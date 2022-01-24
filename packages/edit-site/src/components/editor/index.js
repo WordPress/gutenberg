@@ -30,6 +30,7 @@ import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
 import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
+import CodeEditor from '../code-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
@@ -60,6 +61,7 @@ function Editor( { onError } ) {
 		isNavigationOpen,
 		previousShortcut,
 		nextShortcut,
+		editorMode,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -69,6 +71,7 @@ function Editor( { onError } ) {
 			getEditedPostId,
 			getPage,
 			isNavigationOpened,
+			getEditorMode,
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
 		const postType = getEditedPostType();
@@ -102,6 +105,7 @@ function Editor( { onError } ) {
 			nextShortcut: select(
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
+			editorMode: getEditorMode(),
 		};
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
@@ -220,13 +224,18 @@ function Editor( { onError } ) {
 											content={
 												<>
 													<EditorNotices />
-													{ template && (
-														<BlockEditor
-															setIsInserterOpen={
-																setIsInserterOpened
-															}
-														/>
-													) }
+													{ editorMode === 'visual' &&
+														template && (
+															<BlockEditor
+																setIsInserterOpen={
+																	setIsInserterOpened
+																}
+															/>
+														) }
+													{ editorMode === 'text' &&
+														template && (
+															<CodeEditor />
+														) }
 													{ templateResolved &&
 														! template &&
 														settings?.siteUrl &&
