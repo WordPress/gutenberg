@@ -450,7 +450,7 @@ export const __experimentalGetCurrentThemeBaseGlobalStyles = () => async ( {
 	const themeGlobalStyles = await apiFetch( {
 		path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }`,
 	} );
-	await dispatch.__experimentalReceiveThemeBaseGlobalStyles(
+	dispatch.__experimentalReceiveThemeBaseGlobalStyles(
 		currentTheme.stylesheet,
 		themeGlobalStyles
 	);
@@ -464,7 +464,7 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations = () => async (
 	const variations = await apiFetch( {
 		path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations`,
 	} );
-	await dispatch.__experimentalReceiveThemeGlobalStyleVariations(
+	dispatch.__experimentalReceiveThemeGlobalStyleVariations(
 		currentTheme.stylesheet,
 		variations
 	);
