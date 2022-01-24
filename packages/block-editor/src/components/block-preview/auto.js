@@ -69,8 +69,13 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						position: 'absolute',
 						width: viewportWidth,
 						height: contentHeight,
-						maxHeight: '100vh',
 						pointerEvents: 'none',
+						// This is a catch-all max-height for patterns.
+						// VH units are as tall as your current viewport, and when used inside a scaled iframe
+						// the math to convert an inherited VH unit appears to cause it to keep growing endlessly.
+						// By applying a max-height, at least it will stop growing.
+						// A longer term fix would be to disallow the thumbnail from growing after initial load.
+						maxHeight: '1800px',
 					} }
 				>
 					{ contentResizeListener }
