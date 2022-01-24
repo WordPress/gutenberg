@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { AppRegistry, Text } from 'react-native';
-import { render, waitFor } from 'test/helpers';
+import { AppRegistry } from 'react-native';
+import { initializeEditor, render } from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
 import * as wpHooks from '@wordpress/hooks';
+import '@wordpress/jest-console';
 
 /**
  * Internal dependencies
@@ -30,11 +31,6 @@ const getEditorComponent = ( registerParams ) => {
 };
 
 describe( 'Register Gutenberg', () => {
-	beforeEach( () => {
-		// We need to reset modules to guarantee that setup module is imported on every test.
-		jest.resetModules();
-	} );
-
 	it( 'registers Gutenberg editor component', () => {
 		registerGutenberg();
 		expect( AppRegistry.registerComponent ).toHaveBeenCalled();
@@ -53,7 +49,8 @@ describe( 'Register Gutenberg', () => {
 		} );
 
 		const EditorComponent = getEditorComponent();
-		render( <EditorComponent /> );
+		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
+		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
 		// Reference: https://git.io/JyBk0
@@ -78,7 +75,8 @@ describe( 'Register Gutenberg', () => {
 		} );
 
 		const EditorComponent = getEditorComponent( { beforeInitCallback } );
-		render( <EditorComponent /> );
+		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
+		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
 		// Reference: https://git.io/JyBk0
@@ -105,7 +103,8 @@ describe( 'Register Gutenberg', () => {
 		} ) );
 
 		const EditorComponent = getEditorComponent();
-		render( <EditorComponent /> );
+		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
+		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		const hookCallIndex = 0;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
@@ -135,7 +134,8 @@ describe( 'Register Gutenberg', () => {
 		} ) );
 
 		const EditorComponent = getEditorComponent();
-		render( <EditorComponent /> );
+		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
+		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		const hookCallIndex = 0;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
@@ -165,7 +165,8 @@ describe( 'Register Gutenberg', () => {
 		} ) );
 
 		const EditorComponent = getEditorComponent();
-		render( <EditorComponent /> );
+		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
+		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		const hookCallIndex = 1;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
@@ -181,19 +182,16 @@ describe( 'Register Gutenberg', () => {
 	} );
 
 	it( 'initializes the editor', async () => {
-		const MockEditor = () => <Text>Mock Editor</Text>;
-		jest.mock( '../setup', () => {
-			return {
-				__esModule: true,
-				default: jest.fn( () => <MockEditor /> ),
-			};
-		} );
+		// Unmock setup module to render the actual editor component.
+		jest.unmock( '../setup' );
 
 		const EditorComponent = getEditorComponent();
-		const screen = render( <EditorComponent /> );
-		const blockList = await waitFor( () =>
-			screen.getByText( 'Mock Editor' )
-		);
-		expect( blockList ).toBeDefined();
+		const screen = initializeEditor( {}, { component: EditorComponent } );
+		const blockList = screen.getByTestId( 'block-list-wrapper' );
+
+		expect( blockList ).toHaveProperty( 'type', 'View' );
+		expect( console ).toHaveLoggedWith( 'Hermes is: true' );
+		// It's expected that some blocks are upgraded and inform about it (example: "Updated Block: core/cover")
+		expect( console ).toHaveInformed();
 	} );
 } );
