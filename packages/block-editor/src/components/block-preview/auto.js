@@ -17,8 +17,6 @@ import { store } from '../../store';
 // This is used to avoid rendering the block list if the sizes change.
 let MemoizedBlockList;
 
-const MAX_HEIGHT = 2000;
-
 function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	const [
 		containerResizeListener,
@@ -62,12 +60,8 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 			<Disabled
 				className="block-editor-block-preview__content"
 				style={ {
-					transform: `scale(${ scale })`,
 					height: contentHeight * scale,
-					maxHeight:
-						contentHeight > MAX_HEIGHT
-							? MAX_HEIGHT * scale
-							: undefined,
+					width: '100%',
 				} }
 			>
 				<Iframe
@@ -91,10 +85,9 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						position: 'absolute',
 						width: viewportWidth,
 						height: contentHeight,
+						transform: `scale(${ scale })`,
+						transformOrigin: 'top left',
 						pointerEvents: 'none',
-						// This is a catch-all max-height for patterns.
-						// See: https://github.com/WordPress/gutenberg/pull/38175.
-						maxHeight: MAX_HEIGHT,
 					} }
 				>
 					{ contentResizeListener }
