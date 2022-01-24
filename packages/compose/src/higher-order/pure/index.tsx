@@ -16,7 +16,7 @@ import type { ComponentType, ComponentClass } from 'react';
 
 /**
  * Given a component returns the enhanced component augmented with a component
- * only rerendering when its props/state change
+ * only re-rendering when its props/state change
  */
 const pure = createHigherOrderComponent(
 	< TProps extends Record< string, any > >(

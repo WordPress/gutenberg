@@ -18,7 +18,7 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  *
  * @param  predicate Function to test condition.
  *
- * @return {Object} Higher-order component.
+ * @return Higher-order component.
  */
 const ifCondition = < TProps extends Record< string, any > >(
 	predicate: ( props: TProps ) => boolean

@@ -84,7 +84,7 @@ _Parameters_
 
 _Returns_
 
--   `ComponentType`: Component class with generated display name assigned.
+-   Component class with generated display name assigned.
 
 ### ifCondition
 
@@ -109,12 +109,12 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Higher-order component.
+-   Higher-order component.
 
 ### pure
 
 Given a component returns the enhanced component augmented with a component
-only rerendering when its props/state change
+only re-rendering when its props/state change
 
 ### useAsyncList
 
