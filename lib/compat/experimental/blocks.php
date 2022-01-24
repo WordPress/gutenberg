@@ -52,11 +52,9 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			}
 		}
 
-		$order = ! empty( $block->context['comments/order'] ) ? $block->context['comments/order'] : null;
-		if ( empty( $order ) && get_option( 'comment_order' ) ) {
+		$comment_args['order'] = ! empty( $block->context['comments/order'] ) ? $block->context['comments/order'] : null;
+		if ( empty( $comment_args['order'] ) && get_option( 'comment_order' ) ) {
 			$comment_args['order'] = get_option( 'comment_order' );
-		} else {
-			$comment_args['order'] = $order;
 		}
 
 		return $comment_args;

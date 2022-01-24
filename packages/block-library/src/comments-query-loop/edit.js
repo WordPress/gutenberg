@@ -26,11 +26,10 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 		template: TEMPLATE,
 	} );
 
-	const {
-		__experimentalDiscussionSettings: { commentOrder, commentsPerPage },
-	} = useSelect( ( select ) => {
+	const { commentOrder, commentsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings();
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings;
 	} );
 
 	return (
