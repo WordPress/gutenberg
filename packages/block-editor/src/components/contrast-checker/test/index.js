@@ -415,7 +415,24 @@ describe( 'ContrastChecker', () => {
 		expect( wrapper.html() ).toBeNull();
 	} );
 
-	test( 'should render render null if background color contains a transparency with alpha checker enabled.', () => {
+	test( 'should render null if background color contains a transparency with alpha checker enabled.', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				backgroundColor={ colorWithTransparency }
+				textColor={ sameShade }
+				linkColor={ sameShade }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor }
+				enableAlphaChecker={ true }
+			/>
+		);
+
+		expect( speak ).not.toHaveBeenCalled();
+		expect( wrapper.html() ).toBeNull();
+	} );
+
+	test( 'should render transparency warning only if one text is not readable but the other is transparent and the background color contains a transparency with alpha checker enabled.', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ colorWithTransparency }
@@ -428,8 +445,12 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
-		expect( speak ).not.toHaveBeenCalled();
-		expect( wrapper.html() ).toBeNull();
+		expect( speak ).toHaveBeenCalledWith(
+			'Transparent text may be hard for people to read.'
+		);
+		expect( wrapper.find( Notice ).children().text() ).toBe(
+			'Transparent text may be hard for people to read.'
+		);
 	} );
 
 	test( 'should render component and prioritize contrast warning when the colors do no meet AA WCAG guidelines and text has alpha transparency with the alpha checker enabled.', () => {

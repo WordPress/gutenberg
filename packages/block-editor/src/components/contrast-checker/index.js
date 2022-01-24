@@ -12,6 +12,7 @@ import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
+import {useGetContrastCheckerColors} from "./use-get-contrast-checker-colors";
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -78,146 +79,115 @@ function ContrastChecker( {
 	linkColor,
 	enableAlphaChecker = false,
 } ) {
-	if ( ! ( backgroundColor || fallbackBackgroundColor ) ) {
+	const currentBackgroundColor = backgroundColor || fallbackBackgroundColor;
+
+	// Must have a background color.
+	if ( ! currentBackgroundColor ) {
 		return null;
 	}
 
-	const hasTextColor = !! ( textColor || fallbackTextColor );
-	const hasLinkColor = !! ( linkColor || fallbackLinkColor );
+	const currentTextColor = textColor || fallbackTextColor;
+	const currentLinkColor = linkColor || fallbackLinkColor;
 
 	// Must have at least one text color.
-	if ( ! hasLinkColor && ! hasTextColor ) {
+	if ( ! currentTextColor && ! currentLinkColor ) {
 		return null;
 	}
 
+	// const textSize =
+	// 	isLargeText || ( isLargeText !== false && fontSize >= 24 )
+	// 		? 'large'
+	// 		: 'small';
+	//
+	// const {
+	//
+	// } = useGetContrastCheckerColors( {
+	// 	currentBackgroundColor,
+	// 	currentTextColor,
+	// 	currentLinkColor,
+	// 	enableAlphaChecker,
+	// 	size: textSize,
+	// } );
+
 	const colordBackgroundColor = colord(
-		backgroundColor || fallbackBackgroundColor
+		currentBackgroundColor
 	);
-	const colordTextColor = colord( textColor || fallbackTextColor );
-	const colordLinkColor = colord( linkColor || fallbackLinkColor );
-	const textColorHasTransparency =
-		colordTextColor && colordTextColor.alpha() < 1;
-	const linkColorHasTransparency =
-		colordLinkColor && colordLinkColor.alpha() < 1;
 	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
 
-	const hasTransparency =
-		backgroundColorHasTransparency ||
-		textColorHasTransparency ||
-		linkColorHasTransparency;
+	const hasTextAndLinkColors = currentTextColor && currentLinkColor;
+	// If there's only one color passed, store in `singleTextColor`.
+	const singleTextColor = hasTextAndLinkColors
+		? null
+		: currentTextColor || currentLinkColor;
 
+	const colordTextColor = singleTextColor
+		? colord( singleTextColor )
+		: colord( currentTextColor );
+	const colordLinkColor = colord( currentLinkColor );
+
+	// Transparency.
+	const textColorHasTransparency =
+		currentTextColor && colordTextColor.alpha() < 1;
+	const linkColorHasTransparency =
+		currentLinkColor && colordLinkColor.alpha() < 1;
+
+	// Text size.
 	const textSize =
 		isLargeText || ( isLargeText !== false && fontSize >= 24 )
 			? 'large'
 			: 'small';
 
+	// Readability.
 	const isTextColorReadable =
-		hasTextColor &&
+		currentTextColor &&
 		colordTextColor.isReadable( colordBackgroundColor, {
 			level: 'AA',
 			size: textSize,
 		} );
 
 	const isLinkColorReadable =
-		hasLinkColor &&
+		currentLinkColor &&
 		colordLinkColor.isReadable( colordBackgroundColor, {
 			level: 'AA',
 			size: textSize,
 		} );
 
-	// Don't show the message if the text is readable AND there's no transparency.
-	// This is the default.
-	if ( ! hasTransparency ) {
-		if ( ! hasLinkColor && isTextColorReadable ) {
-			return null;
-		}
-
-		if ( ! hasTextColor && isLinkColorReadable ) {
-			return null;
-		}
-
-		if ( isTextColorReadable && isLinkColorReadable ) {
-			return null;
-		}
-	}
-
-	if ( hasTransparency ) {
-		// If there's transparency, don't show the message if the alpha checker is disabled.
-		if ( ! enableAlphaChecker ) {
-			return null;
-		}
-
-		// If the background has transparency, don't show any warnings.
-		if (
-			backgroundColorHasTransparency &&
-			( ! textColorHasTransparency || ! linkColorHasTransparency )
-		) {
-			return null;
-		}
-
-		// Only text color.
-		if (
-			! hasLinkColor &&
-			isTextColorReadable &&
-			! textColorHasTransparency
-		) {
-			return null;
-		}
-
-		if (
-			! hasTextColor &&
-			isLinkColorReadable &&
-			! linkColorHasTransparency
-		) {
-			return null;
-		}
-
-		if (
-			isTextColorReadable &&
-			! textColorHasTransparency &&
-			isLinkColorReadable &&
-			! linkColorHasTransparency
-		) {
-			return null;
-		}
-	}
-
 	// Flag to warn about transparency only if the text is otherwise readable according to colord
 	// to ensure the readability warnings take precedence.
 	let shouldShowTransparencyWarning = false;
 
-	if ( ! hasLinkColor ) {
-		if ( isTextColorReadable && textColorHasTransparency ) {
-			shouldShowTransparencyWarning = true;
-		}
-	}
-
-	if ( ! hasTextColor ) {
-		if ( isLinkColorReadable && linkColorHasTransparency ) {
-			shouldShowTransparencyWarning = true;
-		}
-	}
-
-	if ( hasTextColor && hasLinkColor ) {
-		if ( linkColorHasTransparency && textColorHasTransparency ) {
-			shouldShowTransparencyWarning = true;
-		}
-
+	// Don't show the message if the text is readable AND there's no transparency.
+	// This is the default.
+	if ( ! textColorHasTransparency && ! linkColorHasTransparency ) {
+		// If the background has transparency, don't show any contrast warnings.
 		if (
-			isLinkColorReadable &&
-			linkColorHasTransparency &&
-			! textColorHasTransparency &&
-			isTextColorReadable
+			backgroundColorHasTransparency ||
+			( isTextColorReadable && isLinkColorReadable ) ||
+			( singleTextColor && isTextColorReadable )
 		) {
+			return null;
+		}
+	} else {
+		// If there's text transparency, don't show the message if the alpha checker is disabled.
+		if ( ! enableAlphaChecker ) {
+			return null;
+		}
+
+		// If the background has transparency, don't show any contrast warnings.
+		if ( backgroundColorHasTransparency ) {
 			shouldShowTransparencyWarning = true;
 		}
 
-		if (
-			isTextColorReadable &&
-			textColorHasTransparency &&
-			! linkColorHasTransparency &&
-			isLinkColorReadable
-		) {
+		// If there is only one text color (text or link) and the color is readable with no transparency.
+		if ( singleTextColor && isTextColorReadable ) {
+			if ( ! textColorHasTransparency ) {
+				return null;
+			}
+			shouldShowTransparencyWarning = true;
+		}
+
+		// If both text colors are readable, but transparent show the warning.
+		if ( isTextColorReadable && isLinkColorReadable ) {
 			shouldShowTransparencyWarning = true;
 		}
 	}
