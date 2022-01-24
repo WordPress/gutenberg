@@ -59,7 +59,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		// Lists/updates a single template based on the given id.
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\/\w-]+)',
+			'/' . $this->rest_base . '/(?P<id>[\/\s%\w\.\(\)\[\]\@_\-]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -131,7 +131,10 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return string Sanitized template ID.
 	 */
 	public function _sanitize_template_id( $id ) {
+		// Decode empty space.
 		$last_slash_pos = strrpos( $id, '/' );
+		$id             = urldecode( $id );
+
 		if ( false === $last_slash_pos ) {
 			return $id;
 		}
@@ -245,6 +248,10 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 
 		$changes = $this->prepare_item_for_database( $request );
 
+		if ( is_wp_error( $changes ) ) {
+			return $changes;
+		}
+
 		if ( 'custom' === $template->source ) {
 			$result = wp_update_post( wp_slash( (array) $changes ), true );
 		} else {
@@ -283,7 +290,12 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$changes            = $this->prepare_item_for_database( $request );
+		$changes = $this->prepare_item_for_database( $request );
+
+		if ( is_wp_error( $changes ) ) {
+			return $changes;
+		}
+
 		$changes->post_name = $request['slug'];
 		$result             = wp_insert_post( wp_slash( (array) $changes ), true );
 		if ( is_wp_error( $result ) ) {
@@ -385,6 +397,9 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			$changes->tax_input   = array(
 				'wp_theme' => $template->theme,
 			);
+			$changes->meta_input  = array(
+				'origin' => $template->source,
+			);
 		} else {
 			$changes->post_name   = $template->slug;
 			$changes->ID          = $template->wp_id;
@@ -416,14 +431,32 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			}
 		}
 
+		if ( ! empty( $request['author'] ) ) {
+			$post_author = (int) $request['author'];
+
+			if ( get_current_user_id() !== $post_author ) {
+				$user_obj = get_userdata( $post_author );
+
+				if ( ! $user_obj ) {
+					return new WP_Error(
+						'rest_invalid_author',
+						__( 'Invalid author ID.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+			}
+
+			$changes->post_author = $post_author;
+		}
+
 		return $changes;
 	}
 
 	/**
 	 * Prepare a single template output for response
 	 *
-	 * @param WP_Block_Template $template Template instance.
-	 * @param WP_REST_Request   $request Request object.
+	 * @param Gutenberg_Block_Template $template Template instance.
+	 * @param WP_REST_Request          $request Request object.
 	 *
 	 * @return WP_REST_Response $data
 	 */
@@ -434,6 +467,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			'content'        => array( 'raw' => $template->content ),
 			'slug'           => $template->slug,
 			'source'         => $template->source,
+			'origin'         => $template->origin,
 			'type'           => $template->type,
 			'description'    => $template->description,
 			'title'          => array(
@@ -443,6 +477,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			'status'         => $template->status,
 			'wp_id'          => $template->wp_id,
 			'has_theme_file' => $template->has_theme_file,
+			'author'         => (int) $template->author,
 		);
 
 		if ( 'wp_template' === $template->type ) {
@@ -565,7 +600,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'required'    => true,
 					'minLength'   => 1,
-					'pattern'     => '[a-zA-Z_\-]+',
+					'pattern'     => '[a-zA-Z0-9_\-]+',
 				),
 				'theme'          => array(
 					'description' => __( 'Theme identifier for the template.', 'gutenberg' ),
@@ -574,6 +609,12 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 				),
 				'source'         => array(
 					'description' => __( 'Source of template', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'origin'         => array(
+					'description' => __( 'Source of customized template', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
@@ -613,6 +654,11 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'type'        => 'bool',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
+				),
+				'author'         => array(
+					'description' => __( 'The ID for the author of the template.', 'gutenberg' ),
+					'type'        => 'integer',
+					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 			),
 		);

@@ -316,11 +316,8 @@ export default compose(
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
 
-		const firstIndex = getBlockIndex( firstClientId, rootClientId );
-		const lastIndex = getBlockIndex(
-			last( normalizedClientIds ),
-			rootClientId
-		);
+		const firstIndex = getBlockIndex( firstClientId );
+		const lastIndex = getBlockIndex( last( normalizedClientIds ) );
 
 		const innerBlocks = getBlocksByClientId( clientIds );
 

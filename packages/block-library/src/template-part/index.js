@@ -50,3 +50,31 @@ addFilter(
 	'core/template-part',
 	enhanceTemplatePartVariations
 );
+
+// Prevent adding template parts inside post templates.
+const DISALLOWED_PARENTS = [ 'core/post-template', 'core/post-content' ];
+addFilter(
+	'blockEditor.__unstableCanInsertBlockType',
+	'removeTemplatePartsFromPostTemplates',
+	(
+		can,
+		blockType,
+		rootClientId,
+		{ getBlock, getBlockParentsByBlockName }
+	) => {
+		if ( blockType.name !== 'core/template-part' ) {
+			return can;
+		}
+
+		for ( const disallowedParentType of DISALLOWED_PARENTS ) {
+			const hasDisallowedParent =
+				getBlock( rootClientId )?.name === disallowedParentType ||
+				getBlockParentsByBlockName( rootClientId, disallowedParentType )
+					.length;
+			if ( hasDisallowedParent ) {
+				return false;
+			}
+		}
+		return true;
+	}
+);

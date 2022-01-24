@@ -19,7 +19,7 @@ export default {
 	title: 'Components/UnitControl',
 	component: UnitControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

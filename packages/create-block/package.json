@@ -41,7 +41,7 @@
 		"lodash": "^4.17.21",
 		"make-dir": "^3.0.0",
 		"mustache": "^4.0.0",
-		"npm-package-arg": "^8.0.1",
+		"npm-package-arg": "^8.1.5",
 		"rimraf": "^3.0.2",
 		"write-pkg": "^4.0.0"
 	},

@@ -28,8 +28,12 @@
 		},
 		"color": {
 			"background": true,
-			"text": false,
-			"links": false
+			"text": false
+		},
+		"spacing": {
+			"__experimentalSkipSerialization": true,
+			"margin": true,
+			"padding": true
 		}
 	}
 }

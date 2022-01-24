@@ -27,7 +27,9 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
-const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+const DEFAULT_BLOCK = {
+	name: 'core/navigation-link',
+};
 
 const LAYOUT = {
 	type: 'default',
@@ -110,11 +112,6 @@ export default function NavigationInnerBlocks( {
 			__experimentalDirectInsert: shouldDirectInsert,
 			orientation,
 			renderAppender: CustomAppender || appender,
-
-			// Ensure block toolbar is not too far removed from item
-			// being edited when in vertical mode.
-			// see: https://github.com/WordPress/gutenberg/pull/34615.
-			__experimentalCaptureToolbars: orientation !== 'vertical',
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.

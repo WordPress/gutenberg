@@ -25,8 +25,8 @@
 	"types": "build-types",
 	"dependencies": {
 		"execa": "^4.0.2",
-		"npm-package-arg": "^8.0.1",
-		"semver": "^7.3.2"
+		"npm-package-arg": "^8.1.5",
+		"semver": "^7.3.5"
 	},
 	"publishConfig": {
 		"access": "public"

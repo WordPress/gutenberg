@@ -1,9 +1,7 @@
 # Block Theme
 
 <div class="callout callout-alert">
-These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors and theme authors.
-
-Documentation is shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. You can provide feedback in the weekly #core-editor chats, or #fse-outreach-experiment channels, or async via Github issues.
+These features are part of the full site editing project releasing in WordPress 5.9. You can provide feedback in the weekly #core-editor chats, or #fse-outreach-experiment channels, or async using GitHub issues.
 </div>
 
 ## What is a block theme?
@@ -131,11 +129,11 @@ A pattern block can be used to insert translatable content inside a block templa
 
 #### Example
 
-Register a pattern: 
+Register a pattern:
 
 ```php
 <?php
-register_block_pattern( 
+register_block_pattern(
 	'myblocktheme/wordpress-credit',
 	array(
 		'title'      => __( 'Wordpress credit', 'myblocktheme' ),
@@ -158,7 +156,7 @@ Load the pattern in a template or template part:
 ```html
 <!-- wp:group -->
 <div class="wp-block-group">
-<!-- wp:pattern {"slug":"myblocktheme/wordpress-credit"} /-->
+	<!-- wp:pattern {"slug":"myblocktheme/wordpress-credit"} /-->
 </div>
 <!-- /wp:group -->
 ```
@@ -174,6 +172,13 @@ Theme authors can opt-out of this feature by removing the `block-templates` them
 ```php
 remove_theme_support( 'block-templates' );
 ```
+
+## Accessibility
+
+A [skip to content link](https://make.wordpress.org/accessibility/handbook/markup/skip-links/) is automatically added on the front of the website when a webpage includes a `<main>` HTML element.
+The skip link points to the `<main>`.
+
+The group, template part, and query blocks can be changed to use `<main>`. You can find the setting to change the HTML element in the block settings sidebar under Advanced.
 
 ## Resources
 

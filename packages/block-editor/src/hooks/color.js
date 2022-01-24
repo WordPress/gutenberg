@@ -216,43 +216,44 @@ function immutableSet( object, path, value ) {
  */
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
-	const {
-		palette: solidsPerOrigin,
-		gradients: gradientsPerOrigin,
-		customGradient: areCustomGradientsEnabled,
-		custom: areCustomSolidsEnabled,
-		text: isTextEnabled,
-		background: isBackgroundEnabled,
-		link: isLinkEnabled,
-	} = useSetting( 'color' ) || {};
+	// Some color settings have a special handling for deprecated flags in `useSetting`,
+	// so we can't unwrap them by doing const { ... } = useSetting('color')
+	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
+	const userPalette = useSetting( 'color.palette.custom' );
+	const themePalette = useSetting( 'color.palette.theme' );
+	const defaultPalette = useSetting( 'color.palette.default' );
+	const allSolids = useMemo(
+		() => [
+			...( userPalette || [] ),
+			...( themePalette || [] ),
+			...( defaultPalette || [] ),
+		],
+		[ userPalette, themePalette, defaultPalette ]
+	);
+	const userGradientPalette = useSetting( 'color.gradients.custom' );
+	const themeGradientPalette = useSetting( 'color.gradients.theme' );
+	const defaultGradientPalette = useSetting( 'color.gradients.default' );
+	const allGradients = useMemo(
+		() => [
+			...( userGradientPalette || [] ),
+			...( themeGradientPalette || [] ),
+			...( defaultGradientPalette || [] ),
+		],
+		[ userGradientPalette, themeGradientPalette, defaultGradientPalette ]
+	);
+	const areCustomSolidsEnabled = useSetting( 'color.custom' );
+	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
+	const isBackgroundEnabled = useSetting( 'color.background' );
+	const isLinkEnabled = useSetting( 'color.link' );
+	const isTextEnabled = useSetting( 'color.text' );
 
 	const solidsEnabled =
-		areCustomSolidsEnabled ||
-		! solidsPerOrigin?.theme ||
-		solidsPerOrigin?.theme?.length > 0;
+		areCustomSolidsEnabled || ! themePalette || themePalette?.length > 0;
 
 	const gradientsEnabled =
 		areCustomGradientsEnabled ||
-		! gradientsPerOrigin?.theme ||
-		gradientsPerOrigin?.theme?.length > 0;
-
-	const allSolids = useMemo(
-		() => [
-			...( solidsPerOrigin?.custom || [] ),
-			...( solidsPerOrigin?.theme || [] ),
-			...( solidsPerOrigin?.default || [] ),
-		],
-		[ solidsPerOrigin ]
-	);
-
-	const allGradients = useMemo(
-		() => [
-			...( gradientsPerOrigin?.custom || [] ),
-			...( gradientsPerOrigin?.theme || [] ),
-			...( gradientsPerOrigin?.default || [] ),
-		],
-		[ gradientsPerOrigin ]
-	);
+		! themeGradientPalette ||
+		themeGradientPalette?.length > 0;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -370,18 +371,19 @@ export function ColorEdit( props ) {
 		props.setAttributes( { style: newStyle } );
 	};
 
+	const enableContrastChecking =
+		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
+
 	return (
 		<ColorPanel
-			enableContrastChecking={
-				// Turn on contrast checker for web only since it's not supported on mobile yet.
-				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
-			}
+			enableContrastChecking={ enableContrastChecking }
 			clientId={ props.clientId }
+			enableAlpha={ true }
 			settings={ [
 				...( hasTextColor
 					? [
 							{
-								label: __( 'Text color' ),
+								label: __( 'Text' ),
 								onColorChange: onChangeColor( 'text' ),
 								colorValue: getColorObjectByAttributeValues(
 									allSolids,
@@ -394,7 +396,7 @@ export function ColorEdit( props ) {
 				...( hasBackgroundColor || hasGradientColor
 					? [
 							{
-								label: __( 'Background color' ),
+								label: __( 'Background' ),
 								onColorChange: hasBackgroundColor
 									? onChangeColor( 'background' )
 									: undefined,
@@ -413,7 +415,7 @@ export function ColorEdit( props ) {
 				...( hasLinkColor
 					? [
 							{
-								label: __( 'Link Color' ),
+								label: __( 'Link' ),
 								onColorChange: onChangeLinkColor,
 								colorValue: getLinkColorFromAttributeValue(
 									allSolids,
@@ -441,28 +443,34 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const { palette: solidsPerOrigin } = useSetting( 'color' ) || {};
+		const userPalette = useSetting( 'color.palette.custom' ) || [];
+		const themePalette = useSetting( 'color.palette.theme' ) || [];
+		const defaultPalette = useSetting( 'color.palette.default' ) || [];
 		const colors = useMemo(
 			() => [
-				...( solidsPerOrigin?.custom || [] ),
-				...( solidsPerOrigin?.theme || [] ),
-				...( solidsPerOrigin?.default || [] ),
+				...( userPalette || [] ),
+				...( themePalette || [] ),
+				...( defaultPalette || [] ),
 			],
-			[ solidsPerOrigin ]
+			[ userPalette, themePalette, defaultPalette ]
 		);
 		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}
+		const extraStyles = {};
 
-		const extraStyles = {
-			color: textColor
-				? getColorObjectByAttributeValues( colors, textColor )?.color
-				: undefined,
-			backgroundColor: backgroundColor
-				? getColorObjectByAttributeValues( colors, backgroundColor )
-						?.color
-				: undefined,
-		};
+		if ( textColor ) {
+			extraStyles.color = getColorObjectByAttributeValues(
+				colors,
+				textColor
+			)?.color;
+		}
+		if ( backgroundColor ) {
+			extraStyles.backgroundColor = getColorObjectByAttributeValues(
+				colors,
+				backgroundColor
+			)?.color;
+		}
 
 		let wrapperProps = props.wrapperProps;
 		wrapperProps = {

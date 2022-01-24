@@ -7,7 +7,7 @@ Note: A single block can only contain one `InnerBlock` component.
 Here is the basic InnerBlocks usage.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -38,7 +38,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, blockEditor ) {
@@ -92,7 +92,7 @@ Specifying this prop does not affect the layout of the inner blocks, but results
 Use the template property to define a set of blocks that prefill the InnerBlocks component when inserted. You can set attributes on the blocks to define their use. The example below shows a book review template using InnerBlocks component and setting placeholders values to show the block usage.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 const MY_TEMPLATE = [
@@ -113,7 +113,7 @@ const MY_TEMPLATE = [
 	},
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 const MY_TEMPLATE = [

@@ -17,7 +17,7 @@ export default {
 	title: 'Components/DateTimePicker',
 	component: DateTimePicker,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

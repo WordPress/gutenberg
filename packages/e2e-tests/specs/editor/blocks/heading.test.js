@@ -9,6 +9,8 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Heading', () => {
+	const COLOR_ITEM_SELECTOR =
+		'.block-editor-panel-color-gradient-settings__item';
 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `.components-color-palette__custom-color`;
 	const CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR =
 		'.components-color-picker button[aria-label="Show detailed inputs"]';
@@ -76,6 +78,11 @@ describe( 'Heading', () => {
 		);
 		await colorPanelToggle.click();
 
+		const textColorButton = await page.waitForSelector(
+			COLOR_ITEM_SELECTOR
+		);
+		await textColorButton.click();
+
 		const customTextColorButton = await page.waitForSelector(
 			CUSTOM_COLOR_BUTTON_X_SELECTOR
 		);
@@ -85,9 +92,9 @@ describe( 'Heading', () => {
 		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
-		await page.keyboard.type( '7700ff' );
+		await page.keyboard.type( '0782f6' );
 		await page.click( 'h3[data-type="core/heading"]' );
-		await page.waitForXPath( '//button[text()="#7700ff"]' );
+		await page.waitForXPath( '//button[text()="#0782f6"]' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -99,13 +106,18 @@ describe( 'Heading', () => {
 		);
 		await colorPanelToggle.click();
 
+		const textColorButton = await page.waitForSelector(
+			COLOR_ITEM_SELECTOR
+		);
+		await textColorButton.click();
+
 		const colorButtonSelector = `//button[@aria-label='Color: Luminous vivid orange']`;
 		const [ colorButton ] = await page.$x( colorButtonSelector );
 		await colorButton.click();
-		await page.click( 'h2[data-type="core/heading"]' );
 		await page.waitForXPath(
 			`${ colorButtonSelector }[@aria-pressed='true']`
 		);
+		await page.click( 'h2[data-type="core/heading"]' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

@@ -8,7 +8,7 @@ import { colord } from 'colord';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
@@ -18,8 +18,8 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
  */
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
-import Dropdown from '../dropdown';
 import { VisuallyHidden } from '../visually-hidden';
+import { CustomColorPickerDropdown } from '../color-palette';
 
 import {
 	addControlPoint,
@@ -31,7 +31,6 @@ import {
 	getHorizontalRelativeGradientPosition,
 } from './utils';
 import {
-	COLOR_POPOVER_PROPS,
 	GRADIENT_MARKERS_WIDTH,
 	MINIMUM_SIGNIFICANT_MOVE,
 	KEYBOARD_CONTROL_POINT_VARIATION,
@@ -74,6 +73,32 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 	);
 }
 
+function GradientColorPickerDropdown( {
+	isRenderedInSidebar,
+	gradientPickerDomRef,
+	...props
+} ) {
+	const popoverProps = useMemo( () => {
+		const result = {
+			className:
+				'components-custom-gradient-picker__color-picker-popover',
+			position: 'top',
+		};
+		if ( isRenderedInSidebar ) {
+			result.anchorRef = gradientPickerDomRef.current;
+			result.position = 'bottom left';
+		}
+		return result;
+	}, [ gradientPickerDomRef.current, isRenderedInSidebar ] );
+	return (
+		<CustomColorPickerDropdown
+			isRenderedInSidebar={ isRenderedInSidebar }
+			popoverProps={ popoverProps }
+			{ ...props }
+		/>
+	);
+}
+
 function ControlPoints( {
 	disableRemove,
 	disableAlpha,
@@ -83,6 +108,7 @@ function ControlPoints( {
 	onChange,
 	onStartControlPointChange,
 	onStopControlPointChange,
+	__experimentalIsRenderedInSidebar,
 } ) {
 	const controlPointMoveState = useRef();
 
@@ -134,7 +160,9 @@ function ControlPoints( {
 		const initialPosition = point?.position;
 		return (
 			ignoreMarkerPosition !== initialPosition && (
-				<Dropdown
+				<GradientColorPickerDropdown
+					gradientPickerDomRef={ gradientPickerDomRef }
+					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					key={ index }
 					onClose={ onStopControlPointChange }
 					renderToggle={ ( { isOpen, onToggle } ) => (
@@ -225,7 +253,7 @@ function ControlPoints( {
 									);
 								} }
 							/>
-							{ ! disableRemove && (
+							{ ! disableRemove && controlPoints.length > 2 && (
 								<Button
 									className="components-custom-gradient-picker__remove-control-point"
 									onClick={ () => {
@@ -244,7 +272,6 @@ function ControlPoints( {
 							) }
 						</>
 					) }
-					popoverProps={ COLOR_POPOVER_PROPS }
 				/>
 			)
 		);
@@ -258,10 +285,14 @@ function InsertPoint( {
 	onCloseInserter,
 	insertPosition,
 	disableAlpha,
+	__experimentalIsRenderedInSidebar,
+	gradientPickerDomRef,
 } ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
-		<Dropdown
+		<GradientColorPickerDropdown
+			gradientPickerDomRef={ gradientPickerDomRef }
+			isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 			className="components-custom-gradient-picker__inserter"
 			onClose={ () => {
 				onCloseInserter();
@@ -314,7 +345,6 @@ function InsertPoint( {
 					} }
 				/>
 			) }
-			popoverProps={ COLOR_POPOVER_PROPS }
 		/>
 	);
 }

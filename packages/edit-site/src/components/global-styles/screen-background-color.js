@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
+import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,7 +17,6 @@ import {
 } from './hooks';
 
 function ScreenBackgroundColor( { name } ) {
-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ gradients ] = useSetting( 'color.gradients', name );
@@ -55,7 +54,6 @@ function ScreenBackgroundColor( { name } ) {
 		return null;
 	}
 
-	const settings = [];
 	let backgroundSettings = {};
 	if ( hasBackgroundColor ) {
 		backgroundSettings = {
@@ -79,25 +77,21 @@ function ScreenBackgroundColor( { name } ) {
 		}
 	}
 
-	settings.push( {
+	const controlProps = {
 		...backgroundSettings,
 		...gradientSettings,
-		label: __( 'Background color' ),
-	} );
+	};
 
 	return (
 		<>
 			<ScreenHeader
-				back={ parentMenu + '/colors' }
 				title={ __( 'Background' ) }
 				description={ __(
 					'Set a background color or gradient for the whole site.'
 				) }
 			/>
-
-			<PanelColorGradientSettings
-				title={ __( 'Color' ) }
-				settings={ settings }
+			<ColorGradientControl
+				className="edit-site-screen-background-color__control"
 				colors={ colorsPerOrigin }
 				gradients={ gradientsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
@@ -105,6 +99,8 @@ function ScreenBackgroundColor( { name } ) {
 				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
+				__experimentalIsRenderedInSidebar
+				{ ...controlProps }
 			/>
 		</>
 	);

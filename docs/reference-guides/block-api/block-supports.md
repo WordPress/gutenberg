@@ -1,20 +1,59 @@
 # Supports
 
-Block Supports is the API that allows a block to declare features used in the editor.
+Block Supports is the API that allows a block to declare support for certain features.
 
-Some block supports — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.
+Opting into any of these features will register additional attributes on the block and provide the UI to manipulate that attribute.
+
+In order for the attribute to get applied to the block the generated properties get added to the wrapping element of the block. They get added to the object you get returned from the `useBlockProps` hook.
+
+`BlockEdit` function:
+```js
+function BlockEdit() {
+	const blockProps = useBlockProps();
+
+	return (
+		<div {...blockProps}>Hello World!</div>
+	);
+}
+```
+
+`save` function:
+```js
+function BlockEdit() {
+	const blockProps = useBlockProps.save();
+
+	return (
+		<div {...blockProps}>Hello World!</div>
+	);
+}
+```
+
+For dynamic blocks that get rendered via a `render_callback` in PHP you can use the `get_block_wrapper_attributes()` function. It returns a string containing all the generated properties and needs to get output in the opening tag of the wrapping block element.
+
+`render_callback` function:
+```php
+function render_block() {
+	$wrapper_attributes = get_block_wrapper_attributes();
+
+	return sprintf(
+		'<div %1$s>%2$s</div>',
+		$wrapper_attributes,
+		'Hello World!'
+	);
+}
+```
 
 ## anchor
 
 -   Type: `boolean`
 -   Default value: `false`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
+Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link. _Important: It doesn't work with dynamic blocks yet._
 
 ```js
 // Declare support for anchor links.
 supports: {
-	anchor: true;
+	anchor: true
 }
 ```
 
@@ -23,21 +62,21 @@ supports: {
 -   Type: `boolean` or `array`
 -   Default value: `false`
 
-This property adds block controls which allow to change block's alignment. _Important: It doesn't work with dynamic blocks yet._
+This property adds block controls which allow to change block's alignment.
 
 ```js
 supports: {
 	// Declare support for block's alignment.
 	// This adds support for all the options:
 	// left, center, right, wide, and full.
-	align: true;
+	align: true
 }
 ```
 
 ```js
 supports: {
 	// Declare support for specific alignment options.
-	align: [ 'left', 'right', 'full' ];
+	align: [ 'left', 'right', 'full' ]
 }
 ```
 
@@ -62,7 +101,7 @@ This property allows to enable [wide alignment](/docs/how-to-guides/themes/theme
 ```js
 supports: {
 	// Remove the support for wide alignment.
-	alignWide: false;
+	alignWide: false
 }
 ```
 
@@ -76,7 +115,7 @@ By default, the class `.wp-block-your-block-name` is added to the root element o
 ```js
 supports: {
 	// Remove the support for the generated className.
-	className: false;
+	className: false
 }
 ```
 
@@ -99,7 +138,7 @@ Note that the `background` and `text` keys have a default value of `true`, so if
 supports: {
 	color: {
 		// This also enables text and background UI controls.
-		gradients: true; // Enable gradients UI control.
+		gradients: true // Enable gradients UI control.
 	}
 }
 ```
@@ -406,7 +445,7 @@ This property adds a field to define a custom className for the block's wrapper.
 ```js
 supports: {
 	// Remove the support for the custom className.
-	customClassName: false;
+	customClassName: false
 }
 ```
 
@@ -420,7 +459,7 @@ When the style picker is shown, the user can set a default style for a block typ
 ```js
 supports: {
 	// Remove the Default Style picker.
-	defaultStylePicker: false;
+	defaultStylePicker: false
 }
 ```
 
@@ -434,7 +473,7 @@ By default, a block's markup can be edited individually. To disable this behavio
 ```js
 supports: {
 	// Remove support for an HTML mode.
-	html: false;
+	html: false
 }
 ```
 
@@ -448,7 +487,7 @@ By default, all blocks will appear in the inserter. To hide a block so that it c
 ```js
 supports: {
 	// Hide this block from the inserter.
-	inserter: false;
+	inserter: false
 }
 ```
 
@@ -462,7 +501,7 @@ A non-multiple block can be inserted into each post, one time only. For example,
 ```js
 supports: {
 	// Use the block just once per post
-	multiple: false;
+	multiple: false
 }
 ```
 

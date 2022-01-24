@@ -40,6 +40,11 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 }
 
 .emotion-6 {
+  display: inline-block;
+  margin-bottom: calc(4px * 2);
+}
+
+.emotion-8 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -56,11 +61,11 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   justify-content: space-between;
 }
 
-.emotion-6>*+*:not( marquee ) {
+.emotion-8>*+*:not( marquee ) {
   margin-top: calc(4px * 3);
 }
 
-.emotion-6>* {
+.emotion-8>* {
   min-height: 0;
 }
 
@@ -81,14 +86,14 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             className="block-editor-color-gradient-control__color-indicator"
           >
             <span
-              className="components-base-control__label"
+              className="components-base-control__label emotion-6 emotion-7"
             >
               Test Color
             </span>
           </div>
         </legend>
         <div
-          className="components-flex components-h-stack components-v-stack emotion-6 emotion-5"
+          className="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
           data-wp-c16t={true}
           data-wp-component="VStack"
         >
@@ -105,6 +110,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
               style={
                 Object {
                   "background": "#f00",
+                  "color": "#000",
                 }
               }
             >

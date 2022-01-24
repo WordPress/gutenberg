@@ -4,15 +4,6 @@
 	justify-content: center;
 	min-height: 152px;
 	line-height: 1;
-
-	.component-color-indicator {
-		border-radius: 50%;
-		border: 0;
-		height: 36px;
-		width: 36px;
-		margin-left: 0;
-		padding: 0;
-	}
 }
 
 .edit-site-typography-panel__preview {
@@ -43,18 +34,8 @@
 	margin: $grid-unit-20;
 
 	.component-color-indicator {
-		margin-left: 0;
-		display: block;
-		border-radius: 50%;
-		border: 0;
-		height: 24px;
-		width: 24px;
-		padding: 0;
-		background-image:
-			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200),
-			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200);
-		background-position: 0 0, 25px 25px;
-		background-size: calc(2 * 5px) calc(2 * 5px);
+		// Show a diagonal line (crossed out) for empty swatches.
+		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 	}
 }
 
@@ -66,7 +47,8 @@
 	// Need to override the too specific styles for complementary areas.
 	margin-bottom: 0 !important;
 	text-transform: uppercase;
-	font-weight: 500;
+	font-weight: 500 !important;
+	font-size: 11px !important;
 }
 
 .edit-site-screen-color-palette-toggle.edit-site-screen-color-palette-toggle {
@@ -76,4 +58,10 @@
 	.components-toggle-group-control {
 		min-height: $grid-unit-40;
 	}
+}
+
+.edit-site-screen-text-color__control,
+.edit-site-screen-link-color__control,
+.edit-site-screen-background-color__control {
+	padding: $grid-unit-20;
 }

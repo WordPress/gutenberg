@@ -5,6 +5,120 @@
  * @package WordPress
  */
 
+// These functions are used for the __unstableLocation feature and only active
+// when the gutenberg plugin is active.
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	/**
+	 * Returns the menu items for a WordPress menu location.
+	 *
+	 * @param string $location The menu location.
+	 * @return array Menu items for the location.
+	 */
+	function block_core_navigation_get_menu_items_at_location( $location ) {
+		if ( empty( $location ) ) {
+			return;
+		}
+
+		// Build menu data. The following approximates the code in
+		// `wp_nav_menu()` and `gutenberg_output_block_nav_menu`.
+
+		// Find the location in the list of locations, returning early if the
+		// location can't be found.
+		$locations = get_nav_menu_locations();
+		if ( ! isset( $locations[ $location ] ) ) {
+			return;
+		}
+
+		// Get the menu from the location, returning early if there is no
+		// menu or there was an error.
+		$menu = wp_get_nav_menu_object( $locations[ $location ] );
+		if ( ! $menu || is_wp_error( $menu ) ) {
+			return;
+		}
+
+		$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
+		_wp_menu_item_classes_by_context( $menu_items );
+
+		return $menu_items;
+	}
+
+
+	/**
+	 * Sorts a standard array of menu items into a nested structure keyed by the
+	 * id of the parent menu.
+	 *
+	 * @param array $menu_items Menu items to sort.
+	 * @return array An array keyed by the id of the parent menu where each element
+	 *               is an array of menu items that belong to that parent.
+	 */
+	function block_core_navigation_sort_menu_items_by_parent_id( $menu_items ) {
+		$sorted_menu_items = array();
+		foreach ( (array) $menu_items as $menu_item ) {
+			$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
+		}
+		unset( $menu_items, $menu_item );
+
+		$menu_items_by_parent_id = array();
+		foreach ( $sorted_menu_items as $menu_item ) {
+			$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
+		}
+
+		return $menu_items_by_parent_id;
+	}
+
+	/**
+	 * Turns menu item data into a nested array of parsed blocks
+	 *
+	 * @param array $menu_items               An array of menu items that represent
+	 *                                        an individual level of a menu.
+	 * @param array $menu_items_by_parent_id  An array keyed by the id of the
+	 *                                        parent menu where each element is an
+	 *                                        array of menu items that belong to
+	 *                                        that parent.
+	 * @return array An array of parsed block data.
+	 */
+	function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
+		if ( empty( $menu_items ) ) {
+			return array();
+		}
+
+		$blocks = array();
+
+		foreach ( $menu_items as $menu_item ) {
+			$class_name       = ! empty( $menu_item->classes ) ? implode( ' ', (array) $menu_item->classes ) : null;
+			$id               = ( null !== $menu_item->object_id && 'custom' !== $menu_item->object ) ? $menu_item->object_id : null;
+			$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
+			$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
+			$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
+
+			$block = array(
+				'blockName' => isset( $menu_items_by_parent_id[ $menu_item->ID ] ) ? 'core/navigation-submenu' : 'core/navigation-link',
+				'attrs'     => array(
+					'className'     => $class_name,
+					'description'   => $menu_item->description,
+					'id'            => $id,
+					'kind'          => $kind,
+					'label'         => $menu_item->title,
+					'opensInNewTab' => $opens_in_new_tab,
+					'rel'           => $rel,
+					'title'         => $menu_item->attr_title,
+					'type'          => $menu_item->object,
+					'url'           => $menu_item->url,
+				),
+			);
+
+			$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+				? block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
+				: array();
+			$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
+
+			$blocks[] = $block;
+		}
+
+		return $blocks;
+	}
+}
+
 /**
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the navigation markup in the front-end.
@@ -145,17 +259,23 @@ function block_core_navigation_get_first_non_empty_navigation() {
 	// see:
 	// - https://github.com/WordPress/wordpress-develop/blob/ba943e113d3b31b121f77a2d30aebe14b047c69d/src/wp-includes/nav-menu.php#L613-L619.
 	// - https://developer.wordpress.org/reference/classes/wp_query/#order-orderby-parameters.
-	$navigation_posts = get_posts(
-		array(
-			'post_type'      => 'wp_navigation',
-			'order'          => 'ASC',
-			'orderby'        => 'name',
-			'posts_per_page' => 1, // only the first post.
-			's'              => '<!-- wp:', // look for block indicators to ensure we only include non-empty Navigations.
-		)
+	$parsed_args = array(
+		'post_type'      => 'wp_navigation',
+		'no_found_rows'  => true,
+		'order'          => 'ASC',
+		'orderby'        => 'name',
+		'post_status'    => 'publish',
+		'posts_per_page' => 20, // Try the first 20 posts.
 	);
-	return count( $navigation_posts ) ? $navigation_posts[0] : null;
 
+	$navigation_posts = new WP_Query( $parsed_args );
+	foreach ( $navigation_posts->posts as $navigation_post ) {
+		if ( has_blocks( $navigation_post ) ) {
+			return $navigation_post;
+		}
+	}
+
+	return null;
 }
 
 /**
@@ -223,6 +343,8 @@ function block_core_navigation_get_fallback_blocks() {
 	 * To customise the blocks provided return an array of blocks - these should be valid
 	 * children of the `core/navigation` block.
 	 *
+	 * @since 5.9.0
+	 *
 	 * @param array[] default fallback blocks provided by the default block mechanic.
 	 */
 	return apply_filters( 'block_core_navigation_render_fallback', $fallback_blocks );
@@ -231,9 +353,9 @@ function block_core_navigation_get_fallback_blocks() {
 /**
  * Renders the `core/navigation` block on server.
  *
- * @param array $attributes The block attributes.
- * @param array $content The saved content.
- * @param array $block The parsed block.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The saved content.
+ * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the post content with the legacy widget added.
  */
@@ -272,37 +394,33 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$inner_blocks = $block->inner_blocks;
 
-	// If `__unstableLocation` is defined and:
-	// - we have menu items at the defined location
-	// - we don't have a relationship to a `wp_navigation` Post (via `navigationMenuId`).
-	// ...then create inner blocks from the classic menu assigned to that location.
-	if (
-		array_key_exists( '__unstableLocation', $attributes ) &&
-		! array_key_exists( 'navigationMenuId', $attributes ) &&
-		! empty( gutenberg_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
-	) {
-		$menu_items = gutenberg_get_menu_items_at_location( $attributes['__unstableLocation'] );
-		if ( empty( $menu_items ) ) {
-			return '';
-		}
-
-		$menu_items_by_parent_id = gutenberg_sort_menu_items_by_parent_id( $menu_items );
-		$parsed_blocks           = gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
-		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
-	}
-
-	if ( ! empty( $block->context['navigationArea'] ) ) {
-		$area    = $block->context['navigationArea'];
-		$mapping = get_option( 'wp_navigation_areas', array() );
-		if ( ! empty( $mapping[ $area ] ) ) {
-			$attributes['ref'] = $mapping[ $area ];
-		}
-	}
-
 	// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
 	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
 		$attributes['ref'] = $attributes['navigationMenuId'];
 	}
+
+	// If:
+	// - the gutenberg plugin is active
+	// - `__unstableLocation` is defined
+	// - we have menu items at the defined location
+	// - we don't have a relationship to a `wp_navigation` Post (via `ref`).
+	// ...then create inner blocks from the classic menu assigned to that location.
+	if (
+		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN &&
+		array_key_exists( '__unstableLocation', $attributes ) &&
+		! array_key_exists( 'ref', $attributes ) &&
+		! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
+	) {
+		$menu_items = block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] );
+		if ( empty( $menu_items ) ) {
+			return '';
+		}
+
+		$menu_items_by_parent_id = block_core_navigation_sort_menu_items_by_parent_id( $menu_items );
+		$parsed_blocks           = block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
+	}
+
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'ref', $attributes ) ) {
 		$navigation_post = get_post( $attributes['ref'] );
@@ -336,14 +454,24 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	}
 
+	$layout_justification = array(
+		'left'          => 'items-justified-left',
+		'right'         => 'items-justified-right',
+		'center'        => 'items-justified-center',
+		'space-between' => 'items-justified-space-between',
+	);
+
 	// Restore legacy classnames for submenu positioning.
 	$layout_class = '';
 	if ( isset( $attributes['layout']['justifyContent'] ) ) {
-		if ( 'right' === $attributes['layout']['justifyContent'] ) {
-			$layout_class .= 'items-justified-right';
-		} elseif ( 'space-between' === $attributes['layout']['justifyContent'] ) {
-			$layout_class .= 'items-justified-space-between';
-		}
+		$layout_class .= $layout_justification[ $attributes['layout']['justifyContent'] ];
+	}
+	if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation'] ) {
+		$layout_class .= ' is-vertical';
+	}
+
+	if ( isset( $attributes['layout']['flexWrap'] ) && 'nowrap' === $attributes['layout']['flexWrap'] ) {
+		$layout_class .= ' no-wrap';
 	}
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
@@ -411,11 +539,15 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$is_hidden_by_default ? 'always-shown' : '',
 	);
 
+	$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
+	$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
+	$toggle_button_content     = $should_display_icon_label ? $toggle_button_icon : 'Menu';
+
 	$responsive_container_markup = sprintf(
-		'<button aria-expanded="false" aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="modal-%1$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
+		'<button aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="modal-%1$s">%9$s</button>
 			<div class="%5$s" style="%7$s" id="modal-%1$s">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
-					<div class="wp-block-navigation__responsive-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-%1$s-title" >
+					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
 							<button aria-label="%4$s" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
 						<div class="wp-block-navigation__responsive-container-content" id="modal-%1$s-content">
 							%2$s
@@ -423,13 +555,15 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 					</div>
 				</div>
 			</div>',
-		$modal_unique_id,
+		esc_attr( $modal_unique_id ),
 		$inner_blocks_html,
 		__( 'Open menu' ), // Open button label.
 		__( 'Close menu' ), // Close button label.
-		implode( ' ', $responsive_container_classes ),
-		implode( ' ', $open_button_classes ),
-		$colors['overlay_inline_styles']
+		esc_attr( implode( ' ', $responsive_container_classes ) ),
+		esc_attr( implode( ' ', $open_button_classes ) ),
+		safecss_filter_attr( $colors['overlay_inline_styles'] ),
+		__( 'Menu' ),
+		$toggle_button_content
 	);
 
 	return sprintf(

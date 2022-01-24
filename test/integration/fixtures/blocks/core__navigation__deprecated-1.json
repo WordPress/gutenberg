@@ -9,7 +9,6 @@
 			"overlayMenu": "mobile",
 			"layout": {
 				"type": "flex",
-				"justifyContent": "left",
 				"orientation": "horizontal"
 			}
 		},

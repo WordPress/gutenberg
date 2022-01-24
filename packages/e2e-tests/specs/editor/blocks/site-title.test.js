@@ -5,41 +5,12 @@ import {
 	createNewPost,
 	createUser,
 	deleteUser,
+	getOption,
 	insertBlock,
 	loginUser,
 	pressKeyWithModifier,
-	switchUserToAdmin,
-	switchUserToTest,
-	visitAdminPage,
+	setOption,
 } from '@wordpress/e2e-test-utils';
-
-async function getOption( setting ) {
-	await switchUserToAdmin();
-	await visitAdminPage( 'options.php' );
-
-	const value = await page.$eval(
-		`#${ setting }`,
-		( element ) => element.value
-	);
-	await switchUserToTest();
-	return value;
-}
-
-async function setOption( setting, value ) {
-	await switchUserToAdmin();
-	await visitAdminPage( 'options-general.php' );
-
-	await page.focus( `#${ setting }` );
-	await pressKeyWithModifier( 'primary', 'a' );
-	await page.type( `#${ setting }`, value );
-
-	await Promise.all( [
-		page.click( '#submit' ),
-		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
-	] );
-
-	await switchUserToTest();
-}
 
 const saveEntities = async () => {
 	const savePostSelector = '.editor-post-publish-button__button';

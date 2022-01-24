@@ -13,7 +13,7 @@ export default {
 	title: 'Components/Placeholder',
 	component: Placeholder,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

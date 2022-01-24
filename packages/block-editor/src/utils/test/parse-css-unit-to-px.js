@@ -6,6 +6,8 @@ import {
 	getPxFromCssUnit,
 } from '../parse-css-unit-to-px';
 
+jest.useRealTimers();
+
 describe( 'getPxFromCssUnit', () => {
 	// Absolute units
 	describe( 'absolute unites should return px values', () => {
@@ -52,6 +54,7 @@ describe( 'getPxFromCssUnit', () => {
 		const testData = [
 			[ '2em', '20px' ],
 			[ '2rem', '20px' ],
+			[ '1.125rem', '11px' ],
 			[ '20vw', '20px' ],
 			[ '20vh', '40px' ],
 			[ '20vmin', '20px' ],

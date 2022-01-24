@@ -54,6 +54,7 @@ export { default as __experimentalPanelColorGradientSettings } from './colors-gr
 export { default as useSetting } from './use-setting';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
 export { default as Warning } from './warning';
+export { default as ContrastChecker } from './contrast-checker';
 
 export {
 	BottomSheetSettings,

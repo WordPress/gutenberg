@@ -7,93 +7,101 @@
 			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
-		"settingsProperties": {
+		"settingsPropertiesAppearanceTools": {
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables ui tools. \nGutenberg plugin required.",
+					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesBorder": {
+			"properties": {
 				"border": {
-					"description": "Settings related to borders.\nGutenberg plugin required.",
+					"description": "Settings related to borders.",
 					"type": "object",
 					"properties": {
 						"color": {
-							"description": "Allow users to set custom border colors.\nGutenberg plugin required.",
+							"description": "Allow users to set custom border colors.",
 							"type": "boolean",
 							"default": false
 						},
 						"radius": {
-							"description": "Allow users to set custom border radius.\nGutenberg plugin required.",
+							"description": "Allow users to set custom border radius.",
 							"type": "boolean",
 							"default": false
 						},
 						"style": {
-							"description": "Allow users to set custom border styles.\nGutenberg plugin required.",
+							"description": "Allow users to set custom border styles.",
 							"type": "boolean",
 							"default": false
 						},
 						"width": {
-							"description": "Allow users to set custom border widths.\nGutenberg plugin required.",
+							"description": "Allow users to set custom border widths.",
 							"type": "boolean",
 							"default": false
 						}
 					},
 					"additionalProperties": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesColor": {
+			"properties": {
 				"color": {
-					"description": "Settings related to colors.\nSince 5.8.",
+					"description": "Settings related to colors.",
 					"type": "object",
 					"properties": {
 						"background": {
-							"description": "Allow users to set background colors.\nGutenberg plugin required.",
+							"description": "Allow users to set background colors.",
 							"type": "boolean",
 							"default": true
 						},
 						"custom": {
-							"description": "Allow users to select custom colors.\nSince 5.8.",
+							"description": "Allow users to select custom colors.",
 							"type": "boolean",
 							"default": true
 						},
 						"customDuotone": {
-							"description": "Allow users to create custom duotone filters.\nSince 5.8.",
+							"description": "Allow users to create custom duotone filters.",
 							"type": "boolean",
 							"default": true
 						},
 						"customGradient": {
-							"description": "Allow users to create custom gradients.\nSince 5.8.",
+							"description": "Allow users to create custom gradients.",
 							"type": "boolean",
 							"default": true
 						},
 						"defaultGradients": {
-							"description": "Allow users to choose colors from the default gradients. \nGutenberg plugin required.",
+							"description": "Allow users to choose colors from the default gradients.",
 							"type": "boolean",
 							"default": true
 						},
 						"defaultPalette": {
-							"description": "Allow users to choose colors from the default palette. \nGutenberg plugin required.",
+							"description": "Allow users to choose colors from the default palette.",
 							"type": "boolean",
 							"default": true
 						},
 						"duotone": {
-							"description": "Duotone presets for the duotone picker.\nDoesn't generate classes or properties.\nSince 5.8.",
+							"description": "Duotone presets for the duotone picker.\nDoesn't generate classes or properties.",
 							"type": "array",
 							"items": {
 								"type": "object",
 								"properties": {
 									"name": {
-										"description": "Name of the duotone preset, translatable.\nSince 5.8.",
+										"description": "Name of the duotone preset, translatable.",
 										"type": "string"
 									},
 									"slug": {
-										"description": "Kebab-case unique identifier for the duotone preset.\nSince 5.8.",
+										"description": "Kebab-case unique identifier for the duotone preset.",
 										"type": "string"
 									},
 									"colors": {
-										"description": "List of colors from dark to light.\nSince 5.8.",
+										"description": "List of colors from dark to light.",
 										"type": "array",
 										"items": {
-											"description": "CSS hex or rgb string.\nSince 5.8.",
+											"description": "CSS hex or rgb string.",
 											"type": "string"
 										}
 									}
@@ -103,21 +111,21 @@
 							}
 						},
 						"gradients": {
-							"description": "Gradient presets for the gradient picker.\nGenerates a single class (`.has-{slug}-background`) and custom property (`--wp--preset--gradient--{slug}`) per preset value.\nSince 5.8.",
+							"description": "Gradient presets for the gradient picker.\nGenerates a single class (`.has-{slug}-background`) and custom property (`--wp--preset--gradient--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
 								"type": "object",
 								"properties": {
 									"name": {
-										"description": "Name of the gradient preset, translatable.\nSince 5.8.",
+										"description": "Name of the gradient preset, translatable.",
 										"type": "string"
 									},
 									"slug": {
-										"description": "Kebab-case unique identifier for the gradient preset.\nSince 5.8.",
+										"description": "Kebab-case unique identifier for the gradient preset.",
 										"type": "string"
 									},
 									"gradient": {
-										"description": "CSS gradient string.\nSince 5.8.",
+										"description": "CSS gradient string.",
 										"type": "string"
 									}
 								},
@@ -126,26 +134,26 @@
 							}
 						},
 						"link": {
-							"description": "Allow users to set link colors.\nSince 5.8.",
+							"description": "Allow users to set link colors.",
 							"type": "boolean",
 							"default": false
 						},
 						"palette": {
-							"description": "Color palette presets for the color picker.\nGenerates three classes (`.has-{slug}-color`, `.has-{slug}-background-color`, and `.has-{slug}-border-color`) and a single custom property (`--wp--preset--color--{slug}`) per preset value.\nSince 5.8.",
+							"description": "Color palette presets for the color picker.\nGenerates three classes (`.has-{slug}-color`, `.has-{slug}-background-color`, and `.has-{slug}-border-color`) and a single custom property (`--wp--preset--color--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
 								"type": "object",
 								"properties": {
 									"name": {
-										"description": "Name of the color preset, translatable.\nSince 5.8.",
+										"description": "Name of the color preset, translatable.",
 										"type": "string"
 									},
 									"slug": {
-										"description": "Kebab-case unique identifier for the color preset.\nSince 5.8.",
+										"description": "Kebab-case unique identifier for the color preset.",
 										"type": "string"
 									},
 									"color": {
-										"description": "CSS hex or rgb(a) string.\nSince 5.8.",
+										"description": "CSS hex or rgb(a) string.",
 										"type": "string"
 									}
 								},
@@ -154,34 +162,42 @@
 							}
 						},
 						"text": {
-							"description": "Allow users to set text colors.\nGutenberg plugin required.",
+							"description": "Allow users to set text colors.",
 							"type": "boolean",
 							"default": true
 						}
 					},
 					"additionalProperties": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesLayout": {
+			"properties": {
 				"layout": {
-					"description": "Settings related to layout.\nSince 5.8.",
+					"description": "Settings related to layout.",
 					"type": "object",
 					"properties": {
 						"contentSize": {
-							"description": "Sets the max-width of the content.\nSince 5.8.",
+							"description": "Sets the max-width of the content.",
 							"type": "string"
 						},
 						"wideSize": {
-							"description": "Sets the max-width of wide (`.alignwide`) content.\nSince 5.8.",
+							"description": "Sets the max-width of wide (`.alignwide`) content.",
 							"type": "string"
 						}
 					},
 					"additionalProperties": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesSpacing": {
+			"properties": {
 				"spacing": {
-					"description": "Settings related to spacing.\nSince 5.8.",
+					"description": "Settings related to spacing.",
 					"type": "object",
 					"properties": {
 						"blockGap": {
-							"description": "Enables `--wp--style--block-gap` to be generated from styles.spacing.blockGap.\nA value of `null` instead of `false` further disables layout styles from being generated.\nGutenberg plugin required.",
+							"description": "Enables `--wp--style--block-gap` to be generated from styles.spacing.blockGap.\nA value of `null` instead of `false` further disables layout styles from being generated.",
 							"oneOf": [
 								{ "type": "boolean" },
 								{ "type": "null" }
@@ -189,17 +205,17 @@
 							"default": null
 						},
 						"margin": {
-							"description": "Allow users to set a custom margin.\nSince 5.8.",
+							"description": "Allow users to set a custom margin.",
 							"type": "boolean",
 							"default": false
 						},
 						"padding": {
-							"description": "Allow users to set a custom padding.\nSince 5.8.",
+							"description": "Allow users to set a custom padding.",
 							"type": "boolean",
 							"default": false
 						},
 						"units": {
-							"description": "List of units the user can use for spacing values.\nSince 5.8.",
+							"description": "List of units the user can use for spacing values.",
 							"type": "array",
 							"items": {
 								"type": "string"
@@ -208,67 +224,71 @@
 						}
 					},
 					"additionalProperties": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesTypography": {
+			"properties": {
 				"typography": {
-					"description": "Settings related to typography.\nSince 5.8.",
+					"description": "Settings related to typography.",
 					"type": "object",
 					"properties": {
 						"customFontSize": {
-							"description": "Allow users to set custom font sizes.\nSince 5.8.",
+							"description": "Allow users to set custom font sizes.",
 							"type": "boolean",
 							"default": true
 						},
 						"fontStyle": {
-							"description": "Allow users to set custom font styles.\nGutenberg plugin required.",
+							"description": "Allow users to set custom font styles.",
 							"type": "boolean",
 							"default": true
 						},
 						"fontWeight": {
-							"description": "Allow users to set custom font weights.\nGutenberg plugin required.",
+							"description": "Allow users to set custom font weights.",
 							"type": "boolean",
 							"default": true
 						},
 						"letterSpacing": {
-							"description": "Allow users to set custom letter spacing.\nGutenberg plugin required.",
+							"description": "Allow users to set custom letter spacing.",
 							"type": "boolean",
 							"default": true
 						},
 						"lineHeight": {
-							"description": "Allow users to set custom line height.\nSince 5.8.",
+							"description": "Allow users to set custom line height.",
 							"type": "boolean",
 							"default": false
 						},
 						"textDecoration": {
-							"description": "Allow users to set custom text decorations.\nGutenberg plugin required.",
+							"description": "Allow users to set custom text decorations.",
 							"type": "boolean",
 							"default": true
 						},
 						"textTransform": {
-							"description": "Allow users to set custom text transforms.\nGutenberg plugin required.",
+							"description": "Allow users to set custom text transforms.",
 							"type": "boolean",
 							"default": true
 						},
 						"dropCap": {
-							"description": "Enable drop cap.\nSince 5.8.",
+							"description": "Enable drop cap.",
 							"type": "boolean",
 							"default": true
 						},
 						"fontSizes": {
-							"description": "Font size presets for the font size selector.\nGenerates a single class (`.has-{slug}-color`) and custom property (`--wp--preset--font-size--{slug}`) per preset value.\nSince 5.8.",
+							"description": "Font size presets for the font size selector.\nGenerates a single class (`.has-{slug}-color`) and custom property (`--wp--preset--font-size--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
 								"type": "object",
 								"properties": {
 									"name": {
-										"description": "Name of the font size preset, translatable.\nSince 5.8.",
+										"description": "Name of the font size preset, translatable.",
 										"type": "string"
 									},
 									"slug": {
-										"description": "Kebab-case unique identifier for the font size preset.\nSince 5.8.",
+										"description": "Kebab-case unique identifier for the font size preset.",
 										"type": "string"
 									},
 									"size": {
-										"description": "CSS font-size value, including units.\nSince 5.8.",
+										"description": "CSS font-size value, including units.",
 										"type": "string"
 									}
 								},
@@ -276,21 +296,21 @@
 							}
 						},
 						"fontFamilies": {
-							"description": "Font family presets for the font family selector.\nGenerates a single custom property (`--wp--preset--font-family--{slug}`) per preset value.\nGutenberg plugin required.",
+							"description": "Font family presets for the font family selector.\nGenerates a single custom property (`--wp--preset--font-family--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
 								"type": "object",
 								"properties": {
 									"name": {
-										"description": "Name of the font family preset, translatable.\nSince 5.8.",
+										"description": "Name of the font family preset, translatable.",
 										"type": "string"
 									},
 									"slug": {
-										"description": "Kebab-case unique identifier for the font family preset.\nSince 5.8.",
+										"description": "Kebab-case unique identifier for the font family preset.",
 										"type": "string"
 									},
 									"fontFamily": {
-										"description": "CSS font-family value.\nSince 5.8.",
+										"description": "CSS font-family value.",
 										"type": "string"
 									}
 								},
@@ -299,12 +319,27 @@
 						}
 					},
 					"additionalProperties": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesCustom": {
+			"properties": {
 				"custom": {
-					"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.\nSince 5.8.",
+					"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
 					"$ref": "#/definitions/settingsCustomAdditionalProperties"
 				}
 			}
+		},
+		"settingsProperties": {
+			"allOf": [
+				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
+				{ "$ref": "#/definitions/settingsPropertiesBorder" },
+				{ "$ref": "#/definitions/settingsPropertiesColor" },
+				{ "$ref": "#/definitions/settingsPropertiesLayout" },
+				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
+				{ "$ref": "#/definitions/settingsPropertiesTypography" },
+				{ "$ref": "#/definitions/settingsPropertiesCustom" }
+			]
 		},
 		"settingsPropertiesComplete": {
 			"type": "object",
@@ -314,6 +349,7 @@
 				},
 				{
 					"properties": {
+						"appearanceTools": {},
 						"border": {},
 						"color": {},
 						"layout": {},
@@ -338,7 +374,33 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/settingsPropertiesAppearanceTools"
+						},
+						{
+							"properties": {
+								"border": {
+									"description": "Settings related to borders.\nGutenberg plugin required.",
+									"type": "object",
+									"properties": {
+										"radius": {
+											"description": "Allow users to set custom border radius.\nGutenberg plugin required.",
+											"type": "boolean",
+											"default": false
+										}
+									}
+								}
+							}
+						},
+						{ "$ref": "#/definitions/settingsPropertiesColor" },
+						{ "$ref": "#/definitions/settingsPropertiesLayout" },
+						{ "$ref": "#/definitions/settingsPropertiesSpacing" },
+						{
+							"$ref": "#/definitions/settingsPropertiesTypography"
+						},
+						{ "$ref": "#/definitions/settingsPropertiesCustom" }
+					]
 				},
 				"core/buttons": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -604,49 +666,49 @@
 		"stylesProperties": {
 			"properties": {
 				"border": {
-					"description": "Border styles.\nGutenberg plugin required.",
+					"description": "Border styles.",
 					"type": "object",
 					"properties": {
 						"color": {
-							"description": "Sets the `border-color` CSS property.\nGutenberg plugin required.",
+							"description": "Sets the `border-color` CSS property.",
 							"type": "string"
 						},
 						"radius": {
-							"description": "Sets the `border-radius` CSS property.\nGutenberg plugin required.",
+							"description": "Sets the `border-radius` CSS property.",
 							"type": "string"
 						},
 						"style": {
-							"description": "Sets the `border-style` CSS property.\nGutenberg plugin required.",
+							"description": "Sets the `border-style` CSS property.",
 							"type": "string"
 						},
 						"width": {
-							"description": "Sets the `border-width` CSS property.\nGutenberg plugin required.",
+							"description": "Sets the `border-width` CSS property.",
 							"type": "string"
 						}
 					},
 					"additionalProperties": false
 				},
 				"color": {
-					"description": "Color styles.\nSince 5.8.",
+					"description": "Color styles.",
 					"type": "object",
 					"properties": {
 						"background": {
-							"description": "Sets the `background-color` CSS property.\nSince 5.8.",
+							"description": "Sets the `background-color` CSS property.",
 							"type": "string"
 						},
 						"gradient": {
-							"description": "Sets the `background` CSS property.\nSince 5.8.",
+							"description": "Sets the `background` CSS property.",
 							"type": "string"
 						},
 						"text": {
-							"description": "Sets the `color` CSS property.\nSince 5.8.",
+							"description": "Sets the `color` CSS property.",
 							"type": "string"
 						}
 					},
 					"additionalProperties": false
 				},
 				"spacing": {
-					"description": "Spacing styles.\nSince 5.8.",
+					"description": "Spacing styles.",
 					"type": "object",
 					"properties": {
 						"blockGap": {
@@ -654,46 +716,46 @@
 							"type": "string"
 						},
 						"margin": {
-							"description": "Margin styles.\nSince 5.8.",
+							"description": "Margin styles.",
 							"type": "object",
 							"properties": {
 								"top": {
-									"description": "Sets the `margin-top` CSS property.\nSince 5.8.",
+									"description": "Sets the `margin-top` CSS property.",
 									"type": "string"
 								},
 								"right": {
-									"description": "Sets the `margin-right` CSS property.\nSince 5.8.",
+									"description": "Sets the `margin-right` CSS property.",
 									"type": "string"
 								},
 								"bottom": {
-									"description": "Sets the `margin-bottom` CSS property.\nSince 5.8.",
+									"description": "Sets the `margin-bottom` CSS property.",
 									"type": "string"
 								},
 								"left": {
-									"description": "Sets the `margin-left` CSS property.\nSince 5.8.",
+									"description": "Sets the `margin-left` CSS property.",
 									"type": "string"
 								}
 							},
 							"additionalProperties": false
 						},
 						"padding": {
-							"description": "Padding styles.\nSince 5.8.",
+							"description": "Padding styles.",
 							"type": "object",
 							"properties": {
 								"top": {
-									"description": "Sets the `padding-top` CSS property.\nSince 5.8.",
+									"description": "Sets the `padding-top` CSS property.",
 									"type": "string"
 								},
 								"right": {
-									"description": "Sets the `padding-right` CSS property.\nSince 5.8.",
+									"description": "Sets the `padding-right` CSS property.",
 									"type": "string"
 								},
 								"bottom": {
-									"description": "Sets the `padding-bottom` CSS property.\nSince 5.8.",
+									"description": "Sets the `padding-bottom` CSS property.",
 									"type": "string"
 								},
 								"left": {
-									"description": "Sets the `padding-left` CSS property.\nSince 5.8.",
+									"description": "Sets the `padding-left` CSS property.",
 									"type": "string"
 								}
 							},
@@ -703,39 +765,39 @@
 					"additionalProperties": false
 				},
 				"typography": {
-					"description": "Typography styles.\nSince 5.8.",
+					"description": "Typography styles.",
 					"type": "object",
 					"properties": {
 						"fontFamily": {
-							"description": "Sets the `font-family` CSS property.\nGutenberg plugin required.",
+							"description": "Sets the `font-family` CSS property.",
 							"type": "string"
 						},
 						"fontSize": {
-							"description": "Sets the `font-size` CSS property.\nSince 5.8.",
+							"description": "Sets the `font-size` CSS property.",
 							"type": "string"
 						},
 						"fontStyle": {
-							"description": "Sets the `font-style` CSS property.\nGutenberg plugin required.",
+							"description": "Sets the `font-style` CSS property.",
 							"type": "string"
 						},
 						"fontWeight": {
-							"description": "Sets the `font-weight` CSS property.\nGutenberg plugin required.",
+							"description": "Sets the `font-weight` CSS property.",
 							"type": "string"
 						},
 						"letterSpacing": {
-							"description": "Sets the `letter-spacing` CSS property.\nGutenberg plugin required.",
+							"description": "Sets the `letter-spacing` CSS property.",
 							"type": "string"
 						},
 						"lineHeight": {
-							"description": "Sets the `line-height` CSS property.\nSince 5.8.",
+							"description": "Sets the `line-height` CSS property.",
 							"type": "string"
 						},
 						"textDecoration": {
-							"description": "Sets the `text-decoration` CSS property.\nGutenberg plugin required.",
+							"description": "Sets the `text-decoration` CSS property.",
 							"type": "string"
 						},
 						"textTransform": {
-							"description": "Sets the `text-transform` CSS property.\nGutenberg plugin required.",
+							"description": "Sets the `text-transform` CSS property.",
 							"type": "string"
 						}
 					},
@@ -1041,7 +1103,7 @@
 				}
 			},
 			"patternProperties": {
-				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
+				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				}
 			},
@@ -1075,12 +1137,12 @@
 			"type": "string"
 		},
 		"version": {
-			"description": "Version of theme.json to use.\nSince 5.8.",
+			"description": "Version of theme.json to use.",
 			"type": "integer",
-			"enum": [ 1 ]
+			"enum": [ 2 ]
 		},
 		"settings": {
-			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).\nSince 5.8.",
+			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
 			"type": "object",
 			"allOf": [
 				{
@@ -1088,6 +1150,7 @@
 				},
 				{
 					"properties": {
+						"appearanceTools": {},
 						"color": {},
 						"layout": {},
 						"spacing": {},
@@ -1095,7 +1158,7 @@
 						"border": {},
 						"custom": {},
 						"blocks": {
-							"description": "Settings defined on a per-block basis.\nSince 5.8.",
+							"description": "Settings defined on a per-block basis.",
 							"$ref": "#/definitions/settingsBlocksPropertiesComplete"
 						}
 					},
@@ -1104,7 +1167,7 @@
 			]
 		},
 		"styles": {
-			"description": "Organized way to set CSS properties. Styles in the top-level will be added in the `body` selector.\nSince 5.8.",
+			"description": "Organized way to set CSS properties. Styles in the top-level will be added in the `body` selector.",
 			"type": "object",
 			"allOf": [
 				{
@@ -1117,11 +1180,11 @@
 						"spacing": {},
 						"typography": {},
 						"elements": {
-							"description": "Styles defined on a per-element basis using the element's selector.\nSince 5.8.",
+							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"blocks": {
-							"description": "Styles defined on a per-block basis using the block's selector.\nSince 5.8.",
+							"description": "Styles defined on a per-block basis using the block's selector.",
 							"$ref": "#/definitions/stylesBlocksPropertiesComplete"
 						}
 					},
@@ -1130,21 +1193,21 @@
 			]
 		},
 		"customTemplates": {
-			"description": "Additional metadata for custom templates defined in the templates folder.\nGutenberg plugin required.",
+			"description": "Additional metadata for custom templates defined in the templates folder.",
 			"type": "array",
 			"items": {
 				"type": "object",
 				"properties": {
 					"name": {
-						"description": "Filename, without extension, of the template in the templates folder.\nGutenberg plugin required.",
+						"description": "Filename, without extension, of the template in the templates folder.",
 						"type": "string"
 					},
 					"title": {
-						"description": "Title of the template, translatable.\nGutenberg plugin required.",
+						"description": "Title of the template, translatable.",
 						"type": "string"
 					},
 					"postTypes": {
-						"description": "List of post types that can use this custom template.\nGutenberg plugin required.",
+						"description": "List of post types that can use this custom template.",
 						"type": "array",
 						"items": {
 							"type": "string"
@@ -1157,21 +1220,21 @@
 			}
 		},
 		"templateParts": {
-			"description": "Additional metadata for template parts defined in the parts folder.\nGutenberg plugin required.",
+			"description": "Additional metadata for template parts defined in the parts folder.",
 			"type": "array",
 			"items": {
 				"type": "object",
 				"properties": {
 					"name": {
-						"description": "Filename, without extension, of the template in the parts folder.\nGutenberg plugin required.",
+						"description": "Filename, without extension, of the template in the parts folder.",
 						"type": "string"
 					},
 					"title": {
-						"description": "Title of the template, translatable.\nGutenberg plugin required.",
+						"description": "Title of the template, translatable.",
 						"type": "string"
 					},
 					"area": {
-						"description": "The area the template part is used for. Block variations for `header` and `footer` values exist and will be used when the area is set to one of those.\nGutenberg plugin required.",
+						"description": "The area the template part is used for. Block variations for `header` and `footer` values exist and will be used when the area is set to one of those.",
 						"type": "string",
 						"default": "uncategorized"
 					}

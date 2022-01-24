@@ -197,6 +197,9 @@ describe( 'Cover', () => {
 		await insertBlock( 'Image' );
 		// Upload image and transform to the Cover block
 		await upload( '.wp-block-image' );
+		// Click the block wrapper before trying to convert to make sure figcaption toolbar is not obscuring
+		// the block toolbar.
+		await page.click( '.wp-block-image' );
 		await transformBlockTo( 'Cover' );
 
 		// Get the block's background dim color and its opacity

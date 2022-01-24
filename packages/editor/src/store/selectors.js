@@ -839,7 +839,12 @@ export function getEditedPostPreviewLink( state ) {
 	}
 
 	let previewLink = getAutosaveAttribute( state, 'preview_link' );
-	if ( ! previewLink ) {
+	// Fix for issue: https://github.com/WordPress/gutenberg/issues/33616
+	// If the post is draft, ignore the preview link from the autosave record,
+	// because the preview could be a stale autosave if the post was switched from
+	// published to draft.
+	// See: https://github.com/WordPress/gutenberg/pull/37952
+	if ( ! previewLink || 'draft' === getCurrentPost( state ).status ) {
 		previewLink = getEditedPostAttribute( state, 'link' );
 		if ( previewLink ) {
 			previewLink = addQueryArgs( previewLink, { preview: true } );
@@ -1166,8 +1171,7 @@ export function getEditorBlocks( state ) {
  */
 export function getEditorSelectionStart( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
-		since: '10.0',
-		plugin: 'Gutenberg',
+		since: '5.8',
 		alternative: "select('core/editor').getEditorSelection",
 	} );
 	return getEditedPostAttribute( state, 'selection' )?.selectionStart;
@@ -1183,8 +1187,7 @@ export function getEditorSelectionStart( state ) {
  */
 export function getEditorSelectionEnd( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
-		since: '10.0',
-		plugin: 'Gutenberg',
+		since: '5.8',
 		alternative: "select('core/editor').getEditorSelection",
 	} );
 	return getEditedPostAttribute( state, 'selection' )?.selectionEnd;
@@ -1258,6 +1261,7 @@ function getBlockEditorSelector( name ) {
 		deprecated( "`wp.data.select( 'core/editor' )." + name + '`', {
 			since: '5.3',
 			alternative: "`wp.data.select( 'core/block-editor' )." + name + '`',
+			version: '6.2',
 		} );
 
 		return select( blockEditorStore )[ name ]( ...args );

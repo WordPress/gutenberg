@@ -17,7 +17,7 @@ export default {
 	title: 'Components/ResizableBox',
 	component: ResizableBox,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

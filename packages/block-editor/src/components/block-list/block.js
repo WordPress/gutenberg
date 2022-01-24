@@ -259,7 +259,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
 			const { getBlockIndex } = select( blockEditorStore );
-			const index = getBlockIndex( clientId, rootClientId );
+			const index = getBlockIndex( clientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {

@@ -8,25 +8,11 @@
 	margin-right: 0;
 }
 
-// To do: remove horizontal margin override by the editor.
-@include break-small() {
-	.editor-styles-wrapper
-	.block-editor-block-list__block.wp-block-column:nth-child(even) {
-		margin-left: var(--wp--style--block-gap, 2em);
-	}
-}
-
-@include break-medium() {
-	.editor-styles-wrapper
-	.block-editor-block-list__block.wp-block-column:not(:first-child) {
-		margin-left: var(--wp--style--block-gap, 2em);
-	}
-}
-
 // Individual columns do not have top and bottom margins on the frontend.
 // So we make the editor match that.
-// Needs specificity.
-.block-editor-block-list__block.wp-block-column.wp-block-column {
+// We use :where to provide minimum specificity, so that intentional margins,
+// such as those configured in theme.json, override and win on specificity.
+html :where(.wp-block-column) {
 	margin-top: 0;
 	margin-bottom: 0;
 }

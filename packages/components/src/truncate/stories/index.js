@@ -12,7 +12,7 @@ export default {
 	component: Truncate,
 	title: 'Components (Experimental)/Truncate',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

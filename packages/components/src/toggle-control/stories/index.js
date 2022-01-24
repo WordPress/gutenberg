@@ -17,7 +17,7 @@ export default {
 	title: 'Components/ToggleControl',
 	component: ToggleControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

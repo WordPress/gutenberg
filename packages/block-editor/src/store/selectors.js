@@ -30,6 +30,7 @@ import {
 	parse,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 
 /**
@@ -826,6 +827,7 @@ export const isAncestorMultiSelected = createSelector(
 		state.selection.selectionEnd.clientId,
 	]
 );
+
 /**
  * Returns the client ID of the block which begins the multi-selection set, or
  * null if there is no multi-selection.
@@ -888,13 +890,13 @@ export function getBlockOrder( state, rootClientId ) {
  * Returns the index at which the block corresponding to the specified client
  * ID occurs within the block order, or `-1` if the block does not exist.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientId     Block client ID.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
  *
  * @return {number} Index at which block exists in order.
  */
-export function getBlockIndex( state, clientId, rootClientId ) {
+export function getBlockIndex( state, clientId ) {
+	const rootClientId = getBlockRootClientId( state, clientId );
 	return getBlockOrder( state, rootClientId ).indexOf( clientId );
 }
 
@@ -1259,15 +1261,43 @@ const canInsertBlockTypeUnmemoized = (
 		parentName
 	);
 
-	if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
-		return hasParentAllowedBlock || hasBlockAllowedParent;
-	} else if ( hasParentAllowedBlock !== null ) {
-		return hasParentAllowedBlock;
-	} else if ( hasBlockAllowedParent !== null ) {
-		return hasBlockAllowedParent;
+	const canInsert =
+		( hasParentAllowedBlock === null && hasBlockAllowedParent === null ) ||
+		hasParentAllowedBlock === true ||
+		hasBlockAllowedParent === true;
+
+	if ( ! canInsert ) {
+		return canInsert;
 	}
 
-	return true;
+	/**
+	 * This filter is an ad-hoc solution to prevent adding template parts inside post content.
+	 * Conceptually, having a filter inside a selector is bad pattern so this code will be
+	 * replaced by a declarative API that doesn't the following drawbacks:
+	 *
+	 * Filters are not reactive: Upon switching between "template mode" and non "template mode",
+	 * the filter and selector won't necessarily be executed again. For now, it doesn't matter much
+	 * because you can't switch between the two modes while the inserter stays open.
+	 *
+	 * Filters are global: Once they're defined, they will affect all editor instances and all registries.
+	 * An ideal API would only affect specific editor instances.
+	 */
+	return applyFilters(
+		'blockEditor.__unstableCanInsertBlockType',
+		canInsert,
+		blockType,
+		rootClientId,
+		{
+			// Pass bound selectors of the current registry. If we're in a nested
+			// context, the data will differ from the one selected from the root
+			// registry.
+			getBlock: getBlock.bind( null, state ),
+			getBlockParentsByBlockName: getBlockParentsByBlockName.bind(
+				null,
+				state
+			),
+		}
+	);
 };
 
 /**
@@ -1814,10 +1844,15 @@ export const __experimentalGetAllowedBlocks = createSelector(
 /**
  * Returns the block to be directly inserted by the block appender.
  *
- * @param {Object}  state        Editor state.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param    {Object}         state            Editor state.
+ * @param    {?string}        rootClientId     Optional root client ID of block list.
  *
- * @return {?Array} The block type to be directly inserted.
+ * @return {?WPDirectInsertBlock}              The block type to be directly inserted.
+ *
+ * @typedef {Object} WPDirectInsertBlock
+ * @property {string}         name             The type of block.
+ * @property {?Object}        attributes       Attributes to pass to the newly created block.
+ * @property {?Array<string>} attributesToCopy Attributes to be copied from adjecent blocks when inserted.
  */
 export const __experimentalGetDirectInsertBlock = createSelector(
 	( state, rootClientId = null ) => {

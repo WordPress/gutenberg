@@ -16,7 +16,6 @@ import {
 	Children,
 	useRef,
 	cloneElement,
-	Platform,
 } from '@wordpress/element';
 
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -88,26 +87,21 @@ function BottomSheetNavigationContainer( {
 
 	const setHeight = useCallback(
 		( height ) => {
-			// The screen is fullHeight or changing from fullScreen to the default mode
+			// The screen is fullHeight
 			if (
-				( typeof currentHeight === 'string' &&
-					typeof height !== 'string' ) ||
-				typeof height === 'string'
+				typeof height === 'string' &&
+				typeof height !== typeof currentHeight
 			) {
-				// Animating the opacity for the initial modal results in the backdrop
-				// provided by react-native-modal to never transition from transparent
-				// to partially opaque black. The core issue was not idenfited, but it
-				// may relate to the experimental state of LayoutAnimation for Android.
-				// https://reactnative.dev/docs/layoutanimation
-				if ( ! Platform.isAndroid || currentHeight !== 1 ) {
-					performLayoutAnimation( ANIMATION_DURATION );
-				}
+				performLayoutAnimation( ANIMATION_DURATION );
 				setCurrentHeight( height );
 
 				return;
 			}
 
-			if ( height > 1 ) {
+			if (
+				height > 1 &&
+				Math.round( height ) !== Math.round( currentHeight )
+			) {
 				if ( currentHeight === 1 ) {
 					setCurrentHeight( height );
 				} else if ( animate ) {

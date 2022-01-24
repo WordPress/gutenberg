@@ -12,7 +12,7 @@ export default {
 	title: 'Components/Tip',
 	component: Tip,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

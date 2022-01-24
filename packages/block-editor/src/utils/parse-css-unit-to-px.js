@@ -8,7 +8,7 @@ function parseUnit( cssUnit ) {
 	const match = cssUnit
 		?.trim()
 		.match(
-			/^(0?[-.]?\d+)(r?e[m|x]|v[h|w|min|max]+|p[x|t|c]|[c|m]m|%|in|ch|Q|lh)$/
+			/^(0?[-.]?\d*\.?\d+)(r?e[m|x]|v[h|w|min|max]+|p[x|t|c]|[c|m]m|%|in|ch|Q|lh)$/
 		);
 	if ( ! isNaN( cssUnit ) && ! isNaN( parseFloat( cssUnit ) ) ) {
 		return { value: parseFloat( cssUnit ), unit: 'px' };

@@ -13,7 +13,7 @@ import {
 
 const getActiveBlockName = async () =>
 	page.evaluate(
-		() => wp.data.select( 'core/block-editor' ).getSelectedBlock().name
+		() => wp.data.select( 'core/block-editor' ).getSelectedBlock()?.name
 	);
 
 const addParagraphsAndColumnsDemo = async () => {
@@ -629,5 +629,25 @@ describe( 'Writing Flow', () => {
 				document.activeElement.getAttribute( 'aria-label' )
 			)
 		).toBe( 'Table' );
+	} );
+
+	it( 'Should unselect all blocks when hitting double escape', async () => {
+		// Add demo content.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Random Paragraph' );
+
+		// Select a block.
+		let activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/paragraph' );
+
+		// First escape enters navigaiton mode.
+		await page.keyboard.press( 'Escape' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/paragraph' );
+
+		// Second escape unselects the blocks.
+		await page.keyboard.press( 'Escape' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( undefined );
 	} );
 } );

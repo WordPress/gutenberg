@@ -1,16 +1,16 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import { Ref, useCallback } from 'react';
+import type { Ref } from 'react';
 import { colord, extend, Colord } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
+import { useCallback, useState, useMemo } from '@wordpress/element';
 import { settings } from '@wordpress/icons';
+import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -32,6 +32,7 @@ import {
 import { ColorDisplay } from './color-display';
 import { ColorInput } from './color-input';
 import { Picker } from './picker';
+import { useControlledValue } from '../utils/hooks';
 
 import type { ColorType } from './types';
 
@@ -57,7 +58,7 @@ const ColorPicker = (
 ) => {
 	const {
 		enableAlpha = false,
-		color,
+		color: colorProp,
 		onChange,
 		defaultValue = '#fff',
 		copyFormat,
@@ -65,15 +66,23 @@ const ColorPicker = (
 	} = useContextSystem( props, 'ColorPicker' );
 
 	// Use a safe default value for the color and remove the possibility of `undefined`.
+	const [ color, setColor ] = useControlledValue( {
+		onChange,
+		value: colorProp,
+		defaultValue,
+	} );
+
 	const safeColordColor = useMemo( () => {
-		return color ? colord( color ) : colord( defaultValue );
-	}, [ color, defaultValue ] );
+		return colord( color );
+	}, [ color ] );
+
+	const debouncedSetColor = useDebounce( setColor );
 
 	const handleChange = useCallback(
 		( nextValue: Colord ) => {
-			onChange( nextValue.toHex() );
+			debouncedSetColor( nextValue.toHex() );
 		},
-		[ onChange ]
+		[ debouncedSetColor ]
 	);
 
 	const [ showInputs, setShowInputs ] = useState< boolean >( false );

@@ -20,7 +20,7 @@ export default {
 	title: 'Components/RangeControl',
 	component: RangeControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

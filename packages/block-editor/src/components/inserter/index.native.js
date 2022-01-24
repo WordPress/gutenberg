@@ -7,7 +7,7 @@ import { delay } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Dropdown, ToolbarButton, Picker } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -34,7 +34,7 @@ const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
 const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 	<ToolbarButton
-		title={ __( 'Add block' ) }
+		title={ _x( 'Add block', 'Generic label for block inserter button' ) }
 		icon={
 			<Icon
 				icon={ plusCircleFilled }
@@ -343,10 +343,7 @@ export default compose( [
 		const destinationRootClientId = isAnyBlockSelected
 			? getBlockRootClientId( end )
 			: rootClientId;
-		const selectedBlockIndex = getBlockIndex(
-			end,
-			destinationRootClientId
-		);
+		const selectedBlockIndex = getBlockIndex( end );
 		const endOfRootIndex = getBlockOrder( rootClientId ).length;
 		const isSelectedUnmodifiedDefaultBlock = isAnyBlockSelected
 			? isUnmodifiedDefaultBlock( getBlock( end ) )
@@ -364,7 +361,7 @@ export default compose( [
 
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
-				return getBlockIndex( clientId, rootClientId );
+				return getBlockIndex( clientId );
 			}
 
 			// If there is a selected block,

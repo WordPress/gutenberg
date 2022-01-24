@@ -11,23 +11,41 @@ import {
 	ColorIndicator,
 } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import NavigationButton from './navigation-button';
+import { NavigationButton } from './navigation-button';
 import { useSetting } from './hooks';
 
 const EMPTY_COLORS = [];
 
 function Palette( { name } ) {
-	const [ colorsSetting ] = useSetting( 'color.palette.custom', name );
-	const colors = colorsSetting || EMPTY_COLORS;
+	const [ customColors ] = useSetting( 'color.palette.custom' );
+	const [ themeColors ] = useSetting( 'color.palette.theme' );
+	const [ defaultColors ] = useSetting( 'color.palette.default' );
+
+	const [ defaultPaletteEnabled ] = useSetting(
+		'color.defaultPalette',
+		name
+	);
+	const colors = useMemo(
+		() => [
+			...( customColors || EMPTY_COLORS ),
+			...( themeColors || EMPTY_COLORS ),
+			...( defaultColors && defaultPaletteEnabled
+				? defaultColors
+				: EMPTY_COLORS ),
+		],
+		[ customColors, themeColors, defaultColors, defaultPaletteEnabled ]
+	);
+
 	const screenPath = ! name
 		? '/colors/palette'
 		: '/blocks/' + name + '/colors/palette';
-	const palleteButtonText =
+	const paletteButtonText =
 		colors.length > 0
 			? sprintf(
 					// Translators: %d: Number of palette colors.
@@ -52,7 +70,7 @@ function Palette( { name } ) {
 								) ) }
 							</ZStack>
 						</FlexBlock>
-						<FlexItem>{ palleteButtonText }</FlexItem>
+						<FlexItem>{ paletteButtonText }</FlexItem>
 					</HStack>
 				</NavigationButton>
 			</ItemGroup>

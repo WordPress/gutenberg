@@ -138,7 +138,7 @@ export function* removeTemplate( template ) {
 			'createSuccessNotice',
 			sprintf(
 				/* translators: The template/part's name. */
-				__( '"%s" removed.' ),
+				__( '"%s" deleted.' ),
 				template.title.rendered
 			),
 			{ type: 'snackbar' }
@@ -168,20 +168,6 @@ export function* removeTemplate( template ) {
 export function setTemplatePart( templatePartId ) {
 	return {
 		type: 'SET_TEMPLATE_PART',
-		templatePartId,
-	};
-}
-
-/**
- * Returns an action object used to push a template part to navigation history.
- *
- * @param {string} templatePartId The template part ID.
- *
- * @return {Object} Action object.
- */
-export function pushTemplatePart( templatePartId ) {
-	return {
-		type: 'PUSH_TEMPLATE_PART',
 		templatePartId,
 	};
 }
@@ -242,49 +228,6 @@ export function* setPage( page ) {
 		templateId,
 	};
 	return templateId;
-}
-
-/**
- * Go back to the current editing page.
- */
-export function goBack() {
-	return {
-		type: 'GO_BACK',
-	};
-}
-
-/**
- * Displays the site homepage for editing in the editor.
- */
-export function* showHomepage() {
-	const {
-		show_on_front: showOnFront,
-		page_on_front: frontpageId,
-	} = yield controls.resolveSelect(
-		coreStore,
-		'getEntityRecord',
-		'root',
-		'site'
-	);
-
-	const { siteUrl } = yield controls.select(
-		editSiteStoreName,
-		'getSettings'
-	);
-
-	const page = {
-		path: siteUrl,
-		context:
-			showOnFront === 'page'
-				? {
-						postType: 'page',
-						postId: frontpageId,
-				  }
-				: {},
-	};
-
-	const homeTemplate = yield* setPage( page );
-	yield setHomeTemplateId( homeTemplate );
 }
 
 /**

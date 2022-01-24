@@ -44,7 +44,7 @@ function YourBlockEdit( { attributes } ) {
 
 The block is responsible for using the `save` function to ensure that all attributes with a `source` field are saved according to the attributes definition. This is not automatic.
 
-Attributes without a `source` will be automatically saved in the block [comment delimiter](/docs/getting-started/architecture/key-concepts.md#delimiters-and-parsing-expression-grammar).
+Attributes without a `source` will be automatically saved in the block [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-attributes).
 
 For example, using the above attributes definition you would need to ensure that your `save` function has a corresponding img tag for the `url` attribute. The `title` and `size` attributes will be saved in the comment delimiter.
 
@@ -66,7 +66,7 @@ The saved HTML will contain the `title` and `size` in the comment delimiter, and
 <!-- /block:your-block -->
 ```
 
-If an attributes change over time then a [block deprecation](block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
+If an attributes change over time then a [block deprecation](/docs/reference-guides/block-api/block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
 
 ## Type Validation
 
@@ -105,7 +105,7 @@ _Example_: Example `enum`.
 Attribute sources are used to define how the attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
 
 The available `source` values are:
-- `(no value)` - when no `source` is specified then data is stored in the block's [comment delimiter](/docs/getting-started/architecture/key-concepts.md#delimiters-and-parsing-expression-grammar).
+- `(no value)` - when no `source` is specified then data is stored in the block's [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-attributes).
 - `attribute` - data is stored in an HTML element attribute.
 - `text` - data is stored in HTML text.
 - `html` - data is stored in HTML. This is typically used by `RichText`.
@@ -230,7 +230,7 @@ Saved content:
 
 Attribute definition:
 ```js
-attributes {
+attributes: {
 	content: {
 		type: 'string',
 		source: 'text',
@@ -343,7 +343,7 @@ Attribute available in the block:
 ## Meta (deprecated)
 
 <div class="callout callout-alert">
-Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; <a href="https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js">EntityProvider and related hook APIs</a> should be used instead, as shown in the <a href="/block-editor/how-to-guides/metabox/meta-block-3-add/">Create Meta Block how-to</a>.
+Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; <a href="https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js">EntityProvider and related hook APIs</a> should be used instead, as shown in the <a href="/block-editor/how-to-guides/metabox/#step-2-add-meta-block">Create Meta Block how-to</a>.
 </div>
 
 Attributes may be obtained from a post's meta rather than from the block's representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the `meta` key:
@@ -361,7 +361,7 @@ Attributes may be obtained from a post's meta rather than from the block's repre
 From here, meta attributes can be read and written by a block using the same interface as any attribute:
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 edit( { attributes, setAttributes } ) {
@@ -373,7 +373,7 @@ edit( { attributes, setAttributes } ) {
 },
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 edit: function( props ) {

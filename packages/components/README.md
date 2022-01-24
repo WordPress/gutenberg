@@ -40,4 +40,3 @@ You can browse the components docs and examples at https://wordpress.github.io/g
 ## Contributing
 
 See [CONTRIBUTING.md](/packages/components/CONTRIBUTING.md) for the contributing guidelines for the `@wordpress/components` package.
-

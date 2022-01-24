@@ -13,7 +13,7 @@ export default {
 	title: 'Components/BaseControl',
 	component: BaseControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

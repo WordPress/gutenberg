@@ -154,6 +154,14 @@ export const defaultEntities = [
 		baseURLParams: { context: 'edit' },
 		key: 'stylesheet',
 	},
+	{
+		label: __( 'Plugins' ),
+		name: 'plugin',
+		kind: 'root',
+		baseURL: '/wp/v2/plugins',
+		baseURLParams: { context: 'edit' },
+		key: 'plugin',
+	},
 ];
 
 export const kinds = [
@@ -197,7 +205,7 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypes = await apiFetch( { path: '/wp/v2/types?context=edit' } );
+	const postTypes = await apiFetch( { path: '/wp/v2/types?context=view' } );
 	return map( postTypes, ( postType, name ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
@@ -208,7 +216,7 @@ async function loadPostTypeEntities() {
 			baseURL: `/${ namespace }/${ postType.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
-			label: postType.labels.singular_name,
+			label: postType.name,
 			transientEdits: {
 				blocks: true,
 				selection: true,
@@ -232,7 +240,7 @@ async function loadPostTypeEntities() {
  */
 async function loadTaxonomyEntities() {
 	const taxonomies = await apiFetch( {
-		path: '/wp/v2/taxonomies?context=edit',
+		path: '/wp/v2/taxonomies?context=view',
 	} );
 	return map( taxonomies, ( taxonomy, name ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
@@ -241,7 +249,7 @@ async function loadTaxonomyEntities() {
 			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
-			label: taxonomy.labels.singular_name,
+			label: taxonomy.name,
 		};
 	} );
 }

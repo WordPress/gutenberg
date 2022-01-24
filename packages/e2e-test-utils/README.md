@@ -161,6 +161,15 @@ _Parameters_
 -   _object.excerpt_ `[string]`: Excerpt of the new post.
 -   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
 
+### createReusableBlock
+
+Creates a simple reusable block with a paragraph block.
+
+_Parameters_
+
+-   _content_ `string`: Paragraph block's content
+-   _title_ `title`: Reusable block's name.
+
 ### createURL
 
 Creates new URL by parsing base URL, WPPath and query string.
@@ -362,6 +371,18 @@ Returns a promise which resolves with the edited post content (HTML string).
 _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
+
+### getOption
+
+Returns a site option, from the options admin page.
+
+_Parameters_
+
+-   _setting_ `string`: The option, used to get the option by id.
+
+_Returns_
+
+-   `string`: The value of the option.
 
 ### getPageError
 
@@ -632,6 +653,15 @@ _Parameters_
 -   _$1_ `Object`: Options.
 -   _$1.plainText_ `string`: Plain text to set.
 -   _$1.html_ `string`: HTML to set.
+
+### setOption
+
+Sets a site option, from the options-general admin page.
+
+_Parameters_
+
+-   _setting_ `string`: The option, used to get the option by id.
+-   _value_ `string`: The value to set the option to.
 
 ### setPostContent
 

@@ -54,6 +54,7 @@ export const buttonView = css`
 
 export const buttonActive = css`
 	color: ${ COLORS.white };
+	background-color: ${ COLORS.gray[ 900 ] };
 `;
 
 export const ButtonContentView = styled.div`

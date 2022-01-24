@@ -78,7 +78,7 @@ export default function SearchEdit( {
 	 * properly creating accessibilityLabel text.
 	 */
 	useEffect( () => {
-		AccessibilityInfo.addEventListener(
+		const a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			handleScreenReaderToggled
 		);
@@ -90,10 +90,7 @@ export default function SearchEdit( {
 		);
 
 		return () => {
-			AccessibilityInfo.removeEventListener(
-				'screenReaderChanged',
-				handleScreenReaderToggled
-			);
+			a11yInfoChangeSubscription.remove();
 		};
 	}, [] );
 

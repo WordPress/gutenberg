@@ -42,6 +42,7 @@ import { toHTMLString } from '../to-html-string';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
+import { getFormatColors } from '../get-format-colors';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
@@ -53,6 +54,7 @@ const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
 	'core/strikethrough': 'strikethrough',
+	'core/text-color': 'mark',
 };
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
@@ -122,7 +124,7 @@ export class RichText extends Component {
 			activeFormats: [],
 			selectedFormat: null,
 			height: 0,
-			dimensions: Dimensions.get( 'window' ),
+			currentFontSize: this.getFontSize( arguments[ 0 ] ),
 		};
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
@@ -143,13 +145,26 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { selectionStart: start, selectionEnd: end } = this.props;
+		const {
+			selectionStart: start,
+			selectionEnd: end,
+			colorPalette,
+		} = this.props;
 		const { value } = this.props;
+		const currentValue = this.formatToValue( value );
 
-		const { formats, replacements, text } = this.formatToValue( value );
+		const { formats, replacements, text } = currentValue;
 		const { activeFormats } = this.state;
+		const newFormats = getFormatColors( value, formats, colorPalette );
 
-		return { formats, replacements, text, start, end, activeFormats };
+		return {
+			formats: newFormats,
+			replacements,
+			text,
+			start,
+			end,
+			activeFormats,
+		};
 	}
 
 	/**
@@ -699,14 +714,11 @@ export class RichText extends Component {
 
 		if ( typeof this.lastEventCount !== 'undefined' ) {
 			this.lastEventCount += 100; // bump by a hundred, hopefully native hasn't bombarded the JS side in the meantime.
-		} else {
-			window.console.warn(
-				"Tried to bump the RichText native event counter but was 'undefined'. Aborting bump."
-			);
-		}
+		} // no need to bump when 'undefined' as native side won't receive the key when the value is undefined, and that will cause force updating anyway,
+		//   see https://github.com/WordPress/gutenberg/blob/82e578dcc75e67891c750a41a04c1e31994192fc/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/ReactAztecManager.java#L213-L215
 	}
 
-	shouldComponentUpdate( nextProps ) {
+	shouldComponentUpdate( nextProps, nextState ) {
 		if (
 			nextProps.tagName !== this.props.tagName ||
 			nextProps.reversed !== this.props.reversed ||
@@ -764,7 +776,10 @@ export class RichText extends Component {
 			}
 
 			if (
-				nextProps?.style?.fontSize !== this.props?.style?.fontSize ||
+				( nextProps?.style?.fontSize !== this.props?.style?.fontSize &&
+					nextState.currentFontSize !==
+						this.state.currentFontSize ) ||
+				nextState.currentFontSize !== this.state.currentFontSize ||
 				nextProps?.style?.lineHeight !== this.props?.style?.lineHeight
 			) {
 				this.needsSelectionUpdate = true;
@@ -799,6 +814,9 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		const { style, tagName } = this.props;
+		const { currentFontSize } = this.state;
+
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
 		}
@@ -816,6 +834,26 @@ export class RichText extends Component {
 			);
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
+		}
+
+		// For font size values changes from the font size picker
+		// we compare previous values to refresh the selected font size,
+		// this is also used when the tag name changes
+		// e.g Heading block and a level change like h1->h2.
+		const currentFontSizeStyle = this.getParsedFontSize( style?.fontSize );
+		const prevFontSizeStyle = this.getParsedFontSize(
+			prevProps?.style?.fontSize
+		);
+		const isDifferentTag = prevProps.tagName !== tagName;
+		if (
+			( currentFontSize &&
+				( currentFontSizeStyle || prevFontSizeStyle ) &&
+				currentFontSizeStyle !== currentFontSize ) ||
+			isDifferentTag
+		) {
+			this.setState( {
+				currentFontSize: this.getFontSize( this.props ),
+			} );
 		}
 	}
 
@@ -859,35 +897,55 @@ export class RichText extends Component {
 		};
 	}
 
-	getFontSize() {
-		const { baseGlobalStyles, tagName } = this.props;
+	getParsedFontSize( fontSize ) {
+		const { height, width } = Dimensions.get( 'window' );
+		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
+
+		if ( ! fontSize ) {
+			return fontSize;
+		}
+
+		const selectedPxValue =
+			getPxFromCssUnit( fontSize, cssUnitOptions ) ?? DEFAULT_FONT_SIZE;
+
+		return parseFloat( selectedPxValue );
+	}
+
+	getFontSize( props ) {
+		const { baseGlobalStyles, tagName, fontSize, style } = props;
 		const tagNameFontSize =
 			baseGlobalStyles?.elements?.[ tagName ]?.typography?.fontSize;
 
-		let fontSize = DEFAULT_FONT_SIZE;
+		let newFontSize = DEFAULT_FONT_SIZE;
 
+		// For block-based themes, get the default editor font size.
 		if ( baseGlobalStyles?.typography?.fontSize ) {
-			fontSize = baseGlobalStyles?.typography?.fontSize;
+			newFontSize = baseGlobalStyles?.typography?.fontSize;
 		}
 
+		// For block-based themes, get the default element font size
+		// e.g h1, h2.
 		if ( tagNameFontSize ) {
-			fontSize = tagNameFontSize;
+			newFontSize = tagNameFontSize;
 		}
 
-		if ( this.props.style?.fontSize ) {
-			fontSize = this.props.style.fontSize;
+		// For font size values provided from the styles,
+		// usually from values set from the font size picker.
+		if ( style?.fontSize ) {
+			newFontSize = style.fontSize;
 		}
 
-		if ( this.props.fontSize && ! tagNameFontSize ) {
-			fontSize = this.props.fontSize;
+		// Fall-back to a font size provided from its props (if there's any)
+		// and there are no other default values to use.
+		if ( fontSize && ! tagNameFontSize && ! style?.fontSize ) {
+			newFontSize = fontSize;
 		}
-		const { height, width } = this.state.dimensions;
-		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
+
 		// We need to always convert to px units because the selected value
 		// could be coming from the web where it could be stored as a different unit.
-		const selectedPxValue = getPxFromCssUnit( fontSize, cssUnitOptions );
+		const selectedPxValue = this.getParsedFontSize( newFontSize );
 
-		return parseFloat( selectedPxValue );
+		return selectedPxValue;
 	}
 
 	getLineHeight() {
@@ -916,6 +974,22 @@ export class RichText extends Component {
 		return lineHeight;
 	}
 
+	getBlockUseDefaultFont() {
+		// For block-based themes it enables using the defaultFont
+		// in Aztec for iOS so it allows customizing the font size
+		// for the Preformatted/Code and Heading blocks.
+		if ( ! this.isIOS ) {
+			return;
+		}
+
+		const { baseGlobalStyles, tagName } = this.props;
+		const isBlockBasedTheme =
+			baseGlobalStyles && Object.entries( baseGlobalStyles ).length !== 0;
+		const tagsToMatch = /pre|h([1-6])$/gm;
+
+		return isBlockBasedTheme && tagsToMatch.test( tagName );
+	}
+
 	render() {
 		const {
 			tagName,
@@ -931,10 +1005,12 @@ export class RichText extends Component {
 			disableEditingMenu = false,
 			baseGlobalStyles,
 		} = this.props;
+		const { currentFontSize } = this.state;
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
 		const editableProps = this.getEditableProps();
+		const blockUseDefaultFont = this.getBlockUseDefaultFont();
 
 		const placeholderStyle = getStylesFromColorScheme(
 			styles.richTextPlaceholder,
@@ -942,7 +1018,7 @@ export class RichText extends Component {
 		);
 
 		const { color: defaultPlaceholderTextColor } = placeholderStyle;
-		const fontSize = this.getFontSize();
+		const fontSize = currentFontSize;
 		const lineHeight = this.getLineHeight();
 
 		const {
@@ -1040,12 +1116,14 @@ export class RichText extends Component {
 							: { maxWidth } ),
 						minHeight: this.state.height,
 					} }
+					blockUseDefaultFont={ blockUseDefaultFont }
 					text={ {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
 						linkTextColor:
 							style?.linkColor || defaultTextDecorationColor,
+						tag: tagName,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
@@ -1097,6 +1175,7 @@ export class RichText extends Component {
 				{ isSelected && (
 					<>
 						<FormatEdit
+							forwardedRef={ this._editor }
 							formatTypes={ formatTypes }
 							value={ record }
 							onChange={ this.onFormatChange }
@@ -1144,6 +1223,13 @@ export default compose( [
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
+		const experimentalFeatures =
+			settings?.__experimentalFeatures?.color?.palette;
+		const colorPalette =
+			experimentalFeatures?.user ??
+			experimentalFeatures?.theme ??
+			experimentalFeatures?.default ??
+			settings?.colors;
 
 		return {
 			areMentionsSupported:
@@ -1151,6 +1237,7 @@ export default compose( [
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
 			...{ parentBlockStyles },
 			baseGlobalStyles,
+			colorPalette,
 		};
 	} ),
 	withPreferredColorScheme,

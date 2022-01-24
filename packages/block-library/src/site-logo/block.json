@@ -7,9 +7,6 @@
 	"description": "Display a graphic to represent this site. Update the block, and the changes apply everywhere it’s used. This is different than the site icon, which is the smaller image visible in your dashboard, browser tabs, etc used to help others recognize this site.",
 	"textdomain": "default",
 	"attributes": {
-		"align": {
-			"type": "string"
-		},
 		"width": {
 			"type": "number"
 		},
@@ -20,12 +17,16 @@
 		"linkTarget": {
 			"type": "string",
 			"default": "_self"
+		},
+		"shouldSyncIcon": {
+			"type": "boolean"
 		}
 	},
 	"example": {
 		"viewportWidth": 500,
 		"attributes": {
-			"width": 350
+			"width": 350,
+			"className": "block-editor-block-types-list__site-logo-example"
 		}
 	},
 	"supports": {

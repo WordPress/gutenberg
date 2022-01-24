@@ -12,7 +12,7 @@ export default {
 	title: 'Components/Snackbar',
 	component: Snackbar,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

@@ -108,11 +108,8 @@ export default withSelect( ( select, { clientIds } ) => {
 	const firstClientId = first( normalizedClientIds );
 	const block = getBlock( firstClientId );
 	const rootClientId = getBlockRootClientId( first( normalizedClientIds ) );
-	const firstIndex = getBlockIndex( firstClientId, rootClientId );
-	const lastIndex = getBlockIndex(
-		last( normalizedClientIds ),
-		rootClientId
-	);
+	const firstIndex = getBlockIndex( firstClientId );
+	const lastIndex = getBlockIndex( last( normalizedClientIds ) );
 	const blockOrder = getBlockOrder( rootClientId );
 	const isFirst = firstIndex === 0;
 	const isLast = lastIndex === blockOrder.length - 1;

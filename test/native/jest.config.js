@@ -25,11 +25,7 @@ module.exports = {
 	// Automatically clear mock calls and instances between every test
 	clearMocks: true,
 	preset: 'react-native',
-	setupFiles: [
-		'<rootDir>/' + configPath + '/setup.js',
-		'<rootDir>/' + configPath + '/enzyme.config.js',
-	],
-	testEnvironment: 'jsdom',
+	setupFiles: [ '<rootDir>/' + configPath + '/setup.js' ],
 	testMatch: [
 		'**/test/*.native.[jt]s?(x)',
 		'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
@@ -71,9 +67,6 @@ module.exports = {
 		// https://github.com/facebook/react-native/blob/HEAD/jest-preset.json#L20
 		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|@react-native|react-clone-referenced-element|@react-navigation))',
 	],
-	snapshotSerializers: [
-		'enzyme-to-json/serializer',
-		'@emotion/jest/serializer',
-	],
+	snapshotSerializers: [ '@emotion/jest/serializer' ],
 	reporters: [ 'default', 'jest-junit' ],
 };

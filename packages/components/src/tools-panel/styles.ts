@@ -9,8 +9,10 @@ import { css } from '@emotion/react';
 import {
 	StyledField as BaseControlField,
 	StyledHelp as BaseControlHelp,
+	StyledLabel as BaseControlLabel,
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
+import { LabelWrapper } from '../input-control/styles/input-control-styles';
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
@@ -29,7 +31,7 @@ const toolsPanelGrid = {
 export const ToolsPanel = css`
 	${ toolsPanelGrid.spacing };
 
-	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
+	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
 `;
@@ -70,6 +72,7 @@ export const ToolsPanelHeader = css`
 	 */
 	.components-dropdown-menu {
 		margin: ${ space( -1 ) } 0;
+		line-height: 0;
 	}
 	&&&& .components-dropdown-menu__toggle {
 		padding: 0;
@@ -116,6 +119,31 @@ export const ToolsPanelItem = css`
 
 	${ BaseControlHelp } {
 		margin-bottom: 0;
+	}
+
+	/**
+	 * Standardize InputControl and BaseControl labels with other labels when
+	 * inside ToolsPanel.
+	 *
+	 * This is a temporary fix until the different control components have their
+	 * labels normalized.
+	 */
+	&& ${ LabelWrapper } {
+		label {
+			line-height: 1.4em;
+		}
+	}
+
+	/**
+	 * The targeting of .components-custom-select-control__label here is a
+	 * temporary measure only.
+	 *
+	 * It should be replaced once CustomSelectControl component has been
+	 * refactored and can be targeted via component interpolation.
+	 */
+	.components-custom-select-control__label,
+	${ BaseControlLabel } {
+		line-height: 1.4em;
 	}
 `;
 

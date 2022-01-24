@@ -88,7 +88,7 @@ describe( 'state', () => {
 
 	describe( 'editedPost()', () => {
 		it( 'should apply default state', () => {
-			expect( editedPost( undefined, {} ) ).toEqual( [] );
+			expect( editedPost( undefined, {} ) ).toEqual( {} );
 		} );
 
 		it( 'should default to returning the same state', () => {
@@ -98,56 +98,39 @@ describe( 'state', () => {
 
 		it( 'should update when a template is set', () => {
 			expect(
-				editedPost( [ { id: 1, type: 'wp_template' } ], {
-					type: 'SET_TEMPLATE',
-					templateId: 2,
-				} )
-			).toEqual( [ { id: 2, type: 'wp_template' } ] );
+				editedPost(
+					{ id: 1, type: 'wp_template' },
+					{
+						type: 'SET_TEMPLATE',
+						templateId: 2,
+					}
+				)
+			).toEqual( { id: 2, type: 'wp_template' } );
 		} );
 
 		it( 'should update when a page is set', () => {
 			expect(
-				editedPost( [ { id: 1, type: 'wp_template' } ], {
-					type: 'SET_PAGE',
-					templateId: 2,
-					page: {},
-				} )
-			).toEqual( [ { id: 2, type: 'wp_template', page: {} } ] );
+				editedPost(
+					{ id: 1, type: 'wp_template' },
+					{
+						type: 'SET_PAGE',
+						templateId: 2,
+						page: {},
+					}
+				)
+			).toEqual( { id: 2, type: 'wp_template', page: {} } );
 		} );
 
 		it( 'should update when a template part is set', () => {
 			expect(
-				editedPost( [ { id: 1, type: 'wp_template' } ], {
-					type: 'SET_TEMPLATE_PART',
-					templatePartId: 2,
-				} )
-			).toEqual( [ { id: 2, type: 'wp_template_part' } ] );
-		} );
-
-		it( 'should update when a template part is pushed', () => {
-			expect(
-				editedPost( [ { id: 1, type: 'wp_template' } ], {
-					type: 'PUSH_TEMPLATE_PART',
-					templatePartId: 2,
-				} )
-			).toEqual( [
-				{ id: 1, type: 'wp_template' },
-				{ id: 2, type: 'wp_template_part' },
-			] );
-		} );
-
-		it( 'should go back to the previous page', () => {
-			expect(
 				editedPost(
-					[
-						{ id: 1, type: 'wp_template' },
-						{ id: 2, type: 'wp_template_part' },
-					],
+					{ id: 1, type: 'wp_template' },
 					{
-						type: 'GO_BACK',
+						type: 'SET_TEMPLATE_PART',
+						templatePartId: 2,
 					}
 				)
-			).toEqual( [ { id: 1, type: 'wp_template' } ] );
+			).toEqual( { id: 2, type: 'wp_template_part' } );
 		} );
 	} );
 

@@ -6,36 +6,59 @@ import { includes, map, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useContext, useMemo } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, withInstanceId } from '@wordpress/compose';
+import { useMemo, useCallback } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
 import { CheckboxControl } from '@wordpress/components';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import BlockTypesChecklist from './checklist';
-import EditPostSettings from '../edit-post-settings';
 import { store as editPostStore } from '../../store';
 
-function BlockManagerCategory( {
-	instanceId,
-	title,
-	blockTypes,
-	hiddenBlockTypes,
-	toggleVisible,
-	toggleAllVisible,
-} ) {
-	const settings = useContext( EditPostSettings );
-	const { allowedBlockTypes } = settings;
+function BlockManagerCategory( { title, blockTypes } ) {
+	const instanceId = useInstanceId( BlockManagerCategory );
+	const { defaultAllowedBlockTypes, hiddenBlockTypes } = useSelect(
+		( select ) => {
+			const { getEditorSettings } = select( editorStore );
+			const { getPreference } = select( editPostStore );
+			return {
+				defaultAllowedBlockTypes: getEditorSettings()
+					.defaultAllowedBlockTypes,
+				hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+			};
+		},
+		[]
+	);
 	const filteredBlockTypes = useMemo( () => {
-		if ( allowedBlockTypes === true ) {
+		if ( defaultAllowedBlockTypes === true ) {
 			return blockTypes;
 		}
 		return blockTypes.filter( ( { name } ) => {
-			return includes( allowedBlockTypes || [], name );
+			return includes( defaultAllowedBlockTypes || [], name );
 		} );
-	}, [ allowedBlockTypes, blockTypes ] );
+	}, [ defaultAllowedBlockTypes, blockTypes ] );
+	const { showBlockTypes, hideBlockTypes } = useDispatch( editPostStore );
+	const toggleVisible = useCallback( ( blockName, nextIsChecked ) => {
+		if ( nextIsChecked ) {
+			showBlockTypes( blockName );
+		} else {
+			hideBlockTypes( blockName );
+		}
+	}, [] );
+	const toggleAllVisible = useCallback(
+		( nextIsChecked ) => {
+			const blockNames = map( blockTypes, 'name' );
+			if ( nextIsChecked ) {
+				showBlockTypes( blockNames );
+			} else {
+				hideBlockTypes( blockNames );
+			}
+		},
+		[ blockTypes ]
+	);
 
 	if ( ! filteredBlockTypes.length ) {
 		return null;
@@ -81,34 +104,4 @@ function BlockManagerCategory( {
 	);
 }
 
-export default compose( [
-	withInstanceId,
-	withSelect( ( select ) => {
-		const { getPreference } = select( editPostStore );
-
-		return {
-			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const { showBlockTypes, hideBlockTypes } = dispatch( editPostStore );
-
-		return {
-			toggleVisible( blockName, nextIsChecked ) {
-				if ( nextIsChecked ) {
-					showBlockTypes( blockName );
-				} else {
-					hideBlockTypes( blockName );
-				}
-			},
-			toggleAllVisible( nextIsChecked ) {
-				const blockNames = map( ownProps.blockTypes, 'name' );
-				if ( nextIsChecked ) {
-					showBlockTypes( blockNames );
-				} else {
-					hideBlockTypes( blockNames );
-				}
-			},
-		};
-	} ),
-] )( BlockManagerCategory );
+export default BlockManagerCategory;

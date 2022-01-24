@@ -38,7 +38,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	// Always should a notice, which will be spoken for accessibility.
 	if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
-		noticeMessage = __( 'Saved' );
+		noticeMessage = __( 'Draft saved' );
 		shouldShowLink = false;
 	} else if ( isPublished && ! willPublish ) {
 		// If undoing publish status, show specific notice

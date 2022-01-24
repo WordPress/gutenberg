@@ -7,7 +7,8 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { dispatch } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -16,6 +17,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import './hooks';
 import './plugins';
 import Editor from './editor';
+import { store as editPostStore } from './store';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -78,6 +80,22 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	// Prevent adding template part in the post editor.
+	// Only add the filter when the post editor is initialized, not imported.
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removeTemplatePartsFromInserter',
+		( can, blockType ) => {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/template-part'
+			) {
+				return false;
+			}
+			return can;
+		}
+	);
+
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind(
 		null,
@@ -91,7 +109,6 @@ export function initializeEditor(
 	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-post', {
 		fixedToolbar: false,
 		welcomeGuide: true,
-		mobileGalleryWarning: true,
 		fullscreenMode: true,
 		showIconLabels: false,
 		themeStyles: true,

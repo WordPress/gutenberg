@@ -3,16 +3,10 @@
  */
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	SlotFillProvider,
-	Popover,
-	Button,
-	Notice,
-} from '@wordpress/components';
+import { Popover, Button, Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
-	FullscreenMode,
 	InterfaceSkeleton,
 	ComplementaryArea,
 	store as interfaceStore,
@@ -21,8 +15,6 @@ import {
 	EditorNotices,
 	EditorSnackbars,
 	EntitiesSavedStates,
-	UnsavedChangesWarning,
-	store as editorStore,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
@@ -47,13 +39,14 @@ import WelcomeGuide from '../welcome-guide';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from './global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
+import useTitle from '../routes/use-title';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
 	drawer: __( 'Navigation Sidebar' ),
 };
 
-function Editor( { initialSettings, onError } ) {
+function Editor( { onError } ) {
 	const {
 		isInserterOpen,
 		isListViewOpen,
@@ -111,26 +104,8 @@ function Editor( { initialSettings, onError } ) {
 			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
 		};
 	}, [] );
-	const { updateEditorSettings } = useDispatch( editorStore );
-	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
-		editSiteStore
-	);
-
-	useEffect( () => {
-		updateSettings( initialSettings );
-	}, [] );
-
-	// Keep the defaultTemplateTypes in the core/editor settings too,
-	// so that they can be selected with core/editor selectors in any editor.
-	// This is needed because edit-site doesn't initialize with EditorProvider,
-	// which internally uses updateEditorSettings as well.
-	const { defaultTemplateTypes, defaultTemplatePartAreas } = settings;
-	useEffect( () => {
-		updateEditorSettings( {
-			defaultTemplateTypes,
-			defaultTemplatePartAreas,
-		} );
-	}, [ defaultTemplateTypes, defaultTemplatePartAreas ] );
+	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const [
 		isEntitiesSavedStatesOpen,
@@ -173,6 +148,19 @@ function Editor( { initialSettings, onError } ) {
 		}
 	}, [ isNavigationOpen ] );
 
+	useEffect(
+		function openGlobalStylesOnLoad() {
+			const searchParams = new URLSearchParams( window.location.search );
+			if ( searchParams.get( 'styles' ) === 'open' ) {
+				enableComplementaryArea(
+					'core/edit-site',
+					'edit-site/global-styles'
+				);
+			}
+		},
+		[ enableComplementaryArea ]
+	);
+
 	// Don't render the Editor until the settings are set and loaded
 	const isReady =
 		settings?.siteUrl &&
@@ -189,120 +177,120 @@ function Editor( { initialSettings, onError } ) {
 		return null;
 	};
 
+	// Only announce the title once the editor is ready to prevent "Replace"
+	// action in <URlQueryController> from double-announcing.
+	useTitle( isReady && __( 'Editor (beta)' ) );
+
 	return (
 		<>
 			<URLQueryController />
 			{ isReady && (
 				<ShortcutProvider>
-					<SlotFillProvider>
-						<EntityProvider kind="root" type="site">
-							<EntityProvider
-								kind="postType"
-								type={ templateType }
-								id={ entityId }
-							>
-								<GlobalStylesProvider>
-									<BlockContextProvider
-										value={ blockContext }
-									>
-										<GlobalStylesRenderer />
-										<ErrorBoundary onError={ onError }>
-											<FullscreenMode isActive />
-											<UnsavedChangesWarning />
-											<KeyboardShortcuts.Register />
-											<SidebarComplementaryAreaFills />
-											<InterfaceSkeleton
-												labels={ interfaceLabels }
-												secondarySidebar={ secondarySidebar() }
-												sidebar={
-													sidebarIsOpened && (
-														<ComplementaryArea.Slot scope="core/edit-site" />
-													)
-												}
-												drawer={ <NavigationSidebar /> }
-												header={
-													<Header
+					<EntityProvider kind="root" type="site">
+						<EntityProvider
+							kind="postType"
+							type={ templateType }
+							id={ entityId }
+						>
+							<GlobalStylesProvider>
+								<BlockContextProvider value={ blockContext }>
+									<GlobalStylesRenderer />
+									<ErrorBoundary onError={ onError }>
+										<KeyboardShortcuts.Register />
+										<SidebarComplementaryAreaFills />
+										<InterfaceSkeleton
+											labels={ interfaceLabels }
+											secondarySidebar={ secondarySidebar() }
+											sidebar={
+												sidebarIsOpened && (
+													<ComplementaryArea.Slot scope="core/edit-site" />
+												)
+											}
+											drawer={
+												<NavigationSidebar.Slot />
+											}
+											header={
+												<Header
+													openEntitiesSavedStates={
+														openEntitiesSavedStates
+													}
+												/>
+											}
+											notices={ <EditorSnackbars /> }
+											content={
+												<>
+													<EditorNotices />
+													{ template && (
+														<BlockEditor
+															setIsInserterOpen={
+																setIsInserterOpened
+															}
+														/>
+													) }
+													{ templateResolved &&
+														! template &&
+														settings?.siteUrl &&
+														entityId && (
+															<Notice
+																status="warning"
+																isDismissible={
+																	false
+																}
+															>
+																{ __(
+																	"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+																) }
+															</Notice>
+														) }
+													<KeyboardShortcuts
 														openEntitiesSavedStates={
 															openEntitiesSavedStates
 														}
 													/>
-												}
-												notices={ <EditorSnackbars /> }
-												content={
-													<>
-														<EditorNotices />
-														{ template && (
-															<BlockEditor
-																setIsInserterOpen={
-																	setIsInserterOpened
-																}
-															/>
-														) }
-														{ templateResolved &&
-															! template &&
-															settings?.siteUrl &&
-															entityId && (
-																<Notice
-																	status="warning"
-																	isDismissible={
-																		false
-																	}
-																>
-																	{ __(
-																		"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-																	) }
-																</Notice>
-															) }
-														<KeyboardShortcuts
-															openEntitiesSavedStates={
-																openEntitiesSavedStates
+												</>
+											}
+											actions={
+												<>
+													{ isEntitiesSavedStatesOpen ? (
+														<EntitiesSavedStates
+															close={
+																closeEntitiesSavedStates
 															}
 														/>
-													</>
-												}
-												actions={
-													<>
-														{ isEntitiesSavedStatesOpen ? (
-															<EntitiesSavedStates
-																close={
-																	closeEntitiesSavedStates
+													) : (
+														<div className="edit-site-editor__toggle-save-panel">
+															<Button
+																variant="secondary"
+																className="edit-site-editor__toggle-save-panel-button"
+																onClick={
+																	openEntitiesSavedStates
 																}
-															/>
-														) : (
-															<div className="edit-site-editor__toggle-save-panel">
-																<Button
-																	variant="secondary"
-																	className="edit-site-editor__toggle-save-panel-button"
-																	onClick={
-																		openEntitiesSavedStates
-																	}
-																	aria-expanded={
-																		false
-																	}
-																>
-																	{ __(
-																		'Open save panel'
-																	) }
-																</Button>
-															</div>
-														) }
-													</>
-												}
-												footer={ <BlockBreadcrumb /> }
-												shortcuts={ {
-													previous: previousShortcut,
-													next: nextShortcut,
-												} }
-											/>
-											<WelcomeGuide />
-											<Popover.Slot />
-											<PluginArea />
-										</ErrorBoundary>
-									</BlockContextProvider>
-								</GlobalStylesProvider>
-							</EntityProvider>
+																aria-expanded={
+																	false
+																}
+															>
+																{ __(
+																	'Open save panel'
+																) }
+															</Button>
+														</div>
+													) }
+												</>
+											}
+											footer={ <BlockBreadcrumb /> }
+											shortcuts={ {
+												previous: previousShortcut,
+												next: nextShortcut,
+											} }
+										/>
+										<WelcomeGuide />
+										<Popover.Slot />
+										<PluginArea />
+									</ErrorBoundary>
+								</BlockContextProvider>
+							</GlobalStylesProvider>
 						</EntityProvider>
-					</SlotFillProvider>
+					</EntityProvider>
 				</ShortcutProvider>
 			) }
 		</>

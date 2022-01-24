@@ -14,15 +14,16 @@ import {
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as viewportStore } from '@wordpress/viewport';
+import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import './plugins';
 import './hooks';
 import { store as editSiteStore } from './store';
-import Editor from './components/editor';
-import List from './components/list';
+import EditSiteApp from './components/app';
+import getIsListPage from './utils/get-is-list-page';
+import redirectToHomepage from './components/routes/redirect-to-homepage';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -32,13 +33,45 @@ import List from './components/list';
  * @param {Element} target   DOM node in which editor is rendered.
  * @param {?Object} settings Editor settings object.
  */
-export function reinitializeEditor( target, settings ) {
+export async function reinitializeEditor( target, settings ) {
+	// The site editor relies on `postType` and `postId` params in the URL to
+	// define what's being edited. When visiting via the dashboard link, these
+	// won't be present. Do a client side redirect to the 'homepage' if that's
+	// the case.
+	await redirectToHomepage( settings.siteUrl );
+
+	// This will be a no-op if the target doesn't have any React nodes.
 	unmountComponentAtNode( target );
 	const reboot = reinitializeEditor.bind( null, target, settings );
-	render(
-		<Editor initialSettings={ settings } onError={ reboot } />,
-		target
-	);
+
+	// We dispatch actions and update the store synchronously before rendering
+	// so that we won't trigger unnecessary re-renders with useEffect.
+	{
+		dispatch( editSiteStore ).updateSettings( settings );
+
+		// Keep the defaultTemplateTypes in the core/editor settings too,
+		// so that they can be selected with core/editor selectors in any editor.
+		// This is needed because edit-site doesn't initialize with EditorProvider,
+		// which internally uses updateEditorSettings as well.
+		dispatch( editorStore ).updateEditorSettings( {
+			defaultTemplateTypes: settings.defaultTemplateTypes,
+			defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
+		} );
+
+		const isLandingOnListPage = getIsListPage(
+			getQueryArgs( window.location.href )
+		);
+
+		if ( isLandingOnListPage ) {
+			// Default the navigation panel to be opened when we're in a bigger
+			// screen and land in the list screen.
+			dispatch( editSiteStore ).setIsNavigationPanelOpened(
+				select( viewportStore ).isViewportMatch( 'medium' )
+			);
+		}
+	}
+
+	render( <EditSiteApp reboot={ reboot } />, target );
 }
 
 /**
@@ -54,7 +87,6 @@ export function initializeEditor( id, settings ) {
 	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, target, settings );
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
@@ -64,35 +96,7 @@ export function initializeEditor( id, settings ) {
 		} );
 	}
 
-	render(
-		<Editor initialSettings={ settings } onError={ reboot } />,
-		target
-	);
-}
-
-/**
- * Initializes the site editor templates list screen.
- *
- * @param {string} id           ID of the root element to render the screen in.
- * @param {string} templateType The type of the list. "wp_template" or "wp_template_part".
- * @param {Object} settings     Editor settings.
- */
-export function initializeList( id, templateType, settings ) {
-	const target = document.getElementById( id );
-
-	dispatch( editorStore ).updateEditorSettings( {
-		defaultTemplateTypes: settings.defaultTemplateTypes,
-		defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
-	} );
-
-	// Default the navigation panel to be opened when we're in a bigger screen.
-	// We update the store synchronously before rendering so that we won't
-	// trigger an unnecessary re-render with useEffect.
-	dispatch( editSiteStore ).setIsNavigationPanelOpened(
-		select( viewportStore ).isViewportMatch( 'medium' )
-	);
-
-	render( <List templateType={ templateType } />, target );
+	reinitializeEditor( target, settings );
 }
 
 export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';

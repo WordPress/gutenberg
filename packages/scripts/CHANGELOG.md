@@ -4,11 +4,35 @@
 
 ### Breaking Changes
 
+-   The bundled `eslint` dependency has been updated from requiring `^7.17.0` to requiring `^8.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
 -   The `puppeteer-core` dependency has been updated from requiring `^10.1.0` to requiring `^11.0.0` (see [Breaking Changes](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0), [#36040](https://github.com/WordPress/gutenberg/pull/36040)).
+-   Removed support for live reload in the `start` command ([#28273](https://github.com/WordPress/gutenberg/pull/28273)).
+-   The bundled `webpack-cli` dependency has been updated to the next major version `^4.9.1` ([#28273](https://github.com/WordPress/gutenberg/pull/28273)).
+-   The peer `jest` dependency has been updated from requiring `>=26` to requiring `>=27` (see [Breaking Changes](https://jestjs.io/blog/2021/05/25/jest-27), [#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+-   The bundled `jest-dev-server` dependency has been updated to the next major version `^6.0.0` ([#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+-   The bundled `stylelint` dependency has been updated from requiring `^13.8.0` to requiring `^14.2.0` ([#38091](https://github.com/WordPress/gutenberg/pull/38091)).
+
+### New Features
+
+-   Added a new `plugin-zip` command to create a zip file for a WordPress plugin ([#37687](https://github.com/WordPress/gutenberg/pull/37687)).
+-   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)).
+-   Automatically copy `block.json` files located in the `src` folder and its subfolders to the output folder (`build` by default) ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
+-   Scan the `src` directory for `block.json` files to detect defined scripts to use them as entry points with the `start` and `build` commands. ([#37661](https://github.com/WordPress/gutenberg/pull/37661)).
 
 ### Bug Fixes
 
 -   Prevent the `CleanWebpackPlugin` plugin from deleting webpack assets during multi-configuration builds [#35980](https://github.com/WordPress/gutenberg/issues/35980).
+-   Remove temporary workaround fixing CommonJS import for `mini-css-extract-plugin` [#38027](https://github.com/WordPress/gutenberg/pull/38027).
+
+### Internal
+
+-   The bundled `read-pkg-up` dependency has been updated from requiring `^1.0.1` to requiring `^7.0.1` ([#37395](https://github.com/WordPress/gutenberg/pull/37395)).
+
+## 19.2.3 (2022-01-17)
+
+### Bug Fixes
+
+-   Added temporary workaround to fix broken CommonJS import of `mini-css-extract-plugin` [#38004](https://github.com/WordPress/gutenberg/pull/38004).
 
 ## 19.2.0 (2021-11-15)
 

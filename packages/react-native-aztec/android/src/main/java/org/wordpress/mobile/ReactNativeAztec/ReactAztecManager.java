@@ -80,6 +80,8 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     private static final String BLOCK_TYPE_TAG_KEY = "tag";
     private static final String LINK_TEXT_COLOR_KEY = "linkTextColor";
 
+    private float mCurrentLineHeight = 0;
+
     @Nullable private final Consumer<Exception> exceptionLogger;
     @Nullable private final Consumer<String> breadcrumbLogger;
 
@@ -286,10 +288,15 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         view.setTextSize(
                 TypedValue.COMPLEX_UNIT_PX,
                 (int) Math.ceil(PixelUtil.toPixelFromSP(fontSize)));
+
+        if (mCurrentLineHeight != 0) {
+            setLineHeight(view, mCurrentLineHeight);
+        }
     }
 
     @ReactProp(name = ViewProps.LINE_HEIGHT)
     public void setLineHeight(ReactAztecText view, float lineHeight) {
+        mCurrentLineHeight = lineHeight;
         float textSize = view.getTextSize();
         view.setLineSpacing(textSize * lineHeight, (float) (lineHeight / textSize));
     }

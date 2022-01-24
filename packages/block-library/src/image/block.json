@@ -84,7 +84,10 @@
 			"background": false
 		},
 		"__experimentalBorder": {
-			"radius": true
+			"radius": true,
+			"__experimentalDefaultControls": {
+				"radius": true
+			}
 		}
 	},
 	"styles": [

@@ -5,6 +5,8 @@
 @import "./buttons/editor.scss";
 @import "./categories/editor.scss";
 @import "./columns/editor.scss";
+@import "./comments-pagination/editor.scss";
+@import "./comments-pagination-numbers/editor.scss";
 @import "./cover/editor.scss";
 @import "./embed/editor.scss";
 @import "./file/editor.scss";
@@ -50,6 +52,13 @@
 	@include gradient-colors-deprecated();
 }
 
+// This CSS Custom Properties aren't used anymore as defaults,
+// but we still need to keep them for backward compatibility.
+.editor-styles-wrapper {
+	--wp--preset--font-size--normal: 16px;
+	--wp--preset--font-size--huge: 42px;
+}
+
 // Font sizes (not used now, kept because of backward compatibility).
 //
 // The reason we add the editor class wrapper here is
@@ -60,6 +69,14 @@
 
 .editor-styles-wrapper .has-larger-font-size {
 	font-size: 42px;
+}
+
+.editor-styles-wrapper .has-normal-font-size {
+	font-size: var(--wp--preset--font-size--normal);
+}
+
+.editor-styles-wrapper .has-huge-font-size {
+	font-size: var(--wp--preset--font-size--huge);
 }
 
 /**
