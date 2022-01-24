@@ -11,13 +11,16 @@ import { useBlockProps } from '@wordpress/block-editor';
  * be combined into the final markup, which is then serialized by the block
  * editor into `post_content`.
  *
+ * When using React hooks, we need to create a React component so that we adhere
+ * to the rules of hooks @see https://reactjs.org/docs/hooks-rules.html
+
  * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#save
  *
  * @param {Object} props            Properties passed to the function.
  * @param {Object} props.attributes Available block attributes.
  * @return {WPElement} Element to render.
  */
-export default function save( { attributes } ) {
+export default function Save( { attributes } ) {
 	const blockProps = useBlockProps.save();
 	return <div { ...blockProps }>{ attributes.message }</div>;
 }
