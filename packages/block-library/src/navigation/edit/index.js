@@ -486,12 +486,15 @@ function Navigation( {
 							>
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
+										clientId={ clientId }
 										onSelect={ ( { id } ) => {
 											setRef( id );
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
-										showCreate={ canUserCreateNavigation }
+										canUserCreateNavigation={
+											canUserCreateNavigation
+										}
 									/>
 								) }
 							</ToolbarDropdownMenu>
