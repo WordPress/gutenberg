@@ -397,7 +397,10 @@ function getFunctionToken( token ) {
 
 function getFunctionNameForError( declarationToken ) {
 	let namedFunctionToken = declarationToken;
-	if ( babelTypes.isExportNamedDeclaration( declarationToken ) ) {
+	if (
+		babelTypes.isExportNamedDeclaration( declarationToken ) ||
+		babelTypes.isExportDefaultDeclaration( declarationToken )
+	) {
 		namedFunctionToken = declarationToken.declaration;
 	}
 
@@ -451,7 +454,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
  * @param {CommentTag} tag              The documented parameter.
  * @param {ASTNode}    declarationToken The function the parameter is documented on.
  * @param {number}     paramIndex       The parameter index.
- * @return {null | string} The parameter's type annotation.
+ * @return {string?} The parameter's type annotation.
  */
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
@@ -469,58 +472,51 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 		);
 	}
 
+	if ( babelTypes.isAssignmentPattern( paramToken ) ) {
+		paramToken = paramToken.left;
+	}
+
+	if (
+		! paramToken.typeAnnotation ||
+		! paramToken.typeAnnotation.typeAnnotation
+	) {
+		return;
+	}
+
+	const paramType = paramToken.typeAnnotation.typeAnnotation;
 	const isQualifiedName = tag.name.includes( '.' );
 
-	try {
-		if ( babelTypes.isAssignmentPattern( paramToken ) ) {
-			paramToken = paramToken.left;
-		}
-
-		const paramType = paramToken.typeAnnotation.typeAnnotation;
-
-		if (
-			babelTypes.isIdentifier( paramToken ) ||
-			babelTypes.isRestElement( paramToken ) ||
-			( ( babelTypes.isArrayPattern( paramToken ) ||
-				babelTypes.isObjectPattern( paramToken ) ) &&
-				! isQualifiedName )
-		) {
-			return getTypeAnnotation( paramType );
-		} else if ( babelTypes.isArrayPattern( paramToken ) ) {
-			return getQualifiedArrayPatternTypeAnnotation( tag, paramType );
-		} else if ( babelTypes.isObjectPattern( paramToken ) ) {
-			return getQualifiedObjectPatternTypeAnnotation( tag, paramType );
-		}
-	} catch ( e ) {
-		throw new Error(
-			`Could not find type for parameter '${
-				tag.name
-			}' in function '${ getFunctionNameForError( declarationToken ) }'.`
-		);
+	if (
+		babelTypes.isIdentifier( paramToken ) ||
+		babelTypes.isRestElement( paramToken ) ||
+		( ( babelTypes.isArrayPattern( paramToken ) ||
+			babelTypes.isObjectPattern( paramToken ) ) &&
+			! isQualifiedName )
+	) {
+		return getTypeAnnotation( paramType );
+	} else if ( babelTypes.isArrayPattern( paramToken ) ) {
+		return getQualifiedArrayPatternTypeAnnotation( tag, paramType );
+	} else if ( babelTypes.isObjectPattern( paramToken ) ) {
+		return getQualifiedObjectPatternTypeAnnotation( tag, paramType );
 	}
 }
 
 /**
  * @param {ASTNode} declarationToken A function token.
- * @return {null | string} The function's return type annoation.
+ * @return {string?} The function's return type annotation.
  */
 function getReturnTypeAnnotation( declarationToken ) {
 	const functionToken = getFunctionToken( declarationToken );
-
-	try {
-		return getTypeAnnotation( functionToken.returnType.typeAnnotation );
-	} catch ( e ) {
-		throw new Error(
-			`Could not find return type for function '${ getFunctionNameForError(
-				declarationToken
-			) }'.`
-		);
+	if ( ! functionToken.returnType ) {
+		return;
 	}
+
+	return getTypeAnnotation( functionToken.returnType.typeAnnotation );
 }
 
 /**
  * @param {ASTNode} declarationToken
- * @return {string} The type annotation for the variable.
+ * @return {string?} The type annotation for the variable.
  */
 function getVariableTypeAnnotation( declarationToken ) {
 	let resolvedToken = declarationToken;
@@ -541,7 +537,6 @@ function getVariableTypeAnnotation( declarationToken ) {
 		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
 	} catch ( e ) {
 		// assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
-		return '';
 	}
 }
 
@@ -550,7 +545,7 @@ module.exports =
 	 * @param {CommentTag}    tag   A comment tag.
 	 * @param {ASTNode}       token A function token.
 	 * @param {number | null} index The index of the parameter or `null` if not a param tag.
-	 * @return {null | string} The type annotation for the given tag or null if the tag has no type annotation.
+	 * @return {[string]} The type annotation for the given tag or null if the tag has no type annotation.
 	 */
 	function ( tag, token, index ) {
 		// If the file is using JSDoc type annotations, use the JSDoc.
@@ -567,9 +562,6 @@ module.exports =
 			}
 			case 'type': {
 				return getVariableTypeAnnotation( token );
-			}
-			default: {
-				return '';
 			}
 		}
 	};
