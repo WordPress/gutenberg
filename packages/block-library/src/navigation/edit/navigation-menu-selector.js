@@ -21,7 +21,10 @@ export default function NavigationMenuSelector( {
 	onCreateNew,
 	canUserCreateNavigation = false,
 } ) {
-	const { menus: classicMenus } = useNavigationEntities();
+	const {
+		menus: classicMenus,
+		hasMenus: hasClassicMenus,
+	} = useNavigationEntities();
 	const { navigationMenus } = useNavigationMenu();
 	const ref = useEntityId( 'postType', 'wp_navigation' );
 
@@ -74,23 +77,25 @@ export default function NavigationMenuSelector( {
 			</MenuGroup>
 			{ canUserCreateNavigation && (
 				<>
-					<MenuGroup label={ __( 'Classic Menus' ) }>
-						{ classicMenus.map( ( menu ) => {
-							return (
-								<MenuItem
-									onClick={ () => {
-										convertClassicMenuToBlocks(
-											menu.id,
-											menu.name
-										);
-									} }
-									key={ menu.id }
-								>
-									{ decodeEntities( menu.name ) }
-								</MenuItem>
-							);
-						} ) }
-					</MenuGroup>
+					{ hasClassicMenus && (
+						<MenuGroup label={ __( 'Classic Menus' ) }>
+							{ classicMenus.map( ( menu ) => {
+								return (
+									<MenuItem
+										onClick={ () => {
+											convertClassicMenuToBlocks(
+												menu.id,
+												menu.name
+											);
+										} }
+										key={ menu.id }
+									>
+										{ decodeEntities( menu.name ) }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
 					<MenuGroup label={ __( 'Tools' ) }>
 						<MenuItem onClick={ onCreateNew }>
 							{ __( 'Create new menu' ) }
