@@ -55,6 +55,8 @@ function createPreloadingMiddleware( preloadedData ) {
 }
 
 /**
+ * This is a helper function that sends a success response.
+ *
  * @param {Record<string, any>} responseData
  * @param {boolean}             parse
  * @return {Promise<any>} Promise with the response.
