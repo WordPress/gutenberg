@@ -7,7 +7,7 @@ import { concat, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { compose, useInstanceId } from '@wordpress/compose';
 import {
 	BaseControl,
 	PanelBody,
@@ -24,8 +24,15 @@ import {
 	useBlockProps,
 	BlockControls,
 	MediaReplaceFlow,
+	BlockList,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useMemo } from '@wordpress/element';
+import {
+	Platform,
+	useEffect,
+	useMemo,
+	createPortal,
+	useContext,
+} from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -113,6 +120,9 @@ function GalleryEdit( props ) {
 			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
 		};
 	}, [] );
+
+	const id = useInstanceId( getBlock( clientId ) );
+	const styleElement = useContext( BlockList.__unstableElementContext );
 
 	const innerBlockImages = useSelect(
 		( select ) => {
@@ -473,9 +483,15 @@ function GalleryEdit( props ) {
 	}
 
 	const hasLinkTo = linkTo && linkTo !== 'none';
-	const style = attributes.style?.spacing?.blockGap
-		? `#block-${ clientId } { --wp--style--unstable-gallery-gap: ${ attributes.style.spacing.blockGap } }`
+
+	const gap = attributes.style?.spacing?.blockGap
+		? `.wp-container-${ id } { --wp--style--unstable-gallery-gap: ${ attributes.style.spacing.blockGap } }`
 		: undefined;
+
+	const GapStyle = () => {
+		return <style>{ gap }</style>;
+	};
+
 	return (
 		<>
 			<InspectorControls>
@@ -550,7 +566,7 @@ function GalleryEdit( props ) {
 				/>
 			</BlockControls>
 			{ noticeUI }
-			<style>{ style }</style>
+			{ gap && createPortal( <GapStyle />, styleElement ) }
 			<Gallery
 				{ ...props }
 				images={ images }
