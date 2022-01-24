@@ -12,5 +12,7 @@ import { css } from '@emotion/react';
  * any parent Popover component.
  */
 export const wrapper = css`
-	z-index: 1000001;
+	&& {
+		z-index: 1000001;
+	}
 `;
