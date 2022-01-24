@@ -4,6 +4,7 @@
 import { Disabled } from '@wordpress/components';
 import { useResizeObserver, pure, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,9 +35,16 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	}, [] );
 
 	// Avoid scrollbars for pattern previews.
-	if ( styles ) {
-		styles.push( { css: 'body{overflow:hidden;}' } );
-	}
+	const editorStyles = useMemo( () => {
+		if ( styles ) {
+			return [
+				...styles,
+				{ css: 'body{overflow:hidden;}', __unstableType: 'presets' },
+			];
+		}
+
+		return styles;
+	}, [ styles ] );
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
@@ -54,7 +62,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 				} }
 			>
 				<Iframe
-					head={ <EditorStyles styles={ styles } /> }
+					head={ <EditorStyles styles={ editorStyles } /> }
 					assets={ assets }
 					contentRef={ useRefEffect( ( bodyElement ) => {
 						const {
