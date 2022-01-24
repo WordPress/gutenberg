@@ -37,6 +37,16 @@ export type ToolsPanelProps = {
 	 * placeholder content instead of null when they are toggled off and hidden.
 	 */
 	shouldRenderPlaceholderItems: boolean;
+	/**
+	 * Experimental prop allowing for a custom CSS class to be applied to the
+	 * first visible `ToolsPanelItem` within the `ToolsPanel`.
+	 */
+	__experimentalFirstVisibleItemClass?: string;
+	/**
+	 * Experimental prop allowing for a custom CSS class to be applied to the
+	 * last visible `ToolsPanelItem` within the `ToolsPanel`.
+	 */
+	__experimentalLastVisibleItemClass?: string;
 };
 
 export type ToolsPanelHeaderProps = {
@@ -130,6 +140,10 @@ export type ToolsPanelContext = {
 	isResetting: boolean;
 	shouldRenderPlaceholderItems: boolean;
 	areAllOptionalControlsHidden: boolean;
+	firstDisplayedItem?: string;
+	lastDisplayedItem?: string;
+	__experimentalFirstVisibleItemClass?: string;
+	__experimentalLastVisibleItemClass?: string;
 };
 
 export type ToolsPanelControlsGroupProps = {

@@ -11,8 +11,24 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.70.0
+
+-   [**] Fix content justification attribute in Buttons block [#37887]
+-   [*] Hide help button from Unsupported Block Editor. [#37221]
 -   [*] Add contrast checker to text-based blocks [#34902]
+-   [*] [Image block] Fix missing translations [#37956]
+-   [*] Fix cut-off setting labels by properly wrapping the text [#37993]
+-   [*] Highlight text: fix applying formatting for non-selected text [#37915]
+-   [*] Fix missing translations of color settings [#38026]
+
+## 1.69.1
+
+-   [*] Fix app freeze when closing link picker while virtual keyboard is hidden [#37782]
+-   [*] Gallery block - Fix bug when migrating from old galleries format [#37889]
+-   [*] RichText - Use parsed font size values when comparing new changes [#37951]
+
 ## 1.69.0
+
 -   [*] Give multi-line block names central alignment in inserter [#37185]
 -   [**] Fix empty line apperaing when splitting heading blocks on Android 12 [#37279]
 -   [**] Fix missing translations by refactoring the editor initialization code [#37073]
@@ -20,6 +36,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fix app freeze when closing link picker while virtual keyboard is hidden [#37782]
 
 ## 1.68.0
+
 -   [**] Fix undo/redo functionality in links when applying text format [#36861]
 -   [**] [iOS] Fix scroll update when typing in RichText component [#36914]
 -   [*] [Preformatted block] Fix an issue where the background color is not showing up for standard themes [#36883]
@@ -27,6 +44,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [***] Highlight text - enables color customization for specific text within a Paragraph block [#36028]
 
 ## 1.67.0
+
 -   [**] Adds Clipboard Link Suggestion to Image block and Button block [#35972]
 -   [*] [Embed block] Included Link in Block Settings [#36099]
 -   [**] Fix tab titles translation of inserter menu [#36534]
@@ -34,13 +52,16 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] [Gallery block] When a gallery block is added, the media options are auto opened for v2 of the Gallery block. [#36757]
 
 ## 1.66.0
+
 -   [**] [Image block] Add ability to quickly link images to Media Files and Attachment Pages [#34846]
 -   [*] Fixed a race condition when autosaving content (Android) [#36072]
 
 ## 1.65.1
+
 -   [**] Fixed a crash that could occur when copying lists from Microsoft Word. [https://github.com/WordPress/gutenberg/pull/36019]
 
 ## 1.65.0
+
 -   [**] Search block - Text and background color support [#35511]
 -   [*] [Embed Block] Fix loading glitch with resolver resolution approach [#35798]
 -   [*] Fixed an issue where the Help screens may not respect an iOS device's notch. [#35570]
@@ -48,10 +69,12 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Add support for the Mark HTML tag [#35956]
 
 ## 1.64.1
+
 -   [**] Fix updating the block list after block removal [#35721]
 -   [**] Cover block: Change dimRatio to 50 if media added and dimRatio is set to 100 [#35792]
 
 ## 1.64.0
+
 -   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
 -   [**] [Embed block] Detect when an embeddable URL is pasted into an empty paragraph. [#35204]
 -   [*] [Unsupported Block Editor] Fix text selection bug for Android [#34668]
@@ -60,22 +83,27 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Preformatted block - Added support for text and background color customization [#35314]
 
 ## 1.63.1
+
 -   [*] Fixed missing modal backdrop for Android help section [#35557]
 -   [*] Fixed erroneous overflow within editor Help screens. [#35552]
 
 ## 1.63.0
+
 -   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
 -   [*] Embed block: Fix URL update when edited after setting a bad URL of a provider [#35013]
 -   [**] Users can now contact support from inside the block editor screen. [#34890]
 
 ## 1.62.2
+
 -   Same as 1.62.1 but with the changelog.
 
 ## 1.62.1
+
 -   [**] Image block: fix height and border regression. [#34957]
 -   [**] Column block: fix width attribute float cut off. [#34604]
 
 ## 1.62.0
+
 -   [**] [Embed block] Implement WP embed preview component [#34004]
 -   [*] [Embed block] Fix content disappearing on Android when switching light/dark mode [#34207]
 -   [*] Embed block: Add device's locale to preview content [#33858]
@@ -86,68 +114,86 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Embed block: Add error bottom sheet with retry and convert to link actions. [#34604]
 
 ## 1.61.2
+
 -   [*] Image block - Fix height and border regression. [#34957]
 
 ## 1.61.1
+
 -   [*] Fix crash related to reusable blocks in the block picker. [#34873]
 
 ## 1.61.0
+
 -   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]
 -   [***] Inserter: Add Inserter Block Search [https://github.com/WordPress/gutenberg/pull/33237]
 
 ## 1.60.1
+
 -   [*] RNmobile: Fix the cancel button on Block Variation Picker / Columns Block. [#34249]
 -   [*] Column block: Fix Android close button alignment. [#34332]
 
 ## 1.60.0
+
 -   [**] Embed block: Add "Resize for smaller devices" setting. [#33654]
 
 ## 1.59.2
+
 -   [*] Inserter: Prevent non-deterministic order of inserter items [#34078]
 -   [*] Fix missing block title of core/latest-posts block [#34116]
 
 ## 1.59.1
+
 -   [*] Global styles - Add color to the block styles filter list [#34000]
 -   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
 
 ## 1.59.0
+
 -   [*] [Android] Fix UBE's inaccessible "more" toolbar item. [#33740]
 -   [*] Image block: Add a "featured" banner and ability to set or remove an image as featured. (iOS only) [#31345]
 
 ## 1.58.3
+
 -   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
 
 ## 1.58.2
+
 -   [*] Fix issue with text input in alt text settings [#33845]
 
 ## 1.58.1
+
 -   [*] Global styles: Check for undefined values and merge user colors [#33707]
 -   [*] [Embed block] Disable paragraph transform [#33745]
 
 ## 1.58.0
+
 -   [***] New Block: Embed block. [#33452]
 
 ## 1.57.0
+
 -   [*] Update loading and failed screens for web version of the editor [#32395]
 -   [*] Handle floating keyboard case - Fix issue with the block selector on iPad. [#33089]
 -   [**] Added color/background customization for text blocks. [#33250]
 
 ## 1.56.0
+
 -   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
 
 ## 1.55.2
+
 -   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
 
 ## 1.55.1
+
 -   [*] Fix: RNMobile borderRadius value setting [#32717]
 -   [*] Improve unsupported block message for reusable block [#32618]
 
 ## 1.55.0
+
 -   [*] Gallery block - Fix gallery images caption text formatting [#32351]
 -   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]
 -   [***] Audio block now available on WP.com sites on the free plan. [#31966]
 
 ## 1.54.0
+
 -   [***] Slash inserter [#29772]
 -   [*] Audio block: Add Insert from URL functionality. [#27817]
 -   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]

@@ -252,7 +252,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		)
 	);
 
-	// If thare are no pages, there is nothing to show.
+	// If there are no pages, there is nothing to show.
 	if ( empty( $all_pages ) ) {
 		return;
 	}

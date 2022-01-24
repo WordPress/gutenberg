@@ -50,7 +50,9 @@ import { name } from './block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
-const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+const DEFAULT_BLOCK = {
+	name: 'core/navigation-link',
+};
 
 const MAX_NESTING = 5;
 

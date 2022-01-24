@@ -176,7 +176,7 @@ class Inserter extends Component {
 			onSelectOrClose,
 		} = this.props;
 
-		if ( hasSingleBlockType || directInsertBlock?.length ) {
+		if ( hasSingleBlockType || directInsertBlock ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 
@@ -251,8 +251,66 @@ export default compose( [
 					onSelectOrClose,
 				} = ownProps;
 
-				if ( ! hasSingleBlockType && ! directInsertBlock?.length ) {
+				if ( ! hasSingleBlockType && ! directInsertBlock ) {
 					return;
+				}
+
+				function getAdjacentBlockAttributes( attributesToCopy ) {
+					const { getBlock, getPreviousBlockClientId } = select(
+						blockEditorStore
+					);
+
+					if (
+						! attributesToCopy ||
+						( ! clientId && ! rootClientId )
+					) {
+						return {};
+					}
+
+					const result = {};
+					let adjacentAttributes = {};
+
+					// If there is no clientId, then attempt to get attributes
+					// from the last block within innerBlocks of the root block.
+					if ( ! clientId ) {
+						const parentBlock = getBlock( rootClientId );
+
+						if ( parentBlock?.innerBlocks?.length ) {
+							const lastInnerBlock =
+								parentBlock.innerBlocks[
+									parentBlock.innerBlocks.length - 1
+								];
+
+							if (
+								directInsertBlock &&
+								directInsertBlock?.name === lastInnerBlock.name
+							) {
+								adjacentAttributes = lastInnerBlock.attributes;
+							}
+						}
+					} else {
+						// Otherwise, attempt to get attributes from the
+						// previous block relative to the current clientId.
+						const currentBlock = getBlock( clientId );
+						const previousBlock = getBlock(
+							getPreviousBlockClientId( clientId )
+						);
+
+						if ( currentBlock?.name === previousBlock?.name ) {
+							adjacentAttributes =
+								previousBlock?.attributes || {};
+						}
+					}
+
+					// Copy over only those attributes flagged to be copied.
+					attributesToCopy.forEach( ( attribute ) => {
+						if ( adjacentAttributes.hasOwnProperty( attribute ) ) {
+							result[ attribute ] =
+								adjacentAttributes[ attribute ];
+						}
+					} );
+
+					return result;
 				}
 
 				function getInsertionIndex() {
@@ -284,9 +342,23 @@ export default compose( [
 
 				const { insertBlock } = dispatch( blockEditorStore );
 
-				const blockToInsert = directInsertBlock?.length
-					? createBlock( ...directInsertBlock )
-					: createBlock( allowedBlockType.name );
+				let blockToInsert;
+
+				// Attempt to augment the directInsertBlock with attributes from an adjacent block.
+				// This ensures styling from nearby blocks is preserved in the newly inserted block.
+				// See: https://github.com/WordPress/gutenberg/issues/37904
+				if ( directInsertBlock ) {
+					const newAttributes = getAdjacentBlockAttributes(
+						directInsertBlock.attributesToCopy
+					);
+
+					blockToInsert = createBlock( directInsertBlock.name, {
+						...( directInsertBlock.attributes || {} ),
+						...newAttributes,
+					} );
+				} else {
+					blockToInsert = createBlock( allowedBlockType.name );
+				}
 
 				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
 

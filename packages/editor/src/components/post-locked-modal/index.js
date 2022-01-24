@@ -102,7 +102,8 @@ export default function PostLockedModal() {
 					isLocked: true,
 					isTakeover: true,
 					user: {
-						avatar: received.lock_error.avatar_src,
+						name: received.lock_error.name,
+						avatar: received.lock_error.avatar_src_2x,
 					},
 				} );
 			} else if ( received.new_lock ) {
@@ -185,6 +186,8 @@ export default function PostLockedModal() {
 					src={ userAvatar }
 					alt={ __( 'Avatar' ) }
 					className="editor-post-locked-modal__avatar"
+					width={ 64 }
+					height={ 64 }
 				/>
 			) }
 			<div>
@@ -214,29 +217,36 @@ export default function PostLockedModal() {
 					</p>
 				) }
 				{ ! isTakeover && (
-					<p>
-						{ createInterpolateElement(
-							userDisplayName
-								? sprintf(
-										/* translators: %s: user's display name */
-										__(
-											'<strong>%s</strong> is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
-										),
-										userDisplayName
-								  )
-								: __(
-										'Another user is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
-								  ),
-							{
-								strong: <strong />,
-								PreviewLink: (
-									<ExternalLink href={ previewLink }>
-										{ __( 'preview' ) }
-									</ExternalLink>
-								),
-							}
-						) }
-					</p>
+					<>
+						<p>
+							{ createInterpolateElement(
+								userDisplayName
+									? sprintf(
+											/* translators: %s: user's display name */
+											__(
+												'<strong>%s</strong> is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
+											),
+											userDisplayName
+									  )
+									: __(
+											'Another user is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
+									  ),
+								{
+									strong: <strong />,
+									PreviewLink: (
+										<ExternalLink href={ previewLink }>
+											{ __( 'preview' ) }
+										</ExternalLink>
+									),
+								}
+							) }
+						</p>
+						<p>
+							{ __(
+								'If you take over, the other user will lose editing control to the post, but their changes will be saved.'
+							) }
+						</p>
+					</>
 				) }
 
 				<Flex

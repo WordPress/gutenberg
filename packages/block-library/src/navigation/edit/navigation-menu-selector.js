@@ -11,18 +11,47 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
+import useNavigationEntities from '../use-navigation-entities';
+import useConvertClassicMenu from '../use-convert-classic-menu';
+import useCreateNavigationMenu from './use-create-navigation-menu';
 
 export default function NavigationMenuSelector( {
+	clientId,
 	onSelect,
 	onCreateNew,
-	showCreate = false,
+	canUserCreateNavigation = false,
 } ) {
+	const {
+		menus: classicMenus,
+		hasMenus: hasClassicMenus,
+	} = useNavigationEntities();
 	const { navigationMenus } = useNavigationMenu();
 	const ref = useEntityId( 'postType', 'wp_navigation' );
 
+	const createNavigationMenu = useCreateNavigationMenu( clientId );
+
+	const onFinishMenuCreation = async (
+		blocks,
+		navigationMenuTitle = null
+	) => {
+		if ( ! canUserCreateNavigation ) {
+			return;
+		}
+
+		const navigationMenu = await createNavigationMenu(
+			navigationMenuTitle,
+			blocks
+		);
+		onSelect( navigationMenu );
+	};
+
+	const convertClassicMenuToBlocks = useConvertClassicMenu(
+		onFinishMenuCreation
+	);
+
 	return (
 		<>
-			<MenuGroup>
+			<MenuGroup label={ __( 'Menus' ) }>
 				<MenuItemsChoice
 					value={ ref }
 					onSelect={ ( selectedId ) =>
@@ -46,19 +75,40 @@ export default function NavigationMenuSelector( {
 					} ) }
 				/>
 			</MenuGroup>
-			{ showCreate && (
-				<MenuGroup>
-					<MenuItem onClick={ onCreateNew }>
-						{ __( 'Create new menu' ) }
-					</MenuItem>
-					<MenuItem
-						href={ addQueryArgs( 'edit.php', {
-							post_type: 'wp_navigation',
-						} ) }
-					>
-						{ __( 'Manage menus' ) }
-					</MenuItem>
-				</MenuGroup>
+			{ canUserCreateNavigation && (
+				<>
+					{ hasClassicMenus && (
+						<MenuGroup label={ __( 'Classic Menus' ) }>
+							{ classicMenus.map( ( menu ) => {
+								return (
+									<MenuItem
+										onClick={ () => {
+											convertClassicMenuToBlocks(
+												menu.id,
+												menu.name
+											);
+										} }
+										key={ menu.id }
+									>
+										{ decodeEntities( menu.name ) }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+					<MenuGroup label={ __( 'Tools' ) }>
+						<MenuItem onClick={ onCreateNew }>
+							{ __( 'Create new menu' ) }
+						</MenuItem>
+						<MenuItem
+							href={ addQueryArgs( 'edit.php', {
+								post_type: 'wp_navigation',
+							} ) }
+						>
+							{ __( 'Manage menus' ) }
+						</MenuItem>
+					</MenuGroup>
+				</>
 			) }
 		</>
 	);

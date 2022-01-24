@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { uniqueId } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -22,6 +27,7 @@ import {
 	deleteUser,
 	switchUserToAdmin,
 } from '@wordpress/e2e-test-utils';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -30,6 +36,7 @@ import menuItemsFixture from '../fixtures/menu-items-request-fixture.json';
 
 const POSTS_ENDPOINT = '/wp/v2/posts';
 const PAGES_ENDPOINT = '/wp/v2/pages';
+const DRAFT_PAGES_ENDPOINT = [ PAGES_ENDPOINT, { status: 'draft' } ];
 const NAVIGATION_MENUS_ENDPOINT = '/wp/v2/navigation';
 
 async function mockSearchResponse( items ) {
@@ -126,8 +133,17 @@ const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select
  * @param {*} endpoints The endpoints of the resources to delete.
  */
 async function deleteAll( endpoints ) {
-	for ( const path of endpoints ) {
-		const items = await rest( { path } );
+	for ( const endpoint of endpoints ) {
+		const defaultArgs = { per_page: -1 };
+		const isArrayEndpoint = Array.isArray( endpoint );
+		const path = isArrayEndpoint ? endpoint[ 0 ] : endpoint;
+		const args = isArrayEndpoint
+			? { ...defaultArgs, ...endpoint[ 1 ] }
+			: defaultArgs;
+
+		const items = await rest( {
+			path: addQueryArgs( path, args ),
+		} );
 
 		for ( const item of items ) {
 			await rest( {
@@ -200,10 +216,23 @@ async function getNavigationMenuRawContent() {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
+	const contributorUsername = uniqueId( 'contributoruser_' );
+	let contributorPassword;
+
+	beforeAll( async () => {
+		// Creation of the contributor user **MUST** be at the top level describe block
+		// otherwise this test will become unstable. This action only happens once
+		// so there is no huge performance hit.
+		contributorPassword = await createUser( contributorUsername, {
+			role: 'contributor',
+		} );
+	} );
+
 	beforeEach( async () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
 			PAGES_ENDPOINT,
+			DRAFT_PAGES_ENDPOINT,
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
@@ -217,9 +246,14 @@ describe( 'Navigation', () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
 			PAGES_ENDPOINT,
+			DRAFT_PAGES_ENDPOINT,
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
+
+		// As per the creation in the beforeAll() above, this
+		// action must be done at the root level describe() block.
+		await deleteUser( contributorUsername );
 	} );
 
 	describe( 'placeholder', () => {
@@ -468,9 +502,6 @@ describe( 'Navigation', () => {
 		);
 		const createPagePromise = createPageButton.click();
 		await Promise.all( [ responsePromise, createPagePromise ] );
-		expect( console ).toHaveErroredWith(
-			'Failed to load resource: the server responded with a status of 404 (Not Found)'
-		);
 
 		// Creating a draft is async, so wait for a sign of completion. In this
 		// case the link that shows in the URL popover once a link is added.
@@ -482,6 +513,9 @@ describe( 'Navigation', () => {
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: the server responded with a status of 404 (Not Found)'
+		);
 	} );
 
 	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
@@ -748,21 +782,8 @@ describe( 'Navigation', () => {
 	} );
 
 	describe( 'Permission based restrictions', () => {
-		const contributorUsername = 'contributoruser';
-		let contributorPassword;
-
-		beforeAll( async () => {
-			contributorPassword = await createUser( contributorUsername, {
-				role: 'contributor',
-			} );
-		} );
-
 		afterEach( async () => {
 			await switchUserToAdmin();
-		} );
-
-		afterAll( async () => {
-			await deleteUser( contributorUsername );
 		} );
 
 		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {
