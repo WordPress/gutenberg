@@ -33,6 +33,11 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 		};
 	}, [] );
 
+	// Avoid scrollbars for pattern previews.
+	if ( styles ) {
+		styles.push( { css: 'body{overflow:hidden;}' } );
+	}
+
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
