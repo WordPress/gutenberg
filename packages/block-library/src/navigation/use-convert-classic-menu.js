@@ -38,18 +38,21 @@ export default function useConvertClassicMenu( onFinish ) {
 		}
 	}, [ isAwaitingMenuItemResolution, hasResolvedMenuItems, menuName ] );
 
-	return ( id, name ) => {
-		setSelectedMenu( id );
+	return useCallback(
+		( id, name ) => {
+			setSelectedMenu( id );
 
-		// If we have menu items, create the block right away.
-		if ( hasResolvedMenuItems ) {
-			createFromMenu( name );
-			return;
-		}
+			// If we have menu items, create the block right away.
+			if ( hasResolvedMenuItems ) {
+				createFromMenu( name );
+				return;
+			}
 
-		// Otherwise, create the block when resolution finishes.
-		setIsAwaitingMenuItemResolution( true );
-		// Store the name to use later.
-		setMenuName( name );
-	};
+			// Otherwise, create the block when resolution finishes.
+			setIsAwaitingMenuItemResolution( true );
+			// Store the name to use later.
+			setMenuName( name );
+		},
+		[ hasResolvedMenuItems, createFromMenu ]
+	);
 }
