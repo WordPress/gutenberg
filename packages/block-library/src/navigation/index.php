@@ -343,6 +343,8 @@ function block_core_navigation_get_fallback_blocks() {
 	 * To customise the blocks provided return an array of blocks - these should be valid
 	 * children of the `core/navigation` block.
 	 *
+	 * @since 5.9.0
+	 *
 	 * @param array[] default fallback blocks provided by the default block mechanic.
 	 */
 	return apply_filters( 'block_core_navigation_render_fallback', $fallback_blocks );
