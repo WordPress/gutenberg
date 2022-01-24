@@ -18,7 +18,7 @@ import setupLocale from '../setup-locale';
 jest.mock( 'react-native/Libraries/ReactNative/AppRegistry' );
 jest.mock( '../setup-locale' );
 
-const initGutenberg = ( registerParams ) => {
+const getEditorComponent = ( registerParams ) => {
 	let EditorComponent;
 	AppRegistry.registerComponent.mockImplementation(
 		( name, componentProvider ) => {
@@ -26,8 +26,7 @@ const initGutenberg = ( registerParams ) => {
 		}
 	);
 	registerGutenberg( registerParams );
-
-	return render( <EditorComponent /> );
+	return EditorComponent;
 };
 
 describe( 'Register Gutenberg', () => {
@@ -53,7 +52,8 @@ describe( 'Register Gutenberg', () => {
 			};
 		} );
 
-		initGutenberg();
+		const EditorComponent = getEditorComponent();
+		render( <EditorComponent /> );
 
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
 		// Reference: https://git.io/JyBk0
@@ -77,7 +77,8 @@ describe( 'Register Gutenberg', () => {
 			};
 		} );
 
-		initGutenberg( { beforeInitCallback } );
+		const EditorComponent = getEditorComponent( { beforeInitCallback } );
+		render( <EditorComponent /> );
 
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
 		// Reference: https://git.io/JyBk0
@@ -94,16 +95,17 @@ describe( 'Register Gutenberg', () => {
 
 		// An empty component is provided in order to listen for render calls of the editor component.
 		const onRenderEditor = jest.fn();
-		const EditorComponent = () => {
+		const MockEditor = () => {
 			onRenderEditor();
 			return null;
 		};
 		jest.mock( '../setup', () => ( {
 			__esModule: true,
-			default: jest.fn().mockReturnValue( <EditorComponent /> ),
+			default: jest.fn().mockReturnValue( <MockEditor /> ),
 		} ) );
 
-		initGutenberg();
+		const EditorComponent = getEditorComponent();
+		render( <EditorComponent /> );
 
 		const hookCallIndex = 0;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
@@ -123,16 +125,17 @@ describe( 'Register Gutenberg', () => {
 
 		// An empty component is provided in order to listen for render calls of the editor component.
 		const onRenderEditor = jest.fn();
-		const EditorComponent = () => {
+		const MockEditor = () => {
 			onRenderEditor();
 			return null;
 		};
 		jest.mock( '../setup', () => ( {
 			__esModule: true,
-			default: jest.fn().mockReturnValue( <EditorComponent /> ),
+			default: jest.fn().mockReturnValue( <MockEditor /> ),
 		} ) );
 
-		initGutenberg();
+		const EditorComponent = getEditorComponent();
+		render( <EditorComponent /> );
 
 		const hookCallIndex = 0;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
@@ -152,16 +155,17 @@ describe( 'Register Gutenberg', () => {
 
 		// An empty component is provided in order to listen for render calls of the editor component.
 		const onRenderEditor = jest.fn();
-		const EditorComponent = () => {
+		const MockEditor = () => {
 			onRenderEditor();
 			return null;
 		};
 		jest.mock( '../setup', () => ( {
 			__esModule: true,
-			default: jest.fn().mockReturnValue( <EditorComponent /> ),
+			default: jest.fn().mockReturnValue( <MockEditor /> ),
 		} ) );
 
-		initGutenberg();
+		const EditorComponent = getEditorComponent();
+		render( <EditorComponent /> );
 
 		const hookCallIndex = 1;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
@@ -185,7 +189,8 @@ describe( 'Register Gutenberg', () => {
 			};
 		} );
 
-		const screen = initGutenberg();
+		const EditorComponent = getEditorComponent();
+		const screen = render( <EditorComponent /> );
 		const blockList = await waitFor( () =>
 			screen.getByText( 'Mock Editor' )
 		);
