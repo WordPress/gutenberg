@@ -100,6 +100,7 @@ require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
 require __DIR__ . '/compat/wordpress-6.0/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
+require __DIR__ . '/compat/wordpress-6.0/global-styles.php';
 require __DIR__ . '/compat/experimental/blocks.php';
 
 require __DIR__ . '/blocks.php';
@@ -121,3 +122,9 @@ require __DIR__ . '/block-supports/layout.php';
 require __DIR__ . '/block-supports/spacing.php';
 require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
+
+/** WordPress Webfonts Classes & Functions */
+require_once __DIR__ . '/class-wp-webfonts.php';
+require_once __DIR__ . '/class-wp-webfonts-provider.php';
+require_once __DIR__ . '/class-wp-webfonts-provider-local.php';
+require_once __DIR__ . '/webfonts.php';
