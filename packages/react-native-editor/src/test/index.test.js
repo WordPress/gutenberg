@@ -181,7 +181,7 @@ describe( 'Register Gutenberg', () => {
 		expect( hookCallOrder ).toBeGreaterThan( onRenderEditorCallOrder );
 	} );
 
-	it( 'initializes the editor', async () => {
+	it( 'initializes the editor', () => {
 		// Unmock setup module to render the actual editor component.
 		jest.unmock( '../setup' );
 
