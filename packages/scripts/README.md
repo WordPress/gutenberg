@@ -350,7 +350,7 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run start` - starts the build for development.
+-   `npm start` - starts the build for development.
 -   `npm run start:hot` - starts the build for development with "Fast Refresh". The page will automatically reload if you make changes to the code.
 -   `npm run start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
 
