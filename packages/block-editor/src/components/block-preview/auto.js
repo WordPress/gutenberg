@@ -39,7 +39,10 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 		if ( styles ) {
 			return [
 				...styles,
-				{ css: 'body{overflow:hidden;}', __unstableType: 'presets' },
+				{
+					css: 'body{height:unset;overflow:hidden;}',
+					__unstableType: 'presets',
+				},
 			];
 		}
 
