@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/reusable-blocks",
-	"version": "3.0.21",
+	"version": "3.0.22",
 	"description": "Reusable blocks utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
