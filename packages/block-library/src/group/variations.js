@@ -9,7 +9,7 @@ const variations = [
 		title: __( 'Group' ),
 		description: __( 'Blocks shown in a column.' ),
 		attributes: { layout: { type: 'default' } },
-		scope: [ 'inserter', 'transform' ],
+		scope: [ 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes.layout?.type === 'default',
 	},
