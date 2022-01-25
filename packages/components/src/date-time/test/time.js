@@ -254,7 +254,7 @@ describe( 'TimePicker', () => {
 		).toBe( true );
 	} );
 
-	it( 'should have same layouts/orders for 12/24 hour formats', () => {
+	it( 'should have different layouts/orders for 12/24 hour formats', () => {
 		const onChangeSpy = jest.fn();
 
 		const { rerender } = render(
@@ -278,7 +278,7 @@ describe( 'TimePicker', () => {
 			screen.getByLabelText( 'Day' )
 		);
 
-		expect( monthInputIndex < dayInputIndex ).toBe( true );
+		expect( monthInputIndex > dayInputIndex ).toBe( true );
 
 		rerender(
 			<form aria-label="form">

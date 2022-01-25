@@ -194,10 +194,15 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 		</div>
 	);
 
-	const dayMonthFormat = (
+	const dayMonthFormat = is12Hour ? (
 		<>
 			{ monthFormat }
 			{ dayFormat }
+		</>
+	) : (
+		<>
+			{ dayFormat }
+			{ monthFormat }
 		</>
 	);
 
