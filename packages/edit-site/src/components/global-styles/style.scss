@@ -73,19 +73,19 @@
 
 .edit-site-global-styles-variations_item {
 	box-sizing: border-box;
-	padding: 3px;
+	padding: $border-width * 2;
 	border-radius: $radius-block-ui;
-	border: $gray-200 1px solid;
+	border: $gray-200 $border-width solid;
 
 	&.is-active {
-		border: $gray-900 1px solid;
+		border: $gray-900 $border-width solid;
 	}
 
 	&:hover {
-		border: var(--wp-admin-theme-color) 1px solid;
+		border: var(--wp-admin-theme-color) $border-width solid;
 	}
 
 	&:focus {
-		border: var(--wp-admin-theme-color) 1px solid;
+		border: var(--wp-admin-theme-color) $border-width solid;
 	}
 }
