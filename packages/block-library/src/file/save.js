@@ -42,7 +42,7 @@ export default function save( { attributes } ) {
 						/>
 					</>
 				) }
-				{ ! RichText.isEmpty( fileName ) && (
+				{
 					<a
 						id={ fileId }
 						href={ textLinkHref }
@@ -51,9 +51,9 @@ export default function save( { attributes } ) {
 							textLinkTarget ? 'noreferrer noopener' : undefined
 						}
 					>
-						<RichText.Content value={ fileName } />
+						{ fileName }
 					</a>
-				) }
+				}
 				{ showDownloadButton && (
 					<a
 						href={ href }
