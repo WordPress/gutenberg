@@ -21,6 +21,7 @@ import ScreenBackgroundColor from './screen-background-color';
 import ScreenTextColor from './screen-text-color';
 import ScreenLinkColor from './screen-link-color';
 import ScreenLayout from './screen-layout';
+import ScreenStyleVariations from './screen-style-variations';
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -98,6 +99,10 @@ function GlobalStylesUI() {
 		>
 			<GlobalStylesNavigationScreen path="/">
 				<ScreenRoot />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/variations">
+				<ScreenStyleVariations />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/blocks">
