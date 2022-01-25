@@ -138,12 +138,6 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Block Supports",
-		"slug": "block-supports",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports.md",
-		"parent": "block-tutorial"
-	},
-	{
 		"title": "Creating dynamic blocks",
 		"slug": "creating-dynamic-blocks",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md",
