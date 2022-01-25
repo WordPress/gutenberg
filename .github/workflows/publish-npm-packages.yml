@@ -5,9 +5,6 @@ on:
         types: [published]
     workflow_dispatch:
         inputs:
-            release_type:
-                description: 'latest, next, or bugfix?'
-                required: true
             version:
                 description: 'patch, minor, or major?'
                 required: true
@@ -158,7 +155,7 @@ jobs:
                     package_name=${package#'packages/'}
                     package_name="@wordpress/${package_name%'/'}"
                     if [ -z "$version_bump" ] && \
-                       [ '${{ github.event.inputs.release_type }}' != 'next' ] && \
+                       [ '${{ github.ref }}' != 'refs/heads/wp/next' ] && \
                        [ "$minimum_version_bump" != 'patch' ]
                     then
                         case "$production_package_names" in
@@ -172,7 +169,7 @@ jobs:
                     fi
                     if [ -n "$next_version" ]; then
                       cat <<< $(jq --tab --arg version "${next_version}-prerelease" '.version = $version' "$package"package.json) > "$package"package.json
-                      if [ '${{ github.event.inputs.release_type }}' = 'next' ]; then
+                      if [ '${{ github.ref }}' = 'refs/heads/wp/next' ]; then
                         next_version="${next_version}-next.0"
                       fi
                       sed -i "s/## Unreleased/\n\n## ${next_version} ($(date +%F))/g" "$package"CHANGELOG.md
@@ -218,11 +215,12 @@ jobs:
             - name: Publish packages
               run: |
                   minimum_version_bump='patch'
-                  if [ '${{ github.event.inputs.release_type }}' = 'next' ]; then
+                  if [ '${{ github.ref }}' = 'refs/heads/wp/next' ]; then
                     sha=$(git rev-parse --short HEAD)
                     npx lerna version pre"$minimum_version_bump" --preid next."$sha" --no-private
                     npx lerna publish from-package --dist-tag next
-                  elif [ '${{ github.event.inputs.release_type }}' = 'bugfix' ]; then
+                  elif [ '${{ github.event_name }}' = 'workflow_dispatch' ] && \
+                    [ '${{ github.ref }}' = 'refs/heads/wp/trunk' ]; then
                     npx lerna publish
                   else
                     npx lerna version "$minimum_version_bump" --no-private
