@@ -22,9 +22,17 @@ ruleTester.run( 'i18n-range-hyphen', rule, {
 		{
 			code: `__( 'Hyphen - when used in this case - is ok' )`,
 		},
-
 		{
 			code: `__('en dash – and em dash — are ok')`,
+		},
+		{
+			code: `__( 'en dash – ranges work 1–99 or 2 – 98' )`,
+		},
+		{
+			code: `__( 'Negative numbers like -99 or -33 are ok' )`,
+		},
+		{
+			code: `__( 'Numbers with trailing hyphens are odd but ok like 99-' )`,
 		},
 	],
 	invalid: [
