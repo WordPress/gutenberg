@@ -19,7 +19,7 @@ import {
 	BlockIcon,
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	RichText,
+	PlainText,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -279,16 +279,17 @@ function FileEdit( {
 					</ResizableBox>
 				) }
 				<div className={ 'wp-block-file__content-wrapper' }>
-					<RichText
-						tagName="a"
-						value={ fileName }
-						placeholder={ __( 'Write file name…' ) }
-						withoutInteractiveFormatting
-						onChange={ ( text ) =>
-							setAttributes( { fileName: text } )
-						}
-						href={ textLinkHref }
-					/>
+					<a href={ textLinkHref }>
+						<PlainText
+							value={ fileName }
+							placeholder={ __( 'Write file name…' ) }
+							withoutInteractiveFormatting
+							onChange={ ( text ) =>
+								setAttributes( { fileName: text } )
+							}
+
+							/>
+					</a>
 					{ showDownloadButton && (
 						<div
 							className={
