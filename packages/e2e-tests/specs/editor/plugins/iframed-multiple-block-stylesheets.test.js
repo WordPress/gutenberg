@@ -63,9 +63,5 @@ describe( 'iframed multiple block stylesheets', () => {
 		expect( await getComputedStyle( canvas(), 'background-color' ) ).toBe(
 			'rgb(0, 0, 0)'
 		);
-
-		// Skip warnings related to block-styles enqueing and the use of add_editor_style.
-		// The issue is tracked on https://github.com/WordPress/gutenberg/issues/33212.
-		expect( console ).toHaveWarned();
 	} );
 } );

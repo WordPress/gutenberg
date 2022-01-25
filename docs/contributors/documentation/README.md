@@ -88,26 +88,26 @@ An example, the link to this page is: `/docs/contributors/documentation/README.m
 
 The code example in markdown should be wrapped in three tick marks \`\`\` and should additionally include a language specifier. See this [GitHub documentation around fenced code blocks](https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks).
 
-A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `ESNext` and `ES5` code samples. For example, [on this block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
+A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `JSX` and `Plain` code samples. For example, [on this block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
 
 Here is an example `codetabs` section:
 
 ````md
-    {% codetabs %}
-    {% ESNext %}
+    \{\% codetabs \%\}
+    \{\% JSX \%\}
     ```js
-    	// ESNext code here
+    // JSX code here
     ```
-    {% ES5 %}
+    \{\% Plain \%\}
     ```js
-    	// ES5 code here
+    // Plain code here
     ```
-    {% end %}
+    \{\% end \%\}
 ````
 
-The preferred format for code examples is ESNext, this should be the default view. The example placed first in source will be shown as the default.
+The preferred format for code examples is JSX, this should be the default view. The example placed first in source will be shown as the default.
 
-**Note:** it is not required to include ES5 code examples. The guidance is to include `ES5` code for beginner tutorials, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem is in ESNext.
+**Note:** It is not required to include plain JavaScript code examples for every guide. The recommendation is to include plain code for beginner tutorials or short examples, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem are in JSX that requires a build process.
 
 ### Callout notices
 

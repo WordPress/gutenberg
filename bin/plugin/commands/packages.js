@@ -345,7 +345,7 @@ async function publishPackagesToNpm(
  * @param {SemVer}      [minimumVersionBump]  Minimum version bump for the packages. Default: `true`.
  * @param {string}      [confirmationMessage] Confirmation message to show at first.
  *
- * @return {Promise<Object>} Github release object.
+ * @return {Promise<Object>} GitHub release object.
  */
 async function prepareForPackageRelease(
 	releaseType,

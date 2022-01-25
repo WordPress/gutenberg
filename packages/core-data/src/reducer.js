@@ -157,6 +157,26 @@ export function themeBaseGlobalStyles( state = {}, action ) {
 }
 
 /**
+ * Reducer managing the theme global styles variations.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function themeGlobalStyleVariations( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_GLOBAL_STYLE_VARIATIONS':
+			return {
+				...state,
+				[ action.stylesheet ]: action.variations,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Higher Order Reducer for a given entity config. It supports:
  *
  *  - Fetching
@@ -431,7 +451,16 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 					// to continue as if we were creating an explicit undo level. This
 					// will result in an extra undo level being appended with the flattened
 					// undo values.
+					// We also have to take into account if the `lastEditAction` had opted out
+					// of being tracked in undo history, like the action that persists the latest
+					// content right before saving. In that case we have to update the `lastEditAction`
+					// to avoid returning early before applying the existing flattened undos.
 					isCreateUndoLevel = true;
+					if ( ! lastEditAction.meta.undo ) {
+						lastEditAction.meta.undo = {
+							edits: {},
+						};
+					}
 					action = lastEditAction;
 				} else {
 					return nextState;
@@ -569,6 +598,7 @@ export default combineReducers( {
 	currentTheme,
 	currentGlobalStylesId,
 	currentUser,
+	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
 	taxonomies,
 	entities,

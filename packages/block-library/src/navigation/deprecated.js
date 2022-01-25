@@ -43,7 +43,6 @@ const migrateWithLayout = ( attributes ) => {
 		Object.assign( updatedAttributes, {
 			layout: {
 				type: 'flex',
-				setCascadingProperties: 'true',
 				...( itemsJustification && {
 					justifyContent: itemsJustification,
 				} ),
@@ -135,7 +134,6 @@ const v6 = {
 			allowInheriting: false,
 			default: {
 				type: 'flex',
-				setCascadingProperties: true,
 			},
 		},
 	},

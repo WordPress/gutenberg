@@ -3,27 +3,46 @@
 		"blockName": "core/comments-pagination",
 		"attrs": {
 			"paginationArrow": "chevron",
-			"textColor": "black",
 			"style": {
-				"color": {
-					"gradient": "linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)"
-				},
 				"elements": {
 					"link": {
 						"color": {
-							"text": "#ffffff"
+							"text": "var:preset|color|background"
 						}
 					}
 				}
 			},
-			"layout": {
-				"type": "flex",
-				"orientation": "horizontal",
-				"justifyContent": "center"
-			}
+			"backgroundColor": "foreground",
+			"textColor": "background"
 		},
-		"innerBlocks": [],
-		"innerHTML": "",
-		"innerContent": []
+		"innerBlocks": [
+			{
+				"blockName": "core/comments-pagination-previous",
+				"attrs": {
+					"label": "Previous label comments"
+				},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			},
+			{
+				"blockName": "core/comments-pagination-numbers",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			},
+			{
+				"blockName": "core/comments-pagination-next",
+				"attrs": {
+					"label": "Next label comments"
+				},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			}
+		],
+		"innerHTML": "\n\n\n\n\n\n",
+		"innerContent": [ "\n", null, "\n\n", null, "\n\n", null, "\n" ]
 	}
 ]

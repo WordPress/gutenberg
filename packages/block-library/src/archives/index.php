@@ -23,7 +23,7 @@ function render_block_core_archives( $attributes ) {
 
 		$class .= ' wp-block-archives-dropdown';
 
-		$dropdown_id = esc_attr( uniqid( 'wp-block-archives-' ) );
+		$dropdown_id = uniqid( 'wp-block-archives-' );
 		$title       = __( 'Archives' );
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-archives.php */
@@ -62,11 +62,9 @@ function render_block_core_archives( $attributes ) {
 				break;
 		}
 
-		$label = esc_html( $label );
-
-		$block_content = '<label for="' . $dropdown_id . '">' . $title . '</label>
-	<select id="' . $dropdown_id . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
-	<option value="">' . $label . '</option>' . $archives . '</select>';
+		$block_content = '<label for="' . esc_attr( $dropdown_id ) . '">' . esc_html( $title ) . '</label>
+	<select id="' . esc_attr( $dropdown_id ) . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
+	<option value="">' . esc_html( $label ) . '</option>' . $archives . '</select>';
 
 		return sprintf(
 			'<div %1$s>%2$s</div>',
@@ -90,9 +88,7 @@ function render_block_core_archives( $attributes ) {
 
 	$archives = wp_get_archives( $archives_args );
 
-	$classnames = esc_attr( $class );
-
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class ) );
 
 	if ( empty( $archives ) ) {
 		return sprintf(

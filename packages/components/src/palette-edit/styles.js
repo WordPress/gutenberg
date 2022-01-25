@@ -13,7 +13,6 @@ import { space } from '../ui/utils/space';
 import { COLORS, CONFIG } from '../utils';
 import { View } from '../view';
 import InputControl from '../input-control';
-import Item from '../item-group/item';
 import {
 	Container as InputControlContainer,
 	Input,
@@ -30,7 +29,7 @@ export const IndicatorStyled = styled( CircularOptionPicker.Option )`
 export const NameInputControl = styled( InputControl )`
 	${ InputControlContainer } {
 		background: ${ COLORS.gray[ 100 ] };
-		border-radius: 2px;
+		border-radius: ${ CONFIG.controlBorderRadius }};
 		${ Input }${ Input }${ Input }${ Input } {
 			height: ${ space( 8 ) };
 		}
@@ -41,9 +40,26 @@ export const NameInputControl = styled( InputControl )`
 	}
 `;
 
-export const PaletteItem = styled( Item )`
+export const PaletteItem = styled( View )`
 	padding: 3px 0 3px ${ space( 3 ) };
 	height: calc( 40px - ${ CONFIG.borderWidth } );
+	border: 1px solid ${ CONFIG.surfaceBorderColor };
+	border-bottom-color: transparent;
+	&:first-of-type {
+		border-top-left-radius: ${ CONFIG.controlBorderRadius };
+		border-top-right-radius: ${ CONFIG.controlBorderRadius };
+	}
+	&:last-of-type {
+		border-bottom-left-radius: ${ CONFIG.controlBorderRadius };
+		border-bottom-right-radius: ${ CONFIG.controlBorderRadius };
+		border-bottom-color: ${ CONFIG.surfaceBorderColor };
+	}
+	&.is-selected + & {
+		border-top-color: transparent;
+	}
+	&.is-selected {
+		border-color: ${ COLORS.blue.wordpress[ 700 ] };
+	}
 `;
 
 export const NameContainer = styled.div`
@@ -52,12 +68,17 @@ export const NameContainer = styled.div`
 	margin-right: ${ space( 2 ) };
 	white-space: nowrap;
 	overflow: hidden;
+	${ PaletteItem }:hover & {
+		color: var( --wp-admin-theme-color, ${ COLORS.blue.wordpress[ 700 ] } );
+	}
 `;
 
 export const PaletteHeading = styled( Heading )`
 	text-transform: uppercase;
 	line-height: ${ space( 6 ) };
+	font-weight: 500;
 	&&& {
+		font-size: 11px;
 		margin-bottom: 0;
 	}
 `;

@@ -48,9 +48,6 @@
 				"docs/how-to-guides/backward-compatibility/README.md": [
 					{
 						"docs/how-to-guides/backward-compatibility/deprecations.md": []
-					},
-					{
-						"docs/how-to-guides/backward-compatibility/meta-box.md": []
 					}
 				]
 			},
@@ -122,40 +119,10 @@
 			},
 			{ "docs/how-to-guides/internationalization.md": [] },
 			{
-				"docs/how-to-guides/metabox/README.md": [
-					{ "docs/how-to-guides/metabox/meta-block-1-intro.md": [] },
-					{
-						"docs/how-to-guides/metabox/meta-block-2-register-meta.md": []
-					},
-					{ "docs/how-to-guides/metabox/meta-block-3-add.md": [] },
-					{
-						"docs/how-to-guides/metabox/meta-block-4-use-data.md": []
-					},
-					{
-						"docs/how-to-guides/metabox/meta-block-5-finishing.md": []
-					}
-				]
+				"docs/how-to-guides/metabox.md": []
 			},
 			{ "docs/how-to-guides/notices/README.md": [] },
-			{
-				"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md": [
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-1-up-and-running.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-3-register-meta.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-4-initialize-input.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-5-update-meta.md": []
-					}
-				]
-			},
+			{ "docs/how-to-guides/plugin-sidebar-0.md": [] },
 			{
 				"docs/how-to-guides/themes/README.md": [
 					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },
@@ -212,6 +179,7 @@
 					}
 				]
 			},
+			{ "docs/reference-guides/core-blocks.md": [] },
 			{
 				"docs/reference-guides/filters/README.md": [
 					{ "docs/reference-guides/filters/block-filters.md": [] },
@@ -253,6 +221,19 @@
 				]
 			},
 			{ "docs/reference-guides/richtext.md": [] },
+			{
+				"docs/reference-guides/theme-json-reference/README.md": [
+					{
+						"docs/reference-guides/theme-json-reference/theme-json-living.md": []
+					},
+					{
+						"docs/reference-guides/theme-json-reference/theme-json-v1.md": []
+					},
+					{
+						"docs/reference-guides/theme-json-reference/theme-json-migrations.md": []
+					}
+				]
+			},
 			{ "packages/components/README.md": "{{components}}" },
 			{ "docs/reference-guides/packages.md": "{{packages}}" },
 			{
@@ -319,6 +300,9 @@
 							},
 							{
 								"docs/contributors/code/react-native/integration-test-guide.md": []
+							},
+							{
+								"docs/contributors/code/react-native/internationalization-guide.md": []
 							}
 						]
 					}

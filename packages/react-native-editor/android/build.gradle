@@ -2,17 +2,16 @@ buildscript {
     ext {
         gradlePluginVersion = '4.2.2'
         kotlinVersion = '1.5.20'
-        buildToolsVersion = "29.0.3"
+        buildToolsVersion = "30.0.2"
         minSdkVersion = 21
-        compileSdkVersion = 29
-        targetSdkVersion = 29
+        compileSdkVersion = 30
+        targetSdkVersion = 30
         supportLibVersion = '28.0.0'
-        wordpressUtilsVersion = '1.22'
-        ndkVersion = "20.1.5948944"
+        ndkVersion = "21.4.7075529"
     }
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradlePluginVersion"
@@ -22,6 +21,7 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenCentral()
         mavenLocal()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
@@ -36,8 +36,7 @@ allprojects {
             }
         }
         maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
-        maven { url 'https://jitpack.io' }
+        maven { url 'https://www.jitpack.io' }
         google()
-        jcenter()
     }
 }

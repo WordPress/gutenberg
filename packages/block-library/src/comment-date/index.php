@@ -31,13 +31,13 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 	$link               = get_comment_link( $comment );
 
 	if ( ! empty( $attributes['isLink'] ) ) {
-		$formatted_date = sprintf( '<a href="%1s">%2s</a>', $link, $formatted_date );
+		$formatted_date = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), esc_html( $formatted_date ) );
 	}
 
 	return sprintf(
 		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
 		$wrapper_attributes,
-		get_comment_date( 'c', $comment ),
+		esc_attr( get_comment_date( 'c', $comment ) ),
 		$formatted_date
 	);
 }

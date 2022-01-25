@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { View, Clipboard, TouchableWithoutFeedback, Text } from 'react-native';
+import { View, TouchableWithoutFeedback, Text } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies
@@ -454,7 +455,10 @@ export class FileEdit extends Component {
 							onLongPress={ openMediaOptions }
 							disabled={ ! isSelected }
 						>
-							<View onLayout={ this.onLayout }>
+							<View
+								onLayout={ this.onLayout }
+								testID="file-edit-container"
+							>
 								{ this.getPlaceholderWidth( placeholderText ) }
 								{ isUploadInProgress ||
 									this.getToolbarEditButton(

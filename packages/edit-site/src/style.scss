@@ -1,6 +1,7 @@
 @import "../../interface/src/style.scss";
 
 @import "./components/block-editor/style.scss";
+@import "./components/code-editor/style.scss";
 @import "./components/global-styles/style.scss";
 @import "./components/header/style.scss";
 @import "./components/header/document-actions/style.scss";
@@ -17,6 +18,7 @@
 @import "./components/create-template-part-modal/style.scss";
 @import "./components/secondary-sidebar/style.scss";
 @import "./components/welcome-guide/style.scss";
+@import "./components/keyboard-shortcut-help-modal/style.scss";
 
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color.
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations.

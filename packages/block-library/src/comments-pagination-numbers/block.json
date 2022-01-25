@@ -2,15 +2,14 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/comments-pagination-numbers",
-	"title": "Comments Pagination Numbers",
-	"category": "theme",
+	"title": "Page Numbers",
+  	"category": "theme",
 	"parent": [ "core/comments-pagination" ],
 	"description": "Displays a list of page numbers for comments pagination.",
 	"textdomain": "default",
-	"usesContext": [ "comments/perPage", "postId" ],
+	"usesContext": [ "comments/perPage", "postId", "comments/order" ],
 	"supports": {
 		"reusable": false,
 		"html": false
-	},
-	"editorStyle": "comments-pagination-numbers-editor"
+	}
 }

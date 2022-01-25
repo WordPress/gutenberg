@@ -31,7 +31,7 @@ const toolsPanelGrid = {
 export const ToolsPanel = css`
 	${ toolsPanelGrid.spacing };
 
-	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
+	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
 `;
@@ -130,8 +130,6 @@ export const ToolsPanelItem = css`
 	 */
 	&& ${ LabelWrapper } {
 		label {
-			margin-bottom: ${ space( 2 ) };
-			padding-bottom: 0;
 			line-height: 1.4em;
 		}
 	}

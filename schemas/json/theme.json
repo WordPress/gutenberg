@@ -7,13 +7,17 @@
 			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
-		"settingsProperties": {
+		"settingsPropertiesAppearanceTools": {
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables ui tools.",
+					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesBorder": {
+			"properties": {
 				"border": {
 					"description": "Settings related to borders.",
 					"type": "object",
@@ -40,7 +44,11 @@
 						}
 					},
 					"additionalProperties": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesColor": {
+			"properties": {
 				"color": {
 					"description": "Settings related to colors.",
 					"type": "object",
@@ -160,7 +168,11 @@
 						}
 					},
 					"additionalProperties": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesLayout": {
+			"properties": {
 				"layout": {
 					"description": "Settings related to layout.",
 					"type": "object",
@@ -175,7 +187,11 @@
 						}
 					},
 					"additionalProperties": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesSpacing": {
+			"properties": {
 				"spacing": {
 					"description": "Settings related to spacing.",
 					"type": "object",
@@ -208,7 +224,11 @@
 						}
 					},
 					"additionalProperties": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesTypography": {
+			"properties": {
 				"typography": {
 					"description": "Settings related to typography.",
 					"type": "object",
@@ -299,12 +319,27 @@
 						}
 					},
 					"additionalProperties": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesCustom": {
+			"properties": {
 				"custom": {
 					"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
 					"$ref": "#/definitions/settingsCustomAdditionalProperties"
 				}
 			}
+		},
+		"settingsProperties": {
+			"allOf": [
+				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
+				{ "$ref": "#/definitions/settingsPropertiesBorder" },
+				{ "$ref": "#/definitions/settingsPropertiesColor" },
+				{ "$ref": "#/definitions/settingsPropertiesLayout" },
+				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
+				{ "$ref": "#/definitions/settingsPropertiesTypography" },
+				{ "$ref": "#/definitions/settingsPropertiesCustom" }
+			]
 		},
 		"settingsPropertiesComplete": {
 			"type": "object",
@@ -314,6 +349,7 @@
 				},
 				{
 					"properties": {
+						"appearanceTools": {},
 						"border": {},
 						"color": {},
 						"layout": {},
@@ -338,7 +374,33 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/settingsPropertiesAppearanceTools"
+						},
+						{
+							"properties": {
+								"border": {
+									"description": "Settings related to borders.\nGutenberg plugin required.",
+									"type": "object",
+									"properties": {
+										"radius": {
+											"description": "Allow users to set custom border radius.\nGutenberg plugin required.",
+											"type": "boolean",
+											"default": false
+										}
+									}
+								}
+							}
+						},
+						{ "$ref": "#/definitions/settingsPropertiesColor" },
+						{ "$ref": "#/definitions/settingsPropertiesLayout" },
+						{ "$ref": "#/definitions/settingsPropertiesSpacing" },
+						{
+							"$ref": "#/definitions/settingsPropertiesTypography"
+						},
+						{ "$ref": "#/definitions/settingsPropertiesCustom" }
+					]
 				},
 				"core/buttons": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -579,7 +641,7 @@
 				}
 			},
 			"patternProperties": {
-				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
+				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				}
 			},
@@ -1041,7 +1103,7 @@
 				}
 			},
 			"patternProperties": {
-				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
+				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				}
 			},
@@ -1088,6 +1150,7 @@
 				},
 				{
 					"properties": {
+						"appearanceTools": {},
 						"color": {},
 						"layout": {},
 						"spacing": {},

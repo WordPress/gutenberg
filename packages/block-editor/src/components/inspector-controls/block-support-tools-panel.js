@@ -3,6 +3,7 @@
  */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,46 +12,62 @@ import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 
 export default function BlockSupportToolsPanel( { children, group, label } ) {
-	const { clientId, attributes } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } = select(
-			blockEditorStore
-		);
-		const selectedBlockClientId = getSelectedBlockClientId();
-
-		return {
-			clientId: selectedBlockClientId,
-			attributes: getBlockAttributes( selectedBlockClientId ),
-		};
-	}, [] );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const {
+		getBlockAttributes,
+		getMultiSelectedBlockClientIds,
+		getSelectedBlockClientId,
+		hasMultiSelection,
+	} = useSelect( blockEditorStore );
 
-	const resetAll = ( resetFilters = [] ) => {
-		const { style } = attributes;
-		let newAttributes = { style };
+	const panelId = getSelectedBlockClientId();
+	const resetAll = useCallback(
+		( resetFilters = [] ) => {
+			const newAttributes = {};
 
-		resetFilters.forEach( ( resetFilter ) => {
-			newAttributes = {
-				...newAttributes,
-				...resetFilter( newAttributes ),
-			};
-		} );
+			const clientIds = hasMultiSelection()
+				? getMultiSelectedBlockClientIds()
+				: [ panelId ];
 
-		// Enforce a cleaned style object.
-		newAttributes = {
-			...newAttributes,
-			style: cleanEmptyObject( newAttributes.style ),
-		};
+			clientIds.forEach( ( clientId ) => {
+				const { style } = getBlockAttributes( clientId );
+				let newBlockAttributes = { style };
 
-		updateBlockAttributes( clientId, newAttributes );
-	};
+				resetFilters.forEach( ( resetFilter ) => {
+					newBlockAttributes = {
+						...newBlockAttributes,
+						...resetFilter( newBlockAttributes ),
+					};
+				} );
+
+				// Enforce a cleaned style object.
+				newBlockAttributes = {
+					...newBlockAttributes,
+					style: cleanEmptyObject( newBlockAttributes.style ),
+				};
+
+				newAttributes[ clientId ] = newBlockAttributes;
+			} );
+
+			updateBlockAttributes( clientIds, newAttributes, true );
+		},
+		[
+			cleanEmptyObject,
+			getBlockAttributes,
+			getMultiSelectedBlockClientIds,
+			hasMultiSelection,
+			panelId,
+			updateBlockAttributes,
+		]
+	);
 
 	return (
 		<ToolsPanel
 			className={ `${ group }-block-support-panel` }
 			label={ label }
 			resetAll={ resetAll }
-			key={ clientId }
-			panelId={ clientId }
+			key={ panelId }
+			panelId={ panelId }
 			hasInnerWrapper={ true }
 			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
 		>

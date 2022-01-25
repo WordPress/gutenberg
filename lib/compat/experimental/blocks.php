@@ -16,9 +16,9 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 	 * @return array Returns the comment query parameters to use with the WP_Comment_Query constructor.
 	 */
 	function build_comment_query_vars_from_block( $block ) {
+
 		$comment_args = array(
 			'orderby'                   => 'comment_date_gmt',
-			'order'                     => 'ASC',
 			'status'                    => 'approve',
 			'no_found_rows'             => false,
 			'update_comment_meta_cache' => false, // We lazy-load comment meta for performance.
@@ -52,6 +52,67 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			}
 		}
 
+		$comment_args['order'] = ! empty( $block->context['comments/order'] ) ? $block->context['comments/order'] : null;
+		if ( empty( $comment_args['order'] ) && get_option( 'comment_order' ) ) {
+			$comment_args['order'] = get_option( 'comment_order' );
+		}
+
 		return $comment_args;
 	}
 }
+
+if ( ! function_exists( 'get_comments_pagination_arrow' ) ) {
+	/**
+	 * Helper function that returns the proper pagination arrow html for
+	 * `CommentsPaginationNext` and `CommentsPaginationPrevious` blocks based
+	 * on the provided `paginationArrow` from `CommentsPagination` context.
+	 *
+	 * It's used in CommentsPaginationNext and CommentsPaginationPrevious blocks.
+	 *
+	 * @param WP_Block $block   Block instance.
+	 * @param string   $pagination_type Type of the arrow we will be rendering. Default 'next'. Accepts 'next' or 'previous'.
+	 *
+	 * @return string|null Returns the constructed WP_Query arguments.
+	 */
+	function get_comments_pagination_arrow( $block, $pagination_type = 'next' ) {
+		$arrow_map = array(
+			'none'    => '',
+			'arrow'   => array(
+				'next'     => '→',
+				'previous' => '←',
+			),
+			'chevron' => array(
+				'next'     => '»',
+				'previous' => '«',
+			),
+		);
+		if ( ! empty( $block->context['comments/paginationArrow'] ) && ! empty( $arrow_map[ $block->context['comments/paginationArrow'] ][ $pagination_type ] ) ) {
+			$arrow_attribute = $block->context['comments/paginationArrow'];
+			$arrow           = $arrow_map[ $block->context['comments/paginationArrow'] ][ $pagination_type ];
+			$arrow_classes   = "wp-block-comments-pagination-$pagination_type-arrow is-arrow-$arrow_attribute";
+			return "<span class='$arrow_classes'>$arrow</span>";
+		}
+		return null;
+	}
+}
+
+if ( ! function_exists( 'extend_block_editor_settings_with_discussion_settings' ) ) {
+	/**
+	 * Workaround for getting discussion settings as block editor settings
+	 * so any user can access to them without needing to be an admin.
+	 *
+	 * @param array $settings Default editor settings.
+	 *
+	 * @return array Filtered editor settings.
+	 */
+	function extend_block_editor_settings_with_discussion_settings( $settings ) {
+		$settings['__experimentalDiscussionSettings'] = array(
+			'pageComments'        => get_option( 'page_comments' ),
+			'commentsPerPage'     => get_option( 'comments_per_page' ),
+			'defaultCommentsPage' => get_option( 'default_comments_page' ),
+			'commentOrder'        => get_option( 'comment_order' ),
+		);
+		return $settings;
+	}
+}
+add_filter( 'block_editor_settings_all', 'extend_block_editor_settings_with_discussion_settings' );

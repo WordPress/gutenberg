@@ -2,13 +2,13 @@
  * External dependencies
  */
 import { useNavigation, useRoute } from '@react-navigation/native';
+
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useContext, useEffect, useMemo } from '@wordpress/element';
 import { prependHTTP } from '@wordpress/url';
-
 import { BottomSheet, BottomSheetContext } from '@wordpress/components';
 import {
 	create,
@@ -62,16 +62,19 @@ const LinkSettingsScreen = ( {
 	};
 	useEffect( () => {
 		onHandleClosingBottomSheet( () => {
-			submit( inputValue );
+			submit( inputValue, { skipStateUpdates: true } );
 		} );
 	}, [ inputValue, opensInNewWindow, text ] );
 
 	useEffect( () => {
 		const { isActiveLink, isRemovingLink } = linkValues;
 		if ( !! inputValue && ! isActiveLink && isVisible ) {
-			submitLink( false );
-		} else if ( ( inputValue === '' && isActiveLink ) || isRemovingLink ) {
-			removeLink( false );
+			submitLink( { shouldCloseBottomSheet: false } );
+		} else if (
+			( ( inputValue === '' && isActiveLink ) || isRemovingLink ) &&
+			isVisible
+		) {
+			removeLink( { shouldCloseBottomSheet: false } );
 		}
 	}, [
 		inputValue,
@@ -80,12 +83,17 @@ const LinkSettingsScreen = ( {
 		linkValues.isRemovingLink,
 	] );
 
-	const clearFormat = () => {
+	const clearFormat = ( { skipStateUpdates = false } = {} ) => {
 		onChange( { ...value, activeFormats: [] } );
-		setLinkValues( { isActiveLink: false, isRemovingLink: true } );
+		if ( ! skipStateUpdates ) {
+			setLinkValues( { isActiveLink: false, isRemovingLink: true } );
+		}
 	};
 
-	const submitLink = ( shouldCloseBottomSheet = true ) => {
+	const submitLink = ( {
+		shouldCloseBottomSheet = true,
+		skipStateUpdates = false,
+	} = {} ) => {
 		const url = prependHTTP( inputValue );
 		const linkText = text || inputValue;
 		const format = createLinkFormat( {
@@ -127,7 +135,9 @@ const LinkSettingsScreen = ( {
 		}
 		newAttributes.activeFormats = [];
 		onChange( { ...newAttributes, needsSelectionUpdate: true } );
-		setLinkValues( { isActiveLink: true, isRemovingLink: false } );
+		if ( ! skipStateUpdates ) {
+			setLinkValues( { isActiveLink: true, isRemovingLink: false } );
+		}
 
 		if ( ! isValidHref( url ) ) {
 			speak(
@@ -147,19 +157,22 @@ const LinkSettingsScreen = ( {
 		}
 	};
 
-	const removeLink = ( shouldCloseBottomSheet = true ) => {
-		clearFormat();
+	const removeLink = ( {
+		shouldCloseBottomSheet = true,
+		skipStateUpdates = false,
+	} = {} ) => {
+		clearFormat( { skipStateUpdates } );
 		onRemove();
 		if ( shouldCloseBottomSheet ) {
 			onClose();
 		}
 	};
 
-	const submit = ( submitValue ) => {
+	const submit = ( submitValue, { skipStateUpdates = false } = {} ) => {
 		if ( submitValue === '' ) {
-			removeLink();
+			removeLink( { skipStateUpdates } );
 		} else {
-			submitLink();
+			submitLink( { skipStateUpdates } );
 		}
 	};
 

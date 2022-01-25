@@ -50,9 +50,6 @@ A transformation of type `block` is an object that takes the following parameter
 
 To declare this transformation we add the following code into the heading block configuration, which uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
 
-{% codetabs %}
-{% ESNext %}
-
 ```js
 transforms: {
     from: [
@@ -69,32 +66,9 @@ transforms: {
 },
 ```
 
-{% ES5 %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: function ( attributes ) {
-                return createBlock( 'core/heading', {
-                    content: attributes.content,
-                } );
-            },
-        },
-    ]
-},
-```
-
-{% end %}
-
 **Example: blocks that have InnerBlocks**
 
 A block with InnerBlocks can also be transformed from and to another block with InnerBlocks.
-
-{% codetabs %}
-{% ESNext %}
 
 ```js
 transforms: {
@@ -114,28 +88,6 @@ transforms: {
 },
 ```
 
-{% ES5 %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'some/block-with-innerblocks' ],
-            transform: function( attributes, innerBlocks ) {
-                return createBlock(
-                    'some/other-block-with-innerblocks',
-                    attributes,
-                    innerBlocks
-                );
-            },
-        },
-    ],
-},
-```
-
-{% end %}
-
 ### Enter
 
 This type of transformations support the _from_ direction, allowing blocks to be created from some content introduced by the user. They're applied in a new block line after the user has introduced some content and hit the ENTER key.
@@ -151,9 +103,6 @@ A transformation of type `enter` is an object that takes the following parameter
 
 To create a separator block when the user types the hypen three times and then hits the ENTER key we can use the following code:
 
-{% codetabs %}
-{% ESNext %}
-
 ```js
 transforms = {
 	from: [
@@ -165,24 +114,6 @@ transforms = {
 	],
 };
 ```
-
-{% ES5 %}
-
-```js
-transforms = {
-	from: [
-		{
-			type: 'enter',
-			regExp: /^-{3,}$/,
-			transform: function ( value ) {
-				return createBlock( 'core/separator' );
-			},
-		},
-	],
-};
-```
-
-{% end %}
 
 ### Files
 
@@ -198,9 +129,6 @@ A transformation of type `files` is an object that takes the following parameter
 **Example: from file to File block**
 
 To create a File block when the user drops a file into the editor we can use the following code:
-
-{% codetabs %}
-{% ESNext %}
 
 ```js
 transforms: {
@@ -227,37 +155,6 @@ transforms: {
 }
 ```
 
-{% ES5 %}
-
-```js
-transforms: {
-	from: [
-		{
-			type: 'files',
-			isMatch: function ( files ) {
-				return files.length === 1;
-			},
-			// By defining a lower priority than the default of 10,
-			// we make that the File block to be created as a fallback,
-			// if no other transform is found.
-			priority: 15,
-			transform: function ( files ) {
-				var file = files[ 0 ];
-				var blobURL = createBlobURL( file );
-				// File will be uploaded in componentDidMount()
-				return createBlock( 'core/file', {
-					href: blobURL,
-					fileName: file.name,
-					textLinkHref: blobURL,
-				} );
-			},
-		},
-	];
-}
-```
-
-{% end %}
-
 ### Prefix
 
 This type of transformations support the _from_ direction, allowing blocks to be created from some text typed by the user. They're applied when, in a new block line, the user types some text and then adds a trailing space.
@@ -272,9 +169,6 @@ A transformation of type `prefix` is an object that takes the following paramete
 **Example: from text to custom block**
 
 If we want to create a custom block when the user types the question mark, we could use this code:
-
-{% codetabs %}
-{% ESNext %}
 
 ```js
 transforms: {
@@ -292,26 +186,6 @@ transforms: {
 }
 ```
 
-{% ES5 %}
-
-```js
-transforms: {
-	from: [
-		{
-			type: 'prefix',
-			prefix: '?',
-			transform: function ( content ) {
-				return createBlock( 'my-plugin/question', {
-					content,
-				} );
-			},
-		},
-	];
-}
-```
-
-{% end %}
-
 ### Raw
 
 This type of transformations support the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action from within the block setting UI menu, as well as when some content is pasted or dropped into the editor.
@@ -328,9 +202,6 @@ A transformation of type `raw` is an object that takes the following parameters:
 **Example: from URLs to Embed block**
 
 If we want to create an Embed block when the user pastes some URL in the editor, we could use this code:
-
-{% codetabs %}
-{% ESNext %}
 
 ```js
 transforms: {
@@ -350,29 +221,6 @@ transforms: {
 }
 ```
 
-{% ES5 %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'raw',
-            isMatch: function( node ) {
-                return node.nodeName === 'P' &&
-                    /^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent );
-            },
-            transform: function( node ) {
-                return createBlock( 'core/embed', {
-                    url: node.textContent.trim(),
-                } );
-            },
-        },
-    ],
-}
-```
-
-{% end %}
-
 ### Shortcode
 
 This type of transformations support the _from_ direction, allowing blocks to be created from shortcodes. It's applied as part of the `raw` transformation process.
@@ -388,9 +236,6 @@ A transformation of type `shortcode` is an object that takes the following param
 **Example: from shortcode to block**
 
 An existing shortcode can be transformed into its block counterpart.
-
-{% codetabs %}
-{% ESNext %}
 
 ```js
 transforms: {
@@ -425,42 +270,3 @@ transforms: {
     ]
 },
 ```
-
-{% ES5 %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'shortcode',
-            tag: 'caption',
-            attributes: {
-                url: {
-                    type: 'string',
-                    source: 'attribute',
-                    attribute: 'src',
-                    selector: 'img',
-                },
-                align: {
-                    type: 'string',
-                    // The shortcode function will extract
-                    // the shortcode atts into a value
-                    // to be sourced in the block's comment.
-                    shortcode: function( attributes ) {
-                        var align = attributes.named.align ? attributes.named.align : 'alignnone';
-                        return align.replace( 'align', '' );
-                    },
-                },
-            },
-            // Prevent the shortcode to be converted
-            // into this block when it doesn't
-            // have the proper ID.
-            isMatch: function( attributes ) {
-                return attributes.named.id === 'my-id';
-            },
-        },
-    ]
-},
-```
-
-{% end %}

@@ -187,7 +187,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigationButton
+          <NavigationBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -199,8 +199,6 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                 />
               </SVG>
             }
-            isBack={true}
-            path="/"
           />
           <Text
             size="16"
@@ -256,7 +254,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigationButton
+          <NavigationBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -268,8 +266,6 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                 />
               </SVG>
             }
-            isBack={true}
-            path="/"
           />
           <Text
             size="16"
@@ -316,7 +312,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigationButton
+          <NavigationBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -328,8 +324,6 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                 />
               </SVG>
             }
-            isBack={true}
-            path="/"
           />
           <Text
             size="16"

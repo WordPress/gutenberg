@@ -114,33 +114,44 @@ const CommentsList = ( {
 
 export default function CommentTemplateEdit( {
 	clientId,
-	context: { postId, 'comments/perPage': perPage },
+	context: { postId, 'comments/perPage': perPage, 'comments/order': order },
 } ) {
 	const blockProps = useBlockProps();
 
 	const [ activeComment, setActiveComment ] = useState();
-
+	const { commentOrder, commentsPerPage } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalDiscussionSettings;
+	} );
 	const { rawComments, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 
+			const commentQuery = {
+				post: postId,
+				status: 'approve',
+				context: 'embed',
+				order: order || commentOrder,
+			};
+
+			if ( order ) {
+				commentQuery.order = order;
+			}
 			return {
-				rawComments: getEntityRecords( 'root', 'comment', {
-					post: postId,
-					status: 'approve',
-					order: 'asc',
-					context: 'embed',
-				} ),
+				rawComments: getEntityRecords(
+					'root',
+					'comment',
+					commentQuery
+				),
 				blocks: getBlocks( clientId ),
 			};
 		},
-		[ postId, clientId ]
+		[ postId, clientId, order ]
 	);
 
 	// TODO: Replicate the logic used on the server.
-	perPage = perPage || 50;
-
+	perPage = perPage || commentsPerPage;
 	// We convert the flat list of comments to tree.
 	// Then, we show only a maximum of `perPage` number of comments.
 	// This is because passing `per_page` to `getEntityRecords()` does not

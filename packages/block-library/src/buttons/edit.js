@@ -15,6 +15,21 @@ import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 
+const DEFAULT_BLOCK = {
+	name: buttonBlockName,
+	attributesToCopy: [
+		'backgroundColor',
+		'border',
+		'className',
+		'fontFamily',
+		'fontSize',
+		'gradient',
+		'style',
+		'textColor',
+		'width',
+	],
+};
+
 function ButtonsEdit( { attributes: { layout = {} } } ) {
 	const blockProps = useBlockProps();
 	const preferredStyle = useSelect( ( select ) => {
@@ -26,6 +41,8 @@ function ButtonsEdit( { attributes: { layout = {} } } ) {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
+		__experimentalDefaultBlock: DEFAULT_BLOCK,
+		__experimentalDirectInsert: true,
 		template: [
 			[
 				buttonBlockName,

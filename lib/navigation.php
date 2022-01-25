@@ -37,8 +37,7 @@ function gutenberg_register_navigation_post_type() {
 		'description'           => __( 'Navigation menus.', 'gutenberg' ),
 		'public'                => false,
 		'has_archive'           => false,
-		// We should disable UI for non-block themes.
-		'show_ui'               => wp_is_block_theme(),
+		'show_ui'               => true,
 		'show_in_menu'          => false,
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
@@ -49,6 +48,18 @@ function gutenberg_register_navigation_post_type() {
 			'title',
 			'editor',
 			'revisions',
+		),
+		'capabilities'          => array(
+			'edit_others_posts'      => 'edit_theme_options',
+			'delete_posts'           => 'edit_theme_options',
+			'publish_posts'          => 'edit_theme_options',
+			'create_posts'           => 'edit_theme_options',
+			'read_private_posts'     => 'edit_theme_options',
+			'delete_private_posts'   => 'edit_theme_options',
+			'delete_published_posts' => 'edit_theme_options',
+			'delete_others_posts'    => 'edit_theme_options',
+			'edit_private_posts'     => 'edit_theme_options',
+			'edit_published_posts'   => 'edit_theme_options',
 		),
 	);
 

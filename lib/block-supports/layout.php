@@ -29,12 +29,13 @@ function gutenberg_register_layout_support( $block_type ) {
  * Generates the CSS corresponding to the provided layout.
  *
  * @param string  $selector CSS selector.
- * @param array   $layout   Layout object. The one that is passed has already checked the existance of default block layout.
+ * @param array   $layout   Layout object. The one that is passed has already checked the existence of default block layout.
  * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
+ * @param string  $gap_value The block gap value to apply.
  *
  * @return string CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false ) {
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
@@ -65,8 +66,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
 		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
 		if ( $has_block_gap_support ) {
-			$style .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
-			$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
+			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
+			$style    .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
+			$style    .= "$selector > * + * { margin-top: $gap_style;  margin-bottom: 0; }";
 		}
 	} elseif ( 'flex' === $layout_type ) {
 		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
@@ -89,16 +91,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style  = "$selector {";
 		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
-			$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
+			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
+			$style    .= "gap: $gap_style;";
 		} else {
 			$style .= 'gap: 0.5em;';
 		}
 		$style .= "flex-wrap: $flex_wrap;";
 		if ( 'horizontal' === $layout_orientation ) {
 			$style .= 'align-items: center;';
-			if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
-				$style .= '--layout-direction: row;';
-			}
 			/**
 			 * Add this style only if is not empty for backwards compatibility,
 			 * since we intend to convert blocks that had flex layout implemented
@@ -106,27 +106,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
-				if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
-					// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
-					$style .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
-					$style .= "--layout-wrap: $flex_wrap;";
-					$style .= "--layout-justify: {$justify_content_options[ $layout['justifyContent'] ]};";
-					$style .= '--layout-align: center;';
-				}
 			}
 		} else {
 			$style .= 'flex-direction: column;';
-			if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
-				$style .= '--layout-direction: column;';
-			}
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
-				if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
-					// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
-					$style .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
-					$style .= '--layout-justify: initial;';
-					$style .= "--layout-align: {$justify_content_options[ $layout['justifyContent'] ]};";
-				}
+			} else {
+				$style .= 'align-items: flex-start;';
 			}
 		}
 		$style .= '}';
@@ -164,15 +150,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout = $default_layout;
 	}
 
-	$id              = uniqid();
-	$style           = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support );
-	$container_class = 'wp-container-' . $id . ' ';
-	$justify_class   = isset( $used_layout['justifyContent'] ) ? 'wp-justify-' . $used_layout['justifyContent'] . ' ' : '';
+	$id        = uniqid();
+	$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+	// Skip if gap value contains unsupported characters.
+	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
+	// because we only want to match against the value, not the CSS attribute.
+	$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
+	$style     = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support, $gap_value );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . $container_class . $justify_class,
+		'class="wp-container-' . $id . ' ',
 		$block_content,
 		1
 	);

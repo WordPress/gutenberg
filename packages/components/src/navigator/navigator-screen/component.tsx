@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, MotionProps } from 'framer-motion';
@@ -46,8 +45,8 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const [ currentPath ] = useContext( NavigatorContext );
-	const isMatch = currentPath.path === path;
+	const { location } = useContext( NavigatorContext );
+	const isMatch = location.path === path;
 	const ref = useFocusOnMount();
 
 	const cx = useCx();
@@ -96,8 +95,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	const initial = {
 		opacity: 0,
 		x:
-			( isRTL() && currentPath.isBack ) ||
-			( ! isRTL() && ! currentPath.isBack )
+			( isRTL() && location.isBack ) || ( ! isRTL() && ! location.isBack )
 				? 50
 				: -50,
 	};
@@ -105,8 +103,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 		delay: animationExitDelay,
 		opacity: 0,
 		x:
-			( ! isRTL() && currentPath.isBack ) ||
-			( isRTL() && ! currentPath.isBack )
+			( ! isRTL() && location.isBack ) || ( isRTL() && ! location.isBack )
 				? 50
 				: -50,
 		transition: {
@@ -144,34 +141,34 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
  *   __experimentalUseNavigator as useNavigator,
  * } from '@wordpress/components';
  *
- * function NavigatorButton( {
- *   path,
- *   isBack = false,
- *   ...props
- * } ) {
- *   const navigator = useNavigator();
- *   return (
- *   	<Button
- *   	  onClick={ () => navigator.push( path, { isBack } ) }
- *   	  { ...props }
- *   	/>
- *   );
+ * function NavigatorButton( { path, ...props } ) {
+ *  const { push } = useNavigator();
+ *  return (
+ *    <Button
+ *      variant="primary"
+ *      onClick={ () => push( path ) }
+ *      { ...props }
+ *    />
+ *  );
+ * }
+ *
+ * function NavigatorBackButton( props ) {
+ *   const { pop } = useNavigator();
+ *   return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
  * }
  *
  * const MyNavigation = () => (
  *   <NavigatorProvider initialPath="/">
  *     <NavigatorScreen path="/">
  *       <p>This is the home screen.</p>
- *   	   <NavigatorButton isPrimary path="/child">
+ *   	   <NavigatorButton path="/child">
  *          Navigate to child screen.
  *       </NavigatorButton>
  *     </NavigatorScreen>
  *
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorButton isPrimary path="/" isBack>
- *         Go back
- *       </NavigatorButton>
+ *       <NavigatorBackButton>Go back</NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>
  * );

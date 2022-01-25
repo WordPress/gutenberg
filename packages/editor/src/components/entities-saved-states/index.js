@@ -24,6 +24,7 @@ const TRANSLATED_SITE_PROPERTIES = {
 	title: __( 'Title' ),
 	description: __( 'Tagline' ),
 	site_logo: __( 'Logo' ),
+	site_icon: __( 'Icon' ),
 	show_on_front: __( 'Show on front' ),
 	page_on_front: __( 'Page on front' ),
 };

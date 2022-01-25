@@ -30,7 +30,7 @@ async function waitForFileExists( filePath, timeout = 10000 ) {
 
 describe( 'Site Editor Templates Export', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );

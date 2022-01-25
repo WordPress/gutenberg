@@ -32,8 +32,6 @@ import useSetting from '../components/use-setting';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
-const EMPTY_OBJECT = {};
-
 const hasColorSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 	return (
@@ -232,7 +230,17 @@ export function ColorEdit( props ) {
 		],
 		[ userPalette, themePalette, defaultPalette ]
 	);
-	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
+	const userGradientPalette = useSetting( 'color.gradients.custom' );
+	const themeGradientPalette = useSetting( 'color.gradients.theme' );
+	const defaultGradientPalette = useSetting( 'color.gradients.default' );
+	const allGradients = useMemo(
+		() => [
+			...( userGradientPalette || [] ),
+			...( themeGradientPalette || [] ),
+			...( defaultGradientPalette || [] ),
+		],
+		[ userGradientPalette, themeGradientPalette, defaultGradientPalette ]
+	);
 	const areCustomSolidsEnabled = useSetting( 'color.custom' );
 	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
 	const isBackgroundEnabled = useSetting( 'color.background' );
@@ -244,17 +252,8 @@ export function ColorEdit( props ) {
 
 	const gradientsEnabled =
 		areCustomGradientsEnabled ||
-		! gradientsPerOrigin?.theme ||
-		gradientsPerOrigin?.theme?.length > 0;
-
-	const allGradients = useMemo(
-		() => [
-			...( gradientsPerOrigin?.custom || [] ),
-			...( gradientsPerOrigin?.theme || [] ),
-			...( gradientsPerOrigin?.default || [] ),
-		],
-		[ gradientsPerOrigin ]
-	);
+		! themeGradientPalette ||
+		themeGradientPalette?.length > 0;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -372,18 +371,19 @@ export function ColorEdit( props ) {
 		props.setAttributes( { style: newStyle } );
 	};
 
+	const enableContrastChecking =
+		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
+
 	return (
 		<ColorPanel
-			enableContrastChecking={
-				// Turn on contrast checker for web only since it's not supported on mobile yet.
-				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
-			}
+			enableContrastChecking={ enableContrastChecking }
 			clientId={ props.clientId }
+			enableAlpha={ true }
 			settings={ [
 				...( hasTextColor
 					? [
 							{
-								label: __( 'Text color' ),
+								label: __( 'Text' ),
 								onColorChange: onChangeColor( 'text' ),
 								colorValue: getColorObjectByAttributeValues(
 									allSolids,
@@ -396,7 +396,7 @@ export function ColorEdit( props ) {
 				...( hasBackgroundColor || hasGradientColor
 					? [
 							{
-								label: __( 'Background color' ),
+								label: __( 'Background' ),
 								onColorChange: hasBackgroundColor
 									? onChangeColor( 'background' )
 									: undefined,
@@ -415,7 +415,7 @@ export function ColorEdit( props ) {
 				...( hasLinkColor
 					? [
 							{
-								label: __( 'Link Color' ),
+								label: __( 'Link' ),
 								onColorChange: onChangeLinkColor,
 								colorValue: getLinkColorFromAttributeValue(
 									allSolids,

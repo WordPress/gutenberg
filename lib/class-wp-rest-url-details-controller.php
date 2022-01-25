@@ -413,7 +413,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * Retrieves the `<head>` section.
 	 *
 	 * @param string $html The string of HTML to parse.
-	 * @return string The `<head>..</head>` section on succes, or original HTML.
+	 * @return string The `<head>..</head>` section on success, or original HTML.
 	 */
 	private function get_document_head( $html ) {
 		$head_html = $html;
@@ -481,7 +481,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$pattern = '#<meta\s' .
 
 			/*
-			 * Alows for additional attributes before the content attribute.
+			 * Allows for additional attributes before the content attribute.
 			 * Searches for anything other than > symbol.
 			 */
 			'[^>]*' .
@@ -499,7 +499,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			'content=(["\']??)(.*)\1' .
 
 			/*
-			 * Alows for additional attributes after the content attribute.
+			 * Allows for additional attributes after the content attribute.
 			 * Searches for anything other than > symbol.
 			 */
 			'[^>]*' .

@@ -101,7 +101,7 @@ class WP_Widget_Block extends WP_Widget {
 	 *
 	 * @since 9.3.0
 	 *
-	 * @param array $content The HTML content of the current block widget.
+	 * @param string $content The HTML content of the current block widget.
 	 *
 	 * @return string The classname to use in the block widget's container HTML.
 	 */

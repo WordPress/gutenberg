@@ -51,5 +51,14 @@ function register_block_core_tag_cloud() {
 			'render_callback' => 'render_block_core_tag_cloud',
 		)
 	);
+
+	register_block_style(
+		'core/tag-cloud',
+		array(
+			'name'         => 'outline',
+			'label'        => __( 'Outline', 'gutenberg' ),
+			'style_handle' => 'outline',
+		)
+	);
 }
 add_action( 'init', 'register_block_core_tag_cloud' );

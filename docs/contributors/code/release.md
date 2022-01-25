@@ -34,7 +34,7 @@ This will trigger a GitHub Actions (GHA) workflow that bumps the plugin version,
 
 As soon as the workflow has finished, you'll find the release draft under https://github.com/WordPress/gutenberg/releases. The draft is pre-populated with changelog entries based on previous release candidates for this version, and any changes that have since been cherry-picked to the release branch. Thus, when releasing the first stable version of a series, make sure to delete any RC version headers (that are only there for your information) and to move the more recent changes to the correct section (see below).
 
-The changelog draft will be at least partially pre-organized (based on Github label) into sections and within those into "features". Take some time to read the generated notes and then edit them to ensure legibility and accuracy.
+The changelog draft will be at least partially pre-organized (based on GitHub label) into sections and within those into "features". Take some time to read the generated notes and then edit them to ensure legibility and accuracy.
 
 Don't rush this part -- it's important to bring the release notes into a nice shape. You don't have to do it all in one go -- you can save the draft and come back to it later.
 
@@ -160,7 +160,11 @@ There is also an option to perform [Standalone Bugfix Package Releases](#standal
 
 ### Synchronizing WordPress Trunk
 
-For each Gutenberg plugin release, WordPress trunk should be synchronized. Note that the WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, this happens between the first `beta` and the first `RC` of the WordPress release cycle. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
+For each Gutenberg plugin release, WordPress trunk should be synchronized.
+
+Note that the WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, feature freeze in WordPress Core happens about 2 weeks before Beta 1 and remains in effect until RC1 when the `trunk` gets branched. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
+
+A different person usually synchronizes the WordPress `trunk` branch and publishes the npm packages. Therefore, you typically shouldn't need to worry about handling this for the normal plugin release process. However, if you are still unsure, ask in [the #core-editor Slack channel](https://wordpress.slack.com/archives/C02QB2JS7).
 
 The process has three steps: 1) update the `wp/trunk` branch within the Gutenberg repo 2) publish the new package versions to npm 3) update the WordPress `trunk` branch.
 

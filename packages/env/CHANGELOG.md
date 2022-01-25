@@ -2,11 +2,18 @@
 
 ## Unreleased
 
+### Enhancement
+-   Added command `wp-env install-path` to list the directory used for the environment.
+-   The help entry is now shown when no subcommand is passed to `wp-env`.
+
+### Bug Fix
+-   Updated `yargs` to fix [CVE-2021-3807](https://nvd.nist.gov/vuln/detail/CVE-2021-3807).
+
 ## 4.1.3 (2021-11-07)
 
 ### Bug Fix
 
-- Fix Xdebug installation code to ensure it would fail gracefully
+-   Fix Xdebug installation code to ensure it would fail gracefully
 
 ## 4.0.3 (2021-04-29)
 

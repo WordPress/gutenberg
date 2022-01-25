@@ -55,7 +55,7 @@ program
 	.command( 'release-plugin-changelog' )
 	.alias( 'changelog' )
 	.option( '-m, --milestone <milestone>', 'Milestone' )
-	.option( '-t, --token <token>', 'Github token' )
+	.option( '-t, --token <token>', 'GitHub token' )
 	.option(
 		'-u, --unreleased',
 		"Only include PRs that haven't been included in a release yet"

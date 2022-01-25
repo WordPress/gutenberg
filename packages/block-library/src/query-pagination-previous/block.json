@@ -3,7 +3,7 @@
 	"apiVersion": 2,
 	"name": "core/query-pagination-previous",
 	"title": "Previous Page",
-	"category": "design",
+	"category": "theme",
 	"parent": [ "core/query-pagination" ],
 	"description": "Displays the previous posts page link.",
 	"textdomain": "default",

@@ -1,23 +1,20 @@
 /**
  * External dependencies
  */
-const { writeFile } = require( 'fs' ).promises;
 const { snakeCase, camelCase, upperFirst } = require( 'lodash' );
-const makeDir = require( 'make-dir' );
-const { render } = require( 'mustache' );
-const { dirname, join } = require( 'path' );
 
 /**
  * Internal dependencies
  */
-const initBlockJSON = require( './init-block-json' );
+const initBlock = require( './init-block' );
 const initPackageJSON = require( './init-package-json' );
 const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success } = require( './log' );
+const { writeOutputAsset, writeOutputTemplate } = require( './output' );
 
 module.exports = async (
-	blockTemplate,
+	{ blockOutputTemplates, outputTemplates, outputAssets },
 	{
 		$schema,
 		apiVersion,
@@ -36,6 +33,7 @@ module.exports = async (
 		wpScripts,
 		wpEnv,
 		npmDependencies,
+		folderName,
 		editorScript,
 		editorStyle,
 		style,
@@ -45,9 +43,8 @@ module.exports = async (
 	namespace = namespace.toLowerCase();
 
 	info( '' );
-	info( `Creating a new WordPress block in "${ slug }" folder.` );
+	info( `Creating a new WordPress plugin in "${ slug }" folder.` );
 
-	const { outputTemplates, outputAssets } = blockTemplate;
 	const view = {
 		$schema,
 		apiVersion,
@@ -69,34 +66,36 @@ module.exports = async (
 		textdomain: slug,
 		wpScripts,
 		npmDependencies,
+		folderName,
 		editorScript,
 		editorStyle,
 		style,
 	};
+
 	await Promise.all(
-		Object.keys( outputTemplates ).map( async ( outputFile ) => {
-			// Output files can have names that depend on the slug provided.
-			const outputFilePath = join(
-				slug,
-				outputFile.replace( /\$slug/g, slug )
-			);
-			await makeDir( dirname( outputFilePath ) );
-			writeFile(
-				outputFilePath,
-				render( outputTemplates[ outputFile ], view )
-			);
-		} )
+		Object.keys( outputTemplates ).map(
+			async ( outputFile ) =>
+				await writeOutputTemplate(
+					outputTemplates[ outputFile ],
+					outputFile,
+					view
+				)
+		)
 	);
 
 	await Promise.all(
-		Object.keys( outputAssets ).map( async ( outputFile ) => {
-			const outputFilePath = join( slug, 'assets', outputFile );
-			await makeDir( dirname( outputFilePath ) );
-			writeFile( outputFilePath, outputAssets[ outputFile ] );
-		} )
+		Object.keys( outputAssets ).map(
+			async ( outputFile ) =>
+				await writeOutputAsset(
+					outputAssets[ outputFile ],
+					outputFile,
+					view
+				)
+		)
 	);
 
-	await initBlockJSON( view );
+	await initBlock( blockOutputTemplates, view );
+
 	await initPackageJSON( view );
 
 	if ( wpScripts ) {

@@ -1,11 +1,81 @@
 [
 	{
 		"blockName": "core/comments-query-loop",
-		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n<div class=\"wp-block-comments-query-loop\"></div>\n",
+		"attrs": {
+			"perPage": 2,
+			"order": "desc"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/comment-template",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/comment-author-avatar",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					},
+					{
+						"blockName": "core/comment-author-name",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					},
+					{
+						"blockName": "core/comment-date",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					},
+					{
+						"blockName": "core/comment-content",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					},
+					{
+						"blockName": "core/comment-reply-link",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					},
+					{
+						"blockName": "core/comment-edit-link",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					}
+				],
+				"innerHTML": "\n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    ",
+				"innerContent": [
+					"\n    ",
+					null,
+					"\n    \n    ",
+					null,
+					"\n    \n    ",
+					null,
+					"\n    \n    ",
+					null,
+					"\n    \n    ",
+					null,
+					"\n    \n    ",
+					null,
+					"\n    "
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-comments-query-loop\"></div>\n    ",
 		"innerContent": [
-			"\n<div class=\"wp-block-comments-query-loop\"></div>\n"
+			"\n<div class=\"wp-block-comments-query-loop\">",
+			null,
+			"</div>\n    "
 		]
 	}
 ]

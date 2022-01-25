@@ -14,6 +14,7 @@ export default function Edit( {
 	attributes,
 	context: { commentId },
 	setAttributes,
+	isSelected,
 } ) {
 	const { height, width } = attributes;
 
@@ -64,6 +65,7 @@ export default function Edit( {
 				width,
 				height,
 			} }
+			showHandle={ isSelected }
 			onResizeStop={ ( event, direction, elt, delta ) => {
 				setAttributes( {
 					height: parseInt( height + delta.height, 10 ),

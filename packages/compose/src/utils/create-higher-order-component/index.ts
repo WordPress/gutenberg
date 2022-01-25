@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { camelCase, upperFirst } from 'lodash';
-// eslint-disable-next-line no-restricted-imports
 import type { ComponentType } from 'react';
 
 /**
@@ -14,35 +13,29 @@ import type { ComponentType } from 'react';
  * of this is the `pure` HOC which does not change the API surface of the component but
  * simply modifies the internals.
  */
-export type HigherOrderComponent< TInnerProps, TOuterProps > = (
-	Inner: ComponentType< TInnerProps >
-) => ComponentType< TOuterProps >;
-
-export type SimpleHigherOrderComponent = < TProps >(
-	Inner: ComponentType< TProps >
-) => ComponentType< TProps >;
-
-export type PropInjectingHigherOrderComponent< TRemovedProps > = <
-	TProps extends TRemovedProps
+export type HigherOrderComponent< HOCProps extends Record< string, any > > = <
+	InnerProps extends HOCProps
 >(
-	Inner: ComponentType< TProps >
-) => ComponentType< Omit< TProps, keyof TRemovedProps > >;
+	Inner: ComponentType< InnerProps >
+) => {} extends HOCProps
+	? ComponentType< InnerProps >
+	: ComponentType< Omit< InnerProps, keyof HOCProps > >;
 
 /**
  * Given a function mapping a component to an enhanced component and modifier
  * name, returns the enhanced component augmented with a generated displayName.
  *
- * @param  mapComponentToEnhancedComponent Function mapping component to enhanced component.
- * @param  modifierName                    Seed name from which to generated display name.
+ * @param mapComponent Function mapping component to enhanced component.
+ * @param modifierName Seed name from which to generated display name.
  *
  * @return Component class with generated display name assigned.
  */
-
-function createHigherOrderComponent< TInnerProps, TOuterProps >(
-	mapComponent: HigherOrderComponent< TInnerProps, TOuterProps >,
-	modifierName: string
-): HigherOrderComponent< TInnerProps, TOuterProps > {
-	return ( Inner ) => {
+function createHigherOrderComponent<
+	HOCProps extends Record< string, any > = {}
+>( mapComponent: HigherOrderComponent< HOCProps >, modifierName: string ) {
+	return < InnerProps extends HOCProps >(
+		Inner: ComponentType< InnerProps >
+	) => {
 		const Outer = mapComponent( Inner );
 		const displayName = Inner.displayName || Inner.name || 'Component';
 		Outer.displayName = `${ upperFirst(
@@ -51,4 +44,5 @@ function createHigherOrderComponent< TInnerProps, TOuterProps >(
 		return Outer;
 	};
 }
+
 export default createHigherOrderComponent;

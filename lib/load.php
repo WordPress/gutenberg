@@ -105,6 +105,7 @@ require __DIR__ . '/compat/wordpress-5.9/register-global-styles-cpt.php';
 // and the global styles assets won't be loaded.
 require __DIR__ . '/compat/wordpress-5.9/script-loader.php';
 require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-5.9/render-svg-filters.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
 require __DIR__ . '/compat/wordpress-5.9/global-styles-css-custom-properties.php';
@@ -122,9 +123,13 @@ require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
-require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-global-styles-controller.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/move-theme-editor-menu-item.php';
+require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
+require __DIR__ . '/compat/wordpress-6.0/blocks.php';
+require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
+require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 require __DIR__ . '/compat/experimental/blocks.php';
 
 require __DIR__ . '/blocks.php';

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "3.0.17",
+	"version": "3.0.20",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -59,6 +59,7 @@
 		"history": "^5.1.0",
 		"jszip": "^3.2.2",
 		"lodash": "^4.17.21",
+		"react-autosize-textarea": "^7.1.0",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

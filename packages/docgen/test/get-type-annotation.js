@@ -36,7 +36,7 @@ describe( 'Type annotations', () => {
 		};
 		const node = {};
 		const result = getTypeAnnotation( tag, node, 0 );
-		expect( result ).toBe( '' );
+		expect( result ).toBeFalsy();
 	} );
 
 	const paramTag = {
@@ -196,16 +196,12 @@ describe( 'Type annotations', () => {
 	describe( 'missing types', () => {
 		const node = getMissingTypesNode();
 
-		it( 'should throw an error if there is no return type', () => {
-			expect( () => getTypeAnnotation( returnTag, node, 0 ) ).toThrow(
-				"Could not find return type for function 'fn'."
-			);
+		it( 'should return empty value if there is no return type', () => {
+			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBeFalsy();
 		} );
 
-		it( 'should throw an error if there is no param type', () => {
-			expect( () => getTypeAnnotation( paramTag, node, 0 ) ).toThrow(
-				"Could not find type for parameter 'foo' in function 'fn'."
-			);
+		it( 'should return empty value if there is no param type', () => {
+			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBeFalsy();
 		} );
 	} );
 
