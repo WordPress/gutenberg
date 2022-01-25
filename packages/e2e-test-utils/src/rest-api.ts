@@ -9,7 +9,8 @@ import FormData from 'form-data';
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
+import apiFetchModule from '@wordpress/api-fetch';
+import type { APIFetchOptions } from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -17,16 +18,20 @@ import apiFetch from '@wordpress/api-fetch';
 import { WP_BASE_URL, WP_ADMIN_USER } from './shared/config';
 import { createURL } from './create-url';
 
-/**
- * @typedef {Object} StorageState
- * @property {string} cookie  The login cookie.
- * @property {string} nonce   The login nonce.
- * @property {string} rootURL The REST API root url.
- */
+interface StorageState {
+	cookie: string;
+	nonce: string;
+	rootURL: string;
+}
+
+const apiFetch: typeof apiFetchModule & {
+	nonceEndpoint?: string;
+	nonceMiddleware?: ReturnType< typeof apiFetchModule.createNonceMiddleware >;
+} = apiFetchModule;
 
 // `apiFetch` expects `window.fetch` to be available in its default handler.
 global.window = global.window || {};
-global.window.fetch = fetch;
+( global.window as any ).fetch = fetch;
 
 const REST_NONCE_ENDPOINT = createURL(
 	'wp-admin/admin-ajax.php',
@@ -34,15 +39,8 @@ const REST_NONCE_ENDPOINT = createURL(
 );
 
 class AdminStorageState {
-	/**
-	 * Initialize the admin storage state from disk.
-	 *
-	 * @param {string} [storageStatePath] The storage state path.
-	 * @return {Promise<AdminStorageState>} The AdminStorageState instance.
-	 */
-	static async init( storageStatePath ) {
-		/** @type {Partial<StorageState>} */
-		let initialStorageState = {};
+	static async init( storageStatePath?: string ) {
+		let initialStorageState: Partial< StorageState > = {};
 
 		if ( storageStatePath ) {
 			try {
@@ -50,7 +48,10 @@ class AdminStorageState {
 					await fs.readFile( storageStatePath, 'utf-8' )
 				);
 			} catch ( error ) {
-				if ( error instanceof Error && error.code === 'ENOENT' ) {
+				if (
+					error instanceof Error &&
+					( error as NodeJS.ErrnoException ).code === 'ENOENT'
+				) {
 					// Ignore errors if the state is not found.
 				} else {
 					throw error;
@@ -61,20 +62,14 @@ class AdminStorageState {
 		return new AdminStorageState( initialStorageState, storageStatePath );
 	}
 
-	/** @type {Partial<StorageState>} */
-	#storageState;
-	/** @type {string|undefined} */
-	#storageStatePath;
-	/** @type {boolean} */
-	#isDirty = false;
+	#storageState: Partial< StorageState >;
+	#storageStatePath: string | undefined;
+	#isDirty: boolean = false;
 
-	/**
-	 * The class to update and save the admin storage state.
-	 *
-	 * @param {Partial<StorageState>} initialStorageState The initial storage state.
-	 * @param {string}                [storageStatePath]  The optional storage state path.
-	 */
-	constructor( initialStorageState, storageStatePath ) {
+	constructor(
+		initialStorageState: Partial< StorageState >,
+		storageStatePath?: string
+	) {
 		this.#storageState = initialStorageState;
 		this.#storageStatePath = storageStatePath;
 	}
@@ -83,25 +78,14 @@ class AdminStorageState {
 		return this.#storageState;
 	}
 
-	/**
-	 * Update the storage state in memory.
-	 * (It's probably impossible now to correctly type-check this using JSDoc.)
-	 *
-	 * @typedef {keyof StorageState} KeyOfStorageState
-	 * @template {KeyOfStorageState} Key
-	 * @param {Key}              key   The key to update.
-	 * @param {StorageState.Key} value The value to update.
-	 */
-	update( key, value ) {
+	update< Key extends keyof StorageState >(
+		key: Key,
+		value: StorageState[ Key ]
+	) {
 		this.#storageState[ key ] = value;
 		this.#isDirty = true;
 	}
 
-	/**
-	 * Save the admin storage state to disk.
-	 *
-	 * @return {Promise<void>}
-	 */
 	async save() {
 		if ( this.#storageStatePath && this.#isDirty ) {
 			await fs.mkdir( path.dirname( this.#storageStatePath ), {
@@ -121,15 +105,13 @@ class AdminStorageState {
 
 /**
  * Get the API root url.
- *
- * @return {Promise<string>} The API root url.
  */
 async function getAPIRootURL() {
 	// Discover the API root url using link header.
 	// See https://developer.wordpress.org/rest-api/using-the-rest-api/discovery/#link-header
 	const res = await fetch( WP_BASE_URL, { method: 'HEAD' } );
 	const links = res.headers.get( 'link' );
-	const restLink = links.match( /<([^>]+)>; rel="https:\/\/api\.w\.org\/"/ );
+	const restLink = links?.match( /<([^>]+)>; rel="https:\/\/api\.w\.org\/"/ );
 
 	if ( ! restLink ) {
 		throw new Error( `Failed to discover REST API endpoint.
@@ -143,8 +125,6 @@ Link header: ${ links }` );
 
 /**
  * Login as admin's username and password and return the login cookie.
- *
- * @return {Promise<string>} The login cookie.
  */
 async function loginAsAdmin() {
 	const formData = new FormData();
@@ -169,13 +149,7 @@ async function loginAsAdmin() {
 	return cookie;
 }
 
-/**
- * Get the nonce.
- *
- * @param {string} cookie The login cookie.
- * @return {Promise<string>} The nonce.
- */
-async function getNonce( cookie ) {
+async function getNonce( cookie: string ) {
 	const response = await fetch( REST_NONCE_ENDPOINT, {
 		headers: { cookie },
 	} );
@@ -196,13 +170,7 @@ async function getNonce( cookie ) {
 	return nonce;
 }
 
-/**
- * Setup the rest API client.
- *
- * @param {string} [storageStatePath] Optional storage state path to save.
- * @return {Promise<StorageState>} The admin storage state.
- */
-async function setupRest( storageStatePath ) {
+async function setupRest( storageStatePath?: string ) {
 	const adminStorageState = await AdminStorageState.init( storageStatePath );
 
 	if ( ! adminStorageState.value.cookie ) {
@@ -212,7 +180,7 @@ async function setupRest( storageStatePath ) {
 	if ( ! adminStorageState.value.nonce ) {
 		adminStorageState.update(
 			'nonce',
-			await getNonce( adminStorageState.value.cookie )
+			await getNonce( adminStorageState.value.cookie! )
 		);
 	}
 
@@ -227,7 +195,7 @@ async function setupRest( storageStatePath ) {
 
 	// Create the nonce middleware and set the initial nonce.
 	apiFetch.nonceMiddleware = apiFetch.createNonceMiddleware(
-		adminStorageState.value.nonce
+		adminStorageState.value.nonce!
 	);
 
 	// Register the nonce middleware.
@@ -235,7 +203,7 @@ async function setupRest( storageStatePath ) {
 
 	// Register root url middleware.
 	apiFetch.use(
-		apiFetch.createRootURLMiddleware( adminStorageState.value.rootURL )
+		apiFetch.createRootURLMiddleware( adminStorageState.value.rootURL! )
 	);
 
 	// For the nonce to work we have to also pass the cookies.
@@ -244,7 +212,7 @@ async function setupRest( storageStatePath ) {
 			...request,
 			headers: {
 				...request.headers,
-				cookie: adminStorageState.value.cookie,
+				cookie: adminStorageState.value.cookie!,
 			},
 		} ).catch( async ( error ) => {
 			// The default nonce handler from `apiFetch` won't pass server-side cookies
@@ -265,7 +233,7 @@ async function setupRest( storageStatePath ) {
 			// Renew the nonce.
 			const nonce = await getNonce( cookie );
 			adminStorageState.update( 'nonce', nonce );
-			apiFetch.nonceMiddleware.nonce = nonce;
+			apiFetch.nonceMiddleware!.nonce = nonce;
 
 			await adminStorageState.save();
 
@@ -277,24 +245,27 @@ async function setupRest( storageStatePath ) {
 	return adminStorageState.value;
 }
 
-/**
- * Call REST API using `apiFetch` to build and clear test states.
- *
- * @param {Object} [options] `apiFetch` options.
- * @return {Promise<any>} The response value.
- */
-async function rest( options = {} ) {
+async function rest< RestResponse >(
+	options: APIFetchOptions = {}
+): Promise< RestResponse > {
 	return await apiFetch( options );
 }
 
-/** @type {number} */
-let cacheMaxBatchSize;
+let cacheMaxBatchSize: number | undefined;
 async function getMaxBatchSize() {
 	if ( cacheMaxBatchSize ) {
 		return cacheMaxBatchSize;
 	}
 
-	const response = await rest( {
+	const response = await rest< {
+		endpoints: {
+			args: {
+				requests: {
+					maxItems: number;
+				};
+			};
+		}[];
+	} >( {
 		method: 'OPTIONS',
 		path: '/batch/v1',
 	} );
@@ -302,15 +273,16 @@ async function getMaxBatchSize() {
 	return cacheMaxBatchSize;
 }
 
-/**
- * Call a set of REST APIs in batch.
- * See https://make.wordpress.org/core/2020/11/20/rest-api-batch-framework-in-wordpress-5-6/
- * Note that calling GET requests in batch is not supported.
- *
- * @param {Array<Object>} requests The request objects.
- * @return {Promise<any>} The response value.
- */
-async function batch( requests ) {
+interface BatchRequest {
+	method?: string;
+	path: string;
+	headers: Record< string, string | string[] >;
+	body: any;
+}
+
+async function batch< BatchResponse >(
+	requests: BatchRequest[]
+): Promise< BatchResponse > {
 	const maxBatchSize = await getMaxBatchSize();
 
 	if ( requests.length > maxBatchSize ) {

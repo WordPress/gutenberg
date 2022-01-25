@@ -13,6 +13,7 @@
 		{ "path": "packages/deprecated" },
 		{ "path": "packages/docgen" },
 		{ "path": "packages/dom" },
+		{ "path": "packages/e2e-test-utils" },
 		{ "path": "packages/element" },
 		{ "path": "packages/dom-ready" },
 		{ "path": "packages/escape-html" },

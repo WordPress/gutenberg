@@ -24,10 +24,12 @@
 	},
 	"files": [
 		"build",
-		"build-module"
+		"build-module",
+		"build-types"
 	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
