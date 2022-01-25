@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../gutenberg-phase';
+import rule from '../is-gutenberg-plugin';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -19,7 +19,7 @@ const ACCESS_ERROR =
 const IF_ERROR =
 	'The `process.env.IS_GUTENBERG_PLUGIN` constant should only be used as the condition in an if statement or ternary expression.';
 
-ruleTester.run( 'gutenberg-phase', rule, {
+ruleTester.run( 'is-gutenberg-plugin', rule, {
 	valid: [
 		{ code: `if ( process.env.IS_GUTENBERG_PLUGIN ) {}` },
 		{ code: `if ( ! process.env.IS_GUTENBERG_PLUGIN ) {}` },
