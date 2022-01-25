@@ -25,6 +25,10 @@ export interface Style {
 export type GeneratedCSSRule = {
 	selector: string;
 	value: string;
+	/**
+	 * The CSS key in JS style attribute format, compatible with React.
+	 * E.g. `paddingTop` instead of `padding-top`.
+	 */
 	key: string;
 };
 

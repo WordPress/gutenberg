@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy } from 'lodash';
+import { groupBy, kebabCase } from 'lodash';
 
 /**
  * Internal dependencies
@@ -26,7 +26,7 @@ export function generate( style: Style, selector: string ): string {
 				`${ subSelector } { ${ groupedRules[ subSelector ]
 					.map(
 						( rule: GeneratedCSSRule ) =>
-							`${ rule.key }: ${ rule.value };`
+							`${ kebabCase( rule.key ) }: ${ rule.value };`
 					)
 					.join( ' ' ) } }`
 			);
