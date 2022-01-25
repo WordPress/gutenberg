@@ -23,7 +23,7 @@ export function generateBoxRules(
 	if ( typeof boxStyle === 'string' ) {
 		rules.push( { selector, key: ruleKey, value: boxStyle } );
 	} else {
-		const sideRules = [ 'top', 'bottom', 'left', 'right' ].reduce(
+		const sideRules = [ 'top', 'right', 'bottom', 'left' ].reduce(
 			( acc: GeneratedCSSRule[], side: string ) => {
 				const value: string | undefined = get( boxStyle, [ side ] );
 				if ( value ) {
