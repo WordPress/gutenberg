@@ -1,6 +1,8 @@
 name: Publish npm packages
 
 on:
+    release:
+        types: [published]
     workflow_dispatch:
         inputs:
             release_type:
@@ -45,22 +47,23 @@ jobs:
 
     sync-wordpress-branch:
         name: Sync the WordPress release branch
+        if: |
+          github.event_name == 'release' &&
+          github.event.release.assets[0] &&
+          endsWith( github.event.release.tag_name, '-rc.1' )
         runs-on: ubuntu-latest
-        outputs:
-            plugin_version: ${{ steps.get_version.outputs.plugin_version }}
-            plugin_release_branch: ${{ steps.get_version.outputs.plugin_release_branch }}
 
         steps:
             - name: Checkout code
               uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-            - name: Compute plugin release branch
-              id: get_version
+            - name: Compute plugin release branch name
+              id: get_release_branch
+              env:
+                  TAG: ${{ github.event.release.tag_name }}
               run: |
-                  PLUGIN_VERSION=$(jq --raw-output '.version' package.json)
-                  echo "::set-output name=plugin_version::$(echo $PLUGIN_VERSION)"
-                  IFS='.' read -r -a PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
-                  PLUGIN_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
+                  IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
+                  PLUGIN_RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
                   echo "::set-output name=plugin_release_branch::$(echo $PLUGIN_RELEASE_BRANCH)"
 
             - name: Configure git user name and email
@@ -79,15 +82,15 @@ jobs:
                   github.event.inputs.release_type == 'next'
               run: |
                   git rm -r .
-                  git fetch --depth=1 origin "${{ steps.get_version.outputs.plugin_release_branch }}"
-                  git checkout origin/"${{ steps.get_version.outputs.plugin_release_branch }}" -- .
+                  git fetch --depth=1 origin "${{ steps.get_release_branch.outputs.plugin_release_branch }}"
+                  git checkout origin/"${{ steps.get_release_branch.outputs.plugin_release_branch }}" -- .
 
             - name: Commit the changes to the WordPress release branch
               if: |
                   github.event.inputs.release_type == 'latest' ||
                   github.event.inputs.release_type == 'next'
               run: |
-                  git commit -m "Merge changes published in the Gutenberg plugin ${{ steps.get_version.outputs.plugin_release_branch }} branch"
+                  git commit -m "Merge changes published in the Gutenberg plugin ${{ steps.get_release_branch.outputs.plugin_release_branch }} branch"
                   git push --set-upstream origin "$WORDPRESS_RELEASE_BRANCH"
 
     update-packages:
