@@ -48,7 +48,7 @@ function block_core_gallery_render( $attributes, $content ) {
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
-	$gap = preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
+	$gap       = preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
 	$id        = uniqid();
 	$class     = 'wp-block-gallery-' . $id;
 	$content   = preg_replace(
