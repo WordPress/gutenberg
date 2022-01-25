@@ -14,7 +14,7 @@ Block themes require WordPress 5.9. To use block themes in earlier versions of W
 4.  [Theme.json - Global styles](#themejson---global-styles)
 5.  [Custom templates](#custom-templates)
 6.  [Global styles presets](#global-styles-presets)
-6.  [Example themes](#example-themes)
+7.  [Example themes](#example-themes)
 
 ## What is needed to create a block theme?
 
@@ -28,7 +28,7 @@ inside a folder called `templates`.
 
 The theme may optionally include a `functions.php` file and a [theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles.
 Template parts are optional. If they are included they must be placed inside a `parts` folder.
-The theme may optionally include a `styles` folder to provide global styles presets.
+The theme may optionally include a `styles` folder to provide [global styles presets](#global-styles-presets).
 
 File structure:
 
