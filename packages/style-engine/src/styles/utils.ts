@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, upperFirst } from 'lodash';
 
 /**
  * Internal dependencies
@@ -29,7 +29,7 @@ export function generateBoxRules(
 				if ( value ) {
 					acc.push( {
 						selector,
-						key: `${ ruleKey }-${ side }`,
+						key: `${ ruleKey }${ upperFirst( side ) }`,
 						value,
 					} );
 				}
