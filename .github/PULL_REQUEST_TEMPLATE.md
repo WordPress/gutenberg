@@ -6,9 +6,6 @@
 <!-- Please describe what you have changed or added -->
 
 ## Testing Instructions
-<!-- Please describe in detail how you tested your changes. -->
-<!-- Include details of your testing environment, tests ran to see how -->
-<!-- your change affects other areas of the code, etc. -->
 <!-- Please include step by step instructions on how to test this PR. -->
 <!-- 1. Open a Post or Page. -->
 <!-- 2. Insert a Heading Block. -->
