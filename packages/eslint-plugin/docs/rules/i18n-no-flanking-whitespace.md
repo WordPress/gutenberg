@@ -9,7 +9,7 @@ Examples of **incorrect** code for this rule:
 ```js
 __( ' A string with a leading space.' );
 __( 'A string with a trailing space. ' );
-__( ' A string with leading and trailing spaces. ' );
+__( ' A string with flanking spaces. ' );
 __( '\tA string with a leading tab.' );
 __( 'A string with an empty newline\n' );
 ```

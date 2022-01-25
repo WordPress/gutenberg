@@ -50,8 +50,8 @@ module.exports = {
 		type: 'problem',
 		schema: [],
 		messages: {
-			noLeadingOrTrailingWhitespace:
-				'Translations should not contain leading or trailing whitespace{{problem}}',
+			noFlankingWhitespace:
+				'Translations should not contain flanking whitespace{{problem}}',
 		},
 		fixable: 'code',
 	},
@@ -93,7 +93,7 @@ module.exports = {
 
 					context.report( {
 						node,
-						messageId: 'noLeadingOrTrailingWhitespace',
+						messageId: 'noFlankingWhitespace',
 						data: {
 							problem: problemString,
 						},
