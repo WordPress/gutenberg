@@ -17,6 +17,7 @@ import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { deleteAllPosts } from './posts';
+import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
 interface StorageState {
 	cookies: Cookie[];
@@ -115,6 +116,8 @@ class RequestUtils {
 	activateTheme = activateTheme;
 	deleteAllBlocks = deleteAllBlocks;
 	deleteAllPosts = deleteAllPosts;
+	deleteAllWidgets = deleteAllWidgets;
+	addWidgetBlock = addWidgetBlock;
 }
 
 export type { StorageState };
