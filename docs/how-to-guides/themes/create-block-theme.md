@@ -778,9 +778,9 @@ Since the theme has custom padding enabled, you can add `padding` within the `sp
 ### Template parts
 
 In the templeParts section, assign the two template parts that you created to their template areas.
-Add three keys: -`name`, the file name of the template part file without the file extension, -`area`, the name of the template area, and `title` the visible name in the editor.
+Add three keys: `name`, the file name of the template part file without the file extension, `area`, the name of the template area, and `title`, the visible name in the editor.
 
-There are three template areas to choose from: Header, footer, and general.
+There are three template areas to choose from: header, footer, and general.
 
 ```json
 "templateParts": [
