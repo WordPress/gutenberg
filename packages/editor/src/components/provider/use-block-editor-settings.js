@@ -100,6 +100,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatternCategories',
 				'__experimentalBlockPatterns',
+				'__experimentalDiscussionSettings',
 				'__experimentalFeatures',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
