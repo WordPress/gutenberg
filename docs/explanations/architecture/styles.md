@@ -28,7 +28,7 @@ On the other hand, there's a number of stylesheets being loaded in the front end
 
 ### 2. User-provided block styles
 
-Since the introduction of the block editor in WordPress 5.0, there was tools for the users to "add styles" to specific blocks. By using these tools, the user would attach new classes or inline styles to the blocks, modifying their visual aspect.
+Since the introduction of the block editor in WordPress 5.0, there were tools for the users to "add styles" to specific blocks. By using these tools, the user would attach new classes or inline styles to the blocks, modifying their visual aspect.
 
 By default, blocks come with a given HTML markup. Think of the paragraph block, for example:
 
@@ -119,7 +119,7 @@ One of the limitations is that, from all the [styles available](https://develope
 
 The Block Supports API only serializes the font size value to the wrapper, resulting in the following HTML `<table class="has-small-font-size">` . The current block supports API doesn't serialize this value to a different node, for example, the `<tbody>`.
 
-This is an active area of work you can follow [in the tracking issue](https://github.com/WordPress/gutenberg/issues/38167). The linked proposal is exploring a different way to serialize the user changes: instead of each block support serializing its own data (for example, classes such as `has-small-font-size`, `has-green-color`) the idea is the the block would get a single class instead (for example, `wp-style-UUID`) and the contents of that class will be generated in the server by WordPress.
+This is an active area of work you can follow [in the tracking issue](https://github.com/WordPress/gutenberg/issues/38167). The linked proposal is exploring a different way to serialize the user changes: instead of each block support serializing its own data (for example, classes such as `has-small-font-size`, `has-green-color`) the idea is the block would get a single class instead (for example, `wp-style-UUID`) and the contents of that class will be generated in the server by WordPress.
 
 While work continues in that proposal, there's a scape hatch, an experimental option block authors can use. Any block support can skip the serialization to HTML markup by using  `__experimentalSkipSerialization`. For example:
 
