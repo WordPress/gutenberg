@@ -1,19 +1,19 @@
 <?php
 /**
- * Server-side rendering of the `core/post-link` block.
+ * Server-side rendering of the `core/read-more` block.
  *
  * @package WordPress
  */
 
 /**
- * Renders the `core/post-link` block on the server.
+ * Renders the `core/read-more` block on the server.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
  * @return string  Returns the post link.
  */
-function render_block_core_post_link( $attributes, $content, $block ) {
+function render_block_core_read_more( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
@@ -32,14 +32,14 @@ function render_block_core_post_link( $attributes, $content, $block ) {
 }
 
 /**
- * Registers the `core/post-link` block on the server.
+ * Registers the `core/read-more` block on the server.
  */
-function register_block_core_post_link() {
+function register_block_core_read_more() {
 	register_block_type_from_metadata(
-		__DIR__ . '/post-link',
+		__DIR__ . '/read-more',
 		array(
-			'render_callback' => 'render_block_core_post_link',
+			'render_callback' => 'render_block_core_read_more',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_post_link' );
+add_action( 'init', 'register_block_core_read_more' );

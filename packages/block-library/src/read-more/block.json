@@ -1,11 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"name": "core/post-link",
-	"title": "Post Link",
+	"name": "core/read-more",
+	"title": "Read More",
 	"category": "theme",
-	"description": "Add the link of this post.",
-	"keywords": [ "read more" ],
+	"description": "Displays the link of a post, page, or any other content-type.",
 	"textdomain": "default",
 	"attributes": {
 		"content": {
@@ -53,5 +52,5 @@
 			}
 		}
 	},
-	"style": "wp-block-post-link"
+	"style": "wp-block-read-more"
 }

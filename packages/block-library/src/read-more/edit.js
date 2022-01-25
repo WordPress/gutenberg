@@ -10,7 +10,7 @@ import { ToggleControl, PanelBody } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
-export default function PostLink( {
+export default function ReadMore( {
 	attributes: { content, linkTarget },
 	setAttributes,
 	insertBlocksAfter,

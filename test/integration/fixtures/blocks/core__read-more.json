@@ -1,7 +1,7 @@
 [
 	{
 		"clientId": "_clientId_0",
-		"name": "core/post-link",
+		"name": "core/read-more",
 		"isValid": true,
 		"attributes": {
 			"linkTarget": "_self"
