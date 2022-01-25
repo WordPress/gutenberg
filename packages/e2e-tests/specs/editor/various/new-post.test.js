@@ -1,4 +1,10 @@
 /**
+ * This file has been migrated to `/test/e2e/specs/editor/various/new-post.spec.js`.
+ * Additional bug fixes and new tests should be added to the new file instead.
+ * This file is only kept here for the migration process.
+ */
+
+/**
  * WordPress dependencies
  */
 import {
