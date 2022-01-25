@@ -19,7 +19,7 @@
 		"npm": ">=6.9.0 <7"
 	},
 	"config": {
-		"GUTENBERG_PHASE": 2
+		"IS_GUTENBERG_PLUGIN": true
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",

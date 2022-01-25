@@ -242,35 +242,35 @@ export const registerCoreBlocks = (
  * __experimentalRegisterExperimentalCoreBlocks( settings );
  * ```
  */
-export const __experimentalRegisterExperimentalCoreBlocks =
-	process.env.GUTENBERG_PHASE === 2
-		? ( { enableFSEBlocks } = {} ) => {
-				[
-					// Experimental blocks.
-					homeLink,
+export const __experimentalRegisterExperimentalCoreBlocks = process.env
+	.IS_GUTENBERG_PLUGIN
+	? ( { enableFSEBlocks } = {} ) => {
+			[
+				// Experimental blocks.
+				homeLink,
 
-					// Full Site Editing blocks.
-					...( enableFSEBlocks
-						? [
-								commentAuthorAvatar,
-								commentAuthorName,
-								commentContent,
-								commentDate,
-								commentEditLink,
-								commentReplyLink,
-								commentTemplate,
-								commentsQueryLoop,
-								commentsPagination,
-								commentsPaginationNext,
-								commentsPaginationNumbers,
-								commentsPaginationPrevious,
-								navigationArea,
-								postComment,
-								postCommentsCount,
-								postCommentsForm,
-								postCommentsLink,
-						  ]
-						: [] ),
-				].forEach( registerBlock );
-		  }
-		: undefined;
+				// Full Site Editing blocks.
+				...( enableFSEBlocks
+					? [
+							commentAuthorAvatar,
+							commentAuthorName,
+							commentContent,
+							commentDate,
+							commentEditLink,
+							commentReplyLink,
+							commentTemplate,
+							commentsQueryLoop,
+							commentsPagination,
+							commentsPaginationNext,
+							commentsPaginationNumbers,
+							commentsPaginationPrevious,
+							navigationArea,
+							postComment,
+							postCommentsCount,
+							postCommentsForm,
+							postCommentsLink,
+					  ]
+					: [] ),
+			].forEach( registerBlock );
+	  }
+	: undefined;
