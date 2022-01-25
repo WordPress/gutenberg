@@ -7,7 +7,7 @@ import { concat, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose, useInstanceId } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import {
 	BaseControl,
 	PanelBody,
@@ -121,7 +121,6 @@ function GalleryEdit( props ) {
 		};
 	}, [] );
 
-	const id = useInstanceId( getBlock( clientId ) );
 	const styleElement = useContext( BlockList.__unstableElementContext );
 
 	const innerBlockImages = useSelect(
@@ -485,8 +484,8 @@ function GalleryEdit( props ) {
 	const hasLinkTo = linkTo && linkTo !== 'none';
 
 	const gap = attributes.style?.spacing?.blockGap
-		? `.wp-container-${ id } { --wp--style--unstable-gallery-gap: ${ attributes.style.spacing.blockGap } }`
-		: undefined;
+		? `#block-${ clientId } { --wp--style--unstable-gallery-gap: ${ attributes.style.spacing.blockGap } }`
+		: `#block-${ clientId } { --wp--style--unstable-gallery-gap: var( --wp--style--block-gap ) }`;
 
 	const GapStyle = () => {
 		return <style>{ gap }</style>;
