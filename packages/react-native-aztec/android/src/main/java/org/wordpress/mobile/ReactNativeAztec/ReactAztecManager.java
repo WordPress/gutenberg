@@ -60,6 +60,8 @@ import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutShadowNode> {
 
@@ -80,7 +82,10 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     private static final String BLOCK_TYPE_TAG_KEY = "tag";
     private static final String LINK_TEXT_COLOR_KEY = "linkTextColor";
 
+    private float DEFAULT_FONT_SIZE = 16.0F;
+    private float mCurrentFontSize = 0;
     private float mCurrentLineHeight = 0;
+    private boolean mIsHeadingBlock = false;
 
     @Nullable private final Consumer<Exception> exceptionLogger;
     @Nullable private final Consumer<String> breadcrumbLogger;
@@ -267,6 +272,25 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         }
     }
 
+    private float getHeadingScale(String scale) {
+        switch (scale) {
+            case "h1":
+                return 1.73f;
+            case "h2":
+                return 1.32f;
+            case "h3":
+                return 1.02f;
+            case "h4":
+                return 0.87f;
+            case "h5":
+                return 0.72f;
+            case "h6":
+                return 0.60f;
+        }
+
+        return 1.0f;
+    }
+
     @ReactProp(name = "activeFormats", defaultBoolean = false)
     public void setActiveFormats(final ReactAztecText view, @Nullable ReadableArray activeFormats) {
         if (activeFormats != null) {
@@ -285,9 +309,18 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
      */
     @ReactProp(name = ViewProps.FONT_SIZE, defaultFloat = ViewDefaults.FONT_SIZE_SP)
     public void setFontSize(ReactAztecText view, float fontSize) {
+        float scale = 1;
+        mCurrentFontSize = fontSize;
+        // Since Aztec applies a scale to the heading's font size
+        // we subtract it before applying the new font size.
+        if (mIsHeadingBlock && fontSize > DEFAULT_FONT_SIZE) {
+            String tag = view.getTagName();
+            scale = getHeadingScale(tag);
+        }
+
         view.setTextSize(
                 TypedValue.COMPLEX_UNIT_PX,
-                (int) Math.ceil(PixelUtil.toPixelFromSP(fontSize)));
+                (int) Math.ceil(PixelUtil.toPixelFromSP(fontSize / scale)));
 
         if (mCurrentLineHeight != 0) {
             setLineHeight(view, mCurrentLineHeight);
@@ -297,7 +330,14 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     @ReactProp(name = ViewProps.LINE_HEIGHT)
     public void setLineHeight(ReactAztecText view, float lineHeight) {
         mCurrentLineHeight = lineHeight;
-        float textSize = view.getTextSize();
+        float scale = 1;
+
+        if (mIsHeadingBlock) {
+            String tag = view.getTagName();
+            scale = getHeadingScale(tag);
+        }
+
+        float textSize = view.getTextSize() * scale;
         view.setLineSpacing(textSize * lineHeight, (float) (lineHeight / textSize));
     }
 
@@ -463,7 +503,25 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     @ReactProp(name = "blockType")
     public void setBlockType(ReactAztecText view, ReadableMap inputMap) {
         if (inputMap.hasKey(BLOCK_TYPE_TAG_KEY)) {
-            view.setTagName(inputMap.getString(BLOCK_TYPE_TAG_KEY));
+            String tag = inputMap.getString(BLOCK_TYPE_TAG_KEY);
+            view.setTagName(tag);
+
+            // Check if it's a heading block, this is needed to set the
+            // right font size scale.
+            final String regex = "h([1-6])";
+            final Pattern pattern = Pattern.compile(regex);
+            final Matcher matcher = pattern.matcher(tag);
+
+            if (matcher.find()) {
+                mIsHeadingBlock = true;
+
+                // Update font size if it was already set when the level of the Heading changes.
+                if (mCurrentFontSize != 0) {
+                    setFontSize(view, mCurrentFontSize);
+                }
+            } else {
+                mIsHeadingBlock = false;
+            }
         }
     }
 
