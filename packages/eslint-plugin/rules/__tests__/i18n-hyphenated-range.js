@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../i18n-range-hyphen';
+import rule from '../i18n-hyphenated-range';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -14,7 +14,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'i18n-range-hyphen', rule, {
+ruleTester.run( 'i18n-hyphenated-range', rule, {
 	valid: [
 		{
 			code: `__( 'Hypenated-words are ok' )`,
