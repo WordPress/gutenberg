@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../i18n-no-leading-or-trailing-whitespace';
+import rule from '../i18n-no-flanking-whitespace';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -14,7 +14,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'i18n-no-leading-or-trailing-whitespace', rule, {
+ruleTester.run( 'i18n-no-flanking-whitespace', rule, {
 	valid: [
 		{
 			code: `__( 'Hello World…' )`,
