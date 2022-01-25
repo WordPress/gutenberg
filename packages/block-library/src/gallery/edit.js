@@ -485,7 +485,7 @@ function GalleryEdit( props ) {
 
 	const gap = attributes.style?.spacing?.blockGap
 		? `#block-${ clientId } { --wp--style--unstable-gallery-gap: ${ attributes.style.spacing.blockGap } }`
-		: `#block-${ clientId } { --wp--style--unstable-gallery-gap: var( --wp--style--block-gap ) }`;
+		: `#block-${ clientId } { --wp--style--unstable-gallery-gap: var( --wp--style--block-gap, 0.5em ) }`;
 
 	const GapStyle = () => {
 		return <style>{ gap }</style>;
