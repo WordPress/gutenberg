@@ -149,9 +149,9 @@ function flattenTree( input = {}, prefix, token ) {
 function getStylesDeclarations( blockStyles = {} ) {
 	const output = reduce(
 		STYLE_PROPERTY,
-		( declarations, { value, properties }, key ) => {
+		( declarations, { value, properties, useEngine }, key ) => {
 			const pathToValue = value;
-			if ( first( pathToValue ) === 'elements' ) {
+			if ( first( pathToValue ) === 'elements' || useEngine ) {
 				return declarations;
 			}
 
@@ -197,7 +197,10 @@ function getStylesDeclarations( blockStyles = {} ) {
 		if ( rule.selector !== 'self' ) {
 			throw "This style can't be added as inline style";
 		}
-		return ( output[ rule.key ] = compileStyleValue( rule.value ) );
+		const cssProperty = rule.key.startsWith( '--' )
+			? rule.key
+			: kebabCase( rule.key );
+		output.push( `${ cssProperty }: ${ compileStyleValue( rule.value ) }` );
 	} );
 
 	return output;
