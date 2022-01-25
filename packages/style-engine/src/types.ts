@@ -1,8 +1,8 @@
 export type Box = {
 	top?: string;
+	right?: string;
 	bottom?: string;
 	left?: string;
-	right?: string;
 };
 
 export interface Style {
