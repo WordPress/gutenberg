@@ -22,7 +22,6 @@ import {
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	getBlockTypes,
 } from '@wordpress/blocks';
-import { withFilters } from '@wordpress/components';
 import { useEffect, useState, useContext } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 
@@ -129,27 +128,6 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 			return declarations;
 		},
 		''
-	);
-}
-
-const PresetSvgFilter = withFilters( 'editor.PresetSvgFilter' )( () => null );
-
-function getPresetsSvgFilters( blockPresets = {} ) {
-	return PRESET_METADATA.filter( ( metadata ) => metadata.svgFilter ).flatMap(
-		( metadata ) => {
-			const presetByOrigin = get( blockPresets, metadata.path, {} );
-			return [ 'default', 'theme' ]
-				.filter( ( origin ) => presetByOrigin[ origin ] )
-				.flatMap( ( origin ) =>
-					presetByOrigin[ origin ].map( ( preset ) => (
-						<PresetSvgFilter
-							metadata={ metadata }
-							preset={ preset }
-							key={ preset.slug }
-						/>
-					) )
-				);
-		}
 	);
 }
 
@@ -417,13 +395,6 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 	return ruleset;
 };
 
-export function toSvgFilters( tree, blockSelectors ) {
-	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
-	return nodesWithSettings.flatMap( ( { presets } ) => {
-		return getPresetsSvgFilters( presets );
-	} );
-}
-
 const getBlockSelectors = ( blockTypes ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
@@ -443,7 +414,6 @@ const getBlockSelectors = ( blockTypes ) => {
 export function useGlobalStylesOutput() {
 	const [ stylesheets, setStylesheets ] = useState( [] );
 	const [ settings, setSettings ] = useState( {} );
-	const [ svgFilters, setSvgFilters ] = useState( {} );
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
@@ -463,7 +433,6 @@ export function useGlobalStylesOutput() {
 			blockSelectors,
 			hasBlockGapSupport
 		);
-		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		setStylesheets( [
 			{
 				css: customProperties,
@@ -475,8 +444,7 @@ export function useGlobalStylesOutput() {
 			},
 		] );
 		setSettings( mergedConfig.settings );
-		setSvgFilters( filters );
 	}, [ mergedConfig ] );
 
-	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
+	return [ stylesheets, settings, hasBlockGapSupport ];
 }
