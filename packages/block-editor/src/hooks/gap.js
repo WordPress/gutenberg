@@ -108,10 +108,12 @@ export function GapEdit( props ) {
 	}
 
 	const onChange = ( next ) => {
-		const row = next?.top ?? next;
-		const column = next?.left ?? next;
-		const newValue = row === column ? row : `${ row } ${ column }`;
-
+		let newValue = next;
+		if ( typeof next === 'object' ) {
+			const row = next?.top;
+			const column = next?.left;
+			newValue = row === column ? row : `${ row } ${ column }`;
+		}
 		const newStyle = {
 			...style,
 			spacing: {
@@ -145,16 +147,22 @@ export function GapEdit( props ) {
 	const boxValues = {
 		left: undefined,
 		top: undefined,
+		bottom: undefined,
+		right: undefined,
 	};
 
 	if ( boxValuesArray.length === 1 ) {
 		boxValues.left = boxValuesArray[ 0 ];
+		boxValues.right = boxValuesArray[ 0 ];
 		boxValues.top = boxValuesArray[ 0 ];
+		boxValues.bottom = boxValuesArray[ 0 ];
 	}
 
 	if ( boxValuesArray.length === 2 ) {
 		boxValues.left = boxValuesArray[ 1 ];
+		boxValues.right = boxValuesArray[ 1 ];
 		boxValues.top = boxValuesArray[ 0 ];
+		boxValues.bottom = boxValuesArray[ 0 ];
 	}
 
 	// The default combined value we'll take from row.
