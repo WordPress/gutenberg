@@ -14,7 +14,7 @@ module.exports = {
 			rules: {
 				'@wordpress/no-base-control-with-label-without-id': 'off',
 				'@wordpress/i18n-no-leading-or-trailing-whitespace': 'error',
-				'@wordpress/i18n-hyphen': 'error',
+				'@wordpress/i18n-range-hyphen': 'error',
 			},
 		},
 		{

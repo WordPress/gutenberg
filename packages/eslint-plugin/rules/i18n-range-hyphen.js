@@ -8,11 +8,11 @@ const {
 	getTranslateFunctionArgs,
 } = require( '../utils' );
 
-const HYPHEN = '-';
 const EN_DASH = '–';
+const HYPHEN_IN_RANGE = /(\d\s*)-(\s*\d)/g;
 
 function replaceHypenWithEnDash( string ) {
-	return string.replace( /-/g, EN_DASH );
+	return string.replace( HYPHEN_IN_RANGE, `$1${ EN_DASH }$2` );
 }
 
 // see eslint-plugin-wpcalypso.
@@ -23,7 +23,7 @@ function makeFixerFunction( arg ) {
 				return arg.quasis.reduce( ( fixes, quasi ) => {
 					if (
 						'TemplateElement' === quasi.type &&
-						quasi.value.raw.includes( HYPHEN )
+						quasi.value.raw.match( HYPHEN_IN_RANGE )
 					) {
 						fixes.push(
 							fixer.replaceTextRange(
@@ -54,7 +54,8 @@ module.exports = {
 		type: 'problem',
 		schema: [],
 		messages: {
-			foundHyphen: 'Use dashes (en or em) in place of hypens',
+			foundHyphen:
+				'Use dashes (en or em) in place of hypens for numeric ranges.',
 		},
 		fixable: 'code',
 	},
@@ -78,7 +79,7 @@ module.exports = {
 					const argumentString = getTextContentFromNode( arg );
 					if (
 						! argumentString ||
-						! argumentString.includes( HYPHEN )
+						! argumentString.match( HYPHEN_IN_RANGE )
 					) {
 						continue;
 					}
