@@ -26,6 +26,11 @@ describe( 'Post visibility', () => {
 			);
 			await privateLabel.click();
 
+			await page.waitForSelector( '.components-confirm-dialog' );
+
+			const [ confirmButton ] = await page.$x( '//button[text()="OK"]' );
+			await confirmButton.click();
+
 			const currentStatus = await page.evaluate( () => {
 				return wp.data
 					.select( 'core/editor' )
@@ -59,6 +64,11 @@ describe( 'Post visibility', () => {
 
 		const [ privateLabel ] = await page.$x( '//label[text()="Private"]' );
 		await privateLabel.click();
+
+		await page.waitForSelector( '.components-confirm-dialog' );
+
+		const [ confirmButton ] = await page.$x( '//button[text()="OK"]' );
+		await confirmButton.click();
 
 		// Enter a title for this post.
 		await page.type( '.editor-post-title__input', ' Changed' );
