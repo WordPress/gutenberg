@@ -4,6 +4,9 @@ This document introduces the main concepts related to styles in the block editor
 
 1. HTML and CSS
 2. User-provided Block Styles
+    - From UI controls to HTML markup
+    - Block Supports API
+    - Current limits of the Block Supports API
 3. User-provided Global Styles
 
 ### 1. HTML and CSS
@@ -63,7 +66,7 @@ To build a experience like the one described above a block author needs a few pi
 
 In essence, these are the essential mechanics a block author needs to care about for their block to be able to be styled by the user. While this can be done completely manually, there's an API that automates this process for common style needs: Block Supports.
 
-#### Block supports
+#### Block Supports API
 
 [Block supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) is an API that allows a block to declare what features it supports. By adding some info to their [block.json file](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/), the block tells the system what kind of actions a user can do to it.
 
@@ -91,7 +94,7 @@ Besides the obvious advantage of having to do less work to achieve the same resu
 - the block will use the UI controls other blocks use for the same styles, creating a more coherent user experience
 - the UI controls in use by the block will be automatically updated as they are improved, without the block author having to do anything
 
-#### Current limits of block supports
+#### Current limits of the Block Supports API
 
 While the Block Supports API provides value, it also comes with some limitations a block author needs to be aware of. To better visualize what they are, let's run with the following example of a table block:
 
@@ -135,6 +138,6 @@ While work continues in that proposal, there's a scape hatch, an experimental op
 
 This means that the font size block supports will do all of the things (create an UI control, bind the block attribute to the control, etc) except serializing the user values into the HTML markup. The classes and inline styles will not be automatically applied to the wrapper and is the block author responsibility to implement this in the `edit`, `save`, and `render_callback` functions. See [this issue](https://github.com/WordPress/gutenberg/issues/28913) for examples of how it was done for some blocks provided by WordPress.
 
-### 3. User-provided global styles
+### 3. User-provided Global Styles
 
-TBD.
+TODO.
