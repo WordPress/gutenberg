@@ -229,10 +229,37 @@ module.exports = {
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
-			files: [ 'packages/e2e-test*/**/*.js' ],
+			files: [
+				'packages/e2e-tests/**/*.js',
+				'packages/e2e-test-utils/**/*.js',
+			],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
 			rules: {
 				'jest/expect-expect': 'off',
+			},
+		},
+		{
+			files: [
+				'packages/e2e-tests-playwright/**/*.[tj]s',
+				'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			],
+			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e-playwright' ],
+			rules: {
+				'@wordpress/no-global-active-element': 'off',
+				'@wordpress/no-global-get-selection': 'off',
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector: 'CallExpression[callee.name="$"]',
+						message:
+							'`$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector: 'CallExpression[callee.name="$$"]',
+						message:
+							'`$$` is discouraged, please use `locator` instead',
+					},
+				],
 			},
 		},
 		{
