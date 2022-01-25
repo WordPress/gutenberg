@@ -24,11 +24,25 @@ jobs:
         name: Determine whether to use wp/trunk or wp/next branch
         runs-on: ubuntu-latest
         outputs:
-            wordpress_release_branch: ${{ steps.get_wordpress_version.outputs.wordpress_release_branch }}
+            wordpress_release_branch: |
+              steps.get_wordpress_branch_for_sync.outputs.wordpress_release_branch ||
+              steps.get_wordpress_branch_for_manual_release.wordpress_release_branch
 
         steps:
-            - name: Get WordPress version from wordpress-develop trunk
-              id: get_wordpress_version
+            - name: Get WordPress release branch for sync
+              id: get_wordpress_branch_for_manual_release
+              if: |
+                  github.event_name == 'workflow_dispatch' &&
+                  startsWith( github.ref, 'wp/' ) &&
+                  ! github.ref == 'wp/next'
+              run: echo "::set-output name=wordpress_release_branch::${GITHUB_REF#refs/heads/}"
+
+            - name: Get WordPress release branch for sync
+              id: get_wordpress_branch_for_sync
+              if: |
+                  github.event_name == 'release' &&
+                  github.event.release.assets[0] &&
+                  endsWith( github.event.release.tag_name, '-rc.1' )
               run: |
                   wp_version_url='https://raw.githubusercontent.com/WordPress/wordpress-develop/trunk/src/wp-includes/version.php'
                   curl -o version.php "$wp_version_url"
@@ -66,8 +80,8 @@ jobs:
             - name: Checkout WordPress release branch
               uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
               with:
-                ref: ${{ needs.get-wordpress-release-branch.outputs.wordpress_release_branch }}
-                fetch-depth: 100
+                  ref: ${{ needs.get-wordpress-release-branch.outputs.wordpress_release_branch }}
+                  fetch-depth: 100
 
             - name: Configure git user name and email
               run: |
