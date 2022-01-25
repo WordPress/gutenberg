@@ -7,6 +7,7 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
  * Internal dependencies
  */
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
+import { createNewPost } from './create-new-post';
 import { getPageError } from './get-page-error';
 import { isCurrentURL } from './is-current-url';
 import { showBlockToolbar } from './show-block-toolbar';
@@ -24,6 +25,7 @@ class PageUtils {
 	}
 
 	clickBlockToolbarButton = clickBlockToolbarButton;
+	createNewPost = createNewPost;
 	getPageError = getPageError;
 	isCurrentURL = isCurrentURL;
 	showBlockToolbar = showBlockToolbar;
