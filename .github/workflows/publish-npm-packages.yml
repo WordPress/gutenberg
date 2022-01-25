@@ -216,7 +216,6 @@ jobs:
                   npm run build
 
             - name: Publish packages
-              if: github.event.inputs.release_type == 'next'
               run: |
                   minimum_version_bump='patch'
                   if [ '${{ github.event.inputs.release_type }}' = 'next' ]; then
