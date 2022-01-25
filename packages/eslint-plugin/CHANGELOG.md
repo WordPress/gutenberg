@@ -12,6 +12,10 @@
 
 -   Replaced no-shadow eslint rule with @typescript-eslint/no-shadow ([#38665](https://github.com/WordPress/gutenberg/pull/38665)).
 
+### Breaking Changes
+
+-   Remove automatic environment detection of `test-unit` and `test-e2e` for the `recommended` preset. It's now recommended to opt-in to specific preset explicitly.
+
 ## 10.0.0 (2022-01-27)
 
 ### Breaking Changes

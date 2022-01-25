@@ -1500,6 +1500,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/e2e-test-utils-playwright",
+		"slug": "packages-e2e-test-utils-playwright",
+		"markdown_source": "../packages/e2e-test-utils-playwright/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/e2e-test-utils",
 		"slug": "packages-e2e-test-utils",
 		"markdown_source": "../packages/e2e-test-utils/README.md",
