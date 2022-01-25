@@ -23,11 +23,11 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    determine-feature-freeze:
-        name: Determine if Core is in Feature Freeze
+    get-wordpress-release-branch:
+        name: Determine whether to use wp/trunk or wp/next branch
         runs-on: ubuntu-latest
         outputs:
-            wordpress_release_branch: ${{ steps.get_wordpress_version.outputs.feature_freeze }}
+            wordpress_release_branch: ${{ steps.get_wordpress_version.outputs.wordpress_release_branch }}
 
         steps:
             - name: Get WordPress version from wordpress-develop trunk
@@ -38,21 +38,21 @@ jobs:
                   wp_version=$(awk -F "'" '/^\$wp_version = /{print $2}' version.php)
                   case "$wp_version" in
                     *"-beta"*|*"-RC1")
-                      echo "::set-output name=feature_freeze::true"
+                      echo "::set-output name=wordpress_release_branch::wp/next"
                     ;;
                     *)
-                      echo "::set-output name=feature_freeze::false"
+                      echo "::set-output name=wordpress_release_branch::wp/trunk"
                   esac
                   rm version.php
 
     sync-wordpress-branch:
         name: Sync the WordPress release branch
         if: |
-          github.event_name == 'release' &&
-          github.event.release.assets[0] &&
-          endsWith( github.event.release.tag_name, '-rc.1' )
+            github.event_name == 'release' &&
+            github.event.release.assets[0] &&
+            endsWith( github.event.release.tag_name, '-rc.1' )
+        needs: get-wordpress-release-branch
         runs-on: ubuntu-latest
-
         steps:
             - name: Checkout code
               uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
@@ -66,32 +66,27 @@ jobs:
                   PLUGIN_RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
                   echo "::set-output name=plugin_release_branch::$(echo $PLUGIN_RELEASE_BRANCH)"
 
+            - name: Checkout WordPress release branch
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                ref: ${{ needs.get-wordpress-release-branch.outputs.wordpress_release_branch }}
+                fetch-depth: 100
+
             - name: Configure git user name and email
               run: |
                   git config user.name "Gutenberg Repository Automation"
                   git config user.email gutenberg@wordpress.org
 
-            - name: Switch to WordPress release branch
-              run: |
-                  git fetch --depth=100 origin "$WORDPRESS_RELEASE_BRANCH"
-                  git checkout "$WORDPRESS_RELEASE_BRANCH"
-
             - name: Sync the WordPress release branch with the changes from the latest plugin release
-              if: |
-                  github.event.inputs.release_type == 'latest' ||
-                  github.event.inputs.release_type == 'next'
               run: |
                   git rm -r .
                   git fetch --depth=1 origin "${{ steps.get_release_branch.outputs.plugin_release_branch }}"
                   git checkout origin/"${{ steps.get_release_branch.outputs.plugin_release_branch }}" -- .
 
             - name: Commit the changes to the WordPress release branch
-              if: |
-                  github.event.inputs.release_type == 'latest' ||
-                  github.event.inputs.release_type == 'next'
               run: |
                   git commit -m "Merge changes published in the Gutenberg plugin ${{ steps.get_release_branch.outputs.plugin_release_branch }} branch"
-                  git push --set-upstream origin "$WORDPRESS_RELEASE_BRANCH"
+                  git push --set-upstream origin "${{ needs.get-wordpress-release-branch.outputs.wordpress_release_branch }}"
 
     update-packages:
         name: Update Packages
