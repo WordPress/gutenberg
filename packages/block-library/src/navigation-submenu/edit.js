@@ -554,7 +554,7 @@ export default function NavigationSubmenuEdit( {
 					<ToolbarButton
 						name="revert"
 						icon={ keyboardReturn }
-						title={ __( 'Revert to Link' ) }
+						title={ __( 'Convert to Link' ) }
 						onClick={ transformToLink }
 						className="wp-block-navigation__submenu__revert"
 					/>
