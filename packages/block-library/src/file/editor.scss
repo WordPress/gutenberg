@@ -1,4 +1,5 @@
 .wp-block-file {
+	/* prettier-ignore */
 	.wp-block[data-align="left"] > &,
 	.wp-block[data-align="right"] > & {
 		// Stop file block from collapsing when floated.
@@ -30,7 +31,16 @@
 	}
 
 	.wp-block-file__content-wrapper {
+		display: flex;
+		align-items: center;
 		flex-grow: 1;
+		textarea {
+			width: min-content;
+			&:focus {
+				border: none;
+				box-shadow: none;
+			}
+		}
 	}
 
 	a {
