@@ -483,10 +483,9 @@ $preview-image-height: 140px;
 		 * Position spinner to the left of the actions.
 		 *
 		 * Compensate for:
-		 *  - Input padding top ($grid-unit-15) plus difference between effective input line-height (18px) and spinner height (16px).
 		 *  - Input padding right ($button-size)
 		 */
-		top: $grid-unit-15 + 1;
+		top: calc(50% - #{$spinner-size} / 2);
 		right: $button-size;
 	}
 }
