@@ -119,11 +119,9 @@ export default function CommentTemplateEdit( {
 	const blockProps = useBlockProps();
 
 	const [ activeComment, setActiveComment ] = useState();
-	const {
-		__experimentalDiscussionSettings: { commentOrder, commentsPerPage },
-	} = useSelect( ( select ) => {
+	const { commentOrder, commentsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings();
+		return getSettings().__experimentalDiscussionSettings;
 	} );
 	const { rawComments, blocks } = useSelect(
 		( select ) => {
