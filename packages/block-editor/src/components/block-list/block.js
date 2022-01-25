@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
+import { noop, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -99,10 +99,10 @@ function BlockListBlock( {
 			isSelected={ isSelected }
 			attributes={ attributes }
 			setAttributes={ setAttributes }
-			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
-			onReplace={ canRemove ? onReplace : undefined }
-			onRemove={ canRemove ? onRemove : undefined }
-			mergeBlocks={ canRemove ? onMerge : undefined }
+			insertBlocksAfter={ isLocked ? noop : onInsertBlocksAfter }
+			onReplace={ canRemove ? onReplace : noop }
+			onRemove={ canRemove ? onRemove : noop }
+			mergeBlocks={ canRemove ? onMerge : noop }
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
