@@ -12,9 +12,6 @@ on:
                 description: 'patch, minor, or major?'
                 required: true
 
-env:
-    WORDPRESS_RELEASE_BRANCH: ${{ github.event.inputs.release_type == 'next' && 'wp/next' || 'wp/trunk' }}
-
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
     # The concurrency group contains the workflow name and the branch name for pull requests
@@ -91,13 +88,13 @@ jobs:
     update-packages:
         name: Update Packages
         runs-on: ubuntu-latest
-        needs: sync-wordpress-branch
+        needs: [get-wordpress-release-branch, sync-wordpress-branch]
 
         steps:
             - name: Checkout code
               uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
               with:
-                  ref: ${{ env.WORDPRESS_RELEASE_BRANCH }}
+                  ref: ${{ needs.get-wordpress-release-branch.outputs.wordpress_release_branch }}
 
             - name: Use desired version of NodeJS
               uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
@@ -170,7 +167,7 @@ jobs:
                     fi
                   done <<< $PUBLIC_PACKAGES
                   git commit -am "Update changelog files"
-                  git push --set-upstream origin "$WORDPRESS_RELEASE_BRANCH"
+                  git push --set-upstream origin "${{ needs.get-wordpress-release-branch.outputs.wordpress_release_branch }}"
                   echo "::set-output name=changelog_commit::$(git rev-parse --verify --short HEAD)"
 
             - name: Fetch trunk
@@ -186,13 +183,13 @@ jobs:
     publish-packages:
         name: Publish Packages
         runs-on: ubuntu-latest
-        needs: update-packages
+        needs: [get-wordpress-release-branch, update-packages]
 
         steps:
             - name: Checkout code
               uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
               with:
-                  ref: ${{ env.WORDPRESS_RELEASE_BRANCH }}
+                  ref: ${{ needs.get-wordpress-release-branch.outputs.wordpress_release_branch }}
 
             - name: Use desired version of NodeJS
               uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
