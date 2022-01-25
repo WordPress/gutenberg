@@ -565,7 +565,9 @@ function GalleryEdit( props ) {
 				/>
 			</BlockControls>
 			{ noticeUI }
-			{ gap && createPortal( <GapStyle />, styleElement ) }
+			{ gap &&
+				styleElement &&
+				createPortal( <GapStyle />, styleElement ) }
 			<Gallery
 				{ ...props }
 				images={ images }
