@@ -12,6 +12,7 @@ const InspectorControlsDimensions = createSlotFill(
 const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
 );
+const InspectorControlsBottom = createSlotFill( 'InspectorControlsBottom' );
 
 const groups = {
 	default: InspectorControlsDefault,
@@ -19,6 +20,7 @@ const groups = {
 	border: InspectorControlsBorder,
 	dimensions: InspectorControlsDimensions,
 	typography: InspectorControlsTypography,
+	bottom: InspectorControlsBottom,
 };
 
 export default groups;

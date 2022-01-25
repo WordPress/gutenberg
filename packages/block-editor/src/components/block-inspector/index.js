@@ -79,6 +79,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 					__experimentalGroup="border"
 					label={ __( 'Border' ) }
 				/>
+				<InspectorControls.Slot __experimentalGroup="bottom" />
 			</div>
 		);
 	}
@@ -151,6 +152,7 @@ const BlockInspectorSingleBlock = ( {
 				__experimentalGroup="border"
 				label={ __( 'Border' ) }
 			/>
+			<InspectorControls.Slot __experimentalGroup="bottom" />
 			<div>
 				<AdvancedControls />
 			</div>
