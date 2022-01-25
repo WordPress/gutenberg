@@ -28,7 +28,7 @@ const MyDateTimePicker = () => {
 			is12Hour={ true }
 		/>
 	);
-}
+};
 ```
 
 ## Props
@@ -52,7 +52,7 @@ The function called when a new date or time has been selected. It is passed the 
 
 ### is12Hour
 
-Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be MM-DD-YYYY.
+Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be MM-DD-YYYY. If its value is `false`, format DD-MM-YYYY will be used.
 
 -   Type: `bool`
 -   Required: No
@@ -69,5 +69,5 @@ A callback function which receives a Date object representing a day as an argume
 
 A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No
