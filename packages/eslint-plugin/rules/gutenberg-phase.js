@@ -21,124 +21,75 @@ function findParent( sourceNode, predicate ) {
 }
 
 /**
- * Tests whether the GUTENBERG_PHASE variable is accessed via
- * `process.env.GUTENBERG_PHASE`.
+ * Tests whether the IS_GUTENBERG_PLUGIN variable is accessed via
+ * `process.env.IS_GUTENBERG_PLUGIN`.
  *
  * @example
  * ```js
  * // good
- * if ( process.env.GUTENBERG_PHASE === 2 ) {
+ * if ( process.env.IS_GUTENBERG_PLUGIN ) {
  *
  * // bad
- * if ( GUTENBERG_PHASE === 2 ) {
+ * if ( IS_GUTENBERG_PLUGIN ) {
  * ```
  *
- * @param {Object} node    The GUTENBERG_PHASE identifier node.
+ * @param {Object} node    The IS_GUTENBERG_PLUGIN identifier node.
  * @param {Object} context The eslint context object.
  */
-function testIsAccessedViaProcessEnv( node, context ) {
+function isAccessedViaProcessEnv( node, context ) {
 	const parent = node.parent;
 
 	if (
 		parent &&
 		parent.type === 'MemberExpression' &&
-		context.getSource( parent ) === 'process.env.GUTENBERG_PHASE'
+		context.getSource( parent ) === 'process.env.IS_GUTENBERG_PLUGIN'
 	) {
-		return;
+		return true;
 	}
 
-	context.report(
-		node,
-		'The `GUTENBERG_PHASE` constant should be accessed using `process.env.GUTENBERG_PHASE`.'
-	);
+	return false;
 }
 
 /**
- * Tests whether the GUTENBERG_PHASE variable is used in a strict binary
- * equality expression in a comparison with a number, triggering a
- * violation if not.
+ * Tests whether the IS_GUTENBERG_PLUGIN variable is used as the condition for an
+ * if statement or ternary, triggering a violation if not.
  *
  * @example
  * ```js
  * // good
- * if ( process.env.GUTENBERG_PHASE === 2 ) {
+ * if ( process.env.IS_GUTENBERG_PLUGIN ) {
  *
  * // bad
- * if ( process.env.GUTENBERG_PHASE >= '2' ) {
+ * const isFeatureActive = process.env.IS_GUTENBERG_PLUGIN;
  * ```
  *
- * @param {Object} node    The GUTENBERG_PHASE identifier node.
+ * @param {Object} node    The IS_GUTENBERG_PLUGIN identifier node.
  * @param {Object} context The eslint context object.
  */
-function testIsUsedInStrictBinaryExpression( node, context ) {
-	const parent = findParent(
-		node,
-		( candidate ) => candidate.type === 'BinaryExpression'
-	);
-
-	if ( parent ) {
-		const comparisonNode =
-			node.parent.type === 'MemberExpression' ? node.parent : node;
-
-		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE
-		const hasCorrectOperator = [ '===', '!==' ].includes( parent.operator );
-		const hasCorrectOperands =
-			( parent.left === comparisonNode &&
-				typeof parent.right.value === 'number' ) ||
-			( parent.right === comparisonNode &&
-				typeof parent.left.value === 'number' );
-
-		if ( hasCorrectOperator && hasCorrectOperands ) {
-			return;
-		}
-	}
-
-	context.report(
-		node,
-		'The `GUTENBERG_PHASE` constant should only be used in a strict equality comparison with a primitive number.'
-	);
-}
-
-/**
- * Tests whether the GUTENBERG_PHASE variable is used as the condition for an
- * if statement, triggering a violation if not.
- *
- * @example
- * ```js
- * // good
- * if ( process.env.GUTENBERG_PHASE === 2 ) {
- *
- * // bad
- * const isFeatureActive = process.env.GUTENBERG_PHASE === 2;
- * ```
- *
- * @param {Object} node    The GUTENBERG_PHASE identifier node.
- * @param {Object} context The eslint context object.
- */
-function testIsUsedInIfOrTernary( node, context ) {
+function isUsedInIfOrTernary( node, context ) {
 	const conditionalParent = findParent( node, ( candidate ) =>
 		[ 'IfStatement', 'ConditionalExpression' ].includes( candidate.type )
 	);
-	const binaryParent = findParent(
-		node,
-		( candidate ) => candidate.type === 'BinaryExpression'
-	);
+
+	const goodTests = [
+		'process.env.IS_GUTENBERG_PLUGIN',
+		'! process.env.IS_GUTENBERG_PLUGIN',
+	];
 
 	if (
 		conditionalParent &&
-		binaryParent &&
-		conditionalParent.test &&
-		conditionalParent.test.range[ 0 ] === binaryParent.range[ 0 ] &&
-		conditionalParent.test.range[ 1 ] === binaryParent.range[ 1 ]
+		goodTests.includes( context.getSource( conditionalParent.test ) )
 	) {
-		return;
+		return true;
 	}
 
-	context.report(
-		node,
-		'The `GUTENBERG_PHASE` constant should only be used as part of the condition in an if statement or ternary expression.'
-	);
+	return false;
 }
+
+const ACCESS_ERROR =
+	'The `IS_GUTENBERG_PLUGIN` constant should be accessed using `process.env.IS_GUTENBERG_PLUGIN`.';
+const IF_ERROR =
+	'The `process.env.IS_GUTENBERG_PLUGIN` constant should only be used as the condition in an if statement or ternary expression.';
 
 module.exports = {
 	meta: {
@@ -148,23 +99,32 @@ module.exports = {
 	create( context ) {
 		return {
 			Identifier( node ) {
-				// Bypass any identifiers with a node name different to `GUTENBERG_PHASE`.
-				if ( node.name !== 'GUTENBERG_PHASE' ) {
+				// Bypass any identifiers with a node name different to `IS_GUTENBERG_PLUGIN`.
+				if ( node.name !== 'IS_GUTENBERG_PLUGIN' ) {
 					return;
 				}
 
-				testIsAccessedViaProcessEnv( node, context );
-				testIsUsedInStrictBinaryExpression( node, context );
-				testIsUsedInIfOrTernary( node, context );
+				if ( ! isAccessedViaProcessEnv( node, context ) ) {
+					context.report( node, ACCESS_ERROR );
+				}
+				if ( ! isUsedInIfOrTernary( node, context ) ) {
+					context.report( node, IF_ERROR );
+				}
 			},
+			// Check for literals, e.g. when 'IS_GUTENBERG_PLUGIN' is used as a string via something like 'window[ 'IS_GUTENBERG_PLUGIN' ]'.
 			Literal( node ) {
-				// Bypass any identifiers with a node value different to `GUTENBERG_PHASE`.
-				if ( node.value !== 'GUTENBERG_PHASE' ) {
+				// Bypass any identifiers with a node value different to `IS_GUTENBERG_PLUGIN`.
+				if ( node.value !== 'IS_GUTENBERG_PLUGIN' ) {
 					return;
 				}
 
 				if ( node.parent && node.parent.type === 'MemberExpression' ) {
-					testIsAccessedViaProcessEnv( node, context );
+					if ( ! isAccessedViaProcessEnv( node, context ) ) {
+						context.report( node, ACCESS_ERROR );
+					}
+					if ( ! isUsedInIfOrTernary( node, context ) ) {
+						context.report( node, IF_ERROR );
+					}
 				}
 			},
 		};

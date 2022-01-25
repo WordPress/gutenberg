@@ -15,48 +15,40 @@ const ruleTester = new RuleTester( {
 } );
 
 const ACCESS_ERROR =
-	'The `GUTENBERG_PHASE` constant should be accessed using `process.env.GUTENBERG_PHASE`.';
-const EQUALITY_ERROR =
-	'The `GUTENBERG_PHASE` constant should only be used in a strict equality comparison with a primitive number.';
+	'The `IS_GUTENBERG_PLUGIN` constant should be accessed using `process.env.IS_GUTENBERG_PLUGIN`.';
 const IF_ERROR =
-	'The `GUTENBERG_PHASE` constant should only be used as part of the condition in an if statement or ternary expression.';
+	'The `process.env.IS_GUTENBERG_PLUGIN` constant should only be used as the condition in an if statement or ternary expression.';
 
 ruleTester.run( 'gutenberg-phase', rule, {
 	valid: [
-		{ code: `if ( process.env.GUTENBERG_PHASE === 2 ) {}` },
-		{ code: `if ( process.env.GUTENBERG_PHASE !== 2 ) {}` },
-		{ code: `if ( 2 === process.env.GUTENBERG_PHASE ) {}` },
-		{ code: `if ( 2 !== process.env.GUTENBERG_PHASE ) {}` },
-		{ code: `const test = process.env.GUTENBERG_PHASE === 2 ? foo : bar` },
-		{ code: `const test = process.env.GUTENBERG_PHASE !== 2 ? foo : bar` },
+		{ code: `if ( process.env.IS_GUTENBERG_PLUGIN ) {}` },
+		{ code: `if ( ! process.env.IS_GUTENBERG_PLUGIN ) {}` },
+		{ code: `const test = process.env.IS_GUTENBERG_PLUGIN ? foo : bar` },
+		{ code: `const test = ! process.env.IS_GUTENBERG_PLUGIN ? bar : foo` },
 	],
 	invalid: [
 		{
-			code: `if ( GUTENBERG_PHASE === 1 ) {}`,
-			errors: [ { message: ACCESS_ERROR } ],
+			code: `if ( IS_GUTENBERG_PLUGIN ) {}`,
+			errors: [ { message: ACCESS_ERROR }, { message: IF_ERROR } ],
 		},
 		{
-			code: `if ( window[ 'GUTENBERG_PHASE' ] === 1 ) {}`,
-			errors: [ { message: ACCESS_ERROR } ],
+			code: `if ( window[ 'IS_GUTENBERG_PLUGIN' ] ) {}`,
+			errors: [ { message: ACCESS_ERROR }, { message: IF_ERROR } ],
 		},
 		{
-			code: `if ( process.env.GUTENBERG_PHASE > 1 ) {}`,
-			errors: [ { message: EQUALITY_ERROR } ],
-		},
-		{
-			code: `if ( process.env.GUTENBERG_PHASE === '2' ) {}`,
-			errors: [ { message: EQUALITY_ERROR } ],
-		},
-		{
-			code: `if ( true ) { process.env.GUTENBERG_PHASE === 2 }`,
+			code: `if ( true ) { process.env.IS_GUTENBERG_PLUGIN === 2 }`,
 			errors: [ { message: IF_ERROR } ],
 		},
 		{
-			code: `if ( true || process.env.GUTENBERG_PHASE === 2 ) {}`,
+			code: `if ( process.env.IS_GUTENBERG_PLUGIN === 2 ) {}`,
 			errors: [ { message: IF_ERROR } ],
 		},
 		{
-			code: `const isFeatureActive = process.env.GUTENBERG_PHASE === 2;`,
+			code: `if ( true || process.env.IS_GUTENBERG_PLUGIN === 2 ) {}`,
+			errors: [ { message: IF_ERROR } ],
+		},
+		{
+			code: `const isFeatureActive = process.env.IS_GUTENBERG_PLUGIN;`,
 			errors: [ { message: IF_ERROR } ],
 		},
 	],
