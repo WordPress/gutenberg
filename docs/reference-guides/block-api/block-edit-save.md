@@ -131,7 +131,7 @@ The value of `attributes.content` will be displayed inside the `div` when insert
 
 ### isSelected
 
-The isSelected property is an object that communicates whether the block is currently selected.
+The isSelected property is an boolean that communicates whether the block is currently selected.
 
 {% codetabs %}
 {% JSX %}

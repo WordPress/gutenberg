@@ -908,3 +908,18 @@ export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
 	}
 	return state.themeBaseGlobalStyles[ currentTheme.stylesheet ];
 }
+
+/**
+ * Return the ID of the current global styles object.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string} The current global styles ID.
+ */
+export function __experimentalGetCurrentThemeGlobalStylesVariations( state ) {
+	const currentTheme = getCurrentTheme( state );
+	if ( ! currentTheme ) {
+		return null;
+	}
+	return state.themeGlobalStyleVariations[ currentTheme.stylesheet ];
+}

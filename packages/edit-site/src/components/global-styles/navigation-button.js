@@ -9,16 +9,9 @@ import {
 } from '@wordpress/components';
 import { Icon } from '@wordpress/icons';
 
-function NavigationButton( {
-	path,
-	icon,
-	children,
-	isBack = false,
-	...props
-} ) {
-	const navigator = useNavigator();
+function GenericNavigationButton( { icon, children, ...props } ) {
 	return (
-		<Item onClick={ () => navigator.push( path, { isBack } ) } { ...props }>
+		<Item { ...props }>
 			{ icon && (
 				<HStack justify="flex-start">
 					<FlexItem>
@@ -31,5 +24,16 @@ function NavigationButton( {
 		</Item>
 	);
 }
+function NavigationButton( { path, ...props } ) {
+	const { push } = useNavigator();
+	return (
+		<GenericNavigationButton onClick={ () => push( path ) } { ...props } />
+	);
+}
 
-export default NavigationButton;
+function NavigationBackButton( { ...props } ) {
+	const { pop } = useNavigator();
+	return <GenericNavigationButton onClick={ pop } { ...props } />;
+}
+
+export { NavigationButton, NavigationBackButton };

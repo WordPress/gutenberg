@@ -9,10 +9,8 @@ import { render, fireEvent, waitFor } from 'test/helpers';
  */
 import LinkSettingsNavigation from '../link-settings-navigation';
 
-beforeAll( () => {
-	jest.useFakeTimers();
-	jest.spyOn( Keyboard, 'dismiss' );
-} );
+jest.useFakeTimers( 'legacy' );
+jest.spyOn( Keyboard, 'dismiss' );
 
 const subject = (
 	<LinkSettingsNavigation

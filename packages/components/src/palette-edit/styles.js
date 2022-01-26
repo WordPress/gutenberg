@@ -13,7 +13,6 @@ import { space } from '../ui/utils/space';
 import { COLORS, CONFIG } from '../utils';
 import { View } from '../view';
 import InputControl from '../input-control';
-import Item from '../item-group/item';
 import {
 	Container as InputControlContainer,
 	Input,
@@ -41,9 +40,26 @@ export const NameInputControl = styled( InputControl )`
 	}
 `;
 
-export const PaletteItem = styled( Item )`
+export const PaletteItem = styled( View )`
 	padding: 3px 0 3px ${ space( 3 ) };
 	height: calc( 40px - ${ CONFIG.borderWidth } );
+	border: 1px solid ${ CONFIG.surfaceBorderColor };
+	border-bottom-color: transparent;
+	&:first-of-type {
+		border-top-left-radius: ${ CONFIG.controlBorderRadius };
+		border-top-right-radius: ${ CONFIG.controlBorderRadius };
+	}
+	&:last-of-type {
+		border-bottom-left-radius: ${ CONFIG.controlBorderRadius };
+		border-bottom-right-radius: ${ CONFIG.controlBorderRadius };
+		border-bottom-color: ${ CONFIG.surfaceBorderColor };
+	}
+	&.is-selected + & {
+		border-top-color: transparent;
+	}
+	&.is-selected {
+		border-color: ${ COLORS.blue.wordpress[ 700 ] };
+	}
 `;
 
 export const NameContainer = styled.div`

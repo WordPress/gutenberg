@@ -1,0 +1,100 @@
+.edit-site-code-editor {
+	position: relative;
+	width: 100%;
+	background-color: $white;
+	flex-grow: 1;
+
+	&__body {
+		width: 100%;
+		padding: 0 $grid-unit-15 $grid-unit-15 $grid-unit-15;
+		max-width: $break-xlarge;
+		margin-left: auto;
+		margin-right: auto;
+
+		@include break-large() {
+			padding: $grid-unit-20 $grid-unit-30 #{ $grid-unit-60 * 2 } $grid-unit-30;
+			padding: 0 $grid-unit-30 $grid-unit-30 $grid-unit-30;
+		}
+	}
+
+	// Exit code editor toolbar.
+	&__toolbar {
+		position: sticky;
+		z-index: z-index(".edit-site-code-editor__toolbar");
+		top: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		background: rgba($white, 0.8);
+		padding: $grid-unit-05 $grid-unit-15;
+
+		@include break-small() {
+			padding: $grid-unit-15;
+		}
+
+		@include break-large() {
+			padding: $grid-unit-15 $grid-unit-30;
+		}
+
+		h2 {
+			line-height: $button-size;
+			margin: 0 auto 0 0;
+			font-size: $default-font-size;
+			color: $gray-900;
+		}
+
+		.components-button svg {
+			order: 1;
+		}
+	}
+}
+
+textarea.edit-site-code-editor-text-area.edit-site-code-editor-text-area {
+	border: $border-width solid $gray-600;
+	border-radius: 0;
+	display: block;
+	margin: 0;
+	width: 100%;
+	box-shadow: none;
+	resize: none;
+	overflow: hidden;
+	font-family: $editor-html-font;
+	line-height: 2.4;
+	min-height: 200px;
+	transition: border 0.1s ease-out, box-shadow 0.1s linear;
+	@include reduce-motion("transition");
+
+	// Same padding as title.
+	padding: $grid-unit-20;
+	@include break-small() {
+		padding: $grid-unit-30;
+	}
+
+	/* Fonts smaller than 16px causes mobile safari to zoom. */
+	font-size: $mobile-text-min-font-size !important;
+	@include break-small {
+		font-size: $text-editor-font-size !important;
+	}
+
+	&:focus {
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Elevate the z-index on focus so the focus style is uncropped.
+		position: relative;
+	}
+
+	&::-webkit-input-placeholder {
+		color: $dark-gray-placeholder;
+	}
+
+	&::-moz-placeholder {
+		color: $dark-gray-placeholder;
+		// Override Firefox default.
+		opacity: 1;
+	}
+
+	&:-ms-input-placeholder {
+		color: $dark-gray-placeholder;
+	}
+}

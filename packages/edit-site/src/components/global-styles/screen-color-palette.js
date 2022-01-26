@@ -17,12 +17,10 @@ import ScreenHeader from './header';
 
 function ScreenColorPalette( { name } ) {
 	const [ currentTab, setCurrentTab ] = useState( 'solid' );
-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 
 	return (
 		<>
 			<ScreenHeader
-				back={ parentMenu + '/colors' }
 				title={ __( 'Palette' ) }
 				description={ __(
 					'Palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'

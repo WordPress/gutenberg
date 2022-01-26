@@ -21,13 +21,9 @@ const elements = {
 };
 
 function ScreenTypographyElement( { name, element } ) {
-	const parentMenu =
-		name === undefined ? '/typography' : '/blocks/' + name + '/typography';
-
 	return (
 		<>
 			<ScreenHeader
-				back={ parentMenu }
 				title={ elements[ element ].title }
 				description={ elements[ element ].description }
 			/>

@@ -40,7 +40,7 @@ describe( 'Unsupported block', () => {
 		const initialHtml = `<!-- wp:table -->
 			 <figure class="wp-block-table"><table><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table></figure>
 			 <!-- /wp:table -->`;
-		const { getByA11yLabel } = await initializeEditor( {
+		const { getByA11yLabel } = initializeEditor( {
 			initialHtml,
 		} );
 
@@ -59,7 +59,7 @@ describe( 'Unsupported block', () => {
 		const initialHtml = `<!-- wp:table -->
 		 <figure class="wp-block-table"><table><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table></figure>
 		 <!-- /wp:table -->`;
-		const { getByA11yLabel, getByText } = await initializeEditor( {
+		const { getByA11yLabel, getByText } = initializeEditor( {
 			initialHtml,
 		} );
 

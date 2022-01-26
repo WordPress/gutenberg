@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { uniqueId } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -211,6 +216,18 @@ async function getNavigationMenuRawContent() {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
+	const contributorUsername = uniqueId( 'contributoruser_' );
+	let contributorPassword;
+
+	beforeAll( async () => {
+		// Creation of the contributor user **MUST** be at the top level describe block
+		// otherwise this test will become unstable. This action only happens once
+		// so there is no huge performance hit.
+		contributorPassword = await createUser( contributorUsername, {
+			role: 'contributor',
+		} );
+	} );
+
 	beforeEach( async () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
@@ -233,6 +250,10 @@ describe( 'Navigation', () => {
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
+
+		// As per the creation in the beforeAll() above, this
+		// action must be done at the root level describe() block.
+		await deleteUser( contributorUsername );
 	} );
 
 	describe( 'placeholder', () => {
@@ -761,21 +782,8 @@ describe( 'Navigation', () => {
 	} );
 
 	describe( 'Permission based restrictions', () => {
-		const contributorUsername = 'contributoruser';
-		let contributorPassword;
-
-		beforeAll( async () => {
-			contributorPassword = await createUser( contributorUsername, {
-				role: 'contributor',
-			} );
-		} );
-
 		afterEach( async () => {
 			await switchUserToAdmin();
-		} );
-
-		afterAll( async () => {
-			await deleteUser( contributorUsername );
 		} );
 
 		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {
