@@ -77,11 +77,10 @@ export class FocalPointPicker extends Component {
 		 * An example is the values resetting based on an UNDO action.
 		 */
 		const {
-			isDragging,
 			percentages: { x, y },
 		} = this.state;
 		const { value } = this.props;
-		if ( ! isDragging && ( value.x !== x || value.y !== y ) ) {
+		if ( value.x !== x || value.y !== y ) {
 			this.setState( { percentages: this.props.value } );
 		}
 	}
