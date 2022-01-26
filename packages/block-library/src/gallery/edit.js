@@ -441,7 +441,6 @@ function GalleryEdit( props ) {
 			},
 			value: {},
 			notices: noticeUI,
-			autoOpenMediaUpload: isSelected && wasBlockJustInserted,
 		},
 		native: {
 			addToGallery: hasImageIds,
