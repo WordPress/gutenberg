@@ -23,7 +23,7 @@ jobs:
         outputs:
             wordpress_release_branch: |
                 steps.get_wordpress_branch_for_sync.outputs.wordpress_release_branch ||
-                steps.get_wordpress_branch_for_manual_release.wordpress_release_branch
+                steps.get_wordpress_branch_for_manual_release.outputs.wordpress_release_branch
 
         steps:
             - name: Get WordPress release branch for sync
