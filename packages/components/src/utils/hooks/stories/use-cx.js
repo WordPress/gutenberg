@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { useState, createPortal } from '@wordpress/element';
+import { __unstableIframe as Iframe } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -20,48 +20,6 @@ import {
 
 export default {
 	title: 'Components (Experimental)/useCx',
-};
-
-const IFrame = ( { children } ) => {
-	const [ iframeDocument, setIframeDocument ] = useState();
-
-	const handleRef = ( node ) => {
-		if ( ! node ) {
-			return null;
-		}
-
-		function setIfReady() {
-			const { contentDocument } = node;
-			const { readyState } = contentDocument;
-
-			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
-				return false;
-			}
-
-			setIframeDocument( contentDocument );
-		}
-
-		if ( setIfReady() ) {
-			return;
-		}
-
-		node.addEventListener( 'load', () => {
-			// iframe isn't immediately ready in Firefox
-			setIfReady();
-		} );
-	};
-
-	return (
-		<iframe ref={ handleRef } title="use-cx-test-frame">
-			{ iframeDocument &&
-				createPortal(
-					<StyleProvider document={ iframeDocument }>
-						{ children }
-					</StyleProvider>,
-					iframeDocument.body
-				) }
-		</iframe>
-	);
 };
 
 const Example = ( { args, children } ) => {
@@ -86,8 +44,8 @@ export const _slotfill = () => {
 	return (
 		<SlotFillProvider>
 			<StyleProvider document={ document }>
-				<IFrame>
-					<IFrame>
+				<Iframe>
+					<Iframe>
 						<Example args={ [ redText ] }>
 							This text is inside an iframe and should be red
 						</Example>
@@ -103,12 +61,12 @@ export const _slotfill = () => {
 								relocated by a slot/fill and should be green
 							</Example>
 						</Fill>
-					</IFrame>
+					</Iframe>
 					<StyleProvider document={ document }>
-						<Slot name="test-slot" />
+						<Slot bubblesVirtually name="test-slot" />
 					</StyleProvider>
-				</IFrame>
-				<Slot name="outside-frame" />
+				</Iframe>
+				<Slot bubblesVirtually name="outside-frame" />
 			</StyleProvider>
 		</SlotFillProvider>
 	);
@@ -119,10 +77,10 @@ export const _default = () => {
 		color: red;
 	`;
 	return (
-		<IFrame>
+		<Iframe>
 			<Example args={ [ redText ] }>
 				This text is inside an iframe and is red!
 			</Example>
-		</IFrame>
+		</Iframe>
 	);
 };
