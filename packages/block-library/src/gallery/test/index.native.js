@@ -117,7 +117,7 @@ describe( 'Gallery block', () => {
 		} );
 
 		const appenderButton = await waitFor( () =>
-			within( galleryBlock ).getByA11yLabel( /false block\. Empty/ )
+			within( galleryBlock ).getByA11yLabel( /Gallery block\. Empty/ )
 		);
 		fireEvent.press( appenderButton );
 

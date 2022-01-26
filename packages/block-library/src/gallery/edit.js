@@ -434,26 +434,14 @@ function GalleryEdit( props ) {
 		web: {
 			addToGallery: false,
 			disableMediaButtons: imagesUploading,
-			icon: sharedIcon,
-			labels: {
-				title: __( 'Gallery' ),
-				instructions: PLACEHOLDER_TEXT,
-			},
 			value: {},
-			notices: noticeUI,
 		},
 		native: {
 			addToGallery: hasImageIds,
 			isAppender: hasImages,
 			disableMediaButtons:
 				( hasImages && ! isSelected ) || imagesUploading,
-			icon: ! hasImages && sharedIcon,
-			labels: {
-				title: ! hasImages && __( 'Gallery' ),
-				instructions: ! hasImages && PLACEHOLDER_TEXT,
-			},
 			value: hasImageIds ? images : {},
-			notices: hasImages ? undefined : noticeUI,
 			autoOpenMediaUpload:
 				! hasImages && isSelected && wasBlockJustInserted,
 		},
@@ -461,11 +449,17 @@ function GalleryEdit( props ) {
 	const mediaPlaceholder = (
 		<MediaPlaceholder
 			handleUpload={ false }
+			icon={ sharedIcon }
+			labels={ {
+				title: __( 'Gallery' ),
+				instructions: PLACEHOLDER_TEXT,
+			} }
 			onSelect={ updateImages }
 			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
 			onError={ onUploadError }
+			notices={ noticeUI }
 			{ ...mediaPlaceholderProps }
 		/>
 	);
