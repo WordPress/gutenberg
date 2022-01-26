@@ -87,7 +87,7 @@ add_action( 'admin_bar_menu', 'gutenberg_adminbar_items', 50 );
  * @return string Modified Admin URL link.
  */
 function gutenberg_override_site_editor_urls( $url, $path ) {
-	if ( $path === 'site-editor.php' ) {
+	if ( 'site-editor.php' === $path ) {
 		$url = str_replace( $path, 'themes.php?page=gutenberg-edit-site', $url );
 	}
 
