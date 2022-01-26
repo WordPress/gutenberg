@@ -29,7 +29,7 @@ const Example = ( { args, children } ) => {
 };
 
 export const _slotfill = () => {
-	const { Fill, Slot } = createSlotFill( 'ToolsPanelSlot' );
+	const { Fill, Slot } = createSlotFill( 'UseCxExampleSlot' );
 
 	const redText = css`
 		color: red;
