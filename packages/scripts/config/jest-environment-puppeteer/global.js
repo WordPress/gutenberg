@@ -93,7 +93,7 @@ async function setup( jestConfig = {} ) {
 		);
 	}
 
-	await setupRest( adminStorageStatePath );
+	await setupRest( browser, adminStorageStatePath );
 }
 
 async function teardown( jestConfig = {} ) {

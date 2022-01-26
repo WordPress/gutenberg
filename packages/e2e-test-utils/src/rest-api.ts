@@ -4,7 +4,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import fetch from 'node-fetch';
-import FormData from 'form-data';
+import type { Browser, Protocol } from 'puppeteer-core';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,7 @@ import { WP_BASE_URL, WP_ADMIN_USER } from './shared/config';
 import { createURL } from './create-url';
 
 interface StorageState {
-	cookie: string;
+	cookies: Protocol.Network.Cookie[];
 	nonce: string;
 	rootURL: string;
 }
@@ -123,65 +123,47 @@ Link header: ${ links }` );
 	return rootURL;
 }
 
-/**
- * Login as admin's username and password and return the login cookie.
- */
-async function loginAsAdmin() {
-	const formData = new FormData();
-	formData.append( 'log', WP_ADMIN_USER.username );
-	formData.append( 'pwd', WP_ADMIN_USER.password );
+async function loginAsAdmin( browser: Browser ) {
+	const page = await browser.newPage();
+	await page.goto( createURL( 'wp-login.php' ) );
 
-	// Login to admin using fetch.
-	const loginResponse = await fetch( createURL( 'wp-login.php' ), {
-		method: 'POST',
-		headers: formData.getHeaders(),
-		body: formData,
-		redirect: 'manual',
-	} );
+	const usernameInput = await page.$< HTMLInputElement >( '#user_login' );
+	await usernameInput!.evaluate(
+		( node, username ) => ( node.value = username ),
+		WP_ADMIN_USER.username
+	);
+	const passwordInput = await page.$< HTMLInputElement >( '#user_pass' );
+	await passwordInput!.evaluate(
+		( node, username ) => ( node.value = username ),
+		WP_ADMIN_USER.password
+	);
 
-	// Retrieve the cookies.
-	const cookies = loginResponse.headers.raw()[ 'set-cookie' ];
-	const cookie = cookies
-		// Only retrieve the cookie value.
-		.map( ( setCookie ) => setCookie.split( ';' )[ 0 ] )
-		.join( ';' );
+	await Promise.all( [
+		page.waitForNavigation(),
+		page.click( '#wp-submit' ),
+	] );
 
-	return cookie;
+	const cookies = await page.cookies();
+
+	await page.goto( REST_NONCE_ENDPOINT );
+
+	const nonce = await page.evaluate( () => document.body.textContent! );
+
+	await page.close();
+
+	return { cookies, nonce };
 }
 
-async function getNonce( cookie: string ) {
-	const response = await fetch( REST_NONCE_ENDPOINT, {
-		headers: { cookie },
-	} );
-
-	if ( response.status !== 200 ) {
-		try {
-			// If there's a json error from the API, throw it.
-			const errorBody = await response.clone().json();
-			throw errorBody;
-		} catch ( error ) {
-			// Otherwise, fallback to throwing the response object.
-			throw response;
-		}
-	}
-
-	const nonce = await response.text();
-
-	return nonce;
-}
-
-async function setupRest( storageStatePath?: string ) {
+async function setupRest( browser: Browser, storageStatePath?: string ) {
 	const adminStorageState = await AdminStorageState.init( storageStatePath );
 
-	if ( ! adminStorageState.value.cookie ) {
-		adminStorageState.update( 'cookie', await loginAsAdmin() );
-	}
-
-	if ( ! adminStorageState.value.nonce ) {
-		adminStorageState.update(
-			'nonce',
-			await getNonce( adminStorageState.value.cookie! )
-		);
+	if (
+		! adminStorageState.value.cookies ||
+		! adminStorageState.value.nonce
+	) {
+		const { cookies, nonce } = await loginAsAdmin( browser );
+		adminStorageState.update( 'cookies', cookies );
+		adminStorageState.update( 'nonce', nonce );
 	}
 
 	if ( ! adminStorageState.value.rootURL ) {
@@ -207,17 +189,27 @@ async function setupRest( storageStatePath?: string ) {
 	);
 
 	// For the nonce to work we have to also pass the cookies.
-	apiFetch.use( function setCookieMiddleware( request, next ) {
-		return next( {
-			...request,
-			headers: {
-				...request.headers,
-				cookie: adminStorageState.value.cookie!,
-			},
-		} ).catch( async ( error ) => {
+	apiFetch.use( async function setCookieMiddleware( request, next ) {
+		const cookieString = adminStorageState.value
+			.cookies!.map( ( cookie ) => `${ cookie.name }=${ cookie.value }` )
+			.join( ';' );
+
+		try {
+			return next( {
+				...request,
+				headers: {
+					...request.headers,
+					cookie: cookieString,
+				},
+			} );
+		} catch ( error ) {
 			// The default nonce handler from `apiFetch` won't pass server-side cookies
 			// automatically, so we handle it here manually in a middleware.
-			if ( error.code !== 'rest_cookie_invalid_nonce' ) {
+			if (
+				error instanceof Error &&
+				( error as NodeJS.ErrnoException ).code !==
+					'rest_cookie_invalid_nonce'
+			) {
 				throw error;
 			}
 
@@ -225,24 +217,19 @@ async function setupRest( storageStatePath?: string ) {
 			 * We can't be sure either the cookie or the nonce is invalid,
 			 * hence updating them both.
 			 */
-
-			// Renew the cookies.
-			const cookie = await loginAsAdmin();
-			adminStorageState.update( 'cookie', cookie );
-
-			// Renew the nonce.
-			const nonce = await getNonce( cookie );
+			// Renew the cookies and nonce.
+			const { cookies, nonce } = await loginAsAdmin( browser );
+			adminStorageState.update( 'cookies', cookies );
 			adminStorageState.update( 'nonce', nonce );
 			apiFetch.nonceMiddleware!.nonce = nonce;
 
 			await adminStorageState.save();
 
 			return apiFetch( request );
-		} );
+		}
 	} );
 
-	/** @type {StorageState} */
-	return adminStorageState.value;
+	return adminStorageState.value as StorageState;
 }
 
 async function rest< RestResponse >(

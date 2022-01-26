@@ -253,7 +253,7 @@ expect.extend( {
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
 beforeAll( async () => {
-	await setupRest( adminStorageStatePath );
+	await setupRest( browser, adminStorageStatePath );
 
 	capturePageEventsForTearDown();
 	enablePageDialogAccept();
