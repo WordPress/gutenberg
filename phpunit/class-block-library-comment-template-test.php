@@ -20,6 +20,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 
 		update_option( 'page_comments', true );
 		update_option( 'comments_per_page', self::$per_page );
+		update_option( 'comment_order', 'ASC' );
 
 		self::$custom_post = self::factory()->post->create_and_get(
 			array(

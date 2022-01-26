@@ -204,7 +204,7 @@ An advanced block that allows displaying post comments based on different query 
 -	**Name:** core/comments-query-loop
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** perPage, tagName
+-	**Attributes:** inherit, order, perPage, tagName
 
 ## Cover
 
@@ -415,7 +415,7 @@ Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tr
 
 ## Paragraph
 
-Start with the building block of all narrative. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/paragraph))
+Start with the basic building block of all narrative. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/paragraph))
 
 -	**Name:** core/paragraph
 -	**Category:** text

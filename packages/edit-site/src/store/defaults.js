@@ -3,4 +3,5 @@ export const PREFERENCES_DEFAULTS = {
 		welcomeGuide: true,
 		welcomeGuideStyles: true,
 	},
+	editorMode: 'visual',
 };
