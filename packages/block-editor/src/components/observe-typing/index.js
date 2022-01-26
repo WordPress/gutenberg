@@ -35,6 +35,13 @@ const KEY_DOWN_ELIGIBLE_KEY_CODES = new Set( [
 ] );
 
 /**
+ * If the mouse is inactive for more than this value, the toolbar is hidden.
+ *
+ * @type {number}
+ */
+const TOOLBAR_INACTIVITY_TIMEOUT = 5000;
+
+/**
  * Returns true if a given keydown event can be inferred as intent to start
  * typing, or false otherwise. A keydown is considered eligible if it is a
  * text navigation without shift active.
@@ -53,58 +60,60 @@ function isKeyDownEligibleForStartTyping( event ) {
  * element.
  */
 export function useMouseMoveTypingReset() {
-	const isTyping = useSelect(
-		( select ) => select( blockEditorStore ).isTyping(),
-		[]
-	);
-	const { stopTyping } = useDispatch( blockEditorStore );
+	const { isTyping } = useSelect( blockEditorStore );
+	const { stopTyping, startTyping } = useDispatch( blockEditorStore );
 
-	return useRefEffect(
-		( node ) => {
-			if ( ! isTyping ) {
-				return;
+	return useRefEffect( ( node ) => {
+		const { ownerDocument } = node;
+		let lastClientX;
+		let lastClientY;
+		let timeoutSinceLastMouseMove;
+
+		/**
+		 * On mouse move, unset typing flag if user has moved cursor.
+		 *
+		 * @param {MouseEvent} event Mousemove event.
+		 */
+		function stopTypingOnMouseMove( event ) {
+			const { clientX, clientY } = event;
+
+			// We need to check that the mouse really moved because Safari
+			// triggers mousemove events when shift or ctrl are pressed.
+			const didMove =
+				lastClientX &&
+				lastClientY &&
+				( lastClientX !== clientX || lastClientY !== clientY );
+
+			if ( isTyping() && didMove ) {
+				stopTyping();
 			}
 
-			const { ownerDocument } = node;
-			let lastClientX;
-			let lastClientY;
-
-			/**
-			 * On mouse move, unset typing flag if user has moved cursor.
-			 *
-			 * @param {MouseEvent} event Mousemove event.
-			 */
-			function stopTypingOnMouseMove( event ) {
-				const { clientX, clientY } = event;
-
-				// We need to check that the mouse really moved because Safari
-				// triggers mousemove events when shift or ctrl are pressed.
-				if (
-					lastClientX &&
-					lastClientY &&
-					( lastClientX !== clientX || lastClientY !== clientY )
-				) {
-					stopTyping();
-				}
-
-				lastClientX = clientX;
-				lastClientY = clientY;
+			if ( didMove ) {
+				clearTimeout( timeoutSinceLastMouseMove );
+				timeoutSinceLastMouseMove = setTimeout( () => {
+					// Only hide the toolbar if the active element is inside the container
+					// For instance if the focus is on a popover of the toolbar,
+					// we shouldn't hide the toolbar.
+					if ( node.contains( ownerDocument.activeElement ) ) {
+						startTyping();
+					}
+				}, TOOLBAR_INACTIVITY_TIMEOUT );
 			}
 
-			ownerDocument.addEventListener(
+			lastClientX = clientX;
+			lastClientY = clientY;
+		}
+
+		ownerDocument.addEventListener( 'mousemove', stopTypingOnMouseMove );
+
+		return () => {
+			ownerDocument.removeEventListener(
 				'mousemove',
 				stopTypingOnMouseMove
 			);
-
-			return () => {
-				ownerDocument.removeEventListener(
-					'mousemove',
-					stopTypingOnMouseMove
-				);
-			};
-		},
-		[ isTyping, stopTyping ]
-	);
+			clearTimeout( timeoutSinceLastMouseMove );
+		};
+	}, [] );
 }
 
 /**
