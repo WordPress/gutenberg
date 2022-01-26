@@ -2,6 +2,8 @@
 
 We will build the application as a WordPress plugin, which means you need to have the WordPress itself installed. One way to do it is by following the instructions on [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) page. Once your setup is finished, you can follow along with the rest of this tutorial.
 
+## Creating a new plugin
+
 To create a new plugin, create a `wp-content/plugins/first-gutenberg-app` directory in your local WordPress environment. We will need to create three files inside that directory:
 
 * first-gutenberg-app.php – to create a new admin page
@@ -108,6 +110,7 @@ If you now go to the Plugins page, you should see a plugin called **My first Gut
 Congratulations! You are now ready to start building the app!
 
 ## Trading readability for convenience
+
 You don’t need any build tools to complete this tutorial. All the code examples work as provided even if you paste them into your browser’s developer tools.
 
 The price to pay is in readability. The way React components are usually depicted is with the JSX syntax that looks like this:
@@ -125,3 +128,4 @@ function MyFirstApp() {
 	return wp.element.createElement('span', {}, 'Hello from JavaScript!');
 }
 ```
+

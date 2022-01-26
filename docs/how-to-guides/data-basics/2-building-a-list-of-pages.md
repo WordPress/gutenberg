@@ -4,7 +4,7 @@ In this part, we will build a filterable list of all WordPress pages. This is wh
 
 ![](./media/list-of-pages/part1-finished.jpg)
 
-Let’s see how we can get there step by step
+Let’s see how we can get there step by step.
 
 ## Step 1: Build the PagesList component
 Let’s start by building a minimal React component to display the list of pages:
@@ -33,7 +33,15 @@ Note this component does not fetch any data yet, only presents the hardcoded lis
 ![](./media/list-of-pages/simple-list.jpg)
 
 ## Step 2: Fetch the data
-The hardcoded sample page isn’t very useful, so let’s fetch the actual list of pages from the WordPress API. Instead of working directly with HTTP requests, we will use the [`getEntityRecords`](/docs/reference-guides/data/data-core/#getentityrecords) provided by Gutenberg’s `coreData`. In broad strokes, it will the correct API request, cache the results, and return the list of the entity records we need. Here’s how to use it:
+The hardcoded sample page isn’t very useful. We want to display your actual WordPress pages so let’s fetch the actual list of pages from the WordPress API.
+
+Before we start, let’s confirm there are some pages for us to fetch. Navigate to Pages using the sidebar menu and confirm it shows at least four or five positions:
+
+![](./media/list-of-pages/pages-list.jpg)
+
+If it doesn’t, go ahead and create a few pages – you can use the same titles as on the screenshot above. Be sure to _publish_ and not just _save_ them.
+
+Now that we have the data to work with, let’s dive into the code. Instead of working directly with HTTP requests, we will use the [`getEntityRecords`](/docs/reference-guides/data/data-core/#getentityrecords) provided by Gutenberg’s `coreData`. In broad strokes, it will the correct API request, cache the results, and return the list of the entity records we need. Here’s how to use it:
 
 `wp.data.select('core').getEntityRecords( 'postType', 'page' ) `
 
