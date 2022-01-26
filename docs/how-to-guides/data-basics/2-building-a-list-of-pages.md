@@ -33,6 +33,7 @@ Note this component does not fetch any data yet, only presents the hardcoded lis
 ![](./media/list-of-pages/simple-list.jpg)
 
 ## Step 2: Fetch the data
+
 The hardcoded sample page isn’t very useful. We want to display your actual WordPress pages so let’s fetch the actual list of pages from the WordPress API.
 
 Before we start, let’s confirm there are some pages for us to fetch. Navigate to Pages using the sidebar menu and confirm it shows at least four or five positions:
@@ -41,9 +42,13 @@ Before we start, let’s confirm there are some pages for us to fetch. Navigate 
 
 If it doesn’t, go ahead and create a few pages – you can use the same titles as on the screenshot above. Be sure to _publish_ and not just _save_ them.
 
-Now that we have the data to work with, let’s dive into the code. Instead of working directly with HTTP requests, we will use the [`getEntityRecords`](/docs/reference-guides/data/data-core/#getentityrecords) provided by Gutenberg’s `coreData`. In broad strokes, it will the correct API request, cache the results, and return the list of the entity records we need. Here’s how to use it:
+Now that we have the data to work with, let’s dive into the code. We will take advantage of the Gutenberg’s `coreData` package which provides resolvers, selectors, and actions to work with the WordPress core API. `coreData` builds on top of the [Gutenberg’s `data`  package](https://github.com/WordPress/gutenberg/tree/trunk/packages/data).
 
-`wp.data.select('core').getEntityRecords( 'postType', 'page' ) `
+To fetch the list of pages, we will use the [`getEntityRecords`](/docs/reference-guides/data/data-core/#getentityrecords) selector. In broad strokes, it will issue the correct API request, cache the results, and return the list of the records we need. Here’s how to use it:
+
+```js
+wp.data.select('core').getEntityRecords( 'postType', 'page' )
+```
 
 If you run that following snippet in your browser’s dev tools, you will see it returns `null`. Why? The pages are only requested by `getEntityRecords` resolver after you first run the selector. If you wait a moment and run it again, it will return the list of all pages.
 
@@ -149,7 +154,9 @@ We can now request only the pages matching the `searchTerm`.
 
 After checking with the [WordPress API documentation]([https://developer.wordpress.org/rest-api/reference/pages/]), we see that the [/wp/v2/pages]([https://developer.wordpress.org/rest-api/reference/pages/]) endpoint accepts a `search` query parameter and uses it to  _Limit results to those matching a string_. But how to use it? We can pass custom query parameters as the third argument to `getEntityRecords` as below:
 
-`wp.data.select('core').getEntityRecords( 'postType', 'page', { search: 'home' } )`
+```js
+wp.data.select('core').getEntityRecords( 'postType', 'page', { search: 'home' } )
+```
 
 Running that snippet in your browser’s dev tools will trigger a request to `/wp/v2/pages?search=home` instead of just `/wp/v2/pages`.
 
@@ -224,7 +231,7 @@ function MyFirstApp() {
 
 We would need to solve two problems here.
 
-First, out-of-order updates. Searching for „About” would trigger five API requests filtering for A, Ab, Abo, Abou, and About. They could finish in a different order than they started. It is possible that _search=A_ would resolve after _ search=About_ and we’d display the wrong data.
+First, out-of-order updates. Searching for „About” would trigger five API requests filtering for A, Ab, Abo, Abou, and About. They could finish in a different order than they started. It is possible that _search=A_ would resolve after _search=About_ and we’d display the wrong data.
 
 Gutenberg data helps by handling the asynchronous part behind the scenes. `useSelect` remembers the most recent call and returns only the data we expect.
 
