@@ -13,7 +13,8 @@ Block themes require WordPress 5.9. To use block themes in earlier versions of W
 3.  [Creating the templates and template parts](#creating-the-templates-and-template-parts)
 4.  [Theme.json - Global styles](#themejson---global-styles)
 5.  [Custom templates](#custom-templates)
-6.  [Example themes](#example-themes)
+6.  [Global styles presets](#global-styles-presets)
+7.  [Example themes](#example-themes)
 
 ## What is needed to create a block theme?
 
@@ -27,6 +28,7 @@ inside a folder called `templates`.
 
 The theme may optionally include a `functions.php` file and a [theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles.
 Template parts are optional. If they are included they must be placed inside a `parts` folder.
+The theme may optionally include a `styles` folder to provide [global styles presets](#global-styles-presets).
 
 File structure:
 
@@ -42,6 +44,10 @@ theme
 |__ parts
 	|__ header.html
 	|__ footer.html
+	|__ ...
+|__ styles
+	|__ red.json
+	|__ blue.json
 	|__ ...
 ```
 
@@ -838,6 +844,38 @@ The key is `postTypes`, followed by the name of the post type:
 		]
 	}
 ]
+```
+
+## Global styles presets
+
+In addition to the default theme.json file, Block Themes can define multiple global styles presets for users to pick from. For example, a theme author might provide multiple theme color variations for the theme.
+
+To provide a global styles preset, themes can add multiple JSON files inside their `/styles` folder. Each one of these JSON file is a mini theme.json file containing `styles` and/or `settings` that overrides any of the default `theme.json` file settings or styles.
+
+**Example**
+
+```json
+// styles/red.json
+{
+	styles: {
+		colors: {
+			text: 'red',
+			background: 'white'
+		}
+	}
+}
+```
+
+```json
+// styles/dark.json
+{
+	styles: {
+		colors: {
+			text: 'white',
+			background: 'black'
+		}
+	}
+}
 ```
 
 ## Example themes
