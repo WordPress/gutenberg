@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
     get-wordpress-release-branch:
-        name: Determine whether to use wp/trunk or wp/next branch
+        name: Determine which WordPress release branch to use
         runs-on: ubuntu-latest
         outputs:
             wordpress_release_branch: >-
@@ -28,7 +28,7 @@ jobs:
                 }}
 
         steps:
-            - name: Get WordPress release branch for sync
+            - name: Get WordPress release branch for manual release
               id: get_wordpress_branch_for_manual_release
               if: |
                   github.event_name == 'workflow_dispatch' &&
@@ -56,7 +56,7 @@ jobs:
                   rm version.php
 
     sync-wordpress-branch:
-        name: Sync the WordPress release branch
+        name: Sync the WordPress release branch (${{ needs.get-wordpress-release-branch.outputs.wordpress_release_branch }})
         if: |
             github.event_name == 'release' &&
             github.event.release.assets[0] &&
