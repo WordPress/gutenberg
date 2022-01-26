@@ -28,7 +28,7 @@ const Example = ( { args, children } ) => {
 	return <span className={ classes }>{ children }</span>;
 };
 
-export const _slotfill = () => {
+export const _slotFill = () => {
 	const { Fill, Slot } = createSlotFill( 'UseCxExampleSlot' );
 
 	const redText = css`
@@ -68,6 +68,27 @@ export const _slotfill = () => {
 				</Iframe>
 				<Slot bubblesVirtually name="outside-frame" />
 			</StyleProvider>
+		</SlotFillProvider>
+	);
+};
+
+export const _slotFillSimple = () => {
+	const { Fill, Slot } = createSlotFill( 'UseCxExampleSlotTwo' );
+
+	const redText = css`
+		color: red;
+	`;
+
+	return (
+		<SlotFillProvider>
+			<Iframe>
+				<Fill name="test-slot">
+					<Example args={ [ redText ] }>
+						This text should be red
+					</Example>
+				</Fill>
+			</Iframe>
+			<Slot bubblesVirtually name="test-slot" />
 		</SlotFillProvider>
 	);
 };
