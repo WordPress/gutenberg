@@ -39,6 +39,41 @@ describe( 'Post visibility', () => {
 
 			expect( currentStatus ).toBe( 'private' );
 		} );
+
+		it( `can be canceled when the viewport is ${ viewport }`, async () => {
+			await setBrowserViewport( viewport );
+
+			await createNewPost();
+
+			await openDocumentSettingsSidebar();
+
+			const initialStatus = await page.evaluate( () => {
+				return wp.data
+					.select( 'core/editor' )
+					.getEditedPostAttribute( 'status' );
+			} );
+
+			await page.click( '.edit-post-post-visibility__toggle' );
+
+			const [ privateLabel ] = await page.$x(
+				'//label[text()="Private"]'
+			);
+			await privateLabel.click();
+			await page.waitForSelector( '.components-confirm-dialog' );
+
+			const cancelButton = await page.waitForSelector(
+				'.components-confirm-dialog button.is-tertiary'
+			);
+			await cancelButton.click();
+
+			const currentStatus = await page.evaluate( () => {
+				return wp.data
+					.select( 'core/editor' )
+					.getEditedPostAttribute( 'status' );
+			} );
+
+			expect( currentStatus ).toBe( initialStatus );
+		} );
 	} );
 
 	it( 'visibility remains private even if the publish date is in the future', async () => {
