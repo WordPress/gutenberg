@@ -189,6 +189,6 @@ describe( 'Register Gutenberg', () => {
 		const blockList = await waitFor( () =>
 			screen.getByText( 'Mock Editor' )
 		);
-		expect( blockList ).toBeDefined();
+		expect( blockList ).toBeVisible();
 	} );
 } );
