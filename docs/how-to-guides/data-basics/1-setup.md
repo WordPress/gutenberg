@@ -2,7 +2,7 @@
 
 We will build the application as a WordPress plugin, which means you need to have the WordPress itself installed. One way to do it is by following the instructions on [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) page. Once your setup is finished, you can follow along with the rest of this tutorial.
 
-## Creating a new plugin
+## Creating a plugin
 
 To create a new plugin, create a `wp-content/plugins/first-gutenberg-app` directory in your local WordPress environment. We will need to create three files inside that directory:
 
@@ -81,15 +81,15 @@ function load_custom_wp_admin_scripts( $hook ) {
 		return;
 	}
 
-	// Load the style.css
-	wp_register_style( 'my-first-gutenberg-app', plugins_url( 'my-first-gutenberg-app/style.css' ) );
-	wp_enqueue_style( 'wp-components' );
-	wp_enqueue_style( 'my-first-gutenberg-app' );
-
 	// Load the required WordPress packages
+	wp_enqueue_style( 'wp-components' );
 	wp_enqueue_script( 'wp-components' );
 	wp_enqueue_script( 'wp-data' );
 	wp_enqueue_script( 'wp-core-data' );
+
+	// Load the style.css
+	wp_register_style( 'my-first-gutenberg-app', plugins_url( 'my-first-gutenberg-app/style.css' ) );
+	wp_enqueue_style( 'my-first-gutenberg-app' );
 
 	// Load the app.js
 	wp_register_script(
