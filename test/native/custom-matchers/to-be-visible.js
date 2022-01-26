@@ -28,6 +28,19 @@ function isElementVisible( element ) {
 	);
 }
 
+/**
+ * Check that the given element is visible.
+ *
+ * An element is visible if ALL the following conditions are met:
+ *
+ * - it does not have its style property "display" set to "none".
+ * - it does not have its style property "opacity" set to "0".
+ * - it is not a "Modal" component or it does not have the prop "visible" set to "false".
+ * - its ancestor elements are also visible.
+ *
+ * @param {import('react-test-renderer').ReactTestInstance} element
+ * @return {boolean} True if the given element is visible.
+ */
 export function toBeVisible( element ) {
 	checkReactElement( element, toBeVisible, this );
 	const isVisible = isElementVisible( element );
