@@ -17,16 +17,10 @@
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = isset( $block->context['openInNewTab'] ) ? $block->context['openInNewTab'] : false;
 
-	$service = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
-	$url     = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
-	$label   = ( isset( $attributes['label'] ) ) ? $attributes['label'] : sprintf(
-		/* translators: %1$s: Social-network name. %2$s: URL. */
-		__( '%1$s: %2$s' ),
-		block_core_social_link_get_name( $service ),
-		$url
-	);
+	$service     = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
+	$url         = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
+	$label       = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
 	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
-	$shown_label = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
 	$class_name  = isset( $attributes['className'] ) ? ' ' . $attributes['className'] : false;
 
 	// Don't render a link if there is no URL set.
@@ -48,14 +42,11 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	);
 
 	$link  = '<li ' . $wrapper_attributes . '>';
-	$link .= '<a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" title="' . esc_attr( $label ) . '" ' . $rel_target_attributes . ' class="wp-block-social-link-anchor">';
+	$link .= '<a href="' . esc_url( $url ) . '" ' . $rel_target_attributes . ' class="wp-block-social-link-anchor">';
 	$link .= $icon;
-
-	if ( $show_labels ) {
-		$link .= '<span class="wp-block-social-link-label">' . esc_html( $shown_label ) . '</span>';
-	}
-
-	$link .= '</a></li>';
+	$link .= '<span class="wp-block-social-link-label' . ( $show_labels ? '' : ' screen-reader-text' ) . '">';
+	$link .= esc_html( $label );
+	$link .= '</span></a></li>';
 
 	return $link;
 }

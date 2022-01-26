@@ -116,7 +116,14 @@ const SocialLinkEdit = ( {
 			<li { ...blockProps }>
 				<Button ref={ ref } onClick={ () => setPopover( true ) }>
 					<IconComponent />
-					{ showLabels && <span>{ socialLinkLabel }</span> }
+					<span
+						className={ classNames(
+							'wp-block-social-link-label',
+							{ 'screen-reader-text': ! showLabels },
+						) }
+					>
+						{ socialLinkLabel }
+					</span>
 					{ isSelected && showURLPopover && (
 						<SocialLinkURLPopover
 							url={ url }
