@@ -52,7 +52,7 @@ The function called when a new date or time has been selected. It is passed the 
 
 ### is12Hour
 
-Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be MM-DD-YYYY. If its value is `false`, format DD-MM-YYYY will be used.
+Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be `MM-DD-YYYY` (as opposed to the default format `DD-MM-YYYY`).
 
 -   Type: `bool`
 -   Required: No
