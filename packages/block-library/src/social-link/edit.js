@@ -114,7 +114,11 @@ const SocialLinkEdit = ( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				<Button ref={ ref } onClick={ () => setPopover( true ) }>
+				<Button
+					className="wp-block-social-link-anchor"
+					ref={ ref }
+					onClick={ () => setPopover( true ) }
+				>
 					<IconComponent />
 					<span
 						className={ classNames( 'wp-block-social-link-label', {
