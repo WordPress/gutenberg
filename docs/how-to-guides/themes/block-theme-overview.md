@@ -27,6 +27,10 @@ theme
     |__ footer.html
     |__ sidebar.html
     |__ ...
+|__ styles
+    |__ red.json
+    |__ blue.json
+    |__ ...
 ```
 
 The difference with existing WordPress themes is that the different templates in the template hierarchy, and template parts, are block templates instead of php files. In addition, this example includes a [`theme.json`](/docs/how-to-guides/themes/theme-json.md) file for some styles.
