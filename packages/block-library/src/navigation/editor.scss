@@ -237,9 +237,9 @@ $color-control-label-height: 20px;
 .wp-block-navigation-placeholder__preview {
 	display: flex;
 	align-items: center;
-	min-height: $button-size + $grid-unit-05 + $grid-unit-05;
-	padding: $grid-unit-05 $grid-unit-10 $grid-unit-05 $grid-unit-15;
 	min-width: $grid-unit-10 * 12;
+	font-size: $default-font-size;
+	font-family: $default-font;
 
 	.wp-block-navigation.is-selected & {
 		display: none;
@@ -273,14 +273,18 @@ $color-control-label-height: 20px;
 }
 
 // Selected state.
+.wp-block-navigation-placeholder__preview,
 .wp-block-navigation-placeholder__controls {
-	padding: $grid-unit-05 $grid-unit-10;
+	padding: ($grid-unit-15 * 0.5) $grid-unit-10;
+	flex-direction: row;
+	align-items: center;
+}
+
+.wp-block-navigation-placeholder__controls {
 	border-radius: $radius-block-ui;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	display: none;
-	flex-direction: row;
-	align-items: center;
 	position: relative;
 	z-index: 1;
 
@@ -288,7 +292,6 @@ $color-control-label-height: 20px;
 	.wp-block-navigation.is-selected & {
 		display: flex;
 	}
-
 
 	// If an ancestor has a text-decoration property applied, it is inherited regardless of
 	// the specificity of a child element. Only pulling the child out of the flow fixes it.
@@ -323,22 +326,22 @@ $color-control-label-height: 20px;
 		margin-right: $grid-unit-15;
 		height: $button-size; // Prevents jumpiness.
 	}
+}
 
-	// Block title
-	.wp-block-navigation-placeholder__actions__indicator {
-		display: flex;
-		padding: 0 ($grid-unit-15 * 0.5) 0 0;
-		align-items: center;
-		justify-content: flex-start;
-		line-height: 0;
-		min-height: $button-size;
+// Block title
+.wp-block-navigation-placeholder__actions__indicator {
+	display: flex;
+	padding: 0 ($grid-unit-15 * 0.5) 0 0;
+	align-items: center;
+	justify-content: flex-start;
+	line-height: 0;
+	min-height: $button-size;
 
-		// Line up with the icon in the toolbar.
-		margin-left: $grid-unit-05;
+	// Line up with the icon in the toolbar.
+	margin-left: $grid-unit-05;
 
-		svg {
-			margin-right: $grid-unit-05;
-		}
+	svg {
+		margin-right: $grid-unit-05;
 	}
 }
 

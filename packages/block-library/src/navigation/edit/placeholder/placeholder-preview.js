@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Icon, navigation } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 const PlaceholderPreview = ( { isLoading } ) => {
 	return (
@@ -16,7 +17,10 @@ const PlaceholderPreview = ( { isLoading } ) => {
 				{ 'is-loading': isLoading }
 			) }
 		>
-			<Icon icon={ navigation } />
+			<div className="wp-block-navigation-placeholder__actions__indicator">
+				<Icon icon={ navigation } />
+				{ __( 'Navigation' ) }
+			</div>
 		</div>
 	);
 };
