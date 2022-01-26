@@ -209,10 +209,8 @@ jobs:
                   node-version: 14
                   cache: npm
 
-            - name: Npm install and build
-              run: |
-                  npm ci
-                  npm run build
+            - name: Npm install
+              run: npm ci
 
             - name: Publish packages
               run: |
