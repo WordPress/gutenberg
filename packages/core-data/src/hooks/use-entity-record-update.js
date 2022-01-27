@@ -10,10 +10,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '../';
 import { IDLE, ERROR, RESOLVING } from './constants';
 
-export default function useEntityRecordMutations( kind, type, id ) {
+export default function useEntityRecordUpdate( kind, type, id ) {
 	const {
 		editEntityRecord,
-		saveEntityRecord,
 		saveEditedEntityRecord,
 		deleteEntityRecord,
 	} = useDispatch( coreStore );
@@ -21,7 +20,6 @@ export default function useEntityRecordMutations( kind, type, id ) {
 	const mutations = useMemo(
 		() => ( {
 			edit: ( record ) => editEntityRecord( kind, type, id, record ),
-			create: ( record ) => saveEntityRecord( kind, type, id, record ),
 			save: () => saveEditedEntityRecord( kind, type, id ),
 			delete: () => deleteEntityRecord( kind, type, id ),
 		} ),
