@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
-	BlockPreview,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
+	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -56,10 +56,10 @@ function CommentTemplateInnerBlocks( {
 			{ comment === ( activeComment || firstComment ) ? (
 				children
 			) : (
-				<BlockPreview
+				<MemoizedCommentTemplatePreview
 					blocks={ blocks }
-					__experimentalLive
-					__experimentalOnClick={ () => setActiveComment( comment ) }
+					comment={ comment }
+					setActiveComment={ setActiveComment }
 				/>
 			) }
 			{ comment?.children?.length > 0 ? (
@@ -73,6 +73,29 @@ function CommentTemplateInnerBlocks( {
 		</li>
 	);
 }
+
+const CommentTemplatePreview = ( { blocks, comment, setActiveComment } ) => {
+	const blockPreviewProps = useBlockPreview( {
+		blocks,
+	} );
+
+	const handleOnClick = () => {
+		setActiveComment( comment );
+	};
+
+	return (
+		<div
+			{ ...blockPreviewProps }
+			tabIndex={ 0 }
+			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
+			role="button"
+			onClick={ handleOnClick }
+			onKeyPress={ handleOnClick }
+		/>
+	);
+};
+
+const MemoizedCommentTemplatePreview = memo( CommentTemplatePreview );
 
 /**
  * Component that renders a list of (nested) comments. It is called recursively.
