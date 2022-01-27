@@ -121,7 +121,10 @@ function GalleryEdit( props ) {
 		};
 	}, [] );
 
-	const styleElement = useContext( BlockList.__unstableElementContext );
+	const styleElement = Platform.isWeb
+		? // eslint-disable-next-line react-hooks/rules-of-hooks
+		  useContext( BlockList.__unstableElementContext )
+		: undefined;
 
 	const innerBlockImages = useSelect(
 		( select ) => {
