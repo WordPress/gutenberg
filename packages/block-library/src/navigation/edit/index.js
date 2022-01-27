@@ -26,7 +26,12 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import { EntityProvider, useEntityProp } from '@wordpress/core-data';
+import {
+	EntityProvider,
+	useEntityProp,
+	useEntityRecordPermissions,
+	useEntityRecords,
+} from '@wordpress/core-data';
 
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
@@ -212,20 +217,14 @@ function Navigation( {
 
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
-	const {
-		isNavigationMenuResolved,
-		isNavigationMenuMissing,
-		canSwitchNavigationMenu,
-		hasResolvedNavigationMenus,
-		navigationMenus,
-		navigationMenu,
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserDeleteNavigationEntity,
-		hasResolvedCanUserDeleteNavigationEntity,
-		canUserCreateNavigation,
-		hasResolvedCanUserCreateNavigation,
-	} = useNavigationMenu( ref );
+	const { navigationMenu, isNavigationMenuMissing } = useNavigationMenu(
+		ref
+	);
+	const permissions = useEntityRecordPermissions( 'navigation', ref );
+	const navigationMenus = useEntityRecords( 'postType', 'wp_navigation', {
+		per_page: -1,
+		status: 'publish',
+	} );
 
 	const navRef = useRef();
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
@@ -234,8 +233,7 @@ function Navigation( {
 		clientId
 	);
 
-	const isEntityAvailable =
-		! isNavigationMenuMissing && isNavigationMenuResolved;
+	const isEntityAvailable = ! isNavigationMenuMissing;
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -356,28 +354,20 @@ function Navigation( {
 		}
 
 		if ( isSelected || isInnerBlockSelected ) {
-			if (
-				hasResolvedCanUserUpdateNavigationEntity &&
-				! canUserUpdateNavigationEntity
-			) {
+			if ( ref && permissions.hasResolved && ! permissions.canUpdate ) {
 				showCantEditNotice();
 			}
 
-			if (
-				! ref &&
-				hasResolvedCanUserCreateNavigation &&
-				! canUserCreateNavigation
-			) {
+			if ( ! ref && permissions.hasResolved && ! permissions.canCreate ) {
 				showCantCreateNotice();
 			}
 		}
 	}, [
 		isSelected,
 		isInnerBlockSelected,
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserCreateNavigation,
-		hasResolvedCanUserCreateNavigation,
+		permissions.hasResolved,
+		permissions.canCreate,
+		permissions.canUpdate,
 		ref,
 	] );
 
@@ -418,7 +408,7 @@ function Navigation( {
 						blockProps={ blockProps }
 						blocks={ uncontrolledInnerBlocks }
 						clientId={ clientId }
-						navigationMenus={ navigationMenus }
+						navigationMenus={ navigationMenus.records }
 						hasSelection={ isSelected || isInnerBlockSelected }
 						hasSavedUnsavedInnerBlocks={
 							hasSavedUnsavedInnerBlocks
@@ -491,7 +481,7 @@ function Navigation( {
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
-										showCreate={ canUserCreateNavigation }
+										showCreate={ permissions.canCreate }
 									/>
 								) }
 							</ToolbarDropdownMenu>
@@ -638,16 +628,14 @@ function Navigation( {
 				</InspectorControls>
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
-						{ hasResolvedCanUserUpdateNavigationEntity &&
-							canUserUpdateNavigationEntity && (
-								<NavigationMenuNameControl />
-							) }
-						{ hasResolvedCanUserDeleteNavigationEntity &&
-							canUserDeleteNavigationEntity && (
-								<NavigationMenuDeleteControl
-									onDelete={ startWithEmptyMenu }
-								/>
-							) }
+						{ permissions.hasResolved && permissions.canCreate && (
+							<NavigationMenuNameControl />
+						) }
+						{ permissions.hasResolved && permissions.canDelete && (
+							<NavigationMenuDeleteControl
+								onDelete={ startWithEmptyMenu }
+							/>
+						) }
 					</InspectorControls>
 				) }
 				<nav { ...blockProps }>
@@ -660,15 +648,17 @@ function Navigation( {
 								}
 								selectBlock( clientId );
 							} }
-							canSwitchNavigationMenu={ canSwitchNavigationMenu }
+							canSwitchNavigationMenu={
+								navigationMenus.data?.length > 0
+							}
 							hasResolvedNavigationMenus={
-								hasResolvedNavigationMenus
+								navigationMenus.hasResolved
 							}
 							clientId={ clientId }
-							canUserCreateNavigation={ canUserCreateNavigation }
+							canUserCreateNavigation={ permissions.canCreate }
 						/>
 					) }
-					{ ! hasResolvedCanUserCreateNavigation ||
+					{ permissions.hasResolved ||
 						( ! isEntityAvailable && ! isPlaceholderShown && (
 							<PlaceholderPreview isLoading />
 						) ) }

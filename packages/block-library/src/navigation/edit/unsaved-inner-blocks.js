@@ -8,14 +8,13 @@ import classnames from 'classnames';
  */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
 import { Disabled, Spinner } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import useNavigationMenu from '../use-navigation-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
 
 const EMPTY_OBJECT = {};
@@ -70,7 +69,10 @@ export default function UnsavedInnerBlocks( {
 		[ isDisabled ]
 	);
 
-	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
+	const navigationMenus = useEntityRecords( 'postType', 'wp_navigation', {
+		per_page: -1,
+		status: 'publish',
+	} );
 
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
@@ -94,7 +96,7 @@ export default function UnsavedInnerBlocks( {
 			isSaving ||
 			savingLock.current ||
 			! hasResolvedDraftNavigationMenus ||
-			! hasResolvedNavigationMenus ||
+			! navigationMenus.hasResolved ||
 			! hasSelection
 		) {
 			return;
@@ -108,9 +110,9 @@ export default function UnsavedInnerBlocks( {
 		isDisabled,
 		isSaving,
 		hasResolvedDraftNavigationMenus,
-		hasResolvedNavigationMenus,
+		navigationMenus.hasResolved,
 		draftNavigationMenus,
-		navigationMenus,
+		navigationMenus.records,
 		hasSelection,
 		createNavigationMenu,
 		blocks,

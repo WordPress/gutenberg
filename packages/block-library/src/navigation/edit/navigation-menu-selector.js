@@ -2,22 +2,20 @@
  * WordPress dependencies
  */
 import { MenuGroup, MenuItem, MenuItemsChoice } from '@wordpress/components';
-import { useEntityId } from '@wordpress/core-data';
+import { useEntityId, useEntityRecords } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
-import useNavigationMenu from '../use-navigation-menu';
 
 export default function NavigationMenuSelector( {
 	onSelect,
 	onCreateNew,
 	showCreate = false,
 } ) {
-	const { navigationMenus } = useNavigationMenu();
+	const navigationMenus = useEntityRecords( 'postType', 'wp_navigation', {
+		per_page: -1,
+		status: 'publish',
+	} );
 	const ref = useEntityId( 'postType', 'wp_navigation' );
 
 	return (
@@ -27,23 +25,25 @@ export default function NavigationMenuSelector( {
 					value={ ref }
 					onSelect={ ( selectedId ) =>
 						onSelect(
-							navigationMenus.find(
+							navigationMenus.records.find(
 								( post ) => post.id === selectedId
 							)
 						)
 					}
-					choices={ navigationMenus.map( ( { id, title } ) => {
-						const label = decodeEntities( title.rendered );
-						return {
-							value: id,
-							label,
-							'aria-label': sprintf(
-								/* translators: %s: The name of a menu. */
-								__( "Switch to '%s'" ),
-								label
-							),
-						};
-					} ) }
+					choices={ navigationMenus.records.map(
+						( { id, title } ) => {
+							const label = decodeEntities( title.rendered );
+							return {
+								value: id,
+								label,
+								'aria-label': sprintf(
+									/* translators: %s: The name of a menu. */
+									__( "Switch to '%s'" ),
+									label
+								),
+							};
+						}
+					) }
 				/>
 			</MenuGroup>
 			{ showCreate && (

@@ -21,8 +21,8 @@ import { decodeEntities } from '@wordpress/html-entities';
 import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
 import menuItemsToBlocks from '../../menu-items-to-blocks';
-import useNavigationMenu from '../../use-navigation-menu';
 import useCreateNavigationMenu from '../use-create-navigation-menu';
+import { useEntityRecords } from '@wordpress/core-data';
 
 const ExistingMenusDropdown = ( {
 	showNavigationMenus,
@@ -167,9 +167,12 @@ export default function NavigationPlaceholder( {
 		}
 	}, [ isCreatingFromMenu, menuItems.hasResolved, menuName ] );
 
-	const { navigationMenus } = useNavigationMenu();
+	const navigationMenus = useEntityRecords( 'postType', 'wp_navigation', {
+		per_page: -1,
+		status: 'publish',
+	} );
 
-	const hasNavigationMenus = !! navigationMenus?.length;
+	const hasNavigationMenus = !! navigationMenus.records?.length;
 
 	const showSelectMenus =
 		( canSwitchNavigationMenu || canUserCreateNavigation ) &&
@@ -198,7 +201,9 @@ export default function NavigationPlaceholder( {
 										showNavigationMenus={
 											canSwitchNavigationMenu
 										}
-										navigationMenus={ navigationMenus }
+										navigationMenus={
+											navigationMenus.records
+										}
 										setSelectedMenu={ setSelectedMenu }
 										onFinish={ onFinish }
 										menus={ menus.records }
