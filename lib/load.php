@@ -31,9 +31,6 @@ function gutenberg_is_experiment_enabled( $name ) {
 // These files only need to be loaded if within a rest server instance
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
-	if ( ! class_exists( 'WP_REST_Widget_Types_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-widget-types-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menus-controller.php';
 	}
