@@ -10,11 +10,11 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
+export { default as useEntityRecords } from './hooks/use-entity-records';
+export { default as useEntityRecord } from './hooks/use-entity-record';
 export { default as useEntityRecordCreate } from './hooks/use-entity-record-create';
 export { default as useEntityRecordUpdate } from './hooks/use-entity-record-update';
-export { default as useEntityRecord } from './hooks/use-entity-record';
-export { default as useEntityRecords } from './hooks/use-entity-records';
-export { default as useEntityRecordPermissions } from './hooks/use-permissions';
+export { default as usePermissions } from './hooks/use-permissions';
 
 import createLocksActions from './locks/actions';
 import { defaultEntities, getMethodName } from './entities';
