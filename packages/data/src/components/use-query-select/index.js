@@ -18,7 +18,7 @@ export default function useQuerySelect( mapSelect, deps ) {
 	return useSelect( ( select, registry ) => {
 		// Memoization would be nice here
 		const resolve = ( store ) => enrichSelectors( select( store ) );
-		return mapSelect( resolve, select, registry );
+		return mapSelect( resolve, registry );
 	}, deps );
 }
 
