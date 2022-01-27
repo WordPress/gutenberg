@@ -1,3 +1,19 @@
+export const META_SELECTORS = [
+	'getIsResolving',
+	'hasStartedResolution',
+	'hasFinishedResolution',
+	'isResolving',
+	'getCachedResolvers',
+];
+
+const META_ACTIONS = [
+	'startResolution',
+	'finishResolution',
+	'invalidateResolution',
+	'invalidateResolutionForStore',
+	'invalidateResolutionForStoreSelector',
+];
+
 const coreDataStore = {
 	name: 'core/data',
 	instantiate( registry ) {
@@ -12,13 +28,7 @@ const coreDataStore = {
 		return {
 			getSelectors() {
 				return Object.fromEntries(
-					[
-						'getIsResolving',
-						'hasStartedResolution',
-						'hasFinishedResolution',
-						'isResolving',
-						'getCachedResolvers',
-					].map( ( selectorName ) => [
+					META_SELECTORS.map( ( selectorName ) => [
 						selectorName,
 						getCoreDataSelector( selectorName ),
 					] )
@@ -27,13 +37,7 @@ const coreDataStore = {
 
 			getActions() {
 				return Object.fromEntries(
-					[
-						'startResolution',
-						'finishResolution',
-						'invalidateResolution',
-						'invalidateResolutionForStore',
-						'invalidateResolutionForStoreSelector',
-					].map( ( actionName ) => [
+					META_ACTIONS.map( ( actionName ) => [
 						actionName,
 						getCoreDataAction( actionName ),
 					] )

@@ -2,10 +2,10 @@
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
-import { useResolveSelect } from '@wordpress/data';
+import { useQuerySelect } from '@wordpress/data';
 
 export default function useNavigationMenu( ref ) {
-	return useResolveSelect(
+	return useQuerySelect(
 		( resolve ) => {
 			const {
 				canUser,
