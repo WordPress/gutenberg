@@ -194,7 +194,13 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				let nextTabbable;
 
 				if ( navigateDown ) {
-					nextTabbable = focus.tabbable.findNext( blockElement );
+					nextTabbable = blockElement;
+					do {
+						nextTabbable = focus.tabbable.findNext( nextTabbable );
+					} while (
+						nextTabbable &&
+						blockElement.contains( nextTabbable )
+					);
 
 					if ( ! nextTabbable ) {
 						nextTabbable =

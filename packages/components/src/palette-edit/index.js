@@ -77,9 +77,16 @@ function Option( {
 
 	return (
 		<PaletteItem
+			className={ isEditing ? 'is-selected' : undefined }
 			as="div"
 			onClick={ onStartEditing }
-			{ ...( isEditing ? focusOutsideProps : {} ) }
+			{ ...( isEditing
+				? { ...focusOutsideProps }
+				: {
+						style: {
+							cursor: 'pointer',
+						},
+				  } ) }
 		>
 			<HStack justify="flex-start">
 				<FlexItem>
@@ -192,7 +199,7 @@ function PaletteEditListView( {
 	}, [] );
 	return (
 		<VStack spacing={ 3 }>
-			<ItemGroup isBordered isSeparated>
+			<ItemGroup isRounded>
 				{ elements.map( ( element, index ) => (
 					<Option
 						isGradient={ isGradient }

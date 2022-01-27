@@ -37,8 +37,7 @@ function gutenberg_register_navigation_post_type() {
 		'description'           => __( 'Navigation menus.', 'gutenberg' ),
 		'public'                => false,
 		'has_archive'           => false,
-		// We should disable UI for non-block themes.
-		'show_ui'               => wp_is_block_theme(),
+		'show_ui'               => true,
 		'show_in_menu'          => false,
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,

@@ -983,4 +983,54 @@ describe( 'ToolsPanel', () => {
 			expect( optionsDisplayedIcon ).toBeInTheDocument();
 		} );
 	} );
+
+	describe( 'first and last panel items', () => {
+		it( 'should apply first/last classes to appropriate items', () => {
+			const { container } = render(
+				<SlotFillProvider>
+					<ToolsPanelItems>
+						<ToolsPanelItem { ...altControlProps }>
+							<div>Item 1</div>
+						</ToolsPanelItem>
+						<ToolsPanelItem { ...controlProps }>
+							<div>Item 2</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanelItems>
+						<ToolsPanelItem
+							{ ...altControlProps }
+							label="Item 3"
+							isShownByDefault={ true }
+						>
+							<div>Item 3</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanelItems>
+						<ToolsPanelItem { ...altControlProps } label="Item 4">
+							<div>Item 4</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanel
+						{ ...defaultProps }
+						hasInnerWrapper={ true }
+						shouldRenderPlaceholderItems={ true }
+						__experimentalFirstVisibleItemClass="first"
+						__experimentalLastVisibleItemClass="last"
+					>
+						<Slot />
+					</ToolsPanel>
+				</SlotFillProvider>
+			);
+
+			const item2 = screen.getByText( 'Item 2' );
+			const item3 = screen.getByText( 'Item 3' );
+
+			expect( screen.queryByText( 'Item 1' ) ).not.toBeInTheDocument();
+			expect( item2 ).toBeInTheDocument();
+			expect( item3 ).toBeInTheDocument();
+			expect( screen.queryByText( 'Item 4' ) ).not.toBeInTheDocument();
+
+			expect( container ).toMatchSnapshot();
+		} );
+	} );
 } );

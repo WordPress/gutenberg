@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isObject, setWith, clone } from 'lodash';
+import { isObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,7 +26,7 @@ import {
 	getGradientValueBySlug,
 	getGradientSlugByValue,
 } from '../components/gradients';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, transformStyles, immutableSet } from './utils';
 import ColorPanel from './color-panel';
 import useSetting from '../components/use-setting';
 
@@ -203,10 +203,6 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
 	return value;
 };
 
-function immutableSet( object, path, value ) {
-	return setWith( object ? clone( object ) : {}, path, value, clone );
-}
-
 /**
  * Inspector control panel containing the color related configuration
  *
@@ -371,13 +367,14 @@ export function ColorEdit( props ) {
 		props.setAttributes( { style: newStyle } );
 	};
 
+	const enableContrastChecking =
+		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
+
 	return (
 		<ColorPanel
-			enableContrastChecking={
-				// Turn on contrast checker for web only since it's not supported on mobile yet.
-				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
-			}
+			enableContrastChecking={ enableContrastChecking }
 			clientId={ props.clientId }
+			enableAlpha={ true }
 			settings={ [
 				...( hasTextColor
 					? [
@@ -484,6 +481,34 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	}
 );
 
+const MIGRATION_PATHS = {
+	linkColor: [ [ 'style', 'elements', 'link', 'color', 'text' ] ],
+	textColor: [ [ 'textColor' ], [ 'style', 'color', 'text' ] ],
+	backgroundColor: [
+		[ 'backgroundColor' ],
+		[ 'style', 'color', 'background' ],
+	],
+	gradient: [ [ 'gradient' ], [ 'style', 'color', 'gradient' ] ],
+};
+
+export function addTransforms( result, source, index, results ) {
+	const destinationBlockType = result.name;
+	const activeSupports = {
+		linkColor: hasLinkColorSupport( destinationBlockType ),
+		textColor: hasTextColorSupport( destinationBlockType ),
+		backgroundColor: hasBackgroundColorSupport( destinationBlockType ),
+		gradient: hasGradientSupport( destinationBlockType ),
+	};
+	return transformStyles(
+		activeSupports,
+		MIGRATION_PATHS,
+		result,
+		source,
+		index,
+		results
+	);
+}
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/color/addAttribute',
@@ -506,4 +531,10 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/color/with-color-palette-styles',
 	withColorPaletteStyles
+);
+
+addFilter(
+	'blocks.switchToBlockType.transformedBlock',
+	'core/color/addTransforms',
+	addTransforms
 );

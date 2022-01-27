@@ -158,7 +158,7 @@ if ( ! function_exists( 'wp_get_global_styles_svg_filters' ) ) {
 
 		$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 
-		$origins = array( 'default', 'theme' );
+		$origins = array( 'default', 'theme', 'custom' );
 		if ( ! $supports_theme_json ) {
 			$origins = array( 'default' );
 		}

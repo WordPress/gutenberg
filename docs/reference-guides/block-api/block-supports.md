@@ -1,15 +1,54 @@
 # Supports
 
-Block Supports is the API that allows a block to declare features used in the editor.
+Block Supports is the API that allows a block to declare support for certain features.
 
-Some block supports — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.
+Opting into any of these features will register additional attributes on the block and provide the UI to manipulate that attribute.
+
+In order for the attribute to get applied to the block the generated properties get added to the wrapping element of the block. They get added to the object you get returned from the `useBlockProps` hook.
+
+`BlockEdit` function:
+```js
+function BlockEdit() {
+	const blockProps = useBlockProps();
+
+	return (
+		<div {...blockProps}>Hello World!</div>
+	);
+}
+```
+
+`save` function:
+```js
+function BlockEdit() {
+	const blockProps = useBlockProps.save();
+
+	return (
+		<div {...blockProps}>Hello World!</div>
+	);
+}
+```
+
+For dynamic blocks that get rendered via a `render_callback` in PHP you can use the `get_block_wrapper_attributes()` function. It returns a string containing all the generated properties and needs to get output in the opening tag of the wrapping block element.
+
+`render_callback` function:
+```php
+function render_block() {
+	$wrapper_attributes = get_block_wrapper_attributes();
+
+	return sprintf(
+		'<div %1$s>%2$s</div>',
+		$wrapper_attributes,
+		'Hello World!'
+	);
+}
+```
 
 ## anchor
 
 -   Type: `boolean`
 -   Default value: `false`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
+Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link. _Important: It doesn't work with dynamic blocks yet._
 
 ```js
 // Declare support for anchor links.
@@ -23,7 +62,7 @@ supports: {
 -   Type: `boolean` or `array`
 -   Default value: `false`
 
-This property adds block controls which allow to change block's alignment. _Important: It doesn't work with dynamic blocks yet._
+This property adds block controls which allow to change block's alignment.
 
 ```js
 supports: {

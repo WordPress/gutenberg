@@ -17,24 +17,20 @@
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = isset( $block->context['openInNewTab'] ) ? $block->context['openInNewTab'] : false;
 
-	$service = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
-	$url     = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
-	$label   = ( isset( $attributes['label'] ) ) ? $attributes['label'] : sprintf(
-		/* translators: %1$s: Social-network name. %2$s: URL. */
-		__( '%1$s: %2$s' ),
-		block_core_social_link_get_name( $service ),
-		$url
-	);
-	$class_name = isset( $attributes['className'] ) ? ' ' . $attributes['className'] : false;
+	$service     = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
+	$url         = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
+	$label       = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
+	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
+	$class_name  = isset( $attributes['className'] ) ? ' ' . $attributes['className'] : false;
 
 	// Don't render a link if there is no URL set.
 	if ( ! $url ) {
 		return '';
 	}
 
-	$attribute = '';
+	$rel_target_attributes = '';
 	if ( $open_in_new_tab ) {
-		$attribute = 'rel="noopener nofollow" target="_blank"';
+		$rel_target_attributes = 'rel="noopener nofollow" target="_blank"';
 	}
 
 	$icon               = block_core_social_link_get_icon( $service );
@@ -45,7 +41,14 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		)
 	);
 
-	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $attribute . ' class="wp-block-social-link-anchor"> ' . $icon . '</a></li>';
+	$link  = '<li ' . $wrapper_attributes . '>';
+	$link .= '<a href="' . esc_url( $url ) . '" ' . $rel_target_attributes . ' class="wp-block-social-link-anchor">';
+	$link .= $icon;
+	$link .= '<span class="wp-block-social-link-label' . ( $show_labels ? '' : ' screen-reader-text' ) . '">';
+	$link .= esc_html( $label );
+	$link .= '</span></a></li>';
+
+	return $link;
 }
 
 /**

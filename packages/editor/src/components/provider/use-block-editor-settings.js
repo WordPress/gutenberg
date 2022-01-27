@@ -35,12 +35,18 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
+		pageOnFront,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser, getUnstableBase, hasFinishedResolution } = select(
-			coreStore
-		);
+		const {
+			canUser,
+			getUnstableBase,
+			hasFinishedResolution,
+			getEntityRecord,
+		} = select( coreStore );
+
+		const siteSettings = getEntityRecord( 'root', 'site' );
 
 		const siteData = getUnstableBase();
 
@@ -64,6 +70,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
 			baseUrl: siteData?.url || '',
 			userCanCreatePages: canUser( 'create', 'pages' ),
+			pageOnFront: siteSettings?.page_on_front,
 		};
 	}, [] );
 
@@ -93,6 +100,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatternCategories',
 				'__experimentalBlockPatterns',
+				'__experimentalDiscussionSettings',
 				'__experimentalFeatures',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
@@ -139,6 +147,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			outlineMode: hasTemplate,
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
+			pageOnFront,
 		} ),
 		[
 			settings,
@@ -148,6 +157,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			undo,
 			hasTemplate,
 			userCanCreatePages,
+			pageOnFront,
 		]
 	);
 }

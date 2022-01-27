@@ -3,6 +3,7 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import {
+	SelectControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -32,6 +33,7 @@ const SCALE_OPTIONS = (
 );
 
 const DEFAULT_SCALE = 'cover';
+const DEFAULT_SIZE = 'full';
 
 const scaleHelp = {
 	cover: __(
@@ -47,8 +49,9 @@ const scaleHelp = {
 
 const DimensionControls = ( {
 	clientId,
-	attributes: { width, height, scale },
+	attributes: { width, height, scale, sizeSlug },
 	setAttributes,
+	imageSizeOptions = [],
 } ) => {
 	const defaultUnits = [ 'px', '%', 'vw', 'em', 'rem' ];
 	const units = useCustomUnits( {
@@ -141,6 +144,30 @@ const DimensionControls = ( {
 					>
 						{ SCALE_OPTIONS }
 					</ToggleGroupControl>
+				</ToolsPanelItem>
+			) }
+			{ !! imageSizeOptions.length && (
+				<ToolsPanelItem
+					hasValue={ () => !! sizeSlug }
+					label={ __( 'Image size' ) }
+					onDeselect={ () =>
+						setAttributes( { sizeSlug: undefined } )
+					}
+					resetAllFilter={ () => ( {
+						sizeSlug: undefined,
+					} ) }
+					isShownByDefault={ false }
+					panelId={ clientId }
+				>
+					<SelectControl
+						label={ __( 'Image size' ) }
+						value={ sizeSlug || DEFAULT_SIZE }
+						options={ imageSizeOptions }
+						onChange={ ( nextSizeSlug ) =>
+							setAttributes( { sizeSlug: nextSizeSlug } )
+						}
+						help={ __( 'Select the size of the source image.' ) }
+					/>
 				</ToolsPanelItem>
 			) }
 		</InspectorControls>

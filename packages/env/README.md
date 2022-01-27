@@ -400,6 +400,18 @@ Options:
   --watch    Watch for logs as they happen.            [boolean] [default: true]
 ```
 
+### `wp-env install-path`
+
+Outputs the absolute path to the WordPress environment files.
+
+Example:
+
+```sh
+$ wp-env install-path
+
+/home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+```
+
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
@@ -609,4 +621,10 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 }
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
