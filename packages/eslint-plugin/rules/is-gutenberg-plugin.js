@@ -21,36 +21,6 @@ function findParent( sourceNode, predicate ) {
 }
 
 /**
- * Tests whether the IS_GUTENBERG_PLUGIN variable is accessed via
- * `process.env.IS_GUTENBERG_PLUGIN`.
- *
- * @example
- * ```js
- * // good
- * if ( process.env.IS_GUTENBERG_PLUGIN ) {
- *
- * // bad
- * if ( IS_GUTENBERG_PLUGIN ) {
- * ```
- *
- * @param {Object} node    The IS_GUTENBERG_PLUGIN identifier node.
- * @param {Object} context The eslint context object.
- */
-function isAccessedViaProcessEnv( node, context ) {
-	const parent = node.parent;
-
-	if (
-		parent &&
-		parent.type === 'MemberExpression' &&
-		context.getSource( parent ) === 'process.env.IS_GUTENBERG_PLUGIN'
-	) {
-		return true;
-	}
-
-	return false;
-}
-
-/**
  * Tests whether the IS_GUTENBERG_PLUGIN variable is used as the condition for an
  * if statement or ternary, triggering a violation if not.
  *
@@ -66,29 +36,27 @@ function isAccessedViaProcessEnv( node, context ) {
  * @param {Object} node    The IS_GUTENBERG_PLUGIN identifier node.
  * @param {Object} context The eslint context object.
  */
-function isUsedInIfOrTernary( node, context ) {
+function isUsedInConditional( node, context ) {
 	const conditionalParent = findParent( node, ( candidate ) =>
 		[ 'IfStatement', 'ConditionalExpression' ].includes( candidate.type )
 	);
 
-	const goodTests = [
-		'process.env.IS_GUTENBERG_PLUGIN',
-		'! process.env.IS_GUTENBERG_PLUGIN',
-	];
-
-	if (
-		conditionalParent &&
-		goodTests.includes( context.getSource( conditionalParent.test ) )
-	) {
-		return true;
+	if ( ! conditionalParent ) {
+		return false;
 	}
 
-	return false;
+	// Allow for whitespace as prettier sometimes breaks this on separate lines.
+	const textRegex = /^\s*!?\s*process\s*\.\s*env\s*\.\s*IS_GUTENBERG_PLUGIN$/;
+	const testSource = context.getSource( conditionalParent.test );
+
+	if ( ! textRegex.test( testSource ) ) {
+		return false;
+	}
+
+	return true;
 }
 
-const ACCESS_ERROR =
-	'The `IS_GUTENBERG_PLUGIN` constant should be accessed using `process.env.IS_GUTENBERG_PLUGIN`.';
-const IF_ERROR =
+const ERROR_MESSAGE =
 	'The `process.env.IS_GUTENBERG_PLUGIN` constant should only be used as the condition in an if statement or ternary expression.';
 
 module.exports = {
@@ -104,11 +72,8 @@ module.exports = {
 					return;
 				}
 
-				if ( ! isAccessedViaProcessEnv( node, context ) ) {
-					context.report( node, ACCESS_ERROR );
-				}
-				if ( ! isUsedInIfOrTernary( node, context ) ) {
-					context.report( node, IF_ERROR );
+				if ( ! isUsedInConditional( node, context ) ) {
+					context.report( node, ERROR_MESSAGE );
 				}
 			},
 			// Check for literals, e.g. when 'IS_GUTENBERG_PLUGIN' is used as a string via something like 'window[ 'IS_GUTENBERG_PLUGIN' ]'.
@@ -119,11 +84,8 @@ module.exports = {
 				}
 
 				if ( node.parent && node.parent.type === 'MemberExpression' ) {
-					if ( ! isAccessedViaProcessEnv( node, context ) ) {
-						context.report( node, ACCESS_ERROR );
-					}
-					if ( ! isUsedInIfOrTernary( node, context ) ) {
-						context.report( node, IF_ERROR );
+					if ( ! isUsedInConditional( node, context ) ) {
+						context.report( node, ERROR_MESSAGE );
 					}
 				}
 			},
