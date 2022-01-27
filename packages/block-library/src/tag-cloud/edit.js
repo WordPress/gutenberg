@@ -7,6 +7,8 @@ import { map, filter } from 'lodash';
  * WordPress dependencies
  */
 import {
+	Flex,
+	FlexItem,
 	PanelBody,
 	ToggleControl,
 	SelectControl,
@@ -89,20 +91,30 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 					max={ MAX_TAGS }
 					required
 				/>
-				<NumberControl
-					label={ __( 'Smallest Font Size (Pt)' ) }
-					value={ smallestFontSize }
-					onChange={ ( value ) =>
-						setAttributes( { smallestFontSize: value } )
-					}
-				/>
-				<NumberControl
-					label={ __( 'Largeest Font Size (Pt)' ) }
-					value={ largestFontSize }
-					onChange={ ( value ) =>
-						setAttributes( { largestFontSize: value } )
-					}
-				/>
+				<Flex>
+					<FlexItem isBlock>
+						<NumberControl
+							label={ __( 'Smallest size (pt)' ) }
+							value={ smallestFontSize }
+							onChange={ ( value ) =>
+								setAttributes( { smallestFontSize: value } )
+							}
+							min={ 8 }
+							max={ 60 }
+						/>
+					</FlexItem>
+					<FlexItem isBlock>
+						<NumberControl
+							label={ __( 'Largest size (pt)' ) }
+							value={ largestFontSize }
+							onChange={ ( value ) =>
+								setAttributes( { largestFontSize: value } )
+							}
+							min={ 8 }
+							max={ 60 }
+						/>
+					</FlexItem>
+				</Flex>
 			</PanelBody>
 		</InspectorControls>
 	);
