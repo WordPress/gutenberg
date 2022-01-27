@@ -24,6 +24,10 @@ function render_block_core_post_author_biography( $attributes, $content, $block 
 	}
 
 	$author_biography   = get_the_author_meta( 'description', $author_id );
+	if ( empty( $author_biography ) ) {
+		return '';
+	}
+
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
