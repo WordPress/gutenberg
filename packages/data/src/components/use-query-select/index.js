@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import memoize from 'memize';
+
+/**
  * Internal dependencies
  */
 import useSelect from '../use-select';
-import { META_SELECTORS } from "../../store";
+import { META_SELECTORS } from '../../store';
 
 /** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
 
@@ -16,7 +21,6 @@ import { META_SELECTORS } from "../../store";
  */
 export default function useQuerySelect( mapSelect, deps ) {
 	return useSelect( ( select, registry ) => {
-		// Memoization would be nice here
 		const resolve = ( store ) => enrichSelectors( select( store ) );
 		return mapSelect( resolve, registry );
 	}, deps );
@@ -29,7 +33,7 @@ export default function useQuerySelect( mapSelect, deps ) {
  * @param {Object} selectors Selectors to enrich
  * @return {Object} Enriched selectors
  */
-function enrichSelectors( selectors ) {
+const enrichSelectors = memoize( ( selectors ) => {
 	const resolvers = {};
 	for ( const selectorName in selectors ) {
 		if ( META_SELECTORS.includes( selectorName ) ) {
@@ -51,4 +55,4 @@ function enrichSelectors( selectors ) {
 		} );
 	}
 	return resolvers;
-}
+} );
