@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useResolveSelect } from '@wordpress/data';
+import { useQuerySelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -34,7 +34,7 @@ export default function useNavigationEntities( menuId ) {
 }
 
 function useMenuEntities() {
-	const { data, isResolving, hasFinished } = useResolveSelect(
+	const { data, isResolving, hasFinished } = useQuerySelect(
 		( resolve ) =>
 			resolve( coreStore ).getMenus( { per_page: -1, context: 'view' } ),
 		[]
@@ -48,7 +48,7 @@ function useMenuEntities() {
 }
 
 function useMenuItemEntities( menuId ) {
-	const { data, hasFinished } = useResolveSelect(
+	const { data, hasFinished } = useQuerySelect(
 		( resolve ) => {
 			const hasSelectedMenu = menuId !== undefined;
 			if ( ! hasSelectedMenu ) {
@@ -67,7 +67,7 @@ function useMenuItemEntities( menuId ) {
 }
 
 function usePageEntities() {
-	const { data, isResolving, hasFinished } = useResolveSelect(
+	const { data, isResolving, hasFinished } = useQuerySelect(
 		( resolve ) =>
 			resolve( coreStore ).getEntityRecords( 'postType', 'page', {
 				parent: 0,
