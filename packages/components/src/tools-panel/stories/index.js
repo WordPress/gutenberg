@@ -2,6 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
+import { boolean } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -23,6 +24,9 @@ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 export default {
 	title: 'Components (Experimental)/ToolsPanel',
 	component: ToolsPanel,
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 export const _default = () => {
@@ -138,11 +142,15 @@ export const WithNonToolsPanelItems = () => {
 export const WithOptionalItemsPlusIcon = () => {
 	const [ height, setHeight ] = useState();
 	const [ width, setWidth ] = useState();
+	const [ minWidth, setMinWidth ] = useState();
 
 	const resetAll = () => {
 		setHeight( undefined );
 		setWidth( undefined );
+		setMinWidth( undefined );
 	};
+
+	const includeDefaultControls = boolean( 'includeDefaultControls', false );
 
 	return (
 		<PanelWrapperView>
@@ -150,7 +158,20 @@ export const WithOptionalItemsPlusIcon = () => {
 				<ToolsPanel
 					label="Tools Panel (optional items only)"
 					resetAll={ resetAll }
+					key={ includeDefaultControls }
 				>
+					<SingleColumnItem
+						hasValue={ () => !! minWidth }
+						label="Minimum width"
+						onDeselect={ () => setMinWidth( undefined ) }
+						isShownByDefault={ includeDefaultControls }
+					>
+						<UnitControl
+							label="Minimum width"
+							value={ minWidth }
+							onChange={ ( next ) => setMinWidth( next ) }
+						/>
+					</SingleColumnItem>
 					<SingleColumnItem
 						hasValue={ () => !! width }
 						label="Width"

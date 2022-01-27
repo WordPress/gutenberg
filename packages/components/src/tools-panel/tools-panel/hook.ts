@@ -50,10 +50,7 @@ const generateMenuItems = ( {
 
 const isMenuItemTypeEmpty = (
 	obj: ToolsPanelMenuItems[ ToolsPanelMenuItemKey ]
-) =>
-	obj &&
-	Object.keys( obj ).length === 0 &&
-	Object.getPrototypeOf( obj ) === Object.prototype;
+) => obj && Object.keys( obj ).length === 0;
 
 export function useToolsPanel(
 	props: WordPressComponentProps< ToolsPanelProps, 'div' >
@@ -183,7 +180,7 @@ export function useToolsPanel(
 			).some( ( [ , isSelected ] ) => isSelected );
 			setAreAllOptionalControlsHidden( allControlsHidden );
 		}
-	}, [ menuItems.optional, setAreAllOptionalControlsHidden ] );
+	}, [ menuItems, setAreAllOptionalControlsHidden ] );
 
 	const cx = useCx();
 	const classes = useMemo( () => {
