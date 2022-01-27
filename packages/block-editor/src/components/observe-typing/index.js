@@ -84,7 +84,7 @@ export function useMouseMoveTypingReset() {
 				lastClientY &&
 				( lastClientX !== clientX || lastClientY !== clientY );
 
-			if ( isTyping() && didMove ) {
+			if ( didMove && isTyping() ) {
 				stopTyping();
 			}
 
