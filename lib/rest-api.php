@@ -53,9 +53,6 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
  * Registers the Sidebars & Widgets REST API routes.
  */
 function gutenberg_register_sidebars_and_widgets_endpoint() {
-	$widgets = new WP_REST_Widgets_Controller();
-	$widgets->register_routes();
-
 	$widget_types = new WP_REST_Widget_Types_Controller();
 	$widget_types->register_routes();
 }

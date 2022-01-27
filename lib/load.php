@@ -34,9 +34,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Widget_Types_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-widget-types-controller.php';
 	}
-	if ( ! class_exists( 'WP_REST_Widgets_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-widgets-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menus-controller.php';
 	}
