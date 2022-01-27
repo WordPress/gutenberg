@@ -18,12 +18,12 @@ import {
 } from '@wordpress/components';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { link, Icon } from '@wordpress/icons';
+import { link } from '@wordpress/icons';
 import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getIconBySite, getNameBySite } from './social-list';
+import { useServiceIcon, useServiceName } from './social-list';
 import styles from './editor.scss';
 
 const ANIMATION_DELAY = 300;
@@ -65,8 +65,8 @@ const SocialLinkEdit = ( {
 
 	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
 
-	const IconComponent = getIconBySite( service )();
-	const socialLinkName = getNameBySite( service );
+	const IconComponent = useServiceIcon( service );
+	const socialLinkName = useServiceName( service );
 
 	// When new social icon is added link sheet is opened automatically
 	useEffect( () => {
@@ -192,11 +192,7 @@ const SocialLinkEdit = ( {
 				<Animated.View
 					style={ [ styles.iconContainer, { backgroundColor } ] }
 				>
-					<Icon
-						animated
-						icon={ IconComponent }
-						style={ { stroke, color } }
-					/>
+					<IconComponent animated style={ { stroke, color } } />
 				</Animated.View>
 			</TouchableWithoutFeedback>
 		</View>
