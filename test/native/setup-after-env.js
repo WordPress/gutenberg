@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { toBeVisible } from './custom-matchers/to-be-visible';
+import { toBeVisible } from './matchers/to-be-visible';
 
 // Extend expect matchers
 expect.extend( {
