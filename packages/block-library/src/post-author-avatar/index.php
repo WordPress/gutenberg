@@ -29,11 +29,11 @@ function render_block_core_post_author_avatar( $attributes, $content, $block ) {
 	 */
 	$wrapper_attributes = WP_Block_Supports::get_instance()->apply_block_supports();
 
-	$width       = isset( $attributes['width'] ) ? $attributes['width'] : 96;
-	$height      = isset( $attributes['height'] ) ? $attributes['height'] : 96;
-	$styles      = isset( $wrapper_attributes['style'] ) ? $wrapper_attributes['style'] : '';
-	$classes     = isset( $wrapper_attributes['class'] ) ? $wrapper_attributes['class'] : '';
-	$author_name = get_the_author_meta( 'display_name', $author_id );
+	$width         = isset( $attributes['width'] ) ? $attributes['width'] : 96;
+	$height        = isset( $attributes['height'] ) ? $attributes['height'] : 96;
+	$styles        = isset( $wrapper_attributes['style'] ) ? $wrapper_attributes['style'] : '';
+	$classes       = isset( $wrapper_attributes['class'] ) ? $wrapper_attributes['class'] : '';
+	$author_name   = get_the_author_meta( 'display_name', $author_id );
 	$image_classes = '';
 
 	if ( isset( $attributes['style']['border'] ) ) {
@@ -43,7 +43,7 @@ function render_block_core_post_author_avatar( $attributes, $content, $block ) {
 		 */
 		$classes = str_replace( $classes, 'has-border-color', '' );
 
-		// Add the border classes to the image element for consistency:
+		// Add the border classes to the image element for consistency.
 		$image_classes = 'has-border-color';
 		if ( isset( $attributes['borderColor'] ) ) {
 			$image_classes .= ' has-' . $attributes['borderColor'] . '-border-color';
@@ -70,7 +70,8 @@ function render_block_core_post_author_avatar( $attributes, $content, $block ) {
 		$avatar = sprintf( '<a href="%1$s" target="%2$s" class="wp-block-post-author-avatar__link">%3$s</a>', get_author_posts_url( $author_id ), esc_attr( $attributes['linkTarget'] ), $avatar );
 	}
 
-	return sprintf('<figure class="wp-block-post-author-avatar %1$s">%2$s</figure>',
+	return sprintf(
+		'<figure class="wp-block-post-author-avatar %1$s">%2$s</figure>',
 		$classes,
 		$avatar
 	);

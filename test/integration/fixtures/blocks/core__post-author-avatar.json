@@ -1,0 +1,15 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/post-author-avatar",
+		"isValid": true,
+		"attributes": {
+			"width": 48,
+			"height": 48,
+			"isLink": false,
+			"linkTarget": "_self"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]
