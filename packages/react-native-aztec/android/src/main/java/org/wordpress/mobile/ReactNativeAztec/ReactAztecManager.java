@@ -317,10 +317,12 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     @ReactProp(name = ViewProps.FONT_SIZE, defaultFloat = ViewDefaults.FONT_SIZE_SP)
     public void setFontSize(ReactAztecText view, float fontSize) {
         float scale = 1;
+        boolean isLineHeightSet = mCurrentLineHeight != 0;
         mCurrentFontSize = fontSize;
+
         // Since Aztec applies a scale to the heading's font size
         // we subtract it before applying the new font size.
-        if (isHeadingBlock(view) && view.getTextSize() >= 0) {
+        if (isHeadingBlock(view) && isLineHeightSet) {
             scale = getHeadingScale(view.getTagName());
         }
 
@@ -328,7 +330,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                 TypedValue.COMPLEX_UNIT_PX,
                 (int) Math.ceil(PixelUtil.toPixelFromSP(fontSize / scale)));
 
-        if (mCurrentLineHeight != 0) {
+        if (isLineHeightSet) {
             setLineHeight(view, mCurrentLineHeight);
         }
     }
