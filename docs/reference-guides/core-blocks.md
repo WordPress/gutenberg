@@ -159,7 +159,7 @@ Contains the block elements used to render a comment, like the title, date, auth
 -	**Name:** core/comment-template
 -	**Category:** design
 -	**Supports:** align, ~~html~~, ~~reusable~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Comments Pagination
 
@@ -186,7 +186,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 -	**Name:** core/comments-pagination-numbers
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~reusable~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Previous Page
 
@@ -402,7 +402,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Name:** core/nextpage
 -	**Category:** design
 -	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Page List
 
@@ -448,6 +448,14 @@ The author biography. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** textAlign
+## Post Author Avatar
+
+Add the avatar of this post's author. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-avatar))
+
+-	**Name:** core/post-author-avatar
+-	**Category:** theme
+-	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin), ~~alignWide~~, ~~html~~
+-	**Attributes:** height, isLink, linkTarget, width
 
 ## Post Author Name
 
@@ -510,7 +518,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 -	**Name:** core/post-content
 -	**Category:** theme
 -	**Supports:** align (full, wide), ~~html~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Post Date
 
@@ -555,7 +563,7 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Name:** core/post-template
 -	**Category:** theme
 -	**Supports:** align, ~~html~~, ~~reusable~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Post Terms
 
@@ -627,7 +635,7 @@ Displays a list of page numbers for pagination ([Source](https://github.com/Word
 -	**Name:** core/query-pagination-numbers
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~reusable~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Previous Page
 
