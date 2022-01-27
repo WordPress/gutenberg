@@ -35,7 +35,7 @@ const TEMPLATE = [
  * @param {Array}  [props.comment]          - A comment object.
  * @param {Array}  [props.activeComment]    - The block that is currently active.
  * @param {Array}  [props.setActiveComment] - The setter for activeComment.
- * @param {Array}  [props.firstBlock]       - First comment in the array.
+ * @param {Array}  [props.firstComment]     - First comment in the array.
  * @param {Array}  [props.blocks]           - Array of blocks returned from
  *                                          getBlocks() in parent .
  * @return {WPElement}                 		Inner blocks of the Comment Template
@@ -44,7 +44,7 @@ function CommentTemplateInnerBlocks( {
 	comment,
 	activeComment,
 	setActiveComment,
-	firstBlock,
+	firstComment,
 	blocks,
 } ) {
 	const { children, ...innerBlocksProps } = useInnerBlocksProps(
@@ -53,7 +53,7 @@ function CommentTemplateInnerBlocks( {
 	);
 	return (
 		<li { ...innerBlocksProps }>
-			{ comment === ( activeComment || firstBlock ) ? (
+			{ comment === ( activeComment || firstComment ) ? (
 				children
 			) : (
 				<BlockPreview
@@ -105,7 +105,7 @@ const CommentsList = ( {
 						activeComment={ activeComment }
 						setActiveComment={ setActiveComment }
 						blocks={ blocks }
-						firstBlock={ comments[ 0 ] }
+						firstComment={ comments[ 0 ] }
 					/>
 				</BlockContextProvider>
 			) ) }
