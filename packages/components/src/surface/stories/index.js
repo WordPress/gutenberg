@@ -13,7 +13,7 @@ export default {
 	component: Surface,
 	title: 'Components (Experimental)/Surface',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

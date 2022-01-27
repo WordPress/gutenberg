@@ -371,18 +371,19 @@ export function ColorEdit( props ) {
 		props.setAttributes( { style: newStyle } );
 	};
 
+	const enableContrastChecking =
+		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
+
 	return (
 		<ColorPanel
-			enableContrastChecking={
-				// Turn on contrast checker for web only since it's not supported on mobile yet.
-				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
-			}
+			enableContrastChecking={ enableContrastChecking }
 			clientId={ props.clientId }
+			enableAlpha={ true }
 			settings={ [
 				...( hasTextColor
 					? [
 							{
-								label: __( 'Text color' ),
+								label: __( 'Text' ),
 								onColorChange: onChangeColor( 'text' ),
 								colorValue: getColorObjectByAttributeValues(
 									allSolids,
@@ -395,7 +396,7 @@ export function ColorEdit( props ) {
 				...( hasBackgroundColor || hasGradientColor
 					? [
 							{
-								label: __( 'Background color' ),
+								label: __( 'Background' ),
 								onColorChange: hasBackgroundColor
 									? onChangeColor( 'background' )
 									: undefined,
@@ -414,7 +415,7 @@ export function ColorEdit( props ) {
 				...( hasLinkColor
 					? [
 							{
-								label: __( 'Link Color' ),
+								label: __( 'Link' ),
 								onColorChange: onChangeLinkColor,
 								colorValue: getLinkColorFromAttributeValue(
 									allSolids,

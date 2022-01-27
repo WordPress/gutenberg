@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from './store/name';
+import coreDataStore from './store';
 
 /** @typedef {import('./registry').WPDataRegistry} WPDataRegistry */
 
@@ -24,7 +24,7 @@ const createResolversCacheMiddleware = ( registry, reducerKey ) => () => (
 	next
 ) => ( action ) => {
 	const resolvers = registry
-		.select( STORE_NAME )
+		.select( coreDataStore )
 		.getCachedResolvers( reducerKey );
 	Object.entries( resolvers ).forEach(
 		( [ selectorName, resolversByArgs ] ) => {
@@ -49,7 +49,7 @@ const createResolversCacheMiddleware = ( registry, reducerKey ) => () => (
 
 				// Trigger cache invalidation
 				registry
-					.dispatch( STORE_NAME )
+					.dispatch( coreDataStore )
 					.invalidateResolution( reducerKey, selectorName, args );
 			} );
 		}

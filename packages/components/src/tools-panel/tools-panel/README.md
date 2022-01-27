@@ -25,6 +25,11 @@ displaying by default through the `isShownByDefault` prop. Determining whether a
 child has a value is done via the `hasValue` function provided through the
 child's props.
 
+Components that are not wrapped within a `ToolsPanelItem` are still rendered
+however they will not be represented within, or controlled by, the `ToolsPanel`
+menu. An example scenario that benefits from this could be displaying
+introduction or help text within a panel.
+
 ## Usage
 
 ```jsx
@@ -51,6 +56,10 @@ export function DimensionPanel( props ) {
 
 	return (
 		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
+			<p>
+				Select dimensions or spacing related settings from the menu for
+				additional controls.
+			</p>
 			{ ! isPaddingDisabled && (
 				<ToolsPanelItem
 					hasValue={ () => hasPaddingValue( props ) }

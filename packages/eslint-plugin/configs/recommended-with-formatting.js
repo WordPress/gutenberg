@@ -3,8 +3,10 @@
  */
 const { isPackageInstalled } = require( '../utils' );
 
+// Exclude bundled WordPress packages from the list.
+const wpPackagesRegExp = '^@wordpress/(?!(icons|interface))';
+
 const config = {
-	parser: '@babel/eslint-parser',
 	extends: [
 		require.resolve( './jsx-a11y.js' ),
 		require.resolve( './custom.js' ),
@@ -21,6 +23,10 @@ const config = {
 		document: true,
 		wp: 'readonly',
 	},
+	settings: {
+		'import/internal-regex': wpPackagesRegExp,
+		'import/extensions': [ '.js', '.jsx' ],
+	},
 	rules: {
 		'import/no-extraneous-dependencies': [
 			'error',
@@ -28,7 +34,12 @@ const config = {
 				peerDependencies: true,
 			},
 		],
-		'import/no-unresolved': 'error',
+		'import/no-unresolved': [
+			'error',
+			{
+				ignore: [ wpPackagesRegExp ],
+			},
+		],
 		'import/default': 'warn',
 		'import/named': 'warn',
 	},

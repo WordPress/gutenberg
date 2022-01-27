@@ -111,13 +111,8 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 
 // All these styles should be made generic and changed on the inputs for all components.
 .components-custom-gradient-picker {
-	.components-select-control__input,
-	.components-input-control__input {
-		height: 40px !important;
-	}
 	.components-input-control__label {
 		line-height: 1;
-		padding-bottom: $grid-unit-10 !important;
 	}
 	label {
 		text-transform: uppercase;

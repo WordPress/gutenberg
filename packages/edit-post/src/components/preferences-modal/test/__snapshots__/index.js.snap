@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PreferencesModal should match snapshot when the modal is active large viewports 1`] = `
-<Modal
+<ForwardRef(Modal)
   className="edit-post-preferences-modal"
   closeLabel="Close"
   onRequestClose={[Function]}
@@ -30,11 +30,11 @@ exports[`PreferencesModal should match snapshot when the modal is active large v
   >
     <Component />
   </TabPanel>
-</Modal>
+</ForwardRef(Modal)>
 `;
 
 exports[`PreferencesModal should match snapshot when the modal is active small viewports 1`] = `
-<Modal
+<ForwardRef(Modal)
   className="edit-post-preferences-modal"
   closeLabel="Close"
   onRequestClose={[Function]}
@@ -187,7 +187,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigationButton
+          <NavigationBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -199,8 +199,6 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                 />
               </SVG>
             }
-            isBack={true}
-            path="/"
           />
           <Text
             size="16"
@@ -256,7 +254,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigationButton
+          <NavigationBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -268,8 +266,6 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                 />
               </SVG>
             }
-            isBack={true}
-            path="/"
           />
           <Text
             size="16"
@@ -316,7 +312,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigationButton
+          <NavigationBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -328,8 +324,6 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                 />
               </SVG>
             }
-            isBack={true}
-            path="/"
           />
           <Text
             size="16"
@@ -386,5 +380,5 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
       </Card>
     </NavigatorScreen>
   </NavigatorProvider>
-</Modal>
+</ForwardRef(Modal)>
 `;

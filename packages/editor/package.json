@@ -65,6 +65,10 @@
 		"react-autosize-textarea": "^7.1.0",
 		"rememo": "^3.0.0"
 	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

@@ -53,7 +53,8 @@ function NavigationAreaBlock( { attributes, setAttributes } ) {
 	);
 
 	deprecated( 'wp.blockLibrary.NavigationArea', {
-		since: '5.9',
+		since: '12.0',
+		plugin: 'gutenberg',
 	} );
 
 	return (

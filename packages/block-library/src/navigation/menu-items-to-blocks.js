@@ -154,14 +154,15 @@ function menuItemToBlockAttributes( {
 			classes.join( ' ' ).trim() && {
 				className: classes.join( ' ' ).trim(),
 			} ),
+		/* eslint-disable camelcase */
 		...( attr_title?.length && {
 			title: attr_title,
 		} ),
-		// eslint-disable-next-line camelcase
 		...( object_id &&
 			'custom' !== object && {
 				id: object_id,
 			} ),
+		/* eslint-enable camelcase */
 		...( description?.length && {
 			description,
 		} ),

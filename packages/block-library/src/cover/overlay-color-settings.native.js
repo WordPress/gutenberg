@@ -74,6 +74,15 @@ function OverlayColorSettings( {
 			}
 		};
 
+		const onColorCleared = () => {
+			setAttributes( {
+				overlayColor: undefined,
+				customOverlayColor: undefined,
+				gradient: undefined,
+				customGradient: undefined,
+			} );
+		};
+
 		return [
 			{
 				label: __( 'Color' ),
@@ -81,6 +90,7 @@ function OverlayColorSettings( {
 				colorValue,
 				gradientValue,
 				onGradientChange,
+				onColorCleared,
 			},
 		];
 	}, [ colorValue, gradientValue, colors, gradients ] );

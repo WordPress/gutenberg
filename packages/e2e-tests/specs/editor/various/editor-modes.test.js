@@ -10,6 +10,7 @@ import {
 	switchEditorModeTo,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	openTypographyToolsPanelMenu,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
@@ -54,6 +55,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// The `drop cap` toggle for the paragraph block should appear, even in
 		// HTML editing mode.
+		await openTypographyToolsPanelMenu();
+		await page.click( 'button[aria-label="Show Drop cap"]' );
+
 		const dropCapToggle = await page.$x(
 			"//label[contains(text(), 'Drop cap')]"
 		);
@@ -74,6 +78,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
 
 		// Change the `drop cap` using the sidebar.
+		await openTypographyToolsPanelMenu();
+		await page.click( 'button[aria-label="Show Drop cap"]' );
+
 		const [ dropCapToggle ] = await page.$x(
 			"//label[contains(text(), 'Drop cap')]"
 		);

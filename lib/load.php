@@ -94,13 +94,24 @@ require __DIR__ . '/compat/wordpress-5.8/index.php';
 require __DIR__ . '/compat/wordpress-5.8/utils.php';
 require __DIR__ . '/compat/wordpress-5.8/block-patterns.php';
 require __DIR__ . '/compat/wordpress-5.8.1/index.php';
+require __DIR__ . '/compat/wordpress-5.9/blocks.php';
 require __DIR__ . '/compat/wordpress-5.9/block-patterns.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/register-global-styles-cpt.php';
+// Needs to be loaded before get-global-styles-and-settings.php
+// to make sure we can use the check "function_exists( 'wp_get_global_styles' )".
+// If it loads after, that function will always be present at that point
+// and the global styles assets won't be loaded.
+require __DIR__ . '/compat/wordpress-5.9/script-loader.php';
 require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-5.9/render-svg-filters.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
+require __DIR__ . '/compat/wordpress-5.9/global-styles-css-custom-properties.php';
+require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-block-template.php';
+require __DIR__ . '/compat/wordpress-5.9/templates.php';
+require __DIR__ . '/compat/wordpress-5.9/template-parts.php';
 require __DIR__ . '/compat/wordpress-5.9/theme-templates.php';
 require __DIR__ . '/editor-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-schema-gutenberg.php';
@@ -112,9 +123,14 @@ require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
-require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-global-styles-controller.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/move-theme-editor-menu-item.php';
+require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
+require __DIR__ . '/compat/wordpress-6.0/blocks.php';
+require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
+require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
+require __DIR__ . '/compat/experimental/blocks.php';
 
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-patterns.php';

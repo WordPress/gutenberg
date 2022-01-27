@@ -58,7 +58,7 @@ export default function ManageLocations( {
 				.map( ( menuLocation ) => menuLocation.name );
 
 			return {
-				path: `/__experimental/menus/${ id }`,
+				path: `/wp/v2/menus/${ id }`,
 				body: {
 					locations,
 				},

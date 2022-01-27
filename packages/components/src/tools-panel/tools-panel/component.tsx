@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 
 /**
@@ -24,14 +23,11 @@ const ToolsPanel = (
 		panelContext,
 		resetAllItems,
 		toggleItem,
-		className,
+		...toolsPanelProps
 	} = useToolsPanel( props );
 
-	// Props are not directly passed through to avoid exposing Grid props
-	// until agreement has been reached on how ToolsPanel layout should be
-	// handled.
 	return (
-		<Grid columns={ 2 } className={ className } ref={ forwardedRef }>
+		<Grid { ...toolsPanelProps } columns={ 2 } ref={ forwardedRef }>
 			<ToolsPanelContext.Provider value={ panelContext }>
 				<ToolsPanelHeader
 					label={ label }

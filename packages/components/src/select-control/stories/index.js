@@ -17,7 +17,7 @@ export default {
 	title: 'Components/SelectControl',
 	component: SelectControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 
@@ -60,6 +60,7 @@ export const _default = () => {
 			{
 				default: 'default',
 				small: 'small',
+				'__unstable-large': '__unstable-large',
 			},
 			'default'
 		),
@@ -68,7 +69,7 @@ export const _default = () => {
 	return <SelectControlWithState { ...props } />;
 };
 
-export const withNativeChildren = () => {
+export const withCustomChildren = () => {
 	return (
 		<SelectControlWithState label="Value">
 			<option value="option-1">Option 1</option>

@@ -14,14 +14,12 @@
 class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 
 	/**
-	 * Constructor.
+	 * Whether the controller supports batching.
 	 *
-	 * @param string $taxonomy Taxonomy key.
+	 * @since 5.9.0
+	 * @var array
 	 */
-	public function __construct( $taxonomy ) {
-		parent::__construct( $taxonomy );
-		$this->namespace = 'wp/v2';
-	}
+	protected $allow_batch = array( 'v1' => true );
 
 	/**
 	 * Overrides the route registration to support "allow_batch".
@@ -47,7 +45,8 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 					'permission_callback' => array( $this, 'create_item_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
 				),
-				'schema' => array( $this, 'get_public_item_schema' ),
+				'allow_batch' => $this->allow_batch,
+				'schema'      => array( $this, 'get_public_item_schema' ),
 			)
 		);
 
@@ -87,7 +86,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 						),
 					),
 				),
-				'allow_batch' => array( 'v1' => true ),
+				'allow_batch' => $this->allow_batch,
 				'schema'      => array( $this, 'get_public_item_schema' ),
 			)
 		);
@@ -294,7 +293,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$locations = $this->get_menu_locations( $term->term_id );
 		$rest_base = 'menu-locations';
 		foreach ( $locations as $location ) {
-			$url                                        = rest_url( sprintf( '__experimental/%s/%s', $rest_base, $location ) );
+			$url                                        = rest_url( sprintf( 'wp/v2/%s/%s', $rest_base, $location ) );
 			$links['https://api.w.org/menu-location'][] = array(
 				'href'       => $url,
 				'embeddable' => true,

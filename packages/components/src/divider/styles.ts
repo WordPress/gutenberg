@@ -8,29 +8,66 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { space } from '../ui/utils/space';
-import CONFIG from '../utils/config-values';
-import type { OwnProps } from './types';
+import { rtl } from '../utils';
+import type { Props } from './types';
 
-const renderMargin = ( { margin, marginTop, marginBottom }: OwnProps ) => {
-	if ( typeof margin !== 'undefined' ) {
-		return css( {
-			marginBottom: space( margin ),
-			marginTop: space( margin ),
-		} );
-	}
+const MARGIN_DIRECTIONS: Record<
+	NonNullable< Props[ 'orientation' ] >,
+	Record< 'start' | 'end', string >
+> = {
+	vertical: {
+		start: 'marginLeft',
+		end: 'marginRight',
+	},
+	horizontal: {
+		start: 'marginTop',
+		end: 'marginBottom',
+	},
+};
 
+// Renders the correct margins given the Divider's `orientation` and the writing direction.
+// When both the generic `margin` and the specific `marginStart|marginEnd` props are defined,
+// the latter will take priority.
+const renderMargin = ( {
+	'aria-orientation': orientation = 'horizontal',
+	margin,
+	marginStart,
+	marginEnd,
+}: Props ) =>
+	css(
+		rtl( {
+			[ MARGIN_DIRECTIONS[ orientation ].start ]: space(
+				marginStart ?? margin
+			),
+			[ MARGIN_DIRECTIONS[ orientation ].end ]: space(
+				marginEnd ?? margin
+			),
+		} )()
+	);
+
+const renderBorder = ( {
+	'aria-orientation': orientation = 'horizontal',
+}: Props ) => {
 	return css( {
-		marginTop: space( marginTop ),
-		marginBottom: space( marginBottom ),
+		[ orientation === 'vertical'
+			? 'borderRight'
+			: 'borderBottom' ]: '1px solid currentColor',
 	} );
 };
 
-export const DividerView = styled.hr< OwnProps >`
-	border-color: ${ CONFIG.colorDivider };
-	border-width: 0 0 1px 0;
-	height: 0;
-	margin: 0;
-	width: auto;
+const renderSize = ( {
+	'aria-orientation': orientation = 'horizontal',
+}: Props ) =>
+	css( {
+		height: orientation === 'vertical' ? 'auto' : 0,
+		width: orientation === 'vertical' ? 0 : 'auto',
+	} );
 
+export const DividerView = styled.hr< Props >`
+	border: 0;
+	margin: 0;
+
+	${ renderBorder }
+	${ renderSize }
 	${ renderMargin }
 `;

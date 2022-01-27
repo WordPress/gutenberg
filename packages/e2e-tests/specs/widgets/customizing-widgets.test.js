@@ -10,6 +10,7 @@ import {
 	clickBlockToolbarButton,
 	deleteAllWidgets,
 	createURL,
+	openTypographyToolsPanelMenu,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -17,10 +18,6 @@ import {
  */
 // eslint-disable-next-line no-restricted-imports
 import { find, findAll } from 'puppeteer-testing-library';
-
-const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
-For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
-For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`;
 
 describe( 'Widgets Customizer', () => {
 	beforeEach( async () => {
@@ -162,8 +159,6 @@ describe( 'Widgets Customizer', () => {
 			name: 'My Search',
 			selector: '.widget-content *',
 		} ).toBeFound( findOptions );
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should open the inspector panel', async () => {
@@ -194,7 +189,7 @@ describe( 'Widgets Customizer', () => {
 
 		const backButton = await find( {
 			role: 'button',
-			name: 'Back',
+			name: /Back/,
 			focused: true,
 		} );
 		await expect( backButton ).toHaveFocus();
@@ -249,8 +244,6 @@ describe( 'Widgets Customizer', () => {
 		} ).toBeFound();
 
 		await expect( inspectorHeading ).not.toBeVisible();
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should handle the inserter outer section', async () => {
@@ -348,7 +341,7 @@ describe( 'Widgets Customizer', () => {
 		// Back to the widget areas panel.
 		const backButton = await find( {
 			role: 'button',
-			name: 'Back',
+			name: /Back/,
 		} );
 		await backButton.click();
 
@@ -358,8 +351,6 @@ describe( 'Widgets Customizer', () => {
 			name: 'Add a block',
 			level: 2,
 		} ).not.toBeFound();
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should move focus to the block', async () => {
@@ -386,7 +377,7 @@ describe( 'Widgets Customizer', () => {
 		await page.keyboard.type( 'First Heading' );
 
 		// Navigate back to the parent panel.
-		const backButton = await find( { role: 'button', name: 'Back' } );
+		const backButton = await find( { role: 'button', name: /Back/ } );
 		await backButton.click();
 
 		await waitForPreviewIframe();
@@ -455,8 +446,6 @@ describe( 'Widgets Customizer', () => {
 			text: 'First Heading',
 		} );
 		await expect( headingBlock ).toHaveFocus();
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should clear block selection', async () => {
@@ -519,8 +508,6 @@ describe( 'Widgets Customizer', () => {
 			role: 'toolbar',
 			name: 'Block tools',
 		} ).not.toBeFound();
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should handle legacy widgets', async () => {
@@ -699,8 +686,6 @@ describe( 'Widgets Customizer', () => {
 			selector: '*[aria-live="polite"][aria-relevant="additions text"]',
 		} ).toBeFound();
 		await expect( paragraphBlock ).toBeVisible();
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should move (inner) blocks to another sidebar', async () => {
@@ -760,8 +745,6 @@ describe( 'Widgets Customizer', () => {
 		await expect( movedParagraphBlockQuery ).toBeFound();
 		const movedParagraphBlock = await find( movedParagraphBlockQuery );
 		await expect( movedParagraphBlock ).toHaveFocus();
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should not render Block Settings sections', async () => {
@@ -831,6 +814,9 @@ describe( 'Widgets Customizer', () => {
 		await showMoreSettingsButton.click();
 
 		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
+		await openTypographyToolsPanelMenu();
+		await page.click( 'button[aria-label="Show Drop cap"]' );
+
 		const [ dropCapToggle ] = await page.$x(
 			"//label[contains(text(), 'Drop cap')]"
 		);
@@ -851,8 +837,6 @@ describe( 'Widgets Customizer', () => {
 			name: 'Customizing ▸ Widgets ▸ Footer #1 Block Settings',
 			level: 3,
 		} );
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 } );
 

@@ -35,8 +35,13 @@
 		"@babel/runtime": "^7.16.0"
 	},
 	"peerDependencies": {
-		"jest": ">=26",
-		"puppeteer": ">=1.19.0"
+		"jest": ">=27",
+		"puppeteer": ">=11"
+	},
+	"peerDependenciesMeta": {
+		"puppeteer": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

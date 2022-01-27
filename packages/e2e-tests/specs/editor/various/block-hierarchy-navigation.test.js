@@ -51,7 +51,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
 		const columnsBlockMenuItem = (
 			await page.$x(
-				"//button[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Columns')]"
+				"//a[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Columns')]"
 			)
 		 )[ 0 ];
 		await columnsBlockMenuItem.click();
@@ -75,7 +75,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Navigate to the last column block.
 		const lastColumnsBlockMenuItem = (
 			await page.$x(
-				"//button[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Column')]"
+				"//a[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Column')]"
 			)
 		 )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
@@ -188,7 +188,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
 		const groupMenuItem = (
 			await page.$x(
-				"//button[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Group')]"
+				"//a[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Group')]"
 			)
 		 )[ 0 ];
 		await groupMenuItem.click();

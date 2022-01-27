@@ -290,50 +290,43 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 	}
 }
 
-
 /**
- * Registers the style and colors block attributes for block types that support it.
+ * Returns the prefixed id for the duotone filter for use as a CSS id.
  *
- * @param WP_Block_Type $block_type Block Type.
+ * @param  array $preset Duotone preset value as seen in theme.json.
+ * @return string        Duotone filter CSS id.
  */
-function gutenberg_register_duotone_support( $block_type ) {
-	$has_duotone_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
-	}
-
-	if ( $has_duotone_support ) {
-		if ( ! $block_type->attributes ) {
-			$block_type->attributes = array();
-		}
-
-		if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
-			$block_type->attributes['style'] = array(
-				'type' => 'object',
-			);
-		}
-	}
+function gutenberg_get_duotone_filter_id( $preset ) {
+	return 'wp-duotone-' . $preset['slug'];
 }
 
 /**
- * Renders the duotone filter SVG and returns the CSS filter property to
- * reference the rendered SVG.
+ * Returns the CSS filter property url to reference the rendered SVG.
  *
- * @param array $preset Duotone preset value as seen in theme.json.
- *
- * @return string Duotone CSS filter property.
+ * @param  array $preset Duotone preset value as seen in theme.json.
+ * @return string        Duotone CSS filter property url value.
  */
-function gutenberg_render_duotone_filter_preset( $preset ) {
-	$duotone_id     = $preset['slug'];
-	$duotone_colors = $preset['colors'];
-	$filter_id      = 'wp-duotone-' . $duotone_id;
+function gutenberg_get_duotone_filter_property( $preset ) {
+	$filter_id = gutenberg_get_duotone_filter_id( $preset );
+	return "url('#" . $filter_id . "')";
+}
+
+/**
+ * Returns the duotone filter SVG string for the preset.
+ *
+ * @param  array $preset Duotone preset value as seen in theme.json.
+ * @return string        Duotone SVG filter.
+ */
+function gutenberg_get_duotone_filter_svg( $preset ) {
+	$filter_id = gutenberg_get_duotone_filter_id( $preset );
+
 	$duotone_values = array(
 		'r' => array(),
 		'g' => array(),
 		'b' => array(),
 		'a' => array(),
 	);
-	foreach ( $duotone_colors as $color_str ) {
+	foreach ( $preset['colors'] as $color_str ) {
 		$color = gutenberg_tinycolor_string_to_rgb( $color_str );
 
 		$duotone_values['r'][] = $color['r'] / 255;
@@ -389,17 +382,31 @@ function gutenberg_render_duotone_filter_preset( $preset ) {
 		$svg = trim( $svg );
 	}
 
-	add_action(
-		// Safari doesn't render SVG filters defined in data URIs,
-		// and SVG filters won't render in the head of a document,
-		// so the next best place to put the SVG is in the footer.
-		is_admin() ? 'admin_footer' : 'wp_footer',
-		function () use ( $svg ) {
-			echo $svg;
-		}
-	);
+	return $svg;
+}
 
-	return "url('#" . $filter_id . "')";
+/**
+ * Registers the style and colors block attributes for block types that support it.
+ *
+ * @param WP_Block_Type $block_type Block Type.
+ */
+function gutenberg_register_duotone_support( $block_type ) {
+	$has_duotone_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+	}
+
+	if ( $has_duotone_support ) {
+		if ( ! $block_type->attributes ) {
+			$block_type->attributes = array();
+		}
+
+		if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
+			$block_type->attributes['style'] = array(
+				'type' => 'object',
+			);
+		}
+	}
 }
 
 /**
@@ -430,8 +437,9 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		'slug'   => uniqid(),
 		'colors' => $block['attrs']['style']['color']['duotone'],
 	);
-	$filter_property = gutenberg_render_duotone_filter_preset( $filter_preset );
-	$filter_id       = 'wp-duotone-' . $filter_preset['slug'];
+	$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
+	$filter_id       = gutenberg_get_duotone_filter_id( $filter_preset );
+	$filter_svg      = gutenberg_get_duotone_filter_svg( $filter_preset );
 
 	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
@@ -450,6 +458,26 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	wp_register_style( $filter_id, false, array(), true, true );
 	wp_add_inline_style( $filter_id, $filter_style );
 	wp_enqueue_style( $filter_id );
+
+	add_action(
+		'wp_footer',
+		function () use ( $filter_svg, $selector ) {
+			echo $filter_svg;
+
+			// Safari renders elements incorrectly on first paint when the SVG
+			// filter comes after the content that it is filtering, so we force
+			// a repaint with a WebKit hack which solves the issue.
+			global $is_safari;
+			if ( $is_safari ) {
+				printf(
+					// Simply accessing el.offsetHeight flushes layout and style
+					// changes in WebKit without having to wait for setTimeout.
+					'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
+					wp_json_encode( $selector )
+				);
+			}
+		}
+	);
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	return preg_replace(

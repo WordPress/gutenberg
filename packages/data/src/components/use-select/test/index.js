@@ -723,42 +723,42 @@ describe( 'useSelect', () => {
 		it( 'handles custom generic stores without a unsubscribe function', () => {
 			let renderer;
 
-			function createCustomStore() {
-				let storeChanged = () => {};
-				let counter = 0;
+			const customStore = {
+				name: 'generic-store',
+				instantiate() {
+					let storeChanged = () => {};
+					let counter = 0;
 
-				const selectors = {
-					getCounter: () => counter,
-				};
+					const selectors = {
+						getCounter: () => counter,
+					};
 
-				const actions = {
-					increment: () => {
-						counter += 1;
-						storeChanged();
-					},
-				};
+					const actions = {
+						increment: () => {
+							counter += 1;
+							storeChanged();
+						},
+					};
 
-				return {
-					getSelectors() {
-						return selectors;
-					},
-					getActions() {
-						return actions;
-					},
-					subscribe( listener ) {
-						storeChanged = listener;
-					},
-				};
-			}
+					return {
+						getSelectors() {
+							return selectors;
+						},
+						getActions() {
+							return actions;
+						},
+						subscribe( listener ) {
+							storeChanged = listener;
+						},
+					};
+				},
+			};
 
-			registry.registerGenericStore(
-				'generic-store',
-				createCustomStore()
-			);
+			registry.register( customStore );
 
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
-					( select ) => select( 'generic-store' ).getCounter(),
+					( select ) => select( customStore ).getCounter(),
 					[]
 				);
 
@@ -778,7 +778,7 @@ describe( 'useSelect', () => {
 			expect( testInstance.findByType( 'div' ).props.data ).toBe( 0 );
 
 			act( () => {
-				registry.dispatch( 'generic-store' ).increment();
+				registry.dispatch( customStore ).increment();
 			} );
 
 			expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );

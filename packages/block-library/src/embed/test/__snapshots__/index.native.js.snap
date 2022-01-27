@@ -102,6 +102,8 @@ https://www.youtube.com/watch?v=lXMskKTw3Bc
 <!-- /wp:embed -->"
 `;
 
+exports[`Embed block edit URL sets empty state when setting an empty URL 1`] = `"<!-- wp:embed {\\"url\\":\\"\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} /-->"`;
+
 exports[`Embed block insert via slash inserter insert generic embed block 1`] = `"<!-- wp:embed /-->"`;
 
 exports[`Embed block insert via slash inserter inserts Twitter embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} /-->"`;
@@ -121,6 +123,14 @@ exports[`Embed block insertion inserts WordPress embed block 1`] = `"<!-- wp:emb
 exports[`Embed block insertion inserts YouTube embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"youtube\\",\\"responsive\\":true} /-->"`;
 
 exports[`Embed block insertion inserts generic embed block 1`] = `"<!-- wp:embed /-->"`;
+
+exports[`Embed block retry allows editing link if request failed 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\"} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
 
 exports[`Embed block retry converts to link if preview request failed 1`] = `
 "<!-- wp:paragraph -->

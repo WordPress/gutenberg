@@ -114,11 +114,11 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 			),
 			'home'           => array(
 				'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
-				'description' => __( 'Displays as the site\'s home page, or as the Posts page when a static home page it set.', 'gutenberg' ),
+				'description' => __( 'Displays posts on the homepage, or on the Posts page if a static homepage is set.', 'gutenberg' ),
 			),
 			'front-page'     => array(
 				'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
-				'description' => __( 'Displays as the site\'s home page.', 'gutenberg' ),
+				'description' => __( 'Displays the homepage.', 'gutenberg' ),
 			),
 			'singular'       => array(
 				'title'       => _x( 'Singular', 'Template name', 'gutenberg' ),
@@ -162,7 +162,7 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 			),
 			'search'         => array(
 				'title'       => _x( 'Search', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used to display search results.', 'gutenberg' ),
+				'description' => __( 'Displays search results.', 'gutenberg' ),
 			),
 			'privacy-policy' => array(
 				'title'       => __( 'Privacy Policy', 'gutenberg' ),
@@ -907,7 +907,7 @@ if ( ! function_exists( 'wp_generate_block_templates_export_file' ) ) {
 	 */
 	function wp_generate_block_templates_export_file() {
 		if ( ! class_exists( 'ZipArchive' ) ) {
-			return new WP_Error( __( 'Zip Export not supported.', 'gutenberg' ) );
+			return new WP_Error( 'missing_zip_package', __( 'Zip Export not supported.', 'gutenberg' ) );
 		}
 
 		$obscura  = wp_generate_password( 12, false, false );
@@ -915,7 +915,7 @@ if ( ! function_exists( 'wp_generate_block_templates_export_file' ) ) {
 
 		$zip = new ZipArchive();
 		if ( true !== $zip->open( $filename, ZipArchive::CREATE ) ) {
-			return new WP_Error( __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
+			return new WP_Error( 'unable_to_create_zip', __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
 		}
 
 		$zip->addEmptyDir( 'theme' );

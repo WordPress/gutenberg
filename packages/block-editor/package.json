@@ -72,6 +72,10 @@
 		"rememo": "^3.0.0",
 		"traverse": "^0.6.6"
 	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

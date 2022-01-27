@@ -286,6 +286,10 @@ function navStripHTML( html ) {
  */
 
 function LinkControlTransforms( { block, transforms, replace } ) {
+	if ( ! transforms?.length ) {
+		return null;
+	}
+
 	return (
 		<div className="link-control-transform">
 			<h3 className="link-control-transform__subheading">
@@ -722,6 +726,7 @@ export default function NavigationLinkEdit( {
 						>
 							<LinkControl
 								hasTextControl
+								hasRichPreviews
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }

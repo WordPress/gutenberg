@@ -90,142 +90,22 @@
 		"parent": null
 	},
 	{
-		"title": "Getting Started with JavaScript",
-		"slug": "javascript",
-		"markdown_source": "../docs/how-to-guides/javascript/README.md",
+		"title": "Accessibility",
+		"slug": "accessibility",
+		"markdown_source": "../docs/how-to-guides/accessibility.md",
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Plugins Background",
-		"slug": "plugins-background",
-		"markdown_source": "../docs/how-to-guides/javascript/plugins-background.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Loading JavaScript",
-		"slug": "loading-javascript",
-		"markdown_source": "../docs/how-to-guides/javascript/loading-javascript.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Extending the Block Editor",
-		"slug": "extending-the-block-editor",
-		"markdown_source": "../docs/how-to-guides/javascript/extending-the-block-editor.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "A first-time setup guide to native mobile development (OSX)",
-		"slug": "osx-setup-guide",
-		"markdown_source": "../docs/how-to-guides/native-mobile/osx-setup-guide.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Troubleshooting",
-		"slug": "troubleshooting",
-		"markdown_source": "../docs/how-to-guides/javascript/troubleshooting.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "JavaScript Versions and Build Step",
-		"slug": "versions-and-building",
-		"markdown_source": "../docs/how-to-guides/javascript/versions-and-building.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Scope Your Code",
-		"slug": "scope-your-code",
-		"markdown_source": "../docs/how-to-guides/javascript/scope-your-code.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "JavaScript Build Setup",
-		"slug": "js-build-setup",
-		"markdown_source": "../docs/how-to-guides/javascript/js-build-setup.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "ESNext Syntax",
-		"slug": "esnext-js",
-		"markdown_source": "../docs/how-to-guides/javascript/esnext-js.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Meta Boxes",
-		"slug": "metabox",
-		"markdown_source": "../docs/how-to-guides/metabox/README.md",
+		"title": "Backward Compatibility",
+		"slug": "backward-compatibility",
+		"markdown_source": "../docs/how-to-guides/backward-compatibility/README.md",
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Store Post Meta with a Block",
-		"slug": "meta-block-1-intro",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-1-intro.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Register Meta Field",
-		"slug": "meta-block-2-register-meta",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-2-register-meta.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Create Meta Block",
-		"slug": "meta-block-3-add",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-3-add.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Use Post Meta Data",
-		"slug": "meta-block-4-use-data",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-4-use-data.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "meta-block-5-finishing",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-5-finishing.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Displaying Notices from Your Plugin or Theme",
-		"slug": "notices",
-		"markdown_source": "../docs/how-to-guides/notices/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Creating a Sidebar for Your Plugin",
-		"slug": "plugin-sidebar-0",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Get a Sidebar up and Running",
-		"slug": "plugin-sidebar-1-up-and-running",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-1-up-and-running.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Tweak the sidebar style and add controls",
-		"slug": "plugin-sidebar-2-styles-and-controls",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Register the Meta Field",
-		"slug": "plugin-sidebar-3-register-meta",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-3-register-meta.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Initialize the Input Control",
-		"slug": "plugin-sidebar-4-initialize-input",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-4-initialize-input.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Update the Meta Field When the Input's Content Changes",
-		"slug": "plugin-sidebar-5-update-meta",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-5-update-meta.md",
-		"parent": "plugin-sidebar-0"
+		"title": "Deprecations",
+		"slug": "deprecations",
+		"markdown_source": "../docs/how-to-guides/backward-compatibility/deprecations.md",
+		"parent": "backward-compatibility"
 	},
 	{
 		"title": "Blocks",
@@ -234,13 +114,13 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Writing Your First Block Type",
+		"title": "Create a basic block",
 		"slug": "writing-your-first-block-type",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/writing-your-first-block-type.md",
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Applying Styles From a Stylesheet",
+		"title": "Use styles and stylesheets",
 		"slug": "applying-styles-with-stylesheets",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md",
 		"parent": "block-tutorial"
@@ -276,102 +156,6 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Themes",
-		"slug": "themes",
-		"markdown_source": "../docs/how-to-guides/themes/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Block Theme",
-		"slug": "block-theme-overview",
-		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Create a block theme",
-		"slug": "create-block-theme",
-		"markdown_source": "../docs/how-to-guides/themes/create-block-theme.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Global Settings & Styles (theme.json)",
-		"slug": "theme-json",
-		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Theme Support",
-		"slug": "theme-support",
-		"markdown_source": "../docs/how-to-guides/themes/theme-support.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Feature Flags",
-		"slug": "feature-flags",
-		"markdown_source": "../docs/how-to-guides/feature-flags.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Backward Compatibility",
-		"slug": "backward-compatibility",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Deprecations",
-		"slug": "deprecations",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/deprecations.md",
-		"parent": "backward-compatibility"
-	},
-	{
-		"title": "Meta Boxes",
-		"slug": "meta-box",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/meta-box.md",
-		"parent": "backward-compatibility"
-	},
-	{
-		"title": "Introduction to the Format API",
-		"slug": "format-api",
-		"markdown_source": "../docs/how-to-guides/format-api/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Register a New Format",
-		"slug": "1-register-format",
-		"markdown_source": "../docs/how-to-guides/format-api/1-register-format.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Add a Button to the Toolbar",
-		"slug": "2-toolbar-button",
-		"markdown_source": "../docs/how-to-guides/format-api/2-toolbar-button.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Apply the Format When the Button Is Clicked",
-		"slug": "3-apply-format",
-		"markdown_source": "../docs/how-to-guides/format-api/3-apply-format.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Gutenberg as a Development Platform",
-		"slug": "platform",
-		"markdown_source": "../docs/how-to-guides/platform/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Building a custom block editor",
-		"slug": "custom-block-editor",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/README.md",
-		"parent": "platform"
-	},
-	{
-		"title": "Tutorial: building a custom block editor",
-		"slug": "tutorial",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
-		"parent": "custom-block-editor"
-	},
-	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "../docs/how-to-guides/designers/README.md",
@@ -402,16 +186,142 @@
 		"parent": "designers"
 	},
 	{
-		"title": "Accessibility",
-		"slug": "accessibility",
-		"markdown_source": "../docs/how-to-guides/accessibility.md",
+		"title": "Development Platform",
+		"slug": "platform",
+		"markdown_source": "../docs/how-to-guides/platform/README.md",
 		"parent": "how-to-guides"
+	},
+	{
+		"title": "Building a custom block editor",
+		"slug": "custom-block-editor",
+		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/README.md",
+		"parent": "platform"
+	},
+	{
+		"title": "Tutorial: building a custom block editor",
+		"slug": "tutorial",
+		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
+		"parent": "custom-block-editor"
+	},
+	{
+		"title": "Feature Flags",
+		"slug": "feature-flags",
+		"markdown_source": "../docs/how-to-guides/feature-flags.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Formatting Toolbar API",
+		"slug": "format-api",
+		"markdown_source": "../docs/how-to-guides/format-api.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Getting Started with JavaScript",
+		"slug": "javascript",
+		"markdown_source": "../docs/how-to-guides/javascript/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Plugins Background",
+		"slug": "plugins-background",
+		"markdown_source": "../docs/how-to-guides/javascript/plugins-background.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Loading JavaScript",
+		"slug": "loading-javascript",
+		"markdown_source": "../docs/how-to-guides/javascript/loading-javascript.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Extending the Block Editor",
+		"slug": "extending-the-block-editor",
+		"markdown_source": "../docs/how-to-guides/javascript/extending-the-block-editor.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Troubleshooting",
+		"slug": "troubleshooting",
+		"markdown_source": "../docs/how-to-guides/javascript/troubleshooting.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "JavaScript Versions and Build Step",
+		"slug": "versions-and-building",
+		"markdown_source": "../docs/how-to-guides/javascript/versions-and-building.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Scope Your Code",
+		"slug": "scope-your-code",
+		"markdown_source": "../docs/how-to-guides/javascript/scope-your-code.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "JavaScript Build Setup",
+		"slug": "js-build-setup",
+		"markdown_source": "../docs/how-to-guides/javascript/js-build-setup.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "ESNext Syntax",
+		"slug": "esnext-js",
+		"markdown_source": "../docs/how-to-guides/javascript/esnext-js.md",
+		"parent": "javascript"
 	},
 	{
 		"title": "Internationalization",
 		"slug": "internationalization",
 		"markdown_source": "../docs/how-to-guides/internationalization.md",
 		"parent": "how-to-guides"
+	},
+	{
+		"title": "Meta Boxes",
+		"slug": "metabox",
+		"markdown_source": "../docs/how-to-guides/metabox.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Notices",
+		"slug": "notices",
+		"markdown_source": "../docs/how-to-guides/notices/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Plugin Sidebar",
+		"slug": "plugin-sidebar-0",
+		"markdown_source": "../docs/how-to-guides/plugin-sidebar-0.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Themes",
+		"slug": "themes",
+		"markdown_source": "../docs/how-to-guides/themes/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Block Theme",
+		"slug": "block-theme-overview",
+		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
+		"parent": "themes"
+	},
+	{
+		"title": "Create a block theme",
+		"slug": "create-block-theme",
+		"markdown_source": "../docs/how-to-guides/themes/create-block-theme.md",
+		"parent": "themes"
+	},
+	{
+		"title": "Global Settings & Styles (theme.json)",
+		"slug": "theme-json",
+		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
+		"parent": "themes"
+	},
+	{
+		"title": "Theme Support",
+		"slug": "theme-support",
+		"markdown_source": "../docs/how-to-guides/themes/theme-support.md",
+		"parent": "themes"
 	},
 	{
 		"title": "Thunks in Core-Data",
@@ -540,6 +450,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Core Blocks Reference",
+		"slug": "core-blocks",
+		"markdown_source": "../docs/reference-guides/core-blocks.md",
+		"parent": "reference-guides"
+	},
+	{
 		"title": "Filter Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/reference-guides/filters/README.md",
@@ -640,6 +556,30 @@
 		"slug": "richtext",
 		"markdown_source": "../docs/reference-guides/richtext.md",
 		"parent": "reference-guides"
+	},
+	{
+		"title": "Theme.json Reference",
+		"slug": "theme-json-reference",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/README.md",
+		"parent": "reference-guides"
+	},
+	{
+		"title": "Version 2 (living reference)",
+		"slug": "theme-json-living",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-living.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Version 1 Reference",
+		"slug": "theme-json-v1",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v1.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Migrating to Newer Versions",
+		"slug": "theme-json-migrations",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
+		"parent": "theme-json-reference"
 	},
 	{
 		"title": "Component Reference",
@@ -771,6 +711,12 @@
 		"title": "ComboboxControl",
 		"slug": "combobox-control",
 		"markdown_source": "../packages/components/src/combobox-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ConfirmDialog",
+		"slug": "confirm-dialog",
+		"markdown_source": "../packages/components/src/confirm-dialog/README.md",
 		"parent": "components"
 	},
 	{
@@ -909,6 +855,12 @@
 		"title": "FormTokenField",
 		"slug": "form-token-field",
 		"markdown_source": "../packages/components/src/form-token-field/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "GradientPicker",
+		"slug": "gradient-picker",
+		"markdown_source": "../packages/components/src/gradient-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -2034,22 +1986,34 @@
 		"parent": "code"
 	},
 	{
-		"title": "React Native based mobile Gutenberg",
-		"slug": "native-mobile",
-		"markdown_source": "../docs/contributors/code/native-mobile.md",
-		"parent": "code"
-	},
-	{
-		"title": "React Native Integration Test Guide",
-		"slug": "native-mobile-integration-test-guide",
-		"markdown_source": "../docs/contributors/code/native-mobile-integration-test-guide.md",
+		"title": "React Native mobile editor",
+		"slug": "react-native",
+		"markdown_source": "../docs/contributors/code/react-native/README.md",
 		"parent": "code"
 	},
 	{
 		"title": "Getting Started for the React Native based Mobile Gutenberg",
-		"slug": "getting-started-native-mobile",
-		"markdown_source": "../docs/contributors/code/getting-started-native-mobile.md",
-		"parent": "code"
+		"slug": "getting-started-react-native",
+		"markdown_source": "../docs/contributors/code/react-native/getting-started-react-native.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "Setup guide for React Native development (macOS)",
+		"slug": "osx-setup-guide",
+		"markdown_source": "../docs/contributors/code/react-native/osx-setup-guide.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "React Native Integration Test Guide",
+		"slug": "integration-test-guide",
+		"markdown_source": "../docs/contributors/code/react-native/integration-test-guide.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "React Native Internationalization Guide",
+		"slug": "internationalization-guide",
+		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
+		"parent": "react-native"
 	},
 	{
 		"title": "Design Contributions",

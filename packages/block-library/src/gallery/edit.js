@@ -22,6 +22,8 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
+	BlockControls,
+	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -52,11 +54,6 @@ import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
-
-/**
- * Internal dependencies
- */
-import useMobileWarning from './use-mobile-warning';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -102,6 +99,7 @@ function GalleryEdit( props ) {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
+		multiSelect,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -123,6 +121,16 @@ function GalleryEdit( props ) {
 		[ clientId ]
 	);
 
+	const wasBlockJustInserted = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			);
+		},
+		[ clientId ]
+	);
+
 	const images = useMemo(
 		() =>
 			innerBlockImages?.map( ( block ) => ( {
@@ -138,8 +146,6 @@ function GalleryEdit( props ) {
 	const imageData = useGetMedia( innerBlockImages );
 
 	const newImages = useGetNewImages( images, imageData );
-
-	useMobileWarning( newImages );
 
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
@@ -290,6 +296,14 @@ function GalleryEdit( props ) {
 					newOrderMap[ b.attributes.id ]
 			)
 		);
+
+		// If new blocks added select the first of these so they scroll into view.
+		if ( newBlocks?.length && existingImageBlocks?.length ) {
+			multiSelect(
+				newBlocks[ 0 ].clientId,
+				newBlocks[ newBlocks.length - 1 ].clientId
+			);
+		}
 	}
 
 	function onUploadError( message ) {
@@ -417,24 +431,22 @@ function GalleryEdit( props ) {
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ hasImageIds }
+			addToGallery={ false }
 			handleUpload={ false }
-			isAppender={ hasImages }
-			disableMediaButtons={
-				( hasImages && ! isSelected ) || imagesUploading
-			}
-			icon={ ! hasImages && sharedIcon }
+			disableMediaButtons={ imagesUploading }
+			icon={ sharedIcon }
 			labels={ {
-				title: ! hasImages && __( 'Gallery' ),
-				instructions: ! hasImages && PLACEHOLDER_TEXT,
+				title: __( 'Gallery' ),
+				instructions: PLACEHOLDER_TEXT,
 			} }
 			onSelect={ updateImages }
 			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
-			value={ hasImageIds ? images : {} }
+			value={ {} }
 			onError={ onUploadError }
-			notices={ hasImages ? undefined : noticeUI }
+			notices={ noticeUI }
+			autoOpenMediaUpload={ isSelected && wasBlockJustInserted }
 		/>
 	);
 
@@ -509,11 +521,23 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*"
+					handleUpload={ false }
+					onSelect={ updateImages }
+					name={ __( 'Add' ) }
+					multiple={ true }
+					mediaIds={ images.map( ( image ) => image.id ) }
+					addToGallery={ hasImageIds }
+				/>
+			</BlockControls>
 			{ noticeUI }
 			<Gallery
 				{ ...props }
 				images={ images }
-				mediaPlaceholder={ mediaPlaceholder }
+				mediaPlaceholder={ ! hasImages ? mediaPlaceholder : undefined }
 				blockProps={ blockProps }
 				insertBlocksAfter={ insertBlocksAfter }
 			/>

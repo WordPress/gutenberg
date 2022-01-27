@@ -136,9 +136,10 @@ export default function ColorPalette( {
 	__experimentalIsRenderedInSidebar = false,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
-	const Component = __experimentalHasMultipleOrigins
-		? MultiplePalettes
-		: SinglePalette;
+	const Component =
+		__experimentalHasMultipleOrigins && colors?.length
+			? MultiplePalettes
+			: SinglePalette;
 
 	const renderCustomColorPicker = () => (
 		<ColorPicker
@@ -148,12 +149,18 @@ export default function ColorPalette( {
 		/>
 	);
 
+	let dropdownPosition;
+	if ( __experimentalIsRenderedInSidebar ) {
+		dropdownPosition = 'bottom left';
+	}
+
 	const colordColor = colord( value );
 
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
 				<CustomColorPickerDropdown
+					position={ dropdownPosition }
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (

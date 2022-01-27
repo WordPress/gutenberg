@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/pullquote",
 	"title": "Pullquote",
@@ -48,7 +49,13 @@
 			"color": true,
 			"radius": true,
 			"style": true,
-			"width": true
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-pullquote-editor",

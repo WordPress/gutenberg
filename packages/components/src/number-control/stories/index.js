@@ -17,7 +17,7 @@ export default {
 	title: 'Components/NumberControl',
 	component: NumberControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

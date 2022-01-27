@@ -21,47 +21,70 @@ import ScreenBackgroundColor from './screen-background-color';
 import ScreenTextColor from './screen-text-color';
 import ScreenLinkColor from './screen-link-color';
 import ScreenLayout from './screen-layout';
+import ScreenStyleVariations from './screen-style-variations';
+
+function GlobalStylesNavigationScreen( { className, ...props } ) {
+	return (
+		<NavigatorScreen
+			className={ [
+				'edit-site-global-styles-sidebar__navigator-screen',
+				className,
+			]
+				.filter( Boolean )
+				.join( ' ' ) }
+			{ ...props }
+		/>
+	);
+}
 
 function ContextScreens( { name } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 
 	return (
 		<>
-			<NavigatorScreen path={ parentMenu + '/typography' }>
+			<GlobalStylesNavigationScreen path={ parentMenu + '/typography' }>
 				<ScreenTypography name={ name } />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 
-			<NavigatorScreen path={ parentMenu + '/typography/text' }>
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/typography/text' }
+			>
 				<ScreenTypographyElement name={ name } element="text" />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 
-			<NavigatorScreen path={ parentMenu + '/typography/link' }>
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/typography/link' }
+			>
 				<ScreenTypographyElement name={ name } element="link" />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 
-			<NavigatorScreen path={ parentMenu + '/colors' }>
+			<GlobalStylesNavigationScreen path={ parentMenu + '/colors' }>
 				<ScreenColors name={ name } />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 
-			<NavigatorScreen path={ parentMenu + '/colors/palette' }>
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/colors/palette' }
+			>
 				<ScreenColorPalette name={ name } />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 
-			<NavigatorScreen path={ parentMenu + '/colors/background' }>
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/colors/background' }
+			>
 				<ScreenBackgroundColor name={ name } />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 
-			<NavigatorScreen path={ parentMenu + '/colors/text' }>
+			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
 				<ScreenTextColor name={ name } />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 
-			<NavigatorScreen path={ parentMenu + '/colors/link' }>
+			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/link' }>
 				<ScreenLinkColor name={ name } />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 
-			<NavigatorScreen path={ parentMenu + '/layout' }>
+			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
 				<ScreenLayout name={ name } />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 		</>
 	);
 }
@@ -70,22 +93,29 @@ function GlobalStylesUI() {
 	const blocks = getBlockTypes();
 
 	return (
-		<NavigatorProvider initialPath="/">
-			<NavigatorScreen path="/">
+		<NavigatorProvider
+			className="edit-site-global-styles-sidebar__navigator-provider"
+			initialPath="/"
+		>
+			<GlobalStylesNavigationScreen path="/">
 				<ScreenRoot />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 
-			<NavigatorScreen path="/blocks">
+			<GlobalStylesNavigationScreen path="/variations">
+				<ScreenStyleVariations />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/blocks">
 				<ScreenBlockList />
-			</NavigatorScreen>
+			</GlobalStylesNavigationScreen>
 
 			{ blocks.map( ( block ) => (
-				<NavigatorScreen
+				<GlobalStylesNavigationScreen
 					key={ 'menu-block-' + block.name }
 					path={ '/blocks/' + block.name }
 				>
 					<ScreenBlock name={ block.name } />
-				</NavigatorScreen>
+				</GlobalStylesNavigationScreen>
 			) ) }
 
 			<ContextScreens />

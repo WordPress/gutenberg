@@ -53,6 +53,7 @@ export { default as commentAuthorAvatar } from './library/comment-author-avatar'
 export { default as commentAuthorName } from './library/comment-author-name';
 export { default as commentContent } from './library/comment-content';
 export { default as commentReplyLink } from './library/comment-reply-link';
+export { default as commentEditLink } from './library/comment-edit-link';
 export { default as cover } from './library/cover';
 export { default as create } from './library/create';
 export { default as crop } from './library/crop';
@@ -228,6 +229,7 @@ export { default as trendingUp } from './library/trending-up';
 export { default as typography } from './library/typography';
 export { default as undo } from './library/undo';
 export { default as ungroup } from './library/ungroup';
+export { default as unlock } from './library/unlock';
 export { default as update } from './library/update';
 export { default as upload } from './library/upload';
 export { default as verse } from './library/verse';

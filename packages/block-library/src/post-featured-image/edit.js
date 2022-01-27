@@ -4,6 +4,7 @@
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	MenuItem,
 	ToggleControl,
 	PanelBody,
 	Placeholder,
@@ -15,6 +16,7 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
@@ -45,13 +47,20 @@ const placeholderChip = (
 	</div>
 );
 
+function getMediaSourceUrlBySizeSlug( media, slug ) {
+	return (
+		media?.media_details?.sizes?.[ slug ]?.source_url || media?.source_url
+	);
+}
+
 function PostFeaturedImageDisplay( {
+	clientId,
 	attributes,
 	setAttributes,
 	context: { postId, postType, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { isLink, height, width, scale } = attributes;
+	const { isLink, height, width, scale, sizeSlug } = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postType,
@@ -65,6 +74,20 @@ function PostFeaturedImageDisplay( {
 			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
 		[ featuredImage ]
 	);
+	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
+
+	const imageSizes = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().imageSizes,
+		[]
+	);
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) => {
+			return media?.media_details?.sizes?.[ slug ]?.source_url;
+		} )
+		.map( ( { name, slug } ) => ( {
+			value: slug,
+			label: name,
+		} ) );
 
 	const blockProps = useBlockProps( {
 		style: { width, height },
@@ -90,9 +113,37 @@ function PostFeaturedImageDisplay( {
 		createErrorNotice( message[ 2 ], { type: 'snackbar' } );
 	};
 
+	const controls = (
+		<>
+			<DimensionControls
+				clientId={ clientId }
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				imageSizeOptions={ imageSizeOptions }
+			/>
+			<InspectorControls>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ sprintf(
+							// translators: %s: Name of the post type e.g: "post".
+							__( 'Link to %s' ),
+							postType
+						) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		</>
+	);
 	let image;
 	if ( ! featuredImage && isDescendentOfQueryLoop ) {
-		return <div { ...blockProps }>{ placeholderChip }</div>;
+		return (
+			<>
+				{ controls }
+				<div { ...blockProps }>{ placeholderChip }</div>
+			</>
+		);
 	}
 
 	const label = __( 'Add a featured image' );
@@ -127,7 +178,7 @@ function PostFeaturedImageDisplay( {
 			placeholderChip
 		) : (
 			<img
-				src={ media.source_url }
+				src={ mediaUrl }
 				alt={ media.alt_text || __( 'Featured image' ) }
 				style={ { height, objectFit: height && scale } }
 			/>
@@ -136,33 +187,21 @@ function PostFeaturedImageDisplay( {
 
 	return (
 		<>
-			<InspectorControls>
-				<DimensionControls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				/>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<ToggleControl
-						label={ sprintf(
-							// translators: %s: Name of the post type e.g: "post".
-							__( 'Link to %s' ),
-							postType
-						) }
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
-					/>
-				</PanelBody>
-			</InspectorControls>
+			{ controls }
 			{ !! media && ! isDescendentOfQueryLoop && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ featuredImage }
-						mediaURL={ media.source_url }
+						mediaURL={ mediaUrl }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept="image/*"
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
-					/>
+					>
+						<MenuItem onClick={ () => setFeaturedImage( 0 ) }>
+							{ __( 'Reset' ) }
+						</MenuItem>
+					</MediaReplaceFlow>
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>{ image }</figure>

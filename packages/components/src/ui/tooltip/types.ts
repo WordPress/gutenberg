@@ -3,7 +3,6 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type { TooltipInitialState, TooltipProps } from 'reakit';
-// eslint-disable-next-line no-restricted-imports
 import type { ReactElement, ReactNode } from 'react';
 
 /**

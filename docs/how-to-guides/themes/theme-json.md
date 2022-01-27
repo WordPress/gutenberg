@@ -805,7 +805,7 @@ body {
 
 Styles found within a block will be enqueued using the block selector.
 
-By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitly telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
+By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitly telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file. Note that the block needs to be registered server-side for the `__experimentalSelector` field to be available to the style engine.
 
 {% codetabs %}
 {% Input %}
@@ -993,11 +993,11 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ## Developing with theme.json
 
-It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at [SchemaStore.org](https://schemastore.org/)
+It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
 
-To use the schema, add `"$schema": "https://json.schemastore.org/theme-v1.json"` to the beginning of your theme.json file. Visual Studio Code and other editors will pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor.
+Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://schemas.wp.org/trunk/theme.json"` to the beginning of your theme.json file.
 
-![Example using validation with schema](https://developer.wordpress.org/files/2021/10/schema-validation.gif)
+![Example using validation with schema](https://developer.wordpress.org/files/2021/11/theme-json-schema-updated.gif)
 
 
 ## Frequently Asked Questions
@@ -1082,6 +1082,31 @@ A few notes about this process:
 			"line--height": { // DO NOT DO THIS
 				"body": 1.7
 			}
+		}
+	}
+}
+```
+
+### What is blockGap and how can I use it?
+
+blockGap adjusts the vertical margin, or gap, between blocks.
+It is also used for margins between inner blocks in columns, buttons, and social icons.
+In the editor, the control for the blockGap is called Block spacing, located in the Dimensions panel.
+
+The value you define for the blockGap style uses a CSS property, a preset, named `--wp--style--block-gap`.
+The default value is 2em.
+
+```json
+{
+	"version": 1,
+	"settings": {
+		"spacing": {
+			"blockGap": true,
+		}
+	},
+	"styles": {
+		"spacing": {
+			"blockGap": "1.5rem"
 		}
 	}
 }

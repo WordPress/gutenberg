@@ -38,8 +38,8 @@
 		"node-fetch": "^2.6.0"
 	},
 	"peerDependencies": {
-		"jest": ">=26",
-		"puppeteer": ">=1.19.0"
+		"jest": ">=27",
+		"puppeteer-core": ">=11"
 	},
 	"publishConfig": {
 		"access": "public"

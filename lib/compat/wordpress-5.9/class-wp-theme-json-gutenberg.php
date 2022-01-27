@@ -120,7 +120,7 @@ class WP_Theme_JSON_Gutenberg {
 			'path'              => array( 'color', 'duotone' ),
 			'override'          => true,
 			'use_default_names' => false,
-			'value_func'        => 'gutenberg_render_duotone_filter_preset',
+			'value_func'        => 'gutenberg_get_duotone_filter_property',
 			'css_vars'          => '--wp--preset--duotone--$slug',
 			'classes'           => array(),
 			'properties'        => array( 'filter' ),
@@ -1440,7 +1440,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * Additionally, for some preset types, we also want to make sure the
 		 * values they introduce don't conflict with default values. We do so
 		 * by checking the incoming slugs for theme presets and compare them
-		 * with the equivalent dfefault presets: if a slug is present as a default
+		 * with the equivalent default presets: if a slug is present as a default
 		 * we remove it from the theme presets.
 		 */
 		$nodes        = self::get_setting_nodes( $incoming_data );
@@ -1492,6 +1492,39 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Converts all filter (duotone) presets into SVGs.
+	 *
+	 * @param array $origins List of origins to process.
+	 *
+	 * @return string SVG filters.
+	 */
+	public function get_svg_filters( $origins ) {
+		$blocks_metadata = self::get_blocks_metadata();
+		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
+		foreach ( $setting_nodes as $metadata ) {
+			$node = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			if ( empty( $node['color']['duotone'] ) ) {
+				continue;
+			}
+
+			$duotone_presets = $node['color']['duotone'];
+
+			$filters = '';
+			foreach ( $origins as $origin ) {
+				if ( ! isset( $duotone_presets[ $origin ] ) ) {
+					continue;
+				}
+				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
+					$filters .= gutenberg_get_duotone_filter_svg( $duotone_preset );
+				}
+			}
+		}
+
+		return $filters;
 	}
 
 	/**

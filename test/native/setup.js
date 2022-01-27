@@ -2,7 +2,15 @@
  * External dependencies
  */
 import 'react-native-gesture-handler/jestSetup';
-import { NativeModules as RNNativeModules } from 'react-native';
+import { Image, NativeModules as RNNativeModules } from 'react-native';
+
+// React Native sets up a global navigator, but that is not executed in the
+// testing environment: https://git.io/JSSBg
+global.navigator = global.navigator ?? {};
+
+// Set up the app runtime globals for the test environment, which includes
+// modifying the above `global.navigator`
+require( '../../packages/react-native-editor/src/globals' );
 
 RNNativeModules.UIManager = RNNativeModules.UIManager || {};
 RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
@@ -34,7 +42,12 @@ jest.mock( '@wordpress/element', () => {
 	};
 } );
 
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+jest.mock( '@wordpress/api-fetch', () => {
+	const apiFetchMock = jest.fn();
+	apiFetchMock.setFetchHandler = jest.fn();
+
+	return apiFetchMock;
+} );
 
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
@@ -45,6 +58,8 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 			callback( {} );
 		} ),
 		requestFocalPointPickerTooltipShown: jest.fn( () => true ),
+		sendMediaUpload: jest.fn(),
+		sendMediaSave: jest.fn(),
 		setBlockTypeImpressions: jest.fn(),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
@@ -119,14 +134,6 @@ jest.mock(
 	{ virtual: true }
 );
 
-if ( ! global.window.matchMedia ) {
-	global.window.matchMedia = () => ( {
-		matches: false,
-		addListener: () => {},
-		removeListener: () => {},
-	} );
-}
-
 jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
 	virtual: true,
 } );
@@ -166,16 +173,28 @@ jest.mock( 'react-native/Libraries/LayoutAnimation/LayoutAnimation' );
 jest.mock(
 	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',
 	() => ( {
-		addEventListener: jest.fn(),
-		announceForAccessibility: jest.fn(),
-		removeEventListener: jest.fn(),
-		isScreenReaderEnabled: jest.fn( () => Promise.resolve( false ) ),
-		fetch: jest.fn( () => ( {
-			done: jest.fn(),
-		} ) ),
+		__esModule: true,
+		default: {
+			addEventListener: jest.fn( () => ( { remove: jest.fn() } ) ),
+			announceForAccessibility: jest.fn(),
+			isBoldTextEnabled: jest.fn(),
+			isGrayscaleEnabled: jest.fn(),
+			isInvertColorsEnabled: jest.fn(),
+			isReduceMotionEnabled: jest.fn(),
+			isReduceTransparencyEnabled: jest.fn(),
+			isScreenReaderEnabled: jest.fn( () => Promise.resolve( false ) ),
+			removeEventListener: jest.fn(),
+			setAccessibilityFocus: jest.fn(),
+			sendAccessibilityEvent_unstable: jest.fn(),
+			getRecommendedTimeoutMillis: jest.fn(),
+		},
 	} )
 );
-jest.mock( 'react-native/Libraries/Components/Clipboard/Clipboard', () => ( {
+
+// The mock provided by the package itself does not appear to work correctly.
+// Specifically, the mock provides a named export, where the module itself uses
+// a default export.
+jest.mock( '@react-native-clipboard/clipboard', () => ( {
 	getString: jest.fn( () => Promise.resolve( '' ) ),
 	setString: jest.fn(),
 } ) );
@@ -186,9 +205,12 @@ jest.mock( 'react-native/Libraries/Components/Clipboard/Clipboard', () => ( {
 // https://github.com/callstack/react-native-testing-library/issues/329#issuecomment-737307473
 jest.mock( 'react-native/Libraries/Components/Switch/Switch', () => {
 	const jestMockComponent = require( 'react-native/jest/mockComponent' );
-	return jestMockComponent(
-		'react-native/Libraries/Components/Switch/Switch'
-	);
+	return {
+		__esModule: true,
+		default: jestMockComponent(
+			'react-native/Libraries/Components/Switch/Switch'
+		),
+	};
 } );
 
 jest.mock( '@wordpress/compose', () => {
@@ -201,3 +223,7 @@ jest.mock( '@wordpress/compose', () => {
 		] ),
 	};
 } );
+
+jest.spyOn( Image, 'getSize' ).mockImplementation( ( url, success ) =>
+	success( 0, 0 )
+);

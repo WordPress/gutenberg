@@ -5,8 +5,8 @@ import { normalizePath } from '@wordpress/url';
 
 /**
  * The purpose of this function is to create a middleware that is responsible for preloading menu-related data.
- * It uses data that is returned from the /__experimental/menus endpoint for requests
- * to the /__experimental/menu/<menuId> endpoint, because the data is the same.
+ * It uses data that is returned from the /wp/v2/menus endpoint for requests
+ * to the /wp/v2/menu/<menuId> endpoint, because the data is the same.
  * This way, we can avoid making additional REST API requests.
  * This middleware can be removed if/when we implement caching at the wordpress/core-data level.
  *
@@ -43,9 +43,7 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 			return next( options );
 		}
 
-		const matches = path.match(
-			/^\/__experimental\/menus\/(\d+)\?context=edit$/
-		);
+		const matches = path.match( /^\/wp\/v2\/menus\/(\d+)\?context=edit$/ );
 		if ( ! matches ) {
 			return next( options );
 		}

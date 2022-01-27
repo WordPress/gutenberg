@@ -3,7 +3,7 @@
  */
 import { first } from 'lodash';
 
-/** @typedef {import('puppeteer').ElementHandle} ElementHandle */
+/** @typedef {import('puppeteer-core').ElementHandle} ElementHandle */
 
 /**
  * Finds a sidebar panel with the provided title.

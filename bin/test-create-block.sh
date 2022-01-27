@@ -36,3 +36,6 @@ status "Lintig CSS files..."
 
 status "Linting JavaScript files..."
 ../node_modules/.bin/wp-scripts lint-js
+
+status "Creating a plugin zip file..."
+../node_modules/.bin/wp-scripts plugin-zip

@@ -17,7 +17,7 @@ export default {
 	title: 'Components/DropdownMenu',
 	component: DropdownMenu,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

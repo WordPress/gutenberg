@@ -76,6 +76,10 @@
 		}
 	}
 
+	.block-library-cover__padding-visualizer {
+		z-index: z-index(".block-library-cover__padding-visualizer");
+	}
+
 	// Apply max-width to floated items that have no intrinsic width
 	&.alignleft,
 	&.alignright {

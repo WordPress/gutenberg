@@ -44,6 +44,9 @@
 		"react-resize-aware": "^3.1.0",
 		"use-memo-one": "^1.1.1"
 	},
+	"peerDependencies": {
+		"react": "^17.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

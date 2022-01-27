@@ -706,6 +706,7 @@ function CoverEdit( {
 				<BoxControlVisualizer
 					values={ styleAttribute?.spacing?.padding }
 					showValues={ styleAttribute?.visualizers?.padding }
+					className="block-library-cover__padding-visualizer"
 				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"

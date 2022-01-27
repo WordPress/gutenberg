@@ -5,11 +5,7 @@ import { SVG, Path } from '@wordpress/primitives';
 
 const archiveTitle = (
 	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-		<Path stroke="#1E1E1E" strokeWidth="1.5" d="M4 19.25h9M4 15.25h16" />
-		<Path
-			d="M8.994 10.103H6.08L5.417 12H4l2.846-8h1.383l2.845 8H9.657l-.663-1.897zm-.457-1.28l-.994-2.857-1.006 2.857h2z"
-			fill="#1E1E1E"
-		/>
+		<Path d="M6.08 10.103h2.914L9.657 12h1.417L8.23 4H6.846L4 12h1.417l.663-1.897Zm1.463-4.137.994 2.857h-2l1.006-2.857ZM20 16H4v-1.5h16V16Zm-7 4H4v-1.5h9V20Z" />
 	</SVG>
 );
 

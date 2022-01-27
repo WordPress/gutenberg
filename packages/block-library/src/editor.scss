@@ -5,6 +5,9 @@
 @import "./buttons/editor.scss";
 @import "./categories/editor.scss";
 @import "./columns/editor.scss";
+@import "./comments-query-loop/editor.scss";
+@import "./comments-pagination/editor.scss";
+@import "./comments-pagination-numbers/editor.scss";
 @import "./cover/editor.scss";
 @import "./embed/editor.scss";
 @import "./file/editor.scss";
@@ -70,11 +73,11 @@
 }
 
 .editor-styles-wrapper .has-normal-font-size {
-	font-size: var(--wp--preset--font-size--normal) !important;
+	font-size: var(--wp--preset--font-size--normal);
 }
 
 .editor-styles-wrapper .has-huge-font-size {
-	font-size: var(--wp--preset--font-size--huge) !important;
+	font-size: var(--wp--preset--font-size--huge);
 }
 
 /**

@@ -96,6 +96,7 @@ export default function PostExcerptEditor( {
 				( isSelected ? '' : __( 'No post excerpt found' ) )
 			}
 			onChange={ setExcerpt }
+			tagName="p"
 		/>
 	) : (
 		( renderedExcerpt && (

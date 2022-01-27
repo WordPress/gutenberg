@@ -22,9 +22,9 @@ import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
-/** @typedef {import('../types').WPDataRegistry} WPDataRegistry */
-/** @typedef {import('../types').WPDataStore} WPDataStore */
-/** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
+/** @typedef {import('../types').DataRegistry} DataRegistry */
+/** @typedef {import('../types').StoreDescriptor} StoreDescriptor */
+/** @typedef {import('../types').ReduxStoreConfig} ReduxStoreConfig */
 
 const trimUndefinedValues = ( array ) => {
 	const result = [ ...array ];
@@ -68,7 +68,7 @@ function createResolversCache() {
 }
 
 /**
- * Creates a data store definition for the provided Redux store options containing
+ * Creates a data store descriptor for the provided Redux store configuration containing
  * properties describing reducer, actions, selectors, controls and resolvers.
  *
  * @example
@@ -83,12 +83,12 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @param {string}                 key     Unique namespace identifier.
- * @param {WPDataReduxStoreConfig} options Registered store options, with properties
- *                                         describing reducer, actions, selectors,
- *                                         and resolvers.
+ * @param {string}           key     Unique namespace identifier.
+ * @param {ReduxStoreConfig} options Registered store options, with properties
+ *                                   describing reducer, actions, selectors,
+ *                                   and resolvers.
  *
- * @return {WPDataStore} Store Object.
+ * @return {StoreDescriptor} Store Object.
  */
 export default function createReduxStore( key, options ) {
 	return {
@@ -210,12 +210,12 @@ export default function createReduxStore( key, options ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string}         key       Unique namespace identifier.
- * @param {Object}         options   Registered store options, with properties
- *                                   describing reducer, actions, selectors,
- *                                   and resolvers.
- * @param {WPDataRegistry} registry  Registry reference.
- * @param {Object}         thunkArgs Argument object for the thunk middleware.
+ * @param {string}       key       Unique namespace identifier.
+ * @param {Object}       options   Registered store options, with properties
+ *                                 describing reducer, actions, selectors,
+ *                                 and resolvers.
+ * @param {DataRegistry} registry  Registry reference.
+ * @param {Object}       thunkArgs Argument object for the thunk middleware.
  * @return {Object} Newly created redux store.
  */
 function instantiateReduxStore( key, options, registry, thunkArgs ) {

@@ -11,7 +11,7 @@ When the user selects a block, a number of control buttons may be shown in a too
 You can also customize the toolbar to include controls specific to your block type. If the return value of your block type's `edit` function includes a `BlockControls` element, those controls will be shown in the selected block's toolbar.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -92,7 +92,7 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, blockEditor, element ) {

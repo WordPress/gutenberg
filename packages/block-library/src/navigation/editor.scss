@@ -12,11 +12,10 @@
 		padding-left: 0;
 	}
 
-	// Revert any left/right margins.
+	// Revert any margins.
 	// This also makes it work with classic theme auto margins.
 	.wp-block-navigation-item.wp-block {
-		margin-left: revert;
-		margin-right: revert;
+		margin: revert;
 	}
 }
 
@@ -573,4 +572,20 @@ body.editor-styles-wrapper
 	width: 100%;
 	justify-content: center;
 	margin-bottom: $grid-unit-20;
+}
+
+.wp-block-navigation__overlay-menu-preview {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	background-color: $gray-100;
+	padding: 0 $grid-unit-30;
+	height: $grid-unit-40 * 2;
+	margin-bottom: $grid-unit-15;
+
+	&.open {
+		box-shadow: inset 0 0 0 $border-width $gray-200;
+		outline: 1px solid transparent; // Box shadow is removed in high contrast mode, a transparent outline is made opaque.
+		background-color: $white;
+	}
 }

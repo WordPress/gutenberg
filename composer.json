@@ -16,7 +16,14 @@
 		"issues": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"config": {
-		"process-timeout": 0
+		"process-timeout": 0,
+		"platform": {
+			"php": "7.4"
+		},
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"composer/installers": true
+		}
 	},
 	"require-dev": {
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",

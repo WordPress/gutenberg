@@ -4,11 +4,14 @@
 import {
 	createNewPost,
 	disablePrePublishChecks,
+	getOption,
 	insertBlock,
 	publishPost,
+	setOption,
 	trashAllPosts,
 	activateTheme,
 	clickButton,
+	createReusableBlock,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -21,13 +24,9 @@ describe( 'Multi-entity save flow', () => {
 	const checkedBoxSelector = '.components-checkbox-control__checked';
 	const checkboxInputSelector = '.components-checkbox-control__input';
 	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
-	const templatePartSelector = '*[data-type="core/template-part"]';
-	const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector =
 		'.editor-post-publish-panel__header-cancel-button button:not(:disabled)';
-	const createNewButtonSelector =
-		'//button[contains(text(), "New template part")]';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
@@ -44,14 +43,26 @@ describe( 'Multi-entity save flow', () => {
 		}
 	};
 
+	let originalSiteTitle, originalBlogDescription;
+
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_block' );
+
+		// Get the current Site Title and Site Tagline, so that we can reset
+		// them back to the original values once the test suite has finished.
+		originalSiteTitle = await getOption( 'blogname' );
+		originalBlogDescription = await getOption( 'blogdescription' );
 	} );
 
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
+
+		// Reset the Site Title and Site Tagline back to their original values.
+		await setOption( 'blogname', originalSiteTitle );
+		await setOption( 'blogdescription', originalBlogDescription );
 	} );
 
 	describe( 'Post Editor', () => {
@@ -66,8 +77,6 @@ describe( 'Multi-entity save flow', () => {
 		const saveA11ySelector =
 			'.edit-post-layout__toggle-entities-saved-states-panel-button';
 		const publishPanelSelector = '.editor-post-publish-panel';
-		const confirmTitleButtonSelector =
-			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
 		// Reusable assertions inside Post editor.
 		const assertMultiSaveEnabled = async () => {
@@ -84,9 +93,10 @@ describe( 'Multi-entity save flow', () => {
 			expect( multiSaveButton ).toBeNull();
 		};
 
-		// Template parts can't be used in posts, so this test needs to be rebuilt using perhaps reusable blocks.
-		it.skip( 'Save flow should work as expected.', async () => {
+		it( 'Save flow should work as expected.', async () => {
+			await createNewPost();
 			// Edit the page some.
+			await page.waitForSelector( '.editor-post-title' );
 			await page.click( '.editor-post-title' );
 			await page.keyboard.type( 'Test Post...' );
 			await page.keyboard.press( 'Enter' );
@@ -100,21 +110,11 @@ describe( 'Multi-entity save flow', () => {
 			await assertExistance( publishPanelSelector, false );
 			await assertExistance( savePanelSelector, false );
 
-			// Add a template part and edit it.
-			await insertBlock( 'Template Part' );
-			const createNewButton = await page.waitForXPath(
-				createNewButtonSelector
-			);
-			await createNewButton.click();
-			const confirmTitleButton = await page.waitForSelector(
-				confirmTitleButtonSelector
-			);
-			await confirmTitleButton.click();
-
-			await page.waitForSelector( activatedTemplatePartSelector );
-			await page.click( '.block-editor-button-block-appender' );
-			await page.click( '.editor-block-list-item-paragraph' );
-			await page.keyboard.type( 'some words...' );
+			// Add a reusable block and edit it.
+			await createReusableBlock( 'Hi!', 'Test' );
+			await page.waitForSelector( 'p[data-type="core/paragraph"]' );
+			await page.click( 'p[data-type="core/paragraph"]' );
+			await page.keyboard.type( 'Oh!' );
 
 			// Should trigger multi-entity save button once template part edited.
 			await assertMultiSaveEnabled();
@@ -165,6 +165,11 @@ describe( 'Multi-entity save flow', () => {
 				'//*[@id="a11y-speak-polite"][contains(text(), "Post published")]'
 			);
 
+			// Unselect the blocks to avoid clicking the block toolbar.
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+			} );
+
 			// Update the post.
 			await page.click( '.editor-post-title' );
 			await page.keyboard.type( '...more title!' );
@@ -178,13 +183,11 @@ describe( 'Multi-entity save flow', () => {
 			await assertMultiSaveDisabled();
 			await assertExistance( saveA11ySelector, false );
 
-			// Update template part.
-			await page.click( templatePartSelector );
-			await page.click(
-				`${ templatePartSelector } .wp-block[data-type="core/paragraph"]`
-			);
-			await page.keyboard.type( '...some more words...' );
-			await page.keyboard.press( 'Enter' );
+			// Update reusable block again.
+			await page.click( 'p[data-type="core/paragraph"]' );
+			// We need to click again due to the clickthrough overlays in reusable blocks.
+			await page.click( 'p[data-type="core/paragraph"]' );
+			await page.keyboard.type( 'R!' );
 
 			// Multi-entity saving should be enabled.
 			await assertMultiSaveEnabled();
@@ -197,7 +200,9 @@ describe( 'Multi-entity save flow', () => {
 
 			await insertBlock( 'Site Title' );
 			// Ensure title is retrieved before typing.
-			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' );
+			await page.waitForXPath(
+				`//a[contains(text(), "${ originalSiteTitle }")]`
+			);
 			const editableSiteTitleSelector =
 				'.wp-block-site-title a[contenteditable="true"]';
 			await page.waitForSelector( editableSiteTitleSelector );
@@ -223,23 +228,16 @@ describe( 'Multi-entity save flow', () => {
 			await checkboxInputs[ 1 ].click();
 			await page.click( entitiesSaveSelector );
 
+			// Wait for the snackbar notice that the post has been published.
+			await page.waitForSelector( '.components-snackbar' );
+
 			await clickButton( 'Update…' );
 			await page.waitForSelector( savePanelSelector );
-			checkboxInputs = await page.$$( checkboxInputSelector );
-			expect( checkboxInputs ).toHaveLength( 1 );
 
-			// Reset site entity to default value to not affect other tests.
-			await page.evaluate( () => {
-				wp.data
-					.dispatch( 'core' )
-					.editEntityRecord( 'root', 'site', undefined, {
-						title: 'gutenberg',
-						description: 'Just another WordPress site',
-					} );
-				wp.data
-					.dispatch( 'core' )
-					.saveEditedEntityRecord( 'root', 'site', undefined );
-			} );
+			await page.waitForSelector( checkboxInputSelector );
+			checkboxInputs = await page.$$( checkboxInputSelector );
+
+			expect( checkboxInputs ).toHaveLength( 1 );
 		} );
 	} );
 
@@ -250,10 +248,23 @@ describe( 'Multi-entity save flow', () => {
 		const disabledSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=true]`;
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
+		const saveAllChanges = async () => {
+			// Clicking button should open panel with boxes checked.
+			await page.click( activeSaveSiteSelector );
+			await page.waitForSelector( savePanelSelector );
+			await assertAllBoxesChecked();
+
+			// Save a11y button should not be present with save panel open.
+			await assertExistance( saveA11ySelector, false );
+
+			// Saving should result in items being saved.
+			await page.click( entitiesSaveSelector );
+		};
+
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
 			await siteEditor.disableWelcomeGuide();
@@ -261,10 +272,10 @@ describe( 'Multi-entity save flow', () => {
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
-				'//button[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
+				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
 			);
 			headerTemplatePartListViewButton.click();
-			await page.click( 'button[aria-label="Close list view sidebar"]' );
+			await page.click( 'button[aria-label="Close List View Sidebar"]' );
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );
@@ -279,20 +290,47 @@ describe( 'Multi-entity save flow', () => {
 			// Save a11y button should be present.
 			await assertExistance( saveA11ySelector, true );
 
-			// Clicking button should open panel with boxes checked.
-			await page.click( activeSaveSiteSelector );
-			await page.waitForSelector( savePanelSelector );
-			await assertAllBoxesChecked();
+			// Save all changes.
+			await saveAllChanges();
 
-			// Save a11y button should not be present with save panel open.
-			await assertExistance( saveA11ySelector, false );
-
-			// Saving should result in items being saved.
-			await page.click( entitiesSaveSelector );
 			const disabledButton = await page.waitForSelector(
 				disabledSaveSiteSelector
 			);
 			expect( disabledButton ).not.toBeNull();
+		} );
+
+		it( 'Save flow should allow re-saving after changing the same block attribute', async () => {
+			// Navigate to site editor.
+			await siteEditor.visit( {
+				postId: 'emptytheme//index',
+				postType: 'wp_template',
+			} );
+			await siteEditor.disableWelcomeGuide();
+
+			// Insert a paragraph at the bottom.
+			await insertBlock( 'Paragraph' );
+
+			// Open the block settings.
+			await page.click( 'button[aria-label="Settings"]' );
+
+			// Change the font size
+			await page.click(
+				'.components-font-size-picker__controls button[aria-label="Small"]'
+			);
+
+			// Save all changes.
+			await saveAllChanges();
+
+			// Change the font size
+			await page.click(
+				'.components-font-size-picker__controls button[aria-label="Medium"]'
+			);
+
+			// Assert that the save button has been re-enabled.
+			const saveButton = await page.waitForSelector(
+				activeSaveSiteSelector
+			);
+			expect( saveButton ).not.toBeNull();
 		} );
 	} );
 } );

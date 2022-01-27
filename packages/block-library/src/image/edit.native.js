@@ -134,7 +134,7 @@ function LinkSettings( {
 		url: {
 			valueMask,
 			autoFocus: false,
-			autoFill: true,
+			autoFill: false,
 		},
 		openInNewTab: {
 			label: __( 'Open in new tab' ),
@@ -490,7 +490,7 @@ export class ImageEdit extends Component {
 				footerNote={
 					<>
 						{ __(
-							'Describe the purpose of the image. Leave empty if the image is purely decorative. '
+							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
 						) }
 						<FooterMessageLink
 							href={
@@ -524,7 +524,7 @@ export class ImageEdit extends Component {
 
 		const removeFeaturedButton = () => (
 			<BottomSheet.Cell
-				label={ __( 'Remove as Featured Image ' ) }
+				label={ __( 'Remove as Featured Image' ) }
 				labelStyle={ [
 					setFeaturedButtonStyle,
 					styles.removeFeaturedButton,
@@ -539,7 +539,7 @@ export class ImageEdit extends Component {
 
 		const setFeaturedButton = () => (
 			<BottomSheet.Cell
-				label={ __( 'Set as Featured Image ' ) }
+				label={ __( 'Set as Featured Image' ) }
 				labelStyle={ setFeaturedButtonStyle }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
 				separatorType={ 'none' }

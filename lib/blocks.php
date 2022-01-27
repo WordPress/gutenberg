@@ -53,61 +53,66 @@ function gutenberg_reregister_core_block_types() {
 				'embed',
 			),
 			'block_names'   => array(
-				'archives.php'                  => 'core/archives',
-				'block.php'                     => 'core/block',
-				'calendar.php'                  => 'core/calendar',
-				'categories.php'                => 'core/categories',
-				'comment-author-avatar.php'     => 'core/comment-author-avatar',
-				'comment-author-name.php'       => 'core/comment-author-name',
-				'comment-content.php'           => 'core/comment-content',
-				'comment-date.php'              => 'core/comment-date',
-				'comment-edit-link.php'         => 'core/comment-edit-link',
-				'comment-reply-link.php'        => 'core/comment-reply-link',
-				'comment-template.php'          => 'core/comment-template',
-				'file.php'                      => 'core/file',
-				'home-link.php'                 => 'core/home-link',
-				'image.php'                     => 'core/image',
-				'gallery.php'                   => 'core/gallery',
-				'latest-comments.php'           => 'core/latest-comments',
-				'latest-posts.php'              => 'core/latest-posts',
-				'loginout.php'                  => 'core/loginout',
-				'navigation.php'                => 'core/navigation',
-				'navigation-area.php'           => 'core/navigation-area',
-				'navigation-link.php'           => 'core/navigation-link',
-				'navigation-submenu.php'        => 'core/navigation-submenu',
-				'page-list.php'                 => 'core/page-list',
-				'pattern.php'                   => 'core/pattern',
-				'post-author.php'               => 'core/post-author',
-				'post-comment.php'              => 'core/post-comment',
-				'post-comments.php'             => 'core/post-comments',
-				'post-comments-count.php'       => 'core/post-comments-count',
-				'post-comments-form.php'        => 'core/post-comments-form',
-				'post-comments-link.php'        => 'core/post-comments-link',
-				'post-content.php'              => 'core/post-content',
-				'post-date.php'                 => 'core/post-date',
-				'post-excerpt.php'              => 'core/post-excerpt',
-				'post-featured-image.php'       => 'core/post-featured-image',
-				'post-navigation-link.php'      => 'core/post-navigation-link',
-				'post-terms.php'                => 'core/post-terms',
-				'post-title.php'                => 'core/post-title',
-				'query.php'                     => 'core/query',
-				'post-template.php'             => 'core/post-template',
-				'query-pagination.php'          => 'core/query-pagination',
-				'query-pagination-next.php'     => 'core/query-pagination-next',
-				'query-pagination-numbers.php'  => 'core/query-pagination-numbers',
-				'query-pagination-previous.php' => 'core/query-pagination-previous',
-				'query-title.php'               => 'core/query-title',
-				'rss.php'                       => 'core/rss',
-				'search.php'                    => 'core/search',
-				'shortcode.php'                 => 'core/shortcode',
-				'social-link.php'               => 'core/social-link',
-				'site-logo.php'                 => 'core/site-logo',
-				'site-tagline.php'              => 'core/site-tagline',
-				'site-title.php'                => 'core/site-title',
-				// 'table-of-contents.php'        => 'core/table-of-contents',
-				'tag-cloud.php'                 => 'core/tag-cloud',
-				'template-part.php'             => 'core/template-part',
-				'term-description.php'          => 'core/term-description',
+				'archives.php'                     => 'core/archives',
+				'block.php'                        => 'core/block',
+				'calendar.php'                     => 'core/calendar',
+				'categories.php'                   => 'core/categories',
+				'comment-author-avatar.php'        => 'core/comment-author-avatar',
+				'comment-author-name.php'          => 'core/comment-author-name',
+				'comment-content.php'              => 'core/comment-content',
+				'comment-date.php'                 => 'core/comment-date',
+				'comment-edit-link.php'            => 'core/comment-edit-link',
+				'comment-reply-link.php'           => 'core/comment-reply-link',
+				'comment-template.php'             => 'core/comment-template',
+				'comments-pagination.php'          => 'core/comments-pagination',
+				'comments-pagination-next.php'     => 'core/comments-pagination-next',
+				'comments-pagination-numbers.php'  => 'core/comments-pagination-numbers',
+				'comments-pagination-previous.php' => 'core/comments-pagination-previous',
+				'file.php'                         => 'core/file',
+				'home-link.php'                    => 'core/home-link',
+				'image.php'                        => 'core/image',
+				'gallery.php'                      => 'core/gallery',
+				'latest-comments.php'              => 'core/latest-comments',
+				'latest-posts.php'                 => 'core/latest-posts',
+				'loginout.php'                     => 'core/loginout',
+				'navigation.php'                   => 'core/navigation',
+				'navigation-area.php'              => 'core/navigation-area',
+				'navigation-link.php'              => 'core/navigation-link',
+				'navigation-submenu.php'           => 'core/navigation-submenu',
+				'page-list.php'                    => 'core/page-list',
+				'pattern.php'                      => 'core/pattern',
+				'post-author.php'                  => 'core/post-author',
+				'post-author-name.php'             => 'core/post-author-name',
+				'post-comment.php'                 => 'core/post-comment',
+				'post-comments.php'                => 'core/post-comments',
+				'post-comments-count.php'          => 'core/post-comments-count',
+				'post-comments-form.php'           => 'core/post-comments-form',
+				'post-comments-link.php'           => 'core/post-comments-link',
+				'post-content.php'                 => 'core/post-content',
+				'post-date.php'                    => 'core/post-date',
+				'post-excerpt.php'                 => 'core/post-excerpt',
+				'post-featured-image.php'          => 'core/post-featured-image',
+				'post-navigation-link.php'         => 'core/post-navigation-link',
+				'post-terms.php'                   => 'core/post-terms',
+				'post-title.php'                   => 'core/post-title',
+				'query.php'                        => 'core/query',
+				'post-template.php'                => 'core/post-template',
+				'query-pagination.php'             => 'core/query-pagination',
+				'query-pagination-next.php'        => 'core/query-pagination-next',
+				'query-pagination-numbers.php'     => 'core/query-pagination-numbers',
+				'query-pagination-previous.php'    => 'core/query-pagination-previous',
+				'query-title.php'                  => 'core/query-title',
+				'rss.php'                          => 'core/rss',
+				'search.php'                       => 'core/search',
+				'shortcode.php'                    => 'core/shortcode',
+				'social-link.php'                  => 'core/social-link',
+				'site-logo.php'                    => 'core/site-logo',
+				'site-tagline.php'                 => 'core/site-tagline',
+				'site-title.php'                   => 'core/site-title',
+				// 'table-of-contents.php'          => 'core/table-of-contents',
+				'tag-cloud.php'                    => 'core/tag-cloud',
+				'template-part.php'                => 'core/template-part',
+				'term-description.php'             => 'core/term-description',
 			),
 		),
 		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
@@ -600,10 +605,9 @@ if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 		 * @param string $content When the callback is used for the render_block filter,
 		 *                        the content needs to be returned so the function parameter
 		 *                        is to ensure the content exists.
-		 *
-		 * @return string
+		 * @return string Block content.
 		 */
-		$callback = function( $content ) use ( $args ) {
+		$callback = static function( $content ) use ( $args ) {
 			// Register the stylesheet.
 			if ( ! empty( $args['src'] ) ) {
 				wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
@@ -618,7 +622,7 @@ if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 
 				// Add RTL stylesheet.
 				if ( file_exists( $rtl_file_path ) ) {
-					wp_style_add_data( $args['hanle'], 'rtl', 'replace' );
+					wp_style_add_data( $args['handle'], 'rtl', 'replace' );
 
 					if ( is_rtl() ) {
 						wp_style_add_data( $args['handle'], 'path', $rtl_file_path );
@@ -634,10 +638,42 @@ if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 
 		$hook = did_action( 'wp_enqueue_scripts' ) ? 'wp_footer' : 'wp_enqueue_scripts';
 		if ( wp_should_load_separate_core_block_assets() ) {
-			$hook = "render_block_$block_name";
+			/**
+			 * Callback function to register and enqueue styles.
+			 *
+			 * @param string $content The block content.
+			 * @param array  $block   The full block, including name and attributes.
+			 * @return string Block content.
+			 */
+			$callback_separate = static function( $content, $block ) use ( $block_name, $callback ) {
+				if ( ! empty( $block['blockName'] ) && $block_name === $block['blockName'] ) {
+					return $callback( $content );
+				}
+				return $content;
+			};
+
+			/*
+			 * The filter's callback here is an anonymous function because
+			 * using a named function in this case is not possible.
+			 *
+			 * The function cannot be unhooked, however, users are still able
+			 * to dequeue the stylesheets registered/enqueued by the callback
+			 * which is why in this case, using an anonymous function
+			 * was deemed acceptable.
+			 */
+			add_filter( 'render_block', $callback_separate, 10, 2 );
+			return;
 		}
 
-		// Enqueue assets in the frontend.
+		/*
+		 * The filter's callback here is an anonymous function because
+		 * using a named function in this case is not possible.
+		 *
+		 * The function cannot be unhooked, however, users are still able
+		 * to dequeue the stylesheets registered/enqueued by the callback
+		 * which is why in this case, using an anonymous function
+		 * was deemed acceptable.
+		 */
 		add_filter( $hook, $callback );
 
 		// Enqueue assets in the editor.

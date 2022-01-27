@@ -12,7 +12,7 @@ export default {
 	title: 'Components/TabPanel',
 	component: TabPanel,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

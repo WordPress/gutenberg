@@ -85,6 +85,56 @@ export const _default = () => {
 	);
 };
 
+export const WithNonToolsPanelItems = () => {
+	const [ height, setHeight ] = useState();
+	const [ width, setWidth ] = useState();
+
+	const resetAll = () => {
+		setHeight( undefined );
+		setWidth( undefined );
+	};
+
+	return (
+		<PanelWrapperView>
+			<Panel>
+				<ToolsPanel
+					label="ToolsPanel (with non-menu items)"
+					resetAll={ resetAll }
+				>
+					<IntroText>
+						This text illustrates not all items must be wrapped in a
+						ToolsPanelItem and represented in the panel menu.
+					</IntroText>
+					<SingleColumnItem
+						hasValue={ () => !! width }
+						label="Width"
+						onDeselect={ () => setWidth( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Width"
+							value={ width }
+							onChange={ ( next ) => setWidth( next ) }
+						/>
+					</SingleColumnItem>
+					<SingleColumnItem
+						hasValue={ () => !! height }
+						label="Height"
+						onDeselect={ () => setHeight( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Height"
+							value={ height }
+							onChange={ ( next ) => setHeight( next ) }
+						/>
+					</SingleColumnItem>
+				</ToolsPanel>
+			</Panel>
+		</PanelWrapperView>
+	);
+};
+
 export const WithOptionalItemsPlusIcon = () => {
 	const [ height, setHeight ] = useState();
 	const [ width, setWidth ] = useState();
@@ -399,6 +449,7 @@ export const WithConditionallyRenderedControl = () => {
 };
 
 export { TypographyPanel } from './typography-panel';
+export { ToolsPanelWithItemGroupSlot } from './tools-panel-with-item-group-slot';
 
 const PanelWrapperView = styled.div`
 	max-width: 280px;
@@ -411,4 +462,8 @@ const PanelWrapperView = styled.div`
 
 const SingleColumnItem = styled( ToolsPanelItem )`
 	grid-column: span 1;
+`;
+
+const IntroText = styled.div`
+	grid-column: span 2;
 `;

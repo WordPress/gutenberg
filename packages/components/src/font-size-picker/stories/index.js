@@ -17,7 +17,7 @@ export default {
 	title: 'Components/FontSizePicker',
 	component: FontSizePicker,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

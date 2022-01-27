@@ -196,7 +196,7 @@ describe( 'Post generator actions', () => {
 								'createSuccessNotice',
 								currentPostStatus === 'publish'
 									? 'Updated Post'
-									: 'Saved',
+									: 'Draft saved',
 								{
 									actions: [],
 									id: 'SAVE_POST_NOTICE_ID',

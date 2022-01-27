@@ -93,15 +93,29 @@ export function Button( props ) {
 		label,
 		shortcut,
 		tooltipPosition,
+		isActiveStyle,
+		customContainerStyles,
 	} = props;
 	const preferredColorScheme = usePreferredColorScheme();
 
 	const isDisabled = ariaDisabled || disabled;
 
+	const containerStyle = [
+		styles.container,
+		customContainerStyles && { ...customContainerStyles },
+	];
+
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.3 : 1,
 		...( fixedRatio && styles.fixedRatio ),
 		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
+		...( isPressed &&
+			isActiveStyle?.borderRadius && {
+				borderRadius: isActiveStyle.borderRadius,
+			} ),
+		...( isActiveStyle?.backgroundColor && {
+			backgroundColor: isActiveStyle.backgroundColor,
+		} ),
 	};
 
 	const states = [];
@@ -159,7 +173,7 @@ export function Button( props ) {
 			accessibilityHint={ hint }
 			onPress={ onClick }
 			onLongPress={ onLongPress }
-			style={ styles.container }
+			style={ containerStyle }
 			disabled={ isDisabled }
 			testID={ testID }
 		>

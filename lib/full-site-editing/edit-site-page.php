@@ -107,14 +107,6 @@ function gutenberg_edit_site_init( $hook ) {
 		}
 	);
 
-	/**
-	 * Make the WP Screen object aware that this is a block editor page.
-	 * Since custom blocks check whether the screen is_block_editor,
-	 * this is required for custom blocks to be loaded.
-	 * See wp_enqueue_registered_block_scripts_and_styles in wp-includes/script-loader.php
-	 */
-	$current_screen->is_block_editor( true );
-
 	$indexed_template_types = array();
 	foreach ( get_default_block_template_types() as $slug => $template_type ) {
 		$template_type['slug']    = (string) $slug;
@@ -141,7 +133,7 @@ function gutenberg_edit_site_init( $hook ) {
 
 	$site_editor_context     = new WP_Block_Editor_Context();
 	$settings                = gutenberg_get_block_editor_settings( $custom_settings, $site_editor_context );
-	$active_global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
+	$active_global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
 	$active_theme            = wp_get_theme()->get_stylesheet();
 	gutenberg_initialize_editor(
 		'edit_site_editor',

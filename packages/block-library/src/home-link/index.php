@@ -114,9 +114,9 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
 /**
  * Renders the `core/home-link` block.
  *
- * @param array $attributes The block attributes.
- * @param array $content    The saved content.
- * @param array $block      The parsed block.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The saved content.
+ * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the post content with the home url added.
  */

@@ -39,14 +39,14 @@ export default function Actions( { template } ) {
 				template.id
 			);
 
-			createSuccessNotice( __( 'Template reverted.' ), {
+			createSuccessNotice( __( 'Entity reverted.' ), {
 				type: 'snackbar',
 			} );
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while reverting the template.' );
+					: __( 'An error occurred while reverting the entity.' );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
@@ -68,18 +68,19 @@ export default function Actions( { template } ) {
 							/>
 							<MenuItem
 								isDestructive
+								isTertiary
 								onClick={ () => {
 									removeTemplate( template );
 									onClose();
 								} }
 							>
-								{ __( 'Delete template' ) }
+								{ __( 'Delete' ) }
 							</MenuItem>
 						</>
 					) }
 					{ isRevertable && (
 						<MenuItem
-							info={ __( 'Restore template to default state' ) }
+							info={ __( 'Restore to default state' ) }
 							onClick={ () => {
 								revertAndSaveTemplate();
 								onClose();

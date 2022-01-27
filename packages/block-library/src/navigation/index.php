@@ -343,6 +343,8 @@ function block_core_navigation_get_fallback_blocks() {
 	 * To customise the blocks provided return an array of blocks - these should be valid
 	 * children of the `core/navigation` block.
 	 *
+	 * @since 5.9.0
+	 *
 	 * @param array[] default fallback blocks provided by the default block mechanic.
 	 */
 	return apply_filters( 'block_core_navigation_render_fallback', $fallback_blocks );
@@ -351,9 +353,9 @@ function block_core_navigation_get_fallback_blocks() {
 /**
  * Renders the `core/navigation` block on server.
  *
- * @param array $attributes The block attributes.
- * @param array $content The saved content.
- * @param array $block The parsed block.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The saved content.
+ * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the post content with the legacy widget added.
  */
@@ -537,8 +539,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$is_hidden_by_default ? 'always-shown' : '',
 	);
 
+	$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
+	$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
+	$toggle_button_content     = $should_display_icon_label ? $toggle_button_icon : 'Menu';
+
 	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="modal-%1$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
+		'<button aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="modal-%1$s">%9$s</button>
 			<div class="%5$s" style="%7$s" id="modal-%1$s">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
@@ -549,14 +555,15 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 					</div>
 				</div>
 			</div>',
-		$modal_unique_id,
+		esc_attr( $modal_unique_id ),
 		$inner_blocks_html,
 		__( 'Open menu' ), // Open button label.
 		__( 'Close menu' ), // Close button label.
-		implode( ' ', $responsive_container_classes ),
-		implode( ' ', $open_button_classes ),
-		$colors['overlay_inline_styles'],
-		__( 'Menu' )
+		esc_attr( implode( ' ', $responsive_container_classes ) ),
+		esc_attr( implode( ' ', $open_button_classes ) ),
+		safecss_filter_attr( $colors['overlay_inline_styles'] ),
+		__( 'Menu' ),
+		$toggle_button_content
 	);
 
 	return sprintf(
@@ -569,8 +576,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 /**
  * Register the navigation block.
  *
- * @throws WP_Error An WP_Error exception parsing the block definition.
  * @uses render_block_core_navigation()
+ * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation() {
 	register_block_type_from_metadata(

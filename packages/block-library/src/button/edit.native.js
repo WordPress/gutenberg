@@ -171,7 +171,7 @@ function ButtonEdit( props ) {
 			label: __( 'Button Link URL' ),
 			placeholder: __( 'Add URL' ),
 			autoFocus: true,
-			autoFill: true,
+			autoFill: false,
 		},
 		openInNewTab: {
 			label: __( 'Open in new tab' ),

@@ -13,10 +13,10 @@
  */
 function gutenberg_add_active_global_styles_link( $response, $theme ) {
 	if ( $theme->get_stylesheet() === wp_get_theme()->get_stylesheet() ) {
-		// This creates a record for the current theme if not existant.
-		$id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
+		// This creates a record for the current theme if not existent.
+		$id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
 	} else {
-		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_custom_post_type( $theme );
+		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
 		$id       = isset( $user_cpt['ID'] ) ? $user_cpt['ID'] : null;
 	}
 

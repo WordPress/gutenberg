@@ -7,7 +7,7 @@ import { delay } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Dropdown, ToolbarButton, Picker } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -34,7 +34,7 @@ const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
 const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 	<ToolbarButton
-		title={ __( 'Add block' ) }
+		title={ _x( 'Add block', 'Generic label for block inserter button' ) }
 		icon={
 			<Icon
 				icon={ plusCircleFilled }

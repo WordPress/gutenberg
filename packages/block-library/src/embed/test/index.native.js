@@ -8,7 +8,8 @@ import {
 	waitFor,
 	within,
 } from 'test/helpers';
-import { Clipboard, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies
@@ -37,6 +38,16 @@ jest.mock( 'react-native-modal', () => {
 	const mockComponent = require( 'react-native/jest/mockComponent' );
 	return mockComponent( 'react-native-modal' );
 } );
+
+// Mock debounce to prevent potentially belated state updates.
+jest.mock( 'lodash', () => ( {
+	...jest.requireActual( 'lodash' ),
+	debounce: ( fn ) => {
+		fn.cancel = jest.fn();
+		return fn;
+	},
+} ) );
+
 const MODAL_DISMISS_EVENT = Platform.OS === 'ios' ? 'onDismiss' : 'onModalHide';
 
 // oEmbed response mocks
@@ -131,7 +142,7 @@ const mockEmbedResponses = ( mockedResponses ) => {
 };
 
 const insertEmbedBlock = async ( blockTitle = 'Embed' ) => {
-	const editor = await initializeEditor( {
+	const editor = initializeEditor( {
 		initialHtml: '',
 	} );
 	const { getByA11yLabel, getByText } = editor;
@@ -151,7 +162,7 @@ const insertEmbedBlock = async ( blockTitle = 'Embed' ) => {
 };
 
 const initializeWithEmbedBlock = async ( initialHtml, selectBlock = true ) => {
-	const editor = await initializeEditor( { initialHtml } );
+	const editor = initializeEditor( { initialHtml } );
 	const { getByA11yLabel } = editor;
 
 	const block = await waitFor( () =>
@@ -175,10 +186,10 @@ beforeAll( () => {
 } );
 
 beforeEach( () => {
-	// Invalidate embed preview resolutions
-	dispatch( coreStore ).invalidateResolutionForStoreSelector(
-		'getEmbedPreview'
-	);
+	// Invalidate all resolutions of core-data to prevent
+	// caching embed preview and theme supports requests.
+	dispatch( coreStore ).invalidateResolutionForStore();
+
 	// Mock embed responses
 	mockEmbedResponses( [
 		RICH_TEXT_EMBED_SUCCESS_RESPONSE,
@@ -236,7 +247,6 @@ describe( 'Embed block', () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
 			const {
-				getByA11yLabel,
 				getByPlaceholderText,
 				getByTestId,
 			} = await insertEmbedBlock();
@@ -254,12 +264,15 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for block settings button to be present
-			const settingsButton = await waitFor( () =>
-				getByA11yLabel( 'Open Settings' )
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings-modal' )
 			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
 
-			expect( settingsButton ).toBeDefined();
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
@@ -269,30 +282,31 @@ describe( 'Embed block', () => {
 			// Mock clipboard
 			Clipboard.getString.mockResolvedValue( clipboardURL );
 
-			const {
-				getByA11yLabel,
-				getByTestId,
-				getByText,
-			} = await insertEmbedBlock();
+			const { getByTestId, getByText } = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible
 			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
-			// Get embed link
-			const embedLink = await waitFor( () => getByText( clipboardURL ) );
+			// Get embed link with auto-pasted URL
+			const autopastedLinkField = await waitFor( () =>
+				getByText( clipboardURL )
+			);
 
 			// Dismiss the edit URL modal
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for block settings button to be present
-			const settingsButton = await waitFor( () =>
-				getByA11yLabel( 'Open Settings' )
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings-modal' )
 			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ clipboardURL }` );
 
-			expect( embedLink ).toBeDefined();
-			expect( settingsButton ).toBeDefined();
+			expect( autopastedLinkField ).toBeDefined();
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 
 			Clipboard.getString.mockReset();
@@ -323,7 +337,6 @@ describe( 'Embed block', () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
 			const {
-				getByA11yLabel,
 				getByPlaceholderText,
 				getByTestId,
 				getByText,
@@ -345,12 +358,15 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for block settings button to be present
-			const settingsButton = await waitFor( () =>
-				getByA11yLabel( 'Open Settings' )
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings-modal' )
 			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
 
-			expect( settingsButton ).toBeDefined();
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
@@ -360,11 +376,9 @@ describe( 'Embed block', () => {
 			// Mock clipboard
 			Clipboard.getString.mockResolvedValue( clipboardURL );
 
-			const {
-				getByA11yLabel,
-				getByTestId,
-				getByText,
-			} = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
+			const { getByTestId, getByText } = await initializeWithEmbedBlock(
+				EMPTY_EMBED_HTML
+			);
 
 			// Edit URL
 			fireEvent.press( getByText( 'ADD LINK' ) );
@@ -380,13 +394,16 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for block settings button to be present
-			const settingsButton = await waitFor( () =>
-				getByA11yLabel( 'Open Settings' )
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings-modal' )
 			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ clipboardURL }` );
 
 			expect( embedLink ).toBeDefined();
-			expect( settingsButton ).toBeDefined();
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 
 			Clipboard.getString.mockReset();
@@ -400,18 +417,18 @@ describe( 'Embed block', () => {
 				getByTestId,
 			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
-			// Edit URL
+			// Open Block Settings
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Edit URL' ) )
+				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
-			// Wait for edit URL modal to be visible
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			// Wait for Block Settings to be visible
+			const blockSettingsModal = getByTestId( 'block-settings-modal' );
+			await waitFor( () => blockSettingsModal.props.isVisible );
 
-			// Dismiss the edit URL modal
-			fireEvent( embedEditURLModal, 'backdropPress' );
-			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+			// Dismiss the Block Settings modal
+			fireEvent( blockSettingsModal, 'backdropPress' );
+			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
@@ -426,18 +443,20 @@ describe( 'Embed block', () => {
 				getByTestId,
 			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
-			// Edit URL
+			// Open Block Settings
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Edit URL' ) )
+				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
-			// Wait for edit URL modal to be visible
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			// Wait for Block Settings to be visible
+			const blockSettingsModal = getByTestId( 'block-settings-modal' );
+			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link
 			fireEvent.press(
-				getByA11yLabel( `Twitter link, ${ initialURL }` )
+				within( blockSettingsModal ).getByA11yLabel(
+					`Twitter link, ${ initialURL }`
+				)
 			);
 
 			// Replace URL
@@ -445,13 +464,15 @@ describe( 'Embed block', () => {
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, expectedURL );
 
-			// Dismiss the edit URL modal
-			fireEvent( embedEditURLModal, 'backdropPress' );
-			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+			// Dismiss the Block Settings modal
+			fireEvent( blockSettingsModal, 'backdropPress' );
+			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
 			// Get YouTube link field
 			const youtubeLinkField = await waitFor( () =>
-				getByA11yLabel( `YouTube link, ${ expectedURL }` )
+				within( blockSettingsModal ).getByA11yLabel(
+					`YouTube link, ${ expectedURL }`
+				)
 			);
 
 			expect( youtubeLinkField ).toBeDefined();
@@ -469,18 +490,20 @@ describe( 'Embed block', () => {
 				getByText,
 			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
-			// Edit URL
+			// Open Block Settings
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Edit URL' ) )
+				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
-			// Wait for edit URL modal to be visible
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			// Wait for Block Settings to be visible
+			const blockSettingsModal = getByTestId( 'block-settings-modal' );
+			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link
 			fireEvent.press(
-				getByA11yLabel( `Twitter link, ${ previousURL }` )
+				within( blockSettingsModal ).getByA11yLabel(
+					`Twitter link, ${ previousURL }`
+				)
 			);
 
 			// Replace URL
@@ -488,15 +511,58 @@ describe( 'Embed block', () => {
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, invalidURL );
 
-			// Dismiss the edit URL modal
-			fireEvent( embedEditURLModal, 'backdropPress' );
-			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+			// Dismiss the Block Settings modal
+			fireEvent( blockSettingsModal, 'backdropPress' );
+			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
 			const errorNotice = await waitFor( () =>
 				getByText( 'Invalid URL. Please enter a valid URL.' )
 			);
 
 			expect( errorNotice ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'sets empty state when setting an empty URL', async () => {
+			const previousURL = 'https://twitter.com/notnownikki';
+
+			const {
+				getByA11yLabel,
+				getByDisplayValue,
+				getByTestId,
+				getByPlaceholderText,
+			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+
+			// Open Block Settings
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+			);
+
+			// Get Block Settings modal
+			const blockSettingsModal = getByTestId( 'block-settings-modal' );
+
+			// Start editing link
+			fireEvent.press(
+				within( blockSettingsModal ).getByA11yLabel(
+					`Twitter link, ${ previousURL }`
+				)
+			);
+
+			// Replace URL with empty value
+			const linkTextInput = getByDisplayValue( previousURL );
+			fireEvent( linkTextInput, 'focus' );
+			fireEvent.changeText( linkTextInput, '' );
+
+			// Dismiss the Block Settings modal
+			fireEvent( blockSettingsModal, 'backdropPress' );
+			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
+
+			// Get empty embed link
+			const emptyLinkTextInput = await waitFor( () =>
+				getByPlaceholderText( 'Add link' )
+			);
+
+			expect( emptyLinkTextInput ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
@@ -549,7 +615,7 @@ describe( 'Embed block', () => {
 			} = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible
-			let embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
 			// Set an bad URL
@@ -561,30 +627,36 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Edit URL
+			// Open Block Settings
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Edit URL' ) )
+				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
-			// Wait for edit URL modal to be visible
-			embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			// Wait for Block Settings to be visible
+			const blockSettingsModal = getByTestId( 'block-settings-modal' );
+			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link
-			fireEvent.press( getByA11yLabel( `Embed link, ${ badURL }` ) );
+			fireEvent.press(
+				within( blockSettingsModal ).getByA11yLabel(
+					`Embed link, ${ badURL }`
+				)
+			);
 
 			// Replace URL
 			linkTextInput = getByDisplayValue( badURL );
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, expectedURL );
 
-			// Dismiss the edit URL modal
-			fireEvent( embedEditURLModal, 'backdropPress' );
-			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+			// Dismiss the Block Settings modal
+			fireEvent( blockSettingsModal, 'backdropPress' );
+			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
 			// Get Twitter link field
 			const twitterLinkField = await waitFor( () =>
-				getByA11yLabel( `Twitter link, ${ expectedURL }` )
+				within( blockSettingsModal ).getByA11yLabel(
+					`Twitter link, ${ expectedURL }`
+				)
 			);
 
 			expect( twitterLinkField ).toBeDefined();
@@ -623,6 +695,8 @@ describe( 'Embed block', () => {
 
 	describe( 'retry', () => {
 		it( 'retries loading the preview if initial request failed', async () => {
+			const expectedURL = 'https://twitter.com/notnownikki';
+
 			// Return bad response for the first request to oembed endpoint
 			// and success response for the rest of requests.
 			let isFirstEmbedRequest = true;
@@ -640,23 +714,26 @@ describe( 'Embed block', () => {
 				return Promise.resolve( response );
 			} );
 
-			const {
-				getByA11yLabel,
-				getByText,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const { getByTestId, getByText } = await initializeWithEmbedBlock(
+				RICH_TEXT_EMBED_HTML
+			);
 
 			// Retry request
 			fireEvent.press( getByText( 'More options' ) );
 			fireEvent.press( getByText( 'Retry' ) );
 
-			// Wait for edit URL button to be present
-			const editURLButton = await waitFor( () =>
-				getByA11yLabel( 'Edit URL' )
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings-modal' )
 			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
 
-			expect( editURLButton ).toBeDefined();
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
+
 		it( 'converts to link if preview request failed', async () => {
 			// Return bad response for requests to oembed endpoint.
 			fetchRequest.mockImplementation( ( { path } ) => {
@@ -681,6 +758,61 @@ describe( 'Embed block', () => {
 			);
 
 			expect( paragraphBlock ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'allows editing link if request failed', async () => {
+			const failURL = 'https://wordpress.org/news/2021/07/tatum/';
+			const successURL = 'https://twitter.com/notnownikki';
+
+			// Return bad response for WordPress URL and success for Twitter URL.
+			fetchRequest.mockImplementation( ( { path } ) => {
+				const matchesPath = ( url ) =>
+					path ===
+					`/oembed/1.0/proxy?url=${ encodeURIComponent( url ) }`;
+
+				let response = {};
+				if ( matchesPath( failURL ) ) {
+					response = MOCK_BAD_WORDPRESS_RESPONSE;
+				} else if ( matchesPath( successURL ) ) {
+					response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+				}
+
+				return Promise.resolve( response );
+			} );
+
+			const {
+				getByA11yLabel,
+				getByText,
+				getByTestId,
+				getByDisplayValue,
+			} = await initializeWithEmbedBlock( WP_EMBED_HTML );
+
+			fireEvent.press( getByText( 'More options' ) );
+			fireEvent.press( getByText( 'Edit link' ) );
+
+			// Start editing link
+			fireEvent.press( getByA11yLabel( `WordPress link, ${ failURL }` ) );
+
+			// Set an URL
+			const linkTextInput = getByDisplayValue( failURL );
+			fireEvent( linkTextInput, 'focus' );
+			fireEvent.changeText( linkTextInput, successURL );
+
+			// Dismiss the edit URL modal
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings-modal' )
+			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ successURL }` );
+
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 	} );
@@ -739,7 +871,7 @@ describe( 'Embed block', () => {
 				getByPlaceholderText,
 				getByTestId,
 				getByText,
-			} = await initializeEditor( {
+			} = initializeEditor( {
 				initialHtml: EMPTY_PARAGRAPH_HTML,
 			} );
 
@@ -782,7 +914,7 @@ describe( 'Embed block', () => {
 				getByPlaceholderText,
 				getByTestId,
 				getByText,
-			} = await initializeEditor( {
+			} = initializeEditor( {
 				initialHtml: EMPTY_PARAGRAPH_HTML,
 			} );
 
@@ -827,7 +959,7 @@ describe( 'Embed block', () => {
 				getByPlaceholderText,
 				getByA11yLabel,
 				getByText,
-			} = await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
+			} = initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
 
 			const paragraphText = getByPlaceholderText( 'Start writing…' );
 			fireEvent( paragraphText, 'focus' );
@@ -869,7 +1001,7 @@ describe( 'Embed block', () => {
 					getByPlaceholderText,
 					getByA11yLabel,
 					getByText,
-				} = await initializeEditor( {
+				} = initializeEditor( {
 					initialHtml: EMPTY_PARAGRAPH_HTML,
 				} );
 
@@ -960,10 +1092,12 @@ describe( 'Embed block', () => {
 				getByText,
 			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
+			// Open Block Settings
 			fireEvent.press(
 				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
+			// Untoggle resize for smaller devices
 			fireEvent.press(
 				await waitFor( () => getByText( /Resize for smaller devices/ ) )
 			);
@@ -971,21 +1105,28 @@ describe( 'Embed block', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
-		it( 'does not show settings button if responsive is not supported', async () => {
-			const { getByA11yLabel } = await initializeWithEmbedBlock(
-				WP_EMBED_HTML
+		it( 'does not show media settings panel if responsive is not supported', async () => {
+			const {
+				getByA11yLabel,
+				getByText,
+			} = await initializeWithEmbedBlock( WP_EMBED_HTML );
+
+			// Open Block Settings
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
-			let settingsButton;
+			// Wait for media settings panel
+			let mediaSettingsPanel;
 			try {
-				settingsButton = await waitFor( () =>
-					getByA11yLabel( 'Open Settings' )
+				mediaSettingsPanel = await waitFor( () =>
+					getByText( 'Media settings' )
 				);
 			} catch ( e ) {
 				// NOOP
 			}
 
-			expect( settingsButton ).not.toBeDefined();
+			expect( mediaSettingsPanel ).not.toBeDefined();
 		} );
 	} );
 } );

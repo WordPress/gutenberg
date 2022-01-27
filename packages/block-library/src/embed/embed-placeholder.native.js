@@ -27,6 +27,7 @@ const EmbedPlaceholder = ( {
 	cannotEmbed,
 	fallback,
 	tryAgain,
+	openEmbedLinkSettings,
 } ) => {
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles.embed__container,
@@ -59,11 +60,18 @@ const EmbedPlaceholder = ( {
 			value: 'convertToLinkOption',
 			onSelect: fallback,
 		},
+		editLink: {
+			id: 'editLinkOption',
+			label: __( 'Edit link' ),
+			value: 'editLinkOption',
+			onSelect: openEmbedLinkSettings,
+		},
 	};
 
 	const options = compact( [
 		cannotEmbed && errorPickerOptions.retry,
 		cannotEmbed && errorPickerOptions.convertToLink,
+		cannotEmbed && errorPickerOptions.editLink,
 	] );
 
 	function onPickerSelect( value ) {

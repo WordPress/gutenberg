@@ -17,7 +17,7 @@ export default {
 	title: 'Components/InputControl',
 	component: InputControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 
@@ -44,6 +44,7 @@ function Example() {
 			{
 				default: 'default',
 				small: 'small',
+				'__unstable-large': '__unstable-large',
 			},
 			'default'
 		),

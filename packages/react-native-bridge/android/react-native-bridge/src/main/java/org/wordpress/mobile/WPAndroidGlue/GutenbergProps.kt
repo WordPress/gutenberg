@@ -1,10 +1,13 @@
 package org.wordpress.mobile.WPAndroidGlue
 
 import android.os.Bundle
+import androidx.annotation.VisibleForTesting
+import java.util.Locale
 
 data class GutenbergProps @JvmOverloads constructor(
     val enableContactInfoBlock: Boolean,
     val enableLayoutGridBlock: Boolean,
+    val enableTiledGalleryBlock: Boolean,
     val enableFacebookEmbed: Boolean,
     val enableInstagramEmbed: Boolean,
     val enableLoomEmbed: Boolean,
@@ -28,7 +31,7 @@ data class GutenbergProps @JvmOverloads constructor(
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
         putString(PROP_INITIAL_DATA, "")
         putString(PROP_INITIAL_TITLE, "")
-        putString(PROP_LOCALE, localeSlug)
+        putString(PROP_LOCALE, revertDeprecatedLanguageCode(localeSlug))
         putString(PROP_POST_TYPE, postType)
         putInt(PROP_INITIAL_FEATURED_IMAGE_ID, featuredImageId)
         putBundle(PROP_TRANSLATIONS, translations)
@@ -55,6 +58,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_XPOSTS, enableXPosts)
         putBoolean(PROP_CAPABILITIES_CONTACT_INFO_BLOCK, enableContactInfoBlock)
         putBoolean(PROP_CAPABILITIES_LAYOUT_GRID_BLOCK, enableLayoutGridBlock)
+        putBoolean(PROP_CAPABILITIES_TILED_GALLERY_BLOCK, enableTiledGalleryBlock)
         putBoolean(PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK, enableMediaFilesCollectionBlocks)
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
@@ -79,7 +83,6 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled"
         private const val PROP_POST_TYPE = "postType"
         private const val PROP_INITIAL_FEATURED_IMAGE_ID = "featuredImageId"
-        private const val PROP_LOCALE = "locale"
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
         private const val PROP_GRADIENTS = "gradients"
@@ -88,9 +91,11 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_IS_FSE_THEME = "isFSETheme"
         private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
 
+        const val PROP_LOCALE = "locale"
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
         const val PROP_CAPABILITIES_LAYOUT_GRID_BLOCK = "layoutGridBlock"
+        const val PROP_CAPABILITIES_TILED_GALLERY_BLOCK = "tiledGalleryBlock"
         const val PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK = "facebookEmbed"
         const val PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK = "instagramEmbed"
         const val PROP_CAPABILITIES_LOOM_EMBED_BLOCK = "loomEmbed"
@@ -102,5 +107,16 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
         const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
+
+        /**
+         * Android converts some new language codes to older, deprecated ones, to preserve
+         * backward compatibility. Gutenberg, however, uses the new language codes, so this
+         * function uses Locale::toLanguageTag to convert back to the "new" codes that Gutenberg
+         * requires.
+         * See https://developer.android.com/reference/java/util/Locale#legacy-language-codes
+         */
+        @VisibleForTesting
+        fun revertDeprecatedLanguageCode(localeSlug: String): String =
+                Locale.forLanguageTag(localeSlug).toLanguageTag()
     }
 }

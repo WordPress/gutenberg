@@ -13,6 +13,7 @@ import {
 	getAvailableBlockTransforms,
 	activatePlugin,
 	deactivatePlugin,
+	createReusableBlock,
 } from '@wordpress/e2e-test-utils';
 
 async function insertBlocksOfSameType() {
@@ -122,24 +123,7 @@ describe( 'Block Grouping', () => {
 			};
 
 			const paragraphText = 'hi';
-			const reusableBlockNameInputSelector =
-				'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( paragraphText );
-
-			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Add to Reusable blocks' );
-			const nameInput = await page.waitForSelector(
-				reusableBlockNameInputSelector
-			);
-			await nameInput.click();
-			await page.keyboard.type( 'Block' );
-			await page.keyboard.press( 'Enter' );
-
-			// Wait for creation to finish
-			await page.waitForXPath(
-				'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block created."]'
-			);
+			await createReusableBlock( paragraphText, 'Block' );
 			// Group
 			await clickBlockToolbarButton( 'Options' );
 			await clickMenuItem( 'Group' );

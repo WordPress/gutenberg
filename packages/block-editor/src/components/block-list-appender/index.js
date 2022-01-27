@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { last } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -18,7 +17,6 @@ import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
 
 function BlockListAppender( {
-	blockClientIds,
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
@@ -36,30 +34,18 @@ function BlockListAppender( {
 		// Prefer custom render prop if provided.
 		appender = <CustomAppender />;
 	} else {
-		const isDocumentAppender = ! rootClientId;
-		const isParentSelected = selectedBlockClientId === rootClientId;
-		const isAnotherDefaultAppenderAlreadyDisplayed =
-			selectedBlockClientId &&
-			! blockClientIds.includes( selectedBlockClientId );
+		const isParentSelected =
+			selectedBlockClientId === rootClientId ||
+			( ! rootClientId && ! selectedBlockClientId );
 
-		if (
-			! isDocumentAppender &&
-			! isParentSelected &&
-			( ! selectedBlockClientId ||
-				isAnotherDefaultAppenderAlreadyDisplayed )
-		) {
+		if ( ! isParentSelected ) {
 			return null;
 		}
 
 		if ( canInsertDefaultBlock ) {
 			// Render the default block appender when renderAppender has not been
 			// provided and the context supports use of the default appender.
-			appender = (
-				<DefaultBlockAppender
-					rootClientId={ rootClientId }
-					lastBlockClientId={ last( blockClientIds ) }
-				/>
-			);
+			appender = <DefaultBlockAppender rootClientId={ rootClientId } />;
 		} else {
 			// Fallback in the case no renderAppender has been provided and the
 			// default block can't be inserted.
@@ -103,7 +89,6 @@ function BlockListAppender( {
 
 export default withSelect( ( select, { rootClientId } ) => {
 	const {
-		getBlockOrder,
 		canInsertBlockType,
 		getTemplateLock,
 		getSelectedBlockClientId,
@@ -111,7 +96,6 @@ export default withSelect( ( select, { rootClientId } ) => {
 
 	return {
 		isLocked: !! getTemplateLock( rootClientId ),
-		blockClientIds: getBlockOrder( rootClientId ),
 		canInsertDefaultBlock: canInsertBlockType(
 			getDefaultBlockName(),
 			rootClientId

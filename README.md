@@ -51,7 +51,7 @@ As with all WordPress projects, we want to ensure a welcoming environment for ev
 
 You can join us in the `#core-editor` channel in Slack, see the [WordPress Slack page](https://make.wordpress.org/chat/) for signup information; it is free to join.
 
-**Weekly meetings** The Editor Team meets weekly on Wednesdays at 14:00 UTC in Slack. If you can not join the meeting, agenda and notes are posted to the [Make WordPress Blog](https://make.wordpress.org/core/).
+**Weekly meetings** The Editor Team meets weekly on Wednesdays at 14:00 UTC in Slack. If you can not join the meeting, [agenda](https://make.wordpress.org/core/tag/core-editor-agenda/) and [notes](https://make.wordpress.org/core/tag/core-editor-summary/) are posted to the [Make WordPress Blog](https://make.wordpress.org/core/).
 
 ## License
 

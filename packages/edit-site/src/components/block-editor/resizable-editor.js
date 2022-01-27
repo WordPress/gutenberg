@@ -177,6 +177,7 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 						) }
 					</>
 				}
+				assets={ settings.__unstableResolvedAssets }
 				ref={ ref }
 				name="editor-canvas"
 				className="edit-site-visual-editor__editor-canvas"

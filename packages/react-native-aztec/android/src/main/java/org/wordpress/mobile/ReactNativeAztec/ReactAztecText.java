@@ -93,6 +93,7 @@ public class ReactAztecText extends AztecText {
             put(AztecTextFormat.FORMAT_CITE, "italic");
             put(AztecTextFormat.FORMAT_STRIKETHROUGH, "strikethrough");
             put(AztecTextFormat.FORMAT_UNDERLINE, "underline");
+            put(AztecTextFormat.FORMAT_MARK, "mark");
         }
     };
 
@@ -327,6 +328,9 @@ public class ReactAztecText extends AztecText {
             if (currentStyle == AztecTextFormat.FORMAT_STRIKETHROUGH) {
                 formattingOptions.add("strikethrough");
             }
+            if (currentStyle == AztecTextFormat.FORMAT_MARK) {
+                formattingOptions.add("mark");
+            }
         }
 
         // Check if the same formatting event was already sent
@@ -535,6 +539,8 @@ public class ReactAztecText extends AztecText {
                     break;
                 case "underline":
                     newFormatsSet.add(AztecTextFormat.FORMAT_UNDERLINE);
+                case "mark":
+                    newFormatsSet.add(AztecTextFormat.FORMAT_MARK);
                     break;
             }
         }

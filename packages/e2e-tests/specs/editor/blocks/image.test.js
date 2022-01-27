@@ -345,8 +345,7 @@ describe( 'Image', () => {
 
 		// Clear the input field. Delay added to account for typing delays.
 		const inputField = await page.$( '.block-editor-url-input__input' );
-		await inputField.click( { clickCount: 3, delay: 100 } );
-		await page.keyboard.press( 'Backspace', { delay: 100 } );
+		await inputField.click( { clickCount: 3, delay: 200 } );
 
 		// Replace the url. Delay added to account for typing delays.
 		await page.focus( '.block-editor-url-input__input' );

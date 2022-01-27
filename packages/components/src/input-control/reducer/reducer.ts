@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { isEmpty } from 'lodash';
-// eslint-disable-next-line no-restricted-imports
 import type { SyntheticEvent } from 'react';
 
 /**

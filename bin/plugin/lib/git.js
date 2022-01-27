@@ -10,7 +10,7 @@ const SimpleGit = require( 'simple-git' );
 const { getRandomTemporaryPath } = require( './utils' );
 
 /**
- * Clones a Github repository.
+ * Clones a GitHub repository.
  *
  * @param {string} repositoryUrl
  *

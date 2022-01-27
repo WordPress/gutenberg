@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Add the optional `externalizedReportFile` option ([#35106](https://github.com/WordPress/gutenberg/pull/35106)).
+
 ## 3.0.0 (2021-01-21)
 
 ### Breaking Changes

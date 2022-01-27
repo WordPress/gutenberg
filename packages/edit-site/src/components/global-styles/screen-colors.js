@@ -15,7 +15,7 @@ import {
  */
 import ScreenHeader from './header';
 import Palette from './palette';
-import NavigationButton from './navigation-button';
+import { NavigationButton } from './navigation-button';
 import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
 import Subtitle from './subtitle';
 
@@ -93,10 +93,9 @@ function ScreenColors( { name } ) {
 	return (
 		<>
 			<ScreenHeader
-				back={ parentMenu ? parentMenu : '/' }
 				title={ __( 'Colors' ) }
 				description={ __(
-					'Manage palettes and the default color of different global elements on the website.'
+					'Manage palettes and the default color of different global elements on the site.'
 				) }
 			/>
 

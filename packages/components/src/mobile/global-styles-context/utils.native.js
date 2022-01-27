@@ -162,7 +162,7 @@ export function getBlockTypography(
 		}
 	}
 
-	if ( blockStyleAttributes?.fontSize ) {
+	if ( blockStyleAttributes?.fontSize && baseGlobalStyles ) {
 		const mappedFontSize = find( fontSizes, {
 			slug: blockStyleAttributes?.fontSize,
 		} );

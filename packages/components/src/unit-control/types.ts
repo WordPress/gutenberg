@@ -1,18 +1,20 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { SyntheticEvent } from 'react';
 
 /**
  * Internal dependencies
  */
 import type { StateReducer } from '../input-control/reducer/state';
-import type { InputChangeCallback } from '../input-control/types';
+import type {
+	InputChangeCallback,
+	Size as InputSize,
+} from '../input-control/types';
 
 export type Value = number | string;
 
-export type SelectSize = 'default' | 'small';
+export type SelectSize = InputSize;
 
 export type WPUnitControlUnit = {
 	/**

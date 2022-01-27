@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The peer `jest` dependency has been updated from requiring `>=26` to requiring `>=27` (see [Breaking Changes](https://jestjs.io/blog/2021/05/25/jest-27), [#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+
+### Bug Fixes
+
+-   Allow ESLint to be imported from within Jest (e.g. when using `ruleTester`) ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   Improve support for test files with `.jsx` and `.tsx` extensions ([#36260](https://github.com/WordPress/gutenberg/pull/36260)).
+
 ## 7.1.2 (2021-10-22)
 
 ### Bug Fix

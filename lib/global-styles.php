@@ -6,25 +6,6 @@
  */
 
 /**
- * Fetches the preferences for each origin (core, theme, user)
- * and enqueues the resulting stylesheet.
- */
-function gutenberg_experimental_global_styles_enqueue_assets() {
-	$stylesheet = wp_get_global_stylesheet();
-	if ( empty( $stylesheet ) ) {
-		return;
-	}
-
-	if ( isset( wp_styles()->registered['global-styles'] ) ) {
-		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
-	} else {
-		wp_register_style( 'global-styles', false, array(), true, true );
-		wp_add_inline_style( 'global-styles', $stylesheet );
-		wp_enqueue_style( 'global-styles' );
-	}
-}
-
-/**
  * Adds the necessary settings for the Global Styles client UI.
  *
  * @param array $settings Existing block editor settings.
@@ -98,7 +79,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			}
 		}
 
-		$settings['styles'] = array_merge( $styles_without_existing_global_styles, $new_global_styles );
+		$settings['styles'] = array_merge( $new_global_styles, $styles_without_existing_global_styles );
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
@@ -191,7 +172,6 @@ function gutenberg_global_styles_filter_post( $content ) {
  */
 function gutenberg_global_styles_kses_init_filters() {
 	add_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
-	add_filter( 'safe_style_css', 'gutenberg_global_styles_include_support_for_duotone', 10, 2 );
 }
 
 /**
@@ -231,6 +211,8 @@ function gutenberg_global_styles_force_filtered_html_on_import_filter( $arg ) {
 	return $arg;
 }
 
+// TODO: Remove this filter when minimum supported version is WP 5.8
+// As all this code is not needed anymore now core supports all variables.
 /**
  * This filter is the last being executed on force_filtered_html_on_import.
  * If the input of the filter is true it means we are in an import situation and should
@@ -263,28 +245,6 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
 }
 
-/**
- * This is for using kses to test user data.
- *
- * @param array $atts Allowed CSS property names, according to kses.
- *
- * @return array The new allowed CSS property names.
- */
-function gutenberg_global_styles_include_support_for_duotone( $atts ) {
-	$atts[] = 'filter';
-	return $atts;
-}
-
-/**
- * Function to enqueue the CSS Custom Properties
- * coming from theme.json.
- */
-function gutenberg_load_css_custom_properties() {
-	wp_register_style( 'global-styles-css-custom-properties', false, array(), true, true );
-	wp_add_inline_style( 'global-styles-css-custom-properties', wp_get_global_stylesheet( array( 'variables' ) ) );
-	wp_enqueue_style( 'global-styles-css-custom-properties' );
-}
-
 // The else clause can be removed when plugin support requires WordPress 5.8.0+.
 if ( function_exists( 'get_block_editor_settings' ) ) {
 	add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
@@ -292,13 +252,9 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 }
 
-add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-
 // kses actions&filters.
 add_action( 'init', 'gutenberg_global_styles_kses_init' );
 add_action( 'set_current_user', 'gutenberg_global_styles_kses_init' );
 add_filter( 'force_filtered_html_on_import', 'gutenberg_global_styles_force_filtered_html_on_import_filter', 999 );
 add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_global_styles_include_support_for_wp_variables', 10, 2 );
 // This filter needs to be executed last.
-
-add_filter( 'enqueue_block_editor_assets', 'gutenberg_load_css_custom_properties' );

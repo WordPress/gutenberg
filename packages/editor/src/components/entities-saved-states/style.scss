@@ -41,18 +41,6 @@
 		padding-right: $grid-unit-10;
 		height: $header-height + $border-width;
 		border-bottom: $border-width solid $gray-300;
-		display: flex;
-		align-items: center;
-		align-content: space-between;
-
-		.editor-entities-saved-states__save-button {
-			margin: auto;
-		}
-
-		.components-button.has-icon {
-			position: absolute;
-			right: $grid-unit-10;
-		}
 	}
 
 	.entities-saved-states__text-prompt {
