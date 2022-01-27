@@ -60,6 +60,7 @@ import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
+import * as postAuthorAvatar from './post-author-avatar';
 import * as postAuthorName from './post-author-name';
 import * as postAuthorBiography from './post-author-biography';
 import * as postComment from './post-comment';
@@ -208,6 +209,7 @@ export const __experimentalGetCoreBlocks = () => [
 	termDescription,
 	queryTitle,
 	postAuthorBiography,
+	postAuthorAvatar,
 ];
 
 /**
