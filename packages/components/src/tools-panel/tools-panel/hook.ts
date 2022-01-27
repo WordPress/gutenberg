@@ -49,7 +49,7 @@ const generateMenuItems = ( {
 };
 
 const isMenuItemTypeEmpty = (
-	obj: ToolsPanelMenuItems[ ToolsPanelMenuItemKey ]
+	obj?: ToolsPanelMenuItems[ ToolsPanelMenuItemKey ]
 ) => obj && Object.keys( obj ).length === 0;
 
 export function useToolsPanel(
