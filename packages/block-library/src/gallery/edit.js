@@ -155,6 +155,14 @@ function GalleryEdit( props ) {
 				align: undefined,
 			} );
 		} );
+
+		// If new blocks added select the first of these so they scroll into view.
+		if ( newImages?.length ) {
+			multiSelect(
+				newImages[ 0 ].clientId,
+				newImages[ newImages?.length - 1 ].clientId
+			);
+		}
 	}, [ newImages ] );
 
 	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
@@ -296,14 +304,6 @@ function GalleryEdit( props ) {
 					newOrderMap[ b.attributes.id ]
 			)
 		);
-
-		// If new blocks added select the first of these so they scroll into view.
-		if ( newBlocks?.length && existingImageBlocks?.length ) {
-			multiSelect(
-				newBlocks[ 0 ].clientId,
-				newBlocks[ newBlocks.length - 1 ].clientId
-			);
-		}
 	}
 
 	function onUploadError( message ) {
