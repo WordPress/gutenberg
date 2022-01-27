@@ -7,7 +7,7 @@ import { useSelect, useQuerySelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as coreStore } from '../';
-import { IDLE, READY, RESOLVING } from './constants';
+import { IDLE, SUCCESS, RESOLVING } from './constants';
 
 export default function useEntityRecord( kind, type, id ) {
 	const {
@@ -22,7 +22,7 @@ export default function useEntityRecord( kind, type, id ) {
 	if ( isResolving ) {
 		status = RESOLVING;
 	} else if ( isResolved || data ) {
-		status = READY;
+		status = SUCCESS;
 	} else {
 		status = IDLE;
 	}
