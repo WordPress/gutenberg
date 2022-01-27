@@ -122,29 +122,23 @@ export default function NavigationPlaceholder( {
 		onFinish( navigationMenu, blocks );
 	};
 
-	const {
-		isResolvingPages,
-		menus,
-		isResolvingMenus,
-		menuItems,
-		hasResolvedMenuItems,
-		hasPages,
-		hasMenus,
-	} = useNavigationEntities( selectedMenu );
+	const { menus, pages, menuItems } = useNavigationEntities( selectedMenu );
 
-	const isStillLoading = isResolvingPages || isResolvingMenus;
+	const isStillLoading = pages.isResolving || menus.isResolving;
 
 	const createFromMenu = useCallback(
 		( name ) => {
-			const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
+			const { innerBlocks: blocks } = menuItemsToBlocks(
+				menuItems.records
+			);
 			onFinishMenuCreation( blocks, name );
 		},
-		[ menuItems, menuItemsToBlocks, onFinish ]
+		[ menuItems.records, menuItemsToBlocks, onFinish ]
 	);
 
 	const onCreateFromMenu = ( name ) => {
 		// If we have menu items, create the block right away.
-		if ( hasResolvedMenuItems ) {
+		if ( menuItems.hasResolved ) {
 			createFromMenu( name );
 			return;
 		}
@@ -167,11 +161,11 @@ export default function NavigationPlaceholder( {
 	useEffect( () => {
 		// If the user selected a menu but we had to wait for menu items to
 		// finish resolving, then create the block once resolution finishes.
-		if ( isCreatingFromMenu && hasResolvedMenuItems ) {
+		if ( isCreatingFromMenu && menuItems.hasResolved ) {
 			createFromMenu( menuName );
 			setIsCreatingFromMenu( false );
 		}
-	}, [ isCreatingFromMenu, hasResolvedMenuItems, menuName ] );
+	}, [ isCreatingFromMenu, menuItems.hasResolved, menuName ] );
 
 	const { navigationMenus } = useNavigationMenu();
 
@@ -179,7 +173,7 @@ export default function NavigationPlaceholder( {
 
 	const showSelectMenus =
 		( canSwitchNavigationMenu || canUserCreateNavigation ) &&
-		( hasNavigationMenus || hasMenus );
+		( hasNavigationMenus || menus.hasRecords );
 
 	return (
 		<>
@@ -207,7 +201,7 @@ export default function NavigationPlaceholder( {
 										navigationMenus={ navigationMenus }
 										setSelectedMenu={ setSelectedMenu }
 										onFinish={ onFinish }
-										menus={ menus }
+										menus={ menus.records }
 										onCreateFromMenu={ onCreateFromMenu }
 										showClassicMenus={
 											canUserCreateNavigation
@@ -216,7 +210,7 @@ export default function NavigationPlaceholder( {
 									<hr />
 								</>
 							) : undefined }
-							{ canUserCreateNavigation && hasPages ? (
+							{ canUserCreateNavigation && pages.hasRecords ? (
 								<>
 									<Button
 										variant="tertiary"
