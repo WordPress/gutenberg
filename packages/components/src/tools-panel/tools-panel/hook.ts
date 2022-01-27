@@ -191,7 +191,7 @@ export function useToolsPanel(
 			hasInnerWrapper &&
 			styles.ToolsPanelWithInnerWrapper( DEFAULT_COLUMNS );
 		const emptyStyle =
-			! isMenuItemTypeEmpty( menuItems?.default ) &&
+			isMenuItemTypeEmpty( menuItems?.default ) &&
 			areAllOptionalControlsHidden &&
 			styles.ToolsPanelHiddenInnerWrapper;
 
