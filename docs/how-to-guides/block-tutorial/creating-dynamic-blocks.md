@@ -148,6 +148,8 @@ There are a few things to notice:
 -   The built-in `save` function just returns `null` because the rendering is performed server-side.
 -   The server-side rendering is a function taking the block and the block inner content as arguments, and returning the markup (quite similar to shortcodes)
 
+**Note :** For common customization settings including color, border, spacing customization and more, we will see on the [next chapter](/docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md) how you can rely on block supports to provide such functionality in an efficient way.
+
 ## Live rendering in the block editor
 
 Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/server-side-render/README.md) block which enables rendering to take place on the server using PHP rather than in JavaScript.

@@ -144,7 +144,7 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Block supports in dynamic blocks",
+		"title": "Block Supports in dynamic blocks",
 		"slug": "block-supports-in-dynamic-blocks",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md",
 		"parent": "block-tutorial"
