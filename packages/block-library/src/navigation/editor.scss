@@ -228,7 +228,7 @@ $color-control-label-height: 20px;
 	// For the placeholder indicators to colorize correctly, colors need to be inherited unless selected.
 	color: inherit;
 
-	.is-selected & {
+	.wp-block-navigation.is-selected & {
 		color: $gray-900;
 	}
 }
