@@ -62,8 +62,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/rest-api.php';
 }
 
-require_once __DIR__ . '/widgets-page.php';
-
 require __DIR__ . '/compat.php';
 require __DIR__ . '/compat/wordpress-5.8/index.php';
 require __DIR__ . '/compat/wordpress-5.8/utils.php';
@@ -111,8 +109,6 @@ require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
-require __DIR__ . '/widgets.php';
-require __DIR__ . '/widgets-customize.php';
 require __DIR__ . '/navigation.php';
 require __DIR__ . '/navigation-theme-opt-in.php';
 require __DIR__ . '/navigation-page.php';
