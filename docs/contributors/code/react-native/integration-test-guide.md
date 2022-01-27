@@ -181,7 +181,7 @@ fireEvent( heightSlider, 'valueChange', '50' );
 
 ## Expect correct element behaviour
 
-After querying elements and firing events, we have to verify that the logic works as expected, for this purpose we can use the same `expect` function from Jest as we use in unit tests. It's recommended to use the custom matcher `toBeVisible` in order to help us assure that the element is defined, is a valid React element and visible.
+After querying elements and firing events, we must verify that the logic works as expected. For this purpose we can use the same `expect` function from Jest that we use in unit tests. It is recommended to use the custom `toBeVisible` matcher to ensure the element is defined, is a valid React element, and visible.
 
 Here is an example:
 
@@ -338,7 +338,7 @@ If you have trouble locating an element’s identifier, you may wish to use Xcod
 
 ### False positives when omitting `await` before `waitFor` function
 
-Omitting the `await` before a `waitFor` can lead to scenarios where tests pass but are not testing the intended behaviour. For example, if `toBeDefined` is used to assert the result of a call to `waitFor`, the assertion will pass because `waitFor` returns a value, even though it’s not the `ReactTestInstance` we meant to check for. For this reason, it's recommended to use the custom matcher `toBeVisible` which prevents this case.
+Omitting the `await` before a `waitFor` can lead to scenarios where tests pass but are not testing the intended behaviour. For example, if `toBeDefined` is used to assert the result of a call to `waitFor`, the assertion will pass because `waitFor` returns a value, even though it is not the `ReactTestInstance` we meant to check for. For this reason, it is recommended to use the custom matcher `toBeVisible` which guards against this type of false positive.
 
 ### `waitFor` timeout
 
