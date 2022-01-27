@@ -94,7 +94,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 				<Flex>
 					<FlexItem isBlock>
 						<NumberControl
-							label={ __( 'Smallest size (pt)' ) }
+							label={ __( 'Smallest size(pt)' ) }
 							value={ smallestFontSize }
 							onChange={ ( value ) =>
 								setAttributes( { smallestFontSize: value } )
