@@ -62,13 +62,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/rest-api.php';
 }
 
-// We can't use class_exists( 'WP_Widget_Block' ) because core loads widgets
-// *after* plugins, so test for wp_use_widgets_block_editor() which we know
-// implies the existence of WP_Widget_Block.
-if ( ! function_exists( 'wp_use_widgets_block_editor' ) ) {
-	require_once __DIR__ . '/class-wp-widget-block.php';
-}
-
 require_once __DIR__ . '/widgets-page.php';
 
 require __DIR__ . '/compat.php';
