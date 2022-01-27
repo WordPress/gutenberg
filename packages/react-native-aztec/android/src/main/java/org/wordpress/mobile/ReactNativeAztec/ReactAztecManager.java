@@ -82,10 +82,8 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     private static final String BLOCK_TYPE_TAG_KEY = "tag";
     private static final String LINK_TEXT_COLOR_KEY = "linkTextColor";
 
-    private float DEFAULT_FONT_SIZE = 16.0F;
     private float mCurrentFontSize = 0;
     private float mCurrentLineHeight = 0;
-    private boolean mIsHeadingBlock = false;
 
     @Nullable private final Consumer<Exception> exceptionLogger;
     @Nullable private final Consumer<String> breadcrumbLogger;
@@ -272,6 +270,15 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         }
     }
 
+    private boolean isHeadingBlock(ReactAztecText view) {
+        String tag = view.getTagName();
+        final String regex = "h([1-6])";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(tag);
+
+        return matcher.find();
+    }
+
     private float getHeadingScale(String scale) {
         switch (scale) {
             case "h1":
@@ -313,9 +320,8 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         mCurrentFontSize = fontSize;
         // Since Aztec applies a scale to the heading's font size
         // we subtract it before applying the new font size.
-        if (mIsHeadingBlock && fontSize > DEFAULT_FONT_SIZE) {
-            String tag = view.getTagName();
-            scale = getHeadingScale(tag);
+        if (isHeadingBlock(view) && view.getTextSize() >= 0) {
+            scale = getHeadingScale(view.getTagName());
         }
 
         view.setTextSize(
@@ -332,9 +338,8 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         mCurrentLineHeight = lineHeight;
         float scale = 1;
 
-        if (mIsHeadingBlock) {
-            String tag = view.getTagName();
-            scale = getHeadingScale(tag);
+        if (isHeadingBlock(view)) {
+            scale = getHeadingScale(view.getTagName());
         }
 
         float textSize = view.getTextSize() * scale;
@@ -503,24 +508,12 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     @ReactProp(name = "blockType")
     public void setBlockType(ReactAztecText view, ReadableMap inputMap) {
         if (inputMap.hasKey(BLOCK_TYPE_TAG_KEY)) {
-            String tag = inputMap.getString(BLOCK_TYPE_TAG_KEY);
-            view.setTagName(tag);
+            view.setTagName(inputMap.getString(BLOCK_TYPE_TAG_KEY));
 
             // Check if it's a heading block, this is needed to set the
             // right font size scale.
-            final String regex = "h([1-6])";
-            final Pattern pattern = Pattern.compile(regex);
-            final Matcher matcher = pattern.matcher(tag);
-
-            if (matcher.find()) {
-                mIsHeadingBlock = true;
-
-                // Update font size if it was already set when the level of the Heading changes.
-                if (mCurrentFontSize != 0) {
-                    setFontSize(view, mCurrentFontSize);
-                }
-            } else {
-                mIsHeadingBlock = false;
+            if (isHeadingBlock(view)) {
+                setFontSize(view, mCurrentFontSize);
             }
         }
     }

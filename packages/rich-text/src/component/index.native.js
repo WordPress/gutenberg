@@ -59,6 +59,7 @@ const gutenbergFormatNamesToAztec = {
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
 const DEFAULT_FONT_SIZE = 16;
+const MIN_LINE_HEIGHT = 1;
 
 export class RichText extends Component {
 	constructor( {
@@ -983,7 +984,9 @@ export class RichText extends Component {
 			newLineHeight = lineHeight;
 		}
 
-		return newLineHeight;
+		return newLineHeight >= MIN_LINE_HEIGHT
+			? newLineHeight
+			: MIN_LINE_HEIGHT;
 	}
 
 	getIsBlockBasedTheme() {
