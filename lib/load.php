@@ -63,10 +63,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 }
 
 require __DIR__ . '/compat.php';
-require __DIR__ . '/compat/wordpress-5.8/index.php';
-require __DIR__ . '/compat/wordpress-5.8/utils.php';
-require __DIR__ . '/compat/wordpress-5.8/block-patterns.php';
-require __DIR__ . '/compat/wordpress-5.8.1/index.php';
 require __DIR__ . '/compat/wordpress-5.9/blocks.php';
 require __DIR__ . '/compat/wordpress-5.9/block-patterns.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template-utils.php';
