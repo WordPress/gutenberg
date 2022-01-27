@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.0.0 (2022-01-27)
+
 ### Breaking Changes
 
 -   The peer `jest` dependency has been updated from requiring `>=26` to requiring `>=27` (see [Breaking Changes](https://jestjs.io/blog/2021/05/25/jest-27), [#33287](https://github.com/WordPress/gutenberg/pull/33287)).
