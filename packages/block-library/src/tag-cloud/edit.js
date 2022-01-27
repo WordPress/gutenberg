@@ -96,9 +96,11 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 						<NumberControl
 							label={ __( 'Smallest size(pt)' ) }
 							value={ smallestFontSize }
-							onChange={ ( value ) =>
-								setAttributes( { smallestFontSize: value } )
-							}
+							onChange={ ( value ) => {
+								const newValue =
+									value && +value >= 8 ? +value : 8;
+								setAttributes( { smallestFontSize: newValue } );
+							} }
 							min={ 8 }
 							max={ 60 }
 						/>
@@ -107,9 +109,11 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 						<NumberControl
 							label={ __( 'Largest size(pt)' ) }
 							value={ largestFontSize }
-							onChange={ ( value ) =>
-								setAttributes( { largestFontSize: value } )
-							}
+							onChange={ ( value ) => {
+								const newValue =
+									value && +value >= 8 ? +value : 60;
+								setAttributes( { largestFontSize: newValue } );
+							} }
 							min={ 8 }
 							max={ 60 }
 						/>
