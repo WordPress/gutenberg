@@ -11,7 +11,7 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
 export { default as useEntityRecordCreate } from './hooks/use-entity-record-create';
-export { default as useEntityRecordMutation } from './hooks/use-entity-record-mutation';
+export { default as useEntityRecordUpdate } from './hooks/use-entity-record-update';
 export { default as useEntityRecord } from './hooks/use-entity-record';
 export { default as useEntityRecords } from './hooks/use-entity-records';
 export { default as useEntityRecordPermissions } from './hooks/use-permissions';
