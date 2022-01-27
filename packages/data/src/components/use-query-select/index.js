@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import useSelect from '../use-select';
+import { META_SELECTORS } from "../../store";
 
 /** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
 
@@ -13,7 +14,7 @@ import useSelect from '../use-select';
  * @param {Array}                           deps      see useSelect
  * @return {Function} A custom react hook.
  */
-export default function useResolveSelect( mapSelect, deps ) {
+export default function useQuerySelect( mapSelect, deps ) {
 	return useSelect( ( select, registry ) => {
 		// Memoization would be nice here
 		const resolve = ( store ) => enrichSelectors( select( store ) );
@@ -31,6 +32,9 @@ export default function useResolveSelect( mapSelect, deps ) {
 function enrichSelectors( selectors ) {
 	const resolvers = {};
 	for ( const selectorName in selectors ) {
+		if ( META_SELECTORS.includes( selectorName ) ) {
+			continue;
+		}
 		Object.defineProperty( resolvers, selectorName, {
 			get: () => ( ...args ) => ( {
 				data: selectors[ selectorName ]( ...args ),
