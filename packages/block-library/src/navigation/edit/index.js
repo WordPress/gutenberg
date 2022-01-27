@@ -155,7 +155,7 @@ function Navigation( {
 	);
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
-	// the Select Menu dropdown.
+	// the Select menu dropdown.
 	useNavigationEntities();
 
 	const {
@@ -485,8 +485,8 @@ function Navigation( {
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
 						<ToolbarGroup>
 							<ToolbarDropdownMenu
-								label={ __( 'Select Menu' ) }
-								text={ __( 'Select Menu' ) }
+								label={ __( 'Select menu' ) }
+								text={ __( 'Select menu' ) }
 								icon={ null }
 							>
 								{ ( { onClose } ) => (

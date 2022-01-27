@@ -614,7 +614,7 @@ describe( 'Navigation', () => {
 		// Select the block to convert to a wp_navigation and publish.
 		// The select menu button shows up when saving is complete.
 		await navBlock.click();
-		await page.waitForSelector( 'button[aria-label="Select Menu"]' );
+		await page.waitForSelector( 'button[aria-label="Select menu"]' );
 		await publishPost();
 
 		// Check that the wp_navigation post has the page list block.
@@ -641,7 +641,7 @@ describe( 'Navigation', () => {
 
 		async function resetNavBlockToInitialState() {
 			const selectMenuDropdown = await page.waitForSelector(
-				'[aria-label="Select Menu"]'
+				'[aria-label="Select menu"]'
 			);
 			await selectMenuDropdown.click();
 			const newMenuButton = await page.waitForXPath(
@@ -668,7 +668,7 @@ describe( 'Navigation', () => {
 			// Select the block to convert to a wp_navigation and publish.
 			// The select menu button shows up when saving is complete.
 			await navBlock.click();
-			await page.waitForSelector( 'button[aria-label="Select Menu"]' );
+			await page.waitForSelector( 'button[aria-label="Select menu"]' );
 
 			// Reset the nav block to create a new entity.
 			await resetNavBlockToInitialState();
