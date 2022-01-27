@@ -55,6 +55,8 @@ export function checkReactElement( element, ...args ) {
 	}
 }
 
+// "printElement" util function is extracted from "@testing-library/jest-native" package.
+// Reference: https://github.com/testing-library/jest-native/blob/0dbda7191106f15a57eda1be10eadf95ad8bd81f/src/utils.js#L59-L68
 export function printElement( { type, props } ) {
 	return JSON.stringify( { type, props }, null, 4 );
 }
