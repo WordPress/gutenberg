@@ -174,14 +174,18 @@ function LinkSettings( {
 	);
 }
 
+const UPLOAD_STATE_IDLE = 0;
+const UPLOAD_STATE_UPLOADING = 1;
+const UPLOAD_STATE_SUCCEEDED = 2;
+const UPLOAD_STATE_FAILED = 3;
+
 export class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
 			isCaptionSelected: false,
-			isUploadInProgress: false,
-			isUploadFailed: false,
+			uploadStatus: UPLOAD_STATE_IDLE,
 		};
 
 		this.replacedFeaturedImage = false;
@@ -249,7 +253,7 @@ export class ImageEdit extends Component {
 		// this action will only exist if the user pressed the trash button on the block holder
 		if (
 			hasAction( 'blocks.onRemoveBlockCheckUpload' ) &&
-			this.state.isUploadInProgress
+			this.state.uploadStatus === UPLOAD_STATE_UPLOADING
 		) {
 			doAction(
 				'blocks.onRemoveBlockCheckUpload',
@@ -324,7 +328,7 @@ export class ImageEdit extends Component {
 	onImagePressed() {
 		const { attributes, image } = this.props;
 
-		if ( this.state.isUploadInProgress ) {
+		if ( this.state.uploadStatus === UPLOAD_STATE_UPLOADING ) {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if (
 			attributes.id &&
@@ -349,8 +353,8 @@ export class ImageEdit extends Component {
 			setAttributes( { url: payload.mediaUrl } );
 		}
 
-		if ( ! this.state.isUploadInProgress ) {
-			this.setState( { isUploadInProgress: true } );
+		if ( this.state.uploadStatus !== UPLOAD_STATE_UPLOADING ) {
+			this.setState( { uploadStatus: UPLOAD_STATE_UPLOADING } );
 		}
 	}
 
@@ -358,21 +362,21 @@ export class ImageEdit extends Component {
 		const { setAttributes } = this.props;
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
-		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
+		this.setState( { uploadStatus: UPLOAD_STATE_SUCCEEDED } );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { id: payload.mediaId } );
-		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
+		this.setState( { uploadStatus: UPLOAD_STATE_FAILED } );
 	}
 
 	mediaUploadStateReset() {
 		const { setAttributes } = this.props;
 
 		setAttributes( { id: null, url: null } );
-		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
+		this.setState( { uploadStatus: UPLOAD_STATE_IDLE } );
 	}
 
 	updateImageURL( url ) {
@@ -597,8 +601,8 @@ export class ImageEdit extends Component {
 		} = this.props;
 		return (
 			typeof id !== 'undefined' &&
-			! this.state.isUploadInProgress &&
-			! this.state.isUploadFailed
+			this.state.uploadStatus !== UPLOAD_STATE_UPLOADING &&
+			this.state.uploadStatus !== UPLOAD_STATE_FAILED
 		);
 	}
 
