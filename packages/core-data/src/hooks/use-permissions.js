@@ -9,15 +9,15 @@ import { useQuerySelect } from '@wordpress/data';
 import { IDLE, SUCCESS, RESOLVING } from './constants';
 import { store as coreStore } from '../';
 
-export default function useEntityRecordPermissions( permissionKey, recordId ) {
+export default function usePermissions( resource, id ) {
 	return useQuerySelect(
 		( resolve ) => {
 			const { canUser } = resolve( coreStore );
-			const create = canUser( 'create', permissionKey );
+			const create = canUser( 'create', resource );
 			let update, _delete;
-			if ( recordId ) {
-				update = canUser( 'update', permissionKey, recordId );
-				_delete = canUser( 'delete', permissionKey, recordId );
+			if ( id ) {
+				update = canUser( 'update', resource, id );
+				_delete = canUser( 'delete', resource, id );
 			}
 			const isResolving =
 				create.isResolving ||
@@ -26,8 +26,8 @@ export default function useEntityRecordPermissions( permissionKey, recordId ) {
 
 			const hasResolved =
 				create.hasResolved &&
-				( recordId ? update.hasResolved : true ) &&
-				( recordId ? _delete.hasResolved : true );
+				( id ? update.hasResolved : true ) &&
+				( id ? _delete.hasResolved : true );
 
 			let status = '';
 			if ( isResolving ) {
@@ -46,6 +46,6 @@ export default function useEntityRecordPermissions( permissionKey, recordId ) {
 				canDelete: _delete?.data,
 			};
 		},
-		[ permissionKey, recordId ]
+		[ resource, id ]
 	);
 }

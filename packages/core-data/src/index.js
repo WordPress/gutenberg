@@ -14,7 +14,7 @@ export { default as useEntityRecordCreate } from './hooks/use-entity-record-crea
 export { default as useEntityRecordMutation } from './hooks/use-entity-record-mutation';
 export { default as useEntityRecord } from './hooks/use-entity-record';
 export { default as useEntityRecords } from './hooks/use-entity-records';
-export { default as useEntityRecordPermissions } from './hooks/use-entity-record-permissions';
+export { default as useEntityRecordPermissions } from './hooks/use-permissions';
 
 import createLocksActions from './locks/actions';
 import { defaultEntities, getMethodName } from './entities';
