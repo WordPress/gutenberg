@@ -218,12 +218,12 @@ jobs:
                   minimum_version_bump='patch'
                   if [ '${{ github.ref }}' = 'refs/heads/wp/next' ]; then
                     sha=$(git rev-parse --short HEAD)
-                    npx lerna version pre"$minimum_version_bump" --preid next."$sha" --no-private
-                    npx lerna publish from-package --dist-tag next
+                    npx lerna version pre"$minimum_version_bump" --preid next."$sha" --no-private --yes
+                    npx lerna publish from-package --dist-tag next --yes
                   elif [ '${{ github.event_name }}' = 'workflow_dispatch' ] && \
                     [ '${{ github.ref }}' = 'refs/heads/wp/trunk' ]; then
-                    npx lerna publish
+                    npx lerna publish --yes
                   else
-                    npx lerna version "$minimum_version_bump" --no-private
-                    npx lerna publish from-package
+                    npx lerna version "$minimum_version_bump" --no-private --yes
+                    npx lerna publish from-package --yes
                   fi
