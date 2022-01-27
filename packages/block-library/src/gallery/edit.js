@@ -429,11 +429,26 @@ function GalleryEdit( props ) {
 		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
 	);
 
+	// MediaPlaceholder props are different between web and native hence, we provide a platform-specific set.
+	const mediaPlaceholderProps = Platform.select( {
+		web: {
+			addToGallery: false,
+			disableMediaButtons: imagesUploading,
+			value: {},
+		},
+		native: {
+			addToGallery: hasImageIds,
+			isAppender: hasImages,
+			disableMediaButtons:
+				( hasImages && ! isSelected ) || imagesUploading,
+			value: hasImageIds ? images : {},
+			autoOpenMediaUpload:
+				! hasImages && isSelected && wasBlockJustInserted,
+		},
+	} );
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ false }
 			handleUpload={ false }
-			disableMediaButtons={ imagesUploading }
 			icon={ sharedIcon }
 			labels={ {
 				title: __( 'Gallery' ),
@@ -443,10 +458,9 @@ function GalleryEdit( props ) {
 			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
-			value={ {} }
 			onError={ onUploadError }
 			notices={ noticeUI }
-			autoOpenMediaUpload={ isSelected && wasBlockJustInserted }
+			{ ...mediaPlaceholderProps }
 		/>
 	);
 
@@ -537,7 +551,11 @@ function GalleryEdit( props ) {
 			<Gallery
 				{ ...props }
 				images={ images }
-				mediaPlaceholder={ ! hasImages ? mediaPlaceholder : undefined }
+				mediaPlaceholder={
+					! hasImages || Platform.isNative
+						? mediaPlaceholder
+						: undefined
+				}
 				blockProps={ blockProps }
 				insertBlocksAfter={ insertBlocksAfter }
 			/>
