@@ -2,7 +2,7 @@
 
 A lot of blocks, including core blocks, offer similar customization options. Whether that is to change the background color, text color, or to add padding, margin customization options...
 
-To avoid duplicating the same logic over and over in your blocks and to allign the behavior of your block with core blocks, you can make use of the different `supports` properties.
+To avoid duplicating the same logic over and over in your blocks and to align the behavior of your block with core blocks, you can make use of the different `supports` properties.
 
 Let's take the block we wrote in the previous chapter (example 3) and with just a single line of code, add support for text, link and background color customizations.
 
