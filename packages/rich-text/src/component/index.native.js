@@ -984,9 +984,12 @@ export class RichText extends Component {
 			newLineHeight = lineHeight;
 		}
 
-		return newLineHeight >= MIN_LINE_HEIGHT
-			? newLineHeight
-			: MIN_LINE_HEIGHT;
+		// Check the final value is not over the minimum supported value.
+		if ( newLineHeight && newLineHeight < MIN_LINE_HEIGHT ) {
+			newLineHeight = MIN_LINE_HEIGHT;
+		}
+
+		return newLineHeight;
 	}
 
 	getIsBlockBasedTheme() {
