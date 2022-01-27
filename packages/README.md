@@ -46,7 +46,7 @@ When creating a new package, you need to provide at least the following:
     - Installation details
     - Usage example
     - API documentation, if applicable ([more info](#maintaining-api-documentation))
-    - A link to the contributing guidelines
+    - A link to the contributing guidelines ([here's an example](https://github.com/WordPress/gutenberg/tree/HEAD/packages/a11y/README.md#contributing-to-this-package) from the a11y package)
     - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 4. `CHANGELOG.md` file containing at least:
 
