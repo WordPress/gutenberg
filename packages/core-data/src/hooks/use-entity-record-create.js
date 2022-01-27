@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -10,17 +10,14 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { IDLE, ERROR, RESOLVING } from './constants';
 import { store as coreStore } from '../';
 
-export default function useEntityRecordBuilder( kind, type, id ) {
-	const [ record, setRecord ] = useState( {} );
+export default function useEntityRecordCreate( kind, type, id ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const mutations = useMemo(
 		() => ( {
-			edit: ( diff ) => setRecord( { ...record, ...diff } ),
-			save: () => saveEntityRecord( kind, type, id, record ),
-			reset: () => setRecord( {} ),
+			create: ( record ) => saveEntityRecord( kind, type, id, record ),
 		} ),
-		[ record ]
+		[]
 	);
 
 	const state = useSelect(
