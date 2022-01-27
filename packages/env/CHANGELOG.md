@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.2.0 (2022-01-27)
+
 ### Enhancement
 -   Added command `wp-env install-path` to list the directory used for the environment.
 -   The help entry is now shown when no subcommand is passed to `wp-env`.

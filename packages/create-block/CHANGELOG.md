@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.8.0 (2022-01-27)
+
 ### New Features
 
 -   Integrated a new `plugin-zip` command to create a zip file for a WordPress plugin ([#37687](https://github.com/WordPress/gutenberg/pull/37687)).

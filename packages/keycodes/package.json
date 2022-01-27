@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/keycodes",
-	"version": "3.2.4",
+	"version": "3.3.0-prerelease",
 	"description": "Keycodes utilities for WordPress. Used to check for keyboard events across browsers/operating systems.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
