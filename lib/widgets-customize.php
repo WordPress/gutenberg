@@ -19,8 +19,6 @@ function gutenberg_widgets_customize_register( $manager ) {
 		return;
 	}
 
-	require_once __DIR__ . '/class-wp-sidebar-block-editor-control.php';
-
 	foreach ( $manager->sections() as $section ) {
 		if ( $section instanceof WP_Customize_Sidebar_Section ) {
 			$section->description = '';
