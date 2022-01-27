@@ -262,5 +262,18 @@ describe( '<RichText/>', () => {
 			// Assert
 			expect( screen.toJSON() ).toMatchSnapshot();
 		} );
+
+		it( 'should set the default minimum line height value if the provided value from the styles is lower', () => {
+			// Arrange
+			const expectedLineHeight = 1;
+			const style = { lineHeight: 0.2 };
+			// Act
+			const { getByA11yLabel } = render(
+				<RichText accessibilityLabel={ 'editor' } style={ style } />
+			);
+			// Assert
+			const actualFontSize = getByA11yLabel( 'editor' ).props.lineHeight;
+			expect( actualFontSize ).toBe( expectedLineHeight );
+		} );
 	} );
 } );
