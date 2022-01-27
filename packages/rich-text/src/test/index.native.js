@@ -122,6 +122,20 @@ describe( '<RichText/>', () => {
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
+		it( `should display rich text with the default editor font size value and not use the
+		\`default font size value from the global styles for a tag different than (p)`, () => {
+			// Arrange
+			const defaultFontSize = 16;
+			mockGlobalSettings( { fontSize: 'min(2em, 3em)' } );
+			// Act
+			const { getByA11yLabel } = render(
+				<RichText accessibilityLabel={ 'editor' } tagName="div" />
+			);
+			// Assert
+			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			expect( actualFontSize ).toBe( defaultFontSize );
+		} );
+
 		it( `should display rich text at the PROVIDED font size computed from the selected GLOBAL
 		\`__experimentalGlobalStylesBaseStyles.typography.fontSize\` CSS.`, () => {
 			// Arrange
@@ -129,7 +143,7 @@ describe( '<RichText/>', () => {
 			mockGlobalSettings( { fontSize: 'min(2em, 3em)' } );
 			// Act
 			const { getByA11yLabel } = render(
-				<RichText accessibilityLabel={ 'editor' } />
+				<RichText accessibilityLabel={ 'editor' } tagName="p" />
 			);
 			// Assert
 			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
@@ -144,7 +158,7 @@ describe( '<RichText/>', () => {
 				mockGlobalSettings( { fontSize: unit } );
 				// Act
 				const { getByA11yLabel } = render(
-					<RichText accessibilityLabel={ 'editor' } />
+					<RichText accessibilityLabel={ 'editor' } tagName="p" />
 				);
 				// Assert
 				const actualFontSize = getByA11yLabel( 'editor' ).props
@@ -164,6 +178,7 @@ describe( '<RichText/>', () => {
 					accessibilityLabel={ 'editor' }
 					style={ { fontSize: '1' } }
 					fontSize={ '2' }
+					tagName="p"
 				/>
 			);
 			// Assert
@@ -181,6 +196,7 @@ describe( '<RichText/>', () => {
 				<RichText
 					accessibilityLabel={ 'editor' }
 					style={ { fontSize: '1' } }
+					tagName="p"
 				/>
 			);
 			// Assert
