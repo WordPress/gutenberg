@@ -48,6 +48,13 @@ const generateMenuItems = ( {
 	return menuItems;
 };
 
+const isMenuItemTypeEmpty = (
+	obj: ToolsPanelMenuItems[ ToolsPanelMenuItemKey ]
+) =>
+	obj &&
+	Object.keys( obj ).length === 0 &&
+	Object.getPrototypeOf( obj ) === Object.prototype;
+
 export function useToolsPanel(
 	props: WordPressComponentProps< ToolsPanelProps, 'div' >
 ) {
@@ -167,24 +174,24 @@ export function useToolsPanel(
 	] = useState( false );
 
 	useEffect( () => {
-		if ( menuItems.optional ) {
-			const optionalItems = Object.entries( menuItems.optional );
-			const allControlsHidden =
-				optionalItems.length > 0 &&
-				! optionalItems.some( ( [ , isSelected ] ) => isSelected );
+		if (
+			isMenuItemTypeEmpty( menuItems?.default ) &&
+			! isMenuItemTypeEmpty( menuItems?.optional )
+		) {
+			const allControlsHidden = ! Object.entries(
+				menuItems.optional
+			).some( ( [ , isSelected ] ) => isSelected );
 			setAreAllOptionalControlsHidden( allControlsHidden );
 		}
 	}, [ menuItems.optional, setAreAllOptionalControlsHidden ] );
 
 	const cx = useCx();
 	const classes = useMemo( () => {
-		const hasDefaultMenuItems =
-			menuItems?.default && !! Object.keys( menuItems?.default ).length;
 		const wrapperStyle =
 			hasInnerWrapper &&
 			styles.ToolsPanelWithInnerWrapper( DEFAULT_COLUMNS );
 		const emptyStyle =
-			! hasDefaultMenuItems &&
+			! isMenuItemTypeEmpty( menuItems?.default ) &&
 			areAllOptionalControlsHidden &&
 			styles.ToolsPanelHiddenInnerWrapper;
 
