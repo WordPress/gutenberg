@@ -213,6 +213,11 @@ jobs:
             - name: Npm install
               run: npm ci
 
+            - name: Configure git user name and email
+              run: |
+                  git config user.name "Gutenberg Repository Automation"
+                  git config user.email gutenberg@wordpress.org
+
             - name: Publish packages
               run: |
                   minimum_version_bump='patch'
