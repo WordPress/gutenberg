@@ -1,53 +1,75 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useQuerySelect } from '@wordpress/data';
+import { useQuerySelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as coreStore } from '../';
-import { IDLE, SUCCESS, RESOLVING } from './constants';
+import { INACTIVE, IDLE, SUCCESS, ERROR, RESOLVING } from './constants';
 
-export default function useEntityRecord( kind, type, id ) {
+export default function useEntityRecord(
+	kind,
+	type,
+	id,
+	options = { runIf: true }
+) {
 	const {
 		data,
+		isMissing,
 		isResolving,
-		hasFinished: isResolved,
-	} = useQuerySelect( ( resolve ) =>
-		resolve( coreStore ).getEntityRecord( kind, type, id )
+		hasResolved,
+		editedRecord,
+		hasEdits,
+	} = useQuerySelect(
+		( resolve ) => {
+			if ( ! options.runIf ) {
+				return {
+					status: INACTIVE,
+					isMissing: true,
+					hasResolved: false,
+					hasEdits: false,
+				};
+			}
+
+			const {
+				getEntityRecord,
+				getEditedEntityRecord,
+				hasEditsForEntityRecord,
+			} = resolve( coreStore );
+			const args = [ kind, type, id ];
+			const record = getEntityRecord( ...args );
+			return {
+				...record,
+				isMissing: record.hasResolved && ! record.data,
+				editedRecord: getEditedEntityRecord( ...args ).data,
+				hasEdits: hasEditsForEntityRecord( ...args ).data,
+			};
+		},
+		[ options.runIf ]
 	);
 
 	let status;
 	if ( isResolving ) {
 		status = RESOLVING;
-	} else if ( isResolved || data ) {
-		status = SUCCESS;
+	} else if ( hasResolved ) {
+		if ( data ) {
+			status = SUCCESS;
+		} else {
+			status = ERROR;
+		}
 	} else {
 		status = IDLE;
 	}
-
-	const { editedRecord, hasEdits } = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord, hasEditsForEntityRecord } = select(
-				coreStore
-			);
-
-			const args = [ kind, type, id ];
-			return {
-				editedRecord: getEditedEntityRecord( ...args ),
-				hasEdits: hasEditsForEntityRecord( ...args ),
-			};
-		},
-		[ kind, type, id ]
-	);
 
 	return {
 		status,
 		record: data,
 		editedRecord,
 		hasEdits,
+		isMissing,
 		isResolving,
-		isResolved,
+		hasResolved,
 	};
 }

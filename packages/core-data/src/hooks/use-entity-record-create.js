@@ -10,12 +10,12 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { IDLE, ERROR, RESOLVING } from './constants';
 import { store as coreStore } from '../';
 
-export default function useEntityRecordCreate( kind, type, id ) {
+export default function useEntityRecordCreate( kind, type ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const mutations = useMemo(
 		() => ( {
-			create: ( record ) => saveEntityRecord( kind, type, id, record ),
+			create: ( record ) => saveEntityRecord( kind, type, record ),
 		} ),
 		[]
 	);

@@ -6,7 +6,7 @@ import { useQuerySelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { IDLE, SUCCESS, RESOLVING } from './constants';
+import { INACTIVE, IDLE, SUCCESS, ERROR, RESOLVING } from './constants';
 import { store as coreStore } from '../';
 
 export default function useEntityRecords(
@@ -20,7 +20,7 @@ export default function useEntityRecords(
 			if ( ! options.runIf ) {
 				return {
 					records: null,
-					status: IDLE,
+					status: INACTIVE,
 					hasResolved: false,
 					hasRecords: false,
 				};
@@ -34,8 +34,12 @@ export default function useEntityRecords(
 			let status;
 			if ( state.isResolving ) {
 				status = RESOLVING;
-			} else if ( Array.isArray( data ) ) {
-				status = SUCCESS;
+			} else if ( state.hasResolved ) {
+				if ( Array.isArray( data ) ) {
+					status = SUCCESS;
+				} else {
+					status = ERROR;
+				}
 			} else {
 				status = IDLE;
 			}
