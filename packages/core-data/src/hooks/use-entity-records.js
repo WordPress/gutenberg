@@ -8,7 +8,7 @@ import { useQuerySelect } from '@wordpress/data';
  */
 import { store as coreStore } from '../';
 
-export function useEntityRecords( kind, type, id, query ) {
+export default function useEntityRecords( kind, type, id, query ) {
 	return useQuerySelect( ( resolve ) =>
 		resolve( coreStore ).getEntityRecords( kind, type, id, query )
 	);

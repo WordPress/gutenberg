@@ -10,7 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { IDLE, ERROR, RESOLVING } from './constants';
 import { store as coreStore } from '../';
 
-export function useEntityRecordBuilder( kind, type, id ) {
+export default function useEntityRecordBuilder( kind, type, id ) {
 	const [ record, setRecord ] = useState( {} );
 	const { saveEntityRecord } = useDispatch( coreStore );
 

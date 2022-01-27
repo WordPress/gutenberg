@@ -9,7 +9,7 @@ import { useSelect, useQuerySelect } from '@wordpress/data';
 import { store as coreStore } from '../';
 import { IDLE, READY, RESOLVING } from './constants';
 
-export function useEntityRecord( kind, type, id ) {
+export default function useEntityRecord( kind, type, id ) {
 	const {
 		data,
 		isResolving,

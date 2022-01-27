@@ -10,7 +10,11 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
-export { default as useEntityMutation } from './use-entity-mutation';
+export { default as useEntityRecordBuilder } from './hooks/use-entity-record-builder';
+export { default as useEntityRecordMutation } from './hooks/use-entity-record-mutation';
+export { default as useEntityRecord } from './hooks/use-entity-record';
+export { default as useEntityRecords } from './hooks/use-entity-records';
+
 
 import createLocksActions from './locks/actions';
 import { defaultEntities, getMethodName } from './entities';
