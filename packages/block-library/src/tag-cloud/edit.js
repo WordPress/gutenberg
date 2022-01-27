@@ -105,7 +105,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 					</FlexItem>
 					<FlexItem isBlock>
 						<NumberControl
-							label={ __( 'Largest size (pt)' ) }
+							label={ __( 'Largest size(pt)' ) }
 							value={ largestFontSize }
 							onChange={ ( value ) =>
 								setAttributes( { largestFontSize: value } )
