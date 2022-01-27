@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { serialize } from '@wordpress/blocks';
-import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { useEntityRecordCreate } from '@wordpress/core-data';
 import { useCallback } from '@wordpress/element';
 
 /**
@@ -12,7 +11,7 @@ import { useCallback } from '@wordpress/element';
 import useGenerateDefaultNavigationTitle from './use-generate-default-navigation-title';
 
 export default function useCreateNavigationMenu( clientId ) {
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { create } = useEntityRecordCreate( 'postType', 'wp_navigation' );
 	const generateDefaultTitle = useGenerateDefaultNavigationTitle( clientId );
 
 	// This callback uses data from the two placeholder steps and only creates
@@ -22,18 +21,13 @@ export default function useCreateNavigationMenu( clientId ) {
 			if ( ! title ) {
 				title = await generateDefaultTitle();
 			}
-			const record = {
+
+			return await create( {
 				title,
 				content: serialize( blocks ),
 				status: 'publish',
-			};
-
-			return await saveEntityRecord(
-				'postType',
-				'wp_navigation',
-				record
-			);
+			} );
 		},
-		[ serialize, saveEntityRecord ]
+		[ serialize, create ]
 	);
 }

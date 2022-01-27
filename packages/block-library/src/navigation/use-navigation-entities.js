@@ -39,3 +39,12 @@ export default function useNavigationEntities( menuId ) {
 		menuItems,
 	};
 }
+
+async function test() {
+	try {
+		const newRecord = await save();
+		// save worked 100%
+	} catch(e) {
+		// access to error
+	}
+}
