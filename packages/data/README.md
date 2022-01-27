@@ -275,19 +275,19 @@ _Usage_
 import { useSelect, AsyncModeProvider } from '@wordpress/data';
 
 function BlockCount() {
-	const count = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlockCount();
-	}, [] );
+  const count = useSelect( ( select ) => {
+    return select( 'core/block-editor' ).getBlockCount()
+  }, [] );
 
-	return count;
+  return count;
 }
 
 function App() {
-	return (
-		<AsyncModeProvider value={ true }>
-			<BlockCount />
-		</AsyncModeProvider>
-	);
+  return (
+    <AsyncModeProvider value={ true }>
+      <BlockCount />
+    </AsyncModeProvider>
+  );
 }
 ```
 
@@ -315,16 +315,18 @@ _Usage_
 import { combineReducers, createReduxStore, register } from '@wordpress/data';
 
 const prices = ( state = {}, action ) => {
-	return action.type === 'SET_PRICE'
-		? {
-				...state,
-				[ action.item ]: action.price,
-		  }
-		: state;
+	return action.type === 'SET_PRICE' ?
+		{
+			...state,
+			[ action.item ]: action.price,
+		} :
+		state;
 };
 
 const discountPercent = ( state = 0, action ) => {
-	return action.type === 'START_SALE' ? action.discountPercent : state;
+	return action.type === 'START_SALE' ?
+		action.discountPercent :
+		state;
 };
 
 const store = createReduxStore( 'my-shop', {
@@ -359,10 +361,10 @@ _Usage_
 import { createReduxStore } from '@wordpress/data';
 
 const store = createReduxStore( 'demo', {
-	reducer: ( state = 'OK' ) => state,
-	selectors: {
-		getValue: ( state ) => state,
-	},
+    reducer: ( state = 'OK' ) => state,
+    selectors: {
+        getValue: ( state ) => state,
+    },
 } );
 ```
 
@@ -395,13 +397,13 @@ Creates a control function that takes additional curried argument with the `regi
 While a regular control has signature
 
 ```js
-( action ) => iteratorOrPromise;
+( action ) => ( iteratorOrPromise )
 ```
 
 where the control works with the `action` that it's bound to, a registry control has signature:
 
 ```js
-( registry ) => ( action ) => iteratorOrPromise;
+( registry ) => ( action ) => ( iteratorOrPromise )
 ```
 
 A registry control is typically used to select data or dispatch an action to a registered
@@ -424,14 +426,14 @@ Creates a selector function that takes additional curried argument with the
 registry `select` function. While a regular selector has signature
 
 ```js
-( state, ...selectorArgs ) => result;
+( state, ...selectorArgs ) => ( result )
 ```
 
 that allows to select data from the store's `state`, a registry selector
 has signature:
 
 ```js
-( select ) => ( state, ...selectorArgs ) => result;
+( select ) => ( state, ...selectorArgs ) => ( result )
 ```
 
 that supports also selecting from other registered stores.
@@ -440,18 +442,14 @@ _Usage_
 
 ```js
 const getCurrentPostId = createRegistrySelector( ( select ) => ( state ) => {
-	return select( 'core/editor' ).getCurrentPostId();
+  return select( 'core/editor' ).getCurrentPostId();
 } );
 
 const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
-	// calling another registry selector just like any other function
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	return select( 'core' ).getEntityRecordEdits(
-		'postType',
-		postType,
-		postId
-	);
+  // calling another registry selector just like any other function
+  const postType = getCurrentPostType( state );
+  const postId = getCurrentPostId( state );
+ return select( 'core' ).getEntityRecordEdits( 'postType', postType, postId );
 } );
 ```
 
@@ -514,10 +512,10 @@ _Usage_
 import { createReduxStore, register } from '@wordpress/data';
 
 const store = createReduxStore( 'demo', {
-	reducer: ( state = 'OK' ) => state,
-	selectors: {
-		getValue: ( state ) => state,
-	},
+    reducer: ( state = 'OK' ) => state,
+    selectors: {
+        getValue: ( state ) => state,
+    },
 } );
 register( store );
 ```
@@ -605,7 +603,7 @@ _Usage_
 ```js
 import { resolveSelect } from '@wordpress/data';
 
-resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then( console.log );
+resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
 ```
 
 _Parameters_
@@ -690,25 +688,21 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 
 function Button( { onClick, children } ) {
-	return (
-		<button type="button" onClick={ onClick }>
-			{ children }
-		</button>
-	);
+  return <button type="button" onClick={ onClick }>{ children }</button>
 }
 
 const SaleButton = ( { children } ) => {
-	const { stockNumber } = useSelect(
-		( select ) => select( 'my-shop' ).getStockNumber(),
-		[]
-	);
-	const { startSale } = useDispatch( 'my-shop' );
-	const onClick = useCallback( () => {
-		const discountPercent = stockNumber > 50 ? 10 : 20;
-		startSale( discountPercent );
-	}, [ stockNumber ] );
-	return <Button onClick={ onClick }>{ children }</Button>;
-};
+  const { stockNumber } = useSelect(
+    ( select ) => select( 'my-shop' ).getStockNumber(),
+    []
+  );
+  const { startSale } = useDispatch( 'my-shop' );
+  const onClick = useCallback( () => {
+    const discountPercent = stockNumber > 50 ? 10: 20;
+    startSale( discountPercent );
+  }, [ stockNumber ] );
+  return <Button onClick={ onClick }>{ children }</Button>
+}
 
 // Rendered somewhere in the application:
 //
@@ -718,6 +712,20 @@ const SaleButton = ( { children } ) => {
 _Parameters_
 
 -   _storeNameOrDescriptor_ `[string|StoreDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+
+_Returns_
+
+-   `Function`: A custom react hook.
+
+### useQuerySelect
+
+Like useSelect, but the selectors return objects containing
+both the original data AND the resolution info.
+
+_Parameters_
+
+-   _mapSelect_ `Function|StoreDescriptor|string`: see useSelect
+-   _deps_ `Array`: see useSelect
 
 _Returns_
 
@@ -735,47 +743,36 @@ It acts similarly to the `useContext` react hook.
 
 Note: Generally speaking, `useRegistry` is a low level hook that in most cases
 won't be needed for implementation. Most interactions with the `@wordpress/data`
-API can be performed via the `useSelect` hook, or the `withSelect` and
+API can be performed via the `useSelect` hook,  or the `withSelect` and
 `withDispatch` higher order components.
 
 _Usage_
 
 ```js
-import { RegistryProvider, createRegistry, useRegistry } from '@wordpress/data';
+import {
+  RegistryProvider,
+  createRegistry,
+  useRegistry,
+} from '@wordpress/data';
 
 const registry = createRegistry( {} );
 
 const SomeChildUsingRegistry = ( props ) => {
-	const registry = useRegistry();
-	// ...logic implementing the registry in other react hooks.
+  const registry = useRegistry();
+  // ...logic implementing the registry in other react hooks.
 };
 
+
 const ParentProvidingRegistry = ( props ) => {
-	return (
-		<RegistryProvider value={ registry }>
-			<SomeChildUsingRegistry { ...props } />
-		</RegistryProvider>
-	);
+  return <RegistryProvider value={ registry }>
+    <SomeChildUsingRegistry { ...props } />
+  </RegistryProvider>
 };
 ```
 
 _Returns_
 
 -   `Function`: A custom react hook exposing the registry context value.
-
-### useResolveSelect
-
-Like useSelect, but the selectors return objects containing
-both the original data AND the resolution info.
-
-_Parameters_
-
--   _mapSelect_ `Function|StoreDescriptor|string`: see useSelect
--   _deps_ `Array`: see useSelect
-
-_Returns_
-
--   `Function`: A custom react hook.
 
 ### useSelect
 
@@ -790,16 +787,13 @@ _Usage_
 import { useSelect } from '@wordpress/data';
 
 function HammerPriceDisplay( { currency } ) {
-	const price = useSelect(
-		( select ) => {
-			return select( 'my-shop' ).getPrice( 'hammer', currency );
-		},
-		[ currency ]
-	);
-	return new Intl.NumberFormat( 'en-US', {
-		style: 'currency',
-		currency,
-	} ).format( price );
+  const price = useSelect( ( select ) => {
+    return select( 'my-shop' ).getPrice( 'hammer', currency )
+  }, [ currency ] );
+  return new Intl.NumberFormat( 'en-US', {
+    style: 'currency',
+    currency,
+  } ).format( price );
 }
 
 // Rendered in the application:
@@ -823,12 +817,12 @@ function because your component won't re-render on a data change.**
 import { useSelect } from '@wordpress/data';
 
 function Paste( { children } ) {
-	const { getSettings } = useSelect( 'my-shop' );
-	function onPaste() {
-		// Do something with the settings.
-		const settings = getSettings();
-	}
-	return <div onPaste={ onPaste }>{ children }</div>;
+  const { getSettings } = useSelect( 'my-shop' );
+  function onPaste() {
+    // Do something with the settings.
+    const settings = getSettings();
+  }
+  return <div onPaste={ onPaste }>{ children }</div>;
 }
 ```
 
@@ -850,24 +844,20 @@ _Usage_
 
 ```jsx
 function Button( { onClick, children } ) {
-	return (
-		<button type="button" onClick={ onClick }>
-			{ children }
-		</button>
-	);
+    return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
 import { withDispatch } from '@wordpress/data';
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
-	const { startSale } = dispatch( 'my-shop' );
-	const { discountPercent } = ownProps;
+    const { startSale } = dispatch( 'my-shop' );
+    const { discountPercent } = ownProps;
 
-	return {
-		onClick() {
-			startSale( discountPercent );
-		},
-	};
+    return {
+        onClick() {
+            startSale( discountPercent );
+        },
+    };
 } )( Button );
 
 // Rendered in the application:
@@ -890,25 +880,21 @@ only.
 
 ```jsx
 function Button( { onClick, children } ) {
-	return (
-		<button type="button" onClick={ onClick }>
-			{ children }
-		</button>
-	);
+    return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
 import { withDispatch } from '@wordpress/data';
 
 const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
-	// Stock number changes frequently.
-	const { getStockNumber } = select( 'my-shop' );
-	const { startSale } = dispatch( 'my-shop' );
-	return {
-		onClick() {
-			const discountPercent = getStockNumber() > 50 ? 10 : 20;
-			startSale( discountPercent );
-		},
-	};
+   // Stock number changes frequently.
+   const { getStockNumber } = select( 'my-shop' );
+   const { startSale } = dispatch( 'my-shop' );
+   return {
+       onClick() {
+           const discountPercent = getStockNumber() > 50 ? 10 : 20;
+           startSale( discountPercent );
+       },
+   };
 } )( Button );
 
 // Rendered in the application:
@@ -984,6 +970,7 @@ _Parameters_
 _Returns_
 
 -   `WPComponent`: Enhanced component with merged state data props.
+
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
