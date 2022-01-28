@@ -123,7 +123,7 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 
 {% end %}
 
-Now, let's alter the block.json file for that block, and add the supports key.
+Now, let's alter the block.json file for that block, and add the supports key. (If you're not using a block.json file, you can also add the key to the `registerBlockType` function call)
 
 ```json
 {
