@@ -43,10 +43,13 @@ export function NumberControl(
 	const baseStep = isStepAny ? 1 : parseFloat( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = ( value, stepOverride ) => {
+		let val = parseFloat( value );
+		val = isNaN( val ) ? 0 : val;
+
 		// When step is "any" clamp the value, otherwise round and clamp it
 		return isStepAny
-			? Math.min( max, Math.max( min, value ) )
-			: roundClamp( value, min, max, stepOverride ?? baseStep );
+			? Math.min( max, Math.max( min, val ) )
+			: roundClamp( val, min, max, stepOverride ?? baseStep );
 	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : null;
