@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
  */
 import { COLORS, rtl } from '../../utils';
 import NumberControl from '../../number-control';
+import InputControl from '../../input-control';
 import type { SelectSize } from '../types';
 
 // Using `selectSize` instead of `size` to avoid a type conflict with the
@@ -60,6 +61,20 @@ const arrowStyles = ( { disableUnits }: InputProps ) => {
 // https://github.com/WordPress/gutenberg/issues/18483
 
 export const ValueInput = styled( NumberControl )`
+	&&& {
+		input {
+			appearance: none;
+			-moz-appearance: textfield;
+			display: block;
+			width: 100%;
+
+			${ arrowStyles };
+			${ paddingStyles };
+		}
+	}
+`;
+
+export const CustomValueInput = styled( InputControl )`
 	&&& {
 		input {
 			appearance: none;

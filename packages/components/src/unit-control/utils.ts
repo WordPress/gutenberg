@@ -117,6 +117,13 @@ const allUnits: Record< string, WPUnitControlUnit > = {
 		a11yLabel: __( 'Points (pt)' ),
 		step: 1,
 	},
+	css: {
+		value: 'css',
+		label: isWeb ? 'css' : __( 'Custom css (css)' ),
+		default: '',
+		a11yLabel: __( 'Custom css (css)' ),
+		step: 'any',
+	},
 };
 
 /**
@@ -139,6 +146,12 @@ export const CSS_UNITS = [
 export const DEFAULT_UNIT = allUnits.px;
 
 /**
+ * A 'unit' used to indicate that the value should be treated as custom CSS.
+ * Used to support complex values like `max(1.25rem, 5vh)`.
+ */
+export const CUSTOM_CSS_UNIT = allUnits.css;
+
+/**
  * Handles legacy value + unit handling.
  * This component use to manage both incoming value and units separately.
  *
@@ -155,8 +168,13 @@ export function getParsedValue(
 	unit?: string,
 	units?: WPUnitControlUnitList
 ): [ Value, string | undefined ] {
-	const initialValue = unit ? `${ value }${ unit }` : value;
+	if ( unit === CUSTOM_CSS_UNIT.value ) {
+		// If this is custom CSS, we do not need to parse anything
+		// out of the value.
+		return [ value, unit ];
+	}
 
+	const initialValue = unit ? `${ value }${ unit }` : value;
 	return parseUnit( initialValue, units );
 }
 
@@ -168,6 +186,20 @@ export function getParsedValue(
  */
 export function hasUnits( units: WPUnitControlUnitList ): boolean {
 	return Array.isArray( units ) && !! units.length;
+}
+
+/**
+ * Determines whether custom CSS is supported
+ * by checking for the presence of the CSS_CUSTOM_UNIT.
+ *
+ * @param units Units to check.
+ * @return Whether custom CSS is supported.
+ */
+export function supportsCustomCSS( units: WPUnitControlUnitList ): boolean {
+	return (
+		units &&
+		!! units.find( ( item ) => item.value === CUSTOM_CSS_UNIT.value )
+	);
 }
 
 /**
@@ -184,8 +216,34 @@ export function parseUnit(
 	const value = String( initialValue ).trim();
 
 	let num: Value = parseFloat( value );
-	num = isNaN( num ) ? '' : num;
+	if ( isNaN( num ) ) {
+		// If the value cannot be parsed as a float, it should be
+		// treated as custom CSS as long as the CSS_CUSTOM_UNIT is
+		// supported.
+		if ( supportsCustomCSS( units ) ) {
+			return [ value, CUSTOM_CSS_UNIT.value ];
+		}
+		// Return empty string if custom CSS is not a supported unit.
+		num = '';
+	}
 
+	const unit = matchUnit( initialValue, units );
+
+	return [ num, unit ];
+}
+
+/**
+ * Parses a unit from a value.
+ *
+ * @param initialValue Value to parse
+ * @param units        Units to derive from.
+ * @return The extracted unit.
+ */
+function matchUnit(
+	initialValue: Value | undefined,
+	units: WPUnitControlUnitList = ALL_CSS_UNITS
+): string | undefined {
+	const value = String( initialValue ).trim();
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ );
 
 	let unit: string | undefined =
@@ -194,12 +252,10 @@ export function parseUnit(
 
 	if ( hasUnits( units ) && units !== false ) {
 		const match = units.find( ( item ) => item.value === unit );
-		unit = match?.value;
-	} else {
-		unit = DEFAULT_UNIT.value;
+		return match?.value;
 	}
 
-	return [ num, unit ];
+	return DEFAULT_UNIT.value;
 }
 
 /**
@@ -221,6 +277,10 @@ export function getValidParsedUnit(
 	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
 	let baseValue = parsedValue;
 	let baseUnit: string | undefined;
+
+	if ( parsedUnit === CUSTOM_CSS_UNIT.value ) {
+		return [ parsedValue, parsedUnit ];
+	}
 
 	// The parsed value from `parseUnit` should now be either a
 	// real number or an empty string. If not, use the fallback value.
@@ -334,9 +394,9 @@ export function getUnitsWithCurrentUnit(
 	}
 
 	const unitsWithCurrentUnit = [ ...units ];
-	const [ , currentUnit ] = getParsedValue(
-		currentValue,
-		legacyUnit,
+
+	const currentUnit = matchUnit(
+		legacyUnit ? `${ currentValue }${ legacyUnit }` : currentValue,
 		ALL_CSS_UNITS
 	);
 
