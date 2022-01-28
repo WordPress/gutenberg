@@ -88,7 +88,7 @@ In its `block.json`, the paragrah block declares support for font size. It means
 
 By using the block supports mechanism via `block.json`, the block author is able to create the same experience than before just by writing a couple of lines.
 
-Besides the obvious advantage of having to do less work to achieve the same results, there's a few other advantages:
+Besides the benefit of having to do less work to achieve the same results, there's a few other advantages:
 
 - the style information of the block becomes available for the native mobile apps and in the server
 - the block will use the UI controls other blocks use for the same styles, creating a more coherent user experience
