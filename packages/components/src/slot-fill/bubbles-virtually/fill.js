@@ -8,6 +8,7 @@ import { useRef, useState, useEffect, createPortal } from '@wordpress/element';
  * Internal dependencies
  */
 import useSlot from './use-slot';
+import StyleProvider from '../../style-provider';
 
 function useForceUpdate() {
 	const [ , setState ] = useState( {} );
@@ -48,5 +49,15 @@ export default function Fill( { name, children } ) {
 		children = children( slot.fillProps );
 	}
 
-	return createPortal( children, slot.ref.current );
+	// When using a `Fill`, the `children` will be rendered in the document of the
+	// `Slot`. This means that we need to wrap the `children` in a `StyleProvider`
+	// to make sure we're referencing the right document/iframe (instead of the
+	// context of the `Fill`'s parent).
+	const wrappedChildren = (
+		<StyleProvider document={ slot.ref.current.ownerDocument }>
+			{ children }
+		</StyleProvider>
+	);
+
+	return createPortal( wrappedChildren, slot.ref.current );
 }
