@@ -124,7 +124,6 @@ async function selectClassicMenu( optionText ) {
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
-const ADD_ALL_PAGES_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Add all pages']`;
 const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select menu']`;
 
 /**
@@ -151,24 +150,6 @@ async function deleteAll( endpoints ) {
 				path: `${ path }/${ item.id }?force=true`,
 			} );
 		}
-	}
-}
-
-/**
- * Create a set of pages using the REST API.
- *
- * @param {Array} pages An array of page objects.
- */
-async function createPages( pages ) {
-	for ( const page of pages ) {
-		await rest( {
-			method: 'POST',
-			path: PAGES_ENDPOINT,
-			data: {
-				status: 'publish',
-				...page,
-			},
-		} );
 	}
 }
 
@@ -257,37 +238,6 @@ describe( 'Navigation', () => {
 	} );
 
 	describe( 'placeholder', () => {
-		it( 'allows a navigation block to be created using existing pages', async () => {
-			await createPages( [
-				{
-					title: 'About',
-					menu_order: 0,
-				},
-				{
-					title: 'Contact Us',
-					menu_order: 1,
-				},
-				{
-					title: 'FAQ',
-					menu_order: 2,
-				},
-			] );
-
-			await createNewPost();
-
-			// Add the navigation block.
-			await insertBlock( 'Navigation' );
-			const allPagesButton = await page.waitForXPath(
-				ADD_ALL_PAGES_XPATH
-			);
-			await allPagesButton.click();
-
-			// Wait for the page list block to be present
-			await page.waitForSelector( 'ul[aria-label="Block: Page List"]' );
-
-			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
-		} );
-
 		it( 'allows a navigation block to be created from existing menus', async () => {
 			await createClassicMenu( { name: 'Test Menu 1' } );
 			await createClassicMenu(
