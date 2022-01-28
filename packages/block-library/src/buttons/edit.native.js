@@ -83,6 +83,7 @@ export default function ButtonsEdit( {
 	const { insertBlock, removeBlock, selectBlock } = useDispatch(
 		blockEditorStore
 	);
+	const hasChildBlocks = getBlockOrder( clientId ).length > 0;
 
 	useEffect( () => {
 		const { width } = sizes || {};
@@ -164,6 +165,9 @@ export default function ButtonsEdit( {
 				] }
 				renderFooterAppender={
 					shouldRenderFooterAppender && renderFooterAppender.current
+				}
+				renderAppender={
+					hasChildBlocks ? undefined : InnerBlocks.ButtonBlockAppender
 				}
 				orientation="horizontal"
 				horizontalAlignment={ justifyContent }
