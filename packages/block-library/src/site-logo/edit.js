@@ -396,11 +396,7 @@ export default function LogoEdit( {
 			siteLogoId: _siteLogoId,
 			canUserEdit: _canUserEdit,
 			url: siteData?.url,
-			mediaItemData: mediaItem && {
-				id: mediaItem.id,
-				url: mediaItem.source_url,
-				alt: mediaItem.alt_text,
-			},
+			mediaItemData: mediaItem,
 			isRequestingMediaItem: _isRequestingMediaItem,
 			siteIconId: _siteIconId,
 		};
@@ -427,9 +423,9 @@ export default function LogoEdit( {
 
 	let alt = null;
 	if ( mediaItemData ) {
-		alt = mediaItemData.alt;
-		if ( logoUrl !== mediaItemData.url ) {
-			setLogoUrl( mediaItemData.url );
+		alt = mediaItemData.alt_text;
+		if ( logoUrl !== mediaItemData.source_url ) {
+			setLogoUrl( mediaItemData.source_url );
 		}
 	}
 
