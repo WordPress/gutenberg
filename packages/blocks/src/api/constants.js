@@ -105,6 +105,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'typography', 'textDecoration' ],
 		support: [ 'typography', '__experimentalTextDecoration' ],
 	},
+	writingMode: {
+		value: [ 'typography', 'writingMode' ],
+		support: [ 'typography', '__experimentalWritingMode' ],
+	},
 	textTransform: {
 		value: [ 'typography', 'textTransform' ],
 		support: [ 'typography', '__experimentalTextTransform' ],

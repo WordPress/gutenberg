@@ -28,6 +28,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
+	$has_writing_mode_support    = _wp_array_get( $typography_supports, array( '__experimentalWritingMode' ), false );
 
 	$has_typography_support = $has_font_family_support
 		|| $has_font_size_support
@@ -36,7 +37,8 @@ function gutenberg_register_typography_support( $block_type ) {
 		|| $has_letter_spacing_support
 		|| $has_line_height_support
 		|| $has_text_decoration_support
-		|| $has_text_transform_support;
+		|| $has_text_transform_support
+		|| $has_writing_mode_support;
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
@@ -92,6 +94,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
+	$has_writing_mode_support    = _wp_array_get( $typography_supports, array( '__experimentalWritingMode' ), false );
 
 	if ( $has_font_size_support ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $block_attributes );
@@ -165,6 +168,12 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		}
 	}
 
+	if ( $has_writing_mode_support ) {
+		$writing_mode_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'writingMode', 'writing-mode' );
+		if ( $writing_mode_style ) {
+			$styles[] = $writing_mode_style;
+		}
+	}
 	if ( ! empty( $classes ) ) {
 		$attributes['class'] = implode( ' ', $classes );
 	}

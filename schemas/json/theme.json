@@ -263,6 +263,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"writingMode": {
+							"description": "Allow users to set custom text orientation and document flow with CSS writing mode.",
+							"type": "boolean",
+							"default": true
+						},
 						"textTransform": {
 							"description": "Allow users to set custom text transforms.",
 							"type": "boolean",
@@ -795,6 +800,10 @@
 						},
 						"textDecoration": {
 							"description": "Sets the `text-decoration` CSS property.",
+							"type": "string"
+						},
+						"writingMode": {
+							"description": "Sets the `writing-mode` CSS property.",
 							"type": "string"
 						},
 						"textTransform": {

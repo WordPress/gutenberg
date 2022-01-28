@@ -1,0 +1,18 @@
+.block-editor-writing-mode-control {
+	flex: 0 0 50%;
+
+	legend {
+		margin-bottom: 8px;
+	}
+
+	.block-editor-writing-mode-control__buttons {
+		display: inline-flex;
+		margin-bottom: 24px;
+
+		.components-button.has-icon {
+			min-width: 24px;
+			padding: 0;
+			margin-right: 4px;
+		}
+	}
+}

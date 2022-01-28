@@ -50,6 +50,13 @@ import {
 	useIsTextDecorationDisabled,
 } from './text-decoration';
 import {
+	WRITING_MODE_SUPPORT_KEY,
+	WritingModeEdit,
+	hasWritingModeValue,
+	resetWritingMode,
+	useIsWritingModeDisabled,
+} from './writing-mode';
+import {
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	TextTransformEdit,
 	hasTextTransformValue,
@@ -72,6 +79,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	FONT_WEIGHT_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
+	WRITING_MODE_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
 ];
@@ -83,6 +91,7 @@ export function TypographyPanel( props ) {
 	const isFontAppearanceDisabled = useIsFontAppearanceDisabled( props );
 	const isLineHeightDisabled = useIsLineHeightDisabled( props );
 	const isTextDecorationDisabled = useIsTextDecorationDisabled( props );
+	const isWritingModeDisabled = useIsWritingModeDisabled( props );
 	const isTextTransformDisabled = useIsTextTransformDisabled( props );
 	const isLetterSpacingDisabled = useIsLetterSpacingDisabled( props );
 
@@ -227,6 +236,19 @@ export function TypographyPanel( props ) {
 					<LetterSpacingEdit { ...props } />
 				</ToolsPanelItem>
 			) }
+			{ ! isWritingModeDisabled && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => hasWritingModeValue( props ) }
+					label={ __( 'Orientation' ) }
+					onDeselect={ () => resetWritingMode( props ) }
+					isShownByDefault={ defaultControls?.writingMode }
+					resetAllFilter={ createResetAllFilter( 'writingMode' ) }
+					panelId={ clientId }
+				>
+					<WritingModeEdit { ...props } />
+				</ToolsPanelItem>
+			) }
 		</InspectorControls>
 	);
 }
@@ -244,6 +266,7 @@ function useIsTypographyDisabled( props = {} ) {
 		useIsLineHeightDisabled( props ),
 		useIsFontFamilyDisabled( props ),
 		useIsTextDecorationDisabled( props ),
+		useIsWritingModeDisabled( props ),
 		useIsTextTransformDisabled( props ),
 		useIsLetterSpacingDisabled( props ),
 	];
