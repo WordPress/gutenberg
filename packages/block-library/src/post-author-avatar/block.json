@@ -9,11 +9,11 @@
 	"attributes": {
 		"width": {
 			"type": "number",
-			"default": 48
+			"default": 60
 		},
 		"height": {
 			"type": "number",
-			"default": 48
+			"default": 60
 		},
 		"isLink": {
 			"type": "boolean",
@@ -39,12 +39,15 @@
 			"style": true,
 			"__experimentalDefaultControls": {
 				"radius": true
-			}
+			},
+			"__experimentalSkipSerialization": true
 		},
 		"color": {
 			"text": false,
 			"background": false,
 			"__experimentalDuotone": "img"
 		}
-	}
+	},
+	"editorStyle": "wp-block-post-author-avatar",
+	"style": "wp-block-post-author-avatar"
 }
