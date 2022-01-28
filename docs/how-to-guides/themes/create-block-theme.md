@@ -69,7 +69,7 @@ Author URI: https://wordpress.org/
 Description:
 Tags: full-site-editing, blog
 Version: 1.0.0
-Requires at least: 5.0
+Requires at least: 5.9
 Tested up to: 5.9
 Requires PHP: 7.0
 License: GNU General Public License v2 or later
