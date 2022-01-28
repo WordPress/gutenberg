@@ -84,7 +84,7 @@ For example:
 }
 ```
 
-In its `block.json`, the paragrah block declares support for font size. It means that there will be a UI control available for users to tweak the font size of that particular block. The system will take care of setting up the UI control data (the font size of the block if it has one already assigned, the list of available font sizes to show), and will serialize the block data into HTML markup upon user changes (attach classes and inline styles appropriately).
+The paragraph declares support for font size in its `block.json`. This means the block will show a UI control for users to tweak its font size, unless it's disabled by the theme (learn more about this in [the `theme.json` reference](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/)). The system will also take care of setting up the UI control data (the font size of the block if it has one already assigned, the list of available font sizes to show), and will serialize the block data into HTML markup upon user changes (attach classes and inline styles appropriately).
 
 By using the block supports mechanism via `block.json`, the block author is able to create the same experience as before just by writing a couple of lines.
 
