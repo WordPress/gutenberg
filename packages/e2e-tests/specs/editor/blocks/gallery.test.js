@@ -66,7 +66,7 @@ describe( 'Gallery', () => {
 		);
 		await selectBlockByClientId( galleryBlock.clientId );
 
-		await page.waitForSelector( '.wp-block-cover img["src^="http://"]' );
+		await page.waitForSelector( '.wp-block-cover img[src^="http://"]' );
 
 		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
 		await page.keyboard.type( galleryCaption );
