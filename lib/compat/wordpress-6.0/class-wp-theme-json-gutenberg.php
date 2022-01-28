@@ -208,6 +208,7 @@ class WP_Theme_JSON_Gutenberg {
 		'settings',
 		'styles',
 		'templateParts',
+		'patterns',
 		'version',
 	);
 
@@ -673,6 +674,18 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 		return $custom_templates;
+	}
+
+	/**
+	 * Returns the current theme's wanted patterns(slugs) to be
+	 * registered from Pattern Directory.
+	 *
+	 * @return array|null
+	 */
+	public function get_pattern_settings() {
+		if ( isset( $this->theme_json['patterns'] ) && is_array( $this->theme_json['patterns'] ) ) {
+			return $this->theme_json['patterns'];
+		}
 	}
 
 	/**
