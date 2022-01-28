@@ -189,7 +189,7 @@ describe( 'Widgets Customizer', () => {
 
 		const backButton = await find( {
 			role: 'button',
-			name: 'Back',
+			name: /Back/,
 			focused: true,
 		} );
 		await expect( backButton ).toHaveFocus();
@@ -341,7 +341,7 @@ describe( 'Widgets Customizer', () => {
 		// Back to the widget areas panel.
 		const backButton = await find( {
 			role: 'button',
-			name: 'Back',
+			name: /Back/,
 		} );
 		await backButton.click();
 
@@ -377,7 +377,7 @@ describe( 'Widgets Customizer', () => {
 		await page.keyboard.type( 'First Heading' );
 
 		// Navigate back to the parent panel.
-		const backButton = await find( { role: 'button', name: 'Back' } );
+		const backButton = await find( { role: 'button', name: /Back/ } );
 		await backButton.click();
 
 		await waitForPreviewIframe();

@@ -278,7 +278,7 @@ describe( 'TimePicker', () => {
 			screen.getByLabelText( 'Day' )
 		);
 
-		expect( monthInputIndex < dayInputIndex ).toBe( true );
+		expect( monthInputIndex > dayInputIndex ).toBe( true );
 
 		rerender(
 			<form aria-label="form">
@@ -299,7 +299,7 @@ describe( 'TimePicker', () => {
 			screen.getByLabelText( 'Day' )
 		);
 
-		expect( monthInputIndex > dayInputIndex ).toBe( true );
+		expect( monthInputIndex < dayInputIndex ).toBe( true );
 	} );
 
 	it( 'Should set a time when passed a null currentTime', () => {

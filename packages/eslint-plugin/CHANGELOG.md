@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.0.0 (2022-01-27)
+
 ### Breaking Changes
 
 -   The peer dependency constraint for ESLint has been updated from `^6 || ^7` to `^8`.

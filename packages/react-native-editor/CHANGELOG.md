@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [**] [Gallery block] Fix crash when adding images and selecting a gallery item [#38238]
+
 ## 1.70.0
 
 -   [**] Fix content justification attribute in Buttons block [#37887]
