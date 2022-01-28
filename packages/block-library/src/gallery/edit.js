@@ -24,15 +24,8 @@ import {
 	useBlockProps,
 	BlockControls,
 	MediaReplaceFlow,
-	BlockList,
 } from '@wordpress/block-editor';
-import {
-	Platform,
-	useEffect,
-	useMemo,
-	createPortal,
-	useContext,
-} from '@wordpress/element';
+import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -61,6 +54,7 @@ import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
+import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -120,11 +114,6 @@ function GalleryEdit( props ) {
 			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
 		};
 	}, [] );
-
-	const styleElement = Platform.isWeb
-		? // eslint-disable-next-line react-hooks/rules-of-hooks
-		  useContext( BlockList.__unstableElementContext )
-		: undefined;
 
 	const innerBlockImages = useSelect(
 		( select ) => {
@@ -486,14 +475,6 @@ function GalleryEdit( props ) {
 
 	const hasLinkTo = linkTo && linkTo !== 'none';
 
-	const gap = attributes.style?.spacing?.blockGap
-		? `#block-${ clientId } { --wp--style--unstable-gallery-gap: ${ attributes.style.spacing.blockGap } }`
-		: `#block-${ clientId } { --wp--style--unstable-gallery-gap: var( --wp--style--block-gap, 0.5em ) }`;
-
-	const GapStyle = () => {
-		return <style>{ gap }</style>;
-	};
-
 	return (
 		<>
 			<InspectorControls>
@@ -568,10 +549,12 @@ function GalleryEdit( props ) {
 				/>
 			</BlockControls>
 			{ noticeUI }
-			{ Platform.isWeb &&
-				gap &&
-				styleElement &&
-				createPortal( <GapStyle />, styleElement ) }
+			{ Platform.isWeb && (
+				<GapStyles
+					blockGap={ attributes.style?.spacing?.blockGap }
+					clientId={ clientId }
+				/>
+			) }
 			<Gallery
 				{ ...props }
 				images={ images }
