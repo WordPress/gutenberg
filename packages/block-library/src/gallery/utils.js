@@ -22,8 +22,17 @@ import {
  */
 export function getHrefAndDestination( image, destination ) {
 	// Need to determine the URL that the selected destination maps to.
-	// Gutenberg and WordPress use different constants so the new link
-	// destination also needs to be tweaked.
+	// Gutenberg and WordPress use different constants so if image_default_link_type
+	// option is set we need to map file -> media and post -> attachment
+	switch ( destination ) {
+		case 'file':
+			destination = LINK_DESTINATION_MEDIA;
+			break;
+		case 'post':
+			destination = LINK_DESTINATION_ATTACHMENT;
+			break;
+	}
+
 	switch ( destination ) {
 		case LINK_DESTINATION_MEDIA:
 			return {
