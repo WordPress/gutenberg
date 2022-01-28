@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 20.0.1 (2022-01-28)
+
 ### Bug Fix
 
 -   Ensure that React Fast Refresh is not wired when it isn't explicitly enabled with `--hot` CLI argument when running the `start` command.
