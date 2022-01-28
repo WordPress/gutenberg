@@ -15,6 +15,7 @@
 function render_block_core_tag_cloud( $attributes ) {
 	$args      = array(
 		'echo'       => false,
+		'unit'		 => 'px',
 		'taxonomy'   => $attributes['taxonomy'],
 		'show_count' => $attributes['showTagCounts'],
 		'number'     => $attributes['numberOfTags'],
