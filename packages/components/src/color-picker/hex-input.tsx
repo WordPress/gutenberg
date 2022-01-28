@@ -24,6 +24,10 @@ interface HexInputProps {
 }
 
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+	const handleChange = ( nextValue ) => {
+		const hexValue = ( '#' + nextValue ).replace( '##', '#' );
+		onChange( colord( hexValue ) );
+	};
 	const handleValidate = ( value: string ) => {
 		if ( ! colord( '#' + value ).isValid() ) {
 			throw new Error( 'Invalid hex color input' );
@@ -43,9 +47,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 				</Spacer>
 			}
 			value={ color.toHex().slice( 1 ).toUpperCase() }
-			onChange={ ( nextValue ) => {
-				onChange( colord( '#' + nextValue ) );
-			} }
+			onChange={ handleChange }
 			onValidate={ handleValidate }
 			maxLength={ enableAlpha ? 8 : 6 }
 			label={ __( 'Hex color' ) }
