@@ -86,7 +86,7 @@ For example:
 
 In its `block.json`, the paragrah block declares support for font size. It means that there will be an UI control available for users to tweak the font size of that particular block. The system will take care of setting up the UI control data (the font size of the block if it has one already assigned, the list of available font sizes to show), and will serialize the block data into HTML markup upon user changes (attach classes and inline styles appropiately).
 
-By using the block supports mechanism via `block.json`, the block author is able to create the same experience than before just by writing a couple of lines.
+By using the block supports mechanism via `block.json`, the block author is able to create the same experience as before just by writing a couple of lines.
 
 Besides the benefit of having to do less work to achieve the same results, there's a few other advantages:
 
