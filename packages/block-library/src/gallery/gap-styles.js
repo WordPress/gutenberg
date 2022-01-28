@@ -15,5 +15,7 @@ export default function GapStyles( { blockGap, clientId } ) {
 		return <style>{ gap }</style>;
 	};
 
-	return gap && styleElement && createPortal( <GapStyle />, styleElement );
+	return gap && styleElement
+		? createPortal( <GapStyle />, styleElement )
+		: null;
 }
