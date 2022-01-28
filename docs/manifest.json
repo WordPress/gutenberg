@@ -150,6 +150,12 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Block Supports in dynamic blocks",
+		"slug": "block-supports-in-dynamic-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Generate Blocks with WP-CLI",
 		"slug": "generate-blocks-with-wp-cli",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md",
