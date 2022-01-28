@@ -1,6 +1,6 @@
 ## Styles in the block editor
 
-This document introduces the main concepts related to styles that affect the user content in the block editor. It points to the relevant reference guides and tutorials for readers to dig deeper into each one of the ideas presented. It's aimed to block authors and people working in the block editor project.
+This document introduces the main concepts related to styles that affect the user content hain the block editor. It points to the relevant reference guides and tutorials for readers to dig deeper into each one of the ideas presented. It's aimed to block authors and people working in the block editor project.
 
 1. HTML and CSS
 2. User-provided Block Styles
@@ -13,13 +13,13 @@ This document introduces the main concepts related to styles that affect the use
 
 By creating a post in the block editor the user is creating a number of artifacts: a HTML document plus a number of CSS stylesheets, either embedded in the document or external.
 
-On the one hand, the final HTML document is the result of a few things:
+The final HTML document is the result of a few things:
 
 - the [WordPress templates](https://developer.wordpress.org/themes/basics/template-files/) defined by the theme
 - the [blocks](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/) and patterns in use that come with a predefined structure (HTML markup)
 - the user modifications to the content: adding content, transforming existing content (convert a given paragraph into a heading), or modifying it (attaching a class or inline styles to a block)
 
-On the other hand, there's a number of stylesheets being loaded in the front end:
+The stylesheets loaded in the front end include:
 
 - **Blocks**. The stylesheets that come with the block. In the front end, you can find a single stylesheet with all block styles defined by WordPress (`wp-block-library-*` ) or separate stylesheets per block in use (as in `wp-block-group-*`, `wp-block-columns-*`, etc). See [this note](https://make.wordpress.org/core/2021/07/01/block-styles-loading-enhancements-in-wordpress-5-8/) for the full details.
 - **Global styles**. These styles are generated on the fly by using data coming from a theme.json file: see [note](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/), [reference](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/), and [how to guide](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/). Specifically, it merges the contents of the theme.json coming with WordPress, the theme.json coming with the theme if any, and the user data provided via the global styles sidebar in the site editor. The result of processing this data is visible in the  `global-styles-inline-css` stylesheet.
