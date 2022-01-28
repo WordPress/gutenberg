@@ -47,7 +47,7 @@ function render_block_core_post_author_avatar( $attributes, $content, $block ) {
 					$name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
 
 					// Add shared styles for individual border radii.
-					$border_style = sprintf(
+					$border_style   = sprintf(
 						'border-%s-radius: %s;',
 						esc_attr( $name ),
 						esc_attr( $value )
