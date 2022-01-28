@@ -11,7 +11,6 @@ import {
 	useBlockProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
-	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -59,7 +58,6 @@ function PostAuthorAvatarEdit( {
 	const blockProps = useBlockProps();
 	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
-	const spacingProps = useSpacingProps( attributes );
 
 	const inspectorControls = (
 		<InspectorControls>
@@ -134,7 +132,7 @@ function PostAuthorAvatarEdit( {
 			/>
 		</ResizableBox>
 	) : (
-		// Displays while loading. TODO: Replace with an avatar placeholder.
+		// Displays while loading
 		<p>{ _x( 'Post Author Avatar', 'block title' ) } </p>
 	);
 
@@ -153,16 +151,7 @@ function PostAuthorAvatarEdit( {
 	return (
 		<>
 			{ inspectorControls }
-			<figure
-				{ ...blockProps }
-				/*
-				 * The spacing properties need to be added to the wrapper,
-				 * not the image element, otherwise they affect the ResizableBox.
-				 */
-				style={ { ...spacingProps.style } }
-			>
-				{ displayAvatar }
-			</figure>
+			<figure { ...blockProps }>{ displayAvatar }</figure>
 		</>
 	);
 }
