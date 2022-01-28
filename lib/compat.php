@@ -11,7 +11,7 @@
 /**
  * Update allowed inline style attributes list.
  *
- * Note: This should be removed when the minimum required WP version is >= 5.8.
+ * Note: This should be removed when the minimum required WP version is >= 5.9.
  *
  * @param string[] $attrs Array of allowed CSS attributes.
  * @return string[] CSS attributes.
