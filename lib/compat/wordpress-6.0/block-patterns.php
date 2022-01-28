@@ -24,8 +24,8 @@ function gutenberg_register_remote_theme_patterns() {
 	if ( $response->is_error() ) {
 		return;
 	}
-	$patterns            = $response->get_data();
-	$patterns_registry   = WP_Block_Patterns_Registry::get_instance();
+	$patterns          = $response->get_data();
+	$patterns_registry = WP_Block_Patterns_Registry::get_instance();
 	foreach ( $patterns as $pattern ) {
 		$pattern_name = sanitize_title( $pattern['title'] );
 		// Some patterns might be already registered as core patterns with the `core` prefix.
@@ -40,7 +40,7 @@ add_action(
 	'init',
 	function() {
 		$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
-		if ( ! get_theme_support( 'core-block-patterns' ) || ! $should_load_remote  ) {
+		if ( ! get_theme_support( 'core-block-patterns' ) || ! $should_load_remote ) {
 			return;
 		}
 		gutenberg_register_remote_theme_patterns();

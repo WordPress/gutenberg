@@ -28,7 +28,7 @@ class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Direct
 		require ABSPATH . WPINC . '/version.php';
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		$gutenberg_data = get_plugin_data( dirname( __DIR__, 3 ) . '/gutenberg.php', false );
+		$gutenberg_data = get_plugin_data( dirname( dirname( dirname( __DIR__ ) ) ) . '/gutenberg.php', false );
 
 		$query_args = array(
 			'locale'            => get_user_locale(),
