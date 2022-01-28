@@ -14,6 +14,8 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	clickButton,
+	getAllBlocks,
+	selectBlockByClientId,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -57,6 +59,12 @@ describe( 'Gallery', () => {
 
 		await insertBlock( 'Gallery' );
 		await upload( '.wp-block-gallery input[type="file"]' );
+
+		const allBlocks = await getAllBlocks();
+		const galleryBlock = allBlocks.find(
+			( block ) => block.name === 'core/gallery'
+		);
+		await selectBlockByClientId( galleryBlock.clientId );
 
 		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
 		await page.keyboard.type( galleryCaption );
