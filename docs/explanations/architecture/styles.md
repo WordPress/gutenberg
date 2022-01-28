@@ -49,7 +49,7 @@ After some user modifications to the block, the initial markup may become someth
 ></p>
 ```
 
-This is what we refer to as "user-provided block styles". Other names people use are local styles or serialized styles. Essentially, each tool (font size, color, etc) ends up adding some classes and/or inline styles to the block markup. The content of these classes is part of the block, global, or theme stylesheets.
+This is what we refer to as "user-provided block styles". Other names people use are local styles or serialized styles. Essentially, each tool (font size, color, etc) ends up adding some classes and/or inline styles to the block markup. The CSS styling for these classes is part of the block, global, or theme stylesheets.
 
 The ability to modify a block state coupled with the fact that a block can live within any other block (think of a paragraph within a group), creates a vast amount of potential states and style possibilities.
 
