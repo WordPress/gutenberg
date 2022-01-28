@@ -12,7 +12,7 @@ import {
 	useInstanceId,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -25,10 +25,48 @@ import { store as editSiteStore } from '../../store';
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
-	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
-	async function selectEditorBlock( clientId ) {
-		await clearSelectedBlock();
-		selectBlock( clientId, -1 );
+	const { getBlockParents, getBlockSelectionStart } = useSelect(
+		blockEditorStore
+	);
+
+	const { clearSelectedBlock, multiSelect, selectBlock } = useDispatch(
+		blockEditorStore
+	);
+
+	async function selectEditorBlock( clientId, event ) {
+		if ( ! event.shiftKey ) {
+			await clearSelectedBlock();
+			selectBlock( clientId, -1 );
+		} else if ( event.shiftKey ) {
+			event.preventDefault();
+
+			const blockSelectionStart = getBlockSelectionStart();
+
+			// By checking `blockSelectionStart` to be set, we handle the
+			// case where we select a single block. We also have to check
+			// the selectionEnd (clientId) not to be included in the
+			// `blockSelectionStart`'s parents because the click event is
+			// propagated.
+			const startParents = getBlockParents( blockSelectionStart );
+
+			if (
+				blockSelectionStart &&
+				blockSelectionStart !== clientId &&
+				! startParents?.includes( clientId )
+			) {
+				const startPath = [ ...startParents, blockSelectionStart ];
+				const endPath = [ ...getBlockParents( clientId ), clientId ];
+				const depth = Math.min( startPath.length, endPath.length ) - 1;
+				const start = startPath[ depth ];
+				const end = endPath[ depth ];
+
+				// Handle the case of having selected a parent block and
+				// then shift+click on a child.
+				if ( start !== end ) {
+					multiSelect( start, end );
+				}
+			}
+		}
 	}
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );

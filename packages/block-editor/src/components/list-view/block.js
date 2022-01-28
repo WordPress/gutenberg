@@ -105,7 +105,7 @@ function ListViewBlock( {
 	const selectEditorBlock = useCallback(
 		( event ) => {
 			event.stopPropagation();
-			selectBlock( clientId );
+			selectBlock( clientId, event );
 		},
 		[ clientId, selectBlock ]
 	);

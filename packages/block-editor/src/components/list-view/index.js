@@ -27,7 +27,6 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import { store as blockEditorStore } from '../../store';
 
-const noop = () => {};
 const expanded = ( state, action ) => {
 	switch ( action.type ) {
 		case 'expand':
@@ -57,7 +56,7 @@ const expanded = ( state, action ) => {
 function ListView(
 	{
 		blocks,
-		onSelect = noop,
+		onSelect,
 		__experimentalFeatures,
 		__experimentalPersistentListViewFeatures,
 		__experimentalHideContainerBlockActions,
@@ -89,9 +88,11 @@ function ListView(
 		[ draggedClientIds ]
 	);
 	const selectEditorBlock = useCallback(
-		( clientId ) => {
-			selectBlock( clientId );
-			onSelect( clientId );
+		( clientId, event ) => {
+			if ( ! onSelect ) {
+				selectBlock( clientId );
+			}
+			onSelect( clientId, event );
 		},
 		[ selectBlock, onSelect ]
 	);
