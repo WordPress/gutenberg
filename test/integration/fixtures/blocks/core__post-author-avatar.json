@@ -4,8 +4,8 @@
 		"name": "core/post-author-avatar",
 		"isValid": true,
 		"attributes": {
-			"width": 48,
-			"height": 48,
+			"width": 60,
+			"height": 60,
 			"isLink": false,
 			"linkTarget": "_self"
 		},
