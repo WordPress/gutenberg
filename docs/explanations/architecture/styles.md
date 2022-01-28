@@ -15,7 +15,7 @@ By creating a post in the block editor the user is creating a number of artifact
 
 The final HTML document is the result of a few things:
 
-- the [WordPress templates](https://developer.wordpress.org/themes/basics/template-files/) defined by the theme
+- the [WordPress templates](https://developer.wordpress.org/themes/basics/template-files/) provided by the theme, either via PHP (classic theme) or via HTML templates (block theme) ([learn more](https://developer.wordpress.org/themes/block-themes/#differences-and-similarities-between-classic-themes-and-block-themes) about the differences)
 - the [blocks](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/) and patterns in use that come with a predefined structure (HTML markup)
 - the user modifications to the content: adding content, transforming existing content (convert a given paragraph into a heading), or modifying it (attaching a class or inline styles to a block)
 
