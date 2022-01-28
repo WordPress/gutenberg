@@ -64,6 +64,8 @@ export default function PostFormat() {
 	);
 
 	const formats = POST_FORMATS.filter( ( format ) => {
+		// Ensure current format is always in the set.
+		// The current format may not be a format supported by the theme.
 		return (
 			includes( supportedFormats, format.id ) || postFormat === format.id
 		);
