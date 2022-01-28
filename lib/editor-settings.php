@@ -18,10 +18,6 @@
  * @return array Filtered settings.
  */
 function gutenberg_extend_post_editor_settings( $settings ) {
-	$image_default_size = get_option( 'image_default_size', 'large' );
-	$image_sizes        = wp_list_pluck( $settings['imageSizes'], 'slug' );
-
-	$settings['imageDefaultSize']                      = in_array( $image_default_size, $image_sizes, true ) ? $image_default_size : 'large';
 	$settings['__unstableEnableFullSiteEditingBlocks'] = current_theme_supports( 'block-templates' );
 
 	if ( wp_is_block_theme() ) {
