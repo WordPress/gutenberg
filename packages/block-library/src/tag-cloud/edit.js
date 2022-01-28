@@ -13,7 +13,9 @@ import {
 	ToggleControl,
 	SelectControl,
 	RangeControl,
-	__experimentalNumberControl as NumberControl,
+	__experimentalInputControl as InputControl,
+	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -93,20 +95,33 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 				/>
 				<Flex>
 					<FlexItem isBlock>
-						<NumberControl
+						<InputControl
+							type="number"
 							label={ __( 'Smallest size' ) }
 							value={ smallestFontSize }
 							onChange={ ( value ) => {
 								const newValue =
 									value && +value >= 8 ? +value : 8;
-								setAttributes( { smallestFontSize: newValue } );
+								setAttributes( {
+									smallestFontSize: newValue,
+								} );
 							} }
 							min={ 8 }
 							max={ 60 }
+							suffix={
+								<Spacer
+									as={ Text }
+									marginTop={ 2 }
+									marginRight={ 3 }
+								>
+									px
+								</Spacer>
+							}
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
-						<NumberControl
+						<InputControl
+							type="number"
 							label={ __( 'Largest size' ) }
 							value={ largestFontSize }
 							onChange={ ( value ) => {
@@ -116,6 +131,15 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 							} }
 							min={ 8 }
 							max={ 60 }
+							suffix={
+								<Spacer
+									as={ Text }
+									marginTop={ 2 }
+									marginRight={ 3 }
+								>
+									px
+								</Spacer>
+							}
 						/>
 					</FlexItem>
 				</Flex>
