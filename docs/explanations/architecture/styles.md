@@ -136,7 +136,7 @@ While work continues in that proposal, there's an escape hatch, an experimental 
 }
 ```
 
-This means that the font size block supports will do all of the things (create an UI control, bind the block attribute to the control, etc) except serializing the user values into the HTML markup. The classes and inline styles will not be automatically applied to the wrapper and is the block author responsibility to implement this in the `edit`, `save`, and `render_callback` functions. See [this issue](https://github.com/WordPress/gutenberg/issues/28913) for examples of how it was done for some blocks provided by WordPress.
+This means that the typography block support will do all of the things (create a UI control, bind the block attribute to the control, etc) except serializing the user values into the HTML markup. The classes and inline styles will not be automatically applied to the wrapper and it is the block author's responsibility to implement this in the `edit`, `save`, and `render_callback` functions. See [this issue](https://github.com/WordPress/gutenberg/issues/28913) for examples of how it was done for some blocks provided by WordPress.
 
 ### 3. User-provided Global Styles
 
