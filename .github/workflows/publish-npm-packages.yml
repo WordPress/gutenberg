@@ -232,3 +232,14 @@ jobs:
                     npx lerna version "$minimum_version_bump" --no-private --yes
                     npx lerna publish from-package --yes
                   fi
+                  if [ '${{ github.ref }}' != 'refs/heads/wp/next' ]; then
+                    echo "::set-output name=publish_commit::$(git rev-parse --verify --short HEAD)"
+                  fi
+
+            - name: Cherry-pick the changelog update commit to trunk
+              if: ${{ steps.publish_packages.outputs.publish_commit }}
+              run: |
+                  git checkout trunk
+                  git pull
+                  git cherry-pick "${{ steps.publish_packages.outputs.publish_commit }}"
+                  git push
