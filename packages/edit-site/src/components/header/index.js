@@ -34,6 +34,7 @@ const preventDefault = ( event ) => {
 export default function Header( {
 	openEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
+	showIconLabels,
 } ) {
 	const inserterButton = useRef();
 	const {
@@ -122,7 +123,10 @@ export default function Header( {
 							'Toggle block inserter',
 							'Generic label for block inserter button'
 						) }
-					/>
+					>
+						{ showIconLabels &&
+							( ! isInserterOpen ? __( 'Add' ) : __( 'Close' ) ) }
+					</Button>
 					{ isLargeViewport && (
 						<>
 							<ToolbarItem

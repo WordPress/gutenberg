@@ -61,6 +61,7 @@ function Editor( { onError } ) {
 		previousShortcut,
 		nextShortcut,
 		editorMode,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -71,6 +72,7 @@ function Editor( { onError } ) {
 			getPage,
 			isNavigationOpened,
 			getEditorMode,
+			isFeatureActive,
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
 		const postType = getEditedPostType();
@@ -105,6 +107,7 @@ function Editor( { onError } ) {
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
 			editorMode: getEditorMode(),
+			showIconLabels: isFeatureActive( 'showIconLabels' ),
 		};
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
@@ -203,6 +206,10 @@ function Editor( { onError } ) {
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
 											labels={ interfaceLabels }
+											className={
+												showIconLabels &&
+												'show-icon-labels'
+											}
 											secondarySidebar={ secondarySidebar() }
 											sidebar={
 												sidebarIsOpened && (
@@ -216,6 +223,9 @@ function Editor( { onError } ) {
 												<Header
 													openEntitiesSavedStates={
 														openEntitiesSavedStates
+													}
+													showIconLabels={
+														showIconLabels
 													}
 												/>
 											}
