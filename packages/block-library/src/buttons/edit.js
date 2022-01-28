@@ -4,6 +4,7 @@
 import {
 	useBlockProps,
 	useInnerBlocksProps,
+	InnerBlocks,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -30,7 +31,7 @@ const DEFAULT_BLOCK = {
 	],
 };
 
-function ButtonsEdit( { attributes: { layout = {} } } ) {
+function ButtonsEdit( { attributes: { layout = {} }, clientId } ) {
 	const blockProps = useBlockProps();
 	const preferredStyle = useSelect( ( select ) => {
 		const preferredStyleVariations = select(
@@ -39,6 +40,15 @@ function ButtonsEdit( { attributes: { layout = {} } } ) {
 		return preferredStyleVariations?.value?.[ buttonBlockName ];
 	}, [] );
 
+	const { hasChildBlocks } = useSelect(
+		( select ) => {
+			const { getBlockOrder } = select( blockEditorStore );
+			return {
+				hasChildBlocks: getBlockOrder( clientId ).length > 0,
+			};
+		},
+		[ clientId ]
+	);
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		__experimentalDefaultBlock: DEFAULT_BLOCK,
@@ -51,8 +61,10 @@ function ButtonsEdit( { attributes: { layout = {} } } ) {
 		],
 		__experimentalLayout: layout,
 		templateInsertUpdatesSelection: true,
+		renderAppender: hasChildBlocks
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
 	} );
-
 	return (
 		<>
 			<div { ...innerBlocksProps } />
