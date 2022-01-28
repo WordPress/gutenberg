@@ -1,6 +1,6 @@
 ## Styles in the block editor
 
-This document introduces the main concepts related to styles that affect the user content hain the block editor. It points to the relevant reference guides and tutorials for readers to dig deeper into each one of the ideas presented. It's aimed to block authors and people working in the block editor project.
+This document introduces the main concepts related to styles that affect the user content in the block editor. It points to the relevant reference guides and tutorials for readers to dig deeper into each one of the ideas presented. It's aimed to block authors and people working in the block editor project.
 
 1. HTML and CSS
 2. User-provided Block Styles
