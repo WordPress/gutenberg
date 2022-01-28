@@ -219,6 +219,9 @@ export default function CommentTemplateEdit( {
 		commentsPerPage,
 		threadCommentsDepth,
 		threadComments,
+		// TODO: Check nested comments rendering.
+		// threadCommentsDepth,
+		// threadComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalDiscussionSettings;
@@ -232,6 +235,7 @@ export default function CommentTemplateEdit( {
 			if ( ! postId ) {
 				// We set a limit in order not to overload the editor of empty comments.
 				const defaultCommentsToShow = perPage <= 3 ? perPage : 1;
+				// Check if we have enabled threaded comments on discussion settings.
 				return {
 					rawComments: Array( defaultCommentsToShow ).fill( {
 						id: null,
