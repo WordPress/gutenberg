@@ -57,7 +57,7 @@ The ability to modify a block state coupled with the fact that a block can live 
 
 If you follow the [block tutorial](https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/) you can learn up about the different parts of the [block API](https://developer.wordpress.org/block-editor/reference-guides/block-api/) presented here in more detail and also build your own block. This is an introduction to the general concepts of how a block can let users edit its state.
 
-To build a experience like the one described above a block author needs a few pieces:
+To build an experience like the one described above a block author needs a few pieces:
 
 1. **An UI control**. It presents the user some choices, for example, be able to change the font size of the block. The control takes care of reading the data from the block (does this block has already a font size assigned?) and other data it needs (what are the font sizes an user can use in this block?). See available [component library](https://developer.wordpress.org/block-editor/reference-guides/components/).
 2. **A block attribute**. The block needs to hold data to know which modifications were applied to it: whether it has been given a font size already, for example. See how blocks can define [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/).
