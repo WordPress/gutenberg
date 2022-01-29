@@ -172,26 +172,47 @@ export default function CommentTemplateEdit( {
 	const {
 		commentOrder,
 		commentsPerPage,
-		// TODO: Check nested comments rendering.
-		// threadCommentsDepth,
-		// threadComments,
+		threadCommentsDepth,
+		threadComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalDiscussionSettings;
 	} );
 	const { rawComments, blocks } = useSelect(
 		( select ) => {
-			// Show empty comments if we don't have a postId context.
-			// The structure of the empty object as a rawComment allows
-			// to inner blocks to render the default placeholders.
+			// Show placeholder comments if we don't have a postId context.
+			// The structure of rawComment as an empty object allows
+			// inner blocks to render the default placeholders.
 			if ( ! postId ) {
+				// If displaying threaded comments is disabled, we only show one comment
+				if ( ! threadComments ) {
+					return { rawComments: [ { id: null } ] };
+				}
+
+				// In case that `threadCommentsDepth` is falsy, we default to a somewhat
+				// arbitrary value of 3.
+				// In case that the value is set but larger than 3 we truncate it to 3.
+				const commentsDepth = Math.min( threadCommentsDepth || 3, 3 );
+
 				// We set a limit in order not to overload the editor of empty comments.
-				const defaultCommentsToShow = perPage <= 3 ? perPage : 1;
-				// Check if we have enabled threaded comments on discussion settings.
+				const defaultCommentsToShow =
+					perPage <= commentsDepth ? perPage : commentsDepth;
+
+				// This is a little hacky. We get a comment structure like:
+				// [
+				//   {id: -1, parent: 0},
+				//   {id: -2, parent: -1},
+				//   {id: -3, parent: -2}
+				//  ]
+				// The idea is that comments with a negative ID will not appear in a
+				// "real" system.
 				return {
-					rawComments: Array( defaultCommentsToShow ).fill( {
-						id: null,
-					} ),
+					rawComments: Array( defaultCommentsToShow )
+						.fill( 'dummy' )
+						.map( ( _, index ) => ( {
+							id: -index - 1, // filling with dummy values that are discarded
+							parent: index ? -index : 0, // if index is positive, return -index, return 0 otherwise
+						} ) ),
 				};
 			}
 			const { getEntityRecords } = select( coreStore );
