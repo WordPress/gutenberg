@@ -43,19 +43,28 @@ provideToNativeHtml.mockImplementation( ( html ) => {
  * @param {import('react').ReactNode} [options.component] A specific editor component to render.
  * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
  */
-export function initializeEditor( props, { component = Editor } = {} ) {
+export async function initializeEditor( props, { component = Editor } = {} ) {
 	// Portions of the React Native Animation API rely upon these APIs. However,
-	// Jest's 'legacy' fake timer mutate these globals, which breaks the Animated
+	// Jest's 'legacy' fake timers mutate these globals, which breaks the Animated
 	// API. We preserve the original implementations to restore them later.
 	const originalRAF = global.requestAnimationFrame;
 	const originalCAF = global.cancelAnimationFrame;
 
-	// During editor initialization, asynchronous store resolvers rely upon
+	// During editor initialization, asynchronous store resolvers leverage
+	// `apiFetch` to fetch data from the REST API. The resolvers also rely upon
 	// `setTimeout` to run at the end of the current JavaScript block execution.
 	// In order to prevent "act" warnings triggered by updates to the React tree,
-	// we leverage fake timers to manually tick and await the resolution of the
-	// current block execution before proceeding.
+	// we manually tick fake timers and await the resolution of `apiFetch`
+	// before proceeding.
 	jest.useFakeTimers( 'legacy' );
+	const mockApiResponse = Promise.resolve();
+	jest.doMock( '@wordpress/data-controls', () => {
+		const dataControls = jest.requireActual( '@wordpress/data-controls' );
+		return {
+			...dataControls,
+			apiFetch: jest.fn( () => mockApiResponse ),
+		};
+	} );
 
 	// Arrange
 	const EditorComponent = component;
@@ -68,7 +77,7 @@ export function initializeEditor( props, { component = Editor } = {} ) {
 		/>
 	);
 
-	// Layout event must be explicitly dispatched in BlockList component,
+	// A layout event must be explicitly dispatched in BlockList component,
 	// otherwise the inner blocks are not rendered.
 	fireEvent( screen.getByTestId( 'block-list-wrapper' ), 'layout', {
 		nativeEvent: {
@@ -80,6 +89,9 @@ export function initializeEditor( props, { component = Editor } = {} ) {
 
 	// Advance all timers allowing store resolvers to resolve.
 	act( () => jest.runAllTimers() );
+
+	// Await resolution of API fetches within store resolvers.
+	await act( () => mockApiResponse );
 
 	// Restore the default timer APIs for remainder of test arrangement, act, and
 	// assertion.

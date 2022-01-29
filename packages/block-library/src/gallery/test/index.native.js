@@ -34,7 +34,7 @@ const GALLERY_WITH_ONE_IMAGE = `<!-- wp:gallery {"linkTo":"none"} -->
 <!-- /wp:gallery -->`;
 
 const addGalleryBlock = async () => {
-	const screen = initializeEditor();
+	const screen = await initializeEditor();
 	const { getByA11yLabel, getByTestId, getByText } = screen;
 
 	fireEvent.press( getByA11yLabel( 'Add block' ) );
@@ -67,7 +67,7 @@ describe( 'Gallery block', () => {
 	} );
 
 	it( 'selects a gallery item', async () => {
-		const { getByA11yLabel } = initializeEditor( {
+		const { getByA11yLabel } = await initializeEditor( {
 			initialHtml: GALLERY_WITH_ONE_IMAGE,
 		} );
 
@@ -96,7 +96,7 @@ describe( 'Gallery block', () => {
 	} );
 
 	it( 'shows appender button when gallery has images', async () => {
-		const { getByA11yLabel, getByText } = initializeEditor( {
+		const { getByA11yLabel, getByText } = await initializeEditor( {
 			initialHtml: GALLERY_WITH_ONE_IMAGE,
 		} );
 
