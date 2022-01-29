@@ -395,6 +395,16 @@ export function getUnitsWithCurrentUnit(
 
 	const unitsWithCurrentUnit = [ ...units ];
 
+	// The Custom CSS unit is not supported when using legacy units. This
+	// is to prevent attempting to save string CSS values into number type
+	// value attributes.
+	const customUnit = unitsWithCurrentUnit.findIndex(
+		( unit ) => unit.value === CUSTOM_CSS_UNIT.value
+	);
+	if ( !! legacyUnit && customUnit ) {
+		unitsWithCurrentUnit.splice( customUnit );
+	}
+
 	const currentUnit = matchUnit(
 		legacyUnit ? `${ currentValue }${ legacyUnit }` : currentValue,
 		ALL_CSS_UNITS
