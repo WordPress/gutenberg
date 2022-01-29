@@ -70,14 +70,12 @@ export const Gallery = ( props ) => {
 		>
 			{ children }
 
-			{ isSelected && ! children && (
-				<View
-					className="blocks-gallery-media-placeholder-wrapper"
-					onClick={ removeCaptionFocus }
-				>
-					{ mediaPlaceholder }
-				</View>
-			) }
+			<View
+				className="blocks-gallery-media-placeholder-wrapper"
+				onClick={ removeCaptionFocus }
+			>
+				{ mediaPlaceholder }
+			</View>
 			<RichTextVisibilityHelper
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				captionFocused={ captionFocused }
