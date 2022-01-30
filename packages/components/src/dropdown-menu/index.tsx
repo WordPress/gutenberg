@@ -17,8 +17,10 @@ import { menu } from '@wordpress/icons';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
+import { useContextSystem } from '../ui/context';
+import type { Merge, DropdownMenuProps } from './types';
 
-function mergeProps( defaultProps = {}, props = {} ) {
+function mergeProps( { defaultProps, props, className }: Merge ) {
 	const mergedProps = {
 		...defaultProps,
 		...props,
@@ -34,20 +36,19 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
-function DropdownMenu( dropdownMenuProps ) {
-	const {
-		children,
-		className,
-		controls,
-		icon = menu,
-		label,
-		popoverProps,
-		toggleProps,
-		menuProps,
-		disableOpenOnArrowDown = false,
-		text,
-		noIcons,
-	} = dropdownMenuProps;
+function DropdownMenu( {
+	children,
+	className,
+	controls,
+	label,
+	popoverProps,
+	toggleProps,
+	menuProps,
+	text,
+	noIcons,
+}: DropdownMenuProps ) {
+	const icon = menu;
+	const disableOpenOnArrowDown = false;
 
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
