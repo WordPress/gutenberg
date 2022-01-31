@@ -96,6 +96,15 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
+		// Check to see if Block contains focussable element before a generic caret insert.
+		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
+			const focusElements = focus.tabbable.findNext( ref.current );
+			if ( focusElements ) {
+				focusElements.focus();
+				return;
+			}
+		}
+
 		setContentEditableWrapper( ref.current, false );
 
 		placeCaretAtHorizontalEdge( target, isReverse );
