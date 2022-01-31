@@ -209,3 +209,15 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 
 "
 `;
+
+exports[`formatContributors verify that the contributors list is properly formatted 1`] = `
+"## First time contributors
+
+The following PRs were merged by first time contrbutors:
+
+- @kapilpaul: Add spaces in add_theme_support documentation code. ([33796](https://github.com/WordPress/gutenberg/pull/33796))
+- @amir2mi: Example for rest_endpoints filter in PHP. ([33738](https://github.com/WordPress/gutenberg/pull/33738))
+- @christianztamayo: Scripts: Webpack configuration update to minimize CSS. ([33676](https://github.com/WordPress/gutenberg/pull/33676))
+- @alexstine: Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))
+"
+`;

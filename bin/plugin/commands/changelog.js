@@ -916,7 +916,7 @@ async function getReleaseChangelog( options ) {
 	} );
 }
 
-/** @type {NodeJS.Module} */ ( module ).exports = {
+/** @type {NodeJS.Module} */ module.exports = {
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
 	createOmitByTitlePrefix,
@@ -931,4 +931,5 @@ async function getReleaseChangelog( options ) {
 	getTypesByTitle,
 	getFormattedItemDescription,
 	formatChangelog,
+	formatContributors,
 };
