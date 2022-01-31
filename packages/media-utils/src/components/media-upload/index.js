@@ -8,12 +8,6 @@ import { castArray, defaults, pick, noop } from 'lodash';
  */
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { store as mediaUtilsStore } from '../../store';
 
 const { wp } = window;
 
@@ -248,22 +242,31 @@ export default function MediaUpload( {
 	multiple = false,
 	title = __( 'Select or Upload Media' ),
 	onSelect = noop,
-	onRemove = noop,
 	render = noop,
 	onClose = noop,
 	value = [],
 	addToGallery = false,
 } ) {
 	const frame = useRef();
+	const GalleryDetailsMediaFrame = useRef();
 	const [ lastGalleryValue, setLastGalleryValue ] = useState( null );
-	const { removeAttachment } = useDispatch( mediaUtilsStore );
-	let GalleryDetailsMediaFrame;
 
-	const renderOpenModal = () => {
-		if ( gallery ) {
-			buildAndSetGalleryFrame();
+	const updateCollection = () => {
+		const frameContent = frame.current?.content?.get();
+		if ( frameContent && frameContent.collection ) {
+			const collection = frameContent.collection;
+
+			// clean all attachments we have in memory.
+			collection
+				.toArray()
+				.forEach( ( model ) => model.trigger( 'destroy', model ) );
+
+			// reset has more flag, if library had small amount of items all items may have been loaded before.
+			collection.mirroring._hasMore = true;
+
+			// request items
+			collection.more();
 		}
-		frame.current?.open();
 	};
 
 	const onOpenModal = () => {
@@ -321,18 +324,17 @@ export default function MediaUpload( {
 		}
 	};
 
-	const onRemoveSelectedAttachment = ( attachment ) => {
-		if ( attachment.destroyed ) {
-			console.log( 'onRemoveSelectedAttachment', attachment );
-			removeAttachment( attachment );
-			onRemove( attachment );
-		}
-	};
-
 	const onSelectMedia = () => {
 		// Get media attachment details from the frame state
 		const attachment = frame.current?.state().get( 'selection' ).toJSON();
 		onSelect( multiple ? attachment : attachment[ 0 ] );
+	};
+
+	const initializeListeners = () => {
+		frame.current?.on( 'select', onSelectMedia );
+		frame.current?.on( 'update', onUpdate );
+		frame.current?.on( 'open', onOpenModal );
+		frame.current?.on( 'close', onCloseModal );
 	};
 
 	/**
@@ -340,7 +342,7 @@ export default function MediaUpload( {
 	 *
 	 * @return {void}
 	 */
-	function buildAndSetGalleryFrame() {
+	const buildAndSetGalleryFrame = () => {
 		// If the value did not changed there is no need to rebuild the frame,
 		// we can continue to use the existing one.
 		if ( value === lastGalleryValue ) {
@@ -361,8 +363,8 @@ export default function MediaUpload( {
 			currentState = value && value.length ? 'gallery-edit' : 'gallery';
 		}
 
-		if ( ! GalleryDetailsMediaFrame ) {
-			GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
+		if ( ! GalleryDetailsMediaFrame?.current ) {
+			GalleryDetailsMediaFrame.current = getGalleryDetailsMediaFrame();
 		}
 
 		const attachments = getAttachmentsCollection( value );
@@ -371,7 +373,7 @@ export default function MediaUpload( {
 			multiple,
 		} );
 
-		frame.current = new GalleryDetailsMediaFrame( {
+		frame.current = new GalleryDetailsMediaFrame.current( {
 			mimeType: allowedTypes,
 			state: currentState,
 			multiple,
@@ -380,14 +382,21 @@ export default function MediaUpload( {
 		} );
 		wp.media.frame = frame.current;
 		initializeListeners();
-	}
+	};
+
+	const renderOpenModal = () => {
+		if ( gallery ) {
+			buildAndSetGalleryFrame();
+		}
+		frame.current?.open();
+	};
 
 	/**
 	 * Initializes the Media Library requirements for the featured image flow.
 	 *
 	 * @return {void}
 	 */
-	function buildAndSetFeatureImageFrame() {
+	const buildAndSetFeatureImageFrame = () => {
 		const featuredImageFrame = getFeaturedImageMediaFrame();
 		const attachments = getAttachmentsCollection( value );
 		const selection = new wp.media.model.Selection( attachments.models, {
@@ -401,39 +410,9 @@ export default function MediaUpload( {
 			editing: !! value,
 		} );
 		wp.media.frame = frame.current;
-	}
+	};
 
-	function updateCollection() {
-		const frameContent = frame.current?.content?.get();
-		if ( frameContent && frameContent.collection ) {
-			const collection = frameContent.collection;
-
-			// clean all attachments we have in memory.
-			collection
-				.toArray()
-				.forEach( ( model ) => model.trigger( 'destroy', model ) );
-
-			// reset has more flag, if library had small amount of items all items may have been loaded before.
-			collection.mirroring._hasMore = true;
-
-			// request items
-			collection.more();
-		}
-	}
-
-	function initializeListeners() {
-		frame.current?.on( 'select', onSelectMedia );
-		frame.current?.on( 'update', onUpdate );
-		frame.current?.on( 'open', onOpenModal );
-		frame.current?.on( 'close', onCloseModal );
-		frame.current?.listenTo(
-			wp.media.model.Attachments.all,
-			'remove',
-			onRemoveSelectedAttachment
-		);
-	}
-
-	function initializeMediaUploadFrame() {
+	const initializeMediaUploadFrame = () => {
 		if ( gallery ) {
 			buildAndSetGalleryFrame();
 		} else {
@@ -457,7 +436,8 @@ export default function MediaUpload( {
 		}
 
 		initializeListeners();
-	}
+	};
+
 	// Initialize listeners.
 	useEffect( () => {
 		initializeMediaUploadFrame();
