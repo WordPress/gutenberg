@@ -685,7 +685,7 @@ async function getChangelog( settings ) {
  * @return {string} The formatted changelog string.
  */
 function formatChangelog( pullRequests ) {
-	let changelog = '';
+	let changelog = '## Changelog\n\n';
 
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
 
