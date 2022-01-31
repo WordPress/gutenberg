@@ -26,11 +26,13 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 		template: TEMPLATE,
 	} );
 
-	const { commentOrder, commentsPerPage } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
-	} );
+	const { commentOrder, commentsPerPage, defaultPage } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			const { __experimentalDiscussionSettings } = getSettings();
+			return __experimentalDiscussionSettings;
+		}
+	);
 
 	return (
 		<>
@@ -40,6 +42,7 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 				defaultSettings={ {
 					defaultOrder: commentOrder,
 					defaultPerPage: commentsPerPage,
+					defaultDefaultPage: defaultPage,
 				} }
 			/>
 			<TagName { ...innerBlocksProps } />
