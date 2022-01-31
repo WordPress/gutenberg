@@ -546,7 +546,7 @@ function getEntry( issue ) {
  * @return {string} the formatted item
  */
 function buildFormattedItemDescription( title, number, url ) {
-	return `${ title }. ([${ number }](${ url }))`;
+	return `${ title } ([${ number }](${ url }))`;
 }
 
 /**
