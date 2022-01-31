@@ -4,7 +4,7 @@ We will build the application as a WordPress plugin, which means you need to hav
 
 ## Creating a plugin
 
-To create a new plugin, create a `wp-content/plugins/first-gutenberg-app` directory in your local WordPress environment. We will need to create three files inside that directory:
+We'll do all the development inside of a WordPress plugin. Let's start by creating a `wp-content/plugins/first-gutenberg-app` directory in your local WordPress environment. We will need to create three files inside that directory:
 
 * first-gutenberg-app.php – to create a new admin page
 * script.js – for our JavaScript application
@@ -114,7 +114,7 @@ function load_custom_wp_admin_scripts( $hook ) {
 add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_scripts' );
 ```
 
-If you now go to the Plugins page, you should see a plugin called **My first Gutenberg App**. Go ahead and activate it. A new menu position labeled _My first Gutenberg app_ should show up. Once you click it, you will see a page that says _Hello from JavaScript!_:
+If you now go to the Plugins page, you should see a plugin called **My first Gutenberg App**. Go ahead and activate it. A new menu item labeled _My first Gutenberg app_ should show up. Once you click it, you will see a page that says _Hello from JavaScript!_:
 
 ![](./media/setup/hello-from-js.jpg)
 
@@ -132,9 +132,9 @@ function MyFirstApp() {
 }
 ```
 
-It is succinct and readable, but the payoff is you need a build tool like webpack to use it. If that's what you prefer, the [Getting Started with JavaScript](/how-to-guides/javascript/) tutorial will guide you through setting up the build tool.
+It is concise and readable, but the payoff is you need a build tool like webpack to use it. If that's what you prefer, the [Getting Started with JavaScript](/how-to-guides/javascript/) tutorial will guide you through setting up the build tool.
 
-There's also an another way. If you'd like to start building your app right away, every JSX snippet is followed by a compiled version that works as-is:
+There's also another way. If you'd like to start building your app right away, every JSX snippet is followed by a compiled version that works as-is:
 
 ```js
 function MyFirstApp() {

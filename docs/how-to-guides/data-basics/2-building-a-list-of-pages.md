@@ -53,18 +53,18 @@ function PagesList( { pages } ) {
 
 </details>
 
-Note this component does not fetch any data yet, only presents the hardcoded list of pages. When you refresh the page,
+Note that this component does not fetch any data yet, only presents the hardcoded list of pages. When you refresh the page,
 you should see the following:
 
 ![](./media/list-of-pages/simple-list.jpg)
 
 ## Step 2: Fetch the data
 
-The hardcoded sample page isn’t very useful. We want to display your actual WordPress pages so let’s fetch the actual
+The hard-coded sample page isn’t very useful. We want to display your actual WordPress pages so let’s fetch the actual
 list of pages from the WordPress API.
 
-Before we start, let’s confirm there are some pages for us to fetch. Navigate to Pages using the sidebar menu and
-confirm it shows at least four or five positions:
+Before we start, let’s confirm we actually have some pages to fetch. Navigate to Pages using the sidebar menu and
+ensure it shows at least four or five positions:
 
 ![](./media/list-of-pages/pages-list.jpg)
 
@@ -84,7 +84,7 @@ wp.data.select( 'core' ).getEntityRecords( 'postType', 'page' )
 ```
 
 If you run that following snippet in your browser’s dev tools, you will see it returns `null`. Why? The pages are only
-requested by `getEntityRecords` resolver after you first run the selector. If you wait a moment and run it again, it
+requested by `getEntityRecords` resolver after first running the selector. If you wait a moment and re-run it, it
 will return the list of all pages.
 
 Similarly, the `MyFirstApp` component needs to re-run the selector once the data is available. That’s exactly what
@@ -213,7 +213,7 @@ function PagesList( { pages } ) {
 
 ## Step 4: Add a search Box
 
-The list of pages is short for now, however the longer it grows the harder it is to work with. WordPress admins
+The list of pages is short for now; however, the longer it grows, the harder it is to work with. WordPress admins
 typically solves this problem with a search box – let’s implement one, too!
 
 Let’s start by adding a search field:
@@ -257,11 +257,11 @@ function MyFirstApp() {
 
 Note that instead of using an `input` tag, we took advantage of
 the [SearchControl](https://developer.wordpress.org/block-editor/reference-guides/components/search-control/) component.
-This is how it looks like:
+This is what it looks like:
 
 ![](./media/list-of-pages/filter-field.jpg)
 
-The field starts empty and the contents are stored in the `searchTerm` state value. If you aren’t familiar with
+The field starts empty, and the contents are stored in the `searchTerm` state value. If you aren’t familiar with
 the [useState](https://reactjs.org/docs/hooks-state.html) hook, you can learn more
 in [React’s documentation](https://reactjs.org/docs/hooks-state.html).
 
@@ -385,11 +385,11 @@ search=About_ and we’d display the wrong data.
 Gutenberg data helps by handling the asynchronous part behind the scenes. `useSelect` remembers the most recent call and
 returns only the data we expect.
 
-Second, every key stroke would trigger an API request. If you typed About, deleted it, and typed it again, it would
+Second, every keystroke would trigger an API request. If you typed About, deleted it, and retyped it, it would
 issue 10 requests in total even though we could reuse the data.
 
 Gutenberg data helps by caching the responses to API requests triggered by `getEntityRecords()`  and reuses them on
-subsequent calls. This is especially important when there’s more other components relying on  `getEntityRecords()`.
+subsequent calls. This is especially important when other components rely on the same entity records.
 
 All in all, the built-in utilities are designed to solve the typical problems so that you can focus on your application
 instead.
@@ -462,7 +462,7 @@ the  `hasFinishedResolution` selector:
 
 `wp.data.select('core').hasFinishedResolution( 'getEntityRecords', [ 'postType', 'page', { search: 'home' } ] )`
 
-It takes the name of the selector and the arguments, and returns either `true` if the data was already loaded or `false`
+It takes the name of the selector and the arguments and returns either `true` if the data was already loaded or `false`
 it we’re still waiting. Let’s add it to `wp.data.useSelect`:
 
 ```js
