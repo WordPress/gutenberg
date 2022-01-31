@@ -109,11 +109,11 @@ If you now go to the Plugins page, you should see a plugin called **My first Gut
 
 Congratulations! You are now ready to start building the app!
 
-## Trading readability for convenience
+## Readability vs Convenience
 
-You don’t need any build tools to complete this tutorial. All the code examples work as provided even if you paste them into your browser’s developer tools.
+You don’t need a build tool to complete this tutorial, but using one will make your core look nicer.
 
-The price to pay is in readability. The way React components are usually depicted is with the JSX syntax that looks like this:
+The examples in this tutorial use the JSX syntax:
 
 ```js
 function MyFirstApp() {
@@ -121,7 +121,9 @@ function MyFirstApp() {
 }
 ```
 
-It was tempting to use that syntax here, however, it would complicate the initial setup. We would need to install node.js, a build tool like webpack, and compile the app on each change. None of that is required for this tutorial. The trade-off is that we are restricted to the regular JavaScript syntax as below:
+It is succinct and readable, but the payoff is you need a build tool like webpack to use it. If that's what you prefer, the [Getting Started with JavaScript](/how-to-guides/javascript/) tutorial will guide you through setting up the build tool.
+
+There's also an another way. If you'd like to start building your app right away, every JSX snippet is followed by a compiled version that works as-is:
 
 ```js
 function MyFirstApp() {
@@ -129,3 +131,4 @@ function MyFirstApp() {
 }
 ```
 
+You can safely ignore the JSX snippets and rely on their compiled versions – they will just work even when pasted to your browser's developer tools.
