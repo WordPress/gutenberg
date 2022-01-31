@@ -219,12 +219,13 @@ typically solves this problem with a search box – let’s implement one, too!
 Let’s start by adding a search field:
 
 ```js
+const { SearchControl } = wp.components;
 function MyFirstApp() {
 	const [searchTerm, setSearchTerm] = wp.element.useState( '' );
 	// ...
 	return (
 		<div>
-			<wp.components.SearchControl
+			<SearchControl
 				onChange={ setSearchTerm }
 				value={ searchTerm }
 			/>
@@ -303,6 +304,7 @@ inside the list of `useSelect` dependencies to make sure `getEntityRecords` is r
 Finally, here’s how `MyFirstApp` looks like once we wire it all together:
 
 ```js
+const { SearchControl } = wp.components;
 function MyFirstApp() {
 	const [searchTerm, setSearchTerm] = wp.element.useState( '' );
 	const pages = wp.data.useSelect( select => {
@@ -315,7 +317,7 @@ function MyFirstApp() {
 
 	return (
 		<div>
-			<wp.components.SearchControl
+			<SearchControl
 				onChange={ setSearchTerm }
 				value={ searchTerm }
 			/>
@@ -402,9 +404,10 @@ A few messages like  _Loading…_ or _No results_ would clear it up. Let’s imp
 aware of the current status:
 
 ```js
+const { Spinner } = wp.components;
 function PagesList( { hasResolved, pages } ) {
 	if ( !hasResolved ) {
-		return <wp.components.Spinner/>
+		return <Spinner/>
 	}
 	if ( !pages?.length ) {
 		return <div>No results</div>
@@ -481,6 +484,7 @@ function MyFirstApp() {
 All the pieces are in place, great! Here’s the complete JavaScript code of our app:
 
 ```js
+const { SearchControl, Spinner } = wp.components;
 
 function MyFirstApp() {
 	const [searchTerm, setSearchTerm] = wp.element.useState( '' );
@@ -498,7 +502,7 @@ function MyFirstApp() {
 
 	return (
 		<div>
-			<wp.components.SearchControl
+			<SearchControl
 				onChange={ setSearchTerm }
 				value={ searchTerm }
 			/>
@@ -509,7 +513,7 @@ function MyFirstApp() {
 
 function PagesList( { hasResolved, pages } ) {
 	if ( !hasResolved ) {
-		return <wp.components.Spinner/>
+		return <Spinner/>
 	}
 	if ( !pages?.length ) {
 		return <div>No results</div>;
