@@ -91,8 +91,11 @@ function TreeGrid(
 					);
 				}
 
-				// Focus is at the left of the grid.
-				if ( currentColumnIndex === 0 ) {
+				// Focus is either at the left or right edge of the grid.
+				if (
+					nextIndex === currentColumnIndex ||
+					( currentColumnIndex === 0 && keyCode === RIGHT )
+				) {
 					if ( keyCode === LEFT ) {
 						// Left:
 						// If a row is focused, and it is expanded, collapses the current row.
@@ -151,10 +154,10 @@ function TreeGrid(
 
 				// Focus the next column only if expanded.
 				if (
-					nextIndex !== 0 &&
+					keyCode === RIGHT &&
 					activeRow.getAttribute( 'aria-expanded' ) === 'false'
 				) {
-					nextIndex -= 1;
+					return;
 				}
 				focusablesInRow[ nextIndex ].focus();
 
