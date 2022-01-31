@@ -38,7 +38,7 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { link as linkIcon, keyboardReturn } from '@wordpress/icons';
+import { link as linkIcon, undo } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
@@ -544,7 +544,7 @@ export default function NavigationSubmenuEdit( {
 					{ ! selectedBlockHasDescendants && (
 						<ToolbarButton
 							name="revert"
-							icon={ keyboardReturn }
+							icon={ undo }
 							title={ __( 'Convert to Link' ) }
 							onClick={ transformToLink }
 							className="wp-block-navigation__submenu__revert"
