@@ -150,7 +150,7 @@ function TreeGrid(
 				}
 
 				// Focus the next column only if expanded.
-				if ( activeRow.getAttribute( 'aria-expanded' ) === 'false' ) {
+				if ( nextIndex !== 0 && activeRow.getAttribute( 'aria-expanded' ) === 'false' ) {
 					nextIndex -= 1;
 				}
 				focusablesInRow[ nextIndex ].focus();
