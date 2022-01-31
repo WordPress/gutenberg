@@ -800,15 +800,18 @@ function findFirstTimeContributorPRs( pullRequests ) {
  * @return {string} The formatted markdown list of contributors and their PRs.
  */
 function buildContributorMarkdownList( ftcPRs ) {
-	return ftcPRs.reduce( ( acc, pr ) => {
+	return ftcPRs.reduce( ( markdownList, pr ) => {
+		const title = getNormalizedTitle( pr.title, pr ) || '';
+
 		const formattedTitle = buildFormattedItemDescription(
-			pr.title,
+			title,
 			pr.number,
 			pr.pull_request.html_url
 		);
 
-		acc += '- ' + '@' + pr.user.login + ': ' + formattedTitle + '\n';
-		return acc;
+		markdownList +=
+			'- ' + '@' + pr.user.login + ': ' + formattedTitle + '\n';
+		return markdownList;
 	}, '' );
 }
 
