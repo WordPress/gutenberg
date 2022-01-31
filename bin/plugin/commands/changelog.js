@@ -758,6 +758,76 @@ function sortFeatureGroups( featureGroups ) {
 }
 
 /**
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted changelog string.
+ */
+function formatContributors( pullRequests ) {
+	let contributorsList = '';
+
+	const ftcPRs = pullRequests.filter( ( pr ) => {
+		if ( pr.user.login === 'dependabot[bot]' ) {
+			return false;
+		}
+
+		return pr.labels.find(
+			( { name } ) => name.toLowerCase() === 'first-time contributor'
+		);
+	} );
+
+	for ( const pr of ftcPRs ) {
+		// log( pr );
+		contributorsList +=
+			'- ' +
+			'@' +
+			pr.user.login +
+			': ' +
+			pr.title +
+			' <a href="' +
+			pr.pull_request.html_url +
+			'">#' +
+			pr.number +
+			'</a>\n';
+	}
+
+	return (
+		'## First time contributors' +
+		'\n\n' +
+		'The following PRs were merged by first time contrbutors:' +
+		'\n\n' +
+		contributorsList
+	);
+}
+
+/**
+ * @param {WPChangelogSettings} settings Changelog settings.
+ *
+ * @return {Promise<string>} Promise resolving to contributors list.
+ */
+async function getContributors( settings ) {
+	const octokit = new Octokit( {
+		auth: settings.token,
+	} );
+
+	const pullRequests = await fetchAllPullRequests( octokit, settings );
+
+	if ( ! pullRequests.length ) {
+		if ( settings.unreleased ) {
+			throw new Error(
+				'There are no unreleased pull requests associated with the milestone.'
+			);
+		} else {
+			throw new Error(
+				'There are no pull requests associated with the milestone.'
+			);
+		}
+	}
+
+	return formatContributors( pullRequests );
+}
+
+/**
  * Generates and logs changelog for a milestone.
  *
  * @param {WPChangelogSettings} settings Changelog settings.
@@ -769,16 +839,18 @@ async function createChangelog( settings ) {
 		)
 	);
 
-	let changelog;
+	let releaselog;
 	try {
-		changelog = await getChangelog( settings );
+		const changelog = getChangelog( settings );
+		const contributors = getContributors( settings );
+		releaselog = await Promise.all( [ changelog, contributors ] );
 	} catch ( error ) {
 		if ( error instanceof Error ) {
-			changelog = formats.error( error.stack );
+			releaselog = formats.error( error.stack );
 		}
 	}
 
-	log( changelog );
+	log( releaselog );
 }
 
 /**
