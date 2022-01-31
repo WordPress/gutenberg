@@ -146,6 +146,6 @@ You can safely ignore the JSX snippets and rely on their compiled versions – t
 
 ## What's next?
 
-* Review the [full example](./media/setup/first-gutenberg-app).
+* Review the [finished example](./media/setup/first-gutenberg-app).
 * Previous part: [Introduction](./README.md)
 * Next part: [Building a basic list of pages](./2-building-a-list-of-pages.md)

@@ -603,6 +603,6 @@ All that’s left is to refresh the page and enjoy the brand new status indicato
 
 ## What's next?
 
-* Review the [full example](./media/list-of-pages/first-gutenberg-app)
+* Review the [finished example](./media/list-of-pages/first-gutenberg-app)
 * **Previous part:** [Setup](./1-setup.md)
 * **Next part:** Adding an „Edit page” feature (coming soon)
