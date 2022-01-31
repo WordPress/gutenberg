@@ -280,6 +280,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     }
 
     private float getHeadingScale(String scale) {
+        // Values from https://github.com/wordpress-mobile/AztecEditor-Android/blob/trunk/aztec/src/main/kotlin/org/wordpress/aztec/spans/AztecHeadingSpan.kt#L94-L100
         switch (scale) {
             case "h1":
                 return 1.73f;
