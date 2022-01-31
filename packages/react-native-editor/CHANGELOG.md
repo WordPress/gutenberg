@@ -12,7 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 -   [**] [Gallery block] Fix crash when adding images and selecting a gallery item [#38238]
--   [***] Font size and line-height support for text-based blocks [#38205]
+-   [***] Font size and line-height support for text-based blocks used in block-based themes [#38205]
 
 ## 1.70.0
 
