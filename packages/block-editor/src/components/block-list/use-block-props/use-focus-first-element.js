@@ -98,7 +98,16 @@ export function useFocusFirstElement( clientId ) {
 
 		// Check to see if Block contains focussable element before a generic caret insert.
 		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
-			const focusElements = focus.tabbable.findNext( ref.current );
+			const whitelistTags = [ 'a', 'button' ];
+			let focusElements = focus.tabbable.findNext( ref.current );
+			// In the event a Block has children, focus will find the next element with tabindex which would happen to be the wrapping element of a child Block. This ensures we only focus on whitelisted tag such as link/button.
+			do {
+				focusElements = focus.tabbable.findNext( focusElements );
+			} while (
+				! whitelistTags.some(
+					( tag ) => focusElements.tagName.toLowerCase() === tag
+				)
+			);
 			if ( focusElements ) {
 				focusElements.focus();
 				return;
