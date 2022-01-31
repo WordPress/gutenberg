@@ -65,7 +65,10 @@ function Snackbar(
 		}
 
 		// Prevent focus loss by moving it to the list element.
-		listRef.current.focus();
+		if ( listRef && listRef.current  ) {
+			listRef.current.focus();
+		}
+		
 
 		onDismiss();
 		onRemove();
