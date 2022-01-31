@@ -11,6 +11,7 @@ import {
 	openDocumentSettingsSidebar,
 	pressKeyWithModifier,
 	selectBlockByClientId,
+	goToSiteEditor,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -144,14 +145,14 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
-		await siteEditor.visit();
+		await goToSiteEditor();
 		await siteEditor.disableWelcomeGuide();
 		expect( await openEntitySavePanel() ).toBe( false );
 	} );
 
 	// Skip reason: This should be rewritten to use other methods to switching to different templates.
 	it.skip( 'should not dirty an entity by switching to it in the template dropdown', async () => {
-		await siteEditor.visit( {
+		await goToSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
@@ -204,7 +205,7 @@ describe( 'Multi-entity editor states', () => {
 				true
 			);
 			await saveAllEntities();
-			await siteEditor.visit();
+			await goToSiteEditor();
 			await siteEditor.disableWelcomeGuide();
 
 			// Wait for site editor to load.

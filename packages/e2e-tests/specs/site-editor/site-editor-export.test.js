@@ -8,7 +8,11 @@ import os from 'os';
 /**
  * WordPress dependencies
  */
-import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
+import {
+	trashAllPosts,
+	activateTheme,
+	goToSiteEditor,
+} from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
@@ -40,7 +44,7 @@ describe( 'Site Editor Templates Export', () => {
 	} );
 
 	beforeEach( async () => {
-		await siteEditor.visit();
+		await goToSiteEditor();
 		await siteEditor.disableWelcomeGuide();
 	} );
 

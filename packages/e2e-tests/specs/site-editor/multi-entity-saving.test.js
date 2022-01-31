@@ -12,6 +12,7 @@ import {
 	activateTheme,
 	clickButton,
 	createReusableBlock,
+	goToSiteEditor,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -263,7 +264,7 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
-			await siteEditor.visit( {
+			await goToSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
@@ -301,7 +302,7 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should allow re-saving after changing the same block attribute', async () => {
 			// Navigate to site editor.
-			await siteEditor.visit( {
+			await goToSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );

@@ -98,5 +98,6 @@ export {
 	batch as __experimentalBatch,
 } from './rest-api';
 export { openListView, closeListView } from './list-view';
+export { goToSiteEditor } from './site-editor';
 
 export * from './mocks';

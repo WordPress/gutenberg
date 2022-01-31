@@ -9,6 +9,7 @@ import {
 	selectBlockByClientId,
 	clickBlockToolbarButton,
 	canvas,
+	goToSiteEditor,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -33,13 +34,13 @@ describe( 'Template Part', () => {
 
 	describe( 'Template part block', () => {
 		beforeEach( async () => {
-			await siteEditor.visit();
+			await goToSiteEditor();
 			await siteEditor.disableWelcomeGuide();
 		} );
 
 		async function navigateToHeader() {
 			// Switch to editing the header template part.
-			await siteEditor.visit( {
+			await goToSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
@@ -60,7 +61,7 @@ describe( 'Template Part', () => {
 			);
 
 			// Switch back to the Index template.
-			await siteEditor.visit( {
+			await goToSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
@@ -314,7 +315,7 @@ describe( 'Template Part', () => {
 				await page.click( entitiesSaveSelector );
 
 				// Reload the page so as the new template part is available in the existing template parts.
-				await siteEditor.visit();
+				await goToSiteEditor();
 				siteEditorCanvas = canvas();
 				await awaitHeaderLoad();
 				// Try to insert the template part we created.

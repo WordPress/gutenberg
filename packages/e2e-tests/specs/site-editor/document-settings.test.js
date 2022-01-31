@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
+import {
+	trashAllPosts,
+	activateTheme,
+	goToSiteEditor,
+} from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
@@ -35,14 +39,14 @@ describe( 'Document Settings', () => {
 	} );
 
 	beforeEach( async () => {
-		await siteEditor.visit();
+		await goToSiteEditor();
 		await siteEditor.disableWelcomeGuide();
 	} );
 
 	describe( 'when a template is selected from the navigation sidebar', () => {
 		it( 'should display the selected templates name in the document header', async () => {
 			// Navigate to a template
-			await siteEditor.visit( {
+			await goToSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
@@ -78,7 +82,7 @@ describe( 'Document Settings', () => {
 	describe( 'when a template part is selected from the navigation sidebar', () => {
 		it( "should display the selected template part's name in the document header", async () => {
 			// Navigate to a template part
-			await siteEditor.visit( {
+			await goToSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
