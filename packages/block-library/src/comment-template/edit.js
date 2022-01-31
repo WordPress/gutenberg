@@ -12,7 +12,7 @@ import {
 	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
-import { store as coreStore, useEntityProp } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -207,12 +207,24 @@ const CommentsList = ( {
 	</ol>
 );
 
-export default function CommentTemplateEdit( { clientId, context } ) {
+export default function CommentTemplateEdit( {
+	clientId,
+	context: {
+		postId,
+		'comments/perPage': perPage,
+		'comments/order': order,
+		'comments/defaultPage': defaultPage,
+	},
+} ) {
 	const blockProps = useBlockProps();
 
 	const [ activeComment, setActiveComment ] = useState();
 
-	const commentQuery = useCommentQueryArgs( { context } );
+	const commentQuery = useCommentQueryArgs( {
+		postId,
+		perPage,
+		defaultPage,
+	} );
 
 	const { topLevelComments, blocks } = useSelect(
 		( select ) => {
@@ -230,15 +242,22 @@ export default function CommentTemplateEdit( { clientId, context } ) {
 		[ clientId, commentQuery ]
 	);
 
+	const { commentOrder } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalDiscussionSettings;
+	} );
+	order = order || commentOrder;
+
 	// Reverse the order of top comments if needed, as specified in the
-	// Discussion settings.
-	const [ commentOrder ] = useEntityProp( 'root', 'site', 'comment_order' );
-	if ( commentOrder === 'desc' ) {
-		topLevelComments?.reverse();
-	}
+	// Discussion settings. NOTE that this only changes the order of comments in
+	// the given page, not the order of pages.
 
 	// Generate a tree structure of comment IDs.
-	const { commentTree } = useCommentTree( topLevelComments );
+	const { commentTree } = useCommentTree(
+		order === 'desc'
+			? topLevelComments?.slice().reverse()
+			: topLevelComments
+	);
 
 	if ( ! topLevelComments ) {
 		return (

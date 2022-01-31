@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { useState, useEffect, useMemo } from '@wordpress/element';
-import { useEntityProp } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -13,9 +14,7 @@ import apiFetch from '@wordpress/api-fetch';
  * @param {*} param0
  * @return {Object} TODO Write JSDOC.
  */
-export const useCommentQueryArgs = ( { context } ) => {
-	let { postId, 'comments/perPage': perPage } = context;
-
+export const useCommentQueryArgs = ( { postId, perPage, defaultPage } ) => {
 	// Initialize the query args that are not going to change.
 	const queryArgs = {
 		status: 'approve',
@@ -26,24 +25,20 @@ export const useCommentQueryArgs = ( { context } ) => {
 	};
 
 	// Get the Discussion settings that may be needed to query the comments.
-	const [ commentsPerPage ] = useEntityProp(
-		'root',
-		'site',
-		'comments_per_page'
-	);
-	const [ defaultCommentsPage ] = useEntityProp(
-		'root',
-		'site',
-		'default_comments_page'
-	);
+	const { commentsPerPage, defaultCommentsPage } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings;
+	} );
 
 	// If a block props is not set, use the settings value to generate the
 	// appropriate query arg.
 	perPage = perPage || commentsPerPage;
+	defaultPage = defaultPage || defaultCommentsPage;
 
 	// Get the number of the default page.
 	const page = useDefaultPage( {
-		defaultCommentsPage,
+		defaultCommentsPage: defaultPage,
 		postId,
 		perPage,
 		queryArgs,
