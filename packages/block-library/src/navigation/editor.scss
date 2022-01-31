@@ -272,12 +272,28 @@ $color-control-label-height: 20px;
 	}
 }
 
+// Prevent layout shift for vertical variant.
+.wp-block-navigation.is-vertical .is-small,
+.wp-block-navigation.is-vertical .is-medium {
+	.components-placeholder__fieldset {
+		// The size of two buttons, with top and bottom padding, and gap.
+		min-height: ($button-size * 2) + $grid-unit-15 + ($grid-unit-15 * 0.5);
+	}
+}
+
+.wp-block-navigation.is-vertical .is-large {
+	.components-placeholder__fieldset {
+		// The size of three buttons, with top and bottom padding, and gap.
+		min-height: ($button-size * 3) + $grid-unit-15 + $grid-unit-15;
+	}
+}
+
 // Selected state.
 .wp-block-navigation-placeholder__preview,
 .wp-block-navigation-placeholder__controls {
 	padding: ($grid-unit-15 * 0.5) $grid-unit-10;
 	flex-direction: row;
-	align-items: center;
+	align-items: flex-start;
 }
 
 .wp-block-navigation-placeholder__controls {
@@ -334,7 +350,7 @@ $color-control-label-height: 20px;
 	align-items: center;
 	justify-content: flex-start;
 	line-height: 0;
-	min-height: $button-size;
+	height: $button-size;
 
 	// Line up with the icon in the toolbar.
 	margin-left: $grid-unit-05;
