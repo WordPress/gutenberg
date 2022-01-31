@@ -528,7 +528,25 @@ function getEntry( issue ) {
 
 	return title === undefined
 		? title
-		: `- ${ title } ([${ issue.number }](${ issue.html_url }))`;
+		: '- ' +
+				buildFormattedItemDescription(
+					title,
+					issue.number,
+					issue.html_url
+				);
+}
+
+/**
+ * Builds a formatted string of the Issue/PR title with a link
+ * to the Github URL for that item.
+ *
+ * @param {string} title  the title of the Issue/PR.
+ * @param {number} number the ID/number of the Issue/PR.
+ * @param {string} url    the URL of the Github Issue/PR.
+ * @return {string} the formatted item
+ */
+function buildFormattedItemDescription( title, number, url ) {
+	return `${ title }. ([${ number }](${ url }))`;
 }
 
 /**
@@ -783,17 +801,13 @@ function findFirstTimeContributorPRs( pullRequests ) {
  */
 function buildContributorMarkdownList( ftcPRs ) {
 	return ftcPRs.reduce( ( acc, pr ) => {
-		acc +=
-			'- ' +
-			'@' +
-			pr.user.login +
-			': ' +
-			pr.title +
-			' <a href="' +
-			pr.pull_request.html_url +
-			'">#' +
-			pr.number +
-			'</a>\n';
+		const formattedTitle = buildFormattedItemDescription(
+			pr.title,
+			pr.number,
+			pr.pull_request.html_url
+		);
+
+		acc += '- ' + '@' + pr.user.login + ': ' + formattedTitle + '\n';
 		return acc;
 	}, '' );
 }
