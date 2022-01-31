@@ -128,3 +128,24 @@ if ( ! function_exists( 'extend_block_editor_settings_with_discussion_settings' 
 	}
 }
 add_filter( 'block_editor_settings_all', 'extend_block_editor_settings_with_discussion_settings' );
+
+if ( ! function_exists( 'gutenberg_rest_comment_set_children_as_embeddable' )) {
+	/**
+	 * Mark the `children` attr of comments as embeddable so they can be included in
+	 * REST API responses without additional requests.
+	 *
+	 * @return void
+	 */
+	function gutenberg_rest_comment_set_children_as_embeddable() {
+		add_filter( 'rest_prepare_comment', function ( $response ) {
+			$links = $response->get_links();
+			if ( isset( $links['children'] ) ) {
+				$href = $links['children'][0]['href'];
+				$response->remove_link( 'children', $href );
+				$response->add_link( 'children', $href, array( 'embeddable' => true ) );
+			}
+			return $response;
+		} );
+	}
+}
+add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable');
