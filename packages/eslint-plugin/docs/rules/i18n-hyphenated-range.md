@@ -1,4 +1,4 @@
-# Disallow using a hyphenated numerical ranges in translatable strings (i18n-hyphen-range)
+# Disallow using a hyphenated numerical ranges in translatable strings (i18n-hyphenated-range)
 
 Using hyphenated numerical ranges in translatable strings is incompatible with Android linting rules and can lead to translation pipeline issues. See [Android Lint: TypographyDashes](https://android.googlesource.com/platform/tools/base/+/master/lint/libs/lint-checks/src/main/java/com/android/tools/lint/checks/TypographyDetector.java#58) for more information.
 
