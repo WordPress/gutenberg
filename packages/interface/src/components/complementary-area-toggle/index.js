@@ -37,7 +37,7 @@ function ComplementaryAreaToggle( {
 	return (
 		<ComponentToUse
 			icon={ selectedIcon && isSelected ? selectedIcon : icon }
-			aria-hidden={ hideToggleToScreenReader || undefined }
+			aria-hidden={ hideToggleToScreenReader }
 			onClick={ () => {
 				if ( isSelected ) {
 					disableComplementaryArea( scope );
