@@ -151,7 +151,7 @@ function TreeGrid(
 
 				// Focus the next element.
 				if ( activeRow.getAttribute( 'aria-expanded' ) === 'false' ) {
-					nextIndex = nextIndex - 1;
+					nextIndex -= 1;
 				}
 				focusablesInRow[ nextIndex ].focus();
 
