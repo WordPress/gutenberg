@@ -60,9 +60,8 @@ describe( 'Post visibility', () => {
 			);
 			await privateLabel.click();
 			await page.waitForSelector( '.components-confirm-dialog' );
-
-			const cancelButton = await page.waitForSelector(
-				'.components-confirm-dialog button.is-tertiary'
+			const cancelButton = await page.waitForXPath(
+				'//*[@role="dialog"][not(@id="wp-link-wrap")]//button[text()="Cancel"]'
 			);
 			await cancelButton.click();
 
