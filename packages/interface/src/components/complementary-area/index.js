@@ -151,7 +151,9 @@ function ComplementaryArea( {
 							icon={ showIconLabels ? check : icon }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
-							hideToggleToScreenReader={ hideToggleToScreenReader }
+							hideToggleToScreenReader={
+								hideToggleToScreenReader
+							}
 						/>
 					) }
 				</PinnedItems>
