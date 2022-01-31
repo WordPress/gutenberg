@@ -551,13 +551,15 @@ export default function NavigationSubmenuEdit( {
 						/>
 					) }
 
-					<ToolbarButton
-						name="revert"
-						icon={ keyboardReturn }
-						title={ __( 'Convert to Link' ) }
-						onClick={ transformToLink }
-						className="wp-block-navigation__submenu__revert"
-					/>
+					{ ! selectedBlockHasDescendants && (
+						<ToolbarButton
+							name="revert"
+							icon={ keyboardReturn }
+							title={ __( 'Convert to Link' ) }
+							onClick={ transformToLink }
+							className="wp-block-navigation__submenu__revert"
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
