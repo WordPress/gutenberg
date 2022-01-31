@@ -4,9 +4,9 @@ We will build the application as a WordPress plugin, which means you need to hav
 
 ## Creating a plugin
 
-We'll do all the development inside of a WordPress plugin. Let's start by creating a `wp-content/plugins/first-gutenberg-app` directory in your local WordPress environment. We will need to create three files inside that directory:
+We'll do all the development inside of a WordPress plugin. Let's start by creating a `wp-content/plugins/my-first-gutenberg-app` directory in your local WordPress environment. We will need to create three files inside that directory:
 
-* first-gutenberg-app.php – to create a new admin page
+* my-first-gutenberg-app.php – to create a new admin page
 * script.js – for our JavaScript application
 * style.css – for the minimal stylesheet
 
@@ -47,7 +47,7 @@ window.addEventListener( 'load', function() {
 }
 ```
 
-**first-gutenberg-app.php:**
+**my-first-gutenberg-app.php:**
 ```php
 <?php
 /**
