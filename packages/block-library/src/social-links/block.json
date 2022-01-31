@@ -30,12 +30,17 @@
 			"type": "boolean",
 			"default": false
 		},
+		"showLabels": {
+			"type": "boolean",
+			"default": false
+		},
 		"size": {
 			"type": "string"
 		}
 	},
 	"providesContext": {
 		"openInNewTab": "openInNewTab",
+		"showLabels": "showLabels",
 		"iconColorValue": "iconColorValue",
 		"iconBackgroundColorValue": "iconBackgroundColorValue"
 	},

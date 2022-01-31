@@ -17,7 +17,7 @@ const jestE2EConfig = {
 	),
 	reporters: [
 		'default',
-		path.join( __dirname, 'jest-github-actions-reporter.js' ),
+		path.join( __dirname, 'jest-github-actions-reporter', 'index.js' ),
 	],
 	setupFilesAfterEnv: [ 'expect-puppeteer' ],
 	testEnvironment: path.join( __dirname, 'jest-environment-puppeteer' ),

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import { Ref } from 'react';
+import type { Ref } from 'react';
 import { colord, extend, Colord } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 

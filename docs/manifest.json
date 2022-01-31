@@ -114,7 +114,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Writing Your First Block Type",
+		"title": "Create a basic block",
 		"slug": "writing-your-first-block-type",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/writing-your-first-block-type.md",
 		"parent": "block-tutorial"
@@ -138,9 +138,21 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Block Supports",
+		"slug": "block-supports",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Creating dynamic blocks",
 		"slug": "creating-dynamic-blocks",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Block Supports in dynamic blocks",
+		"slug": "block-supports-in-dynamic-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md",
 		"parent": "block-tutorial"
 	},
 	{
@@ -560,8 +572,26 @@
 	{
 		"title": "Theme.json Reference",
 		"slug": "theme-json-reference",
-		"markdown_source": "../docs/reference-guides/theme-json-reference.md",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/README.md",
 		"parent": "reference-guides"
+	},
+	{
+		"title": "Version 2 (living reference)",
+		"slug": "theme-json-living",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-living.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Version 1 Reference",
+		"slug": "theme-json-v1",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v1.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Migrating to Newer Versions",
+		"slug": "theme-json-migrations",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
+		"parent": "theme-json-reference"
 	},
 	{
 		"title": "Component Reference",
@@ -1989,6 +2019,12 @@
 		"title": "React Native Integration Test Guide",
 		"slug": "integration-test-guide",
 		"markdown_source": "../docs/contributors/code/react-native/integration-test-guide.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "React Native Internationalization Guide",
+		"slug": "internationalization-guide",
+		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
 		"parent": "react-native"
 	},
 	{

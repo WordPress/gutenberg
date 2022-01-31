@@ -4,7 +4,7 @@
 	"name": "core/paragraph",
 	"title": "Paragraph",
 	"category": "text",
-	"description": "Start with the building block of all narrative.",
+	"description": "Start with the basic building block of all narrative.",
 	"keywords": [ "text" ],
 	"textdomain": "default",
 	"attributes": {
@@ -39,7 +39,6 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,

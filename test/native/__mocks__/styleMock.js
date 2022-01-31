@@ -153,4 +153,7 @@ module.exports = {
 	'components-autocomplete': {
 		height: 100,
 	},
+	addMediaButton: {
+		color: 'white',
+	},
 };

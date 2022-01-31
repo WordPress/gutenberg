@@ -25,8 +25,8 @@ export default function CommentsPaginationNextEdit( {
 			<PlainText
 				__experimentalVersion={ 2 }
 				tagName="span"
-				aria-label={ __( 'Next comments page link' ) }
-				placeholder={ __( 'Next Comments' ) }
+				aria-label={ __( 'Newer comments page link' ) }
+				placeholder={ __( 'Newer Comments' ) }
 				value={ label }
 				onChange={ ( newLabel ) =>
 					setAttributes( { label: newLabel } )

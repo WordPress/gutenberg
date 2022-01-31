@@ -7,7 +7,7 @@
 	"parent": [ "core/comments-query-loop" ],
 	"description": "Contains the block elements used to render a comment, like the title, date, author, avatar and more.",
 	"textdomain": "default",
-	"usesContext": [ "comments/perPage", "postId" ],
+	"usesContext": [ "comments/perPage", "postId", "comments/order" ],
 	"supports": {
 		"reusable": false,
 		"html": false,

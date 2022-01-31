@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { uniqueId } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -22,6 +27,7 @@ import {
 	deleteUser,
 	switchUserToAdmin,
 } from '@wordpress/e2e-test-utils';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -30,6 +36,7 @@ import menuItemsFixture from '../fixtures/menu-items-request-fixture.json';
 
 const POSTS_ENDPOINT = '/wp/v2/posts';
 const PAGES_ENDPOINT = '/wp/v2/pages';
+const DRAFT_PAGES_ENDPOINT = [ PAGES_ENDPOINT, { status: 'draft' } ];
 const NAVIGATION_MENUS_ENDPOINT = '/wp/v2/navigation';
 
 async function mockSearchResponse( items ) {
@@ -117,7 +124,6 @@ async function selectClassicMenu( optionText ) {
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
-const ADD_ALL_PAGES_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Add all pages']`;
 const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select menu']`;
 
 /**
@@ -126,8 +132,17 @@ const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select
  * @param {*} endpoints The endpoints of the resources to delete.
  */
 async function deleteAll( endpoints ) {
-	for ( const path of endpoints ) {
-		const items = await rest( { path } );
+	for ( const endpoint of endpoints ) {
+		const defaultArgs = { per_page: -1 };
+		const isArrayEndpoint = Array.isArray( endpoint );
+		const path = isArrayEndpoint ? endpoint[ 0 ] : endpoint;
+		const args = isArrayEndpoint
+			? { ...defaultArgs, ...endpoint[ 1 ] }
+			: defaultArgs;
+
+		const items = await rest( {
+			path: addQueryArgs( path, args ),
+		} );
 
 		for ( const item of items ) {
 			await rest( {
@@ -135,24 +150,6 @@ async function deleteAll( endpoints ) {
 				path: `${ path }/${ item.id }?force=true`,
 			} );
 		}
-	}
-}
-
-/**
- * Create a set of pages using the REST API.
- *
- * @param {Array} pages An array of page objects.
- */
-async function createPages( pages ) {
-	for ( const page of pages ) {
-		await rest( {
-			method: 'POST',
-			path: PAGES_ENDPOINT,
-			data: {
-				status: 'publish',
-				...page,
-			},
-		} );
 	}
 }
 
@@ -200,10 +197,23 @@ async function getNavigationMenuRawContent() {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
+	const contributorUsername = uniqueId( 'contributoruser_' );
+	let contributorPassword;
+
+	beforeAll( async () => {
+		// Creation of the contributor user **MUST** be at the top level describe block
+		// otherwise this test will become unstable. This action only happens once
+		// so there is no huge performance hit.
+		contributorPassword = await createUser( contributorUsername, {
+			role: 'contributor',
+		} );
+	} );
+
 	beforeEach( async () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
 			PAGES_ENDPOINT,
+			DRAFT_PAGES_ENDPOINT,
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
@@ -217,43 +227,17 @@ describe( 'Navigation', () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
 			PAGES_ENDPOINT,
+			DRAFT_PAGES_ENDPOINT,
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
+
+		// As per the creation in the beforeAll() above, this
+		// action must be done at the root level describe() block.
+		await deleteUser( contributorUsername );
 	} );
 
 	describe( 'placeholder', () => {
-		it( 'allows a navigation block to be created using existing pages', async () => {
-			await createPages( [
-				{
-					title: 'About',
-					menu_order: 0,
-				},
-				{
-					title: 'Contact Us',
-					menu_order: 1,
-				},
-				{
-					title: 'FAQ',
-					menu_order: 2,
-				},
-			] );
-
-			await createNewPost();
-
-			// Add the navigation block.
-			await insertBlock( 'Navigation' );
-			const allPagesButton = await page.waitForXPath(
-				ADD_ALL_PAGES_XPATH
-			);
-			await allPagesButton.click();
-
-			// Wait for the page list block to be present
-			await page.waitForSelector( 'ul[aria-label="Block: Page List"]' );
-
-			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
-		} );
-
 		it( 'allows a navigation block to be created from existing menus', async () => {
 			await createClassicMenu( { name: 'Test Menu 1' } );
 			await createClassicMenu(
@@ -435,20 +419,7 @@ describe( 'Navigation', () => {
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
-	it.skip( 'allows pages to be created from the navigation block and their links added to menu', async () => {
-		// The URL Details endpoint 404s for the created page, since it will
-		// be a draft that is inaccessible publicly. To avoid this we mock
-		// out the endpoint response to be empty which will be handled gracefully
-		// in the UI whilst avoiding any 404s.
-		await setUpResponseMocking( [
-			{
-				match: ( request ) =>
-					request.url().includes( `rest_route` ) &&
-					request.url().includes( `url-details` ),
-				onRequestMatch: createJSONResponse( [] ),
-			},
-		] );
-
+	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
 		await createNewPost();
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
@@ -466,16 +437,21 @@ describe( 'Navigation', () => {
 		);
 		await input.type( pageTitle );
 
-		// Wait for the create button to appear and click it.
+		// When creating a page, the URLControl makes a request to the
+		// url-details endpoint to fetch information about the page.
+		// Because the draft is inaccessible publicly, this request
+		// returns a 404 response. Wait for the response and expect
+		// the error to have occurred.
 		const createPageButton = await page.waitForSelector(
 			'.block-editor-link-control__search-create'
 		);
-		await createPageButton.click();
-
-		const draftLink = await page.waitForSelector(
-			'.wp-block-navigation-item__content'
+		const responsePromise = page.waitForResponse(
+			( response ) =>
+				response.url().includes( 'url-details' ) &&
+				response.status() === 404
 		);
-		await draftLink.click();
+		const createPagePromise = createPageButton.click();
+		await Promise.all( [ responsePromise, createPagePromise ] );
 
 		// Creating a draft is async, so wait for a sign of completion. In this
 		// case the link that shows in the URL popover once a link is added.
@@ -487,6 +463,9 @@ describe( 'Navigation', () => {
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: the server responded with a status of 404 (Not Found)'
+		);
 	} );
 
 	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
@@ -753,21 +732,8 @@ describe( 'Navigation', () => {
 	} );
 
 	describe( 'Permission based restrictions', () => {
-		const contributorUsername = 'contributoruser';
-		let contributorPassword;
-
-		beforeAll( async () => {
-			contributorPassword = await createUser( contributorUsername, {
-				role: 'contributor',
-			} );
-		} );
-
 		afterEach( async () => {
 			await switchUserToAdmin();
-		} );
-
-		afterAll( async () => {
-			await deleteUser( contributorUsername );
 		} );
 
 		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {

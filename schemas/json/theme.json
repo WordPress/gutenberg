@@ -7,13 +7,17 @@
 			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
-		"settingsPropertiesBorder": {
+		"settingsPropertiesAppearanceTools": {
 			"properties": {
 				"appearanceTools": {
 					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
-				},
+				}
+			}
+		},
+		"settingsPropertiesBorder": {
+			"properties": {
 				"border": {
 					"description": "Settings related to borders.",
 					"type": "object",
@@ -165,7 +169,6 @@
 					},
 					"additionalProperties": false
 				}
-
 			}
 		},
 		"settingsPropertiesLayout": {
@@ -187,8 +190,7 @@
 				}
 			}
 		},
-
-		"settingsPropertiesSpacing":{
+		"settingsPropertiesSpacing": {
 			"properties": {
 				"spacing": {
 					"description": "Settings related to spacing.",
@@ -225,7 +227,7 @@
 				}
 			}
 		},
-		"settingsPropertiesTypography":{
+		"settingsPropertiesTypography": {
 			"properties": {
 				"typography": {
 					"description": "Settings related to typography.",
@@ -329,7 +331,8 @@
 			}
 		},
 		"settingsProperties": {
-			"allOf":[
+			"allOf": [
+				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
@@ -346,6 +349,7 @@
 				},
 				{
 					"properties": {
+						"appearanceTools": {},
 						"border": {},
 						"color": {},
 						"layout": {},
@@ -361,7 +365,8 @@
 			"type": "object",
 			"properties": {
 				"core/archives": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings",
+					"additionalProperties": false
 				},
 				"core/audio": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -370,7 +375,10 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
-					"allOf":[
+					"allOf": [
+						{
+							"$ref": "#/definitions/settingsPropertiesAppearanceTools"
+						},
 						{
 							"properties": {
 								"border": {
@@ -389,7 +397,9 @@
 						{ "$ref": "#/definitions/settingsPropertiesColor" },
 						{ "$ref": "#/definitions/settingsPropertiesLayout" },
 						{ "$ref": "#/definitions/settingsPropertiesSpacing" },
-						{ "$ref": "#/definitions/settingsPropertiesTypography" },
+						{
+							"$ref": "#/definitions/settingsPropertiesTypography"
+						},
 						{ "$ref": "#/definitions/settingsPropertiesCustom" }
 					]
 				},
@@ -1141,6 +1151,7 @@
 				},
 				{
 					"properties": {
+						"appearanceTools": {},
 						"color": {},
 						"layout": {},
 						"spacing": {},

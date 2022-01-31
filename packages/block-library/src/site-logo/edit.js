@@ -358,7 +358,7 @@ export default function LogoEdit( {
 	setAttributes,
 	isSelected,
 } ) {
-	const { className: styleClass, width, shouldSyncIcon } = attributes;
+	const { width, shouldSyncIcon } = attributes;
 	const [ logoUrl, setLogoUrl ] = useState();
 	const ref = useRef();
 
@@ -396,48 +396,13 @@ export default function LogoEdit( {
 			siteLogoId: _siteLogoId,
 			canUserEdit: _canUserEdit,
 			url: siteData?.url,
-			mediaItemData: mediaItem && {
-				id: mediaItem.id,
-				url: mediaItem.source_url,
-				alt: mediaItem.alt_text,
-			},
+			mediaItemData: mediaItem,
 			isRequestingMediaItem: _isRequestingMediaItem,
 			siteIconId: _siteIconId,
 		};
 	}, [] );
 
-	const { getGlobalBlockCount } = useSelect( blockEditorStore );
 	const { editEntityRecord } = useDispatch( coreStore );
-
-	useEffect( () => {
-		// Cleanup function to discard unsaved changes to the icon and logo when
-		// the block is removed.
-		return () => {
-			// Do nothing if the block is being rendered in the styles preview or the
-			// block inserter.
-			if (
-				styleClass?.includes(
-					'block-editor-block-types-list__site-logo-example'
-				) ||
-				styleClass?.includes(
-					'block-editor-block-styles__block-preview-container'
-				)
-			) {
-				return;
-			}
-
-			const logoBlockCount = getGlobalBlockCount( 'core/site-logo' );
-
-			// Only discard unsaved changes if we are removing the last Site Logo block
-			// on the page.
-			if ( logoBlockCount === 0 ) {
-				editEntityRecord( 'root', 'site', undefined, {
-					site_logo: undefined,
-					site_icon: undefined,
-				} );
-			}
-		};
-	}, [] );
 
 	const setLogo = ( newValue, shouldForceSync = false ) => {
 		// `shouldForceSync` is used to force syncing when the attribute
@@ -458,9 +423,9 @@ export default function LogoEdit( {
 
 	let alt = null;
 	if ( mediaItemData ) {
-		alt = mediaItemData.alt;
-		if ( logoUrl !== mediaItemData.url ) {
-			setLogoUrl( mediaItemData.url );
+		alt = mediaItemData.alt_text;
+		if ( logoUrl !== mediaItemData.source_url ) {
+			setLogoUrl( mediaItemData.source_url );
 		}
 	}
 

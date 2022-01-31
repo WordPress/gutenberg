@@ -82,11 +82,6 @@ module.exports = {
 						message: 'Please use `memize` instead.',
 					},
 					{
-						name: 'react',
-						message:
-							'Please use React API through `@wordpress/element` instead.',
-					},
-					{
 						name: 'reakit',
 						message:
 							'Please use Reakit API through `@wordpress/components` instead.',
@@ -106,6 +101,19 @@ module.exports = {
 						name: '@emotion/css',
 						message:
 							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+					},
+				],
+			},
+		],
+		'@typescript-eslint/no-restricted-imports': [
+			'error',
+			{
+				paths: [
+					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
+						allowTypeImports: true,
 					},
 				],
 			},

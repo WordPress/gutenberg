@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-const fs = require( 'fs' );
-const path = require( 'path' );
-
-/**
  * Internal dependencies
  */
 const getIntermediateRepresentation = require( '../lib/get-intermediate-representation' );
@@ -12,16 +6,9 @@ const getIntermediateRepresentation = require( '../lib/get-intermediate-represen
 describe( 'Intermediate Representation', () => {
 	describe( 'undocumented code', () => {
 		it( 'default export on multiple lines', () => {
-			const token = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-undocumented-nocomments/exports.json'
-				),
-				'utf-8'
-			);
 			const ir = getIntermediateRepresentation(
 				null,
-				JSON.parse( token )
+				require( './fixtures/default-undocumented-nocomments/exports.json' )
 			);
 			expect( ir ).toMatchInlineSnapshot( `
 			Array [
@@ -37,16 +24,9 @@ describe( 'Intermediate Representation', () => {
 		` );
 		} );
 		it( 'default export on one line', () => {
-			const tokenOneliner = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-undocumented-oneliner/exports.json'
-				),
-				'utf-8'
-			);
 			const irOneliner = getIntermediateRepresentation(
 				null,
-				JSON.parse( tokenOneliner )
+				require( './fixtures/default-undocumented-oneliner/exports.json' )
 			);
 			expect( irOneliner ).toMatchInlineSnapshot( `
 			Array [
@@ -66,16 +46,9 @@ describe( 'Intermediate Representation', () => {
 	describe( 'JSDoc in export statement', () => {
 		describe( 'default export', () => {
 			it( 'anonymous class', () => {
-				const tokenClassAnonymous = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-class-anonymous/exports.json'
-					),
-					'utf-8'
-				);
 				const irClassAnonymous = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenClassAnonymous )
+					require( './fixtures/default-class-anonymous/exports.json' )
 				);
 				expect( irClassAnonymous ).toMatchInlineSnapshot( `
 			Array [
@@ -91,16 +64,9 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'named class', () => {
-				const tokenClassNamed = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-class-named/exports.json'
-					),
-					'utf-8'
-				);
 				const irClassNamed = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenClassNamed )
+					require( './fixtures/default-class-named/exports.json' )
 				);
 				expect( irClassNamed ).toMatchInlineSnapshot( `
 			Array [
@@ -116,16 +82,9 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'anonymous function', () => {
-				const tokenFnAnonymous = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-function-anonymous/exports.json'
-					),
-					'utf-8'
-				);
 				const irFnAnonymous = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenFnAnonymous )
+					require( './fixtures/default-function-anonymous/exports.json' )
 				);
 				expect( irFnAnonymous ).toMatchInlineSnapshot( `
 			Array [
@@ -141,16 +100,9 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'named function', () => {
-				const tokenFnNamed = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-function-named/exports.json'
-					),
-					'utf-8'
-				);
 				const irFnNamed = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenFnNamed )
+					require( './fixtures/default-function-named/exports.json' )
 				);
 				expect( irFnNamed ).toMatchInlineSnapshot( `
 			Array [
@@ -166,16 +118,9 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'variable', () => {
-				const tokenVariable = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-variable/exports.json'
-					),
-					'utf-8'
-				);
 				const irVar = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenVariable )
+					require( './fixtures/default-variable/exports.json' )
 				);
 				expect( irVar ).toMatchInlineSnapshot( `
 			Array [
@@ -193,16 +138,9 @@ describe( 'Intermediate Representation', () => {
 		} );
 		describe( 'named export', () => {
 			it( 'named class', () => {
-				const tokenClass = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-class/exports.json'
-					),
-					'utf-8'
-				);
 				const irNamedClass = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenClass )
+					require( './fixtures/named-class/exports.json' )
 				);
 				expect( irNamedClass ).toMatchInlineSnapshot( `
 			Array [
@@ -225,16 +163,9 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'named function', () => {
-				const tokenFn = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-function/exports.json'
-					),
-					'utf-8'
-				);
 				const irNamedFn = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenFn )
+					require( './fixtures/named-function/exports.json' )
 				);
 				expect( irNamedFn ).toMatchInlineSnapshot( `
 			Array [
@@ -250,16 +181,9 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'named variable', () => {
-				const tokenVariable = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-variable/exports.json'
-					),
-					'utf-8'
-				);
 				const irNamedVar = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenVariable )
+					require( './fixtures/named-variable/exports.json' )
 				);
 				expect( irNamedVar ).toMatchInlineSnapshot( `
 			Array [
@@ -275,16 +199,9 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'named variables', () => {
-				const tokenVariables = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-variables/exports.json'
-					),
-					'utf-8'
-				);
 				const irNamedVars = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenVariables )
+					require( './fixtures/named-variables/exports.json' )
 				);
 				expect( irNamedVars ).toMatchInlineSnapshot( `
 			Array [
@@ -313,24 +230,10 @@ describe( 'Intermediate Representation', () => {
 	describe( 'JSDoc in same file', () => {
 		describe( 'default export', () => {
 			it( 'named class', () => {
-				const token = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-identifier/exports.json'
-					),
-					'utf-8'
-				);
-				const ast = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-identifier/ast.json'
-					),
-					'utf-8'
-				);
 				const irDefaultId = getIntermediateRepresentation(
 					null,
-					JSON.parse( token ),
-					JSON.parse( ast )
+					require( './fixtures/default-identifier/exports.json' ),
+					require( './fixtures/default-identifier/ast.json' )
 				);
 				expect( irDefaultId ).toMatchInlineSnapshot( `
 			Array [
@@ -353,24 +256,12 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'named function', () => {
-				const namedExport = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-named-export/exports.json'
-					),
-					'utf-8'
-				);
-				const namedExportAST = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-named-export/ast.json'
-					),
-					'utf-8'
-				);
+				const namedExport = require( './fixtures/default-named-export/exports.json' );
+				const namedExportAST = require( './fixtures/default-named-export/ast.json' );
 				const irDefaultNamed0 = getIntermediateRepresentation(
 					null,
-					JSON.parse( namedExport )[ 0 ],
-					JSON.parse( namedExportAST )
+					namedExport[ 0 ],
+					namedExportAST
 				);
 				expect( irDefaultNamed0 ).toMatchInlineSnapshot( `
 			Array [
@@ -386,8 +277,8 @@ describe( 'Intermediate Representation', () => {
 		` );
 				const irDefaultNamed1 = getIntermediateRepresentation(
 					null,
-					JSON.parse( namedExport )[ 1 ],
-					JSON.parse( namedExportAST )
+					namedExport[ 1 ],
+					namedExportAST
 				);
 				expect( irDefaultNamed1 ).toMatchInlineSnapshot( `
 			Array [
@@ -406,24 +297,10 @@ describe( 'Intermediate Representation', () => {
 
 		describe( 'named export', () => {
 			it( 'named identifier', () => {
-				const token = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-identifier/exports.json'
-					),
-					'utf-8'
-				);
-				const ast = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-identifier/ast.json'
-					),
-					'utf-8'
-				);
 				const irNamedId = getIntermediateRepresentation(
 					null,
-					JSON.parse( token ),
-					JSON.parse( ast )
+					require( './fixtures/named-identifier/exports.json' ),
+					require( './fixtures/named-identifier/ast.json' )
 				);
 				expect( irNamedId ).toMatchInlineSnapshot( `
 			Array [
@@ -439,24 +316,10 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'named identifier with destructuring', () => {
-				const tokenObject = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-identifier-destructuring/exports.json'
-					),
-					'utf-8'
-				);
-				const astObject = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-identifier-destructuring/ast.json'
-					),
-					'utf-8'
-				);
 				const irNamedIdDestructuring = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenObject ),
-					JSON.parse( astObject )
+					require( './fixtures/named-identifier-destructuring/exports.json' ),
+					require( './fixtures/named-identifier-destructuring/ast.json' )
 				);
 				expect( irNamedIdDestructuring ).toMatchInlineSnapshot( `
 			Array [
@@ -472,24 +335,10 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'named identifiers', () => {
-				const tokens = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-identifiers/exports.json'
-					),
-					'utf-8'
-				);
-				const asts = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-identifiers/ast.json'
-					),
-					'utf-8'
-				);
 				const irIds = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokens ),
-					JSON.parse( asts )
+					require( './fixtures/named-identifiers/exports.json' ),
+					require( './fixtures/named-identifiers/ast.json' )
 				);
 				expect( irIds ).toMatchInlineSnapshot( `
 			Array [
@@ -528,24 +377,12 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'named identifiers and inline', () => {
-				const foo = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-identifiers-and-inline/exports.json'
-					),
-					'utf-8'
-				);
-				const bar = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-identifiers-and-inline/ast.json'
-					),
-					'utf-8'
-				);
+				const foo = require( './fixtures/named-identifiers-and-inline/exports.json' );
+				const bar = require( './fixtures/named-identifiers-and-inline/ast.json' );
 				const irIdInline0 = getIntermediateRepresentation(
 					null,
-					JSON.parse( foo )[ 0 ],
-					JSON.parse( bar )
+					foo[ 0 ],
+					bar
 				);
 				expect( irIdInline0 ).toMatchInlineSnapshot( `
 			Array [
@@ -576,8 +413,8 @@ describe( 'Intermediate Representation', () => {
 		` );
 				const irIdInline1 = getIntermediateRepresentation(
 					null,
-					JSON.parse( foo )[ 1 ],
-					JSON.parse( bar )
+					foo[ 1 ],
+					bar
 				);
 				expect( irIdInline1 ).toMatchInlineSnapshot( `
 			Array [
@@ -598,28 +435,11 @@ describe( 'Intermediate Representation', () => {
 	describe( 'JSDoc in module dependency', () => {
 		describe( 'named export', () => {
 			it( 'named import', () => {
-				const tokenImportNamed = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-import-named/exports.json'
-					),
-					'utf-8'
-				);
-				const getModuleImportNamed = () =>
-					JSON.parse(
-						fs.readFileSync(
-							path.join(
-								__dirname,
-								'./fixtures/named-identifiers/ir.json'
-							),
-							'utf-8'
-						)
-					);
 				const ir = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenImportNamed ),
+					require( './fixtures/named-import-named/exports.json' ),
 					{ body: [] },
-					getModuleImportNamed
+					() => require( './fixtures/named-identifiers/ir.json' )
 				);
 				expect( ir ).toMatchInlineSnapshot( `
 			Array [
@@ -653,29 +473,12 @@ describe( 'Intermediate Representation', () => {
 		} );
 
 		describe( 'named default export', () => {
-			const getModule = () =>
-				JSON.parse(
-					fs.readFileSync(
-						path.join(
-							__dirname,
-							'./fixtures/named-default/module-ir.json'
-						),
-						'utf-8'
-					)
-				);
 			it( 'default', () => {
-				const tokenDefault = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-default/exports.json'
-					),
-					'utf-8'
-				);
 				const irNamedDefault = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenDefault ),
+					require( './fixtures/named-default/exports.json' ),
 					{ body: [] },
-					getModule
+					() => require( './fixtures/named-default/module-ir.json' )
 				);
 				expect( irNamedDefault ).toMatchInlineSnapshot( `
 			Array [
@@ -691,18 +494,11 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'renamed', () => {
-				const tokenDefaultExported = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-default-exported/exports.json'
-					),
-					'utf-8'
-				);
 				const irNamedDefaultExported = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenDefaultExported ),
+					require( './fixtures/named-default-exported/exports.json' ),
 					{ body: [] },
-					getModule
+					() => require( './fixtures/named-default/module-ir.json' )
 				);
 				expect( irNamedDefaultExported ).toMatchInlineSnapshot( `
 			Array [
@@ -721,23 +517,11 @@ describe( 'Intermediate Representation', () => {
 
 		describe( 'namespace export', () => {
 			const getModule = () =>
-				JSON.parse(
-					fs.readFileSync(
-						path.join(
-							__dirname,
-							'./fixtures/namespace/module-ir.json'
-						),
-						'utf-8'
-					)
-				);
+				require( './fixtures/namespace/module-ir.json' );
 			it( 'exports', () => {
-				const token = fs.readFileSync(
-					path.join( __dirname, './fixtures/namespace/exports.json' ),
-					'utf-8'
-				);
 				const irNamespace = getIntermediateRepresentation(
 					null,
-					JSON.parse( token ),
+					require( './fixtures/namespace/exports.json' ),
 					{ body: [] },
 					getModule
 				);
@@ -771,16 +555,9 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'exports with comment', () => {
-				const tokenCommented = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/namespace-commented/exports.json'
-					),
-					'utf-8'
-				);
 				const irNamespaceCommented = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenCommented ),
+					require( './fixtures/namespace-commented/exports.json' ),
 					{ body: [] },
 					getModule
 				);
@@ -819,35 +596,12 @@ describe( 'Intermediate Representation', () => {
 	describe( 'JSDoc in module dependency through import', () => {
 		describe( 'default export', () => {
 			it( 'default import', () => {
-				const tokenDefault = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-import-default/exports.json'
-					),
-					'utf-8'
-				);
-				const astDefault = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-import-default/ast.json'
-					),
-					'utf-8'
-				);
-				const getModuleDefault = () =>
-					JSON.parse(
-						fs.readFileSync(
-							path.join(
-								__dirname,
-								'./fixtures/default-import-default/module-ir.json'
-							),
-							'utf-8'
-						)
-					);
 				const irDefault = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenDefault ),
-					JSON.parse( astDefault ),
-					getModuleDefault
+					require( './fixtures/default-import-default/exports.json' ),
+					require( './fixtures/default-import-default/ast.json' ),
+					() =>
+						require( './fixtures/default-import-default/module-ir.json' )
 				);
 				expect( irDefault ).toMatchInlineSnapshot( `
 			Array [
@@ -863,35 +617,12 @@ describe( 'Intermediate Representation', () => {
 		` );
 			} );
 			it( 'named import', () => {
-				const tokenNamed = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-import-named/exports.json'
-					),
-					'utf-8'
-				);
-				const astNamed = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/default-import-named/ast.json'
-					),
-					'utf-8'
-				);
-				const getModuleNamed = () =>
-					JSON.parse(
-						fs.readFileSync(
-							path.join(
-								__dirname,
-								'./fixtures/default-import-named/module-ir.json'
-							),
-							'utf-8'
-						)
-					);
 				const irNamed = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenNamed ),
-					JSON.parse( astNamed ),
-					getModuleNamed
+					require( './fixtures/default-import-named/exports.json' ),
+					require( './fixtures/default-import-named/ast.json' ),
+					() =>
+						require( './fixtures/default-import-named/module-ir.json' )
 				);
 				expect( irNamed ).toMatchInlineSnapshot( `
 			Array [
@@ -910,46 +641,16 @@ describe( 'Intermediate Representation', () => {
 
 		describe( 'named export', () => {
 			it( 'namespace import', () => {
-				const tokenImportNamespace = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-import-namespace/exports.json'
-					),
-					'utf-8'
-				);
-				const astImportNamespace = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-import-namespace/ast.json'
-					),
-					'utf-8'
-				);
 				const getModuleImportNamespace = ( filePath ) => {
 					if ( filePath === './named-import-namespace-module' ) {
-						return JSON.parse(
-							fs.readFileSync(
-								path.join(
-									__dirname,
-									'./fixtures/named-import-namespace/module-ir.json'
-								),
-								'utf-8'
-							)
-						);
+						return require( './fixtures/named-import-namespace/module-ir.json' );
 					}
-					return JSON.parse(
-						fs.readFileSync(
-							path.join(
-								__dirname,
-								'./fixtures/default-function/ir.json'
-							),
-							'utf-8'
-						)
-					);
+					return require( './fixtures/default-function/ir.json' );
 				};
 				const ir = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenImportNamespace ),
-					JSON.parse( astImportNamespace ),
+					require( './fixtures/named-import-namespace/exports.json' ),
+					require( './fixtures/named-import-namespace/ast.json' ),
 					getModuleImportNamespace
 				);
 				expect( ir ).toMatchInlineSnapshot( `

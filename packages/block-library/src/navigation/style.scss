@@ -306,11 +306,14 @@ button.wp-block-navigation-item__content {
  */
 
 // Menu items with no background.
+.wp-block-navigation__responsive-container,
+.wp-block-navigation__responsive-close,
+.wp-block-navigation__responsive-dialog,
 .wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
 .wp-block-navigation__container,
 .wp-block-navigation__responsive-container-content {
-	gap: var(--wp--style--block-gap, 2em);
+	gap: inherit;
 }
 
 // Menu items with background.
@@ -321,7 +324,7 @@ button.wp-block-navigation-item__content {
 	&,
 	.wp-block-navigation .wp-block-page-list,
 	.wp-block-navigation__container {
-		gap: var(--wp--style--block-gap, 0.5em);
+		gap: inherit;
 	}
 }
 
@@ -509,7 +512,7 @@ button.wp-block-navigation-item__content {
 			// Space unfolded items using gap and padding for submenus.
 			.wp-block-navigation__submenu-container,
 			.wp-block-navigation__container {
-				gap: var(--wp--style--block-gap, 2em);
+				gap: inherit;
 			}
 
 			// Apply top padding to nested submenus.
@@ -580,6 +583,12 @@ button.wp-block-navigation-item__content {
 	color: #000;
 }
 
+// Overlay menu toggle button label
+.wp-block-navigation__toggle_button_label {
+	font-size: 1rem;
+	font-weight: bold;
+}
+
 // Menu and close buttons.
 .wp-block-navigation__responsive-container-open,
 .wp-block-navigation__responsive-container-close {
@@ -622,6 +631,14 @@ button.wp-block-navigation-item__content {
 // The menu adds wrapping containers.
 .wp-block-navigation__responsive-close {
 	width: 100%;
+
+	// This element is not keyboard accessible, and is focusable only using the mouse.
+	// It is part of the MicroModal library that adds a scrim outside of a modal dialog that is not fullscreen,
+	// where clicking that scrim closes the overlay just like the close button.
+	// It should not have a visible focus rectangle.
+	&:focus {
+		outline: none;
+	}
 }
 
 .is-menu-open .wp-block-navigation__responsive-close,

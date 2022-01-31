@@ -2,9 +2,7 @@
 
 ## Unreleased
 
-### Enhancements
-
--   Refactored `useCopyToClipboard` and (deprecated) `useCopyOnClick` hooks to use native Clipboard API instead of third-party dependency `clipboard.js`, removing it from the repo ([#37713](https://github.com/WordPress/gutenberg/pull/37713)).
+## 5.1.0 (2022-01-27)
 
 ## 5.0.0 (2021-07-29)
 

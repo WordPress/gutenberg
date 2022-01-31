@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import Clipboard from 'clipboard';
+
+/**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /* eslint-disable jsdoc/no-undefined-types */
@@ -25,60 +30,45 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 
+	/** @type {import('react').MutableRefObject<Clipboard | undefined>} */
+	const clipboard = useRef();
 	const [ hasCopied, setHasCopied ] = useState( false );
 
 	useEffect( () => {
 		/** @type {number | undefined} */
 		let timeoutId;
-		/** @type Array<Element>) */
-		let triggers = [];
 
 		if ( ! ref.current ) {
 			return;
 		}
 
-		// `triggers` is always an array, regardless of the value of the `ref` param.
-		if ( typeof ref.current === 'string' ) {
-			// expect `ref` to be a DOM selector
-			triggers = Array.from( document.querySelectorAll( ref.current ) );
-		} else if ( 'length' in ref.current ) {
-			// Expect `ref` to be a `NodeList`
-			triggers = Array.from( ref.current );
-		} else {
-			// Expect `ref` to be a single `Element`
-			triggers = [ ref.current ];
-		}
+		// Clipboard listens to click events.
+		clipboard.current = new Clipboard( ref.current, {
+			text: () => ( typeof text === 'function' ? text() : text ),
+		} );
 
-		/**
-		 * @param {Event} e
-		 */
-		const copyTextToClipboard = ( e ) => {
-			const trigger = /** @type {HTMLElement | null} */ ( e.target );
-			const currentWindow = trigger?.ownerDocument.defaultView || window;
-			const textToCopy = typeof text === 'function' ? text() : text || '';
+		clipboard.current.on( 'success', ( { clearSelection, trigger } ) => {
+			// Clearing selection will move focus back to the triggering button,
+			// ensuring that it is not reset to the body, and further that it is
+			// kept within the rendered node.
+			clearSelection();
 
-			currentWindow?.navigator?.clipboard
-				?.writeText( textToCopy )
-				.then( () => {
-					if ( timeout ) {
-						setHasCopied( true );
-						clearTimeout( timeoutId );
-						timeoutId = setTimeout(
-							() => setHasCopied( false ),
-							timeout
-						);
-					}
-				} );
-		};
+			// Handle ClipboardJS focus bug, see https://github.com/zenorocha/clipboard.js/issues/680
+			if ( trigger ) {
+				/** @type {HTMLElement} */ ( trigger ).focus();
+			}
 
-		triggers.forEach( ( t ) =>
-			t.addEventListener( 'click', copyTextToClipboard )
-		);
+			if ( timeout ) {
+				setHasCopied( true );
+				clearTimeout( timeoutId );
+				timeoutId = setTimeout( () => setHasCopied( false ), timeout );
+			}
+		} );
 
 		return () => {
-			triggers.forEach( ( t ) =>
-				t.removeEventListener( 'click', copyTextToClipboard )
-			);
+			if ( clipboard.current ) {
+				clipboard.current.destroy();
+			}
 			clearTimeout( timeoutId );
 		};
 	}, [ text, timeout, setHasCopied ] );

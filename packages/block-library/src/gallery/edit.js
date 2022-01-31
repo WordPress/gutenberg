@@ -22,6 +22,8 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
+	BlockControls,
+	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -52,11 +54,6 @@ import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
-
-/**
- * Internal dependencies
- */
-import useMobileWarning from './use-mobile-warning';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -102,6 +99,7 @@ function GalleryEdit( props ) {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
+		multiSelect,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -149,8 +147,6 @@ function GalleryEdit( props ) {
 
 	const newImages = useGetNewImages( images, imageData );
 
-	useMobileWarning( newImages );
-
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
 			updateBlockAttributes( newImage.clientId, {
@@ -159,6 +155,14 @@ function GalleryEdit( props ) {
 				align: undefined,
 			} );
 		} );
+
+		// If new blocks added select the first of these so they scroll into view.
+		if ( newImages?.length ) {
+			multiSelect(
+				newImages[ 0 ].clientId,
+				newImages[ newImages?.length - 1 ].clientId
+			);
+		}
 	}, [ newImages ] );
 
 	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
@@ -425,29 +429,38 @@ function GalleryEdit( props ) {
 		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
 	);
 
+	// MediaPlaceholder props are different between web and native hence, we provide a platform-specific set.
+	const mediaPlaceholderProps = Platform.select( {
+		web: {
+			addToGallery: false,
+			disableMediaButtons: imagesUploading,
+			value: {},
+		},
+		native: {
+			addToGallery: hasImageIds,
+			isAppender: hasImages,
+			disableMediaButtons:
+				( hasImages && ! isSelected ) || imagesUploading,
+			value: hasImageIds ? images : {},
+			autoOpenMediaUpload:
+				! hasImages && isSelected && wasBlockJustInserted,
+		},
+	} );
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ hasImageIds }
 			handleUpload={ false }
-			isAppender={ hasImages }
-			disableMediaButtons={
-				( hasImages && ! isSelected ) || imagesUploading
-			}
-			icon={ ! hasImages && sharedIcon }
+			icon={ sharedIcon }
 			labels={ {
-				title: ! hasImages && __( 'Gallery' ),
-				instructions: ! hasImages && PLACEHOLDER_TEXT,
+				title: __( 'Gallery' ),
+				instructions: PLACEHOLDER_TEXT,
 			} }
 			onSelect={ updateImages }
 			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
-			value={ hasImageIds ? images : {} }
 			onError={ onUploadError }
-			notices={ hasImages ? undefined : noticeUI }
-			autoOpenMediaUpload={
-				! hasImages && isSelected && wasBlockJustInserted
-			}
+			notices={ noticeUI }
+			{ ...mediaPlaceholderProps }
 		/>
 	);
 
@@ -522,11 +535,27 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*"
+					handleUpload={ false }
+					onSelect={ updateImages }
+					name={ __( 'Add' ) }
+					multiple={ true }
+					mediaIds={ images.map( ( image ) => image.id ) }
+					addToGallery={ hasImageIds }
+				/>
+			</BlockControls>
 			{ noticeUI }
 			<Gallery
 				{ ...props }
 				images={ images }
-				mediaPlaceholder={ mediaPlaceholder }
+				mediaPlaceholder={
+					! hasImages || Platform.isNative
+						? mediaPlaceholder
+						: undefined
+				}
 				blockProps={ blockProps }
 				insertBlocksAfter={ insertBlocksAfter }
 			/>

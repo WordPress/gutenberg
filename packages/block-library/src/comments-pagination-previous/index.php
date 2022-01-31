@@ -15,7 +15,7 @@
  * @return string Returns the previous posts link for the comments pagination.
  */
 function render_block_core_comments_pagination_previous( $attributes, $content, $block ) {
-	$default_label    = __( 'Previous Comments' );
+	$default_label    = __( 'Older Comments' );
 	$label            = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow = get_comments_pagination_arrow( $block, 'previous' );
 	if ( $pagination_arrow ) {

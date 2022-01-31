@@ -132,6 +132,7 @@ export default function LinkControlSearchResults( {
 							) }
 							searchTerm={ currentInputValue }
 							shouldShowType={ shouldShowSuggestionsTypes }
+							isFrontPage={ suggestion?.isFrontPage }
 						/>
 					);
 				} ) }

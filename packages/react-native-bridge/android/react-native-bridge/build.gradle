@@ -70,14 +70,28 @@ repositories {
     maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
     maven { url "https://jitpack.io" }
     google()
-    jcenter()
+    mavenCentral()
+    maven {
+        url "https://a8c-libs.s3.amazonaws.com/android/jcenter-mirror"
+        content {
+            includeVersion "com.google.android.exoplayer", "exoplayer-core", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "exoplayer-dash", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "exoplayer-hls", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "exoplayer-smoothstreaming", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "exoplayer-ui", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "exoplayer", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "extension-okhttp", "2.9.3"
+        }
+    }
 }
 
 dependencies {
     // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:2.0.0'
     implementation 'com.google.android.material:material:1.2.1'
-    implementation "org.wordpress:utils:1.22"
+    implementation "org.wordpress:utils:2.3.0"
+
+    testImplementation "junit:junit:4.13"
 
     if (willPublishReactNativeBridgeBinary) {
         def rnVersion = readReactNativeVersion('../../../../package.json', 'devDependencies')

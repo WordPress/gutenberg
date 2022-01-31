@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.1.0 (2022-01-27)
+
 ### Bug Fix
 
 -   Ensure that the package uses the latest version of React types ([#37365](https://github.com/WordPress/gutenberg/pull/37365)).

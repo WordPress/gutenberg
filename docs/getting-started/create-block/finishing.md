@@ -22,4 +22,4 @@ Nested blocks, a block that contains additional blocks, is a common pattern used
 
 One of the best sources for information and reference is the Block Editor itself, all the core blocks are built the same way. A good way to learn how things are done is to find a core block code that does something close to what you are interested in and then using the same approach for your own block.
 
-All core blocks source are in the [block library package on Github](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src).
+All core blocks source are in the [block library package on GitHub](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src).

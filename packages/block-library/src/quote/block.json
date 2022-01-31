@@ -49,8 +49,7 @@
 			"label": "Default",
 			"isDefault": true
 		},
-		{ "name": "plain", "label": "Plain" },
-		{ "name": "large", "label": "Large" }
+		{ "name": "plain", "label": "Plain" }
 	],
 	"editorStyle": "wp-block-quote-editor",
 	"style": "wp-block-quote"

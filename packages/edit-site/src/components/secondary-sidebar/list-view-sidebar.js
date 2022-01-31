@@ -32,7 +32,8 @@ export default function ListViewSidebar() {
 	}
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const focusReturnRef = useFocusReturn();
+	const headerFocusReturnRef = useFocusReturn();
+	const contentFocusReturnRef = useFocusReturn();
 	function closeOnEscape( event ) {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			setIsListViewOpened( false );
@@ -49,17 +50,23 @@ export default function ListViewSidebar() {
 			className="edit-site-editor__list-view-panel"
 			onKeyDown={ closeOnEscape }
 		>
-			<div className="edit-site-editor__list-view-panel-header">
-				<strong id={ labelId }>{ __( 'List view' ) }</strong>
+			<div
+				className="edit-site-editor__list-view-panel-header"
+				ref={ headerFocusReturnRef }
+			>
+				<strong id={ labelId }>{ __( 'List View' ) }</strong>
 				<Button
 					icon={ closeSmall }
-					label={ __( 'Close list view sidebar' ) }
+					label={ __( 'Close List View Sidebar' ) }
 					onClick={ () => setIsListViewOpened( false ) }
 				/>
 			</div>
 			<div
 				className="edit-site-editor__list-view-panel-content"
-				ref={ useMergeRefs( [ focusReturnRef, focusOnMountRef ] ) }
+				ref={ useMergeRefs( [
+					contentFocusReturnRef,
+					focusOnMountRef,
+				] ) }
 			>
 				<ListView
 					onSelect={ selectEditorBlock }

@@ -204,7 +204,7 @@ An advanced block that allows displaying post comments based on different query 
 -	**Name:** core/comments-query-loop
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** perPage, tagName
+-	**Attributes:** inherit, order, perPage, tagName
 
 ## Cover
 
@@ -365,8 +365,8 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 
 -	**Name:** core/navigation
 -	**Category:** theme
--	**Supports:** align (full, wide), anchor, inserter, spacing (units), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, textColor
+-	**Supports:** align (full, wide), anchor, inserter, spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, textColor
 
 ## Navigation Area
 
@@ -415,7 +415,7 @@ Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tr
 
 ## Paragraph
 
-Start with the building block of all narrative. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/paragraph))
+Start with the basic building block of all narrative. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/paragraph))
 
 -	**Name:** core/paragraph
 -	**Category:** text
@@ -433,7 +433,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 ## Post Author
 
-Add the author of this post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author))
+Display post author details such as name, avatar, and bio. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author))
 
 -	**Name:** core/post-author
 -	**Category:** theme
@@ -528,7 +528,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/post-featured-image
 -	**Category:** theme
 -	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
--	**Attributes:** height, isLink, scale, width
+-	**Attributes:** height, isLink, scale, sizeSlug, width
 
 ## Post Navigation Link
 
@@ -726,7 +726,7 @@ Display icons linking to your social media profiles or sites. ([Source](https://
 -	**Name:** core/social-links
 -	**Category:** widgets
 -	**Supports:** align (center, left, right), anchor, spacing (blockGap, margin, units)
--	**Attributes:** customIconBackgroundColor, customIconColor, iconBackgroundColor, iconBackgroundColorValue, iconColor, iconColorValue, openInNewTab, size
+-	**Attributes:** customIconBackgroundColor, customIconColor, iconBackgroundColor, iconBackgroundColorValue, iconColor, iconColorValue, openInNewTab, showLabels, size
 
 ## Spacer
 

@@ -620,4 +620,4 @@ If you've made it this far then congratulations! I hope you now have a better un
 
 In addition, you've reviewed an working example of the code required to implement your own custom functioning block editor. This information should prove useful, especially as Gutenberg expands beyond editing just the `Post` and into Widgets, Full Site Editing and beyond!
 
-The full code for the custom functioning block editor we've just built is [available on Github](https://github.com/getdave/standalone-block-editor). I encourage you to download and try it out for yourself. Experiment, then and take things even further!
+The full code for the custom functioning block editor we've just built is [available on GitHub](https://github.com/getdave/standalone-block-editor). I encourage you to download and try it out for yourself. Experiment, then and take things even further!
