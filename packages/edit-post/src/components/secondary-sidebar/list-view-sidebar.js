@@ -25,19 +25,28 @@ import { store as editPostStore } from '../../store';
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
 
-	const { getBlockParents, getBlockSelectionStart } = useSelect(
-		blockEditorStore
-	);
+	const {
+		getBlockParents,
+		getBlockSelectionStart,
+		hasMultiSelection,
+		hasSelectedBlock,
+	} = useSelect( blockEditorStore );
 
 	const { clearSelectedBlock, multiSelect, selectBlock } = useDispatch(
 		blockEditorStore
 	);
+
 	async function selectEditorBlock( clientId, event ) {
 		if ( ! event.shiftKey ) {
 			await clearSelectedBlock();
 			selectBlock( clientId, -1 );
 		} else if ( event.shiftKey ) {
 			event.preventDefault();
+
+			if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
+				selectBlock( clientId, -1 );
+				return;
+			}
 
 			const blockSelectionStart = getBlockSelectionStart();
 
