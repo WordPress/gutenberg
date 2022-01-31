@@ -14,7 +14,9 @@ describe( 'generate', () => {
 				{
 					spacing: { padding: '10px' },
 				},
-				'.some-selector'
+				{
+					selector: '.some-selector',
+				}
 			)
 		).toEqual( '.some-selector { padding: 10px; }' );
 
@@ -23,7 +25,9 @@ describe( 'generate', () => {
 				{
 					spacing: { padding: { top: '10px', bottom: '5px' } },
 				},
-				'.some-selector'
+				{
+					selector: '.some-selector',
+				}
 			)
 		).toEqual(
 			'.some-selector { padding-top: 10px; padding-bottom: 5px; }'
@@ -42,7 +46,9 @@ describe( 'getCSSRules', () => {
 				{
 					spacing: { padding: '10px' },
 				},
-				'.some-selector'
+				{
+					selector: '.some-selector',
+				}
 			)
 		).toEqual( [
 			{
@@ -57,7 +63,9 @@ describe( 'getCSSRules', () => {
 				{
 					spacing: { padding: { top: '10px', bottom: '5px' } },
 				},
-				'.some-selector'
+				{
+					selector: '.some-selector',
+				}
 			)
 		).toEqual( [
 			{
