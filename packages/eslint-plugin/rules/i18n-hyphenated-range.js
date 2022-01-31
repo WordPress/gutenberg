@@ -9,10 +9,12 @@ const {
 } = require( '../utils' );
 
 const EN_DASH = '–';
-const HYPHEN_IN_RANGE = /(\d\s*)-(\s*\d)/g;
+const HYPHEN_IN_RANGE = /(\d\s+-\s+\d)|(\d-\d)/g;
 
-function replaceHypenWithEnDash( string ) {
-	return string.replace( HYPHEN_IN_RANGE, `$1${ EN_DASH }$2` );
+function replaceHyphenWithEnDash( string ) {
+	if ( string.match( HYPHEN_IN_RANGE ) ) {
+		return string.replace( '-', EN_DASH );
+	}
 }
 
 // see eslint-plugin-wpcalypso.
@@ -28,7 +30,7 @@ function makeFixerFunction( arg ) {
 						fixes.push(
 							fixer.replaceTextRange(
 								[ quasi.start, quasi.end ],
-								replaceHypenWithEnDash( quasi.value.raw )
+								replaceHyphenWithEnDash( quasi.value.raw )
 							)
 						);
 					}
@@ -37,7 +39,10 @@ function makeFixerFunction( arg ) {
 
 			case 'Literal':
 				return [
-					fixer.replaceText( arg, replaceHypenWithEnDash( arg.raw ) ),
+					fixer.replaceText(
+						arg,
+						replaceHyphenWithEnDash( arg.raw )
+					),
 				];
 
 			case 'BinaryExpression':
