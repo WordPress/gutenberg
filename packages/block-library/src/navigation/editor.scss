@@ -216,15 +216,6 @@ $color-control-label-height: 20px;
 	background: none;
 	min-height: 0;
 
-	// Inherit orientation.
-	&,
-	.components-placeholder__fieldset,
-	.wp-block-navigation-placeholder__controls,
-	.wp-block-navigation-placeholder__preview,
-	.wp-block-navigation-placeholder__actions {
-		flex-direction: inherit;
-	}
-
 	// Needed for the preview menu items to match actual menu items.
 	.components-placeholder__fieldset {
 		font-size: inherit;
@@ -293,8 +284,6 @@ $color-control-label-height: 20px;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
-	flex-direction: row;
-	align-items: flex-start;
 	display: none;
 	position: relative;
 	z-index: 1;
@@ -310,26 +299,25 @@ $color-control-label-height: 20px;
 	float: left;
 	width: 100%;
 
-	// Show stacked for the vertical navigation, or small placeholders.
+	// Hide the navigation indicator when in small contexts.
 	.is-small &,
 	.is-medium & {
 		.wp-block-navigation-placeholder__actions__indicator,
-		.wp-block-navigation-placeholder__actions__indicator + hr,
-		.wp-block-navigation-placeholder__actions > :nth-last-child(3), // Add all pages.
-		.wp-block-navigation-placeholder__actions > :nth-last-child(2) { // hr separator after it.
+		.wp-block-navigation-placeholder__actions__indicator + hr {
 			display: none;
 		}
 	}
 
-	// Show stacked for the vertical navigation, or small placeholders.
-	.is-small & {
+	// Vertical orientation or small context.
+	.is-small &,
+	.wp-block-navigation.is-vertical & {
 		.wp-block-navigation-placeholder__actions {
 			flex-direction: column;
-		}
+			align-items: flex-start;
 
-		// Hide the separators in the vertical version.
-		.wp-block-navigation-placeholder__actions hr {
-			display: none;
+			hr {
+				display: none;
+			}
 		}
 	}
 
