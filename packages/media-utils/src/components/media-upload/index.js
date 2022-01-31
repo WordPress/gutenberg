@@ -303,7 +303,7 @@ export default function MediaUpload( {
 		const state = frame.current?.state();
 		const selectedImages = selections || state.get( 'selection' );
 
-		if ( ! selectedImages || ! selectedImages.models.length ) {
+		if ( ! selectedImages?.models?.length ) {
 			return;
 		}
 
