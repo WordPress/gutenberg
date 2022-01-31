@@ -2,76 +2,88 @@
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
-import { useQuerySelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 export default function useNavigationMenu( ref ) {
-	return useQuerySelect(
-		( resolve ) => {
+	return useSelect(
+		( select ) => {
 			const {
-				canUser,
 				getEntityRecord,
 				getEditedEntityRecord,
 				getEntityRecords,
-			} = resolve( coreStore );
+				hasFinishedResolution,
+				canUser,
+			} = select( coreStore );
 
-			const navigationMenus = getEntityRecords(
+			const navigationMenuSingleArgs = [
 				'postType',
 				'wp_navigation',
-				{ per_page: -1, status: 'publish' }
-			);
-			const canUserCreate = canUser( 'create', 'navigation' );
-			const knownValues = {
-				navigationMenus: navigationMenus.data,
-				canSwitchNavigationMenu: navigationMenus?.length > 0,
-				hasResolvedNavigationMenus: navigationMenus.hasFinished,
-				canUserCreateNavigation: canUserCreate.data,
-				hasResolvedCanUserCreateNavigation: canUserCreate.hasFinished,
-			};
+				ref,
+			];
+			const rawNavigationMenu = ref
+				? getEntityRecord( ...navigationMenuSingleArgs )
+				: null;
+			let navigationMenu = ref
+				? getEditedEntityRecord( ...navigationMenuSingleArgs )
+				: null;
 
-			if ( ! ref ) {
-				return {
-					...knownValues,
-					isNavigationMenuResolved: false,
-					isNavigationMenuMissing: true,
-					navigationMenu: null,
-					canUserUpdateNavigationEntity: undefined,
-					hasResolvedCanUserUpdateNavigationEntity: false,
-					canUserDeleteNavigationEntity: undefined,
-					hasResolvedCanUserDeleteNavigationEntity: false,
-				};
+			// getEditedEntityRecord will return the post regardless of status.
+			// Therefore if the found post is not published then we should ignore it.
+			if ( navigationMenu?.status !== 'publish' ) {
+				navigationMenu = null;
 			}
 
-			const rawNavigationMenu = getEntityRecord(
+			const hasResolvedNavigationMenu = ref
+				? hasFinishedResolution(
+						'getEditedEntityRecord',
+						navigationMenuSingleArgs
+				  )
+				: false;
+
+			const navigationMenuMultipleArgs = [
 				'postType',
 				'wp_navigation',
-				ref
-			);
-			const navigationMenu = getEditedEntityRecord(
-				'postType',
-				'wp_navigation',
-				ref
+				{ per_page: -1, status: 'publish' },
+			];
+			const navigationMenus = getEntityRecords(
+				...navigationMenuMultipleArgs
 			);
 
-			const canUserUpdate = canUser( 'update', 'navigation', ref );
-			const canUserDelete = canUser( 'delete', 'navigation', ref );
+			const canSwitchNavigationMenu = ref
+				? navigationMenus?.length > 1
+				: navigationMenus?.length > 0;
 
 			return {
-				...knownValues,
-				isNavigationMenuResolved: navigationMenu.hasFinished,
+				isNavigationMenuResolved: hasResolvedNavigationMenu,
 				isNavigationMenuMissing:
-					navigationMenu.hasFinished && ! rawNavigationMenu.data,
-				// getEditedEntityRecord will return the post regardless of status.
-				// Therefore if the found post is not published then we should ignore it.
-				navigationMenu:
-					navigationMenu.data?.status !== 'publish'
-						? null
-						: navigationMenu.data,
-				canUserUpdateNavigationEntity: canUserUpdate.data,
-				hasResolvedCanUserUpdateNavigationEntity:
-					canUserUpdate.hasFinished,
-				canUserDeleteNavigationEntity: canUserDelete.data,
-				hasResolvedCanUserDeleteNavigationEntity:
-					canUserDelete.hasFinished,
+					! ref ||
+					( hasResolvedNavigationMenu && ! rawNavigationMenu ),
+				canSwitchNavigationMenu,
+				hasResolvedNavigationMenus: hasFinishedResolution(
+					'getEntityRecords',
+					navigationMenuMultipleArgs
+				),
+				navigationMenu,
+				navigationMenus,
+				canUserUpdateNavigationEntity: ref
+					? canUser( 'update', 'navigation', ref )
+					: undefined,
+				hasResolvedCanUserUpdateNavigationEntity: hasFinishedResolution(
+					'canUser',
+					[ 'update', 'navigation', ref ]
+				),
+				canUserDeleteNavigationEntity: ref
+					? canUser( 'delete', 'navigation', ref )
+					: undefined,
+				hasResolvedCanUserDeleteNavigationEntity: hasFinishedResolution(
+					'canUser',
+					[ 'delete', 'navigation', ref ]
+				),
+				canUserCreateNavigation: canUser( 'create', 'navigation' ),
+				hasResolvedCanUserCreateNavigation: hasFinishedResolution(
+					'canUser',
+					[ 'create', 'navigation' ]
+				),
 			};
 		},
 		[ ref ]
