@@ -181,7 +181,7 @@ class WP_Theme_JSON_5_9 {
 		'padding-left'               => array( 'spacing', 'padding', 'left' ),
 		'--wp--style--block-gap'     => array( 'spacing', 'blockGap' ),
 		'text-decoration'            => array( 'typography', 'textDecoration' ),
-		'writing-mode'               => array( 'typography', 'textOrientation' ),
+		'writing-mode'               => array( 'typography', 'writingMode' ),
 		'text-transform'             => array( 'typography', 'textTransform' ),
 		'filter'                     => array( 'filter', 'duotone' ),
 	);
