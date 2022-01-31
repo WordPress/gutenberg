@@ -69,6 +69,14 @@ function render_block_core_post_author_avatar( $attributes, $content, $block ) {
 		$image_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
 	}
 
+	// Add border style (solid, dashed, dotted ).
+	$has_border_style = ! empty( $attributes['style']['border']['style'] );
+
+	if ( $has_border_style ) {
+		$border_style = $attributes['style']['border']['style'];
+		$image_styles[] = sprintf( 'border-style: %s;', esc_attr( $border_style ) );
+	}
+
 	// Add border classes to the avatar image for both custom colors and palette colors.
 	$image_classes = '';
 	if ( $has_border_color || isset( $attributes['borderColor'] ) ) {
