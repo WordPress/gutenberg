@@ -761,12 +761,10 @@ function sortFeatureGroups( featureGroups ) {
  *
  * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
  *
- * @return {string} The formatted changelog string.
+ * @return {IssuesListForRepoResponseItem[]} pullRequests List of first time contributor PRs.
  */
-function formatContributors( pullRequests ) {
-	let contributorsList = '';
-
-	const ftcPRs = pullRequests.filter( ( pr ) => {
+function findFirstTimeContributorPRs( pullRequests ) {
+	return pullRequests.filter( ( pr ) => {
 		if ( pr.user.login === 'dependabot[bot]' ) {
 			return false;
 		}
@@ -775,10 +773,17 @@ function formatContributors( pullRequests ) {
 			( { name } ) => name.toLowerCase() === 'first-time contributor'
 		);
 	} );
+}
 
-	for ( const pr of ftcPRs ) {
-		// log( pr );
-		contributorsList +=
+/**
+ *
+ * @param {IssuesListForRepoResponseItem[]} ftcPRs List of first time contributor PRs.
+ *
+ * @return {string} The formatted markdown list of contributors and their PRs.
+ */
+function buildContributorMarkdownList( ftcPRs ) {
+	return ftcPRs.reduce( ( acc, pr ) => {
+		acc +=
 			'- ' +
 			'@' +
 			pr.user.login +
@@ -789,7 +794,20 @@ function formatContributors( pullRequests ) {
 			'">#' +
 			pr.number +
 			'</a>\n';
-	}
+		return acc;
+	}, '' );
+}
+
+/**
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted changelog string.
+ */
+function formatContributors( pullRequests ) {
+	const ftcPRs = findFirstTimeContributorPRs( pullRequests );
+
+	const contributorsList = buildContributorMarkdownList( ftcPRs );
 
 	return (
 		'## First time contributors' +
