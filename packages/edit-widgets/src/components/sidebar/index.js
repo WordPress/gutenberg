@@ -173,6 +173,7 @@ export default function Sidebar() {
 			identifier={ currentArea }
 			icon={ cog }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+			hideToggleToScreenReader="true"
 		>
 			{ currentArea === WIDGET_AREAS_IDENTIFIER && (
 				<WidgetAreas

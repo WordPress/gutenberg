@@ -97,6 +97,7 @@ function ComplementaryArea( {
 	toggleShortcut,
 	isActiveByDefault,
 	showIconLabels = false,
+	hideToggleToScreenReader,
 } ) {
 	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
 		( select ) => {
@@ -150,6 +151,7 @@ function ComplementaryArea( {
 							icon={ showIconLabels ? check : icon }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							hideToggleToScreenReader={ hideToggleToScreenReader }
 						/>
 					) }
 				</PinnedItems>

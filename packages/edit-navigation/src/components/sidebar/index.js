@@ -84,6 +84,7 @@ export default function Sidebar( {
 			header={ <SidebarHeader sidebarName={ sidebarName } /> }
 			headerClassName="edit-navigation-sidebar__panel-tabs"
 			isPinnable
+			hideToggleToScreenReader="true"
 		>
 			{ sidebarName === SIDEBAR_MENU && (
 				<>

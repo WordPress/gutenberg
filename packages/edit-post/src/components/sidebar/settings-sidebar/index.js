@@ -82,6 +82,7 @@ const SettingsSidebar = () => {
 			toggleShortcut={ keyboardShortcut }
 			icon={ cog }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+			hideToggleToScreenReader="true"
 		>
 			{ ! isTemplateMode && sidebarName === 'edit-post/document' && (
 				<>
