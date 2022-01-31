@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
-"### Enhancements
+"## Changelog
+
+### Enhancements
 
 - Scripts: Use cssnano to minimize CSS files with build. ([33750](https://github.com/WordPress/gutenberg/pull/33750))
 - Scripts: Webpack configuration update to minimize CSS. ([33676](https://github.com/WordPress/gutenberg/pull/33676))
