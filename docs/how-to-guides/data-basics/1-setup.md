@@ -143,3 +143,6 @@ function MyFirstApp() {
 ```
 
 You can safely ignore the JSX snippets and rely on their compiled versions – they will just work even when pasted to your browser's developer tools.
+
+Previous part: [Introduction](./README.md)
+Next part: [Building a basic list of pages](./2-building-a-list-of-pages.md)
