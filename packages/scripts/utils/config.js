@@ -186,6 +186,7 @@ function getWebpackEntryPoints() {
 	const blockMetadataFiles = glob( 'src/**/block.json', {
 		absolute: true,
 	} );
+
 	if ( blockMetadataFiles.length > 0 ) {
 		return blockMetadataFiles.reduce(
 			( accumulator, blockMetadataFile ) => {
@@ -202,7 +203,7 @@ function getWebpackEntryPoints() {
 						const filepath = join(
 							dirname( blockMetadataFile ),
 							value.replace( 'file:', '' )
-						);
+						).replace( /\\/g, '/' );
 
 						// Takes the path without the file extension, and relative to the `src` directory.
 						const [ , entryName ] = filepath

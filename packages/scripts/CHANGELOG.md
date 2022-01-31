@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 20.0.2 (2022-01-31)
+
+### Bug Fix
+
+-   Fix the `build` command that does not generate assets on Windows OS [#38348](https://github.com/WordPress/gutenberg/pull/38348).
+
 ## 20.0.1 (2022-01-28)
 
 ### Bug Fix
