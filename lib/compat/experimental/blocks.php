@@ -106,6 +106,7 @@ if ( ! function_exists( 'extend_block_editor_settings_with_discussion_settings' 
 	 * @return array Filtered editor settings.
 	 */
 	function extend_block_editor_settings_with_discussion_settings( $settings ) {
+
 		$settings['__experimentalDiscussionSettings'] = array(
 			'commentOrder'        => get_option( 'comment_order' ),
 			'commentsPerPage'     => get_option( 'comments_per_page' ),
@@ -113,7 +114,16 @@ if ( ! function_exists( 'extend_block_editor_settings_with_discussion_settings' 
 			'pageComments'        => get_option( 'page_comments' ),
 			'threadComments'      => get_option( 'thread_comments' ),
 			'threadCommentsDepth' => get_option( 'thread_comments_depth' ),
+			'avatarURL'           => get_avatar_url(
+				'',
+				array(
+					'size'          => 96,
+					'force_default' => true,
+					'default'       => get_option( 'avatar_default' ),
+				)
+			),
 		);
+
 		return $settings;
 	}
 }

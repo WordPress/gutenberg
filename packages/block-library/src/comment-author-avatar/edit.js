@@ -1,25 +1,15 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	__experimentalGetBorderClassesAndStyles as useBorderProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	ResizableBox,
-	RangeControl,
-	SVG,
-	Path,
-} from '@wordpress/components';
+import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 
 export default function Edit( {
@@ -49,8 +39,12 @@ export default function Edit( {
 	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
-	const borderProps = useBorderProps( attributes );
 	const maxSizeBuffer = Math.floor( maxSize * 2.5 );
+	const { avatarURL } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings;
+	} );
 
 	const inspectorControls = (
 		<InspectorControls>
@@ -72,58 +66,37 @@ export default function Edit( {
 		</InspectorControls>
 	);
 
-	const avatarImage = avatarUrls ? (
-		<img
-			src={ avatarUrls[ avatarUrls.length - 1 ] }
-			alt={ `${ authorName } ${ __( 'Avatar' ) }` }
-			{ ...blockProps }
-			{ ...borderProps }
-		/>
-	) : (
-		<SVG
-			className={ classnames(
-				'wp-block-comment-author-avatar__placeholder',
-				borderProps.className
-			) }
-			style={ {
-				...borderProps.style, // Border radius, width and style.
-			} }
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 60 60"
-			preserveAspectRatio="none"
-		>
-			<Path vectorEffect="non-scaling-stroke" d="M60 60 0 0" />
-		</SVG>
-	);
-
 	const resizableAvatar = (
-		<div { ...blockProps }>
-			<ResizableBox
-				size={ {
-					width,
-					height,
-				} }
-				showHandle={ isSelected }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					setAttributes( {
-						height: parseInt( height + delta.height, 10 ),
-						width: parseInt( width + delta.width, 10 ),
-					} );
-				} }
-				lockAspectRatio
-				enable={ {
-					top: false,
-					right: ! isRTL(),
-					bottom: true,
-					left: isRTL(),
-				} }
-				minWidth={ minSize }
-				maxWidth={ maxSizeBuffer }
-			>
-				{ avatarImage }
-			</ResizableBox>
-		</div>
+		<ResizableBox
+			size={ {
+				width,
+				height,
+			} }
+			showHandle={ isSelected }
+			onResizeStop={ ( event, direction, elt, delta ) => {
+				setAttributes( {
+					height: parseInt( height + delta.height, 10 ),
+					width: parseInt( width + delta.width, 10 ),
+				} );
+			} }
+			lockAspectRatio
+			enable={ {
+				top: false,
+				right: ! isRTL(),
+				bottom: true,
+				left: isRTL(),
+			} }
+			minWidth={ minSize }
+			maxWidth={ maxSizeBuffer }
+		>
+			<img
+				src={
+					avatarUrls ? avatarUrls[ avatarUrls.length - 1 ] : avatarURL
+				}
+				alt={ `${ authorName } ${ __( 'Avatar' ) }` }
+				{ ...blockProps }
+			/>
+		</ResizableBox>
 	);
 
 	return (
