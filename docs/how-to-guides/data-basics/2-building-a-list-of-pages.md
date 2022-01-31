@@ -601,5 +601,8 @@ All that’s left is to refresh the page and enjoy the brand new status indicato
 ![](./media/list-of-pages/indicator.jpg)
 ![](./media/list-of-pages/no-results.jpg)
 
-Previous part: [Setup](./1-setup.md)
-Next part: Adding an „Edit page” feature (coming soon)
+## What's next?
+
+* Review the [full example](./media/list-of-pages/first-gutenberg-app)
+* **Previous part:** [Setup](./1-setup.md)
+* **Next part:** Adding an „Edit page” feature (coming soon)
