@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Removed unused `@wordpress/escape-html` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
 ## 6.1.0 (2022-01-27)
 
 -   Code quality: Add block schema to each core block ([#35900](https://github.com/WordPress/gutenberg/pull/35900)).

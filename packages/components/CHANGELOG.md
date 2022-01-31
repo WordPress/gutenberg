@@ -5,6 +5,7 @@
 ### Bug Fix
 
 -   Components: Fix `Slot`/`Fill` Emotion `StyleProvider` ([#38237](https://github.com/WordPress/gutenberg/pull/38237))
+-   Removed unused `rememo` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
 ## 19.3.0 (2022-01-27)
 

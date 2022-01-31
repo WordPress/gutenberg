@@ -2,13 +2,17 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Removed unused `@wordpress/a11y`, `@wordpress/server-side-render`, `rememo` and `uuid` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
 ## 3.2.0 (2022-01-27)
 
 ## 3.1.0 (2021-11-07)
 
 ### Enhancement
 
--  Enable persistent List View in the widget editor [#35706](https://github.com/WordPress/gutenberg/pull/35706).
+-   Enable persistent List View in the widget editor [#35706](https://github.com/WordPress/gutenberg/pull/35706).
 
 ## 3.0.0 (2021-07-29)
 
