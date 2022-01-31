@@ -17,6 +17,8 @@ import {
 	ResizableBox,
 	RangeControl,
 	ToggleControl,
+	SVG,
+	Path,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, _x, isRTL } from '@wordpress/i18n';
@@ -96,6 +98,39 @@ function PostAuthorAvatarEdit( {
 	);
 
 	const avatarImage = avatarUrls ? (
+		<img
+			src={ avatarUrls[ avatarUrls.length - 1 ] }
+			alt={ authorDetails.name }
+			className={ classnames(
+				'wp-post-author-avatar__image',
+				colorProps.className,
+				borderProps.className
+			) }
+			style={ {
+				...borderProps.style, // Border radius, width and style.
+			} }
+		/>
+	) : (
+		// Placeholder that displays when there is no avatar URL.
+		<SVG
+			className={ classnames(
+				'wp-block-post-author-avatar__placeholder',
+				colorProps.className,
+				borderProps.className
+			) }
+			style={ {
+				...borderProps.style, // Border radius, width and style.
+			} }
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 60 60"
+			preserveAspectRatio="none"
+		>
+			<Path vectorEffect="non-scaling-stroke" d="M60 60 0 0" />
+		</SVG>
+	);
+
+	const resizableImage = (
 		<ResizableBox
 			size={ {
 				width,
@@ -118,22 +153,8 @@ function PostAuthorAvatarEdit( {
 			minWidth={ minSize }
 			maxWidth={ maxSizeBuffer }
 		>
-			<img
-				src={ avatarUrls[ avatarUrls.length - 1 ] }
-				alt={ authorDetails.name }
-				className={ classnames(
-					'wp-post-author-avatar__image',
-					colorProps.className,
-					borderProps.className
-				) }
-				style={ {
-					...borderProps.style, // Border radius, width and style.
-				} }
-			/>
+			{ avatarImage }
 		</ResizableBox>
-	) : (
-		// Displays while loading
-		<p>{ _x( 'Post Author Avatar', 'block title' ) } </p>
 	);
 
 	const displayAvatar = isLink ? (
@@ -142,10 +163,10 @@ function PostAuthorAvatarEdit( {
 			className="wp-post-author-avatar__link"
 			onClick={ ( event ) => event.preventDefault() }
 		>
-			{ avatarImage }
+			{ resizableImage }
 		</a>
 	) : (
-		avatarImage
+		resizableImage
 	);
 
 	return (
