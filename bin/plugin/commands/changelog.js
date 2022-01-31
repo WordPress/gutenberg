@@ -529,7 +529,7 @@ function getEntry( issue ) {
 	return title === undefined
 		? title
 		: '- ' +
-				buildFormattedItemDescription(
+				getFormattedItemDescription(
 					title,
 					issue.number,
 					issue.html_url
@@ -545,7 +545,7 @@ function getEntry( issue ) {
  * @param {string} url    the URL of the Github Issue/PR.
  * @return {string} the formatted item
  */
-function buildFormattedItemDescription( title, number, url ) {
+function getFormattedItemDescription( title, number, url ) {
 	return `${ title } ([${ number }](${ url }))`;
 }
 
@@ -803,7 +803,7 @@ function buildContributorMarkdownList( ftcPRs ) {
 	return ftcPRs.reduce( ( markdownList, pr ) => {
 		const title = getNormalizedTitle( pr.title, pr ) || '';
 
-		const formattedTitle = buildFormattedItemDescription(
+		const formattedTitle = getFormattedItemDescription(
 			title,
 			pr.number,
 			pr.pull_request.html_url
@@ -929,5 +929,6 @@ async function getReleaseChangelog( options ) {
 	sortGroup,
 	getTypesByLabels,
 	getTypesByTitle,
+	getFormattedItemDescription,
 	formatChangelog,
 };

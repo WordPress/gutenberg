@@ -13,6 +13,7 @@ import {
 	getTypesByLabels,
 	getTypesByTitle,
 	getIssueFeature,
+	getFormattedItemDescription,
 	formatChangelog,
 } from '../changelog';
 import pullRequests from './fixtures/pull-requests.json';
@@ -321,5 +322,19 @@ describe( 'formatChangelog', () => {
 		// npm run changelog -- --milestone="Gutenberg 11.3"
 		// The response from the `fetchAllPullRequests` call in the `getChangelog` method was stored in the JSON file.
 		expect( formatChangelog( pullRequests ) ).toMatchSnapshot();
+	} );
+} );
+
+describe( 'getFormattedItemDescription', () => {
+	it( 'creates a markdown formatted description', () => {
+		const expected =
+			'This is a test title and should have a link. ([123456](https://github.com/123456))';
+		expect(
+			getFormattedItemDescription(
+				'This is a test title and should have a link.',
+				123456,
+				'https://github.com/123456'
+			)
+		).toEqual( expected );
 	} );
 } );
