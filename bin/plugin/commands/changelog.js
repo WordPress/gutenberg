@@ -781,7 +781,7 @@ function sortFeatureGroups( featureGroups ) {
  *
  * @return {IssuesListForRepoResponseItem[]} pullRequests List of first time contributor PRs.
  */
-function findFirstTimeContributorPRs( pullRequests ) {
+function getFirstTimeContributorPRs( pullRequests ) {
 	return pullRequests.filter( ( pr ) => {
 		if ( pr.user.login === 'dependabot[bot]' ) {
 			return false;
@@ -799,7 +799,7 @@ function findFirstTimeContributorPRs( pullRequests ) {
  *
  * @return {string} The formatted markdown list of contributors and their PRs.
  */
-function buildContributorMarkdownList( ftcPRs ) {
+function getContributorMarkdownList( ftcPRs ) {
 	return ftcPRs.reduce( ( markdownList, pr ) => {
 		const title = getNormalizedTitle( pr.title, pr ) || '';
 
@@ -823,8 +823,8 @@ function buildContributorMarkdownList( ftcPRs ) {
  */
 function formatContributors( pullRequests ) {
 	const contributorsList = flow( [
-		findFirstTimeContributorPRs,
-		buildContributorMarkdownList,
+		getFirstTimeContributorPRs,
+		getContributorMarkdownList,
 	] )( pullRequests );
 
 	return (
