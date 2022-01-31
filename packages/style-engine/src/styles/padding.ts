@@ -1,15 +1,15 @@
 /**
  * Internal dependencies
  */
-import type { Style } from '../types';
+import type { Style, StyleOptions } from '../types';
 import { generateBoxRules } from './utils';
 
 const padding = {
 	name: 'padding',
-	generate: ( style: Style, selector: string ) => {
+	generate: ( style: Style, options: StyleOptions ) => {
 		return generateBoxRules(
 			style,
-			selector,
+			options,
 			[ 'spacing', 'padding' ],
 			'padding'
 		);

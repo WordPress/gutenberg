@@ -107,7 +107,7 @@ export function getInlineStyles( styles = {} ) {
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	const extraRules = getCSSRules( styles, 'self' );
+	const extraRules = getCSSRules( styles, { selector: 'self' } );
 	extraRules.forEach( ( rule ) => {
 		if ( rule.selector !== 'self' ) {
 			throw "This style can't be added as inline style";

@@ -22,6 +22,13 @@ export interface Style {
 	};
 }
 
+export type StyleOptions = {
+	/**
+	 * CSS selector for the generated style.
+	 */
+	selector: string;
+};
+
 export type GeneratedCSSRule = {
 	selector: string;
 	value: string;
@@ -34,5 +41,5 @@ export type GeneratedCSSRule = {
 
 export interface StyleDefinition {
 	name: string;
-	generate: ( style: Style, selector: string ) => GeneratedCSSRule[];
+	generate: ( style: Style, options: StyleOptions ) => GeneratedCSSRule[];
 }

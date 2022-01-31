@@ -38,7 +38,7 @@ Generates a stylesheet for a given style object and selector.
 _Parameters_
 
 -   _style_ `Style`: Style object.
--   _selector_ `string`: CSS selector.
+-   _options_ `StyleOptions`: Options object with settings to adjust how the styles are generated.
 
 _Returns_
 
@@ -51,7 +51,7 @@ Returns a JSON representation of the generated CSS rules.
 _Parameters_
 
 -   _style_ `Style`: Style object.
--   _selector_ `string`: CSS selector.
+-   _options_ `StyleOptions`: Options object with settings to adjust how the styles are generated.
 
 _Returns_
 
