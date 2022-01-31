@@ -541,16 +541,6 @@ export default function NavigationSubmenuEdit( {
 		<Fragment>
 			<BlockControls>
 				<ToolbarGroup>
-					{ ! openSubmenusOnClick && (
-						<ToolbarButton
-							name="link"
-							icon={ linkIcon }
-							title={ __( 'Link' ) }
-							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ () => setIsLinkOpen( true ) }
-						/>
-					) }
-
 					{ ! selectedBlockHasDescendants && (
 						<ToolbarButton
 							name="revert"
@@ -558,6 +548,17 @@ export default function NavigationSubmenuEdit( {
 							title={ __( 'Convert to Link' ) }
 							onClick={ transformToLink }
 							className="wp-block-navigation__submenu__revert"
+						/>
+					) }
+				</ToolbarGroup>
+				<ToolbarGroup>
+					{ ! openSubmenusOnClick && (
+						<ToolbarButton
+							name="link"
+							icon={ linkIcon }
+							title={ __( 'Link' ) }
+							shortcut={ displayShortcut.primary( 'k' ) }
+							onClick={ () => setIsLinkOpen( true ) }
 						/>
 					) }
 				</ToolbarGroup>
