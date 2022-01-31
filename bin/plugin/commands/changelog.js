@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { countBy, groupBy, escapeRegExp, uniq } = require( 'lodash' );
+const { countBy, groupBy, escapeRegExp, uniq, flow } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -805,9 +805,10 @@ function buildContributorMarkdownList( ftcPRs ) {
  * @return {string} The formatted changelog string.
  */
 function formatContributors( pullRequests ) {
-	const ftcPRs = findFirstTimeContributorPRs( pullRequests );
-
-	const contributorsList = buildContributorMarkdownList( ftcPRs );
+	const contributorsList = flow( [
+		findFirstTimeContributorPRs,
+		buildContributorMarkdownList,
+	] )( pullRequests );
 
 	return (
 		'## First time contributors' +
