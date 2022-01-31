@@ -16,6 +16,7 @@ Examples of **correct** code for this rule:
 
 ```js
 __( '-10' );
+__( '1 0 -1' );
 __( '1–10' ); // Note the use of 'en' dash (U+2013) vs hyphen (U+002D)
 __( '1—10' ); // Note use of 'em' dash (U+2014) vs hyphen (U+002D)
 __( '1\u201310' );

@@ -34,6 +34,9 @@ ruleTester.run( 'i18n-hyphenated-range', rule, {
 		{
 			code: `__( 'Numbers with trailing hyphens are odd but ok like 99-' )`,
 		},
+		{
+			code: `__( '1 0 -1' )`,
+		},
 	],
 	invalid: [
 		{
