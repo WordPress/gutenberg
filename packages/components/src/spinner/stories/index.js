@@ -9,31 +9,35 @@ import { css } from '@emotion/react';
 import { useCx } from '../../utils';
 import { space } from '../../ui/utils/space';
 import Spinner from '../';
-import { Spacer } from '../../spacer';
 
-export default { title: 'Components/Spinner', component: Spinner };
+const sizes = {
+	default: undefined,
+	medium: space( 20 ),
+	large: space( 40 ),
+};
 
-export const _default = () => {
+export default {
+	title: 'Components/Spinner',
+	component: Spinner,
+	argTypes: {
+		size: {
+			options: Object.keys( sizes ),
+			mapping: sizes,
+			control: { type: 'select' },
+		},
+	},
+};
+
+const Template = ( { size } ) => {
 	const cx = useCx();
-	const mediumSpinner = cx( css`
-		width: ${ space( 20 ) };
-		height: ${ space( 20 ) };
+	const spinnerClassname = cx( css`
+		width: ${ size };
+		height: ${ size };
 	` );
-	const largeSpinner = cx( css`
-		width: ${ space( 40 ) };
-		height: ${ space( 40 ) };
-	` );
-	return (
-		<>
-			<Spacer marginBottom={ 6 }>
-				<Spinner />
-			</Spacer>
-			<Spacer marginBottom={ 6 }>
-				<Spinner className={ mediumSpinner } />
-			</Spacer>
-			<Spacer marginBottom={ 6 }>
-				<Spinner className={ largeSpinner } />
-			</Spacer>
-		</>
-	);
+	return <Spinner className={ spinnerClassname } />;
+};
+
+export const Default = Template.bind( {} );
+Default.args = {
+	size: 'default',
 };
