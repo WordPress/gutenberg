@@ -149,7 +149,7 @@ function TreeGrid(
 					return;
 				}
 
-				// Focus the next element.
+				// Focus the next column only if expanded.
 				if ( activeRow.getAttribute( 'aria-expanded' ) === 'false' ) {
 					nextIndex -= 1;
 				}
