@@ -73,7 +73,7 @@ function render_block_core_post_author_avatar( $attributes, $content, $block ) {
 	$has_border_style = ! empty( $attributes['style']['border']['style'] );
 
 	if ( $has_border_style ) {
-		$border_style = $attributes['style']['border']['style'];
+		$border_style   = $attributes['style']['border']['style'];
 		$image_styles[] = sprintf( 'border-style: %s;', esc_attr( $border_style ) );
 	}
 
