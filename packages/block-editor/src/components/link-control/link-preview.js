@@ -44,7 +44,8 @@ export default function LinkPreview( {
 
 	const displayTitle = richData?.title || value?.title || displayURL;
 
-	const isEmptyURL = ! value.url.length;
+	// url can be undefined if the href attribute is unset
+	const isEmptyURL = ! value?.url?.length;
 
 	let icon;
 
