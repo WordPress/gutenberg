@@ -22,6 +22,7 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 const {
 	fromConfigRoot,
 	hasBabelConfig,
+	hasArgInCLI,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
 	getWebpackEntryPoints,
@@ -33,6 +34,7 @@ let target = 'browserslist';
 if ( ! browserslist.findConfig( '.' ) ) {
 	target += ':' + fromConfigRoot( '.browserslistrc' );
 }
+const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
 const cssLoaders = [
 	{
@@ -159,7 +161,7 @@ const config = {
 									),
 								],
 								plugins: [
-									! isProduction &&
+									hasReactFastRefresh &&
 										require.resolve(
 											'react-refresh/babel'
 										),
@@ -238,7 +240,7 @@ const config = {
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
 		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
 		// React Fast Refresh.
-		! isProduction && new ReactRefreshWebpackPlugin(),
+		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.
 		! process.env.WP_NO_EXTERNALS &&

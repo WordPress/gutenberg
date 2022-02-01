@@ -3,7 +3,6 @@
  */
 import {
 	activatePlugin,
-	clickBlockAppender,
 	createNewPost,
 	deactivatePlugin,
 	getEditedPostContent,
@@ -100,12 +99,7 @@ describe( 'templates', () => {
 			// Remove the default block template to verify that it's not
 			// re-added after saving and reloading the editor.
 			await page.type( '.editor-post-title__input', 'My Image Format' );
-			await clickBlockAppender();
-			await page.keyboard.press( 'Backspace' );
-			// Wait for the selection to update.
-			await page.evaluate(
-				() => new Promise( window.requestAnimationFrame )
-			);
+			await page.click( '.wp-block-image' );
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
 			await page.reload();

@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Keep styles on block transforms Should keep colors during a transform 1`] = `
+"<!-- wp:paragraph {\\"textColor\\":\\"luminous-vivid-orange\\"} -->
+<p class=\\"has-luminous-vivid-orange-color has-text-color\\" id=\\"heading\\">Heading</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Keep styles on block transforms Should keep the font size during a transform from multiple blocks into a single one 1`] = `
+"<!-- wp:list {\\"fontSize\\":\\"large\\"} -->
+<ul class=\\"has-large-font-size\\"><li>Line 1 to be made large</li><li>Line 2 to be made large</li><li>Line 3 to be made large</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`Keep styles on block transforms Should keep the font size during a transform from multiple blocks into multiple blocks 1`] = `
+"<!-- wp:heading {\\"fontSize\\":\\"large\\"} -->
+<h2 class=\\"has-large-font-size\\" id=\\"line-1-to-be-made-large\\">Line 1 to be made large</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {\\"fontSize\\":\\"large\\"} -->
+<h2 class=\\"has-large-font-size\\" id=\\"line-2-to-be-made-large\\">Line 2 to be made large</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {\\"fontSize\\":\\"large\\"} -->
+<h2 class=\\"has-large-font-size\\" id=\\"line-3-to-be-made-large\\">Line 3 to be made large</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Keep styles on block transforms Should not include styles in the group block when grouping a block 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-large-font-size\\">Line 1 to be made large</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->"
+`;
