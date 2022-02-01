@@ -21,7 +21,7 @@ import {
 	Path,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { __, _x, isRTL } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
 function PostAuthorAvatarEdit( {
@@ -100,8 +100,12 @@ function PostAuthorAvatarEdit( {
 	const avatarImage = avatarUrls ? (
 		<img
 			src={ avatarUrls[ avatarUrls.length - 1 ] }
-			alt={ authorDetails.name }
+			// translators: %s is the Author name.
+			alt={ sprintf( __( '%s Avatar' ), authorDetails.name ) }
 			className={ classnames(
+				'avatar',
+				'avatar-' + width,
+				'photo',
 				'wp-post-author-avatar__image',
 				colorProps.className,
 				borderProps.className
