@@ -6,6 +6,7 @@ import {
 	justifyLeft,
 	justifyCenter,
 	justifyRight,
+	stretchFullWidth,
 	justifySpaceBetween,
 	arrowRight,
 	arrowDown,
@@ -185,6 +186,12 @@ function FlexLayoutJustifyContentControl( {
 			icon: justifySpaceBetween,
 			label: __( 'Space between items' ),
 		} );
+	} else {
+		justificationOptions.push({
+			value: 'stretch',
+			icon: stretchFullWidth,
+			label: __( 'Justify items stretched' ),
+		},)
 	}
 
 	return (
