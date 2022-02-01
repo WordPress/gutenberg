@@ -20,6 +20,13 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 	}
 
 	$post_ID = $block->context['postId'];
+
+	// Check is needed for backward compatibility with third-party plugins
+	// that might rely on the `in_the_loop` check; calling `the_post` sets it to true.
+	if ( ! in_the_loop() && have_posts() ) {
+		the_post();
+	}
+
 	$title   = get_the_title();
 
 	if ( ! $title ) {
