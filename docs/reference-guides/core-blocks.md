@@ -440,6 +440,15 @@ Display post author details such as name, avatar, and bio. ([Source](https://git
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** avatarSize, byline, showAvatar, showBio, textAlign
 
+## Post Author Biography
+
+The author biography. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-biography))
+
+-	**Name:** core/post-author-biography
+-	**Category:** theme
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Attributes:** textAlign
+
 ## Post Author Name
 
 The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-name))
@@ -726,7 +735,7 @@ Display icons linking to your social media profiles or sites. ([Source](https://
 -	**Name:** core/social-links
 -	**Category:** widgets
 -	**Supports:** align (center, left, right), anchor, spacing (blockGap, margin, units)
--	**Attributes:** customIconBackgroundColor, customIconColor, iconBackgroundColor, iconBackgroundColorValue, iconColor, iconColorValue, openInNewTab, size
+-	**Attributes:** customIconBackgroundColor, customIconColor, iconBackgroundColor, iconBackgroundColorValue, iconColor, iconColorValue, openInNewTab, showLabels, size
 
 ## Spacer
 

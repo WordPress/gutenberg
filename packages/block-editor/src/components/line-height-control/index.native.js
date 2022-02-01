@@ -14,7 +14,8 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 	return (
 		<UnitControl
 			label={ __( 'Line Height' ) }
-			min={ 0 }
+			// Set minimun value of 1 since lower values break on Android
+			min={ 1 }
 			max={ 5 }
 			step={ STEP }
 			value={ value }

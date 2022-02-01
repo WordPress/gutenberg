@@ -66,7 +66,13 @@
 						"docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md": []
 					},
 					{
+						"docs/how-to-guides/block-tutorial/block-supports.md": []
+					},
+					{
 						"docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md": []
 					},
 					{
 						"docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md": []

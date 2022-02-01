@@ -942,6 +942,17 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'panel header icon toggle', () => {
+		const defaultControls = {
+			attributes: { value: false },
+			hasValue: jest.fn().mockImplementation( () => {
+				return !! defaultControls.attributes.value;
+			} ),
+			label: 'Default',
+			onDeselect: jest.fn(),
+			onSelect: jest.fn(),
+			isShownByDefault: true,
+		};
+
 		const optionalControls = {
 			attributes: { value: false },
 			hasValue: jest.fn().mockImplementation( () => {
@@ -953,7 +964,26 @@ describe( 'ToolsPanel', () => {
 			isShownByDefault: false,
 		};
 
-		it( 'should render appropriate icons for the dropdown menu', async () => {
+		it( 'should render appropriate icon for the dropdown menu where there are default controls', async () => {
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...defaultControls }>
+						<div>Default control</div>
+					</ToolsPanelItem>
+					<ToolsPanelItem { ...optionalControls }>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			const optionsDisplayedIcon = screen.getByRole( 'button', {
+				name: 'View options',
+			} );
+
+			expect( optionsDisplayedIcon ).toBeInTheDocument();
+		} );
+
+		it( 'should render appropriate icons for the dropdown menu where there are no default controls', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...optionalControls }>

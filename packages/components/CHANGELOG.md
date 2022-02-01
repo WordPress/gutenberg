@@ -2,9 +2,21 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Components: Fix `Slot`/`Fill` Emotion `StyleProvider` ([#38237](https://github.com/WordPress/gutenberg/pull/38237))
+-   Reduce height and min-width of the reset button on `ComboBoxControl` for consistency. ([#38020](https://github.com/WordPress/gutenberg/pull/38020))
+
+### Enhancements
+
+-   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
+
+## 19.3.0 (2022-01-27)
+
 ### Enhancements
 
 -   Refine `ExternalLink` to be same size as the text, to appear more as a glyph than an icon. ([#37859](https://github.com/WordPress/gutenberg/pull/37859))
+-   Updated `ToolsPanel` header icon to only show "plus" icon when all items are optional and all are currently hidden ([#38262](https://github.com/WordPress/gutenberg/pull/38262))
 
 ### Bug Fix
 

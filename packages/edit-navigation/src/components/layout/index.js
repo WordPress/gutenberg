@@ -18,6 +18,7 @@ import {
 } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -200,6 +201,7 @@ export default function Layout( { blockEditorSettings } ) {
 						<UnsavedChangesWarning />
 					</BlockEditorProvider>
 					<Popover.Slot />
+					<PluginArea />
 				</SlotFillProvider>
 			</ShortcutProvider>
 		</ErrorBoundary>
