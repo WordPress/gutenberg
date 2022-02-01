@@ -28,6 +28,10 @@
 		"largestFontSize": {
 			"type": "number",
 			"default": 22
+		},
+		"fontSizeUnit": {
+			"type": "string",
+			"default": "pt"
 		}
 	},
 	"styles": [
