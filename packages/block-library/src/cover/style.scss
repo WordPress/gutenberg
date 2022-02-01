@@ -60,6 +60,8 @@
 	// the first selector is required for old Cover markup
 	&.has-background-dim:not(.has-background-gradient)::before,
 	.has-background-dim:not(.has-background-gradient)::before,
+	// Keep .wp-block-cover__gradient-background for v8 deprecation
+	.wp-block-cover__gradient-background,
 	.wp-block-cover__background {
 		position: absolute;
 		top: 0;
@@ -84,6 +86,8 @@
 	}
 
 	@for $i from 0 through 10 {
+		// Keep .wp-block-cover__gradient-background for v8 deprecation
+		.wp-block-cover__gradient-background.has-background-dim.has-background-dim-#{ $i * 10 },
 		.wp-block-cover__background.has-background-dim.has-background-dim-#{ $i * 10 } {
 			opacity: $i * 0.1;
 		}

@@ -14,6 +14,7 @@ import {
 	InnerBlocks,
 	__experimentalGetGradientClass,
 	useBlockProps,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -26,6 +27,7 @@ import {
 	backgroundImageStyles,
 	getPositionClassName,
 	isContentPositionCenter,
+	dimRatioToClass,
 } from './shared';
 
 /**
@@ -76,6 +78,176 @@ const blockAttributes = {
 	},
 	focalPoint: {
 		type: 'object',
+	},
+};
+
+const v8 = {
+	attributes: {
+		...blockAttributes,
+		isRepeated: {
+			type: 'boolean',
+			default: false,
+		},
+		minHeight: {
+			type: 'number',
+		},
+		minHeightUnit: {
+			type: 'string',
+		},
+		gradient: {
+			type: 'string',
+		},
+		customGradient: {
+			type: 'string',
+		},
+		contentPosition: {
+			type: 'string',
+		},
+		alt: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
+			default: '',
+		},
+	},
+	supports: {
+		anchor: true,
+		align: true,
+		html: false,
+		spacing: {
+			padding: true,
+			__experimentalDefaultControls: {
+				padding: true,
+			},
+		},
+		color: {
+			__experimentalDuotone:
+				'> .wp-block-cover__image-background, > .wp-block-cover__video-background',
+			text: false,
+			background: false,
+		},
+	},
+	save( { attributes } ) {
+		const {
+			backgroundType,
+			gradient,
+			contentPosition,
+			customGradient,
+			customOverlayColor,
+			dimRatio,
+			focalPoint,
+			hasParallax,
+			isDark,
+			isRepeated,
+			overlayColor,
+			url,
+			alt,
+			id,
+			minHeight: minHeightProp,
+			minHeightUnit,
+		} = attributes;
+		const overlayColorClass = getColorClassName(
+			'background-color',
+			overlayColor
+		);
+		const gradientClass = __experimentalGetGradientClass( gradient );
+		const minHeight = minHeightUnit
+			? `${ minHeightProp }${ minHeightUnit }`
+			: minHeightProp;
+
+		const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+		const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+		const isImgElement = ! ( hasParallax || isRepeated );
+
+		const style = {
+			...( isImageBackground && ! isImgElement
+				? backgroundImageStyles( url )
+				: {} ),
+			minHeight: minHeight || undefined,
+		};
+
+		const bgStyle = {
+			backgroundColor: ! overlayColorClass
+				? customOverlayColor
+				: undefined,
+			background: customGradient ? customGradient : undefined,
+		};
+
+		const objectPosition =
+			// prettier-ignore
+			focalPoint && isImgElement
+			 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+			 : undefined;
+
+		const classes = classnames(
+			{
+				'is-light': ! isDark,
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+				'has-custom-content-position': ! isContentPositionCenter(
+					contentPosition
+				),
+			},
+			getPositionClassName( contentPosition )
+		);
+
+		return (
+			<div { ...useBlockProps.save( { className: classes, style } ) }>
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						overlayColorClass,
+						dimRatioToClass( dimRatio ),
+						'wp-block-cover__gradient-background',
+						gradientClass,
+						{
+							'has-background-dim': dimRatio !== undefined,
+							'has-background-gradient':
+								gradient || customGradient,
+							[ gradientClass ]: ! url && gradientClass,
+						}
+					) }
+					style={ bgStyle }
+				/>
+
+				{ isImageBackground && isImgElement && url && (
+					<img
+						className={ classnames(
+							'wp-block-cover__image-background',
+							id ? `wp-image-${ id }` : null
+						) }
+						alt={ alt }
+						src={ url }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) }
+				{ isVideoBackground && url && (
+					<video
+						className={ classnames(
+							'wp-block-cover__video-background',
+							'intrinsic-ignore'
+						) }
+						autoPlay
+						muted
+						loop
+						playsInline
+						src={ url }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) }
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-cover__inner-container',
+					} ) }
+				/>
+			</div>
+		);
 	},
 };
 
@@ -808,4 +980,4 @@ const v1 = {
 	},
 };
 
-export default [ v7, v6, v5, v4, v3, v2, v1 ];
+export default [ v8, v7, v6, v5, v4, v3, v2, v1 ];
