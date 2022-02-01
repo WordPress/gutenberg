@@ -11,6 +11,7 @@ import {
 	subscribeParentGetHtml,
 	provideToNative_Html as provideToNativeHtml,
 } from '@wordpress/react-native-bridge';
+import apiFetch from '@wordpress/api-fetch';
 // Editor component is not exposed in the pacakge because is meant to be consumed
 // internally, however we require it for rendering the editor in integration tests,
 // for this reason it's imported with path access.
@@ -57,13 +58,11 @@ export async function initializeEditor( props, { component = Editor } = {} ) {
 	// we manually tick fake timers and await the resolution of `apiFetch`
 	// before proceeding.
 	jest.useFakeTimers( 'legacy' );
-	const mockApiResponse = Promise.resolve();
-	jest.doMock( '@wordpress/data-controls', () => {
-		const dataControls = jest.requireActual( '@wordpress/data-controls' );
-		return {
-			...dataControls,
-			apiFetch: jest.fn( () => mockApiResponse ),
-		};
+	const apiFetchResolves = [];
+	apiFetch.mockImplementation( () => {
+		return new Promise( ( resolve ) => {
+			apiFetchResolves.push( resolve );
+		} );
 	} );
 
 	// Arrange
@@ -91,7 +90,11 @@ export async function initializeEditor( props, { component = Editor } = {} ) {
 	act( () => jest.runAllTimers() );
 
 	// Await resolution of API fetches within store resolvers.
-	await act( () => mockApiResponse );
+	await act( async () => {
+		apiFetchResolves.forEach( ( resolve ) => {
+			resolve();
+		} );
+	} );
 
 	// Restore the default timer APIs for remainder of test arrangement, act, and
 	// assertion.
