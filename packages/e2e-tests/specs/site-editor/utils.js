@@ -1,8 +1,3 @@
-/**
- * WordPress dependencies
- */
-import { toggleMoreMenu } from '@wordpress/e2e-test-utils';
-
 export const navigationPanel = {
 	async open() {
 		const isOpen = !! ( await page.$(
@@ -68,19 +63,6 @@ export const navigationPanel = {
 };
 
 export const siteEditor = {
-	async clickOnMoreMenuItem( buttonLabel ) {
-		await toggleMoreMenu( 'site-editor' );
-		const moreMenuContainerSelector =
-			'//*[contains(concat(" ", @class, " "), " edit-site-more-menu__content ")]';
-		const elementToClick = (
-			await page.$x(
-				`${ moreMenuContainerSelector }//span[contains(concat(" ", @class, " "), " components-menu-item__item ")][contains(text(), "${ buttonLabel }")]`
-			)
-		 )[ 0 ];
-
-		await elementToClick.click();
-	},
-
 	async getEditedPostContent() {
 		return page.evaluate( async () => {
 			const postId = window.wp.data

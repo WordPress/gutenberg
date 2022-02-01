@@ -12,6 +12,7 @@ import {
 	trashAllPosts,
 	activateTheme,
 	goToSiteEditor,
+	clickOnMoreMenuItem,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -57,7 +58,7 @@ describe( 'Site Editor Templates Export', () => {
 			downloadPath: directory,
 		} );
 
-		await siteEditor.clickOnMoreMenuItem( 'Export' );
+		await clickOnMoreMenuItem( 'Export', 'site-editor' );
 		const filePath = path.join( directory, 'edit-site-export.zip' );
 		await waitForFileExists( filePath );
 		expect( fs.existsSync( filePath ) ).toBe( true );

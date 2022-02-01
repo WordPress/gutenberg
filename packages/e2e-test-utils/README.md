@@ -106,6 +106,7 @@ Clicks on More Menu item, searches for the button with the text provided and cli
 _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
+-   _context_ `[GutenbergContext]`: Whether to click the button in the post editor or site editor context.
 
 ### closeGlobalBlockInserter
 
@@ -743,7 +744,7 @@ Toggles the More Menu.
 
 _Parameters_
 
--   _context_ `['post-editor' | 'site-editor']`: Whether it's toggling in the context of the site editor or post editor.
+-   _context_ `[GutenbergContext]`: Whether it's toggling in the context of the site editor or post editor.
 
 ### toggleOfflineMode
 
