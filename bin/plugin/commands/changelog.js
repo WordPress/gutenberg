@@ -645,6 +645,7 @@ async function fetchAllPullRequests( octokit, settings ) {
 		: undefined;
 
 	const { number } = milestone;
+
 	const issues = await getIssuesByMilestone(
 		octokit,
 		owner,
@@ -653,23 +654,8 @@ async function fetchAllPullRequests( octokit, settings ) {
 		'closed',
 		latestReleaseInSeries ? latestReleaseInSeries.published_at : undefined
 	);
-	return issues.filter( ( issue ) => issue.pull_request );
-}
 
-/**
- * Returns a promise resolving to the changelog string for given settings.
- *
- * @param {WPChangelogSettings} settings Changelog settings.
- *
- * @return {Promise<string>} Promise resolving to changelog.
- */
-async function getChangelog( settings ) {
-	const octokit = new Octokit( {
-		auth: settings.token,
-	} );
-
-	const pullRequests = await fetchAllPullRequests( octokit, settings );
-	if ( ! pullRequests.length ) {
+	if ( ! issues.length ) {
 		if ( settings.unreleased ) {
 			throw new Error(
 				'There are no unreleased pull requests associated with the milestone.'
@@ -681,7 +667,7 @@ async function getChangelog( settings ) {
 		}
 	}
 
-	return formatChangelog( pullRequests );
+	return issues.filter( ( issue ) => issue.pull_request );
 }
 
 /**
@@ -691,7 +677,7 @@ async function getChangelog( settings ) {
  *
  * @return {string} The formatted changelog string.
  */
-function formatChangelog( pullRequests ) {
+function getChangelog( pullRequests ) {
 	let changelog = '## Changelog\n\n';
 
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
@@ -840,7 +826,7 @@ function sortByUsername( items ) {
  *
  * @return {string} The formatted contributors section.
  */
-function formatContributors( pullRequests ) {
+function getContributors( pullRequests ) {
 	const contributorsList = flow( [
 		getFirstTimeContributorPRs,
 		sortByUsername,
@@ -857,33 +843,6 @@ function formatContributors( pullRequests ) {
 }
 
 /**
- * @param {WPChangelogSettings} settings Changelog settings.
- *
- * @return {Promise<string>} Promise resolving to contributors list.
- */
-async function getContributors( settings ) {
-	const octokit = new Octokit( {
-		auth: settings.token,
-	} );
-
-	const pullRequests = await fetchAllPullRequests( octokit, settings );
-
-	if ( ! pullRequests.length ) {
-		if ( settings.unreleased ) {
-			throw new Error(
-				'There are no unreleased pull requests associated with the milestone.'
-			);
-		} else {
-			throw new Error(
-				'There are no pull requests associated with the milestone.'
-			);
-		}
-	}
-
-	return formatContributors( pullRequests );
-}
-
-/**
  * Generates and logs changelog for a milestone.
  *
  * @param {WPChangelogSettings} settings Changelog settings.
@@ -895,11 +854,19 @@ async function createChangelog( settings ) {
 		)
 	);
 
-	let releaselog;
+	const octokit = new Octokit( {
+		auth: settings.token,
+	} );
+
+	let releaselog = '';
+
 	try {
-		const changelog = getChangelog( settings );
-		const contributors = getContributors( settings );
-		releaselog = await Promise.all( [ changelog, contributors ] );
+		const pullRequests = await fetchAllPullRequests( octokit, settings );
+
+		const changelog = getChangelog( pullRequests );
+		const contributors = getContributors( pullRequests );
+
+		releaselog = releaselog.concat( changelog, contributors );
 	} catch ( error ) {
 		if ( error instanceof Error ) {
 			releaselog = formats.error( error.stack );
@@ -950,6 +917,6 @@ async function getReleaseChangelog( options ) {
 	getTypesByLabels,
 	getTypesByTitle,
 	getFormattedItemDescription,
-	formatChangelog,
-	formatContributors,
+	getContributors,
+	getChangelog,
 };

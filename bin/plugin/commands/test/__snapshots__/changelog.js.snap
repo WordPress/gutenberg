@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
+exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 "## Changelog
 
 ### Enhancements
@@ -210,7 +210,7 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 "
 `;
 
-exports[`formatContributors verify that the contributors list is properly formatted 1`] = `
+exports[`getContributors verify that the contributors list is properly formatted 1`] = `
 "## First time contributors
 
 The following PRs were merged by first time contrbutors:
