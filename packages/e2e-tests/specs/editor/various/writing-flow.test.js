@@ -666,11 +666,6 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
 		await page.keyboard.press( 'Enter' );
-		// Move into the placeholder UI.
-		await page.keyboard.press( 'ArrowDown' );
-		// Tab to the "Create table" button.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 		// Create the table.
 		await page.keyboard.press( 'Space' );
 		// Return focus after focus loss. This should be fixed.
