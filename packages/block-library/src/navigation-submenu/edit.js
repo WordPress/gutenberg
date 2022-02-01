@@ -38,7 +38,7 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { link as linkIcon, undo } from '@wordpress/icons';
+import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
@@ -541,17 +541,6 @@ export default function NavigationSubmenuEdit( {
 		<Fragment>
 			<BlockControls>
 				<ToolbarGroup>
-					{ ! selectedBlockHasDescendants && (
-						<ToolbarButton
-							name="revert"
-							icon={ undo }
-							title={ __( 'Convert to Link' ) }
-							onClick={ transformToLink }
-							className="wp-block-navigation__submenu__revert"
-						/>
-					) }
-				</ToolbarGroup>
-				<ToolbarGroup>
 					{ ! openSubmenusOnClick && (
 						<ToolbarButton
 							name="link"
@@ -559,6 +548,15 @@ export default function NavigationSubmenuEdit( {
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
 							onClick={ () => setIsLinkOpen( true ) }
+						/>
+					) }
+					{ ! selectedBlockHasDescendants && (
+						<ToolbarButton
+							name="revert"
+							icon={ removeSubmenu }
+							title={ __( 'Convert to Link' ) }
+							onClick={ transformToLink }
+							className="wp-block-navigation__submenu__revert"
 						/>
 					) }
 				</ToolbarGroup>
