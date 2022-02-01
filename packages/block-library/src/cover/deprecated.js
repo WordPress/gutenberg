@@ -84,10 +84,43 @@ const blockAttributes = {
 // v8: deprecated to remove duplicated gradient classes and swap `wp-block-cover__gradient-background` for `wp-block-cover__background`.
 const v8 = {
 	attributes: {
-		...blockAttributes,
+		url: {
+			type: 'string',
+		},
+		id: {
+			type: 'number',
+		},
+		alt: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
+			default: '',
+		},
+		hasParallax: {
+			type: 'boolean',
+			default: false,
+		},
 		isRepeated: {
 			type: 'boolean',
 			default: false,
+		},
+		dimRatio: {
+			type: 'number',
+			default: 100,
+		},
+		overlayColor: {
+			type: 'string',
+		},
+		customOverlayColor: {
+			type: 'string',
+		},
+		backgroundType: {
+			type: 'string',
+			default: 'image',
+		},
+		focalPoint: {
+			type: 'object',
 		},
 		minHeight: {
 			type: 'number',
@@ -104,12 +137,16 @@ const v8 = {
 		contentPosition: {
 			type: 'string',
 		},
-		alt: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'img',
-			attribute: 'alt',
-			default: '',
+		isDark: {
+			type: 'boolean',
+			default: true,
+		},
+		allowedBlocks: {
+			type: 'array',
+		},
+		templateLock: {
+			type: [ 'string', 'boolean' ],
+			enum: [ 'all', 'insert', false ],
 		},
 	},
 	supports: {
@@ -179,8 +216,8 @@ const v8 = {
 		const objectPosition =
 			// prettier-ignore
 			focalPoint && isImgElement
-			 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
-			 : undefined;
+				 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+				 : undefined;
 
 		const classes = classnames(
 			{
