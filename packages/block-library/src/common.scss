@@ -125,7 +125,6 @@ html :where([style*="border-width"]) {
 /**
  * Provide baseline responsiveness for images.
  */
-
 html :where(img) {
 	height: auto;
 	max-width: 100%;
