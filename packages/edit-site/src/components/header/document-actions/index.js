@@ -106,22 +106,16 @@ export default function DocumentActions( {
 			>
 				<Text
 					size="body"
-					className="edit-site-document-actions__title-prefix"
+					className="edit-site-document-actions__title"
+					as="h1"
 				>
 					<VisuallyHidden as="span">
 						{ sprintf(
 							/* translators: %s: the entity being edited, like "template"*/
-							__( 'Editing %s:' ),
+							__( 'Editing %s: ' ),
 							entityLabel
 						) }
 					</VisuallyHidden>
-				</Text>
-
-				<Text
-					size="body"
-					className="edit-site-document-actions__title"
-					as="h1"
-				>
 					{ entityTitle }
 				</Text>
 

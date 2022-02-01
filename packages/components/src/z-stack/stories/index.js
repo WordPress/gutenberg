@@ -15,7 +15,7 @@ export default {
 	component: ZStack,
 	title: 'Components (Experimental)/ZStack',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

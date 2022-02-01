@@ -1,5 +1,5 @@
 pluginManagement {
-    gradle.ext.kotlinVersion = '1.5.20'
+    gradle.ext.kotlinVersion = '1.5.32'
 
     plugins {
         id "com.android.library" version "4.2.2"
@@ -56,4 +56,6 @@ if (hasProperty("willPublishReactNativeBridgeBinary")) {
     project(':react-native-prompt-android').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-prompt-android/android')
     include ':react-native-webview'
     project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-webview/android')
+    include ':@react-native-clipboard_clipboard'
+    project(':@react-native-clipboard_clipboard').projectDir = new File(rootProject.projectDir, '../../../node_modules/@react-native-clipboard/clipboard/android')
 }

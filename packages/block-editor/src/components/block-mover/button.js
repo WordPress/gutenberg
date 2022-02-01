@@ -84,13 +84,9 @@ const BlockMoverButton = forwardRef(
 				const normalizedClientIds = castArray( clientIds );
 				const firstClientId = first( normalizedClientIds );
 				const blockRootClientId = getBlockRootClientId( firstClientId );
-				const firstBlockIndex = getBlockIndex(
-					firstClientId,
-					blockRootClientId
-				);
+				const firstBlockIndex = getBlockIndex( firstClientId );
 				const lastBlockIndex = getBlockIndex(
-					last( normalizedClientIds ),
-					blockRootClientId
+					last( normalizedClientIds )
 				);
 				const blockOrder = getBlockOrder( blockRootClientId );
 				const block = getBlock( firstClientId );

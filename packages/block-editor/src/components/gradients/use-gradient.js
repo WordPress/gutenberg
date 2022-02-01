@@ -65,14 +65,16 @@ export function __experimentalUseGradient( {
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const { gradients: gradientsPerOrigin } = useSetting( 'color' ) || {};
+	const userGradientPalette = useSetting( 'color.gradients.custom' );
+	const themeGradientPalette = useSetting( 'color.gradients.theme' );
+	const defaultGradientPalette = useSetting( 'color.gradients.default' );
 	const allGradients = useMemo(
 		() => [
-			...( gradientsPerOrigin?.custom || [] ),
-			...( gradientsPerOrigin?.theme || [] ),
-			...( gradientsPerOrigin?.default || [] ),
+			...( userGradientPalette || [] ),
+			...( themeGradientPalette || [] ),
+			...( defaultGradientPalette || [] ),
 		],
-		[ gradientsPerOrigin ]
+		[ userGradientPalette, themeGradientPalette, defaultGradientPalette ]
 	);
 	const { gradient, customGradient } = useSelect(
 		( select ) => {

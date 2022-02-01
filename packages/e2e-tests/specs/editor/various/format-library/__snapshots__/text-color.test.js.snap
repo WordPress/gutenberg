@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RichText should remove highlighting element 1`] = `
+"<!-- wp:paragraph -->
+<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should remove highlighting element 2`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->"
+`;

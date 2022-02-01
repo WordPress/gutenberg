@@ -12,7 +12,7 @@ export default {
 	title: 'Components/Notice',
 	component: Notice,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

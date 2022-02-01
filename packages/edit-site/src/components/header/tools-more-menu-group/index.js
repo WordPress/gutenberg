@@ -6,8 +6,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createSlotFill, MenuGroup } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { createSlotFill } from '@wordpress/components';
 
 const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill(
 	'EditSiteToolsMoreMenuGroup'
@@ -15,11 +14,7 @@ const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill(
 
 ToolsMoreMenuGroup.Slot = ( { fillProps } ) => (
 	<Slot fillProps={ fillProps }>
-		{ ( fills ) =>
-			! isEmpty( fills ) && (
-				<MenuGroup label={ __( 'Tools' ) }>{ fills }</MenuGroup>
-			)
-		}
+		{ ( fills ) => ! isEmpty( fills ) && fills }
 	</Slot>
 );
 

@@ -30,4 +30,10 @@ For React developers, this can be thought of as a custom reconciler or a custom 
 
 This is not the typical way the block editor is intended to be used. As a result, we have to also implement some missing features such as undo/redo and custom focus control. It is still a goal to make the block editor as easy to integrate into different systems as possible, so the integration in the Widgets Customizer can be a good experience for us to reflect some drawbacks in our current API and potentially improve them in the future.
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

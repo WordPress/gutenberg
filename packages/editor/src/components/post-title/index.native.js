@@ -147,6 +147,7 @@ class PostTitle extends Component {
 					style={ titleStyles }
 					styles={ styles }
 					fontSize={ 24 }
+					lineHeight={ 1 }
 					fontWeight={ 'bold' }
 					deleteEnter={ true }
 					onChange={ ( value ) => {

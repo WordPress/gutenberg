@@ -108,25 +108,19 @@
 		"parent": "backward-compatibility"
 	},
 	{
-		"title": "Meta Boxes",
-		"slug": "meta-box",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/meta-box.md",
-		"parent": "backward-compatibility"
-	},
-	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/README.md",
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Writing Your First Block Type",
+		"title": "Create a basic block",
 		"slug": "writing-your-first-block-type",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/writing-your-first-block-type.md",
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Applying Styles From a Stylesheet",
+		"title": "Use styles and stylesheets",
 		"slug": "applying-styles-with-stylesheets",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md",
 		"parent": "block-tutorial"
@@ -144,9 +138,21 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Block Supports",
+		"slug": "block-supports",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Creating dynamic blocks",
 		"slug": "creating-dynamic-blocks",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Block Supports in dynamic blocks",
+		"slug": "block-supports-in-dynamic-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md",
 		"parent": "block-tutorial"
 	},
 	{
@@ -218,26 +224,8 @@
 	{
 		"title": "Formatting Toolbar API",
 		"slug": "format-api",
-		"markdown_source": "../docs/how-to-guides/format-api/README.md",
+		"markdown_source": "../docs/how-to-guides/format-api.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Register a New Format",
-		"slug": "1-register-format",
-		"markdown_source": "../docs/how-to-guides/format-api/1-register-format.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Add a Button to the Toolbar",
-		"slug": "2-toolbar-button",
-		"markdown_source": "../docs/how-to-guides/format-api/2-toolbar-button.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Apply the Format When the Button Is Clicked",
-		"slug": "3-apply-format",
-		"markdown_source": "../docs/how-to-guides/format-api/3-apply-format.md",
-		"parent": "format-api"
 	},
 	{
 		"title": "Getting Started with JavaScript",
@@ -302,43 +290,7 @@
 	{
 		"title": "Meta Boxes",
 		"slug": "metabox",
-		"markdown_source": "../docs/how-to-guides/metabox/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Store Post Meta with a Block",
-		"slug": "meta-block-1-intro",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-1-intro.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Register Meta Field",
-		"slug": "meta-block-2-register-meta",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-2-register-meta.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Create Meta Block",
-		"slug": "meta-block-3-add",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-3-add.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Use Post Meta Data",
-		"slug": "meta-block-4-use-data",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-4-use-data.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "meta-block-5-finishing",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-5-finishing.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "A first-time setup guide to native mobile development (OSX)",
-		"slug": "osx-setup-guide",
-		"markdown_source": "../docs/how-to-guides/native-mobile/osx-setup-guide.md",
+		"markdown_source": "../docs/how-to-guides/metabox.md",
 		"parent": "how-to-guides"
 	},
 	{
@@ -350,38 +302,8 @@
 	{
 		"title": "Plugin Sidebar",
 		"slug": "plugin-sidebar-0",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md",
+		"markdown_source": "../docs/how-to-guides/plugin-sidebar-0.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Get a Sidebar up and Running",
-		"slug": "plugin-sidebar-1-up-and-running",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-1-up-and-running.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Tweak the sidebar style and add controls",
-		"slug": "plugin-sidebar-2-styles-and-controls",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Register the Meta Field",
-		"slug": "plugin-sidebar-3-register-meta",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-3-register-meta.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Initialize the Input Control",
-		"slug": "plugin-sidebar-4-initialize-input",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-4-initialize-input.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Update the Meta Field When the Input's Content Changes",
-		"slug": "plugin-sidebar-5-update-meta",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-5-update-meta.md",
-		"parent": "plugin-sidebar-0"
 	},
 	{
 		"title": "Themes",
@@ -540,6 +462,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Core Blocks Reference",
+		"slug": "core-blocks",
+		"markdown_source": "../docs/reference-guides/core-blocks.md",
+		"parent": "reference-guides"
+	},
+	{
 		"title": "Filter Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/reference-guides/filters/README.md",
@@ -640,6 +568,30 @@
 		"slug": "richtext",
 		"markdown_source": "../docs/reference-guides/richtext.md",
 		"parent": "reference-guides"
+	},
+	{
+		"title": "Theme.json Reference",
+		"slug": "theme-json-reference",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/README.md",
+		"parent": "reference-guides"
+	},
+	{
+		"title": "Version 2 (living reference)",
+		"slug": "theme-json-living",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-living.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Version 1 Reference",
+		"slug": "theme-json-v1",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v1.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Migrating to Newer Versions",
+		"slug": "theme-json-migrations",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
+		"parent": "theme-json-reference"
 	},
 	{
 		"title": "Component Reference",
@@ -915,6 +867,12 @@
 		"title": "FormTokenField",
 		"slug": "form-token-field",
 		"markdown_source": "../packages/components/src/form-token-field/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "GradientPicker",
+		"slug": "gradient-picker",
+		"markdown_source": "../packages/components/src/gradient-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -2040,22 +1998,34 @@
 		"parent": "code"
 	},
 	{
-		"title": "React Native based mobile Gutenberg",
-		"slug": "native-mobile",
-		"markdown_source": "../docs/contributors/code/native-mobile.md",
-		"parent": "code"
-	},
-	{
-		"title": "React Native Integration Test Guide",
-		"slug": "native-mobile-integration-test-guide",
-		"markdown_source": "../docs/contributors/code/native-mobile-integration-test-guide.md",
+		"title": "React Native mobile editor",
+		"slug": "react-native",
+		"markdown_source": "../docs/contributors/code/react-native/README.md",
 		"parent": "code"
 	},
 	{
 		"title": "Getting Started for the React Native based Mobile Gutenberg",
-		"slug": "getting-started-native-mobile",
-		"markdown_source": "../docs/contributors/code/getting-started-native-mobile.md",
-		"parent": "code"
+		"slug": "getting-started-react-native",
+		"markdown_source": "../docs/contributors/code/react-native/getting-started-react-native.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "Setup guide for React Native development (macOS)",
+		"slug": "osx-setup-guide",
+		"markdown_source": "../docs/contributors/code/react-native/osx-setup-guide.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "React Native Integration Test Guide",
+		"slug": "integration-test-guide",
+		"markdown_source": "../docs/contributors/code/react-native/integration-test-guide.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "React Native Internationalization Guide",
+		"slug": "internationalization-guide",
+		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
+		"parent": "react-native"
 	},
 	{
 		"title": "Design Contributions",

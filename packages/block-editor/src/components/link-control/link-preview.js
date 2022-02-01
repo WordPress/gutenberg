@@ -44,7 +44,8 @@ export default function LinkPreview( {
 
 	const displayTitle = richData?.title || value?.title || displayURL;
 
-	const isEmptyURL = ! value.url.length;
+	// url can be undefined if the href attribute is unset
+	const isEmptyURL = ! value?.url?.length;
 
 	let icon;
 
@@ -98,7 +99,7 @@ export default function LinkPreview( {
 							</>
 						) : (
 							<span className="block-editor-link-control__search-item-error-notice">
-								Link is empty
+								{ __( 'Link is empty' ) }
 							</span>
 						) }
 					</span>

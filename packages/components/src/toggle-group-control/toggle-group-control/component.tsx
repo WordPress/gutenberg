@@ -1,18 +1,16 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
-import useResizeAware from 'react-resize-aware';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useMemo } from '@wordpress/element';
-import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId, usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,7 +23,6 @@ import {
 import { useUpdateEffect, useCx } from '../../utils/hooks';
 import { View } from '../../view';
 import BaseControl from '../../base-control';
-import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import type { ToggleGroupControlProps } from '../types';
 import ToggleGroupControlContext from '../context';
 import * as styles from './styles';
@@ -50,7 +47,6 @@ function ToggleGroupControl(
 	} = useContextSystem( props, 'ToggleGroupControl' );
 	const cx = useCx();
 	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeAware();
 	const baseId = useInstanceId(
 		ToggleGroupControl,
 		'toggle-group-control'
@@ -59,10 +55,15 @@ function ToggleGroupControl(
 		baseId,
 		state: value,
 	} );
+	const previousValue = usePrevious( value );
 
 	// Propagate radio.state change
 	useUpdateEffect( () => {
-		onChange( radio.state );
+		// Avoid calling onChange if radio state changed
+		// from incoming value.
+		if ( previousValue !== radio.state ) {
+			onChange( radio.state );
+		}
 	}, [ radio.state ] );
 
 	// Sync incoming value with radio.state
@@ -102,13 +103,6 @@ function ToggleGroupControl(
 					{ ...otherProps }
 					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
 				>
-					{ resizeListener }
-					<ToggleGroupControlBackdrop
-						{ ...radio }
-						containerRef={ containerRef }
-						containerWidth={ sizes.width }
-						isAdaptiveWidth={ isAdaptiveWidth }
-					/>
 					{ children }
 				</RadioGroup>
 			</ToggleGroupControlContext.Provider>

@@ -208,7 +208,8 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		$scripts,
 		'react',
 		'https://unpkg.com/react@17.0.1/umd/react' . $react_suffix . '.js',
-		array( 'wp-polyfill' )
+		// See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
+		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' )
 	);
 	gutenberg_register_vendor_script(
 		$scripts,
@@ -370,7 +371,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-reset-editor-styles',
 		gutenberg_url( 'build/block-library/reset.css' ),
-		array( 'common', 'forms' ), // Make sure the reset is loaded after the default WP Adminn styles.
+		array( 'common', 'forms' ), // Make sure the reset is loaded after the default WP Admin styles.
 		$version
 	);
 	$styles->add_data( 'wp-reset-editor-styles', 'rtl', 'replace' );
@@ -483,24 +484,6 @@ function gutenberg_register_packages_styles( $styles ) {
 	$styles->add_data( 'wp-widgets', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
-
-/**
- * Registers common scripts and styles to be used as dependencies of the editor
- * and plugins.
- *
- * @since 0.1.0
- */
-function gutenberg_enqueue_block_editor_assets() {
-	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
-		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
-
-		wp_enqueue_script(
-			'gutenberg-live-reload',
-			$live_reload_url
-		);
-	}
-}
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets' );
 
 /**
  * Retrieves a unique and reasonably short and human-friendly filename for a
@@ -621,96 +604,9 @@ function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = arra
 }
 
 /**
- * Extends block editor settings to remove the Gutenberg's `editor-styles.css`;
- *
- * This can be removed when plugin support requires WordPress 5.8.0+.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_block_editor_styles( $settings ) {
-	if ( empty( $settings['styles'] ) ) {
-		$settings['styles'] = array();
-	} else {
-		/*
-		 * WordPress versions prior to 5.8 include a legacy editor styles file
-		 * that need to be removed.
-		 * This code can be removed from the Gutenberg plugin when the supported WP
-		 * version is 5.8
-		 */
-		$default_styles_file = is_rtl() ?
-			ABSPATH . WPINC . '/css/dist/editor/editor-styles-rtl.css' :
-			ABSPATH . WPINC . '/css/dist/editor/editor-styles.css';
-
-		if ( file_exists( $default_styles_file ) ) {
-			$default_styles = file_get_contents(
-				$default_styles_file
-			);
-
-			/*
-			* Iterate backwards from the end of the array since the preferred
-			* insertion point in case not found is prepended as first entry.
-			*/
-			for ( $i = count( $settings['styles'] ) - 1; $i >= 0; $i-- ) {
-				if ( isset( $settings['styles'][ $i ]['css'] ) &&
-						$default_styles === $settings['styles'][ $i ]['css'] ) {
-					break;
-				}
-			}
-
-			if ( isset( $i ) && $i >= 0 ) {
-				unset( $settings['styles'][ $i ] );
-			}
-		}
-	}
-
-	// Remove the default font editor styles for FSE themes.
-	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		foreach ( $settings['styles'] as $j => $style ) {
-			if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
-				unset( $settings['styles'][ $j ] );
-			}
-		}
-	}
-
-	return $settings;
-}
-// This can be removed when plugin support requires WordPress 5.8.0+.
-if ( function_exists( 'get_block_editor_settings' ) ) {
-	add_filter( 'block_editor_settings_all', 'gutenberg_extend_block_editor_styles' );
-} else {
-	add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
-}
-
-/**
- * Adds a flag to the editor settings to know whether we're in FSE theme or not.
- *
- * This can be removed when plugin support requires WordPress 5.8.0+.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
-	$settings['supportsTemplateMode'] = gutenberg_supports_block_templates();
-
-	// Enable the new layout options for themes with a theme.json file.
-	$settings['supportsLayout'] = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
-
-	return $settings;
-}
-// This can be removed when plugin support requires WordPress 5.8.0+.
-if ( function_exists( 'get_block_editor_settings' ) ) {
-	add_filter( 'block_editor_settings_all', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
-} else {
-	add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
-}
-
-/**
  * Sets the editor styles to be consumed by JS.
  */
-function gutenberg_extend_block_editor_styles_html() {
+function gutenberg_resolve_assets() {
 	global $pagenow;
 
 	$script_handles = array();
@@ -765,16 +661,17 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	$scripts = ob_get_clean();
 
-	$editor_assets = wp_json_encode(
-		array(
-			'styles'  => $styles,
-			'scripts' => $scripts,
-		)
+	return array(
+		'styles'  => $styles,
+		'scripts' => $scripts,
 	);
-
-	echo "<script>window.__editorAssets = $editor_assets</script>";
 }
-add_action( 'admin_footer-appearance_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-widgets.php', 'gutenberg_extend_block_editor_styles_html' );
+
+add_filter(
+	'block_editor_settings_all',
+	function( $settings ) {
+		// In the future we can allow WP Dependency handles to be passed.
+		$settings['__unstableResolvedAssets'] = gutenberg_resolve_assets();
+		return $settings;
+	}
+);

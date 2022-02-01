@@ -24,7 +24,7 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 
 	public function set_up() {
 		parent::set_up();
-		switch_theme( 'tt1-blocks' );
+		switch_theme( 'emptytheme' );
 	}
 
 	/**
@@ -33,7 +33,6 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetupBeforeClass( $factory ) {
-		gutenberg_register_wp_theme_taxonomy();
 		self::$admin_id = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -46,23 +45,74 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 				'post_status'  => 'publish',
 				'post_title'   => __( 'Custom Styles', 'default' ),
 				'post_type'    => 'wp_global_styles',
-				'post_name'    => 'wp-global-styles-tt1-blocks',
+				'post_name'    => 'wp-global-styles-emptytheme',
 				'tax_input'    => array(
-					'wp_theme' => 'tt1-blocks',
+					'wp_theme' => 'emptytheme',
 				),
 			),
 			true
 		);
 	}
 
+
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
-		$this->assertArrayHasKey( '/wp/v2/global-styles/(?P<id>[\/\w-]+)', $routes );
+		$this->assertArrayHasKey(
+			// '/wp/v2/global-styles/(?P<id>[\/\s%\w\.\(\)\[\]\@_\-]+)',
+			'/wp/v2/global-styles/(?P<id>[\/\w-]+)',
+			$routes,
+			'Single global style based on the given ID route does not exist'
+		);
+		$this->assertArrayHasKey(
+			'/wp/v2/global-styles/themes/(?P<stylesheet>[^\/:<>\*\?"\|]+(?:\/[^\/:<>\*\?"\|]+)?)',
+			$routes,
+			'Theme global styles route does not exist'
+		);
+		$this->assertArrayHasKey(
+			'/wp/v2/global-styles/themes/(?P<stylesheet>[\/\s%\w\.\(\)\[\]\@_\-]+)/variations',
+			$routes,
+			'Theme global styles variations route does not exist'
+		);
 	}
 
 	public function test_context_param() {
 		// TODO: Implement test_context_param() method.
 		$this->markTestIncomplete();
+	}
+
+	public function test_get_theme_items() {
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/themes/emptytheme/variations' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$expected = array(
+			array(
+				'version'  => 2,
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'slug'  => 'foreground',
+									'color' => '#3F67C6',
+									'name'  => 'Foreground',
+								),
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/post-title' => array(
+							'typography' => array(
+								'fontWeight' => '700',
+							),
+						),
+					),
+				),
+			),
+		);
+		$this->assertSameSetsWithIndex( $data, $expected );
 	}
 
 	public function test_get_items() {

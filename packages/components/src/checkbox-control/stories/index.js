@@ -17,7 +17,7 @@ export default {
 	title: 'Components/CheckboxControl',
 	component: CheckboxControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

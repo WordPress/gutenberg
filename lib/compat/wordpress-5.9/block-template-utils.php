@@ -21,7 +21,6 @@ if ( ! defined( 'WP_TEMPLATE_PART_AREA_UNCATEGORIZED' ) ) {
 	define( 'WP_TEMPLATE_PART_AREA_UNCATEGORIZED', 'uncategorized' );
 }
 
-
 if ( ! function_exists( 'get_block_theme_folders' ) ) {
 	/**
 	 * For backward compatibility reasons,
@@ -37,7 +36,7 @@ if ( ! function_exists( 'get_block_theme_folders' ) ) {
 		$root_dir   = get_theme_root( $theme_name );
 		$theme_dir  = "$root_dir/$theme_name";
 
-		if ( is_readable( $theme_dir . '/block-templates/index.html' ) ) {
+		if ( file_exists( $theme_dir . '/block-templates' ) || file_exists( $theme_dir . '/block-template-parts' ) ) {
 			return array(
 				'wp_template'      => 'block-templates',
 				'wp_template_part' => 'block-template-parts',
@@ -111,67 +110,67 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 		$default_template_types = array(
 			'index'          => array(
 				'title'       => _x( 'Index', 'Template name', 'gutenberg' ),
-				'description' => __( 'The default template used when no other template is available. This is a required template in WordPress.', 'gutenberg' ),
+				'description' => __( 'Displays posts.', 'gutenberg' ),
 			),
 			'home'           => array(
 				'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used for the main page that displays blog posts. This is the front page by default in WordPress. If a static front page is set, this is the template used for the page that contains the latest blog posts.', 'gutenberg' ),
+				'description' => __( 'Displays posts on the homepage, or on the Posts page if a static homepage is set.', 'gutenberg' ),
 			),
 			'front-page'     => array(
 				'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used to render the front page of the site, whether it displays blog posts or a static page. The front page template takes precedence over the "Home" template.', 'gutenberg' ),
+				'description' => __( 'Displays the homepage.', 'gutenberg' ),
 			),
 			'singular'       => array(
 				'title'       => _x( 'Singular', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used for displaying single views of the content. This template is a fallback for the Single, Post, and Page templates, which take precedence when they exist.', 'gutenberg' ),
+				'description' => __( 'Displays a single post or page.', 'gutenberg' ),
 			),
 			'single'         => array(
 				'title'       => _x( 'Single Post', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used to display a single blog post.', 'gutenberg' ),
+				'description' => __( 'Displays a single post.', 'gutenberg' ),
 			),
 			'page'           => array(
 				'title'       => _x( 'Page', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used to display individual pages.', 'gutenberg' ),
+				'description' => __( 'Displays a single page.', 'gutenberg' ),
 			),
 			'archive'        => array(
 				'title'       => _x( 'Archive', 'Template name', 'gutenberg' ),
-				'description' => __( 'The archive template displays multiple entries at once. It is used as a fallback for the Category, Author, and Date templates, which take precedence when they are available.', 'gutenberg' ),
+				'description' => __( 'Displays post categories, tags, and other archives.', 'gutenberg' ),
 			),
 			'author'         => array(
 				'title'       => _x( 'Author', 'Template name', 'gutenberg' ),
-				'description' => __( 'Archive template used to display a list of posts from a single author.', 'gutenberg' ),
+				'description' => __( 'Displays latest posts written by a single author.', 'gutenberg' ),
 			),
 			'category'       => array(
 				'title'       => _x( 'Category', 'Template name', 'gutenberg' ),
-				'description' => __( 'Archive template used to display a list of posts from the same category.', 'gutenberg' ),
+				'description' => __( 'Displays latest posts in single post category.', 'gutenberg' ),
 			),
 			'taxonomy'       => array(
 				'title'       => _x( 'Taxonomy', 'Template name', 'gutenberg' ),
-				'description' => __( 'Archive template used to display a list of posts from the same taxonomy.', 'gutenberg' ),
+				'description' => __( 'Displays latest posts from a single post taxonomy.', 'gutenberg' ),
 			),
 			'date'           => array(
 				'title'       => _x( 'Date', 'Template name', 'gutenberg' ),
-				'description' => __( 'Archive template used to display a list of posts from a specific date.', 'gutenberg' ),
+				'description' => __( 'Displays posts from a specific date.', 'gutenberg' ),
 			),
 			'tag'            => array(
 				'title'       => _x( 'Tag', 'Template name', 'gutenberg' ),
-				'description' => __( 'Archive template used to display a list of posts with a given tag.', 'gutenberg' ),
+				'description' => __( 'Displays latest posts with single post tag.', 'gutenberg' ),
 			),
 			'attachment'     => array(
 				'title'       => __( 'Media', 'gutenberg' ),
-				'description' => __( 'Template used to display individual media items or attachments.', 'gutenberg' ),
+				'description' => __( 'Displays individual media items or attachments.', 'gutenberg' ),
 			),
 			'search'         => array(
 				'title'       => _x( 'Search', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used to display search results.', 'gutenberg' ),
+				'description' => __( 'Displays search results.', 'gutenberg' ),
 			),
 			'privacy-policy' => array(
 				'title'       => __( 'Privacy Policy', 'gutenberg' ),
-				'description' => '',
+				'description' => __( 'Displays the privacy policy page.', 'gutenberg' ),
 			),
 			'404'            => array(
 				'title'       => _x( '404', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template shown when no content is found.', 'gutenberg' ),
+				'description' => __( 'Displays when no content is found.', 'gutenberg' ),
 			),
 		);
 
@@ -197,7 +196,7 @@ if ( ! function_exists( '_filter_block_template_part_area' ) ) {
 	 */
 	function _filter_block_template_part_area( $type ) {
 		$allowed_areas = array_map(
-			function ( $item ) {
+			static function ( $item ) {
 				return $item['area'];
 			},
 			get_allowed_block_template_part_areas()
@@ -474,15 +473,15 @@ if ( ! function_exists( '_remove_theme_attribute_in_block_template_content' ) ) 
 			}
 		}
 
-		if ( $has_updated_content ) {
-			foreach ( $template_blocks as $block ) {
-				$new_content .= serialize_block( $block );
-			}
-
-			return $new_content;
+		if ( ! $has_updated_content ) {
+			return $template_content;
 		}
 
-		return $template_content;
+		foreach ( $template_blocks as $block ) {
+			$new_content .= serialize_block( $block );
+		}
+
+		return $new_content;
 	}
 }
 
@@ -493,14 +492,14 @@ if ( ! function_exists( '_build_block_template_result_from_file' ) ) {
 	 * @param array $template_file Theme file.
 	 * @param array $template_type wp_template or wp_template_part.
 	 *
-	 * @return WP_Block_Template Template.
+	 * @return Gutenberg_Block_Template Template.
 	 */
 	function _build_block_template_result_from_file( $template_file, $template_type ) {
 		$default_template_types = get_default_block_template_types();
 		$template_content       = file_get_contents( $template_file['path'] );
 		$theme                  = wp_get_theme()->get_stylesheet();
 
-		$template                 = new WP_Block_Template();
+		$template                 = new Gutenberg_Block_Template();
 		$template->id             = $theme . '//' . $template_file['slug'];
 		$template->theme          = $theme;
 		$template->content        = _inject_theme_attribute_in_block_template_content( $template_content );
@@ -536,7 +535,7 @@ if ( ! function_exists( '_build_block_template_result_from_post' ) ) {
 	 *
 	 * @param WP_Post $post Template post.
 	 *
-	 * @return WP_Block_Template|WP_Error Template.
+	 * @return Gutenberg_Block_Template|WP_Error Template.
 	 */
 	function _build_block_template_result_from_post( $post ) {
 		$default_template_types = get_default_block_template_types();
@@ -556,7 +555,7 @@ if ( ! function_exists( '_build_block_template_result_from_post' ) ) {
 		$has_theme_file = wp_get_theme()->get_stylesheet() === $theme &&
 			null !== _get_block_template_file( $post->post_type, $post->post_name );
 
-		$template                 = new WP_Block_Template();
+		$template                 = new Gutenberg_Block_Template();
 		$template->wp_id          = $post->ID;
 		$template->id             = $theme . '//' . $post->post_name;
 		$template->theme          = $theme;
@@ -611,7 +610,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	 *
 	 * @since 10.8
 	 *
-	 * @param WP_Block_Template[]|null $block_templates Return an array of block templates to short-circuit the default query,
+	 * @param Gutenberg_Block_Template[]|null $block_templates Return an array of block templates to short-circuit the default query,
 	 *                                                  or null to allow WP to run it's normal queries.
 	 * @param array $query {
 	 *     Optional. Arguments to retrieve templates.
@@ -714,7 +713,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	 *
 	 * @since 10.8
 	 *
-	 * @param WP_Block_Template[] $query_result Array of found block templates.
+	 * @param Gutenberg_Block_Template[] $query_result Array of found block templates.
 	 * @param array $query {
 	 *     Optional. Arguments to retrieve templates.
 	 *
@@ -732,7 +731,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
  * @param string $id Template unique identifier (example: theme_slug//template_slug).
  * @param array  $template_type wp_template or wp_template_part.
  *
- * @return WP_Block_Template|null Template.
+ * @return Gutenberg_Block_Template|null Template.
  */
 function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	/**
@@ -742,7 +741,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	 *
 	 * @since 10.8
 	 *
-	 * @param WP_Block_Template|null $block_template Return block template object to short-circuit the default query,
+	 * @param Gutenberg_Block_Template|null $block_template Return block template object to short-circuit the default query,
 	 *                                               or null to allow WP to run it's normal queries.
 	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
 	 * @param array  $template_type wp_template or wp_template_part.
@@ -789,7 +788,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	 *
 	 * @since 10.8
 	 *
-	 * @param WP_Block_Template|null $block_template The found block template, or null if there isn't one.
+	 * @param Gutenberg_Block_Template|null $block_template The found block template, or null if there isn't one.
 	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
 	 * @param array  $template_type wp_template or wp_template_part.
 	 */
@@ -804,7 +803,7 @@ if ( ! function_exists( 'get_block_file_template' ) ) {
 	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
 	 * @param array  $template_type wp_template or wp_template_part.
 	 *
-	 * @return WP_Block_Template|null File template.
+	 * @return Gutenberg_Block_Template|null File template.
 	 */
 	function get_block_file_template( $id, $template_type = 'wp_template' ) {
 		/**
@@ -814,7 +813,7 @@ if ( ! function_exists( 'get_block_file_template' ) ) {
 		 *
 		 * @since 10.8
 		 *
-		 * @param WP_Block_Template|null $block_template Return block template object to short-circuit the default query,
+		 * @param Gutenberg_Block_Template|null $block_template Return block template object to short-circuit the default query,
 		 *                                               or null to allow WP to run it's normal queries.
 		 * @param string $id Template unique identifier (example: theme_slug//template_slug).
 		 * @param array  $template_type wp_template or wp_template_part.
@@ -849,7 +848,7 @@ if ( ! function_exists( 'get_block_file_template' ) ) {
 		 *
 		 * @since 10.8
 		 *
-		 * @param null|WP_Block_Template $block_template The found block template.
+		 * @param null|Gutenberg_Block_Template $block_template The found block template.
 		 * @param string $id Template unique identifier (example: theme_slug//template_slug).
 		 * @param array  $template_type wp_template or wp_template_part.
 		 */
@@ -908,7 +907,7 @@ if ( ! function_exists( 'wp_generate_block_templates_export_file' ) ) {
 	 */
 	function wp_generate_block_templates_export_file() {
 		if ( ! class_exists( 'ZipArchive' ) ) {
-			return new WP_Error( __( 'Zip Export not supported.', 'gutenberg' ) );
+			return new WP_Error( 'missing_zip_package', __( 'Zip Export not supported.', 'gutenberg' ) );
 		}
 
 		$obscura  = wp_generate_password( 12, false, false );
@@ -916,7 +915,7 @@ if ( ! function_exists( 'wp_generate_block_templates_export_file' ) ) {
 
 		$zip = new ZipArchive();
 		if ( true !== $zip->open( $filename, ZipArchive::CREATE ) ) {
-			return new WP_Error( __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
+			return new WP_Error( 'unable_to_create_zip', __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
 		}
 
 		$zip->addEmptyDir( 'theme' );

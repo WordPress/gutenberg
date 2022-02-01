@@ -15,11 +15,9 @@ import {
 } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 import { decodeEntities } from '@wordpress/html-entities';
-import { addQueryArgs } from '@wordpress/url';
 import {
 	home as siteIcon,
 	layout as templateIcon,
@@ -29,10 +27,17 @@ import {
 /**
  * Internal dependencies
  */
+import { useLink } from '../../routes/link';
 import MainDashboardButton from '../../main-dashboard-button';
 import { store as editSiteStore } from '../../../store';
 
 const SITE_EDITOR_KEY = 'site-editor';
+
+function NavLink( { params, replace, ...props } ) {
+	const linkProps = useLink( params, replace );
+
+	return <NavigationItem { ...linkProps } { ...props } />;
+}
 
 const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 	const { isNavigationOpen, siteTitle } = useSelect( ( select ) => {
@@ -48,15 +53,6 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 	}, [] );
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
-	// Ensures focus is moved to the panel area when it is activated
-	// from a separate component (such as document actions in the header).
-	const panelRef = useRef();
-	useEffect( () => {
-		if ( isNavigationOpen ) {
-			panelRef.current.focus();
-		}
-	}, [ activeItem, isNavigationOpen ] );
-
 	const closeOnEscape = ( event ) => {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
@@ -70,8 +66,6 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 			className={ classnames( `edit-site-navigation-panel`, {
 				'is-open': isNavigationOpen,
 			} ) }
-			ref={ panelRef }
-			tabIndex="-1"
 			onKeyDown={ closeOnEscape }
 		>
 			<div className="edit-site-navigation-panel__inner">
@@ -92,32 +86,32 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 
 						<NavigationMenu>
 							<NavigationGroup title={ __( 'Editor' ) }>
-								<NavigationItem
+								<NavLink
 									icon={ siteIcon }
 									title={ __( 'Site' ) }
 									item={ SITE_EDITOR_KEY }
-									href={ addQueryArgs( window.location.href, {
+									params={ {
 										postId: undefined,
 										postType: undefined,
-									} ) }
+									} }
 								/>
-								<NavigationItem
+								<NavLink
 									icon={ templateIcon }
 									title={ __( 'Templates' ) }
 									item="wp_template"
-									href={ addQueryArgs( window.location.href, {
+									params={ {
 										postId: undefined,
 										postType: 'wp_template',
-									} ) }
+									} }
 								/>
-								<NavigationItem
+								<NavLink
 									icon={ templatePartIcon }
 									title={ __( 'Template Parts' ) }
 									item="wp_template_part"
-									href={ addQueryArgs( window.location.href, {
+									params={ {
 										postId: undefined,
 										postType: 'wp_template_part',
-									} ) }
+									} }
 								/>
 							</NavigationGroup>
 						</NavigationMenu>

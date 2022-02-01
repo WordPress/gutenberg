@@ -3,7 +3,11 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Dropdown, Button } from '@wordpress/components';
+import {
+	Dropdown,
+	Button,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 
 /**
@@ -48,6 +52,12 @@ function TemplateTitle() {
 		templateTitle = template.slug;
 	}
 
+	const hasOptions = !! (
+		template.custom ||
+		template.wp_id ||
+		template.description
+	);
+
 	return (
 		<div className="edit-post-template-top-area">
 			<Button
@@ -66,32 +76,39 @@ function TemplateTitle() {
 			>
 				{ title }
 			</Button>
-			<Dropdown
-				position="bottom center"
-				contentClassName="edit-post-template-top-area__popover"
-				renderToggle={ ( { onToggle } ) => (
-					<Button
-						className="edit-post-template-title"
-						isLink
-						icon={ chevronDown }
-						showTooltip
-						onClick={ onToggle }
-						label={ __( 'Template Options' ) }
-					>
-						{ templateTitle }
-					</Button>
-				) }
-				renderContent={ () => (
-					<>
-						{ template.has_theme_file ? (
-							<TemplateDescription />
-						) : (
+			{ hasOptions ? (
+				<Dropdown
+					position="bottom center"
+					contentClassName="edit-post-template-top-area__popover"
+					renderToggle={ ( { onToggle } ) => (
+						<Button
+							className="edit-post-template-title"
+							isLink
+							icon={ chevronDown }
+							showTooltip
+							onClick={ onToggle }
+							label={ __( 'Template Options' ) }
+						>
+							{ templateTitle }
+						</Button>
+					) }
+					renderContent={ () => (
+						<>
 							<EditTemplateTitle />
-						) }
-						<DeleteTemplate />
-					</>
-				) }
-			/>
+							<TemplateDescription />
+							<DeleteTemplate />
+						</>
+					) }
+				/>
+			) : (
+				<Text
+					className="edit-post-template-title"
+					size="body"
+					style={ { lineHeight: '24px' } }
+				>
+					{ templateTitle }
+				</Text>
+			) }
 		</div>
 	);
 }

@@ -59,7 +59,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				hasBlockMovingClientId,
 				getBlockListSettings,
 			} = select( blockEditorStore );
-			const index = getBlockIndex( clientId, rootClientId );
+			const index = getBlockIndex( clientId );
 			const { name, attributes } = getBlock( clientId );
 			const blockMovingMode = hasBlockMovingClientId();
 			return {
@@ -169,14 +169,8 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		if ( ( isEnter || isSpace ) && startingBlockClientId ) {
 			const sourceRoot = getBlockRootClientId( startingBlockClientId );
 			const destRoot = getBlockRootClientId( selectedBlockClientId );
-			const sourceBlockIndex = getBlockIndex(
-				startingBlockClientId,
-				sourceRoot
-			);
-			let destinationBlockIndex = getBlockIndex(
-				selectedBlockClientId,
-				destRoot
-			);
+			const sourceBlockIndex = getBlockIndex( startingBlockClientId );
+			let destinationBlockIndex = getBlockIndex( selectedBlockClientId );
 			if (
 				sourceBlockIndex < destinationBlockIndex &&
 				sourceRoot === destRoot
@@ -200,7 +194,13 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				let nextTabbable;
 
 				if ( navigateDown ) {
-					nextTabbable = focus.tabbable.findNext( blockElement );
+					nextTabbable = blockElement;
+					do {
+						nextTabbable = focus.tabbable.findNext( nextTabbable );
+					} while (
+						nextTabbable &&
+						blockElement.contains( nextTabbable )
+					);
 
 					if ( ! nextTabbable ) {
 						nextTabbable =

@@ -32,7 +32,7 @@ export default {
 	component: ItemGroup,
 	title: 'Components (Experimental)/ItemGroup',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

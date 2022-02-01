@@ -59,7 +59,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		// Lists/updates a single template based on the given id.
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\/\w-]+)',
+			'/' . $this->rest_base . '/(?P<id>[\/\s%\w\.\(\)\[\]\@_\-]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -131,7 +131,10 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return string Sanitized template ID.
 	 */
 	public function _sanitize_template_id( $id ) {
+		// Decode empty space.
 		$last_slash_pos = strrpos( $id, '/' );
+		$id             = urldecode( $id );
+
 		if ( false === $last_slash_pos ) {
 			return $id;
 		}
@@ -452,8 +455,8 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	/**
 	 * Prepare a single template output for response
 	 *
-	 * @param WP_Block_Template $template Template instance.
-	 * @param WP_REST_Request   $request Request object.
+	 * @param Gutenberg_Block_Template $template Template instance.
+	 * @param WP_REST_Request          $request Request object.
 	 *
 	 * @return WP_REST_Response $data
 	 */
@@ -597,7 +600,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'required'    => true,
 					'minLength'   => 1,
-					'pattern'     => '[a-zA-Z_\-]+',
+					'pattern'     => '[a-zA-Z0-9_\-]+',
 				),
 				'theme'          => array(
 					'description' => __( 'Theme identifier for the template.', 'gutenberg' ),

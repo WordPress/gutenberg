@@ -18,6 +18,6 @@
 	},
 	"supports": {
 		"html": false,
-		"inserter": true
+		"inserter": false
 	}
 }

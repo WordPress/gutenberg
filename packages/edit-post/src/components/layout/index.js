@@ -239,7 +239,7 @@ function Layout( { styles } ) {
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />
 						) }
-						<BlockStyles.Slot scope="core/edit-post" />
+						<BlockStyles.Slot scope="core/block-inspector" />
 					</>
 				}
 				footer={

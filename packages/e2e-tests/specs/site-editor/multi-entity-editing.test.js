@@ -134,7 +134,7 @@ const removeErrorMocks = () => {
 
 describe( 'Multi-entity editor states', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -152,7 +152,7 @@ describe( 'Multi-entity editor states', () => {
 	// Skip reason: This should be rewritten to use other methods to switching to different templates.
 	it.skip( 'should not dirty an entity by switching to it in the template dropdown', async () => {
 		await siteEditor.visit( {
-			postId: 'tt1-blocks//header',
+			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
 		await page.waitForFunction( () =>

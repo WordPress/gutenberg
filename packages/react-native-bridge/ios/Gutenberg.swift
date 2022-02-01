@@ -199,7 +199,10 @@ public class Gutenberg: NSObject {
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
         var settingsUpdates = [String : Any]()
         settingsUpdates["isFSETheme"] = editorSettings?.isFSETheme ?? false
-        settingsUpdates["galleryWithImageBlocks"] = editorSettings?.galleryWithImageBlocks ?? false
+        
+        if let galleryWithImageBlocks = editorSettings?.galleryWithImageBlocks {
+            settingsUpdates["galleryWithImageBlocks"] = galleryWithImageBlocks
+        }
 
         if let rawStyles = editorSettings?.rawStyles {
             settingsUpdates["rawStyles"] = rawStyles

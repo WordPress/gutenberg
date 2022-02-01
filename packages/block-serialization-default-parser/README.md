@@ -151,4 +151,10 @@ Further, tokenizing with a RegExp brings an additional advantage. The parser gen
 
 However, since our "token language" of the block comment delimiters is _regular_ and _can_ be trivially matched with RegExp patterns, we can do that here and then something magical happens: we jump out of PHP or JavaScript and into a highly-optimized RegExp engine written in C or C++ on the host system. We thereby leave the virtual machine and its overhead.
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

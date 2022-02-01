@@ -7,7 +7,7 @@ When registering a block, the `edit` and `save` functions provide the interface 
 The `edit` function describes the structure of your block in the context of the editor. This represents what the editor will render when the block is used.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { useBlockProps } from '@wordpress/block-editor';
@@ -26,7 +26,7 @@ const blockSettings = {
 };
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 var blockSettings = {
@@ -51,7 +51,7 @@ The first thing to notice here is the use of the `useBlockProps` React hook on t
 If the element wrapper needs any extra custom HTML attributes, these need to be passed as an argument to the `useBlockProps` hook. For example to add a `my-random-classname` className to the wrapper, you can use the following code:
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { useBlockProps } from '@wordpress/block-editor';
@@ -72,7 +72,7 @@ const blockSettings = {
 };
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 var blockSettings = {
@@ -101,7 +101,7 @@ The `attributes` property surfaces all the available attributes and their corres
 In this case, assuming we had defined an attribute of `content` during block registration, we would receive and use that value in our edit function:
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 edit: ( { attributes } ) => {
@@ -111,7 +111,7 @@ edit: ( { attributes } ) => {
 };
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 edit: function( props ) {
@@ -131,10 +131,10 @@ The value of `attributes.content` will be displayed inside the `div` when insert
 
 ### isSelected
 
-The isSelected property is an object that communicates whether the block is currently selected.
+The isSelected property is an boolean that communicates whether the block is currently selected.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 edit: ( { attributes, isSelected } ) => {
@@ -151,7 +151,7 @@ edit: ( { attributes, isSelected } ) => {
 };
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 edit: function( props ) {
@@ -179,7 +179,7 @@ edit: function( props ) {
 This function allows the block to update individual attributes based on user interactions.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 edit: ( { attributes, setAttributes, isSelected } ) => {
@@ -201,7 +201,7 @@ edit: ( { attributes, setAttributes, isSelected } ) => {
 };
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 edit: function( props ) {
@@ -233,7 +233,7 @@ edit: function( props ) {
 When using attributes that are objects or arrays it's a good idea to copy or clone the attribute prior to updating it:
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 // Good - a new array is created from the old list attribute and a new list item:
@@ -249,7 +249,7 @@ const addListItem = ( newListItem ) => {
 };
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 // Good - cloning the old list
@@ -276,7 +276,7 @@ Why do this? In JavaScript, arrays and objects are passed by reference, so this 
 The `save` function defines the way in which the different attributes should be combined into the final markup, which is then serialized into `post_content`.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 save: () => {
@@ -286,7 +286,7 @@ save: () => {
 };
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 save: function() {
@@ -327,7 +327,7 @@ Like the `edit` function, when rendering static blocks, it's important to add th
 As with `edit`, the `save` function also receives an object argument including attributes which can be inserted into the markup.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 save: ( { attributes } ) => {
@@ -337,7 +337,7 @@ save: ( { attributes } ) => {
 };
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 save: function( props ) {
@@ -362,7 +362,7 @@ Here are a couple examples of using attributes, edit, and save all together. For
 ### Saving Attributes to Child Elements
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 attributes: {
@@ -396,7 +396,7 @@ save: ( { attributes } ) => {
 },
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 attributes: {
@@ -444,7 +444,7 @@ Ideally, the attributes saved should be included in the markup. However, there a
 This example could be for a dynamic block, such as the [Latest Posts block](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/latest-posts/index.js), which renders the markup server-side. The save function is still required, however in this case it simply returns null since the block is not saving content from the editor.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 attributes: {
@@ -474,7 +474,7 @@ save: () => {
 }
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 attributes: {

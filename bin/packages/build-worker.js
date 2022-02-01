@@ -18,7 +18,9 @@ const getBabelConfig = require( './get-babel-config' );
  *
  * @type {string}
  */
-const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
+const PACKAGES_DIR = path
+	.resolve( __dirname, '../../packages' )
+	.replace( /\\/g, '/' );
 
 /**
  * Mapping of JavaScript environments to corresponding build output.

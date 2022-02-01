@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/element",
-	"version": "4.0.4",
+	"version": "4.1.0",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,12 +29,12 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@types/react": "^16.9.0",
-		"@types/react-dom": "^16.9.0",
+		"@types/react": "^17.0.37",
+		"@types/react-dom": "^17.0.11",
 		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "^4.17.21",
-		"react": "^17.0.1",
-		"react-dom": "^17.0.1"
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2"
 	},
 	"publishConfig": {
 		"access": "public"

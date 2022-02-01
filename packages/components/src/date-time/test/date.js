@@ -31,32 +31,6 @@ describe( 'DatePicker', () => {
 		expect( moment.isMoment( date ) ).toBe( true );
 	} );
 
-	describe( 'getMomentDate', () => {
-		it( 'should return a Moment object representing a given date string', () => {
-			const currentDate = '1986-10-18T23:00:00';
-			const wrapper = shallow( <DatePicker /> );
-			const momentDate = wrapper.instance().getMomentDate( currentDate );
-
-			expect( moment.isMoment( momentDate ) ).toBe( true );
-			expect( momentDate.isSame( moment( currentDate ) ) ).toBe( true );
-		} );
-
-		it( 'should return null when given a null agrument', () => {
-			const currentDate = null;
-			const wrapper = shallow( <DatePicker /> );
-			const momentDate = wrapper.instance().getMomentDate( currentDate );
-
-			expect( momentDate ).toBeNull();
-		} );
-
-		it( 'should return a Moment object representing now when given an undefined argument', () => {
-			const wrapper = shallow( <DatePicker /> );
-			const momentDate = wrapper.instance().getMomentDate();
-
-			expect( moment.isMoment( momentDate ) ).toBe( true );
-		} );
-	} );
-
 	describe( 'onChangeMoment', () => {
 		it( 'should call onChange with a formated date of the input', () => {
 			const onChangeSpy = jest.fn();
@@ -69,7 +43,7 @@ describe( 'DatePicker', () => {
 			);
 			const newDate = moment();
 
-			wrapper.instance().onChangeMoment( newDate );
+			wrapper.childAt( 0 ).props().onDateChange( newDate );
 
 			expect( onChangeSpy ).toHaveBeenCalledWith(
 				newDate.format( TIMEZONELESS_FORMAT )
@@ -87,7 +61,7 @@ describe( 'DatePicker', () => {
 				minutes: current.minutes(),
 				seconds: current.seconds(),
 			} );
-			wrapper.instance().onChangeMoment( newDate );
+			wrapper.childAt( 0 ).props().onDateChange( newDate );
 
 			expect(
 				moment( onChangeSpyArgument ).isSame(
@@ -110,7 +84,7 @@ describe( 'DatePicker', () => {
 				minutes: current.minutes(),
 				seconds: current.seconds(),
 			} );
-			wrapper.instance().onChangeMoment( newDate );
+			wrapper.childAt( 0 ).props().onDateChange( newDate );
 
 			expect(
 				moment( onChangeSpyArgument ).isSame(

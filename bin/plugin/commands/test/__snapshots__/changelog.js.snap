@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
-"### Enhancements
+exports[`getChangelog verify that the changelog is properly formatted 1`] = `
+"## Changelog
+
+### Enhancements
 
 - Scripts: Use cssnano to minimize CSS files with build. ([33750](https://github.com/WordPress/gutenberg/pull/33750))
 - Scripts: Webpack configuration update to minimize CSS. ([33676](https://github.com/WordPress/gutenberg/pull/33676))
@@ -45,6 +47,7 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 #### Block Library
 - Fix justification for button block when selected. ([33739](https://github.com/WordPress/gutenberg/pull/33739))
 - Fix navigation block appender invalid html. ([33964](https://github.com/WordPress/gutenberg/pull/33964))
+- Fix navigation margin collapsing. ([33021](https://github.com/WordPress/gutenberg/pull/33021))
 - Image Block: Fix issue with canInsertCover not being set to false for empty arrays. ([33863](https://github.com/WordPress/gutenberg/pull/33863))
 - [Query Pagination Numbers]: Fix first page's link. ([33629](https://github.com/WordPress/gutenberg/pull/33629))
 
@@ -113,18 +116,6 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 - Refactor the HierarchicalTermSelector so that it does not cause unnecessary loading of terms. ([33418](https://github.com/WordPress/gutenberg/pull/33418))
 
 
-### Experiments
-
-#### Full Site Editing
-- Site Editor: Implement a settings object filter. ([33737](https://github.com/WordPress/gutenberg/pull/33737))
-- Template Part placeholder - Add title step to creation flow. ([33703](https://github.com/WordPress/gutenberg/pull/33703))
-- Template part selection popover - minor style updates for visiblity. ([33733](https://github.com/WordPress/gutenberg/pull/33733))
-
-#### Block Library
-- Enable ability to remove a link from the Nav Link block in the Nav Block. ([33777](https://github.com/WordPress/gutenberg/pull/33777))
-- Fix navigation margin collapsing. ([33021](https://github.com/WordPress/gutenberg/pull/33021))
-
-
 ### Documentation
 
 - Add documentation to disable remote calls for block patterns. ([33930](https://github.com/WordPress/gutenberg/pull/33930))
@@ -186,8 +177,14 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 - Tune appender margin. ([33866](https://github.com/WordPress/gutenberg/pull/33866))
 
 #### Block Library
+- Enable ability to remove a link from the Nav Link block in the Nav Block. ([33777](https://github.com/WordPress/gutenberg/pull/33777))
 - Search Block: Removed components class from icon button and polished css. ([33961](https://github.com/WordPress/gutenberg/pull/33961))
 - [Button Block]: Add padding block support. ([31774](https://github.com/WordPress/gutenberg/pull/31774))
+
+#### Full Site Editing
+- Site Editor: Implement a settings object filter. ([33737](https://github.com/WordPress/gutenberg/pull/33737))
+- Template Part placeholder - Add title step to creation flow. ([33703](https://github.com/WordPress/gutenberg/pull/33703))
+- Template part selection popover - minor style updates for visiblity. ([33733](https://github.com/WordPress/gutenberg/pull/33733))
 
 #### Widgets Editor
 - Try to fix flaky customizer inspector test 2nd try. ([33965](https://github.com/WordPress/gutenberg/pull/33965))
@@ -210,5 +207,17 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 - Try: Reduce specificity of reset & classic styles. ([32659](https://github.com/WordPress/gutenberg/pull/32659))
 
 
+"
+`;
+
+exports[`getContributors verify that the contributors list is properly formatted 1`] = `
+"## First time contributors
+
+The following PRs were merged by first time contrbutors:
+
+- @alexstine: Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))
+- @amir2mi: Example for rest_endpoints filter in PHP. ([33738](https://github.com/WordPress/gutenberg/pull/33738))
+- @christianztamayo: Scripts: Webpack configuration update to minimize CSS. ([33676](https://github.com/WordPress/gutenberg/pull/33676))
+- @kapilpaul: Add spaces in add_theme_support documentation code. ([33796](https://github.com/WordPress/gutenberg/pull/33796))
 "
 `;

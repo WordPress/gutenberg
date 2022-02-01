@@ -12,11 +12,10 @@
 		padding-left: 0;
 	}
 
-	// Revert any left/right margins.
+	// Revert any margins.
 	// This also makes it work with classic theme auto margins.
 	.wp-block-navigation-item.wp-block {
-		margin-left: revert;
-		margin-right: revert;
+		margin: revert;
 	}
 }
 
@@ -95,6 +94,19 @@
 		visibility: visible;
 	}
 }
+
+// Show even when a child is selected. This is an edgecase just for navigation submenus.
+.is-editing > .wp-block-navigation__submenu-container > .block-list-appender {
+	display: block;
+	position: static;
+	width: 100%;
+}
+
+// Hide when hovering.
+.wp-block-navigation__submenu-container .block-list-appender {
+	display: none;
+}
+
 
 /**
  * Colors Selector component
@@ -179,10 +191,23 @@ $color-control-label-height: 20px;
 	justify-content: flex-start;
 }
 
+
 /**
  * Setup state
  */
 
+// Loading state.
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	}
+}
 // Unstyle some inherited placeholder component styles.
 .components-placeholder.wp-block-navigation-placeholder {
 	outline: none;
@@ -203,108 +228,85 @@ $color-control-label-height: 20px;
 	// For the placeholder indicators to colorize correctly, colors need to be inherited unless selected.
 	color: inherit;
 
-	.is-selected & {
+	.wp-block-navigation.is-selected & {
 		color: $gray-900;
-	}
-}
-
-// Spinner.
-.wp-block-navigation-placeholder .components-spinner {
-	margin-top: -4px;
-	margin-left: 4px;
-	vertical-align: middle;
-	margin-right: 7px;
-}
-
-@keyframes loadingpulse {
-	0% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.5;
-	}
-	100% {
-		opacity: 1;
 	}
 }
 
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
 	display: flex;
-	flex-direction: row;
 	align-items: center;
-	flex-wrap: nowrap;
-	width: 100%;
-	overflow: hidden;
+	min-width: $grid-unit-10 * 12;
+	font-size: $default-font-size;
+	font-family: $default-font;
 
-	&.is-loading {
-		animation: loadingpulse 1s linear infinite;
-		animation-delay: 0.5s; // avoid animating for fast network responses
+	.wp-block-navigation.is-selected & {
+		display: none;
 	}
 
-	// Style skeleton elements to mostly match the metrics of actual menu items.
-	// Needs specificity.
-	.wp-block-navigation-item.wp-block-navigation-item {
-		position: relative;
-		min-width: 72px;
+	// Draw the dashed outline.
+	// By setting the dashed border to currentColor, we ensure it's visible
+	// against any background color.
+	color: currentColor;
+	background: transparent;
+	&::before {
+		content: "";
+		display: block;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border: $border-width dashed currentColor;
+		opacity: 0.4;
+		pointer-events: none;
 
-		&::before {
-			display: block;
-			content: "";
-			border-radius: $radius-block-ui;
-			background: currentColor;
-			height: $grid-unit-20;
-			width: 100%;
-		}
+		// Inherit border radius from style variations.
+		border-radius: inherit;
 	}
 
-	.wp-block-navigation-placeholder__preview-search-icon {
-		height: $icon-size;
-		svg {
-			fill: currentColor;
-		}
+	> svg {
+		fill: currentColor;
+		opacity: 0.4;
 	}
+}
 
-	.wp-block-navigation-item.wp-block-navigation-item,
-	.wp-block-navigation-placeholder__preview-search-icon {
-		opacity: 0.3;
+// Prevent layout shift for vertical variant.
+.wp-block-navigation.is-vertical .is-small,
+.wp-block-navigation.is-vertical .is-medium {
+	.components-placeholder__fieldset {
+		// The size of two buttons, with top and bottom padding, and gap.
+		min-height: ($button-size * 2) + $grid-unit-15 + ($grid-unit-15 * 0.5);
 	}
+}
 
-	&:not(.is-loading) {
-		// Don't show the preview boxes for an empty nav block,
-		// but be technically present to help size the empty state.
-		.wp-block-navigation.is-selected & {
-			display: flex;
-			opacity: 0;
-			width: 0;
-			overflow: hidden;
-			flex-wrap: nowrap;
-			flex: 0;
-		}
-
-		// Hide entirely when vertical.
-		.wp-block-navigation.is-selected .is-small &,
-		.wp-block-navigation.is-selected .is-medium & {
-			display: none;
-		}
+.wp-block-navigation.is-vertical .is-large {
+	.components-placeholder__fieldset {
+		// The size of three buttons, with top and bottom padding, and gap.
+		min-height: ($button-size * 3) + $grid-unit-15 + $grid-unit-15;
 	}
 }
 
 // Selected state.
+.wp-block-navigation-placeholder__preview,
 .wp-block-navigation-placeholder__controls {
-	padding: $grid-unit-10;
+	padding: ($grid-unit-15 * 0.5) $grid-unit-10;
+	flex-direction: row;
+	align-items: flex-start;
+}
+
+.wp-block-navigation-placeholder__controls {
 	border-radius: $radius-block-ui;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
-	flex-direction: row;
-	align-items: center;
 	display: none;
 	position: relative;
 	z-index: 1;
 
-	// Adjust padding for when shown horizontally.
-	.is-large & {
-		padding: $grid-unit-05 $grid-unit-10;
+	// Show when selected.
+	.wp-block-navigation.is-selected & {
+		display: flex;
 	}
 
 	// If an ancestor has a text-decoration property applied, it is inherited regardless of
@@ -313,21 +315,25 @@ $color-control-label-height: 20px;
 	float: left;
 	width: 100%;
 
-	// Show when selected.
-	.wp-block-navigation.is-selected & {
-		display: flex;
-	}
-
-	// Show stacked for the vertical navigation, or small placeholders.
+	// Hide the navigation indicator when in small contexts.
 	.is-small &,
 	.is-medium & {
+		.wp-block-navigation-placeholder__actions__indicator,
+		.wp-block-navigation-placeholder__actions__indicator + hr {
+			display: none;
+		}
+	}
+
+	// Vertical orientation or small context.
+	.is-small &,
+	.wp-block-navigation.is-vertical & {
 		.wp-block-navigation-placeholder__actions {
 			flex-direction: column;
-		}
+			align-items: flex-start;
 
-		// Hide the separators in the vertical version.
-		.wp-block-navigation-placeholder__actions hr {
-			display: none;
+			hr {
+				display: none;
+			}
 		}
 	}
 
@@ -335,23 +341,29 @@ $color-control-label-height: 20px;
 		margin-right: $grid-unit-15;
 		height: $button-size; // Prevents jumpiness.
 	}
+}
 
-	// Block title
-	.wp-block-navigation-placeholder__actions__indicator {
-		display: flex;
-		padding: 0 ($grid-unit-15 * 0.5) 0 0;
-		align-items: center;
-		justify-content: flex-start;
-		line-height: 0;
-		min-height: $button-size;
+// Block title
+.wp-block-navigation-placeholder__actions__indicator {
+	display: flex;
+	padding: 0 ($grid-unit-15 * 0.5) 0 0;
+	align-items: center;
+	justify-content: flex-start;
+	line-height: 0;
+	height: $button-size;
 
-		// Line up with the icon in the toolbar.
-		margin-left: $grid-unit-05;
+	// Line up with the icon in the toolbar.
+	margin-left: $grid-unit-05;
 
-		svg {
-			margin-right: $grid-unit-05;
-		}
+	svg {
+		margin-right: $grid-unit-05;
+		fill: currentColor;
 	}
+}
+
+// Keep as row for medium.
+.wp-block-navigation .components-placeholder.is-medium .components-placeholder__fieldset {
+	flex-direction: row !important;
 }
 
 .wp-block-navigation-placeholder__actions {
@@ -359,6 +371,7 @@ $color-control-label-height: 20px;
 	font-size: $default-font-size;
 	font-family: $default-font;
 	gap: $grid-unit-15 * 0.5;
+	align-items: center;
 
 	// Margins.
 	.components-dropdown,
@@ -549,4 +562,20 @@ body.editor-styles-wrapper
 	width: 100%;
 	justify-content: center;
 	margin-bottom: $grid-unit-20;
+}
+
+.wp-block-navigation__overlay-menu-preview {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	background-color: $gray-100;
+	padding: 0 $grid-unit-30;
+	height: $grid-unit-40 * 2;
+	margin-bottom: $grid-unit-15;
+
+	&.open {
+		box-shadow: inset 0 0 0 $border-width $gray-200;
+		outline: 1px solid transparent; // Box shadow is removed in high contrast mode, a transparent outline is made opaque.
+		background-color: $white;
+	}
 }

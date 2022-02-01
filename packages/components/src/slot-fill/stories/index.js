@@ -17,7 +17,7 @@ export default {
 	title: 'Components/SlotFill',
 	component: Slot,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

@@ -17,6 +17,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
   style={
     Object {
       "background": "#f00",
+      "color": "#000",
     }
   }
 >
@@ -27,7 +28,6 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
 exports[`ColorPalette Dropdown should render it correctly 1`] = `
 <Dropdown
   contentClassName="components-color-palette__custom-color-dropdown-content"
-  key=".0"
   renderContent={[Function]}
   renderToggle={[Function]}
 >
@@ -44,6 +44,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
       style={
         Object {
           "background": "#f00",
+          "color": "#000",
         }
       }
     >
@@ -172,37 +173,45 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
       data-wp-component="VStack"
       isColumn={true}
     >
+      <Noop />
       <div
         className="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
         data-wp-c16t={true}
         data-wp-component="VStack"
       >
-        <Dropdown
-          contentClassName="components-color-palette__custom-color-dropdown-content"
+        <CustomColorPickerDropdown
+          isRenderedInSidebar={false}
           key=".0"
           renderContent={[Function]}
           renderToggle={[Function]}
         >
-          <div
-            className="components-dropdown"
-            tabIndex="-1"
+          <Dropdown
+            contentClassName="components-color-palette__custom-color-dropdown-content"
+            renderContent={[Function]}
+            renderToggle={[Function]}
           >
-            <button
-              aria-expanded={false}
-              aria-haspopup="true"
-              aria-label="Custom color picker"
-              className="components-color-palette__custom-color"
-              onClick={[Function]}
-              style={
-                Object {
-                  "background": "#f00",
-                }
-              }
+            <div
+              className="components-dropdown"
+              tabIndex="-1"
             >
-              #f00
-            </button>
-          </div>
-        </Dropdown>
+              <button
+                aria-expanded={false}
+                aria-haspopup="true"
+                aria-label="Custom color picker"
+                className="components-color-palette__custom-color"
+                onClick={[Function]}
+                style={
+                  Object {
+                    "background": "#f00",
+                    "color": "#000",
+                  }
+                }
+              >
+                #f00
+              </button>
+            </div>
+          </Dropdown>
+        </CustomColorPickerDropdown>
         <SinglePalette
           actions={
             <ButtonAction
@@ -382,7 +391,6 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                           fill="#000"
                           focusable={false}
                           height={24}
-                          role="img"
                           viewBox="0 0 24 24"
                           width={24}
                           xmlns="http://www.w3.org/2000/svg"

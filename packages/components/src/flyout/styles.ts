@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
+import styled, { StyledComponent } from '@emotion/styled';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as ReakitPopover } from 'reakit';
 
@@ -12,7 +12,9 @@ import { Card, CardBody } from '../card';
 import * as ZIndex from '../utils/z-index';
 import CONFIG from '../utils/config-values';
 
-export const FlyoutContentView = styled( ReakitPopover )`
+export const FlyoutContentView: StyledComponent<
+	React.ComponentPropsWithoutRef< typeof ReakitPopover >
+> = styled( ReakitPopover )`
 	z-index: ${ ZIndex.Flyout };
 	box-sizing: border-box;
 	opacity: 0;

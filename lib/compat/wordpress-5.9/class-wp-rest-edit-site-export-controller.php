@@ -52,7 +52,7 @@ class WP_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 		}
 
 		return new WP_Error(
-			'rest_cannot_view_url_details',
+			'rest_cannot_export_templates',
 			__( 'Sorry, you are not allowed to export templates and template parts.', 'gutenberg' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
@@ -69,6 +69,8 @@ class WP_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 		$filename = wp_generate_block_templates_export_file();
 
 		if ( is_wp_error( $filename ) ) {
+			$filename->add_data( array( 'status' => 500 ) );
+
 			return $filename;
 		}
 

@@ -51,6 +51,8 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
 } ) );
 
+jest.useRealTimers();
+
 /**
  * Wait for next tick of event loop. This is required
  * because the `fetchSearchSuggestions` Promise will
@@ -1634,6 +1636,7 @@ describe( 'Selecting links', () => {
 					);
 
 					// We should have highlighted the first item using the keyboard
+					// eslint-disable-next-line jest/no-conditional-expect
 					expect( selectedSearchResultElement ).toEqual(
 						secondSearchSuggestion
 					);
@@ -1648,6 +1651,7 @@ describe( 'Selecting links', () => {
 					);
 
 					// We should be back to highlighting the first search result again
+					// eslint-disable-next-line jest/no-conditional-expect
 					expect( selectedSearchResultElement ).toEqual(
 						firstSearchSuggestion
 					);

@@ -50,7 +50,9 @@ import { name } from './block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
-const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+const DEFAULT_BLOCK = {
+	name: 'core/navigation-link',
+};
 
 const MAX_NESTING = 5;
 
@@ -508,13 +510,19 @@ export default function NavigationSubmenuEdit( {
 			allowedBlocks: ALLOWED_BLOCKS,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: true,
+
+			// Ensure block toolbar is not too far removed from item
+			// being edited.
+			// see: https://github.com/WordPress/gutenberg/pull/34615.
+			__experimentalCaptureToolbars: true,
+
 			renderAppender:
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
 				hasDescendants
-					? InnerBlocks.DefaultAppender
+					? InnerBlocks.ButtonBlockAppender
 					: false,
 		}
 	);

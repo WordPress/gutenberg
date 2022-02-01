@@ -22,6 +22,7 @@ export default function BlockToolsBackCompat( { children } ) {
 
 	deprecated( 'wp.components.Popover.Slot name="block-toolbar"', {
 		alternative: 'wp.blockEditor.BlockTools',
+		since: '5.8',
 	} );
 
 	return (

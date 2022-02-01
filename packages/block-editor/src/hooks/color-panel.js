@@ -17,6 +17,7 @@ function getComputedStyle( node ) {
 }
 
 export default function ColorPanel( {
+	enableAlpha = false,
 	settings,
 	clientId,
 	enableContrastChecking = true,
@@ -60,12 +61,15 @@ export default function ColorPanel( {
 				initialOpen={ false }
 				settings={ settings }
 				showTitle={ showTitle }
+				enableAlpha={ enableAlpha }
 				__experimentalHasMultipleOrigins
+				__experimentalIsRenderedInSidebar
 			>
 				{ enableContrastChecking && (
 					<ContrastChecker
 						backgroundColor={ detectedBackgroundColor }
 						textColor={ detectedColor }
+						enableAlphaChecker={ enableAlpha }
 					/>
 				) }
 			</PanelColorGradientSettings>

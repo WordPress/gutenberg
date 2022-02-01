@@ -135,11 +135,7 @@ export function getHomeTemplateId( state ) {
 }
 
 function getCurrentEditedPost( state ) {
-	return state.editedPost[ state.editedPost.length - 1 ] || {};
-}
-
-function getPreviousEditedPost( state ) {
-	return state.editedPost[ state.editedPost.length - 2 ] || {};
+	return state.editedPost;
 }
 
 /**
@@ -162,28 +158,6 @@ export function getEditedPostType( state ) {
  */
 export function getEditedPostId( state ) {
 	return getCurrentEditedPost( state ).id;
-}
-
-/**
- * Returns the previous edited post type (wp_template or wp_template_part).
- *
- * @param {Object} state Global application state.
- *
- * @return {TemplateType?} Template type.
- */
-export function getPreviousEditedPostType( state ) {
-	return getPreviousEditedPost( state ).type;
-}
-
-/**
- * Returns the ID of the previous edited template or template part.
- *
- * @param {Object} state Global application state.
- *
- * @return {string?} Post ID.
- */
-export function getPreviousEditedPostId( state ) {
-	return getPreviousEditedPost( state ).id;
 }
 
 /**
@@ -353,3 +327,14 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			.filter( ( { templatePart } ) => !! templatePart );
 	}
 );
+
+/**
+ * Returns the current editing mode.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Editing mode.
+ */
+export function getEditorMode( state ) {
+	return state.preferences.editorMode || 'visual';
+}

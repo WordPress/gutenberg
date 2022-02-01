@@ -2,9 +2,7 @@
  * WordPress dependencies
  */
 import {
-	createNewPost,
 	insertBlock,
-	disablePrePublishChecks,
 	trashAllPosts,
 	activateTheme,
 	getAllBlocks,
@@ -23,7 +21,7 @@ const templatePartNameInput =
 
 describe( 'Template Part', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -42,7 +40,7 @@ describe( 'Template Part', () => {
 		async function navigateToHeader() {
 			// Switch to editing the header template part.
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//header',
+				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
 		}
@@ -63,7 +61,7 @@ describe( 'Template Part', () => {
 
 			// Switch back to the Index template.
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
 		}
@@ -95,12 +93,9 @@ describe( 'Template Part', () => {
 			expect( paragraphInTemplatePart ).not.toBeNull();
 		}
 
-		async function awaitHeaderAndFooterLoad() {
+		async function awaitHeaderLoad() {
 			await canvas().waitForSelector(
-				'.wp-block-template-part.site-header.block-editor-block-list__layout'
-			);
-			await canvas().waitForSelector(
-				'.wp-block-template-part.site-footer.block-editor-block-list__layout'
+				'header.wp-block-template-part.block-editor-block-list__layout'
 			);
 		}
 
@@ -174,7 +169,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert selected block to template part', async () => {
-			await awaitHeaderAndFooterLoad();
+			await awaitHeaderLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -212,7 +207,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert multiple selected blocks to template part', async () => {
-			await awaitHeaderAndFooterLoad();
+			await awaitHeaderLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -260,72 +255,94 @@ describe( 'Template Part', () => {
 				finalTemplateParts.length - initialTemplateParts.length
 			).toBe( 1 );
 		} );
-	} );
+		describe( 'Template part placeholder', () => {
+			// Test constants for template part.
+			const testContent = 'some words...';
 
-	describe( 'Template part placeholder', () => {
-		// Test constants for template part.
-		const testContent = 'some words...';
+			// Selectors
+			const entitiesSaveSelector =
+				'.editor-entities-saved-states__save-button';
+			const savePostSelector = '.edit-site-save-button__button';
+			const templatePartSelector = '*[data-type="core/template-part"]';
+			const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
+			const createNewButtonSelector =
+				'//button[contains(text(), "New template part")]';
+			const chooseExistingButtonSelector =
+				'//button[contains(text(), "Choose existing")]';
+			const confirmTitleButtonSelector =
+				'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
-		// Selectors
-		const entitiesSaveSelector =
-			'.editor-entities-saved-states__save-button';
-		const savePostSelector = '.editor-post-publish-button__button';
-		const templatePartSelector = '*[data-type="core/template-part"]';
-		const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
-		const testContentSelector = `//p[contains(., "${ testContent }")]`;
-		const createNewButtonSelector =
-			'//button[contains(text(), "New template part")]';
-		const chooseExistingButtonSelector =
-			'//button[contains(text(), "Choose existing")]';
-		const confirmTitleButtonSelector =
-			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
+			it( 'Should insert new template part on creation', async () => {
+				let siteEditorCanvas = canvas();
+				await awaitHeaderLoad();
 
-		it( 'Should insert new template part on creation', async () => {
-			await createNewPost();
-			await disablePrePublishChecks();
-			// Create new template part.
-			await insertBlock( 'Template Part' );
-			await page.waitForXPath( chooseExistingButtonSelector );
-			const [ createNewButton ] = await page.$x(
-				createNewButtonSelector
-			);
-			await createNewButton.click();
-			const confirmTitleButton = await page.waitForSelector(
-				confirmTitleButtonSelector
-			);
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( 'Create New' );
-			await confirmTitleButton.click();
+				// Create new template part.
+				await insertBlock( 'Template Part' );
+				await siteEditorCanvas.waitForXPath(
+					chooseExistingButtonSelector
+				);
+				const [ createNewButton ] = await siteEditorCanvas.$x(
+					createNewButtonSelector
+				);
+				await createNewButton.click();
+				const confirmTitleButton = await page.waitForSelector(
+					confirmTitleButtonSelector
+				);
+				await page.keyboard.press( 'Tab' );
+				await page.keyboard.press( 'Tab' );
+				await page.keyboard.type( 'Create New' );
+				await confirmTitleButton.click();
 
-			const newTemplatePart = await page.waitForSelector(
-				activatedTemplatePartSelector
-			);
-			expect( newTemplatePart ).toBeTruthy();
+				const newTemplatePart = await siteEditorCanvas.waitForSelector(
+					activatedTemplatePartSelector
+				);
+				expect( newTemplatePart ).toBeTruthy();
 
-			// Finish creating template part, insert some text, and save.
-			await page.click( '.block-editor-button-block-appender' );
-			await page.click( '.editor-block-list-item-paragraph' );
-			await page.keyboard.type( testContent );
-			await page.click( savePostSelector );
-			await page.click( entitiesSaveSelector );
+				// Finish creating template part, insert some text, and save.
+				await siteEditorCanvas.waitForSelector(
+					'.block-editor-button-block-appender'
+				);
+				await siteEditorCanvas.click(
+					'.block-editor-button-block-appender'
+				);
+				await page.waitForSelector(
+					'.editor-block-list-item-paragraph'
+				);
+				await page.click( '.editor-block-list-item-paragraph' );
+				await page.keyboard.type( testContent );
+				await page.click( savePostSelector );
+				await page.click( entitiesSaveSelector );
 
-			await createNewPost();
-			// Try to insert the template part we created.
-			await insertBlock( 'Template Part' );
-			const chooseExistingButton = await page.waitForXPath(
-				chooseExistingButtonSelector
-			);
-			await chooseExistingButton.click();
-			const preview = await page.waitForSelector(
-				'[aria-label="Create New"]'
-			);
-			await preview.click();
-			await page.waitForSelector( activatedTemplatePartSelector );
-			const templatePartContent = await page.waitForXPath(
-				testContentSelector
-			);
-			expect( templatePartContent ).toBeTruthy();
+				// Reload the page so as the new template part is available in the existing template parts.
+				await siteEditor.visit();
+				siteEditorCanvas = canvas();
+				await awaitHeaderLoad();
+				// Try to insert the template part we created.
+				await insertBlock( 'Template Part' );
+				const chooseExistingButton = await siteEditorCanvas.waitForXPath(
+					chooseExistingButtonSelector
+				);
+				await chooseExistingButton.click();
+				await page.waitForSelector(
+					'.wp-block-template-part__selection-preview-container'
+				);
+				const preview = await page.waitForSelector(
+					'.wp-block-template-part__selection-preview-item[aria-label="Create New"]'
+				);
+				await preview.click();
+				// We now have the same template part two times in the page, so check accordingly.
+				const paragraphs = await siteEditorCanvas.$$eval(
+					'[data-type="core/template-part"] > p:first-child',
+					( options ) =>
+						options.map( ( option ) => option.textContent )
+				);
+				expect( paragraphs ).toHaveLength( 2 );
+				expect(
+					paragraphs.every(
+						( paragraph ) => paragraph === testContent
+					)
+				).toBeTruthy();
+			} );
 		} );
 	} );
 } );

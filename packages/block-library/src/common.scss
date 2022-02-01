@@ -6,6 +6,10 @@
 	@include background-colors-deprecated();
 	@include foreground-colors-deprecated();
 	@include gradient-colors-deprecated();
+	// This CSS Custom Properties aren't used anymore as defaults,
+	// but we still need to keep them for backward compatibility.
+	--wp--preset--font-size--normal: 16px;
+	--wp--preset--font-size--huge: 42px;
 }
 
 // Font sizes (not used now, kept because of backward compatibility).
@@ -15,6 +19,14 @@
 
 .has-larger-font-size {
 	font-size: 2.625em;
+}
+
+.has-normal-font-size {
+	font-size: var(--wp--preset--font-size--normal);
+}
+
+.has-huge-font-size {
+	font-size: var(--wp--preset--font-size--huge);
 }
 
 // Text alignments.

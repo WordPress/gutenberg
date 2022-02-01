@@ -2,51 +2,46 @@
  * WordPress dependencies
  */
 import {
-	BlockControls,
-	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { SelectControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import QueryToolbar from './toolbar';
+import CommentsInspectorControls from './edit/comments-inspector-controls';
+import { useSelect } from '@wordpress/data';
 
-const TEMPLATE = [ [ 'core/comment-template' ] ];
+const TEMPLATE = [
+	[ 'core/comment-template' ],
+	[ 'core/comments-pagination' ],
+];
 
 export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
-	const { queryPerPage, tagName: TagName } = attributes;
+	const { tagName: TagName } = attributes;
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
 
+	const { commentOrder, commentsPerPage } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings;
+	} );
+
 	return (
 		<>
-			<BlockControls>
-				<QueryToolbar
-					queryPerPage={ queryPerPage }
-					setQuery={ setAttributes }
-				/>
-			</BlockControls>
-			<InspectorControls __experimentalGroup="advanced">
-				<SelectControl
-					label={ __( 'HTML element' ) }
-					options={ [
-						{ label: __( 'Default (<div>)' ), value: 'div' },
-						{ label: '<section>', value: 'section' },
-						{ label: '<aside>', value: 'aside' },
-					] }
-					value={ TagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-				/>
-			</InspectorControls>
+			<CommentsInspectorControls
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				defaultSettings={ {
+					defaultOrder: commentOrder,
+					defaultPerPage: commentsPerPage,
+				} }
+			/>
 			<TagName { ...innerBlocksProps } />
 		</>
 	);

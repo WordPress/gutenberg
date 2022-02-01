@@ -4,10 +4,80 @@
 		"name": "core/comments-query-loop",
 		"isValid": true,
 		"attributes": {
-			"queryPerPage": 4,
+			"inherit": true,
+			"order": "desc",
+			"perPage": 2,
 			"tagName": "div"
 		},
-		"innerBlocks": [],
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/comment-template",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"clientId": "_clientId_0",
+						"name": "core/comment-author-avatar",
+						"isValid": true,
+						"attributes": {
+							"width": 96,
+							"height": 96
+						},
+						"innerBlocks": [],
+						"originalContent": ""
+					},
+					{
+						"clientId": "_clientId_1",
+						"name": "core/comment-author-name",
+						"isValid": true,
+						"attributes": {
+							"isLink": false,
+							"linkTarget": "_self"
+						},
+						"innerBlocks": [],
+						"originalContent": ""
+					},
+					{
+						"clientId": "_clientId_2",
+						"name": "core/comment-date",
+						"isValid": true,
+						"attributes": {
+							"isLink": false
+						},
+						"innerBlocks": [],
+						"originalContent": ""
+					},
+					{
+						"clientId": "_clientId_3",
+						"name": "core/comment-content",
+						"isValid": true,
+						"attributes": {},
+						"innerBlocks": [],
+						"originalContent": ""
+					},
+					{
+						"clientId": "_clientId_4",
+						"name": "core/comment-reply-link",
+						"isValid": true,
+						"attributes": {},
+						"innerBlocks": [],
+						"originalContent": ""
+					},
+					{
+						"clientId": "_clientId_5",
+						"name": "core/comment-edit-link",
+						"isValid": true,
+						"attributes": {
+							"linkTarget": "_self"
+						},
+						"innerBlocks": [],
+						"originalContent": ""
+					}
+				],
+				"originalContent": ""
+			}
+		],
 		"originalContent": "<div class=\"wp-block-comments-query-loop\"></div>"
 	}
 ]

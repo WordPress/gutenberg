@@ -1,77 +1,47 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Navigation Creating from existing Menus allows a navigation block to be created from existing menus 1`] = `
-"<!-- wp:navigation -->
-<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"url\\":\\"http://localhost:8889/\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
-
-<!-- wp:navigation-submenu {\\"label\\":\\"Accusamus quo repellat illum magnam quas\\",\\"type\\":\\"page\\",\\"id\\":41,\\"url\\":\\"http://localhost:8889/?page_id=41\\",\\"kind\\":\\"post-type\\",\\"isTopLevelItem\\":true} -->
-<!-- wp:navigation-link {\\"label\\":\\"Debitis cum consequatur sit doloremque\\",\\"type\\":\\"page\\",\\"id\\":51,\\"url\\":\\"http://localhost:8889/?page_id=51\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":false} /-->
-<!-- /wp:navigation-submenu -->
-
-<!-- wp:navigation-submenu {\\"label\\":\\"Est ea vero non nihil officiis in\\",\\"type\\":\\"page\\",\\"id\\":53,\\"url\\":\\"http://localhost:8889/?page_id=53\\",\\"kind\\":\\"post-type\\",\\"isTopLevelItem\\":true} -->
-<!-- wp:navigation-submenu {\\"label\\":\\"Fuga odio quis tempora\\",\\"type\\":\\"page\\",\\"id\\":56,\\"url\\":\\"http://localhost:8889/?page_id=56\\",\\"kind\\":\\"post-type\\",\\"isTopLevelItem\\":false} -->
-<!-- wp:navigation-submenu {\\"label\\":\\"In consectetur repellendus eveniet maiores aperiam\\",\\"type\\":\\"page\\",\\"id\\":15,\\"url\\":\\"http://localhost:8889/?page_id=15\\",\\"kind\\":\\"post-type\\",\\"isTopLevelItem\\":false} -->
-<!-- wp:navigation-submenu {\\"label\\":\\"Mollitia maiores consequatur ea dolorem blanditiis\\",\\"type\\":\\"page\\",\\"id\\":45,\\"url\\":\\"http://localhost:8889/?page_id=45\\",\\"kind\\":\\"post-type\\",\\"isTopLevelItem\\":false} -->
-<!-- wp:navigation-link {\\"label\\":\\"Necessitatibus nisi qui qui necessitatibus quaerat possimus\\",\\"type\\":\\"page\\",\\"id\\":27,\\"url\\":\\"http://localhost:8889/?page_id=27\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":false} /-->
-<!-- /wp:navigation-submenu -->
-<!-- /wp:navigation-submenu -->
-<!-- /wp:navigation-submenu -->
-<!-- /wp:navigation-submenu -->
-
-<!-- wp:navigation-link {\\"label\\":\\"Nulla omnis autem dolores eligendi\\",\\"type\\":\\"page\\",\\"id\\":43,\\"url\\":\\"http://localhost:8889/?page_id=43\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->
-
-<!-- wp:navigation-link {\\"label\\":\\"Sample Page\\",\\"type\\":\\"page\\",\\"id\\":2,\\"url\\":\\"http://localhost:8889/?page_id=2\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->
-
-<!-- wp:navigation-submenu {\\"label\\":\\"Beatae qui labore voluptas eveniet officia quia voluptas qui porro sequi et aut est\\",\\"type\\":\\"category\\",\\"description\\":\\"Ratione nemo ut aut ullam sed assumenda quis est exercitationem\\",\\"id\\":7,\\"url\\":\\"http://localhost:8889/?cat=7\\",\\"kind\\":\\"taxonomy\\",\\"isTopLevelItem\\":true} -->
-<!-- wp:navigation-submenu {\\"label\\":\\"Et minus itaque velit tempore hic quisquam saepe quas asperiores\\",\\"type\\":\\"category\\",\\"description\\":\\"Vel fuga enim rerum perspiciatis sapiente mollitia magni ut molestiae labore quae quia quia libero perspiciatis voluptatem quidem deleniti eveniet laboriosam doloribus dolor laborum accusantium modi ducimus itaque rerum cum nostrum\\",\\"id\\":19,\\"url\\":\\"http://localhost:8889/?cat=19\\",\\"kind\\":\\"taxonomy\\",\\"isTopLevelItem\\":false} -->
-<!-- wp:navigation-submenu {\\"label\\":\\"Et quas a et mollitia et voluptas optio voluptate quia quo unde aut in nostrum iste impedit quisquam id aut\\",\\"type\\":\\"category\\",\\"description\\":\\"Quas sit labore earum omnis eos sint iste est possimus harum aut soluta sint optio quos distinctio inventore voluptate non ut aliquam ad ut voluptates fugiat numquam magnam modi repellendus modi laudantium et debitis officia est voluptatum quidem unde molestiae animi vero fuga accusamus nam\\",\\"id\\":6,\\"url\\":\\"http://localhost:8889/?cat=6\\",\\"kind\\":\\"taxonomy\\",\\"isTopLevelItem\\":false} -->
-<!-- wp:navigation-link {\\"label\\":\\"Illo quis sit impedit itaque expedita earum deserunt magni doloremque velit eum id error\\",\\"type\\":\\"category\\",\\"description\\":\\"Doloremque vero sunt officiis iste voluptatibus voluptas molestiae sint asperiores recusandae amet praesentium et explicabo nesciunt similique voluptatum laudantium amet officiis quas distinctio quis enim nihil tempora\\",\\"id\\":16,\\"url\\":\\"http://localhost:8889/?cat=16\\",\\"kind\\":\\"taxonomy\\",\\"isTopLevelLink\\":false} /-->
-<!-- /wp:navigation-submenu -->
-<!-- /wp:navigation-submenu -->
-<!-- /wp:navigation-submenu -->
-
-<!-- wp:navigation-submenu {\\"label\\":\\"WordPress.org\\",\\"type\\":\\"custom\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelItem\\":true} -->
-<!-- wp:navigation-link {\\"label\\":\\"Google\\",\\"type\\":\\"custom\\",\\"url\\":\\"https://google.com\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":false} /-->
-<!-- /wp:navigation-submenu -->
-<!-- /wp:navigation -->"
-`;
-
-exports[`Navigation Creating from existing Menus creates an empty navigation block when the selected existing menu is also empty 1`] = `"<!-- wp:navigation /-->"`;
-
-exports[`Navigation Creating from existing Pages allows a navigation block to be created using existing pages 1`] = `
-"<!-- wp:navigation -->
-<!-- wp:page-list /-->
-<!-- /wp:navigation -->"
-`;
-
-exports[`Navigation Shows the quick inserter when the block contains non-navigation specific blocks 1`] = `
-"<!-- wp:navigation -->
-<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
-
-<!-- wp:site-title /-->
-
-<!-- wp:navigation-link {\\"label\\":\\"WP News\\",\\"url\\":\\"https://wordpress.org/news/\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
-<!-- /wp:navigation -->"
-`;
-
 exports[`Navigation allows an empty navigation block to be created and manually populated using a mixture of internal and external links 1`] = `
-"<!-- wp:navigation -->
-<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
+"<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
 
-<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->
-<!-- /wp:navigation -->"
+<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"
 `;
 
-exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `
-"<!-- wp:navigation -->
-<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/create/page/my-new-page\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->
-<!-- /wp:navigation -->"
-`;
+exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `"<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"`;
 
 exports[`Navigation encodes URL when create block if needed 1`] = `
-"<!-- wp:navigation -->
-<!-- wp:navigation-link {\\"label\\":\\"wordpress.org/шеллы\\",\\"url\\":\\"https://wordpress.org/%D1%88%D0%B5%D0%BB%D0%BB%D1%8B\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
+"<!-- wp:navigation-link {\\"label\\":\\"wordpress.org/шеллы\\",\\"url\\":\\"https://wordpress.org/%D1%88%D0%B5%D0%BB%D0%BB%D1%8B\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
 
-<!-- wp:navigation-link {\\"label\\":\\"お問い合わせ\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->
-<!-- /wp:navigation -->"
+<!-- wp:navigation-link {\\"label\\":\\"お問い合わせ\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"https://this/is/a/test/search/%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"
 `;
+
+exports[`Navigation placeholder allows a navigation block to be created from existing menus 1`] = `
+"<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"url\\":\\"http://localhost:8889/\\",\\"kind\\":\\"custom\\"} /-->
+
+<!-- wp:navigation-submenu {\\"label\\":\\"About\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Our team\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} /-->
+<!-- /wp:navigation-submenu -->
+
+<!-- wp:navigation-submenu {\\"label\\":\\"Shop\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} -->
+<!-- wp:navigation-submenu {\\"label\\":\\"Winter apparel\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Chunky socks\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Hideous hats\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Glorious gloves\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Jazzy Jumpers\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} /-->
+<!-- /wp:navigation-submenu -->
+<!-- /wp:navigation-submenu -->
+
+<!-- wp:navigation-link {\\"label\\":\\"Shipping\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Contact Us\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} /-->
+
+<!-- wp:navigation-submenu {\\"label\\":\\"WordPress.org\\",\\"type\\":\\"custom\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Google\\",\\"type\\":\\"custom\\",\\"url\\":\\"https://google.com\\",\\"kind\\":\\"custom\\"} /-->
+<!-- /wp:navigation-submenu -->"
+`;
+
+exports[`Navigation placeholder creates an empty navigation block when the selected existing menu is also empty 1`] = `""`;
+
+exports[`Navigation supports navigation blocks that have inner blocks within their markup and converts them to wp_navigation posts 1`] = `"<!-- wp:page-list /-->"`;

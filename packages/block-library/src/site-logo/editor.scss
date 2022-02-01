@@ -1,27 +1,13 @@
 .wp-block[data-align="center"] > .wp-block-site-logo {
+	display: table;
 	margin-left: auto;
 	margin-right: auto;
-	text-align: center;
 }
 
 .wp-block-site-logo {
 	// Make the block selectable.
 	a {
 		pointer-events: none;
-	}
-
-	&:not(.is-default-size) {
-		display: table;
-	}
-
-	// Provide a sane starting point for the size.
-	&.is-default-size {
-		width: 120px;
-
-		img {
-			height: auto;
-			width: 100%;
-		}
 	}
 
 	.custom-logo-link {

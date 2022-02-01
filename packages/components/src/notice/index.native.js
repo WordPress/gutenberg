@@ -36,9 +36,12 @@ const Notice = ( { onNoticeHidden, content, id, status } ) => {
 	};
 
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onDimensionsChange );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onDimensionsChange
+		);
 		return () => {
-			Dimensions.removeEventListener( 'change', onDimensionsChange );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 

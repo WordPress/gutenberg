@@ -181,7 +181,7 @@ describe( 'Block variations', () => {
 			).toBeTruthy();
 			const description = await getBlockCardDescription();
 			expect( description ).toEqual(
-				'Start with the building block of all narrative.'
+				'Start with the basic building block of all narrative.'
 			);
 		} );
 	} );

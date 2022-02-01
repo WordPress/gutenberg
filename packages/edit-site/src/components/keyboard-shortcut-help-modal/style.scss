@@ -1,0 +1,66 @@
+.edit-site-keyboard-shortcut-help-modal {
+	&__section {
+		margin: 0 0 2rem 0;
+	}
+
+	&__main-shortcuts .edit-site-keyboard-shortcut-help-modal__shortcut-list {
+		// Push the shortcut to be flush with top modal header.
+		margin-top: -$grid-unit-30 -$border-width;
+	}
+
+	&__section-title {
+		font-size: 0.9rem;
+		font-weight: 600;
+	}
+
+	&__shortcut {
+		display: flex;
+		align-items: baseline;
+		padding: 0.6rem 0;
+		border-top: 1px solid $gray-300;
+		margin-bottom: 0;
+
+		&:last-child {
+			border-bottom: 1px solid $gray-300;
+		}
+
+		&:empty {
+			display: none;
+		}
+	}
+
+	&__shortcut-term {
+		font-weight: 600;
+		margin: 0 0 0 1rem;
+		text-align: right;
+	}
+
+	&__shortcut-description {
+		flex: 1;
+		margin: 0;
+
+		// IE 11 flex item fix - ensure the item does not collapse.
+		flex-basis: auto;
+	}
+
+	&__shortcut-key-combination {
+		display: block;
+		background: none;
+		margin: 0;
+		padding: 0;
+
+		& + .edit-site-keyboard-shortcut-help-modal__shortcut-key-combination {
+			margin-top: 10px;
+		}
+	}
+
+	&__shortcut-key {
+		padding: 0.25rem 0.5rem;
+		border-radius: 8%;
+		margin: 0 0.2rem 0 0.2rem;
+
+		&:last-child {
+			margin: 0 0 0 0.2rem;
+		}
+	}
+}

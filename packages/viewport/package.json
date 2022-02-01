@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "4.0.6",
+	"version": "4.1.0",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

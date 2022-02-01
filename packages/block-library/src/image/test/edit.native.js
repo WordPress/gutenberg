@@ -3,6 +3,7 @@
  */
 import { act, fireEvent, initializeEditor, getEditorHtml } from 'test/helpers';
 import { Image } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies
@@ -23,8 +24,21 @@ jest.mock( '@wordpress/data-controls', () => {
 	};
 } );
 
+/**
+ * Immediately invoke delayed functions. A better alternative would be using
+ * fake timers and test the delay itself. However, fake timers does not work
+ * with our custom waitFor implementation.
+ */
+jest.mock( 'lodash', () => {
+	const actual = jest.requireActual( 'lodash' );
+	return { ...actual, delay: ( cb ) => cb() };
+} );
+
 const apiFetchPromise = Promise.resolve( {} );
 apiFetch.mockImplementation( () => apiFetchPromise );
+
+const clipboardPromise = Promise.resolve( '' );
+Clipboard.getString.mockImplementation( () => clipboardPromise );
 
 beforeAll( () => {
 	registerCoreBlocks();
@@ -53,7 +67,7 @@ describe( 'Image Block', () => {
 			</a>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -79,7 +93,7 @@ describe( 'Image Block', () => {
 			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -105,7 +119,7 @@ describe( 'Image Block', () => {
 			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -117,6 +131,8 @@ describe( 'Image Block', () => {
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		// Await asynchronous fetch of clipboard
+		await act( () => clipboardPromise );
 		fireEvent.changeText(
 			screen.getByPlaceholderText( 'Search or type URL' ),
 			'wordpress.org'
@@ -136,7 +152,7 @@ describe( 'Image Block', () => {
 			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -149,12 +165,16 @@ describe( 'Image Block', () => {
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Media File' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		// Await asynchronous fetch of clipboard
+		await act( () => clipboardPromise );
 		fireEvent.changeText(
 			screen.getByPlaceholderText( 'Search or type URL' ),
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByA11yLabel( 'Apply' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		// Await asynchronous fetch of clipboard
+		await act( () => clipboardPromise );
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
@@ -172,7 +192,7 @@ describe( 'Image Block', () => {
 			</a>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -196,7 +216,7 @@ describe( 'Image Block', () => {
 			</a>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -227,7 +247,7 @@ describe( 'Image Block', () => {
 			<figcaption>Mountain</figcaption>
 		</figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 

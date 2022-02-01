@@ -50,21 +50,65 @@ function render_block_core_template_part( $attributes ) {
 			if ( ! is_wp_error( $area_terms ) && false !== $area_terms ) {
 				$area = $area_terms[0]->name;
 			}
+			/**
+			 * Fires when a block template part is loaded from a template post stored in the database.
+			 *
+			 * @since 5.9.0
+			 *
+			 * @param string  $template_part_id   The requested template part namespaced to the theme.
+			 * @param array   $attributes         The block attributes.
+			 * @param WP_Post $template_part_post The template part post object.
+			 * @param string  $content            The template part content.
+			 */
+			do_action( 'render_block_core_template_part_post', $template_part_id, $attributes, $template_part_post, $content );
 		} else {
 			// Else, if the template part was provided by the active theme,
 			// render the corresponding file content.
-			$theme_folders           = get_block_theme_folders();
-			$template_part_file_path = get_theme_file_path( '/' . $theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
+			$parent_theme_folders        = get_block_theme_folders( get_template() );
+			$child_theme_folders         = get_block_theme_folders( get_stylesheet() );
+			$child_theme_part_file_path  = get_theme_file_path( '/' . $child_theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
+			$parent_theme_part_file_path = get_theme_file_path( '/' . $parent_theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
+			$template_part_file_path     = 0 === validate_file( $attributes['slug'] ) && file_exists( $child_theme_part_file_path ) ? $child_theme_part_file_path : $parent_theme_part_file_path;
 			if ( 0 === validate_file( $attributes['slug'] ) && file_exists( $template_part_file_path ) ) {
 				$content = file_get_contents( $template_part_file_path );
 				$content = is_string( $content ) && '' !== $content
 						? _inject_theme_attribute_in_block_template_content( $content )
 						: '';
 			}
+
+			if ( '' !== $content && null !== $content ) {
+				/**
+				 * Fires when a block template part is loaded from a template part in the theme.
+				 *
+				 * @since 5.9.0
+				 *
+				 * @param string $template_part_id        The requested template part namespaced to the theme.
+				 * @param array  $attributes              The block attributes.
+				 * @param string $template_part_file_path Absolute path to the template path.
+				 * @param string $content                 The template part content.
+				 */
+				do_action( 'render_block_core_template_part_file', $template_part_id, $attributes, $template_part_file_path, $content );
+			} else {
+				/**
+				 * Fires when a requested block template part does not exist in the database nor in the theme.
+				 *
+				 * @since 5.9.0
+				 *
+				 * @param string $template_part_id        The requested template part namespaced to the theme.
+				 * @param array  $attributes              The block attributes.
+				 * @param string $template_part_file_path Absolute path to the not found template path.
+				 */
+				do_action( 'render_block_core_template_part_none', $template_part_id, $attributes, $template_part_file_path );
+			}
 		}
 	}
 
-	if ( is_null( $content ) && is_user_logged_in() ) {
+	// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
+	// is set in `wp_debug_mode()`.
+	$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
+		defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+
+	if ( is_null( $content ) && $is_debug ) {
 		if ( ! isset( $attributes['slug'] ) ) {
 			// If there is no slug this is a placeholder and we dont want to return any message.
 			return;
@@ -77,11 +121,6 @@ function render_block_core_template_part( $attributes ) {
 	}
 
 	if ( isset( $seen_ids[ $template_part_id ] ) ) {
-		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
-		// is set in `wp_debug_mode()`.
-		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
-			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
-
 		return $is_debug ?
 			// translators: Visible only in the front end, this warning takes the place of a faulty block.
 			__( '[block rendering halted]' ) :

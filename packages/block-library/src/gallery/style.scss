@@ -30,6 +30,7 @@
 		margin-top: auto;
 		margin-bottom: auto;
 		flex-direction: column;
+		max-width: 100%;
 
 		> div,
 		> a {
@@ -41,7 +42,9 @@
 		img {
 			display: block;
 			height: auto;
-			max-width: 100%;
+			// Ensure max-width is not overridden on the img when the parent gallery has
+			// wide or full alignment.
+			max-width: 100% !important;
 			width: auto;
 		}
 
@@ -62,6 +65,10 @@
 
 			img {
 				display: inline;
+			}
+
+			a {
+				color: inherit;
 			}
 		}
 

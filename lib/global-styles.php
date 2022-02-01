@@ -6,25 +6,6 @@
  */
 
 /**
- * Fetches the preferences for each origin (core, theme, user)
- * and enqueues the resulting stylesheet.
- */
-function gutenberg_experimental_global_styles_enqueue_assets() {
-	$stylesheet = wp_get_global_stylesheet();
-	if ( empty( $stylesheet ) ) {
-		return;
-	}
-
-	if ( isset( wp_styles()->registered['global-styles'] ) ) {
-		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
-	} else {
-		wp_register_style( 'global-styles', false, array(), true, true );
-		wp_add_inline_style( 'global-styles', $stylesheet );
-		wp_enqueue_style( 'global-styles' );
-	}
-}
-
-/**
  * Adds the necessary settings for the Global Styles client UI.
  *
  * @param array $settings Existing block editor settings.
@@ -71,38 +52,34 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		}
 
 		$new_global_styles = array();
-		$new_presets       = array(
-			array(
-				'css'                     => 'variables',
-				'__unstableType'          => 'presets',
-				'__experimentalNoWrapper' => true,
-			),
-			array(
-				'css'            => 'presets',
+
+		$css_variables = wp_get_global_stylesheet( array( 'variables' ) );
+		if ( '' !== $css_variables ) {
+			$new_global_styles[] = array(
+				'css'            => $css_variables,
 				'__unstableType' => 'presets',
-			),
-		);
-		foreach ( $new_presets as $new_style ) {
-			$style_css = wp_get_global_stylesheet( array( $new_style['css'] ) );
-			if ( '' !== $style_css ) {
-				$new_style['css']    = $style_css;
-				$new_global_styles[] = $new_style;
-			}
+			);
 		}
 
-		$new_block_classes = array(
-			'css'            => 'styles',
-			'__unstableType' => 'theme',
-		);
+		$css_presets = wp_get_global_stylesheet( array( 'presets' ) );
+		if ( '' !== $css_presets ) {
+			$new_global_styles[] = array(
+				'css'            => $css_presets,
+				'__unstableType' => 'presets',
+			);
+		}
+
 		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			$style_css = wp_get_global_stylesheet( array( $new_block_classes['css'] ) );
-			if ( '' !== $style_css ) {
-				$new_block_classes['css'] = $style_css;
-				$new_global_styles[]      = $new_block_classes;
+			$css_blocks = wp_get_global_stylesheet( array( 'styles' ) );
+			if ( '' !== $css_blocks ) {
+				$new_global_styles[] = array(
+					'css'            => $css_blocks,
+					'__unstableType' => 'theme',
+				);
 			}
 		}
 
-		$settings['styles'] = array_merge( $styles_without_existing_global_styles, $new_global_styles );
+		$settings['styles'] = array_merge( $new_global_styles, $styles_without_existing_global_styles );
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
@@ -163,26 +140,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	return $settings;
-}
-
-/**
- * Whether or not the Site Editor is available.
- *
- * @return boolean
- */
-function gutenberg_experimental_is_site_editor_available() {
-	return gutenberg_is_fse_theme();
-}
-
-/**
- * Register CPT to store/access user data.
- *
- * @return void
- */
-function gutenberg_experimental_global_styles_register_user_cpt() {
-	if ( gutenberg_experimental_is_site_editor_available() ) {
-		WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
-	}
 }
 
 /**
@@ -254,53 +211,10 @@ function gutenberg_global_styles_force_filtered_html_on_import_filter( $arg ) {
 	return $arg;
 }
 
-// TODO: Remove this filter when minimum supported version is WP 5.8
-// As all this code is not needed anymore now core supports all variables.
-/**
- * This filter is the last being executed on force_filtered_html_on_import.
- * If the input of the filter is true it means we are in an import situation and should
- * enable kses, independently of the user capabilities.
- * So in that case we call gutenberg_global_styles_kses_init_filters;
- *
- * @param bool $allow_css       Whether the CSS in the test string is considered safe.
- * @param bool $css_test_string The CSS string to test..
- * @return bool If $allow_css is true it returns true.
- * If $allow_css is false and the CSS rule is referencing a WordPress css variable it returns true.
- * Otherwise the function return false.
- */
-function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $css_test_string ) {
-	if ( $allow_css ) {
-		return $allow_css;
-	}
-	$allowed_preset_attributes = array(
-		'background',
-		'background-color',
-		'border-color',
-		'color',
-		'font-family',
-		'font-size',
-	);
-	$parts                     = explode( ':', $css_test_string, 2 );
-
-	if ( ! in_array( trim( $parts[0] ), $allowed_preset_attributes, true ) ) {
-		return $allow_css;
-	}
-	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
-}
-
-// The else clause can be removed when plugin support requires WordPress 5.8.0+.
-if ( function_exists( 'get_block_editor_settings' ) ) {
-	add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
-} else {
-	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
-}
-
-add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
-add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 
 // kses actions&filters.
 add_action( 'init', 'gutenberg_global_styles_kses_init' );
 add_action( 'set_current_user', 'gutenberg_global_styles_kses_init' );
 add_filter( 'force_filtered_html_on_import', 'gutenberg_global_styles_force_filtered_html_on_import_filter', 999 );
-add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_global_styles_include_support_for_wp_variables', 10, 2 );
 // This filter needs to be executed last.

@@ -1,4 +1,4 @@
-@import "path/to/foo.scss";
+@import "path/to/foo";
 
 @function fooBar {
 
@@ -22,8 +22,10 @@ $map: (
 	display: inline-block;
 }
 
+// stylelint-disable no-invalid-position-at-import-rule
 @import "../some/url";
 @import "../another/url";
+// stylelint-enable no-invalid-position-at-import-rule
 
 b {
 

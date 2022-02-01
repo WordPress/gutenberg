@@ -95,10 +95,7 @@ export function onBlockDrop(
 
 		// If the user is moving a block
 		if ( dropType === 'block' ) {
-			const sourceBlockIndex = getBlockIndex(
-				sourceClientIds[ 0 ],
-				sourceRootClientId
-			);
+			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
 
 			// If the user is dropping to the same position, return early.
 			if (
@@ -259,10 +256,14 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		const files = getFilesFromDataTransfer( event.dataTransfer );
 		const html = event.dataTransfer.getData( 'text/html' );
 
-		if ( files.length ) {
-			_onFilesDrop( files );
-		} else if ( html ) {
+		/**
+		 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
+		 * The order of the checks is important to recognise the HTML drop.
+		 */
+		if ( html ) {
 			_onHTMLDrop( html );
+		} else if ( files.length ) {
+			_onFilesDrop( files );
 		} else {
 			_onDrop( event );
 		}

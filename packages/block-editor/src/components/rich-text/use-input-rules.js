@@ -11,6 +11,7 @@ import { useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { preventEventDiscovery } from './prevent-event-discovery';
 
 export function useInputRules( props ) {
 	const {
@@ -85,7 +86,7 @@ export function useInputRules( props ) {
 
 					return accumlator;
 				},
-				value
+				preventEventDiscovery( value )
 			);
 
 			if ( transformed !== value ) {

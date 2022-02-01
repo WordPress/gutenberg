@@ -22,12 +22,6 @@ module.exports = {
 		supports: {
 			html: false,
 		},
-		npmDependencies: [
-			'@wordpress/block-editor',
-			'@wordpress/blocks',
-			'@wordpress/components',
-			'@wordpress/i18n',
-		],
 	},
 	templatesPath: join( __dirname, 'templates' ),
 	assetsPath: join( __dirname, 'assets' ),

@@ -15,7 +15,7 @@ export default {
 	component: Spacer,
 	title: 'Components (Experimental)/Spacer',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

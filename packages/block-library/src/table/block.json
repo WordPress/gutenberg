@@ -145,7 +145,12 @@
 			"__experimentalSkipSerialization": true,
 			"color": true,
 			"style": true,
-			"width": true
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"style": true,
+				"width": true
+			}
 		},
 		"__experimentalSelector": ".wp-block-table > table"
 	},

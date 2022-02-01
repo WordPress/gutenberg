@@ -59,6 +59,17 @@ describe( 'Preloading Middleware', () => {
 
 			describe( 'and the OPTIONS request has a parse flag', () => {
 				it( 'should return the full response if parse: false', () => {
+					const noResponseMock =
+						'undefined' === typeof window.Response;
+					if ( noResponseMock ) {
+						window.Response = class {
+							constructor( body, options ) {
+								this.body = JSON.parse( body );
+								this.headers = options.headers;
+							}
+						};
+					}
+
 					const data = {
 						body: {
 							status: 'this is the preloaded response',
@@ -85,6 +96,9 @@ describe( 'Preloading Middleware', () => {
 					};
 
 					const response = preloadingMiddleware( requestOptions );
+					if ( noResponseMock ) {
+						delete window.Response;
+					}
 					return response.then( ( value ) => {
 						expect( value ).toEqual( data );
 					} );

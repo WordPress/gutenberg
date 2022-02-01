@@ -29,6 +29,12 @@ export const preferences = combineReducers( {
 				return state;
 		}
 	},
+	editorMode( state = PREFERENCES_DEFAULTS.editorMode, action ) {
+		if ( action.type === 'SWITCH_MODE' ) {
+			return action.mode;
+		}
+		return state;
+	},
 } );
 
 /**
@@ -72,39 +78,25 @@ export function settings( state = {}, action ) {
  * Reducer keeping track of the currently edited Post Type,
  * Post Id and the context provided to fill the content of the block editor.
  *
- * @param {Array}  state  Current state history.
+ * @param {Object} state  Current edited post.
  * @param {Object} action Dispatched action.
  *
- * @return {Array} Updated state.
+ * @return {Object} Updated state.
  */
-export function editedPost( state = [], action ) {
+export function editedPost( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
 		case 'SET_PAGE':
-			return [
-				{
-					type: 'wp_template',
-					id: action.templateId,
-					page: action.page,
-				},
-			];
+			return {
+				type: 'wp_template',
+				id: action.templateId,
+				page: action.page,
+			};
 		case 'SET_TEMPLATE_PART':
-			return [
-				{
-					type: 'wp_template_part',
-					id: action.templatePartId,
-				},
-			];
-		case 'PUSH_TEMPLATE_PART':
-			return [
-				...state,
-				{
-					type: 'wp_template_part',
-					id: action.templatePartId,
-				},
-			];
-		case 'GO_BACK':
-			return state.slice( 0, -1 );
+			return {
+				type: 'wp_template_part',
+				id: action.templatePartId,
+			};
 	}
 
 	return state;

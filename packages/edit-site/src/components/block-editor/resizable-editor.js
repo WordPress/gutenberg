@@ -57,22 +57,49 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 				return;
 			}
 
-			const resizeObserver = new iframe.contentWindow.ResizeObserver(
-				() => {
-					setHeight(
-						iframe.contentDocument.querySelector(
-							`.edit-site-block-editor__block-list`
-						).offsetHeight
+			let animationFrame = null;
+
+			function resizeHeight() {
+				if ( ! animationFrame ) {
+					// Throttle the updates on animation frame.
+					animationFrame = iframe.contentWindow.requestAnimationFrame(
+						() => {
+							setHeight(
+								iframe.contentDocument.documentElement
+									.scrollHeight
+							);
+							animationFrame = null;
+						}
 					);
 				}
-			);
+			}
 
-			// Observing the <html> rather than the <body> because the latter
-			// gets destroyed and remounted after initialization in <Iframe>.
-			resizeObserver.observe( iframe.contentDocument.documentElement );
+			let resizeObserver;
+
+			function registerObserver() {
+				resizeObserver?.disconnect();
+
+				resizeObserver = new iframe.contentWindow.ResizeObserver(
+					resizeHeight
+				);
+				// Observing the <html> rather than the <body> because the latter
+				// gets destroyed and remounted after initialization in <Iframe>.
+				resizeObserver.observe(
+					iframe.contentDocument.documentElement
+				);
+
+				resizeHeight();
+			}
+
+			// This is only required in Firefox for some unknown reasons.
+			iframe.addEventListener( 'load', registerObserver );
+			// This is required in Chrome and Safari.
+			registerObserver();
 
 			return () => {
-				resizeObserver.disconnect();
+				iframe.contentWindow?.cancelAnimationFrame( animationFrame );
+				resizeObserver?.disconnect();
+				iframe.removeEventListener( 'load', registerObserver );
 			};
 		},
 		[ enableResizing ]
@@ -133,10 +160,24 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 						<style>{
 							// Forming a "block formatting context" to prevent margin collapsing.
 							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-							`.edit-site-block-editor__block-list { display: flow-root; }`
+							`.is-root-container { display: flow-root; }`
 						}</style>
+						{ enableResizing && (
+							<style>
+								{
+									// Force the <html> and <body>'s heights to fit the content.
+									`html, body { height: -moz-fit-content !important; height: fit-content !important; min-height: 0 !important; }`
+								}
+								{
+									// Some themes will have `min-height: 100vh` for the root container,
+									// which isn't a requirement in auto resize mode.
+									`.is-root-container { min-height: 0 !important; }`
+								}
+							</style>
+						) }
 					</>
 				}
+				assets={ settings.__unstableResolvedAssets }
 				ref={ ref }
 				name="editor-canvas"
 				className="edit-site-visual-editor__editor-canvas"

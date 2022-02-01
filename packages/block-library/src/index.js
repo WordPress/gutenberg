@@ -29,7 +29,11 @@ import * as commentDate from './comment-date';
 import * as commentEditLink from './comment-edit-link';
 import * as commentReplyLink from './comment-reply-link';
 import * as commentTemplate from './comment-template';
+import * as commentsPaginationPrevious from './comments-pagination-previous';
 import * as commentsQueryLoop from './comments-query-loop';
+import * as commentsPagination from './comments-pagination';
+import * as commentsPaginationNext from './comments-pagination-next';
+import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -55,6 +59,8 @@ import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
+import * as postAuthorName from './post-author-name';
+import * as postAuthorBiography from './post-author-biography';
 import * as postComment from './post-comment';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
@@ -198,6 +204,8 @@ export const __experimentalGetCoreBlocks = () => [
 	logInOut,
 	termDescription,
 	queryTitle,
+	postAuthorName,
+	postAuthorBiography,
 ];
 
 /**
@@ -236,31 +244,35 @@ export const registerCoreBlocks = (
  * __experimentalRegisterExperimentalCoreBlocks( settings );
  * ```
  */
-export const __experimentalRegisterExperimentalCoreBlocks =
-	process.env.GUTENBERG_PHASE === 2
-		? ( { enableFSEBlocks } = {} ) => {
-				[
-					// Experimental blocks.
-					homeLink,
+export const __experimentalRegisterExperimentalCoreBlocks = process.env
+	.IS_GUTENBERG_PLUGIN
+	? ( { enableFSEBlocks } = {} ) => {
+			[
+				// Experimental blocks.
+				homeLink,
 
-					// Full Site Editing blocks.
-					...( enableFSEBlocks
-						? [
-								commentAuthorAvatar,
-								commentAuthorName,
-								commentContent,
-								commentDate,
-								commentEditLink,
-								commentReplyLink,
-								commentTemplate,
-								commentsQueryLoop,
-								navigationArea,
-								postComment,
-								postCommentsCount,
-								postCommentsForm,
-								postCommentsLink,
-						  ]
-						: [] ),
-				].forEach( registerBlock );
-		  }
-		: undefined;
+				// Full Site Editing blocks.
+				...( enableFSEBlocks
+					? [
+							commentAuthorAvatar,
+							commentAuthorName,
+							commentContent,
+							commentDate,
+							commentEditLink,
+							commentReplyLink,
+							commentTemplate,
+							commentsQueryLoop,
+							commentsPagination,
+							commentsPaginationNext,
+							commentsPaginationNumbers,
+							commentsPaginationPrevious,
+							navigationArea,
+							postComment,
+							postCommentsCount,
+							postCommentsForm,
+							postCommentsLink,
+					  ]
+					: [] ),
+			].forEach( registerBlock );
+	  }
+	: undefined;

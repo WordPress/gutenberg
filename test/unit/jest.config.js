@@ -18,7 +18,7 @@ module.exports = {
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
-		'<rootDir>/test/unit/config/gutenberg-phase.js',
+		'<rootDir>/test/unit/config/is-gutenberg-plugin.js',
 	],
 	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
 	testURL: 'http://localhost',
@@ -45,6 +45,6 @@ module.exports = {
 	],
 	reporters: [
 		'default',
-		'<rootDir>packages/scripts/config/jest-github-actions-reporter.js',
+		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
 	],
 };

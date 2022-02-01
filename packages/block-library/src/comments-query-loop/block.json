@@ -7,12 +7,17 @@
 	"description": "An advanced block that allows displaying post comments based on different query parameters and visual configurations.",
 	"textdomain": "default",
 	"attributes": {
-		"queryId": {
-			"type": "number"
+		"inherit": {
+			"type": "boolean",
+			"default": true
 		},
-		"queryPerPage": {
+		"order": {
+			"type": "string",
+			"default": null
+		},
+		"perPage": {
 			"type": "number",
-			"default": 4
+			"default": null
 		},
 		"tagName": {
 			"type": "string",
@@ -20,8 +25,9 @@
 		}
 	},
 	"providesContext": {
-		"queryId": "queryId",
-		"queryPerPage": "queryPerPage"
+		"comments/perPage": "perPage",
+		"comments/order": "order",
+		"comments/inherit": "inherit"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
@@ -30,5 +36,6 @@
 			"gradients": true,
 			"link": true
 		}
-	}
+	},
+	"editorStyle": "wp-block-comments-editor"
 }

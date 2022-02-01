@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -99,7 +104,7 @@ export default function TemplatePartEdit( {
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
-				isMissing: hasResolvedEntity && ! entityRecord,
+				isMissing: hasResolvedEntity && isEmpty( entityRecord ),
 				defaultWrapper: defaultWrapperElement || 'div',
 				area: _area,
 				enableSelection: _enableSelection,

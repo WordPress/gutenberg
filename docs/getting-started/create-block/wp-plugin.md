@@ -8,7 +8,7 @@ A WordPress plugin is a set of files within the site's `wp-content/plugins` dire
 
 ### Switch to Working Directory
 
-(1A) If you do not plan to use `wp-env`, change to your local WordPress plugin directory. For example in Local it is: `~\Local Sites\mywp\wp-content\plugins`
+(1A) If you do not plan to use `wp-env`, change to your local WordPress plugin directory. For example in Local it is: `~\Local Sites\mywp\app\public\wp-content\plugins`
 
 -or-
 
@@ -88,7 +88,7 @@ By default, the build scripts looks for `src/index.js` for the JavaScript file t
 
 ## Plugin to Load Script
 
-To load the built script, so it is run within the editor, you need to tell WordPress about the script. This done in the init action in the `gutenpride.php` file.
+To load the built script, so it is run within the editor, you need to tell WordPress about the script. This is done in the init action in the `gutenpride.php` file.
 
 ```php
 function create_block_gutenpride_block_init() {

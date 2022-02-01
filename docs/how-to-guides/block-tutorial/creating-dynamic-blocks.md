@@ -18,7 +18,7 @@ Block attributes can be used for any content or setting you want to save for tha
 The following code example shows how to create a dynamic block that shows only the last post as a link.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -52,7 +52,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, data, blockEditor ) {
@@ -148,6 +148,8 @@ There are a few things to notice:
 -   The built-in `save` function just returns `null` because the rendering is performed server-side.
 -   The server-side rendering is a function taking the block and the block inner content as arguments, and returning the markup (quite similar to shortcodes)
 
+**Note :** For common customization settings including color, border, spacing customization and more, we will see on the [next chapter](/docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md) how you can rely on block supports to provide such functionality in an efficient way.
+
 ## Live rendering in the block editor
 
 Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/server-side-render/README.md) block which enables rendering to take place on the server using PHP rather than in JavaScript.
@@ -155,7 +157,7 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/server-side-render/READ
 _Server-side render is meant as a fallback; client-side rendering in JavaScript is always preferred (client rendering is faster and allows better editor manipulation)._
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -182,7 +184,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, serverSideRender, blockEditor ) {
@@ -219,4 +221,4 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 
 {% end %}
 
-Note that this code uses the `wp-server-side-render` package but not `wp-data`. Make sure to update the dependencies in the PHP code. You can use wp-scripts and ESNext setup for auto dependencies (see the [gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples/tree/HEAD/01-basic-esnext) for PHP code setup).
+Note that this code uses the `wp-server-side-render` package but not `wp-data`. Make sure to update the dependencies in the PHP code. You can use wp-scripts to automatically build dependencies (see the [gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples/tree/HEAD/01-basic-esnext) for PHP code setup).

@@ -1358,7 +1358,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockIndex( state, 56, '123' ) ).toBe( 1 );
+			expect( getBlockIndex( state, 56 ) ).toBe( 1 );
 		} );
 	} );
 

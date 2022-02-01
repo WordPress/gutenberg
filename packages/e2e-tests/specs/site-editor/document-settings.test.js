@@ -13,7 +13,7 @@ async function getDocumentSettingsTitle() {
 		'.edit-site-document-actions__title'
 	);
 
-	return titleElement.evaluate( ( el ) => el.innerText );
+	return titleElement.evaluate( ( el ) => el.textContent );
 }
 
 async function getDocumentSettingsSecondaryTitle() {
@@ -21,12 +21,12 @@ async function getDocumentSettingsSecondaryTitle() {
 		'.edit-site-document-actions__secondary-item'
 	);
 
-	return secondaryTitleElement.evaluate( ( el ) => el.innerText );
+	return secondaryTitleElement.evaluate( ( el ) => el.textContent );
 }
 
 describe( 'Document Settings', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -43,14 +43,14 @@ describe( 'Document Settings', () => {
 		it( 'should display the selected templates name in the document header', async () => {
 			// Navigate to a template
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
 
 			// Evaluate the document settings title
 			const actual = await getDocumentSettingsTitle();
 
-			expect( actual ).toEqual( 'Index' );
+			expect( actual ).toEqual( 'Editing template: Index' );
 		} );
 
 		describe( 'and a template part is clicked in the template', () => {
@@ -64,13 +64,13 @@ describe( 'Document Settings', () => {
 				);
 				headerTemplatePartListViewButton.click();
 				await page.click(
-					'button[aria-label="Close list view sidebar"]'
+					'button[aria-label="Close List View Sidebar"]'
 				);
 
 				// Evaluate the document settings secondary title
 				const actual = await getDocumentSettingsSecondaryTitle();
 
-				expect( actual ).toEqual( 'Header' );
+				expect( actual ).toEqual( 'Editing template part: header' );
 			} );
 		} );
 	} );
@@ -79,14 +79,14 @@ describe( 'Document Settings', () => {
 		it( "should display the selected template part's name in the document header", async () => {
 			// Navigate to a template part
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//header',
+				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
 
 			// Evaluate the document settings title
 			const actual = await getDocumentSettingsTitle();
 
-			expect( actual ).toEqual( 'header' );
+			expect( actual ).toEqual( 'Editing template part: header' );
 		} );
 	} );
 } );

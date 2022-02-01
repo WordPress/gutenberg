@@ -28,25 +28,27 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { textColor as settings } from './index';
+import { textColor as settings, transparentValue } from './index';
 
 function parseCSS( css = '' ) {
 	return css.split( ';' ).reduce( ( accumulator, rule ) => {
 		if ( rule ) {
 			const [ property, value ] = rule.split( ':' );
 			if ( property === 'color' ) accumulator.color = value;
-			if ( property === 'background-color' )
+			if ( property === 'background-color' && value !== transparentValue )
 				accumulator.backgroundColor = value;
 		}
 		return accumulator;
 	}, {} );
 }
 
-function parseClassName( className = '', colorSettings ) {
+export function parseClassName( className = '', colorSettings ) {
 	return className.split( ' ' ).reduce( ( accumulator, name ) => {
-		const match = name.match( /^has-([^-]+)-color$/ );
-		if ( match ) {
-			const [ , colorSlug ] = name.match( /^has-([^-]+)-color$/ );
+		// `colorSlug` could contain dashes, so simply match the start and end.
+		if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
+			const colorSlug = name
+				.replace( /^has-/, '' )
+				.replace( /-color$/, '' );
 			const colorObject = getColorObjectByAttributeValues(
 				colorSettings,
 				colorSlug
@@ -88,7 +90,7 @@ function setColors( value, name, colorSettings, colors ) {
 		styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
 	} else {
 		// Override default browser color for mark element.
-		styles.push( [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' ) );
+		styles.push( [ 'background-color', transparentValue ].join( ':' ) );
 	}
 
 	if ( color ) {
