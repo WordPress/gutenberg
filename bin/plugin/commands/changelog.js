@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-const { countBy, groupBy, escapeRegExp, uniq, flow } = require( 'lodash' );
+const {
+	countBy,
+	groupBy,
+	escapeRegExp,
+	uniq,
+	flow,
+	sortBy,
+} = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -816,14 +823,27 @@ function getContributorMarkdownList( ftcPRs ) {
 }
 
 /**
+ * Sorts a given Issue/PR by the username of the user who created.
+ *
+ * @param {IssuesListForRepoResponseItem[]} items List of pull requests.
+ * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
+ */
+function sortByUsername( items ) {
+	return sortBy( items, ( item ) => item.user.login );
+}
+
+/**
+ * Produces the formatted markdown for the full time contributors section of
+ * the changelog output.
  *
  * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
  *
- * @return {string} The formatted changelog string.
+ * @return {string} The formatted contributors section.
  */
 function formatContributors( pullRequests ) {
 	const contributorsList = flow( [
 		getFirstTimeContributorPRs,
+		sortByUsername,
 		getContributorMarkdownList,
 	] )( pullRequests );
 
