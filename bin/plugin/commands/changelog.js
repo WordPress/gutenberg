@@ -790,7 +790,7 @@ function sortFeatureGroups( featureGroups ) {
  */
 function getFirstTimeContributorPRs( pullRequests ) {
 	return pullRequests.filter( ( pr ) => {
-		if ( pr.user.login === 'dependabot[bot]' ) {
+		if ( pr.user.type.toLowerCase() === 'bot' ) {
 			return false;
 		}
 
