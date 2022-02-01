@@ -47,10 +47,10 @@ import { META_SELECTORS } from '../../store';
  * the store state using the `mapSelect` callback on `useQuerySelect`.
  *
  * The returned object has the following keys:
- *   data – the return value of the selector.
- *   isResolving – provided by `getIsResolving` meta-selector.
- *   hasStarted – provided by `hasStartedResolution` meta-selector.
- *   hasResolved – provided by `hasFinishedResolution` meta-selector.
+ * * data – the return value of the selector.
+ * * isResolving – provided by `getIsResolving` meta-selector.
+ * * hasStarted – provided by `hasStartedResolution` meta-selector.
+ * * hasResolved – provided by `hasFinishedResolution` meta-selector.
  *
  * If the currency prop changes then any price in the state for that currency is
  * retrieved. If the currency prop doesn't change and other props are passed in
