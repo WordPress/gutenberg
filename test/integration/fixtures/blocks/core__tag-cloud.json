@@ -7,7 +7,8 @@
 			"taxonomy": "category",
 			"showTagCounts": false,
 			"smallestFontSize": 8,
-			"largestFontSize": 22
+			"largestFontSize": 22,
+			"fontSizeUnit": "pt"
 		},
 		"innerBlocks": []
 	}
