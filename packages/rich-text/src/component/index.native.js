@@ -1018,7 +1018,7 @@ export class RichText extends Component {
 
 	getLinkTextColor( defaultColor ) {
 		const { style } = this.props;
-		const customColor = style?.linkColor && colord( style?.linkColor );
+		const customColor = style?.linkColor && colord( style.linkColor );
 
 		return customColor && customColor.isValid()
 			? customColor.toHex()
