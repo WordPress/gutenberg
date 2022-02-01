@@ -726,14 +726,13 @@ function CoverEdit( {
 				<span
 					aria-hidden="true"
 					className={ classnames(
+						'wp-block-cover__background',
 						dimRatioToClass( dimRatio ),
-						{ [ overlayColor.class ]: overlayColor.class },
-						'wp-block-cover__gradient-background',
-						gradientClass,
 						{
+							[ overlayColor.class ]: overlayColor.class,
 							'has-background-dim': dimRatio !== undefined,
 							'has-background-gradient': gradientValue,
-							[ gradientClass ]: ! url && gradientClass,
+							[ gradientClass ]: gradientClass,
 						}
 					) }
 					style={ { backgroundImage: gradientValue, ...bgStyle } }

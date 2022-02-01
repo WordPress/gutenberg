@@ -88,19 +88,20 @@ export default function save( { attributes } ) {
 		getPositionClassName( contentPosition )
 	);
 
+	const gradientValue = gradient || customGradient;
+
 	return (
 		<div { ...useBlockProps.save( { className: classes, style } ) }>
 			<span
 				aria-hidden="true"
 				className={ classnames(
+					'wp-block-cover__background',
 					overlayColorClass,
 					dimRatioToClass( dimRatio ),
-					'wp-block-cover__gradient-background',
-					gradientClass,
 					{
 						'has-background-dim': dimRatio !== undefined,
-						'has-background-gradient': gradient || customGradient,
-						[ gradientClass ]: ! url && gradientClass,
+						'has-background-gradient': gradientValue,
+						[ gradientClass ]: gradientClass,
 					}
 				) }
 				style={ bgStyle }
