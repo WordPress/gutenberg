@@ -103,8 +103,11 @@ function ListView(
 				await clearSelectedBlock();
 				selectBlock( clientId, -1 );
 			} else if ( event.shiftKey ) {
+				// To handle multiple block selection via the `SHIFT` key, prevent
+				// the browser default behavior of opening the link in a new window.
 				event.preventDefault();
 
+				// Select a single block if no block is selected yet.
 				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
 					selectBlock( clientId, -1 );
 					return;
