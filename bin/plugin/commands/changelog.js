@@ -769,6 +769,8 @@ function sortFeatureGroups( featureGroups ) {
 }
 
 /**
+ * Returns a list of PRs created by first time contributors based on the Github
+ * label associated with the PR. Also filters out any "bots".
  *
  * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
  *
@@ -787,6 +789,8 @@ function getFirstTimeContributorPRs( pullRequests ) {
 }
 
 /**
+ * Creates a set of markdown formatted list items for each first time contributor
+ * and their associated PR.
  *
  * @param {IssuesListForRepoResponseItem[]} ftcPRs List of first time contributor PRs.
  *
