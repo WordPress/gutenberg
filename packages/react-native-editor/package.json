@@ -72,7 +72,7 @@
 		"react-native-screens": "https://raw.githubusercontent.com/wordpress-mobile/react-native-screens/2.9.0-wp-2/react-native-screens-2.9.0-wp-2.tgz",
 		"react-native-svg": "https://raw.githubusercontent.com/wordpress-mobile/react-native-svg/v9.13.7-wp-2/react-native-svg-9.13.7-wp-2.tgz",
 		"react-native-url-polyfill": "^1.1.2",
-		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/5.0.2-wp-2/react-native-video-5.0.2-wp-2.tgz",
+		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#31ebacf5584219d4b3888b95673c35243fd30d2e",
 		"react-native-webview": "https://raw.githubusercontent.com/wordpress-mobile/react-native-webview/v11.6.5-wp-2/react-native-webview-11.6.5-wp-2.tgz"
 	},
 	"publishConfig": {
