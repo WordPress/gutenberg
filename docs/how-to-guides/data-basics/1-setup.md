@@ -122,7 +122,7 @@ Congratulations! You are now ready to start building the app!
 
 ## Readability vs Convenience
 
-You don’t need a build tool to complete this tutorial, but using one will make your core look nicer.
+You don’t need a build tool to complete this tutorial, but using one will make your code look nicer.
 
 The examples in this tutorial use the JSX syntax:
 
