@@ -272,12 +272,28 @@ $color-control-label-height: 20px;
 	}
 }
 
+// Prevent layout shift for vertical variant.
+.wp-block-navigation.is-vertical .is-small,
+.wp-block-navigation.is-vertical .is-medium {
+	.components-placeholder__fieldset {
+		// The size of two buttons, with top and bottom padding, and gap.
+		min-height: ($button-size * 2) + $grid-unit-15 + ($grid-unit-15 * 0.5);
+	}
+}
+
+.wp-block-navigation.is-vertical .is-large {
+	.components-placeholder__fieldset {
+		// The size of three buttons, with top and bottom padding, and gap.
+		min-height: ($button-size * 3) + $grid-unit-15 + $grid-unit-15;
+	}
+}
+
 // Selected state.
 .wp-block-navigation-placeholder__preview,
 .wp-block-navigation-placeholder__controls {
 	padding: ($grid-unit-15 * 0.5) $grid-unit-10;
 	flex-direction: row;
-	align-items: center;
+	align-items: flex-start;
 }
 
 .wp-block-navigation-placeholder__controls {
@@ -299,26 +315,25 @@ $color-control-label-height: 20px;
 	float: left;
 	width: 100%;
 
-	// Show stacked for the vertical navigation, or small placeholders.
+	// Hide the navigation indicator when in small contexts.
 	.is-small &,
 	.is-medium & {
 		.wp-block-navigation-placeholder__actions__indicator,
-		.wp-block-navigation-placeholder__actions__indicator + hr,
-		.wp-block-navigation-placeholder__actions > :nth-last-child(3), // Add all pages.
-		.wp-block-navigation-placeholder__actions > :nth-last-child(2) { // hr separator after it.
+		.wp-block-navigation-placeholder__actions__indicator + hr {
 			display: none;
 		}
 	}
 
-	// Show stacked for the vertical navigation, or small placeholders.
-	.is-small & {
+	// Vertical orientation or small context.
+	.is-small &,
+	.wp-block-navigation.is-vertical & {
 		.wp-block-navigation-placeholder__actions {
 			flex-direction: column;
-		}
+			align-items: flex-start;
 
-		// Hide the separators in the vertical version.
-		.wp-block-navigation-placeholder__actions hr {
-			display: none;
+			hr {
+				display: none;
+			}
 		}
 	}
 
@@ -335,7 +350,7 @@ $color-control-label-height: 20px;
 	align-items: center;
 	justify-content: flex-start;
 	line-height: 0;
-	min-height: $button-size;
+	height: $button-size;
 
 	// Line up with the icon in the toolbar.
 	margin-left: $grid-unit-05;

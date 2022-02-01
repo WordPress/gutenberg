@@ -125,7 +125,7 @@ function Navigation( {
 		setAreaMenu = noop;
 	// Navigation areas are deprecated and on their way out. Let's not perform
 	// the request unless we're in an environment where the endpoint exists.
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		[ areaMenu, setAreaMenu ] = useEntityProp(
 			'root',

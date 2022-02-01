@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
+
 ### Bug Fix
 
 -   Removed unused `@wordpress/a11y`, `@wordpress/server-side-render`, `rememo` and `uuid` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
