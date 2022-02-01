@@ -9,7 +9,8 @@ import useResizeAware from 'react-resize-aware';
  */
 import { useEffect, useRef, useState } from '@wordpress/element';
 
-const { clearTimeout, setTimeout } = window;
+const { clearTimeout = () => undefined, setTimeout = () => undefined } =
+	typeof window !== 'undefined' ? window : {};
 
 export type Axis = 'x' | 'y';
 
