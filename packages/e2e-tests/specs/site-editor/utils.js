@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { addQueryArgs } from '@wordpress/url';
-import { visitAdminPage } from '@wordpress/e2e-test-utils';
+import { toggleMoreMenu } from '@wordpress/e2e-test-utils';
 
 export const navigationPanel = {
 	async open() {
@@ -69,24 +68,8 @@ export const navigationPanel = {
 };
 
 export const siteEditor = {
-	async visit( query ) {
-		query = addQueryArgs( '', {
-			page: 'gutenberg-edit-site',
-			...query,
-		} ).slice( 1 );
-		await visitAdminPage( 'themes.php', query );
-		await page.waitForSelector( '.edit-site-visual-editor iframe' );
-	},
-
-	async toggleMoreMenu() {
-		// eslint-disable-next-line jest/no-standalone-expect
-		await expect( page ).toClick(
-			'.edit-site-more-menu [aria-label="More tools & options"]'
-		);
-	},
-
 	async clickOnMoreMenuItem( buttonLabel ) {
-		await this.toggleMoreMenu();
+		await toggleMoreMenu( 'site-editor' );
 		const moreMenuContainerSelector =
 			'//*[contains(concat(" ", @class, " "), " edit-site-more-menu__content ")]';
 		const elementToClick = (
