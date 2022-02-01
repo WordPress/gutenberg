@@ -14,6 +14,7 @@ import {
 	getTypesByTitle,
 	getIssueFeature,
 	getFormattedItemDescription,
+	getUniqueByUsername,
 	getChangelog,
 	getContributors,
 } from '../changelog';
@@ -314,6 +315,62 @@ describe( 'getTypesByTitle', () => {
 		const result = getTypesByTitle( title );
 
 		expect( result ).toEqual( [ 'Bug Fixes' ] );
+	} );
+} );
+
+describe( 'getUniqueByUsername', () => {
+	it( 'removes duplicate entries by username', () => {
+		const entries = [
+			{
+				user: {
+					login: '@user1',
+				},
+			},
+			{
+				user: {
+					login: '@user1',
+				},
+			},
+			{
+				user: {
+					login: '@user2',
+				},
+			},
+			{
+				user: {
+					login: '@user3',
+				},
+			},
+			{
+				user: {
+					login: '@user4',
+				},
+			},
+		];
+
+		const expected = [
+			{
+				user: {
+					login: '@user1',
+				},
+			},
+			{
+				user: {
+					login: '@user2',
+				},
+			},
+			{
+				user: {
+					login: '@user3',
+				},
+			},
+			{
+				user: {
+					login: '@user4',
+				},
+			},
+		];
+		expect( getUniqueByUsername( entries ) ).toEqual( expected );
 	} );
 } );
 

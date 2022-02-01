@@ -8,6 +8,7 @@ const {
 	uniq,
 	flow,
 	sortBy,
+	uniqBy,
 } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
@@ -823,6 +824,16 @@ function sortByUsername( items ) {
 }
 
 /**
+ * Removes duplicate PRs by the username of the user who created.
+ *
+ * @param {IssuesListForRepoResponseItem[]} items List of pull requests.
+ * @return {IssuesListForRepoResponseItem[]} The list of pull requests unique per user.
+ */
+function getUniqueByUsername( items ) {
+	return uniqBy( items, ( item ) => item.user.login );
+}
+
+/**
  * Produces the formatted markdown for the full time contributors section of
  * the changelog output.
  *
@@ -833,6 +844,7 @@ function sortByUsername( items ) {
 function getContributors( pullRequests ) {
 	const contributorsList = flow( [
 		getFirstTimeContributorPRs,
+		getUniqueByUsername,
 		sortByUsername,
 		getContributorMarkdownList,
 	] )( pullRequests );
@@ -923,4 +935,5 @@ async function getReleaseChangelog( options ) {
 	getFormattedItemDescription,
 	getContributors,
 	getChangelog,
+	getUniqueByUsername,
 };
