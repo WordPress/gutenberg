@@ -36,6 +36,7 @@ jobs:
                   cache: npm
 
             - name: npm install, build, format and lint
+              shell: bash
               run: |
                   npm ci
                   npm run test:create-block
