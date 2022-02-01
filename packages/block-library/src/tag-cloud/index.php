@@ -57,7 +57,6 @@ function register_block_core_tag_cloud() {
 		array(
 			'name'         => 'outline',
 			'label'        => __( 'Outline', 'gutenberg' ),
-			'style_handle' => 'outline',
 		)
 	);
 }
