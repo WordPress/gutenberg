@@ -1,3 +1,7 @@
+/**
+ * @typedef {import("./shared/types").GutenbergContext} GutenbergContext
+ */
+
 const SELECTORS = {
 	menuContent: '.components-popover__content',
 	postEditorMenu: '.edit-post-more-menu [aria-label="Options"]',
@@ -7,7 +11,7 @@ const SELECTORS = {
 /**
  * Toggles the More Menu.
  *
- * @param {'post-editor' | 'site-editor'} [context='post-editor'] Whether it's toggling in the context of the site editor or post editor.
+ * @param {GutenbergContext} [context='post-editor'] Whether it's toggling in the context of the site editor or post editor.
  */
 export async function toggleMoreMenu( context = 'post-editor' ) {
 	const selector =

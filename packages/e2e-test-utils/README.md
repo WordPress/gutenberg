@@ -741,6 +741,10 @@ Toggles the global inserter.
 
 Toggles the More Menu.
 
+_Parameters_
+
+-   _context_ `['post-editor' | 'site-editor']`: Whether it's toggling in the context of the site editor or post editor.
+
 ### toggleOfflineMode
 
 Undocumented declaration.
