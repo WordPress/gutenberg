@@ -77,10 +77,11 @@ export class FocalPointPicker extends Component {
 		 * An example is the values resetting based on an UNDO action.
 		 */
 		const {
+			isDragging,
 			percentages: { x, y },
 		} = this.state;
 		const { value } = this.props;
-		if ( value.x !== x || value.y !== y ) {
+		if ( ! isDragging && ( value.x !== x || value.y !== y ) ) {
 			this.setState( { percentages: this.props.value } );
 		}
 	}
@@ -189,8 +190,8 @@ export class FocalPointPicker extends Component {
 			{ x: event.pageX, y: event.pageY },
 			event.shiftKey
 		);
-		this.updateValue( value );
-		this.props.onDrag?.( value, event );
+		const modifiedValue = this.props.onDrag?.( value, event );
+		this.updateValue( modifiedValue ?? value );
 	}
 	getValueFromPoint( point, byTenths ) {
 		const { bounds } = this.state;
