@@ -57,6 +57,13 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		return;
 	}
 
+	const userType = commit.author.type;
+
+	if ( userType === 'Bot' ) {
+		debug( 'first-time-contributor-account-link: User is a bot. Aborting' );
+		return;
+	}
+
 	const repo = payload.repository.name;
 	const owner = payload.repository.owner.login;
 	const author = commit.author.username;
