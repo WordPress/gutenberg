@@ -196,7 +196,11 @@ describe( 'Cover', () => {
 	it( 'dims the background image down by 50% when transformed from the Image block', async () => {
 		await insertBlock( 'Image' );
 		// Upload image and transform to the Cover block
-		await upload( '.wp-block-image' );
+		const filename = await upload( '.wp-block-image' );
+		await page.waitForSelector(
+			`.wp-block-image img[src$="${ filename }.png"]`
+		);
+
 		// Click the block wrapper before trying to convert to make sure figcaption toolbar is not obscuring
 		// the block toolbar.
 		await page.click( '.wp-block-image' );
