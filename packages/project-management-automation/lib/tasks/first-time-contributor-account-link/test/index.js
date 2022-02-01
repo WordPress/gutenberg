@@ -32,6 +32,36 @@ describe( 'firstTimeContributorAccountLink', () => {
 		},
 	};
 
+	it( 'does nothing for commits by bots', async () => {
+		const payloadForBot = {
+			...payload,
+			commits: [
+				{
+					id: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
+					message: 'Add a feature from pull request (#123)',
+					author: {
+						name: 'Ghost',
+						email: 'ghost@example.invalid',
+						username: 'ghost',
+						type: 'Bot',
+					},
+				},
+			],
+		};
+
+		const octokit = {
+			rest: {
+				repos: {
+					listCommits: jest.fn(),
+				},
+			},
+		};
+
+		await firstTimeContributorAccountLink( payloadForBot, octokit );
+
+		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does nothing if not a commit to trunk', async () => {
 		const payloadForBranchPush = {
 			...payload,
