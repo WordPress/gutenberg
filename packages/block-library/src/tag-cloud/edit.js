@@ -13,9 +13,7 @@ import {
 	ToggleControl,
 	SelectControl,
 	RangeControl,
-	__experimentalInputControl as InputControl,
-	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -44,7 +42,13 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		numberOfTags,
 		smallestFontSize,
 		largestFontSize,
+		fontSizeUnit,
 	} = attributes;
+
+	const units = [
+		{ label: 'px', value: 'px' },
+		{ label: 'pt', value: 'pt' },
+	];
 
 	const getTaxonomyOptions = () => {
 		const selectOption = {
@@ -95,51 +99,39 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 				/>
 				<Flex>
 					<FlexItem isBlock>
-						<InputControl
-							type="number"
+						<UnitControl
 							label={ __( 'Smallest size' ) }
-							value={ smallestFontSize }
+							value={ smallestFontSize + fontSizeUnit }
 							onChange={ ( value ) => {
+								value = value.slice( 0, -2 );
 								const newValue =
 									value && +value >= 8 ? +value : 8;
 								setAttributes( {
 									smallestFontSize: newValue,
 								} );
 							} }
-							min={ 8 }
-							max={ 60 }
-							suffix={
-								<Spacer
-									as={ Text }
-									marginTop={ 2 }
-									marginRight={ 3 }
-								>
-									px
-								</Spacer>
-							}
+							units={ units }
+							onUnitChange={ ( value ) => {
+								setAttributes( { fontSizeUnit: value } );
+							} }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
-						<InputControl
-							type="number"
+						<UnitControl
 							label={ __( 'Largest size' ) }
-							value={ largestFontSize }
+							value={ largestFontSize + fontSizeUnit }
 							onChange={ ( value ) => {
+								value = value.slice( 0, -2 );
 								const newValue =
 									value && +value >= 8 ? +value : 60;
-								setAttributes( { largestFontSize: newValue } );
+								setAttributes( {
+									largestFontSize: newValue,
+								} );
 							} }
-							min={ 8 }
-							max={ 60 }
-							suffix={
-								<Spacer
-									as={ Text }
-									marginTop={ 2 }
-									marginRight={ 3 }
-								>
-									px
-								</Spacer>
-							}
+							units={ units }
+							onUnitChange={ ( value ) => {
+								setAttributes( { fontSizeUnit: value } );
+							} }
 						/>
 					</FlexItem>
 				</Flex>
