@@ -2,13 +2,17 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
+
 ## 3.2.0 (2022-01-27)
 
 ## 3.1.0 (2021-11-07)
 
 ### Enhancement
 
--  Enable persistent List View in the widget editor [#35706](https://github.com/WordPress/gutenberg/pull/35706).
+-   Enable persistent List View in the widget editor [#35706](https://github.com/WordPress/gutenberg/pull/35706).
 
 ## 3.0.0 (2021-07-29)
 
