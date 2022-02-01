@@ -8,6 +8,8 @@ import {
 	switchUserToAdmin,
 	switchUserToTest,
 	visitAdminPage,
+	goToSiteEditor,
+	getEditedPageContent,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -16,11 +18,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { siteEditor } from './utils';
 
-const {
-	visit: visitSiteEditor,
-	getEditedPostContent,
-	disableWelcomeGuide,
-} = siteEditor;
+const { disableWelcomeGuide } = siteEditor;
 
 const assertSaveButtonIsDisabled = async () =>
 	page.waitForSelector(
@@ -104,7 +102,7 @@ describe( 'Template Revert', () => {
 	} );
 	beforeEach( async () => {
 		await trashAllPosts( 'wp_template' );
-		await visitSiteEditor();
+		await goToSiteEditor();
 		await disableWelcomeGuide();
 	} );
 
@@ -118,58 +116,58 @@ describe( 'Template Revert', () => {
 	} );
 
 	it( 'should show the original content after revert', async () => {
-		const contentBefore = await getEditedPostContent();
+		const contentBefore = await getEditedPageContent();
 
 		await addDummyText();
 		await save();
 		await revertTemplate();
 		await save();
 
-		const contentAfter = await getEditedPostContent();
+		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );
 	} );
 
 	it( 'should show the original content after revert and page reload', async () => {
-		const contentBefore = await getEditedPostContent();
+		const contentBefore = await getEditedPageContent();
 
 		await addDummyText();
 		await save();
 		await revertTemplate();
 		await save();
-		await visitSiteEditor();
+		await goToSiteEditor();
 
-		const contentAfter = await getEditedPostContent();
+		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );
 	} );
 
 	it( 'should show the edited content after revert and clicking undo in the header toolbar', async () => {
 		await addDummyText();
 		await save();
-		const contentBefore = await getEditedPostContent();
+		const contentBefore = await getEditedPageContent();
 
 		await revertTemplate();
 		await save();
 		await undoRevertInHeaderToolbar();
 
-		const contentAfter = await getEditedPostContent();
+		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );
 	} );
 
 	it( 'should show the edited content after revert and clicking undo in the notice', async () => {
 		await addDummyText();
 		await save();
-		const contentBefore = await getEditedPostContent();
+		const contentBefore = await getEditedPageContent();
 
 		await revertTemplate();
 		await save();
 		await undoRevertInNotice();
 
-		const contentAfter = await getEditedPostContent();
+		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );
 	} );
 
 	it( 'should show the original content after revert, clicking undo then redo in the header toolbar', async () => {
-		const contentBefore = await getEditedPostContent();
+		const contentBefore = await getEditedPageContent();
 
 		await addDummyText();
 		await save();
@@ -178,12 +176,12 @@ describe( 'Template Revert', () => {
 		await undoRevertInHeaderToolbar();
 		await clickRedoInHeaderToolbar();
 
-		const contentAfter = await getEditedPostContent();
+		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );
 	} );
 
 	it( 'should show the original content after revert, clicking undo in the notice then undo in the header toolbar', async () => {
-		const contentBefore = await getEditedPostContent();
+		const contentBefore = await getEditedPageContent();
 
 		await addDummyText();
 		await save();
@@ -192,38 +190,38 @@ describe( 'Template Revert', () => {
 		await undoRevertInNotice();
 		await undoRevertInHeaderToolbar();
 
-		const contentAfter = await getEditedPostContent();
+		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );
 	} );
 
 	it( 'should show the edited content after revert, clicking undo in the header toolbar, save and reload', async () => {
 		await addDummyText();
 		await save();
-		const contentBefore = await getEditedPostContent();
+		const contentBefore = await getEditedPageContent();
 
 		await revertTemplate();
 		await save();
 		await clickUndoInHeaderToolbar();
 		await save();
 		await assertSaveButtonIsDisabled();
-		await visitSiteEditor();
+		await goToSiteEditor();
 
-		const contentAfter = await getEditedPostContent();
+		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );
 	} );
 
 	it( 'should show the edited content after revert, clicking undo in the notice and reload', async () => {
 		await addDummyText();
 		await save();
-		const contentBefore = await getEditedPostContent();
+		const contentBefore = await getEditedPageContent();
 
 		await revertTemplate();
 		await save();
 		await undoRevertInNotice();
 		await save();
-		await visitSiteEditor();
+		await goToSiteEditor();
 
-		const contentAfter = await getEditedPostContent();
+		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );
 	} );
 } );

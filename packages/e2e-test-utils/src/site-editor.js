@@ -13,7 +13,7 @@ const SELECTORS = {
  *
  * @return {Promise<string>} Promise resolving with post content markup.
  */
-export function getEditedPostContent() {
+export function getEditedPageContent() {
 	return page.evaluate( () => {
 		const postId = window.wp.data
 			.select( 'core/edit-site' )
