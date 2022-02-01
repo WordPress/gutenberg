@@ -14,7 +14,12 @@ import apiFetch from '@wordpress/api-fetch';
  * @param {*} param0
  * @return {Object} TODO Write JSDOC.
  */
-export const useCommentQueryArgs = ( { postId, perPage, defaultPage } ) => {
+export const useCommentQueryArgs = ( {
+	postId,
+	perPage,
+	defaultPage,
+	inherit,
+} ) => {
 	// Initialize the query args that are not going to change.
 	const queryArgs = {
 		status: 'approve',
@@ -30,6 +35,12 @@ export const useCommentQueryArgs = ( { postId, perPage, defaultPage } ) => {
 		const { __experimentalDiscussionSettings } = getSettings();
 		return __experimentalDiscussionSettings;
 	} );
+
+	// Overwrite the received attributes if `inherit` is true.
+	if ( inherit ) {
+		perPage = commentsPerPage;
+		defaultPage = defaultCommentsPage;
+	}
 
 	// If a block props is not set, use the settings value to generate the
 	// appropriate query arg.

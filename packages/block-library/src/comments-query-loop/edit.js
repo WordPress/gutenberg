@@ -1,17 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	useBlockProps,
-	useInnerBlocksProps,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import CommentsInspectorControls from './edit/comments-inspector-controls';
-import { useSelect } from '@wordpress/data';
 
 const TEMPLATE = [
 	[ 'core/comment-template' ],
@@ -26,24 +21,11 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 		template: TEMPLATE,
 	} );
 
-	const { commentOrder, commentsPerPage, defaultPage } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const { __experimentalDiscussionSettings } = getSettings();
-			return __experimentalDiscussionSettings;
-		}
-	);
-
 	return (
 		<>
 			<CommentsInspectorControls
 				attributes={ attributes }
 				setAttributes={ setAttributes }
-				defaultSettings={ {
-					defaultOrder: commentOrder,
-					defaultPerPage: commentsPerPage,
-					defaultDefaultPage: defaultPage,
-				} }
 			/>
 			<TagName { ...innerBlocksProps } />
 		</>

@@ -35,7 +35,6 @@ const defaultPageOptions = [
 export default function CommentsInspectorControls( {
 	attributes: { TagName, perPage, order, inherit, defaultPage },
 	setAttributes,
-	defaultSettings: { defaultPerPage, defaultOrder, defaultDefaultPage },
 } ) {
 	return (
 		<InspectorControls>
@@ -46,9 +45,6 @@ export default function CommentsInspectorControls( {
 					onChange={ () => {
 						setAttributes( {
 							inherit: ! inherit,
-							order: inherit ? defaultOrder : null,
-							perPage: inherit ? defaultPerPage : null,
-							defaultPage: inherit ? defaultDefaultPage : null,
 						} );
 					} }
 				/>

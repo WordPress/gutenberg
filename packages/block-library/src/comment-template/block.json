@@ -9,6 +9,7 @@
 	"textdomain": "default",
 	"usesContext": [
 		"comments/defaultPage",
+		"comments/inherit",
 		"comments/order",
 		"comments/perPage",
 		"postId"

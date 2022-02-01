@@ -214,6 +214,7 @@ export default function CommentTemplateEdit( {
 		'comments/perPage': perPage,
 		'comments/order': order,
 		'comments/defaultPage': defaultPage,
+		'comments/inherit': inherit,
 	},
 } ) {
 	const blockProps = useBlockProps();
@@ -224,6 +225,7 @@ export default function CommentTemplateEdit( {
 		postId,
 		perPage,
 		defaultPage,
+		inherit,
 	} );
 
 	const { topLevelComments, blocks } = useSelect(
