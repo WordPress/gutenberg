@@ -108,6 +108,14 @@ _Parameters_
 -   _buttonLabel_ `string`: The label to search the button for.
 -   _context_ `[GutenbergContext]`: Whether to click the button in the post editor or site editor context.
 
+### clickSiteEditorMenuItem
+
+Searches for an item in the navigation panel with the label provided and clicks it.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
+
 ### closeGlobalBlockInserter
 
 Undocumented declaration.
@@ -115,6 +123,10 @@ Undocumented declaration.
 ### closeListView
 
 Closes list view
+
+### closeSiteEditorNavigationPanel
+
+Closes the site editor navigation panel if open
 
 ### createEmbeddingMatcher
 
@@ -259,6 +271,10 @@ Disable auto-accepting any dialogs.
 
 Disables Pre-publish checks.
 
+### disableWelcomeGuide
+
+Skips the welcome guide popping up to first time users of the site editor
+
 ### dragAndResize
 
 Clicks an element, drags a particular distance and releases the mouse button.
@@ -365,6 +381,14 @@ _Returns_
 
 -   `Promise`: Promise resolving with current post content markup.
 
+### getEditedPageContent
+
+Returns a promise which resolves with the edited post content (HTML string).
+
+_Returns_
+
+-   `Promise<string>`: Promise resolving with post content markup.
+
 ### getEditedPostContent
 
 Returns a promise which resolves with the edited post content (HTML string).
@@ -400,9 +424,25 @@ _Returns_
 
 -   `Promise<?string>`: Promise resolving to a string or null, depending whether a page error is present.
 
+### getSiteEditorMenuItem
+
+Searches for an item in the site editor navigation menu with the provided label.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
+
+_Returns_
+
+-   `Promise<?ElementHandle>`: The menu item handle or `null`
+
 ### goToSiteEditor
 
-Undocumented declaration.
+Visits the Site Editor main page
+
+_Parameters_
+
+-   _query_ `string`: String to be serialized as query portion of URL.
 
 ### hasBlockSwitcher
 
@@ -494,6 +534,17 @@ _Returns_
 
 Undocumented declaration.
 
+### isSiteEditorRoot
+
+Returns `true` if in the site editor navigation root
+
+Checks whether the “Back to dashboard” button is visible. If
+not in the root, a “Back” button would be visible instead.
+
+_Returns_
+
+-   `Promise<boolean>`: Whether it currently is the navigation root or not
+
 ### isThemeInstalled
 
 Checks whether a theme exists on the site.
@@ -530,6 +581,14 @@ _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
 
+### navigateSiteEditorBack
+
+Navigates the site editor back
+
+### navigateSiteEditorBackToRoot
+
+Goes back until it gets to the root
+
 ### openDocumentSettingsSidebar
 
 Clicks on the button in the header which opens Document Settings sidebar when it is closed.
@@ -557,6 +616,10 @@ _Returns_
 ### openPublishPanel
 
 Opens the publish panel.
+
+### openSiteEditorNavigationPanel
+
+Opens the site editor navigation panel if closed
 
 ### openTypographyToolsPanelMenu
 
@@ -715,6 +778,14 @@ _Parameters_
 
 The block toolbar is not always visible while typing.
 Call this function to reveal it.
+
+### siteEditorNavigateSequence
+
+Navigates through a sequence of links in the site editor navigation panel
+
+_Parameters_
+
+-   _labels_ `string[] | string`: Labels to navigate through
 
 ### switchEditorModeTo
 

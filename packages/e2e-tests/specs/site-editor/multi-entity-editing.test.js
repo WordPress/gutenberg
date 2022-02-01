@@ -13,18 +13,17 @@ import {
 	selectBlockByClientId,
 	goToSiteEditor,
 	disableWelcomeGuide,
+	clickSiteEditorMenuItem,
+	navigateSiteEditorBackToRoot,
+	openSiteEditorNavigationPanel,
+	siteEditorNavigateSequence,
 } from '@wordpress/e2e-test-utils';
 
-/**
- * Internal dependencies
- */
-import { navigationPanel } from './utils';
-
 const clickTemplateItem = async ( menus, itemName ) => {
-	await navigationPanel.open();
-	await navigationPanel.backToRoot();
-	await navigationPanel.navigate( menus );
-	await navigationPanel.clickItemByText( itemName );
+	await openSiteEditorNavigationPanel();
+	await navigateSiteEditorBackToRoot();
+	await siteEditorNavigateSequence( menus );
+	await clickSiteEditorMenuItem( itemName );
 };
 
 const createTemplatePart = async (

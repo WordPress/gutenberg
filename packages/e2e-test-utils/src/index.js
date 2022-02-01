@@ -99,9 +99,17 @@ export {
 } from './rest-api';
 export { openListView, closeListView } from './list-view';
 export {
+	clickSiteEditorMenuItem,
+	closeSiteEditorNavigationPanel,
 	disableWelcomeGuide,
 	getEditedPageContent,
+	getSiteEditorMenuItem,
 	goToSiteEditor,
+	isSiteEditorRoot,
+	navigateSiteEditorBack,
+	navigateSiteEditorBackToRoot,
+	openSiteEditorNavigationPanel,
+	siteEditorNavigateSequence,
 } from './site-editor';
 
 export * from './mocks';
