@@ -21,8 +21,8 @@ const spinAnimation = keyframes`
 export const StyledSpinner = styled.svg`
 	width: ${ CONFIG.spinnerSize }px;
 	height: ${ CONFIG.spinnerSize }px;
-	display: block;
-	margin: auto;
+	display: inline-block;
+	margin: 5px 11px 0;
 	position: relative;
 	color: var( --wp-admin-theme-color );
 	overflow: visible;
