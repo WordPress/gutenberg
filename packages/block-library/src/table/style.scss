@@ -112,6 +112,49 @@
 		}
 	}
 
+	.has-border-top-color {
+		> *,
+		tr:first-child {
+			border-top-color: inherit;
+
+			th,
+			td {
+				border-top-color: inherit;
+			}
+		}
+	}
+	.has-border-right-color {
+		> *,
+		tr,
+		th,
+		td:last-child {
+			border-right-color: inherit;
+		}
+	}
+	.has-border-bottom-color {
+		> *,
+		tr:last-child {
+			border-bottom-color: inherit;
+
+			th,
+			td {
+				border-bottom-color: inherit;
+			}
+		}
+
+		tr:not(:last-child) {
+			border-bottom-color: currentColor;
+		}
+	}
+	.has-border-left-color {
+		> *,
+		tr,
+		th,
+		td:first-child {
+			border-left-color: inherit;
+		}
+	}
+
 	table[style*="border-style"] {
 		> *,
 		tr,
