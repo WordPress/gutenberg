@@ -16,6 +16,7 @@ import {
 	isEmpty,
 	map,
 	reduce,
+	omit,
 } from 'lodash';
 
 /**
@@ -33,7 +34,7 @@ import {
 } from './registration';
 import {
 	normalizeBlockType,
-	__experimentalRemoveAttributesByRole,
+	__experimentalGetBlockAttributesNamesByRole,
 } from './utils';
 
 /**
@@ -142,19 +143,18 @@ export function __experimentalCloneSanitizedBlock(
 
 	// Merge in new attributes and strip out attributes with the `internal` role,
 	// which should not be copied during block duplication.
-	const retainedAttributes = __experimentalRemoveAttributesByRole(
-		block.name,
+	const filteredAttributes = omit(
 		{
 			...block.attributes,
 			...mergeAttributes,
 		},
-		'internal'
+		__experimentalGetBlockAttributesNamesByRole( block.name, 'internal' )
 	);
 
 	return {
 		...block,
 		clientId,
-		attributes: retainedAttributes,
+		attributes: filteredAttributes,
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) =>
