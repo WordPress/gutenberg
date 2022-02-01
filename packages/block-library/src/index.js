@@ -202,7 +202,6 @@ export const __experimentalGetCoreBlocks = () => [
 	queryPaginationNumbers,
 	queryPaginationPrevious,
 	postComments,
-	readMore,
 	logInOut,
 	termDescription,
 	queryTitle,
@@ -273,6 +272,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 							postCommentsCount,
 							postCommentsForm,
 							postCommentsLink,
+							readMore,
 					  ]
 					: [] ),
 			].forEach( registerBlock );
