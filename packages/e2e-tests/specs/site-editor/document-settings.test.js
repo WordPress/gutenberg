@@ -5,12 +5,8 @@ import {
 	trashAllPosts,
 	activateTheme,
 	goToSiteEditor,
+	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 async function getDocumentSettingsTitle() {
 	const titleElement = await page.waitForSelector(
@@ -40,7 +36,7 @@ describe( 'Document Settings', () => {
 
 	beforeEach( async () => {
 		await goToSiteEditor();
-		await siteEditor.disableWelcomeGuide();
+		await disableWelcomeGuide();
 	} );
 
 	describe( 'when a template is selected from the navigation sidebar', () => {

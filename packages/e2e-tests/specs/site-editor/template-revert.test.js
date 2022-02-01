@@ -10,15 +10,9 @@ import {
 	visitAdminPage,
 	goToSiteEditor,
 	getEditedPageContent,
+	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
-
-const { disableWelcomeGuide } = siteEditor;
 
 const assertSaveButtonIsDisabled = async () =>
 	page.waitForSelector(

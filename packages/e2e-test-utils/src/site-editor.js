@@ -9,6 +9,34 @@ const SELECTORS = {
 };
 
 /**
+ * Skips the welcome guide popping up to first time users of the site editor
+ */
+export async function disableWelcomeGuide() {
+	const isWelcomeGuideActive = await page.evaluate( () =>
+		wp.data.select( 'core/edit-site' ).isFeatureActive( 'welcomeGuide' )
+	);
+	const isWelcomeGuideStyesActive = await page.evaluate( () =>
+		wp.data
+			.select( 'core/edit-site' )
+			.isFeatureActive( 'welcomeGuideStyles' )
+	);
+
+	if ( isWelcomeGuideActive ) {
+		await page.evaluate( () =>
+			wp.data.dispatch( 'core/edit-site' ).toggleFeature( 'welcomeGuide' )
+		);
+	}
+
+	if ( isWelcomeGuideStyesActive ) {
+		await page.evaluate( () =>
+			wp.data
+				.dispatch( 'core/edit-site' )
+				.toggleFeature( 'welcomeGuideStyles' )
+		);
+	}
+}
+
+/**
  * Returns a promise which resolves with the edited post content (HTML string).
  *
  * @return {Promise<string>} Promise resolving with post content markup.

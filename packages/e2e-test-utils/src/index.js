@@ -98,6 +98,10 @@ export {
 	batch as __experimentalBatch,
 } from './rest-api';
 export { openListView, closeListView } from './list-view';
-export { getEditedPageContent, goToSiteEditor } from './site-editor';
+export {
+	disableWelcomeGuide,
+	getEditedPageContent,
+	goToSiteEditor,
+} from './site-editor';
 
 export * from './mocks';

@@ -10,12 +10,8 @@ import {
 	clickBlockToolbarButton,
 	canvas,
 	goToSiteEditor,
+	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 const templatePartNameInput =
 	'.edit-site-create-template-part-modal .components-text-control__input';
@@ -35,7 +31,7 @@ describe( 'Template Part', () => {
 	describe( 'Template part block', () => {
 		beforeEach( async () => {
 			await goToSiteEditor();
-			await siteEditor.disableWelcomeGuide();
+			await disableWelcomeGuide();
 		} );
 
 		async function navigateToHeader() {

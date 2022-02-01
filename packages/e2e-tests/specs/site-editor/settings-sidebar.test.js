@@ -8,12 +8,8 @@ import {
 	selectBlockByClientId,
 	insertBlock,
 	goToSiteEditor,
+	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 async function toggleSidebar() {
 	await page.click(
@@ -54,7 +50,7 @@ describe( 'Settings sidebar', () => {
 	} );
 	beforeEach( async () => {
 		await goToSiteEditor();
-		await siteEditor.disableWelcomeGuide();
+		await disableWelcomeGuide();
 	} );
 
 	describe( 'Template tab', () => {

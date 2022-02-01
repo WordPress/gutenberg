@@ -15,12 +15,12 @@ import {
 	goToSiteEditor,
 	saveDraft,
 	insertBlock,
+	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
  */
-import { siteEditor } from '../site-editor/utils';
 import {
 	readFile,
 	deleteFile,
@@ -85,7 +85,7 @@ describe( 'Site Editor Performance', () => {
 		);
 
 		await goToSiteEditor( { postId: id, postType: 'page' } );
-		await siteEditor.disableWelcomeGuide();
+		await disableWelcomeGuide();
 
 		let i = 3;
 

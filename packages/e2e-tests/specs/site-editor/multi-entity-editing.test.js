@@ -12,12 +12,13 @@ import {
 	pressKeyWithModifier,
 	selectBlockByClientId,
 	goToSiteEditor,
+	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
  */
-import { navigationPanel, siteEditor } from './utils';
+import { navigationPanel } from './utils';
 
 const clickTemplateItem = async ( menus, itemName ) => {
 	await navigationPanel.open();
@@ -146,7 +147,7 @@ describe( 'Multi-entity editor states', () => {
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
 		await goToSiteEditor();
-		await siteEditor.disableWelcomeGuide();
+		await disableWelcomeGuide();
 		expect( await openEntitySavePanel() ).toBe( false );
 	} );
 
@@ -206,7 +207,7 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await saveAllEntities();
 			await goToSiteEditor();
-			await siteEditor.disableWelcomeGuide();
+			await disableWelcomeGuide();
 
 			// Wait for site editor to load.
 			await canvas().waitForSelector(

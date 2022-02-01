@@ -5,12 +5,8 @@ import {
 	trashAllPosts,
 	activateTheme,
 	goToSiteEditor,
+	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 describe( 'Site Editor Inserter', () => {
 	beforeAll( async () => {
@@ -23,7 +19,7 @@ describe( 'Site Editor Inserter', () => {
 	} );
 	beforeEach( async () => {
 		await goToSiteEditor();
-		await siteEditor.disableWelcomeGuide();
+		await disableWelcomeGuide();
 	} );
 
 	it( 'inserter toggle button should toggle global inserter', async () => {

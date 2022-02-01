@@ -13,12 +13,8 @@ import {
 	clickButton,
 	createReusableBlock,
 	goToSiteEditor,
+	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -268,7 +264,7 @@ describe( 'Multi-entity save flow', () => {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await siteEditor.disableWelcomeGuide();
+			await disableWelcomeGuide();
 
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
@@ -306,7 +302,7 @@ describe( 'Multi-entity save flow', () => {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await siteEditor.disableWelcomeGuide();
+			await disableWelcomeGuide();
 
 			// Insert a paragraph at the bottom.
 			await insertBlock( 'Paragraph' );

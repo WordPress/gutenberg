@@ -13,12 +13,8 @@ import {
 	activateTheme,
 	goToSiteEditor,
 	clickOnMoreMenuItem,
+	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 async function waitForFileExists( filePath, timeout = 10000 ) {
 	const start = Date.now();
@@ -46,7 +42,7 @@ describe( 'Site Editor Templates Export', () => {
 
 	beforeEach( async () => {
 		await goToSiteEditor();
-		await siteEditor.disableWelcomeGuide();
+		await disableWelcomeGuide();
 	} );
 
 	it( 'clicking export should download edit-site-export.zip file', async () => {
