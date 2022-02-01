@@ -11,7 +11,6 @@ import {
 	subscribeParentGetHtml,
 	provideToNative_Html as provideToNativeHtml,
 } from '@wordpress/react-native-bridge';
-import apiFetch from '@wordpress/api-fetch';
 // Editor component is not exposed in the pacakge because is meant to be consumed
 // internally, however we require it for rendering the editor in integration tests,
 // for this reason it's imported with path access.
@@ -52,18 +51,11 @@ export async function initializeEditor( props, { component = Editor } = {} ) {
 	const originalCAF = global.cancelAnimationFrame;
 
 	// During editor initialization, asynchronous store resolvers leverage
-	// `apiFetch` to fetch data from the REST API. The resolvers also rely upon
 	// `setTimeout` to run at the end of the current JavaScript block execution.
 	// In order to prevent "act" warnings triggered by updates to the React tree,
-	// we manually tick fake timers and await the resolution of `apiFetch`
-	// before proceeding.
+	// we manually tick fake timers and await the resolution of the current block
+	// execution before proceeding.
 	jest.useFakeTimers( 'legacy' );
-	const apiFetchResolves = [];
-	apiFetch.mockImplementation( () => {
-		return new Promise( ( resolve ) => {
-			apiFetchResolves.push( resolve );
-		} );
-	} );
 
 	// Arrange
 	const EditorComponent = component;
@@ -89,12 +81,12 @@ export async function initializeEditor( props, { component = Editor } = {} ) {
 	// Advance all timers allowing store resolvers to resolve.
 	act( () => jest.runAllTimers() );
 
-	// Await resolution of API fetches within store resolvers.
-	await act( async () => {
-		apiFetchResolves.forEach( ( resolve ) => {
-			resolve();
-		} );
-	} );
+	// The store resolvers perform several API fetches during editor
+	// initialization. The most straightforward approach to ensure all of them
+	// resolve before we consider the editor initialized is to flush micro tasks,
+	// similar to the approach found in `@testing-library/react-native`.
+	// https://github.com/callstack/react-native-testing-library/blob/a010ffdbca906615279ecc3abee423525e528101/src/flushMicroTasks.js#L15-L23
+	await act( async () => {} );
 
 	// Restore the default timer APIs for remainder of test arrangement, act, and
 	// assertion.
