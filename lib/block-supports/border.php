@@ -32,6 +32,12 @@ function gutenberg_register_border_support( $block_type ) {
 			'type' => 'string',
 		);
 	}
+
+	if ( $has_border_color_support && ! array_key_exists( 'sideBorderColors', $block_type->attributes ) ) {
+		$block_type->attributes['sideBorderColors'] = array(
+			'type' => 'object',
+		);
+	}
 }
 
 /**
@@ -50,6 +56,10 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	$classes = array();
 	$styles  = array();
+	$sides   = array( 'top', 'right', 'bottom', 'left' );
+
+	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
+	$has_border_width_support = gutenberg_has_border_feature_support( $block_type, 'width' );
 
 	// Border radius.
 	if (
@@ -88,7 +98,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Border width.
 	if (
-		gutenberg_has_border_feature_support( $block_type, 'width' ) &&
+		$has_border_width_support &&
 		isset( $block_attributes['style']['border']['width'] ) &&
 		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' )
 	) {
@@ -104,7 +114,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Border color.
 	if (
-		gutenberg_has_border_feature_support( $block_type, 'color' ) &&
+		$has_border_color_support &&
 		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
 	) {
 		$has_named_border_color  = array_key_exists( 'borderColor', $block_attributes );
@@ -120,6 +130,39 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 			$border_color = $block_attributes['style']['border']['color'];
 			$styles[]     = sprintf( 'border-color: %s;', $border_color );
 		}
+
+		// Apply individual border sides' named color classes.
+		$has_named_side_border_colors = isset( $block_attributes['sideBorderColors'] );
+
+		if ( $has_named_side_border_colors ) {
+			foreach ( $sides  as $side ) {
+				$named_border_color = _wp_array_get( $block_attributes, array( 'sideBorderColors', $side ), false );
+
+				if ( $named_border_color ) {
+					$classes[] = sprintf( 'has-border-%s-color', $side );
+					$classes[] = sprintf( 'has-%s-border-%s-color', $named_border_color, $side );
+				}
+			}
+		}
+	}
+
+	// Generate styles for individual border sides.
+	if ( $has_border_color_support || $has_border_width_support ) {
+		foreach ( $sides  as $side ) {
+			$border = _wp_array_get( $block_attributes, array( 'style', 'border', $side ), false );
+
+			if ( is_array( $border ) && ! empty( $border ) ) {
+				$split_border_attributes = gutenberg_generate_individual_border_classes_and_styles( $side, $border, $block_type );
+
+				if ( $split_border_attributes['classes'] ) {
+					$classes[] = $split_border_attributes['classes'];
+				}
+
+				if ( $split_border_attributes['styles'] ) {
+					$styles [] = $split_border_attributes['styles'];
+				}
+			}
+		}
 	}
 
 	// Collect classes and styles.
@@ -134,6 +177,54 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	}
 
 	return $attributes;
+}
+
+/**
+ * Generates CSS classes and longhand CSS styles for an individual side border.
+ *
+ * If some values are omitted from the border configuration, using shorthand
+ * styles would lead to `initial` values being used instead of the more
+ * desirable inherited values. This could also lead to browser inconsistencies.
+ *
+ * @param string        $side       The side the classes and styles are being generated for.
+ * @param array         $border     Array containing border color, style, and width values.
+ * @param WP_Block_type $block_type Block type.
+ *
+ * @return array CSS classes and longhand border styles for a single side.
+ */
+function gutenberg_generate_individual_border_classes_and_styles( $side, $border, $block_type ) {
+	$classes = array();
+	$styles  = array();
+
+	if (
+		isset( $border['width'] ) &&
+		null !== $border['width'] &&
+		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' )
+	) {
+		$styles[] = sprintf( 'border-%s-width: %s;', $side, $border['width'] );
+	}
+
+	if (
+		isset( $border['style'] ) &&
+		null !== $border['style'] &&
+		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' )
+	) {
+		$styles[] = sprintf( 'border-%s-style: %s;', $side, $border['style'] );
+	}
+
+	if (
+		isset( $border['color'] ) &&
+		null !== $border['color'] &&
+		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
+	) {
+		$classes[] = sprintf( 'has-border-%s-color', $side );
+		$styles [] = sprintf( 'border-%s-color: %s;', $side, $border['color'] );
+	}
+
+	return array(
+		'classes' => implode( ' ', $classes ),
+		'styles'  => implode( ' ', $styles ),
+	);
 }
 
 /**

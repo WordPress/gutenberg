@@ -11,12 +11,15 @@
 		align-items: flex-start;
 
 		> .components-unit-control-wrapper {
-			width: calc(50% - 26px);
+			// width: calc(50% - 26px);
+			width: 110px;
 			margin-bottom: 0;
+			margin-right: #{ $grid-unit-10 };
+			flex-shrink: 0;
 		}
 
 		.components-range-control {
-			width: calc(50% - 26px);
+			flex: 1;
 			margin-bottom: 0;
 
 			.components-base-control__field {
@@ -49,6 +52,7 @@
 	.component-border-radius-control__linked-button.has-icon {
 		display: flex;
 		justify-content: center;
+		margin-left: 2px;
 
 		svg {
 			margin-right: 0;

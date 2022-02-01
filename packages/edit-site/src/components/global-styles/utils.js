@@ -36,6 +36,22 @@ export const PRESET_METADATA = [
 				classSuffix: 'border-color',
 				propertyName: 'border-color',
 			},
+			{
+				classSuffix: 'border-top-color',
+				propertyName: 'border-top-color',
+			},
+			{
+				classSuffix: 'border-right-color',
+				propertyName: 'border-right-color',
+			},
+			{
+				classSuffix: 'border-bottom-color',
+				propertyName: 'border-bottom-color',
+			},
+			{
+				classSuffix: 'border-left-color',
+				propertyName: 'border-left-color',
+			},
 		],
 	},
 	{

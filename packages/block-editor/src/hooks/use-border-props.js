@@ -1,46 +1,28 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * Internal dependencies
  */
 import { getInlineStyles } from './style';
-import {
-	getColorClassName,
-	getColorObjectByAttributeValues,
-} from '../components/colors';
-import useSetting from '../components/use-setting';
+import { getBorderClasses, getMultiOriginColor } from './border';
+import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 
 // This utility is intended to assist where the serialization of the border
 // block support is being skipped for a block but the border related CSS classes
 // & styles still need to be generated so they can be applied to inner elements.
 
-const EMPTY_ARRAY = [];
-
 /**
  * Provides the CSS class names and inline styles for a block's border support
  * attributes.
  *
- * @param {Object} attributes             Block attributes.
- * @param {string} attributes.borderColor Selected named border color.
- * @param {Object} attributes.style       Block's styles attribute.
- *
+ * @param {Object} attributes Block attributes.
  * @return {Object} Border block support derived CSS classes & styles.
  */
-export function getBorderClassesAndStyles( { borderColor, style } ) {
-	const borderStyles = style?.border || {};
-	const borderClass = getColorClassName( 'border-color', borderColor );
-
-	const className = classnames( {
-		[ borderClass ]: !! borderClass,
-		'has-border-color': borderColor || style?.border?.color,
-	} );
+export function getBorderClassesAndStyles( attributes ) {
+	const border = attributes.style?.border || {};
+	const className = getBorderClasses( attributes );
 
 	return {
 		className: className || undefined,
-		style: getInlineStyles( { border: borderStyles } ),
+		style: getInlineStyles( { border } ),
 	};
 }
 
@@ -56,19 +38,42 @@ export function getBorderClassesAndStyles( { borderColor, style } ) {
  * @return {Object} ClassName & style props from border block support.
  */
 export function useBorderProps( attributes ) {
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const { colors } = useMultipleOriginColorsAndGradients();
 	const borderProps = getBorderClassesAndStyles( attributes );
+	const { borderColor, sideBorderColors } = attributes;
 
-	// Force inline style to apply border color when themes do not load their
-	// color stylesheets in the editor.
-	if ( attributes.borderColor ) {
-		const borderColorObject = getColorObjectByAttributeValues(
+	// Force inline styles to apply named border colors when themes do not load
+	// their color stylesheets in the editor.
+	if ( borderColor ) {
+		const borderColorObject = getMultiOriginColor( {
 			colors,
-			attributes.borderColor
-		);
+			namedColor: borderColor,
+		} );
 
 		borderProps.style.borderColor = borderColorObject.color;
 	}
+
+	if ( ! sideBorderColors ) {
+		return borderProps;
+	}
+
+	const sides = {
+		top: 'borderTopColor',
+		right: 'borderRightColor',
+		bottom: 'borderBottomColor',
+		left: 'borderLeftColor',
+	};
+
+	Object.entries( sides ).forEach( ( [ side, property ] ) => {
+		if ( sideBorderColors[ side ] ) {
+			const { color } = getMultiOriginColor( {
+				colors,
+				namedColor: sideBorderColors[ side ],
+			} );
+
+			borderProps.style[ property ] = color;
+		}
+	} );
 
 	return borderProps;
 }

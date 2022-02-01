@@ -1,17 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { __experimentalBorderRadiusControl as BorderRadiusControl } from '@wordpress/block-editor';
 import {
-	__experimentalBorderRadiusControl as BorderRadiusControl,
-	__experimentalBorderStyleControl as BorderStyleControl,
-	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-} from '@wordpress/block-editor';
-import {
+	__experimentalBorderBoxControl as BorderBoxControl,
+	__experimentalHasSplitBorders as hasSplitBorders,
+	__experimentalIsDefinedBorder as isDefinedBorder,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalUnitControl as UnitControl,
-	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
+import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -23,8 +21,6 @@ import {
 	useSetting,
 	useStyle,
 } from './hooks';
-
-const MIN_BORDER_WIDTH = 0;
 
 export function useHasBorderPanel( name ) {
 	const controls = [
@@ -69,63 +65,45 @@ function useHasBorderWidthControl( name ) {
 	);
 }
 
+function applyFallbackStyle( border ) {
+	if ( ! border ) {
+		return border;
+	}
+
+	if ( ! border.style && ( border.color || border.width ) ) {
+		return { ...border, style: 'solid' };
+	}
+
+	return border;
+}
+
+function applyAllFallbackStyles( border ) {
+	if ( ! border ) {
+		return border;
+	}
+
+	if ( hasSplitBorders( border ) ) {
+		return {
+			top: applyFallbackStyle( border.top ),
+			right: applyFallbackStyle( border.right ),
+			bottom: applyFallbackStyle( border.bottom ),
+			left: applyFallbackStyle( border.left ),
+		};
+	}
+
+	return applyFallbackStyle( border );
+}
+
 export default function BorderPanel( { name } ) {
 	// To better reflect if the user has customized a value we need to
 	// ensure the style value being checked is from the `user` origin.
 	const [ userBorderStyles ] = useStyle( 'border', name, 'user' );
-	const createHasValueCallback = ( feature ) => () =>
-		!! userBorderStyles?.[ feature ];
+	const [ border, setBorder ] = useStyle( 'border', name );
+	const colors = useColorsPerOrigin( name );
 
-	const createResetCallback = ( setStyle ) => () => setStyle( undefined );
-
-	const handleOnChange = ( setStyle ) => ( value ) => {
-		setStyle( value || undefined );
-	};
-
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' )[ 0 ] || [
-			'px',
-			'em',
-			'rem',
-		],
-	} );
-
-	// Border width.
-	const showBorderWidth = useHasBorderWidthControl( name );
-	const [ borderWidthValue, setBorderWidth ] = useStyle(
-		'border.width',
-		name
-	);
-
-	// Border style.
-	const showBorderStyle = useHasBorderStyleControl( name );
-	const [ borderStyle, setBorderStyle ] = useStyle( 'border.style', name );
-
-	// When we set a border color or width ensure we have a style so the user
-	// can see a visible border.
-	const handleOnChangeWithStyle = ( setStyle ) => ( value ) => {
-		if ( !! value && ! borderStyle ) {
-			setBorderStyle( 'solid' );
-		}
-
-		setStyle( value || undefined );
-	};
-
-	// Border color.
 	const showBorderColor = useHasBorderColorControl( name );
-	const [ borderColor, setBorderColor ] = useStyle( 'border.color', name );
-	const disableCustomColors = ! useSetting( 'color.custom' )[ 0 ];
-	const disableCustomGradients = ! useSetting( 'color.customGradient' )[ 0 ];
-
-	const borderColorSettings = [
-		{
-			label: __( 'Color' ),
-			colors: useColorsPerOrigin( name ),
-			colorValue: borderColor,
-			onColorChange: handleOnChangeWithStyle( setBorderColor ),
-			clearable: false,
-		},
-	];
+	const showBorderStyle = useHasBorderStyleControl( name );
+	const showBorderWidth = useHasBorderWidthControl( name );
 
 	// Border radius.
 	const showBorderRadius = useHasBorderRadiusControl( name );
@@ -141,60 +119,70 @@ export default function BorderPanel( { name } ) {
 		return !! borderValues;
 	};
 
-	const resetAll = () => {
-		setBorderColor( undefined );
-		setBorderRadius( undefined );
-		setBorderStyle( undefined );
-		setBorderWidth( undefined );
+	const resetBorder = () => {
+		if ( hasBorderRadius() ) {
+			return setBorder( { radius: userBorderStyles.radius } );
+		}
+
+		setBorder( undefined );
 	};
+
+	const resetAll = useCallback( () => setBorder( undefined ), [ setBorder ] );
+	const onBorderChange = useCallback(
+		( newBorder ) => {
+			// Ensure we have a visible border style when a border width or
+			// color is being selected.
+			const newBorderWithStyle = applyAllFallbackStyles( newBorder );
+
+			// As we can't conditionally generate styles based on if other
+			// style properties have been set we need to force split border
+			// definitions for user set border styles. Border radius is derived
+			// from the same property i.e. `border.radius` if it is a string
+			// that is used. The longhand border radii styles are only generated
+			// if that property is an object.
+			//
+			// For borders (color, style, and width) those are all properties on
+			// the `border` style property. This means if the theme.json defined
+			// split borders and the user condenses them into a flat border or
+			// vice-versa we'd get both sets of styles which would conflict.
+			const updatedBorder = ! hasSplitBorders( newBorderWithStyle )
+				? {
+						top: newBorderWithStyle,
+						right: newBorderWithStyle,
+						bottom: newBorderWithStyle,
+						left: newBorderWithStyle,
+				  }
+				: {
+						color: null,
+						style: null,
+						width: null,
+						...newBorderWithStyle,
+				  };
+
+			// As radius is maintained separately to color, style, and width
+			// maintain its value. Undefined values here will be cleaned when
+			// global styles are saved.
+			setBorder( { radius: border?.radius, ...updatedBorder } );
+		},
+		[ setBorder ]
+	);
 
 	return (
 		<ToolsPanel label={ __( 'Border' ) } resetAll={ resetAll }>
-			{ showBorderWidth && (
+			{ ( showBorderWidth || showBorderColor ) && (
 				<ToolsPanelItem
-					className="single-column"
-					hasValue={ createHasValueCallback( 'width' ) }
-					label={ __( 'Width' ) }
-					onDeselect={ createResetCallback( setBorderWidth ) }
+					hasValue={ () => isDefinedBorder( userBorderStyles ) }
+					label={ __( 'Border' ) }
+					onDeselect={ () => resetBorder() }
 					isShownByDefault={ true }
 				>
-					<UnitControl
-						value={ borderWidthValue }
-						label={ __( 'Width' ) }
-						min={ MIN_BORDER_WIDTH }
-						onChange={ handleOnChangeWithStyle( setBorderWidth ) }
-						units={ units }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ showBorderStyle && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ createHasValueCallback( 'style' ) }
-					label={ __( 'Style' ) }
-					onDeselect={ createResetCallback( setBorderStyle ) }
-					isShownByDefault={ true }
-				>
-					<BorderStyleControl
-						value={ borderStyle }
-						onChange={ handleOnChange( setBorderStyle ) }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ showBorderColor && (
-				<ToolsPanelItem
-					hasValue={ createHasValueCallback( 'color' ) }
-					label={ __( 'Color' ) }
-					onDeselect={ createResetCallback( setBorderColor ) }
-					isShownByDefault={ true }
-				>
-					<ColorGradientSettingsDropdown
-						__experimentalHasMultipleOrigins
-						__experimentalIsRenderedInSidebar
-						disableCustomColors={ disableCustomColors }
-						disableCustomGradients={ disableCustomGradients }
-						enableAlpha
-						settings={ borderColorSettings }
+					<BorderBoxControl
+						colors={ colors }
+						onChange={ onBorderChange }
+						showStyle={ showBorderStyle }
+						value={ border }
+						__experimentalHasMultipleOrigins={ true }
+						__experimentalIsRenderedInSidebar={ true }
 					/>
 				</ToolsPanelItem>
 			) }
@@ -202,12 +190,14 @@ export default function BorderPanel( { name } ) {
 				<ToolsPanelItem
 					hasValue={ hasBorderRadius }
 					label={ __( 'Radius' ) }
-					onDeselect={ createResetCallback( setBorderRadius ) }
+					onDeselect={ () => setBorderRadius( undefined ) }
 					isShownByDefault={ true }
 				>
 					<BorderRadiusControl
 						values={ borderRadiusValues }
-						onChange={ handleOnChange( setBorderRadius ) }
+						onChange={ ( value ) => {
+							setBorderRadius( value || undefined );
+						} }
 					/>
 				</ToolsPanelItem>
 			) }
