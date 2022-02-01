@@ -81,6 +81,7 @@ const blockAttributes = {
 	},
 };
 
+// v8: deprecated to remove duplicated gradient classes and swap `wp-block-cover__gradient-background` for `wp-block-cover__background`.
 const v8 = {
 	attributes: {
 		...blockAttributes,
