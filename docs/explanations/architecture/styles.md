@@ -3,11 +3,15 @@
 This document introduces the main concepts related to styles that affect the user content in the block editor. It points to the relevant reference guides and tutorials for readers to dig deeper into each one of the ideas presented. It's aimed to block authors and people working in the block editor project.
 
 1. HTML and CSS
-2. User-provided Block Styles
-    - From UI controls to HTML markup
-    - Block Supports API
-    - Current limits of the Block Supports API
-3. User-provided Global Styles
+2. Block styles
+  - From UI controls to HTML markup
+  - Block Supports API
+  - Current limits of the Block Supports API
+3. Global styles
+  - Gather data
+  - Consolidate data
+  - From data to styles
+  - Current limits of the Global styles API
 
 ### 1. HTML and CSS
 
@@ -27,7 +31,7 @@ The stylesheets loaded in the front end include:
 - **User**. Some of the user actions in the editor will generate style content. This is the case for features such as duotone, layout, or link color.
 - **Other**. WordPress and plugins can also enqueue stylesheets.
 
-### 2. User-provided block styles
+### 2. Block styles
 
 Since the introduction of the block editor in WordPress 5.0, there were tools for the users to "add styles" to specific blocks. By using these tools, the user would attach new classes or inline styles to the blocks, modifying their visual aspect.
 
@@ -141,6 +145,309 @@ This means that the typography block support will do all of the things (create a
 
 Note that, once `__experimentalSkipSerialization` is enabled for a group (typography, color, spacing) it affects all block supports within this group (font size, line height, and font family within typography, and so on). There's [ongoing work](https://github.com/WordPress/gutenberg/pull/36293) to be able to disable block supports individually, you can follow that issue to check the status.
 
-### 3. User-provided Global Styles
+### 3. Global styles
 
-TODO.
+Global Styles refers to a mechanism that generates site-wide styles. Unlike the block styles described in the previous section, these are not serialized into the post content, they're not attached to the block HTML. Instead, the output of this system is a new stylesheet with id `global-styles-inline-css`.
+
+This mechanism was [introduced in WordPress 5.8](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/). At the time, it only took data from WordPress and the active theme. WordPress 5.9 expanded the system to also take style data from users.
+
+This is the general data flow:
+
+![global-styles-input-output](./assets/global-styles-input-output.png)
+
+The process of generating the stylesheet has, in essence, three steps:
+
+1. Gather data: the `theme.json` file [bundled with WordPress](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/theme.json)), the `theme.json` file of the active theme if it exists, and the user's styles provided via the global styles UI in the site editor.
+2. Consolidate data: the structured information coming from different origins -WordPress defaults, theme, and user- is normalized and merged into a single structure.
+3. Convert data into a stylesheet: convert the internal representation into CSS style rules and enqueue them as a stylesheet.
+
+#### Gather data
+
+The data can come from three different origins: WordPress defaults, the active theme, or the user. All three of them use the same [`theme.json` format](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/).
+
+ Data from WordPress and the active theme is retrieved from the corresponding `theme.json` file. Data from the user is pulled from the database, where it's stored after the user saves the changes they did via the global styles sidebar in the site editor.
+
+#### Consolidate data
+
+The goal of this phase is to build a consolidated structure.
+
+There's two important processes going on in this phase. First, the system needs to normalize all the incoming data, as different origins may be using different versions of the `theme.json` format. For example, a theme may be using [v1](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-v1/) while the WordPress base is using [the latest version](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/). Second, the system needs to decide how to merge the input into a single structure. This will be the focus of the the following sections.
+
+##### Styles
+
+Different parts of the incoming `theme.json` structure are treated differently. The data present in the `styles` section is blended together following this logic: user data overrides theme data, and theme data overrides WordPress data.
+
+For example, if we had the following three `theme.json` structures coming from WordPress, the theme, and the user respectively:
+
+```json
+{
+  "styles": {
+    "color": {
+      "background": <WordPress value>
+	},
+    "typography": {
+      "fontSize": <WordPress value>
+	}
+  }
+}
+```
+
+```json
+{
+  "styles": {
+    "typography": {
+      "fontSize": <theme value>,
+      "lineHeight": <theme value>
+	}
+  }
+}
+```
+
+```json
+{
+  "styles": {
+    "typography": {
+      "lineHeight": <user value>
+	}
+  }
+}
+```
+
+The result after the consolidation would be:
+
+```json
+{
+  "styles": {
+    "color": {
+      "background": <WordPress value>
+    },
+    "typography": {
+      "fontSize": <theme value>
+      "lineHeight": <user value>
+	}
+  }
+}
+```
+
+##### Settings
+
+The `settings` section works differently than styles. Most of the settings are only used to configure the editor and have no effect on the global styles. Only a few of them are part of the resulting stylesheet: the presets.
+
+Presets are the predefined styles that are shown to the user in different parts of the UI: the color palette or the font sizes, for example. They comprise the following settings: `color.duotone`, `color.gradients`, `color.palette`, `typography.fontFamilies`, `typography.fontSizes`. Unlike `styles`, presets from an origin don't override values from other origins. Instead, all of them are stored in the consolidated structure.
+
+For example, if we have the following `theme.json` structures coming from WordPress, the theme, and the user respectively:
+
+```json
+{
+  "settings": {
+    "color": {
+      "palette": [ <WordPress values> ],
+      "gradients": [ <WordPress values> ]
+	}
+  }
+}
+```
+
+```json
+{
+  "settings": {
+    "color": {
+      "palette": [ <theme values> ]
+	},
+    "typography": {
+      "fontFamilies": [ <theme values> ]
+	}
+  }
+}
+```
+
+```json
+{
+  "settings": {
+    "color": {
+      "palette": [ <user values> ]
+	}
+  }
+}
+```
+
+The result after the consolidation would be:
+
+```json
+{
+  "settings": {
+    "color": {
+      "palette": {
+        "default": [ <WordPress values> ],
+        "theme": [ <theme values> ],
+        "user": [ <user values> ]
+	  },
+	  "gradients": {
+        "default": [ <WordPress values> ]
+	  }
+    },
+    "typography": {
+      "fontFamilies": {
+        "theme": [ <theme values> ]
+	  }
+	}
+  }
+}
+```
+
+#### From data to styles
+
+The last phase of generating the stylesheet is converting the consolidated data into CSS style rules.
+
+##### Styles to CSS rules
+
+The `styles` section can be thought as a structured representation of CSS rules, each chunk representing a CSS rule:
+
+- A key/value in theme.json maps to a CSS declaration (`property: value`).
+- The CSS selector for a given chunk is generated based on its semantics:
+	- The top-level section uses the `body` selector.
+	- The top-level elements use a ID selector matching the HTML element they represent (for example, `h1` or `a`).
+	- Blocks use the default class name they generate (`core/group` becomes `.wp-block-group`) unless they explicitly set a different one using their `block.json` (`core/paragraph` becomes `p`). See the "Current limits" section for more about this.
+	- Elements within a block use the concatenation of the block and element selector.
+
+For example, the following `theme.json` structure:
+
+```json
+{
+  "styles": {
+    "typography": {
+      "fontSize": <top-level value>
+	},
+    "elements": {
+      "h1": {
+        "typography": {
+          "fontSize": <h1 value>
+		}
+	  }
+	},
+	"blocks": 
+      "core/paragraph": {
+        "color": {
+          "text": <paragraph value>
+		}
+	  }
+      "core/group": {
+        "color": {
+          "text": <group value>
+		},
+		"elements": {
+          "h1": {
+            "color": {
+              "text": <h1 within group value>
+			}
+		  }
+		}
+	  },
+	}
+  }
+}
+```
+
+is converted to the following CSS:
+
+```css
+body {
+  font-size: <top-level value>;
+}
+h1 {
+  font-size: <h1 value>;
+}
+p {
+  color: <paragraph value>;
+}
+.wp-block-group {
+  color: <group value>;
+}
+.wp-block-group h1 {
+  color: <h1 within group value>;
+}
+```
+
+##### Settings to CSS rules
+
+From the `settings` section, all the values of any given presets will be converted to a CSS Custom Property that follows this name structure: `--wp--preset--<category>-<slug>`. The selectors follow the same rules described in the styles section above.
+
+For example, the following theme.json
+
+```json
+{
+  "settings": {
+    "color": {
+      "palette": {
+        "default": [
+          { "slug": "vivid-red", "value": "#cf2e2e", "name": "Vivid Red" }
+        ],
+        "theme": [
+          { "slug": "foreground", "value": "#000", "name": "Foreground" }
+		]
+      }
+	},
+    "blocks": {
+      "core/site-title": {
+        "color": {
+          "palette": {
+            "theme": [
+              { "slug": "foreground", "value": "#1a4548", "name": "Foreground" }
+			]
+		  }
+		}
+	  }
+	}
+  }
+}
+```
+
+Will be converted to the following CSS style rule:
+
+```CSS
+body {
+  --wp--preset--color--vivid-red: #cf2e2e;
+  --wp--preset--color--foreground: #000;
+}
+
+.wp-block-site-title {
+  --wp--preset--color--foreground: #1a4548;
+}
+```
+
+In addition to the CSS Custom Properties, all presets but duotone generate CSS classes for each value. The example above will generate the following CSS classes as well:
+
+```CSS
+/* vivid-red */
+.has-vivid-red-color { color: var(--wp--preset--color--vivid-red) !important; }
+.has-vivid-red-background-color { background-color: var(--wp--preset--color--vivid-red) !important; }
+.has-vivid-red-bordfer-color { border-color: var(--wp--preset--color--vivid-red) !important; }
+
+/* foreground */
+.has-foreground-color { color: var(--wp--preset--color--foreground) !important; }
+.has-foreground-background-color { background-color: var(--wp--preset--color--foreground) !important; }
+.has-foreground-border-color { border-color: var(--wp--preset--color--foreground) !important; }
+
+/* foreground within site title*/
+.wp-block-site-title .has-foreground-color { color: var(--wp--preset--color--foreground) !important; }
+.wp-block-site-title .has-foreground-background-color { background-color: var(--wp--preset--color--foreground) !important; }
+.wp-block-site-title .has-foreground-border-color { border-color: var(--wp--preset--color--foreground) !important; }
+```
+
+#### Current limits of the Global Styles API
+
+##### Set a different CSS selector for blocks requires server-registration
+
+By default, the selector asigned to a block is `.wp-block-<block-name>`. However, blocks can change this should they need. They can provide a CSS selector via the `__experimentalSelector` property in its `block.json`.
+
+If blocks do this, they need to be registered in the server using the `block.json`, otherwise, the global styles code doesn't have access to that information and will use the default CSS selector for the block.
+
+##### Can't target different parts of the block
+
+Every chunk of styles can only use a single selector.
+
+This is particularly relevant if the block is using `__experimentalSkipSerialization` to serialize the different style properties to different nodes other than the wrapper. See "Current limits of blocks supports" for more.
+
+##### Only a single property per block
+
+Similarly to block supports, there can be only one instance of any style in use by the block. For example, the block can only have a single font size. See related "Current limits of block supports".
