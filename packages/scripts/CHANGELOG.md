@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 20.0.2 (2022-01-31)
+
+### Bug Fix
+
+-   Fix the `build` command that does not generate assets on Windows OS ([#38348](https://github.com/WordPress/gutenberg/pull/38348)).
+-   Adds fallback to `src/index.js` when no valid scripts discovered in metadata files when running the `build` command ([#38367](https://github.com/WordPress/gutenberg/pull/38367)).
+
+## 20.0.1 (2022-01-28)
+
+### Bug Fix
+
+-   Ensure that React Fast Refresh is not wired when it isn't explicitly enabled with `--hot` CLI argument when running the `start` command.
+
+## 20.0.0 (2022-01-27)
+
 ### Breaking Changes
 
 -   The bundled `eslint` dependency has been updated from requiring `^7.17.0` to requiring `^8.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
@@ -15,7 +30,7 @@
 ### New Features
 
 -   Added a new `plugin-zip` command to create a zip file for a WordPress plugin ([#37687](https://github.com/WordPress/gutenberg/pull/37687)).
--   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)).
+-   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)). For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed.
 -   Automatically copy `block.json` files located in the `src` folder and its subfolders to the output folder (`build` by default) ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
 -   Scan the `src` directory for `block.json` files to detect defined scripts to use them as entry points with the `start` and `build` commands. ([#37661](https://github.com/WordPress/gutenberg/pull/37661)).
 

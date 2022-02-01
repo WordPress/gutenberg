@@ -189,7 +189,7 @@ describe( 'Register Gutenberg', () => {
 		const screen = initializeEditor( {}, { component: EditorComponent } );
 		const blockList = screen.getByTestId( 'block-list-wrapper' );
 
-		expect( blockList ).toHaveProperty( 'type', 'View' );
+		expect( blockList ).toBeVisible();
 		expect( console ).toHaveLoggedWith( 'Hermes is: true' );
 		// It's expected that some blocks are upgraded and inform about it (example: "Updated Block: core/cover")
 		expect( console ).toHaveInformed();

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0 (2022-01-27)
+
 ### Breaking Changes
 
 -   The peer `puppeteer` dependency has been updated from requiring `>=1.19` to requiring `>=11` (see [Breaking Changes](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0), [#36040](https://github.com/WordPress/gutenberg/pull/36040)).

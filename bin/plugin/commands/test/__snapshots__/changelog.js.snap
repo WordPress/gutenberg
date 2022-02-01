@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
-"### Enhancements
+exports[`getChangelog verify that the changelog is properly formatted 1`] = `
+"## Changelog
+
+### Enhancements
 
 - Scripts: Use cssnano to minimize CSS files with build. ([33750](https://github.com/WordPress/gutenberg/pull/33750))
 - Scripts: Webpack configuration update to minimize CSS. ([33676](https://github.com/WordPress/gutenberg/pull/33676))
@@ -205,5 +207,17 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 - Try: Reduce specificity of reset & classic styles. ([32659](https://github.com/WordPress/gutenberg/pull/32659))
 
 
+"
+`;
+
+exports[`getContributors verify that the contributors list is properly formatted 1`] = `
+"## First time contributors
+
+The following PRs were merged by first time contrbutors:
+
+- @alexstine: Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))
+- @amir2mi: Example for rest_endpoints filter in PHP. ([33738](https://github.com/WordPress/gutenberg/pull/33738))
+- @christianztamayo: Scripts: Webpack configuration update to minimize CSS. ([33676](https://github.com/WordPress/gutenberg/pull/33676))
+- @kapilpaul: Add spaces in add_theme_support documentation code. ([33796](https://github.com/WordPress/gutenberg/pull/33796))
 "
 `;

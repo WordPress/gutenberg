@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
 import {
 	Placeholder,
 	Button,
@@ -124,7 +123,6 @@ export default function NavigationPlaceholder( {
 		isResolvingPages,
 		menus,
 		isResolvingMenus,
-		hasPages,
 		hasMenus,
 	} = useNavigationEntities();
 
@@ -132,11 +130,6 @@ export default function NavigationPlaceholder( {
 
 	const onCreateEmptyMenu = () => {
 		onFinishMenuCreation( [] );
-	};
-
-	const onCreateAllPages = () => {
-		const block = [ createBlock( 'core/page-list' ) ];
-		onFinishMenuCreation( block );
 	};
 
 	const { navigationMenus } = useNavigationMenu();
@@ -181,18 +174,6 @@ export default function NavigationPlaceholder( {
 									<hr />
 								</>
 							) : undefined }
-							{ canUserCreateNavigation && hasPages ? (
-								<>
-									<Button
-										variant="tertiary"
-										onClick={ onCreateAllPages }
-									>
-										{ __( 'Add all pages' ) }
-									</Button>
-									<hr />
-								</>
-							) : undefined }
-
 							{ canUserCreateNavigation && (
 								<Button
 									variant="tertiary"
