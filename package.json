@@ -81,8 +81,7 @@
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
-		"@wordpress/wordcount": "file:packages/wordcount",
-		"memize": "1.1.0"
+		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
 		"@actions/core": "1.4.0",
