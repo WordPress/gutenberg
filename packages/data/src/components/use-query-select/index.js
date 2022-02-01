@@ -10,7 +10,6 @@ import useSelect from '../use-select';
 import { META_SELECTORS } from '../../store';
 
 /** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
-/** @typedef {import('../../types').QuerySelectResponse} QuerySelectResponse */
 
 /**
  * Like useSelect, but the selectors return objects containing
