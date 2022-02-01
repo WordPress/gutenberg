@@ -28,7 +28,7 @@ import { isClientIdSelected } from './utils';
  * @param {Array}  draggedClientIds a list of dragged client ids
  * @return {number} block count
  */
-export function countBlocks( block, expandedState, draggedClientIds ) {
+function countBlocks( block, expandedState, draggedClientIds ) {
 	const isDragged = draggedClientIds?.includes( block.clientId );
 	if ( isDragged ) {
 		return 0;
