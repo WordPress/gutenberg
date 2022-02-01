@@ -142,7 +142,6 @@ export {
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
 	__experimentalGetBlockAttributesNamesByRole,
-	__experimentalRemoveAttributesByRole,
 } from './utils';
 
 // Templates are, in a general sense, a basic collection of block nodes with any
