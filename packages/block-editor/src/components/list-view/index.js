@@ -27,6 +27,7 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import { store as blockEditorStore } from '../../store';
 
+const noop = () => {};
 const expanded = ( state, action ) => {
 	switch ( action.type ) {
 		case 'expand':
@@ -56,7 +57,7 @@ const expanded = ( state, action ) => {
 function ListView(
 	{
 		blocks,
-		onSelect,
+		onSelect = noop,
 		__experimentalFeatures,
 		__experimentalPersistentListViewFeatures,
 		__experimentalHideContainerBlockActions,
@@ -71,7 +72,16 @@ function ListView(
 		draggedClientIds,
 		selectedClientIds,
 	} = useListViewClientIds( blocks );
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { clearSelectedBlock, multiSelect, selectBlock } = useDispatch(
+		blockEditorStore
+	);
+	const {
+		getBlockParents,
+		getBlockSelectionStart,
+		hasMultiSelection,
+		hasSelectedBlock,
+	} = useSelect( blockEditorStore );
+
 	const { visibleBlockCount } = useSelect(
 		( select ) => {
 			const { getGlobalBlockCount, getClientIdsOfDescendants } = select(
@@ -88,13 +98,61 @@ function ListView(
 		[ draggedClientIds ]
 	);
 	const selectEditorBlock = useCallback(
-		( clientId, event ) => {
-			if ( ! onSelect ) {
-				selectBlock( clientId );
+		async ( clientId, event ) => {
+			if ( ! event.shiftKey ) {
+				await clearSelectedBlock();
+				selectBlock( clientId, -1 );
+			} else if ( event.shiftKey ) {
+				event.preventDefault();
+
+				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
+					selectBlock( clientId, -1 );
+					return;
+				}
+
+				const blockSelectionStart = getBlockSelectionStart();
+
+				// By checking `blockSelectionStart` to be set, we handle the
+				// case where we select a single block. We also have to check
+				// the selectionEnd (clientId) not to be included in the
+				// `blockSelectionStart`'s parents because the click event is
+				// propagated.
+				const startParents = getBlockParents( blockSelectionStart );
+
+				if (
+					blockSelectionStart &&
+					blockSelectionStart !== clientId &&
+					! startParents?.includes( clientId )
+				) {
+					const startPath = [ ...startParents, blockSelectionStart ];
+					const endPath = [
+						...getBlockParents( clientId ),
+						clientId,
+					];
+					const depth =
+						Math.min( startPath.length, endPath.length ) - 1;
+					const start = startPath[ depth ];
+					const end = endPath[ depth ];
+
+					// Handle the case of having selected a parent block and
+					// then shift+click on a child.
+					if ( start !== end ) {
+						multiSelect( start, end );
+					}
+				}
 			}
-			onSelect( clientId, event );
+			onSelect( clientId );
 		},
-		[ selectBlock, onSelect ]
+		[
+			clearSelectedBlock,
+			getBlockParents,
+			getBlockSelectionStart,
+			hasMultiSelection,
+			hasSelectedBlock,
+			multiSelect,
+			selectBlock,
+			onSelect,
+		]
 	);
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
