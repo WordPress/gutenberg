@@ -13,6 +13,9 @@ import {
 	useEffect,
 	useMemo,
 	useReducer,
+	Children,
+	isValidElement,
+	cloneElement,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
@@ -257,6 +260,17 @@ function Iframe(
 		</>
 	);
 
+	const childrenWithProps = Children.map( children, ( child ) => {
+		// Checking isValidElement is the safe way and avoids a typescript
+		// error too.
+		if ( isValidElement( child ) ) {
+			return cloneElement( child, {
+				iframeDocument,
+			} );
+		}
+		return child;
+	} );
+
 	return (
 		<>
 			{ tabIndex >= 0 && before }
@@ -278,7 +292,7 @@ function Iframe(
 								) }
 							>
 								<StyleProvider document={ iframeDocument }>
-									{ children }
+									{ childrenWithProps }
 								</StyleProvider>
 							</body>
 						</>,

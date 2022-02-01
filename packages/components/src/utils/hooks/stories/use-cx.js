@@ -7,6 +7,7 @@ import { css } from '@emotion/react';
  * WordPress dependencies
  */
 import { __unstableIframe as Iframe } from '@wordpress/block-editor';
+// import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -90,6 +91,72 @@ export const _slotFillSimple = () => {
 			</Iframe>
 			<Slot bubblesVirtually name="test-slot" />
 		</SlotFillProvider>
+	);
+};
+
+// export const _iframe = () => {
+// 	const iFrameRef = useRef( null );
+
+// 	const redText = css`
+// 		color: red;
+// 	`;
+// 	const blueText = css`
+// 		color: blue;
+// 	`;
+
+// 	return (
+// 		<Iframe ref={ iFrameRef }>
+// 			<Example args={ [ redText ] }>This text should be red</Example>
+// 			<StyleProvider document={ iFrameRef.current?.contentDocument }>
+// 				<Example args={ [ blueText ] }>
+// 					This text should be blue
+// 				</Example>
+// 			</StyleProvider>
+// 		</Iframe>
+// 	);
+// };
+// export const _iframe = () => {
+// 	const redText = css`
+// 		color: red;
+// 	`;
+// 	const blueText = css`
+// 		color: blue;
+// 	`;
+
+// 	const Content = ( { iframeDocument } ) => (
+// 		<>
+// 			<Example args={ [ redText ] }>This text should be red</Example>
+// 			<StyleProvider document={ iframeDocument }>
+// 				<Example args={ [ blueText ] }>
+// 					This text should be blue
+// 				</Example>
+// 			</StyleProvider>
+// 		</>
+// 	);
+
+// 	return (
+// 		<Iframe>
+// 			<Content />
+// 		</Iframe>
+// 	);
+// };
+export const _iframe = () => {
+	const redText = css`
+		color: red;
+	`;
+	const blueText = css`
+		color: blue;
+	`;
+
+	return (
+		<Iframe>
+			<Example args={ [ redText ] }>This text should be red</Example>
+			<StyleProvider document={ document }>
+				<Example args={ [ blueText ] }>
+					This text should be blue
+				</Example>
+			</StyleProvider>
+		</Iframe>
 	);
 };
 
