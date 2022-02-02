@@ -317,6 +317,17 @@ $color-control-label-height: 20px;
 	}
 }
 
+// Selected "Start empty" state.
+// In this state, the block is entirely empty and will collapse to zero height unless there's
+// content inside. The below rule lets the placeholder staty in an invisible state to avoid
+// collapse and layout shift.
+// @todo: This fix could be augmented with showing the generic appender when there are no
+// innerblocks, a la how the Row block does it.
+.wp-block-navigation.is-selected .wp-block-navigation__container .wp-block-navigation-placeholder__preview:first-of-type {
+	visibility: hidden;
+	display: flex;
+}
+
 // Selected state.
 .wp-block-navigation-placeholder__preview,
 .wp-block-navigation-placeholder__controls {
