@@ -370,7 +370,7 @@ p {
 
 ##### Settings to CSS rules
 
-From the `settings` section, all the values of any given presets will be converted to a CSS Custom Property that follows this name structure: `--wp--preset--<category>-<slug>`. The selectors follow the same rules described in the styles section above.
+From the `settings` section, all the values of any given presets will be converted to a CSS Custom Property that follows this naming structure: `--wp--preset--<category>-<slug>`. The selectors follow the same rules described in the styles section above.
 
 For example, the following theme.json
 
