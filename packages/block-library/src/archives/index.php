@@ -16,8 +16,8 @@
  */
 function render_block_core_archives( $attributes ) {
 	$show_post_count = ! empty( $attributes['showPostCounts'] );
-
-	$class = '';
+	$type            = isset( $attributes['archiveType'] ) ? $attributes['archiveType'] : 'monthly';
+	$class           = '';
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
 
@@ -30,7 +30,7 @@ function render_block_core_archives( $attributes ) {
 		$dropdown_args = apply_filters(
 			'widget_archives_dropdown_args',
 			array(
-				'type'            => 'monthly',
+				'type'            => $type,
 				'format'          => 'option',
 				'show_post_count' => $show_post_count,
 			)
@@ -79,7 +79,7 @@ function render_block_core_archives( $attributes ) {
 	$archives_args = apply_filters(
 		'widget_archives_args',
 		array(
-			'type'            => 'monthly',
+			'type'            => $type,
 			'show_post_count' => $show_post_count,
 		)
 	);
