@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Gallery block cancels uploads (TC009 - Choose from device (stay in editor) - Cancel upload) 1`] = `
+"<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":null} -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"id\\":null} -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
 exports[`Gallery block finishes pending uploads upon opening the editor (TC001 - Close/Re-open post with an ongoing image upload) 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->

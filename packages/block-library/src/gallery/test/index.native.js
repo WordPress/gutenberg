@@ -20,11 +20,13 @@ import {
 	MEDIA_UPLOAD_STATE_UPLOADING,
 	MEDIA_UPLOAD_STATE_SUCCEEDED,
 	MEDIA_UPLOAD_STATE_FAILED,
+	MEDIA_UPLOAD_STATE_RESET,
 } from '@wordpress/block-editor';
 import {
 	getOtherMediaOptions,
 	requestMediaPicker,
 	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
 	subscribeMediaUpload,
 } from '@wordpress/react-native-bridge';
 
@@ -746,6 +748,124 @@ describe( 'Gallery block', () => {
 				mediaServerId: MEDIA[ 1 ].serverId,
 			} );
 		} );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'cancels uploads (TC009 - Choose from device (stay in editor) - Cancel upload)', async () => {
+		const mediaUploadListeners = [];
+		subscribeMediaUpload.mockImplementation( ( callback ) => {
+			mediaUploadListeners.push( callback );
+			return { remove: jest.fn() };
+		} );
+		const triggerMediaUpload = ( payload ) =>
+			mediaUploadListeners.forEach( ( listener ) => listener( payload ) );
+
+		let mediaPickerCallback;
+		requestMediaPicker.mockImplementation(
+			( source, filter, multiple, callback ) => {
+				mediaPickerCallback = callback;
+			}
+		);
+
+		// Initialize with an empty gallery
+		const { galleryBlock, getByText } = initializeWithGalleryBlock(
+			GALLERY_EMPTY,
+			{
+				hasItems: false,
+			}
+		);
+		fireEvent.press( galleryBlock );
+
+		// Upload images from device
+		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Choose from device' ) );
+		expect( requestMediaPicker ).toHaveBeenCalledWith(
+			'DEVICE_MEDIA_LIBRARY',
+			[ 'image' ],
+			true,
+			mediaPickerCallback
+		);
+
+		// Return media items picked
+		await act( async () =>
+			mediaPickerCallback( [
+				{
+					type: 'image',
+					url: MEDIA[ 0 ].localUrl,
+					id: MEDIA[ 0 ].localId,
+				},
+				{
+					type: 'image',
+					url: MEDIA[ 1 ].localUrl,
+					id: MEDIA[ 1 ].localId,
+				},
+			] )
+		);
+
+		// Check that gallery items are visible
+		fireEvent(
+			within( galleryBlock ).getByTestId( 'block-list-wrapper' ),
+			'layout',
+			{
+				nativeEvent: {
+					layout: {
+						width: 100,
+					},
+				},
+			}
+		);
+		const galleryItem1 = within( galleryBlock ).getByA11yLabel(
+			/Image Block\. Row 1/
+		);
+		const galleryItem2 = within( galleryBlock ).getByA11yLabel(
+			/Image Block\. Row 2/
+		);
+		expect( galleryItem1 ).toBeVisible();
+		expect( galleryItem2 ).toBeVisible();
+
+		// Check that images are showing a loading state
+		await act( async () => {
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_UPLOADING,
+				mediaId: MEDIA[ 0 ].localId,
+				progress: 0.5,
+			} );
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_UPLOADING,
+				mediaId: MEDIA[ 1 ].localId,
+				progress: 0.25,
+			} );
+		} );
+		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
+		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
+
+		// Cancel uploads
+		fireEvent.press( galleryItem1 );
+		fireEvent.press( within( galleryItem1 ).getByTestId( 'spinner' ) );
+		expect( requestImageUploadCancelDialog ).toHaveBeenCalledWith(
+			MEDIA[ 0 ].localId
+		);
+		await act( async () =>
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_RESET,
+				mediaId: MEDIA[ 0 ].localId,
+				progress: 0,
+			} )
+		);
+
+		fireEvent.press( galleryItem2 );
+		fireEvent.press( within( galleryItem2 ).getByTestId( 'spinner' ) );
+		expect( requestImageUploadCancelDialog ).toHaveBeenCalledWith(
+			MEDIA[ 1 ].localId
+		);
+		await act( async () =>
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_RESET,
+				mediaId: MEDIA[ 1 ].localId,
+				progress: 0,
+			} )
+		);
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
