@@ -183,11 +183,11 @@ For example, if we had the following three `theme.json` structures coming from W
 {
   "styles": {
     "color": {
-      "background": <WordPress value>
-	},
+      "background": "<WordPress value>"
+    },
     "typography": {
-      "fontSize": <WordPress value>
-	}
+      "fontSize": "<WordPress value>"
+    }
   }
 }
 ```
@@ -196,9 +196,9 @@ For example, if we had the following three `theme.json` structures coming from W
 {
   "styles": {
     "typography": {
-      "fontSize": <theme value>,
-      "lineHeight": <theme value>
-	}
+      "fontSize": "<theme value>",
+      "lineHeight": "<theme value>"
+    }
   }
 }
 ```
@@ -207,8 +207,8 @@ For example, if we had the following three `theme.json` structures coming from W
 {
   "styles": {
     "typography": {
-      "lineHeight": <user value>
-	}
+      "lineHeight": "<user value>"
+    }
   }
 }
 ```
@@ -219,12 +219,12 @@ The result after the consolidation would be:
 {
   "styles": {
     "color": {
-      "background": <WordPress value>
+      "background": "<WordPress value>"
     },
     "typography": {
-      "fontSize": <theme value>
-      "lineHeight": <user value>
-	}
+      "fontSize": "<theme value>",
+      "lineHeight": "<user value>"
+    }
   }
 }
 ```
@@ -241,9 +241,9 @@ For example, if we have the following `theme.json` structures coming from WordPr
 {
   "settings": {
     "color": {
-      "palette": [ <WordPress values> ],
-      "gradients": [ <WordPress values> ]
-	}
+      "palette": [ "<WordPress values>" ],
+      "gradients": [ "<WordPress values>" ]
+    }
   }
 }
 ```
@@ -252,11 +252,11 @@ For example, if we have the following `theme.json` structures coming from WordPr
 {
   "settings": {
     "color": {
-      "palette": [ <theme values> ]
-	},
+      "palette": [ "<theme values>" ]
+    },
     "typography": {
-      "fontFamilies": [ <theme values> ]
-	}
+      "fontFamilies": [ "<theme values>" ]
+    }
   }
 }
 ```
@@ -265,8 +265,8 @@ For example, if we have the following `theme.json` structures coming from WordPr
 {
   "settings": {
     "color": {
-      "palette": [ <user values> ]
-	}
+      "palette": [ "<user values>" ]
+    }
   }
 }
 ```
@@ -278,19 +278,19 @@ The result after the consolidation would be:
   "settings": {
     "color": {
       "palette": {
-        "default": [ <WordPress values> ],
-        "theme": [ <theme values> ],
-        "user": [ <user values> ]
-	  },
-	  "gradients": {
-        "default": [ <WordPress values> ]
-	  }
+        "default": [ "<WordPress values>" ],
+        "theme": [ "<theme values>" ],
+        "user": [ "<user values>" ]
+      },
+      "gradients": {
+        "default": [ "<WordPress values>" ]
+      }
     },
     "typography": {
       "fontFamilies": {
-        "theme": [ <theme values> ]
-	  }
-	}
+        "theme": [ "<theme values>" ]
+      }
+    }
   }
 }
 ```
@@ -316,34 +316,34 @@ For example, the following `theme.json` structure:
 {
   "styles": {
     "typography": {
-      "fontSize": <top-level value>
-	},
+      "fontSize": "<top-level value>"
+    },
     "elements": {
       "h1": {
         "typography": {
-          "fontSize": <h1 value>
-		}
-	  }
-	},
-	"blocks": 
+          "fontSize": "<h1 value>"
+      }
+    }
+  },
+  "blocks": 
       "core/paragraph": {
         "color": {
           "text": <paragraph value>
-		}
-	  }
+        }
+      }
       "core/group": {
         "color": {
           "text": <group value>
-		},
-		"elements": {
+        },
+        "elements": {
           "h1": {
             "color": {
               "text": <h1 within group value>
-			}
-		  }
-		}
-	  },
-	}
+            }
+          }
+        }
+      },
+    }
   }
 }
 ```
@@ -384,20 +384,20 @@ For example, the following theme.json
         ],
         "theme": [
           { "slug": "foreground", "value": "#000", "name": "Foreground" }
-		]
+        ]
       }
-	},
+    },
     "blocks": {
       "core/site-title": {
         "color": {
           "palette": {
             "theme": [
               { "slug": "foreground", "value": "#1a4548", "name": "Foreground" }
-			]
-		  }
-		}
-	  }
-	}
+            ]
+          }
+        }
+      }
+    }
   }
 }
 ```
