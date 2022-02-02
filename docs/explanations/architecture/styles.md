@@ -147,7 +147,7 @@ Note that, once `__experimentalSkipSerialization` is enabled for a group (typogr
 
 ### 3. Global styles
 
-Global Styles refers to a mechanism that generates site-wide styles. Unlike the block styles described in the previous section, these are not serialized into the post content, they're not attached to the block HTML. Instead, the output of this system is a new stylesheet with id `global-styles-inline-css`.
+Global Styles refers to a mechanism that generates site-wide styles. Unlike the block styles described in the previous section, these are not serialized into the post content and are not attached to the block HTML. Instead, the output of this system is a new stylesheet with id `global-styles-inline-css`.
 
 This mechanism was [introduced in WordPress 5.8](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/). At the time, it only took data from WordPress and the active theme. WordPress 5.9 expanded the system to also take style data from users.
 
