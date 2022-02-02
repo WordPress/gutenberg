@@ -450,4 +450,4 @@ This is particularly relevant if the block is using `__experimentalSkipSerializa
 
 ##### Only a single property per block
 
-Similarly to block supports, there can be only one instance of any style in use by the block. For example, the block can only have a single font size. See related "Current limits of block supports".
+Similarly to block supports, there can be only one instance of any style in use by the block. For example, the block can only have a single font size. See related "Current limitations of block supports".
