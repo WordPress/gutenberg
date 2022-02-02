@@ -178,43 +178,9 @@ export default function CommentTemplateEdit( {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalDiscussionSettings;
 	} );
+
 	const { rawComments, blocks } = useSelect(
 		( select ) => {
-			// Show placeholder comments if we don't have a postId context.
-			// The structure of rawComment as an empty object allows
-			// inner blocks to render the default placeholders.
-			if ( ! postId ) {
-				// If displaying threaded comments is disabled, we only show one comment
-				if ( ! threadComments ) {
-					return { rawComments: [ { id: null } ] };
-				}
-
-				// In case that `threadCommentsDepth` is falsy, we default to a somewhat
-				// arbitrary value of 3.
-				// In case that the value is set but larger than 3 we truncate it to 3.
-				const commentsDepth = Math.min( threadCommentsDepth || 3, 3 );
-
-				// We set a limit in order not to overload the editor of empty comments.
-				const defaultCommentsToShow =
-					perPage <= commentsDepth ? perPage : commentsDepth;
-
-				// This is a little hacky. We get a comment structure like:
-				// [
-				//   {id: -1, parent: 0},
-				//   {id: -2, parent: -1},
-				//   {id: -3, parent: -2}
-				//  ]
-				// The idea is that comments with a negative ID will not appear in a
-				// "real" system.
-				return {
-					rawComments: Array( defaultCommentsToShow )
-						.fill( 'dummy' )
-						.map( ( _, index ) => ( {
-							id: -index - 1, // filling with dummy values that are discarded
-							parent: index ? -index : 0, // if index is positive, return -index, return 0 otherwise
-						} ) ),
-				};
-			}
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 
@@ -237,7 +203,7 @@ export default function CommentTemplateEdit( {
 				blocks: getBlocks( clientId ),
 			};
 		},
-		[ postId, clientId, order, perPage ]
+		[ postId, clientId, order ]
 	);
 
 	// TODO: Replicate the logic used on the server.
@@ -246,10 +212,45 @@ export default function CommentTemplateEdit( {
 	// Then, we show only a maximum of `perPage` number of comments.
 	// This is because passing `per_page` to `getEntityRecords()` does not
 	// take into account nested comments.
-	const comments = useMemo(
+	let comments = useMemo(
 		() => convertToTree( rawComments ).slice( 0, perPage ),
 		[ rawComments, perPage ]
 	);
+
+	// In case that `threadCommentsDepth` is falsy, we default to a somewhat
+	// arbitrary value of 3.
+	// In case that the value is set but larger than 3 we truncate it to 3.
+	const commentsDepth = Math.min( threadCommentsDepth || 3, 3 );
+
+	// We set a limit in order not to overload the editor of empty comments.
+	const defaultCommentsToShow =
+		perPage <= commentsDepth ? perPage : commentsDepth;
+
+	if ( ! postId ) {
+		if ( ! threadComments || defaultCommentsToShow === 1 ) {
+			// If displaying threaded comments is disabled, we only show one comment
+			comments = [ { commentId: null, children: [] } ];
+		} else if ( defaultCommentsToShow === 2 ) {
+			comments = [
+				{
+					commentId: null,
+					children: [ { commentId: null, children: [] } ],
+				},
+			];
+		} else if ( defaultCommentsToShow === 3 ) {
+			comments = [
+				{
+					commentId: null,
+					children: [
+						{
+							commentId: null,
+							children: [ { commentId: null, children: [] } ],
+						},
+					],
+				},
+			];
+		}
+	}
 
 	if ( ! rawComments ) {
 		return (
