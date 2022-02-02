@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 12.5.0-rc.1 =
+= 12.5.0 =
 
 ### Features
 
@@ -110,6 +110,7 @@
 #### Block Library
 
 *   Latest Posts: Fix featured image alignment label position. ([38125](https://github.com/WordPress/gutenberg/pull/38125))
+*   Remove the aria-label from the site title block. ([38432](https://github.com/WordPress/gutenberg/pull/38432))
 
 #### Components
 
@@ -233,6 +234,8 @@
 *   [docgen] Refactor code to use require() instead of JSON.parse(fs.readFileSync()). ([38148](https://github.com/WordPress/gutenberg/pull/38148))
 *   end-to-end Tests: Add coverage for reusable blocks save button state regression. ([33151](https://github.com/WordPress/gutenberg/pull/33151))
 *   Add new Testing Instructions section to PR template. ([38147](https://github.com/WordPress/gutenberg/pull/38147))
+
+
 
 
 = 12.4.1 =
