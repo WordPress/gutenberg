@@ -483,16 +483,10 @@ $preview-image-height: 140px;
 		 * Position spinner to the left of the actions.
 		 *
 		 * Compensate for:
-		 *  - Input margin ($grid-unit-20)
-		 *  - Border (1px)
-		 *  - Vertically, for the difference in height between the input (40px)
-		 *    and the spinner.
-		 *  - Horizontally, adjust for the width occupied by the icon buttons,
-		 *    then artificially create spacing that mimics as if the spinner
-		 *    were center-padded to the same width as an icon button.
+		 *  - Input padding right ($button-size)
 		 */
-		top: $grid-unit-20 + 1px + ( ( 40px - $spinner-size ) * 0.5 );
-		right: $grid-unit-20 + 1px + ( $button-size * $block-editor-link-control-number-of-actions ) + ( ( $button-size - $spinner-size ) * 0.5 );
+		top: calc(50% - #{$spinner-size} / 2);
+		right: $button-size;
 	}
 }
 

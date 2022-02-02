@@ -188,7 +188,7 @@ function getWebpackEntryPoints() {
 	} );
 
 	if ( blockMetadataFiles.length > 0 ) {
-		return blockMetadataFiles.reduce(
+		const entryPoints = blockMetadataFiles.reduce(
 			( accumulator, blockMetadataFile ) => {
 				const {
 					editorScript,
@@ -227,6 +227,10 @@ function getWebpackEntryPoints() {
 			},
 			{}
 		);
+
+		if ( Object.keys( entryPoints ).length > 0 ) {
+			return entryPoints;
+		}
 	}
 
 	// 3. Checks whether a standard file name can be detected in the `src` directory,

@@ -99,7 +99,7 @@ function gutenberg_navigation_init( $hook ) {
 	}
 
 	$settings = array_merge(
-		gutenberg_get_default_block_editor_settings(),
+		get_default_block_editor_settings(),
 		array(
 			'blockNavMenus' => false,
 			// We should uncomment the line below when the block-nav-menus feature becomes stable.

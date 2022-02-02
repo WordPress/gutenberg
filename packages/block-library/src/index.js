@@ -60,6 +60,7 @@ import * as pageList from './page-list';
 import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
+import * as postAuthorBiography from './post-author-biography';
 import * as postComment from './post-comment';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
@@ -203,6 +204,7 @@ export const __experimentalGetCoreBlocks = () => [
 	logInOut,
 	termDescription,
 	queryTitle,
+	postAuthorBiography,
 ];
 
 /**
@@ -241,6 +243,7 @@ export const registerCoreBlocks = (
  * __experimentalRegisterExperimentalCoreBlocks( settings );
  * ```
  */
+
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
 		? ( { enableFSEBlocks } = {} ) => {
@@ -249,28 +252,28 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					homeLink,
 					postAuthorName,
 
-					// Full Site Editing blocks.
-					...( enableFSEBlocks
-						? [
-								commentAuthorAvatar,
-								commentAuthorName,
-								commentContent,
-								commentDate,
-								commentEditLink,
-								commentReplyLink,
-								commentTemplate,
-								commentsQueryLoop,
-								commentsPagination,
-								commentsPaginationNext,
-								commentsPaginationNumbers,
-								commentsPaginationPrevious,
-								navigationArea,
-								postComment,
-								postCommentsCount,
-								postCommentsForm,
-								postCommentsLink,
-						  ]
-						: [] ),
-				].forEach( registerBlock );
-		  }
-		: undefined;
+				// Full Site Editing blocks.
+				...( enableFSEBlocks
+					? [
+							commentAuthorAvatar,
+							commentAuthorName,
+							commentContent,
+							commentDate,
+							commentEditLink,
+							commentReplyLink,
+							commentTemplate,
+							commentsQueryLoop,
+							commentsPagination,
+							commentsPaginationNext,
+							commentsPaginationNumbers,
+							commentsPaginationPrevious,
+							navigationArea,
+							postComment,
+							postCommentsCount,
+							postCommentsForm,
+							postCommentsLink,
+					  ]
+					: [] ),
+			].forEach( registerBlock );
+	  }
+	: undefined;
