@@ -3,7 +3,7 @@
  */
 
 const SELECTORS = {
-	menuContent: '.components-popover__content',
+	menuContent: '.interface-more-menu-dropdown__content',
 	postEditorMenu: '.edit-post-more-menu [aria-label="Options"]',
 	siteEditorMenu: '.edit-site-more-menu [aria-label="More tools & options"]',
 };
