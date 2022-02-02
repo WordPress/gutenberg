@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { uniqueId } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -119,7 +124,6 @@ async function selectClassicMenu( optionText ) {
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
-const ADD_ALL_PAGES_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Add all pages']`;
 const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select menu']`;
 
 /**
@@ -146,24 +150,6 @@ async function deleteAll( endpoints ) {
 				path: `${ path }/${ item.id }?force=true`,
 			} );
 		}
-	}
-}
-
-/**
- * Create a set of pages using the REST API.
- *
- * @param {Array} pages An array of page objects.
- */
-async function createPages( pages ) {
-	for ( const page of pages ) {
-		await rest( {
-			method: 'POST',
-			path: PAGES_ENDPOINT,
-			data: {
-				status: 'publish',
-				...page,
-			},
-		} );
 	}
 }
 
@@ -211,6 +197,18 @@ async function getNavigationMenuRawContent() {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
+	const contributorUsername = uniqueId( 'contributoruser_' );
+	let contributorPassword;
+
+	beforeAll( async () => {
+		// Creation of the contributor user **MUST** be at the top level describe block
+		// otherwise this test will become unstable. This action only happens once
+		// so there is no huge performance hit.
+		contributorPassword = await createUser( contributorUsername, {
+			role: 'contributor',
+		} );
+	} );
+
 	beforeEach( async () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
@@ -233,40 +231,13 @@ describe( 'Navigation', () => {
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
+
+		// As per the creation in the beforeAll() above, this
+		// action must be done at the root level describe() block.
+		await deleteUser( contributorUsername );
 	} );
 
 	describe( 'placeholder', () => {
-		it( 'allows a navigation block to be created using existing pages', async () => {
-			await createPages( [
-				{
-					title: 'About',
-					menu_order: 0,
-				},
-				{
-					title: 'Contact Us',
-					menu_order: 1,
-				},
-				{
-					title: 'FAQ',
-					menu_order: 2,
-				},
-			] );
-
-			await createNewPost();
-
-			// Add the navigation block.
-			await insertBlock( 'Navigation' );
-			const allPagesButton = await page.waitForXPath(
-				ADD_ALL_PAGES_XPATH
-			);
-			await allPagesButton.click();
-
-			// Wait for the page list block to be present
-			await page.waitForSelector( 'ul[aria-label="Block: Page List"]' );
-
-			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
-		} );
-
 		it( 'allows a navigation block to be created from existing menus', async () => {
 			await createClassicMenu( { name: 'Test Menu 1' } );
 			await createClassicMenu(
@@ -761,21 +732,8 @@ describe( 'Navigation', () => {
 	} );
 
 	describe( 'Permission based restrictions', () => {
-		const contributorUsername = 'contributoruser';
-		let contributorPassword;
-
-		beforeAll( async () => {
-			contributorPassword = await createUser( contributorUsername, {
-				role: 'contributor',
-			} );
-		} );
-
 		afterEach( async () => {
 			await switchUserToAdmin();
-		} );
-
-		afterAll( async () => {
-			await deleteUser( contributorUsername );
 		} );
 
 		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {

@@ -16,7 +16,7 @@ The abstract term used to describe units of markup that, composed together, form
 
 The CSS styles that are part of the block, either via its stylesheet or via the block markup itself. For example, a class attached to the block markup is considered block styles.
 
-Compare to <a href="#global-styles">Global Styles</a>. In contraposition to "Global Styles", block styles are sometimes referred to as "Local Styles".
+Compare to <a href="#global-styles">Global Styles</a>. In contraposition to Global Styles, block styles are sometimes referred to as <a href="#local-styles">Local Styles</a>.
 
 ## Block Supports
 
@@ -75,6 +75,10 @@ Compare to <a href="#block-styles">block styles</a>.
 ## Inspector
 
 Deprecated term. See <a href="#settings-sidebar">Settings Sidebar.</a>
+
+## Local Styles
+
+See <a href="#block-styles">Block Styles</a>.
 
 ## Navigation Block
 

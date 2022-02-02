@@ -2,8 +2,13 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	min-height: 152px;
 	line-height: 1;
+	cursor: pointer;
+}
+
+.edit-site-global-styles-preview__iframe {
+	max-width: 100%;
+	display: block;
 }
 
 .edit-site-typography-panel__preview {
@@ -64,4 +69,23 @@
 .edit-site-screen-link-color__control,
 .edit-site-screen-background-color__control {
 	padding: $grid-unit-20;
+}
+
+.edit-site-global-styles-variations_item {
+	box-sizing: border-box;
+	padding: $border-width * 2;
+	border-radius: $radius-block-ui;
+	border: $gray-200 $border-width solid;
+
+	&.is-active {
+		border: $gray-900 $border-width solid;
+	}
+
+	&:hover {
+		border: var(--wp-admin-theme-color) $border-width solid;
+	}
+
+	&:focus {
+		border: var(--wp-admin-theme-color) $border-width solid;
+	}
 }

@@ -37,7 +37,6 @@
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dom": "file:../dom",
-		"@wordpress/dom-ready": "file:../dom-ready",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
@@ -46,13 +45,11 @@
 		"@wordpress/interface": "file:../interface",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.3.1",
-		"lodash": "^4.17.21",
-		"rememo": "^3.0.0",
-		"uuid": "^8.3.0"
+		"lodash": "^4.17.21"
 	},
 	"publishConfig": {
 		"access": "public"

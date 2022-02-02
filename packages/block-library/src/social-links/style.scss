@@ -6,6 +6,9 @@
 	// Some themes give all <ul> default margin instead of padding.
 	margin-left: 0;
 
+	// Unset background colors that can be inherited from Global Styles.
+	background: none;
+
 	// Some themes add underlines, false underlines (via shadows), and borders to <a>.
 	.wp-social-link a,
 	.wp-social-link a:hover {
@@ -24,6 +27,12 @@
 		svg {
 			width: 1em;
 			height: 1em;
+		}
+
+		span:not(.screen-reader-text) {
+			margin-left: 0.5em;
+			margin-right: 0.5em;
+			font-size: 0.65em;
 		}
 	}
 
@@ -71,7 +80,8 @@
 	height: auto;
 
 	a {
-		display: block;
+		align-items: center;
+		display: flex;
 		line-height: 0;
 		transition: transform 0.1s ease;
 	}

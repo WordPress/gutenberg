@@ -13,7 +13,6 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import createHigherOrderComponent from '../../utils/create-higher-order-component';
-import type { PropInjectingHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
  * We cannot use the `Window['setTimeout']` and `Window['clearTimeout']`
@@ -32,7 +31,7 @@ type TimeoutProps = {
  * A higher-order component used to provide and manage delayed function calls
  * that ought to be bound to a component's lifecycle.
  */
-const withSafeTimeout: PropInjectingHigherOrderComponent< TimeoutProps > = createHigherOrderComponent(
+const withSafeTimeout = createHigherOrderComponent< TimeoutProps >(
 	< TProps extends TimeoutProps >(
 		OriginalComponent: ComponentType< TProps >
 	) => {
@@ -41,7 +40,7 @@ const withSafeTimeout: PropInjectingHigherOrderComponent< TimeoutProps > = creat
 		> {
 			timeouts: number[];
 
-			constructor( props: any ) {
+			constructor( props: Omit< TProps, keyof TimeoutProps > ) {
 				super( props );
 				this.timeouts = [];
 				this.setTimeout = this.setTimeout.bind( this );
@@ -71,8 +70,9 @@ const withSafeTimeout: PropInjectingHigherOrderComponent< TimeoutProps > = creat
 					...this.props,
 					setTimeout: this.setTimeout,
 					clearTimeout: this.clearTimeout,
-				};
-				return <OriginalComponent { ...( props as TProps ) } />;
+				} as TProps;
+
+				return <OriginalComponent { ...props } />;
 			}
 		};
 	},

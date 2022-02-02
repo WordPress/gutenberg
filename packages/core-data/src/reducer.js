@@ -157,6 +157,26 @@ export function themeBaseGlobalStyles( state = {}, action ) {
 }
 
 /**
+ * Reducer managing the theme global styles variations.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function themeGlobalStyleVariations( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_GLOBAL_STYLE_VARIATIONS':
+			return {
+				...state,
+				[ action.stylesheet ]: action.variations,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Higher Order Reducer for a given entity config. It supports:
  *
  *  - Fetching
@@ -578,6 +598,7 @@ export default combineReducers( {
 	currentTheme,
 	currentGlobalStylesId,
 	currentUser,
+	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
 	taxonomies,
 	entities,
