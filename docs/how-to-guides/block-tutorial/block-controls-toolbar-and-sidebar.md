@@ -280,4 +280,4 @@ registerBlockType( 'create-block/gutenpride', {
 Block controls rendered in both the toolbar and sidebar will also be used when
 multiple blocks of the same type are selected.
 
-**Note :** In the example above, we added text and background color customization support to our block to demonstrate the use of `InspectorControls` to add custom controls to the sidebar. That said, for common customization settings including color, border, spacing customization and more, we will see on the [next chapter](docs/how-to-guides/block-tutorial/block-supports.md) that you can rely on block supports to provide the same functionality in a more efficient way.
+**Note :** In the example above, we added text and background color customization support to our block to demonstrate the use of `InspectorControls` to add custom controls to the sidebar. That said, for common customization settings including color, border, spacing customization and more, we will see on the [next chapter](/docs/how-to-guides/block-tutorial/block-supports.md) that you can rely on block supports to provide the same functionality in a more efficient way.
