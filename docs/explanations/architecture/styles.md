@@ -306,7 +306,7 @@ The `styles` section can be thought of as a structured representation of CSS rul
 - A key/value in theme.json maps to a CSS declaration (`property: value`).
 - The CSS selector for a given chunk is generated based on its semantics:
 	- The top-level section uses the `body` selector.
-	- The top-level elements use a ID selector matching the HTML element they represent (for example, `h1` or `a`).
+	- The top-level elements use an ID selector matching the HTML element they represent (for example, `h1` or `a`).
 	- Blocks use the default class name they generate (`core/group` becomes `.wp-block-group`) unless they explicitly set a different one using their `block.json` (`core/paragraph` becomes `p`). See the "Current limits" section for more about this.
 	- Elements within a block use the concatenation of the block and element selector.
 
