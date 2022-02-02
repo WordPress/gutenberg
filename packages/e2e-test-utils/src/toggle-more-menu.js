@@ -3,7 +3,8 @@
  */
 
 const SELECTORS = {
-	menuContent: '.interface-more-menu-dropdown__content',
+	postEditorMenuContent: '.interface-more-menu-dropdown__content',
+	siteEditorMenuContent: '.edit-site-more-menu__content',
 	postEditorMenu: '.edit-post-more-menu [aria-label="Options"]',
 	siteEditorMenu: '.edit-site-more-menu [aria-label="More tools & options"]',
 };
@@ -15,15 +16,20 @@ const SELECTORS = {
  * @param {GutenbergContext} [context='post-editor'] Whether it's toggling in the context of the site editor or post editor.
  */
 export async function toggleMoreMenu( waitFor, context = 'post-editor' ) {
-	const selector =
+	const menuSelector =
 		context === 'post-editor'
 			? SELECTORS.postEditorMenu
 			: SELECTORS.siteEditorMenu;
 
-	await page.click( selector );
+	await page.click( menuSelector );
 
 	if ( waitFor ) {
 		const opts = waitFor === 'close' ? { hidden: true } : {};
-		await page.waitForSelector( SELECTORS.menuContent, opts );
+		const menuContentSelector =
+			context === 'post-editor'
+				? SELECTORS.postEditorMenuContent
+				: SELECTORS.siteEditorMenuContent;
+
+		await page.waitForSelector( menuContentSelector, opts );
 	}
 }
