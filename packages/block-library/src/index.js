@@ -206,7 +206,6 @@ export const __experimentalGetCoreBlocks = () => [
 	termDescription,
 	queryTitle,
 	postAuthorName,
-	postAuthorAvatar,
 	postAuthorBiography,
 ];
 
@@ -252,6 +251,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 			[
 				// Experimental blocks.
 				homeLink,
+				postAuthorAvatar,
 
 				// Full Site Editing blocks.
 				...( enableFSEBlocks
