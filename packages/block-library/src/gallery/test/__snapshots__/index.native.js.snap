@@ -42,6 +42,22 @@ exports[`Gallery block inserts block 1`] = `
 <!-- /wp:gallery -->"
 `;
 
+exports[`Gallery block rearranges gallery items (TC010 - Rearrange images in Gallery) 1`] = `
+"<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":3} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/image-3.jpeg\\" alt=\\"\\" class=\\"wp-image-3\\"/><figcaption>Image 3</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"id\\":1} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-1\\"/><figcaption>Image 1</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"id\\":2} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/image-2.jpeg\\" alt=\\"\\" class=\\"wp-image-2\\"/><figcaption>Image 2</figcaption></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
 exports[`Gallery block sets caption to gallery (TC003 - Add caption to gallery) 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":1} -->

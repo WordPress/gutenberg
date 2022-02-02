@@ -78,7 +78,7 @@ const addGalleryBlock = async () => {
 
 const initializeWithGalleryBlock = (
 	initialHtml,
-	{ hasItems = true } = {}
+	{ hasItems = true, deviceWidth = 320 } = {}
 ) => {
 	const screen = initializeEditor( { initialHtml } );
 	const { getByA11yLabel } = screen;
@@ -92,7 +92,7 @@ const initializeWithGalleryBlock = (
 			{
 				nativeEvent: {
 					layout: {
-						width: 100,
+						width: deviceWidth,
 					},
 				},
 			}
@@ -865,6 +865,47 @@ describe( 'Gallery block', () => {
 				mediaId: MEDIA[ 1 ].localId,
 				progress: 0,
 			} )
+		);
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'rearranges gallery items (TC010 - Rearrange images in Gallery)', () => {
+		// Initialize with a gallery that contains various items
+		const {
+			galleryBlock,
+			getByA11yLabel,
+		} = initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
+		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":1} -->
+		<figure class="wp-block-image"><img src="https://test-site.files.wordpress.com/image-1.jpeg" alt="" class="wp-image-1"/><figcaption>Image 1</figcaption></figure>
+		<!-- /wp:image -->
+		
+		<!-- wp:image {"id":2} -->
+		<figure class="wp-block-image"><img src="https://test-site.files.wordpress.com/image-2.jpeg" alt="" class="wp-image-2"/><figcaption>Image 2</figcaption></figure>
+		<!-- /wp:image -->
+
+		<!-- wp:image {"id":3} -->
+		<figure class="wp-block-image"><img src="https://test-site.files.wordpress.com/image-3.jpeg" alt="" class="wp-image-3"/><figcaption>Image 3</figcaption></figure>
+		<!-- /wp:image --></figure>
+		<!-- /wp:gallery -->` );
+		fireEvent.press( galleryBlock );
+
+		// Rearrange items (final disposition will be: Image 3 - Image 1 - Image 2)
+		const galleryItem1 = getByA11yLabel( /Image Block\. Row 1/ );
+		const galleryItem3 = getByA11yLabel( /Image Block\. Row 3/ );
+
+		fireEvent.press( galleryItem3 );
+		fireEvent.press(
+			within( galleryItem3 ).getByA11yLabel(
+				/Move block left from position 3 to position 2/
+			)
+		);
+
+		fireEvent.press( galleryItem1 );
+		fireEvent.press(
+			within( galleryItem1 ).getByA11yLabel(
+				/Move block right from position 1 to position 2/
+			)
 		);
 
 		expect( getEditorHtml() ).toMatchSnapshot();
