@@ -26,8 +26,8 @@ const addParagraphsAndColumnsDemo = async () => {
 		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Columns')]`
 	);
 	await page.keyboard.press( 'Enter' );
-	await page.click( 'button[aria-label="Two columns; equal split"]' );
-	await page.click( 'button.block-editor-button-block-appender' );
+	await page.click( ':focus [aria-label="Two columns; equal split"]' );
+	await page.click( ':focus .block-editor-button-block-appender' );
 	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
 	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -666,6 +666,11 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
 		await page.keyboard.press( 'Enter' );
+		// Move into the placeholder UI.
+		await page.keyboard.press( 'ArrowDown' );
+		// Tab to the "Create table" button.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		// Create the table.
 		await page.keyboard.press( 'Space' );
 		// Return focus after focus loss. This should be fixed.
