@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added new block icon: `tip` ([#38424](https://github.com/WordPress/gutenberg/pull/38424)).
+
 ## 6.2.0 (2022-01-27)
 
 ## 6.1.0 (2021-11-07)
