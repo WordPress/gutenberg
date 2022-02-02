@@ -9,7 +9,7 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { wordpress } from '@wordpress/icons';
+import { sidebar, navigation, styles, wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useReducedMotion } from '@wordpress/compose';
 
@@ -98,6 +98,9 @@ function NavigationToggle( { icon } ) {
 			>
 				{ buttonIcon }
 			</Button>
+			<Button icon={ navigation } iconSize={ 24 }></Button>
+			<Button icon={ sidebar } iconSize={ 24 }></Button>
+			<Button icon={ styles } iconSize={ 24 }></Button>
 		</motion.div>
 	);
 }
