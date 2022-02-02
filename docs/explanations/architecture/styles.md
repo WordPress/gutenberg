@@ -171,7 +171,7 @@ The data can come from three different origins: WordPress defaults, the active t
 
 The goal of this phase is to build a consolidated structure.
 
-There's two important processes going on in this phase. First, the system needs to normalize all the incoming data, as different origins may be using different versions of the `theme.json` format. For example, a theme may be using [v1](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-v1/) while the WordPress base is using [the latest version](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/). Second, the system needs to decide how to merge the input into a single structure. This will be the focus of the the following sections.
+There are two important processes going on in this phase. First, the system needs to normalize all the incoming data, as different origins may be using different versions of the `theme.json` format. For example, a theme may be using [v1](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-v1/) while the WordPress base is using [the latest version](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/). Second, the system needs to decide how to merge the input into a single structure. This will be the focus of the following sections.
 
 ##### Styles
 
