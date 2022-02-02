@@ -37,7 +37,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$query = new WP_Query( $query_args );
 
 	if ( ! $query->have_posts() ) {
-		return __( 'No results found.' );
+		return '<p>' . __( 'No results found.' ) . '</p>';
 	}
 
 	$classnames = '';
