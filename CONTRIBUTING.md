@@ -18,7 +18,7 @@ To learn all about contributing to the Gutenberg project, see the [Contributor G
 
 -   As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](/CODE_OF_CONDUCT.md).
 
--   You maintain copyright over any contribution you make. By submitting a pull request you agree to release that code under both the GPLv2+ and MPL licenses as stated in [Gutenberg's License](/LICENSE.md).
+-   You maintain copyright over any contribution you make. By submitting a pull request you agree to release that code under the license stated in [Gutenberg's License](/LICENSE.md).
 
 ## Reporting Security Issues
 
