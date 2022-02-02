@@ -321,7 +321,7 @@ const useMissingText = ( type ) => {
 			missingText = __( 'Add link' );
 	}
 
-	return { missingText };
+	return missingText;
 };
 
 /**
@@ -664,6 +664,10 @@ export default function NavigationLinkEdit( {
 	const placeholderText = `(${
 		isInvalid ? __( 'Invalid' ) : __( 'Draft' )
 	})`;
+	const tooltipText =
+		isInvalid || isDraft
+			? __( 'This item has been deleted, or is a draft' )
+			: __( 'This item is missing a link' );
 
 	return (
 		<Fragment>
@@ -722,11 +726,13 @@ export default function NavigationLinkEdit( {
 					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
-							<Tooltip
-								position="top center"
-								text={ __( 'This item is missing a link' ) }
-							>
-								<span>{ missingText }</span>
+							<Tooltip position="top center" text={ tooltipText }>
+								<>
+									<span>{ missingText }</span>
+									<span className="wp-block-navigation-link__missing_text-tooltip">
+										{ tooltipText }
+									</span>
+								</>
 							</Tooltip>
 						</div>
 					) : (
@@ -778,16 +784,19 @@ export default function NavigationLinkEdit( {
 									/>
 									<Tooltip
 										position="top center"
-										text={ __(
-											'This item has been deleted, or is a draft'
-										) }
+										text={ tooltipText }
 									>
-										<span>
-											{
-												/* Trim to avoid trailing white space when the placeholder text is not present */
-												`${ label } ${ placeholderText }`.trim()
-											}
-										</span>
+										<>
+											<span>
+												{
+													/* Trim to avoid trailing white space when the placeholder text is not present */
+													`${ label } ${ placeholderText }`.trim()
+												}
+											</span>
+											<span className="wp-block-navigation-link__missing_text-tooltip">
+												{ tooltipText }
+											</span>
+										</>
 									</Tooltip>
 								</div>
 							) }
