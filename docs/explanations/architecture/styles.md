@@ -322,29 +322,30 @@ For example, the following `theme.json` structure:
       "h1": {
         "typography": {
           "fontSize": "<h1 value>"
-      }
-    }
-  },
-  "blocks": 
-      "core/paragraph": {
-        "color": {
-          "text": <paragraph value>
         }
       }
+    },
+    "blocks": {
+      "core/paragraph": {
+        "color": {
+          "text": "<paragraph value>"
+        }
+      },
       "core/group": {
         "color": {
-          "text": <group value>
+          "text": "<group value>"
         },
         "elements": {
           "h1": {
             "color": {
-              "text": <h1 within group value>
+              "text": "<h1 within group value>"
             }
           }
         }
-      },
+      }
     }
   }
+}
 }
 ```
 
