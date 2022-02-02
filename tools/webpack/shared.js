@@ -26,7 +26,6 @@ const baseConfig = {
 		minimizer: [
 			new TerserPlugin( {
 				parallel: true,
-				sourceMap: true,
 				terserOptions: {
 					output: {
 						comments: /translators:/i,
