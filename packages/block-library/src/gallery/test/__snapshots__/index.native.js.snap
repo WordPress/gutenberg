@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Gallery block finishes pending uploads upon opening editor (TC001 - Close/Re-open post with an ongoing image upload) 1`] = `
+exports[`Gallery block finishes pending uploads upon opening the editor (TC001 - Close/Re-open post with an ongoing image upload) 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
@@ -15,5 +15,21 @@ exports[`Gallery block finishes pending uploads upon opening editor (TC001 - Clo
 exports[`Gallery block inserts block 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"></figure>
+<!-- /wp:gallery -->"
+`;
+
+exports[`Gallery block sets caption to gallery (TC003 - Add caption to gallery) 1`] = `
+"<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":1} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://cldup.com/cXyG__fTLN.jpg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>
+<!-- /wp:image --><figcaption class=\\"blocks-gallery-caption\\"><strong>Bold</strong> <em>italic</em> <s>strikethrough</s> gallery caption</figcaption></figure>
+<!-- /wp:gallery -->"
+`;
+
+exports[`Gallery block sets caption to gallery items (TC004 - Add caption to gallery images) 1`] = `
+"<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":1} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://cldup.com/cXyG__fTLN.jpg\\" alt=\\"\\" class=\\"wp-image-1\\"/><figcaption><strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption</figcaption></figure>
+<!-- /wp:image --></figure>
 <!-- /wp:gallery -->"
 `;

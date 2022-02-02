@@ -236,4 +236,68 @@ describe( 'Gallery block', () => {
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
+
+	it( 'sets caption to gallery (TC003 - Add caption to gallery)', async () => {
+		// Initialize with a gallery that contains one item
+		const {
+			galleryBlock,
+			getByA11yLabel,
+		} = await initializeWithGalleryBlock( GALLERY_WITH_ONE_IMAGE );
+
+		// Select block
+		fireEvent.press( galleryBlock );
+
+		// Check gallery item caption is not visible
+		const galleryItemCaption = getByA11yLabel( /Image caption. Empty/ );
+		expect( galleryItemCaption ).not.toBeVisible();
+
+		// Set gallery caption
+		const galleryCaption = getByA11yLabel( /Gallery caption. Empty/ );
+		const captionField = within( galleryCaption ).getByPlaceholderText(
+			'Add caption'
+		);
+		fireEvent( captionField, 'focus' );
+		fireEvent( captionField, 'onChange', {
+			nativeEvent: {
+				eventCount: 1,
+				target: undefined,
+				text:
+					'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> gallery caption',
+			},
+		} );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'sets caption to gallery items (TC004 - Add caption to gallery images)', async () => {
+		// Initialize with a gallery that contains one item
+		const { galleryBlock } = await initializeWithGalleryBlock(
+			GALLERY_WITH_ONE_IMAGE
+		);
+
+		// Select block
+		fireEvent.press( galleryBlock );
+
+		// Select gallery item
+		const galleryItem = within( galleryBlock ).getByA11yLabel(
+			/Image Block\. Row 1/
+		);
+		fireEvent.press( galleryItem );
+
+		// Set gallery item caption
+		const captionField = within( galleryItem ).getByPlaceholderText(
+			'Add caption'
+		);
+		fireEvent( captionField, 'focus' );
+		fireEvent( captionField, 'onChange', {
+			nativeEvent: {
+				eventCount: 1,
+				target: undefined,
+				text:
+					'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption',
+			},
+		} );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
 } );
