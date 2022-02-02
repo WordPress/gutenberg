@@ -243,14 +243,13 @@ export const registerCoreBlocks = (
  * __experimentalRegisterExperimentalCoreBlocks( settings );
  * ```
  */
-
-export const __experimentalRegisterExperimentalCoreBlocks =
-	process.env.GUTENBERG_PHASE === 2
-		? ( { enableFSEBlocks } = {} ) => {
-				[
-					// Experimental blocks.
-					homeLink,
-					postAuthorName,
+export const __experimentalRegisterExperimentalCoreBlocks = process.env
+	.IS_GUTENBERG_PLUGIN
+	? ( { enableFSEBlocks } = {} ) => {
+			[
+				// Experimental blocks.
+				homeLink,
+				postAuthorName,
 
 				// Full Site Editing blocks.
 				...( enableFSEBlocks
