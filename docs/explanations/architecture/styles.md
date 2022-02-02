@@ -99,7 +99,7 @@ Besides the benefit of having to do less work to achieve the same results, there
 - the block will use the UI controls other blocks use for the same styles, creating a more coherent user experience
 - the UI controls in use by the block will be automatically updated as they are improved, without the block author having to do anything
 
-#### Current limits of the Block Supports API
+#### Current limitations of the Block Supports API
 
 While the Block Supports API provides value, it also comes with some limitations a block author needs to be aware of. To better visualize what they are, let's run with the following example of a table block:
 
