@@ -301,7 +301,7 @@ The last phase of generating the stylesheet is converting the consolidated data 
 
 ##### Styles to CSS rules
 
-The `styles` section can be thought as a structured representation of CSS rules, each chunk representing a CSS rule:
+The `styles` section can be thought of as a structured representation of CSS rules, each chunk representing a CSS rule:
 
 - A key/value in theme.json maps to a CSS declaration (`property: value`).
 - The CSS selector for a given chunk is generated based on its semantics:
