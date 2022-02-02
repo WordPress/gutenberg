@@ -125,64 +125,45 @@ export function createBlocksFromInnerBlocksTemplate(
 
 /**
  * Given a block object, returns a copy of the block object,
- * optionally merging new attributes and/or replacing its inner blocks.
- * Attributes with the `internal` role are not copied into the new object.
+ * optionally merging new attributes, replacing its inner blocks, and/or
+ * filtering out attributes with the 'internal' role.
  *
- * @param {Object} block           Block instance.
- * @param {Object} mergeAttributes Block attributes.
- * @param {?Array} newInnerBlocks  Nested blocks.
+ * @param {Object}   block                            Block instance.
+ * @param {Object}   mergeAttributes                  Block attributes.
+ * @param {?Array}   newInnerBlocks                   Nested blocks.
+ * @param {?Object}  options                          Cloning options.
+ * @param {?boolean} options.retainInternalAttributes Whether to retain internal attributes in the cloned block.
  *
  * @return {Object} A cloned block.
  */
-export function __experimentalCloneSanitizedBlock(
+export function cloneBlock(
 	block,
 	mergeAttributes = {},
-	newInnerBlocks
+	newInnerBlocks,
+	options = {}
 ) {
+	const { retainInternalAttributes = true } = options;
 	const clientId = uuid();
 
-	// Merge in new attributes and strip out attributes with the `internal` role,
-	// which should not be copied during block duplication.
-	const filteredAttributes = omit(
-		{
-			...block.attributes,
-			...mergeAttributes,
-		},
-		__experimentalGetBlockAttributesNamesByRole( block.name, 'internal' )
-	);
-
-	return {
-		...block,
-		clientId,
-		attributes: filteredAttributes,
-		innerBlocks:
-			newInnerBlocks ||
-			block.innerBlocks.map( ( innerBlock ) =>
-				__experimentalCloneSanitizedBlock( innerBlock )
-			),
+	let attributes = {
+		...block.attributes,
+		...mergeAttributes,
 	};
-}
 
-/**
- * Given a block object, returns a copy of the block object,
- * optionally merging new attributes and/or replacing its inner blocks.
- *
- * @param {Object} block           Block instance.
- * @param {Object} mergeAttributes Block attributes.
- * @param {?Array} newInnerBlocks  Nested blocks.
- *
- * @return {Object} A cloned block.
- */
-export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
-	const clientId = uuid();
+	if ( ! retainInternalAttributes ) {
+		attributes = omit(
+			attributes,
+			__experimentalGetBlockAttributesNamesByRole(
+				block.name,
+				'internal'
+			)
+		);
+	}
 
 	return {
 		...block,
 		clientId,
-		attributes: {
-			...block.attributes,
-			...mergeAttributes,
-		},
+		attributes,
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),

@@ -5,7 +5,7 @@ import { useCallback } from '@wordpress/element';
 import {
 	serialize,
 	pasteHandler,
-	__experimentalCloneSanitizedBlock,
+	cloneBlock,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
@@ -125,7 +125,9 @@ export function useClipboardHandler() {
 				let blocks = getBlocksByClientId( selectedBlockClientIds );
 				if ( event.type === 'copy' ) {
 					blocks = blocks.map( ( block ) =>
-						__experimentalCloneSanitizedBlock( block )
+						cloneBlock( block, {}, null, {
+							retainInternalAttributes: false,
+						} )
 					);
 				}
 				const serialized = serialize( blocks );

@@ -186,13 +186,16 @@ In the random image block above, we've given the `alt` attribute of the image a 
 ### cloneBlock
 
 Given a block object, returns a copy of the block object,
-optionally merging new attributes and/or replacing its inner blocks.
+optionally merging new attributes, replacing its inner blocks, and/or
+filtering out attributes with the 'internal' role.
 
 _Parameters_
 
 -   _block_ `Object`: Block instance.
 -   _mergeAttributes_ `Object`: Block attributes.
 -   _newInnerBlocks_ `?Array`: Nested blocks.
+-   _options_ `?Object`: Cloning options.
+-   _options.retainInternalAttributes_ `?boolean`: Whether to retain internal attributes in the cloned block.
 
 _Returns_
 
