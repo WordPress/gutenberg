@@ -23,8 +23,7 @@ export class PluginErrorBoundary extends Component {
 	}
 
 	render() {
-		const { hasError } = this.state;
-		if ( ! hasError ) {
+		if ( ! this.state.hasError ) {
 			return this.props.children;
 		}
 

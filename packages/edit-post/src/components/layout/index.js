@@ -180,7 +180,7 @@ function Layout( { styles } ) {
 		return null;
 	};
 
-	function handlePluginErrors( name ) {
+	function onPluginAreaError( name ) {
 		createErrorNotice(
 			sprintf(
 				/* translators: %s: plugin name */
@@ -287,7 +287,7 @@ function Layout( { styles } ) {
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
 			<Popover.Slot />
-			<PluginArea onError={ handlePluginErrors } />
+			<PluginArea onError={ onPluginAreaError } />
 		</>
 	);
 }
