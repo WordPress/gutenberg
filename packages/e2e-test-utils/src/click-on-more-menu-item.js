@@ -29,7 +29,7 @@ export async function clickOnMoreMenuItem(
 	buttonLabel,
 	context = 'post-editor'
 ) {
-	await toggleMoreMenu();
+	await toggleMoreMenu( 'open', context );
 	const moreMenuContainerSelector =
 		context === 'post-editor'
 			? SELECTORS.postEditorMenuContainer

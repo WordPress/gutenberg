@@ -815,6 +815,7 @@ Toggles the More Menu.
 
 _Parameters_
 
+-   _waitFor_ `['open' | 'close']`: Whether it should wait for the menu to open or close. If `undefined` it won't wait for anything.
 -   _context_ `[GutenbergContext]`: Whether it's toggling in the context of the site editor or post editor.
 
 ### toggleOfflineMode
