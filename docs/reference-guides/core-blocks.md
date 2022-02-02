@@ -10,12 +10,12 @@ Items marked with a strikeout (~~strikeout~~) are explicitly disabled.
 
 ## Archives
 
-Display a monthly archive of your posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/archives))
+Display a date archive of your posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/archives))
 
 -	**Name:** core/archives
 -	**Category:** widgets
 -	**Supports:** align, ~~html~~
--	**Attributes:** displayAsDropdown, showPostCounts
+-	**Attributes:** archiveType, displayAsDropdown, showPostCounts
 
 ## Audio
 
