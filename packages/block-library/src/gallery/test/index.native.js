@@ -415,4 +415,89 @@ describe( 'Gallery block', () => {
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
+
+	it( 'takes a photo (TC007 - Take a photo)', async () => {
+		const mediaUploadListeners = [];
+		subscribeMediaUpload.mockImplementation( ( callback ) => {
+			mediaUploadListeners.push( callback );
+			return { remove: jest.fn() };
+		} );
+		const triggerMediaUpload = ( payload ) =>
+			mediaUploadListeners.forEach( ( listener ) => listener( payload ) );
+
+		let mediaPickerCallback;
+		requestMediaPicker.mockImplementation(
+			( source, filter, multiple, callback ) => {
+				mediaPickerCallback = callback;
+			}
+		);
+
+		// Initialize with an empty gallery
+		const { galleryBlock, getByText } = initializeWithGalleryBlock(
+			GALLERY_EMPTY,
+			{
+				hasItems: false,
+			}
+		);
+
+		// Take a photo
+		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Take a Photo' ) );
+		expect( requestMediaPicker ).toHaveBeenCalledWith(
+			'DEVICE_CAMERA',
+			[ 'image' ],
+			true,
+			mediaPickerCallback
+		);
+
+		// Return media item from photo taken
+		await act( async () =>
+			mediaPickerCallback( [
+				{
+					type: 'image',
+					url: MEDIA[ 0 ].localUrl,
+					id: MEDIA[ 0 ].localId,
+				},
+			] )
+		);
+
+		// Check gallery item is visible
+		fireEvent(
+			within( galleryBlock ).getByTestId( 'block-list-wrapper' ),
+			'layout',
+			{
+				nativeEvent: {
+					layout: {
+						width: 100,
+					},
+				},
+			}
+		);
+		const galleryItem = within( galleryBlock ).getByA11yLabel(
+			/Image Block\. Row 1/
+		);
+		expect( galleryItem ).toBeVisible();
+
+		// Check image is showing a loading state
+		await act( async () => {
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_UPLOADING,
+				mediaId: MEDIA[ 0 ].localId,
+				progress: 0.5,
+			} );
+		} );
+		expect( within( galleryItem ).getByTestId( 'spinner' ) ).toBeVisible();
+
+		// Notify that the media item upload succeeded
+		await act( async () => {
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_SUCCEEDED,
+				mediaId: MEDIA[ 0 ].localId,
+				mediaUrl: MEDIA[ 0 ].serverUrl,
+				mediaServerId: MEDIA[ 0 ].serverId,
+			} );
+		} );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
 } );
