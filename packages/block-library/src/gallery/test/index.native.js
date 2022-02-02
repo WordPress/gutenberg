@@ -43,6 +43,26 @@ const addGalleryBlock = async () => {
 	return screen;
 };
 
+const initializeWithGalleryBlock = async ( initialHtml ) => {
+	const screen = initializeEditor( { initialHtml } );
+	const { getByA11yLabel } = screen;
+
+	const galleryBlock = getByA11yLabel( /Gallery Block\. Row 1/ );
+
+	const innerBlockListWrapper = await waitFor( () =>
+		within( galleryBlock ).getByTestId( 'block-list-wrapper' )
+	);
+	fireEvent( innerBlockListWrapper, 'layout', {
+		nativeEvent: {
+			layout: {
+				width: 100,
+			},
+		},
+	} );
+
+	return { ...screen, galleryBlock };
+};
+
 beforeAll( () => {
 	// Register all core blocks
 	registerCoreBlocks();
@@ -63,59 +83,31 @@ describe( 'Gallery block', () => {
 			getByA11yLabel( /Gallery Block\. Row 1/ )
 		);
 
-		expect( galleryBlock ).toHaveProperty( 'type', 'View' );
+		expect( galleryBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
 	it( 'selects a gallery item', async () => {
-		const { getByA11yLabel } = initializeEditor( {
-			initialHtml: GALLERY_WITH_ONE_IMAGE,
-		} );
-
-		const galleryBlock = await waitFor( () =>
-			getByA11yLabel( /Gallery Block\. Row 1/ )
+		const { galleryBlock } = await initializeWithGalleryBlock(
+			GALLERY_WITH_ONE_IMAGE
 		);
+
 		fireEvent.press( galleryBlock );
-
-		const innerBlockListWrapper = await waitFor( () =>
-			within( galleryBlock ).getByTestId( 'block-list-wrapper' )
-		);
-		fireEvent( innerBlockListWrapper, 'layout', {
-			nativeEvent: {
-				layout: {
-					width: 100,
-				},
-			},
-		} );
 
 		const galleryItem = await waitFor( () =>
 			within( galleryBlock ).getByA11yLabel( /Image Block\. Row 1/ )
 		);
 		fireEvent.press( galleryItem );
 
-		expect( galleryItem ).toHaveProperty( 'type', 'View' );
+		expect( galleryItem ).toBeVisible();
 	} );
 
 	it( 'shows appender button when gallery has images', async () => {
-		const { getByA11yLabel, getByText } = initializeEditor( {
-			initialHtml: GALLERY_WITH_ONE_IMAGE,
-		} );
-
-		const galleryBlock = await waitFor( () =>
-			getByA11yLabel( /Gallery Block\. Row 1/ )
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
+			GALLERY_WITH_ONE_IMAGE
 		);
+
 		fireEvent.press( galleryBlock );
-
-		const innerBlockListWrapper = await waitFor( () =>
-			within( galleryBlock ).getByTestId( 'block-list-wrapper' )
-		);
-		fireEvent( innerBlockListWrapper, 'layout', {
-			nativeEvent: {
-				layout: {
-					width: 100,
-				},
-			},
-		} );
 
 		const appenderButton = await waitFor( () =>
 			within( galleryBlock ).getByA11yLabel( /Gallery block\. Empty/ )
