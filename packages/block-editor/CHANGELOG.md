@@ -15,7 +15,6 @@
 ### New Features
 
 -   List View now supports selecting and dragging multiple blocks via `SHIFT` clicking items in the list [#38314](https://github.com/WordPress/gutenberg/pull/38314).
->>>>>>> e0937d166f (Update documentation, add changelog entry)
 
 ## 8.1.0 (2022-01-27)
 
