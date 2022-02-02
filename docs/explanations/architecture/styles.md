@@ -434,7 +434,7 @@ In addition to the CSS Custom Properties, all presets but duotone generate CSS c
 .wp-block-site-title .has-foreground-border-color { border-color: var(--wp--preset--color--foreground) !important; }
 ```
 
-#### Current limits of the Global Styles API
+#### Current limitations of the Global Styles API
 
 ##### Set a different CSS selector for blocks requires server-registration
 
