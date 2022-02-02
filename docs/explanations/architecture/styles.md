@@ -13,7 +13,7 @@ This document introduces the main concepts related to styles that affect the use
   - From data to styles
   - Current limits of the Global styles API
 
-### 1. HTML and CSS
+### HTML and CSS
 
 By creating a post in the block editor the user is creating a number of artifacts: a HTML document plus a number of CSS stylesheets, either embedded in the document or external.
 
@@ -31,7 +31,7 @@ The stylesheets loaded in the front end include:
 - **User**. Some of the user actions in the editor will generate style content. This is the case for features such as duotone, layout, or link color.
 - **Other**. WordPress and plugins can also enqueue stylesheets.
 
-### 2. Block styles
+### Block styles
 
 Since the introduction of the block editor in WordPress 5.0, there were tools for the users to "add styles" to specific blocks. By using these tools, the user would attach new classes or inline styles to the blocks, modifying their visual aspect.
 
@@ -145,7 +145,7 @@ This means that the typography block support will do all of the things (create a
 
 Note that, once `__experimentalSkipSerialization` is enabled for a group (typography, color, spacing) it affects all block supports within this group (font size, line height, and font family within typography, and so on). There's [ongoing work](https://github.com/WordPress/gutenberg/pull/36293) to be able to disable block supports individually, you can follow that issue to check the status.
 
-### 3. Global styles
+### Global styles
 
 Global Styles refers to a mechanism that generates site-wide styles. Unlike the block styles described in the previous section, these are not serialized into the post content and are not attached to the block HTML. Instead, the output of this system is a new stylesheet with id `global-styles-inline-css`.
 
