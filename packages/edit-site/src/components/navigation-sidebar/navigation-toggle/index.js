@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useReducedMotion } from '@wordpress/compose';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -107,6 +108,7 @@ function NavigationToggle( { icon } ) {
 			>
 				{ buttonIcon }
 			</Button>
+			<PinnedItems.Slot scope="core/edit-global" />
 		</motion.div>
 	);
 }

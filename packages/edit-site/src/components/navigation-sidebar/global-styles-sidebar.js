@@ -10,7 +10,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import DefaultSidebar from './default-sidebar';
+import DefaultSidebar from '../sidebar/default-sidebar';
 import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
 
 export default function GlobalStylesSidebar() {
@@ -20,7 +20,8 @@ export default function GlobalStylesSidebar() {
 	return (
 		<DefaultSidebar
 			className="edit-site-global-styles-sidebar"
-			identifier="edit-site/global-styles"
+			scope="core/edit-global"
+			identifier="edit-global/global-styles"
 			title={ __( 'Styles' ) }
 			icon={ styles }
 			closeLabel={ __( 'Close global styles sidebar' ) }

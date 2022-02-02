@@ -55,6 +55,7 @@ export default function NavigationMenu( { innerBlocks } ) {
 				showBlockMovers
 				__experimentalFeatures
 				__experimentalPersistentListViewFeatures
+				__experimentalDarkMode
 			/>
 		</>
 	);

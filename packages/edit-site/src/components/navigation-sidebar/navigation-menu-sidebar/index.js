@@ -8,14 +8,15 @@ import { navigation } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import DefaultSidebar from '../default-sidebar';
+import DefaultSidebar from '../../sidebar/default-sidebar';
 import NavigationInspector from './navigation-inspector';
 
 export default function NavigationMenuSidebar() {
 	return (
 		<DefaultSidebar
 			className="edit-site-navigation-menu-sidebar"
-			identifier="edit-site/navigation-menu"
+			scope="core/edit-global"
+			identifier="edit-global/navigation-menu"
 			title={ __( 'Navigation' ) }
 			icon={ navigation }
 			closeLabel={ __( 'Close navigation menu sidebar' ) }

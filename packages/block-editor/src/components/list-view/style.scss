@@ -366,3 +366,16 @@ $block-navigation-max-indent: 8;
 	height: 36px;
 }
 
+.block-editor-list-view-tree.is-dark {
+	background: $gray-900;
+	.block-editor-list-view-block-contents {
+		color: $gray-100;
+	}
+	.block-editor-list-view-leaf.is-branch-selected:not(.is-selected) .block-editor-list-view-block-contents {
+		color: var(--wp-admin-theme-color-darker-20);
+	}
+	.block-editor-block-mover-button,
+	.block-editor-list-view-block__menu {
+		color: $gray-100;
+	}
+}

@@ -12,6 +12,8 @@ import { useDispatch } from '@wordpress/data';
 import { store as editSiteStore } from '../../store';
 import NavigationPanel from './navigation-panel';
 import NavigationToggle from './navigation-toggle';
+import GlobalStylesSidebar from './global-styles-sidebar';
+import NavigationMenuSidebar from './navigation-menu-sidebar';
 
 export const {
 	Fill: NavigationPanelPreviewFill,
@@ -38,6 +40,8 @@ function NavigationSidebar( { isDefaultOpen = false, activeTemplateType } ) {
 		<NavigationSidebarFill>
 			<NavigationToggle />
 			<NavigationPanel activeItem={ activeTemplateType } />
+			<NavigationMenuSidebar />
+			<GlobalStylesSidebar />
 			<NavigationPanelPreviewSlot />
 		</NavigationSidebarFill>
 	);

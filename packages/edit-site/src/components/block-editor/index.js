@@ -74,8 +74,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const openNavigationSidebar = useCallback( () => {
 		enableComplementaryArea(
-			'core/edit-site',
-			'edit-site/navigation-menu'
+			'core/edit-global',
+			'edit-global/navigation-menu'
 		);
 	}, [ enableComplementaryArea ] );
 	const contentRef = useRef();
