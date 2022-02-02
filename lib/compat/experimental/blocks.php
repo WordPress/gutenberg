@@ -19,6 +19,7 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 
 		$comment_args = array(
 			'orderby'                   => 'comment_date_gmt',
+			'order'                     => 'asc',
 			'status'                    => 'approve',
 			'no_found_rows'             => false,
 			'update_comment_meta_cache' => false, // We lazy-load comment meta for performance.
@@ -50,11 +51,6 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			} elseif ( 'oldest' === get_option( 'default_comments_page' ) ) {
 				$comment_args['offset'] = 0;
 			}
-		}
-
-		$comment_args['order'] = ! empty( $block->context['comments/order'] ) ? $block->context['comments/order'] : null;
-		if ( empty( $comment_args['order'] ) && get_option( 'comment_order' ) ) {
-			$comment_args['order'] = get_option( 'comment_order' );
 		}
 
 		return $comment_args;
