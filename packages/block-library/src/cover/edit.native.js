@@ -49,7 +49,13 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useRef,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 import { store as editPostStore } from '@wordpress/edit-post';
@@ -143,10 +149,12 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
-	const colorsDefault = useMobileGlobalStylesColors().reverse();
-	const coverDefaultPalette = {
-		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
-	};
+	const colorsDefault = useMobileGlobalStylesColors();
+	const coverDefaultPalette = useMemo( () => {
+		return {
+			colors: colorsDefault.reverse().slice( 0, THEME_COLORS_COUNT ),
+		};
+	}, [ colorsDefault ] );
 	const gradients = useSetting( 'color.gradients' ) || [];
 	const gradientValue =
 		customGradient || getGradientValueBySlug( gradients, gradient );
