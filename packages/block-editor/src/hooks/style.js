@@ -112,7 +112,7 @@ export function getInlineStyles( styles = {} ) {
 		if ( rule.selector !== 'self' ) {
 			throw "This style can't be added as inline style";
 		}
-		return ( output[ rule.key ] = rule.value );
+		output[ rule.key ] = rule.value;
 	} );
 
 	return output;
