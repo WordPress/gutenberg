@@ -321,7 +321,7 @@ const useMissingText = ( type ) => {
 			missingText = __( 'Add link' );
 	}
 
-	return <span>{ missingText }</span>;
+	return { missingText };
 };
 
 /**
