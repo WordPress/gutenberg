@@ -446,7 +446,7 @@ If blocks do this, they need to be registered in the server using the `block.jso
 
 Every chunk of styles can only use a single selector.
 
-This is particularly relevant if the block is using `__experimentalSkipSerialization` to serialize the different style properties to different nodes other than the wrapper. See "Current limits of blocks supports" for more.
+This is particularly relevant if the block is using `__experimentalSkipSerialization` to serialize the different style properties to different nodes other than the wrapper. See "Current limitations of blocks supports" for more.
 
 ##### Only a single property per block
 
