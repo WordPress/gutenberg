@@ -85,7 +85,7 @@ The following filters are available to change the behavior of blocks while editi
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
-The filter's callback receives an element, a block type and the block attributes as arguments. It should return an element.
+The filter's callback receives an element, a block definition object and the block attributes as arguments. It should return an element.
 
 #### `blocks.getSaveContent.extraProps`
 
