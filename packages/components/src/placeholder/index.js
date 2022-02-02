@@ -74,13 +74,11 @@ function Placeholder( {
 				{ label }
 			</div>
 			<fieldset className={ fieldsetClasses }>
-				<legend>
-					{ !! instructions && (
-						<div className="components-placeholder__instructions">
-							{ instructions }
-						</div>
-					) }
-				</legend>
+				{ !! instructions && (
+					<legend className="components-placeholder__instructions">
+						{ instructions }
+					</legend>
+				) }
 				{ children }
 			</fieldset>
 		</div>
