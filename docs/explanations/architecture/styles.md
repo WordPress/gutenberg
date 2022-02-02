@@ -438,7 +438,7 @@ In addition to the CSS Custom Properties, all presets but duotone generate CSS c
 
 ##### Set a different CSS selector for blocks requires server-registration
 
-By default, the selector asigned to a block is `.wp-block-<block-name>`. However, blocks can change this should they need. They can provide a CSS selector via the `__experimentalSelector` property in its `block.json`.
+By default, the selector assigned to a block is `.wp-block-<block-name>`. However, blocks can change this should they need. They can provide a CSS selector via the `__experimentalSelector` property in its `block.json`.
 
 If blocks do this, they need to be registered in the server using the `block.json`, otherwise, the global styles code doesn't have access to that information and will use the default CSS selector for the block.
 
