@@ -5,7 +5,8 @@
 		"isValid": true,
 		"attributes": {
 			"displayAsDropdown": false,
-			"showPostCounts": false
+			"showPostCounts": false,
+			"archiveType": "monthly"
 		},
 		"innerBlocks": [],
 		"originalContent": ""
