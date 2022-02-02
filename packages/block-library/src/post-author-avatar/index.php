@@ -110,7 +110,8 @@ function render_block_core_post_author_avatar( $attributes, $content, $block ) {
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$label = '';
 		if ( '_blank' === $attributes['linkTarget'] ) {
-			$label = 'aria-label="' . esc_attr__( '(opens in a new tab)' ) . '"';
+			// translators: %s is the Author name.
+			$label = 'aria-label="' . sprintf( esc_attr__( '( %s author archive, opens in a new tab)' ), $author_name ) . '"';
 		}
 		// translators: %1$s: Author archive link. %2$s: Link target. %3$s Aria label. %4$s Avatar image.
 		$avatar = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-post-author-avatar__link">%4$s</a>', get_author_posts_url( $author_id ), esc_attr( $attributes['linkTarget'] ), $label, $avatar );
