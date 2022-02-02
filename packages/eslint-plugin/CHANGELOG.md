@@ -13,6 +13,7 @@
 -   The bundled `eslint-plugin-jest` dependency has been updated from requiring `^24.1.3` to requiring `^25.2.3` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
 -   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^36.0.8` to requiring `^37.0.3` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
 -   The bundled `globals` dependency has been updated from requiring `^12.0.0` to requiring `^13.12.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The `gutenberg-phase` rule has been deprecated and replaced by the `is-gutenberg-plugin` rule. ([#38202](https://github.com/WordPress/gutenberg/pull/38202))
 
 ### Enhancement
 

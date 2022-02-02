@@ -59,7 +59,19 @@ We commit to keeping the breaking changes minimal so you can upgrade `@wordpress
 
 ### `build`
 
-Transforms your code according the configuration provided so it’s ready for production and optimized for the best performance. The entry points for your project get detected by scanning all script fields in `block.json` files located in the `src` directory. The fallback entry point is `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) in case there is no `block.json` file found. The output generated will be written to `build/index.js`. This script exits after producing a single build. For incremental builds, better suited for development, see the [start](#start) script.
+Transforms your code according the configuration provided so it’s ready for production and optimized for the best performance. The entry points for your project get detected by scanning all script fields in `block.json` files located in the `src` directory. The script fields in `block.json` should pass relative paths to `block.json` in the same folder.
+
+_Example:_
+
+```json
+{
+	"editorScript": "file:index.js",
+	"editorStyle": "file:editor.css",
+	"style": "file:style.css"
+}
+```
+
+The fallback entry point is `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) in case there is no `block.json` file found. The output generated will be written to `build/index.js`. This script exits after producing a single build. For incremental builds, better suited for development, see the [start](#start) script.
 
 _Example:_
 
@@ -334,7 +346,19 @@ It reuses the same logic as `npm pack` command to create an npm package tarball.
 
 ### `start`
 
-Transforms your code according the configuration provided so it’s ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry points for your project get detected by scanning all script fields in `block.json` files located in the `src` directory. The fallback entry point is `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) in case there is no `block.json` file found. The output generated will be written to `build/index.js`. For single builds, better suited for production, see the [build](#build) script.
+Transforms your code according the configuration provided so it’s ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry points for your project get detected by scanning all script fields in `block.json` files located in the `src` directory.  The script fields in `block.json` should pass relative paths to `block.json` in the same folder.
+
+_Example:_
+
+```json
+{
+	"editorScript": "file:index.js",
+	"editorStyle": "file:editor.css",
+	"style": "file:style.css"
+}
+```
+
+The fallback entry point is `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) in case there is no `block.json` file found. The output generated will be written to `build/index.js`. For single builds, better suited for production, see the [build](#build) script.
 
 _Example:_
 
