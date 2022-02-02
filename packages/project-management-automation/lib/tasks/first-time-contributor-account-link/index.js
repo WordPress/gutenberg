@@ -40,15 +40,21 @@ function getPromptMessageText( author ) {
  * @param {GitHub}             octokit Initialized Octokit REST client.
  */
 async function firstTimeContributorAccountLink( payload, octokit ) {
-	if ( payload.ref !== 'refs/heads/trunk' ) {
-		debug(
-			'first-time-contributor-account-link: Commit is not to `trunk`. Aborting'
-		);
-		return;
-	}
+	// if ( payload.ref !== 'refs/heads/trunk' ) {
+	// 	debug(
+	// 		'first-time-contributor-account-link: Commit is not to `trunk`. Aborting'
+	// 	);
+	// 	return;
+	// }
 
 	const commit = /** @type {WebhookPayloadPushCommit} */ ( payload
 		.commits[ 0 ] );
+
+	debug(
+		'first-time-contributor-account-link: Have some json: ' +
+			JSON.stringify( commit.author )
+	);
+
 	const pullRequest = getAssociatedPullRequest( commit );
 	if ( ! pullRequest ) {
 		debug(
