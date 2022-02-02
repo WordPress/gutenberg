@@ -139,8 +139,8 @@
 	},
 	{
 		"title": "Block Supports",
-		"slug": "block-supports",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports.md",
+		"slug": "block-supports-in-static-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-static-blocks.md",
 		"parent": "block-tutorial"
 	},
 	{
