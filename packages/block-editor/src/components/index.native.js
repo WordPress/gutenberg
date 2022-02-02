@@ -44,7 +44,13 @@ export {
 	MEDIA_TYPE_AUDIO,
 	MEDIA_TYPE_ANY,
 } from './media-upload';
-export { default as MediaUploadProgress } from './media-upload-progress';
+export {
+	default as MediaUploadProgress,
+	MEDIA_UPLOAD_STATE_UPLOADING,
+	MEDIA_UPLOAD_STATE_SUCCEEDED,
+	MEDIA_UPLOAD_STATE_FAILED,
+	MEDIA_UPLOAD_STATE_RESET,
+} from './media-upload-progress';
 export { default as BlockMediaUpdateProgress } from './block-media-update-progress';
 export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';

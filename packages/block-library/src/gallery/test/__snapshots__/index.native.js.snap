@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Gallery block finishes pending uploads upon opening editor (TC001 - Close/Re-open post with an ongoing image upload) 1`] = `
+"<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"id\\":2001} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-2.jpeg\\" alt=\\"\\" class=\\"wp-image-2001\\"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
 exports[`Gallery block inserts block 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"></figure>

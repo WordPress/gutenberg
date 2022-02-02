@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	act,
 	getEditorHtml,
 	initializeEditor,
 	fireEvent,
@@ -15,6 +16,11 @@ import {
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { Platform } from '@wordpress/element';
+import {
+	MEDIA_UPLOAD_STATE_UPLOADING,
+	MEDIA_UPLOAD_STATE_SUCCEEDED,
+} from '@wordpress/block-editor';
+import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
 
 const GALLERY_WITH_ONE_IMAGE = `<!-- wp:gallery {"linkTo":"none"} -->
 <figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":1} -->
@@ -148,5 +154,86 @@ describe( 'Gallery block', () => {
 		// button is visible
 		const blockActionsButton = getByA11yLabel( /Open Block Actions Menu/ );
 		expect( blockActionsButton ).toBeVisible();
+	} );
+
+	it( 'finishes pending uploads upon opening the editor (TC001 - Close/Re-open post with an ongoing image upload)', async () => {
+		const MEDIA = [
+			{
+				localId: 1,
+				localUrl: 'file:///local-image-1.jpeg',
+				serverId: 2000,
+				serverUrl:
+					'https://test-site.files.wordpress.com/local-image-1.jpeg',
+			},
+			{
+				localId: 2,
+				localUrl: 'file:///local-image-2.jpeg',
+				serverId: 2001,
+				serverUrl:
+					'https://test-site.files.wordpress.com/local-image-2.jpeg',
+			},
+		];
+
+		const mediaUploadListeners = [];
+		subscribeMediaUpload.mockImplementation( ( callback ) => {
+			mediaUploadListeners.push( callback );
+		} );
+		const triggerMediaUpload = ( payload ) =>
+			mediaUploadListeners.forEach( ( listener ) => listener( payload ) );
+
+		// Initialize with a gallery that contains two items that are being uploaded
+		const {
+			galleryBlock,
+		} = await initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
+		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ MEDIA[ 0 ].localId }} -->
+		<figure class="wp-block-image"><img src="${ MEDIA[ 0 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 0 ].localId }"/></figure>
+		<!-- /wp:image -->
+		
+		<!-- wp:image {"id":${ MEDIA[ 1 ].localId }} -->
+		<figure class="wp-block-image"><img src="${ MEDIA[ 1 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 1 ].localId }"/></figure>
+		<!-- /wp:image --></figure>
+		<!-- /wp:gallery -->` );
+
+		// Notify that the media items are uploading
+		await act( async () => {
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_UPLOADING,
+				mediaId: MEDIA[ 0 ].localId,
+				progress: 0.5,
+			} );
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_UPLOADING,
+				mediaId: MEDIA[ 1 ].localId,
+				progress: 0.25,
+			} );
+		} );
+
+		// Check that images are showing a loading state
+		const galleryItem1 = within( galleryBlock ).getByA11yLabel(
+			/Image Block\. Row 1/
+		);
+		const galleryItem2 = within( galleryBlock ).getByA11yLabel(
+			/Image Block\. Row 2/
+		);
+		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
+		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
+
+		// Notify that the media items upload succeeded
+		await act( async () => {
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_SUCCEEDED,
+				mediaId: MEDIA[ 0 ].localId,
+				mediaUrl: MEDIA[ 0 ].serverUrl,
+				mediaServerId: MEDIA[ 0 ].serverId,
+			} );
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_SUCCEEDED,
+				mediaId: MEDIA[ 1 ].localId,
+				mediaUrl: MEDIA[ 1 ].serverUrl,
+				mediaServerId: MEDIA[ 1 ].serverId,
+			} );
+		} );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
