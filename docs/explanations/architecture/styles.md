@@ -128,7 +128,7 @@ This is an active area of work you can follow [in the tracking issue](https://gi
 
 While work continues in that proposal, there's an escape hatch, an experimental option block authors can use. Any block support can skip the serialization to HTML markup by using  `__experimentalSkipSerialization`. For example:
 
-```
+```json
 {
   "name": "core/paragraph", 
   "...": "...",
