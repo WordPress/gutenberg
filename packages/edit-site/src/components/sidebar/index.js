@@ -13,8 +13,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
-import GlobalStylesSidebar from './global-styles-sidebar';
-import NavigationMenuSidebar from './navigation-menu-sidebar';
 import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import TemplateCard from './template-card';
@@ -62,6 +60,7 @@ export function SidebarComplementaryAreaFills() {
 		<>
 			<DefaultSidebar
 				identifier={ sidebarName }
+				scope={ 'core/edit-site' }
 				title={ __( 'Settings' ) }
 				icon={ cog }
 				closeLabel={ __( 'Close settings sidebar' ) }
@@ -77,8 +76,6 @@ export function SidebarComplementaryAreaFills() {
 					<InspectorSlot bubblesVirtually />
 				) }
 			</DefaultSidebar>
-			<GlobalStylesSidebar />
-			<NavigationMenuSidebar />
 		</>
 	);
 }

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -59,8 +64,12 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {boolean} props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean} props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
  * @param {boolean} props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
+<<<<<<< HEAD
  * @param {string}  props.id                                       Unique identifier for the root list element (primarily for a11y purposes).
  * @param {boolean} props.expandNested                             Flag to determine whether nested levels are expanded by default.
+=======
+ * @param {boolean}  props.__experimentalDarkMode                   Flag to turn on dark mode
+>>>>>>> 0231f0b300 (Navigation Sidebar: experiment with a persistent vertical display)
  * @param {Object}  ref                                            Forwarded ref
  */
 function ListView(
@@ -69,6 +78,7 @@ function ListView(
 		__experimentalFeatures,
 		__experimentalPersistentListViewFeatures,
 		__experimentalHideContainerBlockActions,
+		__experimentalDarkMode,
 		showNestedBlocks,
 		showBlockMovers,
 		id,
@@ -209,8 +219,14 @@ function ListView(
 				blockDropTarget={ blockDropTarget }
 			/>
 			<TreeGrid
+<<<<<<< HEAD
 				id={ id }
 				className="block-editor-list-view-tree"
+=======
+				className={ classnames( 'block-editor-list-view-tree', {
+					'is-dark': __experimentalDarkMode,
+				} ) }
+>>>>>>> 0231f0b300 (Navigation Sidebar: experiment with a persistent vertical display)
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }

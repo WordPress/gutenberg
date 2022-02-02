@@ -57,6 +57,7 @@ export default function NavigationMenu( { innerBlocks, id } ) {
 				expandNested={ false }
 				__experimentalFeatures
 				__experimentalPersistentListViewFeatures
+				__experimentalDarkMode
 			/>
 		</>
 	);

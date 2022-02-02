@@ -10,7 +10,6 @@ $header-toolbar-min-width: 335px;
 	justify-content: space-between;
 
 	body.is-fullscreen-mode & {
-		padding-left: 60px;
 		transition: padding-left 20ms linear;
 		transition-delay: 80ms;
 		@include reduce-motion("transition");
@@ -65,10 +64,10 @@ body.is-navigation-sidebar-open {
 .edit-site-header__toolbar {
 	display: flex;
 	align-items: center;
-	padding-left: $grid-unit-10;
+	padding-left: $grid-unit-20;
 
 	@include break-small() {
-		padding-left: $grid-unit-30;
+		padding-left: $grid-unit-20;
 	}
 
 	@include break-wide() {

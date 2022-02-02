@@ -8,6 +8,7 @@ import {
 
 export default function DefaultSidebar( {
 	className,
+	scope,
 	identifier,
 	title,
 	icon,
@@ -21,7 +22,7 @@ export default function DefaultSidebar( {
 		<>
 			<ComplementaryArea
 				className={ className }
-				scope="core/edit-site"
+				scope={ scope }
 				identifier={ identifier }
 				title={ title }
 				icon={ icon }
@@ -33,7 +34,7 @@ export default function DefaultSidebar( {
 				{ children }
 			</ComplementaryArea>
 			<ComplementaryAreaMoreMenuItem
-				scope="core/edit-site"
+				scope={ scope }
 				identifier={ identifier }
 				icon={ icon }
 			>

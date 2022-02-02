@@ -220,7 +220,10 @@ function Editor( { onError } ) {
 												)
 											}
 											drawer={
-												<NavigationSidebar.Slot />
+												<>
+													<NavigationSidebar.Slot />
+													<ComplementaryArea.Slot scope="core/edit-global" />
+												</>
 											}
 											header={
 												<Header
