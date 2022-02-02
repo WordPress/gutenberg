@@ -12,7 +12,7 @@ exports[`Gallery block finishes pending uploads upon opening the editor (TC001 -
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block handles failed uploads items (TC006 - Choose from device (stay in editor) - Failed upload) 1`] = `
+exports[`Gallery block handles failed uploads (TC006 - Choose from device (stay in editor) - Failed upload) 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":1} -->
 <figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>

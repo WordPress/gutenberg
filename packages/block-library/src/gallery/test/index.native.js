@@ -23,6 +23,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	requestMediaPicker,
+	requestImageFailedRetryDialog,
 	subscribeMediaUpload,
 } from '@wordpress/react-native-bridge';
 
@@ -440,6 +441,7 @@ describe( 'Gallery block', () => {
 				hasItems: false,
 			}
 		);
+		fireEvent.press( galleryBlock );
 
 		// Upload images from device
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
@@ -518,12 +520,22 @@ describe( 'Gallery block', () => {
 			} );
 		} );
 
-		expect(
+		// Check that failed images provide the option to retry the upload
+		fireEvent.press( galleryItem1 );
+		fireEvent.press(
 			within( galleryItem1 ).getByText( /Failed to insert media/ )
-		).toBeVisible();
-		expect(
+		);
+		expect( requestImageFailedRetryDialog ).toHaveBeenCalledWith(
+			MEDIA[ 0 ].localId
+		);
+		fireEvent.press( galleryItem2 );
+		fireEvent.press(
 			within( galleryItem2 ).getByText( /Failed to insert media/ )
-		).toBeVisible();
+		);
+		expect( requestImageFailedRetryDialog ).toHaveBeenCalledWith(
+			MEDIA[ 1 ].localId
+		);
+
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
