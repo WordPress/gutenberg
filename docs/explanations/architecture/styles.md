@@ -346,7 +346,6 @@ For example, the following `theme.json` structure:
     }
   }
 }
-}
 ```
 
 is converted to the following CSS:
