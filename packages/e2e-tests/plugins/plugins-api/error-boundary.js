@@ -2,8 +2,7 @@
 	const registerPlugin = wp.plugins.registerPlugin;
 
 	function MyErrorPlugin() {
-		// throw new Error('Whoops!')
-		throw new TypeError('Hello', "someFile.js", 10)
+		throw new Error('Whoops!');
 	}
 
 	registerPlugin( 'my-error-plugin', {
