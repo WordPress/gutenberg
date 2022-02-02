@@ -291,7 +291,10 @@ function Iframe(
 									...bodyClasses
 								) }
 							>
-								<StyleProvider document={ iframeDocument }>
+								<StyleProvider
+									document={ iframeDocument }
+									whichOne="iframe"
+								>
 									{ childrenWithProps }
 								</StyleProvider>
 							</body>

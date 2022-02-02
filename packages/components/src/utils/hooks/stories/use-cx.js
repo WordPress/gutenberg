@@ -151,7 +151,7 @@ export const _iframe = () => {
 	return (
 		<Iframe>
 			<Example args={ [ redText ] }>This text should be red</Example>
-			<StyleProvider document={ document }>
+			<StyleProvider document={ document } whichOne="internal">
 				<Example args={ [ blueText ] }>
 					This text should be blue
 				</Example>
