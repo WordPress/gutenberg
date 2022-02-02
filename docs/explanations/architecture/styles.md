@@ -158,7 +158,7 @@ This is the general data flow:
 The process of generating the stylesheet has, in essence, three steps:
 
 1. Gather data: the `theme.json` file [bundled with WordPress](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/theme.json)), the `theme.json` file of the active theme if it exists, and the user's styles provided via the global styles UI in the site editor.
-2. Consolidate data: the structured information coming from different origins -WordPress defaults, theme, and user- is normalized and merged into a single structure.
+2. Consolidate data: the structured information from different origins -WordPress defaults, theme, and user- is normalized and merged into a single structure.
 3. Convert data into a stylesheet: convert the internal representation into CSS style rules and enqueue them as a stylesheet.
 
 #### Gather data
