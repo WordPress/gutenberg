@@ -5,6 +5,11 @@ import {
 	__unstableIframe as Iframe,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
+import {
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	ColorIndicator,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -21,50 +26,74 @@ const StylesPreview = ( { height = 150 } ) => {
 	const [ styles ] = useGlobalStylesOutput();
 
 	return (
-		<Iframe
-			className="edit-site-global-styles-preview__iframe"
-			head={ <EditorStyles styles={ styles } /> }
-			style={ { height } }
-		>
-			<div
-				style={ {
-					display: 'flex',
-					gap: 20,
-					alignItems: 'center',
-					justifyContent: 'center',
-					height: '100%',
-					transform: `scale(${ height / 150 })`,
-					background: gradientValue ?? backgroundColor,
-					cursor: 'pointer',
-				} }
+		<>
+			<HStack
+				spacing={ 5 }
+				className="edit-site-global-styles-preview__content"
 			>
 				<div style={ { fontFamily, fontSize: '80px' } }>Aa</div>
+				<VStack spacing={ 2 }>
+					<ColorIndicator colorValue={ textColor } />
+					<ColorIndicator colorValue={ linkColor } />
+				</VStack>
+			</HStack>
+
+			<Iframe
+				className="edit-site-global-styles-preview__iframe"
+				head={ <EditorStyles styles={ styles } /> }
+				style={ { height } }
+			>
+				<HStack
+					spacing={ 5 }
+					className="edit-site-global-styles-preview__content"
+				>
+					<div style={ { fontFamily, fontSize: '80px' } }>Aa</div>
+					<VStack spacing={ 2 }>
+						<ColorIndicator colorValue={ textColor } />
+						<ColorIndicator colorValue={ linkColor } />
+					</VStack>
+				</HStack>
+
 				<div
 					style={ {
 						display: 'flex',
 						gap: 20,
-						flexDirection: 'column',
+						alignItems: 'center',
+						justifyContent: 'center',
+						height: '100%',
+						transform: `scale(${ height / 150 })`,
+						background: gradientValue ?? backgroundColor,
+						cursor: 'pointer',
 					} }
 				>
+					<div style={ { fontFamily, fontSize: '80px' } }>Aa</div>
 					<div
 						style={ {
-							height: 40,
-							width: 40,
-							background: textColor,
-							borderRadius: 20,
+							display: 'flex',
+							gap: 20,
+							flexDirection: 'column',
 						} }
-					/>{ ' ' }
-					<div
-						style={ {
-							height: 40,
-							width: 40,
-							background: linkColor,
-							borderRadius: 20,
-						} }
-					/>
+					>
+						<div
+							style={ {
+								height: 40,
+								width: 40,
+								background: textColor,
+								borderRadius: 20,
+							} }
+						/>{ ' ' }
+						<div
+							style={ {
+								height: 40,
+								width: 40,
+								background: linkColor,
+								borderRadius: 20,
+							} }
+						/>
+					</div>
 				</div>
-			</div>
-		</Iframe>
+			</Iframe>
+		</>
 	);
 };
 

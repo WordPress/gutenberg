@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { hasConnectNamespace, useContextSystem } from '../ui/context';
+// import { hasConnectNamespace } from '../ui/context';
 import { FlexItem, useFlex } from '../flex';
 import { getAlignmentProps } from './utils';
 import { getValidChildren } from '../ui/utils/get-valid-children';
@@ -17,7 +17,7 @@ export function useHStack( props ) {
 		direction,
 		spacing = 2,
 		...otherProps
-	} = useContextSystem( props, 'HStack' );
+	} = props;
 
 	const align = getAlignmentProps( alignment, direction );
 
@@ -26,7 +26,7 @@ export function useHStack( props ) {
 		// @ts-ignore
 		( /** @type {import('react').ReactElement} */ child, index ) => {
 			const _key = child.key || `hstack-${ index }`;
-			const _isSpacer = hasConnectNamespace( child, [ 'Spacer' ] );
+			const _isSpacer = false; //hasConnectNamespace( child, [ 'Spacer' ] );
 
 			if ( _isSpacer ) {
 				return <FlexItem isBlock key={ _key } { ...child.props } />;

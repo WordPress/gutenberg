@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
  * WordPress dependencies
  */
 import { __unstableIframe as Iframe } from '@wordpress/block-editor';
-// import { useRef } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,6 +26,18 @@ export default {
 const Example = ( { args, children } ) => {
 	const cx = useCx();
 	const classes = cx( ...args );
+	return <span className={ classes }>{ children }</span>;
+};
+
+const ExampleWithUseMemoWrong = ( { args, children } ) => {
+	const cx = useCx();
+	const classes = useMemo( () => cx( ...args ), [ ...args ] );
+	return <span className={ classes }>{ children }</span>;
+};
+
+const ExampleWithUseMemoRight = ( { args, children } ) => {
+	const cx = useCx();
+	const classes = useMemo( () => cx( ...args ), [ ...args, cx ] );
 	return <span className={ classes }>{ children }</span>;
 };
 
@@ -149,14 +161,17 @@ export const _iframe = () => {
 	`;
 
 	return (
-		<Iframe>
-			<Example args={ [ redText ] }>This text should be red</Example>
-			<StyleProvider document={ document } whichOne="internal">
-				<Example args={ [ blueText ] }>
+		<>
+			<ExampleWithUseMemoRight args={ [ blueText ] }>
+				This text should be blue
+			</ExampleWithUseMemoRight>
+			<Iframe>
+				<Example args={ [ redText ] }>This text should be red</Example>
+				<ExampleWithUseMemoWrong args={ [ blueText ] }>
 					This text should be blue
-				</Example>
-			</StyleProvider>
-		</Iframe>
+				</ExampleWithUseMemoWrong>
+			</Iframe>
+		</>
 	);
 };
 

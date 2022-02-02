@@ -1,7 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-import { contextConnect } from '../ui/context';
+// import { contextConnect } from '../ui/context';
 import { View } from '../view';
 import { useHStack } from './hook';
 
@@ -38,6 +43,6 @@ function HStack( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedHStack = contextConnect( HStack, 'HStack' );
+// const ConnectedHStack = contextConnect( HStack, 'HStack' );
 
-export default ConnectedHStack;
+export default forwardRef( HStack );

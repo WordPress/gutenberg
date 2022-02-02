@@ -134,6 +134,7 @@ export function useFlex( props ) {
 		justify,
 		wrap,
 		rtl.watch(),
+		cx,
 	] );
 
 	return { ...otherProps, className: classes, isColumn };
