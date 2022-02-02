@@ -51,7 +51,7 @@ const COVER_BLOCK_SOLID_COLOR_HTML = `<!-- wp:cover {"overlayColor":"cyan-bluish
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
 
-const COLOR_PINK = '#f78da7';
+const COLOR_CYAN = '#0693e3';
 const COLOR_RED = '#cf2e2e';
 const COLOR_GRAY = '#abb8c3';
 const GRADIENT_GREEN =
@@ -308,7 +308,7 @@ describe( 'color settings', () => {
 		const colorPalette = await waitFor( () =>
 			getByTestId( 'color-palette' )
 		);
-		const colorButton = within( colorPalette ).getByTestId( COLOR_PINK );
+		const colorButton = within( colorPalette ).getByTestId( COLOR_CYAN );
 
 		expect( colorButton ).toBeDefined();
 		fireEvent.press( colorButton );
@@ -338,7 +338,7 @@ describe( 'color settings', () => {
 
 		// Find the selected color
 		const colorPaletteButton = await waitFor( () =>
-			getByTestId( COLOR_PINK )
+			getByTestId( COLOR_CYAN )
 		);
 		expect( colorPaletteButton ).toBeDefined();
 
@@ -420,7 +420,7 @@ describe( 'color settings', () => {
 		const colorPalette = await waitFor( () =>
 			getByTestId( 'color-palette' )
 		);
-		const colorButton = within( colorPalette ).getByTestId( COLOR_PINK );
+		const colorButton = within( colorPalette ).getByTestId( COLOR_CYAN );
 
 		expect( colorButton ).toBeDefined();
 		fireEvent.press( colorButton );
@@ -450,7 +450,7 @@ describe( 'color settings', () => {
 
 		// Find the selected color
 		const colorPaletteButton = await waitFor( () =>
-			getByTestId( COLOR_PINK )
+			getByTestId( COLOR_CYAN )
 		);
 		expect( colorPaletteButton ).toBeDefined();
 
