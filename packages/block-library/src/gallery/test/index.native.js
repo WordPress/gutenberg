@@ -14,18 +14,7 @@ import {
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
-
-beforeAll( () => {
-	// Register all core blocks
-	registerCoreBlocks();
-} );
-
-afterAll( () => {
-	// Clean up registered blocks
-	getBlockTypes().forEach( ( block ) => {
-		unregisterBlockType( block.name );
-	} );
-} );
+import { Platform } from '@wordpress/element';
 
 const GALLERY_WITH_ONE_IMAGE = `<!-- wp:gallery {"linkTo":"none"} -->
 <figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":1} -->
@@ -53,6 +42,18 @@ const addGalleryBlock = async () => {
 
 	return screen;
 };
+
+beforeAll( () => {
+	// Register all core blocks
+	registerCoreBlocks();
+} );
+
+afterAll( () => {
+	// Clean up registered blocks
+	getBlockTypes().forEach( ( block ) => {
+		unregisterBlockType( block.name );
+	} );
+} );
 
 describe( 'Gallery block', () => {
 	it( 'inserts block', async () => {
@@ -88,7 +89,7 @@ describe( 'Gallery block', () => {
 		} );
 
 		const galleryItem = await waitFor( () =>
-			getByA11yLabel( /Image Block\. Row 1/ )
+			within( galleryBlock ).getByA11yLabel( /Image Block\. Row 1/ )
 		);
 		fireEvent.press( galleryItem );
 
@@ -124,5 +125,36 @@ describe( 'Gallery block', () => {
 		expect( getByText( 'Choose from device' ) ).toBeDefined();
 		expect( getByText( 'Take a Photo' ) ).toBeDefined();
 		expect( getByText( 'WordPress Media Library' ) ).toBeDefined();
+	} );
+
+	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
+	// is addressed.
+	it.skip( 'displays media options picker when selecting the block', () => {
+		// Initialize with an empty gallery
+		const { getByA11yLabel, getByText, getByTestId } = initializeEditor( {
+			initialHtml: `<!-- wp:gallery {"linkTo":"none"} -->
+		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure>
+		<!-- /wp:gallery -->`,
+		} );
+
+		// Tap on Gallery block
+		fireEvent.press( getByText( 'ADD MEDIA' ) );
+
+		// Observe that media options picker is displayed
+		expect( getByText( 'Choose images' ) ).toBeDefined();
+		expect( getByText( 'WordPress Media Library' ) ).toBeDefined();
+
+		// Dimiss the picker
+		if ( Platform.isIOS ) {
+			fireEvent.press( getByText( 'Cancel' ) );
+		} else {
+			const mediaPicker = getByTestId( 'media-options-picker' );
+			fireEvent( mediaPicker, 'backdropPress' );
+		}
+
+		// Observe that the block is selected, this is done by checking if the block settings
+		// button is visible
+		const blockActionsButton = getByA11yLabel( /Open Block Actions Menu/ );
+		expect( blockActionsButton ).toBeVisible();
 	} );
 } );
