@@ -8,6 +8,7 @@ import {
 	FocalPointSettingsPanel,
 	ImageLinkDestinationsScreen,
 	LinkPickerScreen,
+	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -32,7 +33,7 @@ function BottomSheetSettings( {
 	...props
 } ) {
 	const colorSettings = {
-		colors: useSetting( 'color.palette' ) || settings.colors,
+		colors: useMobileGlobalStylesColors(),
 		gradients: useSetting( 'color.gradients' ) || settings.gradients,
 	};
 

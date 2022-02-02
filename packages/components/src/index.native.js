@@ -134,4 +134,7 @@ export {
 	withGlobalStyles,
 	getMergedGlobalStyles,
 } from './mobile/global-styles-context';
-export { getGlobalStyles } from './mobile/global-styles-context/utils';
+export {
+	getGlobalStyles,
+	useMobileGlobalStylesColors,
+} from './mobile/global-styles-context/utils';

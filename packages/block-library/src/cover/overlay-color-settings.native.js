@@ -15,6 +15,7 @@ import {
 	useSetting,
 } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
+import { useMobileGlobalStylesColors } from '@wordpress/components';
 
 function OverlayColorSettings( {
 	overlayColor,
@@ -24,7 +25,7 @@ function OverlayColorSettings( {
 	setAttributes,
 } ) {
 	const EMPTY_ARRAY = [];
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const colors = useMobileGlobalStylesColors();
 	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
 
 	const gradientValue =

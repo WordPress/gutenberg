@@ -7,7 +7,11 @@ import { Dimensions } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { getPxFromCssUnit } from '@wordpress/block-editor';
+import {
+	getPxFromCssUnit,
+	useSetting,
+	useMultipleOriginColorsAndGradients,
+} from '@wordpress/block-editor';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
@@ -305,6 +309,19 @@ function normalizeFontSizes( fontSizes ) {
 	return normalizedFontSizes;
 }
 
+export function useMobileGlobalStylesColors() {
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const availableThemeColors = colorGradientSettings.colors
+		.reduce( ( colors, origin ) => colors.concat( origin.colors ), [] )
+		.reverse();
+	// Default editor colors if it's not a block-based theme.
+	const editorDefaultColors = useSetting( 'color.palette' );
+
+	return availableThemeColors.length >= 1
+		? availableThemeColors
+		: editorDefaultColors;
+}
+
 export function getGlobalStyles( rawStyles, rawFeatures ) {
 	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
 	const mappedValues = getMappedValues( features, features?.color?.palette );
@@ -337,6 +354,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 				gradients,
 				text: features?.color?.text ?? true,
 				background: features?.color?.background ?? true,
+				defaultPalette: true,
 			},
 			typography: {
 				fontSizes,

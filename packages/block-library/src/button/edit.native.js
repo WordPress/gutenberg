@@ -29,6 +29,7 @@ import {
 	BottomSheetSelectControl,
 	CSS_UNITS,
 	filterUnitsWithSettings,
+	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import { link } from '@wordpress/icons';
 import { store as editPostStore } from '@wordpress/edit-post';
@@ -118,7 +119,7 @@ function ButtonEdit( props ) {
 	const [ borderRadiusUnit, setBorderRadiusUnit ] = useState( valueUnit );
 
 	const richTextRef = useRef();
-	const colors = useSetting( 'color.palette' ) || [];
+	const colors = useMobileGlobalStylesColors();
 	const gradients = useSetting( 'color.gradients' ) || [];
 
 	useEffect( () => {

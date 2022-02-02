@@ -31,6 +31,7 @@ import {
 	ColorPicker,
 	BottomSheetConsumer,
 	useConvertUnitToMobile,
+	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -142,7 +143,7 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
-	const colorsDefault = useSetting( 'color.palette' ) || [];
+	const colorsDefault = useMobileGlobalStylesColors().reverse();
 	const coverDefaultPalette = {
 		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 	};

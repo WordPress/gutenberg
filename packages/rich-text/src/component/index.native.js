@@ -1260,13 +1260,15 @@ export default compose( [
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
-		const experimentalFeatures =
-			settings?.__experimentalFeatures?.color?.palette;
-		const colorPalette =
-			experimentalFeatures?.user ??
-			experimentalFeatures?.theme ??
-			experimentalFeatures?.default ??
-			settings?.colors;
+		const colorsPalettes = settings?.__experimentalFeatures?.color?.palette;
+		const allColorsPalette = [
+			...( colorsPalettes?.theme ? colorsPalettes.theme : [] ),
+			...( colorsPalettes?.custom ? colorsPalettes.custom : [] ),
+			...( colorsPalettes?.default ? colorsPalettes.default : [] ),
+		];
+		const colorPalette = colorsPalettes
+			? allColorsPalette
+			: settings?.colors;
 
 		return {
 			areMentionsSupported:
