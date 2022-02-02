@@ -22,11 +22,30 @@ import {
 } from '@wordpress/block-editor';
 import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
 
+const GALLERY_EMPTY = `<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure>
+<!-- /wp:gallery -->`;
+
 const GALLERY_WITH_ONE_IMAGE = `<!-- wp:gallery {"linkTo":"none"} -->
 <figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":1} -->
 <figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></figure>
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->`;
+
+const MEDIA = [
+	{
+		localId: 1,
+		localUrl: 'file:///local-image-1.jpeg',
+		serverId: 2000,
+		serverUrl: 'https://test-site.files.wordpress.com/local-image-1.jpeg',
+	},
+	{
+		localId: 2,
+		localUrl: 'file:///local-image-2.jpeg',
+		serverId: 2001,
+		serverUrl: 'https://test-site.files.wordpress.com/local-image-2.jpeg',
+	},
+];
 
 const addGalleryBlock = async () => {
 	const screen = initializeEditor();
@@ -49,22 +68,28 @@ const addGalleryBlock = async () => {
 	return screen;
 };
 
-const initializeWithGalleryBlock = async ( initialHtml ) => {
+const initializeWithGalleryBlock = (
+	initialHtml,
+	{ hasItems = true } = {}
+) => {
 	const screen = initializeEditor( { initialHtml } );
 	const { getByA11yLabel } = screen;
 
 	const galleryBlock = getByA11yLabel( /Gallery Block\. Row 1/ );
 
-	const innerBlockListWrapper = await waitFor( () =>
-		within( galleryBlock ).getByTestId( 'block-list-wrapper' )
-	);
-	fireEvent( innerBlockListWrapper, 'layout', {
-		nativeEvent: {
-			layout: {
-				width: 100,
-			},
-		},
-	} );
+	if ( hasItems ) {
+		fireEvent(
+			within( galleryBlock ).getByTestId( 'block-list-wrapper' ),
+			'layout',
+			{
+				nativeEvent: {
+					layout: {
+						width: 100,
+					},
+				},
+			}
+		);
+	}
 
 	return { ...screen, galleryBlock };
 };
@@ -94,7 +119,7 @@ describe( 'Gallery block', () => {
 	} );
 
 	it( 'selects a gallery item', async () => {
-		const { galleryBlock } = await initializeWithGalleryBlock(
+		const { galleryBlock } = initializeWithGalleryBlock(
 			GALLERY_WITH_ONE_IMAGE
 		);
 
@@ -109,7 +134,7 @@ describe( 'Gallery block', () => {
 	} );
 
 	it( 'shows appender button when gallery has images', async () => {
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
+		const { galleryBlock, getByText } = initializeWithGalleryBlock(
 			GALLERY_WITH_ONE_IMAGE
 		);
 
@@ -130,9 +155,7 @@ describe( 'Gallery block', () => {
 	it.skip( 'displays media options picker when selecting the block', () => {
 		// Initialize with an empty gallery
 		const { getByA11yLabel, getByText, getByTestId } = initializeEditor( {
-			initialHtml: `<!-- wp:gallery {"linkTo":"none"} -->
-		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure>
-		<!-- /wp:gallery -->`,
+			initialHtml: GALLERY_EMPTY,
 		} );
 
 		// Tap on Gallery block
@@ -157,26 +180,10 @@ describe( 'Gallery block', () => {
 	} );
 
 	it( 'finishes pending uploads upon opening the editor (TC001 - Close/Re-open post with an ongoing image upload)', async () => {
-		const MEDIA = [
-			{
-				localId: 1,
-				localUrl: 'file:///local-image-1.jpeg',
-				serverId: 2000,
-				serverUrl:
-					'https://test-site.files.wordpress.com/local-image-1.jpeg',
-			},
-			{
-				localId: 2,
-				localUrl: 'file:///local-image-2.jpeg',
-				serverId: 2001,
-				serverUrl:
-					'https://test-site.files.wordpress.com/local-image-2.jpeg',
-			},
-		];
-
 		const mediaUploadListeners = [];
 		subscribeMediaUpload.mockImplementation( ( callback ) => {
 			mediaUploadListeners.push( callback );
+			return { remove: jest.fn() };
 		} );
 		const triggerMediaUpload = ( payload ) =>
 			mediaUploadListeners.forEach( ( listener ) => listener( payload ) );
@@ -184,7 +191,7 @@ describe( 'Gallery block', () => {
 		// Initialize with a gallery that contains two items that are being uploaded
 		const {
 			galleryBlock,
-		} = await initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
+		} = initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
 		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ MEDIA[ 0 ].localId }} -->
 		<figure class="wp-block-image"><img src="${ MEDIA[ 0 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
@@ -237,12 +244,11 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'sets caption to gallery (TC003 - Add caption to gallery)', async () => {
+	it( 'sets caption to gallery (TC003 - Add caption to gallery)', () => {
 		// Initialize with a gallery that contains one item
-		const {
-			galleryBlock,
-			getByA11yLabel,
-		} = await initializeWithGalleryBlock( GALLERY_WITH_ONE_IMAGE );
+		const { galleryBlock, getByA11yLabel } = initializeWithGalleryBlock(
+			GALLERY_WITH_ONE_IMAGE
+		);
 
 		// Select block
 		fireEvent.press( galleryBlock );
@@ -269,9 +275,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'sets caption to gallery items (TC004 - Add caption to gallery images)', async () => {
+	it( 'sets caption to gallery items (TC004 - Add caption to gallery images)', () => {
 		// Initialize with a gallery that contains one item
-		const { galleryBlock } = await initializeWithGalleryBlock(
+		const { galleryBlock } = initializeWithGalleryBlock(
 			GALLERY_WITH_ONE_IMAGE
 		);
 
