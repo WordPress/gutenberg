@@ -38,6 +38,7 @@ const transforms = {
 			blocks: [ 'core/cover' ],
 			transform: (
 				{
+					align,
 					alt,
 					anchor,
 					backgroundType,
@@ -69,6 +70,7 @@ const transforms = {
 				return createBlock(
 					'core/media-text',
 					{
+						align,
 						anchor,
 						backgroundColor: overlayColor,
 						gradient,
@@ -118,6 +120,7 @@ const transforms = {
 			blocks: [ 'core/cover' ],
 			transform: (
 				{
+					align,
 					anchor,
 					backgroundColor,
 					focalPoint,
@@ -142,6 +145,7 @@ const transforms = {
 				return createBlock(
 					'core/cover',
 					{
+						align,
 						alt: mediaAlt,
 						anchor,
 						backgroundType: mediaType,
