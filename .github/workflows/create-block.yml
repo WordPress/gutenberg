@@ -15,12 +15,16 @@ concurrency:
 jobs:
     checks:
         name: Checks
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                node: ['12', '14']
+                node: [14]
+                os: [macos-latest, ubuntu-latest, windows-latest]
+                include:
+                    - node: 12
+                      os: ubuntu-latest
 
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
@@ -32,6 +36,7 @@ jobs:
                   cache: npm
 
             - name: npm install, build, format and lint
+              shell: bash
               run: |
                   npm ci
-                  npm run test:create-block
+                  sh ./bin/test-create-block.sh
