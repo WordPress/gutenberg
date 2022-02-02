@@ -42,7 +42,8 @@ Or, to use the hierarchical term selector with a non-hierarchical taxonomy `trac
 you can set the `HierarchicalTermSelector` component as shown below.
 
 ```js
-var HierarchicalTermSelector = wp.editor.PostTaxonomiesHierarchicalTermSelector;
+const el = wp.element.createElement;
+const HierarchicalTermSelector = wp.editor.PostTaxonomiesHierarchicalTermSelector;
 
 function customizeTrackSelector( OriginalComponent ) {
 	return function ( props ) {
