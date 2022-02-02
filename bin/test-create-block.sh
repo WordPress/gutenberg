@@ -37,7 +37,7 @@ status "Building block..."
 
 status "Verifying build..."
 expected=5
-actual=$( ls build | wc -l | xargs )
+actual=$( ls build | wc -l | awk '{$1=$1};1' )
 if [ "$expected" != "$actual" ]; then
 	error "Expected $expected files in the build folder, but found $actual."
     exit 1
