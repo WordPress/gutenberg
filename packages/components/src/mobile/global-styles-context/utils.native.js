@@ -186,7 +186,7 @@ export function getBlockTypography(
 
 export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
-	const variables = [ 'preset', 'custom' ];
+	const variables = [ 'preset', 'custom', 'var' ];
 
 	if ( ! stylesBase ) {
 		return styles;
@@ -196,7 +196,9 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 		// Examples
 		// var(--wp--preset--color--gray)
 		// var(--wp--custom--body--typography--font-family)
+		// var:preset|color|custom-color-2
 		const regex = new RegExp( `var\\(--wp--${ variable }--(.*?)\\)`, 'g' );
+		const varRegex = /\"var:preset\|color\|(.*?)\"/gm;
 
 		if ( variable === 'preset' ) {
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
@@ -226,6 +228,18 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 				] );
 			} );
 		}
+
+		if ( variable === 'var' ) {
+			stylesBase = stylesBase.replace( varRegex, ( _$1, $2 ) => {
+				if ( mappedValues && mappedValues?.color ) {
+					const matchedValue = find( mappedValues.color?.values, {
+						slug: $2,
+					} );
+					return `"${ matchedValue?.color }"`;
+				}
+				return UNKNOWN_VALUE;
+			} );
+		}
 	} );
 
 	return JSON.parse( stylesBase );
@@ -233,7 +247,12 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 
 export function getMappedValues( features, palette ) {
 	const typography = features?.typography;
-	const colors = { ...palette?.theme, ...palette?.custom };
+	const colors = [
+		...( palette?.theme ? palette.theme : [] ),
+		...( palette?.custom ? palette.custom : [] ),
+		...( palette?.default ? palette.default : [] ),
+	];
+
 	const fontSizes = {
 		...typography?.fontSizes?.theme,
 		...typography?.fontSizes?.custom,
@@ -265,7 +284,7 @@ function normalizeFontSizes( fontSizes ) {
 	const normalizedFontSizes = {};
 	const dimensions = Dimensions.get( 'window' );
 
-	[ 'default', 'theme', 'user' ].forEach( ( key ) => {
+	[ 'default', 'theme', 'custom' ].forEach( ( key ) => {
 		if ( fontSizes[ key ] ) {
 			normalizedFontSizes[ key ] = fontSizes[ key ]?.map(
 				( fontSizeObject ) => {
