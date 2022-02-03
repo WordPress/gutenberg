@@ -391,7 +391,7 @@ issue 10 requests in total even though we could reuse the data.
 Gutenberg data helps by caching the responses to API requests triggered by `getEntityRecords()`  and reuses them on
 subsequent calls. This is especially important when other components rely on the same entity records.
 
-All in all, the built-in utilities are designed to solve the typical problems so that you can focus on your application
+All in all, the utilities built into core-data are designed to solve the typical problems so that you can focus on your application
 instead.
 
 ## Step 5: Loading Indicator
