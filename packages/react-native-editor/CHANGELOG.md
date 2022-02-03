@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.70.2
+
+-   [**] Rich Text - Validate link colors [#38474]
+
 ## 1.70.1
 
 -   [**] [Gallery block] Fix crash when adding images and selecting a gallery item [#38238]
