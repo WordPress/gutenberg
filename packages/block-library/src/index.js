@@ -35,6 +35,7 @@ import * as commentsPagination from './comments-pagination';
 import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as cover from './cover';
+import * as credits from './credits';
 import * as embed from './embed';
 import * as file from './file';
 import * as gallery from './gallery';
@@ -149,6 +150,7 @@ export const __experimentalGetCoreBlocks = () => [
 	column,
 	columns,
 	cover,
+	credits,
 	embed,
 	file,
 	group,

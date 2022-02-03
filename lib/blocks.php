@@ -23,6 +23,7 @@ function gutenberg_reregister_core_block_types() {
 				'columns',
 				'comments-query-loop',
 				'cover',
+				'credits',
 				'gallery',
 				'group',
 				'heading',
