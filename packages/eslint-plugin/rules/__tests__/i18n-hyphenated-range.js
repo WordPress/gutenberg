@@ -54,5 +54,10 @@ ruleTester.run( 'i18n-hyphenated-range', rule, {
 			output: `__( 'From 0   –   2 many spaces in the range' )`,
 			errors: [ { messageId: 'foundHyphen' } ],
 		},
+		{
+			code: `__( '1-2' + ' fixing multiple strings' )`,
+			output: `__( '1–2' + ' fixing multiple strings' )`,
+			errors: [ { messageId: 'foundHyphen' } ],
+		},
 	],
 } );

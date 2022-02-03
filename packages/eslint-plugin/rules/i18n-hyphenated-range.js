@@ -15,6 +15,7 @@ function replaceHyphenWithEnDash( string ) {
 	if ( string.match( HYPHEN_IN_RANGE ) ) {
 		return string.replace( '-', EN_DASH );
 	}
+	return string;
 }
 
 // see eslint-plugin-wpcalypso.
