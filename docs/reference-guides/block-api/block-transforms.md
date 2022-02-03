@@ -223,13 +223,22 @@ transforms: {
 
 <h4 id="schemas-and-content-models">Schemas and Content Models</h4>
 
-When pasting content it's possible to define a [content model](https://html.spec.whatwg.org/multipage/dom.html#content-models) that will be used to validate and process pasted content.
-It's often the case that HTML pasted into the editor will contain a mixture of elements that _should_ transfer as well as elements that _shouldn't_.
-For example, consider pasting `<span class="time">12:04 pm</span>` into the editor.
-We want to copy `12:04 pm` and omit the `<span>` and its `class` attribute because those won't carry the same meaning or structure as they originally did from where they were copied.
+When pasting content it's possible to define
+a [content model](https://html.spec.whatwg.org/multipage/dom.html#content-models) that will be used to validate and
+process pasted content. It's often the case that HTML pasted into the editor will contain a mixture of elements that _
+should_ transfer as well as elements that _shouldn't_. For example, consider
+pasting `<span class="time">12:04 pm</span>` into the editor. We want to copy `12:04 pm` and omit the `<span>` and
+its `class` attribute because those won't carry the same meaning or structure as they originally did from where they
+were copied.
 
-When writing `raw` transforms you can control this by supplying a `schema` which describes allowable content and which will be applied to clean up the pasted content before attempting to match with your block.
-The schemas are passed into `cleanNodeList` from `@wordpress/dom`; check there for a complete description of the schema.
+When writing `raw` transforms you can control this by supplying a `schema` which describes allowable content and which
+will be applied to clean up the pasted content before attempting to match with your block. The schemas are passed
+into [`cleanNodeList` from `@wordpress/dom`](/packages/dom/src/dom/clean-node-list.js); check there for
+a [complete description of the schema](/packages/dom/src/phrasing-content.js).
+
+```js
+schema = { span: { children: { '#text': {} } } }
+```
 
 **Example: a custom content model**
 
@@ -242,11 +251,12 @@ Suppose we want to match the following HTML snippet and turn it into some kind o
  </div>
  ```
 
-We want to tell the editor to allow the inner `h2` and `p` elements.
-We do this by supplying the following schema.
-In this example we're using the function form, which accepts an argument supplying `phrasingContentSchema` (as well as a boolean `isPaste` indicating if the transformation operation started with pasting text).
-The `phrasingContentSchema` is pre-defined to match HTML phrasing elements, such as `<strong>` and `<sup>` and `<kbd>`.
-Anywhere we expect a `<RichText />` component is a good place to allow phrasing content otherwise we'll lose all text formatting on conversion.
+We want to tell the editor to allow the inner `h2` and `p` elements. We do this by supplying the following schema. In
+this example we're using the function form, which accepts an argument supplying `phrasingContentSchema` (as well as a
+boolean `isPaste` indicating if the transformation operation started with pasting text). The `phrasingContentSchema` is
+pre-defined to match HTML phrasing elements, such as `<strong>` and `<sup>` and `<kbd>`. Anywhere we expect
+a `<RichText />` component is a good place to allow phrasing content otherwise we'll lose all text formatting on
+conversion.
 
  ```js
  schema = ({ phrasingContentSchema }) => {
@@ -261,11 +271,13 @@ Anywhere we expect a `<RichText />` component is a good place to allow phrasing 
  }
  ```
 
-When we successfully match this content every HTML attribute will be stripped away except for `data-post-id` and if we have other arrangements of HTML inside of a given `div` then it won't match our transformer.
-Likewise we'd fail to match if we found an `<h3>` in there instead of an `<h2>`.
+When we successfully match this content every HTML attribute will be stripped away except for `data-post-id` and if we
+have other arrangements of HTML inside of a given `div` then it won't match our transformer. Likewise we'd fail to match
+if we found an `<h3>` in there instead of an `<h2>`.
 
-Schemas are most-important when wanting to match HTML snippets containing non-phrasing content, such as `<details>` with a `<summary>`.
-Without declaring the custom schema the editor will skip over these other contructions before attempting to run them through any block transforms.
+Schemas are most-important when wanting to match HTML snippets containing non-phrasing content, such as `<details>` with
+a `<summary>`. Without declaring the custom schema the editor will skip over these other contructions before attempting
+to run them through any block transforms.
 
 ### Shortcode
 
