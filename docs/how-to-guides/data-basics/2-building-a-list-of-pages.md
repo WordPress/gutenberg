@@ -322,9 +322,28 @@ function MyFirstApp() {
 	const { pages, hasResolved } = wp.data.useSelect( select => {
 		// ...
 		return {
-			pages: {/* ... */ },
+			pages: select( wp.coreData.store ).getEntityRecords( 'postType', 'page', query ),
 			hasResolved:
 				select( wp.coreData.store ).hasFinishedResolution( 'getEntityRecords', ['postType', 'page', query] ),
+		}
+	}, [searchTerm] );
+
+	// ...
+}
+```
+
+There is just one last problem. It is easy too make a typo and pass different arguments to `getEntityRecords` and `hasFinishedResolution`. We can remove this risk by storing the arguments in a variable:
+
+```js
+function MyFirstApp() {
+	// ...
+	const { pages, hasResolved } = wp.data.useSelect( select => {
+		// ...
+		const selectorArgs = [ 'postType', 'page', query ];
+		return {
+			pages: select( wp.coreData.store ).getEntityRecords( ...selectorArgs ),
+			hasResolved:
+				select( wp.coreData.store ).hasFinishedResolution( 'getEntityRecords', selectorArgs ),
 		}
 	}, [searchTerm] );
 
@@ -344,11 +363,12 @@ function MyFirstApp() {
 		if ( searchTerm ) {
 			query.search = searchTerm;
 		}
+		const selectorArgs = [ 'postType', 'page', query ];
 		return {
-			pages: select( wp.coreData.store ).getEntityRecords( 'postType', 'page', query ),
-			hasResolved: select( wp.coreData.store )
-				.hasFinishedResolution( 'getEntityRecords', ['postType', 'page', query] ),
-		};
+			pages: select( wp.coreData.store ).getEntityRecords( ...selectorArgs ),
+			hasResolved:
+				select( wp.coreData.store ).hasFinishedResolution( 'getEntityRecords', selectorArgs ),
+		}
 	}, [searchTerm] );
 
 	return (

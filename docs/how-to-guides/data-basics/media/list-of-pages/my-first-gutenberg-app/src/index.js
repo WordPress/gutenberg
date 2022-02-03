@@ -9,19 +9,15 @@ function MyFirstApp() {
 			if ( searchTerm ) {
 				query.search = searchTerm;
 			}
+			const selectorArgs = [ 'postType', 'page', query ];
 			return {
 				pages: select( wp.coreData.store ).getEntityRecords(
-					'postType',
-					'page',
-					query
+					...selectorArgs
 				),
-				hasResolved: select(
-					wp.coreData.store
-				).hasFinishedResolution( 'getEntityRecords', [
-					'postType',
-					'page',
-					query,
-				] ),
+				hasResolved: select( wp.coreData.store ).hasFinishedResolution(
+					'getEntityRecords',
+					selectorArgs
+				),
 			};
 		},
 		[ searchTerm ]
