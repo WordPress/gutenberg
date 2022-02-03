@@ -37,13 +37,13 @@ status "Building block..."
 
 status "Verifying build..."
 expected=5
-actual=$( ls build | wc -l | awk '{$1=$1};1' )
-if [ "$expected" != "$actual" ]; then
+actual=$( ls build | wc -l )
+if [ "$expected" -ne "$actual" ]; then
 	error "Expected $expected files in the build folder, but found $actual."
     exit 1
 fi
 
-status "Lintig CSS files..."
+status "Linting CSS files..."
 ../node_modules/.bin/wp-scripts lint-style
 
 status "Linting JavaScript files..."
