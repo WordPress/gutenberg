@@ -211,7 +211,7 @@ function PagesList( { pages } ) {
 
 ![](./media/list-of-pages/make-a-table.jpg)
 
-## Step 4: Add a search Box
+## Step 4: Add a search box
 
 The list of pages is short for now; however, the longer it grows, the harder it is to work with. WordPress admins
 typically solves this problem with a search box – let’s implement one, too!
