@@ -29,11 +29,6 @@ const TEMPLATE = [
 ];
 
 /**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
-
-/**
  * Component which renders the inner blocks of the Comment Template.
  *
  * @param {Object} props                    Component props.
@@ -145,9 +140,9 @@ const CommentsList = ( {
 } ) => (
 	<ol { ...blockProps }>
 		{ comments &&
-			comments.map( ( comment ) => (
+			comments.map( ( comment, index ) => (
 				<BlockContextProvider
-					key={ comment.commentId || uniqueId( 'comment-default' ) }
+					key={ comment.commentId || index }
 					value={ comment }
 				>
 					<CommentTemplateInnerBlocks
