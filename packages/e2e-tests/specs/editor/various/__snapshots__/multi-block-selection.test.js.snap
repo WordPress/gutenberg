@@ -116,7 +116,7 @@ exports[`Multi-block selection should not multi select single block 1`] = `
 
 exports[`Multi-block selection should only trigger multi-selection when at the end 1`] = `
 "<!-- wp:paragraph -->
-<p>1.</p>
+<p>4.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
