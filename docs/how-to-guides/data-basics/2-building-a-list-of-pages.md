@@ -358,7 +358,7 @@ Voila! We can now filter the results:
 
 ![](./media/list-of-pages/filter.jpg)
 
-### Gutenberg data vs working directly with the API
+### Using core-data instead vs calling the API directly
 
 Let’s take a pause for a moment to consider an alternative approach. Imagine we sent the API requests directly:
 
