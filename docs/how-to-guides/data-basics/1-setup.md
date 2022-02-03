@@ -1,6 +1,6 @@
 ## Setup
 
-We will build the application as a WordPress plugin, which means you need to have the WordPress itself installed. One way to do it is by following the instructions on [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) page. Once your setup is finished, you can follow along with the rest of this tutorial.
+We will build the application as a WordPress plugin, which means you need to have WordPress itself installed. One way to do this is by following the instructions on the [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) page. Once your setup is complete, you can follow along with the rest of this tutorial.
 
 ## Creating a plugin
 
