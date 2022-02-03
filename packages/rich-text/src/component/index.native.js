@@ -6,6 +6,7 @@
 import { View, Platform, Dimensions } from 'react-native';
 import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -990,6 +991,15 @@ export class RichText extends Component {
 		return isBlockBasedTheme && tagsToMatch.test( tagName );
 	}
 
+	getLinkTextColor( defaultColor ) {
+		const { style } = this.props;
+		const customColor = style?.linkColor && colord( style.linkColor );
+
+		return customColor && customColor.isValid()
+			? customColor.toHex()
+			: defaultColor;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -1026,6 +1036,9 @@ export class RichText extends Component {
 			textDecorationColor: defaultTextDecorationColor,
 			fontFamily: defaultFontFamily,
 		} = getStylesFromColorScheme( styles.richText, styles.richTextDark );
+		const textLinkColor = this.getLinkTextColor(
+			defaultTextDecorationColor
+		);
 
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
@@ -1121,8 +1134,7 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
-						linkTextColor:
-							style?.linkColor || defaultTextDecorationColor,
+						linkTextColor: textLinkColor,
 						tag: tagName,
 					} }
 					placeholder={ this.props.placeholder }
