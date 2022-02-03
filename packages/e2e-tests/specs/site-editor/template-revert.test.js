@@ -8,9 +8,8 @@ import {
 	switchUserToAdmin,
 	switchUserToTest,
 	visitAdminPage,
-	goToSiteEditor,
+	visitSiteEditor,
 	getEditedPageContent,
-	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -96,8 +95,7 @@ describe( 'Template Revert', () => {
 	} );
 	beforeEach( async () => {
 		await trashAllPosts( 'wp_template' );
-		await goToSiteEditor();
-		await disableWelcomeGuide();
+		await visitSiteEditor();
 	} );
 
 	it( 'should delete the template after saving the reverted template', async () => {
@@ -128,7 +126,7 @@ describe( 'Template Revert', () => {
 		await save();
 		await revertTemplate();
 		await save();
-		await goToSiteEditor();
+		await visitSiteEditor();
 
 		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );
@@ -198,7 +196,7 @@ describe( 'Template Revert', () => {
 		await clickUndoInHeaderToolbar();
 		await save();
 		await assertSaveButtonIsDisabled();
-		await goToSiteEditor();
+		await visitSiteEditor();
 
 		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );
@@ -213,7 +211,7 @@ describe( 'Template Revert', () => {
 		await save();
 		await undoRevertInNotice();
 		await save();
-		await goToSiteEditor();
+		await visitSiteEditor();
 
 		const contentAfter = await getEditedPageContent();
 		expect( contentBefore ).toBe( contentAfter );

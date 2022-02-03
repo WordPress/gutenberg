@@ -7,8 +7,7 @@ import {
 	getAllBlocks,
 	selectBlockByClientId,
 	insertBlock,
-	goToSiteEditor,
-	disableWelcomeGuide,
+	visitSiteEditor,
 } from '@wordpress/e2e-test-utils';
 
 async function toggleSidebar() {
@@ -49,8 +48,7 @@ describe( 'Settings sidebar', () => {
 		await activateTheme( 'twentytwentyone' );
 	} );
 	beforeEach( async () => {
-		await goToSiteEditor();
-		await disableWelcomeGuide();
+		await visitSiteEditor();
 	} );
 
 	describe( 'Template tab', () => {
@@ -66,7 +64,7 @@ describe( 'Settings sidebar', () => {
 			await toggleSidebar();
 
 			const templateCardBeforeNavigation = await getTemplateCard();
-			await goToSiteEditor( {
+			await visitSiteEditor( {
 				postId: 'emptytheme//singular',
 				postType: 'wp_template',
 			} );

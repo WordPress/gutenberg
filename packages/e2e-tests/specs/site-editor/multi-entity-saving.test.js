@@ -12,8 +12,7 @@ import {
 	activateTheme,
 	clickButton,
 	createReusableBlock,
-	goToSiteEditor,
-	disableWelcomeGuide,
+	visitSiteEditor,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Multi-entity save flow', () => {
@@ -260,11 +259,10 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
-			await goToSiteEditor( {
+			await visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await disableWelcomeGuide();
 
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
@@ -298,11 +296,10 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should allow re-saving after changing the same block attribute', async () => {
 			// Navigate to site editor.
-			await goToSiteEditor( {
+			await visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await disableWelcomeGuide();
 
 			// Insert a paragraph at the bottom.
 			await insertBlock( 'Paragraph' );

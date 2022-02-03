@@ -88,7 +88,7 @@ export async function disableWelcomeGuide() {
  *
  * @return {Promise<string>} Promise resolving with post content markup.
  */
-export function getEditedPageContent() {
+export function getCurrentSiteEditorContent() {
 	return page.evaluate( () => {
 		const postId = window.wp.data
 			.select( 'core/edit-site' )
@@ -134,9 +134,14 @@ export async function getSiteEditorMenuItem( label ) {
 /**
  * Visits the Site Editor main page
  *
- * @param {string} query String to be serialized as query portion of URL.
+ * By default, it also skips the welcome guide. The option can be disabled if need be.
+ *
+ * @see disableWelcomeGuide
+ *
+ * @param {string}  query                   String to be serialized as query portion of URL.
+ * @param {boolean} [skipWelcomeGuide=true] Whether to skip the welcome guide as part of the navigation.
  */
-export async function goToSiteEditor( query ) {
+export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
 	query = addQueryArgs( '', {
 		page: 'gutenberg-edit-site',
 		...query,
@@ -144,6 +149,10 @@ export async function goToSiteEditor( query ) {
 
 	await visitAdminPage( 'themes.php', query );
 	await page.waitForSelector( SELECTORS.visualEditor );
+
+	if ( skipWelcomeGuide ) {
+		await disableWelcomeGuide();
+	}
 }
 
 /**

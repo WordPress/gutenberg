@@ -11,9 +11,8 @@ import os from 'os';
 import {
 	trashAllPosts,
 	activateTheme,
-	goToSiteEditor,
+	visitSiteEditor,
 	clickOnMoreMenuItem,
-	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
 
 async function waitForFileExists( filePath, timeout = 10000 ) {
@@ -41,8 +40,7 @@ describe( 'Site Editor Templates Export', () => {
 	} );
 
 	beforeEach( async () => {
-		await goToSiteEditor();
-		await disableWelcomeGuide();
+		await visitSiteEditor();
 	} );
 
 	it( 'clicking export should download edit-site-export.zip file', async () => {

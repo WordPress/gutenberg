@@ -102,14 +102,14 @@ export {
 	clickSiteEditorMenuItem,
 	closeSiteEditorNavigationPanel,
 	disableWelcomeGuide,
-	getEditedPageContent,
+	getCurrentSiteEditorContent,
 	getSiteEditorMenuItem,
-	goToSiteEditor,
 	isSiteEditorRoot,
 	navigateSiteEditorBack,
 	navigateSiteEditorBackToRoot,
 	openSiteEditorNavigationPanel,
 	siteEditorNavigateSequence,
+	visitSiteEditor,
 } from './site-editor';
 
 export * from './mocks';

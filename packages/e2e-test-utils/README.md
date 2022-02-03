@@ -381,7 +381,7 @@ _Returns_
 
 -   `Promise`: Promise resolving with current post content markup.
 
-### getEditedPageContent
+### getCurrentSiteEditorContent
 
 Returns a promise which resolves with the edited post content (HTML string).
 
@@ -435,14 +435,6 @@ _Parameters_
 _Returns_
 
 -   `Promise<?ElementHandle>`: The menu item handle or `null`
-
-### goToSiteEditor
-
-Visits the Site Editor main page
-
-_Parameters_
-
--   _query_ `string`: String to be serialized as query portion of URL.
 
 ### hasBlockSwitcher
 
@@ -869,6 +861,21 @@ _Parameters_
 
 -   _adminPath_ `string`: String to be serialized as pathname.
 -   _query_ `string`: String to be serialized as query portion of URL.
+
+### visitSiteEditor
+
+Visits the Site Editor main page
+
+By default, it also skips the welcome guide. The option can be disabled if need be.
+
+_Related_
+
+-   disableWelcomeGuide
+
+_Parameters_
+
+-   _query_ `string`: String to be serialized as query portion of URL.
+-   _skipWelcomeGuide_ `[boolean]`: Whether to skip the welcome guide as part of the navigation.
 
 ### waitForWindowDimensions
 

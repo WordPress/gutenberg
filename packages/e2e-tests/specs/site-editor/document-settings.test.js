@@ -4,8 +4,7 @@
 import {
 	trashAllPosts,
 	activateTheme,
-	goToSiteEditor,
-	disableWelcomeGuide,
+	visitSiteEditor,
 } from '@wordpress/e2e-test-utils';
 
 async function getDocumentSettingsTitle() {
@@ -35,14 +34,13 @@ describe( 'Document Settings', () => {
 	} );
 
 	beforeEach( async () => {
-		await goToSiteEditor();
-		await disableWelcomeGuide();
+		await visitSiteEditor();
 	} );
 
 	describe( 'when a template is selected from the navigation sidebar', () => {
 		it( 'should display the selected templates name in the document header', async () => {
 			// Navigate to a template
-			await goToSiteEditor( {
+			await visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
@@ -78,7 +76,7 @@ describe( 'Document Settings', () => {
 	describe( 'when a template part is selected from the navigation sidebar', () => {
 		it( "should display the selected template part's name in the document header", async () => {
 			// Navigate to a template part
-			await goToSiteEditor( {
+			await visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );

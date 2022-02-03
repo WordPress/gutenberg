@@ -11,8 +11,7 @@ import {
 	openDocumentSettingsSidebar,
 	pressKeyWithModifier,
 	selectBlockByClientId,
-	goToSiteEditor,
-	disableWelcomeGuide,
+	visitSiteEditor,
 	clickSiteEditorMenuItem,
 	navigateSiteEditorBackToRoot,
 	openSiteEditorNavigationPanel,
@@ -145,14 +144,13 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
-		await goToSiteEditor();
-		await disableWelcomeGuide();
+		await visitSiteEditor();
 		expect( await openEntitySavePanel() ).toBe( false );
 	} );
 
 	// Skip reason: This should be rewritten to use other methods to switching to different templates.
 	it.skip( 'should not dirty an entity by switching to it in the template dropdown', async () => {
-		await goToSiteEditor( {
+		await visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
@@ -205,8 +203,7 @@ describe( 'Multi-entity editor states', () => {
 				true
 			);
 			await saveAllEntities();
-			await goToSiteEditor();
-			await disableWelcomeGuide();
+			await visitSiteEditor();
 
 			// Wait for site editor to load.
 			await canvas().waitForSelector(

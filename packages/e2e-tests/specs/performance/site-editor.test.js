@@ -12,10 +12,9 @@ import {
 	activateTheme,
 	canvas,
 	createNewPost,
-	goToSiteEditor,
+	visitSiteEditor,
 	saveDraft,
 	insertBlock,
-	disableWelcomeGuide,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -84,8 +83,7 @@ describe( 'Site Editor Performance', () => {
 			new URL( document.location ).searchParams.get( 'post' )
 		);
 
-		await goToSiteEditor( { postId: id, postType: 'page' } );
-		await disableWelcomeGuide();
+		await visitSiteEditor( { postId: id, postType: 'page' } );
 
 		let i = 3;
 
