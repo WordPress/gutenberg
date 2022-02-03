@@ -462,7 +462,7 @@ the  `hasFinishedResolution` selector:
 
 `wp.data.select('core').hasFinishedResolution( 'getEntityRecords', [ 'postType', 'page', { search: 'home' } ] )`
 
-It takes the name of the selector and the arguments and returns either `true` if the data was already loaded or `false`
+It takes the name of the selector and the _exact same arguments you passed to that selector_ and returns either `true` if the data was already loaded or `false`
 it we’re still waiting. Let’s add it to `wp.data.useSelect`:
 
 ```js
