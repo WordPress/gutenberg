@@ -172,6 +172,67 @@ function classnames_for_block_core_search( $attributes ) {
 }
 
 /**
+ * This generates a CSS rule for the given border property and side if provided.
+ * Based on whether the Search block is configured to display the button inside
+ * or not, the generated rule is injected into the appropriate collection of
+ * styles for later application in the block's markup.
+ *
+ * @param array  $attributes     The block attributes.
+ * @param string $property       Border property to generate rule for e.g. width or color.
+ * @param string $side           Optional side border. The dictates the value retrieved and final CSS property.
+ * @param array  $wrapper_styles Current collection of wrapper styles.
+ * @param array  $button_styles  Current collection of button styles.
+ * @param array  $input_styles   Current collection of input styles.
+ *
+ * @return void
+ */
+function apply_block_core_search_border_style( $attributes, $property, $side, &$wrapper_styles, &$button_styles, &$input_styles ) {
+	$is_button_inside = 'button-inside' === _wp_array_get( $attributes, array( 'buttonPosition' ), false );
+
+	$path = array( 'style', 'border', $property );
+
+	if ( $side ) {
+		array_splice( $path, 2, 0, $side );
+	}
+
+	$value = _wp_array_get( $attributes, $path, false );
+
+	if ( empty( $value ) ) {
+		return;
+	}
+
+	$property_suffix = $side ? sprintf( '%s-%s', $side, $property ) : $property;
+
+	if ( $is_button_inside ) {
+		$wrapper_styles[] = sprintf( 'border-%s: %s;', $property_suffix, esc_attr( $value ) );
+	} else {
+		$button_styles[] = sprintf( 'border-%s: %s;', $property_suffix, esc_attr( $value ) );
+		$input_styles[]  = sprintf( 'border-%s: %s;', $property_suffix, esc_attr( $value ) );
+	}
+}
+
+/**
+ * This adds CSS rules for a given border property e.g. width or color. It
+ * injects rules into the provided wrapper, button and input style arrays for
+ * uniform "flat" borders or those with individual sides configured.
+ *
+ * @param array  $attributes     The block attributes.
+ * @param string $property       Border property to generate rule for e.g. width or color.
+ * @param array  $wrapper_styles Current collection of wrapper styles.
+ * @param array  $button_styles  Current collection of button styles.
+ * @param array  $input_styles   Current collection of input styles.
+ *
+ * @return void
+ */
+function apply_block_core_search_border_styles( $attributes, $property, &$wrapper_styles, &$button_styles, &$input_styles ) {
+	apply_block_core_search_border_style( $attributes, $property, null, $wrapper_styles, $button_styles, $input_styles );
+	apply_block_core_search_border_style( $attributes, $property, 'top', $wrapper_styles, $button_styles, $input_styles );
+	apply_block_core_search_border_style( $attributes, $property, 'right', $wrapper_styles, $button_styles, $input_styles );
+	apply_block_core_search_border_style( $attributes, $property, 'bottom', $wrapper_styles, $button_styles, $input_styles );
+	apply_block_core_search_border_style( $attributes, $property, 'left', $wrapper_styles, $button_styles, $input_styles );
+}
+
+/**
  * Builds an array of inline styles for the search block.
  *
  * The result will contain one entry for shared styles such as those for the
@@ -201,19 +262,10 @@ function styles_for_block_core_search( $attributes ) {
 		);
 	}
 
-	// Add border width styles.
-	$has_border_width = ! empty( $attributes['style']['border']['width'] );
-
-	if ( $has_border_width ) {
-		$border_width = $attributes['style']['border']['width'];
-
-		if ( $is_button_inside ) {
-			$wrapper_styles[] = sprintf( 'border-width: %s;', esc_attr( $border_width ) );
-		} else {
-			$button_styles[] = sprintf( 'border-width: %s;', esc_attr( $border_width ) );
-			$input_styles[]  = sprintf( 'border-width: %s;', esc_attr( $border_width ) );
-		}
-	}
+	// Add border width and color styles.
+	apply_block_core_search_border_styles( $attributes, 'width', $wrapper_styles, $button_styles, $input_styles );
+	apply_block_core_search_border_styles( $attributes, 'color', $wrapper_styles, $button_styles, $input_styles );
+	apply_block_core_search_border_styles( $attributes, 'style', $wrapper_styles, $button_styles, $input_styles );
 
 	// Add border radius styles.
 	$has_border_radius = ! empty( $attributes['style']['border']['radius'] );
@@ -269,21 +321,6 @@ function styles_for_block_core_search( $attributes ) {
 		}
 	}
 
-	// Add border color styles.
-	$has_border_color = ! empty( $attributes['style']['border']['color'] );
-
-	if ( $has_border_color ) {
-		$border_color = $attributes['style']['border']['color'];
-
-		// Apply wrapper border color if button placed inside.
-		if ( $is_button_inside ) {
-			$wrapper_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
-		} else {
-			$button_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
-			$input_styles[]  = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
-		}
-	}
-
 	// Add color styles.
 	$has_text_color = ! empty( $attributes['style']['color']['text'] );
 	if ( $has_text_color ) {
@@ -315,13 +352,49 @@ function styles_for_block_core_search( $attributes ) {
  * @return string The border color classnames to be applied to the block elements.
  */
 function get_border_color_classes_for_block_core_search( $attributes ) {
+	$border_color_classes    = array();
 	$has_custom_border_color = ! empty( $attributes['style']['border']['color'] );
-	$border_color_classes    = ! empty( $attributes['borderColor'] ) ? sprintf( 'has-border-color has-%s-border-color', $attributes['borderColor'] ) : '';
-	// If there's a border color style and no `borderColor` text string, we still want to add the generic `has-border-color` class name to the element.
-	if ( $has_custom_border_color && empty( $attributes['borderColor'] ) ) {
-		$border_color_classes = 'has-border-color';
+	$has_named_border_color  = ! empty( $attributes['borderColor'] );
+
+	if ( $has_custom_border_color || $has_named_border_color ) {
+		$border_color_classes[] = 'has-border-color';
 	}
-	return $border_color_classes;
+
+	if ( $has_named_border_color ) {
+		$border_color_classes[] = sprintf( 'has-%s-border-color', esc_attr( $attributes['borderColor'] ) );
+	}
+
+	$border_color_classes[] = get_side_border_color_classes_for_block_core_search( $attributes, 'top' );
+	$border_color_classes[] = get_side_border_color_classes_for_block_core_search( $attributes, 'right' );
+	$border_color_classes[] = get_side_border_color_classes_for_block_core_search( $attributes, 'bottom' );
+	$border_color_classes[] = get_side_border_color_classes_for_block_core_search( $attributes, 'left' );
+
+	return implode( ' ', $border_color_classes );
+}
+
+/**
+ * Generates required CSS classes for individual border side color selections.
+ *
+ * @param array  $attributes The block attributes.
+ * @param string $side       Border side i.e. `top`, `right`, `bottom`, or `left`.
+ *
+ * @return string
+ */
+function get_side_border_color_classes_for_block_core_search( $attributes, $side ) {
+	$classes = array();
+
+	$has_custom_border_color = ! empty( $attributes['style']['border'][ $side ]['color'] );
+	$has_named_border_color  = ! empty( $attributes['sideBorderColors'][ $side ] );
+
+	if ( $has_custom_border_color || $has_named_border_color ) {
+		$classes[] = sprintf( 'has-border-%s-color', esc_attr( $side ) );
+	}
+
+	if ( $has_named_border_color ) {
+		$classes[] = sprintf( 'has-%s-border-%s-color', esc_attr( $attributes['sideBorderColors'][ $side ] ), esc_attr( $side ) );
+	}
+
+	return implode( ' ', $classes );
 }
 
 /**
