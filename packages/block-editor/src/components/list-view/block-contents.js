@@ -60,8 +60,16 @@ const ListViewBlockContents = forwardRef(
 			'is-dropping-before': isBlockMoveTarget,
 		} );
 
+		// Only include all selected blocks if the currently clicked on block
+		// is one of the selected blocks. This ensures that if a user attempts
+		// to drag a block that isn't part of the selection, they're still able
+		// to drag it and rearrange its position.
+		const draggableClientIds = selectedBlocks.includes( clientId )
+			? selectedBlocks
+			: [ clientId ];
+
 		return (
-			<BlockDraggable clientIds={ selectedBlocks }>
+			<BlockDraggable clientIds={ draggableClientIds }>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<ListViewBlockSelectButton
 						ref={ ref }
