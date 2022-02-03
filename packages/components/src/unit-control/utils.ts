@@ -213,21 +213,20 @@ export function parseUnit(
 	initialValue: Value | undefined,
 	units: WPUnitControlUnitList = ALL_CSS_UNITS
 ): [ Value, string | undefined ] {
-	const value = String( initialValue ).trim();
+	const unit = matchUnit( initialValue, units );
 
+	const value = String( initialValue ).trim();
 	let num: Value = parseFloat( value );
 	if ( isNaN( num ) ) {
-		// If the value cannot be parsed as a float, it should be
-		// treated as custom CSS as long as the CSS_CUSTOM_UNIT is
-		// supported.
-		if ( supportsCustomCSS( units ) ) {
+		// A value may be non-numeric if the value is empty,
+		// or if it contains a unit but no number. Otherwise,
+		// arbitrary strings should be considered custom CSS if
+		// the CSS_CUSTOM_UNIT is supported, or cleared if not.
+		if ( !! initialValue && value !== unit && supportsCustomCSS( units ) ) {
 			return [ value, CUSTOM_CSS_UNIT.value ];
 		}
-		// Return empty string if custom CSS is not a supported unit.
 		num = '';
 	}
-
-	const unit = matchUnit( initialValue, units );
 
 	return [ num, unit ];
 }
@@ -299,6 +298,31 @@ export function getValidParsedUnit(
 	}
 
 	return [ baseValue, baseUnit ];
+}
+
+/**
+ * Takes a value and unit and produces a valid combined value+unit string.
+ * Validation ensures that the special CUSTOM_CSS unit is not appended, and
+ * that non-numeric values are not combined with a non-custom unit.
+ *
+ * @param  initialValue The value.
+ * @param  unit         The unit to append.
+ * @return A string describing both value and unit.
+ */
+export function getValidValueWithUnit(
+	initialValue: Value | undefined,
+	unit: string | undefined
+): string {
+	// The CSS_CUSTOM_UNIT should not be appended to the end of custom CSS.
+	if ( unit === CUSTOM_CSS_UNIT.value ) {
+		return String( initialValue );
+	}
+
+	const value = String( initialValue ).trim();
+	if ( isNaN( parseFloat( value ) ) ) {
+		return '';
+	}
+	return `${ value }${ unit }`;
 }
 
 /**

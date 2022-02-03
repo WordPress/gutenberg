@@ -32,10 +32,10 @@ import UnitSelectControl from './unit-select-control';
 import {
 	CSS_UNITS,
 	CUSTOM_CSS_UNIT,
-	DEFAULT_UNIT,
 	getParsedValue,
 	getUnitsWithCurrentUnit,
 	getValidParsedUnit,
+	getValidValueWithUnit,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
@@ -117,17 +117,13 @@ function UnitControl(
 				? data?.default
 				: value;
 
-		let nextUnit = next;
-		if ( isNextCustomCSS ) {
-			nextUnit = !! unit ? unit : DEFAULT_UNIT.value;
-		}
-
-		const nextValueWithUnit = !! nextValue
-			? `${ nextValue }${ nextUnit }`
-			: '';
+		const nextUnit = isNextCustomCSS ? unit : next;
+		const nextValueWithUnit = getValidValueWithUnit( nextValue, nextUnit );
 
 		onChange( nextValueWithUnit, changeProps );
-		onUnitChange( next, changeProps );
+		// The CUSTOM_CSS_UNIT is not a normal CSS unit and should never be saved
+		// into attributes.
+		onUnitChange( isNextCustomCSS ? undefined : next, changeProps );
 
 		setUnit( next );
 	};
@@ -254,7 +250,7 @@ function UnitControl(
 			{ isCustomCSS && (
 				<CustomValueInput
 					{ ...inputProps }
-					value={ String( valueProp ) }
+					value={ String( valueProp || '' ) }
 					onDrag={ noop }
 					onDragEnd={ noop }
 					onDragStart={ noop }
