@@ -233,8 +233,8 @@ were copied.
 
 When writing `raw` transforms you can control this by supplying a `schema` which describes allowable content and which
 will be applied to clean up the pasted content before attempting to match with your block. The schemas are passed
-into [`cleanNodeList` from `@wordpress/dom`](/packages/dom/src/dom/clean-node-list.js); check there for
-a [complete description of the schema](/packages/dom/src/phrasing-content.js).
+into [`cleanNodeList` from `@wordpress/dom`](https://github.com/wordpress/gutenberg/blob/trunk/packages/dom/src/dom/clean-node-list.js); check there for
+a [complete description of the schema](https://github.com/wordpress/gutenberg/blob/trunk/packages/dom/src/phrasing-content.js).
 
 ```js
 schema = { span: { children: { '#text': {} } } }
