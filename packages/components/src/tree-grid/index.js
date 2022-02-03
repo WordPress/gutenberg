@@ -53,10 +53,11 @@ function TreeGrid(
 ) {
 	const onKeyDown = useCallback(
 		( event ) => {
-			const { keyCode, metaKey, ctrlKey, altKey, shiftKey } = event;
+			const { keyCode, metaKey, ctrlKey, altKey } = event;
 
-			const hasModifierKeyPressed =
-				metaKey || ctrlKey || altKey || shiftKey;
+			// The shift key is intentionally absent from the following list,
+			// to enable shift + up/down to select items from the list.
+			const hasModifierKeyPressed = metaKey || ctrlKey || altKey;
 
 			if (
 				hasModifierKeyPressed ||

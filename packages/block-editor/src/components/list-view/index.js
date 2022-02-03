@@ -99,7 +99,11 @@ function ListView(
 	);
 	const selectEditorBlock = useCallback(
 		async ( clientId, event ) => {
-			if ( ! event.shiftKey ) {
+			if ( ! event.shiftKey || event.type === 'keydown' ) {
+				// When this function is called from a 'keydown' event, select
+				// the block as if it were individually clicked. This allows
+				// the editor canvas to be responsible for the shift + up/down
+				// multiple block selection behaviour.
 				await clearSelectedBlock();
 				selectBlock( clientId, -1 );
 			} else if ( event.shiftKey ) {
