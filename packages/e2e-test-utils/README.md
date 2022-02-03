@@ -271,7 +271,7 @@ Disable auto-accepting any dialogs.
 
 Disables Pre-publish checks.
 
-### disableWelcomeGuide
+### disableSiteEditorWelcomeGuide
 
 Skips the welcome guide popping up to first time users of the site editor
 
@@ -870,7 +870,7 @@ By default, it also skips the welcome guide. The option can be disabled if need 
 
 _Related_
 
--   disableWelcomeGuide
+-   disableSiteEditorWelcomeGuide
 
 _Parameters_
 

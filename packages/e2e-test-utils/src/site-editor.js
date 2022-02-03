@@ -58,7 +58,7 @@ export async function closeSiteEditorNavigationPanel() {
 /**
  * Skips the welcome guide popping up to first time users of the site editor
  */
-export async function disableWelcomeGuide() {
+export async function disableSiteEditorWelcomeGuide() {
 	const isWelcomeGuideActive = await page.evaluate( () =>
 		wp.data.select( 'core/edit-site' ).isFeatureActive( 'welcomeGuide' )
 	);
@@ -132,30 +132,6 @@ export async function getSiteEditorMenuItem( label ) {
 }
 
 /**
- * Visits the Site Editor main page
- *
- * By default, it also skips the welcome guide. The option can be disabled if need be.
- *
- * @see disableWelcomeGuide
- *
- * @param {string}  query                   String to be serialized as query portion of URL.
- * @param {boolean} [skipWelcomeGuide=true] Whether to skip the welcome guide as part of the navigation.
- */
-export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
-	query = addQueryArgs( '', {
-		page: 'gutenberg-edit-site',
-		...query,
-	} ).slice( 1 );
-
-	await visitAdminPage( 'themes.php', query );
-	await page.waitForSelector( SELECTORS.visualEditor );
-
-	if ( skipWelcomeGuide ) {
-		await disableWelcomeGuide();
-	}
-}
-
-/**
  * Returns `true` if in the site editor navigation root
  *
  * Checks whether the “Back to dashboard” button is visible. If
@@ -217,5 +193,29 @@ export async function siteEditorNavigateSequence( labels ) {
 
 	for ( const label of labels ) {
 		await clickSiteEditorMenuItem( label );
+	}
+}
+
+/**
+ * Visits the Site Editor main page
+ *
+ * By default, it also skips the welcome guide. The option can be disabled if need be.
+ *
+ * @see disableSiteEditorWelcomeGuide
+ *
+ * @param {string}  query                   String to be serialized as query portion of URL.
+ * @param {boolean} [skipWelcomeGuide=true] Whether to skip the welcome guide as part of the navigation.
+ */
+export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
+	query = addQueryArgs( '', {
+		page: 'gutenberg-edit-site',
+		...query,
+	} ).slice( 1 );
+
+	await visitAdminPage( 'themes.php', query );
+	await page.waitForSelector( SELECTORS.visualEditor );
+
+	if ( skipWelcomeGuide ) {
+		await disableSiteEditorWelcomeGuide();
 	}
 }

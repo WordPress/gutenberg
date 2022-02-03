@@ -101,7 +101,7 @@ export { openListView, closeListView } from './list-view';
 export {
 	clickSiteEditorMenuItem,
 	closeSiteEditorNavigationPanel,
-	disableWelcomeGuide,
+	disableSiteEditorWelcomeGuide,
 	getCurrentSiteEditorContent,
 	getSiteEditorMenuItem,
 	isSiteEditorRoot,
