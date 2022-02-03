@@ -17,7 +17,7 @@ const ruleTester = new RuleTester( {
 ruleTester.run( 'i18n-hyphenated-range', rule, {
 	valid: [
 		{
-			code: `__( 'Hypenated-words are ok' )`,
+			code: `__( 'Hyphenated-words are ok' )`,
 		},
 		{
 			code: `__( 'Hyphen - when used in this case - is ok' )`,
