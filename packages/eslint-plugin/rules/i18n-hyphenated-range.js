@@ -60,7 +60,7 @@ module.exports = {
 		schema: [],
 		messages: {
 			foundHyphen:
-				'Use dashes (en or em) in place of hypens for numeric ranges.',
+				'Use dashes (en or em) in place of hyphens for numeric ranges.',
 		},
 		fixable: 'code',
 	},
