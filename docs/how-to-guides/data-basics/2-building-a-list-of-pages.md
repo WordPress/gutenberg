@@ -379,7 +379,7 @@ function MyFirstApp() {
 Working outside of core-data, we would need to solve two problems here.
 
 Firstly, out-of-order updates. Searching for „About” would trigger five API requests filtering for `A`, `Ab`, `Abo`, `Abou`, and
-About. They could finish in a different order than they started. It is possible that _search=A_ would resolve after _
+`About`. Theese requests could finish in a different order than they started. It is possible that _search=A_ would resolve after _
 search=About_ and we’d display the wrong data.
 
 Gutenberg data helps by handling the asynchronous part behind the scenes. `useSelect` remembers the most recent call and
