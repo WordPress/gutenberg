@@ -731,6 +731,11 @@ function CoverEdit( {
 						{
 							[ overlayColor.class ]: overlayColor.class,
 							'has-background-dim': dimRatio !== undefined,
+							// For backwards compatibility. Former versions of the Cover Block applied
+							// `.wp-block-cover__gradient-background` in the presence of
+							// media, a gradient and a dim.
+							'wp-block-cover__gradient-background':
+								url && gradientValue && dimRatio !== 0,
 							'has-background-gradient': gradientValue,
 							[ gradientClass ]: gradientClass,
 						}
