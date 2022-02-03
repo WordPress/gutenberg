@@ -214,7 +214,7 @@ function PagesList( { pages } ) {
 ## Step 4: Add a search box
 
 The list of pages is short for now; however, the longer it grows, the harder it is to work with. WordPress admins
-typically solves this problem with a search box – let’s implement one, too!
+typically solves this problem with a search box – let’s implement one too!
 
 Let’s start by adding a search field:
 
