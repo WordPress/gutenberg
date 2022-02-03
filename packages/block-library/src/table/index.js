@@ -43,31 +43,15 @@ export const settings = {
 				{
 					cells: [
 						{
-							content: '5.2',
+							content: '5.9',
 							tag: 'td',
 						},
 						{
-							content: 'Jaco Pastorius',
+							content: 'Joséphine Baker',
 							tag: 'td',
 						},
 						{
-							content: __( 'May 7, 2019' ),
-							tag: 'td',
-						},
-					],
-				},
-				{
-					cells: [
-						{
-							content: '5.1',
-							tag: 'td',
-						},
-						{
-							content: 'Betty Carter',
-							tag: 'td',
-						},
-						{
-							content: __( 'February 21, 2019' ),
+							content: __( 'January 25, 2022' ),
 							tag: 'td',
 						},
 					],
@@ -75,15 +59,31 @@ export const settings = {
 				{
 					cells: [
 						{
-							content: '5.0',
+							content: '5.8',
 							tag: 'td',
 						},
 						{
-							content: 'Bebo Valdés',
+							content: 'Art Tatum',
 							tag: 'td',
 						},
 						{
-							content: __( 'December 6, 2018' ),
+							content: __( 'July 20, 2021' ),
+							tag: 'td',
+						},
+					],
+				},
+				{
+					cells: [
+						{
+							content: '5.7',
+							tag: 'td',
+						},
+						{
+							content: 'Esperanza Spalding',
+							tag: 'td',
+						},
+						{
+							content: __( 'March 9, 2021' ),
 							tag: 'td',
 						},
 					],
