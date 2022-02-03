@@ -156,4 +156,34 @@ describe( 'Using Plugins API', () => {
 			expect( pluginDocumentSettingsText ).toMatchSnapshot();
 		} );
 	} );
+
+	describe( 'Error Boundary', () => {
+		beforeAll( async () => {
+			await activatePlugin(
+				'gutenberg-test-plugin-plugins-error-boundary'
+			);
+		} );
+
+		afterAll( async () => {
+			await deactivatePlugin(
+				'gutenberg-test-plugin-plugins-error-boundary'
+			);
+		} );
+
+		it( 'Should create notice using plugin error boundary callback', async () => {
+			const noticeContent = await page.waitForSelector(
+				'.is-error .components-notice__content'
+			);
+			expect(
+				await page.evaluate(
+					( _noticeContent ) => _noticeContent.firstChild.nodeValue,
+					noticeContent
+				)
+			).toEqual(
+				'The "my-error-plugin" plugin has encountered an error and cannot be rendered.'
+			);
+
+			expect( console ).toHaveErrored();
+		} );
+	} );
 } );

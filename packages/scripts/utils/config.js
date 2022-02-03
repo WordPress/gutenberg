@@ -186,8 +186,9 @@ function getWebpackEntryPoints() {
 	const blockMetadataFiles = glob( 'src/**/block.json', {
 		absolute: true,
 	} );
+
 	if ( blockMetadataFiles.length > 0 ) {
-		return blockMetadataFiles.reduce(
+		const entryPoints = blockMetadataFiles.reduce(
 			( accumulator, blockMetadataFile ) => {
 				const {
 					editorScript,
@@ -202,7 +203,7 @@ function getWebpackEntryPoints() {
 						const filepath = join(
 							dirname( blockMetadataFile ),
 							value.replace( 'file:', '' )
-						);
+						).replace( /\\/g, '/' );
 
 						// Takes the path without the file extension, and relative to the `src` directory.
 						const [ , entryName ] = filepath
@@ -226,6 +227,10 @@ function getWebpackEntryPoints() {
 			},
 			{}
 		);
+
+		if ( Object.keys( entryPoints ).length > 0 ) {
+			return entryPoints;
+		}
 	}
 
 	// 3. Checks whether a standard file name can be detected in the `src` directory,

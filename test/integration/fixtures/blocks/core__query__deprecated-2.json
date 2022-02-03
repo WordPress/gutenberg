@@ -1,0 +1,56 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/query",
+		"isValid": true,
+		"attributes": {
+			"queryId": 19,
+			"query": {
+				"perPage": 3,
+				"pages": 0,
+				"offset": 0,
+				"postType": "post",
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": false,
+				"taxQuery": {
+					"category": [ 3, 5 ],
+					"post_tag": [ 6 ]
+				}
+			},
+			"tagName": "div",
+			"displayLayout": {
+				"type": "list"
+			}
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/post-template",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"clientId": "_clientId_0",
+						"name": "core/post-title",
+						"isValid": true,
+						"attributes": {
+							"level": 2,
+							"isLink": false,
+							"rel": "",
+							"linkTarget": "_self"
+						},
+						"innerBlocks": [],
+						"originalContent": ""
+					}
+				],
+				"originalContent": ""
+			}
+		],
+		"originalContent": "<div class=\"wp-block-query\">\n</div>"
+	}
+]

@@ -129,10 +129,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        ndk { 
-            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "mips" 
-            
-        } 
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "mips"
+
+        }
     }
     splits {
         abi {
@@ -170,8 +170,20 @@ android {
 
 repositories {
     google()
-    jcenter()
+    mavenCentral()
     maven { url "https://jitpack.io" }
+    maven {
+        url "https://a8c-libs.s3.amazonaws.com/android/jcenter-mirror"
+        content {
+            includeVersion "com.google.android.exoplayer", "exoplayer-core", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "exoplayer-dash", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "exoplayer-hls", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "exoplayer-smoothstreaming", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "exoplayer-ui", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "exoplayer", "2.9.3"
+            includeVersion "com.google.android.exoplayer", "extension-okhttp", "2.9.3"
+        }
+    }
 }
 
 dependencies {

@@ -31,7 +31,7 @@ const toolsPanelGrid = {
 export const ToolsPanel = css`
 	${ toolsPanelGrid.spacing };
 
-	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
+	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
 `;

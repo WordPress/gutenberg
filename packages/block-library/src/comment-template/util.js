@@ -44,7 +44,7 @@ export const convertToTree = ( data ) => {
 			// If the comment has a "parent", then find that parent in the table that
 			// we have created above and push the current comment to the array of its
 			// children.
-			table[ item.parent ].children.push( table[ item.id ] );
+			table[ item.parent ]?.children.push( table[ item.id ] );
 		} else {
 			// Otherwise, if the comment has no parent (also works if parent is 0)
 			// that means that it's a top-level comment so we can find it in the table

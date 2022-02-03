@@ -26,17 +26,32 @@ jest.mock( 'framer-motion', () => {
 const PATHS = {
 	HOME: '/',
 	CHILD: '/child',
+	NESTED: '/child/nested',
 	NOT_FOUND: '/not-found',
 };
 
-function NavigatorButton( { path, isBack = false, onClick, ...props } ) {
-	const navigator = useNavigator();
+function NavigatorButton( { path, onClick, ...props } ) {
+	const { push } = useNavigator();
 	return (
 		<button
 			onClick={ () => {
-				navigator.push( path, { isBack } );
+				push( path );
 				// Used to spy on the values passed to `navigator.push`
-				onClick?.( { path, isBack } );
+				onClick?.( { type: 'push', path } );
+			} }
+			{ ...props }
+		/>
+	);
+}
+
+function NavigatorBackButton( { onClick, ...props } ) {
+	const { pop } = useNavigator();
+	return (
+		<button
+			onClick={ () => {
+				pop();
+				// Used to spy on the values passed to `navigator.push`
+				onClick?.( { type: 'pop' } );
 			} }
 			{ ...props }
 		/>
@@ -67,12 +82,21 @@ const MyNavigation = ( {
 		<NavigatorScreen path={ PATHS.CHILD }>
 			<p>This is the child screen.</p>
 			<NavigatorButton
-				path={ PATHS.HOME }
-				isBack
+				path={ PATHS.NESTED }
 				onClick={ onNavigatorButtonClick }
 			>
-				Go back
+				Navigate to nested screen.
 			</NavigatorButton>
+			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
+				Go back
+			</NavigatorBackButton>
+		</NavigatorScreen>
+
+		<NavigatorScreen path={ PATHS.NESTED }>
+			<p>This is the nested screen.</p>
+			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
+				Go back
+			</NavigatorBackButton>
 		</NavigatorScreen>
 
 		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included */ }
@@ -91,6 +115,10 @@ const getChildScreen = ( { throwIfNotFound } = {} ) =>
 	getNavigationScreenByText( 'This is the child screen.', {
 		throwIfNotFound,
 	} );
+const getNestedScreen = ( { throwIfNotFound } = {} ) =>
+	getNavigationScreenByText( 'This is the nested screen.', {
+		throwIfNotFound,
+	} );
 
 const getNavigationButtonByText = ( text, { throwIfNotFound = true } = {} ) => {
 	const fnName = throwIfNotFound ? 'getByRole' : 'queryByRole';
@@ -104,7 +132,11 @@ const getToChildScreenButton = ( { throwIfNotFound } = {} ) =>
 	getNavigationButtonByText( 'Navigate to child screen.', {
 		throwIfNotFound,
 	} );
-const getToHomeScreenButton = ( { throwIfNotFound } = {} ) =>
+const getToNestedScreenButton = ( { throwIfNotFound } = {} ) =>
+	getNavigationButtonByText( 'Navigate to nested screen.', {
+		throwIfNotFound,
+	} );
+const getBackButton = ( { throwIfNotFound } = {} ) =>
 	getNavigationButtonByText( 'Go back', {
 		throwIfNotFound,
 	} );
@@ -117,6 +149,9 @@ describe( 'Navigator', () => {
 		expect(
 			getChildScreen( { throwIfNotFound: false } )
 		).not.toBeInTheDocument();
+		expect(
+			getNestedScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should show a different screen on the first render depending on the value of `initialPath`', () => {
@@ -126,6 +161,9 @@ describe( 'Navigator', () => {
 			getHomeScreen( { throwIfNotFound: false } )
 		).not.toBeInTheDocument();
 		expect( getChildScreen() ).toBeInTheDocument();
+		expect(
+			getNestedScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should ignore changes to `initialPath` after the first render', () => {
@@ -135,12 +173,18 @@ describe( 'Navigator', () => {
 		expect(
 			getChildScreen( { throwIfNotFound: false } )
 		).not.toBeInTheDocument();
+		expect(
+			getNestedScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
 
 		rerender( <MyNavigation initialPath={ PATHS.CHILD } /> );
 
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect(
 			getChildScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
+		expect(
+			getNestedScreen( { throwIfNotFound: false } )
 		).not.toBeInTheDocument();
 	} );
 
@@ -153,6 +197,9 @@ describe( 'Navigator', () => {
 		expect(
 			getChildScreen( { throwIfNotFound: false } )
 		).not.toBeInTheDocument();
+		expect(
+			getNestedScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should navigate across screens', () => {
@@ -160,34 +207,67 @@ describe( 'Navigator', () => {
 
 		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
+		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toBeInTheDocument();
 
 		// Navigate to child screen
 		fireEvent.click( getToChildScreenButton() );
 
-		expect(
-			getHomeScreen( { throwIfNotFound: false } )
-		).not.toBeInTheDocument();
 		expect( getChildScreen() ).toBeInTheDocument();
-		expect( getToHomeScreenButton() ).toBeInTheDocument();
+		expect( getBackButton() ).toBeInTheDocument();
 
 		// Navigate back to home screen
-		fireEvent.click( getToHomeScreenButton() );
+		fireEvent.click( getBackButton() );
 
-		expect(
-			getChildScreen( { throwIfNotFound: false } )
-		).not.toBeInTheDocument();
 		expect( getHomeScreen() ).toBeInTheDocument();
+		expect( getToChildScreenButton() ).toBeInTheDocument();
+
+		// Navigate again to child screen
+		fireEvent.click( getToChildScreenButton() );
+
+		expect( getChildScreen() ).toBeInTheDocument();
+		expect( getToNestedScreenButton() ).toBeInTheDocument();
+
+		// Navigate to nested screen
+		fireEvent.click( getToNestedScreenButton() );
+
+		expect( getNestedScreen() ).toBeInTheDocument();
+		expect( getBackButton() ).toBeInTheDocument();
+
+		// Navigate back to child screen
+		fireEvent.click( getBackButton() );
+
+		expect( getChildScreen() ).toBeInTheDocument();
+		expect( getToNestedScreenButton() ).toBeInTheDocument();
+
+		// Navigate back to home screen
+		fireEvent.click( getBackButton() );
+
+		expect( getHomeScreen() ).toBeInTheDocument();
+		expect( getToChildScreenButton() ).toBeInTheDocument();
 
 		// Check the values passed to `navigator.push()`
-		expect( spy ).toHaveBeenCalledTimes( 2 );
+		expect( spy ).toHaveBeenCalledTimes( 6 );
 		expect( spy ).toHaveBeenNthCalledWith( 1, {
 			path: PATHS.CHILD,
-			isBack: false,
+			type: 'push',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 2, {
-			path: PATHS.HOME,
-			isBack: true,
+			type: 'pop',
+		} );
+		expect( spy ).toHaveBeenNthCalledWith( 3, {
+			path: PATHS.CHILD,
+			type: 'push',
+		} );
+		expect( spy ).toHaveBeenNthCalledWith( 4, {
+			path: PATHS.NESTED,
+			type: 'push',
+		} );
+		expect( spy ).toHaveBeenNthCalledWith( 5, {
+			type: 'pop',
+		} );
+		expect( spy ).toHaveBeenNthCalledWith( 6, {
+			type: 'pop',
 		} );
 	} );
 
@@ -196,7 +276,7 @@ describe( 'Navigator', () => {
 
 		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
-		expect( getToChildScreenButton() ).toBeInTheDocument();
+		expect( getToNonExistingScreenButton() ).toBeInTheDocument();
 
 		// Attempt to navigate to non-existing screen. No screens get rendered.
 		fireEvent.click( getToNonExistingScreenButton() );
@@ -207,12 +287,15 @@ describe( 'Navigator', () => {
 		expect(
 			getChildScreen( { throwIfNotFound: false } )
 		).not.toBeInTheDocument();
+		expect(
+			getNestedScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
 
 		// Check the values passed to `navigator.push()`
 		expect( spy ).toHaveBeenCalledTimes( 1 );
 		expect( spy ).toHaveBeenNthCalledWith( 1, {
 			path: PATHS.NOT_FOUND,
-			isBack: false,
+			type: 'push',
 		} );
 	} );
 } );

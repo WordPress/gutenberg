@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { AppRegistry } from 'react-native';
-import { render, waitFor } from 'test/helpers';
+import { initializeEditor, render } from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
 import * as wpHooks from '@wordpress/hooks';
+import '@wordpress/jest-console';
 
 /**
  * Internal dependencies
@@ -18,7 +19,7 @@ import setupLocale from '../setup-locale';
 jest.mock( 'react-native/Libraries/ReactNative/AppRegistry' );
 jest.mock( '../setup-locale' );
 
-const initGutenberg = ( registerParams ) => {
+const getEditorComponent = ( registerParams ) => {
 	let EditorComponent;
 	AppRegistry.registerComponent.mockImplementation(
 		( name, componentProvider ) => {
@@ -26,16 +27,10 @@ const initGutenberg = ( registerParams ) => {
 		}
 	);
 	registerGutenberg( registerParams );
-
-	return render( <EditorComponent /> );
+	return EditorComponent;
 };
 
 describe( 'Register Gutenberg', () => {
-	beforeEach( () => {
-		// We need to reset modules to guarantee that setup module is imported on every test.
-		jest.resetModules();
-	} );
-
 	it( 'registers Gutenberg editor component', () => {
 		registerGutenberg();
 		expect( AppRegistry.registerComponent ).toHaveBeenCalled();
@@ -53,7 +48,9 @@ describe( 'Register Gutenberg', () => {
 			};
 		} );
 
-		initGutenberg();
+		const EditorComponent = getEditorComponent();
+		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
+		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
 		// Reference: https://git.io/JyBk0
@@ -77,7 +74,9 @@ describe( 'Register Gutenberg', () => {
 			};
 		} );
 
-		initGutenberg( { beforeInitCallback } );
+		const EditorComponent = getEditorComponent( { beforeInitCallback } );
+		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
+		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
 		// Reference: https://git.io/JyBk0
@@ -94,16 +93,18 @@ describe( 'Register Gutenberg', () => {
 
 		// An empty component is provided in order to listen for render calls of the editor component.
 		const onRenderEditor = jest.fn();
-		const EditorComponent = () => {
+		const MockEditor = () => {
 			onRenderEditor();
 			return null;
 		};
 		jest.mock( '../setup', () => ( {
 			__esModule: true,
-			default: jest.fn().mockReturnValue( <EditorComponent /> ),
+			default: jest.fn().mockReturnValue( <MockEditor /> ),
 		} ) );
 
-		initGutenberg();
+		const EditorComponent = getEditorComponent();
+		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
+		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		const hookCallIndex = 0;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
@@ -123,16 +124,18 @@ describe( 'Register Gutenberg', () => {
 
 		// An empty component is provided in order to listen for render calls of the editor component.
 		const onRenderEditor = jest.fn();
-		const EditorComponent = () => {
+		const MockEditor = () => {
 			onRenderEditor();
 			return null;
 		};
 		jest.mock( '../setup', () => ( {
 			__esModule: true,
-			default: jest.fn().mockReturnValue( <EditorComponent /> ),
+			default: jest.fn().mockReturnValue( <MockEditor /> ),
 		} ) );
 
-		initGutenberg();
+		const EditorComponent = getEditorComponent();
+		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
+		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		const hookCallIndex = 0;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
@@ -152,16 +155,18 @@ describe( 'Register Gutenberg', () => {
 
 		// An empty component is provided in order to listen for render calls of the editor component.
 		const onRenderEditor = jest.fn();
-		const EditorComponent = () => {
+		const MockEditor = () => {
 			onRenderEditor();
 			return null;
 		};
 		jest.mock( '../setup', () => ( {
 			__esModule: true,
-			default: jest.fn().mockReturnValue( <EditorComponent /> ),
+			default: jest.fn().mockReturnValue( <MockEditor /> ),
 		} ) );
 
-		initGutenberg();
+		const EditorComponent = getEditorComponent();
+		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
+		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		const hookCallIndex = 1;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
@@ -176,9 +181,20 @@ describe( 'Register Gutenberg', () => {
 		expect( hookCallOrder ).toBeGreaterThan( onRenderEditorCallOrder );
 	} );
 
-	it( 'initializes the editor', () => {
-		const { getByTestId } = initGutenberg();
-		const blockList = waitFor( () => getByTestId( 'block-list-wrapper' ) );
-		expect( blockList ).toBeDefined();
+	it( 'initializes the editor', async () => {
+		// Unmock setup module to render the actual editor component.
+		jest.unmock( '../setup' );
+
+		const EditorComponent = getEditorComponent();
+		const screen = await initializeEditor(
+			{},
+			{ component: EditorComponent }
+		);
+		const blockList = screen.getByTestId( 'block-list-wrapper' );
+
+		expect( blockList ).toBeVisible();
+		expect( console ).toHaveLoggedWith( 'Hermes is: true' );
+		// It's expected that some blocks are upgraded and inform about it (example: "Updated Block: core/cover")
+		expect( console ).toHaveInformed();
 	} );
 } );

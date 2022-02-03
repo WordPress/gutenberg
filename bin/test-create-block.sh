@@ -15,6 +15,10 @@ status () {
 	echo -e "\n\033[1;34m$1\033[0m\n"
 }
 
+error () {
+	echo -e "\n\033[1;31m$1\033[0m\n"
+}
+
 cleanup() {
 	rm -rf "$DIRECTORY/esnext-test"
 }
@@ -31,7 +35,15 @@ status "Formatting files..."
 status "Building block..."
 ../node_modules/.bin/wp-scripts build
 
-status "Lintig CSS files..."
+status "Verifying build..."
+expected=5
+actual=$( ls build | wc -l )
+if [ "$expected" -ne "$actual" ]; then
+	error "Expected $expected files in the build folder, but found $actual."
+    exit 1
+fi
+
+status "Linting CSS files..."
 ../node_modules/.bin/wp-scripts lint-style
 
 status "Linting JavaScript files..."

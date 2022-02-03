@@ -10,11 +10,33 @@ exports[`core/more/edit/native should match snapshot when content is empty 1`] =
     ]
   }
 >
-  <PreformattedEdit
-    getStylesFromColorScheme={[Function]}
-    setAttributes={[MockFunction]}
-    style={Object {}}
-  />
+  <View>
+    <TextInput
+      accessibilityLabel="Text input. Empty"
+      activeFormats={Array []}
+      blockType={
+        Object {
+          "tag": "pre",
+        }
+      }
+      disableEditingMenu={false}
+      fontFamily="serif"
+      fontSize={16}
+      isMultiline={false}
+      maxImagesWidth={200}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onContentSizeChange={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onPaste={[Function]}
+      onSelectionChange={[Function]}
+      placeholder="Write preformatted text…"
+      placeholderTextColor="gray"
+      triggerKeyCodes={Array []}
+      value=""
+    />
+  </View>
 </View>
 `;
 
@@ -28,15 +50,32 @@ exports[`core/more/edit/native should match snapshot when content is not empty 1
     ]
   }
 >
-  <PreformattedEdit
-    attributes={
-      Object {
-        "content": "Hello World!",
+  <View>
+    <TextInput
+      accessibilityLabel="Text input. <pre>Hello World!</pre>"
+      activeFormats={Array []}
+      blockType={
+        Object {
+          "tag": "pre",
+        }
       }
-    }
-    getStylesFromColorScheme={[Function]}
-    setAttributes={[MockFunction]}
-    style={Object {}}
-  />
+      disableEditingMenu={false}
+      fontFamily="serif"
+      fontSize={16}
+      isMultiline={false}
+      maxImagesWidth={200}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onContentSizeChange={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onPaste={[Function]}
+      onSelectionChange={[Function]}
+      placeholder="Write preformatted text…"
+      placeholderTextColor="gray"
+      triggerKeyCodes={Array []}
+      value="<pre>Hello World!</pre>"
+    />
+  </View>
 </View>
 `;

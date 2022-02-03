@@ -135,3 +135,21 @@ git push
 ```
 
 The above commands will update your `trunk` branch from _upstream_. To update any other branch replace `trunk` with the respective branch name.
+
+## Miscellaneous
+
+### Git Archeology
+
+When looking for a commit that introduced a specific change, it might be helpful to ignore revisions that only contain styling or formatting changes.
+
+Fortunately, newer versions of `git` gained the ability to skip commits in history:
+
+```
+git blame --ignore-rev f63053cace3c02e284f00918e1854284c85b9132 -L 66,73 packages/api-fetch/src/middlewares/media-upload.js
+```
+
+All styling and formatting revisions are tracked using the `.git-blame-ignore-revs` file in the Gutenberg repository. You can use this file to ignore them all at once:
+
+```
+git blame --ignore-revs-file .git-blame-ignore-revs -L 66,73 packages/api-fetch/src/middlewares/media-upload.js
+```

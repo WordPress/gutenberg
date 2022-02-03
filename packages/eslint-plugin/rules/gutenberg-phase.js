@@ -144,6 +144,8 @@ module.exports = {
 	meta: {
 		type: 'problem',
 		schema: [],
+		deprecated: true,
+		replacedBy: '@wordpress/is-gutenberg-plugin',
 	},
 	create( context ) {
 		return {

@@ -20,22 +20,31 @@ function ContrastCheckerMessage( {
 	colordTextColor,
 	backgroundColor,
 	textColor,
+	shouldShowTransparencyWarning,
 } ) {
-	const msg =
-		colordBackgroundColor.brightness() < colordTextColor.brightness()
-			? __(
-					'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.'
-			  )
-			: __(
-					'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
-			  );
+	let msg = '';
+	if ( shouldShowTransparencyWarning ) {
+		msg = __( 'Transparent text may be hard for people to read.' );
+	} else {
+		msg =
+			colordBackgroundColor.brightness() < colordTextColor.brightness()
+				? __(
+						'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.'
+				  )
+				: __(
+						'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+				  );
+	}
 
 	// Note: The `Notice` component can speak messages via its `spokenMessage`
 	// prop, but the contrast checker requires granular control over when the
 	// announcements are made. Notably, the message will be re-announced if a
 	// new color combination is selected and the contrast is still insufficient.
 	useEffect( () => {
-		speak( __( 'This color combination may be hard for people to read.' ) );
+		const speakMsg = shouldShowTransparencyWarning
+			? __( 'Transparent text may be hard for people to read.' )
+			: __( 'This color combination may be hard for people to read.' );
+		speak( speakMsg );
 	}, [ backgroundColor, textColor ] );
 
 	return (
@@ -58,6 +67,7 @@ function ContrastChecker( {
 	fontSize, // font size value in pixels
 	isLargeText,
 	textColor,
+	enableAlphaChecker = false,
 } ) {
 	if (
 		! ( backgroundColor || fallbackBackgroundColor ) ||
@@ -69,20 +79,33 @@ function ContrastChecker( {
 		backgroundColor || fallbackBackgroundColor
 	);
 	const colordTextColor = colord( textColor || fallbackTextColor );
+	const textColorHasTransparency = colordTextColor.alpha() < 1;
+	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
 	const hasTransparency =
-		colordBackgroundColor.alpha() !== 1 || colordTextColor.alpha() !== 1;
+		textColorHasTransparency || backgroundColorHasTransparency;
+	const isReadable = colordTextColor.isReadable( colordBackgroundColor, {
+		level: 'AA',
+		size:
+			isLargeText || ( isLargeText !== false && fontSize >= 24 )
+				? 'large'
+				: 'small',
+	} );
 
-	if (
-		hasTransparency ||
-		colordTextColor.isReadable( colordBackgroundColor, {
-			level: 'AA',
-			size:
-				isLargeText || ( isLargeText !== false && fontSize >= 24 )
-					? 'large'
-					: 'small',
-		} )
-	) {
+	// Don't show the message if the text is readable AND there's no transparency.
+	// This is the default.
+	if ( isReadable && ! hasTransparency ) {
 		return null;
+	}
+
+	if ( hasTransparency ) {
+		if (
+			// If there's transparency, don't show the message if the alpha checker is disabled.
+			! enableAlphaChecker ||
+			// If the alpha checker is enabled, we only show the warning if the text has transparency.
+			( isReadable && ! textColorHasTransparency )
+		) {
+			return null;
+		}
 	}
 
 	return (
@@ -91,6 +114,11 @@ function ContrastChecker( {
 			textColor={ textColor }
 			colordBackgroundColor={ colordBackgroundColor }
 			colordTextColor={ colordTextColor }
+			// Flag to warn about transparency only if the text is otherwise readable according to colord
+			// to ensure the readability warnings take precedence.
+			shouldShowTransparencyWarning={
+				isReadable && textColorHasTransparency
+			}
 		/>
 	);
 }

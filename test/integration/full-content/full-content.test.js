@@ -58,8 +58,8 @@ function normalizeParsedBlocks( blocks ) {
 }
 
 describe( 'full post content fixture', () => {
-	beforeAll( async () => {
-		const blockMetadataFiles = await glob(
+	beforeAll( () => {
+		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
 		);
 		const blockDefinitions = fromPairs(
@@ -72,7 +72,7 @@ describe( 'full post content fixture', () => {
 		// Load all hooks that modify blocks
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
-		if ( process.env.GUTENBERG_PHASE === 2 ) {
+		if ( process.env.IS_GUTENBERG_PLUGIN ) {
 			__experimentalRegisterExperimentalCoreBlocks( {
 				enableFSEBlocks: true,
 			} );

@@ -16,12 +16,13 @@ import {
 	EditorSnackbars,
 	EntitiesSavedStates,
 } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
 import {
 	ShortcutProvider,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
 import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
+import CodeEditor from '../code-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
@@ -60,6 +62,7 @@ function Editor( { onError } ) {
 		isNavigationOpen,
 		previousShortcut,
 		nextShortcut,
+		editorMode,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -69,6 +72,7 @@ function Editor( { onError } ) {
 			getEditedPostId,
 			getPage,
 			isNavigationOpened,
+			getEditorMode,
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
 		const postType = getEditedPostType();
@@ -102,9 +106,12 @@ function Editor( { onError } ) {
 			nextShortcut: select(
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
+			editorMode: getEditorMode(),
 		};
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [
 		isEntitiesSavedStatesOpen,
@@ -147,6 +154,19 @@ function Editor( { onError } ) {
 		}
 	}, [ isNavigationOpen ] );
 
+	useEffect(
+		function openGlobalStylesOnLoad() {
+			const searchParams = new URLSearchParams( window.location.search );
+			if ( searchParams.get( 'styles' ) === 'open' ) {
+				enableComplementaryArea(
+					'core/edit-site',
+					'edit-site/global-styles'
+				);
+			}
+		},
+		[ enableComplementaryArea ]
+	);
+
 	// Don't render the Editor until the settings are set and loaded
 	const isReady =
 		settings?.siteUrl &&
@@ -162,6 +182,18 @@ function Editor( { onError } ) {
 		}
 		return null;
 	};
+
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
+		);
+	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URlQueryController> from double-announcing.
@@ -206,13 +238,18 @@ function Editor( { onError } ) {
 											content={
 												<>
 													<EditorNotices />
-													{ template && (
-														<BlockEditor
-															setIsInserterOpen={
-																setIsInserterOpened
-															}
-														/>
-													) }
+													{ editorMode === 'visual' &&
+														template && (
+															<BlockEditor
+																setIsInserterOpen={
+																	setIsInserterOpened
+																}
+															/>
+														) }
+													{ editorMode === 'text' &&
+														template && (
+															<CodeEditor />
+														) }
 													{ templateResolved &&
 														! template &&
 														settings?.siteUrl &&
@@ -271,7 +308,9 @@ function Editor( { onError } ) {
 										/>
 										<WelcomeGuide />
 										<Popover.Slot />
-										<PluginArea />
+										<PluginArea
+											onError={ onPluginAreaError }
+										/>
 									</ErrorBoundary>
 								</BlockContextProvider>
 							</GlobalStylesProvider>

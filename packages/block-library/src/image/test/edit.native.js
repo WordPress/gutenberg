@@ -1,19 +1,44 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, initializeEditor, getEditorHtml } from 'test/helpers';
+import {
+	act,
+	fireEvent,
+	initializeEditor,
+	getEditorHtml,
+	render,
+} from 'test/helpers';
 import { Image } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { apiFetch } from '@wordpress/data-controls';
+import {
+	setFeaturedImage,
+	sendMediaUpload,
+	subscribeMediaUpload,
+} from '@wordpress/react-native-bridge';
+import { select } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
+import '@wordpress/jest-console';
 
 /**
  * Internal dependencies
  */
 import { registerCoreBlocks } from '../..';
+import ImageEdit from '../edit';
+
+let uploadCallBack;
+subscribeMediaUpload.mockImplementation( ( callback ) => {
+	uploadCallBack = callback;
+} );
+sendMediaUpload.mockImplementation( ( payload ) => {
+	uploadCallBack( payload );
+} );
 
 jest.mock( '@wordpress/data-controls', () => {
 	const dataControls = jest.requireActual( '@wordpress/data-controls' );
@@ -35,6 +60,9 @@ jest.mock( 'lodash', () => {
 
 const apiFetchPromise = Promise.resolve( {} );
 apiFetch.mockImplementation( () => apiFetchPromise );
+
+const clipboardPromise = Promise.resolve( '' );
+Clipboard.getString.mockImplementation( () => clipboardPromise );
 
 beforeAll( () => {
 	registerCoreBlocks();
@@ -127,6 +155,8 @@ describe( 'Image Block', () => {
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		// Await asynchronous fetch of clipboard
+		await act( () => clipboardPromise );
 		fireEvent.changeText(
 			screen.getByPlaceholderText( 'Search or type URL' ),
 			'wordpress.org'
@@ -159,12 +189,16 @@ describe( 'Image Block', () => {
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Media File' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		// Await asynchronous fetch of clipboard
+		await act( () => clipboardPromise );
 		fireEvent.changeText(
 			screen.getByPlaceholderText( 'Search or type URL' ),
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByA11yLabel( 'Apply' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		// Await asynchronous fetch of clipboard
+		await act( () => clipboardPromise );
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
@@ -256,5 +290,130 @@ describe( 'Image Block', () => {
 <figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption>Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
+	} );
+
+	describe( "when replacing media for an image set as the post's featured image", () => {
+		function mockFeaturedMedia( featuredImageId ) {
+			jest.spyOn(
+				select( editorStore ),
+				'getEditedPostAttribute'
+			).mockImplementation( ( attributeName ) =>
+				attributeName === 'featured_media' ? featuredImageId : undefined
+			);
+		}
+
+		function mockGetMedia( media ) {
+			jest.spyOn( select( coreStore ), 'getMedia' ).mockReturnValueOnce(
+				media
+			);
+		}
+
+		it( 'does not prompt to replace featured image during a new image upload', () => {
+			// Arrange
+			const INITIAL_IMAGE = { id: 1, url: 'mock-url-1' };
+			const NEW_IMAGE_PENDING = { id: 2, url: 'mock-url-2' };
+			mockFeaturedMedia( INITIAL_IMAGE.id );
+			const screen = render( <ImageEdit attributes={ INITIAL_IMAGE } /> );
+
+			// Act
+			screen.update( <ImageEdit attributes={ NEW_IMAGE_PENDING } /> );
+			const MEDIA_UPLOAD_STATE_UPLOADING = 1;
+			sendMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_UPLOADING,
+				mediaId: NEW_IMAGE_PENDING.id,
+				progress: 0.1,
+			} );
+
+			// Assert
+			expect( setFeaturedImage ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not prompt to replace featured image after a new image upload fails', () => {
+			// Arrange
+			const INITIAL_IMAGE = { id: 1, url: 'mock-url-1' };
+			const NEW_IMAGE_PENDING = { id: 2, url: 'mock-url-2' };
+			mockFeaturedMedia( INITIAL_IMAGE.id );
+			const screen = render(
+				<ImageEdit
+					attributes={ INITIAL_IMAGE }
+					setAttributes={ () => {} }
+				/>
+			);
+
+			// Act
+			screen.update(
+				<ImageEdit
+					attributes={ NEW_IMAGE_PENDING }
+					setAttributes={ () => {} }
+				/>
+			);
+			const MEDIA_UPLOAD_STATE_UPLOADING = 1;
+			sendMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_UPLOADING,
+				mediaId: NEW_IMAGE_PENDING.id,
+				progress: 0.1,
+			} );
+			const MEDIA_UPLOAD_STATE_FAILED = 3;
+			sendMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_FAILED,
+				mediaId: NEW_IMAGE_PENDING.id,
+			} );
+
+			// Assert
+			expect( setFeaturedImage ).not.toHaveBeenCalled();
+		} );
+
+		it( 'prompts to replace featured image after a new image upload succeeds', () => {
+			// Arrange
+			const INITIAL_IMAGE = { id: 1, url: 'mock-url-1' };
+			const NEW_IMAGE_PENDING = { id: 2, url: 'mock-url-2' };
+			const NEW_IMAGE_RESOLVED = { id: 3, url: 'mock-url-2' };
+			mockFeaturedMedia( INITIAL_IMAGE.id );
+			const screen = render( <ImageEdit attributes={ INITIAL_IMAGE } /> );
+
+			// Act
+			screen.update( <ImageEdit attributes={ NEW_IMAGE_PENDING } /> );
+			mockGetMedia( { id: NEW_IMAGE_RESOLVED.id } );
+			screen.update(
+				<ImageEdit
+					attributes={ NEW_IMAGE_RESOLVED }
+					setAttributes={ () => {} }
+				/>
+			);
+
+			// Assert
+			expect( setFeaturedImage ).toHaveBeenCalledTimes( 1 );
+			expect( setFeaturedImage ).toHaveBeenCalledWith(
+				NEW_IMAGE_RESOLVED.id
+			);
+		} );
+
+		it( 'prompts to replace featured image for a cached image', () => {
+			// Arrange
+			const INITIAL_IMAGE = { id: 1, url: 'mock-url-1' };
+			const NEW_IMAGE_RESOLVED = { id: 3, url: 'mock-url-2' };
+			mockFeaturedMedia( INITIAL_IMAGE.id );
+			const screen = render(
+				<ImageEdit
+					attributes={ INITIAL_IMAGE }
+					setAttributes={ () => {} }
+				/>
+			);
+
+			// Act
+			mockGetMedia( { id: NEW_IMAGE_RESOLVED.id } );
+			screen.update(
+				<ImageEdit
+					attributes={ NEW_IMAGE_RESOLVED }
+					setAttributes={ () => {} }
+				/>
+			);
+
+			// Assert
+			expect( setFeaturedImage ).toHaveBeenCalledTimes( 1 );
+			expect( setFeaturedImage ).toHaveBeenCalledWith(
+				NEW_IMAGE_RESOLVED.id
+			);
+		} );
 	} );
 } );
