@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { parseUnit } from '../unit-control/utils';
+import { parseUnit, CUSTOM_CSS_UNIT } from '../unit-control/utils';
 
 export const LABELS = {
 	all: __( 'All' ),
@@ -85,7 +85,18 @@ export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
 	 * isNumber() is more specific for these cases, rather than relying on a
 	 * simple truthy check.
 	 */
-	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
+	let allValue = isNumber( value ) ? `${ value }${ unit }` : null;
+
+	/**
+	 * The shared value can include non-numeric values if it is custom CSS. In this
+	 * case, the value is handled specially and the unit is not appended.
+	 */
+	if (
+		allUnits.every( ( u ) => u === CUSTOM_CSS_UNIT.value ) &&
+		!! value
+	) {
+		allValue = `${ value }`;
+	}
 
 	return allValue;
 }
