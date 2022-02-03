@@ -1,0 +1,28 @@
+{
+  "name": "05-recipe-card-esnext",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Example: Recipe Card (ESNext).",
+  "author": "The WordPress Contributors",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+	"WordPress",
+	"block"
+  ],
+  "homepage": "https://github.com/WordPress/gutenberg-examples/",
+  "repository": "git+https://github.com/WordPress/gutenberg-examples.git",
+  "bugs": {
+	"url": "https://github.com/WordPress/gutenberg-examples/issues"
+  },
+  "main": "build/index.js",
+  "devDependencies": {
+	"@wordpress/scripts": "^18.0.1"
+  },
+  "scripts": {
+	"build": "wp-scripts build",
+	"format:js": "wp-scripts format-js",
+	"lint:js": "wp-scripts lint-js",
+	"packages-update": "wp-scripts packages-update",
+	"start": "wp-scripts start"
+  }
+}

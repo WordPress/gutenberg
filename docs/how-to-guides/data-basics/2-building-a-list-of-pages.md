@@ -30,29 +30,6 @@ function PagesList( { pages } ) {
 }
 ```
 
-<details><summary>Compiled snippet</summary>
-
-```js
-function MyFirstApp() {
-	const pages = [{ id: 'mock', title: 'Sample page' }]
-	return (
-		wp.element.createElement( PagesList, { pages } )
-	)
-}
-
-function PagesList( { pages } ) {
-	return (
-		wp.element.createElement( 'ul', {},
-			pages?.map( page => (
-				wp.element.createElement( 'li', { key: page.id }, page.title )
-			) )
-		)
-	)
-}
-```
-
-</details>
-
 Note that this component does not fetch any data yet, only presents the hardcoded list of pages. When you refresh the page,
 you should see the following:
 
@@ -130,33 +107,6 @@ function PagesList( { pages } ) {
 }
 ```
 
-<details><summary>Compiled snippet</summary>
-
-```js
-function MyFirstApp() {
-	const pages = wp.data.useSelect(
-		select =>
-			select( wp.coreData.store ).getEntityRecords( 'postType', 'page' ),
-		[]
-	);
-	return (
-		wp.element.createElement( PagesList, { pages } )
-	)
-}
-
-function PagesList( { pages } ) {
-	return (
-		wp.element.createElement( 'ul', {},
-			pages?.map( page => (
-				wp.element.createElement( 'li', { key: page.id }, page.title )
-			) )
-		)
-	)
-}
-```
-
-</details>
-
 Refreshing the page should display a list similar to this one:
 
 ![](./media/list-of-pages/fetch-the-data.jpg)
@@ -184,31 +134,6 @@ function PagesList( { pages } ) {
 }
 ```
 
-<details><summary>Compiled snippet</summary>
-
-```js
-function PagesList( { pages } ) {
-	return wp.element.createElement(
-		'table',
-		{ className: 'wp-list-table widefat fixed striped table-view-list' },
-		wp.element.createElement( 'thead', {},
-			wp.element.createElement( 'tr', {},
-				wp.element.createElement( 'td', {}, 'Title' ),
-			),
-		),
-		wp.element.createElement( 'tbody', {},
-			pages?.map( page => (
-				wp.element.createElement( 'tr', { key: page.id },
-					wp.element.createElement( 'td', {}, page.title.rendered ),
-				)
-			) ),
-		),
-	);
-}
-```
-
-</details>
-
 ![](./media/list-of-pages/make-a-table.jpg)
 
 ## Step 4: Add a search box
@@ -234,26 +159,6 @@ function MyFirstApp() {
 	)
 }
 ```
-
-<details><summary>Compiled snippet</summary>
-
-```js
-function MyFirstApp() {
-	const [searchTerm, setSearchTerm] = wp.element.useState( '' );
-	// ...
-	return (
-		wp.element.createElement( 'div', {},
-			wp.element.createElement( wp.components.SearchControl, {
-				onChange: setSearchTerm,
-				value: searchTerm,
-			} ),
-			// ...
-		)
-	)
-}
-```
-
-</details>
 
 Note that instead of using an `input` tag, we took advantage of
 the [SearchControl](https://developer.wordpress.org/block-editor/reference-guides/components/search-control/) component.
@@ -327,33 +232,6 @@ function MyFirstApp() {
 }
 ```
 
-<details><summary>Compiled snippet</summary>
-
-```js
-function MyFirstApp() {
-	const [searchTerm, setSearchTerm] = wp.element.useState( '' );
-	const pages = wp.data.useSelect( select => {
-		const query = {};
-		if ( searchTerm ) {
-			query.search = searchTerm;
-		}
-		return select( wp.coreData.store ).getEntityRecords( 'postType', 'page', query );
-	}, [searchTerm] );
-
-	return (
-		wp.element.createElement( 'div', {},
-			wp.element.createElement( wp.components.SearchControl, {
-				onChange: setSearchTerm,
-				value: searchTerm,
-			} ),
-			wp.element.createElement( PagesList, { pages } ),
-		)
-	)
-}
-```
-
-</details>
-
 Voila! We can now filter the results:
 
 ![](./media/list-of-pages/filter.jpg)
@@ -426,33 +304,6 @@ function MyFirstApp() {
 	)
 }
 ```
-
-<details><summary>Compiled snippet</summary>
-
-```js
-function PagesList( { hasResolved, pages } ) {
-	if ( !hasResolved ) {
-		return wp.element.createElement( wp.components.Spinner );
-	}
-	if ( !pages?.length ) {
-		return wp.element.createElement( 'div', {}, 'No results' );
-	}
-	// ...
-}
-
-function MyFirstApp() {
-	// ...
-
-	return (
-		wp.element.createElement( 'div', {},
-			// ...
-			wp.element.createElement( PagesList, { hasResolved, pages } ),
-		)
-	)
-}
-```
-
-</details>
 
 Note that instead of building a custom loading indicator, we took advantage of
 the [Spinner](https://developer.wordpress.org/block-editor/reference-guides/components/spinner/) component.
@@ -537,64 +388,6 @@ function PagesList( { hasResolved, pages } ) {
 	);
 }
 ```
-
-<details><summary>Compiled snippet</summary>
-
-```js
-
-function MyFirstApp() {
-	const [searchTerm, setSearchTerm] = wp.element.useState( '' );
-	const { pages, hasResolved } = wp.data.useSelect( select => {
-		const query = {};
-		if ( searchTerm ) {
-			query.search = searchTerm;
-		}
-		return {
-			pages: select( wp.coreData.store ).getEntityRecords( 'postType', 'page', query ),
-			hasResolved: select( wp.coreData.store )
-				.hasFinishedResolution( 'getEntityRecords', ['postType', 'page', query] ),
-		};
-	}, [searchTerm] );
-
-	return (
-		wp.element.createElement( 'div', {},
-			wp.element.createElement( wp.components.SearchControl, {
-				onChange: setSearchTerm,
-				value: searchTerm,
-			} ),
-			wp.element.createElement( PagesList, { hasResolved, pages } ),
-		)
-	);
-}
-
-function PagesList( { hasResolved, pages } ) {
-	if ( !hasResolved ) {
-		return wp.element.createElement( wp.components.Spinner );
-	}
-	if ( !pages?.length ) {
-		return wp.element.createElement( 'div', {}, 'No results' );
-	}
-
-	return wp.element.createElement(
-		'table',
-		{ className: 'wp-list-table widefat fixed striped table-view-list posts' },
-		wp.element.createElement( 'thead', {},
-			wp.element.createElement( 'tr', {},
-				wp.element.createElement( 'td', {}, 'Title' ),
-			),
-		),
-		wp.element.createElement( 'tbody', {},
-			pages?.map( page => (
-				wp.element.createElement( 'tr', { key: page.id },
-					wp.element.createElement( 'td', {}, page.title.rendered ),
-				)
-			) ),
-		),
-	);
-}
-```
-
-</details>
 
 All that’s left is to refresh the page and enjoy the brand new status indicator:
 

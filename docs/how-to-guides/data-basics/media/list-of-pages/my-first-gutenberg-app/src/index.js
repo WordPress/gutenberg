@@ -1,21 +1,22 @@
-const { SearchControl, Spinner } = window.wp.components;
+const wp = window.wp;
+const { SearchControl, Spinner } = wp.components;
 
 function MyFirstApp() {
-	const [ searchTerm, setSearchTerm ] = window.wp.element.useState( '' );
-	const { pages, hasResolved } = window.wp.data.useSelect(
+	const [ searchTerm, setSearchTerm ] = wp.element.useState( '' );
+	const { pages, hasResolved } = wp.data.useSelect(
 		( select ) => {
 			const query = {};
 			if ( searchTerm ) {
 				query.search = searchTerm;
 			}
 			return {
-				pages: select( window.wp.coreData.store ).getEntityRecords(
+				pages: select( wp.coreData.store ).getEntityRecords(
 					'postType',
 					'page',
 					query
 				),
 				hasResolved: select(
-					window.wp.coreData.store
+					wp.coreData.store
 				).hasFinishedResolution( 'getEntityRecords', [
 					'postType',
 					'page',
