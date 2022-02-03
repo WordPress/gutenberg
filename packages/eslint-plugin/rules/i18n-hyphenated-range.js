@@ -18,7 +18,6 @@ function replaceHyphenWithEnDash( string ) {
 	return string;
 }
 
-// see eslint-plugin-wpcalypso.
 function makeFixerFunction( arg ) {
 	return ( fixer ) => {
 		switch ( arg.type ) {
