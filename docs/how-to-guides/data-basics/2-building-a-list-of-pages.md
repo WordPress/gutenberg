@@ -269,7 +269,7 @@ We can now request only the pages matching the `searchTerm`.
 
 After checking with the [WordPress API documentation]([https://developer.wordpress.org/rest-api/reference/pages/]), we
 see that the [/wp/v2/pages]([https://developer.wordpress.org/rest-api/reference/pages/]) endpoint accepts a `search`
-query parameter and uses it to  _limit results to those matching a string_. But how to use it? We can pass custom query
+query parameter and uses it to  _limit results to those matching a string_. But how can we use it? We can pass custom query
 parameters as the third argument to `getEntityRecords` as below:
 
 ```js
