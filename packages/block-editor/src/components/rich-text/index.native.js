@@ -405,9 +405,22 @@ function RichTextWrapper(
 				return;
 			}
 
-			// Only process file if no HTML is present.
-			// Note: a pasted file may have the URL as plain text.
-			if ( files && files.length && ! html ) {
+			// Process any attached files, unless we detect Microsoft Office as
+			// the source.
+			//
+			// When content is copied from Microsoft Office, an image of the
+			// content is rendered and attached to the clipboard along with the
+			// plain-text and HTML content. This artifact is a distraction from
+			// the relevant clipboard data, so we ignore it.
+			//
+			// Props https://github.com/pubpub/pubpub/commit/2f933277a15a263a1ab4bbd36b96d3a106544aec
+			if (
+				files &&
+				files.length &&
+				! html?.includes(
+					'xmlns:o="urn:schemas-microsoft-com:office:office'
+				)
+			) {
 				const content = pasteHandler( {
 					HTML: filePasteHandler( files ),
 					mode: 'BLOCKS',
