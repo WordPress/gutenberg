@@ -4,8 +4,8 @@
 import { Component } from '@wordpress/element';
 
 export class PluginErrorBoundary extends Component {
-	constructor() {
-		super( ...arguments );
+	constructor( props ) {
+		super( props );
 		this.state = {
 			hasError: false,
 		};
