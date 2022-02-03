@@ -385,7 +385,7 @@ search=About_ and we’d display the wrong data.
 Gutenberg data helps by handling the asynchronous part behind the scenes. `useSelect` remembers the most recent call and
 returns only the data we expect.
 
-Second, every keystroke would trigger an API request. If you typed About, deleted it, and retyped it, it would
+Secondly, every keystroke would trigger an API request. If you typed `About`, deleted it, and retyped it, it would
 issue 10 requests in total even though we could reuse the data.
 
 Gutenberg data helps by caching the responses to API requests triggered by `getEntityRecords()`  and reuses them on
