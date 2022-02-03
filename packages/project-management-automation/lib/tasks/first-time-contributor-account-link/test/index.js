@@ -6,6 +6,23 @@ import hasWordPressProfile from '../../../has-wordpress-profile';
 
 jest.mock( '../../../has-wordpress-profile', () => jest.fn() );
 
+const botUser = {
+	data: {
+		name: 'Ghost',
+		email: 'ghost@example.invalid',
+		username: 'ghost',
+		type: 'Bot',
+	},
+};
+const humanUser = {
+	data: {
+		name: 'Ghost',
+		email: 'ghost@example.invalid',
+		username: 'ghost',
+		type: 'User',
+	},
+};
+
 describe( 'firstTimeContributorAccountLink', () => {
 	beforeEach( () => {
 		hasWordPressProfile.mockReset();
@@ -43,11 +60,15 @@ describe( 'firstTimeContributorAccountLink', () => {
 				repos: {
 					listCommits: jest.fn(),
 				},
+				users: {
+					getByUsername: jest.fn( () => humanUser ),
+				},
 			},
 		};
 
 		await firstTimeContributorAccountLink( payloadForBranchPush, octokit );
 
+		expect( octokit.rest.users.getByUsername ).not.toHaveBeenCalled();
 		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
 	} );
 
@@ -71,11 +92,36 @@ describe( 'firstTimeContributorAccountLink', () => {
 				repos: {
 					listCommits: jest.fn(),
 				},
+				users: {
+					getByUsername: jest.fn( () => humanUser ),
+				},
 			},
 		};
 
 		await firstTimeContributorAccountLink( payloadDirectToTrunk, octokit );
 
+		expect( octokit.rest.users.getByUsername ).not.toHaveBeenCalled();
+		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing for commits by bots', async () => {
+		const octokit = {
+			rest: {
+				repos: {
+					listCommits: jest.fn(),
+				},
+				users: {
+					// Return a bot when `getByUsername` is called.
+					getByUsername: jest.fn( () => botUser ),
+				},
+			},
+		};
+
+		await firstTimeContributorAccountLink( payload, octokit );
+
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith(
+			payload.commits[ 0 ].author.username
+		);
 		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
 	} );
 
@@ -98,6 +144,9 @@ describe( 'firstTimeContributorAccountLink', () => {
 						} )
 					),
 				},
+				users: {
+					getByUsername: jest.fn( () => humanUser ),
+				},
 				issues: {
 					createComment: jest.fn(),
 				},
@@ -106,6 +155,9 @@ describe( 'firstTimeContributorAccountLink', () => {
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith(
+			payload.commits[ 0 ].author.username
+		);
 		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
@@ -129,6 +181,9 @@ describe( 'firstTimeContributorAccountLink', () => {
 						} )
 					),
 				},
+				users: {
+					getByUsername: jest.fn( () => humanUser ),
+				},
 				issues: {
 					createComment: jest.fn(),
 				},
@@ -141,6 +196,9 @@ describe( 'firstTimeContributorAccountLink', () => {
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith(
+			payload.commits[ 0 ].author.username
+		);
 		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
@@ -164,6 +222,9 @@ describe( 'firstTimeContributorAccountLink', () => {
 						} )
 					),
 				},
+				users: {
+					getByUsername: jest.fn( () => humanUser ),
+				},
 				issues: {
 					createComment: jest.fn(),
 				},
@@ -174,6 +235,9 @@ describe( 'firstTimeContributorAccountLink', () => {
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith(
+			payload.commits[ 0 ].author.username
+		);
 		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',

@@ -13,6 +13,13 @@ const debug = require( '../../debug' );
  * @param {GitHub}                    octokit Initialized Octokit REST client.
  */
 async function firstTimeContributorLabel( payload, octokit ) {
+	const userType = payload.pull_request.user.type;
+
+	if ( userType === 'Bot' ) {
+		debug( 'first-time-contributor: User is a bot. Aborting' );
+		return;
+	}
+
 	const repo = payload.repository.name;
 	const owner = payload.repository.owner.login;
 	const author = payload.pull_request.user.login;
