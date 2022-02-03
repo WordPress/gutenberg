@@ -279,7 +279,7 @@ wp.data.select( 'core' ).getEntityRecords( 'postType', 'page', { search: 'home' 
 Running that snippet in your browser’s dev tools will trigger a request to `/wp/v2/pages?search=home` instead of
 just `/wp/v2/pages`.
 
-Let’s update our `useSelect` call as follows:
+Let’s mirror this in our `useSelect` call as follows:
 
 ```js
 function MyFirstApp() {
