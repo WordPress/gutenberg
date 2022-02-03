@@ -1036,7 +1036,7 @@ export class RichText extends Component {
 			textDecorationColor: defaultTextDecorationColor,
 			fontFamily: defaultFontFamily,
 		} = getStylesFromColorScheme( styles.richText, styles.richTextDark );
-		const textLinkColor = this.getLinkTextColor(
+		const linkTextColor = this.getLinkTextColor(
 			defaultTextDecorationColor
 		);
 
@@ -1134,7 +1134,7 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
-						linkTextColor: textLinkColor,
+						linkTextColor,
 						tag: tagName,
 					} }
 					placeholder={ this.props.placeholder }
