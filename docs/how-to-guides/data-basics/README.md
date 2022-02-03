@@ -1,6 +1,6 @@
 # Create your First App with Gutenberg Data
 
-This tutorial aims to get you comfortable with the Gutenberg data layer. It guides you through building a React application that enables the user to manage their WordPress pages. The finished app will look like this:
+This tutorial aims to get you comfortable with the Gutenberg data layer. It guides you through building a simple React application that enables the user to manage their WordPress pages. The finished app will look like this:
 
 ![](./media/finished-app.jpg)
 
