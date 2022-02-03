@@ -169,7 +169,7 @@ function PagesList( { pages } ) {
 		<table className="wp-list-table widefat fixed striped table-view-list">
 			<thead>
 				<tr>
-					<td>Title</td>
+					<th>Title</th>
 				</tr>
 			</thead>
 			<tbody>
