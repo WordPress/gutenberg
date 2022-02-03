@@ -18,21 +18,6 @@ const PROBLEMS_BY_CHAR_CODE = {
 function makeFixerFunction( arg ) {
 	return ( fixer ) => {
 		switch ( arg.type ) {
-			case 'TemplateLiteral':
-				return arg.quasis.reduce( ( fixes, quasi ) => {
-					if (
-						'TemplateElement' === quasi.type &&
-						quasi.value.value.match( /^\s|\s$/ )
-					) {
-						fixes.push(
-							fixer.replaceTextRange(
-								[ quasi.start, quasi.end ],
-								`'${ quasi.value.value.trim() }'`
-							)
-						);
-					}
-					return fixes;
-				}, [] );
 			case 'Literal':
 				return [ fixer.replaceText( arg, `'${ arg.value.trim() }'` ) ];
 

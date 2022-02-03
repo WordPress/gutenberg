@@ -68,5 +68,10 @@ ruleTester.run( 'i18n-no-flanking-whitespace', rule, {
 			output: `__( 'Flanking tab.' );`,
 			errors: [ { messageId: 'noFlankingWhitespace' } ],
 		},
+
+		{
+			code: '__( ` Template literals ` )',
+			errors: [ { messageId: 'noFlankingWhitespace' } ],
+		},
 	],
 } );
