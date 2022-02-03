@@ -1920,6 +1920,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Styles",
+		"slug": "styles",
+		"markdown_source": "../docs/explanations/architecture/styles.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "../docs/explanations/faq.md",

@@ -274,7 +274,8 @@
 					},
 					{
 						"docs/explanations/architecture/full-site-editing-templates.md": []
-					}
+					},
+					{ "docs/explanations/architecture/styles.md": [] }
 				]
 			},
 			{ "docs/explanations/faq.md": [] },
