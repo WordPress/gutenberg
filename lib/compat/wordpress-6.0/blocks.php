@@ -142,17 +142,17 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 		strpos( $metadata['file'], gutenberg_dir_path() ) !== 0
 	) {
 		return $settings;
- 	}
+	}
 
- 	$view_script_path = realpath( dirname( $metadata['file'] ) . '/' . remove_block_asset_path_prefix( $metadata['viewScript'] ) );
+	$view_script_path = realpath( dirname( $metadata['file'] ) . '/' . remove_block_asset_path_prefix( $metadata['viewScript'] ) );
 
- 	if ( file_exists( $view_script_path ) ) {
- 		$view_script_handle = str_replace( 'core/', 'wp-block-', $metadata['name'] ) . '-view';
- 		$view_script_id     = str_replace( array( '.min.js', '.js' ), '', basename( remove_block_asset_path_prefix( $metadata['viewScript'] ) ) );
- 		$view_script_handle = str_replace( 'core/', 'wp-block-', $metadata['name'] ) . '-' . $view_script_id;
- 		wp_deregister_script( $view_script_handle );
+	if ( file_exists( $view_script_path ) ) {
+		$view_script_handle = str_replace( 'core/', 'wp-block-', $metadata['name'] ) . '-view';
+		$view_script_id     = str_replace( array( '.min.js', '.js' ), '', basename( remove_block_asset_path_prefix( $metadata['viewScript'] ) ) );
+		$view_script_handle = str_replace( 'core/', 'wp-block-', $metadata['name'] ) . '-' . $view_script_id;
+		wp_deregister_script( $view_script_handle );
 
- 		// Replace suffix and extension with `.asset.php` to find the generated dependencies file.
+		// Replace suffix and extension with `.asset.php` to find the generated dependencies file.
 		$view_asset_file          = substr( $view_script_path, 0, -( strlen( '.js' ) ) ) . '.asset.php';
 		$view_asset               = file_exists( $view_asset_file ) ? require( $view_asset_file ) : null;
 		$view_script_dependencies = isset( $view_asset['dependencies'] ) ? $view_asset['dependencies'] : array();
