@@ -298,7 +298,7 @@ function MyFirstApp() {
 }
 ```
 
-The `searchTerm` is now used as a `search` query parameter when specified. Note that `searchTerm` is also specified
+The `searchTerm` is now used as a `search` query parameter when provided. Note that `searchTerm` is also specified
 inside the list of `useSelect` dependencies to make sure `getEntityRecords` is re-run when the `searchTerm` changes.
 
 Finally, here’s how `MyFirstApp` looks like once we wire it all together:
