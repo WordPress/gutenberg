@@ -64,7 +64,7 @@ The hard-coded sample page isn’t very useful. We want to display your actual W
 list of pages from the WordPress API.
 
 Before we start, let’s confirm we actually have some pages to fetch. Navigate to Pages using the sidebar menu and
-ensure it shows at least four or five positions:
+ensure it shows at least four or five Pages:
 
 ![](./media/list-of-pages/pages-list.jpg)
 
