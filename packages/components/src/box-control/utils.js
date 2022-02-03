@@ -91,10 +91,7 @@ export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
 	 * The shared value can include non-numeric values if it is custom CSS. In this
 	 * case, the value is handled specially and the unit is not appended.
 	 */
-	if (
-		allUnits.every( ( u ) => u === CUSTOM_CSS_UNIT.value ) &&
-		!! value
-	) {
+	if ( allUnits.every( ( u ) => u === CUSTOM_CSS_UNIT.value ) && !! value ) {
 		allValue = `${ value }`;
 	}
 
@@ -126,10 +123,7 @@ export function getAllUnitFallback( selectedUnits ) {
  * @return {boolean} Whether values are mixed.
  */
 export function isValuesMixed( values = {}, sides = ALL_SIDES ) {
-	const allValue = getAllValue( values, sides );
-	const isMixed = isNaN( parseFloat( allValue ) );
-
-	return isMixed;
+	return getAllValue( values, sides ) === null;
 }
 
 /**
