@@ -55,6 +55,17 @@ const USERS_LIST_QUERY = {
 	context: 'view',
 };
 
+function getFeaturedImageDetails( post, size ) {
+	const image = get( post, [ '_embedded', 'wp:featuredmedia', '0' ] );
+
+	return {
+		url:
+			image?.media_details?.sizes?.[ size ]?.source_url ??
+			image?.source_url,
+		alt: image?.alt_text,
+	};
+}
+
 export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const {
 		postsToShow,
@@ -77,7 +88,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		addLinkToFeaturedImage,
 	} = attributes;
 	const {
-		imageSizeOptions,
+		imageSizes,
 		latestPosts,
 		defaultImageWidth,
 		defaultImageHeight,
@@ -85,11 +96,8 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		authorList,
 	} = useSelect(
 		( select ) => {
-			const { getEntityRecords, getMedia, getUsers } = select(
-				coreStore
-			);
-			const { getSettings } = select( blockEditorStore );
-			const { imageSizes, imageDimensions } = getSettings();
+			const { getEntityRecords, getUsers } = select( coreStore );
+			const settings = select( blockEditorStore ).getSettings();
 			const catIds =
 				categories && categories.length > 0
 					? categories.map( ( cat ) => cat.id )
@@ -101,59 +109,28 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					order,
 					orderby: orderBy,
 					per_page: postsToShow,
+					_embed: 'wp:featuredmedia',
 				},
 				( value ) => ! isUndefined( value )
 			);
 
-			const posts = getEntityRecords(
-				'postType',
-				'post',
-				latestPostsQuery
-			);
-
 			return {
 				defaultImageWidth: get(
-					imageDimensions,
+					settings.imageDimensions,
 					[ featuredImageSizeSlug, 'width' ],
 					0
 				),
 				defaultImageHeight: get(
-					imageDimensions,
+					settings.imageDimensions,
 					[ featuredImageSizeSlug, 'height' ],
 					0
 				),
-				imageSizeOptions: imageSizes
-					.filter( ( { slug } ) => slug !== 'full' )
-					.map( ( { name, slug } ) => ( {
-						value: slug,
-						label: name,
-					} ) ),
-				latestPosts: ! Array.isArray( posts )
-					? posts
-					: posts.map( ( post ) => {
-							if ( ! post.featured_media ) return post;
-
-							const image = getMedia( post.featured_media );
-							let url = get(
-								image,
-								[
-									'media_details',
-									'sizes',
-									featuredImageSizeSlug,
-									'source_url',
-								],
-								null
-							);
-							if ( ! url ) {
-								url = get( image, 'source_url', null );
-							}
-							const featuredImageInfo = {
-								url,
-								// eslint-disable-next-line camelcase
-								alt: image?.alt_text,
-							};
-							return { ...post, featuredImageInfo };
-					  } ),
+				imageSizes: settings.imageSizes,
+				latestPosts: getEntityRecords(
+					'postType',
+					'post',
+					latestPostsQuery
+				),
 				categoriesList: getEntityRecords(
 					'taxonomy',
 					'category',
@@ -171,6 +148,13 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			selectedAuthor,
 		]
 	);
+
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) => slug !== 'full' )
+		.map( ( { name, slug } ) => ( {
+			value: slug,
+			label: name,
+		} ) );
 	const categorySuggestions =
 		categoriesList?.reduce(
 			( accumulator, category ) => ( {
@@ -451,11 +435,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						'';
 
 					const {
-						featuredImageInfo: {
-							url: imageSourceUrl,
-							alt: featuredImageAlt,
-						} = {},
-					} = post;
+						url: imageSourceUrl,
+						alt: featuredImageAlt,
+					} = getFeaturedImageDetails( post, featuredImageSizeSlug );
 					const imageClasses = classnames( {
 						'wp-block-latest-posts__featured-image': true,
 						[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,

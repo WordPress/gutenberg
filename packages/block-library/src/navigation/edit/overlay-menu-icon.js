@@ -10,7 +10,6 @@ export default function OverlayMenuIcon() {
 			viewBox="0 0 24 24"
 			width="24"
 			height="24"
-			role="img"
 			aria-hidden="true"
 			focusable="false"
 		>

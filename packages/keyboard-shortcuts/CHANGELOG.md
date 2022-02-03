@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Removed unused `@wordpress/compose` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
 ## 3.1.0 (2022-01-27)
 
 ## 3.0.0 (2021-07-29)
