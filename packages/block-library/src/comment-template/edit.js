@@ -29,6 +29,7 @@ const TEMPLATE = [
 ];
 
 /**
+<<<<<<< HEAD
  * Function that returns a comment structure that will be rendered with default placehoders.
  *
  * Each comment has a `commentId` property that is always a negative number in
@@ -84,6 +85,8 @@ const getCommentsPlaceholder = ( {
 };
 
 /**
+=======
+>>>>>>> 80a24d8253 (Allow background color again to avoid compatibility errors)
  * Component which renders the inner blocks of the Comment Template.
  *
  * @param {Object} props                      Component props.
