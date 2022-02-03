@@ -47,3 +47,7 @@
 		margin-top: -($border-width);
 	}
 }
+
+.edit-site-navigation-toggle .interface-pinned-items {
+	flex-direction: column-reverse;
+}

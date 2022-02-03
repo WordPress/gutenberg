@@ -51,7 +51,6 @@ function Editor( { onError } ) {
 	const {
 		isInserterOpen,
 		isListViewOpen,
-		sidebarIsOpened,
 		settings,
 		entityId,
 		templateType,
@@ -205,13 +204,11 @@ function Editor( { onError } ) {
 										<InterfaceSkeleton
 											labels={ interfaceLabels }
 											secondarySidebar={ secondarySidebar() }
-											sidebar={
-												sidebarIsOpened && (
-													<ComplementaryArea.Slot scope="core/edit-site" />
-												)
-											}
 											drawer={
-												<NavigationSidebar.Slot />
+												<>
+													<NavigationSidebar.Slot />
+													<ComplementaryArea.Slot scope="core/edit-site" />
+												</>
 											}
 											header={
 												<Header
