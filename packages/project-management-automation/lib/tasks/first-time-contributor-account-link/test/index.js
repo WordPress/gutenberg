@@ -119,9 +119,9 @@ describe( 'firstTimeContributorAccountLink', () => {
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
-		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith(
-			payload.commits[ 0 ].author.username
-		);
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith( {
+			username: payload.commits[ 0 ].author.username,
+		} );
 		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
 	} );
 
@@ -155,9 +155,9 @@ describe( 'firstTimeContributorAccountLink', () => {
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
-		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith(
-			payload.commits[ 0 ].author.username
-		);
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith( {
+			username: payload.commits[ 0 ].author.username,
+		} );
 		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
@@ -196,9 +196,9 @@ describe( 'firstTimeContributorAccountLink', () => {
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
-		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith(
-			payload.commits[ 0 ].author.username
-		);
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith( {
+			username: payload.commits[ 0 ].author.username,
+		} );
 		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
@@ -235,9 +235,9 @@ describe( 'firstTimeContributorAccountLink', () => {
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
-		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith(
-			payload.commits[ 0 ].author.username
-		);
+		expect( octokit.rest.users.getByUsername ).toHaveBeenCalledWith( {
+			username: payload.commits[ 0 ].author.username,
+		} );
 		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
