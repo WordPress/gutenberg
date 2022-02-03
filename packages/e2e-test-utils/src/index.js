@@ -110,6 +110,9 @@ export {
 	openSiteEditorNavigationPanel,
 	siteEditorNavigateSequence,
 	visitSiteEditor,
+	toggleGlobalStyles,
+	openGlobalStylesPanel,
+	openPreviousGlobalStylesPanel,
 } from './site-editor';
 
 export * from './mocks';
