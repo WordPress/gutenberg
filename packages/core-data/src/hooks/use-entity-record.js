@@ -58,7 +58,7 @@ import { IDLE, SUCCESS, ERROR, RESOLVING } from './constants';
  *
  * @return {EntityRecordResolution} Entity record data.
  */
-export default function useEntityRecord( kind, name, recordId ) {
+export default function __experimentalUseEntityRecord( kind, name, recordId ) {
 	const {
 		data,
 		isMissing,
