@@ -165,6 +165,6 @@ Congratulations! You are now ready to start building the app!
 
 ## What's next?
 
-* Review the [finished example](./media/setup/first-gutenberg-app).
 * Previous part: [Introduction](./README.md)
 * Next part: [Building a basic list of pages](./2-building-a-list-of-pages.md)
+* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository

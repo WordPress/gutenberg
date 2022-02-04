@@ -456,6 +456,6 @@ All that’s left is to refresh the page and enjoy the brand new status indicato
 
 ## What's next?
 
-* Review the [finished example](./media/list-of-pages/first-gutenberg-app)
 * **Previous part:** [Setup](./1-setup.md)
 * **Next part:** Adding an „Edit page” feature (coming soon)
+* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository
