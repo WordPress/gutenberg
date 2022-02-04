@@ -428,7 +428,7 @@ function gutenberg_migrate_old_typography_shape( $metadata ) {
 			'__experimentalFontWeight',
 			'__experimentalLetterSpacing',
 			'__experimentalTextDecoration',
-			'__experimentalOrientation',
+			'__experimentalWritingMode',
 			'__experimentalTextTransform',
 			'fontSize',
 			'lineHeight',
