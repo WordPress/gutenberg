@@ -68,12 +68,12 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$comment_order = ! empty( $block->context['comments/order'] )
+	$comment_order = ! empty( $block->context['comments/inherit'] ) && ! empty( $block->context['comments/order'] )
 		? $block->context['comments/order']
 		: get_option( 'comment_order' );
 
 	if ( 'desc' === $comment_order ) {
-		$comments = reverse_array( $comments );
+		$comments = array_reverse( $comments );
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
