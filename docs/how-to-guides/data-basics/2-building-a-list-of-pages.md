@@ -352,7 +352,7 @@ function MyFirstApp() {
 }
 ```
 
-There is just one last problem. It is easy too make a typo and pass different arguments to `getEntityRecords` and `hasFinishedResolution`. We can remove this risk by storing the arguments in a variable:
+There is just one last problem. It is easy to make a typo and pass different arguments to `getEntityRecords` and `hasFinishedResolution`. We can remove this risk by storing the arguments in a variable:
 
 ```js
 import { useSelect } from '@wordpress/data';
