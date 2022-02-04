@@ -9,13 +9,6 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-const openColorToolsPanelMenu = async () => {
-	const toggleSelector =
-		"//div[contains(@class, 'color-block-support-panel')]//button[contains(@class, 'components-dropdown-menu__toggle')]";
-	const toggle = await page.waitForXPath( toggleSelector );
-	return toggle.click();
-};
-
 describe( 'Heading', () => {
 	const COLOR_ITEM_SELECTOR =
 		'.block-editor-panel-color-gradient-settings__dropdown';
