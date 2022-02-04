@@ -34,7 +34,7 @@ export default function ReadMore( {
 			<RichText
 				tagName="a"
 				aria-label={ __( '"Read more" link text' ) }
-				placeholder={ __( 'Add "read more" link text' ) }
+				placeholder={ __( 'Read more' ) }
 				value={ content }
 				onChange={ ( newValue ) =>
 					setAttributes( { content: newValue } )
