@@ -10,7 +10,26 @@
 	"usesContext": [ "queryId", "query" ],
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"color": {
+			"gradients": true,
+			"text": false
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		}
 	},
 	"editorStyle": "query-pagination-numbers-editor"
 }

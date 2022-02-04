@@ -626,7 +626,7 @@ Displays a list of page numbers for pagination ([Source](https://github.com/Word
 
 -	**Name:** core/query-pagination-numbers
 -	**Category:** theme
--	**Supports:** ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Previous Page

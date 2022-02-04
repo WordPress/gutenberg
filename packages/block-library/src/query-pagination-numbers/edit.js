@@ -19,7 +19,13 @@ const previewPaginationNumbers = () => (
 	</>
 );
 
-export default function QueryPaginationNumbersEdit() {
+export default function QueryPaginationNumbersEdit( attributes ) {
+	const blockProps = useBlockProps();
+	const blockGap = attributes.attributes?.style?.spacing?.blockGap;
 	const paginationNumbers = previewPaginationNumbers();
-	return <div { ...useBlockProps() }>{ paginationNumbers }</div>;
+	return (
+		<div { ...blockProps } style={ { ...blockProps.style, gap: blockGap } }>
+			{ paginationNumbers }
+		</div>
+	);
 }
