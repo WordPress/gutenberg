@@ -143,7 +143,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-excerpt">%1$s</div>',
-				esc_html( $trimmed_excerpt )
+				$trimmed_excerpt
 			);
 		}
 
