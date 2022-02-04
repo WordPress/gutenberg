@@ -20,7 +20,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCommentQueryArgs, useCommentTree } from './hooks';
 
 const TEMPLATE = [
-	[ 'core/comment-author-avatar' ],
+	[ 'core/avatar' ],
 	[ 'core/comment-author-name' ],
 	[ 'core/comment-date' ],
 	[ 'core/comment-content' ],
