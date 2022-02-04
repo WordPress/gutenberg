@@ -10,11 +10,26 @@ import { store as coreStore } from '../';
 import { IDLE, SUCCESS, ERROR, RESOLVING } from './constants';
 
 /**
+ * @typedef {IDLE|RESOLVING|SUCCESS|ERROR} EntityRecordStatus
+ */
+
+/**
+ * @typedef {Object} EntityRecordResolution
+ * @property {Object}             record       the requested entity record
+ * @property {Object}             editedRecord the requested entity record with any edits applied
+ * @property {boolean}            isMissing    is the record missing after the resolver has finished?
+ * @property {boolean}            isResolving  is the record still being resolved?
+ * @property {boolean}            hasResolved  is the record resolved by now?
+ * @property {boolean}            hasEdits     were there eny edits applied to this entity record?
+ * @property {EntityRecordStatus} status       resolution status
+ */
+
+/**
  * Resolves the specified entity record.
  *
- * @param {string}   kind     Kind of the deleted entity.
- * @param {string}   name     Name of the deleted entity.
- * @param {string}   recordId Record ID of the deleted entity.
+ * @param {string} kind     Kind of the deleted entity.
+ * @param {string} name     Name of the deleted entity.
+ * @param {string} recordId Record ID of the deleted entity.
  *
  * @example
  * ```js
@@ -41,16 +56,7 @@ import { IDLE, SUCCESS, ERROR, RESOLVING } from './constants';
  * application, the price and the resolution details will be retrieved from
  * the store state using `getEntityRecord()`, or resolved if missing.
  *
- * The returned object has the following keys:
- * * record – the requested entity record
- * * editedRecord – the requested entity record with any edits applied
- * * isMissing – is the record missing after the resolver has finished?
- * * isResolving – is the record still being resolved?
- * * hasResolved – is the record resolved by now?
- * * hasEdits – were there eny edits applied to this entity record?
- * * status – one of: IDLE, RESOLVING, SUCCESS, ERROR
- *
- * @return {Object} Entity record data.
+ * @return {EntityRecordResolution} Entity record data.
  */
 export default function useEntityRecord( kind, name, recordId ) {
 	const {
