@@ -321,8 +321,9 @@ $color-control-label-height: 20px;
 // In this state, the block is entirely empty and will collapse to zero height unless there's
 // content inside. The below rule lets the placeholder stay in an invisible state to avoid
 // collapsing and shifting the layout.
-// @todo: This fix could be augmented with showing the generic appender when there are no
-// innerblocks, a la how the Row block does it.
+// @todo: Other container blocks show a white/bordered add block button when empty.
+// If we implement the same for Navigation, that button would also prevent the collapse
+// so this fix could be removed.
 .wp-block-navigation.is-selected .wp-block-navigation__container .wp-block-navigation-placeholder__preview:first-of-type {
 	visibility: hidden;
 	display: flex;
