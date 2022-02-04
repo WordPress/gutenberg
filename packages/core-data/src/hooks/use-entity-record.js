@@ -48,7 +48,7 @@ import { IDLE, SUCCESS, ERROR, RESOLVING } from './constants';
  * * isResolving – is the record still being resolved?
  * * hasResolved – is the record resolved by now?
  * * hasEdits – were there eny edits applied to this entity record?
- * * status – one of: RESOLVING, SUCCESS, ERROR, IDLE
+ * * status – one of: IDLE, RESOLVING, SUCCESS, ERROR
  *
  * @return {Object} Entity record data.
  */
