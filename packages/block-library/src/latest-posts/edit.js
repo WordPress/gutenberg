@@ -7,7 +7,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RawHTML } from '@wordpress/element';
 import {
 	BaseControl,
 	PanelBody,
@@ -491,13 +490,13 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 									) }
 								</div>
 							) }
-							<a href={ post.link } rel="noreferrer noopener">
-								{ titleTrimmed ? (
-									<RawHTML>{ titleTrimmed }</RawHTML>
-								) : (
-									__( '(no title)' )
-								) }
-							</a>
+							<a
+								href={ post.link }
+								rel="noreferrer noopener"
+								dangerouslySetInnerHTML={ {
+									__html: titleTrimmed || __( '(no title)' ),
+								} }
+							/>
 							{ displayAuthor && currentAuthor && (
 								<div className="wp-block-latest-posts__post-author">
 									{ sprintf(
@@ -523,11 +522,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								) }
 							{ displayPostContent &&
 								displayPostContentRadio === 'full_post' && (
-									<div className="wp-block-latest-posts__post-full-content">
-										<RawHTML key="html">
-											{ post.content.raw.trim() }
-										</RawHTML>
-									</div>
+									<div
+										className="wp-block-latest-posts__post-full-content"
+										dangerouslySetInnerHTML={ {
+											__html: post.content.raw.trim(),
+										} }
+									/>
 								) }
 						</li>
 					);
