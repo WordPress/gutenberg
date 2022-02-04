@@ -74,17 +74,9 @@ export default function ColorPanel( {
 				{ enableContrastChecking && (
 					<ContrastChecker
 						backgroundColor={ detectedBackgroundColor }
+						textColor={ detectedColor }
 						enableAlphaChecker={ enableAlpha }
-						textColors={ [
-							{
-								color: detectedColor,
-								description: __( 'text color' ),
-							},
-							{
-								color: detectedLinkColor,
-								description: __( 'link color' ),
-							},
-						] }
+						linkColor={ detectedLinkColor }
 					/>
 				) }
 			</PanelColorGradientSettings>

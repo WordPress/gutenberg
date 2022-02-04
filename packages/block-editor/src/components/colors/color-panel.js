@@ -53,11 +53,7 @@ export default function ColorPanel( {
 									<ContrastChecker
 										key={ `${ backgroundColor }-${ textColor }` }
 										backgroundColor={ backgroundColor }
-										textColors={ [
-											{
-												color: textColor,
-											},
-										] }
+										textColor={ textColor }
 										{ ...rest }
 									/>
 								);
@@ -83,11 +79,7 @@ export default function ColorPanel( {
 									{ ...contrastCheckers }
 									key={ `${ backgroundColor }-${ textColor }` }
 									backgroundColor={ backgroundColor }
-									textColors={ [
-										{
-											color: textColor,
-										},
-									] }
+									textColor={ textColor }
 								/>
 							);
 					  } ) ) }

@@ -3,6 +3,8 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
+import { Notice } from '@wordpress/components';
+
 /**
  * External dependencies
  */
@@ -10,28 +12,44 @@ import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
 
-/**
- * Internal dependencies
- */
-import ContrastCheckerMessage from './contrast-checker-message';
-
 extend( [ namesPlugin, a11yPlugin ] );
 
 function ContrastChecker( {
 	backgroundColor,
 	fallbackBackgroundColor,
+	fallbackTextColor,
+	fallbackLinkColor,
 	fontSize, // font size value in pixels
 	isLargeText,
-	textColors,
+	textColor,
+	linkColor,
 	enableAlphaChecker = false,
 } ) {
 	const currentBackgroundColor = backgroundColor || fallbackBackgroundColor;
 
-	// Must have a background color and some colours to iterate over.
-	if ( ! currentBackgroundColor || ! textColors || ! textColors.length ) {
+	// Must have a background color.
+	if ( ! currentBackgroundColor ) {
 		return null;
 	}
 
+	const currentTextColor = textColor || fallbackTextColor;
+	const currentLinkColor = linkColor || fallbackLinkColor;
+
+	// Must have at least one text color.
+	if ( ! currentTextColor && ! currentLinkColor ) {
+		return null;
+	}
+
+	const textColors = [
+		{
+			color: currentTextColor,
+			description: __( 'text color' ),
+		},
+		{
+			color: currentLinkColor,
+			description: __( 'link color' ),
+		},
+	];
 	const colordBackgroundColor = colord( currentBackgroundColor );
 	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
 	const backgroundColorBrightness = colordBackgroundColor.brightness();
@@ -46,12 +64,11 @@ function ContrastChecker( {
 	let message = '';
 	let speakMessage = '';
 	for ( const item of textColors ) {
-		const currentTextColor = item.color || item.fallback;
 		// If there is no color, go no further.
-		if ( ! currentTextColor ) {
+		if ( ! item.color ) {
 			continue;
 		}
-		const colordTextColor = colord( currentTextColor );
+		const colordTextColor = colord( item.color );
 		const isColordTextReadable = colordTextColor.isReadable(
 			colordBackgroundColor,
 			isReadableOptions
@@ -64,7 +81,6 @@ function ContrastChecker( {
 			if ( backgroundColorHasTransparency || textHasTransparency ) {
 				continue;
 			}
-			const description = item.description || __( 'text color' );
 			message =
 				backgroundColorBrightness < colordTextColor.brightness()
 					? sprintf(
@@ -72,14 +88,14 @@ function ContrastChecker( {
 							__(
 								'This color combination may be hard for people to read. Try using a darker background color and/or a brighter %s.'
 							),
-							description
+							item.description
 					  )
 					: sprintf(
 							// translators: %s is a type of text color, e.g., "text color" or "link color"
 							__(
 								'This color combination may be hard for people to read. Try using a brighter background color and/or a darker %s.'
 							),
-							description
+							item.description
 					  );
 			speakMessage = __(
 				'This color combination may be hard for people to read.'
@@ -109,10 +125,15 @@ function ContrastChecker( {
 	speak( speakMessage );
 
 	return (
-		<ContrastCheckerMessage
-			message={ message }
-			speakMessage={ speakMessage }
-		/>
+		<div className="block-editor-contrast-checker">
+			<Notice
+				spokenMessage={ null }
+				status="warning"
+				isDismissible={ false }
+			>
+				{ message }
+			</Notice>
+		</div>
 	);
 }
 

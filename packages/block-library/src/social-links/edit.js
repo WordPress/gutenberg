@@ -208,14 +208,11 @@ export function SocialLinksEdit( props ) {
 				/>
 				{ ! logosOnly && (
 					<ContrastChecker
-						backgroundColor={ iconBackgroundColorValue }
+						{ ...{
+							textColor: iconColorValue,
+							backgroundColor: iconBackgroundColorValue,
+						} }
 						isLargeText={ false }
-						textColors={ [
-							{
-								color: iconColorValue,
-								description: __( 'icon color' ),
-							},
-						] }
 					/>
 				) }
 			</InspectorControls>
