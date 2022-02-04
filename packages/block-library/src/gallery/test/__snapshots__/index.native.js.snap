@@ -12,6 +12,38 @@ exports[`Gallery block cancels uploads (TC009 - Choose from device (stay in edit
 <!-- /wp:gallery -->"
 `;
 
+exports[`Gallery block changes columns setting (TC013 - Settings - Columns 1`] = `
+"<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":1} -->
+<figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"id\\":2} -->
+<figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-2.jpeg\\" alt=\\"\\" class=\\"wp-image-2\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"id\\":3} -->
+<figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-3.jpeg\\" alt=\\"\\" class=\\"wp-image-3\\"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
+exports[`Gallery block changes columns setting (TC013 - Settings - Columns 2`] = `
+"<!-- wp:gallery {\\"columns\\":2,\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-2 is-cropped\\"><!-- wp:image {\\"id\\":1} -->
+<figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"id\\":2} -->
+<figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-2.jpeg\\" alt=\\"\\" class=\\"wp-image-2\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"id\\":3} -->
+<figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-3.jpeg\\" alt=\\"\\" class=\\"wp-image-3\\"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
 exports[`Gallery block finishes pending uploads upon opening the editor (TC001 - Close/Re-open post with an ongoing image upload) 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
@@ -42,7 +74,7 @@ exports[`Gallery block inserts block 1`] = `
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block overrides Link to settings of gallery items (TC012 - Settings - Link to 1`] = `
+exports[`Gallery block overrides "Link to" setting of gallery items (TC012 - Settings - Link to 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"media\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":1,\\"linkDestination\\":\\"media\\"} -->
 <figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>

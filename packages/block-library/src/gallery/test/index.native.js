@@ -53,6 +53,12 @@ const MEDIA = [
 		serverId: 2001,
 		serverUrl: 'https://test-site.files.wordpress.com/local-image-2.jpeg',
 	},
+	{
+		localId: 3,
+		localUrl: 'file:///local-image-3.jpeg',
+		serverId: 2002,
+		serverUrl: 'https://test-site.files.wordpress.com/local-image-3.jpeg',
+	},
 ];
 
 const addGalleryBlock = async () => {
@@ -1062,6 +1068,55 @@ describe( 'Gallery block', () => {
 		fireEvent.press( getByText( 'Link to' ) );
 		fireEvent.press( getByText( 'Media File' ) );
 
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'changes columns setting (TC013 - Settings - Columns', async () => {
+		// Initialize with a gallery that contains three items
+		const {
+			galleryBlock,
+			getByA11yLabel,
+			getByTestId,
+		} = initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
+		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ MEDIA[ 0 ].localId }} -->
+		<figure class="wp-block-image"><img src="${ MEDIA[ 0 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 0 ].localId }"/></figure>
+		<!-- /wp:image -->
+		
+		<!-- wp:image {"id":${ MEDIA[ 1 ].localId }} -->
+		<figure class="wp-block-image"><img src="${ MEDIA[ 1 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 1 ].localId }"/></figure>
+		<!-- /wp:image -->
+		
+		<!-- wp:image {"id":${ MEDIA[ 2 ].localId }} -->
+		<figure class="wp-block-image"><img src="${ MEDIA[ 2 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 2 ].localId }"/></figure>
+		<!-- /wp:image --></figure>
+		<!-- /wp:gallery -->` );
+		fireEvent.press( galleryBlock );
+
+		// Open block settings
+		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		await waitFor(
+			() => getByTestId( 'block-settings-modal' ).props.isVisible
+		);
+
+		// Can't increment due to maximum value
+		// NOTE: Default columns value is 3
+		fireEvent(
+			getByA11yLabel( /Columns\. Value is 3/ ),
+			'accessibilityAction',
+			{
+				nativeEvent: { actionName: 'increment' },
+			}
+		);
+		expect( getEditorHtml() ).toMatchSnapshot();
+
+		// Decrement columns
+		fireEvent(
+			getByA11yLabel( /Columns\. Value is 3/ ),
+			'accessibilityAction',
+			{
+				nativeEvent: { actionName: 'decrement' },
+			}
+		);
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
