@@ -65,6 +65,7 @@ module.exports = async (
 		licenseURI,
 		textdomain: slug,
 		wpScripts,
+		wpEnv,
 		npmDependencies,
 		folderName,
 		editorScript,
