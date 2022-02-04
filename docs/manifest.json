@@ -139,8 +139,8 @@
 	},
 	{
 		"title": "Block Supports",
-		"slug": "block-supports",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports.md",
+		"slug": "block-supports-in-static-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-static-blocks.md",
 		"parent": "block-tutorial"
 	},
 	{
@@ -1917,6 +1917,12 @@
 		"title": "Full Site Editing Templates",
 		"slug": "full-site-editing-templates",
 		"markdown_source": "../docs/explanations/architecture/full-site-editing-templates.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Styles",
+		"slug": "styles",
+		"markdown_source": "../docs/explanations/architecture/styles.md",
 		"parent": "architecture"
 	},
 	{

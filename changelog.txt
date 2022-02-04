@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 12.5.1 =
+
+### Bug Fixes
+
+#### Site Editor
+
+- Fix a WSOD in the site editor which occurred when an entity could be undefined (https://github.com/WordPress/gutenberg/pull/38503)
+
+
 = 12.5.0 =
 
 ### Features
