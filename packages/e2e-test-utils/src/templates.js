@@ -20,7 +20,7 @@ export async function deleteAllTemplates( type ) {
 		return;
 	}
 
-	const [ templates ] = await Promise.all( [ rest( { path } ) ] );
+	const [ templates ] = await rest( { path } );
 
 	await batch(
 		templates
