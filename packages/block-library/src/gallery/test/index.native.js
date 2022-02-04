@@ -876,7 +876,7 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'rearranges gallery items (TC010 - Rearrange images in Gallery)', () => {
+	it( 'rearranges gallery items (TC010 - Rearrange images in Gallery)', async () => {
 		// Initialize with a gallery that contains various items
 		const {
 			galleryBlock,
@@ -901,16 +901,20 @@ describe( 'Gallery block', () => {
 		const galleryItem3 = getByA11yLabel( /Image Block\. Row 3/ );
 
 		fireEvent.press( galleryItem3 );
-		fireEvent.press(
-			within( galleryItem3 ).getByA11yLabel(
-				/Move block left from position 3 to position 2/
+		await act( () =>
+			fireEvent.press(
+				within( galleryItem3 ).getByA11yLabel(
+					/Move block left from position 3 to position 2/
+				)
 			)
 		);
 
 		fireEvent.press( galleryItem1 );
-		fireEvent.press(
-			within( galleryItem1 ).getByA11yLabel(
-				/Move block right from position 1 to position 2/
+		await act( () =>
+			fireEvent.press(
+				within( galleryItem1 ).getByA11yLabel(
+					/Move block right from position 1 to position 2/
+				)
 			)
 		);
 
