@@ -115,19 +115,17 @@ export const _useMemoBadPractices = () => {
 	const blueText = css`
 		color: blue;
 	`;
-	const greenText = css`
-		color: green;
-	`;
 
 	return (
 		<>
+			<Example args={ [ redText ] }>This text should be red</Example>
 			<ExampleWithUseMemoRight args={ [ blueText ] }>
 				This text should be blue
 			</ExampleWithUseMemoRight>
 			<Iframe>
 				<Example args={ [ redText ] }>This text should be red</Example>
-				<ExampleWithUseMemoWrong args={ [ greenText ] }>
-					This text should be green but it&apos;s not!
+				<ExampleWithUseMemoWrong args={ [ blueText ] }>
+					This text should be blue but it&apos;s not!
 				</ExampleWithUseMemoWrong>
 			</Iframe>
 		</>
