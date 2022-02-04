@@ -202,7 +202,7 @@ Themes are responsible for creating the classes that apply the gradients. So to 
 }
 ```
 
-### Block Font Sizes:
+### Block Font Sizes
 
 Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. The block provides a default set of font sizes, but a theme can overwrite it and provide its own:
 
