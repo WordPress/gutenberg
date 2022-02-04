@@ -29,7 +29,11 @@
 		},
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"typography": {
 			"fontSize": true,
