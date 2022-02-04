@@ -315,6 +315,7 @@ export default function NavigationSubmenuEdit( {
 		selectedBlockHasDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
+		onlyDescendantIsEmptyLink,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -322,12 +323,30 @@ export default function NavigationSubmenuEdit( {
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
+				getBlock,
 			} = select( blockEditorStore );
+
+			let _onlyDescendantIsEmptyLink;
 
 			const selectedBlockId = getSelectedBlockClientId();
 
 			const descendants = getClientIdsOfDescendants( [ clientId ] )
 				.length;
+
+			const selectedBlockDescendants = getClientIdsOfDescendants( [
+				selectedBlockId,
+			] );
+
+			// Check for a single descendant in the submenu. If that block
+			// is a link block in a "placeholder" state with no URL then
+			// we can consider as an "empty" link.
+			if ( selectedBlockDescendants?.length === 1 ) {
+				const singleBlock = getBlock( selectedBlockDescendants[ 0 ] );
+
+				_onlyDescendantIsEmptyLink =
+					singleBlock?.name === 'core/navigation-link' &&
+					! singleBlock?.attributes?.url;
+			}
 
 			return {
 				isAtMaxNesting:
@@ -344,9 +363,7 @@ export default function NavigationSubmenuEdit( {
 					false
 				),
 				hasDescendants: !! descendants,
-				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
-					selectedBlockId,
-				] )?.length,
+				selectedBlockHasDescendants: !! selectedBlockDescendants?.length,
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -355,6 +372,7 @@ export default function NavigationSubmenuEdit( {
 					'create',
 					'posts'
 				),
+				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
 			};
 		},
 		[ clientId ]
@@ -550,7 +568,8 @@ export default function NavigationSubmenuEdit( {
 							onClick={ () => setIsLinkOpen( true ) }
 						/>
 					) }
-					{ ! selectedBlockHasDescendants && (
+					{ ( ! selectedBlockHasDescendants ||
+						onlyDescendantIsEmptyLink ) && (
 						<ToolbarButton
 							name="revert"
 							icon={ removeSubmenu }
