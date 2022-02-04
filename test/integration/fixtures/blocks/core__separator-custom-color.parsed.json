@@ -1,0 +1,17 @@
+[
+	{
+		"blockName": "core/separator",
+		"attrs": {
+			"style": {
+				"color": {
+					"background": "#5da54c"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<hr class=\"wp-block-separator has-text-color has-background\" style=\"background-color:#5da54c;color:#5da54c\"/>\n",
+		"innerContent": [
+			"\n<hr class=\"wp-block-separator has-text-color has-background\" style=\"background-color:#5da54c;color:#5da54c\"/>\n"
+		]
+	}
+]
