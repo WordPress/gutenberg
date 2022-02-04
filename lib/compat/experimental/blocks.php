@@ -35,22 +35,40 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			$comment_args['hierarchical'] = false;
 		}
 
-		$per_page = ! empty( $block->context['comments/perPage'] ) ? (int) $block->context['comments/perPage'] : 0;
-		if ( 0 === $per_page && get_option( 'page_comments' ) ) {
-			$per_page = (int) get_query_var( 'comments_per_page' );
-			if ( 0 === $per_page ) {
-				$per_page = (int) get_option( 'comments_per_page' );
-			}
+		$inherit = ! empty( $block->context['comments/inherit'] );
+
+		$per_page = (int) get_option( 'comments_per_page' );
+		$query_per_page = (int) get_query_var( 'comments_per_page' );
+		if ( 0 !== $query_per_page ) {
+			$per_page = $query_per_page;
 		}
+		$block_per_page = ! empty( $block->context['comments/perPage'] ) ? (int) $block->context['comments/perPage'] : 0;
+		if ( ! $inherit && 0 !== $block_per_page ) {
+			$per_page = $block_per_page;
+		}
+
+		$default_page = get_option( 'default_comments_page' );
+		if ( ! $inherit && ! empty( $block->context['comments/defaultPage'] ) ) {
+			$default_page = $block->context['comments/defaultPage'];
+		}
+
 		if ( $per_page > 0 ) {
-			$comment_args['number'] = $per_page;
-			$page                   = (int) get_query_var( 'cpage' );
+			$page = (int) get_query_var( 'cpage' );
 
 			if ( $page ) {
 				$comment_args['offset'] = ( $page - 1 ) * $per_page;
-			} elseif ( 'oldest' === get_option( 'default_comments_page' ) ) {
+			} elseif ( 'oldest' === $default_page ) {
 				$comment_args['offset'] = 0;
+			} elseif ( 'newest' === $default_page ) {
+				// For this specific case, we need to make first a query to know
+				// the number of pages, and so get the index of the last page
+				// (newest comments).
+				$comment_query          = new WP_Comment_Query( $comment_args );
+				$comment_pages_count    = get_comment_pages_count( $comment_query->get_comments(), $per_page, true );
+				$comment_args['offset'] = ( $comment_pages_count - 1 ) * $per_page;
 			}
+
+			$comment_args['number'] = $per_page;
 		}
 
 		return $comment_args;
