@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-## New Features
+### New Features
+
 -    Automatically add a `"env": "wp-env"` entry to scripts when the `--wp-env` is passed or when a template sets `wpEnv` to `true`.
 
 ## 2.8.0 (2022-01-27)
