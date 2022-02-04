@@ -68,15 +68,20 @@ Similarly, the `MyFirstApp` component needs to re-run the selector once the data
 the `useSelect` hook does:
 
 ```js
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
+
 function MyFirstApp() {
-	const pages = wp.data.useSelect(
+	const pages = useSelect(
 		select =>
-			select( wp.coreData.store ).getEntityRecords( 'postType', 'page' ),
+			select( coreDataStore ).getEntityRecords( 'postType', 'page' ),
 		[]
 	);
 	// ...
 }
 ```
+
+Note that we use an `import` statement inside index.js. This enables the plugin to automatically load the dependencies using `wp_enqueue_script`. Any references to `coreDataStore` are compiled to the same `wp.data` reference we use in browser's devtools.
 
 `useSelect` takes two arguments: a callback and dependencies. In broad strokes, it re-runs the callback whenever either
 the dependencies or the underlying data store changes. You can learn more about [useSelect](#) in
@@ -85,10 +90,13 @@ the [data module documentation](/packages/data/README.md#useselect).
 Putting it together, we get the following code:
 
 ```js
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
+
 function MyFirstApp() {
-	const pages = wp.data.useSelect(
+	const pages = useSelect(
 		select =>
-			select( wp.coreData.store ).getEntityRecords( 'postType', 'page' ),
+			select( coreDataStore ).getEntityRecords( 'postType', 'page' ),
 		[]
 	);
 	return <PagesList pages={ pages }/>;
@@ -144,9 +152,11 @@ typically solves this problem with a search box – let’s implement one too!
 Let’s start by adding a search field:
 
 ```js
-const { SearchControl } = wp.components;
+import { SearchControl } from '@wordpress/components';
+import { useState, render } from '@wordpress/element';
+
 function MyFirstApp() {
-	const [searchTerm, setSearchTerm] = wp.element.useState( '' );
+	const [searchTerm, setSearchTerm] = useState( '' );
 	// ...
 	return (
 		<div>
@@ -187,15 +197,18 @@ just `/wp/v2/pages`.
 Let’s mirror this in our `useSelect` call as follows:
 
 ```js
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
+
 function MyFirstApp() {
 	// ...
-	const { pages } = wp.data.useSelect( select => {
+	const { pages } = useSelect( select => {
 		const query = {};
 		if ( searchTerm ) {
 			query.search = searchTerm;
 		}
 		return {
-			pages: select( wp.coreData.store ).getEntityRecords( 'postType', 'page', query )
+			pages: select( coreDataStore ).getEntityRecords( 'postType', 'page', query )
 		}
 	}, [searchTerm] );
 
@@ -209,15 +222,19 @@ inside the list of `useSelect` dependencies to make sure `getEntityRecords` is r
 Finally, here’s how `MyFirstApp` looks once we wire it all together:
 
 ```js
-const { SearchControl } = wp.components;
+import { SearchControl } from '@wordpress/components';
+import { useState, render } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
+
 function MyFirstApp() {
-	const [searchTerm, setSearchTerm] = wp.element.useState( '' );
-	const pages = wp.data.useSelect( select => {
+	const [searchTerm, setSearchTerm] = useState( '' );
+	const pages = useSelect( select => {
 		const query = {};
 		if ( searchTerm ) {
 			query.search = searchTerm;
 		}
-		return select( wp.coreData.store ).getEntityRecords( 'postType', 'page', query );
+		return select( coreDataStore ).getEntityRecords( 'postType', 'page', query );
 	}, [searchTerm] );
 
 	return (
@@ -241,13 +258,13 @@ Voila! We can now filter the results:
 Let’s take a pause for a moment to consider the downsides of an alternative approach we could have taken - working with the API directly. Imagine we sent the API requests directly:
 
 ```js
+import { apiFetch } from '@wordpress/api-fetch';
 function MyFirstApp() {
 	// ...
 	const [pages, setPages] = useState( [] );
 	useEffect( () => {
 		const url = '/wp-json/wp/v2/pages?search=' + searchTerm;
-		wp
-			.apiFetch( { url } )
+		apiFetch( { url } )
 			.then( setPages )
 	}, [searchTerm] );
 	// ...
@@ -282,7 +299,7 @@ A few messages like  _Loading…_ or _No results_ would clear it up. Let’s imp
 aware of the current status:
 
 ```js
-const { Spinner } = wp.components;
+import { SearchControl, Spinner } from '@wordpress/components';
 function PagesList( { hasResolved, pages } ) {
 	if ( !hasResolved ) {
 		return <Spinner/>
@@ -314,17 +331,20 @@ the  `hasFinishedResolution` selector:
 `wp.data.select('core').hasFinishedResolution( 'getEntityRecords', [ 'postType', 'page', { search: 'home' } ] )`
 
 It takes the name of the selector and the _exact same arguments you passed to that selector_ and returns either `true` if the data was already loaded or `false`
-it we’re still waiting. Let’s add it to `wp.data.useSelect`:
+it we’re still waiting. Let’s add it to `useSelect`:
 
 ```js
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
+
 function MyFirstApp() {
 	// ...
-	const { pages, hasResolved } = wp.data.useSelect( select => {
+	const { pages, hasResolved } = useSelect( select => {
 		// ...
 		return {
-			pages: select( wp.coreData.store ).getEntityRecords( 'postType', 'page', query ),
+			pages: select( coreDataStore ).getEntityRecords( 'postType', 'page', query ),
 			hasResolved:
-				select( wp.coreData.store ).hasFinishedResolution( 'getEntityRecords', ['postType', 'page', query] ),
+				select( coreDataStore ).hasFinishedResolution( 'getEntityRecords', ['postType', 'page', query] ),
 		}
 	}, [searchTerm] );
 
@@ -335,15 +355,17 @@ function MyFirstApp() {
 There is just one last problem. It is easy too make a typo and pass different arguments to `getEntityRecords` and `hasFinishedResolution`. We can remove this risk by storing the arguments in a variable:
 
 ```js
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 function MyFirstApp() {
 	// ...
-	const { pages, hasResolved } = wp.data.useSelect( select => {
+	const { pages, hasResolved } = useSelect( select => {
 		// ...
 		const selectorArgs = [ 'postType', 'page', query ];
 		return {
-			pages: select( wp.coreData.store ).getEntityRecords( ...selectorArgs ),
+			pages: select( coreDataStore ).getEntityRecords( ...selectorArgs ),
 			hasResolved:
-				select( wp.coreData.store ).hasFinishedResolution( 'getEntityRecords', selectorArgs ),
+				select( coreDataStore ).hasFinishedResolution( 'getEntityRecords', selectorArgs ),
 		}
 	}, [searchTerm] );
 
@@ -354,39 +376,46 @@ function MyFirstApp() {
 All the pieces are in place, great! Here’s the complete JavaScript code of our app:
 
 ```js
-const { SearchControl, Spinner } = wp.components;
+import { SearchControl, Spinner } from '@wordpress/components';
+import { useState, render } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 function MyFirstApp() {
-	const [searchTerm, setSearchTerm] = wp.element.useState( '' );
-	const { pages, hasResolved } = wp.data.useSelect( select => {
-		const query = {};
-		if ( searchTerm ) {
-			query.search = searchTerm;
-		}
-		const selectorArgs = [ 'postType', 'page', query ];
-		return {
-			pages: select( wp.coreData.store ).getEntityRecords( ...selectorArgs ),
-			hasResolved:
-				select( wp.coreData.store ).hasFinishedResolution( 'getEntityRecords', selectorArgs ),
-		}
-	}, [searchTerm] );
+	const [ searchTerm, setSearchTerm ] = useState( '' );
+	const { pages, hasResolved } = useSelect(
+		( select ) => {
+			const query = {};
+			if ( searchTerm ) {
+				query.search = searchTerm;
+			}
+			const selectorArgs = [ 'postType', 'page', query ];
+			return {
+				pages: select( coreDataStore ).getEntityRecords(
+					...selectorArgs
+				),
+				hasResolved: select( coreDataStore ).hasFinishedResolution(
+					'getEntityRecords',
+					selectorArgs
+				),
+			};
+		},
+		[ searchTerm ]
+	);
 
 	return (
 		<div>
-			<SearchControl
-				onChange={ setSearchTerm }
-				value={ searchTerm }
-			/>
-			<PagesList hasResolved={ hasResolved } pages={ pages }/>
+			<SearchControl onChange={ setSearchTerm } value={ searchTerm } />
+			<PagesList hasResolved={ hasResolved } pages={ pages } />
 		</div>
 	);
 }
 
 function PagesList( { hasResolved, pages } ) {
-	if ( !hasResolved ) {
-		return <Spinner/>
+	if ( ! hasResolved ) {
+		return <Spinner />;
 	}
-	if ( !pages?.length ) {
+	if ( ! pages?.length ) {
 		return <div>No results</div>;
 	}
 
@@ -398,7 +427,7 @@ function PagesList( { hasResolved, pages } ) {
 				</tr>
 			</thead>
 			<tbody>
-				{ pages?.map( page => (
+				{ pages?.map( ( page ) => (
 					<tr key={ page.id }>
 						<td>{ page.title.rendered }</td>
 					</tr>
@@ -407,6 +436,17 @@ function PagesList( { hasResolved, pages } ) {
 		</table>
 	);
 }
+
+window.addEventListener(
+	'load',
+	function () {
+		render(
+			<MyFirstApp />,
+			document.querySelector( '#my-first-gutenberg-app' )
+		);
+	},
+	false
+);
 ```
 
 All that’s left is to refresh the page and enjoy the brand new status indicator:

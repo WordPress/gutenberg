@@ -15,12 +15,14 @@ Go ahead and create these files using the following snippets:
 
 **src/index.js:**
 ```js
+import { render } from '@wordpress/element';
+
 function MyFirstApp() {
 	return <span>Hello from JavaScript!</span>;
 }
 
 window.addEventListener( 'load', function() {
-	wp.element.render(
+	render(
 		<MyFirstApp />,
 		document.querySelector( '#my-first-gutenberg-app' )
 	);
@@ -57,17 +59,17 @@ window.addEventListener( 'load', function() {
  */
 
 function my_admin_menu() {
-	// Create a new admin page for our app
+	// Create a new admin page for our app.
 	add_menu_page(
-		__( 'My first Gutenberg app', 'my-textdomain' ),
-		__( 'My first Gutenberg app', 'my-textdomain' ),
+		__( 'My first Gutenberg app', 'gutenberg' ),
+		__( 'My first Gutenberg app', 'gutenberg' ),
 		'manage_options',
 		'my-first-gutenberg-app',
-		function() {
+		function () {
 			echo '
-				<h2>Pages</h2>
-				<div id="my-first-gutenberg-app"></div>
-			';
+			<h2>Pages</h2>
+			<div id="my-first-gutenberg-app"></div>
+		';
 		},
 		'dashicons-schedule',
 		3
@@ -77,38 +79,35 @@ function my_admin_menu() {
 add_action( 'admin_menu', 'my_admin_menu' );
 
 function load_custom_wp_admin_scripts( $hook ) {
-	// Load only on ?page=my-first-gutenberg-app
-	if ( $hook !== 'toplevel_page_my-first-gutenberg-app' ) {
+	// Load only on ?page=my-first-gutenberg-app.
+	if ( 'toplevel_page_my-first-gutenberg-app' !== $hook ) {
 		return;
 	}
 
-	// Load the required WordPress packages:
+	// Load the required WordPress packages.
 
-	// wp-components is a library of generic WordPress components
-	// used for building consistent user interfaces across the board.
-	wp_enqueue_style( 'wp-components' );
-	wp_enqueue_script( 'wp-components' );
+	// Automatically load imported dependencies and assets version.
+	$asset_file = include plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
 
-	// wp-data provides data management backbone such as the Redux
-	// implementation or data resolution mechanisms.
-	wp_enqueue_script( 'wp-data' );
+	// Enqueue CSS dependencies.
+	foreach ( $asset_file['dependencies'] as $style ) {
+		wp_enqueue_style( $style );
+	}
 
-	// wp-core-data is a glue between WordPress Core and wp-data.
-	// It provides a Redux store with a number of selectors and actions to
-	// power common tasks such as loading the data from the WordPress REST API,
-	// editing it in the browser, and persisting the changes back to the REST API.
-	wp_enqueue_script( 'wp-core-data' );
-
-	// Load the built version of index.js
+	// Load our app.js.
 	wp_register_script(
 		'my-first-gutenberg-app',
-		plugins_url( 'my-first-gutenberg-app/build/index.js' ),
-		array( 'wp-components', 'wp-data', 'wp-core-data' ),
+		plugins_url( 'build/index.js', __FILE__ ),
+		$asset_file['dependencies'],
+		$asset_file['version']
 	);
 	wp_enqueue_script( 'my-first-gutenberg-app' );
 
-	// Load our style.css
-	wp_register_style( 'my-first-gutenberg-app', plugins_url( 'my-first-gutenberg-app/style.css' ) );
+	// Load our style.css.
+	wp_register_style(
+		'my-first-gutenberg-app',
+		plugins_url( 'style.css', __FILE__ )
+	);
 	wp_enqueue_style( 'my-first-gutenberg-app' );
 }
 

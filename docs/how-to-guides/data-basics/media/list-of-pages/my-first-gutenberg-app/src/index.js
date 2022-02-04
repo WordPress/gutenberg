@@ -1,9 +1,16 @@
-const wp = window.wp;
-const { SearchControl, Spinner } = wp.components;
+/**
+ * WordPress dependencies
+ */
+/* eslint-disable import/no-extraneous-dependencies */
+import { SearchControl, Spinner } from '@wordpress/components';
+import { useState, render } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
+/* eslint-enable import/no-extraneous-dependencies */
 
 function MyFirstApp() {
-	const [ searchTerm, setSearchTerm ] = wp.element.useState( '' );
-	const { pages, hasResolved } = wp.data.useSelect(
+	const [ searchTerm, setSearchTerm ] = useState( '' );
+	const { pages, hasResolved } = useSelect(
 		( select ) => {
 			const query = {};
 			if ( searchTerm ) {
@@ -11,10 +18,10 @@ function MyFirstApp() {
 			}
 			const selectorArgs = [ 'postType', 'page', query ];
 			return {
-				pages: select( wp.coreData.store ).getEntityRecords(
+				pages: select( coreDataStore ).getEntityRecords(
 					...selectorArgs
 				),
-				hasResolved: select( wp.coreData.store ).hasFinishedResolution(
+				hasResolved: select( coreDataStore ).hasFinishedResolution(
 					'getEntityRecords',
 					selectorArgs
 				),
@@ -60,8 +67,8 @@ function PagesList( { hasResolved, pages } ) {
 window.addEventListener(
 	'load',
 	function () {
-		window.wp.element.render(
-			window.wp.element.createElement( MyFirstApp ),
+		render(
+			<MyFirstApp />,
 			document.querySelector( '#my-first-gutenberg-app' )
 		);
 	},
