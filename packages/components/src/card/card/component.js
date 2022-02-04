@@ -38,7 +38,7 @@ function Card( props, forwardedRef ) {
 
 	const elevationClassName = useMemo(
 		() => cx( css( { borderRadius: elevationBorderRadius } ) ),
-		[ elevationBorderRadius ]
+		[ cx, elevationBorderRadius ]
 	);
 
 	const contextProviderValue = useMemo( () => {

@@ -61,7 +61,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 				} ),
 				className
 			),
-		[ className ]
+		[ className, cx ]
 	);
 
 	// This flag is used to only apply the focus on mount when the actual path changes.
