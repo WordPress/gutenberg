@@ -910,4 +910,129 @@ describe( 'Gallery block', () => {
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
+
+	it( 'uploads from other apps (TC011 - Choose from Other Apps (iOS Files App)', async () => {
+		const mediaUploadListeners = [];
+		subscribeMediaUpload.mockImplementation( ( callback ) => {
+			mediaUploadListeners.push( callback );
+			return { remove: jest.fn() };
+		} );
+		const triggerMediaUpload = ( payload ) =>
+			mediaUploadListeners.forEach( ( listener ) => listener( payload ) );
+
+		let mediaPickerCallback;
+		requestMediaPicker.mockImplementation(
+			( source, filter, multiple, callback ) => {
+				mediaPickerCallback = callback;
+			}
+		);
+
+		let otherMediaOptionsCallback;
+		getOtherMediaOptions.mockImplementation( ( filter, callback ) => {
+			otherMediaOptionsCallback = callback;
+		} );
+
+		// Initialize with an empty gallery
+		const { galleryBlock, getByText } = initializeWithGalleryBlock(
+			GALLERY_EMPTY,
+			{
+				hasItems: false,
+			}
+		);
+
+		// Notify other media options
+		act( () =>
+			otherMediaOptionsCallback( [
+				{
+					label: 'Free Photo Library',
+					value: 'wpios-stock-photo-library',
+				},
+				{ label: 'Free GIF Library', value: 'wpios-tenor' },
+				{ label: 'Other Apps', value: 'wpios-other-files' },
+			] )
+		);
+
+		// Upload images from other apps
+		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Other Apps' ) );
+		expect( requestMediaPicker ).toHaveBeenCalledWith(
+			'wpios-other-files',
+			[ 'image' ],
+			true,
+			mediaPickerCallback
+		);
+
+		// Return media items picked
+		await act( async () =>
+			mediaPickerCallback( [
+				{
+					type: 'image',
+					title: 'IMG_0001.JPG',
+					url: 'file:///IMG_0001.JPG',
+					id: MEDIA[ 0 ].localId,
+				},
+				{
+					type: 'image',
+					title: 'IMG_0002.JPG',
+					url: 'file:///IMG_0002.JPG',
+					id: MEDIA[ 1 ].localId,
+				},
+			] )
+		);
+
+		// Check that gallery items are visible
+		fireEvent(
+			within( galleryBlock ).getByTestId( 'block-list-wrapper' ),
+			'layout',
+			{
+				nativeEvent: {
+					layout: {
+						width: 100,
+					},
+				},
+			}
+		);
+		const galleryItem1 = within( galleryBlock ).getByA11yLabel(
+			/Image Block\. Row 1/
+		);
+		const galleryItem2 = within( galleryBlock ).getByA11yLabel(
+			/Image Block\. Row 2/
+		);
+		expect( galleryItem1 ).toBeVisible();
+		expect( galleryItem2 ).toBeVisible();
+
+		// Check that images are showing a loading state
+		await act( async () => {
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_UPLOADING,
+				mediaId: MEDIA[ 0 ].localId,
+				progress: 0.5,
+			} );
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_UPLOADING,
+				mediaId: MEDIA[ 1 ].localId,
+				progress: 0.25,
+			} );
+		} );
+		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
+		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
+
+		// Notify that the media items upload succeeded
+		await act( async () => {
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_SUCCEEDED,
+				mediaId: MEDIA[ 0 ].localId,
+				mediaUrl: MEDIA[ 0 ].serverUrl,
+				mediaServerId: MEDIA[ 0 ].serverId,
+			} );
+			triggerMediaUpload( {
+				state: MEDIA_UPLOAD_STATE_SUCCEEDED,
+				mediaId: MEDIA[ 1 ].localId,
+				mediaUrl: MEDIA[ 1 ].serverUrl,
+				mediaServerId: MEDIA[ 1 ].serverId,
+			} );
+		} );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
 } );
