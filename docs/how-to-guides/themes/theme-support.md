@@ -133,15 +133,19 @@ Some colors change dynamically — such as "Primary" and "Secondary" color — s
 
 The colors will be shown in order on the palette, and there's no limit to how many can be specified.
 
-Themes are responsible for creating the classes that apply the colors in different contexts. Core blocks use "color" and "background-color" contexts. So to correctly apply "strong magenta" to all contexts of core blocks a theme should implement the following classes:
+Themes are responsible for creating the classes that apply the colors in different contexts. Core blocks use "color", "background-color", and "border-color" contexts. So to correctly apply "strong magenta" to all contexts of core blocks a theme should implement the following classes:
 
 ```css
 .has-strong-magenta-background-color {
-	background-color: #313131;
+	background-color: #a156b4;
 }
 
 .has-strong-magenta-color {
-	color: #f78da7;
+	color: #a156b4;
+}
+
+.has-strong-magenta-border-color {
+	color: #a156b4;
 }
 ```
 
