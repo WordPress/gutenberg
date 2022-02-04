@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { RawHTML } from '@wordpress/element';
+import { createElement } from '@wordpress/element';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -32,9 +32,10 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
 		</div>
 	) : (
-		<RawHTML key="html" { ...blockProps }>
-			{ content?.rendered }
-		</RawHTML>
+		createElement( 'div', {
+			dangerouslySetInnerHTML: { __html: content?.rendered },
+			...blockProps,
+		} )
 	);
 }
 
