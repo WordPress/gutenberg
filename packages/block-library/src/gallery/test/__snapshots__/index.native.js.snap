@@ -42,6 +42,18 @@ exports[`Gallery block inserts block 1`] = `
 <!-- /wp:gallery -->"
 `;
 
+exports[`Gallery block overrides Link to settings of gallery items (TC012 - Settings - Link to 1`] = `
+"<!-- wp:gallery {\\"linkTo\\":\\"media\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":1,\\"linkDestination\\":\\"media\\"} -->
+<figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"id\\":2,\\"linkDestination\\":\\"media\\"} -->
+<figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-2.jpeg\\" alt=\\"\\" class=\\"wp-image-2\\"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
 exports[`Gallery block rearranges gallery items (TC010 - Rearrange images in Gallery) 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":3} -->

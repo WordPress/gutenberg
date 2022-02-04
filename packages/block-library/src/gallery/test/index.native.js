@@ -1035,4 +1035,33 @@ describe( 'Gallery block', () => {
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
+
+	it( 'overrides "Link to" setting of gallery items (TC012 - Settings - Link to', async () => {
+		// Initialize with a gallery that contains two items, the latter includes "linkDestination" attribute
+		const {
+			galleryBlock,
+			getByA11yLabel,
+			getByTestId,
+			getByText,
+		} = initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
+		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ MEDIA[ 0 ].localId }} -->
+		<figure class="wp-block-image"><img src="${ MEDIA[ 0 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 0 ].localId }"/></figure>
+		<!-- /wp:image -->
+		
+		<!-- wp:image {"id":${ MEDIA[ 1 ].localId },"linkDestination":"attachment"} -->
+		<figure class="wp-block-image"><img src="${ MEDIA[ 1 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 1 ].localId }"/></figure>
+		<!-- /wp:image --></figure>
+		<!-- /wp:gallery -->` );
+		fireEvent.press( galleryBlock );
+
+		// Set "Link to" setting via Gallery block settings
+		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		await waitFor(
+			() => getByTestId( 'block-settings-modal' ).props.isVisible
+		);
+		fireEvent.press( getByText( 'Link to' ) );
+		fireEvent.press( getByText( 'Media File' ) );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
 } );
