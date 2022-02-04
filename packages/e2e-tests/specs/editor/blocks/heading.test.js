@@ -5,19 +5,13 @@ import {
 	clickBlockAppender,
 	createNewPost,
 	getEditedPostContent,
+	openColorToolsPanelMenu,
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-const openColorToolsPanelMenu = async () => {
-	const toggleSelector =
-		"//div[contains(@class, 'color-block-support-panel')]//button[contains(@class, 'components-dropdown-menu__toggle')]";
-	const toggle = await page.waitForXPath( toggleSelector );
-	return toggle.click();
-};
-
 describe( 'Heading', () => {
 	const COLOR_ITEM_SELECTOR =
-		'.block-editor-panel-color-gradient-settings__item';
+		'.block-editor-panel-color-gradient-settings__dropdown';
 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `.components-color-palette__custom-color`;
 	const CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR =
 		'.components-color-picker button[aria-label="Show detailed inputs"]';

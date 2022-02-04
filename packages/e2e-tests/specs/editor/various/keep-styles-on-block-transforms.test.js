@@ -4,9 +4,10 @@
 import {
 	clickBlockAppender,
 	createNewPost,
+	getEditedPostContent,
+	openColorToolsPanelMenu,
 	pressKeyWithModifier,
 	transformBlockTo,
-	getEditedPostContent,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Keep styles on block transforms', () => {
@@ -17,13 +18,11 @@ describe( 'Keep styles on block transforms', () => {
 	it( 'Should keep colors during a transform', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '## Heading' );
-		const [ colorPanelToggle ] = await page.$x(
-			"//button[./span[contains(text(),'Color')]]"
-		);
-		await colorPanelToggle.click();
+		await openColorToolsPanelMenu();
+		await page.click( 'button[aria-label="Show Text"]' );
 
 		const textColorButton = await page.waitForSelector(
-			'.block-editor-panel-color-gradient-settings__item'
+			'.block-editor-panel-color-gradient-settings__dropdown'
 		);
 		await textColorButton.click();
 
