@@ -1,0 +1,48 @@
+name: Props Bot
+
+on:
+  # Gathers all of the participants for pull requests to assist in giving proper credit.
+  pull_request:
+  pull_request_review:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+  # The concurrency group contains the workflow name and the branch name for pull requests
+  # or the commit hash for any other events.
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  pull_request_participants:
+    name: Gather pull request participants
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    #
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+
+      - name: Compile contributor data
+        uses: actions/github-script@e3cbab99d3a9b271e1b79fc96d103a4a5534998c # v5.1.0
+        id: contributor-data
+        with:
+          script: |
+            const contribution_collector = require( './tools/props-bot/contribution-collector.js' );
+            return await contribution_collector({
+              github,
+              context
+            });
+
+      - name: Comment on the pull request
+        uses: actions/github-script@e3cbab99d3a9b271e1b79fc96d103a4a5534998c # v5.1.0
+        with:
+          script: |
+            const props_bot = require( './tools/props-bot/commenting.js' );
+            const generatedMessage = ${{ steps.contributor-data.outputs.result }};
+
+            await props_bot({
+              github,
+              context,
+              generatedMessage
+            });
