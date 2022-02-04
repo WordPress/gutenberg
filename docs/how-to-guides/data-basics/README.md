@@ -6,7 +6,7 @@ This tutorial aims to get you comfortable with the Gutenberg data layer. It guid
 
 ### Table of Contents
 
-1. [Setup](./1-setup)
+1. [Setup](./1-setup.md)
 2. [Building a basic list of pages](./2-building-a-list-of-pages.md)
 
 Coming soon:
