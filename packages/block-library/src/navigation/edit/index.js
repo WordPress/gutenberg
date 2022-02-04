@@ -633,13 +633,23 @@ function Navigation( {
 										backgroundColor={
 											detectedBackgroundColor
 										}
-										textColor={ detectedColor }
+										textColors={ [
+											{
+												color: detectedColor,
+												description: __( 'text color' ),
+											},
+										] }
 									/>
 									<ContrastChecker
 										backgroundColor={
 											detectedOverlayBackgroundColor
 										}
-										textColor={ detectedOverlayColor }
+										textColors={ [
+											{
+												color: detectedOverlayColor,
+												description: __( 'text color' ),
+											},
+										] }
 									/>
 								</>
 							) }

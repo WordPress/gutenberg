@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __, sprintf } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
+/**
  * External dependencies
  */
 import { colord, extend } from 'colord';
@@ -15,50 +20,21 @@ extend( [ namesPlugin, a11yPlugin ] );
 function ContrastChecker( {
 	backgroundColor,
 	fallbackBackgroundColor,
-	fallbackTextColor,
-	fallbackLinkColor,
 	fontSize, // font size value in pixels
 	isLargeText,
-	textColor,
-	linkColor,
+	textColors,
 	enableAlphaChecker = false,
 } ) {
 	const currentBackgroundColor = backgroundColor || fallbackBackgroundColor;
 
-	// Must have a background color.
-	if ( ! currentBackgroundColor ) {
-		return null;
-	}
-
-	const currentTextColor = textColor || fallbackTextColor;
-	const currentLinkColor = linkColor || fallbackLinkColor;
-
-	// Must have at least one text color.
-	if ( ! currentTextColor && ! currentLinkColor ) {
+	// Must have a background color and some colours to iterate over.
+	if ( ! currentBackgroundColor || ! textColors || ! textColors.length ) {
 		return null;
 	}
 
 	const colordBackgroundColor = colord( currentBackgroundColor );
 	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
-
-	// If there's only one color passed, store in `singleTextColor`.
-	const singleTextColor =
-		currentTextColor && currentLinkColor
-			? null
-			: currentTextColor || currentLinkColor;
-
-	const colordTextColor = singleTextColor
-		? colord( singleTextColor )
-		: colord( currentTextColor );
-	const colordLinkColor = colord( currentLinkColor );
-
-	// Transparency.
-	const textColorHasTransparency =
-		currentTextColor && colordTextColor.alpha() < 1;
-	const linkColorHasTransparency =
-		currentLinkColor && colordLinkColor.alpha() < 1;
-
-	// Text size.
+	const backgroundColorBrightness = colordBackgroundColor.brightness();
 	const isReadableOptions = {
 		level: 'AA',
 		size:
@@ -67,63 +43,75 @@ function ContrastChecker( {
 				: 'small',
 	};
 
-	// Readability.
-	const isTextColorReadable =
-		currentTextColor &&
-		colordTextColor.isReadable( colordBackgroundColor, isReadableOptions );
-
-	const isLinkColorReadable =
-		currentLinkColor &&
-		colordLinkColor.isReadable( colordBackgroundColor, isReadableOptions );
-
-	// Flag to warn about transparency only if the text is otherwise readable according to colord
-	// to ensure the readability warnings take precedence.
-	let shouldShowTransparencyWarning = false;
-
-	// Don't show the message if the text is readable AND there's no transparency.
-	// This is the default.
-	if ( ! textColorHasTransparency && ! linkColorHasTransparency ) {
-		// If the background has transparency, don't show any contrast warnings.
-		if (
-			backgroundColorHasTransparency ||
-			( isTextColorReadable && isLinkColorReadable ) ||
-			( singleTextColor && isTextColorReadable )
-		) {
-			return null;
+	let message = '';
+	let speakMessage = '';
+	for ( const item of textColors ) {
+		const currentTextColor = item.color || item.fallback;
+		// If there is no color, go no further.
+		if ( ! currentTextColor ) {
+			continue;
 		}
-	} else {
-		// If there's text transparency, don't show the message if the alpha checker is disabled.
-		if ( ! enableAlphaChecker ) {
-			return null;
-		}
+		const colordTextColor = colord( currentTextColor );
+		const isColordTextReadable = colordTextColor.isReadable(
+			colordBackgroundColor,
+			isReadableOptions
+		);
+		const textHasTransparency = colordTextColor.alpha() < 1;
 
-		// If the background has transparency, don't show any contrast warnings.
-		// If both text colors are readable, but transparent show the warning.
-		if (
-			backgroundColorHasTransparency ||
-			( isTextColorReadable && isLinkColorReadable )
-		) {
-			shouldShowTransparencyWarning = true;
-		}
-
-		// If there is only one text color (text or link) and the color is readable with no transparency.
-		if ( singleTextColor && isTextColorReadable ) {
-			if ( ! textColorHasTransparency ) {
-				return null;
+		// If the contrast is not readable.
+		if ( ! isColordTextReadable ) {
+			// Don't show the message if the background or text is transparent.
+			if ( backgroundColorHasTransparency || textHasTransparency ) {
+				continue;
 			}
-			shouldShowTransparencyWarning = true;
+			const description = item.description || __( 'text color' );
+			message =
+				backgroundColorBrightness < colordTextColor.brightness()
+					? sprintf(
+							// translators: %s is a type of text color, e.g., "text color" or "link color"
+							__(
+								'This color combination may be hard for people to read. Try using a darker background color and/or a brighter %s.'
+							),
+							description
+					  )
+					: sprintf(
+							// translators: %s is a type of text color, e.g., "text color" or "link color"
+							__(
+								'This color combination may be hard for people to read. Try using a brighter background color and/or a darker %s.'
+							),
+							description
+					  );
+			speakMessage = __(
+				'This color combination may be hard for people to read.'
+			);
+			// Break from the loop when we have a contrast warning.
+			// These messages take priority over the transparency warning.
+			break;
+		}
+
+		// If the text color is readable, but transparent, show the transparent warning.
+		if ( textHasTransparency && true === enableAlphaChecker ) {
+			message = __( 'Transparent text may be hard for people to read.' );
+			speakMessage = __(
+				'Transparent text may be hard for people to read.'
+			);
 		}
 	}
 
+	if ( ! message ) {
+		return null;
+	}
+
+	// Note: The `Notice` component can speak messages via its `spokenMessage`
+	// prop, but the contrast checker requires granular control over when the
+	// announcements are made. Notably, the message will be re-announced if a
+	// new color combination is selected and the contrast is still insufficient.
+	speak( speakMessage );
+
 	return (
 		<ContrastCheckerMessage
-			backgroundColor={ backgroundColor }
-			textColor={ textColor }
-			linkColor={ linkColor }
-			colordBackgroundColor={ colordBackgroundColor }
-			colordTextColor={ colordTextColor }
-			colordLinkColor={ colordLinkColor }
-			shouldShowTransparencyWarning={ shouldShowTransparencyWarning }
+			message={ message }
+			speakMessage={ speakMessage }
 		/>
 	);
 }

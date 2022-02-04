@@ -39,9 +39,18 @@ describe( 'ContrastChecker', () => {
 	test( 'should render null when no background or fallback background color is provided', () => {
 		const wrapper = mount(
 			<ContrastChecker
-				textColor={ textColor }
-				linkColor={ linkColor }
-				isLargeText={ isLargeText }
+				textColors={ [
+					{
+						color: textColor,
+						fallback: undefined,
+						description: 'text color',
+					},
+					{
+						color: linkColor,
+						fallback: undefined,
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -53,11 +62,20 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
-				textColor={ textColor }
-				linkColor={ linkColor }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
+				textColors={ [
+					{
+						color: textColor,
+						fallback: fallbackTextColor,
+						description: 'text color',
+					},
+					{
+						color: linkColor,
+						fallback: undefined,
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -69,10 +87,15 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ sameShade }
-				textColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
+				textColors={ [
+					{
+						color: sameShade,
+						fallback: fallbackTextColor,
+						description: 'text color',
+					},
+				] }
 			/>
 		);
 
@@ -88,11 +111,20 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ sameShade }
-				textColor={ textColor }
-				linkColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
+				textColors={ [
+					{
+						color: textColor,
+						fallback: fallbackTextColor,
+						description: 'text color',
+					},
+					{
+						color: sameShade,
+						fallback: undefined,
+						description: 'link color, Jack',
+					},
+				] }
 			/>
 		);
 
@@ -100,7 +132,7 @@ describe( 'ContrastChecker', () => {
 			'This color combination may be hard for people to read.'
 		);
 		expect( wrapper.find( Notice ).children().text() ).toBe(
-			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color, Jack.'
 		);
 	} );
 
@@ -108,11 +140,19 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ sameShade }
-				textColor={ sameShade }
-				linkColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
+				textColors={ [
+					{
+						color: sameShade,
+						fallback: fallbackTextColor,
+						description: 'text color',
+					},
+					{
+						color: sameShade,
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -128,11 +168,18 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ colorWithTransparency }
-				textColor={ sameShade }
-				linkColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
+				textColors={ [
+					{
+						color: sameShade,
+						description: 'text color',
+					},
+					{
+						color: sameShade,
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -140,14 +187,18 @@ describe( 'ContrastChecker', () => {
 		expect( wrapper.html() ).toBeNull();
 	} );
 
-	test( 'should render render null if text color contains a transparency', () => {
+	test( 'should render null if text color contains a transparency', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ sameShade }
-				textColor={ colorWithTransparency }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
+				textColors={ [
+					{
+						color: colorWithTransparency,
+						description: 'text color',
+					},
+				] }
 			/>
 		);
 
@@ -159,11 +210,18 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
-				textColor={ textColor }
-				linkColor={ colorWithTransparency }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
+				textColors={ [
+					{
+						color: textColor,
+						description: 'text color',
+					},
+					{
+						color: colorWithTransparency,
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -177,10 +235,15 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ darkerShade }
-				textColor={ sameShade }
 				isLargeText={ ! isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
+				textColors={ [
+					{
+						color: sameShade,
+						fallback: fallbackTextColor,
+						description: 'text color',
+					},
+				] }
 			/>
 		);
 
@@ -196,8 +259,13 @@ describe( 'ContrastChecker', () => {
 		const wrapperSmallText = mount(
 			<ContrastChecker
 				backgroundColor="#C44B4B"
-				textColor="#000000"
 				isLargeText={ false }
+				textColors={ [
+					{
+						color: '#000000',
+						description: 'text color',
+					},
+				] }
 			/>
 		);
 
@@ -211,8 +279,13 @@ describe( 'ContrastChecker', () => {
 		const wrapperLargeText = mount(
 			<ContrastChecker
 				backgroundColor="#C44B4B"
-				textColor="#000000"
 				isLargeText={ true }
+				textColors={ [
+					{
+						color: '#000000',
+						description: 'text color',
+					},
+				] }
 			/>
 		);
 
@@ -223,7 +296,12 @@ describe( 'ContrastChecker', () => {
 		const wrapperSmallFontSize = mount(
 			<ContrastChecker
 				backgroundColor="#C44B4B"
-				textColor="#000000"
+				textColors={ [
+					{
+						color: '#000000',
+						description: 'text color',
+					},
+				] }
 				fontSize={ 23 }
 			/>
 		);
@@ -238,7 +316,12 @@ describe( 'ContrastChecker', () => {
 		const wrapperLargeText = mount(
 			<ContrastChecker
 				backgroundColor="#C44B4B"
-				textColor="#000000"
+				textColors={ [
+					{
+						color: '#000000',
+						description: 'text color',
+					},
+				] }
 				fontSize={ 24 }
 			/>
 		);
@@ -250,7 +333,12 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor="#C44B4B"
-				textColor="#000000"
+				textColors={ [
+					{
+						color: '#000000',
+						description: 'text color',
+					},
+				] }
 				fontSize={ 23 }
 				isLargeText={ true }
 			/>
@@ -262,7 +350,12 @@ describe( 'ContrastChecker', () => {
 		const wrapperNoLargeText = mount(
 			<ContrastChecker
 				backgroundColor="#C44B4B"
-				textColor="#000000"
+				textColors={ [
+					{
+						color: '#000000',
+						description: 'text color',
+					},
+				] }
 				fontSize={ 24 }
 				isLargeText={ false }
 			/>
@@ -281,7 +374,12 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
+				textColors={ [
+					{
+						fallback: fallbackTextColor,
+						description: 'text color',
+					},
+				] }
 			/>
 		);
 
@@ -292,8 +390,13 @@ describe( 'ContrastChecker', () => {
 	test( 'should render messages when the textColor is valid, but the fallback backgroundColor conflicts.', () => {
 		const wrapper = mount(
 			<ContrastChecker
-				textColor={ textColor }
 				fallbackBackgroundColor={ textColor }
+				textColors={ [
+					{
+						color: textColor,
+						description: 'text color',
+					},
+				] }
 			/>
 		);
 
@@ -308,8 +411,13 @@ describe( 'ContrastChecker', () => {
 	test( 'should render messages when the linkColor is valid, but the fallback backgroundColor conflicts.', () => {
 		const wrapper = mount(
 			<ContrastChecker
-				linkColor={ linkColor }
 				fallbackBackgroundColor={ linkColor }
+				textColors={ [
+					{
+						color: linkColor,
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -317,7 +425,7 @@ describe( 'ContrastChecker', () => {
 			'This color combination may be hard for people to read.'
 		);
 		expect( wrapper.find( Notice ).children().text() ).toBe(
-			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color.'
 		);
 	} );
 
@@ -327,8 +435,13 @@ describe( 'ContrastChecker', () => {
 		act( () => {
 			render(
 				<ContrastChecker
-					textColor={ textColor }
 					fallbackBackgroundColor={ textColor }
+					textColors={ [
+						{
+							color: textColor,
+							description: 'text color',
+						},
+					] }
 				/>,
 				appRoot
 			);
@@ -337,7 +450,12 @@ describe( 'ContrastChecker', () => {
 		act( () => {
 			render(
 				<ContrastChecker
-					textColor={ backgroundColor }
+					textColors={ [
+						{
+							color: backgroundColor,
+							description: 'text color',
+						},
+					] }
 					fallbackBackgroundColor={ backgroundColor }
 				/>,
 				appRoot
@@ -352,9 +470,14 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
-				textColor={ textColor }
 				isLargeText={ isLargeText }
 				enableAlphaChecker={ true }
+				textColors={ [
+					{
+						color: textColor,
+						description: 'text color',
+					},
+				] }
 			/>
 		);
 
@@ -366,10 +489,18 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
-				textColor={ 'rgba(0,0,0,0.9)' }
-				linkColor={ linkColor }
 				isLargeText={ isLargeText }
 				enableAlphaChecker={ true }
+				textColors={ [
+					{
+						color: 'rgba(0,0,0,0.9)',
+						description: 'text color',
+					},
+					{
+						color: linkColor,
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -385,10 +516,18 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
-				linkColor={ 'rgba(0,0,0,0.9)' }
-				textColor={ textColor }
 				isLargeText={ isLargeText }
 				enableAlphaChecker={ true }
+				textColors={ [
+					{
+						color: textColor,
+						description: 'text color',
+					},
+					{
+						color: 'rgba(0,0,0,0.9)',
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -404,10 +543,18 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ 'rgba(255,255,255,0.7)' }
-				textColor={ textColor }
-				linkColor={ linkColor }
 				isLargeText={ isLargeText }
 				enableAlphaChecker={ true }
+				textColors={ [
+					{
+						color: textColor,
+						description: 'text color',
+					},
+					{
+						color: linkColor,
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -419,12 +566,20 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ colorWithTransparency }
-				textColor={ sameShade }
-				linkColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
 				enableAlphaChecker={ true }
+				textColors={ [
+					{
+						color: sameShade,
+						fallback: fallbackTextColor,
+						description: 'text color',
+					},
+					{
+						color: sameShade,
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -436,12 +591,20 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ colorWithTransparency }
-				textColor={ sameShade }
-				linkColor={ 'rgba(0,0,0,0.9)' }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
 				enableAlphaChecker={ true }
+				textColors={ [
+					{
+						color: sameShade,
+						fallback: fallbackTextColor,
+						description: 'text color',
+					},
+					{
+						color: 'rgba(0,0,0,0.9)',
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -457,12 +620,19 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ sameShade }
-				textColor={ 'rgba(0,0,0,0.9)' }
-				linkColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor }
 				enableAlphaChecker={ true }
+				textColors={ [
+					{
+						color: 'rgba(0,0,0,0.9)',
+						description: 'text color',
+					},
+					{
+						color: sameShade,
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
@@ -470,7 +640,7 @@ describe( 'ContrastChecker', () => {
 			'This color combination may be hard for people to read.'
 		);
 		expect( wrapper.find( Notice ).children().text() ).toBe(
-			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color.'
 		);
 	} );
 
@@ -478,10 +648,18 @@ describe( 'ContrastChecker', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ 'rgba(255,255,255,0.7)' }
-				linkColor={ 'rgba(0,0,0,0.7)' }
-				textColor={ 'rgba(0,0,0,0.7)' }
 				isLargeText={ isLargeText }
 				enableAlphaChecker={ true }
+				textColors={ [
+					{
+						color: 'rgba(0,0,0,0.7)',
+						description: 'text color',
+					},
+					{
+						color: 'rgba(0,0,0,0.7)',
+						description: 'link color',
+					},
+				] }
 			/>
 		);
 
