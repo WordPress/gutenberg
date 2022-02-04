@@ -7,6 +7,7 @@ import { css } from '@emotion/react';
  * WordPress dependencies
  */
 import { __unstableIframe as Iframe } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,6 +26,20 @@ export default {
 const Example = ( { args, children } ) => {
 	const cx = useCx();
 	const classes = cx( ...args );
+	return <span className={ classes }>{ children }</span>;
+};
+
+const ExampleWithUseMemoWrong = ( { args, children } ) => {
+	const cx = useCx();
+	// Wrong: using 'useMemo' without adding 'cx' to the dependency list.
+	const classes = useMemo( () => cx( ...args ), [ ...args ] );
+	return <span className={ classes }>{ children }</span>;
+};
+
+const ExampleWithUseMemoRight = ( { args, children } ) => {
+	const cx = useCx();
+	// Right: using 'useMemo' with 'cx' listed as a dependency.
+	const classes = useMemo( () => cx( ...args ), [ ...args, cx ] );
 	return <span className={ classes }>{ children }</span>;
 };
 
@@ -90,6 +105,32 @@ export const _slotFillSimple = () => {
 			</Iframe>
 			<Slot bubblesVirtually name="test-slot" />
 		</SlotFillProvider>
+	);
+};
+
+export const _useMemoBadPractices = () => {
+	const redText = css`
+		color: red;
+	`;
+	const blueText = css`
+		color: blue;
+	`;
+	const greenText = css`
+		color: green;
+	`;
+
+	return (
+		<>
+			<ExampleWithUseMemoRight args={ [ blueText ] }>
+				This text should be blue
+			</ExampleWithUseMemoRight>
+			<Iframe>
+				<Example args={ [ redText ] }>This text should be red</Example>
+				<ExampleWithUseMemoWrong args={ [ greenText ] }>
+					This text should be green but it&apos;s not!
+				</ExampleWithUseMemoWrong>
+			</Iframe>
+		</>
 	);
 };
 
