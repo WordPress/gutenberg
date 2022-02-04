@@ -103,6 +103,7 @@ function gutenberg_reregister_core_block_types() {
 				'query-pagination-numbers.php'     => 'core/query-pagination-numbers',
 				'query-pagination-previous.php'    => 'core/query-pagination-previous',
 				'query-title.php'                  => 'core/query-title',
+				'read-more.php'                    => 'core/read-more',
 				'rss.php'                          => 'core/rss',
 				'search.php'                       => 'core/search',
 				'shortcode.php'                    => 'core/shortcode',
