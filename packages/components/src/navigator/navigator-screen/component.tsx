@@ -11,7 +11,11 @@ import { css } from '@emotion/react';
  */
 import { focus } from '@wordpress/dom';
 import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
-import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
+import {
+	useReducedMotion,
+	useMergeRefs,
+	usePrevious,
+} from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -50,6 +54,8 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	const isMatch = location.path === path;
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
+	const previousLocation = usePrevious( location );
+
 	const cx = useCx();
 	const classes = useMemo(
 		() =>
@@ -80,9 +86,9 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 
 		// When navigating back, if a selector is provided, use it to look for the
 		// target element (assumed to be a node inside the current NavigatorScreen)
-		if ( location.isBack && location.focusTargetSelector ) {
+		if ( location.isBack && previousLocation?.focusTargetSelector ) {
 			elementToFocus = wrapperRef.current.querySelector(
-				location.focusTargetSelector
+				previousLocation.focusTargetSelector
 			);
 		}
 

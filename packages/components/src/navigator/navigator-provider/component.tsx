@@ -42,35 +42,17 @@ function NavigatorProvider(
 	>( [
 		{
 			path: initialPath,
-			isBack: false,
-			isInitial: true,
 		},
 	] );
 
 	const push: NavigatorContextType[ 'push' ] = useCallback(
 		( path, options = {} ) => {
-			const { focusTargetSelector, ...restOptions } = options;
-
-			// Notes:
-			// - the `isBack` flag is set to `false` when navigating forwards on both
-			//   the previous and the new location.
-			// - the `isInitial` flag is set to `false` for the new location, to make
-			//   sure it doesn't get overridden by mistake.
-			// - the `focusTargetSelector` prop is set on the current (soon previous)
-			//   location, as it is used to restore focus in NavigatorScreen. The
-			//   remaining options are instead set on the new location being pushed.
 			setLocationHistory( [
-				...locationHistory.slice( 0, -1 ),
+				...locationHistory,
 				{
-					...locationHistory[ locationHistory.length - 1 ],
-					isBack: false,
-					focusTargetSelector,
-				},
-				{
-					...restOptions,
+					...options,
 					path,
 					isBack: false,
-					isInitial: false,
 				},
 			] );
 		},
@@ -79,7 +61,6 @@ function NavigatorProvider(
 
 	const pop: NavigatorContextType[ 'pop' ] = useCallback( () => {
 		if ( locationHistory.length > 1 ) {
-			// Force the `isBack` flag to `true` when navigating back.
 			setLocationHistory( [
 				...locationHistory.slice( 0, -2 ),
 				{
@@ -92,7 +73,10 @@ function NavigatorProvider(
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
-			location: locationHistory[ locationHistory.length - 1 ],
+			location: {
+				...locationHistory[ locationHistory.length - 1 ],
+				isInitial: locationHistory.length === 1,
+			},
 			push,
 			pop,
 		} ),
