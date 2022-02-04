@@ -26,6 +26,15 @@ Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Supports:** align, anchor
 -	**Attributes:** autoplay, caption, id, loop, preload, src
 
+## Avatar
+
+Add the avatar of an user. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/avatar))
+
+-	**Name:** core/avatar
+-	**Category:** theme
+-	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin, padding), ~~alignWide~~, ~~html~~
+-	**Attributes:** height, isLink, linkTarget, width
+
 ## Reusable block
 
 Create and save content to reuse across your site. Update the block, and the changes apply everywhere it’s used. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/block))
@@ -104,8 +113,8 @@ Add the avatar of this comment's author. ([Source](https://github.com/WordPress/
 
 -	**Name:** core/comment-author-avatar
 -	**Category:** theme
--	**Supports:** color (background, ~~text~~), spacing (margin, padding), ~~html~~
--	**Attributes:** height, width
+-	**Supports:** color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
+-	**Attributes:** height, isLink, linkTarget, width
 
 ## Comment Author Name
 
@@ -440,14 +449,6 @@ Display post author details such as name, avatar, and bio. ([Source](https://git
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** avatarSize, byline, showAvatar, showBio, textAlign
 
-## Post Author Biography
-
-The author biography. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-biography))
-
--	**Name:** core/post-author-biography
--	**Category:** theme
--	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
--	**Attributes:** textAlign
 ## Post Author Avatar
 
 Add the avatar of this post's author. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-avatar))
@@ -456,6 +457,15 @@ Add the avatar of this post's author. ([Source](https://github.com/WordPress/gut
 -	**Category:** theme
 -	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin), ~~alignWide~~, ~~html~~
 -	**Attributes:** height, isLink, linkTarget, width
+
+## Post Author Biography
+
+The author biography. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-biography))
+
+-	**Name:** core/post-author-biography
+-	**Category:** theme
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Attributes:** textAlign
 
 ## Post Author Name
 
