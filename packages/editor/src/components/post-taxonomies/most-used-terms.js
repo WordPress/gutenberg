@@ -34,7 +34,7 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 		);
 		return {
 			_terms: mostUsedTerms,
-			showTerms: mostUsedTerms?.length > MIN_MOST_USED_TERMS,
+			showTerms: mostUsedTerms?.length >= MIN_MOST_USED_TERMS,
 		};
 	}, [] );
 
