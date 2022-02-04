@@ -18,6 +18,7 @@ module.exports = async ( {
 	license,
 	slug,
 	version,
+	wpEnv,
 	wpScripts,
 	npmDependencies,
 } ) => {
@@ -43,6 +44,7 @@ module.exports = async ( {
 					'packages-update': 'wp-scripts packages-update',
 					'plugin-zip': 'wp-scripts plugin-zip',
 					start: 'wp-scripts start',
+					env: wpEnv && 'wp-env',
 				},
 			},
 			isEmpty
