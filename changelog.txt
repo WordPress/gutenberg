@@ -1,5 +1,18 @@
 == Changelog ==
 
+= 12.5.2 =
+
+
+
+### Bug Fixes
+
+#### Block Library
+- Fix latest posts excerpt escaping. ([38517](https://github.com/WordPress/gutenberg/pull/38517))
+
+
+
+
+
 = 12.5.1 =
 
 ### Bug Fixes
