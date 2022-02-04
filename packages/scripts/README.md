@@ -316,7 +316,7 @@ _Example:_
 
 The command checks which packages whose name starts with `@wordpress/` are used in the project by reading the package.json file, and then executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one.
 
-### `packages-update`
+### `plugin-zip`
 
 Creates a zip file for a WordPress plugin.
 
