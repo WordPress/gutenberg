@@ -219,3 +219,31 @@ export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
 		await disableSiteEditorWelcomeGuide();
 	}
 }
+
+/**
+ * Toggles the global styles sidebar (opens it if closed and closes it if open).
+ */
+export async function toggleGlobalStyles() {
+	await page.click(
+		'.edit-site-header__actions button[aria-label="Styles"]'
+	);
+}
+
+/**
+ * Opens a global styles panel.
+ *
+ * @param {string} panelName Name of the panel that is going to be opened.
+ */
+export async function openGlobalStylesPanel( panelName ) {
+	const selector = `//div[@aria-label="Settings"]//button[.//*[text()="${ panelName }"]]`;
+	await ( await page.waitForXPath( selector ) ).click();
+}
+
+/**
+ * Opens the previous global styles panel.
+ */
+export async function openPreviousGlobalStylesPanel() {
+	await page.click(
+		'div[aria-label="Settings"] button[aria-label="Navigate to the previous view"]'
+	);
+}

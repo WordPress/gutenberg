@@ -589,6 +589,14 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 
 Opens the global block inserter.
 
+### openGlobalStylesPanel
+
+Opens a global styles panel.
+
+_Parameters_
+
+-   _panelName_ `string`: Name of the panel that is going to be opened.
+
 ### openListView
 
 Opens list view
@@ -604,6 +612,10 @@ _Parameters_
 _Returns_
 
 -   `Page`: preview page.
+
+### openPreviousGlobalStylesPanel
+
+Opens the previous global styles panel.
 
 ### openPublishPanel
 
@@ -800,6 +812,10 @@ running the tests as (if we're not already that user).
 ### toggleGlobalBlockInserter
 
 Toggles the global inserter.
+
+### toggleGlobalStyles
+
+Toggles the global styles sidebar (opens it if closed and closes it if open).
 
 ### toggleMoreMenu
 
