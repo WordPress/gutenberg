@@ -26,6 +26,7 @@ module.exports = async ( {
 
 	info( '' );
 	info( 'Creating a "package.json" file.' );
+
 	await writePkg(
 		cwd,
 		omitBy(
@@ -44,7 +45,7 @@ module.exports = async ( {
 					'packages-update': 'wp-scripts packages-update',
 					'plugin-zip': 'wp-scripts plugin-zip',
 					start: 'wp-scripts start',
-					env: wpEnv && 'wp-env',
+					...( wpEnv === true && { env: 'wp-env' } ),
 				},
 			},
 			isEmpty
