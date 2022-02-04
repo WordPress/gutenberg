@@ -48,9 +48,9 @@ ensure it shows at least four or five Pages:
 If it doesn’t, go ahead and create a few pages – you can use the same titles as on the screenshot above. Be sure to _
 publish_ and not just _save_ them.
 
-Now that we have the data to work with, let’s dive into the code. We will take advantage of the Gutenberg’s `coreData`
-package which provides resolvers, selectors, and actions to work with the WordPress core API. `coreData` builds on top
-of the [Gutenberg’s `data`  package](https://github.com/WordPress/gutenberg/tree/trunk/packages/data).
+Now that we have the data to work with, let’s dive into the code. We will take advantage of the `@wordpress/core-data`
+package which provides resolvers, selectors, and actions to work with the WordPress core API. `@wordpress/core-data` builds on top
+of the [`@wordpress/data` package](https://github.com/WordPress/gutenberg/tree/trunk/packages/data).
 
 To fetch the list of pages, we will use
 the [`getEntityRecords`](/docs/reference-guides/data/data-core/#getentityrecords) selector. In broad strokes, it will
