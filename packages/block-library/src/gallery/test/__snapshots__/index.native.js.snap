@@ -44,6 +44,14 @@ exports[`Gallery block changes columns setting (TC013 - Settings - Columns 2`] =
 <!-- /wp:gallery -->"
 `;
 
+exports[`Gallery block disables crop images setting (TC014 - Settings - Crop images 1`] = `
+"<!-- wp:gallery {\\"imageCrop\\":false,\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-default\\"><!-- wp:image {\\"id\\":1} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://cldup.com/cXyG__fTLN.jpg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
 exports[`Gallery block finishes pending uploads upon opening the editor (TC001 - Close/Re-open post with an ongoing image upload) 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->

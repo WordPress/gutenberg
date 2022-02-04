@@ -1119,4 +1119,25 @@ describe( 'Gallery block', () => {
 		);
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
+
+	it( 'disables crop images setting (TC014 - Settings - Crop images', async () => {
+		// Initialize with a gallery that contains one item
+		const {
+			galleryBlock,
+			getByA11yLabel,
+			getByTestId,
+			getByText,
+		} = initializeWithGalleryBlock( GALLERY_WITH_ONE_IMAGE );
+		fireEvent.press( galleryBlock );
+
+		// Open block settings
+		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		await waitFor(
+			() => getByTestId( 'block-settings-modal' ).props.isVisible
+		);
+
+		// Disable crop images setting
+		fireEvent.press( getByText( 'Crop images' ) );
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
 } );
