@@ -91,10 +91,11 @@ function TreeGrid(
 					);
 				}
 
-				// Focus is either at the left or right edge of the grid.
+				// Focus is either at the left or right edge of the grid. Allow Right Arrow to expand the row.
 				if (
 					nextIndex === currentColumnIndex ||
-					( currentColumnIndex === 0 && keyCode === RIGHT )
+					( activeRow.hasAttribute( 'aria-expanded' ) &&
+						keyCode === RIGHT )
 				) {
 					if ( keyCode === LEFT ) {
 						// Left:
@@ -152,10 +153,10 @@ function TreeGrid(
 					return;
 				}
 
-				// Focus the next column only if expanded.
+				// Focus the next column only if expanded. Checking Right Arrow key here that way Left Arrow can always get back to the previous column regardless of the row state.
 				if (
-					keyCode === RIGHT &&
-					activeRow.getAttribute( 'aria-expanded' ) === 'false'
+					activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
+					keyCode === RIGHT
 				) {
 					return;
 				}
