@@ -12,6 +12,7 @@ import {
 	activateTheme,
 	canvas,
 	createNewPost,
+	visitSiteEditor,
 	saveDraft,
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
@@ -19,7 +20,6 @@ import {
 /**
  * Internal dependencies
  */
-import { siteEditor } from '../site-editor/utils';
 import {
 	readFile,
 	deleteFile,
@@ -83,8 +83,7 @@ describe( 'Site Editor Performance', () => {
 			new URL( document.location ).searchParams.get( 'post' )
 		);
 
-		await siteEditor.visit( { postId: id, postType: 'page' } );
-		await siteEditor.disableWelcomeGuide();
+		await visitSiteEditor( { postId: id, postType: 'page' } );
 
 		let i = 3;
 
