@@ -18,6 +18,20 @@ html :where(.editor-styles-wrapper) {
 	}
 }
 
+.block-editor-block-preview__content-iframe {
+	.block-editor-block-list__layout.is-root-container > .wp-block {
+		// Prevent full-height blocks expanding height endlessly in pattern preview.
+		margin-top: 0;
+		margin-bottom: 0;
+
+		// Remove the compensating margin of full-wide blocks in pattern preview to prevent horizontal scrollbars.
+		&[data-align="full"] {
+			margin-left: 0;
+			margin-right: 0;
+		}
+	}
+}
+
 // Deprecated style needed for the block widths and alignments.
 // for themes that don't support the new layout (theme.json).
 html :where(.wp-block) {
