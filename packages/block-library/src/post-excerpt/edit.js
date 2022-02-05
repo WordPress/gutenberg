@@ -28,7 +28,7 @@ export default function PostExcerptEditor( {
 	attributes: { textAlign, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
-	context: { postId, postType, queryId },
+	context: { postId, postType, queryId, isPostOneLink },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
@@ -73,7 +73,7 @@ export default function PostExcerptEditor( {
 	const readMoreLink = (
 		<RichText
 			className="wp-block-post-excerpt__more-link"
-			tagName="a"
+			tagName={ isPostOneLink ? 'span' : 'a' }
 			aria-label={ __( '"Read more" link text' ) }
 			placeholder={ __( 'Add "read more" link text' ) }
 			value={ moreText }

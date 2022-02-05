@@ -18,7 +18,7 @@
 			"default": false
 		}
 	},
-	"usesContext": [ "postId", "postType", "queryId" ],
+	"usesContext": [ "postId", "postType", "queryId", "isPostOneLink" ],
 	"supports": {
 		"html": false,
 		"color": {

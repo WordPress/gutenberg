@@ -14,6 +14,9 @@
 		"displayLayout",
 		"templateSlug"
 	],
+	"providesContext": {
+		"isPostOneLink": "makeEntirePostClickable"
+	},
 	"supports": {
 		"reusable": false,
 		"html": false,
@@ -22,6 +25,13 @@
 			"allowEditing": false
 		}
 	},
+	"attributes": {
+		"makeEntirePostClickable": {
+			"type": "boolean",
+			"default": false
+		}
+	},
 	"style": "wp-block-post-template",
-	"editorStyle": "wp-block-post-template-editor"
+	"editorStyle": "wp-block-post-template-editor",
+	"viewScript": "file:./view.min.js"
 }

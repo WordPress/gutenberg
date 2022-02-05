@@ -18,13 +18,20 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$is_post_one_link = $block->context['isPostOneLink'];
+
 	$excerpt = get_the_excerpt();
 
 	if ( empty( $excerpt ) ) {
 		return '';
 	}
 
-	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . esc_html( $attributes['moreText'] ) . '</a>' : '';
+	$more_text  = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . esc_html( $attributes['moreText'] ) . '</a>' : '';
+
+	if ( $is_post_one_link ) {
+		$more_text = ! empty( $attributes['moreText'] ) ? '<span class="wp-block-post-excerpt__more-link">' . esc_html( $attributes['moreText'] ) . '</span>' : '';
+	}
+
 	$filter_excerpt_more = function( $more ) use ( $more_text ) {
 		return empty( $more_text ) ? $more : '';
 	};
