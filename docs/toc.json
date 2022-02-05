@@ -83,14 +83,6 @@
 				]
 			},
 			{
-				"docs/how-to-guides/designers/README.md": [
-					{ "docs/how-to-guides/designers/block-design.md": [] },
-					{ "docs/how-to-guides/designers/user-interface.md": [] },
-					{ "docs/how-to-guides/designers/design-resources.md": [] },
-					{ "docs/how-to-guides/designers/animation.md": [] }
-				]
-			},
-			{
 				"docs/how-to-guides/platform/README.md": [
 					{
 						"docs/how-to-guides/platform/custom-block-editor/README.md": [
@@ -276,6 +268,13 @@
 						"docs/explanations/architecture/full-site-editing-templates.md": []
 					},
 					{ "docs/explanations/architecture/styles.md": [] }
+				]
+			},
+			{
+				"docs/explanations/user-interface/README.md": [
+					{ "docs/explanations/user-interface/block-design.md": [] },
+					{ "docs/explanations/user-interface/animation.md": [] },
+					{ "docs/explanations/user-interface/design-resources.md": [] }
 				]
 			},
 			{ "docs/explanations/faq.md": [] },
