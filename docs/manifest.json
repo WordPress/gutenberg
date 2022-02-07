@@ -180,7 +180,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "1Setup",
+		"title": "Setup",
 		"slug": "1-setup",
 		"markdown_source": "../docs/how-to-guides/data-basics/1-setup.md",
 		"parent": "data-basics"
