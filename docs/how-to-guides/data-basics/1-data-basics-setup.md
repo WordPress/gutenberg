@@ -33,6 +33,7 @@ window.addEventListener( 'load', function() {
 ```css
 .toplevel_page_my-first-gutenberg-app #wpcontent {
 	background: #FFF;
+	height: 800px;
 }
 #my-first-gutenberg-app {
 	max-width: 500px;
@@ -47,6 +48,13 @@ window.addEventListener( 'load', function() {
 #my-first-gutenberg-app .components-search-control__input {
 	height: 36px;
 	margin-left: 0;
+}
+.my-gutenberg-form .form-buttons {
+	margin-top: 20px;
+	margin-left: 1px;
+}
+.my-gutenberg-form .form-buttons button {
+	margin-right: 4px;
 }
 ```
 
