@@ -106,7 +106,7 @@ function ContrastChecker( {
 		}
 
 		// If the text color is readable, but transparent, show the transparent warning.
-		if ( textHasTransparency && true === enableAlphaChecker ) {
+		if ( textHasTransparency && enableAlphaChecker ) {
 			message = __( 'Transparent text may be hard for people to read.' );
 			speakMessage = __(
 				'Transparent text may be hard for people to read.'
