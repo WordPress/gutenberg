@@ -291,6 +291,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	// This function will be deprecated as soon as it is no longer internally referenced.
 	//
 	function use( plugin, options ) {
+		if ( ! plugin ) {
+			return;
+		}
+
 		registry = {
 			...registry,
 			...plugin( registry, options ),
