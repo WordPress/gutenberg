@@ -241,7 +241,7 @@ describe( 'Gallery block', () => {
 		await mediaPickerCallback( MEDIA[ 0 ], MEDIA[ 1 ] );
 
 		// Check that gallery items are visible
-		triggerGalleryLayout( galleryBlock );
+		await triggerGalleryLayout( galleryBlock );
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
 		const galleryItem2 = getGalleryItem( galleryBlock, 2 );
 		expect( galleryItem1 ).toBeVisible();
@@ -287,7 +287,7 @@ describe( 'Gallery block', () => {
 		await mediaPickerCallback( MEDIA[ 0 ], MEDIA[ 1 ] );
 
 		// Check that gallery items are visible
-		triggerGalleryLayout( galleryBlock );
+		await triggerGalleryLayout( galleryBlock );
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
 		const galleryItem2 = getGalleryItem( galleryBlock, 2 );
 		expect( galleryItem1 ).toBeVisible();
@@ -348,7 +348,7 @@ describe( 'Gallery block', () => {
 		await mediaPickerCallback( MEDIA[ 0 ] );
 
 		// Check gallery item is visible
-		triggerGalleryLayout( galleryBlock );
+		await triggerGalleryLayout( galleryBlock );
 		const galleryItem = getGalleryItem( galleryBlock, 1 );
 		expect( galleryItem ).toBeVisible();
 
@@ -413,7 +413,7 @@ describe( 'Gallery block', () => {
 		);
 
 		// Check that gallery items are visible
-		triggerGalleryLayout( galleryBlock );
+		await triggerGalleryLayout( galleryBlock );
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
 		const galleryItem2 = getGalleryItem( galleryBlock, 2 );
 		expect( galleryItem1 ).toBeVisible();
@@ -458,7 +458,7 @@ describe( 'Gallery block', () => {
 		await mediaPickerCallback( MEDIA[ 0 ], MEDIA[ 1 ] );
 
 		// Check that gallery items are visible
-		triggerGalleryLayout( galleryBlock );
+		await triggerGalleryLayout( galleryBlock );
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
 		const galleryItem2 = getGalleryItem( galleryBlock, 2 );
 		expect( galleryItem1 ).toBeVisible();
@@ -568,7 +568,7 @@ describe( 'Gallery block', () => {
 		await mediaPickerCallback( otherAppsMedia[ 0 ], otherAppsMedia[ 1 ] );
 
 		// Check that gallery items are visible
-		triggerGalleryLayout( galleryBlock );
+		await triggerGalleryLayout( galleryBlock );
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
 		const galleryItem2 = getGalleryItem( galleryBlock, 2 );
 		expect( galleryItem1 ).toBeVisible();

@@ -56,7 +56,10 @@ export const addGalleryBlock = async () => {
  * @param {Object}                                          [options]       Configuration options for the event.
  * @param {number}                                          [options.width] Width value to be passed to the event.
  */
-export const triggerGalleryLayout = ( galleryBlock, { width = 320 } = {} ) =>
+export const triggerGalleryLayout = async (
+	galleryBlock,
+	{ width = 320 } = {}
+) =>
 	executeStoreResolvers( () =>
 		fireEvent(
 			within( galleryBlock ).getByTestId( 'block-list-wrapper' ),
@@ -81,7 +84,7 @@ export const initializeWithGalleryBlock = async (
 	const galleryBlock = getByA11yLabel( /Gallery Block\. Row 1/ );
 
 	if ( hasItems ) {
-		triggerGalleryLayout( galleryBlock, { deviceWidth } );
+		await triggerGalleryLayout( galleryBlock, { deviceWidth } );
 	}
 
 	if ( selected ) {
