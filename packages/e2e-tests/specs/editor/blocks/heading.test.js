@@ -5,7 +5,6 @@ import {
 	clickBlockAppender,
 	createNewPost,
 	getEditedPostContent,
-	openColorToolsPanelMenu,
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
@@ -79,8 +78,6 @@ describe( 'Heading', () => {
 	it( 'should correctly apply custom colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '### Heading' );
-		await openColorToolsPanelMenu();
-		await page.click( 'button[aria-label="Show Text"]' );
 
 		const textColorButton = await page.waitForSelector(
 			COLOR_ITEM_SELECTOR
@@ -105,8 +102,6 @@ describe( 'Heading', () => {
 	it( 'should correctly apply named colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '## Heading' );
-		await openColorToolsPanelMenu();
-		await page.click( 'button[aria-label="Show Text"]' );
 
 		const textColorButton = await page.waitForSelector(
 			COLOR_ITEM_SELECTOR

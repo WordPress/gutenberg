@@ -581,10 +581,6 @@ Navigates the site editor back
 
 Goes back until it gets to the root
 
-### openColorToolsPanelMenu
-
-Opens the Color tools panel menu provided via block supports.
-
 ### openDocumentSettingsSidebar
 
 Clicks on the button in the header which opens Document Settings sidebar when it is closed.
