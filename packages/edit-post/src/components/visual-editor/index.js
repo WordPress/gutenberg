@@ -197,9 +197,6 @@ export default function VisualEditor( { styles } ) {
 			<VisualEditorGlobalKeyboardShortcuts />
 			<motion.div
 				className="edit-post-visual-editor__content-area"
-				animate={ {
-					padding: isTemplateMode ? '48px 48px 0' : '0',
-				} }
 				ref={ blockSelectionClearerRef }
 			>
 				{ isTemplateMode && (

@@ -11,6 +11,7 @@ import {
 	activatePlugin,
 	deactivatePlugin,
 	deleteAllTemplates,
+	setBrowserViewport,
 } from '@wordpress/e2e-test-utils';
 
 const openSidebarPanelWithTitle = async ( title ) => {
@@ -119,7 +120,6 @@ describe( 'Post Editor Template mode', () => {
 		// there's a template resolution bug forcing us to do so.
 		await saveDraft();
 		await page.reload();
-
 		await switchToTemplateMode();
 
 		// Edit the template
@@ -195,5 +195,169 @@ describe( 'Post Editor Template mode', () => {
 		);
 
 		expect( content ).toMatchSnapshot();
+	} );
+} );
+
+describe( 'Delete Post Template Confirmation Dialog', () => {
+	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-block-templates' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone' );
+		await createNewPost();
+		// Create a random post.
+		await page.type( '.editor-post-title__input', 'Just an FSE Post' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Hello World' );
+
+		// Save the post
+		// Saving shouldn't be necessary but unfortunately,
+		// there's a template resolution bug forcing us to do so.
+		await saveDraft();
+		await page.reload();
+		// Unselect the blocks.
+		await page.evaluate( () => {
+			wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+	} );
+
+	afterAll( async () => {
+		await activateTheme( 'twentytwentyone' );
+		await deactivatePlugin( 'gutenberg-test-block-templates' );
+	} );
+
+	[ 'large', 'small' ].forEach( ( viewport ) => {
+		it( `should retain template if deletion is canceled when the viewport is ${ viewport }`, async () => {
+			await setBrowserViewport( viewport );
+
+			const isWelcomeGuideActive = await page.evaluate( () =>
+				wp.data
+					.select( 'core/edit-post' )
+					.isFeatureActive( 'welcomeGuide' )
+			);
+			if ( isWelcomeGuideActive === true ) {
+				await page.evaluate( () =>
+					wp.data
+						.dispatch( 'core/edit-post' )
+						.toggleFeature( 'welcomeGuide' )
+				);
+				await page.reload();
+				await page.waitForSelector( '.edit-post-layout' );
+			}
+			const templateTitle = `${ viewport } Viewport Deletion Test`;
+
+			await createNewTemplate( templateTitle );
+			// Edit the template
+			if ( viewport === 'small' ) {
+				const closeDocumentSettingsButton = await page.waitForXPath(
+					'//div[contains(@class,"interface-complementary-area-header__small")]/button[@aria-label="Close settings"]'
+				);
+				await closeDocumentSettingsButton.click();
+			}
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type(
+				'Just a random paragraph added to the template'
+			);
+
+			// Save changes
+			const publishButton = await page.waitForXPath(
+				`//button[contains(text(), 'Publish')]`
+			);
+			await publishButton.click();
+			const saveButton = await page.waitForXPath(
+				`//div[contains(@class, "entities-saved-states__panel-header")]/button[contains(text(), 'Save')]`
+			);
+			await saveButton.click();
+			// Avoid publishing the post
+			// Select the cancel button via parent div's class, because the text `Cancel` is used on another button as well
+			const cancelButton = await page.waitForXPath(
+				`//div[contains(@class,"editor-post-publish-panel__header-cancel-button")]/button[not(@disabled)]`
+			);
+			await cancelButton.click();
+
+			const templateDropdown = await page.waitForXPath(
+				`//button[contains(text(), '${ templateTitle }')]`
+			);
+			await templateDropdown.click();
+			const deleteTemplateButton = await page.waitForXPath(
+				'//button[@role="menuitem"][@aria-label="Delete template"]'
+			);
+			await deleteTemplateButton.click();
+
+			await page.waitForXPath(
+				`//*[text()="Are you sure you want to delete the ${ templateTitle } template? It may be used by other pages or posts."]`
+			);
+			const dialogCancelButton = await page.waitForXPath(
+				'//*[@role="dialog"][not(@id="wp-link-wrap")]//button[text()="Cancel"]'
+			);
+			await dialogCancelButton.click();
+
+			await page.reload();
+			await page.waitForXPath(
+				'//button[@aria-label="Settings"][@aria-expanded="false"]'
+			);
+			await openDocumentSettingsSidebar();
+
+			const element = await page.waitForXPath(
+				'//h2/button[contains(text(), "Template")]/../..//select'
+			);
+			const value = await element.getProperty( 'value' );
+			const currentTemplateSlug = await value.jsonValue();
+
+			expect( currentTemplateSlug ).toBe(
+				`wp-custom-template-${ viewport }-viewport-deletion-test`
+			);
+		} );
+
+		it( `should delete template if deletion is confirmed when the viewport is ${ viewport }`, async () => {
+			const templateTitle = `${ viewport } Viewport Deletion Test`;
+
+			await setBrowserViewport( viewport );
+
+			await switchToTemplateMode();
+			if ( viewport === 'small' ) {
+				const closeDocumentSettingsButton = await page.waitForXPath(
+					'//div[contains(@class,"interface-complementary-area-header__small")]/button[@aria-label="Close settings"]'
+				);
+				await closeDocumentSettingsButton.click();
+			}
+
+			const templateDropdown = await page.waitForXPath(
+				`//button[contains(text(), '${ templateTitle }')]`
+			);
+			await templateDropdown.click();
+
+			const deleteTemplateButton = await page.waitForXPath(
+				'//button[@role="menuitem"][@aria-label="Delete template"]'
+			);
+			await deleteTemplateButton.click();
+
+			await page.waitForXPath(
+				`//*[text()="Are you sure you want to delete the ${ templateTitle } template? It may be used by other pages or posts."]`
+			);
+			const dialogConfirmButton = await page.waitForXPath(
+				'//*[@role="dialog"][not(@id="wp-link-wrap")]//button[text()="OK"]'
+			);
+
+			await dialogConfirmButton.click();
+
+			await page.reload();
+
+			const optionElementHandlers = await page.$x(
+				'//h2/button[contains(text(), "Template")]/../..//select/option'
+			);
+			const availableTemplates = [];
+			for ( const elem of optionElementHandlers ) {
+				const elemName = await elem.getProperty( 'textContent' );
+				const templateName = await elemName.jsonValue();
+				availableTemplates.push( templateName );
+			}
+
+			expect(
+				availableTemplates.includes(
+					`${ viewport } Viewport Deletion Test`
+				)
+			).toBe( false );
+		} );
 	} );
 } );
