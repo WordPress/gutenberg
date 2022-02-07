@@ -46,8 +46,8 @@ exports[`Gallery block changes columns setting (TC013 - Settings - Columns 2`] =
 
 exports[`Gallery block disables crop images setting (TC014 - Settings - Crop images 1`] = `
 "<!-- wp:gallery {\\"imageCrop\\":false,\\"linkTo\\":\\"none\\"} -->
-<figure class=\\"wp-block-gallery has-nested-images columns-default\\"><!-- wp:image {\\"id\\":1} -->
-<figure class=\\"wp-block-image\\"><img src=\\"https://cldup.com/cXyG__fTLN.jpg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>
+<figure class=\\"wp-block-gallery has-nested-images columns-default\\"><!-- wp:image {\\"id\\":2000} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->"
 `;

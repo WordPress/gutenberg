@@ -36,16 +36,6 @@ import {
 	triggerGalleryLayout,
 } from './helpers';
 
-const GALLERY_EMPTY = `<!-- wp:gallery {"linkTo":"none"} -->
-<figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure>
-<!-- /wp:gallery -->`;
-
-const GALLERY_WITH_ONE_IMAGE = `<!-- wp:gallery {"linkTo":"none"} -->
-<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":1} -->
-<figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></figure>
-<!-- /wp:image --></figure>
-<!-- /wp:gallery -->`;
-
 const MEDIA = [
 	{
 		localId: 1,
@@ -527,7 +517,7 @@ describe( 'Gallery block', () => {
 
 		// Initialize with an empty gallery
 		const { galleryBlock, getByText } = initializeWithGalleryBlock(
-			GALLERY_EMPTY,
+			generateGalleryBlock( 0 ),
 			{
 				hasItems: false,
 			}
@@ -658,7 +648,7 @@ describe( 'Gallery block', () => {
 			getByA11yLabel,
 			getByTestId,
 			getByText,
-		} = initializeWithGalleryBlock( GALLERY_WITH_ONE_IMAGE );
+		} = initializeWithGalleryBlock( generateGalleryBlock( 1, MEDIA ) );
 		fireEvent.press( galleryBlock );
 
 		// Open block settings
