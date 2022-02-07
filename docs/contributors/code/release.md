@@ -148,15 +148,15 @@ Once you have the stable release branch in order you can _push it to Github_ and
 
 ![Run workflow dropdown](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/workflow-dispatch-banner.png)
 
-Go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). You should now choose the next action based on information about the current Plugin releases:
+Go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). You should now _carefully_ choose the next action based on information about the current Plugin release version:
 
-_If_ the previous release version was **stable** (`X.Y.Z` - e.g. `12.5.0`, `12.5.1` .etc) specify `stable` in the text input field and the workflow will automatically create a point release, with z incremented (`x.y.(z+1)`).
+_If_ the previous release version was **stable** (`X.Y.Z` - e.g. `12.5.0`, `12.5.1` .etc) leave the the `Use workflow from` field as `trunk` and then specify `stable` in the text input field. The workflow will automatically create a point release, with z incremented (`x.y.(z+1)`) as required.
 
-_If_ however, the previous release was an _RC_ (e.g. `X.Y.0-rc.1`) you will need to _manually_ select the stable version's release branch when creating the release. If you do not then the workflow will try to release the next major _stable_ version which is not what you want.
+_If_ however, the previous release was an **RC** (e.g. `X.Y.0-rc.1`) you will need to _manually_ select the _stable version's release branch_ (e.g. `12.5.0`) when creating the release. Failure to do this will cause the workflow to release the next major _stable_ version which is not what you want.
 
 To do this, when running the Workflow, select the appropriate `release/` branch from the `Use workflow from` dropdown (e.g. `release/12.5`) and specify `stable` in the text input field.
 
-Please note you **cannot create point releases for previous stable releases once a more recent stable release has been published** as this would require significant changes to how we upload plugin versions to the WP.org plugin SVN repo).
+Please note you **cannot create point releases for previous stable releases once a more recent stable release has been published** as this would require significant changes to how we upload plugin versions to the WP.org plugin SVN repo). Always check the latest release version before you proceed.
 
 More more information please see [this Issue](https://github.com/WordPress/gutenberg/issues/33277#issuecomment-876289457).
 
