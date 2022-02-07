@@ -300,7 +300,13 @@ function Editor( { onError } ) {
 													) }
 												</>
 											}
-											footer={ <BlockBreadcrumb /> }
+											footer={
+												<BlockBreadcrumb
+													rootLabelText={ __(
+														'Template'
+													) }
+												/>
+											}
 											shortcuts={ {
 												previous: previousShortcut,
 												next: nextShortcut,
