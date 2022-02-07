@@ -81,7 +81,7 @@ function ToggleGroupControl(
 				'medium',
 				className
 			),
-		[ className, isBlock ]
+		[ className, cx, isBlock ]
 	);
 	return (
 		<BaseControl help={ help }>
