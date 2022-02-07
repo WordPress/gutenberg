@@ -425,7 +425,7 @@ export function getUnitsWithCurrentUnit(
 	const customUnit = unitsWithCurrentUnit.findIndex(
 		( unit ) => unit.value === CUSTOM_CSS_UNIT.value
 	);
-	if ( !! legacyUnit && customUnit ) {
+	if ( !! legacyUnit && customUnit > -1 ) {
 		unitsWithCurrentUnit.splice( customUnit );
 	}
 
