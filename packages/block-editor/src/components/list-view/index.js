@@ -6,7 +6,7 @@ import {
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import {
 	useCallback,
 	useEffect,
@@ -23,11 +23,11 @@ import { __ } from '@wordpress/i18n';
 import ListViewBranch from './branch';
 import { ListViewContext } from './context';
 import ListViewDropIndicator from './drop-indicator';
+import useBlockSelection from './use-block-selection';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import { store as blockEditorStore } from '../../store';
 
-const noop = () => {};
 const expanded = ( state, action ) => {
 	switch ( action.type ) {
 		case 'expand':
@@ -57,7 +57,6 @@ const expanded = ( state, action ) => {
 function ListView(
 	{
 		blocks,
-		onSelect = noop,
 		__experimentalFeatures,
 		__experimentalPersistentListViewFeatures,
 		__experimentalHideContainerBlockActions,
@@ -72,15 +71,6 @@ function ListView(
 		draggedClientIds,
 		selectedClientIds,
 	} = useListViewClientIds( blocks );
-	const { clearSelectedBlock, multiSelect, selectBlock } = useDispatch(
-		blockEditorStore
-	);
-	const {
-		getBlockParents,
-		getBlockSelectionStart,
-		hasMultiSelection,
-		hasSelectedBlock,
-	} = useSelect( blockEditorStore );
 
 	const { visibleBlockCount } = useSelect(
 		( select ) => {
@@ -97,70 +87,9 @@ function ListView(
 		},
 		[ draggedClientIds ]
 	);
-	const selectEditorBlock = useCallback(
-		async ( clientId, event ) => {
-			if ( ! event.shiftKey || event.type === 'keydown' ) {
-				// When this function is called from a 'keydown' event, select
-				// the block as if it were individually clicked. This allows
-				// the editor canvas to be responsible for the shift + up/down
-				// multiple block selection behaviour.
-				await clearSelectedBlock();
-				selectBlock( clientId, -1 );
-			} else if ( event.shiftKey ) {
-				// To handle multiple block selection via the `SHIFT` key, prevent
-				// the browser default behavior of opening the link in a new window.
-				event.preventDefault();
 
-				// Select a single block if no block is selected yet.
-				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
-					selectBlock( clientId, -1 );
-					return;
-				}
+	const { updateBlockSelection } = useBlockSelection();
 
-				const blockSelectionStart = getBlockSelectionStart();
-
-				// By checking `blockSelectionStart` to be set, we handle the
-				// case where we select a single block. We also have to check
-				// the selectionEnd (clientId) not to be included in the
-				// `blockSelectionStart`'s parents because the click event is
-				// propagated.
-				const startParents = getBlockParents( blockSelectionStart );
-
-				if (
-					blockSelectionStart &&
-					blockSelectionStart !== clientId &&
-					! startParents?.includes( clientId )
-				) {
-					const startPath = [ ...startParents, blockSelectionStart ];
-					const endPath = [
-						...getBlockParents( clientId ),
-						clientId,
-					];
-					const depth =
-						Math.min( startPath.length, endPath.length ) - 1;
-					const start = startPath[ depth ];
-					const end = endPath[ depth ];
-
-					// Handle the case of having selected a parent block and
-					// then shift+click on a child.
-					if ( start !== end ) {
-						multiSelect( start, end );
-					}
-				}
-			}
-			onSelect( clientId );
-		},
-		[
-			clearSelectedBlock,
-			getBlockParents,
-			getBlockSelectionStart,
-			hasMultiSelection,
-			hasSelectedBlock,
-			multiSelect,
-			selectBlock,
-			onSelect,
-		]
-	);
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
@@ -255,7 +184,7 @@ function ListView(
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
 						blocks={ clientIdsTree }
-						selectBlock={ selectEditorBlock }
+						selectBlock={ updateBlockSelection }
 						showNestedBlocks={ showNestedBlocks }
 						showBlockMovers={ showBlockMovers }
 						fixedListWindow={ fixedListWindow }
