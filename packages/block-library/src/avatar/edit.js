@@ -5,46 +5,42 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
+/**
+ * Internal dependencies
+ */
+import { getUserAvatar, getCommentAvatar } from './utils';
 
 export default function Edit( {
 	attributes,
-	context: { commentId },
+	context: { commentId, postId, postType },
 	setAttributes,
 	isSelected,
 } ) {
 	const { height, width } = attributes;
 
-	const [ avatars ] = useEntityProp(
-		'root',
-		'comment',
-		'author_avatar_urls',
-		commentId
-	);
+	const isComment = !! commentId;
 
-	const [ authorName ] = useEntityProp(
-		'root',
-		'comment',
-		'author_name',
-		commentId
-	);
-	const avatarUrls = avatars ? Object.values( avatars ) : null;
-	const sizes = avatars ? Object.keys( avatars ) : null;
-	const minSize = sizes ? sizes[ 0 ] : 24;
-	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
-	const maxSizeBuffer = Math.floor( maxSize * 2.5 );
-	const { avatarURL } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
+
+	let avatar = getUserAvatar( {
+		postId,
+		postType,
+		functionUseSelect: useSelect,
 	} );
+
+	if ( isComment ) {
+		avatar = getCommentAvatar( {
+			functionUseEntityProp: useEntityProp,
+			functionUseSelect: useSelect,
+			commentId,
+		} );
+	}
 
 	const inspectorControls = (
 		<InspectorControls>
@@ -57,8 +53,8 @@ export default function Edit( {
 							height: newWidth,
 						} )
 					}
-					min={ minSize }
-					max={ maxSizeBuffer }
+					min={ avatar.minSize }
+					max={ avatar.maxsize }
 					initialPosition={ width }
 					value={ width }
 				/>
@@ -86,16 +82,10 @@ export default function Edit( {
 				bottom: true,
 				left: isRTL(),
 			} }
-			minWidth={ minSize }
-			maxWidth={ maxSizeBuffer }
+			minWidth={ avatar.minSize }
+			maxWidth={ avatar.maxSize }
 		>
-			<img
-				src={
-					avatarUrls ? avatarUrls[ avatarUrls.length - 1 ] : avatarURL
-				}
-				alt={ `${ authorName } ${ __( 'Avatar' ) }` }
-				{ ...blockProps }
-			/>
+			<img src={ avatar.src } alt={ avatar.alt } { ...blockProps } />
 		</ResizableBox>
 	);
 
