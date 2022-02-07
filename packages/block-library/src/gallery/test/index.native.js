@@ -395,17 +395,15 @@ describe( 'Gallery block', () => {
 			otherMediaOptionsCallback( [
 				{
 					label: 'Free Photo Library',
-					value: 'wpios-stock-photo-library',
+					value: 'stock-photo-library',
 				},
-				{ label: 'Free GIF Library', value: 'wpios-tenor' },
-				{ label: 'Other Apps', value: 'wpios-other-files' },
 			] )
 		);
 
 		// Upload images from free photo library
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
 		fireEvent.press( getByText( 'Free Photo Library' ) );
-		expectMediaPickerCall( 'wpios-stock-photo-library', [ 'image' ], true );
+		expectMediaPickerCall( 'stock-photo-library', [ 'image' ], true );
 
 		// Return media items picked
 		await act( async () =>
@@ -550,19 +548,14 @@ describe( 'Gallery block', () => {
 		// Notify other media options
 		act( () =>
 			otherMediaOptionsCallback( [
-				{
-					label: 'Free Photo Library',
-					value: 'wpios-stock-photo-library',
-				},
-				{ label: 'Free GIF Library', value: 'wpios-tenor' },
-				{ label: 'Other Apps', value: 'wpios-other-files' },
+				{ label: 'Other Apps', value: 'other-files' },
 			] )
 		);
 
 		// Upload images from other apps
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
 		fireEvent.press( getByText( 'Other Apps' ) );
-		expectMediaPickerCall( 'wpios-other-files', [ 'image' ], true );
+		expectMediaPickerCall( 'other-files', [ 'image' ], true );
 
 		// Return media items picked
 		await mediaPickerCallback( otherAppsMedia[ 0 ], otherAppsMedia[ 1 ] );
