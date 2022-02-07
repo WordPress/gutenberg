@@ -203,7 +203,7 @@ describe( 'Cover', () => {
 
 		// Click the block wrapper before trying to convert to make sure figcaption toolbar is not obscuring
 		// the block toolbar.
-		await page.click( '.wp-block-image' );
+		await page.click( '.wp-block-image > div' );
 		await transformBlockTo( 'Cover' );
 
 		// Get the block's background dim color and its opacity
