@@ -124,12 +124,11 @@ jobs:
                   cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package.json) > package.json
                   cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package-lock.json) > package-lock.json
                   sed -i "s/${{ steps.get_version.outputs.old_version }}/${VERSION}/g" gutenberg.php
-                  sed -i "s/${{ steps.get_version.outputs.old_version }}/${VERSION}/g" readme.txt
 
             - name: Commit the version bump to the release branch
               id: commit_version_bump_to_release_branch
               run: |
-                  git add gutenberg.php package.json package-lock.json readme.txt
+                  git add gutenberg.php package.json package-lock.json
                   git commit -m "Bump plugin version to ${{ steps.get_version.outputs.new_version }}"
                   git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
                   echo "::set-output name=version_bump_commit::$(git rev-parse --verify --short HEAD)"
