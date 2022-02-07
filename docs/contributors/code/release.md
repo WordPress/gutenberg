@@ -132,7 +132,7 @@ If you decide that the fixes deserve another release candidate before the stable
 
 Occasionally it's necessary to create a point release (i.e. X.Y._Z_) of the Plugin. This is most commonly to push fixes for regressions and/or bugs.
 
-As you proceed with the following process, it's worth bearing in mind that such point releases are not created as branches in their own right (e.g. [`release/12.5.0`](https://github.com/WordPress/gutenberg/tree/release/12.5)) but are simply [tags](https://github.com/WordPress/gutenberg/releases/tag/v12.5.1).
+As you proceed with the following process, it's worth bearing in mind that such point releases are not created as branches in their own right (e.g. `release/12.5.0`) but are simply [tags](https://github.com/WordPress/gutenberg/releases/tag/v12.5.1).
 
 The method for point releases is nearly identical to the main Plugin release process (see above) but has some notable exceptions. Please make sure to read _the whole_ of this guide before proceeding.
 
