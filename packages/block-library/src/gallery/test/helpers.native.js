@@ -80,24 +80,37 @@ export const triggerGalleryLayout = async (
 	);
 
 /**
+ * Initialize the editor with HTML generated of Gallery block.
  *
- * @param {string}  initialHtml        String of block editor HTML to parse and render.
- * @param {Object}  [options]          Configuration options for the initialization.
- * @param {boolean} [options.hasItems] Specifies if the Gallery block included in the initial HTML has items. This is used to assure that gallery items are rendered.
- * @param {number}  [options.width]    Width to be passed when triggering the "onLayout" event on the Gallery block.
- * @param {boolean} [options.selected] Specifies if the Gallery block included in the initial HTML should be automatically selected.
+ * @param {Object}  [options]               Configuration options for the initialization.
+ * @param {string}  [options.html]          String of block editor HTML to parse and render.
+ * @param {number}  [options.numberOfItems] Number of gallery items to generate or already included in the provided block editor HTML.
+ * @param {Object}  [options.media]         Contains media data to be used in the generation.
+ * @param {number}  [options.width]         Width to be passed when triggering the "onLayout" event on the Gallery block.
+ * @param {boolean} [options.selected]      Specifies if the Gallery block included in the initial HTML should be automatically selected.
+ * @param {boolean} [options.useLocalUrl]   Specifies if the items should use the local URL instead of the server URL.
+ *
  * @return {import('@testing-library/react-native').RenderAPI} The Testing Library screen plus the Gallery block React Test instance.
  */
-export const initializeWithGalleryBlock = async (
-	initialHtml,
-	{ hasItems = true, width = 320, selected = true } = {}
-) => {
+export const initializeWithGalleryBlock = async ( {
+	html,
+	numberOfItems = 0,
+	media = [],
+	width = 320,
+	selected = true,
+	useLocalUrl = false,
+} = {} ) => {
+	const initialHtml =
+		html ||
+		generateGalleryBlock( numberOfItems, media, {
+			useLocalUrl,
+		} );
 	const screen = await initializeEditor( { initialHtml } );
 	const { getByA11yLabel } = screen;
 
 	const galleryBlock = getByA11yLabel( /Gallery Block\. Row 1/ );
 
-	if ( hasItems ) {
+	if ( numberOfItems > 0 ) {
 		await triggerGalleryLayout( galleryBlock, { width } );
 	}
 

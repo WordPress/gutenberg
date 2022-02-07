@@ -36,7 +36,7 @@ import {
 	openBlockSettings,
 } from './helpers';
 
-const MEDIA = [
+const media = [
 	{
 		localId: 1,
 		localUrl: 'file:///local-image-1.jpeg',
@@ -78,12 +78,11 @@ describe( 'Gallery block', () => {
 	} );
 
 	it( 'selects a gallery item', async () => {
-		const { galleryBlock } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 1, MEDIA ),
-			{
-				selected: false,
-			}
-		);
+		const { galleryBlock } = await initializeWithGalleryBlock( {
+			numberOfItems: 1,
+			media,
+			selected: false,
+		} );
 
 		const galleryItem = getGalleryItem( galleryBlock, 1 );
 		fireEvent.press( galleryItem );
@@ -92,9 +91,10 @@ describe( 'Gallery block', () => {
 	} );
 
 	it( 'shows appender button when gallery has images', async () => {
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 1, MEDIA )
-		);
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock( {
+			numberOfItems: 1,
+			media,
+		} );
 
 		const appenderButton = within( galleryBlock ).getByA11yLabel(
 			/Gallery block\. Empty/
@@ -144,13 +144,15 @@ describe( 'Gallery block', () => {
 		const { notifyUploadingState, notifySucceedState } = setupMediaUpload();
 
 		// Initialize with a gallery that contains two items that are being uploaded
-		const { galleryBlock } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 2, MEDIA, { useLocalUrl: true } )
-		);
+		const { galleryBlock } = await initializeWithGalleryBlock( {
+			numberOfItems: 2,
+			media,
+			useLocalUrl: true,
+		} );
 
 		// Notify that the media items are uploading
-		await notifyUploadingState( MEDIA[ 0 ] );
-		await notifyUploadingState( MEDIA[ 1 ] );
+		await notifyUploadingState( media[ 0 ] );
+		await notifyUploadingState( media[ 1 ] );
 
 		// Check that images are showing a loading state
 		expect(
@@ -161,8 +163,8 @@ describe( 'Gallery block', () => {
 		).toBeVisible();
 
 		// Notify that the media items upload succeeded
-		await notifySucceedState( MEDIA[ 0 ] );
-		await notifySucceedState( MEDIA[ 1 ] );
+		await notifySucceedState( media[ 0 ] );
+		await notifySucceedState( media[ 1 ] );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -171,9 +173,10 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc003
 	it( 'sets caption to gallery', async () => {
 		// Initialize with a gallery that contains one item
-		const { getByA11yLabel } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 1, MEDIA )
-		);
+		const { getByA11yLabel } = await initializeWithGalleryBlock( {
+			numberOfItems: 1,
+			media,
+		} );
 
 		// Check gallery item caption is not visible
 		const galleryItemCaption = getByA11yLabel( /Image caption. Empty/ );
@@ -195,9 +198,10 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc004
 	it( 'sets caption to gallery items', async () => {
 		// Initialize with a gallery that contains one item
-		const { galleryBlock } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 1, MEDIA )
-		);
+		const { galleryBlock } = await initializeWithGalleryBlock( {
+			numberOfItems: 1,
+			media,
+		} );
 
 		// Select gallery item
 		const galleryItem = getGalleryItem( galleryBlock, 1 );
@@ -225,12 +229,7 @@ describe( 'Gallery block', () => {
 		} = setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 0 ),
-			{
-				hasItems: false,
-			}
-		);
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
@@ -238,7 +237,7 @@ describe( 'Gallery block', () => {
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
 		// Return media items picked
-		await mediaPickerCallback( MEDIA[ 0 ], MEDIA[ 1 ] );
+		await mediaPickerCallback( media[ 0 ], media[ 1 ] );
 
 		// Check that gallery items are visible
 		await triggerGalleryLayout( galleryBlock );
@@ -248,14 +247,14 @@ describe( 'Gallery block', () => {
 		expect( galleryItem2 ).toBeVisible();
 
 		// Check that images are showing a loading state
-		await notifyUploadingState( MEDIA[ 0 ] );
-		await notifyUploadingState( MEDIA[ 1 ] );
+		await notifyUploadingState( media[ 0 ] );
+		await notifyUploadingState( media[ 1 ] );
 		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
 		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
 
 		// Notify that the media items upload succeeded
-		await notifySucceedState( MEDIA[ 0 ] );
-		await notifySucceedState( MEDIA[ 1 ] );
+		await notifySucceedState( media[ 0 ] );
+		await notifySucceedState( media[ 1 ] );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -270,12 +269,7 @@ describe( 'Gallery block', () => {
 		} = setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 0 ),
-			{
-				hasItems: false,
-			}
-		);
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 		fireEvent.press( galleryBlock );
 
 		// Upload images from device
@@ -284,7 +278,7 @@ describe( 'Gallery block', () => {
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
 		// Return media items picked
-		await mediaPickerCallback( MEDIA[ 0 ], MEDIA[ 1 ] );
+		await mediaPickerCallback( media[ 0 ], media[ 1 ] );
 
 		// Check that gallery items are visible
 		await triggerGalleryLayout( galleryBlock );
@@ -294,14 +288,14 @@ describe( 'Gallery block', () => {
 		expect( galleryItem2 ).toBeVisible();
 
 		// Check that images are showing a loading state
-		await notifyUploadingState( MEDIA[ 0 ] );
-		await notifyUploadingState( MEDIA[ 1 ] );
+		await notifyUploadingState( media[ 0 ] );
+		await notifyUploadingState( media[ 1 ] );
 		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
 		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
 
 		// Notify that the media items uploads failed
-		await notifyFailedState( MEDIA[ 0 ] );
-		await notifyFailedState( MEDIA[ 1 ] );
+		await notifyFailedState( media[ 0 ] );
+		await notifyFailedState( media[ 1 ] );
 
 		// Check that failed images provide the option to retry the upload
 		fireEvent.press( galleryItem1 );
@@ -309,14 +303,14 @@ describe( 'Gallery block', () => {
 			within( galleryItem1 ).getByText( /Failed to insert media/ )
 		);
 		expect( requestImageFailedRetryDialog ).toHaveBeenCalledWith(
-			MEDIA[ 0 ].localId
+			media[ 0 ].localId
 		);
 		fireEvent.press( galleryItem2 );
 		fireEvent.press(
 			within( galleryItem2 ).getByText( /Failed to insert media/ )
 		);
 		expect( requestImageFailedRetryDialog ).toHaveBeenCalledWith(
-			MEDIA[ 1 ].localId
+			media[ 1 ].localId
 		);
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -332,12 +326,7 @@ describe( 'Gallery block', () => {
 		} = setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 0 ),
-			{
-				hasItems: false,
-			}
-		);
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Take a photo
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
@@ -345,7 +334,7 @@ describe( 'Gallery block', () => {
 		expectMediaPickerCall( 'DEVICE_CAMERA', [ 'image' ], true );
 
 		// Return media item from photo taken
-		await mediaPickerCallback( MEDIA[ 0 ] );
+		await mediaPickerCallback( media[ 0 ] );
 
 		// Check gallery item is visible
 		await triggerGalleryLayout( galleryBlock );
@@ -353,11 +342,11 @@ describe( 'Gallery block', () => {
 		expect( galleryItem ).toBeVisible();
 
 		// Check image is showing a loading state
-		await notifyUploadingState( MEDIA[ 0 ] );
+		await notifyUploadingState( media[ 0 ] );
 		expect( within( galleryItem ).getByTestId( 'spinner' ) ).toBeVisible();
 
 		// Notify that the media item upload succeeded
-		await notifySucceedState( MEDIA[ 0 ] );
+		await notifySucceedState( media[ 0 ] );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -365,7 +354,7 @@ describe( 'Gallery block', () => {
 	// Test case related to TC008 - Choose from the free photo library
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc008
 	it( 'uploads from free photo library', async () => {
-		const freePhotoMedia = [ ...MEDIA ].map( ( item, index ) => ( {
+		const freePhotoMedia = [ ...media ].map( ( item, index ) => ( {
 			...item,
 			localUrl: `https://images.pexels.com/photos/110854/pexels-photo-${
 				index + 1
@@ -383,12 +372,7 @@ describe( 'Gallery block', () => {
 		} );
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 0 ),
-			{
-				hasItems: false,
-			}
-		);
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Notify other media options
 		act( () =>
@@ -440,12 +424,7 @@ describe( 'Gallery block', () => {
 		} = setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 0 ),
-			{
-				hasItems: false,
-			}
-		);
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
@@ -453,7 +432,7 @@ describe( 'Gallery block', () => {
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
 		// Return media items picked
-		await mediaPickerCallback( MEDIA[ 0 ], MEDIA[ 1 ] );
+		await mediaPickerCallback( media[ 0 ], media[ 1 ] );
 
 		// Check that gallery items are visible
 		await triggerGalleryLayout( galleryBlock );
@@ -463,8 +442,8 @@ describe( 'Gallery block', () => {
 		expect( galleryItem2 ).toBeVisible();
 
 		// Check that images are showing a loading state
-		await notifyUploadingState( MEDIA[ 0 ] );
-		await notifyUploadingState( MEDIA[ 1 ] );
+		await notifyUploadingState( media[ 0 ] );
+		await notifyUploadingState( media[ 1 ] );
 		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
 		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
 
@@ -472,16 +451,16 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem1 );
 		fireEvent.press( within( galleryItem1 ).getByTestId( 'spinner' ) );
 		expect( requestImageUploadCancelDialog ).toHaveBeenCalledWith(
-			MEDIA[ 0 ].localId
+			media[ 0 ].localId
 		);
-		await notifyResetState( MEDIA[ 0 ] );
+		await notifyResetState( media[ 0 ] );
 
 		fireEvent.press( galleryItem2 );
 		fireEvent.press( within( galleryItem2 ).getByTestId( 'spinner' ) );
 		expect( requestImageUploadCancelDialog ).toHaveBeenCalledWith(
-			MEDIA[ 1 ].localId
+			media[ 1 ].localId
 		);
-		await notifyResetState( MEDIA[ 1 ] );
+		await notifyResetState( media[ 1 ] );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -490,9 +469,10 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc010
 	it( 'rearranges gallery items', async () => {
 		// Initialize with a gallery that contains three items
-		const { galleryBlock } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 3, MEDIA )
-		);
+		const { galleryBlock } = await initializeWithGalleryBlock( {
+			numberOfItems: 3,
+			media,
+		} );
 
 		// Rearrange items (final disposition will be: Image 3 - Image 1 - Image 2)
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
@@ -522,7 +502,7 @@ describe( 'Gallery block', () => {
 	// Test case related to TC011 - Choose from Other Apps (iOS Files App
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc011
 	it( 'uploads from other apps', async () => {
-		const otherAppsMedia = [ ...MEDIA ].map( ( item, index ) => ( {
+		const otherAppsMedia = [ ...media ].map( ( item, index ) => ( {
 			...item,
 			localUrl: `file:///IMG_${ index + 1 }.JPG`,
 		} ) );
@@ -538,12 +518,7 @@ describe( 'Gallery block', () => {
 		} );
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
-			generateGalleryBlock( 0 ),
-			{
-				hasItems: false,
-			}
-		);
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Notify other media options
 		act( () =>
@@ -584,15 +559,18 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc012
 	it( 'overrides "Link to" setting of gallery items', async () => {
 		// Initialize with a gallery that contains two items, the latter includes "linkDestination" attribute
-		const screen = await initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
-		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ MEDIA[ 0 ].localId }} -->
-		<figure class="wp-block-image"><img src="${ MEDIA[ 0 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 0 ].localId }"/></figure>
+		const screen = await initializeWithGalleryBlock( {
+			html: `<!-- wp:gallery {"linkTo":"none"} -->
+		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ media[ 0 ].localId }} -->
+		<figure class="wp-block-image"><img src="${ media[ 0 ].localUrl }" alt="" class="wp-image-${ media[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
 		
-		<!-- wp:image {"id":${ MEDIA[ 1 ].localId },"linkDestination":"attachment"} -->
-		<figure class="wp-block-image"><img src="${ MEDIA[ 1 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 1 ].localId }"/></figure>
+		<!-- wp:image {"id":${ media[ 1 ].localId },"linkDestination":"attachment"} -->
+		<figure class="wp-block-image"><img src="${ media[ 1 ].localUrl }" alt="" class="wp-image-${ media[ 1 ].localId }"/></figure>
 		<!-- /wp:image --></figure>
-		<!-- /wp:gallery -->` );
+		<!-- /wp:gallery -->`,
+			numberOfItems: 2,
+		} );
 		const { galleryBlock, getByText } = screen;
 		fireEvent.press( galleryBlock );
 
@@ -609,9 +587,10 @@ describe( 'Gallery block', () => {
 	describe( 'Columns setting', () => {
 		it( 'does not increment due to maximum value', async () => {
 			// Initialize with a gallery that contains three items
-			const screen = await initializeWithGalleryBlock(
-				generateGalleryBlock( 3, MEDIA )
-			);
+			const screen = await initializeWithGalleryBlock( {
+				numberOfItems: 3,
+				media,
+			} );
 			const { galleryBlock, getByA11yLabel } = screen;
 			fireEvent.press( galleryBlock );
 
@@ -631,9 +610,10 @@ describe( 'Gallery block', () => {
 
 		it( 'decrements columns', async () => {
 			// Initialize with a gallery that contains three items
-			const screen = await initializeWithGalleryBlock(
-				generateGalleryBlock( 3, MEDIA )
-			);
+			const screen = await initializeWithGalleryBlock( {
+				numberOfItems: 3,
+				media,
+			} );
 			const { galleryBlock, getByA11yLabel } = screen;
 			fireEvent.press( galleryBlock );
 
@@ -655,9 +635,10 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc014
 	it( 'disables crop images setting', async () => {
 		// Initialize with a gallery that contains one item
-		const screen = await initializeWithGalleryBlock(
-			generateGalleryBlock( 1, MEDIA )
-		);
+		const screen = await initializeWithGalleryBlock( {
+			numberOfItems: 1,
+			media,
+		} );
 		const { galleryBlock, getByText } = screen;
 		fireEvent.press( galleryBlock );
 
