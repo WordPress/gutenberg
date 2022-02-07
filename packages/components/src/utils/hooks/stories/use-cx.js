@@ -32,6 +32,7 @@ const Example = ( { args, children } ) => {
 const ExampleWithUseMemoWrong = ( { args, children } ) => {
 	const cx = useCx();
 	// Wrong: using 'useMemo' without adding 'cx' to the dependency list.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const classes = useMemo( () => cx( ...args ), [ ...args ] );
 	return <span className={ classes }>{ children }</span>;
 };
