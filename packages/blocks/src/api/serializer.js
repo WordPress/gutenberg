@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
+import { isEmpty, reduce, isObject, castArray, startsWith, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,12 +24,17 @@ import {
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
 } from './registration';
-import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
+import {
+	isUnmodifiedDefaultBlock,
+	normalizeBlockType,
+	__experimentalGetBlockAttributesNamesByRole,
+} from './utils';
 
 /**
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
  *
  * @property {boolean} isInnerBlocks Whether we are serializing inner blocks.
+ * @property {boolean} retainCopyAttributes Whether to retain attributes that do not have copy support in the serialized block.
  */
 
 /**
@@ -342,7 +347,10 @@ export function getCommentDelimitedContent(
  *
  * @return {string} Serialized block.
  */
-export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
+export function serializeBlock(
+	block,
+	{ isInnerBlocks = false, retainCopyAttributes = true } = {}
+) {
 	const blockName = block.name;
 	const saveContent = getBlockInnerHTML( block );
 
@@ -354,7 +362,14 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	}
 
 	const blockType = getBlockType( blockName );
-	const saveAttributes = getCommentAttributes( blockType, block.attributes );
+	let saveAttributes = getCommentAttributes( blockType, block.attributes );
+
+	if ( ! retainCopyAttributes ) {
+		saveAttributes = omit(
+			saveAttributes,
+			__experimentalGetBlockAttributesNamesByRole( blockName, 'internal' )
+		);
+	}
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 

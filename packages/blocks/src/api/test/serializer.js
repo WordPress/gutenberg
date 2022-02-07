@@ -327,6 +327,10 @@ describe( 'block serializer', () => {
 					stuff: {
 						type: 'string',
 					},
+					internal: {
+						type: 'string',
+						__experimentalRole: 'internal',
+					},
 				},
 				save( { attributes } ) {
 					if ( attributes.throw ) {
@@ -376,6 +380,30 @@ describe( 'block serializer', () => {
 
 			expect( serialize( block ) ).toEqual(
 				'<!-- wp:test-block {"throw":true} -->\nCorrect\n<!-- /wp:test-block -->'
+			);
+		} );
+
+		it( 'should serialize internal attributes by default', () => {
+			const block = createBlock( 'core/test-block', {
+				content: 'content',
+				internal: 'copy me',
+			} );
+
+			expect( serialize( block ) ).toEqual(
+				'<!-- wp:test-block {"internal":"copy me"} -->\n<p>content</p>\n<!-- /wp:test-block -->'
+			);
+		} );
+
+		it( 'should omit internal attributes when retainCopyAttributes is fasle', () => {
+			const block = createBlock( 'core/test-block', {
+				content: 'content',
+				internal: 'copy me',
+			} );
+
+			expect(
+				serialize( block, { retainCopyAttributes: false } )
+			).toEqual(
+				'<!-- wp:test-block -->\n<p>content</p>\n<!-- /wp:test-block -->'
 			);
 		} );
 	} );

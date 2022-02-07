@@ -5,7 +5,6 @@ import { useCallback } from '@wordpress/element';
 import {
 	serialize,
 	pasteHandler,
-	cloneBlock,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
@@ -122,15 +121,10 @@ export function useClipboardHandler() {
 					flashBlock( selectedBlockClientIds[ 0 ] );
 				}
 				notifyCopy( event.type, selectedBlockClientIds );
-				let blocks = getBlocksByClientId( selectedBlockClientIds );
-				if ( event.type === 'copy' ) {
-					blocks = blocks.map( ( block ) =>
-						cloneBlock( block, {}, null, {
-							retainInternalAttributes: false,
-						} )
-					);
-				}
-				const serialized = serialize( blocks );
+				const blocks = getBlocksByClientId( selectedBlockClientIds );
+				const serialized = serialize( blocks, {
+					retainCopyAttributes: false,
+				} );
 
 				event.clipboardData.setData( 'text/plain', serialized );
 				event.clipboardData.setData( 'text/html', serialized );
