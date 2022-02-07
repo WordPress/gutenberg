@@ -26,7 +26,7 @@ function GenericNavigationButton( { icon, children, ...props } ) {
 }
 
 function NavigationButton( { path, ...props } ) {
-	const { push } = useNavigator();
+	const { goTo } = useNavigator();
 
 	const dataAttrName = 'data-navigator-focusable-id';
 	const dataAttrValue = path;
@@ -41,7 +41,7 @@ function NavigationButton( { path, ...props } ) {
 	return (
 		<GenericNavigationButton
 			onClick={ () =>
-				push( path, { focusTargetSelector: dataAttrCssSelector } )
+				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
 			}
 			{ ...buttonProps }
 		/>
@@ -49,8 +49,8 @@ function NavigationButton( { path, ...props } ) {
 }
 
 function NavigationBackButton( { ...props } ) {
-	const { pop } = useNavigator();
-	return <GenericNavigationButton onClick={ pop } { ...props } />;
+	const { goBack } = useNavigator();
+	return <GenericNavigationButton onClick={ goBack } { ...props } />;
 }
 
 export { NavigationButton, NavigationBackButton };
