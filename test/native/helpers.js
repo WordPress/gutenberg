@@ -37,9 +37,9 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 /**
  * Executes a function that triggers store resolvers.
  *
- * Asynchronous store resolvers rely upon `setTimeout` to run at the end of the
- * current JavaScript block execution In order to prevent "act" warnings triggered
- * by updates to the React tree, we leverage fake timers to manually tick and
+ * Asynchronous store resolvers leverage `setTimeout` to run at the end of
+ * the current JavaScript block execution. In order to prevent "act" warnings
+ * triggered by updates to the React tree, we manually tick fake timers and
  * await the resolution of the current block execution before proceeding.
  *
  * @param {Function} fn Function that triggers store resolvers.
@@ -52,10 +52,6 @@ export function executeStoreResolvers( fn ) {
 	const originalRAF = global.requestAnimationFrame;
 	const originalCAF = global.cancelAnimationFrame;
 
-	// Asynchronous store resolvers leverage `setTimeout` to run at the end of
-	// the current JavaScript block execution. In order to prevent "act" warnings
-	// triggered by updates to the React tree, we manually tick fake timers and
-	// await the resolution of the current block execution before proceeding.
 	jest.useFakeTimers( 'legacy' );
 
 	const result = fn();
