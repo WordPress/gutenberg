@@ -162,7 +162,7 @@ export function VanillaReactForm({ initialTitle }) {
 }
 ```
 
-Working with entity records in Gutenberg data is similar. The counterpart of `setTitle` is a `editEntityRecord` Redux action. It takes the entity kind, name, id, and changes, and stores them in a Redux state for later. Here's how you can try out in your browser's dev tools:
+Working with entity records in Gutenberg data is similar. The counterpart of `setTitle` is a `editEntityRecord` action. It takes the entity kind, name, id, and changes, and stores them in a state for later. Here's how you can try out in your browser's dev tools:
 
 ```js
 // Replace 9 with an actual page ID
@@ -199,7 +199,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 		[ pageId ]
 	);
 	const { editEntityRecord } = useDispatch( coreDataStore );
-	const handleChange = ( title ) => editEntityRecord( 'postType', 'page', page.id, { title } );
+	const handleChange = ( title ) => editEntityRecord( 'postType', 'page', pageId, { title } );
 
 	return (
 		<div className="my-gutenberg-form">
@@ -237,12 +237,30 @@ Third, other components have access to the changes. For example, we could make t
 
 ### Saving the updated title
 
-`saveEditedEntityRecord` action
+The form can now be interacted with, but it still cannot be saved. In Gutenberg data, we save changes using the `saveEditedEntityRecord` action. It sends the updates to the WordPress REST API, processes the result, and updates the cached data in the Redux state. The return is a promise resolved once the save operation is finished.
+
+Here's an example you may try in your browser's devtools:
+
+```js
+// Replace 9 with an actual page ID
+wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'page', 9, { title: 'updated title' } );
+wp.data.dispatch( 'core' ).saveEditedEntityRecord( 'postType', 'page', 9 );
+```
+
+The above snippet saved a new title. Unlike before, the updated title is now returned by `getEntityRecord`:
+
+```js
+// Replace 9 with an actual page ID
+wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', 9 ).title
+// "updated title"
+```
+
+This is how the `EditPageForm` looks like with a working *Save* button:
 
 ```js
 export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	// ...
-	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( coreDataStore );
+	const { saveEditedEntityRecord } = useDispatch( coreDataStore );
 	const handleSave = async () => {
 		await saveEditedEntityRecord( 'postType', 'page', pageId );
 		onSaveFinished();
@@ -263,16 +281,36 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 ```
 
 ### Handle errors
+
+We optimistically assumed that a *save* operation will always succeed. Unfortunately, it may fail in many ways: the website can be down, the update may be invalid, or the page could have been deleted by someone else in the meantime. Let's tell the user about anything that goes wrong.
+
+We have to make two adjustments. Firstly, we don't want to close the form modal when the update fails. The promise returned by `saveEditedEntityRecord` is resolved with an updated record only if the update actually worked. When something goes wrong, it resolves with an empty value. Let's use it to keep the modal open:
+
 ```js
 export function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
 	const handleSave = async () => {
-        const savedRecord = await saveEditedEntityRecord('postType', 'page', pageId);
-        if ( savedRecord ) {
-            onSaveFinished();
-        }
-    };
+		const updatedRecord = await saveEditedEntityRecord('postType', 'page', pageId);
+		if ( updatedRecord ) {
+			onSaveFinished();
+		}
+	};
+	// ...
+}
+```
 
+Great! Now, let's display an error message. The failure details can be grabbed using the `getLastEntitySaveError` selector:
+
+```js
+// Replace 9 with an actual page ID
+wp.data.select( 'core' ).getLastEntitySaveError( 'postType', 'page', 9 )
+```
+
+Here's how we can use it in `EditPageForm`:
+
+```js
+export function EditPageForm( { pageId, onSaveFinished } ) {
+	// ...
     const { lastError, page } = useSelect(
         select => ({
 			page: select(coreDataStore).getEditedEntityRecord('postType', 'page', pageId),
@@ -295,11 +333,35 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 }
 ```
 
+Great! `EditPageForm` is now fully aware of errors.
+
+Let's see that error message in action. We'll trigger an invalid update and let it fail. Post title is hard to break, so let's set a `date` property to `-1` instead – that's a guaranteed validation error:
+
+```js
+export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+	// ...
+	const handleChange = ( title ) => editEntityRecord( 'postType', 'page', pageId, { title, date: -1 } );
+	// ...
+}
+```
+
+Once you refresh the page, open the form, change the title, and hit save you should see the following error message:
+
+Fantastic! We can now restore the previous version of `handleChange` and move on to the next step.
+
 ### Status indicator
+
+There are two more problems with our form: We can click *Save* even when there are no changes, and when we do we can’t be quite sure whether it’s doing anything.
+
+
+We can clear it up by communicating _Loading_ and _No changes detected_ through a stateful *Save* button.
+
+First, `EditPageForm` has to be aware of the current status:
+
 ```js
 export function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
-	const { isSaving, /* ... */ } = useSelect(
+	const { isSaving, hasEdits } = useSelect(
 		select => ({
 			isSaving: select(coreDataStore).isSavingEntityRecord('postType', 'page', pageId),
 			hasEdits: select(coreDataStore).hasEditsForEntityRecord('postType', 'page', pageId),
@@ -307,21 +369,14 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 		}),
 		[ pageId ]
 	)
-	// ...
-	return (
-		<div className="my-gutenberg-form">
-			{/* ... */}
-			<div className="form-buttons">
-				<Button onClick={ handleSave } variant="primary" disabled={ isSaving || ! hasEditshasEdits }>
-					{isSaving ? <Spinner/> : 'Save'}
-				</Button>
-				{/* ... */}
-			</div>
-		</div>
-	);
 }
-
 ```
+
+
+The `isSavingEntityRecord` and `hasEditsForEntityRecord` selectors... @TODO
+
+
+
 ### Wiring it all together
 
 ```js
