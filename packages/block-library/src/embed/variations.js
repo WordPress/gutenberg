@@ -182,7 +182,7 @@ const variations = [
 	},
 	{
 		name: 'imgur',
-		title: 'Imgur',
+		title: 'Embed Imgur',
 		icon: embedPhotoIcon,
 		description: __( 'Embed Imgur content.' ),
 		patterns: [ /^https?:\/\/(.+\.)?imgur\.com\/.+/i ],
