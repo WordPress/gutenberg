@@ -4,7 +4,8 @@
 
 ### New Features
 
--    Automatically add a `"env": "wp-env"` entry to scripts when the `--wp-env` is passed or when a template sets `wpEnv` to `true`.
+-    Automatically add a `"env": "wp-env"` entry to scripts when the `--wp-env` is passed or when a template sets `wpEnv` to `true` ([#38530](https://github.com/WordPress/gutenberg/pull/38530)).
+-    Introduce the `customScripts` property to allow templates to define additional scripts ([#38535](https://github.com/WordPress/gutenberg/pull/38535)).
 
 ## 2.8.0 (2022-01-27)
 

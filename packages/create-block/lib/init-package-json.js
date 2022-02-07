@@ -21,6 +21,7 @@ module.exports = async ( {
 	wpEnv,
 	wpScripts,
 	npmDependencies,
+	customScripts,
 } ) => {
 	const cwd = join( process.cwd(), slug );
 
@@ -48,6 +49,7 @@ module.exports = async ( {
 						start: 'wp-scripts start',
 					} ),
 					...( wpEnv && { env: 'wp-env' } ),
+					...customScripts,
 				},
 			},
 			isEmpty
