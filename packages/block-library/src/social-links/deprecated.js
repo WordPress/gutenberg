@@ -83,7 +83,22 @@ const deprecated = [
 			anchor: true,
 			__experimentalExposeControlsToChildren: true,
 		},
-		isEligible: ( { layout } ) => ! layout,
+		isEligible: ( { className, layout } ) => {
+			const hasLayout = !! layout;
+			if ( hasLayout ) {
+				return false;
+			}
+			// Matches classes with `items-justified-` prefix.
+			const prefix = `items-justified-`;
+			const justifiedItemsRegex = new RegExp(
+				`\\b${ prefix }[^ ]*[ ]?\\b`,
+				'g'
+			);
+			const justifyContent = className
+				?.match( justifiedItemsRegex )?.[ 0 ]
+				?.trim();
+			return !! justifyContent;
+		},
 		migrate: migrateWithLayout,
 		save( props ) {
 			const {
