@@ -45,20 +45,30 @@ export const addGalleryBlock = async () => {
 	return screen;
 };
 
-export const triggerGalleryLayout = (
-	galleryBlock,
-	{ deviceWidth = 320 } = {}
-) =>
-	fireEvent(
-		within( galleryBlock ).getByTestId( 'block-list-wrapper' ),
-		'layout',
-		{
-			nativeEvent: {
-				layout: {
-					width: deviceWidth,
+/**
+ * The gallery items are rendered via the FlatList of the inner block list.
+ * In order to render the items of a FlatList, it's required to trigger the
+ * "onLayout" event. Additionally, the call is wrapped over "executeStoreResolvers"
+ * because the gallery items request the media data associated with the image to
+ * be rendered via the "getMedia" selector.
+ *
+ * @param {import('react-test-renderer').ReactTestInstance} galleryBlock    Gallery block instance to trigger layout event.
+ * @param {Object}                                          [options]       Configuration options for the event.
+ * @param {number}                                          [options.width] Width value to be passed to the event.
+ */
+export const triggerGalleryLayout = ( galleryBlock, { width = 320 } = {} ) =>
+	executeStoreResolvers( () =>
+		fireEvent(
+			within( galleryBlock ).getByTestId( 'block-list-wrapper' ),
+			'layout',
+			{
+				nativeEvent: {
+					layout: {
+						width,
+					},
 				},
-			},
-		}
+			}
+		)
 	);
 
 export const initializeWithGalleryBlock = (
@@ -71,9 +81,7 @@ export const initializeWithGalleryBlock = (
 	const galleryBlock = getByA11yLabel( /Gallery Block\. Row 1/ );
 
 	if ( hasItems ) {
-		executeStoreResolvers( () =>
-			triggerGalleryLayout( galleryBlock, { deviceWidth } )
-		);
+		triggerGalleryLayout( galleryBlock, { deviceWidth } );
 	}
 
 	if ( selected ) {
