@@ -31,8 +31,9 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
 		</div>
 	) : (
-		<div { ...blockProps }
-			dangerouslySetInnerHTML={{ __html: content?.rendered }}
+		<div
+			{ ...blockProps }
+			dangerouslySetInnerHTML={ { __html: content?.rendered } }
 		></div>
 	);
 }
