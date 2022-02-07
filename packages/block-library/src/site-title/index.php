@@ -36,7 +36,7 @@ function render_block_core_site_title( $attributes ) {
 		if ( '_blank' === $attributes['linkTarget'] ) {
 			$link_attrs[] = 'target="_blank"';
 		}
-		$site_title = sprintf( '<a %1$s>%2$s</a>', implode( ' ', $link_attrs ), esc_html( $site_title ) );
+		$site_title = sprintf( '<a %1$s>%2$s</a>', implode( ' ', $link_attrs ), $site_title );
 	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
