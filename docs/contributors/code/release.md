@@ -130,13 +130,31 @@ If you decide that the fixes deserve another release candidate before the stable
 
 ### Creating Point Releases
 
-Occasionally it's necessary to create a point release (i.e. X.Y._Z_) of the Plugin.
+Occasionally it's necessary to create a point release (i.e. X.Y._Z_) of the Plugin. This is most commonly to push fixes for regressions and/or bugs.
 
-The method for doing this is nearly identical to the main Plugin release process (see above). In the `Run workflow` control specify `stable` and, _if_ the previous version was stable (`x.y.z`), the workflow will release a point release, with z incremented (`x.y.(z+1)`) as necessary.
+As you proceed with the following process, it's worth bearing in mind that such point releases are not created as branches in their own right (e.g. [`release/12.5.0`](https://github.com/WordPress/gutenberg/tree/release/12.5)) but are simply [tags](https://github.com/WordPress/gutenberg/releases/tag/v12.5.1).
 
-**Please note** however, that if the previous release was an _RC_ (e.g. `x.y.0-rc.1`), the workflow will try to release the next major _stable_ version. Therefore, should you wish to release a point release for a stable version of the Plugin (e.g. `10.1.0`) but there is an _RC already published_ for the _next_ version of the Plugin (e.g. `10.2.0-rc.1`) you will need to manually select the stable version's release branch when creating the release.
+The method for point releases is nearly identical to the main Plugin release process (see above) but has some notable exceptions. Please be sure to read _the whole_ of this guide before proceeding.
 
-To do this, when running the Workflow, select the appropriate `release/` branch from the `Use workflow from` dropdown (e.g. `release/10.1`) and specify `stable` in the text input field.
+#### Updating the release branch
+
+The point release should only contain the _specific commits_ required. To do this you should checkout the previous _minor_ stable (i.e. non-RC) release (e.g. `release/12.5.0`) locally and then cherry pick any commits (from `trunk`) that you require to be included in the branch.
+
+If there are previous point releases (e.g. `12.5.1` .etc) these can be safely ignored as commits from those releases will have already been picked into the stable release branch as part of the previous point release process.
+
+Once you have the stable release branch in order you can _push it to Github_ and continue with the release process using the Github website GUI.
+
+#### Running the point release
+
+![Run workflow dropdown](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/workflow-dispatch-banner.png)
+
+Go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). You should now choose the next action based on information about the current Plugin releases:
+
+_If_ the previous release version was **stable** (`X.Y.Z` - e.g. `12.5.0`, `12.5.1` .etc) specify `stable` in the text input field and the workflow will automatically create a point release, with z incremented (`x.y.(z+1)`).
+
+_If_ however, the previous release was an _RC_ (e.g. `X.Y.0-rc.1`) you will need to _manually_ select the stable version's release branch when creating the release. If you do not then the workflow will try to release the next major _stable_ version which is not what you want.
+
+To do this, when running the Workflow, select the appropriate `release/` branch from the `Use workflow from` dropdown (e.g. `release/12.5`) and specify `stable` in the text input field.
 
 Please note you **cannot create point releases for previous stable releases once a more recent stable release has been published** as this would require significant changes to how we upload plugin versions to the WP.org plugin SVN repo).
 
