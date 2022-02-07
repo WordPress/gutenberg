@@ -205,3 +205,11 @@ export const setCaption = ( element, text ) => {
 		},
 	} );
 };
+
+export const openBlockSettings = async ( screen ) => {
+	const { getByA11yLabel, getByTestId } = screen;
+	fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+	await waitFor(
+		() => getByTestId( 'block-settings-modal' ).props.isVisible
+	);
+};

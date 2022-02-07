@@ -6,7 +6,6 @@ import {
 	getEditorHtml,
 	initializeEditor,
 	fireEvent,
-	waitFor,
 	within,
 } from 'test/helpers';
 
@@ -34,6 +33,7 @@ import {
 	setCaption,
 	setupMediaPicker,
 	triggerGalleryLayout,
+	openBlockSettings,
 } from './helpers';
 
 const MEDIA = [
@@ -591,12 +591,7 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc012
 	it( 'overrides "Link to" setting of gallery items', async () => {
 		// Initialize with a gallery that contains two items, the latter includes "linkDestination" attribute
-		const {
-			galleryBlock,
-			getByA11yLabel,
-			getByTestId,
-			getByText,
-		} = await initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
+		const screen = await initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
 		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ MEDIA[ 0 ].localId }} -->
 		<figure class="wp-block-image"><img src="${ MEDIA[ 0 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
@@ -605,13 +600,11 @@ describe( 'Gallery block', () => {
 		<figure class="wp-block-image"><img src="${ MEDIA[ 1 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 1 ].localId }"/></figure>
 		<!-- /wp:image --></figure>
 		<!-- /wp:gallery -->` );
+		const { galleryBlock, getByText } = screen;
 		fireEvent.press( galleryBlock );
 
 		// Set "Link to" setting via Gallery block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		await openBlockSettings( screen );
 		fireEvent.press( getByText( 'Link to' ) );
 		fireEvent.press( getByText( 'Media File' ) );
 
@@ -622,30 +615,13 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc013
 	it( 'changes columns setting', async () => {
 		// Initialize with a gallery that contains three items
-		const {
-			galleryBlock,
-			getByA11yLabel,
-			getByTestId,
-		} = await initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
-		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ MEDIA[ 0 ].localId }} -->
-		<figure class="wp-block-image"><img src="${ MEDIA[ 0 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 0 ].localId }"/></figure>
-		<!-- /wp:image -->
-		
-		<!-- wp:image {"id":${ MEDIA[ 1 ].localId }} -->
-		<figure class="wp-block-image"><img src="${ MEDIA[ 1 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 1 ].localId }"/></figure>
-		<!-- /wp:image -->
-		
-		<!-- wp:image {"id":${ MEDIA[ 2 ].localId }} -->
-		<figure class="wp-block-image"><img src="${ MEDIA[ 2 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 2 ].localId }"/></figure>
-		<!-- /wp:image --></figure>
-		<!-- /wp:gallery -->` );
+		const screen = await initializeWithGalleryBlock(
+			generateGalleryBlock( 3, MEDIA )
+		);
+		const { galleryBlock, getByA11yLabel } = screen;
 		fireEvent.press( galleryBlock );
 
-		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		await openBlockSettings( screen );
 
 		// Can't increment due to maximum value
 		// NOTE: Default columns value is 3
@@ -673,21 +649,13 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc014
 	it( 'disables crop images setting', async () => {
 		// Initialize with a gallery that contains one item
-		const {
-			galleryBlock,
-			getByA11yLabel,
-			getByTestId,
-			getByText,
-		} = await initializeWithGalleryBlock(
+		const screen = await initializeWithGalleryBlock(
 			generateGalleryBlock( 1, MEDIA )
 		);
+		const { galleryBlock, getByText } = screen;
 		fireEvent.press( galleryBlock );
 
-		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		await openBlockSettings( screen );
 
 		// Disable crop images setting
 		fireEvent.press( getByText( 'Crop images' ) );
