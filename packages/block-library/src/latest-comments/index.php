@@ -93,7 +93,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 
 			// `_draft_or_post_title` calls `esc_html()` so we don't need to wrap that call in
 			// `esc_html`.
-			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . get_comment_link( $comment ) . '">' . wp_latest_comments_draft_or_post_title( $comment->comment_post_ID ) . '</a>';
+			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . wp_latest_comments_draft_or_post_title( $comment->comment_post_ID ) . '</a>';
 
 			$list_items_markup .= sprintf(
 				/* translators: 1: author name (inside <a> or <span> tag, based on if they have a URL), 2: post title related to this comment */
