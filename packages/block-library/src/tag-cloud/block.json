@@ -22,12 +22,12 @@
 			"default": false
 		},
 		"smallestFontSize": {
-			"type": "number",
-			"default": 8
+			"type": "string",
+			"default": "8pt" 
 		},
 		"largestFontSize": {
-			"type": "number",
-			"default": 22
+			"type": "string",
+			"default": "22pt"
 		},
 		"fontSizeUnit": {
 			"type": "string",
