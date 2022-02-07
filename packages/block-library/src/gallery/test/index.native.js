@@ -611,38 +611,51 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	// Test case related to TC013 - Settings - Columns
+	// Test cases related to TC013 - Settings - Columns
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc013
-	it( 'changes columns setting', async () => {
-		// Initialize with a gallery that contains three items
-		const screen = await initializeWithGalleryBlock(
-			generateGalleryBlock( 3, MEDIA )
-		);
-		const { galleryBlock, getByA11yLabel } = screen;
-		fireEvent.press( galleryBlock );
+	describe( 'Columns setting', () => {
+		it( 'does not increment due to maximum value', async () => {
+			// Initialize with a gallery that contains three items
+			const screen = await initializeWithGalleryBlock(
+				generateGalleryBlock( 3, MEDIA )
+			);
+			const { galleryBlock, getByA11yLabel } = screen;
+			fireEvent.press( galleryBlock );
 
-		await openBlockSettings( screen );
+			await openBlockSettings( screen );
 
-		// Can't increment due to maximum value
-		// NOTE: Default columns value is 3
-		fireEvent(
-			getByA11yLabel( /Columns\. Value is 3/ ),
-			'accessibilityAction',
-			{
-				nativeEvent: { actionName: 'increment' },
-			}
-		);
-		expect( getEditorHtml() ).toMatchSnapshot();
+			// Can't increment due to maximum value
+			// NOTE: Default columns value is 3
+			fireEvent(
+				getByA11yLabel( /Columns\. Value is 3/ ),
+				'accessibilityAction',
+				{
+					nativeEvent: { actionName: 'increment' },
+				}
+			);
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
 
-		// Decrement columns
-		fireEvent(
-			getByA11yLabel( /Columns\. Value is 3/ ),
-			'accessibilityAction',
-			{
-				nativeEvent: { actionName: 'decrement' },
-			}
-		);
-		expect( getEditorHtml() ).toMatchSnapshot();
+		it( 'decrements columns', async () => {
+			// Initialize with a gallery that contains three items
+			const screen = await initializeWithGalleryBlock(
+				generateGalleryBlock( 3, MEDIA )
+			);
+			const { galleryBlock, getByA11yLabel } = screen;
+			fireEvent.press( galleryBlock );
+
+			await openBlockSettings( screen );
+
+			// Decrement columns
+			fireEvent(
+				getByA11yLabel( /Columns\. Value is 3/ ),
+				'accessibilityAction',
+				{
+					nativeEvent: { actionName: 'decrement' },
+				}
+			);
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
 	} );
 
 	// Test case related to TC014 - Settings - Crop images

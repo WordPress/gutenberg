@@ -1,18 +1,22 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Gallery block cancels uploads 1`] = `
-"<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
-<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":null} -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+exports[`Gallery block Columns setting decrements columns 1`] = `
+"<!-- wp:gallery {\\"columns\\":2,\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-2 is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
 <!-- /wp:image -->
 
-<!-- wp:image {\\"id\\":null} -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- wp:image {\\"id\\":2001} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-2.jpeg\\" alt=\\"\\" class=\\"wp-image-2001\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"id\\":2002} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-3.jpeg\\" alt=\\"\\" class=\\"wp-image-2002\\"/></figure>
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block changes columns setting 1`] = `
+exports[`Gallery block Columns setting does not increment due to maximum value 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
@@ -28,18 +32,14 @@ exports[`Gallery block changes columns setting 1`] = `
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block changes columns setting 2`] = `
-"<!-- wp:gallery {\\"columns\\":2,\\"linkTo\\":\\"none\\"} -->
-<figure class=\\"wp-block-gallery has-nested-images columns-2 is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
-<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
+exports[`Gallery block cancels uploads 1`] = `
+"<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":null} -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
-<!-- wp:image {\\"id\\":2001} -->
-<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-2.jpeg\\" alt=\\"\\" class=\\"wp-image-2001\\"/></figure>
-<!-- /wp:image -->
-
-<!-- wp:image {\\"id\\":2002} -->
-<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-3.jpeg\\" alt=\\"\\" class=\\"wp-image-2002\\"/></figure>
+<!-- wp:image {\\"id\\":null} -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->"
 `;
