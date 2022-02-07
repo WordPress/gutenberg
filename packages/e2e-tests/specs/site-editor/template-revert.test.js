@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import {
-	deleteAllTemplates,
 	insertBlock,
 	activateTheme,
+	deleteAllTemplates,
 	switchUserToAdmin,
 	switchUserToTest,
 	visitAdminPage,

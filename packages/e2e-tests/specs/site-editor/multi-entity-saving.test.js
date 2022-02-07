@@ -13,6 +13,7 @@ import {
 	clickButton,
 	createReusableBlock,
 	visitSiteEditor,
+	deleteAllTemplates,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Multi-entity save flow', () => {
@@ -43,8 +44,8 @@ describe( 'Multi-entity save flow', () => {
 
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 		await trashAllPosts( 'wp_block' );
 
 		// Get the current Site Title and Site Tagline, so that we can reset
