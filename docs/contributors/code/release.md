@@ -138,9 +138,7 @@ The method for point releases is nearly identical to the main Plugin release pro
 
 #### Updating the release branch
 
-The point release should only contain the _specific commits_ required. To do this you should checkout the previous _minor_ stable (i.e. non-RC) release (e.g. `release/12.5.0`) locally and then cherry pick any commits (from `trunk`) that you require to be included in the branch.
-
-If there are previous point releases (e.g. `12.5.1` .etc) these can be safely ignored as commits from those releases will have already been picked into the stable release branch as part of the previous point release process.
+The point release should only contain the _specific commits_ required. To do this you should checkout the previous _minor_ stable (i.e. non-RC) release branch (e.g. `release/12.5.0`) locally and then cherry pick any commits that you require into that branch.
 
 Once you have the stable release branch in order you can _push it to Github_ and continue with the release process using the Github website GUI.
 
