@@ -69,10 +69,15 @@ export function getUserAvatar( { postId, postType, functionUseSelect } ) {
 	const minSize = sizes ? sizes[ 0 ] : 24;
 	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
 	const maxSizeBuffer = Math.floor( maxSize * 2.5 );
+	const { avatarURL: defaultAvatarUrl } = functionUseSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings;
+	} );
 	return {
 		src: avatarUrls
 			? avatarUrls[ avatarUrls.length - 1 ]
-			: 'https://upload.wikimedia.org/wikipedia/commons/0/02/Sea_Otter_%28Enhydra_lutris%29_%2825169790524%29_crop.jpg',
+			: defaultAvatarUrl,
 		minSize,
 		maxSize: maxSizeBuffer,
 
