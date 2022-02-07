@@ -57,7 +57,25 @@ const PREFERENCES_MENU = 'preferences-menu';
 
 function NavigationButton( { as: Tag = Button, path, ...props } ) {
 	const { push } = useNavigator();
-	return <Tag onClick={ () => push( path ) } { ...props } />;
+
+	const dataAttrName = 'data-navigator-focusable-id';
+	const dataAttrValue = path;
+
+	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+
+	const tagProps = {
+		...props,
+		[ dataAttrName ]: dataAttrValue,
+	};
+
+	return (
+		<Tag
+			onClick={ () =>
+				push( path, { focusTargetSelector: dataAttrCssSelector } )
+			}
+			{ ...tagProps }
+		/>
+	);
 }
 
 function NavigationBackButton( { as: Tag = Button, ...props } ) {

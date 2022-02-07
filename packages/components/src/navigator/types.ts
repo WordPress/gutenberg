@@ -3,7 +3,9 @@
  */
 import type { ReactNode } from 'react';
 
-type NavigateOptions = {};
+type NavigateOptions = {
+	focusTargetSelector?: string;
+};
 
 export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
@@ -13,7 +15,7 @@ export type NavigatorLocation = NavigateOptions & {
 
 export type NavigatorContext = {
 	location: NavigatorLocation;
-	push: ( path: string, options: NavigateOptions ) => void;
+	push: ( path: string, options?: NavigateOptions ) => void;
 	pop: () => void;
 };
 

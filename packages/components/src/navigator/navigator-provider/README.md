@@ -68,7 +68,9 @@ The `navigator` instance has a few properties:
 
 The `push` function allows navigating to a given path. The second argument can augment the navigation operations with different options.
 
-There currently aren't any available options.
+The available options are:
+
+- `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
 
 ### `pop`: `() => void`
 
