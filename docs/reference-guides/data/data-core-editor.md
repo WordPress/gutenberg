@@ -516,29 +516,6 @@ _Related_
 
 -   getPreviousBlockClientId in core/block-editor store.
 
-### getReferenceByDistinctEdits
-
-> **Deprecated** since Gutenberg 6.5.0.
-
-Returns a new reference when edited values have changed. This is useful in
-inferring where an edit has been made between states by comparison of the
-return values using strict equality.
-
-_Usage_
-
-    const hasEditOccurred = (
-       getReferenceByDistinctEdits( beforeState ) !==
-       getReferenceByDistinctEdits( afterState )
-    );
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `*`: A value whose reference will change only when an edit occurs.
-
 ### getSelectedBlock
 
 _Related_

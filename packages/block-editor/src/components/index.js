@@ -134,7 +134,6 @@ export {
 	useTypingObserver as __unstableUseTypingObserver,
 	useMouseMoveTypingReset as __unstableUseMouseMoveTypingReset,
 } from './observe-typing';
-export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder';
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
 export {
 	default as Typewriter,

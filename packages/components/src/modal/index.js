@@ -22,7 +22,6 @@ import {
 	useConstrainedTabbing,
 	useMergeRefs,
 } from '@wordpress/compose';
-import deprecated from '@wordpress/deprecated';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
@@ -45,8 +44,7 @@ function Modal( props, forwardedRef ) {
 		focusOnMount = true,
 		shouldCloseOnEsc = true,
 		shouldCloseOnClickOutside = true,
-		isDismissable, // Deprecated
-		isDismissible = isDismissable || true,
+		isDismissible = true,
 		/* accessibility */
 		aria = {
 			labelledby: null,
@@ -92,13 +90,6 @@ function Modal( props, forwardedRef ) {
 			}
 		};
 	}, [] );
-
-	if ( isDismissable ) {
-		deprecated( 'isDismissable prop of the Modal component', {
-			since: '5.4',
-			alternative: 'isDismissible prop (renamed) of the Modal component',
-		} );
-	}
 
 	function handleEscapeKeyDown( event ) {
 		if (
