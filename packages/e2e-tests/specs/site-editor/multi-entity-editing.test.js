@@ -11,18 +11,18 @@ import {
 	openDocumentSettingsSidebar,
 	pressKeyWithModifier,
 	selectBlockByClientId,
+	visitSiteEditor,
+	clickSiteEditorMenuItem,
+	navigateSiteEditorBackToRoot,
+	openSiteEditorNavigationPanel,
+	siteEditorNavigateSequence,
 } from '@wordpress/e2e-test-utils';
 
-/**
- * Internal dependencies
- */
-import { navigationPanel, siteEditor } from './utils';
-
 const clickTemplateItem = async ( menus, itemName ) => {
-	await navigationPanel.open();
-	await navigationPanel.backToRoot();
-	await navigationPanel.navigate( menus );
-	await navigationPanel.clickItemByText( itemName );
+	await openSiteEditorNavigationPanel();
+	await navigateSiteEditorBackToRoot();
+	await siteEditorNavigateSequence( menus );
+	await clickSiteEditorMenuItem( itemName );
 };
 
 const createTemplatePart = async (
@@ -144,14 +144,13 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
-		await siteEditor.visit();
-		await siteEditor.disableWelcomeGuide();
+		await visitSiteEditor();
 		expect( await openEntitySavePanel() ).toBe( false );
 	} );
 
 	// Skip reason: This should be rewritten to use other methods to switching to different templates.
 	it.skip( 'should not dirty an entity by switching to it in the template dropdown', async () => {
-		await siteEditor.visit( {
+		await visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
@@ -204,8 +203,7 @@ describe( 'Multi-entity editor states', () => {
 				true
 			);
 			await saveAllEntities();
-			await siteEditor.visit();
-			await siteEditor.disableWelcomeGuide();
+			await visitSiteEditor();
 
 			// Wait for site editor to load.
 			await canvas().waitForSelector(

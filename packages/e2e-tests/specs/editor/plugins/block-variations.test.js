@@ -104,7 +104,7 @@ describe( 'Block variations', () => {
 				'Display block breadcrumbs',
 				true
 			);
-			await toggleMoreMenu();
+			await toggleMoreMenu( 'close' );
 		} );
 
 		afterEach( async () => {
@@ -113,7 +113,7 @@ describe( 'Block variations', () => {
 				'Display block breadcrumbs',
 				false
 			);
-			await toggleMoreMenu();
+			await toggleMoreMenu( 'close' );
 		} );
 
 		const getActiveBreadcrumb = async () =>

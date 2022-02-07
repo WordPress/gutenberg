@@ -208,8 +208,8 @@ export function* setPage( page ) {
 			page.context.postType || 'post',
 			page.context.postId
 		);
-
-		page.path = getPathAndQueryString( entity.link );
+		// If the entity is undefined for some reason, path will resolve to "/"
+		page.path = getPathAndQueryString( entity?.link );
 	}
 	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
 		coreStore,

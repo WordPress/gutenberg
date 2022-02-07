@@ -18,6 +18,7 @@ module.exports = async ( {
 	license,
 	slug,
 	version,
+	wpEnv,
 	wpScripts,
 	npmDependencies,
 } ) => {
@@ -25,6 +26,7 @@ module.exports = async ( {
 
 	info( '' );
 	info( 'Creating a "package.json" file.' );
+
 	await writePkg(
 		cwd,
 		omitBy(
@@ -35,14 +37,17 @@ module.exports = async ( {
 				author,
 				license,
 				main: wpScripts && 'build/index.js',
-				scripts: wpScripts && {
-					build: 'wp-scripts build',
-					format: 'wp-scripts format',
-					'lint:css': 'wp-scripts lint-style',
-					'lint:js': 'wp-scripts lint-js',
-					'packages-update': 'wp-scripts packages-update',
-					'plugin-zip': 'wp-scripts plugin-zip',
-					start: 'wp-scripts start',
+				scripts: {
+					...( wpScripts && {
+						build: 'wp-scripts build',
+						format: 'wp-scripts format',
+						'lint:css': 'wp-scripts lint-style',
+						'lint:js': 'wp-scripts lint-js',
+						'packages-update': 'wp-scripts packages-update',
+						'plugin-zip': 'wp-scripts plugin-zip',
+						start: 'wp-scripts start',
+					} ),
+					...( wpEnv && { env: 'wp-env' } ),
 				},
 			},
 			isEmpty

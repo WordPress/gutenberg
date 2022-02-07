@@ -142,7 +142,7 @@ const mockEmbedResponses = ( mockedResponses ) => {
 };
 
 const insertEmbedBlock = async ( blockTitle = 'Embed' ) => {
-	const editor = initializeEditor( {
+	const editor = await initializeEditor( {
 		initialHtml: '',
 	} );
 	const { getByA11yLabel, getByText } = editor;
@@ -162,7 +162,7 @@ const insertEmbedBlock = async ( blockTitle = 'Embed' ) => {
 };
 
 const initializeWithEmbedBlock = async ( initialHtml, selectBlock = true ) => {
-	const editor = initializeEditor( { initialHtml } );
+	const editor = await initializeEditor( { initialHtml } );
 	const { getByA11yLabel } = editor;
 
 	const block = await waitFor( () =>
@@ -871,7 +871,7 @@ describe( 'Embed block', () => {
 				getByPlaceholderText,
 				getByTestId,
 				getByText,
-			} = initializeEditor( {
+			} = await initializeEditor( {
 				initialHtml: EMPTY_PARAGRAPH_HTML,
 			} );
 
@@ -914,7 +914,7 @@ describe( 'Embed block', () => {
 				getByPlaceholderText,
 				getByTestId,
 				getByText,
-			} = initializeEditor( {
+			} = await initializeEditor( {
 				initialHtml: EMPTY_PARAGRAPH_HTML,
 			} );
 
@@ -959,7 +959,7 @@ describe( 'Embed block', () => {
 				getByPlaceholderText,
 				getByA11yLabel,
 				getByText,
-			} = initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
+			} = await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
 
 			const paragraphText = getByPlaceholderText( 'Start writing…' );
 			fireEvent( paragraphText, 'focus' );
@@ -1001,7 +1001,7 @@ describe( 'Embed block', () => {
 					getByPlaceholderText,
 					getByA11yLabel,
 					getByText,
-				} = initializeEditor( {
+				} = await initializeEditor( {
 					initialHtml: EMPTY_PARAGRAPH_HTML,
 				} );
 
