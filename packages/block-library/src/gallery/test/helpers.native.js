@@ -24,6 +24,11 @@ import {
 	MEDIA_UPLOAD_STATE_RESET,
 } from '@wordpress/block-editor';
 
+/**
+ * Adds a Gallery block via the block picker.
+ *
+ * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
+ */
 export const addGalleryBlock = async () => {
 	const screen = await initializeEditor();
 	const { getByA11yLabel, getByTestId, getByText } = screen;
@@ -74,9 +79,18 @@ export const triggerGalleryLayout = async (
 		)
 	);
 
+/**
+ *
+ * @param {string}  initialHtml        String of block editor HTML to parse and render.
+ * @param {Object}  [options]          Configuration options for the initialization.
+ * @param {boolean} [options.hasItems] Specifies if the Gallery block included in the initial HTML has items. This is used to assure that gallery items are rendered.
+ * @param {number}  [options.width]    Width to be passed when triggering the "onLayout" event on the Gallery block.
+ * @param {boolean} [options.selected] Specifies if the Gallery block included in the initial HTML should be automatically selected.
+ * @return {import('@testing-library/react-native').RenderAPI} The Testing Library screen plus the Gallery block React Test instance.
+ */
 export const initializeWithGalleryBlock = async (
 	initialHtml,
-	{ hasItems = true, deviceWidth = 320, selected = true } = {}
+	{ hasItems = true, width = 320, selected = true } = {}
 ) => {
 	const screen = await initializeEditor( { initialHtml } );
 	const { getByA11yLabel } = screen;
@@ -84,7 +98,7 @@ export const initializeWithGalleryBlock = async (
 	const galleryBlock = getByA11yLabel( /Gallery Block\. Row 1/ );
 
 	if ( hasItems ) {
-		await triggerGalleryLayout( galleryBlock, { deviceWidth } );
+		await triggerGalleryLayout( galleryBlock, { width } );
 	}
 
 	if ( selected ) {
@@ -94,12 +108,30 @@ export const initializeWithGalleryBlock = async (
 	return { ...screen, galleryBlock };
 };
 
+/**
+ * Gets a gallery item within a Gallery block.
+ *
+ * @param {import('react-test-renderer').ReactTestInstance} galleryBlock Gallery block instance.
+ * @param {number}                                          rowPosition  Row position within the Gallery block.
+ * @return {import('react-test-renderer').ReactTestInstance} Gallery item.
+ */
 export const getGalleryItem = ( galleryBlock, rowPosition ) => {
 	return within( galleryBlock ).getByA11yLabel(
 		new RegExp( `Image Block\\. Row ${ rowPosition }` )
 	);
 };
 
+/**
+ * Sets up the media upload mock functions for testing.
+ *
+ * @typedef {Object} MediaUploadMockFunctions
+ * @property {Function} notifyUploadingState Notify uploading state for a media item.
+ * @property {Function} notifySucceedState   Notify succeed state for a media item.
+ * @property {Function} notifyFailedState    Notify failed state for a media item.
+ * @property {Function} notifyResetState     Notify reset state for a media item.
+ *
+ * @return {MediaUploadMockFunctions} Notify state functions.
+ */
 export const setupMediaUpload = () => {
 	const mediaUploadListeners = [];
 	subscribeMediaUpload.mockImplementation( ( callback ) => {
@@ -146,6 +178,16 @@ export const setupMediaUpload = () => {
 	};
 };
 
+/**
+ *
+ * Sets up Media Picker mock functions.
+ *
+ * @typedef {Object} MediaPickerMockFunctions
+ * @property {Function} expectMediaPickerCall Checks if the request media picker function has been called with specific arguments.
+ * @property {Function} mediaPickerCallback   Callback function to notify the media items picked from the media picker.
+ *
+ * @return {MediaPickerMockFunctions} Media picker mock functions.
+ */
 export const setupMediaPicker = () => {
 	let mediaPickerCallback;
 	requestMediaPicker.mockImplementation(
@@ -174,6 +216,15 @@ export const setupMediaPicker = () => {
 	};
 };
 
+/**
+ * Generates the HTML of a Gallery block.
+ *
+ * @param {number}  numberOfItems         Number of gallery items to generate.
+ * @param {Object}  media                 Contains media data to be used in the generation.
+ * @param {Object}  [options]             Configuration options for the generation.
+ * @param {boolean} [options.useLocalUrl] Specifies if the items should use the local URL instead of the server URL.
+ * @return {string} Gallery block HTML.
+ */
 export const generateGalleryBlock = (
 	numberOfItems,
 	media,
@@ -198,6 +249,12 @@ export const generateGalleryBlock = (
     <!-- /wp:gallery -->`;
 };
 
+/**
+ * Sets the text of a caption.
+ *
+ * @param {import('react-test-renderer').ReactTestInstance} element Caption test instance.
+ * @param {string}                                          text    Text to be set.
+ */
 export const setCaption = ( element, text ) => {
 	fireEvent( element, 'focus' );
 	fireEvent( element, 'onChange', {
@@ -209,6 +266,11 @@ export const setCaption = ( element, text ) => {
 	} );
 };
 
+/**
+ * Opens the block settings of the current selected block.
+ *
+ * @param {import('@testing-library/react-native').RenderAPI} screen The Testing Library screen.
+ */
 export const openBlockSettings = async ( screen ) => {
 	const { getByA11yLabel, getByTestId } = screen;
 	fireEvent.press( getByA11yLabel( 'Open Settings' ) );
