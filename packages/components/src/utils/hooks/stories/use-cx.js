@@ -23,24 +23,29 @@ export default {
 	title: 'Components (Experimental)/useCx',
 };
 
-const Example = ( { args, children } ) => {
+const Example = ( { serializedStyles, children } ) => {
 	const cx = useCx();
-	const classes = cx( ...args );
+	const classes = cx( serializedStyles );
 	return <span className={ classes }>{ children }</span>;
 };
 
-const ExampleWithUseMemoWrong = ( { args, children } ) => {
+const ExampleWithUseMemoWrong = ( { serializedStyles, children } ) => {
 	const cx = useCx();
 	// Wrong: using 'useMemo' without adding 'cx' to the dependency list.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const classes = useMemo( () => cx( ...args ), [ ...args ] );
+	const classes = useMemo( () => cx( serializedStyles ), [
+		serializedStyles,
+	] );
 	return <span className={ classes }>{ children }</span>;
 };
 
-const ExampleWithUseMemoRight = ( { args, children } ) => {
+const ExampleWithUseMemoRight = ( { serializedStyles, children } ) => {
 	const cx = useCx();
 	// Right: using 'useMemo' with 'cx' listed as a dependency.
-	const classes = useMemo( () => cx( ...args ), [ ...args, cx ] );
+	const classes = useMemo( () => cx( serializedStyles ), [
+		cx,
+		serializedStyles,
+	] );
 	return <span className={ classes }>{ children }</span>;
 };
 
@@ -62,17 +67,17 @@ export const _slotFill = () => {
 			<StyleProvider document={ document }>
 				<Iframe>
 					<Iframe>
-						<Example args={ [ redText ] }>
+						<Example serializedStyles={ redText }>
 							This text is inside an iframe and should be red
 						</Example>
 						<Fill name="test-slot">
-							<Example args={ [ blueText ] }>
+							<Example serializedStyles={ blueText }>
 								This text is also inside the iframe, but is
 								relocated by a slot/fill and should be blue
 							</Example>
 						</Fill>
 						<Fill name="outside-frame">
-							<Example args={ [ greenText ] }>
+							<Example serializedStyles={ greenText }>
 								This text is also inside the iframe, but is
 								relocated by a slot/fill and should be green
 							</Example>
@@ -99,7 +104,7 @@ export const _slotFillSimple = () => {
 		<SlotFillProvider>
 			<Iframe>
 				<Fill name="test-slot">
-					<Example args={ [ redText ] }>
+					<Example serializedStyles={ redText }>
 						This text should be red
 					</Example>
 				</Fill>
@@ -119,13 +124,17 @@ export const _useMemoBadPractices = () => {
 
 	return (
 		<>
-			<Example args={ [ redText ] }>This text should be red</Example>
-			<ExampleWithUseMemoRight args={ [ blueText ] }>
+			<Example serializedStyles={ redText }>
+				This text should be red
+			</Example>
+			<ExampleWithUseMemoRight serializedStyles={ blueText }>
 				This text should be blue
 			</ExampleWithUseMemoRight>
 			<Iframe>
-				<Example args={ [ redText ] }>This text should be red</Example>
-				<ExampleWithUseMemoWrong args={ [ blueText ] }>
+				<Example serializedStyles={ redText }>
+					This text should be red
+				</Example>
+				<ExampleWithUseMemoWrong serializedStyles={ blueText }>
 					This text should be blue but it&apos;s not!
 				</ExampleWithUseMemoWrong>
 			</Iframe>
@@ -139,7 +148,7 @@ export const _default = () => {
 	`;
 	return (
 		<Iframe>
-			<Example args={ [ redText ] }>
+			<Example serializedStyles={ redText }>
 				This text is inside an iframe and is red!
 			</Example>
 		</Iframe>
