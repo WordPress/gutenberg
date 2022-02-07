@@ -1,16 +1,16 @@
 /**
+ * External dependencies
+ */
+import a11yPlugin from 'colord/plugins/a11y';
+import namesPlugin from 'colord/plugins/names';
+import { colord, extend } from 'colord';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { speak } from '@wordpress/a11y';
 import { Notice } from '@wordpress/components';
-
-/**
- * External dependencies
- */
-import { colord, extend } from 'colord';
-import namesPlugin from 'colord/plugins/names';
-import a11yPlugin from 'colord/plugins/a11y';
+import { speak } from '@wordpress/a11y';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -105,7 +105,8 @@ function ContrastChecker( {
 			break;
 		}
 
-		// If the text color is readable, but transparent, show the transparent warning.
+		// If there is no contrast warning and the text is transparent,
+		// show the transparent warning if alpha check is enabled.
 		if ( textHasTransparency && enableAlphaChecker ) {
 			message = __( 'Transparent text may be hard for people to read.' );
 			speakMessage = __(
