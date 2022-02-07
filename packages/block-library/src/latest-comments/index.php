@@ -106,7 +106,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 				$list_items_markup .= sprintf(
 					'<time datetime="%1$s" class="wp-block-latest-comments__comment-date">%2$s</time>',
 					esc_attr( get_comment_date( 'c', $comment ) ),
-					esc_html( get_option( 'date_format' ), get_comment_date( 'U', $comment ) )
+					date_i18n( get_option( 'date_format' ), get_comment_date( 'U', $comment ) )
 				);
 			}
 			$list_items_markup .= '</footer>';
