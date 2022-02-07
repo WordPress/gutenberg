@@ -493,10 +493,16 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							<a
 								href={ post.link }
 								rel="noreferrer noopener"
-								dangerouslySetInnerHTML={ {
-									__html: titleTrimmed || __( '(no title)' ),
-								} }
-							/>
+								dangerouslySetInnerHTML={
+									!! titleTrimmed
+										? {
+												__html: titleTrimmed,
+										  }
+										: undefined
+								}
+							>
+								{ ! titleTrimmed ? __( '(no title)' ) : null }
+							</a>
 							{ displayAuthor && currentAuthor && (
 								<div className="wp-block-latest-posts__post-author">
 									{ sprintf(
