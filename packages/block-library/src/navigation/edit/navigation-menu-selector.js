@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { MenuGroup, MenuItem, MenuItemsChoice } from '@wordpress/components';
-import { useEntityId } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
+import { MenuGroup, MenuItem } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -14,19 +13,20 @@ import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 import useConvertClassicMenu from '../use-convert-classic-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
+import ExistingMenusOptions from './existing-menus-options';
 
 export default function NavigationMenuSelector( {
 	clientId,
 	onSelect,
 	onCreateNew,
 	canUserCreateNavigation = false,
+	canUserSwitchNavigation = false,
 } ) {
 	const {
 		menus: classicMenus,
 		hasMenus: hasClassicMenus,
 	} = useNavigationEntities();
 	const { navigationMenus } = useNavigationMenu();
-	const ref = useEntityId( 'postType', 'wp_navigation' );
 
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
@@ -49,66 +49,42 @@ export default function NavigationMenuSelector( {
 		onFinishMenuCreation
 	);
 
+	const showSelectMenus =
+		( canUserSwitchNavigation || canUserCreateNavigation ) &&
+		( navigationMenus?.length || hasClassicMenus );
+
+	if ( ! showSelectMenus ) {
+		return null;
+	}
+
 	return (
 		<>
-			<MenuGroup label={ __( 'Menus' ) }>
-				<MenuItemsChoice
-					value={ ref }
-					onSelect={ ( selectedId ) =>
-						onSelect(
-							navigationMenus.find(
-								( post ) => post.id === selectedId
-							)
-						)
-					}
-					choices={ navigationMenus.map( ( { id, title } ) => {
-						const label = decodeEntities( title.rendered );
-						return {
-							value: id,
-							label,
-							'aria-label': sprintf(
-								/* translators: %s: The name of a menu. */
-								__( "Switch to '%s'" ),
-								label
-							),
-						};
-					} ) }
-				/>
-			</MenuGroup>
+			<ExistingMenusOptions
+				showNavigationMenus={ canUserSwitchNavigation }
+				showClassicMenus={ canUserCreateNavigation }
+				navigationMenus={ navigationMenus }
+				classicMenus={ classicMenus }
+				onSelectNavigationMenu={ onSelect }
+				onSelectClassicMenu={ ( { id, name } ) =>
+					convertClassicMenuToBlocks( id, name )
+				}
+				/* translators: %s: The name of a menu. */
+				actionLabel={ __( "Switch to '%s'" ) }
+			/>
+
 			{ canUserCreateNavigation && (
-				<>
-					{ hasClassicMenus && (
-						<MenuGroup label={ __( 'Classic Menus' ) }>
-							{ classicMenus.map( ( menu ) => {
-								return (
-									<MenuItem
-										onClick={ () => {
-											convertClassicMenuToBlocks(
-												menu.id,
-												menu.name
-											);
-										} }
-										key={ menu.id }
-									>
-										{ decodeEntities( menu.name ) }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-					<MenuGroup label={ __( 'Tools' ) }>
-						<MenuItem onClick={ onCreateNew }>
-							{ __( 'Create new menu' ) }
-						</MenuItem>
-						<MenuItem
-							href={ addQueryArgs( 'edit.php', {
-								post_type: 'wp_navigation',
-							} ) }
-						>
-							{ __( 'Manage menus' ) }
-						</MenuItem>
-					</MenuGroup>
-				</>
+				<MenuGroup label={ __( 'Tools' ) }>
+					<MenuItem onClick={ onCreateNew }>
+						{ __( 'Create new menu' ) }
+					</MenuItem>
+					<MenuItem
+						href={ addQueryArgs( 'edit.php', {
+							post_type: 'wp_navigation',
+						} ) }
+					>
+						{ __( 'Manage menus' ) }
+					</MenuItem>
+				</MenuGroup>
 			) }
 		</>
 	);

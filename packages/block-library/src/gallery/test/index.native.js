@@ -78,7 +78,7 @@ describe( 'Gallery block', () => {
 	} );
 
 	it( 'selects a gallery item', async () => {
-		const { galleryBlock } = initializeWithGalleryBlock(
+		const { galleryBlock } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 1, MEDIA ),
 			{
 				selected: false,
@@ -91,8 +91,8 @@ describe( 'Gallery block', () => {
 		expect( galleryItem ).toBeVisible();
 	} );
 
-	it( 'shows appender button when gallery has images', () => {
-		const { galleryBlock, getByText } = initializeWithGalleryBlock(
+	it( 'shows appender button when gallery has images', async () => {
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 1, MEDIA )
 		);
 
@@ -108,9 +108,13 @@ describe( 'Gallery block', () => {
 
 	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
 	// is addressed.
-	it.skip( 'displays media options picker when selecting the block', () => {
+	it.skip( 'displays media options picker when selecting the block', async () => {
 		// Initialize with an empty gallery
-		const { getByA11yLabel, getByText, getByTestId } = initializeEditor( {
+		const {
+			getByA11yLabel,
+			getByText,
+			getByTestId,
+		} = await initializeEditor( {
 			initialHtml: generateGalleryBlock( 0 ),
 		} );
 
@@ -140,7 +144,7 @@ describe( 'Gallery block', () => {
 		const { notifyUploadingState, notifySucceedState } = setupMediaUpload();
 
 		// Initialize with a gallery that contains two items that are being uploaded
-		const { galleryBlock } = initializeWithGalleryBlock(
+		const { galleryBlock } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 2, MEDIA, { useLocalUrl: true } )
 		);
 
@@ -165,9 +169,9 @@ describe( 'Gallery block', () => {
 
 	// Test case related to TC003 - Add caption to gallery
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc003
-	it( 'sets caption to gallery', () => {
+	it( 'sets caption to gallery', async () => {
 		// Initialize with a gallery that contains one item
-		const { getByA11yLabel } = initializeWithGalleryBlock(
+		const { getByA11yLabel } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 1, MEDIA )
 		);
 
@@ -189,9 +193,9 @@ describe( 'Gallery block', () => {
 
 	// Test case related to TC004 - Add caption to gallery images
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc004
-	it( 'sets caption to gallery items', () => {
+	it( 'sets caption to gallery items', async () => {
 		// Initialize with a gallery that contains one item
-		const { galleryBlock } = initializeWithGalleryBlock(
+		const { galleryBlock } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 1, MEDIA )
 		);
 
@@ -221,7 +225,7 @@ describe( 'Gallery block', () => {
 		} = setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = initializeWithGalleryBlock(
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 0 ),
 			{
 				hasItems: false,
@@ -266,7 +270,7 @@ describe( 'Gallery block', () => {
 		} = setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = initializeWithGalleryBlock(
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 0 ),
 			{
 				hasItems: false,
@@ -328,7 +332,7 @@ describe( 'Gallery block', () => {
 		} = setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = initializeWithGalleryBlock(
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 0 ),
 			{
 				hasItems: false,
@@ -379,7 +383,7 @@ describe( 'Gallery block', () => {
 		} );
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = initializeWithGalleryBlock(
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 0 ),
 			{
 				hasItems: false,
@@ -438,7 +442,7 @@ describe( 'Gallery block', () => {
 		} = setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = initializeWithGalleryBlock(
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 0 ),
 			{
 				hasItems: false,
@@ -488,7 +492,7 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc010
 	it( 'rearranges gallery items', async () => {
 		// Initialize with a gallery that contains three items
-		const { galleryBlock } = initializeWithGalleryBlock(
+		const { galleryBlock } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 3, MEDIA )
 		);
 
@@ -536,7 +540,7 @@ describe( 'Gallery block', () => {
 		} );
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = initializeWithGalleryBlock(
+		const { galleryBlock, getByText } = await initializeWithGalleryBlock(
 			generateGalleryBlock( 0 ),
 			{
 				hasItems: false,
@@ -592,7 +596,7 @@ describe( 'Gallery block', () => {
 			getByA11yLabel,
 			getByTestId,
 			getByText,
-		} = initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
+		} = await initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
 		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ MEDIA[ 0 ].localId }} -->
 		<figure class="wp-block-image"><img src="${ MEDIA[ 0 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
@@ -622,7 +626,7 @@ describe( 'Gallery block', () => {
 			galleryBlock,
 			getByA11yLabel,
 			getByTestId,
-		} = initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
+		} = await initializeWithGalleryBlock( `<!-- wp:gallery {"linkTo":"none"} -->
 		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ MEDIA[ 0 ].localId }} -->
 		<figure class="wp-block-image"><img src="${ MEDIA[ 0 ].localUrl }" alt="" class="wp-image-${ MEDIA[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
@@ -674,7 +678,9 @@ describe( 'Gallery block', () => {
 			getByA11yLabel,
 			getByTestId,
 			getByText,
-		} = initializeWithGalleryBlock( generateGalleryBlock( 1, MEDIA ) );
+		} = await initializeWithGalleryBlock(
+			generateGalleryBlock( 1, MEDIA )
+		);
 		fireEvent.press( galleryBlock );
 
 		// Open block settings

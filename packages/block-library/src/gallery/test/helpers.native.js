@@ -25,7 +25,7 @@ import {
 } from '@wordpress/block-editor';
 
 export const addGalleryBlock = async () => {
-	const screen = initializeEditor();
+	const screen = await initializeEditor();
 	const { getByA11yLabel, getByTestId, getByText } = screen;
 
 	fireEvent.press( getByA11yLabel( 'Add block' ) );
@@ -71,11 +71,11 @@ export const triggerGalleryLayout = ( galleryBlock, { width = 320 } = {} ) =>
 		)
 	);
 
-export const initializeWithGalleryBlock = (
+export const initializeWithGalleryBlock = async (
 	initialHtml,
 	{ hasItems = true, deviceWidth = 320, selected = true } = {}
 ) => {
-	const screen = initializeEditor( { initialHtml } );
+	const screen = await initializeEditor( { initialHtml } );
 	const { getByA11yLabel } = screen;
 
 	const galleryBlock = getByA11yLabel( /Gallery Block\. Row 1/ );

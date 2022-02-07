@@ -47,15 +47,15 @@ provideToNativeHtml.mockImplementation( ( html ) => {
  */
 export function executeStoreResolvers( fn ) {
 	// Portions of the React Native Animation API rely upon these APIs. However,
-	// Jest's 'legacy' fake timer mutate these globals, which breaks the Animated
+	// Jest's 'legacy' fake timers mutate these globals, which breaks the Animated
 	// API. We preserve the original implementations to restore them later.
 	const originalRAF = global.requestAnimationFrame;
 	const originalCAF = global.cancelAnimationFrame;
 
-	// Asynchronous store resolvers rely upon `setTimeout` to run at the end of
-	// the current JavaScript block execution In order to prevent "act" warnings
-	// triggered by updates to the React tree, we leverage fake timers to manually
-	// tick and await the resolution of the current block execution before proceeding.
+	// Asynchronous store resolvers leverage `setTimeout` to run at the end of
+	// the current JavaScript block execution. In order to prevent "act" warnings
+	// triggered by updates to the React tree, we manually tick fake timers and
+	// await the resolution of the current block execution before proceeding.
 	jest.useFakeTimers( 'legacy' );
 
 	const result = fn();
@@ -84,10 +84,11 @@ export function executeStoreResolvers( fn ) {
  * @param {import('react').ReactNode} [options.component] A specific editor component to render.
  * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
  */
-export function initializeEditor( props, { component = Editor } = {} ) {
-	return executeStoreResolvers( () => {
+export async function initializeEditor( props, { component = Editor } = {} ) {
+	let screen;
+	executeStoreResolvers( () => {
 		const EditorComponent = component;
-		const screen = render(
+		screen = render(
 			<EditorComponent
 				postId={ `post-id-${ uuid() }` }
 				postType="post"
@@ -96,7 +97,7 @@ export function initializeEditor( props, { component = Editor } = {} ) {
 			/>
 		);
 
-		// Layout event must be explicitly dispatched in BlockList component,
+		// A layout event must be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.
 		fireEvent( screen.getByTestId( 'block-list-wrapper' ), 'layout', {
 			nativeEvent: {
@@ -105,9 +106,16 @@ export function initializeEditor( props, { component = Editor } = {} ) {
 				},
 			},
 		} );
-
-		return screen;
 	} );
+
+	// The store resolvers perform several API fetches during editor
+	// initialization. The most straightforward approach to ensure all of them
+	// resolve before we consider the editor initialized is to flush micro tasks,
+	// similar to the approach found in `@testing-library/react-native`.
+	// https://github.com/callstack/react-native-testing-library/blob/a010ffdbca906615279ecc3abee423525e528101/src/flushMicroTasks.js#L15-L23
+	await act( async () => {} );
+
+	return screen;
 }
 
 export * from '@testing-library/react-native';

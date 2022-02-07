@@ -73,6 +73,8 @@ The granular rulesets will not define any environment globals. As such, if they 
 | [i18n-no-variables](/packages/eslint-plugin/docs/rules/i18n-no-variables.md)                                         | Enforce string literals as translation function arguments                                      | ✓           |
 | [i18n-text-domain](/packages/eslint-plugin/docs/rules/i18n-text-domain.md)                                           | Enforce passing valid text domains                                                             | ✓           |
 | [i18n-translator-comments](/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)                           | Enforce adding translator comments                                                             | ✓           |
+| [i18n-no-flanking-whitespace](/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md)                     | Disallow leading or trailing whitespace in translatable strings                                |             |
+| [i18n-hyphenated-range](/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md)                                 | Disallow hyphenated numerical ranges in translatable strings                                   |             |
 
 ### Legacy
 

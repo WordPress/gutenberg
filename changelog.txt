@@ -1,6 +1,36 @@
 == Changelog ==
 
-= 12.5.0-rc.1 =
+= 12.5.3 =
+
+### Bug Fixes
+
+#### Block Library
+- Fix escaping to consider addition of pagination arrow in Query Loop. ([38519](https://github.com/WordPress/gutenberg/pull/38519))
+
+
+= 12.5.2 =
+
+
+
+### Bug Fixes
+
+#### Block Library
+- Fix latest posts excerpt escaping. ([38517](https://github.com/WordPress/gutenberg/pull/38517))
+
+
+
+
+
+= 12.5.1 =
+
+### Bug Fixes
+
+#### Site Editor
+
+- Fix a WSOD in the site editor which occurred when an entity could be undefined (https://github.com/WordPress/gutenberg/pull/38503)
+
+
+= 12.5.0 =
 
 ### Features
 
@@ -110,6 +140,7 @@
 #### Block Library
 
 *   Latest Posts: Fix featured image alignment label position. ([38125](https://github.com/WordPress/gutenberg/pull/38125))
+*   Remove the aria-label from the site title block. ([38432](https://github.com/WordPress/gutenberg/pull/38432))
 
 #### Components
 
@@ -233,6 +264,8 @@
 *   [docgen] Refactor code to use require() instead of JSON.parse(fs.readFileSync()). ([38148](https://github.com/WordPress/gutenberg/pull/38148))
 *   end-to-end Tests: Add coverage for reusable blocks save button state regression. ([33151](https://github.com/WordPress/gutenberg/pull/33151))
 *   Add new Testing Instructions section to PR template. ([38147](https://github.com/WordPress/gutenberg/pull/38147))
+
+
 
 
 = 12.4.1 =
