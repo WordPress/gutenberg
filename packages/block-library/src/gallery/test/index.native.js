@@ -134,7 +134,9 @@ describe( 'Gallery block', () => {
 		expect( blockActionsButton ).toBeVisible();
 	} );
 
-	it( 'finishes pending uploads upon opening the editor (TC001 - Close/Re-open post with an ongoing image upload)', async () => {
+	// Test case related to TC001 - Close/Re-open post with an ongoing image upload
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc001
+	it( 'finishes pending uploads upon opening the editor', async () => {
 		const { notifyUploadingState, notifySucceedState } = setupMediaUpload();
 
 		// Initialize with a gallery that contains two items that are being uploaded
@@ -161,7 +163,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'sets caption to gallery (TC003 - Add caption to gallery)', () => {
+	// Test case related to TC003 - Add caption to gallery
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc003
+	it( 'sets caption to gallery', () => {
 		// Initialize with a gallery that contains one item
 		const { getByA11yLabel } = initializeWithGalleryBlock(
 			generateGalleryBlock( 1, MEDIA )
@@ -183,7 +187,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'sets caption to gallery items (TC004 - Add caption to gallery images)', () => {
+	// Test case related to TC004 - Add caption to gallery images
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc004
+	it( 'sets caption to gallery items', () => {
 		// Initialize with a gallery that contains one item
 		const { galleryBlock } = initializeWithGalleryBlock(
 			generateGalleryBlock( 1, MEDIA )
@@ -205,7 +211,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'successfully uploads items (TC005 - Choose from device (stay in editor) - Successful upload)', async () => {
+	// Test case related to TC005 - Choose from device (stay in editor) - Successful upload
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc005
+	it( 'successfully uploads items', async () => {
 		const { notifyUploadingState, notifySucceedState } = setupMediaUpload();
 		const {
 			expectMediaPickerCall,
@@ -248,7 +256,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'handles failed uploads (TC006 - Choose from device (stay in editor) - Failed upload)', async () => {
+	// Test case related to TC006 - Choose from device (stay in editor) - Failed upload
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc006
+	it( 'handles failed uploads', async () => {
 		const { notifyUploadingState, notifyFailedState } = setupMediaUpload();
 		const {
 			expectMediaPickerCall,
@@ -308,7 +318,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'takes a photo (TC007 - Take a photo)', async () => {
+	// Test case related to TC007 - Take a photo
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc007
+	it( 'takes a photo', async () => {
 		const { notifyUploadingState, notifySucceedState } = setupMediaUpload();
 		const {
 			expectMediaPickerCall,
@@ -346,7 +358,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'uploads from free photo library (TC008 - Choose from the free photo library)', async () => {
+	// Test case related to TC008 - Choose from the free photo library
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc008
+	it( 'uploads from free photo library', async () => {
 		const freePhotoMedia = [ ...MEDIA ].map( ( item, index ) => ( {
 			...item,
 			localUrl: `https://images.pexels.com/photos/110854/pexels-photo-${
@@ -414,7 +428,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'cancels uploads (TC009 - Choose from device (stay in editor) - Cancel upload)', async () => {
+	// Test case related to TC009 - Choose from device (stay in editor) - Cancel upload
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc009
+	it( 'cancels uploads', async () => {
 		const { notifyUploadingState, notifyResetState } = setupMediaUpload();
 		const {
 			expectMediaPickerCall,
@@ -468,8 +484,10 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'rearranges gallery items (TC010 - Rearrange images in Gallery)', async () => {
-		// Initialize with a gallery that contains various items
+	// Test case related to TC010 - Rearrange images in Gallery
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc010
+	it( 'rearranges gallery items', async () => {
+		// Initialize with a gallery that contains three items
 		const { galleryBlock } = initializeWithGalleryBlock(
 			generateGalleryBlock( 3, MEDIA )
 		);
@@ -499,7 +517,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'uploads from other apps (TC011 - Choose from Other Apps (iOS Files App)', async () => {
+	// Test case related to TC011 - Choose from Other Apps (iOS Files App
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc011
+	it( 'uploads from other apps', async () => {
 		const otherAppsMedia = [ ...MEDIA ].map( ( item, index ) => ( {
 			...item,
 			localUrl: `file:///IMG_${ index + 1 }.JPG`,
@@ -563,7 +583,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'overrides "Link to" setting of gallery items (TC012 - Settings - Link to', async () => {
+	// Test case related to TC012 - Settings - Link to
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc012
+	it( 'overrides "Link to" setting of gallery items', async () => {
 		// Initialize with a gallery that contains two items, the latter includes "linkDestination" attribute
 		const {
 			galleryBlock,
@@ -592,7 +614,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'changes columns setting (TC013 - Settings - Columns', async () => {
+	// Test case related to TC013 - Settings - Columns
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc013
+	it( 'changes columns setting', async () => {
 		// Initialize with a gallery that contains three items
 		const {
 			galleryBlock,
@@ -641,7 +665,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'disables crop images setting (TC014 - Settings - Crop images', async () => {
+	// Test case related to TC014 - Settings - Crop images
+	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc014
+	it( 'disables crop images setting', async () => {
 		// Initialize with a gallery that contains one item
 		const {
 			galleryBlock,

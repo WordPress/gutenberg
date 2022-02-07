@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Gallery block cancels uploads (TC009 - Choose from device (stay in editor) - Cancel upload) 1`] = `
+exports[`Gallery block cancels uploads 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":null} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
@@ -12,7 +12,7 @@ exports[`Gallery block cancels uploads (TC009 - Choose from device (stay in edit
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block changes columns setting (TC013 - Settings - Columns 1`] = `
+exports[`Gallery block changes columns setting 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":1} -->
 <figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>
@@ -28,7 +28,7 @@ exports[`Gallery block changes columns setting (TC013 - Settings - Columns 1`] =
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block changes columns setting (TC013 - Settings - Columns 2`] = `
+exports[`Gallery block changes columns setting 2`] = `
 "<!-- wp:gallery {\\"columns\\":2,\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-2 is-cropped\\"><!-- wp:image {\\"id\\":1} -->
 <figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>
@@ -44,7 +44,7 @@ exports[`Gallery block changes columns setting (TC013 - Settings - Columns 2`] =
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block disables crop images setting (TC014 - Settings - Crop images 1`] = `
+exports[`Gallery block disables crop images setting 1`] = `
 "<!-- wp:gallery {\\"imageCrop\\":false,\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
@@ -52,7 +52,7 @@ exports[`Gallery block disables crop images setting (TC014 - Settings - Crop ima
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block finishes pending uploads upon opening the editor (TC001 - Close/Re-open post with an ongoing image upload) 1`] = `
+exports[`Gallery block finishes pending uploads upon opening the editor 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
@@ -64,7 +64,7 @@ exports[`Gallery block finishes pending uploads upon opening the editor (TC001 -
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block handles failed uploads (TC006 - Choose from device (stay in editor) - Failed upload) 1`] = `
+exports[`Gallery block handles failed uploads 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":1} -->
 <figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>
@@ -82,7 +82,7 @@ exports[`Gallery block inserts block 1`] = `
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block overrides "Link to" setting of gallery items (TC012 - Settings - Link to 1`] = `
+exports[`Gallery block overrides "Link to" setting of gallery items 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"media\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":1,\\"linkDestination\\":\\"media\\"} -->
 <figure class=\\"wp-block-image\\"><img src=\\"file:///local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-1\\"/></figure>
@@ -94,7 +94,7 @@ exports[`Gallery block overrides "Link to" setting of gallery items (TC012 - Set
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block rearranges gallery items (TC010 - Rearrange images in Gallery) 1`] = `
+exports[`Gallery block rearranges gallery items 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2002} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-3.jpeg\\" alt=\\"\\" class=\\"wp-image-2002\\"/></figure>
@@ -110,7 +110,7 @@ exports[`Gallery block rearranges gallery items (TC010 - Rearrange images in Gal
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block sets caption to gallery (TC003 - Add caption to gallery) 1`] = `
+exports[`Gallery block sets caption to gallery 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
@@ -118,7 +118,7 @@ exports[`Gallery block sets caption to gallery (TC003 - Add caption to gallery) 
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block sets caption to gallery items (TC004 - Add caption to gallery images) 1`] = `
+exports[`Gallery block sets caption to gallery items 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/><figcaption><strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption</figcaption></figure>
@@ -126,7 +126,7 @@ exports[`Gallery block sets caption to gallery items (TC004 - Add caption to gal
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block successfully uploads items (TC005 - Choose from device (stay in editor) - Successful upload) 1`] = `
+exports[`Gallery block successfully uploads items 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
@@ -138,7 +138,7 @@ exports[`Gallery block successfully uploads items (TC005 - Choose from device (s
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block takes a photo (TC007 - Take a photo) 1`] = `
+exports[`Gallery block takes a photo 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
@@ -146,7 +146,7 @@ exports[`Gallery block takes a photo (TC007 - Take a photo) 1`] = `
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block uploads from free photo library (TC008 - Choose from the free photo library) 1`] = `
+exports[`Gallery block uploads from free photo library 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
@@ -158,7 +158,7 @@ exports[`Gallery block uploads from free photo library (TC008 - Choose from the 
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block uploads from other apps (TC011 - Choose from Other Apps (iOS Files App) 1`] = `
+exports[`Gallery block uploads from other apps 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
