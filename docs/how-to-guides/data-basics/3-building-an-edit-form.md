@@ -88,8 +88,8 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				value={ '' }
-				label={ "Page title:" }
+				value=''
+				label='Page title:'
 			/>
 			<div className="form-buttons">
 				<Button onClick={ onSaveFinished } variant="primary">
@@ -133,8 +133,8 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
+				label='Page title:'
 				value={ page.title }
-				label={ "Page title:" }
 			/>
 			{ /* ... */ }
 		</div>
@@ -199,13 +199,14 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 		[ pageId ]
 	);
 	const { editEntityRecord } = useDispatch( coreDataStore );
+	const handleChange = ( title ) => editEntityRecord( 'postType', 'page', page.id, { title } );
 
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
+				label="Page title:"
 				value={ page.title }
-				label={ "Page title:" }
-				onChange={ ( title ) => editEntityRecord( 'postType', 'page', page.id, { title } ) }
+				onChange={ handleChange }
 			/>
 			<div className="form-buttons">
 				<Button onClick={ onSaveFinished } variant="primary">
@@ -370,13 +371,14 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 			onSaveFinished();
 		}
 	};
+	const handleChange = ( title ) => editEntityRecord( 'postType', 'page', page.id, { title } );
 
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
+				label="Page title:"
 				value={ page.title }
-				label={ "Page title:" }
-				onChange={ ( title ) => editEntityRecord( 'postType', 'page', page.id, { title } ) }
+				onChange={ handleChange }
 			/>
 			{ lastError ? (
 				<div>
@@ -384,7 +386,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 				</div>
 			) : false }
 			<div className="form-buttons">
-				<Button onClick={ handleSave } variant="primary" disabled={ isSaving || ! hasEditshasEdits }>
+				<Button onClick={ handleSave } variant="primary" disabled={ isSaving || ! hasEdits }>
 					{isSaving ? <Spinner/> : 'Save'}
 				</Button>
 				<Button onClick={ onCancel } variant="tertiary">
