@@ -5,9 +5,9 @@
 			"backgroundColor": "accent"
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<hr class=\"wp-block-separator has-text-color has-background has-accent-background-color has-accent-color\"/>\n",
+		"innerHTML": "\n<hr class=\"wp-block-separator has-text-color has-alpha-channel has-background has-accent-background-color has-accent-color\"/>\n",
 		"innerContent": [
-			"\n<hr class=\"wp-block-separator has-text-color has-background has-accent-background-color has-accent-color\"/>\n"
+			"\n<hr class=\"wp-block-separator has-text-color has-alpha-channel has-background has-accent-background-color has-accent-color\"/>\n"
 		]
 	}
 ]

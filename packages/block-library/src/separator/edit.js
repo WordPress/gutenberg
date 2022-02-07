@@ -23,7 +23,7 @@ export default function SeparatorEdit( { attributes } ) {
 	const colorClass = getColorClassName( 'color', backgroundColor );
 
 	const className = classnames( {
-		'has-text-color': backgroundColor || customColor,
+		'has-text-color has-alpha-channel': backgroundColor || customColor,
 		[ colorClass ]: colorClass,
 	} );
 

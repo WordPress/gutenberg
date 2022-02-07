@@ -20,7 +20,7 @@ export default function separatorSave( { attributes } ) {
 	const colorClass = getColorClassName( 'color', backgroundColor );
 
 	const className = classnames( {
-		'has-text-color': backgroundColor || customColor,
+		'has-text-color has-alpha-channel': backgroundColor || customColor,
 		[ colorClass ]: colorClass,
 		'has-css-opacity': opacity === 'css',
 		'has-alpha-channel-opacity': opacity === 'alpha-channel',

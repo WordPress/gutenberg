@@ -7,6 +7,6 @@
 			"backgroundColor": "accent"
 		},
 		"innerBlocks": [],
-		"originalContent": "<hr class=\"wp-block-separator has-text-color has-background has-accent-background-color has-accent-color\"/>"
+		"originalContent": "<hr class=\"wp-block-separator has-text-color has-alpha-channel has-background has-accent-background-color has-accent-color\"/>"
 	}
 ]

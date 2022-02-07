@@ -5,6 +5,12 @@
 	margin-right: auto;
 	opacity: 0.4;
 
+	// V2 of the block can set opacity via the backgroundColor
+	// alpha channel so reset the default opacity.
+	&.has-alpha-channel {
+		opacity: initial;
+	}
+
 	// Default, thin style
 	&:not(.is-style-wide):not(.is-style-dots) {
 		width: 100px;
