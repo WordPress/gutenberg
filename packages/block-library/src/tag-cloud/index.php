@@ -15,12 +15,12 @@
 function render_block_core_tag_cloud( $attributes ) {
 	$args      = array(
 		'echo'       => false,
-		'unit'       => $attributes['fontSizeUnit'],
+		'unit'       => substr($attributes['smallestFontSize'], -2),
 		'taxonomy'   => $attributes['taxonomy'],
 		'show_count' => $attributes['showTagCounts'],
 		'number'     => $attributes['numberOfTags'],
-		'smallest'   => $attributes['smallestFontSize'],
-		'largest'    => $attributes['largestFontSize'],
+		'smallest'   => (int) substr($attributes['smallestFontSize'], 0, -2),
+		'largest'    => (int) substr($attributes['largestFontSize'], 0, -2),
 	);
 	$tag_cloud = wp_tag_cloud( $args );
 
