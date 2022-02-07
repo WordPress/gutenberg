@@ -42,7 +42,6 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		numberOfTags,
 		smallestFontSize,
 		largestFontSize,
-		fontSizeUnit,
 	} = attributes;
 
 	const units = [
@@ -101,37 +100,47 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 					<FlexItem isBlock>
 						<UnitControl
 							label={ __( 'Smallest size' ) }
-							value={ smallestFontSize + fontSizeUnit }
+							value={ smallestFontSize }
 							onChange={ ( value ) => {
+								const unit = value.slice( -2 );
+								if ( largestFontSize.indexOf( unit ) === -1 ) {
+									setAttributes( {
+										largestFontSize:
+											largestFontSize.slice( 0, -2 ) +
+											unit,
+									} );
+								}
 								value = value.slice( 0, -2 );
 								const newValue =
 									value && +value >= 8 ? +value : 8;
 								setAttributes( {
-									smallestFontSize: newValue,
+									smallestFontSize: newValue + unit,
 								} );
 							} }
 							units={ units }
-							onUnitChange={ ( value ) => {
-								setAttributes( { fontSizeUnit: value } );
-							} }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
 						<UnitControl
 							label={ __( 'Largest size' ) }
-							value={ largestFontSize + fontSizeUnit }
+							value={ largestFontSize }
 							onChange={ ( value ) => {
+								const unit = value.slice( -2 );
+								if ( smallestFontSize.indexOf( unit ) === -1 ) {
+									setAttributes( {
+										smallestFontSize:
+											smallestFontSize.slice( 0, -2 ) +
+											unit,
+									} );
+								}
 								value = value.slice( 0, -2 );
 								const newValue =
 									value && +value >= 8 ? +value : 60;
 								setAttributes( {
-									largestFontSize: newValue,
+									largestFontSize: newValue + unit,
 								} );
 							} }
 							units={ units }
-							onUnitChange={ ( value ) => {
-								setAttributes( { fontSizeUnit: value } );
-							} }
 						/>
 					</FlexItem>
 				</Flex>
