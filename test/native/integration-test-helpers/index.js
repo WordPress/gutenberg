@@ -1,3 +1,4 @@
+export { addBlock } from './add-block';
 export {
 	advanceAnimationByTime,
 	advanceAnimationByFrame,
