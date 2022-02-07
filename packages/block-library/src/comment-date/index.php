@@ -37,7 +37,7 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 	return sprintf(
 		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
 		$wrapper_attributes,
-		get_comment_date( 'c', $comment ),
+		esc_attr( get_comment_date( 'c', $comment ) ),
 		$formatted_date
 	);
 }
