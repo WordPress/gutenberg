@@ -789,7 +789,7 @@ A cloud of your most used tags. ([Source](https://github.com/WordPress/gutenberg
 -	**Name:** core/tag-cloud
 -	**Category:** widgets
 -	**Supports:** align, ~~html~~
--	**Attributes:** fontSizeUnit, largestFontSize, numberOfTags, showTagCounts, smallestFontSize, taxonomy
+-	**Attributes:** largestFontSize, numberOfTags, showTagCounts, smallestFontSize, taxonomy
 
 ## Template Part
 
