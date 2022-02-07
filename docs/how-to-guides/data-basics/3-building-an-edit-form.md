@@ -73,7 +73,7 @@ function PageEditButton({ pageId }) {
 			</Button>
 			{ isOpen && (
 				<Modal onRequestClose={ closeModal } title="Edit page">
-					<PageTitleForm
+					<EditPageForm
 						pageId={pageId}
 						onCancel={closeModal}
 						onSaveFinished={closeModal}
@@ -84,7 +84,7 @@ function PageEditButton({ pageId }) {
 	)
 }
 
-export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
+export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
@@ -108,11 +108,11 @@ When you click the *Edit* button now, you should see the following modal:
 
 ![](/docs/how-to-guides/data-basics/media/edit-form/form-scaffold.png)
 
-Great! We now have a basic user interface to work with. Our `PageTitleForm` doesn't do anything yet, though. Let's change that!
+Great! We now have a basic user interface to work with. Our `EditPageForm` doesn't do anything yet, though. Let's change that!
 
 ### Populating the title field
 
-We need to populate the input field with the actual page title. But how can we do that when the `PageTitleForm` only has access to the `pageId` and not the actual `page`? Enter the [`getEntityRecord`](/docs/reference-guides/data/data-core/#getentityrecord) selector.
+We need to populate the input field with the actual page title. But how can we do that when the `EditPageForm` only has access to the `pageId` and not the actual `page`? Enter the [`getEntityRecord`](/docs/reference-guides/data/data-core/#getentityrecord) selector.
 
 [`getEntityRecord`](/docs/reference-guides/data/data-core/#getentityrecord) retrieves the appropriate from WordPress REST API, or reuses the one already retrieved if available. Here’s how to try it in your browser's dev tools:
 
@@ -122,10 +122,10 @@ wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', 9 );  // Replace 9
 
 The records we're interested in are already cached by the `getEntityRecords` call inside the `MyFirstApp` component, so `getEntityRecord` won't trigger any extra HTTP requests.
 
-Let's put it to use in `PageTitleForm`:
+Let's put it to use in `EditPageForm`:
 
 ```js
-export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
+export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const page = useSelect(
 		select => select( coreDataStore ).getEntityRecord( 'postType', 'page', pageId ),
 		[pageId]
@@ -188,12 +188,12 @@ wp.data.select( 'core' ).getEditedEntityRecord( 'postType', 'page', 9 ).title
 // 'updated title'
 ```
 
-This is how it all comes together in `PageTitleForm`:
+This is how it all comes together in `EditPageForm`:
 
 ```js
 import { useDispatch } from '@wordpress/data';
 
-export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
+export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const page = useSelect(
 		select => select(coreDataStore).getEditedEntityRecord('postType', 'page', pageId),
 		[ pageId ]
@@ -239,7 +239,7 @@ Third, other components have access to the changes. For example, we could make t
 `saveEditedEntityRecord` action
 
 ```js
-export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
+export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	// ...
 	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( coreDataStore );
 	const handleSave = async () => {
@@ -263,7 +263,7 @@ export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
 
 ### Handle errors
 ```js
-export function PageTitleForm( { pageId, onSaveFinished } ) {
+export function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
 	const handleSave = async () => {
         const savedRecord = await saveEditedEntityRecord('postType', 'page', pageId);
@@ -296,7 +296,7 @@ export function PageTitleForm( { pageId, onSaveFinished } ) {
 
 ### Status indicator
 ```js
-export function PageTitleForm( { pageId, onSaveFinished } ) {
+export function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
 	const { isSaving, /* ... */ } = useSelect(
 		select => ({
@@ -341,7 +341,7 @@ function PageEditButton({ pageId }) {
 			</Button>
 			{ isOpen && (
 				<Modal onRequestClose={ closeModal } title="Edit page">
-					<PageTitleForm
+					<EditPageForm
 						pageId={pageId}
 						onCancel={closeModal}
 						onSaveFinished={closeModal}
@@ -352,7 +352,7 @@ function PageEditButton({ pageId }) {
 	)
 }
 
-export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
+export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const { page, lastError, isSaving, hasEdits } = useSelect(
 		select => ({
 			page: select(coreDataStore).getEditedEntityRecord('postType', 'page', pageId),
