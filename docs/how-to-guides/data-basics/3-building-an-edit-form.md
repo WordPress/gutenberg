@@ -261,10 +261,140 @@ export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
 }
 ```
 
-### Progress indicator
 ### Handle errors
+```js
+export function PageTitleForm( { pageId, onSaveFinished } ) {
+	// ...
+	const handleSave = async () => {
+        const savedRecord = await saveEditedEntityRecord('postType', 'page', pageId);
+        if ( savedRecord ) {
+            onSaveFinished();
+        }
+    };
+
+    const { lastError, page } = useSelect(
+        select => ({
+			page: select(coreDataStore).getEditedEntityRecord('postType', 'page', pageId),
+			lastError: select(coreDataStore).getLastEntitySaveError('postType', 'page', pageId)
+		}),
+        [ pageId ]
+	)
+	// ...
+	return (
+		<>
+			{/* ... */}
+			{ lastError ? (
+				<div>
+					Error: { lastError.message }
+				</div>
+			) : false }
+			{/* ... */}
+		</>
+	);
+}
+```
+
+### Status indicator
+```js
+export function PageTitleForm( { pageId, onSaveFinished } ) {
+	// ...
+	const { isSaving, /* ... */ } = useSelect(
+		select => ({
+			isSaving: select(coreDataStore).isSavingEntityRecord('postType', 'page', pageId),
+			hasEdits: select(coreDataStore).hasEditsForEntityRecord('postType', 'page', pageId),
+			// ...
+		}),
+		[ pageId ]
+	)
+	// ...
+	return (
+		<div className="my-gutenberg-form">
+			{/* ... */}
+			<div className="form-buttons">
+				<Button onClick={ handleSave } variant="primary" disabled={ isSaving || ! hasEditshasEdits }>
+					{isSaving ? <Spinner/> : 'Save'}
+				</Button>
+				{/* ... */}
+			</div>
+		</div>
+	);
+}
+
+```
 ### Wiring it all together
 
+```js
+import { useDispatch } from '@wordpress/data';
+import { Button, Modal, TextControl } from '@wordpress/components';
+
+function PageEditButton({ pageId }) {
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = () => setOpen( true );
+	const closeModal = () => setOpen( false );
+	return (
+		<>
+			<Button
+				onClick={ openModal }
+				variant="primary"
+			>
+				Edit
+			</Button>
+			{ isOpen && (
+				<Modal onRequestClose={ closeModal } title="Edit page">
+					<PageTitleForm
+						pageId={pageId}
+						onCancel={closeModal}
+						onSaveFinished={closeModal}
+					/>
+				</Modal>
+			) }
+		</>
+	)
+}
+
+export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
+	const { page, lastError, isSaving, hasEdits } = useSelect(
+		select => ({
+			page: select(coreDataStore).getEditedEntityRecord('postType', 'page', pageId),
+			lastError: select(coreDataStore).getLastEntitySaveError('postType', 'page', pageId),
+			isSaving: select(coreDataStore).isSavingEntityRecord('postType', 'page', pageId),
+			hasEdits: select(coreDataStore).hasEditsForEntityRecord('postType', 'page', pageId),
+		}),
+		[ pageId ]
+	)
+
+	const { saveEditedEntityRecord, editEntityRecord } = useDispatch( coreDataStore );
+	const handleSave = async () => {
+		const savedRecord = await saveEditedEntityRecord('postType', 'page', pageId);
+		if ( savedRecord ) {
+			onSaveFinished();
+		}
+	};
+
+	return (
+		<div className="my-gutenberg-form">
+			<TextControl
+				value={ page.title }
+				label={ "Page title:" }
+				onChange={ ( title ) => editEntityRecord( 'postType', 'page', page.id, { title } ) }
+			/>
+			{ lastError ? (
+				<div>
+					Error: { lastError.message }
+				</div>
+			) : false }
+			<div className="form-buttons">
+				<Button onClick={ handleSave } variant="primary" disabled={ isSaving || ! hasEditshasEdits }>
+					{isSaving ? <Spinner/> : 'Save'}
+				</Button>
+				<Button onClick={ onCancel } variant="tertiary">
+					Cancel
+				</Button>
+			</div>
+		</div>
+	);
+}
+```
 
 ## What's next?
 
