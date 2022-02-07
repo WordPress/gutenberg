@@ -15,8 +15,8 @@ export type NavigatorLocation = NavigateOptions & {
 
 export type NavigatorContext = {
 	location: NavigatorLocation;
-	push: ( path: string, options?: NavigateOptions ) => void;
-	pop: () => void;
+	goTo: ( path: string, options?: NavigateOptions ) => void;
+	goBack: () => void;
 };
 
 // Returned by the `useNavigator` hook

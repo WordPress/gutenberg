@@ -31,13 +31,13 @@ const PATHS = {
 };
 
 function NavigatorButton( { path, onClick, ...props } ) {
-	const { push } = useNavigator();
+	const { goTo } = useNavigator();
 	return (
 		<button
 			onClick={ () => {
-				push( path );
-				// Used to spy on the values passed to `navigator.push`
-				onClick?.( { type: 'push', path } );
+				goTo( path );
+				// Used to spy on the values passed to `navigator.goTo`
+				onClick?.( { type: 'goTo', path } );
 			} }
 			{ ...props }
 		/>
@@ -45,7 +45,7 @@ function NavigatorButton( { path, onClick, ...props } ) {
 }
 
 function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
-	const { push } = useNavigator();
+	const { goTo } = useNavigator();
 	const dataAttrName = 'data-navigator-focusable-id';
 	const dataAttrValue = path;
 
@@ -59,9 +59,9 @@ function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
 	return (
 		<button
 			onClick={ () => {
-				push( path, { focusTargetSelector: dataAttrCssSelector } );
-				// Used to spy on the values passed to `navigator.push`
-				onClick?.( { type: 'push', path } );
+				goTo( path, { focusTargetSelector: dataAttrCssSelector } );
+				// Used to spy on the values passed to `navigator.goTo`
+				onClick?.( { type: 'goTo', path } );
 			} }
 			{ ...buttonProps }
 		/>
@@ -69,13 +69,13 @@ function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
 }
 
 function NavigatorBackButton( { onClick, ...props } ) {
-	const { pop } = useNavigator();
+	const { goBack } = useNavigator();
 	return (
 		<button
 			onClick={ () => {
-				pop();
-				// Used to spy on the values passed to `navigator.push`
-				onClick?.( { type: 'pop' } );
+				goBack();
+				// Used to spy on the values passed to `navigator.goBack`
+				onClick?.( { type: 'goBack' } );
 			} }
 			{ ...props }
 		/>
@@ -270,28 +270,28 @@ describe( 'Navigator', () => {
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toBeInTheDocument();
 
-		// Check the values passed to `navigator.push()`
+		// Check the values passed to `navigator.goTo()`
 		expect( spy ).toHaveBeenCalledTimes( 6 );
 		expect( spy ).toHaveBeenNthCalledWith( 1, {
 			path: PATHS.CHILD,
-			type: 'push',
+			type: 'goTo',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 2, {
-			type: 'pop',
+			type: 'goBack',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 3, {
 			path: PATHS.CHILD,
-			type: 'push',
+			type: 'goTo',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 4, {
 			path: PATHS.NESTED,
-			type: 'push',
+			type: 'goTo',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 5, {
-			type: 'pop',
+			type: 'goBack',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 6, {
-			type: 'pop',
+			type: 'goBack',
 		} );
 	} );
 
@@ -315,11 +315,11 @@ describe( 'Navigator', () => {
 			getNestedScreen( { throwIfNotFound: false } )
 		).not.toBeInTheDocument();
 
-		// Check the values passed to `navigator.push()`
+		// Check the values passed to `navigator.goTo()`
 		expect( spy ).toHaveBeenCalledTimes( 1 );
 		expect( spy ).toHaveBeenNthCalledWith( 1, {
 			path: PATHS.NOT_FOUND,
-			type: 'push',
+			type: 'goTo',
 		} );
 	} );
 
