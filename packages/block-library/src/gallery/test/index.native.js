@@ -270,7 +270,6 @@ describe( 'Gallery block', () => {
 
 		// Initialize with an empty gallery
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
-		fireEvent.press( galleryBlock );
 
 		// Upload images from device
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
@@ -499,7 +498,7 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	// Test case related to TC011 - Choose from Other Apps (iOS Files App
+	// Test case related to TC011 - Choose from Other Apps (iOS Files App)
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc011
 	it( 'uploads from other apps', async () => {
 		const otherAppsMedia = [ ...media ].map( ( item, index ) => ( {
@@ -571,8 +570,7 @@ describe( 'Gallery block', () => {
 		<!-- /wp:gallery -->`,
 			numberOfItems: 2,
 		} );
-		const { galleryBlock, getByText } = screen;
-		fireEvent.press( galleryBlock );
+		const { getByText } = screen;
 
 		// Set "Link to" setting via Gallery block settings
 		await openBlockSettings( screen );
@@ -591,8 +589,7 @@ describe( 'Gallery block', () => {
 				numberOfItems: 3,
 				media,
 			} );
-			const { galleryBlock, getByA11yLabel } = screen;
-			fireEvent.press( galleryBlock );
+			const { getByA11yLabel } = screen;
 
 			await openBlockSettings( screen );
 
@@ -614,8 +611,7 @@ describe( 'Gallery block', () => {
 				numberOfItems: 3,
 				media,
 			} );
-			const { galleryBlock, getByA11yLabel } = screen;
-			fireEvent.press( galleryBlock );
+			const { getByA11yLabel } = screen;
 
 			await openBlockSettings( screen );
 
@@ -639,8 +635,7 @@ describe( 'Gallery block', () => {
 			numberOfItems: 1,
 			media,
 		} );
-		const { galleryBlock, getByText } = screen;
-		fireEvent.press( galleryBlock );
+		const { getByText } = screen;
 
 		await openBlockSettings( screen );
 
