@@ -5,7 +5,6 @@ import {
 	clickBlockAppender,
 	createNewPost,
 	getEditedPostContent,
-	openColorToolsPanelMenu,
 	pressKeyWithModifier,
 	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
@@ -18,8 +17,6 @@ describe( 'Keep styles on block transforms', () => {
 	it( 'Should keep colors during a transform', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '## Heading' );
-		await openColorToolsPanelMenu();
-		await page.click( 'button[aria-label="Show Text"]' );
 
 		const textColorButton = await page.waitForSelector(
 			'.block-editor-panel-color-gradient-settings__dropdown'

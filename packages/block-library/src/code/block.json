@@ -44,7 +44,11 @@
 		"color": {
 			"text": true,
 			"background": true,
-			"gradients": true
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		}
 	},
 	"style": "wp-block-code"
