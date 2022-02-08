@@ -14,10 +14,15 @@ import {
 	SelectControl,
 	RangeControl,
 	__experimentalUnitControl as UnitControl,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	useSetting,
+} from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -44,10 +49,14 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		largestFontSize,
 	} = attributes;
 
-	const units = [
-		{ label: 'px', value: 'px' },
-		{ label: 'pt', value: 'pt' },
-	];
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+		],
+	} );
 
 	const getTaxonomyOptions = () => {
 		const selectOption = {
