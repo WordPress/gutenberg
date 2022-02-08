@@ -30,6 +30,7 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
+		"@testing-library/react": "^11.2.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/data": "file:../data",

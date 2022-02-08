@@ -9,7 +9,7 @@ jest.mock( '@wordpress/api-fetch' );
 /**
  * External dependencies
  */
-import TestRenderer, { act } from 'react-test-renderer';
+import { act, render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -32,15 +32,13 @@ describe( 'useEntityRecord', () => {
 	} );
 
 	const actRender = ( component ) => {
-		let renderer;
 		act( () => {
-			renderer = TestRenderer.create(
+			render(
 				<RegistryProvider value={ registry }>
 					{ component }
 				</RegistryProvider>
 			);
 		} );
-		return renderer;
 	};
 
 	const TEST_RECORD = { id: 1, hello: 'world' };
