@@ -1263,16 +1263,10 @@ _Parameters_
 
 ### resetPost
 
+> **Deprecated** Since WordPress 6.0.
+
 Returns an action object used in signalling that the latest version of the
 post has been received, either by initialization or save.
-
-_Parameters_
-
--   _post_ `Object`: Post object.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### savePost
 

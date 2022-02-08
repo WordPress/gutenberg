@@ -37,7 +37,6 @@ import {
  * @param {Array?} template Block Template.
  */
 export function* setupEditor( post, edits, template ) {
-	yield resetPost( post );
 	yield setupEditorState( post );
 	// Apply a template for new posts only, if exists.
 	const isNewPost = post.status === 'auto-draft';
@@ -83,15 +82,15 @@ export function __experimentalTearDownEditor() {
  * Returns an action object used in signalling that the latest version of the
  * post has been received, either by initialization or save.
  *
- * @param {Object} post Post object.
- *
- * @return {Object} Action object.
+ * @deprecated Since WordPress 6.0.
  */
-export function resetPost( post ) {
-	return {
-		type: 'RESET_POST',
-		post,
-	};
+export function resetPost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).resetPost", {
+		since: '6.0',
+		version: '6.3',
+		alternative: 'Initialize the editor with the setupEditorState action',
+	} );
+	return { type: 'DO_NOTHING' };
 }
 
 /**
