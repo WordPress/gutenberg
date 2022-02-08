@@ -380,8 +380,8 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 				gradients,
 				text: features?.color?.text ?? true,
 				background: features?.color?.background ?? true,
-				defaultPalette: features?.color?.defaultPalette ?? false,
-				defaultGradients: features?.color?.defaultGradients ?? false,
+				defaultPalette: features?.color?.defaultPalette ?? true,
+				defaultGradients: features?.color?.defaultGradients ?? true,
 			},
 			typography: {
 				fontSizes,
