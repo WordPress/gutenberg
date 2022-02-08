@@ -121,6 +121,20 @@ async function selectClassicMenu( optionText ) {
 	await theOption.click();
 }
 
+async function populateNavWithOneItem() {
+	// Add a Link block first.
+	const appender = await page.waitForSelector(
+		'.wp-block-navigation .block-list-appender'
+	);
+	await appender.click();
+	// Add a link to the Link block.
+	await updateActiveNavigationLink( {
+		url: 'https://wordpress.org',
+		label: 'WP',
+		type: 'url',
+	} );
+}
+
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
@@ -575,20 +589,6 @@ describe( 'Navigation', () => {
 		const NAV_ENTITY_SELECTOR =
 			'//div[@class="entities-saved-states__panel"]//label//strong[contains(text(), "Navigation")]';
 
-		async function populateNavWithOneItem() {
-			// Add a Link block first.
-			const appender = await page.waitForSelector(
-				'.wp-block-navigation .block-list-appender'
-			);
-			await appender.click();
-			// Add a link to the Link block.
-			await updateActiveNavigationLink( {
-				url: 'https://wordpress.org',
-				label: 'WP',
-				type: 'url',
-			} );
-		}
-
 		async function resetNavBlockToInitialState() {
 			const selectMenuDropdown = await page.waitForSelector(
 				'[aria-label="Select Menu"]'
@@ -729,6 +729,44 @@ describe( 'Navigation', () => {
 		);
 
 		expect( tagCount ).toBe( 1 );
+	} );
+
+	describe( 'Submenus', () => {
+		it( 'shows button to convert submenu to link when empty', async () => {
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await showBlockToolbar();
+
+			await page.click( 'button[aria-label="Add submenu"]' );
+
+			const navSubmenuSelector =
+				'[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]';
+
+			// Wait for a Submenu block before making assertion.
+			await page.waitForSelector( navSubmenuSelector );
+
+			await showBlockToolbar();
+
+			// Revert the Submenu back to a Navigation Link block.
+			await page.click( 'button[aria-label="Convert to Link"]' );
+
+			// Check the Submenu block is no long present.
+			const navSubmenusLength = await page.$$eval(
+				navSubmenuSelector,
+				( els ) => els.length
+			);
+
+			expect( navSubmenusLength ).toEqual( 0 );
+		} );
 	} );
 
 	describe( 'Permission based restrictions', () => {
