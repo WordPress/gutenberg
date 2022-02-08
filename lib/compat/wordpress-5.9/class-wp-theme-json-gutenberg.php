@@ -928,6 +928,11 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$stylesheet = '';
+		
+		// Allow third party developers to opt out of !important CSS rules.
+		$important_rule = apply_filters( 'compute_preset_classes_important', true );
+		$important = $important_rule ? ' !important' : '';
+		
 		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
 			$slugs = self::get_settings_slugs( $settings, $preset_metadata, $origins );
 			foreach ( $preset_metadata['classes'] as $class => $property ) {
@@ -939,7 +944,7 @@ class WP_Theme_JSON_Gutenberg {
 						array(
 							array(
 								'name'  => $property,
-								'value' => 'var(' . $css_var . ') !important',
+								'value' => 'var(' . $css_var . ')' . $important,
 							),
 						)
 					);
