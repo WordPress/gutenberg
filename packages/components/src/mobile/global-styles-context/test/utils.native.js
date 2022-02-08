@@ -131,8 +131,8 @@ describe( 'getGlobalStyles', () => {
 						gradients,
 						text: true,
 						background: true,
-						defaultPalette: false,
-						defaultGradients: false,
+						defaultPalette: true,
+						defaultGradients: true,
 					},
 					typography: {
 						fontSizes: RAW_FEATURES.typography.fontSizes,
