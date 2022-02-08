@@ -331,6 +331,7 @@ export function getColorsAndGradients(
 	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
 
 	return {
+		__experimentalGlobalStylesBaseStyles: null,
 		__experimentalFeatures: {
 			color: {
 				...( ! features?.color
