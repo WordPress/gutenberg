@@ -166,6 +166,7 @@
 		"cross-env": "3.2.4",
 		"css-loader": "6.2.0",
 		"cssnano": "5.0.7",
+		"csstype": "^3.0.10",
 		"deep-freeze": "0.0.1",
 		"enzyme": "3.11.0",
 		"equivalent-key-map": "0.2.2",

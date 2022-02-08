@@ -146,6 +146,7 @@ importers:
       cross-env: 3.2.4
       css-loader: 6.2.0
       cssnano: 5.0.7
+      csstype: ^3.0.10
       deep-freeze: 0.0.1
       enzyme: 3.11.0
       equivalent-key-map: 0.2.2
@@ -348,6 +349,7 @@ importers:
       cross-env: 3.2.4
       css-loader: 6.2.0_webpack@5.65.0
       cssnano: 5.0.7_postcss@8.4.5
+      csstype: 3.0.10
       deep-freeze: 0.0.1
       enzyme: 3.11.0
       equivalent-key-map: 0.2.2
@@ -10920,7 +10922,7 @@ packages:
       loader-utils: 1.4.0
       make-dir: 3.1.0
       schema-utils: 2.7.1
-      webpack: 5.65.0_webpack-cli@4.9.1
+      webpack: 5.65.0
 
   /babel-plugin-add-react-displayname/0.0.5:
     resolution: {integrity: sha1-M51M3be2X9YtHfnbn+BN4TQSK9U=}
@@ -12574,7 +12576,7 @@ packages:
       normalize-path: 3.0.0
       schema-utils: 4.0.0
       serialize-javascript: 6.0.0
-      webpack: 5.65.0_webpack-cli@4.9.1
+      webpack: 5.65.0
 
   /core-js-builder/3.19.1:
     resolution: {integrity: sha512-PuQdf3ycpvB4jGxtp42uPREHWHzHV/N8QoSX5S5T2QFb8Uaig46oJRfxm6wwT38kfPWTh1gNcPZTzbi8oRoC0w==}
@@ -12874,7 +12876,7 @@ packages:
       postcss-modules-values: 4.0.0_postcss@8.4.5
       postcss-value-parser: 4.2.0
       semver: 7.3.5
-      webpack: 5.65.0_webpack-cli@4.9.1
+      webpack: 5.65.0
 
   /css-mediaquery/0.1.2:
     resolution: {integrity: sha1-aiw3NEkoYYYxxUvTPO3TAdoYvqA=}
@@ -21200,7 +21202,7 @@ packages:
       klona: 2.0.5
       postcss: 8.4.5
       semver: 7.3.5
-      webpack: 5.65.0_webpack-cli@4.9.1
+      webpack: 5.65.0
 
   /postcss-media-query-parser/0.2.3:
     resolution: {integrity: sha1-J7Ocb02U+Bsac7j3Y1HGCeXO8kQ=}
@@ -23405,7 +23407,7 @@ packages:
       klona: 2.0.5
       neo-async: 2.6.2
       sass: 1.35.2
-      webpack: 5.65.0_webpack-cli@4.9.1
+      webpack: 5.65.0
 
   /sass/1.35.2:
     resolution: {integrity: sha512-jhO5KAR+AMxCEwIH3v+4zbB2WB0z67V1X0jbapfVwQQdjHZUGUyukpnoM6+iCMfsIUC016w9OPKQ5jrNOS9uXw==}
@@ -23934,7 +23936,7 @@ packages:
       abab: 2.0.5
       iconv-lite: 0.6.3
       source-map-js: 0.6.2
-      webpack: 5.65.0_webpack-cli@4.9.1
+      webpack: 5.65.0
 
   /source-map-resolve/0.5.2:
     resolution: {integrity: sha512-MjqsvNwyz1s0k81Goz/9vRBe9SZdB09Bdw+/zYyO+3CuPk6fouTaxscHkgtE8jKvf01kVfl8riHzERQ/kefaSA==}
@@ -24880,7 +24882,7 @@ packages:
       serialize-javascript: 6.0.0
       source-map: 0.6.1
       terser: 5.10.0_acorn@8.6.0
-      webpack: 5.65.0_webpack-cli@4.9.1
+      webpack: 5.65.0
     transitivePeerDependencies:
       - acorn
 
@@ -24896,7 +24898,7 @@ packages:
       serialize-javascript: 6.0.0
       source-map: 0.6.1
       terser: 5.10.0
-      webpack: 5.65.0_webpack-cli@4.9.1
+      webpack: 5.65.0
     transitivePeerDependencies:
       - acorn
 
