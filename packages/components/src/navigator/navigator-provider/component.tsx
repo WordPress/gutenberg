@@ -45,7 +45,7 @@ function NavigatorProvider(
 		},
 	] );
 
-	const push: NavigatorContextType[ 'push' ] = useCallback(
+	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
 		( path, options = {} ) => {
 			setLocationHistory( [
 				...locationHistory,
@@ -59,7 +59,7 @@ function NavigatorProvider(
 		[ locationHistory ]
 	);
 
-	const pop: NavigatorContextType[ 'pop' ] = useCallback( () => {
+	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
 		if ( locationHistory.length > 1 ) {
 			setLocationHistory( [
 				...locationHistory.slice( 0, -2 ),
@@ -77,10 +77,10 @@ function NavigatorProvider(
 				...locationHistory[ locationHistory.length - 1 ],
 				isInitial: locationHistory.length === 1,
 			},
-			push,
-			pop,
+			goTo,
+			goBack,
 		} ),
-		[ locationHistory, push, pop ]
+		[ locationHistory, goTo, goBack ]
 	);
 
 	const cx = useCx();
@@ -111,19 +111,19 @@ function NavigatorProvider(
  * } from '@wordpress/components';
  *
  * function NavigatorButton( { path, ...props } ) {
- *  const { push } = useNavigator();
+ *  const { goTo } = useNavigator();
  *  return (
  *    <Button
  *      variant="primary"
- *      onClick={ () => push( path ) }
+ *      onClick={ () => goTo( path ) }
  *      { ...props }
  *    />
  *  );
  * }
  *
  * function NavigatorBackButton( props ) {
- *   const { pop } = useNavigator();
- *   return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
+ *   const { goBack } = useNavigator();
+ *   return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
  * }
  *
  * const MyNavigation = () => (

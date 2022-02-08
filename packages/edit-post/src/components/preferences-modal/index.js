@@ -56,7 +56,7 @@ const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
 
 function NavigationButton( { as: Tag = Button, path, ...props } ) {
-	const { push } = useNavigator();
+	const { goTo } = useNavigator();
 
 	const dataAttrName = 'data-navigator-focusable-id';
 	const dataAttrValue = path;
@@ -71,7 +71,7 @@ function NavigationButton( { as: Tag = Button, path, ...props } ) {
 	return (
 		<Tag
 			onClick={ () =>
-				push( path, { focusTargetSelector: dataAttrCssSelector } )
+				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
 			}
 			{ ...tagProps }
 		/>
@@ -79,8 +79,8 @@ function NavigationButton( { as: Tag = Button, path, ...props } ) {
 }
 
 function NavigationBackButton( { as: Tag = Button, ...props } ) {
-	const { pop } = useNavigator();
-	return <Tag onClick={ pop } { ...props } />;
+	const { goBack } = useNavigator();
+	return <Tag onClick={ goBack } { ...props } />;
 }
 
 export default function PreferencesModal() {

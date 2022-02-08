@@ -18,6 +18,10 @@
 -   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
 - TreeGrid accessibility enhancements. (#38358)
 
+### Experimental
+
+-   `Navigator`: rename `push`/`pop` to `goTo`/`goBack` ([#38582](https://github.com/WordPress/gutenberg/pull/38582))
+
 ## 19.3.0 (2022-01-27)
 
 ### Enhancements

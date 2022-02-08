@@ -182,19 +182,19 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
  * } from '@wordpress/components';
  *
  * function NavigatorButton( { path, ...props } ) {
- *  const { push } = useNavigator();
+ *  const { goTo } = useNavigator();
  *  return (
  *    <Button
  *      variant="primary"
- *      onClick={ () => push( path ) }
+ *      onClick={ () => goTo( path ) }
  *      { ...props }
  *    />
  *  );
  * }
  *
  * function NavigatorBackButton( props ) {
- *   const { pop } = useNavigator();
- *   return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
+ *   const { goBack } = useNavigator();
+ *   return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
  * }
  *
  * const MyNavigation = () => (
