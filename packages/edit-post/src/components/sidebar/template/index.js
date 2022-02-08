@@ -28,6 +28,7 @@ export function TemplatePanel() {
 	const {
 		isEnabled,
 		isOpened,
+		isPostsPage,
 		selectedTemplate,
 		availableTemplates,
 		fetchedTemplates,
@@ -44,10 +45,19 @@ export function TemplatePanel() {
 		const {
 			getEditedPostAttribute,
 			getEditorSettings,
+			getCurrentPostId,
 			getCurrentPostType,
 		} = select( editorStore );
-		const { getPostType, getEntityRecords, canUser } = select( coreStore );
+		const {
+			getPostType,
+			getEntityRecord,
+			getEntityRecords,
+			canUser,
+		} = select( coreStore );
+
+		const currentPostId = getCurrentPostId();
 		const currentPostType = getCurrentPostType();
+		const settings = getEntityRecord( 'root', 'site' );
 		const _isViewable = getPostType( currentPostType )?.viewable ?? false;
 		const _supportsTemplateMode =
 			select( editorStore ).getEditorSettings().supportsTemplateMode &&
@@ -61,6 +71,7 @@ export function TemplatePanel() {
 		return {
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
+			isPostsPage: currentPostId === settings?.page_for_posts,
 			selectedTemplate: getEditedPostAttribute( 'template' ),
 			availableTemplates: getEditorSettings().availableTemplates,
 			fetchedTemplates: templateRecords,
@@ -85,6 +96,10 @@ export function TemplatePanel() {
 
 	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
 	const { editPost } = useDispatch( editorStore );
+
+	if ( isPostsPage ) {
+		return null;
+	}
 
 	if (
 		! isEnabled ||
