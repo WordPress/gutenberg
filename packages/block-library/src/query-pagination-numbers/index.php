@@ -18,10 +18,11 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
-	$blockgap = isset( $attributes['style']['spacing']['blockGap'] ) ? $attributes['style']['spacing']['blockGap'] : '';
+	$blockgap = isset( $attributes['style']['spacing']['blockGap'] ) ? esc_attr( $attributes['style']['spacing']['blockGap'] ) : '';
 	$content  = '';
 
 	$wrapper_attributes = get_block_wrapper_attributes();
+
 	if ( $blockgap ) {
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => "gap:{$blockgap};display:flex;" ) );
 	}

@@ -29,6 +29,13 @@
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}
+		},
+		"__experimentalLayout": {
+			"allowInheriting": false,
+			"allowSwitching": false,
+			"default": {
+				"type": "flex"
+			}
 		}
 	},
 	"editorStyle": "query-pagination-numbers-editor"
