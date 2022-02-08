@@ -230,15 +230,21 @@ class NativeEditorProvider extends Component {
 
 	getThemeColors( { rawStyles, rawFeatures } ) {
 		const { defaultEditorColors, defaultEditorGradients } = this.props;
-		return {
-			...( rawStyles && rawFeatures
-				? getGlobalStyles( rawStyles, rawFeatures )
-				: getColorsAndGradients(
-						defaultEditorColors,
-						defaultEditorGradients,
-						rawFeatures
-				  ) ),
-		};
+
+		if ( rawStyles && rawFeatures ) {
+			return getGlobalStyles( rawStyles, rawFeatures );
+		}
+
+		if (
+			( ! rawStyles && rawFeatures ) ||
+			( ! rawStyles && ! rawFeatures )
+		) {
+			return getColorsAndGradients(
+				defaultEditorColors,
+				defaultEditorGradients,
+				rawFeatures
+			);
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
