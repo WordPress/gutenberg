@@ -362,9 +362,9 @@ Fantastic! We can now restore the previous version of `handleChange` and move on
 
 ### Step 7: Status indicator
 
-There are two more problems with our form: We can click *Save* even when there are no changes, and when we do we can’t be quite sure whether it’s doing anything.
+There is one last problem with our form: there is no visual feedback. We can’t be quite sure whether the *Save* button worked until either the form disappears or an error message shows.
 
-We can clear it up by communicating _Saving_ and _No changes detected_ to the user. Two selectors are going to be useful here: `isSavingEntityRecord` and `hasEditsForEntityRecord`. Unlike `getEntityRecord`, they do not issue any HTTP requests. Instead, they only return the information about the current entity record state.
+We're going to clear it up and communicate two states to the user: _Saving_, and _No changes detected_. The relevant selectors are `isSavingEntityRecord` and `hasEditsForEntityRecord`. Unlike `getEntityRecord`, they never issue any HTTP requests, but only return the information about the current entity record state.
 
 Let's use them in `EditPageForm`:
 
