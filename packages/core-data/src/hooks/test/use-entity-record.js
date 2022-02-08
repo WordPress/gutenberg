@@ -60,7 +60,6 @@ describe( 'useEntityRecord', () => {
 			editedRecord: TEST_RECORD,
 			hasEdits: false,
 			hasResolved: false,
-			isMissing: false,
 			isResolving: false,
 			status: 'IDLE',
 		} );
@@ -96,7 +95,6 @@ describe( 'useEntityRecord', () => {
 			editedRecord: { hello: 'world', id: 1 },
 			hasEdits: false,
 			hasResolved: true,
-			isMissing: false,
 			isResolving: false,
 			status: 'SUCCESS',
 		} );

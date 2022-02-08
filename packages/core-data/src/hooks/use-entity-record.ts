@@ -7,22 +7,27 @@ import { useQuerySelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as coreStore } from '../';
-import { IDLE, SUCCESS, ERROR, RESOLVING } from './constants';
+import { Status } from './constants';
 
-/**
- * @typedef {IDLE|RESOLVING|SUCCESS|ERROR} EntityRecordStatus
- */
+interface EntityRecordResolution {
+	/** The requested entity record */
+	record: Object;
 
-/**
- * @typedef {Object} EntityRecordResolution
- * @property {Object}             record       the requested entity record
- * @property {Object}             editedRecord the requested entity record with any edits applied
- * @property {boolean}            isMissing    is the record missing after the resolver has finished?
- * @property {boolean}            isResolving  is the record still being resolved?
- * @property {boolean}            hasResolved  is the record resolved by now?
- * @property {boolean}            hasEdits     were there eny edits applied to this entity record?
- * @property {EntityRecordStatus} status       resolution status
- */
+	/** The requested entity record with any edits applied*/
+	editedRecord: Object;
+
+	/** Is the record still being resolved? */
+	isResolving: boolean;
+
+	/** Is the record resolved by now? */
+	hasResolved: boolean;
+
+	/** Were there eny edits applied to this entity record? */
+	hasEdits: boolean;
+
+	/** Resolution status */
+	status: Status;
+}
 
 /**
  * Resolves the specified entity record.
@@ -35,24 +40,21 @@ import { IDLE, SUCCESS, ERROR, RESOLVING } from './constants';
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
  *
- * function HammerPriceDisplay( { hammerId } ) {
- *   const { record, isResolving } = useEntityRecord( 'my-shop', 'hammer', hammerId );
+ * function PageTitleDisplay( { id } ) {
+ *   const { record, isResolving } = useEntityRecord( 'postType', 'page', id );
  *
  *   if ( isResolving ) {
  *     return 'Loading...';
  *   }
  *
- *   return new Intl.NumberFormat( 'en-US', {
- *     style: 'USD',
- *     currency,
- *   } ).format( record.price );
+ *   return record.title;
  * }
  *
  * // Rendered in the application:
- * // <HammerPriceDisplay hammerId={ 1 } />
+ * // <PageTitleDisplay id={ 1 } />
  * ```
  *
- * In the above example, when `HammerPriceDisplay` is rendered into an
+ * In the above example, when `PageTitleDisplay` is rendered into an
  * application, the price and the resolution details will be retrieved from
  * the store state using `getEntityRecord()`, or resolved if missing.
  *
@@ -61,7 +63,6 @@ import { IDLE, SUCCESS, ERROR, RESOLVING } from './constants';
 export default function __experimentalUseEntityRecord( kind, name, recordId ) {
 	const {
 		data,
-		isMissing,
 		isResolving,
 		hasResolved,
 		editedRecord,
@@ -77,7 +78,6 @@ export default function __experimentalUseEntityRecord( kind, name, recordId ) {
 			const recordResponse = getEntityRecord( ...args );
 			return {
 				...recordResponse,
-				isMissing: recordResponse.hasResolved && ! recordResponse.data,
 				editedRecord: getEditedEntityRecord( ...args ).data,
 				hasEdits: hasEditsForEntityRecord( ...args ).data,
 			};
@@ -87,15 +87,15 @@ export default function __experimentalUseEntityRecord( kind, name, recordId ) {
 
 	let status;
 	if ( isResolving ) {
-		status = RESOLVING;
+		status = Status.Resolving;
 	} else if ( hasResolved ) {
 		if ( data ) {
-			status = SUCCESS;
+			status = Status.Success;
 		} else {
-			status = ERROR;
+			status = Status.Error;
 		}
 	} else {
-		status = IDLE;
+		status = Status.Idle;
 	}
 
 	return {
@@ -103,7 +103,6 @@ export default function __experimentalUseEntityRecord( kind, name, recordId ) {
 		record: data,
 		editedRecord,
 		hasEdits,
-		isMissing,
 		isResolving,
 		hasResolved,
 	};
