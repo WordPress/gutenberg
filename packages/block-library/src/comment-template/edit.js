@@ -53,15 +53,22 @@ function CommentTemplateInnerBlocks( {
 	);
 	return (
 		<li { ...innerBlocksProps }>
-			{ comment === ( activeComment || firstComment ) ? (
-				children
-			) : (
-				<MemoizedCommentTemplatePreview
-					blocks={ blocks }
-					comment={ comment }
-					setActiveComment={ setActiveComment }
-				/>
-			) }
+			{ comment === ( activeComment || firstComment ) ? children : null }
+
+			{ /* To avoid flicker when switching active block contexts, a preview
+			is ALWAYS rendered and the preview for the active block is hidden. 
+			This ensures that when switching the active block, the component is not 
+			mounted again but rather it only toggles the `isHidden` prop.
+			
+			The same strategy is used for preventing the flicker in the Post Template
+			block. */ }
+			<MemoizedCommentTemplatePreview
+				blocks={ blocks }
+				comment={ comment }
+				setActiveComment={ setActiveComment }
+				isHidden={ comment === ( activeComment || firstComment ) }
+			/>
+
 			{ comment?.children?.length > 0 ? (
 				<CommentsList
 					comments={ comment.children }
@@ -74,7 +81,12 @@ function CommentTemplateInnerBlocks( {
 	);
 }
 
-const CommentTemplatePreview = ( { blocks, comment, setActiveComment } ) => {
+const CommentTemplatePreview = ( {
+	blocks,
+	comment,
+	setActiveComment,
+	isHidden,
+} ) => {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 	} );
@@ -83,12 +95,22 @@ const CommentTemplatePreview = ( { blocks, comment, setActiveComment } ) => {
 		setActiveComment( comment );
 	};
 
+	// We have to hide the preview block if the `comment` props points to
+	// the curently active block!
+
+	// Or, to put it differently, every preview block is visible unless it is the
+	// currently active block - in this case we render its inner blocks.
+	const style = {
+		display: isHidden ? 'none' : undefined,
+	};
+
 	return (
 		<div
 			{ ...blockPreviewProps }
 			tabIndex={ 0 }
-			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 			role="button"
+			style={ style }
+			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 			onClick={ handleOnClick }
 			onKeyPress={ handleOnClick }
 		/>
