@@ -88,29 +88,12 @@ describe( 'Placeholder', () => {
 			const element = <div>Fieldset</div>;
 			const placeholder = shallow( <Placeholder children={ element } /> );
 			const placeholderFieldset = placeholder.find(
-				'fieldset.components-placeholder__fieldset'
+				'.components-placeholder__fieldset'
 			);
 			const child = placeholderFieldset.childAt( 0 );
 
 			expect( placeholderFieldset.exists() ).toBe( true );
 			expect( child.matchesElement( element ) ).toBe( true );
-		} );
-
-		it( 'should display a legend if instructions are passed', () => {
-			const element = <div>Fieldset</div>;
-			const instructions = 'Choose an option.';
-			const placeholder = shallow(
-				<Placeholder
-					children={ element }
-					instructions={ instructions }
-				/>
-			);
-			const placeholderLegend = placeholder.find(
-				'legend.components-placeholder__instructions'
-			);
-
-			expect( placeholderLegend.exists() ).toBe( true );
-			expect( placeholderLegend.text() ).toEqual( instructions );
 		} );
 
 		it( 'should add an additional className to the top container', () => {

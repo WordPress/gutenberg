@@ -78,6 +78,10 @@ function TreeGrid(
 			const activeRow = activeElement.closest( '[role="row"]' );
 			const focusablesInRow = getRowFocusables( activeRow );
 			const currentColumnIndex = focusablesInRow.indexOf( activeElement );
+			const canExpandCollapse = 0 === currentColumnIndex;
+			const cannotFocusNextColumn =
+				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
+				keyCode !== LEFT;
 
 			if ( includes( [ LEFT, RIGHT ], keyCode ) ) {
 				// Calculate to the next element.
@@ -91,12 +95,8 @@ function TreeGrid(
 					);
 				}
 
-				// Focus is either at the left or right edge of the grid. Allow Right Arrow to expand the row.
-				if (
-					nextIndex === currentColumnIndex ||
-					( activeRow.hasAttribute( 'aria-expanded' ) &&
-						keyCode === RIGHT )
-				) {
+				// Focus is at the left most column.
+				if ( canExpandCollapse ) {
 					if ( keyCode === LEFT ) {
 						// Left:
 						// If a row is focused, and it is expanded, collapses the current row.
@@ -153,11 +153,8 @@ function TreeGrid(
 					return;
 				}
 
-				// Focus the next column only if expanded. Checking Right Arrow key here that way Left Arrow can always get back to the previous column regardless of the row state.
-				if (
-					activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
-					keyCode === RIGHT
-				) {
+				// Focus the next element. If at most left column and row is collapsed, moving right is not allowed as this will expand. However, if row is collapsed, moving left is allowed.
+				if ( cannotFocusNextColumn ) {
 					return;
 				}
 				focusablesInRow[ nextIndex ].focus();
