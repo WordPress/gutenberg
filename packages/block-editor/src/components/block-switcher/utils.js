@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalGetBlockAttributesNamesByRole as getBlockAttributesNamesByRole } from '@wordpress/blocks';
+import { __experimentalFilterBlockAttributes as filterBlockAttributes } from '@wordpress/blocks';
 
 /**
  * Try to find a matching block by a block's name in a provided
@@ -46,7 +46,9 @@ export const getMatchingBlockByName = (
  * @return {Object} The block's attributes to retain.
  */
 export const getRetainedBlockAttributes = ( name, attributes ) => {
-	const contentAttributes = getBlockAttributesNamesByRole( name, 'content' );
+	const contentAttributes = filterBlockAttributes( name, {
+		__experimentalRole: 'content',
+	} );
 	if ( ! contentAttributes?.length ) return attributes;
 
 	return contentAttributes.reduce( ( _accumulator, attribute ) => {

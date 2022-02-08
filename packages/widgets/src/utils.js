@@ -51,7 +51,9 @@ function addInternalWidgetIdAttribute( settings ) {
 			...settings.attributes,
 			__internalWidgetId: {
 				type: 'string',
-				__experimentalRole: 'internal',
+				supports: {
+					copy: false,
+				},
 			},
 		},
 	};

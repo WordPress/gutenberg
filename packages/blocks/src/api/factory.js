@@ -34,7 +34,7 @@ import {
 } from './registration';
 import {
 	normalizeBlockType,
-	__experimentalGetBlockAttributesNamesByRole,
+	__experimentalFilterBlockAttributes,
 } from './utils';
 
 /**
@@ -128,11 +128,11 @@ export function createBlocksFromInnerBlocksTemplate(
  * optionally merging new attributes, replacing its inner blocks, and/or
  * filtering out attributes with the 'internal' role.
  *
- * @param {Object}   block                            Block instance.
- * @param {Object}   mergeAttributes                  Block attributes.
- * @param {?Array}   newInnerBlocks                   Nested blocks.
- * @param {?Object}  options                          Cloning options.
- * @param {?boolean} options.retainInternalAttributes Whether to retain internal attributes in the cloned block.
+ * @param {Object}   block                        Block instance.
+ * @param {Object}   mergeAttributes              Block attributes.
+ * @param {?Array}   newInnerBlocks               Nested blocks.
+ * @param {?Object}  options                      Cloning options.
+ * @param {?boolean} options.retainCopyAttributes Whether to retain attributes that do not have copy support in the cloned block.
  *
  * @return {Object} A cloned block.
  */
@@ -142,7 +142,7 @@ export function cloneBlock(
 	newInnerBlocks,
 	options = {}
 ) {
-	const { retainInternalAttributes = true } = options;
+	const { retainCopyAttributes = true } = options;
 	const clientId = uuid();
 
 	let attributes = {
@@ -150,13 +150,12 @@ export function cloneBlock(
 		...mergeAttributes,
 	};
 
-	if ( ! retainInternalAttributes ) {
+	if ( ! retainCopyAttributes ) {
 		attributes = omit(
 			attributes,
-			__experimentalGetBlockAttributesNamesByRole(
-				block.name,
-				'internal'
-			)
+			__experimentalFilterBlockAttributes( block.name, {
+				supports: { copy: false },
+			} )
 		);
 	}
 

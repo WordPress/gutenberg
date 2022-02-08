@@ -27,7 +27,7 @@ import {
 import {
 	isUnmodifiedDefaultBlock,
 	normalizeBlockType,
-	__experimentalGetBlockAttributesNamesByRole,
+	__experimentalFilterBlockAttributes,
 } from './utils';
 
 /**
@@ -367,7 +367,9 @@ export function serializeBlock(
 	if ( ! retainCopyAttributes ) {
 		saveAttributes = omit(
 			saveAttributes,
-			__experimentalGetBlockAttributesNamesByRole( blockName, 'internal' )
+			__experimentalFilterBlockAttributes( blockName, {
+				supports: { copy: false },
+			} )
 		);
 	}
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );

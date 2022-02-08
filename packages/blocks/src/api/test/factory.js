@@ -360,13 +360,15 @@ describe( 'block factory', () => {
 			expect( clonedBlock.clientId ).not.toBe( block.clientId );
 		} );
 
-		it( 'should retain internal attributes by default', () => {
+		it( 'should retain all attributes by default', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
 					internalAttribute: {
 						type: 'string',
-						__experimentalRole: 'internal',
+						supports: {
+							copy: false,
+						},
 					},
 					contentAttribute: {
 						type: 'string',
@@ -387,13 +389,21 @@ describe( 'block factory', () => {
 			} );
 		} );
 
-		it( 'should not duplicate internal attributes when retainInternalAttributes is false', () => {
+		it( 'should not duplicate attributes that do not support copy operation when retainCopyAttributes is false', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
 					internalAttribute: {
 						type: 'string',
-						__experimentalRole: 'internal',
+						supports: {
+							copy: false,
+						},
+					},
+					attributeWithExplicitCopySupport: {
+						type: 'string',
+						supports: {
+							copy: true,
+						},
 					},
 					contentAttribute: {
 						type: 'string',
@@ -405,15 +415,16 @@ describe( 'block factory', () => {
 			const block = createBlock( 'core/test-block', {
 				internalAttribute: 'this-should-not-be-copied',
 				contentAttribute: 'some content',
-				attributeWithNoRole: 'another attribute',
+				attributeWithExplicitCopySupport: 'another attribute',
 			} );
 
 			const clonedBlock = cloneBlock( block, {}, null, {
-				retainInternalAttributes: false,
+				retainCopyAttributes: false,
 			} );
 
 			expect( clonedBlock.attributes ).toEqual( {
 				contentAttribute: 'some content',
+				attributeWithExplicitCopySupport: 'another attribute',
 			} );
 		} );
 

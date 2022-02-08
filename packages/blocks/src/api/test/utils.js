@@ -17,7 +17,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getAccessibleBlockLabel,
 	getBlockLabel,
-	__experimentalGetBlockAttributesNamesByRole,
+	__experimentalFilterBlockAttributes,
 } from '../utils';
 
 describe( 'block helpers', () => {
@@ -214,7 +214,7 @@ describe( 'getAccessibleBlockLabel', () => {
 	} );
 } );
 
-describe( '__experimentalGetBlockAttributesNamesByRole', () => {
+describe( '__experimentalFilterBlockAttributes', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block-1', {
 			attributes: {
@@ -232,6 +232,9 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 				color: {
 					type: 'string',
 					__experimentalRole: 'other',
+					supports: {
+						copy: false,
+					},
 				},
 			},
 			save: noop,
@@ -263,41 +266,45 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 	} );
 	it( 'should return empty array if block has no attributes', () => {
 		expect(
-			__experimentalGetBlockAttributesNamesByRole( 'core/test-block-3' )
+			__experimentalFilterBlockAttributes( 'core/test-block-3' )
 		).toEqual( [] );
 	} );
-	it( 'should return all attribute names if no role is provided', () => {
+	it( 'should return all attribute names if no options are provided', () => {
 		expect(
-			__experimentalGetBlockAttributesNamesByRole( 'core/test-block-1' )
+			__experimentalFilterBlockAttributes( 'core/test-block-1' )
 		).toEqual(
 			expect.arrayContaining( [ 'align', 'content', 'level', 'color' ] )
 		);
 	} );
-	it( 'should return proper results with existing attributes and provided role', () => {
+	it( 'should return proper results with existing attributes and provided options', () => {
 		expect(
-			__experimentalGetBlockAttributesNamesByRole(
-				'core/test-block-1',
-				'content'
-			)
+			__experimentalFilterBlockAttributes( 'core/test-block-1', {
+				__experimentalRole: 'content',
+			} )
 		).toEqual( expect.arrayContaining( [ 'content', 'level' ] ) );
 		expect(
-			__experimentalGetBlockAttributesNamesByRole(
-				'core/test-block-1',
-				'other'
-			)
+			__experimentalFilterBlockAttributes( 'core/test-block-1', {
+				__experimentalRole: 'other',
+				supports: { copy: false },
+			} )
 		).toEqual( [ 'color' ] );
 		expect(
-			__experimentalGetBlockAttributesNamesByRole(
-				'core/test-block-1',
-				'not-exists'
-			)
+			__experimentalFilterBlockAttributes( 'core/test-block-1', {
+				__experimentalRole: 'not-exists',
+			} )
+		).toEqual( [] );
+		// There are no attributes that match all the conditions.
+		expect(
+			__experimentalFilterBlockAttributes( 'core/test-block-1', {
+				__experimentalRole: 'content',
+				type: 'string',
+			} )
 		).toEqual( [] );
 		// A block with no `role` in any attributes.
 		expect(
-			__experimentalGetBlockAttributesNamesByRole(
-				'core/test-block-2',
-				'content'
-			)
+			__experimentalFilterBlockAttributes( 'core/test-block-2', {
+				__experimentalRole: 'content',
+			} )
 		).toEqual( [] );
 	} );
 } );

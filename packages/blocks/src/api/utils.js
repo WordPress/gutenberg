@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString, maxBy } from 'lodash';
+import { every, has, isFunction, isMatch, isString, maxBy } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -240,20 +240,19 @@ export function getAccessibleBlockLabel(
 }
 
 /**
- * Filter block attributes by `role` and return their names.
+ * Filter block attributes by given options and return their names.
  *
- * @param {string} name Block attribute's name.
- * @param {string} role The role of a block attribute.
+ * @param {string} name    Block attribute's name.
+ * @param {Object} options Attribute properties to filter by.
  *
- * @return {string[]} The attribute names that have the provided role.
+ * @return {string[]} The attribute names that have the provided options.
  */
-export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
+export function __experimentalFilterBlockAttributes( name, options ) {
 	const attributes = getBlockType( name )?.attributes;
 	if ( ! attributes ) return [];
+
 	const attributesNames = Object.keys( attributes );
-	if ( ! role ) return attributesNames;
-	return attributesNames.filter(
-		( attributeName ) =>
-			attributes[ attributeName ]?.__experimentalRole === role
+	return attributesNames.filter( ( attributeName ) =>
+		isMatch( attributes[ attributeName ], options )
 	);
 }

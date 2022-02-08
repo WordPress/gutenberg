@@ -195,7 +195,7 @@ _Parameters_
 -   _mergeAttributes_ `Object`: Block attributes.
 -   _newInnerBlocks_ `?Array`: Nested blocks.
 -   _options_ `?Object`: Cloning options.
--   _options.retainInternalAttributes_ `?boolean`: Whether to retain internal attributes in the cloned block.
+-   _options.retainCopyAttributes_ `?boolean`: Whether to retain attributes that do not have copy support in the cloned block.
 
 _Returns_
 
