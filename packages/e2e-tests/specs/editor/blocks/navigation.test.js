@@ -208,6 +208,13 @@ async function getNavigationMenuRawContent() {
 	return stripPageIds( response.content.raw );
 }
 
+async function waitForBlock( blockName ) {
+	const blockSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: ${ blockName }"]`;
+
+	// Wait for a Submenu block before making assertion.
+	return await page.waitForSelector( blockSelector );
+}
+
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
@@ -731,8 +738,11 @@ describe( 'Navigation', () => {
 		expect( tagCount ).toBe( 1 );
 	} );
 
-	describe( 'Submenus', () => {
+	// eslint-disable-next-line jest/no-focused-tests
+	describe.only( 'Submenus', () => {
 		it( 'shows button to convert submenu to link when empty', async () => {
+			const navSubmenuSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]`;
+
 			await createNewPost();
 			await insertBlock( 'Navigation' );
 
@@ -748,11 +758,7 @@ describe( 'Navigation', () => {
 
 			await page.click( 'button[aria-label="Add submenu"]' );
 
-			const navSubmenuSelector =
-				'[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]';
-
-			// Wait for a Submenu block before making assertion.
-			await page.waitForSelector( navSubmenuSelector );
+			await waitForBlock( 'Submenu' );
 
 			await showBlockToolbar();
 
