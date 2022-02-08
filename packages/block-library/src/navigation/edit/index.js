@@ -496,6 +496,7 @@ function Navigation( {
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
+										showTools={ true }
 									/>
 								) }
 							</ToolbarDropdownMenu>

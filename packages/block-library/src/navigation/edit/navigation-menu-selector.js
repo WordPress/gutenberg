@@ -19,6 +19,7 @@ export default function NavigationMenuSelector( {
 	clientId,
 	onSelect,
 	onCreateNew,
+	showTools = false,
 } ) {
 	const {
 		menus: classicMenus,
@@ -75,7 +76,7 @@ export default function NavigationMenuSelector( {
 				actionLabel={ __( "Switch to '%s'" ) }
 			/>
 
-			{ canUserCreateNavigation && (
+			{ showTools && canUserCreateNavigation && (
 				<MenuGroup label={ __( 'Tools' ) }>
 					<MenuItem onClick={ onCreateNew }>
 						{ __( 'Create new menu' ) }
