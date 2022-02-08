@@ -173,7 +173,10 @@ export function VanillaReactForm({ initialTitle }) {
 Updating entity records in Gutenberg Data is similar. We don't use `useState`, though. The counterpart of `setTitle` is an `editEntityRecord` action which stores the updates in the Redux state. Here's how you can try it out in your browser's dev tools:
 
 ```js
-const pageId = wp.data.dispatch( 'core' ).getEntityRecords( 'postType', 'page' )[0].id;
+// Get a real page ID first
+const pageId = wp.data.select( 'core' ).getEntityRecords( 'postType', 'page' )[0].id;
+
+// Uupdate the title
 wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'page', pageId, { title: 'updated title' } );
 ```
 
