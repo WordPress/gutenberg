@@ -254,7 +254,7 @@
 		"format": "wp-scripts format",
 		"format-js": "wp-scripts format-js",
 		"format-php": "wp-env run composer run-script format",
-		"lint": "concurrently \"npm run lint-lockfile\" \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
+		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
 		"prelint-php": "wp-env run composer 'install --no-interaction'",
