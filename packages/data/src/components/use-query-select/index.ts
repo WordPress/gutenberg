@@ -1,23 +1,23 @@
 /**
- * External dependencies
- */
-import memoize from 'memize';
-
-/**
  * Internal dependencies
  */
 import useSelect from '../use-select';
 import { META_SELECTORS } from '../../store';
+import memoize from './memoize';
 
-/** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
+interface QuerySelectResponse {
+	/** the requested selector return value */
+	data: Object;
 
-/**
- * @typedef {Object} QuerySelectResponse
- * @property {Object}  data        the requested entity record
- * @property {boolean} isResolving is the record still being resolved? Via the `getIsResolving` meta-selector.
- * @property {boolean} hasStarted  was the resolution started? Via the `hasStartedResolution` meta-selector.
- * @property {boolean} hasResolved has the resolution finished? Via the `hasFinishedResolution` meta-selector.
- */
+	/** is the record still being resolved? Via the `getIsResolving` meta-selector */
+	isResolving: boolean;
+
+	/** was the resolution started? Via the `hasStartedResolution` meta-selector */
+	hasStarted: boolean;
+
+	/** has the resolution finished? Via the `hasFinishedResolution` meta-selector. */
+	hasResolved: boolean;
+}
 
 /**
  * Like useSelect, but the selectors return objects containing
@@ -66,12 +66,17 @@ export default function useQuerySelect( mapQuerySelect, deps ) {
 	}, deps );
 }
 
+type QuerySelector = ( ...args ) => QuerySelectResponse;
+interface EnrichedSelectors {
+	[ key: string ]: QuerySelector;
+}
+
 /**
  * Transform simple selectors into ones that return an object with the
  * original return value AND the resolution info.
  *
  * @param {Object} selectors Selectors to enrich
- * @return {Object} Enriched selectors
+ * @return {EnrichedSelectors} Enriched selectors
  */
 const enrichSelectors = memoize( ( selectors ) => {
 	const resolvers = {};
