@@ -94,3 +94,10 @@ Callback which is called at the end of drag operations.
 -   Required: No
 
 Callback which is called at the start of drag operations.
+
+### `resolvePoint`
+
+-   Type: `Function`
+-   Required: No
+
+A function that receives the current value and returns a modified value. It is called before the onDrag callback.
