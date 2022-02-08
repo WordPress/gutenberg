@@ -156,9 +156,23 @@ _If_ however, the previous release was an **RC** (e.g. `X.Y.0-rc.1`) you will ne
 
 To do this, when running the Workflow, select the appropriate `release/` branch from the `Use workflow from` dropdown (e.g. `release/12.5`) and specify `stable` in the text input field.
 
-Please note you **cannot create point releases for previous stable releases once a more recent stable release has been published** as this would require significant changes to how we upload plugin versions to the WP.org plugin SVN repo). Always check the latest release version before you proceed.
+Please note you **cannot create point releases for previous stable releases once a more recent stable release has been published** as this would require significant changes to how we upload plugin versions to the WP.org plugin SVN repo). Always check the latest release version before you proceed (see [this Issue](https://github.com/WordPress/gutenberg/issues/33277#issuecomment-876289457) for more information).
 
-More more information please see [this Issue](https://github.com/WordPress/gutenberg/issues/33277#issuecomment-876289457).
+#### Troubleshooting
+
+> The release draft was created but it was empty/contained an error message
+
+If you forget to assign the correct Milestone to your cherry picked PR then the release tool may error or your changelog may be empty.
+
+In this case, edit the release notes manually copying the format from a previous release.
+
+> The draft release only contains 1 asset file. Other releases have x3.
+
+This is expected. The draft release will contain only the plugin zip. Only once the release is published will the remaining assets be generated and added to the release.
+
+> Do I need to publish point releases to WordPress.org?
+
+Yes. The method for this is identical to the main Plugin release process. You will need a Gutenberg Core team member to approve the release workflow.
 
 ## Packages Releases to npm and WordPress Core Updates
 
