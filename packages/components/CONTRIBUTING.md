@@ -228,6 +228,8 @@ export const Wrapper = styled.div`
 
 Once deprecated, code examples in docs/stories should include the opt-in prop set to `true` so that new consumers are encouraged to adopt it from the start.
 
+Remember to [add a **Needs Dev Note** label](/docs/contributors/code/backward-compatibility.md##dev-notes) to the pull request so third-party developers can be informed of the deprecation.
+
 When the grace period is over and the deprecation version arrives, the `__next*` prop, deprecation notice, and deprecated styles should all be completely removed from the codebase.
 
 #### Criteria for putting styles changes behind a feature flag
