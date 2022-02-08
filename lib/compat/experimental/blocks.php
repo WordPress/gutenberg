@@ -53,22 +53,16 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 		}
 
 		if ( $per_page > 0 ) {
-			$page = (int) get_query_var( 'cpage' );
-
-			if ( $page ) {
-				$comment_args['offset'] = ( $page - 1 ) * $per_page;
-			} elseif ( 'oldest' === $default_page ) {
-				$comment_args['offset'] = 0;
-			} elseif ( 'newest' === $default_page ) {
-				// For this specific case, we need to make first a query to know
-				// the number of pages, and so get the index of the last page
-				// (newest comments).
-				$comment_query          = new WP_Comment_Query( $comment_args );
-				$comment_pages_count    = get_comment_pages_count( $comment_query->get_comments(), $per_page, true );
-				$comment_args['offset'] = ( $comment_pages_count - 1 ) * $per_page;
-			}
-
 			$comment_args['number'] = $per_page;
+
+			$page = (int) get_query_var( 'cpage' );
+			if ( $page ) {
+				$comment_args['paged'] = $page;
+			} elseif ( 'oldest' === $default_page ) {
+				$comment_args['paged'] = 0;
+			} elseif ( 'newest' === $default_page ) {
+				$comment_args['paged'] = ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
+			}
 		}
 
 		return $comment_args;
