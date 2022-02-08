@@ -330,7 +330,7 @@ describe( 'block serializer', () => {
 					internal: {
 						type: 'string',
 						supports: {
-							copy: false
+							copy: false,
 						},
 					},
 				},
@@ -385,7 +385,7 @@ describe( 'block serializer', () => {
 			);
 		} );
 
-		it( 'should serialize internal attributes by default', () => {
+		it( 'should serialize all attributes by default', () => {
 			const block = createBlock( 'core/test-block', {
 				content: 'content',
 				internal: 'copy me',
@@ -396,7 +396,7 @@ describe( 'block serializer', () => {
 			);
 		} );
 
-		it( 'should omit internal attributes when retainCopyAttributes is false', () => {
+		it( 'should omit attributes without copy support when retainCopyAttributes is false', () => {
 			const block = createBlock( 'core/test-block', {
 				content: 'content',
 				internal: 'copy me',

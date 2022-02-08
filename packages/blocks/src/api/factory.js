@@ -126,7 +126,7 @@ export function createBlocksFromInnerBlocksTemplate(
 /**
  * Given a block object, returns a copy of the block object,
  * optionally merging new attributes, replacing its inner blocks, and/or
- * filtering out attributes with the 'internal' role.
+ * filtering out attributes which do not have copy support.
  *
  * @param {Object}   block                        Block instance.
  * @param {Object}   mergeAttributes              Block attributes.

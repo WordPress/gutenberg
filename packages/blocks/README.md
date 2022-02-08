@@ -187,7 +187,7 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 Given a block object, returns a copy of the block object,
 optionally merging new attributes, replacing its inner blocks, and/or
-filtering out attributes with the 'internal' role.
+filtering out attributes which do not have copy support.
 
 _Parameters_
 
