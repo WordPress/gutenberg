@@ -185,6 +185,7 @@ function ListViewBlock( {
 							ref={ ref }
 							tabIndex={ tabIndex }
 							onFocus={ onFocus }
+							isExpanded={ isExpanded }
 						/>
 					</div>
 				) }
