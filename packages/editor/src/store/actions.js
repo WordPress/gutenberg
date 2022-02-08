@@ -280,27 +280,16 @@ export function* savePost( options = {} ) {
 }
 
 /**
- * Action generator for handling refreshing the current post.
+ * Action for refreshing the current post.
+ *
+ * @deprecated Since Gutenberg 13.0.0.
  */
-export function* refreshPost() {
-	const post = yield controls.select( STORE_NAME, 'getCurrentPost' );
-	const postTypeSlug = yield controls.select(
-		STORE_NAME,
-		'getCurrentPostType'
-	);
-	const postType = yield controls.resolveSelect(
-		coreStore,
-		'getPostType',
-		postTypeSlug
-	);
-	const newPost = yield apiFetch( {
-		// Timestamp arg allows caller to bypass browser caching, which is
-		// expected for this specific function.
-		path:
-			`/wp/v2/${ postType.rest_base }/${ post.id }` +
-			`?context=edit&_timestamp=${ Date.now() }`,
+export function refreshPost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).refreshPost", {
+		since: '5.9',
+		alternative: 'Use the core entities store instead',
 	} );
-	yield controls.dispatch( STORE_NAME, 'resetPost', newPost );
+	return { type: 'DO_NOTHING' };
 }
 
 /**
@@ -404,13 +393,16 @@ export function* undo() {
 }
 
 /**
- * Returns an action object used in signalling that undo history record should
- * be created.
+ * Action that creates an undo history record.
  *
- * @return {Object} Action object.
+ * @deprecated Since Gutenberg 13.0.0
  */
 export function createUndoLevel() {
-	return { type: 'CREATE_UNDO_LEVEL' };
+	deprecated( "wp.data.dispatch( 'core/editor' ).createUndoLevel", {
+		since: '5.9',
+		alternative: 'Use the core entities store instead',
+	} );
+	return { type: 'DO_NOTHING' };
 }
 
 /**
