@@ -205,7 +205,7 @@ import { useDispatch } from '@wordpress/data';
 
 export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const page = useSelect(
-		select => select(coreDataStore).getEditedEntityRecord('postType', 'page', pageId),
+		select => select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
 		[ pageId ]
 	);
 	const { editEntityRecord } = useDispatch( coreDataStore );
@@ -306,7 +306,7 @@ To tell the user when any of these happens, we have to make two adjustments. We 
 export function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
 	const handleSave = async () => {
-		const updatedRecord = await saveEditedEntityRecord('postType', 'page', pageId);
+		const updatedRecord = await saveEditedEntityRecord( 'postType', 'page', pageId );
 		if ( updatedRecord ) {
 			onSaveFinished();
 		}
@@ -329,8 +329,8 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
     const { lastError, page } = useSelect(
         select => ({
-			page: select(coreDataStore).getEditedEntityRecord('postType', 'page', pageId),
-			lastError: select(coreDataStore).getLastEntitySaveError('postType', 'page', pageId)
+			page: select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
+			lastError: select( coreDataStore ).getLastEntitySaveError( 'postType', 'page', pageId )
 		}),
         [ pageId ]
 	)
@@ -380,8 +380,8 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
 	const { isSaving, hasEdits, /* ... */ } = useSelect(
 		select => ({
-			isSaving: select(coreDataStore).isSavingEntityRecord('postType', 'page', pageId),
-			hasEdits: select(coreDataStore).hasEditsForEntityRecord('postType', 'page', pageId),
+			isSaving: select( coreDataStore ).isSavingEntityRecord( 'postType', 'page', pageId ),
+			hasEdits: select( coreDataStore ).hasEditsForEntityRecord( 'postType', 'page', pageId ),
 			// ...
 		}),
 		[ pageId ]
@@ -399,7 +399,7 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 		// ...
 		<div className="form-buttons">
 			<Button onClick={ handleSave } variant="primary" disabled={ ! hasEdits || isSaving }>
-				{isSaving ? <Spinner/> : 'Save'}
+				{ isSaving ? <Spinner/> : 'Save' }
 			</Button>
 		</div>
 		// ...
