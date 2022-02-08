@@ -16,7 +16,7 @@
 ### Enhancements
 
 -   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
-- TreeGrid accessibility enhancements. (#38358)
+- TreeGrid accessibility enhancements. ([#38358](https://github.com/WordPress/gutenberg/pull/38358))
 
 ## 19.3.0 (2022-01-27)
 
