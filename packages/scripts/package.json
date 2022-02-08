@@ -63,6 +63,7 @@
 		"fast-glob": "^3.2.7",
 		"filenamify": "^4.2.0",
 		"jest": "^27.4.5",
+		"jest-circus": "^27.5.1",
 		"jest-dev-server": "^6.0.2",
 		"jest-environment-node": "^27.4.4",
 		"markdownlint": "^0.23.1",
