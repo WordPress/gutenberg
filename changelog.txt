@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 12.5.4 =
+
+### Bug Fixes
+
+#### Block Library
+- Fix and refine core function escaping in block output. ([38569](https://github.com/WordPress/gutenberg/pull/38569))
+
+
 = 12.5.3 =
 
 ### Bug Fixes
