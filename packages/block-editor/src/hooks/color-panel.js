@@ -25,6 +25,7 @@ export default function ColorPanel( {
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
+	const [ detectedLinkColor, setDetectedLinkColor ] = useState();
 	const ref = useBlockRef( clientId );
 
 	useEffect( () => {
@@ -36,6 +37,11 @@ export default function ColorPanel( {
 			return;
 		}
 		setDetectedColor( getComputedStyle( ref.current ).color );
+
+		const firstLinkElement = ref.current?.querySelector( 'a' );
+		if ( firstLinkElement && !! firstLinkElement.innerText ) {
+			setDetectedLinkColor( getComputedStyle( firstLinkElement ).color );
+		}
 
 		let backgroundColorNode = ref.current;
 		let backgroundColor = getComputedStyle( backgroundColorNode )
@@ -70,6 +76,7 @@ export default function ColorPanel( {
 						backgroundColor={ detectedBackgroundColor }
 						textColor={ detectedColor }
 						enableAlphaChecker={ enableAlpha }
+						linkColor={ detectedLinkColor }
 					/>
 				) }
 			</PanelColorGradientSettings>

@@ -1,5 +1,26 @@
 == Changelog ==
 
+= 12.5.3 =
+
+### Bug Fixes
+
+#### Block Library
+- Fix escaping to consider addition of pagination arrow in Query Loop. ([38519](https://github.com/WordPress/gutenberg/pull/38519))
+
+
+= 12.5.2 =
+
+
+
+### Bug Fixes
+
+#### Block Library
+- Fix latest posts excerpt escaping. ([38517](https://github.com/WordPress/gutenberg/pull/38517))
+
+
+
+
+
 = 12.5.1 =
 
 ### Bug Fixes

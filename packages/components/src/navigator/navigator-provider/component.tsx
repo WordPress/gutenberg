@@ -42,28 +42,17 @@ function NavigatorProvider(
 	>( [
 		{
 			path: initialPath,
-			isBack: false,
-			isInitial: true,
 		},
 	] );
 
 	const push: NavigatorContextType[ 'push' ] = useCallback(
-		( path, options ) => {
-			// Force the `isBack` flag to `false` when navigating forward on both the
-			// previous and the new location.
-			// Also force the `isInitial` flag to `false` for the new location, to make
-			// sure it doesn't get overridden by mistake.
+		( path, options = {} ) => {
 			setLocationHistory( [
-				...locationHistory.slice( 0, -1 ),
-				{
-					...locationHistory[ locationHistory.length - 1 ],
-					isBack: false,
-				},
+				...locationHistory,
 				{
 					...options,
 					path,
 					isBack: false,
-					isInitial: false,
 				},
 			] );
 		},
@@ -72,7 +61,6 @@ function NavigatorProvider(
 
 	const pop: NavigatorContextType[ 'pop' ] = useCallback( () => {
 		if ( locationHistory.length > 1 ) {
-			// Force the `isBack` flag to `true` when navigating back.
 			setLocationHistory( [
 				...locationHistory.slice( 0, -2 ),
 				{
@@ -85,7 +73,10 @@ function NavigatorProvider(
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
-			location: locationHistory[ locationHistory.length - 1 ],
+			location: {
+				...locationHistory[ locationHistory.length - 1 ],
+				isInitial: locationHistory.length === 1,
+			},
 			push,
 			pop,
 		} ),
@@ -96,7 +87,7 @@ function NavigatorProvider(
 	const classes = useMemo(
 		// Prevents horizontal overflow while animating screen transitions
 		() => cx( css( { overflowX: 'hidden' } ), className ),
-		[ className ]
+		[ className, cx ]
 	);
 
 	return (

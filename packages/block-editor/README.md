@@ -524,10 +524,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
 
-### PreserveScrollInReorder
-
-Undocumented declaration.
-
 ### RichText
 
 _Related_

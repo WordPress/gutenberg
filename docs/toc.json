@@ -43,14 +43,6 @@
 	{
 		"docs/how-to-guides/README.md": [
 			{ "docs/how-to-guides/accessibility.md": [] },
-
-			{
-				"docs/how-to-guides/backward-compatibility/README.md": [
-					{
-						"docs/how-to-guides/backward-compatibility/deprecations.md": []
-					}
-				]
-			},
 			{
 				"docs/how-to-guides/block-tutorial/README.md": [
 					{
@@ -80,14 +72,6 @@
 					{
 						"docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md": []
 					}
-				]
-			},
-			{
-				"docs/how-to-guides/designers/README.md": [
-					{ "docs/how-to-guides/designers/block-design.md": [] },
-					{ "docs/how-to-guides/designers/user-interface.md": [] },
-					{ "docs/how-to-guides/designers/design-resources.md": [] },
-					{ "docs/how-to-guides/designers/animation.md": [] }
 				]
 			},
 			{
@@ -278,6 +262,13 @@
 					{ "docs/explanations/architecture/styles.md": [] }
 				]
 			},
+			{
+				"docs/explanations/user-interface/README.md": [
+					{ "docs/explanations/user-interface/block-design.md": [] },
+					{ "docs/explanations/user-interface/animation.md": [] },
+					{ "docs/explanations/user-interface/design-resources.md": [] }
+				]
+			},
 			{ "docs/explanations/faq.md": [] },
 			{ "docs/explanations/glossary.md": [] },
 			{ "docs/explanations/history.md": [] }
@@ -312,7 +303,9 @@
 								"docs/contributors/code/react-native/internationalization-guide.md": []
 							}
 						]
-					}
+					},
+					{ "docs/contributors/code/backward-compatibility.md": [] },
+					{ "docs/contributors/code/deprecations.md": [] }
 				]
 			},
 			{

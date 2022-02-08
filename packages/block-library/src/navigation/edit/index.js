@@ -107,7 +107,6 @@ function Navigation( {
 	hasSubmenuIndicatorSetting = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
-	customAppender: CustomAppender = null,
 } ) {
 	const {
 		openSubmenusOnClick,
@@ -500,6 +499,9 @@ function Navigation( {
 										canUserCreateNavigation={
 											canUserCreateNavigation
 										}
+										canUserSwitchNavigation={
+											canSwitchNavigationMenu
+										}
 									/>
 								) }
 							</ToolbarDropdownMenu>
@@ -696,7 +698,6 @@ function Navigation( {
 								<NavigationInnerBlocks
 									isVisible={ ! isPlaceholderShown }
 									clientId={ clientId }
-									appender={ CustomAppender }
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}

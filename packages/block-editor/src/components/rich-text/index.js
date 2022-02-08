@@ -400,6 +400,7 @@ function RichTextWrapper(
 	deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
 		since: '5.4',
 		alternative: 'className prop or create your own wrapper div',
+		version: '6.2',
 	} );
 
 	const className = classnames( 'block-editor-rich-text', wrapperClassName );
