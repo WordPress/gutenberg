@@ -1,6 +1,6 @@
 # Block Serialization Default Parser
 
-This library contains the default block serialization parser implementations for WordPress documents. It provides native PHP and JavaScript parsers that implement the [specification](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/grammar.md) from [`@wordpress/block-serialization-spec-parser`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-serialization-spec-parser/README.md) and which normally operates on the document stored in `post_content`.
+This library contains the default block serialization parser implementations for WordPress documents. It provides native PHP and JavaScript parsers that implement the [specification](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/grammar.md) from [`@wordpress/block-serialization-spec-parser`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-serialization-spec-parser/README.md) and which normally operates on the document stored in `post_content`.
 
 ## Installation
 
