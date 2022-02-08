@@ -51,6 +51,7 @@ export { default as __experimentalTextTransformControl } from './text-transform-
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalColorGradientSettingsDropdown } from './colors-gradients/dropdown';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
+export { default as __experimentalToolsPanelColorDropdown } from './colors-gradients/tools-panel-color-dropdown';
 export {
 	default as __experimentalImageEditor,
 	ImageEditingProvider as __experimentalImageEditingProvider,
