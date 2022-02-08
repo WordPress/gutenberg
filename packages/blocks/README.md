@@ -40,7 +40,7 @@ The `enqueue_block_editor_assets` hook is only run in the Gutenberg editor conte
 
 The following sections will describe what you'll need to include in `block.js` to describe the behavior of your custom block.
 
-Note that all JavaScript code samples in this document are enclosed in a function that is evaluated immediately afterwards. We recommend using either ES6 modules [as used in this project](/docs/contributors/develop/coding-guidelines.md#imports) (documentation on setting up a plugin with Webpack + ES6 modules coming soon) or these ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) as used in this document. Both of these methods ensure that your plugin's variables will not pollute the global `window` object, which could cause incompatibilities with WordPress core or with other plugins.
+Note that all JavaScript code samples in this document are enclosed in a function that is evaluated immediately afterwards. We recommend using either ES6 modules [as used in this project](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/develop/coding-guidelines.md#imports) (documentation on setting up a plugin with Webpack + ES6 modules coming soon) or these ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) as used in this document. Both of these methods ensure that your plugin's variables will not pollute the global `window` object, which could cause incompatibilities with WordPress core or with other plugins.
 
 ## Example
 
