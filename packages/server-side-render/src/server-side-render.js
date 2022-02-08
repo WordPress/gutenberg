@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import { isEqual, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -87,12 +87,18 @@ export default function ServerSideRender( props ) {
 
 		setIsLoading( true );
 
+		// The __internalWidgetId is only defined on the client-side and must be removed before making the
+		// request.
+		const retainedAttributes = omit( attributes, [ '__internalWidgetId' ] );
+
 		// If httpMethod is 'POST', send the attributes in the request body instead of the URL.
 		// This allows sending a larger attributes object than in a GET request, where the attributes are in the URL.
 		const isPostRequest = 'POST' === httpMethod;
-		const urlAttributes = isPostRequest ? null : attributes ?? null;
+		const urlAttributes = isPostRequest ? null : retainedAttributes ?? null;
 		const path = rendererPath( block, urlAttributes, urlQueryArgs );
-		const data = isPostRequest ? { attributes: attributes ?? null } : null;
+		const data = isPostRequest
+			? { attributes: retainedAttributes ?? null }
+			: null;
 
 		// Store the latest fetch request so that when we process it, we can
 		// check if it is the current request, to avoid race conditions on slow networks.
