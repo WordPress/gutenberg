@@ -114,6 +114,7 @@
 		"@types/estree": "0.0.50",
 		"@types/highlight-words-core": "1.2.1",
 		"@types/lodash": "4.14.172",
+		"@types/node": "^17.0.16",
 		"@types/npm-package-arg": "6.1.1",
 		"@types/prettier": "2.3.2",
 		"@types/qs": "6.9.7",
