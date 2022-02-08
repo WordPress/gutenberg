@@ -44,7 +44,6 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
-	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -152,10 +151,10 @@ const Cover = ( {
 	const colorsDefault = useMobileGlobalStylesColors();
 	const coverDefaultPalette = useMemo( () => {
 		return {
-			colors: colorsDefault.reverse().slice( 0, THEME_COLORS_COUNT ),
+			colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 		};
 	}, [ colorsDefault ] );
-	const gradients = useSetting( 'color.gradients' ) || [];
+	const gradients = useMobileGlobalStylesColors( 'gradients' );
 	const gradientValue =
 		customGradient || getGradientValueBySlug( gradients, gradient );
 	const overlayColorValue = getColorObjectByAttributeValues(

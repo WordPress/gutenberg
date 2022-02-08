@@ -235,7 +235,7 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 
 		if ( variable === 'var' ) {
 			stylesBase = stylesBase.replace( varRegex, ( _$1, $2 ) => {
-				if ( mappedValues && mappedValues?.color ) {
+				if ( mappedValues?.color ) {
 					const matchedValue = find( mappedValues.color?.values, {
 						slug: $2,
 					} );
@@ -252,9 +252,9 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 export function getMappedValues( features, palette ) {
 	const typography = features?.typography;
 	const colors = [
-		...( palette?.theme ? palette.theme : [] ),
-		...( palette?.custom ? palette.custom : [] ),
-		...( palette?.default ? palette.default : [] ),
+		...( palette?.theme || [] ),
+		...( palette?.custom || [] ),
+		...( palette?.default || [] ),
 	];
 
 	const fontSizes = {
@@ -309,17 +309,45 @@ function normalizeFontSizes( fontSizes ) {
 	return normalizedFontSizes;
 }
 
-export function useMobileGlobalStylesColors() {
+export function useMobileGlobalStylesColors( type = 'colors' ) {
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
-	const availableThemeColors = colorGradientSettings.colors
-		.reduce( ( colors, origin ) => colors.concat( origin.colors ), [] )
-		.reverse();
+	const availableThemeColors = colorGradientSettings?.[ type ]?.reduce(
+		( colors, origin ) => colors.concat( origin?.[ type ] ),
+		[]
+	);
 	// Default editor colors if it's not a block-based theme.
 	const editorDefaultColors = useSetting( 'color.palette' );
 
 	return availableThemeColors.length >= 1
 		? availableThemeColors
 		: editorDefaultColors;
+}
+
+export function getColorsAndGradients(
+	defaultEditorColors,
+	defaultEditorGradients,
+	rawFeatures
+) {
+	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
+
+	return {
+		__experimentalFeatures: {
+			color: {
+				...( ! features?.color
+					? {
+							palette: {
+								default: defaultEditorColors,
+							},
+							gradients: {
+								default: defaultEditorGradients,
+							},
+					  }
+					: features?.color ),
+				defaultPalette: defaultEditorColors,
+				defaultGradients: defaultEditorGradients,
+			},
+		},
+	};
 }
 
 export function getGlobalStyles( rawStyles, rawFeatures ) {
@@ -346,15 +374,14 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 	const fontSizes = normalizeFontSizes( features?.typography?.fontSizes );
 
 	return {
-		colors,
-		gradients,
 		__experimentalFeatures: {
 			color: {
 				palette: colors?.palette,
 				gradients,
 				text: features?.color?.text ?? true,
 				background: features?.color?.background ?? true,
-				defaultPalette: true,
+				defaultPalette: features?.color?.defaultPalette ?? false,
+				defaultGradients: features?.color?.defaultGradients ?? false,
 			},
 			typography: {
 				fontSizes,

@@ -136,5 +136,6 @@ export {
 } from './mobile/global-styles-context';
 export {
 	getGlobalStyles,
+	getColorsAndGradients,
 	useMobileGlobalStylesColors,
 } from './mobile/global-styles-context/utils';

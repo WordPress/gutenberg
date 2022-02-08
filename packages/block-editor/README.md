@@ -741,30 +741,6 @@ _Returns_
 
 -   `any`: Returns the value defined for the setting.
 
-### validateThemeColors
-
-Given an array of theme colors checks colors for validity
-
-_Parameters_
-
--   _colors_ `Array`: The array of theme colors
-
-_Returns_
-
--   `Array`: The array of valid theme colors or the default colors
-
-### validateThemeGradients
-
-Given an array of theme gradients checks gradients for validity
-
-_Parameters_
-
--   _gradients_ `Array`: The array of theme gradients
-
-_Returns_
-
--   `Array`: The array of valid theme gradients or the default gradients
-
 ### Warning
 
 _Related_

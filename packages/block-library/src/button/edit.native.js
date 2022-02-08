@@ -17,7 +17,6 @@ import {
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
-	useSetting,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -120,7 +119,7 @@ function ButtonEdit( props ) {
 
 	const richTextRef = useRef();
 	const colors = useMobileGlobalStylesColors();
-	const gradients = useSetting( 'color.gradients' ) || [];
+	const gradients = useMobileGlobalStylesColors( 'gradients' );
 
 	useEffect( () => {
 		if ( isSelected ) {

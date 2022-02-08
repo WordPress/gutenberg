@@ -12,7 +12,6 @@ import {
 	getGradientValueBySlug,
 	getGradientSlugByValue,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
-	useSetting,
 } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 import { useMobileGlobalStylesColors } from '@wordpress/components';
@@ -24,9 +23,8 @@ function OverlayColorSettings( {
 	customGradient,
 	setAttributes,
 } ) {
-	const EMPTY_ARRAY = [];
 	const colors = useMobileGlobalStylesColors();
-	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
+	const gradients = useMobileGlobalStylesColors( 'gradients' );
 
 	const gradientValue =
 		customGradient || getGradientValueBySlug( gradients, gradient );

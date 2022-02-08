@@ -16,6 +16,7 @@ import {
 import {
 	getColorClassName,
 	getColorObjectByColorValue,
+	useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import {
 	BottomSheet,
@@ -123,9 +124,7 @@ function setColors( value, name, colorSettings, colors ) {
 function ColorPicker( { name, value, onChange } ) {
 	const property = 'color';
 	const colors = useMobileGlobalStylesColors();
-	const colorSettings = {
-		colors,
-	};
+	const colorSettings = useMultipleOriginColorsAndGradients();
 
 	const onColorChange = useCallback(
 		( color ) => {
