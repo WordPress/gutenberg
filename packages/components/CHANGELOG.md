@@ -26,6 +26,7 @@
 ### Experimental
 
 -   `Navigator`: rename `push`/`pop` to `goTo`/`goBack` ([#38582](https://github.com/WordPress/gutenberg/pull/38582))
+-   `Navigator`: add `NavigatorLink` and `NavigatorBackLink` components ([#38634](https://github.com/WordPress/gutenberg/pull/38634))
 
 ## 19.3.0 (2022-01-27)
 
