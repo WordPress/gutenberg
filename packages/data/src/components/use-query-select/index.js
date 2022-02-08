@@ -12,6 +12,14 @@ import { META_SELECTORS } from '../../store';
 /** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
 
 /**
+ * @typedef {Object} QuerySelectResponse
+ * @property {Object}  data        the requested entity record
+ * @property {boolean} isResolving is the record still being resolved? Via the `getIsResolving` meta-selector.
+ * @property {boolean} hasStarted  was the resolution started? Via the `hasStartedResolution` meta-selector.
+ * @property {boolean} hasResolved has the resolution finished? Via the `hasFinishedResolution` meta-selector.
+ */
+
+/**
  * Like useSelect, but the selectors return objects containing
  * both the original data AND the resolution info.
  *
@@ -21,42 +29,35 @@ import { META_SELECTORS } from '../../store';
  * @example
  * ```js
  * import { useQuerySelect } from '@wordpress/data';
+ * import { store as coreDataStore } from '@wordpress/core-data';
  *
- * function HammerPriceDisplay( { currency } ) {
- *   const { data, isResolving } = useQuerySelect( ( query ) => {
- *     return query( 'my-shop' ).getPrice( 'hammer', currency )
- *   }, [ currency ] );
+ * function PageTitleDisplay( { id } ) {
+ *   const { data: page, isResolving } = useQuerySelect( ( query ) => {
+ *     return query( coreDataStore ).getEntityRecord( 'postType', 'page', id )
+ *   }, [ id ] );
  *
  *   if ( isResolving ) {
  *     return 'Loading...';
  *   }
  *
- *   return new Intl.NumberFormat( 'en-US', {
- *     style: 'currency',
- *     currency,
- *   } ).format( data );
+ *   return page.title;
  * }
  *
  * // Rendered in the application:
- * // <HammerPriceDisplay currency="USD" />
+ * // <PageTitleDisplay id={ 10 } />
  * ```
  *
- * In the above example, when `HammerPriceDisplay` is rendered into an
- * application, the price and the resolution details will be retrieved from
+ * In the above example, when `PageTitleDisplay` is rendered into an
+ * application, the page and the resolution details will be retrieved from
  * the store state using the `mapSelect` callback on `useQuerySelect`.
  *
- * The returned object has the following keys:
- * * data – the return value of the selector.
- * * isResolving – provided by `getIsResolving` meta-selector.
- * * hasStarted – provided by `hasStartedResolution` meta-selector.
- * * hasResolved – provided by `hasFinishedResolution` meta-selector.
- *
- * If the currency prop changes then any price in the state for that currency is
- * retrieved. If the currency prop doesn't change and other props are passed in
- * that do change, the price will not change because the dependency is just the currency.
+ * If the id prop changes then any page in the state for that id is
+ * retrieved. If the id prop doesn't change and other props are passed in
+ * that do change, the title will not change because the dependency is just
+ * the id.
  * @see useSelect
  *
- * @return {Object} Queried data.
+ * @return {QuerySelectResponse} Queried data.
  */
 export default function useQuerySelect( mapQuerySelect, deps ) {
 	return useSelect( ( select, registry ) => {

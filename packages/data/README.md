@@ -736,43 +736,39 @@ _Usage_
 
 ```js
 import { useQuerySelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 
-function HammerPriceDisplay( { currency } ) {
-	const { data, isResolving } = useQuerySelect(
+function PageTitleDisplay( { id } ) {
+	const { data: page, isResolving } = useQuerySelect(
 		( query ) => {
-			return query( 'my-shop' ).getPrice( 'hammer', currency );
+			return query( coreDataStore ).getEntityRecord(
+				'postType',
+				'page',
+				id
+			);
 		},
-		[ currency ]
+		[ id ]
 	);
 
 	if ( isResolving ) {
 		return 'Loading...';
 	}
 
-	return new Intl.NumberFormat( 'en-US', {
-		style: 'currency',
-		currency,
-	} ).format( data );
+	return page.title;
 }
 
 // Rendered in the application:
-// <HammerPriceDisplay currency="USD" />
+// <PageTitleDisplay id={ 10 } />
 ```
 
-In the above example, when `HammerPriceDisplay` is rendered into an
-application, the price and the resolution details will be retrieved from
+In the above example, when `PageTitleDisplay` is rendered into an
+application, the page and the resolution details will be retrieved from
 the store state using the `mapSelect` callback on `useQuerySelect`.
 
-The returned object has the following keys:
-
--   data – the return value of the selector.
--   isResolving – provided by `getIsResolving` meta-selector.
--   hasStarted – provided by `hasStartedResolution` meta-selector.
--   hasResolved – provided by `hasFinishedResolution` meta-selector.
-
-If the currency prop changes then any price in the state for that currency is
-retrieved. If the currency prop doesn't change and other props are passed in
-that do change, the price will not change because the dependency is just the currency.
+If the id prop changes then any page in the state for that id is
+retrieved. If the id prop doesn't change and other props are passed in
+that do change, the title will not change because the dependency is just
+the id.
 
 _Parameters_
 
@@ -781,7 +777,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Queried data.
+-   `QuerySelectResponse`: Queried data.
 
 ### useRegistry
 
