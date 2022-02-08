@@ -9,7 +9,8 @@ import { get } from 'lodash';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalUseNavigator as useNavigator,
+	__experimentalNavigatorLink as NavigatorLink,
+	__experimentalNavigatorBackLink as NavigatorBackLink,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
@@ -18,7 +19,6 @@ import {
 	FlexItem,
 	Modal,
 	TabPanel,
-	Button,
 	Card,
 	CardHeader,
 	CardBody,
@@ -54,34 +54,6 @@ import BlockManager from '../block-manager';
 
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
-
-function NavigationButton( { as: Tag = Button, path, ...props } ) {
-	const { goTo } = useNavigator();
-
-	const dataAttrName = 'data-navigator-focusable-id';
-	const dataAttrValue = path;
-
-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
-
-	const tagProps = {
-		...props,
-		[ dataAttrName ]: dataAttrValue,
-	};
-
-	return (
-		<Tag
-			onClick={ () =>
-				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
-			}
-			{ ...tagProps }
-		/>
-	);
-}
-
-function NavigationBackButton( { as: Tag = Button, ...props } ) {
-	const { goBack } = useNavigator();
-	return <Tag onClick={ goBack } { ...props } />;
-}
 
 export default function PreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -347,7 +319,7 @@ export default function PreferencesModal() {
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
 									return (
-										<NavigationButton
+										<NavigatorLink
 											key={ tab.name }
 											path={ tab.name }
 											as={ Item }
@@ -369,7 +341,7 @@ export default function PreferencesModal() {
 													/>
 												</FlexItem>
 											</HStack>
-										</NavigationButton>
+										</NavigatorLink>
 									);
 								} ) }
 							</ItemGroup>
@@ -389,7 +361,7 @@ export default function PreferencesModal() {
 									size="small"
 									gap="6"
 								>
-									<NavigationBackButton
+									<NavigatorBackLink
 										icon={
 											isRTL() ? chevronRight : chevronLeft
 										}

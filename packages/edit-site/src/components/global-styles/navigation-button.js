@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import {
-	__experimentalUseNavigator as useNavigator,
+	__experimentalNavigatorLink as NavigatorLink,
+	__experimentalNavigatorBackLink as NavigatorBackLink,
 	__experimentalItem as Item,
 	FlexItem,
 	__experimentalHStack as HStack,
@@ -25,32 +26,12 @@ function GenericNavigationButton( { icon, children, ...props } ) {
 	);
 }
 
-function NavigationButton( { path, ...props } ) {
-	const { goTo } = useNavigator();
-
-	const dataAttrName = 'data-navigator-focusable-id';
-	const dataAttrValue = path;
-
-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
-
-	const buttonProps = {
-		...props,
-		[ dataAttrName ]: dataAttrValue,
-	};
-
-	return (
-		<GenericNavigationButton
-			onClick={ () =>
-				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
-			}
-			{ ...buttonProps }
-		/>
-	);
+function NavigationButton( props ) {
+	return <NavigatorLink as={ GenericNavigationButton } { ...props } />;
 }
 
-function NavigationBackButton( { ...props } ) {
-	const { goBack } = useNavigator();
-	return <GenericNavigationButton onClick={ goBack } { ...props } />;
+function NavigationBackButton( props ) {
+	return <NavigatorBackLink as={ GenericNavigationButton } { ...props } />;
 }
 
 export { NavigationButton, NavigationBackButton };
