@@ -117,6 +117,9 @@ export default {
 				? `
 					${ appendSelectors( selector, '> *' ) } {
 						max-width: ${ contentSize ?? wideSize };
+					}
+
+					${ appendSelectors( selector, '> :not(.alignleft):not(.alignright)' ) } {
 						margin-left: auto !important;
 						margin-right: auto !important;
 					}
@@ -135,11 +138,13 @@ export default {
 			${ appendSelectors( selector, '> .alignleft' ) } {
 				float: left;
 				margin-right: 2em;
+				margin-left: 0;
 			}
 
 			${ appendSelectors( selector, '> .alignright' ) } {
 				float: right;
 				margin-left: 2em;
+				margin-right: 0;
 			}
 
 		`;
