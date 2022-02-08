@@ -682,7 +682,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @return array|null
 	 */
-	public function get_pattern_settings() {
+	public function get_patterns() {
 		if ( isset( $this->theme_json['patterns'] ) && is_array( $this->theme_json['patterns'] ) ) {
 			return $this->theme_json['patterns'];
 		}
