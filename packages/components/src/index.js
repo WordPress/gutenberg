@@ -100,6 +100,8 @@ export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
 	NavigatorProvider as __experimentalNavigatorProvider,
 	NavigatorScreen as __experimentalNavigatorScreen,
+	NavigatorLink as __experimentalNavigatorLink,
+	NavigatorBackLink as __experimentalNavigatorBackLink,
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';

@@ -43,3 +43,28 @@ export type NavigatorScreenProps = {
 	 */
 	children: ReactNode;
 };
+
+export type NavigatorBackLinkProps = {
+	/**
+	 * The children elements.
+	 */
+	children: ReactNode;
+	/**
+	 * The callback called in response to a `click` event.
+	 */
+	onClick?: React.MouseEventHandler< HTMLElement >;
+};
+
+export type NavigatorLinkProps = NavigatorBackLinkProps & {
+	/**
+	 * The path to navigate to.
+	 */
+	path: string;
+	/**
+	 * The HTML attribute used to identify the `NavigatorLink`, which is used
+	 * by `Navigator` to restore focus.
+	 *
+	 * @default 'id'
+	 */
+	attributeName?: string;
+};

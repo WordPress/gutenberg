@@ -6,7 +6,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
+import {
+	NavigatorProvider,
+	NavigatorScreen,
+	NavigatorLink,
+	NavigatorBackLink,
+} from '../';
 
 jest.mock( 'framer-motion', () => {
 	const actual = jest.requireActual( 'framer-motion' );
@@ -31,49 +36,35 @@ const PATHS = {
 };
 
 function NavigatorButton( { path, onClick, ...props } ) {
-	const { goTo } = useNavigator();
 	return (
-		<button
+		<NavigatorLink
 			onClick={ () => {
-				goTo( path );
 				// Used to spy on the values passed to `navigator.goTo`
 				onClick?.( { type: 'goTo', path } );
 			} }
+			path={ path }
 			{ ...props }
 		/>
 	);
 }
 
 function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
-	const { goTo } = useNavigator();
-	const dataAttrName = 'data-navigator-focusable-id';
-	const dataAttrValue = path;
-
-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
-
-	const buttonProps = {
-		...props,
-		[ dataAttrName ]: dataAttrValue,
-	};
-
 	return (
-		<button
+		<NavigatorLink
 			onClick={ () => {
-				goTo( path, { focusTargetSelector: dataAttrCssSelector } );
 				// Used to spy on the values passed to `navigator.goTo`
 				onClick?.( { type: 'goTo', path } );
 			} }
-			{ ...buttonProps }
+			path={ path }
+			{ ...props }
 		/>
 	);
 }
 
 function NavigatorBackButton( { onClick, ...props } ) {
-	const { goBack } = useNavigator();
 	return (
-		<button
+		<NavigatorBackLink
 			onClick={ () => {
-				goBack();
 				// Used to spy on the values passed to `navigator.goBack`
 				onClick?.( { type: 'goBack' } );
 			} }
@@ -95,12 +86,12 @@ const MyNavigation = ( {
 			>
 				Navigate to non-existing screen.
 			</NavigatorButton>
-			<NavigatorButtonWithFocusRestoration
+			<NavigatorButton
 				path={ PATHS.CHILD }
 				onClick={ onNavigatorButtonClick }
 			>
 				Navigate to child screen.
-			</NavigatorButtonWithFocusRestoration>
+			</NavigatorButton>
 		</NavigatorScreen>
 
 		<NavigatorScreen path={ PATHS.CHILD }>

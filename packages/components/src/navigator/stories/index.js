@@ -11,42 +11,17 @@ import { Card, CardBody, CardFooter, CardHeader } from '../../card';
 import { HStack } from '../../h-stack';
 import { Flyout } from '../../flyout';
 import { useCx } from '../../utils/hooks/use-cx';
-import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
+import {
+	NavigatorProvider,
+	NavigatorScreen,
+	NavigatorLink,
+	NavigatorBackLink,
+} from '../';
 
 export default {
 	title: 'Components (Experimental)/Navigator',
 	component: NavigatorProvider,
 };
-
-function NavigatorButton( { path, ...props } ) {
-	const { goTo } = useNavigator();
-	const dataAttrName = 'data-navigator-focusable-id';
-	const dataAttrValue = path;
-
-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
-
-	const buttonProps = {
-		...props,
-		[ dataAttrName ]: dataAttrValue,
-	};
-
-	return (
-		<Button
-			variant="secondary"
-			onClick={ () =>
-				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
-			}
-			{ ...buttonProps }
-		/>
-	);
-}
-
-function NavigatorBackButton( props ) {
-	const { goBack } = useNavigator();
-	return (
-		<Button variant="secondary" onClick={ () => goBack() } { ...props } />
-	);
-}
 
 const MyNavigation = () => {
 	const cx = useCx();
@@ -61,17 +36,20 @@ const MyNavigation = () => {
 						<p>This is the home screen.</p>
 
 						<HStack justify="flex-start" wrap>
-							<NavigatorButton path="/child">
+							<NavigatorLink variant="secondary" path="/child">
 								Navigate to child screen.
-							</NavigatorButton>
+							</NavigatorLink>
 
-							<NavigatorButton path="/overflow-child">
+							<NavigatorLink
+								variant="secondary"
+								path="/overflow-child"
+							>
 								Navigate to screen with horizontal overflow.
-							</NavigatorButton>
+							</NavigatorLink>
 
-							<NavigatorButton path="/stickies">
+							<NavigatorLink variant="secondary" path="/stickies">
 								Navigate to screen with sticky content.
-							</NavigatorButton>
+							</NavigatorLink>
 
 							<Flyout
 								trigger={
@@ -93,7 +71,9 @@ const MyNavigation = () => {
 				<Card>
 					<CardBody>
 						<p>This is the child screen.</p>
-						<NavigatorBackButton>Go back</NavigatorBackButton>
+						<NavigatorBackLink variant="secondary">
+							Go back
+						</NavigatorBackLink>
 					</CardBody>
 				</Card>
 			</NavigatorScreen>
@@ -101,7 +81,9 @@ const MyNavigation = () => {
 			<NavigatorScreen path="/overflow-child">
 				<Card>
 					<CardBody>
-						<NavigatorBackButton>Go back</NavigatorBackButton>
+						<NavigatorBackLink variant="secondary">
+							Go back
+						</NavigatorBackLink>
 						<div
 							className={ cx(
 								css( `
@@ -129,7 +111,9 @@ const MyNavigation = () => {
 			<NavigatorScreen path="/stickies">
 				<Card>
 					<Sticky as={ CardHeader } z="2">
-						<NavigatorBackButton>Go back</NavigatorBackButton>
+						<NavigatorBackLink variant="secondary">
+							Go back
+						</NavigatorBackLink>
 					</Sticky>
 					<CardBody>
 						<Sticky top="69px" colors="papayawhip/peachpuff">
