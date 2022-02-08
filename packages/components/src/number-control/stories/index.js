@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import NumberControl from '../';
 
 export default {
-	title: 'Components/NumberControl',
+	title: 'Components (Experimental)/NumberControl',
 	component: NumberControl,
 	parameters: {
 		knobs: { disable: false },
