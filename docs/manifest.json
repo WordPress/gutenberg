@@ -181,8 +181,8 @@
 	},
 	{
 		"title": "Setup",
-		"slug": "1-setup",
-		"markdown_source": "../docs/how-to-guides/data-basics/1-setup.md",
+		"slug": "1-data-basics-setup",
+		"markdown_source": "../docs/how-to-guides/data-basics/1-data-basics-setup.md",
 		"parent": "data-basics"
 	},
 	{
