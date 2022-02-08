@@ -20,7 +20,7 @@ function render_block_core_comments_pagination_numbers( $attributes, $content, $
 		return '';
 	}
 
-	$comment_vars  = build_comment_query_vars_from_block( $block );
+	$comment_vars = build_comment_query_vars_from_block( $block );
 
 	$total   = ( new WP_Comment_Query( $comment_vars ) )->max_num_pages;
 	$current = $comment_vars['paged'];
