@@ -27,10 +27,7 @@
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true,
-				"__experimentalDefaultControls": {
-					"background": true,
-					"text": true
-				}
+				"link": true
 			}
 		},
 		"__experimentalLayout": {
