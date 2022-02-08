@@ -16,19 +16,19 @@ import {
 } from '@wordpress/components';
 
 function NavigatorButton( { path, ...props } ) {
-	const { push } = useNavigator();
+	const { goTo } = useNavigator();
 	return (
 		<Button
 		 variant="primary"
-		 onClick={ () => push( path ) }
+		 onClick={ () => goTo( path ) }
 		 { ...props }
 	 />
  );
 }
 
 function NavigatorBackButton( props ) {
-	const { pop } = useNavigator();
-	return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
+	const { goBack } = useNavigator();
+	return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
 }
 
 const MyNavigation = () => (
@@ -64,15 +64,17 @@ You can retrieve a `navigator` instance by using the `useNavigator` hook.
 
 The `navigator` instance has a few properties:
 
-### `push`: `( path: string, options: NavigateOptions ) => void`
+### `goTo`: `( path: string, options: NavigateOptions ) => void`
 
-The `push` function allows navigating to a given path. The second argument can augment the navigation operations with different options.
+The `goTo` function allows navigating to a given path. The second argument can augment the navigation operations with different options.
 
-There currently aren't any available options.
+The available options are:
 
-### `pop`: `() => void`
+- `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
 
-The `pop` function allows navigating to the previous path.
+### `goBack`: `() => void`
+
+The `goBack` function allows navigating to the previous path.
 
 ### `location`: `NavigatorLocation`
 
