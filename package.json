@@ -258,7 +258,6 @@
 		"prelint-php": "wp-env run composer 'install --no-interaction'",
 		"lint-php": "wp-env run composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
-		"lint-lockfile": "node ./bin/validate-package-lock.js",
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
 		"lint:md-js": "wp-scripts lint-md-js",
@@ -296,10 +295,6 @@
 		"prepare": "husky install"
 	},
 	"lint-staged": {
-		"package-lock.json": [
-			"npm run lint-lockfile",
-			"node ./bin/check-latest-npm.js"
-		],
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
 		],
