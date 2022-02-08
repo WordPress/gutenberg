@@ -1,0 +1,53 @@
+# this is a reusable workflow that will be called by the
+# push_staging and push_production workflows
+# more info: https://docs.github.com/en/actions/learn-github-actions/reusing-workflows
+
+name: gutenberg/setup-node-env
+description: Setup the Node.js environment including `pnpm` and dependencies
+
+inputs:
+    install:
+        default: true
+        description: Whether to install dependencies.
+    install-working-directory:
+        required: false
+        description: Optional working directory to run installation in.
+    frozen-lockfile:
+        default: false
+        description: Whether to install dependencies using `--frozen-lockfile`.
+    node-version:
+        default: 14
+        description: The node version to use.
+    pnpm-version:
+        default: 6.29.1
+        description: The pnpm version to use.
+
+runs:
+    using: 'composite'
+    steps:
+        - uses: pnpm/action-setup@v2.0.1
+          with:
+              version: ${{ inputs.pnpm-version }}
+
+        - name: Cache pnpm modules
+          uses: actions/cache@v2
+          with:
+              path: ~/.pnpm-store
+              key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+              restore-keys: |
+                  ${{ runner.os }}-
+
+        - uses: actions/setup-node@v2.5.1
+          with:
+              node-version: ${{ inputs.node-version }}
+              cache: pnpm
+              cache-dependency-path: |
+                  pnpm-workspace.yaml
+                  pnpm-lock.yaml
+                  .npmrc
+
+        - name: Install
+          if: inputs.install
+          shell: bash
+          run: "pnpm install ${{ inputs.frozen-lockfile && '--frozen-lockfile' || '' }}"
+          working-directory: ${{ inputs.install-working-directory }}

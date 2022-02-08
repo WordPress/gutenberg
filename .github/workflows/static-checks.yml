@@ -24,27 +24,16 @@ jobs:
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
-              with:
-                  node-version: 14
-                  cache: npm
-
-            - name: Npm install
-              # A "full" install is executed, since `npm ci` does not always exit
-              # with an error status code if the lock file is inaccurate.
-              #
-              # See: https://github.com/WordPress/gutenberg/issues/16157
-              run: npm install
+            - uses: ./.github/action/setup-node-env
 
             - name: Lint JavaScript and Styles
-              run: npm run lint
+              run: pnpm run lint
 
             - name: Type checking
-              run: npm run build:package-types
+              run: pnpm run build:package-types
 
             - name: Check local changes
-              run: npm run check-local-changes
+              run: pnpm run check-local-changes
 
             - name: License compatibility
-              run: npm run check-licenses
+              run: pnpm run check-licenses

@@ -168,11 +168,7 @@ jobs:
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
-              with:
-                  node-version: 14
-                  cache: npm
+            - uses: ./.github/action/setup-node-env
 
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
@@ -192,7 +188,7 @@ jobs:
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION}"
                   MILESTONE="Gutenberg ${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  npm run changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
+                  pnpm run changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
                   sed -ie '1,6d' release-notes.txt
                   if [[ ${{ needs.bump-version.outputs.new_version }} != *"rc"* ]]; then
                     # Include previous RCs' release notes, if any

@@ -19,17 +19,13 @@ jobs:
               with:
                   ref: trunk
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+            - uses: ./.github/action/setup-node-env
               with:
                   node-version: ${{ matrix.node }}
-                  cache: npm
-
-            - name: Install Dependencies
-              run: npm ci
+                  frozen-lockfile: true
 
             - name: Build Storybook
-              run: npm run storybook:build
+              run: pnpm run storybook:build
 
             - name: Deploy
               uses: peaceiris/actions-gh-pages@bbdfb200618d235585ad98e965f4aafc39b4c501 # v3.7.3

@@ -29,20 +29,17 @@ jobs:
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+            - uses: ./.github/action/setup-node-env
               with:
                   node-version: ${{ matrix.node }}
-                  cache: npm
+                  frozen-lockfile: true
 
-            - name: Npm install and build
-              run: |
-                  npm ci
-                  npm run build
+            - name: Build
+              run: pnpm run build
 
             - name: Install WordPress
               run: |
-                  npm run wp-env start
+                  pnpm run wp-env start
 
             - name: Running the tests
               run: |
