@@ -11,8 +11,8 @@ import { waitFor } from './wait-for';
 /**
  * Adds a block via the block picker.
  *
- * @param {import('@testing-library/react-native').RenderAPI} screen A Testing Library screen.
- * @param {string} blockName Name of the block to be inserted as shown in the block picker.
+ * @param {import('@testing-library/react-native').RenderAPI} screen    A Testing Library screen.
+ * @param {string}                                            blockName Name of the block to be inserted as shown in the block picker.
  */
 export const addBlock = async ( screen, blockName ) => {
 	const { getByA11yLabel, getByTestId, getByText } = screen;
