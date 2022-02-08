@@ -190,8 +190,9 @@ export class FocalPointPicker extends Component {
 			{ x: event.pageX, y: event.pageY },
 			event.shiftKey
 		);
-		const modifiedValue = this.props.onDrag?.( value, event );
-		this.updateValue( modifiedValue ?? value );
+		this.props.onDrag?.( value, event );
+		const resolvedValue = this.props.resolvePoint?.( value );
+		this.updateValue( resolvedValue ?? value );
 	}
 	getValueFromPoint( point, byTenths ) {
 		const { bounds } = this.state;
