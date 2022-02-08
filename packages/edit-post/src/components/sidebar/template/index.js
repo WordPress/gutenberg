@@ -129,7 +129,7 @@ export function TemplatePanel() {
 					status="warning"
 					isDismissible={ false }
 				>
-					{ __( 'The posts page template connot be changed.' ) }
+					{ __( 'The posts page template cannot be changed.' ) }
 				</Notice>
 			) : (
 				<SelectControl
