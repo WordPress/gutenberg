@@ -80,7 +80,7 @@ function TreeGrid(
 			const currentColumnIndex = focusablesInRow.indexOf( activeElement );
 			const canExpandCollapse = 0 === currentColumnIndex;
 			const cannotFocusNextColumn =
-			        canExpandCollapse &&
+				canExpandCollapse &&
 				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
 				keyCode === RIGHT;
 
