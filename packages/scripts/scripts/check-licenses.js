@@ -167,14 +167,13 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	);
 };
 
-// Use `npm ls` to grab a list of all the packages.
+// Use `pnpm ls` to grab a list of all the packages.
 const child = spawn.sync(
-	'npm',
+	'pnpm',
 	[
-		'ls',
+		'list',
 		'--json',
 		'--long',
-		'--all',
 		...( prod ? [ '--prod' ] : [] ),
 		...( dev ? [ '--dev' ] : [] ),
 	],
