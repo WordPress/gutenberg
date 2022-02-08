@@ -19,14 +19,17 @@ export default function NavigationMenuSelector( {
 	clientId,
 	onSelect,
 	onCreateNew,
-	canUserCreateNavigation = false,
-	canUserSwitchNavigation = false,
 } ) {
 	const {
 		menus: classicMenus,
 		hasMenus: hasClassicMenus,
 	} = useNavigationEntities();
-	const { navigationMenus } = useNavigationMenu();
+
+	const {
+		navigationMenus,
+		canUserCreateNavigation,
+		canSwitchNavigationMenu,
+	} = useNavigationMenu();
 
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
@@ -50,7 +53,7 @@ export default function NavigationMenuSelector( {
 	);
 
 	const showSelectMenus =
-		( canUserSwitchNavigation || canUserCreateNavigation ) &&
+		( canSwitchNavigationMenu || canUserCreateNavigation ) &&
 		( navigationMenus?.length || hasClassicMenus );
 
 	if ( ! showSelectMenus ) {
@@ -60,7 +63,7 @@ export default function NavigationMenuSelector( {
 	return (
 		<>
 			<ExistingMenusOptions
-				showNavigationMenus={ canUserSwitchNavigation }
+				showNavigationMenus={ canSwitchNavigationMenu }
 				showClassicMenus={ canUserCreateNavigation }
 				navigationMenus={ navigationMenus }
 				classicMenus={ classicMenus }
