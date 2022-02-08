@@ -100,7 +100,7 @@ require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
 require __DIR__ . '/compat/wordpress-6.0/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
-require __DIR__ . '/compat/wordpress-6.0/global-styles.php';
+require __DIR__ . '/compat/wordpress-6.0/register-webfonts-from-theme-json.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/compat/experimental/blocks.php';
 
