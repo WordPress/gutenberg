@@ -113,7 +113,7 @@ Add the avatar of this comment's author. ([Source](https://github.com/WordPress/
 
 -	**Name:** core/comment-author-avatar
 -	**Category:** theme
--	**Supports:** color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
+-	**Supports:** color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~, ~~inserter~~
 -	**Attributes:** height, isLink, linkTarget, width
 
 ## Comment Author Name
@@ -448,15 +448,6 @@ Display post author details such as name, avatar, and bio. ([Source](https://git
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** avatarSize, byline, showAvatar, showBio, textAlign
-
-## Post Author Avatar
-
-Add the avatar of this post's author. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-avatar))
-
--	**Name:** core/post-author-avatar
--	**Category:** theme
--	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin), ~~alignWide~~, ~~html~~
--	**Attributes:** height, isLink, linkTarget, width
 
 ## Post Author Biography
 
