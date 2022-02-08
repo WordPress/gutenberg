@@ -335,6 +335,8 @@ export function getColorsAndGradients(
 			color: {
 				...( ! features?.color
 					? {
+							text: true,
+							background: true,
 							palette: {
 								default: defaultEditorColors,
 							},
