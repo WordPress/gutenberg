@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, ExternalLink } from '@wordpress/components';
+import { withFilters, Button, ExternalLink } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
-export default function WelcomeGuide( { sidebar } ) {
+function WelcomeGuide( { sidebar } ) {
 	const { toggleFeature } = useDispatch( interfaceStore );
 
 	const isEntirelyBlockWidgets = sidebar
@@ -79,3 +79,5 @@ export default function WelcomeGuide( { sidebar } ) {
 		</div>
 	);
 }
+
+export default withFilters( 'customizeWidgets.WelcomeGuide' )( WelcomeGuide );

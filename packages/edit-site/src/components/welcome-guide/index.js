@@ -1,10 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import { withFilters } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import WelcomeGuideEditor from './editor';
 import WelcomeGuideStyles from './styles';
 
-export default function WelcomeGuide() {
+function WelcomeGuide() {
 	return (
 		<>
 			<WelcomeGuideEditor />
@@ -12,3 +17,5 @@ export default function WelcomeGuide() {
 		</>
 	);
 }
+
+export default withFilters( 'editSite.WelcomeGuide' )( WelcomeGuide );

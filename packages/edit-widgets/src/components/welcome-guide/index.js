@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { ExternalLink, Guide } from '@wordpress/components';
+import { withFilters, ExternalLink, Guide } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -12,7 +12,7 @@ import { store as interfaceStore } from '@wordpress/interface';
  */
 import { store as editWidgetsStore } from '../../store';
 
-export default function WelcomeGuide() {
+function WelcomeGuide() {
 	const isActive = useSelect(
 		( select ) =>
 			select( interfaceStore ).isFeatureActive(
@@ -192,6 +192,8 @@ export default function WelcomeGuide() {
 		/>
 	);
 }
+
+export default withFilters( 'editWidgets.WelcomeGuide' )( WelcomeGuide );
 
 function WelcomeGuideImage( { nonAnimatedSrc, animatedSrc } ) {
 	return (

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { withFilters } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -10,7 +11,7 @@ import WelcomeGuideDefault from './default';
 import WelcomeGuideTemplate from './template';
 import { store as editPostStore } from '../../store';
 
-export default function WelcomeGuide() {
+function WelcomeGuide() {
 	const { isActive, isTemplateMode } = useSelect( ( select ) => {
 		const { isFeatureActive, isEditingTemplate } = select( editPostStore );
 		const _isTemplateMode = isEditingTemplate();
@@ -30,3 +31,5 @@ export default function WelcomeGuide() {
 
 	return isTemplateMode ? <WelcomeGuideTemplate /> : <WelcomeGuideDefault />;
 }
+
+export default withFilters( 'editPost.WelcomeGuide' )( WelcomeGuide );
