@@ -368,11 +368,6 @@ describe( 'Editor actions', () => {
 			let { value } = fulfillment.next();
 			expect( value ).toEqual( actions.resetPost( post ) );
 			value = fulfillment.next().value;
-			expect( value ).toEqual( {
-				type: 'SETUP_EDITOR',
-				post: { content: { raw: '' }, status: 'publish' },
-			} );
-			value = fulfillment.next().value;
 			expect( value ).toEqual(
 				actions.setupEditorState( {
 					content: { raw: '' },

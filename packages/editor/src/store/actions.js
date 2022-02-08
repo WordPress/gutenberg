@@ -38,12 +38,6 @@ import {
  */
 export function* setupEditor( post, edits, template ) {
 	yield resetPost( post );
-	yield {
-		type: 'SETUP_EDITOR',
-		post,
-		edits,
-		template,
-	};
 	yield setupEditorState( post );
 	// Apply a template for new posts only, if exists.
 	const isNewPost = post.status === 'auto-draft';
