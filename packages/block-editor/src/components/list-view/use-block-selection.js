@@ -8,24 +8,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-
-export function getStartAndEndIds( {
-	blockSelectionStart,
-	clientId,
-	endParents,
-	startParents,
-} ) {
-	const startPath = [ ...startParents, blockSelectionStart ];
-	const endPath = [ ...endParents, clientId ];
-	const depth = Math.min( startPath.length, endPath.length ) - 1;
-	const start = startPath[ depth ];
-	const end = endPath[ depth ];
-
-	return {
-		start,
-		end,
-	};
-}
+import { getCommonDepthClientIds } from './utils';
 
 export default function useBlockSelection() {
 	const { clearSelectedBlock, multiSelect, selectBlock } = useDispatch(
@@ -74,12 +57,12 @@ export default function useBlockSelection() {
 				) {
 					const endParents = getBlockParents( clientId );
 
-					const { start, end } = getStartAndEndIds( {
+					const { start, end } = getCommonDepthClientIds(
 						blockSelectionStart,
 						clientId,
-						endParents,
 						startParents,
-					} );
+						endParents
+					);
 
 					// Handle the case of having selected a parent block and
 					// then shift+click on a child.
