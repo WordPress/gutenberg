@@ -77,6 +77,22 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		return [ selectOption, ...taxonomyOptions ];
 	};
 
+	const onFontChange = ( fontSize, value ) => {
+		const parsedValue = parseFloat( value );
+		if ( isNaN( parsedValue ) && value ) return;
+
+		const newUnit = value.replace( /\d+/, '' );
+		if ( smallestFontSize.indexOf( newUnit ) === -1 ) {
+			const currentSize = parseFloat( smallestFontSize );
+			setAttributes( { smallestFontSize: currentSize + newUnit } );
+		}
+		if ( largestFontSize.indexOf( newUnit ) === -1 ) {
+			const currentSize = parseFloat( largestFontSize );
+			setAttributes( { largestFontSize: currentSize + newUnit } );
+		}
+		setAttributes( { [ fontSize ]: parsedValue < 0 ? '8pt' : value } );
+	};
+
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Tag Cloud settings' ) }>
@@ -111,20 +127,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 							label={ __( 'Smallest size' ) }
 							value={ smallestFontSize }
 							onChange={ ( value ) => {
-								const unit = value.slice( -2 );
-								if ( largestFontSize.indexOf( unit ) === -1 ) {
-									setAttributes( {
-										largestFontSize:
-											largestFontSize.slice( 0, -2 ) +
-											unit,
-									} );
-								}
-								value = value.slice( 0, -2 );
-								const newValue =
-									value && +value >= 8 ? +value : 8;
-								setAttributes( {
-									smallestFontSize: newValue + unit,
-								} );
+								onFontChange( 'smallestFontSize', value );
 							} }
 							units={ units }
 						/>
@@ -134,20 +137,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 							label={ __( 'Largest size' ) }
 							value={ largestFontSize }
 							onChange={ ( value ) => {
-								const unit = value.slice( -2 );
-								if ( smallestFontSize.indexOf( unit ) === -1 ) {
-									setAttributes( {
-										smallestFontSize:
-											smallestFontSize.slice( 0, -2 ) +
-											unit,
-									} );
-								}
-								value = value.slice( 0, -2 );
-								const newValue =
-									value && +value >= 8 ? +value : 60;
-								setAttributes( {
-									largestFontSize: newValue + unit,
-								} );
+								onFontChange( 'largestFontSize', value );
 							} }
 							units={ units }
 						/>
