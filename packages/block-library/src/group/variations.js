@@ -11,6 +11,7 @@ const variations = [
 		attributes: { layout: { type: 'default' } },
 		scope: [ 'transform' ],
 		isActive: ( blockAttributes ) =>
+			! blockAttributes.layout ||
 			blockAttributes.layout?.type === 'default',
 	},
 	{
