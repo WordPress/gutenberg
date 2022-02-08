@@ -70,6 +70,7 @@ function PullQuoteEdit( {
 					{ shouldShowCitation && (
 						<RichText
 							identifier="citation"
+							tagName="cite"
 							value={ citation }
 							aria-label={ __( 'Pullquote citation text' ) }
 							placeholder={
