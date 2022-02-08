@@ -1002,6 +1002,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorBackLink",
+		"slug": "navigator-back-link",
+		"markdown_source": "../packages/components/src/navigator/navigator-back-link/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorLink",
+		"slug": "navigator-link",
+		"markdown_source": "../packages/components/src/navigator/navigator-link/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "NavigatorProvider",
 		"slug": "navigator-provider",
 		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
