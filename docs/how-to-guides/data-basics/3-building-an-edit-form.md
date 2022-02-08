@@ -54,7 +54,7 @@ The only change in `PagesList` is the additional column labeled _Actions_:
 
 ### Step 2: Display an _Edit_ form
 
-We added a button that looks nice, but doesn't actually display the page edit form. We need a form component for that, so let's create it:
+Our button looks nice but doesn't do anything yet. To display an edit form, we need to have one first – let's create it:
 
 ```js
 import { Button, TextControl } from '@wordpress/components';
@@ -78,7 +78,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 }
 ```
 
-Now let's make the button display the form we just created. As this tutorial is not focused on web design, we will wire the two using a component that requires the least amount of code: [`Modal`](https://developer.wordpress.org/block-editor/reference-guides/components/modal/). Let's update `PageEditButton` accordingly:
+Now let's make the button display the form we just created. As this tutorial is not focused on web design, we will wire the two using a component that requires the least code: [`Modal`](https://developer.wordpress.org/block-editor/reference-guides/components/modal/). Let's update `PageEditButton` accordingly:
 
 ```js
 import { Button, Modal, TextControl } from '@wordpress/components';
@@ -117,11 +117,11 @@ Great! We now have a basic user interface to work with.
 
 ### Step 3: Populate the form with page details
 
-We want the `EditPageForm` to display the title of the currently edited page. You may have noticed that it doesn't receive a `page` prop, only `pageId`. That's okay, Gutenberg Data allows us to easily access entity records from any component.
+We want the `EditPageForm` to display the title of the currently edited page. You may have noticed that it doesn't receive a `page` prop, only `pageId`. That's okay. Gutenberg Data allows us to easily access entity records from any component.
 
-In this case, we need to use the [`getEntityRecord`](/docs/reference-guides/data/data-core/#getentityrecord) selector. The list of records is already available thanks to the `getEntityRecords` call in `MyFirstApp`, so there won't even be any extra HTTP requests involved – we'll get the cached record right away.
+In this case, we need to use the [`getEntityRecord`](/docs/reference-guides/data/data-core/#getentityrecord) selector. The list of records is already available thanks to the `getEntityRecords` call in `MyFirstApp`, so there won't even be any additional HTTP requests involved – we'll get the cached record right away.
 
-Here's how you can try in your browser's dev tools:
+Here's how you can try it in your browser's dev tools:
 
 ```js
 wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', 9 );  // Replace 9 with an actual page ID
@@ -151,9 +151,9 @@ Now it should look like that:
 
 ![](/docs/how-to-guides/data-basics/media/edit-form/form-populated.png)
 
-### Step 4: Making the title field editable
+### Step 4: Making the Page title field editable
 
-There's one problem with our _title_ field: you can't edit it. It receives a fixed `value`, but doesn't update it when the user is typing. We need an `onChange` handler.
+There's one problem with our _Page title_ field: you can't edit it. It receives a fixed `value` but doesn't update it when typing. We need an `onChange` handler.
 
 
 You may have seen a pattern similar to this one in other React apps:
@@ -170,14 +170,14 @@ export function VanillaReactForm({ initialTitle }) {
 }
 ```
 
-Updating entity records in Gutenberg Data is similar. We don't use `useState`, though. The counterpart of `setTitle` is an `editEntityRecord` action which stores the updates in the Redux state. Here's how you can try out in your browser's dev tools:
+Updating entity records in Gutenberg Data is similar. We don't use `useState`, though. The counterpart of `setTitle` is an `editEntityRecord` action which stores the updates in the Redux state. Here's how you can try it out in your browser's dev tools:
 
 ```js
 const pageId = wp.data.dispatch( 'core' ).getEntityRecords( 'postType', 'page' )[0].id;
 wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'page', pageId, { title: 'updated title' } );
 ```
 
-At this point you may ask _How is this better than `useState`?_ There are few upsides. We can save the changes as easily as we retrieved the data and be sure that all caches will be correctly updated. In addition, the changes applied via `editEntityRecord` are easily undo-able via the `undo` and `redo` actions. Finally,  Because the changes live in the Redux state, other components can access them. For example, we could make the `PagesList` display the currently edited title.
+At this point, you may ask _How is this better than `useState`?_ There are a few upsides. We can save the changes as easily as we retrieve the data and ensure that all caches will be correctly updated. In addition, the changes applied via `editEntityRecord` are easily undo-able via the `undo` and `redo` actions. Finally,  Because the changes live in the Redux state, other components can access them. For example, we could make the `PagesList` display the currently edited title.
 
 To that last point, let's see what happens when we use `getEntityRecord` to access the entity record we just updated:
 
@@ -228,7 +228,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 }
 ```
 
-We added an `onChange` handler to keep track of edits via the `editEntityRecord` action, and then changed the selector to `getEditedEntityRecord` so that `page.title` always reflects the changes.
+We added an `onChange` handler to keep track of edits via the `editEntityRecord` action and then changed the selector to `getEditedEntityRecord` so that `page.title` always reflects the changes.
 
 This is what it looks like now:
 
@@ -236,9 +236,9 @@ This is what it looks like now:
 
 ### Step 5: Saving the form data
 
-Now that we can edit the page title, let's also make sure we can save it. In Gutenberg data, we save changes to the WordPress REST API using the `saveEditedEntityRecord` action. It sends the request, processes the result, and updates the cached data in the Redux state.
+Now that we can edit the page title let's also make sure we can save it. In Gutenberg data, we save changes to the WordPress REST API using the `saveEditedEntityRecord` action. It sends the request, processes the result, and updates the cached data in the Redux state.
 
-Here's an example you may try in your browser's devtools:
+Here's an example you may try in your browser's dev tools:
 
 ```js
 // Replace 9 with an actual page ID
@@ -291,9 +291,13 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 
 ### Step 6: Handle errors
 
-We optimistically assumed that a *save* operation will always succeed. Unfortunately, it may fail in many ways: the website can be down, the update may be invalid, or the page could have been deleted by someone else in the meantime. Let's tell the user about anything that goes wrong.
+We optimistically assumed that a *save* operation would always succeed. Unfortunately, it may fail in many ways:
 
-We have to make two adjustments. Firstly, we don't want to close the form modal when the update fails. The promise returned by `saveEditedEntityRecord` is resolved with an updated record only if the update actually worked. When something goes wrong, it resolves with an empty value. Let's use it to keep the modal open:
+* The website can be down
+* The update may be invalid
+* The page could have been deleted by someone else in the meantime
+
+To tell the user when any of these happens, we have to make two adjustments. We don't want to close the form modal when the update fails. The promise returned by `saveEditedEntityRecord` is resolved with an updated record only if the update actually worked. When something goes wrong, it resolves with an empty value. Let's use it to keep the modal open:
 
 ```js
 export function EditPageForm( { pageId, onSaveFinished } ) {
@@ -344,7 +348,7 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 
 Great! `EditPageForm` is now fully aware of errors.
 
-Let's see that error message in action. We'll trigger an invalid update and let it fail. Post title is hard to break, so let's set a `date` property to `-1` instead – that's a guaranteed validation error:
+Let's see that error message in action. We'll trigger an invalid update and let it fail. The post title is hard to break, so let's set a `date` property to `-1` instead – that's a guaranteed validation error:
 
 ```js
 export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
@@ -354,7 +358,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 }
 ```
 
-Once you refresh the page, open the form, change the title, and hit save you should see the following error message:
+Once you refresh the page, open the form, change the title, and hit save, you should see the following error message:
 
 ![](./media/edit-form/form-error.png)
 
@@ -362,9 +366,9 @@ Fantastic! We can now restore the previous version of `handleChange` and move on
 
 ### Step 7: Status indicator
 
-There is one last problem with our form: there is no visual feedback. We can’t be quite sure whether the *Save* button worked until either the form disappears or an error message shows.
+There is one last problem with our form: no visual feedback. We can’t be quite sure whether the *Save* button worked until either the form disappears or an error message shows.
 
-We're going to clear it up and communicate two states to the user: _Saving_, and _No changes detected_. The relevant selectors are `isSavingEntityRecord` and `hasEditsForEntityRecord`. Unlike `getEntityRecord`, they never issue any HTTP requests, but only return the information about the current entity record state.
+We're going to clear it up and communicate two states to the user: _Saving_ and _No changes detected_. The relevant selectors are `isSavingEntityRecord` and `hasEditsForEntityRecord`. Unlike `getEntityRecord`, they never issue any HTTP requests but only return the current entity record state.
 
 Let's use them in `EditPageForm`:
 
@@ -382,7 +386,7 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 }
 ```
 
-We can now use `isSaving` and `hasEdits` to display a spinner when saving is in progress, and grey out the save button when there are no edits:
+We can now use `isSaving` and `hasEdits` to display a spinner when saving is in progress and grey out the save button when there are no edits:
 
 ```js
 
@@ -400,9 +404,9 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 }
 ```
 
-Note that we disable the save button when there are no edits, but also when the page is currently being saved. This is to prevent the user from accidentally pressing the button twice..
+Note that we disable the save button when there are no edits and when the page is currently being saved. This is to prevent the user from accidentally pressing the button twice.
 
-Here's how it looks like in action:
+Here's what it looks like in action:
 
 ![](./media/edit-form/form-inactive.png)
 ![](./media/edit-form/form-spinner.png)
