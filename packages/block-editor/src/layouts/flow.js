@@ -121,23 +121,23 @@ export default {
 						margin-right: auto !important;
 					}
 
-					${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
+					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };
 					}
 
-					${ appendSelectors( selector, '> [data-align="full"]' ) } {
+					${ appendSelectors( selector, '> .alignfull' ) } {
 						max-width: none;
 					}
 				`
 				: '';
 
 		output += `
-			${ appendSelectors( selector, '> [data-align="left"]' ) } {
+			${ appendSelectors( selector, '> .alignleft' ) } {
 				float: left;
 				margin-right: 2em;
 			}
 
-			${ appendSelectors( selector, '> [data-align="right"]' ) } {
+			${ appendSelectors( selector, '> .alignright' ) } {
 				float: right;
 				margin-left: 2em;
 			}

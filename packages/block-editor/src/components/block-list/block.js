@@ -19,7 +19,12 @@ import {
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
+import {
+	withDispatch,
+	withSelect,
+	useDispatch,
+	useSelect,
+} from '@wordpress/data';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
@@ -86,6 +91,10 @@ function BlockListBlock( {
 	onMerge,
 	toggleSelection,
 } ) {
+	const themeSupportsLayout = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().supportsLayout;
+	}, [] );
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
@@ -123,7 +132,13 @@ function BlockListBlock( {
 
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column.
-	if ( isAligned ) {
+	// This is only kept for classic themes that don't support layout
+	// Historically we used to rely on extra divs and data-align to
+	// provide the alignments styles in the editor.
+	// Due to the differences between frontend and backend, we migrated
+	// to the layout feature, and we're now aligning the markup of frontend
+	// and backend.
+	if ( isAligned && ! themeSupportsLayout ) {
 		blockEdit = (
 			<div
 				className="wp-block"
@@ -164,7 +179,13 @@ function BlockListBlock( {
 
 	const value = {
 		clientId,
-		className,
+		className:
+			isAligned && themeSupportsLayout
+				? classnames(
+						className,
+						`align${ wrapperProps[ 'data-align' ] }`
+				  )
+				: className,
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 		isAligned,
 	};
