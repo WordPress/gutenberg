@@ -1043,7 +1043,7 @@ _Related_
 
 ### createUndoLevel
 
-> **Deprecated** Since Gutenberg 13.0.0
+> **Deprecated** Since WordPress 6.0
 
 Action that creates an undo history record.
 
@@ -1218,7 +1218,7 @@ restore last popped state.
 
 ### refreshPost
 
-> **Deprecated** Since Gutenberg 13.0.0.
+> **Deprecated** Since WordPress 6.0.
 
 Action for refreshing the current post.
 

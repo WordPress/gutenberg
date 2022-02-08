@@ -282,11 +282,12 @@ export function* savePost( options = {} ) {
 /**
  * Action for refreshing the current post.
  *
- * @deprecated Since Gutenberg 13.0.0.
+ * @deprecated Since WordPress 6.0.
  */
 export function refreshPost() {
 	deprecated( "wp.data.dispatch( 'core/editor' ).refreshPost", {
-		since: '5.9',
+		since: '6.0',
+		version: '6.3',
 		alternative: 'Use the core entities store instead',
 	} );
 	return { type: 'DO_NOTHING' };
@@ -395,11 +396,12 @@ export function* undo() {
 /**
  * Action that creates an undo history record.
  *
- * @deprecated Since Gutenberg 13.0.0
+ * @deprecated Since WordPress 6.0
  */
 export function createUndoLevel() {
 	deprecated( "wp.data.dispatch( 'core/editor' ).createUndoLevel", {
-		since: '5.9',
+		since: '6.0',
+		version: '6.3',
 		alternative: 'Use the core entities store instead',
 	} );
 	return { type: 'DO_NOTHING' };
