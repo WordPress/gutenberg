@@ -17,7 +17,6 @@
 	},
 	"files": [
 		"./api-docs/update-api-docs.js",
-		"./check-latest-npm.js",
 		"./plugin/config.js",
 		"./plugin/commands/changelog.js",
 		"./plugin/commands/performance.js",
