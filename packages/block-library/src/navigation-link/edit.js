@@ -49,8 +49,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { name } from './block.json';
 
-const MAX_NESTING = 5;
-
 /**
  * A React hook to determine if it's dragging within the target element.
  *
@@ -386,6 +384,7 @@ export default function NavigationLinkEdit( {
 	onReplace,
 	context,
 	clientId,
+	maxNestingLevel = 5,
 } ) {
 	const {
 		id,
@@ -452,7 +451,7 @@ export default function NavigationLinkEdit( {
 					getBlockParentsByBlockName( clientId, [
 						name,
 						'core/navigation-submenu',
-					] ).length >= MAX_NESTING,
+					] ).length >= maxNestingLevel,
 				isTopLevelLink:
 					getBlockName( getBlockRootClientId( clientId ) ) ===
 					'core/navigation',
