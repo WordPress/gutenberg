@@ -7,5 +7,5 @@
 			"wideSize": "1100px"
 		}
 	},
-	"patterns": ["short-text-surrounded-by-round-images", "partner-logos" ]
+	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }
