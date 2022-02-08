@@ -422,50 +422,47 @@ All the pieces are in place, great! Here’s everything we built in this chapter
 import { useDispatch } from '@wordpress/data';
 import { Button, Modal, TextControl } from '@wordpress/components';
 
-function PageEditButton({ pageId }) {
+function PageEditButton( { pageId } ) {
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
 	return (
 		<>
-			<Button
-				onClick={ openModal }
-				variant="primary"
-			>
+			<Button onClick={ openModal } variant="primary">
 				Edit
 			</Button>
 			{ isOpen && (
 				<Modal onRequestClose={ closeModal } title="Edit page">
 					<EditPageForm
-						pageId={pageId}
-						onCancel={closeModal}
-						onSaveFinished={closeModal}
+						pageId={ pageId }
+						onCancel={ closeModal }
+						onSaveFinished={ closeModal }
 					/>
 				</Modal>
 			) }
 		</>
-	)
+	);
 }
 
 export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const { page, lastError, isSaving, hasEdits } = useSelect(
-		select => ({
-			page: select(coreDataStore).getEditedEntityRecord('postType', 'page', pageId),
-			lastError: select(coreDataStore).getLastEntitySaveError('postType', 'page', pageId),
-			isSaving: select(coreDataStore).isSavingEntityRecord('postType', 'page', pageId),
-			hasEdits: select(coreDataStore).hasEditsForEntityRecord('postType', 'page', pageId),
-		}),
+		( select ) => ( {
+			page: select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
+			lastError: select( coreDataStore ).getLastEntitySaveError( 'postType', 'page', pageId ),
+			isSaving: select( coreDataStore ).isSavingEntityRecord( 'postType', 'page', pageId ),
+			hasEdits: select( coreDataStore ).hasEditsForEntityRecord( 'postType', 'page', pageId ),
+		} ),
 		[ pageId ]
-	)
+	);
 
 	const { saveEditedEntityRecord, editEntityRecord } = useDispatch( coreDataStore );
 	const handleSave = async () => {
-		const savedRecord = await saveEditedEntityRecord('postType', 'page', pageId);
+		const savedRecord = await saveEditedEntityRecord( 'postType', 'page', pageId );
 		if ( savedRecord ) {
 			onSaveFinished();
 		}
 	};
-	const handleChange = ( title ) => editEntityRecord( 'postType', 'page', page.id, { title } );
+	const handleChange = ( title ) =>  editEntityRecord( 'postType', 'page', page.id, { title } );
 
 	return (
 		<div className="my-gutenberg-form">
@@ -475,13 +472,17 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 				onChange={ handleChange }
 			/>
 			{ lastError ? (
-				<div className="form-error">
-					Error: { lastError.message }
-				</div>
-			) : false }
+				<div className="form-error">Error: { lastError.message }</div>
+			) : (
+				false
+			) }
 			<div className="form-buttons">
-				<Button onClick={ handleSave } variant="primary" disabled={ ! hasEdits || isSaving }>
-					{isSaving ? <Spinner/> : 'Save'}
+				<Button
+					onClick={ handleSave }
+					variant="primary"
+					disabled={ ! hasEdits || isSaving }
+				>
+					{ isSaving ? <Spinner /> : 'Save' }
 				</Button>
 				<Button onClick={ onCancel } variant="tertiary">
 					Cancel
