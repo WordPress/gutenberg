@@ -95,10 +95,6 @@ body.block-editor-page {
 		max-width: 100%;
 		height: auto;
 	}
-
-	iframe {
-		width: 100%;
-	}
 }
 
 @include wordpress-admin-schemes();
