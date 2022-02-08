@@ -234,7 +234,7 @@
 		"api-docs:theme-ref": "node ./bin/api-docs/gen-theme-reference.js",
 		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\"",
 		"clean:package-types": "tsc --build --clean",
-		"prebuild:packages": "pnpm clean:packages && lerna run build",
+		"prebuild:packages": "pnpm clean:packages && pnpm run -r build",
 		"build:packages": "pnpm build:package-types && node ./bin/packages/build.js",
 		"build:package-types": "node ./bin/packages/validate-typescript-version.js && tsc --build",
 		"build:plugin-zip": "./bin/build-plugin-zip.sh",
