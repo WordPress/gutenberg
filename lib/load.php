@@ -85,7 +85,7 @@ require __DIR__ . '/compat/wordpress-5.9/template-parts.php';
 require __DIR__ . '/compat/wordpress-5.9/theme-templates.php';
 require __DIR__ . '/editor-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-schema-gutenberg.php';
-require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-5-9.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/compat/wordpress-5.9/theme.php';
 require __DIR__ . '/compat/wordpress-5.9/admin-menu.php';
