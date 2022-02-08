@@ -110,7 +110,10 @@ function TreeGrid(
 						}
 						// If a row is focused, and it is collapsed, moves to the parent row (if there is one).
 						const level = Math.max(
-							parseInt( activeRow?.ariaLevel ?? 1, 10 ) - 1,
+							parseInt(
+								activeRow?.getAttribute( 'aria-level' ) ?? 1,
+								10
+							) - 1,
 							1
 						);
 						const rows = Array.from(
@@ -120,7 +123,10 @@ function TreeGrid(
 						const currentRowIndex = rows.indexOf( activeRow );
 						for ( let i = currentRowIndex; i >= 0; i-- ) {
 							if (
-								parseInt( rows[ i ].ariaLevel, 10 ) === level
+								parseInt(
+									rows[ i ].getAttribute( 'aria-level' ),
+									10
+								) === level
 							) {
 								parentRow = rows[ i ];
 								break;
