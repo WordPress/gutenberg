@@ -20,17 +20,10 @@ function render_block_core_comments_pagination_numbers( $attributes, $content, $
 		return '';
 	}
 
-	$comments_query = new WP_Comment_Query(
-		build_comment_query_vars_from_block( $block )
-	);
-	$total          = $comments_query->max_num_pages;
+	$comment_vars  = build_comment_query_vars_from_block( $block );
 
-	// Get the current comment page from the URL.
-	$current = get_query_var( 'cpage' );
-	if ( ! $current ) {
-		// Get the number of the default page.
-		$current = 'newest' === get_option( 'default_comments_page' ) ? $total : 1;
-	}
+	$total   = ( new WP_Comment_Query( $comment_vars ) )->max_num_pages;
+	$current = $comment_vars['paged'];
 
 	// Render links.
 	$content = paginate_comments_links(
