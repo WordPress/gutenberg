@@ -195,7 +195,7 @@ wp.data.select( 'core' ).getEditedEntityRecord( 'postType', 'page', 9 ).title
 // 'updated title'
 ```
 
-Let's update `EditPageForm` accordingly:
+Let's update `EditPageForm` accordingly. We can access the actions using the [`useDispatch`](/packages/data/README.md#usedispatch) hook similarly to how we use `useSelect` to access selectors:
 
 ```js
 import { useDispatch } from '@wordpress/data';
@@ -236,7 +236,7 @@ This is what it looks like now:
 
 ### Step 5: Saving the form data
 
-We can now edit the page title, let's make sure we can also save it. In Gutenberg data, we save changes to the WordPress REST API using the `saveEditedEntityRecord` action. It sends the request, processes the result, and updates the cached data in the Redux state.
+Now that we can edit the page title, let's also make sure we can save it. In Gutenberg data, we save changes to the WordPress REST API using the `saveEditedEntityRecord` action. It sends the request, processes the result, and updates the cached data in the Redux state.
 
 Here's an example you may try in your browser's devtools:
 

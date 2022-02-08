@@ -84,7 +84,7 @@ function MyFirstApp() {
 Note that we use an `import` statement inside index.js. This enables the plugin to automatically load the dependencies using `wp_enqueue_script`. Any references to `coreDataStore` are compiled to the same `wp.data` reference we use in browser's devtools.
 
 `useSelect` takes two arguments: a callback and dependencies. In broad strokes, it re-runs the callback whenever either
-the dependencies or the underlying data store changes. You can learn more about [useSelect](#) in
+the dependencies or the underlying data store changes. You can learn more about [useSelect](/packages/data/README.md#useselect) in
 the [data module documentation](/packages/data/README.md#useselect).
 
 Putting it together, we get the following code:
