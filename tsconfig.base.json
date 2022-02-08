@@ -31,7 +31,13 @@
 		"resolveJsonModule": true,
 
 		"typeRoots": [ "./typings", "./node_modules/@types" ],
-		"types": []
+		"types": [],
+		"baseUrl": ".",
+		"paths": {
+			/* Fixes resolution of this library between multiple @types/react dependencies */
+			"react": ["node_modules/@types/react"],
+			"csstype": ["node_modules/csstype"]
+		}
 	},
 	"exclude": [
 		"**/*.android.js",
