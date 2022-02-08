@@ -99,10 +99,9 @@ done
 
 # Run the build.
 status "Installing dependencies... 📦"
-npm cache verify
-npm ci
+pnpm install --frozen-lockfile
 status "Generating build... 👷‍♀️"
-npm run build
+pnpm build
 
 # Temporarily modify `gutenberg.php` with production constants defined. Use a
 # temp file because `bin/generate-gutenberg-php.php` reads from `gutenberg.php`
