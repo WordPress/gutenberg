@@ -33,7 +33,7 @@ window.addEventListener( 'load', function() {
 ```css
 .toplevel_page_my-first-gutenberg-app #wpcontent {
 	background: #FFF;
-	height: 800px;
+	height: 1000px;
 }
 #my-first-gutenberg-app {
 	max-width: 500px;
@@ -42,19 +42,26 @@ window.addEventListener( 'load', function() {
 #my-first-gutenberg-app ul li {
 	list-style-type: disc;
 }
+.my-gutenberg-form .form-buttons {
+	display: flex;
+	margin-top: 20px;
+	margin-left: 1px;
+}
+.my-gutenberg-form .form-error {
+	color: #cc1818;
+}
+.my-gutenberg-form .form-buttons button {
+	margin-right: 4px;
+}
+.my-gutenberg-form .form-buttons .components-spinner {
+	margin-top: 0;
+}
 #my-first-gutenberg-app ul {
 	padding-left: 20px;
 }
 #my-first-gutenberg-app .components-search-control__input {
 	height: 36px;
 	margin-left: 0;
-}
-.my-gutenberg-form .form-buttons {
-	margin-top: 20px;
-	margin-left: 1px;
-}
-.my-gutenberg-form .form-buttons button {
-	margin-right: 4px;
 }
 ```
 
@@ -114,7 +121,9 @@ function load_custom_wp_admin_scripts( $hook ) {
 	// Load our style.css.
 	wp_register_style(
 		'my-first-gutenberg-app',
-		plugins_url( 'style.css', __FILE__ )
+		plugins_url( 'style.css', __FILE__ ),
+		array(),
+		$asset_file['version']
 	);
 	wp_enqueue_style( 'my-first-gutenberg-app' );
 }

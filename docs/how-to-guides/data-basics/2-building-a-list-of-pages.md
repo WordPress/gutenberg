@@ -373,6 +373,10 @@ function MyFirstApp() {
 }
 ```
 
+And voilà! That's it.
+
+### Wiring it all together
+
 All the pieces are in place, great! Here’s the complete JavaScript code of our app:
 
 ```js

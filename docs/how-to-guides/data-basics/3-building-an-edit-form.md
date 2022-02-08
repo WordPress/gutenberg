@@ -323,7 +323,7 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 		<>
 			{/* ... */}
 			{ lastError ? (
-				<div>
+				<div className="form-error">
 					Error: { lastError.message }
 				</div>
 			) : false }
@@ -347,21 +347,22 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 
 Once you refresh the page, open the form, change the title, and hit save you should see the following error message:
 
+![](./media/edit-form/form-error.png)
+
 Fantastic! We can now restore the previous version of `handleChange` and move on to the next step.
 
 ### Status indicator
 
 There are two more problems with our form: We can click *Save* even when there are no changes, and when we do we can’t be quite sure whether it’s doing anything.
 
+We can clear it up by communicating _Saving_ and _No changes detected_ to the user. Two selectors are going to be useful here: `isSavingEntityRecord` and `hasEditsForEntityRecord`. Unlike `getEntityRecord`, they do not issue any HTTP requests. Instead, they only return the information about the current entity record state.
 
-We can clear it up by communicating _Loading_ and _No changes detected_ through a stateful *Save* button.
-
-First, `EditPageForm` has to be aware of the current status:
+Let's use them in `EditPageForm`:
 
 ```js
 export function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
-	const { isSaving, hasEdits } = useSelect(
+	const { isSaving, hasEdits, /* ... */ } = useSelect(
 		select => ({
 			isSaving: select(coreDataStore).isSavingEntityRecord('postType', 'page', pageId),
 			hasEdits: select(coreDataStore).hasEditsForEntityRecord('postType', 'page', pageId),
@@ -372,12 +373,34 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 }
 ```
 
+We can now use `isSaving` and `hasEdits` to display a spinner when saving is in progress, and grey out the save button when there are no edits:
 
-The `isSavingEntityRecord` and `hasEditsForEntityRecord` selectors... @TODO
+```js
 
+export function EditPageForm( { pageId, onSaveFinished } ) {
+	// ...
+	return (
+		// ...
+		<div className="form-buttons">
+			<Button onClick={ handleSave } variant="primary" disabled={ ! hasEdits || isSaving }>
+				{isSaving ? <Spinner/> : 'Save'}
+			</Button>
+		</div>
+		// ...
+	);
+}
+```
 
+Note that we disable the save button when there are no edits, but also when the page is currently being saved. This is to prevent the user from accidentally pressing the button twice..
+
+Here's how it looks like in action:
+
+![](./media/edit-form/form-inactive.png)
+![](./media/edit-form/form-spinner.png)
 
 ### Wiring it all together
+
+All the pieces are in place, great! Here’s everything we built in this chapter in one place:
 
 ```js
 import { useDispatch } from '@wordpress/data';
@@ -436,12 +459,12 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 				onChange={ handleChange }
 			/>
 			{ lastError ? (
-				<div>
+				<div className="form-error">
 					Error: { lastError.message }
 				</div>
 			) : false }
 			<div className="form-buttons">
-				<Button onClick={ handleSave } variant="primary" disabled={ isSaving || ! hasEdits }>
+				<Button onClick={ handleSave } variant="primary" disabled={ ! hasEdits || isSaving }>
 					{isSaving ? <Spinner/> : 'Save'}
 				</Button>
 				<Button onClick={ onCancel } variant="tertiary">
