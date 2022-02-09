@@ -201,9 +201,9 @@ describe( 'Cover', () => {
 			`.wp-block-image img[src$="${ filename }.png"]`
 		);
 
-		// Click the block wrapper before trying to convert to make sure figcaption toolbar is not obscuring
+		// Focus the block wrapper before trying to convert to make sure figcaption toolbar is not obscuring
 		// the block toolbar.
-		await page.click( '.wp-block-image > div' );
+		await page.focus( '.wp-block-image' );
 		await transformBlockTo( 'Cover' );
 
 		// Get the block's background dim color and its opacity
