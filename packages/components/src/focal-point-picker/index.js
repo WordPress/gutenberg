@@ -49,8 +49,9 @@ export class FocalPointPicker extends Component {
 			}
 		};
 		this.onChangeAtControls = ( value ) => {
-			this.updateValue( value );
-			this.props.onChange( value );
+			this.updateValue( value, () => {
+				this.props.onChange( this.state.percentages );
+			} );
 		};
 
 		this.updateBounds = this.updateBounds.bind( this );
@@ -128,7 +129,7 @@ export class FocalPointPicker extends Component {
 		}
 		return bounds;
 	}
-	updateValue( nextValue = {} ) {
+	updateValue( nextValue = {}, callback ) {
 		const resolvedValue =
 			this.props.resolvePoint?.( nextValue ) ?? nextValue;
 
@@ -139,7 +140,7 @@ export class FocalPointPicker extends Component {
 			y: parseFloat( y ).toFixed( 2 ),
 		};
 
-		this.setState( { percentages: nextPercentage } );
+		this.setState( { percentages: nextPercentage }, callback );
 	}
 	updateBounds() {
 		this.setState( {
@@ -183,8 +184,9 @@ export class FocalPointPicker extends Component {
 
 		next[ axis ] = roundClamp( value, 0, 1, step );
 
-		this.updateValue( next );
-		this.props.onChange( next );
+		this.updateValue( next, () => {
+			this.props.onChange( this.state.percentages );
+		} );
 	}
 	doDrag( event ) {
 		// Prevents text-selection when dragging.
