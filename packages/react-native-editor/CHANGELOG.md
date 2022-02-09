@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
 
 ## 1.71.0
 
