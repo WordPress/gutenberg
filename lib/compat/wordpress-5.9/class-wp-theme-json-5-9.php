@@ -1224,7 +1224,11 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $properties Properties metadata.
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $styles, $settings = array(), $properties = self::PROPERTIES_METADATA ) {
+	private static function compute_style_properties( $styles, $settings = array(), $properties = null ) {
+		if ( $properties === null ) {
+			$properties = static::PROPERTIES_METADATA;
+		}
+
 		$declarations = array();
 		if ( empty( $styles ) ) {
 			return $declarations;
@@ -1785,7 +1789,7 @@ class WP_Theme_JSON_5_9 {
 
 		foreach ( $declarations as $declaration ) {
 			if ( self::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
-				$path = self::PROPERTIES_METADATA[ $declaration['name'] ];
+				$path = static::PROPERTIES_METADATA[ $declaration['name'] ];
 
 				// Check the value isn't an array before adding so as to not
 				// double up shorthand and longhand styles.
