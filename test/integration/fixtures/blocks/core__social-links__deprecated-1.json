@@ -24,8 +24,7 @@
 					"url": "https://wordpress.org",
 					"service": "wordpress"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			},
 			{
 				"clientId": "_clientId_1",
@@ -35,8 +34,7 @@
 					"url": "#",
 					"service": "chain"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			},
 			{
 				"clientId": "_clientId_2",
@@ -46,10 +44,8 @@
 					"url": "#",
 					"service": "mail"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<ul class=\"wp-block-social-links has-icon-color has-icon-background-color items-justified-space-between\">\n\t\n\t\n\t\n</ul>"
+		]
 	}
 ]

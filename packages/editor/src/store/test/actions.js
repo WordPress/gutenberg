@@ -358,46 +358,6 @@ describe( 'Post generator actions', () => {
 			} );
 		} );
 	} );
-	describe( 'refreshPost()', () => {
-		let fulfillment;
-		const currentPost = { id: 10, content: 'foo' };
-		const reset = () => ( fulfillment = actions.refreshPost() );
-		it( 'yields expected action for selecting the currentPost', () => {
-			reset();
-			const { value } = fulfillment.next();
-			expect( value ).toEqual(
-				controls.select( STORE_NAME, 'getCurrentPost' )
-			);
-		} );
-		it( 'yields expected action for selecting the current post type', () => {
-			const { value } = fulfillment.next( currentPost );
-			expect( value ).toEqual(
-				controls.select( STORE_NAME, 'getCurrentPostType' )
-			);
-		} );
-		it( 'yields expected action for selecting the post type object', () => {
-			const { value } = fulfillment.next( postTypeSlug );
-			expect( value ).toEqual(
-				controls.resolveSelect( 'core', 'getPostType', postTypeSlug )
-			);
-		} );
-		it( 'yields expected action for the api fetch call', () => {
-			const { value } = fulfillment.next( postType );
-			// since the timestamp is a computed value we can't do a direct comparison.
-			// so we'll just see if the path has most of the value.
-			expect( value.request.path ).toEqual(
-				expect.stringContaining(
-					`/wp/v2/${ postType.rest_base }/${ currentPost.id }?context=edit&_timestamp=`
-				)
-			);
-		} );
-		it( 'yields expected action for dispatching the reset of the post', () => {
-			const { value } = fulfillment.next( currentPost );
-			expect( value ).toEqual(
-				controls.dispatch( STORE_NAME, 'resetPost', currentPost )
-			);
-		} );
-	} );
 } );
 
 describe( 'Editor actions', () => {

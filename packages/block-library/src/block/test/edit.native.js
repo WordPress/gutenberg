@@ -74,7 +74,11 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel, getByTestId, getByText } = initializeEditor( {
+		const {
+			getByA11yLabel,
+			getByTestId,
+			getByText,
+		} = await initializeEditor( {
 			initialHtml: '',
 			capabilities: { reusableBlock: true },
 		} );
@@ -123,7 +127,7 @@ describe( 'Reusable block', () => {
 		const id = 3;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
 
-		const { getByA11yLabel } = initializeEditor( {
+		const { getByA11yLabel } = await initializeEditor( {
 			initialHtml,
 		} );
 
@@ -158,7 +162,7 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel } = initializeEditor( {
+		const { getByA11yLabel } = await initializeEditor( {
 			initialHtml,
 		} );
 

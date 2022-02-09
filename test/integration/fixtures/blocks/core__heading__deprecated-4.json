@@ -9,7 +9,6 @@
 			"textColor": "accent",
 			"textAlign": "center"
 		},
-		"innerBlocks": [],
-		"originalContent": "<h2 class=\"has-accent-color has-text-color has-text-align-center\">Text</h2>"
+		"innerBlocks": []
 	}
 ]

@@ -7,7 +7,6 @@
 			"content": "A <em>verse</em>…<br>And more!",
 			"textAlign": "left"
 		},
-		"innerBlocks": [],
-		"originalContent": "<pre style=\"text-align:left\" class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>"
+		"innerBlocks": []
 	}
 ]

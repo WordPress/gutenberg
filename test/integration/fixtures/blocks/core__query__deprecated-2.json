@@ -44,13 +44,10 @@
 							"rel": "",
 							"linkTarget": "_self"
 						},
-						"innerBlocks": [],
-						"originalContent": ""
+						"innerBlocks": []
 					}
-				],
-				"originalContent": ""
+				]
 			}
-		],
-		"originalContent": "<div class=\"wp-block-query\">\n</div>"
+		]
 	}
 ]

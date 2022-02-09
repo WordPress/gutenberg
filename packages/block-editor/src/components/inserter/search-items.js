@@ -163,7 +163,9 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 
 	// Give a better rank to "core" namespaced items.
 	if ( rank !== 0 && name.startsWith( 'core/' ) ) {
-		rank++;
+		const isCoreBlockVariation = name !== item.id;
+		// Give a bit better rank to "core" blocks over "core" block variations.
+		rank += isCoreBlockVariation ? 1 : 2;
 	}
 
 	return rank;

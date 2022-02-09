@@ -8,7 +8,6 @@
 			"level": 2,
 			"textColor": "accent"
 		},
-		"innerBlocks": [],
-		"originalContent": "<h2 class=\"has-accent-color\">text</h2>"
+		"innerBlocks": []
 	}
 ]

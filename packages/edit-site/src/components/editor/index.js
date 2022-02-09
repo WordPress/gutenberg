@@ -16,12 +16,13 @@ import {
 	EditorSnackbars,
 	EntitiesSavedStates,
 } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
 import {
 	ShortcutProvider,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -110,6 +111,7 @@ function Editor( { onError } ) {
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [
 		isEntitiesSavedStatesOpen,
@@ -180,6 +182,18 @@ function Editor( { onError } ) {
 		}
 		return null;
 	};
+
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
+		);
+	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URlQueryController> from double-announcing.
@@ -286,7 +300,13 @@ function Editor( { onError } ) {
 													) }
 												</>
 											}
-											footer={ <BlockBreadcrumb /> }
+											footer={
+												<BlockBreadcrumb
+													rootLabelText={ __(
+														'Template'
+													) }
+												/>
+											}
 											shortcuts={ {
 												previous: previousShortcut,
 												next: nextShortcut,
@@ -294,7 +314,9 @@ function Editor( { onError } ) {
 										/>
 										<WelcomeGuide />
 										<Popover.Slot />
-										<PluginArea />
+										<PluginArea
+											onError={ onPluginAreaError }
+										/>
 									</ErrorBoundary>
 								</BlockContextProvider>
 							</GlobalStylesProvider>

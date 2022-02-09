@@ -4,7 +4,6 @@
 		"name": "core/post-comment",
 		"isValid": true,
 		"attributes": {},
-		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-post-comment\"></div>"
+		"innerBlocks": []
 	}
 ]

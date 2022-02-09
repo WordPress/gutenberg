@@ -6,7 +6,6 @@
 		"attributes": {
 			"content": "<p><!-- wp:core/4-invalid /--></p>"
 		},
-		"innerBlocks": [],
-		"originalContent": "<p><!-- wp:core/4-invalid /--></p>"
+		"innerBlocks": []
 	}
 ]

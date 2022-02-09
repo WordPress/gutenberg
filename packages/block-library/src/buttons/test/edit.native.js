@@ -35,7 +35,7 @@ describe( 'Buttons block', () => {
 			<div class="wp-block-button"><a class="wp-block-button__link" style="border-radius:5px" >Hello</a></div>
 			<!-- /wp:button --></div>
 			<!-- /wp:buttons -->`;
-			const { getByA11yLabel } = initializeEditor( {
+			const { getByA11yLabel } = await initializeEditor( {
 				initialHtml,
 			} );
 
@@ -90,7 +90,7 @@ describe( 'Buttons block', () => {
 				const initialHtml = `<!-- wp:buttons -->
 				<div class="wp-block-buttons"><!-- wp:button /--></div>
 				<!-- /wp:buttons -->`;
-				const { getByA11yLabel, getByText } = initializeEditor( {
+				const { getByA11yLabel, getByText } = await initializeEditor( {
 					initialHtml,
 				} );
 

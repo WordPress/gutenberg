@@ -34,7 +34,11 @@
 		"anchor": true,
 		"className": false,
 		"color": {
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

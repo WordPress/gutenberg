@@ -1,0 +1,31 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"alt": "",
+			"hasParallax": false,
+			"isRepeated": false,
+			"dimRatio": 100,
+			"backgroundType": "image",
+			"customGradient": "linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)",
+			"isDark": true
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "Cover!",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

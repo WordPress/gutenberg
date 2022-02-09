@@ -15,8 +15,7 @@
 					"content": "Column One, Paragraph One",
 					"dropCap": false
 				},
-				"innerBlocks": [],
-				"originalContent": "<p>Column One, Paragraph One</p>"
+				"innerBlocks": []
 			},
 			{
 				"clientId": "_clientId_1",
@@ -26,10 +25,8 @@
 					"content": "Column One, Paragraph Two",
 					"dropCap": false
 				},
-				"innerBlocks": [],
-				"originalContent": "<p>Column One, Paragraph Two</p>"
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div class=\"wp-block-column\" style=\"flex-basis:33.33%\">\n\t\n\t\n</div>"
+		]
 	}
 ]

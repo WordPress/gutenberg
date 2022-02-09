@@ -48,6 +48,7 @@ function useDeprecatedProps( {
 		deprecated( 'Button isDefault prop', {
 			since: '5.4',
 			alternative: 'variant="secondary"',
+			version: '6.2',
 		} );
 
 		computedVariant ??= 'secondary';

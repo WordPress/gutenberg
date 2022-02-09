@@ -25,16 +25,14 @@
 				"attributes": {
 					"label": "Previous label comments"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			},
 			{
 				"clientId": "_clientId_1",
 				"name": "core/comments-pagination-numbers",
 				"isValid": true,
 				"attributes": {},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			},
 			{
 				"clientId": "_clientId_2",
@@ -43,10 +41,8 @@
 				"attributes": {
 					"label": "Next label comments"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			}
-		],
-		"originalContent": ""
+		]
 	}
 ]

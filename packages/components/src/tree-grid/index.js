@@ -78,6 +78,11 @@ function TreeGrid(
 			const activeRow = activeElement.closest( '[role="row"]' );
 			const focusablesInRow = getRowFocusables( activeRow );
 			const currentColumnIndex = focusablesInRow.indexOf( activeElement );
+			const canExpandCollapse = 0 === currentColumnIndex;
+			const cannotFocusNextColumn =
+				canExpandCollapse &&
+				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
+				keyCode === RIGHT;
 
 			if ( includes( [ LEFT, RIGHT ], keyCode ) ) {
 				// Calculate to the next element.
@@ -91,8 +96,8 @@ function TreeGrid(
 					);
 				}
 
-				// Focus is either at the left or right edge of the grid.
-				if ( nextIndex === currentColumnIndex ) {
+				// Focus is at the left most column.
+				if ( canExpandCollapse ) {
 					if ( keyCode === LEFT ) {
 						// Left:
 						// If a row is focused, and it is expanded, collapses the current row.
@@ -105,7 +110,10 @@ function TreeGrid(
 						}
 						// If a row is focused, and it is collapsed, moves to the parent row (if there is one).
 						const level = Math.max(
-							parseInt( activeRow?.ariaLevel ?? 1, 10 ) - 1,
+							parseInt(
+								activeRow?.getAttribute( 'aria-level' ) ?? 1,
+								10
+							) - 1,
 							1
 						);
 						const rows = Array.from(
@@ -115,7 +123,10 @@ function TreeGrid(
 						const currentRowIndex = rows.indexOf( activeRow );
 						for ( let i = currentRowIndex; i >= 0; i-- ) {
 							if (
-								parseInt( rows[ i ].ariaLevel, 10 ) === level
+								parseInt(
+									rows[ i ].getAttribute( 'aria-level' ),
+									10
+								) === level
 							) {
 								parentRow = rows[ i ];
 								break;
@@ -149,7 +160,10 @@ function TreeGrid(
 					return;
 				}
 
-				// Focus the next element.
+				// Focus the next element. If at most left column and row is collapsed, moving right is not allowed as this will expand. However, if row is collapsed, moving left is allowed.
+				if ( cannotFocusNextColumn ) {
+					return;
+				}
 				focusablesInRow[ nextIndex ].focus();
 
 				// Prevent key use for anything else. This ensures Voiceover

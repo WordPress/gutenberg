@@ -181,7 +181,7 @@ export const textColor = {
 	__unstableFilterAttributeValue( key, value ) {
 		if ( key !== 'style' ) return value;
 		// We need to remove the extra spaces within the styles on mobile
-		const newValue = value.replace( / /g, '' );
+		const newValue = value?.replace( / /g, '' );
 		// We should not add a background-color if it's already set
 		if ( newValue && newValue.includes( 'background-color' ) )
 			return newValue;

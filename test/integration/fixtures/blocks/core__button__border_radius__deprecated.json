@@ -11,8 +11,7 @@
 				}
 			}
 		},
-		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\" style=\"border-radius:25px\">My button</a></div>"
+		"innerBlocks": []
 	},
 	{
 		"clientId": "_clientId_1",
@@ -21,7 +20,6 @@
 		"attributes": {
 			"content": ""
 		},
-		"innerBlocks": [],
-		"originalContent": "</div>"
+		"innerBlocks": []
 	}
 ]

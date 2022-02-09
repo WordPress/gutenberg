@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Removed unused `memize` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
 ## 6.2.0 (2022-01-27)
 
 ### Bug Fix

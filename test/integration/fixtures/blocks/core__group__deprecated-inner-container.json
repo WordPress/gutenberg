@@ -17,8 +17,7 @@
 					"content": "This is a group block.",
 					"dropCap": false
 				},
-				"innerBlocks": [],
-				"originalContent": "<p>This is a group block.</p>"
+				"innerBlocks": []
 			},
 			{
 				"clientId": "_clientId_1",
@@ -28,10 +27,8 @@
 					"content": "Group block content.",
 					"dropCap": false
 				},
-				"innerBlocks": [],
-				"originalContent": "<p>Group block content.</p>"
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t\n\n\t\t\n\t</div>\n</div>"
+		]
 	}
 ]
