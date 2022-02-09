@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { MenuGroup, MenuItem } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-
+import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -13,7 +13,6 @@ import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 import useConvertClassicMenu from '../use-convert-classic-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
-import ExistingMenusOptions from './existing-menus-options';
 
 export default function NavigationMenuSelector( {
 	clientId,
@@ -21,10 +20,7 @@ export default function NavigationMenuSelector( {
 	onCreateNew,
 	showTools = false,
 } ) {
-	const {
-		menus: classicMenus,
-		hasMenus: hasClassicMenus,
-	} = useNavigationEntities();
+	const { menus: classicMenus } = useNavigationEntities();
 
 	const {
 		navigationMenus,
@@ -53,28 +49,62 @@ export default function NavigationMenuSelector( {
 		onFinishMenuCreation
 	);
 
+	const hasNavigationMenus = !! navigationMenus?.length;
+	const hasClassicMenus = !! classicMenus?.length;
+	const showNavigationMenus = !! canSwitchNavigationMenu;
+	const showClassicMenus = !! canUserCreateNavigation;
 	const showSelectMenus =
 		( canSwitchNavigationMenu || canUserCreateNavigation ) &&
-		( navigationMenus?.length || hasClassicMenus );
+		( hasNavigationMenus || hasClassicMenus );
 
 	if ( ! showSelectMenus ) {
 		return null;
 	}
 
+	/* translators: %s: The name of a menu. */
+	const actionLabel = __( "Create from '%s'" );
+
 	return (
 		<>
-			<ExistingMenusOptions
-				showNavigationMenus={ canSwitchNavigationMenu }
-				showClassicMenus={ canUserCreateNavigation }
-				navigationMenus={ navigationMenus }
-				classicMenus={ classicMenus }
-				onSelectNavigationMenu={ onSelect }
-				onSelectClassicMenu={ ( { id, name } ) =>
-					convertClassicMenuToBlocks( id, name )
-				}
-				/* translators: %s: The name of a menu. */
-				actionLabel={ __( "Switch to '%s'" ) }
-			/>
+			{ showNavigationMenus && hasNavigationMenus && (
+				<MenuGroup label={ __( 'Menus' ) }>
+					{ navigationMenus.map( ( menu ) => {
+						const label = decodeEntities( menu.title.rendered );
+						return (
+							<MenuItem
+								onClick={ () => {
+									onSelect( menu );
+								} }
+								key={ menu.id }
+								aria-label={ sprintf( actionLabel, label ) }
+							>
+								{ label }
+							</MenuItem>
+						);
+					} ) }
+				</MenuGroup>
+			) }
+			{ showClassicMenus && hasClassicMenus && (
+				<MenuGroup label={ __( 'Classic Menus' ) }>
+					{ classicMenus.map( ( menu ) => {
+						const label = decodeEntities( menu.name );
+						return (
+							<MenuItem
+								onClick={ () => {
+									convertClassicMenuToBlocks(
+										menu.id,
+										menu.name
+									);
+								} }
+								key={ menu.id }
+								aria-label={ sprintf( actionLabel, label ) }
+							>
+								{ label }
+							</MenuItem>
+						);
+					} ) }
+				</MenuGroup>
+			) }
 
 			{ showTools && canUserCreateNavigation && (
 				<MenuGroup label={ __( 'Tools' ) }>
