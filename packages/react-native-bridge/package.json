@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-bridge",
-	"version": "1.70.2",
+	"version": "1.70.3",
 	"description": "Native bridge library used to integrate the block editor into a native App.",
 	"private": true,
 	"author": "The WordPress Contributors",
