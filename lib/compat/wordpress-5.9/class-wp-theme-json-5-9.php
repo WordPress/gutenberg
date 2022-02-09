@@ -430,7 +430,7 @@ class WP_Theme_JSON_5_9 {
 
 		// Some styles are only meant to be available at the top-level (e.g.: blockGap),
 		// hence, the schema for blocks & elements should not have them.
-		$styles_non_top_level = self::VALID_STYLES;
+		$styles_non_top_level = static::VALID_STYLES;
 		foreach ( array_keys( $styles_non_top_level ) as $section ) {
 			foreach ( array_keys( $styles_non_top_level[ $section ] ) as $prop ) {
 				if ( 'top' === $styles_non_top_level[ $section ][ $prop ] ) {
@@ -452,7 +452,7 @@ class WP_Theme_JSON_5_9 {
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
-		$schema['styles']             = self::VALID_STYLES;
+		$schema['styles']             = static::VALID_STYLES;
 		$schema['styles']['blocks']   = $schema_styles_blocks;
 		$schema['styles']['elements'] = $schema_styles_elements;
 		$schema['settings']           = self::VALID_SETTINGS;
