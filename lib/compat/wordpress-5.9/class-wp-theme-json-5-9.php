@@ -30,7 +30,7 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * @var array
 	 */
-	private static $blocks_metadata = null;
+	protected static $blocks_metadata = null;
 
 	/**
 	 * The CSS selector for the top-level styles.
@@ -508,11 +508,11 @@ class WP_Theme_JSON_5_9 {
 	 * @return array Block metadata.
 	 */
 	protected static function get_blocks_metadata() {
-		if ( null !== self::$blocks_metadata ) {
-			return self::$blocks_metadata;
+		if ( null !== static::$blocks_metadata ) {
+			return static::$blocks_metadata;
 		}
 
-		self::$blocks_metadata = array();
+		static::$blocks_metadata = array();
 
 		$registry = WP_Block_Type_Registry::get_instance();
 		$blocks   = $registry->get_all_registered();
@@ -521,32 +521,32 @@ class WP_Theme_JSON_5_9 {
 				isset( $block_type->supports['__experimentalSelector'] ) &&
 				is_string( $block_type->supports['__experimentalSelector'] )
 			) {
-				self::$blocks_metadata[ $block_name ]['selector'] = $block_type->supports['__experimentalSelector'];
+				static::$blocks_metadata[ $block_name ]['selector'] = $block_type->supports['__experimentalSelector'];
 			} else {
-				self::$blocks_metadata[ $block_name ]['selector'] = '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
+				static::$blocks_metadata[ $block_name ]['selector'] = '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
 			}
 
 			if (
 				isset( $block_type->supports['color']['__experimentalDuotone'] ) &&
 				is_string( $block_type->supports['color']['__experimentalDuotone'] )
 			) {
-				self::$blocks_metadata[ $block_name ]['duotone'] = $block_type->supports['color']['__experimentalDuotone'];
+				static::$blocks_metadata[ $block_name ]['duotone'] = $block_type->supports['color']['__experimentalDuotone'];
 			}
 
 			// Assign defaults, then overwrite those that the block sets by itself.
 			// If the block selector is compounded, will append the element to each
 			// individual block selector.
-			$block_selectors = explode( ',', self::$blocks_metadata[ $block_name ]['selector'] );
+			$block_selectors = explode( ',', static::$blocks_metadata[ $block_name ]['selector'] );
 			foreach ( static::ELEMENTS as $el_name => $el_selector ) {
 				$element_selector = array();
 				foreach ( $block_selectors as $selector ) {
 					$element_selector[] = $selector . ' ' . $el_selector;
 				}
-				self::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
+				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
 			}
 		}
 
-		return self::$blocks_metadata;
+		return static::$blocks_metadata;
 	}
 
 	/**
