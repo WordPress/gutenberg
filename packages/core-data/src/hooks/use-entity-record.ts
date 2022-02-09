@@ -40,9 +40,9 @@ interface EntityRecordResolution< RecordType > {
 /**
  * Resolves the specified entity record.
  *
- * @param {string} kind     Kind of the deleted entity.
- * @param {string} name     Name of the deleted entity.
- * @param {string} recordId Record ID of the deleted entity.
+ * @param {string} kind     Kind of the requested entity.
+ * @param {string} name     Name of the requested  entity.
+ * @param {string} recordId Record ID of the requested entity.
  *
  * @example
  * ```js
