@@ -67,8 +67,6 @@ module.exports = {
 		'@wordpress/data-no-store-string-literals': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
-		'no-shadow': 'off',
-		'@typescript-eslint/no-shadow': 'error',
 		'no-restricted-imports': [
 			'error',
 			{
