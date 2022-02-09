@@ -1,4 +1,64 @@
+.wp-block-group-image,
 .wp-block-group {
+	position: relative;
+	background-size: cover;
+	background-position: center center;
+
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+
+	&.has-parallax {
+		background-attachment: fixed;
+
+		// Mobile Safari does not support fixed background attachment properly.
+		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
+		// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
+		@supports (-webkit-overflow-scrolling: touch) {
+			background-attachment: scroll;
+		}
+
+		// Remove the appearance of scrolling based on OS-level animation preferences.
+		@media (prefers-reduced-motion: reduce) {
+			background-attachment: scroll;
+		}
+	}
+
+	&.is-repeated {
+		background-repeat: repeat;
+		background-size: auto;
+	}
+
+	.wp-block-group__inner-container {
+		width: 100%;
+		// z-index: z-index(".wp-block-group__inner-container");
+		z-index: 1; // TODO
+		color: $white;
+	}
+
+	&.has-custom-content-position.has-custom-content-position {
+		.wp-block-group__inner-container {
+			margin: 0;
+			width: auto;
+		}
+	}
+
+	// Extra specificity for in edit mode where other styles would override it otherwise.
+	img.wp-block-group__image-background,
+	video.wp-block-group__video-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		object-fit: cover;
+		outline: none;
+		border: none;
+		box-shadow: none;
+	}
 }

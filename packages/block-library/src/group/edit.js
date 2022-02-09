@@ -79,7 +79,10 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const { type = 'default' } = usedLayout;
-	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
+
+	// TODO - temp disabled
+	const layoutSupportEnabled =
+		( false && themeSupportsLayout ) || type !== 'default';
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps(
@@ -148,7 +151,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 				{ showBgImage && (
 					<img
 						ref={ isDarkElement }
-						className="wp-block-cover__image-background"
+						className="wp-block-group__image-background"
 						alt={ alt }
 						src={ url }
 						style={ mediaStyle }
