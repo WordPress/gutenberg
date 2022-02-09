@@ -27,4 +27,16 @@ export const parameters = {
 		// Will be enabled on a per-story basis until migration is complete.
 		disable: true,
 	},
+	options: {
+		storySort: {
+			order: [
+				'Docs',
+				'Playground',
+				'BlockEditor',
+				'Components',
+				'Components (Experimental)',
+				'Icons',
+			],
+		},
+	},
 };
