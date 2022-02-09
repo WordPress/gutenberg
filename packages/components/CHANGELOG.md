@@ -18,6 +18,7 @@
 -   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
 -  `TreeGrid` accessibility enhancements around the expand/collapse functionality. ([#38358](https://github.com/WordPress/gutenberg/pull/38358))
 -  `TreeGrid` accessibility: improve browser support for Left Arrow focus to parent row in child row.  ([#38639](https://github.com/WordPress/gutenberg/pull/38639))
+-  `TreeGrid` accessibility: Add Home/End keys for better keyboard navigation. ([#38679](https://github.com/WordPress/gutenberg/pull/38679))
 
 ### Experimental
 
