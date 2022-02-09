@@ -16,6 +16,22 @@
  * @access private
  */
 class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
+	public static function get_merged_data( $origin = 'custom' ) {
+		if ( is_array( $origin ) ) {
+			_deprecated_argument( __FUNCTION__, '5.9' );
+		}
+
+		$result = new WP_Theme_JSON_Gutenberg();
+		$result->merge( self::get_core_data() );
+		$result->merge( self::get_theme_data() );
+
+		if ( 'custom' === $origin ) {
+			$result->merge( self::get_user_data() );
+		}
+
+		return $result;
+	}
+
 
 	/**
 	 * Returns the theme's data.
