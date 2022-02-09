@@ -26,6 +26,7 @@ import {
 	loginUser,
 	deleteUser,
 	switchUserToAdmin,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -213,16 +214,6 @@ async function waitForBlock( blockName ) {
 
 	// Wait for a Submenu block before making assertion.
 	return page.waitForSelector( blockSelector );
-}
-
-async function clickBlockToolbarButton( label ) {
-	await showBlockToolbar();
-
-	const btn = await page.waitForSelector(
-		`[aria-label="Editor content"][role="region"] [aria-label="Block tools"] [aria-label="${ label }"]`
-	);
-
-	return btn.click();
 }
 
 // Disable reason - these tests are to be re-written.
@@ -749,7 +740,7 @@ describe( 'Navigation', () => {
 	} );
 
 	// eslint-disable-next-line jest/no-focused-tests
-	describe( 'Submenus', () => {
+	describe.only( 'Submenus', () => {
 		it( 'shows button which converts submenu to link when submenu is not-populated (empty)', async () => {
 			const navSubmenuSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]`;
 
