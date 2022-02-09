@@ -762,7 +762,7 @@ describe( 'Navigation', () => {
 			// Revert the Submenu back to a Navigation Link block.
 			await clickBlockToolbarButton( 'Convert to Link' );
 
-			// Check the Submenu block is no long present.
+			// Check the Submenu block is no longer present.
 			const convertToLinkButton = await page.$( navSubmenuSelector );
 
 			expect( convertToLinkButton ).toBeFalsy();
