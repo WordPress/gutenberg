@@ -338,14 +338,14 @@ export default function NavigationSubmenuEdit( {
 			] );
 
 			// Check for a single descendant in the submenu. If that block
-			// is a link block in a "placeholder" state with no URL then
+			// is a link block in a "placeholder" state with no label then
 			// we can consider as an "empty" link.
 			if ( selectedBlockDescendants?.length === 1 ) {
 				const singleBlock = getBlock( selectedBlockDescendants[ 0 ] );
 
 				_onlyDescendantIsEmptyLink =
 					singleBlock?.name === 'core/navigation-link' &&
-					! singleBlock?.attributes?.url;
+					! singleBlock?.attributes?.label;
 			}
 
 			return {
