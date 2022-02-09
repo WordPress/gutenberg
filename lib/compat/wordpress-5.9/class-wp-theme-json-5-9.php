@@ -229,6 +229,7 @@ class WP_Theme_JSON_5_9 {
 			'custom'           => null,
 			'customDuotone'    => null,
 			'customGradient'   => null,
+			'defaultDuotone'   => null,
 			'defaultGradients' => null,
 			'defaultPalette'   => null,
 			'duotone'          => null,
@@ -1527,7 +1528,10 @@ class WP_Theme_JSON_5_9 {
 
 			$filters = '';
 			foreach ( $origins as $origin ) {
-				if ( ! isset( $duotone_presets[ $origin ] ) ) {
+				if (
+					! isset( $duotone_presets[ $origin ] ) ||
+					( 'default' === $origin && false === $node['color']['defaultDuotone'] )
+				) {
 					continue;
 				}
 				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
