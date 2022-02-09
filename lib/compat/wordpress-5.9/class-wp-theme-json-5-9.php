@@ -334,13 +334,13 @@ class WP_Theme_JSON_5_9 {
 		}
 
 		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
-		$valid_block_names   = array_keys( self::get_blocks_metadata() );
+		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$theme_json          = self::sanitize( $this->theme_json, $valid_block_names, $valid_element_names );
-		$this->theme_json    = self::maybe_opt_in_into_settings( $theme_json );
+		$theme_json          = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names );
+		$this->theme_json    = static::maybe_opt_in_into_settings( $theme_json );
 
 		// Internally, presets are keyed by origin.
-		$nodes = self::get_setting_nodes( $this->theme_json );
+		$nodes = static::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $node ) {
 			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
@@ -361,20 +361,20 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $theme_json A theme.json structure to modify.
 	 * @return array The modified theme.json structure.
 	 */
-	private static function maybe_opt_in_into_settings( $theme_json ) {
+	protected static function maybe_opt_in_into_settings( $theme_json ) {
 		$new_theme_json = $theme_json;
 
 		if (
 			isset( $new_theme_json['settings']['appearanceTools'] ) &&
 			true === $new_theme_json['settings']['appearanceTools']
 		) {
-			self::do_opt_in_into_settings( $new_theme_json['settings'] );
+			static::do_opt_in_into_settings( $new_theme_json['settings'] );
 		}
 
 		if ( isset( $new_theme_json['settings']['blocks'] ) && is_array( $new_theme_json['settings']['blocks'] ) ) {
 			foreach ( $new_theme_json['settings']['blocks'] as &$block ) {
 				if ( isset( $block['appearanceTools'] ) && ( true === $block['appearanceTools'] ) ) {
-					self::do_opt_in_into_settings( $block );
+					static::do_opt_in_into_settings( $block );
 				}
 			}
 		}
@@ -387,7 +387,7 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * @param array $context The context to which the settings belong.
 	 */
-	private static function do_opt_in_into_settings( &$context ) {
+	protected static function do_opt_in_into_settings( &$context ) {
 		$to_opt_in = array(
 			array( 'border', 'color' ),
 			array( 'border', 'radius' ),
@@ -419,7 +419,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $valid_element_names List of valid element names.
 	 * @return array The sanitized output.
 	 */
-	private static function sanitize( $input, $valid_block_names, $valid_element_names ) {
+	protected static function sanitize( $input, $valid_block_names, $valid_element_names ) {
 		$output = array();
 
 		if ( ! is_array( $input ) ) {
@@ -469,7 +469,7 @@ class WP_Theme_JSON_5_9 {
 				continue;
 			}
 
-			$result = self::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
+			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
 
 			if ( empty( $result ) ) {
 				unset( $output[ $subtree ] );
@@ -507,7 +507,7 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * @return array Block metadata.
 	 */
-	private static function get_blocks_metadata() {
+	protected static function get_blocks_metadata() {
 		if ( null !== self::$blocks_metadata ) {
 			return self::$blocks_metadata;
 		}
@@ -558,7 +558,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $schema Schema to adhere to.
 	 * @return array Returns the modified $tree.
 	 */
-	private static function remove_keys_not_in_schema( $tree, $schema ) {
+	protected static function remove_keys_not_in_schema( $tree, $schema ) {
 		$tree = array_intersect_key( $tree, $schema );
 
 		foreach ( $schema as $key => $data ) {
@@ -567,7 +567,7 @@ class WP_Theme_JSON_5_9 {
 			}
 
 			if ( is_array( $schema[ $key ] ) && is_array( $tree[ $key ] ) ) {
-				$tree[ $key ] = self::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
+				$tree[ $key ] = static::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
 
 				if ( empty( $tree[ $key ] ) ) {
 					unset( $tree[ $key ] );
@@ -636,9 +636,9 @@ class WP_Theme_JSON_5_9 {
 			}
 		}
 
-		$blocks_metadata = self::get_blocks_metadata();
-		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
-		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+		$blocks_metadata = static::get_blocks_metadata();
+		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata );
+		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
 		$stylesheet = '';
 
@@ -716,7 +716,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $style_nodes Nodes with styles.
 	 * @return string The new stylesheet.
 	 */
-	private function get_block_classes( $style_nodes ) {
+	protected function get_block_classes( $style_nodes ) {
 		$block_rules = '';
 
 		foreach ( $style_nodes as $metadata ) {
@@ -727,7 +727,7 @@ class WP_Theme_JSON_5_9 {
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$selector     = $metadata['selector'];
 			$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
-			$declarations = self::compute_style_properties( $node, $settings );
+			$declarations = static::compute_style_properties( $node, $settings );
 
 			// 1. Separate the ones who use the general selector
 			// and the ones who use the duotone selector.
@@ -752,12 +752,12 @@ class WP_Theme_JSON_5_9 {
 			}
 
 			// 2. Generate the rules that use the general selector.
-			$block_rules .= self::to_ruleset( $selector, $declarations );
+			$block_rules .= static::to_ruleset( $selector, $declarations );
 
 			// 3. Generate the rules that use the duotone selector.
 			if ( isset( $metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
-				$selector_duotone = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
-				$block_rules     .= self::to_ruleset( $selector_duotone, $declarations_duotone );
+				$selector_duotone = static::scope_selector( $metadata['selector'], $metadata['duotone'] );
+				$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
 			}
 
 			if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
@@ -803,7 +803,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $origins       List of origins to process presets from.
 	 * @return string The new stylesheet.
 	 */
-	private function get_preset_classes( $setting_nodes, $origins ) {
+	protected function get_preset_classes( $setting_nodes, $origins ) {
 		$preset_rules = '';
 
 		foreach ( $setting_nodes as $metadata ) {
@@ -813,7 +813,7 @@ class WP_Theme_JSON_5_9 {
 
 			$selector      = $metadata['selector'];
 			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$preset_rules .= self::compute_preset_classes( $node, $selector, $origins );
+			$preset_rules .= static::compute_preset_classes( $node, $selector, $origins );
 		}
 
 		return $preset_rules;
@@ -837,7 +837,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $origins List of origins to process.
 	 * @return string The new stylesheet.
 	 */
-	private function get_css_variables( $nodes, $origins ) {
+	protected function get_css_variables( $nodes, $origins ) {
 		$stylesheet = '';
 		foreach ( $nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
@@ -847,9 +847,9 @@ class WP_Theme_JSON_5_9 {
 			$selector = $metadata['selector'];
 
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$declarations = array_merge( self::compute_preset_vars( $node, $origins ), self::compute_theme_vars( $node ) );
+			$declarations = array_merge( static::compute_preset_vars( $node, $origins ), static::compute_theme_vars( $node ) );
 
-			$stylesheet .= self::to_ruleset( $selector, $declarations );
+			$stylesheet .= static::to_ruleset( $selector, $declarations );
 		}
 
 		return $stylesheet;
@@ -867,7 +867,7 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * @return string CSS ruleset.
 	 */
-	private static function to_ruleset( $selector, $declarations ) {
+	protected static function to_ruleset( $selector, $declarations ) {
 		if ( empty( $declarations ) ) {
 			return '';
 		}
@@ -905,7 +905,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param string $to_append Selector to append.
 	 * @return string
 	 */
-	private static function append_to_selector( $selector, $to_append ) {
+	protected static function append_to_selector( $selector, $to_append ) {
 		$new_selectors = array();
 		$selectors     = explode( ',', $selector );
 		foreach ( $selectors as $sel ) {
@@ -924,7 +924,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array  $origins  List of origins to process.
 	 * @return string The result of processing the presets.
 	 */
-	private static function compute_preset_classes( $settings, $selector, $origins ) {
+	protected static function compute_preset_classes( $settings, $selector, $origins ) {
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
@@ -933,13 +933,13 @@ class WP_Theme_JSON_5_9 {
 
 		$stylesheet = '';
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
-			$slugs = self::get_settings_slugs( $settings, $preset_metadata, $origins );
+			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
 			foreach ( $preset_metadata['classes'] as $class => $property ) {
 				foreach ( $slugs as $slug ) {
-					$css_var     = self::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
-					$class_name  = self::replace_slug_in_string( $class, $slug );
-					$stylesheet .= self::to_ruleset(
-						self::append_to_selector( $selector, $class_name ),
+					$css_var     = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
+					$class_name  = static::replace_slug_in_string( $class, $slug );
+					$stylesheet .= static::to_ruleset(
+						static::append_to_selector( $selector, $class_name ),
 						array(
 							array(
 								'name'  => $property,
@@ -970,7 +970,7 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * @return string Scoped selector.
 	 */
-	private static function scope_selector( $scope, $selector ) {
+	protected static function scope_selector( $scope, $selector ) {
 		$scopes    = explode( ',', $scope );
 		$selectors = explode( ',', $selector );
 
@@ -1018,7 +1018,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $origins List of origins to process.
 	 * @return array Array of presets where each key is a slug and each value is the preset value.
 	 */
-	private static function get_settings_values_by_slug( $settings, $preset_metadata, $origins ) {
+	protected static function get_settings_values_by_slug( $settings, $preset_metadata, $origins ) {
 		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
 
 		$result = array();
@@ -1058,7 +1058,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $origins List of origins to process.
 	 * @return array Array of presets where the key and value are both the slug.
 	 */
-	private static function get_settings_slugs( $settings, $preset_metadata, $origins = null ) {
+	protected static function get_settings_slugs( $settings, $preset_metadata, $origins = null ) {
 		if ( $origins === null ) {
 			$origins = static::VALID_ORIGINS;
 		}
@@ -1087,7 +1087,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param string $slug The slug value to use to generate the custom property.
 	 * @return string The CSS Custom Property. Something along the lines of --wp--preset--color--black.
 	 */
-	private static function replace_slug_in_string( $input, $slug ) {
+	protected static function replace_slug_in_string( $input, $slug ) {
 		return strtr( $input, array( '$slug' => $slug ) );
 	}
 
@@ -1107,13 +1107,13 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $origins  List of origins to process.
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_preset_vars( $settings, $origins ) {
+	protected static function compute_preset_vars( $settings, $origins ) {
 		$declarations = array();
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
-			$values_by_slug = self::get_settings_values_by_slug( $settings, $preset_metadata, $origins );
+			$values_by_slug = static::get_settings_values_by_slug( $settings, $preset_metadata, $origins );
 			foreach ( $values_by_slug as $slug => $value ) {
 				$declarations[] = array(
-					'name'  => self::replace_slug_in_string( $preset_metadata['css_vars'], $slug ),
+					'name'  => static::replace_slug_in_string( $preset_metadata['css_vars'], $slug ),
 					'value' => $value,
 				);
 			}
@@ -1137,10 +1137,10 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $settings Settings to process.
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_theme_vars( $settings ) {
+	protected static function compute_theme_vars( $settings ) {
 		$declarations  = array();
 		$custom_values = _wp_array_get( $settings, array( 'custom' ), array() );
-		$css_vars      = self::flatten_tree( $custom_values );
+		$css_vars      = static::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
 			$declarations[] = array(
 				'name'  => '--wp--custom--' . $key,
@@ -1186,7 +1186,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param string $token  Optional. Token to use between levels. Default '--'.
 	 * @return array The flattened tree.
 	 */
-	private static function flatten_tree( $tree, $prefix = '', $token = '--' ) {
+	protected static function flatten_tree( $tree, $prefix = '', $token = '--' ) {
 		$result = array();
 		foreach ( $tree as $property => $value ) {
 			$new_key = $prefix . str_replace(
@@ -1199,7 +1199,7 @@ class WP_Theme_JSON_5_9 {
 				$new_prefix = $new_key . $token;
 				$result     = array_merge(
 					$result,
-					self::flatten_tree( $value, $new_prefix, $token )
+					static::flatten_tree( $value, $new_prefix, $token )
 				);
 			} else {
 				$result[ $new_key ] = $value;
@@ -1224,7 +1224,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $properties Properties metadata.
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $styles, $settings = array(), $properties = null ) {
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null ) {
 		if ( $properties === null ) {
 			$properties = static::PROPERTIES_METADATA;
 		}
@@ -1235,7 +1235,7 @@ class WP_Theme_JSON_5_9 {
 		}
 
 		foreach ( $properties as $css_property => $value_path ) {
-			$value = self::get_property_value( $styles, $value_path );
+			$value = static::get_property_value( $styles, $value_path );
 
 			// Look up protected properties, keyed by value path.
 			// Skip protected properties that are explicitly set to `null`.
@@ -1275,7 +1275,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $path   Which property to process.
 	 * @return string Style property value.
 	 */
-	private static function get_property_value( $styles, $path ) {
+	protected static function get_property_value( $styles, $path ) {
 		$value = _wp_array_get( $styles, $path, '' );
 
 		if ( '' === $value || is_array( $value ) ) {
@@ -1316,7 +1316,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $selectors  List of selectors per block.
 	 * @return array
 	 */
-	private static function get_setting_nodes( $theme_json, $selectors = array() ) {
+	protected static function get_setting_nodes( $theme_json, $selectors = array() ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['settings'] ) ) {
 			return $nodes;
@@ -1368,7 +1368,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $selectors  List of selectors per block.
 	 * @return array
 	 */
-	private static function get_style_nodes( $theme_json, $selectors = array() ) {
+	protected static function get_style_nodes( $theme_json, $selectors = array() ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
@@ -1455,10 +1455,10 @@ class WP_Theme_JSON_5_9 {
 		 * with the equivalent default presets: if a slug is present as a default
 		 * we remove it from the theme presets.
 		 */
-		$nodes        = self::get_setting_nodes( $incoming_data );
-		$slugs_global = self::get_default_slugs( $this->theme_json, array( 'settings' ) );
+		$nodes        = static::get_setting_nodes( $incoming_data );
+		$slugs_global = static::get_default_slugs( $this->theme_json, array( 'settings' ) );
 		foreach ( $nodes as $node ) {
-			$slugs_node = self::get_default_slugs( $this->theme_json, $node['path'] );
+			$slugs_node = static::get_default_slugs( $this->theme_json, $node['path'] );
 			$slugs      = array_merge_recursive( $slugs_global, $slugs_node );
 
 			// Replace the spacing.units.
@@ -1470,7 +1470,7 @@ class WP_Theme_JSON_5_9 {
 
 			// Replace the presets.
 			foreach ( static::PRESETS_METADATA as $preset ) {
-				$override_preset = self::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
+				$override_preset = static::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
 
 				foreach ( static::VALID_ORIGINS as $origin ) {
 					$base_path = array_merge( $node['path'], $preset['path'] );
@@ -1483,7 +1483,7 @@ class WP_Theme_JSON_5_9 {
 					if ( 'theme' === $origin && $preset['use_default_names'] ) {
 						foreach ( $content as &$item ) {
 							if ( ! array_key_exists( 'name', $item ) ) {
-								$name = self::get_name_from_defaults( $item['slug'], $base_path );
+								$name = static::get_name_from_defaults( $item['slug'], $base_path );
 								if ( null !== $name ) {
 									$item['name'] = $name;
 								}
@@ -1498,7 +1498,7 @@ class WP_Theme_JSON_5_9 {
 						_wp_array_set( $this->theme_json, $path, $content );
 					} else {
 						$slugs_for_preset = _wp_array_get( $slugs, $preset['path'], array() );
-						$content          = self::filter_slugs( $content, $slugs_for_preset );
+						$content          = static::filter_slugs( $content, $slugs_for_preset );
 						_wp_array_set( $this->theme_json, $path, $content );
 					}
 				}
@@ -1514,8 +1514,8 @@ class WP_Theme_JSON_5_9 {
 	 * @return string SVG filters.
 	 */
 	public function get_svg_filters( $origins ) {
-		$blocks_metadata = self::get_blocks_metadata();
-		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+		$blocks_metadata = static::get_blocks_metadata();
+		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
 		foreach ( $setting_nodes as $metadata ) {
 			$node = _wp_array_get( $this->theme_json, $metadata['path'], array() );
@@ -1547,7 +1547,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param bool|array $override Data to compute whether to override the preset.
 	 * @return boolean
 	 */
-	private static function should_override_preset( $theme_json, $path, $override ) {
+	protected static function should_override_preset( $theme_json, $path, $override ) {
 		if ( is_bool( $override ) ) {
 			return $override;
 		}
@@ -1596,7 +1596,7 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * @return array
 	 */
-	private static function get_default_slugs( $data, $node_path ) {
+	protected static function get_default_slugs( $data, $node_path ) {
 		$slugs = array();
 
 		foreach ( static::PRESETS_METADATA as $metadata ) {
@@ -1627,7 +1627,7 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * @return string|null
 	 */
-	private function get_name_from_defaults( $slug, $base_path ) {
+	protected function get_name_from_defaults( $slug, $base_path ) {
 		$path            = array_merge( $base_path, array( 'default' ) );
 		$default_content = _wp_array_get( $this->theme_json, $path, null );
 		if ( ! $default_content ) {
@@ -1649,7 +1649,7 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * @return array The new node
 	 */
-	private static function filter_slugs( $node, $slugs ) {
+	protected static function filter_slugs( $node, $slugs ) {
 		if ( empty( $slugs ) ) {
 			return $node;
 		}
@@ -1675,32 +1675,32 @@ class WP_Theme_JSON_5_9 {
 
 		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
-		$valid_block_names   = array_keys( self::get_blocks_metadata() );
+		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$theme_json          = static::sanitize( $theme_json, $valid_block_names, $valid_element_names );
 
-		$blocks_metadata = self::get_blocks_metadata();
-		$style_nodes     = self::get_style_nodes( $theme_json, $blocks_metadata );
+		$blocks_metadata = static::get_blocks_metadata();
+		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata );
 		foreach ( $style_nodes as $metadata ) {
 			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
 			if ( empty( $input ) ) {
 				continue;
 			}
 
-			$output = self::remove_insecure_styles( $input );
+			$output = static::remove_insecure_styles( $input );
 			if ( ! empty( $output ) ) {
 				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}
 		}
 
-		$setting_nodes = self::get_setting_nodes( $theme_json );
+		$setting_nodes = static::get_setting_nodes( $theme_json );
 		foreach ( $setting_nodes as $metadata ) {
 			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
 			if ( empty( $input ) ) {
 				continue;
 			}
 
-			$output = self::remove_insecure_settings( $input );
+			$output = static::remove_insecure_settings( $input );
 			if ( ! empty( $output ) ) {
 				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}
@@ -1728,7 +1728,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $input Node to process.
 	 * @return array
 	 */
-	private static function remove_insecure_settings( $input ) {
+	protected static function remove_insecure_settings( $input ) {
 		$output = array();
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 			foreach ( static::VALID_ORIGINS as $origin ) {
@@ -1756,7 +1756,7 @@ class WP_Theme_JSON_5_9 {
 
 						$preset_is_valid = true;
 						foreach ( $preset_metadata['properties'] as $property ) {
-							if ( ! self::is_safe_css_declaration( $property, $value ) ) {
+							if ( ! static::is_safe_css_declaration( $property, $value ) ) {
 								$preset_is_valid = false;
 								break;
 							}
@@ -1783,12 +1783,12 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $input Node to process.
 	 * @return array
 	 */
-	private static function remove_insecure_styles( $input ) {
+	protected static function remove_insecure_styles( $input ) {
 		$output       = array();
-		$declarations = self::compute_style_properties( $input );
+		$declarations = static::compute_style_properties( $input );
 
 		foreach ( $declarations as $declaration ) {
-			if ( self::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
+			if ( static::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
 				$path = static::PROPERTIES_METADATA[ $declaration['name'] ];
 
 				// Check the value isn't an array before adding so as to not
@@ -1809,7 +1809,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param string $property_value Value in a CSS declaration, i.e. the `red` in `color: red`.
 	 * @return boolean
 	 */
-	private static function is_safe_css_declaration( $property_name, $property_value ) {
+	protected static function is_safe_css_declaration( $property_name, $property_value ) {
 		$style_to_validate = $property_name . ': ' . $property_value;
 		$filtered          = esc_html( safecss_filter_attr( $style_to_validate ) );
 		return ! empty( trim( $filtered ) );
