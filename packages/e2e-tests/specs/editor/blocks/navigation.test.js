@@ -217,6 +217,16 @@ async function waitForBlock( blockName ) {
 	return page.waitForSelector( blockSelector );
 }
 
+async function clickBlockToolbarButton( label ) {
+	await showBlockToolbar();
+
+	const btn = await page.waitForSelector(
+		`[aria-label="Block tools"] [aria-label="${ label }"]`
+	);
+
+	return btn.click();
+}
+
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
@@ -741,7 +751,7 @@ describe( 'Navigation', () => {
 	} );
 
 	// eslint-disable-next-line jest/no-focused-tests
-	describe( 'Submenus', () => {
+	describe.only( 'Submenus', () => {
 		it( 'shows button to convert submenu to link when empty', async () => {
 			const navSubmenuSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]`;
 
@@ -756,16 +766,12 @@ describe( 'Navigation', () => {
 
 			await populateNavWithOneItem();
 
-			await showBlockToolbar();
-
-			await page.click( 'button[aria-label="Add submenu"]' );
+			await clickBlockToolbarButton( 'Add submenu' );
 
 			await waitForBlock( 'Submenu' );
 
-			await showBlockToolbar();
-
 			// Revert the Submenu back to a Navigation Link block.
-			await page.click( 'button[aria-label="Convert to Link"]' );
+			await clickBlockToolbarButton( 'Convert to Link' );
 
 			// Check the Submenu block is no long present.
 			const navSubmenusLength = await page.$$eval(
@@ -793,9 +799,7 @@ describe( 'Navigation', () => {
 				type: 'url',
 			} );
 
-			await showBlockToolbar();
-
-			await page.click( 'button[aria-label="Add submenu"]' );
+			await clickBlockToolbarButton( 'Add submenu' );
 
 			await waitForBlock( 'Submenu' );
 
@@ -812,13 +816,7 @@ describe( 'Navigation', () => {
 				type: 'url',
 			} );
 
-			await showBlockToolbar();
-
-			const switchToParentBlockButton = await page.waitForSelector(
-				'[aria-label="Block tools"] [aria-label="Select Submenu"]'
-			);
-
-			await switchToParentBlockButton.click();
+			await clickBlockToolbarButton( 'Select Submenu' );
 
 			const convertToLinkButton = await page.$(
 				'[aria-label="Block tools"] [aria-label="Convert to Link"]'
