@@ -121,20 +121,18 @@ async function selectClassicMenu( optionText ) {
 	await theOption.click();
 }
 
-async function populateNavWithOneItem( item ) {
-	item = item || {
-		url: 'https://wordpress.org',
-		label: 'WP',
-		type: 'url',
-	};
-
+async function populateNavWithOneItem() {
 	// Add a Link block first.
 	const appender = await page.waitForSelector(
 		'.wp-block-navigation .block-list-appender'
 	);
 	await appender.click();
 	// Add a link to the Link block.
-	await updateActiveNavigationLink( item );
+	await updateActiveNavigationLink( {
+		url: 'https://wordpress.org',
+		label: 'WP',
+		type: 'url',
+	} );
 }
 
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
