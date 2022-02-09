@@ -752,7 +752,7 @@ describe( 'Navigation', () => {
 
 	// eslint-disable-next-line jest/no-focused-tests
 	describe.only( 'Submenus', () => {
-		it( 'shows button to convert submenu to link when empty', async () => {
+		it( 'shows button which converts submenu to link when submenu is not-populated (empty)', async () => {
 			const navSubmenuSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]`;
 
 			await createNewPost();
@@ -774,12 +774,9 @@ describe( 'Navigation', () => {
 			await clickBlockToolbarButton( 'Convert to Link' );
 
 			// Check the Submenu block is no long present.
-			const navSubmenusLength = await page.$$eval(
-				navSubmenuSelector,
-				( els ) => els.length
-			);
+			const convertToLinkButton = await page.$( navSubmenuSelector );
 
-			expect( navSubmenusLength ).toEqual( 0 );
+			expect( convertToLinkButton ).toBeFalsy();
 		} );
 
 		it( 'does not show button to convert submenu to link when submenu is populated', async () => {
@@ -793,11 +790,6 @@ describe( 'Navigation', () => {
 			await startEmptyButton.click();
 
 			await populateNavWithOneItem();
-			await populateNavWithOneItem( {
-				url: 'https://make.wordpress.org',
-				label: 'Make Blog',
-				type: 'url',
-			} );
 
 			await clickBlockToolbarButton( 'Add submenu' );
 
@@ -823,6 +815,44 @@ describe( 'Navigation', () => {
 			);
 
 			expect( convertToLinkButton ).toBeFalsy();
+		} );
+
+		it( 'shows button to convert submenu to link when submenu is populated with a single incomplete link item', async () => {
+			// For context on why this test is required please see:
+			// https://github.com/WordPress/gutenberg/pull/38203#issuecomment-1027672948.
+
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickBlockToolbarButton( 'Add submenu' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Add a Link block first.
+			const appender = await page.waitForSelector(
+				'[aria-label="Block: Submenu"] [aria-label="Add block"]'
+			);
+
+			await appender.click();
+
+			// Here we intentionally do not populate the inserted Navigation Link block.
+			// Rather we immediaely click away leaving the link in a state where it has
+			// no URL of label and can be considered unpopulated.
+			await clickBlockToolbarButton( 'Select Submenu' );
+
+			const convertToLinkButton = await page.$(
+				'[aria-label="Block tools"] [aria-label="Convert to Link"]'
+			);
+
+			expect( convertToLinkButton ).toBeTruthy();
 		} );
 	} );
 
