@@ -4,7 +4,6 @@
 		"name": "core/comment-template",
 		"isValid": true,
 		"attributes": {},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

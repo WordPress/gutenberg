@@ -6,7 +6,6 @@
 		"attributes": {
 			"content": "Some <em>preformatted</em> text...<br>And more!"
 		},
-		"innerBlocks": [],
-		"originalContent": "<pre class=\"wp-block-preformatted\">Some <em>preformatted</em> text...<br>And more!</pre>"
+		"innerBlocks": []
 	}
 ]

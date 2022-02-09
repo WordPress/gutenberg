@@ -19,8 +19,7 @@
 				"attributes": {
 					"text": "My button 1"
 				},
-				"innerBlocks": [],
-				"originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 1</a></div>"
+				"innerBlocks": []
 			},
 			{
 				"clientId": "_clientId_1",
@@ -29,10 +28,8 @@
 				"attributes": {
 					"text": "My button 2"
 				},
-				"innerBlocks": [],
-				"originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 2</a></div>"
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div class=\"wp-block-buttons alignwide is-content-justification-center\">\n\t\n\n\t\n</div>"
+		]
 	}
 ]

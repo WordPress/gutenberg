@@ -11,7 +11,6 @@
 			"citation": "before block supports",
 			"textColor": "white"
 		},
-		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-pullquote has-background has-black-background-color is-style-solid-color\"><blockquote class=\"has-text-color has-white-color\"><p>pullquote</p><cite>before block supports</cite></blockquote></figure>"
+		"innerBlocks": []
 	}
 ]

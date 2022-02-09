@@ -23,7 +23,6 @@
 				"type": "list"
 			}
 		},
-		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-query\"></div>"
+		"innerBlocks": []
 	}
 ]

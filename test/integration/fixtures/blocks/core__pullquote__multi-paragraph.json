@@ -7,7 +7,6 @@
 			"value": "<p>Paragraph <strong>one</strong></p><p>Paragraph two</p>",
 			"citation": "by whomever"
 		},
-		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-pullquote\">\n    <blockquote>\n        <p>Paragraph <strong>one</strong></p>\n        <p>Paragraph two</p>\n        <cite>by whomever</cite>\n\t</blockquote>\n</figure>"
+		"innerBlocks": []
 	}
 ]

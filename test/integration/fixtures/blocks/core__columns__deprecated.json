@@ -22,8 +22,7 @@
 							"dropCap": false,
 							"className": "layout-column-1"
 						},
-						"innerBlocks": [],
-						"originalContent": "<p class=\"layout-column-1\">Column One, Paragraph One</p>"
+						"innerBlocks": []
 					},
 					{
 						"clientId": "_clientId_1",
@@ -34,8 +33,7 @@
 							"dropCap": false,
 							"className": "layout-column-1"
 						},
-						"innerBlocks": [],
-						"originalContent": "<p class=\"layout-column-1\">Column One, Paragraph Two</p>"
+						"innerBlocks": []
 					}
 				]
 			},
@@ -54,8 +52,7 @@
 							"dropCap": false,
 							"className": "layout-column-2"
 						},
-						"innerBlocks": [],
-						"originalContent": "<p class=\"layout-column-2\">Column Two, Paragraph One</p>"
+						"innerBlocks": []
 					}
 				]
 			},
@@ -74,12 +71,10 @@
 							"dropCap": false,
 							"className": "layout-column-3"
 						},
-						"innerBlocks": [],
-						"originalContent": "<p class=\"layout-column-3\">Column Three, Paragraph One</p>"
+						"innerBlocks": []
 					}
 				]
 			}
-		],
-		"originalContent": "<div class=\"wp-block-columns has-3-columns\">\n\t\n\t\n\t\n\t\n</div>"
+		]
 	}
 ]

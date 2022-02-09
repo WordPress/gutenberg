@@ -7,7 +7,6 @@
 			"url": "https://example.com/",
 			"service": "mastodon"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

@@ -13,7 +13,6 @@
 			"displayPreview": true,
 			"previewHeight": 370
 		},
-		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-file\"><object class=\"wp-block-file__embed\" data=\"http://localhost:8889/wp-content/uploads/2021/04/yolo.pdf\" type=\"application/pdf\" style=\"width:100%;height:370px\" aria-label=\"Embed of yolo.\"></object><a id=\"wp-block-file--media-_clientId_0\" href=\"http://localhost:8889/wp-content/uploads/2021/04/yolo.pdf\">yolo</a><a href=\"http://localhost:8889/wp-content/uploads/2021/04/yolo.pdf\" class=\"wp-block-file__button\" download aria-describedby=\"wp-block-file--media-_clientId_0\">Download</a></div>"
+		"innerBlocks": []
 	}
 ]

@@ -8,7 +8,6 @@
 			"values": "<li>one</li><li>two</li><li>three</li>",
 			"fontFamily": "cambria-georgia"
 		},
-		"innerBlocks": [],
-		"originalContent": "<ul style=\"font-family:var(--wp--preset--font-family--cambria-georgia)\"><li>one</li><li>two</li><li>three</li></ul>"
+		"innerBlocks": []
 	}
 ]

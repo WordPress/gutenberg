@@ -7,7 +7,6 @@
 			"url": "https://example.com/",
 			"service": "mail"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

@@ -4,7 +4,6 @@
 		"name": "core/separator",
 		"isValid": true,
 		"attributes": {},
-		"innerBlocks": [],
-		"originalContent": "<hr class=\"wp-block-separator\" />"
+		"innerBlocks": []
 	}
 ]

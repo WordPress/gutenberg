@@ -24,10 +24,8 @@
 					"placeholder": "Write title…",
 					"fontSize": "large"
 				},
-				"innerBlocks": [],
-				"originalContent": "<p class=\"has-text-align-center has-large-font-size\">Cover!</p>"
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div class=\"wp-block-cover\">\n    <span aria-hidden=\"true\" class=\"has-background-dim-100 wp-block-cover__gradient-background has-luminous-dusk-gradient-background has-background-dim has-background-gradient has-luminous-dusk-gradient-background\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+		]
 	}
 ]
