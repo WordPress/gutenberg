@@ -9,12 +9,12 @@ import { useQuerySelect } from '@wordpress/data';
 import { store as coreStore } from '../';
 import { Status } from './constants';
 
-interface EntityRecordResolution {
+interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
-	record: Object;
+	record: RecordType | null;
 
 	/** The requested entity record with any edits applied*/
-	editedRecord: Object;
+	editedRecord: RecordType | null;
 
 	/** Is the record still being resolved? */
 	isResolving: boolean;
@@ -58,9 +58,14 @@ interface EntityRecordResolution {
  * application, the price and the resolution details will be retrieved from
  * the store state using `getEntityRecord()`, or resolved if missing.
  *
- * @return {EntityRecordResolution} Entity record data.
+ * @return {EntityRecordResolution<RecordType>} Entity record data.
+ * @template RecordType
  */
-export default function __experimentalUseEntityRecord( kind, name, recordId ) {
+export default function __experimentalUseEntityRecord< RecordType >(
+	kind,
+	name,
+	recordId
+): EntityRecordResolution< RecordType > {
 	const {
 		data,
 		isResolving,
