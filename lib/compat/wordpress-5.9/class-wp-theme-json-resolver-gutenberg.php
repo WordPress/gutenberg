@@ -190,6 +190,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$default_gradients = true;
 			}
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
+
+			$theme_support_data['settings']['color']['defaultDuotone'] = false;
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( self::$theme );
