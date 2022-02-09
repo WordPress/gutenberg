@@ -1833,7 +1833,7 @@ class WP_Theme_JSON_5_9 {
 	 */
 	public static function get_from_editor_settings( $settings ) {
 		$theme_settings = array(
-			'version'  => self::LATEST_SCHEMA,
+			'version'  => static::LATEST_SCHEMA,
 			'settings' => array(),
 		);
 
