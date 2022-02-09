@@ -43,7 +43,7 @@ export interface Attachment {
 	/**
 	 * A named status for the post.
 	 */
-	status?: '0' | '1' | '2' | '3' | '4';
+	status?: 'publish' | 'future' | 'draft' | 'pending' | 'private';
 	/**
 	 * Type of post.
 	 */
@@ -76,11 +76,11 @@ export interface Attachment {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status?: '0' | '1';
+	comment_status?: 'open' | 'closed';
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status?: '0' | '1';
+	ping_status?: 'open' | 'closed';
 	/**
 	 * Meta fields.
 	 */
@@ -122,7 +122,7 @@ export interface Attachment {
 	/**
 	 * Attachment type.
 	 */
-	media_type?: '0' | '1';
+	media_type?: 'image' | 'file';
 	/**
 	 * The attachment MIME type.
 	 */
@@ -311,11 +311,11 @@ export interface NavMenuItem {
 	/**
 	 * The family of objects originally represented, such as "post_type" or "taxonomy".
 	 */
-	type?: '0' | '1' | '2' | '3';
+	type?: 'taxonomy' | 'post_type' | 'post_type_archive' | 'custom';
 	/**
 	 * A named status for the object.
 	 */
-	status?: '0' | '1' | '2' | '3' | '4';
+	status?: 'publish' | 'future' | 'draft' | 'pending' | 'private';
 	/**
 	 * The ID for the parent of the object.
 	 */
@@ -347,7 +347,7 @@ export interface NavMenuItem {
 	/**
 	 * The target attribute of the link element for this menu item.
 	 */
-	target?: '0' | '1';
+	target?: '_blank' | '';
 	/**
 	 * The URL to which this menu item points.
 	 */
@@ -393,7 +393,7 @@ export interface Plugin {
 	/**
 	 * The plugin activation status.
 	 */
-	status?: '0' | '1';
+	status?: 'inactive' | 'active';
 	/**
 	 * The plugin name.
 	 */
@@ -509,11 +509,11 @@ export interface Settings {
 	/**
 	 * Allow link notifications from other blogs (pingbacks and trackbacks) on new articles.
 	 */
-	default_ping_status?: '0' | '1';
+	default_ping_status?: 'open' | 'closed';
 	/**
 	 * Allow people to submit comments on new posts.
 	 */
-	default_comment_status?: '0' | '1';
+	default_comment_status?: 'open' | 'closed';
 	/**
 	 * Site logo.
 	 */
@@ -560,7 +560,7 @@ export interface Sidebar {
 	/**
 	 * Status of sidebar.
 	 */
-	status?: '0' | '1';
+	status?: 'active' | 'inactive';
 	/**
 	 * Nested widgets.
 	 */
@@ -748,12 +748,21 @@ export interface Theme {
 			| boolean
 			| {
 					'default-image'?: string;
-					'default-preset'?: '0' | '1' | '2' | '3' | '4';
-					'default-position-x'?: '0' | '1' | '2';
-					'default-position-y'?: '0' | '1' | '2';
-					'default-size'?: '0' | '1' | '2';
-					'default-repeat'?: '0' | '1' | '2' | '3';
-					'default-attachment'?: '0' | '1';
+					'default-preset'?:
+						| 'default'
+						| 'fill'
+						| 'fit'
+						| 'repeat'
+						| 'custom';
+					'default-position-x'?: 'left' | 'center' | 'right';
+					'default-position-y'?: 'left' | 'center' | 'right';
+					'default-size'?: 'auto' | 'contain' | 'cover';
+					'default-repeat'?:
+						| 'repeat-x'
+						| 'repeat-y'
+						| 'repeat'
+						| 'no-repeat';
+					'default-attachment'?: 'scroll' | 'fixed';
 					'default-color'?: string;
 			  };
 		/**
@@ -843,7 +852,17 @@ export interface Theme {
 		/**
 		 * Allows use of HTML5 markup for search forms, comment forms, comment lists, gallery, and caption.
 		 */
-		html5?: boolean | ( '0' | '1' | '2' | '3' | '4' | '5' | '6' )[];
+		html5?:
+			| boolean
+			| (
+					| 'search-form'
+					| 'comment-form'
+					| 'comment-list'
+					| 'gallery'
+					| 'caption'
+					| 'script'
+					| 'style'
+			   )[];
 		/**
 		 * Post formats supported.
 		 */
@@ -896,7 +915,7 @@ export interface Theme {
 	/**
 	 * A named status for the theme.
 	 */
-	status?: '0' | '1';
+	status?: 'inactive' | 'active';
 }
 
 export interface Type {
@@ -999,7 +1018,7 @@ export interface User {
 	/**
 	 * Locale for the user.
 	 */
-	locale?: '0' | '1' | '2';
+	locale?: '' | 'en_US' | 'en_AU';
 	/**
 	 * The nickname for the user.
 	 */
