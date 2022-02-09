@@ -31,16 +31,6 @@ describe( 'useEntityRecord', () => {
 		jest.useRealTimers();
 	} );
 
-	const actRender = ( component ) => {
-		act( () => {
-			render(
-				<RegistryProvider value={ registry }>
-					{ component }
-				</RegistryProvider>
-			);
-		} );
-	};
-
 	const TEST_RECORD = { id: 1, hello: 'world' };
 
 	it( 'retrieves the relevant entity record', async () => {
@@ -52,7 +42,11 @@ describe( 'useEntityRecord', () => {
 			data = useEntityRecord( 'root', 'widget', 1 );
 			return <div />;
 		};
-		actRender( <TestComponent /> );
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
 		expect( data ).toEqual( {
 			record: TEST_RECORD,
 			editedRecord: TEST_RECORD,
@@ -77,7 +71,11 @@ describe( 'useEntityRecord', () => {
 			data = useEntityRecord( 'root', 'widget', 1 );
 			return <div />;
 		};
-		actRender( <TestComponent /> );
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
 
 		await act( async () => {
 			jest.advanceTimersByTime( 1 );
