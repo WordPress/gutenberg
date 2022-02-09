@@ -73,6 +73,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"defaultDuotone": {
+							"description": "Allow users to choose colors from the default duotone presets.",
+							"type": "boolean",
+							"default": true
+						},
 						"defaultGradients": {
 							"description": "Allow users to choose colors from the default gradients.",
 							"type": "boolean",
