@@ -335,7 +335,7 @@ class WP_Theme_JSON_5_9 {
 
 		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
-		$valid_element_names = array_keys( self::ELEMENTS );
+		$valid_element_names = array_keys( static::ELEMENTS );
 		$theme_json          = self::sanitize( $this->theme_json, $valid_block_names, $valid_element_names );
 		$this->theme_json    = self::maybe_opt_in_into_settings( $theme_json );
 
@@ -537,7 +537,7 @@ class WP_Theme_JSON_5_9 {
 			// If the block selector is compounded, will append the element to each
 			// individual block selector.
 			$block_selectors = explode( ',', self::$blocks_metadata[ $block_name ]['selector'] );
-			foreach ( self::ELEMENTS as $el_name => $el_selector ) {
+			foreach ( static::ELEMENTS as $el_name => $el_selector ) {
 				$element_selector = array();
 				foreach ( $block_selectors as $selector ) {
 					$element_selector[] = $selector . ' ' . $el_selector;
@@ -1372,7 +1372,7 @@ class WP_Theme_JSON_5_9 {
 			foreach ( $theme_json['styles']['elements'] as $element => $node ) {
 				$nodes[] = array(
 					'path'     => array( 'styles', 'elements', $element ),
-					'selector' => self::ELEMENTS[ $element ],
+					'selector' => static::ELEMENTS[ $element ],
 				);
 			}
 		}
@@ -1664,7 +1664,7 @@ class WP_Theme_JSON_5_9 {
 		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
-		$valid_element_names = array_keys( self::ELEMENTS );
+		$valid_element_names = array_keys( static::ELEMENTS );
 		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
 
 		$blocks_metadata = self::get_blocks_metadata();
