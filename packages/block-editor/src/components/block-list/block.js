@@ -65,7 +65,7 @@ function Block( { children, isHtml, ...props } ) {
 }
 
 function BlockListBlock( {
-	block,
+	block: { sourceMarkup },
 	mode,
 	isLocked,
 	canRemove,
@@ -131,19 +131,19 @@ function BlockListBlock( {
 		);
 	}
 
-	let BlockComponent;
+	let block;
 
 	if ( ! isValid ) {
-		BlockComponent = (
+		block = (
 			<Block className="has-warning">
 				<BlockInvalidWarning clientId={ clientId } />
-				<RawHTML>{ safeHTML( block.sourceMarkup ) }</RawHTML>
+				<RawHTML>{ safeHTML( sourceMarkup ) }</RawHTML>
 			</Block>
 		);
 	} else if ( mode === 'html' ) {
 		// Render blockEdit so the inspector controls don't disappear.
 		// See #8969.
-		BlockComponent = (
+		block = (
 			<>
 				<div style={ { display: 'none' } }>{ blockEdit }</div>
 				<Block isHtml>
@@ -152,9 +152,9 @@ function BlockListBlock( {
 			</>
 		);
 	} else if ( blockType?.apiVersion > 1 ) {
-		BlockComponent = blockEdit;
+		block = blockEdit;
 	} else {
-		BlockComponent = <Block { ...wrapperProps }>{ blockEdit }</Block>;
+		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
 	}
 
 	const value = {
@@ -174,7 +174,7 @@ function BlockListBlock( {
 					</Block>
 				}
 			>
-				{ BlockComponent }
+				{ block }
 			</BlockCrashBoundary>
 		</BlockListBlockContext.Provider>
 	);
