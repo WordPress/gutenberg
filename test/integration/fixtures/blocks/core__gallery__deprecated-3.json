@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/gallery",
 		"isValid": true,
 		"attributes": {
@@ -11,7 +10,6 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
@@ -23,7 +21,6 @@
 				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_1",
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {

@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/button",
 		"isValid": true,
 		"attributes": {
@@ -14,7 +13,6 @@
 		"innerBlocks": []
 	},
 	{
-		"clientId": "_clientId_1",
 		"name": "core/freeform",
 		"isValid": true,
 		"attributes": {
