@@ -221,7 +221,7 @@ async function clickBlockToolbarButton( label ) {
 	await showBlockToolbar();
 
 	const btn = await page.waitForSelector(
-		`[aria-label="Block tools"] [aria-label="${ label }"]`
+		`[aria-label="Editor content"][role="region"] [aria-label="Block tools"] [aria-label="${ label }"]`
 	);
 
 	return btn.click();
