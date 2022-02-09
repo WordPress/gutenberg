@@ -416,15 +416,28 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 					store.dispatch(
 						metadataActions.startResolution( selectorName, args )
 					);
-					await fulfillResolver(
-						store,
-						mappedResolvers,
-						selectorName,
-						...args
-					);
-					store.dispatch(
-						metadataActions.finishResolution( selectorName, args )
-					);
+					try {
+						await fulfillResolver(
+							store,
+							mappedResolvers,
+							selectorName,
+							...args
+						);
+						store.dispatch(
+							metadataActions.finishResolution(
+								selectorName,
+								args
+							)
+						);
+					} catch ( e ) {
+						store.dispatch(
+							metadataActions.failResolution(
+								selectorName,
+								args,
+								e
+							)
+						);
+					}
 				} );
 			}
 

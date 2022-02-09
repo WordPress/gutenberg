@@ -13,15 +13,19 @@ import { onSubKey } from './utils';
 type Action =
 	| ReturnType< typeof import('./actions').startResolution >
 	| ReturnType< typeof import('./actions').finishResolution >
+	| ReturnType< typeof import('./actions').failResolution >
 	| ReturnType< typeof import('./actions').startResolutions >
 	| ReturnType< typeof import('./actions').finishResolutions >
+	| ReturnType< typeof import('./actions').failResolutions >
 	| ReturnType< typeof import('./actions').invalidateResolution >
 	| ReturnType< typeof import('./actions').invalidateResolutionForStore >
 	| ReturnType<
 			typeof import('./actions').invalidateResolutionForStoreSelector
 	  >;
 
-export type State = EquivalentKeyMap< unknown[] | unknown, boolean >;
+type StateKey = unknown[] | unknown;
+export type StateValue = { isResolving: boolean; error?: Error };
+export type State = EquivalentKeyMap< StateKey, StateValue >;
 
 /**
  * Reducer function returning next state for selector resolution of
@@ -36,17 +40,40 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 	switch ( action.type ) {
 		case 'START_RESOLUTION':
 		case 'FINISH_RESOLUTION': {
-			const isStarting = action.type === 'START_RESOLUTION';
+			const isResolving = action.type === 'START_RESOLUTION';
 			const nextState = new EquivalentKeyMap( state );
-			nextState.set( action.args, isStarting );
+			nextState.set( action.args, { isResolving } );
+			return nextState;
+		}
+		case 'FAIL_RESOLUTION': {
+			const nextState = new EquivalentKeyMap( state );
+			nextState.set( action.args, {
+				isResolving: false,
+				error: action.error,
+			} );
 			return nextState;
 		}
 		case 'START_RESOLUTIONS':
 		case 'FINISH_RESOLUTIONS': {
-			const isStarting = action.type === 'START_RESOLUTIONS';
+			const isResolving = action.type === 'START_RESOLUTIONS';
 			const nextState = new EquivalentKeyMap( state );
 			for ( const resolutionArgs of action.args ) {
-				nextState.set( resolutionArgs, isStarting );
+				nextState.set( resolutionArgs, { isResolving } );
+			}
+			return nextState;
+		}
+		case 'FAIL_RESOLUTIONS': {
+			const nextState = new EquivalentKeyMap( state );
+			for ( const idx in action.args ) {
+				const resolutionArgs = action.args[ idx ];
+				const resolutionState: StateValue = { isResolving: false };
+
+				const error = action.errors[ idx ];
+				if ( error ) {
+					resolutionState.error = error;
+				}
+
+				nextState.set( resolutionArgs, resolutionState );
 			}
 			return nextState;
 		}
@@ -79,8 +106,10 @@ const isResolved = ( state: Record< string, State > = {}, action: Action ) => {
 				: state;
 		case 'START_RESOLUTION':
 		case 'FINISH_RESOLUTION':
+		case 'FAIL_RESOLUTION':
 		case 'START_RESOLUTIONS':
 		case 'FINISH_RESOLUTIONS':
+		case 'FAIL_RESOLUTIONS':
 		case 'INVALIDATE_RESOLUTION':
 			return subKeysIsResolved( state, action );
 	}
