@@ -121,18 +121,20 @@ async function selectClassicMenu( optionText ) {
 	await theOption.click();
 }
 
-async function populateNavWithOneItem() {
+async function populateNavWithOneItem( item ) {
+	item = item || {
+		url: 'https://wordpress.org',
+		label: 'WP',
+		type: 'url',
+	};
+
 	// Add a Link block first.
 	const appender = await page.waitForSelector(
 		'.wp-block-navigation .block-list-appender'
 	);
 	await appender.click();
 	// Add a link to the Link block.
-	await updateActiveNavigationLink( {
-		url: 'https://wordpress.org',
-		label: 'WP',
-		type: 'url',
-	} );
+	await updateActiveNavigationLink( item );
 }
 
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
@@ -212,7 +214,7 @@ async function waitForBlock( blockName ) {
 	const blockSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: ${ blockName }"]`;
 
 	// Wait for a Submenu block before making assertion.
-	return await page.waitForSelector( blockSelector );
+	return page.waitForSelector( blockSelector );
 }
 
 // Disable reason - these tests are to be re-written.
@@ -739,7 +741,7 @@ describe( 'Navigation', () => {
 	} );
 
 	// eslint-disable-next-line jest/no-focused-tests
-	describe.only( 'Submenus', () => {
+	describe( 'Submenus', () => {
 		it( 'shows button to convert submenu to link when empty', async () => {
 			const navSubmenuSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]`;
 
@@ -772,6 +774,57 @@ describe( 'Navigation', () => {
 			);
 
 			expect( navSubmenusLength ).toEqual( 0 );
+		} );
+
+		it( 'does not show button to convert submenu to link when submenu is populated', async () => {
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+			await populateNavWithOneItem( {
+				url: 'https://make.wordpress.org',
+				label: 'Make Blog',
+				type: 'url',
+			} );
+
+			await showBlockToolbar();
+
+			await page.click( 'button[aria-label="Add submenu"]' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Add a Link block first.
+			const appender = await page.waitForSelector(
+				'[aria-label="Block: Submenu"] [aria-label="Add block"]'
+			);
+
+			await appender.click();
+
+			await updateActiveNavigationLink( {
+				url: 'https://make.wordpress.org/core/',
+				label: 'Submenu item #1',
+				type: 'url',
+			} );
+
+			await showBlockToolbar();
+
+			const switchToParentBlockButton = await page.waitForSelector(
+				'[aria-label="Block tools"] [aria-label="Select Submenu"]'
+			);
+
+			await switchToParentBlockButton.click();
+
+			const convertToLinkButton = await page.$(
+				'[aria-label="Block tools"] [aria-label="Convert to Link"]'
+			);
+
+			expect( convertToLinkButton ).toBeFalsy();
 		} );
 	} );
 
