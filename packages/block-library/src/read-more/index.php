@@ -21,7 +21,7 @@ function render_block_core_read_more( $attributes, $content, $block ) {
 	$post_ID            = $block->context['postId'];
 	$justify_class_name = empty( $attributes['justifyContent'] ) ? '' : "is-justified-{$attributes['justifyContent']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $justify_class_name ) );
-	$more_text          = ! empty( $attributes['content'] ) ? $attributes['content'] : __( 'Read more' );
+	$more_text          = ! empty( $attributes['content'] ) ? wp_kses_post( $attributes['content'] ) : __( 'Read more' );
 	return sprintf(
 		'<a %1s href="%2s" target="%3s">%4s</a>',
 		$wrapper_attributes,
