@@ -53,11 +53,11 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 		}
 
 		/*
-		* We want the presets and settings declared in theme.json
-		* to override the ones declared via theme supports.
-		* So we take theme supports, transform it to theme.json shape
-		* and merge the self::$theme upon that.
-		*/
+		 * We want the presets and settings declared in theme.json
+		 * to override the ones declared via theme supports.
+		 * So we take theme supports, transform it to theme.json shape
+		 * and merge the self::$theme upon that.
+		 */
 		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
 		if ( ! self::theme_has_support() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
