@@ -1,6 +1,11 @@
 /**
+ * External dependencies
+ */
+
+/**
  * WordPress dependencies
  */
+import { useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
@@ -8,10 +13,31 @@ import {
 	InspectorControls,
 	useInnerBlocksProps,
 	useSetting,
+	withColors,
+	BlockControls,
+	MediaReplaceFlow,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+/* eslint-disable no-unused-vars */
+import {
+	ALLOWED_MEDIA_TYPES,
+	attributesFromMedia,
+	IMAGE_BACKGROUND_TYPE,
+	VIDEO_BACKGROUND_TYPE,
+	COVER_MIN_HEIGHT,
+	backgroundImageStyles,
+	dimRatioToClass,
+	isContentPositionCenter,
+	getPositionClassName,
+} from './shared';
+/* eslint-enable no-unused-vars */
 
 const htmlElementMessages = {
 	header: __(
@@ -35,6 +61,8 @@ const htmlElementMessages = {
 };
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
+	const { id, url, backgroundType, alt } = attributes;
+
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
@@ -46,6 +74,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
+	const isDarkElement = useRef();
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
@@ -66,8 +95,33 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		}
 	);
 
+	const isImgElement = true; // ! ( hasParallax || isRepeated );
+	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+
+	// const bgStyle = { backgroundColor: overlayColor?.color };
+	const mediaStyle = {
+		// objectPosition:
+		// 	focalPoint && isImgElement
+		// 		? mediaPosition( focalPoint )
+		// 		: undefined,
+	};
+
+	const onSelectMedia = attributesFromMedia( setAttributes, 1 );
+
+	const showBgImage = url && isImageBackground && isImgElement;
+
 	return (
 		<>
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*,video/*"
+					onSelect={ onSelectMedia }
+					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
+				/>
+			</BlockControls>
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
@@ -87,16 +141,24 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 					help={ htmlElementMessages[ TagName ] }
 				/>
 			</InspectorControls>
-			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
-			{ /* Ideally this is not needed but it's there for backward compatibility reason
-				to keep this div for themes that might rely on its presence */ }
-			{ ! layoutSupportEnabled && (
-				<TagName { ...blockProps }>
-					<div { ...innerBlocksProps } />
-				</TagName>
-			) }
+
+			<TagName { ...blockProps }>
+				<div { ...innerBlocksProps } />
+
+				{ showBgImage && (
+					<img
+						ref={ isDarkElement }
+						className="wp-block-cover__image-background"
+						alt={ alt }
+						src={ url }
+						style={ mediaStyle }
+					/>
+				) }
+			</TagName>
 		</>
 	);
 }
 
-export default GroupEdit;
+export default compose( [
+	withColors( { overlayColor: 'background-color' } ),
+] )( GroupEdit );
