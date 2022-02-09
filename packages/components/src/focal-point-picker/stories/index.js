@@ -44,3 +44,33 @@ export const video = () => {
 
 	return <Example url={ url } />;
 };
+
+export const snapping = () => {
+	const snapValues = {
+		x: [ 0, 0.33, 0.66, 1 ],
+		y: [ 0, 0.33, 0.66, 1 ],
+	};
+
+	const thereshold = 0.05;
+
+	const maybeSnapFocalPoint = ( value ) => {
+		let x = parseFloat( value.x );
+		let y = parseFloat( value.y );
+
+		snapValues.x.forEach( ( snapValue ) => {
+			if ( snapValue - thereshold < x && x < snapValue + thereshold ) {
+				x = snapValue;
+			}
+		} );
+
+		snapValues.y.forEach( ( snapValue ) => {
+			if ( snapValue - thereshold < y && y < snapValue + thereshold ) {
+				y = snapValue;
+			}
+		} );
+
+		return { x, y };
+	};
+
+	return <Example resolvePoint={ maybeSnapFocalPoint } />;
+};
