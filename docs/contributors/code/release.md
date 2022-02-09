@@ -51,8 +51,6 @@ You can find some more tips on writing the release notes and post in the section
 
 #### Publishing the release
 
-**Note**: you may not want to undertake this step until the release post is ready on [make.wordpress.org/core](https://make.wordpress.org/core/) ([see below for more detail](#documenting-the-release-with-the-release-notes-and-post)).
-
 Only once you're happy with the shape of the release notes should you press the green "Publish release" button. This will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) that has a twofold purpose:
 
 1. Use the release notes that you just edited to update `changelog.txt`, and
