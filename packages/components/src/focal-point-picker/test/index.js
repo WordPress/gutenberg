@@ -79,8 +79,7 @@ describe( 'FocalPointPicker', () => {
 			const dragArea = getByRole( 'button' );
 			act( () => {
 				fireEvent.mouseDown( dragArea );
-				fireEvent.mouseMove( dragArea );
-				fireEvent.mouseUp( dragArea );
+				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
 			} );
 			expect( spy ).toHaveBeenCalled();
 			expect( spyChange ).toHaveBeenCalledWith( {
