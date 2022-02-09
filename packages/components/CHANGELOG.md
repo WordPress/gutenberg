@@ -16,7 +16,8 @@
 ### Enhancements
 
 -   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
-- TreeGrid accessibility enhancements. ([#38358](https://github.com/WordPress/gutenberg/pull/38358))
+-  `TreeGrid` accessibility enhancements around the expand/collapse functionality. ([#38358](https://github.com/WordPress/gutenberg/pull/38358))
+-  `TreeGrid` accessibility: improve browser support for Left Arrow focus to parent row in child row.  ([#38639](https://github.com/WordPress/gutenberg/pull/38639))
 
 ### Experimental
 
@@ -28,6 +29,7 @@
 
 -   Refine `ExternalLink` to be same size as the text, to appear more as a glyph than an icon. ([#37859](https://github.com/WordPress/gutenberg/pull/37859))
 -   Updated `ToolsPanel` header icon to only show "plus" icon when all items are optional and all are currently hidden ([#38262](https://github.com/WordPress/gutenberg/pull/38262))
+- `TreeGrid`: Fix keyboard navigation for expand/collapse table rows in Firefox ([#37983](https://github.com/WordPress/gutenberg/pull/37983))
 
 ### Bug Fix
 
