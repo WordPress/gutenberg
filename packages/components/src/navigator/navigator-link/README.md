@@ -4,16 +4,31 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-**TODO**
-
-The `Navigator*` family of components is _not_ opinionated in terms of UI, and can be composed with any UI components to navigate between the nested screens.
+The `NavigatorLink` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackLink`](/packages/components/src/navigator/navigator-back-link/README.md) components (or the `useNavigator` hook).
 
 ## Usage
 
-**TODO**
+Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
 
 ## Props
 
 The component accepts the following props:
 
-**TODO**
+### `attributeName`: `string`
+
+The HTML attribute used to identify the `NavigatorLink`, which is used by `Navigator` to restore focus.
+
+-   Required: No
+-   Default: `id`
+
+### `onClick`: `React.MouseEventHandler< HTMLElement >`
+
+The callback called in response to a `click` event.
+
+-   Required: No
+
+### `path`: `string`
+
+The path of the screen to navigate to.
+
+-   Required: Yes

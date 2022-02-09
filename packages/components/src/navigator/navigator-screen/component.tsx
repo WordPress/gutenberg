@@ -171,44 +171,34 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 }
 
 /**
- * The `NavigatorScreen` component represents a single view/screen/panel/menu and is supposed to be used in combination with the `NavigatorProvider` component.
+ * The `NavigatorScreen` component represents a single view/screen/panel and
+ * should be used in combination with the `NavigatorProvider`, the
+ * `NavigatorLink` and the `NavigatorBackLink` components (or the `useNavigator`
+ * hook).
  *
  * @example
  * ```jsx
  * import {
  *   __experimentalNavigatorProvider as NavigatorProvider,
  *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalUseNavigator as useNavigator,
+ *   __experimentalNavigatorLink as NavigatorLink,
+ *   __experimentalNavigatorBackLink as NavigatorBackLink,
  * } from '@wordpress/components';
- *
- * function NavigatorButton( { path, ...props } ) {
- *  const { goTo } = useNavigator();
- *  return (
- *    <Button
- *      variant="primary"
- *      onClick={ () => goTo( path ) }
- *      { ...props }
- *    />
- *  );
- * }
- *
- * function NavigatorBackButton( props ) {
- *   const { goBack } = useNavigator();
- *   return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
- * }
  *
  * const MyNavigation = () => (
  *   <NavigatorProvider initialPath="/">
  *     <NavigatorScreen path="/">
  *       <p>This is the home screen.</p>
- *   	   <NavigatorButton path="/child">
+ *        <NavigatorLink variant="secondary" path="/child">
  *          Navigate to child screen.
- *       </NavigatorButton>
+ *       </NavigatorLink>
  *     </NavigatorScreen>
  *
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorBackButton>Go back</NavigatorBackButton>
+ *       <NavigatorBackLink variant="secondary">
+ *         Go back
+ *       </NavigatorBackLink>
  *     </NavigatorScreen>
  *   </NavigatorProvider>
  * );

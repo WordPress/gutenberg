@@ -57,7 +57,7 @@ export type NavigatorBackLinkProps = {
 
 export type NavigatorLinkProps = NavigatorBackLinkProps & {
 	/**
-	 * The path to navigate to.
+	 * The path of the screen to navigate to.
 	 */
 	path: string;
 	/**

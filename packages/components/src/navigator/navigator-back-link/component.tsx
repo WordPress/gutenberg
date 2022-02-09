@@ -22,7 +22,38 @@ function NavigatorBackLink(
 }
 
 /**
- * TODO: add example
+ * The `NavigatorBackLink` component can be used to navigate to a screen and
+ * should be used in combination with the `NavigatorProvider`, the
+ * `NavigatorScreen` and the `NavigatorLink` components (or the `useNavigator`
+ * hook).
+ *
+ * @example
+ * ```jsx
+ * import {
+ *   __experimentalNavigatorProvider as NavigatorProvider,
+ *   __experimentalNavigatorScreen as NavigatorScreen,
+ *   __experimentalNavigatorLink as NavigatorLink,
+ *   __experimentalNavigatorBackLink as NavigatorBackLink,
+ * } from '@wordpress/components';
+ *
+ * const MyNavigation = () => (
+ *   <NavigatorProvider initialPath="/">
+ *     <NavigatorScreen path="/">
+ *       <p>This is the home screen.</p>
+ *        <NavigatorLink variant="secondary" path="/child">
+ *          Navigate to child screen.
+ *       </NavigatorLink>
+ *     </NavigatorScreen>
+ *
+ *     <NavigatorScreen path="/child">
+ *       <p>This is the child screen.</p>
+ *       <NavigatorBackLink variant="secondary">
+ *         Go back
+ *       </NavigatorBackLink>
+ *     </NavigatorScreen>
+ *   </NavigatorProvider>
+ * );
+ * ```
  */
 const ConnectedNavigatorBackLink = contextConnect(
 	NavigatorBackLink,

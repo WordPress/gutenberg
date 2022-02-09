@@ -4,47 +4,34 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-The `NavigatorProvider` component allows rendering nested panels or menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the `useNavigator` hook). The Global Styles sidebar is an example of this.
+The `NavigatorProvider` component allows rendering nested views/panels/menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`NavigatorLink`](/packages/components/src/navigator/navigator-link/README.md) and [`NavigatorBackLink`](/packages/components/src/navigator/navigator-back-link/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
 
 ## Usage
 
 ```jsx
 import {
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalUseNavigator as useNavigator,
+  __experimentalNavigatorProvider as NavigatorProvider,
+  __experimentalNavigatorScreen as NavigatorScreen,
+  __experimentalNavigatorLink as NavigatorLink,
+  __experimentalNavigatorBackLink as NavigatorBackLink,
 } from '@wordpress/components';
 
-function NavigatorButton( { path, ...props } ) {
-	const { goTo } = useNavigator();
-	return (
-		<Button
-		 variant="primary"
-		 onClick={ () => goTo( path ) }
-		 { ...props }
-	 />
- );
-}
-
-function NavigatorBackButton( props ) {
-	const { goBack } = useNavigator();
-	return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
-}
-
 const MyNavigation = () => (
-	<NavigatorProvider initialPath="/">
-		<NavigatorScreen path="/">
-			<p>This is the home screen.</p>
-			<NavigatorButton path="/child">
-				Navigate to child screen.
-			</NavigatorButton>
-		</NavigatorScreen>
+  <NavigatorProvider initialPath="/">
+    <NavigatorScreen path="/">
+      <p>This is the home screen.</p>
+       <NavigatorLink variant="secondary" path="/child">
+         Navigate to child screen.
+      </NavigatorLink>
+    </NavigatorScreen>
 
-		<NavigatorScreen path="/child">
-			<p>This is the child screen.</p>
-			<NavigatorBackButton>Go back</NavigatorBackButton>
-		</NavigatorScreen>
-	</NavigatorProvider>
+    <NavigatorScreen path="/child">
+      <p>This is the child screen.</p>
+      <NavigatorBackLink variant="secondary">
+        Go back
+      </NavigatorBackLink>
+    </NavigatorScreen>
+  </NavigatorProvider>
 );
 ```
 
