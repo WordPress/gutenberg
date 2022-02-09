@@ -63,14 +63,16 @@ describe( 'FocalPointPicker', () => {
 	} );
 
 	describe( 'resolvePoint handling', () => {
-		it( 'should allow value altering', () => {
+		it( 'should allow value altering', async () => {
+			const spyChange = jest.fn();
 			const spy = jest.fn();
 			const { getByRole } = render(
 				<Picker
-					onChange={ () => {} }
-					resolvePoint={ ( value ) => {
+					value={ { x: 0.25, y: 0.25 } }
+					onChange={ spyChange }
+					resolvePoint={ () => {
 						spy();
-						return { x: 0.5, y: value.y };
+						return { x: 0.91, y: 0.42 };
 					} }
 				/>
 			);
@@ -81,8 +83,10 @@ describe( 'FocalPointPicker', () => {
 				fireEvent.mouseUp( dragArea );
 			} );
 			expect( spy ).toHaveBeenCalled();
-			const xInput = getByRole( 'spinbutton', { name: 'Left' } );
-			expect( xInput.value ).toBe( '50' );
+			expect( spyChange ).toHaveBeenCalledWith( {
+				x: '0.91',
+				y: '0.42',
+			} );
 		} );
 	} );
 
