@@ -20,10 +20,17 @@ function getNeedsHomepageRedirect( params ) {
 	);
 }
 
+/**
+ * Returns the postType and postId of the default homepage.
+ *
+ * @param {string} siteUrl The URL of the site.
+ * @return {Object} An object containing the postType and postId properties
+ *                  or `undefined` if a homepage could not be found.
+ */
 async function getHomepageParams( siteUrl ) {
 	const siteSettings = await apiFetch( { path: '/wp/v2/settings' } );
 	if ( ! siteSettings ) {
-		return;
+		throw new Error( '`getHomepageParams`: unable to load site settings.' );
 	}
 
 	const {
@@ -48,7 +55,7 @@ async function getHomepageParams( siteUrl ) {
 		.then( ( { data } ) => data );
 
 	if ( ! template?.id ) {
-		return;
+		throw new Error( '`getHomepageParams`: unable to find home template.' );
 	}
 
 	return {

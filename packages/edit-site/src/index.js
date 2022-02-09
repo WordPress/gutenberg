@@ -24,6 +24,7 @@ import { store as editSiteStore } from './store';
 import EditSiteApp from './components/app';
 import getIsListPage from './utils/get-is-list-page';
 import redirectToHomepage from './components/routes/redirect-to-homepage';
+import ErrorBoundaryWarning from './components/error-boundary/warning';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -38,7 +39,17 @@ export async function reinitializeEditor( target, settings ) {
 	// define what's being edited. When visiting via the dashboard link, these
 	// won't be present. Do a client side redirect to the 'homepage' if that's
 	// the case.
-	await redirectToHomepage( settings.siteUrl );
+	try {
+		await redirectToHomepage( settings.siteUrl );
+	} catch ( error ) {
+		render(
+			<ErrorBoundaryWarning
+				error={ error }
+				reboot={ () => reinitializeEditor( target, settings ) }
+			/>,
+			target
+		);
+	}
 
 	// This will be a no-op if the target doesn't have any React nodes.
 	unmountComponentAtNode( target );
