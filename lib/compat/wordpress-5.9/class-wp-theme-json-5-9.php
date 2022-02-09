@@ -620,7 +620,7 @@ class WP_Theme_JSON_5_9 {
 	 * @return string Stylesheet.
 	 */
 	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null ) {
-		if ( $origins === null ) {
+		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
 
@@ -1059,7 +1059,7 @@ class WP_Theme_JSON_5_9 {
 	 * @return array Array of presets where the key and value are both the slug.
 	 */
 	protected static function get_settings_slugs( $settings, $preset_metadata, $origins = null ) {
-		if ( $origins === null ) {
+		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
 
@@ -1225,7 +1225,7 @@ class WP_Theme_JSON_5_9 {
 	 * @return array Returns the modified $declarations.
 	 */
 	protected static function compute_style_properties( $styles, $settings = array(), $properties = null ) {
-		if ( $properties === null ) {
+		if ( null === $properties ) {
 			$properties = static::PROPERTIES_METADATA;
 		}
 
