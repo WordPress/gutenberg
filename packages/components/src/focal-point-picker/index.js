@@ -129,7 +129,10 @@ export class FocalPointPicker extends Component {
 		return bounds;
 	}
 	updateValue( nextValue = {} ) {
-		const { x, y } = nextValue;
+		const resolvedValue =
+			this.props.resolvePoint?.( nextValue ) ?? nextValue;
+
+		const { x, y } = resolvedValue;
 
 		const nextPercentage = {
 			x: parseFloat( x ).toFixed( 2 ),
@@ -190,9 +193,8 @@ export class FocalPointPicker extends Component {
 			{ x: event.pageX, y: event.pageY },
 			event.shiftKey
 		);
-		const resolvedValue = this.props.resolvePoint?.( value ) ?? value;
-		this.updateValue( resolvedValue );
-		this.props.onDrag?.( resolvedValue, event );
+		this.updateValue( value );
+		this.props.onDrag?.( value, event );
 	}
 	getValueFromPoint( point, byTenths ) {
 		const { bounds } = this.state;
