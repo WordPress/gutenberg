@@ -146,7 +146,11 @@ The method for point releases is nearly identical to the main Plugin release pro
 
 The point release should only contain the _specific commits_ required. To do this you should checkout the previous _minor_ stable (i.e. non-RC) release branch (e.g. `release/12.5`) locally and then cherry pick any commits that you require into that branch.
 
-Once you have the stable release branch in order you can _push it to Github_ and continue with the release process using the Github website GUI.
+You must also ensure that all PRs being included are assigned to the Github Milestone on which the point release is based. Bear in mind, that when PRs are _merged_ they are automatically assigned a milestone for the next _stable_ release. Therefore you will need to go back through each PR in Github and re-assign the label.
+
+For example, if you are releasing version `12.5.4`, then all PRs picked for that release must be unassigned from the `12.6` Milestone and instead assigned to the `12.5` Milestone.
+
+Once you have the stable release branch in order and the correct Milestone assign to your PRs you can _push the branch to Github_ and continue with the release process using the Github website GUI.
 
 #### Running the point release
 
