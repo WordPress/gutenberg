@@ -13,9 +13,6 @@ interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
 	record: RecordType | null;
 
-	/** The requested entity record with any edits applied*/
-	editedRecord: RecordType | null;
-
 	/**
 	 * Is the record still being resolved?
 	 *
@@ -78,7 +75,6 @@ export default function __experimentalUseEntityRecord< RecordType >(
 		data,
 		isResolving,
 		hasResolved,
-		editedRecord,
 		hasEdits,
 	} = useQuerySelect(
 		( query ) => {
@@ -91,7 +87,6 @@ export default function __experimentalUseEntityRecord< RecordType >(
 			const recordResponse = getEntityRecord( ...args );
 			return {
 				...recordResponse,
-				editedRecord: getEditedEntityRecord( ...args ).data,
 				hasEdits: hasEditsForEntityRecord( ...args ).data,
 			};
 		},
@@ -114,7 +109,6 @@ export default function __experimentalUseEntityRecord< RecordType >(
 	return {
 		status,
 		record: data,
-		editedRecord,
 		hasEdits,
 		isResolving,
 		hasResolved,

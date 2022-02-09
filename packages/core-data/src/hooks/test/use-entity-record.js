@@ -49,7 +49,6 @@ describe( 'useEntityRecord', () => {
 		);
 		expect( data ).toEqual( {
 			record: TEST_RECORD,
-			editedRecord: TEST_RECORD,
 			hasEdits: false,
 			hasResolved: false,
 			isResolving: false,
@@ -88,7 +87,6 @@ describe( 'useEntityRecord', () => {
 
 		expect( data ).toEqual( {
 			record: { hello: 'world', id: 1 },
-			editedRecord: { hello: 'world', id: 1 },
 			hasEdits: false,
 			hasResolved: true,
 			isResolving: false,
