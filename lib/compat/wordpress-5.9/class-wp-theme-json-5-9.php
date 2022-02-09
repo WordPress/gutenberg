@@ -329,7 +329,7 @@ class WP_Theme_JSON_5_9 {
 	 *                           One of 'default', 'theme', or 'custom'. Default 'theme'.
 	 */
 	public function __construct( $theme_json = array(), $origin = 'theme' ) {
-		if ( ! in_array( $origin, self::VALID_ORIGINS, true ) ) {
+		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}
 
@@ -616,10 +616,14 @@ class WP_Theme_JSON_5_9 {
 	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
 	 *                         'styles': only the styles section in theme.json.
 	 *                         'presets': only the classes for the presets.
-	 * @param array $origins A list of origins to include. By default it includes self::VALID_ORIGINS.
+	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
 	 * @return string Stylesheet.
 	 */
-	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = self::VALID_ORIGINS ) {
+	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null ) {
+		if ( $origins === null ) {
+			$origins = static::VALID_ORIGINS;
+		}
+
 		if ( is_string( $types ) ) {
 			// Dispatch error and map old arguments to new ones.
 			_deprecated_argument( __FUNCTION__, '5.9' );
@@ -1054,7 +1058,11 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $origins List of origins to process.
 	 * @return array Array of presets where the key and value are both the slug.
 	 */
-	private static function get_settings_slugs( $settings, $preset_metadata, $origins = self::VALID_ORIGINS ) {
+	private static function get_settings_slugs( $settings, $preset_metadata, $origins = null ) {
+		if ( $origins === null ) {
+			$origins = static::VALID_ORIGINS;
+		}
+
 		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
 
 		$result = array();
@@ -1460,7 +1468,7 @@ class WP_Theme_JSON_5_9 {
 			foreach ( static::PRESETS_METADATA as $preset ) {
 				$override_preset = self::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
 
-				foreach ( self::VALID_ORIGINS as $origin ) {
+				foreach ( static::VALID_ORIGINS as $origin ) {
 					$base_path = array_merge( $node['path'], $preset['path'] );
 					$path      = array_merge( $base_path, array( $origin ) );
 					$content   = _wp_array_get( $incoming_data, $path, null );
@@ -1719,7 +1727,7 @@ class WP_Theme_JSON_5_9 {
 	private static function remove_insecure_settings( $input ) {
 		$output = array();
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
-			foreach ( self::VALID_ORIGINS as $origin ) {
+			foreach ( static::VALID_ORIGINS as $origin ) {
 				$path_with_origin = array_merge( $preset_metadata['path'], array( $origin ) );
 				$presets          = _wp_array_get( $input, $path_with_origin, null );
 				if ( null === $presets ) {
