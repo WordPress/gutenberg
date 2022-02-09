@@ -13,11 +13,7 @@ import {
 	useCallback,
 	RawHTML,
 } from '@wordpress/element';
-import {
-	getBlockType,
-	getSaveContent,
-	isUnmodifiedDefaultBlock,
-} from '@wordpress/blocks';
+import { getBlockType, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
 import { compose, pure, ifCondition } from '@wordpress/compose';
@@ -69,6 +65,7 @@ function Block( { children, isHtml, ...props } ) {
 }
 
 function BlockListBlock( {
+	block,
 	mode,
 	isLocked,
 	canRemove,
@@ -134,21 +131,19 @@ function BlockListBlock( {
 		);
 	}
 
-	let block;
+	let BlockComponent;
 
 	if ( ! isValid ) {
-		const saveContent = getSaveContent( blockType, attributes );
-
-		block = (
+		BlockComponent = (
 			<Block className="has-warning">
 				<BlockInvalidWarning clientId={ clientId } />
-				<RawHTML>{ safeHTML( saveContent ) }</RawHTML>
+				<RawHTML>{ safeHTML( block.sourceMarkup ) }</RawHTML>
 			</Block>
 		);
 	} else if ( mode === 'html' ) {
 		// Render blockEdit so the inspector controls don't disappear.
 		// See #8969.
-		block = (
+		BlockComponent = (
 			<>
 				<div style={ { display: 'none' } }>{ blockEdit }</div>
 				<Block isHtml>
@@ -157,9 +152,9 @@ function BlockListBlock( {
 			</>
 		);
 	} else if ( blockType?.apiVersion > 1 ) {
-		block = blockEdit;
+		BlockComponent = blockEdit;
 	} else {
-		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
+		BlockComponent = <Block { ...wrapperProps }>{ blockEdit }</Block>;
 	}
 
 	const value = {
@@ -179,7 +174,7 @@ function BlockListBlock( {
 					</Block>
 				}
 			>
-				{ block }
+				{ BlockComponent }
 			</BlockCrashBoundary>
 		</BlockListBlockContext.Provider>
 	);

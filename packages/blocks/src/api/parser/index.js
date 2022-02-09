@@ -34,6 +34,7 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  * @property {string}          innerHTML    HTML content of the block.
  * @property {(string|null)[]} innerContent Content without inner blocks.
  * @property {WPRawBlock[]}    innerBlocks  Inner Blocks.
+ * @property {string=}         sourceMarkup Equivalent representation to loaded block HTML.
  */
 
 /**
@@ -45,6 +46,7 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  * @property {Object }   attributes       Block raw or comment attributes.
  * @property {WPBlock[]} innerBlocks      Inner Blocks.
  * @property {string}    originalContent  Original content of the block before validation fixes.
+ * @property {string}    sourceMarkup     Equivalent representation to loaded block HTML.
  * @property {boolean}   isValid          Whether the block is valid.
  * @property {Object[]}  validationIssues Validation issues.
  */
@@ -103,6 +105,12 @@ export function normalizeRawBlock( rawBlock ) {
 		attrs: rawAttributes,
 		innerHTML: rawInnerHTML,
 		innerBlocks: rawInnerBlocks,
+		// Preserve original content as best as we can.
+		// This could be lexically different than the source
+		// but semantically it should be equivalent.
+		sourceMarkup: serializeRawBlock( rawBlock, {
+			isCommentDelimited: true,
+		} ),
 	};
 }
 
@@ -124,20 +132,14 @@ function createMissingBlockType( rawBlock ) {
 		isCommentDelimited: false,
 	} );
 
-	// Preserve full block content for use by the unregistered type
-	// handler, block boundaries included.
-	const originalContent = serializeRawBlock( rawBlock, {
-		isCommentDelimited: true,
-	} );
-
 	return {
 		blockName: unregisteredFallbackBlock,
 		attrs: {
 			originalName: rawBlock.blockName,
-			originalContent,
+			originalContent: rawBlock.sourceMarkup,
 			originalUndelimitedContent,
 		},
-		innerHTML: rawBlock.blockName ? originalContent : rawBlock.innerHTML,
+		innerHTML: rawBlock.sourceMarkup,
 		innerBlocks: rawBlock.innerBlocks,
 		innerContent: rawBlock.innerContent,
 	};
@@ -228,6 +230,7 @@ export function parseRawBlock( rawBlock ) {
 		parsedInnerBlocks
 	);
 	parsedBlock.originalContent = normalizedBlock.innerHTML;
+	parsedBlock.sourceMarkup = normalizedBlock.sourceMarkup;
 
 	const validatedBlock = applyBlockValidation( parsedBlock, blockType );
 	const { validationIssues } = validatedBlock;

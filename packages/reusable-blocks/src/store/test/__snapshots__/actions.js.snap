@@ -15,6 +15,7 @@ Array [
         "isValid": true,
         "name": "core/test-block",
         "originalContent": "",
+        "sourceMarkup": "<!-- wp:test-block {\\"name\\":\\"Oscar the Grouch\\"} /-->",
         "validationIssues": Array [],
       },
       Object {
@@ -25,12 +26,17 @@ Array [
         "isValid": true,
         "name": "core/test-block",
         "originalContent": "",
+        "sourceMarkup": "<!-- wp:test-block {\\"name\\":\\"Cookie Monster\\"} /-->",
         "validationIssues": Array [],
       },
     ],
     "isValid": true,
     "name": "core/test-block",
     "originalContent": "",
+    "sourceMarkup": "<!-- wp:test-block {\\"name\\":\\"Big Bird\\"} -->
+<!-- wp:test-block {\\"name\\":\\"Oscar the Grouch\\"} /-->
+<!-- wp:test-block {\\"name\\":\\"Cookie Monster\\"} /-->
+<!-- /wp:test-block -->",
     "validationIssues": Array [],
   },
 ]
