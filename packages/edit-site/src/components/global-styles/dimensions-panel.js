@@ -6,8 +6,8 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
-	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
 
@@ -22,8 +22,9 @@ export function useHasDimensionsPanel( name ) {
 	const hasPadding = useHasPadding( name );
 	const hasMargin = useHasMargin( name );
 	const hasGap = useHasGap( name );
+	const hasHeight = useHasHeight( name );
 
-	return hasPadding || hasMargin || hasGap;
+	return hasPadding || hasMargin || hasGap || hasHeight;
 }
 
 function useHasPadding( name ) {
@@ -45,6 +46,13 @@ function useHasGap( name ) {
 	const [ settings ] = useSetting( 'spacing.blockGap', name );
 
 	return settings && supports.includes( '--wp--style--block-gap' );
+}
+
+function useHasHeight( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ settings ] = useSetting( 'dimensions.height', name );
+
+	return settings && supports.includes( 'height' );
 }
 
 function filterValuesBySides( values, sides ) {
@@ -89,6 +97,7 @@ export default function DimensionsPanel( { name } ) {
 	const showPaddingControl = useHasPadding( name );
 	const showMarginControl = useHasMargin( name );
 	const showGapControl = useHasGap( name );
+	const showHeightControl = useHasHeight( name );
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units', name )[ 0 ] || [
 			'%',
@@ -99,6 +108,7 @@ export default function DimensionsPanel( { name } ) {
 		],
 	} );
 
+	// Padding.
 	const [ rawPadding, setRawPadding ] = useStyle( 'spacing.padding', name );
 	const paddingValues = splitStyleValue( rawPadding );
 	const paddingSides = useCustomSides( name, 'padding' );
@@ -114,6 +124,7 @@ export default function DimensionsPanel( { name } ) {
 	const hasPaddingValue = () =>
 		!! paddingValues && Object.keys( paddingValues ).length;
 
+	// Margin.
 	const [ rawMargin, setRawMargin ] = useStyle( 'spacing.margin', name );
 	const marginValues = splitStyleValue( rawMargin );
 	const marginSides = useCustomSides( name, 'margin' );
@@ -129,11 +140,21 @@ export default function DimensionsPanel( { name } ) {
 	const hasMarginValue = () =>
 		!! marginValues && Object.keys( marginValues ).length;
 
+	// Gap.
 	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
 	const resetGapValue = () => setGapValue( undefined );
 	const hasGapValue = () => !! gapValue;
 
+	// Height.
+	const [ heightValue, setHeightValue ] = useStyle(
+		'dimensions.height',
+		name
+	);
+	const resetHeightValue = () => setHeightValue( undefined );
+	const hasHeightValue = () => !! heightValue;
+
 	const resetAll = () => {
+		resetHeightValue();
 		resetPaddingValue();
 		resetMarginValue();
 		resetGapValue();
@@ -141,6 +162,23 @@ export default function DimensionsPanel( { name } ) {
 
 	return (
 		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
+			{ showHeightControl && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ hasHeightValue }
+					label={ __( 'Height' ) }
+					onDeselect={ resetHeightValue }
+					isShownByDefault={ true }
+				>
+					<UnitControl
+						label={ __( 'Height' ) }
+						value={ heightValue }
+						onChange={ setHeightValue }
+						units={ units }
+						min={ 0 }
+					/>
+				</ToolsPanelItem>
+			) }
 			{ showPaddingControl && (
 				<ToolsPanelItem
 					hasValue={ hasPaddingValue }

@@ -18,6 +18,13 @@ import {
 	useIsGapDisabled,
 } from './gap';
 import {
+	HeightEdit,
+	hasHeightSupport,
+	hasHeightValue,
+	resetHeight,
+	useIsHeightDisabled,
+} from './height';
+import {
 	MarginEdit,
 	hasMarginSupport,
 	hasMarginValue,
@@ -32,6 +39,7 @@ import {
 	useIsPaddingDisabled,
 } from './padding';
 
+export const DIMENSIONS_SUPPORT_KEY = '__experimentalDimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
@@ -40,13 +48,13 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
  * Inspector controls for dimensions support.
  *
  * @param {Object} props Block props.
- *
- * @return {WPElement} Inspector controls for spacing support features.
+ * @return {WPElement} Inspector controls for dimensions support features.
  */
 export function DimensionsPanel( props ) {
 	const isGapDisabled = useIsGapDisabled( props );
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
+	const isHeightDisabled = useIsHeightDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
 
@@ -54,17 +62,24 @@ export function DimensionsPanel( props ) {
 		return null;
 	}
 
+	const defaultDimensionsControls = getBlockSupport( props.name, [
+		DIMENSIONS_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
 	const defaultSpacingControls = getBlockSupport( props.name, [
 		SPACING_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
 
-	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
+	const createResetAllFilter = ( attribute, featureSet ) => (
+		newAttributes
+	) => ( {
 		...newAttributes,
 		style: {
 			...newAttributes.style,
-			spacing: {
-				...newAttributes.style?.spacing,
+			[ featureSet ]: {
+				...newAttributes.style?.[ featureSet ],
 				[ attribute ]: undefined,
 			},
 		},
@@ -72,12 +87,31 @@ export function DimensionsPanel( props ) {
 
 	return (
 		<InspectorControls __experimentalGroup="dimensions">
+			{ ! isHeightDisabled && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => hasHeightValue( props ) }
+					label={ __( 'Height' ) }
+					onDeselect={ () => resetHeight( props ) }
+					resetAllFilter={ createResetAllFilter(
+						'height',
+						'dimensions'
+					) }
+					isShownByDefault={ defaultDimensionsControls?.height }
+					panelId={ props.clientId }
+				>
+					<HeightEdit { ...props } />
+				</ToolsPanelItem>
+			) }
 			{ ! isPaddingDisabled && (
 				<ToolsPanelItem
 					hasValue={ () => hasPaddingValue( props ) }
 					label={ __( 'Padding' ) }
 					onDeselect={ () => resetPadding( props ) }
-					resetAllFilter={ createResetAllFilter( 'padding' ) }
+					resetAllFilter={ createResetAllFilter(
+						'padding',
+						'spacing'
+					) }
 					isShownByDefault={ defaultSpacingControls?.padding }
 					panelId={ props.clientId }
 				>
@@ -89,7 +123,10 @@ export function DimensionsPanel( props ) {
 					hasValue={ () => hasMarginValue( props ) }
 					label={ __( 'Margin' ) }
 					onDeselect={ () => resetMargin( props ) }
-					resetAllFilter={ createResetAllFilter( 'margin' ) }
+					resetAllFilter={ createResetAllFilter(
+						'margin',
+						'spacing'
+					) }
 					isShownByDefault={ defaultSpacingControls?.margin }
 					panelId={ props.clientId }
 				>
@@ -101,7 +138,10 @@ export function DimensionsPanel( props ) {
 					hasValue={ () => hasGapValue( props ) }
 					label={ __( 'Block spacing' ) }
 					onDeselect={ () => resetGap( props ) }
-					resetAllFilter={ createResetAllFilter( 'blockGap' ) }
+					resetAllFilter={ createResetAllFilter(
+						'blockGap',
+						'spacing'
+					) }
 					isShownByDefault={ defaultSpacingControls?.blockGap }
 					panelId={ props.clientId }
 				>
@@ -126,6 +166,7 @@ export function hasDimensionsSupport( blockName ) {
 
 	return (
 		hasGapSupport( blockName ) ||
+		hasHeightSupport( blockName ) ||
 		hasPaddingSupport( blockName ) ||
 		hasMarginSupport( blockName )
 	);
@@ -135,15 +176,15 @@ export function hasDimensionsSupport( blockName ) {
  * Determines whether dimensions support has been disabled.
  *
  * @param {Object} props Block properties.
- *
- * @return {boolean} If spacing support is completely disabled.
+ * @return {boolean} If dimensions support is completely disabled.
  */
 const useIsDimensionsDisabled = ( props = {} ) => {
 	const gapDisabled = useIsGapDisabled( props );
+	const heightDisabled = useIsHeightDisabled( props );
 	const paddingDisabled = useIsPaddingDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
 
-	return gapDisabled && paddingDisabled && marginDisabled;
+	return gapDisabled && heightDisabled && paddingDisabled && marginDisabled;
 };
 
 /**
