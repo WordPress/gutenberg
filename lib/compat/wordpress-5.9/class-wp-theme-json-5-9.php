@@ -1017,10 +1017,16 @@ class WP_Theme_JSON_5_9 {
 	 */
 	private static function get_settings_values_by_slug( $settings, $preset_metadata, $origins ) {
 		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
+		$skip_default_presets =
+			$preset_metadata['path'] == array( 'color', 'duotone' ) &&
+			! _wp_array_get( $settings, array( 'color', 'defaultDuotone' ), true );
 
 		$result = array();
 		foreach ( $origins as $origin ) {
-			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
+			if (
+				! isset( $preset_per_origin[ $origin ] ) ||
+				( 'default' === $origin && $skip_default_presets )
+			) {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
