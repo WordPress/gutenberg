@@ -9,6 +9,28 @@ import { get } from 'lodash';
 import { selectorArgsToStateKey } from './utils';
 
 /** @typedef {Record<string, import('./reducer').State>} State */
+/** @typedef {import('./reducer').StateValue} StateValue */
+
+/**
+ * Returns the raw resolution state value for a given selector name,
+ * and arguments set. May be undefined if the selector has never been resolved
+ * or not resolved for the given set of arguments, otherwise true or false for
+ * resolution started and completed respectively.
+ *
+ * @param {State}      state        Data state.
+ * @param {string}     selectorName Selector name.
+ * @param {unknown[]?} args         Arguments passed to selector.
+ *
+ * @return {StateValue | undefined} isResolving value.
+ */
+export function getResolutionState( state, selectorName, args ) {
+	const map = get( state, [ selectorName ] );
+	if ( ! map ) {
+		return undefined;
+	}
+
+	return map.get( selectorArgsToStateKey( args ) );
+}
 
 /**
  * Returns the raw `isResolving` value for a given selector name,
@@ -23,12 +45,7 @@ import { selectorArgsToStateKey } from './utils';
  * @return {boolean | undefined} isResolving value.
  */
 export function getIsResolving( state, selectorName, args ) {
-	const map = get( state, [ selectorName ] );
-	if ( ! map ) {
-		return undefined;
-	}
-
-	return map.get( selectorArgsToStateKey( args ) );
+	return getResolutionState( state, selectorName, args )?.isResolving;
 }
 
 /**
@@ -42,7 +59,7 @@ export function getIsResolving( state, selectorName, args ) {
  * @return {boolean} Whether resolution has been triggered.
  */
 export function hasStartedResolution( state, selectorName, args ) {
-	return getIsResolving( state, selectorName, args ) !== undefined;
+	return getResolutionState( state, selectorName, args ) !== undefined;
 }
 
 /**
@@ -57,6 +74,36 @@ export function hasStartedResolution( state, selectorName, args ) {
  */
 export function hasFinishedResolution( state, selectorName, args ) {
 	return getIsResolving( state, selectorName, args ) === false;
+}
+
+/**
+ * Returns true if resolution has failed for a given selector
+ * name, and arguments set.
+ *
+ * @param {State}      state        Data state.
+ * @param {string}     selectorName Selector name.
+ * @param {unknown[]?} args         Arguments passed to selector.
+ *
+ * @return {boolean} Has resolution failed
+ */
+export function hasLastResolutionFailed( state, selectorName, args ) {
+	const resolutionState = getResolutionState( state, selectorName, args );
+	const hasFailed = resolutionState && 'error' in resolutionState;
+	return !! hasFailed;
+}
+
+/**
+ * Returns the resolution error for a given selector
+ * name, and arguments set.
+ *
+ * @param {State}      state        Data state.
+ * @param {string}     selectorName Selector name.
+ * @param {unknown[]?} args         Arguments passed to selector.
+ *
+ * @return {Error|undefined} Last resolution error
+ */
+export function getLastResolutionFailure( state, selectorName, args ) {
+	return getResolutionState( state, selectorName, args )?.error;
 }
 
 /**
