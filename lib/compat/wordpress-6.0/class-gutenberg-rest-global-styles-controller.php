@@ -16,6 +16,32 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 	 * @return void
 	 */
 	public function register_routes() {
+		register_rest_route(
+			$this->namespace,
+			// The route.
+			sprintf(
+				'/%s/themes/(?P<stylesheet>%s)',
+				$this->rest_base,
+				// Matches theme's directory: `/themes/<subdirectory>/<theme>/` or `/themes/<theme>/`.
+				// Excludes invalid directory name characters: `/:<>*?"|`.
+				'[^\/:<>\*\?"\|]+(?:\/[^\/:<>\*\?"\|]+)?'
+			),
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_theme_item' ),
+					'permission_callback' => array( $this, 'get_theme_item_permissions_check' ),
+					'args'                => array(
+						'stylesheet' => array(
+							'description'       => __( 'The theme identifier' ),
+							'type'              => 'string',
+							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
+						),
+					),
+				),
+			)
+		);
+
 		// List themes global styles.
 		register_rest_route(
 			$this->namespace,
@@ -58,6 +84,53 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns the given theme global styles config.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_theme_item( $request ) {
+		if ( wp_get_theme()->get_stylesheet() !== $request['stylesheet'] ) {
+			// This endpoint only supports the active theme for now.
+			return new WP_Error(
+				'rest_theme_not_found',
+				__( 'Theme not found.' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$theme  = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
+		$data   = array();
+		$fields = $this->get_fields_for_response( $request );
+
+		if ( rest_is_field_included( 'settings', $fields ) ) {
+			$data['settings'] = $theme->get_settings();
+		}
+
+		if ( rest_is_field_included( 'styles', $fields ) ) {
+			$data['styles'] = $theme->get_raw_data()['styles'];
+		}
+
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
+
+		$response = rest_ensure_response( $data );
+
+		$links = array(
+			'self' => array(
+				'href' => rest_url( sprintf( '%s/%s/themes/%s', $this->namespace, $this->rest_base, $request['stylesheet'] ) ),
+			),
+		);
+
+		$response->add_links( $links );
+
+		return $response;
 	}
 
 	/**
