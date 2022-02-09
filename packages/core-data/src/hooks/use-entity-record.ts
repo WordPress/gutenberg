@@ -27,9 +27,6 @@ interface EntityRecordResolution< RecordType > {
 	 */
 	hasResolved: boolean;
 
-	/** Were there eny edits applied to this entity record? */
-	hasEdits: boolean;
-
 	/** Resolution status */
 	status: Status;
 }
@@ -71,25 +68,8 @@ export default function __experimentalUseEntityRecord< RecordType >(
 	name,
 	recordId
 ): EntityRecordResolution< RecordType > {
-	const {
-		data,
-		isResolving,
-		hasResolved,
-		hasEdits,
-	} = useQuerySelect(
-		( query ) => {
-			const {
-				getEntityRecord,
-				getEditedEntityRecord,
-				hasEditsForEntityRecord,
-			} = query( coreStore );
-			const args = [ kind, name, recordId ];
-			const recordResponse = getEntityRecord( ...args );
-			return {
-				...recordResponse,
-				hasEdits: hasEditsForEntityRecord( ...args ).data,
-			};
-		},
+	const { data, isResolving, hasResolved } = useQuerySelect(
+		( query ) => query( coreStore ).getEntityRecord( kind, name, recordId ),
 		[ kind, name, recordId ]
 	);
 
@@ -109,7 +89,6 @@ export default function __experimentalUseEntityRecord< RecordType >(
 	return {
 		status,
 		record: data,
-		hasEdits,
 		isResolving,
 		hasResolved,
 	};
