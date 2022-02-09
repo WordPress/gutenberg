@@ -98,6 +98,8 @@ export const getSettings = createSelector(
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 			__experimentalReusableBlocks: getReusableBlocks( state ),
+			__experimentalPrioritizePatternsOnQuickInserterRoot:
+				'wp_template' === getEditedPostType( state ),
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
@@ -120,6 +122,7 @@ export const getSettings = createSelector(
 		isFeatureActive( state, 'focusMode' ),
 		isFeatureActive( state, 'fixedToolbar' ),
 		getReusableBlocks( state ),
+		getEditedPostType( state ),
 	]
 );
 

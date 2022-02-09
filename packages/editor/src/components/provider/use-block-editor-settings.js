@@ -148,6 +148,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
 			pageOnFront,
+			__experimentalPrioritizePatternsOnQuickInserterRoot: hasTemplate,
 		} ),
 		[
 			settings,
