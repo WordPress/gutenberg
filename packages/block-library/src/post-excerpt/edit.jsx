@@ -25,7 +25,7 @@ const ELLIPSIS = '…';
 
 export default function PostExcerptEditor( props ) {
 	const {
-		attributes: { moreText, showMoreOnNewLine, excerptLength },
+		attributes: { moreText, showMoreOnNewLine, excerptLength, addMoreText },
 		setAttributes,
 		isSelected,
 		context: { postId, postType, queryId },
@@ -114,7 +114,7 @@ export default function PostExcerptEditor( props ) {
 			</div>
 		);
 	}
-	const readMoreLink = (
+	const readMoreLink = addMoreText ? (
 		<RichText
 			identifier="moreText"
 			className="wp-block-post-excerpt__more-link"
@@ -127,7 +127,7 @@ export default function PostExcerptEditor( props ) {
 			}
 			withoutInteractiveFormatting
 		/>
-	);
+	) : null;
 	const excerptClassName = clsx( 'wp-block-post-excerpt__excerpt', {
 		'is-inline': ! showMoreOnNewLine,
 	} );
@@ -204,6 +204,7 @@ export default function PostExcerptEditor( props ) {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
+							addMoreText: false,
 							showMoreOnNewLine: true,
 							excerptLength: 55,
 						} );
@@ -211,23 +212,43 @@ export default function PostExcerptEditor( props ) {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						hasValue={ () => showMoreOnNewLine !== true }
-						label={ __( 'Show link on new line' ) }
+						hasValue={ () => !! addMoreText }
+						label={ __( 'Add `read more` text' ) }
 						onDeselect={ () =>
-							setAttributes( { showMoreOnNewLine: true } )
+							setAttributes( { addMoreText: false } )
 						}
 						isShownByDefault
 					>
 						<ToggleControl
-							label={ __( 'Show link on new line' ) }
-							checked={ showMoreOnNewLine }
-							onChange={ ( newShowMoreOnNewLine ) =>
+							label={ __( 'Add `read more` text' ) }
+							checked={ !! addMoreText }
+							onChange={ ( newAddMoreText ) =>
 								setAttributes( {
-									showMoreOnNewLine: newShowMoreOnNewLine,
+									addMoreText: newAddMoreText,
 								} )
 							}
 						/>
 					</ToolsPanelItem>
+					{ !! addMoreText && (
+						<ToolsPanelItem
+							hasValue={ () => showMoreOnNewLine !== true }
+							label={ __( 'Show link on new line' ) }
+							onDeselect={ () =>
+								setAttributes( { showMoreOnNewLine: true } )
+							}
+							isShownByDefault
+						>
+							<ToggleControl
+								label={ __( 'Show link on new line' ) }
+								checked={ showMoreOnNewLine }
+								onChange={ ( newShowMoreOnNewLine ) =>
+									setAttributes( {
+										showMoreOnNewLine: newShowMoreOnNewLine,
+									} )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
 						hasValue={ () => excerptLength !== 55 }
 						label={ __( 'Max number of words' ) }
@@ -250,8 +271,8 @@ export default function PostExcerptEditor( props ) {
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ excerptContent }
-				{ ! showMoreOnNewLine && ' ' }
-				{ showMoreOnNewLine ? (
+				{ addMoreText && ! showMoreOnNewLine && ' ' }
+				{ addMoreText && showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
 						{ readMoreLink }
 					</p>
