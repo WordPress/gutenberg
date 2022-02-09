@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The bundled `puppeteer-core` dependency has been updated from requiring `^11.0.0` to requiring `^13.2.0` ([#37078](https://github.com/WordPress/gutenberg/pull/37078)).
+
 ## 20.0.2 (2022-01-31)
 
 ### Bug Fix
