@@ -342,7 +342,7 @@ class WP_Theme_JSON_5_9 {
 		// Internally, presets are keyed by origin.
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $node ) {
-			foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
 				$preset = _wp_array_get( $this->theme_json, $path, null );
 				if ( null !== $preset ) {
@@ -928,7 +928,7 @@ class WP_Theme_JSON_5_9 {
 		}
 
 		$stylesheet = '';
-		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 			$slugs = self::get_settings_slugs( $settings, $preset_metadata, $origins );
 			foreach ( $preset_metadata['classes'] as $class => $property ) {
 				foreach ( $slugs as $slug ) {
@@ -1101,7 +1101,7 @@ class WP_Theme_JSON_5_9 {
 	 */
 	private static function compute_preset_vars( $settings, $origins ) {
 		$declarations = array();
-		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 			$values_by_slug = self::get_settings_values_by_slug( $settings, $preset_metadata, $origins );
 			foreach ( $values_by_slug as $slug => $value ) {
 				$declarations[] = array(
@@ -1457,7 +1457,7 @@ class WP_Theme_JSON_5_9 {
 			}
 
 			// Replace the presets.
-			foreach ( self::PRESETS_METADATA as $preset ) {
+			foreach ( static::PRESETS_METADATA as $preset ) {
 				$override_preset = self::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
 
 				foreach ( self::VALID_ORIGINS as $origin ) {
@@ -1587,7 +1587,7 @@ class WP_Theme_JSON_5_9 {
 	private static function get_default_slugs( $data, $node_path ) {
 		$slugs = array();
 
-		foreach ( self::PRESETS_METADATA as $metadata ) {
+		foreach ( static::PRESETS_METADATA as $metadata ) {
 			$path   = array_merge( $node_path, $metadata['path'], array( 'default' ) );
 			$preset = _wp_array_get( $data, $path, null );
 			if ( ! isset( $preset ) ) {
@@ -1718,7 +1718,7 @@ class WP_Theme_JSON_5_9 {
 	 */
 	private static function remove_insecure_settings( $input ) {
 		$output = array();
-		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 			foreach ( self::VALID_ORIGINS as $origin ) {
 				$path_with_origin = array_merge( $preset_metadata['path'], array( $origin ) );
 				$presets          = _wp_array_get( $input, $path_with_origin, null );
