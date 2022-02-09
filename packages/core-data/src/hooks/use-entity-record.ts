@@ -16,10 +16,18 @@ interface EntityRecordResolution< RecordType > {
 	/** The requested entity record with any edits applied*/
 	editedRecord: RecordType | null;
 
-	/** Is the record still being resolved? */
+	/**
+	 * Is the record still being resolved?
+	 *
+	 * Note that isResolving and hasResolved may both be true when the entity record is being re-requested.
+	 */
 	isResolving: boolean;
 
-	/** Is the record resolved by now? */
+	/**
+	 * Is the record resolved by now?
+	 *
+	 * Note that isResolving and hasResolved may both be true when the entity record is being re-requested.
+	 */
 	hasResolved: boolean;
 
 	/** Were there eny edits applied to this entity record? */
