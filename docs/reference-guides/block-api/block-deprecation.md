@@ -17,7 +17,7 @@ Deprecations do not operate as a chain of updates in the way other software data
 
 It is important to note that if a deprecation's `save` method does not produce a valid block then it is skipped completely, including its `migrate` method, even if `isEligible` would return true for the given attributes. This means that if you have several deprecations for a block and want to perform a new migration, like moving content to `InnerBlocks`, you may need to update the `migrate` methods in multiple deprecations in order for the required changes to be applied to all previous versions of the block.
 
-It is also important to note that if a deprecations `save` method imports additional methods you may want to add a snapshot copy of these methods to the deprecations file instead of importing them in order to avoid future changes to these methods inadvertently breaking the deprecations.
+It is also important to note that if a deprecation's `save` method imports additional functions from other files, changes to those files may accidentally change the behavior of the deprecation. You may want to add a snapshot copy of these functions to the deprecations file instead of importing them in order to avoid inadvertently breaking the deprecations.
 
 For blocks with multiple deprecations, it may be easier to save each deprecation to a constant with the version of the block it applies to, and then add each of these to the block's `deprecated` array. The deprecations in the array should be in reverse chronological order. This allows the block editor to attempt to apply the most recent and likely deprecations first, avoiding unnecessary and expensive processing.
 
