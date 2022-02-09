@@ -331,7 +331,7 @@ function RichTextWrapper(
 			<TagName
 				// Overridable props.
 				role="textbox"
-				aria-multiline={ true }
+				aria-multiline={ ! disableLineBreaks }
 				aria-label={ placeholder }
 				{ ...props }
 				{ ...autocompleteProps }
