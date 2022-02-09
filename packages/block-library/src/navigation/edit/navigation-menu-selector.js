@@ -19,7 +19,13 @@ export default function NavigationMenuSelector( {
 	onSelect,
 	onCreateNew,
 	showTools = false,
+	actionLabel,
 } ) {
+	/* translators: %s: The name of a menu. */
+	const createActionLabel = __( "Create from '%s'" );
+
+	actionLabel = actionLabel || createActionLabel;
+
 	const { menus: classicMenus } = useNavigationEntities();
 
 	const {
@@ -61,9 +67,6 @@ export default function NavigationMenuSelector( {
 		return null;
 	}
 
-	/* translators: %s: The name of a menu. */
-	const actionLabel = __( "Create from '%s'" );
-
 	return (
 		<>
 			{ showNavigationMenus && hasNavigationMenus && (
@@ -97,7 +100,10 @@ export default function NavigationMenuSelector( {
 									);
 								} }
 								key={ menu.id }
-								aria-label={ sprintf( actionLabel, label ) }
+								aria-label={ sprintf(
+									createActionLabel,
+									label
+								) }
 							>
 								{ label }
 							</MenuItem>

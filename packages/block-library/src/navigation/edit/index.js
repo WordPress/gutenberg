@@ -497,6 +497,8 @@ function Navigation( {
 										} }
 										onCreateNew={ startWithEmptyMenu }
 										showTools={ true }
+										/* translators: %s: The name of a menu. */
+										actionLabel={ __( "Switch to '%s'" ) }
 									/>
 								) }
 							</ToolbarDropdownMenu>
