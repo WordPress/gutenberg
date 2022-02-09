@@ -743,7 +743,7 @@ class WP_Theme_JSON_5_9 {
 			 * user-generated values take precedence in the CSS cascade.
 			 * @link https://github.com/WordPress/gutenberg/issues/36147.
 			 */
-			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+			if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 				$block_rules .= 'body { margin: 0; }';
 			}
 
@@ -756,7 +756,7 @@ class WP_Theme_JSON_5_9 {
 				$block_rules     .= self::to_ruleset( $selector_duotone, $declarations_duotone );
 			}
 
-			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+			if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
@@ -921,7 +921,7 @@ class WP_Theme_JSON_5_9 {
 	 * @return string The result of processing the presets.
 	 */
 	private static function compute_preset_classes( $settings, $selector, $origins ) {
-		if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
 			$selector = '';
@@ -1313,7 +1313,7 @@ class WP_Theme_JSON_5_9 {
 		// Top-level.
 		$nodes[] = array(
 			'path'     => array( 'settings' ),
-			'selector' => self::ROOT_BLOCK_SELECTOR,
+			'selector' => static::ROOT_BLOCK_SELECTOR,
 		);
 
 		// Calculate paths for blocks.
@@ -1365,7 +1365,7 @@ class WP_Theme_JSON_5_9 {
 		// Top-level.
 		$nodes[] = array(
 			'path'     => array( 'styles' ),
-			'selector' => self::ROOT_BLOCK_SELECTOR,
+			'selector' => static::ROOT_BLOCK_SELECTOR,
 		);
 
 		if ( isset( $theme_json['styles']['elements'] ) ) {
