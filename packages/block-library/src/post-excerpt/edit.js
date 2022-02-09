@@ -25,7 +25,7 @@ import { __ } from '@wordpress/i18n';
 import { useCanEditEntity } from '../utils/hooks';
 
 export default function PostExcerptEditor( {
-	attributes: { textAlign, moreText, showMoreOnNewLine },
+	attributes: { textAlign, moreText, showMoreOnNewLine, addMoreText },
 	setAttributes,
 	isSelected,
 	context: { postId, postType, queryId },
@@ -70,7 +70,7 @@ export default function PostExcerptEditor( {
 			</div>
 		);
 	}
-	const readMoreLink = (
+	const readMoreLink = addMoreText ? (
 		<RichText
 			className="wp-block-post-excerpt__more-link"
 			tagName="a"
@@ -82,7 +82,7 @@ export default function PostExcerptEditor( {
 			}
 			withoutInteractiveFormatting={ true }
 		/>
-	);
+	) : null;
 	const excerptContent = isEditable ? (
 		<RichText
 			className={
@@ -119,20 +119,31 @@ export default function PostExcerptEditor( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Post Excerpt Settings' ) }>
 					<ToggleControl
-						label={ __( 'Show link on new line' ) }
-						checked={ showMoreOnNewLine }
-						onChange={ ( newShowMoreOnNewLine ) =>
+						label={ __( 'Add `read more` text' ) }
+						checked={ !! addMoreText }
+						onChange={ ( newAddMoreText ) =>
 							setAttributes( {
-								showMoreOnNewLine: newShowMoreOnNewLine,
+								addMoreText: newAddMoreText,
 							} )
 						}
 					/>
+					{ !! addMoreText && (
+						<ToggleControl
+							label={ __( 'Show link on new line' ) }
+							checked={ showMoreOnNewLine }
+							onChange={ ( newShowMoreOnNewLine ) =>
+								setAttributes( {
+									showMoreOnNewLine: newShowMoreOnNewLine,
+								} )
+							}
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ excerptContent }
-				{ ! showMoreOnNewLine && ' ' }
-				{ showMoreOnNewLine ? (
+				{ addMoreText && ! showMoreOnNewLine && ' ' }
+				{ addMoreText && showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
 						{ readMoreLink }
 					</p>

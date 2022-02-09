@@ -528,7 +528,7 @@ Display a post's excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/
 -	**Name:** core/post-excerpt
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** moreText, showMoreOnNewLine, textAlign
+-	**Attributes:** addMoreText, moreText, showMoreOnNewLine, textAlign
 
 ## Post Featured Image
 
