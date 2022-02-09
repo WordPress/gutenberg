@@ -749,7 +749,7 @@ describe( 'Navigation', () => {
 	} );
 
 	// eslint-disable-next-line jest/no-focused-tests
-	describe.only( 'Submenus', () => {
+	describe( 'Submenus', () => {
 		it( 'shows button which converts submenu to link when submenu is not-populated (empty)', async () => {
 			const navSubmenuSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]`;
 
