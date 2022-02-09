@@ -24,8 +24,7 @@
 							"width": 96,
 							"height": 96
 						},
-						"innerBlocks": [],
-						"originalContent": ""
+						"innerBlocks": []
 					},
 					{
 						"clientId": "_clientId_1",
@@ -35,8 +34,7 @@
 							"isLink": false,
 							"linkTarget": "_self"
 						},
-						"innerBlocks": [],
-						"originalContent": ""
+						"innerBlocks": []
 					},
 					{
 						"clientId": "_clientId_2",
@@ -45,24 +43,21 @@
 						"attributes": {
 							"isLink": false
 						},
-						"innerBlocks": [],
-						"originalContent": ""
+						"innerBlocks": []
 					},
 					{
 						"clientId": "_clientId_3",
 						"name": "core/comment-content",
 						"isValid": true,
 						"attributes": {},
-						"innerBlocks": [],
-						"originalContent": ""
+						"innerBlocks": []
 					},
 					{
 						"clientId": "_clientId_4",
 						"name": "core/comment-reply-link",
 						"isValid": true,
 						"attributes": {},
-						"innerBlocks": [],
-						"originalContent": ""
+						"innerBlocks": []
 					},
 					{
 						"clientId": "_clientId_5",
@@ -71,13 +66,10 @@
 						"attributes": {
 							"linkTarget": "_self"
 						},
-						"innerBlocks": [],
-						"originalContent": ""
+						"innerBlocks": []
 					}
-				],
-				"originalContent": ""
+				]
 			}
-		],
-		"originalContent": "<div class=\"wp-block-comments-query-loop\"></div>"
+		]
 	}
 ]

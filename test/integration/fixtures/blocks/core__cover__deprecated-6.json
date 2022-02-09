@@ -22,11 +22,9 @@
 					"placeholder": "Write title…",
 					"fontSize": "large"
 				},
-				"innerBlocks": [],
-				"originalContent": "<p class=\"has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>"
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div\n\tclass=\"wp-block-cover has-background-dim-40 has-background-dim\"\n\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=)\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+		]
 	},
 	{
 		"clientId": "_clientId_1",
@@ -56,11 +54,9 @@
 					"content": "",
 					"dropCap": false
 				},
-				"innerBlocks": [],
-				"originalContent": "<p></p>"
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"background-image: url( https://example.com/some-background-image.png ); min-height: 48vw; background-position: 50% 40%;\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+		]
 	},
 	{
 		"clientId": "_clientId_2",
@@ -88,10 +84,8 @@
 					"placeholder": "Write title…",
 					"fontSize": "large"
 				},
-				"innerBlocks": [],
-				"originalContent": "<p class=\"has-text-align-center has-large-font-size\">test</p>"
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div class=\"wp-block-cover has-background-dim has-custom-content-position is-position-bottom-right\"><img class=\"wp-block-cover__image-background wp-image-134\" alt=\"\" src=\"http://localhost:8888/wp-content/uploads/2021/02/percy.jpg\" data-object-fit=\"cover\"/>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+		]
 	}
 ]

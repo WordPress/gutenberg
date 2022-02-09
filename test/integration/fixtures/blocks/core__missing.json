@@ -8,7 +8,6 @@
 			"originalUndelimitedContent": "<p>Testing missing block with some</p>\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>",
 			"originalContent": "<!-- wp:unregistered/example {\"attr1\":\"One\",\"attr2\":\"Two\"} -->\n<p>Testing missing block with some</p>\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>\n<!-- /wp:unregistered/example -->"
 		},
-		"innerBlocks": [],
-		"originalContent": "<!-- wp:unregistered/example {\"attr1\":\"One\",\"attr2\":\"Two\"} -->\n<p>Testing missing block with some</p>\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>\n<!-- /wp:unregistered/example -->"
+		"innerBlocks": []
 	}
 ]

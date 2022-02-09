@@ -4,7 +4,6 @@
 		"name": "core/nextpage",
 		"isValid": true,
 		"attributes": {},
-		"innerBlocks": [],
-		"originalContent": "<!--nextpage-->"
+		"innerBlocks": []
 	}
 ]

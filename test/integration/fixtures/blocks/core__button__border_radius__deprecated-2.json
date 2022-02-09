@@ -15,7 +15,6 @@
 				}
 			}
 		},
-		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-button is-style-outline\"><a class=\"wp-block-button__link has-text-color\" style=\"color:#1b9b6c;border-radius:10px;\">Where We Are</a></div>"
+		"innerBlocks": []
 	}
 ]

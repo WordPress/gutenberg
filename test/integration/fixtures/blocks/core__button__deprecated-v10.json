@@ -7,7 +7,6 @@
 			"text": "My button",
 			"fontFamily": "cambria-georgia"
 		},
-		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-button\" style=\"font-family:var(--wp--preset--font-family--cambria-georgia)\"><a class=\"wp-block-button__link\">My button</a></div>"
+		"innerBlocks": []
 	}
 ]

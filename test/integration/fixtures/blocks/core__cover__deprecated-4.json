@@ -26,10 +26,8 @@
 					"placeholder": "Write title…",
 					"fontSize": "large"
 				},
-				"innerBlocks": [],
-				"originalContent": "<p class=\"has-text-align-center has-large-font-size\"><strong>Cover Block</strong></p>"
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div class=\"wp-block-cover has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==);background-position:7.000000000000001% 7.000000000000001%\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+		]
 	}
 ]

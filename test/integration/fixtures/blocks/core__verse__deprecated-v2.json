@@ -7,7 +7,6 @@
 			"content": "A <em>verse</em>…<br>And more!",
 			"fontFamily": "cambria-georgia"
 		},
-		"innerBlocks": [],
-		"originalContent": "<pre style=\"font-family:var(--wp--preset--font-family--cambria-georgia)\" class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>"
+		"innerBlocks": []
 	}
 ]
