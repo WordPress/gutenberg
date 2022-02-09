@@ -53,7 +53,7 @@ function BlockManager( {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ blockTypes, search, debouncedSpeak ] );
+	}, [ blockTypes.length, search, debouncedSpeak ] );
 
 	return (
 		<div className="edit-post-block-manager__content">
