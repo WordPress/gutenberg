@@ -34,9 +34,9 @@ interface EntityRecordResolution< RecordType > {
 /**
  * Resolves the specified entity record.
  *
- * @param {string} kind     Kind of the requested entity.
- * @param {string} name     Name of the requested  entity.
- * @param {string} recordId Record ID of the requested entity.
+ * @param  kind     Kind of the requested entity.
+ * @param  name     Name of the requested  entity.
+ * @param  recordId Record ID of the requested entity.
  *
  * @example
  * ```js
@@ -64,9 +64,9 @@ interface EntityRecordResolution< RecordType > {
  * @template RecordType
  */
 export default function __experimentalUseEntityRecord< RecordType >(
-	kind,
-	name,
-	recordId
+	kind: string,
+	name: string,
+	recordId: string | number
 ): EntityRecordResolution< RecordType > {
 	const { data, isResolving, hasResolved } = useQuerySelect(
 		( query ) => query( coreStore ).getEntityRecord( kind, name, recordId ),
