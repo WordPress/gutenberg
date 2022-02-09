@@ -21,7 +21,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @var array
 	 */
-	private $theme_json = null;
+	protected $theme_json = null;
 
 	/**
 	 * Holds block metadata extracted from block.json
@@ -426,7 +426,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $output;
 		}
 
-		$output = array_intersect_key( $input, array_flip( self::VALID_TOP_LEVEL_KEYS ) );
+		$output = array_intersect_key( $input, array_flip( static::VALID_TOP_LEVEL_KEYS ) );
 
 		// Some styles are only meant to be available at the top-level (e.g.: blockGap),
 		// hence, the schema for blocks & elements should not have them.
