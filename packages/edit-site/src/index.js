@@ -49,6 +49,7 @@ export async function reinitializeEditor( target, settings ) {
 			/>,
 			target
 		);
+		return;
 	}
 
 	// This will be a no-op if the target doesn't have any React nodes.
