@@ -448,14 +448,14 @@ class WP_Theme_JSON_5_9 {
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
 		foreach ( $valid_block_names as $block ) {
-			$schema_settings_blocks[ $block ]           = self::VALID_SETTINGS;
+			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
 		$schema['styles']             = static::VALID_STYLES;
 		$schema['styles']['blocks']   = $schema_styles_blocks;
 		$schema['styles']['elements'] = $schema_styles_elements;
-		$schema['settings']           = self::VALID_SETTINGS;
+		$schema['settings']           = static::VALID_SETTINGS;
 		$schema['settings']['blocks'] = $schema_settings_blocks;
 
 		// Remove anything that's not present in the schema.
