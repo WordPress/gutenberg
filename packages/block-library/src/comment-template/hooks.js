@@ -8,11 +8,17 @@ import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
- * Return an object with the query args needed to get the comments in the
- * default page.
+ * Return an object with the query args needed to fetch the default page of
+ * comments.
  *
- * @param {*} param0
- * @return {Object} TODO Write JSDOC.
+ * @param {Object}  props             Hook props.
+ * @param {number}  props.postId      ID of the post that contains the comments.
+ * @param {number}  props.perPage     The number of comments included per page.
+ * @param {string}  props.defaultPage Page shown by default (newest/oldest).
+ * @param {boolean} props.inherit     Overwrite props with values from WP
+ *                                    discussion settings.
+ *
+ * @return {Object} Query args to retrieve the comments.
  */
 export const useCommentQueryArgs = ( {
 	postId,
@@ -48,8 +54,8 @@ export const useCommentQueryArgs = ( {
 	defaultPage = defaultPage || defaultCommentsPage;
 
 	// Get the number of the default page.
-	const page = useDefaultPage( {
-		defaultCommentsPage: defaultPage,
+	const page = useDefaultPageIndex( {
+		defaultPage,
 		postId,
 		perPage,
 		queryArgs,
@@ -70,20 +76,20 @@ export const useCommentQueryArgs = ( {
 };
 
 /**
- * Return the index of the default page, depending on whether
- * `defaultCommentsPage` is `newest` or not. If the default page is the newest
- * one, the only way to know the page's index is by using the `X-WP-TotalPages`
- * header. That case sadly forces to make an additional request.
+ * Return the index of the default page, depending on whether `defaultPage` is
+ * `newest` or `oldest`. In the first case, the only way to know the page's
+ * index is by using the `X-WP-TotalPages` header, which forces to make an
+ * additional request.
  *
- * @param {*} param0
- * @return {number} Default comments page index.
+ * @param {Object} props             Hook props.
+ * @param {string} props.defaultPage Page shown by default (newest/oldest).
+ * @param {number} props.postId      ID of the post that contains the comments.
+ * @param {number} props.perPage     The number of comments included per page.
+ * @param {Object} props.queryArgs   Other query args.
+ *
+ * @return {number} Index of the default comments page.
  */
-const useDefaultPage = ( {
-	defaultCommentsPage,
-	postId,
-	perPage,
-	queryArgs,
-} ) => {
+const useDefaultPageIndex = ( { defaultPage, postId, perPage, queryArgs } ) => {
 	// Store the default page indices.
 	const [ defaultPages, setDefaultPages ] = useState( {} );
 	const key = `${ postId }_${ perPage }`;
@@ -91,7 +97,7 @@ const useDefaultPage = ( {
 
 	useEffect( () => {
 		// Do nothing if the page is already known or not the newest page.
-		if ( page || defaultCommentsPage !== 'newest' ) {
+		if ( page || defaultPage !== 'newest' ) {
 			return;
 		}
 		// We need to fetch comments to know the index. Use HEAD and limit
@@ -111,26 +117,29 @@ const useDefaultPage = ( {
 				[ key ]: parseInt( res.headers.get( 'X-WP-TotalPages' ) ),
 			} );
 		} );
-	}, [ defaultCommentsPage, postId, perPage, setDefaultPages ] );
+	}, [ defaultPage, postId, perPage, setDefaultPages ] );
 
 	// The oldest one is always the first one.
-	return defaultCommentsPage === 'newest' ? page : 1;
+	return defaultPage === 'newest' ? page : 1;
 };
 
 /**
- * Generate a tree structure of comment IDs.
+ * Generate a tree structure of comment IDs from a list of comment entities. The
+ * children of each comment are obtained from `_embedded`.
  *
- * @param {*} topLevelComments
- * @return {Object} TODO Write JSDOC.
+ * @typedef {{ commentId: number, children: CommentNode }} CommentNode
+ *
+ * @param {Object[]} topLevelComments List of comment entities.
+ * @return {{ commentTree: CommentNode[]}} Tree of comment IDs.
  */
 export const useCommentTree = ( topLevelComments ) => {
 	const commentTree = useMemo(
 		() =>
 			topLevelComments?.map( ( { id, _embedded } ) => {
-				const [ children ] = _embedded?.children || [];
+				const [ children ] = _embedded?.children || [ [] ];
 				return {
 					commentId: id,
-					children: children?.map( ( child ) => ( {
+					children: children.map( ( child ) => ( {
 						commentId: child.id,
 					} ) ),
 				};
