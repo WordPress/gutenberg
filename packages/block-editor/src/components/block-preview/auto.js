@@ -79,6 +79,9 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						documentElement.style.width = '100%';
 						bodyElement.style.padding =
 							__experimentalPadding + 'px';
+
+						// necessary for contentResizeListener to work.
+						bodyElement.style.position = 'relative';
 					}, [] ) }
 					aria-hidden
 					tabIndex={ -1 }
