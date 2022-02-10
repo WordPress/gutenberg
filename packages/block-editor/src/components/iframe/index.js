@@ -32,11 +32,11 @@ const BLOCK_PREFIX = 'wp-block';
  * contains the `editor-styles-wrapper`, `wp-block`, or `wp-block-*` class
  * selectors.
  *
- * Ideally, this hook should be removed in the future and styles should be added
- * explicitly as editor styles.
+ * This is a compatibility layer. Ideally, this hook should be removed in the
+ * future and styles should be added explicitly as editor styles.
  */
-const useEditorStyles = () =>
-	useRefEffect( ( node ) => {
+function useEditorStylesCompat() {
+	return useRefEffect( ( node ) => {
 		// Search the document for stylesheets targetting the editor canvas.
 		const clonedStyles = [];
 		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
@@ -106,6 +106,7 @@ const useEditorStyles = () =>
 
 		node.addEventListener( 'load', appendStyles );
 	} );
+}
 
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
@@ -272,7 +273,7 @@ function Iframe(
 			{ tabIndex >= 0 && before }
 			<iframe
 				{ ...props }
-				ref={ useMergeRefs( [ ref, setRef, useEditorStyles() ] ) }
+				ref={ useMergeRefs( [ ref, setRef, useEditorStylesCompat() ] ) }
 				tabIndex={ tabIndex }
 				title={ __( 'Editor canvas' ) }
 			>
