@@ -19,7 +19,7 @@ export interface NavMenu {
 	 * Meta fields.
 	 */
 	meta?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * The locations assigned to the menu.

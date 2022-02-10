@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { RawData, PostStatus } from './common';
+
 export interface NavMenuItem {
 	/**
 	 * The title for the object.
@@ -71,20 +76,6 @@ export interface NavMenuItem {
 	 * Meta fields.
 	 */
 	meta?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
-}
-
-/**
- * The raw data representation.
- */
-export interface RawData {
-	/**
-	 * Data as it exists in the database.
-	 */
-	raw?: string;
-	/**
-	 * Data transformed for display.
-	 */
-	rendered?: string;
 }

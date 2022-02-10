@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { RawData } from './common';
+
 export interface Comment {
 	/**
 	 * Unique identifier for the comment.
@@ -75,26 +80,12 @@ export interface Comment {
 		 * Avatar URL with image size of 96 pixels.
 		 */
 		'96'?: string;
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * Meta fields.
 	 */
 	meta?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
-}
-
-/**
- * The raw data representation.
- */
-export interface RawData {
-	/**
-	 * Data as it exists in the database.
-	 */
-	raw?: string;
-	/**
-	 * Data transformed for display.
-	 */
-	rendered?: string;
 }

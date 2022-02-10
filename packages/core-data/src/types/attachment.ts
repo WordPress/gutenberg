@@ -1,7 +1,10 @@
-type PostStatus = 'publish' | 'future' | 'draft' | 'pending' | 'private';
-type PingStatus = 'open' | 'closed';
-type CommentsStatus = 'open' | 'closed';
+/**
+ * Internal dependencies
+ */
+import { RawData, PostStatus, OpenOrClosed } from './common';
+
 type MediaType = 'image' | 'file';
+
 export interface Attachment {
 	/**
 	 * The date the post was published, in the site's timezone.
@@ -62,16 +65,16 @@ export interface Attachment {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status?: CommentsStatus;
+	comment_status?: OpenOrClosed;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status?: PingStatus;
+	ping_status?: OpenOrClosed;
 	/**
 	 * Meta fields.
 	 */
 	meta?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * The theme file to use to display the post.
@@ -101,7 +104,7 @@ export interface Attachment {
 	 * Details about the media file, specific to its type.
 	 */
 	media_details: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * The ID for the associated post of the attachment.
@@ -115,18 +118,4 @@ export interface Attachment {
 	 * List of the missing image sizes of the attachment.
 	 */
 	missing_image_sizes?: string[];
-}
-
-/**
- * The raw data representation.
- */
-export interface RawData {
-	/**
-	 * Data as it exists in the database.
-	 */
-	raw?: string;
-	/**
-	 * Data transformed for display.
-	 */
-	rendered?: string;
 }

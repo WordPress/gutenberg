@@ -1,3 +1,9 @@
+/**
+ * Internal dependencies
+ */
+import { Widget } from './widget';
+import { ActiveOrInactive } from "./common";
+
 export interface Sidebar {
 	/**
 	 * ID of sidebar.
@@ -34,14 +40,11 @@ export interface Sidebar {
 	/**
 	 * Status of sidebar.
 	 */
-	status: 'active' | 'inactive';
+	status: ActiveOrInactive;
 	/**
 	 * Nested widgets.
 	 */
-	widgets: (
-		| {
-				[ k: string ]: unknown;
-		  }
-		| string
-	 )[];
+	widgets: NestedWidget[];
 }
+
+type NestedWidget = Widget | string;

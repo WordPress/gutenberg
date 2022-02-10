@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { OpenOrClosed } from './common';
+
 export interface Settings {
 	/**
 	 * What to show on the front page
@@ -62,11 +67,11 @@ export interface Settings {
 	/**
 	 * Allow link notifications from other blogs (pingbacks and trackbacks) on new articles.
 	 */
-	default_ping_status?: 'open' | 'closed';
+	default_ping_status?: OpenOrClosed;
 	/**
 	 * Allow people to submit comments on new posts.
 	 */
-	default_comment_status?: 'open' | 'closed';
+	default_comment_status?: OpenOrClosed;
 	/**
 	 * Site logo.
 	 */

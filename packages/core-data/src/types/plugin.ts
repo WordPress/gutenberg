@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { ActiveOrInactive, RawData } from './common';
+
 export interface Plugin {
 	/**
 	 * The plugin file.
@@ -6,7 +11,7 @@ export interface Plugin {
 	/**
 	 * The plugin activation status.
 	 */
-	status: 'inactive' | 'active';
+	status: ActiveOrInactive;
 	/**
 	 * The plugin name.
 	 */
@@ -19,7 +24,7 @@ export interface Plugin {
 	 * The plugin author.
 	 */
 	author?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * Plugin author's website address.
@@ -49,18 +54,4 @@ export interface Plugin {
 	 * The plugin's text domain.
 	 */
 	textdomain?: string;
-}
-
-/**
- * The raw data representation.
- */
-export interface RawData {
-	/**
-	 * Data as it exists in the database.
-	 */
-	raw?: string;
-	/**
-	 * Data transformed for display.
-	 */
-	rendered?: string;
 }

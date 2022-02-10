@@ -3,7 +3,7 @@ export interface Type {
 	 * All capabilities used by the post type.
 	 */
 	capabilities?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * A human-readable description of the post type.
@@ -21,7 +21,7 @@ export interface Type {
 	 * Human-readable labels for the post type for various contexts.
 	 */
 	labels?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * The title for the post type.
@@ -35,7 +35,7 @@ export interface Type {
 	 * All features, supported by the post type.
 	 */
 	supports?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * Taxonomies associated with post type.
@@ -52,15 +52,16 @@ export interface Type {
 	/**
 	 * The visibility settings for the post type.
 	 */
-	visibility?: {
-		/**
-		 * Whether to generate a default UI for managing this post type.
-		 */
-		show_ui?: boolean;
-		/**
-		 * Whether to make the post type is available for selection in navigation menus.
-		 */
-		show_in_nav_menus?: boolean;
-		[ k: string ]: unknown;
-	};
+	visibility?: Visibility;
+}
+
+interface Visibility {
+	/**
+	 * Whether to generate a default UI for managing this post type.
+	 */
+	show_ui?: boolean;
+	/**
+	 * Whether to make the post type is available for selection in navigation menus.
+	 */
+	show_in_nav_menus?: boolean;
 }

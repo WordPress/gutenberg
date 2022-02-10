@@ -3,7 +3,7 @@ export interface Taxonomy {
 	 * All capabilities used by the taxonomy.
 	 */
 	capabilities?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * A human-readable description of the taxonomy.
@@ -17,7 +17,7 @@ export interface Taxonomy {
 	 * Human-readable labels for the taxonomy for various contexts.
 	 */
 	labels?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * The title for the taxonomy.
@@ -46,31 +46,32 @@ export interface Taxonomy {
 	/**
 	 * The visibility settings for the taxonomy.
 	 */
-	visibility?: {
-		/**
-		 * Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.
-		 */
-		public?: boolean;
-		/**
-		 * Whether the taxonomy is publicly queryable.
-		 */
-		publicly_queryable?: boolean;
-		/**
-		 * Whether to generate a default UI for managing this taxonomy.
-		 */
-		show_ui?: boolean;
-		/**
-		 * Whether to allow automatic creation of taxonomy columns on associated post-types table.
-		 */
-		show_admin_column?: boolean;
-		/**
-		 * Whether to make the taxonomy available for selection in navigation menus.
-		 */
-		show_in_nav_menus?: boolean;
-		/**
-		 * Whether to show the taxonomy in the quick/bulk edit panel.
-		 */
-		show_in_quick_edit?: boolean;
-		[ k: string ]: unknown;
-	};
+	visibility?: Visibility;
+}
+
+interface Visibility {
+	/**
+	 * Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.
+	 */
+	public?: boolean;
+	/**
+	 * Whether the taxonomy is publicly queryable.
+	 */
+	publicly_queryable?: boolean;
+	/**
+	 * Whether to generate a default UI for managing this taxonomy.
+	 */
+	show_ui?: boolean;
+	/**
+	 * Whether to allow automatic creation of taxonomy columns on associated post-types table.
+	 */
+	show_admin_column?: boolean;
+	/**
+	 * Whether to make the taxonomy available for selection in navigation menus.
+	 */
+	show_in_nav_menus?: boolean;
+	/**
+	 * Whether to show the taxonomy in the quick/bulk edit panel.
+	 */
+	show_in_quick_edit?: boolean;
 }

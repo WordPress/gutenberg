@@ -63,36 +63,38 @@ export interface User {
 	 * All capabilities assigned to the user.
 	 */
 	capabilities?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * Any extra capabilities assigned to the user.
 	 */
 	extra_capabilities?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
 	/**
 	 * Avatar URLs for the user.
 	 */
-	avatar_urls: {
-		/**
-		 * Avatar URL with image size of 24 pixels.
-		 */
-		'24'?: string;
-		/**
-		 * Avatar URL with image size of 48 pixels.
-		 */
-		'48'?: string;
-		/**
-		 * Avatar URL with image size of 96 pixels.
-		 */
-		'96'?: string;
-		[ k: string ]: unknown;
-	};
+	avatar_urls: AvatarUrls;
 	/**
 	 * Meta fields.
 	 */
 	meta?: {
-		[ k: string ]: unknown;
+		[ k: string ]: string;
 	};
+}
+
+interface AvatarUrls {
+	/**
+	 * Avatar URL with image size of 24 pixels.
+	 */
+	'24'?: string;
+	/**
+	 * Avatar URL with image size of 48 pixels.
+	 */
+	'48'?: string;
+	/**
+	 * Avatar URL with image size of 96 pixels.
+	 */
+	'96'?: string;
+	[ k: string ]: string;
 }

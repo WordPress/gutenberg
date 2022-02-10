@@ -22,25 +22,26 @@ export interface Widget {
 	/**
 	 * Instance settings of the widget, if supported.
 	 */
-	instance?: {
-		/**
-		 * Base64 encoded representation of the instance settings.
-		 */
-		encoded?: string;
-		/**
-		 * Cryptographic hash of the instance settings.
-		 */
-		hash?: string;
-		/**
-		 * Unencoded instance settings, if supported.
-		 */
-		raw?: {
-			[ k: string ]: unknown;
-		};
-		[ k: string ]: unknown;
-	};
+	instance?: WidgetInstance;
 	/**
 	 * URL-encoded form data from the widget admin form. Used to update a widget that does not support instance. Write only.
 	 */
 	form_data?: string;
+}
+
+interface WidgetInstance {
+	/**
+	 * Base64 encoded representation of the instance settings.
+	 */
+	encoded?: string;
+	/**
+	 * Cryptographic hash of the instance settings.
+	 */
+	hash?: string;
+	/**
+	 * Unencoded instance settings, if supported.
+	 */
+	raw?: {
+		[ k: string ]: string;
+	};
 }
