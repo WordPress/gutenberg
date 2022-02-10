@@ -19,33 +19,6 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 		// List themes global styles.
 		register_rest_route(
 			$this->namespace,
-			// The route.
-			sprintf(
-				'/%s/themes/(?P<stylesheet>%s)',
-				$this->rest_base,
-				// Matches theme's directory: `/themes/<subdirectory>/<theme>/` or `/themes/<theme>/`.
-				// Excludes invalid directory name characters: `/:<>*?"|`.
-				'[^\/:<>\*\?"\|]+(?:\/[^\/:<>\*\?"\|]+)?'
-			),
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_theme_item' ),
-					'permission_callback' => array( $this, 'get_theme_item_permissions_check' ),
-					'args'                => array(
-						'stylesheet' => array(
-							'description'       => __( 'The theme identifier', 'gutenberg' ),
-							'type'              => 'string',
-							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
-						),
-					),
-				),
-			)
-		);
-
-		// List themes global styles.
-		register_rest_route(
-			$this->namespace,
 			'/' . $this->rest_base . '/themes/(?P<stylesheet>[\/\s%\w\.\(\)\[\]\@_\-]+)/variations',
 			array(
 				array(
