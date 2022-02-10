@@ -258,7 +258,7 @@ Combine blocks into a group. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Name:** core/group
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** tagName, templateLock
+-	**Attributes:** alt, backgroundType, customOverlayColor, dimRatio, focalPoint, hasParallax, id, isRepeated, overlayColor, tagName, templateLock, url
 
 ## Heading
 
