@@ -196,7 +196,17 @@ const PageItems = memo( function PageItems( {
 				} ) }
 			>
 				{ hasChildren && context.openSubmenusOnClick ? (
-					<ItemSubmenuToggle title={ page.title?.rendered } />
+					<>
+						<button
+							className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
+							aria-expanded="false"
+						>
+							{ page.title?.rendered }
+						</button>
+						<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
+							<ItemSubmenuIcon />
+						</span>
+					</>
 				) : (
 					<a
 						className={ classnames(
@@ -213,7 +223,14 @@ const PageItems = memo( function PageItems( {
 				{ hasChildren && (
 					<>
 						{ ! context.openSubmenusOnClick &&
-							context.showSubmenuIcon && <ItemSubmenuToggle /> }
+							context.showSubmenuIcon && (
+								<button
+									className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
+									aria-expanded="false"
+								>
+									<ItemSubmenuIcon />
+								</button>
+							) }
 						<ul
 							className={ classnames( 'submenu-container', {
 								'wp-block-navigation__submenu-container': isNavigationChild,
@@ -232,19 +249,3 @@ const PageItems = memo( function PageItems( {
 		);
 	} );
 } );
-
-function ItemSubmenuToggle( { title } ) {
-	return (
-		<>
-			<button
-				className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
-				aria-expanded="false"
-			>
-				{ title }
-			</button>
-			<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
-				<ItemSubmenuIcon />
-			</span>
-		</>
-	);
-}
