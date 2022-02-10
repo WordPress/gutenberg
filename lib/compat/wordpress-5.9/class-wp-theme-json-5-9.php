@@ -69,35 +69,43 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * This contains the necessary metadata to process them:
 	 *
-	 * - path       => where to find the preset within the settings section
-	 * - override   => whether a theme preset with the same slug as a default preset
-	 *                 can override it or the path to a setting that _prevents_
-	 *                 presets from being overridden
-	 * - value_key  => the key that represents the value
-	 * - value_func => optionally, instead of value_key, a function to generate
-	 *                 the value that takes a preset as an argument
-	 *                 (either value_key or value_func should be present)
-	 * - css_vars   => template string to use in generating the CSS Custom Property.
-	 *                 Example output: "--wp--preset--duotone--blue: <value>" will generate as many CSS Custom Properties as presets defined
-	 *                 substituting the $slug for the slug's value for each preset value.
-	 * - classes    => array containing a structure with the classes to
-	 *                 generate for the presets, where for each array item
-	 *                 the key is the class name and the value the property name.
-	 *                 The "$slug" substring will be replaced by the slug of each preset.
-	 *                 For example:
-	 *                 'classes' => array(
-	 *                   '.has-$slug-color'            => 'color',
-	 *                   '.has-$slug-background-color' => 'background-color',
-	 *                   '.has-$slug-border-color'     => 'border-color',
-	 *                 )
-	 * - properties => array of CSS properties to be used by kses to
-	 *                 validate the content of each preset
-	 *                 by means of the remove_insecure_properties method.
+	 * - path             => Where to find the preset within the settings section.
+	 * - prevent_override => Whether a theme preset with the same slug as a default preset
+	 *                       should not override it or the path to a setting for the same
+	 *                       When defaults.
+	 *                       The relationship between whether to override the defaults
+	 *                       and whether the defaults are enabled is inverse:
+	 *                         - If defaults are enabled  => theme presets should not be overriden
+	 *                         - If defaults are disabled => theme presets should be overriden
+	 *                       For example, a theme sets defaultPalette to false,
+	 *                       making the default palette hidden from the user.
+	 *                       In that case, we want all the theme presets to be present,
+	 *                       so they should override the defaults by setting this false.
+	 * - value_key        => the key that represents the value
+	 * - value_func       => optionally, instead of value_key, a function to generate
+	 *                       the value that takes a preset as an argument
+	 *                       (either value_key or value_func should be present)
+	 * - css_vars         => template string to use in generating the CSS Custom Property.
+	 *                       Example output: "--wp--preset--duotone--blue: <value>" will generate as many CSS Custom Properties as presets defined
+	 *                       substituting the $slug for the slug's value for each preset value.
+	 * - classes          => array containing a structure with the classes to
+	 *                       generate for the presets, where for each array item
+	 *                       the key is the class name and the value the property name.
+	 *                       The "$slug" substring will be replaced by the slug of each preset.
+	 *                       For example:
+	 *                       'classes' => array(
+	 *                         '.has-$slug-color'            => 'color',
+	 *                         '.has-$slug-background-color' => 'background-color',
+	 *                         '.has-$slug-border-color'     => 'border-color',
+	 *                       )
+	 * - properties       => array of CSS properties to be used by kses to
+	 *                       validate the content of each preset
+	 *                       by means of the remove_insecure_properties method.
 	 */
 	const PRESETS_METADATA = array(
 		array(
 			'path'              => array( 'color', 'palette' ),
-			'override'          => array( 'color', 'defaultPalette' ),
+			'prevent_override'  => array( 'color', 'defaultPalette' ),
 			'use_default_names' => false,
 			'value_key'         => 'color',
 			'css_vars'          => '--wp--preset--color--$slug',
@@ -110,7 +118,7 @@ class WP_Theme_JSON_5_9 {
 		),
 		array(
 			'path'              => array( 'color', 'gradients' ),
-			'override'          => array( 'color', 'defaultGradients' ),
+			'prevent_override'  => array( 'color', 'defaultGradients' ),
 			'use_default_names' => false,
 			'value_key'         => 'gradient',
 			'css_vars'          => '--wp--preset--gradient--$slug',
@@ -119,7 +127,7 @@ class WP_Theme_JSON_5_9 {
 		),
 		array(
 			'path'              => array( 'color', 'duotone' ),
-			'override'          => array( 'color', 'defaultDuotone' ),
+			'prevent_override'  => array( 'color', 'defaultDuotone' ),
 			'use_default_names' => false,
 			'value_func'        => 'gutenberg_get_duotone_filter_property',
 			'css_vars'          => '--wp--preset--duotone--$slug',
@@ -128,7 +136,7 @@ class WP_Theme_JSON_5_9 {
 		),
 		array(
 			'path'              => array( 'typography', 'fontSizes' ),
-			'override'          => true,
+			'prevent_override'  => false,
 			'use_default_names' => true,
 			'value_key'         => 'size',
 			'css_vars'          => '--wp--preset--font-size--$slug',
@@ -137,7 +145,7 @@ class WP_Theme_JSON_5_9 {
 		),
 		array(
 			'path'              => array( 'typography', 'fontFamilies' ),
-			'override'          => true,
+			'prevent_override'  => false,
 			'use_default_names' => false,
 			'value_key'         => 'fontFamily',
 			'css_vars'          => '--wp--preset--font-family--$slug',
@@ -1479,7 +1487,7 @@ class WP_Theme_JSON_5_9 {
 
 			// Replace the presets.
 			foreach ( static::PRESETS_METADATA as $preset ) {
-				$override_preset = static::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
+				$override_preset = static::should_override_preset( $this->theme_json, $node['path'], $preset['prevent_override'] );
 
 				foreach ( static::VALID_ORIGINS as $origin ) {
 					$base_path = array_merge( $node['path'], $preset['path'] );
@@ -1552,41 +1560,31 @@ class WP_Theme_JSON_5_9 {
 	}
 
 	/**
-	 * Returns whether a presets should be overriden or not.
+	 * Returns whether a presets should be overridden or not.
 	 *
 	 * @param array      $theme_json The theme.json like structure to inspect.
 	 * @param array      $path Path to inspect.
-	 * @param bool|array $override Data to compute whether to override the preset.
+	 * @param bool|array $prevent_override Data to compute whether to prevent override of the preset.
 	 * @return boolean
 	 */
-	protected static function should_override_preset( $theme_json, $path, $override ) {
-		if ( is_bool( $override ) ) {
-			return $override;
+	protected static function should_override_preset( $theme_json, $path, $prevent_override ) {
+		if ( is_bool( $prevent_override ) ) {
+			return ! $prevent_override;
 		}
 
-		// The relationship between whether to override the defaults
-		// and whether the defaults are enabled is inverse:
-		//
-		// - If defaults are enabled  => theme presets should not be overriden
-		// - If defaults are disabled => theme presets should be overriden
-		//
-		// For example, a theme sets defaultPalette to false,
-		// making the default palette hidden from the user.
-		// In that case, we want all the theme presets to be present,
-		// so they should override the defaults.
-		if ( is_array( $override ) ) {
-			$value = _wp_array_get( $theme_json, array_merge( $path, $override ) );
+		if ( is_array( $prevent_override ) ) {
+			$value = _wp_array_get( $theme_json, array_merge( $path, $prevent_override ) );
 			if ( isset( $value ) ) {
 				return ! $value;
 			}
 
 			// Search the top-level key if none was found for this node.
-			$value = _wp_array_get( $theme_json, array_merge( array( 'settings' ), $override ) );
+			$value = _wp_array_get( $theme_json, array_merge( array( 'settings' ), $prevent_override ) );
 			if ( isset( $value ) ) {
 				return ! $value;
 			}
 
-			return true;
+			return false;
 		}
 	}
 
