@@ -185,32 +185,35 @@ const PaletteScreen = () => {
 				</NavBar>
 			) }
 
-			{ currentSegmentColors.map( ( palette, paletteKey ) => {
-				const paletteSettings = {
-					colors: palette.colors,
-					gradients: palette.gradients,
-					allColors: allAvailableColors,
-				};
-				const enableCustomColor =
-					! isGradientSegment && palette.name === THEME_PALETTE_NAME;
+			<View style={ styles.colorPalettes }>
+				{ currentSegmentColors.map( ( palette, paletteKey ) => {
+					const paletteSettings = {
+						colors: palette.colors,
+						gradients: palette.gradients,
+						allColors: allAvailableColors,
+					};
+					const enableCustomColor =
+						! isGradientSegment &&
+						palette.name === THEME_PALETTE_NAME;
 
-				return (
-					<ColorPalette
-						enableCustomColor={ enableCustomColor }
-						label={ palette.name }
-						key={ paletteKey }
-						setColor={ setColor }
-						activeColor={ currentValue }
-						isGradientColor={ isGradientColor }
-						currentSegment={ currentSegment }
-						onCustomPress={ onCustomPress }
-						shouldEnableBottomSheetScroll={
-							shouldEnableBottomSheetScroll
-						}
-						defaultSettings={ paletteSettings }
-					/>
-				);
-			} ) }
+					return (
+						<ColorPalette
+							enableCustomColor={ enableCustomColor }
+							label={ palette.name }
+							key={ paletteKey }
+							setColor={ setColor }
+							activeColor={ currentValue }
+							isGradientColor={ isGradientColor }
+							currentSegment={ currentSegment }
+							onCustomPress={ onCustomPress }
+							shouldEnableBottomSheetScroll={
+								shouldEnableBottomSheetScroll
+							}
+							defaultSettings={ paletteSettings }
+						/>
+					);
+				} ) }
+			</View>
 
 			{ isCustomGadientShown && (
 				<>
