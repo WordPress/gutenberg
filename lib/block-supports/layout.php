@@ -53,10 +53,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		$style = '';
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > * {";
-			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
-			$style .= '}';
 			$style  = "$selector > :not(.alignleft):not(.alignright) {";
+			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 			$style .= 'margin-left: auto !important;';
 			$style .= 'margin-right: auto !important;';
 			$style .= '}';
