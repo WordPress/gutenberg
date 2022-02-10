@@ -79,14 +79,14 @@ test.describe( 'Widgets Customizer', () => {
 		// Expect the heading to be found in the preview iframe.
 		await expect(
 			previewFrame.locator(
-				'css=.widget-content * >> role=heading[name="My Heading"]'
+				'css=.widget-content >> role=heading[name="My Heading"]'
 			)
 		).toBeVisible();
 
 		// Expect the search box to be found in the preview iframe.
 		await expect(
 			previewFrame.locator(
-				'css=.widget-content * >> role=searchbox[name="My Search"]'
+				'css=.widget-content >> role=searchbox[name="My Search"]'
 			)
 		).toHaveCount( 1 );
 	} );
