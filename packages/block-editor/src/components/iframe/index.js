@@ -91,6 +91,14 @@ function useEditorStylesCompat() {
 
 		const appendStyles = () => {
 			const doc = node.contentDocument;
+
+			if (
+				doc.readyState !== 'interactive' &&
+				doc.readyState !== 'complete'
+			) {
+				return false;
+			}
+
 			clonedStyles.forEach( ( style ) => {
 				if (
 					doc?.head &&
@@ -102,7 +110,13 @@ function useEditorStylesCompat() {
 					doc.head.appendChild( style );
 				}
 			} );
+
+			return true;
 		};
+
+		if ( appendStyles() ) {
+			return;
+		}
 
 		node.addEventListener( 'load', appendStyles );
 	} );
