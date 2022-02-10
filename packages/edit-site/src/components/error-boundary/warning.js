@@ -15,7 +15,12 @@ function CopyButton( { text, children } ) {
 	);
 }
 
-export default function ErrorBoundaryWarning( { error, reboot } ) {
+export default function ErrorBoundaryWarning( {
+	message,
+	error,
+	reboot,
+	dashboardLink,
+} ) {
 	const actions = [];
 
 	if ( reboot ) {
@@ -34,9 +39,21 @@ export default function ErrorBoundaryWarning( { error, reboot } ) {
 		);
 	}
 
+	if ( dashboardLink ) {
+		actions.push(
+			<Button
+				key="back-to-dashboard"
+				variant="secondary"
+				href={ dashboardLink }
+			>
+				{ __( 'Back to dashboard' ) }
+			</Button>
+		);
+	}
+
 	return (
 		<Warning className="editor-error-boundary" actions={ actions }>
-			{ __( 'The editor has encountered an unexpected error.' ) }
+			{ message }
 		</Warning>
 	);
 }

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,6 +34,14 @@ export default class ErrorBoundary extends Component {
 			return this.props.children;
 		}
 
-		return <ErrorBoundaryWarning error={ error } reboot={ this.reboot } />;
+		return (
+			<ErrorBoundaryWarning
+				message={ __(
+					'The editor has encountered an unexpected error.'
+				) }
+				error={ error }
+				reboot={ this.reboot }
+			/>
+		);
 	}
 }

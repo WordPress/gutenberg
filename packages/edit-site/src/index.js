@@ -13,6 +13,7 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 import { store as viewportStore } from '@wordpress/viewport';
 import { getQueryArgs } from '@wordpress/url';
 
@@ -44,8 +45,12 @@ export async function reinitializeEditor( target, settings ) {
 	} catch ( error ) {
 		render(
 			<ErrorBoundaryWarning
+				message={ __(
+					'The editor is unable to find a block template for the homepage.'
+				) }
 				error={ error }
 				reboot={ () => reinitializeEditor( target, settings ) }
+				dashboardLink="index.php"
 			/>,
 			target
 		);
