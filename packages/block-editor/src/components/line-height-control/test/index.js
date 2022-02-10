@@ -17,7 +17,13 @@ import { BASE_DEFAULT_VALUE, STEP } from '../utils';
 
 const ControlledLineHeightControl = () => {
 	const [ value, setValue ] = useState();
-	return <LineHeightControl value={ value } onChange={ setValue } />;
+	return (
+		<LineHeightControl
+			value={ value }
+			onChange={ setValue }
+			__nextHasNoMarginBottom={ true }
+		/>
+	);
 };
 
 describe( 'LineHeightControl', () => {
