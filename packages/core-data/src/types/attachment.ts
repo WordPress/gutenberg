@@ -1,3 +1,7 @@
+type PostStatus = 'publish' | 'future' | 'draft' | 'pending' | 'private';
+type PingStatus = 'open' | 'closed';
+type CommentsStatus = 'open' | 'closed';
+type MediaType = 'image' | 'file';
 export interface Attachment {
 	/**
 	 * The date the post was published, in the site's timezone.
@@ -34,7 +38,7 @@ export interface Attachment {
 	/**
 	 * A named status for the post.
 	 */
-	status?: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+	status?: PostStatus;
 	/**
 	 * Type of post.
 	 */
@@ -58,11 +62,11 @@ export interface Attachment {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status?: 'open' | 'closed';
+	comment_status?: CommentsStatus;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status?: 'open' | 'closed';
+	ping_status?: PingStatus;
 	/**
 	 * Meta fields.
 	 */
@@ -88,7 +92,7 @@ export interface Attachment {
 	/**
 	 * Attachment type.
 	 */
-	media_type: 'image' | 'file';
+	media_type: MediaType;
 	/**
 	 * The attachment MIME type.
 	 */
