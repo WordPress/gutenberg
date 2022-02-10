@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { EntityRecordWithRawData } from './common';
+import { AvatarUrls, EntityRecordWithRawData } from './common';
 
 export interface Comment< RawType > extends EntityRecordWithRawData {
 	/**
@@ -67,21 +67,7 @@ export interface Comment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * Avatar URLs for the comment author.
 	 */
-	author_avatar_urls: {
-		/**
-		 * Avatar URL with image size of 24 pixels.
-		 */
-		'24'?: string;
-		/**
-		 * Avatar URL with image size of 48 pixels.
-		 */
-		'48'?: string;
-		/**
-		 * Avatar URL with image size of 96 pixels.
-		 */
-		'96'?: string;
-		[ k: string ]: string;
-	};
+	author_avatar_urls: AvatarUrls;
 	/**
 	 * Meta fields.
 	 */

@@ -36,3 +36,20 @@ export type TemplateContent =
 export interface EntityRecordWithRawData<
 	RawType extends RawData = RawObject
 > {}
+
+export interface AvatarUrls {
+	/**
+	 * Avatar URL with image size of 24 pixels.
+	 */
+	'24'?: string;
+	/**
+	 * Avatar URL with image size of 48 pixels.
+	 */
+	'48'?: string;
+	/**
+	 * Avatar URL with image size of 96 pixels.
+	 */
+	'96'?: string;
+
+	[ k: string ]: string;
+}
