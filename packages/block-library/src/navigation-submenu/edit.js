@@ -555,6 +555,9 @@ export default function NavigationSubmenuEdit( {
 		replaceBlock( clientId, newLinkBlock );
 	}
 
+	const canConvertToLink =
+		! selectedBlockHasDescendants || onlyDescendantIsEmptyLink;
+
 	return (
 		<Fragment>
 			<BlockControls>
@@ -568,16 +571,15 @@ export default function NavigationSubmenuEdit( {
 							onClick={ () => setIsLinkOpen( true ) }
 						/>
 					) }
-					{ ( ! selectedBlockHasDescendants ||
-						onlyDescendantIsEmptyLink ) && (
-						<ToolbarButton
-							name="revert"
-							icon={ removeSubmenu }
-							title={ __( 'Convert to Link' ) }
-							onClick={ transformToLink }
-							className="wp-block-navigation__submenu__revert"
-						/>
-					) }
+
+					<ToolbarButton
+						name="revert"
+						icon={ removeSubmenu }
+						title={ __( 'Convert to Link' ) }
+						onClick={ transformToLink }
+						className="wp-block-navigation__submenu__revert"
+						isDisabled={ ! canConvertToLink }
+					/>
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>

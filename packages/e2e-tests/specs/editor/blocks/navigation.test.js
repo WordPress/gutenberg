@@ -762,12 +762,12 @@ describe( 'Navigation', () => {
 			await clickBlockToolbarButton( 'Convert to Link' );
 
 			// Check the Submenu block is no longer present.
-			const convertToLinkButton = await page.$( navSubmenuSelector );
+			const submenuBlock = await page.$( navSubmenuSelector );
 
-			expect( convertToLinkButton ).toBeFalsy();
+			expect( submenuBlock ).toBeFalsy();
 		} );
 
-		it( 'does not show button to convert submenu to link when submenu is populated', async () => {
+		it( 'shows button to convert submenu to link in disabled state when submenu is populated', async () => {
 			await createNewPost();
 			await insertBlock( 'Navigation' );
 
@@ -798,11 +798,12 @@ describe( 'Navigation', () => {
 
 			await clickBlockToolbarButton( 'Select Submenu' );
 
-			const convertToLinkButton = await page.$(
-				'[aria-label="Block tools"] [aria-label="Convert to Link"]'
+			// Check button exists but is in disabled state.
+			const disabledConvertToLinkButton = await page.$(
+				'[aria-label="Block tools"] [aria-label="Convert to Link"][disabled]'
 			);
 
-			expect( convertToLinkButton ).toBeFalsy();
+			expect( disabledConvertToLinkButton ).toBeTruthy();
 		} );
 
 		it( 'shows button to convert submenu to link when submenu is populated with a single incomplete link item', async () => {
@@ -836,8 +837,9 @@ describe( 'Navigation', () => {
 			// no URL of label and can be considered unpopulated.
 			await clickBlockToolbarButton( 'Select Submenu' );
 
+			// Check for non-disabled Convert to Link button
 			const convertToLinkButton = await page.$(
-				'[aria-label="Block tools"] [aria-label="Convert to Link"]'
+				'[aria-label="Block tools"] [aria-label="Convert to Link"]:not([disabled])'
 			);
 
 			expect( convertToLinkButton ).toBeTruthy();
