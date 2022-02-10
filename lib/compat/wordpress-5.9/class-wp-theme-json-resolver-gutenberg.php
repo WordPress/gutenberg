@@ -132,7 +132,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Data from theme.json will be backfilled from existing
 	 * theme supports, if any. Note that if the same data
 	 * is present in theme.json and in theme supports,
-	 * the theme.json takes precendence.
+	 * the theme.json takes precedence.
 	 *
 	 * @param array $deprecated Deprecated argument.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
@@ -165,7 +165,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		* So we take theme supports, transform it to theme.json shape
 		* and merge the self::$theme upon that.
 		*/
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
 		if ( ! self::theme_has_support() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();

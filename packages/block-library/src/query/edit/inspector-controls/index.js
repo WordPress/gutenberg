@@ -8,9 +8,7 @@ import { debounce } from 'lodash';
  */
 import {
 	PanelBody,
-	QueryControls,
 	TextControl,
-	FormTokenField,
 	SelectControl,
 	RangeControl,
 	ToggleControl,
@@ -18,44 +16,21 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useCallback } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import OrderControl from './order-control';
-import { getTermsInfo, usePostTypes } from '../../utils';
-import { MAX_FETCHED_TERMS } from '../../constants';
+import AuthorControl from './author-control';
+import TaxonomyControls from './taxonomy-controls';
+import { usePostTypes } from '../../utils';
 
 const stickyOptions = [
 	{ label: __( 'Include' ), value: '' },
 	{ label: __( 'Exclude' ), value: 'exclude' },
 	{ label: __( 'Only' ), value: 'only' },
 ];
-
-// Helper function to get the term id based on user input in terms `FormTokenField`.
-const getTermIdByTermValue = ( termsMappedByName, termValue ) => {
-	// First we check for exact match by `term.id` or case sensitive `term.name` match.
-	const termId = termValue?.id || termsMappedByName[ termValue ]?.id;
-	if ( termId ) return termId;
-	/**
-	 * Here we make an extra check for entered terms in a non case sensitive way,
-	 * to match user expectations, due to `FormTokenField` behaviour that shows
-	 * suggestions which are case insensitive.
-	 *
-	 * Although WP tries to discourage users to add terms with the same name (case insensitive),
-	 * it's still possible if you manually change the name, as long as the terms have different slugs.
-	 * In this edge case we always apply the first match from the terms list.
-	 */
-	const termValueLower = termValue.toLocaleLowerCase();
-	for ( const term in termsMappedByName ) {
-		if ( term.toLocaleLowerCase() === termValueLower ) {
-			return termsMappedByName[ term ].id;
-		}
-	}
-};
 
 export default function QueryInspectorControls( {
 	attributes: { query, displayLayout },
@@ -65,71 +40,40 @@ export default function QueryInspectorControls( {
 	const {
 		order,
 		orderBy,
-		author: selectedAuthorId,
+		author: authorIds,
 		postType,
 		sticky,
 		inherit,
+		taxQuery,
 	} = query;
-	const [ showCategories, setShowCategories ] = useState( true );
-	const [ showTags, setShowTags ] = useState( true );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
-	const { authorList, categories, tags } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
-		const termsQuery = { per_page: MAX_FETCHED_TERMS };
-		const _categories = getEntityRecords(
-			'taxonomy',
-			'category',
-			termsQuery
-		);
-		const _tags = getEntityRecords( 'taxonomy', 'post_tag', termsQuery );
-		return {
-			categories: getTermsInfo( _categories ),
-			tags: getTermsInfo( _tags ),
-			authorList: getEntityRecords( 'root', 'user', {
-				per_page: -1,
-			} ),
-		};
-	}, [] );
-	useEffect( () => {
-		if ( ! postTypesTaxonomiesMap ) return;
-		const postTypeTaxonomies = postTypesTaxonomiesMap[ postType ];
-		setShowCategories( postTypeTaxonomies.includes( 'category' ) );
-		setShowTags( postTypeTaxonomies.includes( 'post_tag' ) );
-	}, [ postType, postTypesTaxonomiesMap ] );
 	useEffect( () => {
 		setShowSticky( postType === 'post' );
 	}, [ postType ] );
 	const onPostTypeChange = ( newValue ) => {
 		const updateQuery = { postType: newValue };
-		if ( ! postTypesTaxonomiesMap[ newValue ].includes( 'category' ) ) {
-			updateQuery.categoryIds = [];
-		}
-		if ( ! postTypesTaxonomiesMap[ newValue ].includes( 'post_tag' ) ) {
-			updateQuery.tagIds = [];
-		}
+		// We need to dynamically update the `taxQuery` property,
+		// by removing any not supported taxonomy from the query.
+		const supportedTaxonomies = postTypesTaxonomiesMap[ newValue ];
+		const updatedTaxQuery = Object.entries( taxQuery || {} ).reduce(
+			( accumulator, [ taxonomySlug, terms ] ) => {
+				if ( supportedTaxonomies.includes( taxonomySlug ) ) {
+					accumulator[ taxonomySlug ] = terms;
+				}
+				return accumulator;
+			},
+			{}
+		);
+		updateQuery.taxQuery = !! Object.keys( updatedTaxQuery ).length
+			? updatedTaxQuery
+			: undefined;
+
 		if ( newValue !== 'post' ) {
 			updateQuery.sticky = '';
 		}
 		setQuery( updateQuery );
 	};
-	// Handles categories and tags changes.
-	const onTermsChange = ( terms, queryProperty ) => ( newTermValues ) => {
-		const termIds = Array.from(
-			newTermValues.reduce( ( accumulator, termValue ) => {
-				const termId = getTermIdByTermValue(
-					terms.mapByName,
-					termValue
-				);
-				if ( termId ) accumulator.add( termId );
-				return accumulator;
-			}, new Set() )
-		);
-		setQuery( { [ queryProperty ]: termIds } );
-	};
-	const onCategoriesChange = onTermsChange( categories, 'categoryIds' );
-	const onTagsChange = onTermsChange( tags, 'tagIds' );
-
 	const [ querySearch, setQuerySearch ] = useState( query.search );
 	const onChangeDebounced = useCallback(
 		debounce( () => {
@@ -139,42 +83,10 @@ export default function QueryInspectorControls( {
 		}, 250 ),
 		[ querySearch, query.search ]
 	);
-
 	useEffect( () => {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
-
-	// Returns only the existing term ids (categories/tags) in proper
-	// format to be used in `FormTokenField`. This prevents the component
-	// from crashing in the editor, when non existing term ids were provided.
-	const getExistingTermsFormTokenValue = ( taxonomy ) => {
-		const termsMapper = {
-			category: {
-				queryProp: 'categoryIds',
-				terms: categories,
-			},
-			post_tag: {
-				queryProp: 'tagIds',
-				terms: tags,
-			},
-		};
-		const requestedTerm = termsMapper[ taxonomy ];
-		return ( query[ requestedTerm.queryProp ] || [] ).reduce(
-			( accumulator, termId ) => {
-				const term = requestedTerm.terms.mapById[ termId ];
-				if ( term ) {
-					accumulator.push( {
-						id: termId,
-						value: term.name,
-					} );
-				}
-				return accumulator;
-			},
-			[]
-		);
-	};
-
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
@@ -237,34 +149,8 @@ export default function QueryInspectorControls( {
 			</PanelBody>
 			{ ! inherit && (
 				<PanelBody title={ __( 'Filters' ) }>
-					{ showCategories && categories?.terms?.length > 0 && (
-						<FormTokenField
-							label={ __( 'Categories' ) }
-							value={ getExistingTermsFormTokenValue(
-								'category'
-							) }
-							suggestions={ categories.names }
-							onChange={ onCategoriesChange }
-						/>
-					) }
-					{ showTags && tags?.terms?.length > 0 && (
-						<FormTokenField
-							label={ __( 'Tags' ) }
-							value={ getExistingTermsFormTokenValue(
-								'post_tag'
-							) }
-							suggestions={ tags.names }
-							onChange={ onTagsChange }
-						/>
-					) }
-					<QueryControls
-						{ ...{ selectedAuthorId, authorList } }
-						onAuthorChange={ ( value ) =>
-							setQuery( {
-								author: value !== '' ? +value : undefined,
-							} )
-						}
-					/>
+					<TaxonomyControls onChange={ setQuery } query={ query } />
+					<AuthorControl value={ authorIds } onChange={ setQuery } />
 					<TextControl
 						label={ __( 'Keyword' ) }
 						value={ querySearch }

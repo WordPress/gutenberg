@@ -245,7 +245,7 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
  * @return string
  */
 function block_core_navigation_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
+	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
 
@@ -342,6 +342,8 @@ function block_core_navigation_get_fallback_blocks() {
 	 * Returning a falsey value will opt out of the fallback and cause the block not to render.
 	 * To customise the blocks provided return an array of blocks - these should be valid
 	 * children of the `core/navigation` block.
+	 *
+	 * @since 5.9.0
 	 *
 	 * @param array[] default fallback blocks provided by the default block mechanic.
 	 */
@@ -537,12 +539,16 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$is_hidden_by_default ? 'always-shown' : '',
 	);
 
+	$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
+	$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
+	$toggle_button_content     = $should_display_icon_label ? $toggle_button_icon : 'Menu';
+
 	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="modal-%1$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
+		'<button aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="modal-%1$s">%9$s</button>
 			<div class="%5$s" style="%7$s" id="modal-%1$s">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
-							<button aria-label="%4$s" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
+							<button aria-label="%4$s" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
 						<div class="wp-block-navigation__responsive-container-content" id="modal-%1$s-content">
 							%2$s
 						</div>
@@ -556,7 +562,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		esc_attr( implode( ' ', $responsive_container_classes ) ),
 		esc_attr( implode( ' ', $open_button_classes ) ),
 		safecss_filter_attr( $colors['overlay_inline_styles'] ),
-		__( 'Menu' )
+		__( 'Menu' ),
+		$toggle_button_content
 	);
 
 	return sprintf(

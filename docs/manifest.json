@@ -138,9 +138,21 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Block Supports",
+		"slug": "block-supports",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Creating dynamic blocks",
 		"slug": "creating-dynamic-blocks",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Block Supports in dynamic blocks",
+		"slug": "block-supports-in-dynamic-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md",
 		"parent": "block-tutorial"
 	},
 	{
@@ -2007,6 +2019,12 @@
 		"title": "React Native Integration Test Guide",
 		"slug": "integration-test-guide",
 		"markdown_source": "../docs/contributors/code/react-native/integration-test-guide.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "React Native Internationalization Guide",
+		"slug": "internationalization-guide",
+		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
 		"parent": "react-native"
 	},
 	{

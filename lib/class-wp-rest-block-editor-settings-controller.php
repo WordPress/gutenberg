@@ -76,7 +76,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
 		$editor_context = new WP_Block_Editor_Context();
-		$settings       = gutenberg_get_block_editor_settings( array(), $editor_context );
+		$settings       = get_block_editor_settings( array(), $editor_context );
 
 		return rest_ensure_response( $settings );
 	}

@@ -23,6 +23,7 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
+import ModeSwitcher from '../mode-switcher';
 
 const POPOVER_PROPS = {
 	className: 'edit-site-more-menu__content',
@@ -76,6 +77,7 @@ export default function MoreMenu() {
 									'Spotlight mode deactivated'
 								) }
 							/>
+							<ModeSwitcher />
 							<ActionItem.Slot
 								name="core/edit-site/plugin-more-menu"
 								label={ __( 'Plugins' ) }

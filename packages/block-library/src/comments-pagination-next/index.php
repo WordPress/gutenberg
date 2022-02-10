@@ -24,7 +24,7 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 	}
 	$comments_number  = (int) get_comments_number();
 	$max_page         = 0 !== $per_page ? (int) floor( $comments_number / $per_page ) : 0;
-	$default_label    = __( 'Next Comments' );
+	$default_label    = __( 'Newer Comments' );
 	$label            = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow = get_comments_pagination_arrow( $block, 'next' );
 

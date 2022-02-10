@@ -53,23 +53,17 @@ export function TemplatePanel() {
 			select( editorStore ).getEditorSettings().supportsTemplateMode &&
 			_isViewable;
 
-		const wpTemplates = getEntityRecords( 'postType', 'wp_template', {
+		const templateRecords = getEntityRecords( 'postType', 'wp_template', {
 			post_type: currentPostType,
+			per_page: -1,
 		} );
-
-		const newAvailableTemplates = fromPairs(
-			( wpTemplates || [] ).map( ( { slug, title } ) => [
-				slug,
-				title.rendered,
-			] )
-		);
 
 		return {
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 			selectedTemplate: getEditedPostAttribute( 'template' ),
 			availableTemplates: getEditorSettings().availableTemplates,
-			fetchedTemplates: newAvailableTemplates,
+			fetchedTemplates: templateRecords,
 			template: _supportsTemplateMode && getEditedPostTemplate(),
 			isViewable: _isViewable,
 			supportsTemplateMode: _supportsTemplateMode,
@@ -80,7 +74,12 @@ export function TemplatePanel() {
 	const templates = useMemo( () => {
 		return {
 			...availableTemplates,
-			...fetchedTemplates,
+			...fromPairs(
+				( fetchedTemplates ?? [] ).map( ( { slug, title } ) => [
+					slug,
+					title.rendered,
+				] )
+			),
 		};
 	}, [ availableTemplates, fetchedTemplates ] );
 
