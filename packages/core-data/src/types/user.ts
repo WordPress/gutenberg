@@ -96,5 +96,6 @@ interface AvatarUrls {
 	 * Avatar URL with image size of 96 pixels.
 	 */
 	'96'?: string;
+
 	[ k: string ]: string;
 }

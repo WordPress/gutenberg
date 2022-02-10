@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { Widget } from './widget';
-import { ActiveOrInactive } from "./common";
+import { ActiveOrInactive } from './common';
 
 export interface Sidebar {
 	/**
