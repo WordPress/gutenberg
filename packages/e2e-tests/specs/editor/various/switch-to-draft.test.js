@@ -40,7 +40,7 @@ async function publishTestPost( postType, viewport ) {
 	await publishPost();
 
 	await page.waitForXPath(
-		`//*[contains(@class, "components-snackbar")]/*[text()="${ capitalizedPostType } published."]`
+		`//*[@aria-label="Dismiss this notice"]/div[contains(text(), "${ capitalizedPostType } published.")]`
 	);
 
 	const closePublishingPanel = await page.waitForXPath(
@@ -63,16 +63,14 @@ async function scheduleTestPost( postType, viewport ) {
 	);
 
 	await (
-		await page.$x(
-			'//td[contains(concat(" ", @class, " "), " CalendarDay ")]/div[contains(concat(" ", @class, " "), " components-datetime__date__day ")][text() = "15"]'
-		)
+		await page.$x( '//td[@role="button"]/*[text() = "15"]' )
 	 )[ 0 ].click();
 
 	await page.click( '.edit-post-post-schedule__toggle' );
 
 	if ( viewport === 'small' ) {
 		const closeDocumentSettingsButton = await page.waitForXPath(
-			'//div[contains(@class,"interface-complementary-area-header__small")]/button[@aria-label="Close settings"]'
+			'//div[@aria-label="Editor settings"]//button[@aria-label="Close settings"]'
 		);
 		await closeDocumentSettingsButton.click();
 	}
@@ -137,6 +135,11 @@ describe( 'Clicking "Switch to draft" on a published post/page', () => {
 					expect( postStatus ).toBe( 'publish' );
 				} );
 				it( `should revert a published ${ postType } to a draft if confirmed`, async () => {
+					// Capitalize postType for use in snackbar XPath
+					const capitalizedPostType =
+						postType.charAt( 0 ).toUpperCase() +
+						postType.slice( 1 );
+
 					// Switch to draft
 					const switchToDraftButton = await page.waitForXPath(
 						`//button[contains(text(), "${ buttonText }")]`
@@ -151,6 +154,10 @@ describe( 'Clicking "Switch to draft" on a published post/page', () => {
 						'//*[@role="dialog"]//button[text()="OK"]'
 					);
 					await confirmButton.click();
+
+					await page.waitForXPath(
+						`//*[@aria-label="Dismiss this notice"]/div[contains(text(), "${ capitalizedPostType } reverted to draft.")]`
+					);
 
 					const postStatus = await page.evaluate( () => {
 						return wp.data
@@ -208,6 +215,11 @@ describe( 'Clicking "Switch to draft" on a scheduled post/page', () => {
 					expect( postStatus ).toBe( 'future' );
 				} );
 				it( `should revert a scheduled ${ postType } to a draft if confirmed`, async () => {
+					// Capitalize postType for use in snackbar XPath
+					const capitalizedPostType =
+						postType.charAt( 0 ).toUpperCase() +
+						postType.slice( 1 );
+
 					// Switch to draft
 					const switchToDraftButton = await page.waitForXPath(
 						`//button[contains(text(), "${ buttonText }")]`
@@ -223,9 +235,8 @@ describe( 'Clicking "Switch to draft" on a scheduled post/page', () => {
 					);
 					await confirmButton.click();
 
-					// Confirm that the post is now a draft by verifying the presence of the "Publish" button
 					await page.waitForXPath(
-						'//button[contains(@class,"editor-post-publish-button__button")][not(contains(@class,"is-busy"))]'
+						`//*[@aria-label="Dismiss this notice"]/div[contains(text(), "${ capitalizedPostType } reverted to draft.")]`
 					);
 
 					const postStatus = await page.evaluate( () => {
