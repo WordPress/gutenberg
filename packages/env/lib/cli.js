@@ -197,6 +197,12 @@ module.exports = function cli() {
 		() => {},
 		withSpinner( env.destroy )
 	);
+	yargs.command(
+		'install-path',
+		'Get the path where environment files are located.',
+		() => {},
+		withSpinner( env.installPath )
+	);
 
 	return yargs;
 };

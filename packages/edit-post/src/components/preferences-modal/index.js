@@ -55,19 +55,32 @@ import BlockManager from '../block-manager';
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
 
-function NavigationButton( {
-	as: Tag = Button,
-	path,
-	isBack = false,
-	...props
-} ) {
-	const navigator = useNavigator();
+function NavigationButton( { as: Tag = Button, path, ...props } ) {
+	const { goTo } = useNavigator();
+
+	const dataAttrName = 'data-navigator-focusable-id';
+	const dataAttrValue = path;
+
+	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+
+	const tagProps = {
+		...props,
+		[ dataAttrName ]: dataAttrValue,
+	};
+
 	return (
 		<Tag
-			onClick={ () => navigator.push( path, { isBack } ) }
-			{ ...props }
+			onClick={ () =>
+				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
+			}
+			{ ...tagProps }
 		/>
 	);
+}
+
+function NavigationBackButton( { as: Tag = Button, ...props } ) {
+	const { goBack } = useNavigator();
+	return <Tag onClick={ goBack } { ...props } />;
 }
 
 export default function PreferencesModal() {
@@ -376,12 +389,10 @@ export default function PreferencesModal() {
 									size="small"
 									gap="6"
 								>
-									<NavigationButton
-										path="/"
+									<NavigationBackButton
 										icon={
 											isRTL() ? chevronRight : chevronLeft
 										}
-										isBack
 										aria-label={ __(
 											'Navigate to the previous view'
 										) }

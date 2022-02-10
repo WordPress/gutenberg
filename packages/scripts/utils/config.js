@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-const { basename, dirname, join } = require( 'path' );
+const chalk = require( 'chalk' );
+const { basename, dirname, extname, join, sep } = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
 
 /**
@@ -15,6 +16,8 @@ const {
 } = require( './cli' );
 const { fromConfigRoot, fromProjectRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
+const { exit } = require( './process' );
+const { log } = console;
 
 // See https://babeljs.io/docs/en/config-files#configuration-file-types.
 const hasBabelConfig = () =>
@@ -186,8 +189,10 @@ function getWebpackEntryPoints() {
 	const blockMetadataFiles = glob( 'src/**/block.json', {
 		absolute: true,
 	} );
+
 	if ( blockMetadataFiles.length > 0 ) {
-		return blockMetadataFiles.reduce(
+		const srcDirectory = fromProjectRoot( 'src' + sep );
+		const entryPoints = blockMetadataFiles.reduce(
 			( accumulator, blockMetadataFile ) => {
 				const {
 					editorScript,
@@ -205,12 +210,23 @@ function getWebpackEntryPoints() {
 						);
 
 						// Takes the path without the file extension, and relative to the `src` directory.
-						const [ , entryName ] = filepath
-							.split( '.' )[ 0 ]
-							.split( 'src/' );
-						if ( ! entryName ) {
+						if ( ! filepath.startsWith( srcDirectory ) ) {
+							log(
+								chalk.yellow(
+									`Skipping "${ value.replace(
+										'file:',
+										''
+									) }" listed in "${ blockMetadataFile.replace(
+										fromProjectRoot( sep ),
+										''
+									) }". File is located outside of the "src" directory.`
+								)
+							);
 							return;
 						}
+						const entryName = filepath
+							.replace( extname( filepath ), '' )
+							.replace( srcDirectory, '' );
 
 						// Detects the proper file extension used in the `src` directory.
 						const [ entryFilepath ] = glob(
@@ -220,12 +236,30 @@ function getWebpackEntryPoints() {
 							}
 						);
 
+						if ( ! entryFilepath ) {
+							log(
+								chalk.yellow(
+									`Skipping "${ value.replace(
+										'file:',
+										''
+									) }" listed in "${ blockMetadataFile.replace(
+										fromProjectRoot( sep ),
+										''
+									) }". File does not exist in the "src" directory.`
+								)
+							);
+							return;
+						}
 						accumulator[ entryName ] = entryFilepath;
 					} );
 				return accumulator;
 			},
 			{}
 		);
+
+		if ( Object.keys( entryPoints ).length > 0 ) {
+			return entryPoints;
+		}
 	}
 
 	// 3. Checks whether a standard file name can be detected in the `src` directory,
@@ -234,7 +268,10 @@ function getWebpackEntryPoints() {
 		absolute: true,
 	} );
 	if ( ! entryFile ) {
-		return {};
+		log(
+			chalk.bold.red( 'No entry files discovered in the "src" folder.' )
+		);
+		exit( 1 );
 	}
 
 	return {

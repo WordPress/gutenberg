@@ -45,6 +45,7 @@ import { __ } from '@wordpress/i18n';
  */
 import useListViewModal from './use-list-view-modal';
 import useNavigationMenu from '../use-navigation-menu';
+import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
 import PlaceholderPreview from './placeholder/placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
@@ -106,7 +107,6 @@ function Navigation( {
 	hasSubmenuIndicatorSetting = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
-	customAppender: CustomAppender = null,
 } ) {
 	const {
 		openSubmenusOnClick,
@@ -124,7 +124,7 @@ function Navigation( {
 		setAreaMenu = noop;
 	// Navigation areas are deprecated and on their way out. Let's not perform
 	// the request unless we're in an environment where the endpoint exists.
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		[ areaMenu, setAreaMenu ] = useEntityProp(
 			'root',
@@ -152,6 +152,10 @@ function Navigation( {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		`navigationMenu/${ ref }`
 	);
+
+	// Preload classic menus, so that they don't suddenly pop-in when viewing
+	// the Select Menu dropdown.
+	useNavigationEntities();
 
 	const {
 		hasUncontrolledInnerBlocks,
@@ -486,12 +490,18 @@ function Navigation( {
 							>
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
+										clientId={ clientId }
 										onSelect={ ( { id } ) => {
 											setRef( id );
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
-										showCreate={ canUserCreateNavigation }
+										canUserCreateNavigation={
+											canUserCreateNavigation
+										}
+										canUserSwitchNavigation={
+											canSwitchNavigationMenu
+										}
 									/>
 								) }
 							</ToolbarDropdownMenu>
@@ -688,7 +698,6 @@ function Navigation( {
 								<NavigationInnerBlocks
 									isVisible={ ! isPlaceholderShown }
 									clientId={ clientId }
-									appender={ CustomAppender }
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}

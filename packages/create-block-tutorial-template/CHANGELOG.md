@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.4.0 (2022-01-27)
+
 ### Enhancement
 
 -   Speed up scaffolding process by omitting WordPress dependencies in the template ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).

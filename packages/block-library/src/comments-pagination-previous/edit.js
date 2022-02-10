@@ -32,8 +32,8 @@ export default function CommentsPaginationPreviousEdit( {
 			<PlainText
 				__experimentalVersion={ 2 }
 				tagName="span"
-				aria-label={ __( 'Previous comments page link' ) }
-				placeholder={ __( 'Previous Comments' ) }
+				aria-label={ __( 'Older comments page link' ) }
+				placeholder={ __( 'Older Comments' ) }
 				value={ label }
 				onChange={ ( newLabel ) =>
 					setAttributes( { label: newLabel } )

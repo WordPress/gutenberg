@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
-	BlockPreview,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
+	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -29,13 +29,63 @@ const TEMPLATE = [
 ];
 
 /**
+ * Function that returns a comment structure that will be rendered with default placehoders.
+ *
+ * @param {Object}  settings                       Discussion Settings.
+ * @param {number}  [settings.perPage]             - Comments per page setting or block attribute.
+ * @param {boolean} [settings.threadComments]      - Enable threaded (nested) comments setting.
+ * @param {number}  [settings.threadCommentsDepth] - Level deep of threaded comments.
+ *
+ * @typedef {{id: null, children: EmptyComment[]}} EmptyComment
+ * @return {EmptyComment[]}                 		Inner blocks of the Comment Template
+ */
+const getCommentsPlaceholder = ( {
+	perPage,
+	threadComments,
+	threadCommentsDepth,
+} ) => {
+	// In case that `threadCommentsDepth` is falsy, we default to a somewhat
+	// arbitrary value of 3.
+	// In case that the value is set but larger than 3 we truncate it to 3.
+	const commentsDepth = Math.min( threadCommentsDepth || 3, 3 );
+
+	// We set a limit in order not to overload the editor of empty comments.
+	const defaultCommentsToShow =
+		perPage <= commentsDepth ? perPage : commentsDepth;
+	if ( ! threadComments || defaultCommentsToShow === 1 ) {
+		// If displaying threaded comments is disabled, we only show one comment
+		return [ { commentId: null, children: [] } ];
+	} else if ( defaultCommentsToShow === 2 ) {
+		return [
+			{
+				commentId: null,
+				children: [ { commentId: null, children: [] } ],
+			},
+		];
+	}
+
+	// In case that the value is set but larger than 3 we truncate it to 3.
+	return [
+		{
+			commentId: null,
+			children: [
+				{
+					commentId: null,
+					children: [ { commentId: null, children: [] } ],
+				},
+			],
+		},
+	];
+};
+
+/**
  * Component which renders the inner blocks of the Comment Template.
  *
  * @param {Object} props                    Component props.
  * @param {Array}  [props.comment]          - A comment object.
  * @param {Array}  [props.activeComment]    - The block that is currently active.
  * @param {Array}  [props.setActiveComment] - The setter for activeComment.
- * @param {Array}  [props.firstBlock]       - First comment in the array.
+ * @param {Array}  [props.firstComment]     - First comment in the array.
  * @param {Array}  [props.blocks]           - Array of blocks returned from
  *                                          getBlocks() in parent .
  * @return {WPElement}                 		Inner blocks of the Comment Template
@@ -44,7 +94,7 @@ function CommentTemplateInnerBlocks( {
 	comment,
 	activeComment,
 	setActiveComment,
-	firstBlock,
+	firstComment,
 	blocks,
 } ) {
 	const { children, ...innerBlocksProps } = useInnerBlocksProps(
@@ -53,15 +103,22 @@ function CommentTemplateInnerBlocks( {
 	);
 	return (
 		<li { ...innerBlocksProps }>
-			{ comment === ( activeComment || firstBlock ) ? (
-				children
-			) : (
-				<BlockPreview
-					blocks={ blocks }
-					__experimentalLive
-					__experimentalOnClick={ () => setActiveComment( comment ) }
-				/>
-			) }
+			{ comment === ( activeComment || firstComment ) ? children : null }
+
+			{ /* To avoid flicker when switching active block contexts, a preview
+			is ALWAYS rendered and the preview for the active block is hidden. 
+			This ensures that when switching the active block, the component is not 
+			mounted again but rather it only toggles the `isHidden` prop.
+			
+			The same strategy is used for preventing the flicker in the Post Template
+			block. */ }
+			<MemoizedCommentTemplatePreview
+				blocks={ blocks }
+				comment={ comment }
+				setActiveComment={ setActiveComment }
+				isHidden={ comment === ( activeComment || firstComment ) }
+			/>
+
 			{ comment?.children?.length > 0 ? (
 				<CommentsList
 					comments={ comment.children }
@@ -73,6 +130,44 @@ function CommentTemplateInnerBlocks( {
 		</li>
 	);
 }
+
+const CommentTemplatePreview = ( {
+	blocks,
+	comment,
+	setActiveComment,
+	isHidden,
+} ) => {
+	const blockPreviewProps = useBlockPreview( {
+		blocks,
+	} );
+
+	const handleOnClick = () => {
+		setActiveComment( comment );
+	};
+
+	// We have to hide the preview block if the `comment` props points to
+	// the curently active block!
+
+	// Or, to put it differently, every preview block is visible unless it is the
+	// currently active block - in this case we render its inner blocks.
+	const style = {
+		display: isHidden ? 'none' : undefined,
+	};
+
+	return (
+		<div
+			{ ...blockPreviewProps }
+			tabIndex={ 0 }
+			role="button"
+			style={ style }
+			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
+			onClick={ handleOnClick }
+			onKeyPress={ handleOnClick }
+		/>
+	);
+};
+
+const MemoizedCommentTemplatePreview = memo( CommentTemplatePreview );
 
 /**
  * Component that renders a list of (nested) comments. It is called recursively.
@@ -95,9 +190,9 @@ const CommentsList = ( {
 } ) => (
 	<ol { ...blockProps }>
 		{ comments &&
-			comments.map( ( comment ) => (
+			comments.map( ( comment, index ) => (
 				<BlockContextProvider
-					key={ comment.commentId }
+					key={ comment.commentId || index }
 					value={ comment }
 				>
 					<CommentTemplateInnerBlocks
@@ -105,7 +200,7 @@ const CommentsList = ( {
 						activeComment={ activeComment }
 						setActiveComment={ setActiveComment }
 						blocks={ blocks }
-						firstBlock={ comments[ 0 ] }
+						firstComment={ comments[ 0 ] }
 					/>
 				</BlockContextProvider>
 			) ) }
@@ -114,38 +209,55 @@ const CommentsList = ( {
 
 export default function CommentTemplateEdit( {
 	clientId,
-	context: { postId, 'comments/perPage': perPage },
+	context: { postId, 'comments/perPage': perPage, 'comments/order': order },
 } ) {
 	const blockProps = useBlockProps();
 
 	const [ activeComment, setActiveComment ] = useState();
+	const {
+		commentOrder,
+		commentsPerPage,
+		threadCommentsDepth,
+		threadComments,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalDiscussionSettings;
+	} );
 
 	const { rawComments, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 
+			const commentQuery = {
+				post: postId,
+				status: 'approve',
+				context: 'embed',
+				order: order || commentOrder,
+			};
+
+			if ( order ) {
+				commentQuery.order = order;
+			}
 			return {
-				rawComments: getEntityRecords( 'root', 'comment', {
-					post: postId,
-					status: 'approve',
-					order: 'asc',
-					context: 'embed',
-				} ),
+				rawComments: getEntityRecords(
+					'root',
+					'comment',
+					commentQuery
+				),
 				blocks: getBlocks( clientId ),
 			};
 		},
-		[ postId, clientId ]
+		[ postId, clientId, order ]
 	);
-
 	// TODO: Replicate the logic used on the server.
-	perPage = perPage || 50;
-
+	perPage = perPage || commentsPerPage;
 	// We convert the flat list of comments to tree.
 	// Then, we show only a maximum of `perPage` number of comments.
 	// This is because passing `per_page` to `getEntityRecords()` does not
 	// take into account nested comments.
-	const comments = useMemo(
+
+	let comments = useMemo(
 		() => convertToTree( rawComments ).slice( 0, perPage ),
 		[ rawComments, perPage ]
 	);
@@ -156,6 +268,14 @@ export default function CommentTemplateEdit( {
 				<Spinner />
 			</p>
 		);
+	}
+
+	if ( ! postId ) {
+		comments = getCommentsPlaceholder( {
+			perPage,
+			threadComments,
+			threadCommentsDepth,
+		} );
 	}
 
 	if ( ! comments.length ) {

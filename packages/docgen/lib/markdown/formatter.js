@@ -18,7 +18,7 @@ const formatTag = ( title, tags, formatter, docs ) => {
 		docs.push( '\n' );
 		docs.push( `*${ title }*` );
 		docs.push( '\n' );
-		docs.push( ...tags.map( formatter ) );
+		docs.push( ...tags.map( ( tag ) => `\n${ formatter( tag ) }` ) );
 	}
 };
 
@@ -103,54 +103,88 @@ module.exports = (
 			formatTag(
 				'Related',
 				getSymbolTagsByName( symbol, 'see', 'link' ),
-				( tag ) =>
-					`\n- ${ tag.name.trim() }${
-						tag.description ? ' ' : ''
-					}${ tag.description.trim() }`,
+				( tag ) => {
+					const name = tag.name.trim();
+					const desc = tag.description.trim();
+
+					// prettier-ignore
+					return desc
+						? `- ${ name } ${ desc }`
+						: `- ${ name }`;
+				},
 				docs
 			);
 			formatExamples( getSymbolTagsByName( symbol, 'example' ), docs );
 			formatTag(
 				'Type',
 				getSymbolTagsByName( symbol, 'type' ),
-				( tag ) =>
-					`\n- ${ getTypeOutput( tag ) }${ cleanSpaces(
-						` ${ tag.name } ${ tag.description }`
-					) }`,
+				( tag ) => {
+					const type = tag.type && getTypeOutput( tag );
+					const desc = cleanSpaces(
+						`${ tag.name } ${ tag.description }`
+					);
+
+					// prettier-ignore
+					return type
+						? `- ${ type }${ desc }`
+						: `- ${ desc }`;
+				},
 				docs
 			);
 			formatTag(
 				'Parameters',
 				getSymbolTagsByName( symbol, 'param' ),
-				( tag ) =>
-					`\n- *${ tag.name }* ${ getTypeOutput(
-						tag
-					) }: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => {
+					const name = tag.name;
+					const type = tag.type && getTypeOutput( tag );
+					const desc = cleanSpaces( tag.description );
+
+					return type
+						? `- *${ name }* ${ type }: ${ desc }`
+						: `- *${ name }* ${ desc }`;
+				},
 				docs
 			);
 			formatTag(
 				'Returns',
 				getSymbolTagsByName( symbol, 'return' ),
 				( tag ) => {
-					return `\n- ${ getTypeOutput( tag ) }: ${ cleanSpaces(
+					const type = tag.type && getTypeOutput( tag );
+					const desc = cleanSpaces(
 						`${ tag.name } ${ tag.description }`
-					) }`;
+					);
+
+					// prettier-ignore
+					return type
+						? `- ${ type }: ${ desc }`
+						: `- ${ desc }`;
 				},
 				docs
 			);
 			formatTag(
 				'Type Definition',
 				getSymbolTagsByName( symbol, 'typedef' ),
-				( tag ) => `\n- *${ tag.name }* ${ getTypeOutput( tag ) }`,
+				( tag ) => {
+					const name = tag.name;
+					const type = getTypeOutput( tag );
+
+					return `- *${ name }* ${ type }`;
+				},
 				docs
 			);
 			formatTag(
 				'Properties',
 				getSymbolTagsByName( symbol, 'property' ),
-				( tag ) =>
-					`\n- *${ tag.name }* ${ getTypeOutput(
-						tag
-					) }: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => {
+					const name = tag.name;
+					const type = tag.type && getTypeOutput( tag );
+					const desc = cleanSpaces( tag.description );
+
+					// prettier-ignore
+					return type
+						? `- *${ name }* ${ type }: ${ desc }`
+						: `- *${ name }* ${ desc }`
+				},
 				docs
 			);
 			docs.push( '\n' );

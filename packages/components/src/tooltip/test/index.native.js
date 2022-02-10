@@ -54,7 +54,9 @@ it( 'displays the message', () => {
 	expect( screen.getByText( 'A helpful message' ) ).toBeTruthy();
 } );
 
-it( 'dismisses when the screen is tapped', () => {
+// Skipped until `pointerEvents: 'box-none'` no longer erroneously prevents
+// triggering `onTouch*` on the element: https://git.io/JSHZt
+it.skip( 'dismisses when the screen is tapped', () => {
 	const screen = render(
 		<TooltipSlot>
 			<Tooltip visible={ true } text="A helpful message">

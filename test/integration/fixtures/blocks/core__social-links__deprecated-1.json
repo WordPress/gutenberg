@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/social-links",
 		"isValid": true,
 		"attributes": {
@@ -17,39 +16,32 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/social-link",
 				"isValid": true,
 				"attributes": {
 					"url": "https://wordpress.org",
 					"service": "wordpress"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_1",
 				"name": "core/social-link",
 				"isValid": true,
 				"attributes": {
 					"url": "#",
 					"service": "chain"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_2",
 				"name": "core/social-link",
 				"isValid": true,
 				"attributes": {
 					"url": "#",
 					"service": "mail"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<ul class=\"wp-block-social-links has-icon-color has-icon-background-color items-justified-space-between\">\n\t\n\t\n\t\n</ul>"
+		]
 	}
 ]

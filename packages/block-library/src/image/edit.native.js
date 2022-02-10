@@ -174,13 +174,21 @@ function LinkSettings( {
 	);
 }
 
+const UPLOAD_STATE_IDLE = 0;
+const UPLOAD_STATE_UPLOADING = 1;
+const UPLOAD_STATE_SUCCEEDED = 2;
+const UPLOAD_STATE_FAILED = 3;
+
 export class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
 			isCaptionSelected: false,
+			uploadStatus: UPLOAD_STATE_IDLE,
 		};
+
+		this.replacedFeaturedImage = false;
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
 			this
@@ -245,7 +253,7 @@ export class ImageEdit extends Component {
 		// this action will only exist if the user pressed the trash button on the block holder
 		if (
 			hasAction( 'blocks.onRemoveBlockCheckUpload' ) &&
-			this.state.isUploadInProgress
+			this.state.uploadStatus === UPLOAD_STATE_UPLOADING
 		) {
 			doAction(
 				'blocks.onRemoveBlockCheckUpload',
@@ -255,12 +263,43 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		const { image, attributes, setAttributes } = this.props;
+		const {
+			image,
+			attributes,
+			setAttributes,
+			featuredImageId,
+		} = this.props;
 		if ( ! previousProps.image && image ) {
 			const url =
 				getUrlForSlug( image, attributes?.sizeSlug ) ||
 				image.source_url;
 			setAttributes( { url } );
+		}
+
+		const { id } = attributes;
+		const { id: previousId } = previousProps.attributes;
+
+		// The media changed and the previous media was set as the Featured Image,
+		// we must keep track of the previous media's featured status to act on it
+		// once the new media has a finalized ID.
+		if (
+			!! id &&
+			id !== previousId &&
+			!! featuredImageId &&
+			featuredImageId === previousId
+		) {
+			this.replacedFeaturedImage = true;
+		}
+
+		// The media changed and now has a finalized ID (e.g. upload completed), we
+		// should attempt to replace the featured image if applicable.
+		if (
+			this.replacedFeaturedImage &&
+			!! image &&
+			this.canImageBeFeatured()
+		) {
+			this.replacedFeaturedImage = false;
+			setFeaturedImage( id );
 		}
 	}
 
@@ -289,7 +328,7 @@ export class ImageEdit extends Component {
 	onImagePressed() {
 		const { attributes, image } = this.props;
 
-		if ( this.state.isUploadInProgress ) {
+		if ( this.state.uploadStatus === UPLOAD_STATE_UPLOADING ) {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if (
 			attributes.id &&
@@ -314,8 +353,8 @@ export class ImageEdit extends Component {
 			setAttributes( { url: payload.mediaUrl } );
 		}
 
-		if ( ! this.state.isUploadInProgress ) {
-			this.setState( { isUploadInProgress: true } );
+		if ( this.state.uploadStatus !== UPLOAD_STATE_UPLOADING ) {
+			this.setState( { uploadStatus: UPLOAD_STATE_UPLOADING } );
 		}
 	}
 
@@ -323,21 +362,21 @@ export class ImageEdit extends Component {
 		const { setAttributes } = this.props;
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
-		this.setState( { isUploadInProgress: false } );
+		this.setState( { uploadStatus: UPLOAD_STATE_SUCCEEDED } );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { id: payload.mediaId } );
-		this.setState( { isUploadInProgress: false } );
+		this.setState( { uploadStatus: UPLOAD_STATE_FAILED } );
 	}
 
 	mediaUploadStateReset() {
 		const { setAttributes } = this.props;
 
 		setAttributes( { id: null, url: null } );
-		this.setState( { isUploadInProgress: false } );
+		this.setState( { uploadStatus: UPLOAD_STATE_IDLE } );
 	}
 
 	updateImageURL( url ) {
@@ -490,7 +529,7 @@ export class ImageEdit extends Component {
 				footerNote={
 					<>
 						{ __(
-							'Describe the purpose of the image. Leave empty if the image is purely decorative. '
+							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
 						) }
 						<FooterMessageLink
 							href={
@@ -550,6 +589,23 @@ export class ImageEdit extends Component {
 		return isFeaturedImage ? removeFeaturedButton() : setFeaturedButton();
 	}
 
+	/**
+	 * Featured images must be set to a successfully uploaded self-hosted image,
+	 * which has an ID.
+	 *
+	 * @return {boolean} Boolean indicating whether or not the current may be set as featured.
+	 */
+	canImageBeFeatured() {
+		const {
+			attributes: { id },
+		} = this.props;
+		return (
+			typeof id !== 'undefined' &&
+			this.state.uploadStatus !== UPLOAD_STATE_UPLOADING &&
+			this.state.uploadStatus !== UPLOAD_STATE_FAILED
+		);
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
 		const {
@@ -588,13 +644,7 @@ export class ImageEdit extends Component {
 			selectedSizeOption = 'full';
 		}
 
-		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
-		// The 'canImageBeFeatured' check filters out images that haven't been uploaded based on the following:
-		// - Images that are embedded in a post but are uploaded elsewhere have an id of 'undefined'.
-		// - Image that are uploading or have failed to upload are given a temporary negative ID.
-		const canImageBeFeatured =
-			typeof attributes.id !== 'undefined' && attributes.id > 0;
-
+		const canImageBeFeatured = this.canImageBeFeatured();
 		const isFeaturedImage =
 			canImageBeFeatured && featuredImageId === attributes.id;
 

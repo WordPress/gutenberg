@@ -26,15 +26,15 @@ const getMockedReusableBlock = ( id ) => ( {
     <!-- wp:heading -->
     <h2>First Reusable block</h2>
     <!-- /wp:heading -->
-    
+
     <!-- wp:paragraph -->
     <p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
     <!-- /wp:paragraph -->
-    
+
     !-- wp:heading {"level":4} -->
     <h4>List</h4>
     <!-- /wp:heading -->
-    
+
     <!-- wp:list -->
     <ul><li>First Item</li><li>Second Item</li><li>Third Item</li></ul>
     <!-- /wp:list -->
@@ -87,7 +87,7 @@ describe( 'Reusable block', () => {
 		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
 
 		// Navigate to reusable tab
-		const reusableSegment = getByText( 'Reusable' );
+		const reusableSegment = await waitFor( () => getByText( 'Reusable' ) );
 		// onLayout event is required by Segment component
 		fireEvent( reusableSegment, 'layout', {
 			nativeEvent: {
@@ -145,7 +145,9 @@ describe( 'Reusable block', () => {
 		expect( blockDeleted ).toBeDefined();
 	} );
 
-	it( 'renders block content', async () => {
+	// Skipped until `pointerEvents: 'none'` no longer erroneously prevents
+	// triggering `onLayout*` on the element: https://git.io/JSHZt
+	it.skip( 'renders block content', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 4;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;

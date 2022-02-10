@@ -50,7 +50,7 @@ export function useBaseField( props ) {
 				isInline && styles.inline,
 				className
 			),
-		[ className, controlGroupStyles, hasError, isInline, isSubtle ]
+		[ className, controlGroupStyles, cx, hasError, isInline, isSubtle ]
 	);
 
 	return {

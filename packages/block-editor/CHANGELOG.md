@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 8.1.1 (2022-02-10)
+
+### Bug Fix
+
+-   Removed unused `@wordpress/block-serialization-default-parser`, `css-mediaquery`, `memize` and `redux-multi` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+## 8.1.0 (2022-01-27)
+
 ## 8.0.0 (2021-11-07)
 
 ### Performance

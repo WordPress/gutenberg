@@ -20,6 +20,7 @@ WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/
         - Elements
     - customTemplates
     - templateParts
+    - patterns
 - FAQ
     - The naming schema of CSS Custom Properties
     - Why using -- as a separator?
@@ -805,7 +806,7 @@ body {
 
 Styles found within a block will be enqueued using the block selector.
 
-By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitly telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
+By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitly telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file. Note that the block needs to be registered server-side for the `__experimentalSelector` field to be available to the style engine.
 
 {% codetabs %}
 {% Input %}
@@ -988,6 +989,21 @@ Currently block variations exist for "header" and "footer" values of the area te
 			"area": "header"
 		}
 	]
+}
+```
+
+### patterns
+
+<div class="callout callout-alert">
+This field requires the Gutenberg plugin active and using the [version 2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/) of `theme.json`.
+</div>
+
+Within this field themes can list patterns to register from [Pattern Directory](https://wordpress.org/patterns/). The `patterns` field is an array of pattern `slugs` from the Pattern Directory. Pattern slugs can be extracted by the `url` in single pattern view at the Pattern Directory. For example in this url `https://wordpress.org/patterns/pattern/partner-logos` the slug is `partner-logos`.
+
+```json
+{
+    "version": 2,
+	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }
 ```
 

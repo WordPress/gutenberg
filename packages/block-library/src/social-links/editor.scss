@@ -4,6 +4,13 @@
 		display: inline-block;
 		margin-left: $grid-unit-10;
 	}
+
+	// Unset background colors that can be inherited from Global Styles.
+	// This is a duplicate of a rule in style.scss, as it needs higher specificity in the editor.
+	// The rule can be removed if editor styles get lowered in specificity.
+	&.wp-block-social-links {
+		background: none;
+	}
 }
 
 // Prevent toolbar from jumping when selecting / hovering a link.

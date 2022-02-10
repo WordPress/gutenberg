@@ -1,8 +1,8 @@
 .wp-block-quote {
 	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.
-
-	&.is-style-large,
-	&.is-large {
+	// .is-style-large and .is-large are kept for backwards compatibility. The :not pseudo-class is used to enable switching styles. See PR #37580.
+	&.is-style-large:not(.is-style-plain),
+	&.is-large:not(.is-style-plain) {
 		margin-bottom: 1em;
 		padding: 0 1em;
 

@@ -98,5 +98,21 @@ export {
 	batch as __experimentalBatch,
 } from './rest-api';
 export { openListView, closeListView } from './list-view';
+export {
+	clickSiteEditorMenuItem,
+	closeSiteEditorNavigationPanel,
+	disableSiteEditorWelcomeGuide,
+	getCurrentSiteEditorContent,
+	getSiteEditorMenuItem,
+	isSiteEditorRoot,
+	navigateSiteEditorBack,
+	navigateSiteEditorBackToRoot,
+	openSiteEditorNavigationPanel,
+	siteEditorNavigateSequence,
+	visitSiteEditor,
+	toggleGlobalStyles,
+	openGlobalStylesPanel,
+	openPreviousGlobalStylesPanel,
+} from './site-editor';
 
 export * from './mocks';

@@ -6,13 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	useBlockProps,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
-import { compose, withInstanceId } from '@wordpress/compose';
-import { withDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import { View } from '@wordpress/primitives';
 
@@ -86,8 +81,7 @@ const SpacerEdit = ( {
 	attributes,
 	isSelected,
 	setAttributes,
-	onResizeStart,
-	onResizeStop,
+	toggleSelection,
 	context,
 } ) => {
 	const { orientation } = context;
@@ -96,6 +90,9 @@ const SpacerEdit = ( {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );
 	const [ temporaryWidth, setTemporaryWidth ] = useState( null );
+
+	const onResizeStart = () => toggleSelection( false );
+	const onResizeStop = () => toggleSelection( true );
 
 	const handleOnVerticalResizeStop = ( newHeight ) => {
 		onResizeStop();
@@ -197,14 +194,4 @@ const SpacerEdit = ( {
 	);
 };
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( blockEditorStore );
-
-		return {
-			onResizeStart: () => toggleSelection( false ),
-			onResizeStop: () => toggleSelection( true ),
-		};
-	} ),
-	withInstanceId,
-] )( SpacerEdit );
+export default SpacerEdit;

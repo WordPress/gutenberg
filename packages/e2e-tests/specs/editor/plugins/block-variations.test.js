@@ -104,7 +104,7 @@ describe( 'Block variations', () => {
 				'Display block breadcrumbs',
 				true
 			);
-			await toggleMoreMenu();
+			await toggleMoreMenu( 'close' );
 		} );
 
 		afterEach( async () => {
@@ -113,7 +113,7 @@ describe( 'Block variations', () => {
 				'Display block breadcrumbs',
 				false
 			);
-			await toggleMoreMenu();
+			await toggleMoreMenu( 'close' );
 		} );
 
 		const getActiveBreadcrumb = async () =>
@@ -181,7 +181,7 @@ describe( 'Block variations', () => {
 			).toBeTruthy();
 			const description = await getBlockCardDescription();
 			expect( description ).toEqual(
-				'Start with the building block of all narrative.'
+				'Start with the basic building block of all narrative.'
 			);
 		} );
 	} );

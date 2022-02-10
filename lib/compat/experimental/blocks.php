@@ -16,9 +16,9 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 	 * @return array Returns the comment query parameters to use with the WP_Comment_Query constructor.
 	 */
 	function build_comment_query_vars_from_block( $block ) {
+
 		$comment_args = array(
 			'orderby'                   => 'comment_date_gmt',
-			'order'                     => 'ASC',
 			'status'                    => 'approve',
 			'no_found_rows'             => false,
 			'update_comment_meta_cache' => false, // We lazy-load comment meta for performance.
@@ -50,6 +50,11 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			} elseif ( 'oldest' === get_option( 'default_comments_page' ) ) {
 				$comment_args['offset'] = 0;
 			}
+		}
+
+		$comment_args['order'] = ! empty( $block->context['comments/order'] ) ? $block->context['comments/order'] : null;
+		if ( empty( $comment_args['order'] ) && get_option( 'comment_order' ) ) {
+			$comment_args['order'] = get_option( 'comment_order' );
 		}
 
 		return $comment_args;
@@ -90,3 +95,36 @@ if ( ! function_exists( 'get_comments_pagination_arrow' ) ) {
 		return null;
 	}
 }
+
+if ( ! function_exists( 'extend_block_editor_settings_with_discussion_settings' ) ) {
+	/**
+	 * Workaround for getting discussion settings as block editor settings
+	 * so any user can access to them without needing to be an admin.
+	 *
+	 * @param array $settings Default editor settings.
+	 *
+	 * @return array Filtered editor settings.
+	 */
+	function extend_block_editor_settings_with_discussion_settings( $settings ) {
+
+		$settings['__experimentalDiscussionSettings'] = array(
+			'commentOrder'        => get_option( 'comment_order' ),
+			'commentsPerPage'     => get_option( 'comments_per_page' ),
+			'defaultCommentsPage' => get_option( 'default_comments_page' ),
+			'pageComments'        => get_option( 'page_comments' ),
+			'threadComments'      => get_option( 'thread_comments' ),
+			'threadCommentsDepth' => get_option( 'thread_comments_depth' ),
+			'avatarURL'           => get_avatar_url(
+				'',
+				array(
+					'size'          => 96,
+					'force_default' => true,
+					'default'       => get_option( 'avatar_default' ),
+				)
+			),
+		);
+
+		return $settings;
+	}
+}
+add_filter( 'block_editor_settings_all', 'extend_block_editor_settings_with_discussion_settings' );

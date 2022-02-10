@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/social-links",
 		"isValid": true,
 		"attributes": {
@@ -8,17 +7,14 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/social-link",
 				"isValid": true,
 				"attributes": {
 					"url": "https://mastodon.social/@marcuskaz",
 					"service": "mastodon"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<ul class=\"wp-block-social-links\"></ul>"
+		]
 	}
 ]

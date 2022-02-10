@@ -12,7 +12,7 @@ describe( 'AutosaveMonitor', () => {
 	let wrapper;
 	let setAutosaveTimerSpy;
 	beforeEach( () => {
-		jest.useFakeTimers();
+		jest.useFakeTimers( 'legacy' );
 		setAutosaveTimerSpy = jest.spyOn(
 			AutosaveMonitor.prototype,
 			'setAutosaveTimer'

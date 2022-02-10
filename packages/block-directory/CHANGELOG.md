@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 3.1.1 (2022-02-10)
+
+### Bug Fix
+
+-   Removed unused `@wordpress/url` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+## 3.1.0 (2022-01-27)
+
 ## 3.0.0 (2021-07-29)
 
 ### Breaking Change

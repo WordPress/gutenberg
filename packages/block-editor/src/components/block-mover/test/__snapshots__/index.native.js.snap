@@ -1,55 +1,116 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Block Mover Picker should match snapshot 1`] = `
-<Fragment>
-  <ForwardRef(ToolbarButton)
-    extraProps={
-      Object {
-        "hint": "Double tap to move the block to the left",
+Array [
+  <View>
+    <View
+      accessibilityHint="Double tap to move the block to the left"
+      accessibilityLabel="Move block left from position 2 to position 1"
+      accessibilityRole="button"
+      accessibilityState={
+        Object {
+          "disabled": false,
+        }
       }
-    }
-    icon={
-      <SVG
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <Path
-          d="M20 10.8H6.7l4.1-4.5-1.1-1.1-5.8 6.3 5.8 5.8 1.1-1.1-4-3.9H20z"
-        />
-      </SVG>
-    }
-    isDisabled={false}
-    onClick={[MockFunction]}
-    onLongPress={[Function]}
-    title="Move block left from position 2 to position 1"
-  />
-  <ForwardRef(ToolbarButton)
-    extraProps={
-      Object {
-        "hint": "Double tap to move the block to the right",
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      nativeID="animatedComponent"
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+          "opacity": 1,
+          "padding": 3,
+        }
       }
-    }
-    icon={
-      <SVG
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "aspectRatio": 1,
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "opacity": 1,
+          }
+        }
       >
-        <Path
-          d="M14.3 6.7l-1.1 1.1 4 4H4v1.5h13.3l-4.1 4.4 1.1 1.1 5.8-6.3z"
-        />
-      </SVG>
-    }
-    isDisabled={true}
-    onClick={[MockFunction]}
-    onLongPress={[Function]}
-    title="Move block right"
-  />
-  <Picker
-    hideCancelButton={true}
-    leftAlign={true}
-    onChange={[Function]}
-    options={Array []}
-    title="Change block position"
-  />
-</Fragment>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+            }
+          }
+        >
+          Svg
+        </View>
+      </View>
+    </View>
+  </View>,
+  <View>
+    <View
+      accessibilityHint="Double tap to move the block to the right"
+      accessibilityLabel="Move block right"
+      accessibilityRole="button"
+      accessibilityState={
+        Object {
+          "disabled": true,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      nativeID="animatedComponent"
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+          "opacity": 1,
+          "padding": 3,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "aspectRatio": 1,
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "opacity": 0.3,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+            }
+          }
+        >
+          Svg
+        </View>
+      </View>
+    </View>
+  </View>,
+]
 `;

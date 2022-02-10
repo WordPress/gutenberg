@@ -60,6 +60,7 @@ export function SocialLinksEdit( props ) {
 		iconBackgroundColorValue,
 		iconColorValue,
 		openInNewTab,
+		showLabels,
 		size,
 		layout,
 	} = attributes;
@@ -80,7 +81,6 @@ export function SocialLinksEdit( props ) {
 
 	const SocialPlaceholder = (
 		<li className="wp-block-social-links__social-placeholder">
-			<div className="wp-social-link"></div>
 			<div className="wp-block-social-links__social-placeholder-icons">
 				<div className="wp-social-link wp-social-link-twitter"></div>
 				<div className="wp-social-link wp-social-link-facebook"></div>
@@ -190,6 +190,13 @@ export function SocialLinksEdit( props ) {
 						checked={ openInNewTab }
 						onChange={ () =>
 							setAttributes( { openInNewTab: ! openInNewTab } )
+						}
+					/>
+					<ToggleControl
+						label={ __( 'Show labels' ) }
+						checked={ showLabels }
+						onChange={ () =>
+							setAttributes( { showLabels: ! showLabels } )
 						}
 					/>
 				</PanelBody>
