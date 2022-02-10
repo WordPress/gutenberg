@@ -88,6 +88,7 @@ export function LegacyLineHeightControl( { value: lineHeight, onChange } ) {
 export default function LineHeightControl( {
 	value: lineHeight,
 	onChange,
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
 	__unstableInputWidth = '60px',
 } ) {

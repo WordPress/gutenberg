@@ -23,7 +23,7 @@ const MyLineHeightControl = () => (
 	<LineHeightControl
 		value={ lineHeight }
 		onChange={ onChange }
-		__unstableHasLegacyStyles={ false }
+		__nextHasNoMarginBottom={ true }
 	/>
 );
 ```
@@ -42,11 +42,12 @@ The value of the line height.
 
 A callback function that handles the application of the line height value.
 
-#### `__unstableHasLegacyStyles`
+#### `__nextHasNoMarginBottom`
 
 -   **Type:** `boolean`
+-   **Default:** `false`
 
-Whether to use the legacy styling, which is deprecated and will be removed in a future version. Set this to `false` to opt into the new styling, which will soon become the default.
+Start opting into the new margin-free styles that will become the default in a future version. 
 
 ## Related components
 
