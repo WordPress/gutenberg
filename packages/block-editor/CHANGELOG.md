@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Change internal implementation of the `LineHeightControl` component to use `NumberControl`. New styles, which are more consistent with other control components, can be used by setting the `__unstableHasLegacyStyles` prop to `false`. In a future version, these new styles will become the default and legacy styles will be removed.
+-   `LineHeightControl`: Changes internal implementation to use `NumberControl`, which allows enhanced interactions such as dragging to change the value. To improve consistency with other control components, the bottom margin styles on the component has been deprecated, and will be removed in a future version. To opt into this simplified margin style, set the `__nextHasNoMarginBottom` prop to `true`.
 
 ## 8.1.1 (2022-02-10)
 

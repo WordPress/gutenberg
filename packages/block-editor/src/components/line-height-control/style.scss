@@ -8,14 +8,3 @@
 	}
 }
 // end TODO
-
-.block-editor-line-height-control {
-	&.has-legacy-styles {
-		margin-bottom: 24px;
-		line-height: 1.4;
-
-		.components-input-control__container {
-			margin-top: 4px;
-		}
-	}
-}

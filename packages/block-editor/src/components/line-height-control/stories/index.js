@@ -31,7 +31,7 @@ const Template = ( props ) => {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	__unstableHasLegacyStyles: true,
+	__nextHasNoMarginBottom: false,
 };
 
 // TODO: Remove before merge
