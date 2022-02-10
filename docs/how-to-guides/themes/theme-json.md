@@ -20,6 +20,7 @@ WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/
         - Elements
     - customTemplates
     - templateParts
+    - patterns
 - FAQ
     - The naming schema of CSS Custom Properties
     - Why using -- as a separator?
