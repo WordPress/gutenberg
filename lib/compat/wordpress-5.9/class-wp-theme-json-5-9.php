@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Theme_JSON_Gutenberg class
+ * WP_Theme_JSON_5_9 class
  *
  * @package gutenberg
  */
@@ -14,7 +14,7 @@
  *
  * @access private
  */
-class WP_Theme_JSON_Gutenberg {
+class WP_Theme_JSON_5_9 {
 
 	/**
 	 * Container of data in theme.json format.
