@@ -57,3 +57,12 @@ function register_block_core_comment_form() {
 	);
 }
 add_action( 'init', 'register_block_core_comment_form' );
+
+function hook_javascript() {
+    ?>
+		<script type="module">
+			import hotwiredTurbo from 'https://cdn.skypack.dev/@hotwired/turbo';
+		</script>
+    <?php
+}
+add_action('wp_head', 'hook_javascript');
