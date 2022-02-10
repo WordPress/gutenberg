@@ -18,7 +18,7 @@ export default function NavigationMenuSelector( {
 	clientId,
 	onSelect,
 	onCreateNew,
-	showTools = false,
+	showManageActions = false,
 	actionLabel,
 } ) {
 	/* translators: %s: The name of a menu. */
@@ -112,7 +112,7 @@ export default function NavigationMenuSelector( {
 				</MenuGroup>
 			) }
 
-			{ showTools && canUserCreateNavigationMenu && (
+			{ showManageActions && canUserCreateNavigationMenu && (
 				<MenuGroup label={ __( 'Tools' ) }>
 					<MenuItem onClick={ onCreateNew }>
 						{ __( 'Create new menu' ) }
