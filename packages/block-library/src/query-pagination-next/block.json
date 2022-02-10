@@ -12,6 +12,7 @@
 			"type": "string"
 		}
 	},
+	"viewScript": "file:./view.min.js",
 	"usesContext": [ "queryId", "query", "paginationArrow" ],
 	"supports": {
 		"reusable": false,

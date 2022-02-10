@@ -65,7 +65,8 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"micromodal": "^0.4.10",
-		"moment": "^2.22.1"
+		"moment": "^2.22.1",
+		"morphdom": "2.6.1"
 	},
 	"publishConfig": {
 		"access": "public"

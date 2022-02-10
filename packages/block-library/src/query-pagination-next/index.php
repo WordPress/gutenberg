@@ -19,6 +19,8 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
+	wp_enqueue_script( 'wp-block-query-pagination-next-view' );
+
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$default_label      = __( 'Next Page' );
 	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
