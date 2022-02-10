@@ -17,7 +17,6 @@ import { addQueryArgs } from '@wordpress/url';
 import { wordpress } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -49,26 +48,15 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 		[]
 	);
 
-	const disableMotion = useReducedMotion();
-
 	if ( ! isActive || ! postType ) {
 		return null;
 	}
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
-	const effect = {
-		expand: {
-			scale: 1.7,
-			borderRadius: 0,
-			transition: { type: 'tween', duration: '0.2' },
-		},
-	};
-
 	if ( siteIconUrl ) {
 		buttonIcon = (
-			<motion.img
-				variants={ ! disableMotion && effect }
+			<img
 				alt={ __( 'Site Icon' ) }
 				className="edit-post-fullscreen-mode-close_site-icon"
 				src={ siteIconUrl }
