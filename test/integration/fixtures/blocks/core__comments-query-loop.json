@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/comments-query-loop",
 		"isValid": true,
 		"attributes": {
@@ -11,13 +10,11 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/comment-template",
 				"isValid": true,
 				"attributes": {},
 				"innerBlocks": [
 					{
-						"clientId": "_clientId_0",
 						"name": "core/comment-author-avatar",
 						"isValid": true,
 						"attributes": {
@@ -27,7 +24,6 @@
 						"innerBlocks": []
 					},
 					{
-						"clientId": "_clientId_1",
 						"name": "core/comment-author-name",
 						"isValid": true,
 						"attributes": {
@@ -37,7 +33,6 @@
 						"innerBlocks": []
 					},
 					{
-						"clientId": "_clientId_2",
 						"name": "core/comment-date",
 						"isValid": true,
 						"attributes": {
@@ -46,21 +41,18 @@
 						"innerBlocks": []
 					},
 					{
-						"clientId": "_clientId_3",
 						"name": "core/comment-content",
 						"isValid": true,
 						"attributes": {},
 						"innerBlocks": []
 					},
 					{
-						"clientId": "_clientId_4",
 						"name": "core/comment-reply-link",
 						"isValid": true,
 						"attributes": {},
 						"innerBlocks": []
 					},
 					{
-						"clientId": "_clientId_5",
 						"name": "core/comment-edit-link",
 						"isValid": true,
 						"attributes": {

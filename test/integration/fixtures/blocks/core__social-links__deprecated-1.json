@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/social-links",
 		"isValid": true,
 		"attributes": {
@@ -17,7 +16,6 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/social-link",
 				"isValid": true,
 				"attributes": {
@@ -27,7 +25,6 @@
 				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_1",
 				"name": "core/social-link",
 				"isValid": true,
 				"attributes": {
@@ -37,7 +34,6 @@
 				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_2",
 				"name": "core/social-link",
 				"isValid": true,
 				"attributes": {

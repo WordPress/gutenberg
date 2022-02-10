@@ -1,12 +1,10 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/column",
 		"isValid": true,
 		"attributes": {},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
@@ -16,7 +14,6 @@
 				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_1",
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {

@@ -45,8 +45,7 @@ const blockBasenames = getAvailableBlockFixturesBasenames();
  * @param {WPBlock[]} blocks loaded blocks to normalize.
  */
 const normalizeParsedBlocks = ( blocks ) =>
-	blocks.map( ( block, index ) => ( {
-		clientId: `_clientId_${ index }`,
+	blocks.map( ( block ) => ( {
 		name: block.name,
 		isValid: block.isValid,
 		attributes: JSON.parse( JSON.stringify( block.attributes ) ),
