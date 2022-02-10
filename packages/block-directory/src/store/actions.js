@@ -85,33 +85,40 @@ export const installBlockType = ( block ) => async ( {
 			links: { ...block.links, ...links },
 		} );
 
-		// Ensures that the block metadata registered on the server is propagated to the editor.
-		const blockMetadata = await apiFetch( {
+		// Ensures that the block metadata is propagated to the editor when registered on the server.
+		await apiFetch( {
 			path: `/wp/v2/block-types/${ name }`,
-		} );
-		unstable__bootstrapServerSideBlockDefinitions( {
-			[ name ]: [
-				'api_version',
-				'title',
-				'category',
-				'parent',
-				'icon',
-				'description',
-				'keywords',
-				'attributes',
-				'provides_context',
-				'uses_context',
-				'supports',
-				'styles',
-				'example',
-				'variations',
-			].reduce( ( accumulator, key ) => {
-				if ( key in blockMetadata ) {
-					accumulator[ key ] = blockMetadata[ key ];
+		} )
+			// Ignore when the block is not registered on the server.
+			.catch( () => {} )
+			.then( ( response ) => {
+				if ( ! response ) {
+					return;
 				}
-				return accumulator;
-			}, {} ),
-		} );
+				unstable__bootstrapServerSideBlockDefinitions( {
+					[ name ]: [
+						'api_version',
+						'title',
+						'category',
+						'parent',
+						'icon',
+						'description',
+						'keywords',
+						'attributes',
+						'provides_context',
+						'uses_context',
+						'supports',
+						'styles',
+						'example',
+						'variations',
+					].reduce( ( accumulator, key ) => {
+						if ( key in response ) {
+							accumulator[ key ] = response[ key ];
+						}
+						return accumulator;
+					}, {} ),
+				} );
+			} );
 
 		await loadAssets();
 		const registeredBlocks = registry.select( blocksStore ).getBlockTypes();
