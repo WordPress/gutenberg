@@ -15,6 +15,9 @@ For each user feature we should also add a importance categorization label  to i
 
 -   [*] Image block: Replacing the media for an image set as featured prompts to update the featured image [#34666]
 -   [***] Font size and line-height support for text-based blocks used in block-based themes [#38205]
+
+## 1.70.3
+
 -   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
 
 ## 1.70.2
