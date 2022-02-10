@@ -2,12 +2,12 @@
 
 Welcome! Let's get started building with blocks. Blocks are at the core of extending WordPress. You can create custom blocks, your own block patterns, or combine them together to build a block theme. At a high level, here are a few ways to begin your journey but read on to explore more:
 
-- Join the [Slack community](https://make.wordpress.org/chat/) to join meetings, ongoing conversations, and more. 
-- Explore the [GitHub repo](https://github.com/WordPress/gutenberg/) to see the latest issues and PRs folks are working on, especially [Good First Issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22).
-- Take courses on how to use the block editor and more on [Learn WordPress](https://learn.wordpress.org/). 
-- Subscribe to [updates on Make Core](https://make.wordpress.org/core/), the main site where ongoing project updates happen.
 - Learn more about where this work is going by [reviewing the long term roadmap](https://wordpress.org/about/roadmap/).
+- Explore the [GitHub repo](https://github.com/WordPress/gutenberg/) to see the latest issues and PRs folks are working on, especially [Good First Issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22).
+- Join the [Slack community](https://make.wordpress.org/chat/) to join meetings, ongoing conversations, and more. 
+- Take courses on how to use the block editor and more on [Learn WordPress](https://learn.wordpress.org/). 
 - Expand your knowledge by reviewing more developer docs at the overall [developer.wordpress.org resource](https://developer.wordpress.org/).
+- Subscribe to [updates on Make Core](https://make.wordpress.org/core/), the main site where ongoing project updates happen.
 
 ## Tutorials
 
