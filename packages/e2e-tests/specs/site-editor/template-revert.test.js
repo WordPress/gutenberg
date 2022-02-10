@@ -5,13 +5,9 @@ import {
 	insertBlock,
 	activateTheme,
 	deleteAllTemplates,
-	switchUserToAdmin,
-	switchUserToTest,
-	visitAdminPage,
 	visitSiteEditor,
 	getCurrentSiteEditorContent,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 const assertSaveButtonIsDisabled = async () =>
 	page.waitForSelector(
@@ -71,17 +67,6 @@ const revertTemplate = async () => {
 	await assertSaveButtonIsEnabled();
 };
 
-const assertTemplatesAreDeleted = async () => {
-	await switchUserToAdmin();
-	const query = addQueryArgs( '', {
-		post_type: 'wp_template',
-	} ).slice( 1 );
-	await visitAdminPage( 'edit.php', query );
-	const element = await page.waitForSelector( '#the-list .no-items' );
-	expect( element ).toBeTruthy();
-	await switchUserToTest();
-};
-
 describe( 'Template Revert', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
@@ -98,14 +83,18 @@ describe( 'Template Revert', () => {
 		await visitSiteEditor();
 	} );
 
-	it.skip( 'should delete the template after saving the reverted template', async () => {
+	it( 'should delete the template after saving the reverted template', async () => {
 		await addDummyText();
 		await save();
 		await revertTemplate();
 		await save();
 
-		// @todo find how do this assertion.
-		await assertTemplatesAreDeleted();
+		await page.click( '.edit-site-document-actions__get-info' );
+
+		// The revert button isn't visible anymore.
+		expect(
+			await page.$( '.edit-site-template-details__revert-button' )
+		).toBeNull();
 	} );
 
 	it( 'should show the original content after revert', async () => {
