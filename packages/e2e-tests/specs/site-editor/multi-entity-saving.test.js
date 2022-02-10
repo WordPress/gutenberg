@@ -12,12 +12,8 @@ import {
 	activateTheme,
 	clickButton,
 	createReusableBlock,
+	visitSiteEditor,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -263,11 +259,10 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
-			await siteEditor.visit( {
+			await visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await siteEditor.disableWelcomeGuide();
 
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
@@ -301,11 +296,10 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should allow re-saving after changing the same block attribute', async () => {
 			// Navigate to site editor.
-			await siteEditor.visit( {
+			await visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await siteEditor.disableWelcomeGuide();
 
 			// Insert a paragraph at the bottom.
 			await insertBlock( 'Paragraph' );

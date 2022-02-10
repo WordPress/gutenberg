@@ -57,8 +57,13 @@ describe( 'Gallery', () => {
 
 		await insertBlock( 'Gallery' );
 		await upload( '.wp-block-gallery input[type="file"]' );
+		await page.waitForSelector( '.wp-block-gallery .wp-block-image' );
 
-		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
+		// The newly added image gets the focus, so refocus parent Gallery
+		// block before trying to edit caption.
+		await clickButton( 'Gallery' );
+
+		await page.click( '.wp-block-gallery .blocks-gallery-caption' );
 		await page.keyboard.type( galleryCaption );
 
 		expect( await getEditedPostContent() ).toMatch(

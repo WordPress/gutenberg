@@ -1,68 +1,145 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { useCx } from '..';
-import StyleProvider from '../../../style-provider';
+import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
-import { useState, createPortal } from '@wordpress/element';
+import { __unstableIframe as Iframe } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
+
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { css } from '@emotion/react';
+import { useCx } from '..';
+import StyleProvider from '../../../style-provider';
+import {
+	createSlotFill,
+	Provider as SlotFillProvider,
+} from '../../../slot-fill';
 
 export default {
 	title: 'Components (Experimental)/useCx',
 };
 
-const IFrame = ( { children } ) => {
-	const [ iframeDocument, setIframeDocument ] = useState();
+const Example = ( { serializedStyles, children } ) => {
+	const cx = useCx();
+	const classes = cx( serializedStyles );
+	return <span className={ classes }>{ children }</span>;
+};
 
-	const handleRef = ( node ) => {
-		if ( ! node ) {
-			return null;
-		}
+const ExampleWithUseMemoWrong = ( { serializedStyles, children } ) => {
+	const cx = useCx();
+	// Wrong: using 'useMemo' without adding 'cx' to the dependency list.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const classes = useMemo( () => cx( serializedStyles ), [
+		serializedStyles,
+	] );
+	return <span className={ classes }>{ children }</span>;
+};
 
-		function setIfReady() {
-			const { contentDocument } = node;
-			const { readyState } = contentDocument;
+const ExampleWithUseMemoRight = ( { serializedStyles, children } ) => {
+	const cx = useCx();
+	// Right: using 'useMemo' with 'cx' listed as a dependency.
+	const classes = useMemo( () => cx( serializedStyles ), [
+		cx,
+		serializedStyles,
+	] );
+	return <span className={ classes }>{ children }</span>;
+};
 
-			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
-				return false;
-			}
+export const _slotFill = () => {
+	const { Fill, Slot } = createSlotFill( 'UseCxExampleSlot' );
 
-			setIframeDocument( contentDocument );
-		}
-
-		if ( setIfReady() ) {
-			return;
-		}
-
-		node.addEventListener( 'load', () => {
-			// iframe isn't immediately ready in Firefox
-			setIfReady();
-		} );
-	};
+	const redText = css`
+		color: red;
+	`;
+	const blueText = css`
+		color: blue;
+	`;
+	const greenText = css`
+		color: green;
+	`;
 
 	return (
-		<iframe ref={ handleRef } title="use-cx-test-frame">
-			{ iframeDocument &&
-				createPortal(
-					<StyleProvider document={ iframeDocument }>
-						{ children }
-					</StyleProvider>,
-					iframeDocument.body
-				) }
-		</iframe>
+		<SlotFillProvider>
+			<StyleProvider document={ document }>
+				<Iframe>
+					<Iframe>
+						<Example serializedStyles={ redText }>
+							This text is inside an iframe and should be red
+						</Example>
+						<Fill name="test-slot">
+							<Example serializedStyles={ blueText }>
+								This text is also inside the iframe, but is
+								relocated by a slot/fill and should be blue
+							</Example>
+						</Fill>
+						<Fill name="outside-frame">
+							<Example serializedStyles={ greenText }>
+								This text is also inside the iframe, but is
+								relocated by a slot/fill and should be green
+							</Example>
+						</Fill>
+					</Iframe>
+					<StyleProvider document={ document }>
+						<Slot bubblesVirtually name="test-slot" />
+					</StyleProvider>
+				</Iframe>
+				<Slot bubblesVirtually name="outside-frame" />
+			</StyleProvider>
+		</SlotFillProvider>
 	);
 };
 
-const Example = ( { args, children } ) => {
-	const cx = useCx();
-	const classes = cx( ...args );
-	return <span className={ classes }>{ children }</span>;
+export const _slotFillSimple = () => {
+	const { Fill, Slot } = createSlotFill( 'UseCxExampleSlotTwo' );
+
+	const redText = css`
+		color: red;
+	`;
+
+	return (
+		<SlotFillProvider>
+			<Iframe>
+				<Fill name="test-slot">
+					<Example serializedStyles={ redText }>
+						This text should be red
+					</Example>
+				</Fill>
+			</Iframe>
+			<Slot bubblesVirtually name="test-slot" />
+		</SlotFillProvider>
+	);
+};
+
+export const _useMemoBadPractices = () => {
+	const redText = css`
+		color: red;
+	`;
+	const blueText = css`
+		color: blue;
+	`;
+
+	return (
+		<>
+			<Example serializedStyles={ redText }>
+				This text should be red
+			</Example>
+			<ExampleWithUseMemoRight serializedStyles={ blueText }>
+				This text should be blue
+			</ExampleWithUseMemoRight>
+			<Iframe>
+				<Example serializedStyles={ redText }>
+					This text should be red
+				</Example>
+				<ExampleWithUseMemoWrong serializedStyles={ blueText }>
+					This text should be blue but it&apos;s not!
+				</ExampleWithUseMemoWrong>
+			</Iframe>
+		</>
+	);
 };
 
 export const _default = () => {
@@ -70,10 +147,10 @@ export const _default = () => {
 		color: red;
 	`;
 	return (
-		<IFrame>
-			<Example args={ [ redText ] }>
+		<Iframe>
+			<Example serializedStyles={ redText }>
 				This text is inside an iframe and is red!
 			</Example>
-		</IFrame>
+		</Iframe>
 	);
 };

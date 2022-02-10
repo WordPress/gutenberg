@@ -31,21 +31,6 @@ function gutenberg_is_experiment_enabled( $name ) {
 // These files only need to be loaded if within a rest server instance
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
-	/**
-	* Start: Include for phase 2
-	*/
-	if ( ! class_exists( 'WP_REST_Sidebars_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-sidebars-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Widget_Types_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-widget-types-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Widgets_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-widgets-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Pattern_Directory_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-pattern-directory-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menus-controller.php';
 	}
@@ -65,9 +50,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-block-editor-settings-controller.php';
 	}
-	/**
-	* End: Include for phase 2
-	*/
 
 	if ( ! class_exists( 'WP_REST_URL_Details_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-url-details-controller.php';
@@ -80,20 +62,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/rest-api.php';
 }
 
-// We can't use class_exists( 'WP_Widget_Block' ) because core loads widgets
-// *after* plugins, so test for wp_use_widgets_block_editor() which we know
-// implies the existence of WP_Widget_Block.
-if ( ! function_exists( 'wp_use_widgets_block_editor' ) ) {
-	require_once __DIR__ . '/class-wp-widget-block.php';
-}
-
-require_once __DIR__ . '/widgets-page.php';
-
 require __DIR__ . '/compat.php';
-require __DIR__ . '/compat/wordpress-5.8/index.php';
-require __DIR__ . '/compat/wordpress-5.8/utils.php';
-require __DIR__ . '/compat/wordpress-5.8/block-patterns.php';
-require __DIR__ . '/compat/wordpress-5.8.1/index.php';
+require __DIR__ . '/compat/wordpress-5.9/widget-render-api-endpoint/index.php';
 require __DIR__ . '/compat/wordpress-5.9/blocks.php';
 require __DIR__ . '/compat/wordpress-5.9/block-patterns.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template-utils.php';
@@ -136,9 +106,6 @@ require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
-require __DIR__ . '/widgets.php';
-require __DIR__ . '/widgets-api.php';
-require __DIR__ . '/widgets-customize.php';
 require __DIR__ . '/navigation.php';
 require __DIR__ . '/navigation-theme-opt-in.php';
 require __DIR__ . '/navigation-page.php';

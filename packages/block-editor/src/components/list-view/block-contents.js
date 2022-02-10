@@ -26,6 +26,7 @@ const ListViewBlockContents = forwardRef(
 			position,
 			siblingBlockCount,
 			level,
+			isExpanded,
 			...props
 		},
 		ref
@@ -71,6 +72,7 @@ const ListViewBlockContents = forwardRef(
 						draggable={ draggable }
 						onDragStart={ onDragStart }
 						onDragEnd={ onDragEnd }
+						isExpanded={ isExpanded }
 						{ ...props }
 					/>
 				) }

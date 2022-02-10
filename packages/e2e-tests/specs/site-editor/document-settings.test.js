@@ -1,12 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
+import {
+	trashAllPosts,
+	activateTheme,
+	visitSiteEditor,
+} from '@wordpress/e2e-test-utils';
 
 async function getDocumentSettingsTitle() {
 	const titleElement = await page.waitForSelector(
@@ -35,14 +34,13 @@ describe( 'Document Settings', () => {
 	} );
 
 	beforeEach( async () => {
-		await siteEditor.visit();
-		await siteEditor.disableWelcomeGuide();
+		await visitSiteEditor();
 	} );
 
 	describe( 'when a template is selected from the navigation sidebar', () => {
 		it( 'should display the selected templates name in the document header', async () => {
 			// Navigate to a template
-			await siteEditor.visit( {
+			await visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
@@ -78,7 +76,7 @@ describe( 'Document Settings', () => {
 	describe( 'when a template part is selected from the navigation sidebar', () => {
 		it( "should display the selected template part's name in the document header", async () => {
 			// Navigate to a template part
-			await siteEditor.visit( {
+			await visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );

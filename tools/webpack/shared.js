@@ -66,10 +66,9 @@ const plugins = [
 	// content as a convenient interactive zoomable treemap.
 	process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 	new DefinePlugin( {
-		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
-		'process.env.GUTENBERG_PHASE': JSON.stringify(
-			parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
-		),
+		// Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
+		'process.env.IS_GUTENBERG_PLUGIN':
+			process.env.npm_package_config_IS_GUTENBERG_PLUGIN,
 	} ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];
