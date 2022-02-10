@@ -27,17 +27,17 @@ import { compose } from '@wordpress/compose';
  */
 /* eslint-disable no-unused-vars */
 import {
-	ALLOWED_MEDIA_TYPES,
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
-	VIDEO_BACKGROUND_TYPE,
-	COVER_MIN_HEIGHT,
 	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
 } from './shared';
 /* eslint-enable no-unused-vars */
+
+// For now let's keep things simple and use only images.
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const htmlElementMessages = {
 	header: __(
