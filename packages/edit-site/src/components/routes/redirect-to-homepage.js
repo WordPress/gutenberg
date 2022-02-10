@@ -57,9 +57,18 @@ async function getHomepageParams( siteUrl ) {
 					`\`getHomepageParams\`: HTTP status error, ${ response.status } ${ response.statusText }`
 				);
 			}
+
 			return response.json();
 		} )
-		.then( ( { data } ) => data );
+		.then( ( { data } ) => {
+			if ( data.message ) {
+				throw new Error(
+					`\`getHomepageParams\`: REST API error, ${ data.message }`
+				);
+			}
+
+			return data;
+		} );
 
 	if ( ! template?.id ) {
 		throw new Error( '`getHomepageParams`: unable to find home template.' );
