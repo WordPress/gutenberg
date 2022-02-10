@@ -12,7 +12,7 @@ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { SVG } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { useContext, createPortal } from '@wordpress/element';
+import { useMemo, useContext, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -140,12 +140,33 @@ ${ selector } {
 	);
 }
 
+function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
+	const disableDefault = ! useSetting( defaultSetting );
+	const userPresets =
+		useSetting( `${ presetSetting }.custom` ) || EMPTY_ARRAY;
+	const themePresets =
+		useSetting( `${ presetSetting }.theme` ) || EMPTY_ARRAY;
+	const defaultPresets = disableDefault
+		? EMPTY_ARRAY
+		: useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
+	return useMemo(
+		() => [ ...userPresets, ...themePresets, ...defaultPresets ],
+		[ disableDefault, userPresets, themePresets, defaultPresets ]
+	);
+}
+
 function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
 
-	const duotonePalette = useSetting( 'color.duotone' ) || EMPTY_ARRAY;
-	const colorPalette = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const duotonePalette = useMultiOriginPresets( {
+		presetSetting: 'color.duotone',
+		defaultSetting: 'color.defaultDuotone',
+	} );
+	const colorPalette = useMultiOriginPresets( {
+		presetSetting: 'color.palette',
+		defaultSetting: 'color.defaultPalette',
+	} );
 	const disableCustomColors = ! useSetting( 'color.custom' );
 	const disableCustomDuotone =
 		! useSetting( 'color.customDuotone' ) ||
