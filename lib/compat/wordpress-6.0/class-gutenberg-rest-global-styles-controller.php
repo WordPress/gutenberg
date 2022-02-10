@@ -16,6 +16,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 	 * @return void
 	 */
 	public function register_routes() {
+		// List themes global styles.
 		register_rest_route(
 			$this->namespace,
 			// The route.
