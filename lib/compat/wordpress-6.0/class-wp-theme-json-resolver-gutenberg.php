@@ -54,7 +54,6 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 		return $result;
 	}
 
-
 	/**
 	 * Returns the theme's data.
 	 *
