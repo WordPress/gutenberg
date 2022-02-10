@@ -24,13 +24,21 @@ function render_block_core_comment_form( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes();
 
 	$form_contents = <<<END
+	<turbo-frame id="new_comment">
+	<form>
 	<label for="name">Name:</label>
-
 	<input type="text" id="name" name="name" required size="10">
+
+	<label for="comment">Tell us your story:</label>
+	<textarea id="comment" name="comment" rows="5" cols="33">
+		It was a dark and stormy night...
+	</textarea>
+	<form>
+	</turbo-frame>
 	END;
 
 	return sprintf(
-		'<form %1$s>%2$s</form>',
+		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
 		$form_contents
 	);
