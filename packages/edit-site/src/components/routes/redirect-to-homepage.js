@@ -51,7 +51,14 @@ async function getHomepageParams( siteUrl ) {
 	// (packages/core-data/src/resolvers.js)
 	const template = await window
 		.fetch( addQueryArgs( siteUrl, { '_wp-find-template': true } ) )
-		.then( ( res ) => res.json() )
+		.then( ( response ) => {
+			if ( ! response.ok ) {
+				throw new Error(
+					`\`getHomepageParams\`: HTTP status error, ${ response.status } ${ response.statusText }`
+				);
+			}
+			return response.json();
+		} )
 		.then( ( { data } ) => data );
 
 	if ( ! template?.id ) {
