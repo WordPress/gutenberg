@@ -28,6 +28,7 @@ import * as commentAuthorName from './comment-author-name';
 import * as commentContent from './comment-content';
 import * as commentDate from './comment-date';
 import * as commentEditLink from './comment-edit-link';
+import * as commentForm from './comment-form';
 import * as commentReplyLink from './comment-reply-link';
 import * as commentTemplate from './comment-template';
 import * as commentsPaginationPrevious from './comments-pagination-previous';
@@ -264,6 +265,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 							commentContent,
 							commentDate,
 							commentEditLink,
+							commentForm,
 							commentReplyLink,
 							commentTemplate,
 							commentsQueryLoop,

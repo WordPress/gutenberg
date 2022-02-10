@@ -152,6 +152,15 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 -	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** linkTarget, textAlign
 
+## Comment Form
+
+Comment Form ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-form))
+
+-	**Name:** core/comment-form
+-	**Category:** design
+-	**Supports:** align, ~~html~~, ~~reusable~~
+-	**Attributes:** 
+
 ## Comment Reply Link
 
 Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-reply-link))
