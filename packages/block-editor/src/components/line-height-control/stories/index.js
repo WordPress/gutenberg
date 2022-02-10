@@ -16,22 +16,20 @@ export default {
 const Template = ( props ) => {
 	const [ value, setValue ] = useState();
 	return (
-		<>
-			<LineHeightControl
-				onChange={ setValue }
-				value={ value }
-				{ ...props }
-			/>
-			<hr />
-			<p>value: { value }</p>
-			<p>type: { typeof value }</p>
-		</>
+		<LineHeightControl onChange={ setValue } value={ value } { ...props } />
 	);
 };
 
 export const Default = Template.bind( {} );
 Default.args = {
-	__nextHasNoMarginBottom: false,
+	__nextHasNoMarginBottom: true,
+	__unstableInputWidth: '60px',
+};
+
+export const UnconstrainedWidth = Template.bind( {} );
+UnconstrainedWidth.args = {
+	...Default.args,
+	__unstableInputWidth: '100%',
 };
 
 // TODO: Remove before merge
