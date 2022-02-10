@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/cover",
 		"isValid": true,
 		"attributes": {
@@ -16,7 +15,6 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {

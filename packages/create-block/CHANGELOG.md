@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.9.0 (2022-02-10)
+
 ### New Features
 
 -    Automatically add a `"env": "wp-env"` entry to scripts when the `--wp-env` is passed or when a template sets `wpEnv` to `true` ([#38530](https://github.com/WordPress/gutenberg/pull/38530)).

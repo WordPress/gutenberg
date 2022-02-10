@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
@@ -20,7 +19,6 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/navigation-link",
 				"isValid": true,
 				"attributes": {

@@ -1243,6 +1243,13 @@
 				"required": [ "name" ],
 				"additionalProperties": false
 			}
+		},
+		"patterns": {
+			"description": "An array of pattern slugs to be registered from the Pattern Directory.",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
 		}
 	},
 	"required": [ "version" ],
