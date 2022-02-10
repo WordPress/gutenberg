@@ -56,7 +56,7 @@
 			}
 		},
 		"spacing": {
-			"blockGap": true,
+			"blockGap": [ "vertical", "horizontal" ],
 			"margin": [ "top", "bottom" ],
 			"units": [ "px", "em", "rem", "vh", "vw" ],
 			"__experimentalDefaultControls": {

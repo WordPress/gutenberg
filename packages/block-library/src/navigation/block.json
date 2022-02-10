@@ -95,7 +95,7 @@
 			}
 		},
 		"spacing": {
-			"blockGap": true,
+			"blockGap": [ "vertical", "horizontal" ],
 			"units": [ "px", "em", "rem", "vh", "vw" ],
 			"__experimentalDefaultControls": {
 				"blockGap": true

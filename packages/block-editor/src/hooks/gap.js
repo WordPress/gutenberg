@@ -110,8 +110,8 @@ export function GapEdit( props ) {
 	const onChange = ( next ) => {
 		let newValue = next;
 		if ( typeof next === 'object' ) {
-			const row = next?.top;
-			const column = next?.left;
+			const row = next?.top || 0;
+			const column = next?.left || 0;
 			newValue = row === column ? row : `${ row } ${ column }`;
 		}
 		const newStyle = {
