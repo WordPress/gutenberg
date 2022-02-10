@@ -35,7 +35,6 @@
 
 		// Animate the modal frame/contents appearing on the page.
 		animation: components-modal__appear-animation 0.1s ease-out;
-		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
 
 		&.is-full-screen {
