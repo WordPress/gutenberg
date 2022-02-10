@@ -8,10 +8,10 @@
 /**
  * Get the elements class names.
  *
- * @param  array  $block         Block object.
- * @return string                The unique class name.
+ * @param array $block Block object.
+ * @return string      The unique class name.
  */
-function gutenberg_get_elements_class_name ( $block ) {
+function gutenberg_get_elements_class_name( $block ) {
 	return 'wp-elements-' . md5( serialize( $block ) );
 }
 
@@ -83,8 +83,8 @@ function gutenberg_render_elements_support( $block_content, $block ) {
  * This solves the issue of an element (e.g.: link color) being styled in both the parent and a descendant:
  * we want the descendant style to take priority, and this is done by loading it after, in DOM order.
  *
- * @param string|null   $pre_render   The pre-rendered content. Default null.
- * @param array         $parsed_block The block being rendered.
+ * @param string|null $pre_render   The pre-rendered content. Default null.
+ * @param array       $block The block being rendered.
  *
  * @return null
  */
