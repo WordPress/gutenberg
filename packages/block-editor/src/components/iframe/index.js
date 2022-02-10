@@ -89,7 +89,7 @@ function useEditorStylesCompat() {
 			}
 		} );
 
-		const appendStyles = () => {
+		function appendStyles() {
 			const doc = node.contentDocument;
 
 			if (
@@ -112,7 +112,7 @@ function useEditorStylesCompat() {
 			} );
 
 			return true;
-		};
+		}
 
 		if ( appendStyles() ) {
 			return;
