@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { PostStatus, RawData, TemplateContent } from './common';
+import { EntityRecordWithRawData, PostStatus, TemplateContent } from './common';
 
-export interface WpTemplatePart {
+export interface WpTemplatePart< RawType > extends EntityRecordWithRawData {
 	/**
 	 * ID of template.
 	 */
@@ -35,7 +35,7 @@ export interface WpTemplatePart {
 	/**
 	 * Title of template.
 	 */
-	title: RawData;
+	title: RawType;
 	/**
 	 * Description of template.
 	 */

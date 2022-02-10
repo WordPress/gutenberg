@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { RawData } from './common';
+import { EntityRecordWithRawData } from './common';
 
-export interface Comment {
+export interface Comment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * Unique identifier for the comment.
 	 */
@@ -35,7 +35,7 @@ export interface Comment {
 	/**
 	 * The content for the comment.
 	 */
-	content: RawData;
+	content: RawType;
 	/**
 	 * The date the comment was published, in the site's timezone.
 	 */

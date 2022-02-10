@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { ActiveOrInactive, RawData } from './common';
+import { ActiveOrInactive, EntityRecordWithRawData } from './common';
 
-export interface Plugin {
+export interface Plugin< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The plugin file.
 	 */
@@ -33,7 +33,7 @@ export interface Plugin {
 	/**
 	 * The plugin description.
 	 */
-	description?: RawData;
+	description?: RawType;
 	/**
 	 * The plugin version number.
 	 */

@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { OpenOrClosed, PostStatus, RawData } from './common';
+import { EntityRecordWithRawData, OpenOrClosed, PostStatus } from './common';
 
-export interface Post {
+export interface Post< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -15,7 +15,7 @@ export interface Post {
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid?: RawData;
+	guid?: RawType;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -59,11 +59,11 @@ export interface Post {
 	/**
 	 * The title for the post.
 	 */
-	title: RawData;
+	title: RawType;
 	/**
 	 * The content for the post.
 	 */
-	content?: RawData;
+	content?: RawType;
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -71,7 +71,7 @@ export interface Post {
 	/**
 	 * The excerpt for the post.
 	 */
-	excerpt: RawData;
+	excerpt: RawType;
 	/**
 	 * The ID of the featured media for the post.
 	 */

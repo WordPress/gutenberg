@@ -1,13 +1,12 @@
 /**
  * Internal dependencies
  */
-import { RawData, PostStatus } from './common';
 
 export interface NavMenuItem {
 	/**
 	 * The title for the object.
 	 */
-	title: RawData;
+	title: RawType;
 	/**
 	 * Unique identifier for the object.
 	 */

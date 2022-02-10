@@ -1,7 +1,7 @@
 /**
  * The raw data representation.
  */
-export interface RawData {
+export interface RawObject {
 	/**
 	 * Data as it exists in the database.
 	 */
@@ -11,6 +11,9 @@ export interface RawData {
 	 */
 	rendered?: string;
 }
+
+export type RawString = string;
+export type RawData = RawObject | RawString;
 
 export type PostStatus = 'publish' | 'future' | 'draft' | 'pending' | 'private';
 
@@ -29,3 +32,7 @@ export type TemplateContent =
 			block_version?: number;
 	  }
 	| string;
+
+export interface EntityRecordWithRawData<
+	RawType extends RawData = RawObject
+> {}

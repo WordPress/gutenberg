@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { RawData, PostStatus, OpenOrClosed } from './common';
+import { EntityRecordWithRawData, OpenOrClosed, PostStatus } from './common';
 
 type MediaType = 'image' | 'file';
 
-export interface Attachment {
+export interface Attachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -17,7 +17,7 @@ export interface Attachment {
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid?: RawData;
+	guid?: RawType;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -57,7 +57,7 @@ export interface Attachment {
 	/**
 	 * The title for the post.
 	 */
-	title: RawData;
+	title: RawType;
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -87,11 +87,11 @@ export interface Attachment {
 	/**
 	 * The attachment caption.
 	 */
-	caption: RawData;
+	caption: RawType;
 	/**
 	 * The attachment description.
 	 */
-	description?: RawData;
+	description?: RawType;
 	/**
 	 * Attachment type.
 	 */

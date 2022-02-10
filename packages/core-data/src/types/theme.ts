@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { RawData, ActiveOrInactive } from './common';
+import { ActiveOrInactive, EntityRecordWithRawData } from './common';
 
-export interface Theme {
+export interface Theme< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The theme's stylesheet. This uniquely identifies the theme.
 	 */
@@ -15,19 +15,19 @@ export interface Theme {
 	/**
 	 * The theme author.
 	 */
-	author?: RawData;
+	author?: RawType;
 	/**
 	 * The website of the theme author.
 	 */
-	author_uri?: RawData;
+	author_uri?: RawType;
 	/**
 	 * A description of the theme.
 	 */
-	description?: RawData;
+	description?: RawType;
 	/**
 	 * The name of the theme.
 	 */
-	name?: RawData;
+	name?: RawType;
 	/**
 	 * The minimum PHP version required for the theme to work.
 	 */
@@ -43,7 +43,7 @@ export interface Theme {
 	/**
 	 * Tags indicating styles and features of the theme.
 	 */
-	tags?: RawData;
+	tags?: RawType;
 	/**
 	 * The theme's text domain.
 	 */
@@ -55,7 +55,7 @@ export interface Theme {
 	/**
 	 * The URI of the theme's webpage.
 	 */
-	theme_uri?: RawData;
+	theme_uri?: RawType;
 	/**
 	 * The theme's current version.
 	 */
