@@ -18,9 +18,6 @@ export default async function setup() {
 	await testUtils.activateTheme( 'twentytwentyone' );
 	await testUtils.deleteAllPosts();
 	await testUtils.deleteAllBlocks();
-	await testUtils.activatePlugin(
-		'gutenberg-test-plugin-disables-the-css-animations'
-	);
 
 	await browser.close();
 }
