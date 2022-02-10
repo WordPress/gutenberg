@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { EntityRecordWithRawData, OpenOrClosed, PostStatus } from './common';
+import {
+	EntityRecordWithRawData,
+	OpenOrClosed,
+	PostStatus,
+} from './common';
 
 type MediaType = 'image' | 'file';
 
@@ -119,3 +123,21 @@ export interface Attachment< RawType > extends EntityRecordWithRawData {
 	 */
 	missing_image_sizes?: string[];
 }
+
+/*
+type ViewContext = 'ViewContext';
+type EditContext = 'EditContext';
+type EmbedContext = 'EmbedContext';
+type EntityContext = ViewContext | EditContext | EmbedContext;
+
+type ViewProperties = 'date' | 'date_gmt';
+type EditProperties = 'date' | 'id';
+
+export type Attachment<
+	Context extends EntityContext = EditContext,
+	RawType = RawObject
+> = Pick<
+	BaseAttachment< RawType >,
+	Context extends ViewContext ? ViewProperties : EditProperties
+>;
+*/
