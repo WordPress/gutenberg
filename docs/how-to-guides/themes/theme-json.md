@@ -991,6 +991,21 @@ Currently block variations exist for "header" and "footer" values of the area te
 }
 ```
 
+### patterns
+
+<div class="callout callout-alert">
+This field is only allowed when the Gutenberg plugin is active. It will be added in WordPress 6.0 so in previous versions it will be ignored.
+</div>
+
+Within this field themes can list patterns to register from [Pattern Directory](https://wordpress.org/patterns/). The `patterns` field is an array of pattern `slugs` from the Pattern Directory. Pattern slugs can be extracted by the `url` in single pattern view at the Pattern Directory. For example in this url `https://wordpress.org/patterns/pattern/partner-logos` the slug is `partner-logos`.
+
+```json
+{
+    "version": 2,
+	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
+}
+```
+
 ## Developing with theme.json
 
 It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
