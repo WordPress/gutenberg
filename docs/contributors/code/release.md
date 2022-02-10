@@ -170,9 +170,11 @@ Please note you **cannot create point releases for previous stable releases once
 
 > The release draft was created but it was empty/contained an error message
 
-If you forget to assign the correct Milestone to your cherry picked PR then the release tool may error or your changelog may be empty.
+If you forget to assign the correct Milestone to your cherry picked PR(s) then the changelog may not be generated as you would expect.
 
-In this case, edit the release notes manually copying the format from a previous release.
+It is important to always manually verify that the PRs shown in the changelog match up with those cherry picked to the release branch.
+
+Moreover, if the release includes only a single PR, then failing to assign the PR to the correct Milestone will cause an error to be displayed when generating the changelog. In this case you can edit the release notes to include details of the missing PR ( manually copying the format from a previous release).
 
 If for any reason the Milestone has been closed, you may reopen it for the purposes of the release.
 
