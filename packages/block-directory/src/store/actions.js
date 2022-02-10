@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+} from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
@@ -52,7 +55,7 @@ export const installBlockType = ( block ) => async ( {
 	registry,
 	dispatch,
 } ) => {
-	const { id } = block;
+	const { id, name } = block;
 	let success = false;
 	dispatch.clearErrorNotice( id );
 	try {
@@ -82,9 +85,37 @@ export const installBlockType = ( block ) => async ( {
 			links: { ...block.links, ...links },
 		} );
 
+		// Ensures that the block metadata registered on the server is propagated to the editor.
+		const blockMetadata = await apiFetch( {
+			path: `/wp/v2/block-types/${ name }`,
+		} );
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: [
+				'api_version',
+				'title',
+				'category',
+				'parent',
+				'icon',
+				'description',
+				'keywords',
+				'attributes',
+				'provides_context',
+				'uses_context',
+				'supports',
+				'styles',
+				'example',
+				'variations',
+			].reduce( ( accumulator, key ) => {
+				if ( key in blockMetadata ) {
+					accumulator[ key ] = blockMetadata[ key ];
+				}
+				return accumulator;
+			}, {} ),
+		} );
+
 		await loadAssets();
 		const registeredBlocks = registry.select( blocksStore ).getBlockTypes();
-		if ( ! registeredBlocks.some( ( i ) => i.name === block.name ) ) {
+		if ( ! registeredBlocks.some( ( i ) => i.name === name ) ) {
 			throw new Error(
 				__( 'Error registering block. Try reloading the page.' )
 			);
