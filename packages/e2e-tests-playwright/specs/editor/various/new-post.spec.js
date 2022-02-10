@@ -27,7 +27,7 @@ test.describe( 'new editor state', () => {
 		);
 
 		// Should display the blank title.
-		const title = page.locator( 'role=textbox[name="Add title"]' );
+		const title = page.locator( 'role=textbox[name="Add title"i]' );
 		await expect( title ).toBeEditable();
 
 		// Trim padding non-breaking space
@@ -37,12 +37,12 @@ test.describe( 'new editor state', () => {
 
 		// Should display the Preview button.
 		await expect(
-			page.locator( 'role=button[name="Preview"]' )
+			page.locator( 'role=button[name="Preview"i]' )
 		).toBeVisible();
 
 		// Should display the Post Formats UI.
 		await expect(
-			page.locator( 'role=combobox[name="Post Format"]' )
+			page.locator( 'role=combobox[name="Post Format"i]' )
 		).toBeVisible();
 	} );
 
@@ -50,10 +50,10 @@ test.describe( 'new editor state', () => {
 		await testUtils.createNewPost();
 
 		await expect(
-			page.locator( 'role=button[name="Undo"]' )
+			page.locator( 'role=button[name="Undo"i]' )
 		).toBeDisabled();
 		await expect(
-			page.locator( 'role=button[name="Redo"]' )
+			page.locator( 'role=button[name="Redo"i]' )
 		).toBeDisabled();
 	} );
 
@@ -112,7 +112,7 @@ test.describe( 'new editor state', () => {
 
 		// Verify saveable by presence of the Save Draft button.
 		const saveDraftButton = page.locator(
-			'role=button[name="Save draft"]'
+			'role=button[name="Save draft"i]'
 		);
 		await expect( saveDraftButton ).toBeVisible();
 		await expect( saveDraftButton ).toBeEnabled();

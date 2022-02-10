@@ -44,21 +44,21 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Click on the inline appender.
 		await page.click(
-			'css=.editor-styles-wrapper >> role=button[name="Add block"]'
+			'css=.editor-styles-wrapper >> role=button[name="Add block"i]'
 		);
 
 		const inlineInserterSearchBox = page.locator(
-			'role=searchbox[name="Search for blocks and patterns"]'
+			'role=searchbox[name="Search for blocks and patterns"i]'
 		);
 
 		await expect( inlineInserterSearchBox ).toBeFocused();
 
 		await page.keyboard.type( 'Search' );
 
-		await page.click( 'role=option[name="Search"]' );
+		await page.click( 'role=option[name="Search"i]' );
 
 		await page.focus(
-			'role=document[name="Block: Search"] >> role=textbox[name="Label text"]'
+			'role=document[name="Block: Search"i] >> role=textbox[name="Label text"i]'
 		);
 
 		await page.keyboard.type( 'My ' );
@@ -97,16 +97,16 @@ test.describe( 'Widgets Customizer', () => {
 		widgetsCustomizerPage,
 	} ) => {
 		const showMoreSettingsButton = page.locator(
-			'role=menuitem[name="Show more settings"]'
+			'role=menuitem[name="Show more settings"i]'
 		);
 		const backButton = page.locator(
 			'role=button[name=/Back$/] >> visible=true'
 		);
 		const inspectorHeading = page.locator(
-			'role=heading[name="Customizing ▸ Widgets ▸ Footer #1 Block Settings"][level=3]'
+			'role=heading[name="Customizing ▸ Widgets ▸ Footer #1 Block Settings"i][level=3]'
 		);
 		const widgetsFooter1Heading = page.locator(
-			'role=heading[name="Customizing ▸ Widgets Footer #1"][level=3]'
+			'role=heading[name="Customizing ▸ Widgets Footer #1"i][level=3]'
 		);
 
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
@@ -128,7 +128,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Expect the block title to be found.
 		await expect(
-			page.locator( 'role=heading[name="Paragraph"][level=2]' )
+			page.locator( 'role=heading[name="Paragraph"i][level=2]' )
 		).toBeVisible();
 
 		// Go back to the widgets editor.
@@ -164,10 +164,10 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.waitForPreviewIframe();
 
 		const addBlockButton = page.locator(
-			'role=toolbar[name="Document tools"] >> role=button[name="Add block"]'
+			'role=toolbar[name="Document tools"i] >> role=button[name="Add block"i]'
 		);
 		const inserterHeading = page.locator(
-			'role=heading[name="Add a block"][level=2]'
+			'role=heading[name="Add a block"i][level=2]'
 		);
 
 		// Open the inserter outer section.
@@ -186,7 +186,7 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( inserterHeading ).toBeVisible();
 
 		// Open the Publish Settings.
-		await page.click( 'role=button[name="Publish Settings"]' );
+		await page.click( 'role=button[name="Publish Settings"i]' );
 
 		// Expect the Publish Settings outer section to be found.
 		const publishSettings = page.locator(
@@ -199,7 +199,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
-		await page.focus( 'role=document[name="Paragraph block"]' );
+		await page.focus( 'role=document[name="Paragraph block"i]' );
 		await page.keyboard.type( ' ' );
 
 		// Open the inserter outer section.
@@ -245,12 +245,12 @@ test.describe( 'Widgets Customizer', () => {
 		);
 
 		const editParagraphWidget = paragraphWidget.locator(
-			'role=button[name="Click to edit this widget."]'
+			'role=button[name="Click to edit this widget."i]'
 		);
 		await editParagraphWidget.click();
 
 		const firstParagraphBlock = page.locator(
-			'role=document[name="Paragraph block"] >> text="First Paragraph"'
+			'role=document[name="Paragraph block"i] >> text="First Paragraph"'
 		);
 		await expect( firstParagraphBlock ).toBeFocused();
 
@@ -263,12 +263,12 @@ test.describe( 'Widgets Customizer', () => {
 		);
 
 		const editHeadingWidget = headingWidget.locator(
-			'role=button[name="Click to edit this widget."]'
+			'role=button[name="Click to edit this widget."i]'
 		);
 		await editHeadingWidget.click();
 
 		const headingBlock = page.locator(
-			'role=document[name="Block: Heading"] >> text="First Heading"'
+			'role=document[name="Block: Heading"i] >> text="First Heading"'
 		);
 		await expect( headingBlock ).toBeFocused();
 	} );
@@ -286,12 +286,14 @@ test.describe( 'Widgets Customizer', () => {
 		await page.keyboard.type( 'First Paragraph' );
 		await testUtils.showBlockToolbar();
 
-		const blockToolbar = page.locator( 'role=toolbar[name="Block tools"]' );
+		const blockToolbar = page.locator(
+			'role=toolbar[name="Block tools"i]'
+		);
 
 		// Expect clicking on the section title should clear the selection.
 		{
 			await page.click(
-				'role=heading[name="Customizing ▸ Widgets Footer #1"][level=3]'
+				'role=heading[name="Customizing ▸ Widgets Footer #1"i][level=3]'
 			);
 			await expect( blockToolbar ).not.toBeVisible();
 
@@ -333,7 +335,7 @@ test.describe( 'Widgets Customizer', () => {
 		);
 		await page
 			.locator(
-				'role=combobox[name="Select a legacy widget to display:"]'
+				'role=combobox[name="Select a legacy widget to display:"i]'
 			)
 			.selectOption( 'test_widget' );
 
@@ -344,7 +346,7 @@ test.describe( 'Widgets Customizer', () => {
 		).toBeVisible();
 
 		let titleInput = legacyWidgetBlock.locator(
-			'role=textbox[name="Title:"]'
+			'role=textbox[name="Title:"i]'
 		);
 
 		await titleInput.type( 'Hello Title' );
@@ -389,7 +391,7 @@ test.describe( 'Widgets Customizer', () => {
 			'Test Widget'
 		);
 
-		titleInput = testWidgetBlock.locator( 'role=textbox[name="Title:"]' );
+		titleInput = testWidgetBlock.locator( 'role=textbox[name="Title:"i]' );
 
 		await titleInput.type( 'Hello again!' );
 		// Unfocus the current legacy widget.
@@ -407,10 +409,10 @@ test.describe( 'Widgets Customizer', () => {
 			page.waitForResponse(
 				testUtils.createURL( '/wp-admin/admin-ajax.php' )
 			),
-			page.click( 'role=button[name="Publish"]' ),
+			page.click( 'role=button[name="Publish"i]' ),
 		] );
 		await expect(
-			page.locator( 'role=button[name="Published"]' )
+			page.locator( 'role=button[name="Published"i]' )
 		).toBeDisabled();
 
 		await page.goto( testUtils.createURL( '/' ) );
@@ -434,7 +436,7 @@ test.describe( 'Widgets Customizer', () => {
 		await page.keyboard.type( 'First Paragraph' );
 		await testUtils.showBlockToolbar();
 
-		const optionsMenu = page.locator( 'role=menu[name="Options"]' );
+		const optionsMenu = page.locator( 'role=menu[name="Options"i]' );
 
 		// Open the more menu dropdown in block toolbar.
 		await testUtils.clickBlockToolbarButton( 'Options' );
@@ -471,27 +473,27 @@ test.describe( 'Widgets Customizer', () => {
 
 		await testUtils.showBlockToolbar();
 		await testUtils.clickBlockToolbarButton( 'Options' );
-		await page.click( 'role=menuitem[name="Group"]' );
+		await page.click( 'role=menuitem[name="Group"i]' );
 
 		// Refocus the paragraph block.
 		await page.focus(
-			'*role=document[name="Paragraph block"] >> text="First Paragraph"'
+			'*role=document[name="Paragraph block"i] >> text="First Paragraph"'
 		);
 		await testUtils.showBlockToolbar();
 		await testUtils.clickBlockToolbarButton( 'Move to widget area' );
 
-		await page.click( 'role=menuitemradio[name="Footer #2"]' );
+		await page.click( 'role=menuitemradio[name="Footer #2"i]' );
 
 		// Should switch to and expand Footer #2.
 		await expect(
 			page.locator(
-				'role=heading[name="Customizing ▸ Widgets Footer #2"]'
+				'role=heading[name="Customizing ▸ Widgets Footer #2"i]'
 			)
 		).toBeVisible();
 
 		// The paragraph block should be moved to the new sidebar and have focus.
 		const movedParagraphBlock = page.locator(
-			'*role=document[name="Paragraph block"] >> text="First Paragraph"'
+			'*role=document[name="Paragraph block"i] >> text="First Paragraph"'
 		);
 		await expect( movedParagraphBlock ).toBeVisible();
 		await expect( movedParagraphBlock ).toBeFocused();
@@ -525,41 +527,41 @@ test.describe( 'Widgets Customizer', () => {
 			page.waitForResponse(
 				testUtils.createURL( '/wp-admin/admin-ajax.php' )
 			),
-			page.click( 'role=button[name="Publish"]' ),
+			page.click( 'role=button[name="Publish"i]' ),
 		] );
 		// Wait for publishing to finish.
 		await expect(
-			page.locator( 'role=button[name="Published"]' )
+			page.locator( 'role=button[name="Published"i]' )
 		).toBeDisabled();
 
 		// Select the paragraph block
-		await page.focus( 'role=document[name="Paragraph block"]' );
+		await page.focus( 'role=document[name="Paragraph block"i]' );
 
 		// Click the three dots button, then click "Show More Settings".
 		await testUtils.showBlockToolbar();
 		await testUtils.clickBlockToolbarButton( 'Options' );
-		await page.click( 'role=menuitem[name="Show more settings"]' );
+		await page.click( 'role=menuitem[name="Show more settings"i]' );
 
 		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
 		await page.click(
 			'css=.typography-block-support-panel >> role=button[name=/^View( and add)? options$/]'
 		);
-		await page.click( 'role=menuitemcheckbox[name="Show Drop cap"]' );
+		await page.click( 'role=menuitemcheckbox[name="Show Drop cap"i]' );
 
-		await page.click( 'role=checkbox[name="Drop cap"]' );
+		await page.click( 'role=checkbox[name="Drop cap"i]' );
 
 		// Now that we've made a change:
 		// (1) Publish button should be active
 		// (2) We should still be in the "Block Settings" area
 		await expect(
-			page.locator( 'role=button[name="Publish"]' )
+			page.locator( 'role=button[name="Publish"i]' )
 		).not.toBeDisabled();
 
 		// This fails on 539cea09 and earlier; we get kicked back to the widgets area.
 		// We expect to stay in block settings.
 		await expect(
 			page.locator(
-				'role=heading[name="Customizing ▸ Widgets ▸ Footer #1 Block Settings"][level=3]'
+				'role=heading[name="Customizing ▸ Widgets ▸ Footer #1 Block Settings"i][level=3]'
 			)
 		).toBeVisible();
 	} );
@@ -598,10 +600,10 @@ class WidgetsCustomizerPage {
 	 * @param {string} widgetAreaName The Widget Area's name to expand on.
 	 */
 	async expandWidgetArea( widgetAreaName ) {
-		await this.page.click( 'role=heading[name=/Widgets/][level=3]' );
+		await this.page.click( 'role=heading[name=/Widgets/i][level=3]' );
 
 		await this.page.click(
-			`role=heading[name=/${ widgetAreaName }/][level=3]`
+			`role=heading[name=/${ widgetAreaName }/i][level=3]`
 		);
 	}
 
@@ -610,11 +612,11 @@ class WidgetsCustomizerPage {
 	 */
 	async addBlock( blockName ) {
 		await this.page.click(
-			'role=toolbar[name="Document tools"] >> role=button[name="Add block"]'
+			'role=toolbar[name="Document tools"i] >> role=button[name="Add block"i]'
 		);
 
 		const searchBox = this.page.locator(
-			'role=searchbox[name="Search for blocks and patterns"]'
+			'role=searchbox[name="Search for blocks and patterns"i]'
 		);
 
 		// Clear the input.
