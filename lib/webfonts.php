@@ -54,26 +54,6 @@ function wp_webfonts() {
  * );
  * </code>
  *
- * When requesting from the remote Google Fonts API service provider:
- * <code>
- * wp_register_webfonts(
- *      array(
- *          array(
- *              'provider'    => 'google',
- *              'font_family' => 'Source Serif Pro',
- *              'font_weight' => '200 900',
- *              'font_style'  => 'normal',
- *          ),
- *          array(
- *              'provider'    => 'google',
- *              'font_family' => 'Source Serif Pro',
- *              'font_weight' => '200 900',
- *              'font_style'  => 'italic',
- *          ),
- *      )
- * );
- * </code>
- *
  * @since 6.0.0
  *
  * @param array $webfonts Webfonts to be registered.
@@ -106,18 +86,6 @@ function wp_register_webfonts( array $webfonts = array() ) {
  * );
  * ```
  *
- * When requesting from the remote Google Fonts API service provider:
- * ```
- * wp_register_webfonts(
- *      array(
- *          'provider'    => 'google',
- *          'font_family' => 'Source Serif Pro',
- *          'font_weight' => '200 900',
- *          'font_style'  => 'normal',
- *      )
- * );
- * ```
- *
  * @since 6.0.0
  *
  * @param array $webfont Webfont to be registered.
@@ -133,8 +101,6 @@ function wp_register_webfont( array $webfont ) {
  * A webfont provider contains the business logic for how to
  * interact with a remote font service and how to generate
  * the `@font-face` styles for that remote service.
- *
- * See the `WP_Webfonts_Google_Provider` for inspiration.
  *
  * How to register a custom font service provider:
  *    1. Load its class file into memory before registration.
