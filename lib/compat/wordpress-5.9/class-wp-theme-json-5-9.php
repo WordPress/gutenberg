@@ -71,7 +71,8 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * - path       => where to find the preset within the settings section
 	 * - override   => whether a theme preset with the same slug as a default preset
-	 *                 can override it
+	 *                 can override it or the path to a setting that _prevents_
+	 *                 presets from being overridden
 	 * - value_key  => the key that represents the value
 	 * - value_func => optionally, instead of value_key, a function to generate
 	 *                 the value that takes a preset as an argument
@@ -118,7 +119,7 @@ class WP_Theme_JSON_5_9 {
 		),
 		array(
 			'path'              => array( 'color', 'duotone' ),
-			'override'          => true,
+			'override'          => array( 'color', 'defaultDuotone' ),
 			'use_default_names' => false,
 			'value_func'        => 'gutenberg_get_duotone_filter_property',
 			'css_vars'          => '--wp--preset--duotone--$slug',
