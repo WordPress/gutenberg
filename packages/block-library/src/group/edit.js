@@ -18,9 +18,15 @@ import {
 	MediaReplaceFlow,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { SelectControl } from '@wordpress/components';
+import {
+	SelectControl,
+	Spinner,
+	PanelBody,
+	FocalPointPicker,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -38,6 +44,10 @@ import {
 
 // For now let's keep things simple and use only images.
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+
+function mediaPosition( { x, y } ) {
+	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
+}
 
 const htmlElementMessages = {
 	header: __(
@@ -60,8 +70,11 @@ const htmlElementMessages = {
 	),
 };
 
+// TODO - duplicated from Cover. Should be in shared?
+const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
+
 function GroupEdit( { attributes, setAttributes, clientId } ) {
-	const { id, url, backgroundType, alt } = attributes;
+	const { id, url, backgroundType, alt, focalPoint } = attributes;
 
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
@@ -74,7 +87,10 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
+
+	const ref = useRef();
 	const isDarkElement = useRef();
+
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
@@ -103,15 +119,24 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 
 	// const bgStyle = { backgroundColor: overlayColor?.color };
 	const mediaStyle = {
-		// objectPosition:
-		// 	focalPoint && isImgElement
-		// 		? mediaPosition( focalPoint )
-		// 		: undefined,
+		objectPosition:
+			focalPoint && isImgElement
+				? mediaPosition( focalPoint )
+				: undefined,
 	};
 
 	const onSelectMedia = attributesFromMedia( setAttributes, 1 );
+	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const showBgImage = url && isImageBackground && isImgElement;
+	const showFocalPointPicker = isImageBackground;
+
+	const imperativeFocalPointPreview = ( value ) => {
+		const [ styleOfRef, property ] = isDarkElement.current
+			? [ isDarkElement.current.style, 'objectPosition' ]
+			: [ ref.current.style, 'backgroundPosition' ];
+		styleOfRef[ property ] = mediaPosition( value );
+	};
 
 	return (
 		<>
@@ -125,6 +150,27 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
 				/>
 			</BlockControls>
+			<InspectorControls>
+				{ !! url && (
+					<PanelBody title={ __( 'Media settings' ) }>
+						{ showFocalPointPicker && (
+							<FocalPointPicker
+								label={ __( 'Focal point picker' ) }
+								url={ url }
+								value={ focalPoint }
+								onDragStart={ imperativeFocalPointPreview }
+								onDrag={ imperativeFocalPointPreview }
+								onChange={ ( newFocalPoint ) =>
+									setAttributes( {
+										focalPoint: newFocalPoint,
+									} )
+								}
+							/>
+						) }
+					</PanelBody>
+				) }
+			</InspectorControls>
+
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
@@ -146,8 +192,6 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			</InspectorControls>
 
 			<TagName { ...blockProps }>
-				<div { ...innerBlocksProps } />
-
 				{ showBgImage && (
 					<img
 						ref={ isDarkElement }
@@ -157,6 +201,8 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 						style={ mediaStyle }
 					/>
 				) }
+				{ isUploadingMedia && <Spinner /> }
+				<div { ...innerBlocksProps } />
 			</TagName>
 		</>
 	);
