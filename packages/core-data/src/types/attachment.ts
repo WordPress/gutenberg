@@ -2,7 +2,7 @@ export interface Attachment {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
-	date?: string | null;
+	date: string | null;
 	/**
 	 * The date the post was published, as GMT.
 	 */
@@ -10,24 +10,15 @@ export interface Attachment {
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid?: {
-		/**
-		 * GUID for the post, as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * GUID for the post, transformed for display.
-		 */
-		rendered?: string;
-	};
+	guid?: RawData;
 	/**
 	 * Unique identifier for the post.
 	 */
-	id?: number;
+	id: number;
 	/**
 	 * URL to the post.
 	 */
-	link?: string;
+	link: string;
 	/**
 	 * The date the post was last modified, in the site's timezone.
 	 */
@@ -39,7 +30,7 @@ export interface Attachment {
 	/**
 	 * An alphanumeric identifier for the post unique to its type.
 	 */
-	slug?: string;
+	slug: string;
 	/**
 	 * A named status for the post.
 	 */
@@ -47,7 +38,7 @@ export interface Attachment {
 	/**
 	 * Type of post.
 	 */
-	type?: string;
+	type: string;
 	/**
 	 * Permalink template for the post.
 	 */
@@ -59,20 +50,11 @@ export interface Attachment {
 	/**
 	 * The title for the post.
 	 */
-	title?: {
-		/**
-		 * Title for the post, as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * HTML title for the post, transformed for display.
-		 */
-		rendered?: string;
-	};
+	title: RawData;
 	/**
 	 * The ID for the author of the post.
 	 */
-	author?: number;
+	author: number;
 	/**
 	 * Whether or not comments are open on the post.
 	 */
@@ -84,7 +66,9 @@ export interface Attachment {
 	/**
 	 * Meta fields.
 	 */
-	meta?: {};
+	meta?: {
+		[ k: string ]: unknown;
+	};
 	/**
 	 * The theme file to use to display the post.
 	 */
@@ -92,45 +76,29 @@ export interface Attachment {
 	/**
 	 * Alternative text to display when attachment is not displayed.
 	 */
-	alt_text?: string;
+	alt_text: string;
 	/**
 	 * The attachment caption.
 	 */
-	caption?: {
-		/**
-		 * Caption for the attachment, as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * HTML caption for the attachment, transformed for display.
-		 */
-		rendered?: string;
-	};
+	caption: RawData;
 	/**
 	 * The attachment description.
 	 */
-	description?: {
-		/**
-		 * Description for the attachment, as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * HTML description for the attachment, transformed for display.
-		 */
-		rendered?: string;
-	};
+	description?: RawData;
 	/**
 	 * Attachment type.
 	 */
-	media_type?: 'image' | 'file';
+	media_type: 'image' | 'file';
 	/**
 	 * The attachment MIME type.
 	 */
-	mime_type?: string;
+	mime_type: string;
 	/**
 	 * Details about the media file, specific to its type.
 	 */
-	media_details?: {};
+	media_details: {
+		[ k: string ]: unknown;
+	};
 	/**
 	 * The ID for the associated post of the attachment.
 	 */
@@ -138,9 +106,23 @@ export interface Attachment {
 	/**
 	 * URL to the original attachment file.
 	 */
-	source_url?: string;
+	source_url: string;
 	/**
 	 * List of the missing image sizes of the attachment.
 	 */
 	missing_image_sizes?: string[];
+}
+
+/**
+ * The raw data representation.
+ */
+export interface RawData {
+	/**
+	 * Data as it exists in the database.
+	 */
+	raw?: string;
+	/**
+	 * Data transformed for display.
+	 */
+	rendered?: string;
 }

@@ -1,4 +1,15 @@
-export interface Attachment {
+interface RawField {
+	/**
+	 * The data, as it exists in the database.
+	 */
+	raw?: string;
+	/**
+	 * The data, transformed for display.
+	 */
+	rendered?: string;
+}
+
+export interface Attachment< RawType > {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -10,16 +21,7 @@ export interface Attachment {
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid?: {
-		/**
-		 * GUID for the post, as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * GUID for the post, transformed for display.
-		 */
-		rendered?: string;
-	};
+	guid?: RawType;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -59,16 +61,7 @@ export interface Attachment {
 	/**
 	 * The title for the post.
 	 */
-	title?: {
-		/**
-		 * Title for the post, as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * HTML title for the post, transformed for display.
-		 */
-		rendered?: string;
-	};
+	title?: RawType;
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -96,29 +89,11 @@ export interface Attachment {
 	/**
 	 * The attachment caption.
 	 */
-	caption?: {
-		/**
-		 * Caption for the attachment, as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * HTML caption for the attachment, transformed for display.
-		 */
-		rendered?: string;
-	};
+	caption?: RawType;
 	/**
 	 * The attachment description.
 	 */
-	description?: {
-		/**
-		 * Description for the attachment, as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * HTML description for the attachment, transformed for display.
-		 */
-		rendered?: string;
-	};
+	description?: RawType;
 	/**
 	 * Attachment type.
 	 */
@@ -144,4 +119,3 @@ export interface Attachment {
 	 */
 	missing_image_sizes?: string[];
 }
-
