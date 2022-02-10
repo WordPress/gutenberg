@@ -1906,6 +1906,12 @@ class WP_Theme_JSON_5_9 {
 		// This should be removed when the plugin minimum WordPress version
 		// is bumped to 5.9.
 		//
+		// Since WordPress 5.9, the CSS Custom Properties are enqueued for all themes,
+		// so we no longer need to detect theme support for this.
+		// Removing this code will have the effect of making link color
+		// not visible for classic themes that opted-in and depended on the plugin
+		// to show the UI control for link color to users.
+		//
 		// Do not port this to WordPress core.
 		if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
 			if ( ! isset( $theme_settings['settings']['color'] ) ) {
