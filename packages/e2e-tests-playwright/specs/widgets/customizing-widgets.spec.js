@@ -18,9 +18,6 @@ test.describe( 'Widgets Customizer', () => {
 	test.beforeAll( async ( { testUtils } ) => {
 		// TODO: Ideally we can bundle our test theme directly in the repo.
 		await testUtils.activateTheme( 'twentytwenty' );
-		await testUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disables-the-css-animations'
-		);
 		await testUtils.activatePlugin( 'gutenberg-test-widgets' );
 	} );
 
@@ -30,9 +27,6 @@ test.describe( 'Widgets Customizer', () => {
 	} );
 
 	test.afterAll( async ( { testUtils } ) => {
-		await testUtils.activatePlugin(
-			'gutenberg-test-plugin-disables-the-css-animations'
-		);
 		await testUtils.deactivatePlugin( 'gutenberg-test-widgets' );
 		await testUtils.activateTheme( 'twentytwentyone' );
 	} );
