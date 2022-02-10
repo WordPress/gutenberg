@@ -995,7 +995,7 @@ Currently block variations exist for "header" and "footer" values of the area te
 ### patterns
 
 <div class="callout callout-alert">
-This field is only allowed when the Gutenberg plugin is active. It will be added in WordPress 6.0 so in previous versions it will be ignored.
+This field requires the Gutenberg plugin active and using the [version 2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/) of `theme.json`.
 </div>
 
 Within this field themes can list patterns to register from [Pattern Directory](https://wordpress.org/patterns/). The `patterns` field is an array of pattern `slugs` from the Pattern Directory. Pattern slugs can be extracted by the `url` in single pattern view at the Pattern Directory. For example in this url `https://wordpress.org/patterns/pattern/partner-logos` the slug is `partner-logos`.
