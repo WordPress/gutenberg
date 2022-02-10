@@ -1487,7 +1487,7 @@ class WP_Theme_JSON_5_9 {
 
 			// Replace the presets.
 			foreach ( static::PRESETS_METADATA as $preset ) {
-				$override_preset = static::should_override_preset( $this->theme_json, $node['path'], $preset['prevent_override'] );
+				$override_preset = ! static::get_metadata_boolean( $this->theme_json['settings'], $preset['prevent_override'], true );
 
 				foreach ( static::VALID_ORIGINS as $origin ) {
 					$base_path = array_merge( $node['path'], $preset['path'] );
@@ -1560,32 +1560,25 @@ class WP_Theme_JSON_5_9 {
 	}
 
 	/**
-	 * Returns whether a presets should be overridden or not.
+	 * For metadata values that can either be booleans or paths to booleans, gets the value.
 	 *
-	 * @param array      $theme_json The theme.json like structure to inspect.
-	 * @param array      $path Path to inspect.
-	 * @param bool|array $prevent_override Data to compute whether to prevent override of the preset.
+	 * @param array      $data The data to inspect.
+	 * @param bool|array $path Boolean or path to a boolean.
 	 * @return boolean
 	 */
-	protected static function should_override_preset( $theme_json, $path, $prevent_override ) {
-		if ( is_bool( $prevent_override ) ) {
-			return ! $prevent_override;
+	protected static function get_metadata_boolean( $data, $path, $default = false ) {
+		if ( is_bool( $path ) ) {
+			return $path;
 		}
 
-		if ( is_array( $prevent_override ) ) {
-			$value = _wp_array_get( $theme_json, array_merge( $path, $prevent_override ) );
+		if ( is_array( $path ) ) {
+			$value = _wp_array_get( $data, $path );
 			if ( isset( $value ) ) {
-				return ! $value;
+				return $value;
 			}
-
-			// Search the top-level key if none was found for this node.
-			$value = _wp_array_get( $theme_json, array_merge( array( 'settings' ), $prevent_override ) );
-			if ( isset( $value ) ) {
-				return ! $value;
-			}
-
-			return false;
 		}
+
+		return $default;
 	}
 
 	/**
