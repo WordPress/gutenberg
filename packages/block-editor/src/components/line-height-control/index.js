@@ -93,6 +93,50 @@ export default function LineHeightControl( {
 	__unstableInputWidth = '60px',
 } ) {
 	const isDefined = isLineHeightDefined( lineHeight );
+
+	const adjustNextValue = ( nextValue, wasTypedOrPasted ) => {
+		// Set the next value without modification if lineHeight has been defined
+		if ( isDefined ) return nextValue;
+
+		/**
+		 * The following logic handles the initial step up/down action
+		 * (from an undefined value state) so that the next values are better suited for
+		 * line-height rendering. For example, the first step up should immediately
+		 * go to 1.6, rather than the normally expected 0.1.
+		 *
+		 * Step up/down actions can be triggered by keydowns of the up/down arrow keys,
+		 * or by clicking the spin buttons.
+		 */
+		switch ( nextValue ) {
+			case `${ STEP }`:
+				// Increment by step value
+				return BASE_DEFAULT_VALUE + STEP;
+			case '0': {
+				// This means the user explicitly input '0', rather than stepped down
+				// from an undefined value state
+				if ( wasTypedOrPasted ) return nextValue;
+				// Decrement by step value
+				return BASE_DEFAULT_VALUE - STEP;
+			}
+			case '':
+				return BASE_DEFAULT_VALUE;
+			default:
+				return nextValue;
+		}
+	};
+
+	const stateReducer = ( state, action ) => {
+		// Be careful when changing this — cross-browser behavior of the
+		// `inputType` field in `input` events are inconsistent.
+		// For example, Firefox emits an input event with inputType="insertReplacementText"
+		// on spin button clicks, while other browsers do not even emit an input event.
+		const wasTypedOrPasted = [ 'insertText', 'insertFromPaste' ].includes(
+			action.payload.event.nativeEvent.inputType
+		);
+		state.value = adjustNextValue( state.value, wasTypedOrPasted );
+		return state;
+	};
+
 	const value = isDefined ? lineHeight : RESET_VALUE;
 
 	if ( ! __nextHasNoMarginBottom ) {
@@ -117,6 +161,7 @@ export default function LineHeightControl( {
 		>
 			<NumberControl
 				__unstableInputWidth={ __unstableInputWidth }
+				__unstableStateReducer={ stateReducer }
 				onChange={ onChange }
 				label={ __( 'Line height' ) }
 				placeholder={ BASE_DEFAULT_VALUE }
