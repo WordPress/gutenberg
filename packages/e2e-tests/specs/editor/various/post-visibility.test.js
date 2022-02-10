@@ -95,9 +95,7 @@ describe( 'Post visibility', () => {
 			'div[aria-label="Move forward to switch to the next month."]'
 		);
 		await (
-			await page.$x(
-				'//td[contains(concat(" ", @class, " "), " CalendarDay ")]/div[contains(concat(" ", @class, " "), " components-datetime__date__day ")][text() = "15"]'
-			)
+			await page.$x( '//td[@role="button"]/*[text() = "15"]' )
 		 )[ 0 ].click();
 
 		await page.click( '.edit-post-post-visibility__toggle' );
