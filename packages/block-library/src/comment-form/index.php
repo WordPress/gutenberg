@@ -25,7 +25,7 @@ function render_block_core_comment_form( $attributes, $content, $block ) {
 
 	$form_contents = <<<END
 	<turbo-frame id="new_comment">
-	<form>
+	<form action="/wp-comments-post.php" method="post">
 	<label for="name">Name:</label>
 	<input type="text" id="name" name="name" required size="10">
 
@@ -33,9 +33,12 @@ function render_block_core_comment_form( $attributes, $content, $block ) {
 	<textarea id="comment" name="comment" rows="5" cols="33">
 		It was a dark and stormy night...
 	</textarea>
+	<input type="hidden" name="comment_post_ID" value="{$block->context['postId']}">
+	<input type="submit" value="Submit">
 	<form>
 	</turbo-frame>
 	END;
+
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
