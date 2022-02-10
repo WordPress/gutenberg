@@ -49,7 +49,6 @@ export async function reinitializeEditor( target, settings ) {
 					'The editor is unable to find a block template for the homepage.'
 				) }
 				error={ error }
-				reboot={ () => reinitializeEditor( target, settings ) }
 				dashboardLink="index.php"
 			/>,
 			target
