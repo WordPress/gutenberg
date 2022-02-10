@@ -36,59 +36,55 @@ const BLOCK_PREFIX = 'wp-block';
  * future and styles should be added explicitly as editor styles.
  */
 function useEditorStylesCompat() {
+	// Search the document for stylesheets targetting the editor canvas.
+	const clonedStyles = [];
+	Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
+		try {
+			// May fail for external styles.
+			// eslint-disable-next-line no-unused-expressions
+			styleSheet.cssRules;
+		} catch ( e ) {
+			return;
+		}
+
+		const { ownerNode, cssRules } = styleSheet;
+
+		if ( ! cssRules ) {
+			return;
+		}
+
+		// Generally, ignore inline styles. We add inline styles belonging to a
+		// stylesheet later, which may or may not match the selectors.
+		if ( ownerNode.tagName !== 'LINK' ) {
+			return;
+		}
+
+		// Don't try to add the reset styles, which were removed as a dependency
+		// from `edit-blocks` for the iframe since we don't need to reset admin
+		// styles.
+		if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
+			return;
+		}
+
+		const isMatch = Array.from( cssRules ).find(
+			( { selectorText } ) =>
+				selectorText &&
+				( selectorText.includes( `.${ BODY_CLASS_NAME }` ) ||
+					selectorText.includes( `.${ BLOCK_PREFIX }` ) )
+		);
+
+		if ( isMatch ) {
+			clonedStyles.push( ownerNode.cloneNode( true ) );
+
+			// Add inline styles belonging to the stylesheet.
+			const inlineCssId = ownerNode.id.replace( '-css', '-inline-css' );
+			const inlineCssElement = document.getElementById( inlineCssId );
+			if ( inlineCssElement ) {
+				clonedStyles.push( inlineCssElement.cloneNode( true ) );
+			}
+		}
+	} );
 	return useRefEffect( ( node ) => {
-		// Search the document for stylesheets targetting the editor canvas.
-		const clonedStyles = [];
-		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
-			try {
-				// May fail for external styles.
-				// eslint-disable-next-line no-unused-expressions
-				styleSheet.cssRules;
-			} catch ( e ) {
-				return;
-			}
-
-			const { ownerNode, cssRules } = styleSheet;
-
-			if ( ! cssRules ) {
-				return;
-			}
-
-			// Generally, ignore inline styles. We add inline styles belonging to a
-			// stylesheet later, which may or may not match the selectors.
-			if ( ownerNode.tagName !== 'LINK' ) {
-				return;
-			}
-
-			// Don't try to add the reset styles, which were removed as a dependency
-			// from `edit-blocks` for the iframe since we don't need to reset admin
-			// styles.
-			if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
-				return;
-			}
-
-			const isMatch = Array.from( cssRules ).find(
-				( { selectorText } ) =>
-					selectorText &&
-					( selectorText.includes( `.${ BODY_CLASS_NAME }` ) ||
-						selectorText.includes( `.${ BLOCK_PREFIX }` ) )
-			);
-
-			if ( isMatch ) {
-				clonedStyles.push( ownerNode.cloneNode( true ) );
-
-				// Add inline styles belonging to the stylesheet.
-				const inlineCssId = ownerNode.id.replace(
-					'-css',
-					'-inline-css'
-				);
-				const inlineCssElement = document.getElementById( inlineCssId );
-				if ( inlineCssElement ) {
-					clonedStyles.push( inlineCssElement.cloneNode( true ) );
-				}
-			}
-		} );
-
 		function appendStyles() {
 			const doc = node.contentDocument;
 
