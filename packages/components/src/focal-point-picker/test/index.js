@@ -76,6 +76,7 @@ describe( 'FocalPointPicker', () => {
 					} }
 				/>
 			);
+			// Click and press arrow up
 			const dragArea = getByRole( 'button' );
 			act( () => {
 				fireEvent.mouseDown( dragArea );
@@ -97,6 +98,22 @@ describe( 'FocalPointPicker', () => {
 			const xInput = getByRole( 'spinbutton', { name: 'Left' } );
 			rerender( <Picker value={ { x: 0.93, y: 0.5 } } /> );
 			expect( xInput.value ).toBe( '93' );
+		} );
+		it( 'call onChange with the expected values', async () => {
+			const spyChange = jest.fn();
+			const { getByRole } = render(
+				<Picker value={ { x: 0.14, y: 0.62 } } onChange={ spyChange } />
+			);
+			// Click and press arrow up
+			const dragArea = getByRole( 'button' );
+			act( () => {
+				fireEvent.mouseDown( dragArea );
+				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
+			} );
+			expect( spyChange ).toHaveBeenCalledWith( {
+				x: '0.14',
+				y: '0.61',
+			} );
 		} );
 	} );
 } );
