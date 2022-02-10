@@ -33,7 +33,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 					'permission_callback' => array( $this, 'get_theme_item_permissions_check' ),
 					'args'                => array(
 						'stylesheet' => array(
-							'description'       => __( 'The theme identifier' ),
+							'description'       => __( 'The theme identifier', 'gutenberg' ),
 							'type'              => 'string',
 							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
 						),
