@@ -17,7 +17,7 @@ export default function PostTrash() {
 			isNew: store.isEditedPostNew(),
 			postId: store.getCurrentPostId(),
 		};
-	} );
+	}, [] );
 	const { trashPost } = useDispatch( editorStore );
 
 	if ( isNew || ! postId ) {
