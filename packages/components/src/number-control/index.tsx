@@ -99,10 +99,10 @@ export function NumberControl(
 				nextValue = subtract( nextValue, incrementalValue );
 			}
 
-			state.value = constrainValue(
+			state.value = `${ constrainValue(
 				nextValue,
 				enableShift ? incrementalValue : undefined
-			);
+			) }`;
 		}
 
 		/**
@@ -142,10 +142,10 @@ export function NumberControl(
 				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
 				const distance = delta * modifier * directionModifier;
 
-				state.value = constrainValue(
+				state.value = `${ constrainValue(
 					add( currentValue ?? 0, distance ),
 					enableShift ? modifier : undefined
-				);
+				) }`;
 			}
 		}
 
@@ -160,7 +160,7 @@ export function NumberControl(
 
 			state.value = applyEmptyValue
 				? currentValue
-				: constrainValue( ensureNumber( currentValue ?? 0 ) );
+				: `${ constrainValue( ensureNumber( currentValue ?? 0 ) ) }`;
 		}
 
 		return state;
@@ -182,7 +182,7 @@ export function NumberControl(
 			required={ required }
 			step={ stepProp }
 			type={ typeProp }
-			value={ valueProp }
+			value={ `${ valueProp }` }
 			__unstableStateReducer={ composeStateReducers(
 				numberControlStateReducer,
 				stateReducer
