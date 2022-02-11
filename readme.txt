@@ -33,7 +33,7 @@ For the adventurous and tech-savvy, the Gutenberg plugin gives you the latest an
 
 - **Contributors:** Gutenberg is an open-source project and welcomes all contributors from code to design, from documentation to triage. See the <a href="https://developer.wordpress.org/block-editor/contributors/">Contributor's Handbook</a> for all the details on how you can help.
 
-The development hub for the Gutenberg project can be found at <a href="https://github.com/wordpress/gutenberg">https://github.com/wordpress/gutenberg</a>. Discussions for the project are on the <a href="https://make.wordpress.org/core/">Make Core Blog</a> and in the #core-editor channel in Slack, <a href="https://make.wordpress.org/core/tag/core-editor-agenda/">including weekly meetings</a>. If you don’t have a slack account, you can <a href="https://make.wordpress.org/chat/">sign up here</a>.
+The development hub for the Gutenberg project can be found at <a href="https://github.com/wordpress/gutenberg">https://github.com/wordpress/gutenberg</a>. Discussions for the project are on the <a href="https://make.wordpress.org/core/">Make Core Blog</a> and in the #core-editor channel in Slack, <a href="https://make.wordpress.org/core/tag/core-editor-agenda/">including weekly meetings</a>. If you don’t have a Slack account, you can <a href="https://make.wordpress.org/chat/">sign up here</a>.
 
 == Frequently Asked Questions ==
 
