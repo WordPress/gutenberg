@@ -11,6 +11,11 @@ The Gutenberg plugin provides editing, customization, and site building features
 
 “Gutenberg” is a codename for a whole new paradigm for creating with WordPress, that aims to revolutionize the entire publishing experience as much as <a href="https://en.wikipedia.org/wiki/Johannes_Gutenberg">Johannes Gutenberg</a> did the printed word. The project is <a href="https://wordpress.org/about/roadmap/">following a four-phase process</a> that will touch major pieces of WordPress — Editing, Customization, Collaboration, and Multilingual.
 
+### Who Is This Plugin For?
+
+Are you a tech-savvy early adopter who likes testing bleeding-edge and experimental features, and isn’t afraid to tinker with features that are still in active development? Are you interested in contributing toward the Gutenberg open source project? If so, this beta plugin gives you access to the latest features around block and full site editing, as well as a peek into what’s to come.
+
+However, if you are running a production WordPress site, and favor stable, well-tested features, then you might want to stick with the block features already included with WordPress. Gutenberg is not recommended for production websites.
 
 ### What Does Gutenberg Do?
 
