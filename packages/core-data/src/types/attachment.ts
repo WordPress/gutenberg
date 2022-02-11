@@ -201,12 +201,15 @@ type EmbedProperties =
 export type Attachment<
 	Context extends EntityContext = EntityContext.view,
 	RawType = RawObject< Context >
-> = EntityInContext<
+> = Pick<
 	BaseAttachment< RawType >,
-	Context,
-	ViewProperties,
-	EditProperties,
-	EmbedProperties
+	Context extends EntityContext.view
+		? ViewProperties
+		: Context extends EntityContext.edit
+		? EditProperties
+		: Context extends EntityContext.embed
+		? EmbedProperties
+		: never
 >;
 
 const attachmentInViewContext = ( {} as any ) as Attachment< EntityContext.view >;

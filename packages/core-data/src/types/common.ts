@@ -70,20 +70,6 @@ export type view = EntityContext.view;
 export type edit = EntityContext.edit;
 export type embed = EntityContext.embed;
 
-export type EntityInContext<
-	EntityType extends EntityRecordWithRawData,
-	Context extends EntityContext,
-	ViewProps extends keyof EntityType,
-	EditProps extends keyof EntityType,
-	EmbedProps extends keyof EntityType
-> = Pick<
-	EntityType,
-	Context extends EntityContext.view
-		? ViewProps
-		: Context extends EntityContext.edit
-		? EditProps
-		: EmbedProps
->;
 
 export type RawField<
 	RawDataIsString extends boolean,
