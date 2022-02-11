@@ -33,10 +33,10 @@ class TestUtils {
 	page: Page;
 	context: BrowserContext;
 
-	constructor( browser: Browser, page: Page ) {
-		this.browser = browser;
+	constructor( page: Page ) {
 		this.page = page;
 		this.context = page.context();
+		this.browser = this.context.browser()!;
 	}
 
 	activatePlugin = activatePlugin;
