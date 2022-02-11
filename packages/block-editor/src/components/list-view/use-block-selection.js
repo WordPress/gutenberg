@@ -30,7 +30,7 @@ export default function useBlockSelection() {
 		async ( clientId, event ) => {
 			if ( ! event.shiftKey ) {
 				await clearSelectedBlock();
-				selectBlock( clientId, null );
+				selectBlock( clientId );
 			} else if ( event.shiftKey ) {
 				// To handle multiple block selection via the `SHIFT` key, prevent
 				// the browser default behavior of opening the link in a new window.
