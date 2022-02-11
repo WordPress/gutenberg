@@ -16,7 +16,6 @@ const {
 } = require( './cli' );
 const { fromConfigRoot, fromProjectRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
-const { exit } = require( './process' );
 const { log } = console;
 
 // See https://babeljs.io/docs/en/config-files#configuration-file-types.
@@ -184,6 +183,10 @@ function getWebpackEntryPoints() {
 		return JSON.parse( process.env.WP_ENTRY );
 	}
 
+	if ( ! hasProjectFile( 'src' ) ) {
+		return {};
+	}
+
 	// 2. Checks whether any block metadata files can be detected in the `src` directory.
 	//    It scans all discovered files looking for JavaScript assets and converts them to entry points.
 	const blockMetadataFiles = glob( 'src/**/block.json', {
@@ -268,10 +271,8 @@ function getWebpackEntryPoints() {
 		absolute: true,
 	} );
 	if ( ! entryFile ) {
-		log(
-			chalk.bold.red( 'No entry files discovered in the "src" folder.' )
-		);
-		exit( 1 );
+		log( chalk.yellow( 'No entry file discovered in the "src" folder.' ) );
+		return {};
 	}
 
 	return {
