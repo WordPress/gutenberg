@@ -20,6 +20,10 @@ import { add, subtract, roundClamp } from '../utils/math';
 import { isValueEmpty } from '../utils/values';
 import type { Props } from './types';
 
+// TODO: is there a "safer" version? Should we strip white space, etc?
+const ensureNumber = ( n: string | number ) =>
+	typeof n === 'string' ? parseFloat( n ) : n;
+
 export function NumberControl(
 	{
 		__unstableStateReducer: stateReducer = ( state ) => state,
@@ -29,19 +33,22 @@ export function NumberControl(
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
 		label,
-		max = Infinity,
-		min = -Infinity,
+		max: maxProp = Infinity,
+		min: minProp = -Infinity,
 		required = false,
 		shiftStep = 10,
-		step = 1,
+		step: stepProp = 1,
 		type: typeProp = 'number',
 		value: valueProp,
 		...props
 	}: Props,
 	ref: Ref< any >
 ) {
-	const isStepAny = step === 'any';
-	const baseStep = isStepAny ? 1 : parseFloat( step );
+	const min = ensureNumber( minProp );
+	const max = ensureNumber( maxProp );
+
+	const isStepAny = stepProp === 'any';
+	const baseStep = isStepAny ? 1 : ensureNumber( stepProp );
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = ( value, stepOverride ) => {
 		// When step is "any" clamp the value, otherwise round and clamp it
@@ -178,7 +185,7 @@ export function NumberControl(
 			min={ min }
 			ref={ ref }
 			required={ required }
-			step={ step }
+			step={ stepProp }
 			type={ typeProp }
 			value={ valueProp }
 			__unstableStateReducer={ composeStateReducers(
