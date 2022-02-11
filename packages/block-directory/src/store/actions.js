@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { pick } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -8,6 +13,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -86,8 +92,26 @@ export const installBlockType = ( block ) => async ( {
 		} );
 
 		// Ensures that the block metadata is propagated to the editor when registered on the server.
+		const metadataFields = [
+			'api_version',
+			'title',
+			'category',
+			'parent',
+			'icon',
+			'description',
+			'keywords',
+			'attributes',
+			'provides_context',
+			'uses_context',
+			'supports',
+			'styles',
+			'example',
+			'variations',
+		];
 		await apiFetch( {
-			path: `/wp/v2/block-types/${ name }`,
+			path: addQueryArgs( `/wp/v2/block-types/${ name }`, {
+				_fields: metadataFields,
+			} ),
 		} )
 			// Ignore when the block is not registered on the server.
 			.catch( () => {} )
@@ -96,27 +120,7 @@ export const installBlockType = ( block ) => async ( {
 					return;
 				}
 				unstable__bootstrapServerSideBlockDefinitions( {
-					[ name ]: [
-						'api_version',
-						'title',
-						'category',
-						'parent',
-						'icon',
-						'description',
-						'keywords',
-						'attributes',
-						'provides_context',
-						'uses_context',
-						'supports',
-						'styles',
-						'example',
-						'variations',
-					].reduce( ( accumulator, key ) => {
-						if ( key in response ) {
-							accumulator[ key ] = response[ key ];
-						}
-						return accumulator;
-					}, {} ),
+					[ name ]: pick( response, metadataFields ),
 				} );
 			} );
 
