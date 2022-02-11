@@ -31,6 +31,7 @@ export default function NavigationMenuSelector( {
 	const {
 		navigationMenus,
 		canUserCreateNavigation: canUserCreateNavigationMenu,
+		canUserUpdateNavigationEntity: canUserUpdateNavigationMenu,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
@@ -112,20 +113,24 @@ export default function NavigationMenuSelector( {
 				</MenuGroup>
 			) }
 
-			{ showManageActions && canUserCreateNavigationMenu && (
-				<MenuGroup label={ __( 'Tools' ) }>
-					<MenuItem onClick={ onCreateNew }>
-						{ __( 'Create new menu' ) }
-					</MenuItem>
-					<MenuItem
-						href={ addQueryArgs( 'edit.php', {
-							post_type: 'wp_navigation',
-						} ) }
-					>
-						{ __( 'Manage menus' ) }
-					</MenuItem>
-				</MenuGroup>
-			) }
+			{ showManageActions &&
+				( canUserCreateNavigationMenu ||
+					canUserUpdateNavigationMenu ) && (
+					<MenuGroup label={ __( 'Tools' ) }>
+						{ canUserCreateNavigationMenu && (
+							<MenuItem onClick={ onCreateNew }>
+								{ __( 'Create new menu' ) }
+							</MenuItem>
+						) }
+						<MenuItem
+							href={ addQueryArgs( 'edit.php', {
+								post_type: 'wp_navigation',
+							} ) }
+						>
+							{ __( 'Manage menus' ) }
+						</MenuItem>
+					</MenuGroup>
+				) }
 		</>
 	);
 }
