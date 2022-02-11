@@ -6,6 +6,8 @@
 
 -   Automatically copy PHP files located in the `src` folder and its subfolders to the output directory (`build` by default) ([#38715](https://github.com/WordPress/gutenberg/pull/38715)).
 
+## 21.0.1 (2022-02-11)
+
 ### Bug Fix
 
 -   Return a default entry object in the `build` command when no entry files discovered in the project ([#38737](https://github.com/WordPress/gutenberg/pull/38737)).
