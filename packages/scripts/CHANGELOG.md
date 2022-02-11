@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Automatically copy PHP files located in the `src` folder and its subfolders to the output directory (`build` by default) ([#38715](https://github.com/WordPress/gutenberg/pull/38715)).
+
+
 ## 21.0.0 (2022-02-10)
 
 ### Breaking Changes
