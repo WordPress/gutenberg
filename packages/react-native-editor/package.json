@@ -126,7 +126,7 @@
 		"clean:haste": "rm -rf /tmp/haste-map-react-native-packager-*",
 		"clean:install": "npm run clean; npm install",
 		"clean:jest": "jest --clearCache --config ../../test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
-		"clean:metro": "rm -rf $TMPDIR/metro-cache-*;",
+		"clean:metro": "rm -rf $TMPDIR/metro-cache/",
 		"clean:react": "rm -rf $TMPDIR/react-*",
 		"clean:watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
 		"clean:babel-cache": "rm -rf ../../node_modules/.cache/babel-loader/*",
