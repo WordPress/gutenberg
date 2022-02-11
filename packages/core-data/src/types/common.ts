@@ -1,19 +1,26 @@
-/**
- * The raw data representation.
- */
-export interface RawObject {
+export interface FullRawObject {
 	/**
 	 * Data as it exists in the database.
 	 */
-	raw?: string;
+	raw: string;
 	/**
 	 * Data transformed for display.
 	 */
-	rendered?: string;
+	rendered: string;
 }
 
+/**
+ * The raw data representation.
+ */
+export type RawObject< Context extends EntityContext > = Pick<
+	FullRawObject,
+	Context extends EntityContext.edit ? 'raw' | 'rendered' : 'rendered'
+>;
+
+type DefaultRawObject = RawObject< EntityContext.view >;
+
 export type RawString = string;
-export type RawData = RawObject | RawString;
+export type RawData = Partial< DefaultRawObject > | RawString;
 
 export type PostStatus = 'publish' | 'future' | 'draft' | 'pending' | 'private';
 
@@ -34,7 +41,7 @@ export type TemplateContent =
 	| string;
 
 export interface EntityRecordWithRawData<
-	RawType extends RawData = RawObject
+	RawType extends RawData = DefaultRawObject
 > {}
 
 export interface AvatarUrls {
@@ -53,3 +60,49 @@ export interface AvatarUrls {
 
 	[ k: string ]: string;
 }
+
+export enum EntityContext {
+	view = 'view',
+	edit = 'edit',
+	embed = 'embed',
+}
+export type view = EntityContext.view;
+export type edit = EntityContext.edit;
+export type embed = EntityContext.embed;
+
+export type EntityInContext<
+	EntityType extends EntityRecordWithRawData,
+	Context extends EntityContext,
+	ViewProps extends keyof EntityType,
+	EditProps extends keyof EntityType,
+	EmbedProps extends keyof EntityType
+> = Pick<
+	EntityType,
+	Context extends EntityContext.view
+		? ViewProps
+		: Context extends EntityContext.edit
+		? EditProps
+		: EmbedProps
+>;
+
+export type RawField<
+	RawDataIsString extends boolean,
+	T
+> = RawDataIsString extends true ? string : T;
+
+export type OnlyInContexts<
+	FieldType,
+	AvailableInContexts extends EntityContext,
+	Context extends EntityContext
+> = AvailableInContexts extends Context ? FieldType : never;
+
+export type DifferentPerContext<
+	ViewType,
+	EditType,
+	EmbedType,
+	Context extends EntityContext
+> = Context extends view
+	? ViewType
+	: Context extends edit
+	? EditType
+	: EmbedType;

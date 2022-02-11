@@ -2,14 +2,18 @@
  * Internal dependencies
  */
 import {
+	EntityInContext,
+	EntityContext,
 	EntityRecordWithRawData,
 	OpenOrClosed,
 	PostStatus,
+	RawObject,
+	RawString,
 } from './common';
 
 type MediaType = 'image' | 'file';
 
-export interface Attachment< RawType > extends EntityRecordWithRawData {
+export interface BaseAttachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -17,11 +21,11 @@ export interface Attachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The date the post was published, as GMT.
 	 */
-	date_gmt?: string | null;
+	date_gmt: string | null;
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid?: RawType;
+	guid: RawType;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -33,11 +37,11 @@ export interface Attachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The date the post was last modified, in the site's timezone.
 	 */
-	modified?: string;
+	modified: string;
 	/**
 	 * The date the post was last modified, as GMT.
 	 */
-	modified_gmt?: string;
+	modified_gmt: string;
 	/**
 	 * An alphanumeric identifier for the post unique to its type.
 	 */
@@ -45,7 +49,7 @@ export interface Attachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * A named status for the post.
 	 */
-	status?: PostStatus;
+	status: PostStatus;
 	/**
 	 * Type of post.
 	 */
@@ -53,11 +57,11 @@ export interface Attachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * Permalink template for the post.
 	 */
-	permalink_template?: string;
+	permalink_template: string;
 	/**
 	 * Slug automatically generated from the post title.
 	 */
-	generated_slug?: string;
+	generated_slug: string;
 	/**
 	 * The title for the post.
 	 */
@@ -69,21 +73,21 @@ export interface Attachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status?: OpenOrClosed;
+	comment_status: OpenOrClosed;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status?: OpenOrClosed;
+	ping_status: OpenOrClosed;
 	/**
 	 * Meta fields.
 	 */
-	meta?: {
+	meta: {
 		[ k: string ]: string;
 	};
 	/**
 	 * The theme file to use to display the post.
 	 */
-	template?: string;
+	template: string;
 	/**
 	 * Alternative text to display when attachment is not displayed.
 	 */
@@ -95,7 +99,7 @@ export interface Attachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The attachment description.
 	 */
-	description?: RawType;
+	description: RawType;
 	/**
 	 * Attachment type.
 	 */
@@ -113,7 +117,7 @@ export interface Attachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The ID for the associated post of the attachment.
 	 */
-	post?: number;
+	post: number;
 	/**
 	 * URL to the original attachment file.
 	 */
@@ -121,23 +125,101 @@ export interface Attachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * List of the missing image sizes of the attachment.
 	 */
-	missing_image_sizes?: string[];
+	missing_image_sizes: string[];
 }
 
-/*
-type ViewContext = 'ViewContext';
-type EditContext = 'EditContext';
-type EmbedContext = 'EmbedContext';
-type EntityContext = ViewContext | EditContext | EmbedContext;
+type ViewProperties =
+	| 'date'
+	| 'date_gmt'
+	| 'guid'
+	| 'id'
+	| 'link'
+	| 'modified'
+	| 'modified_gmt'
+	| 'slug'
+	| 'status'
+	| 'type'
+	| 'title'
+	| 'author'
+	| 'comment_status'
+	| 'ping_status'
+	| 'meta'
+	| 'template'
+	| 'alt_text'
+	| 'caption'
+	| 'description'
+	| 'media_type'
+	| 'mime_type'
+	| 'media_details'
+	| 'post'
+	| 'source_url';
 
-type ViewProperties = 'date' | 'date_gmt';
-type EditProperties = 'date' | 'id';
+type EditProperties =
+	| 'date'
+	| 'date_gmt'
+	| 'guid'
+	| 'id'
+	| 'link'
+	| 'modified'
+	| 'modified_gmt'
+	| 'slug'
+	| 'status'
+	| 'type'
+	| 'permalink_template'
+	| 'generated_slug'
+	| 'title'
+	| 'author'
+	| 'comment_status'
+	| 'ping_status'
+	| 'meta'
+	| 'template'
+	| 'alt_text'
+	| 'caption'
+	| 'description'
+	| 'media_type'
+	| 'mime_type'
+	| 'media_details'
+	| 'post'
+	| 'source_url'
+	| 'missing_image_sizes';
+
+type EmbedProperties =
+	| 'date'
+	| 'id'
+	| 'link'
+	| 'slug'
+	| 'type'
+	| 'title'
+	| 'author'
+	| 'alt_text'
+	| 'caption'
+	| 'media_type'
+	| 'mime_type'
+	| 'media_details'
+	| 'source_url';
 
 export type Attachment<
-	Context extends EntityContext = EditContext,
-	RawType = RawObject
-> = Pick<
+	Context extends EntityContext = EntityContext.view,
+	RawType = RawObject< Context >
+> = EntityInContext<
 	BaseAttachment< RawType >,
-	Context extends ViewContext ? ViewProperties : EditProperties
+	Context,
+	ViewProperties,
+	EditProperties,
+	EmbedProperties
 >;
-*/
+
+const attachmentInViewContext = ( {} as any ) as Attachment< EntityContext.view >;
+// attachmentInViewContext.title is { rendered: string }
+
+const attachmentInEditContext = ( {} as any ) as Attachment< EntityContext.edit >;
+// attachmentInEditContext.title is { raw: string, rendered: string }
+
+const attachmentInEmbedContext = ( {} as any ) as Attachment< EntityContext.embed >;
+// attachmentInViewContext.title is { rendered: string }
+
+const editedAttachmentRecord = ( {} as any ) as Attachment<
+	EntityContext.edit,
+	RawString
+>;
+// editedAttachmentRecord.title is string

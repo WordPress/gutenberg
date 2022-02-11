@@ -1,9 +1,22 @@
 /**
  * Internal dependencies
  */
-import { EntityRecordWithRawData, OpenOrClosed, PostStatus } from './common';
+import {
+	edit,
+	EntityContext,
+	OnlyInContexts,
+	FullRawObject,
+	RawField,
+	view,
+	OpenOrClosed,
+	DifferentPerContext,
+	PostStatus,
+} from './common';
 
-export interface Post< RawType > extends EntityRecordWithRawData {
+export interface Post<
+	Context extends EntityContext,
+	RawDataIsString extends boolean = false
+> {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -11,11 +24,19 @@ export interface Post< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The date the post was published, as GMT.
 	 */
-	date_gmt?: string | null;
+	date_gmt: OnlyInContexts< string | null, view | edit, Context >;
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid?: RawType;
+	guid: RawField<
+		RawDataIsString,
+		DifferentPerContext<
+			Pick< FullRawObject, 'rendered' >,
+			FullRawObject,
+			never,
+			Context
+		>
+	>;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -27,11 +48,11 @@ export interface Post< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The date the post was last modified, in the site's timezone.
 	 */
-	modified?: string;
+	modified: OnlyInContexts< string, view | edit, Context >;
 	/**
 	 * The date the post was last modified, as GMT.
 	 */
-	modified_gmt?: string;
+	modified_gmt: OnlyInContexts< string, view | edit, Context >;
 	/**
 	 * An alphanumeric identifier for the post unique to its type.
 	 */
@@ -39,7 +60,7 @@ export interface Post< RawType > extends EntityRecordWithRawData {
 	/**
 	 * A named status for the post.
 	 */
-	status?: PostStatus;
+	status: OnlyInContexts< PostStatus, view | edit, Context >;
 	/**
 	 * Type of post.
 	 */
@@ -47,23 +68,39 @@ export interface Post< RawType > extends EntityRecordWithRawData {
 	/**
 	 * A password to protect access to the content and excerpt.
 	 */
-	password?: string;
+	password: OnlyInContexts< string, edit, Context >;
 	/**
 	 * Permalink template for the post.
 	 */
-	permalink_template?: string;
+	permalink_template: OnlyInContexts< string, edit, Context >;
 	/**
 	 * Slug automatically generated from the post title.
 	 */
-	generated_slug?: string;
+	generated_slug: OnlyInContexts< string, edit, Context >;
 	/**
 	 * The title for the post.
 	 */
-	title: RawType;
+	title: RawField<
+		RawDataIsString,
+		DifferentPerContext<
+			Pick< FullRawObject, 'rendered' >,
+			FullRawObject,
+			Pick< FullRawObject, 'rendered' >,
+			Context
+		>
+	>;
 	/**
 	 * The content for the post.
 	 */
-	content?: RawType;
+	content: RawField<
+		RawDataIsString,
+		DifferentPerContext<
+			Pick< FullRawObject, 'rendered' > & { protected: boolean },
+			FullRawObject & { block_version: number; protected: boolean },
+			{ protected: boolean },
+			Context
+		>
+	>;
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -71,7 +108,15 @@ export interface Post< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The excerpt for the post.
 	 */
-	excerpt: RawType;
+	excerpt: RawField<
+		RawDataIsString,
+		DifferentPerContext<
+			Pick< FullRawObject, 'rendered' >,
+			FullRawObject,
+			Pick< FullRawObject, 'rendered' >,
+			Context
+		> & { protected: boolean }
+	>;
 	/**
 	 * The ID of the featured media for the post.
 	 */
@@ -79,37 +124,41 @@ export interface Post< RawType > extends EntityRecordWithRawData {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status?: OpenOrClosed;
+	comment_status: OnlyInContexts< OpenOrClosed, view | edit, Context >;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status?: OpenOrClosed;
+	ping_status: OnlyInContexts< OpenOrClosed, view | edit, Context >;
 	/**
 	 * The format for the post.
 	 */
-	format?: PostFormat;
+	format: OnlyInContexts< PostFormat, view | edit, Context >;
 	/**
 	 * Meta fields.
 	 */
-	meta?: {
-		[ k: string ]: string;
-	};
+	meta: OnlyInContexts<
+		{
+			[ k: string ]: string;
+		},
+		view | edit,
+		Context
+	>;
 	/**
 	 * Whether or not the post should be treated as sticky.
 	 */
-	sticky?: boolean;
+	sticky: OnlyInContexts< boolean, view | edit, Context >;
 	/**
 	 * The theme file to use to display the post.
 	 */
-	template?: string;
+	template: OnlyInContexts< string, view | edit, Context >;
 	/**
 	 * The terms assigned to the post in the category taxonomy.
 	 */
-	categories?: number[];
+	categories: OnlyInContexts< number[], view | edit, Context >;
 	/**
 	 * The terms assigned to the post in the post_tag taxonomy.
 	 */
-	tags?: number[];
+	tags: OnlyInContexts< number[], view | edit, Context >;
 }
 
 type PostFormat =
