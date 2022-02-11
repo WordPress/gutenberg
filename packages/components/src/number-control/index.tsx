@@ -1,8 +1,8 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
 import classNames from 'classnames';
+import type { Ref } from 'react';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,7 @@ import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { composeStateReducers } from '../input-control/reducer/reducer';
 import { add, subtract, roundClamp } from '../utils/math';
 import { isValueEmpty } from '../utils/values';
+import type { Props } from './types';
 
 export function NumberControl(
 	{
@@ -36,8 +37,8 @@ export function NumberControl(
 		type: typeProp = 'number',
 		value: valueProp,
 		...props
-	},
-	ref
+	}: Props,
+	ref: Ref< any >
 ) {
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : parseFloat( step );
