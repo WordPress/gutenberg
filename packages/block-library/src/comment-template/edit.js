@@ -17,9 +17,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { convertToTree } from './util';
 
 const TEMPLATE = [
