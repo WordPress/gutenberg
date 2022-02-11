@@ -5,7 +5,7 @@
 		"isValid": true,
 		"attributes": {
 			"backgroundColor": "accent",
-			"opacity": "default"
+			"opacity": "css"
 		},
 		"innerBlocks": [],
 		"originalContent": "<hr class=\"wp-block-separator has-text-color has-background has-accent-background-color has-accent-color\"/>"

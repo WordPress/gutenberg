@@ -6,11 +6,11 @@
 
 	// V2 of the block can set opacity via the backgroundColor
 	// alpha channel so reset the default opacity.
-	&.has-default-opacity {
+	&.has-css-opacity {
 		opacity: 0.4;
 	}
 
-	&:not(.has-default-opacity) {
+	&.has-alpha-channel-opacity {
 		opacity: initial;
 	}
 

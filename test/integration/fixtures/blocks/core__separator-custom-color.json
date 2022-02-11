@@ -4,14 +4,14 @@
 		"name": "core/separator",
 		"isValid": true,
 		"attributes": {
+			"opacity": "alpha-channel",
 			"style": {
 				"color": {
 					"background": "#5da54c"
 				}
-			},
-			"className": "has-alpha-channel"
+			}
 		},
 		"innerBlocks": [],
-		"originalContent": "<hr class=\"wp-block-separator has-text-color has-alpha-channel has-background\" style=\"background-color:#5da54c;color:#5da54c\"/>"
+		"originalContent": "<hr class=\"wp-block-separator has-text-color has-alpha-channel-opacity has-background\" style=\"background-color:#5da54c;color:#5da54c\"/>"
 	}
 ]

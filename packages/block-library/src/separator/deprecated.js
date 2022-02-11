@@ -41,15 +41,15 @@ const v1 = {
 
 		return <hr { ...useBlockProps.save( { className, style } ) } />;
 	},
-	isEligible( { color, customColor } ) {
-		return color || customColor;
+	isEligible( { opacity } ) {
+		return ! opacity;
 	},
 	migrate( attributes ) {
 		const { color, customColor } = attributes;
 		return {
 			...omit( attributes, [ 'color', 'customColor' ] ),
 			backgroundColor: color ? color : undefined,
-			opacity: color ? 'default' : undefined,
+			opacity: 'css',
 			style: customColor
 				? { color: { background: customColor } }
 				: undefined,
