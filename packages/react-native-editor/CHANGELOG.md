@@ -13,7 +13,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.71.1
 
--   [**] [Gallery block] Fix crash when adding images and selecting a gallery item [#38238]
+-   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
 
 ## 1.71.0
 
