@@ -19,19 +19,33 @@ export default {
 };
 
 function NavigatorButton( { path, ...props } ) {
-	const { push } = useNavigator();
+	const { goTo } = useNavigator();
+	const dataAttrName = 'data-navigator-focusable-id';
+	const dataAttrValue = path;
+
+	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+
+	const buttonProps = {
+		...props,
+		[ dataAttrName ]: dataAttrValue,
+	};
+
 	return (
 		<Button
 			variant="secondary"
-			onClick={ () => push( path ) }
-			{ ...props }
+			onClick={ () =>
+				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
+			}
+			{ ...buttonProps }
 		/>
 	);
 }
 
 function NavigatorBackButton( props ) {
-	const { pop } = useNavigator();
-	return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
+	const { goBack } = useNavigator();
+	return (
+		<Button variant="secondary" onClick={ () => goBack() } { ...props } />
+	);
 }
 
 const MyNavigation = () => {

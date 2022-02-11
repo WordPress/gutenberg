@@ -31,27 +31,51 @@ const PATHS = {
 };
 
 function NavigatorButton( { path, onClick, ...props } ) {
-	const { push } = useNavigator();
+	const { goTo } = useNavigator();
 	return (
 		<button
 			onClick={ () => {
-				push( path );
-				// Used to spy on the values passed to `navigator.push`
-				onClick?.( { type: 'push', path } );
+				goTo( path );
+				// Used to spy on the values passed to `navigator.goTo`
+				onClick?.( { type: 'goTo', path } );
 			} }
 			{ ...props }
 		/>
 	);
 }
 
-function NavigatorBackButton( { onClick, ...props } ) {
-	const { pop } = useNavigator();
+function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
+	const { goTo } = useNavigator();
+	const dataAttrName = 'data-navigator-focusable-id';
+	const dataAttrValue = path;
+
+	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+
+	const buttonProps = {
+		...props,
+		[ dataAttrName ]: dataAttrValue,
+	};
+
 	return (
 		<button
 			onClick={ () => {
-				pop();
-				// Used to spy on the values passed to `navigator.push`
-				onClick?.( { type: 'pop' } );
+				goTo( path, { focusTargetSelector: dataAttrCssSelector } );
+				// Used to spy on the values passed to `navigator.goTo`
+				onClick?.( { type: 'goTo', path } );
+			} }
+			{ ...buttonProps }
+		/>
+	);
+}
+
+function NavigatorBackButton( { onClick, ...props } ) {
+	const { goBack } = useNavigator();
+	return (
+		<button
+			onClick={ () => {
+				goBack();
+				// Used to spy on the values passed to `navigator.goBack`
+				onClick?.( { type: 'goBack' } );
 			} }
 			{ ...props }
 		/>
@@ -66,27 +90,27 @@ const MyNavigation = ( {
 		<NavigatorScreen path={ PATHS.HOME }>
 			<p>This is the home screen.</p>
 			<NavigatorButton
-				path={ PATHS.CHILD }
-				onClick={ onNavigatorButtonClick }
-			>
-				Navigate to child screen.
-			</NavigatorButton>
-			<NavigatorButton
 				path={ PATHS.NOT_FOUND }
 				onClick={ onNavigatorButtonClick }
 			>
 				Navigate to non-existing screen.
 			</NavigatorButton>
+			<NavigatorButtonWithFocusRestoration
+				path={ PATHS.CHILD }
+				onClick={ onNavigatorButtonClick }
+			>
+				Navigate to child screen.
+			</NavigatorButtonWithFocusRestoration>
 		</NavigatorScreen>
 
 		<NavigatorScreen path={ PATHS.CHILD }>
 			<p>This is the child screen.</p>
-			<NavigatorButton
+			<NavigatorButtonWithFocusRestoration
 				path={ PATHS.NESTED }
 				onClick={ onNavigatorButtonClick }
 			>
 				Navigate to nested screen.
-			</NavigatorButton>
+			</NavigatorButtonWithFocusRestoration>
 			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
 				Go back
 			</NavigatorBackButton>
@@ -246,28 +270,28 @@ describe( 'Navigator', () => {
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toBeInTheDocument();
 
-		// Check the values passed to `navigator.push()`
+		// Check the values passed to `navigator.goTo()`
 		expect( spy ).toHaveBeenCalledTimes( 6 );
 		expect( spy ).toHaveBeenNthCalledWith( 1, {
 			path: PATHS.CHILD,
-			type: 'push',
+			type: 'goTo',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 2, {
-			type: 'pop',
+			type: 'goBack',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 3, {
 			path: PATHS.CHILD,
-			type: 'push',
+			type: 'goTo',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 4, {
 			path: PATHS.NESTED,
-			type: 'push',
+			type: 'goTo',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 5, {
-			type: 'pop',
+			type: 'goBack',
 		} );
 		expect( spy ).toHaveBeenNthCalledWith( 6, {
-			type: 'pop',
+			type: 'goBack',
 		} );
 	} );
 
@@ -291,11 +315,39 @@ describe( 'Navigator', () => {
 			getNestedScreen( { throwIfNotFound: false } )
 		).not.toBeInTheDocument();
 
-		// Check the values passed to `navigator.push()`
+		// Check the values passed to `navigator.goTo()`
 		expect( spy ).toHaveBeenCalledTimes( 1 );
 		expect( spy ).toHaveBeenNthCalledWith( 1, {
 			path: PATHS.NOT_FOUND,
-			type: 'push',
+			type: 'goTo',
 		} );
+	} );
+
+	it( 'should restore focus correctly', () => {
+		render( <MyNavigation /> );
+
+		expect( getHomeScreen() ).toBeInTheDocument();
+
+		// Navigate to child screen
+		fireEvent.click( getToChildScreenButton() );
+
+		expect( getChildScreen() ).toBeInTheDocument();
+
+		// Navigate to nested screen
+		fireEvent.click( getToNestedScreenButton() );
+
+		expect( getNestedScreen() ).toBeInTheDocument();
+
+		// Navigate back to child screen, check that focus was correctly restored
+		fireEvent.click( getBackButton() );
+
+		expect( getChildScreen() ).toBeInTheDocument();
+		expect( getToNestedScreenButton() ).toHaveFocus();
+
+		// Navigate back to home screen, check that focus was correctly restored
+		fireEvent.click( getBackButton() );
+
+		expect( getHomeScreen() ).toBeInTheDocument();
+		expect( getToChildScreenButton() ).toHaveFocus();
 	} );
 } );

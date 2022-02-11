@@ -656,6 +656,15 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 -	**Supports:** anchor, typography (fontSize, lineHeight)
 -	**Attributes:** align, citation, value
 
+## Read More
+
+Displays the link of a post, page, or any other content-type. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/read-more))
+
+-	**Name:** core/read-more
+-	**Category:** theme
+-	**Supports:** color (background, gradients, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** content, linkTarget
+
 ## RSS
 
 Display entries from any RSS or Atom feed. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/rss))

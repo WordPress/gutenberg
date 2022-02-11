@@ -84,11 +84,8 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, anchor } ) =>
-					createBlock( 'core/paragraph', {
-						content,
-						anchor,
-					} )
+				attributes.map( ( { content } ) =>
+					createBlock( 'core/paragraph', { content } )
 				),
 		},
 	],

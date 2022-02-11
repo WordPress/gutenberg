@@ -2,7 +2,7 @@
 
 exports[`Keep styles on block transforms Should keep colors during a transform 1`] = `
 "<!-- wp:paragraph {\\"textColor\\":\\"luminous-vivid-orange\\"} -->
-<p class=\\"has-luminous-vivid-orange-color has-text-color\\" id=\\"heading\\">Heading</p>
+<p class=\\"has-luminous-vivid-orange-color has-text-color\\">Heading</p>
 <!-- /wp:paragraph -->"
 `;
 

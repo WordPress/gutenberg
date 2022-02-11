@@ -6,11 +6,11 @@ import {
 	createNewPost,
 	insertBlock,
 	saveDraft,
-	trashAllPosts,
 	openPreviewPage,
 	openDocumentSettingsSidebar,
 	activatePlugin,
 	deactivatePlugin,
+	deleteAllTemplates,
 } from '@wordpress/e2e-test-utils';
 
 const openSidebarPanelWithTitle = async ( title ) => {
@@ -92,8 +92,8 @@ const createNewTemplate = async ( templateName ) => {
 describe( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-block-templates' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 
 	afterAll( async () => {

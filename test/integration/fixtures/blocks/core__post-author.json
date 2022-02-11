@@ -1,13 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/post-author",
 		"isValid": true,
 		"attributes": {
 			"avatarSize": 48,
 			"showAvatar": true
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

@@ -81,7 +81,8 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 		$base_directory = get_stylesheet_directory() . '/styles';
 		if ( is_dir( $base_directory ) ) {
 			$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory ) );
-			$nested_html_files = new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH );
+			$nested_html_files = iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) );
+			ksort( $nested_html_files );
 			foreach ( $nested_html_files as $path => $file ) {
 				$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
 				if ( is_array( $decoded_file ) ) {

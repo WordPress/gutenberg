@@ -28,7 +28,10 @@
 		},
 		"color": {
 			"background": true,
-			"text": false
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
 		},
 		"spacing": {
 			"__experimentalSkipSerialization": true,
