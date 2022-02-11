@@ -50,14 +50,14 @@ export function NumberControl(
 	const isStepAny = stepProp === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( stepProp );
 	const baseValue = roundClamp( 0, min, max, baseStep );
-	const constrainValue = ( value, stepOverride ) => {
+	const constrainValue = ( value: number, stepOverride?: number ) => {
 		// When step is "any" clamp the value, otherwise round and clamp it
 		return isStepAny
 			? Math.min( max, Math.max( min, value ) )
 			: roundClamp( value, min, max, stepOverride ?? baseStep );
 	};
 
-	const autoComplete = typeProp === 'number' ? 'off' : null;
+	const autoComplete = typeProp === 'number' ? 'off' : undefined;
 	const classes = classNames( 'components-number-control', className );
 
 	// "Middleware" function that intercepts updates from InputControl.
@@ -101,7 +101,7 @@ export function NumberControl(
 
 			state.value = constrainValue(
 				nextValue,
-				enableShift ? incrementalValue : null
+				enableShift ? incrementalValue : undefined
 			);
 		}
 
@@ -144,7 +144,7 @@ export function NumberControl(
 
 				state.value = constrainValue(
 					add( currentValue, distance ),
-					enableShift ? modifier : null
+					enableShift ? modifier : undefined
 				);
 			}
 		}
