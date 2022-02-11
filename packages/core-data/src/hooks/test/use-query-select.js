@@ -1,19 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore } from '@wordpress/data';
+import {
+	createReduxStore,
+	createRegistry,
+	RegistryProvider,
+} from '@wordpress/data';
 
 /**
  * External dependencies
  */
-import TestRenderer, { act } from 'react-test-renderer';
+import { act, render } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
-import { createRegistry } from '../../../registry';
-import { RegistryProvider } from '../../registry-provider';
-import useQuerySelect from '../index';
+import useQuerySelect from '../use-query-select';
 
 describe( 'useQuerySelect', () => {
 	let registry;
@@ -44,25 +46,16 @@ describe( 'useQuerySelect', () => {
 		return <div>{ data.results.data }</div>;
 	};
 
-	const actRender = ( component ) => {
-		let renderer;
-		act( () => {
-			renderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
-					{ component }
-				</RegistryProvider>
-			);
-		} );
-		return renderer;
-	};
-
 	it( 'passes the relevant data to the component', () => {
 		const selectSpy = jest.fn();
 		const TestComponent = jest
 			.fn()
 			.mockImplementation( getTestComponent( selectSpy, 'keyName' ) );
-		const renderer = actRender( <TestComponent keyName="foo" /> );
-		const testInstance = renderer.root;
+		const testInstance = render(
+			<RegistryProvider value={ registry }>
+				<TestComponent keyName="foo" />
+			</RegistryProvider>
+		);
 		// 2 times expected
 		// - 1 for initial mount
 		// - 1 for after mount before subscription set.
@@ -70,9 +63,7 @@ describe( 'useQuerySelect', () => {
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 
 		// ensure expected state was rendered
-		expect( testInstance.findByType( 'div' ).props ).toEqual( {
-			children: 'bar',
-		} );
+		expect( testInstance.findByText( 'bar' ) ).toBeTruthy();
 	} );
 
 	it( 'uses memoized selectors', () => {
@@ -88,7 +79,12 @@ describe( 'useQuerySelect', () => {
 			);
 			return <div />;
 		} );
-		actRender( <TestComponent keyName="foo" /> );
+
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent keyName="foo" />
+			</RegistryProvider>
+		);
 
 		// ensure the selectors were properly memoized
 		expect( selectors ).toHaveLength( 4 );
@@ -97,7 +93,11 @@ describe( 'useQuerySelect', () => {
 		expect( selectors[ 1 ] ).toBe( selectors[ 2 ] );
 
 		// Re-render
-		actRender( <TestComponent keyName="bar" /> );
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent keyName="bar" />
+			</RegistryProvider>
+		);
 
 		// ensure we still got the memoized results after re-rendering
 		expect( selectors ).toHaveLength( 8 );
@@ -114,7 +114,11 @@ describe( 'useQuerySelect', () => {
 			return <div />;
 		} );
 
-		actRender( <TestComponent /> );
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
 
 		expect( querySelectData ).toEqual( {
 			data: 'bar',
@@ -159,13 +163,11 @@ describe( 'useQuerySelect', () => {
 		} );
 
 		// Initial render, expect default values
-		act( () => {
-			TestRenderer.create(
-				<RegistryProvider value={ registry }>
-					<TestComponent />
-				</RegistryProvider>
-			);
-		} );
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
 		expect( querySelectData ).toEqual( {
 			data: 10,
 			isResolving: false,
@@ -178,7 +180,11 @@ describe( 'useQuerySelect', () => {
 		} );
 
 		// Re-render, expect resolved data
-		actRender( <TestComponent /> );
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
 		expect( querySelectData ).toEqual( {
 			data: 15,
 			isResolving: false,

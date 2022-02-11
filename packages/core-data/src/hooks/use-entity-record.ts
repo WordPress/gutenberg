@@ -1,11 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { useQuerySelect } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
+import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import { Status } from './constants';
 
