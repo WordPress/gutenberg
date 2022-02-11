@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { test as base, expect, selectors } from '@playwright/test';
-import type { Page, ConsoleMessage } from '@playwright/test';
+import type { ConsoleMessage } from '@playwright/test';
 import { selectorScript } from 'role-selector/playwright-test';
 
 /**
@@ -12,8 +12,6 @@ import { TestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 // Register role selector.
 selectors.register( 'role', selectorScript, { contentScript: true } );
-
-let globalPage: Page | null = null;
 
 /**
  * Set of console logging types observed to protect against unexpected yet
@@ -100,20 +98,29 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 const test = base.extend< {
 	testUtils: TestUtils;
 } >( {
-	page: async ( { browser }, use ) => {
-		if ( ! globalPage || globalPage.isClosed() ) {
-			globalPage = await browser.newPage( {
-				reducedMotion: 'reduce',
-				strictSelectors: true,
-			} );
+	// Override the default browser context and page for each test so
+	// that it can be created and used in `beforeAll`.
+	context: async ( { browser }, use ) => {
+		const context = await browser.newContext( {
+			reducedMotion: 'reduce',
+			strictSelectors: true,
+		} );
 
-			globalPage.on( 'console', observeConsoleLogging );
-		}
+		await use( context );
 
-		await use( globalPage );
+		await context.close();
 	},
-	testUtils: async ( { browser, page }, use ) => {
-		await use( new TestUtils( browser, page ) );
+	page: async ( { context }, use ) => {
+		const page = await context.newPage();
+
+		page.on( 'console', observeConsoleLogging );
+
+		await use( page );
+
+		await page.close();
+	},
+	testUtils: async ( { page }, use ) => {
+		await use( new TestUtils( page ) );
 	},
 } );
 

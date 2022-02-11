@@ -22,18 +22,12 @@ test.describe( 'new editor state', () => {
 	} ) => {
 		await testUtils.createNewPost();
 
-		expect( page.url() ).toEqual(
-			expect.stringContaining( 'post-new.php' )
-		);
+		await expect( page ).toHaveURL( /post-new.php/ );
 
 		// Should display the blank title.
 		const title = page.locator( 'role=textbox[name="Add title"i]' );
 		await expect( title ).toBeEditable();
-
-		// Trim padding non-breaking space
-		expect(
-			await title.evaluate( ( el ) => el.textContent.trim() )
-		).toBeFalsy();
+		await expect( title ).toHaveText( '' );
 
 		// Should display the Preview button.
 		await expect(

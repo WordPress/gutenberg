@@ -10,10 +10,11 @@ import { TestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 export default async function setup() {
 	const browser = await chromium.launch();
-	const page = await browser.newPage( {
+	const context = await browser.newContext( {
 		reducedMotion: 'reduce',
 	} );
-	const testUtils = new TestUtils( browser, page );
+	const page = await context.newPage();
+	const testUtils = new TestUtils( page );
 
 	await testUtils.activateTheme( 'twentytwentyone' );
 	await testUtils.deleteAllPosts();
