@@ -11,15 +11,11 @@ interface EntityRecordResolution< RecordType > {
 
 	/**
 	 * Is the record still being resolved?
-	 *
-	 * Note that isResolving and hasResolved may both be true when the entity record is being re-requested.
 	 */
 	isResolving: boolean;
 
 	/**
 	 * Is the record resolved by now?
-	 *
-	 * Note that isResolving and hasResolved may both be true when the entity record is being re-requested.
 	 */
 	hasResolved: boolean;
 
