@@ -2187,6 +2187,15 @@ describe( 'state', () => {
 
 			expect( state ).toBe( -1 );
 		} );
+
+		it( 'should allow setting null value in multi selection', () => {
+			const state = initialPosition( undefined, {
+				type: 'MULTI_SELECT',
+				initialPosition: null,
+			} );
+
+			expect( state ).toBe( null );
+		} );
 	} );
 
 	describe( 'isMultiSelecting()', () => {
