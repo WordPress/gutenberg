@@ -65,11 +65,21 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		$content              = substr_replace( $block_content, ' class="' . $class_name . '"', $first_element_offset + strlen( $first_element ) - 1, 0 );
 	}
 
-	// Ideally styles should be loaded in the head, but blocks may be parsed
-	// after that, so loading in the footer for now.
+	// Styles should be loaded in the head for block themes
+	// and classic themes by default.
+	//
+	// Only for classic themes that opt into loading separate block assets
+	// we should load the styles in the body.
+	//
 	// See https://core.trac.wordpress.org/ticket/53494.
+	$separate_assets  = wp_should_load_separate_core_block_assets();
+	$is_classic_theme = ! wp_is_block_theme();
+	$action_hook_name = 'wp_enqueue_scripts';
+	if ( $is_classic_theme && $separate_assets ) {
+		$action_hook_name = 'wp_footer';
+	}
 	add_action(
-		'wp_footer',
+		$action_hook_name,
 		function () use ( $style ) {
 			echo $style;
 		}
