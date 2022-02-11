@@ -89,6 +89,7 @@ export default function ServerSideRender( props ) {
 
 		// The __internalWidgetId is only defined on the client-side and must be removed before making the
 		// request.
+		// TODO: Remove when the API is updated to allow additional properties: https://github.com/WordPress/gutenberg/issues/38754.
 		const retainedAttributes = omit( attributes, [ '__internalWidgetId' ] );
 
 		// If httpMethod is 'POST', send the attributes in the request body instead of the URL.
