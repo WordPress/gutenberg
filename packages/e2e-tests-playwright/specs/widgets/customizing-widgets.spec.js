@@ -208,7 +208,7 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( inserterHeading ).toBeVisible();
 
 		// Expect the Publish Settings section to be closed.
-		await expect( publishSettings ).not.toBeVisible();
+		await expect( publishSettings ).toBeHidden();
 
 		// Back to the widget areas panel.
 		await page.click( 'role=button[name=/Back$/] >> visible=true' );
