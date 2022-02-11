@@ -8,6 +8,8 @@ import type { Reducer } from 'redux';
 /**
  * Internal dependencies
  */
+// @ts-ignore
+import { combineReducers } from '../../';
 import { onSubKey } from './utils';
 
 type Action =
@@ -24,67 +26,11 @@ type Action =
 	  >;
 
 type StateKey = unknown[] | unknown;
-export type StateValue = { isResolving: boolean; error?: Error };
-export type State = EquivalentKeyMap< StateKey, StateValue >;
-
-/**
- * Reducer function returning next state for selector resolution of
- * subkeys, object form:
- *
- *  selectorName -> EquivalentKeyMap<Array,boolean>
- */
-const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
-	State,
-	Action
->( 'selectorName' )( ( state = new EquivalentKeyMap(), action: Action ) => {
-	switch ( action.type ) {
-		case 'START_RESOLUTION':
-		case 'FINISH_RESOLUTION': {
-			const isResolving = action.type === 'START_RESOLUTION';
-			const nextState = new EquivalentKeyMap( state );
-			nextState.set( action.args, { isResolving } );
-			return nextState;
-		}
-		case 'FAIL_RESOLUTION': {
-			const nextState = new EquivalentKeyMap( state );
-			nextState.set( action.args, {
-				isResolving: false,
-				error: action.error,
-			} );
-			return nextState;
-		}
-		case 'START_RESOLUTIONS':
-		case 'FINISH_RESOLUTIONS': {
-			const isResolving = action.type === 'START_RESOLUTIONS';
-			const nextState = new EquivalentKeyMap( state );
-			for ( const resolutionArgs of action.args ) {
-				nextState.set( resolutionArgs, { isResolving } );
-			}
-			return nextState;
-		}
-		case 'FAIL_RESOLUTIONS': {
-			const nextState = new EquivalentKeyMap( state );
-			for ( const idx in action.args ) {
-				const resolutionArgs = action.args[ idx ];
-				const resolutionState: StateValue = { isResolving: false };
-
-				const error = action.errors[ idx ];
-				if ( error ) {
-					resolutionState.error = error;
-				}
-
-				nextState.set( resolutionArgs, resolutionState );
-			}
-			return nextState;
-		}
-		case 'INVALIDATE_RESOLUTION': {
-			const nextState = new EquivalentKeyMap( state );
-			nextState.delete( action.args );
-			return nextState;
-		}
-	}
-	return state;
-} );
+export type ResolutionState = EquivalentKeyMap< StateKey, boolean | undefined >;
+export type ErrorState = EquivalentKeyMap<
+	StateKey,
+	{ error: Error | null } | undefined
+>;
 
 /**
  * Reducer function returning next state for selector resolution, object form:
@@ -96,7 +42,10 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
  *
  * @return Next state.
  */
-const isResolved = ( state: Record< string, State > = {}, action: Action ) => {
+const isResolvingReducer = (
+	state: Record< string, ResolutionState > = {},
+	action: Action
+) => {
 	switch ( action.type ) {
 		case 'INVALIDATE_RESOLUTION_FOR_STORE':
 			return {};
@@ -116,4 +65,119 @@ const isResolved = ( state: Record< string, State > = {}, action: Action ) => {
 	return state;
 };
 
-export default isResolved;
+/**
+ * Reducer function returning next state for selector resolution of
+ * subkeys, object form:
+ *
+ *  selectorName -> EquivalentKeyMap<Array,boolean>
+ */
+const subKeysIsResolved: Reducer<
+	Record< string, ResolutionState >,
+	Action
+> = onSubKey< ResolutionState, Action >( 'selectorName' )(
+	( state = new EquivalentKeyMap(), action: Action ) => {
+		switch ( action.type ) {
+			case 'FAIL_RESOLUTION':
+			case 'START_RESOLUTION':
+			case 'FINISH_RESOLUTION': {
+				const isResolving = action.type === 'START_RESOLUTION';
+				const nextState = new EquivalentKeyMap( state );
+				nextState.set( action.args, isResolving );
+				return nextState;
+			}
+			case 'FAIL_RESOLUTIONS':
+			case 'START_RESOLUTIONS':
+			case 'FINISH_RESOLUTIONS': {
+				const isResolving = action.type === 'START_RESOLUTIONS';
+				const nextState = new EquivalentKeyMap( state );
+				for ( const resolutionArgs of action.args ) {
+					nextState.set( resolutionArgs, isResolving );
+				}
+				return nextState;
+			}
+			case 'INVALIDATE_RESOLUTION': {
+				const nextState = new EquivalentKeyMap( state );
+				nextState.delete( action.args );
+				return nextState;
+			}
+		}
+		return state;
+	}
+);
+
+/**
+ * Reducer function returning next state for selector resolution, object form:
+ *
+ *   selectorName -> EquivalentKeyMap<Array, boolean>
+ *
+ * @param  state  Current state.
+ * @param  action Dispatched action.
+ *
+ * @return Next state.
+ */
+const hasError = (
+	state: Record< string, ErrorState > = {},
+	action: Action
+) => {
+	switch ( action.type ) {
+		case 'INVALIDATE_RESOLUTION_FOR_STORE':
+			return {};
+		case 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR':
+			return has( state, [ action.selectorName ] )
+				? omit( state, [ action.selectorName ] )
+				: state;
+		case 'START_RESOLUTION':
+		case 'FINISH_RESOLUTION':
+		case 'FAIL_RESOLUTION':
+		case 'START_RESOLUTIONS':
+		case 'FINISH_RESOLUTIONS':
+		case 'FAIL_RESOLUTIONS':
+		case 'INVALIDATE_RESOLUTION':
+			return subKeysHasError( state, action );
+	}
+	return state;
+};
+
+/**
+ * Reducer function returning next state for selector resolution of
+ * subkeys, object form:
+ *
+ *  selectorName -> EquivalentKeyMap<Array,boolean>
+ */
+const subKeysHasError: Reducer<
+	Record< string, ErrorState >,
+	Action
+> = onSubKey< ErrorState, Action >( 'selectorName' )(
+	( state = new EquivalentKeyMap(), action: Action ) => {
+		switch ( action.type ) {
+			case 'FAIL_RESOLUTION': {
+				const nextState = new EquivalentKeyMap( state );
+				nextState.set( action.args, {
+					error: action.error,
+				} );
+				return nextState;
+			}
+			case 'FAIL_RESOLUTIONS': {
+				const nextState = new EquivalentKeyMap( state );
+				for ( const idx in action.args ) {
+					const resolutionArgs = action.args[ idx ];
+					const error = action.errors[ idx ];
+					if ( error ) {
+						nextState.set( resolutionArgs, { error } );
+					}
+				}
+				return nextState;
+			}
+			case 'START_RESOLUTION':
+			case 'FINISH_RESOLUTION':
+			case 'INVALIDATE_RESOLUTION': {
+				const nextState = new EquivalentKeyMap( state );
+				nextState.delete( action.args );
+				return nextState;
+			}
+		}
+		return state;
+	}
+);
+
+export default combineReducers( { isResolving: isResolvingReducer, hasError } );

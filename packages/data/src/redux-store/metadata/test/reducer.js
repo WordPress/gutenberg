@@ -12,7 +12,7 @@ describe( 'reducer', () => {
 	it( 'should default to an empty object', () => {
 		const state = reducer( undefined, {} );
 
-		expect( state ).toEqual( {} );
+		expect( state.isResolving ).toEqual( {} );
 	} );
 
 	describe( 'single resolution', () => {
@@ -23,8 +23,8 @@ describe( 'reducer', () => {
 				args: [],
 			} );
 
-			// { test: { getFoo: EquivalentKeyMap( [] =>  isResolving: true } ) } }
-			expect( state.getFoo.get( [] ) ).toEqual( { isResolving: true } );
+			// { test: { getFoo: EquivalentKeyMap( [] => true ) } }
+			expect( state.isResolving.getFoo.get( [] ) ).toBe( true );
 		} );
 
 		it( 'should return with finished resolution', () => {
@@ -39,8 +39,8 @@ describe( 'reducer', () => {
 				args: [],
 			} );
 
-			// { test: { getFoo: EquivalentKeyMap( [] => { isResolving: false } ) } }
-			expect( state.getFoo.get( [] ) ).toEqual( { isResolving: false } );
+			// { test: { getFoo: EquivalentKeyMap( [] => false ) } }
+			expect( state.isResolving.getFoo.get( [] ) ).toBe( false );
 		} );
 
 		it( 'should remove invalidations', () => {
@@ -61,7 +61,7 @@ describe( 'reducer', () => {
 			} );
 
 			// { getFoo: EquivalentKeyMap( [] => undefined ) }
-			expect( state.getFoo.get( [] ) ).toBe( undefined );
+			expect( state.isResolving.getFoo.get( [] ) ).toBe( undefined );
 		} );
 
 		it( 'different arguments should not conflict', () => {
@@ -81,13 +81,9 @@ describe( 'reducer', () => {
 				args: [ 'block' ],
 			} );
 
-			// { getFoo: EquivalentKeyMap( [] => { isResolving: false } ) }
-			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				isResolving: false,
-			} );
-			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				isResolving: true,
-			} );
+			// { getFoo: EquivalentKeyMap( [] => false ) }
+			expect( state.isResolving.getFoo.get( [ 'post' ] ) ).toBe( false );
+			expect( state.isResolving.getFoo.get( [ 'block' ] ) ).toBe( true );
 		} );
 
 		it(
@@ -103,7 +99,7 @@ describe( 'reducer', () => {
 					type: 'INVALIDATE_RESOLUTION_FOR_STORE',
 				} );
 
-				expect( state ).toEqual( {} );
+				expect( state.isResolving ).toEqual( {} );
 			}
 		);
 
@@ -126,11 +122,11 @@ describe( 'reducer', () => {
 					selectorName: 'getBar',
 				} );
 
-				expect( state.getBar ).toBeUndefined();
-				// { getFoo: EquivalentKeyMap( [] => { isResolving: false } ) }
-				expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-					isResolving: false,
-				} );
+				expect( state.isResolving.getBar ).toBeUndefined();
+				// { getFoo: EquivalentKeyMap( [] => false ) }
+				expect( state.isResolving.getFoo.get( [ 'post' ] ) ).toBe(
+					false
+				);
 			}
 		);
 	} );
@@ -143,12 +139,8 @@ describe( 'reducer', () => {
 				args: [ [ 'post' ], [ 'block' ] ],
 			} );
 
-			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				isResolving: true,
-			} );
-			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				isResolving: true,
-			} );
+			expect( state.isResolving.getFoo.get( [ 'post' ] ) ).toBe( true );
+			expect( state.isResolving.getFoo.get( [ 'block' ] ) ).toBe( true );
 		} );
 
 		it( 'should return with finished resolutions', () => {
@@ -163,12 +155,8 @@ describe( 'reducer', () => {
 				args: [ [ 'post' ], [ 'block' ] ],
 			} );
 
-			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				isResolving: false,
-			} );
-			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				isResolving: false,
-			} );
+			expect( state.isResolving.getFoo.get( [ 'post' ] ) ).toBe( false );
+			expect( state.isResolving.getFoo.get( [ 'block' ] ) ).toBe( false );
 		} );
 
 		it( 'should remove invalidations', () => {
@@ -188,10 +176,10 @@ describe( 'reducer', () => {
 				args: [ 'post' ],
 			} );
 
-			expect( state.getFoo.get( [ 'post' ] ) ).toBe( undefined );
-			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				isResolving: false,
-			} );
+			expect( state.isResolving.getFoo.get( [ 'post' ] ) ).toBe(
+				undefined
+			);
+			expect( state.isResolving.getFoo.get( [ 'block' ] ) ).toBe( false );
 		} );
 
 		it( 'different arguments should not conflict', () => {
@@ -211,12 +199,8 @@ describe( 'reducer', () => {
 				args: [ [ 'block' ] ],
 			} );
 
-			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				isResolving: false,
-			} );
-			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				isResolving: true,
-			} );
+			expect( state.isResolving.getFoo.get( [ 'post' ] ) ).toBe( false );
+			expect( state.isResolving.getFoo.get( [ 'block' ] ) ).toBe( true );
 		} );
 
 		it(
@@ -232,7 +216,7 @@ describe( 'reducer', () => {
 					type: 'INVALIDATE_RESOLUTION_FOR_STORE',
 				} );
 
-				expect( state ).toEqual( {} );
+				expect( state.isResolving ).toEqual( {} );
 			}
 		);
 
@@ -255,13 +239,13 @@ describe( 'reducer', () => {
 					selectorName: 'getBar',
 				} );
 
-				expect( state.getBar ).toBeUndefined();
-				expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-					isResolving: false,
-				} );
-				expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-					isResolving: false,
-				} );
+				expect( state.isResolving.getBar ).toBeUndefined();
+				expect( state.isResolving.getFoo.get( [ 'post' ] ) ).toBe(
+					false
+				);
+				expect( state.isResolving.getFoo.get( [ 'block' ] ) ).toBe(
+					false
+				);
 			}
 		);
 	} );

@@ -23,7 +23,9 @@ describe( 'getIsResolving', () => {
 
 	it( 'should return undefined if state by reducerKey, selectorName, but not args', () => {
 		const state = {
-			getFoo: new EquivalentKeyMap( [ [ [], { isResolving: true } ] ] ),
+			isResolving: {
+				getFoo: new EquivalentKeyMap( [ [ [], true ] ] ),
+			},
 		};
 		const result = getIsResolving( state, 'getFoo', [ 'bar' ] );
 
@@ -32,7 +34,9 @@ describe( 'getIsResolving', () => {
 
 	it( 'should return value by reducerKey, selectorName', () => {
 		const state = {
-			getFoo: new EquivalentKeyMap( [ [ [], { isResolving: true } ] ] ),
+			isResolving: {
+				getFoo: new EquivalentKeyMap( [ [ [], true ] ] ),
+			},
 		};
 		const result = getIsResolving( state, 'getFoo', [] );
 
@@ -50,7 +54,9 @@ describe( 'hasStartedResolution', () => {
 
 	it( 'returns true if has started', () => {
 		const state = {
-			getFoo: new EquivalentKeyMap( [ [ [], { isResolving: true } ] ] ),
+			isResolving: {
+				getFoo: new EquivalentKeyMap( [ [ [], true ] ] ),
+			},
 		};
 		const result = hasStartedResolution( state, 'getFoo', [] );
 
@@ -61,7 +67,9 @@ describe( 'hasStartedResolution', () => {
 describe( 'hasFinishedResolution', () => {
 	it( 'returns false if not has finished', () => {
 		const state = {
-			getFoo: new EquivalentKeyMap( [ [ [], { isResolving: true } ] ] ),
+			isResolving: {
+				getFoo: new EquivalentKeyMap( [ [ [], true ] ] ),
+			},
 		};
 		const result = hasFinishedResolution( state, 'getFoo', [] );
 
@@ -70,7 +78,9 @@ describe( 'hasFinishedResolution', () => {
 
 	it( 'returns true if has finished', () => {
 		const state = {
-			getFoo: new EquivalentKeyMap( [ [ [], { isResolving: false } ] ] ),
+			isResolving: {
+				getFoo: new EquivalentKeyMap( [ [ [], false ] ] ),
+			},
 		};
 		const result = hasFinishedResolution( state, 'getFoo', [] );
 
@@ -88,7 +98,7 @@ describe( 'isResolving', () => {
 
 	it( 'returns false if has finished', () => {
 		const state = {
-			getFoo: new EquivalentKeyMap( [ [ [], { isResolving: false } ] ] ),
+			getFoo: new EquivalentKeyMap( [ [ [], false ] ] ),
 		};
 		const result = isResolving( state, 'getFoo', [] );
 
@@ -97,7 +107,9 @@ describe( 'isResolving', () => {
 
 	it( 'returns true if has started but not finished', () => {
 		const state = {
-			getFoo: new EquivalentKeyMap( [ [ [], { isResolving: true } ] ] ),
+			isResolving: {
+				getFoo: new EquivalentKeyMap( [ [ [], true ] ] ),
+			},
 		};
 		const result = isResolving( state, 'getFoo', [] );
 
