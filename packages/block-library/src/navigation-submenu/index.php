@@ -167,7 +167,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$label = '';
 
 	if ( isset( $attributes['label'] ) ) {
-		$label .= wp_kses_post(	$attributes['label'] );
+		$label .= wp_kses_post( $attributes['label'] );
 	}
 
 	$aria_label = sprintf(
