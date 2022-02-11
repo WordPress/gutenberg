@@ -36,7 +36,7 @@ export type WPUnitControlUnit = {
 	/**
 	 * A step value used when incrementing/decrementing the value.
 	 */
-	step?: number;
+	step?: number | 'any';
 };
 
 export type WPUnitControlUnitList = Array< WPUnitControlUnit > | false;

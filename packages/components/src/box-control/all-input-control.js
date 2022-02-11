@@ -24,6 +24,7 @@ export default function AllInputControl( {
 	sides,
 	selectedUnits,
 	setSelectedUnits,
+	supportsCustomCSS,
 	...props
 } ) {
 	const allValue = getAllValue( values, sides );
@@ -67,7 +68,7 @@ export default function AllInputControl( {
 
 	const handleOnChange = ( next ) => {
 		const isNumeric = ! isNaN( parseFloat( next ) );
-		const nextValue = isNumeric ? next : undefined;
+		const nextValue = isNumeric || supportsCustomCSS ? next : undefined;
 		const nextValues = applyValueToSides( values, nextValue );
 
 		onChange( nextValues );

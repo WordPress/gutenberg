@@ -27,7 +27,7 @@ import {
 	Header,
 	HeaderControlWrapper,
 } from './styles/box-control-styles';
-import { parseUnit } from '../unit-control/utils';
+import { parseUnit, supportsCustomCSS } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
 	DEFAULT_VISUALIZER_VALUES,
@@ -129,6 +129,7 @@ export default function BoxControl( {
 		selectedUnits,
 		setSelectedUnits,
 		sides,
+		supportsCustomCSS: supportsCustomCSS( units ),
 		values: inputValues,
 	};
 

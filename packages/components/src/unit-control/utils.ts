@@ -117,6 +117,13 @@ const allUnits: Record< string, WPUnitControlUnit > = {
 		a11yLabel: __( 'Points (pt)' ),
 		step: 1,
 	},
+	css: {
+		value: 'css',
+		label: isWeb ? 'css' : __( 'Custom css (css)' ),
+		default: '',
+		a11yLabel: __( 'Custom css (css)' ),
+		step: 'any',
+	},
 };
 
 /**
@@ -139,6 +146,12 @@ export const CSS_UNITS = [
 export const DEFAULT_UNIT = allUnits.px;
 
 /**
+ * A 'unit' used to indicate that the value should be treated as custom CSS.
+ * Used to support complex values like `max(1.25rem, 5vh)`.
+ */
+export const CUSTOM_CSS_UNIT = allUnits.css;
+
+/**
  * Handles legacy value + unit handling.
  * This component use to manage both incoming value and units separately.
  *
@@ -155,8 +168,13 @@ export function getParsedValue(
 	unit?: string,
 	units?: WPUnitControlUnitList
 ): [ Value, string | undefined ] {
-	const initialValue = unit ? `${ value }${ unit }` : value;
+	if ( unit === CUSTOM_CSS_UNIT.value ) {
+		// If this is custom CSS, we do not need to parse anything
+		// out of the value.
+		return [ value, unit ];
+	}
 
+	const initialValue = unit ? `${ value }${ unit }` : value;
 	return parseUnit( initialValue, units );
 }
 
@@ -171,6 +189,20 @@ export function hasUnits( units: WPUnitControlUnitList ): boolean {
 }
 
 /**
+ * Determines whether custom CSS is supported
+ * by checking for the presence of the CSS_CUSTOM_UNIT.
+ *
+ * @param units Units to check.
+ * @return Whether custom CSS is supported.
+ */
+export function supportsCustomCSS( units: WPUnitControlUnitList ): boolean {
+	return (
+		units &&
+		!! units.find( ( item ) => item.value === CUSTOM_CSS_UNIT.value )
+	);
+}
+
+/**
  * Parses a number and unit from a value.
  *
  * @param  initialValue Value to parse
@@ -181,11 +213,36 @@ export function parseUnit(
 	initialValue: Value | undefined,
 	units: WPUnitControlUnitList = ALL_CSS_UNITS
 ): [ Value, string | undefined ] {
+	const unit = matchUnit( initialValue, units );
+
 	const value = String( initialValue ).trim();
-
 	let num: Value = parseFloat( value );
-	num = isNaN( num ) ? '' : num;
+	if ( isNaN( num ) ) {
+		// A value may be non-numeric if the value is empty,
+		// or if it contains a unit but no number. Otherwise,
+		// arbitrary strings should be considered custom CSS if
+		// the CSS_CUSTOM_UNIT is supported, or cleared if not.
+		if ( !! initialValue && value !== unit && supportsCustomCSS( units ) ) {
+			return [ value, CUSTOM_CSS_UNIT.value ];
+		}
+		num = '';
+	}
 
+	return [ num, unit ];
+}
+
+/**
+ * Parses a unit from a value.
+ *
+ * @param initialValue Value to parse
+ * @param units        Units to derive from.
+ * @return The extracted unit.
+ */
+function matchUnit(
+	initialValue: Value | undefined,
+	units: WPUnitControlUnitList = ALL_CSS_UNITS
+): string | undefined {
+	const value = String( initialValue ).trim();
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ );
 
 	let unit: string | undefined =
@@ -194,12 +251,10 @@ export function parseUnit(
 
 	if ( hasUnits( units ) && units !== false ) {
 		const match = units.find( ( item ) => item.value === unit );
-		unit = match?.value;
-	} else {
-		unit = DEFAULT_UNIT.value;
+		return match?.value;
 	}
 
-	return [ num, unit ];
+	return DEFAULT_UNIT.value;
 }
 
 /**
@@ -222,6 +277,10 @@ export function getValidParsedUnit(
 	let baseValue = parsedValue;
 	let baseUnit: string | undefined;
 
+	if ( parsedUnit === CUSTOM_CSS_UNIT.value ) {
+		return [ parsedValue, parsedUnit ];
+	}
+
 	// The parsed value from `parseUnit` should now be either a
 	// real number or an empty string. If not, use the fallback value.
 	if ( ! Number.isFinite( parsedValue ) || parsedValue === '' ) {
@@ -239,6 +298,31 @@ export function getValidParsedUnit(
 	}
 
 	return [ baseValue, baseUnit ];
+}
+
+/**
+ * Takes a value and unit and produces a valid combined value+unit string.
+ * Validation ensures that the special CUSTOM_CSS unit is not appended, and
+ * that non-numeric values are not combined with a non-custom unit.
+ *
+ * @param  initialValue The value.
+ * @param  unit         The unit to append.
+ * @return A string describing both value and unit.
+ */
+export function getValidValueWithUnit(
+	initialValue: Value | undefined,
+	unit: string | undefined
+): string {
+	// The CSS_CUSTOM_UNIT should not be appended to the end of custom CSS.
+	if ( unit === CUSTOM_CSS_UNIT.value ) {
+		return String( initialValue );
+	}
+
+	const value = String( initialValue ).trim();
+	if ( isNaN( parseFloat( value ) ) ) {
+		return '';
+	}
+	return `${ value }${ unit }`;
 }
 
 /**
@@ -334,9 +418,19 @@ export function getUnitsWithCurrentUnit(
 	}
 
 	const unitsWithCurrentUnit = [ ...units ];
-	const [ , currentUnit ] = getParsedValue(
-		currentValue,
-		legacyUnit,
+
+	// The Custom CSS unit is not supported when using legacy units. This
+	// is to prevent attempting to save string CSS values into number type
+	// value attributes.
+	const customUnit = unitsWithCurrentUnit.findIndex(
+		( unit ) => unit.value === CUSTOM_CSS_UNIT.value
+	);
+	if ( !! legacyUnit && customUnit > -1 ) {
+		unitsWithCurrentUnit.splice( customUnit );
+	}
+
+	const currentUnit = matchUnit(
+		legacyUnit ? `${ currentValue }${ legacyUnit }` : currentValue,
 		ALL_CSS_UNITS
 	);
 

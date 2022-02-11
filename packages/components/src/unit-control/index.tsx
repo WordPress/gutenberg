@@ -23,13 +23,19 @@ import { ENTER } from '@wordpress/keycodes';
 import type { WordPressComponentProps } from '../ui/context';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { composeStateReducers } from '../input-control/reducer/reducer';
-import { Root, ValueInput } from './styles/unit-control-styles';
+import {
+	CustomValueInput,
+	Root,
+	ValueInput,
+} from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
 	CSS_UNITS,
+	CUSTOM_CSS_UNIT,
 	getParsedValue,
 	getUnitsWithCurrentUnit,
 	getValidParsedUnit,
+	getValidValueWithUnit,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
@@ -69,6 +75,7 @@ function UnitControl(
 			fallback: '',
 		}
 	);
+	const isCustomCSS = unit === CUSTOM_CSS_UNIT.value;
 
 	// Stores parsed value for hand-off in state reducer
 	const refParsedValue = useRef< string | null >( null );
@@ -81,6 +88,11 @@ function UnitControl(
 	) => {
 		if ( next === '' ) {
 			onChange( '', changeProps );
+			return;
+		}
+
+		if ( isCustomCSS ) {
+			onChange( next, changeProps );
 			return;
 		}
 
@@ -98,15 +110,20 @@ function UnitControl(
 		changeProps
 	) => {
 		const { data } = changeProps;
+		const isNextCustomCSS = next === CUSTOM_CSS_UNIT.value;
 
-		let nextValue = `${ value }${ next }`;
+		const nextValue =
+			isResetValueOnUnitChange && data?.default !== undefined
+				? data?.default
+				: value;
 
-		if ( isResetValueOnUnitChange && data?.default !== undefined ) {
-			nextValue = `${ data.default }${ next }`;
-		}
+		const nextUnit = isNextCustomCSS ? unit : next;
+		const nextValueWithUnit = getValidValueWithUnit( nextValue, nextUnit );
 
-		onChange( nextValue, changeProps );
-		onUnitChange( next, changeProps );
+		onChange( nextValueWithUnit, changeProps );
+		// The CUSTOM_CSS_UNIT is not a normal CSS unit and should never be saved
+		// into attributes.
+		onUnitChange( isNextCustomCSS ? undefined : next, changeProps );
 
 		setUnit( next );
 	};
@@ -122,6 +139,13 @@ function UnitControl(
 			value,
 			unit
 		);
+
+		// If the entered value is considered custom CSS, do not attempt to
+		// update the unit.
+		if ( parsedValue && parsedUnit === CUSTOM_CSS_UNIT.value ) {
+			refParsedValue.current = null;
+			return;
+		}
 
 		refParsedValue.current = parsedValue.toString();
 
@@ -195,31 +219,43 @@ function UnitControl(
 		step = activeUnit?.step ?? 1;
 	}
 
+	const inputProps = {
+		'aria-label': label,
+		type: isPressEnterToChange || isCustomCSS ? 'text' : 'number',
+		autoComplete,
+		className: classes,
+		disabled,
+		disableUnits,
+		isPressEnterToChange,
+		label,
+		onBlur: handleOnBlur,
+		onKeyDown: handleOnKeyDown,
+		onChange: handleOnChange,
+		ref: forwardedRef,
+		size,
+		suffix: inputSuffix,
+		step,
+		__unstableStateReducer: composeStateReducers(
+			unitControlStateReducer,
+			stateReducer
+		),
+		...omit( props, [ 'children' ] ),
+	};
+
 	return (
 		<Root className="components-unit-control-wrapper" style={ style }>
-			<ValueInput
-				aria-label={ label }
-				type={ isPressEnterToChange ? 'text' : 'number' }
-				{ ...omit( props, [ 'children' ] ) }
-				autoComplete={ autoComplete }
-				className={ classes }
-				disabled={ disabled }
-				disableUnits={ disableUnits }
-				isPressEnterToChange={ isPressEnterToChange }
-				label={ label }
-				onBlur={ handleOnBlur }
-				onKeyDown={ handleOnKeyDown }
-				onChange={ handleOnChange }
-				ref={ forwardedRef }
-				size={ size }
-				suffix={ inputSuffix }
-				value={ value }
-				step={ step }
-				__unstableStateReducer={ composeStateReducers(
-					unitControlStateReducer,
-					stateReducer
-				) }
-			/>
+			{ ! isCustomCSS && (
+				<ValueInput { ...inputProps } value={ value } />
+			) }
+			{ isCustomCSS && (
+				<CustomValueInput
+					{ ...inputProps }
+					value={ String( valueProp || '' ) }
+					onDrag={ noop }
+					onDragEnd={ noop }
+					onDragStart={ noop }
+				/>
+			) }
 		</Root>
 	);
 }
