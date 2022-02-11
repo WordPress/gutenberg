@@ -39,7 +39,9 @@ The development hub for the Gutenberg project can be found at <a href="https://g
 
 = How can I send feedback or get help with a bug? =
 
-We'd love to hear your bug reports, feature suggestions and any other feedback! Please head over to <a href="https://github.com/WordPress/gutenberg/issues">the GitHub issues page</a> to search for existing issues or open a new one. While we'll try to triage issues reported here on the plugin forum, you'll get a faster response (and reduce duplication of effort) by keeping everything centralized in the GitHub repository.
+The best place to report bugs, feature suggestions, or any other feedback is at <a href="https://github.com/WordPress/gutenberg/issues">the Gutenberg GitHub issues page</a>. Before submitting a new issue, please search the existing issues to check if someone else has reported the same feedback.
+
+While we try to triage issues reported here on the plugin forum, you’ll get a faster response (and reduce duplication of effort) by keeping feedback centralized in GitHub.
 
 = Do I have to use the Gutenberg plugin to get access to these features? =
 
