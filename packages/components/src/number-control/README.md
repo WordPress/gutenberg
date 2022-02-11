@@ -27,18 +27,19 @@ const Example = () => {
 
 ## Props
 
+TODO: Should point at `InputControl` for overlapping props
+
 ### dragDirection
 
 Determines the drag axis to increment/decrement the value.
-Directions: `n` | `e` | `s` | `w`
 
--   Type: `String`
+-   Type: `n` | `e` | `s` | `w`
 -   Required: No
 -   Default: `n`
 
 ### dragThreshold
 
-If `isDragEnabled` is true, this controls the amount of `px` to have been dragged before the value changes.
+If `isDragEnabled` is `true`, this controls the amount of `px` to have been dragged before the value changes.
 
 -   Type: `Number`
 -   Required: No
@@ -46,39 +47,40 @@ If `isDragEnabled` is true, this controls the amount of `px` to have been dragge
 
 ### hideHTMLArrows
 
-If true, the default `input` HTML arrows will be hidden.
+If `true`, the default `input` HTML arrows will be hidden.
 
--   Type: `Boolean`
+-   Type: `boolean`
 -   Required: No
 -   Default: `false`
 
 ### isDragEnabled
 
-If true, enables mouse drag gesture to increment/decrement the number value. Holding `SHIFT` while dragging will increase the value by the `shiftStep`.
+If `true`, enables mouse drag gesture to increment/decrement the value. Holding `SHIFT` while dragging will increase the value by the `shiftStep`.
 
--   Type: `Boolean`
+-   Type: `boolean`
 -   Required: No
+-   Default: `true`
 
 ### isShiftStepEnabled
 
-If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the value by the `shiftStep` value.
+If `true`, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the value by the `shiftStep` value.
 
--   Type: `Boolean`
+-   Type: `boolean`
 -   Required: No
 -   Default: `true`
 
 ### label
 
-If this property is added, a label will be generated using label property as the content.
+The text content of the label. If not specified, a label won't be displayed.
 
--   Type: `String`
+-   Type: `string` // It's actually a React.Node
 -   Required: No
 
 ### labelPosition
 
-The position of the label (`top`, `side`, `bottom`, or `edge`).
+The position of the label.
 
--   Type: `String`
+-   Type: `top` | `side` | `bottom` | `edge`
 -   Required: No
 
 ### max
