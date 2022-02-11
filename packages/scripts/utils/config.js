@@ -183,6 +183,7 @@ function getWebpackEntryPoints() {
 		return JSON.parse( process.env.WP_ENTRY );
 	}
 
+	// Continue only if the `src` directory exists.
 	if ( ! hasProjectFile( 'src' ) ) {
 		return {};
 	}
@@ -271,7 +272,7 @@ function getWebpackEntryPoints() {
 		absolute: true,
 	} );
 	if ( ! entryFile ) {
-		log( chalk.yellow( 'No entry file discovered in the "src" folder.' ) );
+		log( chalk.yellow( 'No entry file discovered in the "src" directory.' ) );
 		return {};
 	}
 
