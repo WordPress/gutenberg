@@ -26,6 +26,7 @@ import {
 	loginUser,
 	deleteUser,
 	switchUserToAdmin,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -121,6 +122,20 @@ async function selectClassicMenu( optionText ) {
 	await theOption.click();
 }
 
+async function populateNavWithOneItem() {
+	// Add a Link block first.
+	const appender = await page.waitForSelector(
+		'.wp-block-navigation .block-list-appender'
+	);
+	await appender.click();
+	// Add a link to the Link block.
+	await updateActiveNavigationLink( {
+		url: 'https://wordpress.org',
+		label: 'WP',
+		type: 'url',
+	} );
+}
+
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
@@ -192,6 +207,13 @@ async function getNavigationMenuRawContent() {
 	} );
 
 	return stripPageIds( response.content.raw );
+}
+
+async function waitForBlock( blockName ) {
+	const blockSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: ${ blockName }"]`;
+
+	// Wait for a Submenu block before making assertion.
+	return page.waitForSelector( blockSelector );
 }
 
 // Disable reason - these tests are to be re-written.
@@ -575,20 +597,6 @@ describe( 'Navigation', () => {
 		const NAV_ENTITY_SELECTOR =
 			'//div[@class="entities-saved-states__panel"]//label//strong[contains(text(), "Navigation")]';
 
-		async function populateNavWithOneItem() {
-			// Add a Link block first.
-			const appender = await page.waitForSelector(
-				'.wp-block-navigation .block-list-appender'
-			);
-			await appender.click();
-			// Add a link to the Link block.
-			await updateActiveNavigationLink( {
-				url: 'https://wordpress.org',
-				label: 'WP',
-				type: 'url',
-			} );
-		}
-
 		async function resetNavBlockToInitialState() {
 			const selectMenuDropdown = await page.waitForSelector(
 				'[aria-label="Select Menu"]'
@@ -729,6 +737,113 @@ describe( 'Navigation', () => {
 		);
 
 		expect( tagCount ).toBe( 1 );
+	} );
+
+	describe( 'Submenus', () => {
+		it( 'shows button which converts submenu to link when submenu is not-populated (empty)', async () => {
+			const navSubmenuSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]`;
+
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickBlockToolbarButton( 'Add submenu' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Revert the Submenu back to a Navigation Link block.
+			await clickBlockToolbarButton( 'Convert to Link' );
+
+			// Check the Submenu block is no longer present.
+			const submenuBlock = await page.$( navSubmenuSelector );
+
+			expect( submenuBlock ).toBeFalsy();
+		} );
+
+		it( 'shows button to convert submenu to link in disabled state when submenu is populated', async () => {
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickBlockToolbarButton( 'Add submenu' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Add a Link block first.
+			const appender = await page.waitForSelector(
+				'[aria-label="Block: Submenu"] [aria-label="Add block"]'
+			);
+
+			await appender.click();
+
+			await updateActiveNavigationLink( {
+				url: 'https://make.wordpress.org/core/',
+				label: 'Submenu item #1',
+				type: 'url',
+			} );
+
+			await clickBlockToolbarButton( 'Select Submenu' );
+
+			// Check button exists but is in disabled state.
+			const disabledConvertToLinkButton = await page.$(
+				'[aria-label="Block tools"] [aria-label="Convert to Link"][disabled]'
+			);
+
+			expect( disabledConvertToLinkButton ).toBeTruthy();
+		} );
+
+		it( 'shows button to convert submenu to link when submenu is populated with a single incomplete link item', async () => {
+			// For context on why this test is required please see:
+			// https://github.com/WordPress/gutenberg/pull/38203#issuecomment-1027672948.
+
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickBlockToolbarButton( 'Add submenu' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Add a Link block first.
+			const appender = await page.waitForSelector(
+				'[aria-label="Block: Submenu"] [aria-label="Add block"]'
+			);
+
+			await appender.click();
+
+			// Here we intentionally do not populate the inserted Navigation Link block.
+			// Rather we immediaely click away leaving the link in a state where it has
+			// no URL of label and can be considered unpopulated.
+			await clickBlockToolbarButton( 'Select Submenu' );
+
+			// Check for non-disabled Convert to Link button
+			const convertToLinkButton = await page.$(
+				'[aria-label="Block tools"] [aria-label="Convert to Link"]:not([disabled])'
+			);
+
+			expect( convertToLinkButton ).toBeTruthy();
+		} );
 	} );
 
 	describe( 'Permission based restrictions', () => {
