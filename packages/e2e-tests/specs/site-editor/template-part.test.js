@@ -3,7 +3,7 @@
  */
 import {
 	insertBlock,
-	trashAllPosts,
+	deleteAllTemplates,
 	activateTheme,
 	getAllBlocks,
 	selectBlockByClientId,
@@ -18,12 +18,12 @@ const templatePartNameInput =
 describe( 'Template Part', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 
