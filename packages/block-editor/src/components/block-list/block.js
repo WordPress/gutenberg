@@ -128,7 +128,10 @@ function BlockListBlock( {
 		);
 	}
 
-	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
+	const isAligned =
+		wrapperProps &&
+		!! wrapperProps[ 'data-align' ] &&
+		! themeSupportsLayout;
 
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column.
@@ -138,7 +141,7 @@ function BlockListBlock( {
 	// Due to the differences between frontend and backend, we migrated
 	// to the layout feature, and we're now aligning the markup of frontend
 	// and backend.
-	if ( isAligned && ! themeSupportsLayout ) {
+	if ( isAligned ) {
 		blockEdit = (
 			<div
 				className="wp-block"
@@ -180,7 +183,7 @@ function BlockListBlock( {
 	const value = {
 		clientId,
 		className:
-			isAligned && themeSupportsLayout
+			wrapperProps[ 'data-align' ] && themeSupportsLayout
 				? classnames(
 						className,
 						`align${ wrapperProps[ 'data-align' ] }`
