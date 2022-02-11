@@ -366,7 +366,7 @@ describe( 'block factory', () => {
 				attributes: {
 					internalAttribute: {
 						type: 'string',
-						supports: {
+						__experimentalSupports: {
 							copy: false,
 						},
 					},
@@ -395,13 +395,13 @@ describe( 'block factory', () => {
 				attributes: {
 					internalAttribute: {
 						type: 'string',
-						supports: {
+						__experimentalSupports: {
 							copy: false,
 						},
 					},
 					attributeWithExplicitCopySupport: {
 						type: 'string',
-						supports: {
+						__experimentalSupports: {
 							copy: true,
 						},
 					},

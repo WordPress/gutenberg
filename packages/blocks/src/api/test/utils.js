@@ -232,7 +232,7 @@ describe( '__experimentalFilterBlockAttributes', () => {
 				color: {
 					type: 'string',
 					__experimentalRole: 'other',
-					supports: {
+					__experimentalSupports: {
 						copy: false,
 					},
 				},
@@ -285,7 +285,7 @@ describe( '__experimentalFilterBlockAttributes', () => {
 		expect(
 			__experimentalFilterBlockAttributes( 'core/test-block-1', {
 				__experimentalRole: 'other',
-				supports: { copy: false },
+				__experimentalSupports: { copy: false },
 			} )
 		).toEqual( [ 'color' ] );
 		expect(

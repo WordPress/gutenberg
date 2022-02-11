@@ -329,7 +329,7 @@ describe( 'block serializer', () => {
 					},
 					internal: {
 						type: 'string',
-						supports: {
+						__experimentalSupports: {
 							copy: false,
 						},
 					},

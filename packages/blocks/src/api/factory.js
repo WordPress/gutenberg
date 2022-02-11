@@ -154,7 +154,7 @@ export function cloneBlock(
 		attributes = omit(
 			attributes,
 			__experimentalFilterBlockAttributes( block.name, {
-				supports: { copy: false },
+				__experimentalSupports: { copy: false },
 			} )
 		);
 	}

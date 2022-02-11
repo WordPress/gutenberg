@@ -368,7 +368,7 @@ export function serializeBlock(
 		saveAttributes = omit(
 			saveAttributes,
 			__experimentalFilterBlockAttributes( blockName, {
-				supports: { copy: false },
+				__experimentalSupports: { copy: false },
 			} )
 		);
 	}
