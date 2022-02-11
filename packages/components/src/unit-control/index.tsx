@@ -213,6 +213,7 @@ function UnitControl(
 				ref={ forwardedRef }
 				size={ size }
 				suffix={ inputSuffix }
+				// @ts-ignore
 				value={ value }
 				step={ step }
 				__unstableStateReducer={ composeStateReducers(

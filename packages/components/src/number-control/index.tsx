@@ -111,7 +111,9 @@ export function NumberControl(
 		 * Handles drag to update events
 		 */
 		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
+			// @ts-ignore
 			const [ x, y ] = payload.delta;
+			// @ts-ignore
 			const enableShift = payload.shiftKey && isShiftStepEnabled;
 			const modifier = enableShift ? shiftStep * baseStep : baseStep;
 

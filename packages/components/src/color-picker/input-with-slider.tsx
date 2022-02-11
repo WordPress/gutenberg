@@ -32,7 +32,9 @@ export const InputWithSlider = ( {
 				max={ max }
 				label={ label }
 				hideLabelFromVision
+				// @ts-ignore
 				value={ value }
+				// @ts-ignore
 				onChange={ onChange }
 				prefix={
 					<Spacer
