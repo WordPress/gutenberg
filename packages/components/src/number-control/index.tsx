@@ -84,7 +84,7 @@ export function NumberControl(
 			const enableShift = event.shiftKey && isShiftStepEnabled;
 
 			const incrementalValue = enableShift
-				? parseFloat( shiftStep ) * baseStep
+				? shiftStep * baseStep
 				: baseStep;
 			let nextValue = isValueEmpty( currentValue )
 				? baseValue
@@ -114,9 +114,7 @@ export function NumberControl(
 		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
 			const [ x, y ] = payload.delta;
 			const enableShift = payload.shiftKey && isShiftStepEnabled;
-			const modifier = enableShift
-				? parseFloat( shiftStep ) * baseStep
-				: baseStep;
+			const modifier = enableShift ? shiftStep * baseStep : baseStep;
 
 			let directionModifier;
 			let delta;
