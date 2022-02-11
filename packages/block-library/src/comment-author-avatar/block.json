@@ -28,15 +28,16 @@
 			"style": true
 		},
 		"color": {
+			"background": true,
 			"text": false,
-			"background": true
+			"__experimentalDefaultControls": {
+				"background": true
+			}
 		},
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"margin": true,
 			"padding": true
 		}
-	},
-	"editorStyle": "wp-block-avatar",
-	"style": "wp-block-avatar"
+	}
 }
