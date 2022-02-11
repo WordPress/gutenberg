@@ -75,7 +75,10 @@ function block_core_gallery_render( $attributes, $content ) {
  */
 function register_block_core_gallery() {
 	register_block_type_from_metadata(
-		__DIR__ . '/gallery'
+		__DIR__ . '/gallery',
+		array(
+			'render_callback' => 'block_core_gallery_render',
+		)
 	);
 }
 
