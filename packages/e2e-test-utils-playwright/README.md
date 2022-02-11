@@ -21,7 +21,7 @@ npm install @wordpress/e2e-test-utils-playwright --save-dev
 Create the test utils instance of the current page.
 
 ```js
-const testUtils = new TestUtils( browser, page );
+const testUtils = new TestUtils( page );
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
