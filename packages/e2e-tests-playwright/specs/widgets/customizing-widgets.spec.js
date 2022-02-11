@@ -37,8 +37,6 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
-		await widgetsCustomizerPage.waitForPreviewIframe();
-
 		await widgetsCustomizerPage.addBlock( 'Heading' );
 		await page.keyboard.type( 'My Heading' );
 
@@ -62,8 +60,6 @@ test.describe( 'Widgets Customizer', () => {
 		);
 
 		await page.keyboard.type( 'My ' );
-
-		await widgetsCustomizerPage.waitForPreviewIframe();
 
 		const previewFrame = page.frameLocator(
 			'iframe[title="Site Preview"]'
@@ -161,8 +157,6 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
-		await widgetsCustomizerPage.waitForPreviewIframe();
-
 		const addBlockButton = page.locator(
 			'role=toolbar[name="Document tools"i] >> role=button[name="Add block"i]'
 		);
@@ -226,15 +220,11 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
-		await widgetsCustomizerPage.waitForPreviewIframe();
-
 		await widgetsCustomizerPage.addBlock( 'Heading' );
 		await page.keyboard.type( 'First Heading' );
 
 		// Navigate back to the parent panel.
 		await page.click( 'role=button[name=/Back$/] >> visible=true' );
-
-		await widgetsCustomizerPage.waitForPreviewIframe();
 
 		const previewFrame = page.frameLocator(
 			'iframe[title="Site Preview"]'
@@ -353,12 +343,6 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Unfocus the current legacy widget.
 		await page.keyboard.press( 'Tab' );
-
-		// Disable reason: Sometimes the preview just doesn't fully load,
-		// it's the only way I know for now to ensure that the iframe is ready.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 2000 );
-		await widgetsCustomizerPage.waitForPreviewIframe();
 
 		const previewFrame = page.frameLocator(
 			'iframe[title="Site Preview"]'
@@ -520,8 +504,6 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
-		await widgetsCustomizerPage.waitForPreviewIframe();
-
 		// Click Publish
 		await Promise.all( [
 			page.waitForResponse(
@@ -639,18 +621,5 @@ class WidgetsCustomizerPage {
 		const stableSelector = `[data-block="${ blockId }"]`;
 
 		return this.page.locator( stableSelector );
-	}
-
-	/**
-	 * Wait when there's only one preview iframe.
-	 * There could be 2 iframes when it's changing from no widgets to
-	 * adding a first widget to the sidebar,
-	 */
-	async waitForPreviewIframe() {
-		await this.page.waitForFunction(
-			() =>
-				document.querySelectorAll( '[name^="customize-preview-"]' )
-					.length === 1
-		);
 	}
 }
