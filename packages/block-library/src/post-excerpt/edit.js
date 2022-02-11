@@ -70,6 +70,11 @@ export default function PostExcerptEditor( {
 			</div>
 		);
 	}
+	/**
+	 * Sometimes the excerpt contains a read more link and it should be
+	 * the only time the excerpt even contains HTML.
+	 */
+	const hasReadMore = renderedExcerpt.toLowerCase().includes( '</a></p>' );
 	const readMoreLink = (
 		<RichText
 			className="wp-block-post-excerpt__more-link"
@@ -118,26 +123,28 @@ export default function PostExcerptEditor( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Post Excerpt Settings' ) }>
-					<ToggleControl
-						label={ __( 'Show link on new line' ) }
-						checked={ showMoreOnNewLine }
-						onChange={ ( newShowMoreOnNewLine ) =>
-							setAttributes( {
-								showMoreOnNewLine: newShowMoreOnNewLine,
-							} )
-						}
-					/>
+					{ ! hasReadMore && (
+						<ToggleControl
+							label={ __( 'Show link on new line' ) }
+							checked={ showMoreOnNewLine }
+							onChange={ ( newShowMoreOnNewLine ) =>
+								setAttributes( {
+									showMoreOnNewLine: newShowMoreOnNewLine,
+								} )
+							}
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ excerptContent }
 				{ ! showMoreOnNewLine && ' ' }
-				{ showMoreOnNewLine ? (
+				{ ! hasReadMore && showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
 						{ readMoreLink }
 					</p>
 				) : (
-					readMoreLink
+					! hasReadMore && readMoreLink
 				) }
 			</div>
 		</>
