@@ -183,7 +183,7 @@ function BlockListBlock( {
 	const value = {
 		clientId,
 		className:
-			wrapperProps[ 'data-align' ] && themeSupportsLayout
+			wrapperProps?.[ 'data-align' ] && themeSupportsLayout
 				? classnames(
 						className,
 						`align${ wrapperProps[ 'data-align' ] }`
