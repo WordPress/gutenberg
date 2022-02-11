@@ -70,11 +70,15 @@ export type view = EntityContext.view;
 export type edit = EntityContext.edit;
 export type embed = EntityContext.embed;
 
+export enum RawDataType {
+	default,
+	RawDataIsString,
+}
 
 export type RawField<
-	RawDataIsString extends boolean,
+	RawDataOverride extends RawDataType,
 	T
-> = RawDataIsString extends true ? string : T;
+> = RawDataOverride extends RawDataType.RawDataIsString ? string : T;
 
 export type OnlyInContexts<
 	FieldType,

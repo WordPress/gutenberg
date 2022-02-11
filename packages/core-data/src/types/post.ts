@@ -11,11 +11,13 @@ import {
 	OpenOrClosed,
 	DifferentPerContext,
 	PostStatus,
+	embed,
+	RawDataType,
 } from './common';
 
 export interface Post<
 	Context extends EntityContext,
-	RawDataIsString extends boolean = false
+	RawDataOverride extends RawDataType = RawDataType.default
 > {
 	/**
 	 * The date the post was published, in the site's timezone.
@@ -29,7 +31,7 @@ export interface Post<
 	 * The globally unique identifier for the post.
 	 */
 	guid: RawField<
-		RawDataIsString,
+		RawDataOverride,
 		DifferentPerContext<
 			Pick< FullRawObject, 'rendered' >,
 			FullRawObject,
@@ -81,7 +83,7 @@ export interface Post<
 	 * The title for the post.
 	 */
 	title: RawField<
-		RawDataIsString,
+		RawDataOverride,
 		DifferentPerContext<
 			Pick< FullRawObject, 'rendered' >,
 			FullRawObject,
@@ -93,7 +95,7 @@ export interface Post<
 	 * The content for the post.
 	 */
 	content: RawField<
-		RawDataIsString,
+		RawDataOverride,
 		DifferentPerContext<
 			Pick< FullRawObject, 'rendered' > & { protected: boolean },
 			FullRawObject & { block_version: number; protected: boolean },
@@ -109,7 +111,7 @@ export interface Post<
 	 * The excerpt for the post.
 	 */
 	excerpt: RawField<
-		RawDataIsString,
+		RawDataOverride,
 		DifferentPerContext<
 			Pick< FullRawObject, 'rendered' >,
 			FullRawObject,
