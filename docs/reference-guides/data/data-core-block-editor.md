@@ -1261,6 +1261,7 @@ _Parameters_
 
 -   _start_ `string`: First block of the multi selection.
 -   _end_ `string`: Last block of the multiselection.
+-   _initialPosition_ `number|null`: Optional initial position. Pass as null to skip focus within editor canvas.
 
 ### receiveBlocks
 

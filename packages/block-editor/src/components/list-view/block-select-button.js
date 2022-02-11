@@ -65,7 +65,6 @@ function ListViewBlockSelectButton(
 			( event.shiftKey &&
 				( event.keyCode === UP || event.keyCode === DOWN ) )
 		) {
-			event.preventDefault();
 			onClick( event );
 		}
 	}
