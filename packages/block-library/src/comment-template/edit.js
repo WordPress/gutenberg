@@ -17,6 +17,9 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+/**
+ * Internal dependencies
+ */
 import { convertToTree } from './util';
 
 const TEMPLATE = [
@@ -29,7 +32,6 @@ const TEMPLATE = [
 ];
 
 /**
-<<<<<<< HEAD
  * Function that returns a comment structure that will be rendered with default placehoders.
  *
  * @param {Object}  settings                       Discussion Settings.
@@ -80,8 +82,6 @@ const getCommentsPlaceholder = ( {
 };
 
 /**
-=======
->>>>>>> 80a24d8253 (Allow background color again to avoid compatibility errors)
  * Component which renders the inner blocks of the Comment Template.
  *
  * @param {Object} props                    Component props.
@@ -109,12 +109,12 @@ function CommentTemplateInnerBlocks( {
 			{ comment === ( activeComment || firstComment ) ? children : null }
 
 			{ /* To avoid flicker when switching active block contexts, a preview
-			is ALWAYS rendered and the preview for the active block is hidden. 
-			This ensures that when switching the active block, the component is not 
-			mounted again but rather it only toggles the `isHidden` prop.
-			
-			The same strategy is used for preventing the flicker in the Post Template
-			block. */ }
+			 is ALWAYS rendered and the preview for the active block is hidden. 
+			 This ensures that when switching the active block, the component is not 
+			 mounted again but rather it only toggles the `isHidden` prop.
+			 
+			 The same strategy is used for preventing the flicker in the Post Template
+			 block. */ }
 			<MemoizedCommentTemplatePreview
 				blocks={ blocks }
 				comment={ comment }

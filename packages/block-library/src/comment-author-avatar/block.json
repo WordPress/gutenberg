@@ -15,17 +15,9 @@
 		"height": {
 			"type": "number",
 			"default": 96
-		},
-		"isLink": {
-			"type": "boolean",
-			"default": false
-		},
-		"linkTarget": {
-			"type": "string",
-			"default": "_self"
 		}
 	},
-	"usesContext": [ "commentId", "postType", "postId" ],
+	"usesContext": [ "commentId" ],
 	"supports": {
 		"html": false,
 		"inserter": false,
@@ -37,8 +29,7 @@
 		},
 		"color": {
 			"text": false,
-			"background": false,
-			"__experimentalDuotone": "img"
+			"background": true
 		},
 		"spacing": {
 			"__experimentalSkipSerialization": true,
