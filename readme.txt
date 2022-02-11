@@ -53,7 +53,7 @@ But if you want cutting edge beta features, including more experimental items, y
 
 View the <a href="https://developer.wordpress.org/block-editor/principles/versions-in-wordpress/">Versions in WordPress</a> document to get a table showing which Gutenberg plugin version is included in each WordPress release.
 
-= What's Next for the Project? =
+= What’s next for the project? =
 
 The four phases of the project are Editing, Customization, Collaboration, and Multilingual. You can hear more about the project and phases from Matt in his State of the Word talks for <a href="https://ma.tt/2020/12/sotw-2020/">2020</a>, <a href="https://ma.tt/2019/11/state-of-the-word-2019/">2019</a>, and <a href="https://ma.tt/2018/12/state-of-the-word-2018/">2018</a>. Additionally, you can follow the <a href="https://make.wordpress.org/core/tag/gutenberg-new/">biweekly release notes</a> and <a href="https://make.wordpress.org/core/tag/gutenberg-next/">monthly project plan updates</a> on the <a href="https://make.wordpress.org/core/?s=gutenberg">Make WordPress Core blog</a> for more up to date information about what’s happening now.
 
