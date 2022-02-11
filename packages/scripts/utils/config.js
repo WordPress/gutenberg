@@ -272,7 +272,9 @@ function getWebpackEntryPoints() {
 		absolute: true,
 	} );
 	if ( ! entryFile ) {
-		log( chalk.yellow( 'No entry file discovered in the "src" directory.' ) );
+		log(
+			chalk.yellow( 'No entry file discovered in the "src" directory.' )
+		);
 		return {};
 	}
 
