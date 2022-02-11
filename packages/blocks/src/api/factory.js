@@ -131,8 +131,8 @@ export function createBlocksFromInnerBlocksTemplate(
  * @param {Object}   block                        Block instance.
  * @param {Object}   mergeAttributes              Block attributes.
  * @param {?Array}   newInnerBlocks               Nested blocks.
- * @param {?Object}  options                      Cloning options.
- * @param {?boolean} options.retainCopyAttributes Whether to retain attributes that do not have copy support in the cloned block.
+ * @param {?Object}  __experimentalOptions                      Cloning options.
+ * @param {?boolean} __experimentalOptions.__experimentalExcludeNonCopyableAttributes Whether to exclude attributes that do not have copy support in the cloned block.
  *
  * @return {Object} A cloned block.
  */
@@ -140,9 +140,11 @@ export function cloneBlock(
 	block,
 	mergeAttributes = {},
 	newInnerBlocks,
-	options = {}
+	__experimentalOptions = {}
 ) {
-	const { retainCopyAttributes = true } = options;
+	const {
+		__experimentalExcludeNonCopyableAttributes = false,
+	} = __experimentalOptions;
 	const clientId = uuid();
 
 	let attributes = {
@@ -150,7 +152,7 @@ export function cloneBlock(
 		...mergeAttributes,
 	};
 
-	if ( ! retainCopyAttributes ) {
+	if ( __experimentalExcludeNonCopyableAttributes ) {
 		attributes = omit(
 			attributes,
 			__experimentalFilterBlockAttributes( block.name, {

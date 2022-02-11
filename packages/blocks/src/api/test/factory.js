@@ -389,7 +389,7 @@ describe( 'block factory', () => {
 			} );
 		} );
 
-		it( 'should not duplicate attributes that do not support copy operation when retainCopyAttributes is false', () => {
+		it( 'should not duplicate attributes that do not support copy operation when __experimentalExcludeNonCopyableAttributes is true', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
@@ -419,7 +419,7 @@ describe( 'block factory', () => {
 			} );
 
 			const clonedBlock = cloneBlock( block, {}, null, {
-				retainCopyAttributes: false,
+				__experimentalExcludeNonCopyableAttributes: true,
 			} );
 
 			expect( clonedBlock.attributes ).toEqual( {

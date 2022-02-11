@@ -194,8 +194,8 @@ _Parameters_
 -   _block_ `Object`: Block instance.
 -   _mergeAttributes_ `Object`: Block attributes.
 -   _newInnerBlocks_ `?Array`: Nested blocks.
--   _options_ `?Object`: Cloning options.
--   _options.retainCopyAttributes_ `?boolean`: Whether to retain attributes that do not have copy support in the cloned block.
+-   _\_\_experimentalOptions_ `?Object`: Cloning options.
+-   _**experimentalOptions.**experimentalExcludeNonCopyableAttributes_ `?boolean`: Whether to exclude attributes that do not have copy support in the cloned block.
 
 _Returns_
 
