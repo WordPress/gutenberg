@@ -6,6 +6,10 @@
 
 -   The bundled `@svgr/webpack` dependency has been updated from requiring `^5.5.0` to requiring `^6.2.1` ([#38866](https://github.com/WordPress/gutenberg/pull/38866)). See [official migration guide to v6](https://react-svgr.com/docs/migrate/) for details.
 
+### New Feature
+
+-   Automatically copy PHP files located in the `src` folder and its subfolders to the output directory (`build` by default) ([#38715](https://github.com/WordPress/gutenberg/pull/38715)).
+
 ## 21.0.2 (2022-02-15)
 
 -   Entry points are not detected in Windows OS ([#38781](https://github.com/WordPress/gutenberg/pull/38781)).
