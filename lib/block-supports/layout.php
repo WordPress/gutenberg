@@ -245,7 +245,7 @@ add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
  * @return string Filtered block content.
  */
 function gutenberg_restore_image_outer_container( $block_content, $block ) {
-	$image_with_align = '/(^\s*<figure\b[^>]*)wp-block-image\s([^"]*((alignleft)|(alignright)|(aligncenter))(\s|")[^>]*>((.|\S|\s)*)<\/figure>)/U';
+	$image_with_align = '/(^\s*<figure\b[^>]*)\bwp-block-image\b([^"]*\b(?:alignleft|alignright|aligncenter)\b[^>]*>.*<\/figure>)/U';
 
 	if (
 		'core/image' !== $block['blockName'] ||
