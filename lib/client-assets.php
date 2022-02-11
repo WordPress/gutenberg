@@ -261,6 +261,13 @@ function gutenberg_register_packages_scripts( $scripts ) {
 				break;
 		}
 
+		// Load unminified JS in SCRIPT_DEBUG mode.
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			// We can't replace the glob call above with index.js because the PHP
+			// asset file is associated with the .min file. (index.min.asset.php).
+			$path = str_replace( '.min.js', '.js', $path );
+		}
+
 		// Get the path from Gutenberg directory as expected by `gutenberg_url`.
 		$gutenberg_path = substr( $path, strlen( gutenberg_dir_path() ) );
 
