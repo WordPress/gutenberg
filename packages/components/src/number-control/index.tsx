@@ -85,7 +85,7 @@ export function NumberControl(
 				: baseStep;
 			let nextValue = isValueEmpty( currentValue )
 				? baseValue
-				: currentValue;
+				: ensureNumber( ( currentValue as unknown ) as string );
 
 			if ( event?.preventDefault ) {
 				event.preventDefault();
@@ -143,7 +143,7 @@ export function NumberControl(
 				const distance = delta * modifier * directionModifier;
 
 				state.value = constrainValue(
-					add( currentValue, distance ),
+					add( currentValue ?? 0, distance ),
 					enableShift ? modifier : undefined
 				);
 			}
@@ -160,7 +160,7 @@ export function NumberControl(
 
 			state.value = applyEmptyValue
 				? currentValue
-				: constrainValue( currentValue );
+				: constrainValue( ensureNumber( currentValue ?? 0 ) );
 		}
 
 		return state;
