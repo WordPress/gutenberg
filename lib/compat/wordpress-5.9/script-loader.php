@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-/*
+/**
  * This code lives in script-loader.php
  * where we just load styles using wp_get_global_stylesheet.
  */
