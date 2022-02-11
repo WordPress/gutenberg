@@ -176,7 +176,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$separate_assets  = wp_should_load_separate_core_block_assets();
 	$is_classic_theme = ! wp_is_block_theme();
 	$action_hook_name = 'wp_enqueue_scripts';
-	if ( $is_classic_theme && $separate_assets ) { 
+	if ( $is_classic_theme && $separate_assets ) {
 		$action_hook_name = 'wp_footer';
 	}
 	add_action(
