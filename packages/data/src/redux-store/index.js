@@ -330,20 +330,35 @@ function mapResolveSelectors( selectors, store ) {
 			'getCachedResolvers',
 		] ),
 		( selector, selectorName ) => ( ...args ) =>
-			new Promise( ( resolve ) => {
+			new Promise( ( resolve, reject ) => {
 				const hasFinished = () =>
 					selectors.hasFinishedResolution( selectorName, args );
+				const finalize = ( result ) => {
+					const hasFailed = selectors.hasLastResolutionFailed(
+						selectorName,
+						args
+					);
+					if ( hasFailed ) {
+						const error = selectors.getLastResolutionFailure(
+							selectorName,
+							args
+						);
+						reject( error );
+					} else {
+						resolve( result );
+					}
+				};
 				const getResult = () => selector.apply( null, args );
 				// trigger the selector (to trigger the resolver)
 				const result = getResult();
 				if ( hasFinished() ) {
-					return resolve( result );
+					finalize( result );
 				}
 
 				const unsubscribe = store.subscribe( () => {
 					if ( hasFinished() ) {
 						unsubscribe();
-						resolve( getResult() );
+						finalize( getResult() );
 					}
 				} );
 			} )
