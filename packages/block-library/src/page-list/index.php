@@ -178,7 +178,7 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 			$css_class .= ' menu-item-home';
 		}
 
-		$title      = wp_kses( $page['title'], wp_kses_allowed_html( 'post' ) );
+		$title      = wp_kses_post( $page['title'] );
 		$aria_label = sprintf(
 			/* translators: Accessibility text. %s: Parent page title. */
 			__( '%s submenu' ),

@@ -167,25 +167,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$label = '';
 
 	if ( isset( $attributes['label'] ) ) {
-		$label .= wp_kses(
-			$attributes['label'],
-			array(
-				'code'   => array(),
-				'em'     => array(),
-				'img'    => array(
-					'scale' => array(),
-					'class' => array(),
-					'style' => array(),
-					'src'   => array(),
-					'alt'   => array(),
-				),
-				's'      => array(),
-				'span'   => array(
-					'style' => array(),
-				),
-				'strong' => array(),
-			)
-		);
+		$label .= wp_kses_post(	$attributes['label'] );
 	}
 
 	$aria_label = sprintf(
