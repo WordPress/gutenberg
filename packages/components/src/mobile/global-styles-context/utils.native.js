@@ -315,12 +315,14 @@ export function useMobileGlobalStylesColors( type = 'colors' ) {
 		( colors, origin ) => colors.concat( origin?.[ type ] ),
 		[]
 	);
-	// Default editor colors if it's not a block-based theme.
-	const editorDefaultColors = useSetting( 'color.palette' );
+	// Default editor colors/gradients if it's not a block-based theme.
+	const colorPalette =
+		type === 'colors' ? 'color.palette' : 'color.gradients';
+	const editorDefaultPalette = useSetting( colorPalette );
 
 	return availableThemeColors.length >= 1
 		? availableThemeColors
-		: editorDefaultColors;
+		: editorDefaultPalette;
 }
 
 export function getColorsAndGradients(
@@ -346,8 +348,8 @@ export function getColorsAndGradients(
 							},
 					  }
 					: features?.color ),
-				defaultPalette: defaultEditorColors,
-				defaultGradients: defaultEditorGradients,
+				defaultPalette: !! defaultEditorColors,
+				defaultGradients: !! defaultEditorGradients,
 			},
 		},
 	};
