@@ -9,7 +9,7 @@ The Gutenberg plugin provides editing, customization, and site building features
 
 == Description ==
 
-“Gutenberg” is a codename for a whole new paradigm for creating with WordPress, that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. The project is following a four-phase process that will touch major pieces of WordPress — Editing, Customization, Collaboration, and Multilingual.
+“Gutenberg” is a codename for a whole new paradigm for creating with WordPress, that aims to revolutionize the entire publishing experience as much as <a href="https://en.wikipedia.org/wiki/Johannes_Gutenberg">Johannes Gutenberg</a> did the printed word. The project is <a href="https://wordpress.org/about/roadmap/">following a four-phase process</a> that will touch major pieces of WordPress — Editing, Customization, Collaboration, and Multilingual.
 
 The block editor introduces a modular approach to all parts of your site: each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can be added, arranged, and rearranged, allowing WordPress users to create media-rich content in a visually intuitive way — and without work-arounds like shortcodes or custom HTML.
 
