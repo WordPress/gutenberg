@@ -45,7 +45,9 @@ While we try to triage issues reported here on the plugin forum, you’ll get a 
 
 = Do I have to use the Gutenberg plugin to get access to these features? =
 
-It depends on the feature you want to use! Keep in mind that each version of WordPress after 5.0 comes with bundled versions of the Gutenberg plugin, automatically containing new features and changes. If you want the cutting edge features, including more experimental items, you will need to use the plugin. You can <a href="https://wordpress.org/news/2021/04/become-an-early-adopter-with-the-gutenberg-plugin/">read more here</a> about whether using the plugin is right for you.
+Not necessarily. Each version of WordPress after 5.0 has included features from the Gutenberg plugin, which are known collectively as the <a href="https://wordpress.org/support/article/wordpress-editor/">WordPress Editor</a>. You are likely already benefitting from stable features!
+
+But if you want cutting edge beta features, including more experimental items, you will need to use the plugin. You can <a href="https://wordpress.org/news/2021/04/become-an-early-adopter-with-the-gutenberg-plugin/">read more here</a> to help decide whether the plugin is right for you.
 
 = Where can I see which Gutenberg plugin versions are included in each WordPress release? =
 
