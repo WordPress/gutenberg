@@ -3,7 +3,7 @@
 	padding-top: 0.1px;
 	padding-bottom: 0.1px;
 
-	// This is also set in style.scss, but need a higher specificty in editor
+	// This is also set in style.scss, but needs a higher specificity in editor
 	// due to the way that color block supports adds additional background color styles.
 	&.wp-block-separator.is-style-dots {
 		background: none !important;
