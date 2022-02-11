@@ -223,41 +223,12 @@ describe( 'hasLastResolutionFailed', () => {
 
 describe( 'getLastResolutionFailure', () => {
 	let registry;
+	let shouldFail;
 
 	beforeEach( () => {
+		shouldFail = false;
 		registry = createRegistry();
-	} );
 
-	it( 'returns undefined if the resolution has succeeded', async () => {
-		registry.registerStore( 'store', {
-			reducer: ( state = null, action ) => {
-				if ( action.type === 'RECEIVE' ) {
-					return action.items;
-				}
-
-				return state;
-			},
-			selectors: {
-				getItems: ( state ) => state,
-			},
-			resolvers: {
-				getItems: () => {},
-			},
-		} );
-
-		expect(
-			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
-		).toBeFalsy();
-
-		registry.select( 'store' ).getItems();
-		await jest.advanceTimersByTime( 1 );
-
-		expect(
-			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
-		).toBeFalsy();
-	} );
-
-	it( 'returns error if the resolution has failed', async () => {
 		registry.registerStore( 'store', {
 			reducer: ( state = null, action ) => {
 				if ( action.type === 'RECEIVE' ) {
@@ -271,10 +242,29 @@ describe( 'getLastResolutionFailure', () => {
 			},
 			resolvers: {
 				getItems: () => {
-					throw new Error( 'cannot fetch items' );
+					if ( shouldFail ) {
+						throw new Error( 'cannot fetch items' );
+					}
 				},
 			},
 		} );
+	} );
+
+	it( 'returns undefined if the resolution has succeeded', async () => {
+		expect(
+			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+		).toBeFalsy();
+
+		registry.select( 'store' ).getItems();
+		await jest.advanceTimersByTime( 1 );
+
+		expect(
+			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+		).toBeFalsy();
+	} );
+
+	it( 'returns error if the resolution has failed', async () => {
+		shouldFail = true;
 
 		expect(
 			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
@@ -289,5 +279,34 @@ describe( 'getLastResolutionFailure', () => {
 				.getLastResolutionFailure( 'getItems' )
 				.toString()
 		).toBe( 'Error: cannot fetch items' );
+	} );
+
+	it( 'returns undefined if the failed resolution succeeded after retry', async () => {
+		shouldFail = true;
+		expect(
+			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+		).toBeFalsy();
+
+		registry.select( 'store' ).getItems();
+		await jest.advanceTimersByTime( 1 );
+
+		expect(
+			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+		).toBeTruthy();
+
+		registry.dispatch( 'store' ).invalidateResolution( 'getItems', [] );
+		await jest.advanceTimersByTime( 1 );
+
+		expect(
+			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+		).toBeFalsy();
+
+		shouldFail = false;
+		registry.select( 'store' ).getItems();
+		await jest.advanceTimersByTime( 1 );
+
+		expect(
+			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+		).toBeFalsy();
 	} );
 } );
