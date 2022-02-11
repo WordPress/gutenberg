@@ -78,7 +78,9 @@ export function NumberControl(
 			type === inputControlActionTypes.PRESS_UP ||
 			type === inputControlActionTypes.PRESS_DOWN
 		) {
-			const enableShift = event.shiftKey && isShiftStepEnabled;
+			const enableShift =
+				( event as KeyboardEvent | undefined )?.shiftKey &&
+				isShiftStepEnabled;
 
 			const incrementalValue = enableShift
 				? shiftStep * baseStep
