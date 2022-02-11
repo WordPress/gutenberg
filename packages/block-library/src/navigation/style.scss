@@ -223,11 +223,6 @@ $navigation-icon-size: 24px;
 				margin-right: 0.25em;
 			}
 
-			// For hover-based menus, this class is duplicated for a button.
-			.wp-block-navigation__submenu-icon .wp-block-navigation__submenu-icon {
-				margin: 0;
-			}
-
 			// Reset the submenu indicator for horizontal flyouts.
 			.wp-block-navigation__submenu-icon svg {
 				transform: rotate(-90deg);
