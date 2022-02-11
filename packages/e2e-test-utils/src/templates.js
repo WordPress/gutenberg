@@ -17,7 +17,7 @@ export async function deleteAllTemplates( type ) {
 	const path = PATH_MAPPING[ type ];
 
 	if ( ! path ) {
-		return;
+		throw new Error( `Unsupported template type: ${ type }.` );
 	}
 
 	const templates = await rest( { path } );
