@@ -232,6 +232,11 @@ const config = {
 					context: 'src',
 					noErrorOnMissing: true,
 				},
+				{
+					from: '**/**.php',
+					context: 'src',
+					noErrorOnMissing: true,
+				},
 			],
 		} ),
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents

@@ -12,6 +12,10 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
 
+## 1.71.1
+
+-   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
+
 ## 1.71.0
 
 -   [*] Image block: Replacing the media for an image set as featured prompts to update the featured image [#34666]
