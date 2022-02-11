@@ -60,16 +60,13 @@ export function NumberControl(
 	const autoComplete = typeProp === 'number' ? 'off' : null;
 	const classes = classNames( 'components-number-control', className );
 
-	/**
-	 * "Middleware" function that intercepts updates from InputControl.
-	 * This allows us to tap into actions to transform the (next) state for
-	 * InputControl.
-	 *
-	 * @param {Object} state  State from InputControl
-	 * @param {Object} action Action triggering state change
-	 * @return {Object} The updated state to apply to InputControl
-	 */
-	const numberControlStateReducer = ( state, action ) => {
+	// "Middleware" function that intercepts updates from InputControl.
+	// This allows us to tap into actions to transform the (next) state for
+	// `InputControl`.
+	const numberControlStateReducer: Props[ '__unstableStateReducer' ] = (
+		state,
+		action
+	) => {
 		const { type, payload } = action;
 		const event = payload?.event;
 		const currentValue = state.value;
