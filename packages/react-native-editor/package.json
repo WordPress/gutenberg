@@ -123,7 +123,7 @@
 		"clean:runtime": "npm run clean:haste; npm run clean:react; npm run clean:metro; npm run clean:jest; npm run clean:watchman; npm run clean:babel-cache",
 		"clean:build-artifacts": "rm -rf ./ios/build && rm -rf ./ios/Pods",
 		"clean:aztec": "cd ../react-native-aztec && npm run clean",
-		"clean:haste": "rm -rf /tmp/haste-map-react-native-packager-*",
+		"clean:haste": "rm -rf $TMPDIR/haste-map-metro-*",
 		"clean:install": "npm run clean; npm install",
 		"clean:jest": "jest --clearCache --config ../../test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
 		"clean:metro": "rm -rf $TMPDIR/metro-cache/",
