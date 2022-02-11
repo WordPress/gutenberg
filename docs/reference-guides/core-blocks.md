@@ -113,8 +113,8 @@ Add the avatar of this comment's author. ([Source](https://github.com/WordPress/
 
 -	**Name:** core/comment-author-avatar
 -	**Category:** theme
--	**Supports:** color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~, ~~inserter~~
--	**Attributes:** height, isLink, linkTarget, width
+-	**Supports:** color (background, ~~text~~), spacing (margin, padding), ~~html~~, ~~inserter~~
+-	**Attributes:** height, width
 
 ## Comment Author Name
 
