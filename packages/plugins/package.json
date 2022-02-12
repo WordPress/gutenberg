@@ -26,10 +26,10 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/element": "file:../element",
-		"@wordpress/hooks": "file:../hooks",
-		"@wordpress/icons": "file:../icons",
+		"@wordpress/compose": "workspace:../compose",
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/hooks": "workspace:../hooks",
+		"@wordpress/icons": "workspace:../icons",
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0"
 	},

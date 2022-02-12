@@ -31,7 +31,7 @@
 		"wp-create-block": "./index.js"
 	},
 	"dependencies": {
-		"@wordpress/lazy-import": "file:../lazy-import",
+		"@wordpress/lazy-import": "workspace:../lazy-import",
 		"chalk": "^4.0.0",
 		"check-node-version": "^4.1.0",
 		"commander": "^4.1.0",

@@ -26,10 +26,10 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/data": "file:../data",
-		"@wordpress/hooks": "file:../hooks",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/data": "workspace:../data",
+		"@wordpress/hooks": "workspace:../hooks",
+		"@wordpress/i18n": "workspace:../i18n",
+		"@wordpress/rich-text": "workspace:../rich-text",
 		"lodash": "^4.17.21",
 		"rememo": "^3.0.0",
 		"uuid": "^8.3.0"

@@ -43,91 +43,91 @@ importers:
       '@types/semver': 7.3.8
       '@types/sprintf-js': 1.1.2
       '@types/uuid': 8.3.1
-      '@wordpress/a11y': file:packages/a11y
-      '@wordpress/admin-manifest': file:packages/admin-manifest
-      '@wordpress/annotations': file:packages/annotations
-      '@wordpress/api-fetch': file:packages/api-fetch
-      '@wordpress/autop': file:packages/autop
-      '@wordpress/babel-plugin-import-jsx-pragma': file:packages/babel-plugin-import-jsx-pragma
-      '@wordpress/babel-plugin-makepot': file:packages/babel-plugin-makepot
-      '@wordpress/babel-preset-default': file:packages/babel-preset-default
-      '@wordpress/base-styles': file:packages/base-styles
-      '@wordpress/blob': file:packages/blob
-      '@wordpress/block-directory': file:packages/block-directory
-      '@wordpress/block-editor': file:packages/block-editor
-      '@wordpress/block-library': file:packages/block-library
-      '@wordpress/block-serialization-default-parser': file:packages/block-serialization-default-parser
-      '@wordpress/block-serialization-spec-parser': file:packages/block-serialization-spec-parser
-      '@wordpress/blocks': file:packages/blocks
-      '@wordpress/browserslist-config': file:packages/browserslist-config
-      '@wordpress/components': file:packages/components
-      '@wordpress/compose': file:packages/compose
-      '@wordpress/core-data': file:packages/core-data
-      '@wordpress/create-block': file:packages/create-block
-      '@wordpress/create-block-tutorial-template': file:packages/create-block-tutorial-template
-      '@wordpress/customize-widgets': file:packages/customize-widgets
-      '@wordpress/data': file:packages/data
-      '@wordpress/data-controls': file:packages/data-controls
-      '@wordpress/date': file:packages/date
-      '@wordpress/dependency-extraction-webpack-plugin': file:packages/dependency-extraction-webpack-plugin
-      '@wordpress/deprecated': file:packages/deprecated
-      '@wordpress/docgen': file:packages/docgen
-      '@wordpress/dom': file:packages/dom
-      '@wordpress/dom-ready': file:packages/dom-ready
-      '@wordpress/e2e-test-utils': file:packages/e2e-test-utils
-      '@wordpress/e2e-tests': file:packages/e2e-tests
-      '@wordpress/edit-navigation': file:packages/edit-navigation
-      '@wordpress/edit-post': file:packages/edit-post
-      '@wordpress/edit-site': file:packages/edit-site
-      '@wordpress/edit-widgets': file:packages/edit-widgets
-      '@wordpress/editor': file:packages/editor
-      '@wordpress/element': file:packages/element
-      '@wordpress/env': file:packages/env
-      '@wordpress/escape-html': file:packages/escape-html
-      '@wordpress/eslint-plugin': file:packages/eslint-plugin
-      '@wordpress/format-library': file:packages/format-library
-      '@wordpress/hooks': file:packages/hooks
-      '@wordpress/html-entities': file:packages/html-entities
-      '@wordpress/i18n': file:packages/i18n
-      '@wordpress/icons': file:packages/icons
-      '@wordpress/interface': file:packages/interface
-      '@wordpress/is-shallow-equal': file:packages/is-shallow-equal
-      '@wordpress/jest-console': file:packages/jest-console
-      '@wordpress/jest-preset-default': file:packages/jest-preset-default
-      '@wordpress/jest-puppeteer-axe': file:packages/jest-puppeteer-axe
-      '@wordpress/keyboard-shortcuts': file:packages/keyboard-shortcuts
-      '@wordpress/keycodes': file:packages/keycodes
-      '@wordpress/lazy-import': file:packages/lazy-import
-      '@wordpress/list-reusable-blocks': file:packages/list-reusable-blocks
-      '@wordpress/media-utils': file:packages/media-utils
-      '@wordpress/notices': file:packages/notices
-      '@wordpress/npm-package-json-lint-config': file:packages/npm-package-json-lint-config
-      '@wordpress/nux': file:packages/nux
-      '@wordpress/plugins': file:packages/plugins
-      '@wordpress/postcss-plugins-preset': file:packages/postcss-plugins-preset
-      '@wordpress/postcss-themes': file:packages/postcss-themes
-      '@wordpress/prettier-config': file:packages/prettier-config
-      '@wordpress/primitives': file:packages/primitives
-      '@wordpress/priority-queue': file:packages/priority-queue
-      '@wordpress/project-management-automation': file:packages/project-management-automation
-      '@wordpress/react-i18n': file:packages/react-i18n
-      '@wordpress/react-native-aztec': file:packages/react-native-aztec
-      '@wordpress/react-native-bridge': file:packages/react-native-bridge
-      '@wordpress/react-native-editor': file:packages/react-native-editor
-      '@wordpress/readable-js-assets-webpack-plugin': file:packages/readable-js-assets-webpack-plugin
-      '@wordpress/redux-routine': file:packages/redux-routine
-      '@wordpress/reusable-blocks': file:packages/reusable-blocks
-      '@wordpress/rich-text': file:packages/rich-text
-      '@wordpress/scripts': file:packages/scripts
-      '@wordpress/server-side-render': file:packages/server-side-render
-      '@wordpress/shortcode': file:packages/shortcode
-      '@wordpress/stylelint-config': file:packages/stylelint-config
-      '@wordpress/token-list': file:packages/token-list
-      '@wordpress/url': file:packages/url
-      '@wordpress/viewport': file:packages/viewport
-      '@wordpress/warning': file:packages/warning
-      '@wordpress/widgets': file:packages/widgets
-      '@wordpress/wordcount': file:packages/wordcount
+      '@wordpress/a11y': workspace:./packages/a11y
+      '@wordpress/admin-manifest': workspace:./packages/admin-manifest
+      '@wordpress/annotations': workspace:./packages/annotations
+      '@wordpress/api-fetch': workspace:./packages/api-fetch
+      '@wordpress/autop': workspace:./packages/autop
+      '@wordpress/babel-plugin-import-jsx-pragma': workspace:./packages/babel-plugin-import-jsx-pragma
+      '@wordpress/babel-plugin-makepot': workspace:./packages/babel-plugin-makepot
+      '@wordpress/babel-preset-default': workspace:./packages/babel-preset-default
+      '@wordpress/base-styles': workspace:./packages/base-styles
+      '@wordpress/blob': workspace:./packages/blob
+      '@wordpress/block-directory': workspace:./packages/block-directory
+      '@wordpress/block-editor': workspace:./packages/block-editor
+      '@wordpress/block-library': workspace:./packages/block-library
+      '@wordpress/block-serialization-default-parser': workspace:./packages/block-serialization-default-parser
+      '@wordpress/block-serialization-spec-parser': workspace:./packages/block-serialization-spec-parser
+      '@wordpress/blocks': workspace:./packages/blocks
+      '@wordpress/browserslist-config': workspace:./packages/browserslist-config
+      '@wordpress/components': workspace:./packages/components
+      '@wordpress/compose': workspace:./packages/compose
+      '@wordpress/core-data': workspace:./packages/core-data
+      '@wordpress/create-block': workspace:./packages/create-block
+      '@wordpress/create-block-tutorial-template': workspace:./packages/create-block-tutorial-template
+      '@wordpress/customize-widgets': workspace:./packages/customize-widgets
+      '@wordpress/data': workspace:./packages/data
+      '@wordpress/data-controls': workspace:./packages/data-controls
+      '@wordpress/date': workspace:./packages/date
+      '@wordpress/dependency-extraction-webpack-plugin': workspace:./packages/dependency-extraction-webpack-plugin
+      '@wordpress/deprecated': workspace:./packages/deprecated
+      '@wordpress/docgen': workspace:./packages/docgen
+      '@wordpress/dom': workspace:./packages/dom
+      '@wordpress/dom-ready': workspace:./packages/dom-ready
+      '@wordpress/e2e-test-utils': workspace:./packages/e2e-test-utils
+      '@wordpress/e2e-tests': workspace:./packages/e2e-tests
+      '@wordpress/edit-navigation': workspace:./packages/edit-navigation
+      '@wordpress/edit-post': workspace:./packages/edit-post
+      '@wordpress/edit-site': workspace:./packages/edit-site
+      '@wordpress/edit-widgets': workspace:./packages/edit-widgets
+      '@wordpress/editor': workspace:./packages/editor
+      '@wordpress/element': workspace:./packages/element
+      '@wordpress/env': workspace:./packages/env
+      '@wordpress/escape-html': workspace:./packages/escape-html
+      '@wordpress/eslint-plugin': workspace:./packages/eslint-plugin
+      '@wordpress/format-library': workspace:./packages/format-library
+      '@wordpress/hooks': workspace:./packages/hooks
+      '@wordpress/html-entities': workspace:./packages/html-entities
+      '@wordpress/i18n': workspace:./packages/i18n
+      '@wordpress/icons': workspace:./packages/icons
+      '@wordpress/interface': workspace:./packages/interface
+      '@wordpress/is-shallow-equal': workspace:./packages/is-shallow-equal
+      '@wordpress/jest-console': workspace:./packages/jest-console
+      '@wordpress/jest-preset-default': workspace:./packages/jest-preset-default
+      '@wordpress/jest-puppeteer-axe': workspace:./packages/jest-puppeteer-axe
+      '@wordpress/keyboard-shortcuts': workspace:./packages/keyboard-shortcuts
+      '@wordpress/keycodes': workspace:./packages/keycodes
+      '@wordpress/lazy-import': workspace:./packages/lazy-import
+      '@wordpress/list-reusable-blocks': workspace:./packages/list-reusable-blocks
+      '@wordpress/media-utils': workspace:./packages/media-utils
+      '@wordpress/notices': workspace:./packages/notices
+      '@wordpress/npm-package-json-lint-config': workspace:./packages/npm-package-json-lint-config
+      '@wordpress/nux': workspace:./packages/nux
+      '@wordpress/plugins': workspace:./packages/plugins
+      '@wordpress/postcss-plugins-preset': workspace:./packages/postcss-plugins-preset
+      '@wordpress/postcss-themes': workspace:./packages/postcss-themes
+      '@wordpress/prettier-config': workspace:./packages/prettier-config
+      '@wordpress/primitives': workspace:./packages/primitives
+      '@wordpress/priority-queue': workspace:./packages/priority-queue
+      '@wordpress/project-management-automation': workspace:./packages/project-management-automation
+      '@wordpress/react-i18n': workspace:./packages/react-i18n
+      '@wordpress/react-native-aztec': workspace:./packages/react-native-aztec
+      '@wordpress/react-native-bridge': workspace:./packages/react-native-bridge
+      '@wordpress/react-native-editor': workspace:./packages/react-native-editor
+      '@wordpress/readable-js-assets-webpack-plugin': workspace:./packages/readable-js-assets-webpack-plugin
+      '@wordpress/redux-routine': workspace:./packages/redux-routine
+      '@wordpress/reusable-blocks': workspace:./packages/reusable-blocks
+      '@wordpress/rich-text': workspace:./packages/rich-text
+      '@wordpress/scripts': workspace:./packages/scripts
+      '@wordpress/server-side-render': workspace:./packages/server-side-render
+      '@wordpress/shortcode': workspace:./packages/shortcode
+      '@wordpress/stylelint-config': workspace:./packages/stylelint-config
+      '@wordpress/token-list': workspace:./packages/token-list
+      '@wordpress/url': workspace:./packages/url
+      '@wordpress/viewport': workspace:./packages/viewport
+      '@wordpress/warning': workspace:./packages/warning
+      '@wordpress/widgets': workspace:./packages/widgets
+      '@wordpress/wordcount': workspace:./packages/wordcount
       ajv: 8.7.1
       ajv-draft-04: 1.0.0
       appium: 1.22.0
@@ -414,8 +414,8 @@ importers:
   packages/a11y:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/dom-ready': file:../dom-ready
-      '@wordpress/i18n': file:../i18n
+      '@wordpress/dom-ready': workspace:../dom-ready
+      '@wordpress/i18n': workspace:../i18n
     dependencies:
       '@babel/runtime': 7.16.3
       '@wordpress/dom-ready': link:../dom-ready
@@ -430,10 +430,10 @@ importers:
   packages/annotations:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/data': file:../data
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/rich-text': file:../rich-text
+      '@wordpress/data': workspace:../data
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/rich-text': workspace:../rich-text
       lodash: ^4.17.21
       rememo: ^3.0.0
       uuid: ^8.3.0
@@ -450,8 +450,8 @@ importers:
   packages/api-fetch:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/url': file:../url
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/url': workspace:../url
     dependencies:
       '@babel/runtime': 7.16.3
       '@wordpress/i18n': link:../i18n
@@ -482,10 +482,10 @@ importers:
       '@babel/preset-env': ^7.16.0
       '@babel/preset-typescript': ^7.16.0
       '@babel/runtime': ^7.16.0
-      '@wordpress/babel-plugin-import-jsx-pragma': file:../babel-plugin-import-jsx-pragma
-      '@wordpress/browserslist-config': file:../browserslist-config
-      '@wordpress/element': file:../element
-      '@wordpress/warning': file:../warning
+      '@wordpress/babel-plugin-import-jsx-pragma': workspace:../babel-plugin-import-jsx-pragma
+      '@wordpress/browserslist-config': workspace:../browserslist-config
+      '@wordpress/element': workspace:../element
+      '@wordpress/warning': workspace:../warning
       browserslist: ^4.17.6
       core-js: ^3.19.1
     dependencies:
@@ -514,24 +514,24 @@ importers:
   packages/block-directory:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/core-data': file:../core-data
-      '@wordpress/data': file:../data
-      '@wordpress/edit-post': file:../edit-post
-      '@wordpress/editor': file:../editor
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/html-entities': file:../html-entities
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/notices': file:../notices
-      '@wordpress/plugins': file:../plugins
-      '@wordpress/url': file:../url
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/core-data': workspace:../core-data
+      '@wordpress/data': workspace:../data
+      '@wordpress/edit-post': workspace:../edit-post
+      '@wordpress/editor': workspace:../editor
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/html-entities': workspace:../html-entities
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/notices': workspace:../notices
+      '@wordpress/plugins': workspace:../plugins
+      '@wordpress/url': workspace:../url
       lodash: ^4.17.21
     dependencies:
       '@babel/runtime': 7.16.3
@@ -559,30 +559,30 @@ importers:
     specifiers:
       '@babel/runtime': ^7.16.0
       '@react-spring/web': ^9.2.4
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/blob': file:../blob
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/data': file:../data
-      '@wordpress/deprecated': file:../deprecated
-      '@wordpress/dom': file:../dom
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/html-entities': file:../html-entities
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/is-shallow-equal': file:../is-shallow-equal
-      '@wordpress/keyboard-shortcuts': file:../keyboard-shortcuts
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/notices': file:../notices
-      '@wordpress/rich-text': file:../rich-text
-      '@wordpress/shortcode': file:../shortcode
-      '@wordpress/token-list': file:../token-list
-      '@wordpress/url': file:../url
-      '@wordpress/warning': file:../warning
-      '@wordpress/wordcount': file:../wordcount
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/blob': workspace:../blob
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/data': workspace:../data
+      '@wordpress/deprecated': workspace:../deprecated
+      '@wordpress/dom': workspace:../dom
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/html-entities': workspace:../html-entities
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/is-shallow-equal': workspace:../is-shallow-equal
+      '@wordpress/keyboard-shortcuts': workspace:../keyboard-shortcuts
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/notices': workspace:../notices
+      '@wordpress/rich-text': workspace:../rich-text
+      '@wordpress/shortcode': workspace:../shortcode
+      '@wordpress/token-list': workspace:../token-list
+      '@wordpress/url': workspace:../url
+      '@wordpress/warning': workspace:../warning
+      '@wordpress/wordcount': workspace:../wordcount
       classnames: ^2.3.1
       colord: ^2.7.0
       diff: ^4.0.2
@@ -634,32 +634,32 @@ importers:
   packages/block-library:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/autop': file:../autop
-      '@wordpress/blob': file:../blob
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/core-data': file:../core-data
-      '@wordpress/data': file:../data
-      '@wordpress/date': file:../date
-      '@wordpress/deprecated': file:../deprecated
-      '@wordpress/dom': file:../dom
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/html-entities': file:../html-entities
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/notices': file:../notices
-      '@wordpress/primitives': file:../primitives
-      '@wordpress/reusable-blocks': file:../reusable-blocks
-      '@wordpress/rich-text': file:../rich-text
-      '@wordpress/server-side-render': file:../server-side-render
-      '@wordpress/url': file:../url
-      '@wordpress/viewport': file:../viewport
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/autop': workspace:../autop
+      '@wordpress/blob': workspace:../blob
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/core-data': workspace:../core-data
+      '@wordpress/data': workspace:../data
+      '@wordpress/date': workspace:../date
+      '@wordpress/deprecated': workspace:../deprecated
+      '@wordpress/dom': workspace:../dom
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/html-entities': workspace:../html-entities
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/notices': workspace:../notices
+      '@wordpress/primitives': workspace:../primitives
+      '@wordpress/reusable-blocks': workspace:../reusable-blocks
+      '@wordpress/rich-text': workspace:../rich-text
+      '@wordpress/server-side-render': workspace:../server-side-render
+      '@wordpress/url': workspace:../url
+      '@wordpress/viewport': workspace:../viewport
       classnames: ^2.3.1
       colord: ^2.7.0
       fast-average-color: 4.3.0
@@ -720,19 +720,19 @@ importers:
   packages/blocks:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/autop': file:../autop
-      '@wordpress/blob': file:../blob
-      '@wordpress/block-serialization-default-parser': file:../block-serialization-default-parser
-      '@wordpress/compose': file:../compose
-      '@wordpress/data': file:../data
-      '@wordpress/deprecated': file:../deprecated
-      '@wordpress/dom': file:../dom
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/html-entities': file:../html-entities
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/is-shallow-equal': file:../is-shallow-equal
-      '@wordpress/shortcode': file:../shortcode
+      '@wordpress/autop': workspace:../autop
+      '@wordpress/blob': workspace:../blob
+      '@wordpress/block-serialization-default-parser': workspace:../block-serialization-default-parser
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/data': workspace:../data
+      '@wordpress/deprecated': workspace:../deprecated
+      '@wordpress/dom': workspace:../dom
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/html-entities': workspace:../html-entities
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/is-shallow-equal': workspace:../is-shallow-equal
+      '@wordpress/shortcode': workspace:../shortcode
       colord: ^2.7.0
       hpq: ^1.3.0
       lodash: ^4.17.21
@@ -775,20 +775,20 @@ importers:
       '@emotion/serialize': ^1.0.2
       '@emotion/styled': ^11.6.0
       '@emotion/utils': 1.0.0
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/compose': file:../compose
-      '@wordpress/date': file:../date
-      '@wordpress/deprecated': file:../deprecated
-      '@wordpress/dom': file:../dom
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/is-shallow-equal': file:../is-shallow-equal
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/primitives': file:../primitives
-      '@wordpress/rich-text': file:../rich-text
-      '@wordpress/warning': file:../warning
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/date': workspace:../date
+      '@wordpress/deprecated': workspace:../deprecated
+      '@wordpress/dom': workspace:../dom
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/is-shallow-equal': workspace:../is-shallow-equal
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/primitives': workspace:../primitives
+      '@wordpress/rich-text': workspace:../rich-text
+      '@wordpress/warning': workspace:../warning
       classnames: ^2.3.1
       colord: ^2.7.0
       dom-scroll-into-view: ^1.2.1
@@ -851,12 +851,12 @@ importers:
       '@babel/runtime': ^7.16.0
       '@types/lodash': ^4.14.172
       '@types/mousetrap': ^1.6.8
-      '@wordpress/deprecated': file:../deprecated
-      '@wordpress/dom': file:../dom
-      '@wordpress/element': file:../element
-      '@wordpress/is-shallow-equal': file:../is-shallow-equal
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/priority-queue': file:../priority-queue
+      '@wordpress/deprecated': workspace:../deprecated
+      '@wordpress/dom': workspace:../dom
+      '@wordpress/element': workspace:../element
+      '@wordpress/is-shallow-equal': workspace:../is-shallow-equal
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/priority-queue': workspace:../priority-queue
       clipboard: ^2.0.8
       lodash: ^4.17.21
       mousetrap: ^1.6.5
@@ -881,15 +881,15 @@ importers:
   packages/core-data:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/data': file:../data
-      '@wordpress/deprecated': file:../deprecated
-      '@wordpress/element': file:../element
-      '@wordpress/html-entities': file:../html-entities
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/is-shallow-equal': file:../is-shallow-equal
-      '@wordpress/url': file:../url
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/data': workspace:../data
+      '@wordpress/deprecated': workspace:../deprecated
+      '@wordpress/element': workspace:../element
+      '@wordpress/html-entities': workspace:../html-entities
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/is-shallow-equal': workspace:../is-shallow-equal
+      '@wordpress/url': workspace:../url
       equivalent-key-map: ^0.2.2
       lodash: ^4.17.21
       rememo: ^3.0.0
@@ -912,7 +912,7 @@ importers:
 
   packages/create-block:
     specifiers:
-      '@wordpress/lazy-import': file:../lazy-import
+      '@wordpress/lazy-import': workspace:../lazy-import
       chalk: ^4.0.0
       check-node-version: ^4.1.0
       commander: ^4.1.0
@@ -952,24 +952,24 @@ importers:
   packages/customize-widgets:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/block-library': file:../block-library
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/core-data': file:../core-data
-      '@wordpress/data': file:../data
-      '@wordpress/dom': file:../dom
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/interface': file:../interface
-      '@wordpress/is-shallow-equal': file:../is-shallow-equal
-      '@wordpress/keyboard-shortcuts': file:../keyboard-shortcuts
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/media-utils': file:../media-utils
-      '@wordpress/widgets': file:../widgets
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/block-library': workspace:../block-library
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/core-data': workspace:../core-data
+      '@wordpress/data': workspace:../data
+      '@wordpress/dom': workspace:../dom
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/interface': workspace:../interface
+      '@wordpress/is-shallow-equal': workspace:../is-shallow-equal
+      '@wordpress/keyboard-shortcuts': workspace:../keyboard-shortcuts
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/media-utils': workspace:../media-utils
+      '@wordpress/widgets': workspace:../widgets
       classnames: ^2.3.1
       lodash: ^4.17.21
     dependencies:
@@ -998,12 +998,12 @@ importers:
   packages/data:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/compose': file:../compose
-      '@wordpress/deprecated': file:../deprecated
-      '@wordpress/element': file:../element
-      '@wordpress/is-shallow-equal': file:../is-shallow-equal
-      '@wordpress/priority-queue': file:../priority-queue
-      '@wordpress/redux-routine': file:../redux-routine
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/deprecated': workspace:../deprecated
+      '@wordpress/element': workspace:../element
+      '@wordpress/is-shallow-equal': workspace:../is-shallow-equal
+      '@wordpress/priority-queue': workspace:../priority-queue
+      '@wordpress/redux-routine': workspace:../redux-routine
       equivalent-key-map: ^0.2.2
       is-promise: ^4.0.0
       lodash: ^4.17.21
@@ -1028,9 +1028,9 @@ importers:
   packages/data-controls:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/data': file:../data
-      '@wordpress/deprecated': file:../deprecated
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/data': workspace:../data
+      '@wordpress/deprecated': workspace:../deprecated
     dependencies:
       '@babel/runtime': 7.16.3
       '@wordpress/api-fetch': link:../api-fetch
@@ -1058,7 +1058,7 @@ importers:
   packages/deprecated:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/hooks': file:../hooks
+      '@wordpress/hooks': workspace:../hooks
     dependencies:
       '@babel/runtime': 7.16.3
       '@wordpress/hooks': link:../hooks
@@ -1100,9 +1100,9 @@ importers:
   packages/e2e-test-utils:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/url': file:../url
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/url': workspace:../url
       form-data: ^4.0.0
       lodash: ^4.17.21
       node-fetch: ^2.6.0
@@ -1117,11 +1117,11 @@ importers:
 
   packages/e2e-tests:
     specifiers:
-      '@wordpress/e2e-test-utils': file:../e2e-test-utils
-      '@wordpress/jest-console': file:../jest-console
-      '@wordpress/jest-puppeteer-axe': file:../jest-puppeteer-axe
-      '@wordpress/scripts': file:../scripts
-      '@wordpress/url': file:../url
+      '@wordpress/e2e-test-utils': workspace:../e2e-test-utils
+      '@wordpress/jest-console': workspace:../jest-console
+      '@wordpress/jest-puppeteer-axe': workspace:../jest-puppeteer-axe
+      '@wordpress/scripts': workspace:../scripts
+      '@wordpress/url': workspace:../url
       chalk: ^4.0.0
       expect-puppeteer: ^4.4.0
       filenamify: ^4.2.0
@@ -1148,26 +1148,26 @@ importers:
   packages/edit-navigation:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/block-library': file:../block-library
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/core-data': file:../core-data
-      '@wordpress/data': file:../data
-      '@wordpress/dom': file:../dom
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/html-entities': file:../html-entities
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/interface': file:../interface
-      '@wordpress/keyboard-shortcuts': file:../keyboard-shortcuts
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/notices': file:../notices
-      '@wordpress/plugins': file:../plugins
-      '@wordpress/url': file:../url
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/block-library': workspace:../block-library
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/core-data': workspace:../core-data
+      '@wordpress/data': workspace:../data
+      '@wordpress/dom': workspace:../dom
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/html-entities': workspace:../html-entities
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/interface': workspace:../interface
+      '@wordpress/keyboard-shortcuts': workspace:../keyboard-shortcuts
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/notices': workspace:../notices
+      '@wordpress/plugins': workspace:../plugins
+      '@wordpress/url': workspace:../url
       classnames: ^2.3.1
       lodash: ^4.17.21
     dependencies:
@@ -1198,29 +1198,29 @@ importers:
   packages/edit-post:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/block-library': file:../block-library
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/core-data': file:../core-data
-      '@wordpress/data': file:../data
-      '@wordpress/data-controls': file:../data-controls
-      '@wordpress/editor': file:../editor
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/interface': file:../interface
-      '@wordpress/keyboard-shortcuts': file:../keyboard-shortcuts
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/media-utils': file:../media-utils
-      '@wordpress/notices': file:../notices
-      '@wordpress/plugins': file:../plugins
-      '@wordpress/url': file:../url
-      '@wordpress/viewport': file:../viewport
-      '@wordpress/warning': file:../warning
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/block-library': workspace:../block-library
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/core-data': workspace:../core-data
+      '@wordpress/data': workspace:../data
+      '@wordpress/data-controls': workspace:../data-controls
+      '@wordpress/editor': workspace:../editor
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/interface': workspace:../interface
+      '@wordpress/keyboard-shortcuts': workspace:../keyboard-shortcuts
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/media-utils': workspace:../media-utils
+      '@wordpress/notices': workspace:../notices
+      '@wordpress/plugins': workspace:../plugins
+      '@wordpress/url': workspace:../url
+      '@wordpress/viewport': workspace:../viewport
+      '@wordpress/warning': workspace:../warning
       classnames: ^2.3.1
       lodash: ^4.17.21
       memize: ^1.1.0
@@ -1258,31 +1258,31 @@ importers:
   packages/edit-site:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/block-library': file:../block-library
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/core-data': file:../core-data
-      '@wordpress/data': file:../data
-      '@wordpress/data-controls': file:../data-controls
-      '@wordpress/editor': file:../editor
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/html-entities': file:../html-entities
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/interface': file:../interface
-      '@wordpress/keyboard-shortcuts': file:../keyboard-shortcuts
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/media-utils': file:../media-utils
-      '@wordpress/notices': file:../notices
-      '@wordpress/plugins': file:../plugins
-      '@wordpress/reusable-blocks': file:../reusable-blocks
-      '@wordpress/url': file:../url
-      '@wordpress/viewport': file:../viewport
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/block-library': workspace:../block-library
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/core-data': workspace:../core-data
+      '@wordpress/data': workspace:../data
+      '@wordpress/data-controls': workspace:../data-controls
+      '@wordpress/editor': workspace:../editor
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/html-entities': workspace:../html-entities
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/interface': workspace:../interface
+      '@wordpress/keyboard-shortcuts': workspace:../keyboard-shortcuts
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/media-utils': workspace:../media-utils
+      '@wordpress/notices': workspace:../notices
+      '@wordpress/plugins': workspace:../plugins
+      '@wordpress/reusable-blocks': workspace:../reusable-blocks
+      '@wordpress/url': workspace:../url
+      '@wordpress/viewport': workspace:../viewport
       classnames: ^2.3.1
       downloadjs: ^1.4.7
       history: ^5.1.0
@@ -1326,28 +1326,28 @@ importers:
   packages/edit-widgets:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/block-library': file:../block-library
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/core-data': file:../core-data
-      '@wordpress/data': file:../data
-      '@wordpress/dom': file:../dom
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/interface': file:../interface
-      '@wordpress/keyboard-shortcuts': file:../keyboard-shortcuts
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/media-utils': file:../media-utils
-      '@wordpress/notices': file:../notices
-      '@wordpress/plugins': file:../plugins
-      '@wordpress/reusable-blocks': file:../reusable-blocks
-      '@wordpress/url': file:../url
-      '@wordpress/widgets': file:../widgets
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/block-library': workspace:../block-library
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/core-data': workspace:../core-data
+      '@wordpress/data': workspace:../data
+      '@wordpress/dom': workspace:../dom
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/interface': workspace:../interface
+      '@wordpress/keyboard-shortcuts': workspace:../keyboard-shortcuts
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/media-utils': workspace:../media-utils
+      '@wordpress/notices': workspace:../notices
+      '@wordpress/plugins': workspace:../plugins
+      '@wordpress/reusable-blocks': workspace:../reusable-blocks
+      '@wordpress/url': workspace:../url
+      '@wordpress/widgets': workspace:../widgets
       classnames: ^2.3.1
       lodash: ^4.17.21
     dependencies:
@@ -1380,31 +1380,31 @@ importers:
   packages/editor:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/core-data': file:../core-data
-      '@wordpress/data': file:../data
-      '@wordpress/data-controls': file:../data-controls
-      '@wordpress/date': file:../date
-      '@wordpress/deprecated': file:../deprecated
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/html-entities': file:../html-entities
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/keyboard-shortcuts': file:../keyboard-shortcuts
-      '@wordpress/keycodes': file:../keycodes
-      '@wordpress/media-utils': file:../media-utils
-      '@wordpress/notices': file:../notices
-      '@wordpress/reusable-blocks': file:../reusable-blocks
-      '@wordpress/rich-text': file:../rich-text
-      '@wordpress/server-side-render': file:../server-side-render
-      '@wordpress/url': file:../url
-      '@wordpress/wordcount': file:../wordcount
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/core-data': workspace:../core-data
+      '@wordpress/data': workspace:../data
+      '@wordpress/data-controls': workspace:../data-controls
+      '@wordpress/date': workspace:../date
+      '@wordpress/deprecated': workspace:../deprecated
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/html-entities': workspace:../html-entities
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/keyboard-shortcuts': workspace:../keyboard-shortcuts
+      '@wordpress/keycodes': workspace:../keycodes
+      '@wordpress/media-utils': workspace:../media-utils
+      '@wordpress/notices': workspace:../notices
+      '@wordpress/reusable-blocks': workspace:../reusable-blocks
+      '@wordpress/rich-text': workspace:../rich-text
+      '@wordpress/server-side-render': workspace:../server-side-render
+      '@wordpress/url': workspace:../url
+      '@wordpress/wordcount': workspace:../wordcount
       classnames: ^2.3.1
       lodash: ^4.17.21
       memize: ^1.1.0
@@ -1448,7 +1448,7 @@ importers:
       '@babel/runtime': ^7.16.0
       '@types/react': ^17.0.37
       '@types/react-dom': ^17.0.11
-      '@wordpress/escape-html': file:../escape-html
+      '@wordpress/escape-html': workspace:../escape-html
       lodash: ^4.17.21
       react: ^17.0.2
       react-dom: ^17.0.2
@@ -1500,8 +1500,8 @@ importers:
       '@babel/eslint-parser': ^7.16.0
       '@typescript-eslint/eslint-plugin': ^5.3.0
       '@typescript-eslint/parser': ^5.3.0
-      '@wordpress/babel-preset-default': file:../babel-preset-default
-      '@wordpress/prettier-config': file:../prettier-config
+      '@wordpress/babel-preset-default': workspace:../babel-preset-default
+      '@wordpress/prettier-config': workspace:../prettier-config
       cosmiconfig: ^7.0.0
       eslint-config-prettier: ^8.3.0
       eslint-plugin-import: ^2.25.2
@@ -1536,17 +1536,17 @@ importers:
   packages/format-library:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/data': file:../data
-      '@wordpress/element': file:../element
-      '@wordpress/html-entities': file:../html-entities
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/rich-text': file:../rich-text
-      '@wordpress/url': file:../url
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/data': workspace:../data
+      '@wordpress/element': workspace:../element
+      '@wordpress/html-entities': workspace:../html-entities
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/rich-text': workspace:../rich-text
+      '@wordpress/url': workspace:../url
       lodash: ^4.17.21
     dependencies:
       '@babel/runtime': 7.16.3
@@ -1578,7 +1578,7 @@ importers:
   packages/i18n:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/hooks': file:../hooks
+      '@wordpress/hooks': workspace:../hooks
       gettext-parser: ^1.3.1
       lodash: ^4.17.21
       memize: ^1.1.0
@@ -1596,8 +1596,8 @@ importers:
   packages/icons:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/element': file:../element
-      '@wordpress/primitives': file:../primitives
+      '@wordpress/element': workspace:../element
+      '@wordpress/primitives': workspace:../primitives
     dependencies:
       '@babel/runtime': 7.16.3
       '@wordpress/element': link:../element
@@ -1606,15 +1606,15 @@ importers:
   packages/interface:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/data': file:../data
-      '@wordpress/element': file:../element
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/plugins': file:../plugins
-      '@wordpress/viewport': file:../viewport
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/data': workspace:../data
+      '@wordpress/element': workspace:../element
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/plugins': workspace:../plugins
+      '@wordpress/viewport': workspace:../viewport
       classnames: ^2.3.1
       lodash: ^4.17.21
     dependencies:
@@ -1650,7 +1650,7 @@ importers:
   packages/jest-preset-default:
     specifiers:
       '@wojtekmaj/enzyme-adapter-react-17': ^0.6.1
-      '@wordpress/jest-console': file:../jest-console
+      '@wordpress/jest-console': workspace:../jest-console
       babel-jest: ^27.4.5
       enzyme: ^3.11.0
       enzyme-to-json: ^3.4.4
@@ -1672,9 +1672,9 @@ importers:
   packages/keyboard-shortcuts:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/data': file:../data
-      '@wordpress/element': file:../element
-      '@wordpress/keycodes': file:../keycodes
+      '@wordpress/data': workspace:../data
+      '@wordpress/element': workspace:../element
+      '@wordpress/keycodes': workspace:../keycodes
       lodash: ^4.17.21
       rememo: ^3.0.0
     dependencies:
@@ -1688,7 +1688,7 @@ importers:
   packages/keycodes:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/i18n': file:../i18n
+      '@wordpress/i18n': workspace:../i18n
       lodash: ^4.17.21
     dependencies:
       '@babel/runtime': 7.16.3
@@ -1716,11 +1716,11 @@ importers:
   packages/list-reusable-blocks:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/element': file:../element
-      '@wordpress/i18n': file:../i18n
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/element': workspace:../element
+      '@wordpress/i18n': workspace:../i18n
       lodash: ^4.17.21
     dependencies:
       '@babel/runtime': 7.16.3
@@ -1734,10 +1734,10 @@ importers:
   packages/media-utils:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/blob': file:../blob
-      '@wordpress/element': file:../element
-      '@wordpress/i18n': file:../i18n
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/blob': workspace:../blob
+      '@wordpress/element': workspace:../element
+      '@wordpress/i18n': workspace:../i18n
       lodash: ^4.17.21
     dependencies:
       '@babel/runtime': 7.16.3
@@ -1750,8 +1750,8 @@ importers:
   packages/notices:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/data': file:../data
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/data': workspace:../data
       lodash: ^4.17.21
     dependencies:
       '@babel/runtime': 7.16.3
@@ -1765,13 +1765,13 @@ importers:
   packages/nux:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/data': file:../data
-      '@wordpress/deprecated': file:../deprecated
-      '@wordpress/element': file:../element
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/data': workspace:../data
+      '@wordpress/deprecated': workspace:../deprecated
+      '@wordpress/element': workspace:../element
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
       lodash: ^4.17.21
       rememo: ^3.0.0
     dependencies:
@@ -1789,10 +1789,10 @@ importers:
   packages/plugins:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/compose': file:../compose
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/icons': file:../icons
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/icons': workspace:../icons
       lodash: ^4.17.21
       memize: ^1.1.0
     dependencies:
@@ -1806,7 +1806,7 @@ importers:
 
   packages/postcss-plugins-preset:
     specifiers:
-      '@wordpress/base-styles': file:../base-styles
+      '@wordpress/base-styles': workspace:../base-styles
       autoprefixer: ^10.2.5
     dependencies:
       '@wordpress/base-styles': link:../base-styles
@@ -1821,7 +1821,7 @@ importers:
   packages/primitives:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/element': file:../element
+      '@wordpress/element': workspace:../element
       classnames: ^2.3.1
     dependencies:
       '@babel/runtime': 7.16.3
@@ -1851,8 +1851,8 @@ importers:
   packages/react-i18n:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/element': file:../element
-      '@wordpress/i18n': file:../i18n
+      '@wordpress/element': workspace:../element
+      '@wordpress/i18n': workspace:../i18n
       utility-types: ^3.10.0
     dependencies:
       '@babel/runtime': 7.16.3
@@ -1862,15 +1862,15 @@ importers:
 
   packages/react-native-aztec:
     specifiers:
-      '@wordpress/element': file:../element
-      '@wordpress/keycodes': file:../keycodes
+      '@wordpress/element': workspace:../element
+      '@wordpress/keycodes': workspace:../keycodes
     dependencies:
       '@wordpress/element': link:../element
       '@wordpress/keycodes': link:../keycodes
 
   packages/react-native-bridge:
     specifiers:
-      '@wordpress/react-native-aztec': file:../react-native-aztec
+      '@wordpress/react-native-aztec': workspace:../react-native-aztec
     dependencies:
       '@wordpress/react-native-aztec': link:../react-native-aztec
 
@@ -1885,18 +1885,18 @@ importers:
       '@react-navigation/native': 5.7.0
       '@react-navigation/routers': 5.4.9
       '@react-navigation/stack': 5.6.2
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/block-library': file:../block-library
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/data': file:../data
-      '@wordpress/edit-post': file:../edit-post
-      '@wordpress/element': file:../element
-      '@wordpress/hooks': file:../hooks
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/react-native-aztec': file:../react-native-aztec
-      '@wordpress/react-native-bridge': file:../react-native-bridge
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/block-library': workspace:../block-library
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/data': workspace:../data
+      '@wordpress/edit-post': workspace:../edit-post
+      '@wordpress/element': workspace:../element
+      '@wordpress/hooks': workspace:../hooks
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/react-native-aztec': workspace:../react-native-aztec
+      '@wordpress/react-native-bridge': workspace:../react-native-bridge
       core-js: ^3.19.1
       fast-average-color: ^4.3.0
       gettext-parser: ^1.3.1
@@ -1985,16 +1985,16 @@ importers:
 
   packages/reusable-blocks:
     specifiers:
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/core-data': file:../core-data
-      '@wordpress/data': file:../data
-      '@wordpress/element': file:../element
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/notices': file:../notices
-      '@wordpress/url': file:../url
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/core-data': workspace:../core-data
+      '@wordpress/data': workspace:../data
+      '@wordpress/element': workspace:../element
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/notices': workspace:../notices
+      '@wordpress/url': workspace:../url
       lodash: ^4.17.21
     dependencies:
       '@wordpress/block-editor': link:../block-editor
@@ -2012,13 +2012,13 @@ importers:
   packages/rich-text:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/a11y': file:../a11y
-      '@wordpress/compose': file:../compose
-      '@wordpress/data': file:../data
-      '@wordpress/element': file:../element
-      '@wordpress/escape-html': file:../escape-html
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/keycodes': file:../keycodes
+      '@wordpress/a11y': workspace:../a11y
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/data': workspace:../data
+      '@wordpress/element': workspace:../element
+      '@wordpress/escape-html': workspace:../escape-html
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/keycodes': workspace:../keycodes
       lodash: ^4.17.21
       memize: ^1.1.0
       rememo: ^3.0.0
@@ -2040,15 +2040,15 @@ importers:
       '@babel/core': ^7.16.0
       '@pmmmwh/react-refresh-webpack-plugin': ^0.5.2
       '@svgr/webpack': ^5.5.0
-      '@wordpress/babel-preset-default': file:../babel-preset-default
-      '@wordpress/browserslist-config': file:../browserslist-config
-      '@wordpress/dependency-extraction-webpack-plugin': file:../dependency-extraction-webpack-plugin
-      '@wordpress/eslint-plugin': file:../eslint-plugin
-      '@wordpress/jest-preset-default': file:../jest-preset-default
-      '@wordpress/npm-package-json-lint-config': file:../npm-package-json-lint-config
-      '@wordpress/postcss-plugins-preset': file:../postcss-plugins-preset
-      '@wordpress/prettier-config': file:../prettier-config
-      '@wordpress/stylelint-config': file:../stylelint-config
+      '@wordpress/babel-preset-default': workspace:../babel-preset-default
+      '@wordpress/browserslist-config': workspace:../browserslist-config
+      '@wordpress/dependency-extraction-webpack-plugin': workspace:../dependency-extraction-webpack-plugin
+      '@wordpress/eslint-plugin': workspace:../eslint-plugin
+      '@wordpress/jest-preset-default': workspace:../jest-preset-default
+      '@wordpress/npm-package-json-lint-config': workspace:../npm-package-json-lint-config
+      '@wordpress/postcss-plugins-preset': workspace:../postcss-plugins-preset
+      '@wordpress/prettier-config': workspace:../prettier-config
+      '@wordpress/stylelint-config': workspace:../stylelint-config
       adm-zip: ^0.5.9
       babel-jest: ^27.4.5
       babel-loader: ^8.2.3
@@ -2158,15 +2158,15 @@ importers:
   packages/server-side-render:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/data': file:../data
-      '@wordpress/deprecated': file:../deprecated
-      '@wordpress/element': file:../element
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/url': file:../url
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/data': workspace:../data
+      '@wordpress/deprecated': workspace:../deprecated
+      '@wordpress/element': workspace:../element
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/url': workspace:../url
       lodash: ^4.17.21
     dependencies:
       '@babel/runtime': 7.16.3
@@ -2218,8 +2218,8 @@ importers:
   packages/viewport:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/compose': file:../compose
-      '@wordpress/data': file:../data
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/data': workspace:../data
       lodash: ^4.17.21
     dependencies:
       '@babel/runtime': 7.16.3
@@ -2233,17 +2233,17 @@ importers:
   packages/widgets:
     specifiers:
       '@babel/runtime': ^7.16.0
-      '@wordpress/api-fetch': file:../api-fetch
-      '@wordpress/block-editor': file:../block-editor
-      '@wordpress/blocks': file:../blocks
-      '@wordpress/components': file:../components
-      '@wordpress/compose': file:../compose
-      '@wordpress/core-data': file:../core-data
-      '@wordpress/data': file:../data
-      '@wordpress/element': file:../element
-      '@wordpress/i18n': file:../i18n
-      '@wordpress/icons': file:../icons
-      '@wordpress/notices': file:../notices
+      '@wordpress/api-fetch': workspace:../api-fetch
+      '@wordpress/block-editor': workspace:../block-editor
+      '@wordpress/blocks': workspace:../blocks
+      '@wordpress/components': workspace:../components
+      '@wordpress/compose': workspace:../compose
+      '@wordpress/core-data': workspace:../core-data
+      '@wordpress/data': workspace:../data
+      '@wordpress/element': workspace:../element
+      '@wordpress/i18n': workspace:../i18n
+      '@wordpress/icons': workspace:../icons
+      '@wordpress/notices': workspace:../notices
       classnames: ^2.3.1
       lodash: ^4.17.21
     dependencies:

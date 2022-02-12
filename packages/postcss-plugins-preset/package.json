@@ -29,7 +29,7 @@
 	],
 	"main": "lib/index.js",
 	"dependencies": {
-		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/base-styles": "workspace:../base-styles",
 		"autoprefixer": "^10.2.5"
 	},
 	"publishConfig": {

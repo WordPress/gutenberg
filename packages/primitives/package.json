@@ -31,7 +31,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/element": "file:../element",
+		"@wordpress/element": "workspace:../element",
 		"classnames": "^2.3.1"
 	},
 	"publishConfig": {

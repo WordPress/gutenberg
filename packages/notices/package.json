@@ -26,8 +26,8 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/data": "file:../data",
+		"@wordpress/a11y": "workspace:../a11y",
+		"@wordpress/data": "workspace:../data",
 		"lodash": "^4.17.21"
 	},
 	"publishConfig": {

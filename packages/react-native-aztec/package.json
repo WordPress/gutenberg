@@ -19,8 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"dependencies": {
-		"@wordpress/element": "file:../element",
-		"@wordpress/keycodes": "file:../keycodes"
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/keycodes": "workspace:../keycodes"
 	},
 	"peerDependencies": {
 		"react": "*",

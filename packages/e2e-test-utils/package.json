@@ -30,9 +30,9 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/url": "file:../url",
+		"@wordpress/api-fetch": "workspace:../api-fetch",
+		"@wordpress/keycodes": "workspace:../keycodes",
+		"@wordpress/url": "workspace:../url",
 		"form-data": "^4.0.0",
 		"lodash": "^4.17.21",
 		"node-fetch": "^2.6.0"

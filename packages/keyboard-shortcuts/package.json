@@ -26,9 +26,9 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element",
-		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/data": "workspace:../data",
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/keycodes": "workspace:../keycodes",
 		"lodash": "^4.17.21",
 		"rememo": "^3.0.0"
 	},

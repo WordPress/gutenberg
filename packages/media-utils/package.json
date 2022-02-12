@@ -26,10 +26,10 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/blob": "file:../blob",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/api-fetch": "workspace:../api-fetch",
+		"@wordpress/blob": "workspace:../blob",
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/i18n": "workspace:../i18n",
 		"lodash": "^4.17.21"
 	},
 	"publishConfig": {

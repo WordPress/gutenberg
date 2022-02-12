@@ -26,11 +26,11 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/api-fetch": "workspace:../api-fetch",
+		"@wordpress/components": "workspace:../components",
+		"@wordpress/compose": "workspace:../compose",
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/i18n": "workspace:../i18n",
 		"lodash": "^4.17.21"
 	},
 	"publishConfig": {

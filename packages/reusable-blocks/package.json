@@ -28,16 +28,16 @@
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
 	"dependencies": {
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/blocks": "file:../blocks",
-		"@wordpress/components": "file:../components",
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/notices": "file:../notices",
-		"@wordpress/url": "file:../url",
+		"@wordpress/block-editor": "workspace:../block-editor",
+		"@wordpress/blocks": "workspace:../blocks",
+		"@wordpress/components": "workspace:../components",
+		"@wordpress/core-data": "workspace:../core-data",
+		"@wordpress/data": "workspace:../data",
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/i18n": "workspace:../i18n",
+		"@wordpress/icons": "workspace:../icons",
+		"@wordpress/notices": "workspace:../notices",
+		"@wordpress/url": "workspace:../url",
 		"lodash": "^4.17.21"
 	},
 	"publishConfig": {

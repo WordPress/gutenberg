@@ -28,7 +28,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/hooks": "file:../hooks"
+		"@wordpress/hooks": "workspace:../hooks"
 	},
 	"publishConfig": {
 		"access": "public"
