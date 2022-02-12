@@ -167,7 +167,7 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	);
 };
 
-// Use `pnpm ls` to grab a list of all the packages.
+// Use `pnpm list` to grab a list of all the packages.
 const child = spawn.sync(
 	'pnpm',
 	[
