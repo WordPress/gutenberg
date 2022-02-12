@@ -15,7 +15,6 @@ importers:
       '@emotion/native': ^11.0.0
       '@octokit/rest': 16.26.0
       '@pmmmwh/react-refresh-webpack-plugin': 0.5.2
-      '@rushstack/eslint-patch': ^1.1.0
       '@storybook/addon-a11y': 6.4.9
       '@storybook/addon-controls': 6.4.9
       '@storybook/addon-docs': 6.4.9
@@ -280,7 +279,6 @@ importers:
       '@emotion/native': 11.0.0_5fb1087faf86f29ef29c9ed14f185de2
       '@octokit/rest': 16.26.0
       '@pmmmwh/react-refresh-webpack-plugin': 0.5.2_ded7f6a019386527601fa1fd9853d4f1
-      '@rushstack/eslint-patch': 1.1.0
       '@storybook/addon-a11y': 6.4.9_5539cae010396b202b015f3568914e95
       '@storybook/addon-controls': 6.4.9_fe34fc3c0e781288b67e38dd924a3ab7
       '@storybook/addon-docs': 6.4.9_44eb6a120d4a270549000e046eae9567
@@ -6584,10 +6582,6 @@ packages:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
     dev: false
-
-  /@rushstack/eslint-patch/1.1.0:
-    resolution: {integrity: sha512-JLo+Y592QzIE+q7Dl2pMUtt4q8SKYI5jDrZxrozEQxnGVOyYE+GWK9eLkwTaeN9DDctlaRAQ3TBmzZ1qdLE30A==}
-    dev: true
 
   /@samverschueren/stream-to-observable/0.3.0:
     resolution: {integrity: sha512-MI4Xx6LHs4Webyvi6EbspgyAb4D2Q2VtnCQ1blOJcoLS6mVa8lNN2rkIy1CVxfTUpoyIbCTkXES1rLXztFD1lg==}
@@ -25199,7 +25193,7 @@ packages:
       serialize-javascript: 6.0.0
       source-map: 0.6.1
       terser: 5.10.0_acorn@8.6.0
-      webpack: 5.65.0
+      webpack: 5.65.0_webpack-cli@4.9.1
     transitivePeerDependencies:
       - acorn
 
