@@ -51,8 +51,7 @@
 	}
 
 	// the first selector is required for old Cover markup
-	&.has-background-dim::before,
-	.has-background-dim::before {
+	&.has-background-dim::before {
 		content: "";
 		background-color: inherit;
 	}
@@ -60,7 +59,6 @@
 	// The first selector is required for old Cover markup/
 	// Keep .wp-block-cover__gradient-background for v8 deprecation.
 	&.has-background-dim:not(.has-background-gradient)::before,
-	.has-background-dim:not(.has-background-gradient)::before,
 	.wp-block-cover__background,
 	.wp-block-cover__gradient-background {
 		position: absolute;
