@@ -95,6 +95,7 @@
 		"@emotion/native": "^11.0.0",
 		"@octokit/rest": "16.26.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.2",
+		"@rushstack/eslint-patch": "^1.1.0",
 		"@storybook/addon-a11y": "6.4.9",
 		"@storybook/addon-controls": "6.4.9",
 		"@storybook/addon-docs": "6.4.9",
