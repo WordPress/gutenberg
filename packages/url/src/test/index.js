@@ -55,6 +55,7 @@ describe( 'isEmail', () => {
 			'x@wordpress.org',
 			'wordpress-indeed@strange-wordpress.org',
 			'wordpress@s.wordpress',
+			'ace@204.32.222.14',
 		];
 
 		expect( every( emails, isEmail ) ).toBe( true );
