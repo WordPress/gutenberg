@@ -103,11 +103,8 @@ function ListViewBlock( {
 	}, [ clientId, setIsHovered, highlightBlock ] );
 
 	const selectEditorBlock = useCallback(
-		( event ) => {
-			event.stopPropagation();
-			selectBlock( clientId );
-		},
-		[ clientId, selectBlock ]
+		( _clientId ) => selectBlock( _clientId ),
+		[ selectBlock ]
 	);
 
 	const toggleExpanded = useCallback(
@@ -176,7 +173,10 @@ function ListViewBlock( {
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
 							block={ block }
-							onClick={ selectEditorBlock }
+							onClick={ ( event ) => {
+								event.stopPropagation();
+								selectEditorBlock( clientId );
+							} }
 							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
