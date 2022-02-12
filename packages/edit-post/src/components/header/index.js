@@ -22,6 +22,7 @@ import { default as DevicePreview } from '../device-preview';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import TemplateTitle from './template-title';
+import PostTitle from './post-title';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
@@ -30,6 +31,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isSaving,
 		showIconLabels,
 		hasReducedUI,
+		isTemplateMode,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -43,6 +45,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			hasReducedUI: select( editPostStore ).isFeatureActive(
 				'reducedUI'
 			),
+			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		} ),
 		[]
 	);
@@ -55,47 +58,53 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	return (
 		<div className={ classes }>
-			<MainDashboardButton.Slot>
-				<FullscreenModeClose />
-			</MainDashboardButton.Slot>
-			<div className="edit-post-header__toolbar">
-				<HeaderToolbar />
-				<TemplateTitle />
+			<div className="edit-post-header_start">
+				<div className="edit-post-header__toolbar">
+					<MainDashboardButton.Slot>
+						<FullscreenModeClose />
+					</MainDashboardButton.Slot>
+					<HeaderToolbar />
+				</div>
 			</div>
-			<div className="edit-post-header__settings">
-				{ ! isPublishSidebarOpened && (
-					// This button isn't completely hidden by the publish sidebar.
-					// We can't hide the whole toolbar when the publish sidebar is open because
-					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
-					// We track that DOM node to return focus to the PostPublishButtonOrToggle
-					// when the publish sidebar has been closed.
-					<PostSavedState
+			<div className="edit-post-header_center">
+				{ isTemplateMode ? <TemplateTitle /> : <PostTitle /> }
+			</div>
+			<div className="edit-post-header_end">
+				<div className="edit-post-header__settings">
+					{ ! isPublishSidebarOpened && (
+						// This button isn't completely hidden by the publish sidebar.
+						// We can't hide the whole toolbar when the publish sidebar is open because
+						// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+						// We track that DOM node to return focus to the PostPublishButtonOrToggle
+						// when the publish sidebar has been closed.
+						<PostSavedState
+							forceIsDirty={ hasActiveMetaboxes }
+							forceIsSaving={ isSaving }
+							showIconLabels={ showIconLabels }
+						/>
+					) }
+					<DevicePreview />
+					<PostPreviewButton
+						forceIsAutosaveable={ hasActiveMetaboxes }
+						forcePreviewLink={ isSaving ? null : undefined }
+					/>
+					<PostPublishButtonOrToggle
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
-						showIconLabels={ showIconLabels }
+						setEntitiesSavedStatesCallback={
+							setEntitiesSavedStatesCallback
+						}
 					/>
-				) }
-				<DevicePreview />
-				<PostPreviewButton
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
-				<PostPublishButtonOrToggle
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-					setEntitiesSavedStatesCallback={
-						setEntitiesSavedStatesCallback
-					}
-				/>
-				{ ( isLargeViewport || ! showIconLabels ) && (
-					<>
-						<PinnedItems.Slot scope="core/edit-post" />
+					{ ( isLargeViewport || ! showIconLabels ) && (
+						<>
+							<PinnedItems.Slot scope="core/edit-post" />
+							<MoreMenu showIconLabels={ showIconLabels } />
+						</>
+					) }
+					{ showIconLabels && ! isLargeViewport && (
 						<MoreMenu showIconLabels={ showIconLabels } />
-					</>
-				) }
-				{ showIconLabels && ! isLargeViewport && (
-					<MoreMenu showIconLabels={ showIconLabels } />
-				) }
+					) }
+				</div>
 			</div>
 		</div>
 	);
