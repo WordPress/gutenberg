@@ -57,42 +57,60 @@ function PostFeaturedImage( {
 		</p>
 	);
 
+	const mediaSourceSets = [];
 	let mediaWidth, mediaHeight, mediaSourceUrl;
+	let mediaSrcSetAttr = '';
+
+	// Use Sass medium breakpoint and image's width in sidebar for sizes attr.
+	const mediaSizesAttr = '(min-width: 782px) 248px, 100vw';
+
 	if ( media ) {
-		const mediaSize = applyFilters(
-			'editor.PostFeaturedImage.imageSize',
-			'post-thumbnail',
-			media.id,
-			currentPostId
-		);
-		if ( has( media, [ 'media_details', 'sizes', mediaSize ] ) ) {
-			// use mediaSize when available
-			mediaWidth = media.media_details.sizes[ mediaSize ].width;
-			mediaHeight = media.media_details.sizes[ mediaSize ].height;
-			mediaSourceUrl = media.media_details.sizes[ mediaSize ].source_url;
-		} else {
-			// get fallbackMediaSize if mediaSize is not available
-			const fallbackMediaSize = applyFilters(
-				'editor.PostFeaturedImage.imageSize',
-				'thumbnail',
-				media.id,
-				currentPostId
-			);
-			if (
-				has( media, [ 'media_details', 'sizes', fallbackMediaSize ] )
-			) {
-				// use fallbackMediaSize when mediaSize is not available
-				mediaWidth =
-					media.media_details.sizes[ fallbackMediaSize ].width;
-				mediaHeight =
-					media.media_details.sizes[ fallbackMediaSize ].height;
-				mediaSourceUrl =
-					media.media_details.sizes[ fallbackMediaSize ].source_url;
-			} else {
-				// use full image size when mediaFallbackSize and mediaSize are not available
-				mediaWidth = media.media_details.width;
-				mediaHeight = media.media_details.height;
-				mediaSourceUrl = media.source_url;
+		mediaWidth = media.media_details.width;
+		mediaHeight = media.media_details.height;
+		mediaSourceUrl = media.source_url;
+
+		// Build srcset attribute from available image sizes.
+		if ( has( media, [ 'media_details', 'sizes' ] ) ) {
+			Object.keys( media.media_details.sizes ).forEach( ( key ) => {
+				const mediaSize = applyFilters(
+					'editor.PostFeaturedImage.imageSize',
+					key,
+					media.id,
+					currentPostId
+				);
+
+				/**
+				 * An individual image srcset entry.
+				 *
+				 * @typedef WPImageSourceSet
+				 *
+				 * @property {number} width      The width of the entry.
+				 * @property {string} source_url The URL of the entry.
+				 */
+
+				/** @type {WPImageSourceSet} */
+				const sourceSet = {
+					width: media.media_details.sizes[ mediaSize ].width,
+					source_url:
+						media.media_details.sizes[ mediaSize ].source_url,
+				};
+
+				mediaSourceSets.push( sourceSet );
+			} );
+
+			if ( mediaSourceSets.length > 0 ) {
+				mediaSrcSetAttr = mediaSourceSets.reduce(
+					( prevValue, curValue, i ) => {
+						const entry = `${ curValue.source_url } ${ curValue.width }w`;
+
+						if ( 0 !== i ) {
+							return `${ prevValue }, ${ entry }`;
+						}
+
+						return entry;
+					},
+					''
+				);
 			}
 		}
 	}
@@ -161,6 +179,10 @@ function PostFeaturedImage( {
 										>
 											<img
 												src={ mediaSourceUrl }
+												width={ mediaWidth }
+												height={ mediaHeight }
+												srcSet={ mediaSrcSetAttr }
+												sizes={ mediaSizesAttr }
 												alt=""
 											/>
 										</ResponsiveWrapper>
