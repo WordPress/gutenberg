@@ -16,7 +16,6 @@ jobs:
 
             - uses: ./.github/action/setup-node-env
               with:
-                  frozen-lockfile: true
 
             - name: Report flaky tests
               uses: ./.github/report-flaky-tests

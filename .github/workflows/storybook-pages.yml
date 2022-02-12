@@ -22,7 +22,6 @@ jobs:
             - uses: ./.github/action/setup-node-env
               with:
                   node-version: ${{ matrix.node }}
-                  frozen-lockfile: true
 
             - name: Build Storybook
               run: pnpm run storybook:build

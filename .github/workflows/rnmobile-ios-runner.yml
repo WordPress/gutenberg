@@ -29,7 +29,6 @@ jobs:
             - uses: ./.github/action/setup-node-env
               with:
                   node-version: ${{ matrix.node }}
-                  frozen-lockfile: true
 
             - name: Prepare build cache key
               run: find pnpm-lock.yaml packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt

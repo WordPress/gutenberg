@@ -12,12 +12,9 @@ inputs:
     install-working-directory:
         required: false
         description: Optional working directory to run installation in.
-    frozen-lockfile:
-        default: false
-        description: Whether to install dependencies using `--frozen-lockfile`.
     node-version:
-        default: 14
-        description: The node version to use.
+        required: false
+        description: The node version to use. If not provided, the version in `.nvmrc` will be used.
     pnpm-version:
         default: 6.29.1
         description: The pnpm version to use.
@@ -40,14 +37,16 @@ runs:
         - uses: actions/setup-node@v2.5.1
           with:
               node-version: ${{ inputs.node-version }}
+              node-version-file: ${{ !inputs.node-version && '.nvmrc' || null }}
               cache: pnpm
               cache-dependency-path: |
                   pnpm-workspace.yaml
                   pnpm-lock.yaml
                   .npmrc
+                  .nvmrc
 
         - name: Install
           if: inputs.install
           shell: bash
-          run: "pnpm install ${{ inputs.frozen-lockfile && '--frozen-lockfile' || '' }}"
+          run: "pnpm install"
           working-directory: ${{ inputs.install-working-directory }}
