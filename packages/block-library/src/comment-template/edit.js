@@ -256,8 +256,8 @@ export default function CommentTemplateEdit( {
 
 	// Generate a tree structure of comment IDs.
 	const { commentTree } = useCommentTree(
-		order === 'desc'
-			? topLevelComments?.slice().reverse()
+		order === 'desc' && topLevelComments
+			? [ ...topLevelComments ].reverse()
 			: topLevelComments
 	);
 
