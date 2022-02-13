@@ -1889,7 +1889,7 @@ class WP_Theme_JSON_5_9 {
 			$theme_settings['settings']['color']['gradients'] = $settings['gradients'];
 		}
 
-		if ( isset( $settings['fontSizes'] ) ) {
+		if ( isset( $settings['fontSizes'] ) && is_array( $settings['fontSizes'] ) ) {
 			$font_sizes = $settings['fontSizes'];
 			// Back-compatibility for presets without units.
 			foreach ( $font_sizes as $key => $font_size ) {
