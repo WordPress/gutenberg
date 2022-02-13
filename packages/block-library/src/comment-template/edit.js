@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, memo } from '@wordpress/element';
+import { useState, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -220,6 +220,12 @@ export default function CommentTemplateEdit( {
 	const blockProps = useBlockProps();
 
 	const [ activeComment, setActiveComment ] = useState();
+	const { commentOrder, threadCommentsDepth, threadComments } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return getSettings().__experimentalDiscussionSettings;
+		}
+	);
 
 	const commentQuery = useCommentQueryArgs( {
 		postId,
@@ -244,14 +250,10 @@ export default function CommentTemplateEdit( {
 		[ clientId, commentQuery ]
 	);
 
-	const { commentOrder } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings;
-	} );
 	order = order || commentOrder;
 
 	// Generate a tree structure of comment IDs.
-	const { commentTree } = useCommentTree(
+	let commentTree = useCommentTree(
 		// Reverse the order of top comments if needed.
 		order === 'desc' && topLevelComments
 			? [ ...topLevelComments ].reverse()

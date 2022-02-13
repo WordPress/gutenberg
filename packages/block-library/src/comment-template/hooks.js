@@ -147,5 +147,5 @@ export const useCommentTree = ( topLevelComments ) => {
 		[ topLevelComments ]
 	);
 
-	return { commentTree };
+	return commentTree;
 };
