@@ -150,6 +150,7 @@ importers:
       csstype: ^3.0.10
       deep-freeze: 0.0.1
       enzyme: 3.11.0
+      enzyme-to-json: ^3.4.4
       equivalent-key-map: 0.2.2
       eslint-import-resolver-node: 0.3.4
       eslint-plugin-eslint-comments: 3.1.2
@@ -275,7 +276,7 @@ importers:
       '@babel/runtime-corejs3': 7.16.0
       '@babel/traverse': 7.16.0
       '@emotion/babel-plugin': 11.3.0_@babel+core@7.16.0
-      '@emotion/jest': 11.7.1
+      '@emotion/jest': 11.7.1_enzyme-to-json@3.6.2
       '@emotion/native': 11.0.0_5fb1087faf86f29ef29c9ed14f185de2
       '@octokit/rest': 16.26.0
       '@pmmmwh/react-refresh-webpack-plugin': 0.5.2_ded7f6a019386527601fa1fd9853d4f1
@@ -354,6 +355,7 @@ importers:
       csstype: 3.0.10
       deep-freeze: 0.0.1
       enzyme: 3.11.0
+      enzyme-to-json: 3.6.2_enzyme@3.11.0
       equivalent-key-map: 0.2.2
       eslint-import-resolver-node: 0.3.4
       eslint-plugin-eslint-comments: 3.1.2
@@ -3879,7 +3881,7 @@ packages:
       '@emotion/memoize': 0.7.5
     dev: false
 
-  /@emotion/jest/11.7.1:
+  /@emotion/jest/11.7.1_enzyme-to-json@3.6.2:
     resolution: {integrity: sha512-IYKyiIm4a7LINESYTa6aAizRj6YTwIvpD9s9yDzkrOEJXKwCqWWOTVNNOJKBygim3fv4lC9KM5jG5qzHvy4ZJg==}
     peerDependencies:
       '@types/jest': ^26.0.14 || ^27.0.0
@@ -3893,6 +3895,7 @@ packages:
       '@babel/runtime': 7.16.3
       '@emotion/css-prettifier': 1.0.1
       chalk: 4.1.2
+      enzyme-to-json: 3.6.2_enzyme@3.11.0
       specificity: 0.4.1
       stylis: 4.0.13
     dev: true
@@ -8619,8 +8622,7 @@ packages:
   /@types/cheerio/0.22.29:
     resolution: {integrity: sha512-rNX1PsrDPxiNiyLnRKiW2NXHJFHqx0Fl3J2WsZq0MTBspa/FgwlqhXJE2crIcc+/2IglLHtSWw7g053oUR8fOg==}
     dependencies:
-      '@types/node': 16.3.3
-    dev: false
+      '@types/node': 17.0.16
 
   /@types/classnames/2.3.1:
     resolution: {integrity: sha512-zeOWb0JGBoVmlQoznvqXbE0tEC/HONsnoUNH19Hc96NFsTAwTXbTqb8FMYkru1F/iqp7a18Ws3nWJvtA1sHD1A==}
@@ -13964,7 +13966,6 @@ packages:
       enzyme: 3.11.0
       lodash: 4.17.21
       react-is: 16.13.1
-    dev: false
 
   /enzyme/3.11.0:
     resolution: {integrity: sha512-Dw8/Gs4vRjxY6/6i9wU0V+utmQO9kvh9XLnz3LIudviOnVYDEe2ec+0k+NQoMamn1VrjKgCUOWj5jG/5M5M0Qw==}
@@ -25193,7 +25194,7 @@ packages:
       serialize-javascript: 6.0.0
       source-map: 0.6.1
       terser: 5.10.0_acorn@8.6.0
-      webpack: 5.65.0_webpack-cli@4.9.1
+      webpack: 5.65.0
     transitivePeerDependencies:
       - acorn
 
