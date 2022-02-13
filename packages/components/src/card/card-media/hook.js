@@ -27,7 +27,7 @@ export function useCardMedia( props ) {
 				'components-card__media',
 				className
 			),
-		[ className ]
+		[ className, cx ]
 	);
 
 	return {

@@ -196,6 +196,7 @@ export function useToolsPanel(
 	}, [
 		areAllOptionalControlsHidden,
 		className,
+		cx,
 		hasInnerWrapper,
 		menuItems,
 	] );

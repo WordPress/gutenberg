@@ -100,6 +100,18 @@
 	display: block;
 	position: static;
 	width: 100%;
+
+	// Colors need to work in both dark themes, and dark dropdown colors.
+	// This customization would be nice to retire in a refactor of the canvas appender button.
+	.block-editor-button-block-appender {
+		color: $white;
+		background: $gray-900;
+		padding: 0;
+		width: $button-size-small;
+		border-radius: $radius-block-ui;
+		margin-right: 0;
+		margin-left: auto;
+	}
 }
 
 // Hide when hovering.
@@ -187,8 +199,25 @@ $color-control-label-height: 20px;
 	}
 }
 
+// Override inner padding on default appender.
+// This should be a temporary fix, to be replaced by improvements to
+// the sibling inserter.
+// See https://github.com/WordPress/gutenberg/issues/37572.
 .wp-block-navigation .block-editor-button-block-appender {
-	justify-content: flex-start;
+	background-color: $gray-900;
+	color: $white;
+
+	// This needs specificity to override an inherited padding.
+	// That source padding in turn has high specificity to protect
+	// from theme CSS bleed.
+	&.block-editor-button-block-appender.block-editor-button-block-appender {
+		padding: 0;
+	}
+}
+
+.wp-block-navigation .wp-block .wp-block .block-editor-button-block-appender {
+	background-color: transparent;
+	color: $gray-900;
 }
 
 
@@ -272,12 +301,28 @@ $color-control-label-height: 20px;
 	}
 }
 
+// Prevent layout shift for vertical variant.
+.wp-block-navigation.is-vertical .is-small,
+.wp-block-navigation.is-vertical .is-medium {
+	.components-placeholder__fieldset {
+		// The size of two buttons, with top and bottom padding, and gap.
+		min-height: ($button-size * 2) + $grid-unit-15 + ($grid-unit-15 * 0.5);
+	}
+}
+
+.wp-block-navigation.is-vertical .is-large {
+	.components-placeholder__fieldset {
+		// The size of three buttons, with top and bottom padding, and gap.
+		min-height: ($button-size * 3) + $grid-unit-15 + $grid-unit-15;
+	}
+}
+
 // Selected state.
 .wp-block-navigation-placeholder__preview,
 .wp-block-navigation-placeholder__controls {
 	padding: ($grid-unit-15 * 0.5) $grid-unit-10;
 	flex-direction: row;
-	align-items: center;
+	align-items: flex-start;
 }
 
 .wp-block-navigation-placeholder__controls {
@@ -299,26 +344,25 @@ $color-control-label-height: 20px;
 	float: left;
 	width: 100%;
 
-	// Show stacked for the vertical navigation, or small placeholders.
+	// Hide the navigation indicator when in small contexts.
 	.is-small &,
 	.is-medium & {
 		.wp-block-navigation-placeholder__actions__indicator,
-		.wp-block-navigation-placeholder__actions__indicator + hr,
-		.wp-block-navigation-placeholder__actions > :nth-last-child(3), // Add all pages.
-		.wp-block-navigation-placeholder__actions > :nth-last-child(2) { // hr separator after it.
+		.wp-block-navigation-placeholder__actions__indicator + hr {
 			display: none;
 		}
 	}
 
-	// Show stacked for the vertical navigation, or small placeholders.
-	.is-small & {
+	// Vertical orientation or small context.
+	.is-small &,
+	.wp-block-navigation.is-vertical & {
 		.wp-block-navigation-placeholder__actions {
 			flex-direction: column;
-		}
+			align-items: flex-start;
 
-		// Hide the separators in the vertical version.
-		.wp-block-navigation-placeholder__actions hr {
-			display: none;
+			hr {
+				display: none;
+			}
 		}
 	}
 
@@ -335,7 +379,7 @@ $color-control-label-height: 20px;
 	align-items: center;
 	justify-content: flex-start;
 	line-height: 0;
-	min-height: $button-size;
+	height: $button-size;
 
 	// Line up with the icon in the toolbar.
 	margin-left: $grid-unit-05;

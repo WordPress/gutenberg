@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "3.1.0",
+	"version": "3.1.1",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,12 +31,10 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/url": "file:../url",
 		"lodash": "^4.17.21"

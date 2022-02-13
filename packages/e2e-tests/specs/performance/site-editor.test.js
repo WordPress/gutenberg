@@ -8,18 +8,18 @@ import { writeFileSync } from 'fs';
  * WordPress dependencies
  */
 import {
-	trashAllPosts,
 	activateTheme,
 	canvas,
 	createNewPost,
+	visitSiteEditor,
 	saveDraft,
 	insertBlock,
+	deleteAllTemplates,
 } from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
  */
-import { siteEditor } from '../site-editor/utils';
 import {
 	readFile,
 	deleteFile,
@@ -32,13 +32,12 @@ jest.setTimeout( 1000000 );
 describe( 'Site Editor Performance', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template', 'auto-draft' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 
@@ -83,8 +82,7 @@ describe( 'Site Editor Performance', () => {
 			new URL( document.location ).searchParams.get( 'post' )
 		);
 
-		await siteEditor.visit( { postId: id, postType: 'page' } );
-		await siteEditor.disableWelcomeGuide();
+		await visitSiteEditor( { postId: id, postType: 'page' } );
 
 		let i = 3;
 

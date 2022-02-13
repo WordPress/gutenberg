@@ -18,9 +18,9 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
 
-Refer to [the plugins module documentation](/packages/plugins/README.md) for more information.
+Refer to [the plugins module documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/plugins/README.md) for more information.
 
-The components exported through the API can be used with the `registerPlugin` ([see documentation](/packages/plugins/README.md)) API.
+The components exported through the API can be used with the `registerPlugin` ([see documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/plugins/README.md)) API.
 They can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency.
 
 ## API
@@ -207,7 +207,7 @@ _Parameters_
 -   _props.href_ `[string]`: When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 -   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
--   _props.other_ `[...*]`: Any additional props are passed through to the underlying [MenuItem](/packages/components/src/menu-item/README.md) component.
+-   _props.other_ `[...*]`: Any additional props are passed through to the underlying [MenuItem](https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/src/menu-item/README.md) component.
 
 _Returns_
 

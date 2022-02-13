@@ -18,7 +18,10 @@
 		"html": false,
 		"color": {
 			"gradients": true,
-			"text": false
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

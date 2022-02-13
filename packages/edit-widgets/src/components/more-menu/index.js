@@ -14,6 +14,7 @@ import { useViewportMatch } from '@wordpress/compose';
  * Internal dependencies
  */
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
+import ToolsMoreMenuGroup from './tools-more-menu-group';
 
 export default function MoreMenu() {
 	const [
@@ -33,7 +34,7 @@ export default function MoreMenu() {
 	return (
 		<>
 			<MoreMenuDropdown>
-				{ () => (
+				{ ( onClose ) => (
 					<>
 						{ isLargeViewport && (
 							<MenuGroup label={ _x( 'View', 'noun' ) }>
@@ -84,6 +85,9 @@ export default function MoreMenu() {
 									}
 								</VisuallyHidden>
 							</MenuItem>
+							<ToolsMoreMenuGroup.Slot
+								fillProps={ { onClose } }
+							/>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Preferences' ) }>
 							<MoreMenuFeatureToggle

@@ -49,9 +49,9 @@ Refer to the [official React Quick Start guide](https://reactjs.org/docs/hello-w
 
 ## Why React?
 
-At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](/packages/blocks/README.md), we observe the following technical requirements:
+At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md), we observe the following technical requirements:
 
--   An understanding of a block in terms of its underlying values (in the [random image example](/packages/blocks/README.md#example), a category)
+-   An understanding of a block in terms of its underlying values (in the [random image example](https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md#example), a category)
 -   A means to describe the UI of a block given these values
 
 At its most basic, React provides a simple input / output mechanism. **Given a set of inputs ("props"), a developer describes the output to be shown on the page.** This is most elegantly observed in its [function components](https://reactjs.org/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.

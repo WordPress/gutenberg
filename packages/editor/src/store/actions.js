@@ -37,13 +37,6 @@ import {
  * @param {Array?} template Block Template.
  */
 export function* setupEditor( post, edits, template ) {
-	yield resetPost( post );
-	yield {
-		type: 'SETUP_EDITOR',
-		post,
-		edits,
-		template,
-	};
 	yield setupEditorState( post );
 	// Apply a template for new posts only, if exists.
 	const isNewPost = post.status === 'auto-draft';
@@ -89,15 +82,15 @@ export function __experimentalTearDownEditor() {
  * Returns an action object used in signalling that the latest version of the
  * post has been received, either by initialization or save.
  *
- * @param {Object} post Post object.
- *
- * @return {Object} Action object.
+ * @deprecated Since WordPress 6.0.
  */
-export function resetPost( post ) {
-	return {
-		type: 'RESET_POST',
-		post,
-	};
+export function resetPost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).resetPost", {
+		since: '6.0',
+		version: '6.3',
+		alternative: 'Initialize the editor with the setupEditorState action',
+	} );
+	return { type: 'DO_NOTHING' };
 }
 
 /**
@@ -280,27 +273,17 @@ export function* savePost( options = {} ) {
 }
 
 /**
- * Action generator for handling refreshing the current post.
+ * Action for refreshing the current post.
+ *
+ * @deprecated Since WordPress 6.0.
  */
-export function* refreshPost() {
-	const post = yield controls.select( STORE_NAME, 'getCurrentPost' );
-	const postTypeSlug = yield controls.select(
-		STORE_NAME,
-		'getCurrentPostType'
-	);
-	const postType = yield controls.resolveSelect(
-		coreStore,
-		'getPostType',
-		postTypeSlug
-	);
-	const newPost = yield apiFetch( {
-		// Timestamp arg allows caller to bypass browser caching, which is
-		// expected for this specific function.
-		path:
-			`/wp/v2/${ postType.rest_base }/${ post.id }` +
-			`?context=edit&_timestamp=${ Date.now() }`,
+export function refreshPost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).refreshPost", {
+		since: '6.0',
+		version: '6.3',
+		alternative: 'Use the core entities store instead',
 	} );
-	yield controls.dispatch( STORE_NAME, 'resetPost', newPost );
+	return { type: 'DO_NOTHING' };
 }
 
 /**
@@ -404,13 +387,17 @@ export function* undo() {
 }
 
 /**
- * Returns an action object used in signalling that undo history record should
- * be created.
+ * Action that creates an undo history record.
  *
- * @return {Object} Action object.
+ * @deprecated Since WordPress 6.0
  */
 export function createUndoLevel() {
-	return { type: 'CREATE_UNDO_LEVEL' };
+	deprecated( "wp.data.dispatch( 'core/editor' ).createUndoLevel", {
+		since: '6.0',
+		version: '6.3',
+		alternative: 'Use the core entities store instead',
+	} );
+	return { type: 'DO_NOTHING' };
 }
 
 /**

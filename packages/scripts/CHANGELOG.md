@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Automatically copy PHP files located in the `src` folder and its subfolders to the output directory (`build` by default) ([#38715](https://github.com/WordPress/gutenberg/pull/38715)).
+
+## 21.0.1 (2022-02-11)
+
+### Bug Fix
+
+-   Return a default entry object in the `build` command when no entry files discovered in the project ([#38737](https://github.com/WordPress/gutenberg/pull/38737)).
+
+## 21.0.0 (2022-02-10)
+
+### Breaking Changes
+
+-   The bundled `puppeteer-core` dependency has been updated from requiring `^11.0.0` to requiring `^13.2.0` ([#37078](https://github.com/WordPress/gutenberg/pull/37078)).
+
+### Bug Fix
+
+-   Fix the handling for entry points when running `build` command ([#38584](https://github.com/WordPress/gutenberg/pull/38584)).
+
+## 20.0.2 (2022-01-31)
+
+### Bug Fix
+
+-   Fix the `build` command that does not generate assets on Windows OS ([#38348](https://github.com/WordPress/gutenberg/pull/38348)).
+-   Adds fallback to `src/index.js` when no valid scripts discovered in metadata files when running the `build` command ([#38367](https://github.com/WordPress/gutenberg/pull/38367)).
+
 ## 20.0.1 (2022-01-28)
 
 ### Bug Fix

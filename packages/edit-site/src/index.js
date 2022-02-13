@@ -13,6 +13,7 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 import { store as viewportStore } from '@wordpress/viewport';
 import { getQueryArgs } from '@wordpress/url';
 
@@ -24,6 +25,7 @@ import { store as editSiteStore } from './store';
 import EditSiteApp from './components/app';
 import getIsListPage from './utils/get-is-list-page';
 import redirectToHomepage from './components/routes/redirect-to-homepage';
+import ErrorBoundaryWarning from './components/error-boundary/warning';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -38,7 +40,21 @@ export async function reinitializeEditor( target, settings ) {
 	// define what's being edited. When visiting via the dashboard link, these
 	// won't be present. Do a client side redirect to the 'homepage' if that's
 	// the case.
-	await redirectToHomepage( settings.siteUrl );
+	try {
+		await redirectToHomepage( settings.siteUrl );
+	} catch ( error ) {
+		render(
+			<ErrorBoundaryWarning
+				message={ __(
+					'The editor is unable to find a block template for the homepage.'
+				) }
+				error={ error }
+				dashboardLink="index.php"
+			/>,
+			target
+		);
+		return;
+	}
 
 	// This will be a no-op if the target doesn't have any React nodes.
 	unmountComponentAtNode( target );
@@ -90,7 +106,7 @@ export function initializeEditor( id, settings ) {
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: true,
 		} );

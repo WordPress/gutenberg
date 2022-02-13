@@ -23,7 +23,6 @@ function gutenberg_reregister_core_block_types() {
 				'columns',
 				'comments-query-loop',
 				'cover',
-				'gallery',
 				'group',
 				'heading',
 				'html',
@@ -83,6 +82,7 @@ function gutenberg_reregister_core_block_types() {
 				'pattern.php'                      => 'core/pattern',
 				'post-author.php'                  => 'core/post-author',
 				'post-author-name.php'             => 'core/post-author-name',
+				'post-author-biography.php'        => 'core/post-author-biography',
 				'post-comment.php'                 => 'core/post-comment',
 				'post-comments.php'                => 'core/post-comments',
 				'post-comments-count.php'          => 'core/post-comments-count',
@@ -102,6 +102,7 @@ function gutenberg_reregister_core_block_types() {
 				'query-pagination-numbers.php'     => 'core/query-pagination-numbers',
 				'query-pagination-previous.php'    => 'core/query-pagination-previous',
 				'query-title.php'                  => 'core/query-title',
+				'read-more.php'                    => 'core/read-more',
 				'rss.php'                          => 'core/rss',
 				'search.php'                       => 'core/search',
 				'shortcode.php'                    => 'core/shortcode',
@@ -272,95 +273,6 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	}
 }
 
-/**
- * Change the way styles get loaded depending on their size.
- *
- * Optimizes performance and sustainability of styles by inlining smaller stylesheets.
- *
- * @todo Remove this function when the minimum supported version is WordPress 5.8.
- *
- * @return void
- */
-function gutenberg_maybe_inline_styles() {
-
-	// Early exit if the "wp_maybe_inline_styles" function exists.
-	if ( function_exists( 'wp_maybe_inline_styles' ) ) {
-		return;
-	}
-
-	$total_inline_limit = 20000;
-	/**
-	 * The maximum size of inlined styles in bytes.
-	 *
-	 * @param int $total_inline_limit The file-size threshold, in bytes. Defaults to 20000.
-	 * @return int                    The file-size threshold, in bytes.
-	 */
-	$total_inline_limit = apply_filters( 'styles_inline_size_limit', $total_inline_limit );
-
-	global $wp_styles;
-	$styles = array();
-
-	// Build an array of styles that have a path defined.
-	foreach ( $wp_styles->queue as $handle ) {
-		if ( wp_styles()->get_data( $handle, 'path' ) && file_exists( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
-			$styles[] = array(
-				'handle' => $handle,
-				'src'    => $wp_styles->registered[ $handle ]->src,
-				'path'   => $wp_styles->registered[ $handle ]->extra['path'],
-				'size'   => filesize( $wp_styles->registered[ $handle ]->extra['path'] ),
-			);
-		}
-	}
-
-	if ( ! empty( $styles ) ) {
-		// Reorder styles array based on size.
-		usort(
-			$styles,
-			function( $a, $b ) {
-				return ( $a['size'] <= $b['size'] ) ? -1 : 1;
-			}
-		);
-
-		/**
-		 * The total inlined size.
-		 *
-		 * On each iteration of the loop, if a style gets added inline the value of this var increases
-		 * to reflect the total size of inlined styles.
-		 */
-		$total_inline_size = 0;
-
-		// Loop styles.
-		foreach ( $styles as $style ) {
-
-			// Size check. Since styles are ordered by size, we can break the loop.
-			if ( $total_inline_size + $style['size'] > $total_inline_limit ) {
-				break;
-			}
-
-			// Get the styles if we don't already have them.
-			$style['css'] = file_get_contents( $style['path'] );
-
-			// Check if the style contains relative URLs that need to be modified.
-			// URLs relative to the stylesheet's path should be converted to relative to the site's root.
-			$style['css'] = _wp_normalize_relative_css_links( $style['css'], $style['src'] );
-
-			// Set `src` to `false` and add styles inline.
-			$wp_styles->registered[ $style['handle'] ]->src = false;
-			if ( empty( $wp_styles->registered[ $style['handle'] ]->extra['after'] ) ) {
-				$wp_styles->registered[ $style['handle'] ]->extra['after'] = array();
-			}
-			array_unshift( $wp_styles->registered[ $style['handle'] ]->extra['after'], $style['css'] );
-
-			// Add the styles size to the $total_inline_size var.
-			$total_inline_size += (int) $style['size'];
-		}
-	}
-}
-// Run for styles enqueued in <head>.
-add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
-// Run for late-loaded styles in the footer.
-add_action( 'wp_footer', 'gutenberg_maybe_inline_styles', 1 );
-
 if ( ! function_exists( '_wp_normalize_relative_css_links' ) ) {
 	/**
 	 * Make URLs relative to the WordPress installation.
@@ -482,40 +394,6 @@ function gutenberg_register_legacy_social_link_blocks() {
 }
 
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
-
-/**
- * Filters the default block categories array to add a new one for themes.
- *
- * This can be removed when plugin support requires WordPress 5.8.0+.
- *
- * @see https://core.trac.wordpress.org/ticket/52883
- *
- * @param array[] $categories The list of default block categories.
- *
- * @return array[] Filtered block categories.
- */
-function gutenberg_register_theme_block_category( $categories ) {
-	foreach ( $categories as $category ) {
-		// Skip when the category is already set in WordPress core.
-		if (
-			isset( $category['slug'] ) &&
-			'theme' === $category['slug']
-		) {
-			return $categories;
-		}
-	}
-
-	$categories[] = array(
-		'slug'  => 'theme',
-		'title' => _x( 'Theme', 'block category', 'gutenberg' ),
-		'icon'  => null,
-	);
-	return $categories;
-}
-// This can be removed when plugin support requires WordPress 5.8.0+.
-if ( ! function_exists( 'get_default_block_categories' ) ) {
-	add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
-}
 
 /**
  * Checks whether the current block type supports the feature requested.

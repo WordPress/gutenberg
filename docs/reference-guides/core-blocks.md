@@ -440,6 +440,15 @@ Display post author details such as name, avatar, and bio. ([Source](https://git
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** avatarSize, byline, showAvatar, showBio, textAlign
 
+## Post Author Biography
+
+The author biography. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-biography))
+
+-	**Name:** core/post-author-biography
+-	**Category:** theme
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Attributes:** textAlign
+
 ## Post Author Name
 
 The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-name))
@@ -646,6 +655,15 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 -	**Category:** text
 -	**Supports:** anchor, typography (fontSize, lineHeight)
 -	**Attributes:** align, citation, value
+
+## Read More
+
+Displays the link of a post, page, or any other content-type. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/read-more))
+
+-	**Name:** core/read-more
+-	**Category:** theme
+-	**Supports:** color (background, gradients, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** content, linkTarget
 
 ## RSS
 

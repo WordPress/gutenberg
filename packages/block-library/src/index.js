@@ -60,6 +60,7 @@ import * as pageList from './page-list';
 import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
+import * as postAuthorBiography from './post-author-biography';
 import * as postComment from './post-comment';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
@@ -83,6 +84,7 @@ import * as queryPaginationPrevious from './query-pagination-previous';
 import * as queryTitle from './query-title';
 import * as quote from './quote';
 import * as reusableBlock from './block';
+import * as readMore from './read-more';
 import * as rss from './rss';
 import * as search from './search';
 import * as separator from './separator';
@@ -204,6 +206,7 @@ export const __experimentalGetCoreBlocks = () => [
 	termDescription,
 	queryTitle,
 	postAuthorName,
+	postAuthorBiography,
 ];
 
 /**
@@ -242,35 +245,36 @@ export const registerCoreBlocks = (
  * __experimentalRegisterExperimentalCoreBlocks( settings );
  * ```
  */
-export const __experimentalRegisterExperimentalCoreBlocks =
-	process.env.GUTENBERG_PHASE === 2
-		? ( { enableFSEBlocks } = {} ) => {
-				[
-					// Experimental blocks.
-					homeLink,
+export const __experimentalRegisterExperimentalCoreBlocks = process.env
+	.IS_GUTENBERG_PLUGIN
+	? ( { enableFSEBlocks } = {} ) => {
+			[
+				// Experimental blocks.
+				homeLink,
 
-					// Full Site Editing blocks.
-					...( enableFSEBlocks
-						? [
-								commentAuthorAvatar,
-								commentAuthorName,
-								commentContent,
-								commentDate,
-								commentEditLink,
-								commentReplyLink,
-								commentTemplate,
-								commentsQueryLoop,
-								commentsPagination,
-								commentsPaginationNext,
-								commentsPaginationNumbers,
-								commentsPaginationPrevious,
-								navigationArea,
-								postComment,
-								postCommentsCount,
-								postCommentsForm,
-								postCommentsLink,
-						  ]
-						: [] ),
-				].forEach( registerBlock );
-		  }
-		: undefined;
+				// Full Site Editing blocks.
+				...( enableFSEBlocks
+					? [
+							commentAuthorAvatar,
+							commentAuthorName,
+							commentContent,
+							commentDate,
+							commentEditLink,
+							commentReplyLink,
+							commentTemplate,
+							commentsQueryLoop,
+							commentsPagination,
+							commentsPaginationNext,
+							commentsPaginationNumbers,
+							commentsPaginationPrevious,
+							navigationArea,
+							postComment,
+							postCommentsCount,
+							postCommentsForm,
+							postCommentsLink,
+							readMore,
+					  ]
+					: [] ),
+			].forEach( registerBlock );
+	  }
+	: undefined;

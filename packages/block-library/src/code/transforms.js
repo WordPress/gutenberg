@@ -12,7 +12,7 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/html' ],
+			blocks: [ 'core/html', 'core/paragraph' ],
 			transform: ( { content } ) => {
 				return createBlock( 'core/code', {
 					content,

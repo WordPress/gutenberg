@@ -15,7 +15,11 @@
 	"supports": {
 		"html": false,
 		"color": {
-			"gradients": true
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

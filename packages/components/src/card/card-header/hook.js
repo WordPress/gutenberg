@@ -37,7 +37,7 @@ export function useCardHeader( props ) {
 				'components-card__header',
 				className
 			),
-		[ className, isBorderless, isShady, size ]
+		[ className, cx, isBorderless, isShady, size ]
 	);
 
 	return {

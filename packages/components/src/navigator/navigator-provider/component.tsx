@@ -42,37 +42,25 @@ function NavigatorProvider(
 	>( [
 		{
 			path: initialPath,
-			isBack: false,
-			isInitial: true,
 		},
 	] );
 
-	const push: NavigatorContextType[ 'push' ] = useCallback(
-		( path, options ) => {
-			// Force the `isBack` flag to `false` when navigating forward on both the
-			// previous and the new location.
-			// Also force the `isInitial` flag to `false` for the new location, to make
-			// sure it doesn't get overridden by mistake.
+	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
+		( path, options = {} ) => {
 			setLocationHistory( [
-				...locationHistory.slice( 0, -1 ),
-				{
-					...locationHistory[ locationHistory.length - 1 ],
-					isBack: false,
-				},
+				...locationHistory,
 				{
 					...options,
 					path,
 					isBack: false,
-					isInitial: false,
 				},
 			] );
 		},
 		[ locationHistory ]
 	);
 
-	const pop: NavigatorContextType[ 'pop' ] = useCallback( () => {
+	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
 		if ( locationHistory.length > 1 ) {
-			// Force the `isBack` flag to `true` when navigating back.
 			setLocationHistory( [
 				...locationHistory.slice( 0, -2 ),
 				{
@@ -85,18 +73,21 @@ function NavigatorProvider(
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
-			location: locationHistory[ locationHistory.length - 1 ],
-			push,
-			pop,
+			location: {
+				...locationHistory[ locationHistory.length - 1 ],
+				isInitial: locationHistory.length === 1,
+			},
+			goTo,
+			goBack,
 		} ),
-		[ locationHistory, push, pop ]
+		[ locationHistory, goTo, goBack ]
 	);
 
 	const cx = useCx();
 	const classes = useMemo(
 		// Prevents horizontal overflow while animating screen transitions
 		() => cx( css( { overflowX: 'hidden' } ), className ),
-		[ className ]
+		[ className, cx ]
 	);
 
 	return (
@@ -120,19 +111,19 @@ function NavigatorProvider(
  * } from '@wordpress/components';
  *
  * function NavigatorButton( { path, ...props } ) {
- *  const { push } = useNavigator();
+ *  const { goTo } = useNavigator();
  *  return (
  *    <Button
  *      variant="primary"
- *      onClick={ () => push( path ) }
+ *      onClick={ () => goTo( path ) }
  *      { ...props }
  *    />
  *  );
  * }
  *
  * function NavigatorBackButton( props ) {
- *   const { pop } = useNavigator();
- *   return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
+ *   const { goBack } = useNavigator();
+ *   return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
  * }
  *
  * const MyNavigation = () => (
