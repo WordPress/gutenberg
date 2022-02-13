@@ -215,7 +215,6 @@ function ButtonEdit( props ) {
 					/>
 				) }
 			</BlockControls>
-
 			{ isSelected && ( isEditingURL || isURLSet ) && (
 				<Popover
 					position="bottom center"
@@ -248,7 +247,6 @@ function ButtonEdit( props ) {
 					/>
 				</Popover>
 			) }
-
 			<InspectorControls>
 				<WidthPanel
 					selectedWidth={ width }
