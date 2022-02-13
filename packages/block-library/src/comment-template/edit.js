@@ -250,12 +250,9 @@ export default function CommentTemplateEdit( {
 	} );
 	order = order || commentOrder;
 
-	// Reverse the order of top comments if needed, as specified in the
-	// Discussion settings. NOTE that this only changes the order of comments in
-	// the given page, not the order of pages.
-
 	// Generate a tree structure of comment IDs.
 	const { commentTree } = useCommentTree(
+		// Reverse the order of top comments if needed.
 		order === 'desc' && topLevelComments
 			? [ ...topLevelComments ].reverse()
 			: topLevelComments
