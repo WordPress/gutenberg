@@ -29,6 +29,56 @@ const TEMPLATE = [
 ];
 
 /**
+ * Function that returns a comment structure that will be rendered with default placehoders.
+ *
+ * @param {Object}  settings                       Discussion Settings.
+ * @param {number}  [settings.perPage]             - Comments per page setting or block attribute.
+ * @param {boolean} [settings.threadComments]      - Enable threaded (nested) comments setting.
+ * @param {number}  [settings.threadCommentsDepth] - Level deep of threaded comments.
+ *
+ * @typedef {{id: null, children: EmptyComment[]}} EmptyComment
+ * @return {EmptyComment[]}                 		Inner blocks of the Comment Template
+ */
+const getCommentsPlaceholder = ( {
+	perPage,
+	threadComments,
+	threadCommentsDepth,
+} ) => {
+	// In case that `threadCommentsDepth` is falsy, we default to a somewhat
+	// arbitrary value of 3.
+	// In case that the value is set but larger than 3 we truncate it to 3.
+	const commentsDepth = Math.min( threadCommentsDepth || 3, 3 );
+
+	// We set a limit in order not to overload the editor of empty comments.
+	const defaultCommentsToShow =
+		perPage <= commentsDepth ? perPage : commentsDepth;
+	if ( ! threadComments || defaultCommentsToShow === 1 ) {
+		// If displaying threaded comments is disabled, we only show one comment
+		return [ { commentId: null, children: [] } ];
+	} else if ( defaultCommentsToShow === 2 ) {
+		return [
+			{
+				commentId: null,
+				children: [ { commentId: null, children: [] } ],
+			},
+		];
+	}
+
+	// In case that the value is set but larger than 3 we truncate it to 3.
+	return [
+		{
+			commentId: null,
+			children: [
+				{
+					commentId: null,
+					children: [ { commentId: null, children: [] } ],
+				},
+			],
+		},
+	];
+};
+
+/**
  * Component which renders the inner blocks of the Comment Template.
  *
  * @param {Object} props                    Component props.
@@ -140,9 +190,9 @@ const CommentsList = ( {
 } ) => (
 	<ol { ...blockProps }>
 		{ comments &&
-			comments.map( ( comment ) => (
+			comments.map( ( comment, index ) => (
 				<BlockContextProvider
-					key={ comment.commentId }
+					key={ comment.commentId || index }
 					value={ comment }
 				>
 					<CommentTemplateInnerBlocks
@@ -164,10 +214,16 @@ export default function CommentTemplateEdit( {
 	const blockProps = useBlockProps();
 
 	const [ activeComment, setActiveComment ] = useState();
-	const { commentOrder, commentsPerPage } = useSelect( ( select ) => {
+	const {
+		commentOrder,
+		commentsPerPage,
+		threadCommentsDepth,
+		threadComments,
+	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalDiscussionSettings;
 	} );
+
 	const { rawComments, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
@@ -194,14 +250,14 @@ export default function CommentTemplateEdit( {
 		},
 		[ postId, clientId, order ]
 	);
-
 	// TODO: Replicate the logic used on the server.
 	perPage = perPage || commentsPerPage;
 	// We convert the flat list of comments to tree.
 	// Then, we show only a maximum of `perPage` number of comments.
 	// This is because passing `per_page` to `getEntityRecords()` does not
 	// take into account nested comments.
-	const comments = useMemo(
+
+	let comments = useMemo(
 		() => convertToTree( rawComments ).slice( 0, perPage ),
 		[ rawComments, perPage ]
 	);
@@ -212,6 +268,14 @@ export default function CommentTemplateEdit( {
 				<Spinner />
 			</p>
 		);
+	}
+
+	if ( ! postId ) {
+		comments = getCommentsPlaceholder( {
+			perPage,
+			threadComments,
+			threadCommentsDepth,
+		} );
 	}
 
 	if ( ! comments.length ) {

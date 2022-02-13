@@ -541,7 +541,9 @@ function getEntry( issue ) {
 					title,
 					issue.number,
 					issue.html_url
-				);
+				) +
+				' - @' +
+				issue.user.login;
 }
 
 /**

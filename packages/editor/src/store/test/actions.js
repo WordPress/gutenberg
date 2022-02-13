@@ -365,31 +365,13 @@ describe( 'Editor actions', () => {
 		it( 'should yield the setup editor actions but not reset blocks when the template is empty', () => {
 			const post = { content: { raw: '' }, status: 'publish' };
 			const fulfillment = actions.setupEditor( post );
-			let { value } = fulfillment.next();
-			expect( value ).toEqual( actions.resetPost( post ) );
-			value = fulfillment.next().value;
-			expect( value ).toEqual( {
-				type: 'SETUP_EDITOR',
-				post: { content: { raw: '' }, status: 'publish' },
-			} );
-			value = fulfillment.next().value;
+			const value = fulfillment.next().value;
 			expect( value ).toEqual(
 				actions.setupEditorState( {
 					content: { raw: '' },
 					status: 'publish',
 				} )
 			);
-		} );
-	} );
-
-	describe( 'resetPost', () => {
-		it( 'should return the RESET_POST action', () => {
-			const post = {};
-			const result = actions.resetPost( post );
-			expect( result ).toEqual( {
-				type: 'RESET_POST',
-				post,
-			} );
 		} );
 	} );
 

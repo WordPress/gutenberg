@@ -245,9 +245,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 		$html .= '</span>';
 
-		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
-
 		$html .= '</button>';
+
+		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
 
 	}
 
