@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { colord, Colord } from 'colord';
+import type { ClipboardEvent } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import type { ClipboardEvent } from 'react';
 
 /**
  * Internal dependencies
