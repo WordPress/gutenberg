@@ -55,7 +55,6 @@ const ensureDefaultBlock = () => ( { select, dispatch } ) => {
  */
 export const resetBlocks = ( blocks ) => ( { dispatch } ) => {
 	dispatch( { type: 'RESET_BLOCKS', blocks } );
-	dispatch( validateBlocksToTemplate( blocks ) );
 };
 
 /**
@@ -72,13 +71,14 @@ export const validateBlocksToTemplate = ( blocks ) => ( {
 } ) => {
 	const template = select.getTemplate();
 	const templateLock = select.getTemplateLock();
+	const getBlockListSettings = select.getBlockListSettings;
 
 	// Unlocked templates are considered always valid because they act
 	// as default values only.
 	const isBlocksValidToTemplate =
 		! template ||
 		templateLock !== 'all' ||
-		doBlocksMatchTemplate( blocks, template );
+		doBlocksMatchTemplate( blocks, template, getBlockListSettings );
 
 	// Update if validity has changed.
 	const isValidTemplate = select.isValidTemplate();

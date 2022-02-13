@@ -18,19 +18,32 @@ import { getBlockType } from './registration';
 /**
  * Checks whether a list of blocks matches a template by comparing the block names.
  *
- * @param {Array} blocks   Block list.
- * @param {Array} template Block template.
+ * @param {Array}    blocks               Block list.
+ * @param {Array}    template             Block template.
+ * @param {Function} getBlockListSettings Gets block list settings.
  *
  * @return {boolean} Whether the list of blocks matches a templates.
  */
-export function doBlocksMatchTemplate( blocks = [], template = [] ) {
+export function doBlocksMatchTemplate(
+	blocks = [],
+	template = [],
+	getBlockListSettings = () => ( {} )
+) {
 	return (
 		blocks.length === template.length &&
 		every( template, ( [ name, , innerBlocksTemplate ], index ) => {
 			const block = blocks[ index ];
+			const { clientId, innerBlocks } = block;
+			const { templateLock = null } =
+				getBlockListSettings( clientId ) ?? {};
 			return (
 				name === block.name &&
-				doBlocksMatchTemplate( block.innerBlocks, innerBlocksTemplate )
+				( templateLock === false ||
+					doBlocksMatchTemplate(
+						innerBlocks,
+						innerBlocksTemplate,
+						getBlockListSettings
+					) )
 			);
 		} )
 	);

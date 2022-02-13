@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useLayoutEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,11 +15,20 @@ import { BlockRefsProvider } from './block-refs-provider';
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
 function BlockEditorProvider( props ) {
-	const { children, settings } = props;
+	const { children, settings, value: controlledBlocks } = props;
 
-	const { updateSettings } = useDispatch( blockEditorStore );
+	const { updateSettings, validateBlocksToTemplate } = useDispatch(
+		blockEditorStore
+	);
+
 	useEffect( () => {
 		updateSettings( settings );
+	}, [ settings ] );
+
+	useLayoutEffect( () => {
+		if ( controlledBlocks ) {
+			validateBlocksToTemplate( controlledBlocks );
+		}
 	}, [ settings ] );
 
 	// Syncs the entity provider with changes in the block-editor store.

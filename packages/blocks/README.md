@@ -235,6 +235,7 @@ _Parameters_
 
 -   _blocks_ `Array`: Block list.
 -   _template_ `Array`: Block template.
+-   _getBlockListSettings_ `Function`: Gets block list settings.
 
 _Returns_
 
