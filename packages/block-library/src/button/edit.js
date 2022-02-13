@@ -215,6 +215,7 @@ function ButtonEdit( props ) {
 					/>
 				) }
 			</BlockControls>
+
 			{ isSelected && ( isEditingURL || isURLSet ) && (
 				<Popover
 					position="bottom center"
@@ -224,6 +225,7 @@ function ButtonEdit( props ) {
 					} }
 					anchorRef={ ref?.current }
 					focusOnMount={ isEditingURL ? 'firstElement' : false }
+					__unstableSlotName={ 'block-toolbar' }
 				>
 					<LinkControl
 						className="wp-block-navigation-link__inline-link-input"
@@ -246,6 +248,7 @@ function ButtonEdit( props ) {
 					/>
 				</Popover>
 			) }
+
 			<InspectorControls>
 				<WidthPanel
 					selectedWidth={ width }
