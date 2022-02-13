@@ -241,7 +241,7 @@
 		"build": "pnpm build:packages && wp-scripts build",
 		"changelog": "./bin/plugin/cli.js changelog",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
-		"precheck-local-changes": "pnpm docs:build",
+		"precheck-local-changes": "npm run docs:build",
 		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'pnpm install' or 'pnpm docs:build'!\" && git diff --exit-code && exit 1 );",
 		"dev": "pnpm build:packages && concurrently \"wp-scripts start\" \"pnpm dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
