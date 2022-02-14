@@ -20,14 +20,14 @@ const MyNavigation = () => (
   <NavigatorProvider initialPath="/">
     <NavigatorScreen path="/">
       <p>This is the home screen.</p>
-       <NavigatorLink variant="secondary" path="/child">
+       <NavigatorLink path="/child">
          Navigate to child screen.
       </NavigatorLink>
     </NavigatorScreen>
 
     <NavigatorScreen path="/child">
       <p>This is the child screen.</p>
-      <NavigatorBackLink variant="secondary">
+      <NavigatorBackLink>
         Go back
       </NavigatorBackLink>
     </NavigatorScreen>
