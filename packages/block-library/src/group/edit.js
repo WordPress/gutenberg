@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -17,12 +18,15 @@ import {
 	BlockControls,
 	MediaReplaceFlow,
 	store as blockEditorStore,
+	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import {
 	SelectControl,
 	Spinner,
 	PanelBody,
 	FocalPointPicker,
+	RangeControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
@@ -72,7 +76,22 @@ const htmlElementMessages = {
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
-	const { id, url, backgroundType, alt, focalPoint } = attributes;
+	const {
+		id,
+		url,
+		backgroundType,
+		alt,
+		focalPoint,
+		overlayColor,
+		setOverlayColor,
+		dimRatio,
+	} = attributes;
+
+	const {
+		gradientClass,
+		gradientValue,
+		setGradient,
+	} = __experimentalUseGradient();
 
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
@@ -115,7 +134,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const isImgElement = true; // ! ( hasParallax || isRepeated );
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 
-	// const bgStyle = { backgroundColor: overlayColor?.color };
+	const bgStyle = { backgroundColor: overlayColor?.color };
 	const mediaStyle = {
 		objectPosition:
 			focalPoint && isImgElement
@@ -167,6 +186,36 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 						) }
 					</PanelBody>
 				) }
+
+				<PanelColorGradientSettings
+					__experimentalHasMultipleOrigins
+					__experimentalIsRenderedInSidebar
+					title={ __( 'Overlay' ) }
+					initialOpen={ true }
+					settings={ [
+						{
+							colorValue: overlayColor?.color,
+							gradientValue,
+							onColorChange: setOverlayColor,
+							onGradientChange: setGradient,
+							label: __( 'Color' ),
+						},
+					] }
+				>
+					<RangeControl
+						label={ __( 'Opacity' ) }
+						value={ dimRatio }
+						onChange={ ( newDimRation ) =>
+							setAttributes( {
+								dimRatio: newDimRation,
+							} )
+						}
+						min={ 0 }
+						max={ 100 }
+						step={ 10 }
+						required
+					/>
+				</PanelColorGradientSettings>
 			</InspectorControls>
 
 			<InspectorControls __experimentalGroup="advanced">
@@ -190,6 +239,25 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			</InspectorControls>
 
 			<TagName { ...blockProps }>
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						'wp-block-group__background',
+						dimRatioToClass( dimRatio ),
+						{
+							[ overlayColor?.class ]: overlayColor?.class,
+							'has-background-dim': dimRatio !== undefined,
+							// For backwards compatibility. Former versions of the Cover Block applied
+							// `.wp-block-group__gradient-background` in the presence of
+							// media, a gradient and a dim.
+							'wp-block-group__gradient-background':
+								url && gradientValue && dimRatio !== 0,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						}
+					) }
+					style={ { backgroundImage: gradientValue, ...bgStyle } }
+				/>
 				{ showBgImage && (
 					<img
 						ref={ isDarkElement }

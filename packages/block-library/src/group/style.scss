@@ -61,4 +61,24 @@
 		border: none;
 		box-shadow: none;
 	}
+
+	&.has-background-color .wp-block-group__background,
+	&.has-background-color .wp-block-group__gradient-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		z-index: z-index(".wp-block-cover.has-background-dim::before");
+		opacity: 0.5;
+		max-width: none;
+	}
+
+	// Opacity classnames
+	@for $i from 0 through 10 {
+		.wp-block-group__gradient-background.has-background-dim.has-background-dim-#{ $i * 10 },
+		.wp-block-group__background.has-background-dim.has-background-dim-#{ $i * 10 } {
+			opacity: $i * 0.1;
+		}
+	}
 }
