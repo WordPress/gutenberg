@@ -541,9 +541,7 @@ function getEntry( issue ) {
 					title,
 					issue.number,
 					issue.html_url
-				) +
-				' - @' +
-				issue.user.login;
+				);
 }
 
 /**
@@ -799,7 +797,7 @@ function getFirstTimeContributorPRs( pullRequests ) {
  *
  * @return {string} The formatted markdown list of contributors and their PRs.
  */
-function getContributorMarkdownList( ftcPRs ) {
+function getContributorPropsMarkdownList( ftcPRs ) {
 	return ftcPRs.reduce( ( markdownList, pr ) => {
 		const title = getNormalizedTitle( pr.title, pr ) || '';
 
@@ -822,7 +820,7 @@ function getContributorMarkdownList( ftcPRs ) {
  * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
  */
 function sortByUsername( items ) {
-	return sortBy( items, ( item ) => item.user.login );
+	return sortBy( items, ( item ) => item.user.login.toLowerCase() );
 }
 
 /**
@@ -836,6 +834,44 @@ function getUniqueByUsername( items ) {
 }
 
 /**
+ * Produces the formatted markdown for the contributor props seciton.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted props section.
+ */
+function getContributorProps( pullRequests ) {
+	const contributorsList = flow( [
+		getFirstTimeContributorPRs,
+		getUniqueByUsername,
+		sortByUsername,
+		getContributorPropsMarkdownList,
+	] )( pullRequests );
+
+	return (
+		'## First time contributors' +
+		'\n\n' +
+		'The following PRs were merged by first time contrbutors:' +
+		'\n\n' +
+		contributorsList
+	);
+}
+
+/**
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of first time contributor PRs.
+ * @return {string} The formatted markdown list of contributor usernames.
+ */
+function getContributorsMarkdownList( pullRequests ) {
+	return pullRequests
+		.reduce( ( markdownList = '', pr ) => {
+			markdownList += ` @${ pr.user.login }`;
+			return markdownList;
+		}, '' )
+		.trim();
+}
+
+/**
  * Produces the formatted markdown for the full time contributors section of
  * the changelog output.
  *
@@ -843,18 +879,18 @@ function getUniqueByUsername( items ) {
  *
  * @return {string} The formatted contributors section.
  */
-function getContributors( pullRequests ) {
+function getContributorsList( pullRequests ) {
 	const contributorsList = flow( [
-		getFirstTimeContributorPRs,
 		getUniqueByUsername,
 		sortByUsername,
-		getContributorMarkdownList,
+		getContributorsMarkdownList,
 	] )( pullRequests );
 
 	return (
-		'## First time contributors' +
 		'\n\n' +
-		'The following PRs were merged by first time contrbutors:' +
+		'## Contributors' +
+		'\n\n' +
+		'The following contributors merged PRs in this release:' +
 		'\n\n' +
 		contributorsList
 	);
@@ -882,9 +918,14 @@ async function createChangelog( settings ) {
 		const pullRequests = await fetchAllPullRequests( octokit, settings );
 
 		const changelog = getChangelog( pullRequests );
-		const contributors = getContributors( pullRequests );
+		const contributorProps = getContributorProps( pullRequests );
+		const contributorsList = getContributorsList( pullRequests );
 
-		releaselog = releaselog.concat( changelog, contributors );
+		releaselog = releaselog.concat(
+			changelog,
+			contributorProps,
+			contributorsList
+		);
 	} catch ( error ) {
 		if ( error instanceof Error ) {
 			releaselog = formats.error( error.stack );
@@ -935,7 +976,7 @@ async function getReleaseChangelog( options ) {
 	getTypesByLabels,
 	getTypesByTitle,
 	getFormattedItemDescription,
-	getContributors,
+	getContributorProps,
 	getChangelog,
 	getUniqueByUsername,
 };
