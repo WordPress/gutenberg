@@ -211,11 +211,17 @@ export function* setPage( page ) {
 		// If the entity is undefined for some reason, path will resolve to "/"
 		page.path = getPathAndQueryString( entity?.link );
 	}
-	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
+	const template = yield controls.resolveSelect(
 		coreStore,
 		'__experimentalGetTemplateForLink',
 		page.path
 	);
+
+	if ( ! template ) {
+		return;
+	}
+
+	const { id: templateId, slug: templateSlug } = template;
 	yield {
 		type: 'SET_PAGE',
 		page: ! templateSlug

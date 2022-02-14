@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/search",
 		"isValid": true,
 		"attributes": {
@@ -9,7 +8,6 @@
 			"buttonPosition": "button-outside",
 			"buttonUseIcon": false
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

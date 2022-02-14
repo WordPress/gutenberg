@@ -85,7 +85,6 @@ $navigation-icon-size: 24px;
 		align-self: center; // This one affects nested submenu indicators.
 		line-height: 0;
 		display: inline-block;
-		vertical-align: middle;
 		font-size: inherit;
 
 		// Affect the button as well.
@@ -95,15 +94,18 @@ $navigation-icon-size: 24px;
 		border: none;
 
 		// Scale to font size.
-		margin-left: 0.25em;
 		width: 0.6em;
 		height: 0.6em;
+		margin-left: 0.25em;
 
 		svg {
 			display: inline-block;
 			stroke: currentColor;
 			width: inherit;
 			height: inherit;
+
+			// Position the arrow to balance with the the text.
+			margin-top: 0.075em;
 		}
 	}
 
@@ -216,6 +218,11 @@ $navigation-icon-size: 24px;
 				}
 			}
 
+			// Push inwards from right edge of submenu.
+			.wp-block-navigation__submenu-icon {
+				margin-right: 0.25em;
+			}
+
 			// Reset the submenu indicator for horizontal flyouts.
 			.wp-block-navigation__submenu-icon svg {
 				transform: rotate(-90deg);
@@ -245,7 +252,7 @@ $navigation-icon-size: 24px;
 	}
 
 	// Show submenus on click.
-	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
+	.wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
 		visibility: visible;
 		overflow: visible;
 		opacity: 1;
@@ -298,6 +305,18 @@ button.wp-block-navigation-item__content {
 
 .wp-block-navigation-submenu__toggle {
 	cursor: pointer;
+}
+
+// When set to open on click, a button element is used.
+// We pad it to include the arrow icon in the clickable area.
+// The padding can be blanket for click, since you can't set click and hide the icon.
+.wp-block-navigation-item.open-on-click .wp-block-navigation-submenu__toggle {
+	padding-right: 0.6em + 0.25em; // Same size as icon plus margin.
+
+	+ .wp-block-navigation__submenu-icon {
+		margin-left: -0.6em;
+		pointer-events: none; // Make the icon inert to allow click on the button.
+	}
 }
 
 

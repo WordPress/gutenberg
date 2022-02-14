@@ -466,7 +466,7 @@ export const saveEntityRecord = (
 				// so the client just sends and receives objects.
 				const currentUser = select.getCurrentUser();
 				const currentUserId = currentUser ? currentUser.id : undefined;
-				const autosavePost = resolveSelect.getAutosave(
+				const autosavePost = await resolveSelect.getAutosave(
 					persistedRecord.type,
 					persistedRecord.id,
 					currentUserId

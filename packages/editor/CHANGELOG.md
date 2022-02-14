@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.2.0 (2022-02-10)
+
 ### Enhancement
 
 -   Export `PostTaxonomiesFlatTermSelector` and `PostTaxonomiesHierarchicalTermSelector` components to allow using them to customize the default term selector for a taxonomy.

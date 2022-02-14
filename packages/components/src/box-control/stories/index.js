@@ -14,7 +14,10 @@ import BoxControl from '../';
 import BoxControlVisualizer from '../visualizer';
 import { Flex, FlexBlock } from '../../flex';
 
-export default { title: 'Components/BoxControl', component: BoxControl };
+export default {
+	title: 'Components (Experimental)/BoxControl',
+	component: BoxControl,
+};
 
 export const _default = () => {
 	return <BoxControl />;

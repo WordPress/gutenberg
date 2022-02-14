@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  */
 import { focus } from '@wordpress/dom';
 import { forwardRef, useCallback } from '@wordpress/element';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -60,7 +60,7 @@ function TreeGrid(
 
 			if (
 				hasModifierKeyPressed ||
-				! includes( [ UP, DOWN, LEFT, RIGHT ], keyCode )
+				! includes( [ UP, DOWN, LEFT, RIGHT, HOME, END ], keyCode )
 			) {
 				return;
 			}
@@ -110,7 +110,10 @@ function TreeGrid(
 						}
 						// If a row is focused, and it is collapsed, moves to the parent row (if there is one).
 						const level = Math.max(
-							parseInt( activeRow?.ariaLevel ?? 1, 10 ) - 1,
+							parseInt(
+								activeRow?.getAttribute( 'aria-level' ) ?? 1,
+								10
+							) - 1,
 							1
 						);
 						const rows = Array.from(
@@ -120,7 +123,10 @@ function TreeGrid(
 						const currentRowIndex = rows.indexOf( activeRow );
 						for ( let i = currentRowIndex; i >= 0; i-- ) {
 							if (
-								parseInt( rows[ i ].ariaLevel, 10 ) === level
+								parseInt(
+									rows[ i ].getAttribute( 'aria-level' ),
+									10
+								) === level
 							) {
 								parentRow = rows[ i ];
 								break;
@@ -178,6 +184,53 @@ function TreeGrid(
 						currentRowIndex + 1,
 						rows.length - 1
 					);
+				}
+
+				// Focus is either at the top or bottom edge of the grid. Do nothing.
+				if ( nextRowIndex === currentRowIndex ) {
+					// Prevent key use for anything else. For example, Voiceover
+					// will start navigating horizontally when reaching the vertical
+					// bounds of a table.
+					event.preventDefault();
+					return;
+				}
+
+				// Get the focusables in the next row.
+				const focusablesInNextRow = getRowFocusables(
+					rows[ nextRowIndex ]
+				);
+
+				// If for some reason there are no focusables in the next row, do nothing.
+				if ( ! focusablesInNextRow || ! focusablesInNextRow.length ) {
+					// Prevent key use for anything else. For example, Voiceover
+					// will still focus text when using arrow keys, while this
+					// component should limit navigation to focusables.
+					event.preventDefault();
+					return;
+				}
+
+				// Try to focus the element in the next row that's at a similar column to the activeElement.
+				const nextIndex = Math.min(
+					currentColumnIndex,
+					focusablesInNextRow.length - 1
+				);
+				focusablesInNextRow[ nextIndex ].focus();
+
+				// Prevent key use for anything else. This ensures Voiceover
+				// doesn't try to handle key navigation.
+				event.preventDefault();
+			} else if ( includes( [ HOME, END ], keyCode ) ) {
+				// Calculate the rowIndex of the next row.
+				const rows = Array.from(
+					treeGridElement.querySelectorAll( '[role="row"]' )
+				);
+				const currentRowIndex = rows.indexOf( activeRow );
+				let nextRowIndex;
+
+				if ( keyCode === HOME ) {
+					nextRowIndex = 0;
+				} else {
+					nextRowIndex = rows.length - 1;
 				}
 
 				// Focus is either at the top or bottom edge of the grid. Do nothing.

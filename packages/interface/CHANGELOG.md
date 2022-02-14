@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.2.1 (2022-02-10)
+
 ### Bug Fix
 
 -   Removed unused `@wordpress/deprecated` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).

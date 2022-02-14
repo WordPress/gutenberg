@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
@@ -9,7 +8,6 @@
 			"overlayMenu": "mobile",
 			"hasIcon": true
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

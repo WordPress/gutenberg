@@ -36,11 +36,3 @@ export function localAutosaveSet( postId, isPostNew, title, content, excerpt ) {
 export function localAutosaveClear( postId, isPostNew ) {
 	window.sessionStorage.removeItem( postKey( postId, isPostNew ) );
 }
-
-const controls = {
-	LOCAL_AUTOSAVE_SET( { postId, isPostNew, title, content, excerpt } ) {
-		localAutosaveSet( postId, isPostNew, title, content, excerpt );
-	},
-};
-
-export default controls;

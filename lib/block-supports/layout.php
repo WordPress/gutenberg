@@ -53,7 +53,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		$style = '';
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > * {";
+			$style  = "$selector > :not(.alignleft):not(.alignright) {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 			$style .= 'margin-left: auto !important;';
 			$style .= 'margin-right: auto !important;';
@@ -63,8 +63,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector .alignfull { max-width: none; }";
 		}
 
-		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
-		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
+		$style .= "$selector .alignleft { float: left; margin-right: 2em; margin-left: 0; }";
+		$style .= "$selector .alignright { float: right; margin-left: 2em; margin-right: 0; }";
 		if ( $has_block_gap_support ) {
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
 			$style    .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
@@ -233,3 +233,36 @@ if ( function_exists( 'wp_restore_group_inner_container' ) ) {
 	remove_filter( 'render_block', 'wp_restore_group_inner_container', 10, 2 );
 }
 add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+
+
+/**
+ * For themes without theme.json file, make sure
+ * to restore the outer div for the aligned image block
+ * to avoid breaking styles relying on that div.
+ *
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
+ */
+function gutenberg_restore_image_outer_container( $block_content, $block ) {
+	$image_with_align = '/(^\s*<figure\b[^>]*)\bwp-block-image\b([^"]*\b(?:alignleft|alignright|aligncenter)\b[^>]*>.*<\/figure>)/U';
+
+	if (
+		'core/image' !== $block['blockName'] ||
+		WP_Theme_JSON_Resolver::theme_has_support() ||
+		0 === preg_match( $image_with_align, $block_content )
+	) {
+		return $block_content;
+	}
+
+	$updated_content = preg_replace_callback(
+		$image_with_align,
+		static function( $matches ) {
+			return '<div class="wp-block-image">' . $matches[1] . $matches[2] . '</div>';
+		},
+		$block_content
+	);
+	return $updated_content;
+}
+
+add_filter( 'render_block', 'gutenberg_restore_image_outer_container', 10, 2 );

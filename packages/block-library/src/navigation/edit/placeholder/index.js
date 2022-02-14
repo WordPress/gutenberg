@@ -13,8 +13,7 @@ import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
 import useNavigationMenu from '../../use-navigation-menu';
 import useCreateNavigationMenu from '../use-create-navigation-menu';
-import useConvertClassicMenu from '../../use-convert-classic-menu';
-import ExistingMenusOptions from '../existing-menus-options';
+import NavigationMenuSelector from '../navigation-menu-selector';
 
 export default function NavigationPlaceholder( {
 	clientId,
@@ -40,11 +39,8 @@ export default function NavigationPlaceholder( {
 		onFinish( navigationMenu, blocks );
 	};
 
-	const convertClassicMenu = useConvertClassicMenu( onFinishMenuCreation );
-
 	const {
 		isResolvingPages,
-		menus,
 		isResolvingMenus,
 		hasMenus,
 	} = useNavigationEntities();
@@ -94,29 +90,9 @@ export default function NavigationPlaceholder( {
 										popoverProps={ { isAlternate: true } }
 									>
 										{ () => (
-											<ExistingMenusOptions
-												showNavigationMenus={
-													canSwitchNavigationMenu
-												}
-												navigationMenus={
-													navigationMenus
-												}
-												onSelectNavigationMenu={
-													onFinish
-												}
-												classicMenus={ menus }
-												onSelectClassicMenu={ ( {
-													id,
-													name,
-												} ) =>
-													convertClassicMenu(
-														id,
-														name
-													)
-												}
-												showClassicMenus={
-													canUserCreateNavigation
-												}
+											<NavigationMenuSelector
+												clientId={ clientId }
+												onSelect={ onFinish }
 											/>
 										) }
 									</DropdownMenu>

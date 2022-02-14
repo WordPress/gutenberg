@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/categories",
 		"isValid": true,
 		"attributes": {
@@ -9,7 +8,6 @@
 			"showPostCounts": false,
 			"showOnlyTopLevel": false
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]
