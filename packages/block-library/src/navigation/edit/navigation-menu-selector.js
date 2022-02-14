@@ -60,6 +60,8 @@ export default function NavigationMenuSelector( {
 	const hasClassicMenus = !! classicMenus?.length;
 	const showNavigationMenus = !! canSwitchNavigationMenu;
 	const showClassicMenus = !! canUserCreateNavigationMenu;
+	const hasManagePermissions =
+		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
 	const showSelectMenus =
 		( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
 		( hasNavigationMenus || hasClassicMenus );
@@ -113,24 +115,22 @@ export default function NavigationMenuSelector( {
 				</MenuGroup>
 			) }
 
-			{ showManageActions &&
-				( canUserCreateNavigationMenu ||
-					canUserUpdateNavigationMenu ) && (
-					<MenuGroup label={ __( 'Tools' ) }>
-						{ canUserCreateNavigationMenu && (
-							<MenuItem onClick={ onCreateNew }>
-								{ __( 'Create new menu' ) }
-							</MenuItem>
-						) }
-						<MenuItem
-							href={ addQueryArgs( 'edit.php', {
-								post_type: 'wp_navigation',
-							} ) }
-						>
-							{ __( 'Manage menus' ) }
+			{ showManageActions && hasManagePermissions && (
+				<MenuGroup label={ __( 'Tools' ) }>
+					{ canUserCreateNavigationMenu && (
+						<MenuItem onClick={ onCreateNew }>
+							{ __( 'Create new menu' ) }
 						</MenuItem>
-					</MenuGroup>
-				) }
+					) }
+					<MenuItem
+						href={ addQueryArgs( 'edit.php', {
+							post_type: 'wp_navigation',
+						} ) }
+					>
+						{ __( 'Manage menus' ) }
+					</MenuItem>
+				</MenuGroup>
+			) }
 		</>
 	);
 }
