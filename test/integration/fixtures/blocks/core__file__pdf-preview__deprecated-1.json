@@ -1,11 +1,11 @@
 [
 	{
 		"name": "core/file",
-		"isValid": false,
+		"isValid": true,
 		"attributes": {
 			"href": "http://localhost:8889/wp-content/uploads/2021/04/yolo.pdf",
 			"fileName": "yolo",
-			"textLinkHref": "http://localhost:8888/wp-content/uploads/2021/04/yolo.pdf",
+			"textLinkHref": "http://localhost:8889/wp-content/uploads/2021/04/yolo.pdf",
 			"showDownloadButton": true,
 			"downloadButtonText": "Download",
 			"displayPreview": true,
