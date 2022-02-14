@@ -146,11 +146,13 @@ function ListViewBlock( {
 	} );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const settingsAriaLabel = sprintf(
-		// translators: %s: The title of the block.
-		__( 'Options for %s block' ),
-		blockInformation.title
-	);
+	const settingsAriaLabel = blockInformation
+		? sprintf(
+				// translators: %s: The title of the block.
+				__( 'Options for %s block' ),
+				blockInformation.title
+		  )
+		: __( 'Options' );
 
 	return (
 		<ListViewLeaf
