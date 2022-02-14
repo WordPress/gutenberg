@@ -1,24 +1,29 @@
+/**
+ * External dependencies
+ */
+import type { CSSProperties } from 'react';
+
 export type Box = {
-	top?: string;
-	right?: string;
-	bottom?: string;
-	left?: string;
+	top?: CSSProperties[ 'top' ];
+	right?: CSSProperties[ 'right' ];
+	bottom?: CSSProperties[ 'bottom' ];
+	left?: CSSProperties[ 'left' ];
 };
 
 export interface Style {
 	spacing?: {
-		margin?: string | Box;
-		padding?: string | Box;
+		margin?: CSSProperties[ 'margin' ] | Box;
+		padding?: CSSProperties[ 'padding' ] | Box;
 	};
 	typography?: {
-		fontSize?: string;
-		fontFamily?: string;
-		fontWeight?: string;
-		fontStyle?: string;
-		letterSpacing?: string;
-		lineHeight?: string;
-		textDecoration?: string;
-		textTransform?: string;
+		fontSize?: CSSProperties[ 'fontSize' ];
+		fontFamily?: CSSProperties[ 'fontFamily' ];
+		fontWeight?: CSSProperties[ 'fontWeight' ];
+		fontStyle?: CSSProperties[ 'fontStyle' ];
+		letterSpacing?: CSSProperties[ 'letterSpacing' ];
+		lineHeight?: CSSProperties[ 'lineHeight' ];
+		textDecoration?: CSSProperties[ 'textDecoration' ];
+		textTransform?: CSSProperties[ 'textTransform' ];
 	};
 }
 
