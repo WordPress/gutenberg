@@ -29,18 +29,22 @@ async function prepTestPost( postType, viewport ) {
 }
 
 async function publishTestPost( postType, viewport ) {
-	// Capitalize postType for use in snackbar XPath
-	const capitalizedPostType =
-		postType.charAt( 0 ).toUpperCase() + postType.slice( 1 );
-
 	// Create a post
 	await prepTestPost( postType, viewport );
 
 	// Publish the post
 	await publishPost();
 
-	await page.waitForXPath(
-		`//*[@aria-label="Dismiss this notice"]/div[contains(text(), "${ capitalizedPostType } published.")]`
+	const publishedSnackBar = await page.waitForXPath(
+		`//*[@aria-label="Dismiss this notice"][@role="button"]/div[contains(text(),"published")]`
+	);
+
+	const snackBarText = await (
+		await publishedSnackBar.getProperty( 'textContent' )
+	 ).jsonValue();
+
+	expect( snackBarText.toLowerCase() ).toBe(
+		`${ postType } published.view ${ postType }`
 	);
 
 	const closePublishingPanel = await page.waitForXPath(
@@ -91,6 +95,20 @@ async function scheduleTestPost( postType, viewport ) {
 	await closePublishingPanel.click();
 }
 
+async function verifyRevertToDraft( postType ) {
+	const revertedSnackBar = await page.waitForXPath(
+		`//*[@aria-label="Dismiss this notice"][@role="button"]/div[contains(text(),"reverted")]`
+	);
+
+	const revertedSnackBarText = await (
+		await revertedSnackBar.getProperty( 'textContent' )
+	 ).jsonValue();
+
+	expect( revertedSnackBarText.toLowerCase() ).toBe(
+		`${ postType } reverted to draft.`
+	);
+}
+
 describe( 'Clicking "Switch to draft" on a published post/page', () => {
 	beforeAll( async () => {
 		await trashAllPosts( 'post' );
@@ -105,7 +123,6 @@ describe( 'Clicking "Switch to draft" on a published post/page', () => {
 			[ 'post', 'page' ].forEach( ( postType ) => {
 				const buttonText =
 					viewport === 'large' ? 'Switch to draft' : 'Draft';
-				// Capitalize postType for use in snackbar XPath
 				beforeEach( async () => {
 					await setBrowserViewport( viewport );
 				} );
@@ -135,11 +152,6 @@ describe( 'Clicking "Switch to draft" on a published post/page', () => {
 					expect( postStatus ).toBe( 'publish' );
 				} );
 				it( `should revert a published ${ postType } to a draft if confirmed`, async () => {
-					// Capitalize postType for use in snackbar XPath
-					const capitalizedPostType =
-						postType.charAt( 0 ).toUpperCase() +
-						postType.slice( 1 );
-
 					// Switch to draft
 					const switchToDraftButton = await page.waitForXPath(
 						`//button[contains(text(), "${ buttonText }")]`
@@ -155,9 +167,7 @@ describe( 'Clicking "Switch to draft" on a published post/page', () => {
 					);
 					await confirmButton.click();
 
-					await page.waitForXPath(
-						`//*[@aria-label="Dismiss this notice"]/div[contains(text(), "${ capitalizedPostType } reverted to draft.")]`
-					);
+					await verifyRevertToDraft( postType );
 
 					const postStatus = await page.evaluate( () => {
 						return wp.data
@@ -184,7 +194,6 @@ describe( 'Clicking "Switch to draft" on a scheduled post/page', () => {
 			[ 'post', 'page' ].forEach( ( postType ) => {
 				const buttonText =
 					viewport === 'large' ? 'Switch to draft' : 'Draft';
-				// Capitalize postType for use in snackbar XPath
 				beforeEach( async () => {
 					await setBrowserViewport( viewport );
 				} );
@@ -215,11 +224,6 @@ describe( 'Clicking "Switch to draft" on a scheduled post/page', () => {
 					expect( postStatus ).toBe( 'future' );
 				} );
 				it( `should revert a scheduled ${ postType } to a draft if confirmed`, async () => {
-					// Capitalize postType for use in snackbar XPath
-					const capitalizedPostType =
-						postType.charAt( 0 ).toUpperCase() +
-						postType.slice( 1 );
-
 					// Switch to draft
 					const switchToDraftButton = await page.waitForXPath(
 						`//button[contains(text(), "${ buttonText }")]`
@@ -235,9 +239,7 @@ describe( 'Clicking "Switch to draft" on a scheduled post/page', () => {
 					);
 					await confirmButton.click();
 
-					await page.waitForXPath(
-						`//*[@aria-label="Dismiss this notice"]/div[contains(text(), "${ capitalizedPostType } reverted to draft.")]`
-					);
+					await verifyRevertToDraft( postType );
 
 					const postStatus = await page.evaluate( () => {
 						return wp.data
