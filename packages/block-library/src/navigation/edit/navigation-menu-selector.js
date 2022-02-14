@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { MenuGroup, MenuItem } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-
+import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -13,20 +13,27 @@ import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 import useConvertClassicMenu from '../use-convert-classic-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
-import ExistingMenusOptions from './existing-menus-options';
 
 export default function NavigationMenuSelector( {
 	clientId,
 	onSelect,
 	onCreateNew,
-	canUserCreateNavigation = false,
-	canUserSwitchNavigation = false,
+	showManageActions = false,
+	actionLabel,
 } ) {
+	/* translators: %s: The name of a menu. */
+	const createActionLabel = __( "Create from '%s'" );
+
+	actionLabel = actionLabel || createActionLabel;
+
+	const { menus: classicMenus } = useNavigationEntities();
+
 	const {
-		menus: classicMenus,
-		hasMenus: hasClassicMenus,
-	} = useNavigationEntities();
-	const { navigationMenus } = useNavigationMenu();
+		navigationMenus,
+		canUserCreateNavigation: canUserCreateNavigationMenu,
+		canUserUpdateNavigationEntity: canUserUpdateNavigationMenu,
+		canSwitchNavigationMenu,
+	} = useNavigationMenu();
 
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
@@ -34,7 +41,7 @@ export default function NavigationMenuSelector( {
 		blocks,
 		navigationMenuTitle = null
 	) => {
-		if ( ! canUserCreateNavigation ) {
+		if ( ! canUserCreateNavigationMenu ) {
 			return;
 		}
 
@@ -49,9 +56,15 @@ export default function NavigationMenuSelector( {
 		onFinishMenuCreation
 	);
 
+	const hasNavigationMenus = !! navigationMenus?.length;
+	const hasClassicMenus = !! classicMenus?.length;
+	const showNavigationMenus = !! canSwitchNavigationMenu;
+	const showClassicMenus = !! canUserCreateNavigationMenu;
+	const hasManagePermissions =
+		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
 	const showSelectMenus =
-		( canUserSwitchNavigation || canUserCreateNavigation ) &&
-		( navigationMenus?.length || hasClassicMenus );
+		( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
+		( hasNavigationMenus || hasClassicMenus );
 
 	if ( ! showSelectMenus ) {
 		return null;
@@ -59,24 +72,56 @@ export default function NavigationMenuSelector( {
 
 	return (
 		<>
-			<ExistingMenusOptions
-				showNavigationMenus={ canUserSwitchNavigation }
-				showClassicMenus={ canUserCreateNavigation }
-				navigationMenus={ navigationMenus }
-				classicMenus={ classicMenus }
-				onSelectNavigationMenu={ onSelect }
-				onSelectClassicMenu={ ( { id, name } ) =>
-					convertClassicMenuToBlocks( id, name )
-				}
-				/* translators: %s: The name of a menu. */
-				actionLabel={ __( "Switch to '%s'" ) }
-			/>
+			{ showNavigationMenus && hasNavigationMenus && (
+				<MenuGroup label={ __( 'Menus' ) }>
+					{ navigationMenus.map( ( menu ) => {
+						const label = decodeEntities( menu.title.rendered );
+						return (
+							<MenuItem
+								onClick={ () => {
+									onSelect( menu );
+								} }
+								key={ menu.id }
+								aria-label={ sprintf( actionLabel, label ) }
+							>
+								{ label }
+							</MenuItem>
+						);
+					} ) }
+				</MenuGroup>
+			) }
+			{ showClassicMenus && hasClassicMenus && (
+				<MenuGroup label={ __( 'Classic Menus' ) }>
+					{ classicMenus.map( ( menu ) => {
+						const label = decodeEntities( menu.name );
+						return (
+							<MenuItem
+								onClick={ () => {
+									convertClassicMenuToBlocks(
+										menu.id,
+										menu.name
+									);
+								} }
+								key={ menu.id }
+								aria-label={ sprintf(
+									createActionLabel,
+									label
+								) }
+							>
+								{ label }
+							</MenuItem>
+						);
+					} ) }
+				</MenuGroup>
+			) }
 
-			{ canUserCreateNavigation && (
+			{ showManageActions && hasManagePermissions && (
 				<MenuGroup label={ __( 'Tools' ) }>
-					<MenuItem onClick={ onCreateNew }>
-						{ __( 'Create new menu' ) }
-					</MenuItem>
+					{ canUserCreateNavigationMenu && (
+						<MenuItem onClick={ onCreateNew }>
+							{ __( 'Create new menu' ) }
+						</MenuItem>
+					) }
 					<MenuItem
 						href={ addQueryArgs( 'edit.php', {
 							post_type: 'wp_navigation',

@@ -496,12 +496,9 @@ function Navigation( {
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
-										canUserCreateNavigation={
-											canUserCreateNavigation
-										}
-										canUserSwitchNavigation={
-											canSwitchNavigationMenu
-										}
+										/* translators: %s: The name of a menu. */
+										actionLabel={ __( "Switch to '%s'" ) }
+										showManageActions
 									/>
 								) }
 							</ToolbarDropdownMenu>
