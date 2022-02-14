@@ -238,7 +238,7 @@ function ListViewBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ selectEditorBlock }
+							__experimentalSelectBlock={ selectBlock }
 						/>
 					) }
 				</TreeGridCell>
