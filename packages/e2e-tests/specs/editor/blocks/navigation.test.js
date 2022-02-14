@@ -120,10 +120,10 @@ async function selectClassicMenu( optionText ) {
 	);
 	await theOption.click();
 
-	const navLinkBlockSelector =
-		'[aria-label="Editor content"][role="region"] [aria-label="Block: Custom Link"]';
-
-	await page.waitForSelector( navLinkBlockSelector );
+	await page.waitForResponse(
+		( response ) =>
+			response.url().includes( 'menu-items' ) && response.status() === 200
+	);
 }
 
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
