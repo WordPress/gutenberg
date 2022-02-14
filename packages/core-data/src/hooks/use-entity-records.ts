@@ -24,10 +24,10 @@ interface EntityRecordsResolution< RecordType > {
 }
 
 /**
- * Resolves the specified entity record.
+ * Resolves the specified entity records.
  *
- * @param  kind      Kind of the requested entity.
- * @param  name      Name of the requested  entity.
+ * @param  kind      Kind of the requested entities.
+ * @param  name      Name of the requested entities.
  * @param  httpQuery HTTP query for the requested entities.
  *
  * @example
@@ -58,7 +58,7 @@ interface EntityRecordsResolution< RecordType > {
  * application, the list of records and the resolution details will be retrieved from
  * the store state using `getEntityRecords()`, or resolved if missing.
  *
- * @return {EntityRecordsResolution<RecordType>} Entity record data.
+ * @return {EntityRecordsResolution<RecordType>} Entity records data.
  * @template RecordType
  */
 export default function __experimentalUseEntityRecords< RecordType >(
