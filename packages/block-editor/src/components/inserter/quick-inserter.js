@@ -64,10 +64,10 @@ export default function QuickInserter( {
 			return {
 				setInserterIsOpened: settings.__experimentalSetIsInserterOpened,
 				prioritizePatterns:
-					settings.__experimentalPrioritizePatternsOnQuickInserterRoot &&
+					settings.__experimentalPreferPatternsOnRoot &&
 					! rootClientId &&
 					index > 0 &&
-					index < blockCount,
+					( index < blockCount || blockCount === 0 ),
 				insertionIndex: index === -1 ? blockCount : index,
 			};
 		},
@@ -128,7 +128,7 @@ export default function QuickInserter( {
 					maxBlockPatterns={ maxBlockPatterns }
 					maxBlockTypes={ SHOWN_BLOCK_TYPES }
 					isDraggable={ false }
-					__experimentalPrioritizePatterns={ prioritizePatterns }
+					prioritizePatterns={ prioritizePatterns }
 				/>
 			</div>
 

@@ -98,7 +98,7 @@ export const getSettings = createSelector(
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 			__experimentalReusableBlocks: getReusableBlocks( state ),
-			__experimentalPrioritizePatternsOnQuickInserterRoot:
+			__experimentalPreferPatternsOnRoot:
 				'wp_template' === getEditedPostType( state ),
 		};
 

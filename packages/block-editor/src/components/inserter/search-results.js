@@ -48,7 +48,7 @@ function InserterSearchResults( {
 	showBlockDirectory = false,
 	isDraggable = true,
 	shouldFocusBlock = true,
-	__experimentalPrioritizePatterns,
+	prioritizePatterns,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -72,6 +72,9 @@ function InserterSearchResults( {
 	);
 
 	const filteredBlockPatterns = useMemo( () => {
+		if ( maxBlockPatterns === 0 ) {
+			return [];
+		}
 		const results = searchItems( patterns, filterValue );
 		return maxBlockPatterns !== undefined
 			? results.slice( 0, maxBlockPatterns )
@@ -79,14 +82,14 @@ function InserterSearchResults( {
 	}, [ filterValue, patterns, maxBlockPatterns ] );
 
 	let maxBlockTypesToShow = maxBlockTypes;
-	if (
-		__experimentalPrioritizePatterns &&
-		filteredBlockPatterns.length > 2
-	) {
+	if ( prioritizePatterns && filteredBlockPatterns.length > 2 ) {
 		maxBlockTypesToShow = 0;
 	}
 
 	const filteredBlockTypes = useMemo( () => {
+		if ( maxBlockTypesToShow === 0 ) {
+			return [];
+		}
 		const results = searchBlockItems(
 			orderBy( blockTypes, [ 'frecency' ], [ 'desc' ] ),
 			blockTypeCategories,
@@ -166,14 +169,14 @@ function InserterSearchResults( {
 		<InserterListbox>
 			{ ! showBlockDirectory && ! hasItems && <InserterNoResults /> }
 
-			{ __experimentalPrioritizePatterns ? patternsUI : blocksUI }
+			{ prioritizePatterns ? patternsUI : blocksUI }
 
 			{ !! filteredBlockTypes.length &&
 				!! filteredBlockPatterns.length && (
 					<div className="block-editor-inserter__quick-inserter-separator" />
 				) }
 
-			{ __experimentalPrioritizePatterns ? blocksUI : patternsUI }
+			{ prioritizePatterns ? blocksUI : patternsUI }
 
 			{ showBlockDirectory && (
 				<__unstableInserterMenuExtension.Slot
