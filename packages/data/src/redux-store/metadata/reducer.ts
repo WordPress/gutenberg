@@ -54,6 +54,7 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 				isResolving: false,
 				error: action.error,
 			} );
+
 			return nextState;
 		}
 		case 'START_RESOLUTIONS':

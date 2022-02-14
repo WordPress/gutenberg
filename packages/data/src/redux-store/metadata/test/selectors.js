@@ -19,6 +19,14 @@ import { createRegistry } from '@wordpress/data';
 
 jest.useFakeTimers();
 
+async function resolve( registry, selector ) {
+	const resolution = registry.resolveSelect( 'store' )[ selector ]();
+	jest.advanceTimersByTime( 100 );
+	try {
+		await resolution;
+	} catch ( e ) {}
+}
+
 describe( 'getIsResolving', () => {
 	it( 'should return undefined if no state by reducerKey, selectorName', () => {
 		const state = {};
@@ -181,8 +189,7 @@ describe( 'hasLastResolutionFailed', () => {
 			registry.select( 'store' ).hasLastResolutionFailed( 'getItems' )
 		).toBeFalsy();
 
-		registry.select( 'store' ).getItems();
-		jest.advanceTimersByTime( 1 );
+		await resolve( registry, 'getItems' );
 
 		expect(
 			registry.select( 'store' ).hasLastResolutionFailed( 'getItems' )
@@ -239,8 +246,7 @@ describe( 'getLastResolutionFailure', () => {
 			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
 		).toBeFalsy();
 
-		registry.select( 'store' ).getItems();
-		jest.advanceTimersByTime( 1 );
+		await resolve( registry, 'getItems' );
 
 		expect(
 			registry
@@ -256,8 +262,7 @@ describe( 'getLastResolutionFailure', () => {
 			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
 		).toBeFalsy();
 
-		registry.select( 'store' ).getItems();
-		jest.advanceTimersByTime( 1 );
+		await resolve( registry, 'getItems' );
 
 		expect(
 			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
