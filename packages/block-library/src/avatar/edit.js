@@ -22,7 +22,7 @@ import { __, isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useUserAvatar, useCommentAvatar } from './utils';
+import { useUserAvatar, useCommentAvatar } from './hooks';
 
 const AvatarInspectorControls = ( { setAttributes, avatar, attributes } ) => (
 	<InspectorControls>
