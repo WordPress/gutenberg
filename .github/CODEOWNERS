@@ -14,6 +14,7 @@
 
 # Blocks
 /packages/block-library                         @ajitbohra
+/packages/block-library/src/gallery             @geriux
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
 /packages/block-library/src/navigation          @tellthemachines
