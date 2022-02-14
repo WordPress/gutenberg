@@ -49,7 +49,7 @@ interface EntityRecordResolution< RecordType > {
  * ```
  *
  * In the above example, when `PageTitleDisplay` is rendered into an
- * application, the price and the resolution details will be retrieved from
+ * application, the page and the resolution details will be retrieved from
  * the store state using `getEntityRecord()`, or resolved if missing.
  *
  * @return {EntityRecordResolution<RecordType>} Entity record data.
@@ -60,28 +60,13 @@ export default function __experimentalUseEntityRecord< RecordType >(
 	name: string,
 	recordId: string | number
 ): EntityRecordResolution< RecordType > {
-	const { data, isResolving, hasResolved } = useQuerySelect(
+	const { data: record, ...rest } = useQuerySelect(
 		( query ) => query( coreStore ).getEntityRecord( kind, name, recordId ),
 		[ kind, name, recordId ]
 	);
 
-	let status;
-	if ( isResolving ) {
-		status = Status.Resolving;
-	} else if ( hasResolved ) {
-		if ( data ) {
-			status = Status.Success;
-		} else {
-			status = Status.Error;
-		}
-	} else {
-		status = Status.Idle;
-	}
-
 	return {
-		status,
-		record: data,
-		isResolving,
-		hasResolved,
+		record,
+		...rest,
 	};
 }

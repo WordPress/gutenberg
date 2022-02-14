@@ -7,6 +7,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import memoize from './memoize';
+import { Status } from './constants';
 
 export const META_SELECTORS = [
 	'getIsResolving',
@@ -71,10 +72,28 @@ interface QuerySelectResponse {
  * @return {QuerySelectResponse} Queried data.
  */
 export default function __experimentalUseQuerySelect( mapQuerySelect, deps ) {
-	return useSelect( ( select, registry ) => {
-		const resolve = ( store ) => enrichSelectors( select( store ) );
-		return mapQuerySelect( resolve, registry );
-	}, deps );
+	const { data, isResolving, hasResolved, ...rest } = useSelect(
+		( select, registry ) => {
+			const resolve = ( store ) => enrichSelectors( select( store ) );
+			return mapQuerySelect( resolve, registry );
+		},
+		deps
+	);
+
+	let status;
+	if ( isResolving ) {
+		status = Status.Resolving;
+	} else if ( hasResolved ) {
+		if ( data ) {
+			status = Status.Success;
+		} else {
+			status = Status.Error;
+		}
+	} else {
+		status = Status.Idle;
+	}
+
+	return { data, isResolving, hasResolved, status, ...rest };
 }
 
 type QuerySelector = ( ...args ) => QuerySelectResponse;
@@ -99,14 +118,12 @@ const enrichSelectors = memoize( ( selectors ) => {
 			get: () => ( ...args ) => {
 				const {
 					getIsResolving,
-					hasStartedResolution,
 					hasFinishedResolution,
 				} = selectors;
 				const isResolving = !! getIsResolving( selectorName, args );
 				return {
 					data: selectors[ selectorName ]( ...args ),
 					isResolving,
-					hasStarted: hasStartedResolution( selectorName, args ),
 					hasResolved:
 						! isResolving &&
 						hasFinishedResolution( selectorName, args ),
