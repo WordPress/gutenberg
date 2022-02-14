@@ -23,7 +23,7 @@ Renders a list view with default syles.
 ```jsx
 import { ListView } from '@wordpress/block-editor';
 
-const MyNavigation = () => <ListView onSelect={ onClose } />;
+const MyNavigation = () => <ListView />;
 ```
 
 ## Related components

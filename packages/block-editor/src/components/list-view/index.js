@@ -44,15 +44,14 @@ const expanded = ( state, action ) => {
  * recursive component (it renders itself), so this ensures TreeGrid is only
  * present at the very top of the navigation grid.
  *
- * @param {Object}   props                                          Components props.
- * @param {Array}    props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {Function} props.onSelect                                 Block selection callback.
- * @param {boolean}  props.showNestedBlocks                         Flag to enable displaying nested blocks.
- * @param {boolean}  props.showBlockMovers                          Flag to enable block movers
- * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
- * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
- * @param {boolean}  props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
- * @param {Object}   ref                                            Forwarded ref
+ * @param {Object}  props                                          Components props.
+ * @param {Array}   props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean} props.showNestedBlocks                         Flag to enable displaying nested blocks.
+ * @param {boolean} props.showBlockMovers                          Flag to enable block movers
+ * @param {boolean} props.__experimentalFeatures                   Flag to enable experimental features.
+ * @param {boolean} props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
+ * @param {boolean} props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
+ * @param {Object}  ref                                            Forwarded ref
  */
 function ListView(
 	{
@@ -144,6 +143,18 @@ function ListView(
 		},
 		[ collapse ]
 	);
+	const changeRow = useCallback(
+		( event, startRow, endRow ) => {
+			if ( event.shiftKey ) {
+				updateBlockSelection(
+					event,
+					startRow?.dataset?.block,
+					endRow?.dataset?.block
+				);
+			}
+		},
+		[ updateBlockSelection ]
+	);
 
 	const contextValue = useMemo(
 		() => ( {
@@ -180,6 +191,7 @@ function ListView(
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
+				onChangeRow={ changeRow }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch

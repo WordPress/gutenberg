@@ -104,7 +104,7 @@ function ListViewBlock( {
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
-			selectBlock( clientId, event );
+			selectBlock( event, clientId );
 		},
 		[ clientId, selectBlock ]
 	);

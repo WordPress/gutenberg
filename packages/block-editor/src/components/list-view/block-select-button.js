@@ -19,7 +19,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { getBlockPositionDescription } from './utils';
 import BlockTitle from '../block-title';
 import ListViewExpander from './expander';
-import { UP, DOWN, SPACE, ENTER } from '@wordpress/keycodes';
+import { SPACE, ENTER } from '@wordpress/keycodes';
 
 function ListViewBlockSelectButton(
 	{
@@ -59,12 +59,7 @@ function ListViewBlockSelectButton(
 	};
 
 	function onKeyDownHandler( event ) {
-		if (
-			event.keyCode === ENTER ||
-			event.keyCode === SPACE ||
-			( event.shiftKey &&
-				( event.keyCode === UP || event.keyCode === DOWN ) )
-		) {
+		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
 		}
 	}

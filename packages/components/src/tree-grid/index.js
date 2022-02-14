@@ -45,10 +45,17 @@ function getRowFocusables( rowElement ) {
  * @param {WPElement} props.children      Children to be rendered.
  * @param {Function}  props.onExpandRow   Callback to fire when row is expanded.
  * @param {Function}  props.onCollapseRow Callback to fire when row is collapsed.
+ * @param {Function}  props.onChangeRow   Callback to fire when moving focus to a different row.
  * @param {Object}    ref                 A ref to the underlying DOM table element.
  */
 function TreeGrid(
-	{ children, onExpandRow = () => {}, onCollapseRow = () => {}, ...props },
+	{
+		children,
+		onExpandRow = () => {},
+		onCollapseRow = () => {},
+		onChangeRow = () => {},
+		...props
+	},
 	ref
 ) {
 	const onKeyDown = useCallback(
@@ -216,6 +223,10 @@ function TreeGrid(
 					focusablesInNextRow.length - 1
 				);
 				focusablesInNextRow[ nextIndex ].focus();
+
+				// Let consumers know the row that was originally focused,
+				// and the row that is now in focus.
+				onChangeRow( event, activeRow, rows[ nextRowIndex ] );
 
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
