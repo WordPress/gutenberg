@@ -26,6 +26,7 @@ The properties available for block patterns are:
 -   `categories` (optional): An array of registered pattern categories used to group block patterns. Block patterns can be shown on multiple categories. A category must be registered separately in order to be used here.
 -   `keywords` (optional): An array of aliases or keywords that help users discover the pattern while searching.
 -   `viewportWidth` (optional): An integer specifying the intended width of the pattern to allow for a scaled preview of the pattern in the inserter.
+-   `blockTypes` (optional): An array of block types that the pattern is intended to be used with.
 
 The following code sample registers a block pattern named 'my-plugin/my-awesome-pattern':
 
@@ -135,4 +136,48 @@ function my_plugin_unregister_my_pattern_categories() {
 }
  
 add_action( 'init', 'my_plugin_unregister_my_pattern_categories' );
+```
+
+## Block patterns contextual to block types
+
+It is possible to attach a block pattern to one or multiple block types. This makes the block pattern as an available transform for that block type.
+
+For instance:
+
+```php
+register_block_pattern(
+	'my-plugin/powered-by-wordpress',
+	array(
+		'title'      => __( 'Powered by WordPress', 'my-plugin' ),
+		'blockTypes' => array( 'core/paragraph' ),
+		'content'    => '<!-- wp:paragraph -->
+		<p>Powered by WordPress</p>
+		<!-- /wp:paragraph -->
+		',
+	)
+);
+```
+
+The above code registers a block pattern named 'my-plugin/powered-by-wordpress' and also shows the pattern in the "transform menu" of paragraph blocks.
+
+Blocks can also use these contextual block patterns in other places. For instance, when inserting a new Query Loop block, the user is provided with a list of all patterns attached to the block.
+
+## Semantic block patterns
+
+In block themes, you can also mark block patterns as "header" or "footer" patterns (template part areas). We call these "semantic block patterns". These patterns are shown to the user when inserting or replacing header or footer template parts.
+
+Example:
+
+```php
+<?php
+register_block_pattern(
+	'my-plugin/my-header',
+	array(
+		'title'      => __( 'My Header', 'my-plugin' ),
+		'categories' => array( 'header' ),
+		// Assigning the pattern the "header" area.
+		'blockTypes' => array( 'core/template-part/header' ),
+		'content'    => 'Content of my block pattern',
+	)
+);
 ```
