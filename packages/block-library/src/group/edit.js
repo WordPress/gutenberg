@@ -37,8 +37,6 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	backgroundImageStyles,
 	dimRatioToClass,
-	isContentPositionCenter,
-	getPositionClassName,
 } from './shared';
 /* eslint-enable no-unused-vars */
 
