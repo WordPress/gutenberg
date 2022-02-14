@@ -59,7 +59,7 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			if ( $page ) {
 				$comment_args['paged'] = $page;
 			} elseif ( 'oldest' === $default_page ) {
-				$comment_args['paged'] = 0;
+				$comment_args['paged'] = 1;
 			} elseif ( 'newest' === $default_page ) {
 				$comment_args['paged'] = ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
 			}
