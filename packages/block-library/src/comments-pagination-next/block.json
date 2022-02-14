@@ -12,7 +12,13 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [ "postId", "comments/perPage", "comments/paginationArrow", "comments/inherit" ],
+	"usesContext": [
+		"postId",
+		"comments/perPage",
+		"comments/order",
+		"comments/inherit",
+		"comments/defaultPage"
+	],
 	"supports": {
 		"reusable": false,
 		"html": false,
