@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
+import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
  * Internal dependencies
@@ -28,14 +29,16 @@ export function useNavigatorLink(
 		...otherProps
 	} = useContextSystem( props, 'NavigatorLink' );
 
+	const escapedPath = escapeAttribute( path );
+
 	const { goTo } = useNavigator();
 	const handleClick: React.MouseEventHandler< HTMLElement > = useCallback(
 		( e ) => {
 			e.preventDefault();
-			goTo( path, {
+			goTo( escapedPath, {
 				focusTargetSelector: cssSelectorForAttribute(
 					attributeName,
-					path
+					escapedPath
 				),
 			} );
 			onClick?.( e );
@@ -46,8 +49,7 @@ export function useNavigatorLink(
 	return {
 		as,
 		onClick: handleClick,
-		path,
 		...otherProps,
-		[ attributeName ]: path,
+		[ attributeName ]: escapedPath,
 	};
 }

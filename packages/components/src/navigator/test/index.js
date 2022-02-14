@@ -28,10 +28,16 @@ jest.mock( 'framer-motion', () => {
 	};
 } );
 
+const INVALID_HTML_ATTRIBUTE = {
+	raw: ' "\'><=invalid_path',
+	escaped: " &quot;'&gt;<=invalid_path",
+};
+
 const PATHS = {
 	HOME: '/',
 	CHILD: '/child',
 	NESTED: '/child/nested',
+	INVALID_HTML_ATTRIBUTE: INVALID_HTML_ATTRIBUTE.raw,
 	NOT_FOUND: '/not-found',
 };
 
@@ -92,6 +98,12 @@ const MyNavigation = ( {
 			>
 				Navigate to child screen.
 			</NavigatorButton>
+			<NavigatorButton
+				path={ PATHS.INVALID_HTML_ATTRIBUTE }
+				onClick={ onNavigatorButtonClick }
+			>
+				Navigate to screen with an invalid HTML value as a path.
+			</NavigatorButton>
 		</NavigatorScreen>
 
 		<NavigatorScreen path={ PATHS.CHILD }>
@@ -109,6 +121,13 @@ const MyNavigation = ( {
 
 		<NavigatorScreen path={ PATHS.NESTED }>
 			<p>This is the nested screen.</p>
+			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
+				Go back
+			</NavigatorBackButton>
+		</NavigatorScreen>
+
+		<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+			<p>This is the screen with an invalid HTML value as a path.</p>
 			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
 				Go back
 			</NavigatorBackButton>
@@ -134,6 +153,13 @@ const getNestedScreen = ( { throwIfNotFound } = {} ) =>
 	getNavigationScreenByText( 'This is the nested screen.', {
 		throwIfNotFound,
 	} );
+const getInvalidHTMLPathScreen = ( { throwIfNotFound } = {} ) =>
+	getNavigationScreenByText(
+		'This is the screen with an invalid HTML value as a path.',
+		{
+			throwIfNotFound,
+		}
+	);
 
 const getNavigationButtonByText = ( text, { throwIfNotFound = true } = {} ) => {
 	const fnName = throwIfNotFound ? 'getByRole' : 'queryByRole';
@@ -151,6 +177,13 @@ const getToNestedScreenButton = ( { throwIfNotFound } = {} ) =>
 	getNavigationButtonByText( 'Navigate to nested screen.', {
 		throwIfNotFound,
 	} );
+const getToInvalidHTMLPathScreenButton = ( { throwIfNotFound } = {} ) =>
+	getNavigationButtonByText(
+		'Navigate to screen with an invalid HTML value as a path.',
+		{
+			throwIfNotFound,
+		}
+	);
 const getBackButton = ( { throwIfNotFound } = {} ) =>
 	getNavigationButtonByText( 'Go back', {
 		throwIfNotFound,
@@ -340,5 +373,32 @@ describe( 'Navigator', () => {
 
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toHaveFocus();
+	} );
+
+	it( 'should escape the value of the `path` prop', () => {
+		render( <MyNavigation /> );
+
+		expect( getHomeScreen() ).toBeInTheDocument();
+		expect( getToInvalidHTMLPathScreenButton() ).toBeInTheDocument();
+
+		// The following line tests the implementation details, but it's necessary
+		// as this would be otherwise transparent to the user.
+		expect( getToInvalidHTMLPathScreenButton() ).toHaveAttribute(
+			'id',
+			INVALID_HTML_ATTRIBUTE.escaped
+		);
+
+		// Navigate to screen with an invalid HTML value for its `path`
+		fireEvent.click( getToInvalidHTMLPathScreenButton() );
+
+		expect( getInvalidHTMLPathScreen() ).toBeInTheDocument();
+		expect( getBackButton() ).toBeInTheDocument();
+
+		// Navigate back to home screen, check that the focus restoration selector
+		// worked correctly despite the escaping
+		fireEvent.click( getBackButton() );
+
+		expect( getHomeScreen() ).toBeInTheDocument();
+		expect( getToInvalidHTMLPathScreenButton() ).toHaveFocus();
 	} );
 } );

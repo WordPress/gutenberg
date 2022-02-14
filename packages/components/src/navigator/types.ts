@@ -57,7 +57,8 @@ export type NavigatorBackLinkProps = {
 
 export type NavigatorLinkProps = NavigatorBackLinkProps & {
 	/**
-	 * The path of the screen to navigate to.
+	 * The path of the screen to navigate to. The value of this prop needs to be
+	 * a valid value for an HTML attribute.
 	 */
 	path: string;
 	/**

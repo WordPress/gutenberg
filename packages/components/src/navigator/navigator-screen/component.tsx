@@ -17,6 +17,7 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
+import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
  * Internal dependencies
@@ -51,7 +52,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 
 	const prefersReducedMotion = useReducedMotion();
 	const { location } = useContext( NavigatorContext );
-	const isMatch = location.path === path;
+	const isMatch = location.path === escapeAttribute( path );
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
 	const previousLocation = usePrevious( location );
