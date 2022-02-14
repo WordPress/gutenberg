@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ import type { NavigatorBackLinkProps } from '../types';
 
 function NavigatorBackLink(
 	props: WordPressComponentProps< NavigatorBackLinkProps, 'button' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const navigatorBackLinkProps = useNavigatorBackLink( props );
 

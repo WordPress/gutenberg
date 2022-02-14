@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 import { css } from '@emotion/react';
 
 /**
@@ -28,7 +28,7 @@ import type {
 
 function NavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		initialPath,
