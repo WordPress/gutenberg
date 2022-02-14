@@ -348,8 +348,8 @@ export function getColorsAndGradients(
 							},
 					  }
 					: features?.color ),
-				defaultPalette: !! defaultEditorColors,
-				defaultGradients: !! defaultEditorGradients,
+				defaultPalette: defaultEditorColors?.length > 0,
+				defaultGradients: defaultEditorGradients?.length > 0,
 			},
 		},
 	};
