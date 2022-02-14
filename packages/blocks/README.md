@@ -566,6 +566,8 @@ _Returns_
 
 ### isValidBlockContent
 
+> **Deprecated** Use validateBlock instead to avoid data loss.
+
 Returns true if the parsed block is valid given the input content. A block
 is considered valid if, when serialized with assumed attributes, the content
 matches the original value.
@@ -880,6 +882,22 @@ _Parameters_
 
 -   _slug_ `string`: Block category slug.
 -   _category_ `WPBlockCategory`: Object containing the category properties that should be updated.
+
+### validateBlock
+
+Returns an object with `isValid` property set to `true` if the parsed block
+is valid given the input content. A block is considered valid if, when serialized
+with assumed attributes, the content matches the original value. If block is
+invalid, this function returns all validations issues as well.
+
+_Parameters_
+
+-   _block_ `import('../parser').WPBlock`: block object.
+-   _blockTypeOrName_ `[import('../registration').WPBlockType]`: Block type or name, inferred from block if not given.
+
+_Returns_
+
+-   `[boolean,Object]`: validation results.
 
 ### withBlockContentContext
 

@@ -7,6 +7,7 @@ import { identity, xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -700,12 +701,12 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  * with assumed attributes, the content matches the original value. If block is
  * invalid, this function returns all validations issues as well.
  *
- * @param {import('../parser').WPBlock}           block           block object.
- * @param {import('../registration').WPBlockType} blockTypeOrName Block type or name.
+ * @param {import('../parser').WPBlock}           block             block object.
+ * @param {import('../registration').WPBlockType} [blockTypeOrName] Block type or name, inferred from block if not given.
  *
  * @return {[boolean,Object]} validation results.
  */
-export function validateBlock( block, blockTypeOrName ) {
+export function validateBlock( block, blockTypeOrName = block.name ) {
 	const isFallbackBlock =
 		block.name === getFreeformContentHandlerName() ||
 		block.name === getUnregisteredTypeHandlerName();
@@ -755,6 +756,8 @@ export function validateBlock( block, blockTypeOrName ) {
  *
  * Logs to console in development environments when invalid.
  *
+ * @deprecated Use validateBlock instead to avoid data loss.
+ *
  * @param {string|Object} blockTypeOrName      Block type.
  * @param {Object}        attributes           Parsed block attributes.
  * @param {string}        originalBlockContent Original block content.
@@ -766,6 +769,12 @@ export function isValidBlockContent(
 	attributes,
 	originalBlockContent
 ) {
+	deprecated( 'isValidBlockContent introduces opportunity for data loss', {
+		since: '12.6',
+		plugin: 'Gutenberg',
+		alternative: 'validateBlock',
+	} );
+
 	const blockType = normalizeBlockType( blockTypeOrName );
 	const block = {
 		name: blockType.name,
