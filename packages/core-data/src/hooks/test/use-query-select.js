@@ -123,8 +123,8 @@ describe( 'useQuerySelect', () => {
 		expect( querySelectData ).toEqual( {
 			data: 'bar',
 			isResolving: false,
-			hasStarted: false,
 			hasResolved: false,
+			status: 'IDLE',
 		} );
 	} );
 
@@ -171,8 +171,8 @@ describe( 'useQuerySelect', () => {
 		expect( querySelectData ).toEqual( {
 			data: 10,
 			isResolving: false,
-			hasStarted: false,
 			hasResolved: false,
+			status: 'IDLE',
 		} );
 
 		await act( async () => {
@@ -188,8 +188,8 @@ describe( 'useQuerySelect', () => {
 		expect( querySelectData ).toEqual( {
 			data: 15,
 			isResolving: false,
-			hasStarted: true,
 			hasResolved: true,
+			status: 'SUCCESS',
 		} );
 	} );
 } );
