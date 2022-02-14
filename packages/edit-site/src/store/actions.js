@@ -209,11 +209,17 @@ export function* setPage( page ) {
 
 		page.path = getPathAndQueryString( entity.link );
 	}
-	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
+	const template = yield controls.resolveSelect(
 		coreStore,
 		'__experimentalGetTemplateForLink',
 		page.path
 	);
+
+	if ( ! template ) {
+		return;
+	}
+
+	const { id: templateId, slug: templateSlug } = template;
 	yield {
 		type: 'SET_PAGE',
 		page: ! templateSlug
