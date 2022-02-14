@@ -67,7 +67,8 @@ export default function __experimentalUseEntityRecords< RecordType >(
 	httpQuery: unknown = {}
 ): EntityRecordsResolution< RecordType > {
 	const { data: records, ...rest } = useQuerySelect(
-		( query ) => query( coreStore ).getEntityRecords( kind, name, httpQuery ),
+		( query ) =>
+			query( coreStore ).getEntityRecords( kind, name, httpQuery ),
 		[ kind, name, httpQuery ]
 	);
 
