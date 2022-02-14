@@ -1,13 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/separator",
 		"isValid": true,
 		"attributes": {
 			"backgroundColor": "accent",
 			"opacity": "css"
 		},
-		"innerBlocks": [],
-		"originalContent": "<hr class=\"wp-block-separator has-text-color has-background has-accent-background-color has-accent-color\"/>"
+		"innerBlocks": []
 	}
 ]
