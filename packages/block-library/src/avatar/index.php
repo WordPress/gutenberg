@@ -38,8 +38,9 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 	$classes = isset( $wrapper_attributes['class'] ) ? $wrapper_attributes['class'] : '';
 
 	if ( ! isset( $block->context['commentId'] ) ) {
-		$author_id    = get_post_field( 'post_author', $block->context['postId'] );
-		$author_name  = get_the_author_meta( 'display_name', $author_id );
+		$author_id   = get_post_field( 'post_author', $block->context['postId'] );
+		$author_name = get_the_author_meta( 'display_name', $author_id );
+		// translators: %s is the Author name.
 		$alt          = sprintf( __( '%s Avatar' ), $author_name );
 		$avatar_block = get_avatar(
 			$author_id,
