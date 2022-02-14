@@ -52,7 +52,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
       >
         <CardBody>
           <ItemGroup>
-            <NavigatorLink
+            <NavigatorButton
               as={
                 Object {
                   "$$typeof": Symbol(react.forward_ref),
@@ -90,8 +90,8 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                   />
                 </FlexItem>
               </HStack>
-            </NavigatorLink>
-            <NavigatorLink
+            </NavigatorButton>
+            <NavigatorButton
               as={
                 Object {
                   "$$typeof": Symbol(react.forward_ref),
@@ -129,8 +129,8 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                   />
                 </FlexItem>
               </HStack>
-            </NavigatorLink>
-            <NavigatorLink
+            </NavigatorButton>
+            <NavigatorButton
               as={
                 Object {
                   "$$typeof": Symbol(react.forward_ref),
@@ -168,7 +168,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                   />
                 </FlexItem>
               </HStack>
-            </NavigatorLink>
+            </NavigatorButton>
           </ItemGroup>
         </CardBody>
       </Card>
@@ -187,7 +187,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigatorBackLink
+          <NavigatorBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -254,7 +254,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigatorBackLink
+          <NavigatorBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -312,7 +312,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigatorBackLink
+          <NavigatorBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG

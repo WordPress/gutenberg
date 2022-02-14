@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import {
-	__experimentalNavigatorLink as NavigatorLink,
-	__experimentalNavigatorBackLink as NavigatorBackLink,
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__experimentalItem as Item,
 	FlexItem,
 	__experimentalHStack as HStack,
@@ -27,11 +27,11 @@ function GenericNavigationButton( { icon, children, ...props } ) {
 }
 
 function NavigationButton( props ) {
-	return <NavigatorLink as={ GenericNavigationButton } { ...props } />;
+	return <NavigatorButton as={ GenericNavigationButton } { ...props } />;
 }
 
 function NavigationBackButton( props ) {
-	return <NavigatorBackLink as={ GenericNavigationButton } { ...props } />;
+	return <NavigatorBackButton as={ GenericNavigationButton } { ...props } />;
 }
 
 export { NavigationButton, NavigationBackButton };

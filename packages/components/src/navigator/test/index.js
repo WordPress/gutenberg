@@ -9,8 +9,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import {
 	NavigatorProvider,
 	NavigatorScreen,
-	NavigatorLink,
-	NavigatorBackLink,
+	NavigatorButton,
+	NavigatorBackButton,
 } from '../';
 
 jest.mock( 'framer-motion', () => {
@@ -41,9 +41,9 @@ const PATHS = {
 	NOT_FOUND: '/not-found',
 };
 
-function NavigatorButton( { path, onClick, ...props } ) {
+function CustomNavigatorButton( { path, onClick, ...props } ) {
 	return (
-		<NavigatorLink
+		<NavigatorButton
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goTo`
 				onClick?.( { type: 'goTo', path } );
@@ -54,9 +54,13 @@ function NavigatorButton( { path, onClick, ...props } ) {
 	);
 }
 
-function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
+function CustomNavigatorButtonWithFocusRestoration( {
+	path,
+	onClick,
+	...props
+} ) {
 	return (
-		<NavigatorLink
+		<NavigatorButton
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goTo`
 				onClick?.( { type: 'goTo', path } );
@@ -67,9 +71,9 @@ function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
 	);
 }
 
-function NavigatorBackButton( { onClick, ...props } ) {
+function CustomNavigatorBackButton( { onClick, ...props } ) {
 	return (
-		<NavigatorBackLink
+		<NavigatorBackButton
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goBack`
 				onClick?.( { type: 'goBack' } );
@@ -86,51 +90,51 @@ const MyNavigation = ( {
 	<NavigatorProvider initialPath={ initialPath }>
 		<NavigatorScreen path={ PATHS.HOME }>
 			<p>This is the home screen.</p>
-			<NavigatorButton
+			<CustomNavigatorButton
 				path={ PATHS.NOT_FOUND }
 				onClick={ onNavigatorButtonClick }
 			>
 				Navigate to non-existing screen.
-			</NavigatorButton>
-			<NavigatorButton
+			</CustomNavigatorButton>
+			<CustomNavigatorButton
 				path={ PATHS.CHILD }
 				onClick={ onNavigatorButtonClick }
 			>
 				Navigate to child screen.
-			</NavigatorButton>
-			<NavigatorButton
+			</CustomNavigatorButton>
+			<CustomNavigatorButton
 				path={ PATHS.INVALID_HTML_ATTRIBUTE }
 				onClick={ onNavigatorButtonClick }
 			>
 				Navigate to screen with an invalid HTML value as a path.
-			</NavigatorButton>
+			</CustomNavigatorButton>
 		</NavigatorScreen>
 
 		<NavigatorScreen path={ PATHS.CHILD }>
 			<p>This is the child screen.</p>
-			<NavigatorButtonWithFocusRestoration
+			<CustomNavigatorButtonWithFocusRestoration
 				path={ PATHS.NESTED }
 				onClick={ onNavigatorButtonClick }
 			>
 				Navigate to nested screen.
-			</NavigatorButtonWithFocusRestoration>
-			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
+			</CustomNavigatorButtonWithFocusRestoration>
+			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
 				Go back
-			</NavigatorBackButton>
+			</CustomNavigatorBackButton>
 		</NavigatorScreen>
 
 		<NavigatorScreen path={ PATHS.NESTED }>
 			<p>This is the nested screen.</p>
-			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
+			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
 				Go back
-			</NavigatorBackButton>
+			</CustomNavigatorBackButton>
 		</NavigatorScreen>
 
 		<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
 			<p>This is the screen with an invalid HTML value as a path.</p>
-			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
+			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
 				Go back
-			</NavigatorBackButton>
+			</CustomNavigatorBackButton>
 		</NavigatorScreen>
 
 		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included */ }

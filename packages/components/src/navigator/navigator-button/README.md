@@ -1,10 +1,10 @@
-# `NavigatorLink`
+# `NavigatorButton`
 
 <div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-The `NavigatorLink` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackLink`](/packages/components/src/navigator/navigator-back-link/README.md) components (or the `useNavigator` hook).
+The `NavigatorButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
 
 ## Usage
 
@@ -16,7 +16,7 @@ The component accepts the following props:
 
 ### `attributeName`: `string`
 
-The HTML attribute used to identify the `NavigatorLink`, which is used by `Navigator` to restore focus.
+The HTML attribute used to identify the `NavigatorButton`, which is used by `Navigator` to restore focus.
 
 -   Required: No
 -   Default: `id`

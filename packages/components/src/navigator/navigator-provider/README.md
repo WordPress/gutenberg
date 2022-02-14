@@ -4,7 +4,7 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-The `NavigatorProvider` component allows rendering nested views/panels/menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`NavigatorLink`](/packages/components/src/navigator/navigator-link/README.md) and [`NavigatorBackLink`](/packages/components/src/navigator/navigator-back-link/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
+The `NavigatorProvider` component allows rendering nested views/panels/menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) and [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
 
 ## Usage
 
@@ -12,24 +12,24 @@ The `NavigatorProvider` component allows rendering nested views/panels/menus (vi
 import {
   __experimentalNavigatorProvider as NavigatorProvider,
   __experimentalNavigatorScreen as NavigatorScreen,
-  __experimentalNavigatorLink as NavigatorLink,
-  __experimentalNavigatorBackLink as NavigatorBackLink,
+  __experimentalNavigatorButton as NavigatorButton,
+  __experimentalNavigatorBackButton as NavigatorBackButton,
 } from '@wordpress/components';
 
 const MyNavigation = () => (
   <NavigatorProvider initialPath="/">
     <NavigatorScreen path="/">
       <p>This is the home screen.</p>
-       <NavigatorLink path="/child">
+       <NavigatorButton path="/child">
          Navigate to child screen.
-      </NavigatorLink>
+      </NavigatorButton>
     </NavigatorScreen>
 
     <NavigatorScreen path="/child">
       <p>This is the child screen.</p>
-      <NavigatorBackLink>
+      <NavigatorBackButton>
         Go back
-      </NavigatorBackLink>
+      </NavigatorBackButton>
     </NavigatorScreen>
   </NavigatorProvider>
 );

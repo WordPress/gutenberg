@@ -44,7 +44,7 @@ export type NavigatorScreenProps = {
 	children: ReactNode;
 };
 
-export type NavigatorBackLinkProps = {
+export type NavigatorBackButtonProps = {
 	/**
 	 * The children elements.
 	 */
@@ -55,14 +55,14 @@ export type NavigatorBackLinkProps = {
 	onClick?: React.MouseEventHandler< HTMLElement >;
 };
 
-export type NavigatorLinkProps = NavigatorBackLinkProps & {
+export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	/**
 	 * The path of the screen to navigate to. The value of this prop needs to be
 	 * a valid value for an HTML attribute.
 	 */
 	path: string;
 	/**
-	 * The HTML attribute used to identify the `NavigatorLink`, which is used
+	 * The HTML attribute used to identify the `NavigatorButton`, which is used
 	 * by `Navigator` to restore focus.
 	 *
 	 * @default 'id'

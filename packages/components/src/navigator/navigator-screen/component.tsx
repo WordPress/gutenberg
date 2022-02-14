@@ -174,7 +174,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 /**
  * The `NavigatorScreen` component represents a single view/screen/panel and
  * should be used in combination with the `NavigatorProvider`, the
- * `NavigatorLink` and the `NavigatorBackLink` components (or the `useNavigator`
+ * `NavigatorButton` and the `NavigatorBackButton` components (or the `useNavigator`
  * hook).
  *
  * @example
@@ -182,24 +182,24 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
  * import {
  *   __experimentalNavigatorProvider as NavigatorProvider,
  *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalNavigatorLink as NavigatorLink,
- *   __experimentalNavigatorBackLink as NavigatorBackLink,
+ *   __experimentalNavigatorButton as NavigatorButton,
+ *   __experimentalNavigatorBackButton as NavigatorBackButton,
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
  *   <NavigatorProvider initialPath="/">
  *     <NavigatorScreen path="/">
  *       <p>This is the home screen.</p>
- *        <NavigatorLink path="/child">
+ *        <NavigatorButton path="/child">
  *          Navigate to child screen.
- *       </NavigatorLink>
+ *       </NavigatorButton>
  *     </NavigatorScreen>
  *
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorBackLink>
+ *       <NavigatorBackButton>
  *         Go back
- *       </NavigatorBackLink>
+ *       </NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>
  * );

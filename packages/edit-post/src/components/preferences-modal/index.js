@@ -9,8 +9,8 @@ import { get } from 'lodash';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorLink as NavigatorLink,
-	__experimentalNavigatorBackLink as NavigatorBackLink,
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
@@ -319,7 +319,7 @@ export default function PreferencesModal() {
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
 									return (
-										<NavigatorLink
+										<NavigatorButton
 											key={ tab.name }
 											path={ tab.name }
 											as={ Item }
@@ -341,7 +341,7 @@ export default function PreferencesModal() {
 													/>
 												</FlexItem>
 											</HStack>
-										</NavigatorLink>
+										</NavigatorButton>
 									);
 								} ) }
 							</ItemGroup>
@@ -361,7 +361,7 @@ export default function PreferencesModal() {
 									size="small"
 									gap="6"
 								>
-									<NavigatorBackLink
+									<NavigatorBackButton
 										icon={
 											isRTL() ? chevronRight : chevronLeft
 										}

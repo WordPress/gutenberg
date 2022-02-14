@@ -12,14 +12,14 @@ import { useCallback } from '@wordpress/element';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import Button from '../../button';
 import useNavigator from '../use-navigator';
-import type { NavigatorBackLinkProps } from '../types';
+import type { NavigatorBackButtonProps } from '../types';
 
-export function useNavigatorBackLink(
-	props: WordPressComponentProps< NavigatorBackLinkProps, 'button' >
+export function useNavigatorBackButton(
+	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >
 ) {
 	const { onClick, as = Button, ...otherProps } = useContextSystem(
 		props,
-		'NavigatorBackLink'
+		'NavigatorBackButton'
 	);
 
 	const { goBack } = useNavigator();

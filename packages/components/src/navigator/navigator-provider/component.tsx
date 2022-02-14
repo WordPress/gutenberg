@@ -102,7 +102,7 @@ function NavigatorProvider(
 /**
  * The `NavigatorProvider` component allows rendering nested views/panels/menus
  * (via the `NavigatorScreen` component and navigate between these different
- * view (via the `NavigatorLink` and `NavigatorBackLink` components or the
+ * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
  * `useNavigator` hook).
  *
  * @example
@@ -110,24 +110,24 @@ function NavigatorProvider(
  * import {
  *   __experimentalNavigatorProvider as NavigatorProvider,
  *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalNavigatorLink as NavigatorLink,
- *   __experimentalNavigatorBackLink as NavigatorBackLink,
+ *   __experimentalNavigatorButton as NavigatorButton,
+ *   __experimentalNavigatorBackButton as NavigatorBackButton,
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
  *   <NavigatorProvider initialPath="/">
  *     <NavigatorScreen path="/">
  *       <p>This is the home screen.</p>
- *        <NavigatorLink path="/child">
+ *        <NavigatorButton path="/child">
  *          Navigate to child screen.
- *       </NavigatorLink>
+ *       </NavigatorButton>
  *     </NavigatorScreen>
  *
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorBackLink>
+ *       <NavigatorBackButton>
  *         Go back
- *       </NavigatorBackLink>
+ *       </NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>
  * );

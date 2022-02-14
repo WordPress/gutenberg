@@ -8,22 +8,22 @@ import type { ForwardedRef } from 'react';
  */
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { View } from '../../view';
-import { useNavigatorBackLink } from './hook';
-import type { NavigatorBackLinkProps } from '../types';
+import { useNavigatorBackButton } from './hook';
+import type { NavigatorBackButtonProps } from '../types';
 
-function NavigatorBackLink(
-	props: WordPressComponentProps< NavigatorBackLinkProps, 'button' >,
+function NavigatorBackButton(
+	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const navigatorBackLinkProps = useNavigatorBackLink( props );
+	const navigatorBackButtonProps = useNavigatorBackButton( props );
 
-	return <View ref={ forwardedRef } { ...navigatorBackLinkProps } />;
+	return <View ref={ forwardedRef } { ...navigatorBackButtonProps } />;
 }
 
 /**
- * The `NavigatorBackLink` component can be used to navigate to a screen and
+ * The `NavigatorBackButton` component can be used to navigate to a screen and
  * should be used in combination with the `NavigatorProvider`, the
- * `NavigatorScreen` and the `NavigatorLink` components (or the `useNavigator`
+ * `NavigatorScreen` and the `NavigatorButton` components (or the `useNavigator`
  * hook).
  *
  * @example
@@ -31,32 +31,32 @@ function NavigatorBackLink(
  * import {
  *   __experimentalNavigatorProvider as NavigatorProvider,
  *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalNavigatorLink as NavigatorLink,
- *   __experimentalNavigatorBackLink as NavigatorBackLink,
+ *   __experimentalNavigatorButton as NavigatorButton,
+ *   __experimentalNavigatorBackButton as NavigatorBackButton,
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
  *   <NavigatorProvider initialPath="/">
  *     <NavigatorScreen path="/">
  *       <p>This is the home screen.</p>
- *        <NavigatorLink path="/child">
+ *        <NavigatorButton path="/child">
  *          Navigate to child screen.
- *       </NavigatorLink>
+ *       </NavigatorButton>
  *     </NavigatorScreen>
  *
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorBackLink>
+ *       <NavigatorBackButton>
  *         Go back
- *       </NavigatorBackLink>
+ *       </NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>
  * );
  * ```
  */
-const ConnectedNavigatorBackLink = contextConnect(
-	NavigatorBackLink,
-	'NavigatorBackLink'
+const ConnectedNavigatorBackButton = contextConnect(
+	NavigatorBackButton,
+	'NavigatorBackButton'
 );
 
-export default ConnectedNavigatorBackLink;
+export default ConnectedNavigatorBackButton;

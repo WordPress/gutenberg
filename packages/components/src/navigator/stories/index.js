@@ -14,8 +14,8 @@ import { useCx } from '../../utils/hooks/use-cx';
 import {
 	NavigatorProvider,
 	NavigatorScreen,
-	NavigatorLink,
-	NavigatorBackLink,
+	NavigatorButton,
+	NavigatorBackButton,
 } from '../';
 
 export default {
@@ -36,20 +36,23 @@ const MyNavigation = () => {
 						<p>This is the home screen.</p>
 
 						<HStack justify="flex-start" wrap>
-							<NavigatorLink variant="secondary" path="/child">
+							<NavigatorButton variant="secondary" path="/child">
 								Navigate to child screen.
-							</NavigatorLink>
+							</NavigatorButton>
 
-							<NavigatorLink
+							<NavigatorButton
 								variant="secondary"
 								path="/overflow-child"
 							>
 								Navigate to screen with horizontal overflow.
-							</NavigatorLink>
+							</NavigatorButton>
 
-							<NavigatorLink variant="secondary" path="/stickies">
+							<NavigatorButton
+								variant="secondary"
+								path="/stickies"
+							>
 								Navigate to screen with sticky content.
-							</NavigatorLink>
+							</NavigatorButton>
 
 							<Flyout
 								trigger={
@@ -71,9 +74,9 @@ const MyNavigation = () => {
 				<Card>
 					<CardBody>
 						<p>This is the child screen.</p>
-						<NavigatorBackLink variant="secondary">
+						<NavigatorBackButton variant="secondary">
 							Go back
-						</NavigatorBackLink>
+						</NavigatorBackButton>
 					</CardBody>
 				</Card>
 			</NavigatorScreen>
@@ -81,9 +84,9 @@ const MyNavigation = () => {
 			<NavigatorScreen path="/overflow-child">
 				<Card>
 					<CardBody>
-						<NavigatorBackLink variant="secondary">
+						<NavigatorBackButton variant="secondary">
 							Go back
-						</NavigatorBackLink>
+						</NavigatorBackButton>
 						<div
 							className={ cx(
 								css( `
@@ -111,9 +114,9 @@ const MyNavigation = () => {
 			<NavigatorScreen path="/stickies">
 				<Card>
 					<Sticky as={ CardHeader } z="2">
-						<NavigatorBackLink variant="secondary">
+						<NavigatorBackButton variant="secondary">
 							Go back
-						</NavigatorBackLink>
+						</NavigatorBackButton>
 					</Sticky>
 					<CardBody>
 						<Sticky top="69px" colors="papayawhip/peachpuff">

@@ -1002,15 +1002,15 @@
 		"parent": "components"
 	},
 	{
-		"title": "NavigatorBackLink",
-		"slug": "navigator-back-link",
-		"markdown_source": "../packages/components/src/navigator/navigator-back-link/README.md",
+		"title": "NavigatorBackButton",
+		"slug": "navigator-back-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
 		"parent": "components"
 	},
 	{
-		"title": "NavigatorLink",
-		"slug": "navigator-link",
-		"markdown_source": "../packages/components/src/navigator/navigator-link/README.md",
+		"title": "NavigatorButton",
+		"slug": "navigator-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
 		"parent": "components"
 	},
 	{

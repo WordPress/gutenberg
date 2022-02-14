@@ -13,13 +13,13 @@ import { escapeAttribute } from '@wordpress/escape-html';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import Button from '../../button';
 import useNavigator from '../use-navigator';
-import type { NavigatorLinkProps } from '../types';
+import type { NavigatorButtonProps } from '../types';
 
 const cssSelectorForAttribute = ( attrName: string, attrValue: string ) =>
 	`[${ attrName }="${ attrValue }"]`;
 
-export function useNavigatorLink(
-	props: WordPressComponentProps< NavigatorLinkProps, 'button' >
+export function useNavigatorButton(
+	props: WordPressComponentProps< NavigatorButtonProps, 'button' >
 ) {
 	const {
 		path,
@@ -27,7 +27,7 @@ export function useNavigatorLink(
 		as = Button,
 		attributeName = 'id',
 		...otherProps
-	} = useContextSystem( props, 'NavigatorLink' );
+	} = useContextSystem( props, 'NavigatorButton' );
 
 	const escapedPath = escapeAttribute( path );
 
