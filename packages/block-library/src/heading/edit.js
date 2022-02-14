@@ -71,7 +71,7 @@ function HeadingEdit( {
 
 		// Remove anchor map when block unmounts.
 		return () => setAnchor( clientId, null );
-	}, [ content, anchor ] );
+	}, [ anchor, content, clientId, canGenerateAnchors ] );
 
 	const onContentChange = ( value ) => {
 		const newAttrs = { content: value };
