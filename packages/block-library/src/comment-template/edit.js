@@ -250,7 +250,7 @@ export default function CommentTemplateEdit( {
 		[ clientId, commentQuery ]
 	);
 
-	order = order || commentOrder;
+	order = inherit || ! order ? commentOrder : order;
 
 	// Generate a tree structure of comment IDs.
 	let commentTree = useCommentTree(
