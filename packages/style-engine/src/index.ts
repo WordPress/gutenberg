@@ -55,9 +55,9 @@ export function getCSSRules(
 	style: Style,
 	options: StyleOptions
 ): GeneratedCSSRule[] {
-	let rules: GeneratedCSSRule[] = [];
+	const rules: GeneratedCSSRule[] = [];
 	styleDefinitions.forEach( ( definition: StyleDefinition ) => {
-		rules = [ ...rules, ...definition.generate( style, options ) ];
+		rules.push( ...definition.generate( style, options ) );
 	} );
 
 	return rules;
