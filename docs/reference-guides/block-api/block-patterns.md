@@ -140,7 +140,7 @@ add_action( 'init', 'my_plugin_unregister_my_pattern_categories' );
 
 ## Block patterns contextual to block types
 
-It is possible to attach a block pattern to one or multiple block types. This makes the block pattern as an available transform for that block type.
+It is possible to attach a block pattern to one or more block types. This adds the block pattern as an available transform for that block type.
 
 For instance:
 
