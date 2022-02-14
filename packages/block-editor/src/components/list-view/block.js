@@ -103,8 +103,11 @@ function ListViewBlock( {
 	}, [ clientId, setIsHovered, highlightBlock ] );
 
 	const selectEditorBlock = useCallback(
-		( _clientId ) => selectBlock( _clientId ),
-		[ selectBlock ]
+		( event ) => {
+			event.stopPropagation();
+			selectBlock( clientId );
+		},
+		[ clientId, selectBlock ]
 	);
 
 	const toggleExpanded = useCallback(
@@ -173,10 +176,7 @@ function ListViewBlock( {
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
 							block={ block }
-							onClick={ ( event ) => {
-								event.stopPropagation();
-								selectEditorBlock( clientId );
-							} }
+							onClick={ selectEditorBlock }
 							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
@@ -236,7 +236,7 @@ function ListViewBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ selectEditorBlock }
+							__experimentalSelectBlock={ selectBlock }
 						/>
 					) }
 				</TreeGridCell>
