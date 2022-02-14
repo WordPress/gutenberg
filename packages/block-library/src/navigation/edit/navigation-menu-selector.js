@@ -30,8 +30,8 @@ export default function NavigationMenuSelector( {
 
 	const {
 		navigationMenus,
-		canUserCreateNavigation: canUserCreateNavigationMenu,
-		canUserUpdateNavigationEntity: canUserUpdateNavigationMenu,
+		canUserCreateNavigationMenu,
+		canUserUpdateNavigationMenu,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
