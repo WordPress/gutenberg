@@ -31,7 +31,7 @@
 	.wp-block-group__inner-container {
 		width: 100%;
 		// z-index: z-index(".wp-block-group__inner-container");
-		z-index: 1; // TODO
+		z-index: 1; // TODO refactor to common selector
 		color: $white;
 	}
 
@@ -69,6 +69,7 @@
 		left: 0;
 		bottom: 0;
 		right: 0;
+		// TODO - refactor to common selector
 		z-index: z-index(".wp-block-cover.has-background-dim::before");
 		opacity: 0.5;
 		max-width: none;

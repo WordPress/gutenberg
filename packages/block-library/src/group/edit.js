@@ -2,12 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import FastAverageColor from 'fast-average-color';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useRef, useState, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	InnerBlocks,
 	useBlockProps,
@@ -44,11 +46,57 @@ import {
 } from './shared';
 /* eslint-enable no-unused-vars */
 
+// TODO - refactor to shared from cover block
 // For now let's keep things simple and use only images.
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
+// TODO - refactor to shared from cover block
+function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
+	const [ isDark, setIsDark ] = useState( false );
+	useEffect( () => {
+		// If opacity is lower than 50 the dominant color is the image or video color,
+		// so use that color for the dark mode computation.
+		if ( url && dimRatio <= 50 && elementRef.current ) {
+			retrieveFastAverageColor().getColorAsync(
+				elementRef.current,
+				( color ) => {
+					setIsDark( color.isDark );
+				}
+			);
+		}
+	}, [ url, url && dimRatio <= 50 && elementRef.current, setIsDark ] );
+	useEffect( () => {
+		// If opacity is greater than 50 the dominant color is the overlay color,
+		// so use that color for the dark mode computation.
+		if ( dimRatio > 50 || ! url ) {
+			if ( ! overlayColor ) {
+				// If no overlay color exists the overlay color is black (isDark )
+				setIsDark( true );
+				return;
+			}
+			setIsDark( colord( overlayColor ).isDark() );
+		}
+	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
+	useEffect( () => {
+		if ( ! url && ! overlayColor ) {
+			// Reset isDark
+			setIsDark( false );
+		}
+	}, [ ! url && ! overlayColor, setIsDark ] );
+	return isDark;
+}
+
+// TODO - refactor to shared from cover block
 function mediaPosition( { x, y } ) {
 	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
+}
+
+// TODO - refactor to shared from cover block
+function retrieveFastAverageColor() {
+	if ( ! retrieveFastAverageColor.fastAverageColor ) {
+		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
+	}
+	return retrieveFastAverageColor.fastAverageColor;
 }
 
 const htmlElementMessages = {
@@ -85,6 +133,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		overlayColor,
 		setOverlayColor,
 		dimRatio,
+		isDark,
 	} = attributes;
 
 	const {
@@ -105,8 +154,24 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		[ clientId ]
 	);
 
+	const {
+		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+
 	const ref = useRef();
 	const isDarkElement = useRef();
+	const isCoverDark = useCoverIsDark(
+		url,
+		dimRatio,
+		overlayColor?.color,
+		isDarkElement
+	);
+
+	useEffect( () => {
+		// This side-effect should not create an undo level.
+		markNextChangeAsNotPersistent();
+		setAttributes( { isDark: isCoverDark } );
+	}, [ isCoverDark ] );
 
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
@@ -154,6 +219,19 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			: [ ref.current.style, 'backgroundPosition' ];
 		styleOfRef[ property ] = mediaPosition( value );
 	};
+
+	// TODO - make dynamic
+	const hasParallax = false;
+	const isRepeated = false;
+
+	// TODO - shared with cover block
+	const classes = classnames( {
+		'is-dark-theme': isDark,
+		'is-light': ! isDark,
+		'is-transient': isUploadingMedia,
+		'has-parallax': hasParallax,
+		'is-repeated': isRepeated,
+	} );
 
 	return (
 		<>
@@ -238,7 +316,10 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 				/>
 			</InspectorControls>
 
-			<TagName { ...blockProps }>
+			<TagName
+				{ ...blockProps }
+				className={ classnames( classes, blockProps.className ) }
+			>
 				<span
 					aria-hidden="true"
 					className={ classnames(
