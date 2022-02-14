@@ -62,8 +62,8 @@
 		box-shadow: none;
 	}
 
-	&.has-background-color .wp-block-group__background,
-	&.has-background-color .wp-block-group__gradient-background {
+	.wp-block-group__background,
+	.wp-block-group__gradient-background {
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -72,7 +72,7 @@
 		// TODO - refactor to common selector
 		z-index: z-index(".wp-block-cover.has-background-dim::before");
 		opacity: 0.5;
-		max-width: none;
+		max-width: none !important; // TODO - refactor to avoid !important
 	}
 
 	// Opacity classnames
