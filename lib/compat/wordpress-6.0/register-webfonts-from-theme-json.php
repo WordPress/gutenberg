@@ -108,6 +108,25 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 		return $data;
 	}
 
+	$get_registered_font_family_item = function( $family ) use ( $font_families_registered ) {
+		$font_face = array();
+		foreach ( $font_families_registered as $font_family ) {
+			if ( $family === $font_family['font-family'] ) {
+				$camel_cased = array();
+				foreach ( $font_family as $key => $value ) {
+					$camel_cased[ lcfirst( str_replace( '-', '', ucwords( $key, '-' ) ) ) ] = $value;
+				}
+				$font_face[] = $camel_cased;
+			}
+		}
+		return array(
+			'fontFamily' => false !== strpos( $family, ' ' ) ? "'{$family}'" : $family,
+			'name'       => $family,
+			'slug'       => sanitize_title( $family ),
+			'fontFace'   => $font_face,
+		);
+	};
+
 	// Make sure the path to settings.typography.fontFamilies.theme exists
 	// before adding missing fonts.
 	if ( empty( $data['settings'] ) ) {
@@ -122,11 +141,7 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 
 	// Add missing fonts.
 	foreach ( $to_add as $family ) {
-		$data['settings']['typography']['fontFamilies'][] = array(
-			'fontFamily' => false !== strpos( $family, ' ' ) ? "'{$family}'" : $family,
-			'name'       => $family,
-			'slug'       => sanitize_title( $family ),
-		);
+		$data['settings']['typography']['fontFamilies'][] = $get_registered_font_family_item( $family );
 	}
 
 	return $data;
