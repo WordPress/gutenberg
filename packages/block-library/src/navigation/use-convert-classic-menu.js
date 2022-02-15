@@ -16,15 +16,19 @@ export default function useConvertClassicMenu( onFinish ) {
 		setIsAwaitingMenuItemResolution,
 	] = useState( false );
 	const [ menuName, setMenuName ] = useState( '' );
+	const [ blocks, setBlocks ] = useState( [] );
 
-	const { menuItems, hasResolvedMenuItems } = useNavigationEntities(
-		selectedMenu
-	);
+	const {
+		menuItems,
+		hasResolvedMenuItems,
+		isResolvingMenus,
+	} = useNavigationEntities( selectedMenu );
 
 	const createFromMenu = useCallback(
 		( name ) => {
-			const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
-			onFinish( blocks, name );
+			const { innerBlocks: _blocks } = menuItemsToBlocks( menuItems );
+			setBlocks( _blocks );
+			onFinish( _blocks, name );
 		},
 		[ menuItems, menuItemsToBlocks, onFinish ]
 	);
@@ -38,7 +42,7 @@ export default function useConvertClassicMenu( onFinish ) {
 		}
 	}, [ isAwaitingMenuItemResolution, hasResolvedMenuItems, menuName ] );
 
-	return useCallback(
+	const dispatch = useCallback(
 		( id, name ) => {
 			setSelectedMenu( id );
 
@@ -55,4 +59,12 @@ export default function useConvertClassicMenu( onFinish ) {
 		},
 		[ hasResolvedMenuItems, createFromMenu ]
 	);
+
+	return {
+		dispatch,
+		blocks,
+		name: menuName,
+		isResolving: isResolvingMenus,
+		hasResolved: hasResolvedMenuItems,
+	};
 }

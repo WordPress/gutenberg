@@ -5,6 +5,7 @@ import { MenuGroup, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -37,24 +38,50 @@ export default function NavigationMenuSelector( {
 
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
-	const onFinishMenuCreation = async (
-		blocks,
-		navigationMenuTitle = null
-	) => {
-		if ( ! canUserCreateNavigationMenu ) {
-			return;
+	// const onFinishMenuCreation = async (
+	// 	blocks,
+	// 	navigationMenuTitle = null
+	// ) => {
+	// 	if ( ! canUserCreateNavigationMenu ) {
+	// 		return;
+	// 	}
+
+	// 	const navigationMenu = await createNavigationMenu(
+	// 		navigationMenuTitle,
+	// 		blocks
+	// 	);
+	// 	onSelect( navigationMenu );
+	// };
+
+	const {
+		dispatch: convertClassicMenuToBlocks,
+		blocks: classicMenuBlocks,
+		name: classicMenuName,
+		isResolving: isResolvingClassicMenuConversion,
+		hasResolved: hasResolvedClassicMenuConversion,
+	} = useConvertClassicMenu( () => {} );
+
+	useEffect( () => {
+		async function handleCreateNav() {
+			const navigationMenu = await createNavigationMenu(
+				classicMenuName,
+				classicMenuBlocks
+			);
+			onSelect( navigationMenu );
 		}
-
-		const navigationMenu = await createNavigationMenu(
-			navigationMenuTitle,
-			blocks
-		);
-		onSelect( navigationMenu );
-	};
-
-	const convertClassicMenuToBlocks = useConvertClassicMenu(
-		onFinishMenuCreation
-	);
+		if (
+			hasResolvedClassicMenuConversion &&
+			classicMenuName &&
+			classicMenuBlocks?.length
+		) {
+			handleCreateNav();
+		}
+	}, [
+		classicMenuBlocks,
+		classicMenuName,
+		isResolvingClassicMenuConversion,
+		hasResolvedClassicMenuConversion,
+	] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
