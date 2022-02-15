@@ -326,8 +326,8 @@ export function useMobileGlobalStylesColors( type = 'colors' ) {
 }
 
 export function getColorsAndGradients(
-	defaultEditorColors,
-	defaultEditorGradients,
+	defaultEditorColors = [],
+	defaultEditorGradients = [],
 	rawFeatures
 ) {
 	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
