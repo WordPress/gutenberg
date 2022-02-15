@@ -139,11 +139,6 @@
 /lib/full-site-editing                                               @janw-me
 /phpunit/class-wp-theme-json-test.php                                @oandregal
 
-# Web App
-/packages/admin-manifest                        @ellatrix
-/lib/pwa.php                                    @ellatrix
-/lib/service-worker.js                          @ellatrix
-
 # Native
 /packages/components/src/mobile/global-styles-context                @geriux @antonis
 
