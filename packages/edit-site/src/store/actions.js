@@ -326,8 +326,8 @@ export const revertTemplate = (
 	}
 
 	try {
-		const templateEntity = await registry
-			.resolveSelect( coreStore )
+		const templateEntity = registry
+			.select( coreStore )
 			.getEntity( 'postType', template.type );
 
 		if ( ! templateEntity ) {
