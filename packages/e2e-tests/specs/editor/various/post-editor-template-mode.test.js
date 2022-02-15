@@ -57,7 +57,7 @@ const switchToTemplateMode = async () => {
 
 	// Check that we switched properly to edit mode.
 	await page.waitForXPath(
-		'//*[contains(@class, "components-snackbar")]/*[text()="Editing template. Changes made here affect all posts and pages that use the template."]'
+		'//*[text()="Editing template. Changes made here affect all posts and pages that use the template."]'
 	);
 	const title = await page.$eval(
 		'.edit-post-template-top-area',
