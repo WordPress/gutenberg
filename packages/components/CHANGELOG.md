@@ -22,6 +22,7 @@
 -  `TreeGrid` accessibility: improve browser support for Left Arrow focus to parent row in child row.  ([#38639](https://github.com/WordPress/gutenberg/pull/38639))
 -  `TreeGrid` accessibility: Add Home/End keys for better keyboard navigation. ([#38679](https://github.com/WordPress/gutenberg/pull/38679))
 -   Add `resolvePoint` prop to `FocalPointPicker` to allow updating the value of the picker after a user interaction ([#38247](https://github.com/WordPress/gutenberg/pull/38247))
+-   Add `onChangeRow` callback to the `TreeGrid` component, fired when focus is shifted from one row to another via Up and Down arrow keys. ([#38314](https://github.com/WordPress/gutenberg/pull/38314))
 
 ### Experimental
 
