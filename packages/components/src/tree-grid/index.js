@@ -280,7 +280,7 @@ function TreeGrid(
 				event.preventDefault();
 			}
 		},
-		[ onExpandRow, onCollapseRow ]
+		[ onExpandRow, onCollapseRow, onChangeRow ]
 	);
 
 	/* Disable reason: A treegrid is implemented using a table element. */
