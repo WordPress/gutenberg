@@ -3,9 +3,6 @@
 	margin-bottom: 1.75em;
 	box-sizing: border-box;
 
-	// Assists border radius application via block supports.
-	overflow: hidden;
-
 	// Responsiveness: Allow wrapping on mobile.
 	flex-wrap: wrap !important;
 
@@ -74,42 +71,6 @@
 			}
 		}
 	}
-
-	// Divided block style.
-	//
-	// Following styles update the display of borders for this block style. They
-	// require the use of !important to override the inline styles supplied by
-	// the border block support allowing user defined borders.
-	&.is-style-divided .wp-block-column {
-		// Default divided border to use until user specifies something different.
-		border: 1px solid currentColor;
-
-		// Disable top and left borders.
-		border-top: none !important;
-		border-left: none !important;
-
-		// Disable the last column's border
-		&:last-child {
-			border: none !important;
-		}
-
-		// Show only bottom border on mobile.
-		@media (max-width: #{ ($break-small - 1) }) {
-			border-right: none !important;
-		}
-
-		// Disable bottom border on non-mobile viewports.
-		@include break-small() {
-			border-bottom: none !important;
-		}
-
-		// Between mobile & large viewports, show only odd column borders.
-		@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
-			&:nth-child(even) {
-				border-right: none !important;
-			}
-		}
-	}
 }
 
 // Add low specificity default padding to columns blocks with backgrounds.
@@ -148,5 +109,10 @@
 	&.is-vertically-aligned-center,
 	&.is-vertically-aligned-bottom {
 		width: 100%;
+	}
+
+	// Use of !important is required to remove border support styles.
+	&:last-child {
+		border-right: none !important;
 	}
 }
