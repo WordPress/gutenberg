@@ -35,6 +35,7 @@
 			"padding": true
 		},
 		"__experimentalBorder": {
+			"__experimentalSkipSerialization": true,
 			"radius": true,
 			"width": true,
 			"color": true,
