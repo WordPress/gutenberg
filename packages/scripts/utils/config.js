@@ -230,7 +230,8 @@ function getWebpackEntryPoints() {
 						}
 						const entryName = filepath
 							.replace( extname( filepath ), '' )
-							.replace( srcDirectory, '' );
+							.replace( srcDirectory, '' )
+							.replace( /\\/g, '/' );
 
 						// Detects the proper file extension used in the `src` directory.
 						const [ entryFilepath ] = glob(
