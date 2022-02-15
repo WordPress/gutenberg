@@ -93,13 +93,13 @@ describe( 'actions', () => {
 			registry
 				.select( interfaceStore )
 				.isItemPinned( editPostStore.name, 'rigatoni' )
-		).toBeFalsy();
+		).toBe( false );
 		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
 		expect(
 			registry
 				.select( interfaceStore )
 				.isItemPinned( editPostStore.name, 'rigatoni' )
-		).toBeTruthy();
+		).toBe( true );
 	} );
 	describe( '__unstableSwitchToTemplateMode', () => {
 		it( 'welcome guide is active', () => {
