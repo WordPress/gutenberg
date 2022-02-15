@@ -8,6 +8,7 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
  */
 import { activatePlugin } from './activate-plugin';
 import { activateTheme } from './activate-theme';
+import { changeSiteTimezone } from './change-site-timezone';
 import { deleteAllBlocks } from './blocks';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
 import { createNewPost } from './create-new-post';
@@ -41,6 +42,7 @@ class TestUtils {
 
 	activatePlugin = activatePlugin;
 	activateTheme = activateTheme;
+	changeSiteTimezone = changeSiteTimezone;
 	clickBlockToolbarButton = clickBlockToolbarButton;
 	createNewPost = createNewPost;
 	createURL = createURL;
