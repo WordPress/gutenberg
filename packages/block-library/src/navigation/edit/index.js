@@ -403,7 +403,6 @@ function Navigation( {
 				classicMenuName,
 				classicMenuBlocks
 			);
-			// onSelect( navigationMenu );
 			setRef( navigationMenuPost?.id );
 		}
 		if (
@@ -416,7 +415,6 @@ function Navigation( {
 	}, [
 		classicMenuBlocks,
 		classicMenuName,
-		isResolvingClassicMenuConversion,
 		hasResolvedClassicMenuConversion,
 	] );
 
@@ -530,9 +528,13 @@ function Navigation( {
 											setRef( id );
 											onClose();
 										} }
-										onSelectClassicMenu={
-											convertClassicMenuToBlocks
-										}
+										onSelectClassicMenu={ ( menu ) => {
+											onClose();
+											convertClassicMenuToBlocks(
+												menu?.id,
+												menu?.name
+											);
+										} }
 										onCreateNew={ startWithEmptyMenu }
 										/* translators: %s: The name of a menu. */
 										actionLabel={ __( "Switch to '%s'" ) }
@@ -714,6 +716,7 @@ function Navigation( {
 						/>
 					) }
 					{ ! hasResolvedCanUserCreateNavigation ||
+						isResolvingClassicMenuConversion ||
 						( ! isEntityAvailable && ! isPlaceholderShown && (
 							<PlaceholderPreview isLoading />
 						) ) }

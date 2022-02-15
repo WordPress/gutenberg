@@ -74,7 +74,7 @@ export default function NavigationMenuSelector( {
 						return (
 							<MenuItem
 								onClick={ () => {
-									onSelectClassicMenu( menu.id, menu.name );
+									onSelectClassicMenu( menu );
 								} }
 								key={ menu.id }
 								aria-label={ sprintf(
