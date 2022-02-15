@@ -19,17 +19,12 @@ const load = () => {
 
 		// Fetch the HTML of the new block.
 		// TODO: Need to include blocks' current attributes.
-		const route = `wp/v2/block-renderer/${ blockName }?${ attribute }=${ newValue }`;
-		const restApiBase = document.head.querySelector(
-			'link[rel="https://api.w.org/"]'
-		).href;
-		const url = new URL( restApiBase + route );
-		//url.searchParams.append( 'rest_route', route );
-		url.searchParams.append( 'context', 'edit' );
-		url.searchParams.append( '_locale', 'user' );
-
-		const headers = { 'X-WP-Nonce': nonce };
-		const html = await loadHtml( url, headers );
+		const html = await fetchRenderedBlock(
+			blockName,
+			attribute,
+			newValue,
+			nonce
+		);
 
 		// Find the root of the real DOM.
 		const root = e.target.closest( blockSelector );
@@ -50,7 +45,18 @@ const load = () => {
 
 window.addEventListener( 'load', load );
 
-async function loadHtml( url, headers ) {
+async function fetchRenderedBlock( blockName, attribute, newValue, nonce ) {
+	// TODO: Auth should be done inside of this function (or ideally not at all.)
+	const route = `wp/v2/block-renderer/${ blockName }?${ attribute }=${ newValue }`;
+	const restApiBase = document.head.querySelector(
+		'link[rel="https://api.w.org/"]'
+	).href;
+	const url = new URL( restApiBase + route );
+	//url.searchParams.append( 'rest_route', route );
+	url.searchParams.append( 'context', 'edit' );
+	url.searchParams.append( '_locale', 'user' );
+
+	const headers = { 'X-WP-Nonce': nonce };
 	const data = await window.fetch( url, { headers } );
 	const { rendered } = await data.json();
 	return rendered;
