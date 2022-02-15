@@ -44,6 +44,7 @@ import * as homeLink from './home-link';
 import * as html from './html';
 import * as image from './image';
 import * as latestComments from './latest-comments';
+import * as latestCommentsFilter from './latest-comments-filter';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
 import * as logInOut from './loginout';
@@ -155,6 +156,7 @@ export const __experimentalGetCoreBlocks = () => [
 	group,
 	html,
 	latestComments,
+	latestCommentsFilter,
 	latestPosts,
 	mediaText,
 	missing,

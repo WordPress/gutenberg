@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "core/latest-comments-filter",
+	"title": "Latest Comments Filter",
+	"keywords": [ "comments filter" ],
+	"category": "widgets",
+	"description": "Allows the user to select the number comments that it shows",
+	"textdomain": "default",
+	"style": "wp-block-latest-comments-filter",
+	"viewScript": "file:./view.min.js",
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false
+	}
+}
