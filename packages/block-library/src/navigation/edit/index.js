@@ -241,7 +241,7 @@ function Navigation( {
 		name: classicMenuName,
 		isResolving: isResolvingClassicMenuConversion,
 		hasResolved: hasResolvedClassicMenuConversion,
-	} = useConvertClassicMenu( () => {} );
+	} = useConvertClassicMenu();
 
 	const navRef = useRef();
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';

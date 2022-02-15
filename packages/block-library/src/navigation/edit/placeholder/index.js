@@ -53,7 +53,7 @@ export default function NavigationPlaceholder( {
 		name: classicMenuName,
 		isResolving: isResolvingClassicMenuConversion,
 		hasResolved: hasResolvedClassicMenuConversion,
-	} = useConvertClassicMenu( () => {} );
+	} = useConvertClassicMenu();
 
 	useEffect( () => {
 		async function handleCreateNav() {

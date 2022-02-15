@@ -9,7 +9,7 @@ import { useCallback, useState, useEffect } from '@wordpress/element';
 import useNavigationEntities from './use-navigation-entities';
 import menuItemsToBlocks from './menu-items-to-blocks';
 
-export default function useConvertClassicMenu( onFinish ) {
+export default function useConvertClassicMenu() {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 	const [
 		isAwaitingMenuItemResolution,
@@ -24,20 +24,16 @@ export default function useConvertClassicMenu( onFinish ) {
 		isResolvingMenus,
 	} = useNavigationEntities( selectedMenu );
 
-	const createFromMenu = useCallback(
-		( name ) => {
-			const { innerBlocks: _blocks } = menuItemsToBlocks( menuItems );
-			setBlocks( _blocks );
-			onFinish( _blocks, name );
-		},
-		[ menuItems, menuItemsToBlocks, onFinish ]
-	);
+	const createBlocksFromMenuItems = useCallback( () => {
+		const { innerBlocks: _blocks } = menuItemsToBlocks( menuItems );
+		setBlocks( _blocks );
+	}, [ menuItems, menuItemsToBlocks ] );
 
 	useEffect( () => {
 		// If the user selected a menu but we had to wait for menu items to
 		// finish resolving, then create the block once resolution finishes.
 		if ( isAwaitingMenuItemResolution && hasResolvedMenuItems ) {
-			createFromMenu( menuName );
+			createBlocksFromMenuItems();
 			setIsAwaitingMenuItemResolution( false );
 		}
 	}, [ isAwaitingMenuItemResolution, hasResolvedMenuItems, menuName ] );
@@ -48,7 +44,7 @@ export default function useConvertClassicMenu( onFinish ) {
 
 			// If we have menu items, create the block right away.
 			if ( hasResolvedMenuItems ) {
-				createFromMenu( name );
+				createBlocksFromMenuItems();
 				return;
 			}
 
@@ -57,7 +53,7 @@ export default function useConvertClassicMenu( onFinish ) {
 			// Store the name to use later.
 			setMenuName( name );
 		},
-		[ hasResolvedMenuItems, createFromMenu ]
+		[ hasResolvedMenuItems, createBlocksFromMenuItems ]
 	);
 
 	return {
