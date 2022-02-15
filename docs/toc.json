@@ -126,7 +126,6 @@
 			{
 				"docs/how-to-guides/themes/README.md": [
 					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },
-					{ "docs/how-to-guides/themes/create-block-theme.md": [] },
 					{ "docs/how-to-guides/themes/theme-json.md": [] },
 					{ "docs/how-to-guides/themes/theme-support.md": [] }
 				]
