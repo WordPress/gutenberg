@@ -9,7 +9,12 @@ const load = () => {
 	link.addEventListener( 'click', async ( e ) => {
 		e.preventDefault();
 
-		const { block: blockName, attribute, newValue } = e.target.dataset;
+		const {
+			block: blockName,
+			attribute,
+			newValue,
+			nonce,
+		} = e.target.dataset;
 		const blockSelector = `.wp-block-${ blockName.replace( 'core/', '' ) }`; // TODO: Need a better mechanism here.
 
 		// Fetch the HTML of the new block.
@@ -23,7 +28,8 @@ const load = () => {
 		url.searchParams.append( 'context', 'edit' );
 		url.searchParams.append( '_locale', 'user' );
 
-		const html = await loadHtml( url );
+		const headers = { 'X-WP-Nonce': nonce };
+		const html = await loadHtml( url, headers );
 
 		// Find the root of the real DOM.
 		const root = e.target.closest( blockSelector );
@@ -44,8 +50,8 @@ const load = () => {
 
 window.addEventListener( 'load', load );
 
-async function loadHtml( url ) {
-	const data = await window.fetch( url );
+async function loadHtml( url, headers ) {
+	const data = await window.fetch( url, { headers } );
 	const html = await data.text();
 	return html;
 }
