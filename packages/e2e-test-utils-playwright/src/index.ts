@@ -18,6 +18,7 @@ import { deactivatePlugin } from './deactivate-plugin';
 import { getCurrentUser } from './get-current-user';
 import { getPageError } from './get-page-error';
 import { isCurrentURL } from './is-current-url';
+import { isThemeInstalled } from './theme-installed';
 import { loginUser } from './login-user';
 import { deleteAllPosts } from './posts';
 import {
@@ -54,6 +55,7 @@ class TestUtils {
 	getCurrentUser = getCurrentUser;
 	getPageError = getPageError;
 	isCurrentURL = isCurrentURL;
+	isThemeInstalled = isThemeInstalled;
 	loginUser = loginUser;
 	showBlockToolbar = showBlockToolbar;
 	switchUserToAdmin = switchUserToAdmin;
