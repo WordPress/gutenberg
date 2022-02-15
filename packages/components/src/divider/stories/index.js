@@ -8,10 +8,11 @@ import { css } from '@emotion/react';
  */
 import { useCx } from '../../utils';
 import { Text } from '../../text';
-import { Divider } from '..';
+import { Divider } from '../';
+import { Divider as UnconnectedDivider } from '../component';
 
 export default {
-	component: Divider,
+	component: UnconnectedDivider,
 	title: 'Components (Experimental)/Divider',
 	argTypes: {
 		margin: {
@@ -23,6 +24,14 @@ export default {
 		marginEnd: {
 			control: { type: 'number' },
 		},
+		// TODO: This is a reakit internal prop. We can hide it from the props table like this
+		// if we don't want to expose it, but should we rather omit it at the TypeScript level?
+		unstable_system: {
+			table: { disable: true },
+		},
+	},
+	parameters: {
+		controls: { expanded: true },
 	},
 };
 
@@ -54,8 +63,6 @@ const VerticalTemplate = ( args ) => {
 export const Horizontal = HorizontalTemplate.bind( {} );
 Horizontal.args = {
 	margin: 2,
-	marginStart: undefined,
-	marginEnd: undefined,
 };
 
 export const Vertical = VerticalTemplate.bind( {} );

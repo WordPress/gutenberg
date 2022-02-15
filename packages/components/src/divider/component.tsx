@@ -16,7 +16,7 @@ import {
 import { DividerView } from './styles';
 import type { Props } from './types';
 
-function Divider(
+export function Divider(
 	props: WordPressComponentProps< Props, 'hr', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
