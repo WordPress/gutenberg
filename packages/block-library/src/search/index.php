@@ -92,7 +92,7 @@ function render_block_core_search( $attributes ) {
 			'<button type="submit" class="wp-block-search__button %s" %s aria-label="%s">%s</button>',
 			esc_attr( $button_classes ),
 			$inline_styles['button'],
-			esc_attr( $attributes['label'] ),
+			esc_attr( wp_strip_all_tags( $attributes['label'] ) ),
 			$button_internal_markup
 		);
 	}
