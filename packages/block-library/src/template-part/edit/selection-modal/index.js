@@ -78,7 +78,7 @@ export default function TemplatePartSelectionModal( {
 	};
 
 	return (
-		<div>
+		<div className="block-library-template-part__selection">
 			<div>
 				<h2>{ __( 'Pick from the existing template parts' ) }</h2>
 				<TemplatePartList
@@ -88,7 +88,7 @@ export default function TemplatePartSelectionModal( {
 				/>
 			</div>
 
-			<div className="block-library-template-part__selection-patterns">
+			<div>
 				<h2>{ __( 'Pick from the existing patterns' ) }</h2>
 				<PatternsList
 					area={ area }
