@@ -163,16 +163,6 @@ function gutenberg_edit_site_init( $hook ) {
 		)
 	);
 
-	add_action(
-		'admin_head',
-		function() {
-			$filters = wp_get_global_styles_svg_filters();
-			if ( ! empty( $filters ) ) {
-				printf( '<script>window._wpSvgFilters = %s</script>', wp_json_encode( $filters ) );
-			}
-		}
-	);
-
 	wp_add_inline_script(
 		'wp-blocks',
 		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $post ) ) ),

@@ -53,6 +53,7 @@ export const PRESET_METADATA = [
 		path: [ 'color', 'duotone' ],
 		cssVarInfix: 'duotone',
 		valueFunc: ( { slug } ) => `url( '#wp-duotone-${ slug }' )`,
+		svgFilter: 'duotone',
 	},
 	{
 		path: [ 'typography', 'fontSizes' ],

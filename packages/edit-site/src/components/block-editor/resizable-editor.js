@@ -183,11 +183,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 				className="edit-site-visual-editor__editor-canvas"
 				{ ...props }
 			>
-				<span
-					dangerouslySetInnerHTML={ {
-						__html: window._wpSvgFilters,
-					} }
-				/>
+				{ settings.svgFilters }
 				{ children }
 			</Iframe>
 		</ResizableBox>
