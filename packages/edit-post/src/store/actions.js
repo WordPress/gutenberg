@@ -509,7 +509,7 @@ export const initializeMetaBoxes = () => ( { registry, select, dispatch } ) => {
 		}
 	} );
 
-	return {
+	return dispatch( {
 		type: 'META_BOXES_INITIALIZED',
-	};
+	} );
 };
