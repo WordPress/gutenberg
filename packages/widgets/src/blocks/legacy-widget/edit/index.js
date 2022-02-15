@@ -18,7 +18,7 @@ import { brush as brushIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseEntityRecord as useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -94,17 +94,14 @@ function NotEmpty( {
 } ) {
 	const [ hasPreview, setHasPreview ] = useState( null );
 
-	const { widgetType, hasResolvedWidgetType, isNavigationMode } = useSelect(
-		( select ) => {
-			const widgetTypeId = id ?? idBase;
-			return {
-				widgetType: select( coreStore ).getWidgetType( widgetTypeId ),
-				hasResolvedWidgetType: select(
-					coreStore
-				).hasFinishedResolution( 'getWidgetType', [ widgetTypeId ] ),
-				isNavigationMode: select( blockEditorStore ).isNavigationMode(),
-			};
-		},
+	const widgetTypeId = id ?? idBase;
+	const {
+		data: widgetType,
+		hasResolved: hasResolvedWidgetType,
+	} = useEntityRecord( 'root', 'widgetType', widgetTypeId );
+
+	const isNavigationMode = useSelect(
+		( select ) => select( blockEditorStore ).isNavigationMode(),
 		[ id, idBase ]
 	);
 

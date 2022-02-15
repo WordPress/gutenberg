@@ -3,6 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseEntityRecords as useEntityRecords } from '@wordpress/core-data';
 
 /**
  * @typedef {Object} NavigationEntitiesData
@@ -34,31 +35,14 @@ export default function useNavigationEntities( menuId ) {
 }
 
 function useMenuEntities() {
-	const { menus, isResolvingMenus, hasResolvedMenus } = useSelect(
-		( select ) => {
-			const { getMenus, isResolving, hasFinishedResolution } = select(
-				coreStore
-			);
-
-			const menusParameters = [ { per_page: -1 } ];
-
-			return {
-				menus: getMenus( ...menusParameters ),
-				isResolvingMenus: isResolving( 'getMenus', menusParameters ),
-				hasResolvedMenus: hasFinishedResolution(
-					'getMenus',
-					menusParameters
-				),
-			};
-		},
-		[]
-	);
+	const response = useEntityRecords( 'root', 'menu', [ { per_page: -1 } ] );
+	const { records, isResolving, hasResolved } = response;
 
 	return {
-		menus,
-		isResolvingMenus,
-		hasResolvedMenus,
-		hasMenus: !! ( hasResolvedMenus && menus?.length ),
+		menus: records,
+		isResolvingMenus: isResolving,
+		hasResolvedMenus: hasResolved,
+		hasMenus: !! ( hasResolved && records?.length ),
 	};
 }
 

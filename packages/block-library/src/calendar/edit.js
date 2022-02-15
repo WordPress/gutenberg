@@ -12,7 +12,7 @@ import { Disabled, Placeholder, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import ServerSideRender from '@wordpress/server-side-render';
 import { useBlockProps } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseEntityRecords as useEntityRecords } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
 const getYearMonth = memoize( ( date ) => {
@@ -28,26 +28,17 @@ const getYearMonth = memoize( ( date ) => {
 
 export default function CalendarEdit( { attributes } ) {
 	const blockProps = useBlockProps();
-	const { date, hasPosts, hasPostsResolved } = useSelect( ( select ) => {
-		const { getEntityRecords, hasFinishedResolution } = select( coreStore );
-
-		const singlePublishedPostQuery = {
+	const { records: posts, hasResolved: hasPostsResolved } = useEntityRecords(
+		'postType',
+		'post',
+		{
 			status: 'publish',
 			per_page: 1,
-		};
-		const posts = getEntityRecords(
-			'postType',
-			'post',
-			singlePublishedPostQuery
-		);
-		const postsResolved = hasFinishedResolution( 'getEntityRecords', [
-			'postType',
-			'post',
-			singlePublishedPostQuery,
-		] );
-
+		}
+	);
+	const hasPosts = hasPostsResolved && posts?.length === 1;
+	const date = useSelect( ( select ) => {
 		let _date;
-
 		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 		// Blocks can be loaded into a *non-post* block editor.
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
@@ -62,11 +53,7 @@ export default function CalendarEdit( { attributes } ) {
 			}
 		}
 
-		return {
-			date: _date,
-			hasPostsResolved: postsResolved,
-			hasPosts: postsResolved && posts?.length === 1,
-		};
+		return _date;
 	}, [] );
 
 	if ( ! hasPosts ) {
