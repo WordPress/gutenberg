@@ -22,7 +22,7 @@ import { cleanEmptyObject } from './utils';
  * Determines if there is gap support.
  *
  * @param {string|Object} blockType Block name or Block Type object.
- * @return {boolean}                 Whether there is support.
+ * @return {boolean}                Whether there is support.
  */
 export function hasGapSupport( blockType ) {
 	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
@@ -37,6 +37,45 @@ export function hasGapSupport( blockType ) {
  */
 export function hasGapValue( props ) {
 	return props.attributes.style?.spacing?.blockGap !== undefined;
+}
+
+/**
+ * Returns a BoxControl object value from a given blockGap style.
+ * The string check is for backwards compatibility before Gutenberg supported
+ * split gap values (row and column) and the value was a string n + unit.
+ *
+ * @param {string? | Object?} rawBlockGapValue A style object.
+ * @return {Object?}                           A value to pass to the BoxControl component.
+ */
+export function getGapValueFromStyle( rawBlockGapValue ) {
+	if ( ! rawBlockGapValue ) {
+		return rawBlockGapValue;
+	}
+
+	const isValueString = typeof rawBlockGapValue === 'string';
+	return cleanEmptyObject( {
+		top: isValueString ? rawBlockGapValue : rawBlockGapValue?.top,
+		left: isValueString ? rawBlockGapValue : rawBlockGapValue?.left,
+	} );
+}
+
+/**
+ * Returns a CSS value for the `gap` property from a given blockGap style.
+ *
+ * @param {string? | Object?} blockGapValue A style object.
+ * @param {string?}           defaultValue  A default gap value.
+ * @return {string?}                        The concatenated gap value (row and column).
+ */
+export function getGapCSSValue( blockGapValue, defaultValue = '0' ) {
+	const blockGapBoxControlValue = getGapValueFromStyle( blockGapValue );
+	if ( ! blockGapBoxControlValue ) {
+		return blockGapBoxControlValue;
+	}
+
+	const row = blockGapBoxControlValue?.top || defaultValue;
+	const column = blockGapBoxControlValue?.left || defaultValue;
+
+	return row === column ? row : `${ row } ${ column }`;
 }
 
 /**
@@ -96,11 +135,7 @@ export function GapEdit( props ) {
 			'vw',
 		],
 	} );
-
 	const sides = useCustomSides( blockName, 'blockGap' );
-	const splitOnAxis =
-		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
-
 	const ref = useBlockRef( clientId );
 
 	if ( useIsGapDisabled( props ) ) {
@@ -108,17 +143,13 @@ export function GapEdit( props ) {
 	}
 
 	const onChange = ( next ) => {
-		let newValue = next;
-		if ( typeof next === 'object' ) {
-			const row = next?.top || 0;
-			const column = next?.left || 0;
-			newValue = row === column ? row : `${ row } ${ column }`;
-		}
 		const newStyle = {
 			...style,
 			spacing: {
 				...style?.spacing,
-				blockGap: newValue,
+				blockGap: {
+					...getGapValueFromStyle( next ),
+				},
 			},
 		};
 
@@ -140,33 +171,16 @@ export function GapEdit( props ) {
 		}
 	};
 
-	const blockGapValue = style?.spacing?.blockGap;
-	const boxValuesArray = blockGapValue
-		? blockGapValue.split( ' ' )
-		: [ undefined ];
-	const boxValues = {
-		left: undefined,
-		top: undefined,
-		bottom: undefined,
-		right: undefined,
-	};
-
-	if ( boxValuesArray.length === 1 ) {
-		boxValues.left = boxValuesArray[ 0 ];
-		boxValues.right = boxValuesArray[ 0 ];
-		boxValues.top = boxValuesArray[ 0 ];
-		boxValues.bottom = boxValuesArray[ 0 ];
-	}
-
-	if ( boxValuesArray.length === 2 ) {
-		boxValues.left = boxValuesArray[ 1 ];
-		boxValues.right = boxValuesArray[ 1 ];
-		boxValues.top = boxValuesArray[ 0 ];
-		boxValues.bottom = boxValuesArray[ 0 ];
-	}
-
-	// The default combined value we'll take from row.
-	const defaultValue = boxValues.top;
+	const splitOnAxis =
+		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+	const gapValue = getGapValueFromStyle( style?.spacing?.blockGap );
+	const boxControlGapValue = splitOnAxis
+		? {
+				...gapValue,
+				right: gapValue?.left,
+				bottom: gapValue?.top,
+		  }
+		: gapValue?.top;
 
 	return Platform.select( {
 		web: (
@@ -178,7 +192,7 @@ export function GapEdit( props ) {
 						onChange={ onChange }
 						units={ units }
 						sides={ sides }
-						values={ boxValues }
+						values={ boxControlGapValue }
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
 					/>
@@ -190,7 +204,7 @@ export function GapEdit( props ) {
 						onChange={ onChange }
 						units={ units }
 						// Default to `row` for combined values.
-						value={ defaultValue }
+						value={ boxControlGapValue }
 					/>
 				) }
 			</>
