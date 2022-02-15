@@ -291,8 +291,12 @@ class WP_Webfonts {
 		}
 
 		// Add global styles.
+		$added_global_styles = array();
 		foreach ( $registered_webfonts as $webfont ) {
-			$family      = $webfont['font-family'];
+			$family = $webfont['font-family'];
+			if ( in_array( $family, $added_global_styles, true ) ) {
+				continue;
+			}
 			$family_slug = sanitize_title( $family );
 			$styles     .= "body{--wp--preset--font-family--{$family_slug}:{$family};}";
 			$styles     .= ".has-{$family_slug}-font-family{font-family:var(--wp--preset--font-family--{$family_slug});}";
