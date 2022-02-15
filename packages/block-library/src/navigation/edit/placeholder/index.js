@@ -4,6 +4,7 @@
 import { Placeholder, Button, DropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { navigation, Icon } from '@wordpress/icons';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,6 +15,7 @@ import PlaceholderPreview from './placeholder-preview';
 import useNavigationMenu from '../../use-navigation-menu';
 import useCreateNavigationMenu from '../use-create-navigation-menu';
 import NavigationMenuSelector from '../navigation-menu-selector';
+import useConvertClassicMenu from '../../use-convert-classic-menu';
 
 export default function NavigationPlaceholder( {
 	clientId,
@@ -45,7 +47,39 @@ export default function NavigationPlaceholder( {
 		hasMenus,
 	} = useNavigationEntities();
 
-	const isStillLoading = isResolvingPages || isResolvingMenus;
+	const {
+		dispatch: convertClassicMenuToBlocks,
+		blocks: classicMenuBlocks,
+		name: classicMenuName,
+		isResolving: isResolvingClassicMenuConversion,
+		hasResolved: hasResolvedClassicMenuConversion,
+	} = useConvertClassicMenu( () => {} );
+
+	useEffect( () => {
+		async function handleCreateNav() {
+			const navigationMenuPost = await createNavigationMenu(
+				classicMenuName,
+				classicMenuBlocks
+			);
+			onFinish( navigationMenuPost, classicMenuBlocks );
+		}
+		if (
+			hasResolvedClassicMenuConversion &&
+			classicMenuName &&
+			classicMenuBlocks?.length
+		) {
+			handleCreateNav();
+		}
+	}, [
+		classicMenuBlocks,
+		classicMenuName,
+		hasResolvedClassicMenuConversion,
+	] );
+
+	const isStillLoading =
+		isResolvingPages ||
+		isResolvingMenus ||
+		isResolvingClassicMenuConversion;
 
 	const onCreateEmptyMenu = () => {
 		onFinishMenuCreation( [] );
@@ -89,10 +123,19 @@ export default function NavigationPlaceholder( {
 										} }
 										popoverProps={ { isAlternate: true } }
 									>
-										{ () => (
+										{ ( { onClose } ) => (
 											<NavigationMenuSelector
 												clientId={ clientId }
 												onSelect={ onFinish }
+												onSelectClassicMenu={ (
+													menu
+												) => {
+													onClose();
+													convertClassicMenuToBlocks(
+														menu?.id,
+														menu?.name
+													);
+												} }
 											/>
 										) }
 									</DropdownMenu>
