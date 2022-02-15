@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import LineHeightControl, { LegacyLineHeightControl } from '../';
+import LineHeightControl from '../';
 
 export default {
 	component: LineHeightControl,
@@ -30,34 +30,4 @@ export const UnconstrainedWidth = Template.bind( {} );
 UnconstrainedWidth.args = {
 	...Default.args,
 	__unstableInputWidth: '100%',
-};
-
-// TODO: Remove before merge
-export const TemporaryTest = () => {
-	const [ value, setValue ] = useState();
-	return (
-		<div
-			style={ {
-				display: 'grid',
-				gap: 20,
-				gridTemplateColumns: '1fr 1fr',
-				width: 300,
-			} }
-		>
-			<div>
-				<h2>Migrated</h2>
-				<Template />
-			</div>
-			<div>
-				<h2>Legacy</h2>
-				<LegacyLineHeightControl
-					onChange={ setValue }
-					value={ value }
-				/>
-				<hr />
-				<p>value: { value }</p>
-				<p>type: { typeof value }</p>
-			</div>
-		</div>
-	);
 };
