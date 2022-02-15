@@ -14,7 +14,7 @@ In this Document:
 
 The editor comes with several core block patterns. Theme and plugin authors can register additional custom block patterns using the `register_block_pattern` helper function.
 
-The `register_block_pattern` helper function receives two arguments. 
+The `register_block_pattern` helper function receives two arguments.
 -   `title`: A machine-readable title with a naming convention of `namespace/title`.
 -	`properties`: An array describing properties of the pattern.
 
@@ -26,7 +26,7 @@ The properties available for block patterns are:
 -   `categories` (optional): An array of registered pattern categories used to group block patterns. Block patterns can be shown on multiple categories. A category must be registered separately in order to be used here.
 -   `keywords` (optional): An array of aliases or keywords that help users discover the pattern while searching.
 -   `viewportWidth` (optional): An integer specifying the intended width of the pattern to allow for a scaled preview of the pattern in the inserter.
--   `blockTypes` (optional): An array of block types that the pattern is intended to be used with.
+-   `blockTypes` (optional): An array of block types that the pattern is intended to be used with. Each value needs to be the declared block's `name`.
 
 The following code sample registers a block pattern named 'my-plugin/my-awesome-pattern':
 
@@ -38,10 +38,10 @@ register_block_pattern(
 		'description' => _x( 'Two horizontal buttons, the left button is filled in, and the right button is outlined.', 'Block pattern description', 'my-plugin' ),
 		'content'     => "<!-- wp:buttons {\"align\":\"center\"} -->\n<div class=\"wp-block-buttons aligncenter\"><!-- wp:button {\"backgroundColor\":\"very-dark-gray\",\"borderRadius\":0} -->\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-background has-very-dark-gray-background-color no-border-radius\">" . esc_html__( 'Button One', 'my-plugin' ) . "</a></div>\n<!-- /wp:button -->\n\n<!-- wp:button {\"textColor\":\"very-dark-gray\",\"borderRadius\":0,\"className\":\"is-style-outline\"} -->\n<div class=\"wp-block-button is-style-outline\"><a class=\"wp-block-button__link has-text-color has-very-dark-gray-color no-border-radius\">" . esc_html__( 'Button Two', 'my-plugin' ) . "</a></div>\n<!-- /wp:button --></div>\n<!-- /wp:buttons -->",
 	)
-); 
+);
 ```
 
-_Note:_ 
+_Note:_
 
 `register_block_pattern()` should be called from a handler attached to the init hook.
 
@@ -49,7 +49,7 @@ _Note:_
 function my_plugin_register_my_patterns() {
   register_block_pattern( ... );
 }
- 
+
 add_action( 'init', 'my_plugin_register_my_patterns' );
 ```
 
@@ -57,7 +57,7 @@ add_action( 'init', 'my_plugin_register_my_patterns' );
 
 ### unregister_block_pattern
 
-The `unregister_block_pattern` helper function allows for a previously registered block pattern to be unregistered from a theme or plugin and receives one argument. 
+The `unregister_block_pattern` helper function allows for a previously registered block pattern to be unregistered from a theme or plugin and receives one argument.
 -   `title`: The name of the block pattern to be unregistered.
 
 The following code sample unregisters the block pattern named 'my-plugin/my-awesome-pattern':
@@ -66,7 +66,7 @@ The following code sample unregisters the block pattern named 'my-plugin/my-awes
 unregister_block_pattern( 'my-plugin/my-awesome-pattern' );
 ```
 
-_Note:_ 
+_Note:_
 
 `unregister_block_pattern()` should be called from a handler attached to the init hook.
 
@@ -74,7 +74,7 @@ _Note:_
 function my_plugin_unregister_my_patterns() {
   unregister_block_pattern( ... );
 }
- 
+
 add_action( 'init', 'my_plugin_unregister_my_patterns' );
 ```
 
@@ -84,7 +84,7 @@ Block patterns can be grouped using categories. The block editor comes with bund
 
 ### register_block_pattern_category
 
-The `register_block_pattern_category` helper function receives two arguments. 
+The `register_block_pattern_category` helper function receives two arguments.
 -   `title`: A machine-readable title for the block pattern category.
 -	`properties`: An array describing properties of the pattern category.
 
@@ -101,7 +101,7 @@ register_block_pattern_category(
 );
 ```
 
-_Note:_ 
+_Note:_
 
 `register_block_pattern_category()` should be called from a handler attached to the init hook.
 
@@ -109,7 +109,7 @@ _Note:_
 function my_plugin_register_my_pattern_categories() {
   register_block_pattern_category( ... );
 }
- 
+
 add_action( 'init', 'my_plugin_register_my_pattern_categories' );
 ```
 
@@ -117,7 +117,7 @@ add_action( 'init', 'my_plugin_register_my_pattern_categories' );
 
 `unregister_block_pattern_category` allows unregistering a pattern category.
 
-The `unregister_block_pattern_category` helper function allows for a previously registered block pattern category to be unregistered from a theme or plugin and receives one argument. 
+The `unregister_block_pattern_category` helper function allows for a previously registered block pattern category to be unregistered from a theme or plugin and receives one argument.
 -   `title`: The name of the block pattern category to be unregistered.
 
 The following code sample unregisters the category named 'hero':
@@ -126,7 +126,7 @@ The following code sample unregisters the category named 'hero':
 unregister_block_pattern_category( 'hero' );
 ```
 
-_Note:_ 
+_Note:_
 
 `unregister_block_pattern_category()` should be called from a handler attached to the init hook.
 
@@ -134,13 +134,15 @@ _Note:_
 function my_plugin_unregister_my_pattern_categories() {
   unregister_block_pattern_category( ... );
 }
- 
+
 add_action( 'init', 'my_plugin_unregister_my_pattern_categories' );
 ```
 
-## Block patterns contextual to block types
+## Block patterns contextual to block types and pattern transformations
 
 It is possible to attach a block pattern to one or more block types. This adds the block pattern as an available transform for that block type.
+
+Currently these transformations are available only to simple blocks (blocks without inner blocks). In order for a pattern to be suggested, **every selected block must be present in the block pattern**.
 
 For instance:
 
@@ -150,15 +152,37 @@ register_block_pattern(
 	array(
 		'title'      => __( 'Powered by WordPress', 'my-plugin' ),
 		'blockTypes' => array( 'core/paragraph' ),
-		'content'    => '<!-- wp:paragraph -->
-		<p>Powered by WordPress</p>
-		<!-- /wp:paragraph -->
-		',
+		'content'    => '<!-- wp:paragraph {"backgroundColor":"black","textColor":"white"} -->
+		<p class="has-white-color has-black-background-color has-text-color has-background">Powered by WordPress</p>
+		<!-- /wp:paragraph -->',
 	)
 );
 ```
 
-The above code registers a block pattern named 'my-plugin/powered-by-wordpress' and also shows the pattern in the "transform menu" of paragraph blocks.
+The above code registers a block pattern named 'my-plugin/powered-by-wordpress' and also shows the pattern in the "transform menu" of paragraph blocks. The transformation result will be keeping the paragraph's existing content and also apply the other attributes - in this case the background and text color.
+
+As mentioned above pattern transformations for simple blocks can also work if we have selected multiple blocks and there are matching contextual patterns to these blocks. Let's see an example of a pattern where two block types are attached.
+
+```php
+register_block_pattern(
+	'my-plugin/powered-by-wordpress',
+	array(
+		'title'      => __( 'Powered by WordPress', 'my-plugin' ),
+		'blockTypes' => array( 'core/paragraph', 'core/heading' ),
+		'content'    => '<!-- wp:group -->
+						<div class="wp-block-group">
+						<!-- wp:heading {"fontSize":"large"} -->
+						<h2 class="has-large-font-size"><span style="color:#ba0c49" class="has-inline-color">Hi everyone</span></h2>
+						<!-- /wp:heading -->
+						<!-- wp:paragraph {"backgroundColor":"black","textColor":"white"} -->
+						<p class="has-white-color has-black-background-color has-text-color has-background">Powered by WordPress</p>
+						<!-- /wp:paragraph -->
+						</div><!-- /wp:group -->',
+	)
+);
+```
+
+In the above example if we select **one of the two** block types, either a paragraph or a heading block, this pattern will be suggested by transforming the selected block using its content and will also add the remaing blocks from the pattern. If on the other hand we multi select one paragraph and one heading block, both blocks will be transformed.
 
 Blocks can also use these contextual block patterns in other places. For instance, when inserting a new Query Loop block, the user is provided with a list of all patterns attached to the block.
 
