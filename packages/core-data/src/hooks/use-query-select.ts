@@ -7,6 +7,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import memoize from './memoize';
+import { Status } from './constants';
 
 export const META_SELECTORS = [
 	'getIsResolving',
@@ -97,19 +98,31 @@ const enrichSelectors = memoize( ( selectors ) => {
 		}
 		Object.defineProperty( resolvers, selectorName, {
 			get: () => ( ...args ) => {
-				const {
-					getIsResolving,
-					hasStartedResolution,
-					hasFinishedResolution,
-				} = selectors;
+				const { getIsResolving, hasFinishedResolution } = selectors;
 				const isResolving = !! getIsResolving( selectorName, args );
+				const hasResolved =
+					! isResolving &&
+					hasFinishedResolution( selectorName, args );
+				const data = selectors[ selectorName ]( ...args );
+
+				let status;
+				if ( isResolving ) {
+					status = Status.Resolving;
+				} else if ( hasResolved ) {
+					if ( data ) {
+						status = Status.Success;
+					} else {
+						status = Status.Error;
+					}
+				} else {
+					status = Status.Idle;
+				}
+
 				return {
-					data: selectors[ selectorName ]( ...args ),
+					data,
+					status,
 					isResolving,
-					hasStarted: hasStartedResolution( selectorName, args ),
-					hasResolved:
-						! isResolving &&
-						hasFinishedResolution( selectorName, args ),
+					hasResolved,
 				};
 			},
 		} );

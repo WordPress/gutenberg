@@ -15,9 +15,9 @@ import { act, render } from '@testing-library/react';
  * Internal dependencies
  */
 import { store as coreDataStore } from '../../index';
-import useEntityRecord from '../use-entity-record';
+import useEntityRecords from '../use-entity-records';
 
-describe( 'useEntityRecord', () => {
+describe( 'useEntityRecords', () => {
 	let registry;
 	beforeEach( () => {
 		jest.useFakeTimers();
@@ -31,15 +31,19 @@ describe( 'useEntityRecord', () => {
 		jest.useRealTimers();
 	} );
 
-	const TEST_RECORD = { id: 1, hello: 'world' };
+	const TEST_RECORDS = [
+		{ id: 1, hello: 'world1' },
+		{ id: 2, hello: 'world2' },
+		{ id: 3, hello: 'world3' },
+	];
 
-	it( 'resolves the entity record when missing from the state', async () => {
+	it( 'resolves the entity records when missing from the state', async () => {
 		// Provide response
-		triggerFetch.mockImplementation( () => TEST_RECORD );
+		triggerFetch.mockImplementation( () => TEST_RECORDS );
 
 		let data;
 		const TestComponent = () => {
-			data = useEntityRecord( 'root', 'widget', 1 );
+			data = useEntityRecords( 'root', 'widget', { status: 'draft' } );
 			return <div />;
 		};
 		render(
@@ -49,7 +53,7 @@ describe( 'useEntityRecord', () => {
 		);
 
 		expect( data ).toEqual( {
-			records: undefined,
+			records: null,
 			hasResolved: false,
 			isResolving: false,
 			status: 'IDLE',
@@ -61,11 +65,11 @@ describe( 'useEntityRecord', () => {
 
 		// Fetch request should have been issued
 		expect( triggerFetch ).toHaveBeenCalledWith( {
-			path: '/wp/v2/widgets/1?context=edit',
+			path: '/wp/v2/widgets?context=edit&status=draft',
 		} );
 
 		expect( data ).toEqual( {
-			record: { hello: 'world', id: 1 },
+			records: TEST_RECORDS,
 			hasResolved: true,
 			isResolving: false,
 			status: 'SUCCESS',
