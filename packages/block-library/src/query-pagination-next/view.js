@@ -11,17 +11,22 @@ const load = () => {
 
 		const {
 			block: blockName,
-			attribute,
-			newValue,
+			// attribute,
+			// newValue,
 			nonce,
 		} = e.target.dataset;
 		const blockSelector = `.wp-block-${ blockName.replace( 'core/', '' ) }`; // TODO: Need a better mechanism here.
 
 		// TODO: Need to include blocks' current attributes.
 		// Fetch the HTML of the new block.
+		// const html = await fetchRenderedBlock(
+		// 	blockName,
+		// 	{ [ attribute ]: newValue },
+		// 	nonce
+		// ); // FIXME
 		const html = await fetchRenderedBlock(
-			blockName,
-			{ [ attribute ]: newValue },
+			'core/calendar',
+			{ month: '12', year: '2021' },
 			nonce
 		);
 
