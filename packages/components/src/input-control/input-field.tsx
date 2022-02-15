@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import { useDrag } from 'react-use-gesture';
+import { useDrag } from '@use-gesture/react';
 import type {
 	SyntheticEvent,
 	ChangeEvent,
