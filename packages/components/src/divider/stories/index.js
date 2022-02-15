@@ -54,7 +54,7 @@ const VerticalTemplate = ( args ) => {
 	return (
 		<div className={ wrapperClassName }>
 			<Text>Some text before the divider</Text>
-			<Divider orientation="vertical" { ...args } />
+			<Divider { ...args } />
 			<Text>Some text after the divider</Text>
 		</div>
 	);
@@ -68,4 +68,5 @@ Horizontal.args = {
 export const Vertical = VerticalTemplate.bind( {} );
 Vertical.args = {
 	...Horizontal.args,
+	orientation: 'vertical',
 };
