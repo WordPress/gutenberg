@@ -49,10 +49,17 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		$custom_query           = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
 		$custom_query_max_pages = (int) $custom_query->max_num_pages;
 		if ( $custom_query_max_pages && $custom_query_max_pages !== $page ) {
+			$data_attributes = sprintf(
+				'data-block="%1$s" data-attribute="%2$s" data-new-value="%3$s"',
+				'core/query',
+				esc_attr( $page_key ),
+				esc_attr( $page + 1 )
+			);
 			$content = sprintf(
-				'<a href="%1$s" %2$s>%3$s</a>',
+				'<a href="%1$s" %2$s %3$s>%4$s</a>',
 				esc_url( add_query_arg( $page_key, $page + 1 ) ),
 				$wrapper_attributes,
+				$data_attributes,
 				$label
 			);
 		}

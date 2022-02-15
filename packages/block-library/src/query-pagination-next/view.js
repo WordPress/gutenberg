@@ -9,21 +9,30 @@ const load = () => {
 	link.addEventListener( 'click', async ( e ) => {
 		e.preventDefault();
 
-		// Fetch the HTML of the new page.
-		const url = e.target.href;
+		const { block: blockName, attribute, newValue } = e.target.dataset;
+		const blockSelector = `.wp-block-${ blockName.replace( 'core/', '' ) }`; // TODO: Need a better mechanism here.
+
+		// Fetch the HTML of the new block.
+		// TODO: Need to include blocks' current attributes.
+		const route = `wp/v2/block-renderer/${ blockName }?${ attribute }=${ newValue }`;
+		const restApiBase = document.head.querySelector(
+			'link[rel="https://api.w.org/"]'
+		).href;
+		const url = new URL( restApiBase + route );
+		//url.searchParams.append( 'rest_route', route );
+		url.searchParams.append( 'context', 'view' );
+		url.searchParams.append( '_locale', 'user' );
+
 		const html = await loadHtml( url );
 
-		// Find the root of the real DOM and the new page.
-		const root = document.querySelector( '.wp-site-blocks' );
-		const newRoot = /<div class="wp-site-blocks".*<\/div>/s.exec(
-			html
-		)[ 0 ];
+		// Find the root of the real DOM.
+		const root = e.target.closest( blockSelector );
 
 		// Replace root with the new HTML.
-		morphdom( root, newRoot );
+		morphdom( root, html );
 
 		// Change the browser URL.
-		window.history.pushState( {}, '', url );
+		window.history.pushState( {}, '', e.target.href );
 
 		// Scroll to the top to simulate page load.
 		window.scrollTo( 0, 0 );
