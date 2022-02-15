@@ -124,10 +124,6 @@ export function useInputAndSelection( props ) {
 		 * @param {Event|DOMHighResTimeStamp} event
 		 */
 		function handleSelectionChange( event ) {
-			if ( ownerDocument.activeElement !== element ) {
-				return;
-			}
-
 			const {
 				record,
 				applyRecord,
@@ -280,6 +276,11 @@ export function useInputAndSelection( props ) {
 		element.addEventListener( 'keyup', handleSelectionChange );
 		element.addEventListener( 'mouseup', handleSelectionChange );
 		element.addEventListener( 'touchend', handleSelectionChange );
+		ownerDocument.addEventListener(
+			'selectionchange',
+			handleSelectionChange
+		);
+
 		return () => {
 			element.removeEventListener( 'input', onInput );
 			element.removeEventListener(

@@ -20,6 +20,18 @@ import useArrowNav from './use-arrow-nav';
 import useSelectAll from './use-select-all';
 import { store as blockEditorStore } from '../../store';
 
+function findContentEditableRoot( node ) {
+	if ( node.nodeType !== node.ELEMENT_NODE ) {
+		node = node.parentElement;
+	}
+
+	if ( ! node ) {
+		return;
+	}
+
+	return node.closest( '[contenteditable]' );
+}
+
 export function useWritingFlow() {
 	const [ before, ref, after ] = useTabNav();
 	const hasMultiSelection = useSelect(
@@ -49,6 +61,66 @@ export function useWritingFlow() {
 
 					return () => {
 						node.removeAttribute( 'aria-label' );
+					};
+				},
+				[ hasMultiSelection ]
+			),
+			useRefEffect(
+				( node ) => {
+					node.contentEditable = true;
+
+					function delegate( event ) {
+						if ( event.defaultPrevented ) {
+							return;
+						}
+
+						const { ownerDocument } = node;
+						const { defaultView } = ownerDocument;
+						const selection = defaultView.getSelection();
+						const { anchorNode, focusNode } = selection;
+						const anchorNodeRoot = findContentEditableRoot(
+							anchorNode
+						);
+						const focusNodeRoot = findContentEditableRoot(
+							focusNode
+						);
+
+						if ( anchorNodeRoot === focusNodeRoot ) {
+							const init = {};
+
+							for ( const key in event ) {
+								init[ key ] = event[ key ];
+							}
+
+							init.bubbles = false;
+
+							const prototype = Object.getPrototypeOf( event );
+							const constructorName = prototype.constructor.name;
+							const Constructor = defaultView[ constructorName ];
+							const newEvent = new Constructor(
+								event.type,
+								init
+							);
+							const cancelled = ! anchorNodeRoot.dispatchEvent(
+								newEvent
+							);
+
+							if ( cancelled ) event.preventDefault();
+						} else {
+							event.preventDefault();
+						}
+					}
+
+					const events = [ 'keydown', 'keypress', 'keyup', 'input' ];
+
+					events.forEach( ( eventName ) => {
+						node.addEventListener( eventName, delegate );
+					} );
+
+					return () => {
+						events.forEach( ( eventName ) => {
+							node.removeEventListener( eventName, delegate );
+						} );
 					};
 				},
 				[ hasMultiSelection ]

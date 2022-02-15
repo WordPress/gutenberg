@@ -146,6 +146,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		tabIndex: 0,
+		contentEditable: false,
 		role: 'document',
 		'aria-label': blockLabel,
 		'data-block': clientId,

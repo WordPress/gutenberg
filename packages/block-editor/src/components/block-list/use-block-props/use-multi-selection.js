@@ -10,20 +10,6 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { getBlockClientId } from '../../../utils/dom';
 
-function toggleRichText( container, toggle ) {
-	Array.from(
-		container
-			.closest( '.is-root-container' )
-			.querySelectorAll( '.rich-text' )
-	).forEach( ( node ) => {
-		if ( toggle ) {
-			node.setAttribute( 'contenteditable', true );
-		} else {
-			node.removeAttribute( 'contenteditable' );
-		}
-	} );
-}
-
 /**
  * Sets a multi-selection based on the native selection across blocks.
  *
@@ -57,7 +43,6 @@ export function useMultiSelection( clientId ) {
 				// If no selection is found, end multi selection and enable all rich
 				// text areas.
 				if ( ! selection.rangeCount || selection.isCollapsed ) {
-					toggleRichText( node, true );
 					return;
 				}
 
@@ -73,8 +58,6 @@ export function useMultiSelection( clientId ) {
 					// selection. Additionally, rich text elements that were
 					// previously disabled can now be enabled again.
 					if ( isSelectionEnd ) {
-						toggleRichText( node, true );
-
 						if ( selection.rangeCount ) {
 							const {
 								commonAncestorContainer,
@@ -143,17 +126,6 @@ export function useMultiSelection( clientId ) {
 					onSelectionChange
 				);
 				defaultView.addEventListener( 'mouseup', onSelectionEnd );
-
-				// Removing the contenteditable attributes within the block
-				// editor is essential for selection to work across editable
-				// areas. The edible hosts are removed, allowing selection to be
-				// extended outside the DOM element. `startMultiSelect` sets a
-				// flag in the store so the rich text components are updated,
-				// but the rerender may happen very slowly, especially in Safari
-				// for the blocks that are asynchonously rendered. To ensure the
-				// browser instantly removes the selection boundaries, we remove
-				// the contenteditable attributes manually.
-				toggleRichText( node, false );
 			}
 
 			function onMouseDown( event ) {
@@ -191,7 +163,6 @@ export function useMultiSelection( clientId ) {
 						// Handle the case of having selected a parent block and
 						// then sfift+click on a child.
 						if ( start !== end ) {
-							toggleRichText( node, false );
 							multiSelect( start, end );
 							event.preventDefault();
 						}
