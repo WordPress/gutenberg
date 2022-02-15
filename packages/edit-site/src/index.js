@@ -41,7 +41,7 @@ export async function reinitializeEditor( target, settings ) {
 	// won't be present. Do a client side redirect to the 'homepage' if that's
 	// the case.
 	try {
-		await redirectToHomepage( settings.siteUrl );
+		await redirectToHomepage( settings.__experimentalHomeTemplate );
 	} catch ( error ) {
 		render(
 			<ErrorBoundaryWarning

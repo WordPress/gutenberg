@@ -98,7 +98,7 @@ function gutenberg_edit_site_resolve_home_template() {
 	}
 
 	$hierarchy = array( 'front-page', 'home', 'index' );
-	$template  = gutenberg_resolve_template( 'site', $hierarchy, '' );
+	$template  = gutenberg_resolve_template( 'home', $hierarchy, '' );
 
 	if ( ! $template ) {
 		return null;
