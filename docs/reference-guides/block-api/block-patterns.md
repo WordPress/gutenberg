@@ -142,7 +142,7 @@ add_action( 'init', 'my_plugin_unregister_my_pattern_categories' );
 
 It is possible to attach a block pattern to one or more block types. This adds the block pattern as an available transform for that block type.
 
-Currently pattern transformations are available for simple blocks(blocks without inner blocks). In order for a pattern to be suggested, **every selected block must have matched with a pattern's block**. If a suggested pattern has more blocks than the selected blocks, they are added `as are` from the pattern. Every pattern block that matched with a selected block will be transformed. Noting that this doesn't necessarily mean the order of the blocks will be preserved.
+Currently these transformations are available only to simple blocks (blocks without inner blocks). In order for a pattern to be suggested, **every selected block must be present in the block pattern**.
 
 For instance:
 
