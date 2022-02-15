@@ -259,14 +259,15 @@ export function stopMultiSelect() {
 /**
  * Action that changes block multi-selection.
  *
- * @param {string}      start           First block of the multi selection.
- * @param {string}      end             Last block of the multiselection.
- * @param {number|null} initialPosition Optional initial position. Pass as null to skip focus within editor canvas.
+ * @param {string}      start                         First block of the multi selection.
+ * @param {string}      end                           Last block of the multiselection.
+ * @param {number|null} __experimentalInitialPosition Optional initial position. Pass as null to skip focus within editor canvas.
  */
-export const multiSelect = ( start, end, initialPosition = 0 ) => ( {
-	select,
-	dispatch,
-} ) => {
+export const multiSelect = (
+	start,
+	end,
+	__experimentalInitialPosition = 0
+) => ( { select, dispatch } ) => {
 	const startBlockRootClientId = select.getBlockRootClientId( start );
 	const endBlockRootClientId = select.getBlockRootClientId( end );
 
@@ -275,7 +276,12 @@ export const multiSelect = ( start, end, initialPosition = 0 ) => ( {
 		return;
 	}
 
-	dispatch( { type: 'MULTI_SELECT', start, end, initialPosition } );
+	dispatch( {
+		type: 'MULTI_SELECT',
+		start,
+		end,
+		initialPosition: __experimentalInitialPosition,
+	} );
 
 	const blockCount = select.getSelectedBlockCount();
 
