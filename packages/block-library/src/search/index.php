@@ -72,6 +72,7 @@ function render_block_core_search( $attributes ) {
 	if ( $show_button ) {
 		$button_internal_markup = '';
 		$button_classes         = $color_classes;
+		$aria_label             = '';
 
 		if ( ! $is_button_inside ) {
 			$button_classes .= ' ' . $border_color_classes;
@@ -81,6 +82,7 @@ function render_block_core_search( $attributes ) {
 				$button_internal_markup = wp_kses_post( $attributes['buttonText'] );
 			}
 		} else {
+			$aria_label             = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['label'] ) ) );
 			$button_classes        .= ' has-icon';
 			$button_internal_markup =
 				'<svg id="search-icon" class="search-icon" viewBox="0 0 24 24" width="24" height="24">
@@ -89,10 +91,10 @@ function render_block_core_search( $attributes ) {
 		}
 
 		$button_markup = sprintf(
-			'<button type="submit" class="wp-block-search__button %s" %s aria-label="%s">%s</button>',
+			'<button type="submit" class="wp-block-search__button %s" %s %s>%s</button>',
 			esc_attr( $button_classes ),
 			$inline_styles['button'],
-			esc_attr( wp_strip_all_tags( $attributes['label'] ) ),
+			$aria_label,
 			$button_internal_markup
 		);
 	}
