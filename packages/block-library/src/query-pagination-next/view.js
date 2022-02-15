@@ -20,7 +20,7 @@ const load = () => {
 		).href;
 		const url = new URL( restApiBase + route );
 		//url.searchParams.append( 'rest_route', route );
-		url.searchParams.append( 'context', 'view' );
+		url.searchParams.append( 'context', 'edit' );
 		url.searchParams.append( '_locale', 'user' );
 
 		const html = await loadHtml( url );
