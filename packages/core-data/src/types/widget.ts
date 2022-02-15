@@ -45,3 +45,5 @@ interface WidgetInstance {
 		[ k: string ]: string;
 	};
 }
+
+export interface WidgetWithEdits extends Widget {}

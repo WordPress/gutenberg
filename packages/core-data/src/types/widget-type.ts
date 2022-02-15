@@ -20,3 +20,5 @@ export interface WidgetType {
 	 */
 	classname: string;
 }
+
+export interface WidgetTypeWithEdits extends WidgetType {}

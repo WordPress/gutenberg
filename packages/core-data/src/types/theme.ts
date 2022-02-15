@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { ActiveOrInactive, EntityRecordWithRawData } from './common';
+import { PostFormat, RawField, WithEdits } from './common';
 
-export interface Theme< RawType > extends EntityRecordWithRawData {
+export interface Theme {
 	/**
 	 * The theme's stylesheet. This uniquely identifies the theme.
 	 */
@@ -15,19 +15,19 @@ export interface Theme< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The theme author.
 	 */
-	author?: RawType;
+	author?: RawField;
 	/**
 	 * The website of the theme author.
 	 */
-	author_uri?: RawType;
+	author_uri?: RawField;
 	/**
 	 * A description of the theme.
 	 */
-	description?: RawType;
+	description?: RawField;
 	/**
 	 * The name of the theme.
 	 */
-	name?: RawType;
+	name?: RawField;
 	/**
 	 * The minimum PHP version required for the theme to work.
 	 */
@@ -43,7 +43,7 @@ export interface Theme< RawType > extends EntityRecordWithRawData {
 	/**
 	 * Tags indicating styles and features of the theme.
 	 */
-	tags?: RawType;
+	tags?: RawField;
 	/**
 	 * The theme's text domain.
 	 */
@@ -55,7 +55,7 @@ export interface Theme< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The URI of the theme's webpage.
 	 */
-	theme_uri?: RawType;
+	theme_uri?: RawField;
 	/**
 	 * The theme's current version.
 	 */
@@ -63,8 +63,10 @@ export interface Theme< RawType > extends EntityRecordWithRawData {
 	/**
 	 * A named status for the theme.
 	 */
-	status?: ActiveOrInactive;
+	status?: ThemeStatus;
 }
+
+export type ThemeStatus = 'active' | 'inactive';
 
 interface ThemeSupports {
 	/**
@@ -149,19 +151,7 @@ interface ThemeSupports {
 	'wp-block-styles'?: boolean;
 }
 
-type PostFormat =
-	| 'standard'
-	| 'aside'
-	| 'chat'
-	| 'gallery'
-	| 'link'
-	| 'image'
-	| 'quote'
-	| 'status'
-	| 'video'
-	| 'audio';
-
-type CustomBackground = {
+export interface CustomBackground {
 	'default-image'?: string;
 	'default-preset'?: 'default' | 'fill' | 'fit' | 'repeat' | 'custom';
 	'default-position-x'?: 'left' | 'center' | 'right';
@@ -170,9 +160,9 @@ type CustomBackground = {
 	'default-repeat'?: 'repeat-x' | 'repeat-y' | 'repeat' | 'no-repeat';
 	'default-attachment'?: 'scroll' | 'fixed';
 	'default-color'?: string;
-};
+}
 
-type CustomHeader = {
+export interface CustomHeader {
 	'default-image'?: string;
 	'random-default'?: boolean;
 	width?: number;
@@ -183,36 +173,36 @@ type CustomHeader = {
 	'header-text'?: boolean;
 	uploads?: boolean;
 	video?: boolean;
-};
+}
 
-type CustomLogo = {
+export interface CustomLogo {
 	width?: number;
 	height?: number;
 	'flex-width'?: boolean;
 	'flex-height'?: boolean;
 	'header-text'?: string[];
 	'unlink-homepage-logo'?: boolean;
-};
+}
 
-type Color = {
+export interface Color {
 	name?: string;
 	slug?: string;
 	color?: string;
-};
+}
 
-type FontSize = {
+export interface FontSize {
 	name?: string;
 	size?: number;
 	slug?: string;
-};
+}
 
-type GradientPreset = {
+export interface GradientPreset {
 	name?: string;
 	gradient?: string;
 	slug?: string;
-};
+}
 
-type Html5Option =
+export type Html5Option =
 	| 'search-form'
 	| 'comment-form'
 	| 'comment-list'
@@ -220,3 +210,9 @@ type Html5Option =
 	| 'caption'
 	| 'script'
 	| 'style';
+
+export interface ThemeWithEdits
+	extends WithEdits<
+		Theme,
+		'author' | 'author_uri' | 'description' | 'name' | 'tags' | 'theme_uri'
+	> {}

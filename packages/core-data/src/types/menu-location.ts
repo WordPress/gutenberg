@@ -12,3 +12,5 @@ export interface MenuLocation {
 	 */
 	menu: number;
 }
+
+export interface MenuLocationWithEdits extends MenuLocation {}

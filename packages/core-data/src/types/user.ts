@@ -87,3 +87,5 @@ export interface User {
 		[ k: string ]: string;
 	};
 }
+
+export interface UserWithEdits extends User {}

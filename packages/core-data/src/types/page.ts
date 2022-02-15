@@ -1,9 +1,15 @@
 /**
  * Internal dependencies
  */
-import { EntityRecordWithRawData, OpenOrClosed, PostStatus } from './common';
+import {
+	CommentStatus,
+	PingStatus,
+	PostStatus,
+	RawField,
+	WithEdits,
+} from './common';
 
-export interface Page< RawType > extends EntityRecordWithRawData {
+export interface Page {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -15,7 +21,7 @@ export interface Page< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid?: RawType;
+	guid?: RawField;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -63,11 +69,16 @@ export interface Page< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The title for the post.
 	 */
-	title: RawType;
+	title: RawField;
 	/**
 	 * The content for the post.
 	 */
-	content?: RawType;
+	content?: RawField & {
+		/** Whether the content is protected with a password. */
+		is_protected: boolean;
+		/** Version of the content block format used by the page. */
+		block_version?: string;
+	};
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -75,7 +86,7 @@ export interface Page< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The excerpt for the post.
 	 */
-	excerpt: RawType;
+	excerpt: RawField;
 	/**
 	 * The ID of the featured media for the post.
 	 */
@@ -83,11 +94,11 @@ export interface Page< RawType > extends EntityRecordWithRawData {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status?: OpenOrClosed;
+	comment_status?: CommentStatus;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status?: OpenOrClosed;
+	ping_status?: PingStatus;
 	/**
 	 * The order of the post in relation to other posts.
 	 */
@@ -103,3 +114,6 @@ export interface Page< RawType > extends EntityRecordWithRawData {
 	 */
 	template?: string;
 }
+
+export interface PageWithEdits
+	extends WithEdits< Page, 'guid' | 'title' | 'content' | 'excerpt' > {}

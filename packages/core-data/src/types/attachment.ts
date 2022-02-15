@@ -2,18 +2,14 @@
  * Internal dependencies
  */
 import {
-	EntityInContext,
-	EntityContext,
-	EntityRecordWithRawData,
-	OpenOrClosed,
+	CommentStatus,
+	MediaType,
+	PingStatus,
 	PostStatus,
-	RawObject,
-	RawString,
+	WithEdits,
 } from './common';
 
-type MediaType = 'image' | 'file';
-
-export interface BaseAttachment< RawType > extends EntityRecordWithRawData {
+export interface Attachment {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -25,7 +21,16 @@ export interface BaseAttachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid: RawType;
+	guid?: {
+		/**
+		 * Data as it exists in the database.
+		 */
+		raw?: string;
+		/**
+		 * Data transformed for display.
+		 */
+		rendered: string;
+	};
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -65,7 +70,16 @@ export interface BaseAttachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The title for the post.
 	 */
-	title: RawType;
+	title: {
+		/**
+		 * Data as it exists in the database.
+		 */
+		raw?: string;
+		/**
+		 * Data transformed for display.
+		 */
+		rendered: string;
+	};
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -73,11 +87,11 @@ export interface BaseAttachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status: OpenOrClosed;
+	comment_status: CommentStatus;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status: OpenOrClosed;
+	ping_status: PingStatus;
 	/**
 	 * Meta fields.
 	 */
@@ -95,11 +109,29 @@ export interface BaseAttachment< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The attachment caption.
 	 */
-	caption: RawType;
+	caption: {
+		/**
+		 * Data as it exists in the database.
+		 */
+		raw?: string;
+		/**
+		 * Data transformed for display.
+		 */
+		rendered: string;
+	};
 	/**
 	 * The attachment description.
 	 */
-	description: RawType;
+	description: {
+		/**
+		 * Data as it exists in the database.
+		 */
+		raw?: string;
+		/**
+		 * Data transformed for display.
+		 */
+		rendered: string;
+	};
 	/**
 	 * Attachment type.
 	 */
@@ -128,101 +160,8 @@ export interface BaseAttachment< RawType > extends EntityRecordWithRawData {
 	missing_image_sizes: string[];
 }
 
-type ViewProperties =
-	| 'date'
-	| 'date_gmt'
-	| 'guid'
-	| 'id'
-	| 'link'
-	| 'modified'
-	| 'modified_gmt'
-	| 'slug'
-	| 'status'
-	| 'type'
-	| 'title'
-	| 'author'
-	| 'comment_status'
-	| 'ping_status'
-	| 'meta'
-	| 'template'
-	| 'alt_text'
-	| 'caption'
-	| 'description'
-	| 'media_type'
-	| 'mime_type'
-	| 'media_details'
-	| 'post'
-	| 'source_url';
-
-type EditProperties =
-	| 'date'
-	| 'date_gmt'
-	| 'guid'
-	| 'id'
-	| 'link'
-	| 'modified'
-	| 'modified_gmt'
-	| 'slug'
-	| 'status'
-	| 'type'
-	| 'permalink_template'
-	| 'generated_slug'
-	| 'title'
-	| 'author'
-	| 'comment_status'
-	| 'ping_status'
-	| 'meta'
-	| 'template'
-	| 'alt_text'
-	| 'caption'
-	| 'description'
-	| 'media_type'
-	| 'mime_type'
-	| 'media_details'
-	| 'post'
-	| 'source_url'
-	| 'missing_image_sizes';
-
-type EmbedProperties =
-	| 'date'
-	| 'id'
-	| 'link'
-	| 'slug'
-	| 'type'
-	| 'title'
-	| 'author'
-	| 'alt_text'
-	| 'caption'
-	| 'media_type'
-	| 'mime_type'
-	| 'media_details'
-	| 'source_url';
-
-export type Attachment<
-	Context extends EntityContext = EntityContext.view,
-	RawType = RawObject< Context >
-> = Pick<
-	BaseAttachment< RawType >,
-	Context extends EntityContext.view
-		? ViewProperties
-		: Context extends EntityContext.edit
-		? EditProperties
-		: Context extends EntityContext.embed
-		? EmbedProperties
-		: never
->;
-
-const attachmentInViewContext = ( {} as any ) as Attachment< EntityContext.view >;
-// attachmentInViewContext.title is { rendered: string }
-
-const attachmentInEditContext = ( {} as any ) as Attachment< EntityContext.edit >;
-// attachmentInEditContext.title is { raw: string, rendered: string }
-
-const attachmentInEmbedContext = ( {} as any ) as Attachment< EntityContext.embed >;
-// attachmentInViewContext.title is { rendered: string }
-
-const editedAttachmentRecord = ( {} as any ) as Attachment<
-	EntityContext.edit,
-	RawString
->;
-// editedAttachmentRecord.title is string
+export interface AttachmentWithEdits
+	extends WithEdits<
+		Attachment,
+		'guid' | 'title' | 'description' | 'caption'
+	> {}

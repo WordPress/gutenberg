@@ -1,12 +1,30 @@
 /**
  * Internal dependencies
  */
+import { RawField, WithEdits } from './common';
+
+/**
+ * Internal dependencies
+ */
+
+export type NavMenuItemType =
+	| 'taxonomy'
+	| 'post_type'
+	| 'post_type_archive'
+	| 'custom';
+export type NavMenuItemStatus =
+	| 'publish'
+	| 'future'
+	| 'draft'
+	| 'pending'
+	| 'private';
+export type Target = '_blank' | '';
 
 export interface NavMenuItem {
 	/**
 	 * The title for the object.
 	 */
-	title: RawType;
+	title: RawField;
 	/**
 	 * Unique identifier for the object.
 	 */
@@ -18,11 +36,11 @@ export interface NavMenuItem {
 	/**
 	 * The family of objects originally represented, such as "post_type" or "taxonomy".
 	 */
-	type: 'taxonomy' | 'post_type' | 'post_type_archive' | 'custom';
+	type: NavMenuItemType;
 	/**
 	 * A named status for the object.
 	 */
-	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+	status: NavMenuItemStatus;
 	/**
 	 * The ID for the parent of the object.
 	 */
@@ -54,7 +72,7 @@ export interface NavMenuItem {
 	/**
 	 * The target attribute of the link element for this menu item.
 	 */
-	target: '_blank' | '';
+	target: Target;
 	/**
 	 * The URL to which this menu item points.
 	 */
@@ -78,3 +96,6 @@ export interface NavMenuItem {
 		[ k: string ]: string;
 	};
 }
+
+export interface NavMenuItemWithEdits
+	extends WithEdits< NavMenuItem, 'title' > {}

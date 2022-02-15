@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { OpenOrClosed } from './common';
+import { CommentStatus, PingStatus, WithEdits } from './common';
 
 export interface Settings {
 	/**
@@ -67,11 +67,11 @@ export interface Settings {
 	/**
 	 * Allow link notifications from other blogs (pingbacks and trackbacks) on new articles.
 	 */
-	default_ping_status?: OpenOrClosed;
+	default_ping_status?: PingStatus;
 	/**
 	 * Allow people to submit comments on new posts.
 	 */
-	default_comment_status?: OpenOrClosed;
+	default_comment_status?: CommentStatus;
 	/**
 	 * Site logo.
 	 */
@@ -81,3 +81,6 @@ export interface Settings {
 	 */
 	site_icon?: number;
 }
+
+export interface SettingsWithEdits
+	extends WithEdits< Settings, 'description' > {}

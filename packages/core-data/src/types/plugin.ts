@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { ActiveOrInactive, EntityRecordWithRawData } from './common';
+import { RawField, WithEdits } from './common';
 
-export interface Plugin< RawType > extends EntityRecordWithRawData {
+export interface Plugin {
 	/**
 	 * The plugin file.
 	 */
@@ -11,7 +11,7 @@ export interface Plugin< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The plugin activation status.
 	 */
-	status: ActiveOrInactive;
+	status: PluginStatus;
 	/**
 	 * The plugin name.
 	 */
@@ -33,7 +33,7 @@ export interface Plugin< RawType > extends EntityRecordWithRawData {
 	/**
 	 * The plugin description.
 	 */
-	description?: RawType;
+	description?: RawField;
 	/**
 	 * The plugin version number.
 	 */
@@ -55,3 +55,6 @@ export interface Plugin< RawType > extends EntityRecordWithRawData {
 	 */
 	textdomain?: string;
 }
+
+export type PluginStatus = 'active' | 'inactive';
+export interface PluginWithEdits extends WithEdits< Plugin, 'description' > {}

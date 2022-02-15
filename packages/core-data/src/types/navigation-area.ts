@@ -12,3 +12,5 @@ export interface NavigationArea {
 	 */
 	navigation: number;
 }
+
+export interface NavigationAreaWithEdits extends NavigationArea {}

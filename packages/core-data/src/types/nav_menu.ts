@@ -30,3 +30,5 @@ export interface NavMenu {
 	 */
 	auto_add?: boolean;
 }
+
+export interface NavMenuWithEdits extends NavMenu {}

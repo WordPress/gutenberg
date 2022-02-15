@@ -1,48 +1,6 @@
-export interface FullRawObject {
-	/**
-	 * Data as it exists in the database.
-	 */
-	raw: string;
-	/**
-	 * Data transformed for display.
-	 */
-	rendered: string;
-}
-
-/**
- * The raw data representation.
- */
-export type RawObject< Context extends EntityContext > = Pick<
-	FullRawObject,
-	Context extends EntityContext.edit ? 'raw' | 'rendered' : 'rendered'
->;
-
-type DefaultRawObject = RawObject< EntityContext.view >;
-
-export type RawString = string;
-export type RawData = Partial< DefaultRawObject > | RawString;
-
-export type PostStatus = 'publish' | 'future' | 'draft' | 'pending' | 'private';
-
-export type OpenOrClosed = 'open' | 'closed';
-export type ActiveOrInactive = 'active' | 'inactive';
-
-export type TemplateContent =
-	| {
-			/**
-			 * Content for the template, as it exists in the database.
-			 */
-			raw?: string;
-			/**
-			 * Version of the content block format used by the template.
-			 */
-			block_version?: number;
-	  }
-	| string;
-
-export interface EntityRecordWithRawData<
-	RawType extends RawData = DefaultRawObject
-> {}
+export type WithEdits< T, Fields > = {
+	[ Key in keyof T ]: Key extends Fields ? string : T[ Key ];
+};
 
 export interface AvatarUrls {
 	/**
@@ -61,38 +19,32 @@ export interface AvatarUrls {
 	[ k: string ]: string;
 }
 
-export enum EntityContext {
-	view = 'view',
-	edit = 'edit',
-	embed = 'embed',
+export type MediaType = 'image' | 'file';
+export type CommentStatus = 'open' | 'closed';
+export type PingStatus = 'open' | 'closed';
+export type PostStatus = 'publish' | 'future' | 'draft' | 'pending' | 'private';
+export type PostFormat =
+	| 'standard'
+	| 'aside'
+	| 'chat'
+	| 'gallery'
+	| 'link'
+	| 'image'
+	| 'quote'
+	| 'status'
+	| 'video'
+	| 'audio';
+
+/**
+ * The raw data representation.
+ */
+export interface RawField {
+	/**
+	 * Data as it exists in the database.
+	 */
+	raw?: string;
+	/**
+	 * Data transformed for display.
+	 */
+	rendered: string;
 }
-export type view = EntityContext.view;
-export type edit = EntityContext.edit;
-export type embed = EntityContext.embed;
-
-export enum RawDataType {
-	default,
-	RawDataIsString,
-}
-
-export type RawField<
-	RawDataOverride extends RawDataType,
-	T
-> = RawDataOverride extends RawDataType.RawDataIsString ? string : T;
-
-export type OnlyInContexts<
-	FieldType,
-	AvailableInContexts extends EntityContext,
-	Context extends EntityContext
-> = AvailableInContexts extends Context ? FieldType : never;
-
-export type DifferentPerContext<
-	ViewType,
-	EditType,
-	EmbedType,
-	Context extends EntityContext
-> = Context extends view
-	? ViewType
-	: Context extends edit
-	? EditType
-	: EmbedType;

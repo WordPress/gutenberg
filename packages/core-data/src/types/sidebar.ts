@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import { Widget } from './widget';
-import { ActiveOrInactive } from './common';
 
 export interface Sidebar {
 	/**
@@ -40,11 +39,14 @@ export interface Sidebar {
 	/**
 	 * Status of sidebar.
 	 */
-	status: ActiveOrInactive;
+	status: SidebarStatus;
 	/**
 	 * Nested widgets.
 	 */
 	widgets: NestedWidget[];
 }
 
+type SidebarStatus = 'active' | 'inactive';
 type NestedWidget = Widget | string;
+
+export interface SidebarWithEdits extends Sidebar {}

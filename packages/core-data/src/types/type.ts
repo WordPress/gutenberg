@@ -1,3 +1,7 @@
+/**
+ * Internal dependencies
+ */
+
 export interface Type {
 	/**
 	 * All capabilities used by the post type.
@@ -52,10 +56,10 @@ export interface Type {
 	/**
 	 * The visibility settings for the post type.
 	 */
-	visibility?: Visibility;
+	visibility?: TypeVisibility;
 }
 
-interface Visibility {
+interface TypeVisibility {
 	/**
 	 * Whether to generate a default UI for managing this post type.
 	 */
@@ -65,3 +69,5 @@ interface Visibility {
 	 */
 	show_in_nav_menus?: boolean;
 }
+
+export interface TypeWithEdits extends Type {}

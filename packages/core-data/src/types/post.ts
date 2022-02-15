@@ -2,23 +2,15 @@
  * Internal dependencies
  */
 import {
-	edit,
-	EntityContext,
-	OnlyInContexts,
-	FullRawObject,
-	RawField,
-	view,
-	OpenOrClosed,
-	DifferentPerContext,
 	PostStatus,
-	embed,
-	RawDataType,
+	PingStatus,
+	CommentStatus,
+	RawField,
+	PostFormat,
+	WithEdits,
 } from './common';
 
-export interface Post<
-	Context extends EntityContext,
-	RawDataOverride extends RawDataType = RawDataType.default
-> {
+export interface Post {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -26,19 +18,11 @@ export interface Post<
 	/**
 	 * The date the post was published, as GMT.
 	 */
-	date_gmt: OnlyInContexts< string | null, view | edit, Context >;
+	date_gmt?: string | null;
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid: RawField<
-		RawDataOverride,
-		DifferentPerContext<
-			Pick< FullRawObject, 'rendered' >,
-			FullRawObject,
-			never,
-			Context
-		>
-	>;
+	guid?: RawField;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -50,11 +34,11 @@ export interface Post<
 	/**
 	 * The date the post was last modified, in the site's timezone.
 	 */
-	modified: OnlyInContexts< string, view | edit, Context >;
+	modified?: string;
 	/**
 	 * The date the post was last modified, as GMT.
 	 */
-	modified_gmt: OnlyInContexts< string, view | edit, Context >;
+	modified_gmt?: string;
 	/**
 	 * An alphanumeric identifier for the post unique to its type.
 	 */
@@ -62,7 +46,7 @@ export interface Post<
 	/**
 	 * A named status for the post.
 	 */
-	status: OnlyInContexts< PostStatus, view | edit, Context >;
+	status?: PostStatus;
 	/**
 	 * Type of post.
 	 */
@@ -70,39 +54,28 @@ export interface Post<
 	/**
 	 * A password to protect access to the content and excerpt.
 	 */
-	password: OnlyInContexts< string, edit, Context >;
+	password?: string;
 	/**
 	 * Permalink template for the post.
 	 */
-	permalink_template: OnlyInContexts< string, edit, Context >;
+	permalink_template?: string;
 	/**
 	 * Slug automatically generated from the post title.
 	 */
-	generated_slug: OnlyInContexts< string, edit, Context >;
+	generated_slug?: string;
 	/**
 	 * The title for the post.
 	 */
-	title: RawField<
-		RawDataOverride,
-		DifferentPerContext<
-			Pick< FullRawObject, 'rendered' >,
-			FullRawObject,
-			Pick< FullRawObject, 'rendered' >,
-			Context
-		>
-	>;
+	title: RawField;
 	/**
 	 * The content for the post.
 	 */
-	content: RawField<
-		RawDataOverride,
-		DifferentPerContext<
-			Pick< FullRawObject, 'rendered' > & { protected: boolean },
-			FullRawObject & { block_version: number; protected: boolean },
-			{ protected: boolean },
-			Context
-		>
-	>;
+	content?: RawField & {
+		/** Whether the content is protected with a password. */
+		is_protected: boolean;
+		/** Version of the content block format used by the post. */
+		block_version?: string;
+	};
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -110,15 +83,7 @@ export interface Post<
 	/**
 	 * The excerpt for the post.
 	 */
-	excerpt: RawField<
-		RawDataOverride,
-		DifferentPerContext<
-			Pick< FullRawObject, 'rendered' >,
-			FullRawObject,
-			Pick< FullRawObject, 'rendered' >,
-			Context
-		> & { protected: boolean }
-	>;
+	excerpt: RawField;
 	/**
 	 * The ID of the featured media for the post.
 	 */
@@ -126,51 +91,38 @@ export interface Post<
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status: OnlyInContexts< OpenOrClosed, view | edit, Context >;
+	comment_status?: CommentStatus;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status: OnlyInContexts< OpenOrClosed, view | edit, Context >;
+	ping_status?: PingStatus;
 	/**
 	 * The format for the post.
 	 */
-	format: OnlyInContexts< PostFormat, view | edit, Context >;
+	format?: PostFormat;
 	/**
 	 * Meta fields.
 	 */
-	meta: OnlyInContexts<
-		{
-			[ k: string ]: string;
-		},
-		view | edit,
-		Context
-	>;
+	meta?: {
+		[ k: string ]: string;
+	};
 	/**
 	 * Whether or not the post should be treated as sticky.
 	 */
-	sticky: OnlyInContexts< boolean, view | edit, Context >;
+	sticky?: boolean;
 	/**
 	 * The theme file to use to display the post.
 	 */
-	template: OnlyInContexts< string, view | edit, Context >;
+	template?: string;
 	/**
 	 * The terms assigned to the post in the category taxonomy.
 	 */
-	categories: OnlyInContexts< number[], view | edit, Context >;
+	categories?: number[];
 	/**
 	 * The terms assigned to the post in the post_tag taxonomy.
 	 */
-	tags: OnlyInContexts< number[], view | edit, Context >;
+	tags?: number[];
 }
 
-type PostFormat =
-	| 'standard'
-	| 'aside'
-	| 'chat'
-	| 'gallery'
-	| 'link'
-	| 'image'
-	| 'quote'
-	| 'status'
-	| 'video'
-	| 'audio';
+export interface PostWithEdits
+	extends WithEdits< Post, 'guid' | 'title' | 'content' | 'excerpt' > {}

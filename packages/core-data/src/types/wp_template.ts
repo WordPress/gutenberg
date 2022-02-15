@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { EntityRecordWithRawData, PostStatus, TemplateContent } from './common';
+import { PostStatus, RawField, WithEdits } from './common';
 
-export interface WpTemplate< RawType > extends EntityRecordWithRawData {
+export interface WpTemplate {
 	/**
 	 * ID of template.
 	 */
@@ -31,11 +31,22 @@ export interface WpTemplate< RawType > extends EntityRecordWithRawData {
 	/**
 	 * Content of template.
 	 */
-	content: TemplateContent;
+	content:
+		| {
+				/**
+				 * Content for the template, as it exists in the database.
+				 */
+				raw?: string;
+				/**
+				 * Version of the content block format used by the template.
+				 */
+				block_version?: number;
+		  }
+		| string;
 	/**
 	 * Title of template.
 	 */
-	title: RawType;
+	title: RawField | string;
 	/**
 	 * Description of template.
 	 */
@@ -65,3 +76,5 @@ export interface WpTemplate< RawType > extends EntityRecordWithRawData {
 		[ k: string ]: string;
 	};
 }
+
+export interface WpTemplateWithEdits extends WithEdits< WpTemplate, 'title' > {}

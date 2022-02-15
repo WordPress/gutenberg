@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { WithEdits } from './common';
+
 export interface Taxonomy {
 	/**
 	 * All capabilities used by the taxonomy.
@@ -46,10 +51,10 @@ export interface Taxonomy {
 	/**
 	 * The visibility settings for the taxonomy.
 	 */
-	visibility?: Visibility;
+	visibility?: TaxonomyVisibility;
 }
 
-interface Visibility {
+export interface TaxonomyVisibility {
 	/**
 	 * Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.
 	 */
@@ -75,3 +80,6 @@ interface Visibility {
 	 */
 	show_in_quick_edit?: boolean;
 }
+
+export interface TaxonomyWithEdits
+	extends WithEdits< Taxonomy, 'description' > {}
