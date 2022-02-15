@@ -10,7 +10,7 @@ import { contextConnect, WordPressComponentProps } from '../ui/context';
 import { View } from '../view';
 import { useHeading, HeadingProps } from './hook';
 
-function Heading(
+export function Heading(
 	props: WordPressComponentProps< HeadingProps, 'h1' >,
 	forwardedRef: ForwardedRef< any >
 ) {

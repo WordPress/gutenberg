@@ -2,9 +2,10 @@
  * Internal dependencies
  */
 import { Heading } from '../';
+import { Heading as UnconnectedHeading } from '../component';
 
 export default {
-	component: Heading,
+	component: UnconnectedHeading,
 	title: 'Components (Experimental)/Heading',
 };
 
