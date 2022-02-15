@@ -22,6 +22,11 @@ export const globalTypes = {
 export const decorators = [ WithRTL ];
 
 export const parameters = {
+	docs: {
+		source: {
+			state: 'open',
+		},
+	},
 	knobs: {
 		// Knobs are deprecated, and new stories should use addon-controls.
 		// Will be enabled on a per-story basis until migration is complete.
