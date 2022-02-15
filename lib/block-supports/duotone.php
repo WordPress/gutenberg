@@ -472,8 +472,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 				printf(
 					// Simply accessing el.offsetHeight flushes layout and style
 					// changes in WebKit without having to wait for setTimeout.
-					'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
-					wp_json_encode( $selector )
+					'<script>( function() { var el = document.querySelector( decodeURIComponent( "%s" ) ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
+					rawurlencode( (string) $selector )
 				);
 			}
 		}
