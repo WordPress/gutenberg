@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import {
 	InspectorControls,
 	useBlockProps,
-	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import {
@@ -37,7 +36,7 @@ const AvatarInspectorControls = ( { setAttributes, avatar, attributes } ) => (
 					} )
 				}
 				min={ avatar.minSize }
-				max={ avatar.maxsize }
+				max={ avatar.maxSize }
 				initialPosition={ attributes?.width }
 				value={ attributes?.width }
 			/>
@@ -70,10 +69,9 @@ const ResizableAvatar = ( {
 	blockProps,
 	isSelected,
 } ) => {
-	const spacingProps = useSpacingProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	return (
-		<div { ...spacingProps } { ...blockProps }>
+		<div { ...blockProps }>
 			<ResizableBox
 				size={ {
 					width: attributes.width,
