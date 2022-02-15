@@ -43,7 +43,9 @@ export function useMultiSelection( clientId ) {
 				// If no selection is found, end multi selection and enable all rich
 				// text areas.
 				if ( ! selection.rangeCount || selection.isCollapsed ) {
-					node.closest( '[contenteditable]' ).contentEditable = false;
+					node.parentElement.closest(
+						'[contenteditable]'
+					).contentEditable = false;
 					return;
 				}
 
@@ -59,7 +61,7 @@ export function useMultiSelection( clientId ) {
 					// selection. Additionally, rich text elements that were
 					// previously disabled can now be enabled again.
 					if ( isSelectionEnd ) {
-						node.closest(
+						node.parentElement.closest(
 							'[contenteditable]'
 						).contentEditable = false;
 
@@ -132,7 +134,9 @@ export function useMultiSelection( clientId ) {
 				);
 				defaultView.addEventListener( 'mouseup', onSelectionEnd );
 
-				node.closest( '[contenteditable]' ).contentEditable = true;
+				node.parentElement.closest(
+					'[contenteditable]'
+				).contentEditable = true;
 			}
 
 			function onMouseDown( event ) {
@@ -170,7 +174,7 @@ export function useMultiSelection( clientId ) {
 						// Handle the case of having selected a parent block and
 						// then sfift+click on a child.
 						if ( start !== end ) {
-							node.closest(
+							node.parentElement.closest(
 								'[contenteditable]'
 							).contentEditable = true;
 							multiSelect( start, end );
