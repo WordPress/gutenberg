@@ -50,10 +50,11 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		$custom_query_max_pages = (int) $custom_query->max_num_pages;
 		if ( $custom_query_max_pages && $custom_query_max_pages !== $page ) {
 			$data_attributes = sprintf(
-				'data-block="%1$s" data-attribute="%2$s" data-new-value="%3$s"',
+				'data-block="%1$s" data-attribute="%2$s" data-new-value="%3$s", data-nonce="%4$s"',
 				'core/query',
 				esc_attr( $page_key ),
-				esc_attr( $page + 1 )
+				esc_attr( $page + 1 ),
+				wp_create_nonce( 'wp_rest' )
 			);
 			$content = sprintf(
 				'<a href="%1$s" %2$s %3$s>%4$s</a>',
