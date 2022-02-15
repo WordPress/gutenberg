@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -59,9 +60,8 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 
 	const effect = {
 		expand: {
-			scale: 1.7,
-			borderRadius: 0,
-			transition: { type: 'tween', duration: '0.2' },
+			scale: 1.25,
+			transition: { type: 'tween', duration: '0.3' },
 		},
 	};
 
@@ -85,10 +85,15 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 		buttonIcon = <Icon size="36px" icon={ icon } />;
 	}
 
+	const classes = classnames( {
+		'edit-post-fullscreen-mode-close': true,
+		'has-icon': siteIconUrl,
+	} );
+
 	return (
 		<motion.div whileHover="expand">
 			<Button
-				className="edit-post-fullscreen-mode-close has-icon"
+				className={ classes }
 				href={
 					href ??
 					addQueryArgs( 'edit.php', {
