@@ -82,11 +82,6 @@ function gutenberg_get_editor_styles() {
  * @return array|null A template object, or null if none could be found
  */
 function gutenberg_edit_site_resolve_home_template() {
-	// Return early if we already have template in URL.
-	if ( ! empty( $_GET['postType'] ) ) {
-		return null;
-	}
-
 	$show_on_front = get_option( 'show_on_front' );
 	$front_page_id = get_option( 'page_on_front' );
 

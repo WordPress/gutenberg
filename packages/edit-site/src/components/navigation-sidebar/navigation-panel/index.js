@@ -40,17 +40,22 @@ function NavLink( { params, replace, ...props } ) {
 }
 
 const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
-	const { isNavigationOpen, siteTitle } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreDataStore );
+	const { homeTemplate, isNavigationOpen, siteTitle } = useSelect(
+		( select ) => {
+			const { getEntityRecord } = select( coreDataStore );
+			const { getSettings, isNavigationOpened } = select( editSiteStore );
 
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+			const siteData =
+				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
-		return {
-			siteTitle: siteData.name,
-			isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
-		};
-	}, [] );
+			return {
+				siteTitle: siteData.name,
+				homeTemplate: getSettings().__experimentalHomeTemplate,
+				isNavigationOpen: isNavigationOpened(),
+			};
+		},
+		[]
+	);
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
 	const closeOnEscape = ( event ) => {
@@ -91,8 +96,8 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 									title={ __( 'Site' ) }
 									item={ SITE_EDITOR_KEY }
 									params={ {
-										postId: undefined,
-										postType: undefined,
+										postId: homeTemplate?.postId,
+										postType: homeTemplate?.postType,
 									} }
 								/>
 								<NavLink
