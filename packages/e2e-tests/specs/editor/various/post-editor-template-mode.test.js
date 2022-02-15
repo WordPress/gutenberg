@@ -201,8 +201,8 @@ describe( 'Post Editor Template mode', () => {
 describe( 'Delete Post Template Confirmation Dialog', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-block-templates' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 		await createNewPost();
 		// Create a random post.
