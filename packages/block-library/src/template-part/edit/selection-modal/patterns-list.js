@@ -1,8 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalBlockPatternSetup as BlockPatternSetup } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
+import {
+	__experimentalBlockPatternsList as BlockPatternsList,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	TextControl,
@@ -10,55 +13,61 @@ import {
 	FlexItem,
 	Button,
 	Modal,
-	Placeholder,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { useAsyncList } from '@wordpress/compose';
 
-export default function PatternsSetup( {
+export default function PatternsList( {
 	area,
 	areaLabel,
-	areaIcon,
 	clientId,
-	onCreate,
-	resetPlaceholder,
+	onSelect,
 } ) {
 	const blockNameWithArea = area
 		? `core/template-part/${ area }`
 		: 'core/template-part';
+	const blockPatterns = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				__experimentalGetAllowedPatterns,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			return __experimentalGetAllowedPatterns( rootClientId );
+		},
+		[ clientId ]
+	);
+	const filteredBlockPatterns = useMemo( () => {
+		return blockPatterns.filter( ( pattern ) =>
+			pattern?.blockTypes?.some?.(
+				( blockType ) => blockType === blockNameWithArea
+			)
+		);
+	}, [ blockNameWithArea, blockPatterns ] );
 
 	// Restructure onCreate to set the blocks on local state.
 	// Add modal to confirm title and trigger onCreate.
 	const [ title, setTitle ] = useState( __( 'Untitled Template Part' ) );
 	const [ startingBlocks, setStartingBlocks ] = useState( [] );
 	const [ isTitleStep, setIsTitleStep ] = useState( false );
-
-	const selectPattern = ( selectedPattern ) => {
-		setStartingBlocks( selectedPattern );
-		setIsTitleStep( true );
-	};
+	const shownPatterns = useAsyncList( filteredBlockPatterns );
 
 	const submitForCreation = ( event ) => {
 		event.preventDefault();
-		onCreate( startingBlocks, title );
+		onSelect( startingBlocks, title );
 	};
 
 	return (
 		<>
-			<BlockPatternSetup
-				clientId={ clientId }
-				startBlankComponent={
-					<StartBlankComponent
-						setTitleStep={ setIsTitleStep }
-						areaLabel={ areaLabel }
-						areaIcon={ areaIcon }
-					/>
-				}
-				onBlockPatternSelect={ selectPattern }
-				filterPatternsFn={ ( pattern ) =>
-					pattern?.blockTypes?.some?.(
-						( blockType ) => blockType === blockNameWithArea
-					)
-				}
+			<BlockPatternsList
+				blockPatterns={ filteredBlockPatterns }
+				shownPatterns={ shownPatterns }
+				onClickPattern={ ( _, blocks ) => {
+					setStartingBlocks( blocks );
+					setIsTitleStep( true );
+				} }
 			/>
+
 			{ isTitleStep && (
 				<Modal
 					title={ sprintf(
@@ -67,8 +76,8 @@ export default function PatternsSetup( {
 						areaLabel.toLowerCase()
 					) }
 					closeLabel={ __( 'Cancel' ) }
-					onRequestClose={ resetPlaceholder }
 					overlayClassName="wp-block-template-part__placeholder-create-new__title-form"
+					onRequestClose={ () => setIsTitleStep( false ) }
 				>
 					<form onSubmit={ submitForCreation }>
 						<TextControl
@@ -80,14 +89,6 @@ export default function PatternsSetup( {
 							className="wp-block-template-part__placeholder-create-new__title-form-actions"
 							justify="flex-end"
 						>
-							<FlexItem>
-								<Button
-									variant="secondary"
-									onClick={ resetPlaceholder }
-								>
-									{ __( 'Cancel' ) }
-								</Button>
-							</FlexItem>
 							<FlexItem>
 								<Button
 									variant="primary"
@@ -103,22 +104,5 @@ export default function PatternsSetup( {
 				</Modal>
 			) }
 		</>
-	);
-}
-
-function StartBlankComponent( { setTitleStep, areaLabel, areaIcon } ) {
-	useEffect( () => {
-		setTitleStep( true );
-	}, [] );
-	return (
-		<Placeholder
-			label={ areaLabel }
-			icon={ areaIcon }
-			instructions={ sprintf(
-				// Translators: %s as template part area title ("Header", "Footer", "Template Part", etc.).
-				__( 'Creating your new %s…' ),
-				areaLabel.toLowerCase()
-			) }
-		/>
 	);
 }

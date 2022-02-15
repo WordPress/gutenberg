@@ -15,19 +15,20 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	Dropdown,
 	ToolbarGroup,
 	ToolbarButton,
 	Spinner,
+	Modal,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import TemplatePartPlaceholder from './placeholder';
-import TemplatePartSelection from './selection';
+import TemplatePartSelectionModal from './selection-modal';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
 import { createTemplatePartId } from './utils/create-template-part-id';
@@ -39,10 +40,13 @@ export default function TemplatePartEdit( {
 } ) {
 	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = createTemplatePartId( theme, slug );
-
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		templatePartId
 	);
+	const [
+		isTemplatePartSelectionOpen,
+		setIsTemplatePartSelectionOpen,
+	] = useState( false );
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
@@ -53,15 +57,12 @@ export default function TemplatePartEdit( {
 		isMissing,
 		defaultWrapper,
 		area,
-		enableSelection,
-		hasResolvedReplacements,
+		areaLabel,
 	} = useSelect(
 		( select ) => {
-			const {
-				getEditedEntityRecord,
-				getEntityRecords,
-				hasFinishedResolution,
-			} = select( coreStore );
+			const { getEditedEntityRecord, hasFinishedResolution } = select(
+				coreStore
+			);
 			const { getBlocks } = select( blockEditorStore );
 
 			const getEntityArgs = [
@@ -73,20 +74,6 @@ export default function TemplatePartEdit( {
 				? getEditedEntityRecord( ...getEntityArgs )
 				: null;
 			const _area = entityRecord?.area || attributes.area;
-
-			// Check whether other entities exist for switching/selection.
-			const availableReplacementArgs = [
-				'postType',
-				'wp_template_part',
-				_area && 'uncategorized' !== _area && { area: _area },
-			];
-			const matchingReplacements = getEntityRecords(
-				...availableReplacementArgs
-			);
-			const _enableSelection = templatePartId
-				? matchingReplacements?.length > 1
-				: matchingReplacements?.length > 0;
-
 			const hasResolvedEntity = templatePartId
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
@@ -97,7 +84,7 @@ export default function TemplatePartEdit( {
 			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 			// Blocks can be loaded into a *non-post* block editor.
 			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			const defaultWrapperElement = select( 'core/editor' )
+			const areaObject = select( 'core/editor' )
 				.__experimentalGetDefaultTemplatePartAreas()
 				.find( ( { area: value } ) => value === _area )?.area_tag;
 
@@ -105,13 +92,9 @@ export default function TemplatePartEdit( {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
 				isMissing: hasResolvedEntity && isEmpty( entityRecord ),
-				defaultWrapper: defaultWrapperElement || 'div',
+				defaultWrapper: areaObject?.area_tag ?? 'div',
+				areaLabel: areaObject?.label || __( 'Template Part' ),
 				area: _area,
-				enableSelection: _enableSelection,
-				hasResolvedReplacements: hasFinishedResolution(
-					'getEntityRecords',
-					availableReplacementArgs
-				),
 			};
 		},
 		[ templatePartId, clientId ]
@@ -166,37 +149,22 @@ export default function TemplatePartEdit( {
 				<TagName { ...blockProps }>
 					<TemplatePartPlaceholder
 						area={ attributes.area }
-						clientId={ clientId }
-						setAttributes={ setAttributes }
-						enableSelection={ enableSelection }
-						hasResolvedReplacements={ hasResolvedReplacements }
+						onOpenSelectionModal={ () =>
+							setIsTemplatePartSelectionOpen( true )
+						}
 					/>
 				</TagName>
 			) }
-			{ isEntityAvailable && enableSelection && (
+			{ isEntityAvailable && (
 				<BlockControls>
 					<ToolbarGroup className="wp-block-template-part__block-control-group">
-						<Dropdown
-							className="wp-block-template-part__preview-dropdown-button"
-							contentClassName="wp-block-template-part__preview-dropdown-content"
-							position="bottom right left"
-							renderToggle={ ( { isOpen, onToggle } ) => (
-								<ToolbarButton
-									aria-expanded={ isOpen }
-									onClick={ onToggle }
-								>
-									{ __( 'Replace' ) }
-								</ToolbarButton>
-							) }
-							renderContent={ ( { onClose } ) => (
-								<TemplatePartSelection
-									setAttributes={ setAttributes }
-									onClose={ onClose }
-									area={ area }
-									templatePartId={ templatePartId }
-								/>
-							) }
-						/>
+						<ToolbarButton
+							onClick={ () =>
+								setIsTemplatePartSelectionOpen( true )
+							}
+						>
+							{ __( 'Replace' ) }
+						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
 			) }
@@ -214,6 +182,30 @@ export default function TemplatePartEdit( {
 				<TagName { ...blockProps }>
 					<Spinner />
 				</TagName>
+			) }
+			{ isTemplatePartSelectionOpen && (
+				<Modal
+					className="block-editor-template-part-placeholder__modal"
+					title={ sprintf(
+						// Translators: %s as template part area title ("Header", "Footer", etc.).
+						__( 'Choose a %s' ),
+						areaLabel.toLowerCase()
+					) }
+					closeLabel={ __( 'Cancel' ) }
+					onRequestClose={ () =>
+						setIsTemplatePartSelectionOpen( false )
+					}
+				>
+					<TemplatePartSelectionModal
+						clientId={ clientId }
+						area={ area }
+						areaLabel={ areaLabel }
+						setAttributes={ setAttributes }
+						onClose={ () =>
+							setIsTemplatePartSelectionOpen( false )
+						}
+					/>
+				</Modal>
 			) }
 		</RecursionProvider>
 	);
