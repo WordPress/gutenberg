@@ -1,0 +1,17 @@
+[
+	{
+		"blockName": "core/query-no-results",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<p></p>\n",
+				"innerContent": [ "\n<p></p>\n" ]
+			}
+		],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n", null, "\n" ]
+	}
+]

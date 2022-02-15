@@ -8,8 +8,9 @@
 /**
  * Renders the `core/query-no-results` block on the server.
  *
- * @param array  $attributes Block attributes.
- * @param string $content    Block default content.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string Returns the wrapper for the no results block.
  */
