@@ -86,7 +86,7 @@ export default function TemplatePartEdit( {
 			// eslint-disable-next-line @wordpress/data-no-store-string-literals
 			const areaObject = select( 'core/editor' )
 				.__experimentalGetDefaultTemplatePartAreas()
-				.find( ( { area: value } ) => value === _area )?.area_tag;
+				.find( ( { area: value } ) => value === _area );
 
 			return {
 				innerBlocks: getBlocks( clientId ),
