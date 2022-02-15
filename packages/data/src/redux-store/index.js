@@ -334,12 +334,12 @@ function mapResolveSelectors( selectors, store ) {
 				const hasFinished = () =>
 					selectors.hasFinishedResolution( selectorName, args );
 				const finalize = ( result ) => {
-					const hasFailed = selectors.hasLastResolutionFailed(
+					const hasFailed = selectors.hasResolutionFailed(
 						selectorName,
 						args
 					);
 					if ( hasFailed ) {
-						const error = selectors.getLastResolutionFailure(
+						const error = selectors.getResolutionFailure(
 							selectorName,
 							args
 						);

@@ -130,7 +130,7 @@ describe( 'isResolving', () => {
 	} );
 } );
 
-describe( 'hasLastResolutionFailed', () => {
+describe( 'hasResolutionFailed', () => {
 	let registry;
 
 	beforeEach( () => {
@@ -155,14 +155,14 @@ describe( 'hasLastResolutionFailed', () => {
 		} );
 
 		expect(
-			registry.select( 'store' ).hasLastResolutionFailed( 'getItems' )
+			registry.select( 'store' ).hasResolutionFailed( 'getItems' )
 		).toBeFalsy();
 
 		registry.select( 'store' ).getItems();
 		jest.advanceTimersByTime( 1 );
 
 		expect(
-			registry.select( 'store' ).hasLastResolutionFailed( 'getItems' )
+			registry.select( 'store' ).hasResolutionFailed( 'getItems' )
 		).toBeFalsy();
 	} );
 
@@ -186,18 +186,18 @@ describe( 'hasLastResolutionFailed', () => {
 		} );
 
 		expect(
-			registry.select( 'store' ).hasLastResolutionFailed( 'getItems' )
+			registry.select( 'store' ).hasResolutionFailed( 'getItems' )
 		).toBeFalsy();
 
 		await resolve( registry, 'getItems' );
 
 		expect(
-			registry.select( 'store' ).hasLastResolutionFailed( 'getItems' )
+			registry.select( 'store' ).hasResolutionFailed( 'getItems' )
 		).toBeTruthy();
 	} );
 } );
 
-describe( 'getLastResolutionFailure', () => {
+describe( 'getResolutionFailure', () => {
 	let registry;
 	let shouldFail;
 
@@ -228,14 +228,14 @@ describe( 'getLastResolutionFailure', () => {
 
 	it( 'returns undefined if the resolution has succeeded', async () => {
 		expect(
-			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+			registry.select( 'store' ).getResolutionFailure( 'getItems' )
 		).toBeFalsy();
 
 		registry.select( 'store' ).getItems();
 		jest.advanceTimersByTime( 1 );
 
 		expect(
-			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+			registry.select( 'store' ).getResolutionFailure( 'getItems' )
 		).toBeFalsy();
 	} );
 
@@ -243,7 +243,7 @@ describe( 'getLastResolutionFailure', () => {
 		shouldFail = true;
 
 		expect(
-			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+			registry.select( 'store' ).getResolutionFailure( 'getItems' )
 		).toBeFalsy();
 
 		await resolve( registry, 'getItems' );
@@ -251,7 +251,7 @@ describe( 'getLastResolutionFailure', () => {
 		expect(
 			registry
 				.select( 'store' )
-				.getLastResolutionFailure( 'getItems' )
+				.getResolutionFailure( 'getItems' )
 				.toString()
 		).toBe( 'Error: cannot fetch items' );
 	} );
@@ -259,20 +259,20 @@ describe( 'getLastResolutionFailure', () => {
 	it( 'returns undefined if the failed resolution succeeded after retry', async () => {
 		shouldFail = true;
 		expect(
-			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+			registry.select( 'store' ).getResolutionFailure( 'getItems' )
 		).toBeFalsy();
 
 		await resolve( registry, 'getItems' );
 
 		expect(
-			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+			registry.select( 'store' ).getResolutionFailure( 'getItems' )
 		).toBeTruthy();
 
 		registry.dispatch( 'store' ).invalidateResolution( 'getItems', [] );
 		jest.advanceTimersByTime( 1 );
 
 		expect(
-			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+			registry.select( 'store' ).getResolutionFailure( 'getItems' )
 		).toBeFalsy();
 
 		shouldFail = false;
@@ -280,7 +280,7 @@ describe( 'getLastResolutionFailure', () => {
 		jest.advanceTimersByTime( 1 );
 
 		expect(
-			registry.select( 'store' ).getLastResolutionFailure( 'getItems' )
+			registry.select( 'store' ).getResolutionFailure( 'getItems' )
 		).toBeFalsy();
 	} );
 } );

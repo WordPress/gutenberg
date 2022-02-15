@@ -86,7 +86,7 @@ export function hasFinishedResolution( state, selectorName, args ) {
  *
  * @return {boolean} Has resolution failed
  */
-export function hasLastResolutionFailed( state, selectorName, args ) {
+export function hasResolutionFailed( state, selectorName, args ) {
 	const resolutionState = getResolutionState( state, selectorName, args );
 	const hasFailed = resolutionState && 'error' in resolutionState;
 	return !! hasFailed;
@@ -102,7 +102,7 @@ export function hasLastResolutionFailed( state, selectorName, args ) {
  *
  * @return {Error|undefined} Last resolution error
  */
-export function getLastResolutionFailure( state, selectorName, args ) {
+export function getResolutionFailure( state, selectorName, args ) {
 	return getResolutionState( state, selectorName, args )?.error;
 }
 
