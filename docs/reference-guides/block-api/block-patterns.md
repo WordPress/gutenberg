@@ -26,7 +26,7 @@ The properties available for block patterns are:
 -   `categories` (optional): An array of registered pattern categories used to group block patterns. Block patterns can be shown on multiple categories. A category must be registered separately in order to be used here.
 -   `keywords` (optional): An array of aliases or keywords that help users discover the pattern while searching.
 -   `viewportWidth` (optional): An integer specifying the intended width of the pattern to allow for a scaled preview of the pattern in the inserter.
--   `blockTypes` (optional): An array of block types that the pattern is intended to be used with. Each value needs to be the declared block's `name`. This is used for finding proper matches in the patterns transformation mechanism. In addition this is used by `__experimentalBlockPatternSetup` component which displays patterns to choose from in some blocks, like `Query Loop` block.
+-   `blockTypes` (optional): An array of block types that the pattern is intended to be used with. Each value needs to be the declared block's `name`.
 
 The following code sample registers a block pattern named 'my-plugin/my-awesome-pattern':
 
