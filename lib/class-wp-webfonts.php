@@ -297,6 +297,8 @@ class WP_Webfonts {
 			if ( in_array( $family, $added_global_styles, true ) ) {
 				continue;
 			}
+			$added_global_styles[] = $family;
+
 			$family_slug = sanitize_title( $family );
 			$styles     .= "body{--wp--preset--font-family--{$family_slug}:{$family};}";
 			$styles     .= ".has-{$family_slug}-font-family{font-family:var(--wp--preset--font-family--{$family_slug});}";
