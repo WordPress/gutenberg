@@ -37,41 +37,7 @@ describe( 'useEntityRecords', () => {
 		{ id: 3, hello: 'world3' },
 	];
 
-	it( 'retrieves the relevant entity record', async () => {
-		let data;
-		await registry
-			.dispatch( coreDataStore )
-			.receiveEntityRecords( 'root', 'widget', TEST_RECORDS, {} );
-		const TestComponent = () => {
-			data = useEntityRecords( 'root', 'widget' );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
-		);
-		expect( data ).toEqual( {
-			records: TEST_RECORDS,
-			hasResolved: false,
-			isResolving: false,
-			status: 'IDLE',
-		} );
-
-		// Required to make sure no updates happen outside of act()
-		await act( async () => {
-			jest.advanceTimersByTime( 1 );
-		} );
-
-		expect( data ).toEqual( {
-			records: TEST_RECORDS,
-			hasResolved: true,
-			isResolving: false,
-			status: 'SUCCESS',
-		} );
-	} );
-
-	it( 'resolves the entity if missing from state', async () => {
+	it( 'resolves the entity records when missing from the state', async () => {
 		// Provide response
 		triggerFetch.mockImplementation( () => TEST_RECORDS );
 
@@ -85,6 +51,13 @@ describe( 'useEntityRecords', () => {
 				<TestComponent />
 			</RegistryProvider>
 		);
+
+		expect( data ).toEqual( {
+			records: null,
+			hasResolved: false,
+			isResolving: false,
+			status: 'IDLE',
+		} );
 
 		await act( async () => {
 			jest.advanceTimersByTime( 1 );

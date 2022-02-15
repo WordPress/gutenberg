@@ -33,34 +33,7 @@ describe( 'useEntityRecord', () => {
 
 	const TEST_RECORD = { id: 1, hello: 'world' };
 
-	it( 'retrieves the relevant entity record', async () => {
-		let data;
-		await registry
-			.dispatch( coreDataStore )
-			.receiveEntityRecords( 'root', 'widget', [ TEST_RECORD ] );
-		const TestComponent = () => {
-			data = useEntityRecord( 'root', 'widget', 1 );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
-		);
-		expect( data ).toEqual( {
-			record: TEST_RECORD,
-			hasResolved: false,
-			isResolving: false,
-			status: 'IDLE',
-		} );
-
-		// Required to make sure no updates happen outside of act()
-		await act( async () => {
-			jest.advanceTimersByTime( 1 );
-		} );
-	} );
-
-	it( 'resolves the entity if missing from state', async () => {
+	it( 'resolves the entity record when missing from the state', async () => {
 		// Provide response
 		triggerFetch.mockImplementation( () => TEST_RECORD );
 
@@ -74,6 +47,13 @@ describe( 'useEntityRecord', () => {
 				<TestComponent />
 			</RegistryProvider>
 		);
+
+		expect( data ).toEqual( {
+			records: undefined,
+			hasResolved: false,
+			isResolving: false,
+			status: 'IDLE',
+		} );
 
 		await act( async () => {
 			jest.advanceTimersByTime( 1 );
