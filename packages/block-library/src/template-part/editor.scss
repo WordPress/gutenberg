@@ -1,10 +1,14 @@
-.block-editor-template-part-placeholder__modal {
+.block-editor-template-part__selection-modal {
 	@include break-medium() {
 		width: $break-medium - $grid-unit-20 * 2;
 	}
+
+	.components-modal__content {
+		padding: 0;
+	}
 }
 
-.block-library-template-part__selection .block-editor-block-patterns-list {
+.block-library-template-part__selection-content .block-editor-block-patterns-list {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	grid-gap: $grid-unit-10;
@@ -12,4 +16,21 @@
 	.block-editor-block-patterns-list__list-item {
 		margin-bottom: 0;
 	}
+}
+
+.block-library-template-part__selection-content {
+	padding: 0 $grid-unit-40 $grid-unit-20;
+}
+
+.block-library-template-part__selection-footer {
+	position: sticky;
+	bottom: 0;
+	background: $white;
+	border-top: $border-width solid $gray-300;
+	padding: $grid-unit-20 $grid-unit-40;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	width: 100%;
+	z-index: z-index(".components-modal__header");
 }
