@@ -56,6 +56,8 @@ import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
 import OverlayMenuIcon from './overlay-menu-icon';
+import useConvertClassicMenu from '../use-convert-classic-menu';
+import useCreateNavigationMenu from './use-create-navigation-menu';
 
 const EMPTY_ARRAY = [];
 
@@ -231,6 +233,16 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigation,
 	} = useNavigationMenu( ref );
 
+	const createNavigationMenu = useCreateNavigationMenu( clientId );
+
+	const {
+		dispatch: convertClassicMenuToBlocks,
+		blocks: classicMenuBlocks,
+		name: classicMenuName,
+		isResolving: isResolvingClassicMenuConversion,
+		hasResolved: hasResolvedClassicMenuConversion,
+	} = useConvertClassicMenu( () => {} );
+
 	const navRef = useRef();
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
 
@@ -385,6 +397,29 @@ function Navigation( {
 		ref,
 	] );
 
+	useEffect( () => {
+		async function handleCreateNav() {
+			const navigationMenuPost = await createNavigationMenu(
+				classicMenuName,
+				classicMenuBlocks
+			);
+			// onSelect( navigationMenu );
+			setRef( navigationMenuPost?.id );
+		}
+		if (
+			hasResolvedClassicMenuConversion &&
+			classicMenuName &&
+			classicMenuBlocks?.length
+		) {
+			handleCreateNav();
+		}
+	}, [
+		classicMenuBlocks,
+		classicMenuName,
+		isResolvingClassicMenuConversion,
+		hasResolvedClassicMenuConversion,
+	] );
+
 	const startWithEmptyMenu = useCallback( () => {
 		registry.batch( () => {
 			if ( navigationArea ) {
@@ -495,6 +530,9 @@ function Navigation( {
 											setRef( id );
 											onClose();
 										} }
+										onSelectClassicMenu={
+											convertClassicMenuToBlocks
+										}
 										onCreateNew={ startWithEmptyMenu }
 										/* translators: %s: The name of a menu. */
 										actionLabel={ __( "Switch to '%s'" ) }

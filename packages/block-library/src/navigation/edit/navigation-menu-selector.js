@@ -5,19 +5,16 @@ import { MenuGroup, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
-import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
-import useConvertClassicMenu from '../use-convert-classic-menu';
-import useCreateNavigationMenu from './use-create-navigation-menu';
 
 export default function NavigationMenuSelector( {
-	clientId,
 	onSelect,
+	onSelectClassicMenu,
 	onCreateNew,
 	showManageActions = false,
 	actionLabel,
@@ -35,53 +32,6 @@ export default function NavigationMenuSelector( {
 		canUserUpdateNavigationEntity: canUserUpdateNavigationMenu,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
-
-	const createNavigationMenu = useCreateNavigationMenu( clientId );
-
-	// const onFinishMenuCreation = async (
-	// 	blocks,
-	// 	navigationMenuTitle = null
-	// ) => {
-	// 	if ( ! canUserCreateNavigationMenu ) {
-	// 		return;
-	// 	}
-
-	// 	const navigationMenu = await createNavigationMenu(
-	// 		navigationMenuTitle,
-	// 		blocks
-	// 	);
-	// 	onSelect( navigationMenu );
-	// };
-
-	const {
-		dispatch: convertClassicMenuToBlocks,
-		blocks: classicMenuBlocks,
-		name: classicMenuName,
-		isResolving: isResolvingClassicMenuConversion,
-		hasResolved: hasResolvedClassicMenuConversion,
-	} = useConvertClassicMenu( () => {} );
-
-	useEffect( () => {
-		async function handleCreateNav() {
-			const navigationMenu = await createNavigationMenu(
-				classicMenuName,
-				classicMenuBlocks
-			);
-			onSelect( navigationMenu );
-		}
-		if (
-			hasResolvedClassicMenuConversion &&
-			classicMenuName &&
-			classicMenuBlocks?.length
-		) {
-			handleCreateNav();
-		}
-	}, [
-		classicMenuBlocks,
-		classicMenuName,
-		isResolvingClassicMenuConversion,
-		hasResolvedClassicMenuConversion,
-	] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
@@ -124,10 +74,7 @@ export default function NavigationMenuSelector( {
 						return (
 							<MenuItem
 								onClick={ () => {
-									convertClassicMenuToBlocks(
-										menu.id,
-										menu.name
-									);
+									onSelectClassicMenu( menu.id, menu.name );
 								} }
 								key={ menu.id }
 								aria-label={ sprintf(
