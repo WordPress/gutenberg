@@ -52,6 +52,6 @@ window.addEventListener( 'load', load );
 
 async function loadHtml( url, headers ) {
 	const data = await window.fetch( url, { headers } );
-	const html = await data.text();
-	return html;
+	const { rendered } = await data.json();
+	return rendered;
 }
