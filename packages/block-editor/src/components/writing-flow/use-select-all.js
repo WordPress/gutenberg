@@ -34,7 +34,7 @@ export default function useSelectAll() {
 			const selectedClientIds = getSelectedBlockClientIds();
 
 			if (
-				selectedClientIds.length === 1 &&
+				selectedClientIds.length < 2 &&
 				! isEntirelySelected( event.target )
 			) {
 				return;

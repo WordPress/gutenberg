@@ -95,6 +95,10 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
+		ref.current.parentElement.closest(
+			'[contenteditable]'
+		).contentEditable = false;
+
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition ] );
 

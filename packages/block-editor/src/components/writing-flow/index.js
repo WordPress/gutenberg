@@ -37,7 +37,7 @@ export function useWritingFlow() {
 			useRefEffect(
 				( node ) => {
 					node.tabIndex = -1;
-					node.contentEditable = false;
+					node.contentEditable = hasMultiSelection;
 
 					if ( ! hasMultiSelection ) {
 						return;
