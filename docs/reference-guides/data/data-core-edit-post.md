@@ -426,7 +426,7 @@ _Returns_
 
 ### requestMetaBoxUpdates
 
-Returns a promise of an action object used to request meta box update.
+Update a metabox.
 
 ### setAvailableMetaBoxesPerLocation
 

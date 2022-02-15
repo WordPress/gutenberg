@@ -259,7 +259,7 @@ export const setAvailableMetaBoxesPerLocation = ( metaBoxesPerLocation ) => ( {
 	} );
 
 /**
- * Returns a promise of an action object used to request meta box update.
+ * Update a metabox.
  */
 export const requestMetaBoxUpdates = () => async ( {
 	registry,

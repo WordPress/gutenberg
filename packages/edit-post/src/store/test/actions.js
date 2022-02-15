@@ -55,14 +55,14 @@ describe( 'actions', () => {
 			registry
 				.select( interfaceStore )
 				.isFeatureActive( editPostStore.name, 'welcomeGuide' )
-		).toBeTruthy();
+		).toBe( true );
 
 		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
 		expect(
 			registry
 				.select( interfaceStore )
 				.isFeatureActive( editPostStore.name, 'welcomeGuide' )
-		).toBeFalsy();
+		).toBe( false );
 	} );
 	describe( 'switchEditorMode', () => {
 		it( 'to visual', () => {
