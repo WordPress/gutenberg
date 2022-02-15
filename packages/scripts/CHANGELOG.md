@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 21.0.2 (2022-02-15)
+
+-   Entry points are not detected in Windows OS ([#38781](https://github.com/WordPress/gutenberg/pull/38781)).
+
 ## 21.0.1 (2022-02-11)
 
 ### Bug Fix
