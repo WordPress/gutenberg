@@ -236,7 +236,7 @@ function Navigation( {
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
 	const {
-		dispatch: convertClassicMenuToBlocks,
+		run: convertClassicMenuToBlocks,
 		blocks: classicMenuBlocks,
 		name: classicMenuName,
 		isResolving: isResolvingClassicMenuConversion,

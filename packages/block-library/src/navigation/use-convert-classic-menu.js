@@ -38,7 +38,7 @@ export default function useConvertClassicMenu() {
 		}
 	}, [ isAwaitingMenuItemResolution, hasResolvedMenuItems, menuName ] );
 
-	const dispatch = useCallback(
+	const run = useCallback(
 		( id, name ) => {
 			setSelectedMenu( id );
 
@@ -57,7 +57,7 @@ export default function useConvertClassicMenu() {
 	);
 
 	return {
-		dispatch,
+		run,
 		blocks,
 		name: menuName,
 		isResolving: isResolvingMenus,

@@ -48,7 +48,7 @@ export default function NavigationPlaceholder( {
 	} = useNavigationEntities();
 
 	const {
-		dispatch: convertClassicMenuToBlocks,
+		run: convertClassicMenuToBlocks,
 		blocks: classicMenuBlocks,
 		name: classicMenuName,
 		isResolving: isResolvingClassicMenuConversion,
