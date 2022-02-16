@@ -16,7 +16,7 @@ import { getBlockClientId } from '../../../utils/dom';
  * @param {HTMLElement} node  Block element.
  * @param {boolean}     value `contentEditable` value (true or false)
  */
-function setContentEditableWrapper( node, value ) {
+export function setContentEditableWrapper( node, value ) {
 	// Since `closest` considers `node` as a candidate, use `parentElement`.
 	node.parentElement.closest( '[contenteditable]' ).contentEditable = value;
 }
