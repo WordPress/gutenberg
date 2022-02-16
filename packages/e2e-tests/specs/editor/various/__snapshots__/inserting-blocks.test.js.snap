@@ -71,7 +71,7 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2 id=\\"heading\\">Heading</h2>
+<h2>Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -93,7 +93,7 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <!-- /wp:cover -->
 
 <!-- wp:heading -->
-<h2 id=\\"heading\\">Heading</h2>
+<h2>Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
