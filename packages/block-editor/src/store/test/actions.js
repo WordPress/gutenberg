@@ -1166,7 +1166,6 @@ describe( 'actions', () => {
 				actions,
 				selectors,
 				reducer,
-				__experimentalUseThunks: true,
 			} );
 
 			registerBlockType( 'core/test-block', defaultBlockSettings );

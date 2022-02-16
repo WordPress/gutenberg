@@ -59,7 +59,6 @@ const storeConfig = () => ( {
 	actions: { ...actions, ...entityActions, ...createLocksActions() },
 	selectors: { ...selectors, ...entitySelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
-	__experimentalUseThunks: true,
 } );
 
 /**

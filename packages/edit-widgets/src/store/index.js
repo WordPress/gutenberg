@@ -25,7 +25,6 @@ const storeConfig = {
 	selectors,
 	resolvers,
 	actions,
-	__experimentalUseThunks: true,
 };
 
 /**
