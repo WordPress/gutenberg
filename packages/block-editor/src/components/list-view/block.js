@@ -48,6 +48,7 @@ function ListViewBlock( {
 	showBlockMovers,
 	path,
 	isExpanded,
+	selectedClientIds,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -109,6 +110,13 @@ function ListViewBlock( {
 		[ clientId, selectBlock ]
 	);
 
+	const selectDuplicatedBlock = useCallback(
+		( newClientId ) => {
+			selectBlock( undefined, newClientId );
+		},
+		[ selectBlock ]
+	);
+
 	const toggleExpanded = useCallback(
 		( event ) => {
 			event.stopPropagation();
@@ -153,6 +161,14 @@ function ListViewBlock( {
 		  )
 		: __( 'Options' );
 
+	// Only include all selected blocks if the currently clicked on block
+	// is one of the selected blocks. This ensures that if a user attempts
+	// to alter a block that isn't part of the selection, they're still able
+	// to do so.
+	const dropdownClientIds = selectedClientIds.includes( clientId )
+		? selectedClientIds
+		: [ clientId ];
+
 	return (
 		<ListViewLeaf
 			className={ classes }
@@ -187,6 +203,7 @@ function ListViewBlock( {
 							tabIndex={ tabIndex }
 							onFocus={ onFocus }
 							isExpanded={ isExpanded }
+							selectedClientIds={ selectedClientIds }
 						/>
 					</div>
 				) }
@@ -227,7 +244,7 @@ function ListViewBlock( {
 				<TreeGridCell className={ listViewBlockSettingsClassName }>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsDropdown
-							clientIds={ [ clientId ] }
+							clientIds={ dropdownClientIds }
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
 							toggleProps={ {
@@ -237,7 +254,7 @@ function ListViewBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ selectBlock }
+							__experimentalSelectBlock={ selectDuplicatedBlock }
 						/>
 					) }
 				</TreeGridCell>
