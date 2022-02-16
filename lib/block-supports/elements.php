@@ -43,7 +43,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	}
 	$link_color_declaration = esc_html( safecss_filter_attr( "color: $link_color" ) );
 
-	$style = "<style>.$class_name a{" . $link_color_declaration . ";}</style>\n";
+	$style = ".$class_name a{" . $link_color_declaration . ';}';
 
 	// Like the layout hook this assumes the hook only applies to blocks with a single wrapper.
 	// Retrieve the opening tag of the first HTML element.

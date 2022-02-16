@@ -156,7 +156,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
 	$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
-	$style     = '<style>' . gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support, $gap_value ) . '</style>';
+	$style     = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support, $gap_value );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(

@@ -610,7 +610,7 @@ function gutenberg_enqueue_block_support( $style ) {
 	add_action(
 		$action_hook_name,
 		function () use ( $style ) {
-			echo $style;
+			echo "<style>$style</style>\n";
 		}
 	);
 }
