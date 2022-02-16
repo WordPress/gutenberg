@@ -1,4 +1,9 @@
-export interface NavigationArea {
+/**
+ * Internal dependencies
+ */
+import { Context, WithoutNevers } from './common';
+
+interface FullNavigationArea< C extends Context > {
 	/**
 	 * The name of the navigation area.
 	 */
@@ -13,4 +18,8 @@ export interface NavigationArea {
 	navigation: number;
 }
 
-export interface NavigationAreaWithEdits extends NavigationArea {}
+export type NavigationArea< C extends Context > = WithoutNevers<
+	FullNavigationArea< C >
+>;
+
+export interface EditedNavigationArea extends FullNavigationArea< 'edit' > {}

@@ -1,9 +1,15 @@
 /**
  * Internal dependencies
  */
-import { PostStatus, RawField, WithEdits } from './common';
+import {
+	Context,
+	PostStatus,
+	RawField,
+	WithEdits,
+	WithoutNevers,
+} from './common';
 
-export interface WpTemplate {
+interface FullWpTemplate< C extends Context > {
 	/**
 	 * ID of template.
 	 */
@@ -46,7 +52,7 @@ export interface WpTemplate {
 	/**
 	 * Title of template.
 	 */
-	title: RawField | string;
+	title: RawField< 'edit' > | string;
 	/**
 	 * Description of template.
 	 */
@@ -62,9 +68,7 @@ export interface WpTemplate {
 	/**
 	 * Theme file exists.
 	 */
-	has_theme_file: {
-		[ k: string ]: string;
-	};
+	has_theme_file: Record< string, string >;
 	/**
 	 * The ID for the author of the template.
 	 */
@@ -72,9 +76,11 @@ export interface WpTemplate {
 	/**
 	 * Whether a template is a custom template.
 	 */
-	is_custom: {
-		[ k: string ]: string;
-	};
+	is_custom: Record< string, string >;
 }
 
-export interface WpTemplateWithEdits extends WithEdits< WpTemplate, 'title' > {}
+export type WpTemplate< C extends Context > = WithoutNevers<
+	FullWpTemplate< C >
+>;
+export interface EditedWpTemplate
+	extends WithEdits< WpTemplate< 'edit' >, 'title' > {}

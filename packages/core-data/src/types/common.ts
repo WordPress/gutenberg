@@ -35,14 +35,40 @@ export type PostFormat =
 	| 'video'
 	| 'audio';
 
+export type Context = 'view' | 'edit' | 'embed';
+export type ContextualField<
+	FieldType,
+	AvailableInContexts extends Context,
+	C extends Context
+> = AvailableInContexts extends C ? FieldType : never;
+
+type Without<
+	T,
+	V,
+	WithNevers = {
+		[ K in keyof T ]: Exclude< T[ K ], undefined > extends V
+			? never
+			: T[ K ] extends Record< string, unknown >
+			? Without< T[ K ], V >
+			: T[ K ];
+	}
+> = Pick<
+	WithNevers,
+	{
+		[ K in keyof WithNevers ]: WithNevers[ K ] extends never ? never : K;
+	}[ keyof WithNevers ]
+>;
+
+export type WithoutNevers< T > = Without< T, never >;
+
 /**
  * The raw data representation.
  */
-export interface RawField {
+export interface RawField< C extends Context > {
 	/**
 	 * Data as it exists in the database.
 	 */
-	raw?: string;
+	raw: ContextualField< string, 'edit', C >;
 	/**
 	 * Data transformed for display.
 	 */

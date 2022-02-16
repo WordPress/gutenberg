@@ -1,4 +1,9 @@
-export interface MenuLocation {
+/**
+ * Internal dependencies
+ */
+import { Context, WithoutNevers } from './common';
+
+interface FullMenuLocation< C extends Context > {
 	/**
 	 * The name of the menu location.
 	 */
@@ -13,4 +18,7 @@ export interface MenuLocation {
 	menu: number;
 }
 
-export interface MenuLocationWithEdits extends MenuLocation {}
+export type MenuLocation< C extends Context > = WithoutNevers<
+	FullMenuLocation< C >
+>;
+export interface EditedMenuLocation extends MenuLocation< 'edit' > {}

@@ -2,15 +2,18 @@
  * Internal dependencies
  */
 import {
-	PostStatus,
-	PingStatus,
 	CommentStatus,
-	RawField,
+	Context,
+	ContextualField,
+	PingStatus,
 	PostFormat,
+	PostStatus,
+	RawField,
 	WithEdits,
+	WithoutNevers,
 } from './common';
 
-export interface Post {
+interface FullPost< C extends Context > {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -18,11 +21,11 @@ export interface Post {
 	/**
 	 * The date the post was published, as GMT.
 	 */
-	date_gmt?: string | null;
+	date_gmt: ContextualField< string | null, 'view' | 'edit', C >;
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid?: RawField;
+	guid: ContextualField< RawField< C >, 'view' | 'edit', C >;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -34,11 +37,11 @@ export interface Post {
 	/**
 	 * The date the post was last modified, in the site's timezone.
 	 */
-	modified?: string;
+	modified: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * The date the post was last modified, as GMT.
 	 */
-	modified_gmt?: string;
+	modified_gmt: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * An alphanumeric identifier for the post unique to its type.
 	 */
@@ -46,7 +49,7 @@ export interface Post {
 	/**
 	 * A named status for the post.
 	 */
-	status?: PostStatus;
+	status: ContextualField< PostStatus, 'view' | 'edit', C >;
 	/**
 	 * Type of post.
 	 */
@@ -54,28 +57,44 @@ export interface Post {
 	/**
 	 * A password to protect access to the content and excerpt.
 	 */
-	password?: string;
+	password: ContextualField< string, 'edit', C >;
 	/**
 	 * Permalink template for the post.
 	 */
-	permalink_template?: string;
+	permalink_template: ContextualField< string, 'edit', C >;
 	/**
 	 * Slug automatically generated from the post title.
 	 */
-	generated_slug?: string;
+	generated_slug: ContextualField< string, 'edit', C >;
 	/**
 	 * The title for the post.
 	 */
-	title: RawField;
+	title: RawField< C >;
 	/**
 	 * The content for the post.
 	 */
-	content?: RawField & {
-		/** Whether the content is protected with a password. */
-		is_protected: boolean;
-		/** Version of the content block format used by the post. */
-		block_version?: string;
-	};
+	content: ContextualField<
+		{
+			/**
+			 * Data as it exists in the database.
+			 */
+			raw: ContextualField< string, 'edit', C >;
+			/**
+			 * Data transformed for display.
+			 */
+			rendered: string;
+			/**
+			 * Whether the content is protected with a password.
+			 */
+			is_protected: boolean;
+			/**
+			 * Version of the content block format used by the page.
+			 */
+			block_version: ContextualField< string, 'edit', C >;
+		},
+		'view' | 'edit',
+		C
+	>;
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -83,7 +102,9 @@ export interface Post {
 	/**
 	 * The excerpt for the post.
 	 */
-	excerpt: RawField;
+	excerpt: RawField< C > & {
+		protected: boolean;
+	};
 	/**
 	 * The ID of the featured media for the post.
 	 */
@@ -91,38 +112,41 @@ export interface Post {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status?: CommentStatus;
+	comment_status: ContextualField< CommentStatus, 'view' | 'edit', C >;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status?: PingStatus;
+	ping_status: ContextualField< PingStatus, 'view' | 'edit', C >;
 	/**
 	 * The format for the post.
 	 */
-	format?: PostFormat;
+	format: ContextualField< PostFormat, 'view' | 'edit', C >;
 	/**
 	 * Meta fields.
 	 */
-	meta?: {
-		[ k: string ]: string;
-	};
+	meta?: Record< string, string >;
 	/**
 	 * Whether or not the post should be treated as sticky.
 	 */
-	sticky?: boolean;
+	sticky: ContextualField< boolean, 'view' | 'edit', C >;
 	/**
 	 * The theme file to use to display the post.
 	 */
-	template?: string;
+	template: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * The terms assigned to the post in the category taxonomy.
 	 */
-	categories?: number[];
+	categories: ContextualField< number[], 'view' | 'edit', C >;
 	/**
 	 * The terms assigned to the post in the post_tag taxonomy.
 	 */
-	tags?: number[];
+	tags: ContextualField< number[], 'view' | 'edit', C >;
 }
 
-export interface PostWithEdits
-	extends WithEdits< Post, 'guid' | 'title' | 'content' | 'excerpt' > {}
+export type Post< C extends Context > = WithoutNevers< FullPost< C > >;
+
+export interface EditedPost
+	extends WithEdits<
+		Post< 'edit' >,
+		'guid' | 'title' | 'content' | 'excerpt'
+	> {}

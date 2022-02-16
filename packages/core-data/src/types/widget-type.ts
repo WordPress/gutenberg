@@ -1,4 +1,9 @@
-export interface WidgetType {
+/**
+ * Internal dependencies
+ */
+import { Context, WithoutNevers } from './common';
+
+interface FullWidgetType< C extends Context > {
 	/**
 	 * Unique slug identifying the widget type.
 	 */
@@ -21,4 +26,7 @@ export interface WidgetType {
 	classname: string;
 }
 
-export interface WidgetTypeWithEdits extends WidgetType {}
+export type WidgetType< C extends Context > = WithoutNevers<
+	FullWidgetType< C >
+>;
+export interface EditedWidgetType extends WidgetType< 'edit' > {}

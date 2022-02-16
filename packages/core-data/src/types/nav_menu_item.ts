@@ -1,7 +1,13 @@
 /**
  * Internal dependencies
  */
-import { RawField, WithEdits } from './common';
+import {
+	RawField,
+	WithEdits,
+	Context,
+	ContextualField,
+	WithoutNevers,
+} from './common';
 
 /**
  * Internal dependencies
@@ -20,11 +26,11 @@ export type NavMenuItemStatus =
 	| 'private';
 export type Target = '_blank' | '';
 
-export interface NavMenuItem {
+interface FullNavMenuItem< C extends Context > {
 	/**
 	 * The title for the object.
 	 */
-	title: RawField;
+	title: RawField< C >;
 	/**
 	 * Unique identifier for the object.
 	 */
@@ -88,14 +94,16 @@ export interface NavMenuItem {
 	/**
 	 * The terms assigned to the object in the nav_menu taxonomy.
 	 */
-	menus?: number;
+	menus: ContextualField< number, 'view' | 'edit', C >;
 	/**
 	 * Meta fields.
 	 */
-	meta?: {
-		[ k: string ]: string;
-	};
+	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 }
 
-export interface NavMenuItemWithEdits
-	extends WithEdits< NavMenuItem, 'title' > {}
+export type NavMenuItem< C extends Context > = WithoutNevers<
+	FullNavMenuItem< C >
+>;
+
+export interface EditedNavMenuItem
+	extends WithEdits< NavMenuItem< 'edit' >, 'title' > {}

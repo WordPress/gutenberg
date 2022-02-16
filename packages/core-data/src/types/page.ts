@@ -3,13 +3,16 @@
  */
 import {
 	CommentStatus,
+	Context,
+	ContextualField,
 	PingStatus,
 	PostStatus,
 	RawField,
 	WithEdits,
+	WithoutNevers,
 } from './common';
 
-export interface Page {
+interface FullPage< C extends Context > {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -17,11 +20,11 @@ export interface Page {
 	/**
 	 * The date the post was published, as GMT.
 	 */
-	date_gmt?: string | null;
+	date_gmt: ContextualField< string | null, 'view' | 'edit', C >;
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid?: RawField;
+	guid: ContextualField< RawField< C >, 'view' | 'edit', C >;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -33,11 +36,11 @@ export interface Page {
 	/**
 	 * The date the post was last modified, in the site's timezone.
 	 */
-	modified?: string;
+	modified: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * The date the post was last modified, as GMT.
 	 */
-	modified_gmt?: string;
+	modified_gmt: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * An alphanumeric identifier for the post unique to its type.
 	 */
@@ -45,7 +48,7 @@ export interface Page {
 	/**
 	 * A named status for the post.
 	 */
-	status?: PostStatus;
+	status: ContextualField< PostStatus, 'view' | 'edit', C >;
 	/**
 	 * Type of post.
 	 */
@@ -53,32 +56,48 @@ export interface Page {
 	/**
 	 * A password to protect access to the content and excerpt.
 	 */
-	password?: string;
+	password: ContextualField< string, 'edit', C >;
 	/**
 	 * Permalink template for the post.
 	 */
-	permalink_template?: string;
+	permalink_template: ContextualField< string, 'edit', C >;
 	/**
 	 * Slug automatically generated from the post title.
 	 */
-	generated_slug?: string;
+	generated_slug: ContextualField< string, 'edit', C >;
 	/**
 	 * The ID for the parent of the post.
 	 */
-	parent?: number;
+	parent: ContextualField< number, 'view' | 'edit', C >;
 	/**
 	 * The title for the post.
 	 */
-	title: RawField;
+	title: RawField< C >;
 	/**
 	 * The content for the post.
 	 */
-	content?: RawField & {
-		/** Whether the content is protected with a password. */
-		is_protected: boolean;
-		/** Version of the content block format used by the page. */
-		block_version?: string;
-	};
+	content: ContextualField<
+		{
+			/**
+			 * Data as it exists in the database.
+			 */
+			raw: ContextualField< string, 'edit', C >;
+			/**
+			 * Data transformed for display.
+			 */
+			rendered: string;
+			/**
+			 * Whether the content is protected with a password.
+			 */
+			is_protected: boolean;
+			/**
+			 * Version of the content block format used by the page.
+			 */
+			block_version: ContextualField< string, 'edit', C >;
+		},
+		'view' | 'edit',
+		C
+	>;
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -86,7 +105,9 @@ export interface Page {
 	/**
 	 * The excerpt for the post.
 	 */
-	excerpt: RawField;
+	excerpt: RawField< C > & {
+		protected: boolean;
+	};
 	/**
 	 * The ID of the featured media for the post.
 	 */
@@ -94,26 +115,29 @@ export interface Page {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status?: CommentStatus;
+	comment_status: ContextualField< CommentStatus, 'view' | 'edit', C >;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status?: PingStatus;
+	ping_status: ContextualField< PingStatus, 'view' | 'edit', C >;
 	/**
 	 * The order of the post in relation to other posts.
 	 */
-	menu_order?: number;
+	menu_order: ContextualField< number, 'view' | 'edit', C >;
 	/**
 	 * Meta fields.
 	 */
-	meta?: {
-		[ k: string ]: string;
-	};
+	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 	/**
 	 * The theme file to use to display the post.
 	 */
-	template?: string;
+	template: ContextualField< string, 'view' | 'edit', C >;
 }
 
-export interface PageWithEdits
-	extends WithEdits< Page, 'guid' | 'title' | 'content' | 'excerpt' > {}
+export type Page< C extends Context > = WithoutNevers< FullPage< C > >;
+
+export interface EditedPage
+	extends WithEdits<
+		Page< 'edit' >,
+		'guid' | 'title' | 'content' | 'excerpt'
+	> {}

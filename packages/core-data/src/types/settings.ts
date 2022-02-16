@@ -1,86 +1,93 @@
 /**
  * Internal dependencies
  */
-import { CommentStatus, PingStatus, WithEdits } from './common';
+import {
+	CommentStatus,
+	Context,
+	PingStatus,
+	WithEdits,
+	WithoutNevers,
+} from './common';
 
-export interface Settings {
+interface FullSettings< C extends Context > {
 	/**
 	 * What to show on the front page
 	 */
-	show_on_front?: string;
+	show_on_front: string;
 	/**
 	 * The ID of the page that should be displayed on the front page
 	 */
-	page_on_front?: number;
+	page_on_front: number;
 	/**
 	 * Site title.
 	 */
-	title?: string;
+	title: string;
 	/**
 	 * Site tagline.
 	 */
-	description?: string;
+	description: string;
 	/**
 	 * Site URL.
 	 */
-	url?: string;
+	url: string;
 	/**
 	 * This address is used for admin purposes, like new user notification.
 	 */
-	email?: string;
+	email: string;
 	/**
 	 * A city in the same timezone as you.
 	 */
-	timezone?: string;
+	timezone: string;
 	/**
 	 * A date format for all date strings.
 	 */
-	date_format?: string;
+	date_format: string;
 	/**
 	 * A time format for all time strings.
 	 */
-	time_format?: string;
+	time_format: string;
 	/**
 	 * A day number of the week that the week should start on.
 	 */
-	start_of_week?: number;
+	start_of_week: number;
 	/**
 	 * WordPress locale code.
 	 */
-	language?: string;
+	language: string;
 	/**
 	 * Convert emoticons like :-) and :-P to graphics on display.
 	 */
-	use_smilies?: boolean;
+	use_smilies: boolean;
 	/**
 	 * Default post category.
 	 */
-	default_category?: number;
+	default_category: number;
 	/**
 	 * Default post format.
 	 */
-	default_post_format?: string;
+	default_post_format: string;
 	/**
 	 * Blog pages show at most.
 	 */
-	posts_per_page?: number;
+	posts_per_page: number;
 	/**
 	 * Allow link notifications from other blogs (pingbacks and trackbacks) on new articles.
 	 */
-	default_ping_status?: PingStatus;
+	default_ping_status: PingStatus;
 	/**
 	 * Allow people to submit comments on new posts.
 	 */
-	default_comment_status?: CommentStatus;
+	default_comment_status: CommentStatus;
 	/**
 	 * Site logo.
 	 */
-	site_logo?: number;
+	site_logo: number;
 	/**
 	 * Site icon.
 	 */
-	site_icon?: number;
+	site_icon: number;
 }
 
-export interface SettingsWithEdits
-	extends WithEdits< Settings, 'description' > {}
+export type Settings< C extends Context > = WithoutNevers< FullSettings< C > >;
+export interface EditedSettings
+	extends WithEdits< Settings< 'edit' >, 'description' > {}

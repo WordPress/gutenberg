@@ -1,4 +1,9 @@
-export interface NavMenu {
+/**
+ * Internal dependencies
+ */
+import { Context, WithoutNevers } from './common';
+
+interface FullNavMenu< C extends Context > {
 	/**
 	 * Unique identifier for the term.
 	 */
@@ -18,9 +23,7 @@ export interface NavMenu {
 	/**
 	 * Meta fields.
 	 */
-	meta?: {
-		[ k: string ]: string;
-	};
+	meta?: Record< string, string >;
 	/**
 	 * The locations assigned to the menu.
 	 */
@@ -31,4 +34,5 @@ export interface NavMenu {
 	auto_add?: boolean;
 }
 
-export interface NavMenuWithEdits extends NavMenu {}
+export type NavMenu< C extends Context > = WithoutNevers< FullNavMenu< C > >;
+export interface EditedNavMenu extends NavMenu< 'edit' > {}

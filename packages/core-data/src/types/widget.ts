@@ -1,4 +1,9 @@
-export interface Widget {
+/**
+ * Internal dependencies
+ */
+import { Context, ContextualField, WithoutNevers } from './common';
+
+interface FullWidget< C extends Context > {
 	/**
 	 * Unique identifier for the widget.
 	 */
@@ -18,7 +23,7 @@ export interface Widget {
 	/**
 	 * HTML representation of the widget admin form.
 	 */
-	rendered_form?: string;
+	rendered_form: ContextualField< string, 'edit', C >;
 	/**
 	 * Instance settings of the widget, if supported.
 	 */
@@ -41,9 +46,8 @@ interface WidgetInstance {
 	/**
 	 * Unencoded instance settings, if supported.
 	 */
-	raw?: {
-		[ k: string ]: string;
-	};
+	raw?: Record< string, string >;
 }
 
-export interface WidgetWithEdits extends Widget {}
+export type Widget< C extends Context > = WithoutNevers< FullWidget< C > >;
+export interface EditedWidget extends Widget< 'edit' > {}

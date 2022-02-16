@@ -1,9 +1,15 @@
 /**
  * Internal dependencies
  */
-import { AvatarUrls, RawField, WithEdits } from './common';
+import {
+	AvatarUrls,
+	Context,
+	ContextualField,
+	RawField,
+	WithEdits,
+} from './common';
 
-export interface Comment {
+interface FullComment< C extends Context > {
 	/**
 	 * Unique identifier for the comment.
 	 */
@@ -15,11 +21,11 @@ export interface Comment {
 	/**
 	 * Email address for the comment author.
 	 */
-	author_email?: string;
+	author_email: ContextualField< string, 'edit', C >;
 	/**
 	 * IP address for the comment author.
 	 */
-	author_ip?: string;
+	author_ip: ContextualField< string, 'edit', C >;
 	/**
 	 * Display name for the comment author.
 	 */
@@ -31,11 +37,11 @@ export interface Comment {
 	/**
 	 * User agent for the comment author.
 	 */
-	author_user_agent?: string;
+	author_user_agent: ContextualField< string, 'edit', C >;
 	/**
 	 * The content for the comment.
 	 */
-	content: RawField;
+	content: RawField< C >;
 	/**
 	 * The date the comment was published, in the site's timezone.
 	 */
@@ -43,7 +49,7 @@ export interface Comment {
 	/**
 	 * The date the comment was published, as GMT.
 	 */
-	date_gmt?: string;
+	date_gmt: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * URL to the comment.
 	 */
@@ -55,11 +61,11 @@ export interface Comment {
 	/**
 	 * The ID of the associated post object.
 	 */
-	post?: number;
+	post: ContextualField< number, 'view' | 'edit', C >;
 	/**
 	 * State of the comment.
 	 */
-	status?: string;
+	status: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * Type of the comment.
 	 */
@@ -71,9 +77,9 @@ export interface Comment {
 	/**
 	 * Meta fields.
 	 */
-	meta?: {
-		[ k: string ]: string;
-	};
+	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 }
 
-export interface CommentWithEdits extends WithEdits< Comment, 'content' > {}
+export type Comment< C extends Context > = FullComment< C >;
+export interface EditedComment
+	extends WithEdits< Comment< 'edit' >, 'content' > {}

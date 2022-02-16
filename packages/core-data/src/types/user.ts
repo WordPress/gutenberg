@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { AvatarUrls } from './common';
+import { AvatarUrls, Context, ContextualField, WithoutNevers } from './common';
 
-export interface User {
+interface FullUser< C extends Context > {
 	/**
 	 * Unique identifier for the user.
 	 */
@@ -11,7 +11,7 @@ export interface User {
 	/**
 	 * Login name for the user.
 	 */
-	username?: string;
+	username: ContextualField< string, 'edit', C >;
 	/**
 	 * Display name for the user.
 	 */
@@ -19,15 +19,15 @@ export interface User {
 	/**
 	 * First name for the user.
 	 */
-	first_name?: string;
+	first_name: ContextualField< string, 'edit', C >;
 	/**
 	 * Last name for the user.
 	 */
-	last_name?: string;
+	last_name: ContextualField< string, 'edit', C >;
 	/**
 	 * The email address for the user.
 	 */
-	email?: string;
+	email: ContextualField< string, 'edit', C >;
 	/**
 	 * URL of the user.
 	 */
@@ -43,11 +43,11 @@ export interface User {
 	/**
 	 * Locale for the user.
 	 */
-	locale?: '' | 'en_US';
+	locale: ContextualField< '' | 'en_US', 'edit', C >;
 	/**
 	 * The nickname for the user.
 	 */
-	nickname?: string;
+	nickname: ContextualField< string, 'edit', C >;
 	/**
 	 * An alphanumeric identifier for the user.
 	 */
@@ -55,27 +55,23 @@ export interface User {
 	/**
 	 * Registration date for the user.
 	 */
-	registered_date?: string;
+	registered_date: ContextualField< string, 'edit', C >;
 	/**
 	 * Roles assigned to the user.
 	 */
-	roles?: string[];
+	roles: ContextualField< string[], 'edit', C >;
 	/**
 	 * Password for the user (never included).
 	 */
-	password?: string;
+	password: string;
 	/**
 	 * All capabilities assigned to the user.
 	 */
-	capabilities?: {
-		[ k: string ]: string;
-	};
+	capabilities: ContextualField< Record< string, string >, 'edit', C >;
 	/**
 	 * Any extra capabilities assigned to the user.
 	 */
-	extra_capabilities?: {
-		[ k: string ]: string;
-	};
+	extra_capabilities: ContextualField< Record< string, string >, 'edit', C >;
 	/**
 	 * Avatar URLs for the user.
 	 */
@@ -83,9 +79,8 @@ export interface User {
 	/**
 	 * Meta fields.
 	 */
-	meta?: {
-		[ k: string ]: string;
-	};
+	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 }
 
-export interface UserWithEdits extends User {}
+export type User< C extends Context > = WithoutNevers< FullUser< C > >;
+export interface EditedUser extends User< 'edit' > {}

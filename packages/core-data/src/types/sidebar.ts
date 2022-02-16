@@ -2,8 +2,9 @@
  * Internal dependencies
  */
 import { Widget } from './widget';
+import { Context, WithoutNevers } from './common';
 
-export interface Sidebar {
+interface FullSidebar< C extends Context > {
 	/**
 	 * ID of sidebar.
 	 */
@@ -43,10 +44,11 @@ export interface Sidebar {
 	/**
 	 * Nested widgets.
 	 */
-	widgets: NestedWidget[];
+	widgets: NestedWidget< C >[];
 }
 
 type SidebarStatus = 'active' | 'inactive';
-type NestedWidget = Widget | string;
+type NestedWidget< C extends Context > = Widget< C > | string;
 
-export interface SidebarWithEdits extends Sidebar {}
+export type Sidebar< C extends Context > = WithoutNevers< FullSidebar< C > >;
+export interface EditedSidebar extends Sidebar< 'edit' > {}

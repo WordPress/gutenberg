@@ -1,29 +1,28 @@
 /**
  * Internal dependencies
  */
-import { WithEdits } from './common';
+/**
+ * Internal dependencies
+ */
+import { Context, ContextualField, WithEdits, WithoutNevers } from './common';
 
-export interface Taxonomy {
+interface FullTaxonomy< C extends Context > {
 	/**
 	 * All capabilities used by the taxonomy.
 	 */
-	capabilities?: {
-		[ k: string ]: string;
-	};
+	capabilities: ContextualField< Record< string, string >, 'edit', C >;
 	/**
 	 * A human-readable description of the taxonomy.
 	 */
-	description?: string;
+	description: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * Whether or not the taxonomy should have children.
 	 */
-	hierarchical?: boolean;
+	hierarchical: ContextualField< boolean, 'view' | 'edit', C >;
 	/**
 	 * Human-readable labels for the taxonomy for various contexts.
 	 */
-	labels?: {
-		[ k: string ]: string;
-	};
+	labels: ContextualField< Record< string, string >, 'edit', C >;
 	/**
 	 * The title for the taxonomy.
 	 */
@@ -35,11 +34,11 @@ export interface Taxonomy {
 	/**
 	 * Whether or not the term cloud should be displayed.
 	 */
-	show_cloud?: boolean;
+	show_cloud: ContextualField< boolean, 'edit', C >;
 	/**
 	 * Types associated with the taxonomy.
 	 */
-	types?: string[];
+	types: ContextualField< string[], 'view' | 'edit', C >;
 	/**
 	 * REST base route for the taxonomy.
 	 */
@@ -51,35 +50,36 @@ export interface Taxonomy {
 	/**
 	 * The visibility settings for the taxonomy.
 	 */
-	visibility?: TaxonomyVisibility;
+	visibility: TaxonomyVisibility;
 }
 
 export interface TaxonomyVisibility {
 	/**
 	 * Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.
 	 */
-	public?: boolean;
+	public: boolean;
 	/**
 	 * Whether the taxonomy is publicly queryable.
 	 */
-	publicly_queryable?: boolean;
+	publicly_queryable: boolean;
 	/**
 	 * Whether to generate a default UI for managing this taxonomy.
 	 */
-	show_ui?: boolean;
+	show_ui: boolean;
 	/**
 	 * Whether to allow automatic creation of taxonomy columns on associated post-types table.
 	 */
-	show_admin_column?: boolean;
+	show_admin_column: boolean;
 	/**
 	 * Whether to make the taxonomy available for selection in navigation menus.
 	 */
-	show_in_nav_menus?: boolean;
+	show_in_nav_menus: boolean;
 	/**
 	 * Whether to show the taxonomy in the quick/bulk edit panel.
 	 */
-	show_in_quick_edit?: boolean;
+	show_in_quick_edit: boolean;
 }
 
-export interface TaxonomyWithEdits
-	extends WithEdits< Taxonomy, 'description' > {}
+export type Taxonomy< C extends Context > = WithoutNevers< FullTaxonomy< C > >;
+export interface EditedTaxonomy
+	extends WithEdits< Taxonomy< 'edit' >, 'description' > {}

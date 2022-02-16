@@ -1,9 +1,15 @@
 /**
  * Internal dependencies
  */
-import { RawField, WithEdits } from './common';
+import {
+	Context,
+	ContextualField,
+	RawField,
+	WithEdits,
+	WithoutNevers,
+} from './common';
 
-export interface Plugin {
+interface FullPlugin< C extends Context > {
 	/**
 	 * The plugin file.
 	 */
@@ -19,25 +25,23 @@ export interface Plugin {
 	/**
 	 * The plugin's website address.
 	 */
-	plugin_uri?: string;
+	plugin_uri: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * The plugin author.
 	 */
-	author?: {
-		[ k: string ]: string;
-	};
+	author: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 	/**
 	 * Plugin author's website address.
 	 */
-	author_uri?: string;
+	author_uri: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * The plugin description.
 	 */
-	description?: RawField;
+	description: ContextualField< RawField< 'edit' >, 'view' | 'edit', C >;
 	/**
 	 * The plugin version number.
 	 */
-	version?: string;
+	version: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * Whether the plugin can only be activated network-wide.
 	 */
@@ -53,8 +57,10 @@ export interface Plugin {
 	/**
 	 * The plugin's text domain.
 	 */
-	textdomain?: string;
+	textdomain: ContextualField< string, 'view' | 'edit', C >;
 }
 
 export type PluginStatus = 'active' | 'inactive';
-export interface PluginWithEdits extends WithEdits< Plugin, 'description' > {}
+export type Plugin< C extends Context > = WithoutNevers< FullPlugin< C > >;
+export interface EditedPlugin
+	extends WithEdits< Plugin< 'edit' >, 'description' > {}

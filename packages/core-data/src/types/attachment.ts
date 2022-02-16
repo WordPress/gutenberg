@@ -2,14 +2,16 @@
  * Internal dependencies
  */
 import {
-	CommentStatus,
+	Context,
+	ContextualField,
 	MediaType,
-	PingStatus,
 	PostStatus,
+	RawField,
 	WithEdits,
+	WithoutNevers,
 } from './common';
 
-export interface Attachment {
+interface FullAttachment< C extends Context > {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -17,20 +19,11 @@ export interface Attachment {
 	/**
 	 * The date the post was published, as GMT.
 	 */
-	date_gmt: string | null;
+	date_gmt: ContextualField< string | null, 'view' | 'edit', C >;
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid?: {
-		/**
-		 * Data as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * Data transformed for display.
-		 */
-		rendered: string;
-	};
+	guid: ContextualField< RawField< C >, 'view' | 'edit', C >;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -42,11 +35,11 @@ export interface Attachment {
 	/**
 	 * The date the post was last modified, in the site's timezone.
 	 */
-	modified: string;
+	modified: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * The date the post was last modified, as GMT.
 	 */
-	modified_gmt: string;
+	modified_gmt: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * An alphanumeric identifier for the post unique to its type.
 	 */
@@ -54,7 +47,7 @@ export interface Attachment {
 	/**
 	 * A named status for the post.
 	 */
-	status: PostStatus;
+	status: ContextualField< PostStatus, 'view' | 'edit', C >;
 	/**
 	 * Type of post.
 	 */
@@ -62,24 +55,15 @@ export interface Attachment {
 	/**
 	 * Permalink template for the post.
 	 */
-	permalink_template: string;
+	permalink_template: ContextualField< string, 'edit', C >;
 	/**
 	 * Slug automatically generated from the post title.
 	 */
-	generated_slug: string;
+	generated_slug: ContextualField< string, 'edit', C >;
 	/**
 	 * The title for the post.
 	 */
-	title: {
-		/**
-		 * Data as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * Data transformed for display.
-		 */
-		rendered: string;
-	};
+	title: RawField< C >;
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -87,21 +71,19 @@ export interface Attachment {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status: CommentStatus;
+	comment_status: ContextualField< 'open' | 'closed', 'view' | 'edit', C >;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status: PingStatus;
+	ping_status: ContextualField< 'open' | 'closed', 'view' | 'edit', C >;
 	/**
 	 * Meta fields.
 	 */
-	meta: {
-		[ k: string ]: string;
-	};
+	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 	/**
 	 * The theme file to use to display the post.
 	 */
-	template: string;
+	template: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * Alternative text to display when attachment is not displayed.
 	 */
@@ -109,29 +91,11 @@ export interface Attachment {
 	/**
 	 * The attachment caption.
 	 */
-	caption: {
-		/**
-		 * Data as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * Data transformed for display.
-		 */
-		rendered: string;
-	};
+	caption: ContextualField< string, 'edit', C >;
 	/**
 	 * The attachment description.
 	 */
-	description: {
-		/**
-		 * Data as it exists in the database.
-		 */
-		raw?: string;
-		/**
-		 * Data transformed for display.
-		 */
-		rendered: string;
-	};
+	description: ContextualField< RawField< C >, 'view' | 'edit', C >;
 	/**
 	 * Attachment type.
 	 */
@@ -143,13 +107,11 @@ export interface Attachment {
 	/**
 	 * Details about the media file, specific to its type.
 	 */
-	media_details: {
-		[ k: string ]: string;
-	};
+	media_details: Record< string, string >;
 	/**
 	 * The ID for the associated post of the attachment.
 	 */
-	post: number;
+	post: ContextualField< number, 'view' | 'edit', C >;
 	/**
 	 * URL to the original attachment file.
 	 */
@@ -157,11 +119,15 @@ export interface Attachment {
 	/**
 	 * List of the missing image sizes of the attachment.
 	 */
-	missing_image_sizes: string[];
+	missing_image_sizes: ContextualField< string[], 'edit', C >;
 }
 
-export interface AttachmentWithEdits
+export type Attachment< C extends Context > = WithoutNevers<
+	FullAttachment< C >
+>;
+
+export interface EditedAttachment
 	extends WithEdits<
-		Attachment,
+		Attachment< 'edit' >,
 		'guid' | 'title' | 'description' | 'caption'
 	> {}
