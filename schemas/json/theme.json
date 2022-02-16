@@ -171,6 +171,22 @@
 				}
 			}
 		},
+		"settingsPropertiesDimensions": {
+			"properties": {
+				"dimensions": {
+					"description": "Settings related to dimensions.",
+					"type": "object",
+					"properties": {
+						"height": {
+							"description": "Allow users to set custom heights.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsPropertiesLayout": {
 			"properties": {
 				"layout": {

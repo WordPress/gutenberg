@@ -55,6 +55,16 @@ Settings related to colors.
 
 ---
 
+### dimensions
+
+Settings related to dimensions.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| height | boolean | false |  |
+
+---
+
 ### layout
 
 Settings related to layout.
