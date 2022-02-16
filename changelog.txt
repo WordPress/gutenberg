@@ -1,8 +1,6 @@
 == Changelog ==
 
-= 12.6.0-rc.1 =
-
-
+= 12.6.0 =
 
 ## Changelog
 
@@ -244,6 +242,8 @@ The following PRs were merged by first time contrbutors:
 - @JeffMatsonPagely: Scripts: Fix copypasta typo in README file. ([38531](https://github.com/WordPress/gutenberg/pull/38531))
 - @angelistudio: Update attributes.md. ([38626](https://github.com/WordPress/gutenberg/pull/38626))
 - @sunyatasattva: Refactor Site Editor test utils to the `e2e-test-utils` package. ([38463](https://github.com/WordPress/gutenberg/pull/38463))
+
+
 
 
 
