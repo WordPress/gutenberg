@@ -209,7 +209,14 @@ function UnitControl(
 				label={ label }
 				onBlur={ handleOnBlur }
 				onKeyDown={ handleOnKeyDown }
-				onChange={ handleOnChange }
+				onChange={ ( nextValue, extra ) => {
+					let v;
+
+					if ( typeof v !== 'undefined' ) {
+						v = `${ nextValue }`;
+					}
+					handleOnChange?.( v, extra );
+				} }
 				ref={ forwardedRef }
 				size={ size }
 				suffix={ inputSuffix }
