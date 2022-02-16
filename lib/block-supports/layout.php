@@ -156,7 +156,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
 	$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
-	$style     = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support, $gap_value );
+	$style     = '<style>' . gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support, $gap_value ) . '</style>';
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
@@ -166,25 +166,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		1
 	);
 
-	// Styles should be loaded in the head for block themes
-	// and classic themes by default.
-	//
-	// Only for classic themes that opt into loading separate block assets
-	// we should load the styles in the body.
-	//
-	// See https://core.trac.wordpress.org/ticket/53494.
-	$separate_assets  = wp_should_load_separate_core_block_assets();
-	$is_classic_theme = ! wp_is_block_theme();
-	$action_hook_name = 'wp_enqueue_scripts';
-	if ( $is_classic_theme && $separate_assets ) {
-		$action_hook_name = 'wp_footer';
-	}
-	add_action(
-		$action_hook_name,
-		function () use ( $style ) {
-			echo '<style>' . $style . '</style>';
-		}
-	);
+	wp_enqueue_block_support( $style );
 
 	return $content;
 }
