@@ -244,13 +244,18 @@ describe( 'Delete Post Template Confirmation Dialog', () => {
 				await page.reload();
 				await page.waitForSelector( '.edit-post-layout' );
 			}
+			if ( viewport === 'small' ) {
+				await page.waitForXPath( '//button[@aria-label="Settings"]' );
+				await openDocumentSettingsSidebar();
+			}
 			const templateTitle = `${ viewport } Viewport Deletion Test`;
 
 			await createNewTemplate( templateTitle );
 			// Edit the template
 			if ( viewport === 'small' ) {
+				await page.waitForXPath( `//h2[text()="${ templateTitle }"]` );
 				const closeDocumentSettingsButton = await page.waitForXPath(
-					'//div[contains(@class,"interface-complementary-area-header__small")]/button[@aria-label="Close settings"]'
+					'//button[@aria-label="Close settings"]'
 				);
 				await closeDocumentSettingsButton.click();
 			}
