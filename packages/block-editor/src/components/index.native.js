@@ -56,6 +56,7 @@ export { default as useSetting } from './use-setting';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
 export { default as Warning } from './warning';
 export { default as ContrastChecker } from './contrast-checker';
+export { default as useMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
 
 export {
 	BottomSheetSettings,
