@@ -32,10 +32,14 @@ export const InputWithSlider = ( {
 				max={ max }
 				label={ label }
 				hideLabelFromVision
-				// @ts-ignore
 				value={ value }
-				// @ts-ignore
-				onChange={ onChange }
+				onChange={ ( nextValue?: number ) => {
+					if ( typeof nextValue === 'undefined' ) {
+						return;
+					}
+
+					onChange?.( nextValue );
+				} }
 				prefix={
 					<Spacer
 						as={ Text }
