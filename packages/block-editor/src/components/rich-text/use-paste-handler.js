@@ -62,7 +62,6 @@ export function usePasteHandler( props ) {
 			} = propsRef.current;
 
 			if ( ! isSelected ) {
-				event.preventDefault();
 				return;
 			}
 
