@@ -15,10 +15,10 @@ test.use( {
 } );
 
 test.describe( 'Widgets Customizer', () => {
-	test.beforeAll( async ( { testUtils } ) => {
+	test.beforeAll( async ( { globalTestUtils } ) => {
 		// TODO: Ideally we can bundle our test theme directly in the repo.
-		await testUtils.activateTheme( 'twentytwenty' );
-		await testUtils.activatePlugin( 'gutenberg-test-widgets' );
+		await globalTestUtils.activateTheme( 'twentytwenty' );
+		await globalTestUtils.activatePlugin( 'gutenberg-test-widgets' );
 	} );
 
 	test.beforeEach( async ( { testUtils, widgetsCustomizerPage } ) => {
@@ -26,9 +26,9 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 	} );
 
-	test.afterAll( async ( { testUtils } ) => {
-		await testUtils.deactivatePlugin( 'gutenberg-test-widgets' );
-		await testUtils.activateTheme( 'twentytwentyone' );
+	test.afterAll( async ( { globalTestUtils } ) => {
+		await globalTestUtils.deactivatePlugin( 'gutenberg-test-widgets' );
+		await globalTestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should add blocks', async ( { page, widgetsCustomizerPage } ) => {
