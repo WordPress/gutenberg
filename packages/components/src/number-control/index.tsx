@@ -43,6 +43,7 @@ export function NumberControl(
 		step: stepProp = 1,
 		type: typeProp = 'number',
 		value: valueProp,
+		onChange: onChangeProp,
 		...props
 	}: Props,
 	ref: Ref< any >
@@ -205,6 +206,15 @@ export function NumberControl(
 				numberControlStateReducer,
 				stateReducer
 			) }
+			onChange={ ( nextValue, extra ) => {
+				let v;
+
+				if ( typeof nextValue !== 'undefined' ) {
+					v = ensureNumber( nextValue );
+				}
+
+				onChangeProp?.( v, extra );
+			} }
 		/>
 	);
 }
