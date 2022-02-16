@@ -57,7 +57,7 @@ if ( isPackageInstalled( 'jest' ) ) {
 if ( isPackageInstalled( '@playwright/test' ) ) {
 	config.overrides.push( {
 		// End-to-end test files and their helpers only.
-		files: [ '**/specs/**/*.js', '**/?(*.)spec.js' ],
+		files: [ '**/specs/**/*.spec.js', '**/?(*.)spec.js' ],
 		extends: [ require.resolve( './test-e2e-playwright.js' ) ],
 	} );
 } else if ( isPackageInstalled( 'jest' ) ) {
