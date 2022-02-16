@@ -49,7 +49,7 @@ function Example() {
 			},
 			'default'
 		),
-		step: number( 'step', 1 ),
+		step: text( 'step', '1' ),
 		units: object( 'units', CSS_UNITS ),
 	};
 
