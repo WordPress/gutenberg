@@ -25,3 +25,7 @@ The callback called in response to a `click` event.
 The path of the screen to navigate to.
 
 -   Required: Yes
+
+### Inherited props
+
+`NavigatorBackButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`.

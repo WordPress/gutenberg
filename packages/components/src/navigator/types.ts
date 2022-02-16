@@ -44,15 +44,15 @@ export type NavigatorScreenProps = {
 	children: ReactNode;
 };
 
-export type NavigatorBackButtonProps = {
+type ButtonProps = {
+	// TODO: should also extend `Button` prop types once the `Button` component
+	// is refactored to TypeScript.
+};
+export type NavigatorBackButtonProps = Omit< ButtonProps, 'href' > & {
 	/**
 	 * The children elements.
 	 */
 	children: ReactNode;
-	/**
-	 * The callback called in response to a `click` event.
-	 */
-	onClick?: React.MouseEventHandler< HTMLElement >;
 };
 
 export type NavigatorButtonProps = NavigatorBackButtonProps & {

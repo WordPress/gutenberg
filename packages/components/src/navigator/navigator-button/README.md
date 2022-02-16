@@ -32,3 +32,7 @@ The callback called in response to a `click` event.
 The path of the screen to navigate to. The value of this prop needs to be [a valid value for an HTML attribute](https://html.spec.whatwg.org/multipage/syntax.html#attributes-2).
 
 -   Required: Yes
+
+### Inherited props
+
+`NavigatorButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`.

@@ -23,7 +23,7 @@ export function useNavigatorBackButton(
 	);
 
 	const { goBack } = useNavigator();
-	const handleClick: React.MouseEventHandler< HTMLElement > = useCallback(
+	const handleClick: React.MouseEventHandler< HTMLButtonElement > = useCallback(
 		( e ) => {
 			e.preventDefault();
 			goBack();
