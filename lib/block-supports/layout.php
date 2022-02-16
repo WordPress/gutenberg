@@ -166,15 +166,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		1
 	);
 
-	// Ideally styles should be loaded in the head, but blocks may be parsed
-	// after that, so loading in the footer for now.
-	// See https://core.trac.wordpress.org/ticket/53494.
-	add_action(
-		'wp_footer',
-		function () use ( $style ) {
-			echo '<style>' . $style . '</style>';
-		}
-	);
+	gutenberg_enqueue_block_support( $style );
 
 	return $content;
 }
