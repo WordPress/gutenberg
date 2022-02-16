@@ -1586,6 +1586,7 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * @param array      $data The data to inspect.
 	 * @param bool|array $path Boolean or path to a boolean.
+	 * @param bool       $default Default value if the referenced path is missing.
 	 * @return boolean
 	 */
 	protected static function get_metadata_boolean( $data, $path, $default = false ) {
