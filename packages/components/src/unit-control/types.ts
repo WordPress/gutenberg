@@ -10,6 +10,7 @@ import type { StateReducer } from '../input-control/reducer/state';
 import type {
 	InputChangeCallback,
 	Size as InputSize,
+	InputFieldProps,
 } from '../input-control/types';
 
 export type Value = number | string;
@@ -77,42 +78,43 @@ export type UnitSelectControlProps = {
 	units?: WPUnitControlUnitList;
 };
 
-export type UnitControlProps = UnitSelectControlProps & {
-	__unstableStateReducer?: StateReducer;
-	__unstableInputWidth?: CSSProperties[ 'width' ];
-	/**
-	 * If `true`, the unit `<select>` is hidden.
-	 *
-	 * @default false
-	 */
-	disableUnits?: boolean;
-	/**
-	 * If `true`, the `ENTER` key press is required in order to trigger an `onChange`.
-	 * If enabled, a change is also triggered when tabbing away (`onBlur`).
-	 *
-	 * @default false
-	 */
-	isPressEnterToChange?: boolean;
-	/**
-	 * If `true`, and the selected unit provides a `default` value, this value is set
-	 * when changing units.
-	 *
-	 * @default false
-	 */
-	isResetValueOnUnitChange?: boolean;
-	/**
-	 * If this property is added, a label will be generated using label property as the content.
-	 */
-	label?: string;
-	/**
-	 * Callback when the `unit` changes.
-	 *
-	 * @default noop
-	 */
-	onUnitChange?: UnitControlOnChangeCallback;
-	/**
-	 * Current value. If passed as a string, the current unit will be inferred from this value.
-	 * For example, a `value` of "50%" will set the current unit to `%`.
-	 */
-	value: Value;
-};
+export type UnitControlProps = UnitSelectControlProps &
+	Pick< InputFieldProps, 'onDrag' | 'onDragStart' | 'onDragEnd' > & {
+		__unstableStateReducer?: StateReducer;
+		__unstableInputWidth?: CSSProperties[ 'width' ];
+		/**
+		 * If `true`, the unit `<select>` is hidden.
+		 *
+		 * @default false
+		 */
+		disableUnits?: boolean;
+		/**
+		 * If `true`, the `ENTER` key press is required in order to trigger an `onChange`.
+		 * If enabled, a change is also triggered when tabbing away (`onBlur`).
+		 *
+		 * @default false
+		 */
+		isPressEnterToChange?: boolean;
+		/**
+		 * If `true`, and the selected unit provides a `default` value, this value is set
+		 * when changing units.
+		 *
+		 * @default false
+		 */
+		isResetValueOnUnitChange?: boolean;
+		/**
+		 * If this property is added, a label will be generated using label property as the content.
+		 */
+		label?: string;
+		/**
+		 * Callback when the `unit` changes.
+		 *
+		 * @default noop
+		 */
+		onUnitChange?: UnitControlOnChangeCallback;
+		/**
+		 * Current value. If passed as a string, the current unit will be inferred from this value.
+		 * For example, a `value` of "50%" will set the current unit to `%`.
+		 */
+		value: Value;
+	};
