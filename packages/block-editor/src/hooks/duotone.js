@@ -146,11 +146,14 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 		useSetting( `${ presetSetting }.custom` ) || EMPTY_ARRAY;
 	const themePresets =
 		useSetting( `${ presetSetting }.theme` ) || EMPTY_ARRAY;
-	const defaultPresets = disableDefault
-		? EMPTY_ARRAY
-		: useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
+	const defaultPresets =
+		useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
 	return useMemo(
-		() => [ ...userPresets, ...themePresets, ...defaultPresets ],
+		() => [
+			...userPresets,
+			...themePresets,
+			...( disableDefault ? defaultPresets : EMPTY_ARRAY ),
+		],
 		[ disableDefault, userPresets, themePresets, defaultPresets ]
 	);
 }
