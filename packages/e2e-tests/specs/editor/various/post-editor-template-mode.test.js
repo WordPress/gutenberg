@@ -341,6 +341,10 @@ describe( 'Delete Post Template Confirmation Dialog', () => {
 
 			await dialogConfirmButton.click();
 
+			// Saving isn't technically necessary, but for themes without any specified templates,
+			// the removal of the Templates dropdown is delayed. A save and reload allows for this
+			// delay and prevents flakiness
+			await saveDraft();
 			await page.reload();
 
 			const optionElementHandlers = await page.$x(
