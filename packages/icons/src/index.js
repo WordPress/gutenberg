@@ -4,7 +4,6 @@ export { default as addCard } from './library/add-card';
 export { default as addSubmenu } from './library/add-submenu';
 export { default as alignCenter } from './library/align-center';
 export { default as alignJustify } from './library/align-justify';
-export { default as alignJustifyAlt } from './library/align-justify-alt';
 export { default as alignLeft } from './library/align-left';
 export { default as alignNone } from './library/align-none';
 export { default as alignRight } from './library/align-right';

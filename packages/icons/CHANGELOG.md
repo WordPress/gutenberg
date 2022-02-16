@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## Breaking Change
+
+-   Removed icons that were added by mistake: `alignJustifyAlt`.
+
 ## 6.3.0 (2022-02-10)
 
 ### New Features

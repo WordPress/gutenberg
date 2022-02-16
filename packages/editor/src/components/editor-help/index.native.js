@@ -17,7 +17,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	helpFilled,
 	plusCircleFilled,
-	alignJustifyAlt,
+	alignJustify,
 	trashFilled,
 	cogAlt,
 } from '@wordpress/icons';
@@ -53,7 +53,7 @@ const HELP_TOPICS = [
 		icon: plusCircleFilled,
 		view: <AddBlocks />,
 	},
-	{ label: __( 'Move blocks' ), icon: alignJustifyAlt, view: <MoveBlocks /> },
+	{ label: __( 'Move blocks' ), icon: alignJustify, view: <MoveBlocks /> },
 	{ label: __( 'Remove blocks' ), icon: trashFilled, view: <RemoveBlocks /> },
 	{
 		label: __( 'Customize blocks' ),
