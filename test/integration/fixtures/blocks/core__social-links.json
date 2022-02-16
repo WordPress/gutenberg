@@ -4,8 +4,7 @@
 		"name": "core/social-links",
 		"isValid": true,
 		"attributes": {
-			"openInNewTab": false,
-			"showLabels": false
+			"openInNewTab": false
 		},
 		"innerBlocks": [
 			{
