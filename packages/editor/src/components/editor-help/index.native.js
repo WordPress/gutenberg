@@ -18,7 +18,7 @@ import {
 	helpFilled,
 	plusCircleFilled,
 	alignJustify,
-	trashFilled,
+	trash,
 	cog,
 } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
@@ -54,7 +54,7 @@ const HELP_TOPICS = [
 		view: <AddBlocks />,
 	},
 	{ label: __( 'Move blocks' ), icon: alignJustify, view: <MoveBlocks /> },
-	{ label: __( 'Remove blocks' ), icon: trashFilled, view: <RemoveBlocks /> },
+	{ label: __( 'Remove blocks' ), icon: trash, view: <RemoveBlocks /> },
 	{
 		label: __( 'Customize blocks' ),
 		icon: cog,
