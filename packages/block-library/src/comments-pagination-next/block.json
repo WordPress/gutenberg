@@ -17,7 +17,8 @@
 		"comments/perPage",
 		"comments/order",
 		"comments/inherit",
-		"comments/defaultPage"
+		"comments/defaultPage",
+		"comments/paginationArrow"
 	],
 	"supports": {
 		"reusable": false,
