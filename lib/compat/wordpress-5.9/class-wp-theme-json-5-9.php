@@ -1558,6 +1558,20 @@ class WP_Theme_JSON_5_9 {
 	/**
 	 * For metadata values that can either be booleans or paths to booleans, gets the value.
 	 *
+	 * ```php
+	 * $data = array(
+	 *   'color' => array(
+	 *     'defaultPalette' => true
+	 *   )
+	 * );
+	 *
+	 * self::get_metadata_boolean( $data, false );
+	 * // => false
+	 *
+	 * self::get_metadata_boolean( $data, array( 'color', 'defaultPalette' ) );
+	 * // => true
+	 * ```
+	 *
 	 * @param array      $data The data to inspect.
 	 * @param bool|array $path Boolean or path to a boolean.
 	 * @return boolean
