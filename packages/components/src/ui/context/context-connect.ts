@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { uniq } from 'lodash';
+import type { ReactChild, ReactNode, Ref } from 'react';
 
 /**
  * WordPress dependencies
@@ -14,8 +15,13 @@ import warn from '@wordpress/warning';
  */
 import { CONNECT_STATIC_NAMESPACE } from './constants';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
+import type { WordPressComponentFromProps } from '.';
 
-/* eslint-disable jsdoc/valid-types */
+type ContextConnectOptions = {
+	/** Defaults to `false`. */
+	memo?: boolean;
+};
+
 /**
  * Forwards ref (React.ForwardRef) and "Connects" (or registers) a component
  * within the Context system under a specified namespace.
@@ -24,15 +30,16 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
  * The hope is that we can improve render performance by removing functional
  * component wrappers.
  *
- * @template {import('./wordpress-component').WordPressComponentProps<{}, any, any>} P
- * @param {(props: P, ref: import('react').Ref<any>) => JSX.Element | null} Component            The component to register into the Context system.
- * @param {string}                                                          namespace            The namespace to register the component under.
- * @param {Object}                                                          options
- * @param {boolean}                                                         [options.memo=false]
- * @return {import('./wordpress-component').WordPressComponentFromProps<P>} The connected WordPressComponent
+ * @param  Component The component to register into the Context system.
+ * @param  namespace The namespace to register the component under.
+ * @param  options
+ * @return The connected WordPressComponent
  */
-export function contextConnect( Component, namespace, options = {} ) {
-	/* eslint-enable jsdoc/valid-types */
+export function contextConnect< P >(
+	Component: ( props: P, ref: Ref< any > ) => JSX.Element | null,
+	namespace: string,
+	options: ContextConnectOptions = {}
+): WordPressComponentFromProps< P > {
 	const { memo: memoProp = false } = options;
 
 	let WrappedComponent = forwardRef( Component );
@@ -75,10 +82,12 @@ export function contextConnect( Component, namespace, options = {} ) {
 /**
  * Attempts to retrieve the connected namespace from a component.
  *
- * @param {import('react').ReactChild | undefined | {}} Component The component to retrieve a namespace from.
- * @return {Array<string>} The connected namespaces.
+ * @param  Component The component to retrieve a namespace from.
+ * @return The connected namespaces.
  */
-export function getConnectNamespace( Component ) {
+export function getConnectNamespace(
+	Component: ReactChild | undefined | {}
+): string[] {
 	if ( ! Component ) return [];
 
 	let namespaces = [];
@@ -101,11 +110,13 @@ export function getConnectNamespace( Component ) {
 /**
  * Checks to see if a component is connected within the Context system.
  *
- * @param {import('react').ReactNode} Component The component to retrieve a namespace from.
- * @param {Array<string>|string}      match     The namespace to check.
- * @return {boolean} The result.
+ * @param  Component The component to retrieve a namespace from.
+ * @param  match     The namespace to check.
  */
-export function hasConnectNamespace( Component, match ) {
+export function hasConnectNamespace(
+	Component: ReactNode,
+	match: string[] | string
+): boolean {
 	if ( ! Component ) return false;
 
 	if ( typeof match === 'string' ) {
