@@ -5,7 +5,7 @@ import {
 	CommentStatus,
 	Context,
 	PingStatus,
-	WithEdits,
+	EditedRecord,
 	WithoutNevers,
 } from './common';
 
@@ -90,4 +90,4 @@ interface FullSettings< C extends Context > {
 
 export type Settings< C extends Context > = WithoutNevers< FullSettings< C > >;
 export interface EditedSettings
-	extends WithEdits< Settings< 'edit' >, 'description' > {}
+	extends EditedRecord< Settings< 'edit' >, 'description' > {}

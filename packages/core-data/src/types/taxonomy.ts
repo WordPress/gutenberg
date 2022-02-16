@@ -1,10 +1,12 @@
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
-import { Context, ContextualField, WithEdits, WithoutNevers } from './common';
+import {
+	Context,
+	ContextualField,
+	EditedRecord,
+	WithoutNevers,
+} from './common';
 
 interface FullTaxonomy< C extends Context > {
 	/**
@@ -82,4 +84,4 @@ export interface TaxonomyVisibility {
 
 export type Taxonomy< C extends Context > = WithoutNevers< FullTaxonomy< C > >;
 export interface EditedTaxonomy
-	extends WithEdits< Taxonomy< 'edit' >, 'description' > {}
+	extends EditedRecord< Taxonomy< 'edit' >, 'description' > {}

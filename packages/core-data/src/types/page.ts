@@ -8,7 +8,7 @@ import {
 	PingStatus,
 	PostStatus,
 	RawField,
-	WithEdits,
+	EditedRecord,
 	WithoutNevers,
 } from './common';
 
@@ -137,7 +137,7 @@ interface FullPage< C extends Context > {
 export type Page< C extends Context > = WithoutNevers< FullPage< C > >;
 
 export interface EditedPage
-	extends WithEdits<
+	extends EditedRecord<
 		Page< 'edit' >,
 		'guid' | 'title' | 'content' | 'excerpt'
 	> {}

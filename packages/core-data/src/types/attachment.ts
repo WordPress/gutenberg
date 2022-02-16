@@ -7,7 +7,7 @@ import {
 	MediaType,
 	PostStatus,
 	RawField,
-	WithEdits,
+	EditedRecord,
 	WithoutNevers,
 } from './common';
 
@@ -127,7 +127,7 @@ export type Attachment< C extends Context > = WithoutNevers<
 >;
 
 export interface EditedAttachment
-	extends WithEdits<
+	extends EditedRecord<
 		Attachment< 'edit' >,
 		'guid' | 'title' | 'description' | 'caption'
 	> {}

@@ -1,7 +1,3 @@
-export type WithEdits< T, Fields > = {
-	[ Key in keyof T ]: Key extends Fields ? string : T[ Key ];
-};
-
 export interface AvatarUrls {
 	/**
 	 * Avatar URL with image size of 24 pixels.
@@ -41,6 +37,10 @@ export type ContextualField<
 	AvailableInContexts extends Context,
 	C extends Context
 > = AvailableInContexts extends C ? FieldType : never;
+
+export type EditedRecord< T, Fields > = {
+	[ Key in keyof T ]: Key extends Fields ? string : T[ Key ];
+};
 
 type Without<
 	T,
