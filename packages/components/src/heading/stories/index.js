@@ -2,10 +2,9 @@
  * Internal dependencies
  */
 import { Heading } from '../';
-import { Heading as UnconnectedHeading } from '../component';
 
 export default {
-	component: UnconnectedHeading,
+	component: Heading,
 	title: 'Components (Experimental)/Heading',
 	argTypes: {
 		color: { control: { type: 'color' } },
