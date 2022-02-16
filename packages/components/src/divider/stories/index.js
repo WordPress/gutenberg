@@ -8,11 +8,10 @@ import { css } from '@emotion/react';
  */
 import { useCx } from '../../utils';
 import { Text } from '../../text';
-import { Divider } from '../';
-import { Divider as UnconnectedDivider } from '../component';
+import { Divider } from '..';
 
 export default {
-	component: UnconnectedDivider,
+	component: Divider,
 	title: 'Components (Experimental)/Divider',
 	argTypes: {
 		margin: {
