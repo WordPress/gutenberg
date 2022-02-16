@@ -17,6 +17,7 @@ import {
 	getUniqueByUsername,
 	getChangelog,
 	getContributorProps,
+	skipUsers,
 } from '../changelog';
 import pullRequests from './fixtures/pull-requests.json';
 
@@ -371,6 +372,65 @@ describe( 'getUniqueByUsername', () => {
 			},
 		];
 		expect( getUniqueByUsername( entries ) ).toEqual( expected );
+	} );
+} );
+
+describe( 'skipUsers', () => {
+	it( 'removes entries created by bots', () => {
+		const entries = [
+			{
+				user: {
+					login: '@user1',
+					type: 'User',
+				},
+			},
+			{
+				user: {
+					login: '@dependabot[bot]',
+					type: 'Bot',
+				},
+			},
+			{
+				user: {
+					login: '@user2',
+					type: 'User',
+				},
+			},
+			{
+				user: {
+					login: '@someotherrandombotusername',
+					type: 'Bot',
+				},
+			},
+			{
+				user: {
+					login: '@user3',
+					type: 'User',
+				},
+			},
+		];
+
+		const expected = [
+			{
+				user: {
+					login: '@user1',
+					type: 'User',
+				},
+			},
+			{
+				user: {
+					login: '@user2',
+					type: 'User',
+				},
+			},
+			{
+				user: {
+					login: '@user3',
+					type: 'User',
+				},
+			},
+		];
+		expect( skipUsers( entries ) ).toEqual( expected );
 	} );
 } );
 
