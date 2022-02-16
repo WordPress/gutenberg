@@ -7,11 +7,7 @@
 	"description": "Add the avatar of an user.",
 	"textdomain": "default",
 	"attributes": {
-		"width": {
-			"type": "number",
-			"default": 60
-		},
-		"height": {
+		"size": {
 			"type": "number",
 			"default": 60
 		},
