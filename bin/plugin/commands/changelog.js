@@ -991,6 +991,7 @@ async function getReleaseChangelog( options ) {
 	getTypesByTitle,
 	getFormattedItemDescription,
 	getContributorProps,
+	getContributorsList,
 	getChangelog,
 	getUniqueByUsername,
 	skipUsers,
