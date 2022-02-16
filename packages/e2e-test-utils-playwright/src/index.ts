@@ -25,6 +25,7 @@ import {
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
 } from './rest-api';
+import { setOption } from './set-options';
 import { showBlockToolbar } from './show-block-toolbar';
 import { switchUserToAdmin } from './switch-user-to-admin';
 import { switchUserToTest } from './switch-user-to-test';
@@ -57,6 +58,7 @@ class TestUtils {
 	isCurrentURL = isCurrentURL;
 	isThemeInstalled = isThemeInstalled;
 	loginUser = loginUser;
+	setOption = setOption;
 	showBlockToolbar = showBlockToolbar;
 	switchUserToAdmin = switchUserToAdmin;
 	switchUserToTest = switchUserToTest;
