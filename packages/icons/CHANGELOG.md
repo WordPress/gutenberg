@@ -4,7 +4,7 @@
 
 ## Breaking Change
 
--   Removed icons that were added by mistake: `alignJustifyAlt`.
+-   Removed icons that were added by mistake: `alignJustifyAlt`, `cogAlt`.
 
 ## 6.3.0 (2022-02-10)
 

@@ -19,7 +19,7 @@ import {
 	plusCircleFilled,
 	alignJustify,
 	trashFilled,
-	cogAlt,
+	cog,
 } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
@@ -57,7 +57,7 @@ const HELP_TOPICS = [
 	{ label: __( 'Remove blocks' ), icon: trashFilled, view: <RemoveBlocks /> },
 	{
 		label: __( 'Customize blocks' ),
-		icon: cogAlt,
+		icon: cog,
 		view: <CustomizeBlocks />,
 	},
 ];
