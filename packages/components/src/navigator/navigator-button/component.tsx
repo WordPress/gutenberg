@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -14,7 +13,7 @@ import type { NavigatorButtonProps } from '../types';
 
 function NavigatorButton(
 	props: WordPressComponentProps< NavigatorButtonProps, 'button' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const navigatorButtonProps = useNavigatorButton( props );
 
