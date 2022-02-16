@@ -15275,7 +15275,7 @@
 		"html_url": "https://github.com/WordPress/gutenberg/pull/XXXX",
 		"id": 123456,
 		"node_id": "123456",
-		"number": XXXX,
+		"number": 123456,
 		"title": "Placeholder to test that PRs by bots are removed.",
 		"user": {
 			"login": "@dependabot[bot]",
