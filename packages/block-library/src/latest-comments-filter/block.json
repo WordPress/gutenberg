@@ -9,8 +9,10 @@
 	"textdomain": "default",
 	"style": "wp-block-latest-comments-filter",
 	"viewScript": "file:./view.min.js",
-	"supports": {
-		"align": [ "wide", "full" ],
-		"html": false
+	"attributes": {
+		"numComments": {
+			"type": "number",
+			"default": 4
+		}
 	}
 }
