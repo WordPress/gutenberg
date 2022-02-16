@@ -10,7 +10,7 @@ import { contextConnect, WordPressComponentProps } from '../ui/context';
 import { View } from '../view';
 import { useHeading, HeadingProps } from './hook';
 
-function Heading(
+function UnconnectedHeading(
 	props: WordPressComponentProps< HeadingProps, 'h1' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -31,6 +31,6 @@ function Heading(
  * }
  * ```
  */
-export const ConnectedHeading = contextConnect( Heading, 'Heading' );
+export const Heading = contextConnect( UnconnectedHeading, 'Heading' );
 
-export default ConnectedHeading;
+export default Heading;
