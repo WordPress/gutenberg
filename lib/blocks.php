@@ -592,15 +592,17 @@ function gutenberg_multiple_block_styles( $metadata ) {
 add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
 
 /**
- * Styles should be loaded in the head for block themes.
+ * This function takes care of adding inline styles
+ * in the proper place, depending on the theme in use.
  *
- * For classic ones we need to enqueue them to the body
+ * For block themes, it's loaded in the head.
+ * For classic ones, it's loaded in the body
  * because the wp_head action (and wp_enqueue_scripts)
  * happens before the render_block.
  *
  * See https://core.trac.wordpress.org/ticket/53494.
  *
- * @param string $style HTML content to load in the <head> or <body>.
+ * @param string $style String containing the CSS styles to be added.
  */
 function gutenberg_enqueue_block_support( $style ) {
 	$action_hook_name = 'wp_footer';
