@@ -102,7 +102,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	protected static function translate( $theme_json, $domain = 'default' ) {
 		if ( null === static::$i18n_schema ) {
-			$i18n_schema       = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
+			$i18n_schema         = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
 			static::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
 		}
 
@@ -119,8 +119,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return static::$core;
 		}
 
-		$config     = static::read_json_file( __DIR__ . '/theme.json' );
-		$config     = static::translate( $config );
+		$config       = static::read_json_file( __DIR__ . '/theme.json' );
+		$config       = static::translate( $config );
 		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 
 		return static::$core;
@@ -144,7 +144,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		if ( null === static::$theme ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			static::$theme     = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( wp_get_theme()->parent() ) {
 				// Get parent theme.json.
