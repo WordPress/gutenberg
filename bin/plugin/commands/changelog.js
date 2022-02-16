@@ -681,7 +681,10 @@ async function fetchAllPullRequests( octokit, settings ) {
 function getChangelog( pullRequests ) {
 	let changelog = '## Changelog\n\n';
 
-	const groupedPullRequests = groupBy( pullRequests, getIssueType );
+	const groupedPullRequests = groupBy(
+		skipUsers( pullRequests ),
+		getIssueType
+	);
 
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
 
@@ -990,4 +993,5 @@ async function getReleaseChangelog( options ) {
 	getContributorProps,
 	getChangelog,
 	getUniqueByUsername,
+	skipUsers,
 };
