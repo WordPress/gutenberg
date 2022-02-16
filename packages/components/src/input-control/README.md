@@ -105,5 +105,5 @@ Type of the input element to render. Defaults to "text".
 
 The current value of the input.
 
--   Type: `String | Number`
+-   Type: `String`
 -   Required: Yes
