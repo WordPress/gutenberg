@@ -15,7 +15,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 const configPath = 'test/native';
 
-const transpiledPackageNames = glob( '../../packages/*/src/index.js' ).map(
+const transpiledPackageNames = glob( '../../packages/*/src/index.{js,ts}' ).map(
 	( fileName ) => fileName.split( '/' )[ 3 ]
 );
 
