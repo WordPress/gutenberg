@@ -24,5 +24,5 @@ export type Props = InputControlProps & {
 	 *
 	 * @default 10
 	 */
-	shiftStep?: number;
+	shiftStep?: string | number;
 };

@@ -36,7 +36,7 @@ export function NumberControl(
 		max: maxProp = Infinity,
 		min: minProp = -Infinity,
 		required = false,
-		shiftStep = 10,
+		shiftStep: shiftStepProp = 10,
 		step: stepProp = 1,
 		type: typeProp = 'number',
 		value: valueProp,
@@ -46,6 +46,7 @@ export function NumberControl(
 ) {
 	const min = ensureNumber( minProp );
 	const max = ensureNumber( maxProp );
+	const shiftStep = ensureNumber( shiftStepProp );
 
 	const isStepAny = stepProp === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( stepProp );
