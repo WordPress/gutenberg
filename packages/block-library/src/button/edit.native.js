@@ -17,7 +17,6 @@ import {
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
-	useSetting,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -29,6 +28,7 @@ import {
 	BottomSheetSelectControl,
 	CSS_UNITS,
 	filterUnitsWithSettings,
+	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import { link } from '@wordpress/icons';
 import { store as editPostStore } from '@wordpress/edit-post';
@@ -118,8 +118,8 @@ function ButtonEdit( props ) {
 	const [ borderRadiusUnit, setBorderRadiusUnit ] = useState( valueUnit );
 
 	const richTextRef = useRef();
-	const colors = useSetting( 'color.palette' ) || [];
-	const gradients = useSetting( 'color.gradients' ) || [];
+	const colors = useMobileGlobalStylesColors();
+	const gradients = useMobileGlobalStylesColors( 'gradients' );
 
 	useEffect( () => {
 		if ( isSelected ) {

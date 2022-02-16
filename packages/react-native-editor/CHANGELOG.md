@@ -16,6 +16,8 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
 -   [***] Support for multiple color palettes [#38417]
 
+-   [***] Support for multiple color palettes [#38417]
+
 ## 1.71.1
 
 -   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
