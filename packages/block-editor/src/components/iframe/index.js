@@ -174,11 +174,23 @@ function Iframe(
 	const setRef = useRefEffect( ( node ) => {
 		function setDocumentIfReady() {
 			const { contentDocument, ownerDocument } = node;
-			const { readyState, documentElement } = contentDocument;
+			const { readyState } = contentDocument;
 
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
 			}
+
+			// Iframe document doctype is not set by default and not having doctype
+			// will cause browser to render iframe contents in quirks mode. Appending
+			// doctype to existing document won't change iframe's rendering mode.
+			// Document.write will overwrite the document with a new one containing
+			// a correct doctype and will correctly render in stadards mode.
+			contentDocument.write(
+				'<!DOCTYPE html>' + contentDocument.documentElement.outerHTML
+			);
+			contentDocument.close();
+
+			const { documentElement } = contentDocument;
 
 			bubbleEvents( contentDocument );
 			setIframeDocument( contentDocument );
