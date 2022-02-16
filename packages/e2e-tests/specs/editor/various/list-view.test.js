@@ -87,11 +87,12 @@ describe( 'List view', () => {
 		await page.keyboard.press( 'Enter' );
 
 		const canvasImageBlock = await page.waitForSelector(
-			'figure[aria-label="Block: Image"]'
+			'button.block-editor-media-placeholder__upload-button'
 		);
 		expect( canvasImageBlock ).toHaveFocus();
 
 		// Delete the image block in the canvas.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Backspace' );
 
 		// List view should have two rows.
