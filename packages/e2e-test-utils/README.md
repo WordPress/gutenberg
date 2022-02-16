@@ -236,6 +236,14 @@ _Parameters_
 
 Delete all menus using the REST API
 
+### deleteAllTemplates
+
+Delete all the templates of given type.
+
+_Parameters_
+
+-   _type_ `('wp_template'|'wp_template_part')`: - Template type to delete.
+
 ### deleteAllWidgets
 
 Delete all the widgets in the widgets screen.

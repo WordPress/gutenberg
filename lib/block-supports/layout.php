@@ -53,7 +53,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		$style = '';
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > * {";
+			$style  = "$selector > :not(.alignleft):not(.alignright) {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 			$style .= 'margin-left: auto !important;';
 			$style .= 'margin-right: auto !important;';
@@ -63,8 +63,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector .alignfull { max-width: none; }";
 		}
 
-		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
-		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
+		$style .= "$selector .alignleft { float: left; margin-right: 2em; margin-left: 0; }";
+		$style .= "$selector .alignright { float: right; margin-left: 2em; margin-right: 0; }";
 		if ( $has_block_gap_support ) {
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
 			$style    .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
@@ -245,7 +245,7 @@ add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
  * @return string Filtered block content.
  */
 function gutenberg_restore_image_outer_container( $block_content, $block ) {
-	$image_with_align = '/(^\s*<figure\b[^>]*)wp-block-image\s([^"]*((alignleft)|(alignright)|(aligncenter))(\s|")[^>]*>((.|\S|\s)*)<\/figure>)/U';
+	$image_with_align = '/(^\s*<figure\b[^>]*)\bwp-block-image\b([^"]*\b(?:alignleft|alignright|aligncenter)\b[^>]*>.*<\/figure>)/U';
 
 	if (
 		'core/image' !== $block['blockName'] ||

@@ -480,6 +480,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								<div className={ imageClasses }>
 									{ addLinkToFeaturedImage ? (
 										<a
+											className="wp-block-latest-posts__post-title"
 											href={ post.link }
 											rel="noreferrer noopener"
 										>

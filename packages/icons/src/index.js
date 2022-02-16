@@ -179,6 +179,7 @@ export { default as quote } from './library/quote';
 export { default as receipt } from './library/receipt';
 export { default as redo } from './library/redo';
 export { default as removeBug } from './library/remove-bug';
+export { default as removeSubmenu } from './library/remove-submenu';
 export { default as replace } from './library/replace';
 export { default as reset } from './library/reset';
 export { default as resizeCornerNE } from './library/resize-corner-n-e';

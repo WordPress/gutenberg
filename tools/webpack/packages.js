@@ -19,7 +19,11 @@ const { dependencies } = require( '../../package' );
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
+const BUNDLED_PACKAGES = [
+	'@wordpress/icons',
+	'@wordpress/interface',
+	'@wordpress/style-engine',
+];
 
 const gutenbergPackages = Object.keys( dependencies )
 	.filter(

@@ -99,6 +99,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 			paddingBottom: 'bottom',
 			paddingLeft: 'left',
 		},
+		useEngine: true,
 	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
