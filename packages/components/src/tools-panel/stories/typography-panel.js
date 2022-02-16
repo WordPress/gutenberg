@@ -161,6 +161,8 @@ export const TypographyPanel = () => {
 							<LineHeightControl
 								value={ lineHeight }
 								onChange={ setLineHeight }
+								__unstableInputWidth="100%"
+								__nextHasNoMarginBottom={ true }
 							/>
 						</ToolsPanelItem>
 
