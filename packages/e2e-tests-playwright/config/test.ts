@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { test as base, expect, selectors } from '@playwright/test';
-import type { ConsoleMessage } from '@playwright/test';
+import type { ConsoleMessage, Page } from '@playwright/test';
 import { selectorScript } from 'role-selector/playwright-test';
 
 /**
@@ -97,22 +97,10 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 
 const test = base.extend< {
 	testUtils: TestUtils;
+	globalPage: Page;
+	globalTestUtils: TestUtils;
 } >( {
-	// Override the default browser context and page for each test so
-	// that it can be created and used in `beforeAll`.
-	context: async ( { browser }, use ) => {
-		const context = await browser.newContext( {
-			reducedMotion: 'reduce',
-			strictSelectors: true,
-		} );
-
-		await use( context );
-
-		await context.close();
-	},
-	page: async ( { context }, use ) => {
-		const page = await context.newPage();
-
+	page: async ( { page }, use ) => {
 		page.on( 'console', observeConsoleLogging );
 
 		await use( page );
@@ -122,6 +110,27 @@ const test = base.extend< {
 	testUtils: async ( { page }, use ) => {
 		await use( new TestUtils( page ) );
 	},
+	// Used in `beforeAll` and `afterAll` where `page` isn't available.
+	globalPage: async ( { browser }, use ) => {
+		const context = await browser.newContext();
+		const page = await context.newPage();
+
+		page.on( 'console', observeConsoleLogging );
+
+		await use( page );
+
+		await context.close();
+	},
+	// Used in `beforeAll` and `afterAll` where `testUtils` isn't available.
+	globalTestUtils: async ( { globalPage }, use ) => {
+		await use( new TestUtils( globalPage ) );
+	},
+} );
+
+test.beforeAll( async ( { globalTestUtils } ) => {
+	await globalTestUtils.activateTheme( 'twentytwentyone' );
+	await globalTestUtils.deleteAllPosts();
+	await globalTestUtils.deleteAllBlocks();
 } );
 
 test.afterEach( async ( { page } ) => {

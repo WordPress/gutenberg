@@ -4,14 +4,14 @@
 const { test, expect } = require( '../../../config/test' );
 
 test.describe( 'new editor state', () => {
-	test.beforeAll( async ( { testUtils } ) => {
-		await testUtils.activatePlugin(
+	test.beforeAll( async ( { globalTestUtils } ) => {
+		await globalTestUtils.activatePlugin(
 			'gutenberg-test-plugin-post-formats-support'
 		);
 	} );
 
-	test.afterAll( async ( { testUtils } ) => {
-		await testUtils.deactivatePlugin(
+	test.afterAll( async ( { globalTestUtils } ) => {
+		await globalTestUtils.deactivatePlugin(
 			'gutenberg-test-plugin-post-formats-support'
 		);
 	} );
@@ -57,15 +57,9 @@ test.describe( 'new editor state', () => {
 	} ) => {
 		await testUtils.createNewPost();
 
-		const activeElementClasses = await page.evaluate( () => {
-			return Object.values( document.activeElement.classList );
-		} );
-		const activeElementTagName = await page.evaluate( () => {
-			return document.activeElement.tagName.toLowerCase();
-		} );
-
-		expect( activeElementClasses ).toContain( 'editor-post-title__input' );
-		expect( activeElementTagName ).toEqual( 'h1' );
+		await expect(
+			page.locator( 'role=textbox[name="Add title"i]' )
+		).toBeFocused();
 	} );
 
 	test( 'should not focus the title if the title exists', async ( {
@@ -83,19 +77,9 @@ test.describe( 'new editor state', () => {
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
 
-		const activeElementClasses = await page.evaluate( () => {
-			return Object.values( document.activeElement.classList );
-		} );
-		const activeElementTagName = await page.evaluate( () => {
-			return document.activeElement.tagName.toLowerCase();
-		} );
-
-		expect( activeElementClasses ).not.toContain(
-			'editor-post-title__input'
-		);
 		// The document `body` should be the `activeElement`, because nothing is
 		// focused by default when a post already has a title.
-		expect( activeElementTagName ).toEqual( 'body' );
+		await expect( page.locator( 'body' ) ).toBeFocused();
 	} );
 
 	test( 'should be saveable with sufficient initial edits', async ( {

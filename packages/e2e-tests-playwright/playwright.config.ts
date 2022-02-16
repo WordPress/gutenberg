@@ -17,8 +17,6 @@ const config: PlaywrightTestConfig = {
 	reportSlowTests: null,
 	testDir: new URL( './specs', 'file:' + __filename ).pathname,
 	outputDir: path.join( process.cwd(), 'artifacts/test-results' ),
-	globalSetup: new URL( './config/global-setup.ts', 'file:' + __filename )
-		.pathname,
 	use: {
 		headless: true,
 		viewport: {
@@ -27,6 +25,10 @@ const config: PlaywrightTestConfig = {
 		},
 		ignoreHTTPSErrors: true,
 		locale: 'en-US',
+		contextOptions: {
+			reducedMotion: 'reduce',
+			strictSelectors: true,
+		},
 		actionTimeout: 10_000, // 10 seconds.
 		trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
 		screenshot: 'only-on-failure',
