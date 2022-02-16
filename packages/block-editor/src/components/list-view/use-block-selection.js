@@ -1,9 +1,17 @@
 /**
+ * External dependencies
+ */
+import { difference } from 'lodash';
+
+/**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
+import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { UP, DOWN } from '@wordpress/keycodes';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,6 +24,7 @@ export default function useBlockSelection() {
 		blockEditorStore
 	);
 	const {
+		getBlockName,
 		getBlockParents,
 		getBlockSelectionStart,
 		getBlockSelectionEnd,
@@ -23,6 +32,8 @@ export default function useBlockSelection() {
 		hasMultiSelection,
 		hasSelectedBlock,
 	} = useSelect( blockEditorStore );
+
+	const { getBlockType } = useSelect( blocksStore );
 
 	const updateBlockSelection = useCallback(
 		async ( event, clientId, destinationClientId ) => {
@@ -97,10 +108,44 @@ export default function useBlockSelection() {
 				startParents,
 				endParents
 			);
-			multiSelect( start, end, null );
+			await multiSelect( start, end, null );
+
+			// Announce deselected block, or number of deselected blocks if
+			// the total number of blocks deselected is greater than one.
+			const updatedSelectedBlocks = getSelectedBlockClientIds();
+
+			const selectionDiff = difference(
+				selectedBlocks,
+				updatedSelectedBlocks
+			);
+
+			let label;
+			if ( selectionDiff.length === 1 ) {
+				const title = getBlockType( getBlockName( selectionDiff[ 0 ] ) )
+					?.title;
+				if ( title ) {
+					label = sprintf(
+						/* translators: %s: block name */
+						__( '%s deselected.' ),
+						title
+					);
+				}
+			} else if ( selectionDiff.length > 1 ) {
+				label = sprintf(
+					/* translators: %s: number of deselected blocks */
+					__( '%s blocks deselected.' ),
+					selectionDiff.length
+				);
+			}
+
+			if ( label ) {
+				speak( label );
+			}
 		},
 		[
 			clearSelectedBlock,
+			getBlockName,
+			getBlockType,
 			getBlockParents,
 			getBlockSelectionStart,
 			getBlockSelectionEnd,
