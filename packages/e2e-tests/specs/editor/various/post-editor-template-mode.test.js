@@ -292,7 +292,11 @@ describe( 'Delete Post Template Confirmation Dialog', () => {
 			);
 			await dialogCancelButton.click();
 
-			await page.reload();
+			const exitTemplateModeButton = await page.waitForXPath(
+				'//button[text()="Back"]'
+			);
+			await exitTemplateModeButton.click();
+
 			await page.waitForXPath(
 				'//button[@aria-label="Settings"][@aria-expanded="false"]'
 			);
