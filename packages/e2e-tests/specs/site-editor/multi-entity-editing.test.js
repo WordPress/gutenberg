@@ -5,7 +5,7 @@ import {
 	insertBlock,
 	createNewPost,
 	publishPost,
-	trashAllPosts,
+	deleteAllTemplates,
 	activateTheme,
 	canvas,
 	openDocumentSettingsSidebar,
@@ -135,8 +135,8 @@ const removeErrorMocks = () => {
 describe( 'Multi-entity editor states', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 
 	afterAll( async () => {
@@ -185,8 +185,8 @@ describe( 'Multi-entity editor states', () => {
 		const templateName = 'Custom Template';
 
 		beforeAll( async () => {
-			await trashAllPosts( 'wp_template' );
-			await trashAllPosts( 'wp_template_part' );
+			await deleteAllTemplates( 'wp_template' );
+			await deleteAllTemplates( 'wp_template_part' );
 			await createNewPost( {
 				postType: 'wp_template',
 				title: templateName,

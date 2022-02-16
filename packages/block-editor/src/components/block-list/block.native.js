@@ -11,6 +11,7 @@ import { Component, createRef, useMemo } from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
+	useMobileGlobalStylesColors,
 	alignmentHelpers,
 	useGlobalStyles,
 } from '@wordpress/components';
@@ -50,7 +51,7 @@ function BlockForType( {
 	blockWidth,
 	baseGlobalStyles,
 } ) {
-	const defaultColors = useSetting( 'color.palette' ) || emptyArray;
+	const defaultColors = useMobileGlobalStylesColors();
 	const fontSizes = useSetting( 'typography.fontSizes' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
 	const mergedStyle = useMemo( () => {

@@ -105,7 +105,7 @@ function render_block_core_latest_posts( $attributes ) {
 		}
 
 		$list_items_markup .= sprintf(
-			'<a href="%1$s">%2$s</a>',
+			'<a class="wp-block-latest-posts__post-title" href="%1$s">%2$s</a>',
 			esc_url( $post_link ),
 			$title
 		);

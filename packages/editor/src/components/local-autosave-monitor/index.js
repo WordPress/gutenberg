@@ -17,7 +17,10 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import AutosaveMonitor from '../autosave-monitor';
-import { localAutosaveGet, localAutosaveClear } from '../../store/controls';
+import {
+	localAutosaveGet,
+	localAutosaveClear,
+} from '../../store/local-autosave';
 import { store as editorStore } from '../../store';
 
 const requestIdleCallback = window.requestIdleCallback
