@@ -119,6 +119,8 @@ function ListViewBlock( {
 
 	const toggleExpanded = useCallback(
 		( event ) => {
+			// Prevent shift+click from opening link in a new window when toggling.
+			event.preventDefault();
 			event.stopPropagation();
 			if ( isExpanded === true ) {
 				collapse( clientId );
