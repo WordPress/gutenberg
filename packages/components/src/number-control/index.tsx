@@ -24,6 +24,9 @@ import type { Props } from './types';
 const ensureNumber = ( n: string | number ) =>
 	typeof n === 'string' ? parseFloat( n ) : n;
 
+const ensureString = ( s: string | number ) =>
+	typeof s === 'string' ? s : `${ s }`;
+
 export function NumberControl(
 	{
 		__unstableStateReducer: stateReducer = ( state ) => state,
@@ -102,10 +105,12 @@ export function NumberControl(
 				nextValue = subtract( nextValue, incrementalValue );
 			}
 
-			state.value = `${ constrainValue(
-				nextValue,
-				enableShift ? incrementalValue : undefined
-			) }`;
+			state.value = ensureString(
+				constrainValue(
+					nextValue,
+					enableShift ? incrementalValue : undefined
+				)
+			);
 		}
 
 		/**
@@ -147,10 +152,12 @@ export function NumberControl(
 				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
 				const distance = delta * modifier * directionModifier;
 
-				state.value = `${ constrainValue(
-					add( currentValue ?? 0, distance ),
-					enableShift ? modifier : undefined
-				) }`;
+				state.value = ensureString(
+					constrainValue(
+						add( currentValue ?? 0, distance ),
+						enableShift ? modifier : undefined
+					)
+				);
 			}
 		}
 
@@ -165,7 +172,9 @@ export function NumberControl(
 
 			state.value = applyEmptyValue
 				? currentValue
-				: `${ constrainValue( ensureNumber( currentValue ?? 0 ) ) }`;
+				: ensureString(
+						constrainValue( ensureNumber( currentValue ?? 0 ) )
+				  );
 		}
 
 		return state;
@@ -187,7 +196,11 @@ export function NumberControl(
 			required={ required }
 			step={ stepProp }
 			type={ typeProp }
-			value={ `${ valueProp }` }
+			value={
+				typeof valueProp !== 'undefined'
+					? ensureString( valueProp )
+					: undefined
+			}
 			__unstableStateReducer={ composeStateReducers(
 				numberControlStateReducer,
 				stateReducer
