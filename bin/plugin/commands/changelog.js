@@ -779,10 +779,6 @@ function sortFeatureGroups( featureGroups ) {
  */
 function getFirstTimeContributorPRs( pullRequests ) {
 	return pullRequests.filter( ( pr ) => {
-		if ( pr.user.type.toLowerCase() === 'bot' ) {
-			return false;
-		}
-
 		return pr.labels.find(
 			( { name } ) => name.toLowerCase() === 'first-time contributor'
 		);
@@ -834,6 +830,19 @@ function getUniqueByUsername( items ) {
 }
 
 /**
+ * Excludes users who should not be included in the changelog.
+ * Typically this is "bot" users.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ * @return {IssuesListForRepoResponseItem[]} The list of filtered pull requests.
+ */
+function skipUsers( pullRequests ) {
+	return pullRequests.filter(
+		( pr ) => pr.user.type.toLowerCase() !== 'bot'
+	);
+}
+
+/**
  * Produces the formatted markdown for the contributor props seciton.
  *
  * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
@@ -842,6 +851,7 @@ function getUniqueByUsername( items ) {
  */
 function getContributorProps( pullRequests ) {
 	const contributorsList = flow( [
+		skipUsers,
 		getFirstTimeContributorPRs,
 		getUniqueByUsername,
 		sortByUsername,
@@ -881,6 +891,7 @@ function getContributorsMarkdownList( pullRequests ) {
  */
 function getContributorsList( pullRequests ) {
 	const contributorsList = flow( [
+		skipUsers,
 		getUniqueByUsername,
 		sortByUsername,
 		getContributorsMarkdownList,
