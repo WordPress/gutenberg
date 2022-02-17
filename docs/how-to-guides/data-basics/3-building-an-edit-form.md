@@ -205,13 +205,17 @@ Let's see what happens if we call `getEditedEntityRecord`:
 
 ```js
 wp.data.select( 'core' ).getEditedEntityRecord( 'postType', 'page', pageId ).title
-// 'updated title'
+// "updated title"
 
 wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title
-// original, unchanged title
+// { "rendered": "<original, unchanged title>", "raw": "..." }
 ```
 
-As we will see later, successfully saving an *Edited Entity Record* updates the corresponding *Entity Record*.
+As you can see, the `title` of an Entity Record is an object, but the `title` of an Edited Entity record is a string.
+
+This is no accident. Fields like `title`, `excerpt`, and `content` can only be rendered on the server so the REST API exposes both the `raw` markup and the `rendered` string. For example, in the block editor, `content.rendered` could used as a visual preview, and `content.raw` could be used to populate the code editor.
+
+So why is the `content` of an Edited Entity Record a string? Since Javascript is not be able to properly render arbitrary block markup, it stores only the `raw` markup without the `rendered` part. And since that's a string, the entire field becomes a string.
 
 We can now update `EditPageForm` accordingly. We can access the actions using the [`useDispatch`](/packages/data/README.md#usedispatch) hook similarly to how we use `useSelect` to access selectors:
 
