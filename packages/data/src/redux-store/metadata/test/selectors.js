@@ -193,6 +193,36 @@ describe( 'hasResolutionFailed', () => {
 			registry.select( 'store' ).hasResolutionFailed( 'getItems' )
 		).toBeTruthy();
 	} );
+
+	it( 'returns true if the resolution has failed even if the error is falsy', async () => {
+		registry.registerStore( 'store', {
+			reducer: ( state = null, action ) => {
+				if ( action.type === 'RECEIVE' ) {
+					return action.items;
+				}
+
+				return state;
+			},
+			selectors: {
+				getItems: ( state ) => state,
+			},
+			resolvers: {
+				getItems: () => {
+					throw null;
+				},
+			},
+		} );
+
+		expect(
+			registry.select( 'store' ).hasResolutionFailed( 'getItems' )
+		).toBeFalsy();
+
+		await resolve( registry, 'getItems' );
+
+		expect(
+			registry.select( 'store' ).hasResolutionFailed( 'getItems' )
+		).toBeTruthy();
+	} );
 } );
 
 describe( 'getResolutionError', () => {
