@@ -90,13 +90,14 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 			return $cached;
 		}
 	}
-	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$tree                = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 	if ( empty( $types ) && ! $supports_theme_json ) {
 		$types = array( 'variables', 'presets' );
 	} elseif ( empty( $types ) ) {
 		$types = array( 'variables', 'styles', 'presets' );
 	}
+
 	/*
 	 * If variables are part of the stylesheet,
 	 * we add them for all origins (default, theme, user).
@@ -109,6 +110,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		$styles_variables = $tree->get_stylesheet( array( 'variables' ) );
 		$types            = array_diff( $types, array( 'variables' ) );
 	}
+
 	/*
 	 * For the remaining types (presets, styles), we do consider origins:
 	 *
