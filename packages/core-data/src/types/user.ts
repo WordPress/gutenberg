@@ -83,4 +83,3 @@ interface FullUser< C extends Context > {
 }
 
 export type User< C extends Context > = OmitNevers< FullUser< C > >;
-export interface UpdatableUser extends User< 'edit' > {}

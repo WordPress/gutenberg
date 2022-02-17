@@ -51,4 +51,3 @@ type SidebarStatus = 'active' | 'inactive';
 type NestedWidget< C extends Context > = Widget< C > | string;
 
 export type Sidebar< C extends Context > = OmitNevers< FullSidebar< C > >;
-export interface UpdatableSidebar extends Sidebar< 'edit' > {}

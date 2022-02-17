@@ -21,5 +21,3 @@ interface FullNavigationArea< C extends Context > {
 export type NavigationArea< C extends Context > = OmitNevers<
 	FullNavigationArea< C >
 >;
-
-export interface UpdatableNavigationArea extends FullNavigationArea< 'edit' > {}

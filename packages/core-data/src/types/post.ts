@@ -144,9 +144,3 @@ interface FullPost< C extends Context > {
 }
 
 export type Post< C extends Context > = OmitNevers< FullPost< C > >;
-
-export interface UpdatablePost
-	extends UpdatableRecord<
-		Post< 'edit' >,
-		'guid' | 'title' | 'content' | 'excerpt'
-	> {}

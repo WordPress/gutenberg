@@ -66,4 +66,3 @@ interface TypeVisibility {
 }
 
 export type Type< C extends Context > = OmitNevers< FullType< C > >;
-export interface UpdatableType extends Type< 'edit' > {}

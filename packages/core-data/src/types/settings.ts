@@ -89,5 +89,3 @@ interface FullSettings< C extends Context > {
 }
 
 export type Settings< C extends Context > = OmitNevers< FullSettings< C > >;
-export interface UpdatableSettings
-	extends UpdatableRecord< Settings< 'edit' >, 'description' > {}

@@ -83,5 +83,3 @@ export interface TaxonomyVisibility {
 }
 
 export type Taxonomy< C extends Context > = OmitNevers< FullTaxonomy< C > >;
-export interface UpdatableTaxonomy
-	extends UpdatableRecord< Taxonomy< 'edit' >, 'description' > {}

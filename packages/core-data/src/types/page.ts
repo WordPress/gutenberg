@@ -135,9 +135,3 @@ interface FullPage< C extends Context > {
 }
 
 export type Page< C extends Context > = OmitNevers< FullPage< C > >;
-
-export interface UpdatablePage
-	extends UpdatableRecord<
-		Page< 'edit' >,
-		'guid' | 'title' | 'content' | 'excerpt'
-	> {}

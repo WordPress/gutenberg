@@ -21,4 +21,3 @@ interface FullMenuLocation< C extends Context > {
 export type MenuLocation< C extends Context > = OmitNevers<
 	FullMenuLocation< C >
 >;
-export interface UpdatableMenuLocation extends MenuLocation< 'edit' > {}

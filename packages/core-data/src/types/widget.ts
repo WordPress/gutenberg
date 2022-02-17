@@ -50,4 +50,3 @@ interface WidgetInstance {
 }
 
 export type Widget< C extends Context > = OmitNevers< FullWidget< C > >;
-export interface UpdatableWidget extends Widget< 'edit' > {}

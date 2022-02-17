@@ -123,9 +123,3 @@ interface FullAttachment< C extends Context > {
 }
 
 export type Attachment< C extends Context > = OmitNevers< FullAttachment< C > >;
-
-export interface UpdatableAttachment
-	extends UpdatableRecord<
-		Attachment< 'edit' >,
-		'guid' | 'title' | 'description' | 'caption'
-	> {}

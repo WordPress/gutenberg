@@ -35,4 +35,3 @@ interface FullNavMenu< C extends Context > {
 }
 
 export type NavMenu< C extends Context > = OmitNevers< FullNavMenu< C > >;
-export interface UpdatableNavMenu extends NavMenu< 'edit' > {}

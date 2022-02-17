@@ -81,5 +81,3 @@ interface FullComment< C extends Context > {
 }
 
 export type Comment< C extends Context > = FullComment< C >;
-export interface UpdatableComment
-	extends UpdatableRecord< Comment< 'edit' >, 'content' > {}

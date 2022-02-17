@@ -82,5 +82,3 @@ interface FullWpTemplatePart< C extends Context > {
 export type WpTemplatePart< C extends Context > = OmitNevers<
 	FullWpTemplatePart< C >
 >;
-export interface UpdatableWpTemplatePart
-	extends UpdatableRecord< WpTemplatePart< 'edit' >, 'title' | 'content' > {}

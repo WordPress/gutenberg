@@ -218,9 +218,3 @@ export type Html5Option =
 	| 'style';
 
 export type Theme< C extends Context > = OmitNevers< FullTheme< C > >;
-
-export interface UpdatableTheme
-	extends UpdatableRecord<
-		Theme< 'edit' >,
-		'author' | 'author_uri' | 'description' | 'name' | 'tags' | 'theme_uri'
-	> {}

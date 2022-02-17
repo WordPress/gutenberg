@@ -62,5 +62,3 @@ interface FullPlugin< C extends Context > {
 
 export type PluginStatus = 'active' | 'inactive';
 export type Plugin< C extends Context > = OmitNevers< FullPlugin< C > >;
-export interface UpdatablePlugin
-	extends UpdatableRecord< Plugin< 'edit' >, 'description' > {}

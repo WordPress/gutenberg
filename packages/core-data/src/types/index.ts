@@ -1,25 +1,25 @@
 /**
  * Internal dependencies
  */
-import { Attachment, UpdatableAttachment } from './attachment';
-import { Comment, UpdatableComment } from './comment';
-import { MenuLocation, UpdatableMenuLocation } from './menu-location';
-import { NavMenu, UpdatableNavMenu } from './nav_menu';
-import { NavMenuItem, UpdatableNavMenuItem } from './nav_menu_item';
-import { NavigationArea, UpdatableNavigationArea } from './navigation-area';
-import { Page, UpdatablePage } from './page';
-import { Plugin, UpdatablePlugin } from './plugin';
-import { Post, UpdatablePost } from './post';
-import { Settings, UpdatableSettings } from './settings';
-import { Sidebar, UpdatableSidebar } from './sidebar';
-import { Taxonomy, UpdatableTaxonomy } from './taxonomy';
-import { Theme, UpdatableTheme } from './theme';
-import { User, UpdatableUser } from './user';
-import { Type, UpdatableType } from './type';
-import { Widget, UpdatableWidget } from './widget';
-import { WidgetType, UpdatableWidgetType } from './widget-type';
-import { WpTemplate, UpdatableWpTemplate } from './wp_template';
-import { WpTemplatePart, UpdatableWpTemplatePart } from './wp_template_part';
+import { Attachment } from './attachment';
+import { Comment } from './comment';
+import { MenuLocation } from './menu-location';
+import { NavMenu } from './nav_menu';
+import { NavMenuItem } from './nav_menu_item';
+import { NavigationArea } from './navigation-area';
+import { Page } from './page';
+import { Plugin } from './plugin';
+import { Post } from './post';
+import { Settings } from './settings';
+import { Sidebar } from './sidebar';
+import { Taxonomy } from './taxonomy';
+import { Theme } from './theme';
+import { User } from './user';
+import { Type } from './type';
+import { Widget } from './widget';
+import { WidgetType } from './widget-type';
+import { WpTemplate } from './wp_template';
+import { WpTemplatePart } from './wp_template_part';
 import { Context } from './common';
 
 export type EntityRecord< C extends Context > =
@@ -42,24 +42,3 @@ export type EntityRecord< C extends Context > =
 	| WidgetType< C >
 	| WpTemplate< C >
 	| WpTemplatePart< C >;
-
-export type UpdatableEntityRecord =
-	| UpdatableAttachment
-	| UpdatableComment
-	| UpdatableMenuLocation
-	| UpdatableNavMenu
-	| UpdatableNavMenuItem
-	| UpdatableNavigationArea
-	| UpdatablePage
-	| UpdatablePlugin
-	| UpdatablePost
-	| UpdatableSettings
-	| UpdatableSidebar
-	| UpdatableTaxonomy
-	| UpdatableTheme
-	| UpdatableType
-	| UpdatableUser
-	| UpdatableWidget
-	| UpdatableWidgetType
-	| UpdatableWpTemplate
-	| UpdatableWpTemplatePart;

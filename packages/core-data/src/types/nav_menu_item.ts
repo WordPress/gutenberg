@@ -104,6 +104,3 @@ interface FullNavMenuItem< C extends Context > {
 export type NavMenuItem< C extends Context > = OmitNevers<
 	FullNavMenuItem< C >
 >;
-
-export interface UpdatableNavMenuItem
-	extends UpdatableRecord< NavMenuItem< 'edit' >, 'title' > {}
