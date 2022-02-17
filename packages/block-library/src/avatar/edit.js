@@ -140,7 +140,13 @@ const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 					/>
 				</a>
 			) : (
-				avatar
+				<ResizableAvatar
+					attributes={ attributes }
+					avatar={ avatar }
+					blockProps={ blockProps }
+					isSelected={ isSelected }
+					setAttributes={ setAttributes }
+				/>
 			) }
 		</>
 	);
@@ -173,7 +179,13 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 						/>
 					</a>
 				) : (
-					avatar
+					<ResizableAvatar
+						attributes={ attributes }
+						avatar={ avatar }
+						blockProps={ blockProps }
+						isSelected={ isSelected }
+						setAttributes={ setAttributes }
+					/>
 				) }
 			</div>
 		</>
