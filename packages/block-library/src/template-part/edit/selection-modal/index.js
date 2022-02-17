@@ -6,20 +6,25 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
-import { serialize } from '@wordpress/blocks';
+import { parse, serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { Button } from '@wordpress/components';
+import { useAsyncList } from '@wordpress/compose';
+import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import TemplatePartList from './template-part-list';
-import PatternsList from './patterns-list';
 import TitleModal from './title-modal';
+import {
+	useAlternativeBlockPatterns,
+	useAlternativeTemplateParts,
+} from '../utils/hooks';
+import { createTemplatePartId } from '../utils/create-template-part-id';
 
 export default function TemplatePartSelectionModal( {
 	setAttributes,
@@ -29,9 +34,26 @@ export default function TemplatePartSelectionModal( {
 	areaLabel,
 	clientId,
 } ) {
+	const { templateParts } = useAlternativeTemplateParts(
+		area,
+		templatePartId
+	);
+	// We can map template parts to block patters to reuse the BlockPatternsList UI
+	const templartPartsAsBlockPatterns = useMemo( () => {
+		return templateParts.map( ( templatePart ) => ( {
+			name: createTemplatePartId( templatePart.theme, templatePart.slug ),
+			title: templatePart.title.rendered,
+			blocks: parse( templatePart.content.raw ),
+			templatePart,
+		} ) );
+	}, [ templateParts ] );
+	const shownTemplateParts = useAsyncList( templartPartsAsBlockPatterns );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ showTitleModal, setShowTitleModal ] = useState( false );
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const [ selectedBlocks, setSelectedBlocks ] = useState( [] );
+	const shownBlockPatterns = useAsyncList( blockPatterns );
 
 	const onTemplatePartSelect = useCallback( ( templatePart ) => {
 		setAttributes( {
@@ -83,28 +105,42 @@ export default function TemplatePartSelectionModal( {
 	return (
 		<>
 			<div className="block-library-template-part__selection-content">
-				<div>
-					<h2>{ __( 'Existing template parts' ) }</h2>
-					<TemplatePartList
-						area={ area }
-						templatePartId={ templatePartId }
-						onSelect={ onTemplatePartSelect }
-					/>
-				</div>
+				{ !! templartPartsAsBlockPatterns.length && (
+					<div>
+						<h2>{ __( 'Existing template parts' ) }</h2>
+						<BlockPatternsList
+							blockPatterns={ templartPartsAsBlockPatterns }
+							shownPatterns={ shownTemplateParts }
+							onClickPattern={ ( pattern ) => {
+								onTemplatePartSelect( pattern.templatePart );
+							} }
+						/>
+					</div>
+				) }
 
-				<div>
-					<h2>{ __( 'Patterns' ) }</h2>
-					<PatternsList
-						area={ area }
-						areaLabel={ areaLabel }
-						onSelect={ createFromBlocks }
-						clientId={ clientId }
-					/>
-				</div>
+				{ !! blockPatterns.length && (
+					<div>
+						<h2>{ __( 'Patterns' ) }</h2>
+						<BlockPatternsList
+							blockPatterns={ blockPatterns }
+							shownPatterns={ shownBlockPatterns }
+							onClickPattern={ ( _, blocks ) => {
+								setSelectedBlocks( blocks );
+								setShowTitleModal( true );
+							} }
+						/>
+					</div>
+				) }
 			</div>
 
 			<div className="block-library-template-part__selection-footer">
-				<Button isSecondary onClick={ () => setShowTitleModal( true ) }>
+				<Button
+					isSecondary
+					onClick={ () => {
+						setSelectedBlocks( [] );
+						setShowTitleModal( true );
+					} }
+				>
 					{ __( 'Start blank' ) }
 				</Button>
 			</div>
@@ -113,7 +149,10 @@ export default function TemplatePartSelectionModal( {
 				<TitleModal
 					areaLabel={ areaLabel }
 					onClose={ () => setShowTitleModal( false ) }
-					onSubmit={ ( title ) => createFromBlocks( [], title ) }
+					onSubmit={ ( title ) => {
+						createFromBlocks( selectedBlocks, title );
+						onClose();
+					} }
 				/>
 			) }
 		</>
