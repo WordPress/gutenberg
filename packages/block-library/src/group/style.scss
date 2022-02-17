@@ -1,4 +1,8 @@
 .wp-block-group {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+	// TODO: Remove the following line before getting the PR ready for review.
+	// It should be a feature of sticky positioning that we can set this or another
+	// side value.
+	top: 0;
 }

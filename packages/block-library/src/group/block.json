@@ -32,9 +32,11 @@
 		"spacing": {
 			"padding": true,
 			"blockGap": true,
+			"position": true,
 			"__experimentalDefaultControls": {
 				"padding": true,
-				"blockGap": true
+				"blockGap": true,
+				"position": true
 			}
 		},
 		"__experimentalBorder": {

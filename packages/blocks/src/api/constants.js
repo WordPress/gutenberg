@@ -101,6 +101,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
+	position: {
+		value: [ 'spacing', 'position' ],
+		support: [ 'spacing', 'position' ],
+	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
 		support: [ 'typography', '__experimentalTextDecoration' ],
