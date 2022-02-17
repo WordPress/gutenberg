@@ -1008,4 +1008,9 @@ describe( 'normalizePath', () => {
 		expect( acb ).toBe( cba );
 		expect( cba ).toBe( cab );
 	} );
+
+	it( 'sorts urldecoded values and returns property urlencoded query string', () => {
+		const ab = normalizePath( '/foo/bar?a%2Ca=5,5&a,b=1,1' );
+		expect( ab ).toBe( '/foo/bar?a%2Ca=5%2C5&a%2Cb=1%2C1' );
+	} );
 } );
