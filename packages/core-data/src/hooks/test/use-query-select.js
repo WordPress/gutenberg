@@ -131,7 +131,6 @@ describe( 'useQuerySelect', () => {
 	it( 'returns the expected "response" details – resolvers and arguments', async () => {
 		registry.register(
 			createReduxStore( 'resolverStore', {
-				__experimentalUseThunks: true,
 				reducer: ( state = { resolvedFoo: 0 }, action ) => {
 					if ( action?.type === 'RECEIVE_FOO' ) {
 						return { ...state, resolvedFoo: action.value };
