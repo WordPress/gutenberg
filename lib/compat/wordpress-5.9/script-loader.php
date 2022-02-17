@@ -28,7 +28,7 @@ function gutenberg_enqueue_global_styles_assets() {
 		return;
 	}
 
-	$stylesheet = wp_get_global_stylesheet();
+	$stylesheet = gutenberg_get_global_stylesheet();
 
 	if ( empty( $stylesheet ) ) {
 		return;
