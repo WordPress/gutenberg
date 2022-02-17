@@ -1,13 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	Context,
-	PostStatus,
-	RawField,
-	UpdatableRecord,
-	OmitNevers,
-} from './common';
+import { Context, PostStatus, RawField, OmitNevers } from './common';
 
 interface FullWpTemplate< C extends Context > {
 	/**

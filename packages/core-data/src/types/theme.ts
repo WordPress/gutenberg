@@ -1,13 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	Context,
-	PostFormat,
-	RawField,
-	UpdatableRecord,
-	OmitNevers,
-} from './common';
+import { Context, PostFormat, RawField, OmitNevers } from './common';
 
 interface FullTheme< C extends Context > {
 	/**

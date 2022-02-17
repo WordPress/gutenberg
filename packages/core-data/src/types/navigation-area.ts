@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { Context, OmitNevers } from './common';
+import { Context } from './common';
 
-interface FullNavigationArea< C extends Context > {
+export interface NavigationArea< C extends Context > {
 	/**
 	 * The name of the navigation area.
 	 */
@@ -17,7 +17,3 @@ interface FullNavigationArea< C extends Context > {
 	 */
 	navigation: number;
 }
-
-export type NavigationArea< C extends Context > = OmitNevers<
-	FullNavigationArea< C >
->;

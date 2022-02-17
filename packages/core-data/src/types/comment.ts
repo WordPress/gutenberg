@@ -1,13 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	AvatarUrls,
-	Context,
-	ContextualField,
-	RawField,
-	UpdatableRecord,
-} from './common';
+import { AvatarUrls, Context, ContextualField, RawField } from './common';
 
 interface FullComment< C extends Context > {
 	/**

@@ -3,7 +3,7 @@
  */
 import { Context, OmitNevers } from './common';
 
-interface FullWidgetType< C extends Context > {
+export interface WidgetType< C extends Context > {
 	/**
 	 * Unique slug identifying the widget type.
 	 */
@@ -25,5 +25,3 @@ interface FullWidgetType< C extends Context > {
 	 */
 	classname: string;
 }
-
-export type WidgetType< C extends Context > = OmitNevers< FullWidgetType< C > >;

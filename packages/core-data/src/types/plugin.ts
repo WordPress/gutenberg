@@ -1,13 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	Context,
-	ContextualField,
-	RawField,
-	UpdatableRecord,
-	OmitNevers,
-} from './common';
+import { Context, ContextualField, RawField, OmitNevers } from './common';
 
 interface FullPlugin< C extends Context > {
 	/**

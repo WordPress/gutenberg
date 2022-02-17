@@ -9,7 +9,6 @@ import {
 	PostFormat,
 	PostStatus,
 	RawField,
-	UpdatableRecord,
 	OmitNevers,
 } from './common';
 

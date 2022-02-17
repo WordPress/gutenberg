@@ -1,13 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	RawField,
-	UpdatableRecord,
-	Context,
-	ContextualField,
-	OmitNevers,
-} from './common';
+import { RawField, Context, ContextualField, OmitNevers } from './common';
 
 /**
  * Internal dependencies

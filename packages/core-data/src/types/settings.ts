@@ -1,15 +1,9 @@
 /**
  * Internal dependencies
  */
-import {
-	CommentStatus,
-	Context,
-	PingStatus,
-	UpdatableRecord,
-	OmitNevers,
-} from './common';
+import { CommentStatus, Context, PingStatus } from './common';
 
-interface FullSettings< C extends Context > {
+export interface Settings< C extends Context > {
 	/**
 	 * What to show on the front page
 	 */
@@ -87,5 +81,3 @@ interface FullSettings< C extends Context > {
 	 */
 	site_icon: number;
 }
-
-export type Settings< C extends Context > = OmitNevers< FullSettings< C > >;

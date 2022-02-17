@@ -1,14 +1,9 @@
 /**
  * Internal dependencies
  */
-import {
-	Context,
-	ContextualField,
-	UpdatableRecord,
-	OmitNevers,
-} from './common';
+import { Context, ContextualField } from './common';
 
-interface FullTaxonomy< C extends Context > {
+export interface Taxonomy< C extends Context > {
 	/**
 	 * All capabilities used by the taxonomy.
 	 */
@@ -81,5 +76,3 @@ export interface TaxonomyVisibility {
 	 */
 	show_in_quick_edit: boolean;
 }
-
-export type Taxonomy< C extends Context > = OmitNevers< FullTaxonomy< C > >;

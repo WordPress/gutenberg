@@ -7,7 +7,6 @@ import {
 	MediaType,
 	PostStatus,
 	RawField,
-	UpdatableRecord,
 	OmitNevers,
 } from './common';
 

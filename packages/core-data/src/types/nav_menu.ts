@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { Context, OmitNevers } from './common';
+import { Context } from './common';
 
-interface FullNavMenu< C extends Context > {
+export interface NavMenu< C extends Context > {
 	/**
 	 * Unique identifier for the term.
 	 */
@@ -33,5 +33,3 @@ interface FullNavMenu< C extends Context > {
 	 */
 	auto_add?: boolean;
 }
-
-export type NavMenu< C extends Context > = OmitNevers< FullNavMenu< C > >;

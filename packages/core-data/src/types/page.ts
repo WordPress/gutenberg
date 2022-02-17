@@ -8,7 +8,6 @@ import {
 	PingStatus,
 	PostStatus,
 	RawField,
-	UpdatableRecord,
 	OmitNevers,
 } from './common';
 
