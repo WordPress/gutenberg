@@ -236,11 +236,6 @@ class WP_Webfonts {
 	/**
 	 * Generate styles for webfonts.
 	 *
-	 * By default (due to privacy concerns), this API will not do remote requests to
-	 * external webfont services nor generate `@font-face` styles for these remote
-	 * providers. The filter `'has_remote_webfonts_request_permission'` is provided
-	 * to grant permission to do the remote request.
-	 *
 	 * @since 6.0.0
 	 *
 	 * @return string $styles Generated styles.
