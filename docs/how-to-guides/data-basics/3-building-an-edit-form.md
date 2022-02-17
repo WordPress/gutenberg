@@ -199,17 +199,21 @@ It doesn't reflect the edits. What's going on?
 
 Well, let's imagine for a second that it would reflect the edits. If it did, then anything you typed in the title field would be _immediately_ displayed inside the `PagesList`.
 
-Gutenberg Data solves this problem by distinguishing between *Entity Records* and *Edited Entity Records*.
+Gutenberg Data distinguishes between *Entity Records* and *Edited Entity Records*. *Entity Records* reflect the data from the API and ignore any local edits, while *Edited Entity Records* also have all the local edits applied on top. Both co-exist in the Redux state at the same time.
 
-Calling `getEntityRecord` always returns the data retrieved _from the API_. To see the edits applied, we need to use `getEditedEntityRecord` instead:
+Let's see what happens if we call `getEditedEntityRecord`:
 
 ```js
-// Replace 9 with an actual page ID
-wp.data.select( 'core' ).getEditedEntityRecord( 'postType', 'page', 9 ).title
+wp.data.select( 'core' ).getEditedEntityRecord( 'postType', 'page', pageId ).title
 // 'updated title'
+
+wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title
+// original, unchanged title
 ```
 
-Let's update `EditPageForm` accordingly. We can access the actions using the [`useDispatch`](/packages/data/README.md#usedispatch) hook similarly to how we use `useSelect` to access selectors:
+As we will see later, successfully saving an *Edited Entity Record* updates the corresponding *Entity Record*.
+
+We can now update `EditPageForm` accordingly. We can access the actions using the [`useDispatch`](/packages/data/README.md#usedispatch) hook similarly to how we use `useSelect` to access selectors:
 
 ```js
 import { useDispatch } from '@wordpress/data';
