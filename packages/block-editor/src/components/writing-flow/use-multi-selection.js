@@ -15,21 +15,6 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
-export function toggleRichText( container, toggle ) {
-	Array.from(
-		container.querySelectorAll(
-			// Exclude the Post Title from multi-select disable.
-			'.rich-text:not( .editor-post-title__input )'
-		)
-	).forEach( ( node ) => {
-		if ( toggle ) {
-			node.setAttribute( 'contenteditable', true );
-		} else {
-			node.removeAttribute( 'contenteditable' );
-		}
-	} );
-}
-
 /**
  * Returns for the deepest node at the start or end of a container node. Ignores
  * any text nodes that only contain HTML formatting whitespace.
@@ -131,6 +116,12 @@ export default function useMultiSelection() {
 				return;
 			}
 
+			// Allow cross contentEditable selection by temporarily making
+			// all content editable. We can't rely on using the store and
+			// React because re-rending happens too slowly. We need to be
+			// able to select across instances immediately.
+			node.contentEditable = true;
+
 			// For some browsers, like Safari, it is important that focus happens
 			// BEFORE selection.
 			node.focus();
@@ -143,11 +134,6 @@ export default function useMultiSelection() {
 			// and end at the deepest points.
 			const startNode = getDeepestNode( startRef.current, 'start' );
 			const endNode = getDeepestNode( endRef.current, 'end' );
-
-			// While rich text will be disabled with a delay when there is a multi
-			// selection, we must do it immediately because it's not possible to set
-			// selection across editable hosts.
-			toggleRichText( node, false );
 
 			range.setStartBefore( startNode );
 			range.setEndAfter( endNode );

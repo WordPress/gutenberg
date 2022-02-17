@@ -3,10 +3,11 @@
 		"name": "core/comments-query-loop",
 		"isValid": true,
 		"attributes": {
-			"inherit": true,
+			"inherit": false,
 			"order": "desc",
 			"perPage": 2,
-			"tagName": "div"
+			"tagName": "div",
+			"defaultPage": "oldest"
 		},
 		"innerBlocks": [
 			{

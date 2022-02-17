@@ -120,6 +120,11 @@ async function selectClassicMenu( optionText ) {
 		`//*[contains(@class, 'components-menu-item__item')][ text()="${ optionText }" ]`
 	);
 	await theOption.click();
+
+	await page.waitForResponse(
+		( response ) =>
+			response.url().includes( 'menu-items' ) && response.status() === 200
+	);
 }
 
 async function populateNavWithOneItem() {

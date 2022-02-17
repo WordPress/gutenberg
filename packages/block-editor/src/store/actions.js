@@ -996,11 +996,11 @@ export function selectionChange(
  * @param {?Object} attributes   Optional attributes of the block to assign.
  * @param {?string} rootClientId Optional root client ID of block list on which
  *                               to append.
- * @param {?number} index        Optional index where to insert the default block
- *
- * @return {Object} Action object
+ * @param {?number} index        Optional index where to insert the default block.
  */
-export function insertDefaultBlock( attributes, rootClientId, index ) {
+export const insertDefaultBlock = ( attributes, rootClientId, index ) => ( {
+	dispatch,
+} ) => {
 	// Abort if there is no default block type (if it has been unregistered).
 	const defaultBlockName = getDefaultBlockName();
 	if ( ! defaultBlockName ) {
@@ -1009,8 +1009,8 @@ export function insertDefaultBlock( attributes, rootClientId, index ) {
 
 	const block = createBlock( defaultBlockName, attributes );
 
-	return insertBlock( block, index, rootClientId );
-}
+	return dispatch.insertBlock( block, index, rootClientId );
+};
 
 /**
  * Action that changes the nested settings of a given block.

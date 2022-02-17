@@ -10,7 +10,11 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { BlockControls, useSetting } from '@wordpress/block-editor';
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import {
+	ToolbarGroup,
+	ToolbarButton,
+	useMobileGlobalStylesColors,
+} from '@wordpress/components';
 import { Icon, textColor as textColorIcon } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -25,8 +29,6 @@ import styles from './style.scss';
 
 const name = 'core/text-color';
 const title = __( 'Text color' );
-
-const EMPTY_ARRAY = [];
 
 function getComputedStyleProperty( element, property ) {
 	const {
@@ -68,7 +70,7 @@ function TextColorEdit( {
 	contentRef,
 } ) {
 	const allowCustomControl = useSetting( 'color.custom' );
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const colors = useMobileGlobalStylesColors();
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
 		setIsAddingColor,
