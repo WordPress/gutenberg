@@ -10,12 +10,6 @@
 			"borderColor": "vivid-red",
 			"style": {
 				"spacing": {
-					"padding": {
-						"top": "19px",
-						"right": "19px",
-						"bottom": "19px",
-						"left": "19px"
-					},
 					"margin": {
 						"bottom": "40px"
 					}
