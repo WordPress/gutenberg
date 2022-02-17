@@ -166,7 +166,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		1
 	);
 
-	gutenberg_enqueue_block_support( $style );
+	gutenberg_enqueue_block_support_styles( $style );
 
 	return $content;
 }
