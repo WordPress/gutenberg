@@ -65,31 +65,27 @@ export type EntityRecord< C extends Context > =
 	| WpTemplate< C >
 	| WpTemplatePart< C >;
 
-export type UpdatableEntityRecord = UpdatableRecord< EntityRecord< 'edit' > >;
-export type UpdatableRecord< T extends EntityRecord< 'edit' > > = {
+export type Updatable< T extends EntityRecord< 'edit' > > = {
 	[ K in keyof T ]: T[ K ] extends RenderedText< any > ? string : T[ K ];
 };
 
-export type UpdatableAttachment = UpdatableRecord< Attachment< 'edit' > >;
-export type UpdatableComment = UpdatableRecord< Comment< 'edit' > >;
-export type UpdatableMenuLocation = UpdatableRecord< MenuLocation< 'edit' > >;
-export type UpdatableNavMenu = UpdatableRecord< NavMenu< 'edit' > >;
-export type UpdatableNavMenuItem = UpdatableRecord< NavMenuItem< 'edit' > >;
-export type UpdatableNavigationArea = UpdatableRecord<
-	NavigationArea< 'edit' >
->;
-export type UpdatablePage = UpdatableRecord< Page< 'edit' > >;
-export type UpdatablePlugin = UpdatableRecord< Plugin< 'edit' > >;
-export type UpdatablePost = UpdatableRecord< Post< 'edit' > >;
-export type UpdatableSettings = UpdatableRecord< Settings< 'edit' > >;
-export type UpdatableSidebar = UpdatableRecord< Sidebar< 'edit' > >;
-export type UpdatableTaxonomy = UpdatableRecord< Taxonomy< 'edit' > >;
-export type UpdatableTheme = UpdatableRecord< Theme< 'edit' > >;
-export type UpdatableUser = UpdatableRecord< User< 'edit' > >;
-export type UpdatableType = UpdatableRecord< Type< 'edit' > >;
-export type UpdatableWidget = UpdatableRecord< Widget< 'edit' > >;
-export type UpdatableWidgetType = UpdatableRecord< WidgetType< 'edit' > >;
-export type UpdatableWpTemplate = UpdatableRecord< WpTemplate< 'edit' > >;
-export type UpdatableWpTemplatePart = UpdatableRecord<
-	WpTemplatePart< 'edit' >
->;
+export type UpdatableEntityRecord = Updatable< EntityRecord< 'edit' > >;
+export type UpdatableAttachment = Updatable< Attachment< 'edit' > >;
+export type UpdatableComment = Updatable< Comment< 'edit' > >;
+export type UpdatableMenuLocation = Updatable< MenuLocation< 'edit' > >;
+export type UpdatableNavMenu = Updatable< NavMenu< 'edit' > >;
+export type UpdatableNavMenuItem = Updatable< NavMenuItem< 'edit' > >;
+export type UpdatableNavigationArea = Updatable< NavigationArea< 'edit' > >;
+export type UpdatablePage = Updatable< Page< 'edit' > >;
+export type UpdatablePlugin = Updatable< Plugin< 'edit' > >;
+export type UpdatablePost = Updatable< Post< 'edit' > >;
+export type UpdatableSettings = Updatable< Settings< 'edit' > >;
+export type UpdatableSidebar = Updatable< Sidebar< 'edit' > >;
+export type UpdatableTaxonomy = Updatable< Taxonomy< 'edit' > >;
+export type UpdatableTheme = Updatable< Theme< 'edit' > >;
+export type UpdatableUser = Updatable< User< 'edit' > >;
+export type UpdatableType = Updatable< Type< 'edit' > >;
+export type UpdatableWidget = Updatable< Widget< 'edit' > >;
+export type UpdatableWidgetType = Updatable< WidgetType< 'edit' > >;
+export type UpdatableWpTemplate = Updatable< WpTemplate< 'edit' > >;
+export type UpdatableWpTemplatePart = Updatable< WpTemplatePart< 'edit' > >;
