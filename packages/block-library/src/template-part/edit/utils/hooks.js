@@ -1,10 +1,17 @@
 /**
+ * External dependencies
+ */
+import { find, kebabCase } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
+import { serialize } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -88,5 +95,64 @@ export function useAlternativeBlockPatterns( area, clientId ) {
 			);
 		},
 		[ area, clientId ]
+	);
+}
+
+export function useCreateTemplatePartFromBlocks( area, setAttributes ) {
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	return async ( blocks = [], title = __( 'Untitled Template Part' ) ) => {
+		// If we have `area` set from block attributes, means an exposed
+		// block variation was inserted. So add this prop to the template
+		// part entity on creation. Afterwards remove `area` value from
+		// block attributes.
+		const record = {
+			title,
+			slug: kebabCase( title ),
+			content: serialize( blocks ),
+			// `area` is filterable on the server and defaults to `UNCATEGORIZED`
+			// if provided value is not allowed.
+			area,
+		};
+		const templatePart = await saveEntityRecord(
+			'postType',
+			'wp_template_part',
+			record
+		);
+		setAttributes( {
+			slug: templatePart.slug,
+			theme: templatePart.theme,
+			area: undefined,
+		} );
+	};
+}
+
+/**
+ * Retrieves the template part area object.
+ *
+ * @param {string} area Template part area identifier.
+ *
+ * @return {{icon: Object, label: string, tagName: string}} Template Part area.
+ */
+export function useTemplatePartArea( area ) {
+	return useSelect(
+		( select ) => {
+			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+			// Blocks can be loaded into a *non-post* block editor.
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			const definedAreas = select(
+				'core/editor'
+			).__experimentalGetDefaultTemplatePartAreas();
+
+			const selectedArea = find( definedAreas, { area } );
+			const defaultArea = find( definedAreas, { area: 'uncategorized' } );
+
+			return {
+				icon: selectedArea?.icon || defaultArea?.icon,
+				label: selectedArea?.label || __( 'Template Part' ),
+				tagName: selectedArea?.area_tag ?? 'div',
+			};
+		},
+		[ area ]
 	);
 }

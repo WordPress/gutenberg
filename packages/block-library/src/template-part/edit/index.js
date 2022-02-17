@@ -32,6 +32,11 @@ import TemplatePartSelectionModal from './selection-modal';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
 import { createTemplatePartId } from './utils/create-template-part-id';
+import {
+	useAlternativeBlockPatterns,
+	useAlternativeTemplateParts,
+	useTemplatePartArea,
+} from './utils/hooks';
 
 export default function TemplatePartEdit( {
 	attributes,
@@ -51,14 +56,7 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const {
-		isResolved,
-		innerBlocks,
-		isMissing,
-		defaultWrapper,
-		area,
-		areaLabel,
-	} = useSelect(
+	const { isResolved, innerBlocks, isMissing, area } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } = select(
 				coreStore
@@ -81,29 +79,26 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
-			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
-			// Blocks can be loaded into a *non-post* block editor.
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			const areaObject = select( 'core/editor' )
-				.__experimentalGetDefaultTemplatePartAreas()
-				.find( ( { area: value } ) => value === _area );
-
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
 				isMissing: hasResolvedEntity && isEmpty( entityRecord ),
-				defaultWrapper: areaObject?.area_tag ?? 'div',
-				areaLabel: areaObject?.label || __( 'Template Part' ),
 				area: _area,
 			};
 		},
 		[ templatePartId, clientId ]
 	);
-
+	const { templateParts } = useAlternativeTemplateParts(
+		area,
+		templatePartId
+	);
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
+	const areaObject = useTemplatePartArea( area );
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
-	const TagName = tagName || defaultWrapper;
+	const TagName = tagName || areaObject.tagName;
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
@@ -143,19 +138,22 @@ export default function TemplatePartEdit( {
 				setAttributes={ setAttributes }
 				isEntityAvailable={ isEntityAvailable }
 				templatePartId={ templatePartId }
-				defaultWrapper={ defaultWrapper }
+				defaultWrapper={ areaObject.tagName }
 			/>
 			{ isPlaceholder && (
 				<TagName { ...blockProps }>
 					<TemplatePartPlaceholder
 						area={ attributes.area }
+						templatePartId={ templatePartId }
+						clientId={ clientId }
+						setAttributes={ setAttributes }
 						onOpenSelectionModal={ () =>
 							setIsTemplatePartSelectionOpen( true )
 						}
 					/>
 				</TagName>
 			) }
-			{ isEntityAvailable && (
+			{ isEntityAvailable && hasReplacements && (
 				<BlockControls>
 					<ToolbarGroup className="wp-block-template-part__block-control-group">
 						<ToolbarButton
@@ -189,7 +187,7 @@ export default function TemplatePartEdit( {
 					title={ sprintf(
 						// Translators: %s as template part area title ("Header", "Footer", etc.).
 						__( 'Choose a %s' ),
-						areaLabel.toLowerCase()
+						areaObject.label.toLowerCase()
 					) }
 					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () =>
@@ -199,7 +197,6 @@ export default function TemplatePartEdit( {
 					<TemplatePartSelectionModal
 						clientId={ clientId }
 						area={ area }
-						areaLabel={ areaLabel }
 						setAttributes={ setAttributes }
 						onClose={ () =>
 							setIsTemplatePartSelectionOpen( false )
