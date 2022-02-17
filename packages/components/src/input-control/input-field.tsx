@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import { useDrag } from 'react-use-gesture';
+import { useDrag } from '@use-gesture/react';
 import type {
 	SyntheticEvent,
 	ChangeEvent,
@@ -168,9 +168,6 @@ function InputField(
 	const dragGestureProps = useDrag< PointerEvent< HTMLInputElement > >(
 		( dragProps ) => {
 			const { distance, dragging, event } = dragProps;
-			// The event is persisted to prevent errors in components using this
-			// to check if a modifier key was held while dragging.
-			event.persist();
 
 			if ( ! distance ) return;
 			event.stopPropagation();
@@ -196,6 +193,7 @@ function InputField(
 		{
 			threshold: dragThreshold,
 			enabled: isDragEnabled,
+			pointer: { capture: false },
 		}
 	);
 
