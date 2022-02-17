@@ -51,7 +51,7 @@ Then modify your package.json and add an extra command to npm `scripts` (https:/
 When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
 
 ```sh
-# You must add another dash to pass the "update" flag to wp-env
+# You must add another double dash to pass the "update" flag to wp-env
 $ npm run wp-env start -- --update
 ```
 
@@ -203,7 +203,7 @@ wp-env start
 wp-env start --xdebug=profile,trace,debug
 ```
 
-When you're running `wp-env` using `npm run`, like when working in the Gutenberg repo or when having `wp-env` as a local project dependency, don't forget to add an extra dash before the `--xdebug` command:
+When you're running `wp-env` using `npm run`, like when working in the Gutenberg repo or when having `wp-env` as a local project dependency, don't forget to add an extra double dash before the `--xdebug` command:
 
 ```sh
 npm run wp-env start -- --xdebug
