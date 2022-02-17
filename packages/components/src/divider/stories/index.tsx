@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -32,9 +33,9 @@ export default {
 	parameters: {
 		controls: { expanded: true },
 	},
-};
+} as ComponentMeta< typeof Divider >;
 
-const HorizontalTemplate = ( args ) => (
+const HorizontalTemplate: ComponentStory< typeof Divider > = ( args ) => (
 	<div>
 		<Text>Some text before the divider</Text>
 		<Divider { ...args } />
@@ -42,7 +43,7 @@ const HorizontalTemplate = ( args ) => (
 	</div>
 );
 
-const VerticalTemplate = ( args ) => {
+const VerticalTemplate: ComponentStory< typeof Divider > = ( args ) => {
 	const cx = useCx();
 	const wrapperClassName = cx( css`
 		display: flex;
@@ -59,12 +60,16 @@ const VerticalTemplate = ( args ) => {
 	);
 };
 
-export const Horizontal = HorizontalTemplate.bind( {} );
+export const Horizontal: ComponentStory<
+	typeof Divider
+> = HorizontalTemplate.bind( {} );
 Horizontal.args = {
 	margin: 2,
 };
 
-export const Vertical = VerticalTemplate.bind( {} );
+export const Vertical: ComponentStory< typeof Divider > = VerticalTemplate.bind(
+	{}
+);
 Vertical.args = {
 	...Horizontal.args,
 	orientation: 'vertical',
