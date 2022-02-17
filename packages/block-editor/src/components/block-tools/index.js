@@ -19,6 +19,17 @@ import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import { usePopoverScroll } from './use-popover-scroll';
+import { getBlockNode } from '../../utils/dom';
+
+function isSimpleContentEditable( node ) {
+	return (
+		node.getAttribute( 'contenteditable' ) === 'true' &&
+		( ! node.firstElementChild ||
+			node.ownerDocument.defaultView.getComputedStyle(
+				node.firstElementChild
+			).display === 'inline' )
+	);
+}
 
 /**
  * Renders block tools (the block toolbar, select/navigation mode toolbar, the
@@ -51,6 +62,7 @@ export default function BlockTools( {
 		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
+		mergeBlocks,
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
@@ -106,11 +118,33 @@ export default function BlockTools( {
 			) {
 				return;
 			}
+
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length > 1 ) {
-				event.preventDefault();
-				removeBlocks( clientIds );
+
+			if ( clientIds.length < 2 ) {
+				return;
 			}
+
+			const { ownerDocument } = event.target;
+			const { defaultView } = ownerDocument;
+			const { anchorNode, focusNode } = defaultView.getSelection();
+
+			// To do: find other way to check if blocks are mergeable.
+			if (
+				isSimpleContentEditable( getBlockNode( anchorNode ) ) &&
+				isSimpleContentEditable( getBlockNode( focusNode ) )
+			) {
+				mergeBlocks(
+					first( clientIds ),
+					last( clientIds ),
+					clientIds.slice( 1, -1 )
+				);
+				event.preventDefault();
+				return;
+			}
+
+			event.preventDefault();
+			removeBlocks( clientIds );
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length > 1 ) {

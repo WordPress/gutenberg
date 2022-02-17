@@ -61,7 +61,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/delete-multi-selection',
 			category: 'block',
-			description: __( 'Remove multiple selected blocks.' ),
+			description: __( 'Merge or remove multiple selected blocks.' ),
 			keyCombination: {
 				character: 'del',
 			},

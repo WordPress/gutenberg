@@ -31,6 +31,26 @@ export function isInsideRootBlock( blockElement, element ) {
 }
 
 /**
+ * Finds the block node given any DOM node inside the block.
+ *
+ * @param {Node?} node DOM node.
+ *
+ * @return {Element|null} Client ID or undefined if the node is not part of
+ *                            a block.
+ */
+export function getBlockNode( node ) {
+	while ( node && node.nodeType !== node.ELEMENT_NODE ) {
+		node = node.parentNode;
+	}
+
+	if ( ! node ) {
+		return null;
+	}
+
+	return /** @type {Element} */ ( node ).closest( BLOCK_SELECTOR );
+}
+
+/**
  * Finds the block client ID given any DOM node inside the block.
  *
  * @param {Node?} node DOM node.
@@ -39,16 +59,7 @@ export function isInsideRootBlock( blockElement, element ) {
  *                            a block.
  */
 export function getBlockClientId( node ) {
-	while ( node && node.nodeType !== node.ELEMENT_NODE ) {
-		node = node.parentNode;
-	}
-
-	if ( ! node ) {
-		return;
-	}
-
-	const elementNode = /** @type {Element} */ ( node );
-	const blockNode = elementNode.closest( BLOCK_SELECTOR );
+	const blockNode = getBlockNode( node );
 
 	if ( ! blockNode ) {
 		return;

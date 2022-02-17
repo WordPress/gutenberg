@@ -97,7 +97,7 @@ export function useMultiSelection( clientId ) {
 					];
 					const depth =
 						Math.min( startPath.length, endPath.length ) - 1;
-
+					// Check if selection is already set by rich text.
 					multiSelect( startPath[ depth ], endPath[ depth ] );
 				}
 			}

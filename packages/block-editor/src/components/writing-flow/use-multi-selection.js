@@ -41,6 +41,16 @@ function getDeepestNode( node, type ) {
 	return node;
 }
 
+function isSimpleContentEditable( node ) {
+	return (
+		node.getAttribute( 'contenteditable' ) === 'true' &&
+		( ! node.firstElementChild ||
+			node.ownerDocument.defaultView.getComputedStyle(
+				node.firstElementChild
+			).display === 'inline' )
+	);
+}
+
 function selector( select ) {
 	const {
 		isMultiSelecting,
@@ -120,12 +130,6 @@ export default function useMultiSelection() {
 				return;
 			}
 
-			// The block refs might not be immediately available
-			// when dragging blocks into another block.
-			if ( ! startRef.current || ! endRef.current ) {
-				return;
-			}
-
 			// Allow cross contentEditable selection by temporarily making
 			// all content editable. We can't rely on using the store and
 			// React because re-rending happens too slowly. We need to be
@@ -135,6 +139,19 @@ export default function useMultiSelection() {
 			// For some browsers, like Safari, it is important that focus happens
 			// BEFORE selection.
 			node.focus();
+
+			// The block refs might not be immediately available
+			// when dragging blocks into another block.
+			if ( ! startRef.current || ! endRef.current ) {
+				return;
+			}
+
+			if (
+				isSimpleContentEditable( startRef.current ) &&
+				isSimpleContentEditable( endRef.current )
+			) {
+				return;
+			}
 
 			const selection = defaultView.getSelection();
 			const range = ownerDocument.createRange();

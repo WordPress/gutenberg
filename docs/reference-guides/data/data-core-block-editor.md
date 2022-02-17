@@ -1218,6 +1218,7 @@ _Parameters_
 
 -   _firstBlockClientId_ `string`: Client ID of the first block to merge.
 -   _secondBlockClientId_ `string`: Client ID of the second block to merge.
+-   _toRemove_ `Array?`: Array of block client IDs to remove.
 
 ### moveBlocksDown
 
@@ -1390,7 +1391,7 @@ Action that changes the position of the user caret.
 
 _Parameters_
 
--   _clientId_ `string`: The selected block client ID.
+-   _clientId_ `string|Object`: The selected block client ID.
 -   _attributeKey_ `string`: The selected block attribute key.
 -   _startOffset_ `number`: The start offset.
 -   _endOffset_ `number`: The end offset.

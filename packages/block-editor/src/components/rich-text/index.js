@@ -131,7 +131,10 @@ function RichTextWrapper(
 		if ( originalIsSelected === undefined ) {
 			isSelected =
 				selectionStart.clientId === clientId &&
-				selectionStart.attributeKey === identifier;
+				selectionEnd.clientId === clientId &&
+				selectionStart.attributeKey === identifier &&
+				typeof selectionStart.offset === 'number' &&
+				typeof selectionEnd.offset === 'number';
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
 		}
@@ -171,7 +174,26 @@ function RichTextWrapper(
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {
-			selectionChange( clientId, identifier, start, end );
+			const selection = {};
+			const unset = start === undefined && end === undefined;
+
+			if ( typeof start === 'number' || unset ) {
+				selection.start = {
+					clientId,
+					attributeKey: identifier,
+					offset: start,
+				};
+			}
+
+			if ( typeof end === 'number' || unset ) {
+				selection.end = {
+					clientId,
+					attributeKey: identifier,
+					offset: end,
+				};
+			}
+
+			selectionChange( selection );
 		},
 		[ clientId, identifier ]
 	);
@@ -227,8 +249,16 @@ function RichTextWrapper(
 				changeHandler( __unstableFormats, __unstableText );
 			} );
 		},
-		selectionStart,
-		selectionEnd,
+		selectionStart:
+			typeof selectionStart === 'number' &&
+			typeof selectionEnd === 'number'
+				? selectionStart
+				: undefined,
+		selectionEnd:
+			typeof selectionStart === 'number' &&
+			typeof selectionEnd === 'number'
+				? selectionEnd
+				: undefined,
 		onSelectionChange,
 		placeholder,
 		__unstableIsSelected: isSelected,

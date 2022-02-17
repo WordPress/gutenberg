@@ -1278,17 +1278,24 @@ function selectionHelper( state = {}, action ) {
 export function selection( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SELECTION_CHANGE':
+			if ( action.clientId ) {
+				return {
+					selectionStart: {
+						clientId: action.clientId,
+						attributeKey: action.attributeKey,
+						offset: action.startOffset,
+					},
+					selectionEnd: {
+						clientId: action.clientId,
+						attributeKey: action.attributeKey,
+						offset: action.endOffset,
+					},
+				};
+			}
+
 			return {
-				selectionStart: {
-					clientId: action.clientId,
-					attributeKey: action.attributeKey,
-					offset: action.startOffset,
-				},
-				selectionEnd: {
-					clientId: action.clientId,
-					attributeKey: action.attributeKey,
-					offset: action.endOffset,
-				},
+				selectionStart: action.start || state.selectionStart,
+				selectionEnd: action.end || state.selectionEnd,
 			};
 		case 'RESET_SELECTION':
 			const { selectionStart, selectionEnd } = action;
@@ -1298,6 +1305,14 @@ export function selection( state = {}, action ) {
 			};
 		case 'MULTI_SELECT':
 			const { start, end } = action;
+
+			if (
+				start === state.selectionStart.clientId &&
+				end === state.selectionEnd.clientId
+			) {
+				return state;
+			}
+
 			return {
 				selectionStart: { clientId: start },
 				selectionEnd: { clientId: end },

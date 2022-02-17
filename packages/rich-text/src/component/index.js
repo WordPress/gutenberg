@@ -214,6 +214,11 @@ export function useRichText( {
 			return;
 		}
 
+		// For merging multi selection, focus is on writing flow, so it should
+		// move to the selection after merge. This will probably break some
+		// things.
+		if ( ref.current.ownerDocument.activeElement !== ref.current )
+			ref.current.focus();
 		applyFromProps();
 		hadSelectionUpdate.current = false;
 	}, [ hadSelectionUpdate.current ] );
