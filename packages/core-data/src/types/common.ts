@@ -38,10 +38,6 @@ export type ContextualField<
 	C extends Context
 > = AvailableInContexts extends C ? FieldType : never;
 
-export type UpdatableRecord< T > = {
-	[ K in keyof T ]: T[ K ] extends RawField< any > ? string : T[ K ];
-};
-
 export type OmitNevers<
 	T,
 	Nevers = {
