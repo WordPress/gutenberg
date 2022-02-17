@@ -19,12 +19,20 @@ const load = () => {
 
 		// Find the root of the real DOM.
 		const root = e.target.closest( blockSelector );
-
+		const attributes = {};
+		for ( const attr in root.dataset ) {
+			try {
+				attributes[ attr ] = JSON.parse( root.dataset[ attr ] );
+			} catch ( e ) {
+				attributes[ attr ] = root.dataset[ attr ];
+			}
+		}
+		//console.log( attributes );
 		// TODO: Need to include blocks' current attributes.
 		// Fetch the HTML of the new block.
 		const html = await fetchRenderedBlock(
 			blockName,
-			root.dataset,
+			attributes,
 			{ [ queryArg ]: newQueryArgValue },
 			nonce
 		);
