@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context, PostStatus, RawField, OmitNevers } from './common';
+import { Context, PostStatus, RenderedText, OmitNevers } from './common';
 
 interface FullWpTemplate< C extends Context > {
 	/**
@@ -46,7 +46,7 @@ interface FullWpTemplate< C extends Context > {
 	/**
 	 * Title of template.
 	 */
-	title: RawField< 'edit' > | string;
+	title: RenderedText< 'edit' > | string;
 	/**
 	 * Description of template.
 	 */

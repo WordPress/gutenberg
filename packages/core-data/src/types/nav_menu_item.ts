@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { RawField, Context, ContextualField, OmitNevers } from './common';
+import { RenderedText, Context, ContextualField, OmitNevers } from './common';
 
 /**
  * Internal dependencies
@@ -24,7 +24,7 @@ interface FullNavMenuItem< C extends Context > {
 	/**
 	 * The title for the object.
 	 */
-	title: RawField< C >;
+	title: RenderedText< C >;
 	/**
 	 * Unique identifier for the object.
 	 */

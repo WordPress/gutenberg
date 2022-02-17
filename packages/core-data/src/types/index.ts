@@ -20,7 +20,7 @@ import { Widget } from './widget';
 import { WidgetType } from './widget-type';
 import { WpTemplate } from './wp_template';
 import { WpTemplatePart } from './wp_template_part';
-import { Context, RawField } from './common';
+import { Context, RenderedText } from './common';
 
 export type EntityRecord< C extends Context > =
 	| Attachment< C >
@@ -44,5 +44,5 @@ export type EntityRecord< C extends Context > =
 	| WpTemplatePart< C >;
 
 export type UpdatableRecord< T extends EntityRecord< any > > = {
-	[ K in keyof T ]: T[ K ] extends RawField< any > ? string : T[ K ];
+	[ K in keyof T ]: T[ K ] extends RenderedText< any > ? string : T[ K ];
 };

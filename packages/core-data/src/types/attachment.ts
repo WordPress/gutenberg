@@ -6,7 +6,7 @@ import {
 	ContextualField,
 	MediaType,
 	PostStatus,
-	RawField,
+	RenderedText,
 	OmitNevers,
 } from './common';
 
@@ -22,7 +22,7 @@ interface FullAttachment< C extends Context > {
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid: ContextualField< RawField< C >, 'view' | 'edit', C >;
+	guid: ContextualField< RenderedText< C >, 'view' | 'edit', C >;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -62,7 +62,7 @@ interface FullAttachment< C extends Context > {
 	/**
 	 * The title for the post.
 	 */
-	title: RawField< C >;
+	title: RenderedText< C >;
 	/**
 	 * The ID for the author of the post.
 	 */
@@ -94,7 +94,7 @@ interface FullAttachment< C extends Context > {
 	/**
 	 * The attachment description.
 	 */
-	description: ContextualField< RawField< C >, 'view' | 'edit', C >;
+	description: ContextualField< RenderedText< C >, 'view' | 'edit', C >;
 	/**
 	 * Attachment type.
 	 */

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context, ContextualField, RawField, OmitNevers } from './common';
+import { Context, ContextualField, RenderedText, OmitNevers } from './common';
 
 interface FullPlugin< C extends Context > {
 	/**
@@ -31,7 +31,7 @@ interface FullPlugin< C extends Context > {
 	/**
 	 * The plugin description.
 	 */
-	description: ContextualField< RawField< 'edit' >, 'view' | 'edit', C >;
+	description: ContextualField< RenderedText< 'edit' >, 'view' | 'edit', C >;
 	/**
 	 * The plugin version number.
 	 */

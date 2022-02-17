@@ -57,7 +57,7 @@ export type OmitNevers<
 /**
  * The raw data representation.
  */
-export interface RawField< C extends Context > {
+export interface RenderedText< C extends Context > {
 	/**
 	 * Data as it exists in the database.
 	 */

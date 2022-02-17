@@ -8,7 +8,7 @@ import {
 	PingStatus,
 	PostFormat,
 	PostStatus,
-	RawField,
+	RenderedText,
 	OmitNevers,
 } from './common';
 
@@ -24,7 +24,7 @@ interface FullPost< C extends Context > {
 	/**
 	 * The globally unique identifier for the post.
 	 */
-	guid: ContextualField< RawField< C >, 'view' | 'edit', C >;
+	guid: ContextualField< RenderedText< C >, 'view' | 'edit', C >;
 	/**
 	 * Unique identifier for the post.
 	 */
@@ -68,12 +68,12 @@ interface FullPost< C extends Context > {
 	/**
 	 * The title for the post.
 	 */
-	title: RawField< C >;
+	title: RenderedText< C >;
 	/**
 	 * The content for the post.
 	 */
 	content: ContextualField<
-		RawField< C > & {
+		RenderedText< C > & {
 			/**
 			 * Whether the content is protected with a password.
 			 */
@@ -93,7 +93,7 @@ interface FullPost< C extends Context > {
 	/**
 	 * The excerpt for the post.
 	 */
-	excerpt: RawField< C > & {
+	excerpt: RenderedText< C > & {
 		protected: boolean;
 	};
 	/**

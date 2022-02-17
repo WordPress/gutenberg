@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context, PostFormat, RawField, OmitNevers } from './common';
+import { Context, PostFormat, RenderedText, OmitNevers } from './common';
 
 interface FullTheme< C extends Context > {
 	/**
@@ -15,19 +15,19 @@ interface FullTheme< C extends Context > {
 	/**
 	 * The theme author.
 	 */
-	author: RawField< 'edit' >;
+	author: RenderedText< 'edit' >;
 	/**
 	 * The website of the theme author.
 	 */
-	author_uri: RawField< 'edit' >;
+	author_uri: RenderedText< 'edit' >;
 	/**
 	 * A description of the theme.
 	 */
-	description: RawField< 'edit' >;
+	description: RenderedText< 'edit' >;
 	/**
 	 * The name of the theme.
 	 */
-	name: RawField< 'edit' >;
+	name: RenderedText< 'edit' >;
 	/**
 	 * The minimum PHP version required for the theme to work.
 	 */
@@ -43,7 +43,7 @@ interface FullTheme< C extends Context > {
 	/**
 	 * Tags indicating styles and features of the theme.
 	 */
-	tags: RawField< 'edit' >;
+	tags: RenderedText< 'edit' >;
 	/**
 	 * The theme's text domain.
 	 */
@@ -55,7 +55,7 @@ interface FullTheme< C extends Context > {
 	/**
 	 * The URI of the theme's webpage.
 	 */
-	theme_uri: RawField< 'edit' >;
+	theme_uri: RenderedText< 'edit' >;
 	/**
 	 * The theme's current version.
 	 */

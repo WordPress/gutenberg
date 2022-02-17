@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { AvatarUrls, Context, ContextualField, RawField } from './common';
+import { AvatarUrls, Context, ContextualField, RenderedText } from './common';
 
 interface FullComment< C extends Context > {
 	/**
@@ -35,7 +35,7 @@ interface FullComment< C extends Context > {
 	/**
 	 * The content for the comment.
 	 */
-	content: RawField< C >;
+	content: RenderedText< C >;
 	/**
 	 * The date the comment was published, in the site's timezone.
 	 */
