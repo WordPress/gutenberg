@@ -176,7 +176,7 @@ Updating entity records in Gutenberg Data is similar but instead of using `setTi
 // Get a real page ID first
 const pageId = wp.data.select( 'core' ).getEntityRecords( 'postType', 'page' )[0].id;
 
-// Uupdate the title
+// Update the title
 wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'page', pageId, { title: 'updated title' } );
 ```
 
