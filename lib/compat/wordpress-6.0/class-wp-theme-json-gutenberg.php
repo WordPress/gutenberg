@@ -124,6 +124,46 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	);
 
 	/**
+	 * The valid properties under the styles key.
+	 *
+	 * @var array
+	 */
+	const VALID_STYLES = array(
+		'border'     => array(
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
+		),
+		'color'      => array(
+			'background' => null,
+			'gradient'   => null,
+			'text'       => null,
+		),
+		'filter'     => array(
+			'duotone' => null,
+		),
+		'layout'     => array(
+			'position' => null,
+		),
+		'spacing'    => array(
+			'margin'   => null,
+			'padding'  => null,
+			'blockGap' => 'top',
+		),
+		'typography' => array(
+			'fontFamily'     => null,
+			'fontSize'       => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
+		),
+	);
+
+	/**
 	 * Returns the current theme's wanted patterns(slugs) to be
 	 * registered from Pattern Directory.
 	 *
