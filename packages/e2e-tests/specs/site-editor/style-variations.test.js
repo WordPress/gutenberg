@@ -71,7 +71,7 @@ async function getCustomFontSizeValue() {
 async function getColorValue( colorType ) {
 	return page.evaluate( ( _colorType ) => {
 		return document.evaluate(
-			`substring-before(substring-after(//div[@aria-label="Settings"]//button[.//*[text()="${ _colorType }"]]//*[contains(@class,"component-color-indicator")]/@style, "background: "), ";")`,
+			`substring-before(substring-after(//div[contains(@class, "edit-site-global-styles-sidebar__panel")]//button[.//*[text()="${ _colorType }"]]//*[contains(@class,"component-color-indicator")]/@style, "background: "), ";")`,
 			document,
 			null,
 			XPathResult.ANY_TYPE,

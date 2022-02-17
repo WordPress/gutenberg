@@ -231,7 +231,7 @@ export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
  */
 export async function toggleGlobalStyles() {
 	await page.click(
-		'.edit-site-header__actions button[aria-label="Styles"]'
+		'.interface-interface-skeleton__drawer button[aria-label="Styles"]'
 	);
 }
 
@@ -241,7 +241,7 @@ export async function toggleGlobalStyles() {
  * @param {string} panelName Name of the panel that is going to be opened.
  */
 export async function openGlobalStylesPanel( panelName ) {
-	const selector = `//div[@aria-label="Settings"]//button[.//*[text()="${ panelName }"]]`;
+	const selector = `//div[contains(@class, "edit-site-global-styles-sidebar__panel")]//button[.//*[text()="${ panelName }"]]`;
 	await ( await page.waitForXPath( selector ) ).click();
 }
 
@@ -250,6 +250,6 @@ export async function openGlobalStylesPanel( panelName ) {
  */
 export async function openPreviousGlobalStylesPanel() {
 	await page.click(
-		'div[aria-label="Settings"] button[aria-label="Navigate to the previous view"]'
+		'.edit-site-global-styles-sidebar__panel button[aria-label="Navigate to the previous view"]'
 	);
 }

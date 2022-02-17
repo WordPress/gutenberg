@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	Button,
 	Icon,
@@ -48,14 +48,6 @@ function NavigationToggle( { icon } ) {
 	const disableMotion = useReducedMotion();
 
 	const navigationToggleRef = useRef();
-
-	useEffect( () => {
-		// TODO: Remove this effect when alternative solution is merged.
-		// See: https://github.com/WordPress/gutenberg/pull/37314
-		if ( ! isNavigationOpen ) {
-			navigationToggleRef.current.focus();
-		}
-	}, [ isNavigationOpen ] );
 
 	const toggleNavigationPanel = () =>
 		setIsNavigationPanelOpened( ! isNavigationOpen );
