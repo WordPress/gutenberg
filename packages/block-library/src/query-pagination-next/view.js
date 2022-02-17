@@ -11,27 +11,31 @@ const load = () => {
 
 		const {
 			block: blockName,
-			// attribute,
-			// newValue,
+			queryArg,
+			newQueryArgValue,
 			nonce,
 		} = e.target.dataset;
-		const blockSelector = `.wp-block-${ blockName.replace( 'core/', '' ) }`; // TODO: Need a better mechanism here.
-
-		// TODO: Need to include blocks' current attributes.
-		// Fetch the HTML of the new block.
-		// const html = await fetchRenderedBlock(
-		// 	blockName,
-		// 	{ [ attribute ]: newValue },
-		// 	nonce
-		// ); // FIXME
-		const html = await fetchRenderedBlock(
-			'core/calendar',
-			{ month: '12', year: '2021' },
-			nonce
-		);
+		const blockSelector = `wp-block[type="${ blockName }"]`;
 
 		// Find the root of the real DOM.
 		const root = e.target.closest( blockSelector );
+
+		const rawAttributes = root.attributes;
+		const attributes = {};
+		for ( let i = 0; i < rawAttributes.length; i++ ) {
+			if ( rawAttributes[ i ].name !== 'type' ) {
+				attributes[ rawAttributes[ i ].name ] =
+					rawAttributes[ i ].value;
+			}
+		}
+		// TODO: Need to include blocks' current attributes.
+		// Fetch the HTML of the new block.
+		const html = await fetchRenderedBlock(
+			blockName,
+			attributes,
+			{ [ queryArg ]: newQueryArgValue },
+			nonce
+		);
 
 		// Replace root with the new HTML.
 		morphdom( root, html );
@@ -49,7 +53,7 @@ const load = () => {
 
 window.addEventListener( 'load', load );
 
-async function fetchRenderedBlock( blockName, attributes, nonce ) {
+async function fetchRenderedBlock( blockName, attributes, queryArgs, nonce ) {
 	// TODO: Auth should be done inside of this function (or ideally not at all.)
 	const route = `wp/v2/block-renderer/${ blockName }`;
 	const restApiBase = document.head.querySelector(
@@ -58,6 +62,9 @@ async function fetchRenderedBlock( blockName, attributes, nonce ) {
 	const url = new URL( restApiBase + route );
 	for ( const attr in attributes ) {
 		url.searchParams.append( `attributes[${ attr }]`, attributes[ attr ] );
+	}
+	for ( const arg in queryArgs ) {
+		url.searchParams.append( 'arg', queryArgs[ arg ] );
 	}
 	url.searchParams.append( 'context', 'edit' );
 	url.searchParams.append( '_locale', 'user' );
