@@ -375,7 +375,7 @@ Once you refresh the page, open the form, change the title, and hit save, you sh
 
 ![](./media/edit-form/form-error.png)
 
-Fantastic! We can now restore the previous version of `handleChange` and move on to the next step.
+Fantastic! We can now **restore the previous version of `handleChange`** and move on to the next step.
 
 ### Step 7: Status indicator
 
