@@ -34,7 +34,7 @@
 	"dependencies": {
 		"@babel/core": "^7.16.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "^0.5.2",
-		"@svgr/webpack": "^5.5.0",
+		"@svgr/webpack": "^6.2.1",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/dependency-extraction-webpack-plugin": "file:../dependency-extraction-webpack-plugin",
