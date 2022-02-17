@@ -38,13 +38,15 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 	Action
 >( 'selectorName' )( ( state = new EquivalentKeyMap(), action: Action ) => {
 	switch ( action.type ) {
-		case 'START_RESOLUTION':
-		case 'FINISH_RESOLUTION': {
-			const isResolving = action.type === 'START_RESOLUTION';
+		case 'START_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
-
+			nextState.set( action.args, { isResolving: true } );
+			return nextState;
+		}
+		case 'FINISH_RESOLUTION': {
+			const nextState = new EquivalentKeyMap( state );
 			nextState.set( selectorArgsToStateKey( action.args ), {
-				isResolving,
+				isResolving: false,
 			} );
 			return nextState;
 		}
@@ -54,24 +56,27 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 				isResolving: false,
 				error: action.error,
 			} );
-
 			return nextState;
 		}
-		case 'START_RESOLUTIONS':
-		case 'FINISH_RESOLUTIONS': {
-			const isResolving = action.type === 'START_RESOLUTIONS';
+		case 'START_RESOLUTIONS': {
 			const nextState = new EquivalentKeyMap( state );
-			for ( const resolutionArgs of selectorArgsToStateKey(
-				action.args
-			) ) {
-				nextState.set( resolutionArgs, { isResolving } );
+			for ( const resolutionArgs of action.args ) {
+				nextState.set( resolutionArgs, { isResolving: true } );
+			}
+			return nextState;
+		}
+		case 'FINISH_RESOLUTIONS': {
+			const nextState = new EquivalentKeyMap( state );
+			for ( const resolutionArgs of action.args ) {
+				nextState.set( selectorArgsToStateKey( resolutionArgs ), {
+					isResolving: false,
+				} );
 			}
 			return nextState;
 		}
 		case 'FAIL_RESOLUTIONS': {
 			const nextState = new EquivalentKeyMap( state );
-			for ( const idx in action.args ) {
-				const resolutionArgs = action.args[ idx ] as unknown[];
+			action.args.forEach( ( resolutionArgs, idx ) => {
 				const resolutionState: StateValue = { isResolving: false };
 
 				const error = action.errors[ idx ];
@@ -80,10 +85,10 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 				}
 
 				nextState.set(
-					selectorArgsToStateKey( resolutionArgs ),
+					selectorArgsToStateKey( resolutionArgs as unknown[] ),
 					resolutionState
 				);
-			}
+			} );
 			return nextState;
 		}
 		case 'INVALIDATE_RESOLUTION': {
