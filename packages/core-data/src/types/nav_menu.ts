@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context } from './common';
+import { Context, ContextualField } from './common';
 
 export interface NavMenu< C extends Context > {
 	/**
@@ -11,7 +11,7 @@ export interface NavMenu< C extends Context > {
 	/**
 	 * HTML description of the term.
 	 */
-	description?: string;
+	description: ContextualField< string, 'view' | 'edit', C >;
 	/**
 	 * HTML title for the term.
 	 */
@@ -23,13 +23,17 @@ export interface NavMenu< C extends Context > {
 	/**
 	 * Meta fields.
 	 */
-	meta?: Record< string, string >;
+	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 	/**
 	 * The locations assigned to the menu.
 	 */
-	locations?: string[];
+	locations: ContextualField< string[], 'view' | 'edit', C >;
+	/**
+	 * The DB ID of the original object this menu item represents, e . g . ID for posts and term_id for categories.
+	 */
+	object_id: number;
 	/**
 	 * Whether to automatically add top level pages to this menu.
 	 */
-	auto_add?: boolean;
+	auto_add: ContextualField< boolean, 'view' | 'edit', C >;
 }
