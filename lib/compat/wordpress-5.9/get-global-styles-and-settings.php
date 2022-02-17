@@ -90,8 +90,8 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 			return $cached;
 		}
 	}
-	$tree = WP_Theme_JSON_Resolver::get_merged_data();
-	$supports_theme_json = WP_Theme_JSON_Resolver::theme_has_support();
+	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 	if ( empty( $types ) && ! $supports_theme_json ) {
 		$types = array( 'variables', 'presets' );
 	} elseif ( empty( $types ) ) {
