@@ -73,15 +73,7 @@ interface FullPost< C extends Context > {
 	 * The content for the post.
 	 */
 	content: ContextualField<
-		{
-			/**
-			 * Data as it exists in the database.
-			 */
-			raw: ContextualField< string, 'edit', C >;
-			/**
-			 * Data transformed for display.
-			 */
-			rendered: string;
+		RawField< C > & {
 			/**
 			 * Whether the content is protected with a password.
 			 */
