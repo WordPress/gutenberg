@@ -116,6 +116,8 @@ function PagesList( { pages } ) {
 }
 ```
 
+Note that post title may contain HTML entities like `&aacute;`, so we need to use the [`decodeEntities`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-html-entities/) function to replace them with the symbols they represent like `á`.
+
 Refreshing the page should display a list similar to this one:
 
 ![](/docs/how-to-guides/data-basics/media/list-of-pages/fetch-the-data.jpg)
