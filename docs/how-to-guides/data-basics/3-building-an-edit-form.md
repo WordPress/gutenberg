@@ -196,7 +196,11 @@ wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title
 
 It doesn't reflect the edits. What's going on?
 
-Let's imagine it would reflect the edits. Then, anything you typed in the title field would be immediately displayed inside the `PagesList`. Gutenberg Data solves this problem by distinguishing between *Entity Records* and *Edited Entity Records*. Calling `getEntityRecord` always returns the data retrieved from the API. To see the edits applied, we need to use `getEditedEntityRecord` instead:
+Well, let's imagine for a second that it would reflect the edits. If it did, then anything you typed in the title field would be _immediately_ displayed inside the `PagesList`. 
+
+Gutenberg Data solves this problem by distinguishing between *Entity Records* and *Edited Entity Records*. 
+
+Calling `getEntityRecord` always returns the data retrieved _from the API_. To see the edits applied, we need to use `getEditedEntityRecord` instead:
 
 ```js
 // Replace 9 with an actual page ID
