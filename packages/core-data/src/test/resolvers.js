@@ -312,9 +312,7 @@ describe( 'canUser', () => {
 		} );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'GET',
-			},
+			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
 		await canUser( 'create', 'media' )( { dispatch } );
@@ -337,9 +335,7 @@ describe( 'canUser', () => {
 		} );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'POST, GET, PUT, DELETE',
-			},
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
 		await canUser( 'create', 'media' )( { dispatch } );
@@ -362,9 +358,7 @@ describe( 'canUser', () => {
 		} );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'POST, GET, PUT, DELETE',
-			},
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
 		await canUser( 'create', 'blocks', 123 )( { dispatch } );
