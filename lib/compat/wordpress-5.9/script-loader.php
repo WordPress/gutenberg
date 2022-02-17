@@ -51,8 +51,6 @@ add_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
  * This function takes care of adding inline styles
  * in the proper place, depending on the theme in use.
  *
- * @since 5.9.1
- *
  * For block themes, it's loaded in the head.
  * For classic ones, it's loaded in the body
  * because the wp_head action (and wp_enqueue_scripts)
