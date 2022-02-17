@@ -264,13 +264,15 @@ wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'page', 9, { title: 'up
 wp.data.dispatch( 'core' ).saveEditedEntityRecord( 'postType', 'page', 9 );
 ```
 
-The above snippet saved a new title. Unlike before, the updated title is now returned by `getEntityRecord`:
+The above snippet saved a new title. Unlike before, `getEntityRecord` now reflects the updated title:
 
 ```js
 // Replace 9 with an actual page ID
-wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', 9 ).title
+wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', 9 ).title.rendered
 // "updated title"
 ```
+
+Entity records are updated to reflect any saved changes right after the REST API request is finished.
 
 This is how the `EditPageForm` looks like with a working *Save* button:
 
