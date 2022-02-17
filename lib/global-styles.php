@@ -83,7 +83,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
-	$settings['__experimentalFeatures'] = wp_get_global_settings();
+	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
 
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
