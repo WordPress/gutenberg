@@ -20,19 +20,11 @@ const load = () => {
 		// Find the root of the real DOM.
 		const root = e.target.closest( blockSelector );
 
-		const rawAttributes = root.attributes;
-		const attributes = {};
-		for ( let i = 0; i < rawAttributes.length; i++ ) {
-			if ( rawAttributes[ i ].name !== 'type' ) {
-				attributes[ rawAttributes[ i ].name ] =
-					rawAttributes[ i ].value;
-			}
-		}
 		// TODO: Need to include blocks' current attributes.
 		// Fetch the HTML of the new block.
 		const html = await fetchRenderedBlock(
 			blockName,
-			attributes,
+			root.dataset,
 			{ [ queryArg ]: newQueryArgValue },
 			nonce
 		);
