@@ -30,9 +30,12 @@ import { LayoutStyle } from '../components/block-list/layout';
 import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 
-const layoutBlockSupportKey = '__experimentalLayout';
+import { PositionEdit } from './position';
 
-function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
+export const LAYOUT_SUPPORT_KEY = '__experimentalLayout';
+
+function LayoutPanel( props ) {
+	const { setAttributes, attributes, name: blockName } = props;
 	const { layout } = attributes;
 	const defaultThemeLayout = useSetting( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
@@ -42,13 +45,14 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	const layoutBlockSupport = getBlockSupport(
 		blockName,
-		layoutBlockSupportKey,
+		LAYOUT_SUPPORT_KEY,
 		{}
 	);
 	const {
-		allowSwitching,
 		allowEditing = true,
 		allowInheriting = true,
+		allowPosition,
+		allowSwitching,
 		default: defaultBlockLayout,
 	} = layoutBlockSupport;
 
@@ -103,6 +107,10 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 							layoutBlockSupport={ layoutBlockSupport }
 						/>
 					) }
+
+					{ ! inherit && allowPosition && (
+						<PositionEdit { ...props } />
+					) }
 				</PanelBody>
 			</InspectorControls>
 			{ ! inherit && layoutType && (
@@ -145,7 +153,7 @@ export function addAttribute( settings ) {
 	if ( has( settings.attributes, [ 'layout', 'type' ] ) ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, layoutBlockSupportKey ) ) {
+	if ( hasBlockSupport( settings, LAYOUT_SUPPORT_KEY ) ) {
 		settings.attributes = {
 			...settings.attributes,
 			layout: {
@@ -167,10 +175,7 @@ export function addAttribute( settings ) {
 export const withInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		const supportLayout = hasBlockSupport(
-			blockName,
-			layoutBlockSupportKey
-		);
+		const supportLayout = hasBlockSupport( blockName, LAYOUT_SUPPORT_KEY );
 
 		return [
 			supportLayout && <LayoutPanel key="layout" { ...props } />,
@@ -192,14 +197,14 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { name, attributes } = props;
 		const shouldRenderLayoutStyles = hasBlockSupport(
 			name,
-			layoutBlockSupportKey
+			LAYOUT_SUPPORT_KEY
 		);
 		const id = useInstanceId( BlockListBlock );
 		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
-			getBlockSupport( name, layoutBlockSupportKey ) || {};
+			getBlockSupport( name, LAYOUT_SUPPORT_KEY ) || {};
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};

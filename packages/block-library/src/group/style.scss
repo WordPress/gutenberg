@@ -4,5 +4,8 @@
 	// TODO: Remove the following line before getting the PR ready for review.
 	// It should be a feature of sticky positioning that we can set this or another
 	// side value.
-	top: 0;
+	// Also, note that using the CSS variable doesn't play nicely on mobile, as the
+	// admin bar isn't sticky on mobile.
+	top: var(--wp-admin--admin-bar--height, 0);
+	z-index: 1;
 }

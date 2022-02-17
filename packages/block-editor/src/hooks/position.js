@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY } from './dimensions';
+import { LAYOUT_SUPPORT_KEY } from './layout';
 import { cleanEmptyObject } from './utils';
 
 // TODO: Should these be available for editing in theme.json?
@@ -23,7 +23,7 @@ const POSITION_OPTIONS = [
 	{
 		key: 'normal',
 		label: __( 'Normal' ),
-		value: undefined,
+		value: '',
 		name: __( 'Normal' ),
 	},
 	{
@@ -42,8 +42,8 @@ const POSITION_OPTIONS = [
  * @return {boolean} Whether there is support.
  */
 export function hasPositionSupport( blockType ) {
-	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
-	return !! ( true === support || support?.position );
+	const support = getBlockSupport( blockType, LAYOUT_SUPPORT_KEY );
+	return !! ( true === support || support?.allowPosition );
 }
 
 /**
@@ -53,7 +53,7 @@ export function hasPositionSupport( blockType ) {
  * @return {boolean}     Whether or not the block has a position value set.
  */
 export function hasPositionValue( props ) {
-	return props.attributes.style?.spacing?.position !== undefined;
+	return props.attributes.style?.layout?.position !== undefined;
 }
 
 /**
@@ -70,8 +70,8 @@ export function resetPosition( { attributes = {}, setAttributes } ) {
 	setAttributes( {
 		style: cleanEmptyObject( {
 			...style,
-			spacing: {
-				...style?.spacing,
+			layout: {
+				...style?.layout,
 				position: undefined,
 			},
 		} ),
@@ -86,7 +86,7 @@ export function resetPosition( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether padding setting is disabled.
  */
 export function useIsPositionDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'spacing.position' );
+	const isDisabled = ! useSetting( 'layout.position' );
 
 	return ! hasPositionSupport( blockName ) || isDisabled;
 }
@@ -111,8 +111,8 @@ export function PositionEdit( props ) {
 	const onChange = ( next ) => {
 		const newStyle = {
 			...style,
-			spacing: {
-				...style?.spacing,
+			layout: {
+				...style?.layout,
 				position: next,
 			},
 		};
@@ -127,6 +127,9 @@ export function PositionEdit( props ) {
 			<>
 				<ToggleGroupControl
 					label={ __( 'Position' ) }
+					help={ __(
+						"Lock this block to an area of the page so it doesn't scroll with page content"
+					) }
 					value={ style?.spacing?.position }
 					onChange={ ( newValue ) => {
 						onChange( newValue );

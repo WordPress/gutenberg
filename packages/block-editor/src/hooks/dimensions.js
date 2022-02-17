@@ -31,13 +31,6 @@ import {
 	resetPadding,
 	useIsPaddingDisabled,
 } from './padding';
-import {
-	PositionEdit,
-	hasPositionSupport,
-	hasPositionValue,
-	resetPosition,
-	useIsPositionDisabled,
-} from './position';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -53,7 +46,6 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 export function DimensionsPanel( props ) {
 	const isGapDisabled = useIsGapDisabled( props );
 	const isPaddingDisabled = useIsPaddingDisabled( props );
-	const isPositionDisabled = useIsPositionDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
@@ -116,18 +108,6 @@ export function DimensionsPanel( props ) {
 					<GapEdit { ...props } />
 				</ToolsPanelItem>
 			) }
-			{ ! isPositionDisabled && (
-				<ToolsPanelItem
-					hasValue={ () => hasPositionValue( props ) }
-					label={ __( 'Position' ) }
-					onDeselect={ () => resetPosition( props ) }
-					resetAllFilter={ createResetAllFilter( 'position' ) }
-					isShownByDefault={ defaultSpacingControls?.position }
-					panelId={ props.clientId }
-				>
-					<PositionEdit { ...props } />
-				</ToolsPanelItem>
-			) }
 		</InspectorControls>
 	);
 }
@@ -147,7 +127,6 @@ export function hasDimensionsSupport( blockName ) {
 	return (
 		hasGapSupport( blockName ) ||
 		hasPaddingSupport( blockName ) ||
-		hasPositionSupport( blockName ) ||
 		hasMarginSupport( blockName )
 	);
 }
@@ -162,10 +141,9 @@ export function hasDimensionsSupport( blockName ) {
 const useIsDimensionsDisabled = ( props = {} ) => {
 	const gapDisabled = useIsGapDisabled( props );
 	const paddingDisabled = useIsPaddingDisabled( props );
-	const positionDisabled = useIsPositionDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
 
-	return gapDisabled && paddingDisabled && positionDisabled && marginDisabled;
+	return gapDisabled && paddingDisabled && marginDisabled;
 };
 
 /**

@@ -32,11 +32,9 @@
 		"spacing": {
 			"padding": true,
 			"blockGap": true,
-			"position": true,
 			"__experimentalDefaultControls": {
 				"padding": true,
-				"blockGap": true,
-				"position": true
+				"blockGap": true
 			}
 		},
 		"__experimentalBorder": {
@@ -62,7 +60,10 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": true
+		"__experimentalLayout": {
+			"allowSwitching": false,
+			"allowPosition": true
+		}
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"
