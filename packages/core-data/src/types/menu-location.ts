@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context, WithoutNevers } from './common';
+import { Context, OmitNevers } from './common';
 
 interface FullMenuLocation< C extends Context > {
 	/**
@@ -18,7 +18,7 @@ interface FullMenuLocation< C extends Context > {
 	menu: number;
 }
 
-export type MenuLocation< C extends Context > = WithoutNevers<
+export type MenuLocation< C extends Context > = OmitNevers<
 	FullMenuLocation< C >
 >;
 export interface UpdatableMenuLocation extends MenuLocation< 'edit' > {}

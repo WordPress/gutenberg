@@ -42,24 +42,21 @@ export type UpdatableRecord< T, Fields > = {
 	[ Key in keyof T ]: Key extends Fields ? string : T[ Key ];
 };
 
-type Without<
+export type OmitNevers<
 	T,
-	V,
-	WithNevers = {
-		[ K in keyof T ]: Exclude< T[ K ], undefined > extends V
+	Nevers = {
+		[ K in keyof T ]: Exclude< T[ K ], undefined > extends never
 			? never
 			: T[ K ] extends Record< string, unknown >
-			? Without< T[ K ], V >
+			? OmitNevers< T[ K ] >
 			: T[ K ];
 	}
 > = Pick<
-	WithNevers,
+	Nevers,
 	{
-		[ K in keyof WithNevers ]: WithNevers[ K ] extends never ? never : K;
-	}[ keyof WithNevers ]
+		[ K in keyof Nevers ]: Nevers[ K ] extends never ? never : K;
+	}[ keyof Nevers ]
 >;
-
-export type WithoutNevers< T > = Without< T, never >;
 
 /**
  * The raw data representation.

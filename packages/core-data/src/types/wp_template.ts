@@ -6,7 +6,7 @@ import {
 	PostStatus,
 	RawField,
 	UpdatableRecord,
-	WithoutNevers,
+	OmitNevers,
 } from './common';
 
 interface FullWpTemplate< C extends Context > {
@@ -79,8 +79,6 @@ interface FullWpTemplate< C extends Context > {
 	is_custom: Record< string, string >;
 }
 
-export type WpTemplate< C extends Context > = WithoutNevers<
-	FullWpTemplate< C >
->;
+export type WpTemplate< C extends Context > = OmitNevers< FullWpTemplate< C > >;
 export interface UpdatableWpTemplate
 	extends UpdatableRecord< WpTemplate< 'edit' >, 'title' > {}

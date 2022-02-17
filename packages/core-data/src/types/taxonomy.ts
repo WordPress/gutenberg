@@ -5,7 +5,7 @@ import {
 	Context,
 	ContextualField,
 	UpdatableRecord,
-	WithoutNevers,
+	OmitNevers,
 } from './common';
 
 interface FullTaxonomy< C extends Context > {
@@ -82,6 +82,6 @@ export interface TaxonomyVisibility {
 	show_in_quick_edit: boolean;
 }
 
-export type Taxonomy< C extends Context > = WithoutNevers< FullTaxonomy< C > >;
+export type Taxonomy< C extends Context > = OmitNevers< FullTaxonomy< C > >;
 export interface UpdatableTaxonomy
 	extends UpdatableRecord< Taxonomy< 'edit' >, 'description' > {}

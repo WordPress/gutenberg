@@ -10,7 +10,7 @@ import {
 	PostStatus,
 	RawField,
 	UpdatableRecord,
-	WithoutNevers,
+	OmitNevers,
 } from './common';
 
 interface FullPost< C extends Context > {
@@ -143,7 +143,7 @@ interface FullPost< C extends Context > {
 	tags: ContextualField< number[], 'view' | 'edit', C >;
 }
 
-export type Post< C extends Context > = WithoutNevers< FullPost< C > >;
+export type Post< C extends Context > = OmitNevers< FullPost< C > >;
 
 export interface UpdatablePost
 	extends UpdatableRecord<

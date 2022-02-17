@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context, WithoutNevers, ContextualField } from './common';
+import { Context, OmitNevers, ContextualField } from './common';
 
 interface FullType< C extends Context > {
 	/**
@@ -65,5 +65,5 @@ interface TypeVisibility {
 	show_in_nav_menus: boolean;
 }
 
-export type Type< C extends Context > = WithoutNevers< FullType< C > >;
+export type Type< C extends Context > = OmitNevers< FullType< C > >;
 export interface UpdatableType extends Type< 'edit' > {}

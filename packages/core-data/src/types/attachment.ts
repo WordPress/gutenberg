@@ -8,7 +8,7 @@ import {
 	PostStatus,
 	RawField,
 	UpdatableRecord,
-	WithoutNevers,
+	OmitNevers,
 } from './common';
 
 interface FullAttachment< C extends Context > {
@@ -122,9 +122,7 @@ interface FullAttachment< C extends Context > {
 	missing_image_sizes: ContextualField< string[], 'edit', C >;
 }
 
-export type Attachment< C extends Context > = WithoutNevers<
-	FullAttachment< C >
->;
+export type Attachment< C extends Context > = OmitNevers< FullAttachment< C > >;
 
 export interface UpdatableAttachment
 	extends UpdatableRecord<

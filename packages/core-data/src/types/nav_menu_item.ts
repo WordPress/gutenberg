@@ -6,7 +6,7 @@ import {
 	UpdatableRecord,
 	Context,
 	ContextualField,
-	WithoutNevers,
+	OmitNevers,
 } from './common';
 
 /**
@@ -101,7 +101,7 @@ interface FullNavMenuItem< C extends Context > {
 	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 }
 
-export type NavMenuItem< C extends Context > = WithoutNevers<
+export type NavMenuItem< C extends Context > = OmitNevers<
 	FullNavMenuItem< C >
 >;
 

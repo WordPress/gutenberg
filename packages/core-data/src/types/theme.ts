@@ -6,7 +6,7 @@ import {
 	PostFormat,
 	RawField,
 	UpdatableRecord,
-	WithoutNevers,
+	OmitNevers,
 } from './common';
 
 interface FullTheme< C extends Context > {
@@ -217,7 +217,7 @@ export type Html5Option =
 	| 'script'
 	| 'style';
 
-export type Theme< C extends Context > = WithoutNevers< FullTheme< C > >;
+export type Theme< C extends Context > = OmitNevers< FullTheme< C > >;
 
 export interface UpdatableTheme
 	extends UpdatableRecord<

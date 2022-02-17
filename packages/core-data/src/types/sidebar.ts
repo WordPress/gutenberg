@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { Widget } from './widget';
-import { Context, WithoutNevers } from './common';
+import { Context, OmitNevers } from './common';
 
 interface FullSidebar< C extends Context > {
 	/**
@@ -50,5 +50,5 @@ interface FullSidebar< C extends Context > {
 type SidebarStatus = 'active' | 'inactive';
 type NestedWidget< C extends Context > = Widget< C > | string;
 
-export type Sidebar< C extends Context > = WithoutNevers< FullSidebar< C > >;
+export type Sidebar< C extends Context > = OmitNevers< FullSidebar< C > >;
 export interface UpdatableSidebar extends Sidebar< 'edit' > {}

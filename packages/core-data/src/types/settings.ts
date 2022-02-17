@@ -6,7 +6,7 @@ import {
 	Context,
 	PingStatus,
 	UpdatableRecord,
-	WithoutNevers,
+	OmitNevers,
 } from './common';
 
 interface FullSettings< C extends Context > {
@@ -88,6 +88,6 @@ interface FullSettings< C extends Context > {
 	site_icon: number;
 }
 
-export type Settings< C extends Context > = WithoutNevers< FullSettings< C > >;
+export type Settings< C extends Context > = OmitNevers< FullSettings< C > >;
 export interface UpdatableSettings
 	extends UpdatableRecord< Settings< 'edit' >, 'description' > {}

@@ -9,7 +9,7 @@ import {
 	PostStatus,
 	RawField,
 	UpdatableRecord,
-	WithoutNevers,
+	OmitNevers,
 } from './common';
 
 interface FullPage< C extends Context > {
@@ -134,7 +134,7 @@ interface FullPage< C extends Context > {
 	template: ContextualField< string, 'view' | 'edit', C >;
 }
 
-export type Page< C extends Context > = WithoutNevers< FullPage< C > >;
+export type Page< C extends Context > = OmitNevers< FullPage< C > >;
 
 export interface UpdatablePage
 	extends UpdatableRecord<
