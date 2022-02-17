@@ -309,6 +309,7 @@ function CoverEdit( {
 	overlayColor,
 	setAttributes,
 	setOverlayColor,
+	toggleSelection,
 } ) {
 	const {
 		contentPosition,
@@ -327,10 +328,9 @@ function CoverEdit( {
 		allowedBlocks,
 		templateLock,
 	} = attributes;
-	const {
-		toggleSelection,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
 	const {
 		gradientClass,
 		gradientValue,
