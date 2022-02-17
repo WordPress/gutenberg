@@ -1,25 +1,25 @@
 /**
  * Internal dependencies
  */
-import { Attachment, EditedAttachment } from './attachment';
-import { Comment, EditedComment } from './comment';
-import { MenuLocation, EditedMenuLocation } from './menu-location';
-import { NavMenu, EditedNavMenu } from './nav_menu';
-import { NavMenuItem, EditedNavMenuItem } from './nav_menu_item';
-import { NavigationArea, EditedNavigationArea } from './navigation-area';
-import { Page, EditedPage } from './page';
-import { Plugin, EditedPlugin } from './plugin';
-import { Post, EditedPost } from './post';
-import { Settings, EditedSettings } from './settings';
-import { Sidebar, EditedSidebar } from './sidebar';
-import { Taxonomy, EditedTaxonomy } from './taxonomy';
-import { Theme, EditedTheme } from './theme';
-import { User, EditedUser } from './user';
-import { Type, EditedType } from './type';
-import { Widget, EditedWidget } from './widget';
-import { WidgetType, EditedWidgetType } from './widget-type';
-import { WpTemplate, EditedWpTemplate } from './wp_template';
-import { WpTemplatePart, EditedWpTemplatePart } from './wp_template_part';
+import { Attachment, UpdatableAttachment } from './attachment';
+import { Comment, UpdatableComment } from './comment';
+import { MenuLocation, UpdatableMenuLocation } from './menu-location';
+import { NavMenu, UpdatableNavMenu } from './nav_menu';
+import { NavMenuItem, UpdatableNavMenuItem } from './nav_menu_item';
+import { NavigationArea, UpdatableNavigationArea } from './navigation-area';
+import { Page, UpdatablePage } from './page';
+import { Plugin, UpdatablePlugin } from './plugin';
+import { Post, UpdatablePost } from './post';
+import { Settings, UpdatableSettings } from './settings';
+import { Sidebar, UpdatableSidebar } from './sidebar';
+import { Taxonomy, UpdatableTaxonomy } from './taxonomy';
+import { Theme, UpdatableTheme } from './theme';
+import { User, UpdatableUser } from './user';
+import { Type, UpdatableType } from './type';
+import { Widget, UpdatableWidget } from './widget';
+import { WidgetType, UpdatableWidgetType } from './widget-type';
+import { WpTemplate, UpdatableWpTemplate } from './wp_template';
+import { WpTemplatePart, UpdatableWpTemplatePart } from './wp_template_part';
 import { Context } from './common';
 
 export type EntityRecord< C extends Context > =
@@ -43,23 +43,23 @@ export type EntityRecord< C extends Context > =
 	| WpTemplate< C >
 	| WpTemplatePart< C >;
 
-export type EditedEntityRecord =
-	| EditedAttachment
-	| EditedComment
-	| EditedMenuLocation
-	| EditedNavMenu
-	| EditedNavMenuItem
-	| EditedNavigationArea
-	| EditedPage
-	| EditedPlugin
-	| EditedPost
-	| EditedSettings
-	| EditedSidebar
-	| EditedTaxonomy
-	| EditedTheme
-	| EditedType
-	| EditedUser
-	| EditedWidget
-	| EditedWidgetType
-	| EditedWpTemplate
-	| EditedWpTemplatePart;
+export type UpdatableEntityRecord =
+	| UpdatableAttachment
+	| UpdatableComment
+	| UpdatableMenuLocation
+	| UpdatableNavMenu
+	| UpdatableNavMenuItem
+	| UpdatableNavigationArea
+	| UpdatablePage
+	| UpdatablePlugin
+	| UpdatablePost
+	| UpdatableSettings
+	| UpdatableSidebar
+	| UpdatableTaxonomy
+	| UpdatableTheme
+	| UpdatableType
+	| UpdatableUser
+	| UpdatableWidget
+	| UpdatableWidgetType
+	| UpdatableWpTemplate
+	| UpdatableWpTemplatePart;

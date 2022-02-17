@@ -5,7 +5,7 @@ import {
 	Context,
 	PostStatus,
 	RawField,
-	EditedRecord,
+	UpdatableRecord,
 	WithoutNevers,
 } from './common';
 
@@ -82,5 +82,5 @@ interface FullWpTemplatePart< C extends Context > {
 export type WpTemplatePart< C extends Context > = WithoutNevers<
 	FullWpTemplatePart< C >
 >;
-export interface EditedWpTemplatePart
-	extends EditedRecord< WpTemplatePart< 'edit' >, 'title' | 'content' > {}
+export interface UpdatableWpTemplatePart
+	extends UpdatableRecord< WpTemplatePart< 'edit' >, 'title' | 'content' > {}

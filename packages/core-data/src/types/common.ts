@@ -38,7 +38,7 @@ export type ContextualField<
 	C extends Context
 > = AvailableInContexts extends C ? FieldType : never;
 
-export type EditedRecord< T, Fields > = {
+export type UpdatableRecord< T, Fields > = {
 	[ Key in keyof T ]: Key extends Fields ? string : T[ Key ];
 };
 

@@ -22,4 +22,4 @@ export type NavigationArea< C extends Context > = WithoutNevers<
 	FullNavigationArea< C >
 >;
 
-export interface EditedNavigationArea extends FullNavigationArea< 'edit' > {}
+export interface UpdatableNavigationArea extends FullNavigationArea< 'edit' > {}

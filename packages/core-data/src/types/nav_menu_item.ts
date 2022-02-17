@@ -3,7 +3,7 @@
  */
 import {
 	RawField,
-	EditedRecord,
+	UpdatableRecord,
 	Context,
 	ContextualField,
 	WithoutNevers,
@@ -105,5 +105,5 @@ export type NavMenuItem< C extends Context > = WithoutNevers<
 	FullNavMenuItem< C >
 >;
 
-export interface EditedNavMenuItem
-	extends EditedRecord< NavMenuItem< 'edit' >, 'title' > {}
+export interface UpdatableNavMenuItem
+	extends UpdatableRecord< NavMenuItem< 'edit' >, 'title' > {}

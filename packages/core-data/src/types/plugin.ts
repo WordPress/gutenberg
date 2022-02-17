@@ -5,7 +5,7 @@ import {
 	Context,
 	ContextualField,
 	RawField,
-	EditedRecord,
+	UpdatableRecord,
 	WithoutNevers,
 } from './common';
 
@@ -62,5 +62,5 @@ interface FullPlugin< C extends Context > {
 
 export type PluginStatus = 'active' | 'inactive';
 export type Plugin< C extends Context > = WithoutNevers< FullPlugin< C > >;
-export interface EditedPlugin
-	extends EditedRecord< Plugin< 'edit' >, 'description' > {}
+export interface UpdatablePlugin
+	extends UpdatableRecord< Plugin< 'edit' >, 'description' > {}

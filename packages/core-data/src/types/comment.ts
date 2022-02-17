@@ -6,7 +6,7 @@ import {
 	Context,
 	ContextualField,
 	RawField,
-	EditedRecord,
+	UpdatableRecord,
 } from './common';
 
 interface FullComment< C extends Context > {
@@ -81,5 +81,5 @@ interface FullComment< C extends Context > {
 }
 
 export type Comment< C extends Context > = FullComment< C >;
-export interface EditedComment
-	extends EditedRecord< Comment< 'edit' >, 'content' > {}
+export interface UpdatableComment
+	extends UpdatableRecord< Comment< 'edit' >, 'content' > {}

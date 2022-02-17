@@ -8,7 +8,7 @@ import {
 	PingStatus,
 	PostStatus,
 	RawField,
-	EditedRecord,
+	UpdatableRecord,
 	WithoutNevers,
 } from './common';
 
@@ -136,8 +136,8 @@ interface FullPage< C extends Context > {
 
 export type Page< C extends Context > = WithoutNevers< FullPage< C > >;
 
-export interface EditedPage
-	extends EditedRecord<
+export interface UpdatablePage
+	extends UpdatableRecord<
 		Page< 'edit' >,
 		'guid' | 'title' | 'content' | 'excerpt'
 	> {}

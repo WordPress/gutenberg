@@ -29,4 +29,4 @@ interface FullWidgetType< C extends Context > {
 export type WidgetType< C extends Context > = WithoutNevers<
 	FullWidgetType< C >
 >;
-export interface EditedWidgetType extends WidgetType< 'edit' > {}
+export interface UpdatableWidgetType extends WidgetType< 'edit' > {}

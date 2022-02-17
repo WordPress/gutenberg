@@ -9,7 +9,7 @@ import {
 	PostFormat,
 	PostStatus,
 	RawField,
-	EditedRecord,
+	UpdatableRecord,
 	WithoutNevers,
 } from './common';
 
@@ -145,8 +145,8 @@ interface FullPost< C extends Context > {
 
 export type Post< C extends Context > = WithoutNevers< FullPost< C > >;
 
-export interface EditedPost
-	extends EditedRecord<
+export interface UpdatablePost
+	extends UpdatableRecord<
 		Post< 'edit' >,
 		'guid' | 'title' | 'content' | 'excerpt'
 	> {}

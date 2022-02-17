@@ -5,7 +5,7 @@ import {
 	Context,
 	PostFormat,
 	RawField,
-	EditedRecord,
+	UpdatableRecord,
 	WithoutNevers,
 } from './common';
 
@@ -219,8 +219,8 @@ export type Html5Option =
 
 export type Theme< C extends Context > = WithoutNevers< FullTheme< C > >;
 
-export interface EditedTheme
-	extends EditedRecord<
+export interface UpdatableTheme
+	extends UpdatableRecord<
 		Theme< 'edit' >,
 		'author' | 'author_uri' | 'description' | 'name' | 'tags' | 'theme_uri'
 	> {}

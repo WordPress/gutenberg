@@ -21,4 +21,4 @@ interface FullMenuLocation< C extends Context > {
 export type MenuLocation< C extends Context > = WithoutNevers<
 	FullMenuLocation< C >
 >;
-export interface EditedMenuLocation extends MenuLocation< 'edit' > {}
+export interface UpdatableMenuLocation extends MenuLocation< 'edit' > {}
