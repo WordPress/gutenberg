@@ -261,6 +261,10 @@ $color-control-label-height: 20px;
 	}
 }
 
+.wp-block-navigation-placeholder .components-spinner {
+	margin-top: 0;
+}
+
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
 	display: flex;

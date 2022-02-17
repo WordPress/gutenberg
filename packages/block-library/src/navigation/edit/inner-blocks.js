@@ -38,7 +38,6 @@ const LAYOUT = {
 };
 
 export default function NavigationInnerBlocks( {
-	isVisible,
 	clientId,
 	hasCustomPlaceholder,
 	orientation,
@@ -98,6 +97,15 @@ export default function NavigationInnerBlocks( {
 
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
+	const hasMenuItems = !! blocks?.length;
+
+	// If here is a `ref` attribute pointing to a `wp_navigation` but
+	// that menu has no **items** (i.e. empty) then show a placeholder.
+	// The block must also be selected else the placeholder will display
+	// alongside the appender.
+	const showPlaceholder =
+		! hasCustomPlaceholder && ! hasMenuItems && ! isSelected;
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
@@ -130,8 +138,7 @@ export default function NavigationInnerBlocks( {
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
-			placeholder:
-				! isVisible || hasCustomPlaceholder ? undefined : placeholder,
+			placeholder: showPlaceholder ? placeholder : undefined,
 		}
 	);
 

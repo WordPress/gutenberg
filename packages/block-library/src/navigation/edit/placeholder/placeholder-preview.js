@@ -9,12 +9,12 @@ import classnames from 'classnames';
 import { Icon, navigation } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
-const PlaceholderPreview = ( { isLoading } ) => {
+const PlaceholderPreview = ( { isVisible } ) => {
 	return (
 		<div
+			aria-hidden={ ! isVisible }
 			className={ classnames(
-				'wp-block-navigation-placeholder__preview',
-				{ 'is-loading': isLoading }
+				'wp-block-navigation-placeholder__preview'
 			) }
 		>
 			<div className="wp-block-navigation-placeholder__actions__indicator">

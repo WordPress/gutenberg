@@ -36,6 +36,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarGroup,
 	Button,
+	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -46,7 +47,6 @@ import useListViewModal from './use-list-view-modal';
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
-import PlaceholderPreview from './placeholder/placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
@@ -185,7 +185,7 @@ function Navigation( {
 				hasSubmenus: !! innerBlocks.find(
 					( block ) => block.name === 'core/navigation-submenu'
 				),
-				hasUncontrolledInnerBlocks: _hasUncontrolledInnerBlocks,
+				hasUncontrolledInnerBlocks: !! _hasUncontrolledInnerBlocks,
 				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
@@ -205,10 +205,6 @@ function Navigation( {
 
 	const isWithinUnassignedArea = !! navigationArea && ! ref;
 
-	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasUncontrolledInnerBlocks || isWithinUnassignedArea
-	);
-
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
 	);
@@ -227,6 +223,7 @@ function Navigation( {
 		canUserDeleteNavigationMenu,
 		hasResolvedCanUserDeleteNavigationMenu,
 		canUserCreateNavigationMenu,
+		isResolvingCanUserCreateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
@@ -301,6 +298,18 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
+	// "placeholder" shown if:
+	// - we don't have uncontrolled blocks.
+	// - (legacy) we have a Navigation Area without a ref attribute pointing to a Navigation Post.
+	// - we don't have a ref attribute pointing to a Navigation Post.
+	const isPlaceholderShown =
+		!! ( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea ) && ! ref;
+
+	// "loading" state:
+	// - there is a ref attribute pointing to a Navigation Post
+	// - the Navigation Post hasn't resolved yet.
+	const isLoading = !! ( ref && ! isEntityAvailable );
+
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
 	useEffect( () => {
@@ -330,11 +339,6 @@ function Navigation( {
 			);
 		}
 	} );
-
-	// Hide the placeholder if an navigation menu entity has loaded.
-	useEffect( () => {
-		setIsPlaceholderShown( ! isEntityAvailable );
-	}, [ isEntityAvailable ] );
 
 	const [ showCantEditNotice, hideCantEditNotice ] = useNavigationNotice( {
 		name: 'block-library/core/navigation/permissions/update',
@@ -395,7 +399,6 @@ function Navigation( {
 			if ( ! ref ) {
 				replaceInnerBlocks( clientId, [] );
 			}
-			setIsPlaceholderShown( true );
 		} );
 	}, [ clientId, ref ] );
 
@@ -475,6 +478,37 @@ function Navigation( {
 		'wp-block-navigation__overlay-menu-preview',
 		{ open: overlayMenuPreview }
 	);
+
+	if ( isLoading ) {
+		return (
+			<nav { ...blockProps }>
+				<Spinner className="wp-block-navigation__loading-indicator" />
+			</nav>
+		);
+	}
+
+	if ( isPlaceholderShown ) {
+		return (
+			<nav { ...blockProps }>
+				<PlaceholderComponent
+					isSelected={ isSelected }
+					onFinish={ ( post ) => {
+						if ( post ) {
+							setRef( post.id );
+						}
+						selectBlock( clientId );
+					} }
+					canSwitchNavigationMenu={ canSwitchNavigationMenu }
+					hasResolvedNavigationMenus={ hasResolvedNavigationMenus }
+					clientId={ clientId }
+					canUserCreateNavigationMenu={ canUserCreateNavigationMenu }
+					isResolvingCanUserCreateNavigationMenu={
+						isResolvingCanUserCreateNavigationMenu
+					}
+				/>
+			</nav>
+		);
+	}
 
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
@@ -649,30 +683,6 @@ function Navigation( {
 					</InspectorControls>
 				) }
 				<nav { ...blockProps }>
-					{ isPlaceholderShown && (
-						<PlaceholderComponent
-							currentMenuId={ ref }
-							onFinish={ ( post ) => {
-								setIsPlaceholderShown( false );
-								if ( post ) {
-									setRef( post.id );
-								}
-								selectBlock( clientId );
-							} }
-							canSwitchNavigationMenu={ canSwitchNavigationMenu }
-							hasResolvedNavigationMenus={
-								hasResolvedNavigationMenus
-							}
-							clientId={ clientId }
-							canUserCreateNavigationMenu={
-								canUserCreateNavigationMenu
-							}
-						/>
-					) }
-					{ ! hasResolvedCanUserCreateNavigationMenu ||
-						( ! isEntityAvailable && ! isPlaceholderShown && (
-							<PlaceholderPreview isLoading />
-						) ) }
 					{ ! isPlaceholderShown && (
 						<ResponsiveWrapper
 							id={ clientId }
@@ -687,7 +697,6 @@ function Navigation( {
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks
-									isVisible={ ! isPlaceholderShown }
 									clientId={ clientId }
 									hasCustomPlaceholder={
 										!! CustomPlaceholder

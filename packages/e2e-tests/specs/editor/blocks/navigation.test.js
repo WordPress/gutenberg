@@ -264,7 +264,131 @@ describe( 'Navigation', () => {
 		await deleteUser( contributorUsername );
 	} );
 
-	describe( 'placeholder', () => {
+	describe( 'loading states', () => {
+		it( 'does not show a loading indicator if there is no ref to a Navigation post', async () => {
+			await createNewPost();
+			await clickOnMoreMenuItem( 'Code editor' );
+			const codeEditorInput = await page.waitForSelector(
+				'.editor-post-text-editor'
+			);
+			await codeEditorInput.click();
+			const markup = '<!-- wp:navigation /-->';
+			await page.keyboard.type( markup );
+			await clickButton( 'Exit code editor' );
+
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Test specifically for the primary loading indicator because a spinner also exists
+			// in the hidden Placeholder component when it is loading.
+			const loadingSpinner = await navBlock.$(
+				'.wp-block-navigation__loading-indicator.components-spinner'
+			);
+
+			expect( loadingSpinner ).toBeNull();
+		} );
+
+		it( 'shows a loading indicator whilst ref resolves to Navigation post items', async () => {
+			let resolveNavigationRequest;
+
+			const testNavId = 1;
+
+			await setUpResponseMocking( [
+				{
+					match: ( request ) =>
+						request.url().includes( `rest_route` ) &&
+						request.url().includes( `navigation` ) &&
+						request.url().includes( testNavId ),
+					onRequestMatch: () => {
+						return new Promise( ( resolve ) => {
+							resolveNavigationRequest = resolve;
+						} );
+					},
+				},
+			] );
+
+			await createNewPost();
+			await clickOnMoreMenuItem( 'Code editor' );
+			const codeEditorInput = await page.waitForSelector(
+				'.editor-post-text-editor'
+			);
+			await codeEditorInput.click();
+			const markup = `<!-- wp:navigation {"ref":${ testNavId }} /-->`;
+			await page.keyboard.type( markup );
+			await clickButton( 'Exit code editor' );
+
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Check for the spinner to be present whilst loading.
+			await navBlock.waitForSelector( '.components-spinner' );
+
+			// Resolve the mocked API request.
+			resolveNavigationRequest();
+		} );
+	} );
+
+	describe( 'placeholder states', () => {
+		it( 'shows placeholder on insertion of block', async () => {
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+			await page.waitForXPath( START_EMPTY_XPATH );
+		} );
+
+		it( 'shows placeholder preview when unconfigured block is not selected', async () => {
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			// Check for unconfigured Placeholder state to display
+			await page.waitForXPath( START_EMPTY_XPATH );
+
+			// Deselect the Nav block.
+			await page.keyboard.press( 'Escape' );
+			await page.keyboard.press( 'Escape' );
+
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Check Placeholder Preview is visible.
+			await navBlock.waitForSelector(
+				'.wp-block-navigation-placeholder__preview',
+				{ visible: true }
+			);
+
+			// Check Placeholder Component itself is not visible.
+			await navBlock.waitForSelector(
+				'.wp-block-navigation-placeholder__controls',
+				{ visible: false }
+			);
+		} );
+
+		it( 'shows placeholder preview when block with no menu items is not selected', async () => {
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			// Create empty Navigation block with no items
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+			await startEmptyButton.click();
+
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Deselect the Nav block.
+			await page.keyboard.press( 'Escape' );
+			await page.keyboard.press( 'Escape' );
+
+			// Check Placeholder Preview is visible.
+			await navBlock.waitForSelector(
+				'.wp-block-navigation-placeholder__preview',
+				{ visible: true }
+			);
+
+			// Check the block's appender is not visible.
+			const blockAppender = await navBlock.$( '.block-list-appender' );
+
+			expect( blockAppender ).toBeNull();
+		} );
+	} );
+
+	describe( 'placeholder actions', () => {
 		it( 'allows a navigation block to be created from existing menus', async () => {
 			await createClassicMenu( { name: 'Test Menu 1' } );
 			await createClassicMenu(
@@ -294,7 +418,7 @@ describe( 'Navigation', () => {
 			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 		} );
 
-		it( 'does not display the options to create from pages or menus if there are none', async () => {
+		it( 'does not display the options to create from existing menus if there are no existing menus', async () => {
 			await createNewPost();
 
 			await insertBlock( 'Navigation' );
