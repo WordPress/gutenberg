@@ -18,9 +18,12 @@ const load = () => {
 		const blockSelector = `.wp-block-${ blockName.replace( 'core/', '' ) }`; // TODO: Need a better mechanism here.
 
 		// TODO: Need to include blocks' current attributes.
-		const attributes = { [ attribute ]: newValue };
 		// Fetch the HTML of the new block.
-		const html = await fetchRenderedBlock( blockName, attributes, nonce );
+		const html = await fetchRenderedBlock(
+			blockName,
+			{ [ attribute ]: newValue },
+			nonce
+		);
 
 		// Find the root of the real DOM.
 		const root = e.target.closest( blockSelector );
@@ -43,16 +46,14 @@ window.addEventListener( 'load', load );
 
 async function fetchRenderedBlock( blockName, attributes, nonce ) {
 	// TODO: Auth should be done inside of this function (or ideally not at all.)
-	let route = `wp/v2/block-renderer/${ blockName }`;
-	if ( Object.keys( attributes ).length ) {
-		const queryArgs = new URLSearchParams( attributes );
-		route += '?' + queryArgs.toString();
-	}
+	const route = `wp/v2/block-renderer/${ blockName }`;
 	const restApiBase = document.head.querySelector(
 		'link[rel="https://api.w.org/"]'
 	).href;
 	const url = new URL( restApiBase + route );
-	//url.searchParams.append( 'rest_route', route );
+	for ( const attr in attributes ) {
+		url.searchParams.append( `attributes[${ attr }]`, attributes[ attr ] );
+	}
 	url.searchParams.append( 'context', 'edit' );
 	url.searchParams.append( '_locale', 'user' );
 
