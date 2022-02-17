@@ -132,10 +132,10 @@
 /lib                                                                 @timothybjacobs @spacedmonkey
 /lib/global-styles.php                                               @timothybjabocs @spacedmonkey @oandregal
 /lib/class-wp-rest-block-editor-settings-controller.php              @timothybjacobs @spacedmonkey @geriux @antonis
-/lib/compat/wordpress-5.9/theme.json                                                      @timothybjabocs @spacedmonkey @oandregal
 /lib/compat/wordpress-5.9/theme-i18n.json                                                 @timothybjabocs @spacedmonkey @oandregal
 /lib/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @oandregal
 /lib/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php @timothybjabocs @spacedmonkey @oandregal
+/lib/compat/wordpress-6.0/theme.json                                                      @timothybjabocs @spacedmonkey @oandregal
 /lib/full-site-editing                                               @janw-me
 /phpunit/class-wp-theme-json-test.php                                @oandregal
 

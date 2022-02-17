@@ -184,6 +184,9 @@
 			],
 			"text": true
 		},
+		"layout": {
+			"position": false
+		},
 		"spacing": {
 			"blockGap": null,
 			"margin": false,

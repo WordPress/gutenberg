@@ -119,7 +119,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return static::$core;
 		}
 
-		$config       = static::read_json_file( __DIR__ . '/theme.json' );
+		$config       = static::read_json_file( __DIR__ . '/../wordpress-6.0/theme.json' );
 		$config       = static::translate( $config );
 		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 
