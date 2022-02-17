@@ -604,7 +604,7 @@ add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
  *
  * @param string $style String containing the CSS styles to be added.
  */
-function gutenberg_enqueue_block_support( $style ) {
+function gutenberg_enqueue_block_support_styles( $style ) {
 	$action_hook_name = 'wp_footer';
 	if ( wp_is_block_theme() ) {
 		$action_hook_name = 'wp_enqueue_scripts';
