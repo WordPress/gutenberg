@@ -78,7 +78,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 }
 ```
 
-Now let's make the button display the form we just created. As this tutorial is not focused on web design, we will wire the two using a component that requires the least code: [`Modal`](https://developer.wordpress.org/block-editor/reference-guides/components/modal/). Let's update `PageEditButton` accordingly:
+Now let's make the button display the form we just created. As this tutorial is not focused on web design, we will wire the two together using a component that requires the least code: [`Modal`](https://developer.wordpress.org/block-editor/reference-guides/components/modal/). Let's update `PageEditButton` accordingly:
 
 ```js
 import { Button, Modal, TextControl } from '@wordpress/components';
