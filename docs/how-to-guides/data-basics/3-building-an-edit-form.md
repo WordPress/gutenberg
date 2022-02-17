@@ -180,7 +180,13 @@ const pageId = wp.data.select( 'core' ).getEntityRecords( 'postType', 'page' )[0
 wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'page', pageId, { title: 'updated title' } );
 ```
 
-At this point, you may ask _How is `editEntityRecord` this better than `useState`?_ It offers a few features you wouldn't otherwise get. We can save the changes as easily as we retrieve the data and ensure that all caches will be correctly updated. In addition, the changes applied via `editEntityRecord` are easily undo-able via the `undo` and `redo` actions. Finally,  Because the changes live in the Redux state, other components can access them. For example, we could make the `PagesList` display the currently edited title.
+At this point, you may ask _how is `editEntityRecord` better than `useState`? The answer is that it offers a few features you wouldn't otherwise get. 
+
+Firstly, we can save the changes as easily as we retrieve the data and ensure that all caches will be correctly updated. 
+
+Secondly, the changes applied via `editEntityRecord` are easily undo-able via the `undo` and `redo` actions. 
+
+Lastly, because the changes live in the _Redux_ state, they are "global" and can be accessed by other components. For example, we could make the `PagesList` display the currently edited title.
 
 To that last point, let's see what happens when we use `getEntityRecord` to access the entity record we just updated:
 
