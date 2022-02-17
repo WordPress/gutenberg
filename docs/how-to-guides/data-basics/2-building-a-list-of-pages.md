@@ -92,6 +92,7 @@ Putting it together, we get the following code:
 ```js
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 function MyFirstApp() {
 	const pages = useSelect(
@@ -107,7 +108,7 @@ function PagesList( { pages } ) {
 		<ul>
 			{ pages?.map( page => (
 				<li key={ page.id }>
-					{ page.title.rendered }
+					{ decodeEntities( page.title.rendered ) }
 				</li>
 			) ) }
 		</ul>
@@ -133,7 +134,7 @@ function PagesList( { pages } ) {
 			<tbody>
 				{ pages?.map( page => (
 					<tr key={ page.id }>
-						<td>{ page.title.rendered }</td>
+						<td>{ decodeEntities( page.title.rendered ) }</td>
 					</tr>
 				) ) }
 			</tbody>
@@ -433,7 +434,7 @@ function PagesList( { hasResolved, pages } ) {
 			<tbody>
 				{ pages?.map( ( page ) => (
 					<tr key={ page.id }>
-						<td>{ page.title.rendered }</td>
+						<td>{ decodeEntities( page.title.rendered ) }</td>
 					</tr>
 				) ) }
 			</tbody>

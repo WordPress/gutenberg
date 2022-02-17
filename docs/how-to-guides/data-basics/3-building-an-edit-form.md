@@ -10,6 +10,7 @@ We can't have an *Edit* form without an *Edit* Button, so let's start by adding 
 
 ```js
 import { Button } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 const PageEditButton = () => (
 	<Button variant="primary">
@@ -36,7 +37,7 @@ function PagesList( { hasResolved, pages } ) {
 			<tbody>
 				{ pages?.map( ( page ) => (
 					<tr key={page.id}>
-						<td>{ page.title.rendered }</td>
+						<td>{ decodeEntities( page.title.rendered ) }</td>
 						<td>
 							<PageEditButton pageId={ page.id } />
 						</td>
@@ -180,11 +181,11 @@ const pageId = wp.data.select( 'core' ).getEntityRecords( 'postType', 'page' )[0
 wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'page', pageId, { title: 'updated title' } );
 ```
 
-At this point, you may ask _how is `editEntityRecord` better than `useState`? The answer is that it offers a few features you wouldn't otherwise get. 
+At this point, you may ask _how is `editEntityRecord` better than `useState`? The answer is that it offers a few features you wouldn't otherwise get.
 
-Firstly, we can save the changes as easily as we retrieve the data and ensure that all caches will be correctly updated. 
+Firstly, we can save the changes as easily as we retrieve the data and ensure that all caches will be correctly updated.
 
-Secondly, the changes applied via `editEntityRecord` are easily undo-able via the `undo` and `redo` actions. 
+Secondly, the changes applied via `editEntityRecord` are easily undo-able via the `undo` and `redo` actions.
 
 Lastly, because the changes live in the _Redux_ state, they are "global" and can be accessed by other components. For example, we could make the `PagesList` display the currently edited title.
 
@@ -196,9 +197,9 @@ wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title
 
 It doesn't reflect the edits. What's going on?
 
-Well, let's imagine for a second that it would reflect the edits. If it did, then anything you typed in the title field would be _immediately_ displayed inside the `PagesList`. 
+Well, let's imagine for a second that it would reflect the edits. If it did, then anything you typed in the title field would be _immediately_ displayed inside the `PagesList`.
 
-Gutenberg Data solves this problem by distinguishing between *Entity Records* and *Edited Entity Records*. 
+Gutenberg Data solves this problem by distinguishing between *Entity Records* and *Edited Entity Records*.
 
 Calling `getEntityRecord` always returns the data retrieved _from the API_. To see the edits applied, we need to use `getEditedEntityRecord` instead:
 
