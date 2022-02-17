@@ -203,6 +203,14 @@ wp-env start
 wp-env start --xdebug=profile,trace,debug
 ```
 
+When you're running `wp-env` using `npm run`, like when working in the Gutenberg repo or when having `wp-env` as a local project dependency, don't forget to add an extra dash before the `--xdebug` command:
+
+```sh
+npm run wp-env start -- --xdebug
+```
+
+If you forget about that, the `--xdebug` parameter will be passed to NPM instead of the `wp-env start` command and it will be ignored.
+
 You can see a reference on each of the Xdebug modes and what they do in the [Xdebug documentation](https://xdebug.org/docs/all_settings#mode).
 
 _Since we are only installing Xdebug 3, Xdebug is only supported for PHP versions greater than or equal to 7.2 (the default). Xdebug won't be installed if `phpVersion` is set to a legacy version._
@@ -224,6 +232,8 @@ You should only have to translate `port` and `pathMappings` to the format used b
 	}
 }
 ```
+
+After you create a `.vscode/launch.json` file in your repository, you probably want to add it to your [global gitignore file](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer) so that it stays private for you and is not committed to the repository.
 
 Once your IDEs Xdebug settings have been enabled, you should just have to launch the debugger, put a breakpoint on any line of PHP code, and then refresh your browser!
 
