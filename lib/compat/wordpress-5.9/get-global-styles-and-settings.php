@@ -5,38 +5,33 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( 'wp_get_global_settings' ) ) {
-	/**
-	 * Function to get the settings resulting of merging core, theme, and user data.
-	 *
-	 * @param array $path    Path to the specific setting to retrieve. Optional.
-	 *                       If empty, will return all settings.
-	 * @param array $context {
-	 *     Metadata to know where to retrieve the $path from. Optional.
-	 *
-	 *     @type string $block_name Which block to retrieve the settings from.
-	 *                              If empty, it'll return the settings for the global context.
-	 *     @type string $origin     Which origin to take data from.
-	 *                              Valid values are 'all' (core, theme, and user) or 'base' (core and theme).
-	 *                              If empty or unknown, 'all' is used.
-	 * }
-	 *
-	 * @return array The settings to retrieve.
-	 */
-	function wp_get_global_settings( $path = array(), $context = array() ) {
-		if ( ! empty( $context['block_name'] ) ) {
-			$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
-		}
-
-		$origin = 'custom';
-		if ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
-			$origin = 'theme';
-		}
-
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
-
-		return _wp_array_get( $settings, $path, $settings );
+/**
+ * Function to get the settings resulting of merging core, theme, and user data.
+ *
+ * @param array $path    Path to the specific setting to retrieve. Optional.
+ *                       If empty, will return all settings.
+ * @param array $context {
+ *     Metadata to know where to retrieve the $path from. Optional.
+ *
+ *     @type string $block_name Which block to retrieve the settings from.
+ *                              If empty, it'll return the settings for the global context.
+ *     @type string $origin     Which origin to take data from.
+ *                              Valid values are 'all' (core, theme, and user) or 'base' (core and theme).
+ *                              If empty or unknown, 'all' is used.
+ * }
+ *
+ * @return array The settings to retrieve.
+ */
+function gutenberg_get_global_settings( $path = array(), $context = array() ) {
+	if ( ! empty( $context['block_name'] ) ) {
+		$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
 	}
+	$origin = 'custom';
+	if ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
+		$origin = 'theme';
+	}
+	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
+	return _wp_array_get( $settings, $path, $settings );
 }
 
 if ( ! function_exists( 'wp_get_global_styles' ) ) {
