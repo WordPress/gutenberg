@@ -170,7 +170,7 @@ export function VanillaReactForm({ initialTitle }) {
 }
 ```
 
-Updating entity records in Gutenberg Data is similar. We don't use `useState`, though. The counterpart of `setTitle` is an `editEntityRecord` action which stores the updates in the Redux state. Here's how you can try it out in your browser's dev tools:
+Updating entity records in Gutenberg Data is similar but instead of using `setTitle` to store in local state, we use the `editEntityRecord` action which stores the updates in the _Redux_ state. Here's how you can try it out in your browser's dev tools:
 
 ```js
 // Get a real page ID first
