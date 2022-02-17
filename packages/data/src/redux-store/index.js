@@ -339,7 +339,7 @@ function mapResolveSelectors( selectors, store ) {
 						args
 					);
 					if ( hasFailed ) {
-						const error = selectors.getResolutionFailure(
+						const error = selectors.getResolutionError(
 							selectorName,
 							args
 						);

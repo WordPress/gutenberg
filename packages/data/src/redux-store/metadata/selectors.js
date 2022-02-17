@@ -102,7 +102,7 @@ export function hasResolutionFailed( state, selectorName, args ) {
  *
  * @return {Error|undefined} Last resolution error
  */
-export function getResolutionFailure( state, selectorName, args ) {
+export function getResolutionError( state, selectorName, args ) {
 	return getResolutionState( state, selectorName, args )?.error;
 }
 
