@@ -195,6 +195,7 @@ export default function TemplatePartEdit( {
 					}
 				>
 					<TemplatePartSelectionModal
+						templatePartId={ templatePartId }
 						clientId={ clientId }
 						area={ area }
 						setAttributes={ setAttributes }

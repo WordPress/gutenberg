@@ -7,7 +7,10 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { useAsyncList } from '@wordpress/compose';
-import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
+import {
+	__experimentalBlockPatternsList as BlockPatternsList,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -28,6 +31,9 @@ export default function TemplatePartSelectionModal( {
 	area,
 	clientId,
 } ) {
+	// When the templatePartId is undefined,
+	// it means the user is creating a new one from the placeholder.
+	const isReplacingTemplatePartContent = !! templatePartId;
 	const areaObject = useTemplatePartArea( area );
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
@@ -48,6 +54,7 @@ export default function TemplatePartSelectionModal( {
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
 	const [ selectedBlocks, setSelectedBlocks ] = useState( [] );
 	const shownBlockPatterns = useAsyncList( blockPatterns );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	const onTemplatePartSelect = useCallback( ( templatePart ) => {
 		setAttributes( {
@@ -96,8 +103,13 @@ export default function TemplatePartSelectionModal( {
 							blockPatterns={ blockPatterns }
 							shownPatterns={ shownBlockPatterns }
 							onClickPattern={ ( _, blocks ) => {
-								setSelectedBlocks( blocks );
-								setShowTitleModal( true );
+								if ( isReplacingTemplatePartContent ) {
+									replaceInnerBlocks( clientId, blocks );
+									onClose();
+								} else {
+									setSelectedBlocks( blocks );
+									setShowTitleModal( true );
+								}
 							} }
 						/>
 					</div>
