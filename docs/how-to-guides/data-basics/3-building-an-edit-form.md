@@ -156,7 +156,7 @@ Now it should look like that:
 There's one problem with our _Page title_ field: you can't edit it. It receives a fixed `value` but doesn't update it when typing. We need an `onChange` handler.
 
 
-You may have seen a pattern similar to this one in other React apps:
+You may have seen a pattern similar to this one in other React apps. It's known as a ["controlled component"](https://reactjs.org/docs/forms.html#controlled-components):
 
 ```js
 export function VanillaReactForm({ initialTitle }) {
