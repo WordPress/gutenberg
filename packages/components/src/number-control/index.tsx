@@ -19,6 +19,7 @@ import { composeStateReducers } from '../input-control/reducer/reducer';
 import { add, subtract, roundClamp } from '../utils/math';
 import { isValueEmpty } from '../utils/values';
 import type { Props } from './types';
+import type { DragAction } from '../input-control/reducer/actions';
 
 // TODO: is there a "safer" version? Should we strip white space, etc?
 const ensureNumber = ( n: string | number ) =>
@@ -117,10 +118,9 @@ export function NumberControl(
 		 * Handles drag to update events
 		 */
 		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-			// @ts-ignore
-			const [ x, y ] = payload.delta;
-			// @ts-ignore
-			const enableShift = payload.shiftKey && isShiftStepEnabled;
+			const { payload: dragPayload } = action as DragAction;
+			const [ x, y ] = dragPayload.delta;
+			const enableShift = dragPayload.shiftKey && isShiftStepEnabled;
 			const modifier = enableShift ? shiftStep * baseStep : baseStep;
 
 			let directionModifier;
