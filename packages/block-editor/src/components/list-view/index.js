@@ -143,7 +143,7 @@ function ListView(
 		},
 		[ collapse ]
 	);
-	const changeRow = useCallback(
+	const focusRow = useCallback(
 		( event, startRow, endRow ) => {
 			if ( event.shiftKey ) {
 				updateBlockSelection(
@@ -191,7 +191,7 @@ function ListView(
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
-				onChangeRow={ changeRow }
+				onFocusRow={ focusRow }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch

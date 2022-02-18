@@ -112,7 +112,7 @@ Aside from the documented callback functions, any props specified will be passed
 
 `TreeGrid` should always have children.
 
-###### onChangeRow( event: Event, startRow: HTMLElement, destinationRow: HTMLElement )
+###### onFocusRow( event: Event, startRow: HTMLElement, destinationRow: HTMLElement )
 
 Callback that fires when focus is shifted from one row to another via the UP and DOWN keys.
 The callback is passed the event, the start row element that the focus was on originally, and
