@@ -8,5 +8,5 @@ You may review the [finished app](https://github.com/WordPress/gutenberg-example
 
 ### Table of Contents
 
-1. [Setup](./1-data-basics-setup)
-2. [Building a basic list of pages](./2-building-a-list-of-pages)
+1. [Setup](/docs/how-to-guides/data-basics/1-data-basics-setup.md)
+2. [Building a basic list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
