@@ -73,6 +73,9 @@ export type ContextualField<
  *     bar: never;
  *   }
  * }
+ * const x = {} as OmitNevers<MyType>;
+ * // x is of type { foo: string; nested: { foo: string; }}
+ * // The `never` properties were removed entirely
  * ```
  */
 export type OmitNevers<

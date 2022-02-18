@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { Context, ContextualField, OmitNevers } from './common';
-import { FullWidget } from "./widget";
+import { FullWidget } from './widget';
 
 interface FullTaxonomy< C extends Context > {
 	/**
