@@ -4,8 +4,8 @@
 import { Attachment } from './attachment';
 import { Comment } from './comment';
 import { MenuLocation } from './menu-location';
-import { NavMenu } from './nav_menu';
-import { NavMenuItem } from './nav_menu_item';
+import { NavMenu } from './nav-menu';
+import { NavMenuItem } from './nav-menu-item';
 import { NavigationArea } from './navigation-area';
 import { Page } from './page';
 import { Plugin } from './plugin';
@@ -18,8 +18,8 @@ import { User } from './user';
 import { Type } from './type';
 import { Widget } from './widget';
 import { WidgetType } from './widget-type';
-import { WpTemplate } from './wp_template';
-import { WpTemplatePart } from './wp_template_part';
+import { WpTemplate } from './wp-template';
+import { WpTemplatePart } from './wp-template-part';
 import { Context, RenderedText } from './common';
 
 export {
