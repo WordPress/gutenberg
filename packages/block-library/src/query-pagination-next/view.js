@@ -23,7 +23,7 @@ const load = () => {
 		for ( const attr in root.dataset ) {
 			try {
 				attributes[ attr ] = JSON.parse( root.dataset[ attr ] );
-			} catch ( e ) {
+			} catch ( err ) {
 				attributes[ attr ] = root.dataset[ attr ];
 			}
 		}
