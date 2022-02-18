@@ -1,7 +1,13 @@
 /**
  * Internal dependencies
  */
-import { AvatarUrls, Context, ContextualField, RenderedText } from './common';
+import {
+	AvatarUrls,
+	Context,
+	ContextualField,
+	OmitNevers,
+	RenderedText,
+} from './common';
 
 export type CommentStatus = 'hold' | 'approve' | 'spam' | 'trash' | '1' | '0';
 interface FullComment< C extends Context > {
@@ -75,4 +81,4 @@ interface FullComment< C extends Context > {
 	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 }
 
-export type Comment< C extends Context > = FullComment< C >;
+export type Comment< C extends Context > = OmitNevers< FullComment< C > >;
