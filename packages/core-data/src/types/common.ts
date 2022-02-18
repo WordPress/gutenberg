@@ -55,15 +55,21 @@ export type OmitNevers<
 >;
 
 /**
- * The raw data representation.
+ * A string that the server renders which often involves
+ * modifications from the raw source string.
+ *
+ * For example, block HTML with the comment delimiters exists
+ * in `post_content` but those comments are stripped out when
+ * rendering to a page view. Similarly, plugins might modify
+ * content or replace shortcodes.
  */
 export interface RenderedText< C extends Context > {
 	/**
-	 * Data as it exists in the database.
+	 * The source string which will be rendered on page views.
 	 */
 	raw: ContextualField< string, 'edit', C >;
 	/**
-	 * Data transformed for display.
+	 * The output of the raw source after processing and filtering on the server.
 	 */
 	rendered: string;
 }
