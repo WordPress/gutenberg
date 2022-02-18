@@ -15,6 +15,7 @@ import useConvertClassicMenu from '../use-convert-classic-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
 
 export default function NavigationMenuSelector( {
+	currentMenuId,
 	clientId,
 	onSelect,
 	onCreateNew,
@@ -34,6 +35,12 @@ export default function NavigationMenuSelector( {
 		canUserUpdateNavigationMenu,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
+
+	// Avoid showing any currently active menu in the list of
+	// menus that can be selected.
+	const navigationMenusOmitCurrent = navigationMenus.filter(
+		( menu ) => ! currentMenuId || menu.id !== currentMenuId
+	);
 
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
@@ -56,7 +63,7 @@ export default function NavigationMenuSelector( {
 		onFinishMenuCreation
 	);
 
-	const hasNavigationMenus = !! navigationMenus?.length;
+	const hasNavigationMenus = !! navigationMenusOmitCurrent?.length;
 	const hasClassicMenus = !! classicMenus?.length;
 	const showNavigationMenus = !! canSwitchNavigationMenu;
 	const showClassicMenus = !! canUserCreateNavigationMenu;
@@ -74,7 +81,7 @@ export default function NavigationMenuSelector( {
 		<>
 			{ showNavigationMenus && hasNavigationMenus && (
 				<MenuGroup label={ __( 'Menus' ) }>
-					{ navigationMenus.map( ( menu ) => {
+					{ navigationMenusOmitCurrent.map( ( menu ) => {
 						const label = decodeEntities( menu.title.rendered );
 						return (
 							<MenuItem

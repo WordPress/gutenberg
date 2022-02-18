@@ -16,6 +16,7 @@ import useCreateNavigationMenu from '../use-create-navigation-menu';
 import NavigationMenuSelector from '../navigation-menu-selector';
 
 export default function NavigationPlaceholder( {
+	currentMenuId,
 	clientId,
 	onFinish,
 	canSwitchNavigationMenu,
@@ -91,6 +92,7 @@ export default function NavigationPlaceholder( {
 									>
 										{ () => (
 											<NavigationMenuSelector
+												currentMenuId={ currentMenuId }
 												clientId={ clientId }
 												onSelect={ onFinish }
 											/>

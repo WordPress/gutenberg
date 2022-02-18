@@ -490,6 +490,7 @@ function Navigation( {
 							>
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
+										currentMenuId={ ref }
 										clientId={ clientId }
 										onSelect={ ( { id } ) => {
 											setRef( id );
@@ -660,6 +661,7 @@ function Navigation( {
 				<nav { ...blockProps }>
 					{ isPlaceholderShown && (
 						<PlaceholderComponent
+							currentMenuId={ ref }
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
 								if ( post ) {
