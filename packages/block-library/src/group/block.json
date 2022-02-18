@@ -29,6 +29,12 @@
 				"text": true
 			}
 		},
+		"__experimentalDimensions": {
+			"height": true,
+			"__experimentalDefaultControls": {
+				"height": true
+			}
+		},
 		"spacing": {
 			"padding": true,
 			"blockGap": true,
