@@ -96,8 +96,8 @@ describe( 'Gallery block', () => {
 			media,
 		} );
 
-		const appenderButton = within( galleryBlock ).getByA11yLabel(
-			/Gallery block\. Empty/
+		const appenderButton = within( galleryBlock ).getByTestId(
+			'media-placeholder-appender-icon'
 		);
 		fireEvent.press( appenderButton );
 
