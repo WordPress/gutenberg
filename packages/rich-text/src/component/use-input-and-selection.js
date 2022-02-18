@@ -136,13 +136,14 @@ export function useInputAndSelection( props ) {
 				const selection = defaultView.getSelection();
 				const { anchorNode, focusNode } = selection;
 
-				if (
-					element.contains( anchorNode ) ||
-					element.contains( focusNode )
-				) {
-					const { start, end } = createRecord();
+				if ( element.contains( anchorNode ) ) {
+					const { start, end: offset = start } = createRecord();
 					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
-					onSelectionChange( start, end );
+					onSelectionChange( offset );
+				} else if ( element.contains( focusNode ) ) {
+					const { start, end: offset = start } = createRecord();
+					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
+					onSelectionChange( undefined, offset );
 				}
 				return;
 			}
