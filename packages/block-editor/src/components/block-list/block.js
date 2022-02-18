@@ -15,8 +15,8 @@ import {
 } from '@wordpress/element';
 import {
 	getBlockType,
-	getSaveContent,
 	isUnmodifiedDefaultBlock,
+	serializeRawBlock,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import {
@@ -74,6 +74,7 @@ function Block( { children, isHtml, ...props } ) {
 }
 
 function BlockListBlock( {
+	block: { source },
 	mode,
 	isLocked,
 	canRemove,
@@ -155,7 +156,7 @@ function BlockListBlock( {
 	let block;
 
 	if ( ! isValid ) {
-		const saveContent = getSaveContent( blockType, attributes );
+		const saveContent = serializeRawBlock( source );
 
 		block = (
 			<Block className="has-warning">

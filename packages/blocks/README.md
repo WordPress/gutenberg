@@ -735,6 +735,31 @@ _Returns_
 
 -   `string`: The post content.
 
+### serializeRawBlock
+
+Serializes a block node into the native HTML-comment-powered block format.
+CAVEAT: This function is intended for reserializing blocks as parsed by
+valid parsers and skips any validation steps. This is NOT a generic
+serialization function for in-memory blocks. For most purposes, see the
+following functions available in the `@wordpress/blocks` package:
+
+_Related_
+
+-   serializeBlock
+-   serialize For more on the format of block nodes as returned by valid parsers:
+-   `@wordpress/block-serialization-default-parser` package
+-   `@wordpress/block-serialization-spec-parser` package
+
+_Parameters_
+
+-   _rawBlock_ `import(".").WPRawBlock`: A block node as returned by a valid parser.
+-   _options_ `?Object`: Serialization options.
+-   _options.isCommentDelimited_ `?boolean`: Whether to output HTML comments around blocks.
+
+_Returns_
+
+-   `string`: An HTML string representing a block.
+
 ### setCategories
 
 Sets the block categories.
