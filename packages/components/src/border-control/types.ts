@@ -58,6 +58,8 @@ export type BorderControlProps = ColorProps &
 		/**
 		 * This controls whether to include border style options within the
 		 * `BorderDropdown` sub-component.
+		 *
+		 * @default true
 		 */
 		enableStyle?: boolean;
 		/**
