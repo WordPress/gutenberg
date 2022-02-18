@@ -91,6 +91,7 @@ Settings related to typography.
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textDecoration | boolean | true |  |
+| writingMode | boolean | true |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
 | fontSizes | array |  | name, size, slug |
@@ -157,6 +158,7 @@ Typography styles.
 | letterSpacing | string |  |
 | lineHeight | string |  |
 | textDecoration | string |  |
+| writingMode | string |  |
 | textTransform | string |  |
 
 ---
