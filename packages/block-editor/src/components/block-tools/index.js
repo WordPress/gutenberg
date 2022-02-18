@@ -128,11 +128,14 @@ export default function BlockTools( {
 			const { ownerDocument } = event.target;
 			const { defaultView } = ownerDocument;
 			const { anchorNode, focusNode } = defaultView.getSelection();
+			const blockA = getBlockNode( anchorNode );
+			const blockB = getBlockNode( focusNode );
 
 			// To do: find other way to check if blocks are mergeable.
 			if (
-				isSimpleContentEditable( getBlockNode( anchorNode ) ) &&
-				isSimpleContentEditable( getBlockNode( focusNode ) )
+				isSimpleContentEditable( blockA ) &&
+				isSimpleContentEditable( blockB ) &&
+				blockA !== blockB
 			) {
 				mergeBlocks(
 					first( clientIds ),
