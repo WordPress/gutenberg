@@ -1,23 +1,25 @@
 /**
+ * External dependencies
+ */
+import type { AnyAction, Reducer } from 'redux';
+
+/**
  * Higher-order reducer creator which creates a combined reducer object, keyed
  * by a property on the action object.
  *
- * @template {any} TState
- * @template {import('redux').AnyAction} TAction
- *
- * @param {string} actionProperty Action property by which to key object.
- *
- * @return {(reducer: import('redux').Reducer<TState, TAction>) => import('redux').Reducer<Record<string, TState>, TAction>} Higher-order reducer.
+ * @param  actionProperty Action property by which to key object.
+ * @return Higher-order reducer.
  */
-export const onSubKey = ( actionProperty ) => ( reducer ) => (
-	/* eslint-disable jsdoc/no-undefined-types */
-	state = /** @type {Record<string, TState>} */ ( {} ),
+export const onSubKey = < TState extends unknown, TAction extends AnyAction >(
+	actionProperty: string
+) => (
+	reducer: Reducer< TState, TAction >
+): Reducer< Record< string, TState >, TAction > => (
+	state: Record< string, TState > = {},
 	action
 ) => {
 	// Retrieve subkey from action. Do not track if undefined; useful for cases
 	// where reducer is scoped by action shape.
-	/** @type {keyof state} */
-	/* eslint-enable jsdoc/no-undefined-types */
 	const key = action[ actionProperty ];
 	if ( key === undefined ) {
 		return state;
