@@ -9,6 +9,7 @@ import { css } from '@emotion/react';
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 import { StyledLabel } from '../base-control/styles/base-control-styles';
+import { BackdropUI } from '../input-control/styles/input-control-styles';
 
 export const BorderControl = css`
 	position: relative;
@@ -113,8 +114,8 @@ export const ResetButton = css`
 `;
 
 export const BorderWidthControl = css`
-	/* Target the UnitControl backdrop */
-	&&& > div > div {
+	/* Target the InputControl's backdrop */
+	&&& ${ BackdropUI } {
 		border: none;
 	}
 
