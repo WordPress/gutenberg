@@ -20,7 +20,17 @@ import {
 	getContributorProps,
 	getContributorsList,
 } from '../changelog';
-import pullRequests from './fixtures/pull-requests.json';
+import _pullRequests from './fixtures/pull-requests.json';
+import botPullRequestFixture from './fixtures/bot-pull-requests.json';
+
+/**
+ * pull-requests.json is a static snapshot of real data from the Github API.
+ * We merge this with dummy fixture data for a "bot" pull request so as to
+ * ensure future updates to the pull-requests.json doesn't reduce test coverage
+ * of filtering out of bot PRs.
+ * See: https://github.com/WordPress/gutenberg/pull/38777#discussion_r808992346.
+ */
+const pullRequests = _pullRequests.concat( botPullRequestFixture );
 
 describe( 'getNormalizedTitle', () => {
 	const DEFAULT_ISSUE = {
