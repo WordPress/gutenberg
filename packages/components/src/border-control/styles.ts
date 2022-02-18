@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG } from '../utils';
+import { COLORS, CONFIG, rtl } from '../utils';
 import { space } from '../ui/utils/space';
 import { StyledLabel } from '../base-control/styles/base-control-styles';
 import { BackdropUI } from '../input-control/styles/input-control-styles';
@@ -33,7 +33,7 @@ export const InnerWrapper = css`
 	 */
 	> div:last-child {
 		flex: 1;
-		margin-left: 0;
+		${ rtl( { marginLeft: 0 } )() }
 	}
 
 	/* If arbitrary width is supplied honor it. */
@@ -50,9 +50,17 @@ export const WrapperWidth = ( width: string ) => {
 };
 
 export const BorderControlDropdown = css`
-	border-radius: 1px 0 0 1px;
-	border-right: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
 	background: #fff;
+	${ rtl(
+		{
+			borderRadius: `1px 0 0 1px`,
+			borderRight: `${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] }`,
+		},
+		{
+			borderRadius: `0 1px 1px 0`,
+			borderLeft: `${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] }`,
+		}
+	)() }
 
 	&& > button {
 		padding: ${ space( 1 ) };
@@ -122,7 +130,7 @@ export const BorderWidthControl = css`
 	/* Specificity required to overcome UnitControl padding */
 	/* See packages/components/src/unit-control/styles/unit-control-styles.ts */
 	&&& input {
-		padding-right: 0;
+		${ rtl( { paddingRight: 0 } )() }
 	}
 `;
 
@@ -143,13 +151,13 @@ export const BorderStyleButton = css`
 		width: 30px;
 		height: 30px;
 		padding: 3px;
-		margin-right: ${ space( 1 ) };
+		${ rtl( { marginRight: space( 1 ) } )() }
 	}
 `;
 
 export const BorderSlider = css`
 	flex: 1 1 60%;
-	margin-right: ${ space( 3 ) };
+	${ rtl( { marginRight: space( 3 ) } )() }
 
 	> div {
 		margin-bottom: 0;
