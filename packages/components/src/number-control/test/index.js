@@ -54,7 +54,7 @@ describe( 'NumberControl', () => {
 			const spy = jest.fn();
 
 			render(
-				<NumberControl value={ 5 } onChange={ ( v ) => spy( v ) } />
+				<NumberControl value={ '5' } onChange={ ( v ) => spy( v ) } />
 			);
 
 			const input = getInput();
@@ -67,7 +67,7 @@ describe( 'NumberControl', () => {
 
 	describe( 'Validation', () => {
 		it( 'should clamp value within range on ENTER keypress', () => {
-			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
+			render( <NumberControl value={ '5' } min={ 0 } max={ 10 } /> );
 
 			const input = getInput();
 			input.focus();
@@ -83,7 +83,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should parse to number value on ENTER keypress when required', () => {
-			render( <NumberControl value={ 5 } required={ true } /> );
+			render( <NumberControl value={ '5' } required={ true } /> );
 
 			const input = getInput();
 			input.focus();
@@ -94,7 +94,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should parse to empty string on ENTER keypress when not required', () => {
-			render( <NumberControl value={ 5 } required={ false } /> );
+			render( <NumberControl value={ '5' } required={ false } /> );
 
 			const input = getInput();
 			input.focus();
@@ -105,7 +105,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should accept empty string on ENTER keypress for optional field', () => {
-			render( <NumberControl value={ 5 } required={ false } /> );
+			render( <NumberControl value={ '5' } required={ false } /> );
 
 			const input = getInput();
 			input.focus();
@@ -116,7 +116,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should not enforce numerical value for empty string when required is omitted', () => {
-			render( <NumberControl value={ 5 } /> );
+			render( <NumberControl value={ '5' } /> );
 
 			const input = getInput();
 			input.focus();
@@ -127,7 +127,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should enforce numerical value for empty string when required', () => {
-			render( <NumberControl value={ 5 } required={ true } /> );
+			render( <NumberControl value={ '5' } required={ true } /> );
 
 			const input = getInput();
 			input.focus();
@@ -142,7 +142,7 @@ describe( 'NumberControl', () => {
 		it( 'should fire onKeyDown callback', () => {
 			const spy = jest.fn();
 
-			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
+			render( <StatefulNumberControl value={ '5' } onKeyDown={ spy } /> );
 
 			getInput().focus();
 			fireKeyDown( { keyCode: UP } );
@@ -151,7 +151,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment by step on key UP press', () => {
-			render( <StatefulNumberControl value={ 5 } /> );
+			render( <StatefulNumberControl value={ '5' } /> );
 
 			const input = getInput();
 			input.focus();
@@ -161,7 +161,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment from a negative value', () => {
-			render( <StatefulNumberControl value={ -5 } /> );
+			render( <StatefulNumberControl value={ '-5' } /> );
 
 			const input = getInput();
 			input.focus();
@@ -171,7 +171,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment while preserving the decimal value when `step` is “any”', () => {
-			render( <StatefulNumberControl value={ 866.5309 } step="any" /> );
+			render( <StatefulNumberControl value={ '866.5309' } step="any" /> );
 
 			const input = getInput();
 			input.focus();
@@ -181,7 +181,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment by shiftStep on key UP + shift press', () => {
-			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
+			render( <StatefulNumberControl value={ '5' } shiftStep={ 10 } /> );
 
 			const input = getInput();
 			input.focus();
@@ -191,7 +191,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', () => {
-			render( <StatefulNumberControl value={ 857.5309 } step="any" /> );
+			render( <StatefulNumberControl value={ '857.5309' } step="any" /> );
 
 			const input = getInput();
 			input.focus();
@@ -201,7 +201,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment by custom shiftStep on key UP + shift press', () => {
-			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
+			render( <StatefulNumberControl value={ '5' } shiftStep={ 100 } /> );
 
 			const input = getInput();
 			input.focus();
@@ -213,7 +213,7 @@ describe( 'NumberControl', () => {
 		it( 'should increment but be limited by max on shiftStep', () => {
 			render(
 				<StatefulNumberControl
-					value={ 5 }
+					value={ '5' }
 					shiftStep={ 100 }
 					max={ 99 }
 				/>
@@ -229,7 +229,7 @@ describe( 'NumberControl', () => {
 		it( 'should not increment by shiftStep if disabled', () => {
 			render(
 				<StatefulNumberControl
-					value={ 5 }
+					value={ '5' }
 					shiftStep={ 100 }
 					isShiftStepEnabled={ false }
 				/>
@@ -246,7 +246,7 @@ describe( 'NumberControl', () => {
 	describe( 'Key DOWN interactions', () => {
 		it( 'should fire onKeyDown callback', () => {
 			const spy = jest.fn();
-			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
+			render( <StatefulNumberControl value={ '5' } onKeyDown={ spy } /> );
 
 			getInput().focus();
 			fireKeyDown( { keyCode: DOWN } );
@@ -255,7 +255,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement by step on key DOWN press', () => {
-			render( <StatefulNumberControl value={ 5 } /> );
+			render( <StatefulNumberControl value={ '5' } /> );
 
 			const input = getInput();
 			input.focus();
@@ -265,7 +265,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement from a negative value', () => {
-			render( <StatefulNumberControl value={ -5 } /> );
+			render( <StatefulNumberControl value={ '-5' } /> );
 
 			const input = getInput();
 			input.focus();
@@ -275,7 +275,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement while preserving the decimal value when `step` is “any”', () => {
-			render( <StatefulNumberControl value={ 868.5309 } step="any" /> );
+			render( <StatefulNumberControl value={ '868.5309' } step="any" /> );
 
 			const input = getInput();
 			input.focus();
@@ -285,7 +285,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement by shiftStep on key DOWN + shift press', () => {
-			render( <StatefulNumberControl value={ 5 } /> );
+			render( <StatefulNumberControl value={ '5' } /> );
 
 			const input = getInput();
 			input.focus();
@@ -295,7 +295,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', () => {
-			render( <StatefulNumberControl value={ 877.5309 } step="any" /> );
+			render( <StatefulNumberControl value={ '877.5309' } step="any" /> );
 
 			const input = getInput();
 			input.focus();
@@ -305,7 +305,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement by custom shiftStep on key DOWN + shift press', () => {
-			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
+			render( <StatefulNumberControl value={ '5' } shiftStep={ 100 } /> );
 
 			const input = getInput();
 			input.focus();
@@ -317,7 +317,7 @@ describe( 'NumberControl', () => {
 		it( 'should decrement but be limited by min on shiftStep', () => {
 			render(
 				<StatefulNumberControl
-					value={ 5 }
+					value={ '5' }
 					shiftStep={ 100 }
 					min={ 4 }
 				/>
@@ -333,7 +333,7 @@ describe( 'NumberControl', () => {
 		it( 'should not decrement by shiftStep if disabled', () => {
 			render(
 				<StatefulNumberControl
-					value={ 5 }
+					value={ '5' }
 					shiftStep={ 100 }
 					isShiftStepEnabled={ false }
 				/>
