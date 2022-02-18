@@ -77,7 +77,7 @@ Create a full plugin file, `index.php` like the following, the same PHP code wor
  * Plugin Name: Gutenberg examples 01
  */
 function gutenberg_examples_01_register_block() {
-	register_block_type( __DIR__ );
+	register_block_type_from_metadata( __DIR__ );
 }
 add_action( 'init', 'gutenberg_examples_01_register_block' );
 ```
