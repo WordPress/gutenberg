@@ -31,13 +31,52 @@ export type PostFormat =
 	| 'video'
 	| 'audio';
 
+/**
+ * The REST API context parameter.
+ */
 export type Context = 'view' | 'edit' | 'embed';
+
+/**
+ * A wrapper that turns fields unavailable in the current REST API contexts into
+ * the type `never`. It is typically paired with OmitNevers.
+ *
+ * @example
+ * ```ts
+ * type MyType< C extends Context > = {
+ *   good: ContextualField< string, 'view' | 'edit', C >;
+ *   bad: ContextualField< string, 'edit', C >;
+ * }
+ *
+ * const a = {} as MyType<'view'>;
+ * // a.good is of type string
+ * // b.bad is of type never
+ *
+ * const b = {} as OmitNevers<MyType<'view'>>;
+ * // a.good is of type string
+ * // there is no property b.bad
+ * ```
+ */
 export type ContextualField<
 	FieldType,
 	AvailableInContexts extends Context,
 	C extends Context
 > = AvailableInContexts extends C ? FieldType : never;
 
+/**
+ * Removes all the properties of type never, even the deeply nested ones.
+ *
+ * @example
+ * ```ts
+ * type MyType = {
+ *   foo: string;
+ *   bar: never;
+ *   nested: {
+ *     foo: string;
+ *     bar: never;
+ *   }
+ * }
+ * ```
+ */
 export type OmitNevers<
 	T,
 	Nevers = {
