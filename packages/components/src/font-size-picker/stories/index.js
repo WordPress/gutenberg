@@ -13,7 +13,13 @@ export default {
 	component: FontSizePicker,
 	argTypes: {
 		initialValue: { table: { disable: true } }, // hide prop because it's not actually part of FontSizePicker
+		fallbackFontSize: {
+			description:
+				'If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.',
+		},
 		withReset: {
+			description:
+				'If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` or `withSlider` is `true`.',
 			control: { type: 'boolean' },
 			table: {
 				type: 'boolean',
