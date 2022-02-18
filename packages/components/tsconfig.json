@@ -30,6 +30,7 @@
 		"src/button/**/*",
 		"src/card/**/*",
 		"src/circular-option-picker/**/*",
+		"src/color-indicator/**/*",
 		"src/color-palette/**/*",
 		"src/color-picker/**/*",
 		"src/confirm-dialog/**/*",

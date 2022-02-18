@@ -9,9 +9,7 @@ import { closeSmall } from '@wordpress/icons';
  */
 import BorderControlStylePicker from '../border-control-style-picker';
 import Button from '../../button';
-// @ts-ignore
 import ColorIndicator from '../../color-indicator';
-// @ts-ignore
 import ColorPalette from '../../color-palette';
 import Dropdown from '../../dropdown';
 import { HStack } from '../../h-stack';
