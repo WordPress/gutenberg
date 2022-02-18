@@ -371,7 +371,7 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
-			method: 'GET',
+			method: 'OPTIONS',
 			parse: false,
 		} );
 
