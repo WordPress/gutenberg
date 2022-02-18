@@ -47,6 +47,7 @@ function selector( select ) {
 		getMultiSelectedBlockClientIds,
 		hasMultiSelection,
 		getSelectedBlockClientId,
+		getSelectedBlocksInitialCaretPosition,
 	} = select( blockEditorStore );
 
 	return {
@@ -54,11 +55,13 @@ function selector( select ) {
 		multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 		hasMultiSelection: hasMultiSelection(),
 		selectedBlockClientId: getSelectedBlockClientId(),
+		initialPosition: getSelectedBlocksInitialCaretPosition(),
 	};
 }
 
 export default function useMultiSelection() {
 	const {
+		initialPosition,
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
@@ -77,6 +80,13 @@ export default function useMultiSelection() {
 		( node ) => {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
+
+			// Allow initialPosition to bypass focus behavior. This is useful
+			// for the list view or other areas where we don't want to transfer
+			// focus to the editor canvas.
+			if ( initialPosition === undefined || initialPosition === null ) {
+				return;
+			}
 
 			if ( ! hasMultiSelection || isMultiSelecting ) {
 				if ( ! selectedBlockClientId || isMultiSelecting ) {
@@ -146,6 +156,7 @@ export default function useMultiSelection() {
 			isMultiSelecting,
 			multiSelectedBlockClientIds,
 			selectedBlockClientId,
+			initialPosition,
 		]
 	);
 }

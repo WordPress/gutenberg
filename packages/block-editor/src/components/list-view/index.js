@@ -6,7 +6,7 @@ import {
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import {
 	useCallback,
 	useEffect,
@@ -23,11 +23,11 @@ import { __ } from '@wordpress/i18n';
 import ListViewBranch from './branch';
 import { ListViewContext } from './context';
 import ListViewDropIndicator from './drop-indicator';
+import useBlockSelection from './use-block-selection';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import { store as blockEditorStore } from '../../store';
 
-const noop = () => {};
 const expanded = ( state, action ) => {
 	switch ( action.type ) {
 		case 'expand':
@@ -44,20 +44,18 @@ const expanded = ( state, action ) => {
  * recursive component (it renders itself), so this ensures TreeGrid is only
  * present at the very top of the navigation grid.
  *
- * @param {Object}   props                                          Components props.
- * @param {Array}    props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {Function} props.onSelect                                 Block selection callback.
- * @param {boolean}  props.showNestedBlocks                         Flag to enable displaying nested blocks.
- * @param {boolean}  props.showBlockMovers                          Flag to enable block movers
- * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
- * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
- * @param {boolean}  props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
- * @param {Object}   ref                                            Forwarded ref
+ * @param {Object}  props                                          Components props.
+ * @param {Array}   props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean} props.showNestedBlocks                         Flag to enable displaying nested blocks.
+ * @param {boolean} props.showBlockMovers                          Flag to enable block movers
+ * @param {boolean} props.__experimentalFeatures                   Flag to enable experimental features.
+ * @param {boolean} props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
+ * @param {boolean} props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
+ * @param {Object}  ref                                            Forwarded ref
  */
 function ListView(
 	{
 		blocks,
-		onSelect = noop,
 		__experimentalFeatures,
 		__experimentalPersistentListViewFeatures,
 		__experimentalHideContainerBlockActions,
@@ -72,7 +70,7 @@ function ListView(
 		draggedClientIds,
 		selectedClientIds,
 	} = useListViewClientIds( blocks );
-	const { selectBlock } = useDispatch( blockEditorStore );
+
 	const { visibleBlockCount } = useSelect(
 		( select ) => {
 			const { getGlobalBlockCount, getClientIdsOfDescendants } = select(
@@ -88,13 +86,9 @@ function ListView(
 		},
 		[ draggedClientIds ]
 	);
-	const selectEditorBlock = useCallback(
-		( clientId ) => {
-			selectBlock( clientId );
-			onSelect( clientId );
-		},
-		[ selectBlock, onSelect ]
-	);
+
+	const { updateBlockSelection } = useBlockSelection();
+
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
@@ -149,6 +143,18 @@ function ListView(
 		},
 		[ collapse ]
 	);
+	const focusRow = useCallback(
+		( event, startRow, endRow ) => {
+			if ( event.shiftKey ) {
+				updateBlockSelection(
+					event,
+					startRow?.dataset?.block,
+					endRow?.dataset?.block
+				);
+			}
+		},
+		[ updateBlockSelection ]
+	);
 
 	const contextValue = useMemo(
 		() => ( {
@@ -185,11 +191,12 @@ function ListView(
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
+				onFocusRow={ focusRow }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
 						blocks={ clientIdsTree }
-						selectBlock={ selectEditorBlock }
+						selectBlock={ updateBlockSelection }
 						showNestedBlocks={ showNestedBlocks }
 						showBlockMovers={ showBlockMovers }
 						fixedListWindow={ fixedListWindow }

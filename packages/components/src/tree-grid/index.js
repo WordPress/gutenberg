@@ -45,18 +45,26 @@ function getRowFocusables( rowElement ) {
  * @param {WPElement} props.children      Children to be rendered.
  * @param {Function}  props.onExpandRow   Callback to fire when row is expanded.
  * @param {Function}  props.onCollapseRow Callback to fire when row is collapsed.
+ * @param {Function}  props.onFocusRow    Callback to fire when moving focus to a different row.
  * @param {Object}    ref                 A ref to the underlying DOM table element.
  */
 function TreeGrid(
-	{ children, onExpandRow = () => {}, onCollapseRow = () => {}, ...props },
+	{
+		children,
+		onExpandRow = () => {},
+		onCollapseRow = () => {},
+		onFocusRow = () => {},
+		...props
+	},
 	ref
 ) {
 	const onKeyDown = useCallback(
 		( event ) => {
-			const { keyCode, metaKey, ctrlKey, altKey, shiftKey } = event;
+			const { keyCode, metaKey, ctrlKey, altKey } = event;
 
-			const hasModifierKeyPressed =
-				metaKey || ctrlKey || altKey || shiftKey;
+			// The shift key is intentionally absent from the following list,
+			// to enable shift + up/down to select items from the list.
+			const hasModifierKeyPressed = metaKey || ctrlKey || altKey;
 
 			if (
 				hasModifierKeyPressed ||
@@ -216,6 +224,10 @@ function TreeGrid(
 				);
 				focusablesInNextRow[ nextIndex ].focus();
 
+				// Let consumers know the row that was originally focused,
+				// and the row that is now in focus.
+				onFocusRow( event, activeRow, rows[ nextRowIndex ] );
+
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
 				event.preventDefault();
@@ -268,7 +280,7 @@ function TreeGrid(
 				event.preventDefault();
 			}
 		},
-		[ onExpandRow, onCollapseRow ]
+		[ onExpandRow, onCollapseRow, onFocusRow ]
 	);
 
 	/* Disable reason: A treegrid is implemented using a table element. */
