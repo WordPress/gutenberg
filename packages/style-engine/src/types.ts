@@ -3,12 +3,12 @@
  */
 import type { CSSProperties } from 'react';
 
-type BoxVariants = 'margin' | 'padding';
-export type Box< T extends BoxVariants = 'margin' > = {
-	top?: CSSProperties[ `${ T }Top` ];
-	right?: CSSProperties[ `${ T }Right` ];
-	bottom?: CSSProperties[ `${ T }Bottom` ];
-	left?: CSSProperties[ `${ T }Left` ];
+type BoxVariants = 'margin' | 'padding' | undefined;
+export type Box< T extends BoxVariants = undefined > = {
+	top?: CSSProperties[ T extends undefined ? 'top' : `${ T }Top` ];
+	right?: CSSProperties[ T extends undefined ? 'right' : `${ T }Right` ];
+	bottom?: CSSProperties[ T extends undefined ? 'bottom' : `${ T }Bottom` ];
+	left?: CSSProperties[ T extends undefined ? 'left' : `${ T }Left` ];
 };
 
 export interface Style {
