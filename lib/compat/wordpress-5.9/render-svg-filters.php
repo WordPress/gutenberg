@@ -19,7 +19,7 @@ if ( ! function_exists( 'wp_global_styles_render_svg_filters' ) ) {
 	 * but it should be rendered before the filtered content
 	 * in the body to satisfy Safari's rendering quirks.
 	 */
-	function gutenberg_experimental_global_styles_render_svg_filters() {
+	function wp_global_styles_render_svg_filters() {
 		/*
 		 * When calling via the in_admin_header action, we only want to render the
 		 * SVGs on block editor pages.
@@ -39,10 +39,10 @@ if ( ! function_exists( 'wp_global_styles_render_svg_filters' ) ) {
 
 	add_action(
 		'wp_body_open',
-		'gutenberg_experimental_global_styles_render_svg_filters'
+		'wp_global_styles_render_svg_filters'
 	);
 	add_action(
 		'in_admin_header',
-		'gutenberg_experimental_global_styles_render_svg_filters'
+		'wp_global_styles_render_svg_filters'
 	);
 }
