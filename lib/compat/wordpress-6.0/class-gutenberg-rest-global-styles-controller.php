@@ -69,8 +69,8 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 	 * @return stdClass Changes to pass to wp_update_post.
 	 */
 	protected function prepare_item_for_database( $request ) {
-		$changes     = new stdClass();
-		$changes->ID = $request['id'];
+		$changes         = new stdClass();
+		$changes->ID     = $request['id'];
 		$post            = get_post( $request['id'] );
 		$existing_config = array();
 		if ( $post ) {
@@ -152,7 +152,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 		$data    = $this->filter_response_by_context( $data, $context );
 		// Wrap the data in a response object.
 		$response = rest_ensure_response( $data );
-		$links = $this->prepare_links( $post->ID );
+		$links    = $this->prepare_links( $post->ID );
 		$response->add_links( $links );
 		if ( ! empty( $links['self']['href'] ) ) {
 			$actions = $this->get_available_actions();
@@ -191,11 +191,11 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 			$raw_data       = $theme->get_raw_data();
 			$data['styles'] = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
 		}
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
-		$data    = $this->add_additional_fields_to_object( $data, $request );
-		$data    = $this->filter_response_by_context( $data, $context );
+		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data     = $this->add_additional_fields_to_object( $data, $request );
+		$data     = $this->filter_response_by_context( $data, $context );
 		$response = rest_ensure_response( $data );
-		$links = array(
+		$links    = array(
 			'self' => array(
 				'href' => rest_url( sprintf( '%s/%s/themes/%s', $this->namespace, $this->rest_base, $request['stylesheet'] ) ),
 			),
