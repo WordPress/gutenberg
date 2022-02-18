@@ -14,6 +14,10 @@ export default {
 	argTypes: {
 		initialValue: { table: { disable: true } }, // hide prop because it's not actually part of FontSizePicker
 	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
 };
 
 const FontSizePickerWithState = ( { initialValue, ...props } ) => {
