@@ -30,6 +30,7 @@ export default {
 	},
 	parameters: {
 		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
 	},
 } as ComponentMeta< typeof Divider >;
 
