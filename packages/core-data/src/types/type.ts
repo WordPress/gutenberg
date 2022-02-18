@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { Context, ContextualField } from './common';
+import { Context, ContextualField, OmitNevers } from './common';
 
-export interface Type< C extends Context > {
+interface FullType< C extends Context > {
 	/**
 	 * All capabilities used by the post type.
 	 */
@@ -64,3 +64,5 @@ interface TypeVisibility {
 	 */
 	show_in_nav_menus: boolean;
 }
+
+export type Type< C extends Context > = OmitNevers< FullType< C > >;
