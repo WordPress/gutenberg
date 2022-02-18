@@ -13,6 +13,7 @@ import {
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
 import { BackdropUI } from '../input-control/styles/input-control-styles';
+import { Root as UnitControlWrapper } from '../unit-control/styles/unit-control-styles';
 
 import type { Border } from './types';
 
@@ -40,7 +41,7 @@ export const InnerWrapper = css`
 	 * Forces the width control to fill available space given UnitControl
 	 * passes its className directly through to the input.
 	 */
-	> div:last-child {
+	${ UnitControlWrapper } {
 		flex: 1;
 		${ rtl( { marginLeft: 0 } )() }
 	}
