@@ -181,6 +181,7 @@ export { default as PluginDocumentSettingPanel } from './components/sidebar/plug
 export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
+export { default as WelcomeGuide } from './components/welcome-guide';
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';

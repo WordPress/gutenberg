@@ -1,32 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { createSlotFill } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import WelcomeGuideDefault from './default';
-import WelcomeGuideTemplate from './template';
-import { store as editPostStore } from '../../store';
+export const { Fill, Slot } = createSlotFill( 'WelcomeGuide' );
 
-export default function WelcomeGuide() {
-	const { isActive, isTemplateMode } = useSelect( ( select ) => {
-		const { isFeatureActive, isEditingTemplate } = select( editPostStore );
-		const _isTemplateMode = isEditingTemplate();
-		const feature = _isTemplateMode
-			? 'welcomeGuideTemplate'
-			: 'welcomeGuide';
+const WelcomeGuide = ( { children } ) => <Fill>{ children }</Fill>;
 
-		return {
-			isActive: isFeatureActive( feature ),
-			isTemplateMode: _isTemplateMode,
-		};
-	}, [] );
+WelcomeGuide.Slot = Slot;
 
-	if ( ! isActive ) {
-		return null;
-	}
-
-	return isTemplateMode ? <WelcomeGuideTemplate /> : <WelcomeGuideDefault />;
-}
+export default WelcomeGuide;

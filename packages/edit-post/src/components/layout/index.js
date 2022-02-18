@@ -285,7 +285,7 @@ function Layout( { styles } ) {
 			/>
 			<PreferencesModal />
 			<KeyboardShortcutHelpModal />
-			<WelcomeGuide />
+			<WelcomeGuide.Slot />
 			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />
 		</>
