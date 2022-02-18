@@ -7,6 +7,7 @@ import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
 import { RangeControl, NumberControlWrapper } from './styles';
 import { COLORS } from '../utils/colors-values';
+import { ensureNumber, ensureString } from '../utils/values';
 
 interface InputWithSliderProps {
 	min: number;
@@ -16,15 +17,6 @@ interface InputWithSliderProps {
 	abbreviation: string;
 	onChange: ( value: number ) => void;
 }
-
-// TODO:
-// - look for edge cases, make more robust
-// - move to shared util
-const ensureNumber = ( n: string | number ) =>
-	typeof n === 'string' ? parseFloat( n ) : n;
-
-const ensureString = ( s: string | number ) =>
-	typeof s === 'string' ? s : `${ s }`;
 
 export const InputWithSlider = ( {
 	min,

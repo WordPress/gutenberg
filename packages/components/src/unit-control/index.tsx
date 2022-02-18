@@ -32,11 +32,9 @@ import {
 	getValidParsedUnit,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
+import { ensureString } from '../utils/values';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import type { StateReducer } from '../input-control/reducer/state';
-
-const ensureString = ( s: string | number ) =>
-	typeof s === 'string' ? s : `${ s }`;
 
 function UnitControl(
 	{

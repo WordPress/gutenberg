@@ -100,3 +100,47 @@ export function isValueNumeric( value, locale = window.navigator.language ) {
 			: value;
 	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
 }
+
+/**
+ * Converts a string to a number.
+ *
+ * @param {string} value
+ * @return {number} String as a number.
+ */
+export const stringToNumber = ( value ) => {
+	return parseFloat( value );
+};
+
+/**
+ * Converts a number to a string.
+ *
+ * @param {number} value
+ * @return {string} Number as a string.
+ */
+export const numberToString = ( value ) => {
+	return `${ value }`;
+};
+
+/**
+ * Regardless of the input being a string or a number, returns a number.
+ *
+ * Returns `undefined` in case the string is `undefined` or not a valid numeric value.
+ *
+ * @param {string | number} value
+ * @return {number} The parsed number.
+ */
+export const ensureNumber = ( value ) => {
+	return typeof value === 'string' ? stringToNumber( value ) : value;
+};
+
+/**
+ * Regardless of the input being a string or a number, returns a number.
+ *
+ * Returns `undefined` in case the string is `undefined` or not a valid numeric value.
+ *
+ * @param {string | number} value
+ * @return {string} The converted string, or `undefined` in case the input is `undefined` or `NaN`.
+ */
+export const ensureString = ( value ) => {
+	return typeof value === 'string' ? value : numberToString( value );
+};

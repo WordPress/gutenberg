@@ -17,16 +17,9 @@ import { Input } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { composeStateReducers } from '../input-control/reducer/reducer';
 import { add, subtract, roundClamp } from '../utils/math';
-import { isValueEmpty } from '../utils/values';
+import { isValueEmpty, ensureNumber, ensureString } from '../utils/values';
 import type { Props } from './types';
 import type { DragAction } from '../input-control/reducer/actions';
-
-// TODO: is there a "safer" version? Should we strip white space, etc?
-const ensureNumber = ( n: string | number ) =>
-	typeof n === 'string' ? parseFloat( n ) : n;
-
-const ensureString = ( s: string | number ) =>
-	typeof s === 'string' ? s : `${ s }`;
 
 export function NumberControl(
 	{
