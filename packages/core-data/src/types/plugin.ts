@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context, ContextualField, RenderedText, OmitNevers } from './common';
+import { Context, ContextualField, RenderedText, OmitNevers } from './helpers';
 
 interface FullPlugin< C extends Context > {
 	/**

@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { Widget } from './widget';
-import { Context } from './common';
+import { Context } from './helpers';
 
 export interface Sidebar< C extends Context > {
 	/**

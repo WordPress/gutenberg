@@ -7,7 +7,7 @@ import {
 	ContextualField,
 	OmitNevers,
 	RenderedText,
-} from './common';
+} from './helpers';
 
 export type CommentStatus = 'hold' | 'approve' | 'spam' | 'trash' | '1' | '0';
 interface FullComment< C extends Context > {

@@ -63,7 +63,7 @@ These contexts are supported by the core-data resolvers like `getEntityRecord()`
 The types describing different entity records must thus be aware of the relevant API context. This is implemented using the `Context` type parameter. For example, the implementation of the `Post` type resembles the following snippet:
 
 ```ts
-import { OmitNevers } from "./common";
+import { OmitNevers } from "./helpers";
 
 interface BasePost<C extends Context> {
 	/**

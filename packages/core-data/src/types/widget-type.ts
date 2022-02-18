@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context, OmitNevers } from './common';
+import { Context, OmitNevers } from './helpers';
 
 export interface WidgetType< C extends Context > {
 	/**

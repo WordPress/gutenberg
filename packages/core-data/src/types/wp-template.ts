@@ -7,7 +7,7 @@ import {
 	RenderedText,
 	OmitNevers,
 	ContextualField,
-} from './common';
+} from './helpers';
 
 interface FullWpTemplate< C extends Context > {
 	/**

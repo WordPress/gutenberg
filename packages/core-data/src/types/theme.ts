@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context, PostFormat, RenderedText, OmitNevers } from './common';
+import { Context, PostFormat, RenderedText, OmitNevers } from './helpers';
 
 interface FullTheme< C extends Context > {
 	/**

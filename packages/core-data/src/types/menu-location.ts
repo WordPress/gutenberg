@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context } from './common';
+import { Context } from './helpers';
 
 export interface MenuLocation< C extends Context > {
 	/**

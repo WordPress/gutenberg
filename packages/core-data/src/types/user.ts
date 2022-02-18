@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { AvatarUrls, Context, ContextualField, OmitNevers } from './common';
+import { AvatarUrls, Context, ContextualField, OmitNevers } from './helpers';
 
 interface FullUser< C extends Context > {
 	/**

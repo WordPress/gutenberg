@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Context, ContextualField, OmitNevers } from './common';
+import { Context, ContextualField, OmitNevers } from './helpers';
 
 interface FullType< C extends Context > {
 	/**

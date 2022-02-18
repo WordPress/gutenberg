@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { RenderedText, Context, ContextualField, OmitNevers } from './common';
+import { RenderedText, Context, ContextualField, OmitNevers } from './helpers';
 
 /**
  * Internal dependencies

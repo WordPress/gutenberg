@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { CommentStatus, Context, PingStatus } from './common';
+import { CommentStatus, Context, PingStatus } from './helpers';
 
 export interface Settings< C extends Context > {
 	/**
