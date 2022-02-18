@@ -146,9 +146,15 @@ export default function useMultiSelection() {
 				return;
 			}
 
+			const { anchorNode, focusNode } = defaultView.getSelection();
+
 			if (
 				isSimpleContentEditable( startRef.current ) &&
-				isSimpleContentEditable( endRef.current )
+				( startRef.current.contains( anchorNode ) ||
+					startRef.current.contains( focusNode ) ) &&
+				isSimpleContentEditable( endRef.current ) &&
+				( endRef.current.contains( anchorNode ) ||
+					endRef.current.contains( focusNode ) )
 			) {
 				return;
 			}
