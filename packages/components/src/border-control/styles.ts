@@ -8,7 +8,10 @@ import { css } from '@emotion/react';
  */
 import { COLORS, CONFIG, rtl } from '../utils';
 import { space } from '../ui/utils/space';
-import { StyledLabel } from '../base-control/styles/base-control-styles';
+import {
+	StyledField,
+	StyledLabel,
+} from '../base-control/styles/base-control-styles';
 import { BackdropUI } from '../input-control/styles/input-control-styles';
 
 const labelStyles = css`
@@ -157,7 +160,7 @@ export const BorderSlider = css`
 	flex: 1 1 60%;
 	${ rtl( { marginRight: space( 3 ) } )() }
 
-	> div {
+	${ StyledField } {
 		margin-bottom: 0;
 		display: flex;
 		align-items: center;
