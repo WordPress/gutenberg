@@ -22,11 +22,6 @@ export default {
 		marginEnd: {
 			control: { type: 'number' },
 		},
-		// TODO: This is a reakit internal prop. We can hide it from the props table like this
-		// if we don't want to expose it, but should we rather omit it at the TypeScript level?
-		unstable_system: {
-			table: { disable: true },
-		},
 	},
 	parameters: {
 		controls: { expanded: true },
