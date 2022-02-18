@@ -61,7 +61,19 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	// Width support to be added in near future.
+	// Width.
+
+	// Width support flag can be true|false|"segmented" cannot use
+	// `gutenberg_block_has_support` which checked for boolean true or array.
+	$has_width_support = _wp_array_get( $block_type->supports, array( '__experimentalDimensions', 'width' ), false );
+
+	if ( $has_width_support ) {
+		$width_value = _wp_array_get( $block_attributes, array( 'style', 'dimensions', 'width' ), null );
+
+		if ( null !== $width_value ) {
+			$styles[] = sprintf( 'width: %s;', $width_value );
+		}
+	}
 
 	return empty( $styles ) ? array() : array( 'style' => implode( ' ', $styles ) );
 }

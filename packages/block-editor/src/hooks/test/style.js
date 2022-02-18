@@ -25,6 +25,7 @@ describe( 'getInlineStyles', () => {
 				},
 				dimensions: {
 					height: '500px',
+					width: '100%',
 				},
 				spacing: {
 					blockGap: '1em',
@@ -44,6 +45,7 @@ describe( 'getInlineStyles', () => {
 			height: '500px',
 			marginBottom: '15px',
 			paddingTop: '10px',
+			width: '100%',
 		} );
 	} );
 

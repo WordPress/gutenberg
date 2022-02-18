@@ -54,6 +54,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		'text-decoration'            => array( 'typography', 'textDecoration' ),
 		'text-transform'             => array( 'typography', 'textTransform' ),
 		'filter'                     => array( 'filter', 'duotone' ),
+		'width'                      => array( 'dimensions', 'width' ),
 	);
 
 	/**
@@ -85,6 +86,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		'custom'          => null,
 		'dimensions'      => array(
 			'height' => null,
+			'width'  => null,
 		),
 		'layout'          => array(
 			'contentSize' => null,
@@ -129,6 +131,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		),
 		'dimensions' => array(
 			'height' => null,
+			'width'  => null,
 		),
 		'filter'     => array(
 			'duotone' => null,

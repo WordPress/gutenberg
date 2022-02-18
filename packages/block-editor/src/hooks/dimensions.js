@@ -38,6 +38,13 @@ import {
 	resetPadding,
 	useIsPaddingDisabled,
 } from './padding';
+import {
+	WidthEdit,
+	hasWidthSupport,
+	hasWidthValue,
+	resetWidth,
+	useIsWidthDisabled,
+} from './width';
 
 export const DIMENSIONS_SUPPORT_KEY = '__experimentalDimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -55,6 +62,7 @@ export function DimensionsPanel( props ) {
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
 	const isHeightDisabled = useIsHeightDisabled( props );
+	const isWidthDisabled = useIsWidthDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
 
@@ -101,6 +109,21 @@ export function DimensionsPanel( props ) {
 					panelId={ props.clientId }
 				>
 					<HeightEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ ! isWidthDisabled && (
+				<ToolsPanelItem
+					hasValue={ () => hasWidthValue( props ) }
+					label={ __( 'Width' ) }
+					onDeselect={ () => resetWidth( props ) }
+					resetAllFilter={ createResetAllFilter(
+						'width',
+						'dimensions'
+					) }
+					isShownByDefault={ defaultDimensionsControls?.width }
+					panelId={ props.clientId }
+				>
+					<WidthEdit { ...props } />
 				</ToolsPanelItem>
 			) }
 			{ ! isPaddingDisabled && (
@@ -167,6 +190,7 @@ export function hasDimensionsSupport( blockName ) {
 	return (
 		hasGapSupport( blockName ) ||
 		hasHeightSupport( blockName ) ||
+		hasWidthSupport( blockName ) ||
 		hasPaddingSupport( blockName ) ||
 		hasMarginSupport( blockName )
 	);
@@ -181,10 +205,17 @@ export function hasDimensionsSupport( blockName ) {
 const useIsDimensionsDisabled = ( props = {} ) => {
 	const gapDisabled = useIsGapDisabled( props );
 	const heightDisabled = useIsHeightDisabled( props );
+	const widthDisabled = useIsWidthDisabled( props );
 	const paddingDisabled = useIsPaddingDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
 
-	return gapDisabled && heightDisabled && paddingDisabled && marginDisabled;
+	return (
+		gapDisabled &&
+		heightDisabled &&
+		widthDisabled &&
+		paddingDisabled &&
+		marginDisabled
+	);
 };
 
 /**

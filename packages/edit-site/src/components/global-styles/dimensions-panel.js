@@ -23,8 +23,9 @@ export function useHasDimensionsPanel( name ) {
 	const hasMargin = useHasMargin( name );
 	const hasGap = useHasGap( name );
 	const hasHeight = useHasHeight( name );
+	const hasWidth = useHasWidth( name );
 
-	return hasPadding || hasMargin || hasGap || hasHeight;
+	return hasPadding || hasMargin || hasGap || hasHeight || hasWidth;
 }
 
 function useHasPadding( name ) {
@@ -53,6 +54,13 @@ function useHasHeight( name ) {
 	const [ settings ] = useSetting( 'dimensions.height', name );
 
 	return settings && supports.includes( 'height' );
+}
+
+function useHasWidth( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ settings ] = useSetting( 'dimensions.width', name );
+
+	return settings && supports.includes( 'width' );
 }
 
 function filterValuesBySides( values, sides ) {
@@ -98,12 +106,14 @@ export default function DimensionsPanel( { name } ) {
 	const showMarginControl = useHasMargin( name );
 	const showGapControl = useHasGap( name );
 	const showHeightControl = useHasHeight( name );
+	const showWidthControl = useHasWidth( name );
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units', name )[ 0 ] || [
 			'%',
 			'px',
 			'em',
 			'rem',
+			'vh',
 			'vw',
 		],
 	} );
@@ -153,8 +163,14 @@ export default function DimensionsPanel( { name } ) {
 	const resetHeightValue = () => setHeightValue( undefined );
 	const hasHeightValue = () => !! heightValue;
 
+	// Width.
+	const [ widthValue, setWidthValue ] = useStyle( 'dimensions.width', name );
+	const resetWidthValue = () => setWidthValue( undefined );
+	const hasWidthValue = () => !! widthValue;
+
 	const resetAll = () => {
 		resetHeightValue();
+		resetWidthValue();
 		resetPaddingValue();
 		resetMarginValue();
 		resetGapValue();
@@ -174,6 +190,23 @@ export default function DimensionsPanel( { name } ) {
 						label={ __( 'Height' ) }
 						value={ heightValue }
 						onChange={ setHeightValue }
+						units={ units }
+						min={ 0 }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showWidthControl && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ hasWidthValue }
+					label={ __( 'Width' ) }
+					onDeselect={ resetWidthValue }
+					isShownByDefault={ true }
+				>
+					<UnitControl
+						label={ __( 'Width' ) }
+						value={ widthValue }
+						onChange={ setWidthValue }
 						units={ units }
 						min={ 0 }
 					/>
