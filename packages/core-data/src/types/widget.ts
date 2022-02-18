@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { Context, ContextualField } from './common';
+import { Context, ContextualField, OmitNevers } from './common';
 
-export interface Widget< C extends Context > {
+export interface FullWidget< C extends Context > {
 	/**
 	 * Unique identifier for the widget.
 	 */
@@ -52,3 +52,5 @@ interface WidgetInstance {
 	 */
 	raw: Record< string, string >;
 }
+
+export type Widget< C extends Context > = OmitNevers< FullWidget< C > >;

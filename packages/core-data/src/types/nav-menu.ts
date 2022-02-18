@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { Context, ContextualField } from './common';
+import { Context, ContextualField, OmitNevers } from './common';
 
-export interface NavMenu< C extends Context > {
+interface FullNavMenu< C extends Context > {
 	/**
 	 * Unique identifier for the term.
 	 */
@@ -37,3 +37,5 @@ export interface NavMenu< C extends Context > {
 	 */
 	auto_add: ContextualField< boolean, 'view' | 'edit', C >;
 }
+
+export type NavMenu< C extends Context > = OmitNevers< FullNavMenu< C > >;
