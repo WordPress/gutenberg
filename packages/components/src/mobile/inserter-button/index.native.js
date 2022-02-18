@@ -16,7 +16,7 @@ import { BlockIcon } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import styles from './style.scss';
-import { sparkles } from './sparkles';
+import sparkles from './sparkles';
 class MenuItem extends Component {
 	constructor() {
 		super( ...arguments );
