@@ -65,8 +65,6 @@ export type EntityRecord< C extends Context > =
 	| WpTemplate< C >
 	| WpTemplatePart< C >;
 
-export type StringWhenUpdatable< T > = T & { __brand: 'UpdatableAsString' };
-
 /**
  * Updatable<EntityRecord> is a type describing Edited Entity Records. They are like
  * regular Entity Records, but they have all the local edits applied on top of the REST API data.
@@ -95,10 +93,17 @@ export type StringWhenUpdatable< T > = T & { __brand: 'UpdatableAsString' };
  * ```
  */
 export type Updatable< T extends EntityRecord< 'edit' > > = {
-	[ K in keyof T ]: T[ K ] extends
-		| RenderedText< any >
-		| StringWhenUpdatable< any >
+	[ K in keyof T ]: T[ K ] extends RenderedText< any >
 		? string
+		: /*
+		 * Explicit handling for WpTemplate and WpTemplatePart. They both have a
+		 * `content` field that needs to be collapsed into a string even though
+		 * it doesn't match the RenderedText signature.
+		 */
+		T extends WpTemplate< any > | WpTemplatePart< any >
+		? K extends 'content'
+			? string
+			: T[ K ]
 		: T[ K ];
 };
 

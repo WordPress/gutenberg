@@ -8,7 +8,6 @@ import {
 	OmitNevers,
 	ContextualField,
 } from './common';
-import { StringWhenUpdatable } from './index';
 
 interface FullWpTemplatePart< C extends Context > {
 	/**
@@ -37,8 +36,10 @@ interface FullWpTemplatePart< C extends Context > {
 	origin: string;
 	/**
 	 * Content of template.
+	 *
+	 * When used with the `Updatable` type wrapper, it is transformed to a string as a special case.
 	 */
-	content: StringWhenUpdatable< {
+	content: {
 		/**
 		 * Content for the template, as it exists in the database.
 		 */
@@ -47,7 +48,7 @@ interface FullWpTemplatePart< C extends Context > {
 		 * Version of the content block format used by the template.
 		 */
 		block_version: ContextualField< number, 'edit', C >;
-	} >;
+	};
 	/**
 	 * Title of template.
 	 */
