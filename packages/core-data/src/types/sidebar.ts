@@ -44,8 +44,7 @@ export interface Sidebar< C extends Context > {
 	/**
 	 * Nested widgets.
 	 */
-	widgets: NestedWidget< C >[];
+	widgets: ( Widget< C > | string )[];
 }
 
 type SidebarStatus = 'active' | 'inactive';
-type NestedWidget< C extends Context > = Widget< C > | string;
