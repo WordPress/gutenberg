@@ -12,26 +12,25 @@ import { speak } from '@wordpress/a11y';
  */
 import { store as preferencesStore } from '../../store';
 
-export default function MoreMenuFeatureToggle( {
+export default function MoreMenuPreferenceToggle( {
 	scope,
+	name,
 	label,
 	info,
 	messageActivated,
 	messageDeactivated,
 	shortcut,
-	feature,
 } ) {
 	const isActive = useSelect(
-		( select ) =>
-			select( preferencesStore ).isFeatureActive( scope, feature ),
-		[ feature ]
+		( select ) => !! select( preferencesStore ).get( scope, name ),
+		[ name ]
 	);
-	const { toggleFeature } = useDispatch( preferencesStore );
+	const { toggle } = useDispatch( preferencesStore );
 	const speakMessage = () => {
 		if ( isActive ) {
-			speak( messageDeactivated || __( 'Feature deactivated' ) );
+			speak( messageDeactivated || __( 'Preference deactivated' ) );
 		} else {
-			speak( messageActivated || __( 'Feature activated' ) );
+			speak( messageActivated || __( 'Preference activated' ) );
 		}
 	};
 
@@ -40,7 +39,7 @@ export default function MoreMenuFeatureToggle( {
 			icon={ isActive && check }
 			isSelected={ isActive }
 			onClick={ () => {
-				toggleFeature( scope, feature );
+				toggle( scope, name );
 				speakMessage();
 			} }
 			role="menuitemcheckbox"

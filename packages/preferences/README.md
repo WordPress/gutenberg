@@ -14,11 +14,11 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## API Usage
 
-### Features
+### Data store
 
-Features are boolean values used for toggling specific editor features on or off.
+Preferences are persisted values of any kind.
 
-Set the default values for any features on editor initialization:
+Set the default preferences for any features on initialization by dispatching an action:
 
 ```js
 import { dispatch } from '@wordpress/data';
@@ -27,10 +27,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 function initialize() {
 	// ...
 
-	dispatch( preferencesStore ).setFeatureDefaults(
+	dispatch( preferencesStore ).setDefaults(
 		'namespace/editor-or-plugin-name',
 		{
-			myFeatureName: true,
+			myBooleanFeature: true,
 		}
 	);
 
@@ -38,21 +38,34 @@ function initialize() {
 }
 ```
 
-Use the `toggleFeature` action and the `isFeatureActive` selector to toggle features within your app:
+Or the `get` selector to get a preference value, and the `set` action to update a preference to any value:
+```js
+wp.data
+	.select( 'core/preferences' )
+	.get( 'namespace/editor-or-plugin-name', 'myPreferenceName' ); // 1
+wp.data
+	.dispatch( 'core/preferences' )
+	.set( 'namespace/editor-or-plugin-name', 'myPreferenceName', 2 );
+wp.data
+	.select( 'core/preferences' )
+	.get( 'namespace/editor-or-plugin-name', 'myPreferenceName' ); // 2
+```
+
+Use the `toggle` action to flip a boolean preference between `true` and `false`:
 
 ```js
 wp.data
 	.select( 'core/preferences' )
-	.isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // true
+	.get( 'namespace/editor-or-plugin-name', 'myPreferenceName' ); // true
 wp.data
 	.dispatch( 'core/preferences' )
-	.toggleFeature( 'namespace/editor-or-plugin-name', 'myFeatureName' );
+	.toggle( 'namespace/editor-or-plugin-name', 'myPreferenceName' );
 wp.data
 	.select( 'core/preferences' )
-	.isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // false
+	.get( 'namespace/editor-or-plugin-name', 'myPreferenceName' ); // false
 ```
 
-The `MoreMenuDropdown` and `MoreMenuFeatureToggle` components help to implement an editor menu for changing preferences and feature values.
+The `MoreMenuDropdown` and `MoreMenuPreferenceToggle` components help to implement an editor menu for changing preferences and feature values.
 
 ```jsx
 function MyEditorMenu() {
@@ -60,9 +73,9 @@ function MyEditorMenu() {
 		<MoreMenuDropdown>
 			{ () => (
 				<MenuGroup label={ __( 'Features' ) }>
-					<MoreMenuFeatureToggle
+					<MoreMenuPreferenceToggle
 						scope="namespace/editor-or-plugin-name"
-						feature="myFeatureName"
+						name="myPreferenceName"
 						label={ __( 'My feature' ) }
 						info={ __( 'A really awesome feature' ) }
 						messageActivated={ __( 'My feature activated' ) }

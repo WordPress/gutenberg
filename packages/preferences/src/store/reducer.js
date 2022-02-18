@@ -14,14 +14,14 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-export function featureDefaults( state = {}, action ) {
-	if ( action.type === 'SET_FEATURE_DEFAULTS' ) {
-		const { scope, defaults } = action;
+export function defaults( state = {}, action ) {
+	if ( action.type === 'SET_PREFERENCE_DEFAULTS' ) {
+		const { scope, defaults: values } = action;
 		return {
 			...state,
 			[ scope ]: {
 				...state[ scope ],
-				...defaults,
+				...values,
 			},
 		};
 	}
@@ -37,14 +37,14 @@ export function featureDefaults( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function features( state = {}, action ) {
-	if ( action.type === 'SET_FEATURE_VALUE' ) {
-		const { scope, featureName, value } = action;
+export function preferences( state = {}, action ) {
+	if ( action.type === 'SET_PREFERENCE_VALUE' ) {
+		const { scope, name, value } = action;
 		return {
 			...state,
 			[ scope ]: {
 				...state[ scope ],
-				[ featureName ]: value,
+				[ name ]: value,
 			},
 		};
 	}
@@ -53,6 +53,6 @@ export function features( state = {}, action ) {
 }
 
 export default combineReducers( {
-	featureDefaults,
-	features,
+	defaults,
+	preferences,
 } );

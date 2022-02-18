@@ -1,87 +1,68 @@
 /**
  * Internal dependencies
  */
-import { isFeatureActive } from '../selectors';
+import { get } from '../selectors';
 
 describe( 'selectors', () => {
-	describe( 'isFeatureActive', () => {
-		it( 'returns false if the there is no state for the feature', () => {
+	describe( 'get', () => {
+		it( 'returns `undefined` if the there is no state for the preference', () => {
 			const emptyState = {
-				featureDefaults: {},
-				features: {},
+				defaults: {},
+				preferences: {},
 			};
 
 			expect(
-				isFeatureActive( emptyState, 'test-scope', 'testFeatureName' )
-			).toBe( false );
+				get( emptyState, 'test-scope', 'testPreferenceName' )
+			).toBe( undefined );
 		} );
 
-		it( 'returns false if the the default for a feature is false and there is no preference state', () => {
+		it( 'returns the default for a preference if the default is set and the preference has no value', () => {
 			const emptyState = {
-				featureDefaults: {
+				defaults: {
 					'test-scope': {
-						testFeatureName: false,
+						testPreferenceName: 'test default',
 					},
 				},
-				features: {},
+				preferences: {},
 			};
 
 			expect(
-				isFeatureActive( emptyState, 'test-scope', 'testFeatureName' )
-			).toBe( false );
+				get( emptyState, 'test-scope', 'testPreferenceName' )
+			).toBe( 'test default' );
 		} );
 
-		it( 'returns true if the the default for a feature is true and there is no preference state', () => {
+		it( 'returns the value for a preference if the preference is set and the default is not set', () => {
 			const emptyState = {
-				featureDefaults: {
+				defaults: {},
+				preferences: {
 					'test-scope': {
-						testFeatureName: true,
+						testPreferenceName: 'test value',
 					},
 				},
-				features: {},
 			};
 
 			expect(
-				isFeatureActive( emptyState, 'test-scope', 'testFeatureName' )
-			).toBe( true );
+				get( emptyState, 'test-scope', 'testPreferenceName' )
+			).toBe( 'test value' );
 		} );
 
-		it( 'returns true if the the default for a feature is false but the preference is true', () => {
+		it( 'returns the value for a preference if the preference and the default are set', () => {
 			const emptyState = {
-				featureDefaults: {
+				defaults: {
 					'test-scope': {
-						testFeatureName: false,
+						testPreferenceName: 'test default',
 					},
 				},
-				features: {
+				preferences: {
 					'test-scope': {
-						testFeatureName: true,
+						testPreferenceName: 'test value',
 					},
 				},
 			};
 
 			expect(
-				isFeatureActive( emptyState, 'test-scope', 'testFeatureName' )
-			).toBe( true );
-		} );
-
-		it( 'returns false if the the default for a feature is true but the preference is false', () => {
-			const emptyState = {
-				featureDefaults: {
-					'test-scope': {
-						testFeatureName: true,
-					},
-				},
-				features: {
-					'test-scope': {
-						testFeatureName: false,
-					},
-				},
-			};
-
-			expect(
-				isFeatureActive( emptyState, 'test-scope', 'testFeatureName' )
-			).toBe( false );
+				get( emptyState, 'test-scope', 'testPreferenceName' )
+			).toBe( 'test value' );
 		} );
 	} );
 } );

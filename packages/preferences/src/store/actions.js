@@ -1,46 +1,48 @@
 /**
- * Returns an action object used in signalling that a feature should be toggled.
+ * Returns an action object used in signalling that a preference should be
+ * toggled.
  *
- * @param {string} scope       The feature scope (e.g. core/edit-post).
- * @param {string} featureName The feature name.
+ * @param {string} scope The preference scope (e.g. core/edit-post).
+ * @param {string} name  The preference name.
  */
-export function toggleFeature( scope, featureName ) {
+export function toggle( scope, name ) {
 	return function ( { select, dispatch } ) {
-		const currentValue = select.isFeatureActive( scope, featureName );
-		dispatch.setFeatureValue( scope, featureName, ! currentValue );
+		const currentValue = select.get( scope, name );
+		dispatch.set( scope, name, ! currentValue );
 	};
 }
 
 /**
- * Returns an action object used in signalling that a feature should be set to
- * a true or false value
+ * Returns an action object used in signalling that a preference should be set
+ * to a value
  *
- * @param {string}  scope       The feature scope (e.g. core/edit-post).
- * @param {string}  featureName The feature name.
- * @param {boolean} value       The value to set.
+ * @param {string} scope The preference scope (e.g. core/edit-post).
+ * @param {string} name  The preference name.
+ * @param {*}      value The value to set.
  *
  * @return {Object} Action object.
  */
-export function setFeatureValue( scope, featureName, value ) {
+export function set( scope, name, value ) {
 	return {
-		type: 'SET_FEATURE_VALUE',
+		type: 'SET_PREFERENCE_VALUE',
 		scope,
-		featureName,
-		value: !! value,
+		name,
+		value,
 	};
 }
 
 /**
- * Returns an action object used in signalling that defaults should be set for features.
+ * Returns an action object used in signalling that preference defaults should
+ * be set.
  *
- * @param {string}                  scope    The feature scope (e.g. core/edit-post).
- * @param {Object<string, boolean>} defaults A key/value map of feature names to values.
+ * @param {string}            scope    The preference scope (e.g. core/edit-post).
+ * @param {Object<string, *>} defaults A key/value map of preference names to values.
  *
  * @return {Object} Action object.
  */
-export function setFeatureDefaults( scope, defaults ) {
+export function setDefaults( scope, defaults ) {
 	return {
-		type: 'SET_FEATURE_DEFAULTS',
+		type: 'SET_PREFERENCE_DEFAULTS',
 		scope,
 		defaults,
 	};

@@ -1,7 +1,7 @@
-# MoreMenuFeatureToggle
+# MoreMenuPreferenceToggle
 
-`MoreMenuFeatureToggle` renders a menu item that can be used as a child of the `MoreMenuDropdown` component. The component
-is connected to the interface package's store, and will toggle the value of a 'feature' between true and false.
+`MoreMenuPreferenceToggle` renders a menu item that can be used as a child of the `MoreMenuDropdown` component. The component
+is connected to the preference package's store, and will toggle the value of a 'preference' between true and false.
 
 This component implements a `MenuItem` component from the `@wordpress/components` package.
 
@@ -14,9 +14,9 @@ The 'scope' of the feature. This is usually a namespaced string that represents 
 -   Type: `String`
 -   Required: Yes
 
-### feature
+### name
 
-The name of the feature to toggle (e.g. 'fixedToolbar').
+The name of the preference to toggle (e.g. 'fixedToolbar').
 
 -   Type: `String`
 -   Required: Yes
