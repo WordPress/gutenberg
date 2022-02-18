@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
+import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
@@ -52,7 +53,7 @@ export const InnerWrapper = css`
 	}
 `;
 
-export const WrapperWidth = ( width: string ) => {
+export const WrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
 	return css`
 		width: ${ width };
 		flex: 0 0 auto;

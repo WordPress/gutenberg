@@ -90,7 +90,7 @@ export type BorderControlProps = ColorProps &
 		 * Controls the visual width of the `BorderControl`. It has no effect if
 		 * the `isCompact` prop is set to `true`.
 		 */
-		width?: string;
+		width?: CSSProperties[ 'width' ];
 		/**
 		 * Flags whether this `BorderControl` should also render a `RangeControl`
 		 * for additional control over a border's width.
