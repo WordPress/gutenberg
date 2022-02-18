@@ -107,6 +107,8 @@ export type DropdownProps = ColorProps & {
 	border?: Border;
 	/**
 	 * This controls whether to render border style options.
+	 *
+	 * @default true
 	 */
 	enableStyle?: boolean;
 	/**
