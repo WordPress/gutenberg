@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { colord, Colord } from 'colord';
-import type { ClipboardEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -33,16 +32,6 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 
 		onChange( colord( hexValue ) );
 	};
-	const handlePaste = ( event: ClipboardEvent ) => {
-		const pastedContent = event.clipboardData.getData( 'Text' );
-		handleChange( pastedContent );
-	};
-	const handleValidate = ( value: string ) => {
-		const hexValue = value.startsWith( '#' ) ? value : '#' + value;
-		if ( ! colord( hexValue ).isValid() ) {
-			throw new Error( 'Invalid hex color input' );
-		}
-	};
 
 	return (
 		<ColorHexInputControl
@@ -58,10 +47,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			}
 			value={ color.toHex().slice( 1 ).toUpperCase() }
 			onChange={ handleChange }
-			onPaste={ handlePaste }
-			onValidate={ handleValidate }
-			isPressEnterToChange={ true }
-			maxLength={ enableAlpha ? 8 : 6 }
+			maxLength={ enableAlpha ? 8 : 7 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
 		/>
