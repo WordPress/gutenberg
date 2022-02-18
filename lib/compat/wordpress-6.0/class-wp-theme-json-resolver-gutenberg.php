@@ -18,43 +18,6 @@
 class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 
 	/**
-	 * There are three sources of data (origins) for a site:
-	 * default, theme, and custom. The custom's has higher priority
-	 * than the theme's, and the theme's higher than defaults's.
-	 *
-	 * Unlike the getters {@link get_core_data},
-	 * {@link get_theme_data}, and {@link get_user_data},
-	 * this method returns data after it has been merged
-	 * with the previous origins. This means that if the same piece of data
-	 * is declared in different origins (user, theme, and core),
-	 * the last origin overrides the previous.
-	 *
-	 * For example, if the user has set a background color
-	 * for the paragraph block, and the theme has done it as well,
-	 * the user preference wins.
-	 *
-	 * @param string $origin Optional. To what level should we merge data.
-	 *                       Valid values are 'theme' or 'custom'.
-	 *                       Default is 'custom'.
-	 * @return WP_Theme_JSON_Gutenberg
-	 */
-	public static function get_merged_data( $origin = 'custom' ) {
-		if ( is_array( $origin ) ) {
-			_deprecated_argument( __FUNCTION__, '5.9' );
-		}
-
-		$result = new WP_Theme_JSON_Gutenberg();
-		$result->merge( self::get_core_data() );
-		$result->merge( self::get_theme_data() );
-
-		if ( 'custom' === $origin ) {
-			$result->merge( self::get_user_data() );
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Returns the theme's data.
 	 *
 	 * Data from theme.json will be backfilled from existing
