@@ -1,13 +1,11 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/react';
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
-import { useCx } from '../../utils';
 import { Text } from '../../text';
 import { Divider } from '..';
 
@@ -44,15 +42,14 @@ const HorizontalTemplate: ComponentStory< typeof Divider > = ( args ) => (
 );
 
 const VerticalTemplate: ComponentStory< typeof Divider > = ( args ) => {
-	const cx = useCx();
-	const wrapperClassName = cx( css`
-		display: flex;
-		align-items: stretch;
-		justify-content: start;
-	` );
+	const styles = {
+		display: 'flex',
+		alignItems: 'stretch',
+		justifyContent: 'start',
+	};
 
 	return (
-		<div className={ wrapperClassName }>
+		<div style={ styles }>
 			<Text>Some text before the divider</Text>
 			<Divider { ...args } />
 			<Text>Some text after the divider</Text>
