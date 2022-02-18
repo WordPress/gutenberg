@@ -46,11 +46,6 @@ export const InnerWrapper = css`
 		flex: 1;
 		${ rtl( { marginLeft: 0 } )() }
 	}
-
-	/* If arbitrary width is supplied honor it. */
-	&[style*='width'] {
-		flex: 0 0 auto;
-	}
 `;
 
 export const WrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
