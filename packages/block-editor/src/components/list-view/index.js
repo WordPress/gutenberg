@@ -109,8 +109,8 @@ function ListView(
 		setExpandedState,
 	} );
 	const selectEditorBlock = useCallback(
-		( clientId ) => {
-			updateBlockSelection( clientId );
+		( event, clientId ) => {
+			updateBlockSelection( event, clientId );
 			setSelectedTreeId( clientId );
 		},
 		[ setSelectedTreeId, updateBlockSelection ]
