@@ -43,7 +43,6 @@ export function NumberControl(
 		step: stepProp = 1,
 		type: typeProp = 'number',
 		value: valueProp,
-		onChange: onChangeProp,
 		...props
 	}: Props,
 	ref: Ref< any >
@@ -92,7 +91,7 @@ export function NumberControl(
 				: baseStep;
 			let nextValue = isValueEmpty( currentValue )
 				? baseValue
-				: ensureNumber( ( currentValue as unknown ) as string );
+				: ensureNumber( currentValue );
 
 			if ( event?.preventDefault ) {
 				event.preventDefault();
@@ -155,7 +154,7 @@ export function NumberControl(
 
 				state.value = ensureString(
 					constrainValue(
-						add( currentValue ?? 0, distance ),
+						add( ensureNumber( currentValue ?? 0 ), distance ),
 						enableShift ? modifier : undefined
 					)
 				);
@@ -197,24 +196,11 @@ export function NumberControl(
 			required={ required }
 			step={ stepProp }
 			type={ typeProp }
-			value={
-				typeof valueProp !== 'undefined'
-					? ensureString( valueProp )
-					: undefined
-			}
+			value={ valueProp }
 			__unstableStateReducer={ composeStateReducers(
 				numberControlStateReducer,
 				stateReducer
 			) }
-			onChange={ ( nextValue, extra ) => {
-				let v;
-
-				if ( typeof nextValue !== 'undefined' ) {
-					v = ensureNumber( nextValue );
-				}
-
-				onChangeProp?.( v, extra );
-			} }
 		/>
 	);
 }

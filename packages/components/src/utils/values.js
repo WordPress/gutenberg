@@ -19,7 +19,7 @@ export function isValueDefined( value ) {
  * @template T
  *
  * @param {T | "" | null | undefined} value The value to check.
- * @return {value is T} Whether value is empty.
+ * @return {value is "" | null | undefined} Whether value is empty.
  */
 export function isValueEmpty( value ) {
 	const isEmptyString = value === '';

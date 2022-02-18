@@ -35,6 +35,9 @@ import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import type { StateReducer } from '../input-control/reducer/state';
 
+const ensureString = ( s: string | number ) =>
+	typeof s === 'string' ? s : `${ s }`;
+
 function UnitControl(
 	{
 		__unstableStateReducer: stateReducer = ( state ) => state,
@@ -209,19 +212,11 @@ function UnitControl(
 				label={ label }
 				onBlur={ handleOnBlur }
 				onKeyDown={ handleOnKeyDown }
-				onChange={ ( nextValue, extra ) => {
-					let v;
-
-					if ( typeof v !== 'undefined' ) {
-						v = `${ nextValue }`;
-					}
-					handleOnChange?.( v, extra );
-				} }
+				onChange={ handleOnChange }
 				ref={ forwardedRef }
 				size={ size }
 				suffix={ inputSuffix }
-				// @ts-ignore
-				value={ value }
+				value={ ensureString( value ) }
 				step={ step }
 				__unstableStateReducer={ composeStateReducers(
 					unitControlStateReducer,

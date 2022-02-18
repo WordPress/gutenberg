@@ -1,19 +1,9 @@
 /**
- * External dependencies
- */
-import type { ChangeEvent } from 'react';
-
-/**
  * Internal dependencies
  */
 import type { InputControlProps } from '../input-control/types';
 
-export type InputChangeCallback<
-	E = ChangeEvent< HTMLInputElement >,
-	P = {}
-> = ( nextValue: number | undefined, extra: { event: E } & P ) => void;
-
-export type Props = Omit< InputControlProps, 'value' | 'onChange' > & {
+export type Props = InputControlProps & {
 	/**
 	 * If `true`, the default `input` HTML arrows will be hidden.
 	 *
@@ -35,10 +25,4 @@ export type Props = Omit< InputControlProps, 'value' | 'onChange' > & {
 	 * @default 10
 	 */
 	shiftStep?: string | number;
-
-	// Override `InputControl`'s `value` and `onChange` props:
-	// - `value` can also be a `number` (instead of only a `string`)
-	// - `onChange` passes the `nextValue` as a `number` (instead of a `string`)
-	value?: string | number;
-	onChange?: InputChangeCallback;
 };

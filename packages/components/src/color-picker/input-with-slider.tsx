@@ -17,6 +17,15 @@ interface InputWithSliderProps {
 	onChange: ( value: number ) => void;
 }
 
+// TODO:
+// - look for edge cases, make more robust
+// - move to shared util
+const ensureNumber = ( n: string | number ) =>
+	typeof n === 'string' ? parseFloat( n ) : n;
+
+const ensureString = ( s: string | number ) =>
+	typeof s === 'string' ? s : `${ s }`;
+
 export const InputWithSlider = ( {
 	min,
 	max,
@@ -32,13 +41,13 @@ export const InputWithSlider = ( {
 				max={ max }
 				label={ label }
 				hideLabelFromVision
-				value={ value }
-				onChange={ ( nextValue?: number ) => {
+				value={ ensureString( value ) }
+				onChange={ ( nextValue?: string ) => {
 					if ( typeof nextValue === 'undefined' ) {
 						return;
 					}
 
-					onChange?.( nextValue );
+					onChange?.( ensureNumber( nextValue ) );
 				} }
 				prefix={
 					<Spacer
