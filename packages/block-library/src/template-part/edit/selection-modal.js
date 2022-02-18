@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useState, useMemo } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
@@ -15,12 +15,10 @@ import {
 /**
  * Internal dependencies
  */
-import TitleModal from './title-modal';
 import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
 	useCreateTemplatePartFromBlocks,
-	useTemplatePartArea,
 } from './utils/hooks';
 import { createTemplatePartId } from './utils/create-template-part-id';
 
@@ -34,7 +32,6 @@ export default function TemplatePartSelectionModal( {
 	// When the templatePartId is undefined,
 	// it means the user is creating a new one from the placeholder.
 	const isReplacingTemplatePartContent = !! templatePartId;
-	const areaObject = useTemplatePartArea( area );
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
@@ -50,9 +47,7 @@ export default function TemplatePartSelectionModal( {
 	}, [ templateParts ] );
 	const shownTemplateParts = useAsyncList( templartPartsAsBlockPatterns );
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const [ showTitleModal, setShowTitleModal ] = useState( false );
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
-	const [ selectedBlocks, setSelectedBlocks ] = useState( [] );
 	const shownBlockPatterns = useAsyncList( blockPatterns );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
@@ -102,30 +97,19 @@ export default function TemplatePartSelectionModal( {
 						<BlockPatternsList
 							blockPatterns={ blockPatterns }
 							shownPatterns={ shownBlockPatterns }
-							onClickPattern={ ( _, blocks ) => {
+							onClickPattern={ ( pattern, blocks ) => {
 								if ( isReplacingTemplatePartContent ) {
 									replaceInnerBlocks( clientId, blocks );
-									onClose();
 								} else {
-									setSelectedBlocks( blocks );
-									setShowTitleModal( true );
+									createFromBlocks( blocks, pattern.title );
 								}
+
+								onClose();
 							} }
 						/>
 					</div>
 				) }
 			</div>
-
-			{ showTitleModal && (
-				<TitleModal
-					areaLabel={ areaObject.label }
-					onClose={ () => setShowTitleModal( false ) }
-					onSubmit={ ( title ) => {
-						createFromBlocks( selectedBlocks, title );
-						onClose();
-					} }
-				/>
-			) }
 		</>
 	);
 }
