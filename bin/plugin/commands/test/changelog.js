@@ -10,7 +10,7 @@ import {
 	capitalizeAfterColonSeparatedPrefix,
 	getIssueType,
 	sortGroup,
-	skipUsers,
+	skipCreatedByBots,
 	getTypesByLabels,
 	getTypesByTitle,
 	getIssueFeature,
@@ -376,7 +376,7 @@ describe( 'getUniqueByUsername', () => {
 	} );
 } );
 
-describe( 'skipUsers', () => {
+describe( 'skipCreatedByBots', () => {
 	it( 'removes entries created by bots', () => {
 		const entries = [
 			{
@@ -431,7 +431,7 @@ describe( 'skipUsers', () => {
 				},
 			},
 		];
-		expect( skipUsers( entries ) ).toEqual( expected );
+		expect( skipCreatedByBots( entries ) ).toEqual( expected );
 	} );
 } );
 

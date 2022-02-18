@@ -682,7 +682,7 @@ function getChangelog( pullRequests ) {
 	let changelog = '## Changelog\n\n';
 
 	const groupedPullRequests = groupBy(
-		skipUsers( pullRequests ),
+		skipCreatedByBots( pullRequests ),
 		getIssueType
 	);
 
@@ -839,7 +839,7 @@ function getUniqueByUsername( items ) {
  * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
  * @return {IssuesListForRepoResponseItem[]} The list of filtered pull requests.
  */
-function skipUsers( pullRequests ) {
+function skipCreatedByBots( pullRequests ) {
 	return pullRequests.filter(
 		( pr ) => pr.user.type.toLowerCase() !== 'bot'
 	);
@@ -854,7 +854,7 @@ function skipUsers( pullRequests ) {
  */
 function getContributorProps( pullRequests ) {
 	const contributorsList = flow( [
-		skipUsers,
+		skipCreatedByBots,
 		getFirstTimeContributorPRs,
 		getUniqueByUsername,
 		sortByUsername,
@@ -894,7 +894,7 @@ function getContributorsMarkdownList( pullRequests ) {
  */
 function getContributorsList( pullRequests ) {
 	const contributorsList = flow( [
-		skipUsers,
+		skipCreatedByBots,
 		getUniqueByUsername,
 		sortByUsername,
 		getContributorsMarkdownList,
@@ -994,5 +994,5 @@ async function getReleaseChangelog( options ) {
 	getContributorsList,
 	getChangelog,
 	getUniqueByUsername,
-	skipUsers,
+	skipCreatedByBots,
 };
