@@ -13,6 +13,13 @@ export default {
 	component: FontSizePicker,
 	argTypes: {
 		initialValue: { table: { disable: true } }, // hide prop because it's not actually part of FontSizePicker
+		withReset: {
+			control: { type: 'boolean' },
+			table: {
+				type: 'boolean',
+				defaultValue: { summary: true },
+			},
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -68,7 +75,6 @@ Default.args = {
 	],
 	initialValue: 16,
 	withSlider: false,
-	withReset: true,
 };
 
 export const WithSlider = FontSizePickerWithState.bind( {} );
