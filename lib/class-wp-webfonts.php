@@ -285,7 +285,13 @@ class WP_Webfonts {
 			$styles .= $provider->get_css();
 		}
 
-		// Add global styles.
+		/**
+		 * Add global styles.
+		 *
+		 * This won't be needed when backported to WP-Core,
+		 * it is merely a quirk of the current implementation
+		 * due to limitations in the way we extend the JSON parser.
+		 */
 		$added_global_styles = array();
 		foreach ( $registered_webfonts as $webfont ) {
 			$family = $webfont['font-family'];
