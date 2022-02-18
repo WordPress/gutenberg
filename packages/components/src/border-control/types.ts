@@ -75,6 +75,8 @@ export type BorderControlProps = ColorProps &
 		 * If opted into, sanitizing the border means that if no width or color have
 		 * been selected, the border style is also cleared and `undefined`
 		 * is returned as the new border value.
+		 *
+		 * @default true
 		 */
 		shouldSanitizeBorder?: boolean;
 		/**
