@@ -1,7 +1,14 @@
 /**
  * Internal dependencies
  */
-import { Context, PostStatus, RenderedText, OmitNevers } from './common';
+import {
+	Context,
+	PostStatus,
+	RenderedText,
+	OmitNevers,
+	ContextualField,
+} from './common';
+import { StringWhenUpdatable } from './index';
 
 interface FullWpTemplate< C extends Context > {
 	/**
@@ -31,22 +38,20 @@ interface FullWpTemplate< C extends Context > {
 	/**
 	 * Content of template.
 	 */
-	content:
-		| {
-				/**
-				 * Content for the template, as it exists in the database.
-				 */
-				raw?: string;
-				/**
-				 * Version of the content block format used by the template.
-				 */
-				block_version?: number;
-		  }
-		| string;
+	content: StringWhenUpdatable< {
+		/**
+		 * Content for the template, as it exists in the database.
+		 */
+		raw: ContextualField< string, 'view' | 'edit', C >;
+		/**
+		 * Version of the content block format used by the template.
+		 */
+		block_version: ContextualField< number, 'edit', C >;
+	} >;
 	/**
 	 * Title of template.
 	 */
-	title: RenderedText< 'edit' > | string;
+	title: RenderedText< 'edit' >;
 	/**
 	 * Description of template.
 	 */

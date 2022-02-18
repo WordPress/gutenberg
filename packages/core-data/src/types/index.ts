@@ -65,8 +65,14 @@ export type EntityRecord< C extends Context > =
 	| WpTemplate< C >
 	| WpTemplatePart< C >;
 
+export type StringWhenUpdatable< T > = T & { __brand: 'UpdatableAsString' };
+
 export type Updatable< T extends EntityRecord< 'edit' > > = {
-	[ K in keyof T ]: T[ K ] extends RenderedText< any > ? string : T[ K ];
+	[ K in keyof T ]: T[ K ] extends
+		| RenderedText< any >
+		| StringWhenUpdatable< any >
+		? string
+		: T[ K ];
 };
 
 export type UpdatableEntityRecord = Updatable< EntityRecord< 'edit' > >;
