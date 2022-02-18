@@ -61,9 +61,13 @@ export interface User< C extends Context > {
 	 */
 	roles: ContextualField< string[], 'edit', C >;
 	/**
-	 * Password for the user (never included).
+	 * Password for the user.
+	 *
+	 * This is never sent from the server to the client
+	 * but exists because we might send an update to the
+	 * server with a new password to set.
 	 */
-	password: string;
+	password?: string;
 	/**
 	 * All capabilities assigned to the user.
 	 */
