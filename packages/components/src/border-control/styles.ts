@@ -11,6 +11,10 @@ import { space } from '../ui/utils/space';
 import { StyledLabel } from '../base-control/styles/base-control-styles';
 import { BackdropUI } from '../input-control/styles/input-control-styles';
 
+const labelStyles = css`
+	font-weight: 500;
+`;
+
 export const BorderControl = css`
 	position: relative;
 `;
@@ -98,7 +102,7 @@ export const BorderControlPopoverControls = css`
 
 	> div:first-of-type > ${ StyledLabel } {
 		margin-bottom: 0;
-		font-weight: 500;
+		${ labelStyles }
 	}
 
 	&& ${ StyledLabel } + button:not( .has-text ) {
@@ -135,9 +139,8 @@ export const BorderWidthControl = css`
 `;
 
 export const BorderControlStylePicker = css`
-	> label {
-		display: block;
-		font-weight: 500;
+	${ StyledLabel } {
+		${ labelStyles }
 	}
 `;
 
