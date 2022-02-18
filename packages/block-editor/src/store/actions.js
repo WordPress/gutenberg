@@ -1148,6 +1148,31 @@ export const setBlockMovingClientId = ( hasBlockMovingClientId = null ) => ( {
 };
 
 /**
+ * If a block uses a post id ref instead of innerBlocks, return a copy with populated innerBlocks. This is used to help
+ * create a deep copy of a block.
+ *
+ * @param  {Function} select select function that provides access to block-editor selectors
+ * @param  {Object[]} blocks a list of blocks to potentially hydrate
+ * @return {Object[]} hydrated blocks
+ * @private
+ */
+function __experimentalHydrateBlocks( select, blocks = [] ) {
+	return blocks.map( ( block ) => {
+		let innerBlocks = block.innerBlocks;
+		// eslint-disable-next-line no-unused-vars
+		const { ref, ...attributes } = block.attributes;
+		if ( ref ) {
+			innerBlocks =
+				innerBlocks.length > 0
+					? innerBlocks
+					: select.getBlocks( block.clientId );
+		}
+		innerBlocks = __experimentalHydrateBlocks( select, innerBlocks );
+		return { ...block, attributes, innerBlocks };
+	} );
+}
+
+/**
  * Action that duplicates a list of blocks.
  *
  * @param {string[]} clientIds
@@ -1181,7 +1206,10 @@ export const duplicateBlocks = ( clientIds, updateSelection = true ) => ( {
 	const lastSelectedIndex = select.getBlockIndex(
 		last( castArray( clientIds ) )
 	);
-	const clonedBlocks = blocks.map( ( block ) =>
+
+	// Fully hydrate blocks if they are backed by refs before copying
+	const hydratedBlocks = __experimentalHydrateBlocks( select, blocks );
+	const clonedBlocks = hydratedBlocks.map( ( block ) =>
 		__experimentalCloneSanitizedBlock( block )
 	);
 	dispatch.insertBlocks(
