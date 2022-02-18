@@ -39,7 +39,7 @@ const Label = ( props: LabelProps ) => {
 
 const BorderControlStylePicker = (
 	props: WordPressComponentProps< StylePickerProps, 'div' >,
-	forwardedRef: React.Ref< any >
+	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
 		buttonClassName,

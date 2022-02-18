@@ -29,7 +29,7 @@ const BorderLabel = ( props: LabelProps ) => {
 
 const BorderControl = (
 	props: WordPressComponentProps< BorderControlProps, 'div' >,
-	forwardedRef: React.Ref< any >
+	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
 		colors,

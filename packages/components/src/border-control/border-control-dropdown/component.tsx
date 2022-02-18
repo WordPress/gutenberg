@@ -23,7 +23,7 @@ const noop = () => undefined;
 
 const BorderControlDropdown = (
 	props: WordPressComponentProps< DropdownProps, 'div' >,
-	forwardedRef: React.Ref< any >
+	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
 		__experimentalHasMultipleOrigins,
