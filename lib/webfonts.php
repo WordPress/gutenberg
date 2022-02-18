@@ -54,6 +54,8 @@ function wp_webfonts() {
  * );
  * </code>
  *
+ * Webfonts should be registered in the `after_setup_theme` hook.
+ *
  * @since 6.0.0
  *
  * @param array $webfonts Webfonts to be registered.
