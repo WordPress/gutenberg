@@ -47,7 +47,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			}
 			value={ color.toHex().slice( 1 ).toUpperCase() }
 			onChange={ handleChange }
-			maxLength={ enableAlpha ? 8 : 7 }
+			maxLength={ enableAlpha ? 9 : 7 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
 		/>
