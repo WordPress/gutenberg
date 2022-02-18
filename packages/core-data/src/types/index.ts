@@ -70,22 +70,3 @@ export type Updatable< T extends EntityRecord< 'edit' > > = {
 };
 
 export type UpdatableEntityRecord = Updatable< EntityRecord< 'edit' > >;
-export type UpdatableAttachment = Updatable< Attachment< 'edit' > >;
-export type UpdatableComment = Updatable< Comment< 'edit' > >;
-export type UpdatableMenuLocation = Updatable< MenuLocation< 'edit' > >;
-export type UpdatableNavMenu = Updatable< NavMenu< 'edit' > >;
-export type UpdatableNavMenuItem = Updatable< NavMenuItem< 'edit' > >;
-export type UpdatableNavigationArea = Updatable< NavigationArea< 'edit' > >;
-export type UpdatablePage = Updatable< Page< 'edit' > >;
-export type UpdatablePlugin = Updatable< Plugin< 'edit' > >;
-export type UpdatablePost = Updatable< Post< 'edit' > >;
-export type UpdatableSettings = Updatable< Settings< 'edit' > >;
-export type UpdatableSidebar = Updatable< Sidebar< 'edit' > >;
-export type UpdatableTaxonomy = Updatable< Taxonomy< 'edit' > >;
-export type UpdatableTheme = Updatable< Theme< 'edit' > >;
-export type UpdatableUser = Updatable< User< 'edit' > >;
-export type UpdatableType = Updatable< Type< 'edit' > >;
-export type UpdatableWidget = Updatable< Widget< 'edit' > >;
-export type UpdatableWidgetType = Updatable< WidgetType< 'edit' > >;
-export type UpdatableWpTemplate = Updatable< WpTemplate< 'edit' > >;
-export type UpdatableWpTemplatePart = Updatable< WpTemplatePart< 'edit' > >;
