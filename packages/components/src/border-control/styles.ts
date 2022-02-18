@@ -14,6 +14,8 @@ import {
 } from '../base-control/styles/base-control-styles';
 import { BackdropUI } from '../input-control/styles/input-control-styles';
 
+import type { Border } from './types';
+
 const labelStyles = css`
 	font-weight: 500;
 `;
@@ -72,26 +74,36 @@ export const BorderControlDropdown = css`
 	&& > button {
 		padding: ${ space( 1 ) };
 		border-radius: inherit;
-
-		> span {
-			border-radius: 9999px;
-			border: 2px solid transparent;
-			width: 28px;
-			height: 28px;
-			padding: 2px;
-
-			& > span {
-				background: linear-gradient(
-					-45deg,
-					transparent 48%,
-					rgb( 0 0 0 / 20% ) 48%,
-					rgb( 0 0 0 / 20% ) 52%,
-					transparent 52%
-				);
-			}
-		}
 	}
 `;
+
+export const ColorIndicatorWrapper = ( border?: Border ) => {
+	const { color, style } = border || {};
+
+	const fallbackColor =
+		!! style && style !== 'none' ? COLORS.gray[ 300 ] : undefined;
+
+	return css`
+		border-radius: 9999px;
+		border: 2px solid transparent;
+		border-style: ${ style === 'none' ? 'solid' : style };
+		border-color: ${ color || fallbackColor };
+		width: 28px;
+		height: 28px;
+		padding: 2px;
+
+		/* ColorIndicator */
+		& > span {
+			background: linear-gradient(
+				-45deg,
+				transparent 48%,
+				rgb( 0 0 0 / 20% ) 48%,
+				rgb( 0 0 0 / 20% ) 52%,
+				transparent 52%
+			);
+		}
+	`;
+};
 
 export const BorderControlPopover = css`
 	/* Remove padding from content, this will be re-added via inner elements*/

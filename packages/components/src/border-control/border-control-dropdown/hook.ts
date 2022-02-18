@@ -59,6 +59,10 @@ export function useBorderControlDropdown(
 		return cx( styles.BorderColorIndicator );
 	}, [ cx ] );
 
+	const indicatorWrapperClassName = useMemo( () => {
+		return cx( styles.ColorIndicatorWrapper( border ) );
+	}, [ border, cx ] );
+
 	const popoverClassName = useMemo( () => {
 		return cx( styles.BorderControlPopover );
 	}, [ cx ] );
@@ -81,6 +85,7 @@ export function useBorderControlDropdown(
 		className: classes,
 		colors,
 		indicatorClassName,
+		indicatorWrapperClassName,
 		onColorChange,
 		onStyleChange,
 		onReset,

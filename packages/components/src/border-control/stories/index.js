@@ -61,6 +61,7 @@ Default.args = {
 	enableAlpha: true,
 	enableStyle: true,
 	isCompact: true,
+	shouldSanitizeBorder: true,
 	width: '110px',
 	withSlider: true,
 };
