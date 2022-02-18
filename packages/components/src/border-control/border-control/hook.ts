@@ -106,7 +106,7 @@ export function useBorderControl(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.BorderControl, className );
-	}, [ className ] );
+	}, [ className, cx ] );
 
 	const innerWrapperClassName = useMemo( () => {
 		const wrapperWidth = isCompact ? '90px' : width;
@@ -114,15 +114,15 @@ export function useBorderControl(
 			!! wrapperWidth && styles.WrapperWidth( wrapperWidth );
 
 		return cx( styles.InnerWrapper, widthStyle );
-	}, [ isCompact, width ] );
+	}, [ isCompact, width, cx ] );
 
 	const widthControlClassName = useMemo( () => {
 		return cx( styles.BorderWidthControl );
-	}, [] );
+	}, [ cx ] );
 
 	const sliderClassName = useMemo( () => {
 		return cx( styles.BorderSlider );
-	}, [] );
+	}, [ cx ] );
 
 	return {
 		...otherProps,

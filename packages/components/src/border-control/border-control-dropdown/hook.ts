@@ -53,27 +53,27 @@ export function useBorderControlDropdown(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.BorderControlDropdown, className );
-	}, [ className ] );
+	}, [ className, cx ] );
 
 	const indicatorClassName = useMemo( () => {
 		return cx( styles.BorderColorIndicator );
-	}, [] );
+	}, [ cx ] );
 
 	const popoverClassName = useMemo( () => {
 		return cx( styles.BorderControlPopover );
-	}, [] );
+	}, [ cx ] );
 
 	const popoverControlsClassName = useMemo( () => {
 		return cx( styles.BorderControlPopoverControls );
-	}, [] );
+	}, [ cx ] );
 
 	const popoverContentClassName = useMemo( () => {
 		return cx( styles.BorderControlPopoverContent );
-	}, [] );
+	}, [ cx ] );
 
 	const resetButtonClassName = useMemo( () => {
 		return cx( styles.ResetButton );
-	}, [] );
+	}, [ cx ] );
 
 	return {
 		...otherProps,

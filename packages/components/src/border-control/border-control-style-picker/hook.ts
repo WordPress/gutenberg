@@ -24,11 +24,11 @@ export function useBorderControlStylePicker(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.BorderControlStylePicker, className );
-	}, [ className ] );
+	}, [ className, cx ] );
 
 	const buttonClassName = useMemo( () => {
 		return cx( styles.BorderStyleButton );
-	}, [] );
+	}, [ cx ] );
 
 	return { ...otherProps, className: classes, buttonClassName };
 }
