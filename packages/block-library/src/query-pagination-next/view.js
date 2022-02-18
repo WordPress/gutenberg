@@ -53,6 +53,18 @@ const load = () => {
 
 window.addEventListener( 'load', load );
 
+const flattenAttributes = ( parenKeys, attributes ) =>
+	Object.entries( attributes ).reduce( ( list, [ key, value ] ) => {
+		const attributeEntry = [ [ ...parenKeys, key ], value ];
+
+		if ( typeof value === 'object' ) {
+			const subList = flattenAttributes( ...attributeEntry );
+			return [ ...list, ...subList ];
+		}
+
+		return [ ...list, attributeEntry ];
+	}, [] );
+
 async function fetchRenderedBlock( blockName, attributes, queryArgs, nonce ) {
 	// TODO: Auth should be done inside of this function (or ideally not at all.)
 	const route = `wp/v2/block-renderer/${ blockName }`;
@@ -60,9 +72,13 @@ async function fetchRenderedBlock( blockName, attributes, queryArgs, nonce ) {
 		'link[rel="https://api.w.org/"]'
 	).href;
 	const url = new URL( restApiBase + route );
-	for ( const attr in attributes ) {
-		url.searchParams.append( `attributes[${ attr }]`, attributes[ attr ] );
+
+	const flattenedAttributes = flattenAttributes( [], attributes );
+	for ( const [ keys, value ] of flattenedAttributes ) {
+		const key = `attributes${ keys.map( ( k ) => `[${ k }]` ).join( '' ) }`;
+		url.searchParams.append( key, value );
 	}
+
 	for ( const arg in queryArgs ) {
 		url.searchParams.append( 'arg', queryArgs[ arg ] );
 	}
