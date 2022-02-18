@@ -32,23 +32,23 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 		if ( ! empty( $deprecated ) ) {
 			_deprecated_argument( __METHOD__, '5.9' );
 		}
-		if ( null === self::$theme ) {
-			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json' ) );
-			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+		if ( null === static::$theme ) {
+			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
+			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
-			self::$theme     = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( wp_get_theme()->parent() ) {
 				// Get parent theme.json.
-				$parent_theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json', true ) );
-				$parent_theme_json_data = self::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
+				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
+				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
 				$parent_theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $parent_theme_json_data );
 				$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
 				// Merge the child theme.json into the parent theme.json.
 				// The child theme takes precedence over the parent.
-				$parent_theme->merge( self::$theme );
-				self::$theme = $parent_theme;
+				$parent_theme->merge( static::$theme );
+				static::$theme = $parent_theme;
 			}
 		}
 
@@ -56,10 +56,10 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 		 * We want the presets and settings declared in theme.json
 		 * to override the ones declared via theme supports.
 		 * So we take theme supports, transform it to theme.json shape
-		 * and merge the self::$theme upon that.
+		 * and merge the static::$theme upon that.
 		 */
 		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
-		if ( ! self::theme_has_support() ) {
+		if ( ! static::theme_has_support() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
 			}
@@ -85,7 +85,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
-		$with_theme_supports->merge( self::$theme );
+		$with_theme_supports->merge( static::$theme );
 
 		return $with_theme_supports;
 	}
