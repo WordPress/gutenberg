@@ -3,6 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { Icon, page, customPostType as post } from '@wordpress/icons';
 
 const SHOWN_SUGGESTIONS = 10;
 
@@ -18,8 +19,8 @@ function createLinkCompleter() {
 		name: 'links',
 		className: 'block-editor-autocompleters__link',
 		triggerPrefix: '[[',
-		options( letters ) {
-			return apiFetch( {
+		options: async ( letters ) => {
+			let options = await apiFetch( {
 				path: addQueryArgs( '/wp/v2/search', {
 					per_page: SHOWN_SUGGESTIONS,
 					search: letters,
@@ -27,13 +28,25 @@ function createLinkCompleter() {
 					order_by: 'menu_order',
 				} ),
 			} );
+
+			options = options.filter( ( option ) => option.title !== '' );
+
+			return options;
 		},
 		getOptionKeywords( item ) {
 			const expansionWords = item.title.split( /\s+/ );
 			return [ ...expansionWords ];
 		},
 		getOptionLabel( item ) {
-			return item.title;
+			return (
+				<>
+					<Icon
+						key="icon"
+						icon={ item.subtype === 'page' ? page : post }
+					/>
+					{ item.title }
+				</>
+			);
 		},
 		getOptionCompletion( item ) {
 			return <a href={ item.url }>{ item.title }</a>;
