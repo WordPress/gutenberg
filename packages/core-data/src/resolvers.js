@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, includes, get, hasIn, compact, uniq } from 'lodash';
+import { find, includes, get, compact, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -296,17 +296,7 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 		return;
 	}
 
-	let allowHeader;
-	if ( hasIn( response, [ 'headers', 'get' ] ) ) {
-		// If the request is fetched using the fetch api, the header can be
-		// retrieved using the 'get' method.
-		allowHeader = response.headers.get( 'allow' );
-	} else {
-		// If the request was preloaded server-side and is returned by the
-		// preloading middleware, the header will be a simple property.
-		allowHeader = get( response, [ 'headers', 'Allow' ], '' );
-	}
-
+	const allowHeader = response.headers.get( 'allow' );
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	const isAllowed = includes( allowHeader, method );
 	dispatch.receiveUserPermission( key, isAllowed );
