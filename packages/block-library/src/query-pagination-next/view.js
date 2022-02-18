@@ -27,8 +27,7 @@ const load = () => {
 				attributes[ attr ] = root.dataset[ attr ];
 			}
 		}
-		//console.log( attributes );
-		// TODO: Need to include blocks' current attributes.
+
 		// Fetch the HTML of the new block.
 		const html = await fetchRenderedBlock(
 			blockName,
