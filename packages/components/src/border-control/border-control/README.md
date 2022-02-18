@@ -133,7 +133,8 @@ Example:
 
 ### `width`: `string`
 
-Controls the visual width of the `BorderControl`.
+Controls the visual width of the `BorderControl`. It has no effect if the
+`isCompact` prop is set to `true`.
 
 - Required: No
 
