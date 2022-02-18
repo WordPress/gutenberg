@@ -43,7 +43,7 @@ export interface User< C extends Context > {
 	/**
 	 * Locale for the user.
 	 */
-	locale: ContextualField< '' | 'en_US', 'edit', C >;
+	locale: ContextualField< string, 'edit', C >;
 	/**
 	 * The nickname for the user.
 	 */

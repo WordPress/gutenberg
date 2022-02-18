@@ -3,6 +3,7 @@
  */
 import { AvatarUrls, Context, ContextualField, RenderedText } from './common';
 
+export type CommentStatus = 'hold' | 'approve' | 'spam' | 'trash' | '1' | '0';
 interface FullComment< C extends Context > {
 	/**
 	 * Unique identifier for the comment.
@@ -59,7 +60,7 @@ interface FullComment< C extends Context > {
 	/**
 	 * State of the comment.
 	 */
-	status: ContextualField< string, 'view' | 'edit', C >;
+	status: ContextualField< CommentStatus, 'view' | 'edit', C >;
 	/**
 	 * Type of the comment.
 	 */
