@@ -115,7 +115,7 @@ interface FullPost< C extends Context > {
 	/**
 	 * Meta fields.
 	 */
-	meta?: Record< string, string >;
+	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 	/**
 	 * Whether or not the post should be treated as sticky.
 	 */

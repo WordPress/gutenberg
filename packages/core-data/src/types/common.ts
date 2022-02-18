@@ -2,17 +2,15 @@ export interface AvatarUrls {
 	/**
 	 * Avatar URL with image size of 24 pixels.
 	 */
-	'24'?: string;
+	'24': string;
 	/**
 	 * Avatar URL with image size of 48 pixels.
 	 */
-	'48'?: string;
+	'48': string;
 	/**
 	 * Avatar URL with image size of 96 pixels.
 	 */
-	'96'?: string;
-
-	[ k: string ]: string;
+	'96': string;
 }
 
 export type MediaType = 'image' | 'file';

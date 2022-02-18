@@ -27,9 +27,13 @@ export interface Widget< C extends Context > {
 	/**
 	 * Instance settings of the widget, if supported.
 	 */
-	instance?: WidgetInstance;
+	instance: ContextualField< WidgetInstance, 'edit', C >;
 	/**
-	 * URL-encoded form data from the widget admin form. Used to update a widget that does not support instance. Write only.
+	 * URL-encoded form data from the widget admin form. Used
+	 * to update a widget that does not support instance.
+	 *
+	 * This is never sent from the server to the client but exists
+	 * because we might send an update.
 	 */
 	form_data?: string;
 }
@@ -38,13 +42,13 @@ interface WidgetInstance {
 	/**
 	 * Base64 encoded representation of the instance settings.
 	 */
-	encoded?: string;
+	encoded: string;
 	/**
 	 * Cryptographic hash of the instance settings.
 	 */
-	hash?: string;
+	hash: string;
 	/**
 	 * Unencoded instance settings, if supported.
 	 */
-	raw?: Record< string, string >;
+	raw: Record< string, string >;
 }
