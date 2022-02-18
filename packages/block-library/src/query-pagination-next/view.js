@@ -79,7 +79,7 @@ async function fetchRenderedBlock( blockName, attributes, queryArgs, nonce ) {
 	}
 
 	for ( const arg in queryArgs ) {
-		url.searchParams.append( 'arg', queryArgs[ arg ] );
+		url.searchParams.append( arg, queryArgs[ arg ] );
 	}
 	url.searchParams.append( 'context', 'edit' );
 	url.searchParams.append( '_locale', 'user' );
