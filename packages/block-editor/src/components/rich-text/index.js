@@ -132,9 +132,7 @@ function RichTextWrapper(
 			isSelected =
 				selectionStart.clientId === clientId &&
 				selectionEnd.clientId === clientId &&
-				selectionStart.attributeKey === identifier &&
-				typeof selectionStart.offset === 'number' &&
-				typeof selectionEnd.offset === 'number';
+				selectionStart.attributeKey === identifier;
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
 		}
