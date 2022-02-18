@@ -165,6 +165,7 @@ describe( 'actions', () => {
 				type: 'MULTI_SELECT',
 				start,
 				end,
+				initialPosition: 0,
 			} );
 		} );
 

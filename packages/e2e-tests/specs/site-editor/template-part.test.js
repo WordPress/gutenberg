@@ -260,10 +260,10 @@ describe( 'Template Part', () => {
 			const savePostSelector = '.edit-site-save-button__button';
 			const templatePartSelector = '*[data-type="core/template-part"]';
 			const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
-			const createNewButtonSelector =
-				'//button[contains(text(), "New template part")]';
+			const startBlockButtonSelector =
+				'//button[contains(text(), "Start blank")]';
 			const chooseExistingButtonSelector =
-				'//button[contains(text(), "Choose existing")]';
+				'//button[contains(text(), "Choose")]';
 			const confirmTitleButtonSelector =
 				'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
@@ -273,13 +273,10 @@ describe( 'Template Part', () => {
 
 				// Create new template part.
 				await insertBlock( 'Template Part' );
-				await siteEditorCanvas.waitForXPath(
-					chooseExistingButtonSelector
+				const startBlankButton = await siteEditorCanvas.waitForXPath(
+					startBlockButtonSelector
 				);
-				const [ createNewButton ] = await siteEditorCanvas.$x(
-					createNewButtonSelector
-				);
-				await createNewButton.click();
+				await startBlankButton.click();
 				const confirmTitleButton = await page.waitForSelector(
 					confirmTitleButtonSelector
 				);
@@ -318,13 +315,16 @@ describe( 'Template Part', () => {
 					chooseExistingButtonSelector
 				);
 				await chooseExistingButton.click();
-				await page.waitForSelector(
-					'.wp-block-template-part__selection-preview-container'
-				);
 				const preview = await page.waitForSelector(
-					'.wp-block-template-part__selection-preview-item[aria-label="Create New"]'
+					'.block-editor-block-patterns-list__item'
 				);
 				await preview.click();
+
+				// Wait for the template parts to load properly.
+				await siteEditorCanvas.waitForSelector(
+					'[data-type="core/template-part"] > p:first-child'
+				);
+
 				// We now have the same template part two times in the page, so check accordingly.
 				const paragraphs = await siteEditorCanvas.$$eval(
 					'[data-type="core/template-part"] > p:first-child',
