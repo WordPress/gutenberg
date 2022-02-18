@@ -70,6 +70,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 	const nodeRef = useRef();
 	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
 		{
+			clientId: blockClientId,
 			ref: nodeRef,
 			onChange( isFocused ) {
 				if ( isFocused && hasReducedUI ) {
