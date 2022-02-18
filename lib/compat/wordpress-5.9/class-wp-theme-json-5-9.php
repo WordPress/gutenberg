@@ -1030,7 +1030,7 @@ class WP_Theme_JSON_5_9 {
 				$slug = _wp_to_kebab_case( $preset['slug'] );
 
 				$value = '';
-				if ( isset( $preset_metadata['value_key'] ) ) {
+				if ( isset( $preset_metadata['value_key'], $preset[ $preset_metadata['value_key'] ] ) ) {
 					$value_key = $preset_metadata['value_key'];
 					$value     = $preset[ $value_key ];
 				} elseif (
@@ -1745,7 +1745,7 @@ class WP_Theme_JSON_5_9 {
 						sanitize_html_class( $preset['slug'] ) === $preset['slug']
 					) {
 						$value = null;
-						if ( isset( $preset_metadata['value_key'] ) ) {
+						if ( isset( $preset_metadata['value_key'], $preset[ $preset_metadata['value_key'] ] ) ) {
 							$value = $preset[ $preset_metadata['value_key'] ];
 						} elseif (
 							isset( $preset_metadata['value_func'] ) &&
