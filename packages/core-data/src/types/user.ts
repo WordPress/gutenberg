@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { AvatarUrls, Context, ContextualField } from './common';
+import { AvatarUrls, Context, ContextualField, OmitNevers } from './common';
 
-export interface User< C extends Context > {
+interface FullUser< C extends Context > {
 	/**
 	 * Unique identifier for the user.
 	 */
@@ -85,3 +85,5 @@ export interface User< C extends Context > {
 	 */
 	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 }
+
+export type User< C extends Context > = OmitNevers< FullUser< C > >;
