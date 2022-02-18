@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { onSubKey } from '../utils';
+import { normalizeArgs, onSubKey } from '../utils';
 
 describe( 'onSubKey', () => {
 	function createEnhancedReducer( actionProperty ) {
@@ -37,5 +37,32 @@ describe( 'onSubKey', () => {
 			1: 'Called by 1',
 			2: 'Called by 2',
 		} );
+	} );
+} );
+
+describe( 'normalizeArgs', () => {
+	it( 'should default to an empty array', () => {
+		expect( normalizeArgs( undefined ) ).toEqual( [] );
+	} );
+
+	it( 'should remove trailing undefined values', () => {
+		expect( normalizeArgs( [ 1, 2, undefined ] ) ).toEqual( [ 1, 2 ] );
+		expect( normalizeArgs( [ 1, 2, undefined, undefined ] ) ).toEqual( [
+			1,
+			2,
+		] );
+	} );
+
+	it( 'should leave non-trailing undefined values alone', () => {
+		expect( normalizeArgs( [ 1, undefined, 2, undefined ] ) ).toEqual( [
+			1,
+			undefined,
+			2,
+		] );
+	} );
+
+	it( 'should return already normalized array unchanged', () => {
+		const args = [ 1, 2, 3 ];
+		expect( normalizeArgs( args ) ).toBe( args );
 	} );
 } );
