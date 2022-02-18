@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import Button from '../../button';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import { View } from '../../view';
+import { Flex } from '../../flex';
 import { VisuallyHidden } from '../../visually-hidden';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderControlStylePicker } from './hook';
@@ -55,7 +56,7 @@ const BorderControlStylePicker = (
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
-			<View>
+			<Flex justify="flex-start" gap={ 1 }>
 				{ BORDER_STYLES.map( ( borderStyle ) => (
 					<Button
 						key={ borderStyle.value }
@@ -73,7 +74,7 @@ const BorderControlStylePicker = (
 						aria-label={ borderStyle.label }
 					/>
 				) ) }
-			</View>
+			</Flex>
 		</View>
 	);
 };

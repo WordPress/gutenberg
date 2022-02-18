@@ -139,10 +139,6 @@ export const BorderControlStylePicker = css`
 		display: block;
 		font-weight: 500;
 	}
-
-	> div {
-		display: inline-flex;
-	}
 `;
 
 export const BorderStyleButton = css`
@@ -151,7 +147,6 @@ export const BorderStyleButton = css`
 		width: 30px;
 		height: 30px;
 		padding: 3px;
-		${ rtl( { marginRight: space( 1 ) } )() }
 	}
 `;
 
