@@ -8,7 +8,7 @@
 
 ### Enhancements
 
-- Trigger re-render on `AutoHeightBlockPreview` component when items within its iFrame load (by listening for load events)
+- Trigger re-render on `AutoHeightBlockPreview` component when items within its iFrame load (by listening for load events) ([#38925](https://github.com/WordPress/gutenberg/pull/38925))
 
 ## 19.4.0 (2022-02-10)
 
