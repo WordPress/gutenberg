@@ -93,6 +93,7 @@ export default function LineHeightControl( {
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
 				onChange={ onChange }
+				isDragEnabled={ false }
 				label={ __( 'Line height' ) }
 				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }
