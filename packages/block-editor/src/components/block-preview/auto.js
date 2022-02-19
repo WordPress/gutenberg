@@ -62,7 +62,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
-	// console.log( 'ok' );
+
 	const scale = containerWidth / viewportWidth;
 
 	return (
