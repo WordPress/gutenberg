@@ -57,7 +57,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	}, [ styles ] );
 
 	const handleInnerContentLoaded = debounce( ( iFrame ) => {
-		iFrame.dispatchEvent( new Event( 'resize' ) );
+		iFrame?.dispatchEvent( new Event( 'resize' ) );
 	}, 100 );
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
