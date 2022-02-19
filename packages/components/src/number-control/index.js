@@ -15,7 +15,6 @@ import { isRTL } from '@wordpress/i18n';
  */
 import { Input } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
-import { composeStateReducers } from '../input-control/reducer/reducer';
 import { add, subtract, roundClamp } from '../utils/math';
 import { isValueEmpty } from '../utils/values';
 
@@ -160,7 +159,7 @@ export function NumberControl(
 				: constrainValue( currentValue );
 		}
 
-		return state;
+		return stateReducer( state, action );
 	};
 
 	return (
@@ -180,10 +179,7 @@ export function NumberControl(
 			step={ step }
 			type={ typeProp }
 			value={ valueProp }
-			__unstableStateReducer={ composeStateReducers(
-				numberControlStateReducer,
-				stateReducer
-			) }
+			__unstableStateReducer={ numberControlStateReducer }
 		/>
 	);
 }

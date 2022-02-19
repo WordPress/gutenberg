@@ -23,7 +23,6 @@ import { ENTER } from '@wordpress/keycodes';
  */
 import type { WordPressComponentProps } from '../ui/context';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
-import { composeStateReducers } from '../input-control/reducer/reducer';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
@@ -38,7 +37,7 @@ import type { StateReducer } from '../input-control/reducer/state';
 
 function UnitControl(
 	{
-		__unstableStateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducer,
 		autoComplete = 'off',
 		className,
 		disabled = false,
@@ -198,7 +197,7 @@ function UnitControl(
 			}
 		}
 
-		return state;
+		return stateReducer?.( state, action ) ?? state;
 	};
 
 	const inputSuffix = ! disableUnits ? (
@@ -244,10 +243,7 @@ function UnitControl(
 				suffix={ inputSuffix }
 				value={ parsedQuantity ?? '' }
 				step={ step }
-				__unstableStateReducer={ composeStateReducers(
-					unitControlStateReducer,
-					stateReducer
-				) }
+				__unstableStateReducer={ unitControlStateReducer }
 			/>
 		</Root>
 	);
