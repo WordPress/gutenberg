@@ -10,6 +10,7 @@ import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isSaving,
 		showIconLabels,
 		hasReducedUI,
+		isNavigationMode,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -43,15 +45,18 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			hasReducedUI: select( editPostStore ).isFeatureActive(
 				'reducedUI'
 			),
+			isNavigationMode: select( blockEditorStore ).isNavigationMode(),
 		} ),
 		[]
 	);
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
-	const classes = classnames( 'edit-post-header', {
-		'has-reduced-ui': hasReducedUI,
-	} );
+	if ( hasReducedUI && ! isNavigationMode ) {
+		return null;
+	}
+
+	const classes = classnames( 'edit-post-header' );
 
 	return (
 		<div className={ classes }>

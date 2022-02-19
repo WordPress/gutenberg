@@ -125,7 +125,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 						) }
 						<BlockMover
 							clientIds={ blockClientIds }
-							hideDragHandle={ hideDragHandle || hasReducedUI }
+							hideDragHandle={ hideDragHandle }
 						/>
 					</ToolbarGroup>
 				) }
