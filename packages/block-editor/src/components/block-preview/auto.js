@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Disabled } from '@wordpress/components';
@@ -51,9 +56,13 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 		return styles;
 	}, [ styles ] );
 
+	const handleInnerContentLoaded = debounce( ( iFrame ) => {
+		iFrame.dispatchEvent( new Event( 'resize' ) );
+	}, 100 );
+
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
-
+	// console.log( 'ok' );
 	const scale = containerWidth / viewportWidth;
 
 	return (
@@ -73,6 +82,9 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 				<Iframe
 					head={ <EditorStyles styles={ editorStyles } /> }
 					assets={ assets }
+					onLoad={ ( event ) =>
+						handleInnerContentLoaded( event.currentTarget )
+					}
 					contentRef={ useRefEffect( ( bodyElement ) => {
 						const {
 							ownerDocument: { documentElement },
