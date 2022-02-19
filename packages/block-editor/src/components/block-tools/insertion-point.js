@@ -41,6 +41,8 @@ function InsertionPointPopover( {
 		nextClientId,
 		rootClientId,
 		isInserterShown,
+		hasReducedUI,
+		isNavigationMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockOrder,
@@ -49,6 +51,8 @@ function InsertionPointPopover( {
 			isBlockBeingDragged,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
+			getSettings,
+			isNavigationMode: _isNavigationMode,
 		} = select( blockEditorStore );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
@@ -68,6 +72,8 @@ function InsertionPointPopover( {
 			_nextClientId = getNextBlockClientId( _nextClientId );
 		}
 
+		const settings = getSettings();
+
 		return {
 			previousClientId: _previousClientId,
 			nextClientId: _nextClientId,
@@ -75,6 +81,8 @@ function InsertionPointPopover( {
 				getBlockListSettings( insertionPoint.rootClientId )
 					?.orientation || 'vertical',
 			rootClientId: insertionPoint.rootClientId,
+			isNavigationMode: _isNavigationMode(),
+			hasReducedUI: settings.hasReducedUI,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
@@ -176,11 +184,6 @@ function InsertionPointPopover( {
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 	const disableMotion = useReducedMotion();
 
-	const className = classnames(
-		'block-editor-block-list__insertion-point',
-		'is-' + orientation
-	);
-
 	function onClick( event ) {
 		if ( event.target === ref.current && nextClientId ) {
 			selectBlock( nextClientId, -1 );
@@ -280,6 +283,15 @@ function InsertionPointPopover( {
 			transition: { delay: 0.2 },
 		},
 	};
+
+	if ( hasReducedUI && ! isNavigationMode ) {
+		return null;
+	}
+
+	const className = classnames(
+		'block-editor-block-list__insertion-point',
+		'is-' + orientation
+	);
 
 	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the

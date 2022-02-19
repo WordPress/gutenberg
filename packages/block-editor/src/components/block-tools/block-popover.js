@@ -215,7 +215,9 @@ function BlockPopover( {
 			// obscure specific sections of a block.
 			__unstableEditorCanvasWrapper={ __unstableContentRef?.current }
 		>
-			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
+			{ ( shouldShowBreadcrumb ||
+				shouldShowContextualToolbar ||
+				isToolbarForced ) && (
 				<div
 					onFocus={ onFocus }
 					onBlur={ onBlur }
@@ -240,7 +242,9 @@ function BlockPopover( {
 					/>
 				</div>
 			) }
-			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
+			{ ( shouldShowBreadcrumb ||
+				shouldShowContextualToolbar ||
+				isToolbarForced ) && (
 				<BlockContextualToolbar
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
@@ -256,23 +260,24 @@ function BlockPopover( {
 					key={ clientId }
 				/>
 			) }
-			{ shouldShowBreadcrumb && (
+			{ false && (
 				<BlockSelectionButton
 					clientId={ clientId }
 					rootClientId={ rootClientId }
 					blockElement={ node }
 				/>
 			) }
-			{ showEmptyBlockSideInserter && (
-				<div className="block-editor-block-list__empty-block-inserter">
-					<Inserter
-						position="bottom right"
-						rootClientId={ rootClientId }
-						clientId={ clientId }
-						__experimentalIsQuick
-					/>
-				</div>
-			) }
+			{ shouldShowBreadcrumb ||
+				( showEmptyBlockSideInserter && (
+					<div className="block-editor-block-list__empty-block-inserter">
+						<Inserter
+							position="bottom right"
+							rootClientId={ rootClientId }
+							clientId={ clientId }
+							__experimentalIsQuick
+						/>
+					</div>
+				) ) }
 		</Popover>
 	);
 }
@@ -284,6 +289,8 @@ function wrapperSelector( select ) {
 		getBlockRootClientId,
 		getBlock,
 		getBlockParents,
+		getSettings,
+		isNavigationMode: _isNavigationMode,
 		__experimentalGetBlockListSettingsForBlocks,
 	} = select( blockEditorStore );
 
@@ -310,11 +317,15 @@ function wrapperSelector( select ) {
 				?.__experimentalCaptureToolbars
 	);
 
+	const settings = getSettings();
+
 	return {
 		clientId,
 		rootClientId: getBlockRootClientId( clientId ),
 		name,
 		isValid,
+		hasReducedUI: settings.hasReducedUI,
+		isNavigationMode: _isNavigationMode(),
 		isEmptyDefaultBlock:
 			name && isUnmodifiedDefaultBlock( { name, attributes } ),
 		capturingClientId,
@@ -338,7 +349,13 @@ export default function WrappedBlockPopover( {
 		isValid,
 		isEmptyDefaultBlock,
 		capturingClientId,
+		hasReducedUI,
+		isNavigationMode,
 	} = selected;
+
+	if ( hasReducedUI && ! isNavigationMode ) {
+		return null;
+	}
 
 	if ( ! name ) {
 		return null;
