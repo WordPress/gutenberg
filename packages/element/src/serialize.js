@@ -326,7 +326,7 @@ const SVG_ATTRIBUTE_LIST = new Set( [
 	'overlinePosition',
 	'overlineThickness',
 	'paintOrder',
-	'panose-1',
+	'panose1',
 	'pointerEvents',
 	'renderingIntent',
 	'shapeRendering',
