@@ -129,6 +129,11 @@ describe( 'List view', () => {
 		// Check that we're collapsed
 		expect( await getBlockListLeafNodes() ).toHaveLength( 1 );
 
+		// Focus the cover block. The paragraph is not focussed by default.
+		const coverBlock = await page.waitForSelector( '.wp-block-cover' );
+
+		await coverBlock.focus();
+
 		// Click the cover title placeholder.
 		const coverTitle = await page.waitForSelector(
 			'.wp-block-cover .wp-block-paragraph'
@@ -138,7 +143,7 @@ describe( 'List view', () => {
 
 		// The block list should contain two leafs and the second should be selected (and be a paragraph).
 		const selectedElementText = await page.$eval(
-			'.block-editor-list-view-leaf:nth-child(2).is-selected a',
+			'.block-editor-list-view-leaf.is-selected .block-editor-list-view-block-contents',
 			( element ) => element.innerText
 		);
 
