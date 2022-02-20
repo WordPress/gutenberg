@@ -86,17 +86,9 @@ figure.wp-block-gallery.has-nested-images {
 
 	// Non cropped images.
 	&:not(.is-cropped) {
-
 		figure.wp-block-image:not(#individual-image) {
 			margin-top: 0;
 			margin-bottom: auto;
-			img {
-				margin-bottom: var(--wp--style--unstable-gallery-gap, #{$grid-unit-20});
-			}
-
-			figcaption {
-				bottom: var(--wp--style--unstable-gallery-gap, #{$grid-unit-20});
-			}
 		}
 	}
 
