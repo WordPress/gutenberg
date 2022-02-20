@@ -142,7 +142,7 @@ Whether to allow multiple selection of files or not.
 
 ### mediaPreview
 
-React Element to render as preview in placeholder
+The component is rendered as a preview in the placeholder.
 
 -   Type: `Component`
 -   Required: No
