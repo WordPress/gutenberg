@@ -144,7 +144,7 @@ Whether to allow multiple selection of files or not.
 
 React Element to render as preview in placeholder
 
--   Type: `Object`
+-   Type: `Component`
 -   Required: No
 -   Platform: Web
 
