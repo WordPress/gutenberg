@@ -281,6 +281,87 @@ function getNormalAttributeValue( attribute, value ) {
 
 	return value;
 }
+/**
+ * This is a list of all SVG attributes that have dashes.
+ * We need this to render e.g strokeWidth as stroke-width.
+ *
+ * List from: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute.
+ */
+const SVG_ATTRIBUTE_LIST = new Set( [
+	'accentHeight',
+	'alignmentBaseline',
+	'arabicForm',
+	'baselineShift',
+	'capHeight',
+	'clipPath',
+	'clipRule',
+	'colorInterpolation',
+	'colorInterpolationFilters',
+	'colorProfile',
+	'colorRendering',
+	'dominantBaseline',
+	'enableBackground',
+	'fillOpacity',
+	'fillRule',
+	'floodColor',
+	'floodOpacity',
+	'fontFamily',
+	'fontSize',
+	'fontSizeAdjust',
+	'fontStretch',
+	'fontStyle',
+	'fontVariant',
+	'fontWeight',
+	'glyphName',
+	'glyphOrientationHorizontal',
+	'glyphOrientationVertical',
+	'horizAdvX',
+	'horizOriginX',
+	'imageRendering',
+	'letterSpacing',
+	'lightingColor',
+	'markerEnd',
+	'markerMid',
+	'markerStart',
+	'overlinePosition',
+	'overlineThickness',
+	'paintOrder',
+	'panose-1',
+	'pointerEvents',
+	'renderingIntent',
+	'shapeRendering',
+	'stopColor',
+	'stopOpacity',
+	'strikethroughPosition',
+	'strikethroughThickness',
+	'strokeDasharray',
+	'strokeDashoffset',
+	'strokeLinecap',
+	'strokeLinejoin',
+	'strokeMiterlimit',
+	'strokeOpacity',
+	'strokeWidth',
+	'textAnchor',
+	'textDecoration',
+	'textRendering',
+	'underlinePosition',
+	'underlineThickness',
+	'unicodeBidi',
+	'unicodeRange',
+	'unitsPerEm',
+	'vAlphabetic',
+	'vHanging',
+	'vIdeographic',
+	'vMathematical',
+	'vectorEffect',
+	'vertAdvY',
+	'vertOriginX',
+	'vertOriginY',
+	'wordSpacing',
+	'writingMode',
+	'xmlnsXlink',
+	'xHeight',
+] );
 
 /**
  * Returns the normal form of the element's attribute name for HTML.
@@ -289,6 +370,7 @@ function getNormalAttributeValue( attribute, value ) {
  *
  * @return {string} Normalized attribute name.
  */
+
 function getNormalAttributeName( attribute ) {
 	switch ( attribute ) {
 		case 'htmlFor':
@@ -297,7 +379,9 @@ function getNormalAttributeName( attribute ) {
 		case 'className':
 			return 'class';
 	}
-
+	if ( SVG_ATTRIBUTE_LIST.has( attribute ) ) {
+		return kebabCase( attribute );
+	}
 	return attribute.toLowerCase();
 }
 
