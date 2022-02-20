@@ -191,6 +191,7 @@ function InputField(
 			}
 		},
 		{
+			axis: dragDirection === 'e' || dragDirection === 'w' ? 'x' : 'y',
 			threshold: dragThreshold,
 			enabled: isDragEnabled,
 			pointer: { capture: false },
