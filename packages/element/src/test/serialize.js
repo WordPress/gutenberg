@@ -181,6 +181,18 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( 'hello<div></div>' );
 	} );
 
+	it( 'SVG attributes with dashes should be rendered as such', () => {
+		const result = renderElement(
+			<svg>
+				<rect x="0" y="0" strokeWidth="5"></rect>
+			</svg>
+		);
+
+		expect( result ).toBe(
+			'<svg><rect x="0" y="0" stroke-width="5"></rect></svg>'
+		);
+	} );
+
 	it( 'renders escaped string element', () => {
 		const result = renderElement( 'hello & world &amp; friends <img/>' );
 
