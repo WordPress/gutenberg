@@ -40,8 +40,8 @@ export type PostFormat =
 export type Context = 'view' | 'edit' | 'embed';
 
 /**
- * A wrapper that turns fields unavailable in the current REST API contexts into
- * the type `never`. It is typically paired with OmitNevers.
+ * ContextualField makes the field available only in the specified given contexts,
+ * and ensure the field is absent from the object when in a different context.
  *
  * @example
  * ```ts
