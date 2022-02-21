@@ -13,7 +13,7 @@ test.describe( 'a11y', () => {
 
 		await page.keyboard.press( 'Tab' );
 
-		const headerInserterToggle = await page.locator(
+		const headerInserterToggle = page.locator(
 			'.edit-post-header-toolbar__inserter-toggle'
 		);
 
