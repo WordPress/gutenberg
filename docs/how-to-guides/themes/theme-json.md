@@ -408,7 +408,7 @@ The naming schema for the classes and the custom properties is as follows:
 							"slug": "white",
 							"color": "#ffffff",
 							"name": "White"
-						},
+						}
 					]
 				}
 			}
