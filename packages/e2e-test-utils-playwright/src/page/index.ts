@@ -6,6 +6,7 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
 /**
  * Internal dependencies
  */
+import { canvas } from './canvas';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
 import { createNewPost } from './create-new-post';
 import { getCurrentUser } from './get-current-user';
@@ -16,6 +17,7 @@ import { showBlockToolbar } from './show-block-toolbar';
 import { switchUserToAdmin } from './switch-user-to-admin';
 import { switchUserToTest } from './switch-user-to-test';
 import { visitAdminPage } from './visit-admin-page';
+import { wpDataSelect } from './wp-data-select';
 
 class PageUtils {
 	browser: Browser;
@@ -28,6 +30,7 @@ class PageUtils {
 		this.browser = this.context.browser()!;
 	}
 
+	canvas = canvas;
 	clickBlockToolbarButton = clickBlockToolbarButton;
 	createNewPost = createNewPost;
 	getCurrentUser = getCurrentUser;
@@ -38,6 +41,7 @@ class PageUtils {
 	switchUserToAdmin = switchUserToAdmin;
 	switchUserToTest = switchUserToTest;
 	visitAdminPage = visitAdminPage;
+	wpDataSelect = wpDataSelect;
 }
 
 export { PageUtils };
