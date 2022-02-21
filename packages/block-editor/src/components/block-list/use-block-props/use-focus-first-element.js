@@ -98,7 +98,7 @@ export function useFocusFirstElement( clientId ) {
 
 		// Check to see if Block contains focussable element before a generic caret insert.
 		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
-			let focusElement = focus.tabbable.findNext( ref.current );
+			const focusElement = focus.tabbable.findNext( ref.current );
 			// Need to make sure we're still in the current Block, if not, we could run in to trouble if focus is placed in a Block further down the page.
 			if ( ! ref.current.contains( focusElement ) ) {
 				return;
@@ -108,10 +108,7 @@ export function useFocusFirstElement( clientId ) {
 			const checkDisallowedTags = disallowedTags.some(
 				( tag ) => focusElement.tagName.toLowerCase() === tag
 			);
-			if ( checkDisallowedTags ) {
-				focusElement = false;
-			}
-			if ( focusElement ) {
+			if ( ! checkDisallowedTags && focusElement ) {
 				focusElement.focus();
 				return;
 			}

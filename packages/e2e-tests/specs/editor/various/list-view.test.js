@@ -86,10 +86,10 @@ describe( 'List view', () => {
 		// Select the image block in the canvas.
 		await page.keyboard.press( 'Enter' );
 
-		const canvasImageBlock = await page.waitForSelector(
-			'button.block-editor-media-placeholder__upload-button'
+		const uploadButton = await page.waitForXPath(
+			'//button[contains( text(), "Upload" ) ]'
 		);
-		expect( canvasImageBlock ).toHaveFocus();
+		expect( uploadButton ).toHaveFocus();
 
 		// Delete the image block in the canvas.
 		await page.keyboard.press( 'ArrowUp' );

@@ -72,20 +72,22 @@ exports[`Multi-block selection should cut and paste 2`] = `
 
 exports[`Multi-block selection should gradually multi-select 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"><!-- wp:paragraph -->
+<div class=\\"wp-block-columns\\"><!-- wp:column {\\"width\\":\\"33.33%\\"} -->
+<div class=\\"wp-block-column\\" style=\\"flex-basis:33.33%\\"></div>
+<!-- /wp:column -->
+
+<!-- wp:column {\\"width\\":\\"66.66%\\"} -->
+<div class=\\"wp-block-column\\" style=\\"flex-basis:66.66%\\"></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+
+<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
 <p>2</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:column -->
-
-<!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
-<!-- /wp:column --></div>
-<!-- /wp:columns -->"
+<!-- /wp:paragraph -->"
 `;
 
 exports[`Multi-block selection should gradually multi-select 2`] = `
