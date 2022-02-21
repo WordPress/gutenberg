@@ -148,7 +148,7 @@ This specification is the same for the three different origins that use this for
 ```
 
 ### Version
-This field describes the format of the `theme.json` file. Previously, the version used was only 1. With WordPress 5.9 introduced a new v2 with new keys. Follow [this](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/) link to find out more on v2.
+This field describes the format of the `theme.json` file. The current version is [v2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/), [introduced in WordPress 5.9](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/). It also works with the current Gutenberg plugin.
 
 As of now, WordPress will ignore any version that is not the current one.  If you have used v1 previously, you don’t need to update the version in the v1 file to v2, as it’ll be transformed into v2 at runtime for you. Each version potentially introduces new keys and might rename the old ones. In that case, the old key name becomes invalid and will need to be updated to the new key name.
 
