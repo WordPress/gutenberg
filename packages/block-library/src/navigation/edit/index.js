@@ -35,7 +35,6 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarGroup,
-	ToolbarDropdownMenu,
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -483,26 +482,17 @@ function Navigation( {
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
 						<ToolbarGroup>
-							<ToolbarDropdownMenu
-								label={ __( 'Select Menu' ) }
-								text={ __( 'Select Menu' ) }
-								icon={ null }
-							>
-								{ ( { onClose } ) => (
-									<NavigationMenuSelector
-										currentMenuId={ ref }
-										clientId={ clientId }
-										onSelect={ ( { id } ) => {
-											setRef( id );
-											onClose();
-										} }
-										onCreateNew={ startWithEmptyMenu }
-										/* translators: %s: The name of a menu. */
-										actionLabel={ __( "Switch to '%s'" ) }
-										showManageActions
-									/>
-								) }
-							</ToolbarDropdownMenu>
+							<NavigationMenuSelector
+								currentMenuId={ ref }
+								clientId={ clientId }
+								onSelect={ ( { id } ) => {
+									setRef( id );
+								} }
+								onCreateNew={ startWithEmptyMenu }
+								/* translators: %s: The name of a menu. */
+								actionLabel={ __( "Switch to '%s'" ) }
+								showManageActions
+							/>
 						</ToolbarGroup>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>

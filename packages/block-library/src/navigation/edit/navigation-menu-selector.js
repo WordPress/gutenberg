@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	MenuGroup,
+	MenuItem,
+	ToolbarDropdownMenu,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
@@ -21,6 +25,7 @@ export default function NavigationMenuSelector( {
 	onCreateNew,
 	showManageActions = false,
 	actionLabel,
+	toggleProps = {},
 } ) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
@@ -78,66 +83,82 @@ export default function NavigationMenuSelector( {
 	}
 
 	return (
-		<>
-			{ showNavigationMenus && hasNavigationMenus && (
-				<MenuGroup label={ __( 'Menus' ) }>
-					{ navigationMenusOmitCurrent.map( ( menu ) => {
-						const label = decodeEntities( menu.title.rendered );
-						return (
-							<MenuItem
-								onClick={ () => {
-									onSelect( menu );
-								} }
-								key={ menu.id }
-								aria-label={ sprintf( actionLabel, label ) }
-							>
-								{ label }
-							</MenuItem>
-						);
-					} ) }
-				</MenuGroup>
-			) }
-			{ showClassicMenus && hasClassicMenus && (
-				<MenuGroup label={ __( 'Classic Menus' ) }>
-					{ classicMenus.map( ( menu ) => {
-						const label = decodeEntities( menu.name );
-						return (
-							<MenuItem
-								onClick={ () => {
-									convertClassicMenuToBlocks(
-										menu.id,
-										menu.name
-									);
-								} }
-								key={ menu.id }
-								aria-label={ sprintf(
-									createActionLabel,
-									label
-								) }
-							>
-								{ label }
-							</MenuItem>
-						);
-					} ) }
-				</MenuGroup>
-			) }
-
-			{ showManageActions && hasManagePermissions && (
-				<MenuGroup label={ __( 'Tools' ) }>
-					{ canUserCreateNavigationMenu && (
-						<MenuItem onClick={ onCreateNew }>
-							{ __( 'Create new menu' ) }
-						</MenuItem>
+		<ToolbarDropdownMenu
+			label={ __( 'Select Menu' ) }
+			text={ __( 'Select Menu' ) }
+			icon={ null }
+			toggleProps={ toggleProps }
+		>
+			{ ( { onClose } ) => (
+				<>
+					{ showNavigationMenus && hasNavigationMenus && (
+						<MenuGroup label={ __( 'Menus' ) }>
+							{ navigationMenusOmitCurrent.map( ( menu ) => {
+								const label = decodeEntities(
+									menu.title.rendered
+								);
+								return (
+									<MenuItem
+										onClick={ () => {
+											onClose();
+											onSelect( menu );
+										} }
+										key={ menu.id }
+										aria-label={ sprintf(
+											actionLabel,
+											label
+										) }
+									>
+										{ label }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
 					) }
-					<MenuItem
-						href={ addQueryArgs( 'edit.php', {
-							post_type: 'wp_navigation',
-						} ) }
-					>
-						{ __( 'Manage menus' ) }
-					</MenuItem>
-				</MenuGroup>
+					{ showClassicMenus && hasClassicMenus && (
+						<MenuGroup label={ __( 'Classic Menus' ) }>
+							{ classicMenus.map( ( menu ) => {
+								const label = decodeEntities( menu.name );
+								return (
+									<MenuItem
+										onClick={ () => {
+											onClose();
+											convertClassicMenuToBlocks(
+												menu.id,
+												menu.name
+											);
+										} }
+										key={ menu.id }
+										aria-label={ sprintf(
+											createActionLabel,
+											label
+										) }
+									>
+										{ label }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+
+					{ showManageActions && hasManagePermissions && (
+						<MenuGroup label={ __( 'Tools' ) }>
+							{ canUserCreateNavigationMenu && (
+								<MenuItem onClick={ onCreateNew }>
+									{ __( 'Create new menu' ) }
+								</MenuItem>
+							) }
+							<MenuItem
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</MenuItem>
+						</MenuGroup>
+					) }
+				</>
 			) }
-		</>
+		</ToolbarDropdownMenu>
 	);
 }
