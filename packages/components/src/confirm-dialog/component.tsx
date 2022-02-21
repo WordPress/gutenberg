@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref, KeyboardEvent } from 'react';
+import type { ForwardedRef, KeyboardEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,7 @@ import { useCx } from '../utils/hooks/use-cx';
 
 function ConfirmDialog(
 	props: WordPressComponentProps< OwnProps, 'div', false >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		isOpen: isOpenProp,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, MotionProps } from 'framer-motion';
 import { css } from '@emotion/react';
@@ -44,7 +44,7 @@ type Props = Omit<
 	keyof MotionProps
 >;
 
-function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
