@@ -420,7 +420,7 @@ Block type editor script definition. It will only be enqueued in the context of 
 
 ### Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `script`
@@ -433,7 +433,7 @@ Block type frontend and editor script definition. It will be enqueued both in th
 
 ### View Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `viewScript`
