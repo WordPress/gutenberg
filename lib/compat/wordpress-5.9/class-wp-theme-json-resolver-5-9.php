@@ -191,7 +191,12 @@ class WP_Theme_JSON_Resolver_5_9 {
 			}
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
 
-			$theme_support_data['settings']['color']['defaultDuotone'] = false;
+			$default_duotone = false;
+			if ( ! isset( $theme_support_data['settings']['color']['duotone'] ) ) {
+				// If the theme does not have any duotone filters, we still want to show the core ones.
+				$default_duotone = true;
+			}
+			$theme_support_data['settings']['color']['defaultDuotone'] = $default_duotone;
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
