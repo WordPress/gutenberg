@@ -107,7 +107,7 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 	 */
 	public function test_generate_styles() {
 		$this->assertEquals(
-			'@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url(\'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2\') format(\'woff2\');}@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url(\'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2\') format(\'woff2\');}body{--wp--preset--font-family--source-serif-pro:Source Serif Pro;}.has-source-serif-pro-font-family{font-family:var(--wp--preset--font-family--source-serif-pro);}',
+			'@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url(\'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2\') format(\'woff2\');}@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url(\'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2\') format(\'woff2\');}',
 			wp_webfonts()->generate_styles()
 		);
 	}
