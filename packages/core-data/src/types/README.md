@@ -63,9 +63,7 @@ These contexts are supported by the core-data resolvers like `getEntityRecord()`
 The types describing different entity records must thus be aware of the relevant API context. This is implemented using the `Context` type parameter. For example, the implementation of the `Post` type resembles the following snippet:
 
 ```ts
-import { OmitNevers } from "./helpers";
-
-interface BasePost<C extends Context> {
+interface Post<C extends Context> {
 	/**
 	 * A named status for the post.
 	 */
@@ -73,13 +71,9 @@ interface BasePost<C extends Context> {
 
 	// ... other fields ...
 }
-
-export type Post<C extends Context> = OmitNevers<BasePost<C>>;
 ```
 
-The `status` field of the `BasePost` is either a `PostStatus` when the Context is `view` or `edit`, or it's `never` when the Context is `embed`.
-
-The derived type `Post` is stripped of all the `never` fields, and so `Post<'embed'>` does not have the `status` type at all.
+The `status` field is a `PostStatus` when the requesting context is `view` or `edit`, but if requested with an `embed` context the field won't appear on the `Post` object at all.
 
 ### Static type checks for *edited* entity records, where certain fields become strings instead of objects.
 
