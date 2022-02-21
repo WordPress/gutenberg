@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
 
+-   [*] Small refinement to media upload errors, including centring and tweaking copy. [#38951]
 -   [***] Support for multiple color palettes [#38417]
 
 ## 1.71.1
