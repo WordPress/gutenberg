@@ -31,7 +31,7 @@ function gutenberg_global_styles_render_svg_filters() {
 	}
 }
 
-// Override actions introduced in 5.9.1
+// Override actions introduced in 5.9.1 if they exist.
 remove_action( 'wp_body_open', 'wp_global_styles_render_svg_filters' );
 remove_action( 'in_admin_header', 'wp_global_styles_render_svg_filters' );
 add_action( 'wp_body_open', 'gutenberg_global_styles_render_svg_filters' );
