@@ -74,7 +74,7 @@
 							"default": true
 						},
 						"defaultDuotone": {
-							"description": "Allow users to choose colors from the default duotone presets.",
+							"description": "Allow users to choose filters from the default duotone filter presets.",
 							"type": "boolean",
 							"default": true
 						},
@@ -647,7 +647,7 @@
 				}
 			},
 			"patternProperties": {
-				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
+				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				}
 			},
