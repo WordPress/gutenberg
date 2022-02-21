@@ -36,11 +36,11 @@ export function finishResolution( selectorName, args ) {
  * Returns an action object used in signalling that selector resolution has
  * failed.
  *
- * @param {string}    selectorName Name of selector for which resolver triggered.
- * @param {unknown[]} args         Arguments to associate for uniqueness.
- * @param {Error}     error        The error that caused the failure
+ * @param {string}        selectorName Name of selector for which resolver triggered.
+ * @param {unknown[]}     args         Arguments to associate for uniqueness.
+ * @param {Error|unknown} error        The error that caused the failure
  *
- * @return {{ type: 'FAIL_RESOLUTION', selectorName: string, args: unknown[], error: Error }} Action object.
+ * @return {{ type: 'FAIL_RESOLUTION', selectorName: string, args: unknown[], error: Error|unknown }} Action object.
  */
 export function failResolution( selectorName, args, error ) {
 	return {
@@ -91,12 +91,12 @@ export function finishResolutions( selectorName, args ) {
  * Returns an action object used in signalling that a batch of selector resolutions has
  * completed and at least one of them has failed.
  *
- * @param {string}         selectorName Name of selector for which resolver triggered.
- * @param {unknown[]}      args         Array of arguments to associate for uniqueness, each item
- *                                      is associated to a resolution.
- * @param {(Error|null)[]} errors       Array of errors to associate for uniqueness, each item
- *                                      is associated to a resolution.
- * @return {{ type: 'FAIL_RESOLUTIONS', selectorName: string, args: unknown[], errors: Array<Error|null> }} Action object.
+ * @param {string}            selectorName Name of selector for which resolver triggered.
+ * @param {unknown[]}         args         Array of arguments to associate for uniqueness, each item
+ *                                         is associated to a resolution.
+ * @param {(Error|unknown)[]} errors       Array of errors to associate for uniqueness, each item
+ *                                         is associated to a resolution.
+ * @return {{ type: 'FAIL_RESOLUTIONS', selectorName: string, args: unknown[], errors: Array<Error|unknown> }} Action object.
  */
 export function failResolutions( selectorName, args, errors ) {
 	return {
