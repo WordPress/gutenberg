@@ -9,7 +9,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-export default function useListViewOpenSelectedItem( {
+export default function useListViewExpandSelectedItem({
 	firstSelectedBlockClientId,
 	setExpandedState,
 } ) {

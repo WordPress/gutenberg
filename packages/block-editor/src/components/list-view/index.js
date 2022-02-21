@@ -26,7 +26,7 @@ import ListViewDropIndicator from './drop-indicator';
 import useBlockSelection from './use-block-selection';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
-import useListViewOpenSelectedItem from './use-list-view-open-selected-item';
+import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 
 const expanded = ( state, action ) => {
@@ -104,7 +104,7 @@ function ListView(
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
 	const isMounted = useRef( false );
-	const { setSelectedTreeId } = useListViewOpenSelectedItem( {
+	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
 		setExpandedState,
 	} );
