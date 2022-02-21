@@ -86,7 +86,7 @@ const post = wp.data.select('core').getEntityRecord( 'postType', 'post', 1, { co
 
 The block markup stored in `content` can only be rendered on the server so the REST API exposes both the raw markup and the rendered version. For example, `content.rendered` could used as a visual preview, and `content.raw` could be used to populate the code editor.
 
-The `content` field may still be updated via Javascript, but the updated content cannot be properly rendered without requesting the server. Therefore, it doesn't make sense to keep track the `rendered` when editing. The only remaining part is `raw`, and since that's a string, the entire edited `content` can be expressed a string.
+The `content` field may still be updated via JavaScript, but the updated content cannot be properly rendered without requesting the server. Therefore, it doesn't make sense to keep track the `rendered` when editing. The only remaining part is `raw`, and since that's a string, the entire edited `content` can be expressed a string.
 
 And this is exactly what you'll see after retrieving the editable version of the record using `getEditedEntityRecord`:
 
@@ -154,7 +154,7 @@ and content. The REST API exposes both the raw markup and the rendered version o
 For example, in the block editor, content.rendered could used as a visual preview, and
 content.raw could be used to populate the code editor.
 
-When updating these rendered fields, Javascript is not be able to properly render arbitrary block
+When updating these rendered fields, JavaScript is not be able to properly render arbitrary block
 markup. Therefore, it stores only the raw markup without the rendered part. And since that's a string,
 the entire field becomes a string.
 
