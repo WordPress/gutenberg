@@ -2,9 +2,9 @@
  * Internal dependencies
  */
 import { Widget } from './widget';
-import { Context } from './helpers';
+import { Context, OmitNevers } from './helpers';
 
-export interface Sidebar< C extends Context > {
+export interface ExtensibleSidebar< C extends Context > {
 	/**
 	 * ID of sidebar.
 	 */
@@ -48,3 +48,5 @@ export interface Sidebar< C extends Context > {
 }
 
 type SidebarStatus = 'active' | 'inactive';
+
+export type Sidebar< C extends Context > = OmitNevers< ExtensibleSidebar< C > >;

@@ -10,7 +10,7 @@ import {
 	OmitNevers,
 } from './helpers';
 
-interface FullAttachment< C extends Context > {
+export interface ExtensibleAttachment< C extends Context > {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -121,4 +121,6 @@ interface FullAttachment< C extends Context > {
 	missing_image_sizes: ContextualField< string[], 'edit', C >;
 }
 
-export type Attachment< C extends Context > = OmitNevers< FullAttachment< C > >;
+export type Attachment< C extends Context > = OmitNevers<
+	ExtensibleAttachment< C >
+>;

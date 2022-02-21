@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { CommentingStatus, Context, PingStatus } from './helpers';
+import { CommentingStatus, Context, OmitNevers, PingStatus } from './helpers';
 
-export interface Settings< C extends Context > {
+export interface ExtensibleSettings< C extends Context > {
 	/**
 	 * What to show on the front page
 	 */
@@ -81,3 +81,7 @@ export interface Settings< C extends Context > {
 	 */
 	site_icon: number;
 }
+
+export type Settings< C extends Context > = OmitNevers<
+	ExtensibleSettings< C >
+>;

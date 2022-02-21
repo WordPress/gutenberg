@@ -10,7 +10,8 @@ import {
 } from './helpers';
 
 export type CommentStatus = 'hold' | 'approve' | 'spam' | 'trash' | '1' | '0';
-interface FullComment< C extends Context > {
+
+export interface ExtensibleComment< C extends Context > {
 	/**
 	 * Unique identifier for the comment.
 	 */
@@ -81,4 +82,4 @@ interface FullComment< C extends Context > {
 	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 }
 
-export type Comment< C extends Context > = OmitNevers< FullComment< C > >;
+export type Comment< C extends Context > = OmitNevers< ExtensibleComment< C > >;

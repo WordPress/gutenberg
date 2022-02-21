@@ -3,7 +3,7 @@
  */
 import { Context, ContextualField, OmitNevers } from './helpers';
 
-export interface FullWidget< C extends Context > {
+export interface ExtensibleWidget< C extends Context > {
 	/**
 	 * Unique identifier for the widget.
 	 */
@@ -53,4 +53,4 @@ interface WidgetInstance {
 	raw: Record< string, string >;
 }
 
-export type Widget< C extends Context > = OmitNevers< FullWidget< C > >;
+export type Widget< C extends Context > = OmitNevers< ExtensibleWidget< C > >;

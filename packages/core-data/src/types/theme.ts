@@ -3,7 +3,7 @@
  */
 import { Context, PostFormat, RenderedText, OmitNevers } from './helpers';
 
-interface FullTheme< C extends Context > {
+export interface ExtensibleTheme< C extends Context > {
 	/**
 	 * The theme's stylesheet. This uniquely identifies the theme.
 	 */
@@ -211,4 +211,4 @@ export type Html5Option =
 	| 'script'
 	| 'style';
 
-export type Theme< C extends Context > = OmitNevers< FullTheme< C > >;
+export type Theme< C extends Context > = OmitNevers< ExtensibleTheme< C > >;

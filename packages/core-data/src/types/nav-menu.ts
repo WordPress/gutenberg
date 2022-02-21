@@ -3,7 +3,7 @@
  */
 import { Context, ContextualField, OmitNevers } from './helpers';
 
-interface FullNavMenu< C extends Context > {
+export interface ExtensibleNavMenu< C extends Context > {
 	/**
 	 * Unique identifier for the term.
 	 */
@@ -38,4 +38,4 @@ interface FullNavMenu< C extends Context > {
 	auto_add: ContextualField< boolean, 'view' | 'edit', C >;
 }
 
-export type NavMenu< C extends Context > = OmitNevers< FullNavMenu< C > >;
+export type NavMenu< C extends Context > = OmitNevers< ExtensibleNavMenu< C > >;

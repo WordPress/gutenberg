@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { Context } from './helpers';
+import { Context, OmitNevers } from './helpers';
 
-export interface MenuLocation< C extends Context > {
+export interface ExtensibleMenuLocation< C extends Context > {
 	/**
 	 * The name of the menu location.
 	 */
@@ -17,3 +17,7 @@ export interface MenuLocation< C extends Context > {
 	 */
 	menu: number;
 }
+
+export type MenuLocation< C extends Context > = OmitNevers<
+	ExtensibleMenuLocation< C >
+>;

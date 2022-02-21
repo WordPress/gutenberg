@@ -3,7 +3,7 @@
  */
 import { AvatarUrls, Context, ContextualField, OmitNevers } from './helpers';
 
-interface FullUser< C extends Context > {
+export interface ExtensibleUser< C extends Context > {
 	/**
 	 * Unique identifier for the user.
 	 */
@@ -86,4 +86,4 @@ interface FullUser< C extends Context > {
 	meta: ContextualField< Record< string, string >, 'view' | 'edit', C >;
 }
 
-export type User< C extends Context > = OmitNevers< FullUser< C > >;
+export type User< C extends Context > = OmitNevers< ExtensibleUser< C > >;

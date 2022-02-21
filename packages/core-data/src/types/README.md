@@ -7,7 +7,7 @@ The types in this directory are designed to support the following use-cases:
 * Provide type-hinting and documentation for entity records fetched in the various REST API contexts.
 * Type-check the values we use to *edit* entity records, the values that are sent back to the server as updates.
 
-**Warning:** The types model the _expected_ API responses which is **not** the same as having a full type safety for the API-related operations. The API responses are **not** used as-is and in many cases could disagree with the type definitions, for example a plugin could modify the response, or the API endpoint could have a nuanced implementation in which strings are sometimes used instead of numbers.
+**Warning:** The types model the _expected_ API responses which is **not** the same as having a Extensible type safety for the API-related operations. The API responses are **not** used as-is and in many cases could disagree with the type definitions, for example a plugin could modify the response, or the API endpoint could have a nuanced implementation in which strings are sometimes used instead of numbers.
 
 ### Context-aware type checks for entity records
 
@@ -192,3 +192,32 @@ A string that the server renders which often involves modifications from the raw
 
 For example, block HTML with the comment delimiters exists in `post_content` but those comments are stripped out when rendering to a page view. Similarly, plugins might modify content or replace shortcodes.
 
+## Extending
+
+You can extend the entity record definitions using [TypeScript's declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html).
+
+For example, if you're building a plugin that displays a number of views of each comment, you can add a new `numberOfViews` field to the `Comment` type like this:
+
+```ts
+// In core-data
+export interface ExtensibleComment< C extends Context > {
+	id: number;
+	// ...
+}
+
+export type Comment< C extends Context > = OmitNevers<
+	ExtensibleComment< C >
+>;
+
+// In the plugin
+import { ExtensibleComment, Comment } from '@wordpress/core-data';
+interface ExtensibleComment < C extends Context > {
+	numberOfViews: number;
+}
+
+const c : Comment = ...
+
+// c.numberOfViews is a number
+```
+
+Of course you will also need to extend the REST API to expose the numberOfViews property.

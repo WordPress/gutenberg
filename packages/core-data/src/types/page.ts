@@ -11,7 +11,7 @@ import {
 	OmitNevers,
 } from './helpers';
 
-interface FullPage< C extends Context > {
+export interface ExtensiblePage< C extends Context > {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -125,4 +125,4 @@ interface FullPage< C extends Context > {
 	template: ContextualField< string, 'view' | 'edit', C >;
 }
 
-export type Page< C extends Context > = OmitNevers< FullPage< C > >;
+export type Page< C extends Context > = OmitNevers< ExtensiblePage< C > >;

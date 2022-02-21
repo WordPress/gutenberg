@@ -3,7 +3,7 @@
  */
 import { Context, ContextualField, RenderedText, OmitNevers } from './helpers';
 
-interface FullPlugin< C extends Context > {
+export interface ExtensiblePlugin< C extends Context > {
 	/**
 	 * The plugin file.
 	 */
@@ -55,4 +55,4 @@ interface FullPlugin< C extends Context > {
 }
 
 export type PluginStatus = 'active' | 'inactive';
-export type Plugin< C extends Context > = OmitNevers< FullPlugin< C > >;
+export type Plugin< C extends Context > = OmitNevers< ExtensiblePlugin< C > >;

@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { Context } from './helpers';
+import { Context, OmitNevers } from './helpers';
 
-export interface NavigationArea< C extends Context > {
+export interface ExtensibleNavigationArea< C extends Context > {
 	/**
 	 * The name of the navigation area.
 	 */
@@ -17,3 +17,7 @@ export interface NavigationArea< C extends Context > {
 	 */
 	navigation: number;
 }
+
+export type NavigationArea< C extends Context > = OmitNevers<
+	ExtensibleNavigationArea< C >
+>;

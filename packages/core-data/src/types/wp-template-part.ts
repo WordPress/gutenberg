@@ -9,7 +9,7 @@ import {
 	ContextualField,
 } from './helpers';
 
-interface FullWpTemplatePart< C extends Context > {
+export interface ExtensibleWpTemplatePart< C extends Context > {
 	/**
 	 * ID of template.
 	 */
@@ -84,5 +84,5 @@ interface FullWpTemplatePart< C extends Context > {
 }
 
 export type WpTemplatePart< C extends Context > = OmitNevers<
-	FullWpTemplatePart< C >
+	ExtensibleWpTemplatePart< C >
 >;

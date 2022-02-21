@@ -2,9 +2,8 @@
  * Internal dependencies
  */
 import { Context, ContextualField, OmitNevers } from './helpers';
-import { FullWidget } from './widget';
 
-interface FullTaxonomy< C extends Context > {
+export interface ExtensibleTaxonomy< C extends Context > {
 	/**
 	 * All capabilities used by the taxonomy.
 	 */
@@ -78,4 +77,6 @@ export interface TaxonomyVisibility {
 	show_in_quick_edit: boolean;
 }
 
-export type Taxonomy< C extends Context > = OmitNevers< FullTaxonomy< C > >;
+export type Taxonomy< C extends Context > = OmitNevers<
+	ExtensibleTaxonomy< C >
+>;

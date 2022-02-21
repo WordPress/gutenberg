@@ -3,10 +3,6 @@
  */
 import { RenderedText, Context, ContextualField, OmitNevers } from './helpers';
 
-/**
- * Internal dependencies
- */
-
 export type NavMenuItemType =
 	| 'taxonomy'
 	| 'post_type'
@@ -20,7 +16,7 @@ export type NavMenuItemStatus =
 	| 'private';
 export type Target = '_blank' | '';
 
-interface FullNavMenuItem< C extends Context > {
+export interface ExtensibleNavMenuItem< C extends Context > {
 	/**
 	 * The title for the object.
 	 */
@@ -96,5 +92,5 @@ interface FullNavMenuItem< C extends Context > {
 }
 
 export type NavMenuItem< C extends Context > = OmitNevers<
-	FullNavMenuItem< C >
+	ExtensibleNavMenuItem< C >
 >;

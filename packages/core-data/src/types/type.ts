@@ -3,7 +3,7 @@
  */
 import { Context, ContextualField, OmitNevers } from './helpers';
 
-interface FullType< C extends Context > {
+export interface ExtensibleType< C extends Context > {
 	/**
 	 * All capabilities used by the post type.
 	 */
@@ -65,4 +65,4 @@ interface TypeVisibility {
 	show_in_nav_menus: boolean;
 }
 
-export type Type< C extends Context > = OmitNevers< FullType< C > >;
+export type Type< C extends Context > = OmitNevers< ExtensibleType< C > >;

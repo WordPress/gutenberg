@@ -12,7 +12,7 @@ import {
 	OmitNevers,
 } from './helpers';
 
-interface FullPost< C extends Context > {
+export interface ExtensiblePost< C extends Context > {
 	/**
 	 * The date the post was published, in the site's timezone.
 	 */
@@ -134,4 +134,4 @@ interface FullPost< C extends Context > {
 	tags: ContextualField< number[], 'view' | 'edit', C >;
 }
 
-export type Post< C extends Context > = OmitNevers< FullPost< C > >;
+export type Post< C extends Context > = OmitNevers< ExtensiblePost< C > >;

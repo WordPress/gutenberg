@@ -1,25 +1,25 @@
 /**
  * Internal dependencies
  */
-import { Attachment } from './attachment';
-import { Comment } from './comment';
-import { MenuLocation } from './menu-location';
-import { NavMenu } from './nav-menu';
-import { NavMenuItem } from './nav-menu-item';
-import { NavigationArea } from './navigation-area';
-import { Page } from './page';
-import { Plugin } from './plugin';
-import { Post } from './post';
-import { Settings } from './settings';
-import { Sidebar } from './sidebar';
-import { Taxonomy } from './taxonomy';
-import { Theme } from './theme';
-import { User } from './user';
-import { Type } from './type';
-import { Widget } from './widget';
-import { WidgetType } from './widget-type';
-import { WpTemplate } from './wp-template';
-import { WpTemplatePart } from './wp-template-part';
+import { ExtensibleAttachment, Attachment } from './attachment';
+import { ExtensibleComment, Comment } from './comment';
+import { ExtensibleMenuLocation, MenuLocation } from './menu-location';
+import { ExtensibleNavMenu, NavMenu } from './nav-menu';
+import { ExtensibleNavMenuItem, NavMenuItem } from './nav-menu-item';
+import { ExtensibleNavigationArea, NavigationArea } from './navigation-area';
+import { ExtensiblePage, Page } from './page';
+import { ExtensiblePlugin, Plugin } from './plugin';
+import { ExtensiblePost, Post } from './post';
+import { ExtensibleSettings, Settings } from './settings';
+import { ExtensibleSidebar, Sidebar } from './sidebar';
+import { ExtensibleTaxonomy, Taxonomy } from './taxonomy';
+import { ExtensibleTheme, Theme } from './theme';
+import { ExtensibleUser, User } from './user';
+import { ExtensibleType, Type } from './type';
+import { ExtensibleWidget, Widget } from './widget';
+import { ExtensibleWidgetType, WidgetType } from './widget-type';
+import { ExtensibleWpTemplate, WpTemplate } from './wp-template';
+import { ExtensibleWpTemplatePart, WpTemplatePart } from './wp-template-part';
 import { Context, Updatable } from './helpers';
 
 export {
@@ -67,3 +67,23 @@ export type EntityRecord< C extends Context > =
 	| WpTemplatePart< C >;
 
 export type UpdatableEntityRecord = Updatable< EntityRecord< 'edit' > >;
+
+export { ExtensibleAttachment } from './attachment';
+export { ExtensibleComment } from './comment';
+export { ExtensibleMenuLocation } from './menu-location';
+export { ExtensibleNavMenu } from './nav-menu';
+export { ExtensibleNavMenuItem } from './nav-menu-item';
+export { ExtensibleNavigationArea } from './navigation-area';
+export { ExtensiblePage } from './page';
+export { ExtensiblePlugin } from './plugin';
+export { ExtensiblePost } from './post';
+export { ExtensibleSettings } from './settings';
+export { ExtensibleSidebar } from './sidebar';
+export { ExtensibleTaxonomy } from './taxonomy';
+export { ExtensibleTheme } from './theme';
+export { ExtensibleUser } from './user';
+export { ExtensibleType } from './type';
+export { ExtensibleWidget } from './widget';
+export { ExtensibleWidgetType } from './widget-type';
+export { ExtensibleWpTemplate } from './wp-template';
+export { ExtensibleWpTemplatePart } from './wp-template-part';
