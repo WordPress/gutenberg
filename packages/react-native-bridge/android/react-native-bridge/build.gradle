@@ -92,13 +92,14 @@ dependencies {
         implementation "com.github.wordpress-mobile:react-native-slider:${extractPackageVersion('../../../react-native-editor/package.json', '@react-native-community/slider', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-get-random-values:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-get-random-values', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-masked-view:${extractPackageVersion('../../../react-native-editor/package.json', '@react-native-community/masked-view', 'dependencies')}"
-        implementation "com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-gesture-handler', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-screens:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-screens', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-safe-area-context:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-safe-area-context', 'dependencies')}"
-        implementation "com.github.wordpress-mobile:react-native-reanimated:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-reanimated', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-prompt-android', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-webview:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-webview', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-clipboard:${extractPackageVersion('../../../react-native-editor/package.json', '@react-native-clipboard/clipboard', 'dependencies')}"
+
+        implementation "com.github.fluiddot:publish-gutenberg-mobile-android-dependencies:trunk-SNAPSHOT"
+
         runtimeOnly "org.wordpress-mobile:hermes-release-mirror:0.66.2"
    } else {
         api 'com.facebook.react:react-native:+'
