@@ -6,6 +6,7 @@ const INSERTER_SEARCH_SELECTOR =
 /**
  * Checks if the blocks inserter is open.
  *
+ *
  * @this {import('./').PageUtils}
  */
 async function isGlobalInserterOpen() {
