@@ -1,7 +1,7 @@
 /**
  * Clicks a block toolbar button.
  *
- * @this {import('./').TestUtils}
+ * @this {import('./').PageUtils}
  * @param {string} label  The text string of the button label.
  * @param {string} [type] The type of button label: 'ariaLabel' or 'content'.
  */

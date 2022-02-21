@@ -2,7 +2,7 @@
  * The block toolbar is not always visible while typing.
  * Call this function to reveal it.
  *
- * @this {import('./').TestUtils}
+ * @this {import('./').PageUtils}
  */
 export async function showBlockToolbar() {
 	// Move the mouse to disable the isTyping mode. We need at least three

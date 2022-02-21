@@ -6,13 +6,13 @@ import { join } from 'path';
 /**
  * Visits admin page; if user is not logged in then it logging in it first, then visits admin page.
  *
- * @this {import('./').TestUtils}
+ * @this {import('./').PageUtils}
  * @param {string} adminPath String to be serialized as pathname.
  * @param {string} query     String to be serialized as query portion of URL.
  */
 export async function visitAdminPage( adminPath, query ) {
 	await this.page.goto(
-		this.createURL( join( 'wp-admin', adminPath ), query )
+		join( 'wp-admin', adminPath ) + ( query ? `?${ query }` : '' )
 	);
 
 	// Handle upgrade required screen

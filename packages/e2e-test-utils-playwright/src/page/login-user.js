@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import { WP_USERNAME, WP_PASSWORD } from './shared/config';
+import { WP_USERNAME, WP_PASSWORD } from '../config';
 
 /**
  * Performs log in with specified username and password.
  *
- * @this {import('./').TestUtils}
+ * @this {import('./').PageUtils}
  * @param {?string} username String to be used as user credential.
  * @param {?string} password String to be used as user credential.
  */
@@ -15,7 +15,7 @@ export async function loginUser(
 	password = WP_PASSWORD
 ) {
 	if ( ! this.isCurrentURL( 'wp-login.php' ) ) {
-		await this.page.goto( this.createURL( 'wp-login.php' ) );
+		await this.page.goto( 'wp-login.php' );
 	}
 
 	await this.page.press( '#user_login', 'Control+A' );

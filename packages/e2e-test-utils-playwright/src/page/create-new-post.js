@@ -6,7 +6,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Creates new post.
  *
- * @this {import('./').TestUtils}
+ * @this {import('./').PageUtils}
  * @param {Object}  object                    Object to create new post, along with tips enabling option.
  * @param {string}  [object.postType]         Post type of the new post.
  * @param {string}  [object.title]            Title of the new post.

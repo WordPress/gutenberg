@@ -18,6 +18,7 @@ const config: PlaywrightTestConfig = {
 	testDir: new URL( './specs', 'file:' + __filename ).pathname,
 	outputDir: path.join( process.cwd(), 'artifacts/test-results' ),
 	use: {
+		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
 		headless: true,
 		viewport: {
 			width: 960,
