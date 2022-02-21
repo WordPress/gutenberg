@@ -138,8 +138,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$block_gap             = wp_get_global_settings( array( 'spacing', 'blockGap' ) );
-	$default_layout        = wp_get_global_settings( array( 'layout' ) );
+	$block_gap             = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
+	$default_layout        = gutenberg_get_global_settings( array( 'layout' ) );
 	$has_block_gap_support = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout  = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout           = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
