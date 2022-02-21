@@ -45,18 +45,20 @@ export type Context = 'view' | 'edit' | 'embed';
  *
  * @example
  * ```ts
- * type MyType< C extends Context > = {
- *   good: ContextualField< string, 'view' | 'edit', C >;
- *   bad: ContextualField< string, 'edit', C >;
+ * interface Post< C extends Context > {
+ * 	…
+ * 	modified: ContextualField< string, 'edit' | 'view', C >;
+ * 	password: ContextualField< string, 'edit', C >;
+ * 	…
  * }
  *
- * const a = {} as MyType<'view'>;
- * // a.good is of type string
- * // b.bad is of type never
+ * const post: Post<'edit'> = …
+ * // post.modified exists as a string
+ * // post.password exists as a string
  *
- * const b = {} as OmitNevers<MyType<'view'>>;
- * // a.good is of type string
- * // there is no property b.bad
+ * const post: Post<'view'> = …
+ * // post.modified still exists as a string
+ * // post.password is missing, undefined, because we're not in the `edit` context.
  * ```
  */
 export type ContextualField<
