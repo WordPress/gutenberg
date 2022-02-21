@@ -13,6 +13,7 @@ import {
 	deleteAllMenus,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	setBrowserViewport,
 	setUpResponseMocking,
 	visitAdminPage,
 	__experimentalRest as rest,
@@ -680,122 +681,142 @@ describe.skip( 'Navigation editor', () => {
 		} );
 	} );
 	describe( 'Delete menu button', () => {
-		it( 'should retain menu when confirmation is canceled', async () => {
-			const menuName = 'Menu delete test';
-
-			await createMenu( { name: menuName }, menuItemsFixture );
-			expect( true ).toBe( true );
-			await visitNavigationEditor();
-
-			// Wait for the header to show the menu name.
-			await page.waitForXPath(
-				`//h2[contains(text(), "${ menuName }")]`
-			);
-
-			const deleteMenuButton = await page.waitForXPath(
-				'//button[text()="Delete menu"]'
-			);
-			await deleteMenuButton.click();
-
-			const cancelButton = await page.waitForXPath(
-				'//*[@role="dialog"]//button[text()="Cancel"]'
-			);
-			await cancelButton.click();
-
-			const element = await page.waitForXPath(
-				`//*[contains(@class,"edit-navigation-menu-actions")]//h2[text()="${ menuName }"]`
-			);
-			const currentSelectedMenu = await page.evaluate(
-				( el ) => el.textContent,
-				element
-			);
-
-			expect( currentSelectedMenu ).toBe( menuName );
+		afterEach( async () => {
+			await setBrowserViewport( 'large' );
 		} );
-		it( 'should delete menu when confirmation is confirmed and there are no other menus', async () => {
-			const menuName = 'Menu delete test';
+		it.each( [ 'large', 'small' ] )(
+			`should retain menu when confirmation is canceled and the viewport is %s`,
+			async ( viewport ) => {
+				const menuName = 'Menu delete test';
+				await createMenu( { name: menuName }, menuItemsFixture );
+				await visitNavigationEditor();
+				await setBrowserViewport( viewport );
+				// Wait for the header to show the menu name.
+				await page.waitForXPath(
+					`//h2[contains(text(), "${ menuName }")]`
+				);
 
-			await createMenu( { name: menuName }, menuItemsFixture );
-			await visitNavigationEditor();
-
-			// Wait for the header to show the menu name.
-			await page.waitForXPath(
-				`//h2[contains(text(), "${ menuName }")]`
-			);
-
-			const deleteMenuButton = await page.waitForXPath(
-				'//button[text()="Delete menu"]'
-			);
-			await deleteMenuButton.click();
-
-			const confirmButton = await page.waitForXPath(
-				'//*[@role="dialog"]//button[text()="OK"]'
-			);
-			await confirmButton.click();
-
-			await page.waitForXPath(
-				`//*[@role="button"][@aria-label="Dismiss this notice"]//*[text()='"${ menuName }" menu has been deleted']`
-			);
-
-			// If the "Create your first menu" prompt appears, we know there are no remaining menus,
-			// so our test menu must have been deleted successfully.
-			const createFirstMenuPrompt = await page.waitForXPath(
-				'//h3[.="Create your first menu"]',
-				{
-					visible: true,
+				if ( viewport === 'small' ) {
+					const openSettingsSidebar = await page.waitForXPath(
+						'//button[@aria-label="Settings"][@aria-expanded="false"]'
+					);
+					await openSettingsSidebar.click();
 				}
-			);
-			const noMenusRemaining = createFirstMenuPrompt ? true : false;
-			expect( noMenusRemaining ).toBe( true );
-		} );
 
-		it( 'should delete menu when confirmation is confirmed and there are other existing menus', async () => {
-			const menuName = 'Menu delete test';
+				const deleteMenuButton = await page.waitForXPath(
+					'//button[text()="Delete menu"]'
+				);
+				await deleteMenuButton.click();
 
-			await createMenu( { name: menuName }, menuItemsFixture );
-			await createMenu( { name: `${ menuName } 2` }, menuItemsFixture );
-			await visitNavigationEditor();
-			// Wait for the header to show the menu name.
-			await page.waitForXPath(
-				`//h2[contains(text(), "${ menuName }")]`
-			);
+				const cancelButton = await page.waitForXPath(
+					'//*[@role="dialog"]//button[text()="Cancel"]'
+				);
+				await cancelButton.click();
 
-			const deleteMenuButton = await page.waitForXPath(
-				'//button[text()="Delete menu"]'
-			);
-			await deleteMenuButton.click();
+				const menuActionsDropdown = await page.waitForXPath(
+					`//*[contains(@class,"edit-navigation-menu-actions")]//h2[text()="${ menuName }"]`
+				);
+				const currentSelectedMenu = await page.evaluate(
+					( el ) => el.textContent,
+					menuActionsDropdown
+				);
 
-			const confirmButton = await page.waitForXPath(
-				'//*[@role="dialog"]//button[text()="OK"]'
-			);
-			await confirmButton.click();
-
-			await page.waitForXPath(
-				`//*[@role="button"][@aria-label="Dismiss this notice"]//*[text()='"${ menuName }" menu has been deleted']`
-			);
-
-			const menuActionsDropdown = await page.waitForXPath(
-				'//*[@class="edit-navigation-menu-actions"]//button[@aria-expanded="false"]'
-			);
-
-			await menuActionsDropdown.click();
-
-			const menuElementHandles = await page.$x(
-				'//*[@role="group"]//*[@role="menuitemradio"]/span'
-			);
-			const existingMenus = [];
-			for ( const elem of menuElementHandles ) {
-				const elemName = await elem.getProperty( 'textContent' );
-				const existingMenuName = await elemName.jsonValue();
-				existingMenus.push( existingMenuName );
+				expect( currentSelectedMenu ).toBe( menuName );
 			}
-			expect( existingMenus.includes( `${ menuName }` ) ).toBe( false );
-		} );
+		);
+		it.each( [ 'large', 'small' ] )(
+			`should delete menu when confirmation is confirmed and there are no other menus and the viewport is %s`,
+			async ( viewport ) => {
+				const menuName = 'Menu delete test';
+				await createMenu( { name: menuName }, menuItemsFixture );
+				await visitNavigationEditor();
+				await setBrowserViewport( viewport );
+				// Wait for the header to show the menu name.
+				await page.waitForXPath(
+					`//h2[contains(text(), "${ menuName }")]`
+				);
+				if ( viewport === 'small' ) {
+					const openSettingsSidebar = await page.waitForXPath(
+						'//button[@aria-label="Settings"][@aria-expanded="false"]'
+					);
+					await openSettingsSidebar.click();
+				}
 
-		// it.only( 'test', async () => {
-		// 	expect( true ).toBe( true );
-		// } );
+				const deleteMenuButton = await page.waitForXPath(
+					'//button[text()="Delete menu"]'
+				);
+				await deleteMenuButton.click();
+
+				const confirmButton = await page.waitForXPath(
+					'//*[@role="dialog"]//button[text()="OK"]'
+				);
+				await confirmButton.click();
+
+				await page.waitForXPath(
+					`//*[@role="button"][@aria-label="Dismiss this notice"]//*[text()='"${ menuName }" menu has been deleted']`
+				);
+
+				// If the "Create your first menu" prompt appears, we know there are no remaining menus,
+				// so our test menu must have been deleted successfully.
+				const createFirstMenuPrompt = await page.waitForXPath(
+					'//h3[.="Create your first menu"]',
+					{
+						visible: true,
+					}
+				);
+				const noMenusRemaining = createFirstMenuPrompt ? true : false;
+				expect( noMenusRemaining ).toBe( true );
+			}
+		);
+
+		it.each( [ 'large', 'small' ] )(
+			`should delete menu when confirmation is confirmed and there are other existing menus and the viewport is %s`,
+			async () => {
+				const menuName = 'Menu delete test';
+				await createMenu( { name: menuName }, menuItemsFixture );
+				await createMenu(
+					{ name: `${ menuName } 2` },
+					menuItemsFixture
+				);
+				await visitNavigationEditor();
+				// Wait for the header to show the menu name.
+				await page.waitForXPath(
+					`//h2[contains(text(), "${ menuName }")]`
+				);
+
+				const deleteMenuButton = await page.waitForXPath(
+					'//button[text()="Delete menu"]'
+				);
+				await deleteMenuButton.click();
+
+				const confirmButton = await page.waitForXPath(
+					'//*[@role="dialog"]//button[text()="OK"]'
+				);
+				await confirmButton.click();
+
+				await page.waitForXPath(
+					`//*[@role="button"][@aria-label="Dismiss this notice"]//*[text()='"${ menuName }" menu has been deleted']`
+				);
+
+				const menuActionsDropdown = await page.waitForXPath(
+					'//*[@class="edit-navigation-menu-actions"]//button[@aria-expanded="false"]'
+				);
+
+				await menuActionsDropdown.click();
+
+				const menuElementHandles = await page.$x(
+					'//*[@role="group"]//*[@role="menuitemradio"]/span'
+				);
+				const existingMenus = [];
+				for ( const elem of menuElementHandles ) {
+					const elemName = await elem.getProperty( 'textContent' );
+					const existingMenuName = await elemName.jsonValue();
+					existingMenus.push( existingMenuName );
+				}
+				expect( existingMenus.includes( `${ menuName }` ) ).toBe(
+					false
+				);
+			}
+		);
 	} );
 } );
-
-//TODO: Resolve unhandled asyncs and investigate testing viewports. hint: check 'await' appilcations
