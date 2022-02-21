@@ -55,9 +55,9 @@ export function failResolution( selectorName, args, error ) {
  * Returns an action object used in signalling that a batch of selector resolutions has
  * started.
  *
- * @param {string}    selectorName Name of selector for which resolver triggered.
+ * @param {string}      selectorName Name of selector for which resolver triggered.
  * @param {unknown[][]} args         Array of arguments to associate for uniqueness, each item
- *                                 is associated to a resolution.
+ *                                   is associated to a resolution.
  *
  * @return {{ type: 'START_RESOLUTIONS', selectorName: string, args: unknown[][] }} Action object.
  */
@@ -73,9 +73,9 @@ export function startResolutions( selectorName, args ) {
  * Returns an action object used in signalling that a batch of selector resolutions has
  * completed.
  *
- * @param {string}    selectorName Name of selector for which resolver triggered.
+ * @param {string}      selectorName Name of selector for which resolver triggered.
  * @param {unknown[][]} args         Array of arguments to associate for uniqueness, each item
- *                                 is associated to a resolution.
+ *                                   is associated to a resolution.
  *
  * @return {{ type: 'FINISH_RESOLUTIONS', selectorName: string, args: unknown[][] }} Action object.
  */
