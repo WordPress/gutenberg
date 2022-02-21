@@ -1,22 +1,22 @@
 /**
  * Delete all the widgets in the widgets screen.
  *
- * @this {import('./').TestUtils}
+ * @this {import('./index').RequestUtils}
  */
 export async function deleteAllWidgets() {
 	const [ widgets, sidebars ] = await Promise.all( [
-		this.__experimentalRest( { path: '/wp/v2/widgets' } ),
-		this.__experimentalRest( { path: '/wp/v2/sidebars' } ),
+		this.rest( { path: '/wp/v2/widgets' } ),
+		this.rest( { path: '/wp/v2/sidebars' } ),
 	] );
 
-	await this.__experimentalBatch(
+	await this.batchRest(
 		widgets.map( ( widget ) => ( {
 			method: 'DELETE',
 			path: `/wp/v2/widgets/${ widget.id }?force=true`,
 		} ) )
 	);
 
-	await this.__experimentalBatch(
+	await this.batchRest(
 		sidebars.map( ( sidebar ) => ( {
 			method: 'POST',
 			path: `/wp/v2/sidebars/${ sidebar.id }`,

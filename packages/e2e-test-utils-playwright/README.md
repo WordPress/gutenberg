@@ -16,12 +16,25 @@ npm install @wordpress/e2e-test-utils-playwright --save-dev
 
 ## API
 
-### TestUtils
+### PageUtils
 
 Create the test utils instance of the current page.
 
 ```js
-const testUtils = new TestUtils( page );
+const pageUtils = new PageUtils( page );
+```
+
+### RequestUtils
+
+Create the request utils instance of the request instance.
+
+```js
+const requestUtils = await RequestUtils.setup( {
+	user: {
+		username: 'admin',
+		password: 'password',
+	},
+} );
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

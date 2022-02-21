@@ -1,17 +1,22 @@
 /**
  * External dependencies
  */
+import path from 'path';
 import { test as base, expect, selectors } from '@playwright/test';
-import type { ConsoleMessage, Page } from '@playwright/test';
+import type { ConsoleMessage } from '@playwright/test';
 import { selectorScript } from 'role-selector/playwright-test';
 
 /**
  * WordPress dependencies
  */
-import { TestUtils } from '@wordpress/e2e-test-utils-playwright';
+import { PageUtils, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 // Register role selector.
 selectors.register( 'role', selectorScript, { contentScript: true } );
+
+const STORAGE_STATE_PATH =
+	process.env.STORAGE_STATE_PATH ||
+	path.join( process.cwd(), 'artifacts/storage-states/admin.json' );
 
 /**
  * Set of console logging types observed to protect against unexpected yet
@@ -95,11 +100,14 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 	console[ logFunction ]( text );
 }
 
-const test = base.extend< {
-	testUtils: TestUtils;
-	globalPage: Page;
-	globalTestUtils: TestUtils;
-} >( {
+const test = base.extend<
+	{
+		pageUtils: PageUtils;
+	},
+	{
+		requestUtils: RequestUtils;
+	}
+>( {
 	page: async ( { page }, use ) => {
 		page.on( 'console', observeConsoleLogging );
 
@@ -107,30 +115,27 @@ const test = base.extend< {
 
 		await page.close();
 	},
-	testUtils: async ( { page }, use ) => {
-		await use( new TestUtils( page ) );
+	pageUtils: async ( { page }, use ) => {
+		await use( new PageUtils( page ) );
 	},
-	// Used in `beforeAll` and `afterAll` where `page` isn't available.
-	globalPage: async ( { browser }, use ) => {
-		const context = await browser.newContext();
-		const page = await context.newPage();
-
-		page.on( 'console', observeConsoleLogging );
-
-		await use( page );
-
-		await context.close();
-	},
-	// Used in `beforeAll` and `afterAll` where `testUtils` isn't available.
-	globalTestUtils: async ( { globalPage }, use ) => {
-		await use( new TestUtils( globalPage ) );
-	},
+	requestUtils: [
+		async ( {}, use, workerInfo ) => {
+			const requestUtils = await RequestUtils.setup( {
+				baseURL: workerInfo.project.use.baseURL,
+				storageStatePath: STORAGE_STATE_PATH,
+			} );
+			await use( requestUtils );
+		},
+		{ scope: 'worker' },
+	],
 } );
 
-test.beforeAll( async ( { globalTestUtils } ) => {
-	await globalTestUtils.activateTheme( 'twentytwentyone' );
-	await globalTestUtils.deleteAllPosts();
-	await globalTestUtils.deleteAllBlocks();
+test.beforeAll( async ( { requestUtils } ) => {
+	await Promise.all( [
+		requestUtils.activateTheme( 'twentytwentyone' ),
+		requestUtils.deleteAllPosts(),
+		requestUtils.deleteAllBlocks(),
+	] );
 } );
 
 test.afterEach( async ( { page } ) => {

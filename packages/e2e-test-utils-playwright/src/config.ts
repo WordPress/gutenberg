@@ -1,7 +1,7 @@
 const WP_ADMIN_USER = {
 	username: 'admin',
 	password: 'password',
-};
+} as const;
 
 const {
 	WP_USERNAME = WP_ADMIN_USER.username,
