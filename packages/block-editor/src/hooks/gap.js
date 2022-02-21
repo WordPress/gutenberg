@@ -53,10 +53,10 @@ export function getGapValueFromStyle( rawBlockGapValue ) {
 	}
 
 	const isValueString = typeof rawBlockGapValue === 'string';
-	return cleanEmptyObject( {
+	return {
 		top: isValueString ? rawBlockGapValue : rawBlockGapValue?.top,
 		left: isValueString ? rawBlockGapValue : rawBlockGapValue?.left,
-	} );
+	};
 }
 
 /**
