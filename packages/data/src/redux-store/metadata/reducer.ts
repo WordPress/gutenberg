@@ -8,7 +8,7 @@ import type { Reducer } from 'redux';
 /**
  * Internal dependencies
  */
-import { normalizeArgs, onSubKey } from './utils';
+import { selectorArgsToStateKey, onSubKey } from './utils';
 
 type Action =
 	| ReturnType< typeof import('./actions').startResolution >
@@ -38,7 +38,7 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 		case 'FINISH_RESOLUTION': {
 			const isStarting = action.type === 'START_RESOLUTION';
 			const nextState = new EquivalentKeyMap( state );
-			nextState.set( normalizeArgs( action.args ), isStarting );
+			nextState.set( selectorArgsToStateKey( action.args ), isStarting );
 			return nextState;
 		}
 		case 'START_RESOLUTIONS':
@@ -46,13 +46,16 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 			const isStarting = action.type === 'START_RESOLUTIONS';
 			const nextState = new EquivalentKeyMap( state );
 			for ( const resolutionArgs of action.args ) {
-				nextState.set( normalizeArgs( resolutionArgs ), isStarting );
+				nextState.set(
+					selectorArgsToStateKey( resolutionArgs ),
+					isStarting
+				);
 			}
 			return nextState;
 		}
 		case 'INVALIDATE_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
-			nextState.delete( normalizeArgs( action.args ) );
+			nextState.delete( selectorArgsToStateKey( action.args ) );
 			return nextState;
 		}
 	}

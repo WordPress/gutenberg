@@ -43,9 +43,9 @@ export const onSubKey = < TState extends unknown, TAction extends AnyAction >(
  * and removing trailing `undefined` values.
  *
  * @param  args Selector argument array
- * @return Normalized selector argument array
+ * @return Normalized state key array
  */
-export function normalizeArgs( args: unknown[] | null | undefined ) {
+export function selectorArgsToStateKey( args: unknown[] | null | undefined ) {
 	if ( args === undefined || args === null ) {
 		return [];
 	}

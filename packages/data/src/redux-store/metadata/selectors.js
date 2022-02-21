@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * Internal dependencies
  */
-import { normalizeArgs } from './utils';
+import { selectorArgsToStateKey } from './utils';
 
 /** @typedef {Record<string, import('./reducer').State>} State */
 
@@ -28,7 +28,7 @@ export function getIsResolving( state, selectorName, args ) {
 		return undefined;
 	}
 
-	return map.get( normalizeArgs( args ) );
+	return map.get( selectorArgsToStateKey( args ) );
 }
 
 /**
