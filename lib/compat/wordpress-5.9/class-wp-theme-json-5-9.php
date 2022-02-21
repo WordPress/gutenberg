@@ -1036,7 +1036,7 @@ class WP_Theme_JSON_5_9 {
 	protected static function get_settings_values_by_slug( $settings, $preset_metadata, $origins ) {
 		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
 
-		$skip_default_presets = ! self::get_metadata_boolean( $settings, $preset_metadata['use_default_presets'], true );
+		$skip_default_presets = ! static::get_metadata_boolean( $settings, $preset_metadata['use_default_presets'], true );
 
 		$result = array();
 		foreach ( $origins as $origin ) {
@@ -1085,7 +1085,7 @@ class WP_Theme_JSON_5_9 {
 
 		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
 
-		$skip_default_presets = ! self::get_metadata_boolean( $settings, $preset_metadata['use_default_presets'], true );
+		$skip_default_presets = ! static::get_metadata_boolean( $settings, $preset_metadata['use_default_presets'], true );
 
 		$result = array();
 		foreach ( $origins as $origin ) {
@@ -1577,10 +1577,10 @@ class WP_Theme_JSON_5_9 {
 	 *   )
 	 * );
 	 *
-	 * self::get_metadata_boolean( $data, false );
+	 * static::get_metadata_boolean( $data, false );
 	 * // => false
 	 *
-	 * self::get_metadata_boolean( $data, array( 'color', 'defaultPalette' ) );
+	 * static::get_metadata_boolean( $data, array( 'color', 'defaultPalette' ) );
 	 * // => true
 	 * ```
 	 *
