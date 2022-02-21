@@ -9,7 +9,7 @@ import type {
 	KeyboardEvent,
 	PointerEvent,
 	FocusEvent,
-	Ref,
+	ForwardedRef,
 	MouseEvent,
 } from 'react';
 
@@ -53,7 +53,7 @@ function InputField(
 		type,
 		...props
 	}: WordPressComponentProps< InputFieldProps, 'input', false >,
-	ref: Ref< HTMLInputElement >
+	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
 		// State
