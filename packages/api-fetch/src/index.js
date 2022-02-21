@@ -14,6 +14,7 @@ import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
 import mediaUploadMiddleware from './middlewares/media-upload';
+import jsonSchemaMiddleware from './middlewares/json-schema';
 import {
 	parseResponseAndNormalizeError,
 	parseAndThrowError,
@@ -53,6 +54,7 @@ const middlewares = [
 	userLocaleMiddleware,
 	namespaceEndpointMiddleware,
 	httpV1Middleware,
+	jsonSchemaMiddleware,
 	fetchAllMiddleware,
 ];
 
