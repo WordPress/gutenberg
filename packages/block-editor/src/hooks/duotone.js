@@ -152,7 +152,7 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 		() => [
 			...userPresets,
 			...themePresets,
-			...( disableDefault ? defaultPresets : EMPTY_ARRAY ),
+			...( disableDefault ? EMPTY_ARRAY : defaultPresets ),
 		],
 		[ disableDefault, userPresets, themePresets, defaultPresets ]
 	);
