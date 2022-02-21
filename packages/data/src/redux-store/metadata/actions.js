@@ -38,7 +38,7 @@ export function finishResolution( selectorName, args ) {
  *
  * @param {string}        selectorName Name of selector for which resolver triggered.
  * @param {unknown[]}     args         Arguments to associate for uniqueness.
- * @param {Error|unknown} error        The error that caused the failure
+ * @param {Error|unknown} error        The error that caused the failure.
  *
  * @return {{ type: 'FAIL_RESOLUTION', selectorName: string, args: unknown[], error: Error|unknown }} Action object.
  */

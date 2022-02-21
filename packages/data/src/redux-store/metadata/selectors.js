@@ -93,8 +93,9 @@ export function hasResolutionFailed( state, selectorName, args ) {
 }
 
 /**
- * Returns the resolution error for a given selector
- * name, and arguments set.
+ * Returns the resolution error for a given selector name, and arguments set.
+ * Note it may be of an Error type, but may also be null, undefined, or anything else
+ * that can be `throw`-n.
  *
  * @param {State}      state        Data state.
  * @param {string}     selectorName Selector name.
