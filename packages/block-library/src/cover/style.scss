@@ -50,6 +50,10 @@
 		background-color: $black;
 	}
 
+	.has-background-dim.has-background-gradient {
+		background-color: transparent;
+	}
+
 	// the first selector is required for old Cover markup
 	&.has-background-dim::before,
 	.has-background-dim::before {
