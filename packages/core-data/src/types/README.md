@@ -86,9 +86,26 @@ const post = wp.data.select('core').getEntityRecord( 'postType', 'post', 1, { co
 
 The block markup stored in `content` can only be rendered on the server so the REST API exposes both the raw markup and the rendered version. For example, `content.rendered` could used as a visual preview, and `content.raw` could be used to populate the code editor.
 
-The `content` field may still be updated via JavaScript, but the updated content cannot be properly rendered without requesting the server. Therefore, it doesn't make sense to keep track the `rendered` when editing. The only remaining part is `raw`, and since that's a string, the entire edited `content` can be expressed a string.
+When updating that field from the JavaScript code, however, all we can set is the raw value that the server will eventually render. The API expects us to send a much simpler `string` form which is the raw form that needs to be stored in the database.
 
-And this is exactly what you'll see after retrieving the editable version of the record using `getEditedEntityRecord`:
+The types reflect this through the `Updatable<EntityRecord>` wrapper:
+
+```ts
+interface Post< C extends Context > {
+  title: {
+    raw: string;
+    rendered: string;
+  }
+}
+
+const post : Post< 'edit' > = ...
+// post.title is an object with properties `raw` and `rendered`
+
+const post : Updatable<Post< 'edit' >> = ...
+// post.title is a string
+```
+
+The `getEditedEntityRecord` selector returns the Updatable version of the entity records:
 
 ```js
 const post = wp.data.select('core').getEditedEntityRecord( 'postType', 'post', 1 );
