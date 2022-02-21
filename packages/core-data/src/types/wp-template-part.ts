@@ -37,18 +37,22 @@ interface FullWpTemplatePart< C extends Context > {
 	/**
 	 * Content of template.
 	 *
-	 * When used with the `Updatable` type wrapper, it is transformed to a string as a special case.
+	 * This field never has a `rendered` property when reading but still uses
+	 * the RenderedText type so it can be set as a string when sending updates to
+	 * the server.
+	 *
+	 * TODO: Figure out how to mesh this with `RenderedText<C>`
 	 */
-	content: {
-		/**
-		 * Content for the template, as it exists in the database.
-		 */
-		raw: ContextualField< string, 'view' | 'edit', C >;
-		/**
-		 * Version of the content block format used by the template.
-		 */
-		block_version: ContextualField< number, 'edit', C >;
-	};
+	content: ContextualField<
+		RenderedText< C > & {
+			/**
+			 * Version of the content block format used by the template.
+			 */
+			block_version: ContextualField< number, 'edit', C >;
+		},
+		'view' | 'edit',
+		C
+	>;
 	/**
 	 * Title of template.
 	 */

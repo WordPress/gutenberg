@@ -1,8 +1,6 @@
 /**
  * Internal dependencies
  */
-import { WpTemplate } from './wp-template';
-import { WpTemplatePart } from './wp-template-part';
 import { EntityRecord } from './index';
 
 export interface AvatarUrls {
@@ -149,16 +147,5 @@ export interface RenderedText< C extends Context > {
  * ```
  */
 export type Updatable< T extends EntityRecord< 'edit' > > = {
-	[ K in keyof T ]: T[ K ] extends RenderedText< any >
-		? string
-		: /*
-		 * Explicit handling for WpTemplate and WpTemplatePart. They both have a
-		 * `content` field that needs to be collapsed into a string even though
-		 * it doesn't match the RenderedText signature.
-		 */
-		T extends WpTemplate< any > | WpTemplatePart< any >
-		? K extends 'content'
-			? string
-			: T[ K ]
-		: T[ K ];
+	[ K in keyof T ]: T[ K ] extends RenderedText< any > ? string : T[ K ];
 };
