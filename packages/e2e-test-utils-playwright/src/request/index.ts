@@ -50,9 +50,20 @@ class RequestUtils {
 				recursive: true,
 			} );
 
-			storageState = JSON.parse(
-				await fs.readFile( storageStatePath, 'utf-8' )
-			);
+			try {
+				storageState = JSON.parse(
+					await fs.readFile( storageStatePath, 'utf-8' )
+				);
+			} catch ( error ) {
+				if (
+					error instanceof Error &&
+					( error as NodeJS.ErrnoException ).code === 'ENOENT'
+				) {
+					// Ignore errors if the state is not found.
+				} else {
+					throw error;
+				}
+			}
 		}
 
 		const requestContext = await request.newContext( {
