@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, act } from '@testing-library/react';
+import { render, act, getByText } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -68,5 +68,39 @@ describe( '__experimentalUseSafeDispatch', () => {
 		expect( badCall ).toBe( undefined );
 		// eslint-disable-next-line no-console
 		console.error.mockRestore();
+	} );
+
+	it( 'does dispatch on a mounted component', async () => {
+		jest.spyOn( console, 'error' );
+
+		const { promise, resolve } = deferred();
+
+		jest.useFakeTimers();
+
+		function MyComponent() {
+			const [ msg, setMsg ] = useState();
+
+			const safeSetMsg = useSafeDispatch( setMsg );
+
+			useEffect( () => {
+				async function doAsync() {
+					await promise;
+					safeSetMsg( 'Loaded' );
+				}
+
+				doAsync();
+			}, [ safeSetMsg ] );
+			return <p>Hello from Component: { msg }</p>;
+		}
+
+		const { container } = render( <MyComponent /> );
+
+		// Resolve the Promise within the component's effect
+		// that was not cleaned up.
+		await act( async () => {
+			resolve();
+		} );
+
+		expect( getByText( container, /loaded/i ) ).toBeInTheDocument();
 	} );
 } );
