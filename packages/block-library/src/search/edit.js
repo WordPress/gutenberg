@@ -257,6 +257,7 @@ export default function SearchEdit( {
 						type="button"
 						className={ buttonClasses }
 						style={ buttonStyles }
+						aria-label={ buttonText }
 					>
 						<Icon icon={ search } />
 					</button>
