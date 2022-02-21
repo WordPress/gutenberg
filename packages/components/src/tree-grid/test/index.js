@@ -61,7 +61,7 @@ describe( 'TreeGrid', () => {
 			<TreeGrid onExpandRow={ onExpandRow }>
 				<tr role="row" aria-expanded="true">
 					<td>
-						<TestButton width="">Row 1</TestButton>
+						<TestButton>Row 1</TestButton>
 					</td>
 				</tr>
 				<tr role="row" aria-expanded="false">
@@ -96,7 +96,7 @@ describe( 'TreeGrid', () => {
 			<TreeGrid onCollapseRow={ onCollapseRow }>
 				<tr role="row" aria-expanded="false">
 					<td>
-						<TestButton width="">Row 1</TestButton>
+						<TestButton>Row 1</TestButton>
 					</td>
 				</tr>
 				<tr role="row" aria-expanded="true">
