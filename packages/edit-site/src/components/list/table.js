@@ -8,6 +8,7 @@ import {
 	VisuallyHidden,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -98,8 +99,10 @@ export default function Table( { templateType } ) {
 										postType: template.type,
 									} }
 								>
-									{ template.title?.rendered ||
-										template.slug }
+									{ decodeEntities(
+										template.title?.rendered ||
+											template.slug
+									) }
 								</Link>
 							</Heading>
 							{ template.description }

@@ -84,6 +84,7 @@ import * as queryPaginationPrevious from './query-pagination-previous';
 import * as queryTitle from './query-title';
 import * as quote from './quote';
 import * as reusableBlock from './block';
+import * as readMore from './read-more';
 import * as rss from './rss';
 import * as search from './search';
 import * as separator from './separator';
@@ -271,6 +272,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 							postCommentsCount,
 							postCommentsForm,
 							postCommentsLink,
+							readMore,
 					  ]
 					: [] ),
 			].forEach( registerBlock );

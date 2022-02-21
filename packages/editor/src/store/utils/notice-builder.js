@@ -28,6 +28,11 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		return [];
 	}
 
+	// No notice is shown after trashing a post
+	if ( post.status === 'trash' && previousPost.status !== 'trash' ) {
+		return [];
+	}
+
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = includes( publishStatus, previousPost.status );
 	const willPublish = includes( publishStatus, post.status );

@@ -7,7 +7,7 @@ import type {
 	ChangeEvent,
 	SyntheticEvent,
 } from 'react';
-import type { useDrag } from 'react-use-gesture';
+import type { useDrag } from '@use-gesture/react';
 
 /**
  * Internal dependencies

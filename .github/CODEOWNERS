@@ -1,5 +1,5 @@
 # Documentation
-/docs                                           @ajitbohra @mkaz
+/docs                                           @ajitbohra @mkaz @ryanwelcher
 
 # Schemas
 /schemas                                        @mkaz
@@ -14,7 +14,7 @@
 
 # Blocks
 /packages/block-library                         @ajitbohra
-/packages/block-library/src/gallery             @mkevins
+/packages/block-library/src/gallery             @geriux
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
 /packages/block-library/src/navigation          @tellthemachines
@@ -64,8 +64,8 @@
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @ntwb @nerrad @ajitbohra
-/packages/create-block                          @gziolo @mkaz
-/packages/create-block-tutorial-template        @gziolo @mkaz
+/packages/create-block                          @gziolo @mkaz @ryanwelcher
+/packages/create-block-tutorial-template        @gziolo @mkaz @ryanwelcher
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/docgen                                @oandregal
@@ -79,7 +79,7 @@
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
 /packages/prettier-config                       @ntwb @gziolo
-/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra
+/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
 
 # UI Components

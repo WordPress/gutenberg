@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+## Breaking Change
+
+-   Removed icons that were added by mistake: `alignJustifyAlt`, `cogAlt`, `sparkles`, `trashFilled`. ([#38849](https://github.com/WordPress/gutenberg/pull/38849))
+
+## 6.3.0 (2022-02-10)
+
 ### New Features
 
 -   Added new block icon: `tip` ([#38424](https://github.com/WordPress/gutenberg/pull/38424)).
+-   Added new query title, post terms icons, updated pagination, pagination next/prev, and pagination numbers icons: `tip` ([#38521](https://github.com/WordPress/gutenberg/pull/38521)).
 
 ## 6.2.0 (2022-01-27)
 

@@ -22,11 +22,16 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
+		},
+		"defaultPage": {
+			"type": "string",
+			"default": "oldest"
 		}
 	},
 	"providesContext": {
 		"comments/perPage": "perPage",
 		"comments/order": "order",
+		"comments/defaultPage": "defaultPage",
 		"comments/inherit": "inherit"
 	},
 	"supports": {
@@ -34,7 +39,12 @@
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-comments-editor"

@@ -259,10 +259,15 @@ export function stopMultiSelect() {
 /**
  * Action that changes block multi-selection.
  *
- * @param {string} start First block of the multi selection.
- * @param {string} end   Last block of the multiselection.
+ * @param {string}      start                         First block of the multi selection.
+ * @param {string}      end                           Last block of the multiselection.
+ * @param {number|null} __experimentalInitialPosition Optional initial position. Pass as null to skip focus within editor canvas.
  */
-export const multiSelect = ( start, end ) => ( { select, dispatch } ) => {
+export const multiSelect = (
+	start,
+	end,
+	__experimentalInitialPosition = 0
+) => ( { select, dispatch } ) => {
 	const startBlockRootClientId = select.getBlockRootClientId( start );
 	const endBlockRootClientId = select.getBlockRootClientId( end );
 
@@ -271,7 +276,12 @@ export const multiSelect = ( start, end ) => ( { select, dispatch } ) => {
 		return;
 	}
 
-	dispatch( { type: 'MULTI_SELECT', start, end } );
+	dispatch( {
+		type: 'MULTI_SELECT',
+		start,
+		end,
+		initialPosition: __experimentalInitialPosition,
+	} );
 
 	const blockCount = select.getSelectedBlockCount();
 
@@ -996,11 +1006,11 @@ export function selectionChange(
  * @param {?Object} attributes   Optional attributes of the block to assign.
  * @param {?string} rootClientId Optional root client ID of block list on which
  *                               to append.
- * @param {?number} index        Optional index where to insert the default block
- *
- * @return {Object} Action object
+ * @param {?number} index        Optional index where to insert the default block.
  */
-export function insertDefaultBlock( attributes, rootClientId, index ) {
+export const insertDefaultBlock = ( attributes, rootClientId, index ) => ( {
+	dispatch,
+} ) => {
 	// Abort if there is no default block type (if it has been unregistered).
 	const defaultBlockName = getDefaultBlockName();
 	if ( ! defaultBlockName ) {
@@ -1009,8 +1019,8 @@ export function insertDefaultBlock( attributes, rootClientId, index ) {
 
 	const block = createBlock( defaultBlockName, attributes );
 
-	return insertBlock( block, index, rootClientId );
-}
+	return dispatch.insertBlock( block, index, rootClientId );
+};
 
 /**
  * Action that changes the nested settings of a given block.

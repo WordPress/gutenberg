@@ -107,7 +107,6 @@ function Navigation( {
 	hasSubmenuIndicatorSetting = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
-	customAppender: CustomAppender = null,
 } ) {
 	const {
 		openSubmenusOnClick,
@@ -224,12 +223,12 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserDeleteNavigationEntity,
-		hasResolvedCanUserDeleteNavigationEntity,
-		canUserCreateNavigation,
-		hasResolvedCanUserCreateNavigation,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu,
+		canUserDeleteNavigationMenu,
+		hasResolvedCanUserDeleteNavigationMenu,
+		canUserCreateNavigationMenu,
+		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
 	const navRef = useRef();
@@ -362,16 +361,16 @@ function Navigation( {
 
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
-				hasResolvedCanUserUpdateNavigationEntity &&
-				! canUserUpdateNavigationEntity
+				hasResolvedCanUserUpdateNavigationMenu &&
+				! canUserUpdateNavigationMenu
 			) {
 				showCantEditNotice();
 			}
 
 			if (
 				! ref &&
-				hasResolvedCanUserCreateNavigation &&
-				! canUserCreateNavigation
+				hasResolvedCanUserCreateNavigationMenu &&
+				! canUserCreateNavigationMenu
 			) {
 				showCantCreateNotice();
 			}
@@ -379,10 +378,10 @@ function Navigation( {
 	}, [
 		isSelected,
 		isInnerBlockSelected,
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserCreateNavigation,
-		hasResolvedCanUserCreateNavigation,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu,
+		canUserCreateNavigationMenu,
+		hasResolvedCanUserCreateNavigationMenu,
 		ref,
 	] );
 
@@ -497,9 +496,9 @@ function Navigation( {
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
-										canUserCreateNavigation={
-											canUserCreateNavigation
-										}
+										/* translators: %s: The name of a menu. */
+										actionLabel={ __( "Switch to '%s'" ) }
+										showManageActions
 									/>
 								) }
 							</ToolbarDropdownMenu>
@@ -646,12 +645,12 @@ function Navigation( {
 				</InspectorControls>
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
-						{ hasResolvedCanUserUpdateNavigationEntity &&
-							canUserUpdateNavigationEntity && (
+						{ hasResolvedCanUserUpdateNavigationMenu &&
+							canUserUpdateNavigationMenu && (
 								<NavigationMenuNameControl />
 							) }
-						{ hasResolvedCanUserDeleteNavigationEntity &&
-							canUserDeleteNavigationEntity && (
+						{ hasResolvedCanUserDeleteNavigationMenu &&
+							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
 									onDelete={ startWithEmptyMenu }
 								/>
@@ -673,10 +672,12 @@ function Navigation( {
 								hasResolvedNavigationMenus
 							}
 							clientId={ clientId }
-							canUserCreateNavigation={ canUserCreateNavigation }
+							canUserCreateNavigationMenu={
+								canUserCreateNavigationMenu
+							}
 						/>
 					) }
-					{ ! hasResolvedCanUserCreateNavigation ||
+					{ ! hasResolvedCanUserCreateNavigationMenu ||
 						( ! isEntityAvailable && ! isPlaceholderShown && (
 							<PlaceholderPreview isLoading />
 						) ) }
@@ -696,7 +697,6 @@ function Navigation( {
 								<NavigationInnerBlocks
 									isVisible={ ! isPlaceholderShown }
 									clientId={ clientId }
-									appender={ CustomAppender }
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}

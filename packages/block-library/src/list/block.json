@@ -52,7 +52,11 @@
 		},
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"__unstablePasteTextInline": true,
 		"__experimentalSelector": "ol,ul",

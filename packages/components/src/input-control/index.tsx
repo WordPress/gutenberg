@@ -3,7 +3,7 @@
  */
 import { noop } from 'lodash';
 import classNames from 'classnames';
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -45,7 +45,7 @@ export function InputControl(
 		value,
 		...props
 	}: InputControlProps,
-	ref: Ref< HTMLInputElement >
+	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 

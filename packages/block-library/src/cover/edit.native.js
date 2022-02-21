@@ -31,6 +31,7 @@ import {
 	ColorPicker,
 	BottomSheetConsumer,
 	useConvertUnitToMobile,
+	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -43,12 +44,17 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
-	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useRef,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 import { store as editPostStore } from '@wordpress/edit-post';
@@ -142,11 +148,13 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
-	const colorsDefault = useSetting( 'color.palette' ) || [];
-	const coverDefaultPalette = {
-		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
-	};
-	const gradients = useSetting( 'color.gradients' ) || [];
+	const colorsDefault = useMobileGlobalStylesColors();
+	const coverDefaultPalette = useMemo( () => {
+		return {
+			colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
+		};
+	}, [ colorsDefault ] );
+	const gradients = useMobileGlobalStylesColors( 'gradients' );
 	const gradientValue =
 		customGradient || getGradientValueBySlug( gradients, gradient );
 	const overlayColorValue = getColorObjectByAttributeValues(

@@ -39,4 +39,4 @@ jobs:
               shell: bash
               run: |
                   npm ci
-                  sh ./bin/test-create-block.sh
+                  bash ./bin/test-create-block.sh

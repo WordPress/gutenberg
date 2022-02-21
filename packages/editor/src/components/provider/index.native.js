@@ -31,12 +31,8 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
-import {
-	validateThemeColors,
-	validateThemeGradients,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { getGlobalStyles } from '@wordpress/components';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { getGlobalStyles, getColorsAndGradients } from '@wordpress/components';
 import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
 
 const postTypeEntities = [
@@ -232,15 +228,18 @@ class NativeEditorProvider extends Component {
 		}
 	}
 
-	getThemeColors( { colors, gradients, rawStyles, rawFeatures } ) {
-		return {
-			...( rawStyles && rawFeatures
-				? getGlobalStyles( rawStyles, rawFeatures )
-				: {
-						colors: validateThemeColors( colors ),
-						gradients: validateThemeGradients( gradients ),
-				  } ),
-		};
+	getThemeColors( { rawStyles, rawFeatures } ) {
+		const { defaultEditorColors, defaultEditorGradients } = this.props;
+
+		if ( rawStyles && rawFeatures ) {
+			return getGlobalStyles( rawStyles, rawFeatures );
+		}
+
+		return getColorsAndGradients(
+			defaultEditorColors,
+			defaultEditorGradients,
+			rawFeatures
+		);
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -363,6 +362,10 @@ export default compose( [
 			getSettings: getBlockEditorSettings,
 		} = select( blockEditorStore );
 
+		const settings = getBlockEditorSettings();
+		const defaultEditorColors = settings?.colors ?? [];
+		const defaultEditorGradients = settings?.gradients ?? [];
+
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			mode: getEditorMode(),
@@ -370,7 +373,8 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
-			getBlockEditorSettings,
+			defaultEditorColors,
+			defaultEditorGradients,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
