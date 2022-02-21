@@ -19,7 +19,7 @@ export interface AvatarUrls {
 }
 
 export type MediaType = 'image' | 'file';
-export type CommentStatus = 'open' | 'closed';
+export type CommentingStatus = 'open' | 'closed';
 export type PingStatus = 'open' | 'closed';
 export type PostStatus = 'publish' | 'future' | 'draft' | 'pending' | 'private';
 export type PostFormat =

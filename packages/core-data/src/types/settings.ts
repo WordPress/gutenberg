@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { CommentStatus, Context, PingStatus } from './helpers';
+import { CommentingStatus, Context, PingStatus } from './helpers';
 
 export interface Settings< C extends Context > {
 	/**
@@ -71,7 +71,7 @@ export interface Settings< C extends Context > {
 	/**
 	 * Allow people to submit comments on new posts.
 	 */
-	default_comment_status: CommentStatus;
+	default_comment_status: CommentingStatus;
 	/**
 	 * Site logo.
 	 */

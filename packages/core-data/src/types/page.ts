@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import {
-	CommentStatus,
+	CommentingStatus,
 	Context,
 	ContextualField,
 	PingStatus,
@@ -106,7 +106,7 @@ interface FullPage< C extends Context > {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status: ContextualField< CommentStatus, 'view' | 'edit', C >;
+	comment_status: ContextualField< CommentingStatus, 'view' | 'edit', C >;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
