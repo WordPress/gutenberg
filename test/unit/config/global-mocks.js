@@ -7,6 +7,12 @@ jest.mock( '@wordpress/compose', () => {
 			<App key={ 'mock-key' } />,
 			{ width: 700, height: 500 },
 		] ),
+		usePreferredColorSchemeStyle: jest.fn( () => {
+			return {
+				color: '#fff',
+				backgroundColor: '#0000003f',
+			};
+		} ),
 	};
 } );
 

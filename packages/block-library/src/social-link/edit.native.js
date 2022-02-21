@@ -55,8 +55,11 @@ const SocialLinkEdit = ( {
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
 	const [ hasUrl, setHasUrl ] = useState( !! url );
 
-	const activeIcon =
-		styles[ `wp-social-link-${ service }` ] || styles[ `wp-social-link` ];
+	const activeIcon = styles[ `wp-social-link-${ service }` ] ||
+		styles[ `wp-social-link` ] || {
+			backgroundColor: '#f0f0f0',
+			color: '#444',
+		};
 
 	const inactiveIcon = usePreferredColorSchemeStyle(
 		styles.inactiveIcon,
