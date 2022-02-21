@@ -1,0 +1,38 @@
+{
+	"name": "@wordpress/e2e-tests-playwright",
+	"version": "0.0.0",
+	"description": "End-To-End (E2E) tests for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"e2e",
+		"tests",
+		"playwright"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/e2e-tests-playwright/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/e2e-tests-playwright"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=14"
+	},
+	"dependencies": {
+		"@wordpress/e2e-test-utils-playwright": "file:../e2e-test-utils-playwright",
+		"@wordpress/url": "file:../url",
+		"filenamify": "^4.2.0",
+		"role-selector": "^0.5.0"
+	},
+	"peerDependencies": {
+		"@playwright/test": ">=1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
