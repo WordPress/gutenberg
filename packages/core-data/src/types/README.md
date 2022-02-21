@@ -114,8 +114,6 @@ const post = wp.data.select('core').getEditedEntityRecord( 'postType', 'post', 1
 
 ## Helpers
 
-@TODO – perhaps we could auto generate that from the docstrings in common.ts (to become helpers.ts?)
-
 ### Context
 
 The REST API context parameter.
@@ -194,31 +192,3 @@ A string that the server renders which often involves modifications from the raw
 
 For example, block HTML with the comment delimiters exists in `post_content` but those comments are stripped out when rendering to a page view. Similarly, plugins might modify content or replace shortcodes.
 
-## Extending
-
-Talk about interface merging here
-
-Change the "full" version of these types to be inside a namespace `wpCoreData.BaseTypes` so that they can be extended.
-
-```ts
-// In core-data
-export namespace wpCoreData.BaseTypes {
-	export interface Comment< C extends Context > {
-		id: number;
-		// ...
-	}
-}
-
-export type Comment< C extends Context > = OmitNevers<
-	wpCoreData.BaseTypes.Comment< C >
->;
-
-// In the plugin
-namespace wpCoreData.BaseTypes {
-  interface Comment < C extends Context > {
-    newField: ContextualField<string, 'edit', C>;
-  }
-}
-```
-
-Interface merging has a huge upside: core-data selectors would return the extended types out of the box.
