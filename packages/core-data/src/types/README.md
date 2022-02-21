@@ -11,7 +11,7 @@ The types in this directory are designed to support the following use-cases:
 
 ### Context-aware type checks for entity records
 
-WordPress REST API returns different responses based on the `context` query parameter, which typically is one of `view`, `edit`, or `embed`.
+WordPress REST API returns different responses based on the `context` query parameter, which typically is one of `view`, `edit`, or `embed`. See the [REST API documentation](https://developer.wordpress.org/rest-api/) to learn more.
 
 For example, requesting `/wp/v2/posts/1?context=view` yields:
 
