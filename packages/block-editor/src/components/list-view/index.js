@@ -26,18 +26,26 @@ import ListViewDropIndicator from './drop-indicator';
 import useBlockSelection from './use-block-selection';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
+import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 
 const expanded = ( state, action ) => {
-	switch ( action.type ) {
-		case 'expand':
-			return { ...state, ...{ [ action.clientId ]: true } };
-		case 'collapse':
-			return { ...state, ...{ [ action.clientId ]: false } };
-		default:
-			return state;
+	if ( Array.isArray( action.clientIds ) ) {
+		return {
+			...state,
+			...action.clientIds.reduce(
+				( newState, id ) => ( {
+					...newState,
+					[ id ]: action.type === 'expand',
+				} ),
+				{}
+			),
+		};
 	}
+	return state;
 };
+
+export const BLOCK_LIST_ITEM_HEIGHT = 36;
 
 /**
  * Wrap `ListViewRows` with `TreeGrid`. ListViewRows is a
@@ -96,6 +104,17 @@ function ListView(
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
 	const isMounted = useRef( false );
+	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
+		firstSelectedBlockClientId: selectedClientIds[ 0 ],
+		setExpandedState,
+	} );
+	const selectEditorBlock = useCallback(
+		( event, clientId ) => {
+			updateBlockSelection( event, clientId );
+			setSelectedTreeId( clientId );
+		},
+		[ setSelectedTreeId, updateBlockSelection ]
+	);
 	useEffect( () => {
 		isMounted.current = true;
 	}, [] );
@@ -105,7 +124,7 @@ function ListView(
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	const [ fixedListWindow ] = useFixedWindowList(
 		elementRef,
-		36,
+		BLOCK_LIST_ITEM_HEIGHT,
 		visibleBlockCount,
 		{
 			useWindowing: __experimentalPersistentListViewFeatures,
@@ -118,7 +137,7 @@ function ListView(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientId } );
+			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
 		},
 		[ setExpandedState ]
 	);
@@ -127,7 +146,7 @@ function ListView(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientId } );
+			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
 		},
 		[ setExpandedState ]
 	);
@@ -196,7 +215,7 @@ function ListView(
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
 						blocks={ clientIdsTree }
-						selectBlock={ updateBlockSelection }
+						selectBlock={ selectEditorBlock }
 						showNestedBlocks={ showNestedBlocks }
 						showBlockMovers={ showBlockMovers }
 						fixedListWindow={ fixedListWindow }
