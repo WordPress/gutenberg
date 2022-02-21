@@ -95,7 +95,9 @@ describe( 'Post visibility', () => {
 			'div[aria-label="Move forward to switch to the next month."]'
 		);
 		await (
-			await page.$x( '//td[@role="button"]/*[text() = "15"]' )
+			await page.$x(
+				'//*[@role="application"][@aria-label="Calendar"]//td[@role="button"]/*[text() = "15"]'
+			)
 		 )[ 0 ].click();
 
 		await page.click( '.edit-post-post-visibility__toggle' );
