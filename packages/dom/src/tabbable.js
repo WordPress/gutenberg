@@ -166,7 +166,7 @@ export function findPrevious( element ) {
 	const index = focusables.indexOf( element );
 
 	// Remove all focusables after and including `element`.
-	focusables.length = index;
+	focusables.length = index !== -1 ? index : 0;
 
 	return last( filterTabbable( focusables ) );
 }
