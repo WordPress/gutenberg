@@ -40,7 +40,9 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 	switch ( action.type ) {
 		case 'START_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
-			nextState.set( action.args, { isResolving: true } );
+			nextState.set( selectorArgsToStateKey( action.args ), {
+				isResolving: true,
+			} );
 			return nextState;
 		}
 		case 'FINISH_RESOLUTION': {
@@ -61,7 +63,9 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 		case 'START_RESOLUTIONS': {
 			const nextState = new EquivalentKeyMap( state );
 			for ( const resolutionArgs of action.args ) {
-				nextState.set( resolutionArgs, { isResolving: true } );
+				nextState.set( selectorArgsToStateKey( resolutionArgs ), {
+					isResolving: true,
+				} );
 			}
 			return nextState;
 		}
