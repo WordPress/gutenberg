@@ -140,14 +140,18 @@ describe( 'reducer', () => {
 				selectorName: 'getFoo',
 				args: [ 1, undefined ],
 			} );
-			expect( started.getFoo.get( [ 1 ] ) ).toBe( true );
+			expect( started.getFoo.get( [ 1 ] ) ).toEqual( {
+				isResolving: true,
+			} );
 
 			const finished = reducer( started, {
 				type: 'FINISH_RESOLUTION',
 				selectorName: 'getFoo',
 				args: [ 1, undefined, undefined ],
 			} );
-			expect( finished.getFoo.get( [ 1 ] ) ).toBe( false );
+			expect( finished.getFoo.get( [ 1 ] ) ).toEqual( {
+				isResolving: false,
+			} );
 		} );
 	} );
 
@@ -290,8 +294,12 @@ describe( 'reducer', () => {
 					[ 2, undefined, undefined ],
 				],
 			} );
-			expect( started.getFoo.get( [ 1 ] ) ).toBe( true );
-			expect( started.getFoo.get( [ 2 ] ) ).toBe( true );
+			expect( started.getFoo.get( [ 1 ] ) ).toEqual( {
+				isResolving: true,
+			} );
+			expect( started.getFoo.get( [ 2 ] ) ).toEqual( {
+				isResolving: true,
+			} );
 
 			const finished = reducer( started, {
 				type: 'FINISH_RESOLUTIONS',
@@ -301,8 +309,12 @@ describe( 'reducer', () => {
 					[ 2, undefined ],
 				],
 			} );
-			expect( finished.getFoo.get( [ 1 ] ) ).toBe( false );
-			expect( finished.getFoo.get( [ 2 ] ) ).toBe( false );
+			expect( finished.getFoo.get( [ 1 ] ) ).toEqual( {
+				isResolving: false,
+			} );
+			expect( finished.getFoo.get( [ 2 ] ) ).toEqual( {
+				isResolving: false,
+			} );
 		} );
 	} );
 } );
