@@ -40,8 +40,8 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 			'<%1$s><a href="%2$s" target="%3$s" rel="%4$s" %5$s>%6$s</a></%1$s>',
 			$tag_name,
 			get_the_permalink( $post_ID ),
-			$attributes['linkTarget'],
-			$attributes['rel'],
+			esc_attr( $attributes['linkTarget'] ),
+			esc_attr( $attributes['rel'] ),
 			$wrapper_attributes,
 			$title
 		);
