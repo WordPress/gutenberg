@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { cloneBlock } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	InspectorControls,
@@ -12,9 +12,14 @@ import {
 	useSetting,
 	store as blockEditorStore,
 	useInnerBlocksProps,
-	__experimentalBlockPatternSetup as BlockPatternSetup,
+	__experimentalGetMatchingVariation as getMatchingVariation,
 } from '@wordpress/block-editor';
-import { SelectControl } from '@wordpress/components';
+import {
+	Button,
+	SelectControl,
+	Placeholder,
+	Modal,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -24,10 +29,14 @@ import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './inspector-controls';
 import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
-import { getFirstQueryClientIdFromBlocks } from '../utils';
+import PatternSelectionModal from './pattern-selection-modal';
 
 const TEMPLATE = [ [ 'core/post-template' ] ];
-export function QueryContent( { attributes, setAttributes } ) {
+export function QueryContent( {
+	attributes,
+	setAttributes,
+	openPatternSelectionModal,
+} ) {
 	const {
 		queryId,
 		query,
@@ -102,6 +111,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 					attributes={ attributes }
 					setQuery={ updateQuery }
 					setDisplayLayout={ updateDisplayLayout }
+					openPatternSelectionModal={ openPatternSelectionModal }
 				/>
 			</BlockControls>
 			<InspectorControls __experimentalGroup="advanced">
@@ -124,43 +134,119 @@ export function QueryContent( { attributes, setAttributes } ) {
 	);
 }
 
-function QueryPatternSetup( props ) {
-	const { clientId, name: blockName } = props;
+function QueryPatternSetup( {
+	attributes,
+	clientId,
+	name,
+	openPatternSelectionModal,
+	setAttributes,
+} ) {
+	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
 	const blockProps = useBlockProps();
-	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
-	const onBlockPatternSelect = ( blocks ) => {
-		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
-		const firstQueryClientId = getFirstQueryClientIdFromBlocks(
-			clonedBlocks
+
+	const { blockType, allVariations, hasPatterns } = useSelect(
+		( select ) => {
+			const { getBlockVariations, getBlockType } = select( blocksStore );
+			const {
+				getBlockRootClientId,
+				__experimentalGetPatternsByBlockTypes,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+
+			return {
+				blockType: getBlockType( name ),
+				allVariations: getBlockVariations( name ),
+				hasPatterns: !! __experimentalGetPatternsByBlockTypes(
+					name,
+					rootClientId
+				).length,
+			};
+		},
+		[ name, clientId ]
+	);
+
+	const matchingVariation = getMatchingVariation( attributes, allVariations );
+	const icon = matchingVariation?.icon || blockType?.icon?.src;
+	const label = matchingVariation?.title || blockType?.title;
+	if ( isStartingBlank ) {
+		return (
+			<QueryPlaceholder
+				clientId={ clientId }
+				name={ name }
+				setAttributes={ setAttributes }
+				icon={ icon }
+				label={ label }
+			/>
 		);
-		replaceBlock( clientId, clonedBlocks );
-		if ( firstQueryClientId ) {
-			selectBlock( firstQueryClientId );
-		}
-	};
-	// `startBlankComponent` is what to render when clicking `Start blank`
-	// or if no matched patterns are found.
+	}
 	return (
 		<div { ...blockProps }>
-			<BlockPatternSetup
-				blockName={ blockName }
-				clientId={ clientId }
-				startBlankComponent={ <QueryPlaceholder { ...props } /> }
-				onBlockPatternSelect={ onBlockPatternSelect }
-			/>
+			<Placeholder
+				icon={ icon }
+				label={ label }
+				instructions={ __(
+					'Choose a pattern for the query loop or start blank.'
+				) }
+			>
+				{ !! hasPatterns && (
+					<Button
+						variant="primary"
+						onClick={ openPatternSelectionModal }
+					>
+						{ __( 'Choose' ) }
+					</Button>
+				) }
+
+				<Button
+					variant="secondary"
+					onClick={ () => {
+						setIsStartingBlank( true );
+					} }
+				>
+					{ __( 'Start blank' ) }
+				</Button>
+			</Placeholder>
 		</div>
 	);
 }
 
 const QueryEdit = ( props ) => {
 	const { clientId } = props;
+	const [
+		isPatternSelectionModalOpen,
+		setIsPatternSelectionModalOpen,
+	] = useState( false );
 	const hasInnerBlocks = useSelect(
 		( select ) =>
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
 	const Component = hasInnerBlocks ? QueryContent : QueryPatternSetup;
-	return <Component { ...props } />;
+	return (
+		<>
+			<Component
+				{ ...props }
+				openPatternSelectionModal={ () =>
+					setIsPatternSelectionModalOpen( true )
+				}
+			/>
+			{ isPatternSelectionModalOpen && (
+				<Modal
+					className="block-editor-template-part__selection-modal"
+					title={ __( 'Choose a pattern' ) }
+					closeLabel={ __( 'Cancel' ) }
+					onRequestClose={ () =>
+						setIsPatternSelectionModalOpen( false )
+					}
+				>
+					<PatternSelectionModal
+						clientId={ clientId }
+						name={ props.name }
+					/>
+				</Modal>
+			) }
+		</>
+	);
 };
 
 export default QueryEdit;
