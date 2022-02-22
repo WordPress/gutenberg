@@ -19,11 +19,11 @@
  * ```ts
  * import type { Context } from '@wordpress/core-data';
  * declare module '@wordpress/core-data' {
- * 	export namespace BaseTypes {
- * 		export interface Comment< C extends Context > {
- * 			numberOfViews: number;
- * 		}
- * 	}
+ *     export namespace BaseTypes {
+ *         export interface Comment< C extends Context > {
+ *             numberOfViews: number;
+ *         }
+ *     }
  * }
  *
  * import type { Comment } from '@wordpress/core-data';
