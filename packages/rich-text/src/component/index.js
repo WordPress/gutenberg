@@ -204,6 +204,7 @@ export function useRichText( {
 	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
+			forceRender();
 		}
 	}, [ value ] );
 
