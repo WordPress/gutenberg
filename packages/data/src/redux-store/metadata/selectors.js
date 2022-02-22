@@ -101,7 +101,7 @@ export function hasResolutionFailed( state, selectorName, args ) {
  * @param {string}     selectorName Selector name.
  * @param {unknown[]?} args         Arguments passed to selector.
  *
- * @return {Error|undefined} Last resolution error
+ * @return {Error|unknown} Last resolution error
  */
 export function getResolutionError( state, selectorName, args ) {
 	return getResolutionState( state, selectorName, args )?.error;

@@ -24,7 +24,7 @@ type Action =
 	  >;
 
 type StateKey = unknown[] | unknown;
-export type StateValue = { isResolving: boolean; error?: Error };
+export type StateValue = { isResolving: boolean; error?: Error | unknown };
 export type State = EquivalentKeyMap< StateKey, StateValue >;
 
 /**
