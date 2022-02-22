@@ -8,6 +8,8 @@ import {
 	PostStatus,
 	RenderedText,
 	OmitNevers,
+	CommentingStatus,
+	PingStatus,
 } from './helpers';
 
 export interface ExtensibleAttachment< C extends Context > {
@@ -70,11 +72,11 @@ export interface ExtensibleAttachment< C extends Context > {
 	/**
 	 * Whether or not comments are open on the post.
 	 */
-	comment_status: ContextualField< 'open' | 'closed', 'view' | 'edit', C >;
+	comment_status: ContextualField< CommentingStatus, 'view' | 'edit', C >;
 	/**
 	 * Whether or not the post can be pinged.
 	 */
-	ping_status: ContextualField< 'open' | 'closed', 'view' | 'edit', C >;
+	ping_status: ContextualField< PingStatus, 'view' | 'edit', C >;
 	/**
 	 * Meta fields.
 	 */
