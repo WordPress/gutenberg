@@ -165,7 +165,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		1
 	);
 
-	gutenberg_enqueue_block_support_styles( $style );
+	WP_Style_Engine_Gutenberg::get_instance()->add_style( $class_name, $style );
 
 	return $content;
 }
