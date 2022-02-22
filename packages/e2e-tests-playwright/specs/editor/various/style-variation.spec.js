@@ -4,14 +4,12 @@
 const { test, expect } = require( '../../../config/test' );
 
 test.describe( 'adding blocks', () => {
-	test.beforeAll( async ( { pageUtils } ) => {
-		await pageUtils.createNewPost();
-	} );
-
 	test( 'Should switch to the plain style of the quote block', async ( {
 		page,
 		pageUtils,
 	} ) => {
+		await pageUtils.createNewPost();
+
 		// Inserting a quote block
 		await pageUtils.insertBlock( 'Quote' );
 		await this.page.keyboard.type( 'Quote content' );
