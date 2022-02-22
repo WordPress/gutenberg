@@ -50,6 +50,7 @@
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalTextTransform": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {

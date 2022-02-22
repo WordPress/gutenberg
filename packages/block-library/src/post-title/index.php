@@ -33,10 +33,19 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
 	}
 
-	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-		$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s">%4$s</a>', get_the_permalink( $post_ID ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
-	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+
+	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
+		return sprintf(
+			'<%1$s><a href="%2$s" target="%3$s" rel="%4$s" %5$s>%6$s</a></%1$s>',
+			$tag_name,
+			get_the_permalink( $post_ID ),
+			$attributes['linkTarget'],
+			$attributes['rel'],
+			$wrapper_attributes,
+			$title
+		);
+	}
 
 	return sprintf(
 		'<%1$s %2$s>%3$s</%1$s>',
