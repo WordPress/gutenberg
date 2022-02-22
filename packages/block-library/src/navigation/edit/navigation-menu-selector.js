@@ -74,9 +74,14 @@ export default function NavigationMenuSelector( {
 	const showClassicMenus = !! canUserCreateNavigationMenu;
 	const hasManagePermissions =
 		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
+
+	// Show the selector if:
+	// - has switch or create permissions and there are block or classic menus.
+	// - user has create or update permisisons and component should show the menu actions.
 	const showSelectMenus =
-		( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
-		( hasNavigationMenus || hasClassicMenus );
+		( ( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
+			( hasNavigationMenus || hasClassicMenus ) ) ||
+		( hasManagePermissions && showManageActions );
 
 	if ( ! showSelectMenus ) {
 		return null;
