@@ -181,17 +181,22 @@ export function hasUnits( units?: WPUnitControlUnit[] ): boolean {
  * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value could not be parsed to a number correctly. The unit can be `undefined` in case the unit parsed from the raw value could not be matched against the list of allowed units.
  */
 export function parseQuantityAndUnitFromRawValue(
-	rawValue: string | number,
+	rawValue?: string | number,
 	allowedUnits: WPUnitControlUnit[] = ALL_CSS_UNITS
 ): [ number | undefined, string | undefined ] {
-	const value = `${ rawValue }`.trim();
-	const parsedQuantity = parseFloat( value );
-	const valueToReturn =
-		isNaN( parsedQuantity ) || ! isFinite( parsedQuantity )
-			? undefined
-			: parsedQuantity;
+	let trimmedValue;
+	let valueToReturn;
 
-	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ );
+	if ( typeof rawValue !== 'undefined' ) {
+		trimmedValue = `${ rawValue }`.trim();
+		const parsedQuantity = parseFloat( trimmedValue );
+		valueToReturn =
+			isNaN( parsedQuantity ) || ! isFinite( parsedQuantity )
+				? undefined
+				: parsedQuantity;
+	}
+
+	const unitMatch = trimmedValue?.match( /[\d.\-\+]*\s*(.*)/ );
 	const matchedUnit =
 		typeof unitMatch?.[ 1 ] !== 'undefined'
 			? unitMatch[ 1 ].toLowerCase()
