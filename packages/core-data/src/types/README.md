@@ -200,23 +200,26 @@ For example, if you're building a plugin that displays a number of views of each
 
 ```ts
 // In core-data
-declare module './wp-base-types' {
-	export namespace WPBaseTypes {
-		export interface Comment< C extends Context > {
-			id: number;
-			// ...
-		}
+export namespace WPBaseTypes {
+	// This is the parent interface – it can be extended
+	export interface Comment< C extends Context > {
+		id: number;
+		// ...
 	}
 }
 
+// This the child type used in function signatures – it cannot be extended
 export type Comment< C extends Context > = OmitNevers<
 	WPBaseTypes.Comment< C >
 >;
 
 // In the plugin
 import type { Context } from '@wordpress/core-data';
+// Target the core-data module
 declare module '@wordpress/core-data' {
+	// Extend the WPBaseTypes namespace through declaration merging
 	export namespace WPBaseTypes {
+		// Extend the parent Commet interface through declaration merging
 		export interface Comment< C extends Context > {
 			numberOfViews: number;
 		}
@@ -224,8 +227,10 @@ declare module '@wordpress/core-data' {
 }
 
 import type { Comment } from '@wordpress/core-data';
+// Create an instance of the child type
 const c : Comment< 'view' > = ...;
 
+// Extending the parent had the desired effect on the child type:
 // c.numberOfViews is a number
 // c.id is still present
 ```
