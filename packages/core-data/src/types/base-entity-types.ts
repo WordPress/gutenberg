@@ -13,7 +13,7 @@
  * }
  * ```
  *
- * The huge upside is that consumers of @wordpress/core-data may extends the
+ * The huge upside is that consumers of @wordpress/core-data may extend the
  * exported data types using interface merging as follows:
  *
  * ```ts
