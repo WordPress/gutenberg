@@ -19,7 +19,10 @@ module.exports = function ( api ) {
 					extensions: [ 'css', 'scss', 'sass' ],
 				},
 			],
-			'react-native-reanimated/plugin',
+			path.resolve(
+				__dirname,
+				'../../node_modules/react-native-reanimated/plugin'
+			),
 		],
 		overrides: [
 			{
