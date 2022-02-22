@@ -55,7 +55,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		} elseif ( isset( $attributes['linkLabel'] ) && $attributes['linkLabel'] ) {
 			// If the label link option is enabled and there is a custom label, display it before the title.
 			if ( $label ) {
-				$link = '<span class="post-navigation-link__label">' . wp_kses_post( $label ) . '</span> <span class="post-navigation-link__title">%title</title>';
+				$link = '<span class="post-navigation-link__label">' . wp_kses_post( $label ) . '</span> <span class="post-navigation-link__title">%title</span>';
 			} else {
 				/*
 				 * If the label link option is enabled and there is no custom label,
