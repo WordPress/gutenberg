@@ -160,13 +160,19 @@ export function find( context ) {
  *
  * @param {Element} element The focusable element before which to look. Defaults
  *                          to the active element.
+ *
+ * @return {Element|undefined} Preceding tabbable element.
  */
 export function findPrevious( element ) {
 	const focusables = findFocusable( element.ownerDocument.body );
 	const index = focusables.indexOf( element );
 
+	if ( index === -1 ) {
+		return undefined;
+	}
+
 	// Remove all focusables after and including `element`.
-	focusables.length = index !== -1 ? index : 0;
+	focusables.length = index;
 
 	return last( filterTabbable( focusables ) );
 }
