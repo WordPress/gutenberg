@@ -20,6 +20,7 @@ import { isURL } from '@wordpress/url';
 import { filePasteHandler } from './file-paste-handler';
 import { addActiveFormats, isShortcode } from './utils';
 import { splitValue } from './split-value';
+import { shouldDismissPastedFiles } from './should-dismiss-pasted-files';
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
@@ -124,6 +125,7 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
+			// FIXME: Why the shallow copy?
 			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
 			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
@@ -154,21 +156,14 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
-			// Process any attached files, unless we detect Microsoft Office as
-			// the source.
+			// Process any attached files, unless we infer that the files in
+			// question are redundant "screenshots" of the actual HTML payload,
+			// as created by certain office-type programs.
 			//
-			// When content is copied from Microsoft Office, an image of the
-			// content is rendered and attached to the clipboard along with the
-			// plain-text and HTML content. This artifact is a distraction from
-			// the relevant clipboard data, so we ignore it.
-			//
-			// Props https://github.com/pubpub/pubpub/commit/2f933277a15a263a1ab4bbd36b96d3a106544aec
+			// @see shouldDismissPastedFiles
 			if (
-				files &&
-				files.length &&
-				! html?.includes(
-					'xmlns:o="urn:schemas-microsoft-com:office:office'
-				)
+				files?.length &&
+				! shouldDismissPastedFiles( files, html, plainText )
 			) {
 				const content = pasteHandler( {
 					HTML: filePasteHandler( files ),
