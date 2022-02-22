@@ -151,6 +151,10 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
  * @return boolean Whether to serialize color support styles & classes.
  */
 function gutenberg_skip_color_serialization( $block_type, $feature = null ) {
+	if ( ! is_object( $block_type ) ) {
+		return false;
+	}
+
 	$path               = array( 'color', '__experimentalSkipSerialization' );
 	$skip_serialization = _wp_array_get( $block_type->supports, $path, false );
 
