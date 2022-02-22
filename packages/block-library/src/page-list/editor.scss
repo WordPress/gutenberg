@@ -27,16 +27,6 @@
 	pointer-events: none;
 }
 
-.wp-block-page-list .components-placeholder {
-	min-height: 0;
-	padding: 0;
-	background-color: inherit;
-
-	.components-spinner {
-		margin: 0.5em;
-	}
-}
-
 // Modal that shows conversion option.
 .wp-block-page-list-modal {
 	@include break-small() {
