@@ -57,3 +57,20 @@
 .removeFeaturedButton {
 	color: $alert-red;
 }
+
+.gifText {
+	font-size: 14;
+	font-family: sans-serif;
+	position: absolute;
+	font-weight: 600;
+	text-transform: uppercase;
+	border-radius: 6px;
+	border: 1px solid rgba(0.1, 0.1, 0.1, 0.5);
+	color: #fff;
+	background-color: rgba(0.1, 0.1, 0.1, 0.5);
+	overflow: hidden;
+	padding: 3px 6px;
+	top: 10px;
+	left: 10px;
+	backdrop-filter: blur(5px);
+}

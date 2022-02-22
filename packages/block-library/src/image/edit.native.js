@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 
 /**
@@ -722,6 +722,8 @@ export class ImageEdit extends Component {
 			);
 		}
 
+		const isGif = url.endsWith( '.gif' );
+
 		const alignToFlex = {
 			left: 'flex-start',
 			center: 'center',
@@ -801,6 +803,11 @@ export class ImageEdit extends Component {
 												? additionalImageProps
 												: {} ) }
 										/>
+										{ isGif && (
+											<Text style={ styles.gifText }>
+												GIF
+											</Text>
+										) }
 									</View>
 								);
 							} }
