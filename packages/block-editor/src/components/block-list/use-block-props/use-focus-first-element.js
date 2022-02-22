@@ -100,17 +100,16 @@ export function useFocusFirstElement( clientId ) {
 		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
 			const focusElement = focus.tabbable.findNext( ref.current );
 			// Need to make sure we're still in the current Block, if not, we could run in to trouble if focus is placed in a Block further down the page.
-			if ( ! ref.current.contains( focusElement ) ) {
-				return;
-			}
-			// Need to try our best to detect child Blocks and not focus them straight away.
-			const disallowedTags = [ 'div', 'figure' ];
-			const checkDisallowedTags = disallowedTags.some(
-				( tag ) => focusElement.tagName.toLowerCase() === tag
-			);
-			if ( ! checkDisallowedTags && focusElement ) {
-				focusElement.focus();
-				return;
+			if ( ref.current.contains( focusElement ) ) {
+				// Need to try our best to detect child Blocks and not focus them straight away.
+				const disallowedTags = [ 'div', 'figure' ];
+				const checkDisallowedTags = disallowedTags.some(
+					( tag ) => focusElement.tagName.toLowerCase() === tag
+				);
+				if ( ! checkDisallowedTags && focusElement ) {
+					focusElement.focus();
+					return;
+				}
 			}
 		}
 
