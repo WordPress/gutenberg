@@ -200,20 +200,26 @@ For example, if you're building a plugin that displays a number of views of each
 
 ```ts
 // In core-data
-export interface ExtensibleComment< C extends Context > {
-	id: number;
-	// ...
+declare module './base-types' {
+	export namespace BaseTypes {
+		export interface Comment< C extends Context > {
+			id: number;
+			// ...
+		}
+	}
 }
 
 export type Comment< C extends Context > = OmitNevers<
-	ExtensibleComment< C >
+	BaseTypes.Comment< C >
 >;
 
 // In the plugin
 import { Context } from '@wordpress/core-data';
 declare module '@wordpress/core-data' {
-	interface ExtensibleComment< C extends Context > {
-		numberOfViews: number;
+	export namespace BaseTypes {
+		export interface Comment< C extends Context > {
+			numberOfViews: number;
+		}
 	}
 }
 

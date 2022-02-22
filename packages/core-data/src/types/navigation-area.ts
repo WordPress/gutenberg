@@ -3,21 +3,27 @@
  */
 import { Context, OmitNevers } from './helpers';
 
-export interface ExtensibleNavigationArea< C extends Context > {
-	/**
-	 * The name of the navigation area.
-	 */
-	name: string;
-	/**
-	 * The description of the navigation area.
-	 */
-	description: string;
-	/**
-	 * The ID of the assigned navigation.
-	 */
-	navigation: number;
+import { BaseTypes as _BaseTypes } from './base-types';
+
+declare module './base-types' {
+	export namespace BaseTypes {
+		export interface NavigationArea< C extends Context > {
+			/**
+			 * The name of the navigation area.
+			 */
+			name: string;
+			/**
+			 * The description of the navigation area.
+			 */
+			description: string;
+			/**
+			 * The ID of the assigned navigation.
+			 */
+			navigation: number;
+		}
+	}
 }
 
 export type NavigationArea< C extends Context > = OmitNevers<
-	ExtensibleNavigationArea< C >
+	_BaseTypes.NavigationArea< C >
 >;
