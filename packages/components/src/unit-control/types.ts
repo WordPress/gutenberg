@@ -12,8 +12,6 @@ import type {
 	Size as InputSize,
 } from '../input-control/types';
 
-export type Value = number | string;
-
 export type SelectSize = InputSize;
 
 export type WPUnitControlUnit = {
@@ -28,7 +26,7 @@ export type WPUnitControlUnit = {
 	/**
 	 * Default value for the unit, used when switching units.
 	 */
-	default?: Value;
+	default?: number;
 	/**
 	 * An accessible label used by screen readers.
 	 */
@@ -38,8 +36,6 @@ export type WPUnitControlUnit = {
 	 */
 	step?: number;
 };
-
-export type WPUnitControlUnitList = Array< WPUnitControlUnit > | false;
 
 export type UnitControlOnChangeCallback = InputChangeCallback<
 	SyntheticEvent< HTMLSelectElement | HTMLInputElement >,
@@ -74,7 +70,7 @@ export type UnitSelectControlProps = {
 	 *
 	 * @default CSS_UNITS
 	 */
-	units?: WPUnitControlUnitList;
+	units?: WPUnitControlUnit[];
 };
 
 export type UnitControlProps = UnitSelectControlProps & {
@@ -114,5 +110,5 @@ export type UnitControlProps = UnitSelectControlProps & {
 	 * Current value. If passed as a string, the current unit will be inferred from this value.
 	 * For example, a `value` of "50%" will set the current unit to `%`.
 	 */
-	value: Value;
+	value: string | number;
 };
