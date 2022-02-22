@@ -88,7 +88,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should not render select, if units are disabled', () => {
-			render( <UnitControl unit="em" units={ false } /> );
+			render( <UnitControl unit="em" units={ [] } /> );
 			const input = getInput();
 			const select = getSelect();
 

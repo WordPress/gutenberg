@@ -4,7 +4,7 @@
 import {
 	filterUnitsWithSettings,
 	useCustomUnits,
-	getValidParsedUnit,
+	getValidParsedQuantityAndUnit,
 	getUnitsWithCurrentUnit,
 } from '../utils';
 
@@ -34,7 +34,7 @@ describe( 'UnitControl utils', () => {
 			] );
 		} );
 
-		it( 'should return `false` where availableUnits match no preferred css units', () => {
+		it( 'should return an empty array where availableUnits match no preferred css units', () => {
 			const cssUnits = [ { value: 'em' }, { value: 'vh' } ];
 			const units = useCustomUnits( {
 				availableUnits: [ '%', 'px' ],
@@ -42,7 +42,7 @@ describe( 'UnitControl utils', () => {
 				units: cssUnits,
 			} );
 
-			expect( units ).toBe( false );
+			expect( units ).toHaveLength( 0 );
 		} );
 	} );
 
@@ -65,9 +65,9 @@ describe( 'UnitControl utils', () => {
 			).toEqual( [] );
 		} );
 
-		it( 'should return empty array where available units is set to false', () => {
+		it( 'should return empty array where available units is set to an empty array', () => {
 			const preferredUnits = [ '%', 'px' ];
-			const availableUnits = false;
+			const availableUnits = [];
 
 			expect(
 				filterUnitsWithSettings( preferredUnits, availableUnits )
@@ -75,17 +75,20 @@ describe( 'UnitControl utils', () => {
 		} );
 	} );
 
-	describe( 'getValidParsedUnit', () => {
+	describe( 'getValidParsedQuantityAndUnit', () => {
 		it( 'should parse valid number and unit', () => {
 			const nextValue = '42px';
 
-			expect( getValidParsedUnit( nextValue ) ).toEqual( [ 42, 'px' ] );
+			expect( getValidParsedQuantityAndUnit( nextValue ) ).toEqual( [
+				42,
+				'px',
+			] );
 		} );
 
 		it( 'should return next value only where no known unit parsed', () => {
 			const nextValue = '365zz';
 
-			expect( getValidParsedUnit( nextValue ) ).toEqual( [
+			expect( getValidParsedQuantityAndUnit( nextValue ) ).toEqual( [
 				365,
 				undefined,
 			] );
@@ -97,7 +100,11 @@ describe( 'UnitControl utils', () => {
 			const fallbackValue = 13;
 
 			expect(
-				getValidParsedUnit( nextValue, preferredUnits, fallbackValue )
+				getValidParsedQuantityAndUnit(
+					nextValue,
+					preferredUnits,
+					fallbackValue
+				)
 			).toEqual( [ 13, 'em' ] );
 		} );
 
@@ -106,7 +113,7 @@ describe( 'UnitControl utils', () => {
 			const fallbackUnit = '%';
 
 			expect(
-				getValidParsedUnit(
+				getValidParsedQuantityAndUnit(
 					nextValue,
 					undefined,
 					undefined,
@@ -119,10 +126,9 @@ describe( 'UnitControl utils', () => {
 			const nextValue = 101;
 			const preferredUnits = [ { value: 'px' } ];
 
-			expect( getValidParsedUnit( nextValue, preferredUnits ) ).toEqual( [
-				101,
-				'px',
-			] );
+			expect(
+				getValidParsedQuantityAndUnit( nextValue, preferredUnits )
+			).toEqual( [ 101, 'px' ] );
 		} );
 	} );
 
@@ -139,7 +145,11 @@ describe( 'UnitControl utils', () => {
 		];
 
 		it( 'should return units list with valid current unit prepended', () => {
-			const result = getUnitsWithCurrentUnit( '20%', null, limitedUnits );
+			const result = getUnitsWithCurrentUnit(
+				'20%',
+				undefined,
+				limitedUnits
+			);
 
 			expect( result ).toHaveLength( 3 );
 
@@ -163,7 +173,7 @@ describe( 'UnitControl utils', () => {
 		it( 'should return units list without invalid current unit prepended', () => {
 			const result = getUnitsWithCurrentUnit(
 				'20null',
-				null,
+				undefined,
 				limitedUnits
 			);
 
@@ -174,7 +184,7 @@ describe( 'UnitControl utils', () => {
 		it( 'should return units list without an existing current unit prepended', () => {
 			const result = getUnitsWithCurrentUnit(
 				'20em',
-				null,
+				undefined,
 				limitedUnits
 			);
 
