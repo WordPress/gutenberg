@@ -34,6 +34,34 @@ describe( 'Confirm', () => {
 					expect( el ).toBeInTheDocument();
 				} );
 			} );
+			it( 'should render correctly with custom button lables', () => {
+				const cancelButtonText = 'No thanks';
+				const confirmButtonText = 'Yes please!';
+				const wrapper = render(
+					<ConfirmDialog
+						onConfirm={ noop }
+						onCancel={ noop }
+						cancelButtonText={ cancelButtonText }
+						confirmButtonText={ confirmButtonText }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				const dialog = wrapper.getByRole( 'dialog' );
+				const elementsTexts = [
+					'Are you sure?',
+					confirmButtonText,
+					cancelButtonText,
+				];
+
+				expect( dialog ).toBeInTheDocument();
+
+				elementsTexts.forEach( ( txt ) => {
+					const el = wrapper.getByText( txt );
+					expect( el ).toBeInTheDocument();
+				} );
+			} );
 		} );
 
 		describe( 'When uncontrolled', () => {
