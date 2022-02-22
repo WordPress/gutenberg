@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-reanimated/android/build.gradle b/node_modules/react-native-reanimated/android/build.gradle
-index 5bb494f..8881fa0 100644
+index 05576b2..82e6ae6 100644
 --- a/node_modules/react-native-reanimated/android/build.gradle
 +++ b/node_modules/react-native-reanimated/android/build.gradle
 @@ -8,7 +8,7 @@ def json = new JsonSlurper().parseText(inputFile.text)
