@@ -16,7 +16,7 @@ import RangeCell from '../mobile/bottom-sheet/range-cell';
 import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 import Picker from '../mobile/picker';
 import styles from './style.scss';
-import { CSS_UNITS, hasUnits, parseA11yLabelForUnit } from './utils';
+import { CSS_UNITS, hasUnits, getAccessibleLabelForUnit } from './utils';
 
 /**
  * WordPress dependencies
@@ -164,7 +164,7 @@ function UnitControl( {
 					shouldDisplayTextInput
 					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
-					unitLabel={ parseA11yLabelForUnit( unit ) }
+					unitLabel={ getAccessibleLabelForUnit( unit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
@@ -182,7 +182,7 @@ function UnitControl( {
 					separatorType={ separatorType }
 					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
-					unitLabel={ parseA11yLabelForUnit( unit ) }
+					unitLabel={ getAccessibleLabelForUnit( unit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
