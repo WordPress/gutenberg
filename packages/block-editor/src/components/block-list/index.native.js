@@ -25,9 +25,13 @@ import { __ } from '@wordpress/i18n';
 import styles from './style.scss';
 import BlockListAppender from '../block-list-appender';
 import BlockListItem from './block-list-item';
+import {
+	BlockListProvider,
+	BlockListConsumer,
+	updateBlocksLayouts,
+	blocksLayouts,
+} from './block-list-context';
 import { store as blockEditorStore } from '../../store';
-
-const BlockListContext = createContext();
 
 export const OnCaretVerticalPositionChange = createContext();
 
@@ -173,17 +177,23 @@ export class BlockList extends Component {
 		const { isRootList } = this.props;
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
 		const blockList = isRootList ? (
-			<BlockListContext.Provider value={ this.scrollViewRef }>
+			<BlockListProvider
+				value={ {
+					scrollRef: this.scrollViewRef,
+					updateBlocksLayouts,
+					blocksLayouts,
+				} }
+			>
 				{ this.renderList() }
-			</BlockListContext.Provider>
+			</BlockListProvider>
 		) : (
-			<BlockListContext.Consumer>
-				{ ( ref ) =>
+			<BlockListConsumer>
+				{ ( { scrollRef } ) =>
 					this.renderList( {
-						parentScrollRef: ref,
+						parentScrollRef: scrollRef,
 					} )
 				}
-			</BlockListContext.Consumer>
+			</BlockListConsumer>
 		);
 
 		return (
