@@ -13,7 +13,9 @@ exports[`Navigating the block hierarchy should appear and function even without 
 exports[`Navigating the block hierarchy should navigate block hierarchy using only the keyboard 1`] = `
 "<!-- wp:columns -->
 <div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class=\\"wp-block-column\\"><!-- wp:paragraph -->
+<p>First column</p>
+<!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
