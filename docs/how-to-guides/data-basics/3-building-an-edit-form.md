@@ -213,7 +213,7 @@ wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title
 
 As you can see, the `title` of an Entity Record is an object, but the `title` of an Edited Entity record is a string.
 
-This is no accident. Fields like `title`, `excerpt`, and `content` can only be rendered on the server so the REST API exposes both the `raw` markup and the `rendered` string. For example, in the block editor, `content.rendered` could used as a visual preview, and `content.raw` could be used to populate the code editor.
+This is no accident. Fields like `title`, `excerpt`, and `content` can only be rendered on the server and so the REST API exposes both the `raw` markup _and_ the `rendered` string. For example, in the block editor, `content.rendered` could used as a visual preview, and `content.raw` could be used to populate the code editor.
 
 So why is the `content` of an Edited Entity Record a string? Since Javascript is not be able to properly render arbitrary block markup, it stores only the `raw` markup without the `rendered` part. And since that's a string, the entire field becomes a string.
 
