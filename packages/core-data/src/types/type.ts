@@ -3,10 +3,10 @@
  */
 import { Context, ContextualField, OmitNevers } from './helpers';
 
-import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
+import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
 
-declare module './wp-base-types' {
-	export namespace CoreBaseEntityTypes {
+declare module './base-entity-types' {
+	export namespace BaseEntityTypes {
 		export interface Type< C extends Context > {
 			/**
 			 * All capabilities used by the post type.
@@ -76,5 +76,5 @@ declare module './wp-base-types' {
 }
 
 export type Type< C extends Context > = OmitNevers<
-	_CoreBaseEntityTypes.Type< C >
+	_BaseEntityTypes.Type< C >
 >;

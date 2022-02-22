@@ -3,10 +3,10 @@
  */
 import { CommentingStatus, Context, OmitNevers, PingStatus } from './helpers';
 
-import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
+import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
 
-declare module './wp-base-types' {
-	export namespace CoreBaseEntityTypes {
+declare module './base-entity-types' {
+	export namespace BaseEntityTypes {
 		export interface Settings< C extends Context > {
 			/**
 			 * What to show on the front page
@@ -89,5 +89,5 @@ declare module './wp-base-types' {
 }
 
 export type Settings< C extends Context > = OmitNevers<
-	_CoreBaseEntityTypes.Settings< C >
+	_BaseEntityTypes.Settings< C >
 >;

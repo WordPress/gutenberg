@@ -1,10 +1,10 @@
 /**
- * This module exists solely to make the CoreBaseEntityTypes namespace extensible
+ * This module exists solely to make the BaseEntityTypes namespace extensible
  * with declaration merging:
  *
  * ```ts
- * declare module './wp-base-types' {
- *     export namespace CoreBaseEntityTypes {
+ * declare module './base-entity-types' {
+ *     export namespace BaseEntityTypes {
  * 		     export interface Comment< C extends Context > {
  * 		         id: number;
  * 		         // ...
@@ -19,7 +19,7 @@
  * ```ts
  * import type { Context } from '@wordpress/core-data';
  * declare module '@wordpress/core-data' {
- *     export namespace CoreBaseEntityTypes {
+ *     export namespace BaseEntityTypes {
  *         export interface Comment< C extends Context > {
  *             numberOfViews: number;
  *         }
@@ -33,4 +33,4 @@
  * // c.id is still present
  * ```
  */
-export namespace CoreBaseEntityTypes {}
+export namespace BaseEntityTypes {}

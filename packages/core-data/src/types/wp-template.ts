@@ -9,10 +9,10 @@ import {
 	ContextualField,
 } from './helpers';
 
-import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
+import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
 
-declare module './wp-base-types' {
-	export namespace CoreBaseEntityTypes {
+declare module './base-entity-types' {
+	export namespace BaseEntityTypes {
 		export interface WpTemplate< C extends Context > {
 			/**
 			 * ID of template.
@@ -90,5 +90,5 @@ declare module './wp-base-types' {
 }
 
 export type WpTemplate< C extends Context > = OmitNevers<
-	_CoreBaseEntityTypes.WpTemplate< C >
+	_BaseEntityTypes.WpTemplate< C >
 >;

@@ -3,10 +3,10 @@
  */
 import { Context, ContextualField, OmitNevers } from './helpers';
 
-import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
+import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
 
-declare module './wp-base-types' {
-	export namespace CoreBaseEntityTypes {
+declare module './base-entity-types' {
+	export namespace BaseEntityTypes {
 		export interface NavMenu< C extends Context > {
 			/**
 			 * Unique identifier for the term.
@@ -49,5 +49,5 @@ declare module './wp-base-types' {
 }
 
 export type NavMenu< C extends Context > = OmitNevers<
-	_CoreBaseEntityTypes.NavMenu< C >
+	_BaseEntityTypes.NavMenu< C >
 >;

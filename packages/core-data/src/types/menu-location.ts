@@ -3,10 +3,10 @@
  */
 import { Context, OmitNevers } from './helpers';
 
-import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
+import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
 
-declare module './wp-base-types' {
-	export namespace CoreBaseEntityTypes {
+declare module './base-entity-types' {
+	export namespace BaseEntityTypes {
 		export interface MenuLocation< C extends Context > {
 			/**
 			 * The name of the menu location.
@@ -25,5 +25,5 @@ declare module './wp-base-types' {
 }
 
 export type MenuLocation< C extends Context > = OmitNevers<
-	_CoreBaseEntityTypes.MenuLocation< C >
+	_BaseEntityTypes.MenuLocation< C >
 >;

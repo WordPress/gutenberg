@@ -22,7 +22,7 @@ import type { WpTemplate } from './wp-template';
 import type { WpTemplatePart } from './wp-template-part';
 import type { Context, Updatable } from './helpers';
 
-export type { CoreBaseEntityTypes } from './wp-base-types';
+export type { BaseEntityTypes } from './base-entity-types';
 
 export type {
 	Context,
