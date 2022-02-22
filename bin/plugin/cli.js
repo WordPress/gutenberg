@@ -27,9 +27,14 @@ const {
 const { getReleaseChangelog } = require( './commands/changelog' );
 const { runPerformanceTests } = require( './commands/performance' );
 
+const semverOption = [ '--semver <semver>', 'Semantic Versioning', 'patch' ];
+const ciOption = [ '-c, --ci', 'Run in CI (non interactive)' ];
+
 program
 	.command( 'publish-npm-packages-latest' )
 	.alias( 'npm-latest' )
+	.option( ...semverOption )
+	.option( ...ciOption )
 	.description(
 		'Publishes packages to npm (latest dist-tag, production version)'
 	)
@@ -38,6 +43,8 @@ program
 program
 	.command( 'publish-npm-packages-bugfix-latest' )
 	.alias( 'npm-bugfix' )
+	.option( ...semverOption )
+	.option( ...ciOption )
 	.description(
 		'Publishes bugfixes for packages to npm (latest dist-tag, production version)'
 	)
@@ -46,6 +53,8 @@ program
 program
 	.command( 'publish-npm-packages-next' )
 	.alias( 'npm-next' )
+	.option( ...semverOption )
+	.option( ...ciOption )
 	.description(
 		'Publishes packages to npm (next dist-tag, prerelease version)'
 	)
@@ -66,7 +75,7 @@ program
 program
 	.command( 'performance-tests [branches...]' )
 	.alias( 'perf' )
-	.option( '-c, --ci', 'Run in CI (non interactive)' )
+	.option( ...ciOption )
 	.option(
 		'--tests-branch <branch>',
 		"Use this branch's performance test files"
