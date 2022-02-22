@@ -235,4 +235,4 @@ const c : Comment< 'view' > = ...;
 // c.id is still present
 ```
 
-Of course you will also need to extend the REST API to expose the numberOfViews property.
+Of course, you will also need to extend the REST API to expose the numberOfViews property.
