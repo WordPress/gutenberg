@@ -489,10 +489,7 @@ export function ColorEdit( props ) {
 	const enableContrastChecking =
 		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
 
-	const defaultColorControls = getBlockSupport( props.name, [
-		COLOR_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	const defaultColorControls = getDefaultColorControls( props.name );
 
 	return (
 		<ColorPanel
@@ -619,6 +616,31 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
 	}
 );
+
+/**
+ * Returns an object containing default controls. A control key with a `true` value
+ * means that the control will be shown in the panel by default.
+ *
+ * @param {string|Object} blockType Block name or block type object.
+ *
+ * @return {Object} Default controls key/value pairs.
+ */
+export function getDefaultColorControls( blockType ) {
+	const defaultBorderControls = getBlockSupport( blockType, [
+		COLOR_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
+	if ( defaultBorderControls === 'all' ) {
+		return {
+			text: true,
+			background: true,
+			link: true,
+		};
+	}
+
+	return defaultBorderControls;
+}
 
 const MIGRATION_PATHS = {
 	linkColor: [ [ 'style', 'elements', 'link', 'color', 'text' ] ],

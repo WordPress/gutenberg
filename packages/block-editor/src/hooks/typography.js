@@ -94,10 +94,7 @@ export function TypographyPanel( props ) {
 
 	if ( isDisabled || ! isSupported ) return null;
 
-	const defaultControls = getBlockSupport( props.name, [
-		TYPOGRAPHY_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	const defaultControls = getDefaultTypographyControls( props.name );
 
 	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
 		...newAttributes,
@@ -249,4 +246,32 @@ function useIsTypographyDisabled( props = {} ) {
 	];
 
 	return configs.filter( Boolean ).length === configs.length;
+}
+
+/**
+ * Returns an object containing default controls. A control key with a `true` value
+ * means that the control will be shown in the panel by default.
+ *
+ * @param {string|Object} blockType Block name or block type object.
+ *
+ * @return {Object} Default controls key/value pairs.
+ */
+export function getDefaultTypographyControls( blockType ) {
+	const defaultBorderControls = getBlockSupport( blockType, [
+		TYPOGRAPHY_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
+	if ( defaultBorderControls === 'all' ) {
+		return {
+			fontFamily: true,
+			fontSize: true,
+			fontAppearance: true,
+			lineHeight: true,
+			textDecoration: true,
+			letterSpacing: true,
+		};
+	}
+
+	return defaultBorderControls;
 }

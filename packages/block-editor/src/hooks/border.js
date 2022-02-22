@@ -57,10 +57,7 @@ export function BorderPanel( props ) {
 		return null;
 	}
 
-	const defaultBorderControls = getBlockSupport( props.name, [
-		BORDER_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	const defaultBorderControls = getDefaultBorderControls( props.name );
 
 	const createResetAllFilter = (
 		borderAttribute,
@@ -212,4 +209,30 @@ export function removeBorderAttribute( style, attribute ) {
 			[ attribute ]: undefined,
 		},
 	} );
+}
+
+/**
+ * Returns an object containing default controls. A control key with a `true` value
+ * means that the control will be shown in the panel by default.
+ *
+ * @param {string|Object} blockType Block name or block type object.
+ *
+ * @return {Object} Default controls key/value pairs.
+ */
+export function getDefaultBorderControls( blockType ) {
+	const defaultBorderControls = getBlockSupport( blockType, [
+		BORDER_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
+	if ( defaultBorderControls === 'all' ) {
+		return {
+			color: true,
+			radius: true,
+			width: true,
+			style: true,
+		};
+	}
+
+	return defaultBorderControls;
 }

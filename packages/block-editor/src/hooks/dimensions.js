@@ -54,10 +54,7 @@ export function DimensionsPanel( props ) {
 		return null;
 	}
 
-	const defaultSpacingControls = getBlockSupport( props.name, [
-		SPACING_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	const defaultSpacingControls = getDefaultDimensionsControls( props.name );
 
 	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
 		...newAttributes,
@@ -195,4 +192,29 @@ export function useIsDimensionsSupportValid( blockName, feature ) {
 	}
 
 	return true;
+}
+
+/**
+ * Returns an object containing default controls. A control key with a `true` value
+ * means that the control will be shown in the panel by default.
+ *
+ * @param {string|Object} blockType Block name or block type object.
+ *
+ * @return {Object} Default controls key/value pairs.
+ */
+export function getDefaultDimensionsControls( blockType ) {
+	const defaultBorderControls = getBlockSupport( blockType, [
+		SPACING_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
+	if ( defaultBorderControls === 'all' ) {
+		return {
+			padding: true,
+			margin: true,
+			blockGap: true,
+		};
+	}
+
+	return defaultBorderControls;
 }
