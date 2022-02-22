@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { MenuItem } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 
@@ -28,9 +28,23 @@ export default function PreferenceToggleMenuItem( {
 	const { toggle } = useDispatch( preferencesStore );
 	const speakMessage = () => {
 		if ( isActive ) {
-			speak( messageDeactivated || __( 'Preference deactivated' ) );
+			const message =
+				messageDeactivated ||
+				sprintf(
+					/* translators: %s: preference name, e.g. 'Fullscreen mode' */
+					__( 'Preference deactivated - %s' ),
+					label
+				);
+			speak( message );
 		} else {
-			speak( messageActivated || __( 'Preference activated' ) );
+			const message =
+				messageActivated ||
+				sprintf(
+					/* translators: %s: preference name, e.g. 'Fullscreen mode' */
+					__( 'Preference activated - %s' ),
+					label
+				);
+			speak( message );
 		}
 	};
 
