@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { uniq } from 'lodash';
-import type { ReactChild, ReactNode, Ref } from 'react';
+import type { ForwardedRef, ReactChild, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -36,7 +36,7 @@ type ContextConnectOptions = {
  * @return The connected WordPressComponent
  */
 export function contextConnect< P >(
-	Component: ( props: P, ref: Ref< any > ) => JSX.Element | null,
+	Component: ( props: P, ref: ForwardedRef< any > ) => JSX.Element | null,
 	namespace: string,
 	options: ContextConnectOptions = {}
 ): WordPressComponentFromProps< P > {
