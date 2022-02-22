@@ -8,6 +8,8 @@ figure.wp-block-gallery.has-nested-images {
 }
 // Styles for current version of gallery block.
 .wp-block-gallery.has-nested-images {
+	margin-top: var(--wp--style--block-gap);
+	margin-bottom: 0;
 	// Need bogus :not(#individual-image) to override long :not()
 	// specificity chain on default image block on front end.
 	figure.wp-block-image:not(#individual-image) {
