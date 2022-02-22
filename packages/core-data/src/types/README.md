@@ -218,6 +218,7 @@ interface ExtensibleComment < C extends Context > {
 const c : Comment = ...
 
 // c.numberOfViews is a number
+// c.id is still present
 ```
 
 Of course you will also need to extend the REST API to expose the numberOfViews property.
