@@ -1,31 +1,25 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/buttons",
 		"isValid": true,
 		"attributes": {},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/button",
 				"isValid": true,
 				"attributes": {
 					"text": "My button 1"
 				},
-				"innerBlocks": [],
-				"originalContent": "<a class=\"wp-block-button wp-block-button__link\">My button 1</a>"
+				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_1",
 				"name": "core/button",
 				"isValid": true,
 				"attributes": {
 					"text": "My button 2"
 				},
-				"innerBlocks": [],
-				"originalContent": "<a class=\"wp-block-button wp-block-button__link\">My button 2</a>"
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div class=\"wp-block-buttons\">\n\t\n\n\t\n</div>"
+		]
 	}
 ]

@@ -232,11 +232,8 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 		createResolversCacheMiddleware( registry, key ),
 		promise,
 		createReduxRoutineMiddleware( normalizedControls ),
+		createThunkMiddleware( thunkArgs ),
 	];
-
-	if ( options.__experimentalUseThunks ) {
-		middlewares.push( createThunkMiddleware( thunkArgs ) );
-	}
 
 	const enhancers = [ applyMiddleware( ...middlewares ) ];
 	if (

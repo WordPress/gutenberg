@@ -70,6 +70,8 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 			panelId={ panelId }
 			hasInnerWrapper={ true }
 			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
+			__experimentalFirstVisibleItemClass="first"
+			__experimentalLastVisibleItemClass="last"
 		>
 			{ children }
 		</ToolsPanel>

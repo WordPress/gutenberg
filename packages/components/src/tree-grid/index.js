@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  */
 import { focus } from '@wordpress/dom';
 import { forwardRef, useCallback } from '@wordpress/element';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -45,22 +45,30 @@ function getRowFocusables( rowElement ) {
  * @param {WPElement} props.children      Children to be rendered.
  * @param {Function}  props.onExpandRow   Callback to fire when row is expanded.
  * @param {Function}  props.onCollapseRow Callback to fire when row is collapsed.
+ * @param {Function}  props.onFocusRow    Callback to fire when moving focus to a different row.
  * @param {Object}    ref                 A ref to the underlying DOM table element.
  */
 function TreeGrid(
-	{ children, onExpandRow = () => {}, onCollapseRow = () => {}, ...props },
+	{
+		children,
+		onExpandRow = () => {},
+		onCollapseRow = () => {},
+		onFocusRow = () => {},
+		...props
+	},
 	ref
 ) {
 	const onKeyDown = useCallback(
 		( event ) => {
-			const { keyCode, metaKey, ctrlKey, altKey, shiftKey } = event;
+			const { keyCode, metaKey, ctrlKey, altKey } = event;
 
-			const hasModifierKeyPressed =
-				metaKey || ctrlKey || altKey || shiftKey;
+			// The shift key is intentionally absent from the following list,
+			// to enable shift + up/down to select items from the list.
+			const hasModifierKeyPressed = metaKey || ctrlKey || altKey;
 
 			if (
 				hasModifierKeyPressed ||
-				! includes( [ UP, DOWN, LEFT, RIGHT ], keyCode )
+				! includes( [ UP, DOWN, LEFT, RIGHT, HOME, END ], keyCode )
 			) {
 				return;
 			}
@@ -78,6 +86,11 @@ function TreeGrid(
 			const activeRow = activeElement.closest( '[role="row"]' );
 			const focusablesInRow = getRowFocusables( activeRow );
 			const currentColumnIndex = focusablesInRow.indexOf( activeElement );
+			const canExpandCollapse = 0 === currentColumnIndex;
+			const cannotFocusNextColumn =
+				canExpandCollapse &&
+				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
+				keyCode === RIGHT;
 
 			if ( includes( [ LEFT, RIGHT ], keyCode ) ) {
 				// Calculate to the next element.
@@ -91,8 +104,8 @@ function TreeGrid(
 					);
 				}
 
-				// Focus is either at the left or right edge of the grid.
-				if ( nextIndex === currentColumnIndex ) {
+				// Focus is at the left most column.
+				if ( canExpandCollapse ) {
 					if ( keyCode === LEFT ) {
 						// Left:
 						// If a row is focused, and it is expanded, collapses the current row.
@@ -105,7 +118,10 @@ function TreeGrid(
 						}
 						// If a row is focused, and it is collapsed, moves to the parent row (if there is one).
 						const level = Math.max(
-							parseInt( activeRow?.ariaLevel ?? 1, 10 ) - 1,
+							parseInt(
+								activeRow?.getAttribute( 'aria-level' ) ?? 1,
+								10
+							) - 1,
 							1
 						);
 						const rows = Array.from(
@@ -115,7 +131,10 @@ function TreeGrid(
 						const currentRowIndex = rows.indexOf( activeRow );
 						for ( let i = currentRowIndex; i >= 0; i-- ) {
 							if (
-								parseInt( rows[ i ].ariaLevel, 10 ) === level
+								parseInt(
+									rows[ i ].getAttribute( 'aria-level' ),
+									10
+								) === level
 							) {
 								parentRow = rows[ i ];
 								break;
@@ -149,7 +168,10 @@ function TreeGrid(
 					return;
 				}
 
-				// Focus the next element.
+				// Focus the next element. If at most left column and row is collapsed, moving right is not allowed as this will expand. However, if row is collapsed, moving left is allowed.
+				if ( cannotFocusNextColumn ) {
+					return;
+				}
 				focusablesInRow[ nextIndex ].focus();
 
 				// Prevent key use for anything else. This ensures Voiceover
@@ -202,12 +224,63 @@ function TreeGrid(
 				);
 				focusablesInNextRow[ nextIndex ].focus();
 
+				// Let consumers know the row that was originally focused,
+				// and the row that is now in focus.
+				onFocusRow( event, activeRow, rows[ nextRowIndex ] );
+
+				// Prevent key use for anything else. This ensures Voiceover
+				// doesn't try to handle key navigation.
+				event.preventDefault();
+			} else if ( includes( [ HOME, END ], keyCode ) ) {
+				// Calculate the rowIndex of the next row.
+				const rows = Array.from(
+					treeGridElement.querySelectorAll( '[role="row"]' )
+				);
+				const currentRowIndex = rows.indexOf( activeRow );
+				let nextRowIndex;
+
+				if ( keyCode === HOME ) {
+					nextRowIndex = 0;
+				} else {
+					nextRowIndex = rows.length - 1;
+				}
+
+				// Focus is either at the top or bottom edge of the grid. Do nothing.
+				if ( nextRowIndex === currentRowIndex ) {
+					// Prevent key use for anything else. For example, Voiceover
+					// will start navigating horizontally when reaching the vertical
+					// bounds of a table.
+					event.preventDefault();
+					return;
+				}
+
+				// Get the focusables in the next row.
+				const focusablesInNextRow = getRowFocusables(
+					rows[ nextRowIndex ]
+				);
+
+				// If for some reason there are no focusables in the next row, do nothing.
+				if ( ! focusablesInNextRow || ! focusablesInNextRow.length ) {
+					// Prevent key use for anything else. For example, Voiceover
+					// will still focus text when using arrow keys, while this
+					// component should limit navigation to focusables.
+					event.preventDefault();
+					return;
+				}
+
+				// Try to focus the element in the next row that's at a similar column to the activeElement.
+				const nextIndex = Math.min(
+					currentColumnIndex,
+					focusablesInNextRow.length - 1
+				);
+				focusablesInNextRow[ nextIndex ].focus();
+
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
 				event.preventDefault();
 			}
 		},
-		[ onExpandRow, onCollapseRow ]
+		[ onExpandRow, onCollapseRow, onFocusRow ]
 	);
 
 	/* Disable reason: A treegrid is implemented using a table element. */

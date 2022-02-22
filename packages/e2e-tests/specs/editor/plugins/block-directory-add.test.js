@@ -10,10 +10,19 @@ import {
 	createJSONResponse,
 } from '@wordpress/e2e-test-utils';
 
+const BLOCK1_NAME = 'block-directory-test-block/main-block';
+
 // Urls to mock
 const SEARCH_URLS = [
 	'/wp/v2/block-directory/search',
 	`rest_route=${ encodeURIComponent( '/wp/v2/block-directory/search' ) }`,
+];
+
+const BLOCK_TYPE_URLS = [
+	`/wp/v2/block-types/${ BLOCK1_NAME }`,
+	`rest_route=${ encodeURIComponent(
+		`/wp/v2/block-types/${ BLOCK1_NAME }`
+	) }`,
 ];
 
 const INSTALL_URLS = [
@@ -23,7 +32,7 @@ const INSTALL_URLS = [
 
 // Example Blocks
 const MOCK_BLOCK1 = {
-	name: 'block-directory-test-block/main-block',
+	name: BLOCK1_NAME,
 	title: 'Block Directory Test Block',
 	description: 'This plugin is useful for the block.',
 	id: 'block-directory-test-block',
@@ -108,6 +117,11 @@ const MOCK_BLOCKS_RESPONSES = [
 			matchUrl( request.url(), SEARCH_URLS ) &&
 			request.method() === 'GET',
 		onRequestMatch: createJSONResponse( [ MOCK_BLOCK1, MOCK_BLOCK2 ] ),
+	},
+	{
+		// Mock response for block type
+		match: ( request ) => matchUrl( request.url(), BLOCK_TYPE_URLS ),
+		onRequestMatch: createJSONResponse( {} ),
 	},
 	{
 		// Mock response for install

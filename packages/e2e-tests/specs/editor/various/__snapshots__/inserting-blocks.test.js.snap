@@ -71,7 +71,7 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2 id=\\"heading\\">Heading</h2>
+<h2>Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -89,11 +89,11 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <!-- /wp:paragraph -->
 
 <!-- wp:cover {\\"isDark\\":false} -->
-<div class=\\"wp-block-cover is-light\\"><span aria-hidden=\\"true\\" class=\\"has-background-dim-100 wp-block-cover__gradient-background has-background-dim\\"></span><div class=\\"wp-block-cover__inner-container\\"></div></div>
+<div class=\\"wp-block-cover is-light\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-background-dim-100 has-background-dim\\"></span><div class=\\"wp-block-cover__inner-container\\"></div></div>
 <!-- /wp:cover -->
 
 <!-- wp:heading -->
-<h2 id=\\"heading\\">Heading</h2>
+<h2>Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->

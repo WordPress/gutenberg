@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+–   Replaced no-shadow eslint rule with @typescript-eslint/no-shadow ([#38665](https://github.com/WordPress/gutenberg/pull/38665)).
+
 ## 10.0.0 (2022-01-27)
 
 ### Breaking Changes

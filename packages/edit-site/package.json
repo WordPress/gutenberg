@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "3.1.0",
+	"version": "4.0.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -36,7 +36,6 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
-		"@wordpress/data-controls": "file:../data-controls",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
@@ -50,6 +49,7 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
+		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.3.1",
