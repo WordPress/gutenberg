@@ -25,6 +25,7 @@ import { __ } from '@wordpress/i18n';
 import styles from './style.scss';
 import BlockListAppender from '../block-list-appender';
 import BlockListItem from './block-list-item';
+import BlockListItemCell from './block-list-item-cell';
 import {
 	BlockListProvider,
 	BlockListConsumer,
@@ -82,6 +83,9 @@ export class BlockList extends Component {
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
+		this.getCellRendererComponent = this.getCellRendererComponent.bind(
+			this
+		);
 
 		this.onLayout = this.onLayout.bind( this );
 
@@ -156,6 +160,17 @@ export class BlockList extends Component {
 			};
 		}
 		return this.extraData;
+	}
+
+	getCellRendererComponent( { children, item } ) {
+		const { rootClientId } = this.props;
+		return (
+			<BlockListItemCell
+				children={ children }
+				clientId={ item }
+				rootClientId={ rootClientId }
+			/>
+		);
 	}
 
 	onLayout( { nativeEvent } ) {
@@ -289,6 +304,7 @@ export class BlockList extends Component {
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
+					CellRendererComponent={ this.getCellRendererComponent }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
 					}
