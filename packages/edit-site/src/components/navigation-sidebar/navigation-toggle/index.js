@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
 	Icon,
@@ -47,16 +46,6 @@ function NavigationToggle( { icon } ) {
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
 	const disableMotion = useReducedMotion();
-
-	const navigationToggleRef = useRef();
-
-	useEffect( () => {
-		// TODO: Remove this effect when alternative solution is merged.
-		// See: https://github.com/WordPress/gutenberg/pull/37314
-		if ( ! isNavigationOpen ) {
-			navigationToggleRef.current.focus();
-		}
-	}, [ isNavigationOpen ] );
 
 	const toggleNavigationPanel = () =>
 		setIsNavigationPanelOpened( ! isNavigationOpen );
@@ -104,7 +93,6 @@ function NavigationToggle( { icon } ) {
 			<Button
 				className={ classes }
 				label={ __( 'Toggle navigation' ) }
-				ref={ navigationToggleRef }
 				// isPressed will add unwanted styles.
 				aria-pressed={ isNavigationOpen }
 				onClick={ toggleNavigationPanel }
