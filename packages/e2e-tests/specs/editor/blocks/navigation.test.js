@@ -144,7 +144,7 @@ async function populateNavWithOneItem() {
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
-const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select menu']`;
+const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select Menu']`;
 
 /**
  * Delete all items for the given REST resources using the REST API.
@@ -883,9 +883,10 @@ describe( 'Navigation', () => {
 
 			await insertBlock( 'Navigation' );
 
-			// Select the Navigation post created by the Admin early
+			// Select the Navigation post created by the Admin earlier
 			// in the test.
 			const navigationPostCreatedByAdminName = 'Navigation';
+
 			const dropdown = await page.waitForXPath( SELECT_MENU_XPATH );
 			await dropdown.click();
 			const theOption = await page.waitForXPath(
