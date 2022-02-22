@@ -12,7 +12,7 @@ import { speak } from '@wordpress/a11y';
  */
 import { store as preferencesStore } from '../../store';
 
-export default function MoreMenuPreferenceToggle( {
+export default function PreferenceToggleMenuItem( {
 	scope,
 	name,
 	label,

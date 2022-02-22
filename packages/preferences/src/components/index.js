@@ -1,1 +1,1 @@
-export { default as MoreMenuPreferenceToggle } from './more-menu-preference-toggle';
+export { default as PreferenceToggleMenuItem } from './preference-toggle-menu-item';

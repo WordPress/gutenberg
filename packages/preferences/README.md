@@ -68,7 +68,9 @@ wp.data
 
 ### Components
 
-The `MoreMenuPreferenceToggle` components helps to implement an editor menu for changing preferences and feature values.
+The `PreferenceToggleMenuItem` components can be used with a `DropdownMenu` to implement a menu for changing preferences.
+
+Also see the `MoreMenuDropdown` component from the `@wordpress/interface` package for implementing a more menu.
 
 ```jsx
 function MyEditorMenu() {
@@ -76,7 +78,7 @@ function MyEditorMenu() {
 		<MoreMenuDropdown>
 			{ () => (
 				<MenuGroup label={ __( 'Features' ) }>
-					<MoreMenuPreferenceToggle
+					<PreferenceToggleMenuItem
 						scope="namespace/editor-or-plugin-name"
 						name="myPreferenceName"
 						label={ __( 'My feature' ) }

@@ -1,6 +1,6 @@
-# MoreMenuPreferenceToggle
+# PreferenceToggleMenuItem
 
-`MoreMenuPreferenceToggle` renders a menu item that is connected to the preference package's store, and will toggle the value of a 'preference' between true and false.
+`PreferenceToggleMenuItem` renders a menu item that is connected to the preference package's store, and will toggle the value of a 'preference' between true and false.
 
 This component implements a `MenuItem` component from the `@wordpress/components` package.
 
