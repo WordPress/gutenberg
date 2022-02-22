@@ -6,6 +6,7 @@ import type {
 	KeyboardEvent,
 	ForwardedRef,
 	SyntheticEvent,
+	ChangeEvent,
 } from 'react';
 import { noop, omit } from 'lodash';
 import classnames from 'classnames';
@@ -27,9 +28,9 @@ import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
 	CSS_UNITS,
-	getParsedValue,
+	getParsedQuantityAndUnit,
 	getUnitsWithCurrentUnit,
-	getValidParsedUnit,
+	getValidParsedQuantityAndUnit,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
@@ -61,11 +62,16 @@ function UnitControl(
 		() => getUnitsWithCurrentUnit( valueProp, unitProp, unitsProp ),
 		[ valueProp, unitProp, unitsProp ]
 	);
-	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
+	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
+		valueProp,
+		unitProp,
+		units
+	);
+
 	const [ unit, setUnit ] = useControlledState< string | undefined >(
 		unitProp,
 		{
-			initial: initialUnit,
+			initial: parsedUnit,
 			fallback: '',
 		}
 	);
@@ -79,40 +85,58 @@ function UnitControl(
 
 	const classes = classnames( 'components-unit-control', className );
 
-	const handleOnChange: UnitControlOnChangeCallback = (
-		next,
-		changeProps
+	const handleOnQuantityChange = (
+		nextQuantityValue: number | string | undefined,
+		changeProps: { event: ChangeEvent< HTMLInputElement > }
 	) => {
-		if ( next === '' ) {
-			onChange( '', changeProps );
-			return;
+		let onChangeValue = '';
+
+		// Fire `onChange` with an empty string
+		if (
+			typeof nextQuantityValue !== 'undefined' &&
+			nextQuantityValue !== ''
+		) {
+			/*
+			 * Customizing the onChange callback.
+			 * This allows as to broadcast a combined value+unit to onChange.
+			 */
+			const [
+				validParsedQuantity,
+				validParsedUnit,
+			] = getValidParsedQuantityAndUnit(
+				nextQuantityValue,
+				units,
+				parsedQuantity,
+				unit
+			);
+
+			if ( typeof validParsedQuantity !== 'undefined' ) {
+				onChangeValue = [ validParsedQuantity, validParsedUnit ].join(
+					''
+				);
+			}
 		}
 
-		/*
-		 * Customizing the onChange callback.
-		 * This allows as to broadcast a combined value+unit to onChange.
-		 */
-		next = getValidParsedUnit( next, units, value, unit ).join( '' );
-
-		onChange( next, changeProps );
+		onChange( onChangeValue, changeProps );
 	};
 
 	const handleOnUnitChange: UnitControlOnChangeCallback = (
-		next,
+		nextUnitValue,
 		changeProps
 	) => {
 		const { data } = changeProps;
 
-		let nextValue = `${ value }${ next }`;
-
-		if ( isResetValueOnUnitChange && data?.default !== undefined ) {
-			nextValue = `${ data.default }${ next }`;
+		let onChangeValue = '';
+		if ( typeof parsedQuantity !== 'undefined' ) {
+			onChangeValue = [ parsedQuantity, nextUnitValue ].join( '' );
+			if ( isResetValueOnUnitChange && data?.default !== undefined ) {
+				onChangeValue = `${ data.default }${ nextUnitValue }`;
+			}
 		}
+		onChange( onChangeValue, changeProps );
 
-		onChange( nextValue, changeProps );
-		onUnitChange( next, changeProps );
-
-		setUnit( next );
+		onUnitChange( nextUnitValue, changeProps );
+		setUnit( nextUnitValue );
 	};
 
 	const mayUpdateUnit = ( event: SyntheticEvent< HTMLInputElement > ) => {
@@ -120,25 +144,31 @@ function UnitControl(
 			refParsedValue.current = null;
 			return;
 		}
-		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
+		const [
+			validParsedQuantity,
+			validParsedUnit,
+		] = getValidParsedQuantityAndUnit(
 			event.currentTarget.value,
 			units,
-			value,
+			parsedQuantity,
 			unit
 		);
 
-		refParsedValue.current = parsedValue.toString();
+		refParsedValue.current = validParsedQuantity?.toString() ?? '';
 
-		if ( isPressEnterToChange && parsedUnit !== unit ) {
+		if ( isPressEnterToChange && validParsedUnit !== unit ) {
 			const data = Array.isArray( units )
-				? units.find( ( option ) => option.value === parsedUnit )
+				? units.find( ( option ) => option.value === validParsedUnit )
 				: undefined;
 			const changeProps = { event, data };
 
-			onChange( `${ parsedValue }${ parsedUnit }`, changeProps );
-			onUnitChange( parsedUnit, changeProps );
+			onChange(
+				`${ validParsedQuantity }${ validParsedUnit }`,
+				changeProps
+			);
+			onUnitChange( validParsedUnit, changeProps );
 
-			setUnit( parsedUnit );
+			setUnit( validParsedUnit );
 		}
 	};
 
@@ -213,11 +243,11 @@ function UnitControl(
 				label={ label }
 				onBlur={ handleOnBlur }
 				onKeyDown={ handleOnKeyDown }
-				onChange={ handleOnChange }
+				onChange={ handleOnQuantityChange }
 				ref={ forwardedRef }
 				size={ size }
 				suffix={ inputSuffix }
-				value={ value }
+				value={ parsedQuantity }
 				step={ step }
 				__unstableStateReducer={ composeStateReducers(
 					unitControlStateReducer,
@@ -246,5 +276,5 @@ function UnitControl(
  */
 const ForwardedUnitControl = forwardRef( UnitControl );
 
-export { parseUnit, useCustomUnits } from './utils';
+export { parseQuantityAndUnitFromRawValue, useCustomUnits } from './utils';
 export default ForwardedUnitControl;
