@@ -217,6 +217,4 @@ declare module './base-types' {
 	}
 }
 
-export type Theme< C extends Context > = OmitNevers<
-	_BaseTypes.Theme< C >
->;
+export type Theme< C extends Context > = OmitNevers< _BaseTypes.Theme< C > >;

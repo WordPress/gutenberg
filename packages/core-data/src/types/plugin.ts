@@ -69,6 +69,4 @@ declare module './base-types' {
 }
 
 export type PluginStatus = 'active' | 'inactive';
-export type Plugin< C extends Context > = OmitNevers<
-	_BaseTypes.Plugin< C >
->;
+export type Plugin< C extends Context > = OmitNevers< _BaseTypes.Plugin< C > >;

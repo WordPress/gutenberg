@@ -139,6 +139,4 @@ declare module './base-types' {
 	}
 }
 
-export type Page< C extends Context > = OmitNevers<
-	_BaseTypes.Page< C >
->;
+export type Page< C extends Context > = OmitNevers< _BaseTypes.Page< C > >;

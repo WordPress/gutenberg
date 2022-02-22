@@ -59,6 +59,4 @@ declare module './base-types' {
 	}
 }
 
-export type Widget< C extends Context > = OmitNevers<
-	_BaseTypes.Widget< C >
->;
+export type Widget< C extends Context > = OmitNevers< _BaseTypes.Widget< C > >;
