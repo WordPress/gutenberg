@@ -1,16 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TreeGrid renders a table, tbody and any child elements 1`] = `
-<table
-  onKeyDown={[Function]}
-  role="treegrid"
->
-  <tbody>
-    <tr>
-      <td>
-        Test
-      </td>
-    </tr>
-  </tbody>
-</table>
-`;
+exports[`TreeGrid simple rendering renders a table, tbody and any child elements 1`] = `"<table role=\\"treegrid\\"><tbody><tr><td>Test</td></tr></tbody></table>"`;

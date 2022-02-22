@@ -145,7 +145,7 @@ function useExampleComponent( props: PolymorphicComponentProps< ExampleProps, 'd
 // in `component.tsx`
 function Example(
 	props: PolymorphicComponentProps< ExampleProps, 'div' >,
-	forwardedRef: Ref< any >
+	forwardedRef: React.ForwardedRef< any >
 ) {
 	const exampleProps = useExampleComponent( props );
 
