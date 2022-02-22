@@ -308,9 +308,11 @@ async function publishPackagesToNpm(
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
-		const { stdout: sha } = await command( 'git rev-parse --short HEAD' );
+		const commitHash = await git.getLastCommitHash(
+			gitWorkingDirectoryPath
+		);
 		await command(
-			`npx lerna version pre${ minimumVersionBump } --preid next.${ sha } --no-private`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.${ commitHash } --no-private`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -347,9 +349,9 @@ async function publishPackagesToNpm(
 		} );
 	}
 
-	const result = await command( 'git rev-parse --short HEAD' );
-	return result.stdout;
+	return await git.getLastCommitHash( gitWorkingDirectoryPath );
 }
+
 /**
  * Backports commits from the release branch to the `trunk` branch.
  *
@@ -371,7 +373,6 @@ async function backportCommitsToTrunk(
 	}
 
 	log( '>> Backporting commits.' );
-	console.log( commits );
 	await git.resetLocalBranchAgainstOrigin( gitWorkingDirectoryPath, 'trunk' );
 	for ( const commitHash of commits ) {
 		await git.cherrypickCommitIntoBranch(
