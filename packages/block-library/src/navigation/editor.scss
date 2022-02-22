@@ -119,7 +119,6 @@
 	display: none;
 }
 
-
 /**
  * Colors Selector component
  */
@@ -607,4 +606,10 @@ body.editor-styles-wrapper
 		outline: 1px solid transparent; // Box shadow is removed in high contrast mode, a transparent outline is made opaque.
 		background-color: $white;
 	}
+}
+
+// Temp - hide toolbar component when Nav Menu Selector is empty.
+// TODO - extract state to common hook or parent component to avoid render.
+.wp-block-navigation__toolbar-menu-selector.components-toolbar-group:empty {
+	display: none;
 }

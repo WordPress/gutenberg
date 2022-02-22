@@ -481,7 +481,7 @@ function Navigation( {
 			<RecursionProvider>
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
-						<ToolbarGroup>
+						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
 							<NavigationMenuSelector
 								currentMenuId={ ref }
 								clientId={ clientId }
