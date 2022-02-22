@@ -12,6 +12,7 @@ figure.wp-block-gallery.has-nested-images {
 	// specificity chain on default image block on front end.
 	figure.wp-block-image:not(#individual-image) {
 		width: calc(50% - (var(--wp--style--unstable-gallery-gap, #{$grid-unit-20}) / 2));
+		margin: 0;
 	}
 
 	figure.wp-block-image {
