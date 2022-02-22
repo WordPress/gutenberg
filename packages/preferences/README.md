@@ -68,7 +68,7 @@ wp.data
 
 ### Components
 
-The `MoreMenuDropdown` and `MoreMenuPreferenceToggle` components help to implement an editor menu for changing preferences and feature values.
+The `MoreMenuPreferenceToggle` components helps to implement an editor menu for changing preferences and feature values.
 
 ```jsx
 function MyEditorMenu() {

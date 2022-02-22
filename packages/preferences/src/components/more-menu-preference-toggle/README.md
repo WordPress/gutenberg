@@ -1,7 +1,6 @@
 # MoreMenuPreferenceToggle
 
-`MoreMenuPreferenceToggle` renders a menu item that can be used as a child of the `MoreMenuDropdown` component. The component
-is connected to the preference package's store, and will toggle the value of a 'preference' between true and false.
+`MoreMenuPreferenceToggle` renders a menu item that is connected to the preference package's store, and will toggle the value of a 'preference' between true and false.
 
 This component implements a `MenuItem` component from the `@wordpress/components` package.
 
