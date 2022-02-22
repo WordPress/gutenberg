@@ -12,10 +12,10 @@ import {
 	PingStatus,
 } from './helpers';
 
-import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
+import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
 
 declare module './wp-base-types' {
-	export namespace WPBaseTypes {
+	export namespace CoreBaseEntityTypes {
 		export interface Attachment< C extends Context > {
 			/**
 			 * The date the post was published, in the site's timezone.
@@ -142,5 +142,5 @@ declare module './wp-base-types' {
 }
 
 export type Attachment< C extends Context > = OmitNevers<
-	_WPBaseTypes.Attachment< C >
+	_CoreBaseEntityTypes.Attachment< C >
 >;

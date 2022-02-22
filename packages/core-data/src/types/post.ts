@@ -12,10 +12,10 @@ import {
 	OmitNevers,
 } from './helpers';
 
-import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
+import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
 
 declare module './wp-base-types' {
-	export namespace WPBaseTypes {
+	export namespace CoreBaseEntityTypes {
 		export interface Post< C extends Context > {
 			/**
 			 * The date the post was published, in the site's timezone.
@@ -148,4 +148,6 @@ declare module './wp-base-types' {
 	}
 }
 
-export type Post< C extends Context > = OmitNevers< _WPBaseTypes.Post< C > >;
+export type Post< C extends Context > = OmitNevers<
+	_CoreBaseEntityTypes.Post< C >
+>;

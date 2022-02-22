@@ -3,10 +3,10 @@
  */
 import { Context, OmitNevers } from './helpers';
 
-import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
+import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
 
 declare module './wp-base-types' {
-	export namespace WPBaseTypes {
+	export namespace CoreBaseEntityTypes {
 		export interface WidgetType< C extends Context > {
 			/**
 			 * Unique slug identifying the widget type.
@@ -33,5 +33,5 @@ declare module './wp-base-types' {
 }
 
 export type WidgetType< C extends Context > = OmitNevers<
-	_WPBaseTypes.WidgetType< C >
+	_CoreBaseEntityTypes.WidgetType< C >
 >;

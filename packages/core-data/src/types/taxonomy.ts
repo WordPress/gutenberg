@@ -3,10 +3,10 @@
  */
 import { Context, ContextualField, OmitNevers } from './helpers';
 
-import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
+import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
 
 declare module './wp-base-types' {
-	export namespace WPBaseTypes {
+	export namespace CoreBaseEntityTypes {
 		export interface Taxonomy< C extends Context > {
 			/**
 			 * All capabilities used by the taxonomy.
@@ -88,5 +88,5 @@ declare module './wp-base-types' {
 }
 
 export type Taxonomy< C extends Context > = OmitNevers<
-	_WPBaseTypes.Taxonomy< C >
+	_CoreBaseEntityTypes.Taxonomy< C >
 >;

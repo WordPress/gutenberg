@@ -3,10 +3,10 @@
  */
 import { Context, ContextualField, RenderedText, OmitNevers } from './helpers';
 
-import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
+import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
 
 declare module './wp-base-types' {
-	export namespace WPBaseTypes {
+	export namespace CoreBaseEntityTypes {
 		export interface Plugin< C extends Context > {
 			/**
 			 * The plugin file.
@@ -70,5 +70,5 @@ declare module './wp-base-types' {
 
 export type PluginStatus = 'active' | 'inactive';
 export type Plugin< C extends Context > = OmitNevers<
-	_WPBaseTypes.Plugin< C >
+	_CoreBaseEntityTypes.Plugin< C >
 >;

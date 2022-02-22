@@ -3,10 +3,10 @@
  */
 import { Context, OmitNevers } from './helpers';
 
-import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
+import { CoreBaseEntityTypes as _CoreBaseEntityTypes } from './wp-base-types';
 
 declare module './wp-base-types' {
-	export namespace WPBaseTypes {
+	export namespace CoreBaseEntityTypes {
 		export interface NavigationArea< C extends Context > {
 			/**
 			 * The name of the navigation area.
@@ -25,5 +25,5 @@ declare module './wp-base-types' {
 }
 
 export type NavigationArea< C extends Context > = OmitNevers<
-	_WPBaseTypes.NavigationArea< C >
+	_CoreBaseEntityTypes.NavigationArea< C >
 >;
