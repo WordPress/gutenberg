@@ -691,6 +691,10 @@ export const mergeBlocks = (
 
 	// To do: merge logic with existing mergeBlocks logic.
 	if ( selectionStart.clientId !== selectionEnd.clientId ) {
+		if ( ! selectionStart.attributeKey || ! selectionEnd.attributeKey ) {
+			return;
+		}
+
 		let selectionA, selectionB;
 
 		if ( selectionStart.clientId === clientIdA ) {

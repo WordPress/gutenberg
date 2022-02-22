@@ -51,9 +51,11 @@ export default function BlockTools( {
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const { getSelectedBlockClientIds, getBlockRootClientId } = useSelect(
-		blockEditorStore
-	);
+	const {
+		getSelectedBlockClientIds,
+		getBlockRootClientId,
+		getSelectionStart,
+	} = useSelect( blockEditorStore );
 	const {
 		duplicateBlocks,
 		removeBlocks,
@@ -131,22 +133,25 @@ export default function BlockTools( {
 			const blockA = getBlockNode( anchorNode );
 			const blockB = getBlockNode( focusNode );
 
+			event.preventDefault();
+
+			const selectionStart = getSelectionStart();
+
 			// To do: find other way to check if blocks are mergeable.
 			if (
 				isSimpleContentEditable( blockA ) &&
 				isSimpleContentEditable( blockB ) &&
-				blockA !== blockB
+				blockA !== blockB &&
+				selectionStart.attributeKey
 			) {
 				mergeBlocks(
 					first( clientIds ),
 					last( clientIds ),
 					clientIds.slice( 1, -1 )
 				);
-				event.preventDefault();
 				return;
 			}
 
-			event.preventDefault();
 			removeBlocks( clientIds );
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
