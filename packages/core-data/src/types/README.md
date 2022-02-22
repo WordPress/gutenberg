@@ -214,7 +214,7 @@ export type Comment< C extends Context > = OmitNevers<
 >;
 
 // In the plugin
-import { Context } from '@wordpress/core-data';
+import type { Context } from '@wordpress/core-data';
 declare module '@wordpress/core-data' {
 	export namespace BaseTypes {
 		export interface Comment< C extends Context > {
