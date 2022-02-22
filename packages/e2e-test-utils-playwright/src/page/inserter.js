@@ -6,10 +6,9 @@ const INSERTER_SEARCH_SELECTOR =
 /**
  * Checks if the blocks inserter is open.
  *
- *
  * @this {import('./').PageUtils}
  */
-async function isGlobalInserterOpen() {
+export async function isGlobalInserterOpen() {
 	return await this.page.evaluate( () => {
 		// "Add block" selector is required to make sure performance comparison
 		// doesn't fail on older branches where we still had "Add block" as label.
@@ -29,7 +28,7 @@ async function isGlobalInserterOpen() {
  *
  * @this {import('./').PageUtils}
  */
-async function focusSelectedBlock() {
+export async function focusSelectedBlock() {
 	// Ideally there shouuld be a UI way to do this. (Focus the selected block)
 	await this.page.evaluate( () => {
 		window.wp.data
@@ -46,7 +45,7 @@ async function focusSelectedBlock() {
 /**
  * Retrieves the document container by css class and checks to make sure the document's active element is within it
  */
-async function waitForInserterCloseAndContentFocus() {
+export async function waitForInserterCloseAndContentFocus() {
 	await this.canvas().waitForFunction(
 		() =>
 			document.activeElement.closest(

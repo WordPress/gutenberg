@@ -11,6 +11,15 @@ import { clickBlockToolbarButton } from './click-block-toolbar-button';
 import { createNewPost } from './create-new-post';
 import { getCurrentUser } from './get-current-user';
 import { getPageError } from './get-page-error';
+import {
+	focusSelectedBlock,
+	insertBlock,
+	isGlobalInserterOpen,
+	openGlobalBlockInserter,
+	toggleGlobalBlockInserter,
+	searchForBlock,
+	waitForInserterCloseAndContentFocus,
+} from './inserter';
 import { isCurrentURL } from './is-current-url';
 import { loginUser } from './login-user';
 import { showBlockToolbar } from './show-block-toolbar';
@@ -32,15 +41,22 @@ class PageUtils {
 
 	canvas = canvas;
 	clickBlockToolbarButton = clickBlockToolbarButton;
+	focusSelectedBlock = focusSelectedBlock;
 	createNewPost = createNewPost;
 	getCurrentUser = getCurrentUser;
 	getPageError = getPageError;
+	insertBlock = insertBlock;
 	isCurrentURL = isCurrentURL;
+	isglobalInserterOpen = isGlobalInserterOpen;
 	loginUser = loginUser;
+	openGlobalBlockInserter = openGlobalBlockInserter;
+	searchForBlock = searchForBlock;
 	showBlockToolbar = showBlockToolbar;
 	switchUserToAdmin = switchUserToAdmin;
 	switchUserToTest = switchUserToTest;
+	toggleGlobalBlockInserter = toggleGlobalBlockInserter;
 	visitAdminPage = visitAdminPage;
+	waitForInserterCloseAndContentFocus = waitForInserterCloseAndContentFocus;
 	wpDataSelect = wpDataSelect;
 }
 
