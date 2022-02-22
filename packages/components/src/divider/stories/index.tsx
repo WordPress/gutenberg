@@ -9,7 +9,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Text } from '../../text';
 import { Divider } from '..';
 
-export default {
+const meta: ComponentMeta< typeof Divider > = {
 	component: Divider,
 	title: 'Components (Experimental)/Divider',
 	argTypes: {
@@ -27,7 +27,8 @@ export default {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},
-} as ComponentMeta< typeof Divider >;
+};
+export default meta;
 
 const HorizontalTemplate: ComponentStory< typeof Divider > = ( args ) => (
 	<div>

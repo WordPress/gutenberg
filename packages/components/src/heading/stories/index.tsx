@@ -8,7 +8,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  */
 import { Heading } from '..';
 
-export default {
+const meta: ComponentMeta< typeof Heading > = {
 	component: Heading,
 	title: 'Components (Experimental)/Heading',
 	argTypes: {
@@ -18,7 +18,8 @@ export default {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},
-} as ComponentMeta< typeof Heading >;
+};
+export default meta;
 
 export const Default: ComponentStory< typeof Heading > = ( props ) => (
 	<Heading { ...props } />
