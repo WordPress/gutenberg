@@ -6,7 +6,7 @@ This part is about adding an *Edit* feature to our app. Here's a glimpse of what
 
 ### Step 1: Add an _Edit_ button
 
-We can't have an *Edit* form without an *Edit* Button, so let's start by adding one to our `PagesList` component:
+We can't have an *Edit* form without an *Edit* button, so let's start by adding one to our `PagesList` component:
 
 ```js
 import { Button } from '@wordpress/components';
