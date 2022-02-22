@@ -3,7 +3,7 @@
  */
 import { RenderedText, Context, ContextualField, OmitNevers } from './helpers';
 
-import { BaseTypes as _BaseTypes } from './base-types';
+import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
 
 export type NavMenuItemType =
 	| 'taxonomy'
@@ -18,8 +18,8 @@ export type NavMenuItemStatus =
 	| 'private';
 export type Target = '_blank' | '';
 
-declare module './base-types' {
-	export namespace BaseTypes {
+declare module './wp-base-types' {
+	export namespace WPBaseTypes {
 		export interface NavMenuItem< C extends Context > {
 			/**
 			 * The title for the object.
@@ -102,5 +102,5 @@ declare module './base-types' {
 }
 
 export type NavMenuItem< C extends Context > = OmitNevers<
-	_BaseTypes.NavMenuItem< C >
+	_WPBaseTypes.NavMenuItem< C >
 >;

@@ -4,10 +4,10 @@
 import { Widget } from './widget';
 import { Context, OmitNevers } from './helpers';
 
-import { BaseTypes as _BaseTypes } from './base-types';
+import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
 
-declare module './base-types' {
-	export namespace BaseTypes {
+declare module './wp-base-types' {
+	export namespace WPBaseTypes {
 		export interface Sidebar< C extends Context > {
 			/**
 			 * ID of sidebar.
@@ -56,5 +56,5 @@ declare module './base-types' {
 type SidebarStatus = 'active' | 'inactive';
 
 export type Sidebar< C extends Context > = OmitNevers<
-	_BaseTypes.Sidebar< C >
+	_WPBaseTypes.Sidebar< C >
 >;

@@ -3,10 +3,10 @@
  */
 import { Context, OmitNevers } from './helpers';
 
-import { BaseTypes as _BaseTypes } from './base-types';
+import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
 
-declare module './base-types' {
-	export namespace BaseTypes {
+declare module './wp-base-types' {
+	export namespace WPBaseTypes {
 		export interface MenuLocation< C extends Context > {
 			/**
 			 * The name of the menu location.
@@ -25,5 +25,5 @@ declare module './base-types' {
 }
 
 export type MenuLocation< C extends Context > = OmitNevers<
-	_BaseTypes.MenuLocation< C >
+	_WPBaseTypes.MenuLocation< C >
 >;

@@ -3,10 +3,10 @@
  */
 import { Context, PostFormat, RenderedText, OmitNevers } from './helpers';
 
-import { BaseTypes as _BaseTypes } from './base-types';
+import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
 
-declare module './base-types' {
-	export namespace BaseTypes {
+declare module './wp-base-types' {
+	export namespace WPBaseTypes {
 		export interface Theme< C extends Context > {
 			/**
 			 * The theme's stylesheet. This uniquely identifies the theme.
@@ -217,4 +217,4 @@ declare module './base-types' {
 	}
 }
 
-export type Theme< C extends Context > = OmitNevers< _BaseTypes.Theme< C > >;
+export type Theme< C extends Context > = OmitNevers< _WPBaseTypes.Theme< C > >;

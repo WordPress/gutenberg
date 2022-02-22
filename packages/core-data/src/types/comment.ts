@@ -8,12 +8,12 @@ import {
 	OmitNevers,
 	RenderedText,
 } from './helpers';
-import { BaseTypes as _BaseTypes } from './base-types';
+import { WPBaseTypes as _WPBaseTypes } from './wp-base-types';
 
 export type CommentStatus = 'hold' | 'approve' | 'spam' | 'trash' | '1' | '0';
 
-declare module './base-types' {
-	export namespace BaseTypes {
+declare module './wp-base-types' {
+	export namespace WPBaseTypes {
 		export interface Comment< C extends Context > {
 			/**
 			 * Unique identifier for the comment.
@@ -92,5 +92,5 @@ declare module './base-types' {
 }
 
 export type Comment< C extends Context > = OmitNevers<
-	_BaseTypes.Comment< C >
+	_WPBaseTypes.Comment< C >
 >;

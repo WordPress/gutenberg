@@ -200,8 +200,8 @@ For example, if you're building a plugin that displays a number of views of each
 
 ```ts
 // In core-data
-declare module './base-types' {
-	export namespace BaseTypes {
+declare module './wp-base-types' {
+	export namespace WPBaseTypes {
 		export interface Comment< C extends Context > {
 			id: number;
 			// ...
@@ -210,13 +210,13 @@ declare module './base-types' {
 }
 
 export type Comment< C extends Context > = OmitNevers<
-	BaseTypes.Comment< C >
+	WPBaseTypes.Comment< C >
 >;
 
 // In the plugin
 import type { Context } from '@wordpress/core-data';
 declare module '@wordpress/core-data' {
-	export namespace BaseTypes {
+	export namespace WPBaseTypes {
 		export interface Comment< C extends Context > {
 			numberOfViews: number;
 		}
