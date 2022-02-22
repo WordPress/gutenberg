@@ -454,4 +454,16 @@ describe( 'getCurrentUser', () => {
 			SUCCESSFUL_RESPONSE
 		);
 	} );
+
+	it( 'does nothing when there is an API error', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveCurrentUser: jest.fn(),
+		} );
+
+		triggerFetch.mockRejectedValue( { status: 401 } );
+
+		await getCurrentUser()( { dispatch } );
+
+		expect( dispatch.receiveCurrentUser ).not.toHaveBeenCalled();
+	} );
 } );

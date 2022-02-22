@@ -35,8 +35,12 @@ export const getAuthors = ( query ) => async ( { dispatch } ) => {
  * Requests the current user from the REST API.
  */
 export const getCurrentUser = () => async ( { dispatch } ) => {
-	const currentUser = await apiFetch( { path: '/wp/v2/users/me' } );
-	dispatch.receiveCurrentUser( currentUser );
+	try {
+		const currentUser = await apiFetch( { path: '/wp/v2/users/me' } );
+		dispatch.receiveCurrentUser( currentUser );
+	} catch ( error ) {
+		// Catching the error ensures the resolver is marked as resolved.
+	}
 };
 
 /**
