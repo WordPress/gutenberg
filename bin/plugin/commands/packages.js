@@ -373,7 +373,6 @@ async function backportCommitsToTrunk(
 	}
 
 	log( '>> Backporting commits.' );
-	console.log( commits );
 	await git.resetLocalBranchAgainstOrigin( gitWorkingDirectoryPath, 'trunk' );
 	for ( const commitHash of commits ) {
 		await git.cherrypickCommitIntoBranch(
