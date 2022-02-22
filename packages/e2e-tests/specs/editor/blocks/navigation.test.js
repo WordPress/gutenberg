@@ -627,17 +627,18 @@ describe( 'Navigation', () => {
 				'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
 			await page.keyboard.type( markup );
 			await clickButton( 'Exit code editor' );
-			const navBlock = await page.waitForSelector(
-				'nav[aria-label="Block: Navigation"]'
-			);
 
-			// Select the block to convert to a wp_navigation and publish.
-			// The select menu button shows up when saving is complete.
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Select the block to convert to a wp_navigation
 			await navBlock.click();
-			await page.waitForSelector( 'button[aria-label="Select Menu"]' );
+
+			// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
+			await waitForBlock( 'Page List' );
 
 			// Reset the nav block to create a new entity.
 			await resetNavBlockToInitialState();
+
 			const startEmptyButton = await page.waitForXPath(
 				START_EMPTY_XPATH
 			);
