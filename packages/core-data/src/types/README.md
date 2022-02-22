@@ -7,7 +7,7 @@ The types in this directory are designed to support the following use-cases:
 * Provide type-hinting and documentation for entity records fetched in the various REST API contexts.
 * Type-check the values we use to *edit* entity records, the values that are sent back to the server as updates.
 
-**Warning:** The types model the _expected_ API responses which is **not** the same as having an extensible type safety for the API-related operations. The API responses are **not** used as-is and in many cases could disagree with the type definitions, for example a plugin could modify the response, or the API endpoint could have a nuanced implementation in which strings are sometimes used instead of numbers.
+**Warning:** The API responses are type-cast to these definitions and therefore may not match those expectations; for example, a plugin could modify the response, or the API endpoint could have a nuanced implementation in which strings are sometimes used instead of numbers.
 
 ### Context-aware type checks for entity records
 
