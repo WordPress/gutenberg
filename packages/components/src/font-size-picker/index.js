@@ -231,7 +231,7 @@ function FontSizePicker(
 											);
 										}
 									} }
-									units={ hasUnits ? units : false }
+									units={ hasUnits ? units : [] }
 								/>
 							</FlexItem>
 							{ withReset && (
