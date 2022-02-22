@@ -407,7 +407,7 @@ See the [the example documentation](/docs/reference-guides/block-api/block-regis
 
 ### Editor Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorScript`
@@ -447,7 +447,7 @@ Block type frontend script definition. It will be enqueued only when viewing the
 
 ### Editor Style
 
--   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorStyle`
@@ -462,7 +462,7 @@ _Note: An option to pass also an array of editor styles exists since WordPress `
 
 ### Style
 
--   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `style`
