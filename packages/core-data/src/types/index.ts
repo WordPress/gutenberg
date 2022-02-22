@@ -29,6 +29,7 @@ import type {
 import type { Context, Updatable } from './helpers';
 
 export type {
+	Context,
 	Updatable,
 	Attachment,
 	Comment,

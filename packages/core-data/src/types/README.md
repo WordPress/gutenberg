@@ -210,12 +210,15 @@ export type Comment< C extends Context > = OmitNevers<
 >;
 
 // In the plugin
-import { ExtensibleComment, Comment } from '@wordpress/core-data';
-interface ExtensibleComment < C extends Context > {
-	numberOfViews: number;
+import { Context } from '@wordpress/core-data';
+declare module '@wordpress/core-data' {
+	interface ExtensibleComment< C extends Context > {
+		numberOfViews: number;
+	}
 }
 
-const c : Comment = ...
+import type { Comment } from '@wordpress/core-data';
+const c : Comment< 'view' > = ...;
 
 // c.numberOfViews is a number
 // c.id is still present
