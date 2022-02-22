@@ -18,6 +18,7 @@ export type WordPressComponentProps<
 	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P | 'children' > &
 	( IsPolymorphic extends true
 		? {
+				/** The HTML element to render the component as. */
 				as?: T | keyof JSX.IntrinsicElements;
 		  }
 		: {} );
