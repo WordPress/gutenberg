@@ -1181,7 +1181,9 @@ export const duplicateBlocks = ( clientIds, updateSelection = true ) => ( {
 		last( castArray( clientIds ) )
 	);
 	const clonedBlocks = blocks.map( ( block ) =>
-		cloneBlock( block, {}, null, { retainCopyAttributes: false } )
+		cloneBlock( block, {}, null, {
+			__experimentalExcludeNonCopyableAttributes: true,
+		} )
 	);
 	dispatch.insertBlocks(
 		clonedBlocks,
