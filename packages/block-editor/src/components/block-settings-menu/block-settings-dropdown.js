@@ -46,14 +46,31 @@ export function BlockSettingsDropdown( {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
-	const { onlyBlock, title } = useSelect(
+	const {
+		onlyBlock,
+		title,
+		previousBlockClientId,
+		nextBlockClientId,
+		selectedBlockClientIds,
+	} = useSelect(
 		( select ) => {
-			const { getBlockCount, getBlockName } = select( blockEditorStore );
+			const {
+				getBlockCount,
+				getBlockName,
+				getPreviousBlockClientId,
+				getNextBlockClientId,
+				getSelectedBlockClientIds,
+			} = select( blockEditorStore );
 			const { getBlockType } = select( blocksStore );
 			return {
 				onlyBlock: 1 === getBlockCount(),
 				title: getBlockType( getBlockName( firstBlockClientId ) )
 					?.title,
+				previousBlockClientId: getPreviousBlockClientId(
+					firstBlockClientId
+				),
+				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
+				selectedBlockClientIds: getSelectedBlockClientIds(),
 			};
 		},
 		[ firstBlockClientId ]
@@ -75,7 +92,7 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 
-	const updateSelection = useCallback(
+	const updateSelectionAfterDuplicate = useCallback(
 		__experimentalSelectBlock
 			? async ( clientIdsPromise ) => {
 					const ids = await clientIdsPromise;
@@ -85,6 +102,28 @@ export function BlockSettingsDropdown( {
 			  }
 			: noop,
 		[ __experimentalSelectBlock ]
+	);
+
+	const updateSelectionAfterRemove = useCallback(
+		__experimentalSelectBlock
+			? () => {
+					// Update selection only if current selected block gets removed.
+					if (
+						selectedBlockClientIds.includes( firstBlockClientId ) &&
+						( previousBlockClientId || nextBlockClientId )
+					) {
+						__experimentalSelectBlock(
+							previousBlockClientId || nextBlockClientId
+						);
+					}
+			  }
+			: noop,
+		[
+			__experimentalSelectBlock,
+			previousBlockClientId,
+			nextBlockClientId,
+			selectedBlockClientIds,
+		]
 	);
 
 	const label = sprintf(
@@ -140,7 +179,7 @@ export function BlockSettingsDropdown( {
 										onClick={ flow(
 											onClose,
 											onDuplicate,
-											updateSelection
+											updateSelectionAfterDuplicate
 										) }
 										shortcut={ shortcuts.duplicate }
 									>
@@ -198,7 +237,7 @@ export function BlockSettingsDropdown( {
 										onClick={ flow(
 											onClose,
 											onRemove,
-											updateSelection
+											updateSelectionAfterRemove
 										) }
 										shortcut={ shortcuts.remove }
 									>
