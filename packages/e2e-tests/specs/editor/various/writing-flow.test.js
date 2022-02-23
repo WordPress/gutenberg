@@ -457,6 +457,24 @@ describe( 'Writing Flow', () => {
 	` );
 	} );
 
+	it( 'should merge and then soft line break', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.up( 'Shift' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>1<br>2</p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
+
 	it( 'should merge forwards', async () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
