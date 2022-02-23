@@ -1110,6 +1110,10 @@ _Returns_
 
 -   `Object`: Action object.
 
+### deleteSelection
+
+Delete the current selection.
+
 ### duplicateBlocks
 
 Action that duplicates a list of blocks.
@@ -1218,7 +1222,6 @@ _Parameters_
 
 -   _firstBlockClientId_ `string`: Client ID of the first block to merge.
 -   _secondBlockClientId_ `string`: Client ID of the second block to merge.
--   _toRemove_ `Array?`: Array of block client IDs to remove.
 
 ### moveBlocksDown
 

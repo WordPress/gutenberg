@@ -64,7 +64,7 @@ export default function BlockTools( {
 		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
-		mergeBlocks,
+		deleteSelection,
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
@@ -128,11 +128,7 @@ export default function BlockTools( {
 				blockA !== blockB &&
 				selectionStart.attributeKey
 			) {
-				mergeBlocks(
-					first( clientIds ),
-					last( clientIds ),
-					clientIds.slice( 1, -1 )
-				);
+				deleteSelection();
 				return;
 			}
 

@@ -672,157 +672,160 @@ function mapRichTextSettings( attributeDefinition ) {
 }
 
 /**
+ * Delete the current selection.
+ */
+export const deleteSelection = () => ( { registry, select, dispatch } ) => {
+	const selectionStart = select.getSelectionStart();
+	const selectionEnd = select.getSelectionEnd();
+
+	// Abort if the selection is contained in one block.
+	if ( selectionStart.clientId === selectionEnd.clientId ) return;
+
+	// Abort if the blocks are selected as a whole.
+	if ( ! selectionStart.attributeKey || ! selectionEnd.attributeKey ) return;
+
+	const selectedBlockClientIds = select.getSelectedBlockClientIds();
+	const clientIdA = first( selectedBlockClientIds );
+	const clientIdB = last( selectedBlockClientIds );
+	let selectionA, selectionB;
+
+	if ( selectionStart.clientId === clientIdA ) {
+		selectionA = selectionStart;
+	} else if ( selectionStart.clientId === clientIdB ) {
+		selectionB = selectionStart;
+	}
+
+	if ( selectionEnd.clientId === clientIdA ) {
+		selectionA = selectionEnd;
+	} else if ( selectionEnd.clientId === clientIdB ) {
+		selectionB = selectionEnd;
+	}
+
+	// Abort if the selection doesn't match with blocks to merge.
+	if ( ! selectionA || ! selectionB ) {
+		return;
+	}
+
+	const blockA = select.getBlock( clientIdA );
+	const blockAType = getBlockType( blockA.name );
+	const blockB = select.getBlock( clientIdB );
+	const blockBType = getBlockType( blockB.name );
+
+	// A robust way to retain selection position through various transforms
+	// is to insert a special character at the position and then recover it.
+	const START_OF_SELECTED_AREA = '\u0086';
+
+	// Clone the blocks so we don't insert the character in a "live" block.
+	const cloneA = cloneBlock( blockA );
+	const cloneB = cloneBlock( blockB );
+
+	const attributeDefinitionA =
+		blockAType.attributes[ selectionA.attributeKey ];
+	const attributeDefinitionB =
+		blockBType.attributes[ selectionB.attributeKey ];
+
+	const htmlA = cloneA.attributes[ selectionA.attributeKey ];
+	const htmlB = cloneB.attributes[ selectionB.attributeKey ];
+
+	let valueA = create( {
+		html: htmlA,
+		...mapRichTextSettings( attributeDefinitionA ),
+	} );
+	let valueB = create( {
+		html: htmlB,
+		...mapRichTextSettings( attributeDefinitionB ),
+	} );
+
+	valueA = insert( valueA, '', selectionA.offset, valueA.text.length );
+	valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
+
+	cloneA.attributes[ selectionA.attributeKey ] = toHTMLString( {
+		value: valueA,
+		...mapRichTextSettings( attributeDefinitionA ),
+	} );
+	cloneB.attributes[ selectionB.attributeKey ] = toHTMLString( {
+		value: valueB,
+		...mapRichTextSettings( attributeDefinitionB ),
+	} );
+
+	// We can only merge blocks with similar types
+	// thus, we transform the block to merge first
+	const blocksWithTheSameType =
+		blockA.name === blockB.name
+			? [ cloneB ]
+			: switchToBlockType( cloneB, blockA.name );
+
+	// If the block types can not match, do nothing
+	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+		return;
+	}
+
+	// Calling the merge to update the attributes and remove the block to be merged
+	const updatedAttributes = blockAType.merge(
+		cloneA.attributes,
+		blocksWithTheSameType[ 0 ].attributes
+	);
+
+	const newAttributeKey = findKey(
+		updatedAttributes,
+		( v ) =>
+			typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
+	);
+	const convertedHtml = updatedAttributes[ newAttributeKey ];
+	const convertedValue = create( {
+		html: convertedHtml,
+		...mapRichTextSettings( blockAType.attributes[ newAttributeKey ] ),
+	} );
+	const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
+	const newValue = remove( convertedValue, newOffset, newOffset + 1 );
+	const newHtml = toHTMLString( {
+		value: newValue,
+		...mapRichTextSettings( blockAType.attributes[ newAttributeKey ] ),
+	} );
+
+	updatedAttributes[ newAttributeKey ] = newHtml;
+
+	registry.batch( () => {
+		dispatch.selectionChange(
+			blockA.clientId,
+			newAttributeKey,
+			newOffset,
+			newOffset
+		);
+
+		if ( selectedBlockClientIds.length > 2 )
+			dispatch.removeBlocks( selectedBlockClientIds.slice( 1, -1 ) );
+
+		dispatch.replaceBlocks(
+			[ blockA.clientId, blockB.clientId ],
+			[
+				{
+					...blockA,
+					attributes: {
+						...blockA.attributes,
+						...updatedAttributes,
+					},
+				},
+				...blocksWithTheSameType.slice( 1 ),
+			],
+			0, // If we don't pass the `indexToSelect` it will default to the last block.
+			select.getSelectedBlocksInitialCaretPosition()
+		);
+	} );
+};
+
+/**
  * Action that merges two blocks.
  *
  * @param {string} firstBlockClientId  Client ID of the first block to merge.
  * @param {string} secondBlockClientId Client ID of the second block to merge.
- * @param {Array?} toRemove            Array of block client IDs to remove.
  */
-export const mergeBlocks = (
-	firstBlockClientId,
-	secondBlockClientId,
-	toRemove
-) => ( { registry, select, dispatch } ) => {
+export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
+	select,
+	dispatch,
+} ) => {
 	const blocks = [ firstBlockClientId, secondBlockClientId ];
 	const [ clientIdA, clientIdB ] = blocks;
-
-	const selectionStart = select.getSelectionStart();
-	const selectionEnd = select.getSelectionEnd();
-
-	// To do: merge logic with existing mergeBlocks logic.
-	if ( selectionStart.clientId !== selectionEnd.clientId ) {
-		if ( ! selectionStart.attributeKey || ! selectionEnd.attributeKey ) {
-			return;
-		}
-
-		let selectionA, selectionB;
-
-		if ( selectionStart.clientId === clientIdA ) {
-			selectionA = selectionStart;
-		} else if ( selectionStart.clientId === clientIdB ) {
-			selectionB = selectionStart;
-		}
-
-		if ( selectionEnd.clientId === clientIdA ) {
-			selectionA = selectionEnd;
-		} else if ( selectionEnd.clientId === clientIdB ) {
-			selectionB = selectionEnd;
-		}
-		// Abort if the selection doesn't match with blocks to merge.
-		if ( ! selectionA || ! selectionB ) {
-			return;
-		}
-
-		const blockA = select.getBlock( clientIdA );
-		const blockAType = getBlockType( blockA.name );
-		const blockB = select.getBlock( clientIdB );
-		const blockBType = getBlockType( blockB.name );
-
-		// A robust way to retain selection position through various transforms
-		// is to insert a special character at the position and then recover it.
-		const START_OF_SELECTED_AREA = '\u0086';
-
-		// Clone the blocks so we don't insert the character in a "live" block.
-		const cloneA = cloneBlock( blockA );
-		const cloneB = cloneBlock( blockB );
-
-		const attributeDefinitionA =
-			blockAType.attributes[ selectionA.attributeKey ];
-		const attributeDefinitionB =
-			blockBType.attributes[ selectionB.attributeKey ];
-
-		const htmlA = cloneA.attributes[ selectionA.attributeKey ];
-		const htmlB = cloneB.attributes[ selectionB.attributeKey ];
-
-		let valueA = create( {
-			html: htmlA,
-			...mapRichTextSettings( attributeDefinitionA ),
-		} );
-		let valueB = create( {
-			html: htmlB,
-			...mapRichTextSettings( attributeDefinitionB ),
-		} );
-
-		valueA = insert( valueA, '', selectionA.offset, valueA.text.length );
-		valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
-
-		cloneA.attributes[ selectionA.attributeKey ] = toHTMLString( {
-			value: valueA,
-			...mapRichTextSettings( attributeDefinitionA ),
-		} );
-		cloneB.attributes[ selectionB.attributeKey ] = toHTMLString( {
-			value: valueB,
-			...mapRichTextSettings( attributeDefinitionB ),
-		} );
-
-		// We can only merge blocks with similar types
-		// thus, we transform the block to merge first
-		const blocksWithTheSameType =
-			blockA.name === blockB.name
-				? [ cloneB ]
-				: switchToBlockType( cloneB, blockA.name );
-
-		// If the block types can not match, do nothing
-		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
-			return;
-		}
-
-		// Calling the merge to update the attributes and remove the block to be merged
-		const updatedAttributes = blockAType.merge(
-			cloneA.attributes,
-			blocksWithTheSameType[ 0 ].attributes
-		);
-
-		const newAttributeKey = findKey(
-			updatedAttributes,
-			( v ) =>
-				typeof v === 'string' &&
-				v.indexOf( START_OF_SELECTED_AREA ) !== -1
-		);
-		const convertedHtml = updatedAttributes[ newAttributeKey ];
-		const convertedValue = create( {
-			html: convertedHtml,
-			...mapRichTextSettings( blockAType.attributes[ newAttributeKey ] ),
-		} );
-		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
-		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
-		const newHtml = toHTMLString( {
-			value: newValue,
-			...mapRichTextSettings( blockAType.attributes[ newAttributeKey ] ),
-		} );
-
-		updatedAttributes[ newAttributeKey ] = newHtml;
-
-		registry.batch( () => {
-			dispatch.selectionChange(
-				blockA.clientId,
-				newAttributeKey,
-				newOffset,
-				newOffset
-			);
-
-			if ( toRemove && toRemove.length )
-				dispatch.removeBlocks( toRemove );
-
-			dispatch.replaceBlocks(
-				[ blockA.clientId, blockB.clientId ],
-				[
-					{
-						...blockA,
-						attributes: {
-							...blockA.attributes,
-							...updatedAttributes,
-						},
-					},
-					...blocksWithTheSameType.slice( 1 ),
-				],
-				0, // If we don't pass the `indexToSelect` it will default to the last block.
-				select.getSelectedBlocksInitialCaretPosition()
-			);
-		} );
-
-		return;
-	}
 
 	dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
@@ -846,6 +849,7 @@ export const mergeBlocks = (
 	const cloneA = cloneBlock( blockA );
 	const cloneB = cloneBlock( blockB );
 
+	const selectionStart = select.getSelectionStart();
 	const { clientId, attributeKey, offset } = selectionStart;
 	const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
 	const attributeDefinition = selectedBlockType.attributes[ attributeKey ];
