@@ -437,6 +437,26 @@ describe( 'Writing Flow', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should merge and then split paragraphs', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'abc' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '123' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>abc</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph -->
+		<p>123</p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
+
 	it( 'should merge forwards', async () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
