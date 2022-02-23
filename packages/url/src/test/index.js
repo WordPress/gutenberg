@@ -991,8 +991,8 @@ describe( 'cleanForSlug', () => {
 	} );
 
 	it( 'Should not allow characters used internally in rich-text', () => {
-		//The last space is an object replacement character and a zero width joiner
-		expect( cleanForSlug( 'the long cat￼‍' ) ).toBe( 'the-long-cat' );
+		//The last space is an object replacement character
+		expect( cleanForSlug( 'the long cat￼' ) ).toBe( 'the-long-cat' );
 	} );
 } );
 
