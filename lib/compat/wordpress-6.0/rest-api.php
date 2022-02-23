@@ -22,4 +22,15 @@ function gutenberg_register_rest_pattern_directory() {
 	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller();
 	$pattern_directory_controller->register_routes();
 }
-add_filter( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
+add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
+
+/**
+ * Registers the Edit Site's Export REST API routes.
+ *
+ * @return void
+ */
+function gutenberg_register_edit_site_export_endpoint() {
+	$editor_settings = new Gutenberg_REST_Edit_Site_Export_Controller();
+	$editor_settings->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_endpoint' );
