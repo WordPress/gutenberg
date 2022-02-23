@@ -162,17 +162,14 @@ export const getEntityRecord = createSelector(
 	function <
 		K extends Kind,
 		N extends Name< K >,
-		// Somehow type inference doesn't work properly without the weird signature. Definitely something to dig into.
-		Entity extends EntityType< K, N > = EntityType< K, N >,
-		C extends Context = Entity[ 'defaultContext' ],
-		EntityWithC extends EntityType< K, N, C > = EntityType< K, N, C >
+		C extends Context = DefaultContext< K, N >
 	>(
 		state: State,
 		kind: K,
 		name: N,
-		key: Key< K, N >,
+		key: any,
 		query?: EntityQuery< C >
-	): EntityWithC[ 'recordType' ] | null {
+	): EntityRecordType< K, N, C > | null {
 		const queriedState = get( state.entities.data, [
 			kind,
 			name,
@@ -201,7 +198,7 @@ export const getEntityRecord = createSelector(
 				const value = get( item, field );
 				set( filteredItem, field, value );
 			}
-			return filteredItem as EntityWithC[ 'recordType' ];
+			return filteredItem as EntityRecordType< K, N, C >;
 		}
 
 		return item;
@@ -229,7 +226,8 @@ export const getEntityRecord = createSelector(
 	}
 );
 
-const comment = getEntityRecord( {}, 'root', 'comment', 15 );
+// const comment = getEntityRecord( {}, 'root', 'comment', 15 );
+// comment is Comment<'edit'>
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
