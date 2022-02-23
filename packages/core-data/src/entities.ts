@@ -42,7 +42,7 @@ export type EntityQuery< C extends Context > = Record< string, string > & {
 	context?: C;
 };
 
-export interface EntityDefinition extends Object {
+export interface EntityDefinition {
 	label: string;
 	kind: string;
 	name: string;
