@@ -132,10 +132,15 @@ export function useInputAndSelection( props ) {
 				onSelectionChange,
 			} = propsRef.current;
 
-			if (
-				ownerDocument.activeElement !== element &&
-				ownerDocument.activeElement.contains( element )
-			) {
+			// If the selection changes where the active element is a parent of
+			// the rich text instance (writing flow), call `onSelectionChange`
+			// for the rich text instance that contains the start or end of the
+			// selection.
+			if ( ownerDocument.activeElement !== element ) {
+				if ( ! ownerDocument.activeElement.contains( element ) ) {
+					return;
+				}
+
 				const selection = defaultView.getSelection();
 				const { anchorNode, focusNode } = selection;
 
