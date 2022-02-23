@@ -115,10 +115,7 @@ export default {
 		let output =
 			!! contentSize || !! wideSize
 				? `
-					${ appendSelectors(
-						selector,
-						'> *'
-					) } {
+					${ appendSelectors( selector, '> *' ) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;
 						margin-right: auto !important;
