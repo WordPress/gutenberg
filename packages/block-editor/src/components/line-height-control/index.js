@@ -61,7 +61,7 @@ export default function LineHeightControl( {
 		// For example, Firefox emits an input event with inputType="insertReplacementText"
 		// on spin button clicks, while other browsers do not even emit an input event.
 		const wasTypedOrPasted = [ 'insertText', 'insertFromPaste' ].includes(
-			action.payload.event.nativeEvent.inputType
+			action.payload.event.nativeEvent?.inputType
 		);
 		state.value = adjustNextValue( state.value, wasTypedOrPasted );
 		return state;
