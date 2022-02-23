@@ -449,6 +449,33 @@ describe( 'Writing Flow', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should merge forwards properly on multiple triggers', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+		await pressKeyTimes( 'ArrowUp', 2 );
+		await pressKeyTimes( 'Delete', 2 );
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>1</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph -->
+		<p>3</p>
+		<!-- /wp:paragraph -->"
+	` );
+		await page.keyboard.press( 'Delete' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>13</p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
+
 	it( 'should preserve horizontal position when navigating vertically between blocks', async () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'abc' );
