@@ -48,9 +48,9 @@ describe( 'TreeGrid', () => {
 		it( 'renders a table, tbody and any child elements', () => {
 			const { container } = render(
 				<TreeGrid>
-					<tr>
-						<td>Test</td>
-					</tr>
+					<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 1 }>
+						<TreeGridCell withoutGridItem>Test</TreeGridCell>
+					</TreeGridRow>
 				</TreeGrid>
 			);
 
