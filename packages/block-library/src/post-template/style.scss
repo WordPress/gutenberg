@@ -7,7 +7,6 @@
 .wp-block-query-loop {
 	margin-top: 0;
 	margin-bottom: 0;
-	max-width: 100%;
 	list-style: none;
 	padding: 0;
 
@@ -35,4 +34,10 @@
 			}
 		}
 	}
+}
+
+//lower specificity so it doesn't interfere with alignment rules
+:where(.wp-block-post-template),
+:where(.wp-block-query-loop) {
+	max-width: 100%;
 }
