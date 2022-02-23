@@ -89,33 +89,25 @@ function UnitControl(
 		nextQuantityValue: number | string | undefined,
 		changeProps: { event: ChangeEvent< HTMLInputElement > }
 	) => {
-		let onChangeValue = '';
-
-		// Fire `onChange` with an empty string
 		if (
-			typeof nextQuantityValue !== 'undefined' &&
-			nextQuantityValue !== ''
+			nextQuantityValue === '' ||
+			typeof nextQuantityValue === 'undefined' ||
+			nextQuantityValue === null
 		) {
-			/*
-			 * Customizing the onChange callback.
-			 * This allows as to broadcast a combined value+unit to onChange.
-			 */
-			const [
-				validParsedQuantity,
-				validParsedUnit,
-			] = getValidParsedQuantityAndUnit(
-				nextQuantityValue,
-				units,
-				parsedQuantity,
-				unit
-			);
-
-			if ( typeof validParsedQuantity !== 'undefined' ) {
-				onChangeValue = [ validParsedQuantity, validParsedUnit ].join(
-					''
-				);
-			}
+			onChange( '', changeProps );
+			return;
 		}
+
+		/*
+		 * Customizing the onChange callback.
+		 * This allows as to broadcast a combined value+unit to onChange.
+		 */
+		const onChangeValue = getValidParsedQuantityAndUnit(
+			nextQuantityValue,
+			units,
+			parsedQuantity,
+			unit
+		).join( '' );
 
 		onChange( onChangeValue, changeProps );
 	};
@@ -126,16 +118,15 @@ function UnitControl(
 	) => {
 		const { data } = changeProps;
 
-		let onChangeValue = '';
-		if ( typeof parsedQuantity !== 'undefined' ) {
-			onChangeValue = [ parsedQuantity, nextUnitValue ].join( '' );
-			if ( isResetValueOnUnitChange && data?.default !== undefined ) {
-				onChangeValue = `${ data.default }${ nextUnitValue }`;
-			}
-		}
-		onChange( onChangeValue, changeProps );
+		let nextValue = `${ parsedQuantity ?? '' }${ nextUnitValue }`;
 
+		if ( isResetValueOnUnitChange && data?.default !== undefined ) {
+			nextValue = `${ data.default }${ nextUnitValue }`;
+		}
+
+		onChange( nextValue, changeProps );
 		onUnitChange( nextUnitValue, changeProps );
+
 		setUnit( nextUnitValue );
 	};
 
@@ -154,7 +145,7 @@ function UnitControl(
 			unit
 		);
 
-		refParsedValue.current = validParsedQuantity?.toString() ?? '';
+		refParsedValue.current = ( validParsedQuantity ?? '' ).toString();
 
 		if ( isPressEnterToChange && validParsedUnit !== unit ) {
 			const data = Array.isArray( units )
