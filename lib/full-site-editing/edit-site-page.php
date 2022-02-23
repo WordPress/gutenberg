@@ -77,35 +77,6 @@ function gutenberg_get_editor_styles() {
 }
 
 /**
- * Return the correct template for the site's home page.
- *
- * @return array|null A template object, or null if none could be found
- */
-function gutenberg_edit_site_resolve_home_template() {
-	$show_on_front = get_option( 'show_on_front' );
-	$front_page_id = get_option( 'page_on_front' );
-
-	if ( 'page' === $show_on_front && $front_page_id ) {
-		return array(
-			'postType' => 'page',
-			'postId'   => $front_page_id,
-		);
-	}
-
-	$hierarchy = array( 'front-page', 'home', 'index' );
-	$template  = gutenberg_resolve_template( 'home', $hierarchy, '' );
-
-	if ( ! $template ) {
-		return null;
-	}
-
-	return array(
-		'postType' => 'wp_template',
-		'postId'   => $template->id,
-	);
-}
-
-/**
  * Initialize the Gutenberg Site Editor.
  *
  * @since 7.2.0
@@ -148,7 +119,7 @@ function gutenberg_edit_site_init( $hook ) {
 		'styles'                               => gutenberg_get_editor_styles(),
 		'defaultTemplateTypes'                 => $indexed_template_types,
 		'defaultTemplatePartAreas'             => get_allowed_block_template_part_areas(),
-		'__experimentalHomeTemplate'           => gutenberg_edit_site_resolve_home_template(),
+		'__experimentalHomeTemplate'           => gutenberg_resolve_home_template(),
 		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
 		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
 	);
