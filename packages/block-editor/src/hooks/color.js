@@ -631,7 +631,7 @@ export function getDefaultColorControls( blockType ) {
 		'__experimentalDefaultControls',
 	] );
 
-	if ( defaultBorderControls === 'all' ) {
+	if ( defaultColorControls === 'all' ) {
 		return {
 			text: true,
 			background: true,
@@ -639,7 +639,7 @@ export function getDefaultColorControls( blockType ) {
 		};
 	}
 
-	return defaultBorderControls;
+	return defaultColorControls;
 }
 
 const MIGRATION_PATHS = {

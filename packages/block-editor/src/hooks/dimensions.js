@@ -208,7 +208,7 @@ export function getDefaultDimensionsControls( blockType ) {
 		'__experimentalDefaultControls',
 	] );
 
-	if ( defaultBorderControls === 'all' ) {
+	if ( defaultDimensionsControls === 'all' ) {
 		return {
 			padding: true,
 			margin: true,
@@ -216,5 +216,5 @@ export function getDefaultDimensionsControls( blockType ) {
 		};
 	}
 
-	return defaultBorderControls;
+	return defaultDimensionsControls;
 }

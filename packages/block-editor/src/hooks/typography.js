@@ -262,16 +262,17 @@ export function getDefaultTypographyControls( blockType ) {
 		'__experimentalDefaultControls',
 	] );
 
-	if ( defaultBorderControls === 'all' ) {
+	if ( defaultTypographyControls === 'all' ) {
 		return {
 			fontFamily: true,
 			fontSize: true,
 			fontAppearance: true,
 			lineHeight: true,
 			textDecoration: true,
+			textTransform: true,
 			letterSpacing: true,
 		};
 	}
 
-	return defaultBorderControls;
+	return defaultTypographyControls;
 }
