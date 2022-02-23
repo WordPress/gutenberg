@@ -4,8 +4,3 @@
 	font-family: Menlo, Consolas, monaco, monospace;
 	padding: 0.8em 1em;
 }
-
-/* Ensures code markup inherits the font-family set on pre. */
-.wp-block-code > code {
-	font-family: inherit;
-}
