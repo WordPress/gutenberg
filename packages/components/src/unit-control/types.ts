@@ -110,5 +110,5 @@ export type UnitControlProps = UnitSelectControlProps & {
 	 * Current value. If passed as a string, the current unit will be inferred from this value.
 	 * For example, a `value` of "50%" will set the current unit to `%`.
 	 */
-	value: string | number;
+	value?: string | number;
 };

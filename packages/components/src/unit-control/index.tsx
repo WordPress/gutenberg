@@ -58,12 +58,16 @@ function UnitControl(
 	}: WordPressComponentProps< UnitControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
+	// The `value` prop, in theory, should not be `null`, but the following line
+	// ensures it fallback to `undefined` in case a consumer of `UnitControl`
+	// still passes `null` as a `value`.
+	const nonNullValueProp = valueProp ?? undefined;
 	const units = useMemo(
-		() => getUnitsWithCurrentUnit( valueProp, unitProp, unitsProp ),
-		[ valueProp, unitProp, unitsProp ]
+		() => getUnitsWithCurrentUnit( nonNullValueProp, unitProp, unitsProp ),
+		[ nonNullValueProp, unitProp, unitsProp ]
 	);
 	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
-		valueProp,
+		nonNullValueProp,
 		unitProp,
 		units
 	);

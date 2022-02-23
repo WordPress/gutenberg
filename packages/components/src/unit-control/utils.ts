@@ -151,12 +151,12 @@ export const DEFAULT_UNIT = allUnits.px;
  * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value could not be parsed to a number correctly. The unit can be `undefined` in case the unit parsed from the raw value could not be matched against the list of allowed units.
  */
 export function getParsedQuantityAndUnit(
-	rawValue: string | number,
+	rawValue?: string | number,
 	fallbackUnit?: string,
 	allowedUnits?: WPUnitControlUnit[]
 ): [ number | undefined, string | undefined ] {
 	const initialValue = fallbackUnit
-		? `${ rawValue }${ fallbackUnit }`
+		? `${ rawValue ?? '' }${ fallbackUnit }`
 		: rawValue;
 
 	return parseQuantityAndUnitFromRawValue( initialValue, allowedUnits );
@@ -330,7 +330,7 @@ export const useCustomUnits = ( {
  * @return A collection of units containing the unit for the current value.
  */
 export function getUnitsWithCurrentUnit(
-	rawValue: string | number,
+	rawValue?: string | number,
 	legacyUnit?: string,
 	units: WPUnitControlUnit[] = ALL_CSS_UNITS
 ): WPUnitControlUnit[] {
