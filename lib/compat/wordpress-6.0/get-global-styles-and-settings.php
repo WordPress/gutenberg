@@ -192,7 +192,7 @@ if ( ! function_exists( '_wp_maybe_remove_duotone_filters' ) ) {
 		}
 
 		// If there are no duotones, remove the action from `wp_body_open`.
-		if ( false === strpos( 'wp-duotone-', $template_html ) ) {
+		if ( false === stripos( 'wp-duotone-', $template_html ) ) {
 			remove_action( 'wp_body_open', 'wp_global_styles_render_svg_filters' );
 		}
 	}
