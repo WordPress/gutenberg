@@ -25,10 +25,10 @@ export const LABELS = {
 };
 
 export const DEFAULT_VALUES = {
-	top: null,
-	right: null,
-	bottom: null,
-	left: null,
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
 };
 
 export const DEFAULT_VISUALIZER_VALUES = {
@@ -87,7 +87,7 @@ export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
 	 * isNumber() is more specific for these cases, rather than relying on a
 	 * simple truthy check.
 	 */
-	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
+	const allValue = isNumber( value ) ? `${ value }${ unit }` : undefined;
 
 	return allValue;
 }
