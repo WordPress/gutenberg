@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.4.0-next.0 (2022-02-23)
+
 ### Bug Fix
 
 -   Components: Fix `Slot`/`Fill` Emotion `StyleProvider` ([#38237](https://github.com/WordPress/gutenberg/pull/38237))
