@@ -49,14 +49,14 @@ export default function NavigationPlaceholder( {
 
 		if ( isResolvingMenus ) {
 			speak(
-				'Loading Navigation block setup placeholder options.',
+				__( 'Loading Navigation block setup placeholder options.' ),
 				'polite'
 			);
 		}
 
 		if ( hasResolvedMenus ) {
 			speak(
-				'Navigation block setup placeholder options ready.',
+				__( 'Navigation block setup placeholder options ready.' ),
 				'polite'
 			);
 		}
