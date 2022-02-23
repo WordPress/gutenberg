@@ -974,16 +974,25 @@ describe( 'filterURLForDisplay', () => {
 } );
 
 describe( 'cleanForSlug', () => {
-	it( 'should return string prepared for use as url slug', () => {
+	it( 'Should return string prepared for use as url slug', () => {
 		expect( cleanForSlug( '/Is th@t Déjà_vu? ' ) ).toBe( 'is-tht-deja_vu' );
 	} );
 
-	it( 'should return an empty string for missing argument', () => {
+	it( 'Should allow non-latin characters', () => {
+		expect( cleanForSlug( 'Καλημέρα Κόσμε' ) ).toBe( 'καλημέρα-κόσμε' );
+	} );
+
+	it( 'Should return an empty string for missing argument', () => {
 		expect( cleanForSlug() ).toBe( '' );
 	} );
 
-	it( 'should return an empty string for falsy argument', () => {
+	it( 'Should return an empty string for falsy argument', () => {
 		expect( cleanForSlug( null ) ).toBe( '' );
+	} );
+
+	it( 'Should not allow characters used internally in rich-text', () => {
+		//The last space is an object replacement character and a zero width joiner
+		expect( cleanForSlug( 'the long cat￼‍' ) ).toBe( 'the-long-cat' );
 	} );
 } );
 
