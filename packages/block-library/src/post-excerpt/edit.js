@@ -16,7 +16,7 @@ import {
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, ToggleControl, Disabled } from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -83,25 +83,26 @@ export default function PostExcerptEditor( {
 			withoutInteractiveFormatting={ true }
 		/>
 	);
-	let excerptContent = (
+	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {
+		'is-inline': ! showMoreOnNewLine,
+	} );
+	const excerptValue =
+		rawExcerpt ||
+		strippedRenderedExcerpt ||
+		( isSelected ? '' : __( 'No post excerpt found' ) );
+	const excerptContent = isEditable ? (
 		<RichText
-			className={ classnames( 'wp-block-post-excerpt__excerpt', {
-				'is-inline': ! showMoreOnNewLine,
-			} ) }
+			className={ excerptClassName }
 			aria-label={ __( 'Post excerpt text' ) }
-			value={
-				rawExcerpt ||
-				strippedRenderedExcerpt ||
-				( isSelected ? '' : __( 'No post excerpt found' ) )
-			}
+			value={ excerptValue }
 			onChange={ setExcerpt }
 			tagName="p"
 		/>
-	);
-	excerptContent = isEditable ? (
-		excerptContent
 	) : (
-		<Disabled>{ excerptContent }</Disabled>
+		<p
+			className={ excerptClassName }
+			dangerouslySetInnerHTML={ { __html: excerptValue } }
+		/>
 	);
 	return (
 		<>
