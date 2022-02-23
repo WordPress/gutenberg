@@ -626,7 +626,7 @@ export const withColorPaletteStyles = createHigherOrderComponent(
  * @return {Object} Default controls key/value pairs.
  */
 export function getDefaultColorControls( blockType ) {
-	const defaultBorderControls = getBlockSupport( blockType, [
+	const defaultColorControls = getBlockSupport( blockType, [
 		COLOR_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );

@@ -203,7 +203,7 @@ export function useIsDimensionsSupportValid( blockName, feature ) {
  * @return {Object} Default controls key/value pairs.
  */
 export function getDefaultDimensionsControls( blockType ) {
-	const defaultBorderControls = getBlockSupport( blockType, [
+	const defaultDimensionsControls = getBlockSupport( blockType, [
 		SPACING_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );

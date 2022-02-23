@@ -257,7 +257,7 @@ function useIsTypographyDisabled( props = {} ) {
  * @return {Object} Default controls key/value pairs.
  */
 export function getDefaultTypographyControls( blockType ) {
-	const defaultBorderControls = getBlockSupport( blockType, [
+	const defaultTypographyControls = getBlockSupport( blockType, [
 		TYPOGRAPHY_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
