@@ -18,19 +18,17 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import {
 	DEFAULT_ENTITY_KEY,
-	DefaultEntityContext,
-	EntityRecordByKindName,
 	Kind,
 	Name,
+	Key,
+	EntityType,
+	EntityTypeUnion,
 	EntityQuery,
-	EntityKeyType,
-	EntityDetails,
-	UpdatableEntityRecordByKindName,
-	EntityDefinition,
-	EntityDetailsLookup,
+	DefaultContext,
+	EntityRecordType,
 } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
-import { Context, Updatable } from './types';
+import { Context, EntityRecord, Updatable } from './types';
 
 // createSelector isn't properly typed if I don't explicitly import these files – ideally they would
 // be merely ambient definitions that TS is aware of.
@@ -123,15 +121,10 @@ export const getUserQueryResults = createSelector(
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesByKind< K extends Kind >(
+export function getEntitiesByKind< K extends KindType[ 'kind' ] >(
 	state: State,
 	kind: K
-): Array<
-	| ( K extends keyof EntityDetailsLookup
-			? EntityDetailsLookup[ K ]
-			: EntityDefinition )
-	| EntityDefinition
-> {
+): Array< EntityDefinition > {
 	return filter( state.entities.config, { kind } );
 }
 
@@ -144,13 +137,11 @@ export function getEntitiesByKind< K extends Kind >(
  *
  * @return Entity
  */
-export function getEntity< K extends Kind, N extends Name< K > >(
+export function getEntity< KT extends KindType >(
 	state: State,
-	kind: K,
-	name: N
-): EntityDetails< K, N > extends unknown
-	? EntityDefinition | null
-	: EntityDetails< K, N > {
+	kind: KT[ 'kind' ],
+	name: KT[ 'type' ]
+): EntityDefinition | null {
 	return find( state.entities.config, { kind, name } );
 }
 
@@ -171,15 +162,17 @@ export const getEntityRecord = createSelector(
 	function <
 		K extends Kind,
 		N extends Name< K >,
-		Key extends EntityKeyType< K, N >,
-		C extends Context = DefaultEntityContext< K, N >
+		// Somehow type inference doesn't work properly without the weird signature. Definitely something to dig into.
+		Entity extends EntityType< K, N > = EntityType< K, N >,
+		C extends Context = Entity[ 'defaultContext' ],
+		EntityWithC extends EntityType< K, N, C > = EntityType< K, N, C >
 	>(
 		state: State,
 		kind: K,
 		name: N,
-		key: Key,
+		key: Key< K, N >,
 		query?: EntityQuery< C >
-	): EntityRecordByKindName< K, N, C > | null {
+	): EntityWithC[ 'recordType' ] | null {
 		const queriedState = get( state.entities.data, [
 			kind,
 			name,
@@ -208,7 +201,7 @@ export const getEntityRecord = createSelector(
 				const value = get( item, field );
 				set( filteredItem, field, value );
 			}
-			return filteredItem as EntityRecordByKindName< K, N, C >;
+			return filteredItem as EntityWithC[ 'recordType' ];
 		}
 
 		return item;
@@ -235,6 +228,8 @@ export const getEntityRecord = createSelector(
 		];
 	}
 );
+
+const comment = getEntityRecord( {}, 'root', 'comment', 15 );
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
@@ -326,10 +321,14 @@ export const getRawEntityRecord = createSelector(
  * @return {boolean} Whether entity records have been received.
  */
 export function hasEntityRecords<
-	K extends Kind,
-	N extends Name< K >,
-	C extends Context = DefaultEntityContext< K, N >
->( state: State, kind: K, name: N, query?: EntityQuery< C > ): boolean {
+	KT extends KindType,
+	C extends Context = DefaultContext< KT >
+>(
+	state: State,
+	kind: KT[ 'kind' ],
+	name: KT[ 'type' ],
+	query?: EntityQuery< C >
+): boolean {
 	return Array.isArray( getEntityRecords( state, kind, name, query ) );
 }
 
@@ -344,15 +343,14 @@ export function hasEntityRecords<
  * @return  Records.
  */
 export const getEntityRecords = createSelector( function <
-	K extends Kind,
-	N extends Name< K >,
-	C extends Context = DefaultEntityContext< K, N >
+	KT extends KindType,
+	C extends Context = DefaultContext< KT >
 >(
 	state: State,
-	kind: K,
-	name: N,
+	kind: KT[ 'kind' ],
+	name: KT[ 'type' ],
 	query?: EntityQuery< C >
-): Array< EntityRecordByKindName< K, N, C > > | null {
+): Array< EntityRecordType< KT, C > > | null {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState = get( state.entities.records, [
@@ -496,12 +494,12 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
  *
  * @return The entity record's edits.
  */
-export function getEntityRecordEdits< K extends Kind, N extends Name< K > >(
+export function getEntityRecordEdits< KT extends KindType >(
 	state: State,
-	kind: K,
-	name: N,
-	recordId: EntityKeyType< K, N >
-): Partial< UpdatableEntityRecordByKindName< K, N > > {
+	kind: KT[ 'kind' ],
+	name: KT[ 'type' ],
+	recordId: EntityKeyType< KT >
+): Partial< Updatable< EntityRecordType< KT, 'edit' > > > {
 	return get( state.entities.data, [ kind, name, 'edits', recordId ] );
 }
 
@@ -520,12 +518,12 @@ export function getEntityRecordEdits< K extends Kind, N extends Name< K > >(
  * @return The entity record's non transient edits.
  */
 export const getEntityRecordNonTransientEdits = createSelector(
-	function < K extends Kind, N extends Name< K > >(
+	function < KT extends KindType >(
 		state: State,
-		kind: K,
-		name: N,
-		recordId: EntityKeyType< K, N >
-	): Partial< UpdatableEntityRecordByKindName< K, N > > {
+		kind: KT[ 'kind' ],
+		name: KT[ 'type' ],
+		recordId: EntityKeyType< KT >
+	): Partial< Updatable< EntityRecordType< KT, 'edit' > > > {
 		const entity = getEntity( state, kind, name );
 		const transientEdits = ( entity as any ).transientEdit; // @FIXME
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
@@ -556,11 +554,11 @@ export const getEntityRecordNonTransientEdits = createSelector(
  *
  * @return Whether the entity record has edits or not.
  */
-export function hasEditsForEntityRecord< K extends Kind, N extends Name< K > >(
+export function hasEditsForEntityRecord< KT extends KindType >(
 	state: State,
-	kind: K,
-	name: N,
-	recordId: EntityKeyType< K, N >
+	kind: KT[ 'kind' ],
+	name: KT[ 'type' ],
+	recordId: EntityKeyType< KT >
 ): boolean {
 	return (
 		isSavingEntityRecord( state, kind, name, recordId ) ||
@@ -581,20 +579,16 @@ export function hasEditsForEntityRecord< K extends Kind, N extends Name< K > >(
  * @return The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
-	function <
-		K extends Kind,
-		N extends Name< K >,
-		Key extends EntityKeyType< K, N >
-	>(
+	function < KT extends KindType >(
 		state: State,
-		kind: K,
-		name: N,
-		recordId: Key
-	): UpdatableEntityRecordByKindName< K, N > {
+		kind: KT[ 'kind' ],
+		name: KT[ 'type' ],
+		recordId: EntityKeyType< KT >
+	): Updatable< EntityRecordType< KT, 'edit' > > {
 		return {
 			...getRawEntityRecord( state, kind, name, recordId ),
 			...getEntityRecordEdits( state, kind, name, recordId ),
-		} as UpdatableEntityRecordByKindName< K, N >;
+		} as Updatable< EntityRecordType< KT, 'edit' > >;
 	},
 	( state, kind, name, recordId, query ) => {
 		const context = query?.context ?? 'default';
@@ -631,11 +625,12 @@ export const getEditedEntityRecord = createSelector(
  *
  * @return {boolean} Whether the entity record is autosaving or not.
  */
-export function isAutosavingEntityRecord<
-	K extends Kind,
-	N extends Name< K >,
-	Key extends EntityKeyType< K, N >
->( state: State, kind: K, name: N, recordId: Key ): boolean {
+export function isAutosavingEntityRecord< KT extends KindType >(
+	state: State,
+	kind: KT[ 'kind' ],
+	name: KT[ 'type' ],
+	recordId: EntityKeyType< KT >
+): boolean {
 	const { pending, isAutosave } = get(
 		state.entities.records,
 		[ kind, name, 'saving', recordId ],
@@ -654,11 +649,12 @@ export function isAutosavingEntityRecord<
  *
  * @return Whether the entity record is saving or not.
  */
-export function isSavingEntityRecord<
-	K extends Kind,
-	N extends Name< K >,
-	Key extends EntityKeyType< K, N >
->( state: State, kind: K, name: N, recordId: Key ): boolean {
+export function isSavingEntityRecord< KT extends KindType >(
+	state: State,
+	kind: KT[ 'kind' ],
+	name: KT[ 'type' ],
+	recordId: EntityKeyType< KT >
+): boolean {
 	return get(
 		state.entities.records,
 		[ kind, name, 'saving', recordId, 'pending' ],
@@ -676,11 +672,12 @@ export function isSavingEntityRecord<
  *
  * @return Whether the entity record is deleting or not.
  */
-export function isDeletingEntityRecord<
-	K extends Kind,
-	N extends Name< K >,
-	Key extends EntityKeyType< K, N >
->( state: State, kind: K, name: N, recordId: Key ): boolean {
+export function isDeletingEntityRecord< KT extends KindType >(
+	state: State,
+	kind: KT[ 'kind' ],
+	name: KT[ 'type' ],
+	recordId: EntityKeyType< KT >
+): boolean {
 	return get(
 		state.entities.records,
 		[ kind, name, 'deleting', recordId, 'pending' ],
@@ -698,15 +695,11 @@ export function isDeletingEntityRecord<
  *
  * @return The entity record's save error.
  */
-export function getLastEntitySaveError<
-	K extends Kind,
-	N extends Name< K >,
-	Key extends EntityKeyType< K, N >
->(
+export function getLastEntitySaveError< KT extends KindType >(
 	state: State,
-	kind: K,
-	name: N,
-	recordId: Key
+	kind: KT[ 'kind' ],
+	name: KT[ 'type' ],
+	recordId: EntityKeyType< KT >
 ): Record< string, string > | null {
 	return get( state.entities.data, [
 		kind,
