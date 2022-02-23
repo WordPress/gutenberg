@@ -53,7 +53,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		$style = '';
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > :where(:not(.alignleft):not(.alignright)) {";
+			$style  = "$selector > * {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 			$style .= 'margin-left: auto !important;';
 			$style .= 'margin-right: auto !important;';
@@ -63,8 +63,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector .alignfull { max-width: none; }";
 		}
 
-		$style .= "$selector .alignleft { float: left; margin-right: 2em; margin-left: 0; }";
-		$style .= "$selector .alignright { float: right; margin-left: 2em; margin-right: 0; }";
+		$style .= "$selector .alignleft { float: left; margin-right: 2em !important; margin-left: 0 !important; max-width: revert; }";
+		$style .= "$selector .alignright { float: right; margin-left: 2em !important; margin-right: 0 !important; max-width: revert; }";
 		if ( $has_block_gap_support ) {
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
 			$style    .= "$selector > * { margin-top: 0; margin-bottom: 0; }";

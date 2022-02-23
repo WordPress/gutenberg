@@ -117,7 +117,7 @@ export default {
 				? `
 					${ appendSelectors(
 						selector,
-						'> :where(:not(.alignleft):not(.alignright))'
+						'> *'
 					) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;
@@ -137,14 +137,16 @@ export default {
 		output += `
 			${ appendSelectors( selector, '> .alignleft' ) } {
 				float: left;
-				margin-right: 2em;
-				margin-left: 0;
+				max-width: revert;
+				margin-right: 2em !important;
+				margin-left: 0 !important;
 			}
 
 			${ appendSelectors( selector, '> .alignright' ) } {
 				float: right;
-				margin-left: 2em;
-				margin-right: 0;
+				max-width: revert;
+				margin-left: 2em !important;
+				margin-right: 0 !important;
 			}
 
 		`;
