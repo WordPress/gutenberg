@@ -37,6 +37,7 @@ import {
 	WpTemplate,
 	WpTemplatePart,
 } from './types';
+import type { OmitNevers } from './types/helpers';
 
 export type EntityQuery< C extends Context > = Record< string, string > & {
 	context?: C;
@@ -228,76 +229,112 @@ export const defaultEntities = [
  */
 type Element = typeof defaultEntities[ number ];
 type ElementOfKind< K > = Element & { kind: K };
-type PostEntityDefinition = EntityDefinition & {
-	baseURLParams: { context: 'edit' };
-};
-export type EntityDetailsLookup< C extends Context = any > = {
-	[ E in Element as E[ 'kind' ] ]: {
-		[ E2 in ElementOfKind< E[ 'kind' ] > as E2[ 'name' ] ]: E2;
-	};
-} & {
-	/**
-	 * The entities of kind postType are loaded dynamically and can't be inferred from
-	 * the defaultEntities constant. The expected ones are defined using a hardcoded
-	 * definitions instead.
-	 */
-	postType: {
-		post: PostEntityDefinition;
-		page: PostEntityDefinition;
-		wp_template: PostEntityDefinition;
-		wp_template_part: PostEntityDefinition;
+
+type DefaultEntities = {
+	[ EntityGroup in Element as EntityGroup[ 'kind' ] ]: {
+		[ Entity in ElementOfKind<
+			EntityGroup[ 'kind' ]
+		> as Entity[ 'name' ] ]: {
+			key: 'key' extends keyof Entity ? Entity[ 'key' ] : 'id';
+			defaultContext: 'baseURLParams' extends keyof Entity
+				? 'context' extends keyof Entity[ 'baseURLParams' ]
+					? Entity[ 'baseURLParams' ][ 'context' ]
+					: 'view'
+				: 'view';
+		};
 	};
 };
 
-export type Kind = keyof EntityDetailsLookup | string;
-export type Name< K extends Kind > = K extends keyof EntityDetailsLookup
-	? keyof EntityDetailsLookup[ K ]
-	: string;
+type FlatEntities = {
+	[ EntityGroup in Element as EntityGroup[ 'kind' ] ]: {
+		[ Entity in ElementOfKind<
+			EntityGroup[ 'kind' ]
+		> as Entity[ 'name' ] ]: {
+			name: Entity[ 'name' ];
+			kind: Entity[ 'kind' ];
+			key: 'key' extends keyof Entity ? Entity[ 'key' ] : 'id';
+			defaultContext: 'baseURLParams' extends keyof Entity
+				? 'context' extends keyof Entity[ 'baseURLParams' ]
+					? Entity[ 'baseURLParams' ][ 'context' ]
+					: 'view'
+				: 'view';
+		};
+	};
+};
 
-export type EntityDetails<
-	K extends Kind,
-	N extends Name< K >,
-	C extends Context = any
-> = K extends keyof EntityDetailsLookup< C >
-	? N extends keyof EntityDetailsLookup< C >[ K ]
-		? EntityDetailsLookup< C >[ K ][ N ]
-		: unknown
-	: unknown;
+type FlatEntities2 = FlatEntities[ keyof FlatEntities ];
+type FlatEntities3 = FlatEntities2[ keyof FlatEntities2 ];
 
-export type DefaultEntityContext<
-	K extends Kind,
-	N extends Name< K >,
-	Fallback extends Context = 'view'
-> = Context &
-	( 'baseURLParams' extends keyof EntityDetails< K, N >
-		? 'context' extends keyof EntityDetails< K, N >[ 'baseURLParams' ]
-			? EntityDetails< K, N >[ 'baseURLParams' ][ 'context' ]
-			: Fallback
-		: Fallback );
+type FlatKind = keyof {
+	[ FlatEntity in FlatEntities3 as FlatEntity[ 'kind' ] ]: {};
+};
+type FlatName< K extends FlatKind > = keyof OmitNevers<
+	{
+		[ FlatEntity in FlatEntities3 as FlatEntity[ 'name' ] ]: FlatEntity[ 'kind' ] extends K
+			? true
+			: never;
+	}
+>;
 
-// DefaultEntityContext< 'root', 'site' > is "view"
-// DefaultEntityContext< 'root', 'plugin' > is "edit"
+type FlatDefaultEntityContext<
+	K extends FlatKind,
+	N extends FlatName< K >
+> = keyof OmitNevers<
+	{
+		[ FlatEntity in FlatEntities3 as FlatEntity[ 'defaultContext' ] ]: FlatEntity[ 'kind' ] extends K
+			? FlatEntity[ 'name' ] extends N
+				? true
+				: never
+			: never;
+	}
+>;
 
-export type EntityKeyName<
-	K extends Kind,
-	N extends Name< K >
-> = unknown extends EntityDetails< K, N >
-	? unknown
-	: 'key' extends keyof EntityDetails< K, N >
-	? EntityDetails< K, N >[ 'key' ]
-	: 'id';
 
-// EntityKeyName< 'root', 'menuLocation' > is "name"
-// EntityKeyName< 'root', 'comment' > is "id"
-// EntityKeyName< 'postType', 'wp_template' > is "id"
 
-export type EntityKeyType<
-	K extends Kind,
-	N extends Name< K >
-> = EntityKeyName< K, N > extends keyof EntityRecordByKindName< K, N, any >
-	? EntityRecordByKindName< K, N, any >[ EntityKeyName< K, N > ] &
-			( string | number )
-	: string | number;
+type ByKindType<C extends Context = any> = {
+	'root--widget': {
+		kind: 'root';
+		name: 'widget';
+		key: 'id';
+		defaultContext: 'edit';
+		recordType: Widget<C>;
+	};
+};
+
+export type KindBT = ByKindType[ keyof ByKindType ][ 'kind' ];
+export type NameBT< K extends KindBT > = ( ByKindType[ keyof ByKindType ] & {
+	kind: K;
+} )[ 'name' ];
+export type KindNameBT = { kind: KindBT; name: NameBT< KindBT > };
+
+type EntityBT<
+	KN extends KindNameBT
+> = ByKindType[ `${ KN[ 'kind' ] }--${ KN[ 'name' ] }` ];
+
+type DefaultContext<
+	KN extends KindNameBT
+> = EntityBT< KN >[ 'defaultContext' ];
+type EntityKey< KN extends KindNameBT > = EntityBT< KN >[ 'key' ];
+type EntityKeyType< KN extends KindNameBT > = EntityRecordKN< KN, any >[ EntityKey< KN > ] &
+	( string | number )
+
+
+export type EntityRecordKN<
+	KN extends KindNameBT
+	C extends Context = DefaultContext< KN >
+	> = EntityBT< KN >[ 'defaultContext' ]['recordType']<C>
+//
+// // EntityRecordByKindName< 'root', 'site' > is Settings<'view'>
+// // EntityRecordByKindName< 'root', 'plugin' > is Plugin<'edit'>
+// // EntityRecordByKindName< 'postType', 'wp_template' > is WpTemplate<'edit'>
+//
+// export type UpdatableEntityRecordByKindName<
+// 	K extends Kind,
+// 	N extends Name< K >
+// 	> = EntityRecordByKindName< K, N, 'edit' > extends EntityRecord< 'edit' >
+// 	? EntityRecordByKindName< K, N, 'edit' >
+// 	: unknown;
+// export type EntityRecordBT<XY extends KindNameBT>
 
 // EntityKeyType< 'root', 'menuLocation' > is a string
 // EntityKeyType< 'root', 'comment' > is a number
