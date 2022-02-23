@@ -63,7 +63,7 @@ describe( 'FocalPointPicker', () => {
 	} );
 
 	describe( 'resolvePoint handling', () => {
-		it( 'should allow value altering', async () => {
+		it( 'should allow value altering', () => {
 			const spyChange = jest.fn();
 			const spy = jest.fn();
 			const { getByRole } = render(
@@ -99,7 +99,7 @@ describe( 'FocalPointPicker', () => {
 			rerender( <Picker value={ { x: 0.93, y: 0.5 } } /> );
 			expect( xInput.value ).toBe( '93' );
 		} );
-		it( 'call onChange with the expected values', async () => {
+		it( 'call onChange with the expected values', () => {
 			const spyChange = jest.fn();
 			const { getByRole } = render(
 				<Picker value={ { x: 0.14, y: 0.62 } } onChange={ spyChange } />

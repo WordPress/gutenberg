@@ -16,7 +16,7 @@ import { isRTL } from '@wordpress/i18n';
 import { Input } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { composeStateReducers } from '../input-control/reducer/reducer';
-import { add, subtract, roundClamp } from '../utils/math';
+import { add, subtract, ensureValidStep } from '../utils/math';
 import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
@@ -41,13 +41,14 @@ export function NumberControl(
 ) {
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : parseFloat( step );
-	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = ( value, stepOverride ) => {
-		// When step is "any" clamp the value, otherwise round and clamp it
-		return isStepAny
-			? Math.min( max, Math.max( min, value ) )
-			: roundClamp( value, min, max, stepOverride ?? baseStep );
+		// When step is not "any" round to the nearest step
+		if ( ! isStepAny ) {
+			value = ensureValidStep( value, min, stepOverride ?? baseStep );
+		}
+		return Math.min( max, Math.max( min, value ) )
 	};
+	const baseValue = constrainValue( 0, baseStep );
 
 	const autoComplete = typeProp === 'number' ? 'off' : null;
 	const classes = classNames( 'components-number-control', className );
@@ -94,10 +95,15 @@ export function NumberControl(
 				nextValue = subtract( nextValue, incrementalValue );
 			}
 
-			state.value = constrainValue(
-				nextValue,
-				enableShift ? incrementalValue : null
-			);
+			if ( nextValue < min || nextValue > max ) {
+				state.value = currentValue;
+			} else {
+				state.value = constrainValue(
+					nextValue,
+					enableShift ? incrementalValue : null
+				);
+			}
+
 		}
 
 		/**

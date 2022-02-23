@@ -21,10 +21,7 @@ export default function FocalPoint( {
 		'components-focal-point-picker__icon_container'
 	);
 
-	const style = {
-		left: coordinates.left,
-		top: coordinates.top,
-	};
+	const style = { ...coordinates };
 
 	return (
 		<FocalPointWrapper { ...props } className={ classes } style={ style }>

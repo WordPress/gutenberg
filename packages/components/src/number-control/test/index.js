@@ -210,20 +210,19 @@ describe( 'NumberControl', () => {
 			expect( input.value ).toBe( '100' );
 		} );
 
-		it( 'should increment but be limited by max on shiftStep', () => {
+		it( 'should not increment if the next step is greater than max', () => {
 			render(
-				<StatefulNumberControl
-					value={ 5 }
-					shiftStep={ 100 }
-					max={ 99 }
-				/>
+				<StatefulNumberControl value={ 95 } step={ 5 } max={ 99 } />
 			);
 
 			const input = getInput();
 			input.focus();
-			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
-			expect( input.value ).toBe( '99' );
+			fireKeyDown( { keyCode: UP } );
+			expect( input.value ).toBe( '95' );
+
+			fireKeyDown( { keyCode: UP, shiftKey: true } );
+			expect( input.value ).toBe( '95' );
 		} );
 
 		it( 'should not increment by shiftStep if disabled', () => {
@@ -314,19 +313,18 @@ describe( 'NumberControl', () => {
 			expect( input.value ).toBe( '-100' );
 		} );
 
-		it( 'should decrement but be limited by min on shiftStep', () => {
+		it( 'should not decrement if the next step is less than min', () => {
 			render(
-				<StatefulNumberControl
-					value={ 5 }
-					shiftStep={ 100 }
-					min={ 4 }
-				/>
+				<StatefulNumberControl value={ 4 } step={ 5 } min={ 0 } />
 			);
 
 			const input = getInput();
 			input.focus();
-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
+			fireKeyDown( { keyCode: DOWN } );
+			expect( input.value ).toBe( '4' );
+
+			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 			expect( input.value ).toBe( '4' );
 		} );
 

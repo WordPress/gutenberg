@@ -23,7 +23,6 @@ import {
 	MediaWrapper,
 	MediaContainer,
 } from './styles/focal-point-picker-style';
-import { roundClamp } from '../utils/math';
 import { INITIAL_BOUNDS } from './utils';
 
 export class FocalPointPicker extends Component {
@@ -83,7 +82,7 @@ export class FocalPointPicker extends Component {
 		} = this.state;
 		const { value } = this.props;
 		if ( ! isDragging && ( value.x !== x || value.y !== y ) ) {
-			this.setState( { percentages: this.props.value } );
+			this.setState( { percentages: value } );
 		}
 	}
 	componentWillUnmount() {
@@ -129,7 +128,7 @@ export class FocalPointPicker extends Component {
 		}
 		return bounds;
 	}
-	updateValue( nextValue = {}, callback ) {
+	updateValue( nextValue, callback ) {
 		const resolvedValue =
 			this.props.resolvePoint?.( nextValue ) ?? nextValue;
 
@@ -148,7 +147,6 @@ export class FocalPointPicker extends Component {
 		} );
 	}
 	startDrag( event ) {
-		event.persist();
 		this.containerRef.current.focus();
 		this.setState( { isDragging: true } );
 		const { ownerDocument } = this.containerRef.current;
@@ -182,7 +180,7 @@ export class FocalPointPicker extends Component {
 		const axis = keyCode === UP || keyCode === DOWN ? 'y' : 'x';
 		const value = parseFloat( next[ axis ] ) + delta;
 
-		next[ axis ] = roundClamp( value, 0, 1, step );
+		next[ axis ] = value;
 
 		this.updateValue( next, () => {
 			this.props.onChange( this.state.percentages );
@@ -223,10 +221,10 @@ export class FocalPointPicker extends Component {
 			( top - bounds.top ) / ( pickerDimensions.height - bounds.top * 2 );
 
 		// Enables holding shift to jump values by 10%
-		const step = byTenths ? 0.1 : 0.01;
-
-		nextX = roundClamp( nextX, 0, 1, step );
-		nextY = roundClamp( nextY, 0, 1, step );
+		if ( byTenths ) {
+			nextX = Math.round( nextX / 0.1 ) * 0.1;
+			nextY = Math.round( nextY / 0.1 ) * 0.1;
+		}
 
 		return { x: nextX, y: nextY };
 	}
@@ -259,10 +257,7 @@ export class FocalPointPicker extends Component {
 		} = this.state;
 
 		if ( bounds.left === undefined || bounds.top === undefined ) {
-			return {
-				left: '50%',
-				top: '50%',
-			};
+			return;
 		}
 
 		const { width, height } = this.pickerDimensions();
@@ -281,7 +276,6 @@ export class FocalPointPicker extends Component {
 			url,
 		} = this.props;
 		const { bounds, isDragging, percentages } = this.state;
-		const iconCoordinates = this.iconCoordinates();
 
 		const classes = classnames(
 			'components-focal-point-picker-control',
@@ -319,7 +313,7 @@ export class FocalPointPicker extends Component {
 							src={ url }
 						/>
 						<FocalPoint
-							coordinates={ iconCoordinates }
+							coordinates={ this.iconCoordinates() }
 							isDragging={ isDragging }
 						/>
 					</MediaContainer>
