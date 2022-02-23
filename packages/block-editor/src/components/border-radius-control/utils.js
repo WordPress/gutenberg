@@ -78,7 +78,7 @@ export function getAllValue( values = {} ) {
 		: '';
 	const unit = mode( allUnits );
 
-	const allValue = value === 0 || value ? `${ value }${ unit }` : null;
+	const allValue = value === 0 || value ? `${ value }${ unit }` : undefined;
 
 	return allValue;
 }
