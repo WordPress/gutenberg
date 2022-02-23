@@ -1,6 +1,21 @@
+import groovy.json.JsonSlurper
+
 buildscript {
     ext {
         willPublishReactNativeBridgeBinary = properties["willPublishReactNativeBridgeBinary"]?.toBoolean() ?: false
+
+        compileSdkVersion = 30
+        minSdkVersion = 21
+        targetSdkVersion = 30
+
+        react = {
+            enableHermes = true
+        }
+
+        // Fetch React Native version from Gutenberg package.json
+        def gutenbergPackageJson = new JsonSlurper().parse file("$rootDir/../../../package.json")
+        def devDependencies = gutenbergPackageJson.get('devDependencies')
+        rnVersion = devDependencies.get('react-native')
     }
 }
 

@@ -7,9 +7,6 @@ plugins {
     id "com.automattic.android.publish-to-s3"
 }
 
-// import the `readReactNativeVersion()` function
-apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
-
 def extractPackageVersion(packagejson, packageName, section) {
     def packageSlurper = new JsonSlurper()
     def packageJson = packageSlurper.parse file(packagejson)
@@ -36,11 +33,11 @@ group='org.wordpress-mobile.gutenberg-mobile'
 def buildAssetsFolder = 'build/assets'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
@@ -82,7 +79,7 @@ dependencies {
     testImplementation "junit:junit:4.13"
 
     if (willPublishReactNativeBridgeBinary) {
-        def rnVersion = readReactNativeVersion('../../../../package.json', 'devDependencies')
+        def rnVersion = rootProject.ext.rnVersion
         println "react-native version for react-native-bridge: $rnVersion"
         implementation "com.facebook.react:react-native:$rnVersion"
         implementation "org.wordpress-mobile.gutenberg-mobile:react-native-aztec:$reactNativeAztecVersion"
