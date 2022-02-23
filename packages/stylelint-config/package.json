@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/stylelint-config",
-	"version": "19.1.1-next.33ec3857e2.0",
+	"version": "20.0.0",
 	"description": "stylelint config for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "MIT",
@@ -31,12 +31,11 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"stylelint-config-recommended": "^3.0.0",
-		"stylelint-config-recommended-scss": "^4.2.0",
-		"stylelint-scss": "^3.17.2"
+		"stylelint-config-recommended": "^6.0.0",
+		"stylelint-config-recommended-scss": "^5.0.2"
 	},
 	"peerDependencies": {
-		"stylelint": "^13.7.0 || ^14"
+		"stylelint": "^14.2"
 	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",

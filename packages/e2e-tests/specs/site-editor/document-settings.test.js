@@ -1,12 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
+import {
+	trashAllPosts,
+	activateTheme,
+	visitSiteEditor,
+} from '@wordpress/e2e-test-utils';
 
 async function getDocumentSettingsTitle() {
 	const titleElement = await page.waitForSelector(
@@ -26,7 +25,7 @@ async function getDocumentSettingsSecondaryTitle() {
 
 describe( 'Document Settings', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -35,15 +34,14 @@ describe( 'Document Settings', () => {
 	} );
 
 	beforeEach( async () => {
-		await siteEditor.visit();
-		await siteEditor.disableWelcomeGuide();
+		await visitSiteEditor();
 	} );
 
 	describe( 'when a template is selected from the navigation sidebar', () => {
 		it( 'should display the selected templates name in the document header', async () => {
 			// Navigate to a template
-			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+			await visitSiteEditor( {
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
 
@@ -64,7 +62,7 @@ describe( 'Document Settings', () => {
 				);
 				headerTemplatePartListViewButton.click();
 				await page.click(
-					'button[aria-label="Close list view sidebar"]'
+					'button[aria-label="Close List View Sidebar"]'
 				);
 
 				// Evaluate the document settings secondary title
@@ -78,8 +76,8 @@ describe( 'Document Settings', () => {
 	describe( 'when a template part is selected from the navigation sidebar', () => {
 		it( "should display the selected template part's name in the document header", async () => {
 			// Navigate to a template part
-			await siteEditor.visit( {
-				postId: 'tt1-blocks//header',
+			await visitSiteEditor( {
+				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
 

@@ -75,13 +75,9 @@ function styleSheetsCompat( doc ) {
 		);
 
 		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				`Stylesheet ${ ownerNode.id } was not properly added.
-For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
-For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`,
-				ownerNode.outerHTML
-			);
+			// Display warning once we have a way to add style dependencies to the editor.
+			// See: https://github.com/WordPress/gutenberg/pull/37466.
+
 			doc.head.appendChild( ownerNode.cloneNode( true ) );
 
 			// Add inline styles belonging to the stylesheet.
@@ -195,6 +191,7 @@ function Iframe(
 				Array.from( ownerDocument.body.classList ).filter(
 					( name ) =>
 						name.startsWith( 'admin-color-' ) ||
+						name.startsWith( 'post-type-' ) ||
 						name === 'wp-embed-responsive'
 				)
 			);

@@ -13,12 +13,12 @@ import type { Navigator } from './types';
  * Retrieves a `navigator` instance.
  */
 function useNavigator(): Navigator {
-	const [ , setPath ] = useContext( NavigatorContext );
+	const { location, goTo, goBack } = useContext( NavigatorContext );
 
 	return {
-		push( path, options ) {
-			setPath( { path, ...options } );
-		},
+		location,
+		goTo,
+		goBack,
 	};
 }
 

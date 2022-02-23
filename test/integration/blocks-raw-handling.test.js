@@ -427,6 +427,7 @@ describe( 'Blocks raw handling', () => {
 		[
 			'plain',
 			'classic',
+			'nested-divs',
 			'apple',
 			'google-docs',
 			'google-docs-table',

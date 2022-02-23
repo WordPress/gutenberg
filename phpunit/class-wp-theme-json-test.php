@@ -398,18 +398,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'spacing' => array(
 						'blockGap' => '1em',
 					),
-					'blocks'  => array(
-						'core/columns' => array(
-							'spacing' => array(
-								'blockGap' => '24px',
-							),
-						),
-					),
 				),
 			)
 		);
 
-		$expected = 'body { margin: 0; }body{--wp--style--block-gap: 1em;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }.wp-block-columns{--wp--style--block-gap: 24px;}';
+		$expected = 'body { margin: 0; }body{--wp--style--block-gap: 1em;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
 		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
@@ -1434,6 +1427,97 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	public function test_merge_incoming_data_presets_use_default_names() {
+		$defaults   = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'name' => 'Small',
+								'slug' => 'small',
+								'size' => '12px',
+							),
+							array(
+								'name' => 'Large',
+								'slug' => 'large',
+								'size' => '20px',
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'slug' => 'small',
+								'size' => '1.1rem',
+							),
+							array(
+								'slug' => 'large',
+								'size' => '1.75rem',
+							),
+							array(
+								'name' => 'Huge',
+								'slug' => 'huge',
+								'size' => '3rem',
+							),
+						),
+					),
+				),
+			),
+			'theme'
+		);
+		$expected   = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'typography' => array(
+					'fontSizes' => array(
+						'theme'   => array(
+							array(
+								'name' => 'Small',
+								'slug' => 'small',
+								'size' => '1.1rem',
+							),
+							array(
+								'name' => 'Large',
+								'slug' => 'large',
+								'size' => '1.75rem',
+							),
+							array(
+								'name' => 'Huge',
+								'slug' => 'huge',
+								'size' => '3rem',
+							),
+						),
+						'default' => array(
+							array(
+								'name' => 'Small',
+								'slug' => 'small',
+								'size' => '12px',
+							),
+							array(
+								'name' => 'Large',
+								'slug' => 'large',
+								'size' => '20px',
+							),
+						),
+					),
+				),
+			),
+		);
+		$defaults->merge( $theme_json );
+		$actual = $defaults->get_raw_data();
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	function test_remove_insecure_properties_removes_unsafe_styles() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
@@ -2120,7 +2204,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	function test_get_editor_settings_custom_units_can_be_disabled() {
 		add_theme_support( 'custom-units', array() );
-		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
 		remove_theme_support( 'custom-units' );
 
 		$expected = array(
@@ -2133,7 +2217,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	function test_get_editor_settings_custom_units_can_be_enabled() {
 		add_theme_support( 'custom-units' );
-		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
 		remove_theme_support( 'custom-units' );
 
 		$expected = array(
@@ -2146,7 +2230,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	function test_get_editor_settings_custom_units_can_be_filtered() {
 		add_theme_support( 'custom-units', 'rem', 'em' );
-		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
 		remove_theme_support( 'custom-units' );
 
 		$expected = array(
@@ -2155,6 +2239,46 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['spacing'] );
+	}
+
+	function test_sanitization() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => 2,
+				'styles'  => array(
+					'spacing' => array(
+						'blockGap' => 'valid value',
+					),
+					'blocks'  => array(
+						'core/group' => array(
+							'spacing' => array(
+								'margin'   => 'valid value',
+								'blockGap' => 'invalid value',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual   = $theme_json->get_raw_data();
+		$expected = array(
+			'version' => 2,
+			'styles'  => array(
+				'spacing' => array(
+					'blockGap' => 'valid value',
+				),
+				'blocks'  => array(
+					'core/group' => array(
+						'spacing' => array(
+							'margin' => 'valid value',
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 }

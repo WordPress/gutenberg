@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
@@ -6,6 +11,7 @@ import {
 	Disabled,
 	PanelBody,
 	SelectControl,
+	Spinner,
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
@@ -34,6 +40,7 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 function AudioEdit( {
 	attributes,
+	className,
 	noticeOperations,
 	setAttributes,
 	onReplace,
@@ -42,7 +49,7 @@ function AudioEdit( {
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
-	const blockProps = useBlockProps();
+	const isTemporaryAudio = ! id && isBlobURL( src );
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
@@ -82,7 +89,7 @@ function AudioEdit( {
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url: newSrc },
 			} );
-			if ( undefined !== embedBlock ) {
+			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
 				return;
 			}
@@ -101,7 +108,6 @@ function AudioEdit( {
 			: null;
 	}
 
-	// const { setAttributes, isSelected, noticeUI } = this.props;
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
 			// in this case there was an error and we should continue in the editing state
@@ -113,6 +119,15 @@ function AudioEdit( {
 		// selected media, then switches off the editing UI
 		setAttributes( { src: media.url, id: media.id } );
 	}
+
+	const classes = classnames( className, {
+		'is-transient': isTemporaryAudio,
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
+
 	if ( ! src ) {
 		return (
 			<div { ...blockProps }>
@@ -186,6 +201,7 @@ function AudioEdit( {
 				<Disabled isDisabled={ ! isSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>
+				{ isTemporaryAudio && <Spinner /> }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"

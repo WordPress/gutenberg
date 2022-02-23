@@ -162,7 +162,7 @@ export const subscribe = defaultRegistry.subscribe;
  *
  * @deprecated Use `register( storeDescriptor )` instead.
  *
- * @param {string} name Store registry name.
+ * @param {string} name  Store registry name.
  * @param {Object} store Store instance (`{ getSelectors, getActions, subscribe }`).
  */
 export const registerGenericStore = defaultRegistry.registerGenericStore;

@@ -7,12 +7,8 @@ import {
 	getAllBlocks,
 	selectBlockByClientId,
 	insertBlock,
+	visitSiteEditor,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 async function toggleSidebar() {
 	await page.click(
@@ -42,7 +38,7 @@ async function getTemplateCard() {
 
 describe( 'Settings sidebar', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -52,8 +48,7 @@ describe( 'Settings sidebar', () => {
 		await activateTheme( 'twentytwentyone' );
 	} );
 	beforeEach( async () => {
-		await siteEditor.visit();
-		await siteEditor.disableWelcomeGuide();
+		await visitSiteEditor();
 	} );
 
 	describe( 'Template tab', () => {
@@ -69,8 +64,8 @@ describe( 'Settings sidebar', () => {
 			await toggleSidebar();
 
 			const templateCardBeforeNavigation = await getTemplateCard();
-			await siteEditor.visit( {
-				postId: 'tt1-blocks//404',
+			await visitSiteEditor( {
+				postId: 'emptytheme//singular',
 				postType: 'wp_template',
 			} );
 			const templateCardAfterNavigation = await getTemplateCard();
@@ -80,8 +75,8 @@ describe( 'Settings sidebar', () => {
 				description: 'Displays posts.',
 			} );
 			expect( templateCardAfterNavigation ).toMatchObject( {
-				title: '404',
-				description: 'Displays when no content is found.',
+				title: 'Singular',
+				description: 'Displays a single post or page.',
 			} );
 		} );
 	} );

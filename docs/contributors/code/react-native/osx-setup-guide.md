@@ -44,9 +44,9 @@ Pick one and follow the install instructions noted on their website.
 Then run:
 
 ```sh
-nvm install lts/*
-nvm alias default lts/* #sets this as the default when opening a new terminal
-nvm use #switches to the project settings
+nvm install 'lts/*'
+nvm alias default 'lts/*' # sets this as the default when opening a new terminal
+nvm use # switches to the project settings
 ```
 
 Or
@@ -230,7 +230,7 @@ npm run native test:e2e:ios:local
 Passing a filename should also work to run a subset of tests:
 
 ```sh
-npm run native test:e2e:ios:local gutenberg-editor-gallery.test.js
+npm run native test:e2e:ios:local gutenberg-editor-paragraph.test.js
 ```
 
 If all things go well, it should look like:
@@ -256,7 +256,7 @@ npm run native test:e2e:android:local
 Passing a filename should also work to run a subset of tests:
 
 ```
-npm run native test:e2e:android:local gutenberg-editor-gallery.test.js
+npm run native test:e2e:android:local gutenberg-editor-paragraph.test.js
 ```
 
 After a bit of a wait we should see:

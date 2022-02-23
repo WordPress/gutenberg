@@ -1,5 +1,5 @@
 # Documentation
-/docs                                           @ajitbohra @mkaz
+/docs                                           @ajitbohra @mkaz @ryanwelcher
 
 # Schemas
 /schemas                                        @mkaz
@@ -64,8 +64,8 @@
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @ntwb @nerrad @ajitbohra
-/packages/create-block                          @gziolo @mkaz
-/packages/create-block-tutorial-template        @gziolo @mkaz
+/packages/create-block                          @gziolo @mkaz @ryanwelcher
+/packages/create-block-tutorial-template        @gziolo @mkaz @ryanwelcher
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/docgen                                @oandregal
@@ -79,7 +79,7 @@
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
 /packages/prettier-config                       @ntwb @gziolo
-/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra
+/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
 
 # UI Components
@@ -117,9 +117,9 @@
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @ellatrix @cameronvoell @guarani
-/packages/rich-text                             @ellatrix @cameronvoell @guarani
-/packages/block-editor/src/components/rich-text @ellatrix @cameronvoell @guarani
+/packages/format-library                        @ellatrix @cameronvoell
+/packages/rich-text                             @ellatrix @cameronvoell
+/packages/block-editor/src/components/rich-text @ellatrix @cameronvoell
 
 # Project Management
 /.github
@@ -131,6 +131,7 @@
 # PHP
 /lib                                                                 @timothybjacobs @spacedmonkey
 /lib/global-styles.php                                               @timothybjabocs @spacedmonkey @oandregal
+/lib/class-wp-rest-block-editor-settings-controller.php              @timothybjacobs @spacedmonkey @geriux @antonis
 /lib/compat/wordpress-5.9/theme.json                                                      @timothybjabocs @spacedmonkey @oandregal
 /lib/compat/wordpress-5.9/theme-i18n.json                                                 @timothybjabocs @spacedmonkey @oandregal
 /lib/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @oandregal
@@ -142,6 +143,9 @@
 /packages/admin-manifest                        @ellatrix
 /lib/pwa.php                                    @ellatrix
 /lib/service-worker.js                          @ellatrix
+
+# Native
+/packages/components/src/mobile/global-styles-context                @geriux @antonis
 
 # Native (Unowned)
 *.native.js                                     @ghost

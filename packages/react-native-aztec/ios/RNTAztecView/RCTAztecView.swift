@@ -98,6 +98,10 @@ class RCTAztecView: Aztec.TextView {
 
     // MARK: - Font
 
+    /// Flag to enable using the defaultFont in Aztec for specific blocks
+    /// Like the Preformatted and Heading blocks.
+    private var blockUseDefaultFont: Bool = false
+
     /// Font family for all contents  Once this is set, it will always override the font family for all of its
     /// contents, regardless of what HTML is provided to Aztec.
     private var fontFamily: String? = nil
@@ -146,6 +150,8 @@ class RCTAztecView: Aztec.TextView {
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         storage.htmlConverter.shouldCollapseSpaces = false
         shouldNotifyOfNonUserChanges = false
+        // Typing attributes are controlled by RichText component so we have to prevent Aztec to recalculate them when deleting backward.
+        shouldRecalculateTypingAttributesOnDeleteBackward = false
         disableLinkTapRecognizer()
         preBackgroundColor = .clear
     }
@@ -488,6 +494,21 @@ class RCTAztecView: Aztec.TextView {
 
     // MARK: - RN Properties
 
+    @objc func setBlockUseDefaultFont(_ useDefaultFont: Bool) {
+        guard blockUseDefaultFont != useDefaultFont else {
+            return
+        }
+
+        if useDefaultFont {
+            // Enable using the defaultFont in Aztec
+            // For the PreFormatter and HeadingFormatter
+            Configuration.useDefaultFont = true
+        }
+
+        blockUseDefaultFont = useDefaultFont
+        refreshFont()
+    }
+
     @objc
     func setContents(_ contents: NSDictionary) {
 
@@ -500,6 +521,9 @@ class RCTAztecView: Aztec.TextView {
         }
 
         let html = contents["text"] as? String ?? ""
+
+        let tag = contents["tag"] as? String ?? ""
+        checkDefaultFontFamily(tag: tag)
 
         setHTML(html)
         updatePlaceholderVisibility()
@@ -679,6 +703,16 @@ class RCTAztecView: Aztec.TextView {
             style.lineSpacing = lineSpacing
             defaultParagraphStyle.regularLineSpacing = lineSpacing
             textStorage.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSMakeRange(0, textStorage.length))
+        }
+    }
+    
+    /// This method sets the desired font family
+    /// for specific tags.
+    private func checkDefaultFontFamily(tag: String) {
+        // Since we are using the defaultFont to customize
+        // the font size, we need to set the monospace font.
+        if (blockUseDefaultFont && tag == "pre") {
+            setFontFamily(FontProvider.shared.monospaceFont.fontName)
         }
     }
 

@@ -5,6 +5,7 @@
 @import "./buttons/editor.scss";
 @import "./categories/editor.scss";
 @import "./columns/editor.scss";
+@import "./comments-query-loop/editor.scss";
 @import "./comments-pagination/editor.scss";
 @import "./comments-pagination-numbers/editor.scss";
 @import "./cover/editor.scss";
@@ -50,8 +51,11 @@
 	@include background-colors-deprecated();
 	@include foreground-colors-deprecated();
 	@include gradient-colors-deprecated();
-	// This CSS Custom Properties aren't used anymore as defaults,
-	// but we still need to keep them for backward compatibility.
+}
+
+// This CSS Custom Properties aren't used anymore as defaults,
+// but we still need to keep them for backward compatibility.
+.editor-styles-wrapper {
 	--wp--preset--font-size--normal: 16px;
 	--wp--preset--font-size--huge: 42px;
 }
@@ -69,11 +73,11 @@
 }
 
 .editor-styles-wrapper .has-normal-font-size {
-	font-size: var(--wp--preset--font-size--normal) !important;
+	font-size: var(--wp--preset--font-size--normal);
 }
 
 .editor-styles-wrapper .has-huge-font-size {
-	font-size: var(--wp--preset--font-size--huge) !important;
+	font-size: var(--wp--preset--font-size--huge);
 }
 
 /**

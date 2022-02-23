@@ -18,6 +18,7 @@ module.exports = {
 		),
 	],
 	snapshotSerializers: [ require.resolve( 'enzyme-to-json/serializer.js' ) ],
+	testEnvironment: 'jsdom',
 	testMatch: [
 		'**/__tests__/**/*.[jt]s?(x)',
 		'**/test/*.[jt]s?(x)',

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widgets",
-	"version": "2.0.18-next.33ec3857e2.0",
+	"version": "2.1.0",
 	"description": "Functionality used by the widgets block editor in the Widgets screen and the Customizer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,7 +32,6 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
-		"@wordpress/url": "file:../url",
 		"classnames": "^2.3.1",
 		"lodash": "^4.17.21"
 	},

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { SyntheticEvent } from 'react';
+import type { CSSProperties, SyntheticEvent } from 'react';
 
 /**
  * Internal dependencies
@@ -80,6 +79,7 @@ export type UnitSelectControlProps = {
 
 export type UnitControlProps = UnitSelectControlProps & {
 	__unstableStateReducer?: StateReducer;
+	__unstableInputWidth?: CSSProperties[ 'width' ];
 	/**
 	 * If `true`, the unit `<select>` is hidden.
 	 *

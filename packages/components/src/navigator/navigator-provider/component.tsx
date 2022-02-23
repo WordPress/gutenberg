@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,7 +20,11 @@ import {
 import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
-import type { NavigatorProviderProps, NavigatorPath } from '../types';
+import type {
+	NavigatorProviderProps,
+	NavigatorLocation,
+	NavigatorContext as NavigatorContextType,
+} from '../types';
 
 function NavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
@@ -34,20 +37,62 @@ function NavigatorProvider(
 		...otherProps
 	} = useContextSystem( props, 'NavigatorProvider' );
 
-	const [ path, setPath ] = useState< NavigatorPath >( {
-		path: initialPath,
-	} );
+	const [ locationHistory, setLocationHistory ] = useState<
+		NavigatorLocation[]
+	>( [
+		{
+			path: initialPath,
+		},
+	] );
+
+	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
+		( path, options = {} ) => {
+			setLocationHistory( [
+				...locationHistory,
+				{
+					...options,
+					path,
+					isBack: false,
+				},
+			] );
+		},
+		[ locationHistory ]
+	);
+
+	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
+		if ( locationHistory.length > 1 ) {
+			setLocationHistory( [
+				...locationHistory.slice( 0, -2 ),
+				{
+					...locationHistory[ locationHistory.length - 2 ],
+					isBack: true,
+				},
+			] );
+		}
+	}, [ locationHistory ] );
+
+	const navigatorContextValue: NavigatorContextType = useMemo(
+		() => ( {
+			location: {
+				...locationHistory[ locationHistory.length - 1 ],
+				isInitial: locationHistory.length === 1,
+			},
+			goTo,
+			goBack,
+		} ),
+		[ locationHistory, goTo, goBack ]
+	);
 
 	const cx = useCx();
 	const classes = useMemo(
 		// Prevents horizontal overflow while animating screen transitions
 		() => cx( css( { overflowX: 'hidden' } ), className ),
-		[ className ]
+		[ className, cx ]
 	);
 
 	return (
 		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
-			<NavigatorContext.Provider value={ [ path, setPath ] }>
+			<NavigatorContext.Provider value={ navigatorContextValue }>
 				{ children }
 			</NavigatorContext.Provider>
 		</View>
@@ -56,7 +101,6 @@ function NavigatorProvider(
 
 /**
  * The `NavigatorProvider` component allows rendering nested panels or menus (via the `NavigatorScreen` component) and navigate between these different states (via the `useNavigator` hook).
- * The Global Styles sidebar is an example of this. The `Navigator*` family of components is _not_ opinionated in terms of UI, and can be composed with any UI components to navigate between the nested screens.
  *
  * @example
  * ```jsx
@@ -66,34 +110,34 @@ function NavigatorProvider(
  *   __experimentalUseNavigator as useNavigator,
  * } from '@wordpress/components';
  *
- * function NavigatorButton( {
- *   path,
- *   isBack = false,
- *   ...props
- * } ) {
- *   const navigator = useNavigator();
- *   return (
- *   	<Button
- *   	  onClick={ () => navigator.push( path, { isBack } ) }
- *   	  { ...props }
- *   	/>
- *   );
+ * function NavigatorButton( { path, ...props } ) {
+ *  const { goTo } = useNavigator();
+ *  return (
+ *    <Button
+ *      variant="primary"
+ *      onClick={ () => goTo( path ) }
+ *      { ...props }
+ *    />
+ *  );
+ * }
+ *
+ * function NavigatorBackButton( props ) {
+ *   const { goBack } = useNavigator();
+ *   return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
  * }
  *
  * const MyNavigation = () => (
  *   <NavigatorProvider initialPath="/">
  *     <NavigatorScreen path="/">
  *       <p>This is the home screen.</p>
- *   	   <NavigatorButton isPrimary path="/child">
+ *   	   <NavigatorButton path="/child">
  *          Navigate to child screen.
  *       </NavigatorButton>
  *     </NavigatorScreen>
  *
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorButton isPrimary path="/" isBack>
- *         Go back
- *       </NavigatorButton>
+ *       <NavigatorBackButton>Go back</NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>
  * );

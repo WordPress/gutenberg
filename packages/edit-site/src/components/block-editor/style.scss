@@ -24,6 +24,18 @@
 		.edit-site-visual-editor__editor-canvas {
 			border-radius: $radius-block-ui;
 		}
+
+		// To hide the horizontal scrollbar and show the drag handle on the
+		// left and right of the container.
+		.components-resizable-box__container {
+			overflow: visible;
+		}
+	}
+
+	.components-resizable-box__container {
+		margin: 0 auto;
+		// Removing this will cancel the bottom margins in the iframe.
+		overflow: auto;
 	}
 }
 
@@ -38,10 +50,6 @@
 	&:hover {
 		color: $gray-100;
 	}
-}
-
-.components-resizable-box__container {
-	margin: 0 auto;
 }
 
 .resizable-editor__drag-handle {

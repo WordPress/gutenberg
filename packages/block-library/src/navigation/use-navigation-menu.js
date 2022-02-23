@@ -12,6 +12,7 @@ export default function useNavigationMenu( ref ) {
 				getEditedEntityRecord,
 				getEntityRecords,
 				hasFinishedResolution,
+				canUser,
 			} = select( coreStore );
 
 			const navigationMenuSingleArgs = [
@@ -64,6 +65,25 @@ export default function useNavigationMenu( ref ) {
 				),
 				navigationMenu,
 				navigationMenus,
+				canUserUpdateNavigationEntity: ref
+					? canUser( 'update', 'navigation', ref )
+					: undefined,
+				hasResolvedCanUserUpdateNavigationEntity: hasFinishedResolution(
+					'canUser',
+					[ 'update', 'navigation', ref ]
+				),
+				canUserDeleteNavigationEntity: ref
+					? canUser( 'delete', 'navigation', ref )
+					: undefined,
+				hasResolvedCanUserDeleteNavigationEntity: hasFinishedResolution(
+					'canUser',
+					[ 'delete', 'navigation', ref ]
+				),
+				canUserCreateNavigation: canUser( 'create', 'navigation' ),
+				hasResolvedCanUserCreateNavigation: hasFinishedResolution(
+					'canUser',
+					[ 'create', 'navigation' ]
+				),
 			};
 		},
 		[ ref ]

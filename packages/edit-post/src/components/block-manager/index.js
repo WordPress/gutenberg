@@ -10,7 +10,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { withSelect } from '@wordpress/data';
 import { SearchControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
+import { useDebounce } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -25,6 +27,7 @@ function BlockManager( {
 	isMatchingSearchTerm,
 	numberOfHiddenBlocks,
 } ) {
+	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ search, setSearch ] = useState( '' );
 
 	// Filtering occurs here (as opposed to `withSelect`) to avoid
@@ -37,6 +40,20 @@ function BlockManager( {
 			( ! blockType.parent ||
 				includes( blockType.parent, 'core/post-content' ) )
 	);
+
+	// Announce search results on change
+	useEffect( () => {
+		if ( ! search ) {
+			return;
+		}
+		const count = blockTypes.length;
+		const resultsFoundMessage = sprintf(
+			/* translators: %d: number of results. */
+			_n( '%d result found.', '%d results found.', count ),
+			count
+		);
+		debouncedSpeak( resultsFoundMessage );
+	}, [ blockTypes.length, search, debouncedSpeak ] );
 
 	return (
 		<div className="edit-post-block-manager__content">

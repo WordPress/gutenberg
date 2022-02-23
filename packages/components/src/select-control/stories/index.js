@@ -69,7 +69,7 @@ export const _default = () => {
 	return <SelectControlWithState { ...props } />;
 };
 
-export const withNativeChildren = () => {
+export const withCustomChildren = () => {
 	return (
 		<SelectControlWithState label="Value">
 			<option value="option-1">Option 1</option>

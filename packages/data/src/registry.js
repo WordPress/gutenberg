@@ -165,7 +165,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a store instance.
 	 *
-	 * @param {string} name Store registry name.
+	 * @param {string} name  Store registry name.
 	 * @param {Object} store Store instance object (getSelectors, getActions, subscribe).
 	 */
 	function registerStoreInstance( name, store ) {
@@ -291,6 +291,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	// This function will be deprecated as soon as it is no longer internally referenced.
 	//
 	function use( plugin, options ) {
+		if ( ! plugin ) {
+			return;
+		}
+
 		registry = {
 			...registry,
 			...plugin( registry, options ),

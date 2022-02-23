@@ -392,7 +392,8 @@ export default function SearchEdit( {
 			borderWidth: isButtonPositionInside ? borderWidth : undefined,
 		};
 
-		const isNonZeroBorderRadius = parseInt( borderRadius, 10 ) !== 0;
+		const isNonZeroBorderRadius =
+			borderRadius !== undefined && parseInt( borderRadius, 10 ) !== 0;
 
 		if ( isButtonPositionInside && isNonZeroBorderRadius ) {
 			// We have button inside wrapper and a border radius value to apply.

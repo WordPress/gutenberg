@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "11.1.5-next.33ec3857e2.0",
+	"version": "11.2.0",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

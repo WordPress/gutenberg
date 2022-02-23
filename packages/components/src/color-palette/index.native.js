@@ -219,6 +219,7 @@ function ColorPalette( {
 			onScrollBeginDrag={ () => shouldEnableBottomSheetScroll( false ) }
 			onScrollEndDrag={ () => shouldEnableBottomSheetScroll( true ) }
 			ref={ scrollViewRef }
+			testID="color-palette"
 		>
 			{ shouldShowCustomIndicator && (
 				<View
@@ -266,6 +267,7 @@ function ColorPalette( {
 								selected: isSelected( color ),
 							} }
 							accessibilityHint={ color }
+							testID={ color }
 						>
 							<Animated.View
 								style={ {

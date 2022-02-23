@@ -22,28 +22,28 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @var WP_Theme_JSON_Gutenberg
 	 */
-	private static $core = null;
+	protected static $core = null;
 
 	/**
 	 * Container for data coming from the theme.
 	 *
 	 * @var WP_Theme_JSON_Gutenberg
 	 */
-	private static $theme = null;
+	protected static $theme = null;
 
 	/**
 	 * Whether or not the theme supports theme.json.
 	 *
 	 * @var bool
 	 */
-	private static $theme_has_support = null;
+	protected static $theme_has_support = null;
 
 	/**
 	 * Container for data coming from the user.
 	 *
 	 * @var WP_Theme_JSON_Gutenberg
 	 */
-	private static $user = null;
+	protected static $user = null;
 
 	/**
 	 * Stores the ID of the custom post type
@@ -51,14 +51,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @var integer
 	 */
-	private static $user_custom_post_type_id = null;
+	protected static $user_custom_post_type_id = null;
 
 	/**
 	 * Container to keep loaded i18n schema for `theme.json`.
 	 *
 	 * @var array
 	 */
-	private static $i18n_schema = null;
+	protected static $i18n_schema = null;
 
 	/**
 	 * Processes a file that adheres to the theme.json
@@ -68,7 +68,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @param string $file_path Path to file. Empty if no file.
 	 * @return array Contents that adhere to the theme.json schema.
 	 */
-	private static function read_json_file( $file_path ) {
+	protected static function read_json_file( $file_path ) {
 		$config = array();
 		if ( $file_path ) {
 			$decoded_file = wp_json_file_decode( $file_path, array( 'associative' => true ) );
@@ -100,7 +100,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *                           Default 'default'.
 	 * @return array Returns the modified $theme_json_structure.
 	 */
-	private static function translate( $theme_json, $domain = 'default' ) {
+	protected static function translate( $theme_json, $domain = 'default' ) {
 		if ( null === self::$i18n_schema ) {
 			$i18n_schema       = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
 			self::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
@@ -132,7 +132,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Data from theme.json will be backfilled from existing
 	 * theme supports, if any. Note that if the same data
 	 * is present in theme.json and in theme supports,
-	 * the theme.json takes precendence.
+	 * the theme.json takes precedence.
 	 *
 	 * @param array $deprecated Deprecated argument.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
@@ -165,7 +165,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		* So we take theme supports, transform it to theme.json shape
 		* and merge the self::$theme upon that.
 		*/
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
 		if ( ! self::theme_has_support() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
@@ -391,7 +391,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @param bool   $template  Optional. Use template theme directory. Default false.
 	 * @return string The whole file path or empty if the file doesn't exist.
 	 */
-	private static function get_file_path_from_theme( $file_name, $template = false ) {
+	protected static function get_file_path_from_theme( $file_name, $template = false ) {
 		$path      = $template ? get_template_directory() : get_stylesheet_directory();
 		$candidate = $path . '/' . $file_name;
 

@@ -74,6 +74,7 @@ function compileStyleValue( uncompiledValue ) {
  * @return {Object} Flattened CSS variables declaration.
  */
 export function getInlineStyles( styles = {} ) {
+	const ignoredStyles = [ 'spacing.blockGap' ];
 	const output = {};
 	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
 		const path = STYLE_PROPERTY[ propKey ].value;
@@ -93,7 +94,7 @@ export function getInlineStyles( styles = {} ) {
 						output[ name ] = compileStyleValue( value );
 					}
 				} );
-			} else {
+			} else if ( ! ignoredStyles.includes( path.join( '.' ) ) ) {
 				output[ propKey ] = compileStyleValue( get( styles, path ) );
 			}
 		}

@@ -34,37 +34,70 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 	serializedHtml = html;
 } );
 
-export function initializeEditor( props ) {
-	const renderResult = render(
-		<Editor
+/**
+ * Initialize an editor for test assertions.
+ *
+ * @param {Object}                    props               Properties passed to the editor component.
+ * @param {string}                    props.initialHtml   String of block editor HTML to parse and render.
+ * @param {Object}                    [options]           Configuration options for the editor.
+ * @param {import('react').ReactNode} [options.component] A specific editor component to render.
+ * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
+ */
+export async function initializeEditor( props, { component = Editor } = {} ) {
+	// Portions of the React Native Animation API rely upon these APIs. However,
+	// Jest's 'legacy' fake timers mutate these globals, which breaks the Animated
+	// API. We preserve the original implementations to restore them later.
+	const originalRAF = global.requestAnimationFrame;
+	const originalCAF = global.cancelAnimationFrame;
+
+	// During editor initialization, asynchronous store resolvers leverage
+	// `setTimeout` to run at the end of the current JavaScript block execution.
+	// In order to prevent "act" warnings triggered by updates to the React tree,
+	// we manually tick fake timers and await the resolution of the current block
+	// execution before proceeding.
+	jest.useFakeTimers( 'legacy' );
+
+	// Arrange
+	const EditorComponent = component;
+	const screen = render(
+		<EditorComponent
 			postId={ `post-id-${ uuid() }` }
 			postType="post"
 			initialTitle="test"
 			{ ...props }
 		/>
 	);
-	const { getByTestId } = renderResult;
 
-	// A promise is used here, instead of making the function async, to prevent
-	// the React Native testing library from warning of potential undesired React state updates
-	// that can be covered in the integration tests.
-	// Reference: https://git.io/JPHn6
-	return new Promise( ( resolve ) => {
-		waitFor( () => getByTestId( 'block-list-wrapper' ) ).then(
-			( blockListWrapper ) => {
-				// onLayout event has to be explicitly dispatched in BlockList component,
-				// otherwise the inner blocks are not rendered.
-				fireEvent( blockListWrapper, 'layout', {
-					nativeEvent: {
-						layout: {
-							width: 100,
-						},
-					},
-				} );
-				resolve( renderResult );
-			}
-		);
+	// A layout event must be explicitly dispatched in BlockList component,
+	// otherwise the inner blocks are not rendered.
+	fireEvent( screen.getByTestId( 'block-list-wrapper' ), 'layout', {
+		nativeEvent: {
+			layout: {
+				width: 100,
+			},
+		},
 	} );
+
+	// Advance all timers allowing store resolvers to resolve.
+	act( () => jest.runAllTimers() );
+
+	// The store resolvers perform several API fetches during editor
+	// initialization. The most straightforward approach to ensure all of them
+	// resolve before we consider the editor initialized is to flush micro tasks,
+	// similar to the approach found in `@testing-library/react-native`.
+	// https://github.com/callstack/react-native-testing-library/blob/a010ffdbca906615279ecc3abee423525e528101/src/flushMicroTasks.js#L15-L23
+	await act( async () => {} );
+
+	// Restore the default timer APIs for remainder of test arrangement, act, and
+	// assertion.
+	jest.useRealTimers();
+
+	// Restore the global animation frame APIs to their original state for the
+	// React Native Animated API.
+	global.requestAnimationFrame = originalRAF;
+	global.cancelAnimationFrame = originalCAF;
+
+	return screen;
 }
 
 export * from '@testing-library/react-native';
@@ -75,11 +108,12 @@ export function waitFor(
 	{ timeout, interval } = { timeout: 1000, interval: 50 }
 ) {
 	let result;
+	let lastError;
 	const check = ( resolve, reject, time = 0 ) => {
 		try {
 			result = cb();
-		} catch ( e ) {
-			//NOOP
+		} catch ( error ) {
+			lastError = error;
 		}
 		if ( ! result && time < timeout ) {
 			setTimeout(
@@ -96,7 +130,7 @@ export function waitFor(
 		).then( () => {
 			if ( ! result ) {
 				reject(
-					`waitFor timed out after ${ timeout }ms for callback:\n${ cb }`
+					`waitFor timed out after ${ timeout }ms for callback:\n${ cb }\n${ lastError.toString() }`
 				);
 				return;
 			}

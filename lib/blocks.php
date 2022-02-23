@@ -53,63 +53,68 @@ function gutenberg_reregister_core_block_types() {
 				'embed',
 			),
 			'block_names'   => array(
-				'archives.php'                    => 'core/archives',
-				'block.php'                       => 'core/block',
-				'calendar.php'                    => 'core/calendar',
-				'categories.php'                  => 'core/categories',
-				'comment-author-avatar.php'       => 'core/comment-author-avatar',
-				'comment-author-name.php'         => 'core/comment-author-name',
-				'comment-content.php'             => 'core/comment-content',
-				'comment-date.php'                => 'core/comment-date',
-				'comment-edit-link.php'           => 'core/comment-edit-link',
-				'comment-reply-link.php'          => 'core/comment-reply-link',
-				'comment-template.php'            => 'core/comment-template',
-				'comments-pagination.php'         => 'core/comments-pagination',
-				'comments-pagination-numbers.php' => 'core/comments-pagination-numbers',
-				'file.php'                        => 'core/file',
-				'home-link.php'                   => 'core/home-link',
-				'image.php'                       => 'core/image',
-				'gallery.php'                     => 'core/gallery',
-				'latest-comments.php'             => 'core/latest-comments',
-				'latest-posts.php'                => 'core/latest-posts',
-				'loginout.php'                    => 'core/loginout',
-				'navigation.php'                  => 'core/navigation',
-				'navigation-area.php'             => 'core/navigation-area',
-				'navigation-link.php'             => 'core/navigation-link',
-				'navigation-submenu.php'          => 'core/navigation-submenu',
-				'page-list.php'                   => 'core/page-list',
-				'pattern.php'                     => 'core/pattern',
-				'post-author.php'                 => 'core/post-author',
-				'post-comment.php'                => 'core/post-comment',
-				'post-comments.php'               => 'core/post-comments',
-				'post-comments-count.php'         => 'core/post-comments-count',
-				'post-comments-form.php'          => 'core/post-comments-form',
-				'post-comments-link.php'          => 'core/post-comments-link',
-				'post-content.php'                => 'core/post-content',
-				'post-date.php'                   => 'core/post-date',
-				'post-excerpt.php'                => 'core/post-excerpt',
-				'post-featured-image.php'         => 'core/post-featured-image',
-				'post-navigation-link.php'        => 'core/post-navigation-link',
-				'post-terms.php'                  => 'core/post-terms',
-				'post-title.php'                  => 'core/post-title',
-				'query.php'                       => 'core/query',
-				'post-template.php'               => 'core/post-template',
-				'query-pagination.php'            => 'core/query-pagination',
-				'query-pagination-next.php'       => 'core/query-pagination-next',
-				'query-pagination-numbers.php'    => 'core/query-pagination-numbers',
-				'query-pagination-previous.php'   => 'core/query-pagination-previous',
-				'query-title.php'                 => 'core/query-title',
-				'rss.php'                         => 'core/rss',
-				'search.php'                      => 'core/search',
-				'shortcode.php'                   => 'core/shortcode',
-				'social-link.php'                 => 'core/social-link',
-				'site-logo.php'                   => 'core/site-logo',
-				'site-tagline.php'                => 'core/site-tagline',
-				'site-title.php'                  => 'core/site-title',
+				'archives.php'                     => 'core/archives',
+				'block.php'                        => 'core/block',
+				'calendar.php'                     => 'core/calendar',
+				'categories.php'                   => 'core/categories',
+				'comment-author-avatar.php'        => 'core/comment-author-avatar',
+				'comment-author-name.php'          => 'core/comment-author-name',
+				'comment-content.php'              => 'core/comment-content',
+				'comment-date.php'                 => 'core/comment-date',
+				'comment-edit-link.php'            => 'core/comment-edit-link',
+				'comment-reply-link.php'           => 'core/comment-reply-link',
+				'comment-template.php'             => 'core/comment-template',
+				'comments-pagination.php'          => 'core/comments-pagination',
+				'comments-pagination-next.php'     => 'core/comments-pagination-next',
+				'comments-pagination-numbers.php'  => 'core/comments-pagination-numbers',
+				'comments-pagination-previous.php' => 'core/comments-pagination-previous',
+				'file.php'                         => 'core/file',
+				'home-link.php'                    => 'core/home-link',
+				'image.php'                        => 'core/image',
+				'gallery.php'                      => 'core/gallery',
+				'latest-comments.php'              => 'core/latest-comments',
+				'latest-posts.php'                 => 'core/latest-posts',
+				'loginout.php'                     => 'core/loginout',
+				'navigation.php'                   => 'core/navigation',
+				'navigation-area.php'              => 'core/navigation-area',
+				'navigation-link.php'              => 'core/navigation-link',
+				'navigation-submenu.php'           => 'core/navigation-submenu',
+				'page-list.php'                    => 'core/page-list',
+				'pattern.php'                      => 'core/pattern',
+				'post-author.php'                  => 'core/post-author',
+				'post-author-name.php'             => 'core/post-author-name',
+				'post-author-biography.php'        => 'core/post-author-biography',
+				'post-comment.php'                 => 'core/post-comment',
+				'post-comments.php'                => 'core/post-comments',
+				'post-comments-count.php'          => 'core/post-comments-count',
+				'post-comments-form.php'           => 'core/post-comments-form',
+				'post-comments-link.php'           => 'core/post-comments-link',
+				'post-content.php'                 => 'core/post-content',
+				'post-date.php'                    => 'core/post-date',
+				'post-excerpt.php'                 => 'core/post-excerpt',
+				'post-featured-image.php'          => 'core/post-featured-image',
+				'post-navigation-link.php'         => 'core/post-navigation-link',
+				'post-terms.php'                   => 'core/post-terms',
+				'post-title.php'                   => 'core/post-title',
+				'query.php'                        => 'core/query',
+				'post-template.php'                => 'core/post-template',
+				'query-pagination.php'             => 'core/query-pagination',
+				'query-pagination-next.php'        => 'core/query-pagination-next',
+				'query-pagination-numbers.php'     => 'core/query-pagination-numbers',
+				'query-pagination-previous.php'    => 'core/query-pagination-previous',
+				'query-title.php'                  => 'core/query-title',
+				'read-more.php'                    => 'core/read-more',
+				'rss.php'                          => 'core/rss',
+				'search.php'                       => 'core/search',
+				'shortcode.php'                    => 'core/shortcode',
+				'social-link.php'                  => 'core/social-link',
+				'site-logo.php'                    => 'core/site-logo',
+				'site-tagline.php'                 => 'core/site-tagline',
+				'site-title.php'                   => 'core/site-title',
 				// 'table-of-contents.php'          => 'core/table-of-contents',
-				'tag-cloud.php'                   => 'core/tag-cloud',
-				'template-part.php'               => 'core/template-part',
-				'term-description.php'            => 'core/term-description',
+				'tag-cloud.php'                    => 'core/tag-cloud',
+				'template-part.php'                => 'core/template-part',
+				'term-description.php'             => 'core/term-description',
 			),
 		),
 		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
@@ -269,95 +274,6 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	}
 }
 
-/**
- * Change the way styles get loaded depending on their size.
- *
- * Optimizes performance and sustainability of styles by inlining smaller stylesheets.
- *
- * @todo Remove this function when the minimum supported version is WordPress 5.8.
- *
- * @return void
- */
-function gutenberg_maybe_inline_styles() {
-
-	// Early exit if the "wp_maybe_inline_styles" function exists.
-	if ( function_exists( 'wp_maybe_inline_styles' ) ) {
-		return;
-	}
-
-	$total_inline_limit = 20000;
-	/**
-	 * The maximum size of inlined styles in bytes.
-	 *
-	 * @param int $total_inline_limit The file-size threshold, in bytes. Defaults to 20000.
-	 * @return int                    The file-size threshold, in bytes.
-	 */
-	$total_inline_limit = apply_filters( 'styles_inline_size_limit', $total_inline_limit );
-
-	global $wp_styles;
-	$styles = array();
-
-	// Build an array of styles that have a path defined.
-	foreach ( $wp_styles->queue as $handle ) {
-		if ( wp_styles()->get_data( $handle, 'path' ) && file_exists( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
-			$styles[] = array(
-				'handle' => $handle,
-				'src'    => $wp_styles->registered[ $handle ]->src,
-				'path'   => $wp_styles->registered[ $handle ]->extra['path'],
-				'size'   => filesize( $wp_styles->registered[ $handle ]->extra['path'] ),
-			);
-		}
-	}
-
-	if ( ! empty( $styles ) ) {
-		// Reorder styles array based on size.
-		usort(
-			$styles,
-			function( $a, $b ) {
-				return ( $a['size'] <= $b['size'] ) ? -1 : 1;
-			}
-		);
-
-		/**
-		 * The total inlined size.
-		 *
-		 * On each iteration of the loop, if a style gets added inline the value of this var increases
-		 * to reflect the total size of inlined styles.
-		 */
-		$total_inline_size = 0;
-
-		// Loop styles.
-		foreach ( $styles as $style ) {
-
-			// Size check. Since styles are ordered by size, we can break the loop.
-			if ( $total_inline_size + $style['size'] > $total_inline_limit ) {
-				break;
-			}
-
-			// Get the styles if we don't already have them.
-			$style['css'] = file_get_contents( $style['path'] );
-
-			// Check if the style contains relative URLs that need to be modified.
-			// URLs relative to the stylesheet's path should be converted to relative to the site's root.
-			$style['css'] = _wp_normalize_relative_css_links( $style['css'], $style['src'] );
-
-			// Set `src` to `false` and add styles inline.
-			$wp_styles->registered[ $style['handle'] ]->src = false;
-			if ( empty( $wp_styles->registered[ $style['handle'] ]->extra['after'] ) ) {
-				$wp_styles->registered[ $style['handle'] ]->extra['after'] = array();
-			}
-			array_unshift( $wp_styles->registered[ $style['handle'] ]->extra['after'], $style['css'] );
-
-			// Add the styles size to the $total_inline_size var.
-			$total_inline_size += (int) $style['size'];
-		}
-	}
-}
-// Run for styles enqueued in <head>.
-add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
-// Run for late-loaded styles in the footer.
-add_action( 'wp_footer', 'gutenberg_maybe_inline_styles', 1 );
-
 if ( ! function_exists( '_wp_normalize_relative_css_links' ) ) {
 	/**
 	 * Make URLs relative to the WordPress installation.
@@ -481,40 +397,6 @@ function gutenberg_register_legacy_social_link_blocks() {
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
 
 /**
- * Filters the default block categories array to add a new one for themes.
- *
- * This can be removed when plugin support requires WordPress 5.8.0+.
- *
- * @see https://core.trac.wordpress.org/ticket/52883
- *
- * @param array[] $categories The list of default block categories.
- *
- * @return array[] Filtered block categories.
- */
-function gutenberg_register_theme_block_category( $categories ) {
-	foreach ( $categories as $category ) {
-		// Skip when the category is already set in WordPress core.
-		if (
-			isset( $category['slug'] ) &&
-			'theme' === $category['slug']
-		) {
-			return $categories;
-		}
-	}
-
-	$categories[] = array(
-		'slug'  => 'theme',
-		'title' => _x( 'Theme', 'block category', 'gutenberg' ),
-		'icon'  => null,
-	);
-	return $categories;
-}
-// This can be removed when plugin support requires WordPress 5.8.0+.
-if ( ! function_exists( 'get_default_block_categories' ) ) {
-	add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
-}
-
-/**
  * Checks whether the current block type supports the feature requested.
  *
  * @param WP_Block_Type $block_type Block type to check for support.
@@ -602,10 +484,9 @@ if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 		 * @param string $content When the callback is used for the render_block filter,
 		 *                        the content needs to be returned so the function parameter
 		 *                        is to ensure the content exists.
-		 *
-		 * @return string
+		 * @return string Block content.
 		 */
-		$callback = function( $content ) use ( $args ) {
+		$callback = static function( $content ) use ( $args ) {
 			// Register the stylesheet.
 			if ( ! empty( $args['src'] ) ) {
 				wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
@@ -620,7 +501,7 @@ if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 
 				// Add RTL stylesheet.
 				if ( file_exists( $rtl_file_path ) ) {
-					wp_style_add_data( $args['hanle'], 'rtl', 'replace' );
+					wp_style_add_data( $args['handle'], 'rtl', 'replace' );
 
 					if ( is_rtl() ) {
 						wp_style_add_data( $args['handle'], 'path', $rtl_file_path );
@@ -636,10 +517,42 @@ if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 
 		$hook = did_action( 'wp_enqueue_scripts' ) ? 'wp_footer' : 'wp_enqueue_scripts';
 		if ( wp_should_load_separate_core_block_assets() ) {
-			$hook = "render_block_$block_name";
+			/**
+			 * Callback function to register and enqueue styles.
+			 *
+			 * @param string $content The block content.
+			 * @param array  $block   The full block, including name and attributes.
+			 * @return string Block content.
+			 */
+			$callback_separate = static function( $content, $block ) use ( $block_name, $callback ) {
+				if ( ! empty( $block['blockName'] ) && $block_name === $block['blockName'] ) {
+					return $callback( $content );
+				}
+				return $content;
+			};
+
+			/*
+			 * The filter's callback here is an anonymous function because
+			 * using a named function in this case is not possible.
+			 *
+			 * The function cannot be unhooked, however, users are still able
+			 * to dequeue the stylesheets registered/enqueued by the callback
+			 * which is why in this case, using an anonymous function
+			 * was deemed acceptable.
+			 */
+			add_filter( 'render_block', $callback_separate, 10, 2 );
+			return;
 		}
 
-		// Enqueue assets in the frontend.
+		/*
+		 * The filter's callback here is an anonymous function because
+		 * using a named function in this case is not possible.
+		 *
+		 * The function cannot be unhooked, however, users are still able
+		 * to dequeue the stylesheets registered/enqueued by the callback
+		 * which is why in this case, using an anonymous function
+		 * was deemed acceptable.
+		 */
 		add_filter( $hook, $callback );
 
 		// Enqueue assets in the editor.

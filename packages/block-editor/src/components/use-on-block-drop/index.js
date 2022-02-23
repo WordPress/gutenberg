@@ -95,10 +95,7 @@ export function onBlockDrop(
 
 		// If the user is moving a block
 		if ( dropType === 'block' ) {
-			const sourceBlockIndex = getBlockIndex(
-				sourceClientIds[ 0 ],
-				sourceRootClientId
-			);
+			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
 
 			// If the user is dropping to the same position, return early.
 			if (

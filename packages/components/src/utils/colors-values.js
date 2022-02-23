@@ -31,8 +31,9 @@ export const G2 = {
 		700: '#757575', // Meets 4.6:1 text contrast against white.
 		600: '#949494', // Meets 3:1 UI or large text contrast against white.
 		400: '#ccc',
-		200: '#ddd', // Used for most borders.
-		100: '#f0f0f0',
+		300: '#ddd', // Used for most borders.
+		200: '#e0e0e0', // Used sparingly for light borders.
+		100: '#f0f0f0', // Used for light gray backgrounds.
 	},
 	darkGray: {
 		primary: '#1e1e1e',
@@ -158,7 +159,7 @@ export const UI = {
 	borderHover: G2.gray[ 700 ],
 	borderFocus: ADMIN.themeDark10,
 	borderDisabled: G2.gray[ 400 ],
-	borderLight: G2.gray[ 200 ],
+	borderLight: G2.gray[ 300 ],
 	label: DARK_GRAY[ 500 ],
 	textDisabled: DARK_GRAY[ 150 ],
 	textDark: BASE.white,

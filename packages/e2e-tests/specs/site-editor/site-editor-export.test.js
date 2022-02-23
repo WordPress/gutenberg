@@ -8,12 +8,12 @@ import os from 'os';
 /**
  * WordPress dependencies
  */
-import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
+import {
+	trashAllPosts,
+	activateTheme,
+	visitSiteEditor,
+	clickOnMoreMenuItem,
+} from '@wordpress/e2e-test-utils';
 
 async function waitForFileExists( filePath, timeout = 10000 ) {
 	const start = Date.now();
@@ -30,7 +30,7 @@ async function waitForFileExists( filePath, timeout = 10000 ) {
 
 describe( 'Site Editor Templates Export', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -40,8 +40,7 @@ describe( 'Site Editor Templates Export', () => {
 	} );
 
 	beforeEach( async () => {
-		await siteEditor.visit();
-		await siteEditor.disableWelcomeGuide();
+		await visitSiteEditor();
 	} );
 
 	it( 'clicking export should download edit-site-export.zip file', async () => {
@@ -53,7 +52,7 @@ describe( 'Site Editor Templates Export', () => {
 			downloadPath: directory,
 		} );
 
-		await siteEditor.clickOnMoreMenuItem( 'Export' );
+		await clickOnMoreMenuItem( 'Export', 'site-editor' );
 		const filePath = path.join( directory, 'edit-site-export.zip' );
 		await waitForFileExists( filePath );
 		expect( fs.existsSync( filePath ) ).toBe( true );

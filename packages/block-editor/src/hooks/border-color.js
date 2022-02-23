@@ -14,7 +14,7 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ColorGradientControl from '../components/colors-gradients/control';
+import ColorGradientSettingsDropdown from '../components/colors-gradients/dropdown';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import {
 	getColorClassName,
@@ -68,7 +68,7 @@ export function BorderColorEdit( props ) {
 
 	// Detect changes in the color attributes and update the colorValue to keep the
 	// UI in sync. This is necessary for situations when border controls interact with
-	// eachother: eg, setting the border width to zero causes the color and style
+	// each other: eg, setting the border width to zero causes the color and style
 	// selections to be cleared.
 	useEffect( () => {
 		setColorValue(
@@ -104,14 +104,22 @@ export function BorderColorEdit( props ) {
 		} );
 	};
 
+	const settings = [
+		{
+			label: __( 'Color' ),
+			onColorChange: onChangeColor,
+			colorValue,
+			clearable: false,
+		},
+	];
 	return (
-		<ColorGradientControl
-			label={ __( 'Color' ) }
-			colorValue={ colorValue }
-			onColorChange={ onChangeColor }
-			clearable={ false }
+		<ColorGradientSettingsDropdown
+			settings={ settings }
+			disableCustomColors
+			disableCustomGradients
 			__experimentalHasMultipleOrigins
 			__experimentalIsRenderedInSidebar
+			enableAlpha
 			{ ...colorGradientSettings }
 		/>
 	);

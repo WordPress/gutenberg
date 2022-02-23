@@ -1169,8 +1169,7 @@ export const duplicateBlocks = ( clientIds, updateSelection = true ) => ( {
 
 	const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
 	const lastSelectedIndex = select.getBlockIndex(
-		last( castArray( clientIds ) ),
-		rootClientId
+		last( castArray( clientIds ) )
 	);
 	const clonedBlocks = blocks.map( ( block ) =>
 		__experimentalCloneSanitizedBlock( block )
@@ -1205,7 +1204,7 @@ export const insertBeforeBlock = ( clientId ) => ( { select, dispatch } ) => {
 		return;
 	}
 
-	const firstSelectedIndex = select.getBlockIndex( clientId, rootClientId );
+	const firstSelectedIndex = select.getBlockIndex( clientId );
 	return dispatch.insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
 };
 
@@ -1224,7 +1223,7 @@ export const insertAfterBlock = ( clientId ) => ( { select, dispatch } ) => {
 		return;
 	}
 
-	const firstSelectedIndex = select.getBlockIndex( clientId, rootClientId );
+	const firstSelectedIndex = select.getBlockIndex( clientId );
 	return dispatch.insertDefaultBlock(
 		{},
 		rootClientId,

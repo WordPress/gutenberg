@@ -60,6 +60,7 @@ export function SocialLinksEdit( props ) {
 		iconBackgroundColorValue,
 		iconColorValue,
 		openInNewTab,
+		showLabels,
 		size,
 		layout,
 	} = attributes;
@@ -80,7 +81,6 @@ export function SocialLinksEdit( props ) {
 
 	const SocialPlaceholder = (
 		<li className="wp-block-social-links__social-placeholder">
-			<div className="wp-social-link"></div>
 			<div className="wp-block-social-links__social-placeholder-icons">
 				<div className="wp-social-link wp-social-link-twitter"></div>
 				<div className="wp-social-link wp-social-link-facebook"></div>
@@ -115,6 +115,34 @@ export function SocialLinksEdit( props ) {
 	const POPOVER_PROPS = {
 		position: 'bottom right',
 	};
+
+	const colorSettings = [
+		{
+			// Use custom attribute as fallback to prevent loss of named color selection when
+			// switching themes to a new theme that does not have a matching named color.
+			value: iconColor.color || iconColorValue,
+			onChange: ( colorValue ) => {
+				setIconColor( colorValue );
+				setAttributes( { iconColorValue: colorValue } );
+			},
+			label: __( 'Icon color' ),
+		},
+	];
+
+	if ( ! logosOnly ) {
+		colorSettings.push( {
+			// Use custom attribute as fallback to prevent loss of named color selection when
+			// switching themes to a new theme that does not have a matching named color.
+			value: iconBackgroundColor.color || iconBackgroundColorValue,
+			onChange: ( colorValue ) => {
+				setIconBackgroundColor( colorValue );
+				setAttributes( {
+					iconBackgroundColorValue: colorValue,
+				} );
+			},
+			label: __( 'Icon background' ),
+		} );
+	}
 
 	return (
 		<Fragment>
@@ -164,37 +192,19 @@ export function SocialLinksEdit( props ) {
 							setAttributes( { openInNewTab: ! openInNewTab } )
 						}
 					/>
+					<ToggleControl
+						label={ __( 'Show labels' ) }
+						checked={ showLabels }
+						onChange={ () =>
+							setAttributes( { showLabels: ! showLabels } )
+						}
+					/>
 				</PanelBody>
 				<PanelColorSettings
 					__experimentalHasMultipleOrigins
 					__experimentalIsRenderedInSidebar
 					title={ __( 'Color' ) }
-					colorSettings={ [
-						{
-							// Use custom attribute as fallback to prevent loss of named color selection when
-							// switching themes to a new theme that does not have a matching named color.
-							value: iconColor.color || iconColorValue,
-							onChange: ( colorValue ) => {
-								setIconColor( colorValue );
-								setAttributes( { iconColorValue: colorValue } );
-							},
-							label: __( 'Icon color' ),
-						},
-						! logosOnly && {
-							// Use custom attribute as fallback to prevent loss of named color selection when
-							// switching themes to a new theme that does not have a matching named color.
-							value:
-								iconBackgroundColor.color ||
-								iconBackgroundColorValue,
-							onChange: ( colorValue ) => {
-								setIconBackgroundColor( colorValue );
-								setAttributes( {
-									iconBackgroundColorValue: colorValue,
-								} );
-							},
-							label: __( 'Icon background color' ),
-						},
-					] }
+					colorSettings={ colorSettings }
 				/>
 				{ ! logosOnly && (
 					<ContrastChecker

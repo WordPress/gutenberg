@@ -1,26 +1,26 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { ReactNode } from 'react';
 
-type NavigatorPathOptions = {
-	isBack?: boolean;
+type NavigateOptions = {
+	focusTargetSelector?: string;
 };
 
-export type NavigatorPath = NavigatorPathOptions & {
+export type NavigatorLocation = NavigateOptions & {
+	isInitial?: boolean;
+	isBack?: boolean;
 	path?: string;
 };
 
-export type NavigatorContext = [
-	NavigatorPath,
-	( path: NavigatorPath ) => void
-];
+export type NavigatorContext = {
+	location: NavigatorLocation;
+	goTo: ( path: string, options?: NavigateOptions ) => void;
+	goBack: () => void;
+};
 
 // Returned by the `useNavigator` hook
-export type Navigator = {
-	push: ( path: string, options: NavigatorPathOptions ) => void;
-};
+export type Navigator = NavigatorContext;
 
 export type NavigatorProviderProps = {
 	/**

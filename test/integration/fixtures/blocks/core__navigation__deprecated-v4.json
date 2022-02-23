@@ -10,7 +10,6 @@
 			"fontFamily": "cambria-georgia",
 			"layout": {
 				"type": "flex",
-				"setCascadingProperties": "true",
 				"orientation": "horizontal"
 			}
 		},

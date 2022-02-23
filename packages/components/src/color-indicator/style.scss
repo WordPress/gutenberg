@@ -1,8 +1,8 @@
 .component-color-indicator {
 	width: $grid-unit-50 * 0.5;
 	height: $grid-unit-50 * 0.5;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 	border-radius: 50%;
-	border: $border-width solid $gray-300;
 	display: inline-block;
 	padding: 0;
 }

@@ -12,12 +12,8 @@ import {
 	activateTheme,
 	clickButton,
 	createReusableBlock,
+	visitSiteEditor,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -46,7 +42,7 @@ describe( 'Multi-entity save flow', () => {
 	let originalSiteTitle, originalBlogDescription;
 
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 		await trashAllPosts( 'wp_block' );
@@ -165,6 +161,11 @@ describe( 'Multi-entity save flow', () => {
 				'//*[@id="a11y-speak-polite"][contains(text(), "Post published")]'
 			);
 
+			// Unselect the blocks to avoid clicking the block toolbar.
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+			} );
+
 			// Update the post.
 			await page.click( '.editor-post-title' );
 			await page.keyboard.type( '...more title!' );
@@ -258,11 +259,10 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
-			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+			await visitSiteEditor( {
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await siteEditor.disableWelcomeGuide();
 
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
@@ -270,7 +270,7 @@ describe( 'Multi-entity save flow', () => {
 				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
 			);
 			headerTemplatePartListViewButton.click();
-			await page.click( 'button[aria-label="Close list view sidebar"]' );
+			await page.click( 'button[aria-label="Close List View Sidebar"]' );
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );
@@ -296,11 +296,10 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should allow re-saving after changing the same block attribute', async () => {
 			// Navigate to site editor.
-			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+			await visitSiteEditor( {
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await siteEditor.disableWelcomeGuide();
 
 			// Insert a paragraph at the bottom.
 			await insertBlock( 'Paragraph' );
@@ -308,26 +307,18 @@ describe( 'Multi-entity save flow', () => {
 			// Open the block settings.
 			await page.click( 'button[aria-label="Settings"]' );
 
-			// Click on font size selector.
-			await page.click( 'button[aria-label="Font size"]' );
-
-			// Click on a different font size.
-			const extraSmallFontSize = await page.waitForXPath(
-				'//li[contains(text(), "Extra small")]'
+			// Change the font size
+			await page.click(
+				'.components-font-size-picker__controls button[aria-label="Small"]'
 			);
-			await extraSmallFontSize.click();
 
 			// Save all changes.
 			await saveAllChanges();
 
-			// Click on font size selector again.
-			await page.click( 'button[aria-label="Font size"]' );
-
-			// Select another font size.
-			const normalFontSize = await page.waitForXPath(
-				'//li[contains(text(), "Normal")]'
+			// Change the font size
+			await page.click(
+				'.components-font-size-picker__controls button[aria-label="Medium"]'
 			);
-			await normalFontSize.click();
 
 			// Assert that the save button has been re-enabled.
 			const saveButton = await page.waitForSelector(

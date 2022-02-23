@@ -96,37 +96,19 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Backward Compatibility",
-		"slug": "backward-compatibility",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Deprecations",
-		"slug": "deprecations",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/deprecations.md",
-		"parent": "backward-compatibility"
-	},
-	{
-		"title": "Meta Boxes",
-		"slug": "meta-box",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/meta-box.md",
-		"parent": "backward-compatibility"
-	},
-	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/README.md",
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Writing Your First Block Type",
+		"title": "Create a basic block",
 		"slug": "writing-your-first-block-type",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/writing-your-first-block-type.md",
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Applying Styles From a Stylesheet",
+		"title": "Use styles and stylesheets",
 		"slug": "applying-styles-with-stylesheets",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md",
 		"parent": "block-tutorial"
@@ -144,9 +126,21 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Block Supports",
+		"slug": "block-supports-in-static-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-static-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Creating dynamic blocks",
 		"slug": "creating-dynamic-blocks",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Block Supports in dynamic blocks",
+		"slug": "block-supports-in-dynamic-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md",
 		"parent": "block-tutorial"
 	},
 	{
@@ -160,36 +154,6 @@
 		"slug": "nested-blocks-inner-blocks",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md",
 		"parent": "block-tutorial"
-	},
-	{
-		"title": "Designer Documentation",
-		"slug": "designers",
-		"markdown_source": "../docs/how-to-guides/designers/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Block Design",
-		"slug": "block-design",
-		"markdown_source": "../docs/how-to-guides/designers/block-design.md",
-		"parent": "designers"
-	},
-	{
-		"title": "User Interface",
-		"slug": "user-interface",
-		"markdown_source": "../docs/how-to-guides/designers/user-interface.md",
-		"parent": "designers"
-	},
-	{
-		"title": "Resources",
-		"slug": "design-resources",
-		"markdown_source": "../docs/how-to-guides/designers/design-resources.md",
-		"parent": "designers"
-	},
-	{
-		"title": "Animation",
-		"slug": "animation",
-		"markdown_source": "../docs/how-to-guides/designers/animation.md",
-		"parent": "designers"
 	},
 	{
 		"title": "Development Platform",
@@ -208,6 +172,24 @@
 		"slug": "tutorial",
 		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
 		"parent": "custom-block-editor"
+	},
+	{
+		"title": "Create your First App with Gutenberg Data",
+		"slug": "data-basics",
+		"markdown_source": "../docs/how-to-guides/data-basics/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Setup",
+		"slug": "1-data-basics-setup",
+		"markdown_source": "../docs/how-to-guides/data-basics/1-data-basics-setup.md",
+		"parent": "data-basics"
+	},
+	{
+		"title": "Building a list of pages",
+		"slug": "2-building-a-list-of-pages",
+		"markdown_source": "../docs/how-to-guides/data-basics/2-building-a-list-of-pages.md",
+		"parent": "data-basics"
 	},
 	{
 		"title": "Feature Flags",
@@ -284,38 +266,8 @@
 	{
 		"title": "Meta Boxes",
 		"slug": "metabox",
-		"markdown_source": "../docs/how-to-guides/metabox/README.md",
+		"markdown_source": "../docs/how-to-guides/metabox.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Store Post Meta with a Block",
-		"slug": "meta-block-1-intro",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-1-intro.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Register Meta Field",
-		"slug": "meta-block-2-register-meta",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-2-register-meta.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Create Meta Block",
-		"slug": "meta-block-3-add",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-3-add.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Use Post Meta Data",
-		"slug": "meta-block-4-use-data",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-4-use-data.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "meta-block-5-finishing",
-		"markdown_source": "../docs/how-to-guides/metabox/meta-block-5-finishing.md",
-		"parent": "metabox"
 	},
 	{
 		"title": "Notices",
@@ -326,38 +278,8 @@
 	{
 		"title": "Plugin Sidebar",
 		"slug": "plugin-sidebar-0",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md",
+		"markdown_source": "../docs/how-to-guides/plugin-sidebar-0.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Get a Sidebar up and Running",
-		"slug": "plugin-sidebar-1-up-and-running",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-1-up-and-running.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Tweak the sidebar style and add controls",
-		"slug": "plugin-sidebar-2-styles-and-controls",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Register the Meta Field",
-		"slug": "plugin-sidebar-3-register-meta",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-3-register-meta.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Initialize the Input Control",
-		"slug": "plugin-sidebar-4-initialize-input",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-4-initialize-input.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Update the Meta Field When the Input's Content Changes",
-		"slug": "plugin-sidebar-5-update-meta",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-5-update-meta.md",
-		"parent": "plugin-sidebar-0"
 	},
 	{
 		"title": "Themes",
@@ -516,6 +438,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Core Blocks Reference",
+		"slug": "core-blocks",
+		"markdown_source": "../docs/reference-guides/core-blocks.md",
+		"parent": "reference-guides"
+	},
+	{
 		"title": "Filter Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/reference-guides/filters/README.md",
@@ -616,6 +544,30 @@
 		"slug": "richtext",
 		"markdown_source": "../docs/reference-guides/richtext.md",
 		"parent": "reference-guides"
+	},
+	{
+		"title": "Theme.json Reference",
+		"slug": "theme-json-reference",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/README.md",
+		"parent": "reference-guides"
+	},
+	{
+		"title": "Version 2 (living reference)",
+		"slug": "theme-json-living",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-living.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Version 1 Reference",
+		"slug": "theme-json-v1",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v1.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Migrating to Newer Versions",
+		"slug": "theme-json-migrations",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
+		"parent": "theme-json-reference"
 	},
 	{
 		"title": "Component Reference",
@@ -891,6 +843,12 @@
 		"title": "FormTokenField",
 		"slug": "form-token-field",
 		"markdown_source": "../packages/components/src/form-token-field/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "GradientPicker",
+		"slug": "gradient-picker",
+		"markdown_source": "../packages/components/src/gradient-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -1938,6 +1896,36 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Styles",
+		"slug": "styles",
+		"markdown_source": "../docs/explanations/architecture/styles.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "User Interface",
+		"slug": "user-interface",
+		"markdown_source": "../docs/explanations/user-interface/README.md",
+		"parent": "explanations"
+	},
+	{
+		"title": "Block Design",
+		"slug": "block-design",
+		"markdown_source": "../docs/explanations/user-interface/block-design.md",
+		"parent": "user-interface"
+	},
+	{
+		"title": "Animation",
+		"slug": "animation",
+		"markdown_source": "../docs/explanations/user-interface/animation.md",
+		"parent": "user-interface"
+	},
+	{
+		"title": "Resources",
+		"slug": "design-resources",
+		"markdown_source": "../docs/explanations/user-interface/design-resources.md",
+		"parent": "user-interface"
+	},
+	{
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "../docs/explanations/faq.md",
@@ -2038,6 +2026,24 @@
 		"slug": "integration-test-guide",
 		"markdown_source": "../docs/contributors/code/react-native/integration-test-guide.md",
 		"parent": "react-native"
+	},
+	{
+		"title": "React Native Internationalization Guide",
+		"slug": "internationalization-guide",
+		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "Backward Compatibility",
+		"slug": "backward-compatibility",
+		"markdown_source": "../docs/contributors/code/backward-compatibility.md",
+		"parent": "code"
+	},
+	{
+		"title": "Deprecations",
+		"slug": "deprecations",
+		"markdown_source": "../docs/contributors/code/deprecations.md",
+		"parent": "code"
 	},
 	{
 		"title": "Design Contributions",

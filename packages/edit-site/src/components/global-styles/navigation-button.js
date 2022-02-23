@@ -9,16 +9,9 @@ import {
 } from '@wordpress/components';
 import { Icon } from '@wordpress/icons';
 
-function NavigationButton( {
-	path,
-	icon,
-	children,
-	isBack = false,
-	...props
-} ) {
-	const navigator = useNavigator();
+function GenericNavigationButton( { icon, children, ...props } ) {
 	return (
-		<Item onClick={ () => navigator.push( path, { isBack } ) } { ...props }>
+		<Item { ...props }>
 			{ icon && (
 				<HStack justify="flex-start">
 					<FlexItem>
@@ -32,4 +25,32 @@ function NavigationButton( {
 	);
 }
 
-export default NavigationButton;
+function NavigationButton( { path, ...props } ) {
+	const { goTo } = useNavigator();
+
+	const dataAttrName = 'data-navigator-focusable-id';
+	const dataAttrValue = path;
+
+	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+
+	const buttonProps = {
+		...props,
+		[ dataAttrName ]: dataAttrValue,
+	};
+
+	return (
+		<GenericNavigationButton
+			onClick={ () =>
+				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
+			}
+			{ ...buttonProps }
+		/>
+	);
+}
+
+function NavigationBackButton( { ...props } ) {
+	const { goBack } = useNavigator();
+	return <GenericNavigationButton onClick={ goBack } { ...props } />;
+}
+
+export { NavigationButton, NavigationBackButton };

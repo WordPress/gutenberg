@@ -67,6 +67,22 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
 				<InspectorControls.Slot />
+				<InspectorControls.Slot
+					__experimentalGroup="color"
+					label={ __( 'Color' ) }
+				/>
+				<InspectorControls.Slot
+					__experimentalGroup="typography"
+					label={ __( 'Typography' ) }
+				/>
+				<InspectorControls.Slot
+					__experimentalGroup="dimensions"
+					label={ __( 'Dimensions' ) }
+				/>
+				<InspectorControls.Slot
+					__experimentalGroup="border"
+					label={ __( 'Border' ) }
+				/>
 			</div>
 		);
 	}
@@ -128,16 +144,21 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<InspectorControls.Slot />
 			<InspectorControls.Slot
+				__experimentalGroup="color"
+				label={ __( 'Color' ) }
+				className="color-block-support-panel__inner-wrapper"
+			/>
+			<InspectorControls.Slot
 				__experimentalGroup="typography"
 				label={ __( 'Typography' ) }
 			/>
 			<InspectorControls.Slot
-				__experimentalGroup="border"
-				label={ __( 'Border' ) }
-			/>
-			<InspectorControls.Slot
 				__experimentalGroup="dimensions"
 				label={ __( 'Dimensions' ) }
+			/>
+			<InspectorControls.Slot
+				__experimentalGroup="border"
+				label={ __( 'Border' ) }
 			/>
 			<div>
 				<AdvancedControls />

@@ -56,7 +56,7 @@ function gutenberg_locate_block_template( $template, $type, array $templates ) {
 		);
 		$index                  = array_search( $relative_template_path, $templates, true );
 
-		// If the template hiearchy algorithm has successfully located a PHP template file,
+		// If the template hierarchy algorithm has successfully located a PHP template file,
 		// we will only consider block templates with higher or equal specificity.
 		$templates = array_slice( $templates, 0, $index + 1 );
 	}
@@ -216,7 +216,10 @@ function gutenberg_get_the_template_html() {
 	$content = $wp_embed->autoembed( $content );
 	$content = do_blocks( $content );
 	$content = wptexturize( $content );
+	$content = convert_smilies( $content );
+	$content = shortcode_unautop( $content );
 	$content = wp_filter_content_tags( $content );
+	$content = do_shortcode( $content );
 	$content = str_replace( ']]>', ']]&gt;', $content );
 
 	// Wrap block template in .wp-site-blocks to allow for specific descendant styles

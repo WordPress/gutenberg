@@ -51,6 +51,8 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
 } ) );
 
+jest.useRealTimers();
+
 /**
  * Wait for next tick of event loop. This is required
  * because the `fetchSearchSuggestions` Promise will

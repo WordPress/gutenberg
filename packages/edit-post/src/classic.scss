@@ -6,6 +6,18 @@
 	margin-right: auto;
 }
 
+// Add a default 8px padding for classic themes around the canvas.
+// Themes with theme.json can control this themselves.
+// For full-wide blocks, we compensate for the base padding.
+// These margins should match the padding value above.
+html :where(.editor-styles-wrapper) {
+	padding: 8px;
+	.block-editor-block-list__layout.is-root-container > .wp-block[data-align="full"] {
+		margin-left: -8px;
+		margin-right: -8px;
+	}
+}
+
 // Deprecated style needed for the block widths and alignments.
 // for themes that don't support the new layout (theme.json).
 html :where(.wp-block) {

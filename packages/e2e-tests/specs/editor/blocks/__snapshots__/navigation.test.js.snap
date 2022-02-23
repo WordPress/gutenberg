@@ -6,6 +6,8 @@ exports[`Navigation allows an empty navigation block to be created and manually 
 <!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"
 `;
 
+exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `"<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"`;
+
 exports[`Navigation encodes URL when create block if needed 1`] = `
 "<!-- wp:navigation-link {\\"label\\":\\"wordpress.org/шеллы\\",\\"url\\":\\"https://wordpress.org/%D1%88%D0%B5%D0%BB%D0%BB%D1%8B\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
 
@@ -40,6 +42,6 @@ exports[`Navigation placeholder allows a navigation block to be created from exi
 <!-- /wp:navigation-submenu -->"
 `;
 
-exports[`Navigation placeholder allows a navigation block to be created using existing pages 1`] = `"<!-- wp:page-list /-->"`;
-
 exports[`Navigation placeholder creates an empty navigation block when the selected existing menu is also empty 1`] = `""`;
+
+exports[`Navigation supports navigation blocks that have inner blocks within their markup and converts them to wp_navigation posts 1`] = `"<!-- wp:page-list /-->"`;

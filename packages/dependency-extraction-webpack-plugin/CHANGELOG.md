@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 3.2.2-next.0 (2021-12-20)
+## 3.3.0 (2022-01-27)
 
 -   Add the optional `externalizedReportFile` option ([#35106](https://github.com/WordPress/gutenberg/pull/35106)).
 

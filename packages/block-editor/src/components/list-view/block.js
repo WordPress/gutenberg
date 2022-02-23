@@ -19,6 +19,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { sprintf, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -32,6 +33,7 @@ import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useListViewContext } from './context';
 import { store as blockEditorStore } from '../../store';
+import useBlockDisplayInformation from '../use-block-display-information';
 
 function ListViewBlock( {
 	block,
@@ -143,6 +145,13 @@ function ListViewBlock( {
 		'has-single-cell': hideBlockActions,
 	} );
 
+	const blockInformation = useBlockDisplayInformation( clientId );
+	const settingsAriaLabel = sprintf(
+		// translators: %s: The title of the block.
+		__( 'Options for %s block' ),
+		blockInformation.title
+	);
+
 	return (
 		<ListViewLeaf
 			className={ classes }
@@ -176,6 +185,7 @@ function ListViewBlock( {
 							ref={ ref }
 							tabIndex={ tabIndex }
 							onFocus={ onFocus }
+							isExpanded={ isExpanded }
 						/>
 					</div>
 				) }
@@ -218,6 +228,7 @@ function ListViewBlock( {
 						<BlockSettingsDropdown
 							clientIds={ [ clientId ] }
 							icon={ moreVertical }
+							label={ settingsAriaLabel }
 							toggleProps={ {
 								ref,
 								className: 'block-editor-list-view-block__menu',

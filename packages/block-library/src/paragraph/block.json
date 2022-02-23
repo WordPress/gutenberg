@@ -4,7 +4,7 @@
 	"name": "core/paragraph",
 	"title": "Paragraph",
 	"category": "text",
-	"description": "Start with the building block of all narrative.",
+	"description": "Start with the basic building block of all narrative.",
 	"keywords": [ "text" ],
 	"textdomain": "default",
 	"attributes": {
@@ -34,7 +34,11 @@
 		"anchor": true,
 		"className": false,
 		"color": {
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

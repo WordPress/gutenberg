@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/a11y",
-	"version": "3.2.5-next.33ec3857e2.0",
+	"version": "3.3.0",
 	"description": "Accessibility (a11y) utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

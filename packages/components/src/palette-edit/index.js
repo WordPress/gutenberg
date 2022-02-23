@@ -40,6 +40,8 @@ import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
 
+const DEFAULT_COLOR = '#000';
+
 function NameInput( { value, onChange, label } ) {
 	return (
 		<NameInputControl
@@ -48,6 +50,14 @@ function NameInput( { value, onChange, label } ) {
 			value={ value }
 			onChange={ onChange }
 		/>
+	);
+}
+
+function getNameForPosition( position ) {
+	return sprintf(
+		/* translators: %s: is a temporary id for a custom color */
+		__( 'Color %s ' ),
+		position + 1
 	);
 }
 
@@ -67,9 +77,16 @@ function Option( {
 
 	return (
 		<PaletteItem
+			className={ isEditing ? 'is-selected' : undefined }
 			as="div"
 			onClick={ onStartEditing }
-			{ ...( isEditing ? focusOutsideProps : {} ) }
+			{ ...( isEditing
+				? { ...focusOutsideProps }
+				: {
+						style: {
+							cursor: 'pointer',
+						},
+				  } ) }
 		>
 			<HStack justify="flex-start">
 				<FlexItem>
@@ -143,6 +160,14 @@ function Option( {
 	);
 }
 
+function isTemporaryElement( slugPrefix, { slug, color, gradient }, index ) {
+	return (
+		slug === slugPrefix + kebabCase( getNameForPosition( index ) ) &&
+		( ( !! color && color === DEFAULT_COLOR ) ||
+			( !! gradient && gradient === DEFAULT_GRADIENT ) )
+	);
+}
+
 function PaletteEditListView( {
 	elements,
 	onChange,
@@ -159,9 +184,14 @@ function PaletteEditListView( {
 	}, [ elements ] );
 	useEffect( () => {
 		return () => {
-			if ( elementsReference.current.some( ( { slug } ) => ! slug ) ) {
+			if (
+				elementsReference.current.some( ( element, index ) =>
+					isTemporaryElement( slugPrefix, element, index )
+				)
+			) {
 				const newElements = elementsReference.current.filter(
-					( { slug } ) => slug
+					( element, index ) =>
+						! isTemporaryElement( slugPrefix, element, index )
 				);
 				onChange( newElements.length ? newElements : undefined );
 			}
@@ -169,7 +199,7 @@ function PaletteEditListView( {
 	}, [] );
 	return (
 		<VStack spacing={ 3 }>
-			<ItemGroup isBordered isSeparated>
+			<ItemGroup isRounded>
 				{ elements.map( ( element, index ) => (
 					<Option
 						isGradient={ isGradient }
@@ -272,19 +302,19 @@ export default function PaletteEdit( {
 									: __( 'Add color' )
 							}
 							onClick={ () => {
-								const tempOptionName = sprintf(
-									/* translators: %s: is a temporary id for a custom color */
-									__( 'Color %s ' ),
-									elementsLength + 1
+								const tempOptionName = getNameForPosition(
+									elementsLength
 								);
 								onChange( [
 									...elements,
 									{
 										...( isGradient
 											? { gradient: DEFAULT_GRADIENT }
-											: { color: '#000' } ),
+											: { color: DEFAULT_COLOR } ),
 										name: tempOptionName,
-										slug: '',
+										slug:
+											slugPrefix +
+											kebabCase( tempOptionName ),
 									},
 								] );
 								setIsEditing( true );
@@ -293,71 +323,81 @@ export default function PaletteEdit( {
 						/>
 					) }
 
-					{ hasElements && ( canReset || ! canOnlyChangeValues ) && (
-						<DropdownMenu
-							icon={ moreVertical }
-							label={
-								isGradient
-									? __( 'Gradient options' )
-									: __( 'Color options' )
-							}
-							toggleProps={ {
-								isSmall: true,
-							} }
-						>
-							{ ( { onClose } ) => (
-								<>
-									<NavigableMenu role="menu">
-										<Button
-											variant="tertiary"
-											disabled={ isEditing }
-											onClick={ () => {
-												setIsEditing( true );
-												onClose();
-											} }
-											className="components-palette-edit__menu-button"
-										>
-											{ __( 'Edit custom colors' ) }
-										</Button>
-										{ ! canOnlyChangeValues && (
-											<Button
-												variant="tertiary"
-												onClick={ () => {
-													setEditingElement( null );
-													setIsEditing( false );
-													onChange();
-													onClose();
-												} }
-												className="components-palette-edit__menu-button"
-											>
-												{ isGradient
-													? __(
-															'Remove all gradients'
-													  )
-													: __(
-															'Remove all colors'
-													  ) }
-											</Button>
-										) }
-										{ canReset && (
-											<Button
-												variant="tertiary"
-												onClick={ () => {
-													setEditingElement( null );
-													onChange();
-													onClose();
-												} }
-											>
-												{ isGradient
-													? __( 'Reset gradient' )
-													: __( 'Reset colors' ) }
-											</Button>
-										) }
-									</NavigableMenu>
-								</>
-							) }
-						</DropdownMenu>
-					) }
+					{ hasElements &&
+						( ! isEditing ||
+							! canOnlyChangeValues ||
+							canReset ) && (
+							<DropdownMenu
+								icon={ moreVertical }
+								label={
+									isGradient
+										? __( 'Gradient options' )
+										: __( 'Color options' )
+								}
+								toggleProps={ {
+									isSmall: true,
+								} }
+							>
+								{ ( { onClose } ) => (
+									<>
+										<NavigableMenu role="menu">
+											{ ! isEditing && (
+												<Button
+													variant="tertiary"
+													onClick={ () => {
+														setIsEditing( true );
+														onClose();
+													} }
+													className="components-palette-edit__menu-button"
+												>
+													{ isGradient
+														? __( 'Edit gradients' )
+														: __( 'Edit colors' ) }
+												</Button>
+											) }
+											{ ! canOnlyChangeValues && (
+												<Button
+													variant="tertiary"
+													onClick={ () => {
+														setEditingElement(
+															null
+														);
+														setIsEditing( false );
+														onChange();
+														onClose();
+													} }
+													className="components-palette-edit__menu-button"
+												>
+													{ isGradient
+														? __(
+																'Remove all gradients'
+														  )
+														: __(
+																'Remove all colors'
+														  ) }
+												</Button>
+											) }
+											{ canReset && (
+												<Button
+													variant="tertiary"
+													onClick={ () => {
+														setEditingElement(
+															null
+														);
+														onChange();
+														onClose();
+													} }
+												>
+													{ isGradient
+														? __( 'Reset gradient' )
+														: __( 'Reset colors' ) }
+												</Button>
+											) }
+										</NavigableMenu>
+									</>
+								) }
+							</DropdownMenu>
+						) }
 				</PaletteActionsContainer>
 			</PaletteHStackHeader>
 			{ hasElements && (

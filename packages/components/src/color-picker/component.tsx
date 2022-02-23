@@ -1,15 +1,14 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import { Ref, useCallback } from 'react';
+import type { Ref } from 'react';
 import { colord, extend, Colord } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
+import { useCallback, useState, useMemo } from '@wordpress/element';
 import { settings } from '@wordpress/icons';
 import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -74,7 +73,7 @@ const ColorPicker = (
 	} );
 
 	const safeColordColor = useMemo( () => {
-		return colord( color );
+		return colord( color || '' );
 	}, [ color ] );
 
 	const debouncedSetColor = useDebounce( setColor );

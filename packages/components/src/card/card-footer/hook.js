@@ -38,7 +38,7 @@ export function useCardFooter( props ) {
 				'components-card__footer',
 				className
 			),
-		[ className, isBorderless, isShady, size ]
+		[ className, cx, isBorderless, isShady, size ]
 	);
 
 	return {

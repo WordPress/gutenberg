@@ -59,7 +59,7 @@ registerBlockType( 'myplugin/template', {
 } );
 ```
 
-See the [Meta Block Tutorial](/docs/how-to-guides/metabox/meta-block-5-finishing.md) for a full example of a template in use.
+See the [Meta Block Tutorial](/docs/how-to-guides/metabox.md#step-4-finishing-touches) for a full example of a template in use.
 
 ## Block Attributes
 

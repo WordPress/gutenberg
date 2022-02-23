@@ -132,7 +132,7 @@ function gutenberg_edit_site_init( $hook ) {
 	$current_screen->is_block_editor( true );
 
 	$site_editor_context     = new WP_Block_Editor_Context();
-	$settings                = gutenberg_get_block_editor_settings( $custom_settings, $site_editor_context );
+	$settings                = get_block_editor_settings( $custom_settings, $site_editor_context );
 	$active_global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
 	$active_theme            = wp_get_theme()->get_stylesheet();
 	gutenberg_initialize_editor(
@@ -221,6 +221,16 @@ function register_site_editor_homepage_settings() {
 			'show_in_rest' => true,
 			'type'         => 'number',
 			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
+		)
+	);
+
+	register_setting(
+		'reading',
+		'page_for_posts',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'number',
+			'description'  => __( 'The ID of the page that should display the latest posts', 'gutenberg' ),
 		)
 	);
 }

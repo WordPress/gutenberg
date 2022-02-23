@@ -30,7 +30,7 @@ export default function PostExcerptEditor( {
 	isSelected,
 	context: { postId, postType, queryId },
 } ) {
-	const isDescendentOfQueryLoop = !! queryId;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 	const [
@@ -96,6 +96,7 @@ export default function PostExcerptEditor( {
 				( isSelected ? '' : __( 'No post excerpt found' ) )
 			}
 			onChange={ setExcerpt }
+			tagName="p"
 		/>
 	) : (
 		( renderedExcerpt && (
