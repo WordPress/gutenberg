@@ -1,0 +1,7 @@
+before_install:
+    - echo 'Installing Javascript dependencies'
+    - pushd packages/react-native-bridge/android && ./gradlew -p publish-android-dependencies/android-npm npmInstall && popd
+
+install:
+    - echo 'Publishing Android dependencies'
+    - pushd packages/react-native-bridge/android && ./gradlew -p publish-android-dependencies install && popd
