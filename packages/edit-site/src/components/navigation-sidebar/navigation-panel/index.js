@@ -50,7 +50,7 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 
 			return {
 				siteTitle: siteData.name,
-				homeTemplate: getSettings().__experimentalHomeTemplate,
+				homeTemplate: getSettings().__unstableHomeTemplate,
 				isNavigationOpen: isNavigationOpened(),
 			};
 		},
