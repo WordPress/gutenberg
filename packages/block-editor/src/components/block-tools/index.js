@@ -10,6 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { DELETE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -19,17 +20,6 @@ import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import { usePopoverScroll } from './use-popover-scroll';
-import { getBlockNode } from '../../utils/dom';
-
-function isSimpleContentEditable( node ) {
-	return (
-		node.getAttribute( 'contenteditable' ) === 'true' &&
-		( ! node.firstElementChild ||
-			node.ownerDocument.defaultView.getComputedStyle(
-				node.firstElementChild
-			).display === 'inline' )
-	);
-}
 
 /**
  * Renders block tools (the block toolbar, select/navigation mode toolbar, the
@@ -51,11 +41,9 @@ export default function BlockTools( {
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const {
-		getSelectedBlockClientIds,
-		getBlockRootClientId,
-		getSelectionStart,
-	} = useSelect( blockEditorStore );
+	const { getSelectedBlockClientIds, getBlockRootClientId } = useSelect(
+		blockEditorStore
+	);
 	const {
 		duplicateBlocks,
 		removeBlocks,
@@ -111,28 +99,9 @@ export default function BlockTools( {
 				return;
 			}
 
-			const { ownerDocument } = event.target;
-			const { defaultView } = ownerDocument;
-			const { anchorNode, focusNode } = defaultView.getSelection();
-			const blockA = getBlockNode( anchorNode );
-			const blockB = getBlockNode( focusNode );
-
+			const isForward = event.keyCode === DELETE;
+			deleteSelection( isForward );
 			event.preventDefault();
-
-			const selectionStart = getSelectionStart();
-
-			// To do: find other way to check if blocks are mergeable.
-			if (
-				isSimpleContentEditable( blockA ) &&
-				isSimpleContentEditable( blockB ) &&
-				blockA !== blockB &&
-				selectionStart.attributeKey
-			) {
-				deleteSelection();
-				return;
-			}
-
-			removeBlocks( clientIds );
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
 			if ( clientIds.length > 1 ) {
 				event.preventDefault();

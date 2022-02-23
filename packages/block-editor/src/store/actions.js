@@ -673,59 +673,81 @@ function mapRichTextSettings( attributeDefinition ) {
 
 /**
  * Delete the current selection.
+ *
+ * @param {boolean} isForward
  */
-export const deleteSelection = () => ( { registry, select, dispatch } ) => {
-	const selectionStart = select.getSelectionStart();
-	const selectionEnd = select.getSelectionEnd();
+export const deleteSelection = ( isForward ) => ( {
+	registry,
+	select,
+	dispatch,
+} ) => {
+	const selectionAnchor = select.getSelectionStart();
+	const selectionFocus = select.getSelectionEnd();
 
-	// Abort if the selection is contained in one block.
-	if ( selectionStart.clientId === selectionEnd.clientId ) return;
+	if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
 
-	// Abort if the blocks are selected as a whole.
-	if ( ! selectionStart.attributeKey || ! selectionEnd.attributeKey ) return;
-
-	const selectedBlockClientIds = select.getSelectedBlockClientIds();
-	const clientIdA = first( selectedBlockClientIds );
-	const clientIdB = last( selectedBlockClientIds );
-	let selectionA, selectionB;
-
-	if ( selectionStart.clientId === clientIdA ) {
-		selectionA = selectionStart;
-	} else if ( selectionStart.clientId === clientIdB ) {
-		selectionB = selectionStart;
-	}
-
-	if ( selectionEnd.clientId === clientIdA ) {
-		selectionA = selectionEnd;
-	} else if ( selectionEnd.clientId === clientIdB ) {
-		selectionB = selectionEnd;
-	}
-
-	// Abort if the selection doesn't match with blocks to merge.
-	if ( ! selectionA || ! selectionB ) {
+	// Remove the blocks if the whole blocks are selected.
+	if ( ! selectionAnchor.attributeKey || ! selectionFocus.attributeKey ) {
+		removeBlocks( select.getSelectedBlockClientIds() );
 		return;
 	}
 
-	const blockA = select.getBlock( clientIdA );
-	const blockAType = getBlockType( blockA.name );
-	const blockB = select.getBlock( clientIdB );
-	const blockBType = getBlockType( blockB.name );
+	if (
+		typeof selectionAnchor.offset === 'undefined' ||
+		typeof selectionFocus.offset === 'undefined'
+	)
+		return;
 
-	// A robust way to retain selection position through various transforms
-	// is to insert a special character at the position and then recover it.
-	const START_OF_SELECTED_AREA = '\u0086';
+	const anchorRootClientId = select.getBlockRootClientId(
+		selectionAnchor.clientId
+	);
+	const focusRootClientId = select.getBlockRootClientId(
+		selectionFocus.clientId
+	);
+
+	// It's not mergeable if the selection doesn't start and end in the same
+	// block list. Maybe in the future it should be allowed.
+	if ( anchorRootClientId !== focusRootClientId ) {
+		return;
+	}
+
+	const blockOrder = select.getBlockOrder( anchorRootClientId );
+	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
+	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+
+	// Reassign selection start and end based on order.
+	let selectionStart, selectionEnd;
+
+	if ( anchorIndex > focusIndex ) {
+		selectionStart = selectionFocus;
+		selectionEnd = selectionAnchor;
+	} else {
+		selectionStart = selectionAnchor;
+		selectionEnd = selectionFocus;
+	}
+
+	const selectionA = isForward ? selectionEnd : selectionStart;
+	const selectionB = isForward ? selectionStart : selectionEnd;
+
+	const blockA = select.getBlock( selectionA.clientId );
+	const blockAType = getBlockType( blockA.name );
+
+	if ( ! blockAType.merge ) return;
+
+	const blockB = select.getBlock( selectionB.clientId );
+	const blockBType = getBlockType( blockB.name );
 
 	// Clone the blocks so we don't insert the character in a "live" block.
 	const cloneA = cloneBlock( blockA );
 	const cloneB = cloneBlock( blockB );
 
+	const htmlA = cloneA.attributes[ selectionA.attributeKey ];
+	const htmlB = cloneB.attributes[ selectionB.attributeKey ];
+
 	const attributeDefinitionA =
 		blockAType.attributes[ selectionA.attributeKey ];
 	const attributeDefinitionB =
 		blockBType.attributes[ selectionB.attributeKey ];
-
-	const htmlA = cloneA.attributes[ selectionA.attributeKey ];
-	const htmlB = cloneB.attributes[ selectionB.attributeKey ];
 
 	let valueA = create( {
 		html: htmlA,
@@ -735,6 +757,10 @@ export const deleteSelection = () => ( { registry, select, dispatch } ) => {
 		html: htmlB,
 		...mapRichTextSettings( attributeDefinitionB ),
 	} );
+
+	// A robust way to retain selection position through various transforms
+	// is to insert a special character at the position and then recover it.
+	const START_OF_SELECTED_AREA = '\u0086';
 
 	valueA = insert( valueA, '', selectionA.offset, valueA.text.length );
 	valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
@@ -785,6 +811,8 @@ export const deleteSelection = () => ( { registry, select, dispatch } ) => {
 
 	updatedAttributes[ newAttributeKey ] = newHtml;
 
+	const selectedBlockClientIds = select.getSelectedBlockClientIds();
+
 	registry.batch( () => {
 		dispatch.selectionChange(
 			blockA.clientId,
@@ -793,11 +821,8 @@ export const deleteSelection = () => ( { registry, select, dispatch } ) => {
 			newOffset
 		);
 
-		if ( selectedBlockClientIds.length > 2 )
-			dispatch.removeBlocks( selectedBlockClientIds.slice( 1, -1 ) );
-
 		dispatch.replaceBlocks(
-			[ blockA.clientId, blockB.clientId ],
+			selectedBlockClientIds,
 			[
 				{
 					...blockA,
@@ -840,17 +865,7 @@ export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
 
 	const blockB = select.getBlock( clientIdB );
 	const blockBType = getBlockType( blockB.name );
-
-	// A robust way to retain selection position through various transforms
-	// is to insert a special character at the position and then recover it.
-	const START_OF_SELECTED_AREA = '\u0086';
-
-	// Clone the blocks so we don't insert the character in a "live" block.
-	const cloneA = cloneBlock( blockA );
-	const cloneB = cloneBlock( blockB );
-
-	const selectionStart = select.getSelectionStart();
-	const { clientId, attributeKey, offset } = selectionStart;
+	const { clientId, attributeKey, offset } = select.getSelectionStart();
 	const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
 	const attributeDefinition = selectedBlockType.attributes[ attributeKey ];
 	const canRestoreTextSelection =
@@ -874,6 +889,14 @@ export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
 			);
 		}
 	}
+
+	// A robust way to retain selection position through various transforms
+	// is to insert a special character at the position and then recover it.
+	const START_OF_SELECTED_AREA = '\u0086';
+
+	// Clone the blocks so we don't insert the character in a "live" block.
+	const cloneA = cloneBlock( blockA );
+	const cloneB = cloneBlock( blockB );
 
 	if ( canRestoreTextSelection ) {
 		const selectedBlock = clientId === clientIdA ? cloneA : cloneB;

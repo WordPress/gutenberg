@@ -1114,6 +1114,10 @@ _Returns_
 
 Delete the current selection.
 
+_Parameters_
+
+-   _isForward_ `boolean`:
+
 ### duplicateBlocks
 
 Action that duplicates a list of blocks.
