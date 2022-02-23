@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 12.6.1 =
+
+### Bug Fixes
+
+**Block Editor**
+- Fix an issue where content copied from certain editors (like MS Word) would paste as an image rather than the actual content. ([38992](https://github.com/WordPress/gutenberg/pull/38992))
+
+
 = 12.7.0-rc.1 =
 
 
