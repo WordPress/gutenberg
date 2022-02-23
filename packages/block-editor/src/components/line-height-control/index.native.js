@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+// Is this even used? Shouldn't this named import be `__experimentalUnitControl` ?
 import { UnitControl } from '@wordpress/components';
 /**
  * Internal dependencies
@@ -20,7 +21,7 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 			step={ STEP }
 			value={ value }
 			onChange={ onChange }
-			units={ false }
+			units={ [] }
 		/>
 	);
 }
