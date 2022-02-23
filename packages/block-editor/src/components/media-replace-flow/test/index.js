@@ -2,74 +2,46 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import { render, unmountComponentAtNode } from 'react-dom';
-import { act } from 'react-dom/test-utils';
-import { fireEvent } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
-import { registerCoreBlocks } from '@wordpress/block-library';
+import { render, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import MediaReplaceFlow from '../';
 
-let container = null;
-
-beforeAll( () => {
-	registerCoreBlocks();
-} );
-
-beforeEach( async () => {
-	// setup a DOM element as a render target
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
-
-afterEach( async () => {
-	// cleanup on exiting
-	unmountComponentAtNode( container );
-	container.remove();
-	container = null;
-} );
-
-function getMediaReplaceButton() {
-	return container.querySelector( 'button[aria-expanded="false"]' );
-}
-
 function setUpMediaReplaceFlow() {
-	act( () => {
-		render(
-			<MediaReplaceFlow
-				mediaId={ 1 }
-				mediaURL={ 'https://example.media' }
-				allowedTypes={ [ 'png' ] }
-				accept="image/*"
-				onSelect={ noop }
-				onSelectURL={ noop }
-				onError={ noop }
-				onCloseModal={ noop }
-			/>,
-			container
-		);
-	} );
+	const { container } = render(
+		<MediaReplaceFlow
+			mediaId={ 1 }
+			mediaURL={ 'https://example.media' }
+			allowedTypes={ [ 'png' ] }
+			accept="image/*"
+			onSelect={ noop }
+			onSelectURL={ noop }
+			onError={ noop }
+			onCloseModal={ noop }
+		/>
+	);
+	return container;
 }
 
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
-		setUpMediaReplaceFlow();
+		const container = setUpMediaReplaceFlow();
 
-		const mediaReplaceButton = getMediaReplaceButton();
+		const mediaReplaceButton = container.querySelector(
+			'button[aria-expanded="false"]'
+		);
 
 		expect( mediaReplaceButton ).not.toBeNull();
 	} );
 
 	it( 'renders replace menu', () => {
-		setUpMediaReplaceFlow();
+		const container = setUpMediaReplaceFlow();
 
-		const mediaReplaceButton = getMediaReplaceButton();
+		const mediaReplaceButton = container.querySelector(
+			'button[aria-expanded="false"]'
+		);
 		mediaReplaceButton.click();
 
 		const uploadMenu = container.querySelector(
@@ -80,9 +52,11 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'displays media URL', () => {
-		setUpMediaReplaceFlow();
+		const container = setUpMediaReplaceFlow();
 
-		const mediaReplaceButton = getMediaReplaceButton();
+		const mediaReplaceButton = container.querySelector(
+			'button[aria-expanded="false"]'
+		);
 		mediaReplaceButton.click();
 
 		const mediaURL = container.querySelector( '.components-external-link' );
@@ -91,9 +65,11 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'edits media URL', () => {
-		setUpMediaReplaceFlow();
+		const container = setUpMediaReplaceFlow();
 
-		const mediaReplaceButton = getMediaReplaceButton();
+		const mediaReplaceButton = container.querySelector(
+			'button[aria-expanded="false"]'
+		);
 		mediaReplaceButton.click();
 
 		const editMediaURL = container.querySelector(
@@ -113,9 +89,8 @@ describe( 'General media replace flow', () => {
 		const saveMediaURLButton = container.querySelector(
 			'.block-editor-link-control__search-submit'
 		);
-		act( () => {
-			saveMediaURLButton.click();
-		} );
+
+		saveMediaURLButton.click();
 
 		const mediaURL = container.querySelector( '.components-external-link' );
 
