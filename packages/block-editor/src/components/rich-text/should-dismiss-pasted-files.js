@@ -21,12 +21,12 @@ export function shouldDismissPastedFiles( files, html /*, plainText */ ) {
 		files?.length === 1 &&
 		files[ 0 ].type.indexOf( 'image/' ) === 0
 	) {
-		// An <img> tag found in the HTML source suggests that the content
-		// being pasted revolves around an image. Sometimes there are other
-		// elements found, like <figure>, but we assume that the user's
+		// A single <img> tag found in the HTML source suggests that the
+		// content being pasted revolves around an image. Sometimes there are
+		// other elements found, like <figure>, but we assume that the user's
 		// intention is to paste the actual image file.
-		const IMAGE_TAG = /<\s*img\b/i;
-		return ! IMAGE_TAG.test( html );
+		const IMAGE_TAG = /<\s*img\b/ig;
+		return html.match( IMAGE_TAG )?.length !== 1;
 	}
 
 	return false;

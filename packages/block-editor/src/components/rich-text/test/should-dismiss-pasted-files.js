@@ -29,6 +29,24 @@ describe( 'shouldDismissPastedFiles', () => {
 			)
 		).toBe( false );
 	} );
+	it( 'should return false when the HTML contains a single image', () => {
+		expect(
+			shouldDismissPastedFiles(
+				[ mocks.pngImageFile ],
+				'<img src="path.png">',
+				''
+			)
+		).toBe( false );
+	} );
+	it( 'should return true when the HTML contains more than one image', () => {
+		expect(
+			shouldDismissPastedFiles(
+				[ mocks.pngImageFile ],
+				'<img src="1.png"><br><img src="2.png">',
+				''
+			)
+		).toBe( true );
+	} );
 
 	/*
 	 * REAL-WORLD SCENARIOS
