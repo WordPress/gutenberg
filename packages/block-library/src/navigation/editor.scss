@@ -613,3 +613,10 @@ body.editor-styles-wrapper
 .wp-block-navigation__toolbar-menu-selector.components-toolbar-group:empty {
 	display: none;
 }
+
+// Temp - hide adjacent <hr>s when Nav Menu Selector is empty.
+// TODO - extract state to common hook or parent component to avoid render of <hr>.
+.wp-block-navigation-placeholder__actions hr + hr {
+	display: none;
+}
+
