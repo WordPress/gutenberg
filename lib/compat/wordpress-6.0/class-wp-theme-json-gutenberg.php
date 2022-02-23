@@ -103,9 +103,9 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-inline-end: 2em; }';
-				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-inline-start: 2em; }';
-				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-inline-start: auto; margin-inline-end: auto; }';
+				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
+				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
+				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
 				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 				if ( $has_block_gap_support ) {

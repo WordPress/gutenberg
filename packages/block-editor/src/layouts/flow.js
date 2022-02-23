@@ -120,8 +120,8 @@ export default {
 						'> :where(:not(.alignleft):not(.alignright))'
 					) } {
 						max-width: ${ contentSize ?? wideSize };
-						margin-inline-start: auto !important;
-						margin-inline-end: auto !important;
+						margin-left: auto !important;
+						margin-right: auto !important;
 					}
 					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };
