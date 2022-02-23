@@ -34,3 +34,79 @@ allprojects {
         }
     }
 }
+
+def dependenciesToPublish = []
+
+// Xml helpers
+def hasSingleXmlNode(node, name) {
+    def nodeList = node.getAt(name)
+    return !nodeList.isEmpty()
+}
+
+def getSingleXmlNode(node, name) {
+    def nodeList = node.getAt(name)
+    if (nodeList.isEmpty()) {
+        throw new GradleException("No '$name' node found.")
+    }
+    return nodeList[0]
+}
+
+subprojects {
+    if (dependenciesToPublish.contains(name)) {
+        // Force that the dependency is built using the React Native version specified in package.json
+        configurations.all {
+            resolutionStrategy {
+                force "com.facebook.react:react-native:$rnVersion"
+            }
+        }
+
+        // Publish the dependency to S3
+        apply plugin: "maven-publish"
+        // apply plugin: "com.automattic.android.publish-to-s3"
+
+        project.afterEvaluate {
+            afterEvaluate {
+                publishing {
+                    publications {
+                        release(MavenPublication) {
+                            try {
+                                // By default we use the release build variant as the artifact
+                                from components.release
+                            } catch (exception) {
+                                println "'$name' - Release build variant not defined, trying to use default artifact."
+
+                                // If release build variant is not defined, we try to use the first default artifact
+                                def defaultArtifacts = configurations.default.artifacts
+                                if (defaultArtifacts.isEmpty()) {
+                                    throw new GradleException("'$name' - No default artifact found, aborting publishing!")
+                                }
+                                def defaultArtifact = defaultArtifacts.getFiles().getSingleFile()
+                                artifact defaultArtifact
+                            }
+
+                            groupId 'org.wordpress-mobile.gutenberg-mobile'
+                            artifactId project.name
+                            // version is set by 'publish-to-s3' plugin
+
+                            // Although the React Native version is forced for building, it's not reflected in the POM file.
+                            // For this reason, we need to directly modify the POM file.
+                            pom.withXml {
+                                if (hasSingleXmlNode(asNode(), 'dependencies')) {
+                                    def dependenciesNode = getSingleXmlNode(asNode(), 'dependencies')
+                                    dependenciesNode.each {
+                                        def artifactId = getSingleXmlNode(it, "artifactId")
+                                        def version = getSingleXmlNode(it, "version")
+                                        if (artifactId.text() == "react-native") {
+                                            println("Enforcing React Native version '$rnVersion' in POM file of '${project.name}'")
+                                            version.setValue(rnVersion)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
