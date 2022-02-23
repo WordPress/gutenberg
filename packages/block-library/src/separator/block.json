@@ -18,7 +18,10 @@
 		"color": {
 			"gradients": true,
 			"background": true,
-			"text": false
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
 		}
 	},
 	"styles": [
