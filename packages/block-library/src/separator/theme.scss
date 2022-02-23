@@ -1,14 +1,11 @@
+// Import styles for rendering the static content of deprecated block versions.
+@import "./deprecated.scss";
+
 .wp-block-separator {
 	border: none;
 	border-bottom: 2px solid currentColor;
 	margin-left: auto;
 	margin-right: auto;
-
-	// V2 of the block can set opacity via the backgroundColor
-	// alpha channel so reset the default opacity.
-	&.has-css-opacity {
-		opacity: 0.4;
-	}
 
 	&.has-alpha-channel-opacity {
 		opacity: initial;
