@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { shouldDismissPastedFiles } from '../should-dismiss-pasted-files';
+import { shouldDismissPastedFiles } from '../pasting';
 
 const mocks = {
 	pngImageFile: { type: 'image/png' },

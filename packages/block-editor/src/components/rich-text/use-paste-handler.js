@@ -20,7 +20,7 @@ import { isURL } from '@wordpress/url';
 import { filePasteHandler } from './file-paste-handler';
 import { addActiveFormats, isShortcode } from './utils';
 import { splitValue } from './split-value';
-import { shouldDismissPastedFiles } from './should-dismiss-pasted-files';
+import { shouldDismissPastedFiles } from '../../utils/pasting';
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
