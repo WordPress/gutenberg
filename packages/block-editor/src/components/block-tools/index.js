@@ -68,44 +68,30 @@ export default function BlockTools( {
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
+		const clientIds = getSelectedBlockClientIds();
+
+		if ( ! clientIds.length ) return;
+
 		if ( isMatch( 'core/block-editor/move-up', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				const rootClientId = getBlockRootClientId( first( clientIds ) );
-				moveBlocksUp( clientIds, rootClientId );
-			}
+			event.preventDefault();
+			const rootClientId = getBlockRootClientId( first( clientIds ) );
+			moveBlocksUp( clientIds, rootClientId );
 		} else if ( isMatch( 'core/block-editor/move-down', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				const rootClientId = getBlockRootClientId( first( clientIds ) );
-				moveBlocksDown( clientIds, rootClientId );
-			}
+			event.preventDefault();
+			const rootClientId = getBlockRootClientId( first( clientIds ) );
+			moveBlocksDown( clientIds, rootClientId );
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				duplicateBlocks( clientIds );
-			}
+			event.preventDefault();
+			duplicateBlocks( clientIds );
 		} else if ( isMatch( 'core/block-editor/remove', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				removeBlocks( clientIds );
-			}
+			event.preventDefault();
+			removeBlocks( clientIds );
 		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				insertAfterBlock( last( clientIds ) );
-			}
+			event.preventDefault();
+			insertAfterBlock( last( clientIds ) );
 		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				insertBeforeBlock( first( clientIds ) );
-			}
+			event.preventDefault();
+			insertBeforeBlock( first( clientIds ) );
 		} else if (
 			isMatch( 'core/block-editor/delete-multi-selection', event )
 		) {
@@ -120,8 +106,6 @@ export default function BlockTools( {
 			) {
 				return;
 			}
-
-			const clientIds = getSelectedBlockClientIds();
 
 			if ( clientIds.length < 2 ) {
 				return;
@@ -154,7 +138,6 @@ export default function BlockTools( {
 
 			removeBlocks( clientIds );
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length > 1 ) {
 				event.preventDefault();
 				clearSelectedBlock();
@@ -163,6 +146,12 @@ export default function BlockTools( {
 					.removeAllRanges();
 			}
 		}
+
+		if ( clientIds.length === 1 ) {
+			return;
+		}
+
+		event.preventDefault();
 	}
 
 	return (
