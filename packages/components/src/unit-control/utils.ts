@@ -187,7 +187,7 @@ export function parseQuantityAndUnitFromRawValue(
 	let trimmedValue;
 	let valueToReturn;
 
-	if ( typeof rawValue !== 'undefined' ) {
+	if ( typeof rawValue !== 'undefined' || rawValue === null ) {
 		trimmedValue = `${ rawValue }`.trim();
 		const parsedQuantity = parseFloat( trimmedValue );
 		valueToReturn =
