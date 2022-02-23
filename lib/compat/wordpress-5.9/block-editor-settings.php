@@ -6,13 +6,13 @@
  */
 
 /**
- * Adds the necessary settings for the Global Styles client UI.
+ * Adds styles and __experimentalFeatures to the block editor settings.
  *
  * @param array $settings Existing block editor settings.
  *
  * @return array New block editor settings.
  */
-function gutenberg_experimental_global_styles_settings( $settings ) {
+function gutenberg_get_block_editor_settings( $settings ) {
 	// Set what is the context for this data request.
 	$context = 'other';
 	if (
@@ -143,4 +143,4 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	return $settings;
 }
 
-add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
+add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', PHP_INT_MAX );
