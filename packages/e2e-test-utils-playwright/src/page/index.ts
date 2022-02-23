@@ -8,6 +8,8 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
  */
 import { canvas } from './canvas';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
+import { clickOnCloseModalButton } from './click-on-close-modal-button';
+import { clickOnMoreMenuItem } from './click-on-more-menu-item';
 import { createNewPost } from './create-new-post';
 import { getCurrentUser } from './get-current-user';
 import { getPageError } from './get-page-error';
@@ -25,6 +27,7 @@ import { loginUser } from './login-user';
 import { showBlockToolbar } from './show-block-toolbar';
 import { switchUserToAdmin } from './switch-user-to-admin';
 import { switchUserToTest } from './switch-user-to-test';
+import { toggleMoreMenu } from './toggle-more-menu';
 import { visitAdminPage } from './visit-admin-page';
 import { wpDataSelect } from './wp-data-select';
 
@@ -41,8 +44,10 @@ class PageUtils {
 
 	canvas = canvas;
 	clickBlockToolbarButton = clickBlockToolbarButton;
-	focusSelectedBlock = focusSelectedBlock;
+	clickOnCloseModalButton = clickOnCloseModalButton;
+	clickOnMoreMenuItem = clickOnMoreMenuItem;
 	createNewPost = createNewPost;
+	focusSelectedBlock = focusSelectedBlock;
 	getCurrentUser = getCurrentUser;
 	getPageError = getPageError;
 	insertBlock = insertBlock;
@@ -55,6 +60,7 @@ class PageUtils {
 	switchUserToAdmin = switchUserToAdmin;
 	switchUserToTest = switchUserToTest;
 	toggleGlobalBlockInserter = toggleGlobalBlockInserter;
+	toggleMoreMenu = toggleMoreMenu;
 	visitAdminPage = visitAdminPage;
 	waitForInserterCloseAndContentFocus = waitForInserterCloseAndContentFocus;
 	wpDataSelect = wpDataSelect;
