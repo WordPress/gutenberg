@@ -240,146 +240,49 @@ type EntityKeyName<
 	}
 > = 'key' extends keyof E ? E[ 'key' ] : 'id';
 
+type DeclaredEntity< K extends string, N extends string, RecordType > = {
+	kind: K;
+	name: N;
+	recordType: RecordType;
+	keyType: EntityKeyName< K, N > extends keyof RecordType
+		? RecordType[ EntityKeyName< K, N > ]
+		: never;
+	defaultContext: DefaultEntityContext< K, N >;
+};
+type APIEntity<
+	K extends string,
+	N extends string,
+	RecordType,
+	KeyName = 'id',
+	C = 'edit'
+> = {
+	kind: K;
+	name: N;
+	recordType: RecordType;
+	keyType: KeyName extends keyof RecordType ? RecordType[ KeyName ] : never;
+	defaultContext: C;
+};
+
 export type EntityTypeUnion< C extends Context = any > =
-	| {
-			kind: 'root';
-			name: 'site';
-			recordType: Settings< C >;
-			keyType: never;
-			defaultContext: DefaultEntityContext< 'root', 'site' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'postType';
-			recordType: Type< C >;
-			keyType: Type< C >[ EntityKeyName< 'root', 'postType' > ];
-			defaultContext: DefaultEntityContext< 'root', 'site' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'media';
-			recordType: Attachment< C >;
-			keyType: Attachment< C >[ EntityKeyName< 'root', 'media' > ];
-			defaultContext: DefaultEntityContext< 'root', 'media' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'taxonomy';
-			recordType: Taxonomy< C >;
-			keyType: Taxonomy< C >[ EntityKeyName< 'root', 'taxonomy' > ];
-			defaultContext: DefaultEntityContext< 'root', 'taxonomy' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'sidebar';
-			recordType: Sidebar< C >;
-			keyType: Sidebar< C >[ EntityKeyName< 'root', 'sidebar' > ];
-			defaultContext: DefaultEntityContext< 'root', 'sidebar' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'widget';
-			recordType: Widget< C >;
-			keyType: Widget< C >[ EntityKeyName< 'root', 'widget' > ];
-			defaultContext: DefaultEntityContext< 'root', 'widget' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'widgetType';
-			recordType: WidgetType< C >;
-			keyType: WidgetType< C >[ EntityKeyName< 'root', 'widgetType' > ];
-			defaultContext: DefaultEntityContext< 'root', 'widgetType' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'user';
-			recordType: User< C >;
-			keyType: User< C >[ EntityKeyName< 'root', 'user' > ];
-			defaultContext: DefaultEntityContext< 'root', 'user' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'comment';
-			recordType: Comment< C >;
-			keyType: Attachment< C >[ EntityKeyName< 'root', 'comment' > ];
-			defaultContext: DefaultEntityContext< 'root', 'comment' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'menu';
-			recordType: NavMenu< C >;
-			keyType: NavMenu< C >[ EntityKeyName< 'root', 'menu' > ];
-			defaultContext: DefaultEntityContext< 'root', 'menu' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'menuItem';
-			recordType: NavMenuItem< C >;
-			keyType: NavMenuItem< C >[ EntityKeyName< 'root', 'menuItem' > ];
-			defaultContext: DefaultEntityContext< 'root', 'menuItem' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'menuLocation';
-			recordType: MenuLocation< C >;
-			keyType: MenuLocation< C >[ EntityKeyName<
-				'root',
-				'menuLocation'
-			> ];
-			defaultContext: DefaultEntityContext< 'root', 'menuLocation' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'navigationArea';
-			recordType: NavigationArea< C >;
-			keyType: NavigationArea< C >[ EntityKeyName<
-				'root',
-				'navigationArea'
-			> ];
-			defaultContext: DefaultEntityContext< 'root', 'navigationArea' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'theme';
-			recordType: Theme< C >;
-			keyType: Theme< C >[ EntityKeyName< 'root', 'theme' > ];
-			defaultContext: DefaultEntityContext< 'root', 'theme' >;
-	  }
-	| {
-			kind: 'root';
-			name: 'plugin';
-			recordType: Plugin< C >;
-			keyType: Plugin< C >[ EntityKeyName< 'root', 'plugin' > ];
-			defaultContext: DefaultEntityContext< 'root', 'plugin' >;
-	  }
-	| {
-			kind: 'postType';
-			name: 'post';
-			recordType: Post< C >;
-			keyType: Post< C >[ 'id' ];
-			defaultContext: 'edit';
-	  }
-	| {
-			kind: 'postType';
-			name: 'page';
-			recordType: Page< C >;
-			keyType: Page< C >[ 'id' ];
-			defaultContext: 'edit';
-	  }
-	| {
-			kind: 'postType';
-			name: 'wp_template';
-			recordType: WpTemplate< C >;
-			keyType: WpTemplate< C >[ 'id' ];
-			defaultContext: 'edit';
-	  }
-	| {
-			kind: 'postType';
-			name: 'wp_template_part';
-			recordType: WpTemplatePart< C >;
-			keyType: WpTemplatePart< C >[ 'id' ];
-			defaultContext: 'edit';
-	  };
+	| DeclaredEntity< 'root', 'site', Settings< C > >
+	| DeclaredEntity< 'root', 'postType', Type< C > >
+	| DeclaredEntity< 'root', 'media', Attachment< C > >
+	| DeclaredEntity< 'root', 'taxonomy', Taxonomy< C > >
+	| DeclaredEntity< 'root', 'sidebar', Sidebar< C > >
+	| DeclaredEntity< 'root', 'widget', Widget< C > >
+	| DeclaredEntity< 'root', 'widgetType', WidgetType< C > >
+	| DeclaredEntity< 'root', 'user', User< C > >
+	| DeclaredEntity< 'root', 'comment', Comment< C > >
+	| DeclaredEntity< 'root', 'menu', NavMenu< C > >
+	| DeclaredEntity< 'root', 'menuItem', NavMenuItem< C > >
+	| DeclaredEntity< 'root', 'menuLocation', MenuLocation< C > >
+	| DeclaredEntity< 'root', 'navigationArea', NavigationArea< C > >
+	| DeclaredEntity< 'root', 'theme', Theme< C > >
+	| DeclaredEntity< 'root', 'plugin', Plugin< C > >
+	| APIEntity< 'postType', 'post', Post< C > >
+	| APIEntity< 'postType', 'page', Page< C > >
+	| APIEntity< 'postType', 'wp_template', WpTemplate< C > >
+	| APIEntity< 'postType', 'wp_template_part', WpTemplatePart< C > >;
 
 export type Kind = EntityTypeUnion[ 'kind' ];
 export type Name< K extends Kind > = ( EntityTypeUnion & {
