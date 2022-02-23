@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "7.0.0-prerelease",
+	"version": "7.0.1-next.f435e9e01b.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
