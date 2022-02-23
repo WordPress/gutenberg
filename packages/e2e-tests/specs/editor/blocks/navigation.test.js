@@ -144,7 +144,7 @@ async function populateNavWithOneItem() {
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
-const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select menu']`;
+const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select Menu']`;
 
 /**
  * Delete all items for the given REST resources using the REST API.
@@ -584,14 +584,17 @@ describe( 'Navigation', () => {
 		const markup =
 			'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
 		await page.keyboard.type( markup );
+
 		await clickButton( 'Exit code editor' );
-		const navBlock = await page.waitForSelector(
-			'nav[aria-label="Block: Navigation"]'
-		);
-		// Select the block to convert to a wp_navigation and publish.
-		// The select menu button shows up when saving is complete.
+
+		const navBlock = await waitForBlock( 'Navigation' );
+
+		// Select the block to convert to a wp_navigation
 		await navBlock.click();
-		await page.waitForSelector( 'button[aria-label="Select Menu"]' );
+
+		// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
+		await waitForBlock( 'Page List' );
+
 		await publishPost();
 
 		// Check that the wp_navigation post has the page list block.
@@ -624,17 +627,18 @@ describe( 'Navigation', () => {
 				'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
 			await page.keyboard.type( markup );
 			await clickButton( 'Exit code editor' );
-			const navBlock = await page.waitForSelector(
-				'nav[aria-label="Block: Navigation"]'
-			);
 
-			// Select the block to convert to a wp_navigation and publish.
-			// The select menu button shows up when saving is complete.
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Select the block to convert to a wp_navigation
 			await navBlock.click();
-			await page.waitForSelector( 'button[aria-label="Select Menu"]' );
+
+			// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
+			await waitForBlock( 'Page List' );
 
 			// Reset the nav block to create a new entity.
 			await resetNavBlockToInitialState();
+
 			const startEmptyButton = await page.waitForXPath(
 				START_EMPTY_XPATH
 			);
@@ -879,9 +883,10 @@ describe( 'Navigation', () => {
 
 			await insertBlock( 'Navigation' );
 
-			// Select the Navigation post created by the Admin early
+			// Select the Navigation post created by the Admin earlier
 			// in the test.
 			const navigationPostCreatedByAdminName = 'Navigation';
+
 			const dropdown = await page.waitForXPath( SELECT_MENU_XPATH );
 			await dropdown.click();
 			const theOption = await page.waitForXPath(
