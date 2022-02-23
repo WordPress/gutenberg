@@ -27,6 +27,7 @@
 		a {
 			border: 1px solid currentColor;
 			font-size: unset !important; // !important Needed to override the inline styles.
+			margin-right: 0;
 			padding: 1ch 2ch;
 			text-decoration: none !important; // !important needed to override generic post content link decoration.
 		}
