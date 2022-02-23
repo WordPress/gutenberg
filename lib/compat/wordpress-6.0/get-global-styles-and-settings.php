@@ -175,3 +175,26 @@ if ( ! function_exists( 'wp_get_global_styles_svg_filters' ) ) {
 		return $svgs;
 	}
 }
+
+if ( ! function_exists( '_wp_maybe_remove_duotone_filters' ) ) {
+	/**
+	 * Checks if the current page uses duotones,
+	 * and if it doesn't then it's safe to remove duotone styles.
+	 *
+	 * Hooks in `wp_head` and only applies to block themes.
+	 */
+	function _wp_maybe_remove_duotone_filters() {
+
+		// Bail if not a block theme.
+		global $template_html;
+		if ( ! $template_html ) {
+			return;
+		}
+
+		// If there are no duotones, remove the action from `wp_body_open`.
+		if ( false === strpos( 'wp-duotone-', $template_html ) ) {
+			remove_action( 'wp_body_open', 'wp_global_styles_render_svg_filters' );
+		}
+	}
+}
+add_action( 'wp_head', '_wp_maybe_remove_duotone_filters' );
