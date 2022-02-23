@@ -67,11 +67,13 @@ function mode( arr ) {
  */
 export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
 	const sides = normalizeSides( availableSides );
-	const parsedValues = sides.map( ( side ) =>
+	const parsedQuantitiesAndUnits = sides.map( ( side ) =>
 		parseQuantityAndUnitFromRawValue( values[ side ] )
 	);
-	const allValues = parsedValues.map( ( value ) => value[ 0 ] ?? '' );
-	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
+	const allValues = parsedQuantitiesAndUnits.map(
+		( value ) => value[ 0 ] ?? ''
+	);
+	const allUnits = parsedQuantitiesAndUnits.map( ( value ) => value[ 1 ] );
 
 	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
 		? allValues[ 0 ]
