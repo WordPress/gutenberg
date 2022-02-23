@@ -35,7 +35,10 @@ allprojects {
     }
 }
 
-def dependenciesToPublish = []
+def dependenciesToPublish = [
+        'react-native-gesture-handler',
+        'react-native-reanimated'
+]
 
 // Xml helpers
 def hasSingleXmlNode(node, name) {
