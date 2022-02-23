@@ -15,9 +15,8 @@ import {
 	getFontSizeObjectByValue,
 	FontSizePicker,
 } from '../components/font-sizes';
-import { shouldSkipSerialization } from './style';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
-import { cleanEmptyObject, transformStyles } from './utils';
+import { cleanEmptyObject, transformStyles, shouldSkipSerialization } from './utils';
 import useSetting from '../components/use-setting';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';

@@ -27,8 +27,7 @@ import {
 	hasBorderSupport,
 	removeBorderAttribute,
 } from './border';
-import { shouldSkipSerialization } from './style';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 
 // Defining empty array here instead of inline avoids unnecessary re-renders of
 // color control.

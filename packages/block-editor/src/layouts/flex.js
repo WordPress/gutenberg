@@ -19,7 +19,7 @@ import { appendSelectors } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import useSetting from '../components/use-setting';
 import { BlockControls, JustifyContentControl } from '../components';
-import { shouldSkipSerialization } from '../hooks/style';
+import { shouldSkipSerialization } from '../hooks/utils';
 
 // Used with the default, horizontal flex orientation.
 const justifyContentMap = {
