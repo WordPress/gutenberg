@@ -108,7 +108,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
 		$font_sizes_by_origin  = $settings['__experimentalFeatures']['typography']['fontSizes'];
 		$settings['fontSizes'] = isset( $font_sizes_by_origin['custom'] ) ?
-			$font_sizes_by_origin['user'] : (
+			$font_sizes_by_origin['custom'] : (
 				isset( $font_sizes_by_origin['theme'] ) ?
 					$font_sizes_by_origin['theme'] :
 					$font_sizes_by_origin['default']
@@ -133,6 +133,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
 		$settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
+		unset( $settings['__experimentalFeatures']['spacing']['units'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['padding'] ) ) {
 		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['padding'];
