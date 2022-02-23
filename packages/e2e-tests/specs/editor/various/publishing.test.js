@@ -35,11 +35,10 @@ describe( 'Publishing', () => {
 				await openPublishPanel();
 
 				expect(
-					await page.$eval(
-						'.editor-post-publish-button',
-						( element ) => element.getAttribute( 'aria-disabled' )
+					await page.$(
+						'.editor-post-publish-button[aria-disabled="true"]'
 					)
-				).toBe( 'true' );
+				).not.toBeNull();
 			} );
 
 			it( `disables the save shortcut when a ${ postType } is locked`, async () => {
@@ -57,7 +56,7 @@ describe( 'Publishing', () => {
 				expect( await page.$( '.editor-post-saved-state' ) ).toBeNull();
 				expect(
 					await page.$( '.editor-post-save-draft' )
-				).toBeTruthy();
+				).not.toBeNull();
 			} );
 		}
 	);
