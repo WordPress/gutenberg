@@ -29,9 +29,10 @@ export function getPasteEventData( { clipboardData } ) {
 		clipboardData
 	).filter( ( { type } ) => /^image\/(?:jpe?g|png|gif|webp)$/.test( type ) );
 
-	// Only process files if no HTML is present.
-	// A pasted file may have the URL as plain text.
-	if ( files.length && ! html ) {
+	if (
+		files.length &&
+		! shouldDismissPastedFiles( files, html, plainText )
+	) {
 		html = files
 			.map( ( file ) => `<img src="${ createBlobURL( file ) }">` )
 			.join( '' );
