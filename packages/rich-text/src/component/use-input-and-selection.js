@@ -132,7 +132,10 @@ export function useInputAndSelection( props ) {
 				onSelectionChange,
 			} = propsRef.current;
 
-			if ( ownerDocument.activeElement !== element ) {
+			if (
+				ownerDocument.activeElement !== element &&
+				ownerDocument.activeElement.contains( element )
+			) {
 				const selection = defaultView.getSelection();
 				const { anchorNode, focusNode } = selection;
 
