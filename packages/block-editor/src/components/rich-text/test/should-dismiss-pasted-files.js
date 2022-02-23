@@ -34,12 +34,22 @@ describe( 'shouldDismissPastedFiles', () => {
 	 * REAL-WORLD SCENARIOS
 	 */
 
-	it( 'should return false when pasting from Google Photos', () => {
+	it( 'should return false when pasting an image from Google Photos', () => {
 		expect(
 			shouldDismissPastedFiles(
 				[ mocks.pngImageFile ],
 				'<img src="https://lh3.googleusercontent.com/ab/SOMESTRING?authuser=0">',
 				'https://lh3.googleusercontent.com/ab/SOMESTRING?authuser=0'
+			)
+		).toBe( false );
+	} );
+
+	it( 'should return false when pasting an image from Apple Numbers', () => {
+		expect(
+			shouldDismissPastedFiles(
+				[ mocks.pngImageFile ],
+				'<figure><img src="blob:..."></figure>',
+				''
 			)
 		).toBe( false );
 	} );
@@ -52,15 +62,5 @@ describe( 'shouldDismissPastedFiles', () => {
 				'Some table text'
 			)
 		).toBe( true );
-	} );
-
-	it( 'should return false when pasting an image from Apple Numbers', () => {
-		expect(
-			shouldDismissPastedFiles(
-				[ mocks.pngImageFile ],
-				'<figure><img src="blob:..."></figure>',
-				''
-			)
-		).toBe( false );
 	} );
 } );

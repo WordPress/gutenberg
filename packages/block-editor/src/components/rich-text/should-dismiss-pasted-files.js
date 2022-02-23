@@ -26,9 +26,7 @@ export function shouldDismissPastedFiles( files, html /*, plainText */ ) {
 		// elements found, like <figure>, but we assume that the user's
 		// intention is to paste the actual image file.
 		const IMAGE_TAG = /<\s*img\b/i;
-		if ( ! IMAGE_TAG.test( html ) ) {
-			return true;
-		}
+		return ! IMAGE_TAG.test( html );
 	}
 
 	return false;

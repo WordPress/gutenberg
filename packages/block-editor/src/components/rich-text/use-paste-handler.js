@@ -125,7 +125,6 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
-			// FIXME: Why the shallow copy?
 			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
 			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
