@@ -688,7 +688,7 @@ export const deleteSelection = ( isForward ) => ( {
 
 	// Remove the blocks if the whole blocks are selected.
 	if ( ! selectionAnchor.attributeKey || ! selectionFocus.attributeKey ) {
-		removeBlocks( select.getSelectedBlockClientIds() );
+		dispatch.removeBlocks( select.getSelectedBlockClientIds() );
 		return;
 	}
 
@@ -850,10 +850,10 @@ export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
 	dispatch,
 } ) => {
 	const blocks = [ firstBlockClientId, secondBlockClientId ];
-	const [ clientIdA, clientIdB ] = blocks;
 
 	dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
+	const [ clientIdA, clientIdB ] = blocks;
 	const blockA = select.getBlock( clientIdA );
 	const blockAType = getBlockType( blockA.name );
 
