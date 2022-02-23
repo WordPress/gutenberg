@@ -10,6 +10,7 @@ import {
 	arePrePublishChecksEnabled,
 	setBrowserViewport,
 	openPublishPanel,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Publishing', () => {
@@ -51,9 +52,7 @@ describe( 'Publishing', () => {
 						.dispatch( 'core/editor' )
 						.lockPostSaving( 'futurelock' )
 				);
-
-				await page.keyboard.press( 'ControlLeft' );
-				await page.keyboard.press( 'KeyS' );
+				await pressKeyWithModifier( 'primary', 'S' );
 
 				expect( await page.$( '.editor-post-saved-state' ) ).toBeNull();
 				expect(
