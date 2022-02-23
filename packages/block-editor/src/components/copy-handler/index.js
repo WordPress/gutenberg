@@ -19,7 +19,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getPasteEventData } from '../../utils/get-paste-event-data';
+import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 
 export function useNotifyCopy() {
