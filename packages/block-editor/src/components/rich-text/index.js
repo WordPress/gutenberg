@@ -120,12 +120,9 @@ function RichTextWrapper(
 	const anchorRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const selector = ( select ) => {
-		const {
-			getSelectionStart,
-			getSelectionEnd,
-			isMultiSelecting,
-			hasMultiSelection,
-		} = select( blockEditorStore );
+		const { getSelectionStart, getSelectionEnd } = select(
+			blockEditorStore
+		);
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -143,15 +140,12 @@ function RichTextWrapper(
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			disabled: isMultiSelecting() || hasMultiSelection(),
 		};
 	};
 	// This selector must run on every render so the right selection state is
 	// retreived from the store on merge.
 	// To do: fix this somehow.
-	const { selectionStart, selectionEnd, isSelected, disabled } = useSelect(
-		selector
-	);
+	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
@@ -331,7 +325,7 @@ function RichTextWrapper(
 			<TagName
 				// Overridable props.
 				role="textbox"
-				aria-multiline={ true }
+				aria-multiline={ ! disableLineBreaks }
 				aria-label={ placeholder }
 				{ ...props }
 				{ ...autocompleteProps }
@@ -379,9 +373,8 @@ function RichTextWrapper(
 					anchorRef,
 					forwardedRef,
 				] ) }
-				// Do not set the attribute if disabled.
-				contentEditable={ disabled ? undefined : true }
-				suppressContentEditableWarning={ ! disabled }
+				contentEditable={ true }
+				suppressContentEditableWarning={ true }
 				className={ classnames(
 					'block-editor-rich-text__editable',
 					props.className,

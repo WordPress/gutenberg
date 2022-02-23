@@ -9,7 +9,7 @@ import os from 'os';
  * WordPress dependencies
  */
 import {
-	trashAllPosts,
+	deleteAllTemplates,
 	activateTheme,
 	visitSiteEditor,
 	clickOnMoreMenuItem,
@@ -31,8 +31,8 @@ async function waitForFileExists( filePath, timeout = 10000 ) {
 describe( 'Site Editor Templates Export', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 
 	afterAll( async () => {

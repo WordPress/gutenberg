@@ -681,7 +681,10 @@ async function fetchAllPullRequests( octokit, settings ) {
 function getChangelog( pullRequests ) {
 	let changelog = '## Changelog\n\n';
 
-	const groupedPullRequests = groupBy( pullRequests, getIssueType );
+	const groupedPullRequests = groupBy(
+		skipCreatedByBots( pullRequests ),
+		getIssueType
+	);
 
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
 
@@ -779,10 +782,6 @@ function sortFeatureGroups( featureGroups ) {
  */
 function getFirstTimeContributorPRs( pullRequests ) {
 	return pullRequests.filter( ( pr ) => {
-		if ( pr.user.type.toLowerCase() === 'bot' ) {
-			return false;
-		}
-
 		return pr.labels.find(
 			( { name } ) => name.toLowerCase() === 'first-time contributor'
 		);
@@ -797,7 +796,7 @@ function getFirstTimeContributorPRs( pullRequests ) {
  *
  * @return {string} The formatted markdown list of contributors and their PRs.
  */
-function getContributorMarkdownList( ftcPRs ) {
+function getContributorPropsMarkdownList( ftcPRs ) {
 	return ftcPRs.reduce( ( markdownList, pr ) => {
 		const title = getNormalizedTitle( pr.title, pr ) || '';
 
@@ -820,7 +819,7 @@ function getContributorMarkdownList( ftcPRs ) {
  * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
  */
 function sortByUsername( items ) {
-	return sortBy( items, ( item ) => item.user.login );
+	return sortBy( items, ( item ) => item.user.login.toLowerCase() );
 }
 
 /**
@@ -834,6 +833,58 @@ function getUniqueByUsername( items ) {
 }
 
 /**
+ * Excludes users who should not be included in the changelog.
+ * Typically this is "bot" users.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ * @return {IssuesListForRepoResponseItem[]} The list of filtered pull requests.
+ */
+function skipCreatedByBots( pullRequests ) {
+	return pullRequests.filter(
+		( pr ) => pr.user.type.toLowerCase() !== 'bot'
+	);
+}
+
+/**
+ * Produces the formatted markdown for the contributor props seciton.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted props section.
+ */
+function getContributorProps( pullRequests ) {
+	const contributorsList = flow( [
+		skipCreatedByBots,
+		getFirstTimeContributorPRs,
+		getUniqueByUsername,
+		sortByUsername,
+		getContributorPropsMarkdownList,
+	] )( pullRequests );
+
+	return (
+		'## First time contributors' +
+		'\n\n' +
+		'The following PRs were merged by first time contrbutors:' +
+		'\n\n' +
+		contributorsList
+	);
+}
+
+/**
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of first time contributor PRs.
+ * @return {string} The formatted markdown list of contributor usernames.
+ */
+function getContributorsMarkdownList( pullRequests ) {
+	return pullRequests
+		.reduce( ( markdownList = '', pr ) => {
+			markdownList += ` @${ pr.user.login }`;
+			return markdownList;
+		}, '' )
+		.trim();
+}
+
+/**
  * Produces the formatted markdown for the full time contributors section of
  * the changelog output.
  *
@@ -841,18 +892,19 @@ function getUniqueByUsername( items ) {
  *
  * @return {string} The formatted contributors section.
  */
-function getContributors( pullRequests ) {
+function getContributorsList( pullRequests ) {
 	const contributorsList = flow( [
-		getFirstTimeContributorPRs,
+		skipCreatedByBots,
 		getUniqueByUsername,
 		sortByUsername,
-		getContributorMarkdownList,
+		getContributorsMarkdownList,
 	] )( pullRequests );
 
 	return (
-		'## First time contributors' +
 		'\n\n' +
-		'The following PRs were merged by first time contrbutors:' +
+		'## Contributors' +
+		'\n\n' +
+		'The following contributors merged PRs in this release:' +
 		'\n\n' +
 		contributorsList
 	);
@@ -880,9 +932,14 @@ async function createChangelog( settings ) {
 		const pullRequests = await fetchAllPullRequests( octokit, settings );
 
 		const changelog = getChangelog( pullRequests );
-		const contributors = getContributors( pullRequests );
+		const contributorProps = getContributorProps( pullRequests );
+		const contributorsList = getContributorsList( pullRequests );
 
-		releaselog = releaselog.concat( changelog, contributors );
+		releaselog = releaselog.concat(
+			changelog,
+			contributorProps,
+			contributorsList
+		);
 	} catch ( error ) {
 		if ( error instanceof Error ) {
 			releaselog = formats.error( error.stack );
@@ -933,7 +990,9 @@ async function getReleaseChangelog( options ) {
 	getTypesByLabels,
 	getTypesByTitle,
 	getFormattedItemDescription,
-	getContributors,
+	getContributorProps,
+	getContributorsList,
 	getChangelog,
 	getUniqueByUsername,
+	skipCreatedByBots,
 };

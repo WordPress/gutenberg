@@ -65,22 +65,22 @@ export default function useNavigationMenu( ref ) {
 				),
 				navigationMenu,
 				navigationMenus,
-				canUserUpdateNavigationEntity: ref
+				canUserUpdateNavigationMenu: ref
 					? canUser( 'update', 'navigation', ref )
 					: undefined,
-				hasResolvedCanUserUpdateNavigationEntity: hasFinishedResolution(
+				hasResolvedCanUserUpdateNavigationMenu: hasFinishedResolution(
 					'canUser',
 					[ 'update', 'navigation', ref ]
 				),
-				canUserDeleteNavigationEntity: ref
+				canUserDeleteNavigationMenu: ref
 					? canUser( 'delete', 'navigation', ref )
 					: undefined,
-				hasResolvedCanUserDeleteNavigationEntity: hasFinishedResolution(
+				hasResolvedCanUserDeleteNavigationMenu: hasFinishedResolution(
 					'canUser',
 					[ 'delete', 'navigation', ref ]
 				),
-				canUserCreateNavigation: canUser( 'create', 'navigation' ),
-				hasResolvedCanUserCreateNavigation: hasFinishedResolution(
+				canUserCreateNavigationMenu: canUser( 'create', 'navigation' ),
+				hasResolvedCanUserCreateNavigationMenu: hasFinishedResolution(
 					'canUser',
 					[ 'create', 'navigation' ]
 				),

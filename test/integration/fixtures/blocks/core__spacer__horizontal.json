@@ -1,13 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/spacer",
 		"isValid": true,
 		"attributes": {
 			"height": "0px",
 			"width": "72px"
 		},
-		"innerBlocks": [],
-		"originalContent": "<div style=\"height:0px;width:72px\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>"
+		"innerBlocks": []
 	}
 ]

@@ -111,6 +111,8 @@ async function runWordPressReleaseBranchSyncStep(
  * @param {SemVer}      minimumVersionBump      Minimum version bump for the packages.
  * @param {ReleaseType} releaseType             Release type selected from CLI.
  * @param {string}      abortMessage            Abort Message.
+ *
+ * @return {?string}   The optional commit's hash when changelog files updated.
  */
 async function updatePackages(
 	gitWorkingDirectoryPath,
@@ -251,8 +253,14 @@ async function updatePackages(
 		true,
 		abortMessage
 	);
-	git.commit( gitWorkingDirectoryPath, 'Update changelog files', [ './*' ] );
+	const commitHash = await git.commit(
+		gitWorkingDirectoryPath,
+		'Update changelog files',
+		[ './*' ]
+	);
 	log( '>> Changelog files changes have been committed successfully.' );
+
+	return commitHash;
 }
 
 /**
@@ -283,6 +291,8 @@ async function runPushGitChangesStep(
  * @param {string}      gitWorkingDirectoryPath Git working directory path.
  * @param {SemVer}      minimumVersionBump      Minimum version bump for the packages.
  * @param {ReleaseType} releaseType             Release type selected from CLI.
+ *
+ * @return {?string}   The optional commit's hash when changelog files updated.
  */
 async function publishPackagesToNpm(
 	gitWorkingDirectoryPath,
@@ -298,9 +308,11 @@ async function publishPackagesToNpm(
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
-		const { stdout: sha } = await command( 'git rev-parse --short HEAD' );
+		const commitHash = await git.getLastCommitHash(
+			gitWorkingDirectoryPath
+		);
 		await command(
-			`npx lerna version pre${ minimumVersionBump } --preid next.${ sha } --no-private`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.${ commitHash } --no-private`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -336,6 +348,39 @@ async function publishPackagesToNpm(
 			stdio: 'inherit',
 		} );
 	}
+
+	return await git.getLastCommitHash( gitWorkingDirectoryPath );
+}
+
+/**
+ * Backports commits from the release branch to the `trunk` branch.
+ *
+ * @param {string}      gitWorkingDirectoryPath Git working directory path.
+ * @param {ReleaseType} releaseType             Release type selected from CLI.
+ * @param {string[]}    commits                 The list of commits to backport.
+ *
+ */
+async function backportCommitsToTrunk(
+	gitWorkingDirectoryPath,
+	releaseType,
+	commits
+) {
+	if (
+		! [ 'latest', 'bugfix' ].includes( releaseType ) ||
+		commits.length === 0
+	) {
+		return;
+	}
+
+	log( '>> Backporting commits.' );
+	await git.resetLocalBranchAgainstOrigin( gitWorkingDirectoryPath, 'trunk' );
+	for ( const commitHash of commits ) {
+		await git.cherrypickCommitIntoBranch(
+			gitWorkingDirectoryPath,
+			commitHash
+		);
+	}
+	await git.pushBranchToOrigin( gitWorkingDirectoryPath, 'trunk' );
 }
 
 /**
@@ -369,7 +414,7 @@ async function prepareForPackageRelease(
 		abortMessage
 	);
 
-	await updatePackages(
+	const commitHashChangelogUpdates = await updatePackages(
 		gitWorkingDirectoryPath,
 		minimumVersionBump,
 		releaseType,
@@ -382,10 +427,16 @@ async function prepareForPackageRelease(
 		`Aborting! Make sure to push changes applied to WordPress release branch "${ releaseBranch }" manually.`
 	);
 
-	await publishPackagesToNpm(
+	const commitHashNpmPublish = await publishPackagesToNpm(
 		gitWorkingDirectoryPath,
 		minimumVersionBump,
 		releaseType
+	);
+
+	await backportCommitsToTrunk(
+		gitWorkingDirectoryPath,
+		releaseType,
+		[ commitHashChangelogUpdates, commitHashNpmPublish ].filter( Boolean )
 	);
 
 	await runCleanLocalFoldersStep( temporaryFolders, 'Cleaning failed.' );
@@ -417,10 +468,7 @@ async function publishNpmLatestDistTag() {
 
 	log(
 		'\n>> 🎉 WordPress packages are now published!\n\n',
-		'Please remember to run `git cherry-pick` in the `trunk` branch for the newly created commits during the release with labels:\n',
-		' - Update changelog files (if exists)\n',
-		' - chore(release): publish\n\n',
-		'Finally, let also people know on WordPress Slack and celebrate together.'
+		'Let also people know on WordPress Slack and celebrate together.'
 	);
 }
 
@@ -439,15 +487,12 @@ async function publishNpmBugfixLatestDistTag() {
 	await prepareForPackageRelease(
 		'bugfix',
 		'patch',
-		'Before we proceed, can you confirm that all required changes have beed already cherry-picked to the release branch?'
+		'Before we proceed, can you confirm that all required changes have been already cherry-picked to the release branch?'
 	);
 
 	log(
 		'\n>> 🎉 WordPress packages are now published!\n\n',
-		'Please remember to run `git cherry-pick` in the `trunk` branch for the newly created commits during the release with labels:\n',
-		' - Update changelog files (if exists)\n',
-		' - chore(release): publish\n\n',
-		'Finally, let also people know on WordPress Slack and celebrate together.'
+		'Let also people know on WordPress Slack and celebrate together.'
 	);
 }
 

@@ -115,31 +115,36 @@ export default {
 		let output =
 			!! contentSize || !! wideSize
 				? `
-					${ appendSelectors( selector, '> *' ) } {
+					${ appendSelectors(
+						selector,
+						'> :where(:not(.alignleft):not(.alignright))'
+					) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;
 						margin-right: auto !important;
 					}
 
-					${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
+					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };
 					}
 
-					${ appendSelectors( selector, '> [data-align="full"]' ) } {
+					${ appendSelectors( selector, '> .alignfull' ) } {
 						max-width: none;
 					}
 				`
 				: '';
 
 		output += `
-			${ appendSelectors( selector, '> [data-align="left"]' ) } {
+			${ appendSelectors( selector, '> .alignleft' ) } {
 				float: left;
 				margin-right: 2em;
+				margin-left: 0;
 			}
 
-			${ appendSelectors( selector, '> [data-align="right"]' ) } {
+			${ appendSelectors( selector, '> .alignright' ) } {
 				float: right;
 				margin-left: 2em;
+				margin-right: 0;
 			}
 
 		`;

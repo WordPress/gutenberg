@@ -145,6 +145,7 @@ function ListViewBranch( props ) {
 								path={ updatedPath }
 								isExpanded={ isExpanded }
 								listPosition={ nextPosition }
+								selectedClientIds={ selectedClientIds }
 							/>
 						) }
 						{ ! showBlock && (

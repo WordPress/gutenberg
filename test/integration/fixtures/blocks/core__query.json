@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/query",
 		"isValid": true,
 		"attributes": {
@@ -23,7 +22,6 @@
 				"type": "list"
 			}
 		},
-		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-query\"></div>"
+		"innerBlocks": []
 	}
 ]

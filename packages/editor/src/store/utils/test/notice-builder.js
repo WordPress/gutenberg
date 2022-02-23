@@ -74,6 +74,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 				},
 			],
 		],
+		[ 'when post will be trashed', [ 'publish', 'trash', true ], [] ],
 	].forEach(
 		( [
 			description,
