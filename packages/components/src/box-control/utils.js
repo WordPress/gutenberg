@@ -70,7 +70,7 @@ export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
 	const parsedValues = sides.map( ( side ) =>
 		parseQuantityAndUnitFromRawValue( values[ side ] )
 	);
-	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
+	const allValues = parsedValues.map( ( value ) => value[ 0 ] ?? '' );
 	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
 
 	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
