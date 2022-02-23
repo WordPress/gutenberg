@@ -90,6 +90,7 @@ require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/move-theme-editor-menu-item.php';
 require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
 require __DIR__ . '/compat/wordpress-6.0/blocks.php';
+require __DIR__ . '/compat/wordpress-6.0/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';

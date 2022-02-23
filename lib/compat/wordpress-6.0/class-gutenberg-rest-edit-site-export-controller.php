@@ -38,7 +38,7 @@ class Gutenberg_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 			),
-			true, // Override core route if already exists (WP 5.9).
+			true // Override core route if already exists (WP 5.9).
 		);
 	}
 
@@ -67,7 +67,7 @@ class Gutenberg_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 	 */
 	public function export() {
 		// Generate the export file.
-		$filename = wp_generate_block_templates_export_file();
+		$filename = gutenberg_generate_block_templates_export_file();
 
 		if ( is_wp_error( $filename ) ) {
 			$filename->add_data( array( 'status' => 500 ) );
