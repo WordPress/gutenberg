@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.2.0 (2022-02-23)
+
 ### New Features
 
 -   `LineHeightControl`: Changes internal implementation to use `NumberControl`, which allows enhanced interactions such as dragging to change the value. To improve consistency with other control components, the bottom margin styles on the component has been deprecated, and will be removed in a future version. To opt into this simplified margin style, set the `__nextHasNoMarginBottom` prop to `true`.
