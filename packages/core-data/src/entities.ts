@@ -257,7 +257,7 @@ type APIEntity<
 	defaultContext: C;
 };
 
-export type EntityTypeUnion< C extends Context = any > =
+export type EntityType< C extends Context = any > =
 	| DeclaredEntity< 'root', 'site', Settings< C > >
 	| DeclaredEntity< 'root', 'postType', Type< C > >
 	| DeclaredEntity< 'root', 'media', Attachment< C > >
@@ -278,34 +278,22 @@ export type EntityTypeUnion< C extends Context = any > =
 	| APIEntity< 'postType', 'wp_template', WpTemplate< C > >
 	| APIEntity< 'postType', 'wp_template_part', WpTemplatePart< C > >;
 
-export type Kind = EntityTypeUnion[ 'kind' ];
-export type Name< K extends Kind > = Extract<
-	EntityTypeUnion,
-	{ kind: K }
->[ 'name' ];
-
-export type EntityType<
-	K extends Kind,
-	N extends Name< any >,
-	C extends Context = any
-> = EntityTypeUnion< C > & {
-	kind: K;
-	name: N;
-};
+export type Kind = EntityType[ 'kind' ];
+export type Name = EntityType[ 'name' ];
 
 export type EntityRecordType<
 	K extends Kind,
-	N extends Name< any >,
+	N extends Name,
 	C extends Context = any
-> = Extract< EntityTypeUnion< C >, { kind: K; name: N } >[ 'recordType' ];
+> = Extract< EntityType< C >, { kind: K; name: N } >[ 'recordType' ];
 
-export type Key< K extends Kind, N extends Name< K > > = Extract<
-	EntityTypeUnion,
+export type Key< K extends Kind, N extends Name > = Extract<
+	EntityType,
 	{ kind: K; name: N }
 >[ 'keyType' ];
 
-export type DefaultContext< K extends Kind, N extends Name< any > > = Extract<
-	EntityTypeUnion,
+export type DefaultContext< K extends Kind, N extends Name > = Extract<
+	EntityType,
 	{ kind: K; name: N }
 >[ 'defaultContext' ];
 
