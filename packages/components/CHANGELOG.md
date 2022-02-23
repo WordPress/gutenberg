@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.5.0 (2022-02-23)
+
 ### Bug Fix
 
 -   Fix spin buttons of number inputs in Safari ([#38840](https://github.com/WordPress/gutenberg/pull/38840))

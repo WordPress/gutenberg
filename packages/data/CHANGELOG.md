@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.3.0 (2022-02-23)
+
 ### New Features
 
 - Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
