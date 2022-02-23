@@ -221,10 +221,7 @@ type Element = typeof defaultEntities[ number ];
 type DefaultEntityContext<
 	K extends string,
 	N extends string,
-	E = Element & {
-		kind: K;
-		name: N;
-	}
+	E = Extract< Element, { kind: K; name: N } >
 > = 'baseURLParams' extends keyof E
 	? 'context' extends keyof E[ 'baseURLParams' ]
 		? E[ 'baseURLParams' ][ 'context' ]
@@ -234,10 +231,7 @@ type DefaultEntityContext<
 type EntityKeyName<
 	K extends string,
 	N extends string,
-	E = Element & {
-		kind: K;
-		name: N;
-	}
+	E = Extract< Element, { kind: K; name: N } >
 > = 'key' extends keyof E ? E[ 'key' ] : 'id';
 
 type DeclaredEntity< K extends string, N extends string, RecordType > = {
@@ -285,27 +279,34 @@ export type EntityTypeUnion< C extends Context = any > =
 	| APIEntity< 'postType', 'wp_template_part', WpTemplatePart< C > >;
 
 export type Kind = EntityTypeUnion[ 'kind' ];
-export type Name< K extends Kind > = ( EntityTypeUnion & {
-	kind: K;
-} )[ 'name' ];
+export type Name< K extends Kind > = Extract<
+	EntityTypeUnion,
+	{ kind: K }
+>[ 'name' ];
 
 export type EntityType<
 	K extends Kind,
-	N extends Name< K >,
+	N extends Name< any >,
 	C extends Context = any
 > = EntityTypeUnion< C > & {
 	kind: K;
 	name: N;
 };
 
-export type Key< K extends Kind, N extends Name< K > > = EntityType<
-	K,
-	N
+export type EntityRecordType<
+	K extends Kind,
+	N extends Name< any >,
+	C extends Context = any
+> = Extract< EntityTypeUnion< C >, { kind: K; name: N } >[ 'recordType' ];
+
+export type Key< K extends Kind, N extends Name< K > > = Extract<
+	EntityTypeUnion,
+	{ kind: K; name: N }
 >[ 'keyType' ];
 
-export type DefaultContext< K extends Kind, N extends Name< K > > = EntityType<
-	K,
-	N
+export type DefaultContext< K extends Kind, N extends Name< any > > = Extract<
+	EntityTypeUnion,
+	{ kind: K; name: N }
 >[ 'defaultContext' ];
 
 export const additionalEntityConfigLoaders = [
