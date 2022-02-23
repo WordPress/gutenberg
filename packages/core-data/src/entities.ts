@@ -13,19 +13,71 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { addEntities } from './actions';
+import {
+	Attachment,
+	Comment,
+	Context,
+	EntityRecord,
+	MenuLocation,
+	NavigationArea,
+	NavMenu,
+	NavMenuItem,
+	Page,
+	Plugin,
+	Post,
+	Settings,
+	Sidebar,
+	Taxonomy,
+	Theme,
+	Type,
+	Updatable,
+	User,
+	Widget,
+	WidgetType,
+	WpTemplate,
+	WpTemplatePart,
+} from './types';
+
+export type EntityQuery< C extends Context > = Record< string, string > & {
+	context?: C;
+};
+
+export interface EntityDefinition extends Object {
+	label: string;
+	kind: string;
+	name: string;
+	baseURL: string;
+	plural?: string;
+	key?: string;
+	baseURLParams?: EntityQuery< any >;
+	getTitle?: ( unknown ) => string;
+	rawAttributes?: readonly string[];
+	transientEdits?: {
+		blocks: boolean;
+	};
+}
+
+/**
+ * This function is in place to make the elements of defaultEntities
+ * both compliant with the EntityDefinition interface AND a const.
+ *
+ * @param  definition The description of the entity.
+ */
+const defineEntity = < T extends EntityDefinition >( definition: T ) =>
+	definition;
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
 export const defaultEntities = [
-	{
+	defineEntity( {
 		label: __( 'Base' ),
 		name: '__unstableBase',
 		kind: 'root',
 		baseURL: '/',
-	},
-	{
+	} as const ),
+	defineEntity( {
 		label: __( 'Site' ),
 		name: 'site',
 		kind: 'root',
@@ -33,8 +85,8 @@ export const defaultEntities = [
 		getTitle: ( record ) => {
 			return get( record, [ 'title' ], __( 'Site Title' ) );
 		},
-	},
-	{
+	} as const ),
+	defineEntity( {
 		label: __( 'Post Type' ),
 		name: 'postType',
 		kind: 'root',
@@ -42,16 +94,16 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
 		rawAttributes: POST_RAW_ATTRIBUTES,
-	},
-	{
+	} as const ),
+	defineEntity( {
 		name: 'media',
 		kind: 'root',
 		baseURL: '/wp/v2/media',
 		baseURLParams: { context: 'edit' },
 		plural: 'mediaItems',
 		label: __( 'Media' ),
-	},
-	{
+	} as const ),
+	defineEntity( {
 		name: 'taxonomy',
 		kind: 'root',
 		key: 'slug',
@@ -59,16 +111,16 @@ export const defaultEntities = [
 		baseURLParams: { context: 'edit' },
 		plural: 'taxonomies',
 		label: __( 'Taxonomy' ),
-	},
-	{
+	} as const ),
+	defineEntity( {
 		name: 'sidebar',
 		kind: 'root',
 		baseURL: '/wp/v2/sidebars',
 		plural: 'sidebars',
 		transientEdits: { blocks: true },
 		label: __( 'Widget areas' ),
-	},
-	{
+	} as const ),
+	defineEntity( {
 		name: 'widget',
 		kind: 'root',
 		baseURL: '/wp/v2/widgets',
@@ -76,40 +128,40 @@ export const defaultEntities = [
 		plural: 'widgets',
 		transientEdits: { blocks: true },
 		label: __( 'Widgets' ),
-	},
-	{
+	} as const ),
+	defineEntity( {
 		name: 'widgetType',
 		kind: 'root',
 		baseURL: '/wp/v2/widget-types',
 		baseURLParams: { context: 'edit' },
 		plural: 'widgetTypes',
 		label: __( 'Widget types' ),
-	},
-	{
+	} as const ),
+	defineEntity( {
 		label: __( 'User' ),
 		name: 'user',
 		kind: 'root',
 		baseURL: '/wp/v2/users',
 		baseURLParams: { context: 'edit' },
 		plural: 'users',
-	},
-	{
+	} as const ),
+	defineEntity( {
 		name: 'comment',
 		kind: 'root',
 		baseURL: '/wp/v2/comments',
 		baseURLParams: { context: 'edit' },
 		plural: 'comments',
 		label: __( 'Comment' ),
-	},
-	{
+	} as const ),
+	defineEntity( {
 		name: 'menu',
 		kind: 'root',
 		baseURL: '/wp/v2/menus',
 		baseURLParams: { context: 'edit' },
 		plural: 'menus',
 		label: __( 'Menu' ),
-	},
-	{
+	} as const ),
+	defineEntity( {
 		name: 'menuItem',
 		kind: 'root',
 		baseURL: '/wp/v2/menu-items',
@@ -117,8 +169,8 @@ export const defaultEntities = [
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
 		rawAttributes: [ 'title', 'content' ],
-	},
-	{
+	} as const ),
+	defineEntity( {
 		name: 'menuLocation',
 		kind: 'root',
 		baseURL: '/wp/v2/menu-locations',
@@ -126,8 +178,8 @@ export const defaultEntities = [
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
-	},
-	{
+	} as const ),
+	defineEntity( {
 		name: 'navigationArea',
 		kind: 'root',
 		baseURL: '/wp/v2/block-navigation-areas',
@@ -136,8 +188,8 @@ export const defaultEntities = [
 		label: __( 'Navigation Area' ),
 		key: 'name',
 		getTitle: ( record ) => record?.description,
-	},
-	{
+	} as const ),
+	defineEntity( {
 		label: __( 'Global Styles' ),
 		name: 'globalStyles',
 		kind: 'root',
@@ -145,24 +197,163 @@ export const defaultEntities = [
 		baseURLParams: { context: 'edit' },
 		plural: 'globalStylesVariations', // should be different than name
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
-	},
-	{
+	} as const ),
+	defineEntity( {
 		label: __( 'Themes' ),
 		name: 'theme',
 		kind: 'root',
 		baseURL: '/wp/v2/themes',
 		baseURLParams: { context: 'edit' },
 		key: 'stylesheet',
-	},
-	{
+	} as const ),
+	defineEntity( {
 		label: __( 'Plugins' ),
 		name: 'plugin',
 		kind: 'root',
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
-	},
-];
+	} as const ),
+] as const;
+
+/**
+ * Converts the defaultEntities into a TypeScript lookup type of the following shape:
+ * {
+ *   root: {
+ *     plugin: // Plugin entity definition
+ *     theme: // Theme entity definition
+ *     // ...
+ *   }
+ * }
+ */
+type Element = typeof defaultEntities[ number ];
+type ElementOfKind< K > = Element & { kind: K };
+type PostEntityDefinition = EntityDefinition & {
+	baseURLParams: { context: 'edit' };
+};
+export type EntityDetailsLookup< C extends Context = any > = {
+	[ E in Element as E[ 'kind' ] ]: {
+		[ E2 in ElementOfKind< E[ 'kind' ] > as E2[ 'name' ] ]: E2;
+	};
+} & {
+	/**
+	 * The entities of kind postType are loaded dynamically and can't be inferred from
+	 * the defaultEntities constant. The expected ones are defined using a hardcoded
+	 * definitions instead.
+	 */
+	postType: {
+		post: PostEntityDefinition;
+		page: PostEntityDefinition;
+		wp_template: PostEntityDefinition;
+		wp_template_part: PostEntityDefinition;
+	};
+};
+
+export type Kind = keyof EntityDetailsLookup | string;
+export type Name< K extends Kind > = K extends keyof EntityDetailsLookup
+	? keyof EntityDetailsLookup[ K ]
+	: string;
+
+export type EntityDetails<
+	K extends Kind,
+	N extends Name< K >,
+	C extends Context = any
+> = K extends keyof EntityDetailsLookup< C >
+	? N extends keyof EntityDetailsLookup< C >[ K ]
+		? EntityDetailsLookup< C >[ K ][ N ]
+		: unknown
+	: unknown;
+
+export type DefaultEntityContext<
+	K extends Kind,
+	N extends Name< K >,
+	Fallback extends Context = 'view'
+> = Context &
+	( 'baseURLParams' extends keyof EntityDetails< K, N >
+		? 'context' extends keyof EntityDetails< K, N >[ 'baseURLParams' ]
+			? EntityDetails< K, N >[ 'baseURLParams' ][ 'context' ]
+			: Fallback
+		: Fallback );
+
+// DefaultEntityContext< 'root', 'site' > is "view"
+// DefaultEntityContext< 'root', 'plugin' > is "edit"
+
+export type EntityKeyName<
+	K extends Kind,
+	N extends Name< K >
+> = unknown extends EntityDetails< K, N >
+	? unknown
+	: 'key' extends keyof EntityDetails< K, N >
+	? EntityDetails< K, N >[ 'key' ]
+	: 'id';
+
+// EntityKeyName< 'root', 'menuLocation' > is "name"
+// EntityKeyName< 'root', 'comment' > is "id"
+// EntityKeyName< 'postType', 'wp_template' > is "id"
+
+export type EntityKeyType<
+	K extends Kind,
+	N extends Name< K >
+> = EntityKeyName< K, N > extends keyof EntityRecordByKindName< K, N, any >
+	? EntityRecordByKindName< K, N, any >[ EntityKeyName< K, N > ] &
+			( string | number )
+	: string | number;
+
+// EntityKeyType< 'root', 'menuLocation' > is a string
+// EntityKeyType< 'root', 'comment' > is a number
+// EntityKeyType< 'postType', 'wp_template' > is a string
+
+type EntityRecordLookup< C extends Context = any > = {
+	root: {
+		site: Settings< C >;
+		postType: Type< C >;
+		media: Attachment< C >;
+		taxonomy: Taxonomy< C >;
+		sidebar: Sidebar< C >;
+		widget: Widget< C >;
+		widgetType: WidgetType< C >;
+		user: User< C >;
+		comment: Comment< C >;
+		menu: NavMenu< C >;
+		menuItem: NavMenuItem< C >;
+		menuLocation: MenuLocation< C >;
+		navigationArea: NavigationArea< C >;
+		theme: Theme< C >;
+		plugin: Plugin< C >;
+	};
+	/**
+	 * The entities of kind postType are loaded dynamically and can't be inferred from
+	 * the defaultEntities constant. The expected ones are defined using a hardcoded
+	 * definitions instead.
+	 */
+	postType: {
+		post: Post< C >;
+		page: Page< C >;
+		wp_template: WpTemplate< C >;
+		wp_template_part: WpTemplatePart< C >;
+	};
+};
+
+export type EntityRecordByKindName<
+	K extends Kind,
+	N extends Name< K >,
+	C extends Context = DefaultEntityContext< K, N >
+> = K extends keyof EntityRecordLookup< C >
+	? N extends keyof EntityRecordLookup< C >[ K ]
+		? EntityRecordLookup< C >[ K ][ N ]
+		: unknown
+	: unknown;
+
+// EntityRecordByKindName< 'root', 'site' > is Settings<'view'>
+// EntityRecordByKindName< 'root', 'plugin' > is Plugin<'edit'>
+// EntityRecordByKindName< 'postType', 'wp_template' > is WpTemplate<'edit'>
+
+export type UpdatableEntityRecordByKindName<
+	K extends Kind,
+	N extends Name< K >
+> = EntityRecordByKindName< K, N, 'edit' > extends EntityRecord< 'edit' >
+	? EntityRecordByKindName< K, N, 'edit' >
+	: unknown;
 
 export const kinds = [
 	{ name: 'postType', loadEntities: loadPostTypeEntities },
@@ -177,7 +368,7 @@ export const kinds = [
  * @return {Object} Updated edits.
  */
 export const prePersistPostType = ( persistedRecord, edits ) => {
-	const newEdits = {};
+	const newEdits = {} as Updatable< Post< 'edit' > >;
 
 	if ( persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
@@ -205,7 +396,9 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypes = await apiFetch( { path: '/wp/v2/types?context=view' } );
+	const postTypes = ( await apiFetch( {
+		path: '/wp/v2/types?context=view',
+	} ) ) as Record< string, Type< 'view' > >;
 	return map( postTypes, ( postType, name ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
@@ -239,9 +432,9 @@ async function loadPostTypeEntities() {
  * @return {Promise} Entities promise
  */
 async function loadTaxonomyEntities() {
-	const taxonomies = await apiFetch( {
+	const taxonomies = ( await apiFetch( {
 		path: '/wp/v2/taxonomies?context=view',
-	} );
+	} ) ) as Array< Taxonomy< 'view' > >;
 	return map( taxonomies, ( taxonomy, name ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
@@ -275,7 +468,7 @@ export const getMethodName = (
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && entity.plural
+		usePlural && 'plural' in entity && entity.plural
 			? upperFirst( camelCase( entity.plural ) )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;

@@ -16,8 +16,29 @@ import deprecated from '@wordpress/deprecated';
  */
 import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
-import { DEFAULT_ENTITY_KEY } from './entities';
+import {
+	DEFAULT_ENTITY_KEY,
+	DefaultEntityContext,
+	EntityRecordByKindName,
+	Kind,
+	Name,
+	EntityQuery,
+	EntityKeyType,
+	EntityDetails,
+	UpdatableEntityRecordByKindName,
+	EntityDefinition,
+	EntityDetailsLookup,
+} from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
+import { Context, Updatable } from './types';
+
+// createSelector isn't properly typed if I don't explicitly import these files – ideally they would
+// be merely ambient definitions that TS is aware of.
+import type {} from './rememo';
+import type {} from './wordpress-data';
+
+// Bogus definition for the development
+type State = any;
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -73,7 +94,7 @@ export function getAuthors( state, query ) {
  *
  * @return {Object} Current user object.
  */
-export function getCurrentUser( state ) {
+export function getCurrentUser( state: State ) {
 	return state.currentUser;
 }
 
@@ -97,25 +118,39 @@ export const getUserQueryResults = createSelector(
 /**
  * Returns whether the entities for the give kind are loaded.
  *
- * @param {Object} state Data state.
- * @param {string} kind  Entity kind.
+ * @param  state Data state.
+ * @param  kind  Entity kind.
  *
- * @return {Array<Object>} Array of entities with config matching kind.
+ * @return Array of entities with config matching kind.
  */
-export function getEntitiesByKind( state, kind ) {
+export function getEntitiesByKind< K extends Kind >(
+	state: State,
+	kind: K
+): Array<
+	| ( K extends keyof EntityDetailsLookup
+			? EntityDetailsLookup[ K ]
+			: EntityDefinition )
+	| EntityDefinition
+> {
 	return filter( state.entities.config, { kind } );
 }
 
 /**
  * Returns the entity object given its kind and name.
  *
- * @param {Object} state Data state.
- * @param {string} kind  Entity kind.
- * @param {string} name  Entity name.
+ * @param  state Data state.
+ * @param  kind  Entity kind.
+ * @param  name  Entity name.
  *
- * @return {Object} Entity
+ * @return Entity
  */
-export function getEntity( state, kind, name ) {
+export function getEntity< K extends Kind, N extends Name< K > >(
+	state: State,
+	kind: K,
+	name: N
+): EntityDetails< K, N > extends unknown
+	? EntityDefinition | null
+	: EntityDetails< K, N > {
 	return find( state.entities.config, { kind, name } );
 }
 
@@ -124,16 +159,27 @@ export function getEntity( state, kind, name ) {
  * yet received, undefined if the value entity is known to not exist, or the
  * entity object if it exists and is received.
  *
- * @param {Object}  state State tree
- * @param {string}  kind  Entity kind.
- * @param {string}  name  Entity name.
- * @param {number}  key   Record's key
- * @param {?Object} query Optional query.
+ * @param  state State tree
+ * @param  kind  Entity kind.
+ * @param  name  Entity name.
+ * @param  key   Record's key
+ * @param  query Optional query.
  *
- * @return {Object?} Record.
+ * @return Record.
  */
 export const getEntityRecord = createSelector(
-	( state, kind, name, key, query ) => {
+	function <
+		K extends Kind,
+		N extends Name< K >,
+		Key extends EntityKeyType< K, N >,
+		C extends Context = DefaultEntityContext< K, N >
+	>(
+		state: State,
+		kind: K,
+		name: N,
+		key: Key,
+		query?: EntityQuery< C >
+	): EntityRecordByKindName< K, N, C > | null {
 		const queriedState = get( state.entities.data, [
 			kind,
 			name,
@@ -162,7 +208,7 @@ export const getEntityRecord = createSelector(
 				const value = get( item, field );
 				set( filteredItem, field, value );
 			}
-			return filteredItem;
+			return filteredItem as EntityRecordByKindName< K, N, C >;
 		}
 
 		return item;
@@ -277,21 +323,34 @@ export const getRawEntityRecord = createSelector(
  *
  * @return {boolean} Whether entity records have been received.
  */
-export function hasEntityRecords( state, kind, name, query ) {
+export function hasEntityRecords<
+	K extends Kind,
+	N extends Name< K >,
+	C extends Context = DefaultEntityContext< K, N >
+>( state: State, kind: K, name: N, query?: EntityQuery< C > ): boolean {
 	return Array.isArray( getEntityRecords( state, kind, name, query ) );
 }
 
 /**
  * Returns the Entity's records.
  *
- * @param {Object}  state State tree
- * @param {string}  kind  Entity kind.
- * @param {string}  name  Entity name.
- * @param {?Object} query Optional terms query.
+ * @param  state State tree
+ * @param  kind  Entity kind.
+ * @param  name  Entity name.
+ * @param  query Optional terms query.
  *
- * @return {?Array} Records.
+ * @return  Records.
  */
-export function getEntityRecords( state, kind, name, query ) {
+export const getEntityRecords = createSelector( function <
+	K extends Kind,
+	N extends Name< K >,
+	C extends Context = DefaultEntityContext< K, N >
+>(
+	state: State,
+	kind: K,
+	name: N,
+	query?: EntityQuery< C >
+): Array< EntityRecordByKindName< K, N, C > > | null {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState = get( state.entities.data, [
@@ -303,7 +362,18 @@ export function getEntityRecords( state, kind, name, query ) {
 		return null;
 	}
 	return getQueriedItems( queriedState, query );
-}
+} );
+
+const s = getEntityRecords( {}, 'root', 'site' )[ 0 ];
+// s is Settings<'view'>
+const a = getEntityRecords( {}, 'root', 'plugin' )[ 0 ];
+// a is Plugin<'edit'>
+const b = getEntityRecords( {}, 'root', 'plugin', { context: 'embed' } )[ 0 ];
+// b is Plugin<'embed'>
+const c = getEntityRecords( {}, 'postType', 'post', { context: 'embed' } )[ 0 ];
+// c is Post<'embed'>
+const d = getEntityRecords( {}, 'postType', 'post' )[ 0 ];
+// d is Post<'edit'>
 
 /**
  * Returns the  list of dirty entity records.
@@ -344,7 +414,9 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 							// when it's used as an object key.
 							key:
 								entityRecord[
-									entity.key || DEFAULT_ENTITY_KEY
+									'key' in entity && entity.key
+										? entity.key
+										: DEFAULT_ENTITY_KEY
 								],
 							title: entity?.getTitle?.( entityRecord ) || '',
 							name,
@@ -413,14 +485,19 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 /**
  * Returns the specified entity record's edits.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param  state    State tree.
+ * @param  kind     Entity kind.
+ * @param  name     Entity name.
+ * @param  recordId Record ID.
  *
- * @return {Object?} The entity record's edits.
+ * @return The entity record's edits.
  */
-export function getEntityRecordEdits( state, kind, name, recordId ) {
+export function getEntityRecordEdits< K extends Kind, N extends Name< K > >(
+	state: State,
+	kind: K,
+	name: N,
+	recordId: EntityKeyType< K, N >
+): Partial< UpdatableEntityRecordByKindName< K, N > > {
 	return get( state.entities.data, [ kind, name, 'edits', recordId ] );
 }
 
@@ -431,16 +508,22 @@ export function getEntityRecordEdits( state, kind, name, recordId ) {
  * are not considered for change detection.
  * They are defined in the entity's config.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param  state    State tree.
+ * @param  kind     Entity kind.
+ * @param  name     Entity name.
+ * @param  recordId Record ID.
  *
- * @return {Object?} The entity record's non transient edits.
+ * @return The entity record's non transient edits.
  */
 export const getEntityRecordNonTransientEdits = createSelector(
-	( state, kind, name, recordId ) => {
-		const { transientEdits } = getEntity( state, kind, name ) || {};
+	function < K extends Kind, N extends Name< K > >(
+		state: State,
+		kind: K,
+		name: N,
+		recordId: EntityKeyType< K, N >
+	): Partial< UpdatableEntityRecordByKindName< K, N > > {
+		const entity = getEntity( state, kind, name );
+		const transientEdits = ( entity as any ).transientEdit; // @FIXME
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
 		if ( ! transientEdits ) {
 			return edits;
@@ -462,14 +545,19 @@ export const getEntityRecordNonTransientEdits = createSelector(
  * Returns true if the specified entity record has edits,
  * and false otherwise.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param  state    State tree.
+ * @param  kind     Entity kind.
+ * @param  name     Entity name.
+ * @param  recordId Record ID.
  *
- * @return {boolean} Whether the entity record has edits or not.
+ * @return Whether the entity record has edits or not.
  */
-export function hasEditsForEntityRecord( state, kind, name, recordId ) {
+export function hasEditsForEntityRecord< K extends Kind, N extends Name< K > >(
+	state: State,
+	kind: K,
+	name: N,
+	recordId: EntityKeyType< K, N >
+): boolean {
 	return (
 		isSavingEntityRecord( state, kind, name, recordId ) ||
 		Object.keys(
@@ -481,18 +569,29 @@ export function hasEditsForEntityRecord( state, kind, name, recordId ) {
 /**
  * Returns the specified entity record, merged with its edits.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param  state    State tree.
+ * @param  kind     Entity kind.
+ * @param  name     Entity name.
+ * @param  recordId Record ID.
  *
- * @return {Object?} The entity record, merged with its edits.
+ * @return The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
-	( state, kind, name, recordId ) => ( {
-		...getRawEntityRecord( state, kind, name, recordId ),
-		...getEntityRecordEdits( state, kind, name, recordId ),
-	} ),
+	function <
+		K extends Kind,
+		N extends Name< K >,
+		Key extends EntityKeyType< K, N >
+	>(
+		state: State,
+		kind: K,
+		name: N,
+		recordId: Key
+	): UpdatableEntityRecordByKindName< K, N > {
+		return {
+			...getRawEntityRecord( state, kind, name, recordId ),
+			...getEntityRecordEdits( state, kind, name, recordId ),
+		} as UpdatableEntityRecordByKindName< K, N >;
+	},
 	( state, kind, name, recordId, query ) => {
 		const context = query?.context ?? 'default';
 		return [
@@ -528,7 +627,11 @@ export const getEditedEntityRecord = createSelector(
  *
  * @return {boolean} Whether the entity record is autosaving or not.
  */
-export function isAutosavingEntityRecord( state, kind, name, recordId ) {
+export function isAutosavingEntityRecord<
+	K extends Kind,
+	N extends Name< K >,
+	Key extends EntityKeyType< K, N >
+>( state: State, kind: K, name: N, recordId: Key ): boolean {
 	const { pending, isAutosave } = get(
 		state.entities.data,
 		[ kind, name, 'saving', recordId ],
@@ -540,14 +643,18 @@ export function isAutosavingEntityRecord( state, kind, name, recordId ) {
 /**
  * Returns true if the specified entity record is saving, and false otherwise.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param  state    State tree.
+ * @param  kind     Entity kind.
+ * @param  name     Entity name.
+ * @param  recordId Record ID.
  *
- * @return {boolean} Whether the entity record is saving or not.
+ * @return Whether the entity record is saving or not.
  */
-export function isSavingEntityRecord( state, kind, name, recordId ) {
+export function isSavingEntityRecord<
+	K extends Kind,
+	N extends Name< K >,
+	Key extends EntityKeyType< K, N >
+>( state: State, kind: K, name: N, recordId: Key ): boolean {
 	return get(
 		state.entities.data,
 		[ kind, name, 'saving', recordId, 'pending' ],
@@ -558,14 +665,18 @@ export function isSavingEntityRecord( state, kind, name, recordId ) {
 /**
  * Returns true if the specified entity record is deleting, and false otherwise.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param  state    State tree.
+ * @param  kind     Entity kind.
+ * @param  name     Entity name.
+ * @param  recordId Record ID.
  *
- * @return {boolean} Whether the entity record is deleting or not.
+ * @return Whether the entity record is deleting or not.
  */
-export function isDeletingEntityRecord( state, kind, name, recordId ) {
+export function isDeletingEntityRecord<
+	K extends Kind,
+	N extends Name< K >,
+	Key extends EntityKeyType< K, N >
+>( state: State, kind: K, name: N, recordId: Key ): boolean {
 	return get(
 		state.entities.data,
 		[ kind, name, 'deleting', recordId, 'pending' ],
@@ -576,14 +687,23 @@ export function isDeletingEntityRecord( state, kind, name, recordId ) {
 /**
  * Returns the specified entity record's last save error.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param  state    State tree.
+ * @param  kind     Entity kind.
+ * @param  name     Entity name.
+ * @param  recordId Record ID.
  *
- * @return {Object?} The entity record's save error.
+ * @return The entity record's save error.
  */
-export function getLastEntitySaveError( state, kind, name, recordId ) {
+export function getLastEntitySaveError<
+	K extends Kind,
+	N extends Name< K >,
+	Key extends EntityKeyType< K, N >
+>(
+	state: State,
+	kind: K,
+	name: N,
+	recordId: Key
+): Record< string, string > | null {
 	return get( state.entities.data, [
 		kind,
 		name,
@@ -620,11 +740,11 @@ export function getLastEntityDeleteError( state, kind, name, recordId ) {
  * of the history stack we are at. 0 is the
  * last edit, -1 is the second last, and so on.
  *
- * @param {Object} state State tree.
+ * @param  state State tree.
  *
- * @return {number} The current undo offset.
+ * @return The current undo offset.
  */
-function getCurrentUndoOffset( state ) {
+function getCurrentUndoOffset( state: State ): number {
 	return state.undo.offset;
 }
 
@@ -632,11 +752,11 @@ function getCurrentUndoOffset( state ) {
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param {Object} state State tree.
+ * @param  state State tree.
  *
- * @return {Object?} The edit.
+ * @return The edit.
  */
-export function getUndoEdit( state ) {
+export function getUndoEdit( state: State ): Record< string, any > | null {
 	return state.undo[ state.undo.length - 2 + getCurrentUndoOffset( state ) ];
 }
 
@@ -644,11 +764,11 @@ export function getUndoEdit( state ) {
  * Returns the next edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param {Object} state State tree.
+ * @param  state State tree.
  *
- * @return {Object?} The edit.
+ * @return The edit.
  */
-export function getRedoEdit( state ) {
+export function getRedoEdit( state: State ): Record< string, any > | null {
 	return state.undo[ state.undo.length + getCurrentUndoOffset( state ) ];
 }
 
@@ -656,11 +776,11 @@ export function getRedoEdit( state ) {
  * Returns true if there is a previous edit from the current undo offset
  * for the entity records edits history, and false otherwise.
  *
- * @param {Object} state State tree.
+ * @param  state State tree.
  *
- * @return {boolean} Whether there is a previous edit or not.
+ * @return Whether there is a previous edit or not.
  */
-export function hasUndo( state ) {
+export function hasUndo( state: State ): boolean {
 	return Boolean( getUndoEdit( state ) );
 }
 
@@ -668,11 +788,11 @@ export function hasUndo( state ) {
  * Returns true if there is a next edit from the current undo offset
  * for the entity records edits history, and false otherwise.
  *
- * @param {Object} state State tree.
+ * @param  state State tree.
  *
- * @return {boolean} Whether there is a next edit or not.
+ * @return Whether there is a next edit or not.
  */
-export function hasRedo( state ) {
+export function hasRedo( state: State ): boolean {
 	return Boolean( getRedoEdit( state ) );
 }
 
@@ -683,7 +803,7 @@ export function hasRedo( state ) {
  *
  * @return {Object} The current theme.
  */
-export function getCurrentTheme( state ) {
+export function getCurrentTheme( state: State ) {
 	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
 }
 
@@ -694,7 +814,7 @@ export function getCurrentTheme( state ) {
  *
  * @return {string} The current global styles ID.
  */
-export function __experimentalGetCurrentGlobalStylesId( state ) {
+export function __experimentalGetCurrentGlobalStylesId( state: State ) {
 	return state.currentGlobalStylesId;
 }
 
@@ -705,7 +825,7 @@ export function __experimentalGetCurrentGlobalStylesId( state ) {
  *
  * @return {*} Index data.
  */
-export function getThemeSupports( state ) {
+export function getThemeSupports( state: State ) {
 	return getCurrentTheme( state )?.theme_supports ?? EMPTY_OBJECT;
 }
 
@@ -784,7 +904,7 @@ export function canUserEditEntityRecord( state, kind, name, recordId ) {
 	if ( ! entity ) {
 		return false;
 	}
-	const resource = entity.__unstable_rest_base;
+	const resource = ( entity as any ).__unstable_rest_base;
 
 	return canUser( state, 'update', resource, recordId );
 }
@@ -901,7 +1021,7 @@ export function __experimentalGetTemplateForLink( state, link ) {
  *
  * @return {Object?} The Global Styles object.
  */
-export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
+export function __experimentalGetCurrentThemeBaseGlobalStyles( state: State ) {
 	const currentTheme = getCurrentTheme( state );
 	if ( ! currentTheme ) {
 		return null;
@@ -916,7 +1036,9 @@ export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
  *
  * @return {string} The current global styles ID.
  */
-export function __experimentalGetCurrentThemeGlobalStylesVariations( state ) {
+export function __experimentalGetCurrentThemeGlobalStylesVariations(
+	state: State
+) {
 	const currentTheme = getCurrentTheme( state );
 	if ( ! currentTheme ) {
 		return null;

@@ -34,5 +34,5 @@
 		{ "path": "packages/warning" },
 		{ "path": "packages/wordcount" }
 	],
-	"files": []
+	"files": [],
 }
