@@ -64,12 +64,14 @@ export function getAllValue( values = {} ) {
 		return values;
 	}
 
-	const parsedValues = Object.values( values ).map( ( value ) =>
+	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) =>
 		parseQuantityAndUnitFromRawValue( value )
 	);
 
-	const allValues = parsedValues.map( ( value ) => value[ 0 ] ?? '' );
-	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
+	const allValues = parsedQuantitiesAndUnits.map(
+		( value ) => value[ 0 ] ?? ''
+	);
+	const allUnits = parsedQuantitiesAndUnits.map( ( value ) => value[ 1 ] );
 
 	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
 		? allValues[ 0 ]
