@@ -32,6 +32,9 @@
 		"lodash": "^4.17.21",
 		"rememo": "^3.0.0"
 	},
+	"peerDependencies": {
+		"react": "^17.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
