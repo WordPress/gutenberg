@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { dropRight, get, times } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,10 +11,10 @@ import { __ } from '@wordpress/i18n';
 import {
 	Notice,
 	PanelBody,
-	RangeControl,
 	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-
 import {
 	InspectorControls,
 	useInnerBlocksProps,
@@ -24,9 +24,9 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import {
-	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -34,12 +34,7 @@ import {
 /**
  * Internal dependencies
  */
-import {
-	hasExplicitPercentColumnWidths,
-	getMappedColumnWidths,
-	getRedistributedColumnWidths,
-	toWidthPrecision,
-} from './utils';
+import { getRevisedColumns, getVacantIndexes } from './utils';
 
 /**
  * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
@@ -52,23 +47,47 @@ import {
  */
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
-function ColumnsEditContainer( {
-	attributes,
-	setAttributes,
-	updateAlignment,
-	updateColumns,
-	clientId,
-} ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+function ColumnsEdit( { attributes, clientId, setAttributes } ) {
+	const { getBlocks, getBlockOrder } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
 
-	const { count } = useSelect(
-		( select ) => {
-			return {
-				count: select( blockEditorStore ).getBlockCount( clientId ),
-			};
+	const { updateBlockAttributes, replaceInnerBlocks } = useDispatch(
+		blockEditorStore
+	);
+
+	/**
+	 * Update all child Column blocks with a new vertical alignment setting
+	 * based on whatever alignment is passed in. This allows change to parent
+	 * to overide anything set on a individual column basis.
+	 *
+	 * @param {string} nextVerticalAlignment the vertical alignment setting
+	 */
+	const updateAlignment = ( nextVerticalAlignment ) => {
+		// Update own alignment.
+		setAttributes( { verticalAlignment: nextVerticalAlignment } );
+
+		// Update all child Column Blocks to match
+		getBlockOrder( clientId ).forEach( ( innerBlockClientId ) => {
+			updateBlockAttributes( innerBlockClientId, {
+				nextVerticalAlignment,
+			} );
+		} );
+	};
+
+	// Memoizing this prevents duplicate calls when used as onChange for
+	// ToggleGroupControl
+	const updateColumns = useCallback(
+		( nextCount ) => {
+			const currentBlocks = getBlocks( clientId );
+			const revised = getRevisedColumns( currentBlocks, nextCount );
+			replaceInnerBlocks( clientId, revised );
 		},
 		[ clientId ]
 	);
+
+	const { isStackedOnMobile, verticalAlignment } = attributes;
 
 	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -84,6 +103,13 @@ function ColumnsEditContainer( {
 		renderAppender: false,
 	} );
 
+	const layoutPanelProps = {
+		clientId,
+		isStackedOnMobile,
+		updateColumns,
+		setAttributes,
+	};
+
 	return (
 		<>
 			<BlockControls>
@@ -93,132 +119,65 @@ function ColumnsEditContainer( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody>
-					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ count }
-						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 1 }
-						max={ Math.max( 6, count ) }
-					/>
-					{ count > 6 && (
-						<Notice status="warning" isDismissible={ false }>
-							{ __(
-								'This column count exceeds the recommended amount and may cause visual breakage.'
-							) }
-						</Notice>
-					) }
-					<ToggleControl
-						label={ __( 'Stack on mobile' ) }
-						checked={ isStackedOnMobile }
-						onChange={ () =>
-							setAttributes( {
-								isStackedOnMobile: ! isStackedOnMobile,
-							} )
-						}
-					/>
-				</PanelBody>
+				<ColumnsLayoutPanel { ...layoutPanelProps } />
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
 		</>
 	);
 }
 
-const ColumnsEditContainerWrapper = withDispatch(
-	( dispatch, ownProps, registry ) => ( {
-		/**
-		 * Update all child Column blocks with a new vertical alignment setting
-		 * based on whatever alignment is passed in. This allows change to parent
-		 * to overide anything set on a individual column basis.
-		 *
-		 * @param {string} verticalAlignment the vertical alignment setting
-		 */
-		updateAlignment( verticalAlignment ) {
-			const { clientId, setAttributes } = ownProps;
-			const { updateBlockAttributes } = dispatch( blockEditorStore );
-			const { getBlockOrder } = registry.select( blockEditorStore );
-
-			// Update own alignment.
-			setAttributes( { verticalAlignment } );
-
-			// Update all child Column Blocks to match
-			const innerBlockClientIds = getBlockOrder( clientId );
-			innerBlockClientIds.forEach( ( innerBlockClientId ) => {
-				updateBlockAttributes( innerBlockClientId, {
-					verticalAlignment,
-				} );
-			} );
-		},
-
-		/**
-		 * Updates the column count, including necessary revisions to child Column
-		 * blocks to grant required or redistribute available space.
-		 *
-		 * @param {number} previousColumns Previous column count.
-		 * @param {number} newColumns      New column count.
-		 */
-		updateColumns( previousColumns, newColumns ) {
-			const { clientId } = ownProps;
-			const { replaceInnerBlocks } = dispatch( blockEditorStore );
-			const { getBlocks } = registry.select( blockEditorStore );
-
-			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitPercentColumnWidths(
-				innerBlocks
-			);
-
-			// Redistribute available width for existing inner blocks.
-			const isAddingColumn = newColumns > previousColumns;
-
-			if ( isAddingColumn && hasExplicitWidths ) {
-				// If adding a new column, assign width to the new column equal to
-				// as if it were `1 / columns` of the total available space.
-				const newColumnWidth = toWidthPrecision( 100 / newColumns );
-
-				// Redistribute in consideration of pending block insertion as
-				// constraining the available working width.
-				const widths = getRedistributedColumnWidths(
-					innerBlocks,
-					100 - newColumnWidth
-				);
-
-				innerBlocks = [
-					...getMappedColumnWidths( innerBlocks, widths ),
-					...times( newColumns - previousColumns, () => {
-						return createBlock( 'core/column', {
-							width: `${ newColumnWidth }%`,
-						} );
-					} ),
-				];
-			} else if ( isAddingColumn ) {
-				innerBlocks = [
-					...innerBlocks,
-					...times( newColumns - previousColumns, () => {
-						return createBlock( 'core/column' );
-					} ),
-				];
-			} else {
-				// The removed column will be the last of the inner blocks.
-				innerBlocks = dropRight(
-					innerBlocks,
-					previousColumns - newColumns
-				);
-
-				if ( hasExplicitWidths ) {
-					// Redistribute as if block is already removed.
-					const widths = getRedistributedColumnWidths(
-						innerBlocks,
-						100
-					);
-
-					innerBlocks = getMappedColumnWidths( innerBlocks, widths );
+function ColumnsLayoutPanel( {
+	clientId,
+	isStackedOnMobile,
+	updateColumns,
+	setAttributes,
+} ) {
+	const blocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks( clientId ),
+		[ clientId ]
+	);
+	const vacancies = getVacantIndexes( blocks ).length;
+	const count = blocks.length;
+	const countMin = Math.max( 1, count - vacancies );
+	const countMax = 6;
+	const countOptionList = [];
+	for ( let i = 1; i <= countMax; i++ ) {
+		const disabled = i < countMin;
+		const itemProps = { disabled, value: i, label: i, key: i };
+		countOptionList.push( <ToggleGroupControlOption { ...itemProps } /> );
+	}
+	if ( count > countMax ) {
+		const itemProps = { value: count, label: count, key: count };
+		countOptionList.push( <ToggleGroupControlOption { ...itemProps } /> );
+	}
+	return (
+		<PanelBody title={ __( 'Layout' ) }>
+			<ToggleGroupControl
+				label={ __( 'Quantity' ) }
+				onChange={ updateColumns }
+				value={ count }
+			>
+				{ countOptionList }
+			</ToggleGroupControl>
+			{ count > 6 && (
+				<Notice status="warning" isDismissible={ false }>
+					{ __(
+						'This column count exceeds the recommended amount and may cause visual breakage.'
+					) }
+				</Notice>
+			) }
+			<ToggleControl
+				label={ __( 'Stack on mobile' ) }
+				checked={ isStackedOnMobile }
+				onChange={ () =>
+					setAttributes( {
+						isStackedOnMobile: ! isStackedOnMobile,
+					} )
 				}
-			}
-
-			replaceInnerBlocks( clientId, innerBlocks );
-		},
-	} )
-)( ColumnsEditContainer );
+			/>
+		</PanelBody>
+	);
+}
 
 function Placeholder( { clientId, name, setAttributes } ) {
 	const { blockType, defaultVariation, variations } = useSelect(
@@ -266,18 +225,16 @@ function Placeholder( { clientId, name, setAttributes } ) {
 	);
 }
 
-const ColumnsEdit = ( props ) => {
+const MetaColumnsEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlocks( clientId ).length > 0,
 		[ clientId ]
 	);
-	const Component = hasInnerBlocks
-		? ColumnsEditContainerWrapper
-		: Placeholder;
+	const Component = hasInnerBlocks ? ColumnsEdit : Placeholder;
 
 	return <Component { ...props } />;
 };
 
-export default ColumnsEdit;
+export default MetaColumnsEdit;
