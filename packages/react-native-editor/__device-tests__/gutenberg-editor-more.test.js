@@ -14,4 +14,3 @@ describe( 'Gutenberg Editor More Block test', () => {
 		await editorPage.removeBlockAtPosition( blockNames.more );
 	} );
 } );
- 

@@ -135,4 +135,3 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		expect( html.toLowerCase() ).toBe( expectedHtml );
 	} );
 } );
- 
