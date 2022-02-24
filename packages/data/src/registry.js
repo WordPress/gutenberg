@@ -16,7 +16,7 @@ import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
 
 /** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
-/** @typedef {import('./types').DataRegistry} DataRegistry */
+/** @typedef {import('./types').DataRegistry} WPDataRegistry */
 
 /**
  * @typedef {Object} WPDataPlugin An object of registry function overrides.
@@ -31,7 +31,7 @@ import { createEmitter } from './utils/emitter';
  * @param {Object}  storeConfigs Initial store configurations.
  * @param {Object?} parent       Parent registry.
  *
- * @return {DataRegistry} Data registry.
+ * @return {WPDataRegistry} Data registry.
  */
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
