@@ -70,7 +70,7 @@ require __DIR__ . '/compat/wordpress-5.9/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/register-global-styles-cpt.php';
 require __DIR__ . '/compat/wordpress-5.9/script-loader.php';
-require __DIR__ . '/compat/wordpress-5.9/block-editor-settings.php';
+require __DIR__ . '/compat/wordpress-6.0/block-editor-settings.php';
 require __DIR__ . '/compat/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/compat/wordpress-6.0/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/render-svg-filters.php';
