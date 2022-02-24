@@ -34,7 +34,7 @@ import {
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
  *
  * @property {boolean} isInnerBlocks Whether we are serializing inner blocks.
- * @property {boolean} __experimentalExcludeNonCopyableAttributes Whether to exclude attributes that do not have copy support in the serialized block.
+ * @property {Object} __experimentalExcludeAttributes Attributes matching these filters will be excluded from the serialized block.
  */
 
 /**
@@ -349,10 +349,7 @@ export function getCommentDelimitedContent(
  */
 export function serializeBlock(
 	block,
-	{
-		isInnerBlocks = false,
-		__experimentalExcludeNonCopyableAttributes = false,
-	} = {}
+	{ isInnerBlocks = false, __experimentalExcludeAttributes } = {}
 ) {
 	const blockName = block.name;
 	const saveContent = getBlockInnerHTML( block );
@@ -367,14 +364,15 @@ export function serializeBlock(
 	const blockType = getBlockType( blockName );
 	let saveAttributes = getCommentAttributes( blockType, block.attributes );
 
-	if ( __experimentalExcludeNonCopyableAttributes ) {
+	if ( __experimentalExcludeAttributes ) {
 		saveAttributes = omit(
 			saveAttributes,
 			__experimentalFilterBlockAttributes( blockName, {
-				__experimentalSupports: { copy: false },
+				__experimentalSupports: __experimentalExcludeAttributes,
 			} )
 		);
 	}
+
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 

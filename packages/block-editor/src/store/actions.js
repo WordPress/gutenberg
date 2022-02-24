@@ -1182,7 +1182,7 @@ export const duplicateBlocks = ( clientIds, updateSelection = true ) => ( {
 	);
 	const clonedBlocks = blocks.map( ( block ) =>
 		cloneBlock( block, {}, null, {
-			__experimentalExcludeNonCopyableAttributes: true,
+			__experimentalExcludeAttributes: { copy: false },
 		} )
 	);
 	dispatch.insertBlocks(

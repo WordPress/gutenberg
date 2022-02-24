@@ -396,7 +396,7 @@ describe( 'block serializer', () => {
 			);
 		} );
 
-		it( 'should omit attributes without copy support when __experimentalExcludeNonCopyableAttributes is true', () => {
+		it( 'should omit attributes without copy support when configured with __experimentalExcludeAttributes', () => {
 			const block = createBlock( 'core/test-block', {
 				content: 'content',
 				internal: 'copy me',
@@ -404,7 +404,7 @@ describe( 'block serializer', () => {
 
 			expect(
 				serialize( block, {
-					__experimentalExcludeNonCopyableAttributes: true,
+					__experimentalExcludeAttributes: { copy: false },
 				} )
 			).toEqual(
 				'<!-- wp:test-block -->\n<p>content</p>\n<!-- /wp:test-block -->'

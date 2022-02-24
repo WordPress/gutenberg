@@ -36,7 +36,7 @@ function CopyMenuItem( { blocks, onCopy } ) {
 	const ref = useCopyToClipboard(
 		() =>
 			serialize( blocks, {
-				__experimentalExcludeNonCopyableAttributes: true,
+				__experimentalSupports: { copy: false },
 			} ),
 		onCopy
 	);
