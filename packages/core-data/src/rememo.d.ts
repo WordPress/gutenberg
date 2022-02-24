@@ -1,3 +1,3 @@
 declare module 'rememo' {
-	export default function createSelector< T extends Function >( fn: T, ...any ) : T;
+	export default function createSelector< T extends Function >( select: T, makeKey?: any ) : T;
 }
