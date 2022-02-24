@@ -196,7 +196,7 @@ export class BlockList extends Component {
 				value={ {
 					scrollRef: this.scrollViewRef,
 					updateBlocksLayouts,
-					blocksLayouts,
+					blocksLayouts: blocksLayouts.current,
 				} }
 			>
 				{ this.renderList() }
