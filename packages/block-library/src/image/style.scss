@@ -3,6 +3,8 @@
 
 	img {
 		vertical-align: bottom;
+		height: auto;
+		max-width: 100%;
 	}
 
 	&:not(.is-style-rounded) {
