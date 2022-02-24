@@ -12,6 +12,7 @@ To use the Placeholder, wrap the `<TextControl>` component so it becomes a child
 
 ```jsx
 import { Placeholder, TextControl } from '@wordpress/components';
+import { useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 export default function Edit( { attributes, className, setAttributes } ) {
