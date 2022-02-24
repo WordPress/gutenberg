@@ -7,7 +7,13 @@ import { isEqual } from 'lodash';
  * WordPress dependencies
  */
 import { useDebounce, usePrevious } from '@wordpress/compose';
-import { RawHTML, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	RawHTML,
+	renderToString,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -62,10 +68,11 @@ function DefaultLoadingResponsePlaceholder( { children, showLoader } ) {
 	);
 }
 
-export default function ServerSideRender( props ) {
+export function useServerSideRender( props ) {
 	const {
 		attributes,
 		block,
+		// eslint-disable-next-line no-unused-vars
 		className,
 		httpMethod = 'GET',
 		urlQueryArgs,
@@ -183,22 +190,38 @@ export default function ServerSideRender( props ) {
 	const hasError = response?.error;
 
 	if ( isLoading ) {
-		return (
+		return renderToString(
 			<LoadingResponsePlaceholder { ...props } showLoader={ showLoader }>
-				{ hasResponse && (
-					<RawHTML className={ className }>{ response }</RawHTML>
-				) }
+				{ hasResponse && <RawHTML>{ response }</RawHTML> }
 			</LoadingResponsePlaceholder>
 		);
 	}
 
 	if ( hasEmptyResponse || ! hasResponse ) {
-		return <EmptyResponsePlaceholder { ...props } />;
+		return renderToString( <EmptyResponsePlaceholder { ...props } /> );
 	}
 
 	if ( hasError ) {
-		return <ErrorResponsePlaceholder response={ response } { ...props } />;
+		return renderToString(
+			<ErrorResponsePlaceholder response={ response } { ...props } />
+		);
 	}
 
-	return <RawHTML className={ className }>{ response }</RawHTML>;
+	try {
+		// eslint-disable-next-line no-console
+		console.log( response );
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.log( 'could not log response' );
+	}
+
+	return response;
+}
+
+export default function ServerSideRender( props ) {
+	return (
+		<RawHTML className={ props.className }>
+			{ useServerSideRender( props ) }
+		</RawHTML>
+	);
 }
