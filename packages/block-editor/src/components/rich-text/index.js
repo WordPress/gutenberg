@@ -247,16 +247,8 @@ function RichTextWrapper(
 				changeHandler( __unstableFormats, __unstableText );
 			} );
 		},
-		selectionStart:
-			typeof selectionStart === 'number' &&
-			typeof selectionEnd === 'number'
-				? selectionStart
-				: undefined,
-		selectionEnd:
-			typeof selectionStart === 'number' &&
-			typeof selectionEnd === 'number'
-				? selectionEnd
-				: undefined,
+		selectionStart,
+		selectionEnd,
 		onSelectionChange,
 		placeholder,
 		__unstableIsSelected: isSelected,
