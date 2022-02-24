@@ -171,6 +171,8 @@ Docker is just one method to run a local WordPress environment. Block developmen
 
 -   Remote server - you can work on a remote server, most hosts provide a quick WordPress setup. However, this will require additional time thorughout development syncing to the server, or working directly on the remote server.
 
+-   [WSL](https://docs.microsoft.com/en-us/windows/wsl/about) - for the more advanced _Windows_ user. Using [wp-cli](https://wp-cli.org/), you can easily install WordPress on Windows Subsystem for Linux. Utilizing a script ([example](https://gist.github.com/bgoewert/f860e6007a20a68a8169fcd03364ec70)) makes setting up multiple installations even easier.
+
 The important part is having a WordPress site installed, and know where and how to update files in the plugins directory.
 
 ## Code Editor
