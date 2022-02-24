@@ -23,6 +23,15 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		$context = 'site-editor';
 	}
 
+	if (
+		defined( 'REST_REQUEST' ) &&
+		REST_REQUEST &&
+		isset( $_GET['context'] ) &&
+		'mobile' === $_GET['context']
+	) {
+		$context = 'mobile';
+	}
+
 	if ( 'other' === $context ) {
 		// Make sure the styles array exists.
 		// In some contexts, like the navigation editor, it doesn't.
