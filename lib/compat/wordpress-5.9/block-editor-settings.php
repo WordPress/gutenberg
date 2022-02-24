@@ -23,19 +23,6 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		$context = 'site-editor';
 	}
 
-	if (
-		defined( 'REST_REQUEST' ) &&
-		REST_REQUEST &&
-		isset( $_GET['context'] ) &&
-		'mobile' === $_GET['context']
-	) {
-		$context = 'mobile';
-	}
-
-	if ( 'mobile' === $context && WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$settings['__experimentalStyles'] = gutenberg_get_global_styles();
-	}
-
 	if ( 'other' === $context ) {
 		// Make sure the styles array exists.
 		// In some contexts, like the navigation editor, it doesn't.
