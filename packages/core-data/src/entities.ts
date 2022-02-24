@@ -12,33 +12,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+// @ts-ignore
 import { addEntities } from './actions';
-import {
-	Attachment,
-	Comment,
-	Context,
-	EntityRecord,
-	MenuLocation,
-	NavigationArea,
-	NavMenu,
-	NavMenuItem,
-	Page,
-	Plugin,
-	Post,
-	Settings,
-	Sidebar,
-	Taxonomy,
-	Theme,
-	Type,
-	Updatable,
-	User,
-	Widget,
-	WidgetType,
-	WpTemplate,
-	WpTemplatePart,
-} from './types';
+import type * as EntityTypes from './types';
 
-export type EntityQuery< C extends Context > = Record< string, string > & {
+export type EntityQuery< C extends EntityTypes.Context > = Record<
+	string,
+	string
+> & {
 	context?: C;
 };
 
@@ -50,7 +31,7 @@ export interface EntityDefinition {
 	plural?: string;
 	key?: string;
 	baseURLParams?: EntityQuery< any >;
-	getTitle?: ( unknown ) => string;
+	getTitle?: ( record: any ) => string | undefined;
 	rawAttributes?: readonly string[];
 	transientEdits?: {
 		blocks: boolean;
@@ -187,7 +168,8 @@ export const defaultEntities = [
 		plural: 'navigationAreas',
 		label: __( 'Navigation Area' ),
 		key: 'name',
-		getTitle: ( record ) => record?.description,
+		getTitle: ( record: EntityTypes.NavigationArea< 'edit' > | null ) =>
+			record?.description,
 	} as const ),
 	defineEntity( {
 		label: __( 'Global Styles' ),
@@ -257,30 +239,38 @@ type APIEntity<
 	defaultContext: C;
 };
 
-export type EntityType< C extends Context = any > =
-	| DeclaredEntity< 'root', 'site', Settings< C > >
-	| DeclaredEntity< 'root', 'postType', Type< C > >
-	| DeclaredEntity< 'root', 'media', Attachment< C > >
-	| DeclaredEntity< 'root', 'taxonomy', Taxonomy< C > >
-	| DeclaredEntity< 'root', 'sidebar', Sidebar< C > >
-	| DeclaredEntity< 'root', 'widget', Widget< C > >
-	| DeclaredEntity< 'root', 'widgetType', WidgetType< C > >
-	| DeclaredEntity< 'root', 'user', User< C > >
-	| DeclaredEntity< 'root', 'comment', Comment< C > >
-	| DeclaredEntity< 'root', 'menu', NavMenu< C > >
-	| DeclaredEntity< 'root', 'menuItem', NavMenuItem< C > >
-	| DeclaredEntity< 'root', 'menuLocation', MenuLocation< C > >
-	| DeclaredEntity< 'root', 'navigationArea', NavigationArea< C > >
-	| DeclaredEntity< 'root', 'theme', Theme< C > >
-	| DeclaredEntity< 'root', 'plugin', Plugin< C > >
-	| APIEntity< 'postType', 'post', Post< C > >
-	| APIEntity< 'postType', 'page', Page< C > >
-	| APIEntity< 'postType', 'wp_template', WpTemplate< C > >
-	| APIEntity< 'postType', 'wp_template_part', WpTemplatePart< C > >;
+export type EntityType< C extends EntityTypes.Context = any > =
+	| DeclaredEntity< 'root', 'site', EntityTypes.Settings< C > >
+	| DeclaredEntity< 'root', 'postType', EntityTypes.Type< C > >
+	| DeclaredEntity< 'root', 'media', EntityTypes.Attachment< C > >
+	| DeclaredEntity< 'root', 'taxonomy', EntityTypes.Taxonomy< C > >
+	| DeclaredEntity< 'root', 'sidebar', EntityTypes.Sidebar< C > >
+	| DeclaredEntity< 'root', 'widget', EntityTypes.Widget< C > >
+	| DeclaredEntity< 'root', 'widgetType', EntityTypes.WidgetType< C > >
+	| DeclaredEntity< 'root', 'user', EntityTypes.User< C > >
+	| DeclaredEntity< 'root', 'comment', EntityTypes.Comment< C > >
+	| DeclaredEntity< 'root', 'menu', EntityTypes.NavMenu< C > >
+	| DeclaredEntity< 'root', 'menuItem', EntityTypes.NavMenuItem< C > >
+	| DeclaredEntity< 'root', 'menuLocation', EntityTypes.MenuLocation< C > >
+	| DeclaredEntity<
+			'root',
+			'navigationArea',
+			EntityTypes.NavigationArea< C >
+	  >
+	| DeclaredEntity< 'root', 'theme', EntityTypes.Theme< C > >
+	| DeclaredEntity< 'root', 'plugin', EntityTypes.Plugin< C > >
+	| APIEntity< 'postType', 'post', EntityTypes.Post< C > >
+	| APIEntity< 'postType', 'page', EntityTypes.Page< C > >
+	| APIEntity< 'postType', 'wp_template', EntityTypes.WpTemplate< C > >
+	| APIEntity<
+			'postType',
+			'wp_template_part',
+			EntityTypes.WpTemplatePart< C >
+	  >;
 
 export type DefinitionOf<
-	R extends EntityRecord< C >,
-	C extends Context = any
+	R extends EntityTypes.EntityRecord< C >,
+	C extends EntityTypes.Context = any
 > = Extract< EntityType< C >, { recordType: R } >;
 
 export type Kind = EntityType[ 'kind' ];
@@ -289,22 +279,24 @@ export type Name = EntityType[ 'name' ];
 export type EntityRecordType<
 	K extends Kind,
 	N extends Name,
-	C extends Context = any
+	C extends EntityTypes.Context = any
 > = Extract< EntityType< C >, { kind: K; name: N } >[ 'recordType' ];
 
-export type KindOf< R extends EntityRecord< any > > = Extract<
+export type KindOf< R extends EntityTypes.EntityRecord< any > > = Extract<
 	EntityType,
 	{ recordType: R }
 >[ 'kind' ];
 
-export type NameOf< R extends EntityRecord< any > > = Extract<
+export type NameOf< R extends EntityTypes.EntityRecord< any > > = Extract<
 	EntityType< any >,
 	{ recordType: R }
 >[ 'name' ];
 
-export type KeyTypeOf<
-	R extends EntityRecord< any >
-> = DefinitionOf< R >[ 'keyType' ];
+export type PrimaryKey<
+	R extends EntityTypes.EntityRecord< any > | unknown = unknown
+> = R extends EntityTypes.EntityRecord< any >
+	? DefinitionOf< R >[ 'keyType' ]
+	: string | number;
 
 export type DefaultContextOf< K extends Kind, N extends Name > = Extract<
 	EntityType,
@@ -323,8 +315,8 @@ export const kinds = [
  * @param {Object} edits           Edits.
  * @return {Object} Updated edits.
  */
-export const prePersistPostType = ( persistedRecord, edits ) => {
-	const newEdits = {} as Updatable< Post< 'edit' > >;
+export const prePersistPostType = ( persistedRecord: any, edits: any ) => {
+	const newEdits = {} as EntityTypes.Updatable< EntityTypes.Post< 'edit' > >;
 
 	if ( persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
@@ -354,7 +346,7 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 async function loadPostTypeEntities() {
 	const postTypes = ( await apiFetch( {
 		path: '/wp/v2/types?context=view',
-	} ) ) as Record< string, Type< 'view' > >;
+	} ) ) as Record< string, EntityTypes.Type< 'view' > >;
 	return map( postTypes, ( postType, name ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
@@ -372,7 +364,7 @@ async function loadPostTypeEntities() {
 			},
 			mergedEdits: { meta: true },
 			rawAttributes: POST_RAW_ATTRIBUTES,
-			getTitle: ( record ) =>
+			getTitle: ( record: any ) =>
 				record?.title?.rendered ||
 				record?.title ||
 				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
@@ -390,7 +382,7 @@ async function loadPostTypeEntities() {
 async function loadTaxonomyEntities() {
 	const taxonomies = ( await apiFetch( {
 		path: '/wp/v2/taxonomies?context=view',
-	} ) ) as Array< Taxonomy< 'view' > >;
+	} ) ) as Array< EntityTypes.Taxonomy< 'view' > >;
 	return map( taxonomies, ( taxonomy, name ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
@@ -414,17 +406,17 @@ async function loadTaxonomyEntities() {
  * @return {string} Method name
  */
 export const getMethodName = (
-	kind,
-	name,
+	kind: Kind,
+	name: Name,
 	prefix = 'get',
 	usePlural = false
 ) => {
-	const entity = find( defaultEntities, { kind, name } );
+	const entity = find( defaultEntities, { kind, name } ) as any;
 	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && 'plural' in entity && entity.plural
+		usePlural && 'plural' in entity && entity?.plural
 			? upperFirst( camelCase( entity.plural ) )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
@@ -437,7 +429,10 @@ export const getMethodName = (
  *
  * @return {Array} Entities
  */
-export const getKindEntities = ( kind ) => async ( { select, dispatch } ) => {
+export const getKindEntities = ( kind: Kind ) => async ( {
+	select,
+	dispatch,
+}: any ) => {
 	let entities = select.getEntitiesByKind( kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
