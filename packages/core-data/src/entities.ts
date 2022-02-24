@@ -278,6 +278,11 @@ export type EntityType< C extends Context = any > =
 	| APIEntity< 'postType', 'wp_template', WpTemplate< C > >
 	| APIEntity< 'postType', 'wp_template_part', WpTemplatePart< C > >;
 
+export type DefinitionOf<
+	R extends EntityRecord< C >,
+	C extends Context = any
+> = Extract< EntityType< C >, { recordType: R } >;
+
 export type Kind = EntityType[ 'kind' ];
 export type Name = EntityType[ 'name' ];
 
@@ -287,12 +292,21 @@ export type EntityRecordType<
 	C extends Context = any
 > = Extract< EntityType< C >, { kind: K; name: N } >[ 'recordType' ];
 
-export type Key< K extends Kind, N extends Name > = Extract<
+export type KindOf< R extends EntityRecord< any > > = Extract<
 	EntityType,
-	{ kind: K; name: N }
->[ 'keyType' ];
+	{ recordType: R }
+>[ 'kind' ];
 
-export type DefaultContext< K extends Kind, N extends Name > = Extract<
+export type NameOf< R extends EntityRecord< any > > = Extract<
+	EntityType< any >,
+	{ recordType: R }
+>[ 'name' ];
+
+export type KeyTypeOf<
+	R extends EntityRecord< any >
+> = DefinitionOf< R >[ 'keyType' ];
+
+export type DefaultContextOf< K extends Kind, N extends Name > = Extract<
 	EntityType,
 	{ kind: K; name: N }
 >[ 'defaultContext' ];

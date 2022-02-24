@@ -22,12 +22,15 @@ import {
 	Name,
 	EntityDefinition,
 	EntityQuery,
-	Key,
-	DefaultContext,
+	DefaultContextOf,
 	EntityRecordType,
+	EntityType,
+	KindOf,
+	NameOf,
+	KeyTypeOf,
 } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
-import { Context, Updatable } from './types';
+import { Context, Post, Comment, Updatable } from './types';
 
 // createSelector isn't properly typed if I don't explicitly import these files – ideally they would
 // be merely ambient definitions that TS is aware of.
@@ -159,16 +162,17 @@ export function getEntity< K extends Kind, N extends Name >(
  */
 export const getEntityRecord = createSelector(
 	function <
-		K extends Kind,
-		N extends Name,
-		C extends Context = DefaultContext< K, N >
+		R extends EntityRecordType< K, N, C >,
+		K extends Kind = KindOf< R >,
+		N extends Name = NameOf< R >,
+		C extends Context = DefaultContextOf< K, N >
 	>(
 		state: State,
 		kind: K,
 		name: N,
-		key: Key< K, N >,
+		key: KeyTypeOf< R >,
 		query?: EntityQuery< C >
-	): EntityRecordType< K, N, C > | null {
+	): R | null | undefined {
 		const queriedState = get( state.entities.data, [
 			kind,
 			name,
@@ -197,7 +201,7 @@ export const getEntityRecord = createSelector(
 				const value = get( item, field );
 				set( filteredItem, field, value );
 			}
-			return filteredItem as EntityRecordType< K, N, C >;
+			return filteredItem as R;
 		}
 
 		return item;
@@ -226,9 +230,15 @@ export const getEntityRecord = createSelector(
 );
 
 const comment = getEntityRecord( {}, 'root', 'comment', 15 );
+const settings = getEntityRecord( {}, 'root', 'site' );
 // comment is Comment<'edit'>
 
-const commentView = getEntityRecord( {}, 'root', 'comment', 15, {
+const commentView = getEntityRecord<
+	Comment< 'view' >,
+	'root',
+	'comment',
+	'view'
+>( {}, 'root', 'comment', 15, {
 	context: 'view',
 } );
 // commentView is Comment<'view'>
@@ -325,7 +335,7 @@ export const getRawEntityRecord = createSelector(
 export function hasEntityRecords<
 	K extends Kind,
 	N extends Name,
-	C extends Context = DefaultContext< K, N >
+	C extends Context = DefaultContextOf< K, N >
 >( state: State, kind: K, name: N, query?: EntityQuery< C > ): boolean {
 	return Array.isArray( getEntityRecords( state, kind, name, query ) );
 }
@@ -343,7 +353,7 @@ export function hasEntityRecords<
 export const getEntityRecords = createSelector( function <
 	K extends Kind,
 	N extends Name,
-	C extends Context = DefaultContext< K, N >
+	C extends Context = DefaultContextOf< K, N >
 >(
 	state: State,
 	kind: K,
