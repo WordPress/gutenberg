@@ -103,6 +103,74 @@ describe( 'List view', () => {
 		expect( console ).not.toHaveErrored();
 	} );
 
+	it( 'should select previous block after removing currently selected one', async () => {
+		// Insert some blocks of different types.
+		await insertBlock( 'Quote' );
+		await insertBlock( 'Image' );
+		await insertBlock( 'Heading' );
+		await insertBlock( 'Paragraph' );
+
+		// Open list view.
+		await openListView();
+
+		// The last inserted paragraph block should be selected in List View.
+		await page.waitForXPath(
+			'//a[contains(., "Paragraph(selected block)")]'
+		);
+
+		/**
+		 * Make sure removing the currently selected block makes the previous block selected
+		 */
+		const paragraphOptionsButton = await page.waitForSelector(
+			'tr.block-editor-list-view-leaf.is-selected button[aria-label="Options for Paragraph block"]'
+		);
+
+		// Open paragraph block option dropdown.
+		await paragraphOptionsButton.click();
+
+		const paragraphRemoveButton = await page.waitForXPath(
+			'//button[contains(., "Remove Paragraph")]'
+		);
+
+		// Remove paragraph block.
+		await paragraphRemoveButton.click();
+
+		// Make sure the Paragraph has been removed.
+		let listViewRows = await page.$$( 'tr.block-editor-list-view-leaf' );
+		expect( listViewRows ).toHaveLength( 3 );
+
+		// Heading block should be selected as previous block.
+		await page.waitForXPath(
+			'//a[contains(., "Heading(selected block)")]'
+		);
+
+		/**
+		 * Make sure removing a non-selected block doesn't change selection.
+		 */
+		const quoteOptionsButton = await page.waitForSelector(
+			'tr.block-editor-list-view-leaf:first-child button[aria-label="Options for Quote block"]'
+		);
+
+		// Open Image block option dropdown.
+		quoteOptionsButton.click();
+
+		const quoteRemoveButton = await page.waitForXPath(
+			'//button[contains(., "Remove Quote")]'
+		);
+
+		// Remove image block
+		await quoteRemoveButton.click();
+
+		// Make sure the Quote block has been removed.
+		listViewRows = await page.$$( 'tr.block-editor-list-view-leaf' );
+		expect( listViewRows ).toHaveLength( 2 );
+
+		// Heading block should be selected
+		await page.waitForXPath(
+			'//a[contains(., "Heading(selected block)")]'
+		);
+	} );
+
 	it( 'should expand nested list items', async () => {
 		// Insert some blocks of different types.
 		await insertBlock( 'Cover' );
