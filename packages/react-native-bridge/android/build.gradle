@@ -67,8 +67,7 @@ if(willPublishAndroidDependenciesBinaries) {
             }
 
             // Publish the dependency to S3
-            apply plugin: "maven-publish"
-            // apply plugin: "com.automattic.android.publish-to-s3"
+            apply plugin: "com.automattic.android.publish-to-s3"
 
             project.afterEvaluate {
                 afterEvaluate {
