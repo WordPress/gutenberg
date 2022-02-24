@@ -34,8 +34,25 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		foreach ( $settings['styles'] as $style ) {
 			if (
 				! isset( $style['__unstableType'] ) ||
-				// 'globalStyles' is for WordPress 5.8. 'theme' and 'presets' is for WordPress 5.9.
-				! in_array( $style['__unstableType'], array( 'globalStyles', 'theme', 'presets' ), true )
+				// '__unstableType' is 'globalStyles' for WordPress 5.8 and 'presets' for WordPress 5.9.
+				//
+				// Note that styles classified as'theme', can be from the theme stylesheet
+				// or from the theme.json (the styles section).
+				// We are unable to identify which is which, so we can't remove and recreate those.
+				// Instead, we reload the theme.json styles from the plugin.
+				// Because they'll use the same selectors and load later,
+				// they'll have higher priority than core's.
+				//
+				// Theoretically, this approach with 'theme' styles could be problematic:
+				// if we remove style properties in the plugin, if selectors change, etc.
+				// We need to address this issue directly in core by alowing to identify
+				// styles coming from theme.json.
+				//
+				// A final note about 'theme' styles: this flag is used to identify theme
+				// styles that may need to be removed if the user toggles
+				// "Preferences > Use theme styles" in the preferences modal.
+				//
+				! in_array( $style['__unstableType'], array( 'globalStyles', 'presets' ), true )
 			) {
 				$styles_without_existing_global_styles[] = $style;
 			}
