@@ -387,7 +387,7 @@ _Parameters_
 
 _Returns_
 
--   `DataRegistry`: Data registry.
+-   `WPDataRegistry`: Data registry.
 
 ### createRegistryControl
 
