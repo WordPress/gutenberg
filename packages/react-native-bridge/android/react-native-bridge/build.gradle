@@ -38,7 +38,7 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
+        buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishBinaries.toString()
     }
 
     lintOptions {
@@ -78,7 +78,7 @@ dependencies {
 
     testImplementation "junit:junit:4.13"
 
-    if (willPublishReactNativeBridgeBinary) {
+    if (willPublishBinaries) {
         def rnVersion = rootProject.ext.rnVersion
         println "react-native version for react-native-bridge: $rnVersion"
         implementation "com.facebook.react:react-native:$rnVersion"

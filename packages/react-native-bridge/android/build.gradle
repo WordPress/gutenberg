@@ -2,8 +2,7 @@ import groovy.json.JsonSlurper
 
 buildscript {
     ext {
-        willPublishReactNativeBridgeBinary = properties["willPublishReactNativeBridgeBinary"]?.toBoolean() ?: false
-        willPublishAndroidDependenciesBinaries = properties["willPublishAndroidDependenciesBinaries"]?.toBoolean() ?: false
+        willPublishBinaries = properties["willPublishBinaries"]?.toBoolean() ?: false
 
         compileSdkVersion = 30
         minSdkVersion = 21
@@ -28,7 +27,7 @@ plugins {
 
 allprojects {
     repositories {
-        if (willPublishReactNativeBridgeBinary || willPublishAndroidDependenciesBinaries) {
+        if (willPublishBinaries) {
             maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
         } else {
             maven { url "$rootDir/../../../node_modules/react-native/android" }
@@ -57,7 +56,7 @@ def getSingleXmlNode(node, name) {
 }
 
 // Configure Android dependencies for publishing
-if(willPublishAndroidDependenciesBinaries) {
+if(willPublishBinaries) {
     subprojects {
         if (androidDependenciesToPublish.contains(name)) {
             // Force that the dependency is built using the React Native version specified in package.json
