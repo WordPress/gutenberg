@@ -209,7 +209,7 @@ describe( 'full post content fixture', () => {
 				) {
 					throw new Error(
 						format(
-							"File '%s' does not match expected value (however, the block re-serializes identically):\n\n%s",
+							"File '%s' does not match expected value (however, the block re-serializes identically so you may need to run 'npm run fixtures:regenerate'):\n\n%s",
 							serializedHTMLFileName,
 							err.message
 						)
