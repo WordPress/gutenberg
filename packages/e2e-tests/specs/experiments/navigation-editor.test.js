@@ -711,7 +711,7 @@ describe.skip( 'Navigation editor', () => {
 				}
 
 				const deleteMenuButton = await page.waitForXPath(
-					'//button[text()="Delete menu"]'
+					'//*[@role="region"][@aria-label="Navigation settings"]//button[text()="Delete menu"]'
 				);
 				await deleteMenuButton.click();
 
@@ -750,7 +750,7 @@ describe.skip( 'Navigation editor', () => {
 				}
 
 				const deleteMenuButton = await page.waitForXPath(
-					'//button[text()="Delete menu"]'
+					'//*[@role="region"][@aria-label="Navigation settings"]//button[text()="Delete menu"]'
 				);
 				await deleteMenuButton.click();
 
@@ -821,7 +821,7 @@ describe.skip( 'Navigation editor', () => {
 
 				// Delete the first test menu
 				const deleteMenuButton = await page.waitForXPath(
-					'//button[text()="Delete menu"]'
+					'//*[@role="region"][@aria-label="Navigation settings"]//button[text()="Delete menu"]'
 				);
 				await deleteMenuButton.click();
 
