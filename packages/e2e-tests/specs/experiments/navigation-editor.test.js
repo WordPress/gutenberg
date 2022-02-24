@@ -693,7 +693,7 @@ describe.skip( 'Navigation editor', () => {
 				await setBrowserViewport( viewport );
 				// Wait for the header to show the menu name.
 				await page.waitForXPath(
-					`//h2[contains(text(), "${ menuName }")]`
+					`//*[@role="region"][@aria-label="Navigation top bar"]//h2[contains(text(), "${ menuName }")]`
 				);
 
 				if ( viewport === 'small' ) {
@@ -733,7 +733,7 @@ describe.skip( 'Navigation editor', () => {
 				await setBrowserViewport( viewport );
 				// Wait for the header to show the menu name.
 				await page.waitForXPath(
-					`//h2[contains(text(), "${ menuName }")]`
+					`//*[@role="region"][@aria-label="Navigation top bar"]//h2[contains(text(), "${ menuName }")]`
 				);
 				if ( viewport === 'small' ) {
 					const openSettingsSidebar = await page.waitForXPath(
@@ -781,7 +781,7 @@ describe.skip( 'Navigation editor', () => {
 				await visitNavigationEditor();
 				// Wait for the header to show the menu name.
 				await page.waitForXPath(
-					`//h2[contains(text(), "${ menuName }")]`
+					`//*[@role="region"][@aria-label="Navigation top bar"]//h2[contains(text(), "${ menuName }")]`
 				);
 
 				const deleteMenuButton = await page.waitForXPath(
@@ -799,7 +799,7 @@ describe.skip( 'Navigation editor', () => {
 				);
 
 				const menuActionsDropdown = await page.waitForXPath(
-					'//*[@class="edit-navigation-menu-actions"]//button[@aria-expanded="false"]'
+					'//*[@role="region"][@aria-label="Navigation top bar"]//*[@class="edit-navigation-menu-actions"]//button[@aria-expanded="false"]'
 				);
 
 				await menuActionsDropdown.click();
