@@ -19,17 +19,6 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 	const { backgroundColor, style, opacity } = attributes;
 	const color = useColorProps( attributes );
 
-	// V1 blocks expect to have a default opacity of 0.4, so on transformation
-	// get an opacity attribute set to css in order to assign a class name
-	// to provide this opactiy. Once the user changes the color this is removed
-	// and opacity can then be set via the color block support alpha channel.
-
-	useEffect( () => {
-		if ( ! opacity ) {
-			setAttributes( { opacity: 'alpha-channel' } );
-		}
-	}, [ opacity ] );
-
 	const previousClassName = usePrevious( color.className );
 	useEffect( () => {
 		if (

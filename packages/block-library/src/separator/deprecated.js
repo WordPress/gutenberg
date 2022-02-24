@@ -41,9 +41,6 @@ const v1 = {
 
 		return <hr { ...useBlockProps.save( { className, style } ) } />;
 	},
-	isEligible( { opacity } ) {
-		return ! opacity;
-	},
 	migrate( attributes ) {
 		const { color, customColor } = attributes;
 		return {

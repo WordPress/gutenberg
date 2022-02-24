@@ -9,7 +9,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"opacity": {
-			"type": "string"
+			"type": "string",
+			"default": "alpha-channel"
 		}
 	},
 	"supports": {
