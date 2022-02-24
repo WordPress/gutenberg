@@ -178,6 +178,13 @@ async function deleteAllLinkedResources() {
 	} );
 }
 
+async function openMenuActionsDropdown() {
+	const menuActionsDropdown = await page.waitForXPath(
+		'//*[@role="region"][@aria-label="Navigation top bar"]//*[@class="edit-navigation-menu-actions"]//button[@aria-expanded="false"]'
+	);
+	await menuActionsDropdown.click();
+}
+
 describe.skip( 'Navigation editor', () => {
 	useExperimentalFeatures( [ '#gutenberg-navigation' ] );
 
@@ -779,11 +786,40 @@ describe.skip( 'Navigation editor', () => {
 					menuItemsFixture
 				);
 				await visitNavigationEditor();
-				// Wait for the header to show the menu name.
+				// Wait for the header to show the menu name
 				await page.waitForXPath(
 					`//*[@role="region"][@aria-label="Navigation top bar"]//h2[contains(text(), "${ menuName }")]`
 				);
 
+				// Confirm both test menus are present
+				openMenuActionsDropdown();
+				const firstTestMenuItem = await page
+					.waitForXPath(
+						`//*[@role="group"]//*[@role="menuitemradio"]/span[text()="${ menuName }"]`
+					)
+					.catch( ( error ) => {
+						if ( error.name !== 'TimeoutError' ) {
+							throw error;
+						} else {
+							return null;
+						}
+					} );
+				const secondTestMenuItem = await page
+					.waitForXPath(
+						`//*[@role="group"]//*[@role="menuitemradio"]/span[text()="${ menuName } 2"]`
+					)
+					.catch( ( error ) => {
+						if ( error.name !== 'TimeoutError' ) {
+							throw error;
+						} else {
+							return null;
+						}
+					} );
+
+				expect( firstTestMenuItem ).not.toBeNull();
+				expect( secondTestMenuItem ).not.toBeNull();
+
+				// Delete the first test menu
 				const deleteMenuButton = await page.waitForXPath(
 					'//button[text()="Delete menu"]'
 				);
@@ -798,24 +834,19 @@ describe.skip( 'Navigation editor', () => {
 					`//*[@role="button"][@aria-label="Dismiss this notice"]//*[text()='"${ menuName }" menu has been deleted']`
 				);
 
-				const menuActionsDropdown = await page.waitForXPath(
-					'//*[@role="region"][@aria-label="Navigation top bar"]//*[@class="edit-navigation-menu-actions"]//button[@aria-expanded="false"]'
-				);
-
-				await menuActionsDropdown.click();
-
-				const menuElementHandles = await page.$x(
-					'//*[@role="group"]//*[@role="menuitemradio"]/span'
-				);
-				const existingMenus = [];
-				for ( const elem of menuElementHandles ) {
-					const elemName = await elem.getProperty( 'textContent' );
-					const existingMenuName = await elemName.jsonValue();
-					existingMenus.push( existingMenuName );
-				}
-				expect( existingMenus.includes( `${ menuName }` ) ).toBe(
-					false
-				);
+				openMenuActionsDropdown();
+				const deletedTestMenuItem = await page
+					.waitForXPath(
+						`//*[@role="group"]//*[@role="menuitemradio"]/span[text()="${ menuName }"]`
+					)
+					.catch( ( error ) => {
+						if ( error.name !== 'TimeoutError' ) {
+							throw error;
+						} else {
+							return null;
+						}
+					} );
+				expect( deletedTestMenuItem ).toBeNull();
 			}
 		);
 	} );
