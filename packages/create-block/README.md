@@ -6,7 +6,7 @@ It is largely inspired by [create-react-app](https://create-react-app.dev/docs/g
 
 ## Description
 
-Blocks are the fundamental element of the WordPress block editor. They are the primary way in which plugins and themes can register their functionality and extend the editor's capabilities.
+Blocks are the fundamental element of the WordPress block editor. They are the primary way in which plugins can register their functionality and extend the editor's capabilities.
 
 Visit the [Gutenberg handbook](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/) to learn more about Block API.
 
