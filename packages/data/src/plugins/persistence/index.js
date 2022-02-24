@@ -9,7 +9,7 @@ import { merge, isPlainObject } from 'lodash';
 import defaultStorage from './storage/default';
 import { combineReducers } from '../../';
 
-/** @typedef {import('../../registry').WPDataRegistry} WPDataRegistry */
+/** @typedef {import('../../types').DataRegistry} DataRegistry */
 
 /** @typedef {import('../../registry').WPDataPlugin} WPDataPlugin */
 
@@ -116,7 +116,7 @@ export function createPersistenceInterface( options ) {
 /**
  * Data plugin to persist store state into a single storage key.
  *
- * @param {WPDataRegistry}                  registry      Data registry.
+ * @param {DataRegistry}                  registry      Data registry.
  * @param {?WPDataPersistencePluginOptions} pluginOptions Plugin options.
  *
  * @return {WPDataPlugin} Data plugin.

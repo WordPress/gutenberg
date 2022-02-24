@@ -12,8 +12,6 @@ import useBlockSync from './use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
 
-/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
-
 function BlockEditorProvider( props ) {
 	const { children, settings } = props;
 
