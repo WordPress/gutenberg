@@ -29,7 +29,7 @@ trap cleanup EXIT
 # First test block
 
 status "Scaffolding Example Static (ES5) block..."
-npx wp-create-block example-static-es5 -t es5 --no-wp-scripts
+npx wp-create-block example-static-es5 -t es5
 cd example-static-es5
 
 status "Verifying project..."

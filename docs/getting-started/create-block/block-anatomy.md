@@ -17,7 +17,6 @@ import Edit from './edit';
 import save from './save';
 
 registerBlockType( 'create-block/gutenpride', {
-	apiVersion: 2,
 	/**
 	 * @see ./edit.js
 	 */
@@ -43,19 +42,21 @@ Most of the properties are set in the `block.json` file.
 
 ```json
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "create-block/gutenpride",
+	"version": "0.1.0",
 	"title": "Gutenpride",
-	"category": "widgets",
-	"icon": "smiley",
-	"description": "Example block written with ESNext standard and JSX support – build step required.",
+	"category": "text",
+	"icon": "flag",
+	"description": "A Gutenberg block to show your pride! This block enables you to type text and style it with the color font Gilbert from Type with Pride.",
 	"supports": {
 		"html": false
 	},
 	"textdomain": "gutenpride",
-	"editorScript": "file:./build/index.js",
-	"editorStyle": "file:./build/index.css",
-	"style": "file:./build/style-index.css"
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
 }
 ```
 

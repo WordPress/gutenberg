@@ -25,7 +25,7 @@ const predefinedPluginTemplates = {
 			slug: 'example-static-es5',
 			title: 'Example Static (ES5)',
 			description:
-				'Example static block scaffolded with `@wordpress/create-block` – no build step required.',
+				'Example static block scaffolded with Create Block tool – no build step required.',
 			dashicon: 'smiley',
 			wpScripts: false,
 			editorScript: 'file:./index.js',
@@ -39,7 +39,7 @@ const predefinedPluginTemplates = {
 			slug: 'example-static',
 			title: 'Example Static',
 			description:
-				'Example static block scaffolded with `@wordpress/create-block`.',
+				'Example static block scaffolded with Create Block tool.',
 			dashicon: 'smiley',
 			supports: {
 				html: false,
