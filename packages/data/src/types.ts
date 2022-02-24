@@ -48,12 +48,24 @@ export interface Unsubscriber {
 	(): void;
 }
 
+export interface DataStores {}
+
+export interface Stores extends DataStores {}
+
 export interface DataRegistry {
 	/** Apply multiple store updates without calling store listeners until all have finished */
 	batch( executor: () => void ): void;
 
 	/** Returns the available actions for a given store. */
-	dispatch( store: StoreDescriptor< any > | string ): MapOf< ActionCreator >;
+	dispatch< Store extends Stores[ keyof Stores ] | keyof Stores >(
+		store: Store
+	): NonNullable<
+		Store extends AnyConfig
+			? Store[ 'actions' ]
+			: Store extends keyof Stores
+			? Stores[ Store ][ 'actions' ]
+			: never
+	>;
 
 	/** Registers a new store into the registry. */
 	register( store: StoreDescriptor< any > ): void;
@@ -73,12 +85,32 @@ export interface DataRegistry {
 	): MapOf< ( ...args: any[] ) => Promise< any > >;
 
 	/** Returns the available selectors for a given store. */
-	select(
-		store: StoreDescriptor< any > | string
-	): MapOf< ( ...args: any[] ) => any >;
+	select<
+		Store extends Stores[ keyof Stores ] | keyof Stores,
+		Selectors extends Store extends AnyConfig
+			? Store[ 'selectors' ]
+			: Store extends keyof Stores
+			? Stores[ Store ][ 'selectors' ]
+			: never
+	>(
+		store: Store
+	): NonNullable<
+		{
+			[ Name in keyof Selectors ]: Selectors[ Name ] extends (
+				state: any,
+				...args: infer P
+			) => infer R
+				? ( ...args: P ) => R
+				: Selectors[ Name ];
+		}
+	>;
 
 	/** Raw access to the underlying store instances in the registry. */
-	stores: Readonly< Record< string, StoreInstance< any > > >;
+	stores: Readonly<
+		{
+			[ Name in keyof Stores ]: StoreInstance< Stores[ Name ] >;
+		}
+	>;
 
 	/** Subscribe to changes from all registered stores. */
 	subscribe( listener: () => void ): Unsubscriber;
@@ -106,7 +138,11 @@ export interface DataRegistry {
 	 *
 	 * @deprecated Use registry.stores instead.
 	 */
-	namespaces: Readonly< Record< string, StoreInstance< any > > >;
+	namespaces: Readonly<
+		{
+			[ Name in keyof Stores ]: StoreInstance< Stores[ Name ] >;
+		}
+	>;
 
 	/**
 	 * Given a namespace key and settings object, registers a new store into the registry.
@@ -143,7 +179,7 @@ export interface DataEmitter {
 type ActionCreatorsOf<
 	Config extends AnyConfig
 > = Config extends ReduxStoreConfig< any, infer ActionCreators, any >
-	? { [ name in keyof ActionCreators ]: Function | Generator }
+	? ActionCreators
 	: never;
 
 type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
@@ -151,5 +187,5 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 	any,
 	infer Selectors
 >
-	? { [ name in keyof Selectors ]: Function }
+	? Selectors
 	: never;
