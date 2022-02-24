@@ -95,7 +95,9 @@ dependencies {
         implementation "com.github.wordpress-mobile:react-native-webview:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-webview', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-clipboard:${extractPackageVersion('../../../react-native-editor/package.json', '@react-native-clipboard/clipboard', 'dependencies')}"
 
-        implementation "com.github.fluiddot:publish-gutenberg-mobile-android-dependencies:0.0.1"
+        // Android dependencies
+        implementation "org.wordpress-mobile.gutenberg-mobile:react-native-gesture-handler:$PandroidDependenciesVersion"
+        implementation "org.wordpress-mobile.gutenberg-mobile:react-native-reanimated:$PandroidDependenciesVersion"
 
         runtimeOnly "org.wordpress-mobile:hermes-release-mirror:0.66.2"
    } else {
