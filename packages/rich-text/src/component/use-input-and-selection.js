@@ -146,6 +146,15 @@ export function useInputAndSelection( props ) {
 
 				if (
 					element.contains( anchorNode ) &&
+					element !== anchorNode &&
+					element.contains( focusNode ) &&
+					element !== focusNode
+				) {
+					const { start, end } = createRecord();
+					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
+					onSelectionChange( start, end );
+				} else if (
+					element.contains( anchorNode ) &&
 					element !== anchorNode
 				) {
 					const { start, end: offset = start } = createRecord();

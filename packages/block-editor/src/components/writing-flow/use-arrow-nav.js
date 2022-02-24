@@ -128,6 +128,7 @@ export default function useArrowNav() {
 		getLastMultiSelectedBlockClientId,
 		getSettings,
 		hasMultiSelection,
+		getSelectionStart,
 	} = useSelect( blockEditorStore );
 	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
@@ -218,7 +219,7 @@ export default function useArrowNav() {
 			const { defaultView } = ownerDocument;
 
 			if ( hasMultiSelection() ) {
-				if ( isNav ) {
+				if ( isNav && ! getSelectionStart().attributeKey ) {
 					const action = isShift ? expandSelection : moveSelection;
 					action( isReverse );
 					event.preventDefault();
@@ -278,10 +279,7 @@ export default function useArrowNav() {
 					isTabbableEdge( target, isReverse ) &&
 					isNavEdge( target, isReverse )
 				) {
-					// Shift key is down, and there is multi selection or we're
-					// at the end of the current block.
-					expandSelection( isReverse );
-					event.preventDefault();
+					node.contentEditable = true;
 				}
 			} else if (
 				isVertical &&

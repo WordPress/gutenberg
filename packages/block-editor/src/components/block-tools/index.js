@@ -10,7 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { DELETE } from '@wordpress/keycodes';
+import { DELETE, LEFT, RIGHT, UP, DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -113,6 +113,15 @@ export default function BlockTools( {
 		}
 
 		if ( clientIds.length === 1 ) {
+			return;
+		}
+
+		if (
+			event.keyCode === UP ||
+			event.keyCode === DOWN ||
+			event.keyCode === LEFT ||
+			event.keyCode === RIGHT
+		) {
 			return;
 		}
 
