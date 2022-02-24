@@ -7,11 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { InterfaceSkeleton } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
+import { PluginArea } from '@wordpress/plugins';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { EditorSnackbars } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -30,6 +32,8 @@ export default function List() {
 	} = useLocation();
 
 	useRegisterShortcuts();
+
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const { previousShortcut, nextShortcut, isNavigationOpen } = useSelect(
 		( select ) => {
@@ -73,23 +77,38 @@ export default function List() {
 		  }
 		: undefined;
 
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
+		);
+	}
+
 	return (
-		<InterfaceSkeleton
-			className={ classnames( 'edit-site-list', {
-				'is-navigation-open': isNavigationOpen,
-			} ) }
-			labels={ {
-				drawer: __( 'Navigation Sidebar' ),
-				...detailedRegionLabels,
-			} }
-			header={ <Header templateType={ templateType } /> }
-			drawer={ <NavigationSidebar.Slot /> }
-			notices={ <EditorSnackbars /> }
-			content={ <Table templateType={ templateType } /> }
-			shortcuts={ {
-				previous: previousShortcut,
-				next: nextShortcut,
-			} }
-		/>
+		<>
+			<InterfaceSkeleton
+				className={ classnames( 'edit-site-list', {
+					'is-navigation-open': isNavigationOpen,
+				} ) }
+				labels={ {
+					drawer: __( 'Navigation Sidebar' ),
+					...detailedRegionLabels,
+				} }
+				header={ <Header templateType={ templateType } /> }
+				drawer={ <NavigationSidebar.Slot /> }
+				notices={ <EditorSnackbars /> }
+				content={ <Table templateType={ templateType } /> }
+				shortcuts={ {
+					previous: previousShortcut,
+					next: nextShortcut,
+				} }
+			/>
+			<PluginArea onError={ onPluginAreaError } />
+		</>
 	);
 }
