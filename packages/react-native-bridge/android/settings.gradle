@@ -33,7 +33,7 @@ project(':react-native-gesture-handler').projectDir = new File(rootProject.proje
 include ':react-native-reanimated'
 project(':react-native-reanimated').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-reanimated/android')
 
-if (hasProperty("willPublishBinaries")) {
+if (hasProperty("willPublishReactNativeBridgeBinary")) {
     assert file("./react-native-bridge/build/assets/index.android.bundle").exists() : "index.android.bundle is necessary to publish a new version!"
 } else {
     assert file("../../../node_modules").exists() : "node_modules folder is missing. Please run `npm install` from the root Gutenberg project"
