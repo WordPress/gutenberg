@@ -11,22 +11,6 @@ import {
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
-	it( 'should be able to add a new Paragraph block', async () => {
-		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.paragraph
-		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
-
-		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
-			testData.shortText
-		);
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
-	} );
-
 	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
@@ -130,22 +114,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			await editorPage.hasBlockAtPosition( 2, blockNames.paragraph )
 		).toBe( false );
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
-	} );
-
-	it( 'should be able to create a post with multiple paragraph blocks', async () => {
-		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.paragraph
-		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
-
-		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
-
-		for ( let i = 3; i > 0; i-- ) {
-			await editorPage.removeBlockAtPosition( blockNames.paragraph, i );
-		}
 	} );
 
 	it( 'should be able to merge blocks with unknown html elements', async () => {

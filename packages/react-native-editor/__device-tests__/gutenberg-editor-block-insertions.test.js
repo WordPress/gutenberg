@@ -3,7 +3,7 @@
  */
 import { blockNames } from './pages/editor-page';
 
-describe( 'Gutenberg Editor tests for Block insertion 2', () => {
+describe( 'Gutenberg Editor tests for Block insertion', () => {
 	it( 'adds new block at the end of post', async () => {
 		await editorPage.addNewBlock( blockNames.heading );
 
@@ -135,3 +135,4 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 		expect( html.toLowerCase() ).toBe( expectedHtml );
 	} );
 } );
+ 
