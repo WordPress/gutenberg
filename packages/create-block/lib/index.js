@@ -23,26 +23,29 @@ const commandName = `wp-create-block`;
 program
 	.name( commandName )
 	.description(
-		'Generates PHP, JS and CSS code for registering a block for a WordPress plugin.\n\n' +
-			'[slug] is optional. When provided it triggers the quick mode where ' +
+		'Generates PHP, JS and CSS code for registering a WordPress plugin with blocks.\n\n' +
+			'[slug] is optional. When provided, it triggers the quick mode where ' +
 			'it is used as the block slug used for its identification, the output ' +
 			'location for scaffolded files, and the name of the WordPress plugin.' +
 			'The rest of the configuration is set to all default values unless ' +
-			'overridden with some of the options listed below.'
+			'overridden with some options listed below.'
 	)
 	.version( version )
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'plugin template type name, allowed values: "es5", "esnext", or the name of an external npm package',
-		'esnext'
+		'project template type name; allowed values: "static", "es5", the name of an external npm package, or the path to a local directory',
+		'static'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
-	.option( '--title <value>', 'display title for the plugin/block' )
+	.option(
+		'--title <value>',
+		'display title for the block and the WordPress plugin'
+	)
 	// The name "description" is used internally so it couldn't be used.
 	.option(
 		'--short-description <value>',
-		'short description for the plugin/block'
+		'short description for the block and the WordPress plugin'
 	)
 	.option( '--category <name>', 'category name for the block' )
 	.option(
@@ -98,7 +101,9 @@ program
 							! Object.keys( optionsValues ).includes( name )
 					);
 					log.info( '' );
-					log.info( "Let's customize your WordPress plugin:" );
+					log.info(
+						"Let's customize your WordPress plugin with blocks:"
+					);
 					const answers = await inquirer.prompt( prompts );
 					await scaffold( pluginTemplate, {
 						...defaultValues,
