@@ -7,7 +7,7 @@
 
 /**
  * Adds settings to the mobile block editor.
- * 
+ *
  * This is used by the settings REST endpoint and it should land in core
  * as soon as lib/class-wp-rest-block-editor-settings-controller.php does.
  *
