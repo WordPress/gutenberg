@@ -172,10 +172,10 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pressKeyWithModifier( 'shift', 'ArrowRight' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
 		await testNativeSelection();
-		// This delete all blocks.
+		// This deletes all blocks.
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

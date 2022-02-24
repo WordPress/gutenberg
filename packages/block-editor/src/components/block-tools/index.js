@@ -10,7 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { DELETE, LEFT, RIGHT, UP, DOWN } from '@wordpress/keycodes';
+import { DELETE, LEFT, RIGHT, UP, DOWN, TAB } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -80,47 +80,42 @@ export default function BlockTools( {
 		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
 			event.preventDefault();
 			insertBeforeBlock( first( clientIds ) );
-		} else if (
-			isMatch( 'core/block-editor/delete-multi-selection', event )
+		}
+
+		/**
+		 * Check if the target element is a text area, input or
+		 * event.defaultPrevented and return early. In all these
+		 * cases backspace could be handled elsewhere.
+		 */
+		if (
+			[ 'INPUT', 'TEXTAREA' ].includes( event.target.nodeName ) ||
+			event.defaultPrevented
 		) {
-			/**
-			 * Check if the target element is a text area, input or
-			 * event.defaultPrevented and return early. In all these
-			 * cases backspace could be handled elsewhere.
-			 */
-			if (
-				[ 'INPUT', 'TEXTAREA' ].includes( event.target.nodeName ) ||
-				event.defaultPrevented
-			) {
-				return;
-			}
-
-			if ( clientIds.length < 2 ) {
-				return;
-			}
-
-			const isForward = event.keyCode === DELETE;
-			deleteSelection( isForward );
-			event.preventDefault();
-		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
-			if ( clientIds.length > 1 ) {
-				event.preventDefault();
-				clearSelectedBlock();
-				event.target.ownerDocument.defaultView
-					.getSelection()
-					.removeAllRanges();
-			}
+			return;
 		}
 
 		if ( clientIds.length === 1 ) {
 			return;
 		}
 
+		if ( isMatch( 'core/block-editor/delete-multi-selection', event ) ) {
+			const isForward = event.keyCode === DELETE;
+			deleteSelection( isForward );
+			event.preventDefault();
+		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
+			event.preventDefault();
+			clearSelectedBlock();
+			event.target.ownerDocument.defaultView
+				.getSelection()
+				.removeAllRanges();
+		}
+
 		if (
 			event.keyCode === UP ||
 			event.keyCode === DOWN ||
 			event.keyCode === LEFT ||
-			event.keyCode === RIGHT
+			event.keyCode === RIGHT ||
+			event.keyCode === TAB
 		) {
 			return;
 		}
