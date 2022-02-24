@@ -123,7 +123,7 @@ export function useClipboardHandler() {
 				notifyCopy( event.type, selectedBlockClientIds );
 				const blocks = getBlocksByClientId( selectedBlockClientIds );
 				const serialized = serialize( blocks, {
-					__experimentalSupports: { copy: event.type !== 'copy' },
+					__experimentalExcludeAttributes: { copy: event.type !== 'copy' },
 				} );
 
 				event.clipboardData.setData( 'text/plain', serialized );
