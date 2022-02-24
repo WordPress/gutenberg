@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// noinspection DuplicatedCode
 import { fireEvent, initializeEditor, waitFor, within } from 'test/helpers';
 /**
  * WordPress dependencies
@@ -135,6 +134,5 @@ describe( '<SocialLinkEdit/>', () => {
 				subject.getByA11yHint( /Instagram has no URL set/ )
 			)
 		).toBeDefined();
-		// console.log( JSON.stringify( subject.toJSON(), null, 1 ) );
 	} );
 } );
