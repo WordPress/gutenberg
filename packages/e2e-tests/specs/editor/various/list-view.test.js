@@ -125,14 +125,14 @@ describe( 'List view', () => {
 			'tr.block-editor-list-view-leaf.is-selected button[aria-label="Options for Paragraph block"]'
 		);
 
-		// Open paragraph block option dropdown.
+		// Open block option dropdown.
 		await paragraphOptionsButton.click();
 
 		const paragraphRemoveButton = await page.waitForXPath(
 			'//button[contains(., "Remove Paragraph")]'
 		);
 
-		// Remove paragraph block.
+		// Remove block.
 		await paragraphRemoveButton.click();
 
 		// Make sure the Paragraph has been removed.
@@ -151,14 +151,14 @@ describe( 'List view', () => {
 			'tr.block-editor-list-view-leaf:first-child button[aria-label="Options for Quote block"]'
 		);
 
-		// Open Image block option dropdown.
+		// Open block option dropdown.
 		quoteOptionsButton.click();
 
 		const quoteRemoveButton = await page.waitForXPath(
 			'//button[contains(., "Remove Quote")]'
 		);
 
-		// Remove image block
+		// Remove block
 		await quoteRemoveButton.click();
 
 		// Make sure the Quote block has been removed.
