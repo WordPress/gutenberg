@@ -1307,8 +1307,8 @@ export function selection( state = {}, action ) {
 			const { start, end } = action;
 
 			if (
-				start === state.selectionStart.clientId &&
-				end === state.selectionEnd.clientId
+				start === state.selectionStart?.clientId &&
+				end === state.selectionEnd?.clientId
 			) {
 				return state;
 			}
