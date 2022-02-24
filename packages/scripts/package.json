@@ -90,6 +90,10 @@
 		"webpack-cli": "^4.9.1",
 		"webpack-dev-server": "^4.4.0"
 	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
