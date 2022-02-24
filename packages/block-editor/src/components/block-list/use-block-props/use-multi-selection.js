@@ -32,6 +32,7 @@ export function useMultiSelection( clientId ) {
 		stopMultiSelect,
 		multiSelect,
 		selectBlock,
+		selectionChange,
 	} = useDispatch( blockEditorStore );
 	const {
 		isSelectionEnabled,
@@ -39,6 +40,7 @@ export function useMultiSelection( clientId ) {
 		getBlockParents,
 		getBlockSelectionStart,
 		hasMultiSelection,
+		isSelectionMergeable,
 	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
@@ -97,8 +99,20 @@ export function useMultiSelection( clientId ) {
 					];
 					const depth =
 						Math.min( startPath.length, endPath.length ) - 1;
+
 					// Check if selection is already set by rich text.
 					multiSelect( startPath[ depth ], endPath[ depth ] );
+
+					if ( ! isSelectionMergeable() ) {
+						selectionChange( {
+							start: {
+								clientId: startPath[ depth ],
+							},
+							end: {
+								clientId: endPath[ depth ],
+							},
+						} );
+					}
 				}
 			}
 

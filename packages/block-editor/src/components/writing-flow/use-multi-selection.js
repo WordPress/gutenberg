@@ -41,16 +41,6 @@ function getDeepestNode( node, type ) {
 	return node;
 }
 
-function isSimpleContentEditable( node ) {
-	return (
-		node.getAttribute( 'contenteditable' ) === 'true' &&
-		( ! node.firstElementChild ||
-			node.ownerDocument.defaultView.getComputedStyle(
-				node.firstElementChild
-			).display === 'inline' )
-	);
-}
-
 function selector( select ) {
 	const {
 		isMultiSelecting,
@@ -58,6 +48,7 @@ function selector( select ) {
 		hasMultiSelection,
 		getSelectedBlockClientId,
 		getSelectedBlocksInitialCaretPosition,
+		getSelectionStart,
 	} = select( blockEditorStore );
 
 	return {
@@ -66,6 +57,7 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		selectedBlockClientId: getSelectedBlockClientId(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
+		isFullSelection: ! getSelectionStart().attributeKey,
 	};
 }
 
@@ -76,6 +68,7 @@ export default function useMultiSelection() {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		selectedBlockClientId,
+		isFullSelection,
 	} = useSelect( selector, [] );
 	const selectedRef = useBlockRef( selectedBlockClientId );
 	// These must be in the right DOM order.
@@ -130,6 +123,10 @@ export default function useMultiSelection() {
 				return;
 			}
 
+			if ( ! isFullSelection ) {
+				return;
+			}
+
 			// Allow cross contentEditable selection by temporarily making
 			// all content editable. We can't rely on using the store and
 			// React because re-rending happens too slowly. We need to be
@@ -143,19 +140,6 @@ export default function useMultiSelection() {
 			// The block refs might not be immediately available
 			// when dragging blocks into another block.
 			if ( ! startRef.current || ! endRef.current ) {
-				return;
-			}
-
-			const { anchorNode, focusNode } = defaultView.getSelection();
-
-			if (
-				isSimpleContentEditable( startRef.current ) &&
-				( startRef.current.contains( anchorNode ) ||
-					startRef.current.contains( focusNode ) ) &&
-				isSimpleContentEditable( endRef.current ) &&
-				( endRef.current.contains( anchorNode ) ||
-					endRef.current.contains( focusNode ) )
-			) {
 				return;
 			}
 
@@ -180,6 +164,7 @@ export default function useMultiSelection() {
 			multiSelectedBlockClientIds,
 			selectedBlockClientId,
 			initialPosition,
+			isFullSelection,
 		]
 	);
 }

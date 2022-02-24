@@ -1058,6 +1058,19 @@ _Returns_
 
 -   `boolean`: True if it should be possible to multi-select blocks, false if multi-selection is disabled.
 
+### isSelectionMergeable
+
+Check wether the selection is mergeable.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _isForward_ `boolean`: Wether to merge forwards.
+
+_Returns_
+
+-   `boolean`: Wether the selection is mergeable.
+
 ### isTyping
 
 Returns true if the user is typing, or false otherwise.
