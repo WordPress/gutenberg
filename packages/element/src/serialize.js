@@ -282,12 +282,12 @@ function getNormalAttributeValue( attribute, value ) {
 	return value;
 }
 /**
- * This is a list of all SVG attributes that have dashes.
+ * This is a map of all SVG attributes that have dashes. Map(lower case prop => dashed lower case attribute).
  * We need this to render e.g strokeWidth as stroke-width.
  *
  * List from: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute.
  */
-const SVG_ATTRIBUTE_LIST = new Set( [
+const SVG_ATTRIBUTE_WITH_DASHES_LIST = [
 	'accentHeight',
 	'alignmentBaseline',
 	'arabicForm',
@@ -361,7 +361,110 @@ const SVG_ATTRIBUTE_LIST = new Set( [
 	'writingMode',
 	'xmlnsXlink',
 	'xHeight',
-] );
+].reduce( ( map, attribute ) => {
+	// The keys are lower-cased for more robust lookup.
+	map[ attribute.toLowerCase() ] = attribute;
+	return map;
+}, {} );
+
+/**
+ * This is a map of all case-sensitive SVG attributes. Map(lowercase key => proper case attribute).
+ * The keys are lower-cased for more robust lookup.
+ * Note that this list only contains attributes that contain at least one capital letter.
+ * Lowercase attributes don't need mapping, since we lowercase all attributes by default.
+ */
+const CASE_SENSITIVE_SVG_ATTRIBUTES = [
+	'allowReorder',
+	'attributeName',
+	'attributeType',
+	'autoReverse',
+	'baseFrequency',
+	'baseProfile',
+	'calcMode',
+	'clipPathUnits',
+	'contentScriptType',
+	'contentStyleType',
+	'diffuseConstant',
+	'edgeMode',
+	'externalResourcesRequired',
+	'filterRes',
+	'filterUnits',
+	'glyphRef',
+	'gradientTransform',
+	'gradientUnits',
+	'kernelMatrix',
+	'kernelUnitLength',
+	'keyPoints',
+	'keySplines',
+	'keyTimes',
+	'lengthAdjust',
+	'limitingConeAngle',
+	'markerHeight',
+	'markerUnits',
+	'markerWidth',
+	'maskContentUnits',
+	'maskUnits',
+	'numOctaves',
+	'pathLength',
+	'patternContentUnits',
+	'patternTransform',
+	'patternUnits',
+	'pointsAtX',
+	'pointsAtY',
+	'pointsAtZ',
+	'preserveAlpha',
+	'preserveAspectRatio',
+	'primitiveUnits',
+	'refX',
+	'refY',
+	'repeatCount',
+	'repeatDur',
+	'requiredExtensions',
+	'requiredFeatures',
+	'specularConstant',
+	'specularExponent',
+	'spreadMethod',
+	'startOffset',
+	'stdDeviation',
+	'stitchTiles',
+	'suppressContentEditableWarning',
+	'suppressHydrationWarning',
+	'surfaceScale',
+	'systemLanguage',
+	'tableValues',
+	'targetX',
+	'targetY',
+	'textLength',
+	'viewBox',
+	'viewTarget',
+	'xChannelSelector',
+	'yChannelSelector',
+].reduce( ( map, attribute ) => {
+	// The keys are lower-cased for more robust lookup.
+	map[ attribute.toLowerCase() ] = attribute;
+	return map;
+}, {} );
+
+/**
+ * This is a map of all SVG attributes that have colons.
+ * Keys are lower-cased and stripped of their colons for more robust lookup.
+ */
+const SVG_ATTRIBUTES_WITH_COLONS = [
+	'xlink:actuate',
+	'xlink:arcrole',
+	'xlink:href',
+	'xlink:role',
+	'xlink:show',
+	'xlink:title',
+	'xlink:type',
+	'xml:base',
+	'xml:lang',
+	'xml:space',
+	'xmlns:xlink',
+].reduce( ( map, attribute ) => {
+	map[ attribute.replace( ':', '' ).toLowerCase() ] = attribute;
+	return map;
+}, {} );
 
 /**
  * Returns the normal form of the element's attribute name for HTML.
@@ -370,7 +473,6 @@ const SVG_ATTRIBUTE_LIST = new Set( [
  *
  * @return {string} Normalized attribute name.
  */
-
 function getNormalAttributeName( attribute ) {
 	switch ( attribute ) {
 		case 'htmlFor':
@@ -379,10 +481,19 @@ function getNormalAttributeName( attribute ) {
 		case 'className':
 			return 'class';
 	}
-	if ( SVG_ATTRIBUTE_LIST.has( attribute ) ) {
-		return kebabCase( attribute );
+	const attributeLowerCase = attribute.toLowerCase();
+
+	if ( CASE_SENSITIVE_SVG_ATTRIBUTES[ attributeLowerCase ] ) {
+		return CASE_SENSITIVE_SVG_ATTRIBUTES[ attributeLowerCase ];
+	} else if ( SVG_ATTRIBUTE_WITH_DASHES_LIST[ attributeLowerCase ] ) {
+		return kebabCase(
+			SVG_ATTRIBUTE_WITH_DASHES_LIST[ attributeLowerCase ]
+		);
+	} else if ( SVG_ATTRIBUTES_WITH_COLONS[ attributeLowerCase ] ) {
+		return SVG_ATTRIBUTES_WITH_COLONS[ attributeLowerCase ];
 	}
-	return attribute.toLowerCase();
+
+	return attributeLowerCase;
 }
 
 /**
