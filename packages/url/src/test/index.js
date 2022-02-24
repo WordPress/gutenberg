@@ -978,10 +978,6 @@ describe( 'cleanForSlug', () => {
 		expect( cleanForSlug( '/Is th@t Déjà_vu? ' ) ).toBe( 'is-tht-deja_vu' );
 	} );
 
-	it( 'Should allow non-latin characters', () => {
-		expect( cleanForSlug( 'Καλημέρα Κόσμε' ) ).toBe( 'καλημέρα-κόσμε' );
-	} );
-
 	it( 'Should return an empty string for missing argument', () => {
 		expect( cleanForSlug() ).toBe( '' );
 	} );
@@ -993,6 +989,17 @@ describe( 'cleanForSlug', () => {
 	it( 'Should not allow characters used internally in rich-text', () => {
 		//The last space is an object replacement character
 		expect( cleanForSlug( 'the long cat￼' ) ).toBe( 'the-long-cat' );
+	} );
+
+	it( 'Creates a slug for languages that use multibyte encodings', () => {
+		expect( cleanForSlug( '新荣记 ' ) ).toBe( '新荣记' );
+		expect( cleanForSlug( '私のテンプレートパーツのテスト ' ) ).toBe(
+			'私のテンプレートパーツのテスト'
+		);
+		expect( cleanForSlug( 'ქართული ნაწილი' ) ).toBe( 'ქართული-ნაწილი' );
+		expect( cleanForSlug( 'Καλημέρα Κόσμε' ) ).toBe( 'καλημέρα-κόσμε' );
+		expect( cleanForSlug( '안녕하세요 ' ) ).toBe( '안녕하세요' );
+		expect( cleanForSlug( '繁体字 ' ) ).toBe( '繁体字' );
 	} );
 } );
 
