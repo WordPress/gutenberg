@@ -8,6 +8,10 @@
 -   Custom project templates will use default template files during scaffolding for the WordPress plugin shell and/or individual blocks. It is possible to replace them with a custom set of template files by using the `pluginTemplatesPath` and/or `blockTemplatesPath` options ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
 -   The default `esnext` project template got renamed to `static` ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
 
+### New Features
+
+-   Added CLI prompts for three additional plugin header fields: `Plugin URI`, `Domain Path`, and `Update URI` ([#39096](https://github.com/WordPress/gutenberg/pull/39096)).
+
 ### Deprecations
 
 -   To remove confusion when configuring custom project templates, the `templatesPath` option got renamed to `pluginTemplatesPath`. The old name still works but is considered deprecated, and it might get removed in the future ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
