@@ -2327,7 +2327,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$theme->merge( $user );
-		$actual   = $theme->export_theme_json();
+		$actual   = $theme->get_data();
 		$expected = array(
 			'version'  => 2,
 			'settings' => array(
@@ -2379,7 +2379,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$actual   = $theme->export_theme_json();
+		$actual   = $theme->get_data();
 		$expected = array(
 			'version'  => 2,
 			'settings' => array(
@@ -2427,7 +2427,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'custom'
 		);
 
-		$actual   = $user->export_theme_json();
+		$actual   = $user->get_data();
 		$expected = array(
 			'version'  => 2,
 			'settings' => array(

@@ -59,7 +59,7 @@ function gutenberg_generate_block_templates_export_file() {
 
 	$zip->addFromString(
 		'theme/theme.json',
-		wp_json_encode( $tree->export_theme_json(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
+		wp_json_encode( $tree->get_data(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
 	);
 
 	// Save changes to the zip file.

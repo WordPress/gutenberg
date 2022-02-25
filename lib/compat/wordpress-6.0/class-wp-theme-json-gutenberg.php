@@ -49,7 +49,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	 *
 	 * @return array
 	 */
-	public function export_theme_json() {
+	public function get_data() {
 		$flattened_theme_json = $this->theme_json;
 		$nodes                = static::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $node ) {
