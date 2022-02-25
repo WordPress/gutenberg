@@ -197,10 +197,9 @@ export function parseQuantityAndUnitFromRawValue(
 	if ( typeof rawValue !== 'undefined' || rawValue === null ) {
 		trimmedValue = `${ rawValue }`.trim();
 		const parsedQuantity = parseFloat( trimmedValue );
-		quantityToReturn =
-			isNaN( parsedQuantity ) || ! isFinite( parsedQuantity )
-				? undefined
-				: parsedQuantity;
+		quantityToReturn = ! isFinite( parsedQuantity )
+			? undefined
+			: parsedQuantity;
 	}
 
 	const unitMatch = trimmedValue?.match( /[\d.\-\+]*\s*(.*)/ );
