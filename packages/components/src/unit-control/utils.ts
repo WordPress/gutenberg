@@ -203,10 +203,7 @@ export function parseQuantityAndUnitFromRawValue(
 	}
 
 	const unitMatch = trimmedValue?.match( /[\d.\-\+]*\s*(.*)/ );
-	const matchedUnit =
-		typeof unitMatch?.[ 1 ] !== 'undefined'
-			? unitMatch[ 1 ].toLowerCase()
-			: undefined;
+	const matchedUnit = unitMatch?.[ 1 ]?.toLowerCase();
 	let unitToReturn: string | undefined;
 	if ( hasUnits( allowedUnits ) ) {
 		const match = allowedUnits.find(

@@ -85,7 +85,7 @@ function UnitControl(
 	}, [ initialUnit ] );
 
 	// Stores parsed value for hand-off in state reducer.
-	const refParsedValue = useRef< string | null >( null );
+	const refParsedQuantity = useRef< number | undefined >( undefined );
 
 	const classes = classnames( 'components-unit-control', className );
 
@@ -136,7 +136,7 @@ function UnitControl(
 
 	const mayUpdateUnit = ( event: SyntheticEvent< HTMLInputElement > ) => {
 		if ( ! isNaN( Number( event.currentTarget.value ) ) ) {
-			refParsedValue.current = null;
+			refParsedQuantity.current = undefined;
 			return;
 		}
 		const [
@@ -149,7 +149,7 @@ function UnitControl(
 			unit
 		);
 
-		refParsedValue.current = ( validParsedQuantity ?? '' ).toString();
+		refParsedQuantity.current = validParsedQuantity;
 
 		if ( isPressEnterToChange && validParsedUnit !== unit ) {
 			const data = Array.isArray( units )
@@ -192,9 +192,9 @@ function UnitControl(
 		 * then use that result to update the state.
 		 */
 		if ( action.type === inputControlActionTypes.COMMIT ) {
-			if ( refParsedValue.current !== null ) {
-				state.value = refParsedValue.current;
-				refParsedValue.current = null;
+			if ( refParsedQuantity.current !== undefined ) {
+				state.value = ( refParsedQuantity.current ?? '' ).toString();
+				refParsedQuantity.current = undefined;
 			}
 		}
 
