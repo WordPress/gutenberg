@@ -11,8 +11,8 @@ The state when a block has been inserted, but no data has been entered yet, is c
 To use the Placeholder, wrap the `<TextControl>` component so it becomes a child element of the `<Placeholder>` component. Try it out in your code. After updating, you might have something like:
 
 ```jsx
-import { Placeholder, TextControl } from '@wordpress/components';
 import { useBlockProps } from '@wordpress/block-editor';
+import { Placeholder, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function Edit( { attributes, className, setAttributes } ) {
