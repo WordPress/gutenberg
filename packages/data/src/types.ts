@@ -52,56 +52,71 @@ export interface DataStores {}
 
 export interface Stores extends DataStores {}
 
+type Store<
+	StoreRef extends Stores[ keyof Stores ] | keyof Stores
+> = StoreRef extends AnyConfig
+	? StoreRef
+	: StoreRef extends keyof Stores
+	? Stores[ StoreRef ]
+	: never;
+
+type CurriedState< F extends ( ...args: any[] ) => any > = F extends (
+	state: any,
+	...args: infer P
+) => infer R
+	? ( ...args: P ) => R
+	: F;
+
+type Resolvable<
+	F extends ( ...args: any[] ) => any
+> = ReturnType< F > extends Promise< any >
+	? F
+	: ( ...args: Parameters< F > ) => Promise< ReturnType< F > >;
+
 export interface DataRegistry {
 	/** Apply multiple store updates without calling store listeners until all have finished */
 	batch( executor: () => void ): void;
 
 	/** Returns the available actions for a given store. */
-	dispatch< Store extends Stores[ keyof Stores ] | keyof Stores >(
-		store: Store
-	): NonNullable<
-		Store extends AnyConfig
-			? Store[ 'actions' ]
-			: Store extends keyof Stores
-			? Stores[ Store ][ 'actions' ]
-			: never
-	>;
+	dispatch< StoreRef extends Stores[ keyof Stores ] | keyof Stores >(
+		store: StoreRef
+	): NonNullable< Store< StoreRef >[ 'actions' ] >;
 
 	/** Registers a new store into the registry. */
 	register( store: StoreDescriptor< any > ): void;
 
 	/** Given a namespace key and store description, registers a new Redux store into the registry. */
-	registerStore< Store extends StoreDescriptor< any > >(
+	registerStore(
 		name: string,
-		store: Store
+		store: StoreDescriptor<any>
 	): ReduxStore;
 
 	/**
 	 * Returns a version of the available selectors for a given store that returns
 	 * a Promise which resolves after all associated resolvers have finished.
 	 */
-	resolveSelect(
-		store: StoreDescriptor< any > | string
-	): MapOf< ( ...args: any[] ) => Promise< any > >;
+	resolveSelect<
+		StoreRef extends Stores[ keyof Stores ] | keyof Stores,
+		Selectors extends Store< StoreRef >[ 'selectors' ]
+	>(
+		store: StoreRef
+	): NonNullable<
+		{
+			[ Name in keyof Selectors ]: Resolvable<
+				CurriedState< Selectors[ Name ] >
+			>;
+		}
+	>;
 
 	/** Returns the available selectors for a given store. */
 	select<
-		Store extends Stores[ keyof Stores ] | keyof Stores,
-		Selectors extends Store extends AnyConfig
-			? Store[ 'selectors' ]
-			: Store extends keyof Stores
-			? Stores[ Store ][ 'selectors' ]
-			: never
+		StoreRef extends Stores[ keyof Stores ] | keyof Stores,
+		Selectors extends Store< StoreRef >[ 'selectors' ]
 	>(
-		store: Store
+		store: StoreRef
 	): NonNullable<
 		{
-			[ Name in keyof Selectors ]: Selectors[ Name ] extends (
-				state: any,
-				...args: infer P
-			) => infer R
-				? ( ...args: P ) => R
-				: Selectors[ Name ];
+			[ Name in keyof Selectors ]: CurriedState< Selectors[ Name ] >;
 		}
 	>;
 
