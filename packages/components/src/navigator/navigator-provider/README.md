@@ -4,49 +4,34 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-The `NavigatorProvider` component allows rendering nested panels or menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the `useNavigator` hook). The Global Styles sidebar is an example of this.
-
-The `Navigator*` family of components is _not_ opinionated in terms of UI, and can be composed with any UI components to navigate between the nested screens.
+The `NavigatorProvider` component allows rendering nested views/panels/menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) and [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
 
 ## Usage
 
 ```jsx
 import {
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalUseNavigator as useNavigator,
+  __experimentalNavigatorProvider as NavigatorProvider,
+  __experimentalNavigatorScreen as NavigatorScreen,
+  __experimentalNavigatorButton as NavigatorButton,
+  __experimentalNavigatorBackButton as NavigatorBackButton,
 } from '@wordpress/components';
 
-function NavigatorButton( {
-	path,
-	isBack = false,
-	...props
-} ) {
-	const navigator = useNavigator();
-	return (
-		<Button
-			onClick={ () => navigator.push( path, { isBack } ) }
-			{ ...props }
-		/>
-	);
-}
-
 const MyNavigation = () => (
-	<NavigatorProvider initialPath="/">
-		<NavigatorScreen path="/">
-			<p>This is the home screen.</p>
-			<NavigatorButton isPrimary path="/child">
-				Navigate to child screen.
-			</NavigatorButton>
-		</NavigatorScreen>
+  <NavigatorProvider initialPath="/">
+    <NavigatorScreen path="/">
+      <p>This is the home screen.</p>
+       <NavigatorButton path="/child">
+         Navigate to child screen.
+      </NavigatorButton>
+    </NavigatorScreen>
 
-		<NavigatorScreen path="/child">
-			<p>This is the child screen.</p>
-			<NavigatorButton isPrimary path="/" isBack>
-				Go back
-			</NavigatorButton>
-		</NavigatorScreen>
-	</NavigatorProvider>
+    <NavigatorScreen path="/child">
+      <p>This is the child screen.</p>
+      <NavigatorBackButton>
+        Go back
+      </NavigatorBackButton>
+    </NavigatorScreen>
+  </NavigatorProvider>
 );
 ```
 
@@ -64,12 +49,24 @@ The initial active path.
 
 You can retrieve a `navigator` instance by using the `useNavigator` hook.
 
-The hook offers the following methods:
+The `navigator` instance has a few properties:
 
-### `push`: `( path: string, options ) => void`
+### `goTo`: `( path: string, options: NavigateOptions ) => void`
 
-The `push` function allows you to navigate to a given path. The second argument can augment the navigation operations with different options.
+The `goTo` function allows navigating to a given path. The second argument can augment the navigation operations with different options.
 
 The available options are:
 
-- `isBack` (`boolean): A boolean flag indicating that we're moving back to a previous state. -->
+- `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
+
+### `goBack`: `() => void`
+
+The `goBack` function allows navigating to the previous path.
+
+### `location`: `NavigatorLocation`
+
+The `location` object represent the current location, and has a few properties:
+
+- `path`: `string`. The path associated to the location.
+- `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards in the location stack.
+- `isInitial`: `boolean`. A flag that is `true` only for the first (root) location in the location stack.

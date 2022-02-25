@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Radio } from 'reakit';
 
@@ -40,7 +39,7 @@ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 
 function ToggleGroupControlOption(
 	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const toggleGroupControlContext = useToggleGroupControlContext();
 	const id = useInstanceId(

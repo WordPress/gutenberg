@@ -154,6 +154,25 @@ export function __experimentalReceiveThemeBaseGlobalStyles(
 }
 
 /**
+ * Returns an action object used in signalling that the theme global styles variations have been received.
+ *
+ * @param {string} stylesheet The theme's identifier
+ * @param {Array}  variations The global styles variations.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveThemeGlobalStyleVariations(
+	stylesheet,
+	variations
+) {
+	return {
+		type: 'RECEIVE_THEME_GLOBAL_STYLE_VARIATIONS',
+		stylesheet,
+		variations,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the index has been received.
  *
  * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.
@@ -447,7 +466,7 @@ export const saveEntityRecord = (
 				// so the client just sends and receives objects.
 				const currentUser = select.getCurrentUser();
 				const currentUserId = currentUser ? currentUser.id : undefined;
-				const autosavePost = resolveSelect.getAutosave(
+				const autosavePost = await resolveSelect.getAutosave(
 					persistedRecord.type,
 					persistedRecord.id,
 					currentUserId

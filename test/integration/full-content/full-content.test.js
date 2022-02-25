@@ -2,7 +2,7 @@
  * External dependencies
  */
 import glob from 'fast-glob';
-import { fromPairs, omit, startsWith, get } from 'lodash';
+import { fromPairs, startsWith, get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -38,28 +38,23 @@ import {
 
 const blockBasenames = getAvailableBlockFixturesBasenames();
 
-function normalizeParsedBlocks( blocks ) {
-	return blocks.map( ( block, index ) => {
-		// Clone and remove React-instance-specific stuff; also, attribute
-		// values that equal `undefined` will be removed. Validation issues
-		// add too much noise so they get removed as well.
-		block = JSON.parse(
-			JSON.stringify( omit( block, 'validationIssues' ) )
-		);
-
-		// Change client IDs to a predictable value
-		block.clientId = '_clientId_' + index;
-
-		// Recurse to normalize inner blocks
-		block.innerBlocks = normalizeParsedBlocks( block.innerBlocks );
-
-		return block;
-	} );
-}
+/**
+ * Returns only the properties of the block that
+ * we care about comparing with the fixture data.
+ *
+ * @param {WPBlock[]} blocks loaded blocks to normalize.
+ */
+const normalizeParsedBlocks = ( blocks ) =>
+	blocks.map( ( block ) => ( {
+		name: block.name,
+		isValid: block.isValid,
+		attributes: JSON.parse( JSON.stringify( block.attributes ) ),
+		innerBlocks: normalizeParsedBlocks( block.innerBlocks ),
+	} ) );
 
 describe( 'full post content fixture', () => {
-	beforeAll( async () => {
-		const blockMetadataFiles = await glob(
+	beforeAll( () => {
+		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
 		);
 		const blockDefinitions = fromPairs(
@@ -72,7 +67,7 @@ describe( 'full post content fixture', () => {
 		// Load all hooks that modify blocks
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
-		if ( process.env.GUTENBERG_PHASE === 2 ) {
+		if ( process.env.IS_GUTENBERG_PLUGIN ) {
 			__experimentalRegisterExperimentalCoreBlocks( {
 				enableFSEBlocks: true,
 			} );
@@ -208,13 +203,26 @@ describe( 'full post content fixture', () => {
 			try {
 				expect( serializedActual ).toEqual( serializedExpected );
 			} catch ( err ) {
-				throw new Error(
-					format(
-						"File '%s' does not match expected value:\n\n%s",
-						serializedHTMLFileName,
-						err.message
-					)
-				);
+				if (
+					serialize( blocksActual ) ===
+					serialize( parse( serializedExpected ) )
+				) {
+					throw new Error(
+						format(
+							"File '%s' does not match expected value (however, the block re-serializes identically so you may need to run 'npm run fixtures:regenerate'):\n\n%s",
+							serializedHTMLFileName,
+							err.message
+						)
+					);
+				} else {
+					throw new Error(
+						format(
+							"File '%s' does not match expected value:\n\n%s",
+							serializedHTMLFileName,
+							err.message
+						)
+					);
+				}
 			}
 		} );
 	} );

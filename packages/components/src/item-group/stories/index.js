@@ -145,7 +145,7 @@ const ItemWithChevron = ( {
 
 	const itemClassName = useMemo(
 		() => cx( ! alwaysVisible && appearingChevron, className ),
-		[ alwaysVisible, className ]
+		[ alwaysVisible, className, cx ]
 	);
 
 	const chevronIconClassName = useMemo(
@@ -155,7 +155,7 @@ const ItemWithChevron = ( {
 				fill: currentColor;
 				transform: ${ isRtlLayout ? 'scaleX( -100% )' : 'none' };
 			` ),
-		[ isRtlLayout ]
+		[ cx, isRtlLayout ]
 	);
 
 	return (

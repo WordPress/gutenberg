@@ -15,7 +15,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 const configPath = 'test/native';
 
-const transpiledPackageNames = glob( '../../packages/*/src/index.js' ).map(
+const transpiledPackageNames = glob( '../../packages/*/src/index.{js,ts}' ).map(
 	( fileName ) => fileName.split( '/' )[ 3 ]
 );
 
@@ -25,11 +25,8 @@ module.exports = {
 	// Automatically clear mock calls and instances between every test
 	clearMocks: true,
 	preset: 'react-native',
-	setupFiles: [
-		'<rootDir>/' + configPath + '/setup.js',
-		'<rootDir>/' + configPath + '/enzyme.config.js',
-	],
-	testEnvironment: 'jsdom',
+	setupFiles: [ '<rootDir>/' + configPath + '/setup.js' ],
+	setupFilesAfterEnv: [ '<rootDir>/' + configPath + '/setup-after-env.js' ],
 	testMatch: [
 		'**/test/*.native.[jt]s?(x)',
 		'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
@@ -71,9 +68,6 @@ module.exports = {
 		// https://github.com/facebook/react-native/blob/HEAD/jest-preset.json#L20
 		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|@react-native|react-clone-referenced-element|@react-navigation))',
 	],
-	snapshotSerializers: [
-		'enzyme-to-json/serializer',
-		'@emotion/jest/serializer',
-	],
+	snapshotSerializers: [ '@emotion/jest/serializer' ],
 	reporters: [ 'default', 'jest-junit' ],
 };

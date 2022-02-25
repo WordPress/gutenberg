@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+
+import { reject } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
@@ -8,16 +14,19 @@ import {
 	getActiveFormat,
 } from '@wordpress/rich-text';
 import {
-	useSetting,
 	getColorClassName,
 	getColorObjectByColorValue,
+	useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
-import { BottomSheet, ColorSettings } from '@wordpress/components';
+import {
+	BottomSheet,
+	ColorSettings,
+	useMobileGlobalStylesColors,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { textColor as settings } from './index';
 import { transparentValue } from './index.js';
 import { parseClassName } from './inline.js';
 
@@ -82,15 +91,31 @@ function setColors( value, name, colorSettings, colors ) {
 	if ( classNames.length ) attributes.class = classNames.join( ' ' );
 
 	const format = { type: name, attributes };
+	const hasNoSelection = value.start === value.end;
+	const isAtTheEnd = value.end === value.text.length;
+	const previousCharacter = value.text.charAt( value.end - 1 );
 
-	// For cases when there is no text selected, formatting is forced
-	// for the first empty character
+	// Force formatting due to limitations in the native implementation
 	if (
-		value?.start === value?.end &&
-		( value?.text.length === 0 ||
-			value.text?.charAt( value.end - 1 ) === ' ' )
+		hasNoSelection &&
+		( value.text.length === 0 ||
+			( previousCharacter === ' ' && isAtTheEnd ) )
 	) {
-		return applyFormat( value, format, value?.start - 1, value?.end + 1 );
+		// For cases where there's no text selected, there's a space before
+		// the current caret position and it's at the end of the text.
+		return applyFormat( value, format, value.start - 1, value.end + 1 );
+	} else if ( hasNoSelection && isAtTheEnd ) {
+		// If there's no selection and is at the end of the text
+		// manually add the format within the current caret position.
+		const newFormat = applyFormat( value, format );
+		const { activeFormats } = newFormat;
+		newFormat.formats[ value.start ] = [
+			...reject( activeFormats, { type: format.type } ),
+			format,
+		];
+		return newFormat;
+	} else if ( hasNoSelection ) {
+		return removeFormat( value, format );
 	}
 
 	return applyFormat( value, format );
@@ -98,10 +123,8 @@ function setColors( value, name, colorSettings, colors ) {
 
 function ColorPicker( { name, value, onChange } ) {
 	const property = 'color';
-	const colors = useSetting( 'color.palette' ) || settings.colors;
-	const colorSettings = {
-		colors,
-	};
+	const colors = useMobileGlobalStylesColors();
+	const colorSettings = useMultipleOriginColorsAndGradients();
 
 	const onColorChange = useCallback(
 		( color ) => {

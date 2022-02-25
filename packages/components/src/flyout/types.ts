@@ -3,7 +3,6 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type { PopoverStateReturn } from 'reakit';
-// eslint-disable-next-line no-restricted-imports
 import type { CSSProperties, FunctionComponentElement } from 'react';
 
 /**

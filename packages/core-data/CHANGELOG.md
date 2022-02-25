@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 4.1.2 (2022-02-23)
+
+### Bug Fixes
+
+-   The `canUser` no longer uses the `GET` request with the resource ID argument [#38901](https://github.com/WordPress/gutenberg/pull/38901).
+
+## 4.1.0 (2022-01-27)
+
 ### Bug Fixes
 
 -   `getEntityRecords` no longer returns an empty array for unknown entities but returns `null` instead. `hasEntityRecords` now also returns `false` when the entity configuration is unknown. ([#36984](https://github.com/WordPress/gutenberg/pull/36984))

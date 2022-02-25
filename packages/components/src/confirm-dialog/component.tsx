@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref, KeyboardEvent } from 'react';
+import type { ForwardedRef, KeyboardEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -24,10 +23,12 @@ import { Flex } from '../flex';
 import Button from '../button';
 import { Text } from '../text';
 import { VStack } from '../v-stack';
+import * as styles from './styles';
+import { useCx } from '../utils/hooks/use-cx';
 
 function ConfirmDialog(
 	props: WordPressComponentProps< OwnProps, 'div', false >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		isOpen: isOpenProp,
@@ -36,6 +37,9 @@ function ConfirmDialog(
 		children,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
+
+	const cx = useCx();
+	const wrapperClassName = cx( styles.wrapper );
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
 	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();
@@ -83,6 +87,7 @@ function ConfirmDialog(
 					closeButtonLabel={ cancelLabel }
 					isDismissible={ true }
 					ref={ forwardedRef }
+					overlayClassName={ wrapperClassName }
 					__experimentalHideHeader
 					{ ...otherProps }
 				>

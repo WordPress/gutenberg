@@ -3,8 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import { Separator } from 'reakit';
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -19,7 +18,7 @@ import type { Props } from './types';
 
 function Divider(
 	props: WordPressComponentProps< Props, 'hr', false >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const contextProps = useContextSystem( props, 'Divider' );
 

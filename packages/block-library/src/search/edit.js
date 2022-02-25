@@ -32,6 +32,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -257,6 +258,11 @@ export default function SearchEdit( {
 						type="button"
 						className={ buttonClasses }
 						style={ buttonStyles }
+						aria-label={
+							buttonText
+								? stripHTML( buttonText )
+								: __( 'Search' )
+						}
 					>
 						<Icon icon={ search } />
 					</button>
@@ -392,7 +398,8 @@ export default function SearchEdit( {
 			borderWidth: isButtonPositionInside ? borderWidth : undefined,
 		};
 
-		const isNonZeroBorderRadius = parseInt( borderRadius, 10 ) !== 0;
+		const isNonZeroBorderRadius =
+			borderRadius !== undefined && parseInt( borderRadius, 10 ) !== 0;
 
 		if ( isButtonPositionInside && isNonZeroBorderRadius ) {
 			// We have button inside wrapper and a border radius value to apply.

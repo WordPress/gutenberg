@@ -56,7 +56,7 @@ From a performance perspective, when themes support lazy loading assets, blocks 
 
 Furthermore, because the [Block Type REST API Endpoint](https://developer.wordpress.org/rest-api/reference/block-types/) can only list blocks registered on the server, registering blocks server-side is recommended; using the `block.json` file simplifies this registration.
 
-The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/tutorials/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
+The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
 
 Development is improved by using a defined schema definition file. Supported editors can provide help like tooltips, autocomplete, and schema validation. To use the schema, add the following to the top of the `block.json`.
 
@@ -407,7 +407,7 @@ See the [the example documentation](/docs/reference-guides/block-api/block-regis
 
 ### Editor Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorScript`
@@ -420,7 +420,7 @@ Block type editor script definition. It will only be enqueued in the context of 
 
 ### Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `script`
@@ -433,7 +433,7 @@ Block type frontend and editor script definition. It will be enqueued both in th
 
 ### View Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `viewScript`
@@ -447,7 +447,7 @@ Block type frontend script definition. It will be enqueued only when viewing the
 
 ### Editor Style
 
--   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorStyle`
@@ -462,7 +462,7 @@ _Note: An option to pass also an array of editor styles exists since WordPress `
 
 ### Style
 
--   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `style`

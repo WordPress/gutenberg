@@ -48,7 +48,6 @@ import {
 	MultiSelectScrollIntoView as RootMultiSelectScrollIntoView,
 	NavigableToolbar as RootNavigableToolbar,
 	ObserveTyping as RootObserveTyping,
-	PreserveScrollInReorder as RootPreserveScrollInReorder,
 	SkipToSelectedBlock as RootSkipToSelectedBlock,
 	URLInput as RootURLInput,
 	URLInputButton as RootURLInputButton,
@@ -67,6 +66,7 @@ function deprecateComponent( name, Wrapped, staticsToHoist = [] ) {
 		deprecated( 'wp.editor.' + name, {
 			since: '5.3',
 			alternative: 'wp.blockEditor.' + name,
+			version: '6.2',
 		} );
 
 		return <Wrapped ref={ ref } { ...props } />;
@@ -87,6 +87,7 @@ function deprecateFunction( name, func ) {
 		deprecated( 'wp.editor.' + name, {
 			since: '5.3',
 			alternative: 'wp.blockEditor.' + name,
+			version: '6.2',
 		} );
 
 		return func( ...args );
@@ -221,10 +222,6 @@ export const NavigableToolbar = deprecateComponent(
 export const ObserveTyping = deprecateComponent(
 	'ObserveTyping',
 	RootObserveTyping
-);
-export const PreserveScrollInReorder = deprecateComponent(
-	'PreserveScrollInReorder',
-	RootPreserveScrollInReorder
 );
 export const SkipToSelectedBlock = deprecateComponent(
 	'SkipToSelectedBlock',

@@ -58,7 +58,7 @@ export const BeforeIconWrapper = styled.span`
 export const AfterIconWrapper = styled.span`
 	margin-top: ${ railHeight }px;
 
-	${ rtl( { marginLeft: 16 } ) }
+	${ rtl( { marginLeft: 6 } ) }
 `;
 
 const railBackgroundColor = ( { disabled, railColor } ) => {

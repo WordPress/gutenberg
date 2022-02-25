@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -13,7 +12,7 @@ import { useHeading, HeadingProps } from './hook';
 
 function Heading(
 	props: WordPressComponentProps< HeadingProps, 'h1' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const headerProps = useHeading( props );
 

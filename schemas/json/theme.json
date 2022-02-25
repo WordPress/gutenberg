@@ -365,7 +365,8 @@
 			"type": "object",
 			"properties": {
 				"core/archives": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings",
+					"additionalProperties": false
 				},
 				"core/audio": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -1241,6 +1242,13 @@
 				},
 				"required": [ "name" ],
 				"additionalProperties": false
+			}
+		},
+		"patterns": {
+			"description": "An array of pattern slugs to be registered from the Pattern Directory.",
+			"type": "array",
+			"items": {
+				"type": "string"
 			}
 		}
 	},

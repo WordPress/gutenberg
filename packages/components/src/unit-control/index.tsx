@@ -1,11 +1,10 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type {
 	FocusEventHandler,
 	KeyboardEvent,
-	Ref,
+	ForwardedRef,
 	SyntheticEvent,
 } from 'react';
 import { noop, omit } from 'lodash';
@@ -56,7 +55,7 @@ function UnitControl(
 		value: valueProp,
 		...props
 	}: WordPressComponentProps< UnitControlProps, 'input', false >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const units = useMemo(
 		() => getUnitsWithCurrentUnit( valueProp, unitProp, unitsProp ),

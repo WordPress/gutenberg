@@ -36,6 +36,10 @@ export function useToolsPanelItem(
 		flagItemCustomization,
 		isResetting,
 		shouldRenderPlaceholderItems: shouldRenderPlaceholder,
+		firstDisplayedItem,
+		lastDisplayedItem,
+		__experimentalFirstVisibleItemClass,
+		__experimentalLastVisibleItemClass,
 	} = useToolsPanelContext();
 
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
@@ -129,8 +133,27 @@ export function useToolsPanelItem(
 			shouldRenderPlaceholder &&
 			! isShown &&
 			styles.ToolsPanelItemPlaceholder;
-		return cx( styles.ToolsPanelItem, placeholderStyle, className );
-	}, [ isShown, shouldRenderPlaceholder, className ] );
+		const firstItemStyle =
+			firstDisplayedItem === label && __experimentalFirstVisibleItemClass;
+		const lastItemStyle =
+			lastDisplayedItem === label && __experimentalLastVisibleItemClass;
+		return cx(
+			styles.ToolsPanelItem,
+			placeholderStyle,
+			className,
+			firstItemStyle,
+			lastItemStyle
+		);
+	}, [
+		isShown,
+		shouldRenderPlaceholder,
+		className,
+		cx,
+		firstDisplayedItem,
+		lastDisplayedItem,
+		__experimentalFirstVisibleItemClass,
+		__experimentalLastVisibleItemClass,
+	] );
 
 	return {
 		...otherProps,

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, MotionProps } from 'framer-motion';
 import { css } from '@emotion/react';
@@ -10,9 +9,15 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useState, useMemo } from '@wordpress/element';
-import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
+import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useReducedMotion,
+	useMergeRefs,
+	usePrevious,
+} from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
+import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
  * Internal dependencies
@@ -39,16 +44,18 @@ type Props = Omit<
 	keyof MotionProps
 >;
 
-function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const [ currentPath ] = useContext( NavigatorContext );
-	const isMatch = currentPath.path === path;
-	const ref = useFocusOnMount();
+	const { location } = useContext( NavigatorContext );
+	const isMatch = location.path === escapeAttribute( path );
+	const wrapperRef = useRef< HTMLDivElement >( null );
+
+	const previousLocation = usePrevious( location );
 
 	const cx = useCx();
 	const classes = useMemo(
@@ -62,15 +69,44 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 				} ),
 				className
 			),
-		[ className ]
+		[ className, cx ]
 	);
 
-	// This flag is used to only apply the focus on mount when the actual path changes.
-	// It avoids the focus to happen on the first render.
-	const [ hasPathChanged, setHasPathChanged ] = useState( false );
+	// Focus restoration
+	const isInitialLocation = location.isInitial && ! location.isBack;
 	useEffect( () => {
-		setHasPathChanged( true );
-	}, [ path ] );
+		// Only attempt to restore focus:
+		// - if the current location is not the initial one (to avoid moving focus on page load)
+		// - when the screen becomes visible
+		// - if the wrapper ref has been assigned
+		if ( isInitialLocation || ! isMatch || ! wrapperRef.current ) {
+			return;
+		}
+
+		let elementToFocus: HTMLElement | null = null;
+
+		// When navigating back, if a selector is provided, use it to look for the
+		// target element (assumed to be a node inside the current NavigatorScreen)
+		if ( location.isBack && previousLocation?.focusTargetSelector ) {
+			elementToFocus = wrapperRef.current.querySelector(
+				previousLocation.focusTargetSelector
+			);
+		}
+
+		// If the previous query didn't run or find any element to focus, fallback
+		// to the first tabbable element in the screen (or the screen itself).
+		if ( ! elementToFocus ) {
+			const firstTabbable = ( focus.tabbable.find(
+				wrapperRef.current
+			) as HTMLElement[] )[ 0 ];
+
+			elementToFocus = firstTabbable ?? wrapperRef.current;
+		}
+
+		elementToFocus.focus();
+	}, [ isInitialLocation, isMatch ] );
+
+	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
 	if ( ! isMatch ) {
 		return null;
@@ -78,7 +114,11 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 
 	if ( prefersReducedMotion ) {
 		return (
-			<View ref={ forwardedRef } className={ classes } { ...otherProps }>
+			<View
+				ref={ mergedWrapperRef }
+				className={ classes }
+				{ ...otherProps }
+			>
 				{ children }
 			</View>
 		);
@@ -96,8 +136,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	const initial = {
 		opacity: 0,
 		x:
-			( isRTL() && currentPath.isBack ) ||
-			( ! isRTL() && ! currentPath.isBack )
+			( isRTL() && location.isBack ) || ( ! isRTL() && ! location.isBack )
 				? 50
 				: -50,
 	};
@@ -105,8 +144,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 		delay: animationExitDelay,
 		opacity: 0,
 		x:
-			( ! isRTL() && currentPath.isBack ) ||
-			( isRTL() && ! currentPath.isBack )
+			( ! isRTL() && location.isBack ) || ( isRTL() && ! location.isBack )
 				? 50
 				: -50,
 		transition: {
@@ -123,7 +161,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 
 	return (
 		<motion.div
-			ref={ hasPathChanged ? ref : undefined }
+			ref={ mergedWrapperRef }
 			className={ classes }
 			{ ...otherProps }
 			{ ...animatedProps }
@@ -134,44 +172,34 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 }
 
 /**
- * The `NavigatorScreen` component represents a single view/screen/panel/menu and is supposed to be used in combination with the `NavigatorProvider` component.
+ * The `NavigatorScreen` component represents a single view/screen/panel and
+ * should be used in combination with the `NavigatorProvider`, the
+ * `NavigatorButton` and the `NavigatorBackButton` components (or the `useNavigator`
+ * hook).
  *
  * @example
  * ```jsx
  * import {
  *   __experimentalNavigatorProvider as NavigatorProvider,
  *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalUseNavigator as useNavigator,
+ *   __experimentalNavigatorButton as NavigatorButton,
+ *   __experimentalNavigatorBackButton as NavigatorBackButton,
  * } from '@wordpress/components';
- *
- * function NavigatorButton( {
- *   path,
- *   isBack = false,
- *   ...props
- * } ) {
- *   const navigator = useNavigator();
- *   return (
- *   	<Button
- *   	  onClick={ () => navigator.push( path, { isBack } ) }
- *   	  { ...props }
- *   	/>
- *   );
- * }
  *
  * const MyNavigation = () => (
  *   <NavigatorProvider initialPath="/">
  *     <NavigatorScreen path="/">
  *       <p>This is the home screen.</p>
- *   	   <NavigatorButton isPrimary path="/child">
+ *        <NavigatorButton path="/child">
  *          Navigate to child screen.
  *       </NavigatorButton>
  *     </NavigatorScreen>
  *
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorButton isPrimary path="/" isBack>
+ *       <NavigatorBackButton>
  *         Go back
- *       </NavigatorButton>
+ *       </NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>
  * );

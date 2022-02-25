@@ -35,7 +35,6 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarGroup,
-	ToolbarDropdownMenu,
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -45,6 +44,7 @@ import { __ } from '@wordpress/i18n';
  */
 import useListViewModal from './use-list-view-modal';
 import useNavigationMenu from '../use-navigation-menu';
+import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
 import PlaceholderPreview from './placeholder/placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
@@ -54,6 +54,7 @@ import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
+import OverlayMenuIcon from './overlay-menu-icon';
 
 const EMPTY_ARRAY = [];
 
@@ -105,7 +106,6 @@ function Navigation( {
 	hasSubmenuIndicatorSetting = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
-	customAppender: CustomAppender = null,
 } ) {
 	const {
 		openSubmenusOnClick,
@@ -116,13 +116,14 @@ function Navigation( {
 			orientation = 'horizontal',
 			flexWrap = 'wrap',
 		} = {},
+		hasIcon,
 	} = attributes;
 
 	let areaMenu,
 		setAreaMenu = noop;
 	// Navigation areas are deprecated and on their way out. Let's not perform
 	// the request unless we're in an environment where the endpoint exists.
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		[ areaMenu, setAreaMenu ] = useEntityProp(
 			'root',
@@ -150,6 +151,10 @@ function Navigation( {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		`navigationMenu/${ ref }`
 	);
+
+	// Preload classic menus, so that they don't suddenly pop-in when viewing
+	// the Select Menu dropdown.
+	useNavigationEntities();
 
 	const {
 		hasUncontrolledInnerBlocks,
@@ -208,6 +213,8 @@ function Navigation( {
 		false
 	);
 
+	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
+
 	const {
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
@@ -215,12 +222,12 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserDeleteNavigationEntity,
-		hasResolvedCanUserDeleteNavigationEntity,
-		canUserCreateNavigation,
-		hasResolvedCanUserCreateNavigation,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu,
+		canUserDeleteNavigationMenu,
+		hasResolvedCanUserDeleteNavigationMenu,
+		canUserCreateNavigationMenu,
+		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
 	const navRef = useRef();
@@ -353,16 +360,16 @@ function Navigation( {
 
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
-				hasResolvedCanUserUpdateNavigationEntity &&
-				! canUserUpdateNavigationEntity
+				hasResolvedCanUserUpdateNavigationMenu &&
+				! canUserUpdateNavigationMenu
 			) {
 				showCantEditNotice();
 			}
 
 			if (
 				! ref &&
-				hasResolvedCanUserCreateNavigation &&
-				! canUserCreateNavigation
+				hasResolvedCanUserCreateNavigationMenu &&
+				! canUserCreateNavigationMenu
 			) {
 				showCantCreateNotice();
 			}
@@ -370,10 +377,10 @@ function Navigation( {
 	}, [
 		isSelected,
 		isInnerBlockSelected,
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserCreateNavigation,
-		hasResolvedCanUserCreateNavigation,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu,
+		canUserCreateNavigationMenu,
+		hasResolvedCanUserCreateNavigationMenu,
 		ref,
 	] );
 
@@ -462,28 +469,30 @@ function Navigation( {
 		? CustomPlaceholder
 		: Placeholder;
 
+	const isResponsive = 'never' !== overlayMenu;
+
+	const overlayMenuPreviewClasses = classnames(
+		'wp-block-navigation__overlay-menu-preview',
+		{ open: overlayMenuPreview }
+	);
+
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider>
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
-						<ToolbarGroup>
-							<ToolbarDropdownMenu
-								label={ __( 'Select Menu' ) }
-								text={ __( 'Select Menu' ) }
-								icon={ null }
-							>
-								{ ( { onClose } ) => (
-									<NavigationMenuSelector
-										onSelect={ ( { id } ) => {
-											setRef( id );
-											onClose();
-										} }
-										onCreateNew={ startWithEmptyMenu }
-										showCreate={ canUserCreateNavigation }
-									/>
-								) }
-							</ToolbarDropdownMenu>
+						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
+							<NavigationMenuSelector
+								currentMenuId={ ref }
+								clientId={ clientId }
+								onSelect={ ( { id } ) => {
+									setRef( id );
+								} }
+								onCreateNew={ startWithEmptyMenu }
+								/* translators: %s: The name of a menu. */
+								actionLabel={ __( "Switch to '%s'" ) }
+								showManageActions
+							/>
 						</ToolbarGroup>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
@@ -492,6 +501,33 @@ function Navigation( {
 				<InspectorControls>
 					{ hasSubmenuIndicatorSetting && (
 						<PanelBody title={ __( 'Display' ) }>
+							{ isResponsive && (
+								<Button
+									className={ overlayMenuPreviewClasses }
+									onClick={ () => {
+										setOverlayMenuPreview(
+											! overlayMenuPreview
+										);
+									} }
+								>
+									{ hasIcon && <OverlayMenuIcon /> }
+									{ ! hasIcon && (
+										<span>{ __( 'Menu' ) }</span>
+									) }
+								</Button>
+							) }
+							{ overlayMenuPreview && (
+								<ToggleControl
+									label={ __( 'Show icon button' ) }
+									help={ __(
+										'Configure the visual appearance of the button opening the overlay menu.'
+									) }
+									onChange={ ( value ) =>
+										setAttributes( { hasIcon: value } )
+									}
+									checked={ hasIcon }
+								/>
+							) }
 							<h3>{ __( 'Overlay Menu' ) }</h3>
 							<ToggleGroupControl
 								label={ __( 'Configure overlay menu' ) }
@@ -600,12 +636,12 @@ function Navigation( {
 				</InspectorControls>
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
-						{ hasResolvedCanUserUpdateNavigationEntity &&
-							canUserUpdateNavigationEntity && (
+						{ hasResolvedCanUserUpdateNavigationMenu &&
+							canUserUpdateNavigationMenu && (
 								<NavigationMenuNameControl />
 							) }
-						{ hasResolvedCanUserDeleteNavigationEntity &&
-							canUserDeleteNavigationEntity && (
+						{ hasResolvedCanUserDeleteNavigationMenu &&
+							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
 									onDelete={ startWithEmptyMenu }
 								/>
@@ -615,6 +651,7 @@ function Navigation( {
 				<nav { ...blockProps }>
 					{ isPlaceholderShown && (
 						<PlaceholderComponent
+							currentMenuId={ ref }
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
 								if ( post ) {
@@ -627,10 +664,12 @@ function Navigation( {
 								hasResolvedNavigationMenus
 							}
 							clientId={ clientId }
-							canUserCreateNavigation={ canUserCreateNavigation }
+							canUserCreateNavigationMenu={
+								canUserCreateNavigationMenu
+							}
 						/>
 					) }
-					{ ! hasResolvedCanUserCreateNavigation ||
+					{ ! hasResolvedCanUserCreateNavigationMenu ||
 						( ! isEntityAvailable && ! isPlaceholderShown && (
 							<PlaceholderPreview isLoading />
 						) ) }
@@ -638,8 +677,10 @@ function Navigation( {
 						<ResponsiveWrapper
 							id={ clientId }
 							onToggle={ setResponsiveMenuVisibility }
+							label={ __( 'Menu' ) }
+							hasIcon={ hasIcon }
 							isOpen={ isResponsiveMenuOpen }
-							isResponsive={ 'never' !== overlayMenu }
+							isResponsive={ isResponsive }
 							isHiddenByDefault={ 'always' === overlayMenu }
 							classNames={ overlayClassnames }
 							styles={ overlayStyles }
@@ -648,7 +689,6 @@ function Navigation( {
 								<NavigationInnerBlocks
 									isVisible={ ! isPlaceholderShown }
 									clientId={ clientId }
-									appender={ CustomAppender }
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}

@@ -15,16 +15,14 @@
  * @return string Returns the next comments link for the query pagination.
  */
 function render_block_core_comments_pagination_next( $attributes, $content, $block ) {
-	$per_page = ! empty( $block->context['comments/perPage'] ) ? (int) $block->context['comments/perPage'] : 0;
-	if ( 0 === $per_page && get_option( 'page_comments' ) ) {
-		$per_page = (int) get_query_var( 'comments_per_page' );
-		if ( 0 === $per_page ) {
-			$per_page = (int) get_option( 'comments_per_page' );
-		}
+	// Bail out early if the post ID is not set for some reason.
+	if ( empty( $block->context['postId'] ) ) {
+		return '';
 	}
-	$comments_number  = (int) get_comments_number();
-	$max_page         = isset( $per_page ) ? (int) floor( $comments_number / $per_page ) : 0;
-	$default_label    = __( 'Next Comments' );
+
+	$comment_vars     = build_comment_query_vars_from_block( $block );
+	$max_page         = ( new WP_Comment_Query( $comment_vars ) )->max_num_pages;
+	$default_label    = __( 'Newer Comments' );
 	$label            = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow = get_comments_pagination_arrow( $block, 'next' );
 

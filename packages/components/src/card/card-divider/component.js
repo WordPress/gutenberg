@@ -7,7 +7,7 @@ import { useCardDivider } from './hook';
 
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
- * @param {import('react').Ref<any>}                                                                              forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                                                     forwardedRef
  */
 function CardDivider( props, forwardedRef ) {
 	const dividerProps = useCardDivider( props );

@@ -42,8 +42,6 @@ exports[`Navigation placeholder allows a navigation block to be created from exi
 <!-- /wp:navigation-submenu -->"
 `;
 
-exports[`Navigation placeholder allows a navigation block to be created using existing pages 1`] = `"<!-- wp:page-list /-->"`;
-
 exports[`Navigation placeholder creates an empty navigation block when the selected existing menu is also empty 1`] = `""`;
 
 exports[`Navigation supports navigation blocks that have inner blocks within their markup and converts them to wp_navigation posts 1`] = `"<!-- wp:page-list /-->"`;

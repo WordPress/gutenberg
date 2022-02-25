@@ -22,11 +22,11 @@
 }
 
 .has-normal-font-size {
-	font-size: var(--wp--preset--font-size--normal) !important;
+	font-size: var(--wp--preset--font-size--normal);
 }
 
 .has-huge-font-size {
-	font-size: var(--wp--preset--font-size--huge) !important;
+	font-size: var(--wp--preset--font-size--huge);
 }
 
 // Text alignments.
@@ -119,4 +119,13 @@ html :where(.has-border-color) {
 
 html :where([style*="border-width"]) {
 	border-style: solid;
+}
+
+
+/**
+ * Provide baseline responsiveness for images.
+ */
+html :where(img[class*="wp-image-"]) {
+	height: auto;
+	max-width: 100%;
 }

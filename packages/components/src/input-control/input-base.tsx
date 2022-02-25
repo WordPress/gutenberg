@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -67,7 +66,7 @@ export function InputBase(
 		suffix,
 		...props
 	}: InputBaseProps,
-	ref: Ref< HTMLDivElement >
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;

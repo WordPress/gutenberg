@@ -7,7 +7,13 @@
 	"parent": [ "core/comments-pagination" ],
 	"description": "Displays a list of page numbers for comments pagination.",
 	"textdomain": "default",
-	"usesContext": [ "comments/perPage", "postId" ],
+	"usesContext": [
+		"postId",
+		"comments/perPage",
+		"comments/order",
+		"comments/inherit",
+		"comments/defaultPage"
+	],
 	"supports": {
 		"reusable": false,
 		"html": false

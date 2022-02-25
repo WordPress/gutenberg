@@ -109,7 +109,6 @@ export function initializeEditor(
 	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-post', {
 		fixedToolbar: false,
 		welcomeGuide: true,
-		mobileGalleryWarning: true,
 		fullscreenMode: true,
 		showIconLabels: false,
 		themeStyles: true,
@@ -119,7 +118,7 @@ export function initializeEditor(
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );

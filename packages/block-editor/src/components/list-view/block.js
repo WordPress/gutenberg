@@ -19,6 +19,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { sprintf, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -32,6 +33,7 @@ import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useListViewContext } from './context';
 import { store as blockEditorStore } from '../../store';
+import useBlockDisplayInformation from '../use-block-display-information';
 
 function ListViewBlock( {
 	block,
@@ -46,6 +48,7 @@ function ListViewBlock( {
 	showBlockMovers,
 	path,
 	isExpanded,
+	selectedClientIds,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -102,14 +105,22 @@ function ListViewBlock( {
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
-			event.stopPropagation();
-			selectBlock( clientId );
+			selectBlock( event, clientId );
 		},
 		[ clientId, selectBlock ]
 	);
 
+	const selectDuplicatedBlock = useCallback(
+		( newClientId ) => {
+			selectBlock( undefined, newClientId );
+		},
+		[ selectBlock ]
+	);
+
 	const toggleExpanded = useCallback(
 		( event ) => {
+			// Prevent shift+click from opening link in a new window when toggling.
+			event.preventDefault();
 			event.stopPropagation();
 			if ( isExpanded === true ) {
 				collapse( clientId );
@@ -142,6 +153,23 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': hideBlockActions,
 	} );
+
+	const blockInformation = useBlockDisplayInformation( clientId );
+	const settingsAriaLabel = blockInformation
+		? sprintf(
+				// translators: %s: The title of the block.
+				__( 'Options for %s block' ),
+				blockInformation.title
+		  )
+		: __( 'Options' );
+
+	// Only include all selected blocks if the currently clicked on block
+	// is one of the selected blocks. This ensures that if a user attempts
+	// to alter a block that isn't part of the selection, they're still able
+	// to do so.
+	const dropdownClientIds = selectedClientIds.includes( clientId )
+		? selectedClientIds
+		: [ clientId ];
 
 	return (
 		<ListViewLeaf
@@ -176,6 +204,8 @@ function ListViewBlock( {
 							ref={ ref }
 							tabIndex={ tabIndex }
 							onFocus={ onFocus }
+							isExpanded={ isExpanded }
+							selectedClientIds={ selectedClientIds }
 						/>
 					</div>
 				) }
@@ -216,8 +246,9 @@ function ListViewBlock( {
 				<TreeGridCell className={ listViewBlockSettingsClassName }>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsDropdown
-							clientIds={ [ clientId ] }
+							clientIds={ dropdownClientIds }
 							icon={ moreVertical }
+							label={ settingsAriaLabel }
 							toggleProps={ {
 								ref,
 								className: 'block-editor-list-view-block__menu',
@@ -225,7 +256,7 @@ function ListViewBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ selectEditorBlock }
+							__experimentalSelectBlock={ selectDuplicatedBlock }
 						/>
 					) }
 				</TreeGridCell>

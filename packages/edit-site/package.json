@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "3.0.20",
+	"version": "4.0.2",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -36,7 +36,6 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
-		"@wordpress/data-controls": "file:../data-controls",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
@@ -49,17 +48,20 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
-		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
+		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.3.1",
 		"downloadjs": "^1.4.7",
-		"file-saver": "^2.0.2",
 		"history": "^5.1.0",
-		"jszip": "^3.2.2",
 		"lodash": "^4.17.21",
+		"react-autosize-textarea": "^7.1.0",
 		"rememo": "^3.0.0"
+	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -22,8 +22,11 @@ function gutenberg_remove_legacy_pages() {
 	$customize_menu    = null;
 	foreach ( $submenu['themes.php'] as $index => $menu_item ) {
 		if ( false !== strpos( $menu_item[2], 'customize.php' ) ) {
-			$indexes_to_remove[] = $index;
-			$customize_menu      = $menu_item;
+			// Assume the first entry is the Customizer proper, if customize.php is linked > once.
+			if ( is_null( $customize_menu ) ) {
+				$indexes_to_remove[] = $index;
+				$customize_menu      = $menu_item;
+			}
 		}
 
 		if ( false !== strpos( $menu_item[2], 'site-editor.php' ) ) {
@@ -77,8 +80,23 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 		);
 	}
 }
-
 add_action( 'admin_bar_menu', 'gutenberg_adminbar_items', 50 );
+
+/**
+ * Override Site Editor URLs to use plugin page.
+ *
+ * @param string $url Admin URL link with path.
+ * @param string $path Path relative to the admin URL.
+ * @return string Modified Admin URL link.
+ */
+function gutenberg_override_site_editor_urls( $url, $path ) {
+	if ( 'site-editor.php' === $path ) {
+		$url = str_replace( $path, 'themes.php?page=gutenberg-edit-site', $url );
+	}
+
+	return $url;
+}
+add_filter( 'admin_url', 'gutenberg_override_site_editor_urls', 10, 2 );
 
 /**
  * Check if any plugin, or theme features, are using the Customizer.

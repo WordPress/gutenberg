@@ -59,9 +59,8 @@ body.block-editor-page {
 	}
 }
 
-// Target the editor UI excluding the metaboxes and custom fields areas.
+// Target the editor UI excluding the visual editor contents, metaboxes and custom fields areas.
 .edit-post-header,
-.edit-post-visual-editor,
 .edit-post-text-editor,
 .edit-post-sidebar,
 .editor-post-publish-panel,

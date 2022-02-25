@@ -14,9 +14,9 @@
 			padding-left: 3.25em;
 
 			p {
-				font-size: 0.875em;
+				font-size: 1em;
 				line-height: 1.8;
-				margin: 0.36em 0 1.4em;
+				margin: 1em 0;
 			}
 		}
 
@@ -35,6 +35,7 @@
 			display: block;
 			float: left;
 			height: 2.5em;
+			margin-top: 0.5em;
 			margin-right: 0.75em;
 			width: 2.5em;
 		}
@@ -45,12 +46,17 @@
 	}
 
 	.comment-meta {
+		font-size: 0.875em;
 		line-height: 1.5;
 		margin-left: -3.25em;
+
+		b {
+			font-weight: normal;
+		}
 	}
 
 	.comment-body .commentmetadata {
-		font-size: 0.75em;
+		font-size: 0.875em;
 	}
 
 	.comment-form-comment,
@@ -82,7 +88,7 @@
 	}
 
 	.reply {
-		font-size: 0.75em;
+		font-size: 0.875em;
 		margin-bottom: 1.4em;
 	}
 

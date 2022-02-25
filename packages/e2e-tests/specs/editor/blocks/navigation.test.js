@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { uniqueId } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -21,7 +26,9 @@ import {
 	loginUser,
 	deleteUser,
 	switchUserToAdmin,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -30,6 +37,7 @@ import menuItemsFixture from '../fixtures/menu-items-request-fixture.json';
 
 const POSTS_ENDPOINT = '/wp/v2/posts';
 const PAGES_ENDPOINT = '/wp/v2/pages';
+const DRAFT_PAGES_ENDPOINT = [ PAGES_ENDPOINT, { status: 'draft' } ];
 const NAVIGATION_MENUS_ENDPOINT = '/wp/v2/navigation';
 
 async function mockSearchResponse( items ) {
@@ -112,13 +120,31 @@ async function selectClassicMenu( optionText ) {
 		`//*[contains(@class, 'components-menu-item__item')][ text()="${ optionText }" ]`
 	);
 	await theOption.click();
+
+	await page.waitForResponse(
+		( response ) =>
+			response.url().includes( 'menu-items' ) && response.status() === 200
+	);
+}
+
+async function populateNavWithOneItem() {
+	// Add a Link block first.
+	const appender = await page.waitForSelector(
+		'.wp-block-navigation .block-list-appender'
+	);
+	await appender.click();
+	// Add a link to the Link block.
+	await updateActiveNavigationLink( {
+		url: 'https://wordpress.org',
+		label: 'WP',
+		type: 'url',
+	} );
 }
 
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
-const ADD_ALL_PAGES_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Add all pages']`;
-const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select menu']`;
+const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select Menu']`;
 
 /**
  * Delete all items for the given REST resources using the REST API.
@@ -126,8 +152,17 @@ const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select
  * @param {*} endpoints The endpoints of the resources to delete.
  */
 async function deleteAll( endpoints ) {
-	for ( const path of endpoints ) {
-		const items = await rest( { path } );
+	for ( const endpoint of endpoints ) {
+		const defaultArgs = { per_page: -1 };
+		const isArrayEndpoint = Array.isArray( endpoint );
+		const path = isArrayEndpoint ? endpoint[ 0 ] : endpoint;
+		const args = isArrayEndpoint
+			? { ...defaultArgs, ...endpoint[ 1 ] }
+			: defaultArgs;
+
+		const items = await rest( {
+			path: addQueryArgs( path, args ),
+		} );
 
 		for ( const item of items ) {
 			await rest( {
@@ -135,24 +170,6 @@ async function deleteAll( endpoints ) {
 				path: `${ path }/${ item.id }?force=true`,
 			} );
 		}
-	}
-}
-
-/**
- * Create a set of pages using the REST API.
- *
- * @param {Array} pages An array of page objects.
- */
-async function createPages( pages ) {
-	for ( const page of pages ) {
-		await rest( {
-			method: 'POST',
-			path: PAGES_ENDPOINT,
-			data: {
-				status: 'publish',
-				...page,
-			},
-		} );
 	}
 }
 
@@ -197,13 +214,33 @@ async function getNavigationMenuRawContent() {
 	return stripPageIds( response.content.raw );
 }
 
+async function waitForBlock( blockName ) {
+	const blockSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: ${ blockName }"]`;
+
+	// Wait for a Submenu block before making assertion.
+	return page.waitForSelector( blockSelector );
+}
+
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
+	const contributorUsername = uniqueId( 'contributoruser_' );
+	let contributorPassword;
+
+	beforeAll( async () => {
+		// Creation of the contributor user **MUST** be at the top level describe block
+		// otherwise this test will become unstable. This action only happens once
+		// so there is no huge performance hit.
+		contributorPassword = await createUser( contributorUsername, {
+			role: 'contributor',
+		} );
+	} );
+
 	beforeEach( async () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
 			PAGES_ENDPOINT,
+			DRAFT_PAGES_ENDPOINT,
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
@@ -217,43 +254,17 @@ describe( 'Navigation', () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
 			PAGES_ENDPOINT,
+			DRAFT_PAGES_ENDPOINT,
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
+
+		// As per the creation in the beforeAll() above, this
+		// action must be done at the root level describe() block.
+		await deleteUser( contributorUsername );
 	} );
 
 	describe( 'placeholder', () => {
-		it( 'allows a navigation block to be created using existing pages', async () => {
-			await createPages( [
-				{
-					title: 'About',
-					menu_order: 0,
-				},
-				{
-					title: 'Contact Us',
-					menu_order: 1,
-				},
-				{
-					title: 'FAQ',
-					menu_order: 2,
-				},
-			] );
-
-			await createNewPost();
-
-			// Add the navigation block.
-			await insertBlock( 'Navigation' );
-			const allPagesButton = await page.waitForXPath(
-				ADD_ALL_PAGES_XPATH
-			);
-			await allPagesButton.click();
-
-			// Wait for the page list block to be present
-			await page.waitForSelector( 'ul[aria-label="Block: Page List"]' );
-
-			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
-		} );
-
 		it( 'allows a navigation block to be created from existing menus', async () => {
 			await createClassicMenu( { name: 'Test Menu 1' } );
 			await createClassicMenu(
@@ -435,20 +446,7 @@ describe( 'Navigation', () => {
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
-	it.skip( 'allows pages to be created from the navigation block and their links added to menu', async () => {
-		// The URL Details endpoint 404s for the created page, since it will
-		// be a draft that is inaccessible publicly. To avoid this we mock
-		// out the endpoint response to be empty which will be handled gracefully
-		// in the UI whilst avoiding any 404s.
-		await setUpResponseMocking( [
-			{
-				match: ( request ) =>
-					request.url().includes( `rest_route` ) &&
-					request.url().includes( `url-details` ),
-				onRequestMatch: createJSONResponse( [] ),
-			},
-		] );
-
+	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
 		await createNewPost();
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
@@ -466,16 +464,21 @@ describe( 'Navigation', () => {
 		);
 		await input.type( pageTitle );
 
-		// Wait for the create button to appear and click it.
+		// When creating a page, the URLControl makes a request to the
+		// url-details endpoint to fetch information about the page.
+		// Because the draft is inaccessible publicly, this request
+		// returns a 404 response. Wait for the response and expect
+		// the error to have occurred.
 		const createPageButton = await page.waitForSelector(
 			'.block-editor-link-control__search-create'
 		);
-		await createPageButton.click();
-
-		const draftLink = await page.waitForSelector(
-			'.wp-block-navigation-item__content'
+		const responsePromise = page.waitForResponse(
+			( response ) =>
+				response.url().includes( 'url-details' ) &&
+				response.status() === 404
 		);
-		await draftLink.click();
+		const createPagePromise = createPageButton.click();
+		await Promise.all( [ responsePromise, createPagePromise ] );
 
 		// Creating a draft is async, so wait for a sign of completion. In this
 		// case the link that shows in the URL popover once a link is added.
@@ -487,6 +490,9 @@ describe( 'Navigation', () => {
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: the server responded with a status of 404 (Not Found)'
+		);
 	} );
 
 	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
@@ -578,14 +584,17 @@ describe( 'Navigation', () => {
 		const markup =
 			'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
 		await page.keyboard.type( markup );
+
 		await clickButton( 'Exit code editor' );
-		const navBlock = await page.waitForSelector(
-			'nav[aria-label="Block: Navigation"]'
-		);
-		// Select the block to convert to a wp_navigation and publish.
-		// The select menu button shows up when saving is complete.
+
+		const navBlock = await waitForBlock( 'Navigation' );
+
+		// Select the block to convert to a wp_navigation
 		await navBlock.click();
-		await page.waitForSelector( 'button[aria-label="Select Menu"]' );
+
+		// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
+		await waitForBlock( 'Page List' );
+
 		await publishPost();
 
 		// Check that the wp_navigation post has the page list block.
@@ -595,20 +604,6 @@ describe( 'Navigation', () => {
 	describe( 'Creating and restarting', () => {
 		const NAV_ENTITY_SELECTOR =
 			'//div[@class="entities-saved-states__panel"]//label//strong[contains(text(), "Navigation")]';
-
-		async function populateNavWithOneItem() {
-			// Add a Link block first.
-			const appender = await page.waitForSelector(
-				'.wp-block-navigation .block-list-appender'
-			);
-			await appender.click();
-			// Add a link to the Link block.
-			await updateActiveNavigationLink( {
-				url: 'https://wordpress.org',
-				label: 'WP',
-				type: 'url',
-			} );
-		}
 
 		async function resetNavBlockToInitialState() {
 			const selectMenuDropdown = await page.waitForSelector(
@@ -632,17 +627,18 @@ describe( 'Navigation', () => {
 				'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
 			await page.keyboard.type( markup );
 			await clickButton( 'Exit code editor' );
-			const navBlock = await page.waitForSelector(
-				'nav[aria-label="Block: Navigation"]'
-			);
 
-			// Select the block to convert to a wp_navigation and publish.
-			// The select menu button shows up when saving is complete.
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Select the block to convert to a wp_navigation
 			await navBlock.click();
-			await page.waitForSelector( 'button[aria-label="Select Menu"]' );
+
+			// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
+			await waitForBlock( 'Page List' );
 
 			// Reset the nav block to create a new entity.
 			await resetNavBlockToInitialState();
+
 			const startEmptyButton = await page.waitForXPath(
 				START_EMPTY_XPATH
 			);
@@ -752,22 +748,116 @@ describe( 'Navigation', () => {
 		expect( tagCount ).toBe( 1 );
 	} );
 
-	describe( 'Permission based restrictions', () => {
-		const contributorUsername = 'contributoruser';
-		let contributorPassword;
+	describe( 'Submenus', () => {
+		it( 'shows button which converts submenu to link when submenu is not-populated (empty)', async () => {
+			const navSubmenuSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]`;
 
-		beforeAll( async () => {
-			contributorPassword = await createUser( contributorUsername, {
-				role: 'contributor',
-			} );
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickBlockToolbarButton( 'Add submenu' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Revert the Submenu back to a Navigation Link block.
+			await clickBlockToolbarButton( 'Convert to Link' );
+
+			// Check the Submenu block is no longer present.
+			const submenuBlock = await page.$( navSubmenuSelector );
+
+			expect( submenuBlock ).toBeFalsy();
 		} );
 
+		it( 'shows button to convert submenu to link in disabled state when submenu is populated', async () => {
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickBlockToolbarButton( 'Add submenu' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Add a Link block first.
+			const appender = await page.waitForSelector(
+				'[aria-label="Block: Submenu"] [aria-label="Add block"]'
+			);
+
+			await appender.click();
+
+			await updateActiveNavigationLink( {
+				url: 'https://make.wordpress.org/core/',
+				label: 'Submenu item #1',
+				type: 'url',
+			} );
+
+			await clickBlockToolbarButton( 'Select Submenu' );
+
+			// Check button exists but is in disabled state.
+			const disabledConvertToLinkButton = await page.$(
+				'[aria-label="Block tools"] [aria-label="Convert to Link"][disabled]'
+			);
+
+			expect( disabledConvertToLinkButton ).toBeTruthy();
+		} );
+
+		it( 'shows button to convert submenu to link when submenu is populated with a single incomplete link item', async () => {
+			// For context on why this test is required please see:
+			// https://github.com/WordPress/gutenberg/pull/38203#issuecomment-1027672948.
+
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickBlockToolbarButton( 'Add submenu' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Add a Link block first.
+			const appender = await page.waitForSelector(
+				'[aria-label="Block: Submenu"] [aria-label="Add block"]'
+			);
+
+			await appender.click();
+
+			// Here we intentionally do not populate the inserted Navigation Link block.
+			// Rather we immediaely click away leaving the link in a state where it has
+			// no URL of label and can be considered unpopulated.
+			await clickBlockToolbarButton( 'Select Submenu' );
+
+			// Check for non-disabled Convert to Link button
+			const convertToLinkButton = await page.$(
+				'[aria-label="Block tools"] [aria-label="Convert to Link"]:not([disabled])'
+			);
+
+			expect( convertToLinkButton ).toBeTruthy();
+		} );
+	} );
+
+	describe( 'Permission based restrictions', () => {
 		afterEach( async () => {
 			await switchUserToAdmin();
-		} );
-
-		afterAll( async () => {
-			await deleteUser( contributorUsername );
 		} );
 
 		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {
@@ -793,9 +883,10 @@ describe( 'Navigation', () => {
 
 			await insertBlock( 'Navigation' );
 
-			// Select the Navigation post created by the Admin early
+			// Select the Navigation post created by the Admin earlier
 			// in the test.
 			const navigationPostCreatedByAdminName = 'Navigation';
+
 			const dropdown = await page.waitForXPath( SELECT_MENU_XPATH );
 			await dropdown.click();
 			const theOption = await page.waitForXPath(

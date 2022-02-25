@@ -10,14 +10,12 @@ import {
 
 describe( 'Heading', () => {
 	const COLOR_ITEM_SELECTOR =
-		'.block-editor-panel-color-gradient-settings__item';
+		'.block-editor-panel-color-gradient-settings__dropdown';
 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `.components-color-palette__custom-color`;
 	const CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR =
 		'.components-color-picker button[aria-label="Show detailed inputs"]';
 	const COLOR_INPUT_FIELD_SELECTOR =
 		'.components-color-picker .components-input-control__input';
-	const COLOR_PANEL_TOGGLE_X_SELECTOR =
-		"//button[./span[contains(text(),'Color')]]";
 
 	beforeEach( async () => {
 		await createNewPost();
@@ -73,10 +71,6 @@ describe( 'Heading', () => {
 	it( 'should correctly apply custom colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '### Heading' );
-		const colorPanelToggle = await page.waitForXPath(
-			COLOR_PANEL_TOGGLE_X_SELECTOR
-		);
-		await colorPanelToggle.click();
 
 		const textColorButton = await page.waitForSelector(
 			COLOR_ITEM_SELECTOR
@@ -101,10 +95,6 @@ describe( 'Heading', () => {
 	it( 'should correctly apply named colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '## Heading' );
-		const [ colorPanelToggle ] = await page.$x(
-			COLOR_PANEL_TOGGLE_X_SELECTOR
-		);
-		await colorPanelToggle.click();
 
 		const textColorButton = await page.waitForSelector(
 			COLOR_ITEM_SELECTOR

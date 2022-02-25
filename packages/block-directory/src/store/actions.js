@@ -1,10 +1,19 @@
 /**
+ * External dependencies
+ */
+import { pick } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+} from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -52,7 +61,7 @@ export const installBlockType = ( block ) => async ( {
 	registry,
 	dispatch,
 } ) => {
-	const { id } = block;
+	const { id, name } = block;
 	let success = false;
 	dispatch.clearErrorNotice( id );
 	try {
@@ -82,9 +91,42 @@ export const installBlockType = ( block ) => async ( {
 			links: { ...block.links, ...links },
 		} );
 
+		// Ensures that the block metadata is propagated to the editor when registered on the server.
+		const metadataFields = [
+			'api_version',
+			'title',
+			'category',
+			'parent',
+			'icon',
+			'description',
+			'keywords',
+			'attributes',
+			'provides_context',
+			'uses_context',
+			'supports',
+			'styles',
+			'example',
+			'variations',
+		];
+		await apiFetch( {
+			path: addQueryArgs( `/wp/v2/block-types/${ name }`, {
+				_fields: metadataFields,
+			} ),
+		} )
+			// Ignore when the block is not registered on the server.
+			.catch( () => {} )
+			.then( ( response ) => {
+				if ( ! response ) {
+					return;
+				}
+				unstable__bootstrapServerSideBlockDefinitions( {
+					[ name ]: pick( response, metadataFields ),
+				} );
+			} );
+
 		await loadAssets();
 		const registeredBlocks = registry.select( blocksStore ).getBlockTypes();
-		if ( ! registeredBlocks.some( ( i ) => i.name === block.name ) ) {
+		if ( ! registeredBlocks.some( ( i ) => i.name === name ) ) {
 			throw new Error(
 				__( 'Error registering block. Try reloading the page.' )
 			);

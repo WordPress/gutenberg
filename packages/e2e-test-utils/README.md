@@ -106,6 +106,15 @@ Clicks on More Menu item, searches for the button with the text provided and cli
 _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
+-   _context_ `[GutenbergContext]`: Whether to click the button in the post editor or site editor context.
+
+### clickSiteEditorMenuItem
+
+Searches for an item in the navigation panel with the label provided and clicks it.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
 
 ### closeGlobalBlockInserter
 
@@ -114,6 +123,10 @@ Undocumented declaration.
 ### closeListView
 
 Closes list view
+
+### closeSiteEditorNavigationPanel
+
+Closes the site editor navigation panel if open
 
 ### createEmbeddingMatcher
 
@@ -223,6 +236,14 @@ _Parameters_
 
 Delete all menus using the REST API
 
+### deleteAllTemplates
+
+Delete all the templates of given type.
+
+_Parameters_
+
+-   _type_ `('wp_template'|'wp_template_part')`: - Template type to delete.
+
 ### deleteAllWidgets
 
 Delete all the widgets in the widgets screen.
@@ -257,6 +278,10 @@ Disable auto-accepting any dialogs.
 ### disablePrePublishChecks
 
 Disables Pre-publish checks.
+
+### disableSiteEditorWelcomeGuide
+
+Skips the welcome guide popping up to first time users of the site editor
 
 ### dragAndResize
 
@@ -364,6 +389,14 @@ _Returns_
 
 -   `Promise`: Promise resolving with current post content markup.
 
+### getCurrentSiteEditorContent
+
+Returns a promise which resolves with the edited post content (HTML string).
+
+_Returns_
+
+-   `Promise<string>`: Promise resolving with post content markup.
+
 ### getEditedPostContent
 
 Returns a promise which resolves with the edited post content (HTML string).
@@ -398,6 +431,18 @@ _Related_
 _Returns_
 
 -   `Promise<?string>`: Promise resolving to a string or null, depending whether a page error is present.
+
+### getSiteEditorMenuItem
+
+Searches for an item in the site editor navigation menu with the provided label.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
+
+_Returns_
+
+-   `Promise<?ElementHandle>`: The menu item handle or `null`
 
 ### hasBlockSwitcher
 
@@ -489,6 +534,17 @@ _Returns_
 
 Undocumented declaration.
 
+### isSiteEditorRoot
+
+Returns `true` if in the site editor navigation root
+
+Checks whether the “Back to dashboard” button is visible. If
+not in the root, a “Back” button would be visible instead.
+
+_Returns_
+
+-   `Promise<boolean>`: Whether it currently is the navigation root or not
+
 ### isThemeInstalled
 
 Checks whether a theme exists on the site.
@@ -525,6 +581,14 @@ _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
 
+### navigateSiteEditorBack
+
+Navigates the site editor back
+
+### navigateSiteEditorBackToRoot
+
+Goes back until it gets to the root
+
 ### openDocumentSettingsSidebar
 
 Clicks on the button in the header which opens Document Settings sidebar when it is closed.
@@ -532,6 +596,14 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 ### openGlobalBlockInserter
 
 Opens the global block inserter.
+
+### openGlobalStylesPanel
+
+Opens a global styles panel.
+
+_Parameters_
+
+-   _panelName_ `string`: Name of the panel that is going to be opened.
 
 ### openListView
 
@@ -549,9 +621,17 @@ _Returns_
 
 -   `Page`: preview page.
 
+### openPreviousGlobalStylesPanel
+
+Opens the previous global styles panel.
+
 ### openPublishPanel
 
 Opens the publish panel.
+
+### openSiteEditorNavigationPanel
+
+Opens the site editor navigation panel if closed
 
 ### openTypographyToolsPanelMenu
 
@@ -711,6 +791,14 @@ _Parameters_
 The block toolbar is not always visible while typing.
 Call this function to reveal it.
 
+### siteEditorNavigateSequence
+
+Navigates through a sequence of links in the site editor navigation panel
+
+_Parameters_
+
+-   _labels_ `string[] | string`: Labels to navigate through
+
 ### switchEditorModeTo
 
 Switches editor mode.
@@ -733,9 +821,18 @@ running the tests as (if we're not already that user).
 
 Toggles the global inserter.
 
+### toggleGlobalStyles
+
+Toggles the global styles sidebar (opens it if closed and closes it if open).
+
 ### toggleMoreMenu
 
 Toggles the More Menu.
+
+_Parameters_
+
+-   _waitFor_ `['open' | 'close']`: Whether it should wait for the menu to open or close. If `undefined` it won't wait for anything.
+-   _context_ `[GutenbergContext]`: Whether it's toggling in the context of the site editor or post editor.
 
 ### toggleOfflineMode
 
@@ -789,6 +886,21 @@ _Parameters_
 -   _adminPath_ `string`: String to be serialized as pathname.
 -   _query_ `string`: String to be serialized as query portion of URL.
 
+### visitSiteEditor
+
+Visits the Site Editor main page
+
+By default, it also skips the welcome guide. The option can be disabled if need be.
+
+_Related_
+
+-   disableSiteEditorWelcomeGuide
+
+_Parameters_
+
+-   _query_ `string`: String to be serialized as query portion of URL.
+-   _skipWelcomeGuide_ `[boolean]`: Whether to skip the welcome guide as part of the navigation.
+
 ### waitForWindowDimensions
 
 Function that waits until the page viewport has the required dimensions.
@@ -830,4 +942,10 @@ _Returns_
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

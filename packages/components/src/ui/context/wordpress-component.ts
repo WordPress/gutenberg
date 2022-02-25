@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type * as React from 'react';
 
 /**
@@ -21,7 +20,7 @@ export type WordPressComponentProps<
 		? {
 				as?: T | keyof JSX.IntrinsicElements;
 		  }
-		: { as?: never } );
+		: {} );
 
 export type WordPressComponent<
 	T extends React.ElementType,
@@ -30,7 +29,7 @@ export type WordPressComponent<
 > = {
 	< TT extends React.ElementType >(
 		props: WordPressComponentProps< O, TT, IsPolymorphic > &
-			( IsPolymorphic extends true ? { as: TT } : { as: never } )
+			( IsPolymorphic extends true ? { as: TT } : {} )
 	): JSX.Element | null;
 	(
 		props: WordPressComponentProps< O, T, IsPolymorphic >

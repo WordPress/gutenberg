@@ -285,7 +285,10 @@ class BottomSheet extends Component {
 		const { height } = nativeEvent.layout;
 		// The layout animation should only be triggered if the header
 		// height has changed after being mounted.
-		if ( this.headerHeight !== 0 && height !== this.headerHeight ) {
+		if (
+			this.headerHeight !== 0 &&
+			Math.round( height ) !== Math.round( this.headerHeight )
+		) {
 			this.performRegularLayoutAnimation( {
 				useLastLayoutAnimation: true,
 			} );
@@ -551,6 +554,7 @@ class BottomSheet extends Component {
 					<View
 						style={ styles.header }
 						onLayout={ this.onHeaderLayout }
+						testID={ `${ rest.testID || 'bottom-sheet' }-header` }
 					>
 						{ showDragIndicator() && (
 							<View style={ styles.dragIndicator } />

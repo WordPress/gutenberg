@@ -1,9 +1,7 @@
 # Block Theme
 
 <div class="callout callout-alert">
-These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors and theme authors.
-
-Documentation is shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. You can provide feedback in the weekly #core-editor chats, or #fse-outreach-experiment channels, or async via Github issues.
+These features are part of the full site editing project releasing in WordPress 5.9. You can provide feedback in the weekly #core-editor chats, or #fse-outreach-experiment channels, or async using GitHub issues.
 </div>
 
 ## What is a block theme?
@@ -28,6 +26,10 @@ theme
     |__ header.html
     |__ footer.html
     |__ sidebar.html
+    |__ ...
+|__ styles
+    |__ red.json
+    |__ blue.json
     |__ ...
 ```
 
@@ -131,11 +133,11 @@ A pattern block can be used to insert translatable content inside a block templa
 
 #### Example
 
-Register a pattern: 
+Register a pattern:
 
 ```php
 <?php
-register_block_pattern( 
+register_block_pattern(
 	'myblocktheme/wordpress-credit',
 	array(
 		'title'      => __( 'Wordpress credit', 'myblocktheme' ),
@@ -158,7 +160,7 @@ Load the pattern in a template or template part:
 ```html
 <!-- wp:group -->
 <div class="wp-block-group">
-<!-- wp:pattern {"slug":"myblocktheme/wordpress-credit"} /-->
+	<!-- wp:pattern {"slug":"myblocktheme/wordpress-credit"} /-->
 </div>
 <!-- /wp:group -->
 ```

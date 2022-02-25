@@ -51,7 +51,7 @@ Then modify your package.json and add an extra command to npm `scripts` (https:/
 When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
 
 ```sh
-# You must add another dash to pass the "update" flag to wp-env
+# You must add another double dash to pass the "update" flag to wp-env
 $ npm run wp-env start -- --update
 ```
 
@@ -203,6 +203,14 @@ wp-env start
 wp-env start --xdebug=profile,trace,debug
 ```
 
+When you're running `wp-env` using `npm run`, like when working in the Gutenberg repo or when having `wp-env` as a local project dependency, don't forget to add an extra double dash before the `--xdebug` command:
+
+```sh
+npm run wp-env start -- --xdebug
+```
+
+If you forget about that, the `--xdebug` parameter will be passed to NPM instead of the `wp-env start` command and it will be ignored.
+
 You can see a reference on each of the Xdebug modes and what they do in the [Xdebug documentation](https://xdebug.org/docs/all_settings#mode).
 
 _Since we are only installing Xdebug 3, Xdebug is only supported for PHP versions greater than or equal to 7.2 (the default). Xdebug won't be installed if `phpVersion` is set to a legacy version._
@@ -224,6 +232,8 @@ You should only have to translate `port` and `pathMappings` to the format used b
 	}
 }
 ```
+
+After you create a `.vscode/launch.json` file in your repository, you probably want to add it to your [global gitignore file](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer) so that it stays private for you and is not committed to the repository.
 
 Once your IDEs Xdebug settings have been enabled, you should just have to launch the debugger, put a breakpoint on any line of PHP code, and then refresh your browser!
 
@@ -398,6 +408,18 @@ Options:
   --version  Show version number                                       [boolean]
   --debug    Enable debug output.                     [boolean] [default: false]
   --watch    Watch for logs as they happen.            [boolean] [default: true]
+```
+
+### `wp-env install-path`
+
+Outputs the absolute path to the WordPress environment files.
+
+Example:
+
+```sh
+$ wp-env install-path
+
+/home/user/.wp-env/63263e6506becb7b8613b02d42280a49
 ```
 
 ## .wp-env.json
@@ -609,4 +631,10 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 }
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

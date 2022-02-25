@@ -201,9 +201,9 @@ An array of objects containing the following properties:
 
 #### children
 
-An alternative to the `options` prop.  
+An alternative to the `options` prop.
 Use the `children` prop to have more control on the style of the items being rendered, like `optgroup`s or `options` and possibly avoid re-rendering due to the reference update on the `options` prop.
-- Type: `Element`
+- Type: `ReactNode`
 - Required: No
 
 #### onChange

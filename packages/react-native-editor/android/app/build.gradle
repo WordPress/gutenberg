@@ -129,10 +129,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        ndk { 
-            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "mips" 
-            
-        } 
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "mips"
+
+        }
     }
     splits {
         abi {
@@ -170,16 +170,13 @@ android {
 
 repositories {
     google()
-    jcenter()
+    mavenCentral()
     maven { url "https://jitpack.io" }
 }
 
 dependencies {
     implementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
         exclude group: 'org.wordpress', module: 'utils'
-    })
-    implementation("org.wordpress:utils:$wordpressUtilsVersion", {
-        exclude group: 'com.android.support'
     })
     implementation 'androidx.appcompat:appcompat:1.2.0'
     //noinspection GradleDynamicVersion

@@ -57,3 +57,30 @@ export const longLabels = () => (
 		options={ longLabelOptions }
 	/>
 );
+
+const withHintsOptions = [
+	{
+		key: 'thumbnail',
+		name: 'Thumbnail',
+		__experimentalHint: '150x150',
+	},
+	{
+		key: 'medium',
+		name: 'Medium',
+		__experimentalHint: '250x250',
+	},
+	{
+		key: 'large',
+		name: 'Large',
+		__experimentalHint: '1024x1024',
+	},
+	{
+		key: 'full',
+		name: 'Full Size',
+		__experimentalHint: '1600x1600',
+	},
+];
+
+export const hints = () => (
+	<CustomSelectControl label="Testing hints" options={ withHintsOptions } />
+);

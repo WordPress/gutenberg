@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref, ReactNode } from 'react';
+import type { ForwardedRef, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -44,7 +43,7 @@ export interface ZStackProps {
 
 function ZStack(
 	props: WordPressComponentProps< ZStackProps, 'div' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		children,

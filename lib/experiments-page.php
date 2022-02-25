@@ -105,9 +105,5 @@ function gutenberg_experiments_editor_settings( $settings ) {
 	);
 	return array_merge( $settings, $experiments_settings );
 }
-// This can be removed when plugin support requires WordPress 5.8.0+.
-if ( function_exists( 'get_block_editor_settings' ) ) {
-	add_filter( 'block_editor_settings_all', 'gutenberg_experiments_editor_settings' );
-} else {
-	add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );
-}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_experiments_editor_settings' );

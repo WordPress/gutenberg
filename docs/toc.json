@@ -43,14 +43,6 @@
 	{
 		"docs/how-to-guides/README.md": [
 			{ "docs/how-to-guides/accessibility.md": [] },
-
-			{
-				"docs/how-to-guides/backward-compatibility/README.md": [
-					{
-						"docs/how-to-guides/backward-compatibility/deprecations.md": []
-					}
-				]
-			},
 			{
 				"docs/how-to-guides/block-tutorial/README.md": [
 					{
@@ -66,7 +58,13 @@
 						"docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md": []
 					},
 					{
+						"docs/how-to-guides/block-tutorial/block-supports-in-static-blocks.md": []
+					},
+					{
 						"docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md": []
 					},
 					{
 						"docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md": []
@@ -77,14 +75,6 @@
 				]
 			},
 			{
-				"docs/how-to-guides/designers/README.md": [
-					{ "docs/how-to-guides/designers/block-design.md": [] },
-					{ "docs/how-to-guides/designers/user-interface.md": [] },
-					{ "docs/how-to-guides/designers/design-resources.md": [] },
-					{ "docs/how-to-guides/designers/animation.md": [] }
-				]
-			},
-			{
 				"docs/how-to-guides/platform/README.md": [
 					{
 						"docs/how-to-guides/platform/custom-block-editor/README.md": [
@@ -92,6 +82,16 @@
 								"docs/how-to-guides/platform/custom-block-editor/tutorial.md": []
 							}
 						]
+					}
+				]
+			},
+			{
+				"docs/how-to-guides/data-basics/README.md": [
+					{
+					  "docs/how-to-guides/data-basics/1-data-basics-setup.md": []
+					},
+					{
+					  "docs/how-to-guides/data-basics/2-building-a-list-of-pages.md": []
 					}
 				]
 			},
@@ -221,7 +221,19 @@
 				]
 			},
 			{ "docs/reference-guides/richtext.md": [] },
-			{ "docs/reference-guides/theme-json-reference.md": [] },
+			{
+				"docs/reference-guides/theme-json-reference/README.md": [
+					{
+						"docs/reference-guides/theme-json-reference/theme-json-living.md": []
+					},
+					{
+						"docs/reference-guides/theme-json-reference/theme-json-v1.md": []
+					},
+					{
+						"docs/reference-guides/theme-json-reference/theme-json-migrations.md": []
+					}
+				]
+			},
 			{ "packages/components/README.md": "{{components}}" },
 			{ "docs/reference-guides/packages.md": "{{packages}}" },
 			{
@@ -256,7 +268,15 @@
 					},
 					{
 						"docs/explanations/architecture/full-site-editing-templates.md": []
-					}
+					},
+					{ "docs/explanations/architecture/styles.md": [] }
+				]
+			},
+			{
+				"docs/explanations/user-interface/README.md": [
+					{ "docs/explanations/user-interface/block-design.md": [] },
+					{ "docs/explanations/user-interface/animation.md": [] },
+					{ "docs/explanations/user-interface/design-resources.md": [] }
 				]
 			},
 			{ "docs/explanations/faq.md": [] },
@@ -288,9 +308,14 @@
 							},
 							{
 								"docs/contributors/code/react-native/integration-test-guide.md": []
+							},
+							{
+								"docs/contributors/code/react-native/internationalization-guide.md": []
 							}
 						]
-					}
+					},
+					{ "docs/contributors/code/backward-compatibility.md": [] },
+					{ "docs/contributors/code/deprecations.md": [] }
 				]
 			},
 			{

@@ -1,13 +1,68 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/comments-query-loop",
 		"isValid": true,
 		"attributes": {
-			"perPage": null,
-			"tagName": "div"
+			"inherit": false,
+			"order": "desc",
+			"perPage": 2,
+			"tagName": "div",
+			"defaultPage": "oldest"
 		},
-		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-comments-query-loop\"></div>"
+		"innerBlocks": [
+			{
+				"name": "core/comment-template",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/comment-author-avatar",
+						"isValid": true,
+						"attributes": {
+							"width": 96,
+							"height": 96
+						},
+						"innerBlocks": []
+					},
+					{
+						"name": "core/comment-author-name",
+						"isValid": true,
+						"attributes": {
+							"isLink": false,
+							"linkTarget": "_self"
+						},
+						"innerBlocks": []
+					},
+					{
+						"name": "core/comment-date",
+						"isValid": true,
+						"attributes": {
+							"isLink": false
+						},
+						"innerBlocks": []
+					},
+					{
+						"name": "core/comment-content",
+						"isValid": true,
+						"attributes": {},
+						"innerBlocks": []
+					},
+					{
+						"name": "core/comment-reply-link",
+						"isValid": true,
+						"attributes": {},
+						"innerBlocks": []
+					},
+					{
+						"name": "core/comment-edit-link",
+						"isValid": true,
+						"attributes": {
+							"linkTarget": "_self"
+						},
+						"innerBlocks": []
+					}
+				]
+			}
+		]
 	}
 ]

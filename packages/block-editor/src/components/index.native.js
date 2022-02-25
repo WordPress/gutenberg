@@ -35,6 +35,7 @@ export {
 	RichTextToolbarButton,
 	__unstableRichTextInputEvent,
 } from './rich-text';
+export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export {
 	default as MediaUpload,
@@ -54,6 +55,8 @@ export { default as __experimentalPanelColorGradientSettings } from './colors-gr
 export { default as useSetting } from './use-setting';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
 export { default as Warning } from './warning';
+export { default as ContrastChecker } from './contrast-checker';
+export { default as useMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
 
 export {
 	BottomSheetSettings,

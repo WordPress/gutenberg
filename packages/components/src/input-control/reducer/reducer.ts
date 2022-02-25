@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { isEmpty } from 'lodash';
-// eslint-disable-next-line no-restricted-imports
 import type { SyntheticEvent } from 'react';
 
 /**
@@ -51,6 +50,9 @@ export const composeStateReducers = (
 ): StateReducer => {
 	return ( ...args ) => {
 		return fns.reduceRight( ( state, fn ) => {
+			// TODO: Assess whether this can be replaced with a more standard `compose` implementation
+			// like wp.data.compose() (aka lodash flowRight) or Redux compose().
+			// The current implementation only works by functions mutating the original state object.
 			const fnState = fn( ...args );
 			return isEmpty( fnState ) ? state : { ...state, ...fnState };
 		}, {} as InputState );

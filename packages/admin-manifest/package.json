@@ -26,7 +26,8 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.16.0"
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/url": "file:../url"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -454,7 +454,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * Processes a settings array, renaming or moving properties.
 	 *
 	 * @param array $settings        Reference to settings either defaults or an individual block's.
-	 * @param arary $paths_to_rename Paths to rename.
+	 * @param array $paths_to_rename Paths to rename.
 	 */
 	private static function rename_settings( &$settings, $paths_to_rename ) {
 		foreach ( $paths_to_rename as $original => $renamed ) {

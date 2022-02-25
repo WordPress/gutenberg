@@ -52,7 +52,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
       >
         <CardBody>
           <ItemGroup>
-            <NavigationButton
+            <NavigatorButton
               as={
                 Object {
                   "$$typeof": Symbol(react.forward_ref),
@@ -90,8 +90,8 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                   />
                 </FlexItem>
               </HStack>
-            </NavigationButton>
-            <NavigationButton
+            </NavigatorButton>
+            <NavigatorButton
               as={
                 Object {
                   "$$typeof": Symbol(react.forward_ref),
@@ -129,8 +129,8 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                   />
                 </FlexItem>
               </HStack>
-            </NavigationButton>
-            <NavigationButton
+            </NavigatorButton>
+            <NavigatorButton
               as={
                 Object {
                   "$$typeof": Symbol(react.forward_ref),
@@ -168,7 +168,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                   />
                 </FlexItem>
               </HStack>
-            </NavigationButton>
+            </NavigatorButton>
           </ItemGroup>
         </CardBody>
       </Card>
@@ -187,7 +187,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigationButton
+          <NavigatorBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -199,8 +199,6 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                 />
               </SVG>
             }
-            isBack={true}
-            path="/"
           />
           <Text
             size="16"
@@ -256,7 +254,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigationButton
+          <NavigatorBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -268,8 +266,6 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                 />
               </SVG>
             }
-            isBack={true}
-            path="/"
           />
           <Text
             size="16"
@@ -316,7 +312,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           justify="left"
           size="small"
         >
-          <NavigationButton
+          <NavigatorBackButton
             aria-label="Navigate to the previous view"
             icon={
               <SVG
@@ -328,8 +324,6 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
                 />
               </SVG>
             }
-            isBack={true}
-            path="/"
           />
           <Text
             size="16"

@@ -34,6 +34,7 @@ import { store as blockEditorStore } from '../../store';
 const MediaReplaceFlow = ( {
 	mediaURL,
 	mediaId,
+	mediaIds,
 	allowedTypes,
 	accept,
 	onSelect,
@@ -44,6 +45,9 @@ const MediaReplaceFlow = ( {
 	createNotice,
 	removeNotice,
 	children,
+	multiple = false,
+	addToGallery,
+	handleUpload = true,
 } ) => {
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
@@ -78,7 +82,8 @@ const MediaReplaceFlow = ( {
 		}, 1000 );
 	};
 
-	const selectMedia = ( media ) => {
+	const selectMedia = ( media, closeMenu ) => {
+		closeMenu();
 		setMediaURLValue( media.url );
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
@@ -90,11 +95,15 @@ const MediaReplaceFlow = ( {
 		onSelectURL( newURL );
 	};
 
-	const uploadFiles = ( event ) => {
+	const uploadFiles = ( event, closeMenu ) => {
 		const files = event.target.files;
+		if ( ! handleUpload ) {
+			closeMenu();
+			return onSelect( files );
+		}
 		onFilesUpload( files );
 		const setMedia = ( [ media ] ) => {
-			selectMedia( media );
+			selectMedia( media, closeMenu );
 		};
 		mediaUpload( {
 			allowedTypes,
@@ -110,6 +119,19 @@ const MediaReplaceFlow = ( {
 			event.target.click();
 		}
 	};
+
+	const onlyAllowsImages = () => {
+		if ( ! allowedTypes || allowedTypes.length === 0 ) {
+			return false;
+		}
+
+		return allowedTypes.every(
+			( allowedType ) =>
+				allowedType === 'image' || allowedType.startsWith( 'image/' )
+		);
+	};
+
+	const gallery = multiple && onlyAllowsImages();
 
 	const POPOVER_PROPS = {
 		isAlternate: true,
@@ -134,8 +156,13 @@ const MediaReplaceFlow = ( {
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
 						<MediaUpload
-							value={ mediaId }
-							onSelect={ ( media ) => selectMedia( media ) }
+							gallery={ gallery }
+							addToGallery={ addToGallery }
+							multiple={ multiple }
+							value={ multiple ? mediaIds : mediaId }
+							onSelect={ ( media ) =>
+								selectMedia( media, onClose )
+							}
 							allowedTypes={ allowedTypes }
 							onClose={ onCloseModal }
 							render={ ( { open } ) => (
@@ -150,6 +177,7 @@ const MediaReplaceFlow = ( {
 									uploadFiles( event, onClose );
 								} }
 								accept={ accept }
+								multiple={ multiple }
 								render={ ( { openFileDialog } ) => {
 									return (
 										<MenuItem

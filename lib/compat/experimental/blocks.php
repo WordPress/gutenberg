@@ -16,6 +16,7 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 	 * @return array Returns the comment query parameters to use with the WP_Comment_Query constructor.
 	 */
 	function build_comment_query_vars_from_block( $block ) {
+
 		$comment_args = array(
 			'orderby'                   => 'comment_date_gmt',
 			'order'                     => 'ASC',
@@ -34,21 +35,33 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			$comment_args['hierarchical'] = false;
 		}
 
-		$per_page = ! empty( $block->context['comments/perPage'] ) ? (int) $block->context['comments/perPage'] : 0;
-		if ( 0 === $per_page && get_option( 'page_comments' ) ) {
-			$per_page = (int) get_query_var( 'comments_per_page' );
-			if ( 0 === $per_page ) {
-				$per_page = (int) get_option( 'comments_per_page' );
-			}
+		$inherit = ! empty( $block->context['comments/inherit'] );
+
+		$per_page       = (int) get_option( 'comments_per_page' );
+		$query_per_page = (int) get_query_var( 'comments_per_page' );
+		if ( 0 !== $query_per_page ) {
+			$per_page = $query_per_page;
 		}
+		$block_per_page = ! empty( $block->context['comments/perPage'] ) ? (int) $block->context['comments/perPage'] : 0;
+		if ( ! $inherit && 0 !== $block_per_page ) {
+			$per_page = $block_per_page;
+		}
+
+		$default_page = get_option( 'default_comments_page' );
+		if ( ! $inherit && ! empty( $block->context['comments/defaultPage'] ) ) {
+			$default_page = $block->context['comments/defaultPage'];
+		}
+
 		if ( $per_page > 0 ) {
 			$comment_args['number'] = $per_page;
-			$page                   = (int) get_query_var( 'cpage' );
 
+			$page = (int) get_query_var( 'cpage' );
 			if ( $page ) {
-				$comment_args['offset'] = ( $page - 1 ) * $per_page;
-			} elseif ( 'oldest' === get_option( 'default_comments_page' ) ) {
-				$comment_args['offset'] = 0;
+				$comment_args['paged'] = $page;
+			} elseif ( 'oldest' === $default_page ) {
+				$comment_args['paged'] = 1;
+			} elseif ( 'newest' === $default_page ) {
+				$comment_args['paged'] = ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
 			}
 		}
 
@@ -90,3 +103,60 @@ if ( ! function_exists( 'get_comments_pagination_arrow' ) ) {
 		return null;
 	}
 }
+
+if ( ! function_exists( 'extend_block_editor_settings_with_discussion_settings' ) ) {
+	/**
+	 * Workaround for getting discussion settings as block editor settings
+	 * so any user can access to them without needing to be an admin.
+	 *
+	 * @param array $settings Default editor settings.
+	 *
+	 * @return array Filtered editor settings.
+	 */
+	function extend_block_editor_settings_with_discussion_settings( $settings ) {
+
+		$settings['__experimentalDiscussionSettings'] = array(
+			'commentOrder'        => get_option( 'comment_order' ),
+			'commentsPerPage'     => get_option( 'comments_per_page' ),
+			'defaultCommentsPage' => get_option( 'default_comments_page' ),
+			'pageComments'        => get_option( 'page_comments' ),
+			'threadComments'      => get_option( 'thread_comments' ),
+			'threadCommentsDepth' => get_option( 'thread_comments_depth' ),
+			'avatarURL'           => get_avatar_url(
+				'',
+				array(
+					'size'          => 96,
+					'force_default' => true,
+					'default'       => get_option( 'avatar_default' ),
+				)
+			),
+		);
+
+		return $settings;
+	}
+}
+add_filter( 'block_editor_settings_all', 'extend_block_editor_settings_with_discussion_settings' );
+
+if ( ! function_exists( 'gutenberg_rest_comment_set_children_as_embeddable' ) ) {
+	/**
+	 * Mark the `children` attr of comments as embeddable so they can be included in
+	 * REST API responses without additional requests.
+	 *
+	 * @return void
+	 */
+	function gutenberg_rest_comment_set_children_as_embeddable() {
+		add_filter(
+			'rest_prepare_comment',
+			function ( $response ) {
+				$links = $response->get_links();
+				if ( isset( $links['children'] ) ) {
+					$href = $links['children'][0]['href'];
+					$response->remove_link( 'children', $href );
+					$response->add_link( 'children', $href, array( 'embeddable' => true ) );
+				}
+				return $response;
+			}
+		);
+	}
+}
+add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable' );

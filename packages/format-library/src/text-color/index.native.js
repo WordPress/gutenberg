@@ -10,7 +10,11 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { BlockControls, useSetting } from '@wordpress/block-editor';
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import {
+	ToolbarGroup,
+	ToolbarButton,
+	useMobileGlobalStylesColors,
+} from '@wordpress/components';
 import { Icon, textColor as textColorIcon } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -25,8 +29,6 @@ import styles from './style.scss';
 
 const name = 'core/text-color';
 const title = __( 'Text color' );
-
-const EMPTY_ARRAY = [];
 
 function getComputedStyleProperty( element, property ) {
 	const {
@@ -68,7 +70,7 @@ function TextColorEdit( {
 	contentRef,
 } ) {
 	const allowCustomControl = useSetting( 'color.custom' );
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const colors = useMobileGlobalStylesColors();
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
 		setIsAddingColor,
@@ -180,12 +182,15 @@ export const textColor = {
 	 */
 	__unstableFilterAttributeValue( key, value ) {
 		if ( key !== 'style' ) return value;
+		// We need to remove the extra spaces within the styles on mobile
+		const newValue = value?.replace( / /g, '' );
 		// We should not add a background-color if it's already set
-		if ( value && value.includes( 'background-color' ) ) return value;
+		if ( newValue && newValue.includes( 'background-color' ) )
+			return newValue;
 		const addedCSS = [ 'background-color', transparentValue ].join( ':' );
 		// Prepend `addedCSS` to avoid a double `;;` as any the existing CSS
 		// rules will already include a `;`.
-		return value ? [ addedCSS, value ].join( ';' ) : addedCSS;
+		return newValue ? [ addedCSS, newValue ].join( ';' ) : addedCSS;
 	},
 	edit: TextColorEdit,
 };

@@ -29,10 +29,6 @@ const CONTROL_PROPS = {
 const TOGGLE_GROUP_CONTROL_PROPS = {
 	toggleGroupControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
 	toggleGroupControlBorderColor: COLORS.ui.border,
-	toggleGroupControlBackdropBackgroundColor:
-		CONTROL_PROPS.controlSurfaceColor,
-	toggleGroupControlBackdropBorderColor: COLORS.ui.border,
-	toggleGroupControlBackdropBoxShadow: 'transparent',
 	toggleGroupControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
 };
 
@@ -48,7 +44,7 @@ export default {
 	borderWidth: '1px',
 	borderWidthFocus: '1.5px',
 	borderWidthTab: '4px',
-	spinnerSize: '18px',
+	spinnerSize: 16,
 	fontSize: '13px',
 	fontSizeH1: 'calc(2.44 * 13px)',
 	fontSizeH2: 'calc(1.95 * 13px)',

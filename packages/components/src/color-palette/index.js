@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -136,9 +137,10 @@ export default function ColorPalette( {
 	__experimentalIsRenderedInSidebar = false,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
-	const Component = __experimentalHasMultipleOrigins
-		? MultiplePalettes
-		: SinglePalette;
+	const Component =
+		__experimentalHasMultipleOrigins && colors?.length
+			? MultiplePalettes
+			: SinglePalette;
 
 	const renderCustomColorPicker = () => (
 		<ColorPicker

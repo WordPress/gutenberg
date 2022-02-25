@@ -75,6 +75,12 @@ describe( 'actions', () => {
 		},
 	};
 
+	const blockTypePath = '/wp/v2/block-types/block/block';
+	const blockTypeResponse = {
+		name: 'block/block',
+		title: 'Test Block',
+	};
+
 	describe( 'installBlockType', () => {
 		it( 'should install a block successfully', async () => {
 			const registry = createRegistryWithStores();
@@ -84,6 +90,8 @@ describe( 'actions', () => {
 				switch ( path ) {
 					case 'wp/v2/plugins':
 						return pluginResponse;
+					case blockTypePath:
+						return blockTypeResponse;
 					default:
 						throw new Error( `unexpected API endpoint: ${ path }` );
 				}
@@ -121,14 +129,14 @@ describe( 'actions', () => {
 			const registry = createRegistryWithStores();
 
 			// mock the api-fetch and load-assets modules
-			apiFetch.mockImplementation( async ( p ) => {
-				const { url } = p;
-				switch ( url ) {
-					case pluginEndpoint:
-						return pluginResponse;
-					default:
-						throw new Error( `unexpected API endpoint: ${ url }` );
+			apiFetch.mockImplementation( async ( { path, url } ) => {
+				if ( path === blockTypePath ) {
+					return blockTypeResponse;
 				}
+				if ( url === pluginEndpoint ) {
+					return pluginResponse;
+				}
+				throw new Error( `unexpected API endpoint: ${ url }` );
 			} );
 
 			loadAssets.mockImplementation( loadAssetsMock( registry ) );

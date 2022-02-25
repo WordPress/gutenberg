@@ -16,7 +16,7 @@ import UnitControl from '../';
 import { CSS_UNITS } from '../utils';
 
 export default {
-	title: 'Components/UnitControl',
+	title: 'Components (Experimental)/UnitControl',
 	component: UnitControl,
 	parameters: {
 		knobs: { disable: false },

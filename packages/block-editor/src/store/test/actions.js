@@ -165,6 +165,7 @@ describe( 'actions', () => {
 				type: 'MULTI_SELECT',
 				start,
 				end,
+				initialPosition: 0,
 			} );
 		} );
 
@@ -1166,7 +1167,6 @@ describe( 'actions', () => {
 				actions,
 				selectors,
 				reducer,
-				__experimentalUseThunks: true,
 			} );
 
 			registerBlockType( 'core/test-block', defaultBlockSettings );

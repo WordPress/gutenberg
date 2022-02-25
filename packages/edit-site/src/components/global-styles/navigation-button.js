@@ -2,23 +2,17 @@
  * WordPress dependencies
  */
 import {
-	__experimentalUseNavigator as useNavigator,
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__experimentalItem as Item,
 	FlexItem,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { Icon } from '@wordpress/icons';
 
-function NavigationButton( {
-	path,
-	icon,
-	children,
-	isBack = false,
-	...props
-} ) {
-	const navigator = useNavigator();
+function GenericNavigationButton( { icon, children, ...props } ) {
 	return (
-		<Item onClick={ () => navigator.push( path, { isBack } ) } { ...props }>
+		<Item { ...props }>
 			{ icon && (
 				<HStack justify="flex-start">
 					<FlexItem>
@@ -32,4 +26,12 @@ function NavigationButton( {
 	);
 }
 
-export default NavigationButton;
+function NavigationButton( props ) {
+	return <NavigatorButton as={ GenericNavigationButton } { ...props } />;
+}
+
+function NavigationBackButton( props ) {
+	return <NavigatorBackButton as={ GenericNavigationButton } { ...props } />;
+}
+
+export { NavigationButton, NavigationBackButton };

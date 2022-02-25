@@ -87,7 +87,6 @@ export const SVG = ( { className, isPressed, ...props } ) => {
 		...props,
 		className:
 			classnames( className, { 'is-pressed': isPressed } ) || undefined,
-		role: 'img',
 		'aria-hidden': true,
 		focusable: false,
 	};

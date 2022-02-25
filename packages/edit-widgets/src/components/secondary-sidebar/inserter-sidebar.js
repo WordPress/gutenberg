@@ -34,11 +34,9 @@ export default function InserterSidebar() {
 		focusOnMount: null,
 	} );
 
-	const inserterContentRef = useRef();
+	const libraryRef = useRef();
 	useEffect( () => {
-		inserterContentRef.current
-			.querySelector( '.block-editor-inserter__search input' )
-			.focus();
+		libraryRef.current.focusSearch();
 	}, [] );
 
 	return (
@@ -54,15 +52,13 @@ export default function InserterSidebar() {
 					label={ __( 'Close block inserter' ) }
 				/>
 			</TagName>
-			<div
-				className="edit-widgets-layout__inserter-panel-content"
-				ref={ inserterContentRef }
-			>
+			<div className="edit-widgets-layout__inserter-panel-content">
 				<Library
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }
 					rootClientId={ rootClientId }
 					__experimentalInsertionIndex={ insertionIndex }
+					ref={ libraryRef }
 				/>
 			</div>
 		</div>

@@ -98,6 +98,8 @@ export const getSettings = createSelector(
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 			__experimentalReusableBlocks: getReusableBlocks( state ),
+			__experimentalPreferPatternsOnRoot:
+				'wp_template' === getEditedPostType( state ),
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
@@ -120,6 +122,7 @@ export const getSettings = createSelector(
 		isFeatureActive( state, 'focusMode' ),
 		isFeatureActive( state, 'fixedToolbar' ),
 		getReusableBlocks( state ),
+		getEditedPostType( state ),
 	]
 );
 
@@ -327,3 +330,14 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			.filter( ( { templatePart } ) => !! templatePart );
 	}
 );
+
+/**
+ * Returns the current editing mode.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Editing mode.
+ */
+export function getEditorMode( state ) {
+	return state.preferences.editorMode || 'visual';
+}
