@@ -37,18 +37,6 @@
 			"__experimentalDuotone": "img",
 			"text": false,
 			"background": false
-		},
-		"__experimentalBorder": {
-			"color": true,
-			"radius": true,
-			"style": true,
-			"width": true,
-			"__experimentalDefaultControls": {
-				"color": false,
-				"radius": false,
-				"style": false,
-				"width": false
-			}
 		}
 	},
 	"styles": [
