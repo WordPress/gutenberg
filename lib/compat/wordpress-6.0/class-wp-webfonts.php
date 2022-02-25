@@ -20,6 +20,16 @@ class WP_Webfonts {
 	private static $webfonts = array();
 
 	/**
+	 * An array of used webfonts.
+	 *
+	 * @static
+	 * @access private
+	 * @var array
+	 */
+	private static $block_used_fonts    = array();
+	private static $globally_used_fonts = array();
+
+	/**
 	 * An array of registered providers.
 	 *
 	 * @static
@@ -51,10 +61,66 @@ class WP_Webfonts {
 			$this->stylesheet_handle = 'webfonts';
 			$hook                    = 'wp_enqueue_scripts';
 		}
+
+		add_filter( 'pre_render_block', array( $this, 'register_used_font_family_from_block' ), 10, 2 );
+		add_action( 'init', array( $this, 'register_used_font_families_on_global_styles' ) );
+
 		add_action( $hook, array( $this, 'generate_and_enqueue_styles' ) );
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+	}
+
+	private function register_used_font_family( $setting ) {
+		if ( isset( $setting['typography'] ) && isset( $setting['typography']['fontFamily'] ) ) {
+			$font_family_custom = $setting['typography']['fontFamily'];
+
+			if ( strpos( $font_family_custom, 'var:preset|font-family|' ) !== false ) {
+				$index_to_splice  = strrpos( $font_family_custom, '|' ) + 1;
+				$font_family_slug = _wp_to_kebab_case( substr( $font_family_custom, $index_to_splice ) );
+
+				self::$globally_used_fonts[ $font_family_slug ] = 1;
+			}
+		}
+	}
+
+	public function register_used_font_families_on_global_styles() {
+		$global_styles = gutenberg_get_global_styles();
+
+		// Register used fonts from blocks.
+		foreach ( $global_styles['blocks'] as $id => $setting ) {
+			$this->register_used_font_family( $setting );
+		}
+
+		// Register used fonts from elements.
+		foreach ( $global_styles['elements'] as $id => $setting ) {
+			$this->register_used_font_family( $setting );
+		}
+
+		// Register used fonts from global styles.
+		$this->register_used_font_family( $global_styles );
+	}
+
+	public function register_used_font_family_from_block( $output, $block ) {
+		if ( isset( $block['attrs']['fontFamily'] ) ) {
+			self::$block_used_fonts[ $block['attrs']['fontFamily'] ] = 1;
+		}
+	}
+
+	private function filter_unused_fonts() {
+		$registered_webfonts = $this->get_fonts();
+
+		foreach ( $registered_webfonts as $id => $webfont ) {
+			$font_name = _wp_to_kebab_case( $webfont['font-family'] );
+
+			if ( isset( self::$block_used_fonts[ $font_name ] ) || isset( self::$globally_used_fonts[ $font_name ] ) ) {
+				continue;
+			}
+
+			unset( $registered_webfonts[ $id ] );
+		}
+
+		self::$webfonts = $registered_webfonts;
 	}
 
 	/**
@@ -202,6 +268,8 @@ class WP_Webfonts {
 	 * Generate and enqueue webfonts styles.
 	 */
 	public function generate_and_enqueue_styles() {
+		$this->filter_unused_fonts();
+
 		// Generate the styles.
 		$styles = $this->generate_styles();
 
