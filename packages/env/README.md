@@ -223,13 +223,13 @@ You should only have to translate `port` and `pathMappings` to the format used b
 
 ```json
 {
-	"name": "Listen for XDebug",
-	"type": "php",
-	"request": "launch",
-	"port": 9003,
-	"pathMappings": {
-		"/var/www/html/wp-content/plugins/gutenberg": "${workspaceFolder}/"
-	}
+  "name": "Listen for XDebug",
+  "type": "php",
+  "request": "launch",
+  "port": 9003,
+  "pathMappings": {
+    "/var/www/html/wp-content/plugins/gutenberg": "${workspaceFolder}/"
+  }
 }
 ```
 
@@ -297,6 +297,24 @@ Positionals:
 
 ### `wp-env run [container] [command]`
 
+The run command can be used to open shell sessions or invoke WP-CLI commands.
+
+<div class="callout callout-alert">
+To run a WP-CLI command that includes optional arguments, enclose the command in quotation marks; otherwise, the arguments are ignored.
+
+For example, to list cron schedules with optional arguments that specify the fields returned and the format of the output:
+
+```sh
+wp-env run cli "wp cron schedule list --fields=name --format=csv"
+```
+
+Without the quotation marks, WP-CLI lists the schedule in its default format, ignoring the `fields` and `format` arguments.
+</div>
+
+Note that quotation marks are not required for a WP-CLI command that excludes optional arguments, although it does not hurt to include them. For example, the following command syntaxes return identical results: `wp-env run cli "wp cron schedule list"` or `wp-env run cli wp cron schedule list`.
+
+For more information about all the available commands, see [WP-CLI Commands](https://developer.wordpress.org/cli/commands/).
+
 ```sh
 wp-env run <container> [command..]
 
@@ -363,7 +381,7 @@ wp> ^C
 #### Installing a plugin or theme on the development instance
 
 ```sh
-wp-env run cli plugin install custom-post-type-ui
+wp-env run cli wp plugin install custom-post-type-ui
 
 Creating 500cd328b649d63e882d5c4695871d04_cli_run ... done
 Installing Custom Post Type UI (1.9.2)
@@ -455,22 +473,22 @@ Additionally, the key `env` is available to override any of the above options on
 
 ```json
 {
-	"plugins": [ "." ],
-	"config": {
-		"KEY_1": true,
-		"KEY_2": false
-	},
-	"env": {
-		"development": {
-			"themes": [ "./one-theme" ]
-		},
-		"tests": {
-			"config": {
-				"KEY_1": false
-			},
-			"port": 3000
-		}
-	}
+  "plugins": ["."],
+  "config": {
+    "KEY_1": true,
+    "KEY_2": false
+  },
+  "env": {
+    "development": {
+      "themes": ["./one-theme"]
+    },
+    "tests": {
+      "config": {
+        "KEY_1": false
+      },
+      "port": 3000
+    }
+  }
 }
 ```
 
@@ -511,8 +529,8 @@ This is useful for plugin development.
 
 ```json
 {
-	"core": null,
-	"plugins": [ "." ]
+  "core": null,
+  "plugins": ["."]
 }
 ```
 
@@ -522,8 +540,8 @@ This is useful for plugin development when upstream Core changes need to be test
 
 ```json
 {
-	"core": "WordPress/WordPress#master",
-	"plugins": [ "." ]
+  "core": "WordPress/WordPress#master",
+  "plugins": ["."]
 }
 ```
 
@@ -535,8 +553,8 @@ If you are running a _build_ of `wordpress-develop`, point `core` to the `build`
 
 ```json
 {
-	"core": "../wordpress-develop/build",
-	"plugins": [ "." ]
+  "core": "../wordpress-develop/build",
+  "plugins": ["."]
 }
 ```
 
@@ -544,8 +562,8 @@ If you are running `wordpress-develop` in a dev mode (e.g. the watch command `de
 
 ```json
 {
-	"core": "../wordpress-develop/src",
-	"plugins": [ "." ]
+  "core": "../wordpress-develop/src",
+  "plugins": ["."]
 }
 ```
 
@@ -555,9 +573,9 @@ This is useful for integration testing: that is, testing how old versions of Wor
 
 ```json
 {
-	"core": "WordPress/WordPress#5.2.0",
-	"plugins": [ "WordPress/wp-lazy-loading", "WordPress/classic-editor" ],
-	"themes": [ "WordPress/theme-experiments" ]
+  "core": "WordPress/WordPress#5.2.0",
+  "plugins": ["WordPress/wp-lazy-loading", "WordPress/classic-editor"],
+  "themes": ["WordPress/theme-experiments"]
 }
 ```
 
@@ -567,12 +585,12 @@ You can add mu-plugins via the mapping config. The mapping config also allows yo
 
 ```json
 {
-	"plugins": [ "." ],
-	"mappings": {
-		"wp-content/mu-plugins": "./path/to/local/mu-plugins",
-		"wp-content/themes": "./path/to/local/themes",
-		"wp-content/themes/specific-theme": "./path/to/local/theme-1"
-	}
+  "plugins": ["."],
+  "mappings": {
+    "wp-content/mu-plugins": "./path/to/local/mu-plugins",
+    "wp-content/themes": "./path/to/local/themes",
+    "wp-content/themes/specific-theme": "./path/to/local/theme-1"
+  }
 }
 ```
 
@@ -582,10 +600,10 @@ Since all plugins in the `plugins` key are activated by default, you should use 
 
 ```json
 {
-	"plugins": [ "." ],
-	"mappings": {
-		"wp-content/plugins/my-test-plugin": "./path/to/test/plugin"
-	}
+  "plugins": ["."],
+  "mappings": {
+    "wp-content/plugins/my-test-plugin": "./path/to/test/plugin"
+  }
 }
 ```
 
@@ -595,12 +613,12 @@ If you need a plugin active in one environment but not the other, you can use `e
 
 ```json
 {
-	"plugins": [ "." ],
-	"env": {
-		"tests": {
-			"plugins": [ ".", "path/to/test/plugin" ]
-		}
-	}
+  "plugins": ["."],
+  "env": {
+    "tests": {
+      "plugins": [".", "path/to/test/plugin"]
+    }
+  }
 }
 ```
 
@@ -610,13 +628,13 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 
 ```json
 {
-	"plugins": [ "." ],
-	"port": 4013,
-	"env": {
-		"tests": {
-			"port": 4012
-		}
-	}
+  "plugins": ["."],
+  "port": 4013,
+  "env": {
+    "tests": {
+      "port": 4012
+    }
+  }
 }
 ```
 
@@ -626,8 +644,8 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 
 ```json
 {
-	"phpVersion": "7.2",
-	"plugins": [ "." ]
+  "phpVersion": "7.2",
+  "plugins": ["."]
 }
 ```
 
