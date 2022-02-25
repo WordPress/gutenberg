@@ -57,8 +57,8 @@ export function entitiesConfig<
 
 // Build the CoreEntity type using the data from entity config when possible:
 type DeclaredEntity<
-	K extends string,
-	N extends string,
+	K extends Kind,
+	N extends Name,
 	RecordType,
 	E extends EntityConfig = Extract<
 		typeof defaultEntities,
@@ -78,8 +78,8 @@ type DeclaredEntity<
 };
 
 type APIEntity<
-	K extends string,
-	N extends string,
+	K extends Kind,
+	N extends Name,
 	RecordType,
 	KeyName = 'id',
 	C = 'edit'
@@ -137,10 +137,11 @@ export type EntityRecord<
 	C extends Context = any
 > = Entity< C >[ 'recordType' ];
 
-export type RecordOf< K, N, C extends Context = any > = Extract<
-	Entity< C >,
-	{ kind: K; name: N }
->[ 'recordType' ];
+export type RecordOf<
+	K extends Kind,
+	N extends Name,
+	C extends Context = any
+> = Extract< Entity< C >, { kind: K; name: N } >[ 'recordType' ];
 
 export type KindOf< R extends EntityRecord > = Extract<
 	Entity,
