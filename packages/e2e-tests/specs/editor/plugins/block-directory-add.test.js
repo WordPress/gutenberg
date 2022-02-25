@@ -12,7 +12,7 @@ import {
 
 const BLOCK1_NAME = 'block-directory-test-block/main-block';
 
-// Urls to mock
+// Urls to mock.
 const SEARCH_URLS = [
 	'/wp/v2/block-directory/search',
 	`rest_route=${ encodeURIComponent( '/wp/v2/block-directory/search' ) }`,
@@ -30,7 +30,7 @@ const INSTALL_URLS = [
 	`rest_route=${ encodeURIComponent( '/wp/v2/plugins' ) }`,
 ];
 
-// Example Blocks
+// Example Blocks.
 const MOCK_BLOCK1 = {
 	name: BLOCK1_NAME,
 	title: 'Block Directory Test Block',
@@ -44,7 +44,7 @@ const MOCK_BLOCK1 = {
 	author: 'No Author',
 	icon: 'block-default',
 	assets: [
-		'https://fake_url.com/block.js', // we will mock this
+		'https://fake_url.com/block.js', // We will mock this.
 	],
 	humanized_updated: '5 months ago',
 	links: {},
@@ -82,7 +82,7 @@ const MOCK_BLOCK2 = {
 	id: 'block-directory-test-secondary-block',
 };
 
-// Block that will be registered
+// Block that will be registered.
 const block = `( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
@@ -112,26 +112,26 @@ const MOCK_EMPTY_RESPONSES = [
 
 const MOCK_BLOCKS_RESPONSES = [
 	{
-		// Mock response for search with the block
+		// Mock response for search with the block.
 		match: ( request ) =>
 			matchUrl( request.url(), SEARCH_URLS ) &&
 			request.method() === 'GET',
 		onRequestMatch: createJSONResponse( [ MOCK_BLOCK1, MOCK_BLOCK2 ] ),
 	},
 	{
-		// Mock response for block type
+		// Mock response for block type.
 		match: ( request ) => matchUrl( request.url(), BLOCK_TYPE_URLS ),
 		onRequestMatch: createJSONResponse( {} ),
 	},
 	{
-		// Mock response for install
+		// Mock response for install.
 		match: ( request ) => matchUrl( request.url(), INSTALL_URLS ),
 		onRequestMatch: createJSONResponse(
 			MOCK_INSTALLED_BLOCK_PLUGIN_DETAILS
 		),
 	},
 	{
-		// Mock the response for the js asset once it gets injected
+		// Mock the response for the js asset once it gets injected.
 		match: ( request ) => request.url().includes( MOCK_BLOCK1.assets[ 0 ] ),
 		onRequestMatch: createResponse(
 			Buffer.from( block, 'utf8' ),
@@ -171,13 +171,13 @@ describe( 'adding blocks from block directory', () => {
 	} );
 
 	it( 'Should show an empty state when no plugin is found.', async () => {
-		// Be super weird so there won't be a matching block installed
+		// Be super weird so there won't be a matching block installed.
 		const impossibleBlockName = '@#$@@Dsdsdfw2#$@';
 
-		// Return an empty list of plugins
+		// Return an empty list of plugins.
 		await setUpResponseMocking( MOCK_EMPTY_RESPONSES );
 
-		// Search for the block via the inserter
+		// Search for the block via the inserter.
 		await searchForBlock( impossibleBlockName );
 
 		const selectorContent = await page.evaluate(
@@ -191,15 +191,15 @@ describe( 'adding blocks from block directory', () => {
 	} );
 
 	it( 'Should be able to add (the first) block.', async () => {
-		// Setup our mocks
+		// Setup our mocks.
 		await setUpResponseMocking( MOCK_BLOCKS_RESPONSES );
 
-		// Search for the block via the inserter
+		// Search for the block via the inserter.
 		await insertBlockDirectoryBlock( MOCK_BLOCK1.title );
 
 		await page.waitForSelector( `div[data-type="${ MOCK_BLOCK1.name }"]` );
 
-		// The block will auto select and get added, make sure we see it in the content
+		// The block will auto select and get added, make sure we see it in the content.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

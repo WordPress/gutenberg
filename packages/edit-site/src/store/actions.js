@@ -374,12 +374,12 @@ export const revertTemplate = (
 			template.type,
 			template.id,
 			{
-				content: serializeBlocks, // required to make the `undo` behave correctly
-				blocks: edited.blocks, // required to revert the blocks in the editor
+				content: serializeBlocks, // Required to make the `undo` behave correctly.
+				blocks: edited.blocks, // Required to revert the blocks in the editor.
 				source: 'custom', // required to avoid turning the editor into a dirty state
 			},
 			{
-				undoIgnore: true, // required to merge this edit with the last undo level
+				undoIgnore: true, // Required to merge this edit with the last undo level.
 			}
 		);
 

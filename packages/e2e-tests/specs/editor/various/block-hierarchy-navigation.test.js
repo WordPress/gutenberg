@@ -129,7 +129,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 
-		// Insert text in the last column block
+		// Insert text in the last column block.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
@@ -165,7 +165,7 @@ describe( 'Navigating the block hierarchy', () => {
 	} );
 
 	it( 'should select the wrapper div for a group', async () => {
-		// Insert a group block
+		// Insert a group block.
 		await insertBlock( 'Group' );
 
 		// Insert some random blocks.
@@ -178,13 +178,13 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'just a paragraph' );
 		await insertBlock( 'Separator' );
 
-		// Check the Group block content
+		// Check the Group block content.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// Unselect the blocks
+		// Unselect the blocks.
 		await page.click( '.editor-post-title' );
 
-		// Try selecting the group block using the Outline
+		// Try selecting the group block using the Outline.
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
 		const groupMenuItem = (
 			await page.$x(

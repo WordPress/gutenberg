@@ -57,7 +57,7 @@ function ToggleGroupControl(
 	} );
 	const previousValue = usePrevious( value );
 
-	// Propagate radio.state change
+	// Propagate radio.state change.
 	useUpdateEffect( () => {
 		// Avoid calling onChange if radio state changed
 		// from incoming value.
@@ -66,7 +66,7 @@ function ToggleGroupControl(
 		}
 	}, [ radio.state ] );
 
-	// Sync incoming value with radio.state
+	// Sync incoming value with radio.state.
 	useUpdateEffect( () => {
 		if ( value !== radio.state ) {
 			radio.setState( value );

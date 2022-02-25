@@ -1,4 +1,4 @@
-// Block Creation Components
+// Block Creation Components.
 export {
 	BlockAlignmentControl,
 	BlockAlignmentToolbar,
@@ -65,7 +65,7 @@ export {
 } from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
-// Content Related Components
+// Content Related Components.
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';
@@ -77,5 +77,5 @@ export { default as Inserter } from './inserter';
 export { useBlockProps } from './block-list/use-block-props';
 export { default as FloatingToolbar } from './floating-toolbar';
 
-// State Related Components
+// State Related Components.
 export { default as BlockEditorProvider } from './provider';

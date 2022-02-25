@@ -46,7 +46,7 @@ class EditorPage {
 
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object and selects the block
-	// position uses one based numbering
+	// position uses one based numbering.
 	async getBlockAtPosition(
 		blockName,
 		position = 1,
@@ -58,7 +58,7 @@ class EditorPage {
 		if ( elements.length === 0 && options.autoscroll ) {
 			const firstBlockVisible = await this.getFirstBlockVisible();
 			const lastBlockVisible = await this.getLastBlockVisible();
-			// exit if no block is found
+			// Exit if no block is found.
 			if ( ! firstBlockVisible || ! lastBlockVisible ) {
 				return lastElementFound;
 			}
@@ -80,13 +80,13 @@ class EditorPage {
 				lastBlockRowMatch && Number( lastBlockRowMatch[ 1 ] );
 			if ( firstBlockRow && position < firstBlockRow ) {
 				if ( firstBlockRow === 1 ) {
-					// we're at the top already stop recursing
+					// We're at the top already stop recursing.
 					return lastElementFound;
 				}
-				// scroll up
+				// Scroll up.
 				await swipeDown( this.driver );
 			} else if ( lastBlockRow && position > lastBlockRow ) {
-				// scroll down
+				// Scroll down.
 				await swipeUp( this.driver );
 			}
 			return await this.getBlockAtPosition(
@@ -125,7 +125,7 @@ class EditorPage {
 	}
 
 	async getTitleElement( options = { autoscroll: false } ) {
-		//TODO: Improve the identifier for this element
+		// TODO: Improve the identifier for this element
 		const elements = await this.driver.elementsByXPath(
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "Post title.")]`
 		);
@@ -168,7 +168,7 @@ class EditorPage {
 	}
 
 	// Returns html content
-	// Ensure to take additional steps to handle text being changed by auto correct
+	// Ensure to take additional steps to handle text being changed by auto correct.
 	async getHtmlContent() {
 		await toggleHtmlMode( this.driver, true );
 
@@ -179,7 +179,7 @@ class EditorPage {
 		return text;
 	}
 
-	// set html editor content explicitly
+	// Set html editor content explicitly.
 	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
 
@@ -197,7 +197,7 @@ class EditorPage {
 		} else {
 			await htmlContentView.click();
 			await doubleTap( this.driver, htmlContentView );
-			// Sometimes double tap is not enough for paste menu to appear, so we also long press
+			// Sometimes double tap is not enough for paste menu to appear, so we also long press.
 			await longPressMiddleOfElement( this.driver, htmlContentView );
 
 			const pasteButton = this.driver.elementByXPath(
@@ -205,14 +205,14 @@ class EditorPage {
 			);
 
 			await pasteButton.click();
-			await this.driver.sleep( 3000 ); // wait for paste notification to disappear
+			await this.driver.sleep( 3000 ); // Wait for paste notification to disappear.
 		}
 
 		await toggleHtmlMode( this.driver, false );
 	}
 
 	async dismissKeyboard() {
-		await this.driver.sleep( 1000 ); /// wait for any keyboard animations
+		await this.driver.sleep( 1000 ); // Wait for any keyboard animations.
 		const keyboardShown = await this.driver.isKeyboardShown();
 		if ( ! keyboardShown ) {
 			return;
@@ -258,7 +258,7 @@ class EditorPage {
 	// =========================
 
 	async addNewBlock( blockName, relativePosition ) {
-		// Click add button
+		// Click add button.
 		let identifier = 'Add block';
 		if ( isAndroid() ) {
 			identifier = 'Add block, Double tap to add a block';
@@ -279,7 +279,7 @@ class EditorPage {
 			await addButton.click();
 		}
 
-		// Click on block of choice
+		// Click on block of choice.
 		const blockButton = await this.findBlockButton( blockName );
 		if ( isAndroid() ) {
 			await blockButton.click();
@@ -293,7 +293,7 @@ class EditorPage {
 	}
 
 	static getInserterPageHeight( screenHeight ) {
-		// Rough estimate of a swipe distance required to scroll one page of blocks
+		// Rough estimate of a swipe distance required to scroll one page of blocks.
 		return screenHeight * 0.82;
 	}
 
@@ -375,7 +375,7 @@ class EditorPage {
 	// Inline toolbar functions
 	// =========================
 
-	// position of the block to move up
+	// position of the block to move up.
 	async moveBlockUpAtPosition( position, blockName = '' ) {
 		if ( ! ( await this.hasBlockAtPosition( position, blockName ) ) ) {
 			throw Error( `No Block at position ${ position }` );
@@ -391,7 +391,7 @@ class EditorPage {
 		await moveUpButton.click();
 	}
 
-	// position of the block to move down
+	// position of the block to move down.
 	async moveBlockDownAtPosition( position, blockName = '' ) {
 		if ( ! ( await this.hasBlockAtPosition( position, blockName ) ) ) {
 			throw Error( `No Block at position ${ position }` );
@@ -407,8 +407,8 @@ class EditorPage {
 		await moveDownButton.click();
 	}
 
-	// position of the block to remove
-	// Block will no longer be present if this succeeds
+	// Position of the block to remove
+	// Block will no longer be present if this succeeds.
 	async removeBlockAtPosition( blockName = '', position = 1 ) {
 		if ( ! ( await this.hasBlockAtPosition( position, blockName ) ) ) {
 			throw Error( `No Block at position ${ position }` );
@@ -426,7 +426,7 @@ class EditorPage {
 				blockActionsMenuButtonLocator
 			);
 			while ( checkList.length === 0 ) {
-				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom
+				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom.
 				checkList = await this.driver.elementsByXPath(
 					blockActionsMenuButtonLocator
 				);
@@ -477,7 +477,7 @@ class EditorPage {
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
-			// Select block first
+			// Select block first.
 			const block = await this.getBlockAtPosition(
 				this.paragraphBlockName,
 				position + i
@@ -504,7 +504,7 @@ class EditorPage {
 	}
 
 	async getTextForParagraphBlockAtPosition( position ) {
-		// Select block first
+		// Select block first.
 		let block = await this.getBlockAtPosition(
 			this.paragraphBlockName,
 			position
@@ -541,7 +541,7 @@ class EditorPage {
 	async sendTextToListBlock( block, text ) {
 		const textViewElement = await this.getTextViewForListBlock( block );
 
-		// Cannot clear list blocks because it messes up the list bullet
+		// Cannot clear list blocks because it messes up the list bullet.
 		const clear = false;
 
 		return await typeString( this.driver, textViewElement, text, clear );
@@ -665,7 +665,7 @@ class EditorPage {
 		return await this.driver
 			.elementByXPath( optionMenuButtonLocator )
 			.click()
-			.sleep( isAndroid() ? 600 : 200 ); // sleep a little longer due to multiple menus
+			.sleep( isAndroid() ? 600 : 200 ); // sleep a little longer due to multiple menus.
 	}
 
 	async toggleSearchIconOnlySetting( block ) {

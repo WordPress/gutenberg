@@ -1,4 +1,4 @@
-// Primitives
+// Primitives.
 export {
 	SVG,
 	Path,
@@ -10,7 +10,7 @@ export {
 	BlockQuotation,
 } from '@wordpress/primitives';
 
-// Components
+// Components.
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export {
 	default as Animate,
@@ -179,7 +179,7 @@ export {
 export { default as __experimentalStyleProvider } from './style-provider';
 export { ZStack as __experimentalZStack } from './z-stack';
 
-// Higher-Order Components
+// Higher-Order Components.
 export {
 	default as navigateRegions,
 	useNavigateRegions as __unstableUseNavigateRegions,

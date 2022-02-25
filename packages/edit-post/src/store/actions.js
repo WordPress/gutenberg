@@ -270,7 +270,7 @@ export const requestMetaBoxUpdates = () => async ( {
 		type: 'REQUEST_META_BOX_UPDATES',
 	} );
 
-	// Saves the wp_editor fields
+	// Saves the wp_editor fields.
 	if ( window.tinyMCE ) {
 		window.tinyMCE.triggerSave();
 	}
@@ -285,7 +285,7 @@ export const requestMetaBoxUpdates = () => async ( {
 		post.author ? [ 'post_author', post.author ] : false,
 	].filter( Boolean );
 
-	// We gather all the metaboxes locations data and the base form data
+	// We gather all the metaboxes locations data and the base form data.
 	const baseFormData = new window.FormData(
 		document.querySelector( '.metabox-base-form' )
 	);
@@ -314,7 +314,7 @@ export const requestMetaBoxUpdates = () => async ( {
 	);
 
 	try {
-		// Save the metaboxes
+		// Save the metaboxes.
 		await apiFetch( {
 			url: window._wpMetaBoxUrl,
 			method: 'POST',
@@ -493,7 +493,7 @@ export const initializeMetaBoxes = () => ( { registry, select, dispatch } ) => {
 		// Meta boxes are initialized once at page load. It is not necessary to
 		// account for updates on each state change.
 		//
-		// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
+		// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309.
 		const shouldTriggerMetaboxesSave =
 			hasMetaBoxes &&
 			wasSavingPost &&

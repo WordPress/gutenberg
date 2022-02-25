@@ -56,9 +56,9 @@ function InputField(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		// State
+		// State.
 		state,
-		// Actions
+		// Actions.
 		change,
 		commit,
 		drag,

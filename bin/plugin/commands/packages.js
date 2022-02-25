@@ -60,7 +60,7 @@ async function checkoutNpmReleaseBranch( {
 	gitWorkingDirectoryPath,
 	npmReleaseBranch,
 } ) {
-	// Creating the release branch
+	// Creating the release branch.
 	await git.checkoutRemoteBranch( gitWorkingDirectoryPath, npmReleaseBranch );
 	await git.fetch( gitWorkingDirectoryPath, [ '--depth=100' ] );
 	log(
@@ -226,7 +226,7 @@ async function updatePackages( config ) {
 				nextVersion,
 				version,
 			} ) => {
-				// Update changelog
+				// Update changelog.
 				const content = await fs.promises.readFile(
 					changelogPath,
 					'utf8'
@@ -243,7 +243,7 @@ async function updatePackages( config ) {
 					)
 				);
 
-				// Update package.json
+				// Update package.json.
 				const packageJson = readJSONFile( packageJSONPath );
 				const newPackageJson = {
 					...packageJson,

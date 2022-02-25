@@ -70,7 +70,7 @@ function UnitControl(
 		}
 	);
 
-	// Stores parsed value for hand-off in state reducer
+	// Stores parsed value for hand-off in state reducer.
 	const refParsedValue = useRef< string | null >( null );
 
 	const classes = classnames( 'components-unit-control', className );

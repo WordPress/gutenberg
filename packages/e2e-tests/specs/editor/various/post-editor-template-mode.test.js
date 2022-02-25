@@ -122,13 +122,13 @@ describe( 'Post Editor Template mode', () => {
 		await page.reload();
 		await switchToTemplateMode();
 
-		// Edit the template
+		// Edit the template.
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type(
 			'Just a random paragraph added to the template'
 		);
 
-		// Save changes
+		// Save changes.
 		const publishButton = await page.waitForXPath(
 			`//button[contains(text(), 'Publish')]`
 		);
@@ -138,7 +138,7 @@ describe( 'Post Editor Template mode', () => {
 		);
 		await saveButton.click();
 
-		// Preview changes
+		// Preview changes.
 		const previewPage = await openPreviewPage();
 		await previewPage.waitForXPath(
 			'//p[contains(text(), "Just a random paragraph added to the template")]'
@@ -166,13 +166,13 @@ describe( 'Post Editor Template mode', () => {
 
 		await createNewTemplate( 'Blank Template' );
 
-		// Edit the template
+		// Edit the template.
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type(
 			'Just a random paragraph added to the template'
 		);
 
-		// Save changes
+		// Save changes.
 		const publishButton = await page.waitForXPath(
 			`//button[contains(text(), 'Publish')]`
 		);
@@ -187,7 +187,7 @@ describe( 'Post Editor Template mode', () => {
 		);
 		await cancelButton.click();
 
-		// Preview changes
+		// Preview changes.
 		const previewPage = await openPreviewPage();
 		await previewPage.waitForSelector( '.wp-site-blocks' );
 		const content = await previewPage.evaluate(

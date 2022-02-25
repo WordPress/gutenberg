@@ -18,7 +18,7 @@ module.exports = {
 			options: { configureJSX: true },
 		},
 		'@storybook/addon-controls',
-		'@storybook/addon-knobs', // deprecated, new stories should use addon-controls
+		'@storybook/addon-knobs', // Deprecated, new stories should use addon-controls.
 		'@storybook/addon-storysource',
 		'@storybook/addon-viewport',
 		'@storybook/addon-a11y',
@@ -31,11 +31,11 @@ module.exports = {
 	// Workaround:
 	// https://github.com/storybookjs/storybook/issues/12270
 	webpackFinal: async ( config ) => {
-		// Find the DefinePlugin
+		// Find the DefinePlugin.
 		const plugin = config.plugins.find( ( p ) => {
 			return p.definitions && p.definitions[ 'process.env' ];
 		} );
-		// Add custom env variables
+		// Add custom env variables.
 		Object.keys( customEnvVariables ).forEach( ( key ) => {
 			plugin.definitions[ 'process.env' ][ key ] = JSON.stringify(
 				customEnvVariables[ key ]

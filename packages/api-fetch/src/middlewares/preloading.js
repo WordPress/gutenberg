@@ -39,7 +39,7 @@ function createPreloadingMiddleware( preloadedData ) {
 		if ( 'GET' === method && cache[ path ] ) {
 			const cacheData = cache[ path ];
 
-			// Unsetting the cache key ensures that the data is only used a single time
+			// Unsetting the cache key ensures that the data is only used a single time.
 			delete cache[ path ];
 
 			return prepareResponse( cacheData, !! parse );
@@ -50,7 +50,7 @@ function createPreloadingMiddleware( preloadedData ) {
 		) {
 			const cacheData = cache[ method ][ path ];
 
-			// Unsetting the cache key ensures that the data is only used a single time
+			// Unsetting the cache key ensures that the data is only used a single time.
 			delete cache[ method ][ path ];
 
 			return prepareResponse( cacheData, !! parse );

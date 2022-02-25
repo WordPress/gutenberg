@@ -108,7 +108,7 @@ function InserterSearchResults( {
 		maxBlockTypes,
 	] );
 
-	// Announce search results on change
+	// Announce search results on change.
 	useEffect( () => {
 		if ( ! filterValue ) {
 			return;

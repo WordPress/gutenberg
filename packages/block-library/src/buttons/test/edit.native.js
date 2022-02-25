@@ -16,12 +16,12 @@ import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 beforeAll( () => {
-	// Register all core blocks
+	// Register all core blocks.
 	registerCoreBlocks();
 } );
 
 afterAll( () => {
-	// Clean up registered blocks
+	// Clean up registered blocks.
 	getBlockTypes().forEach( ( block ) => {
 		unregisterBlockType( block.name );
 	} );
@@ -103,7 +103,7 @@ describe( 'Buttons block', () => {
 					getByA11yLabel( 'Change items justification' )
 				);
 
-				// Select alignment option
+				// Select alignment option.
 				fireEvent.press(
 					await waitFor( () => getByText( justificationOption ) )
 				);
