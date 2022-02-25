@@ -28,17 +28,17 @@ function gutenberg_register_layout_support( $block_type ) {
 /**
  * Generates the CSS corresponding to the provided layout.
  *
- * @param string  $selector CSS selector.
- * @param array   $layout   Layout object. The one that is passed has already checked the existence of default block layout.
+ * @param string  $selector              CSS selector.
+ * @param array   $layout                Layout object. The one that is passed has already checked the existence of default block layout.
  * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
- * @param string  $gap_value The block gap value to apply.
+ * @param array   $gap_value             The block gap value to apply.
  *
- * @return string CSS style.
+ * @return string                        CSS style.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
-	$style = '';
+	$styles = array();
 	if ( 'default' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
@@ -51,24 +51,44 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
-		$style = '';
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > :where(:not(.alignleft):not(.alignright)) {";
-			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
-			$style .= 'margin-left: auto !important;';
-			$style .= 'margin-right: auto !important;';
-			$style .= '}';
+			$styles[ "$selector > :where(:not(.alignleft):not(.alignright))" ] = array(
+				'max-width'    => esc_html( $all_max_width_value ),
+				'margin-left'  => 'auto !important',
+				'margin-right' => 'auto !important',
+			);
 
-			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
+			$styles[ "$selector > .alignwide" ] = array(
+				'max-width' => esc_html( $wide_max_width_value ),
+			);
+
+			$styles[ "$selector > .alignfull" ] = array(
+				'max-width' => 'none',
+			);
 		}
 
-		$style .= "$selector .alignleft { float: left; margin-right: 2em; margin-left: 0; }";
-		$style .= "$selector .alignright { float: right; margin-left: 2em; margin-right: 0; }";
+		$styles[ "$selector .alignleft" ] = array(
+			'float'        => 'left',
+			'margin-right' => '2em',
+			'margin-left'  => '0',
+		);
+
+		$styles[ "$selector .alignright" ] = array(
+			'float'        => 'right',
+			'margin-right' => '0',
+			'margin-left'  => '2em',
+		);
+
 		if ( $has_block_gap_support ) {
-			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
-			$style    .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
-			$style    .= "$selector > * + * { margin-top: $gap_style;  margin-bottom: 0; }";
+			$gap_style                     = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
+			$styles[ "$selector > *" ]     = array(
+				'margin-top'    => '0',
+				'margin-bottom' => '0',
+			);
+			$styles[ "$selector > * + *" ] = array(
+				'margin-top'    => $gap_style,
+				'margin-bottom' => '0',
+			);
 		}
 	} elseif ( 'flex' === $layout_type ) {
 		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
@@ -88,39 +108,57 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$layout['flexWrap'] :
 			'wrap';
 
-		$style  = "$selector {";
-		$style .= 'display: flex;';
+		$styles[ "$selector" ] = array(
+			'display'   => 'flex',
+			'flex-wrap' => $flex_wrap,
+		);
+
 		if ( $has_block_gap_support ) {
-			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
-			$style    .= "gap: $gap_style;";
+			$gap_style             = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
+			$styles[ "$selector" ] = array(
+				'gap' => $gap_style,
+			);
 		} else {
-			$style .= 'gap: 0.5em;';
+			$styles[ "$selector" ] = array(
+				'gap' => '0.5em',
+			);
 		}
-		$style .= "flex-wrap: $flex_wrap;";
+
 		if ( 'horizontal' === $layout_orientation ) {
-			$style .= 'align-items: center;';
+			$styles[ "$selector" ] = array(
+				'align-items' => 'center',
+			);
 			/**
 			 * Add this style only if is not empty for backwards compatibility,
 			 * since we intend to convert blocks that had flex layout implemented
 			 * by custom css.
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
+				$styles[ "$selector" ] = array(
+					'justify-content' => $justify_content_options[ $layout['justifyContent'] ],
+				);
 			}
 		} else {
-			$style .= 'flex-direction: column;';
+			$styles[ "$selector" ] = array(
+				'flex-direction' => 'column',
+			);
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
+				$styles[ "$selector" ] = array(
+					'align-items' => $justify_content_options[ $layout['justifyContent'] ],
+				);
 			} else {
-				$style .= 'align-items: flex-start;';
+				$styles[ "$selector" ] = array(
+					'align-items' => 'flex-start',
+				);
 			}
 		}
-		$style .= '}';
 
-		$style .= "$selector > * { margin: 0; }";
+		$styles[ "$selector > *" ] = array(
+			'margin' => '0',
+		);
 	}
 
-	return $style;
+	return $styles;
 }
 
 /**
@@ -156,7 +194,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
 	$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
-	$style     = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value );
+	$styles    = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value );
+	WP_Style_Engine_Gutenberg::get_instance()->add_styles( $styles );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
@@ -165,8 +204,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$block_content,
 		1
 	);
-
-	WP_Style_Engine_Gutenberg::get_instance()->add_style( $class_name, $style );
 
 	return $content;
 }
