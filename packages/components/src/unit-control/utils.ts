@@ -171,6 +171,9 @@ export function getParsedQuantityAndUnit(
  * @return Whether the list actually contains any units.
  */
 export function hasUnits( units?: WPUnitControlUnit[] ): boolean {
+	// Although the `isArray` check shouldn't be necessary (given the signature of
+	// this typed function), it's better to stay on the side of caution, since
+	// this function may be called from un-typed environments.
 	return Array.isArray( units ) && !! units.length;
 }
 
@@ -281,9 +284,14 @@ export function filterUnitsWithSettings(
 	allowedUnitValues: string[] = [],
 	availableUnits: WPUnitControlUnit[]
 ): WPUnitControlUnit[] {
-	return availableUnits.filter( ( unit ) =>
-		allowedUnitValues.includes( unit.value )
-	);
+	// Although the `isArray` check shouldn't be necessary (given the signature of
+	// this typed function), it's better to stay on the side of caution, since
+	// this function may be called from un-typed environments.
+	return Array.isArray( availableUnits )
+		? availableUnits.filter( ( unit ) =>
+				allowedUnitValues.includes( unit.value )
+		  )
+		: [];
 }
 
 /**
@@ -294,7 +302,7 @@ export function filterUnitsWithSettings(
  * @param  args                An object containing units, settingPath & defaultUnits.
  * @param  args.units          Collection of all potentially available units.
  * @param  args.availableUnits Collection of unit value strings for filtering available units.
- * @param  args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
+ * @param  args.defaultValues  Collection of default values for defined units. Example: `{ px: 350, em: 15 }`.
  *
  * @return Filtered list of units, with their default values updated following the `defaultValues`
  * argument's property.
@@ -316,7 +324,11 @@ export const useCustomUnits = ( {
 	if ( defaultValues ) {
 		customUnitsToReturn.forEach( ( unit, i ) => {
 			if ( defaultValues[ unit.value ] ) {
-				customUnitsToReturn[ i ].default = defaultValues[ unit.value ];
+				const [ parsedDefaultValue ] = parseQuantityAndUnitFromRawValue(
+					defaultValues[ unit.value ]
+				);
+
+				customUnitsToReturn[ i ].default = parsedDefaultValue;
 			}
 		} );
 	}

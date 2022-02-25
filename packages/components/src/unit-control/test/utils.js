@@ -34,6 +34,26 @@ describe( 'UnitControl utils', () => {
 			] );
 		} );
 
+		it( 'should add default values to available units even if the default values are strings', () => {
+			// Although the public APIs of the component expect a `number` as the type of the
+			// default values, it's still good to test for strings (as it can happen in un-typed
+			// environments)
+			const cssUnits = [ { value: 'px' }, { value: '%' } ];
+			const units = useCustomUnits( {
+				availableUnits: [ '%', 'px' ],
+				defaultValues: {
+					'%': '14',
+					px: 'not a valid numeric quantity',
+				},
+				units: cssUnits,
+			} );
+
+			expect( units ).toEqual( [
+				{ value: 'px', default: undefined },
+				{ value: '%', default: 14 },
+			] );
+		} );
+
 		it( 'should return an empty array where availableUnits match no preferred css units', () => {
 			const cssUnits = [ { value: 'em' }, { value: 'vh' } ];
 			const units = useCustomUnits( {

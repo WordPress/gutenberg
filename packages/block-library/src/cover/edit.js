@@ -110,7 +110,7 @@ function CoverHeightInput( {
 			'vw',
 			'vh',
 		],
-		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
+		defaultValues: { px: 430, em: 20, rem: 20, vw: 20, vh: 50 },
 	} );
 
 	const handleOnChange = ( unprocessedValue ) => {
