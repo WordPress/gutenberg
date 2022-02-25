@@ -272,7 +272,9 @@ describe( 'Preview', () => {
 		await publishPost();
 
 		// Close the panel.
-		await page.waitForSelector( '.editor-post-publish-panel' );
+		await page.waitForSelector(
+			'.editor-post-publish-panel__header button'
+		);
 		await page.click( '.editor-post-publish-panel__header button' );
 
 		// Change the title and preview again.
