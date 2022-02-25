@@ -176,7 +176,7 @@ function getTemplatedPageBlocks(
 		const hasChildren = pagesByParentId.has( page.id );
 		// const isNavigationChild = 'showSubmenuIcon' in context;
 		const block = [
-			'core/navigation-link',
+			hasChildren ? 'core/navigation-submenu' : 'core/navigation-link',
 			{
 				id: page.id,
 				kind: 'post-type',
@@ -193,7 +193,7 @@ function getTemplatedPageBlocks(
 				? getTemplatedPageBlocks(
 						context,
 						pagesByParentId,
-						parentId,
+						page.id,
 						depth + 1
 				  )
 				: [],
