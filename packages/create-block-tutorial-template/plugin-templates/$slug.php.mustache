@@ -1,12 +1,15 @@
 <?php
 /**
  * Plugin Name:       {{title}}
+{{#pluginURI}}
+ * Plugin URI:        {{{pluginURI}}}
+{{/pluginURI}}
 {{#description}}
  * Description:       {{description}}
 {{/description}}
+ * Version:           {{version}}
  * Requires at least: 5.8
  * Requires PHP:      7.0
- * Version:           {{version}}
 {{#author}}
  * Author:            {{author}}
 {{/author}}
@@ -17,6 +20,12 @@
  * License URI:       {{{licenseURI}}}
 {{/licenseURI}}
  * Text Domain:       {{textdomain}}
+{{#domainPath}}
+ * Domain Path:       {{{domainPath}}}
+{{/domainPath}}
+{{#updateURI}}
+ * Update URI:        {{{updateURI}}}
+{{/updateURI}}
  *
  * @package           {{namespace}}
  */

@@ -194,30 +194,41 @@ module.exports = {
 };
 ```
 
-The following configurable variables are used with the template files. Template authors can change default values to use when users don't provide their data:
+The following configurable variables are used with the template files. Template authors can change default values to use when users don't provide their data.
 
--   `$schema` (default: `https://schemas.wp.org/trunk/block.json`)
--   `apiVersion` (default: `2`) - see https://make.wordpress.org/core/2020/11/18/block-api-version-2/.
--   `slug` (no default)
--   `namespace` (default: `'create-block'`)
--   `title` (no default) - a display title for your block.
--   `description` (no default) - a short description for your block.
--   `dashicon` (no default) - an icon property thats makes it easier to identify a block, see https://developer.wordpress.org/resource/dashicons/.
--   `category` (default: `'widgets'`) - blocks are grouped into categories to help users browse and discover them. The categories provided by core are `text`, `media`, `design`, `widgets`, `theme`, and `embed`.
--   `attributes` (no default) - see https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/.
--   `supports` (no default) - optional block extended support features, see https://developer.wordpress.org/block-editor/developers/block-api/block-supports/.
--   `author` (default: `'The WordPress Contributors'`)
--   `license` (default: `'GPL-2.0-or-later'`)
--   `licenseURI` (default: `'https://www.gnu.org/licenses/gpl-2.0.html'`)
--   `version` (default: `'0.1.0'`)
--   `wpScripts` (default: `true`)
--   `wpEnv` (default: `false`) - enables integration with the `@wordpress/env` package and adds the `env` command to the package.json.
+**Project**:
+
+-   `wpScripts` (default: `true`) – enables integration with the `@wordpress/scripts` package and adds common scripts to the `package.json`.
+-   `wpEnv` (default: `false`) – enables integration with the `@wordpress/env` package and adds the `env` script to the `package.json`.
+-   `customScripts` (default: {}) – the list of custom scripts to add to `package.json` . It also allows overriding default scripts.
 -   `npmDependencies` (default: `[]`) – the list of remote npm packages to be installed in the project with [`npm install`](https://docs.npmjs.com/cli/v8/commands/npm-install) when `wpScripts` is enabled.
-    `customScripts` (default: {}) - the list of custom scripts to add to `package.json`. It also allows overriding default scripts.
+
+**Plugin header fields** ([learn more](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/)):
+
+-   `pluginURI` (no default) – the home page of the plugin.
+-   `version` (default: `'0.1.0'`) – the current version number of the plugin.
+-   `author` (default: `'The WordPress Contributors'`) – the name of the plugin author(s).
+-   `license` (default: `'GPL-2.0-or-later'`) – the short name of the plugin’s license.
+-   `licenseURI` (default: `'https://www.gnu.org/licenses/gpl-2.0.html'`) – a link to the full text of the license.
+-   `domainPath` (no default) – a custom domain path for the translations ([more info](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#domain-path)).
+-   `updateURI:` (no default) – a custom update URI for the plugin ([related dev note](https://make.wordpress.org/core/2021/06/29/introducing-update-uri-plugin-header-in-wordpress-5-8/)).
+
+**Block metadata** ([learn more](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/)):
+
 -   `folderName` (default: `.`) – the location for the `block.json` file and other optional block files generated from block templates included in the folder set with the `blockTemplatesPath` setting.
--   `editorScript` (default: `'file:./index.js'`)
--   `editorStyle` (default: `'file:./index.css'`)
--   `style` (default: `'file:./style-index.css'`)
+-   `$schema` (default: `https://schemas.wp.org/trunk/block.json`) – the schema URL used for block validation.
+-   `apiVersion` (default: `2`) – the block API version ([related dev note](https://make.wordpress.org/core/2020/11/18/block-api-version-2/)).
+-   `slug` (no default) – the block slug used for identification in the block name.
+-   `namespace` (default: `'create-block'`) – the internal namespace for the block name.
+-   `title` (no default) – a display title for your block.
+-   `description` (no default) – a short description for your block.
+-   `dashicon` (no default) – an icon property thats makes it easier to identify a block ([available values](https://developer.wordpress.org/resource/dashicons/)).
+-   `category` (default: `'widgets'`) – blocks are grouped into categories to help users browse and discover them. The categories provided by core are `text`, `media`, `design`, `widgets`, `theme`, and `embed`.
+-   `attributes` (no default) – block attributes ([more details](https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/)).
+-   `supports` (no default) – optional block extended support features ([more details](https://developer.wordpress.org/block-editor/developers/block-api/block-supports/).
+-   `editorScript` (default: `'file:./index.js'`) – an editor script definition.
+-   `editorStyle` (default: `'file:./index.css'`) – an editor style definition.
+-   `style` (default: `'file:./style-index.css'`) – a frontend and editor style definition.
 
 ## Contributing to this package
 
