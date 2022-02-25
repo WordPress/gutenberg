@@ -79,118 +79,6 @@ const getUrlForSlug = ( image, sizeSlug ) => {
 	return image?.media_details?.sizes?.[ sizeSlug ]?.source_url;
 };
 
-var Base64Binary = {
-	_keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-	
-	/* will return a  Uint8Array type */
-	decodeArrayBuffer: function(input) {
-		var bytes = (input.length/4) * 3;
-		var ab = new ArrayBuffer(bytes);
-		this.decode(input, ab);
-
-		return ab;
-	},
-
-	removePaddingChars: function(input){
-		var lkey = this._keyStr.indexOf(input.charAt(input.length - 1));
-		if(lkey == 64){
-			return input.substring(0,input.length - 1);
-		}
-		return input;
-	},
-
-	decode: function (input, arrayBuffer) {
-		//get last chars to see if are valid
-		input = this.removePaddingChars(input);
-		input = this.removePaddingChars(input);
-
-		var bytes = parseInt((input.length / 4) * 3, 10);
-		
-		var uarray;
-		var chr1, chr2, chr3;
-		var enc1, enc2, enc3, enc4;
-		var i = 0;
-		var j = 0;
-		
-		if (arrayBuffer)
-			uarray = new Uint8Array(arrayBuffer);
-		else
-			uarray = new Uint8Array(bytes);
-		
-		input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-		
-		for (i=0; i<bytes; i+=3) {	
-			//get the 3 octects in 4 ascii chars
-			enc1 = this._keyStr.indexOf(input.charAt(j++));
-			enc2 = this._keyStr.indexOf(input.charAt(j++));
-			enc3 = this._keyStr.indexOf(input.charAt(j++));
-			enc4 = this._keyStr.indexOf(input.charAt(j++));
-	
-			chr1 = (enc1 << 2) | (enc2 >> 4);
-			chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-			chr3 = ((enc3 & 3) << 6) | enc4;
-	
-			uarray[i] = chr1;			
-			if (enc3 != 64) uarray[i+1] = chr2;
-			if (enc4 != 64) uarray[i+2] = chr3;
-		}
-
-		return uarray;	
-	}
-}
-
-const imageUrlToData = ( url, callback ) => {
-	const request = new XMLHttpRequest();
-	request.onload = () => {
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			callback( reader.result );
-		};
-		reader.readAsDataURL( request.response );
-	};
-	request.open( 'GET', url );
-	request.responseType = 'blob';
-	request.send();
-};
-
-const isAnimatedGif = ( imageData ) => {
-	const base64 = imageData.substr(imageData.indexOf(',') + 1);
-	const binaryString = Base64Binary.decodeArrayBuffer(base64);
-
-	const HEADER_LEN = 6;                 // offset bytes for the header section
-	const LOGICAL_SCREEN_DESC_LEN = 7;    // offset bytes for logical screen description section
-
-	console.log(binaryString.buffer)
-	// Start from last 4 bytes of the Logical Screen Descriptor
-	const dv = new DataView(binaryString.buffer, HEADER_LEN + LOGICAL_SCREEN_DESC_LEN - 3);
-	let offset = 0;
-	const globalColorTable = dv.getUint8(0);	// aka packet byte
-	let globalColorTableSize = 0;
-
-	// check first bit, if 0, then we don't have a Global Color Table
-	if (globalColorTable & 0x80) {
-		// grab the last 3 bits, to calculate the global color table size -> RGB * 2^(N+1)
-		// N is the value in the last 3 bits.
-		globalColorTableSize = 3 * (2 ** ((globalColorTable & 0x7) + 1));
-	}
-
-	// move on to the Graphics Control Extension
-	offset = 3 + globalColorTableSize;
-
-	const extensionIntroducer = dv.getUint8(offset);
-	const graphicsConrolLabel = dv.getUint8(offset + 1);
-	let delayTime = 0;
-
-	// Graphics Control Extension section is where GIF animation data is stored
-	// First 2 bytes must be 0x21 and 0xF9
-	if ((extensionIntroducer & 0x21) && (graphicsConrolLabel & 0xF9)) {
-		// skip to the 2 bytes with the delay time
-		delayTime = dv.getUint16(offset + 4);
-	}
-
-	return delayTime > 0;
-};
-
 function LinkSettings( {
 	attributes,
 	image,
@@ -477,10 +365,9 @@ export class ImageEdit extends Component {
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
 		this.setState( { uploadStatus: UPLOAD_STATE_SUCCEEDED } );
 
-		this.setState( { isAnimatedGif: payload.mediaUrl.includes( '.gif' ) } );
-		// imageUrlToData( payload.mediaUrl, ( imageData ) => {
-		// 	this.setState( { isAnimatedGif: isAnimatedGif( imageData ) } );
-		// } );
+		this.setState( {
+			isAnimatedGif: payload.mediaUrl.toLowerCase().includes( '.gif' ),
+		} );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
@@ -858,7 +745,12 @@ export class ImageEdit extends Component {
 		];
 
 		const badgeLabelShown = isFeaturedImage || this.state.isAnimatedGif;
-		const badgeLabelText = isFeaturedImage ? __( 'Featured' ) : ( this.state.isAnimatedGif ? __( 'GIF' ) : '' );
+		let badgeLabelText = '';
+		if ( isFeaturedImage ) {
+			badgeLabelText = __( 'Featured' );
+		} else if ( this.state.isAnimatedGif ) {
+			badgeLabelText = __( 'GIF' );
+		}
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<Badge label={ badgeLabelText } show={ badgeLabelShown }>
