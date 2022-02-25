@@ -58,12 +58,44 @@ class WP_Style_Engine_Gutenberg {
 		return self::$instance;
 	}
 
-	public function add_style( $key, $value ) {
-		$this->registered_styles[ $key ] = $value;
+	/**
+	 * Assemble the style rule from a list of rules, and store based on a key
+	 * generated from the class name, the selector, and any values used as a suffix.
+	 *
+	 * @param string $key     A class name used to construct a key.
+	 * @param array  $options An array of options, rules, and selector for constructing the rules.
+	 *
+	 * @return string The class name for the added style.
+	 */
+	public function add_style( $key, $options ) {
+		$class    = ! empty( $options['suffix'] ) ? $key . '-' . sanitize_title( $options['suffix'] ) : $key;
+		$selector = ! empty( $options['selector'] ) ? ' ' . trim( $options['selector'] ) : '';
+		$rules    = ! empty( $options['rules'] ) ? $options['rules'] : array();
+		$prefix   = ! empty( $options['prefix'] ) ? $options['prefix'] : '.';
+
+		if ( ! $class ) {
+			return;
+		}
+
+		$style = "{$prefix}{$class}{$selector} {\n";
+
+		if ( is_string( $rules ) ) {
+			$style .= '  ';
+			$style .= $rules;
+		} else {
+			foreach( $rules as $rule => $value ) {
+				$style .= "  {$rule}: {$value};\n";
+			}
+		}
+		$style .= "}\n";
+
+		$this->registered_styles[ $class . $selector ] = $style;
+
+		return $class;
 	}
 
 	public function output_styles() {
 		$style = implode( "\n", $this->registered_styles );
-		echo "<style>$style</style>\n";
+		echo "<style>\n$style</style>\n";
 	}
 }
