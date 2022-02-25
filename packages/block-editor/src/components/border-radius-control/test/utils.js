@@ -133,14 +133,14 @@ describe( 'getAllValue', () => {
 	} );
 
 	describe( 'when provided invalid values', () => {
-		it( 'should return px when passed an array', () => {
+		it( 'should return undefined when passed an array', () => {
 			expect( getAllValue( [] ) ).toBe( undefined );
 		} );
-		it( 'should return px when passed a boolean', () => {
+		it( 'should return undefined when passed a boolean', () => {
 			expect( getAllValue( false ) ).toBe( undefined );
 		} );
-		it( 'should return px when passed undefined', () => {
-			expect( getAllValue( false ) ).toBe( undefined );
+		it( 'should return undefined when passed undefined', () => {
+			expect( getAllValue( undefined ) ).toBe( undefined );
 		} );
 	} );
 } );
