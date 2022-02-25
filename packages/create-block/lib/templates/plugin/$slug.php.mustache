@@ -29,6 +29,6 @@
  * @see https://developer.wordpress.org/reference/functions/register_block_type/
  */
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
-	register_block_type( __DIR__ );
+	register_block_type( __DIR__ . '/build' );
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );

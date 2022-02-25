@@ -125,15 +125,16 @@ Update `src/editor.scss` to:
 The edit function can simply be:
 
 ```jsx
-import { useBlockProps } from '@wordpress/block-editor';
 import { TextControl } from '@wordpress/components';
+import { useBlockProps } from '@wordpress/block-editor';
 
 import './editor.scss';
 
 export default function Edit( { attributes, setAttributes } ) {
+	const blockProps = useBlockProps();
 	return (
 		<TextControl
-			{ ...useBlockProps() }
+			{ ...blockProps }
 			value={ attributes.message }
 			onChange={ ( val ) => setAttributes( { message: val } ) }
 		/>
