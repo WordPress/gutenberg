@@ -5,6 +5,7 @@ const { test, expect } = require( '../../config/test' );
 
 /**
  * @typedef {import('@playwright/test').Page} Page
+ * @typedef {import('@playwright/test').FrameLocator} FrameLocator
  * @typedef {import('@wordpress/e2e-test-utils-playwright').PageUtils} PageUtils
  * @typedef {import('@wordpress/e2e-test-utils-playwright').RequestUtils} RequestUtils
  */
@@ -33,13 +34,29 @@ test.describe( 'Widgets Customizer', () => {
 	} );
 
 	test( 'should add blocks', async ( { page, widgetsCustomizerPage } ) => {
+		const previewFrame = widgetsCustomizerPage.previewFrame;
+
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await widgetsCustomizerPage.addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
+		// Expect the paragraph to be found in the preview iframe.
+		await expect(
+			previewFrame.locator(
+				'css=.widget-content p >> text="First Paragraph"'
+			)
+		).toBeVisible();
+
 		await widgetsCustomizerPage.addBlock( 'Heading' );
 		await page.keyboard.type( 'My Heading' );
+
+		// Expect the heading to be found in the preview iframe.
+		await expect(
+			previewFrame.locator(
+				'css=.widget-content >> role=heading[name="My Heading"]'
+			)
+		).toBeVisible();
 
 		// Click on the inline appender.
 		await page.click(
@@ -61,24 +78,6 @@ test.describe( 'Widgets Customizer', () => {
 		);
 
 		await page.keyboard.type( 'My ' );
-
-		const previewFrame = page.frameLocator(
-			'iframe[title="Site Preview"]'
-		);
-
-		// Expect the paragraph to be found in the preview iframe.
-		await expect(
-			previewFrame.locator(
-				'css=.widget-content p >> text="First Paragraph"'
-			)
-		).toBeVisible();
-
-		// Expect the heading to be found in the preview iframe.
-		await expect(
-			previewFrame.locator(
-				'css=.widget-content >> role=heading[name="My Heading"]'
-			)
-		).toBeVisible();
 
 		// Expect the search box to be found in the preview iframe.
 		await expect(
@@ -227,9 +226,7 @@ test.describe( 'Widgets Customizer', () => {
 		// Navigate back to the parent panel.
 		await page.click( 'role=button[name=/Back$/] >> visible=true' );
 
-		const previewFrame = page.frameLocator(
-			'iframe[title="Site Preview"]'
-		);
+		const previewFrame = widgetsCustomizerPage.previewFrame;
 
 		const paragraphWidget = previewFrame.locator(
 			'.widget:has-text("First Paragraph")'
@@ -345,9 +342,7 @@ test.describe( 'Widgets Customizer', () => {
 		// Unfocus the current legacy widget.
 		await page.keyboard.press( 'Tab' );
 
-		const previewFrame = page.frameLocator(
-			'iframe[title="Site Preview"]'
-		);
+		const previewFrame = widgetsCustomizerPage.previewFrame;
 		const legacyWidgetPreviewFrame = page.frameLocator(
 			'iframe[title="Legacy Widget Preview"]'
 		);
@@ -555,6 +550,13 @@ class WidgetsCustomizerPage {
 	constructor( { page, pageUtils } ) {
 		this.page = page;
 		this.pageUtils = pageUtils;
+
+		/** @type {FrameLocator} */
+		this.previewFrame = this.page
+			.frameLocator( 'iframe[title="Site Preview"]' )
+			// There could be two preview frames at the same time while updating.
+			// We only care about the latest (last) one.
+			.last();
 	}
 
 	async visitCustomizerPage() {
