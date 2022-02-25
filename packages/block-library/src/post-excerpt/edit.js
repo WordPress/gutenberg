@@ -86,23 +86,22 @@ export default function PostExcerptEditor( {
 	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {
 		'is-inline': ! showMoreOnNewLine,
 	} );
-	const excerptValue =
-		rawExcerpt ||
-		strippedRenderedExcerpt ||
-		( isSelected ? '' : __( 'No post excerpt found' ) );
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
 			aria-label={ __( 'Post excerpt text' ) }
-			value={ excerptValue }
+			value={
+				rawExcerpt ||
+				strippedRenderedExcerpt ||
+				( isSelected ? '' : __( 'No post excerpt found' ) )
+			}
 			onChange={ setExcerpt }
 			tagName="p"
 		/>
 	) : (
-		<p
-			className={ excerptClassName }
-			dangerouslySetInnerHTML={ { __html: excerptValue } }
-		/>
+		<p className={ excerptClassName }>
+			{ strippedRenderedExcerpt || __( 'No post excerpt found' ) }
+		</p>
 	);
 	return (
 		<>
