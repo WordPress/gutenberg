@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Add GIF badge for animated GIFs uploaded to Image blocks [#38996]
+
 -   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
 
 -   [***] Support for multiple color palettes [#38417]
