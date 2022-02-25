@@ -144,7 +144,6 @@ function FontSizePicker(
 									? __( 'Use size preset' )
 									: __( 'Set custom size' )
 							}
-							showTooltip={ false }
 							icon={ settings }
 							onClick={ () => {
 								setShowCustomValueControl(

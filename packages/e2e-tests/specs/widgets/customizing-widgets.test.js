@@ -880,6 +880,10 @@ async function addBlock( blockName ) {
 		}
 	} );
 
+	// Click something so that the block toolbar, which sometimes obscures
+	// buttons in the inserter, goes away.
+	await searchBox.click();
+
 	await searchBox.type( blockName );
 
 	// TODO - remove this timeout when the test plugin for disabling CSS

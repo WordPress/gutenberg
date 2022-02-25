@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 import { css } from '@emotion/react';
 
 /**
@@ -28,7 +28,7 @@ import type {
 
 function NavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		initialPath,
@@ -100,44 +100,34 @@ function NavigatorProvider(
 }
 
 /**
- * The `NavigatorProvider` component allows rendering nested panels or menus (via the `NavigatorScreen` component) and navigate between these different states (via the `useNavigator` hook).
+ * The `NavigatorProvider` component allows rendering nested views/panels/menus
+ * (via the `NavigatorScreen` component and navigate between these different
+ * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
+ * `useNavigator` hook).
  *
  * @example
  * ```jsx
  * import {
  *   __experimentalNavigatorProvider as NavigatorProvider,
  *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalUseNavigator as useNavigator,
+ *   __experimentalNavigatorButton as NavigatorButton,
+ *   __experimentalNavigatorBackButton as NavigatorBackButton,
  * } from '@wordpress/components';
- *
- * function NavigatorButton( { path, ...props } ) {
- *  const { goTo } = useNavigator();
- *  return (
- *    <Button
- *      variant="primary"
- *      onClick={ () => goTo( path ) }
- *      { ...props }
- *    />
- *  );
- * }
- *
- * function NavigatorBackButton( props ) {
- *   const { goBack } = useNavigator();
- *   return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
- * }
  *
  * const MyNavigation = () => (
  *   <NavigatorProvider initialPath="/">
  *     <NavigatorScreen path="/">
  *       <p>This is the home screen.</p>
- *   	   <NavigatorButton path="/child">
+ *        <NavigatorButton path="/child">
  *          Navigate to child screen.
  *       </NavigatorButton>
  *     </NavigatorScreen>
  *
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorBackButton>Go back</NavigatorBackButton>
+ *       <NavigatorBackButton>
+ *         Go back
+ *       </NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>
  * );

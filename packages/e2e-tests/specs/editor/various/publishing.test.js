@@ -9,9 +9,58 @@ import {
 	disablePrePublishChecks,
 	arePrePublishChecksEnabled,
 	setBrowserViewport,
+	openPublishPanel,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Publishing', () => {
+	describe.each( [ 'post', 'page' ] )(
+		'%s locking prevent saving',
+		( postType ) => {
+			beforeEach( async () => {
+				await createNewPost( postType );
+			} );
+
+			it( `disables the publish button when a ${ postType } is locked`, async () => {
+				await page.type(
+					'.editor-post-title__input',
+					'E2E Test Post lock check publish button'
+				);
+				await page.evaluate( () =>
+					wp.data
+						.dispatch( 'core/editor' )
+						.lockPostSaving( 'futurelock' )
+				);
+
+				await openPublishPanel();
+
+				expect(
+					await page.$(
+						'.editor-post-publish-button[aria-disabled="true"]'
+					)
+				).not.toBeNull();
+			} );
+
+			it( `disables the save shortcut when a ${ postType } is locked`, async () => {
+				await page.type(
+					'.editor-post-title__input',
+					'E2E Test Post check save shortcut'
+				);
+				await page.evaluate( () =>
+					wp.data
+						.dispatch( 'core/editor' )
+						.lockPostSaving( 'futurelock' )
+				);
+				await pressKeyWithModifier( 'primary', 'S' );
+
+				expect( await page.$( '.editor-post-saved-state' ) ).toBeNull();
+				expect(
+					await page.$( '.editor-post-save-draft' )
+				).not.toBeNull();
+			} );
+		}
+	);
+
 	describe.each( [ 'post', 'page' ] )( 'a %s', ( postType ) => {
 		let werePrePublishChecksEnabled;
 

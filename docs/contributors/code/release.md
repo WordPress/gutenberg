@@ -212,7 +212,7 @@ A different person usually synchronizes the WordPress `trunk` branch and publish
 
 The process has three steps: 1) update the `wp/trunk` branch within the Gutenberg repo 2) publish the new package versions to npm 3) update the WordPress `trunk` branch.
 
-The first step is automated via `./bin/plugin/cli.js npm-latest` command. You only have to run the command, but, for the record, the manual process would look very close to the following steps:
+All steps are automated via `./bin/plugin/cli.js npm-latest` command. You only have to run the command, but, for the record, the manual process would look very close to the following steps:
 
 1. Ensure the WordPress `trunk` branch is open for enhancements.
 2. Get the last published Gutenberg release branch with `git fetch`.
@@ -227,8 +227,7 @@ The first step is automated via `./bin/plugin/cli.js npm-latest` command. You on
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
     - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
-
-Finally, now that the npm packages are ready, a patch can be created and committed into WordPress `trunk`. You should also cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
+11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### Minor WordPress Releases
 
@@ -300,97 +299,17 @@ Check the versions listed in the current `CHANGELOG.md` file, looking through th
 
 Note: You may discover the current version of each package is not up to date, if so updating the previously released versions would be appreciated.
 
-The good news is that the rest of the process is automated with `./bin/plugin/cli.js npm-bugfix` command. The rest of the section covers all the necessary steps for publishing the packages if you prefer to do it manually.
+The good news is that the rest of the process is automated with `./bin/plugin/cli.js npm-bugfix` command. For the record, the manual process would look very close to the following steps:
 
-Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#maintaining-changelogs) documentation and commit the changes:
-
-1. `git checkout wp/trunk`
-2. Update each of the `CHANGELOG.md` files
-3. Stage the _changelog_ changes `git add packages/`
-4. `git commit -m "Update changelogs"`
-5. Make a note of the commit hash of this commit
-    > Example
-    >
-    > ```
-    > [trunk 278f524f16] Update changelogs` 278f524
-    > ```
-6. `git push`
-
-Now that the changes have been committed to the `wp/trunk` branch and the Travis CI builds for the `wp/trunk` [branch are passing](https://travis-ci.com/WordPress/gutenberg/branches) it's time to publish the packages to npm:
-
-1. Once again run `npm run publish:check` to confirm there are no unexpected packages ready to be published:
-    > Example
-    >
-    > ```shell
-    > npm run publish:check
-    > @wordpress/e2e-tests
-    > @wordpress/jest-preset-default
-    > @wordpress/scripts
-    > lerna success found 3 packages ready to publish
-    > ```
-2. Run the `npm run publish:latest` command (see more in [package release process]) but when asked for the version numbers to choose for each package use the versions you made note of above when updating each packages `CHANGELOG.md` file.
-    > Truncated example of publishing process output
-    >
-    > ```
-    > npm run publish:latest
-    >
-    > Build Progress: [==============================] 100%
-    > lerna notice cli v3.18.2
-    > lerna info versioning independent
-    > ? Select a new version for @wordpress/e2e-tests (currently 1.9.0) Patch (1.9.1)
-    > ? Select a new version for @wordpress/jest-preset-default (currently 5.3.0) Patch (5.3.1)
-    > ? Select a new version for @wordpress/scripts (currently 6.1.0) Patch (6.1.1)
-    >
-    > Changes:
-    >  - @wordpress/e2e-tests: 1.9.0 => 1.9.1
-    >  - @wordpress/jest-preset-default: 5.3.0 => 5.3.1
-    >  - @wordpress/scripts: 6.1.0 => 6.1.1
-    >
-    > ? Are you sure you want to publish these packages? Yes
-    > lerna info execute Skipping releases
-    > lerna info git Pushing tags...
-    > lerna info publish Publishing packages to npm...
-    > lerna info Verifying npm credentials
-    > lerna info Checking two-factor auth mode
-    > ? Enter OTP: 753566
-    > lerna success published @wordpress/jest-preset-default 5.3.1
-    > lerna success published @wordpress/scripts 6.1.1
-    > lerna success published @wordpress/e2e-tests 1.9.1
-    > Successfully published:
-    >  - @wordpress/e2e-tests@1.9.1
-    >  - @wordpress/jest-preset-default@5.3.1
-    >  - @wordpress/scripts@6.1.1
-    > lerna success published 3 packages
-    > ```
-
-Now that the packages have been published the _"chore(release): publish"_ and _"Update changelogs"_ commits to `wp/trunk` need to be ported to the `trunk` branch:
-
-1. `git checkout trunk`
-2. `git pull`
-3. Cherry-pick the `278f524`hash you noted above from the _"Update changelogs"_ commit made to `wp/trunk`
-4. `git cherry-pick 278f524`
-5. Get the commit hash from the lerna publish commit either from the terminal or [wp/trunk commits](https://github.com/WordPress/gutenberg/commits/wp/trunk)
-6. Cherry-pick the `fe6ae0d` "chore(release): publish"\_ commit made to `wp/trunk`
-7. `git cherry-pick fe6ae0d`
-8. `git push`
-
-Confirm the packages dependencies do not contain `file://` links in the `dependencies` or `devdependencies` section of the packages released, e.g:
-
-> https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json > https://unpkg.com/browse/@wordpress/scripts@6.1.1/package.json > https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json
-
-Time to announce the published changes in the #core-js and #core-editor Slack channels
-
-> ```
-> 📣 Successfully published:
-> • @wordpress/e2e-tests@1.9.1
-> • @wordpress/jest-preset-default@5.3.1
-> • @wordpress/scripts@6.1.1
-> Lerna success published 3 packages
-> ```
-
----
-
-Ta-da! 🎉
+1. Check out the `wp/trunk` branch.
+2. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch.
+3. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
+4. From the `wp/trunk` branch, install npm dependencies with `npm ci`.
+5. Run the script `npm run publish:latest`.
+    - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
+    - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
+    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
+6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### Development Releases
 

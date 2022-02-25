@@ -38,6 +38,17 @@ describe( 'getIsResolving', () => {
 
 		expect( result ).toBe( true );
 	} );
+
+	it( 'should normalize args ard return the right value', () => {
+		const state = {
+			getFoo: new EquivalentKeyMap( [ [ [], true ] ] ),
+		};
+		expect( getIsResolving( state, 'getFoo' ) ).toBe( true );
+		expect( getIsResolving( state, 'getFoo', [ undefined ] ) ).toBe( true );
+		expect(
+			getIsResolving( state, 'getFoo', [ undefined, undefined ] )
+		).toBe( true );
+	} );
 } );
 
 describe( 'hasStartedResolution', () => {

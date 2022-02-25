@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls, useSetting } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useMultipleOriginColorsAndGradients,
+} from '@wordpress/block-editor';
 import {
 	BottomSheet,
 	ColorSettings,
@@ -28,13 +31,9 @@ export const blockSettingsScreens = {
 function BottomSheetSettings( {
 	editorSidebarOpened,
 	closeGeneralSidebar,
-	settings,
 	...props
 } ) {
-	const colorSettings = {
-		colors: useSetting( 'color.palette' ) || settings.colors,
-		gradients: useSetting( 'color.gradients' ) || settings.gradients,
-	};
+	const colorSettings = useMultipleOriginColorsAndGradients();
 
 	return (
 		<BottomSheet
