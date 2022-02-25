@@ -273,9 +273,11 @@ describe( 'Preview', () => {
 
 		// Close the panel.
 		await page.waitForSelector(
-			'.editor-post-publish-panel__header button'
+			'.editor-post-publish-panel button[aria-label="Close panel"]'
 		);
-		await page.click( '.editor-post-publish-panel__header button' );
+		await page.click(
+			'.editor-post-publish-panel button[aria-label="Close panel"]'
+		);
 
 		// Change the title and preview again.
 		await editorPage.type( '[aria-label="Add title"]', ' Ipsum' );
