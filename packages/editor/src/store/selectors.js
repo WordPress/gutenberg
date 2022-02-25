@@ -597,7 +597,7 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		// Disable reason - this line causes the side-effect of fetching the autosave
 		// via a resolver, moving below the return would result in the autosave never
 		// being fetched.
-		// eslint-disable-next-line @wordpress/no-unused-vars-before-return.
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 		const autosave = select( coreStore ).getAutosave(
 			postType,
 			postId,
@@ -1642,7 +1642,7 @@ export const getPostTypeLabel = createRegistrySelector(
 		const currentPostType = getCurrentPostType( state );
 		const postType = select( coreStore ).getPostType( currentPostType );
 		// Disable reason: Post type labels object is shaped like this.
-		// eslint-disable-next-line camelcase.
+		// eslint-disable-next-line camelcase
 		return postType?.labels?.singular_name;
 	}
 );
