@@ -11,10 +11,11 @@ import {
 	BlockControls,
 	useBlockProps,
 	getColorClassName,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { ToolbarButton, Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState, memo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -22,7 +23,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import ConvertToLinksModal from './convert-to-links-modal';
-import { ItemSubmenuIcon } from '../navigation-link/icons';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -53,6 +53,13 @@ export default function PageListEdit( { context, clientId } ) {
 			) ]: !! context.backgroundColor,
 		} ),
 		style: { ...context.style?.color },
+	} );
+
+	const template = getTemplatedPageBlocks( context, pagesByParentId );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template,
+		templateLock: 'all',
+		renderAppender: false,
 	} );
 
 	return (
@@ -93,24 +100,17 @@ export default function PageListEdit( { context, clientId } ) {
 					</Notice>
 				</div>
 			) }
-			{ totalPages > 0 && (
-				<ul { ...blockProps }>
-					<PageItems
-						context={ context }
-						pagesByParentId={ pagesByParentId }
-					/>
-				</ul>
-			) }
+			{ totalPages > 0 && <ul { ...innerBlocksProps } /> }
 		</>
 	);
 }
 
-function useFrontPageId() {
-	return useSelect( ( select ) => {
-		const site = select( coreStore ).getEntityRecord( 'root', 'site' );
-		return site?.show_on_front === 'page' && site?.page_on_front;
-	}, [] );
-}
+// function useFrontPageId() {
+// 	return useSelect( ( select ) => {
+// 		const site = select( coreStore ).getEntityRecord( 'root', 'site' );
+// 		return site?.show_on_front === 'page' && site?.page_on_front;
+// 	}, [] );
+// }
 
 function usePageData() {
 	const { pages, hasResolvedPages } = useSelect( ( select ) => {
@@ -159,14 +159,14 @@ function usePageData() {
 	}, [ pages, hasResolvedPages ] );
 }
 
-const PageItems = memo( function PageItems( {
+function getTemplatedPageBlocks(
 	context,
 	pagesByParentId,
 	parentId = 0,
-	depth = 0,
-} ) {
+	depth = 0
+) {
 	const pages = pagesByParentId.get( parentId );
-	const frontPageId = useFrontPageId();
+	// const frontPageId = useFrontPageId();
 
 	if ( ! pages?.length ) {
 		return [];
@@ -174,71 +174,31 @@ const PageItems = memo( function PageItems( {
 
 	return pages.map( ( page ) => {
 		const hasChildren = pagesByParentId.has( page.id );
-		const isNavigationChild = 'showSubmenuIcon' in context;
-		return (
-			<li
-				key={ page.id }
-				className={ classnames( 'wp-block-pages-list__item', {
-					'has-child': hasChildren,
-					'wp-block-navigation-item': isNavigationChild,
-					'open-on-click': context.openSubmenusOnClick,
-					'open-on-hover-click':
-						! context.openSubmenusOnClick &&
-						context.showSubmenuIcon,
-					'menu-item-home': page.id === frontPageId,
-				} ) }
-			>
-				{ hasChildren && context.openSubmenusOnClick ? (
-					<>
-						<button
-							className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
-							aria-expanded="false"
-						>
-							{ page.title?.rendered }
-						</button>
-						<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-					</>
-				) : (
-					<a
-						className={ classnames(
-							'wp-block-pages-list__item__link',
-							{
-								'wp-block-navigation-item__content': isNavigationChild,
-							}
-						) }
-						href={ page.link }
-					>
-						{ page.title?.rendered }
-					</a>
-				) }
-				{ hasChildren && (
-					<>
-						{ ! context.openSubmenusOnClick &&
-							context.showSubmenuIcon && (
-								<button
-									className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
-									aria-expanded="false"
-								>
-									<ItemSubmenuIcon />
-								</button>
-							) }
-						<ul
-							className={ classnames( 'submenu-container', {
-								'wp-block-navigation__submenu-container': isNavigationChild,
-							} ) }
-						>
-							<PageItems
-								context={ context }
-								pagesByParentId={ pagesByParentId }
-								parentId={ page.id }
-								depth={ depth + 1 }
-							/>
-						</ul>
-					</>
-				) }
-			</li>
-		);
+		// const isNavigationChild = 'showSubmenuIcon' in context;
+		const block = [
+			'core/navigation-link',
+			{
+				id: page.id,
+				kind: 'post-type',
+				type: 'page',
+				url: page.link,
+				label: page.title?.rendered,
+				isTopLevelLink: depth === 0,
+				lock: {
+					remove: true,
+					move: true,
+				},
+			},
+			hasChildren
+				? getTemplatedPageBlocks(
+						context,
+						pagesByParentId,
+						parentId,
+						depth + 1
+				  )
+				: [],
+		];
+
+		return block;
 	} );
-} );
+}
