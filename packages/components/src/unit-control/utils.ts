@@ -148,7 +148,9 @@ export const DEFAULT_UNIT = allUnits.px;
  * @param  rawValue     The raw value as a string (may or may not contain the unit)
  * @param  fallbackUnit The unit used as a fallback, if not unit is detected in the `value`
  * @param  allowedUnits Units to derive from.
- * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value could not be parsed to a number correctly. The unit can be `undefined` in case the unit parsed from the raw value could not be matched against the list of allowed units.
+ * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
+ * could not be parsed to a number correctly. The unit can be `undefined` in case the unit parse
+ * from the raw value could not be matched against the list of allowed units.
  */
 export function getParsedQuantityAndUnit(
 	rawValue?: string | number,
@@ -169,7 +171,7 @@ export function getParsedQuantityAndUnit(
  * @return Whether the list actually contains any units.
  */
 export function hasUnits( units?: WPUnitControlUnit[] ): boolean {
-	return !! units?.length;
+	return Array.isArray( units ) && !! units.length;
 }
 
 /**
@@ -178,7 +180,9 @@ export function hasUnits( units?: WPUnitControlUnit[] ): boolean {
  *
  * @param  rawValue     The raw value as a string (may or may not contain the unit)
  * @param  allowedUnits Units to derive from.
- * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value could not be parsed to a number correctly. The unit can be `undefined` in case the unit parsed from the raw value could not be matched against the list of allowed units.
+ * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
+ * could not be parsed to a number correctly. The unit can be `undefined` in case the unit parsed
+ * from the raw value could not be matched against the list of allowed units.
  */
 export function parseQuantityAndUnitFromRawValue(
 	rawValue?: string | number,
@@ -222,7 +226,11 @@ export function parseQuantityAndUnitFromRawValue(
  * @param  allowedUnits     Units to derive from.
  * @param  fallbackQuantity The fallback quantity, used in case it's not possible to parse a valid quantity from the raw value.
  * @param  fallbackUnit     The fallback unit, used in case it's not possible to parse a valid unit from the raw value.
- * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value could not be parsed to a number correctly, and the `fallbackQuantity` was also `undefined`. The unit can be `undefined` only if the unit parsed from the raw value could not be matched against the list of allowed units, the `fallbackQuantity` is also `undefined` and the list of `allowedUnits` is passed empty.
+ * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
+ * could not be parsed to a number correctly, and the `fallbackQuantity` was also `undefined`. The
+ * unit can be `undefined` only if the unit parsed from the raw value could not be matched against
+ * the list of allowed units, the `fallbackQuantity` is also `undefined` and the list of
+ * `allowedUnits` is passed empty.
  */
 export function getValidParsedQuantityAndUnit(
 	rawValue: string | number,
@@ -288,7 +296,8 @@ export function filterUnitsWithSettings(
  * @param  args.availableUnits Collection of unit value strings for filtering available units.
  * @param  args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
  *
- * @return Filtered list of units, with their default values updated following the `defaultValues` argument's property.
+ * @return Filtered list of units, with their default values updated following the `defaultValues`
+ * argument's property.
  */
 export const useCustomUnits = ( {
 	units = ALL_CSS_UNITS,
