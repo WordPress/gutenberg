@@ -288,7 +288,7 @@ export function filterUnitsWithSettings(
  * @param  args.availableUnits Collection of unit value strings for filtering available units.
  * @param  args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
  *
- * @return Filtered units of units, with their default values updated following the `defaultValues` argument's property.
+ * @return Filtered list of units, with their default values updated following the `defaultValues` argument's property.
  */
 export const useCustomUnits = ( {
 	units = ALL_CSS_UNITS,
