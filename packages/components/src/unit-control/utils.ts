@@ -236,7 +236,7 @@ export function getValidParsedQuantityAndUnit(
 	);
 
 	// The parsed value from `parseQuantityAndUnitFromRawValue` should now be
-	// either a real number or undefined. If not, use the fallback value.
+	// either a real number or undefined. If undefined, use the fallback value.
 	const quantityToReturn = parsedQuantity ?? fallbackQuantity;
 
 	// If no unit is parsed from the raw value, or if the fallback unit is not
