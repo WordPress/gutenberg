@@ -355,7 +355,7 @@ export function getUnitsWithCurrentUnit(
 	legacyUnit?: string,
 	units: WPUnitControlUnit[] = ALL_CSS_UNITS
 ): WPUnitControlUnit[] {
-	const unitsToReturn = [ ...units ];
+	const unitsToReturn = Array.isArray( units ) ? [ ...units ] : [];
 	const [ , currentUnit ] = getParsedQuantityAndUnit(
 		rawValue,
 		legacyUnit,
