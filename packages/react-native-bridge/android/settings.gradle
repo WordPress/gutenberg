@@ -2,7 +2,7 @@ pluginManagement {
     gradle.ext.kotlinVersion = '1.5.32'
 
     plugins {
-        id "com.android.library" version "7.0.4"
+        id "com.android.library" version "7.1.1"
         id "org.jetbrains.kotlin.android" version gradle.ext.kotlinVersion
         id "com.automattic.android.publish-to-s3" version "0.7.0"
     }
