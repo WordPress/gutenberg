@@ -60,10 +60,7 @@ type Store<
 	? Stores[ StoreRef ]
 	: never;
 
-type CurriedState< F extends ( ...args: any[] ) => any > = F extends (
-	state: any,
-	...args: infer P
-) => infer R
+type CurriedState< F > = F extends ( state: any, ...args: infer P ) => infer R
 	? ( ...args: P ) => R
 	: F;
 
@@ -72,6 +69,13 @@ type Resolvable<
 > = ReturnType< F > extends Promise< any >
 	? F
 	: ( ...args: Parameters< F > ) => Promise< ReturnType< F > >;
+
+type NonResolveSelectFields =
+	| 'getIsResolving'
+	| 'hasStartedResolution'
+	| 'hasFinishedResolution'
+	| 'isResolving'
+	| 'getCachedResolvers';
 
 export interface DataRegistry {
 	/** Apply multiple store updates without calling store listeners until all have finished */
@@ -86,10 +90,7 @@ export interface DataRegistry {
 	register( store: StoreDescriptor< any > ): void;
 
 	/** Given a namespace key and store description, registers a new Redux store into the registry. */
-	registerStore(
-		name: string,
-		store: StoreDescriptor<any>
-	): ReduxStore;
+	registerStore( name: string, store: StoreDescriptor< any > ): ReduxStore;
 
 	/**
 	 * Returns a version of the available selectors for a given store that returns
@@ -102,9 +103,10 @@ export interface DataRegistry {
 		store: StoreRef
 	): NonNullable<
 		{
-			[ Name in keyof Selectors ]: Resolvable<
-				CurriedState< Selectors[ Name ] >
-			>;
+			[ Name in keyof Selectors as Exclude<
+				Name,
+				NonResolveSelectFields
+			> ]: Resolvable< CurriedState< Selectors[ Name ] > >;
 		}
 	>;
 
