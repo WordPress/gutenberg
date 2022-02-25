@@ -69,6 +69,7 @@ function FileEdit( {
 } ) {
 	const {
 		id,
+		fileId,
 		fileName,
 		href,
 		textLinkHref,
@@ -115,9 +116,11 @@ function FileEdit( {
 	}, [] );
 
 	useEffect( () => {
-		// Add a unique fileId to each file block
-		setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
-	}, [ clientId ] );
+		if ( ! fileId ) {
+			// Add a unique fileId to each file block
+			setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
+		}
+	}, [ fileId, clientId ] );
 
 	function onSelectFile( newMedia ) {
 		if ( newMedia && newMedia.url ) {
