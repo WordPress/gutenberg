@@ -254,8 +254,6 @@ console.log( result ); // Will log 3
 `number` The result of subtracting the two numbers.
 ````
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
-
 ### TypeScript support
 
 Entry point `index.ts`:

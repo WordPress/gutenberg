@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
 
@@ -31,7 +31,7 @@ const noop = () => {};
 
 function ToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		className,
@@ -81,7 +81,7 @@ function ToggleGroupControl(
 				'medium',
 				className
 			),
-		[ className, isBlock ]
+		[ className, cx, isBlock ]
 	);
 	return (
 		<BaseControl help={ help }>

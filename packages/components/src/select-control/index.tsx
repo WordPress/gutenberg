@@ -3,8 +3,7 @@
  */
 import { isEmpty, noop } from 'lodash';
 import classNames from 'classnames';
-// eslint-disable-next-line no-restricted-imports
-import type { ChangeEvent, FocusEvent, ReactNode, Ref } from 'react';
+import type { ChangeEvent, FocusEvent, ReactNode, ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -74,7 +73,7 @@ function SelectControl(
 		suffix,
 		...props
 	}: WordPressComponentProps< SelectControlProps, 'select', false >,
-	ref: Ref< HTMLSelectElement >
+	ref: ForwardedRef< HTMLSelectElement >
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const id = useUniqueId( idProp );

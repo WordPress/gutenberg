@@ -127,6 +127,22 @@ describe( 'reducer', () => {
 				expect( state.getFoo.get( [ 'post' ] ) ).toBe( false );
 			}
 		);
+
+		it( 'should normalize args array when dispatching actions', () => {
+			const started = reducer( undefined, {
+				type: 'START_RESOLUTION',
+				selectorName: 'getFoo',
+				args: [ 1, undefined ],
+			} );
+			expect( started.getFoo.get( [ 1 ] ) ).toBe( true );
+
+			const finished = reducer( started, {
+				type: 'FINISH_RESOLUTION',
+				selectorName: 'getFoo',
+				args: [ 1, undefined, undefined ],
+			} );
+			expect( finished.getFoo.get( [ 1 ] ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'resolution batch', () => {
@@ -240,5 +256,29 @@ describe( 'reducer', () => {
 				expect( state.getFoo.get( [ 'block' ] ) ).toBe( false );
 			}
 		);
+
+		it( 'should normalize args array when dispatching actions', () => {
+			const started = reducer( undefined, {
+				type: 'START_RESOLUTIONS',
+				selectorName: 'getFoo',
+				args: [
+					[ 1, undefined ],
+					[ 2, undefined, undefined ],
+				],
+			} );
+			expect( started.getFoo.get( [ 1 ] ) ).toBe( true );
+			expect( started.getFoo.get( [ 2 ] ) ).toBe( true );
+
+			const finished = reducer( started, {
+				type: 'FINISH_RESOLUTIONS',
+				selectorName: 'getFoo',
+				args: [
+					[ 1, undefined, undefined ],
+					[ 2, undefined ],
+				],
+			} );
+			expect( finished.getFoo.get( [ 1 ] ) ).toBe( false );
+			expect( finished.getFoo.get( [ 2 ] ) ).toBe( false );
+		} );
 	} );
 } );

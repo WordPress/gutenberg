@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/button",
 		"isValid": true,
 		"attributes": {
@@ -8,7 +7,6 @@
 			"text": "Help build Gutenberg",
 			"align": "center"
 		},
-		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-button aligncenter\"><a class=\"wp-block-button__link\" href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>"
+		"innerBlocks": []
 	}
 ]

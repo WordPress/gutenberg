@@ -13,7 +13,7 @@ import {
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
-import { addQueryArgs } from '@wordpress/url';
+import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
@@ -32,7 +32,6 @@ import {
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import { cleanForSlug } from '../utils/url';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 
 /**
@@ -276,41 +275,6 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
 		) || EMPTY_OBJECT
 	);
 } );
-
-/**
- * Returns a new reference when edited values have changed. This is useful in
- * inferring where an edit has been made between states by comparison of the
- * return values using strict equality.
- *
- * @deprecated since Gutenberg 6.5.0.
- *
- * @example
- *
- * ```
- * const hasEditOccurred = (
- *    getReferenceByDistinctEdits( beforeState ) !==
- *    getReferenceByDistinctEdits( afterState )
- * );
- * ```
- *
- * @param {Object} state Editor state.
- *
- * @return {*} A value whose reference will change only when an edit occurs.
- */
-export const getReferenceByDistinctEdits = createRegistrySelector(
-	( select ) => (/* state */) => {
-		deprecated(
-			"`wp.data.select( 'core/editor' ).getReferenceByDistinctEdits`",
-			{
-				since: '5.4',
-				alternative:
-					"`wp.data.select( 'core' ).getReferenceByDistinctEdits`",
-			}
-		);
-
-		return select( coreStore ).getReferenceByDistinctEdits();
-	}
-);
 
 /**
  * Returns an attribute value of the saved post.

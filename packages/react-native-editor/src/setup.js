@@ -6,10 +6,6 @@ import { I18nManager, LogBox } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	validateThemeColors,
-	validateThemeGradients,
-} from '@wordpress/block-editor';
 import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
 import { addAction, addFilter } from '@wordpress/hooks';
 import * as wpData from '@wordpress/data';
@@ -80,8 +76,6 @@ const setupInitHooks = () => {
 				initialTitle,
 				postType,
 				featuredImageId,
-				colors,
-				gradients,
 				rawStyles,
 				rawFeatures,
 				galleryWithImageBlocks,
@@ -98,10 +92,6 @@ const setupInitHooks = () => {
 				postType = 'post';
 			}
 
-			colors = validateThemeColors( colors );
-
-			gradients = validateThemeGradients( gradients );
-
 			return {
 				initialHtml: initialData,
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
@@ -109,8 +99,6 @@ const setupInitHooks = () => {
 				postType,
 				featuredImageId,
 				capabilities,
-				colors,
-				gradients,
 				rawStyles,
 				rawFeatures,
 				galleryWithImageBlocks,

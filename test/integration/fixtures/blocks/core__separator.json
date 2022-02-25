@@ -1,10 +1,8 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/separator",
 		"isValid": true,
 		"attributes": {},
-		"innerBlocks": [],
-		"originalContent": "<hr class=\"wp-block-separator\" />"
+		"innerBlocks": []
 	}
 ]

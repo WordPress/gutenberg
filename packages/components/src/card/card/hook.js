@@ -61,7 +61,7 @@ export function useCard( props ) {
 			isRounded && styles.rounded,
 			className
 		);
-	}, [ className, isBorderless, isRounded ] );
+	}, [ className, cx, isBorderless, isRounded ] );
 
 	const surfaceProps = useSurface( { ...otherProps, className: classes } );
 

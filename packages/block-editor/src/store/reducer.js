@@ -1380,7 +1380,7 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
- * Reducer returning the intial block selection.
+ * Reducer returning the initial block selection.
  *
  * Currently this in only used to restore the selection after block deletion and
  * pasting new content.This reducer should eventually be removed in favour of setting
@@ -1399,6 +1399,7 @@ export function initialPosition( state = null, action ) {
 		return action.initialPosition;
 	} else if (
 		[
+			'MULTI_SELECT',
 			'SELECT_BLOCK',
 			'RESET_SELECTION',
 			'INSERT_BLOCKS',

@@ -3,6 +3,11 @@
  */
 import { get } from 'lodash';
 
+/**
+ * Internal dependencies
+ */
+import { selectorArgsToStateKey } from './utils';
+
 /** @typedef {Record<string, import('./reducer').State>} State */
 
 /**
@@ -11,9 +16,9 @@ import { get } from 'lodash';
  * or not resolved for the given set of arguments, otherwise true or false for
  * resolution started and completed respectively.
  *
- * @param {State}     state        Data state.
- * @param {string}    selectorName Selector name.
- * @param {unknown[]} args         Arguments passed to selector.
+ * @param {State}      state        Data state.
+ * @param {string}     selectorName Selector name.
+ * @param {unknown[]?} args         Arguments passed to selector.
  *
  * @return {boolean | undefined} isResolving value.
  */
@@ -23,20 +28,20 @@ export function getIsResolving( state, selectorName, args ) {
 		return undefined;
 	}
 
-	return map.get( args );
+	return map.get( selectorArgsToStateKey( args ) );
 }
 
 /**
  * Returns true if resolution has already been triggered for a given
  * selector name, and arguments set.
  *
- * @param {State}     state        Data state.
- * @param {string}    selectorName Selector name.
- * @param {unknown[]} [args]       Arguments passed to selector (default `[]`).
+ * @param {State}      state        Data state.
+ * @param {string}     selectorName Selector name.
+ * @param {unknown[]?} args         Arguments passed to selector.
  *
  * @return {boolean} Whether resolution has been triggered.
  */
-export function hasStartedResolution( state, selectorName, args = [] ) {
+export function hasStartedResolution( state, selectorName, args ) {
 	return getIsResolving( state, selectorName, args ) !== undefined;
 }
 
@@ -44,13 +49,13 @@ export function hasStartedResolution( state, selectorName, args = [] ) {
  * Returns true if resolution has completed for a given selector
  * name, and arguments set.
  *
- * @param {State}     state        Data state.
- * @param {string}    selectorName Selector name.
- * @param {unknown[]} [args]       Arguments passed to selector.
+ * @param {State}      state        Data state.
+ * @param {string}     selectorName Selector name.
+ * @param {unknown[]?} args         Arguments passed to selector.
  *
  * @return {boolean} Whether resolution has completed.
  */
-export function hasFinishedResolution( state, selectorName, args = [] ) {
+export function hasFinishedResolution( state, selectorName, args ) {
 	return getIsResolving( state, selectorName, args ) === false;
 }
 
@@ -58,13 +63,13 @@ export function hasFinishedResolution( state, selectorName, args = [] ) {
  * Returns true if resolution has been triggered but has not yet completed for
  * a given selector name, and arguments set.
  *
- * @param {State}     state        Data state.
- * @param {string}    selectorName Selector name.
- * @param {unknown[]} [args]       Arguments passed to selector.
+ * @param {State}      state        Data state.
+ * @param {string}     selectorName Selector name.
+ * @param {unknown[]?} args         Arguments passed to selector.
  *
  * @return {boolean} Whether resolution is in progress.
  */
-export function isResolving( state, selectorName, args = [] ) {
+export function isResolving( state, selectorName, args ) {
 	return getIsResolving( state, selectorName, args ) === true;
 }
 

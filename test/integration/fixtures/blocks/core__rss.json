@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/rss",
 		"isValid": true,
 		"attributes": {
@@ -13,7 +12,6 @@
 			"displayDate": true,
 			"excerptLength": 20
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

@@ -426,7 +426,7 @@ _Returns_
 
 ### requestMetaBoxUpdates
 
-Returns an action object used to request meta box update.
+Update a metabox.
 
 ### setAvailableMetaBoxesPerLocation
 

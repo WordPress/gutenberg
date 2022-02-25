@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 import { colord, extend, Colord } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
@@ -54,7 +54,7 @@ const options = [
 
 const ColorPicker = (
 	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
 		enableAlpha = false,
@@ -73,7 +73,7 @@ const ColorPicker = (
 	} );
 
 	const safeColordColor = useMemo( () => {
-		return colord( color );
+		return colord( color || '' );
 	}, [ color ] );
 
 	const debouncedSetColor = useDebounce( setColor );

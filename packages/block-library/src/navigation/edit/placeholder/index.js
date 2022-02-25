@@ -1,16 +1,9 @@
 /**
  * WordPress dependencies
  */
-import {
-	Placeholder,
-	Button,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-} from '@wordpress/components';
+import { Placeholder, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { navigation, Icon } from '@wordpress/icons';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -18,87 +11,15 @@ import { decodeEntities } from '@wordpress/html-entities';
 
 import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
-import useNavigationMenu from '../../use-navigation-menu';
 import useCreateNavigationMenu from '../use-create-navigation-menu';
-import useConvertClassicMenu from '../../use-convert-classic-menu';
-
-const ExistingMenusDropdown = ( {
-	showNavigationMenus,
-	navigationMenus,
-	onFinish,
-	menus,
-	onCreateFromMenu,
-	showClassicMenus = false,
-} ) => {
-	const toggleProps = {
-		variant: 'tertiary',
-		iconPosition: 'right',
-		className: 'wp-block-navigation-placeholder__actions__dropdown',
-	};
-
-	const hasNavigationMenus = !! navigationMenus?.length;
-	const hasClassicMenus = !! menus?.length;
-
-	return (
-		<DropdownMenu
-			text={ __( 'Select menu' ) }
-			icon={ null }
-			toggleProps={ toggleProps }
-			popoverProps={ { isAlternate: true } }
-		>
-			{ ( { onClose } ) => (
-				<>
-					{ showNavigationMenus && hasNavigationMenus && (
-						<MenuGroup label={ __( 'Menus' ) }>
-							{ navigationMenus.map( ( menu ) => {
-								return (
-									<MenuItem
-										onClick={ () => {
-											onFinish( menu );
-										} }
-										onClose={ onClose }
-										key={ menu.id }
-									>
-										{ decodeEntities(
-											menu.title.rendered
-										) }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-					{ showClassicMenus && hasClassicMenus && (
-						<MenuGroup label={ __( 'Classic Menus' ) }>
-							{ menus.map( ( menu ) => {
-								return (
-									<MenuItem
-										onClick={ () => {
-											onCreateFromMenu(
-												menu.id,
-												menu.name
-											);
-										} }
-										onClose={ onClose }
-										key={ menu.id }
-									>
-										{ decodeEntities( menu.name ) }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-				</>
-			) }
-		</DropdownMenu>
-	);
-};
+import NavigationMenuSelector from '../navigation-menu-selector';
 
 export default function NavigationPlaceholder( {
+	currentMenuId,
 	clientId,
 	onFinish,
-	canSwitchNavigationMenu,
 	hasResolvedNavigationMenus,
-	canUserCreateNavigation = false,
+	canUserCreateNavigationMenu = false,
 } ) {
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
@@ -106,7 +27,7 @@ export default function NavigationPlaceholder( {
 		blocks,
 		navigationMenuTitle = null
 	) => {
-		if ( ! canUserCreateNavigation ) {
+		if ( ! canUserCreateNavigationMenu ) {
 			return;
 		}
 
@@ -117,28 +38,13 @@ export default function NavigationPlaceholder( {
 		onFinish( navigationMenu, blocks );
 	};
 
-	const convertClassicMenu = useConvertClassicMenu( onFinishMenuCreation );
-
-	const {
-		isResolvingPages,
-		menus,
-		isResolvingMenus,
-		hasMenus,
-	} = useNavigationEntities();
+	const { isResolvingPages, isResolvingMenus } = useNavigationEntities();
 
 	const isStillLoading = isResolvingPages || isResolvingMenus;
 
 	const onCreateEmptyMenu = () => {
 		onFinishMenuCreation( [] );
 	};
-
-	const { navigationMenus } = useNavigationMenu();
-
-	const hasNavigationMenus = !! navigationMenus?.length;
-
-	const showSelectMenus =
-		( canSwitchNavigationMenu || canUserCreateNavigation ) &&
-		( hasNavigationMenus || hasMenus );
 
 	return (
 		<>
@@ -157,24 +63,21 @@ export default function NavigationPlaceholder( {
 
 							<hr />
 
-							{ showSelectMenus ? (
-								<>
-									<ExistingMenusDropdown
-										showNavigationMenus={
-											canSwitchNavigationMenu
-										}
-										navigationMenus={ navigationMenus }
-										onFinish={ onFinish }
-										menus={ menus }
-										onCreateFromMenu={ convertClassicMenu }
-										showClassicMenus={
-											canUserCreateNavigation
-										}
-									/>
-									<hr />
-								</>
-							) : undefined }
-							{ canUserCreateNavigation && (
+							<NavigationMenuSelector
+								currentMenuId={ currentMenuId }
+								clientId={ clientId }
+								onSelect={ onFinish }
+								toggleProps={ {
+									variant: 'tertiary',
+									iconPosition: 'right',
+									className:
+										'wp-block-navigation-placeholder__actions__dropdown',
+								} }
+							/>
+
+							<hr />
+
+							{ canUserCreateNavigationMenu && (
 								<Button
 									variant="tertiary"
 									onClick={ onCreateEmptyMenu }

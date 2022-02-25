@@ -32,7 +32,7 @@ afterAll( () => {
 
 describe( 'Text color', () => {
 	it( 'shows the text color formatting button in the toolbar', async () => {
-		const { getByA11yLabel } = initializeEditor();
+		const { getByA11yLabel } = await initializeEditor();
 
 		// Wait for the editor placeholder
 		const paragraphPlaceholder = await waitFor( () =>
@@ -59,7 +59,7 @@ describe( 'Text color', () => {
 			getByA11yLabel,
 			getByTestId,
 			getByA11yHint,
-		} = initializeEditor();
+		} = await initializeEditor();
 
 		// Wait for the editor placeholder
 		const paragraphPlaceholder = await waitFor( () =>
@@ -101,7 +101,7 @@ describe( 'Text color', () => {
 			getByTestId,
 			getByPlaceholderText,
 			getByA11yHint,
-		} = initializeEditor();
+		} = await initializeEditor();
 		const text = 'Hello this is a test';
 
 		// Wait for the editor placeholder
@@ -149,7 +149,7 @@ describe( 'Text color', () => {
 	} );
 
 	it( 'creates a paragraph block with the text color format', async () => {
-		const { getByA11yLabel } = initializeEditor( {
+		const { getByA11yLabel } = await initializeEditor( {
 			initialHtml: TEXT_WITH_COLOR,
 		} );
 
@@ -158,6 +158,20 @@ describe( 'Text color', () => {
 			getByA11yLabel( /Paragraph Block\. Row 1/ )
 		);
 		expect( paragraphBlock ).toBeDefined();
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'supports old text color format using "span" tag', async () => {
+		await initializeEditor( {
+			initialHtml: `<!-- wp:paragraph -->
+			<p>this <span class="has-inline-color has-green-color">is</span> <span class="has-inline-color has-red-color">test</span></p>
+			<!-- /wp:paragraph -->
+			
+			<!-- wp:paragraph -->
+			<p><span style="color:#08a5e9" class="has-inline-color">this is a test</span></p>
+			<!-- /wp:paragraph -->`,
+		} );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );

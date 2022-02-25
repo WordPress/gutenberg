@@ -12,7 +12,7 @@ import { contextConnect } from '../context';
 
 /**
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                     forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                            forwardedRef
  */
 function ControlGroup( props, forwardedRef ) {
 	const {

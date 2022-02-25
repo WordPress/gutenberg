@@ -6,6 +6,7 @@
 import { View, Platform, Dimensions } from 'react-native';
 import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -1015,6 +1016,15 @@ export class RichText extends Component {
 		return isBlockBasedTheme && tagsToMatch.test( tagName );
 	}
 
+	getLinkTextColor( defaultColor ) {
+		const { style } = this.props;
+		const customColor = style?.linkColor && colord( style.linkColor );
+
+		return customColor && customColor.isValid()
+			? customColor.toHex()
+			: defaultColor;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -1051,6 +1061,9 @@ export class RichText extends Component {
 			textDecorationColor: defaultTextDecorationColor,
 			fontFamily: defaultFontFamily,
 		} = getStylesFromColorScheme( styles.richText, styles.richTextDark );
+		const linkTextColor = this.getLinkTextColor(
+			defaultTextDecorationColor
+		);
 
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
@@ -1146,8 +1159,7 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
-						linkTextColor:
-							style?.linkColor || defaultTextDecorationColor,
+						linkTextColor,
 						tag: tagName,
 					} }
 					placeholder={ this.props.placeholder }
@@ -1248,13 +1260,15 @@ export default compose( [
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
-		const experimentalFeatures =
-			settings?.__experimentalFeatures?.color?.palette;
-		const colorPalette =
-			experimentalFeatures?.user ??
-			experimentalFeatures?.theme ??
-			experimentalFeatures?.default ??
-			settings?.colors;
+		const colorsPalettes = settings?.__experimentalFeatures?.color?.palette;
+		const allColorsPalette = [
+			...( colorsPalettes?.theme || [] ),
+			...( colorsPalettes?.custom || [] ),
+			...( colorsPalettes?.default || [] ),
+		];
+		const colorPalette = colorsPalettes
+			? allColorsPalette
+			: settings?.colors;
 
 		return {
 			areMentionsSupported:

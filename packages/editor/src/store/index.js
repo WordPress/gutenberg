@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { createReduxStore, registerStore } from '@wordpress/data';
-import { controls as dataControls } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -10,7 +9,6 @@ import { controls as dataControls } from '@wordpress/data-controls';
 import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
-import controls from './controls';
 import { STORE_NAME } from './constants';
 
 /**
@@ -24,10 +22,6 @@ export const storeConfig = {
 	reducer,
 	selectors,
 	actions,
-	controls: {
-		...dataControls,
-		...controls,
-	},
 };
 
 /**

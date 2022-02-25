@@ -3,18 +3,11 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
-import { Warning } from '@wordpress/block-editor';
-import { useCopyToClipboard } from '@wordpress/compose';
 
-function CopyButton( { text, children } ) {
-	const ref = useCopyToClipboard( text );
-	return (
-		<Button variant="secondary" ref={ ref }>
-			{ children }
-		</Button>
-	);
-}
+/**
+ * Internal dependencies
+ */
+import ErrorBoundaryWarning from './warning';
 
 export default class ErrorBoundary extends Component {
 	constructor() {
@@ -42,23 +35,13 @@ export default class ErrorBoundary extends Component {
 		}
 
 		return (
-			<Warning
-				className="editor-error-boundary"
-				actions={ [
-					<Button
-						key="recovery"
-						onClick={ this.reboot }
-						variant="secondary"
-					>
-						{ __( 'Attempt Recovery' ) }
-					</Button>,
-					<CopyButton key="copy-error" text={ error.stack }>
-						{ __( 'Copy Error' ) }
-					</CopyButton>,
-				] }
-			>
-				{ __( 'The editor has encountered an unexpected error.' ) }
-			</Warning>
+			<ErrorBoundaryWarning
+				message={ __(
+					'The editor has encountered an unexpected error.'
+				) }
+				error={ error }
+				reboot={ this.reboot }
+			/>
 		);
 	}
 }

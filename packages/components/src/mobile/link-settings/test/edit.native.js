@@ -72,7 +72,7 @@ describe.each( [
 	it( 'should display the LINK SETTINGS with an EMPTY LINK TO field.', async () => {
 		// Arrange
 		const url = 'https://tonytahmouchtest.files.wordpress.com';
-		const subject = initializeEditor( { initialHtml } );
+		const subject = await initializeEditor( { initialHtml } );
 		Clipboard.getString.mockReturnValue( url );
 
 		// Act
@@ -109,7 +109,7 @@ describe.each( [
 			it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async () => {
 				// Arrange
 				const url = 'tonytahmouchtest.files.wordpress.com';
-				const subject = initializeEditor( { initialHtml } );
+				const subject = await initializeEditor( { initialHtml } );
 				Clipboard.getString.mockReturnValue( url );
 
 				// Act
@@ -162,7 +162,7 @@ describe.each( [
 			it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async () => {
 				// Arrange
 				const url = 'https://tonytahmouchtest.files.wordpress.com';
-				const subject = initializeEditor( { initialHtml } );
+				const subject = await initializeEditor( { initialHtml } );
 				Clipboard.getString.mockReturnValue( url );
 
 				// Act
@@ -241,7 +241,7 @@ describe.each( [
 				async () => {
 					// Arrange
 					const url = 'https://tonytahmouchtest.files.wordpress.com';
-					const subject = initializeEditor( { initialHtml } );
+					const subject = await initializeEditor( { initialHtml } );
 					Clipboard.getString.mockReturnValue( url );
 
 					// Act
@@ -308,7 +308,7 @@ describe.each( [
 				async () => {
 					// Arrange
 					const url = 'https://tonytahmouchtest.files.wordpress.com';
-					const subject = initializeEditor( { initialHtml } );
+					const subject = await initializeEditor( { initialHtml } );
 					Clipboard.getString.mockReturnValue( url );
 
 					// Act

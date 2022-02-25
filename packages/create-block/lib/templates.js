@@ -198,6 +198,7 @@ const getDefaultValues = ( pluginTemplate ) => {
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
 		wpScripts: true,
+		customScripts: {},
 		wpEnv: false,
 		npmDependencies: [],
 		folderName: '.',

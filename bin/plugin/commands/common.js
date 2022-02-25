@@ -58,14 +58,17 @@ async function runCleanLocalFoldersStep( folders, abortMessage ) {
 }
 
 /**
- * Finds the name of the current release branch based on the version in
+ * Finds the name of the current plugin release branch based on the version in
  * the package.json file.
  *
- * @param {string} packageJsonPath Path to the package.json file.
+ * @param {string} gitWorkingDirectoryPath Path to the project's working directory.
  *
- * @return {string} Name of the release branch.
+ * @return {string} Name of the plugin release branch.
  */
-function findReleaseBranchName( packageJsonPath ) {
+async function findPluginReleaseBranchName( gitWorkingDirectoryPath ) {
+	await git.checkoutRemoteBranch( gitWorkingDirectoryPath, 'trunk' );
+
+	const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
 	const mainPackageJson = readJSONFile( packageJsonPath );
 	const mainParsedVersion = semver.parse( mainPackageJson.version );
 
@@ -137,7 +140,7 @@ function calculateVersionBumpFromChangelog(
 
 module.exports = {
 	calculateVersionBumpFromChangelog,
-	findReleaseBranchName,
+	findPluginReleaseBranchName,
 	runGitRepositoryCloneStep,
 	runCleanLocalFoldersStep,
 };

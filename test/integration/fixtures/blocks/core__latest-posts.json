@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/latest-posts",
 		"isValid": true,
 		"attributes": {
@@ -20,7 +19,6 @@
 			"featuredImageSizeHeight": null,
 			"addLinkToFeaturedImage": false
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

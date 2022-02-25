@@ -35,7 +35,6 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarGroup,
-	ToolbarDropdownMenu,
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -107,7 +106,6 @@ function Navigation( {
 	hasSubmenuIndicatorSetting = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
-	customAppender: CustomAppender = null,
 } ) {
 	const {
 		openSubmenusOnClick,
@@ -224,12 +222,12 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserDeleteNavigationEntity,
-		hasResolvedCanUserDeleteNavigationEntity,
-		canUserCreateNavigation,
-		hasResolvedCanUserCreateNavigation,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu,
+		canUserDeleteNavigationMenu,
+		hasResolvedCanUserDeleteNavigationMenu,
+		canUserCreateNavigationMenu,
+		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
 	const navRef = useRef();
@@ -362,16 +360,16 @@ function Navigation( {
 
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
-				hasResolvedCanUserUpdateNavigationEntity &&
-				! canUserUpdateNavigationEntity
+				hasResolvedCanUserUpdateNavigationMenu &&
+				! canUserUpdateNavigationMenu
 			) {
 				showCantEditNotice();
 			}
 
 			if (
 				! ref &&
-				hasResolvedCanUserCreateNavigation &&
-				! canUserCreateNavigation
+				hasResolvedCanUserCreateNavigationMenu &&
+				! canUserCreateNavigationMenu
 			) {
 				showCantCreateNotice();
 			}
@@ -379,10 +377,10 @@ function Navigation( {
 	}, [
 		isSelected,
 		isInnerBlockSelected,
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserCreateNavigation,
-		hasResolvedCanUserCreateNavigation,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu,
+		canUserCreateNavigationMenu,
+		hasResolvedCanUserCreateNavigationMenu,
 		ref,
 	] );
 
@@ -483,26 +481,18 @@ function Navigation( {
 			<RecursionProvider>
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
-						<ToolbarGroup>
-							<ToolbarDropdownMenu
-								label={ __( 'Select Menu' ) }
-								text={ __( 'Select Menu' ) }
-								icon={ null }
-							>
-								{ ( { onClose } ) => (
-									<NavigationMenuSelector
-										clientId={ clientId }
-										onSelect={ ( { id } ) => {
-											setRef( id );
-											onClose();
-										} }
-										onCreateNew={ startWithEmptyMenu }
-										canUserCreateNavigation={
-											canUserCreateNavigation
-										}
-									/>
-								) }
-							</ToolbarDropdownMenu>
+						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
+							<NavigationMenuSelector
+								currentMenuId={ ref }
+								clientId={ clientId }
+								onSelect={ ( { id } ) => {
+									setRef( id );
+								} }
+								onCreateNew={ startWithEmptyMenu }
+								/* translators: %s: The name of a menu. */
+								actionLabel={ __( "Switch to '%s'" ) }
+								showManageActions
+							/>
 						</ToolbarGroup>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
@@ -646,12 +636,12 @@ function Navigation( {
 				</InspectorControls>
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
-						{ hasResolvedCanUserUpdateNavigationEntity &&
-							canUserUpdateNavigationEntity && (
+						{ hasResolvedCanUserUpdateNavigationMenu &&
+							canUserUpdateNavigationMenu && (
 								<NavigationMenuNameControl />
 							) }
-						{ hasResolvedCanUserDeleteNavigationEntity &&
-							canUserDeleteNavigationEntity && (
+						{ hasResolvedCanUserDeleteNavigationMenu &&
+							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
 									onDelete={ startWithEmptyMenu }
 								/>
@@ -661,6 +651,7 @@ function Navigation( {
 				<nav { ...blockProps }>
 					{ isPlaceholderShown && (
 						<PlaceholderComponent
+							currentMenuId={ ref }
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
 								if ( post ) {
@@ -673,10 +664,12 @@ function Navigation( {
 								hasResolvedNavigationMenus
 							}
 							clientId={ clientId }
-							canUserCreateNavigation={ canUserCreateNavigation }
+							canUserCreateNavigationMenu={
+								canUserCreateNavigationMenu
+							}
 						/>
 					) }
-					{ ! hasResolvedCanUserCreateNavigation ||
+					{ ! hasResolvedCanUserCreateNavigationMenu ||
 						( ! isEntityAvailable && ! isPlaceholderShown && (
 							<PlaceholderPreview isLoading />
 						) ) }
@@ -696,7 +689,6 @@ function Navigation( {
 								<NavigationInnerBlocks
 									isVisible={ ! isPlaceholderShown }
 									clientId={ clientId }
-									appender={ CustomAppender }
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}

@@ -26,6 +26,7 @@ import {
 	loginUser,
 	deleteUser,
 	switchUserToAdmin,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -119,12 +120,31 @@ async function selectClassicMenu( optionText ) {
 		`//*[contains(@class, 'components-menu-item__item')][ text()="${ optionText }" ]`
 	);
 	await theOption.click();
+
+	await page.waitForResponse(
+		( response ) =>
+			response.url().includes( 'menu-items' ) && response.status() === 200
+	);
+}
+
+async function populateNavWithOneItem() {
+	// Add a Link block first.
+	const appender = await page.waitForSelector(
+		'.wp-block-navigation .block-list-appender'
+	);
+	await appender.click();
+	// Add a link to the Link block.
+	await updateActiveNavigationLink( {
+		url: 'https://wordpress.org',
+		label: 'WP',
+		type: 'url',
+	} );
 }
 
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
-const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select menu']`;
+const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select Menu']`;
 
 /**
  * Delete all items for the given REST resources using the REST API.
@@ -192,6 +212,13 @@ async function getNavigationMenuRawContent() {
 	} );
 
 	return stripPageIds( response.content.raw );
+}
+
+async function waitForBlock( blockName ) {
+	const blockSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: ${ blockName }"]`;
+
+	// Wait for a Submenu block before making assertion.
+	return page.waitForSelector( blockSelector );
 }
 
 // Disable reason - these tests are to be re-written.
@@ -557,14 +584,17 @@ describe( 'Navigation', () => {
 		const markup =
 			'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
 		await page.keyboard.type( markup );
+
 		await clickButton( 'Exit code editor' );
-		const navBlock = await page.waitForSelector(
-			'nav[aria-label="Block: Navigation"]'
-		);
-		// Select the block to convert to a wp_navigation and publish.
-		// The select menu button shows up when saving is complete.
+
+		const navBlock = await waitForBlock( 'Navigation' );
+
+		// Select the block to convert to a wp_navigation
 		await navBlock.click();
-		await page.waitForSelector( 'button[aria-label="Select Menu"]' );
+
+		// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
+		await waitForBlock( 'Page List' );
+
 		await publishPost();
 
 		// Check that the wp_navigation post has the page list block.
@@ -574,20 +604,6 @@ describe( 'Navigation', () => {
 	describe( 'Creating and restarting', () => {
 		const NAV_ENTITY_SELECTOR =
 			'//div[@class="entities-saved-states__panel"]//label//strong[contains(text(), "Navigation")]';
-
-		async function populateNavWithOneItem() {
-			// Add a Link block first.
-			const appender = await page.waitForSelector(
-				'.wp-block-navigation .block-list-appender'
-			);
-			await appender.click();
-			// Add a link to the Link block.
-			await updateActiveNavigationLink( {
-				url: 'https://wordpress.org',
-				label: 'WP',
-				type: 'url',
-			} );
-		}
 
 		async function resetNavBlockToInitialState() {
 			const selectMenuDropdown = await page.waitForSelector(
@@ -611,17 +627,18 @@ describe( 'Navigation', () => {
 				'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
 			await page.keyboard.type( markup );
 			await clickButton( 'Exit code editor' );
-			const navBlock = await page.waitForSelector(
-				'nav[aria-label="Block: Navigation"]'
-			);
 
-			// Select the block to convert to a wp_navigation and publish.
-			// The select menu button shows up when saving is complete.
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Select the block to convert to a wp_navigation
 			await navBlock.click();
-			await page.waitForSelector( 'button[aria-label="Select Menu"]' );
+
+			// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
+			await waitForBlock( 'Page List' );
 
 			// Reset the nav block to create a new entity.
 			await resetNavBlockToInitialState();
+
 			const startEmptyButton = await page.waitForXPath(
 				START_EMPTY_XPATH
 			);
@@ -731,6 +748,113 @@ describe( 'Navigation', () => {
 		expect( tagCount ).toBe( 1 );
 	} );
 
+	describe( 'Submenus', () => {
+		it( 'shows button which converts submenu to link when submenu is not-populated (empty)', async () => {
+			const navSubmenuSelector = `[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]`;
+
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickBlockToolbarButton( 'Add submenu' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Revert the Submenu back to a Navigation Link block.
+			await clickBlockToolbarButton( 'Convert to Link' );
+
+			// Check the Submenu block is no longer present.
+			const submenuBlock = await page.$( navSubmenuSelector );
+
+			expect( submenuBlock ).toBeFalsy();
+		} );
+
+		it( 'shows button to convert submenu to link in disabled state when submenu is populated', async () => {
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickBlockToolbarButton( 'Add submenu' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Add a Link block first.
+			const appender = await page.waitForSelector(
+				'[aria-label="Block: Submenu"] [aria-label="Add block"]'
+			);
+
+			await appender.click();
+
+			await updateActiveNavigationLink( {
+				url: 'https://make.wordpress.org/core/',
+				label: 'Submenu item #1',
+				type: 'url',
+			} );
+
+			await clickBlockToolbarButton( 'Select Submenu' );
+
+			// Check button exists but is in disabled state.
+			const disabledConvertToLinkButton = await page.$(
+				'[aria-label="Block tools"] [aria-label="Convert to Link"][disabled]'
+			);
+
+			expect( disabledConvertToLinkButton ).toBeTruthy();
+		} );
+
+		it( 'shows button to convert submenu to link when submenu is populated with a single incomplete link item', async () => {
+			// For context on why this test is required please see:
+			// https://github.com/WordPress/gutenberg/pull/38203#issuecomment-1027672948.
+
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickBlockToolbarButton( 'Add submenu' );
+
+			await waitForBlock( 'Submenu' );
+
+			// Add a Link block first.
+			const appender = await page.waitForSelector(
+				'[aria-label="Block: Submenu"] [aria-label="Add block"]'
+			);
+
+			await appender.click();
+
+			// Here we intentionally do not populate the inserted Navigation Link block.
+			// Rather we immediaely click away leaving the link in a state where it has
+			// no URL of label and can be considered unpopulated.
+			await clickBlockToolbarButton( 'Select Submenu' );
+
+			// Check for non-disabled Convert to Link button
+			const convertToLinkButton = await page.$(
+				'[aria-label="Block tools"] [aria-label="Convert to Link"]:not([disabled])'
+			);
+
+			expect( convertToLinkButton ).toBeTruthy();
+		} );
+	} );
+
 	describe( 'Permission based restrictions', () => {
 		afterEach( async () => {
 			await switchUserToAdmin();
@@ -759,9 +883,10 @@ describe( 'Navigation', () => {
 
 			await insertBlock( 'Navigation' );
 
-			// Select the Navigation post created by the Admin early
+			// Select the Navigation post created by the Admin earlier
 			// in the test.
 			const navigationPostCreatedByAdminName = 'Navigation';
+
 			const dropdown = await page.waitForXPath( SELECT_MENU_XPATH );
 			await dropdown.click();
 			const theOption = await page.waitForXPath(

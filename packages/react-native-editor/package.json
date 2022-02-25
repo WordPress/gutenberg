@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.70.0",
+	"version": "1.71.1",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -72,7 +72,7 @@
 		"react-native-screens": "https://raw.githubusercontent.com/wordpress-mobile/react-native-screens/2.9.0-wp-2/react-native-screens-2.9.0-wp-2.tgz",
 		"react-native-svg": "https://raw.githubusercontent.com/wordpress-mobile/react-native-svg/v9.13.7-wp-2/react-native-svg-9.13.7-wp-2.tgz",
 		"react-native-url-polyfill": "^1.1.2",
-		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/5.0.2-wp-2/react-native-video-5.0.2-wp-2.tgz",
+		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/5.2.0-wp-2/react-native-video-5.2.0-wp-2.tgz",
 		"react-native-webview": "https://raw.githubusercontent.com/wordpress-mobile/react-native-webview/v11.6.5-wp-2/react-native-webview-11.6.5-wp-2.tgz"
 	},
 	"publishConfig": {
@@ -119,15 +119,14 @@
 		"test:e2e:build-wda": "xcodebuild -project ../../node_modules/appium/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination 'platform=iOS Simulator,name=iPhone 11' -derivedDataPath ios/build/WDA",
 		"test:e2e:ios:local": "npm run test:e2e:bundle:ios && npm run test:e2e:build-app:ios && npm run test:e2e:build-wda && TEST_RN_PLATFORM=ios npm run device-tests:local",
 		"build:gutenberg": "cd gutenberg && npm ci && npm run build",
-		"clean": "npm run clean:build-artifacts; npm run clean:aztec; npm run clean:haste; npm run clean:jest; npm run clean:metro; npm run clean:react; npm run clean:watchman",
-		"clean:runtime": "npm run clean:haste; npm run clean:react; npm run clean:metro; npm run clean:jest; npm run clean:watchman; npm run clean:babel-cache",
+		"clean": "npm run clean:build-artifacts; npm run clean:aztec; npm run clean:haste; npm run clean:jest; npm run clean:metro; npm run clean:watchman",
+		"clean:runtime": "npm run clean:haste; npm run clean:metro; npm run clean:jest; npm run clean:watchman; npm run clean:babel-cache",
 		"clean:build-artifacts": "rm -rf ./ios/build && rm -rf ./ios/Pods",
 		"clean:aztec": "cd ../react-native-aztec && npm run clean",
-		"clean:haste": "rm -rf /tmp/haste-map-react-native-packager-*",
+		"clean:haste": "rm -rf $TMPDIR/haste-map-metro-*",
 		"clean:install": "npm run clean; npm install",
 		"clean:jest": "jest --clearCache --config ../../test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
-		"clean:metro": "rm -rf $TMPDIR/metro-cache-*;",
-		"clean:react": "rm -rf $TMPDIR/react-*",
+		"clean:metro": "rm -rf $TMPDIR/metro-cache/",
 		"clean:watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
 		"clean:babel-cache": "rm -rf ../../node_modules/.cache/babel-loader/*",
 		"clean:i18n-cache": "rm -rf ./i18n-cache/data/*.json && rm -f ./i18n-cache/index.native.js"
