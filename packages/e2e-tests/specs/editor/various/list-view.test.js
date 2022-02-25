@@ -103,9 +103,9 @@ describe( 'List view', () => {
 		expect( console ).not.toHaveErrored();
 	} );
 
-	it( 'should select previous block after removing currently selected one', async () => {
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026
+	it( 'should select previous block after removing selected one', async () => {
 		// Insert some blocks of different types.
-		await insertBlock( 'Quote' );
 		await insertBlock( 'Image' );
 		await insertBlock( 'Heading' );
 		await insertBlock( 'Paragraph' );
@@ -118,54 +118,63 @@ describe( 'List view', () => {
 			'//a[contains(., "Paragraph(selected block)")]'
 		);
 
-		/**
-		 * Make sure removing the currently selected block makes the previous block selected
-		 */
 		const paragraphOptionsButton = await page.waitForSelector(
-			'tr.block-editor-list-view-leaf.is-selected button[aria-label="Options for Paragraph block"]'
+			'tr.block-editor-list-view-leaf:last-child button[aria-label="Options for Paragraph block"]'
 		);
 
-		// Open block option dropdown.
+		// Option image options dropdown.
 		await paragraphOptionsButton.click();
 
 		const paragraphRemoveButton = await page.waitForXPath(
 			'//button[contains(., "Remove Paragraph")]'
 		);
 
-		// Remove block.
+		// Remove Image block.
 		await paragraphRemoveButton.click();
-
-		// Make sure the Paragraph has been removed.
-		let listViewRows = await page.$$( 'tr.block-editor-list-view-leaf' );
-		expect( listViewRows ).toHaveLength( 3 );
 
 		// Heading block should be selected as previous block.
 		await page.waitForXPath(
 			'//a[contains(., "Heading(selected block)")]'
 		);
+	} );
 
-		/**
-		 * Make sure removing a non-selected block doesn't change selection.
-		 */
-		const quoteOptionsButton = await page.waitForSelector(
-			'tr.block-editor-list-view-leaf:first-child button[aria-label="Options for Quote block"]'
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026
+	it( 'should select next block after removing the very first block', async () => {
+		// Insert some blocks of different types.
+		await insertBlock( 'Image' );
+		await insertBlock( 'Heading' );
+		await insertBlock( 'Paragraph' );
+
+		// Open list view.
+		await openListView();
+
+		// The last inserted paragraph block should be selected in List View.
+		await page.waitForXPath(
+			'//a[contains(., "Paragraph(selected block)")]'
 		);
 
-		// Open block option dropdown.
-		quoteOptionsButton.click();
+		// Go to the image block in list view.
+		await pressKeyTimes( 'ArrowUp', 2 );
+		await pressKeyTimes( 'Enter', 1 );
 
-		const quoteRemoveButton = await page.waitForXPath(
-			'//button[contains(., "Remove Quote")]'
+		// Image block should have selected.
+		await page.waitForXPath( '//a[contains(., "Image(selected block)")]' );
+
+		const imageOptionsButton = await page.waitForSelector(
+			'tr.block-editor-list-view-leaf:first-child button[aria-label="Options for Image block"]'
 		);
 
-		// Remove block
-		await quoteRemoveButton.click();
+		// Option image options dropdown.
+		await imageOptionsButton.click();
 
-		// Make sure the Quote block has been removed.
-		listViewRows = await page.$$( 'tr.block-editor-list-view-leaf' );
-		expect( listViewRows ).toHaveLength( 2 );
+		const imageRemoveButton = await page.waitForXPath(
+			'//button[contains(., "Remove Image")]'
+		);
 
-		// Heading block should be selected
+		// Remove Image block.
+		await imageRemoveButton.click();
+
+		// Heading block should be selected as next block.
 		await page.waitForXPath(
 			'//a[contains(., "Heading(selected block)")]'
 		);

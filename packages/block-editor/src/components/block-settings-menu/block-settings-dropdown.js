@@ -50,6 +50,7 @@ export function BlockSettingsDropdown( {
 		onlyBlock,
 		title,
 		previousBlockClientId,
+		nextBlockClientId,
 		selectedBlockClientIds,
 	} = useSelect(
 		( select ) => {
@@ -57,6 +58,7 @@ export function BlockSettingsDropdown( {
 				getBlockCount,
 				getBlockName,
 				getPreviousBlockClientId,
+				getNextBlockClientId,
 				getSelectedBlockClientIds,
 			} = select( blockEditorStore );
 			const { getBlockType } = select( blocksStore );
@@ -67,6 +69,7 @@ export function BlockSettingsDropdown( {
 				previousBlockClientId: getPreviousBlockClientId(
 					firstBlockClientId
 				),
+				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
 			};
 		},
@@ -104,18 +107,27 @@ export function BlockSettingsDropdown( {
 	const updateSelectionAfterRemove = useCallback(
 		__experimentalSelectBlock
 			? () => {
-					// Update selection only if current selected block gets removed.
+					const blockToSelect =
+						previousBlockClientId || nextBlockClientId;
+
 					if (
+						// It's possible to remove a block which is not selected from block options,
+						// in this case, update selection only if currently selected block gets removed.
 						selectedBlockClientIds.includes( firstBlockClientId ) &&
-						previousBlockClientId
+						// Don't update selection if all blocks gets removed at once
+						! selectedBlockClientIds.includes( blockToSelect ) &&
+						blockToSelect
 					) {
-						__experimentalSelectBlock( previousBlockClientId );
+						__experimentalSelectBlock(
+							previousBlockClientId || nextBlockClientId
+						);
 					}
 			  }
 			: noop,
 		[
 			__experimentalSelectBlock,
 			previousBlockClientId,
+			nextBlockClientId,
 			selectedBlockClientIds,
 		]
 	);
