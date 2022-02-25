@@ -1489,6 +1489,10 @@ _Returns_
 
 -   `Object`: Action object.
 
+### splitSelection
+
+Undocumented declaration.
+
 ### startDraggingBlocks
 
 Returns an action object used in signalling that the user has begun to drag blocks.

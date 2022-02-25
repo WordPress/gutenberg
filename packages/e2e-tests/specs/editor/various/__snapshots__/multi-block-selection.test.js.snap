@@ -118,6 +118,34 @@ exports[`Multi-block selection should gradually multi-select 2`] = `
 <!-- /wp:columns -->"
 `;
 
+exports[`Multi-block selection should handle Enter across blocks 1`] = `
+"<!-- wp:paragraph -->
+<p>1[[</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>a</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>]2</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Multi-block selection should handle Enter across blocks 2`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>2</h2>
+<!-- /wp:heading -->"
+`;
+
 exports[`Multi-block selection should multi-select from within the list block 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>

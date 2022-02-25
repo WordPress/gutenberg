@@ -858,6 +858,102 @@ export const deleteSelection = ( isForward ) => ( {
 	} );
 };
 
+export const splitSelection = () => ( { select, dispatch } ) => {
+	const selectionAnchor = select.getSelectionStart();
+	const selectionFocus = select.getSelectionEnd();
+
+	if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
+
+	// Remove the blocks if the whole blocks are selected.
+	if ( ! selectionAnchor.attributeKey || ! selectionFocus.attributeKey ) {
+		dispatch.removeBlocks( select.getSelectedBlockClientIds() );
+		return;
+	}
+
+	if (
+		typeof selectionAnchor.offset === 'undefined' ||
+		typeof selectionFocus.offset === 'undefined'
+	)
+		return;
+
+	const anchorRootClientId = select.getBlockRootClientId(
+		selectionAnchor.clientId
+	);
+	const focusRootClientId = select.getBlockRootClientId(
+		selectionFocus.clientId
+	);
+
+	// It's not mergeable if the selection doesn't start and end in the same
+	// block list. Maybe in the future it should be allowed.
+	if ( anchorRootClientId !== focusRootClientId ) {
+		return;
+	}
+
+	const blockOrder = select.getBlockOrder( anchorRootClientId );
+	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
+	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+
+	// Reassign selection start and end based on order.
+	let selectionStart, selectionEnd;
+
+	if ( anchorIndex > focusIndex ) {
+		selectionStart = selectionFocus;
+		selectionEnd = selectionAnchor;
+	} else {
+		selectionStart = selectionAnchor;
+		selectionEnd = selectionFocus;
+	}
+
+	const selectionA = selectionStart;
+	const selectionB = selectionEnd;
+
+	const blockA = select.getBlock( selectionA.clientId );
+	const blockAType = getBlockType( blockA.name );
+
+	const blockB = select.getBlock( selectionB.clientId );
+	const blockBType = getBlockType( blockB.name );
+
+	// Clone the blocks so we don't insert the character in a "live" block.
+	const cloneA = cloneBlock( blockA );
+	const cloneB = cloneBlock( blockB );
+
+	const htmlA = cloneA.attributes[ selectionA.attributeKey ];
+	const htmlB = cloneB.attributes[ selectionB.attributeKey ];
+
+	const attributeDefinitionA =
+		blockAType.attributes[ selectionA.attributeKey ];
+	const attributeDefinitionB =
+		blockBType.attributes[ selectionB.attributeKey ];
+
+	let valueA = create( {
+		html: htmlA,
+		...mapRichTextSettings( attributeDefinitionA ),
+	} );
+	let valueB = create( {
+		html: htmlB,
+		...mapRichTextSettings( attributeDefinitionB ),
+	} );
+
+	valueA = insert( valueA, '', selectionA.offset, valueA.text.length );
+	valueB = insert( valueB, '', 0, selectionB.offset );
+
+	cloneA.attributes[ selectionA.attributeKey ] = toHTMLString( {
+		value: valueA,
+		...mapRichTextSettings( attributeDefinitionA ),
+	} );
+	cloneB.attributes[ selectionB.attributeKey ] = toHTMLString( {
+		value: valueB,
+		...mapRichTextSettings( attributeDefinitionB ),
+	} );
+
+	dispatch.replaceBlocks(
+		select.getSelectedBlockClientIds(),
+		[ cloneA, createBlock( 'core/paragraph' ), cloneB ],
+		1, // If we don't pass the `indexToSelect` it will default to the last block.
+		select.getSelectedBlocksInitialCaretPosition()
+	);
+};
+
 /**
  * Action that merges two blocks.
  *

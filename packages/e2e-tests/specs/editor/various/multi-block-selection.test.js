@@ -850,4 +850,25 @@ describe( 'Multi-block selection', () => {
 		// Expect a heading with "12" as its content.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should handle Enter across blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1[[' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '## ]2' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+
+		// Test setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Enter' );
+
+		// Expect a heading with "12" as its content.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

@@ -10,7 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { DELETE, LEFT, RIGHT, UP, DOWN, TAB } from '@wordpress/keycodes';
+import { DELETE, LEFT, RIGHT, UP, DOWN, TAB, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -53,6 +53,7 @@ export default function BlockTools( {
 		moveBlocksUp,
 		moveBlocksDown,
 		deleteSelection,
+		splitSelection,
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
@@ -118,6 +119,10 @@ export default function BlockTools( {
 			event.keyCode === TAB
 		) {
 			return;
+		}
+
+		if ( event.keyCode === ENTER ) {
+			splitSelection();
 		}
 
 		event.preventDefault();
