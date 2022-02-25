@@ -830,4 +830,24 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.up( 'Shift' );
 		expect( await getSelectedFlatIndices() ).toEqual( [ 3, 4 ] );
 	} );
+
+	it( 'should forward delete across blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1[[' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '## ]2' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+
+		// Test setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Delete' );
+
+		// Expect a heading with "12" as its content.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

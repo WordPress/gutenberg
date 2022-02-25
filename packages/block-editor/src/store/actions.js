@@ -726,13 +726,17 @@ export const deleteSelection = ( isForward ) => ( {
 		selectionEnd = selectionFocus;
 	}
 
-	const selectionA = isForward ? selectionEnd : selectionStart;
-	const selectionB = isForward ? selectionStart : selectionEnd;
+	const targetSelection = isForward ? selectionEnd : selectionStart;
+	const targetBlock = select.getBlock( targetSelection.clientId );
+	const targetBlockType = getBlockType( targetBlock.name );
+
+	if ( ! targetBlockType.merge ) return;
+
+	const selectionA = selectionStart;
+	const selectionB = selectionEnd;
 
 	const blockA = select.getBlock( selectionA.clientId );
 	const blockAType = getBlockType( blockA.name );
-
-	if ( ! blockAType.merge ) return;
 
 	const blockB = select.getBlock( selectionB.clientId );
 	const blockBType = getBlockType( blockB.name );
@@ -774,48 +778,72 @@ export const deleteSelection = ( isForward ) => ( {
 		...mapRichTextSettings( attributeDefinitionB ),
 	} );
 
+	const followingBlock = isForward ? cloneA : cloneB;
+
 	// We can only merge blocks with similar types
 	// thus, we transform the block to merge first
 	const blocksWithTheSameType =
 		blockA.name === blockB.name
-			? [ cloneB ]
-			: switchToBlockType( cloneB, blockA.name );
+			? [ followingBlock ]
+			: switchToBlockType( followingBlock, targetBlockType.name );
 
 	// If the block types can not match, do nothing
 	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
 		return;
 	}
 
-	// Calling the merge to update the attributes and remove the block to be merged
-	const updatedAttributes = blockAType.merge(
-		cloneA.attributes,
-		blocksWithTheSameType[ 0 ].attributes
-	);
+	let updatedAttributes;
+
+	if ( isForward ) {
+		const blockToMerge = blocksWithTheSameType.pop();
+		updatedAttributes = targetBlockType.merge(
+			blockToMerge.attributes,
+			cloneB.attributes
+		);
+	} else {
+		const blockToMerge = blocksWithTheSameType.shift();
+		updatedAttributes = targetBlockType.merge(
+			cloneA.attributes,
+			blockToMerge.attributes
+		);
+	}
 
 	const newAttributeKey = findKey(
 		updatedAttributes,
 		( v ) =>
 			typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
 	);
+
 	const convertedHtml = updatedAttributes[ newAttributeKey ];
 	const convertedValue = create( {
 		html: convertedHtml,
-		...mapRichTextSettings( blockAType.attributes[ newAttributeKey ] ),
+		...mapRichTextSettings( targetBlockType.attributes[ newAttributeKey ] ),
 	} );
 	const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 	const newValue = remove( convertedValue, newOffset, newOffset + 1 );
 	const newHtml = toHTMLString( {
 		value: newValue,
-		...mapRichTextSettings( blockAType.attributes[ newAttributeKey ] ),
+		...mapRichTextSettings( targetBlockType.attributes[ newAttributeKey ] ),
 	} );
 
 	updatedAttributes[ newAttributeKey ] = newHtml;
 
 	const selectedBlockClientIds = select.getSelectedBlockClientIds();
+	const replacement = [
+		...( isForward ? blocksWithTheSameType : [] ),
+		{
+			...targetBlock,
+			attributes: {
+				...targetBlock.attributes,
+				...updatedAttributes,
+			},
+		},
+		...( isForward ? [] : blocksWithTheSameType ),
+	];
 
 	registry.batch( () => {
 		dispatch.selectionChange(
-			blockA.clientId,
+			targetBlock.clientId,
 			newAttributeKey,
 			newOffset,
 			newOffset
@@ -823,16 +851,7 @@ export const deleteSelection = ( isForward ) => ( {
 
 		dispatch.replaceBlocks(
 			selectedBlockClientIds,
-			[
-				{
-					...blockA,
-					attributes: {
-						...blockA.attributes,
-						...updatedAttributes,
-					},
-				},
-				...blocksWithTheSameType.slice( 1 ),
-			],
+			replacement,
 			0, // If we don't pass the `indexToSelect` it will default to the last block.
 			select.getSelectedBlocksInitialCaretPosition()
 		);

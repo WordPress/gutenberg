@@ -74,6 +74,26 @@ exports[`Multi-block selection should cut and paste 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Multi-block selection should forward delete across blocks 1`] = `
+"<!-- wp:paragraph -->
+<p>1[[</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>]2</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Multi-block selection should forward delete across blocks 2`] = `
+"<!-- wp:heading -->
+<h2>12</h2>
+<!-- /wp:heading -->"
+`;
+
 exports[`Multi-block selection should gradually multi-select 1`] = `
 "<!-- wp:columns -->
 <div class=\\"wp-block-columns\\"><!-- wp:column -->
