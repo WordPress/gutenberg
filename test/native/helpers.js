@@ -14,7 +14,7 @@ import {
 // Editor component is not exposed in the pacakge because is meant to be consumed
 // internally, however we require it for rendering the editor in integration tests,
 // for this reason it's imported with path access.
-// eslint-disable-next-line no-restricted-syntax.
+// eslint-disable-next-line no-restricted-syntax
 import Editor from '@wordpress/edit-post/src/editor';
 
 // Set up the mocks for getting the HTML output of the editor.

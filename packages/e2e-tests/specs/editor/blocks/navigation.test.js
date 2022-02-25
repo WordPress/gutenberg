@@ -222,7 +222,7 @@ async function waitForBlock( blockName ) {
 }
 
 // Disable reason - these tests are to be re-written.
-// eslint-disable-next-line jest/no-disabled-tests.
+// eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
 	const contributorUsername = uniqueId( 'contributoruser_' );
 	let contributorPassword;

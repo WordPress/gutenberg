@@ -32,7 +32,7 @@ const Example = ( { serializedStyles, children } ) => {
 const ExampleWithUseMemoWrong = ( { serializedStyles, children } ) => {
 	const cx = useCx();
 	// Wrong: using 'useMemo' without adding 'cx' to the dependency list.
-	// eslint-disable-next-line react-hooks/exhaustive-deps.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const classes = useMemo( () => cx( serializedStyles ), [
 		serializedStyles,
 	] );

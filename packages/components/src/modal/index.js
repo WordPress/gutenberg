@@ -105,7 +105,7 @@ function Modal( props, forwardedRef ) {
 	}
 
 	return createPortal(
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions.
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ classnames(
