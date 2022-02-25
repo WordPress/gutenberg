@@ -65,6 +65,17 @@ describe( 'UnitControl utils', () => {
 			).toEqual( [] );
 		} );
 
+		// Although the component's APIs and types don't allow for `false` as a value
+		// unit lists, it's good to keep this test around for backwards compat.
+		it( 'should return empty array where available units is set to false', () => {
+			const preferredUnits = [ '%', 'px' ];
+			const availableUnits = false;
+
+			expect(
+				filterUnitsWithSettings( preferredUnits, availableUnits )
+			).toEqual( [] );
+		} );
+
 		it( 'should return empty array where available units is set to an empty array', () => {
 			const preferredUnits = [ '%', 'px' ];
 			const availableUnits = [];
