@@ -13,7 +13,7 @@ import {
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
-import { addQueryArgs } from '@wordpress/url';
+import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
@@ -32,7 +32,6 @@ import {
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import { cleanForSlug } from '../utils/url';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 
 /**
