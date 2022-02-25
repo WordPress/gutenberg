@@ -207,21 +207,10 @@ export function useServerSideRender( props ) {
 		);
 	}
 
-	try {
-		// eslint-disable-next-line no-console
-		console.log( response );
-	} catch ( error ) {
-		// eslint-disable-next-line no-console
-		console.log( 'could not log response' );
-	}
-
 	return response;
 }
 
 export default function ServerSideRender( props ) {
-	return (
-		<RawHTML className={ props.className }>
-			{ useServerSideRender( props ) }
-		</RawHTML>
-	);
+	const renderedContent = useServerSideRender( props );
+	return <RawHTML className={ props.className }>{ renderedContent }</RawHTML>;
 }
