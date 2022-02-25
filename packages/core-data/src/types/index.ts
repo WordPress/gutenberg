@@ -48,7 +48,7 @@ export type {
 	WpTemplatePart,
 };
 
-export type EntityRecord< C extends Context > =
+export type CoreEntityRecord< C extends Context > =
 	| Attachment< C >
 	| Comment< C >
 	| MenuLocation< C >
@@ -69,4 +69,4 @@ export type EntityRecord< C extends Context > =
 	| WpTemplate< C >
 	| WpTemplatePart< C >;
 
-export type UpdatableEntityRecord = Updatable< EntityRecord< 'edit' > >;
+export * from './configure';

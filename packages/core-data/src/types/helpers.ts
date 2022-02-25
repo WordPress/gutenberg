@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { EntityRecord } from './index';
+import { CoreEntityRecord } from './index';
 
 export interface AvatarUrls {
 	/**
@@ -148,6 +148,6 @@ export interface RenderedText< C extends Context > {
  * // updatablePost.title is a string
  * ```
  */
-export type Updatable< T extends EntityRecord< 'edit' > > = {
+export type Updatable< T extends CoreEntityRecord< 'edit' > > = {
 	[ K in keyof T ]: T[ K ] extends RenderedText< any > ? string : T[ K ];
 };

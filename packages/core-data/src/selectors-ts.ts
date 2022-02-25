@@ -7,21 +7,24 @@ import { set, get } from 'lodash';
 /**
  * Internal dependencies
  */
-import type {
-	EntityRecordType,
-	NameOf,
-	KindOf,
-	Kind,
-	Name,
-	DefaultContextOf,
-	EntityQuery,
-	PrimaryKey,
-} from './entities';
 import { getNormalizedCommaSeparable } from './utils';
-import type { Context } from './types';
+import type {
+	Context,
+	EntityQuery,
+	KeyOf,
+	Kind,
+	KindOf,
+	Name,
+	NameOf,
+	RecordOf,
+	DefaultContextOf,
+} from './types';
+
+// Let's get rid of this import
+import type {} from './rememo';
 
 // Placeholder State type for now
-type State = any;
+export type State = any;
 
 /**
  * Returns the Entity's record object by key. Returns `null` if the value is not
@@ -38,17 +41,17 @@ type State = any;
  */
 export const getEntityRecord = createSelector(
 	function <
-		R extends EntityRecordType< K, N, C >,
+		R extends RecordOf< K, N >,
+		C extends Context = DefaultContextOf< R >,
 		K extends Kind = KindOf< R >,
-		N extends Name = NameOf< R >,
-		C extends Context = DefaultContextOf< K, N >
+		N extends Name = NameOf< R >
 	>(
 		state: State,
 		kind: K,
 		name: N,
-		key: PrimaryKey< R >,
+		key: KeyOf< R >,
 		query?: EntityQuery< C >
-	): R | null | undefined {
+	): RecordOf< K, N, C > | null | undefined {
 		const queriedState = get( state.entities.data, [
 			kind,
 			name,
@@ -79,18 +82,12 @@ export const getEntityRecord = createSelector(
 					set( filteredItem, field, value );
 				}
 			}
-			return filteredItem as R;
+			return filteredItem as RecordOf< K, N, C >;
 		}
 
 		return item;
 	},
-	(
-		state: State,
-		kind: Kind,
-		name: Name,
-		recordId: PrimaryKey,
-		query?: EntityQuery< any >
-	) => {
+	( state, kind, name, recordId, query? ) => {
 		const context = query?.context ?? 'default';
 		return [
 			get( state.entities.data, [
@@ -109,29 +106,27 @@ export const getEntityRecord = createSelector(
 				context,
 				recordId,
 			] ),
-		];
+		] as any;
 	}
 );
 
-/*
-const commentDefault = getEntityRecord( {}, 'root', 'comment', 15 );
-// commentDefault is Comment<'edit'>
-
-const commentView = getEntityRecord( {}, 'root', 'comment', 15, {
-	context: 'view',
-} );
-// commentView is Comment<'view'>
-
-const commentInvalidPK = getEntityRecord( {}, 'root', 'comment', '15' );
-// commentInvalidPK shows a TypeScript error
-
-const commentCustom = getEntityRecord<
-	Comment< 'view' >,
-	'root',
-	'comment',
-	'view'
->( {}, 'root', 'comment', 15, {
-	context: 'view',
-} );
-// commentCustom is Comment<'view'>
-*/
+// const commentDefault = getEntityRecord( {}, 'root', 'comment', 15 );
+// // commentDefault is Comment<'edit'>
+//
+// const commentView = getEntityRecord( {}, 'root', 'comment', 15, {
+// 	context: 'view',
+// } );
+// // commentView is Comment<'view'>
+//
+// const commentInvalidPK = getEntityRecord( {}, 'root', 'comment', '15' );
+// // commentInvalidPK shows a TypeScript error
+//
+// const commentCustom = getEntityRecord< Comment< 'view' >, 'view' >(
+// 	{},
+// 	'root',
+// 	'comment',
+// 	15,
+// 	{
+// 		context: 'view',
+// 	}
+// );
