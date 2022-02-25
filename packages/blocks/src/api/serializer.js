@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, startsWith, omit } from 'lodash';
+import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,17 +24,12 @@ import {
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
 } from './registration';
-import {
-	isUnmodifiedDefaultBlock,
-	normalizeBlockType,
-	__experimentalFilterBlockAttributes,
-} from './utils';
+import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
 
 /**
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
  *
  * @property {boolean} isInnerBlocks Whether we are serializing inner blocks.
- * @property {Object} __experimentalExcludeAttributes Attributes matching these filters will be excluded from the serialized block.
  */
 
 /**
@@ -347,10 +342,7 @@ export function getCommentDelimitedContent(
  *
  * @return {string} Serialized block.
  */
-export function serializeBlock(
-	block,
-	{ isInnerBlocks = false, __experimentalExcludeAttributes } = {}
-) {
+export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	const blockName = block.name;
 	const saveContent = getBlockInnerHTML( block );
 
@@ -362,16 +354,7 @@ export function serializeBlock(
 	}
 
 	const blockType = getBlockType( blockName );
-	let saveAttributes = getCommentAttributes( blockType, block.attributes );
-
-	if ( __experimentalExcludeAttributes ) {
-		saveAttributes = omit(
-			saveAttributes,
-			__experimentalFilterBlockAttributes( blockName, {
-				__experimentalSupports: __experimentalExcludeAttributes,
-			} )
-		);
-	}
+	const saveAttributes = getCommentAttributes( blockType, block.attributes );
 
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }

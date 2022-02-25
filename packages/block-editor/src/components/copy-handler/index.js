@@ -3,6 +3,7 @@
  */
 import { useCallback } from '@wordpress/element';
 import {
+	cloneBlock,
 	serialize,
 	pasteHandler,
 	store as blocksStore,
@@ -121,10 +122,15 @@ export function useClipboardHandler() {
 					flashBlock( selectedBlockClientIds[ 0 ] );
 				}
 				notifyCopy( event.type, selectedBlockClientIds );
-				const blocks = getBlocksByClientId( selectedBlockClientIds );
-				const serialized = serialize( blocks, {
-					__experimentalExcludeAttributes: { copy: event.type !== 'copy' },
-				} );
+				let blocks = getBlocksByClientId( selectedBlockClientIds );
+				if ( event.type === 'copy' ) {
+					blocks = blocks.map( ( block ) =>
+						cloneBlock( block, {}, null, {
+							__experimentalExcludeAttributes: { copy: false },
+						} )
+					);
+				}
+				const serialized = serialize( blocks );
 
 				event.clipboardData.setData( 'text/plain', serialized );
 				event.clipboardData.setData( 'text/html', serialized );
