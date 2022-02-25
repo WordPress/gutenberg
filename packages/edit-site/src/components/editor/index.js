@@ -28,7 +28,6 @@ import ErrorBoundary from '../error-boundary';
 import WelcomeGuide from '../welcome-guide';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from './global-styles-renderer';
-import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 import Layout from '../layout';
 import EditorActions from './actions';
@@ -137,38 +136,34 @@ function Editor( { onError } ) {
 				type={ templateType }
 				id={ entityId }
 			>
-				<GlobalStylesProvider>
-					<BlockContextProvider value={ blockContext }>
-						<GlobalStylesRenderer />
-						<ErrorBoundary onError={ onError }>
-							<KeyboardShortcuts.Register />
-							<SidebarComplementaryAreaFills />
-							<EditorNotices />
-							{ editorMode === 'visual' && template && (
-								<BlockEditor
-									setIsInserterOpen={ setIsInserterOpened }
-								/>
+				<BlockContextProvider value={ blockContext }>
+					<GlobalStylesRenderer />
+					<ErrorBoundary onError={ onError }>
+						<KeyboardShortcuts.Register />
+						<SidebarComplementaryAreaFills />
+						<EditorNotices />
+						{ editorMode === 'visual' && template && (
+							<BlockEditor
+								setIsInserterOpen={ setIsInserterOpened }
+							/>
+						) }
+						{ editorMode === 'text' && template && <CodeEditor /> }
+						{ templateResolved &&
+							! template &&
+							settings?.siteUrl &&
+							entityId && (
+								<Notice
+									status="warning"
+									isDismissible={ false }
+								>
+									{ __(
+										"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+									) }
+								</Notice>
 							) }
-							{ editorMode === 'text' && template && (
-								<CodeEditor />
-							) }
-							{ templateResolved &&
-								! template &&
-								settings?.siteUrl &&
-								entityId && (
-									<Notice
-										status="warning"
-										isDismissible={ false }
-									>
-										{ __(
-											"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-										) }
-									</Notice>
-								) }
-							<KeyboardShortcuts />
-						</ErrorBoundary>
-					</BlockContextProvider>
-				</GlobalStylesProvider>
+						<KeyboardShortcuts />
+					</ErrorBoundary>
+				</BlockContextProvider>
 			</EntityProvider>
 		</EntityProvider>
 	);

@@ -19,6 +19,7 @@ import { PluginArea } from '@wordpress/plugins';
  * Internal dependencies
  */
 import NavigationSidebar from '../navigation-sidebar';
+import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import { store as editSiteStore } from '../../store';
 
 function Layout( {
@@ -73,24 +74,26 @@ function Layout( {
 		<ShortcutProvider>
 			<SlotFillProvider>
 				<EntityProvider kind="root" type="site">
-					<UnsavedChangesWarning />
-					<InterfaceSkeleton
-						drawer={
-							<NavigationSidebar
-								isDefaultOpen={ isNavigationDefaultOpen }
-								activeTemplateType={ activeTemplateType }
-							/>
-						}
-						notices={ <EditorSnackbars /> }
-						shortcuts={ {
-							previous: previousShortcut,
-							next: nextShortcut,
-						} }
-						{ ...props }
-					/>
-					<Popover.Slot />
-					<PluginArea onError={ onPluginAreaError } />
-					{ children }
+					<GlobalStylesProvider>
+						<UnsavedChangesWarning />
+						<InterfaceSkeleton
+							drawer={
+								<NavigationSidebar
+									isDefaultOpen={ isNavigationDefaultOpen }
+									activeTemplateType={ activeTemplateType }
+								/>
+							}
+							notices={ <EditorSnackbars /> }
+							shortcuts={ {
+								previous: previousShortcut,
+								next: nextShortcut,
+							} }
+							{ ...props }
+						/>
+						<Popover.Slot />
+						<PluginArea onError={ onPluginAreaError } />
+						{ children }
+					</GlobalStylesProvider>
 				</EntityProvider>
 			</SlotFillProvider>
 		</ShortcutProvider>
