@@ -185,12 +185,12 @@ export function parseQuantityAndUnitFromRawValue(
 	allowedUnits: WPUnitControlUnit[] = ALL_CSS_UNITS
 ): [ number | undefined, string | undefined ] {
 	let trimmedValue;
-	let valueToReturn;
+	let quantityToReturn;
 
 	if ( typeof rawValue !== 'undefined' || rawValue === null ) {
 		trimmedValue = `${ rawValue }`.trim();
 		const parsedQuantity = parseFloat( trimmedValue );
-		valueToReturn =
+		quantityToReturn =
 			isNaN( parsedQuantity ) || ! isFinite( parsedQuantity )
 				? undefined
 				: parsedQuantity;
@@ -211,7 +211,7 @@ export function parseQuantityAndUnitFromRawValue(
 		unitToReturn = DEFAULT_UNIT.value;
 	}
 
-	return [ valueToReturn, unitToReturn ];
+	return [ quantityToReturn, unitToReturn ];
 }
 
 /**
