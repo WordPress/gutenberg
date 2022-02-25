@@ -24,7 +24,7 @@ export type WPUnitControlUnit = {
 	 */
 	label: string;
 	/**
-	 * Default value for the unit, used when switching units.
+	 * Default value (quantity) for the unit, used when switching units.
 	 */
 	default?: number;
 	/**
