@@ -52,6 +52,21 @@ export interface DataStores {}
 
 export interface Stores extends DataStores {}
 
+/**
+ * Returns a store config given a store name or an actual store config.
+ *
+ * Functions in the data registry typically accept either the name of
+ * a store, e.g. 'core/editor', or they accept the actual store
+ * configuration object, e.g. 'import { storeConfig } from '@wordpress/editor'`.
+ *
+ * This type is a convenience wrapper for turning that reference into
+ * an actual store regardless of what was passed.
+ *
+ * Warning! Will fail if given a name not already registered. In such a
+ * case add an ambient declaration for `@wordpress/data` with the store
+ * name and configuration so that it can merge into the catalog of
+ * registered stores.
+ */
 type Store<
 	StoreRef extends Stores[ keyof Stores ] | keyof Stores
 > = StoreRef extends AnyConfig
@@ -60,16 +75,39 @@ type Store<
 	? Stores[ StoreRef ]
 	: never;
 
+/**
+ * Removes the first argument from a function
+ *
+ * This is designed to remove the `state` parameter from
+ * registered selectors since that argument is supplied
+ * by the editor when calling `select(…)`.
+ *
+ * For functions with no arguments, which some selectors
+ * are free to define, returns the original function.
+ */
 type CurriedState< F > = F extends ( state: any, ...args: infer P ) => infer R
 	? ( ...args: P ) => R
 	: F;
 
+/**
+ * Returns a function whose return type is a Promise of the given return type.
+ *
+ * This is designed to take existing selectors and return a resolveSelector
+ * version of it which returns a Promise of the original return type. Promises
+ * flatten naturally and so if the original function already returned a Promise
+ * we can reuse the existing function type.
+ */
 type Resolvable<
 	F extends ( ...args: any[] ) => any
 > = ReturnType< F > extends Promise< any >
 	? F
 	: ( ...args: Parameters< F > ) => Promise< ReturnType< F > >;
 
+/**
+ * These fields are excluded from the resolveSelect mapping.
+ *
+ * @see mapResolveSelectors
+ */
 type NonResolveSelectFields =
 	| 'getIsResolving'
 	| 'hasStartedResolution'
