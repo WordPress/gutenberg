@@ -32,6 +32,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -257,6 +258,11 @@ export default function SearchEdit( {
 						type="button"
 						className={ buttonClasses }
 						style={ buttonStyles }
+						aria-label={
+							buttonText
+								? stripHTML( buttonText )
+								: __( 'Search' )
+						}
 					>
 						<Icon icon={ search } />
 					</button>
