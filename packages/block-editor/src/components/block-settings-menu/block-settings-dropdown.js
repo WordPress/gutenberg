@@ -111,10 +111,11 @@ export function BlockSettingsDropdown( {
 						previousBlockClientId || nextBlockClientId;
 
 					if (
-						// It's possible to remove a block which is not selected from block options,
-						// in this case, update selection only if currently selected block gets removed.
+						// From block options dropdown, it's possible to remove a block which is not selected,
+						// in this case, it's not necessary to update selection since selected wasn't removed.
 						selectedBlockClientIds.includes( firstBlockClientId ) &&
-						// Don't update selection if all blocks gets removed at once
+						// Don't update selection when next/prev block also is in selection and got removed,
+						// it's only possible when someone select all blocks and remove at once.
 						! selectedBlockClientIds.includes( blockToSelect ) &&
 						blockToSelect
 					) {
