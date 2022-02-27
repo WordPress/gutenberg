@@ -7,12 +7,6 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../store';
 
 const { clearTimeout, setTimeout } = window;
 
@@ -105,15 +99,12 @@ export function useDebouncedShowMovers( {
  * @param {Object}   props.ref                   Element reference.
  * @param {number}   [props.debounceTimeout=250] Debounce timeout in milliseconds.
  * @param {Function} [props.onChange=noop]       Callback function.
- * @param {string}   props.clientId              Block Client Id
  */
 export function useShowMoversGestures( {
-	clientId,
 	ref,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
 	onChange = noop,
 } ) {
-	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const [ isFocused, setIsFocused ] = useState( false );
 	const {
 		showMovers,
@@ -136,7 +127,7 @@ export function useShowMoversGestures( {
 		const handleOnFocus = () => {
 			if ( isFocusedWithin() ) {
 				setIsFocused( true );
-				toggleBlockHighlight( clientId, true );
+				onChange( true );
 				debouncedShowMovers();
 			}
 		};
@@ -144,7 +135,7 @@ export function useShowMoversGestures( {
 		const handleOnBlur = () => {
 			if ( ! isFocusedWithin() ) {
 				setIsFocused( false );
-				toggleBlockHighlight( clientId, false );
+				onChange( false );
 				debouncedHideMovers();
 			}
 		};
