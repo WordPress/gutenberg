@@ -111,17 +111,15 @@ export function BlockSettingsDropdown( {
 						previousBlockClientId || nextBlockClientId;
 
 					if (
-						// From block options dropdown, it's possible to remove a block which is not selected,
-						// in this case, it's not necessary to update selection since selected wasn't removed.
+						blockToSelect &&
+						// From the block options dropdown, it's possible to remove a block that is not selected,
+						// in this case, it's not necessary to update the selection since the selected block wasn't removed.
 						selectedBlockClientIds.includes( firstBlockClientId ) &&
-						// Don't update selection when next/prev block also is in selection and got removed,
-						// it's only possible when someone select all blocks and remove at once.
-						! selectedBlockClientIds.includes( blockToSelect ) &&
-						blockToSelect
+						// Don't update selection when next/prev block also is in the selection ( and gets removed ),
+						// it's only possible when someone selects all blocks and removes them at once.
+						! selectedBlockClientIds.includes( blockToSelect )
 					) {
-						__experimentalSelectBlock(
-							previousBlockClientId || nextBlockClientId
-						);
+						__experimentalSelectBlock( blockToSelect );
 					}
 			  }
 			: noop,

@@ -181,8 +181,8 @@ describe( 'List view', () => {
 	} );
 
 	/**
-	 * When all the blocks gets removed from the editor, it inserts a default paragraph block
-	 * make sure that paragraph block gets selected after removing blocks from ListView
+	 * When all the blocks gets removed from the editor, it inserts a default paragraph block;
+	 * make sure that paragraph block gets selected after removing blocks from ListView.
 	 */
 	it( 'should select default paragraph block after removing all blocks', async () => {
 		// Insert some blocks of different types.
