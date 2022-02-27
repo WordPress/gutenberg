@@ -38,7 +38,7 @@ export default function BoxUnitControl( {
 					isFirst={ isFirst }
 					isLast={ isLast }
 					isOnly={ isOnly }
-					isPressEnterToChange
+					isPressEnterToChange={ false }
 					isResetValueOnUnitChange={ false }
 					value={ value }
 					{ ...props }
