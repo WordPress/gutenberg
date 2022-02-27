@@ -15,6 +15,7 @@ import {
 	RangeControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalParseUnit as parseUnit,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -77,20 +78,26 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		return [ selectOption, ...taxonomyOptions ];
 	};
 
-	const onFontChange = ( fontSize, value ) => {
-		const parsedValue = parseFloat( value );
-		if ( isNaN( parsedValue ) && value ) return;
-
-		const newUnit = value.replace( /\d+/, '' );
-		if ( smallestFontSize.indexOf( newUnit ) === -1 ) {
-			const currentSize = parseFloat( smallestFontSize );
-			setAttributes( { smallestFontSize: currentSize + newUnit } );
+	const onFontSizeChange = ( fontSize, value ) => {
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const [ quantity, newUnit ] = parseUnit( value );
+		if ( ! Number.isFinite( quantity ) || quantity < 0 || quantity > 100 ) {
+			return;
 		}
-		if ( largestFontSize.indexOf( newUnit ) === -1 ) {
-			const currentSize = parseFloat( largestFontSize );
-			setAttributes( { largestFontSize: currentSize + newUnit } );
-		}
-		setAttributes( { [ fontSize ]: parsedValue < 0 ? '8pt' : value } );
+		const updateObj = { [ fontSize ]: value };
+		// We need to keep in sync the `unit` changes to both `smallestFontSize`
+		// and `largestFontSize` attributes.
+		Object.entries( {
+			smallestFontSize,
+			largestFontSize,
+		} ).forEach( ( [ attribute, currentValue ] ) => {
+			const [ _value, _unit ] = parseUnit( currentValue );
+			// Only add an update if the other font size attribute has a different unit.
+			if ( attribute !== fontSize && _unit !== newUnit ) {
+				updateObj[ attribute ] = `${ _value }${ newUnit }`;
+			}
+		} );
+		setAttributes( updateObj );
 	};
 
 	const inspectorControls = (
@@ -127,7 +134,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 							label={ __( 'Smallest size' ) }
 							value={ smallestFontSize }
 							onChange={ ( value ) => {
-								onFontChange( 'smallestFontSize', value );
+								onFontSizeChange( 'smallestFontSize', value );
 							} }
 							units={ units }
 						/>
@@ -137,7 +144,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 							label={ __( 'Largest size' ) }
 							value={ largestFontSize }
 							onChange={ ( value ) => {
-								onFontChange( 'largestFontSize', value );
+								onFontSizeChange( 'largestFontSize', value );
 							} }
 							units={ units }
 						/>
