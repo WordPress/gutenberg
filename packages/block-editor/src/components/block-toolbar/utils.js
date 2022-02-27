@@ -44,7 +44,6 @@ export function useDebouncedShowMovers( {
 
 	const shouldHideMovers = () => {
 		const isHovered = getIsHovered();
-
 		return ! isFocused && ! isHovered;
 	};
 
@@ -82,7 +81,13 @@ export function useDebouncedShowMovers( {
 		}, debounceTimeout );
 	};
 
-	useEffect( () => () => clearTimeoutRef(), [] );
+	useEffect(
+		() => () => {
+			handleOnChange( false );
+			clearTimeoutRef();
+		},
+		[]
+	);
 
 	return {
 		showMovers,
@@ -127,16 +132,12 @@ export function useShowMoversGestures( {
 		const handleOnFocus = () => {
 			if ( isFocusedWithin() ) {
 				setIsFocused( true );
-				onChange( true );
-				debouncedShowMovers();
 			}
 		};
 
 		const handleOnBlur = () => {
 			if ( ! isFocusedWithin() ) {
 				setIsFocused( false );
-				onChange( false );
-				debouncedHideMovers();
 			}
 		};
 
