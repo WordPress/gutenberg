@@ -21,6 +21,7 @@ import createThunkMiddleware from './thunk-middleware';
 import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
+import { ReduxStoreConfig, StoreDescriptor } from '../types';
 
 /** @typedef {import('../types').DataRegistry} DataRegistry */
 /** @typedef {import('../types').StoreDescriptor} StoreDescriptor */

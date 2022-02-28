@@ -32,6 +32,9 @@ import { createEmitter } from './utils/emitter';
  * @property {Function} select               Given a namespace key, returns an
  *                                           object of the  store's registered
  *                                           selectors.
+ * @property {Function} resolveSelect        Given a namespace key, returns an
+ *                                           object of the  store's registered
+ *                                           resolved selectors.
  * @property {Function} dispatch             Given a namespace key, returns an
  *                                           object of the store's registered
  *                                           action dispatchers.

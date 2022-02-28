@@ -59,10 +59,18 @@ type ActionCreatorsOf<
 	? { [ name in keyof ActionCreators ]: Function | Generator }
 	: never;
 
-type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
-	any,
-	any,
-	infer Selectors
->
-	? { [ name in keyof Selectors ]: Function }
+export type SelectorsOf<
+	Config extends AnyConfig
+> = Config extends ReduxStoreConfig< any, any, infer Selectors >
+	? { [ name in keyof Selectors ]: Selectors[ name ] }
+	: never;
+
+type OmitFirstArg< F > = F extends ( x: any, ...args: infer P ) => infer R
+	? ( ...args: P ) => R
+	: never;
+
+export type BoundSelectorsOf<
+	Config extends AnyConfig
+> = Config extends ReduxStoreConfig< any, any, infer Selectors >
+	? { [ name in keyof Selectors ]: OmitFirstArg< Selectors[ name ] > }
 	: never;
