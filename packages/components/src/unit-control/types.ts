@@ -73,6 +73,7 @@ export type UnitSelectControlProps = {
 	units?: WPUnitControlUnit[];
 };
 
+// TODO: when available, should (partially) extend `NumberControl` props.
 export type UnitControlProps = UnitSelectControlProps & {
 	__unstableStateReducer?: StateReducer;
 	__unstableInputWidth?: CSSProperties[ 'width' ];
