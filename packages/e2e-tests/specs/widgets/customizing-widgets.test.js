@@ -29,17 +29,13 @@ describe( 'Widgets Customizer', () => {
 			() =>
 				!! wp.data
 					.select( 'core/preferences' )
-					.isFeatureActive( 'core/customize-widgets', 'welcomeGuide' )
+					.get( 'core/customize-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
-			await page.evaluate(
-				() =>
-					!! wp.data
-						.dispatch( 'core/preferences' )
-						.toggleFeature(
-							'core/customize-widgets',
-							'welcomeGuide'
-						)
+			await page.evaluate( () =>
+				wp.data
+					.dispatch( 'core/preferences' )
+					.toggle( 'core/customize-widgets', 'welcomeGuide' )
 			);
 		}
 	} );
