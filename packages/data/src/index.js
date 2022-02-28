@@ -25,15 +25,9 @@ export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
-import { default as untypedCreateReduxStore } from './redux-store';
-import type { ReduxStoreConfig, StoreDescriptor } from './types';
+export { default as createReduxStore } from './redux-store';
+export { doSelect } from './types';
 
-export function createReduxStore< C extends ReduxStoreConfig< any, any, any > >(
-	key: string,
-	config: C
-): StoreDescriptor< C > {
-	return untypedCreateReduxStore( key, config );
-}
 /**
  * Object of available plugins to use with a registry.
  *

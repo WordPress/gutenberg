@@ -24,6 +24,7 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"types": "src/types.js",
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
