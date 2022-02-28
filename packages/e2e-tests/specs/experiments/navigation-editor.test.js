@@ -185,6 +185,20 @@ async function openMenuActionsDropdown() {
 	await menuActionsDropdown.click();
 }
 
+async function getMenuItem( menuItemName ) {
+	return await page
+		.waitForXPath(
+			`//*[@role="group"]//*[@role="menuitemradio"]/span[text()="${ menuItemName }"]`
+		)
+		.catch( ( error ) => {
+			if ( error.name !== 'TimeoutError' ) {
+				throw error;
+			} else {
+				return null;
+			}
+		} );
+}
+
 describe.skip( 'Navigation editor', () => {
 	useExperimentalFeatures( [ '#gutenberg-navigation' ] );
 
@@ -793,28 +807,10 @@ describe.skip( 'Navigation editor', () => {
 
 				// Confirm both test menus are present
 				openMenuActionsDropdown();
-				const firstTestMenuItem = await page
-					.waitForXPath(
-						`//*[@role="group"]//*[@role="menuitemradio"]/span[text()="${ menuName }"]`
-					)
-					.catch( ( error ) => {
-						if ( error.name !== 'TimeoutError' ) {
-							throw error;
-						} else {
-							return null;
-						}
-					} );
-				const secondTestMenuItem = await page
-					.waitForXPath(
-						`//*[@role="group"]//*[@role="menuitemradio"]/span[text()="${ menuName } 2"]`
-					)
-					.catch( ( error ) => {
-						if ( error.name !== 'TimeoutError' ) {
-							throw error;
-						} else {
-							return null;
-						}
-					} );
+				const firstTestMenuItem = await getMenuItem( menuName );
+				const secondTestMenuItem = await getMenuItem(
+					`${ menuName } 2`
+				);
 
 				expect( firstTestMenuItem ).not.toBeNull();
 				expect( secondTestMenuItem ).not.toBeNull();
@@ -835,17 +831,7 @@ describe.skip( 'Navigation editor', () => {
 				);
 
 				openMenuActionsDropdown();
-				const deletedTestMenuItem = await page
-					.waitForXPath(
-						`//*[@role="group"]//*[@role="menuitemradio"]/span[text()="${ menuName }"]`
-					)
-					.catch( ( error ) => {
-						if ( error.name !== 'TimeoutError' ) {
-							throw error;
-						} else {
-							return null;
-						}
-					} );
+				const deletedTestMenuItem = await getMenuItem( menuName );
 				expect( deletedTestMenuItem ).toBeNull();
 			}
 		);
