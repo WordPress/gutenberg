@@ -89,13 +89,14 @@ export interface EntityInterface< C extends Context > {
 }
 
 /**
- * An interface that may be extended to add types for custom Entity types. Each entry
- * must be a union of types adhering to the EntityInterface type.
+ * An interface that may be extended to add types for new entities. Each entry
+ * must be a union of entity definitions adhering to the EntityInterface type.
  *
  * Example:
  *
  * ```ts
  * import type { Context } from '@wordpress/core-data';
+ * // ...
  *
  * interface Order {
  *   id: number;
@@ -109,15 +110,12 @@ export interface EntityInterface< C extends Context > {
  *   recordType: Order;
  * }
  *
- * // ...
- *
  * declare module '@wordpress/core-data' {
  *     export interface PerPackageEntities< C extends Context > {
  *         myPlugin: OrderEntity | ClientEntity
  *     }
  * }
  *
- * import type { Comment } from '@wordpress/core-data';
  * const c = getEntityRecord( 'myPlugin', 'order', 15 );
  * // c is of the type Order
  * ```
@@ -127,7 +125,7 @@ export class PerPackageEntities< C extends Context > {
 }
 
 /**
- * A union of all registered entities.
+ * A union of all the registered entities.
  */
 type Entity<
 	C extends Context = any
