@@ -631,6 +631,7 @@ describe( 'Writing Flow', () => {
 
 		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
 
 		// Confirm correct setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -666,8 +667,6 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
 		await page.keyboard.press( 'Enter' );
-		// Move into the placeholder UI.
-		await page.keyboard.press( 'ArrowDown' );
 		// Tab to the "Create table" button.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );

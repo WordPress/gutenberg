@@ -280,7 +280,7 @@ exports[`Writing Flow should not prematurely multi-select 1`] = `
 
 exports[`Writing Flow should only consider the content as one tab stop 1`] = `
 "<!-- wp:table -->
-<figure class=\\"wp-block-table\\"><table><tbody><tr><td></td></tr><tr><td>2</td></tr></tbody></table></figure>
+<figure class=\\"wp-block-table\\"><table><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
 <!-- /wp:table -->"
 `;
 
