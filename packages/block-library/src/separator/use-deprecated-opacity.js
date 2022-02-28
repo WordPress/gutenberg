@@ -24,6 +24,10 @@ export default function useDeprecatedOpacity(
 		}
 	}, [ currentColor, previousColor, opacity ] );
 
+	// For deprecated blocks, that have a default 0.4 css opacity set, we
+	// need to remove this if the current color is changed, or a color is added.
+	// In these instances the opacity attribute is set back to the default of
+	// alpha-channel which allows a new custom opacity to be set via the color picker.
 	useEffect( () => {
 		if (
 			opacity === 'css' &&
