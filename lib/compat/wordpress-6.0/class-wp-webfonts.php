@@ -267,7 +267,7 @@ class WP_Webfonts {
 			// Bail out if the provider class does not exist.
 			if ( ! class_exists( $provider_class ) ) {
 				/* translators: %s is the provider name. */
-				error_log( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider ) );
+				error_log( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider_id ) );
 				continue;
 			}
 
