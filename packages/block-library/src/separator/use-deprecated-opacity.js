@@ -11,13 +11,16 @@ export default function useDeprecatedOpacity(
 ) {
 	const [
 		deprecatedOpacityWithNoColor,
-		setSeprecatedOpacityWithNoColor,
+		setDeprecatedOpacityWithNoColor,
 	] = useState( false );
 	const previousColor = usePrevious( currentColor );
 
+	// A separator with no color set will always have previousColor set to undefined,
+	// and we need to differentiate these from those with color set that will return
+	// previousColor as undefined on the first render.
 	useEffect( () => {
 		if ( opacity === 'css' && ! currentColor && ! previousColor ) {
-			setSeprecatedOpacityWithNoColor( true );
+			setDeprecatedOpacityWithNoColor( true );
 		}
 	}, [ currentColor, previousColor, opacity ] );
 
@@ -28,7 +31,7 @@ export default function useDeprecatedOpacity(
 				( previousColor && currentColor !== previousColor ) )
 		) {
 			setAttributes( { opacity: 'alpha-channel' } );
-			setSeprecatedOpacityWithNoColor( false );
+			setDeprecatedOpacityWithNoColor( false );
 		}
 	}, [ deprecatedOpacityWithNoColor, currentColor, previousColor ] );
 }
