@@ -5,12 +5,6 @@
 		height: auto;
 	}
 
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 0;
-
 	.components-resizable-box__container {
 		margin-bottom: 1em;
 	}
@@ -29,16 +23,19 @@
 		left: 0;
 	}
 
+	// This is an extra container present only in the editor view.
 	.wp-block-file__content-wrapper {
-		flex-grow: 1;
+		display: flex;
+		flex: 1;
 	}
 
+	// Apply a min-width to the text-editable link.
 	a {
-		min-width: 1em;
+		min-width: 1em !important;
 	}
 
+	// This element maps to the Download button link on the right.
 	.wp-block-file__button-richtext-wrapper {
-		display: inline-block;
-		margin-left: 0.75em;
+		margin-left: auto;
 	}
 }

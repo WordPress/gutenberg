@@ -1,5 +1,9 @@
 .wp-block-file {
-	margin-bottom: 1.5em;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1em;
 
 	&.aligncenter {
 		text-align: center;
@@ -15,28 +19,6 @@
 	}
 
 	.wp-block-file__button {
-		background: #32373c;
-		border-radius: 2em;
-		color: $white;
-		font-size: 0.8em;
-		padding: 0.5em 1em;
-	}
-
-	a.wp-block-file__button {
-		text-decoration: none;
-
-		&:hover,
-		&:visited,
-		&:focus,
-		&:active {
-			box-shadow: none;
-			color: $white;
-			opacity: 0.85;
-			text-decoration: none;
-		}
-	}
-
-	* + .wp-block-file__button {
-		margin-left: 0.75em;
+		margin-left: auto;
 	}
 }
