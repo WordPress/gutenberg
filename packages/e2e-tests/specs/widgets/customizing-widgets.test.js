@@ -25,16 +25,17 @@ describe( 'Widgets Customizer', () => {
 		await visitAdminPage( 'customize.php' );
 
 		// Disable welcome guide if it is enabled.
-		const isWelcomeGuideActive = await page.evaluate( () =>
-			wp.data
-				.select( 'core/interface' )
-				.isFeatureActive( 'core/customize-widgets', 'welcomeGuide' )
+		const isWelcomeGuideActive = await page.evaluate(
+			() =>
+				!! wp.data
+					.select( 'core/preferences' )
+					.get( 'core/customize-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
-					.dispatch( 'core/interface' )
-					.toggleFeature( 'core/customize-widgets', 'welcomeGuide' )
+					.dispatch( 'core/preferences' )
+					.toggle( 'core/customize-widgets', 'welcomeGuide' )
 			);
 		}
 	} );
