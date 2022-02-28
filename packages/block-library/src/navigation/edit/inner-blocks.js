@@ -95,7 +95,10 @@ export default function NavigationInnerBlocks( {
 		isSelected ||
 		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants );
 
-	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
+	const placeholder = useMemo(
+		() => <PlaceholderPreview isVisible={ true } />,
+		[]
+	);
 
 	const hasMenuItems = !! blocks?.length;
 
