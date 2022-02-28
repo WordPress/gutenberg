@@ -75,7 +75,7 @@ export default function NavigationPlaceholder( {
 				 }
 				<PlaceholderPreview isVisible={ ! isSelected } />
 				<div
-					aria-hidden={ ! isSelected }
+					aria-hidden={ ! isSelected ? true : undefined }
 					className="wp-block-navigation-placeholder__controls"
 				>
 					<div className="wp-block-navigation-placeholder__actions">
