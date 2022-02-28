@@ -3,10 +3,10 @@
  */
 import { Context, ContextualField, OmitNevers } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface Taxonomy< C extends Context > {
 			/**
 			 * All capabilities used by the taxonomy.
@@ -88,5 +88,5 @@ declare module './base-entity-types' {
 }
 
 export type Taxonomy< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Taxonomy< C >
+	_BaseEntityRecords.Taxonomy< C >
 >;

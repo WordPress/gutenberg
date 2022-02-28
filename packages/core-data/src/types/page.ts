@@ -11,10 +11,10 @@ import {
 	OmitNevers,
 } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface Page< C extends Context > {
 			/**
 			 * The date the post was published, in the site's timezone.
@@ -140,5 +140,5 @@ declare module './base-entity-types' {
 }
 
 export type Page< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Page< C >
+	_BaseEntityRecords.Page< C >
 >;

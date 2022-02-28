@@ -3,10 +3,10 @@
  */
 import { AvatarUrls, Context, ContextualField, OmitNevers } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface User< C extends Context > {
 			/**
 			 * Unique identifier for the user.
@@ -105,5 +105,5 @@ declare module './base-entity-types' {
 }
 
 export type User< C extends Context > = OmitNevers<
-	_BaseEntityTypes.User< C >
+	_BaseEntityRecords.User< C >
 >;

@@ -3,10 +3,10 @@
  */
 import { Context, ContextualField, RenderedText, OmitNevers } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface Plugin< C extends Context > {
 			/**
 			 * The plugin file.
@@ -70,5 +70,5 @@ declare module './base-entity-types' {
 
 export type PluginStatus = 'active' | 'inactive';
 export type Plugin< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Plugin< C >
+	_BaseEntityRecords.Plugin< C >
 >;

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { CoreEntityRecord } from './index';
+import { EntityRecord } from './index';
 
 export interface AvatarUrls {
 	/**
@@ -148,6 +148,35 @@ export interface RenderedText< C extends Context > {
  * // updatablePost.title is a string
  * ```
  */
-export type Updatable< T extends CoreEntityRecord< 'edit' > > = {
+export type Updatable< T extends EntityRecord< 'edit' > > = {
 	[ K in keyof T ]: T[ K ] extends RenderedText< any > ? string : T[ K ];
+};
+
+/**
+ * TODO Docstring
+ */
+export type EntityFromConfig<
+	E extends {
+		kind: string;
+		name: string;
+		key?: string;
+		baseURLParams?: EntityQuery< any >;
+	},
+	R
+> = {
+	kind: E[ 'kind' ];
+	name: E[ 'name' ];
+	recordType: R;
+	key: E[ 'key' ] extends string ? E[ 'key' ] : 'id';
+	defaultContext: E[ 'baseURLParams' ] extends EntityQuery< infer C >
+		? C
+		: 'view';
+};
+
+/**
+ * TODO Docstring
+ */
+export type EntityQuery< C extends Context > = {
+	[ key: string ]: string;
+	context?: C;
 };

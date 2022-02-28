@@ -3,10 +3,10 @@
  */
 import { Context, OmitNevers } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface WidgetType< C extends Context > {
 			/**
 			 * Unique slug identifying the widget type.
@@ -33,5 +33,5 @@ declare module './base-entity-types' {
 }
 
 export type WidgetType< C extends Context > = OmitNevers<
-	_BaseEntityTypes.WidgetType< C >
+	_BaseEntityRecords.WidgetType< C >
 >;

@@ -3,10 +3,10 @@
  */
 import { CommentingStatus, Context, OmitNevers, PingStatus } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface Settings< C extends Context > {
 			/**
 			 * What to show on the front page
@@ -89,5 +89,5 @@ declare module './base-entity-types' {
 }
 
 export type Settings< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Settings< C >
+	_BaseEntityRecords.Settings< C >
 >;
