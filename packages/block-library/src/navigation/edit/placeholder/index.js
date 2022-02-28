@@ -48,11 +48,11 @@ export default function NavigationPlaceholder( {
 		}
 
 		if ( isResolvingMenus ) {
-			speak( __( 'Loading Navigation block setup options.' ), 'polite' );
+			speak( __( 'Loading Navigation block setup options.' ) );
 		}
 
 		if ( hasResolvedMenus ) {
-			speak( __( 'Navigation block setup options ready.' ), 'polite' );
+			speak( __( 'Navigation block setup options ready.' ) );
 		}
 	}, [ isResolvingMenus, isSelected ] );
 
