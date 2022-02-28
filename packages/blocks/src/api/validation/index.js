@@ -432,18 +432,6 @@ export function isEqualTagAttributePairs(
 	expected,
 	logger = createLogger()
 ) {
-	// Attributes is tokenized as tuples. Their lengths should match. This also
-	// avoids us needing to check both attributes sets, since if A has any keys
-	// which do not exist in B, we know the sets to be different.
-	if ( actual.length !== expected.length ) {
-		logger.warning(
-			'Expected attributes %o, instead saw %o.',
-			expected,
-			actual
-		);
-		return false;
-	}
-
 	// Attributes are not guaranteed to occur in the same order. For validating
 	// actual attributes, first convert the set of expected attribute values to
 	// an object, for lookup by key.
@@ -451,6 +439,44 @@ export function isEqualTagAttributePairs(
 	for ( let i = 0; i < expected.length; i++ ) {
 		expectedAttributes[ expected[ i ][ 0 ].toLowerCase() ] =
 			expected[ i ][ 1 ];
+	}
+
+	const expectedLen = expected.length;
+	const actualLen = actual.length;
+
+	// Attributes is tokenized as tuples. Their lengths should match. This also
+	// avoids us needing to check both attributes sets, since if A has any keys
+	// which do not exist in B, we know the sets to be different.
+	if ( expectedLen !== actualLen ) {
+		// The `rel` attribute mismatches when someone uses the `target` attribute
+		// in the anchor tag without rel='noopener'. WordPress core injects the `rel`
+		// attribute for security purposes that causes block validation fails.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/39051
+		// See also: https://github.com/WordPress/WordPress/blob/2ae4784ca0aa4ba0e8e87d9c7c1c22f26b214701/wp-includes/formatting.php#L3236-L3288
+		if ( actualLen === expectedLen + 1 ) {
+			const missingRelAttr = actual.find(
+				( attr ) =>
+					! expectedAttributes.hasOwnProperty(
+						attr[ 0 ]?.toLowerCase()
+					) && 'rel' === attr[ 0 ]
+			);
+
+			if ( missingRelAttr && 'rel' === missingRelAttr[ 0 ] ) {
+				logger.warning(
+					'All anchor tags with the `target` attribute must have a `rel` attribute of value `%s` in the `save` function.',
+					missingRelAttr[ 1 ]
+				);
+				return false;
+			}
+		}
+
+		logger.warning(
+			'Expected attributes %o, instead saw %o.',
+			expected,
+			actual
+		);
+		return false;
 	}
 
 	for ( let i = 0; i < actual.length; i++ ) {
