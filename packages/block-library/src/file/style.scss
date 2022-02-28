@@ -4,6 +4,24 @@
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 1em;
+	box-sizing: border-box;
+
+	// Basic styles meant to be easily overridden by block supports and theme.json.
+	border: 1px solid;
+	padding: 0.5em;
+
+	// Link/text.
+	> a {
+		flex: 1;
+	}
+
+	// Separate download button.
+	.wp-block-file__button {
+		margin-left: auto;
+		text-decoration: none;
+		color: currentColor;
+		flex-grow: 0;
+	}
 
 	&.aligncenter {
 		text-align: center;
@@ -16,9 +34,5 @@
 
 	.wp-block-file__embed {
 		margin-bottom: 1em;
-	}
-
-	.wp-block-file__button {
-		margin-left: auto;
 	}
 }

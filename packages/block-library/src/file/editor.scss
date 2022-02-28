@@ -27,15 +27,23 @@
 	.wp-block-file__content-wrapper {
 		display: flex;
 		flex: 1;
+		align-items: center;
 	}
 
-	// Apply a min-width to the text-editable link.
+	// This is the editable filename on the left.
+	// Make sure it matches the styling on the frontend.
+	// Except for flex-grow, it is useful to have an easily selectable block.
 	a {
-		min-width: 1em !important;
+		min-width: 2em !important;
 	}
 
 	// This element maps to the Download button link on the right.
 	.wp-block-file__button-richtext-wrapper {
 		margin-left: auto;
+	}
+
+	// The file block already has a border, so don't show the extra border of the placceholder.
+	.components-placeholder.components-placeholder {
+		box-shadow: none;
 	}
 }
