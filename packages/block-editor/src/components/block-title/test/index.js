@@ -106,7 +106,7 @@ describe( 'BlockTitle', () => {
 		expect( wrapper.text() ).toBe( 'Test Label' );
 	} );
 
-	it( 'truncates the label if it is too long', () => {
+	it( 'truncates the label at the default value if it is too long', () => {
 		useSelect.mockImplementation( () => ( {
 			name: 'name-with-long-label',
 			attributes: null,
@@ -114,6 +114,38 @@ describe( 'BlockTitle', () => {
 
 		const wrapper = shallow(
 			<BlockTitle clientId="id-name-with-long-label" />
+		);
+
+		expect( wrapper.text() ).toBe( 'This is a longer label than typi...' );
+	} );
+
+	it( 'truncates the label if it is too long with custom truncate length', () => {
+		useSelect.mockImplementation( () => ( {
+			name: 'name-with-long-label',
+			attributes: null,
+		} ) );
+
+		const wrapper = shallow(
+			<BlockTitle
+				clientId="id-name-with-long-label"
+				maximumLength={ 12 }
+			/>
+		);
+
+		expect( wrapper.text() ).toBe( 'This is a...' );
+	} );
+
+	it( 'truncates the label at the default value if maximum length is not a number', () => {
+		useSelect.mockImplementation( () => ( {
+			name: 'name-with-long-label',
+			attributes: null,
+		} ) );
+
+		const wrapper = shallow(
+			<BlockTitle
+				clientId="id-name-with-long-label"
+				maximumLength={ false }
+			/>
 		);
 
 		expect( wrapper.text() ).toBe( 'This is a longer label than typi...' );
