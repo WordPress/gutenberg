@@ -99,7 +99,7 @@ export default function NavigationInnerBlocks( {
 
 	const hasMenuItems = !! blocks?.length;
 
-	// If here is a `ref` attribute pointing to a `wp_navigation` but
+	// If there is a `ref` attribute pointing to a `wp_navigation` but
 	// that menu has no **items** (i.e. empty) then show a placeholder.
 	// The block must also be selected else the placeholder will display
 	// alongside the appender.
