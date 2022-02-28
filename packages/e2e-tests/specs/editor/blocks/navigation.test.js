@@ -271,11 +271,14 @@ describe( 'Navigation', () => {
 			const codeEditorInput = await page.waitForSelector(
 				'.editor-post-text-editor'
 			);
+
+			// Simulate block behaviour when loading a page containing an unconfigured Nav block.
 			await codeEditorInput.click();
 			const markup = '<!-- wp:navigation /-->';
 			await page.keyboard.type( markup );
 			await clickButton( 'Exit code editor' );
 
+			// Wait for block to render...
 			const navBlock = await waitForBlock( 'Navigation' );
 
 			// Test specifically for the primary loading indicator because a spinner also exists
@@ -284,6 +287,7 @@ describe( 'Navigation', () => {
 				'.wp-block-navigation__loading-indicator.components-spinner'
 			);
 
+			// We should not see the loading state if the block has not been configured and is empty.
 			expect( loadingSpinner ).toBeNull();
 		} );
 
