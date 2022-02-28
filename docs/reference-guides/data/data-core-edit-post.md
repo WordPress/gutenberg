@@ -490,7 +490,11 @@ _Returns_
 
 ### switchEditorMode
 
-Undocumented declaration.
+Triggers an action used to switch editor mode.
+
+_Parameters_
+
+-   _mode_ `string`: The editor mode.
 
 ### toggleEditorPanelEnabled
 

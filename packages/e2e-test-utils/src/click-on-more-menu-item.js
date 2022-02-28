@@ -14,7 +14,7 @@ import { toggleMoreMenu } from './toggle-more-menu';
 
 const SELECTORS = {
 	postEditorMenuContainer:
-		'//*[contains(concat(" ", @class, " "), " edit-post-more-menu__content ")]',
+		'//*[contains(concat(" ", @class, " "), " interface-more-menu__content ")]',
 	siteEditorMenuContainer:
 		'//*[contains(concat(" ", @class, " "), " edit-site-more-menu__content ")]',
 };

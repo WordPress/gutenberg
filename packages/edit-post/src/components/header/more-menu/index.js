@@ -4,8 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import { MenuGroup } from '@wordpress/components';
 import {
-	ActionItem,
 	MoreMenuDropdown,
+	ActionItem,
 	PinnedItems,
 } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
@@ -18,17 +18,11 @@ import PreferencesMenuItem from '../preferences-menu-item';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import WritingMenu from '../writing-menu';
 
-const POPOVER_PROPS = {
-	className: 'edit-post-more-menu__content',
-};
-
 const MoreMenu = ( { showIconLabels } ) => {
 	const isLargeViewport = useViewportMatch( 'large' );
 
 	return (
 		<MoreMenuDropdown
-			className="edit-post-more-menu"
-			popoverProps={ POPOVER_PROPS }
 			toggleProps={ {
 				showTooltip: ! showIconLabels,
 				...( showIconLabels && { variant: 'tertiary' } ),
