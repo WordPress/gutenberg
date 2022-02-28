@@ -9,25 +9,25 @@ import classnames from 'classnames';
 import { getColorClassName, useBlockProps } from '@wordpress/block-editor';
 
 export default function separatorSave( { attributes } ) {
-	const { color, customColor } = attributes;
+	const { backgroundColor, style, opacity } = attributes;
+	const customColor = style?.color?.background;
 
 	// The hr support changing color using border-color, since border-color
 	// is not yet supported in the color palette, we use background-color.
-	const backgroundClass = getColorClassName( 'background-color', color );
+
 	// The dots styles uses text for the dots, to change those dots color is
 	// using color, not backgroundColor.
-	const colorClass = getColorClassName( 'color', color );
+	const colorClass = getColorClassName( 'color', backgroundColor );
 
 	const className = classnames( {
-		'has-text-color has-background': color || customColor,
-		[ backgroundClass ]: backgroundClass,
+		'has-text-color': backgroundColor || customColor,
 		[ colorClass ]: colorClass,
+		'has-css-opacity': opacity === 'css',
+		'has-alpha-channel-opacity': opacity === 'alpha-channel',
 	} );
 
-	const style = {
-		backgroundColor: backgroundClass ? undefined : customColor,
+	const styles = {
 		color: colorClass ? undefined : customColor,
 	};
-
-	return <hr { ...useBlockProps.save( { className, style } ) } />;
+	return <hr { ...useBlockProps.save( { className, style: styles } ) } />;
 }

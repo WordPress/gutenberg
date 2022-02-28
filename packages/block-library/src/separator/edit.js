@@ -1,36 +1,17 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { HorizontalRule } from '@wordpress/components';
-import { withColors, useBlockProps } from '@wordpress/block-editor';
-/**
- * Internal dependencies
- */
-import SeparatorSettings from './separator-settings';
+import { useBlockProps } from '@wordpress/block-editor';
 
-function SeparatorEdit( { color, setColor, className } ) {
+export default function SeparatorEdit( { className } ) {
 	return (
 		<>
 			<HorizontalRule
 				{ ...useBlockProps( {
-					className: classnames( className, {
-						'has-background': color.color,
-						[ color.class ]: color.class,
-					} ),
-					style: {
-						backgroundColor: color.color,
-						color: color.color,
-					},
+					className,
 				} ) }
 			/>
-			<SeparatorSettings color={ color } setColor={ setColor } />
 		</>
 	);
 }
-
-export default withColors( 'color', { textColor: 'color' } )( SeparatorEdit );

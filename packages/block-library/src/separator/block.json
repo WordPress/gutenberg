@@ -17,7 +17,11 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": [ "center", "wide", "full" ]
+		"align": [ "center", "wide", "full" ],
+		"color": {
+			"gradients": true,
+			"text": false
+		}
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },
