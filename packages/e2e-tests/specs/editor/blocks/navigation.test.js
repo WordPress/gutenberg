@@ -292,10 +292,14 @@ describe( 'Navigation', () => {
 		} );
 
 		it( 'shows a loading indicator whilst ref resolves to Navigation post items', async () => {
-			let resolveNavigationRequest;
-
 			const testNavId = 1;
 
+			let resolveNavigationRequest;
+
+			// Mock the request for the single Navigation post in order to fully
+			// control the resolution of the request. This will enable the ability
+			// to assert on how the UI responds during the API resolution without
+			// relying on variable factors such as network conditions.
 			await setUpResponseMocking( [
 				{
 					match: ( request ) =>
@@ -303,7 +307,11 @@ describe( 'Navigation', () => {
 						request.url().includes( `navigation` ) &&
 						request.url().includes( testNavId ),
 					onRequestMatch: () => {
+						// The Promise simulates a REST API request whose resolultion
+						// the test has full control over.
 						return new Promise( ( resolve ) => {
+							// Assign the resolution function to the var in the
+							// upper scope to afford control over resolution.
 							resolveNavigationRequest = resolve;
 						} );
 					},
@@ -316,6 +324,9 @@ describe( 'Navigation', () => {
 				'.editor-post-text-editor'
 			);
 			await codeEditorInput.click();
+
+			// The ID used in this `ref` is that which we mock in the request
+			// above to ensure we can control the resolution of the Navigation post.
 			const markup = `<!-- wp:navigation {"ref":${ testNavId }} /-->`;
 			await page.keyboard.type( markup );
 			await clickButton( 'Exit code editor' );
@@ -325,7 +336,7 @@ describe( 'Navigation', () => {
 			// Check for the spinner to be present whilst loading.
 			await navBlock.waitForSelector( '.components-spinner' );
 
-			// Resolve the mocked API request.
+			// Resolve the controlled mocked API request.
 			resolveNavigationRequest();
 		} );
 	} );
