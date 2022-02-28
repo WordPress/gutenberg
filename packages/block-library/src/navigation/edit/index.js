@@ -172,8 +172,7 @@ function Navigation( {
 			// introduce a selector like `getUncontrolledInnerBlocks`, just in
 			// case `getBlock` is fixed.
 			const _uncontrolledInnerBlocks = getBlock( clientId ).innerBlocks;
-			const _hasUncontrolledInnerBlocks =
-				_uncontrolledInnerBlocks?.length;
+			const _hasUncontrolledInnerBlocks = !! _uncontrolledInnerBlocks?.length;
 			const _controlledInnerBlocks = _hasUncontrolledInnerBlocks
 				? EMPTY_ARRAY
 				: getBlocks( clientId );
@@ -185,7 +184,7 @@ function Navigation( {
 				hasSubmenus: !! innerBlocks.find(
 					( block ) => block.name === 'core/navigation-submenu'
 				),
-				hasUncontrolledInnerBlocks: !! _hasUncontrolledInnerBlocks,
+				hasUncontrolledInnerBlocks: _hasUncontrolledInnerBlocks,
 				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
