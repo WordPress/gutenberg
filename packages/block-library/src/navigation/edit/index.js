@@ -296,11 +296,11 @@ function Navigation( {
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
 	// "placeholder" shown if:
+	// - we don't have a ref attribute pointing to a Navigation Post.
 	// - we don't have uncontrolled blocks.
 	// - (legacy) we have a Navigation Area without a ref attribute pointing to a Navigation Post.
-	// - we don't have a ref attribute pointing to a Navigation Post.
 	const isPlaceholderShown =
-		!! ( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea ) && ! ref;
+		! ref && ( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
 
 	// "loading" state:
 	// - there is a ref attribute pointing to a Navigation Post
