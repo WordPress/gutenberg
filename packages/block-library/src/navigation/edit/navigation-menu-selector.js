@@ -4,6 +4,7 @@
 import {
 	MenuGroup,
 	MenuItem,
+	MenuItemsChoice,
 	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -41,13 +42,6 @@ export default function NavigationMenuSelector( {
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
-	// Avoid showing any currently active menu in the list of
-	// menus that can be selected.
-	const navigationMenusOmitCurrent =
-		navigationMenus?.filter(
-			( menu ) => ! currentMenuId || menu.id !== currentMenuId
-		) || [];
-
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
 	const onFinishMenuCreation = async (
@@ -69,7 +63,7 @@ export default function NavigationMenuSelector( {
 		onFinishMenuCreation
 	);
 
-	const hasNavigationMenus = !! navigationMenusOmitCurrent?.length;
+	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
 	const showNavigationMenus = !! canSwitchNavigationMenu;
 	const showClassicMenus = !! canUserCreateNavigationMenu;
@@ -99,26 +93,32 @@ export default function NavigationMenuSelector( {
 				<>
 					{ showNavigationMenus && hasNavigationMenus && (
 						<MenuGroup label={ __( 'Menus' ) }>
-							{ navigationMenusOmitCurrent?.map( ( menu ) => {
-								const label = decodeEntities(
-									menu.title.rendered
-								);
-								return (
-									<MenuItem
-										onClick={ () => {
-											onClose();
-											onSelect( menu );
-										} }
-										key={ menu.id }
-										aria-label={ sprintf(
-											actionLabel,
-											label
-										) }
-									>
-										{ label }
-									</MenuItem>
-								);
-							} ) }
+							<MenuItemsChoice
+								value={ currentMenuId }
+								onSelect={ ( selectedId ) => {
+									onClose();
+									onSelect(
+										navigationMenus.find(
+											( post ) => post.id === selectedId
+										)
+									);
+								} }
+								choices={ navigationMenus.map(
+									( { id, title } ) => {
+										const label = decodeEntities(
+											title.rendered
+										);
+										return {
+											value: id,
+											label,
+											ariaLabel: sprintf(
+												actionLabel,
+												label
+											),
+										};
+									}
+								) }
+							/>
 						</MenuGroup>
 					) }
 					{ showClassicMenus && hasClassicMenus && (
