@@ -126,9 +126,11 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should persist cleared value when focus changes', () => {
-			const { container } = render( <BoxControl /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
+			render( <BoxControl /> );
+			const input = screen.getByLabelText( 'Box Control', {
+				selector: 'input',
+			} );
+			const unitSelect = screen.getByLabelText( 'Select unit' );
 
 			input.focus();
 			fireEvent.change( input, { target: { value: '100%' } } );
