@@ -122,7 +122,7 @@ function compileElementsStyles( selector, elements = {} ) {
 	return map( elements, ( styles, element ) => {
 		const elementStyles = getInlineStyles( styles );
 		if ( ! isEmpty( elementStyles ) ) {
-			// The .editor-styles-wrapper selctor is required on elements styles. As it is
+			// The .editor-styles-wrapper selector is required on elements styles. As it is
 			// added to all other editor styles, not providing it causes reset and global
 			// styles to override element styles because of higher specificity.
 			return [
