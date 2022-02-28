@@ -51,7 +51,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
-		$style = '';
 		if ( $content_size || $wide_size ) {
 			$style  = "$selector > :where(:not(.alignleft):not(.alignright)) {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
