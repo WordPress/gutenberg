@@ -3,6 +3,7 @@
  */
 import {
 	render,
+	screen,
 	fireEvent,
 	waitForElementToBeRemoved,
 } from '@testing-library/react';
@@ -37,7 +38,7 @@ describe( 'Confirm', () => {
 			it( 'should render correctly with custom button lables', () => {
 				const cancelButtonText = 'No thanks';
 				const confirmButtonText = 'Yes please!';
-				const wrapper = render(
+				render(
 					<ConfirmDialog
 						onConfirm={ noop }
 						onCancel={ noop }
@@ -48,7 +49,7 @@ describe( 'Confirm', () => {
 					</ConfirmDialog>
 				);
 
-				const dialog = wrapper.getByRole( 'dialog' );
+				const dialog = screen.getByRole( 'dialog' );
 				const elementsTexts = [
 					'Are you sure?',
 					confirmButtonText,
@@ -58,7 +59,7 @@ describe( 'Confirm', () => {
 				expect( dialog ).toBeInTheDocument();
 
 				elementsTexts.forEach( ( txt ) => {
-					const el = wrapper.getByText( txt );
+					const el = screen.getByText( txt );
 					expect( el ).toBeInTheDocument();
 				} );
 			} );
