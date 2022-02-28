@@ -10,8 +10,8 @@ export type DialogInputEvent =
 type BaseProps = {
 	children: ReactNode;
 	onConfirm: ( event: DialogInputEvent ) => void;
-	confirmButtonText: string;
-	cancelButtonText: string;
+	confirmButtonText?: string;
+	cancelButtonText?: string;
 };
 
 type ControlledProps = BaseProps & {
