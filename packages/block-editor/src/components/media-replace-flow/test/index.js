@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import { render, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import MediaReplaceFlow from '../';
+
+const noop = () => {};
 
 function setUpMediaReplaceFlow() {
 	const { container } = render(
