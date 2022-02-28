@@ -15,7 +15,7 @@
  *
  * @access private
  */
-class WP_Theme_JSON_Resolver_Gutenberg {
+class WP_Theme_JSON_Resolver_5_9 {
 
 	/**
 	 * Container for data coming from core.

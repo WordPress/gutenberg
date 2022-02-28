@@ -84,7 +84,7 @@ require __DIR__ . '/compat/wordpress-5.9/theme-templates.php';
 require __DIR__ . '/editor-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-5-9.php';
-require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-5-9.php';
 require __DIR__ . '/compat/wordpress-5.9/theme.php';
 require __DIR__ . '/compat/wordpress-5.9/admin-menu.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
@@ -101,6 +101,12 @@ require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
+require __DIR__ . '/compat/wordpress-6.0/register-webfonts-from-theme-json.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-gutenberg.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider-local.php';
+require __DIR__ . '/compat/wordpress-6.0/webfonts.php';
 require __DIR__ . '/compat/experimental/blocks.php';
 
 require __DIR__ . '/blocks.php';
