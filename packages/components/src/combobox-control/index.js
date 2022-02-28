@@ -3,6 +3,8 @@
  */
 import classnames from 'classnames';
 import { noop, deburr } from 'lodash';
+import runes from 'runes';
+
 /**
  * WordPress dependencies
  */
@@ -54,6 +56,7 @@ function ComboboxControl( {
 	messages = {
 		selected: __( 'Item selected.' ),
 	},
+	fuzzyMatch = false,
 } ) {
 	const currentOption = options.find( ( option ) => option.value === value );
 	const currentLabel = currentOption?.label ?? '';
@@ -67,6 +70,12 @@ function ComboboxControl( {
 	const inputContainer = useRef();
 
 	const matchingSuggestions = useMemo( () => {
+		if ( fuzzyMatch ) {
+			return options.filter( ( option ) =>
+				isFuzzyMatch( inputValue, option.label )
+			);
+		}
+
 		const startsWithMatch = [];
 		const containsMatch = [];
 		const match = deburr( inputValue.toLocaleLowerCase() );
@@ -82,7 +91,7 @@ function ComboboxControl( {
 		} );
 
 		return startsWithMatch.concat( containsMatch );
-	}, [ inputValue, options, value ] );
+	}, [ inputValue, options, value, fuzzyMatch ] );
 
 	const onSuggestionSelected = ( newSelectedSuggestion ) => {
 		onChange( newSelectedSuggestion.value );
@@ -260,6 +269,7 @@ function ComboboxControl( {
 						<SuggestionsList
 							instanceId={ instanceId }
 							match={ { label: inputValue } }
+							fuzzyMatch={ fuzzyMatch }
 							displayTransform={ ( suggestion ) =>
 								suggestion.label
 							}
@@ -280,3 +290,34 @@ function ComboboxControl( {
 }
 
 export default ComboboxControl;
+
+function isFuzzyMatch( needle, haystack ) {
+	const nrunes = runes( needle.toLocaleLowerCase() ).map( deburr );
+	const nlen = nrunes.length;
+	const hrunes = runes( haystack.toLocaleLowerCase() ).map( deburr );
+	const hlen = hrunes.length;
+
+	if ( nlen > hlen ) {
+		return false;
+	}
+
+	if ( nlen === hlen ) {
+		return nrunes.join( '' ) === hrunes.join( '' );
+	}
+
+	outer: for ( let n = 0, h = 0; n < nlen; n++ ) {
+		if ( nrunes[ n ] === ' ' ) {
+			continue;
+		}
+
+		while ( h < hlen ) {
+			if ( hrunes[ h++ ].indexOf( nrunes[ n ] ) >= 0 ) {
+				continue outer;
+			}
+		}
+
+		return false;
+	}
+
+	return true;
+}

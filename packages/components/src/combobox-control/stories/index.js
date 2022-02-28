@@ -266,7 +266,7 @@ const mapCountryOption = ( country ) => ( {
 
 const countryOptions = countries.map( mapCountryOption );
 
-function CountryCodeComboboxControl( { allowReset } ) {
+function CountryCodeComboboxControl( { allowReset, fuzzyMatch } ) {
 	const [ value, setValue ] = useState( null );
 
 	return (
@@ -277,12 +277,50 @@ function CountryCodeComboboxControl( { allowReset } ) {
 				label="Select a country"
 				options={ countryOptions }
 				allowReset={ allowReset }
+				fuzzyMatch={ fuzzyMatch }
 			/>
 			<p>Value: { value }</p>
 		</>
 	);
 }
-export const _default = CountryCodeComboboxControl.bind( {} );
+const runeOptions = [
+	{ value: 'arabic', label: 'ځڂڃڄڅچڇڈ' },
+	{ value: 'chinese', label: '𨭎 𩷶' },
+	{ value: 'grapheme clusters', label: 'ม้าลายหกตั' },
+	{ value: 'grapheme clusters 2', label: 'நகரத்தில்' },
+	{ value: 'diacritics', label: 'abco͝oņęą̈' },
+	{ value: 'skin tones', label: '🎅🏻🎅🏼🎅🏽🎅🏾🎅🏿' },
+	{ value: 'zero width joins', label: '🧑‍🦳abc👨‍👩‍👧mno👨‍👨‍👧‍👧xyz🧑‍🦱' },
+	{ value: 'flags', label: '🇦🇸🏳️‍🌈' },
+];
+
+function RuneFilledComboboxControl( { allowReset, fuzzyMatch } ) {
+	const [ value, setValue ] = useState( null );
+
+	return (
+		<>
+			<ComboboxControl
+				value={ value }
+				onChange={ setValue }
+				label="Select a rune"
+				options={ runeOptions }
+				allowReset={ allowReset }
+				fuzzyMatch={ fuzzyMatch }
+			/>
+			<p>Value: { value }</p>
+		</>
+	);
+}
+
+export const _default = ( props ) => (
+	<>
+		<CountryCodeComboboxControl { ...props } />
+		<RuneFilledComboboxControl { ...props } />
+	</>
+);
 _default.args = {
 	allowReset: false,
+	fuzzyMatch: false,
 };
+
+// export const _default = CountryCodeComboboxControl.bind( {} );

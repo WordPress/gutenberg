@@ -1,9 +1,10 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, deburr } from 'lodash';
 import scrollView from 'dom-scroll-into-view';
 import classnames from 'classnames';
+import runes from 'runes';
 
 /**
  * WordPress dependencies
@@ -28,6 +29,7 @@ function SuggestionsList( {
 	displayTransform,
 	instanceId,
 	setTimeout,
+	fuzzyMatch = false,
 } ) {
 	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
 
@@ -66,7 +68,14 @@ function SuggestionsList( {
 		};
 	};
 
-	const computeSuggestionMatch = ( suggestion ) => {
+	const renderMatchText = ( suggestion ) => {
+		if ( fuzzyMatch ) {
+			return renderFuzzyMatchText(
+				displayTransform( match || '' ),
+				displayTransform( suggestion )
+			);
+		}
+
 		const matchText = displayTransform( match || '' ).toLocaleLowerCase();
 		if ( matchText.length === 0 ) {
 			return null;
@@ -77,16 +86,18 @@ function SuggestionsList( {
 			.toLocaleLowerCase()
 			.indexOf( matchText );
 
-		return {
-			suggestionBeforeMatch: suggestion.substring( 0, indexOfMatch ),
-			suggestionMatch: suggestion.substring(
-				indexOfMatch,
-				indexOfMatch + matchText.length
-			),
-			suggestionAfterMatch: suggestion.substring(
-				indexOfMatch + matchText.length
-			),
-		};
+		return (
+			<>
+				{ suggestion.substring( 0, indexOfMatch ) }
+				<strong className="components-form-token-field__suggestion-match">
+					{ suggestion.substring(
+						indexOfMatch,
+						indexOfMatch + matchText.length
+					) }
+				</strong>
+				{ suggestion.substring( indexOfMatch + matchText.length ) }
+			</>
+		);
 	};
 
 	// We set `tabIndex` here because otherwise Firefox sets focus on this
@@ -101,7 +112,8 @@ function SuggestionsList( {
 			role="listbox"
 		>
 			{ map( suggestions, ( suggestion, index ) => {
-				const matchText = computeSuggestionMatch( suggestion );
+				const suggestionText = displayTransform( suggestion );
+				const matchText = renderMatchText( suggestion );
 				const className = classnames(
 					'components-form-token-field__suggestion',
 					{
@@ -118,7 +130,7 @@ function SuggestionsList( {
 						key={
 							suggestion?.value
 								? suggestion.value
-								: displayTransform( suggestion )
+								: suggestionText
 						}
 						onMouseDown={ handleMouseDown }
 						onClick={ handleClick( suggestion ) }
@@ -126,15 +138,11 @@ function SuggestionsList( {
 						aria-selected={ index === selectedIndex }
 					>
 						{ matchText ? (
-							<span aria-label={ displayTransform( suggestion ) }>
-								{ matchText.suggestionBeforeMatch }
-								<strong className="components-form-token-field__suggestion-match">
-									{ matchText.suggestionMatch }
-								</strong>
-								{ matchText.suggestionAfterMatch }
+							<span aria-label={ suggestionText }>
+								{ matchText }
 							</span>
 						) : (
-							displayTransform( suggestion )
+							suggestionText
 						) }
 					</li>
 				);
@@ -142,6 +150,51 @@ function SuggestionsList( {
 			} ) }
 		</ul>
 	);
+}
+
+function renderFuzzyMatchText( needle = '', haystack = '' ) {
+	const nrunes = runes( needle.toLocaleLowerCase() ).map( deburr );
+	const nlen = nrunes.length;
+
+	if ( nlen === 0 ) {
+		return haystack;
+	}
+
+	const hrunes = runes( haystack.toLocaleLowerCase() ).map( deburr );
+	const hlen = hrunes.length;
+
+	if ( nlen === hlen && nrunes.join( '' ) === hrunes.join( '' ) ) {
+		return <u>{ haystack }</u>;
+	}
+
+	const hrunesRaw = runes( haystack );
+
+	const result = [];
+	let h = 0;
+	outer: for ( let n = 0; n < nlen; n++ ) {
+		const nrune = nrunes[ n ];
+
+		if ( nrune === ' ' ) {
+			continue;
+		}
+
+		while ( h < hlen ) {
+			const hruneRaw = hrunesRaw[ h ];
+			const hrune = hrunes[ h ];
+			h++;
+			if ( hrune.indexOf( nrune ) >= 0 ) {
+				result.push( <u key={ `${ n }:${ h }` }>{ hruneRaw }</u> );
+				continue outer;
+			}
+			result.push( hruneRaw );
+		}
+	}
+
+	if ( h < hlen ) {
+		result.push( hrunesRaw.slice( h ) );
+	}
+
+	return result;
 }
 
 export default withSafeTimeout( SuggestionsList );
