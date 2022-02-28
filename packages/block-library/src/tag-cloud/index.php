@@ -15,7 +15,7 @@
 function render_block_core_tag_cloud( $attributes ) {
 	$args      = array(
 		'echo'       => false,
-		'unit'       => preg_replace( '/\d+/', '', $attributes['smallestFontSize'] ),
+		'unit'       => preg_replace( '/^\d*\.?\d*/', '', $attributes['smallestFontSize'] ),
 		'taxonomy'   => $attributes['taxonomy'],
 		'show_count' => $attributes['showTagCounts'],
 		'number'     => $attributes['numberOfTags'],
