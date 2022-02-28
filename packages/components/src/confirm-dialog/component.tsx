@@ -77,8 +77,8 @@ function ConfirmDialog(
 		[ handleEvent, onConfirm ]
 	);
 
-	const cancelLabel = cancelButtonText ? cancelButtonText : __( 'Cancel' );
-	const confirmLabel = confirmButtonText ? confirmButtonText : __( 'OK' );
+	const cancelLabel = cancelButtonText ?? __( 'Cancel' );
+	const confirmLabel = confirmButtonText ?? : __( 'OK' );
 
 	return (
 		<>
