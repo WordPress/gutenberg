@@ -8,10 +8,7 @@
 	"keywords": [ "horizontal-line", "hr", "divider" ],
 	"textdomain": "default",
 	"attributes": {
-		"color": {
-			"type": "string"
-		},
-		"customColor": {
+		"opacity": {
 			"type": "string"
 		}
 	},
@@ -20,6 +17,7 @@
 		"align": [ "center", "wide", "full" ],
 		"color": {
 			"gradients": true,
+			"background": true,
 			"text": false
 		}
 	},

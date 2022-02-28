@@ -49,6 +49,7 @@ const v1 = {
 		return {
 			...omit( attributes, [ 'color', 'customColor' ] ),
 			backgroundColor: color ? color : undefined,
+			opacity: color ? 'default' : undefined,
 			style: customColor
 				? { color: { background: customColor } }
 				: undefined,

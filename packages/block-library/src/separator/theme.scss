@@ -3,11 +3,14 @@
 	border-bottom: 2px solid currentColor;
 	margin-left: auto;
 	margin-right: auto;
-	opacity: 0.4;
 
 	// V2 of the block can set opacity via the backgroundColor
 	// alpha channel so reset the default opacity.
-	&.has-alpha-channel {
+	&.has-default-opacity {
+		opacity: 0.4;
+	}
+
+	&:not(.has-default-opacity) {
 		opacity: initial;
 	}
 
