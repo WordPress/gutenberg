@@ -5,7 +5,7 @@
 const SELECTORS = {
 	postEditorMenuContent: '.interface-more-menu-dropdown__content',
 	siteEditorMenuContent: '.edit-site-more-menu__content',
-	postEditorMenu: '.interface-more-menu [aria-label="Options"]',
+	postEditorMenu: '.interface-more-menu-dropdown [aria-label="Options"]',
 	siteEditorMenu: '.edit-site-more-menu [aria-label="More tools & options"]',
 };
 
