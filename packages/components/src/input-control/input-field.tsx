@@ -159,7 +159,7 @@ function InputField(
 				break;
 
 			case ESCAPE:
-				if ( isPressEnterToChange ) {
+				if ( isPressEnterToChange && isDirty ) {
 					event.preventDefault();
 					reset( valueProp, event );
 				}
