@@ -14,11 +14,6 @@
  * This provider builds an optimized `src` (for browser support)
  * and then generates the `@font-face` styles.
  *
- * When enqueued styles are rendered, the Controller passes its
- * 'local' webfonts {@see WP_Webfonts_Provider::set_setfonts()}
- * and then triggers {@see WP_Webfonts_Provider_Local::get_css()}
- * the processing to transform them into `@font-face` styles.
- *
  * All know-how (business logic) for how to interact with and
  * generate styles from locally-hosted font files is contained
  * in this provider.
