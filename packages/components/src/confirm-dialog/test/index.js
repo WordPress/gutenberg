@@ -50,16 +50,15 @@ describe( 'Confirm', () => {
 				);
 
 				const dialog = screen.getByRole( 'dialog' );
-				const elementsTexts = [
-					'Are you sure?',
-					confirmButtonText,
-					cancelButtonText,
-				];
+				const elementsTexts = [ confirmButtonText, cancelButtonText ];
 
 				expect( dialog ).toBeInTheDocument();
+				expect(
+					screen.getByText( 'Are you sure?' )
+				).toBeInTheDocument();
 
 				elementsTexts.forEach( ( txt ) => {
-					const el = screen.getByText( txt );
+					const el = screen.getByRole( 'button', { name: txt } );
 					expect( el ).toBeInTheDocument();
 				} );
 			} );
