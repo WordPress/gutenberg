@@ -195,7 +195,8 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 
 		foreach ( $webfont as $key => $value ) {
 
-			// Skip "provider".
+			// Skip "provider", since it's for internal API use,
+			// and not a valid CSS property.
 			if ( 'provider' === $key ) {
 				continue;
 			}
