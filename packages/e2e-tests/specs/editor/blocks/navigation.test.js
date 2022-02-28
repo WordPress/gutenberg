@@ -326,111 +326,117 @@ describe( 'Navigation', () => {
 		} );
 	} );
 
-	describe( 'placeholder states', () => {
-		it( 'shows placeholder on insertion of block', async () => {
-			await createNewPost();
-			await insertBlock( 'Navigation' );
-			await page.waitForXPath( START_EMPTY_XPATH );
+	describe( 'Placeholder', () => {
+		describe( 'placeholder states', () => {
+			it( 'shows placeholder on insertion of block', async () => {
+				await createNewPost();
+				await insertBlock( 'Navigation' );
+				await page.waitForXPath( START_EMPTY_XPATH );
+			} );
+
+			it( 'shows placeholder preview when unconfigured block is not selected', async () => {
+				await createNewPost();
+				await insertBlock( 'Navigation' );
+
+				// Check for unconfigured Placeholder state to display
+				await page.waitForXPath( START_EMPTY_XPATH );
+
+				// Deselect the Nav block.
+				await page.keyboard.press( 'Escape' );
+				await page.keyboard.press( 'Escape' );
+
+				const navBlock = await waitForBlock( 'Navigation' );
+
+				// Check Placeholder Preview is visible.
+				await navBlock.waitForSelector(
+					'.wp-block-navigation-placeholder__preview',
+					{ visible: true }
+				);
+
+				// Check Placeholder Component itself is not visible.
+				await navBlock.waitForSelector(
+					'.wp-block-navigation-placeholder__controls',
+					{ visible: false }
+				);
+			} );
+
+			it( 'shows placeholder preview when block with no menu items is not selected', async () => {
+				await createNewPost();
+				await insertBlock( 'Navigation' );
+
+				// Create empty Navigation block with no items
+				const startEmptyButton = await page.waitForXPath(
+					START_EMPTY_XPATH
+				);
+				await startEmptyButton.click();
+
+				const navBlock = await waitForBlock( 'Navigation' );
+
+				// Deselect the Nav block.
+				await page.keyboard.press( 'Escape' );
+				await page.keyboard.press( 'Escape' );
+
+				// Check Placeholder Preview is visible.
+				await navBlock.waitForSelector(
+					'.wp-block-navigation-placeholder__preview',
+					{ visible: true }
+				);
+
+				// Check the block's appender is not visible.
+				const blockAppender = await navBlock.$(
+					'.block-list-appender'
+				);
+
+				expect( blockAppender ).toBeNull();
+			} );
 		} );
 
-		it( 'shows placeholder preview when unconfigured block is not selected', async () => {
-			await createNewPost();
-			await insertBlock( 'Navigation' );
+		describe( 'placeholder actions', () => {
+			it( 'allows a navigation block to be created from existing menus', async () => {
+				await createClassicMenu( { name: 'Test Menu 1' } );
+				await createClassicMenu(
+					{ name: 'Test Menu 2' },
+					menuItemsFixture
+				);
 
-			// Check for unconfigured Placeholder state to display
-			await page.waitForXPath( START_EMPTY_XPATH );
+				await createNewPost();
+				await insertBlock( 'Navigation' );
+				await selectClassicMenu( 'Test Menu 2' );
 
-			// Deselect the Nav block.
-			await page.keyboard.press( 'Escape' );
-			await page.keyboard.press( 'Escape' );
+				// Wait for a navigation link block before making assertion.
+				await page.waitForSelector(
+					'*[aria-label="Block: Custom Link"]'
+				);
+				expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+			} );
 
-			const navBlock = await waitForBlock( 'Navigation' );
+			it( 'creates an empty navigation block when the selected existing menu is also empty', async () => {
+				await createClassicMenu( { name: 'Test Menu 1' } );
+				await createNewPost();
+				await insertBlock( 'Navigation' );
+				await selectClassicMenu( 'Test Menu 1' );
 
-			// Check Placeholder Preview is visible.
-			await navBlock.waitForSelector(
-				'.wp-block-navigation-placeholder__preview',
-				{ visible: true }
-			);
+				// Wait for the appender so that we know the navigation menu was created.
+				await page.waitForSelector(
+					'nav[aria-label="Block: Navigation"] button[aria-label="Add block"]'
+				);
+				expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+			} );
 
-			// Check Placeholder Component itself is not visible.
-			await navBlock.waitForSelector(
-				'.wp-block-navigation-placeholder__controls',
-				{ visible: false }
-			);
-		} );
+			it( 'does not display the options to create from existing menus if there are no existing menus', async () => {
+				await createNewPost();
 
-		it( 'shows placeholder preview when block with no menu items is not selected', async () => {
-			await createNewPost();
-			await insertBlock( 'Navigation' );
+				await insertBlock( 'Navigation' );
+				await page.waitForXPath( START_EMPTY_XPATH );
 
-			// Create empty Navigation block with no items
-			const startEmptyButton = await page.waitForXPath(
-				START_EMPTY_XPATH
-			);
-			await startEmptyButton.click();
+				const placeholderActionsLength = await page.$$eval(
+					`.${ PLACEHOLDER_ACTIONS_CLASS } button`,
+					( els ) => els.length
+				);
 
-			const navBlock = await waitForBlock( 'Navigation' );
-
-			// Deselect the Nav block.
-			await page.keyboard.press( 'Escape' );
-			await page.keyboard.press( 'Escape' );
-
-			// Check Placeholder Preview is visible.
-			await navBlock.waitForSelector(
-				'.wp-block-navigation-placeholder__preview',
-				{ visible: true }
-			);
-
-			// Check the block's appender is not visible.
-			const blockAppender = await navBlock.$( '.block-list-appender' );
-
-			expect( blockAppender ).toBeNull();
-		} );
-	} );
-
-	describe( 'placeholder actions', () => {
-		it( 'allows a navigation block to be created from existing menus', async () => {
-			await createClassicMenu( { name: 'Test Menu 1' } );
-			await createClassicMenu(
-				{ name: 'Test Menu 2' },
-				menuItemsFixture
-			);
-
-			await createNewPost();
-			await insertBlock( 'Navigation' );
-			await selectClassicMenu( 'Test Menu 2' );
-
-			// Wait for a navigation link block before making assertion.
-			await page.waitForSelector( '*[aria-label="Block: Custom Link"]' );
-			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
-		} );
-
-		it( 'creates an empty navigation block when the selected existing menu is also empty', async () => {
-			await createClassicMenu( { name: 'Test Menu 1' } );
-			await createNewPost();
-			await insertBlock( 'Navigation' );
-			await selectClassicMenu( 'Test Menu 1' );
-
-			// Wait for the appender so that we know the navigation menu was created.
-			await page.waitForSelector(
-				'nav[aria-label="Block: Navigation"] button[aria-label="Add block"]'
-			);
-			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
-		} );
-
-		it( 'does not display the options to create from existing menus if there are no existing menus', async () => {
-			await createNewPost();
-
-			await insertBlock( 'Navigation' );
-			await page.waitForXPath( START_EMPTY_XPATH );
-
-			const placeholderActionsLength = await page.$$eval(
-				`.${ PLACEHOLDER_ACTIONS_CLASS } button`,
-				( els ) => els.length
-			);
-
-			// Should only be showing "Start empty".
-			expect( placeholderActionsLength ).toEqual( 1 );
+				// Should only be showing "Start empty".
+				expect( placeholderActionsLength ).toEqual( 1 );
+			} );
 		} );
 	} );
 
