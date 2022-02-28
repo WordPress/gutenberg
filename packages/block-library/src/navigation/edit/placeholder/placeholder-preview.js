@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Icon, navigation } from '@wordpress/icons';
@@ -13,9 +8,7 @@ const PlaceholderPreview = ( { isVisible } ) => {
 	return (
 		<div
 			aria-hidden={ ! isVisible }
-			className={ classnames(
-				'wp-block-navigation-placeholder__preview'
-			) }
+			className="wp-block-navigation-placeholder__preview"
 		>
 			<div className="wp-block-navigation-placeholder__actions__indicator">
 				<Icon icon={ navigation } />
