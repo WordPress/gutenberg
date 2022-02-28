@@ -27,8 +27,8 @@ export const MAXIMUM_TITLE_LENGTH = 35;
  *
  * @example
  *
- * ```jsx
- * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+ * ```js
+ * useBlockDisplayTitle( 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1', 17 );
  * ```
  *
  * @param {string} clientId Client ID of block.
