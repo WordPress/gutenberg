@@ -17,51 +17,30 @@ import type {
 	Name,
 	NameOf,
 	RecordOf,
-	Entity,
 	DefaultContextOf,
 } from './types';
 
 // Placeholder State type for now
 export type State = {
 	entities: {
-		data: KindState;
-	};
-};
-
-type KindState = {
-	[ K in Kind ]?: NameState< K >;
-};
-type NameState< K extends Kind > = {
-	[ N in Extract< Entity, { kind: K } >[ 'name' ] ]?: {
-		queriedData: QueriedState< K, N >;
-	};
-};
-interface QueriedState< K extends Kind, N extends Name > {
-	items: {
-		[ C in Context ]?: ContextState< K, N, C >;
-	};
-}
-type ContextState< K extends Kind, N extends Name, C extends Context > = Record<
-	KeyOf< RecordOf< K, N, C > > & ( string | number ),
-	RecordOf< K, N, C >
->;
-
-const z: State = {
-	entities: {
 		data: {
-			root: {
-				comment: {
+			[ K in Kind ]?: {
+				[ N in Name ]?: {
 					queriedData: {
 						items: {
-							view: {
-								12: {},
-							},
-						},
-					},
-				},
-			},
-		},
-	},
+							[ C in Context ]?: Record< string | number, any >;
+						};
+						itemIsComplete: {
+							[ C in Context ]?: Record<
+								string | number,
+								boolean
+							>;
+						};
+					};
+				};
+			};
+		};
+	};
 };
 
 /**
@@ -88,7 +67,7 @@ export const getEntityRecord = createSelector(
 		state: State,
 		kind: K,
 		name: N,
-		key: KeyOf< R >,
+		key: KeyOf< R > & ( string | number ),
 		query?: Q
 	):
 		| ( Q[ '_fields' ] extends string[]
@@ -96,15 +75,11 @@ export const getEntityRecord = createSelector(
 				: RecordOf< K, N, C > )
 		| null
 		| undefined {
-		const queriedState = get( state.entities.data, [
-			kind,
-			name,
-			'queriedData',
-		] );
+		const queriedState = state.entities.data[ kind ]?.[ name ]?.queriedData;
 		if ( ! queriedState ) {
 			return undefined;
 		}
-		const context = query?.context ?? 'default';
+		const context = 'view'; // query?.context ?? 'default';
 
 		if ( query === undefined ) {
 			// If expecting a complete item, validate that completeness.
@@ -112,7 +87,7 @@ export const getEntityRecord = createSelector(
 				return undefined;
 			}
 
-			return queriedState.items[ context ][ key ];
+			return queriedState.items[ context ]?.[ key ];
 		}
 
 		const item = queriedState.items[ context ]?.[ key ];
