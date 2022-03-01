@@ -295,6 +295,8 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
+	const TagName = 'nav';
+
 	// "placeholder" shown if:
 	// - we don't have a ref attribute pointing to a Navigation Post.
 	// - we don't have uncontrolled blocks.
@@ -407,7 +409,7 @@ function Navigation( {
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 	if ( hasUnsavedBlocks ) {
 		return (
-			<nav { ...blockProps }>
+			<TagName { ...blockProps }>
 				<ResponsiveWrapper
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
@@ -434,7 +436,7 @@ function Navigation( {
 						} }
 					/>
 				</ResponsiveWrapper>
-			</nav>
+			</TagName>
 		);
 	}
 
@@ -476,17 +478,9 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	if ( isLoading ) {
-		return (
-			<nav { ...blockProps }>
-				<Spinner className="wp-block-navigation__loading-indicator" />
-			</nav>
-		);
-	}
-
 	if ( isPlaceholderShown ) {
 		return (
-			<nav { ...blockProps }>
+			<TagName { ...blockProps }>
 				<PlaceholderComponent
 					isSelected={ isSelected }
 					currentMenuId={ ref }
@@ -502,7 +496,7 @@ function Navigation( {
 						selectBlock( clientId );
 					} }
 				/>
-			</nav>
+			</TagName>
 		);
 	}
 
@@ -678,31 +672,40 @@ function Navigation( {
 							) }
 					</InspectorControls>
 				) }
-				<nav { ...blockProps }>
-					{ ! isPlaceholderShown && (
-						<ResponsiveWrapper
-							id={ clientId }
-							onToggle={ setResponsiveMenuVisibility }
-							label={ __( 'Menu' ) }
-							hasIcon={ hasIcon }
-							isOpen={ isResponsiveMenuOpen }
-							isResponsive={ isResponsive }
-							isHiddenByDefault={ 'always' === overlayMenu }
-							classNames={ overlayClassnames }
-							styles={ overlayStyles }
-						>
-							{ isEntityAvailable && (
-								<NavigationInnerBlocks
-									clientId={ clientId }
-									hasCustomPlaceholder={
-										!! CustomPlaceholder
-									}
-									orientation={ orientation }
-								/>
-							) }
-						</ResponsiveWrapper>
-					) }
-				</nav>
+
+				{ isLoading && (
+					<TagName { ...blockProps }>
+						<Spinner className="wp-block-navigation__loading-indicator" />
+					</TagName>
+				) }
+
+				{ ! isLoading && ! isPlaceholderShown && (
+					<TagName { ...blockProps }>
+						{ ! isPlaceholderShown && (
+							<ResponsiveWrapper
+								id={ clientId }
+								onToggle={ setResponsiveMenuVisibility }
+								label={ __( 'Menu' ) }
+								hasIcon={ hasIcon }
+								isOpen={ isResponsiveMenuOpen }
+								isResponsive={ isResponsive }
+								isHiddenByDefault={ 'always' === overlayMenu }
+								classNames={ overlayClassnames }
+								styles={ overlayStyles }
+							>
+								{ isEntityAvailable && (
+									<NavigationInnerBlocks
+										clientId={ clientId }
+										hasCustomPlaceholder={
+											!! CustomPlaceholder
+										}
+										orientation={ orientation }
+									/>
+								) }
+							</ResponsiveWrapper>
+						) }
+					</TagName>
+				) }
 			</RecursionProvider>
 		</EntityProvider>
 	);
