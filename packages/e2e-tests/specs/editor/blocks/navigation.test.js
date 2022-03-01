@@ -272,7 +272,8 @@ describe( 'Navigation', () => {
 				'.editor-post-text-editor'
 			);
 
-			// Simulate block behaviour when loading a page containing an unconfigured Nav block.
+			// Simulate block behaviour when loading a page containing an unconfigured Nav block
+			// that is not selected.
 			await codeEditorInput.click();
 			const markup = '<!-- wp:navigation /-->';
 			await page.keyboard.type( markup );
