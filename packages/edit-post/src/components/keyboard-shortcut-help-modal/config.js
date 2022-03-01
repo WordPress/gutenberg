@@ -24,4 +24,8 @@ export const textFormattingShortcuts = [
 		keyCombination: { modifier: 'primary', character: 'u' },
 		description: __( 'Underline the selected text.' ),
 	},
+	{
+		keyCombination: { character: '[[' },
+		description: __( 'Insert a link to a post or page' ),
+	},
 ];

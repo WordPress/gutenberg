@@ -3,7 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { Icon, page, customPostType as post } from '@wordpress/icons';
+import { Icon, page, post } from '@wordpress/icons';
 
 const SHOWN_SUGGESTIONS = 10;
 
