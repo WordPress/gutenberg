@@ -56,28 +56,30 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
 				$preset = _wp_array_get( $flattened_theme_json, $path, null );
-				if ( null !== $preset ) {
-					$items = array();
-					if ( isset( $preset['theme'] ) ) {
-						foreach ( $preset['theme'] as $item ) {
-							$slug = $item['slug'];
-							unset( $item['slug'] );
-							$items[ $slug ] = $item;
-						}
-					}
-					if ( isset( $preset['custom'] ) ) {
-						foreach ( $preset['custom'] as $item ) {
-							$slug = $item['slug'];
-							unset( $item['slug'] );
-							$items[ $slug ] = $item;
-						}
-					}
-					$flattened_preset = array();
-					foreach ( $items as $slug => $value ) {
-						$flattened_preset[] = array_merge( array( 'slug' => $slug ), $value );
-					}
-					_wp_array_set( $flattened_theme_json, $path, $flattened_preset );
+				if ( null === $preset ) {
+					continue;
 				}
+
+				$items = array();
+				if ( isset( $preset['theme'] ) ) {
+					foreach ( $preset['theme'] as $item ) {
+						$slug = $item['slug'];
+						unset( $item['slug'] );
+						$items[ $slug ] = $item;
+					}
+				}
+				if ( isset( $preset['custom'] ) ) {
+					foreach ( $preset['custom'] as $item ) {
+						$slug = $item['slug'];
+						unset( $item['slug'] );
+						$items[ $slug ] = $item;
+					}
+				}
+				$flattened_preset = array();
+				foreach ( $items as $slug => $value ) {
+					$flattened_preset[] = array_merge( array( 'slug' => $slug ), $value );
+				}
+				_wp_array_set( $flattened_theme_json, $path, $flattened_preset );
 			}
 		}
 
