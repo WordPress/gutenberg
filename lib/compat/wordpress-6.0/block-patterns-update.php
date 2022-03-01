@@ -17,7 +17,7 @@ function gutenberg_register_gutenberg_patterns() {
 	$patterns = array(
 		'query-standard-posts'                 => array(
 			'title'      => _x( 'Standard', 'Block pattern title', 'gutenberg' ),
-			'blockTypes' => array( 'core/query' ),
+			'blockTypes' => array( 'core/query', 'core/post-content' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
@@ -35,7 +35,7 @@ function gutenberg_register_gutenberg_patterns() {
 		),
 		'query-medium-posts'                   => array(
 			'title'      => _x( 'Image at left', 'Block pattern title', 'gutenberg' ),
-			'blockTypes' => array( 'core/query' ),
+			'blockTypes' => array( 'core/query', 'core/post-content' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
@@ -55,7 +55,7 @@ function gutenberg_register_gutenberg_patterns() {
 		),
 		'query-small-posts'                    => array(
 			'title'      => _x( 'Small image and title', 'Block pattern title', 'gutenberg' ),
-			'blockTypes' => array( 'core/query' ),
+			'blockTypes' => array( 'core/query', 'core/post-content' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
@@ -74,7 +74,7 @@ function gutenberg_register_gutenberg_patterns() {
 		),
 		'query-grid-posts'                     => array(
 			'title'      => _x( 'Grid', 'Block pattern title', 'gutenberg' ),
-			'blockTypes' => array( 'core/query' ),
+			'blockTypes' => array( 'core/query', 'core/post-content' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
 							<div class="wp-block-query">
