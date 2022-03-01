@@ -366,7 +366,7 @@ export class ImageEdit extends Component {
 		this.setState( { uploadStatus: UPLOAD_STATE_SUCCEEDED } );
 
 		this.setState( {
-			isAnimatedGif: payload.mediaUrl.toLowerCase().includes( '.gif' ),
+			isAnimatedGif: payload.mediaUrl.toLowerCase().includes( 'gif' ),
 		} );
 	}
 
@@ -463,6 +463,10 @@ export class ImageEdit extends Component {
 		this.props.setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
+		} );
+
+		this.setState( {
+			isAnimatedGif: media.url.toLowerCase().includes( 'gif' ),
 		} );
 	}
 
