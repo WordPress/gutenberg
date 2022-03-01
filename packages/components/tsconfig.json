@@ -86,7 +86,7 @@
 		"src/**/*.ios.js",
 		"src/**/*.native.js",
 		"src/**/react-native-*",
-		"src/**/stories",
+		"src/**/stories/**.js", // only exclude js files, tsx files should be checked
 		"src/**/test",
 		"src/ui/__storybook-utils",
 		"src/ui/font-size-control"
