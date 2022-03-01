@@ -2,6 +2,10 @@
  * External dependencies
  */
 import { get } from 'lodash';
+/**
+ * Internal dependencies
+ */
+import { Status } from './reducer';
 
 /**
  * Internal dependencies
@@ -45,7 +49,11 @@ export function getResolutionState( state, selectorName, args ) {
  * @return {boolean | undefined} isResolving value.
  */
 export function getIsResolving( state, selectorName, args ) {
-	return getResolutionState( state, selectorName, args )?.isResolving;
+	const resolutionState = getResolutionState( state, selectorName, args );
+
+	return resolutionState
+		? resolutionState.status === Status.RESOLVING
+		: undefined;
 }
 
 /**
@@ -59,7 +67,9 @@ export function getIsResolving( state, selectorName, args ) {
  * @return {boolean} Whether resolution has been triggered.
  */
 export function hasStartedResolution( state, selectorName, args ) {
-	return getIsResolving( state, selectorName, args ) !== undefined;
+	return (
+		getResolutionState( state, selectorName, args )?.status !== undefined
+	);
 }
 
 /**
@@ -73,7 +83,8 @@ export function hasStartedResolution( state, selectorName, args ) {
  * @return {boolean} Whether resolution has completed.
  */
 export function hasFinishedResolution( state, selectorName, args ) {
-	return getIsResolving( state, selectorName, args ) === false;
+	const status = getResolutionState( state, selectorName, args )?.status;
+	return status === Status.FINISHED || status === Status.ERROR;
 }
 
 /**
@@ -87,9 +98,9 @@ export function hasFinishedResolution( state, selectorName, args ) {
  * @return {boolean} Has resolution failed
  */
 export function hasResolutionFailed( state, selectorName, args ) {
-	const resolutionState = getResolutionState( state, selectorName, args );
-	const hasFailed = resolutionState && 'error' in resolutionState;
-	return !! hasFailed;
+	return (
+		getResolutionState( state, selectorName, args )?.status === Status.ERROR
+	);
 }
 
 /**
@@ -104,7 +115,10 @@ export function hasResolutionFailed( state, selectorName, args ) {
  * @return {Error|unknown} Last resolution error
  */
 export function getResolutionError( state, selectorName, args ) {
-	return getResolutionState( state, selectorName, args )?.error;
+	const resolutionState = getResolutionState( state, selectorName, args );
+	return resolutionState?.status === Status.ERROR
+		? resolutionState?.error
+		: null;
 }
 
 /**

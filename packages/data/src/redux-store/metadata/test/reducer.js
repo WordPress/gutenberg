@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import reducer from '../reducer';
+import reducer, { Status } from '../reducer';
 
 describe( 'reducer', () => {
 	it( 'should default to an empty object', () => {
@@ -23,8 +23,10 @@ describe( 'reducer', () => {
 				args: [],
 			} );
 
-			// { test: { getFoo: EquivalentKeyMap( [] =>  isResolving: true } ) } }
-			expect( state.getFoo.get( [] ) ).toEqual( { isResolving: true } );
+			// { test: { getFoo: EquivalentKeyMap( [] =>  status: 'resolving } ) } }
+			expect( state.getFoo.get( [] ) ).toEqual( {
+				status: Status.RESOLVING,
+			} );
 		} );
 
 		it( 'should return with finished resolution', () => {
@@ -39,8 +41,10 @@ describe( 'reducer', () => {
 				args: [],
 			} );
 
-			// { test: { getFoo: EquivalentKeyMap( [] => { isResolving: false } ) } }
-			expect( state.getFoo.get( [] ) ).toEqual( { isResolving: false } );
+			// { test: { getFoo: EquivalentKeyMap( [] => { status: Status.FINISHED } ) } }
+			expect( state.getFoo.get( [] ) ).toEqual( {
+				status: Status.FINISHED,
+			} );
 		} );
 
 		it( 'should remove invalidations', () => {
@@ -81,12 +85,12 @@ describe( 'reducer', () => {
 				args: [ 'block' ],
 			} );
 
-			// { getFoo: EquivalentKeyMap( [] => { isResolving: false } ) }
+			// { getFoo: EquivalentKeyMap( [] => { status: Status.FINISHED } ) }
 			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				isResolving: false,
+				status: Status.FINISHED,
 			} );
 			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				isResolving: true,
+				status: Status.RESOLVING,
 			} );
 		} );
 
@@ -127,9 +131,9 @@ describe( 'reducer', () => {
 				} );
 
 				expect( state.getBar ).toBeUndefined();
-				// { getFoo: EquivalentKeyMap( [] => { isResolving: false } ) }
+				// { getFoo: EquivalentKeyMap( [] => { status: Status.FINISHED } ) }
 				expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-					isResolving: false,
+					status: Status.FINISHED,
 				} );
 			}
 		);
@@ -141,7 +145,7 @@ describe( 'reducer', () => {
 				args: [ 1, undefined ],
 			} );
 			expect( started.getFoo.get( [ 1 ] ) ).toEqual( {
-				isResolving: true,
+				status: Status.RESOLVING,
 			} );
 
 			const finished = reducer( started, {
@@ -150,7 +154,7 @@ describe( 'reducer', () => {
 				args: [ 1, undefined, undefined ],
 			} );
 			expect( finished.getFoo.get( [ 1 ] ) ).toEqual( {
-				isResolving: false,
+				status: Status.FINISHED,
 			} );
 		} );
 	} );
@@ -164,10 +168,10 @@ describe( 'reducer', () => {
 			} );
 
 			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				isResolving: true,
+				status: Status.RESOLVING,
 			} );
 			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				isResolving: true,
+				status: Status.RESOLVING,
 			} );
 		} );
 
@@ -184,10 +188,10 @@ describe( 'reducer', () => {
 			} );
 
 			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				isResolving: false,
+				status: Status.FINISHED,
 			} );
 			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				isResolving: false,
+				status: Status.FINISHED,
 			} );
 		} );
 
@@ -210,7 +214,7 @@ describe( 'reducer', () => {
 
 			expect( state.getFoo.get( [ 'post' ] ) ).toBe( undefined );
 			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				isResolving: false,
+				status: Status.FINISHED,
 			} );
 		} );
 
@@ -232,10 +236,10 @@ describe( 'reducer', () => {
 			} );
 
 			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				isResolving: false,
+				status: Status.FINISHED,
 			} );
 			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				isResolving: true,
+				status: Status.RESOLVING,
 			} );
 		} );
 
@@ -277,10 +281,10 @@ describe( 'reducer', () => {
 
 				expect( state.getBar ).toBeUndefined();
 				expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-					isResolving: false,
+					status: Status.FINISHED,
 				} );
 				expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-					isResolving: false,
+					status: Status.FINISHED,
 				} );
 			}
 		);
@@ -295,10 +299,10 @@ describe( 'reducer', () => {
 				],
 			} );
 			expect( started.getFoo.get( [ 1 ] ) ).toEqual( {
-				isResolving: true,
+				status: Status.RESOLVING,
 			} );
 			expect( started.getFoo.get( [ 2 ] ) ).toEqual( {
-				isResolving: true,
+				status: Status.RESOLVING,
 			} );
 
 			const finished = reducer( started, {
@@ -310,10 +314,10 @@ describe( 'reducer', () => {
 				],
 			} );
 			expect( finished.getFoo.get( [ 1 ] ) ).toEqual( {
-				isResolving: false,
+				status: Status.FINISHED,
 			} );
 			expect( finished.getFoo.get( [ 2 ] ) ).toEqual( {
-				isResolving: false,
+				status: Status.FINISHED,
 			} );
 		} );
 	} );

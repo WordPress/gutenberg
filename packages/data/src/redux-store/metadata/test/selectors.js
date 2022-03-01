@@ -4,7 +4,7 @@
 import { createRegistry } from '@wordpress/data';
 
 jest.useRealTimers();
-
+jest.setTimeout( 1000000 );
 const testStore = {
 	reducer: ( state = null, action ) => {
 		if ( action.type === 'RECEIVE' ) {

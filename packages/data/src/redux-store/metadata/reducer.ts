@@ -24,7 +24,14 @@ type Action =
 	  >;
 
 type StateKey = unknown[] | unknown;
-export type StateValue = { isResolving: boolean; error?: Error | unknown };
+export enum Status {
+	FINISHED = 'finished',
+	RESOLVING = 'resolving',
+	ERROR = 'error',
+}
+export type StateValue =
+	| { status: Status.RESOLVING | Status.FINISHED }
+	| { status: Status.ERROR; error: Error | unknown };
 export type State = EquivalentKeyMap< StateKey, StateValue >;
 
 /**
@@ -41,21 +48,21 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 		case 'START_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
 			nextState.set( selectorArgsToStateKey( action.args ), {
-				isResolving: true,
+				status: Status.RESOLVING,
 			} );
 			return nextState;
 		}
 		case 'FINISH_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
 			nextState.set( selectorArgsToStateKey( action.args ), {
-				isResolving: false,
+				status: Status.FINISHED,
 			} );
 			return nextState;
 		}
 		case 'FAIL_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
 			nextState.set( selectorArgsToStateKey( action.args ), {
-				isResolving: false,
+				status: Status.ERROR,
 				error: action.error,
 			} );
 			return nextState;
@@ -64,7 +71,7 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 			const nextState = new EquivalentKeyMap( state );
 			for ( const resolutionArgs of action.args ) {
 				nextState.set( selectorArgsToStateKey( resolutionArgs ), {
-					isResolving: true,
+					status: Status.RESOLVING,
 				} );
 			}
 			return nextState;
@@ -73,7 +80,7 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 			const nextState = new EquivalentKeyMap( state );
 			for ( const resolutionArgs of action.args ) {
 				nextState.set( selectorArgsToStateKey( resolutionArgs ), {
-					isResolving: false,
+					status: Status.FINISHED,
 				} );
 			}
 			return nextState;
@@ -81,7 +88,10 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 		case 'FAIL_RESOLUTIONS': {
 			const nextState = new EquivalentKeyMap( state );
 			action.args.forEach( ( resolutionArgs, idx ) => {
-				const resolutionState: StateValue = { isResolving: false };
+				const resolutionState: StateValue = {
+					status: Status.ERROR,
+					error: undefined,
+				};
 
 				const error = action.errors[ idx ];
 				if ( error ) {
