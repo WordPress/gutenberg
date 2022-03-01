@@ -41,6 +41,15 @@ function gutenberg_register_rest_navigation_areas() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_navigation_areas' );
 
 /**
+ * Registers the block patterns REST API routes.
+ */
+function gutenberg_register_rest_block_patterns() {
+	$block_patterns = new WP_REST_Block_Patterns_Controller();
+	$block_patterns->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
+
+/**
  * Registers the customizer nonces REST API routes.
  */
 function gutenberg_register_rest_customizer_nonces() {

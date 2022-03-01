@@ -40,6 +40,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Block_Navigation_Areas_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-block-navigation-areas-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Block_Patterns_Controller' ) ) {
+		require_once __DIR__ . '/class-wp-rest-block-patterns-controller.php';
+	}
 	if ( ! class_exists( 'WP_REST_Menu_Locations_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menu-locations-controller.php';
 	}
