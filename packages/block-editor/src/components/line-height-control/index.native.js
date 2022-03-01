@@ -20,7 +20,7 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 			step={ STEP }
 			value={ value }
 			onChange={ onChange }
-			units={ false }
+			units={ [] }
 		/>
 	);
 }

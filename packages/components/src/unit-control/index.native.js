@@ -116,13 +116,13 @@ function UnitControl( {
 	};
 
 	const renderUnitPicker = useCallback( () => {
-		if ( units === false ) {
+		if ( hasUnits( units ) ) {
 			return null;
 		}
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
 				{ renderUnitButton }
-				{ hasUnits( units ) && units?.length > 1 ? (
+				{ units?.length > 1 ? (
 					<Picker
 						ref={ pickerRef }
 						options={ units }
