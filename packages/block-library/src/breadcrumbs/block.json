@@ -35,8 +35,12 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"color": {
-			"gradients": true,
-			"link": true
+			"background": false,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"link": true
+			}
 		},
 		"html": false,
 		"spacing": {
