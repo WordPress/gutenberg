@@ -628,6 +628,8 @@ describe( 'Writing Flow', () => {
 			`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Wide width')]`
 		);
 		await wideButton.click();
+		// Focus the block content
+		await page.keyboard.press( 'Tab' );
 
 		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );
