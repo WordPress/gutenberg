@@ -21,7 +21,7 @@ import type { WidgetType } from './widget-type';
 import type { WpTemplate } from './wp-template';
 import type { WpTemplatePart } from './wp-template-part';
 import type { Context, Updatable, EntityQuery } from './helpers';
-import { CoreEntity } from '../entities';
+import type { CoreEntity } from '../entities';
 
 export type { BaseEntityRecords } from './base-entity-records';
 
@@ -120,7 +120,7 @@ export interface EntityInterface< C extends Context > {
  * // c is of the type Order
  * ```
  */
-export class PerPackageEntities< C extends Context > {
+export interface PerPackageEntities< C extends Context > {
 	core: CoreEntity< C >;
 }
 
