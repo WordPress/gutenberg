@@ -26,8 +26,7 @@
 	"dependencies": {
 		"@wordpress/e2e-test-utils-playwright": "file:../e2e-test-utils-playwright",
 		"@wordpress/url": "file:../url",
-		"filenamify": "^4.2.0",
-		"role-selector": "^0.5.0"
+		"filenamify": "^4.2.0"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1"

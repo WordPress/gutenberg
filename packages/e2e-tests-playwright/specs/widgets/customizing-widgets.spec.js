@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-const { test, expect } = require( '../../config/test' );
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
  * @typedef {import('@playwright/test').Page} Page

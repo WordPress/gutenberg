@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import fs from 'fs/promises';
+import * as fs from 'fs/promises';
 import { dirname } from 'path';
 import type { APIRequestContext } from '@playwright/test';
 import { chunk } from 'lodash';

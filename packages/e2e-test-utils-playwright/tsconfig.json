@@ -1,12 +1,21 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
+		"incremental": false,
+		"composite": false,
+		"module": "CommonJS",
+		"rootDir": "source",
+		"noEmit": false,
+		"outDir": "build",
+		"sourceMap": true,
+		"declaration": true,
+		"declarationMap": true,
 		"declarationDir": "build-types",
+		"emitDeclarationOnly": false,
 		"allowJs": true,
-		"checkJs": false
+		"checkJs": false,
 	},
 	"include": [
-		"src/**/*"
+		"source/**/*"
 	]
 }

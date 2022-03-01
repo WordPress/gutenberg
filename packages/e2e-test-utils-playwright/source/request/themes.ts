@@ -6,7 +6,10 @@ import { WP_BASE_URL } from '../config';
 
 const THEMES_URL = new URL( '/wp-admin/themes.php', WP_BASE_URL ).href;
 
-async function activateTheme( this: RequestUtils, themeSlug: string ) {
+async function activateTheme(
+	this: RequestUtils,
+	themeSlug: string
+): Promise< void > {
 	let response = await this.request.get( THEMES_URL );
 	const html = await response.text();
 	const matchGroup = html.match(

@@ -1,18 +1,14 @@
 /**
  * External dependencies
  */
-import path from 'path';
-import { test as base, expect, selectors } from '@playwright/test';
+import * as path from 'path';
+import { test as base, expect } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
-import { selectorScript } from 'role-selector/playwright-test';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { PageUtils, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
-
-// Register role selector.
-selectors.register( 'role', selectorScript, { contentScript: true } );
+import { PageUtils, RequestUtils } from './index';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
