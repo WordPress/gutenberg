@@ -17,11 +17,52 @@ import type {
 	Name,
 	NameOf,
 	RecordOf,
+	Entity,
 	DefaultContextOf,
 } from './types';
 
 // Placeholder State type for now
-export type State = any;
+export type State = {
+	entities: {
+		data: KindState;
+	};
+};
+
+type KindState = {
+	[ K in Kind ]?: NameState< K >;
+};
+type NameState< K extends Kind > = {
+	[ N in Extract< Entity, { kind: K } >[ 'name' ] ]?: {
+		queriedData: QueriedState< K, N >;
+	};
+};
+interface QueriedState< K extends Kind, N extends Name > {
+	items: {
+		[ C in Context ]?: ContextState< K, N, C >;
+	};
+}
+type ContextState< K extends Kind, N extends Name, C extends Context > = Record<
+	KeyOf< RecordOf< K, N, C > > & ( string | number ),
+	RecordOf< K, N, C >
+>;
+
+const z: State = {
+	entities: {
+		data: {
+			root: {
+				comment: {
+					queriedData: {
+						items: {
+							view: {
+								12: {},
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+};
 
 /**
  * Returns the Entity's record object by key. Returns `null` if the value is not

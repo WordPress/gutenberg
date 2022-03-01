@@ -127,7 +127,7 @@ export interface PerPackageEntities< C extends Context > {
 /**
  * A union of all the registered entities.
  */
-type Entity<
+export type Entity<
 	C extends Context = any
 > = PerPackageEntities< C >[ keyof PerPackageEntities< C > ];
 
