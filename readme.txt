@@ -74,10 +74,6 @@ Many reviews are from plugin installers who might expect a bug-free, well-polish
 
 We do read every review, but the best way to provide feedback is through <a href="https://github.com/WordPress/gutenberg/issues">the Gutenberg GitHub issues page</a>. And new contributors are always welcome to join the design and development effort!
 
-= How can I get the old “classic” editor back? =
-
-If you have tried out Gutenberg or the block editing features built into the WordPress Editor, but have found they’re not a good fit for you or your site, you might be interested in the <a href="https://wordpress.org/plugins/classic-editor/">Classic Editor plugin</a>. The Classic Editor restores WordPress’s original “wysiwyg” editor, and is maintained by many of the same fine folks who contribute to Gutenberg.
-
 == Changelog ==
 
 To read the changelog for the latest Gutenberg release, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/latest">release page</a>.
