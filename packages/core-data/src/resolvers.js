@@ -453,3 +453,8 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations = () => async (
 		variations
 	);
 };
+
+export const getBlockPatterns = () => async ( { dispatch } ) => {
+	const patterns = await apiFetch( { path: '/wp/v2/block-patterns' } );
+	dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
+};
