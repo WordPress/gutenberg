@@ -68,12 +68,6 @@ The four phases of the project are Editing, Customization, Collaboration, and Mu
 - <a href="https://wordpress.org/gutenberg/handbook/">Documentation: Creating Blocks, Reference, and Guidelines</a>
 - <a href="https://wordpress.org/gutenberg/handbook/reference/faq/">Additional frequently asked questions</a>
 
-= What’s with all the 1-star reviews? =
-
-Many reviews are from plugin installers who might expect a bug-free, well-polished editor, that doesn’t change often. However, Gutenberg is a continually evolving work in progress, subject to frequent changes (typically every one to two weeks!), some of which can be surprising to users — and admittedly, may break non-stable functionality. This is why the plugin is not recommended for production sites.
-
-We do read every review, but the best way to provide feedback is through <a href="https://github.com/WordPress/gutenberg/issues">the Gutenberg GitHub issues page</a>. And new contributors are always welcome to join the design and development effort!
-
 == Changelog ==
 
 To read the changelog for the latest Gutenberg release, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/latest">release page</a>.
