@@ -220,18 +220,18 @@ export function updatePreferredStyleVariations( blockName, blockStyle ) {
 }
 
 /**
- * Returns an action object used in signalling that the editor should attempt
+ * Dispatches an action object used in signalling that the editor should attempt
  * to locally autosave the current post every `interval` seconds.
  *
  * @param {number} interval The new interval, in seconds.
- * @return {Object} Action object.
  */
-export function __experimentalUpdateLocalAutosaveInterval( interval ) {
-	return {
-		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',
-		interval,
-	};
-}
+export const __experimentalUpdateLocalAutosaveInterval = ( interval ) => ( {
+	registry,
+} ) => {
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/post-editor', 'localAutosaveInterval', interval );
+};
 
 /**
  * Returns an action object used in signalling that block types by the given

@@ -105,11 +105,20 @@ export function getPreferences( state ) {
  *
  * @return {*} Preference Value.
  */
-export function getPreference( state, preferenceKey, defaultValue ) {
-	const preferences = getPreferences( state );
-	const value = preferences[ preferenceKey ];
-	return value === undefined ? defaultValue : value;
-}
+export const getPreference = createRegistrySelector(
+	( select ) => ( state, preferenceKey, defaultValue ) => {
+		if ( preferenceKey === 'localAutosaveInterval' ) {
+			return select( preferencesStore ).get(
+				'core/edit-post',
+				preferenceKey
+			);
+		}
+
+		const preferences = getPreferences( state );
+		const value = preferences[ preferenceKey ];
+		return value === undefined ? defaultValue : value;
+	}
+);
 
 /**
  * Returns true if the publish sidebar is opened.

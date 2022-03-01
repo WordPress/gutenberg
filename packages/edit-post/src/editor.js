@@ -17,6 +17,7 @@ import {
 import { StrictMode, useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
@@ -91,9 +92,9 @@ function Editor( {
 				),
 				hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
 				blockTypes: getBlockTypes(),
-				__experimentalLocalAutosaveInterval: getPreference(
-					'localAutosaveInterval'
-				),
+				__experimentalLocalAutosaveInterval: select(
+					preferencesStore
+				).get( 'localAutosaveInterval' ),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 				isTemplateMode: isEditingTemplate(),
 				template:

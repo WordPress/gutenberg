@@ -108,11 +108,12 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fixedToolbar: false,
-		welcomeGuide: true,
 		fullscreenMode: true,
+		localAutosaveInterval: 15,
+		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		themeStyles: true,
-		showBlockBreadcrumbs: true,
+		welcomeGuide: true,
 		welcomeGuideTemplate: true,
 	} );
 
