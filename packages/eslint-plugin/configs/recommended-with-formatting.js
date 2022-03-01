@@ -43,21 +43,29 @@ const config = {
 		'import/default': 'warn',
 		'import/named': 'warn',
 	},
+	overrides: [],
 };
 
 if ( isPackageInstalled( 'jest' ) ) {
-	config.overrides = [
-		{
-			// Unit test files and their helpers only.
-			files: [ '**/@(test|__tests__)/**/*.js', '**/?(*.)test.js' ],
-			extends: [ require.resolve( './test-unit.js' ) ],
-		},
-		{
-			// End-to-end test files and their helpers only.
-			files: [ '**/specs/**/*.js', '**/?(*.)spec.js' ],
-			extends: [ require.resolve( './test-e2e.js' ) ],
-		},
-	];
+	config.overrides.push( {
+		// Unit test files and their helpers only.
+		files: [ '**/@(test|__tests__)/**/*.js', '**/?(*.)test.js' ],
+		extends: [ require.resolve( './test-unit.js' ) ],
+	} );
+}
+
+if ( isPackageInstalled( '@playwright/test' ) ) {
+	config.overrides.push( {
+		// End-to-end test files and their helpers only.
+		files: [ '**/specs/**/*.spec.js', '**/?(*.)spec.js' ],
+		extends: [ require.resolve( './test-e2e-playwright.js' ) ],
+	} );
+} else if ( isPackageInstalled( 'jest' ) ) {
+	config.overrides.push( {
+		// End-to-end test files and their helpers only.
+		files: [ '**/specs/**/*.js', '**/?(*.)spec.js' ],
+		extends: [ require.resolve( './test-e2e.js' ) ],
+	} );
 }
 
 module.exports = config;
