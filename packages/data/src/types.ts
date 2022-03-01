@@ -14,7 +14,7 @@ export interface StoreInstance< Config extends AnyConfig > {
 	subscribe: ( listener: () => void ) => () => void;
 }
 
-export interface StoreDescriptor< Config extends AnyConfig > {
+export interface StoreDescriptor< Config extends AnyConfig = AnyConfig > {
 	/**
 	 * Store Name
 	 */
@@ -39,10 +39,6 @@ export interface ReduxStoreConfig<
 	controls?: MapOf< Function >;
 }
 
-export interface DataRegistry {
-	register: ( store: StoreDescriptor< any > ) => void;
-}
-
 export interface DataEmitter {
 	emit: () => void;
 	subscribe: ( listener: () => void ) => () => void;
@@ -58,7 +54,7 @@ export interface DataEmitter {
 type ActionCreatorsOf<
 	Config extends AnyConfig
 > = Config extends ReduxStoreConfig< any, infer ActionCreators, any >
-	? { [ name in keyof ActionCreators ]: Function | Generator }
+	? ActionCreators
 	: never;
 
 export type SelectorsOf< Config > = Config extends ReduxStoreConfig<
@@ -106,3 +102,23 @@ export function doSelect< D, T >(
 ): T {
 	return {} as any;
 }
+
+export function doDispatch< D, T >(
+	descriptor: D
+): ActionCreatorsOf< ConfigOf< D > > {
+	return {} as any;
+}
+
+export interface DataRegistry< Stores extends StoreDescriptor[] = any > {
+	register: ( store: StoreDescriptor< any > ) => void;
+	dispatch: typeof doDispatch;
+	select: typeof doSelect;
+}
+
+type ThunkArgs< D extends StoreDescriptor > = {
+	select: BoundSelectorsOf< ConfigOf< D > > & ( < T >( state: any ) => T );
+	dispatch: ActionCreatorsOf< ConfigOf< D > > & ( ( action: any ) => void );
+};
+export type ThunkOf< D extends StoreDescriptor > = () => < T >(
+	args: ThunkArgs< D >
+) => T;
