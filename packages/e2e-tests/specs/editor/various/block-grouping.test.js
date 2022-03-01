@@ -140,6 +140,23 @@ describe( 'Block Grouping', () => {
 			// Make sure the paragraph in reusable block exists.
 			expect( await getParagraphText() ).toEqual( paragraphText );
 		} );
+		it( 'should group another Group block via options toolbar', async () => {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( '1' );
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:group -->
+			<div class=\\"wp-block-group\\"><!-- wp:group -->
+			<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+			<p>1</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:group --></div>
+			<!-- /wp:group -->"
+		` );
+		} );
 	} );
 
 	describe( 'Grouping Block availability', () => {
