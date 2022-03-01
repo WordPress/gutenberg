@@ -1,13 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/archives",
 		"isValid": true,
 		"attributes": {
 			"displayAsDropdown": false,
 			"showPostCounts": true
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

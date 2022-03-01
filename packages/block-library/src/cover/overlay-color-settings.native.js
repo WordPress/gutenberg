@@ -12,9 +12,9 @@ import {
 	getGradientValueBySlug,
 	getGradientSlugByValue,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
-	useSetting,
 } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
+import { useMobileGlobalStylesColors } from '@wordpress/components';
 
 function OverlayColorSettings( {
 	overlayColor,
@@ -23,9 +23,8 @@ function OverlayColorSettings( {
 	customGradient,
 	setAttributes,
 } ) {
-	const EMPTY_ARRAY = [];
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
+	const colors = useMobileGlobalStylesColors();
+	const gradients = useMobileGlobalStylesColors( 'gradients' );
 
 	const gradientValue =
 		customGradient || getGradientValueBySlug( gradients, gradient );
@@ -39,7 +38,7 @@ function OverlayColorSettings( {
 	const settings = useMemo( () => {
 		const setOverlayAttribute = ( attributeName, value ) => {
 			setAttributes( {
-				// clear all related attributes (only one should be set)
+				// Clear all related attributes (only one should be set)
 				overlayColor: undefined,
 				customOverlayColor: undefined,
 				gradient: undefined,
@@ -49,7 +48,7 @@ function OverlayColorSettings( {
 		};
 
 		const onColorChange = ( value ) => {
-			// do nothing for falsy values
+			// Do nothing for falsy values.
 			if ( ! value ) {
 				return;
 			}
@@ -62,7 +61,7 @@ function OverlayColorSettings( {
 		};
 
 		const onGradientChange = ( value ) => {
-			// do nothing for falsy values
+			// Do nothing for falsy values.
 			if ( ! value ) {
 				return;
 			}

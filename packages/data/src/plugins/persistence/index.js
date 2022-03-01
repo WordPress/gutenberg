@@ -224,6 +224,80 @@ function persistencePlugin( registry, pluginOptions ) {
 
 /**
  * Move the 'features' object in local storage from the sourceStoreName to the
+ * preferences store.
+ *
+ * @param {Object} persistence     The persistence interface.
+ * @param {string} sourceStoreName The name of the store that has persisted
+ *                                 preferences to migrate to the preferences
+ *                                 package.
+ */
+export function migrateFeaturePreferencesToPreferencesStore(
+	persistence,
+	sourceStoreName
+) {
+	const preferencesStoreName = 'core/preferences';
+	const interfaceStoreName = 'core/interface';
+
+	const state = persistence.get();
+
+	// Features most recently (and briefly) lived in the interface package.
+	// If data exists there, prioritize using that for the migration. If not
+	// also check the original package as the user may have updated from an
+	// older block editor version.
+	const interfaceFeatures =
+		state[ interfaceStoreName ]?.preferences?.features?.[ sourceStoreName ];
+	const sourceFeatures = state[ sourceStoreName ]?.preferences?.features;
+	const featuresToMigrate = interfaceFeatures
+		? interfaceFeatures
+		: sourceFeatures;
+
+	if ( featuresToMigrate ) {
+		const targetFeatures = state[ preferencesStoreName ]?.preferences;
+
+		// Avoid migrating features again if they've previously been migrated.
+		if ( ! targetFeatures?.[ sourceStoreName ] ) {
+			// Set the feature values in the interface store, the features
+			// object is keyed by 'scope', which matches the store name for
+			// the source.
+			persistence.set( preferencesStoreName, {
+				preferences: {
+					...targetFeatures,
+					[ sourceStoreName ]: featuresToMigrate,
+				},
+			} );
+
+			// Remove migrated feature preferences from `interface`.
+			if ( interfaceFeatures ) {
+				const otherInterfaceFeatures =
+					state[ interfaceStoreName ]?.preferences?.features;
+
+				persistence.set( interfaceStoreName, {
+					preferences: {
+						features: {
+							...otherInterfaceFeatures,
+							[ sourceStoreName ]: undefined,
+						},
+					},
+				} );
+			}
+
+			// Remove migrated feature preferences from the source.
+			if ( sourceFeatures ) {
+				const sourcePreferences = state[ sourceStoreName ]?.preferences;
+
+				persistence.set( sourceStoreName, {
+					preferences: {
+						...sourcePreferences,
+						features: undefined,
+					},
+				} );
+			}
+		}
+	}
+}
+
+/**
+ * Move the 'features' object in local storage from the sourceStoreName to the
  * interface store.
  *
  * @param {Object} persistence     The persistence interface.
@@ -277,11 +351,11 @@ export function migrateFeaturePreferencesToInterfaceStore(
 persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const persistence = createPersistenceInterface( pluginOptions );
 
-	migrateFeaturePreferencesToInterfaceStore(
+	migrateFeaturePreferencesToPreferencesStore(
 		persistence,
 		'core/edit-widgets'
 	);
-	migrateFeaturePreferencesToInterfaceStore(
+	migrateFeaturePreferencesToPreferencesStore(
 		persistence,
 		'core/customize-widgets'
 	);

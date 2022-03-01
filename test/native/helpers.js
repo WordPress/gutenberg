@@ -17,7 +17,7 @@ import {
 // eslint-disable-next-line no-restricted-syntax
 import Editor from '@wordpress/edit-post/src/editor';
 
-// Set up the mocks for getting the HTML output of the editor
+// Set up the mocks for getting the HTML output of the editor.
 let triggerHtmlSerialization;
 let serializedHtml;
 subscribeParentGetHtml.mockImplementation( ( callback ) => {
@@ -59,11 +59,11 @@ export async function executeStoreResolvers( fn ) {
 	// Advance all timers allowing store resolvers to resolve.
 	act( () => jest.runAllTimers() );
 
-	// The store resolvers might perform API fetch requests. The most
-	// straightforward approach to ensure all of them resolve before we consider
-	// the function finished is to flush micro tasks, similar to the approach found
-	// in `@testing-library/react-native`.
-	// https://github.com/callstack/react-native-testing-library/blob/a010ffdbca906615279ecc3abee423525e528101/src/flushMicroTasks.js#L15-L23
+	// The store resolvers perform several API fetches during editor
+	// initialization. The most straightforward approach to ensure all of them
+	// resolve before we consider the editor initialized is to flush micro tasks,
+	// similar to the approach found in `@testing-library/react-native`.
+	// https://github.com/callstack/react-native-testing-library/blob/a010ffdbca906615279ecc3abee423525e528101/src/flushMicroTasks.js#L15-L23.
 	await act( async () => {} );
 
 	// Restore the default timer APIs for remainder of test arrangement, act, and
@@ -115,7 +115,7 @@ export async function initializeEditor( props, { component = Editor } = {} ) {
 
 export * from '@testing-library/react-native';
 
-// Custom implementation of the waitFor utility to prevent the issue: https://git.io/JYYGE
+// Custom implementation of the waitFor utility to prevent the issue: https://git.io/JYYGE.
 export function waitFor(
 	cb,
 	{ timeout, interval } = { timeout: 1000, interval: 50 }
@@ -152,7 +152,7 @@ export function waitFor(
 	);
 }
 
-// Helper for getting the current HTML output of the editor
+// Helper for getting the current HTML output of the editor.
 export function getEditorHtml() {
 	if ( ! triggerHtmlSerialization ) {
 		throw new Error( 'HTML serialization trigger is not defined.' );

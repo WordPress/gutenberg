@@ -68,7 +68,7 @@ const SocialLinkEdit = ( {
 	const IconComponent = getIconBySite( service )();
 	const socialLinkName = getNameBySite( service );
 
-	// When new social icon is added link sheet is opened automatically
+	// When new social icon is added link sheet is opened automatically.
 	useEffect( () => {
 		if ( isSelected && ! url ) {
 			setIsLinkSheetVisible( true );

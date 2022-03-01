@@ -10,6 +10,7 @@ import {
 	clickBlockToolbarButton,
 	clickButton,
 	clickMenuItem,
+	openListView,
 	saveDraft,
 	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
@@ -693,12 +694,12 @@ describe( 'Multi-block selection', () => {
 		// Select a paragraph.
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		// Add a list
+		// Add a list.
 		await page.keyboard.type( '/list' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 
-		// Confirm correct setup: a paragraph and a list
+		// Confirm correct setup: a paragraph and a list.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await pressKeyWithModifier( 'primary', 'a' );
@@ -746,5 +747,88 @@ describe( 'Multi-block selection', () => {
 			return window.getSelection().toString();
 		} );
 		expect( selectedText ).toEqual( 'Post title' );
+	} );
+
+	it( 'should multi-select in the ListView component with shift + click', async () => {
+		// Create four blocks.
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '4' );
+
+		// Open up the list view, and get a reference to each of the list items.
+		await openListView();
+		const navButtons = await page.$$(
+			'.block-editor-list-view-block-select-button'
+		);
+
+		// Clicking on the second list item should result in the second block being selected.
+		await navButtons[ 1 ].click();
+		expect( await getSelectedFlatIndices() ).toEqual( 2 );
+
+		// Shift clicking the fourth list item should result in blocks 2 through 4 being selected.
+		await page.keyboard.down( 'Shift' );
+		await navButtons[ 3 ].click();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3, 4 ] );
+
+		// With the shift key still held down, clicking the first block should result in
+		// the first two blocks being selected.
+		await navButtons[ 0 ].click();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
+
+		// With the shift key up, clicking the fourth block should result in only that block
+		// being selected.
+		await page.keyboard.up( 'Shift' );
+		await navButtons[ 3 ].click();
+		expect( await getSelectedFlatIndices() ).toEqual( 4 );
+	} );
+
+	it( 'should multi-select in the ListView component with shift + up and down keys', async () => {
+		// Create four blocks.
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '4' );
+
+		// Open up the list view. The fourth block button will be focused.
+		await openListView();
+
+		// Press Up twice to focus over the second block.
+		await pressKeyTimes( 'ArrowUp', 2 );
+
+		// Shift + press Down to select the 2nd and 3rd blocks.
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowDown' );
+		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3 ] );
+
+		// Press Down once more to also select the 4th block.
+		await page.keyboard.press( 'ArrowDown' );
+		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3, 4 ] );
+
+		// Press Up three times to adjust the selection to only include the first two blocks.
+		await pressKeyTimes( 'ArrowUp', 3 );
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
+
+		// Raise the shift key
+		await page.keyboard.up( 'Shift' );
+
+		// Navigate to the bottom of the list of blocks.
+		await pressKeyTimes( 'ArrowDown', 3 );
+
+		// Shift + press UP to select the 3rd and 4th blocks.
+		// This tests that shift selecting blocks by keyboard that are not adjacent
+		// to an existing selection resets the selection.
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.up( 'Shift' );
+		expect( await getSelectedFlatIndices() ).toEqual( [ 3, 4 ] );
 	} );
 } );

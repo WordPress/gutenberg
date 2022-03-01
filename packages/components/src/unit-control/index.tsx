@@ -4,7 +4,7 @@
 import type {
 	FocusEventHandler,
 	KeyboardEvent,
-	Ref,
+	ForwardedRef,
 	SyntheticEvent,
 } from 'react';
 import { noop, omit } from 'lodash';
@@ -55,7 +55,7 @@ function UnitControl(
 		value: valueProp,
 		...props
 	}: WordPressComponentProps< UnitControlProps, 'input', false >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const units = useMemo(
 		() => getUnitsWithCurrentUnit( valueProp, unitProp, unitsProp ),
@@ -70,7 +70,7 @@ function UnitControl(
 		}
 	);
 
-	// Stores parsed value for hand-off in state reducer
+	// Stores parsed value for hand-off in state reducer.
 	const refParsedValue = useRef< string | null >( null );
 
 	const classes = classnames( 'components-unit-control', className );

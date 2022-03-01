@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 6.3.0 (2022-02-23)
+
+### New Features
+
+- Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
+
+## 6.2.1 (2022-02-10)
+
 ### Bug Fix
 
 -   Removed unused `memize` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).

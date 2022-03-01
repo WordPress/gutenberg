@@ -16,11 +16,13 @@ module.exports = async ( {
 	author,
 	description,
 	license,
+	pluginURI,
 	slug,
 	version,
 	wpEnv,
 	wpScripts,
 	npmDependencies,
+	customScripts,
 } ) => {
 	const cwd = join( process.cwd(), slug );
 
@@ -36,6 +38,7 @@ module.exports = async ( {
 				description,
 				author,
 				license,
+				homepage: pluginURI,
 				main: wpScripts && 'build/index.js',
 				scripts: {
 					...( wpScripts && {
@@ -48,6 +51,7 @@ module.exports = async ( {
 						start: 'wp-scripts start',
 					} ),
 					...( wpEnv && { env: 'wp-env' } ),
+					...customScripts,
 				},
 			},
 			isEmpty

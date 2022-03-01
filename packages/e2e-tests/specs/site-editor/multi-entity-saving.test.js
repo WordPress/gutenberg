@@ -13,6 +13,7 @@ import {
 	clickButton,
 	createReusableBlock,
 	visitSiteEditor,
+	deleteAllTemplates,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Multi-entity save flow', () => {
@@ -43,8 +44,8 @@ describe( 'Multi-entity save flow', () => {
 
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 		await trashAllPosts( 'wp_block' );
 
 		// Get the current Site Title and Site Tagline, so that we can reset
@@ -97,7 +98,7 @@ describe( 'Multi-entity save flow', () => {
 			await page.keyboard.type( 'Test Post...' );
 			await page.keyboard.press( 'Enter' );
 
-			// Should not trigger multi-entity save button with only post edited
+			// Should not trigger multi-entity save button with only post edited.
 			await assertMultiSaveDisabled();
 
 			// Should only have publish panel a11y button active with only post edited.
@@ -267,7 +268,7 @@ describe( 'Multi-entity save flow', () => {
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
-				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
+				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "header")]'
 			);
 			headerTemplatePartListViewButton.click();
 			await page.click( 'button[aria-label="Close List View Sidebar"]' );

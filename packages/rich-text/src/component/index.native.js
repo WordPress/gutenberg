@@ -1,4 +1,4 @@
-/*eslint no-console: ["error", { allow: ["warn"] }] */
+/* eslint no-console: ["error", { allow: ["warn"] }] */
 
 /**
  * External dependencies
@@ -98,7 +98,7 @@ export class RichText extends Component {
 			maxSize: 1,
 		} );
 		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
-		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
+		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change.
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
 			this
@@ -195,7 +195,7 @@ export class RichText extends Component {
 	}
 
 	valueToFormat( value ) {
-		// remove the outer root tags
+		// Remove the outer root tags.
 		return this.removeRootTagsProduceByAztec(
 			toHTMLString( {
 				value,
@@ -310,7 +310,7 @@ export class RichText extends Component {
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
-		this.firedAfterTextChanged = true; // the onChange event always fires after the fact
+		this.firedAfterTextChanged = true; // The onChange event always fires after the fact.
 		this.onTextUpdate( event );
 		this.lastAztecEventType = 'input';
 	}
@@ -331,7 +331,7 @@ export class RichText extends Component {
 		const refresh = this.value !== formattedContent;
 		this.value = formattedContent;
 
-		// we don't want to refresh if our goal is just to create a record
+		// We don't want to refresh if our goal is just to create a record.
 		if ( refresh ) {
 			this.props.onChange( formattedContent );
 		}
@@ -357,7 +357,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		// Add stubs for conformance in downstream autocompleters logic
+		// Add stubs for conformance in downstream autocompleters logic.
 		this.customEditableOnKeyDown?.( {
 			preventDefault: () => undefined,
 			...event,
@@ -459,7 +459,7 @@ export class RichText extends Component {
 			const record = this.getRecord();
 			const text = getTextContent( record );
 			// Only respond to the trigger if the selection is on the start of text or line
-			// or if the character before is a space
+			// or if the character before is a space.
 			const useTrigger =
 				text.length === 0 ||
 				record.start === 0 ||
@@ -530,7 +530,7 @@ export class RichText extends Component {
 				.replace( /<[^>]+>/g, '' )
 				.trim();
 
-			// A URL was pasted, turn the selection into a link
+			// A URL was pasted, turn the selection into a link.
 			if ( isURL( trimmedText ) ) {
 				const linkedRecord = applyFormat( currentRecord, {
 					type: 'a',
@@ -580,7 +580,7 @@ export class RichText extends Component {
 	onBlur( event ) {
 		this.isTouched = false;
 
-		// Check if value is up to date with latest state of native AztecView
+		// Check if value is up to date with latest state of native AztecView.
 		if (
 			event.nativeEvent.text &&
 			event.nativeEvent.text !== this.props.value
@@ -605,7 +605,7 @@ export class RichText extends Component {
 		// This is a manual selection change event if onChange was not triggered just before
 		// and we did not just trigger a text update
 		// `onChange` could be the last event and could have been triggered a long time ago so
-		// this approach is not perfectly reliable
+		// this approach is not perfectly reliable.
 		const isManual =
 			this.lastAztecEventType !== 'input' &&
 			this.props.value === this.value;
@@ -635,11 +635,11 @@ export class RichText extends Component {
 		}
 
 		// `end` can be less than `start` on iOS
-		// Let's fix that here so `rich-text/slice` can work properly
+		// Let's fix that here so `rich-text/slice` can work properly.
 		const realStart = Math.min( start, end );
 		const realEnd = Math.max( start, end );
 
-		// check and dicsard stray event, where the text and selection is equal to the ones already cached
+		// Check and dicsard stray event, where the text and selection is equal to the ones already cached.
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
@@ -652,10 +652,10 @@ export class RichText extends Component {
 		}
 
 		this.comesFromAztec = true;
-		this.firedAfterTextChanged = true; // Selection change event always fires after the fact
+		this.firedAfterTextChanged = true; // Selection change event always fires after the fact.
 
-		// update text before updating selection
-		// Make sure there are changes made to the content before upgrading it upward
+		// Update text before updating selection
+		// Make sure there are changes made to the content before upgrading it upward.
 		this.onTextUpdate( event );
 
 		// Aztec can send us selection change events after it has lost focus.
@@ -668,7 +668,7 @@ export class RichText extends Component {
 		if ( this.props.__unstableIsSelected ) {
 			this.onSelectionChange( realStart, realEnd );
 		}
-		// Update lastEventCount to prevent Aztec from re-rendering the content it just sent
+		// Update lastEventCount to prevent Aztec from re-rendering the content it just sent.
 		this.lastEventCount = event.nativeEvent.eventCount;
 
 		this.lastAztecEventType = 'selection change';
@@ -772,7 +772,7 @@ export class RichText extends Component {
 			}
 
 			// For font size changes from a prop value a force refresh
-			// is needed without the selection update
+			// is needed without the selection update.
 			if ( nextProps?.fontSize !== this.props?.fontSize ) {
 				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
@@ -829,7 +829,7 @@ export class RichText extends Component {
 		if ( isSelected && ! prevIsSelected ) {
 			this._editor.focus();
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
-			// if its internal value hasn't change. When created, default value is 0, 0
+			// if its internal value hasn't change. When created, default value is 0, 0.
 			this.onSelectionChange(
 				this.props.selectionStart || 0,
 				this.props.selectionEnd || 0
@@ -860,7 +860,7 @@ export class RichText extends Component {
 	}
 
 	getHtmlToRender( record, tagName ) {
-		// Save back to HTML from React tree
+		// Save back to HTML from React tree.
 		let value = this.valueToFormat( record );
 
 		if ( value === undefined ) {
@@ -1260,13 +1260,15 @@ export default compose( [
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
-		const experimentalFeatures =
-			settings?.__experimentalFeatures?.color?.palette;
-		const colorPalette =
-			experimentalFeatures?.user ??
-			experimentalFeatures?.theme ??
-			experimentalFeatures?.default ??
-			settings?.colors;
+		const colorsPalettes = settings?.__experimentalFeatures?.color?.palette;
+		const allColorsPalette = [
+			...( colorsPalettes?.theme || [] ),
+			...( colorsPalettes?.custom || [] ),
+			...( colorsPalettes?.default || [] ),
+		];
+		const colorPalette = colorsPalettes
+			? allColorsPalette
+			: settings?.colors;
 
 		return {
 			areMentionsSupported:

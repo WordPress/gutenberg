@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/media-text",
 		"isValid": true,
 		"attributes": {
@@ -19,7 +18,6 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
@@ -28,10 +26,8 @@
 					"placeholder": "Content…",
 					"fontSize": "large"
 				},
-				"innerBlocks": [],
-				"originalContent": "<p class=\"has-large-font-size\">My Content</p>"
+				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div class=\"wp-block-media-text alignwide is-image-fill is-stacked-on-mobile\">\n\t<figure class=\"wp-block-media-text__media\"\n\t\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=);background-position:84.70588235294117% 84.70588235294117%\">\n\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\"\n\t\t\talt=\"My alt text\" /></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>"
+		]
 	}
 ]

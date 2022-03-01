@@ -43,7 +43,7 @@ export function useBlockClassNames( clientId ) {
 			const isSelected = isBlockSelected( clientId );
 			const name = getBlockName( clientId );
 			const checkDeep = true;
-			// "ancestor" is the more appropriate label due to "deep" check
+			// "ancestor" is the more appropriate label due to "deep" check.
 			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
 				clientId,
 				checkDeep

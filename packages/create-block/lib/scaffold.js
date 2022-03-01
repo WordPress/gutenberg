@@ -14,7 +14,7 @@ const { code, info, success } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
 
 module.exports = async (
-	{ blockOutputTemplates, outputTemplates, outputAssets },
+	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
 	{
 		$schema,
 		apiVersion,
@@ -27,12 +27,16 @@ module.exports = async (
 		attributes,
 		supports,
 		author,
+		pluginURI,
 		license,
 		licenseURI,
+		domainPath,
+		updateURI,
 		version,
 		wpScripts,
 		wpEnv,
 		npmDependencies,
+		customScripts,
 		folderName,
 		editorScript,
 		editorStyle,
@@ -43,7 +47,7 @@ module.exports = async (
 	namespace = namespace.toLowerCase();
 
 	info( '' );
-	info( `Creating a new WordPress plugin in "${ slug }" folder.` );
+	info( `Creating a new WordPress plugin in the "${ slug }" directory.` );
 
 	const view = {
 		$schema,
@@ -61,12 +65,16 @@ module.exports = async (
 		supports,
 		version,
 		author,
+		pluginURI,
 		license,
 		licenseURI,
 		textdomain: slug,
+		domainPath,
+		updateURI,
 		wpScripts,
 		wpEnv,
 		npmDependencies,
+		customScripts,
 		folderName,
 		editorScript,
 		editorStyle,
@@ -74,10 +82,10 @@ module.exports = async (
 	};
 
 	await Promise.all(
-		Object.keys( outputTemplates ).map(
+		Object.keys( pluginOutputTemplates ).map(
 			async ( outputFile ) =>
 				await writeOutputTemplate(
-					outputTemplates[ outputFile ],
+					pluginOutputTemplates[ outputFile ],
 					outputFile,
 					view
 				)
@@ -109,11 +117,11 @@ module.exports = async (
 
 	info( '' );
 	success(
-		`Done: block "${ title }" bootstrapped in the "${ slug }" folder.`
+		`Done: WordPress plugin "${ title }" bootstrapped in the "${ slug }" directory.`
 	);
 	if ( wpScripts ) {
 		info( '' );
-		info( 'Inside that directory, you can run several commands:' );
+		info( 'You can run several commands inside:' );
 		info( '' );
 		code( '  $ npm start' );
 		info( '    Starts the build for development.' );
@@ -130,11 +138,14 @@ module.exports = async (
 		code( '  $ npm run lint:js' );
 		info( '    Lints JavaScript files.' );
 		info( '' );
+		code( '  $ npm run plugin-zip' );
+		info( '    Creates a zip file for a WordPress plugin.' );
+		info( '' );
 		code( '  $ npm run packages-update' );
 		info( '    Updates WordPress packages to the latest version.' );
 	}
 	info( '' );
-	info( 'To enter the folder type:' );
+	info( 'To enter the directory type:' );
 	info( '' );
 	code( `  $ cd ${ slug }` );
 	if ( wpScripts ) {

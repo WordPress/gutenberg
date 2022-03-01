@@ -4,7 +4,7 @@ This package provides a demo application to simplify the environment setup requi
 
 ## Getting Started
 
-Please review [Getting Started for the React Native based Mobile Gutenberg](/docs/contributors/code/react-native/getting-started-react-native.md) to learn how to set up and run this demo application.
+Please review [Getting Started for the React Native based Mobile Gutenberg](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/react-native/getting-started-react-native.md) to learn how to set up and run this demo application.
 
 ## License
 

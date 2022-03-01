@@ -71,6 +71,7 @@ export default function useGrid( props ) {
 		alignment,
 		className,
 		columnGap,
+		cx,
 		gap,
 		gridTemplateColumns,
 		gridTemplateRows,

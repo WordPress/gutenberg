@@ -44,7 +44,11 @@
 		"align": [ "left", "center", "right" ],
 		"color": {
 			"gradients": true,
-			"__experimentalSkipSerialization": true
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"__experimentalBorder": {
 			"color": true,

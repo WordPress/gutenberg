@@ -105,7 +105,7 @@ function render_block_core_latest_posts( $attributes ) {
 		}
 
 		$list_items_markup .= sprintf(
-			'<a href="%1$s">%2$s</a>',
+			'<a class="wp-block-latest-posts__post-title" href="%1$s">%2$s</a>',
 			esc_url( $post_link ),
 			$title
 		);
@@ -119,7 +119,7 @@ function render_block_core_latest_posts( $attributes ) {
 			if ( ! empty( $author_display_name ) ) {
 				$list_items_markup .= sprintf(
 					'<div class="wp-block-latest-posts__post-author">%1$s</div>',
-					esc_html( $byline )
+					$byline
 				);
 			}
 		}
@@ -128,7 +128,7 @@ function render_block_core_latest_posts( $attributes ) {
 			$list_items_markup .= sprintf(
 				'<time datetime="%1$s" class="wp-block-latest-posts__post-date">%2$s</time>',
 				esc_attr( get_the_date( 'c', $post ) ),
-				esc_html( get_the_date( '', $post ) )
+				get_the_date( '', $post )
 			);
 		}
 

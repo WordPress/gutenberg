@@ -1,0 +1,37 @@
+{
+	"name": "@wordpress/style-engine",
+	"version": "0.2.0",
+	"description": "WordPress Style engine.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"styles",
+		"global styles"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/style-engine"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"lodash": "^4.17.21"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

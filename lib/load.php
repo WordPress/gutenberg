@@ -69,12 +69,10 @@ require __DIR__ . '/compat/wordpress-5.9/block-patterns.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/register-global-styles-cpt.php';
-// Needs to be loaded before get-global-styles-and-settings.php
-// to make sure we can use the check "function_exists( 'wp_get_global_styles' )".
-// If it loads after, that function will always be present at that point
-// and the global styles assets won't be loaded.
 require __DIR__ . '/compat/wordpress-5.9/script-loader.php';
-require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-6.0/block-editor-settings.php';
+require __DIR__ . '/compat/experimental/block-editor-settings-mobile.php';
+require __DIR__ . '/compat/wordpress-6.0/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/render-svg-filters.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
@@ -85,8 +83,8 @@ require __DIR__ . '/compat/wordpress-5.9/template-parts.php';
 require __DIR__ . '/compat/wordpress-5.9/theme-templates.php';
 require __DIR__ . '/editor-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-schema-gutenberg.php';
-require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php';
-require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-5-9.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-5-9.php';
 require __DIR__ . '/compat/wordpress-5.9/theme.php';
 require __DIR__ . '/compat/wordpress-5.9/admin-menu.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
@@ -99,7 +97,16 @@ require __DIR__ . '/compat/wordpress-5.9/move-theme-editor-menu-item.php';
 require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
 require __DIR__ . '/compat/wordpress-6.0/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
+require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
+require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
+require __DIR__ . '/compat/wordpress-6.0/register-webfonts-from-theme-json.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-gutenberg.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider-local.php';
+require __DIR__ . '/compat/wordpress-6.0/webfonts.php';
 require __DIR__ . '/compat/experimental/blocks.php';
 
 require __DIR__ . '/blocks.php';

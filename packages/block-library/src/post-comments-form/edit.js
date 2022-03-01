@@ -13,7 +13,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 export default function PostCommentsFormEdit( {
 	attributes,
@@ -55,8 +55,12 @@ export default function PostCommentsFormEdit( {
 
 				{ 'open' !== commentStatus && (
 					<Warning>
-						{ __(
-							'Post Comments Form block: comments to this post are not allowed.'
+						{ sprintf(
+							/* translators: 1: Post type (i.e. "post", "page") */
+							__(
+								'Post Comments Form block: comments to this %s are not allowed.'
+							),
+							postType
 						) }
 					</Warning>
 				) }

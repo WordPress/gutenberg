@@ -223,6 +223,16 @@ function register_site_editor_homepage_settings() {
 			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
 		)
 	);
+
+	register_setting(
+		'reading',
+		'page_for_posts',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'number',
+			'description'  => __( 'The ID of the page that should display the latest posts', 'gutenberg' ),
+		)
+	);
 }
 add_action( 'init', 'register_site_editor_homepage_settings', 10 );
 

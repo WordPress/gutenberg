@@ -26,7 +26,7 @@ export function cleanForSlug( string ) {
 	return trim(
 		deburr( string )
 			.replace( /[\s\./]+/g, '-' )
-			.replace( /[^\w-]+/g, '' )
+			.replace( /[^\p{L}\p{N}_-]+/gu, '' )
 			.toLowerCase(),
 		'-'
 	);

@@ -35,11 +35,17 @@ export default function NewTemplatePart( { postType } ) {
 		}
 
 		try {
+			// Currently template parts only allow latin chars.
+			// Fallback slug will receive suffix by default.
+			const cleanSlug =
+				kebabCase( title ).replace( /[^\w-]+/g, '' ) ||
+				'wp-custom-part';
+
 			const templatePart = await saveEntityRecord(
 				'postType',
 				'wp_template_part',
 				{
-					slug: kebabCase( title ),
+					slug: cleanSlug,
 					title,
 					content: '',
 					area,

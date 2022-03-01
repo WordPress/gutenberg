@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { size, map, without } from 'lodash';
+import { forEach, size, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -164,7 +164,7 @@ function Editor( {
 	const styles = useMemo( () => {
 		const themeStyles = [];
 		const presetStyles = [];
-		settings.styles.forEach( ( style ) => {
+		forEach( settings.styles, ( style ) => {
 			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
 				themeStyles.push( style );
 			} else {
