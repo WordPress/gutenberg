@@ -13,11 +13,7 @@ import {
 } from './styles/focal-point-picker-style';
 import { useUpdateEffect } from '../utils/hooks';
 
-export default function FocalPointPickerGrid( {
-	bounds = {},
-	value,
-	...props
-} ) {
+export default function FocalPointPickerGrid( { bounds, value, ...props } ) {
 	const animationProps = useRevealAnimation( value );
 	const style = {
 		width: bounds.width,
