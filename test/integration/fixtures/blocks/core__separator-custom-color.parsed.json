@@ -2,7 +2,6 @@
 	{
 		"blockName": "core/separator",
 		"attrs": {
-			"opacity": "alpha-channel",
 			"style": {
 				"color": {
 					"background": "#5da54c"

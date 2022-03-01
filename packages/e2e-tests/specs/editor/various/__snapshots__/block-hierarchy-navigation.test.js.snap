@@ -56,7 +56,7 @@ exports[`Navigating the block hierarchy should select the wrapper div for a grou
 <p>just a paragraph</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:separator {\\"opacity\\":\\"alpha-channel\\"} -->
+<!-- wp:separator -->
 <hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
 <!-- /wp:separator --></div>
 <!-- /wp:group -->"

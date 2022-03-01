@@ -1,9 +1,7 @@
 [
 	{
 		"blockName": "core/separator",
-		"attrs": {
-			"opacity": "alpha-channel"
-		},
+		"attrs": {},
 		"innerBlocks": [],
 		"innerHTML": "\n<hr class=\"wp-block-separator has-alpha-channel-opacity\"/>\n",
 		"innerContent": [
