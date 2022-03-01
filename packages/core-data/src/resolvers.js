@@ -292,7 +292,7 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 		return;
 	}
 
-	const allowHeader = response.headers.get( 'allow' );
+	const allowHeader = response.headers?.get( 'allow' );
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	const isAllowed = includes( allowHeader, method );
 	dispatch.receiveUserPermission( key, isAllowed );
