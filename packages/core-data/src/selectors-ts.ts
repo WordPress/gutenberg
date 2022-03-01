@@ -31,13 +31,13 @@ export type State = any;
  * yet received, undefined if the value entity is known to not exist, or the
  * entity object if it exists and is received.
  *
- * @param {Object}  state State tree
- * @param {string}  kind  Entity kind.
- * @param {string}  name  Entity name.
- * @param {number}  key   Record's key
- * @param {?Object} query Optional query.
+ * @param  state State tree
+ * @param  kind  Entity kind.
+ * @param  name  Entity name.
+ * @param  key   Record's key
+ * @param  query Optional query.
  *
- * @return {Object?} Record.
+ * @return Record.
  */
 export const getEntityRecord = createSelector(
 	function <
@@ -109,7 +109,7 @@ export const getEntityRecord = createSelector(
 		] as any;
 	}
 );
-//
+
 // const commentDefault = getEntityRecord( {}, 'root', 'comment', 15 );
 // // commentDefault is Comment<'edit'>
 //
