@@ -125,9 +125,6 @@ function CoverHeightInput( {
 		}
 		setTemporaryInput( null );
 		onChange( inputValue );
-		if ( inputValue === undefined ) {
-			onUnitChange();
-		}
 	};
 
 	const handleOnBlur = () => {
@@ -402,9 +399,10 @@ function CoverEdit( {
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
-	const minHeightWithUnit = minHeightUnit
-		? `${ minHeight }${ minHeightUnit }`
-		: minHeight;
+	const minHeightWithUnit =
+		minHeight && minHeightUnit
+			? `${ minHeight }${ minHeightUnit }`
+			: minHeight;
 
 	const isImgElement = ! ( hasParallax || isRepeated );
 
