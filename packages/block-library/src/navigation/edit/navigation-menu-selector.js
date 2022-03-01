@@ -10,6 +10,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -63,6 +64,27 @@ export default function NavigationMenuSelector( {
 		onFinishMenuCreation
 	);
 
+	const handleSelect = useCallback(
+		( _onClose ) => ( selectedId ) => {
+			_onClose();
+			onSelect(
+				navigationMenus.find( ( post ) => post.id === selectedId )
+			);
+		},
+		[ navigationMenus ]
+	);
+
+	const menuChoices = useMemo( () => {
+		return navigationMenus.map( ( { id, title } ) => {
+			const label = decodeEntities( title.rendered );
+			return {
+				value: id,
+				label,
+				ariaLabel: sprintf( actionLabel, label ),
+			};
+		} );
+	}, [ navigationMenus ] );
+
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
 	const showNavigationMenus = !! canSwitchNavigationMenu;
@@ -95,29 +117,8 @@ export default function NavigationMenuSelector( {
 						<MenuGroup label={ __( 'Menus' ) }>
 							<MenuItemsChoice
 								value={ currentMenuId }
-								onSelect={ ( selectedId ) => {
-									onClose();
-									onSelect(
-										navigationMenus.find(
-											( post ) => post.id === selectedId
-										)
-									);
-								} }
-								choices={ navigationMenus.map(
-									( { id, title } ) => {
-										const label = decodeEntities(
-											title.rendered
-										);
-										return {
-											value: id,
-											label,
-											ariaLabel: sprintf(
-												actionLabel,
-												label
-											),
-										};
-									}
-								) }
+								onSelect={ handleSelect( onClose ) }
+								choices={ menuChoices }
 							/>
 						</MenuGroup>
 					) }
