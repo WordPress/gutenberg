@@ -52,6 +52,16 @@ function useInitialPosition( clientId ) {
 	);
 }
 
+function isFormElement( element ) {
+	const { tagName } = element;
+	return (
+		tagName === 'INPUT' ||
+		tagName === 'BUTTON' ||
+		tagName === 'SELECT' ||
+		tagName === 'TEXTAREA'
+	);
+}
+
 /**
  * Transitions focus to the block or inner tabbable when the block becomes
  * selected and an initial position is set.
@@ -97,19 +107,12 @@ export function useFocusFirstElement( clientId ) {
 		}
 
 		// Check to see if Block contains focussable element before a generic caret insert.
-		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
+		if ( ! target.getAttribute( 'contenteditable' ) ) {
 			const focusElement = focus.tabbable.findNext( ref.current );
-			// Need to make sure we're still in the current Block, if not, we could run in to trouble if focus is placed in a Block further down the page.
-			if ( ref.current.contains( focusElement ) ) {
-				// Need to try our best to detect child Blocks and not focus them straight away.
-				const disallowedTags = [ 'div', 'figure' ];
-				const checkDisallowedTags = disallowedTags.some(
-					( tag ) => focusElement.tagName.toLowerCase() === tag
-				);
-				if ( ! checkDisallowedTags && focusElement ) {
-					focusElement.focus();
-					return;
-				}
+			// Make sure focusElement is valid, form field, and in current ref.
+			if ( focusElement && isFormElement( focusElement ) && ref.current.contains( focusElement ) ) {
+				focusElement.focus();
+				return;
 			}
 		}
 
