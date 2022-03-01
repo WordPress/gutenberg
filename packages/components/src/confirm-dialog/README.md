@@ -127,13 +127,13 @@ If `isOpen` is set (controlled mode), then it's required, and you need to set th
 ### `confirmButtonText`: `string`
 
 -   Required: No
--   Default: OK
+-   Default: "OK"
 
 The optional custom text to display as the confirmation button's label
 
 ### `cancelButtonText`: `string`
 
 -   Required: No
--   Default: Cancel
+-   Default: "Cancel"
 
 The optional custom text to display as the cancelation button's label
