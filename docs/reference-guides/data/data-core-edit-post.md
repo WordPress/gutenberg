@@ -352,16 +352,12 @@ _Returns_
 
 ### hideBlockTypes
 
-Returns an action object used in signalling that block types by the given
-name(s) should be hidden.
+Dispatches an action to update the hidden block types preference with new
+hidden blocks.
 
 _Parameters_
 
 -   _blockNames_ `string[]`: Names of block types to hide.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### initializeMetaBoxes
 
@@ -477,16 +473,12 @@ _Returns_
 
 ### showBlockTypes
 
-Returns an action object used in signalling that block types by the given
-name(s) should be shown.
+Dispatches an action to update the hidden block types preference with new
+visible blocks.
 
 _Parameters_
 
 -   _blockNames_ `string[]`: Names of block types to show.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### switchEditorMode
 
