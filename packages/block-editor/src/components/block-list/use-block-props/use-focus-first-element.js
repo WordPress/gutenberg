@@ -108,9 +108,18 @@ export function useFocusFirstElement( clientId ) {
 
 		// Check to see if Block contains focussable element before a generic caret insert.
 		if ( ! target.getAttribute( 'contenteditable' ) ) {
-			const focusElement = focus.tabbable.findNext( ref.current );
+			const focusElement = focus.tabbable.findNext( target );
+			// Ensure is not Add block/Block Inserter trigger
+			const isBlockInserterTrigger = target.getAttribute( 'aria-label' )
+				? target.getAttribute( 'aria-label' ) === 'Add block'
+				: false;
 			// Make sure focusElement is valid, form field, and in current ref.
-			if ( focusElement && isFormElement( focusElement ) && ref.current.contains( focusElement ) ) {
+			if (
+				focusElement &&
+				isFormElement( focusElement ) &&
+				! isBlockInserterTrigger &&
+				target.contains( focusElement )
+			) {
 				focusElement.focus();
 				return;
 			}
