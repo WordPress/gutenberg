@@ -35,48 +35,26 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 } );
 
 /**
- * Initialize an editor for test assertions.
+ * Executes a function that triggers store resolvers and waits for them to be finished.
  *
- * @param {Object}                    props               Properties passed to the editor component.
- * @param {string}                    props.initialHtml   String of block editor HTML to parse and render.
- * @param {Object}                    [options]           Configuration options for the editor.
- * @param {import('react').ReactNode} [options.component] A specific editor component to render.
- * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
+ * Asynchronous store resolvers leverage `setTimeout` to run at the end of
+ * the current JavaScript block execution. In order to prevent "act" warnings
+ * triggered by updates to the React tree, we manually tick fake timers and
+ * await the resolution of the current block execution before proceeding.
+ *
+ * @param {Function} fn Function that triggers store resolvers.
+ * @return {*} The result of the function call.
  */
-export async function initializeEditor( props, { component = Editor } = {} ) {
+export async function waitForStoreResolvers( fn ) {
 	// Portions of the React Native Animation API rely upon these APIs. However,
 	// Jest's 'legacy' fake timers mutate these globals, which breaks the Animated
 	// API. We preserve the original implementations to restore them later.
 	const originalRAF = global.requestAnimationFrame;
 	const originalCAF = global.cancelAnimationFrame;
 
-	// During editor initialization, asynchronous store resolvers leverage
-	// `setTimeout` to run at the end of the current JavaScript block execution.
-	// In order to prevent "act" warnings triggered by updates to the React tree,
-	// we manually tick fake timers and await the resolution of the current block
-	// execution before proceeding.
 	jest.useFakeTimers( 'legacy' );
 
-	// Arrange.
-	const EditorComponent = component;
-	const screen = render(
-		<EditorComponent
-			postId={ `post-id-${ uuid() }` }
-			postType="post"
-			initialTitle="test"
-			{ ...props }
-		/>
-	);
-
-	// A layout event must be explicitly dispatched in BlockList component,
-	// otherwise the inner blocks are not rendered.
-	fireEvent( screen.getByTestId( 'block-list-wrapper' ), 'layout', {
-		nativeEvent: {
-			layout: {
-				width: 100,
-			},
-		},
-	} );
+	const result = fn();
 
 	// Advance all timers allowing store resolvers to resolve.
 	act( () => jest.runAllTimers() );
@@ -97,7 +75,42 @@ export async function initializeEditor( props, { component = Editor } = {} ) {
 	global.requestAnimationFrame = originalRAF;
 	global.cancelAnimationFrame = originalCAF;
 
-	return screen;
+	return result;
+}
+
+/**
+ * Initialize an editor for test assertions.
+ *
+ * @param {Object}                    props               Properties passed to the editor component.
+ * @param {string}                    props.initialHtml   String of block editor HTML to parse and render.
+ * @param {Object}                    [options]           Configuration options for the editor.
+ * @param {import('react').ReactNode} [options.component] A specific editor component to render.
+ * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
+ */
+export async function initializeEditor( props, { component = Editor } = {} ) {
+	return waitForStoreResolvers( () => {
+		const EditorComponent = component;
+		const screen = render(
+			<EditorComponent
+				postId={ `post-id-${ uuid() }` }
+				postType="post"
+				initialTitle="test"
+				{ ...props }
+			/>
+		);
+
+		// A layout event must be explicitly dispatched in BlockList component,
+		// otherwise the inner blocks are not rendered.
+		fireEvent( screen.getByTestId( 'block-list-wrapper' ), 'layout', {
+			nativeEvent: {
+				layout: {
+					width: 100,
+				},
+			},
+		} );
+
+		return screen;
+	} );
 }
 
 export * from '@testing-library/react-native';
