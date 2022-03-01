@@ -45,6 +45,15 @@ Create and save content to reuse across your site. Update the block, and the cha
 -	**Supports:** ~~customClassName~~, ~~html~~, ~~inserter~~
 -	**Attributes:** ref
 
+## Breadcrumbs
+
+Displays breadcrumbs of a page's hierarchy, or a post's categories ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs))
+
+-	**Name:** core/breadcrumbs
+-	**Category:** design
+-	**Supports:** align (full, wide), color (background, gradients, link, text), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** contentJustification, separator, showCurrentPageTitle, showLeadingSeparator, showSiteTitle, siteTitleOverride
+
 ## Button
 
 Prompt visitors to take action with a button-style link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button))

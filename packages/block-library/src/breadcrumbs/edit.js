@@ -13,12 +13,7 @@ import {
 	JustifyContentControl,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import {
-	RangeControl,
-	PanelBody,
-	TextControl,
-	ToggleControl,
-} from '@wordpress/components';
+import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -67,7 +62,6 @@ export default function BreadcrumbsEdit( {
 } ) {
 	const {
 		contentJustification,
-		nestingLevel,
 		separator,
 		showCurrentPageTitle,
 		showLeadingSeparator,
@@ -161,11 +155,6 @@ export default function BreadcrumbsEdit( {
 			}
 		}
 
-		// Limit titles by nesting level.
-		if ( nestingLevel > 0 ) {
-			breadcrumbTitles = breadcrumbTitles.slice( -nestingLevel );
-		}
-
 		// Append current page title if set.
 		if ( showCurrentPageTitle ) {
 			breadcrumbTitles.push( post?.title || __( 'Current page' ) );
@@ -182,7 +171,6 @@ export default function BreadcrumbsEdit( {
 		) );
 	}, [
 		categories,
-		nestingLevel,
 		parents,
 		showCurrentPageTitle,
 		showLeadingSeparator,
@@ -214,18 +202,6 @@ export default function BreadcrumbsEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Display' ) }>
-					<RangeControl
-						label={ __( 'Nesting level' ) }
-						help={ __(
-							'Control how many levels of nesting to display. Set to 0 to show all nesting levels.'
-						) }
-						value={ nestingLevel }
-						onChange={ ( value ) =>
-							setAttributes( { nestingLevel: value } )
-						}
-						min={ 0 }
-						max={ Math.max( 10, nestingLevel ) }
-					/>
 					<TextControl
 						label={ __( 'Separator character' ) }
 						help={ __(

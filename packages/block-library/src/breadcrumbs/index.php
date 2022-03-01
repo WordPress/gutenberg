@@ -80,14 +80,6 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 	}
 
-	// Trim the list of breadcrumbs based on nesting level if available.
-	if ( ! empty( $attributes['nestingLevel'] ) && is_numeric( $attributes['nestingLevel'] ) ) {
-		$breadcrumbs = array_slice(
-			$breadcrumbs,
-			0 - intval( $attributes['nestingLevel'] )
-		);
-	}
-
 	// Append current page title if set to show.
 	if ( ! empty( $attributes['showCurrentPageTitle'] ) ) {
 		$breadcrumbs[] = array(

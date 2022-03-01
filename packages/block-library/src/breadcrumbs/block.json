@@ -12,10 +12,6 @@
 		"contentJustification": {
 			"type": "string"
 		},
-		"nestingLevel": {
-			"type": "number",
-			"default": 0
-		},
 		"separator": {
 			"type": "string",
 			"default": "/"
@@ -54,15 +50,12 @@
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,
-			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
-			"__experimentalTextTransform": true
-		},
-		"__experimentalBorder": {
-			"color": true,
-			"radius": true,
-			"style": true,
-			"width": true
+			"__experimentalFontWeight": true,
+			"__experimentalTextTransform": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-breadcrumbs-editor",
