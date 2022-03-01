@@ -1,17 +1,20 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
 import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import UnitControl from '../';
+import { parseUnit } from '../utils';
 
 const getComponent = () =>
 	document.body.querySelector( '.components-unit-control' );
@@ -24,6 +27,47 @@ const getUnitLabel = () =>
 
 const fireKeyDown = ( data ) =>
 	fireEvent.keyDown( document.activeElement || document.body, data );
+
+const ControlledSyncUnits = () => {
+	const [ state, setState ] = useState( { valueA: '', valueB: '' } );
+
+	// Keep the unit sync'd between the two `UnitControl` instances.
+	const onUnitControlChange = ( fieldName, newValue ) => {
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const [ quantity, newUnit ] = parseUnit( newValue );
+
+		if ( ! Number.isFinite( quantity ) ) {
+			return;
+		}
+
+		const nextState = { ...state, [ fieldName ]: newValue };
+
+		Object.entries( state ).forEach( ( [ stateProp, stateValue ] ) => {
+			const [ stateQuantity, stateUnit ] = parseUnit( stateValue );
+
+			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
+				nextState[ stateProp ] = `${ stateQuantity }${ newUnit }`;
+			}
+		} );
+
+		setState( nextState );
+	};
+
+	return (
+		<>
+			<UnitControl
+				label="Field A"
+				value={ state.valueA }
+				onChange={ ( v ) => onUnitControlChange( 'valueA', v ) }
+			/>
+			<UnitControl
+				label="Field B"
+				value={ state.valueB }
+				onChange={ ( v ) => onUnitControlChange( 'valueB', v ) }
+			/>
+		</>
+	);
+};
 
 describe( 'UnitControl', () => {
 	describe( 'Basic rendering', () => {
@@ -265,6 +309,32 @@ describe( 'UnitControl', () => {
 			fireEvent.change( input, { target: { value: 62 } } );
 
 			expect( state ).toBe( '62%' );
+		} );
+
+		it( 'should update unit value when a new raw value is passed', () => {
+			render( <ControlledSyncUnits /> );
+
+			const [ inputA, inputB ] = screen.getAllByRole( 'spinbutton' );
+			const [ selectA, selectB ] = screen.getAllByRole( 'combobox' );
+			const [ remOptionA ] = screen.getAllByRole( 'option', {
+				name: 'rem',
+			} );
+			const [ , vwOptionB ] = screen.getAllByRole( 'option', {
+				name: 'vw',
+			} );
+
+			userEvent.type( inputA, '55' );
+			userEvent.type( inputB, '14' );
+
+			userEvent.selectOptions( selectA, remOptionA );
+
+			expect( selectA ).toHaveValue( 'rem' );
+			expect( selectB ).toHaveValue( 'rem' );
+
+			userEvent.selectOptions( selectB, vwOptionB );
+
+			expect( selectA ).toHaveValue( 'vw' );
+			expect( selectB ).toHaveValue( 'vw' );
 		} );
 	} );
 
