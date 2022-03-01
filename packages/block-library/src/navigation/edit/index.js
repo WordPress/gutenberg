@@ -680,31 +680,29 @@ function Navigation( {
 					</TagName>
 				) }
 
-				{ ! isLoading && ! isPlaceholder && (
+				{ ! isLoading && (
 					<TagName { ...blockProps }>
-						{ ! isPlaceholder && (
-							<ResponsiveWrapper
-								id={ clientId }
-								onToggle={ setResponsiveMenuVisibility }
-								label={ __( 'Menu' ) }
-								hasIcon={ hasIcon }
-								isOpen={ isResponsiveMenuOpen }
-								isResponsive={ isResponsive }
-								isHiddenByDefault={ 'always' === overlayMenu }
-								classNames={ overlayClassnames }
-								styles={ overlayStyles }
-							>
-								{ isEntityAvailable && (
-									<NavigationInnerBlocks
-										clientId={ clientId }
-										hasCustomPlaceholder={
-											!! CustomPlaceholder
-										}
-										orientation={ orientation }
-									/>
-								) }
-							</ResponsiveWrapper>
-						) }
+						<ResponsiveWrapper
+							id={ clientId }
+							onToggle={ setResponsiveMenuVisibility }
+							label={ __( 'Menu' ) }
+							hasIcon={ hasIcon }
+							isOpen={ isResponsiveMenuOpen }
+							isResponsive={ isResponsive }
+							isHiddenByDefault={ 'always' === overlayMenu }
+							classNames={ overlayClassnames }
+							styles={ overlayStyles }
+						>
+							{ isEntityAvailable && (
+								<NavigationInnerBlocks
+									clientId={ clientId }
+									hasCustomPlaceholder={
+										!! CustomPlaceholder
+									}
+									orientation={ orientation }
+								/>
+							) }
+						</ResponsiveWrapper>
 					</TagName>
 				) }
 			</RecursionProvider>
