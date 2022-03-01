@@ -304,7 +304,7 @@ PODS:
     - React-Core
   - RNCMaskedView (0.1.11-wp-2):
     - React-Core
-  - RNGestureHandler (2.2.0-wp-1):
+  - RNGestureHandler (2.2.0-wp-2):
     - React-Core
   - RNReanimated (2.2.4-wp-1):
     - DoubleConversion
@@ -539,7 +539,7 @@ SPEC CHECKSUMS:
   ReactCommon: c0263c1a41509aeb94be3214fa7bc3b71eae5ef6
   RNCClipboard: 6e20baf63bfe3515c2b719a8c3d6797718098663
   RNCMaskedView: 579fdb1e0abb33cc0d38ee8d4942df9976a0533e
-  RNGestureHandler: 2dc92d952d5aa98866737870d1f40f1dd8b80e73
+  RNGestureHandler: fce8f224be161a49e3d311052caac03533900d19
   RNReanimated: 6aee4bed42a400d9472b7e843762ab4119cf201c
   RNScreens: ec0e85d1babdd61d7ec78c98072d9e6b62d96ff6
   RNSVG: b3b9c40381636e5116894398d72a830be15b7258
