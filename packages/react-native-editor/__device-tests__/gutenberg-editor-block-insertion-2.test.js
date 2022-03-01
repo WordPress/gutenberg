@@ -3,7 +3,7 @@
  */
 import { blockNames } from './pages/editor-page';
 
-describe( 'Gutenberg Editor tests for Block insertion', () => {
+describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 	it( 'adds new block at the end of post', async () => {
 		await editorPage.addNewBlock( blockNames.heading );
 

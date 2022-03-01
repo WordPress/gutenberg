@@ -116,6 +116,22 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
+	it( 'should be able to create a post with multiple paragraph blocks', async () => {
+		await editorPage.addNewBlock( blockNames.paragraph );
+		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+			blockNames.paragraph
+		);
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
+
+		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
+
+		for ( let i = 3; i > 0; i-- ) {
+			await editorPage.removeBlockAtPosition( blockNames.paragraph, i );
+		}
+	} );
+
 	it( 'should be able to merge blocks with unknown html elements', async () => {
 		await editorPage.setHtmlContent( `
 <!-- wp:paragraph -->
