@@ -150,6 +150,7 @@ export { default as plugins } from './library/plugins';
 export { default as plusCircleFilled } from './library/plus-circle-filled';
 export { default as plusCircle } from './library/plus-circle';
 export { default as plus } from './library/plus';
+export { default as post } from './library/post';
 export { default as postAuthor } from './library/post-author';
 export { default as postCategories } from './library/post-categories';
 export { default as postContent } from './library/post-content';
