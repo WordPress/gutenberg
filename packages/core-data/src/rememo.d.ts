@@ -22,6 +22,10 @@ declare module 'rememo' {
 	) : never
 	export default function createSelector< T extends Function >(
 		select: T,
-		makeKey?: ReplaceReturnType<T, unknown>
+		// @TODO: Figure out why this doesn't work with
+		//        getEntityRecord when it also has a Q generic
+		//        In the next iteration perhaps?
+		// makeKey?: ReplaceReturnType<T, unknown>
+		makeKey?: any
 	): T;
 }

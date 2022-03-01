@@ -20,9 +20,6 @@ import type {
 	DefaultContextOf,
 } from './types';
 
-// Let's get rid of this import
-import type {} from './rememo';
-
 // Placeholder State type for now
 export type State = any;
 
@@ -44,14 +41,20 @@ export const getEntityRecord = createSelector(
 		R extends RecordOf< K, N >,
 		C extends Context = DefaultContextOf< R >,
 		K extends Kind = KindOf< R >,
-		N extends Name = NameOf< R >
+		N extends Name = NameOf< R >,
+		Q extends EntityQuery< any > = EntityQuery< C >
 	>(
 		state: State,
 		kind: K,
 		name: N,
 		key: KeyOf< R >,
-		query?: EntityQuery< C >
-	): RecordOf< K, N, C > | null | undefined {
+		query?: Q
+	):
+		| ( Q[ '_fields' ] extends string[]
+				? Partial< RecordOf< K, N, C > >
+				: RecordOf< K, N, C > )
+		| null
+		| undefined {
 		const queriedState = get( state.entities.data, [
 			kind,
 			name,
@@ -73,7 +76,7 @@ export const getEntityRecord = createSelector(
 
 		const item = queriedState.items[ context ]?.[ key ];
 		if ( item && query._fields ) {
-			const filteredItem = {};
+			const filteredItem: Partial< RecordOf< K, N, C > > = {};
 			const fields = getNormalizedCommaSeparable( query._fields );
 			if ( fields !== null ) {
 				for ( let f = 0; f < fields.length; f++ ) {
@@ -82,12 +85,19 @@ export const getEntityRecord = createSelector(
 					set( filteredItem, field, value );
 				}
 			}
-			return filteredItem as RecordOf< K, N, C >;
+			// @TODO: Get rid of any when a larger portion of this package uses types.
+			return filteredItem as any;
 		}
 
 		return item;
 	},
-	( state, kind, name, recordId, query? ) => {
+	(
+		state: State,
+		kind: Kind,
+		name: Name,
+		recordId: string | number,
+		query?: EntityQuery< Context >
+	) => {
 		const context = query?.context ?? 'default';
 		return [
 			get( state.entities.data, [
@@ -112,6 +122,11 @@ export const getEntityRecord = createSelector(
 
 // const commentDefault = getEntityRecord( {}, 'root', 'comment', 15 );
 // // commentDefault is Comment<'edit'>
+
+// const commentPartial = getEntityRecord( {}, 'root', 'comment', 15, {
+// 	_fields: [ 'id' ],
+// } );
+// // commentPartial is Partial< Comment<'edit'> >
 //
 // const commentView = getEntityRecord( {}, 'root', 'comment', 15, {
 // 	context: 'view',

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { EntityRecord } from './index';
+import type { EntityRecord } from './index';
 
 export interface AvatarUrls {
 	/**
@@ -176,7 +176,7 @@ export type EntityFromConfig<
 /**
  * TODO Docstring
  */
-export type EntityQuery< C extends Context > = {
-	[ key: string ]: string;
+export type EntityQuery< C extends Context > = Record< string, any > & {
 	context?: C;
+	_fields?: string[];
 };

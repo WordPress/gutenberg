@@ -1,0 +1,19 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"noUnusedParameters": false,
+	},
+	"references": [
+		{ "path": "../api-fetch" },
+		{ "path": "../data" },
+		{ "path": "../deprecated" },
+		{ "path": "../element" },
+		{ "path": "../i18n" },
+		{ "path": "../is-shallow-equal" }
+	],
+	"include": [
+	  	"src/**/*.ts"
+	]
+}
