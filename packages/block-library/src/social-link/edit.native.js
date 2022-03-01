@@ -26,12 +26,13 @@ import { withSelect } from '@wordpress/data';
 import { getIconBySite, getNameBySite } from './social-list';
 import styles from './editor.scss';
 
-/**
- * These values are derived from `./socials-with-bg.scss`.
- */
 const DEFAULT_ACTIVE_ICON_STYLES = {
 	backgroundColor: '#f0f0f0',
 	color: '#444',
+};
+const DEFAULT_INACTIVE_ICON_STYLES = {
+	backgroundColor: '#0000003f',
+	color: '#fff',
 };
 const ANIMATION_DELAY = 300;
 const ANIMATION_DURATION = 400;
@@ -65,10 +66,11 @@ const SocialLinkEdit = ( {
 		styles[ `wp-social-link-${ service }` ] ||
 		styles[ `wp-social-link` ] ||
 		DEFAULT_ACTIVE_ICON_STYLES;
-	const inactiveIcon = usePreferredColorSchemeStyle(
-		styles.inactiveIcon,
-		styles.inactiveIconDark
-	);
+	const inactiveIcon =
+		usePreferredColorSchemeStyle(
+			styles.inactiveIcon,
+			styles.inactiveIconDark
+		) || DEFAULT_INACTIVE_ICON_STYLES;
 
 	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
 

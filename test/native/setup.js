@@ -222,12 +222,6 @@ jest.mock( '@wordpress/compose', () => {
 			mockComponent( 'ResizeObserverMock' )( {} ),
 			{ width: 100, height: 100 },
 		] ),
-		usePreferredColorSchemeStyle: jest.fn( () => {
-			return {
-				color: '#fff',
-				backgroundColor: '#0000003f',
-			};
-		} ),
 	};
 } );
 
