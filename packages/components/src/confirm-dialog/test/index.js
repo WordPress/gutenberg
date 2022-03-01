@@ -35,7 +35,7 @@ describe( 'Confirm', () => {
 					expect( el ).toBeInTheDocument();
 				} );
 			} );
-			it( 'should render correctly with custom button lables', () => {
+			it( 'should render correctly with custom button labels', () => {
 				const cancelButtonText = 'No thanks';
 				const confirmButtonText = 'Yes please!';
 				render(
