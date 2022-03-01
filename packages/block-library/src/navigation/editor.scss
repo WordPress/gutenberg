@@ -561,6 +561,12 @@ body.editor-styles-wrapper
 	}
 }
 
+// Space spinner to give it breathing
+// room when block is selected and has focus outline.
+.wp-block-navigation .components-spinner {
+	padding: $grid-unit-10 $grid-unit-15;
+}
+
 .wp-block-navigation__unsaved-changes {
 	position: relative;
 
