@@ -7,7 +7,7 @@ import {
 	fireEvent,
 	waitFor,
 	within,
-	executeStoreResolvers,
+	waitForStoreResolvers,
 } from 'test/helpers';
 
 /**
@@ -53,7 +53,7 @@ export const addGalleryBlock = async () => {
 /**
  * The gallery items are rendered via the FlatList of the inner block list.
  * In order to render the items of a FlatList, it's required to trigger the
- * "onLayout" event. Additionally, the call is wrapped over "executeStoreResolvers"
+ * "onLayout" event. Additionally, the call is wrapped over "waitForStoreResolvers"
  * because the gallery items request the media data associated with the image to
  * be rendered via the "getMedia" selector.
  *
@@ -65,7 +65,7 @@ export const triggerGalleryLayout = async (
 	galleryBlock,
 	{ width = 320 } = {}
 ) =>
-	executeStoreResolvers( () =>
+	waitForStoreResolvers( () =>
 		fireEvent(
 			within( galleryBlock ).getByTestId( 'block-list-wrapper' ),
 			'layout',

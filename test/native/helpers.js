@@ -35,7 +35,7 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 } );
 
 /**
- * Executes a function that triggers store resolvers.
+ * Executes a function that triggers store resolvers and waits for them to be finished.
  *
  * Asynchronous store resolvers leverage `setTimeout` to run at the end of
  * the current JavaScript block execution. In order to prevent "act" warnings
@@ -45,7 +45,7 @@ provideToNativeHtml.mockImplementation( ( html ) => {
  * @param {Function} fn Function that triggers store resolvers.
  * @return {*} The result of the function call.
  */
-export async function executeStoreResolvers( fn ) {
+export async function waitForStoreResolvers( fn ) {
 	// Portions of the React Native Animation API rely upon these APIs. However,
 	// Jest's 'legacy' fake timers mutate these globals, which breaks the Animated
 	// API. We preserve the original implementations to restore them later.
@@ -88,7 +88,7 @@ export async function executeStoreResolvers( fn ) {
  * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
  */
 export async function initializeEditor( props, { component = Editor } = {} ) {
-	return executeStoreResolvers( () => {
+	return waitForStoreResolvers( () => {
 		const EditorComponent = component;
 		const screen = render(
 			<EditorComponent
