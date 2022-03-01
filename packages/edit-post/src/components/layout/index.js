@@ -47,6 +47,7 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
+import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 
 const interfaceLabels = {
@@ -286,6 +287,7 @@ function Layout( { styles } ) {
 			<PreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
+			<StartPageOptions />
 			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />
 		</>
