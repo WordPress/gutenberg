@@ -264,14 +264,14 @@ describe( 'resolveSelect', () => {
 	it( 'resolves when the resolution succeeded', async () => {
 		shouldFail = false;
 		const promise = registry.resolveSelect( 'store' ).getItems();
-		jest.advanceTimersByTime( 1 );
+		jest.runAllTimers();
 		await expect( promise ).resolves.toEqual( 'items' );
 	} );
 
 	it( 'rejects when the resolution failed', async () => {
 		shouldFail = true;
 		const promise = registry.resolveSelect( 'store' ).getItems();
-		jest.advanceTimersByTime( 1 );
+		jest.runAllTimers();
 		await expect( promise ).rejects.toEqual(
 			new Error( 'cannot fetch items' )
 		);
