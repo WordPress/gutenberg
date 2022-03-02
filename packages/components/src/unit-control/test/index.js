@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { render, fireEvent, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -316,22 +315,21 @@ describe( 'UnitControl', () => {
 
 			const [ inputA, inputB ] = screen.getAllByRole( 'spinbutton' );
 			const [ selectA, selectB ] = screen.getAllByRole( 'combobox' );
-			const [ remOptionA ] = screen.getAllByRole( 'option', {
-				name: 'rem',
-			} );
-			const [ , vwOptionB ] = screen.getAllByRole( 'option', {
-				name: 'vw',
-			} );
 
-			userEvent.type( inputA, '55' );
-			userEvent.type( inputB, '14' );
+			inputA.focus();
+			fireEvent.change( inputA, { target: { value: '55' } } );
 
-			userEvent.selectOptions( selectA, remOptionA );
+			inputB.focus();
+			fireEvent.change( inputB, { target: { value: '14' } } );
+
+			selectA.focus();
+			fireEvent.change( selectA, { target: { value: 'rem' } } );
 
 			expect( selectA ).toHaveValue( 'rem' );
 			expect( selectB ).toHaveValue( 'rem' );
 
-			userEvent.selectOptions( selectB, vwOptionB );
+			selectB.focus();
+			fireEvent.change( selectB, { target: { value: 'vw' } } );
 
 			expect( selectA ).toHaveValue( 'vw' );
 			expect( selectB ).toHaveValue( 'vw' );
