@@ -294,6 +294,7 @@ export class MediaUpload extends Component {
 				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
 				onChange={ this.onPickerSelect }
+				testID="media-options-picker"
 			/>
 		);
 

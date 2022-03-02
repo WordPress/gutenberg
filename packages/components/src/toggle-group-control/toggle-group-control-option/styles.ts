@@ -29,6 +29,7 @@ export const buttonView = css`
 	color: ${ COLORS.gray[ 700 ] };
 	cursor: pointer;
 	display: flex;
+	font-family: inherit;
 	height: 100%;
 	justify-content: center;
 	line-height: 100%;

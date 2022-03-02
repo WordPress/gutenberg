@@ -43,7 +43,7 @@ export default function NavigationMenuSelector( {
 
 	// Avoid showing any currently active menu in the list of
 	// menus that can be selected.
-	const navigationMenusOmitCurrent = navigationMenus.filter(
+	const navigationMenusOmitCurrent = navigationMenus?.filter(
 		( menu ) => ! currentMenuId || menu.id !== currentMenuId
 	);
 

@@ -224,6 +224,7 @@ function ButtonEdit( props ) {
 					} }
 					anchorRef={ ref?.current }
 					focusOnMount={ isEditingURL ? 'firstElement' : false }
+					__unstableSlotName={ '__unstable-block-tools-after' }
 				>
 					<LinkControl
 						className="wp-block-navigation-link__inline-link-input"
