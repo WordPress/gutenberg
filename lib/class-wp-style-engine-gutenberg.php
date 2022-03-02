@@ -3,7 +3,6 @@
  * WP_Style_Engine class
  *
  * @package Gutenberg
-
  */
 
 /**
@@ -31,6 +30,9 @@ class WP_Style_Engine_Gutenberg {
 	 */
 	private static $instance = null;
 
+	/**
+	 * Register action for outputting styles when the class is constructed.
+	 */
 	public function __construct() {
 		// Borrows the logic from `gutenberg_enqueue_block_support_styles`.
 		$action_hook_name = 'wp_footer';
@@ -83,7 +85,7 @@ class WP_Style_Engine_Gutenberg {
 			$style .= '  ';
 			$style .= $rules;
 		} else {
-			foreach( $rules as $rule => $value ) {
+			foreach ( $rules as $rule => $value ) {
 				$style .= "  {$rule}: {$value};\n";
 			}
 		}
@@ -94,6 +96,9 @@ class WP_Style_Engine_Gutenberg {
 		return $class;
 	}
 
+	/**
+	 * Render registered styles for final output.
+	 */
 	public function output_styles() {
 		$style = implode( "\n", $this->registered_styles );
 		echo "<style>\n$style</style>\n";
