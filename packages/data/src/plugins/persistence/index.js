@@ -343,11 +343,6 @@ export function migrateFeaturePreferencesToInterfaceStore(
 	}
 }
 
-/**
- * Deprecated: Remove this function and the code in WordPress Core that calls
- * it once WordPress 6.0 is released.
- */
-
 persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const persistence = createPersistenceInterface( pluginOptions );
 
