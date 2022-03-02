@@ -83,6 +83,11 @@ export function useDebouncedShowMovers( {
 
 	useEffect(
 		() => () => {
+			/**
+			 * We need to call the change handler with `isFocused`
+			 * set to false on unmount because we also clear the
+			 * timeout that would handle that.
+			 */
 			handleOnChange( false );
 			clearTimeoutRef();
 		},
@@ -132,12 +137,14 @@ export function useShowMoversGestures( {
 		const handleOnFocus = () => {
 			if ( isFocusedWithin() ) {
 				setIsFocused( true );
+				debouncedShowMovers();
 			}
 		};
 
 		const handleOnBlur = () => {
 			if ( ! isFocusedWithin() ) {
 				setIsFocused( false );
+				debouncedHideMovers();
 			}
 		};
 
