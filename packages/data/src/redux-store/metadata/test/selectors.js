@@ -18,9 +18,8 @@ const testStore = {
 };
 
 async function resolve( registry, selector ) {
-	const resolution = registry.resolveSelect( 'store' )[ selector ]();
 	try {
-		await resolution;
+		await registry.resolveSelect( 'store' )[ selector ]();
 	} catch ( e ) {}
 }
 
