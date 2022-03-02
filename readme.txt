@@ -27,8 +27,6 @@ Are you a tech-savvy early adopter who likes testing bleeding-edge and experimen
 
 For the adventurous and tech-savvy, the Gutenberg plugin gives you the latest and greatest feature set, so you can join us in testing bleeding-edge features, playing around with blocks, and maybe get inspired to build your own.
 
-However, if you are running a production WordPress site, and favor stable, well-tested features, then you might want to stick with the block features already included with WordPress. Gutenberg is not recommended for production websites.
-
 ### Discover More
 
 - **User Documentation:** Review the <a href="https://wordpress.org/support/article/wordpress-editor/">WordPress Editor documentation</a> for detailed instructions on using the editor as an author to create posts, pages, and more.
