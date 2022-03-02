@@ -78,23 +78,23 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		return [ selectOption, ...taxonomyOptions ];
 	};
 
-	const onFontSizeChange = ( fontSize, value ) => {
+	const onFontSizeChange = ( fontSizeLabel, newValue ) => {
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const [ quantity, newUnit ] = parseUnit( value );
+		const [ quantity, newUnit ] = parseUnit( newValue );
 		if ( ! Number.isFinite( quantity ) || quantity < 0 || quantity > 100 ) {
 			return;
 		}
-		const updateObj = { [ fontSize ]: value };
+		const updateObj = { [ fontSizeLabel ]: newValue };
 		// We need to keep in sync the `unit` changes to both `smallestFontSize`
 		// and `largestFontSize` attributes.
 		Object.entries( {
 			smallestFontSize,
 			largestFontSize,
 		} ).forEach( ( [ attribute, currentValue ] ) => {
-			const [ _value, _unit ] = parseUnit( currentValue );
+			const [ currentQuantity, currentUnit ] = parseUnit( currentValue );
 			// Only add an update if the other font size attribute has a different unit.
-			if ( attribute !== fontSize && _unit !== newUnit ) {
-				updateObj[ attribute ] = `${ _value }${ newUnit }`;
+			if ( attribute !== fontSizeLabel && currentUnit !== newUnit ) {
+				updateObj[ attribute ] = `${ currentQuantity }${ newUnit }`;
 			}
 		} );
 		setAttributes( updateObj );
