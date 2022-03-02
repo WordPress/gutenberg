@@ -52,7 +52,7 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 	// Add universal styles for all default layouts.
 	// Add left align rule.
 	$class_names[] = $style_engine->add_style(
-		'wp-layout-default',
+		'wp-layout-flow',
 		array(
 			'selector' => '.alignleft',
 			'rules'    => array(
@@ -65,7 +65,7 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 
 	// Add right align rule.
 	$class_names[] = $style_engine->add_style(
-		'wp-layout-default',
+		'wp-layout-flow',
 		array(
 			'selector' => '.alignright',
 			'rules'    => array(
@@ -79,7 +79,7 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 	if ( $content_size || $wide_size ) {
 		// Add value specific content size.
 		$class_names[] = $style_engine->add_style(
-			'wp-layout-default-content-size',
+			'wp-layout-flow-content-size',
 			array(
 				'suffix'   => $all_max_width_value,
 				'selector' => '> :where(:not(.alignleft):not(.alignright))',
@@ -93,7 +93,7 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 
 		// Add value specific wide size.
 		$class_names[] = $style_engine->add_style(
-			'wp-layout-default-wide-size',
+			'wp-layout-flow-wide-size',
 			array(
 				'suffix'   => $wide_max_width_value,
 				'selector' => '> .alignwide',
@@ -105,7 +105,7 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 
 		// Add universal full width.
 		$class_names[] = $style_engine->add_style(
-			'wp-layout-default',
+			'wp-layout-flow',
 			array(
 				'selector' => '> .alignfull',
 				'rules'    => array(
@@ -118,7 +118,7 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 	if ( $has_block_gap_support ) {
 		if ( ! $gap_value ) {
 			$class_names[] = $style_engine->add_style(
-				'wp-layout-default-global-gap',
+				'wp-layout-flow-global-gap',
 				array(
 					'selector' => '> *',
 					'rules'    => array(
@@ -128,7 +128,7 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 				)
 			);
 			$class_names[] = $style_engine->add_style(
-				'wp-layout-default-global-gap',
+				'wp-layout-flow-global-gap',
 				array(
 					'selector' => '> * + *',
 					'rules'    => array(
@@ -139,7 +139,7 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 			);
 		} else {
 			$class_names[] = $style_engine->add_style(
-				'wp-layout-default-custom-gap',
+				'wp-layout-flow-custom-gap',
 				array(
 					'suffix'   => $gap_value,
 					'selector' => '> *',
@@ -150,7 +150,7 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 				)
 			);
 			$class_names[] = $style_engine->add_style(
-				'wp-layout-default-custom-gap',
+				'wp-layout-flow-custom-gap',
 				array(
 					'suffix'   => $gap_value,
 					'selector' => '> * + *',
@@ -320,10 +320,10 @@ function gutenberg_generate_layout_style_flex( $layout, $has_block_gap_support =
  * @return array An array of class names corresponding to the generated layout CSS.
  */
 function gutenberg_get_layout_style( $layout, $has_block_gap_support = false, $gap_value = null ) {
-	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
+	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'flow';
 	$class_names = array();
 
-	if ( 'default' === $layout_type ) {
+	if ( 'flow' === $layout_type ) {
 		$class_names = gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support, $gap_value );
 	} elseif ( 'flex' === $layout_type ) {
 		$class_names = gutenberg_generate_layout_style_flex( $layout, $has_block_gap_support, $gap_value );

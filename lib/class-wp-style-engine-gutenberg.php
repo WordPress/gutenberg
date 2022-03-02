@@ -61,8 +61,7 @@ class WP_Style_Engine_Gutenberg {
 	}
 
 	/**
-	 * Assemble the style rule from a list of rules, and store based on a key
-	 * generated from the class name, the selector, and any values used as a suffix.
+	 * Stores style rules for a given CSS selector (the key) and returns an associated classname.
 	 *
 	 * @param string $key     A class name used to construct a key.
 	 * @param array  $options An array of options, rules, and selector for constructing the rules.
@@ -79,28 +78,29 @@ class WP_Style_Engine_Gutenberg {
 			return;
 		}
 
-		$style = "{$prefix}{$class}{$selector} {\n";
-
-		if ( is_string( $rules ) ) {
-			$style .= '  ';
-			$style .= $rules;
-		} else {
-			foreach ( $rules as $rule => $value ) {
-				$style .= "  {$rule}: {$value};\n";
-			}
-		}
-		$style .= "}\n";
-
-		$this->registered_styles[ $class . $selector ] = $style;
+		$this->registered_styles[ $prefix . $class . $selector ] = $rules;
 
 		return $class;
 	}
 
 	/**
-	 * Render registered styles for final output.
+	 * Render registered styles as key { ...rules }  for final output.
 	 */
 	public function output_styles() {
-		$style = implode( "\n", $this->registered_styles );
-		echo "<style>\n$style</style>\n";
+		$output = '';
+		foreach ( $this->registered_styles as $selector => $rules ) {
+			$output .= "{$selector} {\n";
+
+			if ( is_string( $rules ) ) {
+				$output .= '  ';
+				$output .= $rules;
+			} else {
+				foreach ( $rules as $rule => $value ) {
+					$output .= "  {$rule}: {$value};\n";
+				}
+			}
+			$output .= "}\n";
+		}
+		echo "<style>\n$output</style>\n";
 	}
 }
