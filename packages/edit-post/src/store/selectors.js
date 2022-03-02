@@ -12,6 +12,12 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+// import { store as editPostStore } from '../store';
+
 /**
  * Returns the current editing mode.
  *
@@ -86,6 +92,10 @@ export const getActiveGeneralSidebarName = createRegistrySelector(
 	}
 );
 
+// The current list of preference keys that have been migrated to the
+// preferences package.
+const MIGRATED_KEYS = [ 'hiddenBlockTypes' ];
+
 /**
  * Returns the preferences (these preferences are persisted locally).
  *
@@ -93,9 +103,34 @@ export const getActiveGeneralSidebarName = createRegistrySelector(
  *
  * @return {Object} Preferences Object.
  */
-export function getPreferences( state ) {
-	return state.preferences;
-}
+export const getPreferences = createRegistrySelector(
+	( select ) => ( state ) => {
+		const editPostPreferences = state.preferences;
+
+		// Some preferences now exist in the preferences store.
+		// Fetch them so that they can be merged into the post
+		// editor preferences.
+		const preferenceStorePreferences = MIGRATED_KEYS.reduce(
+			( accumulatedPrefs, preferenceKey ) => {
+				const value = select( preferencesStore ).get(
+					'core/edit-post',
+					preferenceKey
+				);
+
+				return {
+					...accumulatedPrefs,
+					[ preferenceKey ]: value,
+				};
+			},
+			{}
+		);
+
+		return {
+			...editPostPreferences,
+			...preferenceStorePreferences,
+		};
+	}
+);
 
 /**
  *
@@ -105,20 +140,15 @@ export function getPreferences( state ) {
  *
  * @return {*} Preference Value.
  */
-export const getPreference = createRegistrySelector(
-	( select ) => ( state, preferenceKey, defaultValue ) => {
-		if ( preferenceKey === 'hiddenBlockTypes' ) {
-			return select( preferencesStore ).get(
-				'core/edit-post',
-				preferenceKey
-			);
-		}
-
-		const preferences = getPreferences( state );
-		const value = preferences[ preferenceKey ];
-		return value === undefined ? defaultValue : value;
-	}
-);
+export function getPreference( state, preferenceKey, defaultValue ) {
+	// Avoid using the `getPreferences` registry selector where possible.
+	const isMigratedKey = MIGRATED_KEYS.includes( preferenceKey );
+	const preferences = isMigratedKey
+		? getPreferences( state )
+		: state.preferences;
+	const value = preferences[ preferenceKey ];
+	return value === undefined ? defaultValue : value;
+}
 
 /**
  * Returns true if the publish sidebar is opened.
