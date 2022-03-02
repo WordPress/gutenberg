@@ -441,12 +441,12 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 								args
 							)
 						);
-					} catch ( e ) {
+					} catch ( error ) {
 						store.dispatch(
 							metadataActions.failResolution(
 								selectorName,
 								args,
-								e
+								error
 							)
 						);
 					}
