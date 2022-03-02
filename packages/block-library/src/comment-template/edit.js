@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, memo } from '@wordpress/element';
+import { useState, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -17,7 +17,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { convertToTree } from './util';
+import { useCommentQueryArgs, useCommentTree } from './hooks';
 
 const TEMPLATE = [
 	[ 'core/comment-author-avatar' ],
@@ -106,10 +106,10 @@ function CommentTemplateInnerBlocks( {
 			{ comment === ( activeComment || firstComment ) ? children : null }
 
 			{ /* To avoid flicker when switching active block contexts, a preview
-			is ALWAYS rendered and the preview for the active block is hidden. 
-			This ensures that when switching the active block, the component is not 
+			is ALWAYS rendered and the preview for the active block is hidden.
+			This ensures that when switching the active block, the component is not
 			mounted again but rather it only toggles the `isHidden` prop.
-			
+
 			The same strategy is used for preventing the flicker in the Post Template
 			block. */ }
 			<MemoizedCommentTemplatePreview
@@ -209,60 +209,58 @@ const CommentsList = ( {
 
 export default function CommentTemplateEdit( {
 	clientId,
-	context: { postId, 'comments/perPage': perPage, 'comments/order': order },
+	context: {
+		postId,
+		'comments/perPage': perPage,
+		'comments/order': order,
+		'comments/defaultPage': defaultPage,
+		'comments/inherit': inherit,
+	},
 } ) {
 	const blockProps = useBlockProps();
 
 	const [ activeComment, setActiveComment ] = useState();
-	const {
-		commentOrder,
-		commentsPerPage,
-		threadCommentsDepth,
-		threadComments,
-	} = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings;
+	const { commentOrder, threadCommentsDepth, threadComments } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return getSettings().__experimentalDiscussionSettings;
+		}
+	);
+
+	const commentQuery = useCommentQueryArgs( {
+		postId,
+		perPage,
+		defaultPage,
+		inherit,
 	} );
 
-	const { rawComments, blocks } = useSelect(
+	const { topLevelComments, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 
-			const commentQuery = {
-				post: postId,
-				status: 'approve',
-				context: 'embed',
-				order: order || commentOrder,
-			};
-
-			if ( order ) {
-				commentQuery.order = order;
-			}
 			return {
-				rawComments: getEntityRecords(
-					'root',
-					'comment',
-					commentQuery
-				),
+				// Request only top-level comments. Replies are embedded.
+				topLevelComments: commentQuery
+					? getEntityRecords( 'root', 'comment', commentQuery )
+					: null,
 				blocks: getBlocks( clientId ),
 			};
 		},
-		[ postId, clientId, order ]
-	);
-	// TODO: Replicate the logic used on the server.
-	perPage = perPage || commentsPerPage;
-	// We convert the flat list of comments to tree.
-	// Then, we show only a maximum of `perPage` number of comments.
-	// This is because passing `per_page` to `getEntityRecords()` does not
-	// take into account nested comments.
-
-	let comments = useMemo(
-		() => convertToTree( rawComments ).slice( 0, perPage ),
-		[ rawComments, perPage ]
+		[ clientId, commentQuery ]
 	);
 
-	if ( ! rawComments ) {
+	order = inherit || ! order ? commentOrder : order;
+
+	// Generate a tree structure of comment IDs.
+	let commentTree = useCommentTree(
+		// Reverse the order of top comments if needed.
+		order === 'desc' && topLevelComments
+			? [ ...topLevelComments ].reverse()
+			: topLevelComments
+	);
+
+	if ( ! topLevelComments ) {
 		return (
 			<p { ...blockProps }>
 				<Spinner />
@@ -271,20 +269,20 @@ export default function CommentTemplateEdit( {
 	}
 
 	if ( ! postId ) {
-		comments = getCommentsPlaceholder( {
+		commentTree = getCommentsPlaceholder( {
 			perPage,
 			threadComments,
 			threadCommentsDepth,
 		} );
 	}
 
-	if ( ! comments.length ) {
+	if ( ! commentTree.length ) {
 		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
 	return (
 		<CommentsList
-			comments={ comments }
+			comments={ commentTree }
 			blockProps={ blockProps }
 			blocks={ blocks }
 			activeComment={ activeComment }

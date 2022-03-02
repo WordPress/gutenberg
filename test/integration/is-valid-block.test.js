@@ -6,7 +6,7 @@ import { createElement } from '@wordpress/element';
 
 describe( 'isValidBlockContent', () => {
 	beforeAll( () => {
-		// Load all hooks that modify blocks
+		// Load all hooks that modify blocks.
 		require( '../../packages/editor/src/hooks' );
 	} );
 

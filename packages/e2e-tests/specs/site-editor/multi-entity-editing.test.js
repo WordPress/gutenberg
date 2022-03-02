@@ -53,7 +53,7 @@ const createTemplatePart = async (
 	// Select all of the text in the title field.
 	await pressKeyWithModifier( 'primary', 'a' );
 
-	// Give the reusable block a title
+	// Give the reusable block a title.
 	await page.keyboard.type( templatePartName );
 };
 

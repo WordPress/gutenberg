@@ -27,7 +27,7 @@ import {
 	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
+import { compose, useInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
@@ -47,7 +47,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { withDispatch, useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
 
@@ -110,7 +110,7 @@ function CoverHeightInput( {
 			'vw',
 			'vh',
 		],
-		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
+		defaultValues: { px: 430, em: 20, rem: 20, vw: 20, vh: 50 },
 	} );
 
 	const handleOnChange = ( unprocessedValue ) => {
@@ -244,7 +244,7 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
 	useEffect( () => {
 		if ( ! url && ! overlayColor ) {
-			// Reset isDark
+			// Reset isDark.
 			setIsDark( false );
 		}
 	}, [ ! url && ! overlayColor, setIsDark ] );
@@ -310,7 +310,6 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
-	markNextChangeAsNotPersistent,
 } ) {
 	const {
 		contentPosition,
@@ -329,6 +328,9 @@ function CoverEdit( {
 		allowedBlocks,
 		templateLock,
 	} = attributes;
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
 	const {
 		gradientClass,
 		gradientValue,
@@ -393,14 +395,12 @@ function CoverEdit( {
 
 	useEffect( () => {
 		// This side-effect should not create an undo level.
-		markNextChangeAsNotPersistent();
+		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( { isDark: isCoverDark } );
 	}, [ isCoverDark ] );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
-
-	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
 
 	const minHeightWithUnit = minHeightUnit
 		? `${ minHeight }${ minHeightUnit }`
@@ -412,7 +412,7 @@ function CoverEdit( {
 		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
 			: undefined ),
-		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
+		minHeight: minHeightWithUnit || undefined,
 	};
 
 	const bgStyle = { backgroundColor: overlayColor.color };
@@ -593,7 +593,7 @@ function CoverEdit( {
 					panelId={ clientId }
 				>
 					<CoverHeightInput
-						value={ temporaryMinHeight || minHeight }
+						value={ minHeight }
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
 							setAttributes( { minHeight: newMinHeight } )
@@ -646,10 +646,7 @@ function CoverEdit( {
 						onSelectMedia={ onSelectMedia }
 						noticeOperations={ noticeOperations }
 						style={ {
-							minHeight:
-								temporaryMinHeight ||
-								minHeightWithUnit ||
-								undefined,
+							minHeight: minHeightWithUnit || undefined,
 						} }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
@@ -667,11 +664,12 @@ function CoverEdit( {
 							setAttributes( { minHeightUnit: 'px' } );
 							toggleSelection( false );
 						} }
-						onResize={ setTemporaryMinHeight }
+						onResize={ ( value ) => {
+							setAttributes( { minHeight: value } );
+						} }
 						onResizeStop={ ( newMinHeight ) => {
 							toggleSelection( true );
 							setAttributes( { minHeight: newMinHeight } );
-							setTemporaryMinHeight( null );
 						} }
 						showHandle={ isSelected }
 					/>
@@ -714,11 +712,12 @@ function CoverEdit( {
 						setAttributes( { minHeightUnit: 'px' } );
 						toggleSelection( false );
 					} }
-					onResize={ setTemporaryMinHeight }
+					onResize={ ( value ) => {
+						setAttributes( { minHeight: value } );
+					} }
 					onResizeStop={ ( newMinHeight ) => {
 						toggleSelection( true );
 						setAttributes( { minHeight: newMinHeight } );
-						setTemporaryMinHeight( null );
 					} }
 					showHandle={ isSelected }
 				/>
@@ -777,18 +776,6 @@ function CoverEdit( {
 }
 
 export default compose( [
-	withDispatch( ( dispatch ) => {
-		const {
-			toggleSelection,
-			__unstableMarkNextChangeAsNotPersistent,
-		} = dispatch( blockEditorStore );
-
-		return {
-			toggleSelection,
-			markNextChangeAsNotPersistent: __unstableMarkNextChangeAsNotPersistent,
-		};
-	} ),
 	withColors( { overlayColor: 'background-color' } ),
 	withNotices,
-	withInstanceId,
 ] )( CoverEdit );

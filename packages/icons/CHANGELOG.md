@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 7.0.0 (2022-02-23)
+
+### New Features
+
+- Added new icon: `post`, and refreshed the existing `pin` icon. ([#39139](https://github.com/WordPress/gutenberg/pull/39139))
+
+### Breaking Changes
+
+-   Removed icons that were added by mistake: `alignJustifyAlt`, `cogAlt`, `sparkles`, `trashFilled`. ([#38849](https://github.com/WordPress/gutenberg/pull/38849))
+
 ## 6.3.0 (2022-02-10)
 
 ### New Features

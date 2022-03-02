@@ -98,7 +98,7 @@ export class MediaUploadProgress extends Component {
 	}
 
 	addMediaUploadListener() {
-		//if we already have a subscription not worth doing it again
+		// If we already have a subscription not worth doing it again.
 		if ( this.subscriptionParentMediaUpload ) {
 			return;
 		}

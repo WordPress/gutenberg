@@ -91,14 +91,14 @@ describe( 'getAllValue', () => {
 	} );
 
 	describe( 'when provided object based values', () => {
-		it( 'should return null if values are mixed', () => {
+		it( 'should return undefined if values are mixed', () => {
 			const values = {
 				bottomLeft: '2em',
 				bottomRight: '2em',
 				topLeft: '0',
 				topRight: '2px',
 			};
-			expect( getAllValue( values ) ).toBe( null );
+			expect( getAllValue( values ) ).toBe( undefined );
 		} );
 
 		it( 'should return the common value + unit when all values are the same', () => {
@@ -121,26 +121,26 @@ describe( 'getAllValue', () => {
 			expect( getAllValue( values ) ).toBe( '1em' );
 		} );
 
-		it( 'should fall back to null when values are undefined', () => {
+		it( 'should fall back to undefined when values are undefined', () => {
 			const values = {
 				bottomLeft: undefined,
 				bottomRight: undefined,
 				topLeft: undefined,
 				topRight: undefined,
 			};
-			expect( getAllValue( values ) ).toBe( null );
+			expect( getAllValue( values ) ).toBe( undefined );
 		} );
 	} );
 
 	describe( 'when provided invalid values', () => {
-		it( 'should return px when passed an array', () => {
-			expect( getAllValue( [] ) ).toBe( null );
+		it( 'should return undefined when passed an array', () => {
+			expect( getAllValue( [] ) ).toBe( undefined );
 		} );
-		it( 'should return px when passed a boolean', () => {
-			expect( getAllValue( false ) ).toBe( null );
+		it( 'should return undefined when passed a boolean', () => {
+			expect( getAllValue( false ) ).toBe( undefined );
 		} );
-		it( 'should return px when passed undefined', () => {
-			expect( getAllValue( false ) ).toBe( null );
+		it( 'should return undefined when passed undefined', () => {
+			expect( getAllValue( undefined ) ).toBe( undefined );
 		} );
 	} );
 } );

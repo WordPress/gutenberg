@@ -2281,4 +2281,174 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	function test_export_data() {
+		$theme = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => 2,
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'slug'  => 'white',
+								'color' => 'white',
+								'label' => 'White',
+							),
+							array(
+								'slug'  => 'black',
+								'color' => 'black',
+								'label' => 'Black',
+							),
+						),
+					),
+				),
+			)
+		);
+		$user  = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => 2,
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'slug'  => 'white',
+								'color' => '#fff',
+								'label' => 'User White',
+							),
+							array(
+								'slug'  => 'hotpink',
+								'color' => 'hotpink',
+								'label' => 'hotpink',
+							),
+						),
+					),
+				),
+			),
+			'custom'
+		);
+
+		$theme->merge( $user );
+		$actual   = $theme->get_data();
+		$expected = array(
+			'version'  => 2,
+			'settings' => array(
+				'color' => array(
+					'palette' => array(
+						array(
+							'slug'  => 'white',
+							'color' => '#fff',
+							'label' => 'User White',
+						),
+						array(
+							'slug'  => 'black',
+							'color' => 'black',
+							'label' => 'Black',
+						),
+						array(
+							'slug'  => 'hotpink',
+							'color' => 'hotpink',
+							'label' => 'hotpink',
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	function test_export_data_deals_with_empty_user_data() {
+		$theme = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => 2,
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'slug'  => 'white',
+								'color' => 'white',
+								'label' => 'White',
+							),
+							array(
+								'slug'  => 'black',
+								'color' => 'black',
+								'label' => 'Black',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual   = $theme->get_data();
+		$expected = array(
+			'version'  => 2,
+			'settings' => array(
+				'color' => array(
+					'palette' => array(
+						array(
+							'slug'  => 'white',
+							'color' => 'white',
+							'label' => 'White',
+						),
+						array(
+							'slug'  => 'black',
+							'color' => 'black',
+							'label' => 'Black',
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	function test_export_data_deals_with_empty_theme_data() {
+		$user = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => 2,
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'slug'  => 'white',
+								'color' => '#fff',
+								'label' => 'User White',
+							),
+							array(
+								'slug'  => 'hotpink',
+								'color' => 'hotpink',
+								'label' => 'hotpink',
+							),
+						),
+					),
+				),
+			),
+			'custom'
+		);
+
+		$actual   = $user->get_data();
+		$expected = array(
+			'version'  => 2,
+			'settings' => array(
+				'color' => array(
+					'palette' => array(
+						array(
+							'slug'  => 'white',
+							'color' => '#fff',
+							'label' => 'User White',
+						),
+						array(
+							'slug'  => 'hotpink',
+							'color' => 'hotpink',
+							'label' => 'hotpink',
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 }

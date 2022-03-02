@@ -14,7 +14,7 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import PreferencesModal from '../';
 
-// This allows us to tweak the returned value on each test
+// This allows us to tweak the returned value on each test.
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => jest.fn() );
 

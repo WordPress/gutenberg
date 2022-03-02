@@ -1002,6 +1002,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorBackButton",
+		"slug": "navigator-back-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorButton",
+		"slug": "navigator-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "NavigatorProvider",
 		"slug": "navigator-provider",
 		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",

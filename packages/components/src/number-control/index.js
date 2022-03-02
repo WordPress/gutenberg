@@ -43,7 +43,7 @@ export function NumberControl(
 	const baseStep = isStepAny ? 1 : parseFloat( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = ( value, stepOverride ) => {
-		// When step is "any" clamp the value, otherwise round and clamp it
+		// When step is "any" clamp the value, otherwise round and clamp it.
 		return isStepAny
 			? Math.min( max, Math.max( min, value ) )
 			: roundClamp( value, min, max, stepOverride ?? baseStep );

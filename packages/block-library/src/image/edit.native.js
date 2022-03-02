@@ -88,7 +88,7 @@ function LinkSettings( {
 	const route = useRoute();
 	const { href: url, label, linkDestination, linkTarget, rel } = attributes;
 
-	// Persist attributes passed from child screen
+	// Persist attributes passed from child screen.
 	useEffect( () => {
 		const { inputValue: newUrl } = route.params || {};
 
@@ -225,7 +225,7 @@ export class ImageEdit extends Component {
 			console.warn( 'Attributes has id with no url.' );
 		}
 
-		// Detect any pasted image and start an upload
+		// Detect any pasted image and start an upload.
 		if (
 			! attributes.id &&
 			attributes.url &&
@@ -239,7 +239,7 @@ export class ImageEdit extends Component {
 		}
 
 		// Make sure we mark any temporary images as failed if they failed while
-		// the editor wasn't open
+		// the editor wasn't open.
 		if (
 			attributes.id &&
 			attributes.url &&
@@ -250,7 +250,7 @@ export class ImageEdit extends Component {
 	}
 
 	componentWillUnmount() {
-		// this action will only exist if the user pressed the trash button on the block holder
+		// This action will only exist if the user pressed the trash button on the block holder.
 		if (
 			hasAction( 'blocks.onRemoveBlockCheckUpload' ) &&
 			this.state.uploadStatus === UPLOAD_STATE_UPLOADING
@@ -305,7 +305,7 @@ export class ImageEdit extends Component {
 
 	static getDerivedStateFromProps( props, state ) {
 		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
-		// is updated immediately any time the isSelected prop becomes false
+		// is updated immediately any time the isSelected prop becomes false.
 		return {
 			isCaptionSelected: props.isSelected && state.isCaptionSelected,
 		};
@@ -813,7 +813,7 @@ export class ImageEdit extends Component {
 					accessible
 					accessibilityLabelCreator={ this.accessibilityLabelCreator }
 					onFocus={ this.onFocusCaption }
-					onBlur={ this.props.onBlur } // always assign onBlur as props
+					onBlur={ this.props.onBlur } // Always assign onBlur as props.
 					insertBlocksAfter={ this.props.insertBlocksAfter }
 				/>
 			</Badge>
@@ -851,7 +851,7 @@ export default compose( [
 		const shouldGetMedia =
 			( isSelected && isNotFileUrl ) ||
 			// Edge case to update the image after uploading if the block gets unselected
-			// Check if it's the original image and not the resized one with queryparams
+			// Check if it's the original image and not the resized one with queryparams.
 			( ! isSelected &&
 				isNotFileUrl &&
 				url &&

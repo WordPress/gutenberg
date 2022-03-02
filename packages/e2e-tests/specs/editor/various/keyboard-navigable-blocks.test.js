@@ -20,7 +20,7 @@ async function getActiveLabel() {
 }
 
 const navigateToContentEditorTop = async () => {
-	// Use 'Ctrl+`' to return to the top of the editor
+	// Use 'Ctrl+`' to return to the top of the editor.
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
 };
@@ -81,7 +81,7 @@ describe( 'Order of block keyboard navigation', () => {
 	it( 'permits tabbing through paragraph blocks in the expected order', async () => {
 		const paragraphBlocks = [ 'Paragraph 0', 'Paragraph 1', 'Paragraph 2' ];
 
-		// create 3 paragraphs blocks with some content
+		// Create 3 paragraphs blocks with some content.
 		for ( const paragraphBlock of paragraphBlocks ) {
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( paragraphBlock );

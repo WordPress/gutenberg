@@ -22,10 +22,10 @@ const prompts = require( './prompts' );
 const predefinedPluginTemplates = {
 	es5: {
 		defaultValues: {
-			slug: 'es5-example',
-			title: 'ES5 Example',
+			slug: 'example-static-es5',
+			title: 'Example Static (ES5)',
 			description:
-				'Example block written with ES5 standard and no JSX – no build step required.',
+				'Example static block scaffolded with Create Block tool – no build step required.',
 			dashicon: 'smiley',
 			wpScripts: false,
 			editorScript: 'file:./index.js',
@@ -34,23 +34,17 @@ const predefinedPluginTemplates = {
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
 	},
-	esnext: {
+	static: {
 		defaultValues: {
-			slug: 'esnext-example',
-			title: 'ESNext Example',
+			slug: 'example-static',
+			title: 'Example Static',
 			description:
-				'Example block written with ESNext standard and JSX support – build step required.',
+				'Example static block scaffolded with Create Block tool.',
 			dashicon: 'smiley',
 			supports: {
 				html: false,
 			},
-			folderName: 'src',
-			editorScript: 'file:./index.js',
-			editorStyle: 'file:./index.css',
-			style: 'file:./style-index.css',
 		},
-		templatesPath: join( __dirname, 'templates', 'esnext', 'plugin' ),
-		blockTemplatesPath: join( __dirname, 'templates', 'esnext', 'block' ),
 	},
 };
 
@@ -103,13 +97,30 @@ const externalTemplateExists = async ( templateName ) => {
 };
 
 const configToTemplate = async ( {
-	assetsPath,
+	pluginTemplatesPath,
 	blockTemplatesPath,
 	defaultValues = {},
-	templatesPath,
+	assetsPath,
+	...deprecated
 } ) => {
-	if ( ! isObject( defaultValues ) || ! templatesPath ) {
+	if ( ! isObject( defaultValues ) ) {
 		throw new CLIError( 'Template found but invalid definition provided.' );
+	}
+
+	if ( deprecated.templatesPath ) {
+		pluginTemplatesPath = deprecated.templatesPath;
+		defaultValues = {
+			folderName: '.',
+			editorScript: 'file:./build/index.js',
+			editorStyle: 'file:./build/index.css',
+			style: 'file:./build/style-index.css',
+			...defaultValues,
+		};
+	} else {
+		pluginTemplatesPath =
+			pluginTemplatesPath || join( __dirname, 'templates', 'plugin' );
+		blockTemplatesPath =
+			blockTemplatesPath || join( __dirname, 'templates', 'block' );
 	}
 
 	return {
@@ -118,7 +129,7 @@ const configToTemplate = async ( {
 			: {},
 		defaultValues,
 		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
-		outputTemplates: await getOutputTemplates( templatesPath ),
+		pluginOutputTemplates: await getOutputTemplates( pluginTemplatesPath ),
 	};
 };
 
@@ -201,10 +212,10 @@ const getDefaultValues = ( pluginTemplate ) => {
 		customScripts: {},
 		wpEnv: false,
 		npmDependencies: [],
-		folderName: '.',
-		editorScript: 'file:./build/index.js',
-		editorStyle: 'file:./build/index.css',
-		style: 'file:./build/style-index.css',
+		folderName: './src',
+		editorScript: 'file:./index.js',
+		editorStyle: 'file:./index.css',
+		style: 'file:./style-index.css',
 		...pluginTemplate.defaultValues,
 	};
 };

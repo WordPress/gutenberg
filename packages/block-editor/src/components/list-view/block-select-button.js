@@ -60,7 +60,6 @@ function ListViewBlockSelectButton(
 
 	function onKeyDownHandler( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
-			event.preventDefault();
 			onClick( event );
 		}
 	}

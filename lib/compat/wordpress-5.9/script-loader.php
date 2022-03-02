@@ -28,7 +28,7 @@ function gutenberg_enqueue_global_styles_assets() {
 		return;
 	}
 
-	$stylesheet = wp_get_global_stylesheet();
+	$stylesheet = gutenberg_get_global_stylesheet();
 
 	if ( empty( $stylesheet ) ) {
 		return;
@@ -46,3 +46,29 @@ function gutenberg_enqueue_global_styles_assets() {
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_assets' );
 add_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
+
+/**
+ * This function takes care of adding inline styles
+ * in the proper place, depending on the theme in use.
+ *
+ * For block themes, it's loaded in the head.
+ * For classic ones, it's loaded in the body
+ * because the wp_head action (and wp_enqueue_scripts)
+ * happens before the render_block.
+ *
+ * @link https://core.trac.wordpress.org/ticket/53494.
+ *
+ * @param string $style String containing the CSS styles to be added.
+ */
+function gutenberg_enqueue_block_support_styles( $style ) {
+	$action_hook_name = 'wp_footer';
+	if ( wp_is_block_theme() ) {
+		$action_hook_name = 'wp_enqueue_scripts';
+	}
+	add_action(
+		$action_hook_name,
+		static function () use ( $style ) {
+			echo "<style>$style</style>\n";
+		}
+	);
+}

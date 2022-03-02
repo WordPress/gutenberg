@@ -9,6 +9,7 @@ import { get, includes, some, flatten, values } from 'lodash';
  */
 import { createRegistrySelector } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 /**
@@ -191,10 +192,7 @@ export function isModalActive( state, modalName ) {
  */
 export const isFeatureActive = createRegistrySelector(
 	( select ) => ( state, feature ) => {
-		return select( interfaceStore ).isFeatureActive(
-			'core/edit-post',
-			feature
-		);
+		return !! select( preferencesStore ).get( 'core/edit-post', feature );
 	}
 );
 

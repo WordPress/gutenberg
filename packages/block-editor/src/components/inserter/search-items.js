@@ -3,7 +3,7 @@
  */
 import { deburr, differenceWith, find, words } from 'lodash';
 
-// Default search helpers
+// Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
 const defaultGetTitle = ( item ) => item.title;
 const defaultGetDescription = ( item ) => item.description || '';
