@@ -63,7 +63,7 @@ add_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
 function gutenberg_enqueue_block_support_styles( $style ) {
 	$action_hook_name = 'wp_footer';
 	if ( wp_is_block_theme() ) {
-		$action_hook_name = 'wp_enqueue_scripts';
+		$action_hook_name = 'wp_head';
 	}
 	add_action(
 		$action_hook_name,
