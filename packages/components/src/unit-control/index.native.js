@@ -116,13 +116,15 @@ function UnitControl( {
 	};
 
 	const renderUnitPicker = useCallback( () => {
-		if ( hasUnits( units ) ) {
+		// Keeping for legacy reasons, although `false` should not be a valid
+		// value for the `units` prop anymore.
+		if ( units === false ) {
 			return null;
 		}
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
 				{ renderUnitButton }
-				{ units?.length > 1 ? (
+				{ hasUnits( units ) && units?.length > 1 ? (
 					<Picker
 						ref={ pickerRef }
 						options={ units }

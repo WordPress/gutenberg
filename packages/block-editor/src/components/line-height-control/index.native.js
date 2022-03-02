@@ -20,7 +20,9 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 			step={ STEP }
 			value={ value }
 			onChange={ onChange }
-			units={ [] }
+			// TODO: should be updated to avoid using `false`, in order to
+			// align with the web version of `UnitControl`
+			units={ false }
 		/>
 	);
 }

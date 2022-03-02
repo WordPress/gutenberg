@@ -81,8 +81,8 @@ function UnitControl(
 	);
 
 	useEffect( () => {
-		setUnit( initialUnit );
-	}, [ initialUnit ] );
+		setUnit( parsedUnit );
+	}, [ parsedUnit ] );
 
 	// Stores parsed value for hand-off in state reducer.
 	const refParsedQuantity = useRef< number | undefined >( undefined );
