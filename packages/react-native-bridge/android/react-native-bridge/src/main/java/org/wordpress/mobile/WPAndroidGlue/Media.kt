@@ -1,7 +1,9 @@
 package org.wordpress.mobile.WPAndroidGlue
 
+import android.os.Parcelable
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.WritableNativeMap
+import kotlinx.parcelize.Parcelize
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType.IMAGE
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType.OTHER
@@ -9,13 +11,14 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia
 import java.util.Locale
 
+@Parcelize
 data class Media(
     override val id: Int,
     override val url: String,
     override val type: String,
     override val caption: String = "",
     override val title: String = ""
-) : RNMedia {
+) : RNMedia, Parcelable {
     override fun toMap(): WritableMap = WritableNativeMap().apply {
         putInt("id", id)
         putString("url", url)

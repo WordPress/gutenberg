@@ -73,15 +73,17 @@ export class MediaEdit extends Component {
 
 	onPickerSelect( value ) {
 		const {
+			blockIndex,
 			onSelect,
 			pickerOptions,
 			multiple = false,
 			openReplaceMediaOptions,
+			source,
 		} = this.props;
 
 		switch ( value ) {
 			case MEDIA_EDITOR:
-				requestMediaEditor( this.props.source.uri, ( media ) => {
+				requestMediaEditor( source.uri, blockIndex, ( media ) => {
 					if ( ( multiple && media ) || ( media && media.id ) ) {
 						onSelect( media );
 					}

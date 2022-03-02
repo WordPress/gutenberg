@@ -31,6 +31,7 @@ export const IMAGE_DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 const ImageComponent = ( {
 	align,
 	alt,
+	blockIndex,
 	editButton = true,
 	focalPoint,
 	height: imageHeight,
@@ -50,6 +51,30 @@ const ImageComponent = ( {
 	style,
 	width: imageWidth,
 } ) => {
+	// const ImageComponent = ( props ) => {
+	// 	const {
+	// 		align,
+	// 		alt,
+	// 		editButton = true,
+	// 		focalPoint,
+	// 		height: imageHeight,
+	// 		highlightSelected = true,
+	// 		isSelected,
+	// 		isUploadFailed,
+	// 		isUploadInProgress,
+	// 		mediaPickerOptions,
+	// 		onImageDataLoad,
+	// 		onSelectMediaUploadOption,
+	// 		openMediaOptions,
+	// 		resizeMode,
+	// 		retryMessage,
+	// 		retryIcon,
+	// 		url,
+	// 		shapeStyle,
+	// 		style,
+	// 		width: imageWidth,
+	// 	} = props;
+	// 	console.log(`imagecomponent props: ${JSON.stringify(props, null, 2)}`);
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
 
@@ -248,6 +273,7 @@ const ImageComponent = ( {
 
 			{ editButton && isSelected && ! isUploadInProgress && (
 				<ImageEditingButton
+					blockIndex={ blockIndex }
 					onSelectMediaUploadOption={ onSelectMediaUploadOption }
 					openMediaOptions={ openMediaOptions }
 					url={ ! isUploadFailed && imageData && url }

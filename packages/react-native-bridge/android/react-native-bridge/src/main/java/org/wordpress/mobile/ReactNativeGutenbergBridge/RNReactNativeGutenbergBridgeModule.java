@@ -41,6 +41,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_UPDATE_TITLE = "setTitle";
     private static final String EVENT_NAME_FOCUS_TITLE = "setFocusOnTitle";
     private static final String EVENT_NAME_MEDIA_APPEND = "mediaAppend";
+    private static final String EVENT_NAME_MEDIA_ADD = "mediaAdd";
+    private static final String EVENT_NAME_MEDIA_INSERT = "mediaInsert";
     private static final String EVENT_NAME_TOGGLE_HTML_MODE = "toggleHTMLMode";
     private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
     private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
@@ -54,6 +56,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_NEW_ID = "newId";
     private static final String MAP_KEY_SHOW_NOTICE_MESSAGE = "message";
 
+    public static final String MAP_KEY_MEDIA_FILE_BLOCK_INDEX = "blockIndex";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID = "mediaId";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL = "mediaUrl";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
@@ -129,12 +132,33 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         emitToJS(EVENT_NAME_SHOW_NOTICE, writableMap);
     }
 
+    // FIXME stop passing all this data separately
     public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE, mediaType);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUri);
         writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
         emitToJS(EVENT_NAME_MEDIA_APPEND, writableMap);
+    }
+
+    // FIXME stop passing all this data separately
+    public void insertNewMediaBlock(int blockIndex, int mediaId, String mediaUri, String mediaType) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_BLOCK_INDEX, blockIndex);
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUri);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE, mediaType);
+        emitToJS(EVENT_NAME_MEDIA_INSERT, writableMap);
+    }
+
+    // FIXME stop passing all this data separately
+    public void addMediaToBlock(int blockIndex, int mediaId, String mediaUri, String mediaType) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_BLOCK_INDEX, blockIndex);
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUri);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE, mediaType);
+        emitToJS(EVENT_NAME_MEDIA_ADD, writableMap);
     }
 
     public void setPreferredColorScheme(boolean isDarkMode) {
@@ -207,16 +231,32 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void requestMediaPickFrom(String mediaSource, ReadableArray filter, Boolean allowMultipleSelection, final Callback onMediaSelected) {
+    public void requestMediaPickFrom(String mediaSource, ReadableArray filter, Boolean allowMultipleSelection, int blockIndex, final Callback onMediaSelected) {
+
         MediaType mediaType = getMediaTypeFromFilter(filter);
         if (mediaSource.equals(MEDIA_SOURCE_MEDIA_LIBRARY)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection, mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(
+                    getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected),
+                    allowMultipleSelection,
+                    blockIndex,
+                    mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_LIBRARY)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection, mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(
+                    getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected),
+                    allowMultipleSelection,
+                    blockIndex,
+                    mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_CAMERA)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(
+                    getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected),
+                    blockIndex,
+                    mediaType);
         } else {
-            mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection);
+            mGutenbergBridgeJS2Parent.requestMediaPickFrom(
+                    mediaSource,
+                    getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected),
+                    allowMultipleSelection,
+                    blockIndex);
         }
     }
 
@@ -278,8 +318,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void requestMediaEditor(String mediaUrl, final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.requestMediaEditor(getNewMediaSelectedCallback(false, onUploadMediaSelected), mediaUrl);
+    public void requestMediaEditor(String mediaUrl, int blockIndex, final Callback onUploadMediaSelected) {
+        mGutenbergBridgeJS2Parent.requestMediaEditor(
+                getNewMediaSelectedCallback(false, onUploadMediaSelected),
+                blockIndex,
+                mediaUrl);
     }
 
     @ReactMethod

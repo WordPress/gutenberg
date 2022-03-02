@@ -5,6 +5,7 @@ plugins {
     id "org.jetbrains.kotlin.android"
     id "maven-publish"
     id "com.automattic.android.publish-to-s3"
+    id "kotlin-parcelize"
 }
 
 // import the `readReactNativeVersion()` function

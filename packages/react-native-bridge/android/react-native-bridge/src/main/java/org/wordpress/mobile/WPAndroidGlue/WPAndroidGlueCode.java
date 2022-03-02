@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
 import androidx.core.util.Pair;
@@ -64,14 +65,13 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import im.shimo.react.prompt.RNPromptPackage;
+import kotlin.NotImplementedError;
 import okhttp3.OkHttpClient;
 
 
@@ -82,7 +82,6 @@ public class WPAndroidGlueCode {
     private RNReactNativeGutenbergBridgePackage mRnReactNativeGutenbergBridgePackage;
     private MediaSelectedCallback mMediaSelectedCallback;
     private DeferredEventEmitter mDeferredEventEmitter = new DeferredEventEmitter();
-    private boolean mMediaPickedByUserOnBlock;
 
     /**
      * Flag to append as siblings when allowMultipleSelection = false is not respected
@@ -110,7 +109,7 @@ public class WPAndroidGlueCode {
 
     private String mContentHtml = "";
     private boolean mContentInitialized;
-    private HashMap<Integer, Media> mMediaToAddAfterMounting = new HashMap<>();
+    private SelectedMedia mSelectedMedia;
     private String mTitle = "";
     private boolean mTitleInitialized;
     private boolean mContentChanged;
@@ -128,8 +127,9 @@ public class WPAndroidGlueCode {
     private Consumer<Exception> mExceptionLogger;
     private Consumer<String> mBreadcrumbLogger;
 
-    public void onCreate(Context context) {
+    public void onCreate(Context context, SelectedMedia selectedMedia) {
         SoLoader.init(context, /* native exopackage */ false);
+        mSelectedMedia = selectedMedia;
     }
 
     public boolean hasReactRootView() {
@@ -266,8 +266,13 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
-                mMediaPickedByUserOnBlock = true;
+            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback,
+                                                         Boolean allowMultipleSelection,
+                                                         int blockIndex,
+                                                         MediaType mediaType) {
+
+                mSelectedMedia.setBlockIndex(blockIndex);
+
                 mAppendsMultipleSelectedToSiblingBlocks = !allowMultipleSelection;
                 mMediaSelectedCallback = mediaSelectedCallback;
                 switch (mediaType) {
@@ -292,8 +297,13 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestMediaPickFromDeviceLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
-                mMediaPickedByUserOnBlock = true;
+            public void requestMediaPickFromDeviceLibrary(MediaSelectedCallback mediaSelectedCallback,
+                                                          Boolean allowMultipleSelection,
+                                                          int blockIndex,
+                                                          MediaType mediaType) {
+
+                mSelectedMedia.setBlockIndex(blockIndex);
+
                 // image blocks do not respect the multiple selection flag, so we set the append as siblings flag instead
                 mAppendsMultipleSelectedToSiblingBlocks = mediaType == MediaType.IMAGE && !allowMultipleSelection;
                 mMediaSelectedCallback = mediaSelectedCallback;
@@ -307,8 +317,12 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestMediaPickerFromDeviceCamera(MediaSelectedCallback mediaSelectedCallback, MediaType mediaType) {
-                mMediaPickedByUserOnBlock = true;
+            public void requestMediaPickerFromDeviceCamera(MediaSelectedCallback mediaSelectedCallback,
+                                                           int blockIndex,
+                                                           MediaType mediaType) {
+
+                mSelectedMedia.setBlockIndex(blockIndex);
+
                 mAppendsMultipleSelectedToSiblingBlocks = false;
                 mMediaSelectedCallback = mediaSelectedCallback;
                 if (mediaType == MediaType.IMAGE) {
@@ -367,6 +381,8 @@ public class WPAndroidGlueCode {
                     // send signal to Editor to create a new image block and pass the media URL, start uploading, etc
                     // use mMediaUrlToAddAfterMounting
                     dispatchOneMediaToAddAtATimeIfAvailable();
+                } else {
+                    replaceMediaItem();
                 }
                 refreshEditorTheme();
             }
@@ -419,10 +435,13 @@ public class WPAndroidGlueCode {
 
             @Override
             public void requestMediaPickFrom(String mediaSource,
-                                                       MediaSelectedCallback mediaSelectedCallback,
-                                                       Boolean allowMultipleSelection) {
+                                             MediaSelectedCallback mediaSelectedCallback,
+                                             Boolean allowMultipleSelection,
+                                             int blockIndex) {
                 mMediaSelectedCallback = mediaSelectedCallback;
-                mMediaPickedByUserOnBlock = true;
+
+                mSelectedMedia.setBlockIndex(blockIndex);
+
                 mAppendsMultipleSelectedToSiblingBlocks = false;
                 mOnMediaLibraryButtonListener.onOtherMediaButtonClicked(mediaSource, allowMultipleSelection);
             }
@@ -438,8 +457,10 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestMediaEditor(MediaSelectedCallback mediaSelectedCallback, String mediaUrl) {
-                mMediaPickedByUserOnBlock = true;
+            public void requestMediaEditor(MediaSelectedCallback mediaSelectedCallback, int blockIndex, String mediaUrl) {
+
+                mSelectedMedia.setBlockIndex(blockIndex);
+
                 mMediaSelectedCallback = mediaSelectedCallback;
                 mOnMediaEditorListener.onMediaEditorClicked(mediaUrl);
             }
@@ -747,6 +768,38 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setFocusOnTitleInJS();
     }
 
+    private void addMediaToBlock(@NonNull List<Media> mediaList) {
+        // FIXME should I be catching this editor mounting thing earlier?
+        if (mIsEditorMounted) {
+            Integer blockIndex = mSelectedMedia.getBlockIndex();
+            if (blockIndex == null) {
+                AppLog.e(T.EDITOR, "blockIndex was null when adding media to block. This should never happen.");
+            } else {
+                int index = mSelectedMedia.getBlockIndex();
+                for (Media media : mediaList) {
+                    if (index == mSelectedMedia.getBlockIndex()) {
+                        mRnReactNativeGutenbergBridgePackage
+                                .getRNReactNativeGutenbergBridgeModule()
+                                .addMediaToBlock(index, media.getId(), media.getUrl(),
+                                        media.getType());
+                    } else {
+                        mRnReactNativeGutenbergBridgePackage
+                                .getRNReactNativeGutenbergBridgeModule()
+                                .insertNewMediaBlock(index, media.getId(), media.getUrl(), media.getType());
+                    }
+                    index++;
+                }
+
+                // FIXME this isn't the place to do this I don't think
+                mSelectedMedia.resetBlockIndex();
+            }
+        } else {
+            synchronized (WPAndroidGlueCode.this) {
+                mSelectedMedia.add(mediaList);
+            }
+        }
+    }
+
     public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType) {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
                                             .appendNewMediaBlock(mediaId, mediaUri, mediaType);
@@ -976,9 +1029,13 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 
+    // FIXME unify Media and RNMedia types??
     public void appendMediaFiles(ArrayList<Media> mediaList) {
-        if (isMediaSelectedCallbackRegistered() && mMediaPickedByUserOnBlock) {
-            mMediaPickedByUserOnBlock = false;
+        if (isMediaSelectedCallbackRegistered() && mSelectedMedia.isMediaBeingPickedByUser()) {
+
+            // FIXME this seems like a problem
+            mSelectedMedia.userFinishedPickingMedia();
+
             List<RNMedia> rnMediaList = new ArrayList<>();
 
             // We have special handling here for the image block when the user selects multiple items from the
@@ -1002,13 +1059,21 @@ public class WPAndroidGlueCode {
                 mMediaSelectedCallback.onMediaFileSelected(rnMediaList);
             }
         } else {
-            // This case is for media that is shared from the device
-            for (Media mediaToAppend : mediaList) {
-                sendOrDeferAppendMediaSignal(mediaToAppend);
+            // FIXME this doesn't feel like the right check, will I ever get to the "else" condition????
+            if (!isMediaSelectedCallbackRegistered()) {
+                // no callback (activity may have restarted) so we need to queue these up for later, but without
+                // appending new blocks
+                addMediaToBlock(mediaList);
+            } else {
+                // FIXME test that this still works
+                // This case is for media that is shared from the device
+                for (Media mediaToAppend : mediaList) {
+                    sendOrDeferAppendMediaSignal(mediaToAppend);
+                }
             }
-        }
 
-        mAppendsMultipleSelectedToSiblingBlocks = false;
+            mAppendsMultipleSelectedToSiblingBlocks = false;
+        }
     }
 
     private void sendOrDeferAppendMediaSignal(Media media) {
@@ -1021,22 +1086,40 @@ public class WPAndroidGlueCode {
         } else {
             // save the URL, we'll add it once Editor is mounted
             synchronized (WPAndroidGlueCode.this) {
-                mMediaToAddAfterMounting.put(media.getId(), media);
+                mSelectedMedia.add(media);
             }
         }
     }
 
     private synchronized void dispatchOneMediaToAddAtATimeIfAvailable() {
-        Iterator<Entry<Integer, Media>> iter = mMediaToAddAfterMounting.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<Integer, Media> entry = iter.next();
-            Integer mediaId = entry.getKey();
-            Media media = entry.getValue();
-            if (!TextUtils.isEmpty(media.getUrl()) && mediaId > 0) {
+        // TODO TEST THIS
+        // I think that this flow gets triggered when image(s) are shared to the app
+
+        List<Media> mediaList = mSelectedMedia.getList();
+        for (Media media : mediaList) {
+            if (!TextUtils.isEmpty(media.getUrl()) && media.getId() > 0) {
                 // send signal to JS
-                appendNewMediaBlock(mediaId, media.getUrl(), media.getType());
-                iter.remove();
+                appendNewMediaBlock(media.getId(), media.getUrl(), media.getType());
+                mSelectedMedia.remove(media);
             }
+        }
+    }
+
+    // FIXME need a better name
+    private synchronized void replaceMediaItem() {
+
+        List<Media> mediaList = mSelectedMedia.getList();
+
+        if (!mediaList.isEmpty()) {
+
+            // FIXME
+            if (mediaList.size() > 1) {
+//                throw new NotImplementedError("Not handling insertion of more than one media item yet");
+            }
+
+//            Media media = mediaList.get(0);
+            addMediaToBlock(mediaList);
+            mSelectedMedia.clear();
         }
     }
 
@@ -1095,6 +1178,7 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onReplaceMediaFilesEditedBlock(mediaFiles, blockId);
     }
 
+    // FIXME should I be removing this?
     private boolean isMediaSelectedCallbackRegistered() {
         return mMediaSelectedCallback != null;
     }

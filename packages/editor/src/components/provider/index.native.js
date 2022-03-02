@@ -13,7 +13,10 @@ import RNReactNativeGutenbergBridge, {
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
 	subscribeSetTitle,
+	subscribeMediaAdd,
 	subscribeMediaAppend,
+	subscribeMediaInsert,
+	subscribeMediaUpload,
 	subscribeReplaceBlock,
 	subscribeUpdateEditorSettings,
 	subscribeUpdateCapabilities,
@@ -124,6 +127,49 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
+		this.subscriptionParentMediaAdd = subscribeMediaAdd( ( payload ) => {
+			console.log(
+				`subscribeMediaAdd payload: ${ JSON.stringify(
+					payload,
+					null,
+					2
+				) }`
+			);
+
+			const blockOrder = this.props.getBlockOrder();
+			const clientIdToUpdate = blockOrder[ payload.blockIndex ];
+			this.props.updateBlockAttributes( clientIdToUpdate, {
+				[ payload.mediaType === 'image'
+					? 'url'
+					: 'src' ]: payload.mediaUrl,
+			} );
+		} );
+
+		this.subscriptionParentMediaInsert = subscribeMediaInsert(
+			( payload ) => {
+				console.log(
+					`subscribeMediaInsert payload: ${ JSON.stringify(
+						payload,
+						null,
+						2
+					) }`
+				);
+
+				const blockName = 'core/' + payload.mediaType;
+				const newBlock = createBlock( blockName, {
+					id: payload.mediaId,
+					[ payload.mediaType === 'image'
+						? 'url'
+						: 'src' ]: payload.mediaUrl,
+				} );
+
+				const insertionIndex =
+					payload.blockIndex || this.props.blockCount;
+
+				this.props.insertBlock( newBlock, insertionIndex );
+			}
+		);
+
 		this.subscriptionParentMediaAppend = subscribeMediaAppend(
 			( payload ) => {
 				const blockName = 'core/' + payload.mediaType;
@@ -139,6 +185,18 @@ class NativeEditorProvider extends Component {
 					indexAfterSelected || this.props.blockCount;
 
 				this.props.insertBlock( newBlock, insertionIndex );
+			}
+		);
+
+		this.subscriptionParentMediaUpload = subscribeMediaUpload(
+			( payload ) => {
+				console.log(
+					`providerMediaUpload payload: ${ JSON.stringify(
+						payload,
+						null,
+						2
+					) }`
+				);
 			}
 		);
 
@@ -207,8 +265,20 @@ class NativeEditorProvider extends Component {
 			this.subscriptionParentReplaceBlock.remove();
 		}
 
+		if ( this.subscriptionParentMediaAdd ) {
+			this.subscriptionParentMediaAdd.remove();
+		}
+
+		if ( this.subscriptionParentMediaInsert ) {
+			this.subscriptionParentMediaInsert.remove();
+		}
+
 		if ( this.subscriptionParentMediaAppend ) {
 			this.subscriptionParentMediaAppend.remove();
+		}
+
+		if ( this.subscriptionParentMediaUpload ) {
+			this.subscriptionParentMediaUpload.remove();
 		}
 
 		if ( this.subscriptionParentUpdateEditorSettings ) {
@@ -357,6 +427,7 @@ export default compose( [
 
 		const {
 			getBlockIndex,
+			getBlockOrder,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
 			getSettings: getBlockEditorSettings,
@@ -368,13 +439,14 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
+			getBlockOrder,
+			getEditedPostContent,
+			defaultEditorColors,
+			defaultEditorGradients,
 			mode: getEditorMode(),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
-			getEditedPostContent,
-			defaultEditorColors,
-			defaultEditorGradients,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
@@ -383,21 +455,24 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { editPost, resetEditorBlocks } = dispatch( editorStore );
 		const {
-			updateSettings,
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
+			updateBlockAttributes,
+			updateSettings,
 		} = dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( editPostStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
 		const { createSuccessNotice } = dispatch( noticesStore );
 
 		return {
-			updateSettings,
 			addEntities,
 			clearSelectedBlock,
-			insertBlock,
 			createSuccessNotice,
+			insertBlock,
+			replaceBlock,
+			updateBlockAttributes,
+			updateSettings,
 			editTitle( title ) {
 				editPost( { title } );
 			},
@@ -410,7 +485,6 @@ export default compose( [
 			switchMode( mode ) {
 				switchEditorMode( mode );
 			},
-			replaceBlock,
 		};
 	} ),
 ] )( NativeEditorProvider );

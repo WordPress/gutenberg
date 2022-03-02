@@ -198,6 +198,7 @@ export class MediaUpload extends Component {
 	onPickerSelect( value ) {
 		const {
 			allowedTypes = [],
+			blockIndex,
 			onSelect,
 			onSelectURL,
 			multiple = false,
@@ -231,11 +232,17 @@ export class MediaUpload extends Component {
 			mediaSource.types.includes( type )
 		);
 
-		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
-			if ( ( multiple && media ) || ( media && media.id ) ) {
-				onSelect( media );
+		requestMediaPicker(
+			mediaSource.id,
+			types,
+			multiple,
+			blockIndex,
+			( media ) => {
+				if ( ( multiple && media ) || ( media && media.id ) ) {
+					onSelect( media );
+				}
 			}
-		} );
+		);
 	}
 
 	render() {

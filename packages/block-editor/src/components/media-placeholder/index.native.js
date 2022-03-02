@@ -35,6 +35,7 @@ function MediaPlaceholder( props ) {
 	const {
 		addToGallery,
 		allowedTypes = [],
+		blockIndex,
 		labels = {},
 		icon,
 		onSelect,
@@ -157,6 +158,7 @@ function MediaPlaceholder( props ) {
 		<View style={ { flex: 1 } }>
 			<MediaUpload
 				allowedTypes={ allowedTypes }
+				blockIndex={ blockIndex }
 				onSelect={ setMedia }
 				onSelectURL={ onSelectURL }
 				__experimentalOnlyMediaLibrary={

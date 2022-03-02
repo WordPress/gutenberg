@@ -107,11 +107,11 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         }
     }
 
-    void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType);
+    void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, int blockIndex, MediaType mediaType);
 
-    void requestMediaPickFromDeviceLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType);
+    void requestMediaPickFromDeviceLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, int blockIndex, MediaType mediaType);
 
-    void requestMediaPickerFromDeviceCamera(MediaSelectedCallback mediaSelectedCallback, MediaType mediaType);
+    void requestMediaPickerFromDeviceCamera(MediaSelectedCallback mediaSelectedCallback, int blockIndex, MediaType mediaType);
 
     void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback);
 
@@ -133,11 +133,11 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback, MediaType mediaType);
 
-    void requestMediaPickFrom(String mediaSource, MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection);
+    void requestMediaPickFrom(String mediaSource, MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, int blockIndex);
 
     void requestImageFullscreenPreview(String mediaUrl);
 
-    void requestMediaEditor(MediaSelectedCallback mediaSelectedCallback, String mediaUrl);
+    void requestMediaEditor(MediaSelectedCallback mediaSelectedCallback, int blockIndex, String mediaUrl);
 
     void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
                                                      String content,

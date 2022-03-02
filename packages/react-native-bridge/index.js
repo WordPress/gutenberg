@@ -117,6 +117,14 @@ export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
 }
 
+export function subscribeMediaAdd( callback ) {
+	return gutenbergBridgeEvents.addListener( 'mediaAdd', callback );
+}
+
+export function subscribeMediaInsert( callback ) {
+	return gutenbergBridgeEvents.addListener( 'mediaInsert', callback );
+}
+
 export function subscribeAndroidModalClosed( callback ) {
 	return isAndroid
 		? gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback )
@@ -178,19 +186,29 @@ export function subscribeShowEditorHelp( callback ) {
  * @param {string}        source   The media source to request media from.
  * @param {Array<string>} filter   Array of media types to filter the media to select.
  * @param {boolean}       multiple Is multiple selection allowed?
+ * @param {int}           blockIndex Index of block triggering request.
  * @param {Function}      callback RN Callback function to be called with the selected media objects.
  */
-export function requestMediaPicker( source, filter, multiple, callback ) {
+// FIXME this signature change will break iOS
+export function requestMediaPicker(
+	source,
+	filter,
+	multiple,
+	blockIndex,
+	callback
+) {
+	console.log( `requestMediaPicker blockIndex: ${ blockIndex }` );
 	RNReactNativeGutenbergBridge.requestMediaPickFrom(
 		source,
 		filter,
 		multiple,
+		blockIndex,
 		callback
 	);
 }
 
 /**
- * Request to render an unsuported block.
+ * Request to render an unsupported block.
  *
  * A way to show unsupported blocks to the user is to render it on a web view.
  *
@@ -283,9 +301,11 @@ export function requestImageFullscreenPreview(
 	);
 }
 
-export function requestMediaEditor( mediaUrl, callback ) {
+// FIXME this will break iOS
+export function requestMediaEditor( mediaUrl, blockIndex, callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaEditor(
 		mediaUrl,
+		blockIndex,
 		callback
 	);
 }

@@ -26,6 +26,7 @@ const accessibilityHint =
 		  );
 
 const ImageEditingButton = ( {
+	blockIndex,
 	onSelectMediaUploadOption,
 	openMediaOptions,
 	pickerOptions,
@@ -33,6 +34,7 @@ const ImageEditingButton = ( {
 } ) => {
 	return (
 		<MediaEdit
+			blockIndex={ blockIndex }
 			onSelect={ onSelectMediaUploadOption }
 			source={ { uri: url } }
 			openReplaceMediaOptions={ openMediaOptions }

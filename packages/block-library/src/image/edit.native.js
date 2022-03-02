@@ -423,6 +423,13 @@ export class ImageEdit extends Component {
 	}
 
 	onSelectMediaUploadOption( media ) {
+		console.log(
+			`onSelectMediaUploadOption with media: ${ JSON.stringify(
+				media,
+				null,
+				2
+			) }`
+		);
 		const { imageDefaultSize } = this.props;
 		const { id, url, destination } = this.props.attributes;
 		const mediaAttributes = {
@@ -610,6 +617,7 @@ export class ImageEdit extends Component {
 		const { isCaptionSelected } = this.state;
 		const {
 			attributes,
+			blockIndex,
 			isSelected,
 			image,
 			clientId,
@@ -619,6 +627,7 @@ export class ImageEdit extends Component {
 			wasBlockJustInserted,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
+		console.log( `image render id: ${ id }` );
 		const hasImageContext = context
 			? Object.keys( context ).length > 0
 			: false;
@@ -711,6 +720,7 @@ export class ImageEdit extends Component {
 				<View style={ styles.content }>
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+						blockIndex={ blockIndex }
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
@@ -755,6 +765,7 @@ export class ImageEdit extends Component {
 						<MediaUploadProgress
 							coverUrl={ url }
 							mediaId={ id }
+							blockIndex={ blockIndex }
 							onUpdateMediaProgress={ this.updateMediaProgress }
 							onFinishMediaUploadWithSuccess={
 								this.finishMediaUploadWithSuccess
@@ -777,6 +788,7 @@ export class ImageEdit extends Component {
 												align && alignToFlex[ align ]
 											}
 											alt={ alt }
+											blockIndex={ blockIndex }
 											isSelected={
 												isSelected &&
 												! isCaptionSelected
@@ -819,9 +831,11 @@ export class ImageEdit extends Component {
 			</Badge>
 		);
 
+		console.log( `image render blockIndex: ${ blockIndex }` );
 		return (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+				blockIndex={ blockIndex }
 				isReplacingMedia={ true }
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
@@ -835,7 +849,7 @@ export class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
-		const { getSettings, wasBlockJustInserted } = select(
+		const { getBlockIndex, getSettings, wasBlockJustInserted } = select(
 			blockEditorStore
 		);
 		const { getEditedPostAttribute } = select( 'core/editor' );
@@ -844,6 +858,7 @@ export default compose( [
 			isSelected,
 			clientId,
 		} = props;
+		const blockIndex = getBlockIndex( clientId );
 		const { imageSizes, imageDefaultSize } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 		const featuredImageId = getEditedPostAttribute( 'featured_media' );
@@ -858,6 +873,7 @@ export default compose( [
 				! hasQueryArg( url, 'w' ) );
 
 		return {
+			blockIndex,
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
 			imageDefaultSize,

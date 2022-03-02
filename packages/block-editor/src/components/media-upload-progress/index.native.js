@@ -43,6 +43,14 @@ export class MediaUploadProgress extends Component {
 	}
 
 	mediaUpload( payload ) {
+		console.log(
+			`mediaUpload payload: ${ JSON.stringify( payload, null, 2 ) }`
+		);
+		console.log(
+			`mediaUpload this.props.mediaId: ${ this.props.mediaId }`
+		);
+		console.log( `mediaUpload blockIndex: ${ this.props.blockIndex }` );
+		// console.log(`mediaUpload - ${JSON.stringify(payload, null, 2)}`)
 		const { mediaId } = this.props;
 
 		if ( payload.mediaId !== mediaId ) {
@@ -66,6 +74,7 @@ export class MediaUploadProgress extends Component {
 	}
 
 	updateMediaProgress( payload ) {
+		// console.log(`updateMediaProgress - passed index from native: ${payload.index}`)
 		this.setState( {
 			progress: payload.progress,
 			isUploadInProgress: true,
@@ -77,6 +86,7 @@ export class MediaUploadProgress extends Component {
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
+		// console.log(`finishUploadWithSuccess - passed index from native: ${payload.index}`)
 		this.setState( { isUploadInProgress: false } );
 		if ( this.props.onFinishMediaUploadWithSuccess ) {
 			this.props.onFinishMediaUploadWithSuccess( payload );
@@ -84,6 +94,7 @@ export class MediaUploadProgress extends Component {
 	}
 
 	finishMediaUploadWithFailure( payload ) {
+		// console.log(`finishUploadWithFailure - passed index from native: ${payload.index}`)
 		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
 		if ( this.props.onFinishMediaUploadWithFailure ) {
 			this.props.onFinishMediaUploadWithFailure( payload );
@@ -91,6 +102,7 @@ export class MediaUploadProgress extends Component {
 	}
 
 	mediaUploadStateReset( payload ) {
+		// console.log(`mediaUploadStateReset - passed index from native: ${payload.index}`)
 		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
 		if ( this.props.onMediaUploadStateReset ) {
 			this.props.onMediaUploadStateReset( payload );
@@ -102,6 +114,7 @@ export class MediaUploadProgress extends Component {
 		if ( this.subscriptionParentMediaUpload ) {
 			return;
 		}
+		console.log( `adding MediaUploadListener in MediaUploadProgress` );
 		this.subscriptionParentMediaUpload = subscribeMediaUpload(
 			( payload ) => {
 				this.mediaUpload( payload );
