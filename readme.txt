@@ -21,7 +21,7 @@ We’re always hard at work refining the experience, creating more and better bl
 
 For the adventurous and tech-savvy, the Gutenberg plugin gives you the latest and greatest feature set, so you can join us in testing bleeding-edge features, playing around with blocks, and maybe get inspired to build your own.
 
-### Who Is This Plugin For?
+### Early Access
 
 Are you a tech-savvy early adopter who likes testing bleeding-edge and experimental features, and isn’t afraid to tinker with features that are still in active development? Are you interested in contributing toward the Gutenberg open source project? If so, this beta plugin gives you access to the latest features around block and full site editing, as well as a peek into what’s to come.
 
