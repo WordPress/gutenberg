@@ -19,11 +19,13 @@ Gutenberg is a “block editor”, and introduces a modular approach to all part
 
 We’re always hard at work refining the experience, creating more and better blocks, and laying the groundwork for future phases of work. Each WordPress release includes stable features from the Gutenberg plugin, so you don’t need to install the plugin to benefit from the work being done here.
 
-For the adventurous and tech-savvy, the Gutenberg plugin gives you the latest and greatest feature set, so you can join us in testing bleeding-edge features, playing around with blocks, and maybe get inspired to build your own.
-
 ### Early Access
 
-Are you a tech-savvy early adopter who likes testing bleeding-edge and experimental features, and isn’t afraid to tinker with features that are still in active development? Are you interested in contributing toward the Gutenberg open source project? If so, this beta plugin gives you access to the latest features around block and full site editing, as well as a peek into what’s to come.
+Are you a tech-savvy early adopter who likes testing bleeding-edge and experimental features, and isn’t afraid to tinker with features that are still in active development? If so, this beta plugin gives you access to the latest features around block and full site editing, as well as a peek into what’s to come.
+
+### Contributors Wanted
+
+For the adventurous and tech-savvy, the Gutenberg plugin gives you the latest and greatest feature set, so you can join us in testing bleeding-edge features, playing around with blocks, and maybe get inspired to build your own.
 
 However, if you are running a production WordPress site, and favor stable, well-tested features, then you might want to stick with the block features already included with WordPress. Gutenberg is not recommended for production websites.
 
