@@ -100,7 +100,7 @@ WithCustomSizesDisabled.parameters = {
 	docs: {
 		description: {
 			story:
-				'When disabled, the user will only be able to pick one of the predefined sizes passed in `fontSizes`.',
+				'With custom font sizes disabled via the `disableCustomFontSizes` prop, the user will only be able to pick one of the predefined sizes passed in `fontSizes`.',
 		},
 	},
 };
