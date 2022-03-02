@@ -19,6 +19,10 @@ if ( hasArgInCLI( '--webpack-bundle-analyzer' ) ) {
 	process.env.WP_BUNDLE_ANALYZER = true;
 }
 
+if ( hasArgInCLI( '--webpack-copy-php' ) ) {
+	process.env.WP_COPY_PHP_FILES_TO_DIST = true;
+}
+
 const { status } = spawn( resolveBin( 'webpack' ), getWebpackArgs(), {
 	stdio: 'inherit',
 } );
