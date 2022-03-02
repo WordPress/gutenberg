@@ -68,21 +68,23 @@ export default function NavigationMenuSelector( {
 		( _onClose ) => ( selectedId ) => {
 			_onClose();
 			onSelect(
-				navigationMenus.find( ( post ) => post.id === selectedId )
+				navigationMenus?.find( ( post ) => post.id === selectedId )
 			);
 		},
 		[ navigationMenus ]
 	);
 
 	const menuChoices = useMemo( () => {
-		return navigationMenus.map( ( { id, title } ) => {
-			const label = decodeEntities( title.rendered );
-			return {
-				value: id,
-				label,
-				ariaLabel: sprintf( actionLabel, label ),
-			};
-		} );
+		return (
+			navigationMenus?.map( ( { id, title } ) => {
+				const label = decodeEntities( title.rendered );
+				return {
+					value: id,
+					label,
+					ariaLabel: sprintf( actionLabel, label ),
+				};
+			} ) || []
+		);
 	}, [ navigationMenus ] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
@@ -124,7 +126,7 @@ export default function NavigationMenuSelector( {
 					) }
 					{ showClassicMenus && hasClassicMenus && (
 						<MenuGroup label={ __( 'Classic Menus' ) }>
-							{ classicMenus.map( ( menu ) => {
+							{ classicMenus?.map( ( menu ) => {
 								const label = decodeEntities( menu.name );
 								return (
 									<MenuItem
