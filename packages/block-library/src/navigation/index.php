@@ -365,6 +365,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// a fallback (i.e. the block has no menu associated with it).
 	$is_fallback = false;
 
+	$nav_menu_name = '';
+
 	/**
 	 * Deprecated:
 	 * The rgbTextColor and rgbBackgroundColor attributes
@@ -427,6 +429,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		if ( ! isset( $navigation_post ) ) {
 			return '';
 		}
+
+		$nav_menu_name = $navigation_post->post_title;
 
 		$parsed_blocks = parse_blocks( $navigation_post->post_content );
 
@@ -510,8 +514,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => implode( ' ', $classes ),
-			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+			'class'      => implode( ' ', $classes ),
+			'style'      => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+			'aria-label' => $nav_menu_name,
 		)
 	);
 
