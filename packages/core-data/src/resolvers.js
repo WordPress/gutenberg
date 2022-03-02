@@ -292,6 +292,9 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 		return;
 	}
 
+	// Optional chaining operator is used here because the API requests don't
+	// return the expected result in the native version. Instead, API requests
+	// only return the result, without including response properties like the headers.
 	const allowHeader = response.headers?.get( 'allow' );
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	const isAllowed = includes( allowHeader, method );
