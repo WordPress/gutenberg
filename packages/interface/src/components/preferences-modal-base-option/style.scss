@@ -1,0 +1,14 @@
+.interface-preferences-modal__option {
+	.components-base-control {
+		.components-base-control__field {
+			align-items: center;
+			display: flex;
+			margin-bottom: 0;
+
+			& > label {
+				flex-grow: 1;
+				padding: 0.6rem 0 0.6rem 10px;
+			}
+		}
+	}
+}
