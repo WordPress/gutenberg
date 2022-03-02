@@ -34,6 +34,7 @@ describe( 'actions', () => {
 	beforeEach( () => {
 		registry = createRegistryWithStores();
 	} );
+
 	it( 'openGeneralSidebar/closeGeneralSidebar', () => {
 		registry.dispatch( editPostStore ).openGeneralSidebar( 'test/sidebar' );
 		expect(
@@ -51,6 +52,7 @@ describe( 'actions', () => {
 				.getActiveComplementaryArea( 'core/edit-post' )
 		).toBeNull();
 	} );
+
 	it( 'toggleFeature', () => {
 		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
 		expect(
@@ -66,6 +68,7 @@ describe( 'actions', () => {
 				.get( editPostStore.name, 'welcomeGuide' )
 		).toBe( false );
 	} );
+
 	describe( 'switchEditorMode', () => {
 		it( 'to visual', () => {
 			registry.dispatch( editPostStore ).switchEditorMode( 'visual' );
@@ -73,6 +76,7 @@ describe( 'actions', () => {
 				'visual'
 			);
 		} );
+
 		it( 'to text', () => {
 			// Add a selected client id and make sure it's there.
 			const clientId = 'clientId_1';
@@ -87,6 +91,7 @@ describe( 'actions', () => {
 			).toBeNull();
 		} );
 	} );
+
 	it( 'togglePinnedPluginItem', () => {
 		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
 		// Sidebars are pinned by default.
@@ -103,6 +108,7 @@ describe( 'actions', () => {
 				.isItemPinned( editPostStore.name, 'rigatoni' )
 		).toBe( true );
 	} );
+
 	describe( '__unstableSwitchToTemplateMode', () => {
 		it( 'welcome guide is active', () => {
 			// Activate `welcomeGuideTemplate` feature.
@@ -116,6 +122,7 @@ describe( 'actions', () => {
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toHaveLength( 0 );
 		} );
+
 		it( 'welcome guide is inactive', () => {
 			expect(
 				registry.select( editPostStore ).isEditingTemplate()
