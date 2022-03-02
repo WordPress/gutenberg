@@ -167,12 +167,12 @@ Once all the dependencies are in place, all that's left is to run `npm start` an
 
 If you now go to the Plugins page, you should see a plugin called **My first Gutenberg App**. Go ahead and activate it. A new menu item labeled _My first Gutenberg app_ should show up. Once you click it, you will see a page that says _Hello from JavaScript!_:
 
-![](./media/setup/hello-from-js.jpg)
+![](/docs/how-to-guides/data-basics/media/setup/hello-from-js.jpg)
 
 Congratulations! You are now ready to start building the app!
 
 ## What's next?
 
-* Previous part: [Introduction](./README.md)
-* Next part: [Building a basic list of pages](./2-building-a-list-of-pages.md)
+* Previous part: [Introduction](/docs/how-to-guides/data-basics/README.md)
+* Next part: [Building a basic list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
 * (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository

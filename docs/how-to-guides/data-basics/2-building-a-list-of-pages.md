@@ -3,7 +3,7 @@
 In this part, we will build a filterable list of all WordPress pages. This is what the app will look like at the end of
 this part:
 
-![](./media/list-of-pages/part1-finished.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/part1-finished.jpg)
 
 Let’s see how we can get there step by step.
 
@@ -33,7 +33,7 @@ function PagesList( { pages } ) {
 Note that this component does not fetch any data yet, only presents the hardcoded list of pages. When you refresh the page,
 you should see the following:
 
-![](./media/list-of-pages/simple-list.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/simple-list.jpg)
 
 ## Step 2: Fetch the data
 
@@ -43,7 +43,7 @@ list of pages from the [WordPress REST API](https://developer.wordpress.org/rest
 Before we start, let’s confirm we actually have some pages to fetch. Within WPAdmin, Navigate to Pages using the sidebar menu and
 ensure it shows at least four or five Pages:
 
-![](./media/list-of-pages/pages-list.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/pages-list.jpg)
 
 If it doesn’t, go ahead and create a few pages – you can use the same titles as on the screenshot above. Be sure to _
 publish_ and not just _save_ them.
@@ -117,7 +117,7 @@ function PagesList( { pages } ) {
 
 Refreshing the page should display a list similar to this one:
 
-![](./media/list-of-pages/fetch-the-data.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/fetch-the-data.jpg)
 
 ## Step 3: Turn it into a table
 
@@ -142,7 +142,7 @@ function PagesList( { pages } ) {
 }
 ```
 
-![](./media/list-of-pages/make-a-table.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/make-a-table.jpg)
 
 ## Step 4: Add a search box
 
@@ -174,7 +174,7 @@ Note that instead of using an `input` tag, we took advantage of
 the [SearchControl](https://developer.wordpress.org/block-editor/reference-guides/components/search-control/) component.
 This is what it looks like:
 
-![](./media/list-of-pages/filter-field.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/filter-field.jpg)
 
 The field starts empty, and the contents are stored in the `searchTerm` state value. If you aren’t familiar with
 the [useState](https://reactjs.org/docs/hooks-state.html) hook, you can learn more
@@ -251,7 +251,7 @@ function MyFirstApp() {
 
 Voila! We can now filter the results:
 
-![](./media/list-of-pages/filter.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/filter.jpg)
 
 ### Using core-data instead vs calling the API directly
 
@@ -293,7 +293,7 @@ instead.
 
 There is one problem with our search feature. We can’t be quite sure whether it’s still searching or showing no results:
 
-![](./media/list-of-pages/unclear-status.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/unclear-status.jpg)
 
 A few messages like  _Loading…_ or _No results_ would clear it up. Let’s implement them! First,  `PagesList` has to be
 aware of the current status:
@@ -451,11 +451,11 @@ window.addEventListener(
 
 All that’s left is to refresh the page and enjoy the brand new status indicator:
 
-![](./media/list-of-pages/indicator.jpg)
-![](./media/list-of-pages/no-results.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/indicator.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/no-results.jpg)
 
 ## What's next?
 
-* **Previous part:** [Setup](./1-data-basics-setup.md)
-* **Next part:** [Building an edit form](./3-building-an-edit-form.md)
+* **Previous part:** [Setup](/docs/how-to-guides/data-basics/1-data-basics-setup.md)
+* **Next part:** [Building an edit form](/docs/how-to-guides/data-basics/3-building-an-edit-form.md)
 * (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository

@@ -2,7 +2,7 @@
 
 In this part, we will add an edit feature to the pages list we built in the last step:
 
-![](./media/edit-form/form-finished.png)
+![](/docs/how-to-guides/data-basics/media/edit-form/form-finished.png)
 
 Let’s see how we can get there step by step.
 
@@ -52,7 +52,7 @@ const PageEditButton = () => (
 
 Once you refresh the page, you should see the following:
 
-![](./media/edit-form/edit-button.png)
+![](/docs/how-to-guides/data-basics/media/edit-form/edit-button.png)
 
 The button is in place, but it doesn't do anything yet. We want it to display the page edit form. A convenient way to make it happen is by using the [`Modal` component from the `@wordpress/components` package](https://developer.wordpress.org/block-editor/reference-guides/components/modal/). Let's update the  `PageEditButton` accordingly:
 
@@ -106,7 +106,7 @@ export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
 
 When you click the *Edit* button now, you should see the following modal:
 
-![](./media/edit-form/form-scaffold.png)
+![](/docs/how-to-guides/data-basics/media/edit-form/form-scaffold.png)
 
 Great! We now have a basic user interface to work with. Our `PageTitleForm` doesn't do anything yet, though. Let's change that!
 
@@ -142,7 +142,7 @@ export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
 }
 ```
 
-![](./media/edit-form/form-populated.png)
+![](/docs/how-to-guides/data-basics/media/edit-form/form-populated.png)
 
 Splendid, it looks like a real form already! Unfortunately, the input field isn't editable yet – let's fix that.
 
@@ -222,7 +222,7 @@ export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
 
 And here's how it looks like:
 
-![](./media/edit-form/form-editable.png)
+![](/docs/how-to-guides/data-basics/media/edit-form/form-editable.png)
 
 #### `useState` vs `editEntityRecord`
 
@@ -268,6 +268,6 @@ export function PageTitleForm( { pageId, onCancel, onSaveFinished } ) {
 
 ## What's next?
 
-* **Previous part:** [Building a list of pages](./2-building-a-list-of-pages.md)
+* **Previous part:** [Building a list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
 * **Next part:** Building a *New Page* form (coming soon)
 * (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository
