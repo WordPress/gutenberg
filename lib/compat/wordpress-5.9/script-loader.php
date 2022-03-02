@@ -53,8 +53,8 @@ add_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
  *
  * For block themes, it's loaded in the head.
  * For classic ones, it's loaded in the body
- * because the wp_head action (and wp_enqueue_scripts)
- * happens before the render_block.
+ * because the wp_head action  happens before
+ * the render_block.
  *
  * @link https://core.trac.wordpress.org/ticket/53494.
  *
@@ -63,7 +63,7 @@ add_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
 function gutenberg_enqueue_block_support_styles( $style ) {
 	$action_hook_name = 'wp_footer';
 	if ( wp_is_block_theme() ) {
-		$action_hook_name = 'wp_enqueue_scripts';
+		$action_hook_name = 'wp_head';
 	}
 	add_action(
 		$action_hook_name,
