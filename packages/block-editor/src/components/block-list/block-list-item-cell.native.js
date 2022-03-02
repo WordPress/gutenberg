@@ -13,8 +13,7 @@ import { useEffect, useCallback } from '@wordpress/element';
  */
 import { useBlockListContext } from './block-list-context';
 
-function BlockListItemCell( props ) {
-	const { clientId, rootClientId } = props;
+function BlockListItemCell( { children, clientId, rootClientId } ) {
 	const { updateBlocksLayouts } = useBlockListContext();
 
 	useEffect( () => {
@@ -30,7 +29,7 @@ function BlockListItemCell( props ) {
 		[ clientId, rootClientId, updateBlocksLayouts ]
 	);
 
-	return <View onLayout={ onLayout }>{ props.children }</View>;
+	return <View onLayout={ onLayout }>{ children }</View>;
 }
 
 export default BlockListItemCell;
