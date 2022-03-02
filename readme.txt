@@ -31,8 +31,6 @@ For the adventurous and tech-savvy, the Gutenberg plugin gives you the latest an
 
 ### Discover More
 
-- **Try It Out:** <a href="https://wordpress.org/gutenberg/">Test drive Gutenberg</a> directly in your browser, no installation required.
-
 - **User Documentation:** Review the <a href="https://wordpress.org/support/article/wordpress-editor/">WordPress Editor documentation</a> for detailed instructions on using the editor as an author to create posts, pages, and more.
 
 - **Developer Documentation:** Explore the <a href="https://developer.wordpress.org/block-editor/">Developer Documentation</a> for extensive tutorials, documentation, and API references on how to extend the editor.
