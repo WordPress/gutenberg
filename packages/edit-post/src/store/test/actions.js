@@ -195,4 +195,99 @@ describe( 'actions', () => {
 			).toEqual( expectedB );
 		} );
 	} );
+
+	describe( '__experimentalUpdateLocalAutosaveInterval', () => {
+		it( 'sets the local autosave interval', () => {
+			registry
+				.dispatch( editPostStore )
+				.__experimentalUpdateLocalAutosaveInterval( 42 );
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'localAutosaveInterval' )
+			).toBe( 42 );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelEnabled', () => {
+		it( 'toggles panels to be enabled and not enabled', () => {
+			const defaultState = {
+				'post-status': {
+					opened: true,
+				},
+			};
+
+			// This will switch it off, since the default is on.
+			registry
+				.dispatch( editPostStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry.select( editPostStore ).getPreference( 'panels' )
+			).toEqual( {
+				...defaultState,
+				'control-panel': {
+					enabled: false,
+				},
+			} );
+
+			// Switch it on again.
+			registry
+				.dispatch( editPostStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry.select( editPostStore ).getPreference( 'panels' )
+			).toEqual( {
+				...defaultState,
+				'control-panel': {
+					enabled: true,
+				},
+			} );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelOpened', () => {
+		it( 'toggles panels open and closed', () => {
+			const defaultState = {
+				'post-status': {
+					opened: true,
+				},
+			};
+
+			// This will open it, since the default is closed.
+			registry
+				.dispatch( editPostStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry.select( editPostStore ).getPreference( 'panels' )
+			).toEqual( {
+				...defaultState,
+				'control-panel': {
+					opened: true,
+				},
+			} );
+
+			// Close it.
+			registry
+				.dispatch( editPostStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry.select( editPostStore ).getPreference( 'panels' )
+			).toEqual( {
+				...defaultState,
+				'control-panel': {
+					opened: false,
+				},
+			} );
+		} );
+	} );
 } );
