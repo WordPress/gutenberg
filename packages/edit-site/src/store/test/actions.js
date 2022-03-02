@@ -42,17 +42,6 @@ function createRegistryWithStores() {
 }
 
 describe( 'actions', () => {
-	describe( 'toggleFeature', () => {
-		it( 'should toggle a feature flag', () => {
-			const registry = createRegistryWithStores();
-
-			registry.dispatch( editSiteStore ).toggleFeature( 'name' );
-			expect(
-				registry.select( editSiteStore ).isFeatureActive( 'name' )
-			).toBe( true );
-		} );
-	} );
-
 	describe( 'setTemplate', () => {
 		const ID = 1;
 		const SLUG = 'archive';
