@@ -23,7 +23,7 @@ We’re always hard at work refining the experience, creating more and better bl
 
 ### Early Access
 
-Are you a tech-savvy early adopter who likes testing bleeding-edge and experimental features, and isn’t afraid to tinker with features that are still in active development? If so, this beta plugin gives you access to the latest features for block and full site editing, as well as a peek into what’s to come for the WordPress editor.
+Are you a tech-savvy early adopter who likes testing bleeding-edge and experimental features, and isn’t afraid to tinker with features that are still in active development? If so, this beta plugin gives you access to the latest Gutenberg features for block and full site editing, as well as a peek into what’s to come.
 
 ### Contributors Wanted
 
