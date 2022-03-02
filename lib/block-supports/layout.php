@@ -26,13 +26,298 @@ function gutenberg_register_layout_support( $block_type ) {
 }
 
 /**
+ * Generates styles for the default flow layout type.
+ *
+ * @param array   $layout                Layout object.
+ * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
+ * @param string  $gap_value             The block gap value to apply.
+ *
+ * @return array An array of class names corresponding to the generated layout CSS.
+ */
+function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support = false, $gap_value = null ) {
+	$style_engine = WP_Style_Engine_Gutenberg::get_instance();
+	$class_names  = array();
+
+	$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
+	$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
+
+	$all_max_width_value  = $content_size ? $content_size : $wide_size;
+	$wide_max_width_value = $wide_size ? $wide_size : $content_size;
+
+	// Make sure there is a single CSS rule, and all tags are stripped for security.
+	// TODO: Use `safecss_filter_attr` instead - once https://core.trac.wordpress.org/ticket/46197 is patched.
+	$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
+	$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
+
+	// Add universal styles for all default layouts.
+	// Add left align rule;
+	$class_names[] = $style_engine->add_style(
+		'wp-layout-default',
+		array(
+			'selector' => '.alignleft',
+			'rules'    => array(
+				'float' => 'left',
+				'margin-right' => '2em',
+				'margin-left'  => '0',
+			),
+		)
+	);
+
+	// Add right align rule:
+	$class_names[] = $style_engine->add_style(
+		'wp-layout-default',
+		array(
+			'selector' => '.alignright',
+			'rules'    => array(
+				'float' => 'right',
+				'margin-left'  => '2em',
+				'margin-right' => '0',
+			),
+		)
+	);
+
+	if ( $content_size || $wide_size ) {
+		// Add value specific content size.
+		$class_names[] = $style_engine->add_style(
+			'wp-layout-default-content-size',
+			array(
+				'suffix'   => $all_max_width_value,
+				'selector' => '> :where(:not(.alignleft):not(.alignright))',
+				'rules' => array(
+					'max-width'    => esc_html( $all_max_width_value ),
+					'margin-left'  => 'auto !important',
+					'margin-right' => 'auto !important',
+				)
+			)
+		);
+
+		// Add value specific wide size.
+		$class_names[] = $style_engine->add_style(
+			'wp-layout-default-wide-size',
+			array(
+				'suffix'   => $wide_max_width_value,
+				'selector' => '> .alignwide',
+				'rules' => array(
+					'max-width' => esc_html( $wide_max_width_value ),
+				)
+			)
+		);
+
+		// Add universal full width.
+		$class_names[] = $style_engine->add_style(
+			'wp-layout-default',
+			array(
+				'selector' => '> .alignfull',
+				'rules'    => array(
+					'max-width' => 'none',
+				)
+			)
+		);
+	}
+
+	if ( $has_block_gap_support ) {
+		if ( ! $gap_value ) {
+			$class_names[] = $style_engine->add_style(
+				'wp-layout-default-global-gap',
+				array(
+					'selector' => '> *',
+					'rules'    => array(
+						'margin-top'    => '0',
+						'margin-bottom' => '0',
+					),
+				)
+			);
+			$class_names[] = $style_engine->add_style(
+				'wp-layout-default-global-gap',
+				array(
+					'selector' => '> * + *',
+					'rules'    => array(
+						'margin-top'    => 'var( --wp--style--block-gap )',
+						'margin-bottom' => '0',
+					),
+				)
+			);
+		} else {
+			$class_names[] = $style_engine->add_style(
+				'wp-layout-default-custom-gap',
+				array(
+					'suffix'   => $gap_value,
+					'selector' => '> *',
+					'rules'    => array(
+						'margin-top'    => '0',
+						'margin-bottom' => '0',
+					),
+				)
+			);
+			$class_names[] = $style_engine->add_style(
+				'wp-layout-default-custom-gap',
+				array(
+					'suffix'   => $gap_value,
+					'selector' => '> * + *',
+					'rules'    => array(
+						'margin-top'    => $gap_value,
+						'margin-bottom' => '0',
+					),
+				)
+			);
+		}
+	}
+
+	return $class_names;
+}
+
+/**
+ * Generates styles for the flex layout type.
+ *
+ * @param array   $layout                Layout object.
+ * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
+ * @param string  $gap_value             The block gap value to apply.
+ *
+ * @return array An array of class names corresponding to the generated layout CSS.
+ */
+function gutenberg_generate_layout_style_flex( $layout, $has_block_gap_support = false, $gap_value = null ) {
+	$style_engine       = WP_Style_Engine_Gutenberg::get_instance();
+	$class_names        = array();
+	$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
+
+	$justify_content_options = array(
+		'left'   => 'flex-start',
+		'right'  => 'flex-end',
+		'center' => 'center',
+	);
+
+	if ( 'horizontal' === $layout_orientation ) {
+		$justify_content_options += array( 'space-between' => 'space-between' );
+	}
+
+	$flex_wrap_options = array( 'wrap', 'nowrap' );
+	$flex_wrap         = ! empty( $layout['flexWrap'] ) && in_array( $layout['flexWrap'], $flex_wrap_options, true ) ?
+		$layout['flexWrap'] :
+		'wrap';
+
+	$class_names[] = $style_engine->add_style(
+		'wp-layout-flex',
+		array(
+			'rules' => array(
+				'display' => 'flex',
+				'gap'     => '0.5em',
+			),
+		)
+	);
+
+	$class_names[] = $style_engine->add_style(
+		'wp-layout-flex',
+		array(
+			'selector' => '> *',
+			'rules'    => array(
+				'margin' => '0',
+			),
+		)
+	);
+
+	$class_names[] = $style_engine->add_style(
+		'wp-layout-flex',
+		array(
+			'suffix' => $flex_wrap,
+			'rules'  => array(
+				'flex-wrap' => $flex_wrap,
+			),
+		)
+	);
+
+	if ( $has_block_gap_support ) {
+		if ( ! $gap_value ) {
+			$class_names[] = $style_engine->add_style(
+				'wp-layout-flex-global-gap',
+				array(
+					'rules'  => array(
+						'gap' => 'var( --wp--style--block-gap, 0.5em )',
+					),
+				)
+			);
+		} else {
+			$class_names[] = $style_engine->add_style(
+				'wp-layout-flex-custom-gap',
+				array(
+					'suffix' => $gap_value,
+					'rules'  => array(
+						'gap' => $gap_value,
+					),
+				)
+			);
+		}
+	}
+
+	if ( 'horizontal' === $layout_orientation ) {
+		$class_names[] = $style_engine->add_style(
+			'wp-layout-flex-orientation-horizontal',
+			array(
+				'rules'  => array(
+					'align-items'    => 'center',
+				),
+			)
+		);
+
+		/**
+		 * Add this style only if is not empty for backwards compatibility,
+		 * since we intend to convert blocks that had flex layout implemented
+		 * by custom css.
+		 */
+		if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
+			$class_names[] = $style_engine->add_style(
+				'wp-layout-flex-orientation-horizontal',
+				array(
+					'suffix' => $justify_content_options[ $layout['justifyContent'] ],
+					'rules'  => array(
+						'justify-content' => $justify_content_options[ $layout['justifyContent'] ],
+					),
+				)
+			);
+		}
+	} else {
+		$class_names[] = $style_engine->add_style(
+			'wp-layout-flex-orientation-vertical',
+			array(
+				'rules'  => array(
+					'flex-direction' => 'column',
+				),
+			)
+		);
+
+		if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
+			$class_names[] = $style_engine->add_style(
+				'wp-layout-flex-orientation-vertical',
+				array(
+					'suffix' => $justify_content_options[ $layout['justifyContent'] ],
+					'rules'  => array(
+						'align-items' => $justify_content_options[ $layout['justifyContent'] ],
+					),
+				)
+			);
+		} else {
+			$class_names[] = $style_engine->add_style(
+				'wp-layout-flex-orientation-vertical',
+				array(
+					'suffix' => 'flex-start',
+					'rules'  => array(
+						'align-items' => 'flex-start',
+					),
+				)
+			);
+		}
+	}
+
+	return $class_names;
+}
+
+/**
  * Generates the CSS corresponding to the provided layout.
  *
- * @param array   $layout   Layout object. The one that is passed has already checked the existence of default block layout.
+ * @param array   $layout                Layout object. The one that is passed has already checked the existence of default block layout.
  * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
- * @param string  $gap_value The block gap value to apply.
+ * @param string  $gap_value             The block gap value to apply.
  *
- * @return string CSS style.
+ * @return array An array of class names corresponding to the generated layout CSS.
  */
 function gutenberg_get_layout_style( $layout, $has_block_gap_support = false, $gap_value = null ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
@@ -41,259 +326,9 @@ function gutenberg_get_layout_style( $layout, $has_block_gap_support = false, $g
 	$class_names = array();
 
 	if ( 'default' === $layout_type ) {
-		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
-		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
-
-		$all_max_width_value  = $content_size ? $content_size : $wide_size;
-		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
-
-		// Make sure there is a single CSS rule, and all tags are stripped for security.
-		// TODO: Use `safecss_filter_attr` instead - once https://core.trac.wordpress.org/ticket/46197 is patched.
-		$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
-		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
-
-		// Add universal styles for all default layouts.
-		// Add left align rule;
-		$class_names[] = $style_engine->add_style(
-			'wp-layout-default',
-			array(
-				'selector' => '.alignleft',
-				'rules'    => array(
-					'float' => 'left',
-					'margin-right' => '2em',
-					'margin-left'  => '0',
-				),
-			)
-		);
-
-		// Add right align rule:
-		$class_names[] = $style_engine->add_style(
-			'wp-layout-default',
-			array(
-				'selector' => '.alignright',
-				'rules'    => array(
-					'float' => 'right',
-					'margin-left'  => '2em',
-					'margin-right' => '0',
-				),
-			)
-		);
-
-		if ( $content_size || $wide_size ) {
-			// Add value specific content size.
-			$class_names[] = $style_engine->add_style(
-				'wp-layout-default-content-size',
-				array(
-					'suffix'   => $all_max_width_value,
-					'selector' => '> :where(:not(.alignleft):not(.alignright))',
-					'rules' => array(
-						'max-width'    => esc_html( $all_max_width_value ),
-						'margin-left'  => 'auto !important',
-						'margin-right' => 'auto !important',
-					)
-				)
-			);
-
-			// Add value specific wide size.
-			$class_names[] = $style_engine->add_style(
-				'wp-layout-default-wide-size',
-				array(
-					'suffix'   => $wide_max_width_value,
-					'selector' => '> .alignwide',
-					'rules' => array(
-						'max-width' => esc_html( $wide_max_width_value ),
-					)
-				)
-			);
-
-			// Add universal full width.
-			$class_names[] = $style_engine->add_style(
-				'wp-layout-default',
-				array(
-					'selector' => '> .alignfull',
-					'rules'    => array(
-						'max-width' => 'none',
-					)
-				)
-			);
-		}
-
-		if ( $has_block_gap_support ) {
-			if ( ! $gap_value ) {
-				$class_names[] = $style_engine->add_style(
-					'wp-layout-default-global-gap',
-					array(
-						'selector' => '> *',
-						'rules'    => array(
-							'margin-top'    => '0',
-							'margin-bottom' => '0',
-						),
-					)
-				);
-				$class_names[] = $style_engine->add_style(
-					'wp-layout-default-global-gap',
-					array(
-						'selector' => '> * + *',
-						'rules'    => array(
-							'margin-top'    => 'var( --wp--style--block-gap )',
-							'margin-bottom' => '0',
-						),
-					)
-				);
-			} else {
-				$class_names[] = $style_engine->add_style(
-					'wp-layout-default-custom-gap',
-					array(
-						'suffix'   => $gap_value,
-						'selector' => '> *',
-						'rules'    => array(
-							'margin-top'    => '0',
-							'margin-bottom' => '0',
-						),
-					)
-				);
-				$class_names[] = $style_engine->add_style(
-					'wp-layout-default-custom-gap',
-					array(
-						'suffix'   => $gap_value,
-						'selector' => '> * + *',
-						'rules'    => array(
-							'margin-top'    => $gap_value,
-							'margin-bottom' => '0',
-						),
-					)
-				);
-			}
-		}
+		$class_names = gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support, $gap_value );
 	} elseif ( 'flex' === $layout_type ) {
-		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
-
-		$justify_content_options = array(
-			'left'   => 'flex-start',
-			'right'  => 'flex-end',
-			'center' => 'center',
-		);
-
-		if ( 'horizontal' === $layout_orientation ) {
-			$justify_content_options += array( 'space-between' => 'space-between' );
-		}
-
-		$flex_wrap_options = array( 'wrap', 'nowrap' );
-		$flex_wrap         = ! empty( $layout['flexWrap'] ) && in_array( $layout['flexWrap'], $flex_wrap_options, true ) ?
-			$layout['flexWrap'] :
-			'wrap';
-
-		$class_names[] = $style_engine->add_style(
-			'wp-layout-flex',
-			array(
-				'rules' => array(
-					'display' => 'flex',
-					'gap'     => '0.5em',
-				),
-			)
-		);
-
-		$class_names[] = $style_engine->add_style(
-			'wp-layout-flex',
-			array(
-				'selector' => '> *',
-				'rules'    => array(
-					'margin' => '0',
-				),
-			)
-		);
-
-		$class_names[] = $style_engine->add_style(
-			'wp-layout-flex',
-			array(
-				'suffix' => $flex_wrap,
-				'rules'  => array(
-					'flex-wrap' => $flex_wrap,
-				),
-			)
-		);
-
-		if ( $has_block_gap_support ) {
-			if ( ! $gap_value ) {
-				$class_names[] = $style_engine->add_style(
-					'wp-layout-flex-global-gap',
-					array(
-						'rules'  => array(
-							'gap' => 'var( --wp--style--block-gap, 0.5em )',
-						),
-					)
-				);
-			} else {
-				$class_names[] = $style_engine->add_style(
-					'wp-layout-flex-custom-gap',
-					array(
-						'suffix' => $gap_value,
-						'rules'  => array(
-							'gap' => $gap_value,
-						),
-					)
-				);
-			}
-		}
-
-		if ( 'horizontal' === $layout_orientation ) {
-			$class_names[] = $style_engine->add_style(
-				'wp-layout-flex-orientation-horizontal',
-				array(
-					'rules'  => array(
-						'align-items'    => 'center',
-					),
-				)
-			);
-
-			/**
-			 * Add this style only if is not empty for backwards compatibility,
-			 * since we intend to convert blocks that had flex layout implemented
-			 * by custom css.
-			 */
-			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$class_names[] = $style_engine->add_style(
-					'wp-layout-flex-orientation-horizontal',
-					array(
-						'suffix' => $justify_content_options[ $layout['justifyContent'] ],
-						'rules'  => array(
-							'justify-content' => $justify_content_options[ $layout['justifyContent'] ],
-						),
-					)
-				);
-			}
-		} else {
-			$class_names[] = $style_engine->add_style(
-				'wp-layout-flex-orientation-vertical',
-				array(
-					'rules'  => array(
-						'flex-direction' => 'column',
-					),
-				)
-			);
-
-			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$class_names[] = $style_engine->add_style(
-					'wp-layout-flex-orientation-vertical',
-					array(
-						'suffix' => $justify_content_options[ $layout['justifyContent'] ],
-						'rules'  => array(
-							'align-items' => $justify_content_options[ $layout['justifyContent'] ],
-						),
-					)
-				);
-			} else {
-				$class_names[] = $style_engine->add_style(
-					'wp-layout-flex-orientation-vertical',
-					array(
-						'suffix' => 'flex-start',
-						'rules'  => array(
-							'align-items' => 'flex-start',
-						),
-					)
-				);
-			}
-		}
+		$class_names = gutenberg_generate_layout_style_flex( $layout, $has_block_gap_support, $gap_value );
 	}
 
 	return array_unique( $class_names );
