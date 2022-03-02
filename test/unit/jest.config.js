@@ -26,6 +26,7 @@ module.exports = {
 		'/.git/',
 		'/node_modules/',
 		'/packages/e2e-tests',
+		'/packages/e2e-test-utils-playwright/source/',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+.native.js$',
