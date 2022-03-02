@@ -457,5 +457,5 @@ All that’s left is to refresh the page and enjoy the brand new status indicato
 ## What's next?
 
 * **Previous part:** [Setup](./1-data-basics-setup.md)
-* **Next part:** Adding an „Edit page” feature (coming soon)
+* **Next part:** [Building an edit form](./3-building-an-edit-form.md)
 * (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository
