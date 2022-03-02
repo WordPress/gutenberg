@@ -18,6 +18,10 @@
 		"linkTarget": {
 			"type": "string",
 			"default": "_self"
+		},
+		"isSiteOwner": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "postType", "postId", "commentId" ],

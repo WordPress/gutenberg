@@ -40,6 +40,13 @@ const AvatarInspectorControls = ( { setAttributes, avatar, attributes } ) => (
 				value={ attributes?.size }
 			/>
 			<ToggleControl
+				label={ __( 'Show admin Avatar' ) }
+				onChange={ () =>
+					setAttributes( { isSiteOwner: ! attributes.isSiteOwner } )
+				}
+				checked={ attributes.isSiteOwner }
+			/>
+			<ToggleControl
 				label={ __( 'Link to user profile' ) }
 				onChange={ () =>
 					setAttributes( { isLink: ! attributes.isLink } )
