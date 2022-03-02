@@ -50,26 +50,26 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 	$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
 	// Add universal styles for all default layouts.
-	// Add left align rule;
+	// Add left align rule.
 	$class_names[] = $style_engine->add_style(
 		'wp-layout-default',
 		array(
 			'selector' => '.alignleft',
 			'rules'    => array(
-				'float' => 'left',
+				'float'        => 'left',
 				'margin-right' => '2em',
 				'margin-left'  => '0',
 			),
 		)
 	);
 
-	// Add right align rule:
+	// Add right align rule.
 	$class_names[] = $style_engine->add_style(
 		'wp-layout-default',
 		array(
 			'selector' => '.alignright',
 			'rules'    => array(
-				'float' => 'right',
+				'float'        => 'right',
 				'margin-left'  => '2em',
 				'margin-right' => '0',
 			),
@@ -83,11 +83,11 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 			array(
 				'suffix'   => $all_max_width_value,
 				'selector' => '> :where(:not(.alignleft):not(.alignright))',
-				'rules' => array(
+				'rules'    => array(
 					'max-width'    => esc_html( $all_max_width_value ),
 					'margin-left'  => 'auto !important',
 					'margin-right' => 'auto !important',
-				)
+				),
 			)
 		);
 
@@ -97,9 +97,9 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 			array(
 				'suffix'   => $wide_max_width_value,
 				'selector' => '> .alignwide',
-				'rules' => array(
+				'rules'    => array(
 					'max-width' => esc_html( $wide_max_width_value ),
-				)
+				),
 			)
 		);
 
@@ -110,7 +110,7 @@ function gutenberg_generate_layout_style_flow( $layout, $has_block_gap_support =
 				'selector' => '> .alignfull',
 				'rules'    => array(
 					'max-width' => 'none',
-				)
+				),
 			)
 		);
 	}
@@ -230,7 +230,7 @@ function gutenberg_generate_layout_style_flex( $layout, $has_block_gap_support =
 			$class_names[] = $style_engine->add_style(
 				'wp-layout-flex-global-gap',
 				array(
-					'rules'  => array(
+					'rules' => array(
 						'gap' => 'var( --wp--style--block-gap, 0.5em )',
 					),
 				)
@@ -252,8 +252,8 @@ function gutenberg_generate_layout_style_flex( $layout, $has_block_gap_support =
 		$class_names[] = $style_engine->add_style(
 			'wp-layout-flex-orientation-horizontal',
 			array(
-				'rules'  => array(
-					'align-items'    => 'center',
+				'rules' => array(
+					'align-items' => 'center',
 				),
 			)
 		);
@@ -278,7 +278,7 @@ function gutenberg_generate_layout_style_flex( $layout, $has_block_gap_support =
 		$class_names[] = $style_engine->add_style(
 			'wp-layout-flex-orientation-vertical',
 			array(
-				'rules'  => array(
+				'rules' => array(
 					'flex-direction' => 'column',
 				),
 			)
@@ -321,8 +321,6 @@ function gutenberg_generate_layout_style_flex( $layout, $has_block_gap_support =
  */
 function gutenberg_get_layout_style( $layout, $has_block_gap_support = false, $gap_value = null ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
-
-	$style_engine = WP_Style_Engine_Gutenberg::get_instance();
 	$class_names = array();
 
 	if ( 'default' === $layout_type ) {
@@ -361,7 +359,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout = $default_layout;
 	}
 
-	$gap_value  = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+	$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
