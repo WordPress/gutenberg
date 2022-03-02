@@ -20,14 +20,47 @@ error () {
 }
 
 cleanup() {
-	rm -rf "$DIRECTORY/esnext-test"
+	rm -rf "$DIRECTORY/example-static-es5"
+	rm -rf "$DIRECTORY/example-static"
 }
 
 trap cleanup EXIT
 
-status "Scaffolding block..."
-npx wp-create-block esnext-test --no-wp-scripts
-cd esnext-test
+# First test block
+
+status "Scaffolding Example Static (ES5) block..."
+npx wp-create-block example-static-es5 -t es5
+cd example-static-es5
+
+status "Verifying project..."
+expected=8
+actual=$( find . -maxdepth 1 -type f | wc -l )
+if [ "$expected" -ne "$actual" ]; then
+	error "Expected $expected files in the project root, but found $actual."
+    exit 1
+fi
+
+cd ..
+
+# Second test block
+
+status "Scaffolding Example Static block..."
+npx wp-create-block example-static --no-wp-scripts
+cd example-static
+
+status "Verifying project..."
+expected=5
+actual=$( find . -maxdepth 1 -type f | wc -l )
+if [ "$expected" -ne "$actual" ]; then
+	error "Expected $expected files in the project root, but found $actual."
+    exit 1
+fi
+expected=6
+actual=$( find src -maxdepth 1 -type f | wc -l )
+if [ "$expected" -ne "$actual" ]; then
+	error "Expected $expected files in the `src` directory, but found $actual."
+    exit 1
+fi
 
 status "Formatting files..."
 ../node_modules/.bin/wp-scripts format
@@ -37,9 +70,9 @@ status "Building block..."
 
 status "Verifying build..."
 expected=5
-actual=$( ls build | wc -l )
+actual=$( find build -maxdepth 1 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
-	error "Expected $expected files in the build folder, but found $actual."
+	error "Expected $expected files in the `build` directory, but found $actual."
     exit 1
 fi
 

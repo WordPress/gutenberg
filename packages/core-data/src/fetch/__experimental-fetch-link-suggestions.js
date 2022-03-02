@@ -103,7 +103,7 @@ const fetchLinkSuggestions = async (
 						};
 					} );
 				} )
-				.catch( () => [] ) // fail by returning no results
+				.catch( () => [] ) // Fail by returning no results.
 		);
 	}
 
@@ -156,7 +156,7 @@ const fetchLinkSuggestions = async (
 	return Promise.all( queries ).then( ( results ) => {
 		return results
 			.reduce(
-				( accumulator, current ) => accumulator.concat( current ), //flatten list
+				( accumulator, current ) => accumulator.concat( current ), // Flatten list.
 				[]
 			)
 			.filter(

@@ -20,7 +20,7 @@ import {
 	registerLegacyWidgetVariations,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -78,7 +78,7 @@ export function initialize( id, settings ) {
 		);
 	} );
 
-	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-widgets', {
+	dispatch( preferencesStore ).setDefaults( 'core/edit-widgets', {
 		fixedToolbar: false,
 		welcomeGuide: true,
 		showBlockBreadcrumbs: true,

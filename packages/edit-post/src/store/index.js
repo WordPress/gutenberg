@@ -15,7 +15,6 @@ const storeConfig = {
 	reducer,
 	actions,
 	selectors,
-	__experimentalUseThunks: true,
 	persist: [ 'preferences' ],
 };
 

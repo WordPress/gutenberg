@@ -1,4 +1,4 @@
-// Primitives
+// Primitives.
 export {
 	SVG,
 	Path,
@@ -10,7 +10,7 @@ export {
 	BlockQuotation,
 } from '@wordpress/primitives';
 
-// Components
+// Components.
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export {
 	default as Animate,
@@ -100,6 +100,8 @@ export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
 	NavigatorProvider as __experimentalNavigatorProvider,
 	NavigatorScreen as __experimentalNavigatorScreen,
+	NavigatorButton as __experimentalNavigatorButton,
+	NavigatorBackButton as __experimentalNavigatorBackButton,
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
@@ -161,7 +163,7 @@ export { Truncate as __experimentalTruncate } from './truncate';
 export {
 	default as __experimentalUnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
-	parseUnit as __experimentalParseUnit,
+	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
 } from './unit-control';
 export { View as __experimentalView } from './view';
 export { VisuallyHidden } from './visually-hidden';
@@ -177,7 +179,7 @@ export {
 export { default as __experimentalStyleProvider } from './style-provider';
 export { ZStack as __experimentalZStack } from './z-stack';
 
-// Higher-Order Components
+// Higher-Order Components.
 export {
 	default as navigateRegions,
 	useNavigateRegions as __unstableUseNavigateRegions,

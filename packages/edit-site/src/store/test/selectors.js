@@ -106,7 +106,11 @@ describe( 'selectors', () => {
 		it( "returns the settings when the user can't create media", () => {
 			canUser.mockReturnValueOnce( false );
 			canUser.mockReturnValueOnce( false );
-			const state = { settings: {}, preferences: {} };
+			const state = {
+				settings: {},
+				preferences: {},
+				editedPost: { type: 'wp_template' },
+			};
 			const setInserterOpened = () => {};
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
 				outlineMode: true,
@@ -114,6 +118,7 @@ describe( 'selectors', () => {
 				hasFixedToolbar: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
 				__experimentalReusableBlocks: [],
+				__experimentalPreferPatternsOnRoot: true,
 			} );
 		} );
 
@@ -126,6 +131,7 @@ describe( 'selectors', () => {
 						fixedToolbar: true,
 					},
 				},
+				editedPost: { type: 'wp_template_part' },
 			};
 			const setInserterOpened = () => {};
 
@@ -137,6 +143,7 @@ describe( 'selectors', () => {
 				__experimentalSetIsInserterOpened: setInserterOpened,
 				__experimentalReusableBlocks: [],
 				mediaUpload: expect.any( Function ),
+				__experimentalPreferPatternsOnRoot: false,
 			} );
 		} );
 	} );

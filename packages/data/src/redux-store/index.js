@@ -232,11 +232,8 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 		createResolversCacheMiddleware( registry, key ),
 		promise,
 		createReduxRoutineMiddleware( normalizedControls ),
+		createThunkMiddleware( thunkArgs ),
 	];
-
-	if ( options.__experimentalUseThunks ) {
-		middlewares.push( createThunkMiddleware( thunkArgs ) );
-	}
 
 	const enhancers = [ applyMiddleware( ...middlewares ) ];
 	if (
@@ -337,7 +334,7 @@ function mapResolveSelectors( selectors, store ) {
 				const hasFinished = () =>
 					selectors.hasFinishedResolution( selectorName, args );
 				const getResult = () => selector.apply( null, args );
-				// trigger the selector (to trigger the resolver)
+				// Trigger the selector (to trigger the resolver)
 				const result = getResult();
 				if ( hasFinished() ) {
 					return resolve( result );
@@ -373,8 +370,8 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		}
 
 		return {
-			...resolver, // copy the enumerable properties of the resolver function
-			fulfill: resolver, // add the fulfill method
+			...resolver, // Copy the enumerable properties of the resolver function.
+			fulfill: resolver, // Add the fulfill method.
 		};
 	} );
 

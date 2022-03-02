@@ -38,11 +38,11 @@ const BlockSelectionButton = ( {
 			<TouchableOpacity
 				style={ styles.button }
 				onPress={ () => {
-					/* Open BottomSheet with markup */
+					/* Open BottomSheet with markup. */
 				} }
 				disabled={
 					true
-				} /* Disable temporarily since onPress function is empty */
+				} /* Disable temporarily since onPress function is empty. */
 			>
 				{ rootClientId &&
 					rootBlockIcon && [

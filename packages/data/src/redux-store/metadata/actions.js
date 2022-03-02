@@ -36,11 +36,11 @@ export function finishResolution( selectorName, args ) {
  * Returns an action object used in signalling that a batch of selector resolutions has
  * started.
  *
- * @param {string}    selectorName Name of selector for which resolver triggered.
- * @param {unknown[]} args         Array of arguments to associate for uniqueness, each item
- *                                 is associated to a resolution.
+ * @param {string}      selectorName Name of selector for which resolver triggered.
+ * @param {unknown[][]} args         Array of arguments to associate for uniqueness, each item
+ *                                   is associated to a resolution.
  *
- * @return {{ type: 'START_RESOLUTIONS', selectorName: string, args: unknown[] }} Action object.
+ * @return {{ type: 'START_RESOLUTIONS', selectorName: string, args: unknown[][] }} Action object.
  */
 export function startResolutions( selectorName, args ) {
 	return {
@@ -54,11 +54,11 @@ export function startResolutions( selectorName, args ) {
  * Returns an action object used in signalling that a batch of selector resolutions has
  * completed.
  *
- * @param {string}    selectorName Name of selector for which resolver triggered.
- * @param {unknown[]} args         Array of arguments to associate for uniqueness, each item
- *                                 is associated to a resolution.
+ * @param {string}      selectorName Name of selector for which resolver triggered.
+ * @param {unknown[][]} args         Array of arguments to associate for uniqueness, each item
+ *                                   is associated to a resolution.
  *
- * @return {{ type: 'FINISH_RESOLUTIONS', selectorName: string, args: unknown[] }} Action object.
+ * @return {{ type: 'FINISH_RESOLUTIONS', selectorName: string, args: unknown[][] }} Action object.
  */
 export function finishResolutions( selectorName, args ) {
 	return {

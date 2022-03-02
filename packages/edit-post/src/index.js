@@ -9,7 +9,7 @@ import {
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -106,7 +106,7 @@ export function initializeEditor(
 		initialEdits
 	);
 
-	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-post', {
+	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fixedToolbar: false,
 		welcomeGuide: true,
 		fullscreenMode: true,

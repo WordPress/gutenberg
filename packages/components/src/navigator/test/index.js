@@ -6,7 +6,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
+import {
+	NavigatorProvider,
+	NavigatorScreen,
+	NavigatorButton,
+	NavigatorBackButton,
+} from '../';
 
 jest.mock( 'framer-motion', () => {
 	const actual = jest.requireActual( 'framer-motion' );
@@ -23,58 +28,54 @@ jest.mock( 'framer-motion', () => {
 	};
 } );
 
+const INVALID_HTML_ATTRIBUTE = {
+	raw: ' "\'><=invalid_path',
+	escaped: " &quot;'&gt;<=invalid_path",
+};
+
 const PATHS = {
 	HOME: '/',
 	CHILD: '/child',
 	NESTED: '/child/nested',
+	INVALID_HTML_ATTRIBUTE: INVALID_HTML_ATTRIBUTE.raw,
 	NOT_FOUND: '/not-found',
 };
 
-function NavigatorButton( { path, onClick, ...props } ) {
-	const { goTo } = useNavigator();
+function CustomNavigatorButton( { path, onClick, ...props } ) {
 	return (
-		<button
+		<NavigatorButton
 			onClick={ () => {
-				goTo( path );
-				// Used to spy on the values passed to `navigator.goTo`
+				// Used to spy on the values passed to `navigator.goTo`.
 				onClick?.( { type: 'goTo', path } );
 			} }
+			path={ path }
 			{ ...props }
 		/>
 	);
 }
 
-function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
-	const { goTo } = useNavigator();
-	const dataAttrName = 'data-navigator-focusable-id';
-	const dataAttrValue = path;
-
-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
-
-	const buttonProps = {
-		...props,
-		[ dataAttrName ]: dataAttrValue,
-	};
-
+function CustomNavigatorButtonWithFocusRestoration( {
+	path,
+	onClick,
+	...props
+} ) {
 	return (
-		<button
+		<NavigatorButton
 			onClick={ () => {
-				goTo( path, { focusTargetSelector: dataAttrCssSelector } );
-				// Used to spy on the values passed to `navigator.goTo`
+				// Used to spy on the values passed to `navigator.goTo`.
 				onClick?.( { type: 'goTo', path } );
 			} }
-			{ ...buttonProps }
+			path={ path }
+			{ ...props }
 		/>
 	);
 }
 
-function NavigatorBackButton( { onClick, ...props } ) {
-	const { goBack } = useNavigator();
+function CustomNavigatorBackButton( { onClick, ...props } ) {
 	return (
-		<button
+		<NavigatorBackButton
 			onClick={ () => {
-				goBack();
-				// Used to spy on the values passed to `navigator.goBack`
+				// Used to spy on the values passed to `navigator.goBack`.
 				onClick?.( { type: 'goBack' } );
 			} }
 			{ ...props }
@@ -89,41 +90,54 @@ const MyNavigation = ( {
 	<NavigatorProvider initialPath={ initialPath }>
 		<NavigatorScreen path={ PATHS.HOME }>
 			<p>This is the home screen.</p>
-			<NavigatorButton
+			<CustomNavigatorButton
 				path={ PATHS.NOT_FOUND }
 				onClick={ onNavigatorButtonClick }
 			>
 				Navigate to non-existing screen.
-			</NavigatorButton>
-			<NavigatorButtonWithFocusRestoration
+			</CustomNavigatorButton>
+			<CustomNavigatorButton
 				path={ PATHS.CHILD }
 				onClick={ onNavigatorButtonClick }
 			>
 				Navigate to child screen.
-			</NavigatorButtonWithFocusRestoration>
+			</CustomNavigatorButton>
+			<CustomNavigatorButton
+				path={ PATHS.INVALID_HTML_ATTRIBUTE }
+				onClick={ onNavigatorButtonClick }
+			>
+				Navigate to screen with an invalid HTML value as a path.
+			</CustomNavigatorButton>
 		</NavigatorScreen>
 
 		<NavigatorScreen path={ PATHS.CHILD }>
 			<p>This is the child screen.</p>
-			<NavigatorButtonWithFocusRestoration
+			<CustomNavigatorButtonWithFocusRestoration
 				path={ PATHS.NESTED }
 				onClick={ onNavigatorButtonClick }
 			>
 				Navigate to nested screen.
-			</NavigatorButtonWithFocusRestoration>
-			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
+			</CustomNavigatorButtonWithFocusRestoration>
+			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
 				Go back
-			</NavigatorBackButton>
+			</CustomNavigatorBackButton>
 		</NavigatorScreen>
 
 		<NavigatorScreen path={ PATHS.NESTED }>
 			<p>This is the nested screen.</p>
-			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
+			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
 				Go back
-			</NavigatorBackButton>
+			</CustomNavigatorBackButton>
 		</NavigatorScreen>
 
-		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included */ }
+		<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+			<p>This is the screen with an invalid HTML value as a path.</p>
+			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+				Go back
+			</CustomNavigatorBackButton>
+		</NavigatorScreen>
+
+		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
 	</NavigatorProvider>
 );
 
@@ -143,6 +157,13 @@ const getNestedScreen = ( { throwIfNotFound } = {} ) =>
 	getNavigationScreenByText( 'This is the nested screen.', {
 		throwIfNotFound,
 	} );
+const getInvalidHTMLPathScreen = ( { throwIfNotFound } = {} ) =>
+	getNavigationScreenByText(
+		'This is the screen with an invalid HTML value as a path.',
+		{
+			throwIfNotFound,
+		}
+	);
 
 const getNavigationButtonByText = ( text, { throwIfNotFound = true } = {} ) => {
 	const fnName = throwIfNotFound ? 'getByRole' : 'queryByRole';
@@ -160,6 +181,13 @@ const getToNestedScreenButton = ( { throwIfNotFound } = {} ) =>
 	getNavigationButtonByText( 'Navigate to nested screen.', {
 		throwIfNotFound,
 	} );
+const getToInvalidHTMLPathScreenButton = ( { throwIfNotFound } = {} ) =>
+	getNavigationButtonByText(
+		'Navigate to screen with an invalid HTML value as a path.',
+		{
+			throwIfNotFound,
+		}
+	);
 const getBackButton = ( { throwIfNotFound } = {} ) =>
 	getNavigationButtonByText( 'Go back', {
 		throwIfNotFound,
@@ -234,43 +262,42 @@ describe( 'Navigator', () => {
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toBeInTheDocument();
 
-		// Navigate to child screen
+		// Navigate to child screen.
 		fireEvent.click( getToChildScreenButton() );
 
 		expect( getChildScreen() ).toBeInTheDocument();
 		expect( getBackButton() ).toBeInTheDocument();
 
-		// Navigate back to home screen
+		// Navigate back to home screen.
 		fireEvent.click( getBackButton() );
-
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toBeInTheDocument();
 
-		// Navigate again to child screen
+		// Navigate again to child screen.
 		fireEvent.click( getToChildScreenButton() );
 
 		expect( getChildScreen() ).toBeInTheDocument();
 		expect( getToNestedScreenButton() ).toBeInTheDocument();
 
-		// Navigate to nested screen
+		// Navigate to nested screen.
 		fireEvent.click( getToNestedScreenButton() );
 
 		expect( getNestedScreen() ).toBeInTheDocument();
 		expect( getBackButton() ).toBeInTheDocument();
 
-		// Navigate back to child screen
+		// Navigate back to child screen.
 		fireEvent.click( getBackButton() );
 
 		expect( getChildScreen() ).toBeInTheDocument();
 		expect( getToNestedScreenButton() ).toBeInTheDocument();
 
-		// Navigate back to home screen
+		// Navigate back to home screen.
 		fireEvent.click( getBackButton() );
 
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toBeInTheDocument();
 
-		// Check the values passed to `navigator.goTo()`
+		// Check the values passed to `navigator.goTo()`.
 		expect( spy ).toHaveBeenCalledTimes( 6 );
 		expect( spy ).toHaveBeenNthCalledWith( 1, {
 			path: PATHS.CHILD,
@@ -315,7 +342,7 @@ describe( 'Navigator', () => {
 			getNestedScreen( { throwIfNotFound: false } )
 		).not.toBeInTheDocument();
 
-		// Check the values passed to `navigator.goTo()`
+		// Check the values passed to `navigator.goTo()`.
 		expect( spy ).toHaveBeenCalledTimes( 1 );
 		expect( spy ).toHaveBeenNthCalledWith( 1, {
 			path: PATHS.NOT_FOUND,
@@ -328,26 +355,53 @@ describe( 'Navigator', () => {
 
 		expect( getHomeScreen() ).toBeInTheDocument();
 
-		// Navigate to child screen
+		// Navigate to child screen.
 		fireEvent.click( getToChildScreenButton() );
 
 		expect( getChildScreen() ).toBeInTheDocument();
 
-		// Navigate to nested screen
+		// Navigate to nested screen.
 		fireEvent.click( getToNestedScreenButton() );
 
 		expect( getNestedScreen() ).toBeInTheDocument();
 
-		// Navigate back to child screen, check that focus was correctly restored
+		// Navigate back to child screen, check that focus was correctly restored.
 		fireEvent.click( getBackButton() );
 
 		expect( getChildScreen() ).toBeInTheDocument();
 		expect( getToNestedScreenButton() ).toHaveFocus();
 
-		// Navigate back to home screen, check that focus was correctly restored
+		// Navigate back to home screen, check that focus was correctly restored.
 		fireEvent.click( getBackButton() );
 
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toHaveFocus();
+	} );
+
+	it( 'should escape the value of the `path` prop', () => {
+		render( <MyNavigation /> );
+
+		expect( getHomeScreen() ).toBeInTheDocument();
+		expect( getToInvalidHTMLPathScreenButton() ).toBeInTheDocument();
+
+		// The following line tests the implementation details, but it's necessary
+		// as this would be otherwise transparent to the user.
+		expect( getToInvalidHTMLPathScreenButton() ).toHaveAttribute(
+			'id',
+			INVALID_HTML_ATTRIBUTE.escaped
+		);
+
+		// Navigate to screen with an invalid HTML value for its `path`.
+		fireEvent.click( getToInvalidHTMLPathScreenButton() );
+
+		expect( getInvalidHTMLPathScreen() ).toBeInTheDocument();
+		expect( getBackButton() ).toBeInTheDocument();
+
+		// Navigate back to home screen, check that the focus restoration selector
+		// worked correctly despite the escaping.
+		fireEvent.click( getBackButton() );
+
+		expect( getHomeScreen() ).toBeInTheDocument();
+		expect( getToInvalidHTMLPathScreenButton() ).toHaveFocus();
 	} );
 } );
