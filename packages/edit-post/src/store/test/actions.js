@@ -136,4 +136,42 @@ describe( 'actions', () => {
 			expect( notices[ 0 ].content ).toMatch( 'template' );
 		} );
 	} );
+
+	describe( 'hideBlockTypes', () => {
+		it( 'adds the hidden block type to the preferences', () => {
+			registry
+				.dispatch( editPostStore )
+				.hideBlockTypes( [ 'core/quote', 'core/table' ] );
+
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'hiddenBlockTypes' )
+			).toEqual( [ 'core/quote', 'core/table' ] );
+		} );
+	} );
+
+	describe( 'showBlockTypes', () => {
+		it( 'removes the hidden block type from the preferences', () => {
+			registry
+				.dispatch( editPostStore )
+				.hideBlockTypes( [ 'core/quote', 'core/table' ] );
+
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'hiddenBlockTypes' )
+			).toEqual( [ 'core/quote', 'core/table' ] );
+
+			registry
+				.dispatch( editPostStore )
+				.showBlockTypes( [ 'core/table' ] );
+
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'hiddenBlockTypes' )
+			).toEqual( [ 'core/quote' ] );
+		} );
+	} );
 } );
