@@ -13,7 +13,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useMemo, useRef } from '@wordpress/element';
+import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ENTER } from '@wordpress/keycodes';
 
@@ -69,6 +69,10 @@ function UnitControl(
 			fallback: '',
 		}
 	);
+
+	useEffect( () => {
+		setUnit( initialUnit );
+	}, [ initialUnit ] );
 
 	// Stores parsed value for hand-off in state reducer.
 	const refParsedValue = useRef< string | null >( null );
