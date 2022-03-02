@@ -63,13 +63,13 @@ export default function useNavigationEntities( menuId ) {
 function useMenuItemEntities( menuId ) {
 	const { menuItems, hasResolvedMenuItems } = useSelect(
 		( select ) => {
-			const { getMenuItems, hasFinishedResolution } = select( coreStore );
-
 			if ( ! menuId ) {
 				return {
 					hasResolvedMenuItems: false,
 				};
 			}
+
+			const { getMenuItems, hasFinishedResolution } = select( coreStore );
 
 			const query = {
 				menus: menuId,
