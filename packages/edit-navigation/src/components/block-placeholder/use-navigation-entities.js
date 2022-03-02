@@ -68,7 +68,6 @@ function useMenuItemEntities( menuId ) {
 			}
 
 			const { getMenuItems, hasFinishedResolution } = select( coreStore );
-
 			const query = {
 				menus: menuId,
 				per_page: -1,
