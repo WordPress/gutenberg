@@ -25,7 +25,7 @@ Are you a tech-savvy early adopter who likes testing bleeding-edge and experimen
 
 ### Contributors Wanted
 
-For the adventurous and tech-savvy, the Gutenberg plugin gives you the latest and greatest feature set, so you can join us in testing bleeding-edge features, playing around with blocks, and maybe get inspired to build your own.
+For the adventurous and tech-savvy, the Gutenberg plugin gives you the latest and greatest feature set, so you can join us in testing and developing bleeding-edge features, playing around with blocks, and maybe <a href="https://developer.wordpress.org/block-editor/contributors/">get inspired to contribute</a> or <a href="https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/">build your own blocks</a>.
 
 ### Discover More
 
