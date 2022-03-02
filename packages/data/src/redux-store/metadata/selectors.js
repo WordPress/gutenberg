@@ -2,10 +2,6 @@
  * External dependencies
  */
 import { get } from 'lodash';
-/**
- * Internal dependencies
- */
-import { Status } from './reducer';
 
 /**
  * Internal dependencies
@@ -14,6 +10,7 @@ import { selectorArgsToStateKey } from './utils';
 
 /** @typedef {Record<string, import('./reducer').State>} State */
 /** @typedef {import('./reducer').StateValue} StateValue */
+/** @typedef {import('./reducer').Status} Status */
 
 /**
  * Returns the raw resolution state value for a given selector name,
@@ -25,15 +22,19 @@ import { selectorArgsToStateKey } from './utils';
  * @param {string}     selectorName Selector name.
  * @param {unknown[]?} args         Arguments passed to selector.
  *
- * @return {StateValue | undefined} isResolving value.
+ * @return {StateValue} isResolving value.
  */
 export function getResolutionState( state, selectorName, args ) {
 	const map = get( state, [ selectorName ] );
 	if ( ! map ) {
-		return undefined;
+		return { status: undefined };
 	}
 
-	return map.get( selectorArgsToStateKey( args ) );
+	const resolutionState = map.get( selectorArgsToStateKey( args ) );
+	if ( ! resolutionState ) {
+		return { status: undefined };
+	}
+	return resolutionState;
 }
 
 /**
@@ -51,9 +52,9 @@ export function getResolutionState( state, selectorName, args ) {
 export function getIsResolving( state, selectorName, args ) {
 	const resolutionState = getResolutionState( state, selectorName, args );
 
-	return resolutionState
-		? resolutionState.status === Status.RESOLVING
-		: undefined;
+	return resolutionState.status === undefined
+		? undefined
+		: resolutionState.status === 'resolving';
 }
 
 /**
@@ -67,9 +68,7 @@ export function getIsResolving( state, selectorName, args ) {
  * @return {boolean} Whether resolution has been triggered.
  */
 export function hasStartedResolution( state, selectorName, args ) {
-	return (
-		getResolutionState( state, selectorName, args )?.status !== undefined
-	);
+	return getResolutionState( state, selectorName, args ).status !== undefined;
 }
 
 /**
@@ -83,8 +82,8 @@ export function hasStartedResolution( state, selectorName, args ) {
  * @return {boolean} Whether resolution has completed.
  */
 export function hasFinishedResolution( state, selectorName, args ) {
-	const status = getResolutionState( state, selectorName, args )?.status;
-	return status === Status.FINISHED || status === Status.ERROR;
+	const { status } = getResolutionState( state, selectorName, args );
+	return status === 'finished' || status === 'error';
 }
 
 /**
@@ -98,9 +97,7 @@ export function hasFinishedResolution( state, selectorName, args ) {
  * @return {boolean} Has resolution failed
  */
 export function hasResolutionFailed( state, selectorName, args ) {
-	return (
-		getResolutionState( state, selectorName, args )?.status === Status.ERROR
-	);
+	return getResolutionState( state, selectorName, args ).status === 'error';
 }
 
 /**
@@ -116,9 +113,7 @@ export function hasResolutionFailed( state, selectorName, args ) {
  */
 export function getResolutionError( state, selectorName, args ) {
 	const resolutionState = getResolutionState( state, selectorName, args );
-	return resolutionState?.status === Status.ERROR
-		? resolutionState?.error
-		: null;
+	return resolutionState.status === 'error' ? resolutionState.error : null;
 }
 
 /**
@@ -132,7 +127,9 @@ export function getResolutionError( state, selectorName, args ) {
  * @return {boolean} Whether resolution is in progress.
  */
 export function isResolving( state, selectorName, args ) {
-	return getIsResolving( state, selectorName, args ) === true;
+	return (
+		getResolutionState( state, selectorName, args ).status === 'resolving'
+	);
 }
 
 /**

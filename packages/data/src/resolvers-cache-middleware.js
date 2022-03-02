@@ -7,7 +7,6 @@ import { get } from 'lodash';
  * Internal dependencies
  */
 import coreDataStore from './store';
-import { Status } from './redux-store/metadata/reducer';
 
 /** @typedef {import('./registry').WPDataRegistry} WPDataRegistry */
 
@@ -42,7 +41,7 @@ const createResolversCacheMiddleware = ( registry, reducerKey ) => () => (
 				// If the value is false it means this resolver has finished its resolution which means we need to invalidate it,
 				// if it's true it means it's inflight and the invalidation is not necessary.
 				if (
-					value?.status === Status.RESOLVING ||
+					value?.status === 'resolving' ||
 					! value?.status ||
 					! resolver.shouldInvalidate( action, ...args )
 				) {

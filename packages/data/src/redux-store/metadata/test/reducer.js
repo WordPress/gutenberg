@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import reducer, { Status } from '../reducer';
+import reducer from '../reducer';
 
 describe( 'reducer', () => {
 	it( 'should default to an empty object', () => {
@@ -25,7 +25,7 @@ describe( 'reducer', () => {
 
 			// { test: { getFoo: EquivalentKeyMap( [] =>  status: 'resolving } ) } }
 			expect( state.getFoo.get( [] ) ).toEqual( {
-				status: Status.RESOLVING,
+				status: 'resolving',
 			} );
 		} );
 
@@ -41,9 +41,9 @@ describe( 'reducer', () => {
 				args: [],
 			} );
 
-			// { test: { getFoo: EquivalentKeyMap( [] => { status: Status.FINISHED } ) } }
+			// { test: { getFoo: EquivalentKeyMap( [] => { status: 'finished' } ) } }
 			expect( state.getFoo.get( [] ) ).toEqual( {
-				status: Status.FINISHED,
+				status: 'finished',
 			} );
 		} );
 
@@ -85,12 +85,12 @@ describe( 'reducer', () => {
 				args: [ 'block' ],
 			} );
 
-			// { getFoo: EquivalentKeyMap( [] => { status: Status.FINISHED } ) }
+			// { getFoo: EquivalentKeyMap( [] => { status: 'finished' } ) }
 			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				status: Status.FINISHED,
+				status: 'finished',
 			} );
 			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				status: Status.RESOLVING,
+				status: 'resolving',
 			} );
 		} );
 
@@ -131,9 +131,9 @@ describe( 'reducer', () => {
 				} );
 
 				expect( state.getBar ).toBeUndefined();
-				// { getFoo: EquivalentKeyMap( [] => { status: Status.FINISHED } ) }
+				// { getFoo: EquivalentKeyMap( [] => { status: 'finished' } ) }
 				expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-					status: Status.FINISHED,
+					status: 'finished',
 				} );
 			}
 		);
@@ -145,7 +145,7 @@ describe( 'reducer', () => {
 				args: [ 1, undefined ],
 			} );
 			expect( started.getFoo.get( [ 1 ] ) ).toEqual( {
-				status: Status.RESOLVING,
+				status: 'resolving',
 			} );
 
 			const finished = reducer( started, {
@@ -154,7 +154,7 @@ describe( 'reducer', () => {
 				args: [ 1, undefined, undefined ],
 			} );
 			expect( finished.getFoo.get( [ 1 ] ) ).toEqual( {
-				status: Status.FINISHED,
+				status: 'finished',
 			} );
 		} );
 	} );
@@ -168,10 +168,10 @@ describe( 'reducer', () => {
 			} );
 
 			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				status: Status.RESOLVING,
+				status: 'resolving',
 			} );
 			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				status: Status.RESOLVING,
+				status: 'resolving',
 			} );
 		} );
 
@@ -188,10 +188,10 @@ describe( 'reducer', () => {
 			} );
 
 			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				status: Status.FINISHED,
+				status: 'finished',
 			} );
 			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				status: Status.FINISHED,
+				status: 'finished',
 			} );
 		} );
 
@@ -214,7 +214,7 @@ describe( 'reducer', () => {
 
 			expect( state.getFoo.get( [ 'post' ] ) ).toBe( undefined );
 			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				status: Status.FINISHED,
+				status: 'finished',
 			} );
 		} );
 
@@ -236,10 +236,10 @@ describe( 'reducer', () => {
 			} );
 
 			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-				status: Status.FINISHED,
+				status: 'finished',
 			} );
 			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-				status: Status.RESOLVING,
+				status: 'resolving',
 			} );
 		} );
 
@@ -281,10 +281,10 @@ describe( 'reducer', () => {
 
 				expect( state.getBar ).toBeUndefined();
 				expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
-					status: Status.FINISHED,
+					status: 'finished',
 				} );
 				expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
-					status: Status.FINISHED,
+					status: 'finished',
 				} );
 			}
 		);
@@ -299,10 +299,10 @@ describe( 'reducer', () => {
 				],
 			} );
 			expect( started.getFoo.get( [ 1 ] ) ).toEqual( {
-				status: Status.RESOLVING,
+				status: 'resolving',
 			} );
 			expect( started.getFoo.get( [ 2 ] ) ).toEqual( {
-				status: Status.RESOLVING,
+				status: 'resolving',
 			} );
 
 			const finished = reducer( started, {
@@ -314,10 +314,10 @@ describe( 'reducer', () => {
 				],
 			} );
 			expect( finished.getFoo.get( [ 1 ] ) ).toEqual( {
-				status: Status.FINISHED,
+				status: 'finished',
 			} );
 			expect( finished.getFoo.get( [ 2 ] ) ).toEqual( {
-				status: Status.FINISHED,
+				status: 'finished',
 			} );
 		} );
 	} );

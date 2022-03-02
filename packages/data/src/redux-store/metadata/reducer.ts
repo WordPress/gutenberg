@@ -24,14 +24,11 @@ type Action =
 	  >;
 
 type StateKey = unknown[] | unknown;
-export enum Status {
-	FINISHED = 'finished',
-	RESOLVING = 'resolving',
-	ERROR = 'error',
-}
 export type StateValue =
-	| { status: Status.RESOLVING | Status.FINISHED }
-	| { status: Status.ERROR; error: Error | unknown };
+	| { status: 'resolving' | 'finished' | undefined }
+	| { status: 'error'; error: Error | unknown };
+
+export type Status = StateValue[ 'status' ];
 export type State = EquivalentKeyMap< StateKey, StateValue >;
 
 /**
@@ -48,21 +45,21 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 		case 'START_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
 			nextState.set( selectorArgsToStateKey( action.args ), {
-				status: Status.RESOLVING,
+				status: 'resolving',
 			} );
 			return nextState;
 		}
 		case 'FINISH_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
 			nextState.set( selectorArgsToStateKey( action.args ), {
-				status: Status.FINISHED,
+				status: 'finished',
 			} );
 			return nextState;
 		}
 		case 'FAIL_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
 			nextState.set( selectorArgsToStateKey( action.args ), {
-				status: Status.ERROR,
+				status: 'error',
 				error: action.error,
 			} );
 			return nextState;
@@ -71,7 +68,7 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 			const nextState = new EquivalentKeyMap( state );
 			for ( const resolutionArgs of action.args ) {
 				nextState.set( selectorArgsToStateKey( resolutionArgs ), {
-					status: Status.RESOLVING,
+					status: 'resolving',
 				} );
 			}
 			return nextState;
@@ -80,7 +77,7 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 			const nextState = new EquivalentKeyMap( state );
 			for ( const resolutionArgs of action.args ) {
 				nextState.set( selectorArgsToStateKey( resolutionArgs ), {
-					status: Status.FINISHED,
+					status: 'finished',
 				} );
 			}
 			return nextState;
@@ -89,7 +86,7 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
 			const nextState = new EquivalentKeyMap( state );
 			action.args.forEach( ( resolutionArgs, idx ) => {
 				const resolutionState: StateValue = {
-					status: Status.ERROR,
+					status: 'error',
 					error: undefined,
 				};
 
