@@ -85,6 +85,8 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeMediaSave: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
 		provideToNative_Html: jest.fn(),
+		requestImageFailedRetryDialog: jest.fn(),
+		requestImageUploadCancelDialog: jest.fn(),
 		requestMediaEditor: jest.fn(),
 		requestMediaPicker: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
@@ -173,7 +175,7 @@ jest.mock( 'react-native/Libraries/Animated/NativeAnimatedHelper' );
 // a React ref instead. We could then remove this internal mock.
 jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
 
-// Mock native modules incompatible with testing environment
+// Mock native modules incompatible with testing environment.
 jest.mock( 'react-native/Libraries/LayoutAnimation/LayoutAnimation' );
 jest.mock(
 	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',

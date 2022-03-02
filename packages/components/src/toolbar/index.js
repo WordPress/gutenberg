@@ -35,7 +35,7 @@ function Toolbar( { className, label, ...props }, ref ) {
 		} );
 		return <ToolbarGroup { ...props } className={ className } />;
 	}
-	// `ToolbarGroup` already uses components-toolbar for compatibility reasons
+	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
 	const finalClassName = classnames(
 		'components-accessible-toolbar',
 		className

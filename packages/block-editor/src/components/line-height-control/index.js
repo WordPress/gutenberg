@@ -25,7 +25,7 @@ export default function LineHeightControl( {
 	const isDefined = isLineHeightDefined( lineHeight );
 
 	const adjustNextValue = ( nextValue, wasTypedOrPasted ) => {
-		// Set the next value without modification if lineHeight has been defined
+		// Set the next value without modification if lineHeight has been defined.
 		if ( isDefined ) return nextValue;
 
 		/**
@@ -39,13 +39,13 @@ export default function LineHeightControl( {
 		 */
 		switch ( nextValue ) {
 			case `${ STEP }`:
-				// Increment by step value
+				// Increment by step value.
 				return BASE_DEFAULT_VALUE + STEP;
 			case '0': {
 				// This means the user explicitly input '0', rather than stepped down
-				// from an undefined value state
+				// from an undefined value state.
 				if ( wasTypedOrPasted ) return nextValue;
-				// Decrement by step value
+				// Decrement by step value.
 				return BASE_DEFAULT_VALUE - STEP;
 			}
 			case '':

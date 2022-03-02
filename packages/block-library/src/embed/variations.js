@@ -151,7 +151,7 @@ const variations = [
 		attributes: { providerNameSlug: 'cloudup', responsive: true },
 	},
 	{
-		// Deprecated since CollegeHumor content is now powered by YouTube
+		// Deprecated since CollegeHumor content is now powered by YouTube.
 		name: 'collegehumor',
 		title: 'CollegeHumor',
 		icon: embedVideoIcon,

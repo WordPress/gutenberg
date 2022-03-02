@@ -51,7 +51,7 @@ describe( 'List view', () => {
 			'//a[contains(., "Paragraph")][@draggable="true"]'
 		);
 
-		// Drag above the heading block
+		// Drag above the heading block.
 		const headingBlock = await page.waitForXPath(
 			'//a[contains(., "Heading")][@draggable="true"]'
 		);

@@ -85,7 +85,7 @@ function NavigatorProvider(
 
 	const cx = useCx();
 	const classes = useMemo(
-		// Prevents horizontal overflow while animating screen transitions
+		// Prevents horizontal overflow while animating screen transitions.
 		() => cx( css( { overflowX: 'hidden' } ), className ),
 		[ className, cx ]
 	);

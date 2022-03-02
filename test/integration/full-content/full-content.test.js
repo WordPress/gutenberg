@@ -64,7 +64,7 @@ describe( 'full post content fixture', () => {
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		// Load all hooks that modify blocks
+		// Load all hooks that modify blocks.
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		if ( process.env.IS_GUTENBERG_PLUGIN ) {

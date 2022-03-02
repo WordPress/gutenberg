@@ -16,7 +16,7 @@ import {
 import { DividerView } from './styles';
 import type { Props } from './types';
 
-function Divider(
+function UnconnectedDivider(
 	props: WordPressComponentProps< Props, 'hr', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -53,6 +53,6 @@ function Divider(
  * }
  * ```
  */
-const ConnectedDivider = contextConnect( Divider, 'Divider' );
+export const Divider = contextConnect( UnconnectedDivider, 'Divider' );
 
-export default ConnectedDivider;
+export default Divider;

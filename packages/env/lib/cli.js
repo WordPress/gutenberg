@@ -14,14 +14,14 @@ const { execSync } = require( 'child_process' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
 
-// Colors
+// Colors.
 const boldWhite = chalk.bold.white;
 const wpPrimary = boldWhite.bgHex( '#00669b' );
 const wpGreen = boldWhite.bgHex( '#4ab866' );
 const wpRed = boldWhite.bgHex( '#d94f4f' );
 const wpYellow = boldWhite.bgHex( '#f0b849' );
 
-// Spinner
+// Spinner.
 const withSpinner = ( command ) => ( ...args ) => {
 	const spinner = ora().start();
 	args[ 0 ].spinner = spinner;

@@ -168,17 +168,17 @@ export class Inserter extends Component {
 					{}
 				);
 
-				// Persist block type impression to JavaScript store
+				// Persist block type impression to JavaScript store.
 				updateSettings( {
 					impressions: decrementedImpressions,
 				} );
 
-				// Persist block type impression count to native app store
+				// Persist block type impression count to native app store.
 				setBlockTypeImpressions( decrementedImpressions );
 			}
 		}
 
-		// Surface toggle callback to parent component
+		// Surface toggle callback to parent component.
 		if ( onToggle ) {
 			onToggle( isOpen );
 		}
@@ -354,7 +354,7 @@ export default compose( [
 				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 			} = getBlockEditorSettings();
 
-			// if post title is selected insert as first block
+			// If post title is selected insert as first block.
 			if ( shouldInsertAtTheTop ) {
 				return 0;
 			}
@@ -366,16 +366,16 @@ export default compose( [
 
 			// If there is a selected block,
 			if ( isAnyBlockSelected ) {
-				// and the last selected block is unmodified (empty), it will be replaced
+				// And the last selected block is unmodified (empty), it will be replaced.
 				if ( isSelectedUnmodifiedDefaultBlock ) {
 					return selectedBlockIndex;
 				}
 
-				// we insert after the selected block.
+				// We insert after the selected block.
 				return selectedBlockIndex + 1;
 			}
 
-			// Otherwise, we insert at the end of the current rootClientId
+			// Otherwise, we insert at the end of the current rootClientId.
 			return endOfRootIndex;
 		}
 

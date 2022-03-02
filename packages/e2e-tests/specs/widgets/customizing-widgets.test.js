@@ -25,16 +25,17 @@ describe( 'Widgets Customizer', () => {
 		await visitAdminPage( 'customize.php' );
 
 		// Disable welcome guide if it is enabled.
-		const isWelcomeGuideActive = await page.evaluate( () =>
-			wp.data
-				.select( 'core/interface' )
-				.isFeatureActive( 'core/customize-widgets', 'welcomeGuide' )
+		const isWelcomeGuideActive = await page.evaluate(
+			() =>
+				!! wp.data
+					.select( 'core/preferences' )
+					.get( 'core/customize-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
-					.dispatch( 'core/interface' )
-					.toggleFeature( 'core/customize-widgets', 'welcomeGuide' )
+					.dispatch( 'core/preferences' )
+					.toggle( 'core/customize-widgets', 'welcomeGuide' )
 			);
 		}
 	} );
@@ -784,7 +785,7 @@ describe( 'Widgets Customizer', () => {
 
 		await waitForPreviewIframe();
 
-		// Click Publish
+		// Click Publish.
 		const publishButton = await find( {
 			role: 'button',
 			name: 'Publish',
@@ -797,7 +798,7 @@ describe( 'Widgets Customizer', () => {
 			disabled: true,
 		} );
 
-		// Select the paragraph block
+		// Select the paragraph block.
 		const paragraphBlock = await find( {
 			role: 'document',
 			name: 'Paragraph block',
@@ -824,7 +825,7 @@ describe( 'Widgets Customizer', () => {
 
 		// Now that we've made a change:
 		// (1) Publish button should be active
-		// (2) We should still be in the "Block Settings" area
+		// (2) We should still be in the "Block Settings" area.
 		await find( {
 			role: 'button',
 			name: 'Publish',

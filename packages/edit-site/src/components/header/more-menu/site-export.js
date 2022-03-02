@@ -44,7 +44,7 @@ export default function SiteExport() {
 			role="menuitem"
 			icon={ download }
 			onClick={ handleExport }
-			info={ __( 'Download your templates and template parts.' ) }
+			info={ __( 'Download your templates and styles.' ) }
 		>
 			{ _x( 'Export', 'site exporter menu item' ) }
 		</MenuItem>

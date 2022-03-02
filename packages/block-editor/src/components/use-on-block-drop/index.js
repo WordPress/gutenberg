@@ -78,7 +78,7 @@ export function onBlockDrop(
 			blocks,
 		} = parseDropEvent( event );
 
-		// If the user is inserting a block
+		// If the user is inserting a block.
 		if ( dropType === 'inserter' ) {
 			clearSelectedBlock();
 			const blocksToInsert = blocks.map( ( block ) =>
@@ -93,7 +93,7 @@ export function onBlockDrop(
 			);
 		}
 
-		// If the user is moving a block
+		// If the user is moving a block.
 		if ( dropType === 'block' ) {
 			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
 
