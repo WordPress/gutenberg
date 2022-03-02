@@ -67,6 +67,8 @@ export async function reinitializeEditor( target, settings ) {
 		dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
 			fixedToolbar: false,
 			focusMode: false,
+			welcomeGuide: true,
+			welcomeGuideStyles: true,
 		} );
 
 		dispatch( editSiteStore ).updateSettings( settings );
