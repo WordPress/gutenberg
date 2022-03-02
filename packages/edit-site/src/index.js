@@ -34,7 +34,7 @@ import ErrorBoundaryWarning from './components/error-boundary/warning';
  * @param {Element} target   DOM node in which editor is rendered.
  * @param {?Object} settings Editor settings object.
  */
-export async function reinitializeEditor( target, settings ) {
+export function reinitializeEditor( target, settings ) {
 	// Display warning if editor wasn't able to resolve homepage template.
 	if ( ! settings.__unstableHomeTemplate ) {
 		render(
