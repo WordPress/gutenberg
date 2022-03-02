@@ -15,7 +15,7 @@ Following the introduction of post block editing in December 2018, Gutenberg lat
 
 ### What Does Gutenberg Do?
 
-Gutenberg is a “block editor”, introducing a modular approach to modifying your entire site. Edit individual content blocks on posts or pages. Add and adjust widgets. Even design your site headers, footers, and navigation with full site editing support.
+Gutenberg is WordPress's “block editor”, and introduces a modular approach to modifying your entire site. Edit individual content blocks on posts or pages. Add and adjust widgets. Even design your site headers, footers, and navigation with full site editing support.
 
 Each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can be added, arranged, and rearranged, allowing users to create media-rich content and site layouts in a visually intuitive way — and without workarounds like shortcodes or custom HTML and PHP.
 
