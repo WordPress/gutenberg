@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import UnitControl from '../';
-import { CSS_UNITS, parseUnit } from '../utils';
+import { CSS_UNITS } from '../utils';
 
 export default {
 	title: 'Components (Experimental)/UnitControl',
@@ -125,51 +125,3 @@ export function WithCustomUnits() {
 		</ControlWrapperView>
 	);
 }
-
-export const Controlled = () => {
-	const [ state, setState ] = useState( { valueA: '', valueB: '' } );
-
-	// Keep the unit sync'd between the two `UnitControl` instances.
-	const onUnitControlChange = ( fieldName, newValue ) => {
-		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const [ quantity, newUnit ] = parseUnit( newValue );
-
-		if ( ! Number.isFinite( quantity ) ) {
-			return;
-		}
-
-		const nextState = { ...state, [ fieldName ]: newValue };
-
-		Object.entries( state ).forEach( ( [ stateProp, stateValue ] ) => {
-			const [ stateQuantity, stateUnit ] = parseUnit( stateValue );
-
-			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
-				nextState[ stateProp ] = `${ stateQuantity }${ newUnit }`;
-			}
-		} );
-
-		setState( nextState );
-	};
-
-	const style = {
-		display: 'inline-block',
-		maxWidth: '200px',
-	};
-
-	return (
-		<>
-			<UnitControl
-				label="Field A"
-				value={ state.valueA }
-				onChange={ ( v ) => onUnitControlChange( 'valueA', v ) }
-				style={ style }
-			/>
-			<UnitControl
-				label="Field B"
-				value={ state.valueB }
-				onChange={ ( v ) => onUnitControlChange( 'valueB', v ) }
-				style={ style }
-			/>
-		</>
-	);
-};
