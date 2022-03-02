@@ -11,6 +11,8 @@ The Gutenberg plugin provides editing, customization, and site building features
 
 “Gutenberg” is a codename for a whole new paradigm for creating with WordPress, that aims to revolutionize the entire publishing experience as much as <a href="https://en.wikipedia.org/wiki/Johannes_Gutenberg">Johannes Gutenberg</a> did the printed word. The project is <a href="https://wordpress.org/about/roadmap/">following a four-phase process</a> that will touch major pieces of WordPress — Editing, Customization, Collaboration, and Multilingual.
 
+Following the introduction of post block editing in December 2018, Gutenberg later introduced full site editing (FSE) in 2021, <a href="https://wordpress.org/news/2022/01/josephine/">which shipped with WordPress 5.9 in early 2022</a>.
+
 ### Who Is This Plugin For?
 
 Are you a tech-savvy early adopter who likes testing bleeding-edge and experimental features, and isn’t afraid to tinker with features that are still in active development? Are you interested in contributing toward the Gutenberg open source project? If so, this beta plugin gives you access to the latest features around block and full site editing, as well as a peek into what’s to come.
@@ -21,7 +23,7 @@ However, if you are running a production WordPress site, and favor stable, well-
 
 Gutenberg is a “block editor”, and introduces a modular approach to all parts of your site: each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can be added, arranged, and rearranged, allowing WordPress users to create media-rich content in a visually intuitive way — and without work-arounds like shortcodes or custom HTML.
 
-The block editor first became available in December 2018. We’re always hard at work refining the experience, creating more and better blocks, and laying the groundwork for future phases of work. Each WordPress release includes stable features from the Gutenberg plugin, so you don’t need to install the plugin to benefit from the work being done here.
+We’re always hard at work refining the experience, creating more and better blocks, and laying the groundwork for future phases of work. Each WordPress release includes stable features from the Gutenberg plugin, so you don’t need to install the plugin to benefit from the work being done here.
 
 For the adventurous and tech-savvy, the Gutenberg plugin gives you the latest and greatest feature set, so you can join us in testing bleeding-edge features, playing around with blocks, and maybe get inspired to build your own.
 
