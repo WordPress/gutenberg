@@ -214,8 +214,6 @@ function Navigation( {
 	const {
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
-		canSwitchNavigationMenu,
-		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
 		canUserUpdateNavigationMenu,
@@ -492,19 +490,18 @@ function Navigation( {
 			<nav { ...blockProps }>
 				<PlaceholderComponent
 					isSelected={ isSelected }
+					currentMenuId={ ref }
+					clientId={ clientId }
+					canUserCreateNavigationMenu={ canUserCreateNavigationMenu }
+					isResolvingCanUserCreateNavigationMenu={
+						isResolvingCanUserCreateNavigationMenu
+					}
 					onFinish={ ( post ) => {
 						if ( post ) {
 							setRef( post.id );
 						}
 						selectBlock( clientId );
 					} }
-					canSwitchNavigationMenu={ canSwitchNavigationMenu }
-					hasResolvedNavigationMenus={ hasResolvedNavigationMenus }
-					clientId={ clientId }
-					canUserCreateNavigationMenu={ canUserCreateNavigationMenu }
-					isResolvingCanUserCreateNavigationMenu={
-						isResolvingCanUserCreateNavigationMenu
-					}
 				/>
 			</nav>
 		);

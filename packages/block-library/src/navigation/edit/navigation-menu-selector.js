@@ -43,9 +43,10 @@ export default function NavigationMenuSelector( {
 
 	// Avoid showing any currently active menu in the list of
 	// menus that can be selected.
-	const navigationMenusOmitCurrent = navigationMenus?.filter(
-		( menu ) => ! currentMenuId || menu.id !== currentMenuId
-	);
+	const navigationMenusOmitCurrent =
+		navigationMenus?.filter(
+			( menu ) => ! currentMenuId || menu.id !== currentMenuId
+		) || [];
 
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
@@ -98,7 +99,7 @@ export default function NavigationMenuSelector( {
 				<>
 					{ showNavigationMenus && hasNavigationMenus && (
 						<MenuGroup label={ __( 'Menus' ) }>
-							{ navigationMenusOmitCurrent.map( ( menu ) => {
+							{ navigationMenusOmitCurrent?.map( ( menu ) => {
 								const label = decodeEntities(
 									menu.title.rendered
 								);

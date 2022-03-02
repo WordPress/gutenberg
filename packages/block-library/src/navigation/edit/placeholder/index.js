@@ -16,12 +16,12 @@ import useCreateNavigationMenu from '../use-create-navigation-menu';
 import NavigationMenuSelector from '../navigation-menu-selector';
 
 export default function NavigationPlaceholder( {
-	currentMenuId,
 	isSelected,
+	currentMenuId,
 	clientId,
-	onFinish,
 	canUserCreateNavigationMenu = false,
 	isResolvingCanUserCreateNavigationMenu,
+	onFinish,
 } ) {
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
@@ -36,11 +36,7 @@ export default function NavigationPlaceholder( {
 		onFinish( navigationMenu, blocks );
 	};
 
-	const {
-		hasMenus,
-		isResolvingMenus,
-		hasResolvedMenus,
-	} = useNavigationEntities();
+	const { isResolvingMenus, hasResolvedMenus } = useNavigationEntities();
 
 	const onCreateEmptyMenu = () => {
 		onFinishMenuCreation( [] );
