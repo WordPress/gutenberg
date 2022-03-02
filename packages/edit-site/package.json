@@ -48,6 +48,7 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/url": "file:../url",
