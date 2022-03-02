@@ -81,6 +81,15 @@ _Returns_
 
 -   `string`: Editing mode.
 
+### getHiddenBlockTypes
+
+Registry selector that gets the hidden block types from the preferences
+store.
+
+_Returns_
+
+-   `Array`: A list of the hidden block types
+
 ### getMetaBoxesPerLocation
 
 Returns the list of all the available meta boxes for a given location.

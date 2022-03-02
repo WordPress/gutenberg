@@ -13,10 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-// import { store as editPostStore } from '../store';
+const EMPTY_ARRAY = [];
 
 /**
  * Returns the current editing mode.
@@ -149,6 +146,21 @@ export function getPreference( state, preferenceKey, defaultValue ) {
 	const value = preferences[ preferenceKey ];
 	return value === undefined ? defaultValue : value;
 }
+
+/**
+ * Registry selector that gets the hidden block types from the preferences
+ * store.
+ *
+ * @return {Array} A list of the hidden block types
+ */
+export const getHiddenBlockTypes = createRegistrySelector( ( select ) => () => {
+	return (
+		select( preferencesStore ).get(
+			'core/edit-post',
+			'hiddenBlockTypes'
+		) ?? EMPTY_ARRAY
+	);
+} );
 
 /**
  * Returns true if the publish sidebar is opened.

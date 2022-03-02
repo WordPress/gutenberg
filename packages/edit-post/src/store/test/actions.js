@@ -143,11 +143,18 @@ describe( 'actions', () => {
 				.dispatch( editPostStore )
 				.hideBlockTypes( [ 'core/quote', 'core/table' ] );
 
+			const expected = [ 'core/quote', 'core/table' ];
+
+			// TODO - remove once `getPreference` is deprecated.
 			expect(
 				registry
 					.select( editPostStore )
 					.getPreference( 'hiddenBlockTypes' )
-			).toEqual( [ 'core/quote', 'core/table' ] );
+			).toEqual( expected );
+
+			expect(
+				registry.select( editPostStore ).getHiddenBlockTypes()
+			).toEqual( expected );
 		} );
 	} );
 
@@ -157,21 +164,35 @@ describe( 'actions', () => {
 				.dispatch( editPostStore )
 				.hideBlockTypes( [ 'core/quote', 'core/table' ] );
 
+			const expectedA = [ 'core/quote', 'core/table' ];
+
+			// TODO - remove once `getPreference` is deprecated.
 			expect(
 				registry
 					.select( editPostStore )
 					.getPreference( 'hiddenBlockTypes' )
-			).toEqual( [ 'core/quote', 'core/table' ] );
+			).toEqual( expectedA );
+
+			expect(
+				registry.select( editPostStore ).getHiddenBlockTypes()
+			).toEqual( expectedA );
 
 			registry
 				.dispatch( editPostStore )
 				.showBlockTypes( [ 'core/table' ] );
 
+			const expectedB = [ 'core/quote' ];
+
+			// TODO - remove once `getPreference` is deprecated.
 			expect(
 				registry
 					.select( editPostStore )
 					.getPreference( 'hiddenBlockTypes' )
-			).toEqual( [ 'core/quote' ] );
+			).toEqual( expectedB );
+
+			expect(
+				registry.select( editPostStore ).getHiddenBlockTypes()
+			).toEqual( expectedB );
 		} );
 	} );
 } );

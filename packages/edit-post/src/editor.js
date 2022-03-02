@@ -55,6 +55,7 @@ function Editor( {
 				__experimentalGetPreviewDeviceType,
 				isEditingTemplate,
 				getEditedPostTemplate,
+				getHiddenBlockTypes,
 			} = select( editPostStore );
 			const { getEntityRecord, getPostType, getEntityRecords } = select(
 				coreStore
@@ -89,7 +90,7 @@ function Editor( {
 				preferredStyleVariations: getPreference(
 					'preferredStyleVariations'
 				),
-				hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				__experimentalLocalAutosaveInterval: getPreference(
 					'localAutosaveInterval'

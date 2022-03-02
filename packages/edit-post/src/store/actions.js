@@ -225,9 +225,10 @@ export function __experimentalUpdateLocalAutosaveInterval( interval ) {
  * @param {string[]} blockNames Names of block types to show.
  */
 export const showBlockTypes = ( blockNames ) => ( { registry } ) => {
-	const existingBlockNames = registry
-		.select( preferencesStore )
-		.get( 'core/edit-post', 'hiddenBlockTypes' );
+	const existingBlockNames =
+		registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
 
 	const newBlockNames = without(
 		existingBlockNames,
@@ -246,9 +247,10 @@ export const showBlockTypes = ( blockNames ) => ( { registry } ) => {
  * @param {string[]} blockNames Names of block types to hide.
  */
 export const hideBlockTypes = ( blockNames ) => ( { registry } ) => {
-	const existingBlockNames = registry
-		.select( preferencesStore )
-		.get( 'core/edit-post', 'hiddenBlockTypes' );
+	const existingBlockNames =
+		registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
 
 	const mergedBlockNames = new Set( [
 		...existingBlockNames,
