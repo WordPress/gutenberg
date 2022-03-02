@@ -456,8 +456,10 @@ export const closeGeneralSidebar = () => ( { registry } ) => {
 		.disableComplementaryArea( editSiteStoreName );
 };
 
-export const switchEditorMode = ( mode ) => ( { dispatch, registry } ) => {
-	dispatch( { type: 'SWITCH_MODE', mode } );
+export const switchEditorMode = ( mode ) => ( { registry } ) => {
+	registry
+		.dispatch( 'core/preferences' )
+		.set( 'core/edit-site', 'editorMode', mode );
 
 	// Unselect blocks when we switch to a non visual mode.
 	if ( mode !== 'visual' ) {

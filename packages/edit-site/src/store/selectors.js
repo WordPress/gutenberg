@@ -351,10 +351,8 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 /**
  * Returns the current editing mode.
  *
- * @param {Object} state Global application state.
- *
  * @return {string} Editing mode.
  */
-export function getEditorMode( state ) {
-	return state.preferences.editorMode || 'visual';
+export function getEditorMode() {
+	return getPreference( 'editorMode' );
 }
