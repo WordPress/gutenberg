@@ -65,25 +65,21 @@ function useMenuItemEntities( menuId ) {
 		( select ) => {
 			const { getMenuItems, hasFinishedResolution } = select( coreStore );
 
-			const hasSelectedMenu = menuId !== undefined;
-			if ( ! hasSelectedMenu ) {
+			if ( ! menuId ) {
 				return {
 					hasResolvedMenuItems: false,
 				};
 			}
 
-			const menuItemsParameters = [
-				{
-					menus: menuId,
-					per_page: -1,
-				},
-			];
+			const query = {
+				menus: menuId,
+				per_page: -1,
+			};
 			return {
-				menuItems: getMenuItems( ...menuItemsParameters ),
-				hasResolvedMenuItems: hasFinishedResolution(
-					'getMenuItems',
-					menuItemsParameters
-				),
+				menuItems: getMenuItems( query ),
+				hasResolvedMenuItems: hasFinishedResolution( 'getMenuItems', [
+					query,
+				] ),
 			};
 		},
 		[ menuId ]
