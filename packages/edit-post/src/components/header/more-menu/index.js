@@ -4,8 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import { MenuGroup } from '@wordpress/components';
 import {
-	MoreMenuDropdown,
 	ActionItem,
+	MoreMenuDropdown,
 	PinnedItems,
 } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
