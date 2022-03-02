@@ -5,6 +5,10 @@ import path from 'path';
 import { devices } from '@playwright/test';
 import type { PlaywrightTestConfig } from '@playwright/test';
 
+const STORAGE_STATE_PATH =
+	process.env.STORAGE_STATE_PATH ||
+	path.join( process.cwd(), 'artifacts/storage-states/admin.json' );
+
 const config: PlaywrightTestConfig = {
 	reporter: process.env.CI
 		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
@@ -30,6 +34,7 @@ const config: PlaywrightTestConfig = {
 			reducedMotion: 'reduce',
 			strictSelectors: true,
 		},
+		storageState: STORAGE_STATE_PATH,
 		actionTimeout: 10_000, // 10 seconds.
 		trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
 		screenshot: 'only-on-failure',
