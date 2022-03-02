@@ -163,7 +163,7 @@ export { Truncate as __experimentalTruncate } from './truncate';
 export {
 	default as __experimentalUnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
-	parseUnit as __experimentalParseUnit,
+	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
 } from './unit-control';
 export { View as __experimentalView } from './view';
 export { VisuallyHidden } from './visually-hidden';

@@ -22,7 +22,7 @@ export default function UnitSelectControl( {
 	units = CSS_UNITS,
 	...props
 }: WordPressComponentProps< UnitSelectControlProps, 'select', false > ) {
-	if ( ! units || ! hasUnits( units ) || units?.length === 1 ) {
+	if ( ! hasUnits( units ) || units?.length === 1 ) {
 		return (
 			<UnitLabel
 				className="components-unit-control__unit-label"

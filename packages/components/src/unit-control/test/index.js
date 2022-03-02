@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import UnitControl from '../';
-import { parseUnit } from '../utils';
+import { parseQuantityAndUnitFromRawValue } from '../utils';
 
 const getComponent = () =>
 	document.body.querySelector( '.components-unit-control' );
@@ -33,7 +33,9 @@ const ControlledSyncUnits = () => {
 	// Keep the unit sync'd between the two `UnitControl` instances.
 	const onUnitControlChange = ( fieldName, newValue ) => {
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const [ quantity, newUnit ] = parseUnit( newValue );
+		const [ quantity, newUnit ] = parseQuantityAndUnitFromRawValue(
+			newValue
+		);
 
 		if ( ! Number.isFinite( quantity ) ) {
 			return;
@@ -42,7 +44,10 @@ const ControlledSyncUnits = () => {
 		const nextState = { ...state, [ fieldName ]: newValue };
 
 		Object.entries( state ).forEach( ( [ stateProp, stateValue ] ) => {
-			const [ stateQuantity, stateUnit ] = parseUnit( stateValue );
+			const [
+				stateQuantity,
+				stateUnit,
+			] = parseQuantityAndUnitFromRawValue( stateValue );
 
 			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
 				nextState[ stateProp ] = `${ stateQuantity }${ newUnit }`;
@@ -88,7 +93,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should not render select, if units are disabled', () => {
-			render( <UnitControl unit="em" units={ false } /> );
+			render( <UnitControl unit="em" units={ [] } /> );
 			const input = getInput();
 			const select = getSelect();
 
