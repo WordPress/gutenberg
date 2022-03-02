@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, map, keyBy } from 'lodash';
+import { map, keyBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -9,9 +9,11 @@ import createSelector from 'rememo';
  */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { uploadMedia } from '@wordpress/media-utils';
 import { isTemplatePart } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -32,15 +34,30 @@ import {
  */
 
 /**
+ * Helper for getting a preference from the preferences store.
+ *
+ * This is only used so that `getSettings` doesn't need to be
+ * made a registry selector. Do not export it.
+ */
+const getPreference = createRegistrySelector( ( select ) => ( state, name ) => {
+	return select( preferencesStore ).get( 'core/edit-site', name );
+} );
+
+/**
  * Returns whether the given feature is enabled or not.
  *
- * @param {Object} state   Global application state.
- * @param {string} feature Feature slug.
+ * @param {Object} state       Global application state.
+ * @param {string} featureName Feature slug.
  *
  * @return {boolean} Is active.
  */
-export function isFeatureActive( state, feature ) {
-	return get( state.preferences.features, [ feature ], false );
+export function isFeatureActive( state, featureName ) {
+	deprecated( `select( 'core/interface' ).isFeatureActive`, {
+		since: '6.0',
+		alternative: `select( 'core/preferences' ).get`,
+	} );
+
+	return !! getPreference( state, featureName );
 }
 
 /**
@@ -94,8 +111,8 @@ export const getSettings = createSelector(
 		const settings = {
 			...state.settings,
 			outlineMode: true,
-			focusMode: isFeatureActive( state, 'focusMode' ),
-			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
+			focusMode: !! getPreference( state, 'focusMode' ),
+			hasFixedToolbar: !! getPreference( state, 'fixedToolbar' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 			__experimentalReusableBlocks: getReusableBlocks( state ),
 			__experimentalPreferPatternsOnRoot:
@@ -119,8 +136,8 @@ export const getSettings = createSelector(
 	( state ) => [
 		getCanUserCreateMedia( state ),
 		state.settings,
-		isFeatureActive( state, 'focusMode' ),
-		isFeatureActive( state, 'fixedToolbar' ),
+		getPreference( state, 'focusMode' ),
+		getPreference( state, 'fixedToolbar' ),
 		getReusableBlocks( state ),
 		getEditedPostType( state ),
 	]
