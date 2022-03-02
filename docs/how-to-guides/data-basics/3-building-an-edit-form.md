@@ -197,9 +197,9 @@ wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title
 
 It doesn't reflect the edits. What's going on?
 
-Well, let's imagine for a second that it would reflect the edits. If it did, then anything you typed in the title field would be _immediately_ displayed inside the `PagesList`.
+Well, `<PagesList />` renders the data returned by `getEntityRecord()`. If `getEntityRecord()` reflected the updated title, then anything the user types in the `TextControl` would be immediately displayed inside `<PagesList />`, too. This is not what we want. The edits shouldn't leak outside the form until the user decides to save them.
 
-Gutenberg Data distinguishes between *Entity Records* and *Edited Entity Records*. *Entity Records* reflect the data from the API and ignore any local edits, while *Edited Entity Records* also have all the local edits applied on top. Both co-exist in the Redux state at the same time.
+Gutenberg Data solves this problem by making a distinction between *Entity Records* and *Edited Entity Records*. *Entity Records* reflect the data from the API and ignore any local edits, while *Edited Entity Records* also have all the local edits applied on top. Both co-exist in the Redux state at the same time.
 
 Let's see what happens if we call `getEditedEntityRecord`:
 
