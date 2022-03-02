@@ -76,7 +76,7 @@ export default function FileBlockInspector( {
 						onChange={ changeLinkDestinationOption }
 					/>
 					<ToggleControl
-						label={ __( 'Open link in new tab' ) }
+						label={ __( 'Open in new tab' ) }
 						checked={ openInNewWindow }
 						onChange={ changeOpenInNewWindow }
 					/>
