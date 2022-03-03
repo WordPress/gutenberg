@@ -28,7 +28,7 @@ function findBlockLayoutByClientId( data, clientId ) {
 	}, null );
 }
 
-function deleteByClientId( data, clientId ) {
+function deleteBlockLayoutByClientId( data, clientId ) {
 	return Object.keys( data ).reduce( ( acc, key ) => {
 		if ( key !== clientId ) {
 			acc[ key ] = data[ key ];
@@ -38,7 +38,7 @@ function deleteByClientId( data, clientId ) {
 			Object.keys( data[ key ].innerBlocks ).length > 0
 		) {
 			if ( acc[ key ] ) {
-				acc[ key ].innerBlocks = deleteByClientId(
+				acc[ key ].innerBlocks = deleteBlockLayoutByClientId(
 					data[ key ].innerBlocks,
 					clientId
 				);
@@ -52,7 +52,7 @@ function updateBlocksLayouts( blockData ) {
 	const { clientId, rootClientId, shouldRemove, ...layoutProps } = blockData;
 
 	if ( clientId && shouldRemove ) {
-		blocksLayouts.current = deleteByClientId(
+		blocksLayouts.current = deleteBlockLayoutByClientId(
 			blocksLayouts.current,
 			clientId
 		);
