@@ -325,12 +325,17 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
+	function handleUpdateMenu( menuId ) {
+		setRef( menuId );
+		selectBlock( clientId );
+	}
+
 	useEffect( () => {
 		if (
 			! classicMenuConversionState?.isFetching &&
 			classicMenuConversionState.navMenu
 		) {
-			setRef( classicMenuConversionState.navMenu?.id );
+			handleUpdateMenu( classicMenuConversionState.navMenu?.id );
 		}
 	}, [ classicMenuConversionState ] );
 
@@ -514,15 +519,17 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onFinish={ ( post, requiresConversion = false ) => {
-						if ( requiresConversion ) {
+					onFinish={ ( post, isClassicMenu = false ) => {
+						if ( ! post ) {
+							return;
+						}
+
+						if ( isClassicMenu ) {
 							// Setting ref and selecting block
 							// handled by effect post-conversion.
 							convert( post.id, post.name );
-						}
-						if ( ! requiresConversion && post ) {
-							setRef( post.id );
-							selectBlock( clientId );
+						} else {
+							handleUpdateMenu( post.id );
 						}
 					} }
 				/>

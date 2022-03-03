@@ -86,7 +86,8 @@ export default function NavigationPlaceholder( {
 							clientId={ clientId }
 							onSelect={ onFinish }
 							onSelectClassic={ ( menu ) => {
-								onFinish( menu, true );
+								const isClassicMenu = true;
+								onFinish( menu, isClassicMenu );
 							} }
 							toggleProps={ {
 								variant: 'tertiary',
