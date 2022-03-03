@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+// @ts-ignore
 import { useSelect } from '@wordpress/data';
 
 /**
