@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.71.1",
+	"version": "1.71.2",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
