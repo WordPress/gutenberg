@@ -108,6 +108,7 @@ export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
 export {
 	BlockLockModal as __experimentalBlockLockModal,
 	BlockLockMenuItem as __experimentalBlockLockMenuItem,
+	BlockLockToolbar as __experimentalBlockLockToolbar,
 } from './block-lock';
 export { default as BlockMover } from './block-mover';
 export {

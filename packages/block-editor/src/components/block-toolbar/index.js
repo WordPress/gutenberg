@@ -20,6 +20,7 @@ import BlockParentSelector from '../block-parent-selector';
 import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockSettingsMenu from '../block-settings-menu';
+import { BlockLockToolbar } from '../block-lock';
 import { useShowMoversGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 
@@ -118,6 +119,11 @@ export default function BlockToolbar( { hideDragHandle } ) {
 							clientIds={ blockClientIds }
 							hideDragHandle={ hideDragHandle || hasReducedUI }
 						/>
+						{ ! isMultiToolbar && (
+							<BlockLockToolbar
+								clientId={ blockClientIds[ 0 ] }
+							/>
+						) }
 					</ToolbarGroup>
 				) }
 			</div>
