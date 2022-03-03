@@ -4,7 +4,7 @@
 		"incremental": false,
 		"composite": false,
 		"module": "CommonJS",
-		"rootDir": "source",
+		"rootDir": "src",
 		"noEmit": false,
 		"outDir": "build",
 		"sourceMap": true,
@@ -16,6 +16,6 @@
 		"checkJs": false,
 	},
 	"include": [
-		"source/**/*"
+		"src/**/*"
 	]
 }
