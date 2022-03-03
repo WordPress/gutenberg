@@ -228,10 +228,10 @@ PODS:
     - React-Core
   - react-native-slider (3.0.2-wp-2):
     - React-Core
-  - react-native-video (5.0.2-wp-2):
+  - react-native-video (5.2.0-wp-2):
     - React-Core
-    - react-native-video/Video (= 5.0.2-wp-2)
-  - react-native-video/Video (5.0.2-wp-2):
+    - react-native-video/Video (= 5.2.0-wp-2)
+  - react-native-video/Video (5.2.0-wp-2):
     - React-Core
   - react-native-webview (11.6.5-wp-2):
     - React-Core
@@ -304,10 +304,36 @@ PODS:
     - React-Core
   - RNCMaskedView (0.1.11-wp-2):
     - React-Core
-  - RNGestureHandler (1.10.1-wp-4):
+  - RNGestureHandler (2.2.0-wp-3):
     - React-Core
-  - RNReanimated (1.9.0-wp-2):
+  - RNReanimated (2.2.4-wp-1):
+    - DoubleConversion
+    - FBLazyVector
+    - FBReactNativeSpec
+    - glog
+    - RCT-Folly
+    - RCTRequired
+    - RCTTypeSafety
+    - React-callinvoker
     - React-Core
+    - React-Core/DevSupport
+    - React-Core/RCTWebSocket
+    - React-CoreModules
+    - React-cxxreact
+    - React-jsi
+    - React-jsiexecutor
+    - React-jsinspector
+    - React-RCTActionSheet
+    - React-RCTAnimation
+    - React-RCTBlob
+    - React-RCTImage
+    - React-RCTLinking
+    - React-RCTNetwork
+    - React-RCTSettings
+    - React-RCTText
+    - React-RCTVibration
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RNScreens (2.9.0-wp-2):
     - React-Core
   - RNSVG (9.13.7-wp-2):
@@ -497,7 +523,7 @@ SPEC CHECKSUMS:
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
   react-native-safe-area-context: 12756eb7af017b6ff6b4f50dc5a55eab299c62fd
   react-native-slider: d4c3367c5db5d2bec3ac0ab9d15ebb73d896034c
-  react-native-video: 7ebeec33e4e00837563d7315b633b00337079217
+  react-native-video: 2ad952d1a9ce83e058dcb4a1800af3a99cb7edee
   react-native-webview: 5189276d033e3d3c5292d22e5a66ec48c9b2b04b
   React-perflogger: 5ab487cacfe6ec19bfe3d3f8072bf71eb07d63da
   React-RCTActionSheet: 03f25695e095fb5aa003828620943c74cc281fec
@@ -513,8 +539,8 @@ SPEC CHECKSUMS:
   ReactCommon: c0263c1a41509aeb94be3214fa7bc3b71eae5ef6
   RNCClipboard: 6e20baf63bfe3515c2b719a8c3d6797718098663
   RNCMaskedView: 579fdb1e0abb33cc0d38ee8d4942df9976a0533e
-  RNGestureHandler: 0c0e58f463a725fa37d8643d50da6abf300f7844
-  RNReanimated: 7d8459391b2f3e1dc6dea919307db4adf4c1d254
+  RNGestureHandler: 73184394c98d543e6a24ab26dba4169824e85288
+  RNReanimated: 6aee4bed42a400d9472b7e843762ab4119cf201c
   RNScreens: ec0e85d1babdd61d7ec78c98072d9e6b62d96ff6
   RNSVG: b3b9c40381636e5116894398d72a830be15b7258
   RNTAztecView: 1bbc9f43c8b5746c0ae8a0998430bd07cf21b2b6
