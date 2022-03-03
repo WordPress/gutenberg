@@ -6,7 +6,7 @@ import { isAndroid, swipeDown, clickMiddleOfElement } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for Block insertion', () => {
-	it( 'should be able to insert paragraph block with text between blocks on post', async () => {
+	it( 'should be able to insert multi-paragraph text, and text to another paragraph block in between', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
 		let paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph
