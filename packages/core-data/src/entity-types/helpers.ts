@@ -153,7 +153,24 @@ export type Updatable< T extends EntityRecord< 'edit' > > = {
 };
 
 /**
- * TODO Docstring
+ * Helped type to turn an entity type configuration entry such as:
+ *
+ * ```ts
+ * export const attachment = {
+ * 	name: 'media',
+ * 	kind: 'root',
+ * 	baseURL: '/wp/v2/media',
+ * 	baseURLParams: { context: 'edit' },
+ * 	plural: 'mediaItems',
+ * 	label: __( 'Media' ),
+ * } as const;
+ * ```
+ *
+ * Into a lookup type adhering to EntityInterface used by RecordOf
+ * to find the record type related to the specified kind and name.
+ *
+ * @see RecordOf
+ * @see EntityInterface
  */
 export type EntityFromConfig<
 	E extends {
@@ -174,9 +191,13 @@ export type EntityFromConfig<
 };
 
 /**
- * TODO Docstring
+ * HTTP Query parameters sent with the API request to fetch the entity records.
  */
 export type EntityQuery< C extends Context > = Record< string, any > & {
 	context?: C;
+	/**
+	 * The requested fields. If specified, the REST API will remove from the response
+	 * any fields not on that list.
+	 */
 	_fields?: string[];
 };
