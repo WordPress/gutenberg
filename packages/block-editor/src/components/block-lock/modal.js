@@ -152,7 +152,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 				>
 					<FlexItem>
 						<Button variant="tertiary" onClick={ onClose }>
-							{ __( 'Canel' ) }
+							{ __( 'Cancel' ) }
 						</Button>
 					</FlexItem>
 					<FlexItem>
