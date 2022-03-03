@@ -18,16 +18,21 @@ import {
 	isNavigationOpened,
 	isInserterOpened,
 	isListViewOpened,
+	__unstableGetPreference,
 } from '../selectors';
 
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
 	const getEntityRecords = jest.fn( () => [] );
+	const get = jest.fn();
 	getCanUserCreateMedia.registry = {
 		select: jest.fn( () => ( { canUser } ) ),
 	};
 	getReusableBlocks.registry = {
 		select: jest.fn( () => ( { getEntityRecords } ) ),
+	};
+	__unstableGetPreference.registry = {
+		select: jest.fn( () => ( { get } ) ),
 	};
 
 	describe( 'getCanUserCreateMedia', () => {
@@ -60,6 +65,10 @@ describe( 'selectors', () => {
 		it( "returns the settings when the user can't create media", () => {
 			canUser.mockReturnValueOnce( false );
 			canUser.mockReturnValueOnce( false );
+			get.mockImplementation( ( scope, name ) => {
+				if ( name === 'focusMode' ) return false;
+				if ( name === 'fixedToolbar' ) return false;
+			} );
 			const state = {
 				settings: {},
 				preferences: {},
@@ -77,14 +86,13 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'returns the extended settings when the user can create media', () => {
+			get.mockImplementation( ( scope, name ) => {
+				if ( name === 'focusMode' ) return true;
+				if ( name === 'fixedToolbar' ) return true;
+			} );
+
 			const state = {
 				settings: { key: 'value' },
-				preferences: {
-					features: {
-						focusMode: true,
-						fixedToolbar: true,
-					},
-				},
 				editedPost: { type: 'wp_template_part' },
 			};
 			const setInserterOpened = () => {};
