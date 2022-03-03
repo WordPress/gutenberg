@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0 (2022-03-03)
+
 ### Breaking Changes
 
 -   It is no longer mandatory to provide the deprecated `templatesPath` option when configuring the custom project template ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
