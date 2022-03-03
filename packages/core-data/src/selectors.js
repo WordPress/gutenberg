@@ -493,7 +493,7 @@ export function hasEditsForEntityRecord( state, kind, name, recordId ) {
 /**
  * Returns the specified entity record, merged with its edits.
  *
- * @type getEditedEntityRecord
+ * @type {getEditedEntityRecord}
  *
  * @param  state    State tree.
  * @param  kind     Entity kind.
