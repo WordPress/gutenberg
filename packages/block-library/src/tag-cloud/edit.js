@@ -91,7 +91,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			smallestFontSize,
 			largestFontSize,
 		} ).forEach( ( [ attribute, currentValue ] ) => {
-			const [ currentQuantity, currentUnit ] = parseUnit( currentValue );
+			const [ currentQuantity, currentUnit ] = parseQuantityAndUnitFromRawValue( currentValue );
 			// Only add an update if the other font size attribute has a different unit.
 			if ( attribute !== fontSizeLabel && currentUnit !== newUnit ) {
 				updateObj[ attribute ] = `${ currentQuantity }${ newUnit }`;
