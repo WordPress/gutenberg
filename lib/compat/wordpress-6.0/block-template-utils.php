@@ -62,6 +62,16 @@ function gutenberg_generate_block_templates_export_file() {
 		wp_json_encode( $tree->get_data(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
 	);
 
+	$zip->addFile(
+		wp_normalize_path( get_stylesheet_directory() ) . '/index.php',
+		'theme/index.php'
+	);
+
+	$zip->addFile(
+		wp_normalize_path( get_stylesheet_directory() ) . '/style.css',
+		'theme/style.css'
+	);
+
 	// Save changes to the zip file.
 	$zip->close();
 
