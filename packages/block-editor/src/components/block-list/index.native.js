@@ -29,8 +29,7 @@ import BlockListItemCell from './block-list-item-cell';
 import {
 	BlockListProvider,
 	BlockListConsumer,
-	updateBlocksLayouts,
-	blocksLayouts,
+	DEFAULT_BLOCK_LIST_CONTEXT,
 } from './block-list-context';
 import { store as blockEditorStore } from '../../store';
 
@@ -194,9 +193,8 @@ export class BlockList extends Component {
 		const blockList = isRootList ? (
 			<BlockListProvider
 				value={ {
+					...DEFAULT_BLOCK_LIST_CONTEXT,
 					scrollRef: this.scrollViewRef,
-					updateBlocksLayouts,
-					blocksLayouts: blocksLayouts.current,
 				} }
 			>
 				{ this.renderList() }

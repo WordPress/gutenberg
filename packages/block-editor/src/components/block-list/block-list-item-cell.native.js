@@ -14,17 +14,24 @@ import { useEffect, useCallback } from '@wordpress/element';
 import { useBlockListContext } from './block-list-context';
 
 function BlockListItemCell( { children, clientId, rootClientId } ) {
-	const { updateBlocksLayouts } = useBlockListContext();
+	const { blocksLayouts, updateBlocksLayouts } = useBlockListContext();
 
 	useEffect( () => {
 		return () => {
-			updateBlocksLayouts( { clientId, shouldRemove: true } );
+			updateBlocksLayouts( blocksLayouts, {
+				clientId,
+				shouldRemove: true,
+			} );
 		};
 	}, [] );
 
 	const onLayout = useCallback(
 		( { nativeEvent: { layout } } ) => {
-			updateBlocksLayouts( { clientId, rootClientId, ...layout } );
+			updateBlocksLayouts( blocksLayouts, {
+				clientId,
+				rootClientId,
+				...layout,
+			} );
 		},
 		[ clientId, rootClientId, updateBlocksLayouts ]
 	);

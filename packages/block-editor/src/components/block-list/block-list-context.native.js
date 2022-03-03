@@ -3,13 +3,13 @@
  */
 import { createContext, useContext } from '@wordpress/element';
 
-const blocksLayouts = { current: {} };
-
-const Context = createContext( {
+export const DEFAULT_BLOCK_LIST_CONTEXT = {
 	scrollRef: null,
-	blocksLayouts: {},
-	updateBlocksLayouts: () => {},
-} );
+	blocksLayouts: { current: {} },
+	updateBlocksLayouts,
+};
+
+const Context = createContext( DEFAULT_BLOCK_LIST_CONTEXT );
 const { Provider, Consumer } = Context;
 
 function findBlockLayoutByClientId( data, clientId ) {
@@ -48,7 +48,7 @@ function deleteBlockLayoutByClientId( data, clientId ) {
 	}, {} );
 }
 
-function updateBlocksLayouts( blockData ) {
+function updateBlocksLayouts( blocksLayouts, blockData ) {
 	const { clientId, rootClientId, shouldRemove, ...layoutProps } = blockData;
 
 	if ( clientId && shouldRemove ) {
@@ -87,14 +87,8 @@ function updateBlocksLayouts( blockData ) {
 	}
 }
 
-export {
-	Provider as BlockListProvider,
-	Consumer as BlockListConsumer,
-	updateBlocksLayouts,
-	blocksLayouts,
-};
+export { Provider as BlockListProvider, Consumer as BlockListConsumer };
 
 export const useBlockListContext = () => {
-	const blockListContext = useContext( Context );
-	return blockListContext;
+	return useContext( Context );
 };
