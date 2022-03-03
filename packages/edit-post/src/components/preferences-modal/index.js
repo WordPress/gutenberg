@@ -22,6 +22,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	PreferencesModal,
+	PreferencesModalTabs,
 	PreferencesModalSection,
 } from '@wordpress/interface';
 
@@ -257,5 +258,9 @@ export default function EditPostPreferencesModal() {
 		return null;
 	}
 
-	return <PreferencesModal closeModal={ closeModal } sections={ sections } />;
+	return (
+		<PreferencesModal closeModal={ closeModal }>
+			<PreferencesModalTabs sections={ sections } />
+		</PreferencesModal>
+	);
 }
