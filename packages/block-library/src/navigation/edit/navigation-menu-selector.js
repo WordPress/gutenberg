@@ -17,13 +17,11 @@ import { useCallback, useMemo } from '@wordpress/element';
  */
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
-import useConvertClassicMenu from '../use-convert-classic-menu';
-import useCreateNavigationMenu from './use-create-navigation-menu';
 
 export default function NavigationMenuSelector( {
 	currentMenuId,
-	clientId,
 	onSelect,
+	onSelectClassic,
 	onCreateNew,
 	showManageActions = false,
 	actionLabel,
@@ -42,27 +40,6 @@ export default function NavigationMenuSelector( {
 		canUserUpdateNavigationMenu,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
-
-	const createNavigationMenu = useCreateNavigationMenu( clientId );
-
-	const onFinishMenuCreation = async (
-		blocks,
-		navigationMenuTitle = null
-	) => {
-		if ( ! canUserCreateNavigationMenu ) {
-			return;
-		}
-
-		const navigationMenu = await createNavigationMenu(
-			navigationMenuTitle,
-			blocks
-		);
-		onSelect( navigationMenu );
-	};
-
-	const convertClassicMenuToBlocks = useConvertClassicMenu(
-		onFinishMenuCreation
-	);
 
 	const handleSelect = useCallback(
 		( _onClose ) => ( selectedId ) => {
@@ -132,10 +109,7 @@ export default function NavigationMenuSelector( {
 									<MenuItem
 										onClick={ () => {
 											onClose();
-											convertClassicMenuToBlocks(
-												menu.id,
-												menu.name
-											);
+											onSelectClassic( menu );
 										} }
 										key={ menu.id }
 										aria-label={ sprintf(

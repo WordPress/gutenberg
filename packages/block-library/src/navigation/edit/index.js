@@ -55,6 +55,7 @@ import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
 import OverlayMenuIcon from './overlay-menu-icon';
+import useConvertClassicToBlockMenu from './use-convert-classic-menu-to-block-menu';
 
 const EMPTY_ARRAY = [];
 
@@ -231,6 +232,13 @@ function Navigation( {
 		clientId
 	);
 
+	const {
+		convert,
+		state: classicMenuConversionState,
+	} = useConvertClassicToBlockMenu( clientId );
+
+	const isConvertingClassicMenu = classicMenuConversionState?.isFetching;
+
 	// The standard HTML5 tag for the block wrapper.
 	const TagName = 'nav';
 
@@ -247,7 +255,12 @@ function Navigation( {
 	// "loading" state:
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
-	const isLoading = !! ( ref && ! isEntityAvailable );
+	// - we are not running the Classic Menu conversion process.
+	const isLoading = !! (
+		ref &&
+		! isEntityAvailable &&
+		! isConvertingClassicMenu
+	);
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -309,6 +322,15 @@ function Navigation( {
 		setDetectedOverlayBackgroundColor,
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+
+	useEffect( () => {
+		if (
+			! classicMenuConversionState?.isFetching &&
+			classicMenuConversionState.navMenu
+		) {
+			setRef( classicMenuConversionState.navMenu?.id );
+		}
+	}, [ classicMenuConversionState ] );
 
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
@@ -490,11 +512,16 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onFinish={ ( post ) => {
-						if ( post ) {
-							setRef( post.id );
+					onFinish={ ( post, requiresConversion = false ) => {
+						if ( requiresConversion ) {
+							// Setting ref and selecting block
+							// handled by effect post-conversion.
+							convert( post.id, post.name );
 						}
-						selectBlock( clientId );
+						if ( ! requiresConversion && post ) {
+							setRef( post.id );
+							selectBlock( clientId );
+						}
 					} }
 				/>
 			</TagName>
@@ -512,6 +539,9 @@ function Navigation( {
 								clientId={ clientId }
 								onSelect={ ( { id } ) => {
 									setRef( id );
+								} }
+								onSelectClassic={ ( classicMenu ) => {
+									convert( classicMenu.id, classicMenu.name );
 								} }
 								onCreateNew={ startWithEmptyMenu }
 								/* translators: %s: The name of a menu. */
