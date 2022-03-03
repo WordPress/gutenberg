@@ -20,6 +20,7 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 
 /** @typedef {import('./types/index').getEntityRecord} getEntityRecord */
+/** @typedef {import('./types/index').getRawEntityRecord} getRawEntityRecord */
 /** @typedef {import('./types/index').getEditedEntityRecord} getEditedEntityRecord */
 
 /**
@@ -218,12 +219,14 @@ export function __experimentalGetEntityRecordNoResolver(
  * Returns the entity's record object by key,
  * with its attributes mapped to their raw values.
  *
- * @param {Object} state State tree.
- * @param {string} kind  Entity kind.
- * @param {string} name  Entity name.
- * @param {number} key   Record's key.
+ * @type {getRawEntityRecord}
  *
- * @return {Object?} Object with the entity's raw attributes.
+ * @param  state State tree.
+ * @param  kind  Entity kind.
+ * @param  name  Entity name.
+ * @param  key   Record's key.
+ *
+ * @return Object with the entity's raw attributes.
  */
 export const getRawEntityRecord = createSelector(
 	( state, kind, name, key ) => {

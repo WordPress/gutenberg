@@ -49,7 +49,11 @@ export type {
 	WpTemplatePart,
 };
 
-export type { getEntityRecord, getEditedEntityRecord } from './selectors';
+export type {
+	getEntityRecord,
+	getEditedEntityRecord,
+	getRawEntityRecord,
+} from './selectors';
 
 /**
  * The type that the entries of PerPackageEntities must adhere to. This is for reference only,

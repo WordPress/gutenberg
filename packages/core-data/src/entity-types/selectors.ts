@@ -45,3 +45,5 @@ export type getEditedEntityRecord = <
 	name: N,
 	recordId: KeyOf< R >
 ) => Updatable< RecordOf< K, N, DefaultContextOf< R > > > | null | undefined;
+
+export type getRawEntityRecord = getEditedEntityRecord;
