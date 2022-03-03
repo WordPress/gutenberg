@@ -82,6 +82,22 @@ describe( 'NumberControl', () => {
 			expect( input.value ).toBe( '0' );
 		} );
 
+		it( 'should clamp value within range on blur', () => {
+			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: 41 } } );
+
+			// Before blurring, the value is still un-clamped
+			expect( input.value ).toBe( '41' );
+
+			input.blur();
+
+			// After blur, value is clamped
+			expect( input.value ).toBe( '10' );
+		} );
+
 		it( 'should parse to number value on ENTER keypress when required', () => {
 			render( <NumberControl value={ 5 } required={ true } /> );
 
