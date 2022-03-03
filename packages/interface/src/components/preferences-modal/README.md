@@ -1,6 +1,6 @@
 # PreferencesModal
 
-`PreferencesModal` renders a modal with editor preferences. It can take multiple sections, which are split into tabs. On small viewports, the modal is fullscreen and the tabs are closed by default. Markup differs between small and large viewports.
+`PreferencesModal` renders a modal with editor preferences. It can take a `PreferencesModalTabs` component, which accepts multiple tabs, and/or other child components. On small viewports, the modal is fullscreen.
 
 This component implements a `Modal` component from the `@wordpress/components` package.
 
@@ -11,6 +11,7 @@ Sections passed to this component should use `PreferencesModalSection` component
 
 ```jsx
 function MyEditorPreferencesModal() {
+	const { closeModal } = useDispatch( editPostStore );
 	const sections = [
 		{
 			name: 'section 1',
@@ -59,7 +60,9 @@ function MyEditorPreferencesModal() {
 		}
 	]
 	return (
-		<PreferencesModal sections={ sections } />
+		<PreferencesModal closeModal={ closeModal }>
+			<PreferencesModalTabs sections={ sections } />
+		<PreferencesModal />
 	);
 }
 ```
@@ -71,11 +74,4 @@ function MyEditorPreferencesModal() {
 A function to call when closing the modal.
 
 -   Type: `Function`
--   Required: Yes.
-
-### sections
-
-Sections to populate the modal with. Takes an array of objects, where each should include `name`, `tablabel` and `content`.
-
--   Type: `Array`
 -   Required: Yes.

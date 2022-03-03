@@ -1,5 +1,3 @@
-$vertical-tabs-width: 160px;
-
 .interface-preferences-modal {
 	// To keep modal dimensions consistent as subsections are navigated, width
 	// and height are used instead of max-(width/height).
@@ -27,32 +25,6 @@ $vertical-tabs-width: 160px;
 		// to ensure that sticky position elements stick where intended.
 		.components-navigator-provider {
 			height: 100%;
-		}
-	}
-
-	.interface-preferences__tabs {
-		.components-tab-panel__tabs {
-			position: absolute;
-			top: $header-height + $grid-unit-30;
-			// Aligns button text instead of button box.
-			left: $grid-unit-20;
-			width: $vertical-tabs-width;
-			.components-tab-panel__tabs-item {
-				border-radius: $radius-block-ui;
-				font-weight: 400;
-				&.is-active {
-					background: $gray-100;
-					box-shadow: none;
-					font-weight: 500;
-				}
-				&:focus:not(:disabled) {
-					box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-				}
-			}
-		}
-		.components-tab-panel__tab-content {
-			padding-left: $grid-unit-30;
-			margin-left: $vertical-tabs-width;
 		}
 	}
 
