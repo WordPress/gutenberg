@@ -12,7 +12,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-// @ts-ignore
 import { addEntities } from './actions';
 import type * as Records from './types';
 import type { Kind, Name, Context } from './types';

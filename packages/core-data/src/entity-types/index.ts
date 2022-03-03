@@ -49,6 +49,8 @@ export type {
 	WpTemplatePart,
 };
 
+export type { getEntityRecord } from './selectors';
+
 /**
  * The type that the entries of PerPackageEntities must adhere to. This is for reference only,
  * there is no type checking in place.

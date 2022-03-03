@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map, find, get, filter, compact } from 'lodash';
+import { set, map, find, get, filter, compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,9 +17,9 @@ import deprecated from '@wordpress/deprecated';
 import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
-import { isRawAttribute } from './utils';
-import { getEntityRecord } from './selectors-ts';
-export { getEntityRecord };
+import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
+
+/** @typedef {import('./types/index').getEntityRecord} getEntityRecord */
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -120,6 +120,79 @@ export function getEntitiesByKind( state, kind ) {
 export function getEntity( state, kind, name ) {
 	return find( state.entities.config, { kind, name } );
 }
+
+/**
+ * Returns the Entity's record object by key. Returns `null` if the value is not
+ * yet received, undefined if the value entity is known to not exist, or the
+ * entity object if it exists and is received.
+ *
+ * @type {getEntityRecord}
+ *
+ * @param  state State tree
+ * @param  kind  Entity kind.
+ * @param  name  Entity name.
+ * @param  key   Record's key
+ * @param  query Optional query.
+ *
+ * @return Record.
+ */
+export const getEntityRecord = createSelector(
+	( state, kind, name, key, query ) => {
+		const queriedState = get( state.entities.data, [
+			kind,
+			name,
+			'queriedData',
+		] );
+		if ( ! queriedState ) {
+			return undefined;
+		}
+		const context = query?.context ?? 'default';
+
+		if ( query === undefined ) {
+			// If expecting a complete item, validate that completeness.
+			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
+				return undefined;
+			}
+
+			return queriedState.items[ context ][ key ];
+		}
+
+		const item = queriedState.items[ context ]?.[ key ];
+		if ( item && query._fields ) {
+			const filteredItem = {};
+			const fields = getNormalizedCommaSeparable( query._fields );
+			for ( let f = 0; f < fields.length; f++ ) {
+				const field = fields[ f ].split( '.' );
+				const value = get( item, field );
+				set( filteredItem, field, value );
+			}
+			return filteredItem;
+		}
+
+		return item;
+	},
+	( state, kind, name, recordId, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'items',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'itemIsComplete',
+				context,
+				recordId,
+			] ),
+		];
+	}
+);
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
