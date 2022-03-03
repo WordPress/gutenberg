@@ -37,12 +37,12 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 
 		$inherit = ! empty( $block->context['comments/inherit'] );
 
-		$per_page       = (int) get_option( 'comments_per_page' );
-		$query_per_page = (int) get_query_var( 'comments_per_page' );
-		if ( 0 !== $query_per_page ) {
-			$per_page = $query_per_page;
+		$per_page = 0;
+		$block_per_page = ! empty( $block->context['comments/perPage'] ) ? (int) $block->context['comments/perPage'] : null;
+		if ( $inherit && get_option( 'page_comments' )  ) {
+			$per_page = get_option( 'comments_per_page' );
 		}
-		$block_per_page = ! empty( $block->context['comments/perPage'] ) ? (int) $block->context['comments/perPage'] : 0;
+
 		if ( ! $inherit && 0 !== $block_per_page ) {
 			$per_page = $block_per_page;
 		}
