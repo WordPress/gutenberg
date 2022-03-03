@@ -148,8 +148,7 @@ export function getPreference( state, preferenceKey, defaultValue ) {
 }
 
 /**
- * Registry selector that gets the hidden block types from the preferences
- * store.
+ * Returns an array of blocks that are hidden.
  *
  * @return {Array} A list of the hidden block types
  */

@@ -83,8 +83,7 @@ _Returns_
 
 ### getHiddenBlockTypes
 
-Registry selector that gets the hidden block types from the preferences
-store.
+Returns an array of blocks that are hidden.
 
 _Returns_
 
@@ -361,8 +360,7 @@ _Returns_
 
 ### hideBlockTypes
 
-Dispatches an action to update the hidden block types preference with new
-hidden blocks.
+Update the provided block types to be hidden.
 
 _Parameters_
 
@@ -482,8 +480,7 @@ _Returns_
 
 ### showBlockTypes
 
-Dispatches an action to update the hidden block types preference with new
-visible blocks.
+Update the provided block types to be visible.
 
 _Parameters_
 

@@ -219,8 +219,7 @@ export function __experimentalUpdateLocalAutosaveInterval( interval ) {
 }
 
 /**
- * Dispatches an action to update the hidden block types preference with new
- * visible blocks.
+ * Update the provided block types to be visible.
  *
  * @param {string[]} blockNames Names of block types to show.
  */
@@ -241,8 +240,7 @@ export const showBlockTypes = ( blockNames ) => ( { registry } ) => {
 };
 
 /**
- * Dispatches an action to update the hidden block types preference with new
- * hidden blocks.
+ * Update the provided block types to be hidden.
  *
  * @param {string[]} blockNames Names of block types to hide.
  */
