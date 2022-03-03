@@ -20,6 +20,7 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 
 /** @typedef {import('./types/index').getEntityRecord} getEntityRecord */
+/** @typedef {import('./types/index').getEditedEntityRecord} getEditedEntityRecord */
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -489,12 +490,14 @@ export function hasEditsForEntityRecord( state, kind, name, recordId ) {
 /**
  * Returns the specified entity record, merged with its edits.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @type getEditedEntityRecord
  *
- * @return {Object?} The entity record, merged with its edits.
+ * @param  state    State tree.
+ * @param  kind     Entity kind.
+ * @param  name     Entity name.
+ * @param  recordId Record ID.
+ *
+ * @return The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
 	( state, kind, name, recordId ) => ( {

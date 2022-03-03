@@ -12,6 +12,7 @@ import type {
 	NameOf,
 	RecordOf,
 } from './index';
+import { Updatable } from './index';
 
 type State = any;
 
@@ -33,3 +34,17 @@ export type getEntityRecord = <
 			: RecordOf< K, N, C > )
 	| null
 	| undefined;
+
+export type getEditedEntityRecord = <
+	R extends RecordOf< K, N >,
+	K extends Kind = KindOf< R >,
+	N extends Name = NameOf< R >,
+	Q extends EntityQuery< 'edit' > = EntityQuery< 'edit' >
+>(
+	state: State,
+	kind: K,
+	name: N,
+	query?: EntityQuery< 'edit' >
+) => Q[ '_fields' ] extends string[]
+	? Partial< Updatable< RecordOf< K, N, 'edit' > > >
+	: Updatable< RecordOf< K, N, 'edit' > > | null | undefined;
