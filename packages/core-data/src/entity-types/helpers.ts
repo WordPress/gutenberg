@@ -151,3 +151,32 @@ export interface RenderedText< C extends Context > {
 export type Updatable< T extends EntityRecord< 'edit' > > = {
 	[ K in keyof T ]: T[ K ] extends RenderedText< any > ? string : T[ K ];
 };
+
+/**
+ * TODO Docstring
+ */
+export type EntityFromConfig<
+	E extends {
+		kind: string;
+		name: string;
+		key?: string;
+		baseURLParams?: EntityQuery< any >;
+	},
+	R
+> = {
+	kind: E[ 'kind' ];
+	name: E[ 'name' ];
+	recordType: R;
+	key: E[ 'key' ] extends string ? E[ 'key' ] : 'id';
+	defaultContext: E[ 'baseURLParams' ] extends EntityQuery< infer C >
+		? C
+		: 'view';
+};
+
+/**
+ * TODO Docstring
+ */
+export type EntityQuery< C extends Context > = Record< string, any > & {
+	context?: C;
+	_fields?: string[];
+};

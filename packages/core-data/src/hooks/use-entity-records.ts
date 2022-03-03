@@ -8,7 +8,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
-import { Status } from './constants';
+import type { Status } from './constants';
 
 interface EntityRecordsResolution< RecordType > {
 	/** The requested entity record */
@@ -77,7 +77,7 @@ export default function __experimentalUseEntityRecords< RecordType >(
 	const queryAsString = addQueryArgs( '', queryArgs );
 
 	const { data: records, ...rest } = useQuerySelect(
-		( query ) =>
+		( query: any ) =>
 			query( coreStore ).getEntityRecords( kind, name, queryArgs ),
 		[ kind, name, queryAsString ]
 	);

@@ -1,12 +1,7 @@
 /**
  * Internal dependencies
  */
-import type {
-	CommentingStatus,
-	Context,
-	OmitNevers,
-	PingStatus,
-} from './helpers';
+import type { CommentingStatus, Context, OmitNevers, PingStatus } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 

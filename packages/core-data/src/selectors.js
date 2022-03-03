@@ -18,7 +18,7 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { isRawAttribute } from './utils';
-import { getEntityRecord } from './ts-selectors';
+import { getEntityRecord } from './selectors-ts';
 export { getEntityRecord };
 
 /**
