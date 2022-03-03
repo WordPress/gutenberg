@@ -326,6 +326,13 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
+	const [
+		showClassicMenuConversionErrorNotice,
+		hideClassicMenuConversionErrorNotice,
+	] = useNavigationNotice( {
+		name: 'block-library/core/navigation/classic-menu-conversion/error',
+	} );
+
 	function handleUpdateMenu( menuId ) {
 		setRef( menuId );
 		selectBlock( clientId );
@@ -392,13 +399,6 @@ function Navigation( {
 			),
 		}
 	);
-
-	const [
-		showClassicMenuConversionErrorNotice,
-		hideClassicMenuConversionErrorNotice,
-	] = useNavigationNotice( {
-		name: 'block-library/core/navigation/classic-menu-conversion/error',
-	} );
 
 	useEffect( () => {
 		if ( ! isSelected && ! isInnerBlockSelected ) {
