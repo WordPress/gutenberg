@@ -1,0 +1,56 @@
+.block-editor-block-lock-modal {
+	z-index: z-index(".block-editor-block-lock-modal");
+
+	.components-modal__frame {
+		@include break-small() {
+			max-width: $break-mobile;
+		}
+	}
+}
+
+.block-editor-block-lock-modal__checklist {
+	margin: 0;
+}
+
+.block-editor-block-lock-modal__options-title {
+	border-top: 1px solid $gray-300;
+	border-bottom: 1px solid $gray-300;
+	padding: $grid-unit-15 0;
+
+	.components-checkbox-control__label {
+		font-weight: 600;
+	}
+
+	.components-base-control__field {
+		align-items: center;
+		display: flex;
+		margin: 0;
+	}
+}
+.block-editor-block-lock-modal__checklist-item {
+	border-bottom: 1px solid $gray-300;
+	margin-bottom: 0;
+	padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
+
+	.components-base-control__field {
+		align-items: center;
+		display: flex;
+		margin: 0;
+	}
+
+	.components-checkbox-control__label {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-grow: 1;
+
+		svg {
+			margin-right: $grid-unit-15;
+			fill: $gray-900;
+		}
+	}
+}
+
+.block-editor-block-lock-modal__actions {
+	margin-top: $grid-unit-30;
+}

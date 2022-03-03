@@ -105,6 +105,10 @@ export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
 export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
+export {
+	BlockLockModal as __experimentalBlockLockModal,
+	BlockLockMenuItem as __experimentalBlockLockMenuItem,
+} from './block-lock';
 export { default as BlockMover } from './block-mover';
 export {
 	default as BlockPreview,
