@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 (2022-03-03)
+
 ### Breaking Change
 
 -   Bring project's template compatibility with `@wordpress/create-block` v3 ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
