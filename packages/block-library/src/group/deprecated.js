@@ -11,6 +11,7 @@ import {
 	InnerBlocks,
 	getColorClassName,
 	useBlockProps,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 const migrateAttributes = ( attributes ) => {
@@ -38,6 +39,69 @@ const migrateAttributes = ( attributes ) => {
 };
 
 const deprecated = [
+	// Version of the block without a CSS class for the row variation.
+	{
+		attributes: {
+			tagName: {
+				type: 'string',
+				default: 'div',
+			},
+			templateLock: {
+				type: 'string',
+			},
+		},
+		supports: {
+			align: [ 'wide', 'full' ],
+			anchor: true,
+			color: {
+				gradients: true,
+				link: true,
+				__experimentalDefaultControls: {
+					background: true,
+					text: true,
+				},
+			},
+			spacing: {
+				padding: true,
+				blockGap: true,
+				__experimentalDefaultControls: {
+					padding: true,
+					blockGap: true,
+				},
+			},
+			__experimentalBorder: {
+				radius: true,
+				color: true,
+				style: true,
+				width: true,
+				__experimentalDefaultControls: {
+					color: true,
+					radius: true,
+					style: true,
+					width: true,
+				},
+			},
+			typography: {
+				fontSize: true,
+				lineHeight: true,
+				__experimentalFontStyle: true,
+				__experimentalFontWeight: true,
+				__experimentalLetterSpacing: true,
+				__experimentalTextTransform: true,
+				__experimentalDefaultControls: {
+					fontSize: true,
+				},
+			},
+			__experimentalLayout: true,
+		},
+		save( { attributes } ) {
+			const { tagName: Tag } = attributes;
+
+			return (
+				<Tag { ...useInnerBlocksProps.save( useBlockProps.save() ) } />
+			);
+		},
+	},
 	// Version of the block with the double div.
 	{
 		attributes: {

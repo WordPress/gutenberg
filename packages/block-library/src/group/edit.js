@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -34,7 +39,7 @@ const htmlElementMessages = {
 	),
 };
 
-function GroupEdit( { attributes, setAttributes, clientId } ) {
+function GroupEdit( { attributes, setAttributes, clientId, className } ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
@@ -52,7 +57,14 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const { type = 'default' } = usedLayout;
 	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
 
-	const blockProps = useBlockProps();
+	const classes = classnames( className, {
+		'is-row': type === 'flex',
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
+
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
 			? blockProps
