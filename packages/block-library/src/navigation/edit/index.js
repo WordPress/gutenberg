@@ -244,23 +244,25 @@ function Navigation( {
 
 	// "placeholder" shown if:
 	// - we don't have a ref attribute pointing to a Navigation Post.
+	// - we are not running a menu conversion process.
 	// - we don't have uncontrolled blocks.
 	// - (legacy) we have a Navigation Area without a ref attribute pointing to a Navigation Post.
 	const isPlaceholder =
-		! ref && ( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
+		! ref &&
+		! isConvertingClassicMenu &&
+		( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
 
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
 
 	// "loading" state:
+	// - we are running the Classic Menu conversion process.
+	// OR
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
-	// - we are not running the Classic Menu conversion process.
-	const isLoading = !! (
-		ref &&
-		! isEntityAvailable &&
-		! isConvertingClassicMenu
-	);
+	const isLoading =
+		isConvertingClassicMenu ||
+		!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu );
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
