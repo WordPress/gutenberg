@@ -125,7 +125,7 @@ export function getImageBlock( image, sizeSlug, linkTo ) {
 	} );
 }
 
-const v6 = {
+const v7 = {
 	attributes: {
 		images: {
 			type: 'array',
@@ -289,7 +289,7 @@ const v6 = {
 		return attributes;
 	},
 };
-const v5 = {
+const v6 = {
 	attributes: {
 		images: {
 			type: 'array',
@@ -466,7 +466,7 @@ const v5 = {
 	},
 };
 
-const v4b = {
+const v5 = {
 	attributes: {
 		images: {
 			type: 'array',
@@ -623,7 +623,7 @@ const v4b = {
 	},
 };
 
-const v4a = {
+const v4 = {
 	attributes: {
 		images: {
 			type: 'array',
@@ -631,10 +631,15 @@ const v4a = {
 			source: 'query',
 			selector: '.blocks-gallery-item',
 			query: {
-				url: {
+				fullUrl: {
 					source: 'attribute',
 					selector: 'img',
 					attribute: 'src',
+				},
+				url: {
+					source: 'attribute',
+					selector: 'a',
+					attribute: 'href',
 				},
 				link: {
 					source: 'attribute',
@@ -716,17 +721,17 @@ const v4a = {
 						let href;
 
 						switch ( linkTo ) {
-							case 'media':
-								href = image.fullUrl || image.url;
+							case DEPRECATED_LINK_DESTINATION_MEDIA:
+								href = image.url;
 								break;
-							case 'attachment':
+							case DEPRECATED_LINK_DESTINATION_ATTACHMENT:
 								href = image.link;
 								break;
 						}
 
 						const img = (
 							<img
-								src={ image.url }
+								src={ image.fullUrl }
 								alt={ image.alt }
 								data-id={ image.id }
 								data-link={ image.link }
@@ -1131,4 +1136,4 @@ const v1 = {
 	},
 };
 
-export default [ v6, v5, v4a, v4b, v3, v2, v1 ];
+export default [ v7, v6, v5, v4, v3, v2, v1 ];

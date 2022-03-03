@@ -5,8 +5,8 @@
 		"attributes": {
 			"caption": "",
 			"imageCrop": true,
-			"linkTo": "media",
-			"sizeSlug": "large",
+			"linkTo": "none",
+			"align": "wide",
 			"allowResize": false
 		},
 		"innerBlocks": [
@@ -14,13 +14,11 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
-					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
+					"url": "https://sergioestevaofolio.files.wordpress.com/2016/09/cropped-img_9054-1.jpg?w=190",
 					"alt": "",
 					"caption": "",
-					"href": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
-					"id": 705,
-					"sizeSlug": "large",
-					"linkDestination": "media"
+					"id": 1421,
+					"linkDestination": "none"
 				},
 				"innerBlocks": []
 			},
@@ -28,13 +26,11 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
-					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
+					"url": "https://sergioestevaofolio.files.wordpress.com/2017/09/cropped-l1001498-1.jpg?w=580",
 					"alt": "",
 					"caption": "",
-					"href": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
-					"id": 704,
-					"sizeSlug": "large",
-					"linkDestination": "media"
+					"id": 1440,
+					"linkDestination": "none"
 				},
 				"innerBlocks": []
 			},
@@ -42,13 +38,11 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
-					"url": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
+					"url": "https://sergioestevaofolio.files.wordpress.com/2017/05/cropped-l1005945-2-2.jpg?w=580",
 					"alt": "",
 					"caption": "",
-					"href": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
-					"id": 703,
-					"sizeSlug": "large",
-					"linkDestination": "media"
+					"id": 1362,
+					"linkDestination": "none"
 				},
 				"innerBlocks": []
 			}
