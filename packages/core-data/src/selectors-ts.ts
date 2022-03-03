@@ -17,7 +17,9 @@ import type {
 	Name,
 	NameOf,
 	RecordOf,
+	Comment,
 	DefaultContextOf,
+	Entity,
 } from './types';
 
 // Placeholder State type for now
@@ -25,23 +27,35 @@ export type State = {
 	entities: {
 		data: {
 			[ K in Kind ]?: {
-				[ N in Name ]?: {
-					queriedData: {
-						items: {
-							[ C in Context ]?: Record< string | number, any >;
-						};
-						itemIsComplete: {
-							[ C in Context ]?: Record<
-								string | number,
-								boolean
-							>;
-						};
-					};
-				};
+				[ N in Extract<
+					Entity< any >,
+					{ kind: K }
+				>[ 'name' ] ]?: KNState< K, N >;
 			};
 		};
 	};
 };
+
+interface KNState< K extends Kind, N extends Name > {
+	queriedData: {
+		items: {
+			[ C in Context | 'default' ]?: {
+				[ key: number | string ]: RecordOf< K, N, C >;
+			};
+		};
+		itemIsComplete: {
+			[ C in Context | 'default' ]?: {
+				[ key: number | string ]: boolean; // KeyOf< RecordOf< K, N, C > > & ( string | number ),
+			};
+		};
+	};
+}
+
+const zxc: State = {} as any;
+const cmt = zxc.entities.data.root!.comment!.queriedData.items.view?.[ 12 ];
+const cmt2 = zxc.entities.data.root!.comment!.queriedData.items.default?.[ 12 ];
+const cmt3 = zxc.entities.data.root!.comment!.queriedData.itemIsComplete
+	.default?.[ 12 ];
 
 /**
  * Returns the Entity's record object by key. Returns `null` if the value is not
@@ -69,17 +83,18 @@ export const getEntityRecord = createSelector(
 		name: N,
 		key: KeyOf< R > & ( string | number ),
 		query?: Q
-	):
-		| ( Q[ '_fields' ] extends string[]
-				? Partial< RecordOf< K, N, C > >
-				: RecordOf< K, N, C > )
+	): // | RecordOf< KindOf< R >, NameOf< R >, C >
+	| // ( Q[ '_fields' ] extends string[]
+		// 		?
+		Partial< RecordOf< KindOf< R >, NameOf< R >, C > >
+		// : RecordOf< KindOf< R >, NameOf< R >, C > )
 		| null
 		| undefined {
 		const queriedState = state.entities.data[ kind ]?.[ name ]?.queriedData;
 		if ( ! queriedState ) {
 			return undefined;
 		}
-		const context = 'view'; // query?.context ?? 'default';
+		const context = ( query?.context as Context ) ?? 'default';
 
 		if ( query === undefined ) {
 			// If expecting a complete item, validate that completeness.
@@ -92,7 +107,9 @@ export const getEntityRecord = createSelector(
 
 		const item = queriedState.items[ context ]?.[ key ];
 		if ( item && query._fields ) {
-			const filteredItem: Partial< RecordOf< K, N, C > > = {};
+			const filteredItem: Partial<
+				RecordOf< KindOf< R >, NameOf< R >, C >
+			> = {};
 			const fields = getNormalizedCommaSeparable( query._fields );
 			if ( fields !== null ) {
 				for ( let f = 0; f < fields.length; f++ ) {
@@ -102,7 +119,7 @@ export const getEntityRecord = createSelector(
 				}
 			}
 			// @TODO: Get rid of any when a larger portion of this package uses types.
-			return filteredItem as any;
+			return filteredItem;
 		}
 
 		return item;

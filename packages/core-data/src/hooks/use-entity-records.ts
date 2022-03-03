@@ -69,7 +69,7 @@ export default function __experimentalUseEntityRecords< RecordType >(
 	const { data: records, ...rest } = useQuerySelect(
 		( query ) =>
 			query( coreStore ).getEntityRecords( kind, name, queryArgs ),
-		[ kind, name, queryArgs ]
+		[ kind, name, JSON.stringify( queryArgs ) ]
 	);
 
 	return {

@@ -161,7 +161,7 @@ export type KindOf< R extends EntityRecord > = EntityOf< R >[ 'kind' ];
 export type KeyOf<
 	R extends EntityRecord
 > = EntityOf< R >[ 'key' ] extends keyof R
-	? R[ EntityOf< R >[ 'key' ] ]
+	? R[ EntityOf< R >[ 'key' ] ] & ( string | number )
 	: never;
 
 /**
@@ -174,14 +174,30 @@ export type DefaultContextOf<
 	R extends EntityRecord
 > = EntityOf< R >[ 'defaultContext' ];
 
+export type _internalEntityByKN<
+	K extends Kind,
+	N extends Name,
+	C extends Context = any
+> = Extract< Entity< C >, { kind: K; name: N } >;
+
+export type EntityByKN<
+	K extends Kind,
+	N extends Name,
+	C extends Context | 'default' = any
+> = _internalEntityByKN<
+	K,
+	N,
+	C extends 'default' ? _internalEntityByKN< K, N >[ 'defaultContext' ] : C
+>;
+
 /**
  * An entity record type associated with specified kind and name, sourced from PerPackageEntities.
  */
 export type RecordOf<
 	K extends Kind,
 	N extends Name,
-	C extends Context = any
-> = Extract< Entity< C >, { kind: K; name: N } >[ 'recordType' ];
+	C extends Context | 'default' = any
+> = EntityByKN< K, N, C >[ 'recordType' ];
 
 /**
  * A union of all known entity kinds.
