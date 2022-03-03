@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { uniqueId, noop } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useState, createRef, renderToString } from '@wordpress/element';
+import { useState, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -17,11 +17,9 @@ import {
 	Dropdown,
 	withFilters,
 } from '@wordpress/components';
-import { withDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
-import { compose } from '@wordpress/compose';
 import { upload, media as mediaIcon } from '@wordpress/icons';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -37,13 +35,12 @@ const MediaReplaceFlow = ( {
 	mediaIds,
 	allowedTypes,
 	accept,
+	onError = noop,
 	onSelect,
 	onSelectURL,
 	onFilesUpload = noop,
 	onCloseModal = noop,
 	name = __( 'Replace' ),
-	createNotice,
-	removeNotice,
 	children,
 	multiple = false,
 	addToGallery,
@@ -54,41 +51,13 @@ const MediaReplaceFlow = ( {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = createRef();
-	const errorNoticeID = uniqueId(
-		'block-editor/media-replace-flow/error-notice/'
-	);
-
-	const onError = ( message ) => {
-		const errorElement = document.createElement( 'div' );
-		errorElement.innerHTML = renderToString( message );
-		// The default error contains some HTML that,
-		// for example, makes the filename bold.
-		// The notice, by default, accepts strings only and so
-		// we need to remove the html from the error.
-		const renderMsg =
-			errorElement.textContent || errorElement.innerText || '';
-		// We need to set a timeout for showing the notice
-		// so that VoiceOver and possibly other screen readers
-		// can announce the error afer the toolbar button
-		// regains focus once the upload dialog closes.
-		// Otherwise VO simply skips over the notice and announces
-		// the focused element and the open menu.
-		setTimeout( () => {
-			createNotice( 'error', renderMsg, {
-				speak: true,
-				id: errorNoticeID,
-				isDismissible: true,
-			} );
-		}, 1000 );
-	};
 
 	const selectMedia = ( media, closeMenu ) => {
 		closeMenu();
-		setMediaURLValue( media.url );
+		setMediaURLValue( media?.url );
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
-		removeNotice( errorNoticeID );
 	};
 
 	const selectURL = ( newURL ) => {
@@ -102,13 +71,12 @@ const MediaReplaceFlow = ( {
 			return onSelect( files );
 		}
 		onFilesUpload( files );
-		const setMedia = ( [ media ] ) => {
-			selectMedia( media, closeMenu );
-		};
 		mediaUpload( {
 			allowedTypes,
 			filesList: files,
-			onFileChange: setMedia,
+			onFileChange: ( [ media ] ) => {
+				selectMedia( media, closeMenu );
+			},
 			onError,
 		} );
 	};
@@ -218,13 +186,4 @@ const MediaReplaceFlow = ( {
 	);
 };
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { createNotice, removeNotice } = dispatch( noticesStore );
-		return {
-			createNotice,
-			removeNotice,
-		};
-	} ),
-	withFilters( 'editor.MediaReplaceFlow' ),
-] )( MediaReplaceFlow );
+export default withFilters( 'editor.MediaReplaceFlow' )( MediaReplaceFlow );
