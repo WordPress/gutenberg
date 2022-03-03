@@ -11,32 +11,82 @@ import {
 	BlockControls,
 	InspectorControls,
 	JustifyContentControl,
+	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { PanelBody, ToggleControl } from '@wordpress/components';
+import { useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 function Breadcrumb( {
-	crumbTitle,
-	separator,
-	showSeparator,
 	addLeadingSeparator,
+	crumbTitle,
+	editableTitleField = undefined,
+	isSelected,
+	placeholder,
+	separator,
+	setAttributes,
+	showSeparator,
 } ) {
-	let separatorSpan;
 	let crumbAnchor;
+	let separatorSpan;
 
-	if ( separator ) {
+	// Keep track of whether or not the title field has been edited.
+	// This allows the default site title to be rendered as full "real" text.
+	// Then, when it's edited, if the title is removed, it is displayed as a placeholder,
+	// until the block is de-selected, where it is then treated as real text again.
+	const [ isDirty, setIsDirty ] = useState();
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsDirty( false );
+		}
+	}, [ isSelected ] );
+
+	if ( separator || isSelected ) {
 		separatorSpan = (
 			<span className="wp-block-breadcrumbs__separator">
-				{ separator }
+				<RichText
+					aria-label={ __( 'Separator character' ) }
+					placeholder={ __( '/' ) }
+					withoutInteractiveFormatting
+					value={ separator }
+					onChange={ ( html ) =>
+						setAttributes( { separator: html } )
+					}
+				/>
 			</span>
 		);
 	}
 
-	if ( crumbTitle ) {
+	if ( editableTitleField ) {
+		/* eslint-disable jsx-a11y/anchor-is-valid */
+		crumbAnchor = (
+			<a href="#" onClick={ ( event ) => event.preventDefault() }>
+				{ isSelected ? (
+					<RichText
+						aria-label={ __( 'Title override' ) }
+						placeholder={ placeholder }
+						withoutInteractiveFormatting
+						value={
+							isDirty
+								? crumbTitle ?? placeholder
+								: crumbTitle || placeholder
+						}
+						onChange={ ( html ) => {
+							setIsDirty( true );
+							setAttributes( { [ editableTitleField ]: html } );
+						} }
+					/>
+				) : (
+					crumbTitle || placeholder
+				) }
+			</a>
+		);
+		/* eslint-enable */
+	} else if ( crumbTitle ) {
 		/* eslint-disable jsx-a11y/anchor-is-valid */
 		crumbAnchor = (
 			<a href="#" onClick={ ( event ) => event.preventDefault() }>
@@ -57,6 +107,7 @@ function Breadcrumb( {
 
 export default function BreadcrumbsEdit( {
 	attributes,
+	isSelected,
 	setAttributes,
 	context: { postType, postId },
 } ) {
@@ -132,6 +183,7 @@ export default function BreadcrumbsEdit( {
 		// Set breadcrumb names to real hierarchical post titles if available, and
 		// fall back to category names, or placeholder content if neither exists.
 
+		const crumbs = [];
 		let breadcrumbTitles;
 
 		if ( parents?.length ) {
@@ -148,11 +200,19 @@ export default function BreadcrumbsEdit( {
 
 		// Prepend the site title or site title override if specified.
 		if ( showSiteTitle && siteTitle ) {
-			if ( siteTitleOverride ) {
-				breadcrumbTitles.unshift( siteTitleOverride );
-			} else {
-				breadcrumbTitles.unshift( siteTitle );
-			}
+			crumbs.push(
+				<Breadcrumb
+					addLeadingSeparator={ showLeadingSeparator }
+					crumbTitle={ siteTitleOverride }
+					editableTitleField={ 'siteTitleOverride' }
+					isSelected={ isSelected }
+					placeholder={ siteTitle }
+					separator={ separator }
+					setAttributes={ setAttributes }
+					showSeparator={ !! breadcrumbTitles.length }
+					key="site-title"
+				/>
+			);
 		}
 
 		// Append current page title if set.
@@ -160,17 +220,26 @@ export default function BreadcrumbsEdit( {
 			breadcrumbTitles.push( post?.title || __( 'Current page' ) );
 		}
 
-		return breadcrumbTitles.map( ( item, index ) => (
-			<Breadcrumb
-				crumbTitle={ item }
-				separator={ separator }
-				showSeparator={ index < breadcrumbTitles.length - 1 }
-				addLeadingSeparator={ index === 0 && showLeadingSeparator }
-				key={ index }
-			/>
-		) );
+		breadcrumbTitles.forEach( ( item, index ) => {
+			crumbs.push(
+				<Breadcrumb
+					addLeadingSeparator={
+						index === 0 && showLeadingSeparator && ! showSiteTitle
+					}
+					crumbTitle={ item }
+					isSelected={ isSelected }
+					separator={ separator }
+					setAttributes={ setAttributes }
+					showSeparator={ index < breadcrumbTitles.length - 1 }
+					key={ index }
+				/>
+			);
+		} );
+
+		return crumbs;
 	}, [
 		categories,
+		isSelected,
 		parents,
 		showCurrentPageTitle,
 		showLeadingSeparator,
@@ -202,21 +271,6 @@ export default function BreadcrumbsEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Display' ) }>
-					<TextControl
-						label={ __( 'Separator character' ) }
-						help={ __(
-							'Enter a character to display between items.'
-						) }
-						value={ separator || '' }
-						placeholder={ __( 'e.g. / - *' ) }
-						onChange={ ( nextValue ) =>
-							setAttributes( {
-								separator: nextValue,
-							} )
-						}
-						autoCapitalize="none"
-						autoComplete="off"
-					/>
 					<ToggleControl
 						label={ __( 'Show leading separator' ) }
 						checked={ showLeadingSeparator }
@@ -244,23 +298,6 @@ export default function BreadcrumbsEdit( {
 							} )
 						}
 					/>
-					{ showSiteTitle && (
-						<TextControl
-							label={ __( 'Site title override' ) }
-							help={ __(
-								'Enter a label to override the site title'
-							) }
-							value={ siteTitleOverride || '' }
-							placeholder={ __( 'e.g. Home' ) }
-							onChange={ ( nextValue ) =>
-								setAttributes( {
-									siteTitleOverride: nextValue,
-								} )
-							}
-							autoCapitalize="none"
-							autoComplete="off"
-						/>
-					) }
 				</PanelBody>
 			</InspectorControls>
 			<nav { ...blockProps }>

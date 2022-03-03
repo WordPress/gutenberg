@@ -154,14 +154,14 @@ function build_block_core_breadcrumbs_inner_markup_item( $url, $title, $attribut
 		$markup .= sprintf(
 			'<span class="%1$s">%2$s</span>',
 			$separator_class,
-			esc_html( $attributes['separator'] )
+			wp_kses_post( $attributes['separator'] )
 		);
 	}
 
 	$markup .= sprintf(
 		'<a itemprop="item" href="%s">%s%s</a>',
 		esc_url( $url ),
-		sprintf( '<span itemprop="name">%s</span>', esc_html( $title ) ),
+		sprintf( '<span itemprop="name">%s</span>', wp_kses_post( $title ) ),
 		sprintf( '<meta itemprop="position" content="%s" />', $index + 1 )
 	);
 
@@ -172,7 +172,7 @@ function build_block_core_breadcrumbs_inner_markup_item( $url, $title, $attribut
 		$markup .= sprintf(
 			'<span class="%1$s">%2$s</span>',
 			$separator_class,
-			esc_html( $attributes['separator'] )
+			wp_kses_post( $attributes['separator'] )
 		);
 	}
 
