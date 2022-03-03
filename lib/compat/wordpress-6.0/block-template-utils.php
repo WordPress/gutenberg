@@ -62,14 +62,14 @@ function gutenberg_generate_block_templates_export_file() {
 		wp_json_encode( $tree->get_data(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
 	);
 
-	$zip->addFromString(
-		'theme/index.php',
-		'<?php // This file is needed to make the theme work, but it doesn\'t do anything.'
+	$zip->addFile(
+		get_stylesheet_directory() . '/index.php',
+		'theme/index.php'
 	);
 
-	$zip->addFromString(
-		'theme/style.css',
-		file_get_contents( get_stylesheet_directory() . '/style.css' )
+	$zip->addFile(
+		get_stylesheet_directory() . '/style.css',
+		'theme/style.css'
 	);
 
 	// Save changes to the zip file.
