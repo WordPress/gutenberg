@@ -148,7 +148,7 @@ export interface RenderedText< C extends Context > {
  * // updatablePost.title is a string
  * ```
  */
-export type Updatable< T extends EntityRecord< 'edit' > > = {
+export type Updatable< T extends EntityRecord > = {
 	[ K in keyof T ]: T[ K ] extends RenderedText< any > ? string : T[ K ];
 };
 
@@ -185,7 +185,9 @@ export type EntityFromConfig<
 	name: E[ 'name' ];
 	recordType: R;
 	key: E[ 'key' ] extends string ? E[ 'key' ] : 'id';
-	defaultContext: E[ 'baseURLParams' ] extends EntityQuery< infer C >
+	defaultContext: E[ 'baseURLParams' ] extends {
+		context: infer C;
+	}
 		? C
 		: 'view';
 };

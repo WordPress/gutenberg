@@ -38,13 +38,10 @@ export type getEntityRecord = <
 export type getEditedEntityRecord = <
 	R extends RecordOf< K, N >,
 	K extends Kind = KindOf< R >,
-	N extends Name = NameOf< R >,
-	Q extends EntityQuery< 'edit' > = EntityQuery< 'edit' >
+	N extends Name = NameOf< R >
 >(
 	state: State,
 	kind: K,
 	name: N,
-	query?: EntityQuery< 'edit' >
-) => Q[ '_fields' ] extends string[]
-	? Partial< Updatable< RecordOf< K, N, 'edit' > > >
-	: Updatable< RecordOf< K, N, 'edit' > > | null | undefined;
+	recordId: KeyOf< R >
+) => Updatable< RecordOf< K, N, DefaultContextOf< R > > > | null | undefined;
