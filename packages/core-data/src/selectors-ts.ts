@@ -119,22 +119,3 @@ export const getEntityRecord = createSelector(
 		] as any;
 	}
 );
-
-// const commentDefault = getEntityRecord( {}, 'root', 'comment', 15 );
-// // commentDefault is Comment<'edit'>
-
-// const commentPartial = getEntityRecord( {}, 'root', 'comment', 15, {
-// 	_fields: [ 'id' ],
-// } );
-// // commentPartial is Partial< Comment<'edit'> >
-//
-// const commentView = getEntityRecord( {}, 'root', 'comment', 15, {
-// 	context: 'view',
-// } );
-// // commentView is Comment<'view'>
-//
-// const commentInvalidPK = getEntityRecord( {}, 'root', 'comment', '15' );
-// // commentInvalidPK shows a TypeScript error
-//
-// const commentCustom = getEntityRecord<Comment< 'view' >, 'view'>({},	'root',	'comment',15,	{ context: 'view' });
-// // commentCustom is Comment<'view'>
