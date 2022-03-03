@@ -21,19 +21,21 @@ function reducer( state, action ) {
 		case 'RESOLVED':
 			return {
 				...state,
-				isFetching: false,
+				status: 'success',
 				navMenu: action.navMenu,
 			};
 		case 'ERROR':
 			return {
 				...state,
-				isFetching: false,
+				status: 'error',
+				error: action.error,
 				navMenu: null,
 			};
 		case 'LOADING':
 			return {
 				...state,
-				isFetching: true,
+				status: 'fetching',
+				error: null,
 			};
 		default:
 			throw new Error( `Unexpected action type ${ action.type }` );
@@ -58,7 +60,8 @@ function useConvertClassicToBlockMenu( clientId ) {
 
 	const [ state, dispatch ] = useReducer( reducer, {
 		navMenu: null,
-		isFetching: false,
+		status: 'idle',
+		error: null,
 	} );
 
 	const safeDispatch = useSafeDispatch( dispatch );

@@ -237,7 +237,8 @@ function Navigation( {
 		state: classicMenuConversionState,
 	} = useConvertClassicToBlockMenu( clientId );
 
-	const isConvertingClassicMenu = classicMenuConversionState?.isFetching;
+	const isConvertingClassicMenu =
+		classicMenuConversionState?.status === 'fetching';
 
 	// The standard HTML5 tag for the block wrapper.
 	const TagName = 'nav';
