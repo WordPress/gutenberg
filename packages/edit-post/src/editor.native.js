@@ -187,8 +187,8 @@ export default compose( [
 		const {
 			isFeatureActive,
 			getEditorMode,
-			getPreference,
 			__experimentalGetPreviewDeviceType,
+			getHiddenBlockTypes,
 		} = select( editPostStore );
 		const { getBlockTypes } = select( blocksStore );
 
@@ -198,7 +198,7 @@ export default compose( [
 				__experimentalGetPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
 			mode: getEditorMode(),
-			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+			hiddenBlockTypes: getHiddenBlockTypes(),
 			blockTypes: getBlockTypes(),
 		};
 	} ),

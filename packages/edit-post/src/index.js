@@ -108,11 +108,12 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fixedToolbar: false,
-		welcomeGuide: true,
 		fullscreenMode: true,
+		hiddenBlockTypes: [],
+		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		themeStyles: true,
-		showBlockBreadcrumbs: true,
+		welcomeGuide: true,
 		welcomeGuideTemplate: true,
 	} );
 

@@ -11,6 +11,7 @@ import plugin, {
 	withLazySameState,
 	migrateFeaturePreferencesToInterfaceStore,
 	migrateFeaturePreferencesToPreferencesStore,
+	migrateIndividualPreferenceToPreferencesStore,
 } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
@@ -762,6 +763,135 @@ describe( 'migrateFeaturePreferencesToInterfaceStore', () => {
 								featureL: true,
 							},
 						},
+					},
+				},
+			} );
+		} );
+	} );
+
+	describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
+		it( 'migrates an individual preference from the source to the preferences store', () => {
+			const persistenceInterface = createPersistenceInterface( {
+				storageKey: 'test-username',
+			} );
+
+			const initialState = {
+				preferences: {
+					myPreference: '123',
+				},
+			};
+
+			persistenceInterface.set( 'core/test', initialState );
+
+			migrateIndividualPreferenceToPreferencesStore(
+				persistenceInterface,
+				'core/test',
+				'myPreference'
+			);
+
+			expect( persistenceInterface.get() ).toEqual( {
+				'core/preferences': {
+					preferences: {
+						'core/test': {
+							myPreference: '123',
+						},
+					},
+				},
+				'core/test': {
+					preferences: {
+						myPreference: undefined,
+					},
+				},
+			} );
+		} );
+
+		it( 'does not overwrite other preferences in the preferences store', () => {
+			const persistenceInterface = createPersistenceInterface( {
+				storageKey: 'test-username',
+			} );
+
+			const initialState = {
+				preferences: {
+					myPreference: '123',
+				},
+			};
+
+			persistenceInterface.set( 'core/test', initialState );
+			persistenceInterface.set( 'core/preferences', {
+				preferences: {
+					'core/other-store': {
+						preferenceA: 1,
+						preferenceB: 2,
+					},
+					'core/test': {
+						unrelatedPreference: 'unrelated-value',
+					},
+				},
+			} );
+
+			migrateIndividualPreferenceToPreferencesStore(
+				persistenceInterface,
+				'core/test',
+				'myPreference'
+			);
+
+			expect( persistenceInterface.get() ).toEqual( {
+				'core/preferences': {
+					preferences: {
+						'core/other-store': {
+							preferenceA: 1,
+							preferenceB: 2,
+						},
+						'core/test': {
+							unrelatedPreference: 'unrelated-value',
+							myPreference: '123',
+						},
+					},
+				},
+				'core/test': {
+					preferences: {
+						myPreference: undefined,
+					},
+				},
+			} );
+		} );
+
+		it( 'does not migrate data if there is already a matching preference key at the target', () => {
+			const persistenceInterface = createPersistenceInterface( {
+				storageKey: 'test-username',
+			} );
+
+			persistenceInterface.set( 'core/test', {
+				preferences: {
+					myPreference: '123',
+				},
+			} );
+
+			persistenceInterface.set( 'core/preferences', {
+				preferences: {
+					'core/test': {
+						myPreference: 'already-set',
+					},
+				},
+			} );
+
+			migrateIndividualPreferenceToPreferencesStore(
+				persistenceInterface,
+				'core/test',
+				'myPreference'
+			);
+
+			expect( persistenceInterface.get() ).toEqual( {
+				'core/preferences': {
+					preferences: {
+						'core/test': {
+							myPreference: 'already-set',
+						},
+					},
+				},
+				'core/test': {
+					preferences: {
+						myPreference: '123',
 					},
 				},
 			} );

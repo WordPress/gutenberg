@@ -12,6 +12,9 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+
+const EMPTY_ARRAY = [];
+
 /**
  * Returns the current editing mode.
  *
@@ -86,6 +89,10 @@ export const getActiveGeneralSidebarName = createRegistrySelector(
 	}
 );
 
+// The current list of preference keys that have been migrated to the
+// preferences package.
+const MIGRATED_KEYS = [ 'hiddenBlockTypes' ];
+
 /**
  * Returns the preferences (these preferences are persisted locally).
  *
@@ -93,9 +100,34 @@ export const getActiveGeneralSidebarName = createRegistrySelector(
  *
  * @return {Object} Preferences Object.
  */
-export function getPreferences( state ) {
-	return state.preferences;
-}
+export const getPreferences = createRegistrySelector(
+	( select ) => ( state ) => {
+		const editPostPreferences = state.preferences;
+
+		// Some preferences now exist in the preferences store.
+		// Fetch them so that they can be merged into the post
+		// editor preferences.
+		const preferenceStorePreferences = MIGRATED_KEYS.reduce(
+			( accumulatedPrefs, preferenceKey ) => {
+				const value = select( preferencesStore ).get(
+					'core/edit-post',
+					preferenceKey
+				);
+
+				return {
+					...accumulatedPrefs,
+					[ preferenceKey ]: value,
+				};
+			},
+			{}
+		);
+
+		return {
+			...editPostPreferences,
+			...preferenceStorePreferences,
+		};
+	}
+);
 
 /**
  *
@@ -106,10 +138,28 @@ export function getPreferences( state ) {
  * @return {*} Preference Value.
  */
 export function getPreference( state, preferenceKey, defaultValue ) {
-	const preferences = getPreferences( state );
+	// Avoid using the `getPreferences` registry selector where possible.
+	const isMigratedKey = MIGRATED_KEYS.includes( preferenceKey );
+	const preferences = isMigratedKey
+		? getPreferences( state )
+		: state.preferences;
 	const value = preferences[ preferenceKey ];
 	return value === undefined ? defaultValue : value;
 }
+
+/**
+ * Returns an array of blocks that are hidden.
+ *
+ * @return {Array} A list of the hidden block types
+ */
+export const getHiddenBlockTypes = createRegistrySelector( ( select ) => () => {
+	return (
+		select( preferencesStore ).get(
+			'core/edit-post',
+			'hiddenBlockTypes'
+		) ?? EMPTY_ARRAY
+	);
+} );
 
 /**
  * Returns true if the publish sidebar is opened.
