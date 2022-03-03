@@ -68,24 +68,55 @@ function useConvertClassicToBlockMenu( clientId ) {
 	const safeDispatch = useSafeDispatch( dispatch );
 
 	async function convertClassicMenuToBlockMenu( menuId, menuName ) {
+		let navigationMenu;
+		let classicMenuItems;
+
 		const menuItemsParameters = {
 			menus: menuId,
 			per_page: -1,
 			context: 'view',
 		};
 
-		// 1. Fetch the classic Menu items.
-		const classicMenuItems = await registry
-			.resolveSelect( coreStore )
-			.getMenuItems( menuItemsParameters );
+		const fetchError = new Error(
+			sprintf(
+				// translators: %s: the name of a menu (e.g. Header navigation).
+				__( `Unable to fetch classic menu "%s" from API.` ),
+				menuName
+			),
+			{
+				menuId,
+				menuName,
+			}
+		);
 
-		// Offline response results in `null`
+		// 1. Fetch the classic Menu items.
+		try {
+			classicMenuItems = await registry
+				.resolveSelect( coreStore )
+				.getMenuItems( menuItemsParameters );
+		} catch ( e ) {
+			throw fetchError;
+		}
+
+		// Handle offline response which resolves to `null`.
 		if ( classicMenuItems === null ) {
+			throw fetchError;
+		}
+
+		// 2. Convert the classic items into blocks.
+		const { innerBlocks } = menuItemsToBlocks( classicMenuItems );
+
+		// 3. Create the `wp_navigation` Post with the blocks.
+		try {
+			navigationMenu = await createNavigationMenu(
+				menuName,
+				innerBlocks
+			);
+		} catch ( e ) {
 			throw new Error(
-				// TODO - i18n
 				sprintf(
 					// translators: %s: the name of a menu (e.g. Header navigation).
-					__( `Unable to fetch classic menu "%s" from API.` ),
+					__( `Unable to create Navigation Menu "%s".` ),
 					menuName
 				),
 				{
@@ -94,15 +125,6 @@ function useConvertClassicToBlockMenu( clientId ) {
 				}
 			);
 		}
-
-		// 2. Convert the classic items into blocks.
-		const { innerBlocks } = menuItemsToBlocks( classicMenuItems );
-
-		// 3. Create the `wp_navigation` Post with the blocks.
-		const navigationMenu = await createNavigationMenu(
-			menuName,
-			innerBlocks
-		);
 
 		return navigationMenu;
 	}
