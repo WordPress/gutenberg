@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, createRef } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -50,7 +50,7 @@ const MediaReplaceFlow = ( {
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
-	const editMediaButtonRef = createRef();
+	const editMediaButtonRef = useRef();
 
 	const selectMedia = ( media, closeMenu ) => {
 		closeMenu();
