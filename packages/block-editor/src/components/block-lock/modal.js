@@ -25,11 +25,16 @@ export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
 	const { canMove, canRemove } = useSelect(
 		( select ) => {
-			const { canMoveBlock, canRemoveBlock } = select( blockEditorStore );
+			const {
+				canMoveBlock,
+				canRemoveBlock,
+				getBlockRootClientId,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
 
 			return {
-				canMove: canMoveBlock( clientId ),
-				canRemove: canRemoveBlock( clientId ),
+				canMove: canMoveBlock( clientId, rootClientId ),
+				canRemove: canRemoveBlock( clientId, rootClientId ),
 			};
 		},
 		[ clientId ]
