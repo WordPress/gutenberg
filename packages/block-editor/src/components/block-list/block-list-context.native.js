@@ -12,17 +12,17 @@ const Context = createContext( {
 } );
 const { Provider, Consumer } = Context;
 
-function findByRootId( data, rootClientId ) {
+function findBlockLayoutByClientId( data, clientId ) {
 	return Object.entries( data ).reduce( ( acc, entry ) => {
 		const item = entry[ 1 ];
 		if ( acc ) {
 			return acc;
 		}
-		if ( item?.clientId === rootClientId ) {
+		if ( item?.clientId === clientId ) {
 			return item;
 		}
 		if ( item?.innerBlocks && Object.keys( item.innerBlocks ).length > 0 ) {
-			return findByRootId( item.innerBlocks, rootClientId );
+			return findBlockLayoutByClientId( item.innerBlocks, clientId );
 		}
 		return null;
 	}, null );
@@ -69,7 +69,10 @@ function updateBlocksLayouts( blockData ) {
 			},
 		};
 	} else if ( clientId && rootClientId ) {
-		const block = findByRootId( blocksLayouts.current, rootClientId );
+		const block = findBlockLayoutByClientId(
+			blocksLayouts.current,
+			rootClientId
+		);
 
 		if ( block ) {
 			block.innerBlocks[ clientId ] = {
