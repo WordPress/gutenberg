@@ -78,13 +78,6 @@ export const preferences = flow( [
 
 		return state;
 	},
-	editorMode( state, action ) {
-		if ( action.type === 'SWITCH_MODE' ) {
-			return action.mode;
-		}
-
-		return state;
-	},
 	preferredStyleVariations( state, action ) {
 		switch ( action.type ) {
 			case 'UPDATE_PREFERRED_STYLE_VARIATIONS': {
