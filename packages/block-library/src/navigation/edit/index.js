@@ -333,10 +333,17 @@ function Navigation( {
 
 	useEffect( () => {
 		if (
-			! classicMenuConversionState?.isFetching &&
+			classicMenuConversionState?.status === 'success' &&
 			classicMenuConversionState.navMenu
 		) {
 			handleUpdateMenu( classicMenuConversionState.navMenu?.id );
+			hideClassicMenuConversionErrorNotice();
+		}
+
+		if ( classicMenuConversionState?.status === 'error' ) {
+			showClassicMenuConversionErrorNotice(
+				classicMenuConversionState.error
+			);
 		}
 	}, [ classicMenuConversionState ] );
 
@@ -385,6 +392,13 @@ function Navigation( {
 			),
 		}
 	);
+
+	const [
+		showClassicMenuConversionErrorNotice,
+		hideClassicMenuConversionErrorNotice,
+	] = useNavigationNotice( {
+		name: 'block-library/core/navigation/classic-menu-conversion/error',
+	} );
 
 	useEffect( () => {
 		if ( ! isSelected && ! isInnerBlockSelected ) {

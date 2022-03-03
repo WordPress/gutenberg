@@ -78,6 +78,18 @@ function useConvertClassicToBlockMenu( clientId ) {
 			.resolveSelect( coreStore )
 			.getMenuItems( menuItemsParameters );
 
+		// Offline response results in `null`
+		if ( classicMenuItems === null ) {
+			throw new Error(
+				// TODO - i18n
+				`Unable to fetch classic menu "${ menuName }" from API.`,
+				{
+					menuId,
+					menuName,
+				}
+			);
+		}
+
 		// 2. Convert the classic items into blocks.
 		const { innerBlocks } = menuItemsToBlocks( classicMenuItems );
 
@@ -109,9 +121,10 @@ function useConvertClassicToBlockMenu( clientId ) {
 						navMenu,
 					} );
 				} )
-				.catch( () => {
+				.catch( ( e ) => {
 					safeDispatch( {
 						type: 'ERROR',
+						error: e?.message,
 					} );
 				} );
 		},
