@@ -80,7 +80,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 
 	const onFontSizeChange = ( fontSizeLabel, newValue ) => {
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const [ quantity, newUnit ] = parseUnit( newValue );
+		const [ quantity, newUnit ] = parseQuantityAndUnitFromRawValue( newValue );
 		if ( ! Number.isFinite( quantity ) || quantity < 0 || quantity > 100 ) {
 			return;
 		}
