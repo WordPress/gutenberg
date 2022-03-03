@@ -9,6 +9,7 @@ import {
 	useRef,
 	useLayoutEffect,
 } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -82,7 +83,11 @@ function useConvertClassicToBlockMenu( clientId ) {
 		if ( classicMenuItems === null ) {
 			throw new Error(
 				// TODO - i18n
-				`Unable to fetch classic menu "${ menuName }" from API.`,
+				sprintf(
+					// translators: %s: the name of a menu (e.g. Header navigation).
+					__( `Unable to fetch classic menu "%s" from API.` ),
+					menuName
+				),
 				{
 					menuId,
 					menuName,
@@ -107,6 +112,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 			if ( ! menuId || ! menuName ) {
 				safeDispatch( {
 					type: 'ERROR',
+					error: '',
 				} );
 			}
 
