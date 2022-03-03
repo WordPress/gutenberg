@@ -87,8 +87,8 @@ describe( 'Post Editor Performance', () => {
 		// Disable auto-save to avoid impacting the metrics.
 		await page.evaluate( () => {
 			window.wp.data
-				.dispatch( 'core/edit-post' )
-				.__experimentalUpdateLocalAutosaveInterval( 100000000000 );
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-post', 'localAutosaveInterval', 100000000000 );
 			window.wp.data
 				.dispatch( 'core/editor' )
 				.updateEditorSettings( { autosaveInterval: 100000000000 } );

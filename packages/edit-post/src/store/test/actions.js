@@ -196,21 +196,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( '__experimentalUpdateLocalAutosaveInterval', () => {
-		it( 'sets the local autosave interval', () => {
-			registry
-				.dispatch( editPostStore )
-				.__experimentalUpdateLocalAutosaveInterval( 42 );
-
-			// TODO - remove once `getPreference` is deprecated.
-			expect(
-				registry
-					.select( editPostStore )
-					.getPreference( 'localAutosaveInterval' )
-			).toBe( 42 );
-		} );
-	} );
-
 	describe( 'toggleEditorPanelEnabled', () => {
 		it( 'toggles panels to be enabled and not enabled', () => {
 			const defaultState = {

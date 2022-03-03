@@ -18,6 +18,7 @@ import { StrictMode, useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -51,7 +52,7 @@ function Editor( {
 		( select ) => {
 			const {
 				isFeatureActive,
-				getPreference,
+				getPreference: getEditorPreference,
 				__experimentalGetPreviewDeviceType,
 				isEditingTemplate,
 				getEditedPostTemplate,
@@ -61,6 +62,7 @@ function Editor( {
 				coreStore
 			);
 			const { getEditorSettings } = select( editorStore );
+			const { get: getPreference } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
 			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 				postType
@@ -87,12 +89,13 @@ function Editor( {
 				focusMode: isFeatureActive( 'focusMode' ),
 				hasReducedUI: isFeatureActive( 'reducedUI' ),
 				hasThemeStyles: isFeatureActive( 'themeStyles' ),
-				preferredStyleVariations: getPreference(
+				preferredStyleVariations: getEditorPreference(
 					'preferredStyleVariations'
 				),
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				__experimentalLocalAutosaveInterval: getPreference(
+					'core/edit-post',
 					'localAutosaveInterval'
 				),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),

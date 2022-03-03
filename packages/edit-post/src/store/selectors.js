@@ -91,7 +91,7 @@ export const getActiveGeneralSidebarName = createRegistrySelector(
 
 // The current list of preference keys that have been migrated to the
 // preferences package.
-const MIGRATED_KEYS = [ 'hiddenBlockTypes' ];
+const MIGRATED_KEYS = [ 'hiddenBlockTypes', 'localAutosaveInterval' ];
 
 /**
  * Returns the preferences (these preferences are persisted locally).
