@@ -59,7 +59,7 @@ function MyEditorPreferencesModal() {
 		}
 	]
 	return (
-		<PreferencesModal>
+		<PreferencesModal sections={ sections } />
 	);
 }
 ```
