@@ -2,25 +2,15 @@
  * Clicks a block toolbar button.
  *
  * @this {import('./').PageUtils}
- * @param {string} label  The text string of the button label.
- * @param {string} [type] The type of button label: 'ariaLabel' or 'content'.
+ * @param {string} label The text string of the button label.
  */
-export async function clickBlockToolbarButton( label, type = 'ariaLabel' ) {
+export async function clickBlockToolbarButton( label ) {
 	await this.showBlockToolbar();
-	const blockToolbar = this.page.locator( '.block-editor-block-toolbar' );
-	let button;
 
-	if ( type === 'ariaLabel' ) {
-		button = await blockToolbar.locator(
-			`button[aria-label=${ JSON.stringify( label ) }]`
-		);
-	}
-
-	if ( type === 'content' ) {
-		button = await blockToolbar.locator(
-			`button:has-text(${ JSON.stringify( label ) })`
-		);
-	}
+	const blockToolbar = this.page.locator(
+		'role=toolbar[name="Block tools"i]'
+	);
+	const button = blockToolbar.locator( `role=button[name="${ label }"]` );
 
 	await button.click();
 }

@@ -69,10 +69,16 @@ test.describe( 'new editor state', () => {
 		await pageUtils.createNewPost();
 
 		// Enter a title for this post.
-		await page.type( '.editor-post-title__input', 'Here is the title' );
+		await page.type(
+			'role=textbox[name="Add title"i]',
+			'Here is the title'
+		);
 		// Save the post as a draft.
-		await page.click( '.editor-post-save-draft' );
-		await page.waitForSelector( '.editor-post-saved-state.is-saved' );
+		await page.click( 'role=button[name="Save draft"i]' );
+		await page.waitForSelector(
+			'role=button[name="Dismiss this notice"] >> text=Draft saved'
+		);
+
 		// Reload the browser so a post is loaded with a title.
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
