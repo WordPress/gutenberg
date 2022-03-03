@@ -63,12 +63,12 @@ function gutenberg_generate_block_templates_export_file() {
 	);
 
 	$zip->addFile(
-		get_stylesheet_directory() . '/index.php',
+		wp_normalize_path( get_stylesheet_directory() ) . '/index.php',
 		'theme/index.php'
 	);
 
 	$zip->addFile(
-		get_stylesheet_directory() . '/style.css',
+		wp_normalize_path( get_stylesheet_directory() ) . '/style.css',
 		'theme/style.css'
 	);
 
