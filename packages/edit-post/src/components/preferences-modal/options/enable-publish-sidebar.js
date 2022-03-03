@@ -5,11 +5,7 @@ import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifViewportMatches } from '@wordpress/viewport';
 import { store as editorStore } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
-import BaseOption from './base';
+import { PreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
 
 export default compose(
 	withSelect( ( select ) => ( {
