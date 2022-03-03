@@ -466,7 +466,7 @@ const v5 = {
 	},
 };
 
-const v4 = {
+const v4b = {
 	attributes: {
 		images: {
 			type: 'array',
@@ -622,6 +622,155 @@ const v4 = {
 		);
 	},
 };
+
+const v4a = {
+	attributes: {
+		images: {
+			type: 'array',
+			default: [],
+			source: 'query',
+			selector: '.blocks-gallery-item',
+			query: {
+				url: {
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'src',
+				},
+				link: {
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'data-link',
+				},
+				alt: {
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'alt',
+					default: '',
+				},
+				id: {
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'data-id',
+				},
+				caption: {
+					type: 'string',
+					source: 'html',
+					selector: '.blocks-gallery-item__caption',
+				},
+			},
+		},
+		ids: {
+			type: 'array',
+			default: [],
+		},
+		columns: {
+			type: 'number',
+		},
+		caption: {
+			type: 'string',
+			source: 'html',
+			selector: '.blocks-gallery-caption',
+		},
+		imageCrop: {
+			type: 'boolean',
+			default: true,
+		},
+		linkTo: {
+			type: 'string',
+			default: 'none',
+		},
+	},
+	supports: {
+		align: true,
+	},
+	migrate( attributes ) {
+		if ( isGalleryV2Enabled() ) {
+			return runV2Migration( attributes );
+		}
+
+		return {
+			...attributes,
+			ids: map( attributes.ids, ( id ) => {
+				const parsedId = parseInt( id, 10 );
+				return Number.isInteger( parsedId ) ? parsedId : null;
+			} ),
+		};
+	},
+	save( { attributes } ) {
+		const {
+			images,
+			columns = defaultColumnsNumberV1( attributes ),
+			imageCrop,
+			caption,
+			linkTo,
+		} = attributes;
+
+		return (
+			<figure
+				className={ `columns-${ columns } ${
+					imageCrop ? 'is-cropped' : ''
+				}` }
+			>
+				<ul className="blocks-gallery-grid">
+					{ images.map( ( image ) => {
+						let href;
+
+						switch ( linkTo ) {
+							case 'media':
+								href = image.fullUrl || image.url;
+								break;
+							case 'attachment':
+								href = image.link;
+								break;
+						}
+
+						const img = (
+							<img
+								src={ image.url }
+								alt={ image.alt }
+								data-id={ image.id }
+								data-link={ image.link }
+								className={
+									image.id ? `wp-image-${ image.id }` : null
+								}
+							/>
+						);
+
+						return (
+							<li
+								key={ image.id || image.url }
+								className="blocks-gallery-item"
+							>
+								<figure>
+									{ href ? (
+										<a href={ href }>{ img }</a>
+									) : (
+										img
+									) }
+									{ ! RichText.isEmpty( image.caption ) && (
+										<RichText.Content
+											tagName="figcaption"
+											className="blocks-gallery-item__caption"
+											value={ image.caption }
+										/>
+									) }
+								</figure>
+							</li>
+						);
+					} ) }
+				</ul>
+				{ ! RichText.isEmpty( caption ) && (
+					<RichText.Content
+						tagName="figcaption"
+						className="blocks-gallery-caption"
+						value={ caption }
+					/>
+				) }
+			</figure>
+		);
+	},
+};
+
 const v3 = {
 	attributes: {
 		images: {
@@ -982,4 +1131,4 @@ const v1 = {
 	},
 };
 
-export default [ v6, v5, v4, v3, v2, v1 ];
+export default [ v6, v5, v4a, v4b, v3, v2, v1 ];
