@@ -25,41 +25,39 @@ import { isRTL, __ } from '@wordpress/i18n';
 
 const PREFERENCES_MENU = 'preferences-menu';
 
-export default function PreferencesModal(
-	closeModal,
-	isModalActive,
-	sections
-) {
+export default function PreferencesModal( { closeModal, sections } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	// This is also used to sync the two different rendered components
 	// between small and large viewports.
 	const [ activeMenu, setActiveMenu ] = useState( PREFERENCES_MENU );
-
 	/**
 	 * Create helper objects from `sections` for easier data handling.
 	 * `tabs` is used for creating the `TabPanel` and `sectionsContentMap`
 	 * is used for easier access to active tab's content.
 	 */
-	const { tabs, sectionsContentMap } = useMemo(
-		() =>
-			sections.reduce(
+	const { tabs, sectionsContentMap } = useMemo( () => {
+		let mappedTabs = {
+			tabs: [],
+			sectionsContentMap: {},
+		};
+		if ( sections.length ) {
+			mappedTabs = sections.reduce(
 				( accumulator, { name, tabLabel: title, content } ) => {
 					accumulator.tabs.push( { name, title } );
 					accumulator.sectionsContentMap[ name ] = content;
 					return accumulator;
 				},
 				{ tabs: [], sectionsContentMap: {} }
-			),
-		[ sections ]
-	);
+			);
+		}
+		return mappedTabs;
+	}, [ sections ] );
+
 	const getCurrentTab = useCallback(
 		( tab ) => sectionsContentMap[ tab.name ] || null,
 		[ sectionsContentMap ]
 	);
-	if ( ! isModalActive ) {
-		return null;
-	}
 
 	let modalContent;
 	// We render different components based on the viewport size.
@@ -115,34 +113,39 @@ export default function PreferencesModal(
 						</CardBody>
 					</Card>
 				</NavigatorScreen>
-				{ sections.map( ( section ) => {
-					return (
-						<NavigatorScreen
-							key={ `${ section.name }-menu` }
-							path={ section.name }
-						>
-							<Card isBorderless size="large">
-								<CardHeader
-									isBorderless={ false }
-									justify="left"
-									size="small"
-									gap="6"
-								>
-									<NavigatorBackButton
-										icon={
-											isRTL() ? chevronRight : chevronLeft
-										}
-										aria-label={ __(
-											'Navigate to the previous view'
-										) }
-									/>
-									<Text size="16">{ section.tabLabel }</Text>
-								</CardHeader>
-								<CardBody>{ section.content }</CardBody>
-							</Card>
-						</NavigatorScreen>
-					);
-				} ) }
+				{ sections.length &&
+					sections.map( ( section ) => {
+						return (
+							<NavigatorScreen
+								key={ `${ section.name }-menu` }
+								path={ section.name }
+							>
+								<Card isBorderless size="large">
+									<CardHeader
+										isBorderless={ false }
+										justify="left"
+										size="small"
+										gap="6"
+									>
+										<NavigatorBackButton
+											icon={
+												isRTL()
+													? chevronRight
+													: chevronLeft
+											}
+											aria-label={ __(
+												'Navigate to the previous view'
+											) }
+										/>
+										<Text size="16">
+											{ section.tabLabel }
+										</Text>
+									</CardHeader>
+									<CardBody>{ section.content }</CardBody>
+								</Card>
+							</NavigatorScreen>
+						);
+					} ) }
 			</NavigatorProvider>
 		);
 	}
