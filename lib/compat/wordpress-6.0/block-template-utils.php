@@ -37,7 +37,7 @@ function gutenberg_generate_block_templates_export_file() {
 	$zip->addEmptyDir( $theme_name . '/parts' );
 
 	// Get path of the theme.
-	$theme_path = get_stylesheet_directory();
+	$theme_path = wp_normalize_path( get_stylesheet_directory() );
 
 	// Create recursive directory iterator.
 	$theme_files = new RecursiveIteratorIterator(
