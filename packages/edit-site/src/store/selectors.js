@@ -36,12 +36,16 @@ import {
 /**
  * Helper for getting a preference from the preferences store.
  *
- * This is only used so that `getSettings` doesn't need to be
- * made a registry selector. Do not export it.
+ * This is only present so that `getSettings` doesn't need to be made a
+ * registry selector.
+ *
+ * It's unstable because the selector needs to be exported and so part of the
+ * public API to work.
  */
-const getPreference = createRegistrySelector( ( select ) => ( state, name ) => {
-	return select( preferencesStore ).get( 'core/edit-site', name );
-} );
+export const __unstableGetPreference = createRegistrySelector(
+	( select ) => ( state, name ) =>
+		select( preferencesStore ).get( 'core/edit-site', name )
+);
 
 /**
  * Returns whether the given feature is enabled or not.
@@ -57,7 +61,7 @@ export function isFeatureActive( state, featureName ) {
 		alternative: `select( 'core/preferences' ).get`,
 	} );
 
-	return !! getPreference( state, featureName );
+	return !! __unstableGetPreference( state, featureName );
 }
 
 /**
@@ -111,8 +115,11 @@ export const getSettings = createSelector(
 		const settings = {
 			...state.settings,
 			outlineMode: true,
-			focusMode: !! getPreference( state, 'focusMode' ),
-			hasFixedToolbar: !! getPreference( state, 'fixedToolbar' ),
+			focusMode: !! __unstableGetPreference( state, 'focusMode' ),
+			hasFixedToolbar: !! __unstableGetPreference(
+				state,
+				'fixedToolbar'
+			),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 			__experimentalReusableBlocks: getReusableBlocks( state ),
 			__experimentalPreferPatternsOnRoot:
@@ -136,8 +143,8 @@ export const getSettings = createSelector(
 	( state ) => [
 		getCanUserCreateMedia( state ),
 		state.settings,
-		getPreference( state, 'focusMode' ),
-		getPreference( state, 'fixedToolbar' ),
+		__unstableGetPreference( state, 'focusMode' ),
+		__unstableGetPreference( state, 'fixedToolbar' ),
 		getReusableBlocks( state ),
 		getEditedPostType( state ),
 	]
@@ -351,8 +358,10 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 /**
  * Returns the current editing mode.
  *
+ * @param {Object} state Global application state.
+ *
  * @return {string} Editing mode.
  */
-export function getEditorMode() {
-	return getPreference( 'editorMode' );
+export function getEditorMode( state ) {
+	return __unstableGetPreference( state, 'editorMode' );
 }
