@@ -39,6 +39,7 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -339,18 +340,24 @@ function Navigation( {
 	}
 
 	useEffect( () => {
+		if ( classicMenuConversionState?.status === 'fetching' ) {
+			speak( __( 'Classic menu importing.' ) );
+		}
+
 		if (
 			classicMenuConversionState?.status === 'success' &&
 			classicMenuConversionState.navMenu
 		) {
 			handleUpdateMenu( classicMenuConversionState.navMenu?.id );
 			hideClassicMenuConversionErrorNotice();
+			speak( __( 'Classic menu imported successfully.' ) );
 		}
 
 		if ( classicMenuConversionState?.status === 'error' ) {
 			showClassicMenuConversionErrorNotice(
 				classicMenuConversionState.error
 			);
+			speak( __( 'Classic menu import failed.' ) );
 		}
 	}, [ classicMenuConversionState ] );
 
