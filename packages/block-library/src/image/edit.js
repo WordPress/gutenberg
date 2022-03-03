@@ -171,6 +171,12 @@ export function ImageEdit( {
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			url: undefined,
+		} );
+		setTemporaryURL( undefined );
 	}
 
 	function onSelectImage( media ) {
@@ -287,7 +293,7 @@ export function ImageEdit( {
 		} );
 	}
 
-	let isTemp = isTemporaryImage( id, url );
+	const isTemp = isTemporaryImage( id, url );
 
 	// Upload a temporary image on mount.
 	useEffect( () => {
@@ -304,15 +310,7 @@ export function ImageEdit( {
 					onSelectImage( img );
 				},
 				allowedTypes: ALLOWED_MEDIA_TYPES,
-				onError: ( message ) => {
-					isTemp = false;
-					noticeOperations.createErrorNotice( message );
-					setAttributes( {
-						src: undefined,
-						id: undefined,
-						url: undefined,
-					} );
-				},
+				onError: onUploadError,
 			} );
 		}
 	}, [] );
