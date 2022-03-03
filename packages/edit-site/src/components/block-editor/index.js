@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockList,
 	BlockEditorProvider,
@@ -42,17 +42,35 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, templateId, page } = useSelect(
+	const { settings } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				getEditedPostType,
-				getEditedPostId,
-				getPage,
-			} = select( editSiteStore );
+			let storedSettings = select( editSiteStore ).getSettings(
+				setIsInserterOpen
+			);
+
+			if ( ! storedSettings.__experimentalBlockPatterns ) {
+				storedSettings = {
+					...storedSettings,
+					__experimentalBlockPatterns: select(
+						coreStore
+					).getBlockPatterns(),
+				};
+			}
 
 			return {
-				settings: getSettings( setIsInserterOpen ),
+				settings: storedSettings,
+			};
+		},
+		[ setIsInserterOpen ]
+	);
+
+	const { templateType, templateId, page } = useSelect(
+		( select ) => {
+			const { getEditedPostType, getEditedPostId, getPage } = select(
+				editSiteStore
+			);
+
+			return {
 				templateType: getEditedPostType(),
 				templateId: getEditedPostId(),
 				page: getPage(),
@@ -60,6 +78,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		},
 		[ setIsInserterOpen ]
 	);
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		templateType
