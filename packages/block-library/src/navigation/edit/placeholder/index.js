@@ -85,10 +85,6 @@ export default function NavigationPlaceholder( {
 							currentMenuId={ currentMenuId }
 							clientId={ clientId }
 							onSelect={ onFinish }
-							onSelectClassic={ ( menu ) => {
-								const isClassicMenu = true;
-								onFinish( menu, isClassicMenu );
-							} }
 							toggleProps={ {
 								variant: 'tertiary',
 								iconPosition: 'right',

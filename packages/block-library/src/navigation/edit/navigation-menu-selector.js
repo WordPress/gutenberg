@@ -21,7 +21,6 @@ import useNavigationEntities from '../use-navigation-entities';
 export default function NavigationMenuSelector( {
 	currentMenuId,
 	onSelect,
-	onSelectClassic,
 	onCreateNew,
 	showManageActions = false,
 	actionLabel,
@@ -49,6 +48,14 @@ export default function NavigationMenuSelector( {
 			);
 		},
 		[ navigationMenus ]
+	);
+
+	const handleSelectClassic = useCallback(
+		( _onClose, menu ) => () => {
+			_onClose();
+			onSelect( menu );
+		},
+		[]
 	);
 
 	const menuChoices = useMemo( () => {
@@ -107,10 +114,10 @@ export default function NavigationMenuSelector( {
 								const label = decodeEntities( menu.name );
 								return (
 									<MenuItem
-										onClick={ () => {
-											onClose();
-											onSelectClassic( menu );
-										} }
+										onClick={ handleSelectClassic(
+											onClose,
+											menu
+										) }
 										key={ menu.id }
 										aria-label={ sprintf(
 											createActionLabel,

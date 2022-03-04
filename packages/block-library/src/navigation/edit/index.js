@@ -544,17 +544,17 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onFinish={ ( post, isClassicMenu = false ) => {
-						if ( ! post ) {
-							return;
-						}
-
+					onFinish={ ( navPostOrClassicMenu ) => {
+						const isClassicMenu = navPostOrClassicMenu.hasOwnProperty(
+							'auto_add'
+						);
 						if ( isClassicMenu ) {
-							// Setting ref and selecting block
-							// handled by effect post-conversion.
-							convert( post.id, post.name );
+							convert(
+								navPostOrClassicMenu.id,
+								navPostOrClassicMenu.name
+							);
 						} else {
-							handleUpdateMenu( post.id );
+							handleUpdateMenu( navPostOrClassicMenu?.id );
 						}
 					} }
 				/>
@@ -571,11 +571,18 @@ function Navigation( {
 							<NavigationMenuSelector
 								currentMenuId={ ref }
 								clientId={ clientId }
-								onSelect={ ( { id } ) => {
-									setRef( id );
-								} }
-								onSelectClassic={ ( classicMenu ) => {
-									convert( classicMenu.id, classicMenu.name );
+								onSelect={ ( navPostOrClassicMenu ) => {
+									const isClassicMenu = navPostOrClassicMenu.hasOwnProperty(
+										'auto_add'
+									);
+									if ( isClassicMenu ) {
+										convert(
+											navPostOrClassicMenu.id,
+											navPostOrClassicMenu.name
+										);
+									} else {
+										setRef( navPostOrClassicMenu?.id );
+									}
 								} }
 								onCreateNew={ startWithEmptyMenu }
 								/* translators: %s: The name of a menu. */
