@@ -4,6 +4,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useReducer } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
+import { lock, unlock } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -34,7 +35,9 @@ export default function BlockLockMenuItem( {
 
 	return (
 		<>
-			<MenuItem onClick={ toggleModal }>{ label }</MenuItem>
+			<MenuItem icon={ isLocked ? unlock : lock } onClick={ toggleModal }>
+				{ label }
+			</MenuItem>
 			{ isModalOpen && (
 				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
 			) }
