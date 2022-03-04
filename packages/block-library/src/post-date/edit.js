@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { useEntityProp } from '@wordpress/core-data';
 import { useRef } from '@wordpress/element';
-import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
+import { dateI18n } from '@wordpress/date';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -24,7 +24,7 @@ import {
 	PanelBody,
 	CustomSelectControl,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 
@@ -35,30 +35,39 @@ export default function PostDateEdit( {
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
+	const [ timeFormat ] = useEntityProp( 'root', 'site', 'time_format' );
 	const [ date, setDate ] = useEntityProp(
 		'postType',
 		postType,
 		'date',
 		postId
 	);
-	const settings = __experimentalGetSettings();
-	// To know if the current time format is a 12 hour time, look for "a".
-	// Also make sure this "a" is not escaped by a "/".
-	const is12Hour = /a(?!\\)/i.test(
-		settings.formats.time
-			.toLowerCase() // Test only for the lower case "a".
-			.replace( /\\\\/g, '' ) // Replace "//" with empty strings.
-			.split( '' )
-			.reverse()
-			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
-	);
-	const formatOptions = Object.values( settings.formats ).map(
-		( formatOption ) => ( {
-			key: formatOption,
-			name: dateI18n( formatOption, date ),
-		} )
-	);
-	const resolvedFormat = format || siteFormat || settings.formats.date;
+	// To know if the time format is a 12 hour time, look for any of the 12 hour
+	// format characters: 'a', 'A', 'g', and 'h'. The character must be
+	// unescaped, i.e. not preceded by a '\'. Coincidentally, 'aAgh' is how I
+	// feel when working with regular expressions.
+	// https://www.php.net/manual/en/datetime.format.php
+	const is12Hour = /(?:^|[^\\])[aAgh]/.test( timeFormat );
+	const formatOptions = [
+		{
+			key: null,
+			name: sprintf(
+				// translators: %s: Example of how the date will look if selected.
+				_x( 'Site default (%s)', 'date format option' ),
+				dateI18n( siteFormat, date )
+			),
+		},
+		...[
+			_x( 'M jS', 'date format option' ),
+			_x( 'M j, Y', 'date format option' ),
+			_x( 'M j, Y, h:i A', 'date format option' ),
+			_x( 'F j, Y', 'date format option' ),
+			_x( 'd/m/Y', 'date format option' ),
+		].map( ( suggestedFormat ) => ( {
+			key: suggestedFormat,
+			name: dateI18n( suggestedFormat, date ),
+		} ) ),
+	];
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -69,7 +78,7 @@ export default function PostDateEdit( {
 
 	let postDate = date ? (
 		<time dateTime={ dateI18n( 'c', date ) } ref={ timeRef }>
-			{ dateI18n( resolvedFormat, date ) }
+			{ dateI18n( format ?? siteFormat, date ) }
 		</time>
 	) : (
 		__( 'Post Date' )
@@ -139,7 +148,7 @@ export default function PostDateEdit( {
 							} )
 						}
 						value={ formatOptions.find(
-							( option ) => option.key === resolvedFormat
+							( option ) => option.key === format
 						) }
 					/>
 				</PanelBody>
