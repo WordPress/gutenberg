@@ -2248,6 +2248,7 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: {},
 					attributes: {},
+					parents: {},
 				},
 				blockListSettings: {},
 				settings: {},
@@ -2284,6 +2285,7 @@ describe( 'selectors', () => {
 					attributes: {
 						block1: {},
 					},
+					parents: {},
 				},
 				blockListSettings: {
 					block1: {},
@@ -2304,6 +2306,7 @@ describe( 'selectors', () => {
 					attributes: {
 						block1: {},
 					},
+					parents: {},
 				},
 				blockListSettings: {
 					block1: {},
@@ -2368,6 +2371,7 @@ describe( 'selectors', () => {
 					attributes: {
 						block1: {},
 					},
+					parents: {},
 				},
 				blockListSettings: {
 					block1: {
@@ -2404,6 +2408,7 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: {},
 					attributes: {},
+					parents: {},
 				},
 				blockListSettings: {},
 				settings: {},
@@ -2428,6 +2433,7 @@ describe( 'selectors', () => {
 						2: {},
 						3: {},
 					},
+					parents: {},
 				},
 				blockListSettings: {
 					1: {
@@ -2464,6 +2470,32 @@ describe( 'selectors', () => {
 				settings: {},
 			};
 			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( false );
+		} );
+
+		it( 'should allow blocks to be inserted into any parent if an ancestor allows it', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-b' },
+						block2: { name: 'core/test-block-a' },
+					},
+					attributes: {
+						block1: {},
+						block2: {},
+					},
+					parents: {
+						block2: 'block1',
+					},
+				},
+				blockListSettings: {
+					block1: {},
+					block2: {},
+				},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType( state, 'core/test-block-c', 'block2' )
+			).toBe( true );
 		} );
 	} );
 
@@ -2664,6 +2696,7 @@ describe( 'selectors', () => {
 						},
 					},
 					controlledInnerBlocks: {},
+					parents: {},
 				},
 				preferences: {
 					insertUsage: {},
@@ -2872,6 +2905,7 @@ describe( 'selectors', () => {
 						},
 					},
 					controlledInnerBlocks: {},
+					parents: {},
 				},
 				preferences: {
 					insertUsage: {},
