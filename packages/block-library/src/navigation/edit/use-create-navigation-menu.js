@@ -28,6 +28,19 @@ export default function useCreateNavigationMenu( clientId ) {
 	// a new navigation menu when the user completes the final step.
 	const create = useCallback(
 		async ( title = null, blocks = [] ) => {
+			// Guard against creating Navigations without a title.
+			// Note you can pass no title, but if one is passed it must be
+			// a string otherwise the title may end up being empty.
+			if ( title && typeof title !== 'string' ) {
+				setError(
+					'Invalid title supplied when creating Navigation Menu.'
+				);
+				setStatus( ERROR );
+				throw new Error(
+					`Value of supplied title argument was not a string.`
+				);
+			}
+
 			setStatus( PENDING );
 			setValue( null );
 			setError( null );
