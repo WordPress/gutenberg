@@ -153,46 +153,6 @@ export type Updatable< T extends EntityRecord > = {
 };
 
 /**
- * Helped type to turn an entity type configuration entry such as:
- *
- * ```ts
- * export const attachment = {
- * 	name: 'media',
- * 	kind: 'root',
- * 	baseURL: '/wp/v2/media',
- * 	baseURLParams: { context: 'edit' },
- * 	plural: 'mediaItems',
- * 	label: __( 'Media' ),
- * } as const;
- * ```
- *
- * Into a lookup type adhering to EntityInterface used by RecordOf
- * to find the record type related to the specified kind and name.
- *
- * @see RecordOf
- * @see EntityInterface
- */
-export type EntityFromConfig<
-	E extends {
-		kind: string;
-		name: string;
-		key?: string;
-		baseURLParams?: EntityQuery< any >;
-	},
-	R
-> = {
-	kind: E[ 'kind' ];
-	name: E[ 'name' ];
-	recordType: R;
-	key: E[ 'key' ] extends string ? E[ 'key' ] : 'id';
-	defaultContext: E[ 'baseURLParams' ] extends {
-		context: infer C;
-	}
-		? C
-		: 'view';
-};
-
-/**
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
 export type EntityQuery< C extends Context > = Record< string, any > & {

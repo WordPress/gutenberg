@@ -3,6 +3,56 @@
  */
 import type { Context } from './helpers';
 import type { CoreEntity } from '../entities';
+import { EntityQuery } from './helpers';
+
+/**
+ * An entity type configuration entry as seen in src/entities.js.
+ *
+ * @example
+ * ```ts
+ * export const attachment = {
+ * 	name: 'media',
+ * 	kind: 'root',
+ * 	baseURL: '/wp/v2/media',
+ * 	baseURLParams: { context: 'edit' },
+ * 	plural: 'mediaItems',
+ * 	label: __( 'Media' ),
+ * } as const;
+ * ```
+ */
+export interface EntityDeclaration {
+	baseURL?: string;
+	baseURLParams?: EntityQuery< any >;
+	getTitle?: ( record: unknown ) => string;
+	key?: string;
+	kind: string;
+	label?: string;
+	name: string;
+	plural?: string;
+	rawAttributes?: readonly string[];
+	title?: string;
+	transientEdits?: { blocks: boolean };
+}
+
+/**
+ * Helped type to turn an entity type configuration entry into a lookup
+ * type adhering to EntityInterface used by RecordOf to find the record
+ * type related to the specified kind and name.
+ *
+ * @see RecordOf
+ * @see EntityInterface
+ */
+export type EntityFromConfig< E extends EntityDeclaration, R > = {
+	kind: E[ 'kind' ];
+	name: E[ 'name' ];
+	recordType: R;
+	key: E[ 'key' ] extends string ? E[ 'key' ] : 'id';
+	defaultContext: E[ 'baseURLParams' ] extends {
+		context: infer C;
+	}
+		? C
+		: 'view';
+};
 
 /**
  * The type that the entries of PerPackageEntities must adhere to. This is for reference only,
@@ -95,7 +145,12 @@ export type EntityRecord<
 /**
  * An entity corresponding to a specified record type.
  */
-type EntityOf< R extends EntityRecord > = Extract< Entity, { recordType: R } >;
+export type EntityOf<
+	RecordOrKind extends EntityRecord | Kind,
+	N extends Name = undefined
+> = RecordOrKind extends EntityRecord
+	? Extract< Entity, { recordType: RecordOrKind } >
+	: Extract< Entity, { kind: RecordOrKind; name: N } >;
 
 /**
  * Name of the requested entity.
@@ -113,9 +168,11 @@ export type KindOf< R extends EntityRecord > = EntityOf< R >[ 'kind' ];
  * For core entities, the key type is computed using the entity configuration in entities.js.
  */
 export type KeyOf<
-	R extends EntityRecord
-> = EntityOf< R >[ 'key' ] extends keyof R
-	? R[ EntityOf< R >[ 'key' ] ]
+	RecordOrKind extends EntityRecord | Kind,
+	N extends Name = undefined,
+	E extends Entity = EntityOf< RecordOrKind, N >
+> = E[ 'key' ] extends keyof E[ 'recordType' ]
+	? E[ 'recordType' ][ E[ 'key' ] ]
 	: never;
 
 /**
@@ -127,9 +184,7 @@ export type KeyOf<
 export type DefaultContextOf<
 	RecordOrKind extends EntityRecord | Kind,
 	N extends Name = undefined
-> = RecordOrKind extends EntityRecord
-	? EntityOf< RecordOrKind >[ 'defaultContext' ]
-	: Extract< Entity, { kind: RecordOrKind; name: N } >[ 'defaultContext' ];
+> = EntityOf< RecordOrKind, N >[ 'defaultContext' ];
 
 /**
  * An entity record type associated with specified kind and name, sourced from PerPackageEntities.
@@ -137,7 +192,7 @@ export type DefaultContextOf<
 export type RecordOf<
 	K extends Kind,
 	N extends Name,
-	C extends Context = any
+	C extends Context = DefaultContextOf< K, N >
 > = Extract< Entity< C >, { kind: K; name: N } >[ 'recordType' ];
 
 /**

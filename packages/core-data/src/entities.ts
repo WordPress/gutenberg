@@ -14,8 +14,8 @@ import { __ } from '@wordpress/i18n';
  */
 import { addEntities } from './actions';
 import type * as Records from './types';
-import type { Kind, Name, Context } from './types';
-import type { EntityFromConfig } from './types/helpers';
+import type { Context } from './types';
+import type { EntityFromConfig, Kind, Name } from './types/entities';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
