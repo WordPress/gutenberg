@@ -70,6 +70,20 @@ The label of the replace button.
 -   Type: `string`
 -   Required: No
 
+### createNotice
+
+Creates a media replace notice.
+
+-   Type: `func`
+-   Required: No
+
+### removeNotice
+
+Removes a media replace notice.
+
+-   Type: `func`
+-   Required: No
+
 ### children
 
 -   Type: `Element`

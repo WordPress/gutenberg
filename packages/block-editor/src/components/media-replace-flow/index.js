@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,9 +17,12 @@ import {
 	Dropdown,
 	withFilters,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, withDispatch } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
 import { upload, media as mediaIcon } from '@wordpress/icons';
+import { compose } from '@wordpress/compose';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -35,12 +38,14 @@ const MediaReplaceFlow = ( {
 	mediaIds,
 	allowedTypes,
 	accept,
-	onError = noop,
+	onError,
 	onSelect,
 	onSelectURL,
 	onFilesUpload = noop,
 	onCloseModal = noop,
 	name = __( 'Replace' ),
+	createNotice,
+	removeNotice,
 	children,
 	multiple = false,
 	addToGallery,
@@ -51,6 +56,30 @@ const MediaReplaceFlow = ( {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = useRef();
+	const errorNoticeID = uniqueId(
+		'block-editor/media-replace-flow/error-notice/'
+	);
+
+	const onUploadError = ( message ) => {
+		const safeMessage = stripHTML( message );
+		if ( onError ) {
+			onError( safeMessage );
+			return;
+		}
+		// We need to set a timeout for showing the notice
+		// so that VoiceOver and possibly other screen readers
+		// can announce the error afer the toolbar button
+		// regains focus once the upload dialog closes.
+		// Otherwise VO simply skips over the notice and announces
+		// the focused element and the open menu.
+		setTimeout( () => {
+			createNotice( 'error', safeMessage, {
+				speak: true,
+				id: errorNoticeID,
+				isDismissible: true,
+			} );
+		}, 1000 );
+	};
 
 	const selectMedia = ( media, closeMenu ) => {
 		closeMenu();
@@ -58,6 +87,7 @@ const MediaReplaceFlow = ( {
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
+		removeNotice( errorNoticeID );
 	};
 
 	const selectURL = ( newURL ) => {
@@ -77,7 +107,7 @@ const MediaReplaceFlow = ( {
 			onFileChange: ( [ media ] ) => {
 				selectMedia( media, closeMenu );
 			},
-			onError,
+			onError: onUploadError,
 		} );
 	};
 
@@ -186,4 +216,13 @@ const MediaReplaceFlow = ( {
 	);
 };
 
-export default withFilters( 'editor.MediaReplaceFlow' )( MediaReplaceFlow );
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { createNotice, removeNotice } = dispatch( noticesStore );
+		return {
+			createNotice,
+			removeNotice,
+		};
+	} ),
+	withFilters( 'editor.MediaReplaceFlow' ),
+] )( MediaReplaceFlow );
