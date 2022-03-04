@@ -447,21 +447,24 @@ function Navigation( {
 		ref,
 	] );
 
-	const handleSelectNavigation = ( navPostOrClassicMenu ) => {
-		if ( ! navPostOrClassicMenu ) {
-			return;
-		}
+	const handleSelectNavigation = useCallback(
+		( navPostOrClassicMenu ) => {
+			if ( ! navPostOrClassicMenu ) {
+				return;
+			}
 
-		const isClassicMenu = navPostOrClassicMenu?.hasOwnProperty(
-			'auto_add'
-		);
+			const isClassicMenu = navPostOrClassicMenu?.hasOwnProperty(
+				'auto_add'
+			);
 
-		if ( isClassicMenu ) {
-			convert( navPostOrClassicMenu.id, navPostOrClassicMenu.name );
-		} else {
-			handleUpdateMenu( navPostOrClassicMenu?.id );
-		}
-	};
+			if ( isClassicMenu ) {
+				convert( navPostOrClassicMenu.id, navPostOrClassicMenu.name );
+			} else {
+				handleUpdateMenu( navPostOrClassicMenu?.id );
+			}
+		},
+		[ convert, handleUpdateMenu ]
+	);
 
 	const startWithEmptyMenu = useCallback( () => {
 		registry.batch( () => {
