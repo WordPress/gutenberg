@@ -19,10 +19,6 @@ import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 
-/** @typedef {import('./types/index').getEntityRecord} getEntityRecord */
-/** @typedef {import('./types/index').getRawEntityRecord} getRawEntityRecord */
-/** @typedef {import('./types/index').getEditedEntityRecord} getEditedEntityRecord */
-
 /**
  * Shared reference to an empty object for cases where it is important to avoid
  * returning a new object reference on every invocation, as in a connected or
@@ -128,15 +124,13 @@ export function getEntity( state, kind, name ) {
  * yet received, undefined if the value entity is known to not exist, or the
  * entity object if it exists and is received.
  *
- * @type {getEntityRecord}
+ * @param {Object}  state State tree
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {number}  key   Record's key
+ * @param {?Object} query Optional query.
  *
- * @param  state State tree
- * @param  kind  Entity kind.
- * @param  name  Entity name.
- * @param  key   Record's key
- * @param  query Optional query.
- *
- * @return Record.
+ * @return {Object?} Record.
  */
 export const getEntityRecord = createSelector(
 	( state, kind, name, key, query ) => {
@@ -219,14 +213,12 @@ export function __experimentalGetEntityRecordNoResolver(
  * Returns the entity's record object by key,
  * with its attributes mapped to their raw values.
  *
- * @type {getRawEntityRecord}
+ * @param {Object} state State tree.
+ * @param {string} kind  Entity kind.
+ * @param {string} name  Entity name.
+ * @param {number} key   Record's key.
  *
- * @param  state State tree.
- * @param  kind  Entity kind.
- * @param  name  Entity name.
- * @param  key   Record's key.
- *
- * @return Object with the entity's raw attributes.
+ * @return {Object?} Object with the entity's raw attributes.
  */
 export const getRawEntityRecord = createSelector(
 	( state, kind, name, key ) => {
@@ -493,14 +485,12 @@ export function hasEditsForEntityRecord( state, kind, name, recordId ) {
 /**
  * Returns the specified entity record, merged with its edits.
  *
- * @type {getEditedEntityRecord}
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
  *
- * @param  state    State tree.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record ID.
- *
- * @return The entity record, merged with its edits.
+ * @return {Object?} The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
 	( state, kind, name, recordId ) => ( {
