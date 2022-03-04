@@ -27,7 +27,7 @@ import { isVideoType } from './utils';
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
-const FOCAL_POINT_UNITS = [ { default: '50', label: '%', value: '%' } ];
+const FOCAL_POINT_UNITS = [ { default: 50, label: '%', value: '%' } ];
 
 function FocalPointPicker( props ) {
 	const { focalPoint, onChange, shouldEnableBottomSheetScroll, url } = props;

@@ -27,7 +27,7 @@ import {
 	Header,
 	HeaderControlWrapper,
 } from './styles/box-control-styles';
-import { parseUnit } from '../unit-control/utils';
+import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
 	DEFAULT_VISUALIZER_VALUES,
@@ -79,10 +79,10 @@ export default function BoxControl( {
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS only values prevents invalid style values.
 	const [ selectedUnits, setSelectedUnits ] = useState( {
-		top: parseUnit( valuesProp?.top )[ 1 ],
-		right: parseUnit( valuesProp?.right )[ 1 ],
-		bottom: parseUnit( valuesProp?.bottom )[ 1 ],
-		left: parseUnit( valuesProp?.left )[ 1 ],
+		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ],
+		right: parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ],
+		bottom: parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ],
+		left: parseQuantityAndUnitFromRawValue( valuesProp?.left )[ 1 ],
 	} );
 
 	const id = useUniqueId( idProp );

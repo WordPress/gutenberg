@@ -220,9 +220,9 @@ const getDefaultValues = ( pluginTemplate ) => {
 	};
 };
 
-const getPrompts = ( pluginTemplate ) => {
+const getPrompts = ( pluginTemplate, keys ) => {
 	const defaultValues = getDefaultValues( pluginTemplate );
-	return Object.keys( prompts ).map( ( promptName ) => {
+	return keys.map( ( promptName ) => {
 		return {
 			...prompts[ promptName ],
 			default: defaultValues[ promptName ],

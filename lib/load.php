@@ -55,10 +55,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-url-details-controller.php';
 	}
 
-	if ( ! class_exists( 'WP_REST_Edit_Site_Export_Controller' ) ) {
-		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-edit-site-export-controller.php';
-	}
-
 	require __DIR__ . '/rest-api.php';
 }
 
@@ -96,11 +92,14 @@ require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/move-theme-editor-menu-item.php';
 require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
 require __DIR__ . '/compat/wordpress-6.0/blocks.php';
+require __DIR__ . '/compat/wordpress-6.0/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller.php';
+require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
+require __DIR__ . '/compat/wordpress-6.0/block-template.php';
 require __DIR__ . '/compat/wordpress-6.0/register-webfonts-from-theme-json.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts.php';

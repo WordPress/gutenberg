@@ -81,6 +81,14 @@ _Returns_
 
 -   `string`: Editing mode.
 
+### getHiddenBlockTypes
+
+Returns an array of blocks that are hidden.
+
+_Returns_
+
+-   `Array`: A list of the hidden block types
+
 ### getMetaBoxesPerLocation
 
 Returns the list of all the available meta boxes for a given location.
@@ -352,16 +360,11 @@ _Returns_
 
 ### hideBlockTypes
 
-Returns an action object used in signalling that block types by the given
-name(s) should be hidden.
+Update the provided block types to be hidden.
 
 _Parameters_
 
 -   _blockNames_ `string[]`: Names of block types to hide.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### initializeMetaBoxes
 
@@ -477,20 +480,19 @@ _Returns_
 
 ### showBlockTypes
 
-Returns an action object used in signalling that block types by the given
-name(s) should be shown.
+Update the provided block types to be visible.
 
 _Parameters_
 
 -   _blockNames_ `string[]`: Names of block types to show.
 
-_Returns_
-
--   `Object`: Action object.
-
 ### switchEditorMode
 
-Undocumented declaration.
+Triggers an action used to switch editor mode.
+
+_Parameters_
+
+-   _mode_ `string`: The editor mode.
 
 ### toggleEditorPanelEnabled
 

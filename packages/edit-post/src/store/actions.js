@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
-import { castArray, reduce } from 'lodash';
+import { castArray, reduce, without } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { speak } from '@wordpress/a11y';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -147,10 +148,13 @@ export function removeEditorPanel( panelName ) {
  * @param {string} feature Feature name.
  */
 export const toggleFeature = ( feature ) => ( { registry } ) =>
-	registry
-		.dispatch( interfaceStore )
-		.toggleFeature( 'core/edit-post', feature );
+	registry.dispatch( preferencesStore ).toggle( 'core/edit-post', feature );
 
+/**
+ * Triggers an action used to switch editor mode.
+ *
+ * @param {string} mode The editor mode.
+ */
 export const switchEditorMode = ( mode ) => ( { dispatch, registry } ) => {
 	dispatch( {
 		type: 'SWITCH_MODE',
@@ -185,21 +189,6 @@ export const togglePinnedPluginItem = ( pluginName ) => ( { registry } ) => {
 };
 
 /**
- * Returns an action object used in signalling that block types by the given
- * name(s) should be hidden.
- *
- * @param {string[]} blockNames Names of block types to hide.
- *
- * @return {Object} Action object.
- */
-export function hideBlockTypes( blockNames ) {
-	return {
-		type: 'HIDE_BLOCK_TYPES',
-		blockNames: castArray( blockNames ),
-	};
-}
-
-/**
  * Returns an action object used in signaling that a style should be auto-applied when a block is created.
  *
  * @param {string}  blockName  Name of the block.
@@ -230,19 +219,46 @@ export function __experimentalUpdateLocalAutosaveInterval( interval ) {
 }
 
 /**
- * Returns an action object used in signalling that block types by the given
- * name(s) should be shown.
+ * Update the provided block types to be visible.
  *
  * @param {string[]} blockNames Names of block types to show.
- *
- * @return {Object} Action object.
  */
-export function showBlockTypes( blockNames ) {
-	return {
-		type: 'SHOW_BLOCK_TYPES',
-		blockNames: castArray( blockNames ),
-	};
-}
+export const showBlockTypes = ( blockNames ) => ( { registry } ) => {
+	const existingBlockNames =
+		registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
+
+	const newBlockNames = without(
+		existingBlockNames,
+		...castArray( blockNames )
+	);
+
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/edit-post', 'hiddenBlockTypes', newBlockNames );
+};
+
+/**
+ * Update the provided block types to be hidden.
+ *
+ * @param {string[]} blockNames Names of block types to hide.
+ */
+export const hideBlockTypes = ( blockNames ) => ( { registry } ) => {
+	const existingBlockNames =
+		registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
+
+	const mergedBlockNames = new Set( [
+		...existingBlockNames,
+		...castArray( blockNames ),
+	] );
+
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/edit-post', 'hiddenBlockTypes', [ ...mergedBlockNames ] );
+};
 
 /**
  * Returns an action object used in signaling

@@ -230,16 +230,17 @@ describe( 'Delete Post Template Confirmation Dialog', () => {
 		it( `should retain template if deletion is canceled when the viewport is ${ viewport }`, async () => {
 			await setBrowserViewport( viewport );
 
-			const isWelcomeGuideActive = await page.evaluate( () =>
-				wp.data
-					.select( 'core/edit-post' )
-					.isFeatureActive( 'welcomeGuide' )
+			const isWelcomeGuideActive = await page.evaluate(
+				() =>
+					!! wp.data
+						.select( 'core/preferences' )
+						.get( 'core/edit-post', 'welcomeGuide' )
 			);
 			if ( isWelcomeGuideActive === true ) {
 				await page.evaluate( () =>
 					wp.data
 						.dispatch( 'core/edit-post' )
-						.toggleFeature( 'welcomeGuide' )
+						.toggle( 'core/edit-post', 'welcomeGuide' )
 				);
 				await page.reload();
 				await page.waitForSelector( '.edit-post-layout' );

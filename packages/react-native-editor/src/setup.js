@@ -32,6 +32,12 @@ const reactNativeSetup = () => {
 		'Overriding previous layout animation',
 	] );
 
+	// "@react-navigation" package uses the old API of gesture handler,
+	// so the warning will be silenced until it gets updated.
+	LogBox.ignoreLogs( [
+		"[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
+	] );
+
 	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
 };
 
