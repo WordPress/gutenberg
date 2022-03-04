@@ -171,11 +171,6 @@ export function ImageEdit( {
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
-		setAttributes( {
-			src: undefined,
-			id: undefined,
-			url: undefined,
-		} );
 		setTemporaryURL( undefined );
 	}
 
