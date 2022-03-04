@@ -235,11 +235,12 @@ function Navigation( {
 
 	const {
 		convert,
-		state: classicMenuConversionState,
+		status: classicMenuConversionStatus,
+		error: classicMenuConversionError,
+		value: classicMenuConversionResult,
 	} = useConvertClassicToBlockMenu( clientId );
 
-	const isConvertingClassicMenu =
-		classicMenuConversionState?.status === 'fetching';
+	const isConvertingClassicMenu = classicMenuConversionStatus === 'pending';
 
 	// The standard HTML5 tag for the block wrapper.
 	const TagName = 'nav';
@@ -340,26 +341,28 @@ function Navigation( {
 	}
 
 	useEffect( () => {
-		if ( classicMenuConversionState?.status === 'fetching' ) {
+		if ( classicMenuConversionStatus === 'pending' ) {
 			speak( __( 'Classic menu importing.' ) );
 		}
 
 		if (
-			classicMenuConversionState?.status === 'success' &&
-			classicMenuConversionState.navMenu
+			classicMenuConversionStatus === 'success' &&
+			classicMenuConversionResult
 		) {
-			handleUpdateMenu( classicMenuConversionState.navMenu?.id );
+			handleUpdateMenu( classicMenuConversionResult?.id );
 			hideClassicMenuConversionErrorNotice();
 			speak( __( 'Classic menu imported successfully.' ) );
 		}
 
-		if ( classicMenuConversionState?.status === 'error' ) {
-			showClassicMenuConversionErrorNotice(
-				classicMenuConversionState.error
-			);
+		if ( classicMenuConversionStatus === 'error' ) {
+			showClassicMenuConversionErrorNotice( classicMenuConversionError );
 			speak( __( 'Classic menu import failed.' ) );
 		}
-	}, [ classicMenuConversionState ] );
+	}, [
+		classicMenuConversionStatus,
+		classicMenuConversionResult,
+		classicMenuConversionError,
+	] );
 
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.

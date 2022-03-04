@@ -3,12 +3,7 @@
  */
 import { useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	useReducer,
-	useCallback,
-	useRef,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -17,55 +12,17 @@ import { __, sprintf } from '@wordpress/i18n';
 import useCreateNavigationMenu from './use-create-navigation-menu';
 import menuItemsToBlocks from '../menu-items-to-blocks';
 
-function reducer( state, action ) {
-	switch ( action.type ) {
-		case 'RESOLVED':
-			return {
-				...state,
-				status: 'success',
-				navMenu: action.navMenu,
-			};
-		case 'ERROR':
-			return {
-				...state,
-				status: 'error',
-				error: action.error,
-				navMenu: null,
-			};
-		case 'LOADING':
-			return {
-				...state,
-				status: 'fetching',
-				error: null,
-			};
-		default:
-			throw new Error( `Unexpected action type ${ action.type }` );
-	}
-}
-
-function useSafeDispatch( dispatch ) {
-	const mounted = useRef( false );
-	useLayoutEffect( () => {
-		mounted.current = true;
-		return () => ( mounted.current = false );
-	}, [] );
-	return useCallback(
-		( ...args ) => ( mounted.current ? dispatch( ...args ) : void 0 ),
-		[ dispatch ]
-	);
-}
+const CLASSIC_MENU_CONVERSION_SUCCESS = CLASSIC_MENU_CONVERSION_SUCCESS;
+const CLASSIC_MENU_CONVERSION_ERROR = CLASSIC_MENU_CONVERSION_ERROR;
+const CLASSIC_MENU_CONVERSION_PENDING = CLASSIC_MENU_CONVERSION_PENDING;
 
 function useConvertClassicToBlockMenu( clientId ) {
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 	const registry = useRegistry();
 
-	const [ state, dispatch ] = useReducer( reducer, {
-		navMenu: null,
-		status: 'idle',
-		error: null,
-	} );
-
-	const safeDispatch = useSafeDispatch( dispatch );
+	const [ status, setStatus ] = useState( 'idle' );
+	const [ value, setValue ] = useState( null );
+	const [ error, setError ] = useState( null );
 
 	async function convertClassicMenuToBlockMenu( menuId, menuName ) {
 		let navigationMenu;
@@ -132,28 +89,23 @@ function useConvertClassicToBlockMenu( clientId ) {
 	const convert = useCallback(
 		( menuId, menuName ) => {
 			if ( ! menuId || ! menuName ) {
-				safeDispatch( {
-					type: 'ERROR',
-					error: '',
-				} );
+				setError( 'Unable to convert menu. Missing menu details.' );
+				setStatus( CLASSIC_MENU_CONVERSION_ERROR );
+				return;
 			}
 
-			safeDispatch( {
-				type: 'LOADING',
-			} );
+			setStatus( CLASSIC_MENU_CONVERSION_PENDING );
+			setValue( null );
+			setError( null );
 
 			convertClassicMenuToBlockMenu( menuId, menuName )
 				.then( ( navMenu ) => {
-					safeDispatch( {
-						type: 'RESOLVED',
-						navMenu,
-					} );
+					setValue( navMenu );
+					setStatus( CLASSIC_MENU_CONVERSION_SUCCESS );
 				} )
 				.catch( ( e ) => {
-					safeDispatch( {
-						type: 'ERROR',
-						error: e?.message,
-					} );
+					setError( e?.message );
+					setStatus( CLASSIC_MENU_CONVERSION_ERROR );
 				} );
 		},
 		[ clientId ]
@@ -161,7 +113,9 @@ function useConvertClassicToBlockMenu( clientId ) {
 
 	return {
 		convert,
-		state,
+		status,
+		value,
+		error,
 	};
 }
 
