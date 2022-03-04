@@ -27,7 +27,8 @@
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
-			}
+			},
+			"__experimentalSkipSerialization": [ "gradients", "link", "background", "text" ]
 		},
 		"spacing": {
 			"margin": [ "top", "bottom" ],
@@ -36,7 +37,8 @@
 			"__experimentalDefaultControls": {
 				"padding": true,
 				"blockGap": true
-			}
+			},
+			"__experimentalSkipSerialization": [ "blockGap", "margin", "padding" ]
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -48,7 +50,8 @@
 				"radius": true,
 				"style": true,
 				"width": true
-			}
+			},
+			"__experimentalSkipSerialization": [ "color", "radius", "style", "width" ]
 		},
 		"typography": {
 			"fontSize": true,

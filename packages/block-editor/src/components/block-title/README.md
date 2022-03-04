@@ -19,7 +19,7 @@ The client ID of a block.
 
 #### maximumLength
 
-The maximum length that the block title string may be before truncated. The default is stored in `MAXIMUM_TITLE_LENGTH`.
+The maximum length that the block title string may be before truncated. If `undefined` no truncation will take place.
 
 -   Type: `Number`
 -   Required: No

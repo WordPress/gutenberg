@@ -2,9 +2,7 @@
  * Internal dependencies
  */
 
-import useBlockDisplayTitle, {
-	MAXIMUM_TITLE_LENGTH,
-} from './use-block-display-title';
+import useBlockDisplayTitle from './use-block-display-title';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -18,13 +16,10 @@ import useBlockDisplayTitle, {
  *
  * @param {Object} props
  * @param {string} props.clientId Client ID of block.
- * @param {number} props.maximumLength The maximum length that the block title string may be before truncated.
+ * @param {number|undefined} props.maximumLength The maximum length that the block title string may be before truncated.
  *
  * @return {JSX.Element} Block title.
  */
-export default function BlockTitle( {
-	clientId,
-	maximumLength = MAXIMUM_TITLE_LENGTH,
-} ) {
+export default function BlockTitle( { clientId, maximumLength } ) {
 	return useBlockDisplayTitle( clientId, maximumLength );
 }

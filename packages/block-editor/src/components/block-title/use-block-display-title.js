@@ -19,8 +19,6 @@ import {
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
-export const MAXIMUM_TITLE_LENGTH = 35;
-
 /**
  * Returns the block's configured title as a string, or empty if the title
  * cannot be determined.
@@ -32,14 +30,10 @@ export const MAXIMUM_TITLE_LENGTH = 35;
  * ```
  *
  * @param {string} clientId Client ID of block.
- * @param {number} maximumLength The maximum length that the block title string may be before truncated.
+ * @param {number|undefined} maximumLength The maximum length that the block title string may be before truncated.
  * @return {?string} Block title.
  */
 export default function useBlockDisplayTitle( clientId, maximumLength ) {
-	maximumLength = Number.isInteger( maximumLength )
-		? maximumLength
-		: MAXIMUM_TITLE_LENGTH;
-
 	const { attributes, name, reusableBlockTitle } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
@@ -81,7 +75,9 @@ export default function useBlockDisplayTitle( clientId, maximumLength ) {
 	// label context. If the label is defined we prioritize it over possible
 	// possible block variation title match.
 	if ( label && label !== blockType.title ) {
-		return truncate( label, { length: maximumLength } );
+		return maximumLength && maximumLength > 0
+			? truncate( label, { length: maximumLength } )
+			: label;
 	}
 	return blockInformation.title;
 }
