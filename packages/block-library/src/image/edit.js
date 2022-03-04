@@ -293,7 +293,7 @@ export function ImageEdit( {
 		} );
 	}
 
-	const isTemp = isTemporaryImage( id, url );
+	let isTemp = isTemporaryImage( id, url );
 
 	// Upload a temporary image on mount.
 	useEffect( () => {
@@ -310,7 +310,10 @@ export function ImageEdit( {
 					onSelectImage( img );
 				},
 				allowedTypes: ALLOWED_MEDIA_TYPES,
-				onError: onUploadError,
+				onError: ( message ) => {
+					isTemp = false;
+					onUploadError( message );
+				},
 			} );
 		}
 	}, [] );
