@@ -25,7 +25,7 @@ type Action =
 
 type StateKey = unknown[] | unknown;
 export type StateValue =
-	| { status: 'resolving' | 'finished' | undefined }
+	| { status: 'resolving' | 'finished' }
 	| { status: 'error'; error: Error | unknown };
 
 export type Status = StateValue[ 'status' ];
