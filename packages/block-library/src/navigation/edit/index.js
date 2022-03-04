@@ -447,6 +447,22 @@ function Navigation( {
 		ref,
 	] );
 
+	const handleSelectNavigation = ( navPostOrClassicMenu ) => {
+		if ( ! navPostOrClassicMenu ) {
+			return;
+		}
+
+		const isClassicMenu = navPostOrClassicMenu?.hasOwnProperty(
+			'auto_add'
+		);
+
+		if ( isClassicMenu ) {
+			convert( navPostOrClassicMenu.id, navPostOrClassicMenu.name );
+		} else {
+			handleUpdateMenu( navPostOrClassicMenu?.id );
+		}
+	};
+
 	const startWithEmptyMenu = useCallback( () => {
 		registry.batch( () => {
 			if ( navigationArea ) {
@@ -549,19 +565,7 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onFinish={ ( navPostOrClassicMenu ) => {
-						const isClassicMenu = navPostOrClassicMenu.hasOwnProperty(
-							'auto_add'
-						);
-						if ( isClassicMenu ) {
-							convert(
-								navPostOrClassicMenu.id,
-								navPostOrClassicMenu.name
-							);
-						} else {
-							handleUpdateMenu( navPostOrClassicMenu?.id );
-						}
-					} }
+					onFinish={ handleSelectNavigation }
 				/>
 			</TagName>
 		);
@@ -576,19 +580,7 @@ function Navigation( {
 							<NavigationMenuSelector
 								currentMenuId={ ref }
 								clientId={ clientId }
-								onSelect={ ( navPostOrClassicMenu ) => {
-									const isClassicMenu = navPostOrClassicMenu.hasOwnProperty(
-										'auto_add'
-									);
-									if ( isClassicMenu ) {
-										convert(
-											navPostOrClassicMenu.id,
-											navPostOrClassicMenu.name
-										);
-									} else {
-										setRef( navPostOrClassicMenu?.id );
-									}
-								} }
+								onSelect={ handleSelectNavigation }
 								onCreateNew={ startWithEmptyMenu }
 								/* translators: %s: The name of a menu. */
 								actionLabel={ __( "Switch to '%s'" ) }
