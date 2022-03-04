@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Image, Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 
 /**
  * WordPress dependencies
@@ -13,7 +14,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
 
 /**
- * Internal dependencies
+ 
  */
 import { getImageWithFocalPointStyles } from './utils';
 import styles from './style.scss';
@@ -210,12 +211,15 @@ const ImageComponent = ( {
 					</View>
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
-						<Image
+						<FastImage
 							{ ...( ! resizeMode && {
 								aspectRatio: imageData?.aspectRatio,
 							} ) }
 							style={ imageStyles }
-							source={ { uri: url } }
+							source={ {
+								uri: url,
+								priority: FastImage.priority.normal,
+							} }
 							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',
 							} ) }

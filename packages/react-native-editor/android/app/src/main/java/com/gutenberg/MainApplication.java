@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.core.util.Consumer;
 
+import com.dylanvann.fastimage.FastImageViewPackage;
 import com.facebook.react.ReactApplication;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.facebook.react.bridge.Arguments;
@@ -303,6 +304,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new RNPromptPackage(),
                         new RNCWebViewPackage(),
                         new ClipboardPackage(),
+                        new FastImageViewPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 

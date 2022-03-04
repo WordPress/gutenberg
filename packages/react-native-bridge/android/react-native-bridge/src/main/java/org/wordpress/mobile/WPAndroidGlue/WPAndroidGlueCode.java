@@ -19,6 +19,7 @@ import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
 import com.brentvatne.react.ReactVideoPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
@@ -576,6 +577,7 @@ public class WPAndroidGlueCode {
                 new RNPromptPackage(),
                 new RNCWebViewPackage(),
                 new ClipboardPackage(),
+                new FastImageViewPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
