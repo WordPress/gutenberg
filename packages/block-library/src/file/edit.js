@@ -112,11 +112,11 @@ function FileEdit( {
 	}, [] );
 
 	useEffect( () => {
-		if ( ! fileId && href ) {
+		if ( ! fileId ) {
 			// Add a unique fileId to each file block.
 			setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
 		}
-	}, [ href, fileId, clientId ] );
+	}, [ fileId, clientId ] );
 
 	function onSelectFile( newMedia ) {
 		if ( newMedia && newMedia.url ) {
