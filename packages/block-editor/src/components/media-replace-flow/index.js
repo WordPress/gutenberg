@@ -90,10 +90,6 @@ const MediaReplaceFlow = ( {
 		removeNotice( errorNoticeID );
 	};
 
-	const selectURL = ( newURL ) => {
-		onSelectURL( newURL );
-	};
-
 	const uploadFiles = ( event, closeMenu ) => {
 		const files = event.target.files;
 		if ( ! handleUpload ) {
@@ -204,7 +200,7 @@ const MediaReplaceFlow = ( {
 								showSuggestions={ false }
 								onChange={ ( { url } ) => {
 									setMediaURLValue( url );
-									selectURL( url );
+									onSelectURL( url );
 									editMediaButtonRef.current.focus();
 								} }
 							/>
