@@ -33,9 +33,15 @@ export default function useCreateNavigationMenu( clientId ) {
 			setError( null );
 
 			if ( ! title ) {
-				title = generateDefaultTitle().catch( ( e ) => {
-					setError( e?.message );
+				title = generateDefaultTitle().catch( ( err ) => {
+					setError( err?.message );
 					setStatus( ERROR );
+					throw new Error(
+						'Failed to create title when saving new Navigation Menu.',
+						{
+							cause: err,
+						}
+					);
 				} );
 			}
 			const record = {
@@ -44,16 +50,19 @@ export default function useCreateNavigationMenu( clientId ) {
 				status: 'publish',
 			};
 
+			// Return affords ability to await on this function directly
 			return saveEntityRecord( 'postType', 'wp_navigation', record )
 				.then( ( response ) => {
 					setValue( response );
 					setStatus( SUCCESS );
 					return response;
 				} )
-				.catch( ( e ) => {
-					setError( e?.message );
+				.catch( ( err ) => {
+					setError( err?.message );
 					setStatus( ERROR );
-					return e;
+					throw new Error( 'Unable to save new Navigation Menu', {
+						cause: err,
+					} );
 				} );
 		},
 		[ serialize, saveEntityRecord ]
