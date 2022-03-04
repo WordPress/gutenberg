@@ -45,7 +45,7 @@ function gutenberg_register_dimensions_support( $block_type ) {
  * @return array Block dimensions CSS classes and inline styles.
  */
 function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	if ( gutenberg_skip_dimensions_serialization( $block_type ) ) {
+	if ( gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalDimensions' ) ) {
 		return array();
 	}
 
@@ -55,26 +55,6 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
 	// Width support to be added in near future.
 
 	return empty( $styles ) ? array() : array( 'style' => implode( ' ', $styles ) );
-}
-
-/**
- * Checks whether serialization of the current block's dimensions properties
- * should occur.
- *
- * @param WP_Block_type $block_type Block type.
- * @param string        $feature    Optional name of individual feature to check.
- *
- * @return boolean Whether to serialize dimensions support styles & classes.
- */
-function gutenberg_skip_dimensions_serialization( $block_type, $feature = null ) {
-	$path               = array( '__experimentalDimensions', '__experimentalSkipSerialization' );
-	$skip_serialization = _wp_array_get( $block_type->supports, $path, false );
-
-	if ( is_array( $skip_serialization ) ) {
-		return in_array( $feature, $skip_serialization, true );
-	}
-
-	return $skip_serialization;
 }
 
 // Register the block support.

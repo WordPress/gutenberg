@@ -175,7 +175,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.
-	$should_skip_gap_serialization = gutenberg_skip_spacing_serialization( $block_type, 'blockGap' );
+	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
 	$style                         = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.

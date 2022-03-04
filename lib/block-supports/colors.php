@@ -68,7 +68,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 
 	if (
 		is_array( $color_support ) &&
-		gutenberg_skip_color_serialization( $block_type )
+		gutenberg_should_skip_block_supports_serialization( $block_type, 'color' )
 	) {
 		return array();
 	}
@@ -81,7 +81,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 
 	// Text colors.
 	// Check support for text colors.
-	if ( $has_text_colors_support && ! gutenberg_skip_color_serialization( $block_type, 'text' ) ) {
+	if ( $has_text_colors_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'text' ) ) {
 		$has_named_text_color  = array_key_exists( 'textColor', $block_attributes );
 		$has_custom_text_color = isset( $block_attributes['style']['color']['text'] );
 
@@ -98,7 +98,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	}
 
 	// Background colors.
-	if ( $has_background_colors_support && ! gutenberg_skip_color_serialization( $block_type, 'background' ) ) {
+	if ( $has_background_colors_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'background' ) ) {
 		$has_named_background_color  = array_key_exists( 'backgroundColor', $block_attributes );
 		$has_custom_background_color = isset( $block_attributes['style']['color']['background'] );
 
@@ -115,7 +115,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	}
 
 	// Gradients.
-	if ( $has_gradients_support && ! gutenberg_skip_color_serialization( $block_type, 'gradients' ) ) {
+	if ( $has_gradients_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' ) ) {
 		$has_named_gradient  = array_key_exists( 'gradient', $block_attributes );
 		$has_custom_gradient = isset( $block_attributes['style']['color']['gradient'] );
 
@@ -140,31 +140,6 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 
 	return $attributes;
 }
-
-/**
- * Checks whether serialization of the current block's color properties
- * should occur.
- *
- * @param WP_Block_type $block_type Block type.
- * @param string        $feature    Optional name of individual feature to check.
- *
- * @return boolean Whether to serialize color support styles & classes.
- */
-function gutenberg_skip_color_serialization( $block_type, $feature = null ) {
-	if ( ! is_object( $block_type ) ) {
-		return false;
-	}
-
-	$path               = array( 'color', '__experimentalSkipSerialization' );
-	$skip_serialization = _wp_array_get( $block_type->supports, $path, false );
-
-	if ( is_array( $skip_serialization ) ) {
-		return in_array( $feature, $skip_serialization, true );
-	}
-
-	return $skip_serialization;
-}
-
 
 // Register the block support.
 WP_Block_Supports::get_instance()->register(

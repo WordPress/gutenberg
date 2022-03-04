@@ -19,7 +19,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	}
 
 	$block_type                    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$skip_link_color_serialization = gutenberg_skip_color_serialization( $block_type, 'link' );
+	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 
 	if ( $skip_link_color_serialization ) {
 		return $block_content;

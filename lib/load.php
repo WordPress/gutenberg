@@ -126,6 +126,7 @@ require __DIR__ . '/pwa.php';
 // similar to the loading behaviour in `blocks.php`.
 require __DIR__ . '/style-engine/class-wp-style-engine-gutenberg.php';
 
+require __DIR__ . '/block-supports/utils.php';
 require __DIR__ . '/block-supports/elements.php';
 require __DIR__ . '/block-supports/colors.php';
 require __DIR__ . '/block-supports/typography.php';
