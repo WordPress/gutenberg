@@ -1,13 +1,28 @@
-#PreferencesModalBaseOption
+#__unstablePreferencesModalBaseOption
 
-`PreferencesModalBaseOption` renders a toggle meant to be used with `PreferencesModal`. 
+`__unstablePreferencesModalBaseOption` renders a toggle meant to be used with `PreferencesModal`. 
 
 This component implements a `ToggleControl` component from the `@wordpress/components` package.
 
+**It is an unstable component so is subject to breaking changes at any moment. Use at own risk.**
+
 ## Example
 
-See the `PreferencesModal` readme for usage info.
-
+```jsx
+function MyEditorPreferencesOption() {
+	return (
+		<__unstablePreferencesModalBaseOption
+			label={ label }
+			isChecked={ isChecked }
+			onChange={ setIsChecked }
+		>
+			{ isChecked !== areCustomFieldsEnabled && (
+				<CustomFieldsConfirmation willEnable={ isChecked } />
+			) }
+		</__unstablePreferencesModalBaseOption>
+	)				
+}
+```
 
 ## Props
 

@@ -4,7 +4,7 @@
 
 This component implements a `Modal` component from the `@wordpress/components` package.
 
-Sections passed to this component should use `PreferencesModalSection` component from the `@wordpress/interface` package, and can also use `PreferencesModalBaseOption`, from the same package, to implement toggle buttons.
+Sections passed to this component should use `PreferencesModalSection` component from the `@wordpress/interface` package.
 
 
 ## Example
@@ -45,15 +45,7 @@ function MyEditorPreferencesModal() {
 								'Add extra areas to the editor.'
 							) }
 						>
-							<PreferencesModalBaseOption
-								label={ label }
-								isChecked={ isChecked }
-								onChange={ setIsChecked }
-							>
-								{ isChecked !== areCustomFieldsEnabled && (
-									<CustomFieldsConfirmation willEnable={ isChecked } />
-								) }
-							</PreferencesModalBaseOption>
+							// Section content here
 						</PreferencesModalSection>
 					) 
 

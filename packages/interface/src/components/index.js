@@ -9,4 +9,4 @@ export { default as ActionItem } from './action-item';
 export { default as PreferencesModal } from './preferences-modal';
 export { default as PreferencesModalTabs } from './preferences-modal-tabs';
 export { default as PreferencesModalSection } from './preferences-modal-section';
-export { default as PreferencesModalBaseOption } from './preferences-modal-base-option';
+export { default as ___unstablePreferencesModalBaseOption } from './preferences-modal-base-option';
