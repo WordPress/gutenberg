@@ -12,10 +12,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import useCreateNavigationMenu from './use-create-navigation-menu';
 import menuItemsToBlocks from '../menu-items-to-blocks';
 
-const CLASSIC_MENU_CONVERSION_SUCCESS = 'success';
-const CLASSIC_MENU_CONVERSION_ERROR = 'error';
-const CLASSIC_MENU_CONVERSION_PENDING = 'pending';
-const CLASSIC_MENU_CONVERSION_IDLE = 'idle';
+export const CLASSIC_MENU_CONVERSION_SUCCESS = 'success';
+export const CLASSIC_MENU_CONVERSION_ERROR = 'error';
+export const CLASSIC_MENU_CONVERSION_PENDING = 'pending';
+export const CLASSIC_MENU_CONVERSION_IDLE = 'idle';
 
 function useConvertClassicToBlockMenu( clientId ) {
 	const createNavigationMenu = useCreateNavigationMenu( clientId );

@@ -56,7 +56,11 @@ import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
 import OverlayMenuIcon from './overlay-menu-icon';
-import useConvertClassicToBlockMenu from './use-convert-classic-menu-to-block-menu';
+import useConvertClassicToBlockMenu, {
+	CLASSIC_MENU_CONVERSION_ERROR,
+	CLASSIC_MENU_CONVERSION_PENDING,
+	CLASSIC_MENU_CONVERSION_SUCCESS,
+} from './use-convert-classic-menu-to-block-menu';
 
 const EMPTY_ARRAY = [];
 
@@ -240,7 +244,8 @@ function Navigation( {
 		value: classicMenuConversionResult,
 	} = useConvertClassicToBlockMenu( clientId );
 
-	const isConvertingClassicMenu = classicMenuConversionStatus === 'pending';
+	const isConvertingClassicMenu =
+		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	// The standard HTML5 tag for the block wrapper.
 	const TagName = 'nav';
@@ -341,12 +346,12 @@ function Navigation( {
 	}
 
 	useEffect( () => {
-		if ( classicMenuConversionStatus === 'pending' ) {
+		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING ) {
 			speak( __( 'Classic menu importing.' ) );
 		}
 
 		if (
-			classicMenuConversionStatus === 'success' &&
+			classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_SUCCESS &&
 			classicMenuConversionResult
 		) {
 			handleUpdateMenu( classicMenuConversionResult?.id );
@@ -354,7 +359,7 @@ function Navigation( {
 			speak( __( 'Classic menu imported successfully.' ) );
 		}
 
-		if ( classicMenuConversionStatus === 'error' ) {
+		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
 			showClassicMenuConversionErrorNotice( classicMenuConversionError );
 			speak( __( 'Classic menu import failed.' ) );
 		}
