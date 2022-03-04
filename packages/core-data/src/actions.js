@@ -603,7 +603,7 @@ export const saveEntityRecord = (
  *                         `saveEntityRecord`, `saveEditedEntityRecord`, and
  *                         `deleteEntityRecord`.
  *
- * @return {(thinkArgs: Object) => Promise} A promise that resolves to an array containing the return
+ * @return {(thunkArgs: Object) => Promise} A promise that resolves to an array containing the return
  *                                          values of each function given in `requests`.
  */
 export const __experimentalBatch = ( requests ) => async ( { dispatch } ) => {
