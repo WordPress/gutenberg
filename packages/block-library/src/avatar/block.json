@@ -19,9 +19,9 @@
 			"type": "string",
 			"default": "_self"
 		},
-		"isSiteOwner": {
-			"type": "boolean",
-			"default": false
+		"authorId": {
+			"type": "string",
+			"default": null
 		}
 	},
 	"usesContext": [ "postType", "postId", "commentId" ],

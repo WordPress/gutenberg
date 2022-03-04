@@ -23,8 +23,14 @@ import { __, isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useUserAvatar, useCommentAvatar } from './hooks';
+import AuthorControl from './author-control';
 
-const AvatarInspectorControls = ( { setAttributes, avatar, attributes } ) => (
+const AvatarInspectorControls = ( {
+	setAttributes,
+	avatar,
+	attributes,
+	selectAuthor,
+} ) => (
 	<InspectorControls>
 		<PanelBody title={ __( 'Avatar Settings' ) }>
 			<RangeControl
@@ -39,13 +45,16 @@ const AvatarInspectorControls = ( { setAttributes, avatar, attributes } ) => (
 				initialPosition={ attributes?.size }
 				value={ attributes?.size }
 			/>
-			<ToggleControl
-				label={ __( 'Show admin Avatar' ) }
-				onChange={ () =>
-					setAttributes( { isSiteOwner: ! attributes.isSiteOwner } )
-				}
-				checked={ attributes.isSiteOwner }
-			/>
+			{ selectAuthor && (
+				<AuthorControl
+					value={ attributes?.authorId }
+					onChange={ ( value ) => {
+						setAttributes( {
+							authorId: value,
+						} );
+					} }
+				/>
+			) }
 			<ToggleControl
 				label={ __( 'Link to user profile' ) }
 				onChange={ () =>
@@ -131,6 +140,7 @@ const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				avatar={ avatar }
 				setAttributes={ setAttributes }
 				attributes={ attributes }
+				selectAuthor={ false }
 			/>
 			{ attributes.isLink ? (
 				<a
@@ -166,6 +176,7 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 	return (
 		<>
 			<AvatarInspectorControls
+				selectAuthor={ true }
 				attributes={ attributes }
 				avatar={ avatar }
 				setAttributes={ setAttributes }

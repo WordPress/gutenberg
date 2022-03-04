@@ -81,8 +81,8 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 	}
 
 	if ( ! isset( $block->context['commentId'] ) ) {
-		$author_id   = $attributes['isSiteOwner'] ? get_option('admin_email') : get_post_field( 'post_author', $block->context['postId'] );
-		$author_name = $attributes['isSiteOwner'] ? __( 'Site owner' ) : get_the_author_meta( 'display_name', $author_id );
+		$author_id   = isset( $attributes['authorId'] ) ? $attributes['authorId'] : get_post_field( 'post_author', $block->context['postId'] );
+		$author_name = get_the_author_meta( 'display_name', $author_id );
 		// translators: %s is the Author name.
 		$alt          = sprintf( __( '%s Avatar' ), $author_name );
 		$avatar_block = get_avatar(

@@ -33,7 +33,7 @@ Add the avatar of an user. ([Source](https://github.com/WordPress/gutenberg/tree
 -	**Name:** core/avatar
 -	**Category:** theme
 -	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin), ~~alignWide~~, ~~html~~
--	**Attributes:** isLink, isSiteOwner, linkTarget, size
+-	**Attributes:** authorId, isLink, linkTarget, size
 
 ## Reusable block
 
