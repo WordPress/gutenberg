@@ -653,13 +653,17 @@ describe( 'Writing Flow', () => {
 		const inserter = await page.$(
 			'.block-editor-block-list__insertion-point'
 		);
+		// Find the space between the inserter and the image block.
 		const inserterRect = await inserter.boundingBox();
 		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
 
+		// Clicking that in-between space should select the image block.
 		await page.mouse.click( x, lowerInserterY );
 
 		const type = await page.evaluate( () =>
-			document.activeElement.getAttribute( 'data-type' )
+			document.activeElement
+				.closest( '[data-block]' )
+				.getAttribute( 'data-type' )
 		);
 
 		expect( type ).toBe( 'core/image' );
