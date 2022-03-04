@@ -70,9 +70,11 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves all block patterns.
 	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
-	public function get_items() {
+	public function get_items( $request ) {
 		$data = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
 		return rest_ensure_response( $data );
 	}
