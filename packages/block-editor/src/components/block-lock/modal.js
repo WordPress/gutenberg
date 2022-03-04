@@ -96,7 +96,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 						className="block-editor-block-lock-modal__options-title"
 						label={
 							<span id={ instanceId }>
-								{ __( 'Lock block' ) }
+								{ __( 'Lock Everything' ) }
 							</span>
 						}
 						checked={ isAllChecked }
@@ -113,7 +113,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							<CheckboxControl
 								label={
 									<>
-										{ __( 'Lock movement' ) }
+										{ __( 'Disable movement' ) }
 										<Icon icon={ dragHandle } />
 									</>
 								}
@@ -130,7 +130,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							<CheckboxControl
 								label={
 									<>
-										{ __( 'Lock removal' ) }
+										{ __( 'Prevent removal' ) }
 										<Icon icon={ trash } />
 									</>
 								}
