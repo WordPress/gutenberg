@@ -15,12 +15,13 @@ import menuItemsToBlocks from '../menu-items-to-blocks';
 const CLASSIC_MENU_CONVERSION_SUCCESS = 'success';
 const CLASSIC_MENU_CONVERSION_ERROR = 'error';
 const CLASSIC_MENU_CONVERSION_PENDING = 'pending';
+const CLASSIC_MENU_CONVERSION_IDLE = 'idle';
 
 function useConvertClassicToBlockMenu( clientId ) {
 	const createNavigationMenu = useCreateNavigationMenu( clientId );
 	const registry = useRegistry();
 
-	const [ status, setStatus ] = useState( 'idle' );
+	const [ status, setStatus ] = useState( CLASSIC_MENU_CONVERSION_IDLE );
 	const [ value, setValue ] = useState( null );
 	const [ error, setError ] = useState( null );
 
@@ -28,36 +29,37 @@ function useConvertClassicToBlockMenu( clientId ) {
 		let navigationMenu;
 		let classicMenuItems;
 
-		const menuItemsParameters = {
-			menus: menuId,
-			per_page: -1,
-			context: 'view',
-		};
-
-		const fetchError = new Error(
-			sprintf(
-				// translators: %s: the name of a menu (e.g. Header navigation).
-				__( `Unable to fetch classic menu "%s" from API.` ),
-				menuName
-			),
-			{
-				menuId,
-				menuName,
-			}
-		);
-
 		// 1. Fetch the classic Menu items.
 		try {
 			classicMenuItems = await registry
 				.resolveSelect( coreStore )
-				.getMenuItems( menuItemsParameters );
-		} catch ( e ) {
-			throw fetchError;
+				.getMenuItems( {
+					menus: menuId,
+					per_page: -1,
+					context: 'view',
+				} );
+		} catch ( err ) {
+			throw new Error(
+				sprintf(
+					// translators: %s: the name of a menu (e.g. Header navigation).
+					__( `Unable to fetch classic menu "%s" from API.` ),
+					menuName
+				),
+				{
+					cause: err,
+				}
+			);
 		}
 
 		// Handle offline response which resolves to `null`.
 		if ( classicMenuItems === null ) {
-			throw fetchError;
+			throw new Error(
+				sprintf(
+					// translators: %s: the name of a menu (e.g. Header navigation).
+					__( `Unable to fetch classic menu "%s" from API.` ),
+					menuName
+				)
+			);
 		}
 
 		// 2. Convert the classic items into blocks.
@@ -69,7 +71,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 				menuName,
 				innerBlocks
 			);
-		} catch ( e ) {
+		} catch ( err ) {
 			throw new Error(
 				sprintf(
 					// translators: %s: the name of a menu (e.g. Header navigation).
@@ -77,8 +79,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 					menuName
 				),
 				{
-					menuId,
-					menuName,
+					cause: err,
 				}
 			);
 		}
@@ -103,9 +104,21 @@ function useConvertClassicToBlockMenu( clientId ) {
 					setValue( navMenu );
 					setStatus( CLASSIC_MENU_CONVERSION_SUCCESS );
 				} )
-				.catch( ( e ) => {
-					setError( e?.message );
+				.catch( ( err ) => {
+					setError( err?.message );
 					setStatus( CLASSIC_MENU_CONVERSION_ERROR );
+
+					// Rethrow error for debugging.
+					throw new Error(
+						sprintf(
+							// translators: %s: the name of a menu (e.g. Header navigation).
+							__( `Unable to create Navigation Menu "%s".` ),
+							menuName
+						),
+						{
+							cause: err,
+						}
+					);
 				} );
 		},
 		[ clientId ]
