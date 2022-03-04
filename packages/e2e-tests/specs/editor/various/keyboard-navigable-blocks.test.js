@@ -209,7 +209,7 @@ describe( 'Order of block keyboard navigation', () => {
 	} );
 
 	it( 'allows the first element within a block to receive focus', async () => {
-		// Insert a columns block.
+		// Insert a group block.
 		await insertBlock( 'Image' );
 
 		const uploadButton = await page.waitForXPath(
