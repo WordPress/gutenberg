@@ -115,15 +115,15 @@ export default function BlockToolbar( { hideDragHandle } ) {
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 						<BlockSwitcher clientIds={ blockClientIds } />
-						<BlockMover
-							clientIds={ blockClientIds }
-							hideDragHandle={ hideDragHandle || hasReducedUI }
-						/>
 						{ ! isMultiToolbar && (
 							<BlockLockToolbar
 								clientId={ blockClientIds[ 0 ] }
 							/>
 						) }
+						<BlockMover
+							clientIds={ blockClientIds }
+							hideDragHandle={ hideDragHandle || hasReducedUI }
+						/>
 					</ToolbarGroup>
 				) }
 			</div>
