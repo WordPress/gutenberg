@@ -3,7 +3,7 @@
  */
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { PreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
+import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
 
 /**
  * Internal dependencies

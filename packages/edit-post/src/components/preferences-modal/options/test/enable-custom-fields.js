@@ -7,7 +7,7 @@ import { default as TestRenderer, act } from 'react-test-renderer';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { PreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
+import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
 
 /**
  * Internal dependencies

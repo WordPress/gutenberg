@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { PreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
+import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
 
 export function CustomFieldsConfirmation( { willEnable } ) {
 	const [ isReloading, setIsReloading ] = useState( false );

@@ -5,7 +5,7 @@ import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifViewportMatches } from '@wordpress/viewport';
 import { store as editorStore } from '@wordpress/editor';
-import { PreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
+import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
 
 export default compose(
 	withSelect( ( select ) => ( {
