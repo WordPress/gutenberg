@@ -4,7 +4,7 @@
 import type { Context, PostFormat, RenderedText, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import { DefaultContextByKN } from './entities';
+import type { DefaultContextOf } from './entities';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -219,5 +219,5 @@ declare module './base-entity-records' {
 }
 
 export type Theme<
-	C extends Context = DefaultContextByKN< 'root', 'theme' >
+	C extends Context = DefaultContextOf< 'root', 'theme' >
 > = OmitNevers< _BaseEntityRecords.Theme< C > >;

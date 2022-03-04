@@ -1,7 +1,13 @@
 /**
  * Internal dependencies
  */
-import type { Context, EntityQuery, Updatable } from './index';
+import type {
+	Attachment,
+	Context,
+	EntityQuery,
+	Updatable,
+	User,
+} from './index';
 import {
 	DefaultContextOf,
 	KeyOf,
@@ -14,18 +20,32 @@ import {
 
 type State = any;
 
+export type isRequestingEmbedPreview = ( state: State, url: string ) => boolean;
+export type getAuthors = (
+	state: State,
+	query: Record< string, unknown >
+) => Array< User >;
+
 export type getEntityRecord = <
 	R extends RecordOf< K, N >,
 	C extends Context = DefaultContextOf< R >,
 	K extends Kind = KindOf< R >,
 	N extends Name = NameOf< R >,
-	Q extends EntityQuery< any > = EntityQuery< C >
+	Q extends {
+		/**
+		 * The requested fields. If specified, the REST API will remove from the response
+		 * any fields not on that list.
+		 */
+		_fields?: string[];
+	} = {}
 >(
 	state: State,
 	kind: K,
 	name: N,
 	key: KeyOf< R >,
-	query?: Q
+	query?: Q & {
+		context?: C;
+	}
 ) =>
 	| ( Q[ '_fields' ] extends string[]
 			? Partial< RecordOf< K, N, C > >

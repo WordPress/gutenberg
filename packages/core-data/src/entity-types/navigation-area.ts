@@ -4,7 +4,7 @@
 import type { Context, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import { DefaultContextByKN } from './entities';
+import type { DefaultContextOf } from './entities';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -26,5 +26,5 @@ declare module './base-entity-records' {
 }
 
 export type NavigationArea<
-	C extends Context = DefaultContextByKN< 'root', 'navigationArea' >
+	C extends Context = DefaultContextOf< 'root', 'navigationArea' >
 > = OmitNevers< _BaseEntityRecords.NavigationArea< C > >;

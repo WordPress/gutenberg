@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { Context } from './helpers';
-import { CoreEntity } from '../entities';
+import type { Context } from './helpers';
+import type { CoreEntity } from '../entities';
 
 /**
  * The type that the entries of PerPackageEntities must adhere to. This is for reference only,
@@ -125,13 +125,11 @@ export type KeyOf<
  * in entities.js.
  */
 export type DefaultContextOf<
-	R extends EntityRecord
-> = EntityOf< R >[ 'defaultContext' ];
-
-export type DefaultContextByKN< K extends Kind, N extends Name > = Extract<
-	Entity,
-	{ kind: K; name: N }
->[ 'defaultContext' ];
+	RecordOrKind extends EntityRecord | Kind,
+	N extends Name = undefined
+> = RecordOrKind extends EntityRecord
+	? EntityOf< RecordOrKind >[ 'defaultContext' ]
+	: Extract< Entity, { kind: RecordOrKind; name: N } >[ 'defaultContext' ];
 
 /**
  * An entity record type associated with specified kind and name, sourced from PerPackageEntities.

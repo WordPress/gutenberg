@@ -9,7 +9,7 @@ import type {
 	RenderedText,
 } from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import { DefaultContextByKN } from './entities';
+import type { DefaultContextOf } from './entities';
 
 export type CommentStatus = 'hold' | 'approve' | 'spam' | 'trash' | '1' | '0';
 
@@ -93,5 +93,5 @@ declare module './base-entity-records' {
 }
 
 export type Comment<
-	C extends Context = DefaultContextByKN< 'root', 'comment' >
+	C extends Context = DefaultContextOf< 'root', 'comment' >
 > = OmitNevers< _BaseEntityRecords.Comment< C > >;
