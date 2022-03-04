@@ -307,7 +307,7 @@ export default function SearchEdit( {
 					className="wp-block-search__input"
 					style={ inputStyle }
 					numberOfLines={ 1 }
-					ellipsizeMode="tail" // currently only works on ios
+					ellipsizeMode="tail" // Currently only works on ios.
 					label={ null }
 					value={ placeholder }
 					placeholder={

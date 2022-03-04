@@ -64,7 +64,7 @@ describe( 'full post content fixture', () => {
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		// Load all hooks that modify blocks
+		// Load all hooks that modify blocks.
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		if ( process.env.IS_GUTENBERG_PLUGIN ) {
@@ -203,13 +203,26 @@ describe( 'full post content fixture', () => {
 			try {
 				expect( serializedActual ).toEqual( serializedExpected );
 			} catch ( err ) {
-				throw new Error(
-					format(
-						"File '%s' does not match expected value:\n\n%s",
-						serializedHTMLFileName,
-						err.message
-					)
-				);
+				if (
+					serialize( blocksActual ) ===
+					serialize( parse( serializedExpected ) )
+				) {
+					throw new Error(
+						format(
+							"File '%s' does not match expected value (however, the block re-serializes identically so you may need to run 'npm run fixtures:regenerate'):\n\n%s",
+							serializedHTMLFileName,
+							err.message
+						)
+					);
+				} else {
+					throw new Error(
+						format(
+							"File '%s' does not match expected value:\n\n%s",
+							serializedHTMLFileName,
+							err.message
+						)
+					);
+				}
 			}
 		} );
 	} );

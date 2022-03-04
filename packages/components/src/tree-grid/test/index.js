@@ -13,6 +13,8 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import TreeGrid from '../';
+import TreeGridRow from '../row';
+import TreeGridCell from '../cell';
 
 const TestButton = forwardRef( ( { ...props }, ref ) => (
 	<button { ...props } ref={ ref }></button>
@@ -46,9 +48,9 @@ describe( 'TreeGrid', () => {
 		it( 'renders a table, tbody and any child elements', () => {
 			const { container } = render(
 				<TreeGrid>
-					<tr>
-						<td>Test</td>
-					</tr>
+					<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 1 }>
+						<TreeGridCell withoutGridItem>Test</TreeGridCell>
+					</TreeGridRow>
 				</TreeGrid>
 			);
 
@@ -62,21 +64,36 @@ describe( 'TreeGrid', () => {
 
 			render(
 				<TreeGrid onExpandRow={ onExpandRow }>
-					<tr role="row" aria-expanded="true">
-						<td>
+					<TreeGridRow
+						level={ 1 }
+						positionInSet={ 1 }
+						setSize={ 3 }
+						isExpanded={ true }
+					>
+						<TreeGridCell withoutGridItem>
 							<TestButton>Row 1</TestButton>
-						</td>
-					</tr>
-					<tr role="row" aria-expanded="false">
-						<td>
+						</TreeGridCell>
+					</TreeGridRow>
+					<TreeGridRow
+						level={ 1 }
+						positionInSet={ 2 }
+						setSize={ 3 }
+						isExpanded={ false }
+					>
+						<TreeGridCell withoutGridItem>
 							<TestButton>Row 2</TestButton>
-						</td>
-					</tr>
-					<tr role="row" aria-expanded="true">
-						<td>
+						</TreeGridCell>
+					</TreeGridRow>
+					<TreeGridRow
+						level={ 1 }
+						positionInSet={ 3 }
+						setSize={ 3 }
+						isExpanded={ true }
+					>
+						<TreeGridCell withoutGridItem>
 							<TestButton>Row 3</TestButton>
-						</td>
-					</tr>
+						</TreeGridCell>
+					</TreeGridRow>
 				</TreeGrid>
 			);
 
@@ -99,21 +116,36 @@ describe( 'TreeGrid', () => {
 
 			render(
 				<TreeGrid onCollapseRow={ onCollapseRow }>
-					<tr role="row" aria-expanded="false">
-						<td>
+					<TreeGridRow
+						level={ 1 }
+						positionInSet={ 1 }
+						setSize={ 3 }
+						isExpanded={ false }
+					>
+						<TreeGridCell withoutGridItem>
 							<TestButton>Row 1</TestButton>
-						</td>
-					</tr>
-					<tr role="row" aria-expanded="true">
-						<td>
+						</TreeGridCell>
+					</TreeGridRow>
+					<TreeGridRow
+						level={ 1 }
+						positionInSet={ 2 }
+						setSize={ 3 }
+						isExpanded={ true }
+					>
+						<TreeGridCell withoutGridItem>
 							<TestButton>Row 2</TestButton>
-						</td>
-					</tr>
-					<tr role="row" aria-expanded="false">
-						<td>
+						</TreeGridCell>
+					</TreeGridRow>
+					<TreeGridRow
+						level={ 1 }
+						positionInSet={ 3 }
+						setSize={ 3 }
+						isExpanded={ false }
+					>
+						<TreeGridCell withoutGridItem>
 							<TestButton>Row 3</TestButton>
-						</td>
-					</tr>
+						</TreeGridCell>
+					</TreeGridRow>
 				</TreeGrid>
 			);
 
@@ -133,21 +165,21 @@ describe( 'TreeGrid', () => {
 	describe( 'onFocusRow', () => {
 		const TestTree = ( { onFocusRow } ) => (
 			<TreeGrid onFocusRow={ onFocusRow }>
-				<tr role="row" aria-expanded="false">
-					<td>
+				<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 3 }>
+					<TreeGridCell withoutGridItem>
 						<TestButton>Row 1</TestButton>
-					</td>
-				</tr>
-				<tr role="row" aria-expanded="true">
-					<td>
+					</TreeGridCell>
+				</TreeGridRow>
+				<TreeGridRow level={ 1 } positionInSet={ 2 } setSize={ 3 }>
+					<TreeGridCell withoutGridItem>
 						<TestButton>Row 2</TestButton>
-					</td>
-				</tr>
-				<tr role="row" aria-expanded="false">
-					<td>
+					</TreeGridCell>
+				</TreeGridRow>
+				<TreeGridRow level={ 1 } positionInSet={ 3 } setSize={ 3 }>
+					<TreeGridCell withoutGridItem>
 						<TestButton>Row 3</TestButton>
-					</td>
-				</tr>
+					</TreeGridCell>
+				</TreeGridRow>
 			</TreeGrid>
 		);
 

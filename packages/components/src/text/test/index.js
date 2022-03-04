@@ -99,7 +99,7 @@ describe( 'Text', () => {
 		const { container } = render(
 			<Text highlightWords={ undefined }>Lorem ipsum.</Text>
 		);
-		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered
+		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered.
 		expect( container.firstChild.childNodes ).toHaveLength( 1 );
 	} );
 
@@ -111,7 +111,7 @@ describe( 'Text', () => {
 		);
 
 		expect( container.firstChild ).toMatchSnapshot();
-		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered
+		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered.
 		expect( container.firstChild.childNodes ).toHaveLength( 1 );
 	} );
 

@@ -7,7 +7,7 @@ import { slashInserter, shortText } from './helpers/test-data';
 
 const ANIMATION_TIME = 200;
 
-// helper function for asserting slash inserter presence
+// Helper function for asserting slash inserter presence.
 async function assertSlashInserterPresent( checkIsVisible ) {
 	let areResultsDisplayed;
 	try {
@@ -66,7 +66,7 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 
 		assertSlashInserterPresent( true );
 
-		// Remove / character
+		// Remove / character.
 		if ( isAndroid() ) {
 			await editorPage.typeTextToParagraphBlock(
 				paragraphBlockElement,
@@ -82,7 +82,7 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 		}
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		// Check if the slash inserter UI no longer exists
+		// Check if the slash inserter UI no longer exists.
 		assertSlashInserterPresent( false );
 
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
@@ -105,24 +105,24 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 
 		assertSlashInserterPresent( true );
 
-		// Find Image block button
+		// Find Image block button.
 		const imageButtonElement = await editorPage.driver.elementByAccessibilityId(
 			'Image block'
 		);
 		expect( imageButtonElement ).toBeTruthy();
 
-		// Add image block
+		// Add image block.
 		await imageButtonElement.click();
 
-		// Check image exists in the editor
+		// Check image exists in the editor.
 		expect(
 			await editorPage.hasBlockAtPosition( 1, blockNames.image )
 		).toBe( true );
 
-		// Slash inserter UI should not be present after adding a block
+		// Slash inserter UI should not be present after adding a block.
 		assertSlashInserterPresent( false );
 
-		// Remove image block
+		// Remove image block.
 		await editorPage.removeBlockAtPosition( blockNames.image );
 	} );
 

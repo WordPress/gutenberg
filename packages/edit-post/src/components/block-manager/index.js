@@ -116,8 +116,8 @@ export default withSelect( ( select ) => {
 		hasBlockSupport,
 		isMatchingSearchTerm,
 	} = select( blocksStore );
-	const { getPreference } = select( editPostStore );
-	const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
+	const { getHiddenBlockTypes } = select( editPostStore );
+	const hiddenBlockTypes = getHiddenBlockTypes();
 	const numberOfHiddenBlocks =
 		isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 

@@ -138,23 +138,23 @@ describe( 'Template Part', () => {
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( 'Header Template Part 789' );
 
-			// Select the paragraph block
+			// Select the paragraph block.
 			const text = await canvas().waitForXPath(
 				'//p[contains(text(), "Header Template Part 789")]'
 			);
 
-			// Highlight all the text in the paragraph block
+			// Highlight all the text in the paragraph block.
 			await text.click( { clickCount: 3 } );
 
-			// Click the convert to link toolbar button
+			// Click the convert to link toolbar button.
 			await page.waitForSelector( 'button[aria-label="Link"]' );
 			await page.click( 'button[aria-label="Link"]' );
 
-			// Enter url for link
+			// Enter url for link.
 			await page.keyboard.type( 'https://google.com' );
 			await page.keyboard.press( 'Enter' );
 
-			// Verify that there is no error
+			// Verify that there is no error.
 			await canvas().click( 'p[data-type="core/paragraph"] a' );
 			const expectedContent = await canvas().$x(
 				'//p[contains(text(), "Header Template Part 789")]'
@@ -184,7 +184,7 @@ describe( 'Template Part', () => {
 			await page.keyboard.type( 'My template part' );
 			await page.keyboard.press( 'Enter' );
 
-			// Wait for creation to finish
+			// Wait for creation to finish.
 			await page.waitForXPath(
 				'//*[contains(@class, "components-snackbar")]/*[text()="Template part created."]'
 			);
@@ -233,7 +233,7 @@ describe( 'Template Part', () => {
 			await page.keyboard.type( 'My multi  template part' );
 			await page.keyboard.press( 'Enter' );
 
-			// Wait for creation to finish
+			// Wait for creation to finish.
 			await page.waitForXPath(
 				'//*[contains(@class, "components-snackbar")]/*[text()="Template part created."]'
 			);
@@ -250,11 +250,12 @@ describe( 'Template Part', () => {
 				finalTemplateParts.length - initialTemplateParts.length
 			).toBe( 1 );
 		} );
+
 		describe( 'Template part placeholder', () => {
 			// Test constants for template part.
 			const testContent = 'some words...';
 
-			// Selectors
+			// Selectors.
 			const entitiesSaveSelector =
 				'.editor-entities-saved-states__save-button';
 			const savePostSelector = '.edit-site-save-button__button';

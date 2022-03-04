@@ -124,7 +124,7 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
  * @return {?Object} The chosen default block type.
  */
 function getOutboundType( blockName ) {
-	// Grab the first outbound transform
+	// Grab the first outbound transform.
 	const transform = findTransform(
 		getBlockTransforms( 'to', blockName ),
 		( { type, blocks } ) => type === 'block' && blocks.length === 1 // What about when .length > 1?

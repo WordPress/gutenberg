@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 
 /**
  * External dependencies
@@ -45,7 +45,7 @@ function Modal( props, forwardedRef ) {
 		shouldCloseOnEsc = true,
 		shouldCloseOnClickOutside = true,
 		isDismissible = true,
-		/* accessibility */
+		/* Accessibility. */
 		aria = {
 			labelledby: null,
 			describedby: null,

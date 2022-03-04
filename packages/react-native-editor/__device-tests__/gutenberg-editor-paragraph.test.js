@@ -142,7 +142,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 <p>E</p>
 <!-- /wp:paragraph -->` );
 
-		// // Merge paragraphs
+		// // Merge paragraphs.
 		const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			2
@@ -156,7 +156,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			backspace
 		);
 
-		// verify the editor has not crashed
+		// Verify the editor has not crashed.
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text.length ).not.toEqual( 0 );
 
@@ -174,7 +174,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 <p></p>
 <!-- /wp:paragraph -->` );
 
-		// // Merge paragraphs
+		// // Merge paragraphs.
 		const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			2
@@ -185,7 +185,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			backspace
 		);
 
-		// verify the editor has not crashed
+		// Verify the editor has not crashed.
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text.length ).not.toEqual( 0 );
 

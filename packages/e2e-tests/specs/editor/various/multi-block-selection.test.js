@@ -694,12 +694,12 @@ describe( 'Multi-block selection', () => {
 		// Select a paragraph.
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		// Add a list
+		// Add a list.
 		await page.keyboard.type( '/list' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 
-		// Confirm correct setup: a paragraph and a list
+		// Confirm correct setup: a paragraph and a list.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await pressKeyWithModifier( 'primary', 'a' );

@@ -152,14 +152,16 @@ async function getLastCommitHash( gitWorkingDirectoryPath ) {
  * Cherry-picks a commit into trunk
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} commitHash              Branch Name
+ * @param {string} branchName              Branch name.
+ * @param {string} commitHash              Commit hash.
  */
 async function cherrypickCommitIntoBranch(
 	gitWorkingDirectoryPath,
+	branchName,
 	commitHash
 ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.checkout( 'trunk' );
+	await simpleGit.checkout( branchName );
 	await simpleGit.raw( [ 'cherry-pick', commitHash ] );
 }
 

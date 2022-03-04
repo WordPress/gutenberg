@@ -2,13 +2,28 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ConfirmDialog`: Add support for custom label text on the confirmation and cancelation buttons ([#38994](https://github.com/WordPress/gutenberg/pull/38994))
+-   `InputControl`: Allow `onBlur` for empty values to commit the change when `isPressEnterToChange` is true, and move reset behavior to the ESCAPE key. ([#39109](https://github.com/WordPress/gutenberg/pull/39109)).
+
+### Bug Fix
+
+-   Normalize `font-family` on `Button`, `ColorPalette`, `ComoboboxControl`, `DateTimePicker`, `FormTokenField`, `InputControl`, `SelectControl`, and `ToggleGroupControl` ([#38969](https://github.com/WordPress/gutenberg/pull/38969)).
+-   Fix input value selection of `InputControl`-based controls in Firefox and Safari with axial constraint of drag gesture ([#38968](https://github.com/WordPress/gutenberg/pull/38968)).
+-   Fix `UnitControl`'s behavior around updating the unit when a new `value` is passed (i.e. in controlled mode). ([#39148](https://github.com/WordPress/gutenberg/pull/39148)).
+
+## 19.5.0 (2022-02-23)
+
 ### Bug Fix
 
 -   Fix spin buttons of number inputs in Safari ([#38840](https://github.com/WordPress/gutenberg/pull/38840))
+-   Show tooltip on toggle custom size button in FontSizePicker ([#38985](https://github.com/WordPress/gutenberg/pull/38985))
 
 ### Enhancements
 
 -   `TreeGrid`: Add tests for `onCollapseRow`, `onExpandRow`, and `onFocusRow` callback functions. ([#38942](https://github.com/WordPress/gutenberg/pull/38942)).
+-   `TreeGrid`: Update callback tests to use `TreeGridRow` and `TreeGridCell` sub-components. ([#39002](https://github.com/WordPress/gutenberg/pull/39002)).
 
 ## 19.4.0 (2022-02-10)
 
@@ -26,16 +41,17 @@
 ### Enhancements
 
 -   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
--  `TreeGrid` accessibility enhancements around the expand/collapse functionality. ([#38358](https://github.com/WordPress/gutenberg/pull/38358))
--  `TreeGrid` accessibility: improve browser support for Left Arrow focus to parent row in child row.  ([#38639](https://github.com/WordPress/gutenberg/pull/38639))
--  `TreeGrid` accessibility: Add Home/End keys for better keyboard navigation. ([#38679](https://github.com/WordPress/gutenberg/pull/38679))
+-   `TreeGrid` accessibility enhancements around the expand/collapse functionality. ([#38358](https://github.com/WordPress/gutenberg/pull/38358))
+-   `TreeGrid` accessibility: improve browser support for Left Arrow focus to parent row in child row. ([#38639](https://github.com/WordPress/gutenberg/pull/38639))
+-   `TreeGrid` accessibility: Add Home/End keys for better keyboard navigation. ([#38679](https://github.com/WordPress/gutenberg/pull/38679))
 -   Add `resolvePoint` prop to `FocalPointPicker` to allow updating the value of the picker after a user interaction ([#38247](https://github.com/WordPress/gutenberg/pull/38247))
--  `TreeGrid`: Allow SHIFT key to be held, and add `onFocusRow` callback to the `TreeGrid` component, fired when focus is shifted from one row to another via Up and Down arrow keys. ([#38314](https://github.com/WordPress/gutenberg/pull/38314))
+-   `TreeGrid`: Allow SHIFT key to be held, and add `onFocusRow` callback to the `TreeGrid` component, fired when focus is shifted from one row to another via Up and Down arrow keys. ([#38314](https://github.com/WordPress/gutenberg/pull/38314))
 
 ### Experimental
 
 -   `Navigator`: rename `push`/`pop` to `goTo`/`goBack` ([#38582](https://github.com/WordPress/gutenberg/pull/38582))
 -   `Navigator`: add `NavigatorButton` and `NavigatorBackButton` components ([#38634](https://github.com/WordPress/gutenberg/pull/38634))
+-   `UnitControl`: tidy up utilities and types. In particular, change the type of parsed quantities to `number` (previously it could have been a `string` too). ([#38987](https://github.com/WordPress/gutenberg/pull/38987]))
 
 ## 19.3.0 (2022-01-27)
 
@@ -43,7 +59,7 @@
 
 -   Refine `ExternalLink` to be same size as the text, to appear more as a glyph than an icon. ([#37859](https://github.com/WordPress/gutenberg/pull/37859))
 -   Updated `ToolsPanel` header icon to only show "plus" icon when all items are optional and all are currently hidden ([#38262](https://github.com/WordPress/gutenberg/pull/38262))
--  `TreeGrid`: Fix keyboard navigation for expand/collapse table rows in Firefox ([#37983](https://github.com/WordPress/gutenberg/pull/37983))
+-   `TreeGrid`: Fix keyboard navigation for expand/collapse table rows in Firefox ([#37983](https://github.com/WordPress/gutenberg/pull/37983))
 
 ### Bug Fix
 

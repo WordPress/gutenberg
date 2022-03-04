@@ -675,7 +675,7 @@ export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
 	const blockA = select.getBlock( clientIdA );
 	const blockAType = getBlockType( blockA.name );
 
-	// Only focus the previous block if it's not mergeable
+	// Only focus the previous block if it's not mergeable.
 	if ( blockAType && ! blockAType.merge ) {
 		dispatch.selectBlock( blockA.clientId );
 		return;
@@ -744,18 +744,18 @@ export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
 	}
 
 	// We can only merge blocks with similar types
-	// thus, we transform the block to merge first
+	// thus, we transform the block to merge first.
 	const blocksWithTheSameType =
 		blockA.name === blockB.name
 			? [ cloneB ]
 			: switchToBlockType( cloneB, blockA.name );
 
-	// If the block types can not match, do nothing
+	// If the block types can not match, do nothing.
 	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
 		return;
 	}
 
-	// Calling the merge to update the attributes and remove the block to be merged
+	// Calling the merge to update the attributes and remove the block to be merged.
 	const updatedAttributes = blockAType.merge(
 		cloneA.attributes,
 		blocksWithTheSameType[ 0 ].attributes
