@@ -3,7 +3,6 @@
  */
 import type { Context } from './helpers';
 import type { CoreEntity } from '../entities';
-import { EntityQuery } from './helpers';
 
 /**
  * An entity type configuration entry as seen in src/entities.js.
@@ -33,6 +32,18 @@ export interface EntityDeclaration {
 	title?: string;
 	transientEdits?: { blocks: boolean };
 }
+
+/**
+ * HTTP Query parameters sent with the API request to fetch the entity records.
+ */
+type EntityQuery< C extends Context > = Record< string, any > & {
+	context?: C;
+	/**
+	 * The requested fields. If specified, the REST API will remove from the response
+	 * any fields not on that list.
+	 */
+	_fields?: string[];
+};
 
 /**
  * Helped type to turn an entity type configuration entry into a lookup

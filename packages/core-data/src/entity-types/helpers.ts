@@ -151,15 +151,3 @@ export interface RenderedText< C extends Context > {
 export type Updatable< T extends EntityRecord > = {
 	[ K in keyof T ]: T[ K ] extends RenderedText< any > ? string : T[ K ];
 };
-
-/**
- * HTTP Query parameters sent with the API request to fetch the entity records.
- */
-export type EntityQuery< C extends Context > = Record< string, any > & {
-	context?: C;
-	/**
-	 * The requested fields. If specified, the REST API will remove from the response
-	 * any fields not on that list.
-	 */
-	_fields?: string[];
-};
