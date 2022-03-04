@@ -28,6 +28,11 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		return [];
 	}
 
+	// No notice is shown after trashing a post
+	if ( post.status === 'trash' && previousPost.status !== 'trash' ) {
+		return [];
+	}
+
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = includes( publishStatus, previousPost.status );
 	const willPublish = includes( publishStatus, post.status );
@@ -41,19 +46,19 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		noticeMessage = __( 'Draft saved' );
 		shouldShowLink = false;
 	} else if ( isPublished && ! willPublish ) {
-		// If undoing publish status, show specific notice
+		// If undoing publish status, show specific notice.
 		noticeMessage = postType.labels.item_reverted_to_draft;
 		shouldShowLink = false;
 	} else if ( ! isPublished && willPublish ) {
 		// If publishing or scheduling a post, show the corresponding
-		// publish message
+		// publish message.
 		noticeMessage = {
 			publish: postType.labels.item_published,
 			private: postType.labels.item_published_privately,
 			future: postType.labels.item_scheduled,
 		}[ post.status ];
 	} else {
-		// Generic fallback notice
+		// Generic fallback notice.
 		noticeMessage = postType.labels.item_updated;
 	}
 
@@ -93,7 +98,7 @@ export function getNotificationArgumentsForSaveFail( data ) {
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.indexOf( post.status ) !== -1;
 	// If the post was being published, we show the corresponding publish error message
-	// Unless we publish an "updating failed" message
+	// Unless we publish an "updating failed" message.
 	const messages = {
 		publish: __( 'Publishing failed.' ),
 		private: __( 'Publishing failed.' ),

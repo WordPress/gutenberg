@@ -24,7 +24,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 		} );
 
 		beforeEach( async () => {
-			// Tap search block to ensure selected
+			// Tap search block to ensure selected.
 			const searchBlock = await editorPage.getBlockAtPosition(
 				blockNames.search
 			);
@@ -95,7 +95,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			await editorPage.toggleHideSearchLabelSetting( searchBlock );
 			await editorPage.dismissBottomSheet();
 
-			// switch to html and verify
+			// Switch to html and verify.
 			const html = await editorPage.getHtmlContent();
 			expect( html ).toContain( `"showLabel":false` );
 		} );
@@ -109,7 +109,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			await editorPage.toggleSearchIconOnlySetting( searchBlock );
 			await editorPage.dismissBottomSheet();
 
-			// switch to html and verify
+			// Switch to html and verify.
 			const html = await editorPage.getHtmlContent();
 			expect( html ).toContain( `"buttonUseIcon":true` );
 		} );
@@ -126,7 +126,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			);
 			await editorPage.dismissBottomSheet();
 
-			// switch to html and verify
+			// Switch to html and verify.
 			const html = await editorPage.getHtmlContent();
 			expect( html ).toContain( `"buttonPosition":"button-inside"` );
 		} );
@@ -143,7 +143,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			);
 			await editorPage.dismissBottomSheet();
 
-			// switch to html and verify
+			// Switch to html and verify.
 			const html = await editorPage.getHtmlContent();
 			expect( html ).toContain( `"buttonPosition":"no-button"` );
 		} );
@@ -156,7 +156,7 @@ const removeSearchBlock = async () => {
 	);
 	await searchBlock.click();
 
-	// Remove search block
+	// Remove search block.
 	await editorPage.removeBlockAtPosition( blockNames.search );
 };
 

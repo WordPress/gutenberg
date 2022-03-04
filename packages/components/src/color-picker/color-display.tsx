@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { colord, extend, Colord } from 'colord';
+import type { Colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -139,7 +139,7 @@ export const ColorDisplay = ( {
 		}
 	);
 	useEffect( () => {
-		// clear copyTimer on component unmount.
+		// Clear copyTimer on component unmount.
 		return () => {
 			if ( copyTimer.current ) {
 				clearTimeout( copyTimer.current );

@@ -35,8 +35,8 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarGroup,
-	ToolbarDropdownMenu,
 	Button,
+	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -47,7 +47,6 @@ import useListViewModal from './use-list-view-modal';
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
-import PlaceholderPreview from './placeholder/placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
@@ -107,7 +106,6 @@ function Navigation( {
 	hasSubmenuIndicatorSetting = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
-	customAppender: CustomAppender = null,
 } ) {
 	const {
 		openSubmenusOnClick,
@@ -174,8 +172,7 @@ function Navigation( {
 			// introduce a selector like `getUncontrolledInnerBlocks`, just in
 			// case `getBlock` is fixed.
 			const _uncontrolledInnerBlocks = getBlock( clientId ).innerBlocks;
-			const _hasUncontrolledInnerBlocks =
-				_uncontrolledInnerBlocks?.length;
+			const _hasUncontrolledInnerBlocks = !! _uncontrolledInnerBlocks?.length;
 			const _controlledInnerBlocks = _hasUncontrolledInnerBlocks
 				? EMPTY_ARRAY
 				: getBlocks( clientId );
@@ -207,10 +204,6 @@ function Navigation( {
 
 	const isWithinUnassignedArea = !! navigationArea && ! ref;
 
-	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasUncontrolledInnerBlocks || isWithinUnassignedArea
-	);
-
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
 	);
@@ -220,16 +213,15 @@ function Navigation( {
 	const {
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
-		canSwitchNavigationMenu,
-		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserDeleteNavigationEntity,
-		hasResolvedCanUserDeleteNavigationEntity,
-		canUserCreateNavigation,
-		hasResolvedCanUserCreateNavigation,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu,
+		canUserDeleteNavigationMenu,
+		hasResolvedCanUserDeleteNavigationMenu,
+		canUserCreateNavigationMenu,
+		isResolvingCanUserCreateNavigationMenu,
+		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
 	const navRef = useRef();
@@ -239,8 +231,23 @@ function Navigation( {
 		clientId
 	);
 
+	// The standard HTML5 tag for the block wrapper.
+	const TagName = 'nav';
+
+	// "placeholder" shown if:
+	// - we don't have a ref attribute pointing to a Navigation Post.
+	// - we don't have uncontrolled blocks.
+	// - (legacy) we have a Navigation Area without a ref attribute pointing to a Navigation Post.
+	const isPlaceholder =
+		! ref && ( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
+
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
+
+	// "loading" state:
+	// - there is a ref attribute pointing to a Navigation Post
+	// - the Navigation Post isn't available (hasn't resolved) yet.
+	const isLoading = !! ( ref && ! isEntityAvailable );
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -333,11 +340,6 @@ function Navigation( {
 		}
 	} );
 
-	// Hide the placeholder if an navigation menu entity has loaded.
-	useEffect( () => {
-		setIsPlaceholderShown( ! isEntityAvailable );
-	}, [ isEntityAvailable ] );
-
 	const [ showCantEditNotice, hideCantEditNotice ] = useNavigationNotice( {
 		name: 'block-library/core/navigation/permissions/update',
 		message: __(
@@ -362,16 +364,16 @@ function Navigation( {
 
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
-				hasResolvedCanUserUpdateNavigationEntity &&
-				! canUserUpdateNavigationEntity
+				hasResolvedCanUserUpdateNavigationMenu &&
+				! canUserUpdateNavigationMenu
 			) {
 				showCantEditNotice();
 			}
 
 			if (
 				! ref &&
-				hasResolvedCanUserCreateNavigation &&
-				! canUserCreateNavigation
+				hasResolvedCanUserCreateNavigationMenu &&
+				! canUserCreateNavigationMenu
 			) {
 				showCantCreateNotice();
 			}
@@ -379,10 +381,10 @@ function Navigation( {
 	}, [
 		isSelected,
 		isInnerBlockSelected,
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserCreateNavigation,
-		hasResolvedCanUserCreateNavigation,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu,
+		canUserCreateNavigationMenu,
+		hasResolvedCanUserCreateNavigationMenu,
 		ref,
 	] );
 
@@ -397,7 +399,6 @@ function Navigation( {
 			if ( ! ref ) {
 				replaceInnerBlocks( clientId, [] );
 			}
-			setIsPlaceholderShown( true );
 		} );
 	}, [ clientId, ref ] );
 
@@ -409,7 +410,7 @@ function Navigation( {
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 	if ( hasUnsavedBlocks ) {
 		return (
-			<nav { ...blockProps }>
+			<TagName { ...blockProps }>
 				<ResponsiveWrapper
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
@@ -436,7 +437,7 @@ function Navigation( {
 						} }
 					/>
 				</ResponsiveWrapper>
-			</nav>
+			</TagName>
 		);
 	}
 
@@ -478,31 +479,45 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
+	if ( isPlaceholder ) {
+		return (
+			<TagName { ...blockProps }>
+				<PlaceholderComponent
+					isSelected={ isSelected }
+					currentMenuId={ ref }
+					clientId={ clientId }
+					canUserCreateNavigationMenu={ canUserCreateNavigationMenu }
+					isResolvingCanUserCreateNavigationMenu={
+						isResolvingCanUserCreateNavigationMenu
+					}
+					onFinish={ ( post ) => {
+						if ( post ) {
+							setRef( post.id );
+						}
+						selectBlock( clientId );
+					} }
+				/>
+			</TagName>
+		);
+	}
+
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider>
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
-						<ToolbarGroup>
-							<ToolbarDropdownMenu
-								label={ __( 'Select Menu' ) }
-								text={ __( 'Select Menu' ) }
-								icon={ null }
-							>
-								{ ( { onClose } ) => (
-									<NavigationMenuSelector
-										clientId={ clientId }
-										onSelect={ ( { id } ) => {
-											setRef( id );
-											onClose();
-										} }
-										onCreateNew={ startWithEmptyMenu }
-										canUserCreateNavigation={
-											canUserCreateNavigation
-										}
-									/>
-								) }
-							</ToolbarDropdownMenu>
+						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
+							<NavigationMenuSelector
+								currentMenuId={ ref }
+								clientId={ clientId }
+								onSelect={ ( { id } ) => {
+									setRef( id );
+								} }
+								onCreateNew={ startWithEmptyMenu }
+								/* translators: %s: The name of a menu. */
+								actionLabel={ __( "Switch to '%s'" ) }
+								showManageActions
+							/>
 						</ToolbarGroup>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
@@ -646,41 +661,27 @@ function Navigation( {
 				</InspectorControls>
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
-						{ hasResolvedCanUserUpdateNavigationEntity &&
-							canUserUpdateNavigationEntity && (
+						{ hasResolvedCanUserUpdateNavigationMenu &&
+							canUserUpdateNavigationMenu && (
 								<NavigationMenuNameControl />
 							) }
-						{ hasResolvedCanUserDeleteNavigationEntity &&
-							canUserDeleteNavigationEntity && (
+						{ hasResolvedCanUserDeleteNavigationMenu &&
+							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
 									onDelete={ startWithEmptyMenu }
 								/>
 							) }
 					</InspectorControls>
 				) }
-				<nav { ...blockProps }>
-					{ isPlaceholderShown && (
-						<PlaceholderComponent
-							onFinish={ ( post ) => {
-								setIsPlaceholderShown( false );
-								if ( post ) {
-									setRef( post.id );
-								}
-								selectBlock( clientId );
-							} }
-							canSwitchNavigationMenu={ canSwitchNavigationMenu }
-							hasResolvedNavigationMenus={
-								hasResolvedNavigationMenus
-							}
-							clientId={ clientId }
-							canUserCreateNavigation={ canUserCreateNavigation }
-						/>
-					) }
-					{ ! hasResolvedCanUserCreateNavigation ||
-						( ! isEntityAvailable && ! isPlaceholderShown && (
-							<PlaceholderPreview isLoading />
-						) ) }
-					{ ! isPlaceholderShown && (
+
+				{ isLoading && (
+					<TagName { ...blockProps }>
+						<Spinner className="wp-block-navigation__loading-indicator" />
+					</TagName>
+				) }
+
+				{ ! isLoading && (
+					<TagName { ...blockProps }>
 						<ResponsiveWrapper
 							id={ clientId }
 							onToggle={ setResponsiveMenuVisibility }
@@ -694,9 +695,7 @@ function Navigation( {
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks
-									isVisible={ ! isPlaceholderShown }
 									clientId={ clientId }
-									appender={ CustomAppender }
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}
@@ -704,8 +703,8 @@ function Navigation( {
 								/>
 							) }
 						</ResponsiveWrapper>
-					) }
-				</nav>
+					</TagName>
+				) }
 			</RecursionProvider>
 		</EntityProvider>
 	);

@@ -32,7 +32,11 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 
 When adding new components or new props to existing components, it's recommended to prefix them with `__unstable` or `__experimental` until they're stable enough to be exposed as part of the public API.
 
-Learn more on [How to preserve backward compatibility for a React Component](/docs/how-to-guides/backward-compatibility/README.md#how-to-preserve-backward-compatibility-for-a-react-component) and [Experimental and Unstable APIs](/docs/contributors/code/coding-guidelines.md#experimental-and-unstable-apis).
+### Learn more
+
+- [How to preserve backward compatibility for a React Component](/docs/contributors/code/backward-compatibility.md#how-to-preserve-backward-compatibility-for-a-react-component)
+- [Experimental and Unstable APIs](/docs/contributors/code/coding-guidelines.md#experimental-and-unstable-apis)
+- [Deprecating styles](#deprecating-styles)
 
 <!-- ## Polymorphic Components (i.e. the `as` prop)
 
@@ -141,7 +145,7 @@ function useExampleComponent( props: PolymorphicComponentProps< ExampleProps, 'd
 // in `component.tsx`
 function Example(
 	props: PolymorphicComponentProps< ExampleProps, 'div' >,
-	forwardedRef: Ref< any >
+	forwardedRef: React.ForwardedRef< any >
 ) {
 	const exampleProps = useExampleComponent( props );
 
@@ -179,6 +183,69 @@ We strongly encourage using TypeScript for all new components. Components should
 All new component should be styled using [Emotion](https://emotion.sh/docs/introduction).
 
 Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
+
+
+### Deprecating styles
+
+Changing the styles of a non-experimental component must be done with care. To prevent serious breakage in third-party usage, in some cases we may want a grace period before fully removing the old styles. This can be done by temporarily placing the new styles behind a feature flag prop prefixed by `__next`, accompanied by a `deprecate()` warning in the console. The feature flag should be opt-in (false by default), and have a reasonably descriptive name (**not** `__nextHasNewStyles`). A descriptive name allows for multiple deprecations to proceed in parallel, separated by concerns or by deprecation version.
+
+```jsx
+// component.tsx
+import deprecated from '@wordpress/deprecated';
+import { Wrapper } from './styles.ts';
+
+function MyComponent({ __nextHasNoOuterMargins = false }) {
+	if ( ! __nextHasNoOuterMargins ) {
+		deprecated( 'Outer margin styles for wp.components.MyComponent', {
+			since: '6.0',
+			version: '6.2', // Set a reasonable grace period depending on impact
+			hint:
+				'Set the `__nextHasNoOuterMargins` prop to true to start opting into the new styles, which will become the default in a future version.',
+		} );
+	}
+	return <Wrapper __nextHasNoOuterMargins={__nextHasNoOuterMargins} />
+}
+```
+
+Styles should be structured so the deprecated styles are cleanly encapsulated, and can be easily removed when the deprecation version arrives.
+
+```js
+// styles.ts
+const deprecatedMargins = ({ __nextHasNoOuterMargins }) => {
+  if ( ! __nextHasNoOuterMargins ) {
+    return css`
+      margin: 8px;
+    `;
+  }
+};
+
+export const Wrapper = styled.div`
+  margin: 0;
+
+  ${deprecatedMargins}
+`;
+```
+
+Once deprecated, code examples in docs/stories should include the opt-in prop set to `true` so that new consumers are encouraged to adopt it from the start.
+
+Remember to [add a **Needs Dev Note** label](/docs/contributors/code/backward-compatibility.md##dev-notes) to the pull request so third-party developers can be informed of the deprecation.
+
+When the grace period is over and the deprecation version arrives, the `__next*` prop, deprecation notice, and deprecated styles should all be completely removed from the codebase.
+
+#### Criteria for putting styles changes behind a feature flag
+
+Not all style changes justify a formal deprecation process. The main thing to look for is whether the changes could cause layouts to break in an obvious or harmful way, given that the component is being used in a standard fashion.
+
+##### DOES need formal deprecation
+
+- Removing an outer margin.
+- Substantial changes to width/height, such as adding or removing a size restriction.
+
+##### DOES NOT need formal deprecation
+
+- Breakage only occurs in non-standard usage, such as when the consumer is overriding component internals.
+- Minor layout shifts of a few pixels.
+- Internal layout changes of a higher-level component.
 
 ## Context system
 

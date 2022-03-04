@@ -34,7 +34,7 @@ describe( 'Editor', () => {
 		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();
 
 		const appContainer = renderEditorWith( unsupportedBlock );
-		// for some reason resetEditorBlocks() is asynchronous when dispatching editEntityRecord
+		// For some reason resetEditorBlocks() is asynchronous when dispatching editEntityRecord.
 		act( () => {
 			jest.runAllTicks();
 		} );
@@ -49,7 +49,7 @@ describe( 'Editor', () => {
 	} );
 } );
 
-// Utilities
+// Utilities.
 const renderEditorWith = ( content ) => {
 	return render(
 		<Editor

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Deprecations
+
+- Deprecated `cleanForSlug` that is now part of `@wordpress/url`.
+
+## 12.2.0 (2022-02-10)
+
 ### Enhancement
 
 -   Export `PostTaxonomiesFlatTermSelector` and `PostTaxonomiesHierarchicalTermSelector` components to allow using them to customize the default term selector for a taxonomy.
@@ -9,6 +15,10 @@
 ### Bug Fix
 
 -   Removed unused `@wordpress/autop`, `@wordpress/blob` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+### Deprecations
+
+- the `createUndoLevel` and `refreshPost` actions were marked as deprecated. They were already defunct and acting as noops.
 
 ## 12.1.0 (2022-01-27)
 

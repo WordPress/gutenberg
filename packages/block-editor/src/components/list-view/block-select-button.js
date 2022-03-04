@@ -36,6 +36,7 @@ function ListViewBlockSelectButton(
 		onDragStart,
 		onDragEnd,
 		draggable,
+		isExpanded,
 	},
 	ref
 ) {
@@ -59,7 +60,6 @@ function ListViewBlockSelectButton(
 
 	function onKeyDownHandler( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
-			event.preventDefault();
 			onClick( event );
 		}
 	}
@@ -81,6 +81,7 @@ function ListViewBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
+				aria-expanded={ isExpanded }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />

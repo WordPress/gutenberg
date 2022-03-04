@@ -104,6 +104,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalFeatures',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
+				'__experimentalGenerateAnchors',
 				'__unstableGalleryWithImageBlocks',
 				'alignWide',
 				'allowedBlockTypes',
@@ -148,6 +149,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
 			pageOnFront,
+			__experimentalPreferPatternsOnRoot: hasTemplate,
 		} ),
 		[
 			settings,

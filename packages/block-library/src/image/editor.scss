@@ -70,24 +70,6 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
-*:not([data-align]) {
-	> .wp-block-image {
-		display: grid;
-		grid-template-columns: [image] minmax(0, max-content) [placeholder] auto;
-		.components-placeholder {
-			grid-column: placeholder;
-		}
-		> div:not(.components-placeholder) {
-			grid-column: image;
-		}
-		> figcaption {
-			grid-column: image;
-			display: table-caption;
-			caption-side: bottom;
-		}
-	}
-}
-
 .wp-block[data-align="left"] > .wp-block-image {
 	margin-right: 1em;
 	margin-left: 0;

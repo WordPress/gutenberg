@@ -84,6 +84,7 @@ import * as queryPaginationPrevious from './query-pagination-previous';
 import * as queryTitle from './query-title';
 import * as quote from './quote';
 import * as reusableBlock from './block';
+import * as readMore from './read-more';
 import * as rss from './rss';
 import * as search from './search';
 import * as separator from './separator';
@@ -95,7 +96,6 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as table from './table';
-// import * as tableOfContents from './table-of-contents';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termDescription from './term-description';
@@ -144,7 +144,7 @@ export const __experimentalGetCoreBlocks = () => [
 	buttons,
 	calendar,
 	categories,
-	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
+	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context.
 	code,
 	column,
 	columns,
@@ -271,6 +271,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 							postCommentsCount,
 							postCommentsForm,
 							postCommentsLink,
+							readMore,
 					  ]
 					: [] ),
 			].forEach( registerBlock );

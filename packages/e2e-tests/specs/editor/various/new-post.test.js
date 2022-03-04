@@ -27,7 +27,7 @@ describe( 'new editor state', () => {
 		// Should display the blank title.
 		const title = await page.$( '[aria-label="Add title"]' );
 		expect( title ).not.toBeNull();
-		// Trim padding non-breaking space
+		// Trim padding non-breaking space.
 		expect(
 			await title.evaluate( ( el ) => el.textContent.trim() )
 		).toBeFalsy();

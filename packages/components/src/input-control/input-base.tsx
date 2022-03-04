@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -66,13 +66,13 @@ export function InputBase(
 		suffix,
 		...props
 	}: InputBaseProps,
-	ref: Ref< HTMLDivElement >
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;
 
 	return (
-		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions
+		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
 		<Root
 			{ ...props }
 			{ ...getUIFlexProps( labelPosition ) }

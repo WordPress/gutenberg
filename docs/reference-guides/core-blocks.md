@@ -204,7 +204,7 @@ An advanced block that allows displaying post comments based on different query 
 -	**Name:** core/comments-query-loop
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** inherit, order, perPage, tagName
+-	**Attributes:** defaultPage, inherit, order, perPage, tagName
 
 ## Cover
 
@@ -257,7 +257,7 @@ Combine blocks into a group. ([Source](https://github.com/WordPress/gutenberg/tr
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** tagName, templateLock
 
 ## Heading
@@ -655,6 +655,15 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 -	**Category:** text
 -	**Supports:** anchor, typography (fontSize, lineHeight)
 -	**Attributes:** align, citation, value
+
+## Read More
+
+Displays the link of a post, page, or any other content-type. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/read-more))
+
+-	**Name:** core/read-more
+-	**Category:** theme
+-	**Supports:** color (background, gradients, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** content, linkTarget
 
 ## RSS
 

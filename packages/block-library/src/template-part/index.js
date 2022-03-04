@@ -10,6 +10,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import { symbolFilled } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -39,7 +40,9 @@ export const settings = {
 			return;
 		}
 
-		return startCase( entity.title?.rendered || entity.slug );
+		return (
+			decodeEntities( entity.title?.rendered ) || startCase( entity.slug )
+		);
 	},
 	edit,
 };

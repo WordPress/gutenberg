@@ -17,7 +17,6 @@ import {
 	EntitiesSavedStates,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { PluginArea } from '@wordpress/plugins';
 import {
 	ShortcutProvider,
 	store as keyboardShortcutsStore,
@@ -165,7 +164,7 @@ function Editor( { onError } ) {
 		[ enableComplementaryArea ]
 	);
 
-	// Don't render the Editor until the settings are set and loaded
+	// Don't render the Editor until the settings are set and loaded.
 	const isReady =
 		settings?.siteUrl &&
 		templateType !== undefined &&
@@ -286,7 +285,13 @@ function Editor( { onError } ) {
 													) }
 												</>
 											}
-											footer={ <BlockBreadcrumb /> }
+											footer={
+												<BlockBreadcrumb
+													rootLabelText={ __(
+														'Template'
+													) }
+												/>
+											}
 											shortcuts={ {
 												previous: previousShortcut,
 												next: nextShortcut,
@@ -294,7 +299,6 @@ function Editor( { onError } ) {
 										/>
 										<WelcomeGuide />
 										<Popover.Slot />
-										<PluginArea />
 									</ErrorBoundary>
 								</BlockContextProvider>
 							</GlobalStylesProvider>

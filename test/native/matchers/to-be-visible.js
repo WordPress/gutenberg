@@ -17,7 +17,7 @@ function isStyleVisible( element ) {
 }
 
 function isAttributeVisible( element ) {
-	return element.type !== 'Modal' || ! element.props.visible === false;
+	return element.type !== 'Modal' || element.props.visible !== false;
 }
 
 function isElementVisible( element ) {

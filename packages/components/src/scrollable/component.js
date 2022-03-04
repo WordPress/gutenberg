@@ -7,7 +7,7 @@ import { useScrollable } from './hook';
 
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                        forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                               forwardedRef
  */
 function Scrollable( props, forwardedRef ) {
 	const scrollableProps = useScrollable( props );

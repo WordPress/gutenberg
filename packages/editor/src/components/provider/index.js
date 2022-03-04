@@ -92,7 +92,7 @@ function EditorProvider( {
 		};
 	}, [] );
 
-	// Synchronize the editor settings as they change
+	// Synchronize the editor settings as they change.
 	useEffect( () => {
 		updateEditorSettings( settings );
 	}, [ settings ] );

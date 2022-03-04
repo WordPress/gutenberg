@@ -15,20 +15,20 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 const configPath = 'test/native';
 
-const transpiledPackageNames = glob( '../../packages/*/src/index.js' ).map(
+const transpiledPackageNames = glob( '../../packages/*/src/index.{js,ts}' ).map(
 	( fileName ) => fileName.split( '/' )[ 3 ]
 );
 
 module.exports = {
 	verbose: true,
 	rootDir: '../../',
-	// Automatically clear mock calls and instances between every test
+	// Automatically clear mock calls and instances between every test.
 	clearMocks: true,
 	preset: 'react-native',
 	setupFiles: [ '<rootDir>/' + configPath + '/setup.js' ],
 	setupFilesAfterEnv: [ '<rootDir>/' + configPath + '/setup-after-env.js' ],
 	testMatch: [
-		'**/test/*.native.[jt]s?(x)',
+		'**/test/!(helper)*.native.[jt]s?(x)',
 		'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
 	],
 	testPathIgnorePatterns: [

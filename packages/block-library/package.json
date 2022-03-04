@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "6.1.0",
+	"version": "7.0.2",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -66,6 +66,10 @@
 		"memize": "^1.1.0",
 		"micromodal": "^0.4.10",
 		"moment": "^2.22.1"
+	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
