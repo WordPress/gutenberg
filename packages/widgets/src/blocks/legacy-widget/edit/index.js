@@ -96,7 +96,7 @@ function NotEmpty( {
 
 	const widgetTypeId = id ?? idBase;
 	const {
-		data: widgetType,
+		record: widgetType,
 		hasResolved: hasResolvedWidgetType,
 	} = useEntityRecord( 'root', 'widgetType', widgetTypeId );
 
