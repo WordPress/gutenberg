@@ -1,18 +1,16 @@
 /**
  * Internal dependencies
  */
-import type {
-	Context,
+import type { Context, EntityQuery, Updatable } from './index';
+import {
 	DefaultContextOf,
-	EntityQuery,
 	KeyOf,
 	Kind,
 	KindOf,
 	Name,
 	NameOf,
 	RecordOf,
-} from './index';
-import { Updatable } from './index';
+} from './entities';
 
 type State = any;
 
