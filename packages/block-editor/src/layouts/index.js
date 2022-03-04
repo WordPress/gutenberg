@@ -14,7 +14,10 @@ const layoutTypes = [ flow, flex, constrained ];
  * @return {Object} Layout type.
  */
 export function getLayoutType( name = 'default' ) {
-	return layoutTypes.find( ( layoutType ) => layoutType.name === name );
+	return (
+		layoutTypes.find( ( layoutType ) => layoutType.name === name ) ??
+		layoutTypes.find( ( layoutType ) => layoutType.name === 'default' )
+	);
 }
 
 /**
