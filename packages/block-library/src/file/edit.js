@@ -90,7 +90,10 @@ function FileEdit( {
 		[ id ]
 	);
 
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const {
+		toggleSelection,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		// Upload a file drag-and-dropped into the editor.
@@ -112,11 +115,12 @@ function FileEdit( {
 	}, [] );
 
 	useEffect( () => {
-		if ( ! fileId ) {
+		if ( ! fileId && href ) {
 			// Add a unique fileId to each file block.
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
 		}
-	}, [ fileId, clientId ] );
+	}, [ href, fileId, clientId ] );
 
 	function onSelectFile( newMedia ) {
 		if ( newMedia && newMedia.url ) {
