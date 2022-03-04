@@ -84,15 +84,15 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 
 		// Wait for the autocomplete suggestion item to appear.
 		await page.waitForXPath( suggestionPath );
-		// Set the suggestion
+		// Set the suggestion.
 		const suggestion = await page.waitForXPath( suggestionPath );
 
-		// Select it (so we're clicking the right one, even if it's further down the list)
+		// Select it (so we're clicking the right one, even if it's further down the list).
 		await suggestion.click();
 	}
 
 	if ( label ) {
-		// Wait for rich text editor input to be focused before we start typing the label
+		// Wait for rich text editor input to be focused before we start typing the label.
 		await page.waitForSelector( ':focus.rich-text' );
 
 		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label if the label is URL-ish.
@@ -264,49 +264,195 @@ describe( 'Navigation', () => {
 		await deleteUser( contributorUsername );
 	} );
 
-	describe( 'placeholder', () => {
-		it( 'allows a navigation block to be created from existing menus', async () => {
-			await createClassicMenu( { name: 'Test Menu 1' } );
-			await createClassicMenu(
-				{ name: 'Test Menu 2' },
-				menuItemsFixture
+	describe( 'loading states', () => {
+		it( 'does not show a loading indicator if there is no ref to a Navigation post', async () => {
+			await createNewPost();
+			await clickOnMoreMenuItem( 'Code editor' );
+			const codeEditorInput = await page.waitForSelector(
+				'.editor-post-text-editor'
 			);
 
-			await createNewPost();
-			await insertBlock( 'Navigation' );
-			await selectClassicMenu( 'Test Menu 2' );
+			// Simulate block behaviour when loading a page containing an unconfigured Nav block
+			// that is not selected.
+			await codeEditorInput.click();
+			const markup = '<!-- wp:navigation /-->';
+			await page.keyboard.type( markup );
+			await clickButton( 'Exit code editor' );
 
-			// Wait for a navigation link block before making assertion.
-			await page.waitForSelector( '*[aria-label="Block: Custom Link"]' );
-			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+			// Wait for block to render...
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Test specifically for the primary loading indicator because a spinner also exists
+			// in the hidden Placeholder component when it is loading.
+			const loadingSpinner = await navBlock.$(
+				'.wp-block-navigation__loading-indicator.components-spinner'
+			);
+
+			// We should not see the loading state if the block has not been configured and is empty.
+			expect( loadingSpinner ).toBeNull();
 		} );
 
-		it( 'creates an empty navigation block when the selected existing menu is also empty', async () => {
-			await createClassicMenu( { name: 'Test Menu 1' } );
-			await createNewPost();
-			await insertBlock( 'Navigation' );
-			await selectClassicMenu( 'Test Menu 1' );
+		it( 'shows a loading indicator whilst ref resolves to Navigation post items', async () => {
+			const testNavId = 1;
 
-			// Wait for the appender so that we know the navigation menu was created.
-			await page.waitForSelector(
-				'nav[aria-label="Block: Navigation"] button[aria-label="Add block"]'
+			let resolveNavigationRequest;
+
+			// Mock the request for the single Navigation post in order to fully
+			// control the resolution of the request. This will enable the ability
+			// to assert on how the UI responds during the API resolution without
+			// relying on variable factors such as network conditions.
+			await setUpResponseMocking( [
+				{
+					match: ( request ) =>
+						request.url().includes( `rest_route` ) &&
+						request.url().includes( `navigation` ) &&
+						request.url().includes( testNavId ),
+					onRequestMatch: () => {
+						// The Promise simulates a REST API request whose resolultion
+						// the test has full control over.
+						return new Promise( ( resolve ) => {
+							// Assign the resolution function to the var in the
+							// upper scope to afford control over resolution.
+							resolveNavigationRequest = resolve;
+						} );
+					},
+				},
+			] );
+
+			await createNewPost();
+			await clickOnMoreMenuItem( 'Code editor' );
+			const codeEditorInput = await page.waitForSelector(
+				'.editor-post-text-editor'
 			);
-			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+			await codeEditorInput.click();
+
+			// The ID used in this `ref` is that which we mock in the request
+			// above to ensure we can control the resolution of the Navigation post.
+			const markup = `<!-- wp:navigation {"ref":${ testNavId }} /-->`;
+			await page.keyboard.type( markup );
+			await clickButton( 'Exit code editor' );
+
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Check for the spinner to be present whilst loading.
+			await navBlock.waitForSelector( '.components-spinner' );
+
+			// Resolve the controlled mocked API request.
+			resolveNavigationRequest();
+		} );
+	} );
+
+	describe( 'Placeholder', () => {
+		describe( 'placeholder states', () => {
+			it( 'shows placeholder on insertion of block', async () => {
+				await createNewPost();
+				await insertBlock( 'Navigation' );
+				await page.waitForXPath( START_EMPTY_XPATH );
+			} );
+
+			it( 'shows placeholder preview when unconfigured block is not selected', async () => {
+				await createNewPost();
+				await insertBlock( 'Navigation' );
+
+				// Check for unconfigured Placeholder state to display
+				await page.waitForXPath( START_EMPTY_XPATH );
+
+				// Deselect the Nav block.
+				await page.keyboard.press( 'Escape' );
+				await page.keyboard.press( 'Escape' );
+
+				const navBlock = await waitForBlock( 'Navigation' );
+
+				// Check Placeholder Preview is visible.
+				await navBlock.waitForSelector(
+					'.wp-block-navigation-placeholder__preview',
+					{ visible: true }
+				);
+
+				// Check Placeholder Component itself is not visible.
+				await navBlock.waitForSelector(
+					'.wp-block-navigation-placeholder__controls',
+					{ visible: false }
+				);
+			} );
+
+			it( 'shows placeholder preview when block with no menu items is not selected', async () => {
+				await createNewPost();
+				await insertBlock( 'Navigation' );
+
+				// Create empty Navigation block with no items
+				const startEmptyButton = await page.waitForXPath(
+					START_EMPTY_XPATH
+				);
+				await startEmptyButton.click();
+
+				const navBlock = await waitForBlock( 'Navigation' );
+
+				// Deselect the Nav block.
+				await page.keyboard.press( 'Escape' );
+				await page.keyboard.press( 'Escape' );
+
+				// Check Placeholder Preview is visible.
+				await navBlock.waitForSelector(
+					'.wp-block-navigation-placeholder__preview',
+					{ visible: true }
+				);
+
+				// Check the block's appender is not visible.
+				const blockAppender = await navBlock.$(
+					'.block-list-appender'
+				);
+
+				expect( blockAppender ).toBeNull();
+			} );
 		} );
 
-		it( 'does not display the options to create from pages or menus if there are none', async () => {
-			await createNewPost();
+		describe( 'placeholder actions', () => {
+			it( 'allows a navigation block to be created from existing menus', async () => {
+				await createClassicMenu( { name: 'Test Menu 1' } );
+				await createClassicMenu(
+					{ name: 'Test Menu 2' },
+					menuItemsFixture
+				);
 
-			await insertBlock( 'Navigation' );
-			await page.waitForXPath( START_EMPTY_XPATH );
+				await createNewPost();
+				await insertBlock( 'Navigation' );
+				await selectClassicMenu( 'Test Menu 2' );
 
-			const placeholderActionsLength = await page.$$eval(
-				`.${ PLACEHOLDER_ACTIONS_CLASS } button`,
-				( els ) => els.length
-			);
+				// Wait for a navigation link block before making assertion.
+				await page.waitForSelector(
+					'*[aria-label="Block: Custom Link"]'
+				);
+				expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+			} );
 
-			// Should only be showing "Start empty".
-			expect( placeholderActionsLength ).toEqual( 1 );
+			it( 'creates an empty navigation block when the selected existing menu is also empty', async () => {
+				await createClassicMenu( { name: 'Test Menu 1' } );
+				await createNewPost();
+				await insertBlock( 'Navigation' );
+				await selectClassicMenu( 'Test Menu 1' );
+
+				// Wait for the appender so that we know the navigation menu was created.
+				await page.waitForSelector(
+					'nav[aria-label="Block: Navigation"] button[aria-label="Add block"]'
+				);
+				expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+			} );
+
+			it( 'does not display the options to create from existing menus if there are no existing menus', async () => {
+				await createNewPost();
+
+				await insertBlock( 'Navigation' );
+				await page.waitForXPath( START_EMPTY_XPATH );
+
+				const placeholderActionsLength = await page.$$eval(
+					`.${ PLACEHOLDER_ACTIONS_CLASS } button`,
+					( els ) => els.length
+				);
+
+				// Should only be showing "Start empty".
+				expect( placeholderActionsLength ).toEqual( 1 );
+			} );
 		} );
 	} );
 
@@ -340,7 +486,7 @@ describe( 'Navigation', () => {
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
-		// Wait for URL input to be focused
+		// Wait for URL input to be focused.
 		await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
@@ -405,7 +551,7 @@ describe( 'Navigation', () => {
 		);
 		await appenderAgain.click();
 
-		// Wait for URL input to be focused
+		// Wait for URL input to be focused.
 		await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
@@ -420,7 +566,7 @@ describe( 'Navigation', () => {
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
 
-		// Click the link placeholder
+		// Click the link placeholder.
 		const placeholder = await page.waitForSelector(
 			'.wp-block-navigation-link__placeholder'
 		);
@@ -589,7 +735,7 @@ describe( 'Navigation', () => {
 
 		const navBlock = await waitForBlock( 'Navigation' );
 
-		// Select the block to convert to a wp_navigation
+		// Select the block to convert to a wp_navigation.
 		await navBlock.click();
 
 		// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
@@ -630,7 +776,7 @@ describe( 'Navigation', () => {
 
 			const navBlock = await waitForBlock( 'Navigation' );
 
-			// Select the block to convert to a wp_navigation
+			// Select the block to convert to a wp_navigation.
 			await navBlock.click();
 
 			// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
@@ -674,7 +820,7 @@ describe( 'Navigation', () => {
 			await page.waitForXPath( NAV_ENTITY_SELECTOR );
 			expect( await page.$x( NAV_ENTITY_SELECTOR ) ).toHaveLength( 1 );
 
-			// Publish the post
+			// Publish the post.
 			const entitySaveButton = await page.waitForSelector(
 				'.editor-entities-saved-states__save-button'
 			);
@@ -846,7 +992,7 @@ describe( 'Navigation', () => {
 			// no URL of label and can be considered unpopulated.
 			await clickBlockToolbarButton( 'Select Submenu' );
 
-			// Check for non-disabled Convert to Link button
+			// Check for non-disabled Convert to Link button.
 			const convertToLinkButton = await page.$(
 				'[aria-label="Block tools"] [aria-label="Convert to Link"]:not([disabled])'
 			);
@@ -894,7 +1040,7 @@ describe( 'Navigation', () => {
 			);
 			await theOption.click();
 
-			// Make sure the snackbar error shows up
+			// Make sure the snackbar error shows up.
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
 			);
@@ -917,7 +1063,7 @@ describe( 'Navigation', () => {
 			await createNewPost();
 			await insertBlock( 'Navigation' );
 
-			// Make sure the snackbar error shows up
+			// Make sure the snackbar error shows up.
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="${ noticeText }" ]`
 			);

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { size, map, without } from 'lodash';
+import { forEach, size, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -55,6 +55,7 @@ function Editor( {
 				__experimentalGetPreviewDeviceType,
 				isEditingTemplate,
 				getEditedPostTemplate,
+				getHiddenBlockTypes,
 			} = select( editPostStore );
 			const { getEntityRecord, getPostType, getEntityRecords } = select(
 				coreStore
@@ -89,7 +90,7 @@ function Editor( {
 				preferredStyleVariations: getPreference(
 					'preferredStyleVariations'
 				),
-				hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				__experimentalLocalAutosaveInterval: getPreference(
 					'localAutosaveInterval'
@@ -164,7 +165,7 @@ function Editor( {
 	const styles = useMemo( () => {
 		const themeStyles = [];
 		const presetStyles = [];
-		settings.styles.forEach( ( style ) => {
+		forEach( settings.styles, ( style ) => {
 			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
 				themeStyles.push( style );
 			} else {

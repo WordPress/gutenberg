@@ -59,7 +59,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 		if ( newWidth === 'auto' ) {
 			width = undefined;
 		}
-		// Update attributes
+		// Update attributes.
 		setAttributes( { width } );
 	}
 
@@ -435,7 +435,7 @@ function ButtonEdit( props ) {
 	const buttonBorderRadiusValue =
 		borderRadiusUnit === 'px' || borderRadiusUnit === '%'
 			? borderRadiusValue
-			: Math.floor( 14 * borderRadiusValue ); // lets assume that the font size is set to 14px; TO get a nicer preview.
+			: Math.floor( 14 * borderRadiusValue ); // Lets assume that the font size is set to 14px; TO get a nicer preview.
 	const outlineBorderRadius =
 		buttonBorderRadiusValue > 0
 			? buttonBorderRadiusValue + spacing + borderWidth

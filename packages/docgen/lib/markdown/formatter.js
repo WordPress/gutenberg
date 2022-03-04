@@ -190,7 +190,7 @@ module.exports = (
 			docs.push( '\n' );
 			docs.push( '\n' );
 		} );
-		docs.pop(); // remove last \n, we want one blank line at the end of the file.
+		docs.pop(); // Remove last \n, we want one blank line at the end of the file.
 	} else {
 		docs.push( 'Nothing to document.' );
 		docs.push( '\n' );

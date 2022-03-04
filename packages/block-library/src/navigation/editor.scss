@@ -261,6 +261,10 @@ $color-control-label-height: 20px;
 	}
 }
 
+.wp-block-navigation-placeholder .components-spinner {
+	margin-top: 0;
+}
+
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
 	display: flex;
@@ -555,6 +559,12 @@ body.editor-styles-wrapper
 	100% {
 		opacity: 1;
 	}
+}
+
+// Space spinner to give it breathing
+// room when block is selected and has focus outline.
+.wp-block-navigation .components-spinner {
+	padding: $grid-unit-10 $grid-unit-15;
 }
 
 .wp-block-navigation__unsaved-changes {

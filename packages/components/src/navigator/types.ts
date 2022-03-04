@@ -19,7 +19,7 @@ export type NavigatorContext = {
 	goBack: () => void;
 };
 
-// Returned by the `useNavigator` hook
+// Returned by the `useNavigator` hook.
 export type Navigator = NavigatorContext;
 
 export type NavigatorProviderProps = {

@@ -106,8 +106,8 @@ export const createUpgradedEmbedBlock = (
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
 	const isCurrentBlockWP =
 		providerNameSlug === 'wordpress' || type === WP_EMBED_TYPE;
-	// if current block is not WordPress and a more suitable block found
-	// that is different from the current one, create the new matched block
+	// If current block is not WordPress and a more suitable block found
+	// that is different from the current one, create the new matched block.
 	const shouldCreateNewBlock =
 		! isCurrentBlockWP &&
 		matchedBlock &&

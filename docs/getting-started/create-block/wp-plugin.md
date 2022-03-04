@@ -29,15 +29,17 @@ The main plugin file created is the PHP file `gutenpride.php`, at the top of thi
 
 ```php
 /**
- * Plugin Name:     Gutenpride
- * Description:     Example block
- * Version:         0.1.0
- * Author:          The WordPress Contributors
- * License:         GPL-2.0-or-later
- * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:     gutenpride
+ * Plugin Name:       Gutenpride
+ * Description:       Example static block scaffolded with Create Block tool.
+ * Requires at least: 5.8
+ * Requires PHP:      7.0
+ * Version:           0.1.0
+ * Author:            The WordPress Contributors
+ * License:           GPL-2.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:       gutenpride
  *
- * @package         create-block
+ * @package           create-block
  */
 ```
 
@@ -78,7 +80,7 @@ In `package.json`, there is a `scripts` property that defines what command to ru
   },
 ```
 
-These scripts are run by using: `npm run build` or `npm run start`
+These scripts are run by using: `npm run build` or `npm run start`.
 
 Use `npm run build` for running once to create a "production" build. This compresses the code down so it downloads faster, but makes it harder to read using browser tools—good for final deployment but not while developing.
 
@@ -92,32 +94,34 @@ To load the built script, so it is run within the editor, you need to tell WordP
 
 ```php
 function create_block_gutenpride_block_init() {
-	register_block_type( __DIR__ );
+	register_block_type( __DIR__ . '/build' );
 }
 add_action( 'init', 'create_block_gutenpride_block_init' );
 ```
 
-The `register_block_type` function registers the block we are going to create and specifies the editor script handle registered from the metadata provided in `block.json` file with the `editorScript` field. So now when the editor loads it will load this script.
+The `register_block_type` function registers the block we are going to create and specifies the editor script handle registered from the metadata provided in `build/block.json` file with the `editorScript` field. So now when the editor loads it will load this script. The source metadata file `src/block.json` is copied during the build process:
 
 ```json
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "create-block/gutenpride",
+	"version": "0.1.0",
 	"title": "Gutenpride",
 	"category": "widgets",
 	"icon": "smiley",
-	"description": "Example block written with ESNext standard and JSX support – build step required.",
+	"description": "Example static block scaffolded with Create Block tool.",
 	"supports": {
 		"html": false
 	},
 	"textdomain": "gutenpride",
-	"editorScript": "file:./build/index.js",
-	"editorStyle": "file:./build/index.css",
-	"style": "file:./build/style-index.css"
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
 }
 ```
 
-For the `editorScript` provided in the block metadata, the build process creates a secondary asset file that contains the list of dependencies and a file version based on the timestamp, this is the `index.asset.php` file.
+For the `editorScript` provided in the block metadata, the build process creates a secondary asset file that contains the list of dependencies and a file version based on the timestamp, this is the `build/index.asset.php` file.
 
 The `wp_register_script` function used internally registers a name, called the handle, and relates that name to the script file. The dependencies are used to specify if the script requires including other libraries. The version is specified so the browser will reload if the file changed.
 

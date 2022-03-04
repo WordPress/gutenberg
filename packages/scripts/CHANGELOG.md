@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 22.1.0 (2022-03-03)
+
+### New Feature
+
+-   Add `--webpack-copy-php` CLI flag to opt-in to copying php files from `src` and its subfolders to the output directory (`build` by default) ([#39171](https://github.com/WordPress/gutenberg/pull/39171)).
+
 ## 22.0.0 (2022-02-22)
 
 ### Breaking Changes

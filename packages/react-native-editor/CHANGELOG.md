@@ -10,8 +10,12 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
--   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
 
+-   [*] Update gesture handler and reanimated libraries [#39098]
+
+## 1.71.3
+
+-   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
 -   [***] Support for multiple color palettes [#38417]
 
 ## 1.71.1

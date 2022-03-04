@@ -60,7 +60,7 @@ async function checkoutNpmReleaseBranch( {
 	gitWorkingDirectoryPath,
 	npmReleaseBranch,
 } ) {
-	// Creating the release branch
+	// Creating the release branch.
 	await git.checkoutRemoteBranch( gitWorkingDirectoryPath, npmReleaseBranch );
 	await git.fetch( gitWorkingDirectoryPath, [ '--depth=100' ] );
 	log(
@@ -226,7 +226,7 @@ async function updatePackages( config ) {
 				nextVersion,
 				version,
 			} ) => {
-				// Update changelog
+				// Update changelog.
 				const content = await fs.promises.readFile(
 					changelogPath,
 					'utf8'
@@ -243,7 +243,7 @@ async function updatePackages( config ) {
 					)
 				);
 
-				// Update package.json
+				// Update package.json.
 				const packageJson = readJSONFile( packageJSONPath );
 				const newPackageJson = {
 					...packageJson,
@@ -322,6 +322,7 @@ async function runPushGitChangesStep( {
  */
 async function publishPackagesToNpm( {
 	gitWorkingDirectoryPath,
+	interactive,
 	minimumVersionBump,
 	releaseType,
 } ) {
@@ -334,13 +335,14 @@ async function publishPackagesToNpm( {
 		gitWorkingDirectoryPath
 	);
 
+	const yesFlag = interactive ? '' : '--yes';
 	if ( releaseType === 'next' ) {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
 
 		await command(
-			`npx lerna version pre${ minimumVersionBump } --preid next.${ beforeCommitHash } --no-private`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.${ beforeCommitHash } --no-private ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -348,14 +350,17 @@ async function publishPackagesToNpm( {
 		);
 
 		log( '>> Publishing modified packages to npm.' );
-		await command( 'npx lerna publish from-package --dist-tag next', {
-			cwd: gitWorkingDirectoryPath,
-			stdio: 'inherit',
-		} );
+		await command(
+			`npx lerna publish from-package --dist-tag next ${ yesFlag }`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
 	} else if ( releaseType === 'bugfix' ) {
 		log( '>> Publishing modified packages to npm.' );
 		await command(
-			`npx lerna publish ${ minimumVersionBump } --no-private`,
+			`npx lerna publish ${ minimumVersionBump } --no-private ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -366,7 +371,7 @@ async function publishPackagesToNpm( {
 			'>> Bumping version of public packages changed since the last release.'
 		);
 		await command(
-			`npx lerna version ${ minimumVersionBump } --no-private`,
+			`npx lerna version ${ minimumVersionBump } --no-private ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -374,7 +379,7 @@ async function publishPackagesToNpm( {
 		);
 
 		log( '>> Publishing modified packages to npm.' );
-		await command( `npx lerna publish from-package`, {
+		await command( `npx lerna publish from-package ${ yesFlag }`, {
 			cwd: gitWorkingDirectoryPath,
 			stdio: 'inherit',
 		} );
@@ -449,16 +454,15 @@ async function runPackagesRelease( config, customMessages ) {
 		...customMessages
 	);
 
-	const temporaryFolders = [];
 	if ( config.interactive ) {
 		await askForConfirmation( 'Ready to go?' );
-
-		// Cloning the Git repository.
-		config.gitWorkingDirectoryPath = await runGitRepositoryCloneStep(
-			config.abortMessage
-		);
-		temporaryFolders.push( config.gitWorkingDirectoryPath );
 	}
+
+	// Cloning the Git repository.
+	config.gitWorkingDirectoryPath = await runGitRepositoryCloneStep(
+		config.abortMessage
+	);
+	const temporaryFolders = [ config.gitWorkingDirectoryPath ];
 
 	let pluginReleaseBranch;
 	if ( [ 'latest', 'next' ].includes( config.releaseType ) ) {

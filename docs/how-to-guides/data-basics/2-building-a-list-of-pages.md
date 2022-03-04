@@ -1,9 +1,9 @@
 # Building a list of pages
 
 In this part, we will build a filterable list of all WordPress pages. This is what the app will look like at the end of
-this part:
+this section:
 
-![](./media/list-of-pages/part1-finished.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/part1-finished.jpg)
 
 Let’s see how we can get there step by step.
 
@@ -33,7 +33,7 @@ function PagesList( { pages } ) {
 Note that this component does not fetch any data yet, only presents the hardcoded list of pages. When you refresh the page,
 you should see the following:
 
-![](./media/list-of-pages/simple-list.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/simple-list.jpg)
 
 ## Step 2: Fetch the data
 
@@ -43,7 +43,7 @@ list of pages from the [WordPress REST API](https://developer.wordpress.org/rest
 Before we start, let’s confirm we actually have some pages to fetch. Within WPAdmin, Navigate to Pages using the sidebar menu and
 ensure it shows at least four or five Pages:
 
-![](./media/list-of-pages/pages-list.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/pages-list.jpg)
 
 If it doesn’t, go ahead and create a few pages – you can use the same titles as on the screenshot above. Be sure to _
 publish_ and not just _save_ them.
@@ -84,7 +84,7 @@ function MyFirstApp() {
 Note that we use an `import` statement inside index.js. This enables the plugin to automatically load the dependencies using `wp_enqueue_script`. Any references to `coreDataStore` are compiled to the same `wp.data` reference we use in browser's devtools.
 
 `useSelect` takes two arguments: a callback and dependencies. In broad strokes, it re-runs the callback whenever either
-the dependencies or the underlying data store changes. You can learn more about [useSelect](#) in
+the dependencies or the underlying data store changes. You can learn more about [useSelect](/packages/data/README.md#useselect) in
 the [data module documentation](/packages/data/README.md#useselect).
 
 Putting it together, we get the following code:
@@ -92,6 +92,7 @@ Putting it together, we get the following code:
 ```js
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 function MyFirstApp() {
 	const pages = useSelect(
@@ -107,7 +108,7 @@ function PagesList( { pages } ) {
 		<ul>
 			{ pages?.map( page => (
 				<li key={ page.id }>
-					{ page.title.rendered }
+					{ decodeEntities( page.title.rendered ) }
 				</li>
 			) ) }
 		</ul>
@@ -115,9 +116,11 @@ function PagesList( { pages } ) {
 }
 ```
 
+Note that post title may contain HTML entities like `&aacute;`, so we need to use the [`decodeEntities`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-html-entities/) function to replace them with the symbols they represent like `á`.
+
 Refreshing the page should display a list similar to this one:
 
-![](./media/list-of-pages/fetch-the-data.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/fetch-the-data.jpg)
 
 ## Step 3: Turn it into a table
 
@@ -133,7 +136,7 @@ function PagesList( { pages } ) {
 			<tbody>
 				{ pages?.map( page => (
 					<tr key={ page.id }>
-						<td>{ page.title.rendered }</td>
+						<td>{ decodeEntities( page.title.rendered ) }</td>
 					</tr>
 				) ) }
 			</tbody>
@@ -142,7 +145,7 @@ function PagesList( { pages } ) {
 }
 ```
 
-![](./media/list-of-pages/make-a-table.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/make-a-table.jpg)
 
 ## Step 4: Add a search box
 
@@ -174,7 +177,7 @@ Note that instead of using an `input` tag, we took advantage of
 the [SearchControl](https://developer.wordpress.org/block-editor/reference-guides/components/search-control/) component.
 This is what it looks like:
 
-![](./media/list-of-pages/filter-field.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/filter-field.jpg)
 
 The field starts empty, and the contents are stored in the `searchTerm` state value. If you aren’t familiar with
 the [useState](https://reactjs.org/docs/hooks-state.html) hook, you can learn more
@@ -251,7 +254,7 @@ function MyFirstApp() {
 
 Voila! We can now filter the results:
 
-![](./media/list-of-pages/filter.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/filter.jpg)
 
 ### Using core-data instead vs calling the API directly
 
@@ -293,7 +296,7 @@ instead.
 
 There is one problem with our search feature. We can’t be quite sure whether it’s still searching or showing no results:
 
-![](./media/list-of-pages/unclear-status.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/unclear-status.jpg)
 
 A few messages like  _Loading…_ or _No results_ would clear it up. Let’s implement them! First,  `PagesList` has to be
 aware of the current status:
@@ -373,6 +376,10 @@ function MyFirstApp() {
 }
 ```
 
+And voilà! That's it.
+
+### Wiring it all together
+
 All the pieces are in place, great! Here’s the complete JavaScript code of our app:
 
 ```js
@@ -429,7 +436,7 @@ function PagesList( { hasResolved, pages } ) {
 			<tbody>
 				{ pages?.map( ( page ) => (
 					<tr key={ page.id }>
-						<td>{ page.title.rendered }</td>
+						<td>{ decodeEntities( page.title.rendered ) }</td>
 					</tr>
 				) ) }
 			</tbody>
@@ -451,11 +458,11 @@ window.addEventListener(
 
 All that’s left is to refresh the page and enjoy the brand new status indicator:
 
-![](./media/list-of-pages/indicator.jpg)
-![](./media/list-of-pages/no-results.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/indicator.jpg)
+![](/docs/how-to-guides/data-basics/media/list-of-pages/no-results.jpg)
 
 ## What's next?
 
-* **Previous part:** [Setup](./1-data-basics-setup.md)
-* **Next part:** Adding an „Edit page” feature (coming soon)
+* **Previous part:** [Setup](/docs/how-to-guides/data-basics/1-data-basics-setup.md)
+* **Next part:** [Building an edit form](/docs/how-to-guides/data-basics/3-building-an-edit-form.md)
 * (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository

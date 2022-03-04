@@ -24,7 +24,7 @@ export const convertSelectedBlockToNavigationLinks = ( {
 	const linkMap = {};
 	const navigationLinks = [];
 	pages.forEach( ( { id, title, link: url, type, parent } ) => {
-		// See if a placeholder exists. This is created if children appear before parents in list
+		// See if a placeholder exists. This is created if children appear before parents in list.
 		const innerBlocks = linkMap[ id ]?.innerBlocks ?? [];
 		linkMap[ id ] = createBlock(
 			'core/navigation-link',
@@ -42,7 +42,7 @@ export const convertSelectedBlockToNavigationLinks = ( {
 			navigationLinks.push( linkMap[ id ] );
 		} else {
 			if ( ! linkMap[ parent ] ) {
-				// Use a placeholder if the child appears before parent in list
+				// Use a placeholder if the child appears before parent in list.
 				linkMap[ parent ] = { innerBlocks: [] };
 			}
 			const parentLinkInnerBlocks = linkMap[ parent ].innerBlocks;
