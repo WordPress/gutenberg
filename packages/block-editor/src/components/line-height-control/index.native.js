@@ -12,6 +12,8 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 	const isDefined = isLineHeightDefined( lineHeight );
 	const value = isDefined ? lineHeight : BASE_DEFAULT_VALUE;
 	return (
+		// If there's no units, this should be a `NumberControl` ?
+		// Alternatively, use `disableUnits` prop.
 		<UnitControl
 			label={ __( 'Line Height' ) }
 			// Set minimun value of 1 since lower values break on Android
@@ -22,7 +24,8 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 			onChange={ onChange }
 			// TODO: should be updated to avoid using `false`, in order to
 			// align with the web version of `UnitControl`
-			units={ false }
+			units={ [] }
+			disableUnits={ true }
 		/>
 	);
 }

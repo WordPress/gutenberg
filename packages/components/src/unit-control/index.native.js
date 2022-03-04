@@ -16,7 +16,13 @@ import RangeCell from '../mobile/bottom-sheet/range-cell';
 import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 import Picker from '../mobile/picker';
 import styles from './style.scss';
-import { CSS_UNITS, hasUnits, getAccessibleLabelForUnit } from './utils';
+import {
+	CSS_UNITS,
+	hasUnits,
+	getAccessibleLabelForUnit,
+	getUnitsWithCurrentUnit,
+	getParsedQuantityAndUnit,
+} from './utils';
 
 /**
  * WordPress dependencies
@@ -25,19 +31,37 @@ import { useRef, useCallback, useMemo, memo } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
+const shouldShowPicker = ( units ) => {
+	return hasUnits( units ) && units?.length > 1;
+};
+
+/**
+ * Notes:
+ *   - Goal: we want to stop using `false` as a value for 'UNITS'
+ *   - The internal logic should be:
+ *     - The units array should have a list of allowed units
+ *     - Therefore, if the `units` prop is an empty array, there shouldn't be any UI shown for the unit, and the rawValue's unit should be `undefined`
+ *
+ *
+ *   - The Native UnitControl's internal logic still relies on `unit` holding the `unit value` and `value` holding the `quantity`
+ *     - Use `getParsedQuantityAndUnit` to take into account value, unit and units and parse the resulting unit
+ *     - Render the button only if `units` has at least 1 item, and render the select if it has at least 2 items.
+ */
+
 function UnitControl( {
 	currentInput,
 	label,
-	value,
+	value: valueProp,
 	onChange,
 	onUnitChange,
 	initialPosition,
 	min,
 	max,
 	separatorType,
-	units = CSS_UNITS,
-	unit,
+	units: unitsProp = CSS_UNITS,
+	unit: unitProp,
 	getStylesFromColorScheme,
+	disableUnits,
 	...props
 } ) {
 	const pickerRef = useRef();
@@ -49,18 +73,34 @@ function UnitControl( {
 		}
 	}, [ pickerRef?.current ] );
 
-	const currentInputValue = currentInput === null ? value : currentInput;
+	// Force value to `undefined` in case it was `null`.
+	const currentInputValue =
+		( currentInput === null ? valueProp : currentInput ) ?? undefined;
 	const initialControlValue = isFinite( currentInputValue )
 		? currentInputValue
 		: initialPosition;
+
+	const nonNullValueProp = initialControlValue ?? undefined;
+	const units = useMemo(
+		() => getUnitsWithCurrentUnit( nonNullValueProp, unitProp, unitsProp ),
+		[ nonNullValueProp, unitProp, unitsProp ]
+	);
+	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
+		nonNullValueProp,
+		unitProp,
+		units
+	);
 
 	const unitButtonTextStyle = getStylesFromColorScheme(
 		styles.unitButtonText,
 		styles.unitButtonTextDark
 	);
 
-	/* translators: accessibility text. Inform about current unit value. %s: Current unit value. */
-	const accessibilityLabel = sprintf( __( 'Current unit is %s' ), unit );
+	const accessibilityLabel = sprintf(
+		/* translators: accessibility text. Inform about current unit value. %s: Current unit value. */
+		__( 'Current unit is %s' ),
+		parsedUnit
+	);
 
 	const accessibilityHint =
 		Platform.OS === 'ios'
@@ -70,11 +110,11 @@ function UnitControl( {
 	const renderUnitButton = useMemo( () => {
 		const unitButton = (
 			<View style={ styles.unitButton }>
-				<Text style={ unitButtonTextStyle }>{ unit }</Text>
+				<Text style={ unitButtonTextStyle }>{ parsedUnit }</Text>
 			</View>
 		);
 
-		if ( hasUnits( units ) && units?.length > 1 ) {
+		if ( shouldShowPicker( units ) ) {
 			return (
 				<TouchableWithoutFeedback
 					onPress={ onPickerPresent }
@@ -93,7 +133,7 @@ function UnitControl( {
 		accessibilityLabel,
 		accessibilityHint,
 		unitButtonTextStyle,
-		unit,
+		parsedUnit,
 		units,
 	] );
 
@@ -118,13 +158,18 @@ function UnitControl( {
 	const renderUnitPicker = useCallback( () => {
 		// Keeping for legacy reasons, although `false` should not be a valid
 		// value for the `units` prop anymore.
-		if ( units === false ) {
+		if ( disableUnits || units === false ) {
 			return null;
 		}
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
+				{ /*
+				 * If units is an array of at least 2 items, show an interactive unit text,
+				 * that opens a picker when tapped.
+				 * Otherwise, just show the same text (but not interactive)
+				 */ }
 				{ renderUnitButton }
-				{ hasUnits( units ) && units?.length > 1 ? (
+				{ shouldShowPicker( units ) ? (
 					<Picker
 						ref={ pickerRef }
 						options={ units }
@@ -145,7 +190,9 @@ function UnitControl( {
 	 * try to get step from `units`, or default to a value of `1`
 	 */
 	if ( ! step && units ) {
-		const activeUnit = units.find( ( option ) => option.value === unit );
+		const activeUnit = units.find(
+			( option ) => option.value === parsedUnit
+		);
 		step = activeUnit?.step ?? 1;
 	}
 
@@ -153,20 +200,20 @@ function UnitControl( {
 
 	return (
 		<>
-			{ unit !== '%' ? (
+			{ parsedUnit !== '%' ? (
 				<StepperCell
 					label={ label }
 					max={ max }
 					min={ min }
 					onChange={ onChange }
 					separatorType={ separatorType }
-					value={ value }
+					value={ parsedQuantity }
 					step={ step }
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
 					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
-					unitLabel={ getAccessibleLabelForUnit( unit ) }
+					unitLabel={ getAccessibleLabelForUnit( parsedUnit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
@@ -177,14 +224,14 @@ function UnitControl( {
 					onChange={ onChange }
 					minimumValue={ min }
 					maximumValue={ max }
-					value={ value }
+					value={ parsedQuantity }
 					step={ step }
-					unit={ unit }
+					unit={ parsedUnit }
 					defaultValue={ initialControlValue }
 					separatorType={ separatorType }
 					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
-					unitLabel={ getAccessibleLabelForUnit( unit ) }
+					unitLabel={ getAccessibleLabelForUnit( parsedUnit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
