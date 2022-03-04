@@ -37,6 +37,7 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 
 		$inherit = ! empty( $block->context['comments/inherit'] );
 
+		$per_page = 0;
 		if ( $inherit && get_option( 'page_comments' ) ) {
 			$per_page = get_option( 'comments_per_page' );
 		}
