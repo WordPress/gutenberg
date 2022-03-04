@@ -84,7 +84,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			>
 				<p>
 					{ __(
-						'Locking a block allowss you to restrict which attributes of the block are ditable. The block can be unlocked any time using "Options" menu in the block toolbar'
+						'Locking a block allows you to restrict which attributes of the block are editable.'
 					) }
 				</p>
 				<div
