@@ -1255,11 +1255,20 @@ const canInsertBlockTypeUnmemoized = (
 	);
 
 	const blockAllowedParentBlocks = blockType.parent;
-	const parentName = getBlockName( state, rootClientId );
-	const hasBlockAllowedParent = checkAllowList(
-		blockAllowedParentBlocks,
-		parentName
-	);
+	let hasBlockAllowedParent = null;
+	if ( blockAllowedParentBlocks ) {
+		const parents = [
+			rootClientId,
+			...getBlockParents( state, rootClientId ),
+		];
+
+		hasBlockAllowedParent = some( parents, ( parentClientId ) =>
+			checkAllowList(
+				blockAllowedParentBlocks,
+				getBlockName( state, parentClientId )
+			)
+		);
+	}
 
 	const canInsert =
 		( hasParentAllowedBlock === null && hasBlockAllowedParent === null ) ||
