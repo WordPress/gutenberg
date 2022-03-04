@@ -36,7 +36,8 @@ export default function CategoriesEdit( {
 	const { categories, isResolving } = useEntityRecords(
 		'taxonomy',
 		'category',
-		query
+		query,
+		[ showOnlyTopLevel ]
 	);
 	const getCategoriesList = ( parentId ) => {
 		if ( ! categories?.length ) {

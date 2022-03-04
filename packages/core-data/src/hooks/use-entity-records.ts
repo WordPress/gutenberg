@@ -29,7 +29,7 @@ interface EntityRecordsResolution< RecordType > {
  * @param  kind      Kind of the requested entities.
  * @param  name      Name of the requested entities.
  * @param  queryArgs HTTP query for the requested entities.
- *
+ * @param  deps      Array of additional deps, see useSelect.
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -64,12 +64,13 @@ interface EntityRecordsResolution< RecordType > {
 export default function __experimentalUseEntityRecords< RecordType >(
 	kind: string,
 	name: string,
-	queryArgs: unknown = {}
+	queryArgs: unknown = {},
+	deps: unknown[] = []
 ): EntityRecordsResolution< RecordType > {
 	const { data: records, ...rest } = useQuerySelect(
 		( query ) =>
 			query( coreStore ).getEntityRecords( kind, name, queryArgs ),
-		[ kind, name, queryArgs ]
+		[ kind, name, ...deps ]
 	);
 
 	return {
