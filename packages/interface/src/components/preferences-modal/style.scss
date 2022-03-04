@@ -21,17 +21,5 @@
 				content: none;
 			}
 		}
-		// Keep the navigator component from overflowing the modal content area
-		// to ensure that sticky position elements stick where intended.
-		.components-navigator-provider {
-			height: 100%;
-		}
-	}
-
-	.components-base-control__help {
-		margin: -$grid-unit-10 0 $grid-unit-10 58px;
-		font-size: $helptext-font-size;
-		font-style: normal;
-		color: $gray-700;
 	}
 }

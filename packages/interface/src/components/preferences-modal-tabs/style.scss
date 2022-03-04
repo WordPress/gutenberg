@@ -25,3 +25,11 @@ $vertical-tabs-width: 160px;
 		margin-left: $vertical-tabs-width;
 	}
 }
+
+@media (max-width: #{ ($break-medium - 1) }) {
+	// Keep the navigator component from overflowing the modal content area
+	// to ensure that sticky position elements stick where intended.
+	.interface-preferences__provider {
+		height: 100%;
+	}
+}

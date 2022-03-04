@@ -11,4 +11,11 @@
 			}
 		}
 	}
+
+	.components-base-control__help {
+		margin: -$grid-unit-10 0 $grid-unit-10 58px;
+		font-size: $helptext-font-size;
+		font-style: normal;
+		color: $gray-700;
+	}
 }
