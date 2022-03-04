@@ -15,6 +15,8 @@
  * @return string Returns the previous posts link for the comments pagination.
  */
 function render_block_core_comments_pagination_previous( $attributes, $content, $block ) {
+	$comment_vars     = build_comment_query_vars_from_block($block);
+	$max_page         = (new WP_Comment_Query($comment_vars))->max_num_pages;
 	$default_label    = __( 'Older Comments' );
 	$label            = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow = get_comments_pagination_arrow( $block, 'previous' );
@@ -27,7 +29,7 @@ function render_block_core_comments_pagination_previous( $attributes, $content, 
 	};
 	add_filter( 'previous_comments_link_attributes', $filter_link_attributes );
 
-	$previous_comments_link = get_previous_comments_link( $label );
+	$previous_comments_link = gutenberg_get_previous_comments_link( $block, $label, $max_page );
 
 	remove_filter( 'previous_comments_link_attributes', $filter_link_attributes );
 

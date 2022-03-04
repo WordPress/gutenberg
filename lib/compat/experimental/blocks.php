@@ -159,3 +159,152 @@ if ( ! function_exists( 'gutenberg_rest_comment_set_children_as_embeddable' ) ) 
 	}
 }
 add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable' );
+
+if ( ! function_exists( 'gutenberg_get_comments_pagenum_link' ) ) {
+	/**
+	 * Refactor of core get_comments_pagenum_link function to make it work with comments blocks.
+	 *
+	 * It's used in the Comments Next Link and Comment Previous link blocks.
+	 *
+	 * @param WP_Block $block Block instance.
+	 * @param int  $pagenum Page number.
+	 *
+	 * @return string Returns the comments page number link URL.
+	 */
+	function gutenberg_get_comments_pagenum_link(  $block, $pagenum = 1 ) {
+		global $wp_rewrite;
+		$pagenum = (int) $pagenum;
+
+		$result = get_permalink();
+
+		if ($wp_rewrite->using_permalinks()) {
+			$result = user_trailingslashit(trailingslashit($result) . $wp_rewrite->comments_pagination_base . '-' . $pagenum, 'commentpaged');
+		} else {
+			$result = add_query_arg('cpage', $pagenum, $result);
+		}
+
+		$result .= '#comments';
+
+		/**
+		 * Filters the comments page number link for the current request.
+		 *
+		 * @since 2.7.0
+		 *
+		 * @param string $result The comments page number link.
+		 */
+		return apply_filters('get_comments_pagenum_link', $result);
+	}
+}
+
+if ( ! function_exists( 'gutenberg_get_next_comments_link' ) ) {
+	/**
+	 * Refactor of core get_next_comments_link function to make it work with the comments blocks.
+	 *
+	 * @param WP_Block $block Block instance.
+	 * @param string $label Label for link text.
+	 * @param int $max_page Max Page.
+	 *
+	 * @return string|void Returns HTML-formatted link for the next page of comments.
+	 */
+	function gutenberg_get_next_comments_link(  $block, $label, $max_page ) {
+		global $wp_query;
+		$inherit = ! empty( $block->context['comments/inherit'] );
+
+		if ($inherit){
+			$default_page = get_option( 'default_comments_page' );
+		} else{
+			$default_page = $block->context['comments/defaultPage'];
+		};
+
+		if (!is_singular()) {
+			return;
+		}
+
+		$page = get_query_var('cpage');
+
+		if ( 'newest' === $default_page && !$page ){
+			return;
+		}
+
+		if (!$page) {
+			$page = 1;
+		}
+
+		$nextpage = (int) $page + 1;
+
+		if (empty($max_page)) {
+			$max_page = $wp_query->max_num_comment_pages;
+		}
+
+		if (empty($max_page)) {
+			$max_page = get_comment_pages_count();
+		}
+
+		if ($nextpage > $max_page) {
+			return;
+		}
+
+		if (empty($label)) {
+			$label = __('Newer Comments &raquo;');
+		}
+
+		/**
+		 * Filters the anchor tag attributes for the next comments page link.
+		 *
+		 * @since 2.7.0
+		 *
+		 * @param string $attributes Attributes for the anchor tag.
+		 */
+		return '<a href="' . esc_url(gutenberg_get_comments_pagenum_link($block, $nextpage)) . '" ' . apply_filters('next_comments_link_attributes', '') . '>' . preg_replace('/&([^#])(?![a-z]{1,8};)/i', '&#038;$1', $label) . '</a>';
+	}
+}
+
+if ( ! function_exists( 'gutenberg_get_previous_comments_link' ) ) {
+	/**
+	 * Refactor of core get_previous_comments_link function to make it work with the comments blocks.
+	 *
+	 * @param WP_Block $block Block instance.
+	 * @param string $label Label for link text.
+	 * @param int $max_page Max Page.
+	 *
+	 * @return string|void Returns HTML-formatted link for the previous page of comments.
+	 */
+	function gutenberg_get_previous_comments_link(  $block, $label, $max_page ) {
+		$inherit = ! empty( $block->context['comments/inherit'] );
+
+		if ($inherit){
+			$default_page = get_option( 'default_comments_page' );
+		} else{
+			$default_page = $block->context['comments/defaultPage'];
+		};
+
+		if (!is_singular()) {
+			return;
+		}
+
+		$page = get_query_var('cpage');
+
+		if ('newest' === $default_page && !$page) {
+			$page = $max_page;
+		}
+
+		if ((int) $page <= 1) {
+			return;
+		}
+
+		$prevpage = (int) $page - 1;
+
+		if (empty($label)) {
+			$label = __('&laquo; Older Comments');
+		}
+
+		/**
+		 * Filters the anchor tag attributes for the previous comments page link.
+		 *
+		 * @since 2.7.0
+		 *
+		 * @param string $attributes Attributes for the anchor tag.
+		 */
+		return '<a href="' . esc_url(gutenberg_get_comments_pagenum_link($block, $prevpage)) . '" ' . apply_filters('previous_comments_link_attributes', '') . '>' . preg_replace('/&([^#])(?![a-z]{1,8};)/i', '&#038;$1', $label) . '</a>';
+	}
+}
