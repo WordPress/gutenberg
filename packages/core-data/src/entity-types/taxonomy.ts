@@ -4,6 +4,7 @@
 import type { Context, ContextualField, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import { DefaultContextByKN } from './entities';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -87,6 +88,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Taxonomy< C extends Context > = OmitNevers<
-	_BaseEntityRecords.Taxonomy< C >
->;
+export type Taxonomy<
+	C extends Context = DefaultContextByKN< 'root', 'taxonomy' >
+> = OmitNevers< _BaseEntityRecords.Taxonomy< C > >;

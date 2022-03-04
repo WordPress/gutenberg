@@ -9,6 +9,7 @@ import type {
 } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import { DefaultContextByKN } from './entities';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -74,6 +75,6 @@ declare module './base-entity-records' {
 }
 
 export type PluginStatus = 'active' | 'inactive';
-export type Plugin< C extends Context > = OmitNevers<
-	_BaseEntityRecords.Plugin< C >
->;
+export type Plugin<
+	C extends Context = DefaultContextByKN< 'root', 'plugin' >
+> = OmitNevers< _BaseEntityRecords.Plugin< C > >;

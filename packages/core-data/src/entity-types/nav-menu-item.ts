@@ -9,6 +9,7 @@ import type {
 } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import { DefaultContextByKN } from './entities';
 
 export type NavMenuItemType =
 	| 'taxonomy'
@@ -106,6 +107,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type NavMenuItem< C extends Context > = OmitNevers<
-	_BaseEntityRecords.NavMenuItem< C >
->;
+export type NavMenuItem<
+	C extends Context = DefaultContextByKN< 'root', 'menuItem' >
+> = OmitNevers< _BaseEntityRecords.NavMenuItem< C > >;

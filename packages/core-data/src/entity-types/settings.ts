@@ -9,6 +9,7 @@ import type {
 } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import { DefaultContextByKN } from './entities';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -93,6 +94,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Settings< C extends Context > = OmitNevers<
-	_BaseEntityRecords.Settings< C >
->;
+export type Settings<
+	C extends Context = DefaultContextByKN< 'root', 'site' >
+> = OmitNevers< _BaseEntityRecords.Settings< C > >;

@@ -128,6 +128,11 @@ export type DefaultContextOf<
 	R extends EntityRecord
 > = EntityOf< R >[ 'defaultContext' ];
 
+export type DefaultContextByKN< K extends Kind, N extends Name > = Extract<
+	Entity,
+	{ kind: K; name: N }
+>[ 'defaultContext' ];
+
 /**
  * An entity record type associated with specified kind and name, sourced from PerPackageEntities.
  */
