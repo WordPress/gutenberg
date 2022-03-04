@@ -62,9 +62,7 @@ export function getIsResolving( state, selectorName, args ) {
  * @return {boolean} Whether resolution has been triggered.
  */
 export function hasStartedResolution( state, selectorName, args ) {
-	return (
-		getResolutionState( state, selectorName, args )?.status !== undefined
-	);
+	return getResolutionState( state, selectorName, args ) !== undefined;
 }
 
 /**
