@@ -121,7 +121,7 @@ function InputField(
 	};
 
 	const validateAction = (
-		inputAction: (nextValue: string, event: SyntheticEvent) => void,
+		inputAction: ( nextValue: string, event: SyntheticEvent ) => void,
 		nextValue: string,
 		event: SyntheticEvent< HTMLInputElement >
 	) => {

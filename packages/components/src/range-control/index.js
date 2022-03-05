@@ -129,7 +129,7 @@ function RangeControl(
 		onChange( nextValue );
 	};
 
-	const handleOnChange = ( nextValue ) => {
+	const handleOnInputNumberValidate = ( nextValue ) => {
 		nextValue = parseFloat( nextValue );
 		setValue( nextValue );
 		/*
@@ -288,7 +288,7 @@ function RangeControl(
 						max={ max }
 						min={ min }
 						onBlur={ handleOnInputNumberBlur }
-						onChange={ handleOnChange }
+						onValidate={ handleOnInputNumberValidate }
 						shiftStep={ shiftStep }
 						step={ step }
 						value={ inputSliderValue }
