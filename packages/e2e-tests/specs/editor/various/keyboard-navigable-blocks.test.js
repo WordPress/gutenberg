@@ -212,11 +212,10 @@ describe( 'Order of block keyboard navigation', () => {
 		// Insert a image block.
 		await insertBlock( 'Image' );
 
+		// Make sure the upload button has focus.
 		const uploadButton = await page.waitForXPath(
 			'//button[contains( text(), "Upload" ) ]'
 		);
-
-		// Make sure the upload button has focus.
 		await expect( uploadButton ).toHaveFocus();
 
 		// Try to focus the image block wrapper.
@@ -228,7 +227,7 @@ describe( 'Order of block keyboard navigation', () => {
 		// Insert a group block.
 		await insertBlock( 'Group' );
 
-		// If active label matches, that means focus did not change from block wrapper.
+		// If active label matches, that means focus did not change from group block wrapper.
 		await expect( await getActiveLabel() ).toBe( 'Block: Group' );
 	} );
 } );

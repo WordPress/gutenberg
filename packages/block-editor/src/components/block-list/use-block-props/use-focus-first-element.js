@@ -111,7 +111,6 @@ export function useFocusFirstElement( clientId ) {
 			const focusElement = focus.tabbable.findNext( target );
 			// Ensure is not block inserter trigger, don't want to focus that in the event of the group block which doesn't contain any other focussable elements.
 			let skipForInserterTrigger = false;
-
 			if ( focusElement.getAttribute( 'aria-label' ) === 'Add block' ) {
 				skipForInserterTrigger = true;
 			}
