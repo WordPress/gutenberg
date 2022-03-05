@@ -209,17 +209,17 @@ describe( 'Order of block keyboard navigation', () => {
 	} );
 
 	it( 'allows the first element within a block to receive focus', async () => {
-		// Insert a group block.
+		// Insert a image block.
 		await insertBlock( 'Image' );
 
 		const uploadButton = await page.waitForXPath(
 			'//button[contains( text(), "Upload" ) ]'
 		);
 
-		// Make sure the button has focus.
+		// Make sure the upload button has focus.
 		await expect( uploadButton ).toHaveFocus();
 
-		// Try to focus the block wrapper.
+		// Try to focus the image block wrapper.
 		await page.keyboard.press( 'ArrowUp' );
 		await expect( await getActiveLabel() ).toBe( 'Block: Image' );
 	} );
