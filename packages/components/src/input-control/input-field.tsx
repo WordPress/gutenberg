@@ -120,20 +120,31 @@ function InputField(
 		setIsFocused?.( true );
 	};
 
+	const validateAction = (
+		inputAction: (nextValue: string, event: SyntheticEvent) => void,
+		nextValue: string,
+		event: SyntheticEvent< HTMLInputElement >
+	) => {
+		try {
+			onValidate( nextValue, event );
+			inputAction( nextValue, event );
+		} catch ( err ) {
+			invalidate( err, event );
+		}
+	};
+
 	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
 		const nextValue = event.target.value;
-		change( nextValue, event );
+		if ( isPressEnterToChange ) {
+			change( nextValue, event );
+		} else {
+			validateAction( change, nextValue, event );
+		}
 	};
 
 	const handleOnCommit = ( event: SyntheticEvent< HTMLInputElement > ) => {
 		const nextValue = event.currentTarget.value;
-
-		try {
-			onValidate( nextValue );
-			commit( nextValue, event );
-		} catch ( err ) {
-			invalidate( err, event );
-		}
+		validateAction( commit, nextValue, event );
 	};
 
 	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
