@@ -110,16 +110,15 @@ export function useFocusFirstElement( clientId ) {
 		if ( ! target.getAttribute( 'contenteditable' ) ) {
 			const focusElement = focus.tabbable.findNext( target );
 			// Ensure is not block inserter trigger, don't want to focus that in the event of the group block which doesn't contain any other focussable elements.
-			let skipForInserterTrigger = false;
-			if ( focusElement.getAttribute( 'aria-label' ) === 'Add block' ) {
-				skipForInserterTrigger = true;
-			}
+			const skipBlockInserterTrigger = target.classList.contains(
+				'block-editor-button-block-appender'
+			);
 			// Make sure focusElement is valid, form field, and in current ref.
 			if (
 				focusElement &&
 				isFormElement( focusElement ) &&
 				target.contains( focusElement ) &&
-				skipForInserterTrigger === false
+				! skipBlockInserterTrigger
 			) {
 				focusElement.focus();
 				return;
