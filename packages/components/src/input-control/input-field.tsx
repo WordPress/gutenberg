@@ -26,7 +26,7 @@ import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
 import { useUpdateEffect } from '../utils';
-import type { InputFieldProps } from './types';
+import type { InputFieldProps, KeyedValidityState } from './types';
 
 function InputField(
 	{
@@ -119,19 +119,50 @@ function InputField(
 		setIsFocused?.( true );
 	};
 
-	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
-		const nextValue = event.target.value;
-		change( nextValue, event );
+	const validateAction = (
+		inputAction: ( nextValue: string, event: SyntheticEvent ) => void,
+		nextValue: string,
+		event:
+			| ChangeEvent< HTMLInputElement >
+			| KeyboardEvent< HTMLInputElement >
+			| FocusEvent< HTMLInputElement >
+	) => {
+		try {
+			onValidate( nextValue, event );
+		} catch ( err ) {
+			let isExpected;
+			const validity = event.currentTarget.validity as KeyedValidityState;
+			for ( const condition in validity ) {
+				isExpected ||= validity[ condition ];
+			}
+			if ( isExpected ) {
+				invalidate( err, event );
+				return;
+			}
+			throw err;
+		}
+		inputAction( nextValue, event );
 	};
 
-	const handleOnCommit = ( event: SyntheticEvent< HTMLInputElement > ) => {
-		const nextValue = event.currentTarget.value;
+	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
+		const nextValue = event.target.value;
+		if ( isPressEnterToChange ) {
+			change( nextValue, event );
+		} else {
+			validateAction( change, nextValue, event );
+		}
+	};
 
-		try {
-			onValidate( nextValue );
+	const handleOnCommit = (
+		event:
+			| KeyboardEvent< HTMLInputElement >
+			| FocusEvent< HTMLInputElement >
+	) => {
+		const nextValue = event.currentTarget.value;
+		if ( event.type === 'blur' ) {
 			commit( nextValue, event );
-		} catch ( err ) {
-			invalidate( err, event );
+		} else {
+			validateAction( commit, nextValue, event );
 		}
 	};
 

@@ -90,3 +90,7 @@ export interface InputControlLabelProps {
 	labelPosition?: BaseProps[ 'labelPosition' ];
 	size?: BaseProps[ 'size' ];
 }
+
+export interface KeyedValidityState extends ValidityState {
+	[ key: string ]: boolean;
+}
