@@ -73,15 +73,15 @@ export default function Edit( { attributes, setAttributes } ) {
 **save.js** file:
 
 ```jsx
-import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	return <div { ...useBlockProps.save() }>{ attributes.message }</div>;
+	const blockProps = useBlockProps.save();
+	return <div { ...blockProps }>{ attributes.message }</div>;
 }
 ```
 
-If you have previously run `npm start`, and the script is still running, you can reload the editor now and add the block to test.
+If you have previously run `npm run start`, and the script is still running, you can reload the editor now and add the block to test.
 Otherwise rebuild the block using `npm run build`, reload the editor and add the block. Type a message in the editor, save, and view it in the post.
 
 Next Section: [Code Implementation](/docs/getting-started/create-block/block-code.md)

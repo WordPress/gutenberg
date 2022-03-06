@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 
 /**
  * External dependencies
@@ -11,7 +11,7 @@ import * as uuid from 'uuid';
 const uuidCache = new Set();
 
 const memoizedCreateCacheWithContainer = memoize( ( container ) => {
-	// emotion only accepts alphabetical and hyphenated keys so we just strip the numbers from the UUID. It _should_ be fine.
+	// Emotion only accepts alphabetical and hyphenated keys so we just strip the numbers from the UUID. It _should_ be fine.
 	let key = uuid.v4().replace( /[0-9]/g, '' );
 	while ( uuidCache.has( key ) ) {
 		key = uuid.v4().replace( /[0-9]/g, '' );

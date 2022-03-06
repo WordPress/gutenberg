@@ -73,7 +73,7 @@ class MediaContainer extends Component {
 		const { mediaId, mediaUrl } = this.props;
 
 		// Make sure we mark any temporary images as failed if they failed while
-		// the editor wasn't open
+		// the editor wasn't open.
 		if ( mediaId && mediaUrl && getProtocol( mediaUrl ) === 'file:' ) {
 			mediaUploadSync();
 		}

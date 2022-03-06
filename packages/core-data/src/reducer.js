@@ -355,7 +355,7 @@ export function entitiesConfig( state = defaultEntities, action ) {
 export const entities = ( state = {}, action ) => {
 	const newConfig = entitiesConfig( state.config, action );
 
-	// Generates a dynamic reducer for the entities
+	// Generates a dynamic reducer for the entities.
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
 		const entitiesByKind = groupBy( newConfig, 'kind' );

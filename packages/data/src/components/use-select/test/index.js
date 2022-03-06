@@ -57,7 +57,7 @@ describe( 'useSelect', () => {
 		expect( selectSpy ).toHaveBeenCalledTimes( 2 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
-		// ensure expected state was rendered
+		// Ensure expected state was rendered.
 		expect( testInstance.findByType( 'div' ).props ).toEqual( {
 			children: 'bar',
 		} );
@@ -92,12 +92,12 @@ describe( 'useSelect', () => {
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 0 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
-		// ensure expected state was rendered
+		// Ensure expected state was rendered.
 		expect( testInstance.findByType( 'div' ).props ).toEqual( {
 			children: 'foo',
 		} );
 
-		//rerender with non dependency changed
+		// Rerender with non dependency changed.
 		act( () => {
 			renderer.update(
 				<RegistryProvider value={ registry }>
@@ -110,12 +110,12 @@ describe( 'useSelect', () => {
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 0 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 
-		// ensure expected state was rendered
+		// Ensure expected state was rendered.
 		expect( testInstance.findByType( 'div' ).props ).toEqual( {
 			children: 'foo',
 		} );
 
-		// rerender with dependency changed
+		// Rerender with dependency changed.
 		act( () => {
 			renderer.update(
 				<RegistryProvider value={ registry }>
@@ -128,7 +128,7 @@ describe( 'useSelect', () => {
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 2 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 
-		// ensure expected state was rendered
+		// Ensure expected state was rendered.
 		expect( testInstance.findByType( 'div' ).props ).toEqual( {
 			children: 'bar',
 		} );
@@ -189,7 +189,7 @@ describe( 'useSelect', () => {
 					);
 				} );
 				const testInstance = renderer.root;
-				// ensure expected state was rendered.
+				// Ensure expected state was rendered.
 				expect( testInstance.findByType( 'div' ).props.data ).toEqual(
 					valueA
 				);

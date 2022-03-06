@@ -12,7 +12,7 @@ import useRefEffect from '../use-ref-effect';
 /**
  * @template T
  * @param {T} value
- * @return {import('react').MutableRefObject<T>} A ref with the value.
+ * @return {import('react').MutableRefObject<T|null>} A ref with the value.
  */
 function useFreshRef( value ) {
 	/* eslint-enable jsdoc/valid-types */
@@ -219,6 +219,12 @@ export default function useDropZone( {
 			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 
 			return () => {
+				onDropRef.current = null;
+				onDragStartRef.current = null;
+				onDragEnterRef.current = null;
+				onDragLeaveRef.current = null;
+				onDragEndRef.current = null;
+				onDragOverRef.current = null;
 				delete element.dataset.isDropZone;
 				element.removeEventListener( 'drop', onDrop );
 				element.removeEventListener( 'dragenter', onDragEnter );

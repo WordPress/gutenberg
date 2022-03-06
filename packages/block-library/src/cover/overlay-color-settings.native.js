@@ -38,7 +38,7 @@ function OverlayColorSettings( {
 	const settings = useMemo( () => {
 		const setOverlayAttribute = ( attributeName, value ) => {
 			setAttributes( {
-				// clear all related attributes (only one should be set)
+				// Clear all related attributes (only one should be set)
 				overlayColor: undefined,
 				customOverlayColor: undefined,
 				gradient: undefined,
@@ -48,7 +48,7 @@ function OverlayColorSettings( {
 		};
 
 		const onColorChange = ( value ) => {
-			// do nothing for falsy values
+			// Do nothing for falsy values.
 			if ( ! value ) {
 				return;
 			}
@@ -61,7 +61,7 @@ function OverlayColorSettings( {
 		};
 
 		const onGradientChange = ( value ) => {
-			// do nothing for falsy values
+			// Do nothing for falsy values.
 			if ( ! value ) {
 				return;
 			}

@@ -11,6 +11,13 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
 
+const storeConfig = {
+	reducer,
+	actions,
+	selectors,
+	persist: [ 'enableItems', 'preferences' ],
+};
+
 /**
  * Store definition for the interface namespace.
  *
@@ -18,20 +25,8 @@ import { STORE_NAME } from './constants';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
-	reducer,
-	actions,
-	selectors,
-	persist: [ 'enableItems', 'preferences' ],
-	__experimentalUseThunks: true,
-} );
+export const store = createReduxStore( STORE_NAME, storeConfig );
 
 // Once we build a more generic persistence plugin that works across types of stores
 // we'd be able to replace this with a register call.
-registerStore( STORE_NAME, {
-	reducer,
-	actions,
-	selectors,
-	persist: [ 'enableItems', 'preferences' ],
-	__experimentalUseThunks: true,
-} );
+registerStore( STORE_NAME, storeConfig );

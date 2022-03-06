@@ -86,7 +86,7 @@ describe( 'Meta boxes', () => {
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
-		// Retrieve the excerpt used as meta
+		// Retrieve the excerpt used as meta.
 		const metaExcerpt = await page.evaluate( () => {
 			return document
 				.querySelector( 'meta[property="gutenberg:hello"]' )
@@ -101,7 +101,7 @@ describe( 'Meta boxes', () => {
 		await page.keyboard.type( 'Excerpt from content.' );
 		await page.type( '.editor-post-title__input', 'A published post' );
 
-		// Open the excerpt panel
+		// Open the excerpt panel.
 		await openDocumentSettingsSidebar();
 		const excerptButton = await findSidebarPanelToggleButtonWithTitle(
 			'Excerpt'
@@ -126,7 +126,7 @@ describe( 'Meta boxes', () => {
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
-		// Retrieve the excerpt used as meta
+		// Retrieve the excerpt used as meta.
 		const metaExcerpt = await page.evaluate( () => {
 			return document
 				.querySelector( 'meta[property="gutenberg:hello"]' )

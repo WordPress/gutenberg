@@ -108,9 +108,32 @@ function TreeMenu() {
 
 ##### Props
 
-`TreeGrid` accepts no specific props. Any props specified will be passed to the `table` element rendered by `TreeGrid`.
+Aside from the documented callback functions, any props specified will be passed to the `table` element rendered by `TreeGrid`.
 
 `TreeGrid` should always have children.
+
+###### onFocusRow( event: Event, startRow: HTMLElement, destinationRow: HTMLElement )
+
+Callback that fires when focus is shifted from one row to another via the UP and DOWN keys.
+The callback is passed the event, the start row element that the focus was on originally, and
+the destination row element after the focus has moved.
+
+-   Type: `Function`
+-   Required: No
+
+###### onCollapseRow( row: HTMLElement )
+
+A callback that passes in the row element to be collapsed.
+
+-   Type: `Function`
+-   Required: No
+
+###### onExpandRow( row: HTMLElement )
+
+A callback that passes in the row element to be expanded.
+
+-   Type: `Function`
+-   Required: No
 
 #### TreeGridRow
 

@@ -66,7 +66,7 @@ export default function LinkControlSearchResults( {
 	// when that is required.
 	const searchResultsLabel = createElement(
 		isInitialSuggestions ? Fragment : VisuallyHidden,
-		{}, // empty props
+		{}, // Empty props.
 		<span
 			className="block-editor-link-control__search-results-label"
 			id={ searchResultsLabelId }
@@ -109,7 +109,7 @@ export default function LinkControlSearchResults( {
 					}
 
 					// If we're not handling "Create" suggestions above then
-					// we don't want them in the main results so exit early
+					// we don't want them in the main results so exit early.
 					if ( CREATE_TYPE === suggestion.type ) {
 						return null;
 					}

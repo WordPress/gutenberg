@@ -22,7 +22,7 @@ jest.mock( '../load-assets', () => ( {
 } ) );
 
 function createRegistryWithStores() {
-	// create a registry and register stores
+	// Create a registry and register stores.
 	const registry = createRegistry();
 
 	registry.register( blockDirectoryStore );
@@ -32,7 +32,7 @@ function createRegistryWithStores() {
 	return registry;
 }
 
-// mock the `loadAssets` function. The real function would load the installed
+// Mock the `loadAssets` function. The real function would load the installed
 // block's script assets, which in turn register the block. That registration
 // call is the only thing we need to mock.
 function loadAssetsMock( registry ) {
@@ -85,7 +85,7 @@ describe( 'actions', () => {
 		it( 'should install a block successfully', async () => {
 			const registry = createRegistryWithStores();
 
-			// mock the api-fetch and load-assets modules
+			// Mock the api-fetch and load-assets modules.
 			apiFetch.mockImplementation( async ( { path } ) => {
 				switch ( path ) {
 					case 'wp/v2/plugins':
@@ -99,18 +99,18 @@ describe( 'actions', () => {
 
 			loadAssets.mockImplementation( loadAssetsMock( registry ) );
 
-			// install the block
+			// Install the block.
 			await registry
 				.dispatch( blockDirectoryStore )
 				.installBlockType( block );
 
-			// check that blocks store contains the new block
+			// Check that blocks store contains the new block.
 			const registeredBlock = registry
 				.select( blocksStore )
 				.getBlockType( 'block/block' );
 			expect( registeredBlock ).toBeTruthy();
 
-			// check that the block-directory store contains the new block, too
+			// Check that the block-directory store contains the new block, too.
 			const installedBlockTypes = registry
 				.select( blockDirectoryStore )
 				.getInstalledBlockTypes();
@@ -118,7 +118,7 @@ describe( 'actions', () => {
 				{ name: 'block/block' },
 			] );
 
-			// check that notice was displayed
+			// Check that notice was displayed.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toMatchObject( [
 				{ content: 'Block Test Block installed and added.' },
@@ -128,7 +128,7 @@ describe( 'actions', () => {
 		it( 'should activate an inactive block plugin successfully', async () => {
 			const registry = createRegistryWithStores();
 
-			// mock the api-fetch and load-assets modules
+			// Mock the api-fetch and load-assets modules.
 			apiFetch.mockImplementation( async ( { path, url } ) => {
 				if ( path === blockTypePath ) {
 					return blockTypeResponse;
@@ -141,20 +141,20 @@ describe( 'actions', () => {
 
 			loadAssets.mockImplementation( loadAssetsMock( registry ) );
 
-			// install the block
+			// Install the block.
 			await registry.dispatch( blockDirectoryStore ).installBlockType(
 				blockWithLinks( block, {
 					'wp:plugin': [ { href: pluginEndpoint } ],
 				} )
 			);
 
-			// check that blocks store contains the new block
+			// Check that blocks store contains the new block.
 			const registeredBlock = registry
 				.select( blocksStore )
 				.getBlockType( 'block/block' );
 			expect( registeredBlock ).toBeTruthy();
 
-			// check that notice was displayed
+			// Check that notice was displayed.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toMatchObject( [
 				{ content: 'Block Test Block installed and added.' },
@@ -164,7 +164,7 @@ describe( 'actions', () => {
 		it( "should set an error if the plugin can't install", async () => {
 			const registry = createRegistryWithStores();
 
-			// mock the api-fetch and load-assets modules
+			// Mock the api-fetch and load-assets modules.
 			apiFetch.mockImplementation( async ( { path } ) => {
 				switch ( path ) {
 					case 'wp/v2/plugins':
@@ -180,18 +180,18 @@ describe( 'actions', () => {
 
 			loadAssets.mockImplementation( loadAssetsMock( registry ) );
 
-			// install the block
+			// Install the block.
 			await registry
 				.dispatch( blockDirectoryStore )
 				.installBlockType( block );
 
-			// check that blocks store doesn't contain the new block
+			// Check that blocks store doesn't contain the new block.
 			const registeredBlock = registry
 				.select( blocksStore )
 				.getBlockType( 'block/block' );
 			expect( registeredBlock ).toBeUndefined();
 
-			// check that error notice was displayed
+			// Check that error notice was displayed.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toMatchObject( [
 				{ content: 'Plugin not found.' },
@@ -224,21 +224,21 @@ describe( 'actions', () => {
 				}
 			} );
 
-			// add installed block type that we're going to uninstall
+			// Add installed block type that we're going to uninstall.
 			registry
 				.dispatch( blockDirectoryStore )
 				.addInstalledBlockType( installedBlock );
 
-			// uninstall the block
+			// Uninstall the block.
 			await registry
 				.dispatch( blockDirectoryStore )
 				.uninstallBlockType( installedBlock );
 
-			// check that no error notice was displayed
+			// Check that no error notice was displayed.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toEqual( [] );
 
-			// verify that the block was uninstalled
+			// Verify that the block was uninstalled.
 			const installedBlockTypes = registry
 				.select( blockDirectoryStore )
 				.getInstalledBlockTypes();
@@ -271,12 +271,12 @@ describe( 'actions', () => {
 				}
 			} );
 
-			// uninstall the block
+			// Uninstall the block.
 			await registry
 				.dispatch( blockDirectoryStore )
 				.uninstallBlockType( installedBlock );
 
-			// check that error notice was displayed
+			// Check that error notice was displayed.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toMatchObject( [
 				{

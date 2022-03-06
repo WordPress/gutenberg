@@ -12,12 +12,7 @@ import {
 	useBlockProps,
 	getColorClassName,
 } from '@wordpress/block-editor';
-import {
-	ToolbarButton,
-	Placeholder,
-	Spinner,
-	Notice,
-} from '@wordpress/components';
+import { ToolbarButton, Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -77,9 +72,7 @@ export default function PageListEdit( { context, clientId } ) {
 			) }
 			{ ! hasResolvedPages && (
 				<div { ...blockProps }>
-					<Placeholder>
-						<Spinner />
-					</Placeholder>
+					<Spinner />
 				</div>
 			) }
 

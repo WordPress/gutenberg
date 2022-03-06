@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ import type { ToolsPanelItemProps } from '../types';
 // prevents props being applied to HTML elements that would make them invalid.
 const ToolsPanelItem = (
 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
 		children,

@@ -12,6 +12,7 @@ export default function useNavigationMenu( ref ) {
 				getEditedEntityRecord,
 				getEntityRecords,
 				hasFinishedResolution,
+				isResolving,
 				canUser,
 			} = select( coreStore );
 
@@ -80,6 +81,10 @@ export default function useNavigationMenu( ref ) {
 					[ 'delete', 'navigation', ref ]
 				),
 				canUserCreateNavigationMenu: canUser( 'create', 'navigation' ),
+				isResolvingCanUserCreateNavigationMenu: isResolving(
+					'canUser',
+					[ 'create', 'navigation' ]
+				),
 				hasResolvedCanUserCreateNavigationMenu: hasFinishedResolution(
 					'canUser',
 					[ 'create', 'navigation' ]

@@ -19,7 +19,7 @@ export function stripFirstImage( attributes, { shortcode } ) {
 
 	let nodeToRemove = body.querySelector( 'img' );
 
-	// if an image has parents, find the topmost node to remove
+	// If an image has parents, find the topmost node to remove.
 	while (
 		nodeToRemove &&
 		nodeToRemove.parentNode &&

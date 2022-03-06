@@ -98,7 +98,7 @@ describe( 'Multi-entity save flow', () => {
 			await page.keyboard.type( 'Test Post...' );
 			await page.keyboard.press( 'Enter' );
 
-			// Should not trigger multi-entity save button with only post edited
+			// Should not trigger multi-entity save button with only post edited.
 			await assertMultiSaveDisabled();
 
 			// Should only have publish panel a11y button active with only post edited.
