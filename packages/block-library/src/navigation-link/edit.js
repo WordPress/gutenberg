@@ -384,7 +384,6 @@ export default function NavigationLinkEdit( {
 	onReplace,
 	context,
 	clientId,
-	maxNestingLevel = 5,
 } ) {
 	const {
 		id,
@@ -399,6 +398,7 @@ export default function NavigationLinkEdit( {
 	} = attributes;
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
+	const { maxNestingLevel } = context;
 
 	const link = {
 		url,

@@ -59,6 +59,10 @@
 		},
 		"customOverlayTextColor": {
 			"type": "string"
+		},
+		"maxNestingLevel": {
+			"type": "number",
+			"default": 3
 		}
 	},
 	"usesContext": [ "navigationArea" ],
@@ -76,7 +80,8 @@
 		"showSubmenuIcon": "showSubmenuIcon",
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
-		"orientation": "orientation"
+		"orientation": "orientation",
+		"maxNestingLevel": "maxNestingLevel"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],

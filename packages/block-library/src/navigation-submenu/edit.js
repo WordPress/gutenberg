@@ -55,8 +55,6 @@ const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
 };
 
-const MAX_NESTING = 5;
-
 /**
  * A React hook to determine if it's dragging within the target element.
  *
@@ -293,7 +291,7 @@ export default function NavigationSubmenuEdit( {
 		url,
 		opensInNewTab,
 	};
-	const { showSubmenuIcon, openSubmenusOnClick } = context;
+	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const {
@@ -351,7 +349,7 @@ export default function NavigationSubmenuEdit( {
 			return {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, name ).length >=
-					MAX_NESTING,
+					maxNestingLevel,
 				isTopLevelItem:
 					getBlockParentsByBlockName( clientId, name ).length === 0,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
