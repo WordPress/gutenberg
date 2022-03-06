@@ -167,6 +167,13 @@ export function NumberControl(
 		return state;
 	};
 
+	const onValidate = ( nextValue, event ) => {
+		props.onValidate?.( nextValue, event );
+		if ( ! event.target.validity.valid ) {
+			throw new Error( event.target.validationMessage );
+		}
+	};
+
 	return (
 		<Input
 			autoComplete={ autoComplete }
@@ -179,6 +186,7 @@ export function NumberControl(
 			label={ label }
 			max={ max }
 			min={ min }
+			onValidate={ onValidate }
 			ref={ ref }
 			required={ required }
 			step={ step }
