@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { isEmpty } from 'lodash';
-import type { SyntheticEvent } from 'react';
+import type { ChangeEvent, KeyboardEvent, FocusEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -132,6 +132,7 @@ function inputControlStateReducer(
 			 */
 			case actions.INVALIDATE:
 				nextState.error = action.payload.error;
+				nextState.value = action.payload.value;
 				break;
 		}
 
@@ -215,8 +216,21 @@ export function useInputControlStateReducer(
 	 * Actions for the reducer
 	 */
 	const change = createChangeEvent( actions.CHANGE );
-	const invalidate = ( error: unknown, event: SyntheticEvent ) =>
-		dispatch( { type: actions.INVALIDATE, payload: { error, event } } );
+	const invalidate = (
+		error: unknown,
+		event:
+			| ChangeEvent< HTMLInputElement >
+			| KeyboardEvent< HTMLInputElement >
+			| FocusEvent< HTMLInputElement >
+	) =>
+		dispatch( {
+			type: actions.INVALIDATE,
+			payload: {
+				error,
+				event,
+				value: event.currentTarget.value,
+			},
+		} );
 	const reset = createChangeEvent( actions.RESET );
 	const commit = createChangeEvent( actions.COMMIT );
 	const update = createChangeEvent( actions.UPDATE );

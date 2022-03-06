@@ -33,6 +33,11 @@ interface ValuePayload {
 	value: string;
 }
 
+interface ErrorPayload {
+	value: string;
+	error: unknown;
+}
+
 export type ChangeAction = Action< typeof CHANGE, ValuePayload >;
 export type CommitAction = Action< typeof COMMIT, ValuePayload >;
 export type PressUpAction = Action< typeof PRESS_UP >;
@@ -43,7 +48,7 @@ export type DragEndAction = Action< typeof DRAG_END, DragProps >;
 export type DragAction = Action< typeof DRAG, DragProps >;
 export type ResetAction = Action< typeof RESET, Partial< ValuePayload > >;
 export type UpdateAction = Action< typeof UPDATE, ValuePayload >;
-export type InvalidateAction = Action< typeof INVALIDATE, { error: unknown } >;
+export type InvalidateAction = Action< typeof INVALIDATE, ErrorPayload >;
 
 export type ChangeEventAction =
 	| ChangeAction
