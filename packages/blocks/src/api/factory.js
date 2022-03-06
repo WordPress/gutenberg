@@ -15,6 +15,8 @@ import {
 	isFunction,
 	isEmpty,
 	map,
+	reduce,
+	omit,
 } from 'lodash';
 
 /**
@@ -32,7 +34,7 @@ import {
 } from './registration';
 import {
 	normalizeBlockType,
-	__experimentalSanitizeBlockAttributes,
+	__experimentalGetBlockAttributesNamesByRole,
 } from './utils';
 
 /**
@@ -45,9 +47,37 @@ import {
  * @return {Object} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		name,
-		attributes
+	// Get the type definition associated with a registered block.
+	const blockType = getBlockType( name );
+
+	if ( undefined === blockType ) {
+		throw new Error( `Block type '${ name }' is not registered.` );
+	}
+
+	const sanitizedAttributes = reduce(
+		blockType.attributes,
+		( accumulator, schema, key ) => {
+			const value = attributes[ key ];
+
+			if ( undefined !== value ) {
+				accumulator[ key ] = value;
+			} else if ( schema.hasOwnProperty( 'default' ) ) {
+				accumulator[ key ] = schema.default;
+			}
+
+			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
+				// Ensure value passed is always an array, which we're expecting in
+				// the RichText component to handle the deprecated value.
+				if ( typeof accumulator[ key ] === 'string' ) {
+					accumulator[ key ] = [ accumulator[ key ] ];
+				} else if ( ! Array.isArray( accumulator[ key ] ) ) {
+					accumulator[ key ] = [];
+				}
+			}
+
+			return accumulator;
+		},
+		{}
 	);
 
 	const clientId = uuid();
@@ -94,8 +124,9 @@ export function createBlocksFromInnerBlocksTemplate(
 }
 
 /**
- * Given a block object, returns a copy of the block object while sanitizing its attributes,
+ * Given a block object, returns a copy of the block object,
  * optionally merging new attributes and/or replacing its inner blocks.
+ * Attributes with the `internal` role are not copied into the new object.
  *
  * @param {Object} block           Block instance.
  * @param {Object} mergeAttributes Block attributes.
@@ -110,18 +141,20 @@ export function __experimentalCloneSanitizedBlock(
 ) {
 	const clientId = uuid();
 
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		block.name,
+	// Merge in new attributes and strip out attributes with the `internal` role,
+	// which should not be copied during block duplication.
+	const filteredAttributes = omit(
 		{
 			...block.attributes,
 			...mergeAttributes,
-		}
+		},
+		__experimentalGetBlockAttributesNamesByRole( block.name, 'internal' )
 	);
 
 	return {
 		...block,
 		clientId,
-		attributes: sanitizedAttributes,
+		attributes: filteredAttributes,
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) =>

@@ -17,7 +17,6 @@ import {
 	isUnmodifiedDefaultBlock,
 	getAccessibleBlockLabel,
 	getBlockLabel,
-	__experimentalSanitizeBlockAttributes,
 	__experimentalGetBlockAttributesNamesByRole,
 } from '../utils';
 
@@ -212,103 +211,6 @@ describe( 'getAccessibleBlockLabel', () => {
 		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe(
 			'Recipe Block. Row 3'
 		);
-	} );
-} );
-
-describe( 'sanitizeBlockAttributes', () => {
-	afterEach( () => {
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
-	} );
-
-	it( 'sanitize block attributes not defined in the block type', () => {
-		registerBlockType( 'core/test-block', {
-			attributes: {
-				defined: {
-					type: 'string',
-				},
-			},
-			title: 'Test block',
-		} );
-
-		const attributes = __experimentalSanitizeBlockAttributes(
-			'core/test-block',
-			{
-				defined: 'defined-attribute',
-				notDefined: 'not-defined-attribute',
-			}
-		);
-
-		expect( attributes ).toEqual( {
-			defined: 'defined-attribute',
-		} );
-	} );
-
-	it( 'throws error if the block is not registered', () => {
-		expect( () => {
-			__experimentalSanitizeBlockAttributes(
-				'core/not-registered-test-block',
-				{}
-			);
-		} ).toThrowErrorMatchingInlineSnapshot(
-			`"Block type 'core/not-registered-test-block' is not registered."`
-		);
-	} );
-
-	it( 'handles undefined values and default values', () => {
-		registerBlockType( 'core/test-block', {
-			attributes: {
-				hasDefaultValue: {
-					type: 'string',
-					default: 'default-value',
-				},
-				noDefaultValue: {
-					type: 'string',
-				},
-			},
-			title: 'Test block',
-		} );
-
-		const attributes = __experimentalSanitizeBlockAttributes(
-			'core/test-block',
-			{}
-		);
-
-		expect( attributes ).toEqual( {
-			hasDefaultValue: 'default-value',
-		} );
-	} );
-
-	it( 'handles node and children sources as arrays', () => {
-		registerBlockType( 'core/test-block', {
-			attributes: {
-				nodeContent: {
-					source: 'node',
-				},
-				childrenContent: {
-					source: 'children',
-				},
-				withDefault: {
-					source: 'children',
-					default: 'test',
-				},
-			},
-			title: 'Test block',
-		} );
-
-		const attributes = __experimentalSanitizeBlockAttributes(
-			'core/test-block',
-			{
-				nodeContent: [ 'test-1', 'test-2' ],
-			}
-		);
-
-		expect( attributes ).toEqual( {
-			nodeContent: [ 'test-1', 'test-2' ],
-			childrenContent: [],
-			withDefault: [ 'test' ],
-		} );
 	} );
 } );
 

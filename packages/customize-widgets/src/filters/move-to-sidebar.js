@@ -55,10 +55,10 @@ const withMoveToSidebarToolbarItem = createHigherOrderComponent(
 			const newSidebarControl = sidebarControls.find(
 				( sidebarControl ) => sidebarControl.id === sidebarControlId
 			);
-
-			if ( widgetId ) {
+			const activeSidebarAdapter = activeSidebarControl.sidebarAdapter;
+			if ( widgetId && activeSidebarAdapter.getWidget( widgetId ) ) {
 				/**
-				 * If there's a widgetId, move it to the other sidebar.
+				 * If there's an existing widget, move it to the other sidebar.
 				 */
 				const oldSetting = activeSidebarControl.setting;
 				const newSetting = newSidebarControl.setting;
@@ -67,15 +67,15 @@ const withMoveToSidebarToolbarItem = createHigherOrderComponent(
 				newSetting( [ ...newSetting(), widgetId ] );
 			} else {
 				/**
-				 * If there isn't a widgetId, it's most likely a inner block.
-				 * First, remove the block in the original sidebar,
+				 * If there isn't an existing widget with this id, it's most likely an
+				 * inner block. First, remove the block in the original sidebar,
 				 * then, create a new widget in the new sidebar and get back its widgetId.
 				 */
-				const sidebarAdapter = newSidebarControl.sidebarAdapter;
+				const newSidebarAdapter = newSidebarControl.sidebarAdapter;
 
 				removeBlock( clientId );
-				const addedWidgetIds = sidebarAdapter.setWidgets( [
-					...sidebarAdapter.getWidgets(),
+				const addedWidgetIds = newSidebarAdapter.setWidgets( [
+					...newSidebarAdapter.getWidgets(),
 					blockToWidget( block ),
 				] );
 				// The last non-null id is the added widget's id.

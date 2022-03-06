@@ -1,4 +1,8 @@
 // @ts-check
+/**
+ * WordPress dependencies
+ */
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Get the internal widget id from block.
@@ -30,4 +34,33 @@ export function addWidgetIdToBlock( block, widgetId ) {
 			__internalWidgetId: widgetId,
 		},
 	};
+}
+
+/**
+ * Filters registered block settings, extending attributes to include
+ * `__internalWidgetId` if needed.
+ *
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Updated block settings.
+ */
+function addInternalWidgetIdAttribute( settings ) {
+	return {
+		...settings,
+		attributes: {
+			...settings.attributes,
+			__internalWidgetId: {
+				type: 'string',
+				__experimentalRole: 'internal',
+			},
+		},
+	};
+}
+
+export function registerInternalWidgetIds() {
+	addFilter(
+		'blocks.registerBlockType',
+		'core/widget/addAttributes',
+		addInternalWidgetIdAttribute
+	);
 }
