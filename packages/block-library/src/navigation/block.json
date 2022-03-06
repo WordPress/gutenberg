@@ -62,7 +62,7 @@
 		},
 		"maxNestingLevel": {
 			"type": "number",
-			"default": 3
+			"default": 5
 		}
 	},
 	"usesContext": [ "navigationArea" ],
