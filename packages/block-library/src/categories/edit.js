@@ -33,7 +33,7 @@ export default function CategoriesEdit( {
 	if ( showOnlyTopLevel ) {
 		query.parent = 0;
 	}
-	const { categories, isResolving } = useEntityRecords(
+	const { records: categories, isResolving } = useEntityRecords(
 		'taxonomy',
 		'category',
 		query,
