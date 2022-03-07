@@ -330,20 +330,35 @@ function mapResolveSelectors( selectors, store ) {
 			'getCachedResolvers',
 		] ),
 		( selector, selectorName ) => ( ...args ) =>
-			new Promise( ( resolve ) => {
+			new Promise( ( resolve, reject ) => {
 				const hasFinished = () =>
 					selectors.hasFinishedResolution( selectorName, args );
+				const finalize = ( result ) => {
+					const hasFailed = selectors.hasResolutionFailed(
+						selectorName,
+						args
+					);
+					if ( hasFailed ) {
+						const error = selectors.getResolutionError(
+							selectorName,
+							args
+						);
+						reject( error );
+					} else {
+						resolve( result );
+					}
+				};
 				const getResult = () => selector.apply( null, args );
 				// Trigger the selector (to trigger the resolver)
 				const result = getResult();
 				if ( hasFinished() ) {
-					return resolve( result );
+					return finalize( result );
 				}
 
 				const unsubscribe = store.subscribe( () => {
 					if ( hasFinished() ) {
 						unsubscribe();
-						resolve( getResult() );
+						finalize( getResult() );
 					}
 				} );
 			} )
@@ -413,15 +428,28 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 					store.dispatch(
 						metadataActions.startResolution( selectorName, args )
 					);
-					await fulfillResolver(
-						store,
-						mappedResolvers,
-						selectorName,
-						...args
-					);
-					store.dispatch(
-						metadataActions.finishResolution( selectorName, args )
-					);
+					try {
+						await fulfillResolver(
+							store,
+							mappedResolvers,
+							selectorName,
+							...args
+						);
+						store.dispatch(
+							metadataActions.finishResolution(
+								selectorName,
+								args
+							)
+						);
+					} catch ( error ) {
+						store.dispatch(
+							metadataActions.failResolution(
+								selectorName,
+								args,
+								error
+							)
+						);
+					}
 				} );
 			}
 
