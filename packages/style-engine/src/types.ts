@@ -12,6 +12,10 @@ export type Box< T extends BoxVariants = undefined > = {
 };
 
 export interface Style {
+	backgroundImage?: {
+		url?: CSSProperties[ 'backgroundImage' ];
+		source?: string;
+	};
 	spacing?: {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;
 		padding?: CSSProperties[ 'padding' ] | Box< 'padding' >;

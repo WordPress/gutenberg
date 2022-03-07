@@ -29,6 +29,7 @@
 				"text": true
 			}
 		},
+		"__experimentalBackgroundImage": true,
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,

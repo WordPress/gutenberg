@@ -2,6 +2,7 @@
 	"version": 2,
 	"settings": {
 		"appearanceTools": false,
+		"backgroundImage": true,
 		"border": {
 			"color": false,
 			"radius": false,

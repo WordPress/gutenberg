@@ -33,6 +33,10 @@ import { getCSSRules } from '@wordpress/style-engine';
  * Internal dependencies
  */
 import BlockList from '../components/block-list';
+import {
+	BACKGROUND_IMAGE_SUPPORT_KEY,
+	BackgroundImagePanel,
+} from './backgroundImage';
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -45,6 +49,7 @@ import useDisplayBlockControls from '../components/use-display-block-controls';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
+	BACKGROUND_IMAGE_SUPPORT_KEY,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
@@ -197,6 +202,7 @@ const skipSerializationPathsEdit = {
  */
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
+	[ `${ BACKGROUND_IMAGE_SUPPORT_KEY }` ]: [ 'backgroundImage' ],
 	[ `${ SPACING_SUPPORT_KEY }` ]: [ 'spacing.blockGap' ],
 };
 
@@ -283,6 +289,7 @@ export const withBlockControls = createHigherOrderComponent(
 			<>
 				{ shouldDisplayControls && (
 					<>
+						<BackgroundImagePanel { ...props } />
 						<ColorEdit { ...props } />
 						<TypographyPanel { ...props } />
 						<BorderPanel { ...props } />

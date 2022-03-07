@@ -144,6 +144,10 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<InspectorControls.Slot />
 			<InspectorControls.Slot
+				__experimentalGroup="backgroundImage"
+				label={ __( 'Background image' ) }
+			/>
+			<InspectorControls.Slot
 				__experimentalGroup="color"
 				label={ __( 'Color' ) }
 				className="color-block-support-panel__inner-wrapper"

@@ -48,6 +48,7 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
+	variant,
 } ) => {
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
@@ -148,6 +149,7 @@ const MediaReplaceFlow = ( {
 					aria-haspopup="true"
 					onClick={ onToggle }
 					onKeyDown={ openOnArrowDown }
+					variant={ variant }
 				>
 					{ name }
 				</ToolbarButton>
