@@ -604,6 +604,22 @@ export const saveEntityRecord = (
 	}
 };
 
+export const throwingSaveEntityRecord = ( ...args ) => async ( {
+	dispatch,
+	select,
+} ) => {
+	const result = await dispatch( saveEntityRecord( ...args ) );
+
+	const [ kind, name, id ] = args;
+	const error = select.getLastEntitySaveError( kind, name, id );
+
+	// Error may be null, but the result is only available if everything worked correctly.
+	if ( ! result ) {
+		throw error;
+	}
+	return result;
+};
+
 /**
  * Runs multiple core-data actions at the same time using one API request.
  *
