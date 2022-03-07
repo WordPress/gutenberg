@@ -25,10 +25,6 @@ export default function NavigationPlaceholder( {
 } ) {
 	const { isResolvingMenus, hasResolvedMenus } = useNavigationEntities();
 
-	const onCreateEmptyMenu = () => {
-		onCreateEmpty( [] );
-	};
-
 	useEffect( () => {
 		if ( ! isSelected ) {
 			return;
@@ -85,7 +81,7 @@ export default function NavigationPlaceholder( {
 						{ canUserCreateNavigationMenu && (
 							<Button
 								variant="tertiary"
-								onClick={ onCreateEmptyMenu }
+								onClick={ onCreateEmpty }
 							>
 								{ __( 'Start empty' ) }
 							</Button>
