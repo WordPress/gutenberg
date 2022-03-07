@@ -72,6 +72,19 @@ function attributesFromMedia( {
 	setAttributes,
 } ) {
 	return ( media ) => {
+		if ( ! media || ! media.url ) {
+			setAttributes( {
+				mediaAlt: undefined,
+				mediaId: undefined,
+				mediaType: undefined,
+				mediaUrl: undefined,
+				mediaLink: undefined,
+				href: undefined,
+				focalPoint: undefined,
+			} );
+			return;
+		}
+
 		let mediaType;
 		let src;
 		// For media selections originated from a file upload.
