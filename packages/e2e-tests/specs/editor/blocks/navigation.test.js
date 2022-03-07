@@ -357,9 +357,9 @@ describe( 'Navigation', () => {
 				// Check for unconfigured Placeholder state to display
 				await page.waitForXPath( START_EMPTY_XPATH );
 
-				// Deselect the Nav block.
-				await page.keyboard.press( 'Escape' );
-				await page.keyboard.press( 'Escape' );
+				// Deselect the Nav block by inserting a new block at the root level
+				// outside of the Nav block.
+				await insertBlock( 'Paragraph' );
 
 				const navBlock = await waitForBlock( 'Navigation' );
 
@@ -386,11 +386,15 @@ describe( 'Navigation', () => {
 				);
 				await startEmptyButton.click();
 
-				const navBlock = await waitForBlock( 'Navigation' );
+				// Wait for block to resolve
+				let navBlock = await waitForBlock( 'Navigation' );
 
-				// Deselect the Nav block.
-				await page.keyboard.press( 'Escape' );
-				await page.keyboard.press( 'Escape' );
+				// Deselect the Nav block by inserting a new block at the root level
+				// outside of the Nav block.
+				await insertBlock( 'Paragraph' );
+
+				// Aquire fresh reference to block
+				navBlock = await waitForBlock( 'Navigation' );
 
 				// Check Placeholder Preview is visible.
 				await navBlock.waitForSelector(
