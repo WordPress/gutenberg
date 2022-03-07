@@ -18,7 +18,9 @@ export const CLASSIC_MENU_CONVERSION_PENDING = 'pending';
 export const CLASSIC_MENU_CONVERSION_IDLE = 'idle';
 
 function useConvertClassicToBlockMenu( clientId ) {
-	const createNavigationMenu = useCreateNavigationMenu( clientId );
+	const { create: createNavigationMenu } = useCreateNavigationMenu(
+		clientId
+	);
 	const registry = useRegistry();
 
 	const [ status, setStatus ] = useState( CLASSIC_MENU_CONVERSION_IDLE );
