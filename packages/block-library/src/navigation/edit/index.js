@@ -515,7 +515,7 @@ function Navigation( {
 		[ convert, handleUpdateMenu ]
 	);
 
-	const startWithEmptyMenu = useCallback( () => {
+	const resetToEmptyBlock = useCallback( () => {
 		registry.batch( () => {
 			if ( navigationArea ) {
 				setAreaMenu( 0 );
@@ -577,7 +577,7 @@ function Navigation( {
 					{ __(
 						'Navigation menu has been deleted or is unavailable. '
 					) }
-					<Button onClick={ startWithEmptyMenu } variant="link">
+					<Button onClick={ resetToEmptyBlock } variant="link">
 						{ __( 'Create a new menu?' ) }
 					</Button>
 				</Warning>
@@ -634,7 +634,7 @@ function Navigation( {
 								currentMenuId={ ref }
 								clientId={ clientId }
 								onSelect={ handleSelectNavigation }
-								onCreateNew={ startWithEmptyMenu }
+								onCreateNew={ resetToEmptyBlock }
 								/* translators: %s: The name of a menu. */
 								actionLabel={ __( "Switch to '%s'" ) }
 								showManageActions
@@ -789,7 +789,7 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationMenu &&
 							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
-									onDelete={ startWithEmptyMenu }
+									onDelete={ resetToEmptyBlock }
 								/>
 							) }
 					</InspectorControls>
