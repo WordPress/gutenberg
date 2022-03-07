@@ -61,7 +61,11 @@ import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_PENDING,
 	CLASSIC_MENU_CONVERSION_SUCCESS,
 } from './use-convert-classic-menu-to-block-menu';
-import useCreateNavigationMenu from './use-create-navigation-menu';
+import useCreateNavigationMenu, {
+	CREATE_NAVIGATION_MENU_ERROR,
+	CREATE_NAVIGATION_MENU_PENDING,
+	CREATE_NAVIGATION_MENU_SUCCESS,
+} from './use-create-navigation-menu';
 
 const EMPTY_ARRAY = [];
 
@@ -180,11 +184,11 @@ function Navigation( {
 	useEffect( () => {
 		hideNavigationMenuCreateNotice();
 
-		if ( createNavigationMenuStatus === 'pending' ) {
+		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_PENDING ) {
 			speak( __( `Creating Navigation Menu.` ) );
 		}
 
-		if ( createNavigationMenuStatus === 'success' ) {
+		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_SUCCESS ) {
 			setRef( createNavigationMenuPost.id );
 			selectBlock( clientId );
 
@@ -193,7 +197,7 @@ function Navigation( {
 			);
 		}
 
-		if ( createNavigationMenuStatus === 'error' ) {
+		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_ERROR ) {
 			showNavigationMenuCreateNotice(
 				__( 'Failed to create Navigation Menu.' )
 			);
