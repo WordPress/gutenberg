@@ -6,7 +6,7 @@ import { WP_BASE_URL } from '../config';
 /**
  * Checks if current URL is a WordPress path.
  *
- * @this {import('./').PageUtils}
+ * @this {import('.').PageUtils}
  * @param {string} WPPath String to be serialized as pathname.
  * @return {boolean} Boolean represents whether current URL is or not a WordPress path.
  */

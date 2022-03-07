@@ -6,7 +6,7 @@ import { WP_USERNAME, WP_PASSWORD } from '../config';
 /**
  * Performs log in with specified username and password.
  *
- * @this {import('./').PageUtils}
+ * @this {import('.').PageUtils}
  * @param {?string} username String to be used as user credential.
  * @param {?string} password String to be used as user credential.
  */

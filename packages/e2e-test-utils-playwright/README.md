@@ -16,9 +16,23 @@ npm install @wordpress/e2e-test-utils-playwright --save-dev
 
 ## API
 
+<<<<<<< HEAD
 ### PageUtils
 
 Create the test utils instance of the current page.
+=======
+### test
+
+The extended Playwright's [test](https://playwright.dev/docs/api/class-test) module with the `pageUtils` and the `requestUtils` fixtures.
+
+### expect
+
+The Playwright/Jest's [expect](https://jestjs.io/docs/expect) function.
+
+### PageUtils
+
+Create a page utils instance of the current page.
+>>>>>>> fb341de8c709dcc810b2b60be0376bb07430efe8
 
 ```js
 const pageUtils = new PageUtils( page );
@@ -26,7 +40,11 @@ const pageUtils = new PageUtils( page );
 
 ### RequestUtils
 
+<<<<<<< HEAD
 Create the request utils instance of the request instance.
+=======
+Create a request utils instance.
+>>>>>>> fb341de8c709dcc810b2b60be0376bb07430efe8
 
 ```js
 const requestUtils = await RequestUtils.setup( {

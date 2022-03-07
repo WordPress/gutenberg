@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import fs from 'fs/promises';
-import path from 'path';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 import { request } from '@playwright/test';
 import type { APIRequestContext, Cookie } from '@playwright/test';
 
@@ -82,10 +82,8 @@ class RequestUtils {
 			baseURL,
 		} );
 
-		if ( ! storageState ) {
-			await requestUtils.login();
-			await requestUtils.setupRest();
-		}
+		// Always re-auth once to make sure the session is not expired.
+		await requestUtils.setupRest();
 
 		return requestUtils;
 	}

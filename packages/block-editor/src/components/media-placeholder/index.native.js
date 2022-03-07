@@ -130,12 +130,14 @@ function MediaPlaceholder( props ) {
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
 			return (
-				<Icon
-					icon={ plusCircleFilled }
-					style={ addMediaButtonStyle }
-					color={ addMediaButtonStyle.color }
-					size={ addMediaButtonStyle.size }
-				/>
+				<View testID="media-placeholder-appender-icon">
+					<Icon
+						icon={ plusCircleFilled }
+						style={ addMediaButtonStyle }
+						color={ addMediaButtonStyle.color }
+						size={ addMediaButtonStyle.size }
+					/>
+				</View>
 			);
 		}
 	};

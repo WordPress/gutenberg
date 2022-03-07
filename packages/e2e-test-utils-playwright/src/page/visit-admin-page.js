@@ -6,7 +6,7 @@ import { join } from 'path';
 /**
  * Visits admin page; if user is not logged in then it logging in it first, then visits admin page.
  *
- * @this {import('./').PageUtils}
+ * @this {import('.').PageUtils}
  * @param {string} adminPath String to be serialized as pathname.
  * @param {string} query     String to be serialized as query portion of URL.
  */

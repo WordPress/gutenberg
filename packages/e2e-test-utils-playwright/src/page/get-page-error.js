@@ -15,7 +15,7 @@ const REGEXP_PHP_ERROR = /(<b>)?(Fatal error|Recoverable fatal error|Warning|Par
  *
  * @see http://php.net/manual/en/function.error-reporting.php
  *
- * @this {import('./').PageUtils}
+ * @this {import('.').PageUtils}
  * @return {Promise<?string>} Promise resolving to a string or null, depending
  *                            whether a page error is present.
  */

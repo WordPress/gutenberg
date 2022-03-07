@@ -1,7 +1,7 @@
 /**
  * Delete a user account.
  *
- * @this {import('./').PageUtils}
+ * @this {import('.').PageUtils}
  * @param {string} username User name.
  */
 export async function deleteUser( username ) {

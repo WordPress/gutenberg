@@ -6,7 +6,7 @@ import { render, fireEvent } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -125,6 +125,32 @@ describe( 'UnitControl', () => {
 			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
 			expect( state ).toBe( '40px' );
+		} );
+
+		it( 'should cancel change when ESCAPE key is pressed', () => {
+			let state = 50;
+			const setState = ( nextState ) => ( state = nextState );
+
+			render(
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					isPressEnterToChange
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+
+			fireEvent.change( input, { target: { value: '300px' } } );
+
+			expect( input.value ).toBe( '300px' );
+			expect( state ).toBe( 50 );
+
+			fireKeyDown( { keyCode: ESCAPE } );
+
+			expect( input.value ).toBe( '50' );
+			expect( state ).toBe( 50 );
 		} );
 	} );
 

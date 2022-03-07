@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-const { test, expect } = require( '../../config/test' );
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
  * @typedef {import('@playwright/test').Page} Page
@@ -562,19 +562,12 @@ class WidgetsCustomizerPage {
 	async visitCustomizerPage() {
 		await this.pageUtils.visitAdminPage( 'customize.php' );
 
-		// Disable welcome guide if it is enabled.
-		const isWelcomeGuideActive = await this.page.evaluate( () =>
+		// Disable welcome guide.
+		await this.page.evaluate( () => {
 			window.wp.data
-				.select( 'core/interface' )
-				.isFeatureActive( 'core/customize-widgets', 'welcomeGuide' )
-		);
-		if ( isWelcomeGuideActive ) {
-			await this.page.evaluate( () =>
-				window.wp.data
-					.dispatch( 'core/interface' )
-					.toggleFeature( 'core/customize-widgets', 'welcomeGuide' )
-			);
-		}
+				.dispatch( 'core/preferences' )
+				.set( 'core/customize-widgets', 'welcomeGuide', false );
+		} );
 	}
 
 	/**

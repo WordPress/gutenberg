@@ -124,6 +124,26 @@ describe( 'BoxControl', () => {
 			expect( input.value ).toBe( '' );
 			expect( unitSelect.value ).toBe( 'px' );
 		} );
+
+		it( 'should persist cleared value when focus changes', () => {
+			render( <BoxControl /> );
+			const input = screen.getByLabelText( 'Box Control', {
+				selector: 'input',
+			} );
+			const unitSelect = screen.getByLabelText( 'Select unit' );
+
+			input.focus();
+			fireEvent.change( input, { target: { value: '100%' } } );
+			fireEvent.keyDown( input, { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '100' );
+			expect( unitSelect.value ).toBe( '%' );
+
+			fireEvent.change( input, { target: { value: '' } } );
+			fireEvent.blur( input );
+
+			expect( input.value ).toBe( '' );
+		} );
 	} );
 
 	describe( 'Unlinked Sides', () => {

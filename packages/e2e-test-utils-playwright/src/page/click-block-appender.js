@@ -1,7 +1,7 @@
 /**
  * Clicks the default block appender.
  *
- * @this {import('./').PageUtils}
+ * @this {import('.').PageUtils}
  */
 export async function clickBlockAppender() {
 	// The block appender is only visible when there's no selection.

@@ -64,7 +64,7 @@ function isSourceFile( filename ) {
 	return (
 		/\/src\/.+\.(js|json|scss|ts|tsx)$/.test( relativePath ) &&
 		! [
-			/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
+			/\/(benchmark|__mocks__|__tests__|test|storybook|stories|e2e-test-utils-playwright)\/.+/,
 			/.\.(spec|test)\.js$/,
 		].some( ( regex ) => regex.test( relativePath ) )
 	);

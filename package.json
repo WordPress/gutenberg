@@ -245,7 +245,7 @@
 		"precheck-local-changes": "npm run docs:build",
 		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && git diff --exit-code && exit 1 );",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
-		"dev:packages": "node ./bin/packages/watch.js",
+		"dev:packages": "concurrently \"node ./bin/packages/watch.js\" \"tsc --build --watch\"",
 		"distclean": "rimraf node_modules packages/*/node_modules",
 		"docs:gen": "node ./docs/tool/index.js",
 		"docs:build": "npm-run-all docs:gen api-docs:*",

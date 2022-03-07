@@ -84,6 +84,7 @@ exports[`ToggleGroupControl should render correctly 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  font-family: inherit;
   height: 100%;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
