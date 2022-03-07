@@ -136,7 +136,6 @@
 /lib/compat/wordpress-5.9/theme-i18n.json                            @timothybjacobs @spacedmonkey @oandregal
 /lib/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php          @timothybjacobs @spacedmonkey @oandregal
 /lib/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php @timothybjacobs @spacedmonkey @oandregal
-/lib/full-site-editing
 /phpunit/class-wp-theme-json-test.php                                @oandregal
 
 # Web App
@@ -148,9 +147,9 @@
 /packages/components/src/mobile/global-styles-context                @geriux @antonis
 
 # Native (Unowned)
-*.native.js                                     @ghost
-*.android.js                                    @ghost
-*.ios.js                                        @ghost
-*.native.scss                                   @ghost
-*.android.scss                                  @ghost
-*.ios.scss                                      @ghost
+*.native.js
+*.android.js
+*.ios.js
+*.native.scss
+*.android.scss
+*.ios.scss
