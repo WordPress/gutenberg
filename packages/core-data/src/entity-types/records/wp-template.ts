@@ -1,18 +1,18 @@
 /**
  * Internal dependencies
  */
-import {
+import type {
 	Context,
 	PostStatus,
 	RenderedText,
 	OmitNevers,
 	ContextualField,
-} from './helpers';
+} from '../helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface WpTemplate< C extends Context > {
 			/**
 			 * ID of template.
@@ -90,5 +90,5 @@ declare module './base-entity-types' {
 }
 
 export type WpTemplate< C extends Context > = OmitNevers<
-	_BaseEntityTypes.WpTemplate< C >
+	_BaseEntityRecords.WpTemplate< C >
 >;

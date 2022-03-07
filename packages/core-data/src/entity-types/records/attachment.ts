@@ -1,22 +1,22 @@
 /**
  * Internal dependencies
  */
-import {
-	CommentingStatus,
+import type {
 	Context,
 	ContextualField,
-	PingStatus,
-	PostFormat,
+	MediaType,
 	PostStatus,
 	RenderedText,
 	OmitNevers,
-} from './helpers';
+	CommentingStatus,
+	PingStatus,
+} from '../helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
-		export interface Post< C extends Context > {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
+		export interface Attachment< C extends Context > {
 			/**
 			 * The date the post was published, in the site's timezone.
 			 */
@@ -58,10 +58,6 @@ declare module './base-entity-types' {
 			 */
 			type: string;
 			/**
-			 * A password to protect access to the content and excerpt.
-			 */
-			password: ContextualField< string, 'edit', C >;
-			/**
 			 * Permalink template for the post.
 			 */
 			permalink_template: ContextualField< string, 'edit', C >;
@@ -74,36 +70,9 @@ declare module './base-entity-types' {
 			 */
 			title: RenderedText< C >;
 			/**
-			 * The content for the post.
-			 */
-			content: ContextualField<
-				RenderedText< C > & {
-					/**
-					 * Whether the content is protected with a password.
-					 */
-					is_protected: boolean;
-					/**
-					 * Version of the content block format used by the page.
-					 */
-					block_version: ContextualField< string, 'edit', C >;
-				},
-				'view' | 'edit',
-				C
-			>;
-			/**
 			 * The ID for the author of the post.
 			 */
 			author: number;
-			/**
-			 * The excerpt for the post.
-			 */
-			excerpt: RenderedText< C > & {
-				protected: boolean;
-			};
-			/**
-			 * The ID of the featured media for the post.
-			 */
-			featured_media: number;
 			/**
 			 * Whether or not comments are open on the post.
 			 */
@@ -117,10 +86,6 @@ declare module './base-entity-types' {
 			 */
 			ping_status: ContextualField< PingStatus, 'view' | 'edit', C >;
 			/**
-			 * The format for the post.
-			 */
-			format: ContextualField< PostFormat, 'view' | 'edit', C >;
-			/**
 			 * Meta fields.
 			 */
 			meta: ContextualField<
@@ -129,25 +94,53 @@ declare module './base-entity-types' {
 				C
 			>;
 			/**
-			 * Whether or not the post should be treated as sticky.
-			 */
-			sticky: ContextualField< boolean, 'view' | 'edit', C >;
-			/**
 			 * The theme file to use to display the post.
 			 */
 			template: ContextualField< string, 'view' | 'edit', C >;
 			/**
-			 * The terms assigned to the post in the category taxonomy.
+			 * Alternative text to display when attachment is not displayed.
 			 */
-			categories: ContextualField< number[], 'view' | 'edit', C >;
+			alt_text: string;
 			/**
-			 * The terms assigned to the post in the post_tag taxonomy.
+			 * The attachment caption.
 			 */
-			tags: ContextualField< number[], 'view' | 'edit', C >;
+			caption: ContextualField< string, 'edit', C >;
+			/**
+			 * The attachment description.
+			 */
+			description: ContextualField<
+				RenderedText< C >,
+				'view' | 'edit',
+				C
+			>;
+			/**
+			 * Attachment type.
+			 */
+			media_type: MediaType;
+			/**
+			 * The attachment MIME type.
+			 */
+			mime_type: string;
+			/**
+			 * Details about the media file, specific to its type.
+			 */
+			media_details: Record< string, string >;
+			/**
+			 * The ID for the associated post of the attachment.
+			 */
+			post: ContextualField< number, 'view' | 'edit', C >;
+			/**
+			 * URL to the original attachment file.
+			 */
+			source_url: string;
+			/**
+			 * List of the missing image sizes of the attachment.
+			 */
+			missing_image_sizes: ContextualField< string[], 'edit', C >;
 		}
 	}
 }
 
-export type Post< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Post< C >
+export type Attachment< C extends Context > = OmitNevers<
+	_BaseEntityRecords.Attachment< C >
 >;
