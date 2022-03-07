@@ -1,14 +1,5 @@
-<!--
-
-Hi there! Thanks for contributing to Gutenberg!
-
-If this is your first time contributing, you may find reviewing these guides first to be helpful:
-- Overall process and best practices for pull requests: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/repository-management.md#pull-requests.
-- Coding Standards: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/
-- Accessibility testing: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/accessibility-testing.md
-- Gutenberg licensing: https://github.com/WordPress/gutenberg/blob/trunk/LICENSE.md
-
--->
+<!-- Thanks for contributing to Gutenberg! Please follow the Gutenberg Contributing Guidelines:
+https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 
 ## What?
 <!-- In a few words, what is the PR actually doing? -->
