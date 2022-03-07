@@ -46,6 +46,9 @@ class LatestPostsEdit extends Component {
 		this.onSetDisplayFeaturedImage = this.onSetDisplayFeaturedImage.bind(
 			this
 		);
+		this.onSetAddLinkToFeaturedImage = this.onSetAddLinkToFeaturedImage.bind(
+			this
+		);
 		this.onSetOrder = this.onSetOrder.bind( this );
 		this.onSetOrderBy = this.onSetOrderBy.bind( this );
 		this.onSetPostsToShow = this.onSetPostsToShow.bind( this );
@@ -103,6 +106,11 @@ class LatestPostsEdit extends Component {
 		setAttributes( { displayFeaturedImage: value } );
 	}
 
+	onSetAddLinkToFeaturedImage( value ) {
+		const { setAttributes } = this.props;
+		setAttributes( { addLinkToFeaturedImage: value } );
+	}
+
 	onSetOrder( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { order: value } );
@@ -133,6 +141,7 @@ class LatestPostsEdit extends Component {
 			excerptLength,
 			displayPostDate,
 			displayFeaturedImage,
+			addLinkToFeaturedImage,
 			order,
 			orderBy,
 			postsToShow,
@@ -182,6 +191,15 @@ class LatestPostsEdit extends Component {
 						checked={ displayFeaturedImage }
 						onChange={ this.onSetDisplayFeaturedImage }
 					/>
+					{ displayFeaturedImage && (
+						<>
+							<ToggleControl
+								label={ __( 'Add link to featured image' ) }
+								checked={ addLinkToFeaturedImage }
+								onChange={ this.onSetAddLinkToFeaturedImage }
+							/>
+						</>
+					) }
 				</PanelBody>
 
 				<PanelBody title={ __( 'Sorting and filtering' ) }>
