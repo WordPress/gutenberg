@@ -466,9 +466,12 @@ async function runPackagesRelease( config, customMessages ) {
 
 	let pluginReleaseBranch;
 	if ( [ 'latest', 'next' ].includes( config.releaseType ) ) {
-		pluginReleaseBranch = await findPluginReleaseBranchName(
-			config.gitWorkingDirectoryPath
-		);
+		pluginReleaseBranch =
+			config.releaseType === 'next'
+				? 'trunk'
+				: await findPluginReleaseBranchName(
+						config.gitWorkingDirectoryPath
+				  );
 		await runNpmReleaseBranchSyncStep( pluginReleaseBranch, config );
 	} else {
 		await checkoutNpmReleaseBranch( config );
