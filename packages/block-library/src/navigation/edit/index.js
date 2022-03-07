@@ -453,14 +453,14 @@ function Navigation( {
 				return;
 			}
 
-			const isClassicMenu = navPostOrClassicMenu?.hasOwnProperty(
+			const isClassicMenu = navPostOrClassicMenu.hasOwnProperty(
 				'auto_add'
 			);
 
 			if ( isClassicMenu ) {
 				convert( navPostOrClassicMenu.id, navPostOrClassicMenu.name );
 			} else {
-				handleUpdateMenu( navPostOrClassicMenu?.id );
+				handleUpdateMenu( navPostOrClassicMenu.id );
 			}
 		},
 		[ convert, handleUpdateMenu ]
