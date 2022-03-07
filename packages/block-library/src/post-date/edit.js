@@ -37,20 +37,16 @@ export default function PostDateEdit( {
 	setAttributes,
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
-	const [ timeFormat ] = useEntityProp( 'root', 'site', 'time_format' );
+	const [ siteTimeFormat ] = useEntityProp( 'root', 'site', 'time_format' );
 	const [ date, setDate ] = useEntityProp(
 		'postType',
 		postType,
 		'date',
 		postId
 	);
-	// To know if the time format is a 12 hour time, look for any of the 12 hour
-	// format characters: 'a', 'A', 'g', and 'h'. The character must be
-	// unescaped, i.e. not preceded by a '\'. Coincidentally, 'aAgh' is how I
-	// feel when working with regular expressions.
-	// https://www.php.net/manual/en/datetime.format.php
-	const is12Hour = /(?:^|[^\\])[aAgh]/.test( timeFormat );
+
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -76,6 +72,7 @@ export default function PostDateEdit( {
 			</a>
 		);
 	}
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -85,7 +82,6 @@ export default function PostDateEdit( {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-
 				{ date && ! isDescendentOfQueryLoop && (
 					<ToolbarGroup>
 						<Dropdown
@@ -94,7 +90,9 @@ export default function PostDateEdit( {
 								<DateTimePicker
 									currentDate={ date }
 									onChange={ setDate }
-									is12Hour={ is12Hour }
+									is12Hour={ is12HourFormat(
+										siteTimeFormat
+									) }
 								/>
 							) }
 							renderToggle={ ( { isOpen, onToggle } ) => {
@@ -140,9 +138,19 @@ export default function PostDateEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+
 			<div { ...blockProps }>{ postDate }</div>
 		</>
 	);
+}
+
+function is12HourFormat( format ) {
+	// To know if the time format is a 12 hour time, look for any of the 12 hour
+	// format characters: 'a', 'A', 'g', and 'h'. The character must be
+	// unescaped, i.e. not preceded by a '\'. Coincidentally, 'aAgh' is how I
+	// feel when working with regular expressions.
+	// https://www.php.net/manual/en/datetime.format.php
+	return /(?:^|[^\\])[aAgh]/.test( format );
 }
 
 function FormatSettings( { date, format, siteFormat, setFormat } ) {
