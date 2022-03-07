@@ -163,10 +163,12 @@ function FormatSettings( { date, format, siteFormat, setFormat } ) {
 	// formats.
 	const suggestedFormats = uniq( [
 		_x( 'n/j/Y', 'short date format' ),
-		_x( 'F j, Y', 'medium date format' ),
-		_x( 'l, F j, Y', 'long date format' ),
-		_x( 'n/j/Y h:i A', 'short date format with time' ),
-		_x( 'F j, Y h:i A', 'medium date format with time' ),
+		_x( 'M j, Y', 'medium date format' ),
+		_x( 'F j, Y', 'long date format' ),
+		_x( 'l, F j, Y', 'full date format' ),
+		_x( 'n/j/Y g:i A', 'short date format with time' ),
+		_x( 'M j, Y g:i A', 'medium date format with time' ),
+		_x( 'F j, Y g:i A', 'long date format with time' ),
 		'Y-m-d',
 	] );
 
