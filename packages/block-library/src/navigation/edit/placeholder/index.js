@@ -12,7 +12,6 @@ import { useEffect } from '@wordpress/element';
  */
 import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
-import useCreateNavigationMenu from '../use-create-navigation-menu';
 import NavigationMenuSelector from '../navigation-menu-selector';
 
 export default function NavigationPlaceholder( {
@@ -22,26 +21,12 @@ export default function NavigationPlaceholder( {
 	canUserCreateNavigationMenu = false,
 	isResolvingCanUserCreateNavigationMenu,
 	onFinish,
+	onCreateEmpty,
 } ) {
-	const { create: createNavigationMenu } = useCreateNavigationMenu(
-		clientId
-	);
-
-	const onFinishMenuCreation = async (
-		blocks,
-		navigationMenuTitle = null
-	) => {
-		const navigationMenu = await createNavigationMenu(
-			navigationMenuTitle,
-			blocks
-		);
-		onFinish( navigationMenu, blocks );
-	};
-
 	const { isResolvingMenus, hasResolvedMenus } = useNavigationEntities();
 
 	const onCreateEmptyMenu = () => {
-		onFinishMenuCreation( [] );
+		onCreateEmpty( [] );
 	};
 
 	useEffect( () => {

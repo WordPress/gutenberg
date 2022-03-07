@@ -61,6 +61,7 @@ import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_PENDING,
 	CLASSIC_MENU_CONVERSION_SUCCESS,
 } from './use-convert-classic-menu-to-block-menu';
+import useCreateNavigationMenu from './use-create-navigation-menu';
 
 const EMPTY_ARRAY = [];
 
@@ -163,6 +164,25 @@ function Navigation( {
 	useNavigationEntities();
 
 	const {
+		create: createNavigationMenu,
+		status: createNavigationMenuStatus,
+		error: createNavigationMenuError,
+		value: createNavigationMenuPost,
+	} = useCreateNavigationMenu( clientId );
+
+	useEffect( () => {
+		if ( createNavigationMenuStatus === 'success' ) {
+			setRef( createNavigationMenuPost.id );
+			selectBlock( clientId );
+		}
+	}, [
+		createNavigationMenu,
+		createNavigationMenuStatus,
+		createNavigationMenuError,
+		createNavigationMenuPost,
+	] );
+
+	const {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
 		isInnerBlockSelected,
@@ -256,6 +276,7 @@ function Navigation( {
 	// - we don't have uncontrolled blocks.
 	// - (legacy) we have a Navigation Area without a ref attribute pointing to a Navigation Post.
 	const isPlaceholder =
+		createNavigationMenuStatus !== 'pending' &&
 		! ref &&
 		! isConvertingClassicMenu &&
 		( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
@@ -269,6 +290,7 @@ function Navigation( {
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
 	const isLoading =
+createNavigationMenuStatus === 'pending' ||
 		isConvertingClassicMenu ||
 		!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu );
 
@@ -569,6 +591,7 @@ function Navigation( {
 						isResolvingCanUserCreateNavigationMenu
 					}
 					onFinish={ handleSelectNavigation }
+					onCreateEmpty={ createNavigationMenu }
 				/>
 			</TagName>
 		);
