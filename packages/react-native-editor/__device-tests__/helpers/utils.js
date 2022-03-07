@@ -46,7 +46,7 @@ const strToKeycode = {
 	[ backspace ]: 67,
 };
 
-const waitForEditorReady = 5000;
+const editorReadyTimeout = 8000;
 
 const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
@@ -161,8 +161,8 @@ const setupDriver = async () => {
 
 	// eslint-disable-next-line no-console
 	console.log( 'Waiting for the editor to be ready' );
-	await driver.setImplicitWaitTimeout( waitForEditorReady );
-	await timer( waitForEditorReady );
+	await driver.setImplicitWaitTimeout( editorReadyTimeout );
+	await timer( editorReadyTimeout );
 	// eslint-disable-next-line no-console
 	console.log( 'The editor should be ready by now' );
 
