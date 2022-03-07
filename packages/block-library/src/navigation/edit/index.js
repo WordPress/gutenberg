@@ -290,7 +290,7 @@ function Navigation( {
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
 	const isLoading =
-createNavigationMenuStatus === 'pending' ||
+		createNavigationMenuStatus === 'pending' ||
 		isConvertingClassicMenu ||
 		!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu );
 
