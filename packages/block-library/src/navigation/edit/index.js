@@ -39,6 +39,7 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -55,6 +56,11 @@ import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
 import OverlayMenuIcon from './overlay-menu-icon';
+import useConvertClassicToBlockMenu, {
+	CLASSIC_MENU_CONVERSION_ERROR,
+	CLASSIC_MENU_CONVERSION_PENDING,
+	CLASSIC_MENU_CONVERSION_SUCCESS,
+} from './use-convert-classic-menu-to-block-menu';
 
 const EMPTY_ARRAY = [];
 
@@ -231,23 +237,40 @@ function Navigation( {
 		clientId
 	);
 
+	const {
+		convert,
+		status: classicMenuConversionStatus,
+		error: classicMenuConversionError,
+		value: classicMenuConversionResult,
+	} = useConvertClassicToBlockMenu( clientId );
+
+	const isConvertingClassicMenu =
+		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
+
 	// The standard HTML5 tag for the block wrapper.
 	const TagName = 'nav';
 
 	// "placeholder" shown if:
 	// - we don't have a ref attribute pointing to a Navigation Post.
+	// - we are not running a menu conversion process.
 	// - we don't have uncontrolled blocks.
 	// - (legacy) we have a Navigation Area without a ref attribute pointing to a Navigation Post.
 	const isPlaceholder =
-		! ref && ( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
+		! ref &&
+		! isConvertingClassicMenu &&
+		( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
 
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
 
 	// "loading" state:
+	// - we are running the Classic Menu conversion process.
+	// OR
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
-	const isLoading = !! ( ref && ! isEntityAvailable );
+	const isLoading =
+		isConvertingClassicMenu ||
+		!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu );
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -309,6 +332,42 @@ function Navigation( {
 		setDetectedOverlayBackgroundColor,
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+
+	const [
+		showClassicMenuConversionErrorNotice,
+		hideClassicMenuConversionErrorNotice,
+	] = useNavigationNotice( {
+		name: 'block-library/core/navigation/classic-menu-conversion/error',
+	} );
+
+	function handleUpdateMenu( menuId ) {
+		setRef( menuId );
+		selectBlock( clientId );
+	}
+
+	useEffect( () => {
+		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING ) {
+			speak( __( 'Classic menu importing.' ) );
+		}
+
+		if (
+			classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_SUCCESS &&
+			classicMenuConversionResult
+		) {
+			handleUpdateMenu( classicMenuConversionResult?.id );
+			hideClassicMenuConversionErrorNotice();
+			speak( __( 'Classic menu imported successfully.' ) );
+		}
+
+		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
+			showClassicMenuConversionErrorNotice( classicMenuConversionError );
+			speak( __( 'Classic menu import failed.' ) );
+		}
+	}, [
+		classicMenuConversionStatus,
+		classicMenuConversionResult,
+		classicMenuConversionError,
+	] );
 
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
@@ -387,6 +446,25 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenu,
 		ref,
 	] );
+
+	const handleSelectNavigation = useCallback(
+		( navPostOrClassicMenu ) => {
+			if ( ! navPostOrClassicMenu ) {
+				return;
+			}
+
+			const isClassicMenu = navPostOrClassicMenu.hasOwnProperty(
+				'auto_add'
+			);
+
+			if ( isClassicMenu ) {
+				convert( navPostOrClassicMenu.id, navPostOrClassicMenu.name );
+			} else {
+				handleUpdateMenu( navPostOrClassicMenu.id );
+			}
+		},
+		[ convert, handleUpdateMenu ]
+	);
 
 	const startWithEmptyMenu = useCallback( () => {
 		registry.batch( () => {
@@ -490,12 +568,7 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onFinish={ ( post ) => {
-						if ( post ) {
-							setRef( post.id );
-						}
-						selectBlock( clientId );
-					} }
+					onFinish={ handleSelectNavigation }
 				/>
 			</TagName>
 		);
@@ -510,9 +583,7 @@ function Navigation( {
 							<NavigationMenuSelector
 								currentMenuId={ ref }
 								clientId={ clientId }
-								onSelect={ ( { id } ) => {
-									setRef( id );
-								} }
+								onSelect={ handleSelectNavigation }
 								onCreateNew={ startWithEmptyMenu }
 								/* translators: %s: The name of a menu. */
 								actionLabel={ __( "Switch to '%s'" ) }
