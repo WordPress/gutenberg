@@ -43,6 +43,9 @@ class LatestPostsEdit extends Component {
 		);
 		this.onSetExcerptLength = this.onSetExcerptLength.bind( this );
 		this.onSetDisplayPostDate = this.onSetDisplayPostDate.bind( this );
+		this.onSetDisplayFeaturedImage = this.onSetDisplayFeaturedImage.bind(
+			this
+		);
 		this.onSetOrder = this.onSetOrder.bind( this );
 		this.onSetOrderBy = this.onSetOrderBy.bind( this );
 		this.onSetPostsToShow = this.onSetPostsToShow.bind( this );
@@ -95,6 +98,11 @@ class LatestPostsEdit extends Component {
 		setAttributes( { displayPostDate: value } );
 	}
 
+	onSetDisplayFeaturedImage( value ) {
+		const { setAttributes } = this.props;
+		setAttributes( { displayFeaturedImage: value } );
+	}
+
 	onSetOrder( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { order: value } );
@@ -124,6 +132,7 @@ class LatestPostsEdit extends Component {
 			displayPostContentRadio,
 			excerptLength,
 			displayPostDate,
+			displayFeaturedImage,
 			order,
 			orderBy,
 			postsToShow,
@@ -166,6 +175,15 @@ class LatestPostsEdit extends Component {
 						onChange={ this.onSetDisplayPostDate }
 					/>
 				</PanelBody>
+
+				<PanelBody title={ __( 'Featured image settings' ) }>
+					<ToggleControl
+						label={ __( 'Display featured image' ) }
+						checked={ displayFeaturedImage }
+						onChange={ this.onSetDisplayFeaturedImage }
+					/>
+				</PanelBody>
+
 				<PanelBody title={ __( 'Sorting and filtering' ) }>
 					<QueryControls
 						{ ...{ order, orderBy } }
