@@ -513,6 +513,11 @@ describe( 'Navigation', () => {
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
 		await startEmptyButton.click();
 
+		// Await "success" notice.
+		await page.waitForXPath(
+			'//div[@class="components-snackbar__content"][contains(text(), "Navigation Menu successfully created.")]'
+		);
+
 		const appender = await page.waitForSelector(
 			'.wp-block-navigation .block-list-appender'
 		);
