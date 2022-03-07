@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -57,13 +58,21 @@ export default function PostDateEdit( {
 				dateI18n( siteFormat, date )
 			),
 		},
-		...[
-			_x( 'M jS', 'date format option' ),
-			_x( 'M j, Y', 'date format option' ),
-			_x( 'M j, Y, h:i A', 'date format option' ),
-			_x( 'F j, Y', 'date format option' ),
-			_x( 'd/m/Y', 'date format option' ),
-		].map( ( suggestedFormat ) => ( {
+		// Suggest a short format, medium format, long format, and a
+		// standardised (YYYY-MM-DD) format. The short, medium, and long formats
+		// are localised as different languages have different ways of writing
+		// these. For example, 'F j, Y' (April 20, 2022) in American English
+		// (en_US) is 'j. F Y' (20. April 2022) in German (de). The resultant
+		// array is de-duplicated as some languages will use the same format
+		// string for short, medium, and long formats.
+		...uniq( [
+			_x( 'n/j/Y', 'short date format' ),
+			_x( 'F j, Y', 'medium date format' ),
+			_x( 'l, F j, Y', 'long date format' ),
+			_x( 'n/j/Y h:i A', 'short date format with time' ),
+			_x( 'F j, Y h:i A', 'medium date format with time' ),
+			'Y-m-d',
+		] ).map( ( suggestedFormat ) => ( {
 			key: suggestedFormat,
 			name: dateI18n( suggestedFormat, date ),
 		} ) ),
