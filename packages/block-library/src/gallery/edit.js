@@ -156,8 +156,12 @@ function GalleryEdit( props ) {
 			} );
 		} );
 
-		// If new blocks added select the first of these so they scroll into view.
-		if ( newImages?.length ) {
+		// If new blocks added, and no images still uploading, select new images
+		//  so they scroll into view.
+		if (
+			newImages?.length &&
+			! images.find( ( image ) => image.url.startsWith( 'blob' ) )
+		) {
 			multiSelect(
 				newImages[ 0 ].clientId,
 				newImages[ newImages?.length - 1 ].clientId
