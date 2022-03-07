@@ -23,7 +23,6 @@ import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
-import { BlockLockMenuItem } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
@@ -175,13 +174,6 @@ export function BlockSettingsDropdown( {
 									>
 										{ __( 'Move to' ) }
 									</MenuItem>
-								) }
-								{ count === 1 && (
-									<BlockLockMenuItem
-										blockTitle={ title }
-										clientId={ firstBlockClientId }
-										isLocked={ ! canMove || ! canRemove }
-									/>
 								) }
 								{ count === 1 && (
 									<BlockModeToggle
