@@ -7,6 +7,7 @@ async function getUserID( this: RequestUtils, username: string ) {
 	// Get User Details
 	// https://developer.wordpress.org/rest-api/reference/users/#retrieve-a-user
 	const user = await this.rest( {
+		method: 'GET',
 		path: '/wp/v2/users',
 		params: {
 			search: username,
@@ -26,6 +27,7 @@ async function createUser(
 	// Create User
 	// https://developer.wordpress.org/rest-api/reference/users/#create-a-user
 	await this.rest( {
+		method: 'POST',
 		path: '/wp/v2/users',
 		params: {
 			username,
@@ -39,6 +41,10 @@ async function createUser(
 
 async function deleteUser( this: RequestUtils, username: string ) {
 	const userID = await this.getUserID( username );
+
+	if ( ! userID ) {
+		throw new Error( `The user "${ username }" doesn't exist` );
+	}
 	// Create User
 	// https://developer.wordpress.org/rest-api/reference/users/#create-a-user
 	await this.rest( {

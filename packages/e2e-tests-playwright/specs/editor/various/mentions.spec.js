@@ -12,8 +12,8 @@ test.describe( 'autocomplete mentions', () => {
 		await pageUtils.createNewPost();
 	} );
 
-	test.afterAll( async ( { pageUtils } ) => {
-		await pageUtils.deleteUser( 'testuser' );
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteUser( 'testuser' );
 	} );
 
 	test( 'should insert mention', async ( { page, pageUtils } ) => {

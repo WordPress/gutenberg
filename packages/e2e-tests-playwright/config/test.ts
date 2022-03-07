@@ -132,7 +132,7 @@ const test = base.extend<
 
 test.beforeAll( async ( { requestUtils } ) => {
 	await Promise.all( [
-		// requestUtils.activateTheme( 'twentytwentyone' ),
+		requestUtils.activateTheme( 'twentytwentyone' ),
 		requestUtils.deleteAllPosts(),
 		requestUtils.deleteAllBlocks(),
 	] );

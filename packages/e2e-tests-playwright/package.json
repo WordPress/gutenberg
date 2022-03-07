@@ -29,7 +29,8 @@
 		"filenamify": "^4.2.0"
 	},
 	"peerDependencies": {
-		"@playwright/test": ">=1"
+		"@playwright/test": ">=1",
+		"role-selector": "0.5.0"
 	},
 	"publishConfig": {
 		"access": "public"
