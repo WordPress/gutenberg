@@ -61,7 +61,7 @@ Callback used when media is replaced with an URL. It is called with one argument
 Callback called when an upload error happens and receives an error message as an argument.
 
 -   Type: `func`
--   Required: Yes
+-   Required: No
 
 ### name
 
