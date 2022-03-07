@@ -13,7 +13,10 @@ import {
 	NavigableMenu,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	__experimentalUseEntityRecordCreate as useEntityRecordCreate,
+} from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import {
 	archive,
@@ -84,9 +87,8 @@ export default function NewTemplate( { postType } ) {
 		} ),
 		[]
 	);
-	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { getLastEntitySaveError } = useSelect( coreStore );
+	const { create } = useEntityRecordCreate( 'postType', 'wp_template' );
 
 	async function createTemplate( { slug } ) {
 		try {
@@ -94,26 +96,13 @@ export default function NewTemplate( { postType } ) {
 				slug,
 			} );
 
-			const template = await saveEntityRecord(
-				'postType',
-				'wp_template',
-				{
-					excerpt: description,
-					// Slugs need to be strings, so this is for template `404`
-					slug: slug.toString(),
-					status: 'publish',
-					title,
-				}
-			);
-
-			const lastEntitySaveError = getLastEntitySaveError(
-				'postType',
-				'wp_template',
-				template.id
-			);
-			if ( lastEntitySaveError ) {
-				throw lastEntitySaveError;
-			}
+			const template = await create( {
+				excerpt: description,
+				// Slugs need to be strings, so this is for template `404`
+				slug: slug.toString(),
+				status: 'publish',
+				title,
+			} );
 
 			// Navigate to the created template editor.
 			history.push( {

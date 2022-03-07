@@ -15,7 +15,8 @@ import {
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseEntityRecordDelete as useEntityRecordDelete } from '@wordpress/core-data';
+
 import { useState } from '@wordpress/element';
 
 /**
@@ -28,7 +29,11 @@ export default function DeleteTemplate() {
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const { getEditorSettings } = useSelect( editorStore );
 	const { updateEditorSettings, editPost } = useDispatch( editorStore );
-	const { deleteEntityRecord } = useDispatch( coreStore );
+	const { deleteRecord } = useEntityRecordDelete(
+		'postType',
+		'wp_template',
+		template.id
+	);
 	const { template } = useSelect( ( select ) => {
 		const { isEditingTemplate, getEditedPostTemplate } = select(
 			editPostStore
@@ -67,7 +72,7 @@ export default function DeleteTemplate() {
 			...settings,
 			availableTemplates: newAvailableTemplates,
 		} );
-		deleteEntityRecord( 'postType', 'wp_template', template.id );
+		deleteRecord();
 	};
 
 	return (

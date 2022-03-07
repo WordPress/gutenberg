@@ -7,11 +7,11 @@ import { kebabCase } from 'lodash';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseEntityRecordCreate as useEntityRecordCreate } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,8 +23,7 @@ export default function NewTemplatePart( { postType } ) {
 	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const { getLastEntitySaveError } = useSelect( coreStore );
+	const { create } = useEntityRecordCreate( 'postType', 'wp_template_part' );
 
 	async function createTemplatePart( { title, area } ) {
 		if ( ! title ) {
@@ -41,25 +40,12 @@ export default function NewTemplatePart( { postType } ) {
 				kebabCase( title ).replace( /[^\w-]+/g, '' ) ||
 				'wp-custom-part';
 
-			const templatePart = await saveEntityRecord(
-				'postType',
-				'wp_template_part',
-				{
-					slug: cleanSlug,
-					title,
-					content: '',
-					area,
-				}
-			);
-
-			const lastEntitySaveError = getLastEntitySaveError(
-				'postType',
-				'wp_template_part',
-				templatePart.id
-			);
-			if ( lastEntitySaveError ) {
-				throw lastEntitySaveError;
-			}
+			const templatePart = await create( {
+				slug: cleanSlug,
+				title,
+				content: '',
+				area,
+			} );
 
 			setIsModalOpen( false );
 

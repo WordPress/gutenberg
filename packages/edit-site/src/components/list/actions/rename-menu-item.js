@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import {
 	Button,
 	Flex,
@@ -12,16 +12,17 @@ import {
 	Modal,
 	TextControl,
 } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseEntityRecordUpdate as useEntityRecordUpdate } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
 export default function RenameMenuItem( { template, onClose } ) {
 	const [ title, setTitle ] = useState( () => template.title.rendered );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	const { getLastEntitySaveError } = useSelect( coreStore );
-	const { editEntityRecord, saveEditedEntityRecord } = useDispatch(
-		coreStore
+	const { applyEdits, saveEdits } = useEntityRecordUpdate(
+		'postType',
+		template.type,
+		template.id
 	);
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
 		noticesStore
@@ -35,7 +36,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 		event.preventDefault();
 
 		try {
-			await editEntityRecord( 'postType', template.type, template.id, {
+			await applyEdits( {
 				title,
 			} );
 
@@ -45,21 +46,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 			onClose();
 
 			// Persist edited entity.
-			await saveEditedEntityRecord(
-				'postType',
-				template.type,
-				template.id
-			);
-
-			const lastError = getLastEntitySaveError(
-				'postType',
-				template.type,
-				template.id
-			);
-
-			if ( lastError ) {
-				throw lastError;
-			}
+			await saveEdits();
 
 			createSuccessNotice( __( 'Entity renamed.' ), {
 				type: 'snackbar',
