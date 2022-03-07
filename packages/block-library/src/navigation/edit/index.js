@@ -614,7 +614,7 @@ function Navigation( {
 						isResolvingCanUserCreateNavigationMenu
 					}
 					onFinish={ handleSelectNavigation }
-					onCreateEmpty={ () => createNavigationMenu( [] ) }
+					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
 				/>
 			</TagName>
 		);

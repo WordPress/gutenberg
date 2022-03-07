@@ -27,13 +27,13 @@ export default function useCreateNavigationMenu( clientId ) {
 	// This callback uses data from the two placeholder steps and only creates
 	// a new navigation menu when the user completes the final step.
 	const create = useCallback(
-		( title = null, blocks = [] ) => {
+		async ( title = null, blocks = [] ) => {
 			setStatus( PENDING );
 			setValue( null );
 			setError( null );
 
 			if ( ! title ) {
-				title = generateDefaultTitle().catch( ( err ) => {
+				title = await generateDefaultTitle().catch( ( err ) => {
 					setError( err?.message );
 					setStatus( ERROR );
 					throw new Error(
