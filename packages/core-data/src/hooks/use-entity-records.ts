@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
+
+/**
  * Internal dependencies
  */
 import useQuerySelect from './use-query-select';
@@ -29,7 +34,6 @@ interface EntityRecordsResolution< RecordType > {
  * @param  kind      Kind of the requested entities.
  * @param  name      Name of the requested entities.
  * @param  queryArgs HTTP query for the requested entities.
- * @param  deps      Array of additional deps, see useSelect.
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -64,13 +68,18 @@ interface EntityRecordsResolution< RecordType > {
 export default function __experimentalUseEntityRecords< RecordType >(
 	kind: string,
 	name: string,
-	queryArgs: unknown = {},
-	deps: unknown[] = []
+	queryArgs: unknown = {}
 ): EntityRecordsResolution< RecordType > {
+	// Serialize queryArgs to a string that can be safely used as a React dep.
+	// We can't just pass queryArgs as one of the deps, because if it is passed
+	// as an object literal, then it will be a different object on each call even
+	// if the values remain the same.
+	const queryAsString = addQueryArgs( '', queryArgs );
+
 	const { data: records, ...rest } = useQuerySelect(
 		( query ) =>
 			query( coreStore ).getEntityRecords( kind, name, queryArgs ),
-		[ kind, name, ...deps ]
+		[ kind, name, queryAsString ]
 	);
 
 	return {
