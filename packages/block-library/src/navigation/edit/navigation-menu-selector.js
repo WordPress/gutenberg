@@ -40,10 +40,6 @@ export default function NavigationMenuSelector( {
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
-	const { create: createNavigationMenu } = useCreateNavigationMenu(
-		clientId
-	);
-
 	const handleSelect = useCallback(
 		( _onClose ) => ( selectedId ) => {
 			_onClose();
