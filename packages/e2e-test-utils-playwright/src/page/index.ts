@@ -7,6 +7,7 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
  * Internal dependencies
  */
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
+import { clickBlockAppender } from './click-block-appender';
 import { createNewPost } from './create-new-post';
 import { getCurrentUser } from './get-current-user';
 import { getPageError } from './get-page-error';
@@ -16,6 +17,7 @@ import { showBlockToolbar } from './show-block-toolbar';
 import { switchUserToAdmin } from './switch-user-to-admin';
 import { switchUserToTest } from './switch-user-to-test';
 import { visitAdminPage } from './visit-admin-page';
+import { getEditedPostContent } from './get-edited-post-content';
 
 class PageUtils {
 	browser: Browser;
@@ -38,6 +40,8 @@ class PageUtils {
 	switchUserToAdmin = switchUserToAdmin;
 	switchUserToTest = switchUserToTest;
 	visitAdminPage = visitAdminPage;
+	clickBlockAppender = clickBlockAppender;
+	getEditedPostContent = getEditedPostContent;
 }
 
 export { PageUtils };

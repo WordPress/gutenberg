@@ -18,6 +18,7 @@ import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { deleteAllPosts } from './posts';
 import { deleteAllWidgets } from './widgets';
+import { getUserID, createUser, deleteUser } from './users';
 
 interface StorageState {
 	cookies: Cookie[];
@@ -34,6 +35,7 @@ class RequestUtils {
 	baseURL?: string;
 
 	pluginsMap: Record< string, string > | null = null;
+	userID?: number;
 
 	static async setup( {
 		user = WP_ADMIN_USER,
@@ -120,6 +122,9 @@ class RequestUtils {
 	deleteAllBlocks = deleteAllBlocks;
 	deleteAllPosts = deleteAllPosts;
 	deleteAllWidgets = deleteAllWidgets;
+	createUser = createUser;
+	deleteUser = deleteUser;
+	getUserID = getUserID;
 }
 
 export type { StorageState };
