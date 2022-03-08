@@ -30,6 +30,7 @@ export default function useNavigationEntities( menuId ) {
 		isResolving: isResolvingMenus,
 		hasResolved: hasResolvedMenus,
 	} = useEntityRecords( 'root', 'menu', { per_page: -1, context: 'view' } );
+
 	const {
 		records: pages,
 		isResolving: isResolvingPages,
