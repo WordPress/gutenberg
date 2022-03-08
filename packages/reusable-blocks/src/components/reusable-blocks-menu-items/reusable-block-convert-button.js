@@ -149,19 +149,19 @@ export default function ReusableBlockConvertButton( {
 									justify="flex-end"
 								>
 									<FlexItem>
+										<Button variant="primary" type="submit">
+											{ __( 'Save' ) }
+										</Button>
+									</FlexItem>
+									<FlexItem>
 										<Button
-											variant="secondary"
+											variant="tertiary"
 											onClick={ () => {
 												setIsModalOpen( false );
 												setTitle( '' );
 											} }
 										>
 											{ __( 'Cancel' ) }
-										</Button>
-									</FlexItem>
-									<FlexItem>
-										<Button variant="primary" type="submit">
-											{ __( 'Save' ) }
 										</Button>
 									</FlexItem>
 								</Flex>
