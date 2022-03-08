@@ -71,6 +71,7 @@ class WP_Webfonts {
 		}
 
 		add_action( 'init', array( $this, 'collect_webfonts_used_in_global_styles' ) );
+		add_action( 'switch_theme', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
 		add_action( 'save_post_wp_global_styles', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
 
 		add_action( $hook, array( $this, 'generate_and_enqueue_styles' ) );
