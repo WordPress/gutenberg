@@ -7,6 +7,9 @@
 	"description": "Add the avatar of an user.",
 	"textdomain": "default",
 	"attributes": {
+		"userId": {
+			"type": "number"
+		},
 		"size": {
 			"type": "number",
 			"default": 60
@@ -18,11 +21,8 @@
 		"linkTarget": {
 			"type": "string",
 			"default": "_self"
-		},
-		"authorId": {
-			"type": "string",
-			"default": null
 		}
+
 	},
 	"usesContext": [ "postType", "postId", "commentId" ],
 	"supports": {

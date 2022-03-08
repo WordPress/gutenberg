@@ -3,6 +3,7 @@
 		"name": "core/avatar",
 		"isValid": true,
 		"attributes": {
+			"userId": 4,
 			"size": 85,
 			"isLink": true,
 			"linkTarget": "_self",

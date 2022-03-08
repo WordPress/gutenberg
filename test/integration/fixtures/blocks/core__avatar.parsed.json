@@ -2,6 +2,7 @@
 	{
 		"blockName": "core/avatar",
 		"attrs": {
+			"userId": 4,
 			"size": 85,
 			"isLink": true,
 			"align": "right",

@@ -14,7 +14,7 @@ const AUTHORS_QUERY = {
 	context: 'view',
 };
 
-function AuthorControl( { value, onChange } ) {
+function UserControl( { value, onChange } ) {
 	const [ filteredAuthorsList, setFilteredAuthorsList ] = useState();
 	const authorsList = useSelect( ( select ) => {
 		const { getUsers } = select( coreStore );
@@ -33,9 +33,9 @@ function AuthorControl( { value, onChange } ) {
 
 	return (
 		<ComboboxControl
-			label={ __( 'Author' ) }
+			label={ __( 'User' ) }
 			help={ __(
-				'Select the avatar author to display, if it is blank it will use the post/page author.'
+				'Select the avatar user to display, if it is blank it will use the post/page author.'
 			) }
 			value={ value }
 			onChange={ onChange }
@@ -53,4 +53,4 @@ function AuthorControl( { value, onChange } ) {
 	);
 }
 
-export default AuthorControl;
+export default UserControl;

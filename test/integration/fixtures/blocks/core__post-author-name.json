@@ -1,10 +1,11 @@
 [
 	{
-		"name": "core/post-author-name",
+		"name": "core/missing",
 		"isValid": true,
 		"attributes": {
-			"isLink": false,
-			"linkTarget": "_self"
+			"originalName": "core/post-author-name",
+			"originalUndelimitedContent": "",
+			"originalContent": "<!-- wp:post-author-name /-->"
 		},
 		"innerBlocks": []
 	}

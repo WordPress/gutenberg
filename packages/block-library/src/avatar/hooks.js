@@ -54,10 +54,15 @@ export function useCommentAvatar( { commentId } ) {
 	};
 }
 
-export function useUserAvatar( { postId, postType } ) {
+export function useUserAvatar( { userId, postId, postType } ) {
 	const { authorDetails } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser } = select( coreStore );
+			if ( userId ) {
+				return {
+					authorDetails: getUser( userId ),
+				};
+			}
 			const _authorId = getEditedEntityRecord(
 				'postType',
 				postType,
@@ -68,7 +73,7 @@ export function useUserAvatar( { postId, postType } ) {
 				authorDetails: _authorId ? getUser( _authorId ) : null,
 			};
 		},
-		[ postType, postId ]
+		[ postType, postId, userId ]
 	);
 	const avatarUrls = authorDetails
 		? Object.values( authorDetails.avatar_urls )

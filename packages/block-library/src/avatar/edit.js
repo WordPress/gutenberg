@@ -23,13 +23,13 @@ import { __, isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useUserAvatar, useCommentAvatar } from './hooks';
-import AuthorControl from './author-control';
+import UserControl from './user-control';
 
 const AvatarInspectorControls = ( {
 	setAttributes,
 	avatar,
 	attributes,
-	selectAuthor,
+	selectUser,
 } ) => (
 	<InspectorControls>
 		<PanelBody title={ __( 'Avatar Settings' ) }>
@@ -45,12 +45,12 @@ const AvatarInspectorControls = ( {
 				initialPosition={ attributes?.size }
 				value={ attributes?.size }
 			/>
-			{ selectAuthor && (
-				<AuthorControl
-					value={ attributes?.authorId }
+			{ selectUser && (
+				<UserControl
+					value={ attributes?.userId }
 					onChange={ ( value ) => {
 						setAttributes( {
-							authorId: value,
+							userId: value,
 						} );
 					} }
 				/>
@@ -140,7 +140,7 @@ const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				avatar={ avatar }
 				setAttributes={ setAttributes }
 				attributes={ attributes }
-				selectAuthor={ false }
+				selectUser={ false }
 			/>
 			{ attributes.isLink ? (
 				<a
@@ -171,12 +171,16 @@ const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 
 const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 	const { postId, postType } = context;
+	const avatar = useUserAvatar( {
+		userId: attributes?.userId,
+		postId,
+		postType,
+	} );
 	const blockProps = useBlockProps();
-	const avatar = useUserAvatar( { postId, postType } );
 	return (
 		<>
 			<AvatarInspectorControls
-				selectAuthor={ true }
+				selectUser={ true }
 				attributes={ attributes }
 				avatar={ avatar }
 				setAttributes={ setAttributes }
@@ -211,8 +215,6 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 };
 
 export default function Edit( props ) {
-	// I would like to not call useCommentAvatar API requests if there is no commentId
-	// but is not recommended having conditional hook. Any ideas?
 	if ( props?.context?.commentId ) {
 		return <CommentEdit { ...props } />;
 	}
