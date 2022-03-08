@@ -199,6 +199,14 @@ function Iframe(
 			contentDocument.dir = ownerDocument.dir;
 			documentElement.removeChild( contentDocument.head );
 			documentElement.removeChild( contentDocument.body );
+			contentDocument.insertBefore(
+				contentDocument.implementation.createDocumentType(
+					'html',
+					'',
+					''
+				),
+				documentElement
+			);
 
 			return true;
 		}
