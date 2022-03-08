@@ -140,7 +140,7 @@ export default function PostDateEdit( {
 	);
 }
 
-function is12HourFormat( format ) {
+export function is12HourFormat( format ) {
 	// To know if the time format is a 12 hour time, look for any of the 12 hour
 	// format characters: 'a', 'A', 'g', and 'h'. The character must be
 	// unescaped, i.e. not preceded by a '\'. Coincidentally, 'aAgh' is how I
