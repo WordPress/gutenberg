@@ -18,7 +18,6 @@ export const PRESS_DOWN = 'PRESS_DOWN';
 export const PRESS_ENTER = 'PRESS_ENTER';
 export const PRESS_UP = 'PRESS_UP';
 export const RESET = 'RESET';
-export const UPDATE = 'UPDATE';
 
 interface EventPayload {
 	event?: SyntheticEvent;
@@ -42,14 +41,9 @@ export type DragStartAction = Action< typeof DRAG_START, DragProps >;
 export type DragEndAction = Action< typeof DRAG_END, DragProps >;
 export type DragAction = Action< typeof DRAG, DragProps >;
 export type ResetAction = Action< typeof RESET, Partial< ValuePayload > >;
-export type UpdateAction = Action< typeof UPDATE, ValuePayload >;
 export type InvalidateAction = Action< typeof INVALIDATE, { error: unknown } >;
 
-export type ChangeEventAction =
-	| ChangeAction
-	| ResetAction
-	| CommitAction
-	| UpdateAction;
+export type ChangeEventAction = ChangeAction | ResetAction | CommitAction;
 
 export type DragEventAction = DragStartAction | DragEndAction | DragAction;
 

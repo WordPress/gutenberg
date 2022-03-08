@@ -152,8 +152,7 @@ export function NumberControl(
 		 */
 		if (
 			type === inputControlActionTypes.PRESS_ENTER ||
-			type === inputControlActionTypes.COMMIT ||
-			type === inputControlActionTypes.UPDATE
+			type === inputControlActionTypes.COMMIT
 		) {
 			const applyEmptyValue = required === false && currentValue === '';
 
