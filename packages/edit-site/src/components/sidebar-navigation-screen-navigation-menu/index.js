@@ -9,7 +9,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -18,6 +17,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import ScreenNavigationMoreMenu from './more-menu';
 import NavigationMenuEditor from './navigation-menu-editor';
+import EditButton from './edit-button';
 
 export const noop = () => {};
 
@@ -217,12 +217,15 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	return (
 		<SidebarNavigationScreenWrapper
 			actions={
-				<ScreenNavigationMoreMenu
-					menuTitle={ decodeEntities( menuTitle ) }
-					onDelete={ handleDelete }
-					onSave={ handleSave }
-					onDuplicate={ handleDuplicate }
-				/>
+				<>
+					<EditButton />
+					<ScreenNavigationMoreMenu
+						menuTitle={ decodeEntities( menuTitle ) }
+						onDelete={ handleDelete }
+						onSave={ handleSave }
+						onDuplicate={ handleDuplicate }
+					/>
+				</>
 			}
 			title={ decodeEntities( menuTitle ) }
 			description={ __(
