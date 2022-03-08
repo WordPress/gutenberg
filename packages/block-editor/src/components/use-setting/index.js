@@ -102,7 +102,7 @@ const removeCustomPrefixes = ( path ) => {
  * ```
  */
 export default function useSetting( path ) {
-	const { name: blockName } = useBlockEditContext();
+	const { name: blockName, clientId } = useBlockEditContext();
 
 	const setting = useSelect(
 		( select ) => {
@@ -115,13 +115,26 @@ export default function useSetting( path ) {
 			}
 			const settings = select( blockEditorStore ).getSettings();
 
+			// 0 - Use settings for this block instance, if there's any.
+			//     Also, look up in the block hierarchy.
+			// todo: only check if the block type has support for settings to minimize the queries we make
+			// todo: how do we provide i18n for the presets defined by block instances? In PHP, they already do i18n.
+			// todo: the presets defined in a block instance are "custom" ones;
+			// remove the need for users to provide the custom key.
+			const blockAtts = select( blockEditorStore ).getBlockAttributes(
+				clientId
+			);
+
 			// 1 - Use __experimental features, if available.
 			// We cascade to the all value if the block one is not available.
 			const normalizedPath = removeCustomPrefixes( path );
 			const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
 			const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
+			const blockInstancePath = `settings.${ normalizedPath }`;
 			const experimentalFeaturesResult =
-				get( settings, blockPath ) ?? get( settings, defaultsPath );
+				get( blockAtts, blockInstancePath ) ??
+				get( settings, blockPath ) ??
+				get( settings, defaultsPath );
 
 			if ( experimentalFeaturesResult !== undefined ) {
 				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
