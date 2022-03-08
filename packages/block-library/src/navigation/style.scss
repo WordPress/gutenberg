@@ -284,6 +284,7 @@ $navigation-icon-size: 24px;
 .wp-block-navigation-submenu {
 	position: relative;
 	display: flex;
+	font-size: inherit;
 
 	.wp-block-navigation__submenu-icon svg {
 		stroke: currentColor;
