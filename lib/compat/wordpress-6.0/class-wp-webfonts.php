@@ -29,6 +29,15 @@ class WP_Webfonts {
 	private static $providers = array();
 
 	/**
+	 * An array of fonts actually used in the front-end.
+	 *
+	 * @static
+	 * @access private
+	 * @var array
+	 */
+	private static $webfonts_used_in_front_end = array();
+
+	/**
 	 * Stylesheet handle.
 	 *
 	 * @var string
@@ -199,9 +208,33 @@ class WP_Webfonts {
 	}
 
 	/**
+	 * Filter out webfonts that are not being used by the front-end.
+	 *
+	 * @return void
+	 */
+	private function filter_out_webfonts_unused_in_front_end() {
+		$all_registered_fonts = $this->get_fonts();
+		$picked_webfonts      = array();
+
+		self::$webfonts_used_in_front_end = apply_filters( 'gutenberg_webfonts_used_in_front_end', self::$webfonts_used_in_front_end );
+
+		foreach ( $all_registered_fonts as $id => $webfont ) {
+			$font_name = _wp_to_kebab_case( $webfont['font-family'] );
+
+			if ( isset( self::$webfonts_used_in_front_end[ $font_name ] ) ) {
+				$picked_webfonts[ $id ] = $webfont;
+			}
+		}
+
+		self::$webfonts = $picked_webfonts;
+	}
+
+	/**
 	 * Generate and enqueue webfonts styles.
 	 */
 	public function generate_and_enqueue_styles() {
+		$this->filter_out_webfonts_unused_in_front_end();
+
 		// Generate the styles.
 		$styles = $this->generate_styles();
 
