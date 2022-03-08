@@ -1,5 +1,23 @@
 == Changelog ==
 
+= 12.7.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Image block: Add additional selector to account for the move of is-style classes. ([39295](https://github.com/WordPress/gutenberg/pull/39295))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@glendaviesnz
+
+
 = 12.7.0 =
 
 ## Changelog
