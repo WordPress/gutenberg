@@ -18,8 +18,7 @@ export default function useEntityRecordDelete( kind, type, id ) {
 			deleteRecord: async () => {
 				const result = await deleteEntityRecord( kind, type, id );
 				const error = getLastEntityDeleteError( kind, type, id );
-				// Error may be null, but the result is only available if everything worked correctly.
-				if ( ! result ) {
+				if ( error || ! result ) {
 					throw error;
 				}
 				return result;

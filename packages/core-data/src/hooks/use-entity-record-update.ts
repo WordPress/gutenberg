@@ -21,8 +21,7 @@ export default function useEntityRecordUpdate( kind, type, id ) {
 			saveEdits: async () => {
 				const result = await saveEditedEntityRecord( kind, type, id );
 				const error = getLastEntitySaveError( kind, type, id );
-				// Error may be null, but the result is only available if everything worked correctly.
-				if ( ! result ) {
+				if ( error || ! result ) {
 					throw error;
 				}
 				return result;

@@ -18,8 +18,7 @@ export default function useEntityRecordCreate( kind, type ) {
 			create: async ( record ) => {
 				const result = await saveEntityRecord( kind, type, record );
 				const error = getLastEntitySaveError( kind, type );
-				// Error may be null, but the result is only available if everything worked correctly.
-				if ( ! result ) {
+				if ( error || ! result ) {
 					throw error;
 				}
 				return result;
