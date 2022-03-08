@@ -102,7 +102,7 @@ function NotEmpty( {
 
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
-		[ id, idBase ]
+		[]
 	);
 
 	const setInstance = useCallback( ( nextInstance ) => {
