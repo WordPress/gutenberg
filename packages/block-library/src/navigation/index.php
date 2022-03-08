@@ -435,7 +435,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$nav_menu_name = $navigation_post->post_title;
 
 		if ( isset( $seen_menu_names[ $nav_menu_name ] ) ) {
-			$seen_menu_names[ $nav_menu_name ] = $seen_menu_names[ $nav_menu_name ] + 1;
+			++$seen_menu_names[ $nav_menu_name ];
 		} else {
 			$seen_menu_names[ $nav_menu_name ] = 1;
 		}
