@@ -272,7 +272,7 @@ function Iframe(
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
 				// Correct doctype is required to enable rendering in standards mode
-				srcDoc="<!doctype html><html><head>yyy</head><body>xxx</body></html>"
+				srcDoc="<!doctype html>"
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&
