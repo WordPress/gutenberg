@@ -319,6 +319,22 @@ _Returns_
 
 -   `Function`: Higher-order component.
 
+### DateFormatControl
+
+The `DateFormatControl` component renders a dropdown that lets the user
+choose a _date format_. That is, how they want their dates to be formatted.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/date-format-control/README.md>
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.format_ `string|null`: The selected date format.
+-   _props.siteFormat_ `string`: The site's date format, used to show what the date will look like if user selects _Site default_.
+-   _props.onChange_ `( format: string ) => void`: Called when a selection is made.
+
 ### DefaultBlockAppender
 
 Undocumented declaration.

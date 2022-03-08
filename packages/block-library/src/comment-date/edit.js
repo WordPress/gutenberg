@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { dateI18n } from '@wordpress/date';
 import {
-	PanelBody,
-	CustomSelectControl,
-	ToggleControl,
-} from '@wordpress/components';
+	InspectorControls,
+	useBlockProps,
+	DateFormatControl,
+} from '@wordpress/block-editor';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 
 /**
@@ -31,32 +31,17 @@ export default function Edit( {
 } ) {
 	const blockProps = useBlockProps();
 	const [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
-	const [ siteDateFormat ] = useEntityProp( 'root', 'site', 'date_format' );
-
-	const settings = __experimentalGetSettings();
-	const formatOptions = Object.values( settings.formats ).map(
-		( formatOption ) => ( {
-			key: formatOption,
-			name: dateI18n( formatOption, date || new Date() ),
-		} )
-	);
-	const resolvedFormat = format || siteDateFormat || settings.formats.date;
+	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
 
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Format settings' ) }>
-				<CustomSelectControl
-					hideLabelFromVision
-					label={ __( 'Date Format' ) }
-					options={ formatOptions }
-					onChange={ ( { selectedItem } ) =>
-						setAttributes( {
-							format: selectedItem.key,
-						} )
+				<DateFormatControl
+					format={ format }
+					siteFormat={ siteFormat }
+					onChange={ ( nextFormat ) =>
+						setAttributes( { format: nextFormat } )
 					}
-					value={ formatOptions.find(
-						( option ) => option.key === resolvedFormat
-					) }
 				/>
 			</PanelBody>
 			<PanelBody title={ __( 'Link settings' ) }>
@@ -82,7 +67,7 @@ export default function Edit( {
 
 	let commentDate = (
 		<time dateTime={ dateI18n( 'c', date ) }>
-			{ dateI18n( resolvedFormat, date ) }
+			{ dateI18n( format || siteFormat, date ) }
 		</time>
 	);
 
