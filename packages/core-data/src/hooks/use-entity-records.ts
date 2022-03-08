@@ -28,12 +28,17 @@ interface EntityRecordsResolution< RecordType > {
 	status: Status;
 }
 
+interface Options {
+	execute: boolean;
+}
+
 /**
  * Resolves the specified entity records.
  *
  * @param  kind      Kind of the requested entities.
  * @param  name      Name of the requested entities.
  * @param  queryArgs HTTP query for the requested entities.
+ * @param  options
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -68,7 +73,8 @@ interface EntityRecordsResolution< RecordType > {
 export default function __experimentalUseEntityRecords< RecordType >(
 	kind: string,
 	name: string,
-	queryArgs: unknown = {}
+	queryArgs: unknown = {},
+	options: Options = { execute: true }
 ): EntityRecordsResolution< RecordType > {
 	// Serialize queryArgs to a string that can be safely used as a React dep.
 	// We can't just pass queryArgs as one of the deps, because if it is passed
@@ -77,9 +83,16 @@ export default function __experimentalUseEntityRecords< RecordType >(
 	const queryAsString = addQueryArgs( '', queryArgs );
 
 	const { data: records, ...rest } = useQuerySelect(
-		( query ) =>
-			query( coreStore ).getEntityRecords( kind, name, queryArgs ),
-		[ kind, name, queryAsString ]
+		( query ) => {
+			if ( options.execute ) {
+				return query( coreStore ).getEntityRecords(
+					kind,
+					name,
+					queryArgs
+				);
+			}
+		},
+		[ kind, name, queryAsString, options.execute ]
 	);
 
 	return {
