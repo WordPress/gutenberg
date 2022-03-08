@@ -71,6 +71,11 @@ describe( 'actions', () => {
 
 	describe( 'switchEditorMode', () => {
 		it( 'to visual', () => {
+			// Switch to text first, since the default is visual.
+			registry.dispatch( editPostStore ).switchEditorMode( 'text' );
+			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
+				'text'
+			);
 			registry.dispatch( editPostStore ).switchEditorMode( 'visual' );
 			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
 				'visual'
@@ -78,6 +83,10 @@ describe( 'actions', () => {
 		} );
 
 		it( 'to text', () => {
+			// It defaults to visual.
+			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
 			// Add a selected client id and make sure it's there.
 			const clientId = 'clientId_1';
 			registry.dispatch( blockEditorStore ).selectionChange( clientId );
@@ -89,6 +98,9 @@ describe( 'actions', () => {
 			expect(
 				registry.select( blockEditorStore ).getSelectedBlockClientId()
 			).toBeNull();
+			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
+				'text'
+			);
 		} );
 	} );
 

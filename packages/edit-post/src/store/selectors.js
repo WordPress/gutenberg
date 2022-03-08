@@ -23,7 +23,7 @@ const EMPTY_ARRAY = [];
  * @return {string} Editing mode.
  */
 export const getEditorMode = createRegistrySelector( ( select ) => () =>
-	select( preferencesStore ).get( 'core/edit-post', 'editorMode' )
+	select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ?? 'visual'
 );
 
 /**
