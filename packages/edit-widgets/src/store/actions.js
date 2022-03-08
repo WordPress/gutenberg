@@ -282,18 +282,13 @@ export const saveWidgetArea = ( widgetAreaId ) => async ( {
 };
 
 const trySaveWidgetArea = ( widgetAreaId ) => ( { registry } ) => {
-	const saveErrorBefore = registry
-		.select( coreStore )
-		.getLastEntitySaveError( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId );
 	registry
 		.dispatch( coreStore )
-		.saveEditedEntityRecord( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId );
-	const saveErrorAfter = registry
-		.select( coreStore )
-		.getLastEntitySaveError( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId );
-	if ( saveErrorAfter && saveErrorBefore !== saveErrorAfter ) {
-		throw new Error( saveErrorAfter );
-	}
+		.throwingSaveEditedEntityRecord(
+			KIND,
+			WIDGET_AREA_ENTITY_TYPE,
+			widgetAreaId
+		);
 };
 
 /**
