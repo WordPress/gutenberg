@@ -7,7 +7,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import {
-	isFeatureActive,
 	getCanUserCreateMedia,
 	getSettings,
 	getHomeTemplateId,
@@ -19,62 +18,22 @@ import {
 	isNavigationOpened,
 	isInserterOpened,
 	isListViewOpened,
+	__unstableGetPreference,
 } from '../selectors';
 
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
 	const getEntityRecords = jest.fn( () => [] );
+	const get = jest.fn();
 	getCanUserCreateMedia.registry = {
 		select: jest.fn( () => ( { canUser } ) ),
 	};
 	getReusableBlocks.registry = {
 		select: jest.fn( () => ( { getEntityRecords } ) ),
 	};
-
-	describe( 'isFeatureActive', () => {
-		it( 'is tolerant to an undefined features preference', () => {
-			// See: https://github.com/WordPress/gutenberg/issues/14580
-			const state = {
-				preferences: {},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-
-		it( 'should return true if feature is active', () => {
-			const state = {
-				preferences: {
-					features: {
-						chicken: true,
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( true );
-		} );
-
-		it( 'should return false if feature is not active', () => {
-			const state = {
-				preferences: {
-					features: {
-						chicken: false,
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-
-		it( 'should return false if feature is not referred', () => {
-			const state = {
-				preferences: {
-					features: {},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-	} );
+	__unstableGetPreference.registry = {
+		select: jest.fn( () => ( { get } ) ),
+	};
 
 	describe( 'getCanUserCreateMedia', () => {
 		it( "selects `canUser( 'create', 'media' )` from the core store", () => {
@@ -106,6 +65,10 @@ describe( 'selectors', () => {
 		it( "returns the settings when the user can't create media", () => {
 			canUser.mockReturnValueOnce( false );
 			canUser.mockReturnValueOnce( false );
+			get.mockImplementation( ( scope, name ) => {
+				if ( name === 'focusMode' ) return false;
+				if ( name === 'fixedToolbar' ) return false;
+			} );
 			const state = {
 				settings: {},
 				preferences: {},
@@ -123,14 +86,13 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'returns the extended settings when the user can create media', () => {
+			get.mockImplementation( ( scope, name ) => {
+				if ( name === 'focusMode' ) return true;
+				if ( name === 'fixedToolbar' ) return true;
+			} );
+
 			const state = {
 				settings: { key: 'value' },
-				preferences: {
-					features: {
-						focusMode: true,
-						fixedToolbar: true,
-					},
-				},
 				editedPost: { type: 'wp_template_part' },
 			};
 			const setInserterOpened = () => {};

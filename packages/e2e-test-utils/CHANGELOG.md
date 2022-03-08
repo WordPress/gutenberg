@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   The `toggleMoreMenu` and `clickMoreMenuItem` utilities no longer require a second 'context' parameter.
+
 ## 6.0.0 (2022-01-27)
 
 ### Breaking Changes

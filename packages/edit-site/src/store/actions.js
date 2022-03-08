@@ -3,6 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -10,6 +11,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -18,16 +20,21 @@ import { STORE_NAME as editSiteStoreName } from './constants';
 import isTemplateRevertable from '../utils/is-template-revertable';
 
 /**
- * Action that toggles a feature flag.
+ * Dispatches an action that toggles a feature flag.
  *
- * @param {string} feature Feature name.
- *
- * @return {Object} Action object.
+ * @param {string} featureName Feature name.
  */
-export function toggleFeature( feature ) {
-	return {
-		type: 'TOGGLE_FEATURE',
-		feature,
+export function toggleFeature( featureName ) {
+	return function ( { registry } ) {
+		deprecated( "select( 'core/edit-site' ).toggleFeature( featureName )", {
+			since: '6.0',
+			alternative:
+				"select( 'core/preferences').toggle( 'core/edit-site', featureName )",
+		} );
+
+		registry
+			.dispatch( preferencesStore )
+			.toggle( 'core/edit-site', featureName );
 	};
 }
 
@@ -449,8 +456,10 @@ export const closeGeneralSidebar = () => ( { registry } ) => {
 		.disableComplementaryArea( editSiteStoreName );
 };
 
-export const switchEditorMode = ( mode ) => ( { dispatch, registry } ) => {
-	dispatch( { type: 'SWITCH_MODE', mode } );
+export const switchEditorMode = ( mode ) => ( { registry } ) => {
+	registry
+		.dispatch( 'core/preferences' )
+		.set( 'core/edit-site', 'editorMode', mode );
 
 	// Unselect blocks when we switch to a non visual mode.
 	if ( mode !== 'visual' ) {
