@@ -99,7 +99,8 @@ function GalleryEdit( props ) {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
-		multiSelect,
+		selectBlock,
+		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -155,17 +156,8 @@ function GalleryEdit( props ) {
 				align: undefined,
 			} );
 		} );
-
-		// If new blocks added, and no images still uploading, select new images
-		//  so they scroll into view.
-		if (
-			newImages?.length &&
-			! images.find( ( image ) => image.url.startsWith( 'blob' ) )
-		) {
-			multiSelect(
-				newImages[ 0 ].clientId,
-				newImages[ newImages?.length - 1 ].clientId
-			);
+		if ( newImages?.length > 0 ) {
+			clearSelectedBlock();
 		}
 	}, [ newImages ] );
 
@@ -299,6 +291,10 @@ function GalleryEdit( props ) {
 				alt: image.alt,
 			} );
 		} );
+
+		if ( newBlocks?.length > 0 ) {
+			selectBlock( newBlocks[ 0 ].clientId );
+		}
 
 		replaceInnerBlocks(
 			clientId,
