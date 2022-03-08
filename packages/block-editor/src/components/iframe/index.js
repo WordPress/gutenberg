@@ -174,16 +174,9 @@ function Iframe(
 	const setRef = useRefEffect( ( node ) => {
 		function setDocumentIfReady() {
 			const { contentDocument, ownerDocument } = node;
-			const { readyState, documentElement, compatMode } = contentDocument;
+			const { readyState, documentElement } = contentDocument;
 
-			// As srcDoc loads contents asynchronously this will cause the iframe to
-			// load documents twice. We need to hook react to the correct contentDocument
-			// so we need to skip the initial document and wait for the srcDoc with
-			// correct compatMode to load.
-			if (
-				compatMode !== 'CSS1Compat' ||
-				( readyState !== 'complete' && readyState !== 'interactive' )
-			) {
+			if ( readyState !== 'complete' && readyState !== 'interactive' ) {
 				return false;
 			}
 
@@ -210,11 +203,7 @@ function Iframe(
 			return true;
 		}
 
-		if ( setDocumentIfReady() ) {
-			return;
-		}
-
-		// Document is not immediately loaded in Firefox.
+		// Document set with srcDoc is not immediately ready.
 		node.addEventListener( 'load', () => {
 			setDocumentIfReady();
 		} );
