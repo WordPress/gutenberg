@@ -158,7 +158,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 								/>
 								{ ( isReusable || isTemplate ) && (
 									<span className="block-editor-block-switcher__toggle-text">
-										<BlockTitle clientId={ clientIds } />
+										<BlockTitle
+											clientId={ clientIds }
+											maximumLength={ 35 }
+										/>
 									</span>
 								) }
 							</>

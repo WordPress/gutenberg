@@ -10,9 +10,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
-
 import { Children, cloneElement, useCallback } from '@wordpress/element';
-import { serialize, store as blocksStore } from '@wordpress/blocks';
+import { serialize } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useCopyToClipboard } from '@wordpress/compose';
 
@@ -25,6 +24,7 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -46,14 +46,11 @@ export function BlockSettingsDropdown( {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
-	const { onlyBlock, title } = useSelect(
+	const { onlyBlock } = useSelect(
 		( select ) => {
-			const { getBlockCount, getBlockName } = select( blockEditorStore );
-			const { getBlockType } = select( blocksStore );
+			const { getBlockCount } = select( blockEditorStore );
 			return {
 				onlyBlock: 1 === getBlockCount(),
-				title: getBlockType( getBlockName( firstBlockClientId ) )
-					?.title,
 			};
 		},
 		[ firstBlockClientId ]
@@ -87,10 +84,12 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
+	const blockTitle = useBlockDisplayTitle( firstBlockClientId, 25 );
+
 	const label = sprintf(
 		/* translators: %s: block name */
 		__( 'Remove %s' ),
-		title
+		blockTitle
 	);
 	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
 
