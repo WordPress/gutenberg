@@ -38,6 +38,15 @@ class WP_Webfonts {
 	private static $webfonts_used_in_front_end = array();
 
 	/**
+	 * The name of option that caches the webfonts used in the templates.
+	 *
+	 * @static
+	 * @access private
+	 * @var string
+	 */
+	private static $webfonts_used_in_templates_cache_option = 'gutenberg_webfonts_used_in_templates';
+
+	/**
 	 * The name of option that caches the webfonts used in global styles.
 	 *
 	 * @static
@@ -70,6 +79,7 @@ class WP_Webfonts {
 			$hook                    = 'wp_enqueue_scripts';
 		}
 
+		add_action( 'init', array( $this, 'register_filter_for_current_template_webfonts_collector' ) );
 		add_action( 'init', array( $this, 'collect_webfonts_used_in_global_styles' ) );
 		add_action( 'switch_theme', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
 		add_action( 'save_post_wp_global_styles', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
@@ -78,6 +88,79 @@ class WP_Webfonts {
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+	}
+
+	/**
+	 * Hook into every possible template so we can collect the webfonts used in the template
+	 * that has been loaded in the front-end.
+	 */
+	public function register_filter_for_current_template_webfonts_collector() {
+		$template_type_slugs = array_keys( get_default_block_template_types() );
+
+		foreach ( $template_type_slugs as $template_type_slug ) {
+			add_filter(
+				str_replace( '-', '', $template_type_slug ) . '_template',
+				array( $this, 'collect_webfonts_used_in_template' ),
+				10,
+				2
+			);
+		}
+	}
+
+	/**
+	 * Grab the webfonts used in the template and include them
+	 * in the set of all the webfonts used in the front-end.
+	 *
+	 * @param string $template_path The current template path.
+	 * @param string $template_slug The current template slug.
+	 *
+	 * @return void
+	 */
+	public function collect_webfonts_used_in_template( $template_path, $template_slug ) {
+		global $_wp_current_template_content;
+
+		$webfonts_used_in_templates = get_option( self::$webfonts_used_in_templates_cache_option, array() );
+
+		if ( ! isset( $webfonts_used_in_templates[ $template_slug ] ) ) {
+			$webfonts_used_in_templates[ $template_slug ] = $this->get_fonts_from_template( $_wp_current_template_content );
+
+			update_option( self::$webfonts_used_in_templates_cache_option, $webfonts_used_in_templates );
+		}
+
+		$webfonts_used_in_template        = $webfonts_used_in_templates[ $template_slug ];
+		self::$webfonts_used_in_front_end = array_merge( self::$webfonts_used_in_front_end, $webfonts_used_in_template );
+	}
+
+	/**
+	 * Get webfonts used in the template.
+	 *
+	 * @param string $template_content The template content.
+	 *
+	 * @return array
+	 */
+	private function get_fonts_from_template( $template_content ) {
+		$webfonts_used_in_template = array();
+
+		$template_blocks = parse_blocks( $template_content );
+		$template_blocks = _flatten_blocks( $template_blocks );
+
+		foreach ( $template_blocks as $block ) {
+			if ( 'core/template-part' === $block['blockName'] ) {
+				$template_part          = get_block_template( get_stylesheet() . '//' . $block['attrs']['slug'], 'wp_template_part' );
+				$fonts_in_template_part = $this->get_fonts_from_template( $template_part->content );
+
+				$webfonts_used_in_template = array_merge(
+					$webfonts_used_in_template,
+					$fonts_in_template_part
+				);
+			}
+
+			if ( isset( $block['attrs']['fontFamily'] ) ) {
+				$used_webfonts[ $block['attrs']['fontFamily'] ] = 1;
+			}
+		}
+
+		return $webfonts_used_in_template;
 	}
 
 	/**
