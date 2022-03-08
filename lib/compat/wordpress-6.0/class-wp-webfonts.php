@@ -71,11 +71,22 @@ class WP_Webfonts {
 		}
 
 		add_action( 'init', array( $this, 'collect_webfonts_used_in_global_styles' ) );
+		add_action( 'save_post_wp_global_styles', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
 
 		add_action( $hook, array( $this, 'generate_and_enqueue_styles' ) );
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+	}
+
+	/**
+	 * Update webfonts used in global styles cache.
+	 */
+	public function update_webfonts_used_in_global_styles_cache() {
+		$webfonts_used_in_global_styles = $this->get_webfonts_used_in_global_styles();
+		update_option( self::$webfonts_used_in_global_styles_cache_option, $webfonts_used_in_global_styles );
+
+		return $webfonts_used_in_global_styles;
 	}
 
 	/**
@@ -86,8 +97,7 @@ class WP_Webfonts {
 		$webfonts_used_in_global_styles = get_option( self::$webfonts_used_in_global_styles_cache_option );
 
 		if ( ! $webfonts_used_in_global_styles ) {
-			$webfonts_used_in_global_styles = $this->get_webfonts_used_in_global_styles();
-			update_option( self::$webfonts_used_in_global_styles_cache_option, $webfonts_used_in_global_styles );
+			$webfonts_used_in_global_styles = $this->update_webfonts_used_in_global_styles_cache();
 		}
 
 		self::$webfonts_used_in_front_end = array_merge( self::$webfonts_used_in_front_end, $webfonts_used_in_global_styles );
