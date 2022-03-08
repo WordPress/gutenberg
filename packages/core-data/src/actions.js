@@ -759,3 +759,69 @@ export function receiveAutosaves( postId, autosaves ) {
 		autosaves: castArray( autosaves ),
 	};
 }
+
+export const throwingSaveEntityRecord = ( ...args ) => async ( {
+	dispatch,
+	select,
+} ) => {
+	const [ kind, name, record ] = args;
+	const recordId = await dispatch( getRecordPk( kind, name, record ) );
+
+	const result = await dispatch( saveEntityRecord( ...args ) );
+	if ( ! result ) {
+		if ( recordId ) {
+			const error = select.getLastEntitySaveError( kind, name, recordId );
+			throw error;
+		} else {
+			throw new Error( 'Something went wrong' );
+		}
+	}
+
+	const resultId = await dispatch( getRecordPk( kind, name, result ) );
+	const error = select.getLastEntitySaveError( kind, name, resultId );
+
+	if ( error ) {
+		throw error;
+	}
+	return result;
+};
+
+export const throwingSaveEditedEntityRecord = ( ...args ) => async ( {
+	dispatch,
+	select,
+} ) => {
+	const result = await dispatch( saveEditedEntityRecord( ...args ) );
+
+	const [ kind, name, id ] = args;
+	const error = select.getLastEntitySaveError( kind, name, id );
+
+	if ( error || ! result ) {
+		throw error;
+	}
+	return result;
+};
+
+export const throwingDeleteEntityRecord = ( ...args ) => async ( {
+	dispatch,
+	select,
+} ) => {
+	const result = await dispatch( deleteEntityRecord( ...args ) );
+
+	const [ kind, name, id ] = args;
+	const error = select.getLastEntityDeleteError( kind, name, id );
+
+	if ( error || ! result ) {
+		throw error;
+	}
+	return result;
+};
+
+const getRecordPk = ( kind, name, record ) => async ( { dispatch } ) => {
+	const entities = await dispatch( getKindEntities( kind ) );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity || entity?.__experimentalNoFetch ) {
+		return;
+	}
+	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
+	return record[ entityIdKey ];
+};

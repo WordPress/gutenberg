@@ -11,7 +11,7 @@ import { useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { __experimentalUseEntityRecordCreate as useEntityRecordCreate } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,7 +23,7 @@ export default function NewTemplatePart( { postType } ) {
 	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { create } = useEntityRecordCreate( 'postType', 'wp_template_part' );
+	const { throwingSaveEntityRecord } = useDispatch( coreStore );
 
 	async function createTemplatePart( { title, area } ) {
 		if ( ! title ) {
@@ -40,12 +40,16 @@ export default function NewTemplatePart( { postType } ) {
 				kebabCase( title ).replace( /[^\w-]+/g, '' ) ||
 				'wp-custom-part';
 
-			const templatePart = await create( {
-				slug: cleanSlug,
-				title,
-				content: '',
-				area,
-			} );
+			const templatePart = await throwingSaveEntityRecord(
+				'postType',
+				'wp_template_part',
+				{
+					slug: cleanSlug,
+					title,
+					content: '',
+					area,
+				}
+			);
 
 			setIsModalOpen( false );
 

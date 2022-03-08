@@ -735,6 +735,18 @@ _Parameters_
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
 
+### throwingDeleteEntityRecord
+
+Undocumented declaration.
+
+### throwingSaveEditedEntityRecord
+
+Undocumented declaration.
+
+### throwingSaveEntityRecord
+
+Undocumented declaration.
+
 ### undo
 
 Action triggered to undo the last edit to
