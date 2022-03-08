@@ -82,7 +82,7 @@ class WP_Webfonts {
 		add_action( 'init', array( $this, 'register_filter_for_current_template_webfonts_collector' ) );
 		add_action( 'init', array( $this, 'collect_webfonts_used_in_global_styles' ) );
 		add_action( 'switch_theme', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
-
+		add_action( 'switch_theme', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
 		add_action( 'save_post_wp_template', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
 		add_action( 'save_post_wp_template_part', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
 		add_action( 'save_post_wp_global_styles', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
