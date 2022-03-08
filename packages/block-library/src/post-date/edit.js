@@ -153,7 +153,15 @@ function is12HourFormat( format ) {
 	return /(?:^|[^\\])[aAgh]/.test( format );
 }
 
-function FormatSettings( { date, format, siteFormat, setFormat } ) {
+/**
+ * So that we can illustrate the different formats in the dropdown properly,
+ * show a date that has a day greater than 12 and a month with more than three
+ * letters. Here we're using 2022-01-25 which is when WordPress 5.9 was
+ * released.
+ */
+const EXAMPLE_DATE = new Date( 2022, 0, 25 );
+
+function FormatSettings( { format, siteFormat, setFormat } ) {
 	// Suggest a short format, medium format, long format, and a standardised
 	// (YYYY-MM-DD) format. The short, medium, and long formats are localised as
 	// different languages have different ways of writing these. For example, 'F
@@ -176,12 +184,12 @@ function FormatSettings( { date, format, siteFormat, setFormat } ) {
 		label: sprintf(
 			// translators: %s: Example of how the date will look if selected.
 			_x( 'Site default (%s)', 'date format option' ),
-			dateI18n( siteFormat, date )
+			dateI18n( siteFormat, EXAMPLE_DATE )
 		),
 	};
 	const suggestedOptions = suggestedFormats.map( ( suggestedFormat ) => ( {
 		format: suggestedFormat,
-		label: dateI18n( suggestedFormat, date ),
+		label: dateI18n( suggestedFormat, EXAMPLE_DATE ),
 	} ) );
 	const customOption = {
 		label: _x( 'Custom', 'date format option' ),
