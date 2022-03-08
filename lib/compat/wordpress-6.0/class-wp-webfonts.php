@@ -82,12 +82,26 @@ class WP_Webfonts {
 		add_action( 'init', array( $this, 'register_filter_for_current_template_webfonts_collector' ) );
 		add_action( 'init', array( $this, 'collect_webfonts_used_in_global_styles' ) );
 		add_action( 'switch_theme', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
+
+		add_action( 'save_post_wp_template', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
+		add_action( 'save_post_wp_template_part', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
 		add_action( 'save_post_wp_global_styles', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
 
 		add_action( $hook, array( $this, 'generate_and_enqueue_styles' ) );
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+	}
+
+	/**
+	 * Invalidate webfonts used in templates cache.
+	 * We need to do that because there's no indication on which templates uses which template parts,
+	 * so we're throwing everything away and lazily reconstructing the cache whenever a template gets loaded.
+	 *
+	 * @return void
+	 */
+	public function invalidate_webfonts_used_in_templates_cache() {
+		delete_option( self::$webfonts_used_in_templates_cache_option );
 	}
 
 	/**
