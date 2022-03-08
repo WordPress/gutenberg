@@ -20,6 +20,7 @@ const {
 	runCleanLocalFoldersStep,
 } = require( './common' );
 const git = require( '../lib/git' );
+const { join } = require( 'path' );
 
 /**
  * Release type names.
@@ -36,8 +37,9 @@ const git = require( '../lib/git' );
 /**
  * @typedef WPPackagesCommandOptions
  *
- * @property {SemVer}  [semver] The selected semantic versioning. Defaults to `patch`.
- * @property {boolean} [ci]     Disables interactive mode when executed in CI mode.
+ * @property {boolean} [ci]             Disables interactive mode when executed in CI mode.
+ * @property {string}  [repositoryPath] Relative path to the git repository.
+ * @property {SemVer}  [semver]         The selected semantic versioning. Defaults to `patch`.
  */
 
 /**
@@ -331,11 +333,18 @@ async function publishPackagesToNpm( {
 		cwd: gitWorkingDirectoryPath,
 	} );
 
+	log( '>> Current npm user:' );
+	await command( 'npm whoami', {
+		cwd: gitWorkingDirectoryPath,
+		stdio: 'inherit',
+	} );
+
 	const beforeCommitHash = await git.getLastCommitHash(
 		gitWorkingDirectoryPath
 	);
 
 	const yesFlag = interactive ? '' : '--yes';
+	const noVerifyAccessFlag = interactive ? '' : '--no-verify-access';
 	if ( releaseType === 'next' ) {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
@@ -351,7 +360,7 @@ async function publishPackagesToNpm( {
 
 		log( '>> Publishing modified packages to npm.' );
 		await command(
-			`npx lerna publish from-package --dist-tag next ${ yesFlag }`,
+			`npx lerna publish from-package --dist-tag next ${ yesFlag } ${ noVerifyAccessFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -360,7 +369,7 @@ async function publishPackagesToNpm( {
 	} else if ( releaseType === 'bugfix' ) {
 		log( '>> Publishing modified packages to npm.' );
 		await command(
-			`npx lerna publish ${ minimumVersionBump } --no-private ${ yesFlag }`,
+			`npx lerna publish ${ minimumVersionBump } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -379,10 +388,13 @@ async function publishPackagesToNpm( {
 		);
 
 		log( '>> Publishing modified packages to npm.' );
-		await command( `npx lerna publish from-package ${ yesFlag }`, {
-			cwd: gitWorkingDirectoryPath,
-			stdio: 'inherit',
-		} );
+		await command(
+			`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
 	}
 
 	const afterCommitHash = await git.getLastCommitHash(
@@ -458,11 +470,14 @@ async function runPackagesRelease( config, customMessages ) {
 		await askForConfirmation( 'Ready to go?' );
 	}
 
-	// Cloning the Git repository.
-	config.gitWorkingDirectoryPath = await runGitRepositoryCloneStep(
-		config.abortMessage
-	);
-	const temporaryFolders = [ config.gitWorkingDirectoryPath ];
+	const temporaryFolders = [];
+	if ( ! config.gitWorkingDirectoryPath ) {
+		// Cloning the Git repository.
+		config.gitWorkingDirectoryPath = await runGitRepositoryCloneStep(
+			config.abortMessage
+		);
+		temporaryFolders.push( config.gitWorkingDirectoryPath );
+	}
 
 	let pluginReleaseBranch;
 	if ( [ 'latest', 'next' ].includes( config.releaseType ) ) {
@@ -513,10 +528,11 @@ async function runPackagesRelease( config, customMessages ) {
  *
  * @return {WPPackagesConfig} The config object.
  */
-function getConfig( releaseType, { ci, semver } ) {
+function getConfig( releaseType, { ci, repositoryPath, semver } ) {
 	return {
 		abortMessage: 'Aborting!',
-		gitWorkingDirectoryPath: process.cwd(),
+		gitWorkingDirectoryPath:
+			repositoryPath && join( process.cwd(), repositoryPath ),
 		interactive: ! ci,
 		minimumVersionBump: semver,
 		npmReleaseBranch: releaseType === 'next' ? 'wp/next' : 'wp/trunk',
