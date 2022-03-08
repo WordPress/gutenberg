@@ -38,6 +38,15 @@ class WP_Webfonts {
 	private static $webfonts_used_in_front_end = array();
 
 	/**
+	 * The key of the post meta attribute that caches the webfonts used in the post content.
+	 *
+	 * @static
+	 * @access private
+	 * @var string
+	 */
+	private static $webfonts_used_in_content_meta_key = 'gutenberg_webfonts_used_in_content';
+
+	/**
 	 * The name of option that caches the webfonts used in the templates.
 	 *
 	 * @static
@@ -81,6 +90,7 @@ class WP_Webfonts {
 
 		add_action( 'init', array( $this, 'register_filter_for_current_template_webfonts_collector' ) );
 		add_action( 'init', array( $this, 'collect_webfonts_used_in_global_styles' ) );
+		add_filter( 'the_content', array( $this, 'collect_webfonts_used_in_content' ) );
 		add_action( 'switch_theme', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
 		add_action( 'switch_theme', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
 		add_action( 'save_post_wp_template', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
@@ -91,6 +101,30 @@ class WP_Webfonts {
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+	}
+
+	/**
+	 * Grab the webfonts used in the content and include them
+	 * in the set of all the webfonts used in the front-end.
+	 *
+	 * @param string $content The post content.
+	 *
+	 * @return string
+	 */
+	public function collect_webfonts_used_in_content( $content ) {
+		global $post;
+
+		preg_match_all( '/class\=\".*has-(?P<slug>.+)-font-family/', $content, $matches );
+
+		if ( isset( $matches['slug'] ) ) {
+			foreach ( $matches['slug'] as $font_family_slug ) {
+				$webfonts_used_in_post_cache[ $font_family_slug ] = 1;
+			}
+		}
+
+		self::$webfonts_used_in_front_end = array_merge( self::$webfonts_used_in_front_end, $webfonts_used_in_post_cache );
+
+		return $content;
 	}
 
 	/**
