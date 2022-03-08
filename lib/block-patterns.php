@@ -211,11 +211,25 @@ add_action(
 );
 
 /**
- * FIXME.
+ * Register any patterns that the active theme may provide under its
+ * `./patterns/` directory. Each pattern is defined as a PHP file and defines
+ * its metadata using plugin-style headers. The minimum required definition is:
+ *
+ *     /**
+ *      * Pattern Name: My Pattern
+ *      *
+ *
+ * The output of the PHP source corresponds to the content of the pattern, e.g.:
+ *
+ *     <main><p><?php echo "Hello"; ?></p></main>
+ *
+ * If applicable, this will collect from both parent and child theme.
  *
  * @since 5.9.0
+ * @access private
+ * @internal
  */
-function _register_theme_block_patterns() {
+function register_theme_block_patterns() {
 	$default_headers = array(
 		'title'         => 'Pattern Name',
 		'description'   => 'Description',
@@ -283,4 +297,4 @@ function _register_theme_block_patterns() {
 		}
 	}
 }
-add_action( 'init', '_register_theme_block_patterns' );
+add_action( 'init', 'register_theme_block_patterns' );
