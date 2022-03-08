@@ -174,23 +174,18 @@ function Iframe(
 	const setRef = useRefEffect( ( node ) => {
 		function setDocumentIfReady() {
 			const { contentDocument, ownerDocument } = node;
-			const { readyState } = contentDocument;
+			const { readyState, documentElement, compatMode } = contentDocument;
 
-			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
+			// As srcDoc loads contents asynchronously this will cause the iframe to
+			// load documents twice. We need to hook react to the correct contentDocument
+			// so we need to skip the initial document and wait for the srcDoc with
+			// correct compatMode to load.
+			if (
+				compatMode !== 'CSS1Compat' ||
+				( readyState !== 'complete' && readyState !== 'interactive' )
+			) {
 				return false;
 			}
-
-			// Iframe document doctype is not set by default and not having doctype
-			// will cause browser to render iframe contents in quirks mode. Appending
-			// doctype to existing document won't change iframe's rendering mode.
-			// Document.write will overwrite the document with a new one containing
-			// a correct doctype and will correctly render in stadards mode.
-			contentDocument.write(
-				'<!DOCTYPE html>' + contentDocument.documentElement.outerHTML
-			);
-			contentDocument.close();
-
-			const { documentElement } = contentDocument;
 
 			bubbleEvents( contentDocument );
 			setIframeDocument( contentDocument );
@@ -276,6 +271,8 @@ function Iframe(
 				{ ...props }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
+				// Correct doctype is required to enable rendering in standards mode
+				srcDoc="<!doctype html><html><head>yyy</head><body>xxx</body></html>"
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&
