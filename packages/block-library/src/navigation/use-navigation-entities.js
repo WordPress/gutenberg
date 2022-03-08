@@ -53,7 +53,7 @@ export default function useNavigationEntities( menuId ) {
 			per_page: -1,
 			context: 'view',
 		},
-		{ execute: ! menuId }
+		{ execute: !! menuId }
 	);
 
 	return {
