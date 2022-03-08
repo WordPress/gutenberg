@@ -230,65 +230,9 @@ function _register_theme_block_patterns() {
 	foreach ( wp_get_active_and_valid_themes() as $theme ) {
 		$dirpath = $theme . '/patterns/';
 		if ( file_exists( $dirpath ) ) {
-			$files = glob( $dirpath . '*.html' );
-			if ( $files ) {
-				foreach ( $files as $file ) {
-					// Parse pattern slug from file name.
-					if ( ! preg_match( '#/(?P<slug>[A-z0-9_-]+)\.html$#', $file, $matches ) ) {
-						continue; // FIXME: Consider logging notice.
-					}
-					// Example name: twentytwentytwo/query-grid-posts.
-					$pattern_name = get_stylesheet() . '/' . $matches['slug'];
-
-					$pattern_data = get_file_data( $file, $default_headers );
-
-					// Title is a required property.
-					if ( ! $pattern_data['title'] ) {
-						continue;
-					}
-
-					// For properties of type array, parse data as comma-separated.
-					foreach ( array( 'categories', 'keywords', 'blockTypes' ) as $property ) {
-						$pattern_data[ $property ] = array_filter(
-							preg_split(
-								'/[\s,]+/',
-								(string) $pattern_data[ $property ]
-							)
-						);
-					}
-
-					// Parse properties of type int.
-					foreach ( array( 'viewportWidth' ) as $property ) {
-						$pattern_data[ $property ] = (int) $pattern_data[ $property ];
-					}
-
-					// Remove up empty values, so as not to override defaults.
-					foreach ( array_keys( $default_headers ) as $property ) {
-						if ( empty( $pattern_data[ $property ] ) ) {
-							unset( $pattern_data[ $property ] );
-						}
-					}
-
-					// The actual pattern is everything following the leading comment.
-					$raw_content             = file_get_contents( $file );
-					$token                   = '-->';
-					$pattern_data['content'] = substr(
-						$raw_content,
-						strpos( $raw_content, $token ) + strlen( $token )
-					);
-					if ( ! $pattern_data['content'] ) {
-						continue;
-					}
-
-					register_block_pattern( $pattern_name, $pattern_data );
-				}
-			}
-		}
-		if ( file_exists( $dirpath ) ) {
 			$files = glob( $dirpath . '*.php' );
 			if ( $files ) {
 				foreach ( $files as $file ) {
-
 					// Parse pattern slug from file name.
 					if ( ! preg_match( '#/(?P<slug>[A-z0-9_-]+)\.php$#', $file, $matches ) ) {
 						continue; // FIXME: Consider logging notice.
