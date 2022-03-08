@@ -93,6 +93,8 @@ class WP_Webfonts {
 		add_filter( 'the_content', array( $this, 'collect_webfonts_used_in_content' ) );
 		add_action( 'switch_theme', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
 		add_action( 'switch_theme', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
+		add_action( 'save_post_post', array( $this, 'update_webfonts_used_in_content_cache' ), 10, 2 );
+		add_action( 'save_post_page', array( $this, 'update_webfonts_used_in_content_cache' ), 10, 2 );
 		add_action( 'save_post_wp_template', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
 		add_action( 'save_post_wp_template_part', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
 		add_action( 'save_post_wp_global_styles', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
@@ -101,6 +103,30 @@ class WP_Webfonts {
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+	}
+
+	/**
+	 * Update webfonts used in the content cache.
+	 *
+	 * @param integer $post_id The post ID.
+	 * @param WP_Post $post The post.
+	 *
+	 * @return array
+	 */
+	public function update_webfonts_used_in_content_cache( $post_id, $post ) {
+		$webfonts_used_in_post_cache = array();
+
+		preg_match_all( '/class\=\".*has-(?P<slug>.+)-font-family/', $post->post_content, $matches );
+
+		if ( isset( $matches['slug'] ) ) {
+			foreach ( $matches['slug'] as $font_family_slug ) {
+				$webfonts_used_in_post_cache[ $font_family_slug ] = 1;
+			}
+		}
+
+		update_post_meta( $post->ID, self::$webfonts_used_in_content_meta_key, $webfonts_used_in_post_cache );
+
+		return $webfonts_used_in_post_cache;
 	}
 
 	/**
@@ -114,12 +140,10 @@ class WP_Webfonts {
 	public function collect_webfonts_used_in_content( $content ) {
 		global $post;
 
-		preg_match_all( '/class\=\".*has-(?P<slug>.+)-font-family/', $content, $matches );
+		$webfonts_used_in_post_cache = get_post_meta( $post->ID, self::$webfonts_used_in_content_meta_key, true );
 
-		if ( isset( $matches['slug'] ) ) {
-			foreach ( $matches['slug'] as $font_family_slug ) {
-				$webfonts_used_in_post_cache[ $font_family_slug ] = 1;
-			}
+		if ( ! $webfonts_used_in_post_cache ) {
+			$webfonts_used_in_post_cache = $this->update_webfonts_used_in_content_cache( $post->ID, $post );
 		}
 
 		self::$webfonts_used_in_front_end = array_merge( self::$webfonts_used_in_front_end, $webfonts_used_in_post_cache );
