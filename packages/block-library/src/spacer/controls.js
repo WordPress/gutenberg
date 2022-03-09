@@ -7,7 +7,7 @@ import {
 	BaseControl,
 	PanelBody,
 	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalUnitControl as UnitControl,
+	__experimentalCustomUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
