@@ -19,7 +19,7 @@ function gutenberg_export_theme_zip() {
 }
 add_action( 'admin_init', 'gutenberg_export_theme_zip' );
 
-function export_theme() {
+function gutenberg_export_theme() {
 	submit_button( __( 'Download Export File' ), 'primary not-hidden' );
 ?>
 	</form>
@@ -36,4 +36,4 @@ function export_theme() {
 <?php
 	submit_button( __( 'Download Theme Files' ), 'primary not-hidden' );
 }
-add_action( 'export_filters', 'export_theme' );
+add_action( 'export_filters', 'gutenberg_export_theme' );
