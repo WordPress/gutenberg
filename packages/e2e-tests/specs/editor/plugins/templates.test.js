@@ -105,7 +105,7 @@ describe( 'templates', () => {
 			await page.reload();
 			await page.waitForSelector( '.edit-post-layout' );
 
-			// Wait a bit more for getEditedPostContent to be correct
+			// Wait a bit more for getEditedPostContent to be correct.
 			await page.waitForSelector(
 				'.block-editor-default-block-appender__content'
 			);

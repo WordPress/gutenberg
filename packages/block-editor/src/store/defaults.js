@@ -134,7 +134,7 @@ export const SETTINGS_DEFAULTS = {
 		{ slug: 'full', name: __( 'Full Size' ) },
 	],
 
-	// Allow plugin to disable Image Editor if need be
+	// Allow plugin to disable Image Editor if need be.
 	imageEditing: true,
 
 	// This is current max width of the block inner area
@@ -156,8 +156,8 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
 	__experimentalSpotlightEntityBlocks: [],
+	__experimentalGenerateAnchors: false,
 	__unstableGalleryWithImageBlocks: false,
-
 	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	gradients: [

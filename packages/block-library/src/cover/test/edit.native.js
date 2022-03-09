@@ -30,7 +30,7 @@ import * as paragraph from '../../paragraph';
 import * as cover from '..';
 import { registerBlock } from '../..';
 
-// Avoid errors due to mocked stylesheet files missing required selectors
+// Avoid errors due to mocked stylesheet files missing required selectors.
 jest.mock( '@wordpress/compose', () => ( {
 	...jest.requireActual( '@wordpress/compose' ),
 	withPreferredColorScheme: jest.fn( ( Component ) => ( props ) => (
@@ -57,7 +57,7 @@ const COLOR_GRAY = '#abb8c3';
 const GRADIENT_GREEN =
 	'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)';
 
-// Simplified tree to render Cover edit within slot
+// Simplified tree to render Cover edit within slot.
 const CoverEdit = ( props ) => (
 	<SlotFillProvider>
 		<BlockEdit isSelected name={ cover.name } clientId={ 0 } { ...props } />
@@ -75,7 +75,7 @@ const attributes = {
 };
 
 beforeAll( () => {
-	// Mock Image.getSize to avoid failed attempt to size non-existant image
+	// Mock Image.getSize to avoid failed attempt to size non-existant image.
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
 
@@ -83,18 +83,18 @@ beforeAll( () => {
 		Promise.resolve( true )
 	);
 
-	// Register required blocks
+	// Register required blocks.
 	registerBlock( paragraph );
 	registerBlock( cover );
 	setDefaultBlockName( paragraph.name );
 } );
 
 afterAll( () => {
-	// Restore mocks
+	// Restore mocks.
 	Image.getSize.mockRestore();
 	AccessibilityInfo.isScreenReaderEnabled.mockReset();
 
-	// Clean up registered blocks
+	// Clean up registered blocks.
 	unregisterBlockType( paragraph.name );
 	unregisterBlockType( cover.name );
 } );
@@ -304,7 +304,7 @@ describe( 'color settings', () => {
 		);
 		expect( block ).toBeDefined();
 
-		// Select a color from the placeholder palette
+		// Select a color from the placeholder palette.
 		const colorPalette = await waitFor( () =>
 			getByTestId( 'color-palette' )
 		);
@@ -313,36 +313,36 @@ describe( 'color settings', () => {
 		expect( colorButton ).toBeDefined();
 		fireEvent.press( colorButton );
 
-		// Wait for the block to be created
+		// Wait for the block to be created.
 		const coverBlockWithOverlay = await waitFor( () =>
 			getByA11yLabel( /Cover Block\. Row 1/ )
 		);
 		fireEvent.press( coverBlockWithOverlay );
 
-		// Open Block Settings
+		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
 			getByA11yLabel( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
-		// Wait for Block Settings to be visible
+		// Wait for Block Settings to be visible.
 		const blockSettingsModal = getByTestId( 'block-settings-modal' );
 		await waitFor( () => blockSettingsModal.props.isVisible );
 
-		// Open the overlay color settings
+		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
 			getByA11yLabel( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
 
-		// Find the selected color
+		// Find the selected color.
 		const colorPaletteButton = await waitFor( () =>
 			getByTestId( COLOR_PINK )
 		);
 		expect( colorPaletteButton ).toBeDefined();
 
-		// Select another color
+		// Select another color.
 		const newColorButton = await waitFor( () => getByTestId( COLOR_RED ) );
 		fireEvent.press( newColorButton );
 
@@ -354,35 +354,35 @@ describe( 'color settings', () => {
 			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 		} );
 
-		// Wait for the block to be created
+		// Wait for the block to be created.
 		const coverBlock = await waitFor( () =>
 			getByA11yLabel( /Cover Block\. Row 1/ )
 		);
 		expect( coverBlock ).toBeDefined();
 		fireEvent.press( coverBlock );
 
-		// Open Block Settings
+		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
 			getByA11yLabel( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
-		// Wait for Block Settings to be visible
+		// Wait for Block Settings to be visible.
 		const blockSettingsModal = getByTestId( 'block-settings-modal' );
 		await waitFor( () => blockSettingsModal.props.isVisible );
 
-		// Open the overlay color settings
+		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
 			getByA11yLabel( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
 
-		// Find the selected color
+		// Find the selected color.
 		const colorButton = await waitFor( () => getByTestId( COLOR_GRAY ) );
 		expect( colorButton ).toBeDefined();
 
-		// Open the gradients
+		// Open the gradients.
 		const gradientsButton = await waitFor( () =>
 			getByA11yLabel( 'Gradient' )
 		);
@@ -393,14 +393,14 @@ describe( 'color settings', () => {
 		} );
 		fireEvent.press( gradientsButton );
 
-		// Find the gradient color
+		// Find the gradient color.
 		const newGradientButton = await waitFor( () =>
 			getByTestId( GRADIENT_GREEN )
 		);
 		expect( newGradientButton ).toBeDefined();
 		fireEvent.press( newGradientButton );
 
-		// Dismiss the Block Settings modal
+		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -416,7 +416,7 @@ describe( 'color settings', () => {
 		);
 		expect( block ).toBeDefined();
 
-		// Select a color from the placeholder palette
+		// Select a color from the placeholder palette.
 		const colorPalette = await waitFor( () =>
 			getByTestId( 'color-palette' )
 		);
@@ -425,40 +425,40 @@ describe( 'color settings', () => {
 		expect( colorButton ).toBeDefined();
 		fireEvent.press( colorButton );
 
-		// Wait for the block to be created
+		// Wait for the block to be created.
 		const coverBlockWithOverlay = await waitFor( () =>
 			getByA11yLabel( /Cover Block\. Row 1/ )
 		);
 		fireEvent.press( coverBlockWithOverlay );
 
-		// Open Block Settings
+		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
 			getByA11yLabel( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
-		// Wait for Block Settings to be visible
+		// Wait for Block Settings to be visible.
 		const blockSettingsModal = getByTestId( 'block-settings-modal' );
 		await waitFor( () => blockSettingsModal.props.isVisible );
 
-		// Open the overlay color settings
+		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
 			getByA11yLabel( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
 
-		// Find the selected color
+		// Find the selected color.
 		const colorPaletteButton = await waitFor( () =>
 			getByTestId( COLOR_PINK )
 		);
 		expect( colorPaletteButton ).toBeDefined();
 
-		// Select another color
+		// Select another color.
 		const newColorButton = await waitFor( () => getByTestId( COLOR_RED ) );
 		fireEvent.press( newColorButton );
 
-		// Open the gradients
+		// Open the gradients.
 		const gradientsButton = await waitFor( () =>
 			getByA11yLabel( 'Gradient' )
 		);
@@ -469,24 +469,24 @@ describe( 'color settings', () => {
 		} );
 		fireEvent.press( gradientsButton );
 
-		// Find the gradient color
+		// Find the gradient color.
 		const newGradientButton = await waitFor( () =>
 			getByTestId( GRADIENT_GREEN )
 		);
 		expect( newGradientButton ).toBeDefined();
 		fireEvent.press( newGradientButton );
 
-		// Go back to the settings list
+		// Go back to the settings list.
 		fireEvent.press( await waitFor( () => getByA11yLabel( 'Go back' ) ) );
 
-		// Find the color setting
+		// Find the color setting.
 		const colorSetting = await waitFor( () =>
 			getByA11yLabel( 'Color. Empty' )
 		);
 		expect( colorSetting ).toBeDefined();
 		fireEvent.press( colorSetting );
 
-		// Dismiss the Block Settings modal
+		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -501,35 +501,35 @@ describe( 'color settings', () => {
 			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 		} );
 
-		// Wait for the block to be created
+		// Wait for the block to be created.
 		const coverBlock = await waitFor( () =>
 			getByA11yLabel( /Cover Block\. Row 1/ )
 		);
 		expect( coverBlock ).toBeDefined();
 		fireEvent.press( coverBlock );
 
-		// Open Block Settings
+		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
 			getByA11yLabel( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
-		// Wait for Block Settings to be visible
+		// Wait for Block Settings to be visible.
 		const blockSettingsModal = getByTestId( 'block-settings-modal' );
 		await waitFor( () => blockSettingsModal.props.isVisible );
 
-		// Open the overlay color settings
+		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
 			getByA11yLabel( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
 
-		// Find the selected color
+		// Find the selected color.
 		const colorButton = await waitFor( () => getByTestId( COLOR_GRAY ) );
 		expect( colorButton ).toBeDefined();
 
-		// Reset the selected color
+		// Reset the selected color.
 		const resetButton = await waitFor( () => getByText( 'Reset' ) );
 		expect( resetButton ).toBeDefined();
 		fireEvent.press( resetButton );

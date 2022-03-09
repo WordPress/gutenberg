@@ -27,6 +27,7 @@ const ListViewBlockContents = forwardRef(
 			siblingBlockCount,
 			level,
 			isExpanded,
+			selectedClientIds,
 			...props
 		},
 		ref
@@ -36,12 +37,10 @@ const ListViewBlockContents = forwardRef(
 		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
 			( select ) => {
 				const {
-					getBlockRootClientId,
 					hasBlockMovingClientId,
 					getSelectedBlockClientId,
 				} = select( blockEditorStore );
 				return {
-					rootClientId: getBlockRootClientId( clientId ) || '',
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
 				};
@@ -56,8 +55,16 @@ const ListViewBlockContents = forwardRef(
 			'is-dropping-before': isBlockMoveTarget,
 		} );
 
+		// Only include all selected blocks if the currently clicked on block
+		// is one of the selected blocks. This ensures that if a user attempts
+		// to drag a block that isn't part of the selection, they're still able
+		// to drag it and rearrange its position.
+		const draggableClientIds = selectedClientIds.includes( clientId )
+			? selectedClientIds
+			: [ clientId ];
+
 		return (
-			<BlockDraggable clientIds={ [ block.clientId ] }>
+			<BlockDraggable clientIds={ draggableClientIds }>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<ListViewBlockSelectButton
 						ref={ ref }

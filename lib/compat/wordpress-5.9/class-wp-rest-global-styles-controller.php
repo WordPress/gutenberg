@@ -564,8 +564,10 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 			}
 
 			if ( rest_is_field_included( 'styles', $fields ) ) {
-				$raw_data       = $theme->get_raw_data();
-				$data['styles'] = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
+				$raw_data = $theme->get_raw_data();
+				if ( isset( $raw_data['styles'] ) ) {
+					$data['styles'] = $raw_data['styles'];
+				}
 			}
 
 			$context = ! empty( $request['context'] ) ? $request['context'] : 'view';

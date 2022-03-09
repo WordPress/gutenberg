@@ -147,10 +147,10 @@ export const installBlockType = ( block ) => async ( {
 	} catch ( error ) {
 		let message = error.message || __( 'An error occurred.' );
 
-		// Errors we throw are fatal
+		// Errors we throw are fatal.
 		let isFatal = error instanceof Error;
 
-		// Specific API errors that are fatal
+		// Specific API errors that are fatal.
 		const fatalAPIErrors = {
 			folder_exists: __(
 				'This block is already installed. Try reloading the page.'

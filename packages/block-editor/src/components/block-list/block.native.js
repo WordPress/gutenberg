@@ -86,9 +86,9 @@ function BlockForType( {
 				onReplace={ onReplace }
 				insertBlocksAfter={ insertBlocksAfter }
 				mergeBlocks={ mergeBlocks }
-				// Block level styles
+				// Block level styles.
 				wrapperProps={ wrapperProps }
-				// inherited styles merged with block level styles
+				// Inherited styles merged with block level styles.
 				style={ mergedStyle }
 				clientId={ clientId }
 				parentWidth={ parentWidth }
@@ -127,7 +127,7 @@ class BlockListBlock extends Component {
 		this.props.onInsertBlocks( blocks, this.props.order + 1 );
 
 		if ( blocks[ 0 ] ) {
-			// focus on the first block inserted
+			// Focus on the first block inserted.
 			this.props.onSelect( blocks[ 0 ].clientId );
 		}
 	}
@@ -286,7 +286,7 @@ class BlockListBlock extends Component {
 	}
 }
 
-// Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference
+// Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference.
 const wrapperPropsCache = new WeakMap();
 const emptyObj = {};
 function getWrapperProps( value, getWrapperPropsFunction ) {
@@ -339,7 +339,7 @@ export default compose( [
 			: parents[ parents.length - 1 ];
 
 		const isParentSelected =
-			// set false as a default value to prevent re-render when it's changed from null to false
+			// Set false as a default value to prevent re-render when it's changed from null to false.
 			( selectedBlockClientId || false ) &&
 			selectedBlockClientId === parentId;
 

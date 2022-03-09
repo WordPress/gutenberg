@@ -14,15 +14,15 @@ exports[`Keep styles on block transforms Should keep the font size during a tran
 
 exports[`Keep styles on block transforms Should keep the font size during a transform from multiple blocks into multiple blocks 1`] = `
 "<!-- wp:heading {\\"fontSize\\":\\"large\\"} -->
-<h2 class=\\"has-large-font-size\\" id=\\"line-1-to-be-made-large\\">Line 1 to be made large</h2>
+<h2 class=\\"has-large-font-size\\">Line 1 to be made large</h2>
 <!-- /wp:heading -->
 
 <!-- wp:heading {\\"fontSize\\":\\"large\\"} -->
-<h2 class=\\"has-large-font-size\\" id=\\"line-2-to-be-made-large\\">Line 2 to be made large</h2>
+<h2 class=\\"has-large-font-size\\">Line 2 to be made large</h2>
 <!-- /wp:heading -->
 
 <!-- wp:heading {\\"fontSize\\":\\"large\\"} -->
-<h2 class=\\"has-large-font-size\\" id=\\"line-3-to-be-made-large\\">Line 3 to be made large</h2>
+<h2 class=\\"has-large-font-size\\">Line 3 to be made large</h2>
 <!-- /wp:heading -->"
 `;
 

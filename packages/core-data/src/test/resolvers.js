@@ -46,12 +46,12 @@ describe( 'getEntityRecord', () => {
 
 		await getEntityRecord( 'root', 'postType', 'post' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
@@ -59,7 +59,7 @@ describe( 'getEntityRecord', () => {
 			undefined
 		);
 
-		// Locks should have been acquired and released
+		// Locks should have been acquired and released.
 		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
 			1
 		);
@@ -94,19 +94,19 @@ describe( 'getEntityRecord', () => {
 			query
 		)( { dispatch, select } );
 
-		// Check resolution cache for an existing entity that fulfills the request with query
+		// Check resolution cache for an existing entity that fulfills the request with query.
 		expect( select.hasEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			queryObj
 		);
 
-		// Trigger apiFetch, test that the query is present in the url
+		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=view&_envelope=1',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
@@ -114,7 +114,7 @@ describe( 'getEntityRecord', () => {
 			queryObj
 		);
 
-		// Locks should have been acquired and released
+		// Locks should have been acquired and released.
 		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
 			1
 		);
@@ -163,12 +163,12 @@ describe( 'getEntityRecords', () => {
 
 		await getEntityRecords( 'root', 'postType' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
@@ -191,12 +191,12 @@ describe( 'getEntityRecords', () => {
 
 		await getEntityRecords( 'root', 'postType' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect(
 			dispatch.__unstableAcquireStoreLock
 		).toHaveBeenCalledWith(
@@ -223,12 +223,12 @@ describe( 'getEntityRecords', () => {
 
 		await getEntityRecords( 'root', 'postType' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'START_RESOLUTIONS',
 			selectorName: 'getEntityRecord',
@@ -312,9 +312,7 @@ describe( 'canUser', () => {
 		} );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'GET',
-			},
+			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
 		await canUser( 'create', 'media' )( { dispatch } );
@@ -337,9 +335,7 @@ describe( 'canUser', () => {
 		} );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'POST, GET, PUT, DELETE',
-			},
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
 		await canUser( 'create', 'media' )( { dispatch } );
@@ -362,16 +358,14 @@ describe( 'canUser', () => {
 		} );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'POST, GET, PUT, DELETE',
-			},
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
 		await canUser( 'create', 'blocks', 123 )( { dispatch } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
-			method: 'GET',
+			method: 'OPTIONS',
 			parse: false,
 		} );
 

@@ -186,7 +186,7 @@ export function getFormatBoundary(
 	// Walk the endIndex "forwards" until the trailing "edge" of the matching format.
 	endIndex = walkToEnd( ...walkingArgs );
 
-	// Safe guard: start index cannot be less than 0
+	// Safe guard: start index cannot be less than 0.
 	startIndex = startIndex < 0 ? 0 : startIndex;
 
 	// // Return the indicies of the "edges" as the boundaries.

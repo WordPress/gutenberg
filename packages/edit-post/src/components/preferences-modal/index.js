@@ -6,27 +6,11 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalUseNavigator as useNavigator,
-	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
-	__experimentalTruncate as Truncate,
-	FlexItem,
-	Modal,
-	TabPanel,
-	Button,
-	Card,
-	CardHeader,
-	CardBody,
-} from '@wordpress/components';
-import { isRTL, __ } from '@wordpress/i18n';
+
+import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	PostTaxonomies,
 	PostExcerptCheck,
@@ -36,12 +20,16 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
+import {
+	PreferencesModal,
+	PreferencesModalTabs,
+	PreferencesModalSection,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import Section from './section';
+
 import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
@@ -53,37 +41,8 @@ import { store as editPostStore } from '../../store';
 import BlockManager from '../block-manager';
 
 const MODAL_NAME = 'edit-post/preferences';
-const PREFERENCES_MENU = 'preferences-menu';
 
-function NavigationButton( { as: Tag = Button, path, ...props } ) {
-	const { goTo } = useNavigator();
-
-	const dataAttrName = 'data-navigator-focusable-id';
-	const dataAttrValue = path;
-
-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
-
-	const tagProps = {
-		...props,
-		[ dataAttrName ]: dataAttrValue,
-	};
-
-	return (
-		<Tag
-			onClick={ () =>
-				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
-			}
-			{ ...tagProps }
-		/>
-	);
-}
-
-function NavigationBackButton( { as: Tag = Button, ...props } ) {
-	const { goBack } = useNavigator();
-	return <Tag onClick={ goBack } { ...props } />;
-}
-
-export default function PreferencesModal() {
+export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { closeModal } = useDispatch( editPostStore );
 	const { isModalActive, isViewable } = useSelect( ( select ) => {
@@ -119,7 +78,7 @@ export default function PreferencesModal() {
 				content: (
 					<>
 						{ isLargeViewport && (
-							<Section
+							<PreferencesModalSection
 								title={ __( 'Publishing' ) }
 								description={ __(
 									'Change options related to publishing.'
@@ -133,10 +92,10 @@ export default function PreferencesModal() {
 										'Include pre-publish checklist'
 									) }
 								/>
-							</Section>
+							</PreferencesModalSection>
 						) }
 
-						<Section
+						<PreferencesModalSection
 							title={ __( 'Appearance' ) }
 							description={ __(
 								'Customize options related to the block editor interface and editing flow.'
@@ -177,7 +136,7 @@ export default function PreferencesModal() {
 									label={ __( 'Display block breadcrumbs' ) }
 								/>
 							) }
-						</Section>
+						</PreferencesModalSection>
 					</>
 				),
 			},
@@ -186,7 +145,7 @@ export default function PreferencesModal() {
 				tabLabel: __( 'Blocks' ),
 				content: (
 					<>
-						<Section
+						<PreferencesModalSection
 							title={ __( 'Block interactions' ) }
 							description={ __(
 								'Customize how you interact with blocks in the block library and editing canvas.'
@@ -208,15 +167,15 @@ export default function PreferencesModal() {
 									'Contain text cursor inside block'
 								) }
 							/>
-						</Section>
-						<Section
+						</PreferencesModalSection>
+						<PreferencesModalSection
 							title={ __( 'Visible blocks' ) }
 							description={ __(
 								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
 							) }
 						>
 							<BlockManager />
-						</Section>
+						</PreferencesModalSection>
 					</>
 				),
 			},
@@ -225,7 +184,7 @@ export default function PreferencesModal() {
 				tabLabel: __( 'Panels' ),
 				content: (
 					<>
-						<Section
+						<PreferencesModalSection
 							title={ __( 'Document settings' ) }
 							description={ __(
 								'Choose what displays in the panel.'
@@ -281,7 +240,7 @@ export default function PreferencesModal() {
 									panelName="page-attributes"
 								/>
 							</PageAttributesCheck>
-						</Section>
+						</PreferencesModalSection>
 						<MetaBoxesSection
 							title={ __( 'Additional' ) }
 							description={ __(
@@ -295,126 +254,13 @@ export default function PreferencesModal() {
 		[ isViewable, isLargeViewport, showBlockBreadcrumbsOption ]
 	);
 
-	// This is also used to sync the two different rendered components
-	// between small and large viewports.
-	const [ activeMenu, setActiveMenu ] = useState( PREFERENCES_MENU );
-	/**
-	 * Create helper objects from `sections` for easier data handling.
-	 * `tabs` is used for creating the `TabPanel` and `sectionsContentMap`
-	 * is used for easier access to active tab's content.
-	 */
-	const { tabs, sectionsContentMap } = useMemo(
-		() =>
-			sections.reduce(
-				( accumulator, { name, tabLabel: title, content } ) => {
-					accumulator.tabs.push( { name, title } );
-					accumulator.sectionsContentMap[ name ] = content;
-					return accumulator;
-				},
-				{ tabs: [], sectionsContentMap: {} }
-			),
-		[ sections ]
-	);
-	const getCurrentTab = useCallback(
-		( tab ) => sectionsContentMap[ tab.name ] || null,
-		[ sectionsContentMap ]
-	);
 	if ( ! isModalActive ) {
 		return null;
 	}
-	let modalContent;
-	// We render different components based on the viewport size.
-	if ( isLargeViewport ) {
-		modalContent = (
-			<TabPanel
-				className="edit-post-preferences__tabs"
-				tabs={ tabs }
-				initialTabName={
-					activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
-				}
-				onSelect={ setActiveMenu }
-				orientation="vertical"
-			>
-				{ getCurrentTab }
-			</TabPanel>
-		);
-	} else {
-		modalContent = (
-			<NavigatorProvider initialPath="/">
-				<NavigatorScreen path="/">
-					<Card isBorderless size="small">
-						<CardBody>
-							<ItemGroup>
-								{ tabs.map( ( tab ) => {
-									return (
-										<NavigationButton
-											key={ tab.name }
-											path={ tab.name }
-											as={ Item }
-											isAction
-										>
-											<HStack justify="space-between">
-												<FlexItem>
-													<Truncate>
-														{ tab.title }
-													</Truncate>
-												</FlexItem>
-												<FlexItem>
-													<Icon
-														icon={
-															isRTL()
-																? chevronLeft
-																: chevronRight
-														}
-													/>
-												</FlexItem>
-											</HStack>
-										</NavigationButton>
-									);
-								} ) }
-							</ItemGroup>
-						</CardBody>
-					</Card>
-				</NavigatorScreen>
-				{ sections.map( ( section ) => {
-					return (
-						<NavigatorScreen
-							key={ `${ section.name }-menu` }
-							path={ section.name }
-						>
-							<Card isBorderless size="large">
-								<CardHeader
-									isBorderless={ false }
-									justify="left"
-									size="small"
-									gap="6"
-								>
-									<NavigationBackButton
-										icon={
-											isRTL() ? chevronRight : chevronLeft
-										}
-										aria-label={ __(
-											'Navigate to the previous view'
-										) }
-									/>
-									<Text size="16">{ section.tabLabel }</Text>
-								</CardHeader>
-								<CardBody>{ section.content }</CardBody>
-							</Card>
-						</NavigatorScreen>
-					);
-				} ) }
-			</NavigatorProvider>
-		);
-	}
+
 	return (
-		<Modal
-			className="edit-post-preferences-modal"
-			title={ __( 'Preferences' ) }
-			closeLabel={ __( 'Close' ) }
-			onRequestClose={ closeModal }
-		>
-			{ modalContent }
-		</Modal>
+		<PreferencesModal closeModal={ closeModal }>
+			<PreferencesModalTabs sections={ sections } />
+		</PreferencesModal>
 	);
 }

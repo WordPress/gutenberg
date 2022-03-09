@@ -22,7 +22,6 @@ export const storeConfig = {
 	reducer,
 	selectors,
 	actions,
-	__experimentalUseThunks: true,
 };
 
 /**

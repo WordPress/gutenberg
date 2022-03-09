@@ -145,6 +145,7 @@ export { default as WritingFlow } from './writing-flow';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
+export { default as __experimentalBlockPatternsList } from './block-patterns-list';
 
 /*
  * State Related Components

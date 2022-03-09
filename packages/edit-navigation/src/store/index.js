@@ -25,7 +25,6 @@ const storeConfig = {
 	resolvers,
 	actions,
 	persist: [ 'selectedMenuId' ],
-	__experimentalUseThunks: true,
 };
 
 /**

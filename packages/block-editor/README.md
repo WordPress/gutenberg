@@ -221,17 +221,21 @@ cannot be determined.
 _Usage_
 
 ```jsx
-<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+<BlockTitle
+	clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1"
+	maximumLength={ 17 }
+/>
 ```
 
 _Parameters_
 
 -   _props_ `Object`:
 -   _props.clientId_ `string`: Client ID of block.
+-   _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
 
 _Returns_
 
--   `?string`: Block title.
+-   `JSX.Element`: Block title.
 
 ### BlockToolbar
 

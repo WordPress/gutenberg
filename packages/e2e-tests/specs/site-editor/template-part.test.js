@@ -138,23 +138,23 @@ describe( 'Template Part', () => {
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( 'Header Template Part 789' );
 
-			// Select the paragraph block
+			// Select the paragraph block.
 			const text = await canvas().waitForXPath(
 				'//p[contains(text(), "Header Template Part 789")]'
 			);
 
-			// Highlight all the text in the paragraph block
+			// Highlight all the text in the paragraph block.
 			await text.click( { clickCount: 3 } );
 
-			// Click the convert to link toolbar button
+			// Click the convert to link toolbar button.
 			await page.waitForSelector( 'button[aria-label="Link"]' );
 			await page.click( 'button[aria-label="Link"]' );
 
-			// Enter url for link
+			// Enter url for link.
 			await page.keyboard.type( 'https://google.com' );
 			await page.keyboard.press( 'Enter' );
 
-			// Verify that there is no error
+			// Verify that there is no error.
 			await canvas().click( 'p[data-type="core/paragraph"] a' );
 			const expectedContent = await canvas().$x(
 				'//p[contains(text(), "Header Template Part 789")]'
@@ -184,7 +184,7 @@ describe( 'Template Part', () => {
 			await page.keyboard.type( 'My template part' );
 			await page.keyboard.press( 'Enter' );
 
-			// Wait for creation to finish
+			// Wait for creation to finish.
 			await page.waitForXPath(
 				'//*[contains(@class, "components-snackbar")]/*[text()="Template part created."]'
 			);
@@ -233,7 +233,7 @@ describe( 'Template Part', () => {
 			await page.keyboard.type( 'My multi  template part' );
 			await page.keyboard.press( 'Enter' );
 
-			// Wait for creation to finish
+			// Wait for creation to finish.
 			await page.waitForXPath(
 				'//*[contains(@class, "components-snackbar")]/*[text()="Template part created."]'
 			);
@@ -250,20 +250,21 @@ describe( 'Template Part', () => {
 				finalTemplateParts.length - initialTemplateParts.length
 			).toBe( 1 );
 		} );
+
 		describe( 'Template part placeholder', () => {
 			// Test constants for template part.
 			const testContent = 'some words...';
 
-			// Selectors
+			// Selectors.
 			const entitiesSaveSelector =
 				'.editor-entities-saved-states__save-button';
 			const savePostSelector = '.edit-site-save-button__button';
 			const templatePartSelector = '*[data-type="core/template-part"]';
 			const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
-			const createNewButtonSelector =
-				'//button[contains(text(), "New template part")]';
+			const startBlockButtonSelector =
+				'//button[contains(text(), "Start blank")]';
 			const chooseExistingButtonSelector =
-				'//button[contains(text(), "Choose existing")]';
+				'//button[contains(text(), "Choose")]';
 			const confirmTitleButtonSelector =
 				'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
@@ -273,13 +274,10 @@ describe( 'Template Part', () => {
 
 				// Create new template part.
 				await insertBlock( 'Template Part' );
-				await siteEditorCanvas.waitForXPath(
-					chooseExistingButtonSelector
+				const startBlankButton = await siteEditorCanvas.waitForXPath(
+					startBlockButtonSelector
 				);
-				const [ createNewButton ] = await siteEditorCanvas.$x(
-					createNewButtonSelector
-				);
-				await createNewButton.click();
+				await startBlankButton.click();
 				const confirmTitleButton = await page.waitForSelector(
 					confirmTitleButtonSelector
 				);
@@ -318,13 +316,16 @@ describe( 'Template Part', () => {
 					chooseExistingButtonSelector
 				);
 				await chooseExistingButton.click();
-				await page.waitForSelector(
-					'.wp-block-template-part__selection-preview-container'
-				);
 				const preview = await page.waitForSelector(
-					'.wp-block-template-part__selection-preview-item[aria-label="Create New"]'
+					'.block-editor-block-patterns-list__item'
 				);
 				await preview.click();
+
+				// Wait for the template parts to load properly.
+				await siteEditorCanvas.waitForSelector(
+					'[data-type="core/template-part"] > p:first-child'
+				);
+
 				// We now have the same template part two times in the page, so check accordingly.
 				const paragraphs = await siteEditorCanvas.$$eval(
 					'[data-type="core/template-part"] > p:first-child',

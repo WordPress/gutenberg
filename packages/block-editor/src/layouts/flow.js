@@ -115,7 +115,10 @@ export default {
 		let output =
 			!! contentSize || !! wideSize
 				? `
-					${ appendSelectors( selector, '> :not(.alignleft):not(.alignright)' ) } {
+					${ appendSelectors(
+						selector,
+						'> :where(:not(.alignleft):not(.alignright))'
+					) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;
 						margin-right: auto !important;

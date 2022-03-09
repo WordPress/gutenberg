@@ -13,21 +13,21 @@ module.exports = ( environment = '', file ) => {
 	};
 	switch ( environment ) {
 		case 'main':
-			// to be merged as a presetEnv option
+			// To be merged as a presetEnv option.
 			callerOpts.caller.modules = 'commonjs';
 			break;
 		case 'module':
-			// to be merged as a presetEnv option
+			// To be merged as a presetEnv option.
 			callerOpts.caller.modules = false;
-			// to be merged as a pluginTransformRuntime option
+			// To be merged as a pluginTransformRuntime option.
 			callerOpts.caller.useESModules = true;
 			break;
 		default:
-			// preventing measure, this shouldn't happen ever
+			// Preventing measure, this shouldn't happen ever.
 			delete callerOpts.caller;
 	}
 
-	// Sourcemaps options
+	// Sourcemaps options.
 	const sourceMapsOpts = {
 		sourceMaps: true,
 		sourceFileName: file,

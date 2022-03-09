@@ -34,7 +34,7 @@ export default function BoxControlIcon( {
 	const bottom = hasSide( 'bottom' ) || hasSide( 'vertical' );
 	const left = hasSide( 'left' ) || hasSide( 'horizontal' );
 
-	// Simulates SVG Icon scaling
+	// Simulates SVG Icon scaling.
 	const scale = size / BASE_ICON_SIZE;
 
 	return (

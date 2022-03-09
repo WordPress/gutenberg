@@ -2,6 +2,8 @@
 
 We will build the application as a WordPress plugin, which means you need to have WordPress itself installed. One way to do this is by following the instructions on the [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) page. Once your setup is complete, you can follow along with the rest of this tutorial.
 
+Also, this tutorial will lean heavily on Redux concepts such as state, actions, and selectors. If you are not familiar with them, you may want to start by reviewing [Getting Started With Redux](https://redux.js.org/introduction/getting-started).
+
 ## Creating a plugin
 
 We'll do all the development inside of a WordPress plugin. Let's start by creating a `wp-content/plugins/my-first-gutenberg-app` directory in your local WordPress environment. We will need to create three files inside that directory:
@@ -33,6 +35,7 @@ window.addEventListener( 'load', function() {
 ```css
 .toplevel_page_my-first-gutenberg-app #wpcontent {
 	background: #FFF;
+	height: 1000px;
 }
 #my-first-gutenberg-app {
 	max-width: 500px;
@@ -40,6 +43,20 @@ window.addEventListener( 'load', function() {
 #my-first-gutenberg-app ul,
 #my-first-gutenberg-app ul li {
 	list-style-type: disc;
+}
+.my-gutenberg-form .form-buttons {
+	display: flex;
+	margin-top: 20px;
+	margin-left: 1px;
+}
+.my-gutenberg-form .form-error {
+	color: #cc1818;
+}
+.my-gutenberg-form .form-buttons button {
+	margin-right: 4px;
+}
+.my-gutenberg-form .form-buttons .components-spinner {
+	margin-top: 0;
 }
 #my-first-gutenberg-app ul {
 	padding-left: 20px;
@@ -106,7 +123,9 @@ function load_custom_wp_admin_scripts( $hook ) {
 	// Load our style.css.
 	wp_register_style(
 		'my-first-gutenberg-app',
-		plugins_url( 'style.css', __FILE__ )
+		plugins_url( 'style.css', __FILE__ ),
+		array(),
+		$asset_file['version']
 	);
 	wp_enqueue_style( 'my-first-gutenberg-app' );
 }
@@ -159,12 +178,12 @@ Once all the dependencies are in place, all that's left is to run `npm start` an
 
 If you now go to the Plugins page, you should see a plugin called **My first Gutenberg App**. Go ahead and activate it. A new menu item labeled _My first Gutenberg app_ should show up. Once you click it, you will see a page that says _Hello from JavaScript!_:
 
-![](./media/setup/hello-from-js.jpg)
+![](/docs/how-to-guides/data-basics/media/setup/hello-from-js.jpg)
 
 Congratulations! You are now ready to start building the app!
 
 ## What's next?
 
-* Previous part: [Introduction](./README.md)
-* Next part: [Building a basic list of pages](./2-building-a-list-of-pages.md)
+* Previous part: [Introduction](/docs/how-to-guides/data-basics/README.md)
+* Next part: [Building a basic list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
 * (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository
