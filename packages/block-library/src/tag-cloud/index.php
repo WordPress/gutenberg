@@ -13,9 +13,12 @@
  * @return string Returns the tag cloud for selected taxonomy.
  */
 function render_block_core_tag_cloud( $attributes ) {
+    $smallestFontSize = $attributes['smallestFontSize'];
+    $unit = preg_match('/[0-9.]+([a-zA-Z%]+)$/', $smallestFontSize) ? preg_replace( '/^\d*\.?\d*/', '', $smallestFontSize ): 'pt';
+
 	$args      = array(
 		'echo'       => false,
-		'unit'       => preg_replace( '/^\d*\.?\d*/', '', $attributes['smallestFontSize'] ),
+		'unit'       => $unit,
 		'taxonomy'   => $attributes['taxonomy'],
 		'show_count' => $attributes['showTagCounts'],
 		'number'     => $attributes['numberOfTags'],
