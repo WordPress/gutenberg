@@ -33,7 +33,7 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ () => {} } /> );
 
 			expect(
-				screen.getByRole( 'textbox', { name: 'Box Control' } )
+				screen.getByRole( 'spinbutton', { name: 'Box Control' } )
 			).toBeVisible();
 		} );
 
@@ -42,19 +42,13 @@ describe( 'BoxControl', () => {
 
 			render( <BoxControl onChange={ () => {} } /> );
 
-			const input = screen.getByRole( 'textbox', {
+			const input = screen.getByRole( 'spinbutton', {
 				name: 'Box Control',
 			} );
 
-			await user.type( input, '100%' );
-			await user.keyboard( '{Enter}' );
+			await user.type( input, '100' );
 
-			expect( input ).toHaveValue( '100' );
-			expect(
-				screen.getByRole( 'combobox', {
-					name: 'Select unit',
-				} )
-			).toHaveValue( '%' );
+			expect( input ).toHaveValue( 100 );
 		} );
 	} );
 
@@ -64,23 +58,17 @@ describe( 'BoxControl', () => {
 
 			render( <BoxControl onChange={ () => {} } /> );
 
-			const input = screen.getByRole( 'textbox', {
+			const input = screen.getByRole( 'spinbutton', {
 				name: 'Box Control',
 			} );
-			const select = screen.getByRole( 'combobox', {
-				name: 'Select unit',
-			} );
 
-			await user.type( input, '100px' );
-			await user.keyboard( '{Enter}' );
+			await user.type( input, '100' );
 
-			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
+			expect( input ).toHaveValue( 100 );
 
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
-			expect( input ).toHaveValue( '' );
-			expect( select ).toHaveValue( 'px' );
+			expect( input ).toHaveValue( null );
 		} );
 
 		it( 'should reset values when clicking Reset, if controlled', async () => {
@@ -88,23 +76,17 @@ describe( 'BoxControl', () => {
 
 			render( <Example /> );
 
-			const input = screen.getByRole( 'textbox', {
+			const input = screen.getByRole( 'spinbutton', {
 				name: 'Box Control',
 			} );
-			const select = screen.getByRole( 'combobox', {
-				name: 'Select unit',
-			} );
 
-			await user.type( input, '100px' );
-			await user.keyboard( '{Enter}' );
+			await user.type( input, '100' );
 
-			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
+			expect( input ).toHaveValue( 100 );
 
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
-			expect( input ).toHaveValue( '' );
-			expect( select ).toHaveValue( 'px' );
+			expect( input ).toHaveValue( null );
 		} );
 
 		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', async () => {
@@ -112,23 +94,17 @@ describe( 'BoxControl', () => {
 
 			render( <Example /> );
 
-			const input = screen.getByRole( 'textbox', {
+			const input = screen.getByRole( 'spinbutton', {
 				name: 'Box Control',
 			} );
-			const select = screen.getByRole( 'combobox', {
-				name: 'Select unit',
-			} );
 
-			await user.type( input, '100px' );
-			await user.keyboard( '{Enter}' );
+			await user.type( input, '100' );
 
-			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
+			expect( input ).toHaveValue( 100 );
 
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
-			expect( input ).toHaveValue( '' );
-			expect( select ).toHaveValue( 'px' );
+			expect( input ).toHaveValue( null );
 		} );
 
 		it( 'should persist cleared value when focus changes', async () => {
@@ -137,26 +113,20 @@ describe( 'BoxControl', () => {
 
 			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
 
-			const input = screen.getByRole( 'textbox', {
+			const input = screen.getByRole( 'spinbutton', {
 				name: 'Box Control',
 			} );
 
-			await user.type( input, '100%' );
-			await user.keyboard( '{Enter}' );
+			await user.type( input, '100' );
 
-			expect( input ).toHaveValue( '100' );
-			expect(
-				screen.getByRole( 'combobox', {
-					name: 'Select unit',
-				} )
-			).toHaveValue( '%' );
+			expect( input ).toHaveValue( 100 );
 
 			await user.clear( input );
-			expect( input ).toHaveValue( '' );
+			expect( input ).toHaveValue( null );
 			// Clicking document.body to trigger a blur event on the input.
 			await user.click( document.body );
 
-			expect( input ).toHaveValue( '' );
+			expect( input ).toHaveValue( null );
 			expect( spyChange ).toHaveBeenLastCalledWith( {
 				top: undefined,
 				right: undefined,
@@ -177,29 +147,22 @@ describe( 'BoxControl', () => {
 			);
 
 			await user.type(
-				screen.getByRole( 'textbox', { name: 'Top' } ),
-				'100px'
+				screen.getByRole( 'spinbutton', { name: 'Top' } ),
+				'100'
 			);
-			await user.keyboard( '{Enter}' );
 
 			expect(
-				screen.getByRole( 'textbox', { name: 'Top' } )
-			).toHaveValue( '100' );
+				screen.getByRole( 'spinbutton', { name: 'Top' } )
+			).toHaveValue( 100 );
 			expect(
-				screen.getByRole( 'textbox', { name: 'Right' } )
+				screen.getByRole( 'spinbutton', { name: 'Right' } )
 			).not.toHaveValue();
 			expect(
-				screen.getByRole( 'textbox', { name: 'Bottom' } )
+				screen.getByRole( 'spinbutton', { name: 'Bottom' } )
 			).not.toHaveValue();
 			expect(
-				screen.getByRole( 'textbox', { name: 'Left' } )
+				screen.getByRole( 'spinbutton', { name: 'Left' } )
 			).not.toHaveValue();
-
-			screen
-				.getAllByRole( 'combobox', { name: 'Select unit' } )
-				.forEach( ( combobox ) => {
-					expect( combobox ).toHaveValue( 'px' );
-				} );
 		} );
 
 		it( 'should update a whole axis when value is changed when unlinked', async () => {
@@ -212,25 +175,18 @@ describe( 'BoxControl', () => {
 			);
 
 			await user.type(
-				screen.getByRole( 'textbox', {
+				screen.getByRole( 'spinbutton', {
 					name: 'Vertical',
 				} ),
-				'100px'
+				'100'
 			);
-			await user.keyboard( '{Enter}' );
 
 			expect(
-				screen.getByRole( 'textbox', { name: 'Vertical' } )
-			).toHaveValue( '100' );
+				screen.getByRole( 'spinbutton', { name: 'Vertical' } )
+			).toHaveValue( 100 );
 			expect(
-				screen.getByRole( 'textbox', { name: 'Horizontal' } )
+				screen.getByRole( 'spinbutton', { name: 'Horizontal' } )
 			).not.toHaveValue();
-
-			screen
-				.getAllByRole( 'combobox', { name: 'Select unit' } )
-				.forEach( ( combobox ) => {
-					expect( combobox ).toHaveValue( 'px' );
-				} );
 		} );
 	} );
 
@@ -326,18 +282,17 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ setState } /> );
 
 			await user.type(
-				screen.getByRole( 'textbox', {
+				screen.getByRole( 'spinbutton', {
 					name: 'Box Control',
 				} ),
-				'7.5rem'
+				'7.5'
 			);
-			await user.keyboard( '{Enter}' );
 
 			expect( setState ).toHaveBeenCalledWith( {
-				top: '7.5rem',
-				right: '7.5rem',
-				bottom: '7.5rem',
-				left: '7.5rem',
+				top: '7.5px',
+				right: '7.5px',
+				bottom: '7.5px',
+				left: '7.5px',
 			} );
 		} );
 

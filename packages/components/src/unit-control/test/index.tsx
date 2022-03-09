@@ -233,9 +233,9 @@ describe( 'UnitControl', () => {
 			// Input type is `text` when the `isPressEnterToChange` prop is passed
 			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
-			await user.type( input, '300px' );
+			await user.type( input, '300' );
 
-			expect( input.value ).toBe( '300px' );
+			expect( input.value ).toBe( '300' );
 			expect( state ).toBe( 50 );
 
 			await user.keyboard( '{Escape}' );
@@ -277,10 +277,9 @@ describe( 'UnitControl', () => {
 			expect( onBlurSpy ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
+		it( 'should invoke onChange when isPressEnterToChange is true and the input is blurred with an uncommitted value', async () => {
 			const user = userEvent.setup();
 
-			const onUnitChangeSpy = jest.fn();
 			const onChangeSpy = jest.fn();
 
 			let state: string | undefined = '15px';
@@ -293,7 +292,6 @@ describe( 'UnitControl', () => {
 				<UnitControl
 					value={ state }
 					onChange={ setState }
-					onUnitChange={ onUnitChangeSpy }
 					isPressEnterToChange
 				/>
 			);
@@ -301,23 +299,15 @@ describe( 'UnitControl', () => {
 			// Input type is `text` when the `isPressEnterToChange` prop is passed
 			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
-			await user.type( input, '41vh' );
+			// Typing the first letter of a unit blurs the input.
+			await user.type( input, '41v' );
 
-			// This is because `isPressEnterToChange` is `true`
-			expect( onChangeSpy ).not.toHaveBeenCalled();
-			expect( onUnitChangeSpy ).not.toHaveBeenCalled();
-
-			// Clicking document.body to trigger a blur event on the input.
-			await user.click( document.body );
-
+			// Called only once because `isPressEnterToChange` is `true`.
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
-			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41vh' );
 
-			expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 );
-			expect( onUnitChangeSpy ).toHaveBeenLastCalledWith(
-				'vh',
-				expect.anything()
-			);
+			// True for the test environment but in common browsers this would
+			// be last called with '41vw' (after the call with '41px').
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41px' );
 		} );
 
 		it( 'should update value correctly when typed and blurred when a single unit is passed', async () => {
@@ -560,121 +550,6 @@ describe( 'UnitControl', () => {
 	} );
 
 	describe( 'Unit Parser', () => {
-		it( 'should parse unit from input', async () => {
-			const user = userEvent.setup();
-
-			let state = '10px';
-			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
-
-			render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			// Input type is `text` when the `isPressEnterToChange` prop is passed
-			const input = getInput( { isInputTypeText: true } );
-			await user.clear( input );
-			await user.type( input, '55 em' );
-			await user.keyboard( '{Enter}' );
-
-			expect( state ).toBe( '55em' );
-		} );
-
-		it( 'should parse PX unit from input', async () => {
-			const user = userEvent.setup();
-
-			let state = '10px';
-			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
-
-			render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			// Input type is `text` when the `isPressEnterToChange` prop is passed
-			const input = getInput( { isInputTypeText: true } );
-			await user.clear( input );
-			await user.type( input, '61   PX' );
-			await user.keyboard( '{Enter}' );
-
-			expect( state ).toBe( '61px' );
-		} );
-
-		it( 'should parse EM unit from input', async () => {
-			const user = userEvent.setup();
-
-			let state = '10px';
-			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
-
-			render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			// Input type is `text` when the `isPressEnterToChange` prop is passed
-			const input = getInput( { isInputTypeText: true } );
-			await user.clear( input );
-			await user.type( input, '55 em' );
-			await user.keyboard( '{Enter}' );
-
-			expect( state ).toBe( '55em' );
-		} );
-
-		it( 'should parse % unit from input', async () => {
-			const user = userEvent.setup();
-
-			let state = '10px';
-			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
-
-			render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			// Input type is `text` when the `isPressEnterToChange` prop is passed
-			const input = getInput( { isInputTypeText: true } );
-			await user.clear( input );
-			await user.type( input, '-10  %' );
-			await user.keyboard( '{Enter}' );
-
-			expect( state ).toBe( '-10%' );
-		} );
-
-		it( 'should parse REM unit from input', async () => {
-			const user = userEvent.setup();
-
-			let state = '10px';
-			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
-
-			render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			// Input type is `text` when the `isPressEnterToChange` prop is passed
-			const input = getInput( { isInputTypeText: true } );
-			await user.clear( input );
-			await user.type( input, '123       rEm  ' );
-			await user.keyboard( '{Enter}' );
-
-			expect( state ).toBe( '123rem' );
-		} );
-
 		it( 'should update unit after initial render and with new unit prop', async () => {
 			const { rerender } = render( <UnitControl value={ '10%' } /> );
 
@@ -709,6 +584,19 @@ describe( 'UnitControl', () => {
 
 			expect( select.value ).toBe( '%' );
 			expect( options.length ).toBe( 3 );
+		} );
+	} );
+
+	describe( 'Unit switching convenience', () => {
+		it( 'should focus unit select when a charater matches the first of one of the units', async () => {
+			const user = userEvent.setup();
+			render( <UnitControl value={ '10%' } /> );
+
+			const input = getInput();
+			await user.clear( input );
+			await user.type( input, '55 e' );
+
+			expect( getSelect() ).toHaveFocus();
 		} );
 	} );
 } );
