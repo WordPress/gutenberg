@@ -94,6 +94,37 @@ describe( 'NumberControl', () => {
 				expect( spy ).toHaveBeenNthCalledWith( 2, 4 );
 			} );
 		} );
+
+		it( 'should call onChange callback when value is not valid', () => {
+			const spy = jest.fn();
+			render(
+				<NumberControl
+					value={ 5 }
+					min={ 1 }
+					max={ 10 }
+					onChange={ ( v, extra ) =>
+						spy( v, extra.event.target.validity.valid )
+					}
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: 14 } } );
+
+			expect( input.value ).toBe( '14' );
+
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '10' );
+
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+
+			// First call: invalid, unclamped value
+			expect( spy ).toHaveBeenNthCalledWith( 1, '14', false );
+			// Second call: valid, clamped value
+			expect( spy ).toHaveBeenNthCalledWith( 2, 10, true );
+		} );
 	} );
 
 	describe( 'Validation', () => {

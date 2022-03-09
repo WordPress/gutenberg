@@ -97,6 +97,20 @@ The minimum `value` allowed.
 -   Required: No
 -   Default: `-Infinity`
 
+### onChange
+
+Callback fired whenever the value of the input changes.
+
+The callback receives two arguments:
+
+1. `newValue`: the new value of the input
+2. `extra`: an object containing, under the `event` key, the original browser event.
+
+Note that the value received as the first argument of the callback is _not_ guaranteed to be a valid value (e.g. it could be outside of the range defined by the [`min`, `max`] props). In order to check the value's validity, check the `event.target.validity.valid` property from the callback's second argument.
+
+-   Type: `(newValue, extra) => void`
+-   Required: No
+
 ### required
 
 If `true` enforces a valid number within the control's min/max range. If `false` allows an empty string as a valid value.
