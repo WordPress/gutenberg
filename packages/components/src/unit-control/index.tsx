@@ -254,7 +254,7 @@ function UnconnectedUnitControl(
 }
 
 /**
- * `UnitControl` allows the user to set a value as well as a unit (e.g. `px`).
+ * `UnitControl` allows the user to set a numeric quantity as well as a unit (e.g. `px`).
  *
  *
  * @example
