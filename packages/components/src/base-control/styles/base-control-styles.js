@@ -15,8 +15,16 @@ export const Wrapper = styled.div`
 	font-size: ${ font( 'default.fontSize' ) };
 `;
 
+const deprecatedMargin = ( { __nextHasNoMarginBottom = false } ) => {
+	return ! __nextHasNoMarginBottom
+		? css`
+				margin-bottom: ${ space( 2 ) };
+		  `
+		: undefined;
+};
+
 export const StyledField = styled.div`
-	margin-bottom: ${ space( 2 ) };
+	${ deprecatedMargin }
 
 	.components-panel__row & {
 		margin-bottom: inherit;
@@ -33,6 +41,7 @@ export const StyledLabel = styled.label`
 `;
 
 export const StyledHelp = styled.p`
+	margin-top: ${ space( 2 ) };
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
 	color: ${ COLORS.mediumGray.text };

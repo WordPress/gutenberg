@@ -22,6 +22,7 @@ const BaseControlWithTextarea = ( { id, ...props } ) => {
 
 export const Default = BaseControlWithTextarea.bind( {} );
 Default.args = {
+	__nextHasNoMarginBottom: true,
 	id: 'textarea-1',
 	label: '',
 	hideLabelFromVision: false,

@@ -10,7 +10,7 @@ Render a BaseControl for a textarea input:
 import { BaseControl } from '@wordpress/components';
 
 const MyBaseControl = () => (
-	<BaseControl id="textarea-1" label="Text" help="Enter some text">
+	<BaseControl id="textarea-1" label="Text" help="Enter some text" __nextHasNoMarginBottom={ true }>
 		<textarea id="textarea-1" />
 	</BaseControl>
 );
@@ -62,6 +62,14 @@ The content to be displayed within the BaseControl.
 
 -   Type: `Element`
 -   Required: Yes
+
+### __nextHasNoMarginBottom
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+Start opting into the new margin-free styles that will become the default in a future version.
 
 ## BaseControl.VisualLabel
 
