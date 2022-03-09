@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { describe, expect, it } from '@jest/globals';
+
+/**
  * Internal dependencies
  */
 import {
@@ -7,21 +12,28 @@ import {
 	getValidParsedQuantityAndUnit,
 	getUnitsWithCurrentUnit,
 } from '../utils';
+import type { WPUnitControlUnit } from '../types';
 
 describe( 'UnitControl utils', () => {
 	describe( 'useCustomUnits', () => {
 		it( 'should return filtered css units', () => {
-			const cssUnits = [ { value: 'px' }, { value: '%' } ];
+			const cssUnits = [
+				{ value: 'px', label: 'pixel' },
+				{ value: '%', label: 'percent' },
+			];
 			const units = useCustomUnits( {
 				availableUnits: [ 'em', 'px' ],
 				units: cssUnits,
 			} );
 
-			expect( units ).toEqual( [ { value: 'px' } ] );
+			expect( units ).toEqual( [ { value: 'px', label: 'pixel' } ] );
 		} );
 
 		it( 'should add default values to available units', () => {
-			const cssUnits = [ { value: 'px' }, { value: '%' } ];
+			const cssUnits = [
+				{ value: 'px', label: 'pixel' },
+				{ value: '%', label: 'percent' },
+			];
 			const units = useCustomUnits( {
 				availableUnits: [ '%', 'px' ],
 				defaultValues: { '%': 10, px: 10 },
@@ -29,8 +41,8 @@ describe( 'UnitControl utils', () => {
 			} );
 
 			expect( units ).toEqual( [
-				{ value: 'px', default: 10 },
-				{ value: '%', default: 10 },
+				{ value: 'px', label: 'pixel', default: 10 },
+				{ value: '%', label: 'percent', default: 10 },
 			] );
 		} );
 
@@ -38,24 +50,32 @@ describe( 'UnitControl utils', () => {
 			// Although the public APIs of the component expect a `number` as the type of the
 			// default values, it's still good to test for strings (as it can happen in un-typed
 			// environments)
-			const cssUnits = [ { value: 'px' }, { value: '%' } ];
+			const cssUnits = [
+				{ value: 'px', label: 'pixel' },
+				{ value: '%', label: 'percent' },
+			];
 			const units = useCustomUnits( {
 				availableUnits: [ '%', 'px' ],
 				defaultValues: {
+					// @ts-ignore (passing a string instead of a number is the point of the test)
 					'%': '14',
+					// @ts-ignore (passing a string instead of a number is the point of the test)
 					px: 'not a valid numeric quantity',
 				},
 				units: cssUnits,
 			} );
 
 			expect( units ).toEqual( [
-				{ value: 'px', default: undefined },
-				{ value: '%', default: 14 },
+				{ value: 'px', label: 'pixel', default: undefined },
+				{ value: '%', label: 'percent', default: 14 },
 			] );
 		} );
 
 		it( 'should return an empty array where availableUnits match no preferred css units', () => {
-			const cssUnits = [ { value: 'em' }, { value: 'vh' } ];
+			const cssUnits = [
+				{ value: 'em', label: 'em' },
+				{ value: 'vh', label: 'vh' },
+			];
 			const units = useCustomUnits( {
 				availableUnits: [ '%', 'px' ],
 				defaultValues: { '%': 10, px: 10 },
@@ -69,16 +89,19 @@ describe( 'UnitControl utils', () => {
 	describe( 'filterUnitsWithSettings', () => {
 		it( 'should return filtered units array', () => {
 			const preferredUnits = [ '%', 'px' ];
-			const availableUnits = [ { value: 'px' }, { value: 'em' } ];
+			const availableUnits = [
+				{ value: 'px', label: 'pixel' },
+				{ value: 'em', label: 'em' },
+			];
 
 			expect(
 				filterUnitsWithSettings( preferredUnits, availableUnits )
-			).toEqual( [ { value: 'px' } ] );
+			).toEqual( [ { value: 'px', label: 'pixel' } ] );
 		} );
 
 		it( 'should return empty array where preferred units match no available css unit', () => {
 			const preferredUnits = [ '%', 'px' ];
-			const availableUnits = [ { value: 'em' } ];
+			const availableUnits = [ { value: 'em', label: 'em' } ];
 
 			expect(
 				filterUnitsWithSettings( preferredUnits, availableUnits )
@@ -92,13 +115,14 @@ describe( 'UnitControl utils', () => {
 			const availableUnits = false;
 
 			expect(
+				// @ts-ignore (passing `false` instead of a valid array of units is the point of the test)
 				filterUnitsWithSettings( preferredUnits, availableUnits )
 			).toEqual( [] );
 		} );
 
 		it( 'should return empty array where available units is set to an empty array', () => {
 			const preferredUnits = [ '%', 'px' ];
-			const availableUnits = [];
+			const availableUnits: WPUnitControlUnit[] = [];
 
 			expect(
 				filterUnitsWithSettings( preferredUnits, availableUnits )
@@ -127,7 +151,7 @@ describe( 'UnitControl utils', () => {
 
 		it( 'should return fallback value', () => {
 			const nextValue = 'thirteen';
-			const preferredUnits = [ { value: 'em' } ];
+			const preferredUnits = [ { value: 'em', label: 'em' } ];
 			const fallbackValue = 13;
 
 			expect(
@@ -155,7 +179,7 @@ describe( 'UnitControl utils', () => {
 
 		it( 'should return first unit in preferred units collection as second fallback unit', () => {
 			const nextValue = 101;
-			const preferredUnits = [ { value: 'px' } ];
+			const preferredUnits = [ { value: 'px', label: 'pixel' } ];
 
 			expect(
 				getValidParsedQuantityAndUnit( nextValue, preferredUnits )
@@ -185,8 +209,8 @@ describe( 'UnitControl utils', () => {
 			expect( result ).toHaveLength( 3 );
 
 			const currentUnit = result.shift();
-			expect( currentUnit.value ).toBe( '%' );
-			expect( currentUnit.label ).toBe( '%' );
+			expect( currentUnit?.value ).toBe( '%' );
+			expect( currentUnit?.label ).toBe( '%' );
 			expect( result ).toEqual( limitedUnits );
 		} );
 
@@ -196,8 +220,8 @@ describe( 'UnitControl utils', () => {
 			expect( result ).toHaveLength( 3 );
 
 			const currentUnit = result.shift();
-			expect( currentUnit.value ).toBe( '%' );
-			expect( currentUnit.label ).toBe( '%' );
+			expect( currentUnit?.value ).toBe( '%' );
+			expect( currentUnit?.label ).toBe( '%' );
 			expect( result ).toEqual( limitedUnits );
 		} );
 
