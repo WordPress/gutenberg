@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	__experimentalUseEntityRecords as useEntityRecords,
+} from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	VisuallyHidden,
@@ -18,26 +21,15 @@ import Actions from './actions';
 import AddedBy from './added-by';
 
 export default function Table( { templateType } ) {
-	const { templates, isLoading, postType } = useSelect(
-		( select ) => {
-			const {
-				getEntityRecords,
-				hasFinishedResolution,
-				getPostType,
-			} = select( coreStore );
-
-			return {
-				templates: getEntityRecords( 'postType', templateType, {
-					per_page: -1,
-				} ),
-				isLoading: ! hasFinishedResolution( 'getEntityRecords', [
-					'postType',
-					templateType,
-					{ per_page: -1 },
-				] ),
-				postType: getPostType( templateType ),
-			};
-		},
+	const { records: templates, isResolving: isLoading } = useEntityRecords(
+		'postType',
+		templateType,
+		{
+			per_page: -1,
+		}
+	);
+	const postType = useSelect(
+		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]
 	);
 

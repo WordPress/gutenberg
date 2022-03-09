@@ -13,6 +13,7 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { __ } from '@wordpress/i18n';
 import { store as viewportStore } from '@wordpress/viewport';
 import { getQueryArgs } from '@wordpress/url';
@@ -56,6 +57,14 @@ export function reinitializeEditor( target, settings ) {
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	{
+		dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
+			editorMode: 'visual',
+			fixedToolbar: false,
+			focusMode: false,
+			welcomeGuide: true,
+			welcomeGuideStyles: true,
+		} );
+
 		dispatch( editSiteStore ).updateSettings( settings );
 
 		// Keep the defaultTemplateTypes in the core/editor settings too,

@@ -29,6 +29,7 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
+import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -72,6 +73,23 @@ function attributesFromMedia( {
 	setAttributes,
 } ) {
 	return ( media ) => {
+		if ( ! media || ! media.url ) {
+			setAttributes( {
+				mediaAlt: undefined,
+				mediaId: undefined,
+				mediaType: undefined,
+				mediaUrl: undefined,
+				mediaLink: undefined,
+				href: undefined,
+				focalPoint: undefined,
+			} );
+			return;
+		}
+
+		if ( isBlobURL( media.url ) ) {
+			media.type = getBlobTypeByURL( media.url );
+		}
+
 		let mediaType;
 		let src;
 		// For media selections originated from a file upload.
