@@ -64,11 +64,19 @@ class Gutenberg_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 	 * template parts, theme.json and index.php from the site editor,
 	 * and close the connection.
 	 *
+	 * @param $type copy|templates-styles Are we exporting a copy of the theme or just the templates and styles?
 	 * @return WP_Error|void
 	 */
-	public function export() {
+	public function export( $type ) {
 		// Generate the export file.
-		$filename = gutenberg_generate_block_templates_export_file();
+		$filename = gutenberg_generate_block_templates_export_file( $type );
+
+		// Define the zip file name.
+		$theme_name = wp_get_theme()->get('TextDomain');
+		$zipname = $theme_name . '.zip';
+		if ( 'templates-styles' === $type ) {
+			$zipname = $theme_name . '-edited.zip';
+		}
 
 		if ( is_wp_error( $filename ) ) {
 			$filename->add_data( array( 'status' => 500 ) );
@@ -76,8 +84,9 @@ class Gutenberg_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 			return $filename;
 		}
 
+		// Output the zip file.
 		header( 'Content-Type: application/zip' );
-		header( 'Content-Disposition: attachment; filename=edit-site-export.zip' );
+		header( 'Content-Disposition: attachment; filename=' . $zipname );
 		header( 'Content-Length: ' . filesize( $filename ) );
 		flush();
 		readfile( $filename );

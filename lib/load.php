@@ -127,3 +127,5 @@ require __DIR__ . '/block-supports/layout.php';
 require __DIR__ . '/block-supports/spacing.php';
 require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
+
+require __DIR__ . '/theme-export.php';
