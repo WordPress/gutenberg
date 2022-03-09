@@ -36,13 +36,16 @@ export interface EntityDeclaration {
 /**
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
-type EntityQuery< C extends Context > = Record< string, any > & {
+export type EntityQuery<
+	C extends Context,
+	Fields extends string[] | undefined = undefined
+> = Record< string, any > & {
 	context?: C;
 	/**
 	 * The requested fields. If specified, the REST API will remove from the response
 	 * any fields not on that list.
 	 */
-	_fields?: string[];
+	_fields?: Fields;
 };
 
 /**

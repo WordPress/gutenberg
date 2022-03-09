@@ -1,11 +1,19 @@
 /**
  * Internal dependencies
  */
-import type { Context, Theme, Updatable, User, WpTemplate } from './index';
+import type {
+	Context,
+	Theme,
+	Updatable,
+	User,
+	WpTemplate,
+	Comment,
+} from './index';
 import type {
 	DefaultContextOf,
 	EntityDeclaration,
 	EntityOf,
+	EntityQuery,
 	KeyOf,
 	Kind,
 	KindOf,
@@ -56,10 +64,7 @@ export type getEntityRecord = <
 	kind: K,
 	name: N,
 	key: KeyOf< R >,
-	query?: {
-		context?: C;
-		_fields?: Fields;
-	}
+	query?: EntityQuery< C, Fields >
 ) =>
 	| ( Fields extends undefined
 			? RecordOf< K, N, C >
@@ -99,10 +104,7 @@ export type getEntityRecords = <
 	state: State,
 	kind: K,
 	name: N,
-	query?: {
-		context?: C;
-		_fields?: Fields;
-	}
+	query?: EntityQuery< C, Fields >
 ) =>
 	| Array<
 			Fields extends undefined
