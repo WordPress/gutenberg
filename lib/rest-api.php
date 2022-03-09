@@ -10,6 +10,48 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+/**
+ * Add Default context field to type and taxonomy endpoints.
+ */
+function slug_add_post_data() {
+	register_rest_field( 'type',
+		'default_context',
+		array(
+			'get_callback'    => function ( $request ) {
+				$obj = get_post_type_object( $request['slug'] );
+
+				return ! current_user_can( $obj->cap->edit_posts ) ? 'view' : 'edit';
+			},
+			'update_callback' => null,
+			'schema'          => array(
+				'description' => __( 'Default context', 'gutenberg' ),
+				'type'        => 'string',
+				'readonly'    => true,
+				'context'     => array( 'view', 'edit', 'embed' )
+			)
+		)
+	);
+
+	register_rest_field( 'taxonomy',
+		'default_context',
+		array(
+			'get_callback'    => function ( $request ) {
+				$obj = get_taxonomy( $request['slug'] );
+
+				return ! current_user_can( $obj->cap->assign_terms ) ? 'view' : 'edit';
+			},
+			'update_callback' => null,
+			'schema'          => array(
+				'description' => __( 'Default context', 'gutenberg' ),
+				'type'        => 'string',
+				'readonly'    => true,
+				'context'     => array( 'view', 'edit', 'embed' )
+			)
+		)
+	);
+}
+
+add_action( 'rest_api_init', 'slug_add_post_data' );
 
 /**
  * Registers the REST API routes for URL Details.
