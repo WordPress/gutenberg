@@ -103,13 +103,14 @@ function InputField(
 		onBlur( event );
 		setIsFocused?.( false );
 
-		// If isPressEnterToChange is set, cause the `onChange` callback to be fired.
-		if ( isPressEnterToChange && isDirty ) {
+		/**
+		 * If isPressEnterToChange is set, this commits the value to
+		 * the onChange callback.
+		 */
+		if ( isDirty || ! event.target.validity.valid ) {
 			wasDirtyOnBlur.current = true;
+			handleOnCommit( event );
 		}
-
-		// Commit the value (which allows consumers to apply their validation)
-		handleOnCommit( event );
 	};
 
 	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
