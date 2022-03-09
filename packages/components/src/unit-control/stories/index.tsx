@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, number, select, text, object } from '@storybook/addon-knobs';
-import styled from '@emotion/styled';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -15,57 +14,55 @@ import { useState } from '@wordpress/element';
 import UnitControl from '../';
 import { CSS_UNITS } from '../utils';
 
-export default {
-	title: 'Components (Experimental)/UnitControl',
+const meta: ComponentMeta< typeof UnitControl > = {
 	component: UnitControl,
+	title: 'Components (Experimental)/UnitControl',
+	argTypes: {
+		disableUnits: { control: { type: 'boolean' } },
+		size: {
+      options: ['default', 'small', '__unstable-large'],
+			control: { type: 'select' }
+    },
+	},
 	parameters: {
-		knobs: { disable: false },
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-const ControlWrapperView = styled.div`
-	max-width: 80px;
-`;
-
-function Example() {
-	const [ value, setValue ] = useState( '10px' );
-
-	const props = {
-		disableUnits: boolean( 'disableUnits', false ),
-		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
-		isPressEnterToChange: boolean( 'isPressEnterToChange', true ),
-		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
-		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
-		label: text( 'label', 'Value' ),
-		min: number( 'min', 0 ),
-		max: number( 'max', 100 ),
-		shiftStep: number( 'shiftStep', 10 ),
-		size: select(
-			'size',
-			{
-				default: 'default',
-				small: 'small',
-				'__unstable-large': '__unstable-large',
-			},
-			'default'
-		),
-		step: number( 'step', 1 ),
-		units: object( 'units', CSS_UNITS ),
-	};
+const DefaultTemplate: ComponentStory< typeof UnitControl > = ( args ) => {
+	const [ value, setValue ] = useState<string | undefined>( '10px' );
 
 	return (
-		<ControlWrapperView>
+		<div style={{maxWidth: '80px'}}>
 			<UnitControl
-				{ ...props }
+				{ ...args }
 				value={ value }
 				onChange={ ( v ) => setValue( v ) }
 			/>
-		</ControlWrapperView>
+		</div>
 	);
-}
+};
 
-export const _default = () => {
-	return <Example />;
+export const Default: ComponentStory<
+	typeof UnitControl
+> = DefaultTemplate.bind({});
+Default.args = {
+	disableUnits: false,
+	hideLabelFromVision: false,
+	isPressEnterToChange: true,
+	isResetValueOnUnitChange: false,
+	isShiftStepEnabled: true,
+	isUnitSelectTabbable: true,
+	label: 'Value',
+	min: 0,
+	max: 100,
+	shiftStep: 10,
+	size: 'default',
+	step: 1,
+	units: CSS_UNITS,
+	onUnitChange: () => {},
 };
 
 // export const WithSingleUnit = ( props ) => {
