@@ -168,12 +168,6 @@ android {
     }
 }
 
-repositories {
-    google()
-    mavenCentral()
-    maven { url "https://jitpack.io" }
-}
-
 dependencies {
     implementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
         exclude group: 'org.wordpress', module: 'utils'
