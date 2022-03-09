@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "5.1.2",
+	"version": "5.1.3-next.620c52dd93.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
