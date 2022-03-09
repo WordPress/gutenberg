@@ -1,14 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, forwardRef } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { forwardRef, useMemo } from '@wordpress/element';
+import { useSelect, withSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import ServerSideRender from './server-side-render';
+import {
+	default as ServerSideRender,
+	useServerSideRender,
+} from './server-side-render';
 
 /**
  * Constants
@@ -59,3 +62,40 @@ if ( window && window.wp && window.wp.components ) {
 }
 
 export default ExportedServerSideRender;
+
+const useExportedServerSideRender = ( {
+	urlQueryArgs = EMPTY_OBJECT,
+	...props
+} ) => {
+	const currentPostId = useSelect( ( select ) => {
+		// FIXME: @wordpress/server-side-render should not depend on @wordpress/editor.
+		// It is used by blocks that can be loaded into a *non-post* block editor.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const coreEditorSelect = select( 'core/editor' );
+		if ( coreEditorSelect ) {
+			const _currentPostId = coreEditorSelect.getCurrentPostId();
+			// For templates and template parts we use a custom ID format.
+			// Since they aren't real posts, we don't want to use their ID
+			// for server-side rendering. Since they use a string based ID,
+			// we can assume real post IDs are numbers.
+			if ( _currentPostId && typeof _currentPostId === 'number' ) {
+				return _currentPostId;
+			}
+		}
+		return null;
+	}, [] );
+
+	const newUrlQueryArgs = useMemo( () => {
+		if ( currentPostId === null ) {
+			return urlQueryArgs;
+		}
+		return {
+			post_id: currentPostId,
+			...urlQueryArgs,
+		};
+	}, [ currentPostId, urlQueryArgs ] );
+
+	return useServerSideRender( { urlQueryArgs: newUrlQueryArgs, ...props } );
+};
+
+export { useExportedServerSideRender as useServerSideRender };

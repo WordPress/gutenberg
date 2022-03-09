@@ -15,8 +15,9 @@ import {
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import ServerSideRender from '@wordpress/server-side-render';
 import { store as coreStore } from '@wordpress/core-data';
+// import { useServerSideRender } from '@wordpress/server-side-render';
+import ServerSideRender from '@wordpress/server-side-render';
 
 /**
  * Minimum number of tags a user can show using this block.
@@ -85,6 +86,12 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			</PanelBody>
 		</InspectorControls>
 	);
+
+	// const renderedContent = useServerSideRender( {
+	// 	key: 'tag-cloud',
+	// 	block: 'core/tag-cloud',
+	// 	attributes,
+	// } );
 
 	return (
 		<>
