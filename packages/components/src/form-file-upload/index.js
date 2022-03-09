@@ -13,7 +13,7 @@ function FormFileUpload( {
 	children,
 	multiple = false,
 	onChange,
-	onInputFileClick,
+	onClick,
 	render,
 	...props
 } ) {
@@ -39,7 +39,8 @@ function FormFileUpload( {
 				style={ { display: 'none' } }
 				accept={ accept }
 				onChange={ onChange }
-				onClick={ onInputFileClick }
+				onClick={ onClick }
+				data-testid="input"
 			/>
 		</div>
 	);
