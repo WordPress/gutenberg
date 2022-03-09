@@ -4,7 +4,6 @@
 import BaseControl from '../';
 import Button from '../../button';
 import { Spacer } from '../../spacer';
-import TextareaControl from '../../textarea-control';
 
 export default {
 	title: 'Components/BaseControl',
@@ -15,7 +14,7 @@ export default {
 const BaseControlWithTextarea = ( { id, ...props } ) => {
 	return (
 		<BaseControl id={ id } { ...props }>
-			<TextareaControl id={ id } />
+			<textarea style={ { display: 'block' } } id={ id } />
 		</BaseControl>
 	);
 };
