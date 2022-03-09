@@ -13,11 +13,14 @@ import { space } from '../../ui/utils/space';
 export const Wrapper = styled.div`
 	font-family: ${ font( 'default.fontFamily' ) };
 	font-size: ${ font( 'default.fontSize' ) };
+	margin-bottom: ${ space( 2 ) };
+
+	> *:not(:last-child) {
+		margin-bottom: ${ space( 2 ) };
+	}
 `;
 
 export const StyledField = styled.div`
-	margin-bottom: ${ space( 2 ) };
-
 	.components-panel__row & {
 		margin-bottom: inherit;
 	}
@@ -36,6 +39,7 @@ export const StyledHelp = styled.p`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
 	color: ${ COLORS.mediumGray.text };
+	margin: 0;
 `;
 
 export const StyledVisualLabel = styled.span`
