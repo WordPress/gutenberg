@@ -11,9 +11,9 @@ dates to be formatted however their website is configured to format dates.
 Selecting _Custom_ will display a text box that lets the user type in any format
 string.
 
-All date format strings should be in the format accepted by by the (`dateI18n`
+All date format strings should be in the format accepted by by the [`dateI18n`
 function in
-`@wordpress/date`)[https://github.com/WordPress/gutenberg/tree/trunk/packages/date#datei18n].
+`@wordpress/date`](https://github.com/WordPress/gutenberg/tree/trunk/packages/date#datei18n).
 
 ## Usage
 
