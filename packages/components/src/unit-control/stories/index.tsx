@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import UnitControl from '../';
+import { UnitControl } from '../';
 import { CSS_UNITS } from '../utils';
 
 const meta: ComponentMeta< typeof UnitControl > = {
