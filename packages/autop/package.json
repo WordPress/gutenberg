@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/autop",
-	"version": "3.3.1",
+	"version": "3.3.2-next.a55ed9455a.0",
 	"description": "WordPress's automatic paragraph functions `autop` and `removep`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
