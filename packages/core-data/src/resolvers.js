@@ -104,10 +104,6 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 
 		const record = await apiFetch( { path } );
 		dispatch.receiveEntityRecords( kind, name, record, query );
-	} catch ( error ) {
-		// We need a way to handle and access REST API errors in state
-		// Until then, catching the error ensures the resolver is marked as resolved.
-		// See similar implementation in `getEntityRecords()`.
 	} finally {
 		dispatch.__unstableReleaseStoreLock( lock );
 	}
@@ -202,10 +198,6 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 				args: resolutionsArgs,
 			} );
 		}
-	} catch ( error ) {
-		// We need a way to handle and access REST API errors in state
-		// Until then, catching the error ensures the resolver is marked as resolved.
-		// See similar implementation in `getEntityRecord()`.
 	} finally {
 		dispatch.__unstableReleaseStoreLock( lock );
 	}
