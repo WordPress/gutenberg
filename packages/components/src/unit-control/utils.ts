@@ -155,7 +155,7 @@ export function getParsedQuantityAndUnit(
  * @param  units List of units.
  * @return Whether the list actually contains any units.
  */
-export function hasUnits( units?: WPUnitControlUnit[] ): boolean {
+export function hasUnits( units?: WPUnitControlUnit[] ) {
 	// Although the `isArray` check shouldn't be necessary (given the signature of
 	// this typed function), it's better to stay on the side of caution, since
 	// this function may be called from un-typed environments.
@@ -218,7 +218,7 @@ export function parseQuantityAndUnitFromRawValue(
  */
 export function getValidParsedQuantityAndUnit(
 	rawValue: string | number,
-	allowedUnits: WPUnitControlUnit[],
+	allowedUnits?: WPUnitControlUnit[],
 	fallbackQuantity?: number,
 	fallbackUnit?: string
 ): [ number | undefined, string | undefined ] {
@@ -236,7 +236,9 @@ export function getValidParsedQuantityAndUnit(
 	let unitToReturn = parsedUnit || fallbackUnit;
 
 	if ( ! unitToReturn && hasUnits( allowedUnits ) ) {
-		unitToReturn = allowedUnits[ 0 ].value;
+		// The `hasUnit` check guarantees that `allowedUnits`, for the next line,
+		// is an array with at least one item.
+		unitToReturn = ( allowedUnits as WPUnitControlUnit[] )[ 0 ].value;
 	}
 
 	return [ quantityToReturn, unitToReturn ];
@@ -295,7 +297,7 @@ export const useCustomUnits = ( {
 }: {
 	units?: WPUnitControlUnit[];
 	availableUnits?: string[];
-	defaultValues: Record< string, number >;
+	defaultValues?: Record< string, number >;
 } ): WPUnitControlUnit[] => {
 	const customUnitsToReturn = filterUnitsWithSettings(
 		availableUnits,
