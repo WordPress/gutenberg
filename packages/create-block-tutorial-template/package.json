@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/create-block-tutorial-template",
-	"version": "2.0.0",
+	"version": "2.1.0-next.e230fbab09.0",
 	"description": "Template for @wordpress/create-block used in the official WordPress tutorial.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

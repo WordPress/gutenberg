@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/browserslist-config",
-	"version": "4.1.1",
+	"version": "4.2.0-next.e230fbab09.0",
 	"description": "WordPress Browserslist shared configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
