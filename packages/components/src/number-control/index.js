@@ -148,7 +148,7 @@ export function NumberControl(
 		}
 
 		/**
-		 * Handles commit (ENTER key press or on blur if isPressEnterToChange)
+		 * Handles commit (ENTER key press or blur)
 		 */
 		if (
 			type === inputControlActionTypes.PRESS_ENTER ||

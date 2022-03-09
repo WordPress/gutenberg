@@ -87,6 +87,7 @@ describe( 'NumberControl', () => {
 			// After blur, value is clamped
 			expect( input.value ).toBe( '4' );
 
+			// After the blur, the `onChange` callback fires asynchronously.
 			await waitFor( () => {
 				expect( spy ).toHaveBeenCalledTimes( 2 );
 				expect( spy ).toHaveBeenNthCalledWith( 1, '1' );
