@@ -6,7 +6,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { LEFT, RIGHT, UP, DOWN } from '@wordpress/keycodes';
+import { LEFT, RIGHT, UP, DOWN, HOME, END } from '@wordpress/keycodes';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -205,6 +205,28 @@ describe( 'TreeGrid', () => {
 			);
 		} );
 
+		it( 'should call onFocusRow with event, start and end nodes when pressing End', () => {
+			const onFocusRow = jest.fn();
+			render( <TestTree onFocusRow={ onFocusRow } /> );
+
+			screen.getByText( 'Row 1' ).focus();
+
+			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
+			const row3Element = screen.getByText( 'Row 3' ).closest( 'tr' );
+
+			fireEvent.keyDown( screen.getByText( 'Row 1' ), {
+				key: 'End',
+				keyCode: END,
+				currentTarget: row1Element,
+			} );
+
+			expect( onFocusRow ).toHaveBeenCalledWith(
+				expect.objectContaining( { key: 'End', keyCode: END } ),
+				row1Element,
+				row3Element
+			);
+		} );
+
 		it( 'should call onFocusRow with event, start and end nodes when pressing Up Arrow', () => {
 			const onFocusRow = jest.fn();
 			render( <TestTree onFocusRow={ onFocusRow } /> );
@@ -223,6 +245,28 @@ describe( 'TreeGrid', () => {
 			expect( onFocusRow ).toHaveBeenCalledWith(
 				expect.objectContaining( { key: 'ArrowUp', keyCode: UP } ),
 				row2Element,
+				row1Element
+			);
+		} );
+
+		it( 'should call onFocusRow with event, start and end nodes when pressing Home', () => {
+			const onFocusRow = jest.fn();
+			render( <TestTree onFocusRow={ onFocusRow } /> );
+
+			screen.getByText( 'Row 3' ).focus();
+
+			const row3Element = screen.getByText( 'Row 3' ).closest( 'tr' );
+			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
+
+			fireEvent.keyDown( screen.getByText( 'Row 3' ), {
+				key: 'Home',
+				keyCode: HOME,
+				currentTarget: row3Element,
+			} );
+
+			expect( onFocusRow ).toHaveBeenCalledWith(
+				expect.objectContaining( { key: 'Home', keyCode: HOME } ),
+				row3Element,
 				row1Element
 			);
 		} );
