@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.3.0-next.0 (2022-03-09)
+
 ### Deprecations
 
 - Deprecated `cleanForSlug` that is now part of `@wordpress/url`.

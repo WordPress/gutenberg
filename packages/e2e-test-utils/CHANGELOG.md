@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.0.0-next.0 (2022-03-09)
+
 ### Breaking Changes
 
 -   Updated `clickMenuItem` method to use exact label matching instead of partial [#39274](https://github.com/WordPress/gutenberg/pull/39274).
