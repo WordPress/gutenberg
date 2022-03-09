@@ -22,7 +22,7 @@ export default function BlockLockMenuItem( { clientId } ) {
 
 			return {
 				isLocked:
-					canMoveBlock( clientId ) || canRemoveBlock( clientId ),
+					! canMoveBlock( clientId ) || ! canRemoveBlock( clientId ),
 			};
 		},
 		[ clientId ]
