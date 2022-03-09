@@ -12,10 +12,6 @@ plugins {
 
 allprojects {
     repositories {
-        if (willPublishReactNativeBridgeBinary) {
-            maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
-        } else {
-            maven { url "$rootDir/../../../node_modules/react-native/android" }
-        }
+        maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
     }
 }
