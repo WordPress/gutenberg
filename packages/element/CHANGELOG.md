@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.1.2-next.0 (2022-03-09)
+
 ### Bug Fix
 
 - Serialize will now keep correct casing for SVG attributes ([#38936](https://github.com/WordPress/gutenberg/pull/38936)).
