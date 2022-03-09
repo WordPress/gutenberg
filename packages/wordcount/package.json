@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/wordcount",
-	"version": "3.3.2-next.620c52dd93.0",
+	"version": "3.3.1",
 	"description": "WordPress word count utility.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
