@@ -69,8 +69,8 @@ function gutenberg_register_webfonts_from_theme_json() {
  *
  * @return array The global styles with missing fonts data.
  */
-function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
-	$font_families_registered = wp_webfonts()->get_fonts();
+function gutenberg_add_webfonts_to_theme_json( $data ) {
+	$webfonts                 = wp_webfonts()->get_all_webfonts();
 	$font_families_from_theme = array();
 	if ( ! empty( $data['settings'] ) && ! empty( $data['settings']['typography'] ) && ! empty( $data['settings']['typography']['fontFamilies'] ) ) {
 		$font_families_from_theme = $data['settings']['typography']['fontFamilies'];
@@ -101,7 +101,7 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 
 	// Diff the arrays to find the missing fonts.
 	$to_add = array_diff(
-		$get_families( $font_families_registered ),
+		$get_families( $webfonts ),
 		$get_families( $font_families_from_theme )
 	);
 
@@ -125,7 +125,7 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 	// Add missing fonts.
 	foreach ( $to_add as $family ) {
 		$font_face = array();
-		foreach ( $font_families_registered as $font_family ) {
+		foreach ( $webfonts as $font_family ) {
 			if ( $family !== $font_family['font-family'] ) {
 				continue;
 			}

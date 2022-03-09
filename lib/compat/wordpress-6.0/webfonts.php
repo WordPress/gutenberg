@@ -37,6 +37,7 @@ function wp_webfonts() {
  * wp_register_webfonts(
  *      array(
  *          array(
+ *              'id'          => 'source-serif-200-900-normal',
  *              'provider'    => 'local',
  *              'font_family' => 'Source Serif Pro',
  *              'font_weight' => '200 900',
@@ -44,6 +45,7 @@ function wp_webfonts() {
  *              'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
  *          ),
  *          array(
+ *              'id'          => 'source-serif-200-900-italic',
  *              'provider'    => 'local',
  *              'font_family' => 'Source Serif Pro',
  *              'font_weight' => '200 900',
@@ -64,9 +66,9 @@ function wp_webfonts() {
  *                        See {@see WP_Webfonts_Registry::register()} for a list of
  *                        supported arguments for each webfont.
  */
-function wp_register_webfonts( array $webfonts = array() ) {
+function wp_register_webfonts( $webfonts = array() ) {
 	foreach ( $webfonts as $webfont ) {
-		wp_register_webfont( $webfont );
+		wp_register_webfont( $webfont['id'], $webfont );
 	}
 }
 
@@ -90,11 +92,12 @@ function wp_register_webfonts( array $webfonts = array() ) {
  *
  * @since 6.0.0
  *
- * @param array $webfont Webfont to be registered.
- *                       See {@see WP_Webfonts_Registry::register()} for a list of supported arguments.
+ * @param string $id The webfont id.
+ * @param array  $webfont Webfont to be registered.
+ *                        See {@see WP_Webfonts_Registry::register()} for a list of supported arguments.
  */
-function wp_register_webfont( array $webfont ) {
-	wp_webfonts()->register_font( $webfont );
+function wp_register_webfont( $id, $webfont ) {
+	wp_webfonts()->register_font( $id, $webfont );
 }
 
 /**
