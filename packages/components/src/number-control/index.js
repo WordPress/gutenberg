@@ -20,7 +20,7 @@ import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
 	{
-		__unstableStateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducer,
 		className,
 		dragDirection = 'n',
 		hideHTMLArrows = false,
@@ -159,7 +159,7 @@ export function NumberControl(
 				: constrainValue( currentValue );
 		}
 
-		return stateReducer( state, action );
+		return stateReducer?.( state, action ) ?? state;
 	};
 
 	return (
