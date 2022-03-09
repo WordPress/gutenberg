@@ -198,7 +198,6 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		preg_quote( $tag_name, '/' )
 	);
 	if (
-		'core/group' !== $block['blockName'] ||
 		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
 		( isset( $block['attrs']['layout']['type'] ) && 'default' !== $block['attrs']['layout']['type'] )
@@ -222,8 +221,9 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 
 if ( function_exists( 'wp_restore_group_inner_container' ) ) {
 	remove_filter( 'render_block', 'wp_restore_group_inner_container', 10, 2 );
+	remove_filter( 'render_block_core/group', 'wp_restore_group_inner_container', 10, 2 );
 }
-add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container', 10, 2 );
 
 
 /**
@@ -232,14 +232,12 @@ add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
  * to avoid breaking styles relying on that div.
  *
  * @param string $block_content Rendered block content.
- * @param array  $block         Block object.
  * @return string Filtered block content.
  */
-function gutenberg_restore_image_outer_container( $block_content, $block ) {
+function gutenberg_restore_image_outer_container( $block_content ) {
 	$image_with_align = '/(^\s*<figure\b[^>]*)\bwp-block-image\b([^"]*\b(?:alignleft|alignright|aligncenter)\b[^>]*>.*<\/figure>)/U';
 
 	if (
-		'core/image' !== $block['blockName'] ||
 		WP_Theme_JSON_Resolver::theme_has_support() ||
 		0 === preg_match( $image_with_align, $block_content )
 	) {
@@ -256,4 +254,7 @@ function gutenberg_restore_image_outer_container( $block_content, $block ) {
 	return $updated_content;
 }
 
-add_filter( 'render_block', 'gutenberg_restore_image_outer_container', 10, 2 );
+if ( function_exists( 'wp_restore_image_outer_container' ) ) {
+	remove_filter( 'render_block_core/image', 'wp_restore_image_outer_container', 10, 1 );
+}
+add_filter( 'render_block_core/image', 'gutenberg_restore_image_outer_container', 10, 1 );
