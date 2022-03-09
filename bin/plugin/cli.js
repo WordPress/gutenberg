@@ -29,12 +29,17 @@ const { runPerformanceTests } = require( './commands/performance' );
 
 const semverOption = [ '--semver <semver>', 'Semantic Versioning', 'patch' ];
 const ciOption = [ '-c, --ci', 'Run in CI (non interactive)' ];
+const repositoryPathOption = [
+	'--repository-path <repository-path>',
+	'Relative path to the git repository.',
+];
 
 program
 	.command( 'publish-npm-packages-latest' )
 	.alias( 'npm-latest' )
 	.option( ...semverOption )
 	.option( ...ciOption )
+	.option( ...repositoryPathOption )
 	.description(
 		'Publishes packages to npm (latest dist-tag, production version)'
 	)
@@ -45,6 +50,7 @@ program
 	.alias( 'npm-bugfix' )
 	.option( ...semverOption )
 	.option( ...ciOption )
+	.option( ...repositoryPathOption )
 	.description(
 		'Publishes bugfixes for packages to npm (latest dist-tag, production version)'
 	)
@@ -55,6 +61,7 @@ program
 	.alias( 'npm-next' )
 	.option( ...semverOption )
 	.option( ...ciOption )
+	.option( ...repositoryPathOption )
 	.description(
 		'Publishes packages to npm (next dist-tag, prerelease version)'
 	)

@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 19.6.0-next.0 (2022-03-09)
-
 ### Enhancements
 
 -   `ConfirmDialog`: Add support for custom label text on the confirmation and cancelation buttons ([#38994](https://github.com/WordPress/gutenberg/pull/38994))
