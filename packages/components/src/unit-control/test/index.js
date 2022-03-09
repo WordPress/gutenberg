@@ -210,9 +210,9 @@ describe( 'UnitControl', () => {
 
 			const input = getInput();
 			await user.clear( input );
-			await user.type( input, '300px' );
+			await user.type( input, '300' );
 
-			expect( input.value ).toBe( '300px' );
+			expect( input.value ).toBe( '300' );
 			expect( state ).toBe( 50 );
 
 			user.keyboard( '{Escape}' );
@@ -259,51 +259,33 @@ describe( 'UnitControl', () => {
 			);
 		} );
 
-		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
+		it( 'should invoke onChange callback when isPressEnterToChange is true and the input is blurred with an uncommitted value', async () => {
 			let state = '15px';
-
-			const onUnitChangeSpy = jest.fn();
 			const onChangeSpy = jest.fn();
-
 			const setState = ( nextState ) => {
 				onChangeSpy( nextState );
 				state = nextState;
 			};
 
 			const { user } = render(
-				<>
-					<button>Click me</button>
-					<UnitControl
-						value={ state }
-						onChange={ setState }
-						onUnitChange={ onUnitChangeSpy }
-						isPressEnterToChange
-					/>
-				</>
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					isPressEnterToChange
+				/>
 			);
 
 			const input = getInput();
 			await user.clear( input );
-			await user.type( input, '41vh' );
-
-			// This is because `isPressEnterToChange` is `true`
-			expect( onChangeSpy ).not.toHaveBeenCalled();
-
-			// Clicking on the button should cause the `onBlur` callback to fire.
-			const button = screen.getByRole( 'button' );
-			await user.click( button );
-
+			// Typing the first letter of a unit blurs the input.
+			await user.type( input, '41v' );
 			await waitFor( () =>
+				// Called only once because `isPressEnterToChange` is `true`.
 				expect( onChangeSpy ).toHaveBeenCalledTimes( 1 )
 			);
-
-			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41vh' );
-
-			expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 );
-			expect( onUnitChangeSpy ).toHaveBeenLastCalledWith(
-				'vh',
-				expect.anything()
-			);
+			// True for the test environment but in common browsers this would
+			// be last called with '41vw' (after the call with '41px').
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41px' );
 		} );
 	} );
 
@@ -507,94 +489,6 @@ describe( 'UnitControl', () => {
 	} );
 
 	describe( 'Unit Parser', () => {
-		let state = '10px';
-		const setState = jest.fn( ( nextState ) => ( state = nextState ) );
-
-		it( 'should parse unit from input', async () => {
-			const { user } = render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			const input = getInput();
-			await user.clear( input );
-			await user.type( input, '55 em' );
-			user.keyboard( '{Enter}' );
-
-			expect( state ).toBe( '55em' );
-		} );
-
-		it( 'should parse PX unit from input', async () => {
-			const { user } = render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			const input = getInput();
-			await user.clear( input );
-			await user.type( input, '61   PX' );
-			user.keyboard( '{Enter}' );
-
-			expect( state ).toBe( '61px' );
-		} );
-
-		it( 'should parse EM unit from input', async () => {
-			const { user } = render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			const input = getInput();
-			await user.clear( input );
-			await user.type( input, '55 em' );
-			user.keyboard( '{Enter}' );
-
-			expect( state ).toBe( '55em' );
-		} );
-
-		it( 'should parse % unit from input', async () => {
-			const { user } = render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			const input = getInput();
-			await user.clear( input );
-			await user.type( input, '-10  %' );
-			user.keyboard( '{Enter}' );
-
-			expect( state ).toBe( '-10%' );
-		} );
-
-		it( 'should parse REM unit from input', async () => {
-			const { user } = render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			const input = getInput();
-			await user.clear( input );
-			await user.type( input, '123       rEm  ' );
-			user.keyboard( '{Enter}' );
-
-			expect( state ).toBe( '123rem' );
-		} );
-
 		it( 'should update unit after initial render and with new unit prop', async () => {
 			const { rerender } = render( <UnitControl value={ '10%' } /> );
 
@@ -629,6 +523,18 @@ describe( 'UnitControl', () => {
 
 			expect( select.value ).toBe( '%' );
 			expect( options.length ).toBe( 3 );
+		} );
+	} );
+
+	describe( 'Unit switching convenience', () => {
+		it( 'should focus unit select when a charater matches the first of one of the units', async () => {
+			const { user } = render( <UnitControl value={ '10%' } /> );
+
+			const input = getInput();
+			await user.clear( input );
+			await user.type( input, '55 e' );
+
+			expect( document.activeElement ).toBe( getSelect() );
 		} );
 	} );
 } );

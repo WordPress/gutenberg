@@ -26,14 +26,11 @@ describe( 'BoxControl', () => {
 		it( 'should update values when interacting with input', () => {
 			const { container } = render( <BoxControl /> );
 			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100%' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			fireEvent.change( input, { target: { value: '100' } } );
 
 			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( '%' );
 		} );
 	} );
 
@@ -45,7 +42,7 @@ describe( 'BoxControl', () => {
 			const reset = getByText( /Reset/ );
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
+			fireEvent.change( input, { target: { value: '100' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '100' );
@@ -75,7 +72,7 @@ describe( 'BoxControl', () => {
 			const reset = getByText( /Reset/ );
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
+			fireEvent.change( input, { target: { value: '100' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '100' );
@@ -112,7 +109,7 @@ describe( 'BoxControl', () => {
 			const reset = getByText( /Reset/ );
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
+			fireEvent.change( input, { target: { value: '100' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '100' );
@@ -133,11 +130,11 @@ describe( 'BoxControl', () => {
 			const unitSelect = screen.getByLabelText( 'Select unit' );
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100%' } } );
+			fireEvent.change( input, { target: { value: '100' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( '%' );
+			expect( unitSelect.value ).toBe( 'px' );
 
 			fireEvent.change( input, { target: { value: '' } } );
 			fireEvent.blur( input );
@@ -165,7 +162,7 @@ describe( 'BoxControl', () => {
 			const unitSelect = container.querySelector( 'select' );
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
+			fireEvent.change( input, { target: { value: '100' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '100' );
@@ -198,7 +195,7 @@ describe( 'BoxControl', () => {
 			const unitSelect = container.querySelector( 'select' );
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
+			fireEvent.change( input, { target: { value: '100' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '100' );
@@ -261,7 +258,7 @@ describe( 'BoxControl', () => {
 	} );
 
 	describe( 'onChange updates', () => {
-		it( 'should call onChange when values contain more than just CSS units', () => {
+		it( 'should call onChange when input is changed', () => {
 			const setState = jest.fn();
 
 			render( <BoxControl onChange={ setState } /> );
@@ -271,14 +268,14 @@ describe( 'BoxControl', () => {
 			} );
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '7.5rem' } } );
+			fireEvent.change( input, { target: { value: '7.5' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
 			expect( setState ).toHaveBeenCalledWith( {
-				top: '7.5rem',
-				right: '7.5rem',
-				bottom: '7.5rem',
-				left: '7.5rem',
+				top: '7.5px',
+				right: '7.5px',
+				bottom: '7.5px',
+				left: '7.5px',
 			} );
 		} );
 
