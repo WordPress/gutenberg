@@ -19,7 +19,7 @@ describe( 'FormFileUpload', () => {
 		expect( input.style.display ).toBe( 'none' );
 	} );
 
-	it( 'should not fire a change event after selecting the same file', async () => {
+	it( 'should not fire a change event after selecting the same file', () => {
 		const onChange = jest.fn();
 
 		render(
@@ -35,9 +35,9 @@ describe( 'FormFileUpload', () => {
 
 		const input = screen.getByTestId( 'input' );
 
-		await userEvent.upload( input, file );
+		userEvent.upload( input, file );
 
-		// await onClick event run
+		// await last upload event propagation
 		setTimeout( () => {
 			userEvent.upload( input, file );
 
@@ -67,7 +67,7 @@ describe( 'FormFileUpload', () => {
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 
-		// await onClick event run
+		// await last upload event propagation and onClick event run
 		setTimeout( () => {
 			userEvent.upload( input, file );
 
