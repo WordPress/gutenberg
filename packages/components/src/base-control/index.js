@@ -83,6 +83,7 @@ function BaseControl( {
 				<StyledHelp
 					id={ id ? id + '__help' : undefined }
 					className="components-base-control__help"
+					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				>
 					{ help }
 				</StyledHelp>
