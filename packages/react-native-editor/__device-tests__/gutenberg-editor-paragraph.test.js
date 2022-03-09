@@ -11,22 +11,6 @@ import {
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
-	it( 'should be able to add a new Paragraph block', async () => {
-		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.paragraph
-		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
-
-		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
-			testData.shortText
-		);
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
-	} );
-
 	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
