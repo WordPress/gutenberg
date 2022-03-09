@@ -1,4 +1,5 @@
 apply plugin: "com.android.application"
+apply from: "../../../react-native-bridge/android/extractPackageVersion.gradle"
 
 import com.android.build.OutputFile
 
@@ -177,6 +178,20 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+
+    implementation "com.github.wordpress-mobile:react-native-svg:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-svg', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-video:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-video', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-linear-gradient:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-linear-gradient', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-slider:${extractPackageVersion('../../../react-native-editor/package.json', '@react-native-community/slider', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-get-random-values:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-get-random-values', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-masked-view:${extractPackageVersion('../../../react-native-editor/package.json', '@react-native-community/masked-view', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-gesture-handler', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-screens:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-screens', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-safe-area-context:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-safe-area-context', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-reanimated:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-reanimated', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-prompt-android', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-webview:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-webview', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-clipboard:${extractPackageVersion('../../../react-native-editor/package.json', '@react-native-clipboard/clipboard', 'dependencies')}"
 }
 
 // Run this once to be able to run the application with BUCK
