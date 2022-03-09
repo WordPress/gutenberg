@@ -46,25 +46,24 @@ export type getEntityRecord = <
 	C extends Context = DefaultContextOf< R >,
 	K extends Kind = KindOf< R >,
 	N extends Name = NameOf< R >,
-	Q extends {
-		/**
-		 * The requested fields. If specified, the REST API will remove from the response
-		 * any fields not on that list.
-		 */
-		_fields?: string[];
-	} = {}
+	/**
+	 * The requested fields. If specified, the REST API will remove from the response
+	 * any fields not on that list.
+	 */
+	Fields extends string[] | undefined = undefined
 >(
 	state: State,
 	kind: K,
 	name: N,
 	key: KeyOf< R >,
-	query?: Q & {
+	query?: {
 		context?: C;
+		_fields?: Fields;
 	}
 ) =>
-	| ( Q[ '_fields' ] extends string[]
-			? Partial< RecordOf< K, N, C > >
-			: RecordOf< K, N, C > )
+	| ( Fields extends undefined
+			? RecordOf< K, N, C >
+			: Partial< RecordOf< K, N, C > > )
 	| null
 	| undefined;
 
@@ -91,25 +90,24 @@ export type getEntityRecords = <
 	C extends Context = DefaultContextOf< R >,
 	K extends Kind = KindOf< R >,
 	N extends Name = NameOf< R >,
-	Q extends {
-		/**
-		 * The requested fields. If specified, the REST API will remove from the response
-		 * any fields not on that list.
-		 */
-		_fields?: string[];
-	} = {}
+	/**
+	 * The requested fields. If specified, the REST API will remove from the response
+	 * any fields not on that list.
+	 */
+	Fields extends string[] | undefined = undefined
 >(
 	state: State,
 	kind: K,
 	name: N,
-	query?: Q & {
+	query?: {
 		context?: C;
+		_fields?: Fields;
 	}
 ) =>
 	| Array<
-			Q[ '_fields' ] extends string[]
-				? Partial< RecordOf< K, N, C > >
-				: RecordOf< K, N, C >
+			Fields extends undefined
+				? RecordOf< K, N, C >
+				: Partial< RecordOf< K, N, C > >
 	  >
 	| null
 	| undefined;
