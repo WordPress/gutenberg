@@ -1,35 +1,16 @@
 /**
- * @typedef {import("./shared/types").GutenbergContext} GutenbergContext
- */
-
-const SELECTORS = {
-	postEditorMenuContent: '.interface-more-menu-dropdown__content',
-	siteEditorMenuContent: '.edit-site-more-menu__content',
-	postEditorMenu: '.interface-more-menu-dropdown [aria-label="Options"]',
-	siteEditorMenu: '.edit-site-more-menu [aria-label="More tools & options"]',
-};
-
-/**
  * Toggles the More Menu.
  *
- * @param {'open' | 'close'} [waitFor]               Whether it should wait for the menu to open or close. If `undefined` it won't wait for anything.
- * @param {GutenbergContext} [context='post-editor'] Whether it's toggling in the context of the site editor or post editor.
+ * @param {'open' | 'close'} [waitFor] Whether it should wait for the menu to open or close. If `undefined` it won't wait for anything.
  */
-export async function toggleMoreMenu( waitFor, context = 'post-editor' ) {
-	const menuSelector =
-		context === 'post-editor'
-			? SELECTORS.postEditorMenu
-			: SELECTORS.siteEditorMenu;
+export async function toggleMoreMenu( waitFor ) {
+	const menuSelector = '.interface-more-menu-dropdown [aria-label="Options"]';
 
 	await page.click( menuSelector );
 
 	if ( waitFor ) {
 		const opts = waitFor === 'close' ? { hidden: true } : {};
-		const menuContentSelector =
-			context === 'post-editor'
-				? SELECTORS.postEditorMenuContent
-				: SELECTORS.siteEditorMenuContent;
-
+		const menuContentSelector = '.interface-more-menu-dropdown__content';
 		await page.waitForSelector( menuContentSelector, opts );
 	}
 }

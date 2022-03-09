@@ -72,7 +72,7 @@ const BlockSelectionButton = ( {
 					numberOfLines={ 1 }
 					style={ styles.selectionButtonTitle }
 				>
-					<BlockTitle clientId={ clientId } />
+					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
 				</Text>
 			</TouchableOpacity>
 		</View>

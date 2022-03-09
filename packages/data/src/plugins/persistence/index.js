@@ -296,6 +296,54 @@ export function migrateFeaturePreferencesToPreferencesStore(
 	}
 }
 
+export function migrateIndividualPreferenceToPreferencesStore(
+	persistence,
+	sourceStoreName,
+	key
+) {
+	const preferencesStoreName = 'core/preferences';
+	const state = persistence.get();
+	const sourcePreference = state[ sourceStoreName ]?.preferences?.[ key ];
+
+	// There's nothing to migrate, exit early.
+	if ( ! sourcePreference ) {
+		return;
+	}
+
+	const targetPreference =
+		state[ preferencesStoreName ]?.preferences?.[ sourceStoreName ]?.[
+			key
+		];
+
+	// There's existing data at the target, so don't overwrite it, exit early.
+	if ( targetPreference ) {
+		return;
+	}
+
+	const allPreferences = state[ preferencesStoreName ]?.preferences;
+	const targetPreferences =
+		state[ preferencesStoreName ]?.preferences?.[ sourceStoreName ];
+
+	persistence.set( preferencesStoreName, {
+		preferences: {
+			...allPreferences,
+			[ sourceStoreName ]: {
+				...targetPreferences,
+				[ key ]: sourcePreference,
+			},
+		},
+	} );
+
+	// Remove migrated feature preferences from the source.
+	const allSourcePreferences = state[ sourceStoreName ]?.preferences;
+	persistence.set( sourceStoreName, {
+		preferences: {
+			...allSourcePreferences,
+			[ key ]: undefined,
+		},
+	} );
+}
+
 /**
  * Move the 'features' object in local storage from the sourceStoreName to the
  * interface store.
@@ -357,6 +405,20 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	migrateFeaturePreferencesToPreferencesStore(
 		persistence,
 		'core/edit-post'
+	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		'core/edit-post',
+		'hiddenBlockTypes'
+	);
+	migrateFeaturePreferencesToPreferencesStore(
+		persistence,
+		'core/edit-site'
+	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		'core/edit-site',
+		'editorMode'
 	);
 };
 

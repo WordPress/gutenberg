@@ -91,20 +91,19 @@ WithSlider.args = {
 	withSlider: true,
 };
 
+/**
+ * With custom font sizes disabled via the `disableCustomFontSizes` prop, the user will
+ * only be able to pick one of the predefined sizes passed in `fontSizes`.
+ */
 export const WithCustomSizesDisabled = FontSizePickerWithState.bind( {} );
 WithCustomSizesDisabled.args = {
 	...Default.args,
 	disableCustomFontSizes: true,
 };
-WithCustomSizesDisabled.parameters = {
-	docs: {
-		description: {
-			story:
-				'With custom font sizes disabled via the `disableCustomFontSizes` prop, the user will only be able to pick one of the predefined sizes passed in `fontSizes`.',
-		},
-	},
-};
 
+/**
+ * When there are more than 5 font size options, the UI is no longer a toggle group.
+ */
 export const WithMoreFontSizes = FontSizePickerWithState.bind( {} );
 WithMoreFontSizes.args = {
 	...Default.args,
@@ -142,15 +141,10 @@ WithMoreFontSizes.args = {
 	],
 	initialValue: 8,
 };
-WithMoreFontSizes.parameters = {
-	docs: {
-		description: {
-			story:
-				'When there are more than 5 font size options, the UI is no longer a toggle group.',
-		},
-	},
-};
 
+/**
+ * When units like `px` are specified explicitly, it will be shown as a label hint.
+ */
 export const WithUnits = TwoFontSizePickersWithState.bind( {} );
 WithUnits.args = {
 	...WithMoreFontSizes.args,
@@ -160,15 +154,11 @@ WithUnits.args = {
 	} ) ),
 	initialValue: '8px',
 };
-WithUnits.parameters = {
-	docs: {
-		description: {
-			story:
-				'When units like `px` are specified explicitly, it will be shown as a label hint.',
-		},
-	},
-};
 
+/**
+ * The label hint will not be shown if it is a complex CSS value. Some examples of complex CSS values
+ * in this context are CSS functions like `calc()`, `clamp()`, and `var()`.
+ */
 export const WithComplexCSSValues = TwoFontSizePickersWithState.bind( {} );
 WithComplexCSSValues.args = {
 	...Default.args,
@@ -206,12 +196,4 @@ WithComplexCSSValues.args = {
 		},
 	],
 	initialValue: '1.125rem',
-};
-WithComplexCSSValues.parameters = {
-	docs: {
-		description: {
-			story:
-				'The label hint will not be shown if it is a complex CSS value. Some examples of complex CSS values in this context are CSS functions like `calc()`, `clamp()`, and `var()`.',
-		},
-	},
 };

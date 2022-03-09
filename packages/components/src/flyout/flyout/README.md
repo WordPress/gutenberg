@@ -9,7 +9,7 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
-import { Button, __experimentalFlyout as Flyout, __experimentalText as } from '@wordpress/components';
+import { Button, __experimentalFlyout as Flyout, __experimentalText as Text } from '@wordpress/components';
 
 function Example() {
 	return (

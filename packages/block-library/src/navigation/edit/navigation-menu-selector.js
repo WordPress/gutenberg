@@ -17,12 +17,9 @@ import { useCallback, useMemo } from '@wordpress/element';
  */
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
-import useConvertClassicMenu from '../use-convert-classic-menu';
-import useCreateNavigationMenu from './use-create-navigation-menu';
 
 export default function NavigationMenuSelector( {
 	currentMenuId,
-	clientId,
 	onSelect,
 	onCreateNew,
 	showManageActions = false,
@@ -43,27 +40,6 @@ export default function NavigationMenuSelector( {
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
-	const createNavigationMenu = useCreateNavigationMenu( clientId );
-
-	const onFinishMenuCreation = async (
-		blocks,
-		navigationMenuTitle = null
-	) => {
-		if ( ! canUserCreateNavigationMenu ) {
-			return;
-		}
-
-		const navigationMenu = await createNavigationMenu(
-			navigationMenuTitle,
-			blocks
-		);
-		onSelect( navigationMenu );
-	};
-
-	const convertClassicMenuToBlocks = useConvertClassicMenu(
-		onFinishMenuCreation
-	);
-
 	const handleSelect = useCallback(
 		( _onClose ) => ( selectedId ) => {
 			_onClose();
@@ -72,6 +48,14 @@ export default function NavigationMenuSelector( {
 			);
 		},
 		[ navigationMenus ]
+	);
+
+	const handleSelectClassic = useCallback(
+		( _onClose, menu ) => () => {
+			_onClose();
+			onSelect( menu );
+		},
+		[]
 	);
 
 	const menuChoices = useMemo( () => {
@@ -130,13 +114,10 @@ export default function NavigationMenuSelector( {
 								const label = decodeEntities( menu.name );
 								return (
 									<MenuItem
-										onClick={ () => {
-											onClose();
-											convertClassicMenuToBlocks(
-												menu.id,
-												menu.name
-											);
-										} }
+										onClick={ handleSelectClassic(
+											onClose,
+											menu
+										) }
 										key={ menu.id }
 										aria-label={ sprintf(
 											createActionLabel,

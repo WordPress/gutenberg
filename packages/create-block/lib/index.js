@@ -96,19 +96,55 @@ program
 					};
 					await scaffold( pluginTemplate, answers );
 				} else {
-					const prompts = getPrompts( pluginTemplate ).filter(
-						( { name } ) =>
-							! Object.keys( optionsValues ).includes( name )
-					);
 					log.info( '' );
 					log.info(
 						"Let's customize your WordPress plugin with blocks:"
 					);
-					const answers = await inquirer.prompt( prompts );
+
+					const filterOptionsProvided = ( { name } ) =>
+						! Object.keys( optionsValues ).includes( name );
+					const blockPrompts = getPrompts( pluginTemplate, [
+						'slug',
+						'namespace',
+						'title',
+						'description',
+						'dashicon',
+						'category',
+					] ).filter( filterOptionsProvided );
+					const blockAnswers = await inquirer.prompt( blockPrompts );
+
+					const pluginAnswers = await inquirer
+						.prompt( {
+							type: 'confirm',
+							name: 'configurePlugin',
+							message:
+								'Do you want to customize the WordPress plugin?',
+							default: false,
+						} )
+						.then( async ( { configurePlugin } ) => {
+							if ( ! configurePlugin ) {
+								return {};
+							}
+
+							const pluginPrompts = getPrompts( pluginTemplate, [
+								'pluginURI',
+								'version',
+								'author',
+								'license',
+								'licenseURI',
+								'domainPath',
+								'updateURI',
+							] ).filter( filterOptionsProvided );
+							const result = await inquirer.prompt(
+								pluginPrompts
+							);
+							return result;
+						} );
 					await scaffold( pluginTemplate, {
 						...defaultValues,
 						...optionsValues,
-						...answers,
+						...blockAnswers,
+						...pluginAnswers,
 					} );
 				}
 			} catch ( error ) {

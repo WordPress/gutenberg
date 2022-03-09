@@ -3,8 +3,8 @@
  */
 import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreDataStore } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
+import { __experimentalUseEntityRecords as useEntityRecords } from '@wordpress/core-data';
 import { createBlock as create } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -74,34 +74,20 @@ export const convertSelectedBlockToNavigationLinks = ( {
 };
 
 export default function ConvertToLinksModal( { onClose, clientId } ) {
-	const { pages, pagesFinished } = useSelect(
-		( select ) => {
-			const { getEntityRecords, hasFinishedResolution } = select(
-				coreDataStore
-			);
-			const query = [
-				'postType',
-				'page',
-				{
-					per_page: MAX_PAGE_COUNT,
-					_fields: PAGE_FIELDS,
-					// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-					// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-					// sort.
-					orderby: 'menu_order',
-					order: 'asc',
-				},
-			];
-			return {
-				pages: getEntityRecords( ...query ),
-				pagesFinished: hasFinishedResolution(
-					'getEntityRecords',
-					query
-				),
-			};
-		},
-		[ clientId ]
+	const { records: pages, hasResolved: pagesFinished } = useEntityRecords(
+		'postType',
+		'page',
+		{
+			per_page: MAX_PAGE_COUNT,
+			_fields: PAGE_FIELDS,
+			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
+			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
+			// sort.
+			orderby: 'menu_order',
+			order: 'asc',
+		}
 	);
+
 	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	return (

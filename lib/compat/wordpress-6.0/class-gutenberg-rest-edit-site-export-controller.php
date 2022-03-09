@@ -61,7 +61,8 @@ class Gutenberg_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 
 	/**
 	 * Output a ZIP file with an export of the current templates
-	 * and template parts from the site editor, and close the connection.
+	 * template parts, theme.json and index.php from the site editor,
+	 * and close the connection.
 	 *
 	 * @return WP_Error|void
 	 */

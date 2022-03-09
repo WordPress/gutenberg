@@ -8,7 +8,7 @@
 # Data
 /packages/api-fetch                             @nerrad @mmtr
 /packages/core-data                             @nerrad
-/packages/data                                  @nerrad @coderkevin
+/packages/data                                  @nerrad
 /packages/redux-routine                         @nerrad
 /packages/data-controls                         @nerrad
 
@@ -83,12 +83,12 @@
 /packages/stylelint-config                      @ntwb
 
 # UI Components
-/packages/components                            @ajitbohra @jaymanpandya
-/packages/compose                               @ajitbohra @jaymanpandya
-/packages/element                               @ajitbohra @jaymanpandya
-/packages/notices                               @ajitbohra @jaymanpandya
-/packages/nux                                   @ajitbohra @jaymanpandya
-/packages/viewport                              @ajitbohra @jaymanpandya
+/packages/components                            @ajitbohra
+/packages/compose                               @ajitbohra
+/packages/element                               @ajitbohra
+/packages/notices                               @ajitbohra
+/packages/nux                                   @ajitbohra
+/packages/viewport                              @ajitbohra
 /packages/base-styles
 /packages/icons
 /packages/primitives
@@ -130,13 +130,12 @@
 
 # PHP
 /lib                                                                 @timothybjacobs @spacedmonkey
-/lib/global-styles.php                                               @timothybjabocs @spacedmonkey @oandregal
+/lib/global-styles.php                                               @timothybjacobs @spacedmonkey @oandregal
 /lib/class-wp-rest-block-editor-settings-controller.php              @timothybjacobs @spacedmonkey @geriux @antonis
-/lib/compat/wordpress-5.9/theme.json                                                      @timothybjabocs @spacedmonkey @oandregal
-/lib/compat/wordpress-5.9/theme-i18n.json                                                 @timothybjabocs @spacedmonkey @oandregal
-/lib/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @oandregal
-/lib/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php @timothybjabocs @spacedmonkey @oandregal
-/lib/full-site-editing                                               @janw-me
+/lib/compat/wordpress-5.9/theme.json                                 @timothybjacobs @spacedmonkey @oandregal
+/lib/compat/wordpress-5.9/theme-i18n.json                            @timothybjacobs @spacedmonkey @oandregal
+/lib/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php          @timothybjacobs @spacedmonkey @oandregal
+/lib/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php @timothybjacobs @spacedmonkey @oandregal
 /phpunit/class-wp-theme-json-test.php                                @oandregal
 
 # Web App
@@ -148,9 +147,9 @@
 /packages/components/src/mobile/global-styles-context                @geriux @antonis
 
 # Native (Unowned)
-*.native.js                                     @ghost
-*.android.js                                    @ghost
-*.ios.js                                        @ghost
-*.native.scss                                   @ghost
-*.android.scss                                  @ghost
-*.ios.scss                                      @ghost
+*.native.js
+*.android.js
+*.ios.js
+*.native.scss
+*.android.scss
+*.ios.scss

@@ -23,7 +23,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
@@ -79,7 +79,6 @@ function FileEdit( {
 		displayPreview,
 		previewHeight,
 	} = attributes;
-	const [ hasError, setHasError ] = useState( false );
 	const { media, mediaUpload } = useSelect(
 		( select ) => ( {
 			media:
@@ -91,7 +90,10 @@ function FileEdit( {
 		[ id ]
 	);
 
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const {
+		toggleSelection,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		// Upload a file drag-and-dropped into the editor.
@@ -101,10 +103,7 @@ function FileEdit( {
 			mediaUpload( {
 				filesList: [ file ],
 				onFileChange: ( [ newMedia ] ) => onSelectFile( newMedia ),
-				onError: ( message ) => {
-					setHasError( true );
-					noticeOperations.createErrorNotice( message );
-				},
+				onError: onUploadError,
 			} );
 
 			revokeBlobURL( href );
@@ -116,15 +115,15 @@ function FileEdit( {
 	}, [] );
 
 	useEffect( () => {
-		if ( ! fileId ) {
+		if ( ! fileId && href ) {
 			// Add a unique fileId to each file block.
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
 		}
-	}, [ fileId, clientId ] );
+	}, [ href, fileId, clientId ] );
 
 	function onSelectFile( newMedia ) {
 		if ( newMedia && newMedia.url ) {
-			setHasError( false );
 			const isPdf = newMedia.url.endsWith( '.pdf' );
 			setAttributes( {
 				href: newMedia.url,
@@ -138,7 +137,7 @@ function FileEdit( {
 	}
 
 	function onUploadError( message ) {
-		setHasError( true );
+		setAttributes( { href: undefined } );
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
 	}
@@ -197,7 +196,7 @@ function FileEdit( {
 
 	const displayPreviewInEditor = browserSupportsPdfs() && displayPreview;
 
-	if ( ! href || hasError ) {
+	if ( ! href ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder

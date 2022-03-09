@@ -59,26 +59,32 @@ export async function closeSiteEditorNavigationPanel() {
  * Skips the welcome guide popping up to first time users of the site editor
  */
 export async function disableSiteEditorWelcomeGuide() {
-	const isWelcomeGuideActive = await page.evaluate( () =>
-		wp.data.select( 'core/edit-site' ).isFeatureActive( 'welcomeGuide' )
+	const isWelcomeGuideActive = await page.evaluate(
+		() =>
+			!! wp.data
+				.select( 'core/preferences' )
+				.get( 'core/edit-site', 'welcomeGuide' )
 	);
-	const isWelcomeGuideStyesActive = await page.evaluate( () =>
-		wp.data
-			.select( 'core/edit-site' )
-			.isFeatureActive( 'welcomeGuideStyles' )
+	const isWelcomeGuideStyesActive = await page.evaluate(
+		() =>
+			!! wp.data
+				.select( 'core/preferences' )
+				.get( 'core/edit-site', 'welcomeGuideStyles' )
 	);
 
 	if ( isWelcomeGuideActive ) {
 		await page.evaluate( () =>
-			wp.data.dispatch( 'core/edit-site' ).toggleFeature( 'welcomeGuide' )
+			wp.data
+				.dispatch( 'core/preferences' )
+				.toggle( 'core/edit-site', 'welcomeGuide' )
 		);
 	}
 
 	if ( isWelcomeGuideStyesActive ) {
 		await page.evaluate( () =>
 			wp.data
-				.dispatch( 'core/edit-site' )
-				.toggleFeature( 'welcomeGuideStyles' )
+				.dispatch( 'core/preferences' )
+				.toggle( 'core/edit-site', 'welcomeGuideStyles' )
 		);
 	}
 }
