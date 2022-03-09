@@ -10,10 +10,9 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
 -   [*] Add GIF badge for animated GIFs uploaded to Image blocks [#38996]
-
--   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
-
+-   [*] Small refinement to media upload errors, including centring and tweaking copy. [#38951]
 -   [*] Update gesture handler and reanimated libraries [#39098]
 
 ## 1.71.3

@@ -7,6 +7,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -37,6 +38,7 @@ function createRegistryWithStores() {
 	registry.register( editSiteStore );
 	registry.register( interfaceStore );
 	registry.register( noticesStore );
+	registry.register( preferencesStore );
 
 	return registry;
 }
@@ -46,10 +48,25 @@ describe( 'actions', () => {
 		it( 'should toggle a feature flag', () => {
 			const registry = createRegistryWithStores();
 
+			// Should default to false.
+			expect(
+				registry.select( editSiteStore ).isFeatureActive( 'name' )
+			).toBe( false );
+
+			// Toggle on.
 			registry.dispatch( editSiteStore ).toggleFeature( 'name' );
 			expect(
 				registry.select( editSiteStore ).isFeatureActive( 'name' )
 			).toBe( true );
+
+			// Toggle off again.
+			registry.dispatch( editSiteStore ).toggleFeature( 'name' );
+			expect(
+				registry.select( editSiteStore ).isFeatureActive( 'name' )
+			).toBe( false );
+
+			// Expect a deprecation warning.
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
