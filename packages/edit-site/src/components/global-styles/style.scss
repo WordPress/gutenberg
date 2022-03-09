@@ -73,19 +73,22 @@
 
 .edit-site-global-styles-variations_item {
 	box-sizing: border-box;
-	padding: $border-width * 2;
-	border-radius: $radius-block-ui;
-	border: $gray-200 $border-width solid;
 
-	&.is-active {
+	.edit-site-global-styles-variations_item-preview {
+		padding: $border-width * 2;
+		border-radius: $radius-block-ui;
+		border: $gray-200 $border-width solid;
+	}
+
+	&.is-active .edit-site-global-styles-variations_item-preview {
 		border: $gray-900 $border-width solid;
 	}
 
-	&:hover {
+	&:hover .edit-site-global-styles-variations_item-preview {
 		border: var(--wp-admin-theme-color) $border-width solid;
 	}
 
-	&:focus {
+	&:focus .edit-site-global-styles-variations_item-preview {
 		border: var(--wp-admin-theme-color) $border-width solid;
 	}
 }

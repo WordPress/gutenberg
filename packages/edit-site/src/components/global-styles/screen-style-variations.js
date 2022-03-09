@@ -13,6 +13,8 @@ import { useMemo, useContext } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import {
 	__experimentalGrid as Grid,
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	Card,
 	CardBody,
 } from '@wordpress/components';
@@ -78,7 +80,12 @@ function Variation( { variation } ) {
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
 			>
-				<StylesPreview height={ 100 } />
+				<VStack spacing="2">
+					<div className="edit-site-global-styles-variations_item-preview">
+						<StylesPreview height={ 100 } />
+					</div>
+					<HStack alignment="center">{ variation?.name }</HStack>
+				</VStack>
 			</div>
 		</GlobalStylesContext.Provider>
 	);
