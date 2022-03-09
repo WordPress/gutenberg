@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -62,6 +62,36 @@ describe( 'NumberControl', () => {
 			fireEvent.change( input, { target: { value: 10 } } );
 
 			expect( spy ).toHaveBeenCalledWith( '10' );
+		} );
+
+		it( 'should call onChange callback when value is clamped on blur', async () => {
+			const spy = jest.fn();
+			render(
+				<NumberControl
+					value={ 5 }
+					min={ 4 }
+					max={ 10 }
+					onChange={ ( v ) => spy( v ) }
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: 1 } } );
+
+			// Before blurring, the value is still un-clamped
+			expect( input.value ).toBe( '1' );
+
+			input.blur();
+
+			// After blur, value is clamped
+			expect( input.value ).toBe( '4' );
+
+			await waitFor( () => {
+				expect( spy ).toHaveBeenCalledTimes( 2 );
+				expect( spy ).toHaveBeenNthCalledWith( 1, '1' );
+				expect( spy ).toHaveBeenNthCalledWith( 2, 4 );
+			} );
 		} );
 	} );
 
