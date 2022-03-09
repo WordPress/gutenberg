@@ -38,7 +38,7 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import PreferencesModal from '../preferences-modal';
+import EditPostPreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
@@ -283,7 +283,7 @@ function Layout( { styles } ) {
 					next: nextShortcut,
 				} }
 			/>
-			<PreferencesModal />
+			<EditPostPreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
 			<Popover.Slot />

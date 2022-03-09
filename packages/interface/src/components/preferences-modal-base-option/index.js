@@ -5,7 +5,7 @@ import { ToggleControl } from '@wordpress/components';
 
 function BaseOption( { help, label, isChecked, onChange, children } ) {
 	return (
-		<div className="edit-post-preferences-modal__option">
+		<div className="interface-preferences-modal__option">
 			<ToggleControl
 				help={ help }
 				label={ label }

@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
-	store as coreStore,
+	__experimentalUseEntityRecord as useEntityRecord,
 } from '@wordpress/core-data';
 import {
 	Placeholder,
@@ -33,27 +33,12 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		ref
 	);
-	const { isMissing, hasResolved } = useSelect(
-		( select ) => {
-			const persistedBlock = select( coreStore ).getEntityRecord(
-				'postType',
-				'wp_block',
-				ref
-			);
-			const hasResolvedBlock = select(
-				coreStore
-			).hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				'wp_block',
-				ref,
-			] );
-			return {
-				hasResolved: hasResolvedBlock,
-				isMissing: hasResolvedBlock && ! persistedBlock,
-			};
-		},
-		[ ref, clientId ]
+	const { record, hasResolved } = useEntityRecord(
+		'postType',
+		'wp_block',
+		ref
 	);
+	const isMissing = hasResolved && ! record;
 
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
