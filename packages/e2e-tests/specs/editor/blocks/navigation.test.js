@@ -340,6 +340,53 @@ describe( 'Navigation', () => {
 			// Resolve the controlled mocked API request.
 			resolveNavigationRequest();
 		} );
+
+		it( 'shows a loading indicator whilst empty Navigation menu is being created', async () => {
+			const testNavId = 1;
+
+			let resolveNavigationRequest;
+
+			// Mock the request for the single Navigation post in order to fully
+			// control the resolution of the request. This will enable the ability
+			// to assert on how the UI responds during the API resolution without
+			// relying on variable factors such as network conditions.
+			await setUpResponseMocking( [
+				{
+					match: ( request ) =>
+						request.url().includes( `rest_route` ) &&
+						request.url().includes( `navigation` ) &&
+						request.url().includes( testNavId ),
+					onRequestMatch: () => {
+						// The Promise simulates a REST API request whose resolultion
+						// the test has full control over.
+						return new Promise( ( resolve ) => {
+							// Assign the resolution function to the var in the
+							// upper scope to afford control over resolution.
+							resolveNavigationRequest = resolve;
+						} );
+					},
+				},
+			] );
+
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			let navBlock = await waitForBlock( 'Navigation' );
+
+			// Create empty Navigation block with no items
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+			await startEmptyButton.click();
+
+			navBlock = await waitForBlock( 'Navigation' );
+
+			// Check for the spinner to be present whilst loading.
+			await navBlock.waitForSelector( '.components-spinner' );
+
+			// Resolve the controlled mocked API request.
+			resolveNavigationRequest();
+		} );
 	} );
 
 	describe( 'Placeholder', () => {
@@ -357,9 +404,9 @@ describe( 'Navigation', () => {
 				// Check for unconfigured Placeholder state to display
 				await page.waitForXPath( START_EMPTY_XPATH );
 
-				// Deselect the Nav block.
-				await page.keyboard.press( 'Escape' );
-				await page.keyboard.press( 'Escape' );
+				// Deselect the Nav block by inserting a new block at the root level
+				// outside of the Nav block.
+				await insertBlock( 'Paragraph' );
 
 				const navBlock = await waitForBlock( 'Navigation' );
 
@@ -386,11 +433,15 @@ describe( 'Navigation', () => {
 				);
 				await startEmptyButton.click();
 
-				const navBlock = await waitForBlock( 'Navigation' );
+				// Wait for block to resolve
+				let navBlock = await waitForBlock( 'Navigation' );
 
-				// Deselect the Nav block.
-				await page.keyboard.press( 'Escape' );
-				await page.keyboard.press( 'Escape' );
+				// Deselect the Nav block by inserting a new block at the root level
+				// outside of the Nav block.
+				await insertBlock( 'Paragraph' );
+
+				// Aquire fresh reference to block
+				navBlock = await waitForBlock( 'Navigation' );
 
 				// Check Placeholder Preview is visible.
 				await navBlock.waitForSelector(
@@ -461,6 +512,11 @@ describe( 'Navigation', () => {
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
 		await startEmptyButton.click();
+
+		// Await "success" notice.
+		await page.waitForXPath(
+			'//div[@class="components-snackbar__content"][contains(text(), "Navigation Menu successfully created.")]'
+		);
 
 		const appender = await page.waitForSelector(
 			'.wp-block-navigation .block-list-appender'
