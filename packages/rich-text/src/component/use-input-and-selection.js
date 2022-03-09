@@ -152,7 +152,8 @@ export function useInputAndSelection( props ) {
 				) {
 					const { start, end } = createRecord();
 					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
-					ownerDocument.activeElement.contentEditable = false;
+					// Need to find alternative solution for this.
+					// ownerDocument.activeElement.contentEditable = false;
 					onSelectionChange( start, end );
 				} else if (
 					element.contains( anchorNode ) &&

@@ -27,8 +27,7 @@
 	&.is-navigate-mode .block-editor-block-list__block.is-selected,
 	&.is-navigate-mode .block-editor-block-list__block.is-hovered,
 	.block-editor-block-list__block.is-highlighted,
-	.block-editor-block-list__block.is-multi-selected {
-
+	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected {
 		&::after {
 			// Show selection borders around every non-nested block's actual footprint.
 			position: absolute;
@@ -70,7 +69,6 @@
 		outline: $border-width solid transparent;
 	}
 
-	.block-editor-block-list__block.is-multi-selected::after,
 	&.is-navigate-mode .block-editor-block-list__block.is-selected::after,
 	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
