@@ -6,10 +6,6 @@ import { I18nManager, LogBox } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	validateThemeColors,
-	validateThemeGradients,
-} from '@wordpress/block-editor';
 import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
 import { addAction, addFilter } from '@wordpress/hooks';
 import * as wpData from '@wordpress/data';
@@ -34,6 +30,12 @@ const reactNativeSetup = () => {
 		 * https://git.io/J1lZY
 		 */
 		'Overriding previous layout animation',
+	] );
+
+	// "@react-navigation" package uses the old API of gesture handler,
+	// so the warning will be silenced until it gets updated.
+	LogBox.ignoreLogs( [
+		"[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
 	] );
 
 	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
@@ -80,8 +82,6 @@ const setupInitHooks = () => {
 				initialTitle,
 				postType,
 				featuredImageId,
-				colors,
-				gradients,
 				rawStyles,
 				rawFeatures,
 				galleryWithImageBlocks,
@@ -98,10 +98,6 @@ const setupInitHooks = () => {
 				postType = 'post';
 			}
 
-			colors = validateThemeColors( colors );
-
-			gradients = validateThemeGradients( gradients );
-
 			return {
 				initialHtml: initialData,
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
@@ -109,8 +105,6 @@ const setupInitHooks = () => {
 				postType,
 				featuredImageId,
 				capabilities,
-				colors,
-				gradients,
 				rawStyles,
 				rawFeatures,
 				galleryWithImageBlocks,

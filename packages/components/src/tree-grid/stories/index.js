@@ -9,7 +9,10 @@ import { Fragment } from '@wordpress/element';
 import TreeGrid, { TreeGridRow, TreeGridCell } from '../';
 import { Button } from '../../';
 
-export default { title: 'Components/TreeGrid', component: TreeGrid };
+export default {
+	title: 'Components (Experimental)/TreeGrid',
+	component: TreeGrid,
+};
 
 const groceries = [
 	{

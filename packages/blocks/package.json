@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "11.2.1-next.f435e9e01b.0",
+	"version": "11.2.2",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -49,6 +49,9 @@
 		"showdown": "^1.9.1",
 		"simple-html-tokenizer": "^0.5.7",
 		"uuid": "^8.3.0"
+	},
+	"peerDependencies": {
+		"react": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

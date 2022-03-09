@@ -2,11 +2,21 @@
 
 ## Unreleased
 
-## 8.1.1-next.0 (2022-02-23)
+## 8.2.0 (2022-02-23)
+
+### New Features
+
+-   `LineHeightControl`: Changes internal implementation to use `NumberControl`, which allows enhanced interactions such as dragging to change the value. To improve consistency with other control components, the bottom margin styles on the component has been deprecated, and will be removed in a future version. To opt into this simplified margin style, set the `__nextHasNoMarginBottom` prop to `true`.
+
+## 8.1.1 (2022-02-10)
 
 ### Bug Fix
 
 -   Removed unused `@wordpress/block-serialization-default-parser`, `css-mediaquery`, `memize` and `redux-multi` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+### New Features
+
+-   List View now supports selecting and dragging multiple blocks via `SHIFT` clicking items in the list [#38314](https://github.com/WordPress/gutenberg/pull/38314).
 
 ## 8.1.0 (2022-01-27)
 

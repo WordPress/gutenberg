@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	trashAllPosts,
+	deleteAllTemplates,
 	activateTheme,
 	visitSiteEditor,
 } from '@wordpress/e2e-test-utils';
@@ -26,8 +26,8 @@ async function getDocumentSettingsSecondaryTitle() {
 describe( 'Document Settings', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
@@ -39,13 +39,13 @@ describe( 'Document Settings', () => {
 
 	describe( 'when a template is selected from the navigation sidebar', () => {
 		it( 'should display the selected templates name in the document header', async () => {
-			// Navigate to a template
+			// Navigate to a template.
 			await visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
 
-			// Evaluate the document settings title
+			// Evaluate the document settings title.
 			const actual = await getDocumentSettingsTitle();
 
 			expect( actual ).toEqual( 'Editing template: Index' );
@@ -65,7 +65,7 @@ describe( 'Document Settings', () => {
 					'button[aria-label="Close List View Sidebar"]'
 				);
 
-				// Evaluate the document settings secondary title
+				// Evaluate the document settings secondary title.
 				const actual = await getDocumentSettingsSecondaryTitle();
 
 				expect( actual ).toEqual( 'Editing template part: header' );
@@ -75,13 +75,13 @@ describe( 'Document Settings', () => {
 
 	describe( 'when a template part is selected from the navigation sidebar', () => {
 		it( "should display the selected template part's name in the document header", async () => {
-			// Navigate to a template part
+			// Navigate to a template part.
 			await visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
 
-			// Evaluate the document settings title
+			// Evaluate the document settings title.
 			const actual = await getDocumentSettingsTitle();
 
 			expect( actual ).toEqual( 'Editing template part: header' );

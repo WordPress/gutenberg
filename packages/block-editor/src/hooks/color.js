@@ -209,7 +209,7 @@ function addAttributes( settings ) {
 		return settings;
 	}
 
-	// allow blocks to specify their own attribute definition with default values if needed.
+	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( ! settings.attributes.backgroundColor ) {
 		Object.assign( settings.attributes, {
 			backgroundColor: {
@@ -269,7 +269,7 @@ export function addSaveProps( props, blockType, attributes ) {
 		textClass,
 		gradientClass,
 		{
-			// Don't apply the background class if there's a custom gradient
+			// Don't apply the background class if there's a custom gradient.
 			[ backgroundClass ]:
 				( ! hasGradient || ! style?.color?.gradient ) &&
 				!! backgroundClass,

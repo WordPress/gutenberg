@@ -467,7 +467,6 @@ export const WithConditionallyRenderedControl = () => {
 	);
 };
 
-export { TypographyPanel } from './typography-panel';
 export { ToolsPanelWithItemGroupSlot } from './tools-panel-with-item-group-slot';
 
 const PanelWrapperView = styled.div`

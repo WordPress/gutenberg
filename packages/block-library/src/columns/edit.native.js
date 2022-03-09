@@ -317,7 +317,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			// Update own alignment.
 			setAttributes( { verticalAlignment } );
 
-			// Update all child Column Blocks to match
+			// Update all child Column Blocks to match.
 			const innerBlockClientIds = getBlockOrder( clientId );
 			innerBlockClientIds.forEach( ( innerBlockClientId ) => {
 				updateBlockAttributes( innerBlockClientId, {
@@ -359,7 +359,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
 
-			// Get verticalAlignment from Columns block to set the same to new Column
+			// Get verticalAlignment from Columns block to set the same to new Column.
 			const { verticalAlignment } = getBlockAttributes( clientId ) || {};
 
 			if ( isAddingColumn && hasExplicitWidths ) {
@@ -421,7 +421,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 				blockEditorStore
 			);
 
-			// Get verticalAlignment from Columns block to set the same to new Column
+			// Get verticalAlignment from Columns block to set the same to new Column.
 			const { verticalAlignment } = getBlockAttributes( clientId );
 
 			const innerBlocks = getBlocks( clientId );

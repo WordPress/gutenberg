@@ -22,6 +22,9 @@
 		width: 100%;
 	}
 
+	&.alignleft,
+	&.alignright,
+	&.aligncenter,
 	.alignleft,
 	.alignright,
 	.aligncenter {
@@ -66,7 +69,8 @@
 	}
 
 	// Variations
-	&.is-style-rounded img {
+	&.is-style-rounded img,
+	.is-style-rounded img {
 		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 		// to rectangular images. A pill-shape is better than otherwise.
 		border-radius: 9999px;

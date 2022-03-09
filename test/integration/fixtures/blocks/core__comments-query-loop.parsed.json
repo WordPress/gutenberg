@@ -2,8 +2,10 @@
 	{
 		"blockName": "core/comments-query-loop",
 		"attrs": {
+			"inherit": false,
 			"perPage": 2,
-			"order": "desc"
+			"order": "desc",
+			"defaultPage": "oldest"
 		},
 		"innerBlocks": [
 			{

@@ -21,6 +21,10 @@ if ( hasArgInCLI( '--webpack--devtool' ) ) {
 	process.env.WP_DEVTOOL = getArgFromCLI( '--webpack--devtool' );
 }
 
+if ( hasArgInCLI( '--webpack-copy-php' ) ) {
+	process.env.WP_COPY_PHP_FILES_TO_DIST = true;
+}
+
 const { status } = spawn(
 	resolveBin( 'webpack' ),
 	[ hasArgInCLI( '--hot' ) ? 'serve' : 'watch', ...getWebpackArgs() ],

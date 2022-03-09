@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "8.1.2-next.f435e9e01b.0",
+	"version": "8.2.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -53,6 +53,7 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/shortcode": "file:../shortcode",
+		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/token-list": "file:../token-list",
 		"@wordpress/url": "file:../url",
 		"@wordpress/warning": "file:../warning",

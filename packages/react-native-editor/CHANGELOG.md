@@ -10,11 +10,28 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Add GIF badge for animated GIFs uploaded to Image blocks [#38996]
+
+-   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
+
+-   [*] Update gesture handler and reanimated libraries [#39098]
+
+## 1.71.3
+
+-   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
+-   [***] Support for multiple color palettes [#38417]
+
+## 1.71.1
+
+-   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
 
 ## 1.71.0
 
 -   [*] Image block: Replacing the media for an image set as featured prompts to update the featured image [#34666]
 -   [***] Font size and line-height support for text-based blocks used in block-based themes [#38205]
+
+## 1.70.3
+
 -   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
 
 ## 1.70.2

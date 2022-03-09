@@ -106,7 +106,6 @@ Clicks on More Menu item, searches for the button with the text provided and cli
 _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
--   _context_ `[GutenbergContext]`: Whether to click the button in the post editor or site editor context.
 
 ### clickSiteEditorMenuItem
 
@@ -235,6 +234,14 @@ _Parameters_
 ### deleteAllMenus
 
 Delete all menus using the REST API
+
+### deleteAllTemplates
+
+Delete all the templates of given type.
+
+_Parameters_
+
+-   _type_ `('wp_template'|'wp_template_part')`: - Template type to delete.
 
 ### deleteAllWidgets
 
@@ -824,7 +831,6 @@ Toggles the More Menu.
 _Parameters_
 
 -   _waitFor_ `['open' | 'close']`: Whether it should wait for the menu to open or close. If `undefined` it won't wait for anything.
--   _context_ `[GutenbergContext]`: Whether it's toggling in the context of the site editor or post editor.
 
 ### toggleOfflineMode
 

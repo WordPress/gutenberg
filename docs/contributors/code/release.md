@@ -24,6 +24,8 @@ The plugin release process is entirely automated and happens solely on GitHub --
 
 For your convenience, here's an [11-minute video walkthrough](https://youtu.be/TnSgJd3zpJY) that demonstrates the release process. It's recommended to watch this if you're unfamiliar with it. The process is also documented in the following paragraphs.
 
+#### Running workflow
+
 In order to start the release process, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
 
 ![Run workflow dropdown](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/workflow-dispatch-banner.png)
@@ -31,6 +33,8 @@ In order to start the release process, go to Gutenberg's GitHub repository's Act
 To release a release candidate (RC) version of the plugin, enter `rc`. To release a stable version, enter `stable`. In each case, press the green "Run workflow" button.
 
 This will trigger a GitHub Actions (GHA) workflow that bumps the plugin version, builds the Gutenberg plugin .zip file, creates a release draft, and attaches the plugin .zip file to it. This part of the process typically takes a little under six minutes. You'll see that workflow appear at the top of the list, right under the blue banner. Once it's finished, it'll change its status icon from a yellow dot to a green checkmark. You can follow along in a more detailed view by clicking on the workflow.
+
+#### View the release draft
 
 As soon as the workflow has finished, you'll find the release draft under https://github.com/WordPress/gutenberg/releases. The draft is pre-populated with changelog entries based on previous release candidates for this version, and any changes that have since been cherry-picked to the release branch. Thus, when releasing the first stable version of a series, make sure to delete any RC version headers (that are only there for your information) and to move the more recent changes to the correct section (see below).
 
@@ -45,10 +49,12 @@ When editing the notes, you should be sure to:
 
 You can find some more tips on writing the release notes and post in the section below.
 
+#### Publishing the release
+
 Only once you're happy with the shape of the release notes should you press the green "Publish release" button. This will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) that has a twofold purpose:
 
 1. Use the release notes that you just edited to update `changelog.txt`, and
-2. upload the new plugin version to the WordPress.org plugin repository (SVN) (only if you're releasing a stable version).
+2. Upload the new plugin version to the WordPress.org plugin repository (SVN) (only if you're releasing a stable version).
 
 The latter step needs approval by a member of the Gutenberg Core team. Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
@@ -140,7 +146,11 @@ The method for point releases is nearly identical to the main Plugin release pro
 
 The point release should only contain the _specific commits_ required. To do this you should checkout the previous _minor_ stable (i.e. non-RC) release branch (e.g. `release/12.5`) locally and then cherry pick any commits that you require into that branch.
 
-Once you have the stable release branch in order you can _push it to Github_ and continue with the release process using the Github website GUI.
+You must also ensure that all PRs being included are assigned to the Github Milestone on which the point release is based. Bear in mind, that when PRs are _merged_ they are automatically assigned a milestone for the next _stable_ release. Therefore you will need to go back through each PR in Github and re-assign the Milestone.
+
+For example, if you are releasing version `12.5.4`, then all PRs picked for that release must be unassigned from the `12.6` Milestone and instead assigned to the `12.5` Milestone.
+
+Once you have the stable release branch in order and the correct Milestone assigned to your PRs you can _push the branch to Github_ and continue with the release process using the Github website GUI.
 
 #### Running the point release
 
@@ -154,9 +164,27 @@ _If_ however, the previous release was an **RC** (e.g. `X.Y.0-rc.1`) you will ne
 
 To do this, when running the Workflow, select the appropriate `release/` branch from the `Use workflow from` dropdown (e.g. `release/12.5`) and specify `stable` in the text input field.
 
-Please note you **cannot create point releases for previous stable releases once a more recent stable release has been published** as this would require significant changes to how we upload plugin versions to the WP.org plugin SVN repo). Always check the latest release version before you proceed.
+Please note you **cannot create point releases for previous stable releases once a more recent stable release has been published** as this would require significant changes to how we upload plugin versions to the WP.org plugin SVN repo). Always check the latest release version before you proceed (see [this Issue](https://github.com/WordPress/gutenberg/issues/33277#issuecomment-876289457) for more information).
 
-More more information please see [this Issue](https://github.com/WordPress/gutenberg/issues/33277#issuecomment-876289457).
+#### Troubleshooting
+
+> The release draft was created but it was empty/contained an error message
+
+If you forget to assign the correct Milestone to your cherry picked PR(s) then the changelog may not be generated as you would expect.
+
+It is important to always manually verify that the PRs shown in the changelog match up with those cherry picked to the release branch.
+
+Moreover, if the release includes only a single PR, then failing to assign the PR to the correct Milestone will cause an error to be displayed when generating the changelog. In this case you can edit the release notes to include details of the missing PR (manually copying the format from a previous release).
+
+If for any reason the Milestone has been closed, you may reopen it for the purposes of the release.
+
+> The draft release only contains 1 asset file. Other releases have x3.
+
+This is expected. The draft release will contain only the plugin zip. Only once the release is published will the remaining assets be generated and added to the release.
+
+> Do I need to publish point releases to WordPress.org?
+
+Yes. The method for this is identical to the main Plugin release process. You will need a Gutenberg Core team member to approve the release workflow.
 
 ## Packages Releases to npm and WordPress Core Updates
 
@@ -184,7 +212,7 @@ A different person usually synchronizes the WordPress `trunk` branch and publish
 
 The process has three steps: 1) update the `wp/trunk` branch within the Gutenberg repo 2) publish the new package versions to npm 3) update the WordPress `trunk` branch.
 
-The first step is automated via `./bin/plugin/cli.js npm-latest` command. You only have to run the command, but, for the record, the manual process would look very close to the following steps:
+All steps are automated via `./bin/plugin/cli.js npm-latest` command. You only have to run the command, but, for the record, the manual process would look very close to the following steps:
 
 1. Ensure the WordPress `trunk` branch is open for enhancements.
 2. Get the last published Gutenberg release branch with `git fetch`.
@@ -199,8 +227,7 @@ The first step is automated via `./bin/plugin/cli.js npm-latest` command. You on
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
     - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
-
-Finally, now that the npm packages are ready, a patch can be created and committed into WordPress `trunk`. You should also cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
+11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### Minor WordPress Releases
 
@@ -272,97 +299,17 @@ Check the versions listed in the current `CHANGELOG.md` file, looking through th
 
 Note: You may discover the current version of each package is not up to date, if so updating the previously released versions would be appreciated.
 
-The good news is that the rest of the process is automated with `./bin/plugin/cli.js npm-bugfix` command. The rest of the section covers all the necessary steps for publishing the packages if you prefer to do it manually.
+The good news is that the rest of the process is automated with `./bin/plugin/cli.js npm-bugfix` command. For the record, the manual process would look very close to the following steps:
 
-Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#maintaining-changelogs) documentation and commit the changes:
-
-1. `git checkout wp/trunk`
-2. Update each of the `CHANGELOG.md` files
-3. Stage the _changelog_ changes `git add packages/`
-4. `git commit -m "Update changelogs"`
-5. Make a note of the commit hash of this commit
-    > Example
-    >
-    > ```
-    > [trunk 278f524f16] Update changelogs` 278f524
-    > ```
-6. `git push`
-
-Now that the changes have been committed to the `wp/trunk` branch and the Travis CI builds for the `wp/trunk` [branch are passing](https://travis-ci.com/WordPress/gutenberg/branches) it's time to publish the packages to npm:
-
-1. Once again run `npm run publish:check` to confirm there are no unexpected packages ready to be published:
-    > Example
-    >
-    > ```shell
-    > npm run publish:check
-    > @wordpress/e2e-tests
-    > @wordpress/jest-preset-default
-    > @wordpress/scripts
-    > lerna success found 3 packages ready to publish
-    > ```
-2. Run the `npm run publish:latest` command (see more in [package release process]) but when asked for the version numbers to choose for each package use the versions you made note of above when updating each packages `CHANGELOG.md` file.
-    > Truncated example of publishing process output
-    >
-    > ```
-    > npm run publish:latest
-    >
-    > Build Progress: [==============================] 100%
-    > lerna notice cli v3.18.2
-    > lerna info versioning independent
-    > ? Select a new version for @wordpress/e2e-tests (currently 1.9.0) Patch (1.9.1)
-    > ? Select a new version for @wordpress/jest-preset-default (currently 5.3.0) Patch (5.3.1)
-    > ? Select a new version for @wordpress/scripts (currently 6.1.0) Patch (6.1.1)
-    >
-    > Changes:
-    >  - @wordpress/e2e-tests: 1.9.0 => 1.9.1
-    >  - @wordpress/jest-preset-default: 5.3.0 => 5.3.1
-    >  - @wordpress/scripts: 6.1.0 => 6.1.1
-    >
-    > ? Are you sure you want to publish these packages? Yes
-    > lerna info execute Skipping releases
-    > lerna info git Pushing tags...
-    > lerna info publish Publishing packages to npm...
-    > lerna info Verifying npm credentials
-    > lerna info Checking two-factor auth mode
-    > ? Enter OTP: 753566
-    > lerna success published @wordpress/jest-preset-default 5.3.1
-    > lerna success published @wordpress/scripts 6.1.1
-    > lerna success published @wordpress/e2e-tests 1.9.1
-    > Successfully published:
-    >  - @wordpress/e2e-tests@1.9.1
-    >  - @wordpress/jest-preset-default@5.3.1
-    >  - @wordpress/scripts@6.1.1
-    > lerna success published 3 packages
-    > ```
-
-Now that the packages have been published the _"chore(release): publish"_ and _"Update changelogs"_ commits to `wp/trunk` need to be ported to the `trunk` branch:
-
-1. `git checkout trunk`
-2. `git pull`
-3. Cherry-pick the `278f524`hash you noted above from the _"Update changelogs"_ commit made to `wp/trunk`
-4. `git cherry-pick 278f524`
-5. Get the commit hash from the lerna publish commit either from the terminal or [wp/trunk commits](https://github.com/WordPress/gutenberg/commits/wp/trunk)
-6. Cherry-pick the `fe6ae0d` "chore(release): publish"\_ commit made to `wp/trunk`
-7. `git cherry-pick fe6ae0d`
-8. `git push`
-
-Confirm the packages dependencies do not contain `file://` links in the `dependencies` or `devdependencies` section of the packages released, e.g:
-
-> https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json > https://unpkg.com/browse/@wordpress/scripts@6.1.1/package.json > https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json
-
-Time to announce the published changes in the #core-js and #core-editor Slack channels
-
-> ```
-> 📣 Successfully published:
-> • @wordpress/e2e-tests@1.9.1
-> • @wordpress/jest-preset-default@5.3.1
-> • @wordpress/scripts@6.1.1
-> Lerna success published 3 packages
-> ```
-
----
-
-Ta-da! 🎉
+1. Check out the `wp/trunk` branch.
+2. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch.
+3. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
+4. From the `wp/trunk` branch, install npm dependencies with `npm ci`.
+5. Run the script `npm run publish:latest`.
+    - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
+    - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
+    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
+6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### Development Releases
 

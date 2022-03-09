@@ -24,7 +24,7 @@ jest.mock( '@wordpress/api-fetch', () => ( {
 } ) );
 
 function createRegistryWithStores() {
-	// create a registry and register stores
+	// Create a registry and register stores.
 	const registry = createRegistry();
 
 	registry.register( coreStore );
@@ -102,7 +102,7 @@ describe( 'Actions', () => {
 			} );
 
 			const registry = createRegistryWithStores();
-			// mock the api-fetch
+			// Mock the api-fetch.
 			apiFetch.mockImplementation( async ( args ) => {
 				const { path, data } = args;
 				switch ( path ) {
@@ -124,7 +124,7 @@ describe( 'Actions', () => {
 					staticBlock.clientId,
 				] );
 
-			// check that blocks were converted to reusable
+			// Check that blocks were converted to reusable.
 			const updatedBlocks = registry
 				.select( blockEditorStore )
 				.getBlocks();
@@ -133,7 +133,7 @@ describe( 'Actions', () => {
 
 			expect( updatedBlocks ).toHaveLength( 1 );
 
-			// Delete random clientId before matching with snapshot
+			// Delete random clientId before matching with snapshot.
 			delete updatedBlocks[ 0 ].clientId;
 			expect( updatedBlocks ).toMatchSnapshot();
 
@@ -158,7 +158,7 @@ describe( 'Actions', () => {
 			};
 
 			const registry = createRegistryWithStores();
-			// mock the api-fetch
+			// Mock the api-fetch.
 			apiFetch.mockImplementation( async ( args ) => {
 				const { path, data } = args;
 				switch ( path ) {
@@ -182,14 +182,14 @@ describe( 'Actions', () => {
 					associatedBlock.clientId,
 				] );
 
-			// check that blocks were converted to reusable
+			// Check that blocks were converted to reusable.
 			const updatedBlocks = registry
 				.select( blockEditorStore )
 				.getBlocks();
 
 			expect( updatedBlocks ).toHaveLength( 1 );
 
-			// Delete random clientIds before matching with snapshot
+			// Delete random clientIds before matching with snapshot.
 			delete updatedBlocks[ 0 ].clientId;
 			delete updatedBlocks[ 0 ].innerBlocks[ 0 ].clientId;
 			delete updatedBlocks[ 0 ].innerBlocks[ 1 ].clientId;
@@ -219,7 +219,7 @@ describe( 'Actions', () => {
 			];
 
 			const registry = createRegistryWithStores();
-			// mock the api-fetch
+			// Mock the api-fetch.
 			apiFetch.mockImplementation( async ( args ) => {
 				const { path, data, method } = args;
 				if (
@@ -246,7 +246,7 @@ describe( 'Actions', () => {
 				.dispatch( blockEditorStore )
 				.insertBlocks( availableBlocks );
 
-			// confirm that reusable block is stored
+			// Confirm that reusable block is stored.
 			const reusableBlockBefore = registry
 				.select( coreStore )
 				.getEntityRecord( 'postType', 'wp_block', reusableBlock.id );
@@ -257,13 +257,13 @@ describe( 'Actions', () => {
 				.dispatch( reusableBlocksStore )
 				.__experimentalDeleteReusableBlock( reusableBlock.id );
 
-			// check if reusable block was deleted
+			// Check if reusable block was deleted.
 			const reusableBlockAfter = registry
 				.select( coreStore )
 				.getEntityRecord( 'postType', 'wp_block', reusableBlock.id );
 			expect( reusableBlockAfter ).toBeFalsy();
 
-			// check if block instances were removed from the editor
+			// Check if block instances were removed from the editor.
 			const blocksAfter = registry.select( blockEditorStore ).getBlocks();
 			expect( blocksAfter ).toHaveLength( 3 );
 		} );

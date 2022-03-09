@@ -283,12 +283,12 @@ export const deleteEntityRecord = (
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string}  kind               Kind of the edited entity record.
- * @param {string}  name               Name of the edited entity record.
- * @param {number}  recordId           Record ID of the edited entity record.
- * @param {Object}  edits              The edits.
- * @param {Object}  options            Options for the edit.
- * @param {boolean} options.undoIgnore Whether to ignore the edit in undo history or not.
+ * @param {string}  kind                 Kind of the edited entity record.
+ * @param {string}  name                 Name of the edited entity record.
+ * @param {number}  recordId             Record ID of the edited entity record.
+ * @param {Object}  edits                The edits.
+ * @param {Object}  options              Options for the edit.
+ * @param {boolean} [options.undoIgnore] Whether to ignore the edit in undo history or not.
  *
  * @return {Object} Action object.
  */
@@ -345,8 +345,6 @@ export const editEntityRecord = (
 /**
  * Action triggered to undo the last edit to
  * an entity record, if any.
- *
- * @return {undefined}
  */
 export const undo = () => ( { select, dispatch } ) => {
 	const undoEdit = select.getUndoEdit();
@@ -363,8 +361,6 @@ export const undo = () => ( { select, dispatch } ) => {
 /**
  * Action triggered to redo the last undoed
  * edit to an entity record, if any.
- *
- * @return {undefined}
  */
 export const redo = () => ( { select, dispatch } ) => {
 	const redoEdit = select.getRedoEdit();
@@ -466,7 +462,7 @@ export const saveEntityRecord = (
 				// so the client just sends and receives objects.
 				const currentUser = select.getCurrentUser();
 				const currentUserId = currentUser ? currentUser.id : undefined;
-				const autosavePost = resolveSelect.getAutosave(
+				const autosavePost = await resolveSelect.getAutosave(
 					persistedRecord.type,
 					persistedRecord.id,
 					currentUserId
@@ -607,8 +603,8 @@ export const saveEntityRecord = (
  *                         `saveEntityRecord`, `saveEditedEntityRecord`, and
  *                         `deleteEntityRecord`.
  *
- * @return {Promise} A promise that resolves to an array containing the return
- *                   values of each function given in `requests`.
+ * @return {(thunkArgs: Object) => Promise} A promise that resolves to an array containing the return
+ *                                          values of each function given in `requests`.
  */
 export const __experimentalBatch = ( requests ) => async ( { dispatch } ) => {
 	const batch = createBatch();

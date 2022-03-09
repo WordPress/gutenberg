@@ -48,6 +48,7 @@ function ListViewBlock( {
 	showBlockMovers,
 	path,
 	isExpanded,
+	selectedClientIds,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -104,14 +105,22 @@ function ListViewBlock( {
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
-			event.stopPropagation();
-			selectBlock( clientId );
+			selectBlock( event, clientId );
 		},
 		[ clientId, selectBlock ]
 	);
 
+	const selectDuplicatedBlock = useCallback(
+		( newClientId ) => {
+			selectBlock( undefined, newClientId );
+		},
+		[ selectBlock ]
+	);
+
 	const toggleExpanded = useCallback(
 		( event ) => {
+			// Prevent shift+click from opening link in a new window when toggling.
+			event.preventDefault();
 			event.stopPropagation();
 			if ( isExpanded === true ) {
 				collapse( clientId );
@@ -124,7 +133,7 @@ function ListViewBlock( {
 
 	const showBlockActions =
 		withExperimentalFeatures &&
-		//hide actions for blocks like core/widget-areas
+		// hide actions for blocks like core/widget-areas
 		( ! hideContainerBlockActions ||
 			( hideContainerBlockActions && level > 1 ) );
 
@@ -146,11 +155,21 @@ function ListViewBlock( {
 	} );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const settingsAriaLabel = sprintf(
-		// translators: %s: The title of the block.
-		__( 'Options for %s block' ),
-		blockInformation.title
-	);
+	const settingsAriaLabel = blockInformation
+		? sprintf(
+				// translators: %s: The title of the block.
+				__( 'Options for %s block' ),
+				blockInformation.title
+		  )
+		: __( 'Options' );
+
+	// Only include all selected blocks if the currently clicked on block
+	// is one of the selected blocks. This ensures that if a user attempts
+	// to alter a block that isn't part of the selection, they're still able
+	// to do so.
+	const dropdownClientIds = selectedClientIds.includes( clientId )
+		? selectedClientIds
+		: [ clientId ];
 
 	return (
 		<ListViewLeaf
@@ -186,6 +205,7 @@ function ListViewBlock( {
 							tabIndex={ tabIndex }
 							onFocus={ onFocus }
 							isExpanded={ isExpanded }
+							selectedClientIds={ selectedClientIds }
 						/>
 					</div>
 				) }
@@ -226,7 +246,7 @@ function ListViewBlock( {
 				<TreeGridCell className={ listViewBlockSettingsClassName }>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsDropdown
-							clientIds={ [ clientId ] }
+							clientIds={ dropdownClientIds }
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
 							toggleProps={ {
@@ -236,7 +256,7 @@ function ListViewBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ selectEditorBlock }
+							__experimentalSelectBlock={ selectDuplicatedBlock }
 						/>
 					) }
 				</TreeGridCell>

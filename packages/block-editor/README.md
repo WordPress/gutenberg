@@ -221,17 +221,21 @@ cannot be determined.
 _Usage_
 
 ```jsx
-<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+<BlockTitle
+	clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1"
+	maximumLength={ 17 }
+/>
 ```
 
 _Parameters_
 
 -   _props_ `Object`:
 -   _props.clientId_ `string`: Client ID of block.
+-   _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
 
 _Returns_
 
--   `?string`: Block title.
+-   `JSX.Element`: Block title.
 
 ### BlockToolbar
 
@@ -736,30 +740,6 @@ _Parameters_
 _Returns_
 
 -   `any`: Returns the value defined for the setting.
-
-### validateThemeColors
-
-Given an array of theme colors checks colors for validity
-
-_Parameters_
-
--   _colors_ `Array`: The array of theme colors
-
-_Returns_
-
--   `Array`: The array of valid theme colors or the default colors
-
-### validateThemeGradients
-
-Given an array of theme gradients checks gradients for validity
-
-_Parameters_
-
--   _gradients_ `Array`: The array of theme gradients
-
-_Returns_
-
--   `Array`: The array of valid theme gradients or the default gradients
 
 ### Warning
 
