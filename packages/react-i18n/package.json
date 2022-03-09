@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-i18n",
-	"version": "3.1.2-next.bfd0c9025a.0",
+	"version": "3.1.1",
 	"description": "React bindings for @wordpress/i18n.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
