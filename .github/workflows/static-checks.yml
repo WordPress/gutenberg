@@ -16,41 +16,6 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    test-npm-publish:
-        name: Publish WordPress packages to npm (Work In Progress)
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout (for CLI)
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
-              with:
-                  path: main
-
-            - name: Checkout (for publishing)
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
-              with:
-                  path: publish
-                  ref: trunk
-                  token: ${{ secrets.GUTENBERG_TOKEN }}
-
-            - name: Configure git user name and email (for publishing)
-              run: |
-                  cd publish
-                  git config user.name "Gutenberg Repository Automation"
-                  git config user.email gutenberg@wordpress.org
-
-            - name: Setup Node
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
-              with:
-                  node-version: 14
-                  registry-url: 'https://registry.npmjs.org'
-
-            - name: Publish packages to npm
-              run: |
-                  cd main
-                  npm ci
-                  ./bin/plugin/cli.js npm-next --ci --repository-path ../publish
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     check:
         name: All
         runs-on: ubuntu-latest
