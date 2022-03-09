@@ -176,7 +176,7 @@ function Iframe(
 			const { contentDocument, ownerDocument } = node;
 			const { readyState, documentElement } = contentDocument;
 
-			if ( readyState !== 'complete' && readyState !== 'interactive' ) {
+			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
 			}
 
@@ -204,9 +204,9 @@ function Iframe(
 		}
 
 		// Document set with srcDoc is not immediately ready.
-		node.addEventListener( 'load', () => {
-			setDocumentIfReady();
-		} );
+		node.addEventListener( 'load', setDocumentIfReady );
+
+		return () => node.removeEventListener( 'load', setDocumentIfReady );
 	}, [] );
 	const headRef = useRefEffect( ( element ) => {
 		scripts
