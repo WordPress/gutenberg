@@ -106,6 +106,7 @@ require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-gutenberg.
 require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider-local.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider-google.php';
 require __DIR__ . '/compat/wordpress-6.0/webfonts.php';
 require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
 require __DIR__ . '/compat/experimental/blocks.php';

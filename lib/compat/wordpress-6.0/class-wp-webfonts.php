@@ -40,6 +40,7 @@ class WP_Webfonts {
 
 		// Register default providers.
 		$this->register_provider( 'local', 'WP_Webfonts_Provider_Local' );
+		$this->register_provider( 'google', 'WP_Webfonts_Provider_Google' );
 
 		// Register callback to generate and enqueue styles.
 		if ( did_action( 'wp_enqueue_scripts' ) ) {
