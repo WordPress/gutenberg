@@ -57,7 +57,7 @@ export type UnitSelectControlProps = {
 	/**
 	 * Size of the control option. Supports "default" and "small".
 	 *
-	 * @default default
+	 * @default 'default'
 	 */
 	size?: SelectSize;
 	/**
