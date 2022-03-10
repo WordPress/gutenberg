@@ -70,7 +70,8 @@
 		"uuid": "^8.3.0"
 	},
 	"devDependencies": {
-		"@jest/globals": "27.5.1"
+		"@jest/globals": "27.5.1",
+		"@testing-library/react": "11.2.2"
 	},
 	"peerDependencies": {
 		"react": "^17.0.0",

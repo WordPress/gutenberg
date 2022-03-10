@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UnitControl Basic rendering should render custom className 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,10 +1,10 @@
+  <div
+    class="components-unit-control-wrapper css-aa2xc3-Root e1bagdl33"
+  >
+    <div
+-     class="components-flex components-input-control components-number-control components-unit-control e1bagdl32 ep48uk90 em5sgkm7 css-18wzek1-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles-paddingStyles em57xhy0"
++     class="components-flex components-input-control components-number-control components-unit-control hello e1bagdl32 ep48uk90 em5sgkm7 css-18wzek1-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles-paddingStyles em57xhy0"
+      data-wp-c16t="true"
+      data-wp-component="Flex"
+    >
+      <div
+        class="components-flex-item em5sgkm3 css-1fmchc6-View-Item-sx-Base-LabelWrapper em57xhy0"
+@@ -15,11 +15,11 @@
+        class="components-input-control__container css-1sy20aj-Container-containerDisabledStyles-containerMarginStyles-containerWidthStyles em5sgkm6"
+      >
+        <input
+          autocomplete="off"
+          class="components-input-control__input css-117vub9-Input-dragStyles-fontSizeStyles-sizeStyles em5sgkm5"
+-         id="inspector-input-control-1"
++         id="inspector-input-control-2"
+          inputmode="numeric"
+          max="Infinity"
+          min="-Infinity"
+          step="1"
+          type="number"
+`;
