@@ -279,13 +279,13 @@ export const getMethodName = (
 	prefix = 'get',
 	usePlural = false
 ) => {
-	const entity = find( rootEntitiesConfig, { kind, name } );
+	const entityConfig = find( rootEntitiesConfig, { kind, name } );
 	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && entity.plural
-			? upperFirst( camelCase( entity.plural ) )
+		usePlural && entityConfig.plural
+			? upperFirst( camelCase( entityConfig.plural ) )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };

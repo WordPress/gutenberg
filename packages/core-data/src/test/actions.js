@@ -30,19 +30,19 @@ jest.mock( '../batch', () => {
 
 describe( 'editEntityRecord', () => {
 	it( 'throws when the edited entity does not have a loaded config.', async () => {
-		const entity = { kind: 'someKind', name: 'someName', id: 'someId' };
+		const entityConfig = { kind: 'someKind', name: 'someName', id: 'someId' };
 		const select = {
 			getEntityConfig: jest.fn(),
 		};
 		const fulfillment = () =>
 			editEntityRecord(
-				entity.kind,
-				entity.name,
-				entity.id,
+				entityConfig.kind,
+				entityConfig.name,
+				entityConfig.id,
 				{}
 			)( { select } );
 		expect( fulfillment ).toThrow(
-			`The entity being edited (${ entity.kind }, ${ entity.name }) does not have a loaded config.`
+			`The entity being edited (${ entityConfig.kind }, ${ entityConfig.name }) does not have a loaded config.`
 		);
 		expect( select.getEntityConfig ).toHaveBeenCalledTimes( 1 );
 	} );

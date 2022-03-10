@@ -23,15 +23,15 @@ const EMPTY_ARRAY = [];
 import { rootEntitiesConfig, additionalEntityConfigLoaders } from './entities';
 
 const entityContexts = {
-	...rootEntitiesConfig.reduce( ( acc, entity ) => {
-		if ( ! acc[ entity.kind ] ) {
-			acc[ entity.kind ] = {};
+	...rootEntitiesConfig.reduce( ( acc, loader ) => {
+		if ( ! acc[ loader.kind ] ) {
+			acc[ loader.kind ] = {};
 		}
-		acc[ entity.kind ][ entity.name ] = { context: createContext() };
+		acc[ loader.kind ][ loader.name ] = { context: createContext() };
 		return acc;
 	}, {} ),
-	...additionalEntityConfigLoaders.reduce( ( acc, kind ) => {
-		acc[ kind.kind ] = {};
+	...additionalEntityConfigLoaders.reduce( ( acc, loader ) => {
+		acc[ loader.kind ] = {};
 		return acc;
 	}, {} ),
 };
@@ -102,12 +102,12 @@ export function useEntityProp( kind, type, prop, _id ) {
 			const { getEntityRecord, getEditedEntityRecord } = select(
 				STORE_NAME
 			);
-			const entity = getEntityRecord( kind, type, id ); // Trigger resolver.
-			const editedEntity = getEditedEntityRecord( kind, type, id );
-			return entity && editedEntity
+			const record = getEntityRecord( kind, type, id ); // Trigger resolver.
+			const editedRecord = getEditedEntityRecord( kind, type, id );
+			return record && editedRecord
 				? {
-						value: editedEntity[ prop ],
-						fullValue: entity[ prop ],
+						value: editedRecord[ prop ],
+						fullValue: record[ prop ],
 				  }
 				: {};
 		},
@@ -150,10 +150,10 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 	const { content, blocks } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord } = select( STORE_NAME );
-			const editedEntity = getEditedEntityRecord( kind, type, id );
+			const editedRecord = getEditedEntityRecord( kind, type, id );
 			return {
-				blocks: editedEntity.blocks,
-				content: editedEntity.content,
+				blocks: editedRecord.blocks,
+				content: editedRecord.content,
 			};
 		},
 		[ kind, type, id ]

@@ -124,7 +124,7 @@ export function getEntitiesConfig( state, kind ) {
 }
 
 /**
- * Returns the entity object given its kind and name.
+ * Returns the entity config given its kind and name.
  *
  * @deprecated since ??. Use getEntityConfig instead
  * @param {Object} state Data state.
@@ -142,7 +142,7 @@ export function getEntity( state, kind, name ) {
 }
 
 /**
- * Returns the entity object given its kind and name.
+ * Returns the entity config given its kind and name.
  *
  * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
@@ -226,7 +226,7 @@ export const getEntityRecord = createSelector(
 );
 
 /**
- * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
+ * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
  *
  * @param {Object} state State tree
  * @param {string} kind  Entity kind.

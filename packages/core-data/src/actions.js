@@ -66,8 +66,8 @@ export function addEntities( entities ) {
 /**
  * Returns an action object used in signalling that entity records have been received.
  *
- * @param {string}       kind            Kind of the received entity.
- * @param {string}       name            Name of the received entity.
+ * @param {string}       kind            Kind of the received entity record.
+ * @param {string}       name            Name of the received entity record.
  * @param {Array|Object} records         Records received.
  * @param {?Object}      query           Query Object.
  * @param {?boolean}     invalidateCache Should invalidate query caches.
@@ -209,9 +209,9 @@ export function receiveEmbedPreview( url, preview ) {
 /**
  * Action triggered to delete an entity record.
  *
- * @param {string}   kind                      Kind of the deleted entity.
- * @param {string}   name                      Name of the deleted entity.
- * @param {string}   recordId                  Record ID of the deleted entity.
+ * @param {string}   kind                      Kind of the deleted entity record.
+ * @param {string}   name                      Name of the deleted entity record.
+ * @param {string}   recordId                  Record ID of the deleted entity record.
  * @param {?Object}  query                     Special query parameters for the
  *                                             DELETE API call.
  * @param {Object}   [options]                 Delete options.
