@@ -82,7 +82,7 @@ module.exports = {
 			// - Normalize `/**` and `/*`
 			// - Case insensitive "Dependencies" vs. "dependencies"
 			// - Ending period
-			// - "Node" dependencies as an alias for External
+			// - "Node" dependencies as an alias for External.
 
 			if ( locality === 'External' ) {
 				locality = '(External|Node)';

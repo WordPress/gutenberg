@@ -95,7 +95,7 @@ export const saveWidgetAreas = ( widgetAreas ) => async ( {
 			await dispatch.saveWidgetArea( widgetArea.id );
 		}
 	} finally {
-		// saveEditedEntityRecord resets the resolution status, let's fix it manually
+		// saveEditedEntityRecord resets the resolution status, let's fix it manually.
 		await registry
 			.dispatch( coreStore )
 			.finishResolution(

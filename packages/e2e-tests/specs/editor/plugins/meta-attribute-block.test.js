@@ -62,7 +62,7 @@ describe( 'Block with a meta attribute', () => {
 						// Clicking the input selects the block,
 						// and selecting the block enables the sync data mode
 						// as otherwise the asynchronous re-rendering of unselected blocks
-						// may cause the input to have not yet been updated for the other blocks
+						// may cause the input to have not yet been updated for the other blocks.
 						await input.click();
 						const inputValue = await input.getProperty( 'value' );
 						expect( await inputValue.jsonValue() ).toBe(

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "12.6.0",
+	"version": "12.8.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -65,6 +65,7 @@
 		"@wordpress/notices": "file:packages/notices",
 		"@wordpress/nux": "file:packages/nux",
 		"@wordpress/plugins": "file:packages/plugins",
+		"@wordpress/preferences": "file:packages/preferences",
 		"@wordpress/primitives": "file:packages/primitives",
 		"@wordpress/priority-queue": "file:packages/priority-queue",
 		"@wordpress/react-i18n": "file:packages/react-i18n",

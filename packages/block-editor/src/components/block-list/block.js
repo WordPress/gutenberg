@@ -330,7 +330,7 @@ export default compose(
 	pure,
 	applyWithSelect,
 	applyWithDispatch,
-	// block is sometimes not mounted at the right time, causing it be undefined
+	// Block is sometimes not mounted at the right time, causing it be undefined
 	// see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
 	ifCondition( ( { block } ) => !! block ),

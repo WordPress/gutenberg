@@ -3,6 +3,7 @@
  */
 import { createRegistry } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -22,6 +23,7 @@ function createRegistryWithStores() {
 		blockEditorStore,
 		coreStore,
 		interfaceStore,
+		preferencesStore,
 		editorStore,
 	].forEach( registry.register );
 	return registry;
@@ -32,6 +34,7 @@ describe( 'actions', () => {
 	beforeEach( () => {
 		registry = createRegistryWithStores();
 	} );
+
 	it( 'openGeneralSidebar/closeGeneralSidebar', () => {
 		registry.dispatch( editPostStore ).openGeneralSidebar( 'test/sidebar' );
 		expect(
@@ -49,21 +52,23 @@ describe( 'actions', () => {
 				.getActiveComplementaryArea( 'core/edit-post' )
 		).toBeNull();
 	} );
+
 	it( 'toggleFeature', () => {
 		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
 		expect(
 			registry
-				.select( interfaceStore )
-				.isFeatureActive( editPostStore.name, 'welcomeGuide' )
+				.select( preferencesStore )
+				.get( editPostStore.name, 'welcomeGuide' )
 		).toBe( true );
 
 		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
 		expect(
 			registry
-				.select( interfaceStore )
-				.isFeatureActive( editPostStore.name, 'welcomeGuide' )
+				.select( preferencesStore )
+				.get( editPostStore.name, 'welcomeGuide' )
 		).toBe( false );
 	} );
+
 	describe( 'switchEditorMode', () => {
 		it( 'to visual', () => {
 			registry.dispatch( editPostStore ).switchEditorMode( 'visual' );
@@ -71,6 +76,7 @@ describe( 'actions', () => {
 				'visual'
 			);
 		} );
+
 		it( 'to text', () => {
 			// Add a selected client id and make sure it's there.
 			const clientId = 'clientId_1';
@@ -85,6 +91,7 @@ describe( 'actions', () => {
 			).toBeNull();
 		} );
 	} );
+
 	it( 'togglePinnedPluginItem', () => {
 		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
 		// Sidebars are pinned by default.
@@ -101,6 +108,7 @@ describe( 'actions', () => {
 				.isItemPinned( editPostStore.name, 'rigatoni' )
 		).toBe( true );
 	} );
+
 	describe( '__unstableSwitchToTemplateMode', () => {
 		it( 'welcome guide is active', () => {
 			// Activate `welcomeGuideTemplate` feature.
@@ -114,6 +122,7 @@ describe( 'actions', () => {
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toHaveLength( 0 );
 		} );
+
 		it( 'welcome guide is inactive', () => {
 			expect(
 				registry.select( editPostStore ).isEditingTemplate()
@@ -125,6 +134,160 @@ describe( 'actions', () => {
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toHaveLength( 1 );
 			expect( notices[ 0 ].content ).toMatch( 'template' );
+		} );
+	} );
+
+	describe( 'hideBlockTypes', () => {
+		it( 'adds the hidden block type to the preferences', () => {
+			registry
+				.dispatch( editPostStore )
+				.hideBlockTypes( [ 'core/quote', 'core/table' ] );
+
+			const expected = [ 'core/quote', 'core/table' ];
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'hiddenBlockTypes' )
+			).toEqual( expected );
+
+			expect(
+				registry.select( editPostStore ).getHiddenBlockTypes()
+			).toEqual( expected );
+		} );
+	} );
+
+	describe( 'showBlockTypes', () => {
+		it( 'removes the hidden block type from the preferences', () => {
+			registry
+				.dispatch( editPostStore )
+				.hideBlockTypes( [ 'core/quote', 'core/table' ] );
+
+			const expectedA = [ 'core/quote', 'core/table' ];
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'hiddenBlockTypes' )
+			).toEqual( expectedA );
+
+			expect(
+				registry.select( editPostStore ).getHiddenBlockTypes()
+			).toEqual( expectedA );
+
+			registry
+				.dispatch( editPostStore )
+				.showBlockTypes( [ 'core/table' ] );
+
+			const expectedB = [ 'core/quote' ];
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'hiddenBlockTypes' )
+			).toEqual( expectedB );
+
+			expect(
+				registry.select( editPostStore ).getHiddenBlockTypes()
+			).toEqual( expectedB );
+		} );
+	} );
+
+	describe( '__experimentalUpdateLocalAutosaveInterval', () => {
+		it( 'sets the local autosave interval', () => {
+			registry
+				.dispatch( editPostStore )
+				.__experimentalUpdateLocalAutosaveInterval( 42 );
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'localAutosaveInterval' )
+			).toBe( 42 );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelEnabled', () => {
+		it( 'toggles panels to be enabled and not enabled', () => {
+			const defaultState = {
+				'post-status': {
+					opened: true,
+				},
+			};
+
+			// This will switch it off, since the default is on.
+			registry
+				.dispatch( editPostStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry.select( editPostStore ).getPreference( 'panels' )
+			).toEqual( {
+				...defaultState,
+				'control-panel': {
+					enabled: false,
+				},
+			} );
+
+			// Switch it on again.
+			registry
+				.dispatch( editPostStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry.select( editPostStore ).getPreference( 'panels' )
+			).toEqual( {
+				...defaultState,
+				'control-panel': {
+					enabled: true,
+				},
+			} );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelOpened', () => {
+		it( 'toggles panels open and closed', () => {
+			const defaultState = {
+				'post-status': {
+					opened: true,
+				},
+			};
+
+			// This will open it, since the default is closed.
+			registry
+				.dispatch( editPostStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry.select( editPostStore ).getPreference( 'panels' )
+			).toEqual( {
+				...defaultState,
+				'control-panel': {
+					opened: true,
+				},
+			} );
+
+			// Close it.
+			registry
+				.dispatch( editPostStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			// TODO - remove once `getPreference` is deprecated.
+			expect(
+				registry.select( editPostStore ).getPreference( 'panels' )
+			).toEqual( {
+				...defaultState,
+				'control-panel': {
+					opened: false,
+				},
+			} );
 		} );
 	} );
 } );

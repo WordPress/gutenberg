@@ -61,9 +61,9 @@ function _getComputedBackgroundColor( backgroundColor ) {
 	if ( ! el ) return '';
 
 	el.style.background = backgroundColor;
-	// Grab the style
+	// Grab the style.
 	const computedColor = window?.getComputedStyle( el ).background;
-	// Reset
+	// Reset.
 	el.style.background = '';
 
 	return computedColor || '';

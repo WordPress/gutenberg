@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 
-const DEFAULT_VALUES = { px: '100', em: '10', rem: '10', vw: '10', vh: '25' };
+const DEFAULT_VALUES = { px: 100, em: 10, rem: 10, vw: 10, vh: 25 };
 
 function Controls( { attributes, context, setAttributes } ) {
 	const { orientation } = context;

@@ -93,7 +93,7 @@ const Tooltip = ( {
 	const { onHandleScreenTouch } = useContext( TooltipContext );
 	const keyboardVisible = useKeyboardVisibility();
 
-	// Register callback to dismiss the tooltip whenever the screen is touched
+	// Register callback to dismiss the tooltip whenever the screen is touched.
 	useEffect( () => {
 		if ( visible ) {
 			onHandleScreenTouch( () => {
@@ -104,10 +104,10 @@ const Tooltip = ( {
 		return () => onHandleScreenTouch( null );
 	}, [ visible ] );
 
-	// Manage visibility animation
+	// Manage visibility animation.
 	useEffect( () => {
 		if (
-			// Initial render and visibility enabled, animate show
+			// Initial render and visibility enabled, animate show.
 			( typeof previousVisible === 'undefined' && visible ) ||
 			// Previously visible, animate hide
 			( previousVisible && previousVisible !== visible )
@@ -117,13 +117,13 @@ const Tooltip = ( {
 		}
 	}, [ visible ] );
 
-	// Manage tooltip visibility and position in relation to keyboard
+	// Manage tooltip visibility and position in relation to keyboard.
 	useEffect( () => {
 		if ( ! visible ) {
 			return;
 		}
 
-		// Update tooltip position if keyboard is visible
+		// Update tooltip position if keyboard is visible.
 		if ( keyboardVisible ) {
 			getReferenceElementPosition();
 		}
@@ -135,7 +135,7 @@ const Tooltip = ( {
 		}
 	}, [ visible, keyboardVisible ] );
 
-	// Manage tooltip position during keyboard frame changes
+	// Manage tooltip position during keyboard frame changes.
 	useEffect( () => {
 		const frameListener = Keyboard.addListener(
 			'keyboardWillChangeFrame',
@@ -253,7 +253,7 @@ const Tooltip = ( {
 const TooltipSlot = ( { children, ...rest } ) => {
 	const [ handleScreenTouch, setHandleScreenTouch ] = useState( null );
 	const onHandleScreenTouch = ( callback ) => {
-		// Must use function to set state below as `callback` is a function itself
+		// Must use function to set state below as `callback` is a function itself.
 		setHandleScreenTouch( () => callback );
 	};
 	const handleTouchStart = () => {

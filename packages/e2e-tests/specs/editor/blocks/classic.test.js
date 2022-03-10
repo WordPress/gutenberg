@@ -106,7 +106,7 @@ describe( 'Classic', () => {
 	} );
 
 	it( 'Should not fail after save/reload', async () => {
-		// Might move to utils if this becomes useful enough for other tests
+		// Might move to utils if this becomes useful enough for other tests.
 		const runWithoutCache = async ( cb ) => {
 			try {
 				await page.setCacheEnabled( false );
@@ -128,7 +128,7 @@ describe( 'Classic', () => {
 		// Move focus away.
 		await pressKeyWithModifier( 'shift', 'Tab' );
 
-		// Save
+		// Save.
 		await saveDraft();
 
 		// Reload

@@ -21,7 +21,7 @@ export const BLOCK_STYLE_ATTRIBUTES = [
 	'fontSize',
 ];
 
-// Mapping style properties name to native
+// Mapping style properties name to native.
 const BLOCK_STYLE_ATTRIBUTES_MAPPING = {
 	textColor: 'color',
 	text: 'color',
@@ -51,7 +51,7 @@ export function getBlockPaddings(
 		return blockPaddings;
 	}
 
-	// Prevent adding extra paddings to inner blocks without background colors
+	// Prevent adding extra paddings to inner blocks without background colors.
 	if (
 		mergedStyle?.padding &&
 		! wrapperPropsStyle?.backgroundColor &&
@@ -74,7 +74,7 @@ export function getBlockColors(
 	const customBlockStyles = blockStyleAttributes?.style?.color || {};
 	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ blockName ];
 
-	// Global styles colors
+	// Global styles colors.
 	if ( blockGlobalStyles?.color ) {
 		Object.entries( blockGlobalStyles.color ).forEach(
 			( [ key, value ] ) => {
@@ -91,7 +91,7 @@ export function getBlockColors(
 			baseGlobalStyles?.styles?.color?.text;
 	}
 
-	// Global styles elements
+	// Global styles elements.
 	if ( blockGlobalStyles?.elements ) {
 		const linkColor = blockGlobalStyles.elements?.link?.color?.text;
 		const styleKey = BLOCK_STYLE_ATTRIBUTES_MAPPING.link;
@@ -101,7 +101,7 @@ export function getBlockColors(
 		}
 	}
 
-	// Custom colors
+	// Custom colors.
 	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {
 		const isCustomColor = startsWith( value, '#' );
 		let styleKey = key;
@@ -123,7 +123,7 @@ export function getBlockColors(
 		}
 	} );
 
-	// Color placeholder
+	// Color placeholder.
 	if ( blockStyles?.color ) {
 		blockStyles[ BLOCK_STYLE_ATTRIBUTES_MAPPING.placeholder ] =
 			blockStyles.color;
@@ -142,7 +142,7 @@ export function getBlockTypography(
 	const customBlockStyles = blockStyleAttributes?.style?.typography || {};
 	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ blockName ];
 
-	// Global styles
+	// Global styles.
 	if ( blockGlobalStyles?.typography ) {
 		const fontSize = blockGlobalStyles?.typography?.fontSize;
 		const lineHeight = blockGlobalStyles?.typography?.lineHeight;
@@ -176,7 +176,7 @@ export function getBlockTypography(
 		}
 	}
 
-	// Custom styles
+	// Custom styles.
 	if ( customBlockStyles?.fontSize ) {
 		typographyStyles.fontSize = customBlockStyles?.fontSize;
 	}
@@ -225,7 +225,7 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 					return get( customValuesData, path );
 				}
 
-				// Check for camelcase properties
+				// Check for camelcase properties.
 				return get( customValuesData, [
 					...path.slice( 0, path.length - 1 ),
 					camelCase( path[ path.length - 1 ] ),
@@ -281,7 +281,7 @@ export function getMappedValues( features, palette ) {
  * @return {Object} normalized sizes.
  */
 function normalizeFontSizes( fontSizes ) {
-	// Adds normalized PX values for each of the different keys
+	// Adds normalized PX values for each of the different keys.
 	if ( ! fontSizes ) {
 		return fontSizes;
 	}

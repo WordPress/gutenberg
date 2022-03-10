@@ -17,16 +17,16 @@ describe( 'Gutenberg Editor tests for List block (end)', () => {
 			await listBlockElement.click();
 		}
 
-		// Send the first list item text
+		// Send the first list item text.
 		await editorPage.sendTextToListBlock(
 			listBlockElement,
 			testData.listItem1
 		);
 
-		// send an Enter
+		// Send an Enter.
 		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
 
-		// send an Enter
+		// Send an Enter.
 		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
 
 		const html = await editorPage.getHtmlContent();
