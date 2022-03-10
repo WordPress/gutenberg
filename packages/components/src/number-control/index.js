@@ -161,7 +161,7 @@ export function NumberControl(
 				: constrainValue( currentValue );
 		}
 
-		return state;
+		return nextState;
 	};
 
 	return (
@@ -181,7 +181,7 @@ export function NumberControl(
 			step={ step }
 			type={ typeProp }
 			value={ valueProp }
-			__unstableStateReducer={ ( state, action ) => { 
+			__unstableStateReducer={ ( state, action ) => {
 				const baseState = numberControlStateReducer( state, action );
 				return stateReducerProp?.( baseState, action ) ?? baseState;
 			} }

@@ -201,7 +201,7 @@ function UnitControl(
 			}
 		}
 
-		return state;
+		return nextState;
 	};
 
 	let stateReducer: StateReducer = unitControlStateReducer;
