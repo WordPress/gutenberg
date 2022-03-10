@@ -8,6 +8,7 @@ import { find, includes, get, compact, uniq } from 'lodash';
  */
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -104,6 +105,17 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 
 		const record = await apiFetch( { path } );
 		dispatch.receiveEntityRecords( kind, name, record, query );
+	} catch ( error ) {
+		deprecated(
+			'Wordpress silently hid the errors for getEntityRecord and getEntityRecords resolvers. ' +
+				'These resolved even if error occurred. This has changed in 6.0 and starting 6.1 the errors ' +
+				'will be thrown.',
+			{
+				since: '6.0',
+			}
+		);
+		// eslint-disable-next-line no-console
+		console.error( error );
 	} finally {
 		dispatch.__unstableReleaseStoreLock( lock );
 	}
@@ -198,6 +210,17 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 				args: resolutionsArgs,
 			} );
 		}
+	} catch ( error ) {
+		deprecated(
+			'Wordpress silently hid the errors for getEntityRecord and getEntityRecords resolvers. ' +
+				'These resolved even if error occurred. This has changed in 6.0 and starting 6.1 the errors ' +
+				'will be thrown.',
+			{
+				since: '6.0',
+			}
+		);
+		// eslint-disable-next-line no-console
+		console.error( error );
 	} finally {
 		dispatch.__unstableReleaseStoreLock( lock );
 	}
