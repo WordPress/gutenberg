@@ -66,6 +66,8 @@ function RichTextWrapper(
 	{
 		children,
 		tagName,
+		start,
+		reversed,
 		value: originalValue,
 		onChange: originalOnChange,
 		isSelected: originalIsSelected,
@@ -575,6 +577,8 @@ function RichTextWrapper(
 			selectionEnd={ selectionEnd }
 			onSelectionChange={ onSelectionChange }
 			tagName={ tagName }
+			start={ start }
+			reversed={ reversed }
 			placeholder={ placeholder }
 			allowedFormats={ adjustedAllowedFormats }
 			withoutInteractiveFormatting={ withoutInteractiveFormatting }
