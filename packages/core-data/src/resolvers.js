@@ -13,7 +13,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 
 /**
@@ -52,7 +52,7 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 	select,
 	dispatch,
 } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
+	const entities = await dispatch( getOrLoadEntitiesConfig( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
@@ -133,7 +133,7 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
 export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 	dispatch,
 } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
+	const entities = await dispatch( getOrLoadEntitiesConfig( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
@@ -312,7 +312,7 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 export const canUserEditEntityRecord = ( kind, name, recordId ) => async ( {
 	dispatch,
 } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
+	const entities = await dispatch( getOrLoadEntitiesConfig( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;

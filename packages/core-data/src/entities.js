@@ -18,7 +18,7 @@ export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
-export const defaultEntities = [
+export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
 		name: '__unstableBase',
@@ -164,9 +164,9 @@ export const defaultEntities = [
 	},
 ];
 
-export const kinds = [
-	{ name: 'postType', loadEntities: loadPostTypeEntities },
-	{ name: 'taxonomy', loadEntities: loadTaxonomyEntities },
+export const additionalEntityConfigLoaders = [
+	{ kind: 'postType', loadEntities: loadPostTypeEntities },
+	{ kind: 'taxonomy', loadEntities: loadTaxonomyEntities },
 ];
 
 /**
@@ -257,6 +257,15 @@ async function loadTaxonomyEntities() {
 /**
  * Returns the entity's getter method name given its kind and name.
  *
+ * @example
+ * ```js
+ * const nameSingular = getMethodName( 'root', 'theme', 'get' );
+ * // nameSingular is getRootTheme
+ *
+ * const namePlural = getMethodName( 'root', 'theme', 'set' );
+ * // namePlural is setRootThemes
+ * ```
+ *
  * @param {string}  kind      Entity kind.
  * @param {string}  name      Entity name.
  * @param {string}  prefix    Function prefix.
@@ -270,7 +279,7 @@ export const getMethodName = (
 	prefix = 'get',
 	usePlural = false
 ) => {
-	const entity = find( defaultEntities, { kind, name } );
+	const entity = find( rootEntitiesConfig, { kind, name } );
 	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
@@ -288,18 +297,21 @@ export const getMethodName = (
  *
  * @return {Array} Entities
  */
-export const getKindEntities = ( kind ) => async ( { select, dispatch } ) => {
+export const getOrLoadEntitiesConfig = ( kind ) => async ( {
+	select,
+	dispatch,
+} ) => {
 	let entities = select.getEntitiesByKind( kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}
 
-	const kindConfig = find( kinds, { name: kind } );
-	if ( ! kindConfig ) {
+	const loader = find( additionalEntityConfigLoaders, { kind } );
+	if ( ! loader ) {
 		return [];
 	}
 
-	entities = await kindConfig.loadEntities();
+	entities = await loader.loadEntities();
 	dispatch( addEntities( entities ) );
 
 	return entities;

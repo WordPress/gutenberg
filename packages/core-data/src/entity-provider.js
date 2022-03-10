@@ -20,18 +20,18 @@ const EMPTY_ARRAY = [];
 /**
  * Internal dependencies
  */
-import { defaultEntities, kinds } from './entities';
+import { rootEntitiesConfig, additionalEntityConfigLoaders } from './entities';
 
 const entities = {
-	...defaultEntities.reduce( ( acc, entity ) => {
+	...rootEntitiesConfig.reduce( ( acc, entity ) => {
 		if ( ! acc[ entity.kind ] ) {
 			acc[ entity.kind ] = {};
 		}
 		acc[ entity.kind ][ entity.name ] = { context: createContext() };
 		return acc;
 	}, {} ),
-	...kinds.reduce( ( acc, kind ) => {
-		acc[ kind.name ] = {};
+	...additionalEntityConfigLoaders.reduce( ( acc, kind ) => {
+		acc[ kind.kind ] = {};
 		return acc;
 	}, {} ),
 };

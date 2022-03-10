@@ -15,7 +15,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
-import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 
@@ -226,7 +226,7 @@ export const deleteEntityRecord = (
 	query,
 	{ __unstableFetch = apiFetch } = {}
 ) => async ( { dispatch } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
+	const entities = await dispatch( getOrLoadEntitiesConfig( kind ) );
 	const entity = find( entities, { kind, name } );
 	let error;
 	let deletedRecord = false;
@@ -401,7 +401,7 @@ export const saveEntityRecord = (
 	record,
 	{ isAutosave = false, __unstableFetch = apiFetch } = {}
 ) => async ( { select, resolveSelect, dispatch } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
+	const entities = await dispatch( getOrLoadEntitiesConfig( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
@@ -659,7 +659,7 @@ export const saveEditedEntityRecord = (
 	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 		return;
 	}
-	const entities = await dispatch( getKindEntities( kind ) );
+	const entities = await dispatch( getOrLoadEntitiesConfig( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;
