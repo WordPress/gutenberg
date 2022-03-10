@@ -10,7 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { DELETE, LEFT, RIGHT, UP, DOWN, TAB, ENTER } from '@wordpress/keycodes';
+import { DELETE, ENTER, BACKSPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -99,11 +99,7 @@ export default function BlockTools( {
 			return;
 		}
 
-		if ( isMatch( 'core/block-editor/delete-multi-selection', event ) ) {
-			const isForward = event.keyCode === DELETE;
-			deleteSelection( isForward );
-			event.preventDefault();
-		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
+		if ( isMatch( 'core/block-editor/unselect', event ) ) {
 			event.preventDefault();
 			clearSelectedBlock();
 			event.target.ownerDocument.defaultView
@@ -111,21 +107,23 @@ export default function BlockTools( {
 				.removeAllRanges();
 		}
 
-		if (
-			event.keyCode === UP ||
-			event.keyCode === DOWN ||
-			event.keyCode === LEFT ||
-			event.keyCode === RIGHT ||
-			event.keyCode === TAB
-		) {
-			return;
-		}
-
 		if ( event.keyCode === ENTER ) {
 			splitSelection();
+			event.preventDefault();
+		} else if ( event.keyCode === DELETE ) {
+			deleteSelection( true );
+			event.preventDefault();
+		} else if ( event.keyCode === BACKSPACE ) {
+			deleteSelection();
+			event.preventDefault();
+		} else if (
+			// If key.length is longer than 1, it's a control key that doesn't
+			// input anything.
+			event.key.length === 1 &&
+			! ( event.metaKey || event.ctrlKey )
+		) {
+			deleteSelection();
 		}
-
-		event.preventDefault();
 	}
 
 	return (
