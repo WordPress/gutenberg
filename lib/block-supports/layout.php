@@ -245,12 +245,16 @@ function gutenberg_restore_image_outer_container( $block_content ) {
 		return $block_content;
 	}
 
+	$block_classnames                 = isset( $block['attrs']['className'] ) ? $block['attrs']['className'] : '';
+	$remove_classnames_pattern        = '/(<figure.*?class=".*)' . $block_classnames . '(.*?">)/';
+	$content_without_block_classnames = preg_replace( $remove_classnames_pattern, '$1 $2', $block_content );
+
 	$updated_content = preg_replace_callback(
 		$image_with_align,
-		static function( $matches ) {
-			return '<div class="wp-block-image">' . $matches[1] . $matches[2] . '</div>';
+		static function( $matches ) use ( $block_classnames ) {
+			return '<div class="wp-block-image ' . $block_classnames . '">' . $matches[1] . $matches[2] . '</div>';
 		},
-		$block_content
+		$content_without_block_classnames
 	);
 	return $updated_content;
 }
