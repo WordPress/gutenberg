@@ -29,6 +29,42 @@ class WP_Webfonts {
 	private static $providers = array();
 
 	/**
+	 * An array of fonts actually used in the front-end.
+	 *
+	 * @static
+	 * @access private
+	 * @var array
+	 */
+	private static $webfonts_used_in_front_end = array();
+
+	/**
+	 * The key of the post meta attribute that caches the webfonts used in the post content.
+	 *
+	 * @static
+	 * @access private
+	 * @var string
+	 */
+	private static $webfonts_used_in_content_meta_key = 'gutenberg_webfonts_used_in_content';
+
+	/**
+	 * The name of option that caches the webfonts used in the templates.
+	 *
+	 * @static
+	 * @access private
+	 * @var string
+	 */
+	private static $webfonts_used_in_templates_cache_option = 'gutenberg_webfonts_used_in_templates';
+
+	/**
+	 * The name of option that caches the webfonts used in global styles.
+	 *
+	 * @static
+	 * @access private
+	 * @var string
+	 */
+	private static $webfonts_used_in_global_styles_cache_option = 'gutenberg_webfonts_used_in_global_styles';
+
+	/**
 	 * Stylesheet handle.
 	 *
 	 * @var string
@@ -51,6 +87,18 @@ class WP_Webfonts {
 			$this->stylesheet_handle = 'webfonts';
 			$hook                    = 'wp_enqueue_scripts';
 		}
+
+		add_action( 'init', array( $this, 'register_filter_for_current_template_webfonts_collector' ) );
+		add_action( 'init', array( $this, 'collect_webfonts_used_in_global_styles' ) );
+		add_filter( 'the_content', array( $this, 'collect_webfonts_used_in_content' ) );
+		add_action( 'switch_theme', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
+		add_action( 'switch_theme', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
+		add_action( 'save_post_post', array( $this, 'update_webfonts_used_in_content_cache' ), 10, 2 );
+		add_action( 'save_post_page', array( $this, 'update_webfonts_used_in_content_cache' ), 10, 2 );
+		add_action( 'save_post_wp_template', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
+		add_action( 'save_post_wp_template_part', array( $this, 'invalidate_webfonts_used_in_templates_cache' ) );
+		add_action( 'save_post_wp_global_styles', array( $this, 'update_webfonts_used_in_global_styles_cache' ) );
+
 		add_action( $hook, array( $this, 'generate_and_enqueue_styles' ) );
 
 		// Enqueue webfonts in the block editor.
@@ -58,7 +106,237 @@ class WP_Webfonts {
 	}
 
 	/**
-	 * Get the list of fonts.
+	 * Update webfonts used in the content cache.
+	 *
+	 * @param integer $post_id The post ID.
+	 * @param WP_Post $post The post.
+	 *
+	 * @return array
+	 */
+	public function update_webfonts_used_in_content_cache( $post_id, $post ) {
+		$webfonts_used_in_post_cache = array();
+
+		preg_match_all( '/class\=\".*has-(?P<slug>.+)-font-family/', $post->post_content, $matches );
+
+		if ( isset( $matches['slug'] ) ) {
+			foreach ( $matches['slug'] as $font_family_slug ) {
+				$webfonts_used_in_post_cache[ $font_family_slug ] = 1;
+			}
+		}
+
+		update_post_meta( $post->ID, self::$webfonts_used_in_content_meta_key, $webfonts_used_in_post_cache );
+
+		return $webfonts_used_in_post_cache;
+	}
+
+	/**
+	 * Grab the webfonts used in the content and include them
+	 * in the set of all the webfonts used in the front-end.
+	 *
+	 * @param string $content The post content.
+	 *
+	 * @return string
+	 */
+	public function collect_webfonts_used_in_content( $content ) {
+		global $post;
+
+		$webfonts_used_in_post_cache = get_post_meta( $post->ID, self::$webfonts_used_in_content_meta_key, true );
+
+		if ( ! $webfonts_used_in_post_cache ) {
+			$webfonts_used_in_post_cache = $this->update_webfonts_used_in_content_cache( $post->ID, $post );
+		}
+
+		self::$webfonts_used_in_front_end = array_merge( self::$webfonts_used_in_front_end, $webfonts_used_in_post_cache );
+
+		return $content;
+	}
+
+	/**
+	 * Invalidate webfonts used in templates cache.
+	 * We need to do that because there's no indication on which templates uses which template parts,
+	 * so we're throwing everything away and lazily reconstructing the cache whenever a template gets loaded.
+	 *
+	 * @return void
+	 */
+	public function invalidate_webfonts_used_in_templates_cache() {
+		delete_option( self::$webfonts_used_in_templates_cache_option );
+	}
+
+	/**
+	 * Hook into every possible template so we can collect the webfonts used in the template
+	 * that has been loaded in the front-end.
+	 */
+	public function register_filter_for_current_template_webfonts_collector() {
+		$template_type_slugs = array_keys( get_default_block_template_types() );
+
+		foreach ( $template_type_slugs as $template_type_slug ) {
+			add_filter(
+				str_replace( '-', '', $template_type_slug ) . '_template',
+				array( $this, 'collect_webfonts_used_in_template' ),
+				10,
+				2
+			);
+		}
+	}
+
+	/**
+	 * Grab the webfonts used in the template and include them
+	 * in the set of all the webfonts used in the front-end.
+	 *
+	 * @param string $template_path The current template path.
+	 * @param string $template_slug The current template slug.
+	 *
+	 * @return void
+	 */
+	public function collect_webfonts_used_in_template( $template_path, $template_slug ) {
+		global $_wp_current_template_content;
+
+		$webfonts_used_in_templates = get_option( self::$webfonts_used_in_templates_cache_option, array() );
+
+		if ( ! isset( $webfonts_used_in_templates[ $template_slug ] ) ) {
+			$webfonts_used_in_templates[ $template_slug ] = $this->get_fonts_from_template( $_wp_current_template_content );
+
+			update_option( self::$webfonts_used_in_templates_cache_option, $webfonts_used_in_templates );
+		}
+
+		$webfonts_used_in_template        = $webfonts_used_in_templates[ $template_slug ];
+		self::$webfonts_used_in_front_end = array_merge( self::$webfonts_used_in_front_end, $webfonts_used_in_template );
+	}
+
+	/**
+	 * Get webfonts used in the template.
+	 *
+	 * @param string $template_content The template content.
+	 *
+	 * @return array
+	 */
+	private function get_fonts_from_template( $template_content ) {
+		$webfonts_used_in_template = array();
+
+		$template_blocks = parse_blocks( $template_content );
+		$template_blocks = _flatten_blocks( $template_blocks );
+
+		foreach ( $template_blocks as $block ) {
+			if ( 'core/template-part' === $block['blockName'] ) {
+				$template_part          = get_block_template( get_stylesheet() . '//' . $block['attrs']['slug'], 'wp_template_part' );
+				$fonts_in_template_part = $this->get_fonts_from_template( $template_part->content );
+
+				$webfonts_used_in_template = array_merge(
+					$webfonts_used_in_template,
+					$fonts_in_template_part
+				);
+			}
+
+			if ( isset( $block['attrs']['fontFamily'] ) ) {
+				$used_webfonts[ $block['attrs']['fontFamily'] ] = 1;
+			}
+		}
+
+		return $webfonts_used_in_template;
+	}
+
+	/**
+	 * Update webfonts used in global styles cache.
+	 */
+	public function update_webfonts_used_in_global_styles_cache() {
+		$webfonts_used_in_global_styles = $this->get_webfonts_used_in_global_styles();
+		update_option( self::$webfonts_used_in_global_styles_cache_option, $webfonts_used_in_global_styles );
+
+		return $webfonts_used_in_global_styles;
+	}
+
+	/**
+	 * Grab the webfonts used in global styles and include them
+	 * in the set of all the webfonts used in the front-end.
+	 */
+	public function collect_webfonts_used_in_global_styles() {
+		$webfonts_used_in_global_styles = get_option( self::$webfonts_used_in_global_styles_cache_option );
+
+		if ( ! $webfonts_used_in_global_styles ) {
+			$webfonts_used_in_global_styles = $this->update_webfonts_used_in_global_styles_cache();
+		}
+
+		self::$webfonts_used_in_front_end = array_merge( self::$webfonts_used_in_front_end, $webfonts_used_in_global_styles );
+	}
+
+	/**
+	 * Get globally used webfonts.
+	 *
+	 * @return array
+	 */
+	private function get_webfonts_used_in_global_styles() {
+		$global_styles                  = gutenberg_get_global_styles();
+		$webfonts_used_in_global_styles = array();
+
+		if ( isset( $global_styles['blocks'] ) ) {
+			// Register used fonts from blocks.
+			foreach ( $global_styles['blocks'] as $setting ) {
+				$font_family_slug = $this->get_font_family_from_setting( $setting );
+
+				if ( $font_family_slug ) {
+					$webfonts_used_in_global_styles[ $font_family_slug ] = 1;
+				}
+			}
+		}
+
+		if ( isset( $global_styles['elements'] ) ) {
+			// Register used fonts from elements.
+			foreach ( $global_styles['elements'] as $setting ) {
+				$font_family_slug = $this->get_font_family_from_setting( $setting );
+
+				if ( $font_family_slug ) {
+					$webfonts_used_in_global_styles[ $font_family_slug ] = 1;
+				}
+			}
+		}
+
+		// Get global font.
+		$font_family_slug = $this->get_font_family_from_setting( $global_styles );
+
+		if ( $font_family_slug ) {
+			$webfonts_used_in_global_styles[ $font_family_slug ] = 1;
+		}
+
+		return $webfonts_used_in_global_styles;
+	}
+
+	/**
+	 * Get font family from global setting.
+	 *
+	 * @param mixed $setting The global setting.
+	 * @return string|false
+	 */
+	private function get_font_family_from_setting( $setting ) {
+		if ( isset( $setting['typography'] ) && isset( $setting['typography']['fontFamily'] ) ) {
+			$font_family = $setting['typography']['fontFamily'];
+
+			preg_match( '/var\(--wp--(?:preset|custom)--font-family--([^\\\]+)\)/', $font_family, $matches );
+
+			if ( isset( $matches[1] ) ) {
+				return _wp_to_kebab_case( $matches[1] );
+			}
+
+			preg_match( '/var:(?:preset|custom)\|font-family\|(.+)/', $font_family, $matches );
+
+			if ( isset( $matches[1] ) ) {
+				return _wp_to_kebab_case( $matches[1] );
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get the list of registered fonts.
+	 *
+	 * @return array
+	 */
+	public function get_registered_fonts() {
+		return self::$registered_webfonts;
+	}
+
+	/**
+	 * Get the list of enqueued fonts.
 	 *
 	 * @return array
 	 */
@@ -199,9 +477,32 @@ class WP_Webfonts {
 	}
 
 	/**
+	 * Filter out webfonts that are not being used by the front-end.
+	 *
+	 * @return void
+	 */
+	private function filter_out_webfonts_unused_in_front_end() {
+		$enqueued_webfonts   = $this->get_enqueued_fonts();
+		$picked_webfonts     = array();
+
+		self::$webfonts_used_in_front_end = apply_filters( 'gutenberg_webfonts_used_in_front_end', self::$webfonts_used_in_front_end );
+		foreach ( $enqueued_webfonts as $id => $webfont ) {
+			$font_name = _wp_to_kebab_case( $webfont['font-family'] );
+
+			if ( isset( self::$webfonts_used_in_front_end[ $font_name ] ) ) {
+				$picked_webfonts[ $id ] = $webfont;
+			}
+		}
+
+		self::$enqueued_webfonts = apply_filters('gutenberg_enqueued_fonts_to_render', $picked_webfonts);
+	}
+
+	/**
 	 * Generate and enqueue webfonts styles.
 	 */
 	public function generate_and_enqueue_styles() {
+		$this->filter_out_webfonts_unused_in_front_end();
+
 		// Generate the styles.
 		$styles = $this->generate_styles();
 
