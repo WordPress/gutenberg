@@ -88,7 +88,7 @@ describe( 'Post Editor Performance', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
 				autosaveInterval: 100000000000,
-				__experimentalLocalAutosaveInterval: 100000000000,
+				localAutosaveInterval: 100000000000,
 			} );
 		} );
 	} );
