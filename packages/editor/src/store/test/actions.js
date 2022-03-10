@@ -84,6 +84,8 @@ describe( 'Post actions', () => {
 				) {
 					return { ...post, ...data };
 				} else if (
+					// This URL is requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
 					method === 'GET' &&
 					path.startsWith( '/wp/v2/types/post' )
 				) {
@@ -169,9 +171,11 @@ describe( 'Post actions', () => {
 						return [];
 					}
 				} else if ( method === 'GET' ) {
+					// These URLs are requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
 					if (
 						path.startsWith( '/wp/v2/types/post' ) ||
-						path.startsWith( '/wp/v2/posts/44' )
+						path.startsWith( `/wp/v2/posts/${ postId }` )
 					) {
 						return {};
 					}
@@ -251,6 +255,8 @@ describe( 'Post actions', () => {
 							...data,
 						};
 					}
+					// This URL is requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
 				} else if (
 					method === 'GET' &&
 					path.startsWith( '/wp/v2/types/post' )
