@@ -1,0 +1,35 @@
+.block-editor-date-format-picker {
+	margin-bottom: $grid-unit-20;
+}
+
+.block-editor-date-format-picker__header {
+	margin-bottom: $grid-unit-10;
+}
+
+.block-editor-date-format-picker__header__hint {
+	color: $gray-700;
+	margin-left: 4px;
+}
+
+.block-editor-date-format-picker__custom-format-select-control {
+	&.components-base-control {
+		margin-bottom: 0;
+	}
+
+	.components-custom-select-control__button {
+		width: 100%;
+	}
+}
+
+.block-editor-date-format-picker__custom-format-select-control__other-option {
+	border-top: 1px solid $gray-300;
+
+	&.has-hint {
+		grid-template-columns: auto 30px;
+	}
+
+	.components-custom-select-control__item-hint {
+		grid-row: 2;
+		text-align: left;
+	}
+}

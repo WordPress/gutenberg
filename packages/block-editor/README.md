@@ -326,7 +326,7 @@ choose a _date format_. That is, how they want their dates to be formatted.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/date-format-control/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/date-format-picker/README.md>
 
 _Parameters_
 
