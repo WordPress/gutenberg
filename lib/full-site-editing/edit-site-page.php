@@ -143,11 +143,10 @@ function gutenberg_edit_site_init( $hook ) {
 			'preload_paths'    => array_merge(
 				array(
 					array( '/wp/v2/media', 'OPTIONS' ),
-					'/',
-					'/wp/v2/types?context=edit',
+					'/wp/v2/types?context=view',
 					'/wp/v2/types/wp_template?context=edit',
 					'/wp/v2/types/wp_template-part?context=edit',
-					'/wp/v2/taxonomies?context=edit',
+					'/wp/v2/taxonomies?context=view',
 					'/wp/v2/pages?context=edit',
 					'/wp/v2/categories?context=edit',
 					'/wp/v2/posts?context=edit',
