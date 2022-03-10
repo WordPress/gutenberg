@@ -65,7 +65,7 @@
 		"react-native-linear-gradient": "https://raw.githubusercontent.com/wordpress-mobile/react-native-linear-gradient/v2.5.6-wp-2/react-native-linear-gradient-2.5.6-wp-2.tgz",
 		"react-native-modal": "^11.10.0",
 		"react-native-prompt-android": "https://raw.githubusercontent.com/wordpress-mobile/react-native-prompt-android/v1.0.0-wp-2/react-native-prompt-android-1.0.0-wp-2.tgz",
-		"react-native-reanimated": "2.4.1",
+		"react-native-reanimated": "https://raw.githubusercontent.com/wordpress-mobile/react-native-reanimated/2.2.4-wp-1/react-native-reanimated-2.2.4-wp-1.tgz",
 		"react-native-safe-area": "^0.5.0",
 		"react-native-safe-area-context": "3.2.0",
 		"react-native-sass-transformer": "^1.1.1",

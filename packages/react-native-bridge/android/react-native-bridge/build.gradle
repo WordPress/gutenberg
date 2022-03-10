@@ -73,7 +73,7 @@ dependencies {
     implementation "org.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-screens:${extractPackageVersion(packageJson, 'react-native-screens', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"
-    implementation "org.wordpress-mobile:react-native-reanimated:${extractPackageVersion(packageJson, 'react-native-reanimated', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-reanimated:${extractPackageVersion(packageJson, 'react-native-reanimated', 'dependencies')}"
     implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion(packageJson, 'react-native-prompt-android', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-webview:${extractPackageVersion(packageJson, 'react-native-webview', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
