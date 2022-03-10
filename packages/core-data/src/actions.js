@@ -226,11 +226,11 @@ export const deleteEntityRecord = (
 	query,
 	{ __unstableFetch = apiFetch } = {}
 ) => async ( { dispatch } ) => {
-	const entities = await dispatch( getOrLoadEntitiesConfig( kind ) );
-	const entity = find( entities, { kind, name } );
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
 	let error;
 	let deletedRecord = false;
-	if ( ! entity || entity?.__experimentalNoFetch ) {
+	if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 		return;
 	}
 
@@ -249,7 +249,7 @@ export const deleteEntityRecord = (
 		} );
 
 		try {
-			let path = `${ entity.baseURL }/${ recordId }`;
+			let path = `${ entityConfig.baseURL }/${ recordId }`;
 
 			if ( query ) {
 				path = addQueryArgs( path, query );
@@ -299,13 +299,13 @@ export const editEntityRecord = (
 	edits,
 	options = {}
 ) => ( { select, dispatch } ) => {
-	const entity = select.getEntityConfig( kind, name );
-	if ( ! entity ) {
+	const entityConfig = select.getEntityConfig( kind, name );
+	if ( ! entityConfig ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 		);
 	}
-	const { transientEdits = {}, mergedEdits = {} } = entity;
+	const { transientEdits = {}, mergedEdits = {} } = entityConfig;
 	const record = select.getRawEntityRecord( kind, name, recordId );
 	const editedRecord = select.getEditedEntityRecord( kind, name, recordId );
 
@@ -401,12 +401,12 @@ export const saveEntityRecord = (
 	record,
 	{ isAutosave = false, __unstableFetch = apiFetch } = {}
 ) => async ( { select, resolveSelect, dispatch } ) => {
-	const entities = await dispatch( getOrLoadEntitiesConfig( kind ) );
-	const entity = find( entities, { kind, name } );
-	if ( ! entity || entity?.__experimentalNoFetch ) {
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
+	if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 		return;
 	}
-	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
+	const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ entityIdKey ];
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
@@ -446,7 +446,7 @@ export const saveEntityRecord = (
 		let updatedRecord;
 		let error;
 		try {
-			const path = `${ entity.baseURL }${
+			const path = `${ entityConfig.baseURL }${
 				recordId ? '/' + recordId : ''
 			}`;
 			const persistedRecord = select.getRawEntityRecord(
@@ -543,10 +543,10 @@ export const saveEntityRecord = (
 				}
 			} else {
 				let edits = record;
-				if ( entity.__unstablePrePersist ) {
+				if ( entityConfig.__unstablePrePersist ) {
 					edits = {
 						...edits,
-						...entity.__unstablePrePersist(
+						...entityConfig.__unstablePrePersist(
 							persistedRecord,
 							edits
 						),
@@ -659,12 +659,12 @@ export const saveEditedEntityRecord = (
 	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 		return;
 	}
-	const entities = await dispatch( getOrLoadEntitiesConfig( kind ) );
-	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
+	if ( ! entityConfig ) {
 		return;
 	}
-	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
+	const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
 
 	const edits = select.getEntityRecordNonTransientEdits(
 		kind,

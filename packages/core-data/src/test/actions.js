@@ -56,7 +56,7 @@ describe( 'deleteEntityRecord', () => {
 
 	it( 'triggers a DELETE request for an existing record', async () => {
 		const deletedRecord = { title: 'new post', id: 10 };
-		const entities = [
+		const configs = [
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 
@@ -66,7 +66,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		apiFetch.mockImplementation( () => deletedRecord );
@@ -116,7 +116,7 @@ describe( 'saveEditedEntityRecord', () => {
 
 	it( 'Uses "id" as a key when no entity key is provided', async () => {
 		const area = { id: 1, menu: 0 };
-		const entities = [
+		const configs = [
 			{
 				kind: 'root',
 				name: 'navigationArea',
@@ -132,7 +132,7 @@ describe( 'saveEditedEntityRecord', () => {
 			saveEntityRecord: jest.fn(),
 		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		const updatedRecord = { ...area, menu: 10 };
@@ -156,7 +156,7 @@ describe( 'saveEditedEntityRecord', () => {
 
 	it( 'Uses the entity key when provided', async () => {
 		const area = { area: 'primary', menu: 0 };
-		const entities = [
+		const configs = [
 			{
 				kind: 'root',
 				name: 'navigationArea',
@@ -173,7 +173,7 @@ describe( 'saveEditedEntityRecord', () => {
 			saveEntityRecord: jest.fn(),
 		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		const updatedRecord = { ...area, menu: 10 };
@@ -204,7 +204,7 @@ describe( 'saveEntityRecord', () => {
 
 	it( 'triggers a POST request for a new record', async () => {
 		const post = { title: 'new post' };
-		const entities = [
+		const configs = [
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 		const select = {
@@ -217,7 +217,7 @@ describe( 'saveEntityRecord', () => {
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		const updatedRecord = { ...post, id: 10 };
@@ -276,7 +276,7 @@ describe( 'saveEntityRecord', () => {
 
 	it( 'triggers a PUT request for an existing record', async () => {
 		const post = { id: 10, title: 'new post' };
-		const entities = [
+		const configs = [
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 		const select = {
@@ -289,7 +289,7 @@ describe( 'saveEntityRecord', () => {
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		const updatedRecord = { ...post, id: 10 };
@@ -348,7 +348,7 @@ describe( 'saveEntityRecord', () => {
 
 	it( 'triggers a PUT request for an existing record with a custom key', async () => {
 		const postType = { slug: 'page', title: 'Pages' };
-		const entities = [
+		const configs = [
 			{
 				name: 'postType',
 				kind: 'root',
@@ -366,7 +366,7 @@ describe( 'saveEntityRecord', () => {
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		apiFetch.mockImplementation( () => postType );

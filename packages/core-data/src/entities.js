@@ -301,9 +301,9 @@ export const getOrLoadEntitiesConfig = ( kind ) => async ( {
 	select,
 	dispatch,
 } ) => {
-	let entities = select.getEntitiesConfig( kind );
-	if ( entities && entities.length !== 0 ) {
-		return entities;
+	let configs = select.getEntitiesConfig( kind );
+	if ( configs && configs.length !== 0 ) {
+		return configs;
 	}
 
 	const loader = find( additionalEntityConfigLoaders, { kind } );
@@ -311,8 +311,8 @@ export const getOrLoadEntitiesConfig = ( kind ) => async ( {
 		return [];
 	}
 
-	entities = await loader.loadEntities();
-	dispatch( addEntities( entities ) );
+	configs = await loader.loadEntities();
+	dispatch( addEntities( configs ) );
 
-	return entities;
+	return configs;
 };

@@ -368,7 +368,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 				);
 
 				if ( primaryKeys.length ) {
-					const entity = getEntityConfig( state, kind, name );
+					const entityConfig = getEntityConfig( state, kind, name );
 					primaryKeys.forEach( ( primaryKey ) => {
 						const entityRecord = getEditedEntityRecord(
 							state,
@@ -381,9 +381,9 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 							// when it's used as an object key.
 							key:
 								entityRecord[
-									entity.key || DEFAULT_ENTITY_KEY
+									entityConfig.key || DEFAULT_ENTITY_KEY
 								],
-							title: entity?.getTitle?.( entityRecord ) || '',
+							title: entityConfig?.getTitle?.( entityRecord ) || '',
 							name,
 							kind,
 						} );
@@ -419,7 +419,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 				);
 
 				if ( primaryKeys.length ) {
-					const entity = getEntityConfig( state, kind, name );
+					const entityConfig = getEntityConfig( state, kind, name );
 					primaryKeys.forEach( ( primaryKey ) => {
 						const entityRecord = getEditedEntityRecord(
 							state,
@@ -432,9 +432,9 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 							// when it's used as an object key.
 							key:
 								entityRecord[
-									entity.key || DEFAULT_ENTITY_KEY
+									entityConfig.key || DEFAULT_ENTITY_KEY
 								],
-							title: entity?.getTitle?.( entityRecord ) || '',
+							title: entityConfig?.getTitle?.( entityRecord ) || '',
 							name,
 							kind,
 						} );
@@ -817,11 +817,11 @@ export function canUser( state, action, resource, id ) {
  * or `undefined` if the OPTIONS request is still being made.
  */
 export function canUserEditEntityRecord( state, kind, name, recordId ) {
-	const entity = getEntityConfig( state, kind, name );
-	if ( ! entity ) {
+	const entityConfig = getEntityConfig( state, kind, name );
+	if ( ! entityConfig ) {
 		return false;
 	}
-	const resource = entity.__unstable_rest_base;
+	const resource = entityConfig.__unstable_rest_base;
 
 	return canUser( state, 'update', resource, recordId );
 }
