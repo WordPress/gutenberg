@@ -107,6 +107,11 @@ WithSingleUnit.args = {
 	units: CSS_UNITS.slice( 0, 1 ),
 };
 
+/**
+ * It is possible to pass a custom list of units. Every time the unit changes,
+ * if the `isResetValueOnUnitChange` is set to `true`, the input's quantity is
+ * reset to the new unit's default value.
+ */
 export const WithCustomUnits: ComponentStory< typeof UnitControl > = ( {
 	onChange,
 	...args
@@ -152,12 +157,4 @@ WithCustomUnits.args = {
 			default: 1760,
 		},
 	],
-};
-WithCustomUnits.parameters = {
-	docs: {
-		description: {
-			story:
-				"It is possible to pass a custom list of units. Every time the unit changes, if the `isResetValueOnUnitChange` is set to `true`, the input's quantity is reset to the new unit's default value.",
-		},
-	},
 };
