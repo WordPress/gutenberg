@@ -1,145 +1,127 @@
 /**
- * External dependencies
- */
-import styled from '@emotion/styled';
-import { boolean, number, text } from '@storybook/addon-knobs';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { wordpress } from '@wordpress/icons';
+import { styles, wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import RangeControl from '../index';
-import { COLORS } from '../../utils';
+
+const ICONS = { styles, wordpress };
 
 export default {
 	title: 'Components/RangeControl',
 	component: RangeControl,
+	argTypes: {
+		afterIcon: {
+			control: { type: 'select' },
+			options: Object.keys( ICONS ),
+			mapping: ICONS,
+		},
+		allowReset: { control: { type: 'boolean' } },
+		beforeIcon: {
+			control: { type: 'select' },
+			options: Object.keys( ICONS ),
+			mapping: ICONS,
+		},
+		color: { control: { type: 'color' } },
+		disabled: { control: { type: 'boolean' } },
+		help: { control: { type: 'text' } },
+		marks: { control: { type: 'object' } },
+		min: { control: { type: 'number' } },
+		max: { control: { type: 'number' } },
+		railColor: { control: { type: 'color' } },
+		showTooltip: { control: { type: 'boolean' } },
+		step: { control: { type: 'number' } },
+		trackColor: { control: { type: 'color' } },
+		withInputField: { control: { type: 'boolean' } },
+	},
 	parameters: {
-		knobs: { disable: false },
+		docs: { source: { state: 'open' } },
 	},
 };
 
-const RangeControlWithState = ( props ) => {
-	const initialValue = props.value === undefined ? 5 : props.value;
+const RangeControlWithState = ( { initialValue, ...props } ) => {
 	const [ value, setValue ] = useState( initialValue );
 
 	return <RangeControl { ...props } value={ value } onChange={ setValue } />;
 };
 
-const DefaultExample = () => {
-	const [ value, setValue ] = useState( undefined );
+export const Default = RangeControlWithState.bind( {} );
+Default.args = {
+	label: 'Range label',
+};
 
-	const showBeforeIcon = boolean( 'beforeIcon', false );
-	const showAfterIcon = boolean( 'afterIcon', false );
+/**
+ * The `initialPosition` prop sets the starting position of the slider when no `value` is provided.
+ */
+export const InitialValueZero = RangeControlWithState.bind( {} );
+InitialValueZero.args = {
+	...Default.args,
+	initialPosition: 0,
+	max: 20,
+};
 
-	const props = {
-		afterIcon: showAfterIcon ? wordpress : undefined,
-		allowReset: boolean( 'allowReset', false ),
-		beforeIcon: showBeforeIcon ? wordpress : undefined,
-		color: text( 'color', COLORS.ui.theme ),
-		disabled: boolean( 'disabled', false ),
-		help: text( 'help', '' ),
-		label: text( 'label', 'Range Label' ),
-		marks: boolean( 'marks', false ),
-		max: number( 'max', 100 ),
-		min: number( 'min', 0 ),
-		showTooltip: boolean( 'showTooltip', false ),
-		step: text( 'step', 1 ),
-		railColor: text( 'railColor', null ),
-		trackColor: text( 'trackColor', null ),
-		withInputField: boolean( 'withInputField', true ),
-		value,
-		onChange: setValue,
-	};
+/**
+ * Setting the `step` prop to `"any"` will allow users to select non-integer values.
+ * This also overrides both `withInputField` and `showTooltip` props to `false`.
+ */
+export const WithAnyStep = ( props ) => {
+	const [ value, setValue ] = useState( 1.2345 );
 
 	return (
-		<Wrapper>
-			<RangeControl { ...props } />
-		</Wrapper>
+		<>
+			<RangeControl value={ value } onChange={ setValue } { ...props } />
+			<p>Current value: { value }</p>
+		</>
 	);
 };
-
-const RangeControlLabeledByMarksType = ( props ) => {
-	const label = Array.isArray( props.marks ) ? 'Custom' : 'Automatic';
-	return <RangeControl { ...{ ...props, label } } />;
+WithAnyStep.args = {
+	label: 'Brightness',
+	step: 'any',
 };
 
-export const _default = () => {
-	return <DefaultExample />;
+export const WithHelp = RangeControlWithState.bind( {} );
+WithHelp.args = {
+	...Default.args,
+	label: 'How many columns should this use?',
+	help: 'Please select the number of columns you would like this to contain.',
 };
 
-export const InitialValueZero = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
-
-	return (
-		<RangeControlWithState
-			initialPosition={ 0 }
-			label={ label }
-			max={ 20 }
-			min={ 0 }
-			value={ null }
-		/>
-	);
+/**
+ * Set `min` and `max` values to constrain the range of allowed values.
+ */
+export const WithMinimumAndMaximumLimits = RangeControlWithState.bind( {} );
+WithMinimumAndMaximumLimits.args = {
+	...Default.args,
+	min: 2,
+	max: 10,
 };
 
-export const withAnyStep = () => {
-	return <RangeControlWithState label="Brightness" step="any" />;
+export const WithIconBefore = RangeControlWithState.bind( {} );
+WithIconBefore.args = {
+	...Default.args,
+	beforeIcon: wordpress,
 };
 
-export const withHelp = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
-	const help = text(
-		'Help Text',
-		'Please select the number of columns you would like this to contain.'
-	);
-
-	return <RangeControlWithState label={ label } help={ help } />;
+export const WithIconAfter = RangeControlWithState.bind( {} );
+WithIconAfter.args = {
+	...Default.args,
+	afterIcon: wordpress,
 };
 
-export const withMinimumAndMaximumLimits = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
-	const min = number( 'Min Value', 2 );
-	const max = number( 'Max Value', 10 );
-
-	return <RangeControlWithState label={ label } min={ min } max={ max } />;
+export const WithReset = RangeControlWithState.bind( {} );
+WithReset.args = {
+	...Default.args,
+	allowReset: true,
 };
 
-export const withIconBefore = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
-	const showIcon = boolean( 'icon', true );
-
-	return (
-		<RangeControlWithState
-			label={ label }
-			beforeIcon={ showIcon ? wordpress : undefined }
-		/>
-	);
-};
-
-export const withIconAfter = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
-	const showIcon = boolean( 'icon', true );
-
-	return (
-		<RangeControlWithState
-			label={ label }
-			afterIcon={ showIcon ? wordpress : undefined }
-		/>
-	);
-};
-
-export const withReset = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
-
-	return <RangeControlWithState label={ label } allowReset />;
-};
-
-export const marks = () => {
+/**
+ * Use `marks` to render a visual representation of `step` ticks. Custom mark indicators can be provided by an `Array`.
+ */
+export const WithMarks = ( props ) => {
 	const marksBase = [
 		{ value: 0, label: '0' },
 		{ value: 1, label: '1' },
@@ -164,11 +146,15 @@ export const marks = () => {
 	const minNegative = { min: -10, max: 10, step: 1 };
 	const rangeNegative = { min: -10, max: -1, step: 1 };
 
-	// Use a short alias to keep formatting to fewer lines.
-	const Range = RangeControlLabeledByMarksType;
+	const Range = ( localProps ) => {
+		const label = Array.isArray( localProps.marks )
+			? 'Custom'
+			: 'Automatic';
+		return <RangeControl { ...{ ...localProps, ...props, label } } />;
+	};
 
 	return (
-		<Wrapper>
+		<>
 			<h2>Integer Step</h2>
 			<Range marks { ...stepInteger } />
 			<Range marks={ marksBase } { ...stepInteger } />
@@ -188,21 +174,6 @@ export const marks = () => {
 			<h2>Any Step</h2>
 			<Range marks { ...{ ...stepInteger, step: 'any' } } />
 			<Range marks={ marksBase } { ...{ ...stepInteger, step: 'any' } } />
-		</Wrapper>
+		</>
 	);
 };
-
-export const multiple = () => {
-	return (
-		<Wrapper>
-			<RangeControlWithState />
-			<RangeControlWithState />
-			<RangeControlWithState />
-			<RangeControlWithState />
-		</Wrapper>
-	);
-};
-
-const Wrapper = styled.div`
-	padding: 60px 40px;
-`;
