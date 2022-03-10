@@ -134,7 +134,7 @@ export function getEntity( state, kind, name ) {
  */
 export const getEntityRecord = createSelector(
 	( state, kind, name, key, query ) => {
-		const queriedState = get( state.entities.data, [
+		const queriedState = get( state.entities.records, [
 			kind,
 			name,
 			'queriedData',
@@ -170,7 +170,7 @@ export const getEntityRecord = createSelector(
 	( state, kind, name, recordId, query ) => {
 		const context = query?.context ?? 'default';
 		return [
-			get( state.entities.data, [
+			get( state.entities.records, [
 				kind,
 				name,
 				'queriedData',
@@ -178,7 +178,7 @@ export const getEntityRecord = createSelector(
 				context,
 				recordId,
 			] ),
-			get( state.entities.data, [
+			get( state.entities.records, [
 				kind,
 				name,
 				'queriedData',
@@ -246,7 +246,7 @@ export const getRawEntityRecord = createSelector(
 		const context = query?.context ?? 'default';
 		return [
 			state.entities.config,
-			get( state.entities.data, [
+			get( state.entities.records, [
 				kind,
 				name,
 				'queriedData',
@@ -254,7 +254,7 @@ export const getRawEntityRecord = createSelector(
 				context,
 				recordId,
 			] ),
-			get( state.entities.data, [
+			get( state.entities.records, [
 				kind,
 				name,
 				'queriedData',
@@ -294,7 +294,7 @@ export function hasEntityRecords( state, kind, name, query ) {
 export function getEntityRecords( state, kind, name, query ) {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
-	const queriedState = get( state.entities.data, [
+	const queriedState = get( state.entities.records, [
 		kind,
 		name,
 		'queriedData',
@@ -315,13 +315,13 @@ export function getEntityRecords( state, kind, name, query ) {
 export const __experimentalGetDirtyEntityRecords = createSelector(
 	( state ) => {
 		const {
-			entities: { data },
+			entities: { records },
 		} = state;
 		const dirtyRecords = [];
-		Object.keys( data ).forEach( ( kind ) => {
-			Object.keys( data[ kind ] ).forEach( ( name ) => {
+		Object.keys( records ).forEach( ( kind ) => {
+			Object.keys( records[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
-					data[ kind ][ name ].edits
+					records[ kind ][ name ].edits
 				).filter(
 					( primaryKey ) =>
 						// The entity record must exist (not be deleted),
@@ -357,7 +357,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 
 		return dirtyRecords;
 	},
-	( state ) => [ state.entities.data ]
+	( state ) => [ state.entities.records ]
 );
 
 /**
@@ -370,13 +370,13 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 export const __experimentalGetEntitiesBeingSaved = createSelector(
 	( state ) => {
 		const {
-			entities: { data },
+			entities: { records },
 		} = state;
 		const recordsBeingSaved = [];
-		Object.keys( data ).forEach( ( kind ) => {
-			Object.keys( data[ kind ] ).forEach( ( name ) => {
+		Object.keys( records ).forEach( ( kind ) => {
+			Object.keys( records[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
-					data[ kind ][ name ].saving
+					records[ kind ][ name ].saving
 				).filter( ( primaryKey ) =>
 					isSavingEntityRecord( state, kind, name, primaryKey )
 				);
@@ -407,7 +407,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 		} );
 		return recordsBeingSaved;
 	},
-	( state ) => [ state.entities.data ]
+	( state ) => [ state.entities.records ]
 );
 
 /**
@@ -421,7 +421,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
  * @return {Object?} The entity record's edits.
  */
 export function getEntityRecordEdits( state, kind, name, recordId ) {
-	return get( state.entities.data, [ kind, name, 'edits', recordId ] );
+	return get( state.entities.records, [ kind, name, 'edits', recordId ] );
 }
 
 /**
@@ -454,7 +454,7 @@ export const getEntityRecordNonTransientEdits = createSelector(
 	},
 	( state, kind, name, recordId ) => [
 		state.entities.config,
-		get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+		get( state.entities.records, [ kind, name, 'edits', recordId ] ),
 	]
 );
 
@@ -497,7 +497,7 @@ export const getEditedEntityRecord = createSelector(
 		const context = query?.context ?? 'default';
 		return [
 			state.entities.config,
-			get( state.entities.data, [
+			get( state.entities.records, [
 				kind,
 				name,
 				'queriedData',
@@ -505,7 +505,7 @@ export const getEditedEntityRecord = createSelector(
 				context,
 				recordId,
 			] ),
-			get( state.entities.data, [
+			get( state.entities.records, [
 				kind,
 				name,
 				'queriedData',
@@ -513,7 +513,7 @@ export const getEditedEntityRecord = createSelector(
 				context,
 				recordId,
 			] ),
-			get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+			get( state.entities.records, [ kind, name, 'edits', recordId ] ),
 		];
 	}
 );
@@ -530,7 +530,7 @@ export const getEditedEntityRecord = createSelector(
  */
 export function isAutosavingEntityRecord( state, kind, name, recordId ) {
 	const { pending, isAutosave } = get(
-		state.entities.data,
+		state.entities.records,
 		[ kind, name, 'saving', recordId ],
 		{}
 	);
@@ -549,7 +549,7 @@ export function isAutosavingEntityRecord( state, kind, name, recordId ) {
  */
 export function isSavingEntityRecord( state, kind, name, recordId ) {
 	return get(
-		state.entities.data,
+		state.entities.records,
 		[ kind, name, 'saving', recordId, 'pending' ],
 		false
 	);
@@ -567,7 +567,7 @@ export function isSavingEntityRecord( state, kind, name, recordId ) {
  */
 export function isDeletingEntityRecord( state, kind, name, recordId ) {
 	return get(
-		state.entities.data,
+		state.entities.records,
 		[ kind, name, 'deleting', recordId, 'pending' ],
 		false
 	);
@@ -584,7 +584,7 @@ export function isDeletingEntityRecord( state, kind, name, recordId ) {
  * @return {Object?} The entity record's save error.
  */
 export function getLastEntitySaveError( state, kind, name, recordId ) {
-	return get( state.entities.data, [
+	return get( state.entities.records, [
 		kind,
 		name,
 		'saving',
@@ -604,7 +604,7 @@ export function getLastEntitySaveError( state, kind, name, recordId ) {
  * @return {Object?} The entity record's save error.
  */
 export function getLastEntityDeleteError( state, kind, name, recordId ) {
-	return get( state.entities.data, [
+	return get( state.entities.records, [
 		kind,
 		name,
 		'deleting',

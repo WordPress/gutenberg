@@ -236,7 +236,7 @@ export const deleteEntityRecord = (
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
-		[ 'entities', 'data', kind, name, recordId ],
+		[ 'entities', 'records', kind, name, recordId ],
 		{ exclusive: true }
 	);
 
@@ -411,7 +411,7 @@ export const saveEntityRecord = (
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
-		[ 'entities', 'data', kind, name, recordId || uuid() ],
+		[ 'entities', 'records', kind, name, recordId || uuid() ],
 		{ exclusive: true }
 	);
 

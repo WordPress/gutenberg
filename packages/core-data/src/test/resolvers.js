@@ -201,7 +201,7 @@ describe( 'getEntityRecords', () => {
 			dispatch.__unstableAcquireStoreLock
 		).toHaveBeenCalledWith(
 			'core',
-			[ 'entities', 'data', 'root', 'postType' ],
+			[ 'entities', 'records', 'root', 'postType' ],
 			{ exclusive: false }
 		);
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(

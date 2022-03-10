@@ -60,7 +60,7 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
-		[ 'entities', 'data', kind, name, key ],
+		[ 'entities', 'records', kind, name, key ],
 		{ exclusive: false }
 	);
 
@@ -141,7 +141,7 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
-		[ 'entities', 'data', kind, name ],
+		[ 'entities', 'records', kind, name ],
 		{ exclusive: false }
 	);
 

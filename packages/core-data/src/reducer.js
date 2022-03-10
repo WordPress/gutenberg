@@ -380,10 +380,10 @@ export const entities = ( state = {}, action ) => {
 		);
 	}
 
-	const newData = entitiesDataReducer( state.data, action );
+	const newData = entitiesDataReducer( state.records, action );
 
 	if (
-		newData === state.data &&
+		newData === state.records &&
 		newConfig === state.config &&
 		entitiesDataReducer === state.reducer
 	) {
@@ -392,7 +392,7 @@ export const entities = ( state = {}, action ) => {
 
 	return {
 		reducer: entitiesDataReducer,
-		data: newData,
+		records: newData,
 		config: newConfig,
 	};
 };
