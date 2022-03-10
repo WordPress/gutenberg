@@ -177,15 +177,13 @@ class EditorPage {
 			await this.driver.sleep( 1000 );
 		}
 
-		const locator = await this.driver.elementsByXPath(
-			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "Post title.")]`
-		);
+		const blockLocator = isAndroid() 
+			? `//android.widget.EditText[@content-desc="Post title. Welcome to Gutenberg!"]`
+			: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[@name="Post title. Welcome to Gutenberg!"])`
 
-		// very brittle condition at the moment, need to find a better locator
-		const locatorLength = isAndroid() ? 2 : 6;
-
-		if ( locator.length !== locatorLength ) {
-			// if locator doesn't meet expected length for Android and iOS, try again
+		const locator = await this.driver.elementsByXPath( blockLocator );
+		if ( locator.length !== 1 ) {
+			// if locator is not visible, try again
 			iteration++;
 			return await this.isEditorVisible( iteration );
 		}
