@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { Context, PostFormat, RenderedText, OmitNevers } from '../helpers';
+import type { Context, PostFormat, RenderedText, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 

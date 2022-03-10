@@ -6,7 +6,7 @@ import type {
 	Context,
 	OmitNevers,
 	PingStatus,
-} from '../helpers';
+} from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 

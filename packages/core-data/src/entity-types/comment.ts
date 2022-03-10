@@ -7,7 +7,7 @@ import type {
 	ContextualField,
 	OmitNevers,
 	RenderedText,
-} from '../helpers';
+} from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 export type CommentStatus = 'hold' | 'approve' | 'spam' | 'trash' | '1' | '0';

@@ -9,7 +9,7 @@ import type {
 	PostStatus,
 	RenderedText,
 	OmitNevers,
-} from '../helpers';
+} from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 

@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { Widget } from './widget';
-import type { Context, OmitNevers } from '../helpers';
+import type { Context, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
