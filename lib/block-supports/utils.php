@@ -6,14 +6,14 @@
  */
 
 /**
- * Checks whether serialization of the current block's typography properties
+ * Checks whether serialization of the current block's supported properties
  * should occur.
  *
  * @param WP_Block_type $block_type  Block type.
  * @param string        $feature_set Name of block support feature set..
  * @param string        $feature     Optional name of individual feature to check.
  *
- * @return boolean Whether to serialize typography support styles & classes.
+ * @return boolean Whether to serialize block support styles & classes.
  */
 function gutenberg_should_skip_block_supports_serialization( $block_type, $feature_set, $feature = null ) {
 	if ( ! is_object( $block_type ) || ! $feature_set ) {
