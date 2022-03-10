@@ -76,11 +76,11 @@ exports[`Multi-block selection should cut and paste 2`] = `
 
 exports[`Multi-block selection should forward delete across blocks 1`] = `
 "<!-- wp:paragraph -->
-<p>1[[</p>
+<p>1[</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p>.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -120,11 +120,11 @@ exports[`Multi-block selection should gradually multi-select 2`] = `
 
 exports[`Multi-block selection should handle Enter across blocks 1`] = `
 "<!-- wp:paragraph -->
-<p>1[[</p>
+<p>1[</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>a</p>
+<p>.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
