@@ -65,11 +65,11 @@ The content to be displayed within the BaseControl.
 
 ### __nextHasNoMarginBottom
 
+Start opting into the new margin-free styles that will become the default in a future version.
+
 -   Type: `Boolean`
 -   Required: No
 -   Default: `false`
-
-Start opting into the new margin-free styles that will become the default in a future version.
 
 ## BaseControl.VisualLabel
 
