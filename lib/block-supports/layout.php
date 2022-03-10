@@ -117,7 +117,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 		$style .= '}';
 
-		$style .= ":where($selector > *) { margin: 0; }";
+		$style .= "$selector > * { margin: 0; }";
 	}
 
 	return $style;
