@@ -33,7 +33,8 @@ $z-layers: (
 	".block-editor-url-input__suggestions": 30,
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
-	".interface-interface-skeleton__content": 20,
+	".interface-interface-skeleton__content": 91,
+	".edit-site-list.interface-interface-skeleton__content": 29, // The content area needs to be lower than the header so tools dropdowns appear over the content.
 	".edit-site-header": 62,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter

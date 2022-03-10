@@ -94,6 +94,45 @@ jobs:
                   name: changelog ${{ matrix.label }}
                   path: ./changelog.txt
 
+    npm-publish:
+        name: Publish WordPress packages to npm
+        runs-on: ubuntu-latest
+        needs: update-changelog
+        if: ${{ github.event.release.prerelease && endsWith( github.event.release.tag_name, '-rc.1' ) && github.event.release.assets[0] }}
+        steps:
+            - name: Checkout (for CLI)
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  path: main
+                  ref: trunk
+
+            - name: Checkout (for publishing)
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  path: publish
+                  ref: trunk
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+
+            - name: Configure git user name and email (for publishing)
+              run: |
+                  cd publish
+                  git config user.name "Gutenberg Repository Automation"
+                  git config user.email gutenberg@wordpress.org
+
+            - name: Setup Node
+              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              with:
+                  node-version: 14
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: Publish packages to npm ("next" dist-tag)
+              run: |
+                  cd main
+                  npm ci
+                  ./bin/plugin/cli.js npm-next --semver minor --ci --repository-path ../publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
     upload:
         name: Upload Gutenberg Plugin
         runs-on: ubuntu-latest
