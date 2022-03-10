@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Changed `dragHandle` footprint from 18x18 to 24x24 to match other icons.
+
 ## 7.0.0 (2022-02-23)
 
 ### New Features
