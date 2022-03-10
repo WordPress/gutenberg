@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/api-fetch",
-	"version": "3.21.5",
+	"version": "3.21.6",
 	"description": "Utility to make WordPress REST API requests.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

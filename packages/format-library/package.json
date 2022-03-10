@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "1.26.12",
+	"version": "1.26.13",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
