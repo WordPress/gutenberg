@@ -23,6 +23,7 @@ module.exports = {
 		'@storybook/addon-viewport',
 		'@storybook/addon-a11y',
 		'@storybook/addon-toolbars',
+		'@storybook/addon-actions',
 	],
 	features: {
 		babelModeV7: true,
