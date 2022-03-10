@@ -15,6 +15,21 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import {
+	home,
+	post,
+	page,
+	archive,
+	search,
+	close as closeIcon,
+	list,
+	category,
+	postAuthor,
+	postDate,
+	postTerms,
+	tag,
+	media,
+} from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -31,7 +46,29 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'search',
 	'404',
 	'index',
+	'category',
+	'author',
+	'taxonomy',
+	'date',
+	'tag',
+	'attachment',
 ];
+
+const TEMPLATE_ICONS = {
+	'front-page': home,
+	'single-post': post,
+	page,
+	archive,
+	search,
+	404: closeIcon,
+	index: list,
+	category,
+	author: postAuthor,
+	taxonomy: postTerms,
+	date: postDate,
+	tag,
+	attachment: media,
+};
 
 export default function NewTemplate( { postType } ) {
 	const history = useHistory();
@@ -131,6 +168,8 @@ export default function NewTemplate( { postType } ) {
 							missingTemplates,
 							( { title, description, slug } ) => (
 								<MenuItem
+									icon={ TEMPLATE_ICONS[ slug ] }
+									iconPosition="left"
 									info={ description }
 									key={ slug }
 									onClick={ () => {
