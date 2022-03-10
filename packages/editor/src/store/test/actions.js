@@ -83,6 +83,11 @@ describe( 'Post actions', () => {
 					path.startsWith( `/wp/v2/posts/${ postId }` )
 				) {
 					return { ...post, ...data };
+				} else if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {};
 				}
 
 				throw {
@@ -163,6 +168,13 @@ describe( 'Post actions', () => {
 					} else if ( method === 'GET' ) {
 						return [];
 					}
+				} else if ( method === 'GET' ) {
+					if (
+						path.startsWith( '/wp/v2/types/post' ) ||
+						path.startsWith( '/wp/v2/posts/44' )
+					) {
+						return {};
+					}
 				}
 
 				throw {
@@ -239,6 +251,11 @@ describe( 'Post actions', () => {
 							...data,
 						};
 					}
+				} else if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {};
 				}
 
 				throw {
