@@ -18,6 +18,7 @@ import { parseQuantityAndUnitFromRawValue } from '../utils';
 function render( jsx ) {
 	return {
 		user: userEvent.setup( {
+			// Avoids timeout errors (https://github.com/testing-library/user-event/issues/565#issuecomment-1064579531).
 			delay: null,
 		} ),
 		...RTLrender( jsx ),
