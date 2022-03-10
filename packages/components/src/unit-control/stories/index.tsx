@@ -31,7 +31,6 @@ const meta: ComponentMeta< typeof UnitControl > = {
 	parameters: {
 		controls: {
 			expanded: true,
-			exclude: [ '__unstableInputWidth', '__unstableStateReducer' ],
 		},
 		docs: { source: { state: 'open' } },
 	},
