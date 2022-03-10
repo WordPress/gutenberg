@@ -192,16 +192,43 @@ export const togglePinnedPluginItem = ( pluginName ) => ( { registry } ) => {
  *
  * @param {string}  blockName  Name of the block.
  * @param {?string} blockStyle Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
- *
- * @return {Object} Action object.
  */
-export function updatePreferredStyleVariations( blockName, blockStyle ) {
-	return {
-		type: 'UPDATE_PREFERRED_STYLE_VARIATIONS',
-		blockName,
-		blockStyle,
-	};
-}
+export const updatePreferredStyleVariations = ( blockName, blockStyle ) => ( {
+	registry,
+} ) => {
+	if ( ! blockName ) {
+		return;
+	}
+
+	const existingVarations =
+		registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'preferredStyleVariations' ) ?? {};
+
+	// When the blockStyle is ommitted, remove the block's preferred variation.
+	if ( ! blockStyle ) {
+		const updatedVariations = {
+			...existingVarations,
+		};
+
+		delete updatedVariations[ blockName ];
+
+		registry
+			.dispatch( preferencesStore )
+			.set(
+				'core/edit-post',
+				'preferredStyleVariations',
+				updatedVariations
+			);
+	}
+
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/edit-post', 'preferredStyleVariations', {
+			...existingVarations,
+			[ blockName ]: blockStyle,
+		} );
+};
 
 /**
  * Update the provided block types to be visible.
