@@ -302,6 +302,9 @@ export default function Image( {
 		if ( isSelected && isMediaDestroyed( id ) ) {
 			onImageLoadError();
 		}
+		if ( isSelected ) {
+			containerRef.current?.focus();
+		}
 	}, [ isSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
