@@ -58,7 +58,7 @@ describe( 'getKindEntities', () => {
 	it( 'shouldn’t do anything if the entities have already been resolved', async () => {
 		const dispatch = jest.fn();
 		const select = {
-			getEntitiesByKind: jest.fn( () => entities ),
+			getEntitiesConfig: jest.fn( () => entities ),
 		};
 		const entities = [ { kind: 'postType' } ];
 		await getOrLoadEntitiesConfig( 'postType' )( { dispatch, select } );
@@ -68,7 +68,7 @@ describe( 'getKindEntities', () => {
 	it( 'shouldn’t do anything if there no defined kind config', async () => {
 		const dispatch = jest.fn();
 		const select = {
-			getEntitiesByKind: jest.fn( () => [] ),
+			getEntitiesConfig: jest.fn( () => [] ),
 		};
 		await getOrLoadEntitiesConfig( 'unknownKind' )( { dispatch, select } );
 		expect( dispatch ).not.toHaveBeenCalled();
@@ -85,7 +85,7 @@ describe( 'getKindEntities', () => {
 		];
 		const dispatch = jest.fn();
 		const select = {
-			getEntitiesByKind: jest.fn( () => [] ),
+			getEntitiesConfig: jest.fn( () => [] ),
 		};
 		triggerFetch.mockImplementation( () => fetchedEntities );
 

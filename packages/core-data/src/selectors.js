@@ -95,14 +95,31 @@ export const getUserQueryResults = createSelector(
 );
 
 /**
- * Returns whether the entities for the give kind are loaded.
+ * Returns the loaded entities for the given kind.
  *
+ * @deprecated since ??. Use getEntitiesConfig instead
  * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
  *
  * @return {Array<Object>} Array of entities with config matching kind.
  */
 export function getEntitiesByKind( state, kind ) {
+	deprecated( "wp.data.select( 'core' ).getEntitiesByKind()", {
+		since: '6.0',
+		alternative: "wp.data.select( 'core' ).getEntitiesConfig()",
+	} );
+	return getEntitiesConfig( state, kind );
+}
+
+/**
+ * Returns the loaded entities for the given kind.
+ *
+ * @param {Object} state Data state.
+ * @param {string} kind  Entity kind.
+ *
+ * @return {Array<Object>} Array of entities with config matching kind.
+ */
+export function getEntitiesConfig( state, kind ) {
 	return filter( state.entities.config, { kind } );
 }
 

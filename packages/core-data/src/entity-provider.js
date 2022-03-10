@@ -22,7 +22,7 @@ const EMPTY_ARRAY = [];
  */
 import { rootEntitiesConfig, additionalEntityConfigLoaders } from './entities';
 
-const entities = {
+const entityContexts = {
 	...rootEntitiesConfig.reduce( ( acc, entity ) => {
 		if ( ! acc[ entity.kind ] ) {
 			acc[ entity.kind ] = {};
@@ -35,16 +35,16 @@ const entities = {
 		return acc;
 	}, {} ),
 };
-const getEntity = ( kind, type ) => {
-	if ( ! entities[ kind ] ) {
+const getEntityContext = ( kind, type ) => {
+	if ( ! entityContexts[ kind ] ) {
 		throw new Error( `Missing entity config for kind: ${ kind }.` );
 	}
 
-	if ( ! entities[ kind ][ type ] ) {
-		entities[ kind ][ type ] = { context: createContext() };
+	if ( ! entityContexts[ kind ][ type ] ) {
+		entityContexts[ kind ][ type ] = { context: createContext() };
 	}
 
-	return entities[ kind ][ type ];
+	return entityContexts[ kind ][ type ].context;
 };
 
 /**
@@ -61,7 +61,7 @@ const getEntity = ( kind, type ) => {
  *                   the entity's context provider.
  */
 export default function EntityProvider( { kind, type, id, children } ) {
-	const Provider = getEntityConfig( kind, type ).context.Provider;
+	const Provider = getEntityContext( kind, type ).Provider;
 	return <Provider value={ id }>{ children }</Provider>;
 }
 
@@ -72,8 +72,8 @@ export default function EntityProvider( { kind, type, id, children } ) {
  * @param {string} kind The entity kind.
  * @param {string} type The entity type.
  */
-export function useEntityId( kind, type ) {
-	return useContext( getEntityConfig( kind, type ).context );
+export function useEntityProviderId( kind, type ) {
+	return useContext( getEntityContext( kind, type ) );
 }
 
 /**
@@ -94,7 +94,7 @@ export function useEntityId( kind, type ) {
  * 							  `protected` props.
  */
 export function useEntityProp( kind, type, prop, _id ) {
-	const providerId = useEntityId( kind, type );
+	const providerId = useEntityProviderId( kind, type );
 	const id = _id ?? providerId;
 
 	const { value, fullValue } = useSelect(
@@ -145,7 +145,7 @@ export function useEntityProp( kind, type, prop, _id ) {
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
 export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
-	const providerId = useEntityId( kind, type );
+	const providerId = useEntityProviderId( kind, type );
 	const id = _id ?? providerId;
 	const { content, blocks } = useSelect(
 		( select ) => {

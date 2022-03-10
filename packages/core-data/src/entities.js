@@ -301,7 +301,7 @@ export const getOrLoadEntitiesConfig = ( kind ) => async ( {
 	select,
 	dispatch,
 } ) => {
-	let entities = select.getEntitiesByKind( kind );
+	let entities = select.getEntitiesConfig( kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}
