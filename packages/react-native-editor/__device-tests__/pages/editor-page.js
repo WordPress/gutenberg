@@ -178,11 +178,13 @@ class EditorPage {
 		}
 
 		const locator = await this.driver.elementsByXPath(
-			`//*[contains(@content-desc, "Post title.")]`
+			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "Post title.")]`
 		);
-
-		if ( locator.length !== 2 ) {
-			// if locator is not found, try again
+		
+		// very brittle condition at the moment, need to find a better locator
+		const locatorLength = isAndroid() ? 2 : 6;
+		if ( locator.length !== locatorLength ) {
+			// if locator doesn't meet expected length for Android and iOS, try again
 			iteration++;
 			return await this.isEditorVisible( iteration );
 		}
