@@ -52,6 +52,21 @@
  * These styles apply to all in-canvas inserters that exist inside nesting containers.
  */
 
+.items-justified-right .is-menu-open .wp-block-navigation__responsive-container-content * .block-list-appender {
+	left: -30px;
+	right: unset;
+}
+
+.items-justified-center .is-menu-open .wp-block-navigation__responsive-container-content * .block-list-appender {
+	right: -30px;
+	left: unset;
+}
+
+.items-justified-left .is-menu-open .wp-block-navigation__responsive-container-content * .block-list-appender {
+	right: -30px;
+	left: unset;
+}
+
 .block-editor-block-list__block .block-list-appender {
 	position: absolute;
 	list-style: none;
