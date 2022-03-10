@@ -180,9 +180,9 @@ class EditorPage {
 		const locator = await this.driver.elementsByXPath(
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "Post title.")]`
 		);
-		
 		// very brittle condition at the moment, need to find a better locator
 		const locatorLength = isAndroid() ? 2 : 6;
+
 		if ( locator.length !== locatorLength ) {
 			// if locator doesn't meet expected length for Android and iOS, try again
 			iteration++;
