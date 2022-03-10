@@ -168,7 +168,7 @@ class EditorPage {
 	}
 
 	async isEditorVisible( iteration = 0 ) {
-		if ( iteration >= 25 ) {
+		if ( iteration >= 15 ) {
 			throw new Error(
 				`Gutenberg Editor is still not visible after ${ iteration } retries!`
 			);
@@ -180,10 +180,9 @@ class EditorPage {
 		const locator = await this.driver.elementsByXPath(
 			`//*[contains(@content-desc, "Post title.")]`
 		);
-		if ( locator.length === 2 ) {
-			// if locator exists, move along
-		} else {
-			// else, try again
+
+		if ( locator.length !== 2 ) {
+			// if locator is not found, try again
 			iteration++;
 			return await this.isEditorVisible( iteration );
 		}
