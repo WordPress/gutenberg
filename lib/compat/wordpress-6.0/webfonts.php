@@ -102,6 +102,57 @@ function wp_register_webfont( $id, $webfont ) {
 }
 
 /**
+ * Enqueues a collection of webfonts.
+ *
+ * Example of how to enqueue Source Serif Pro font with font-weight range of 200-900
+ * and font-style of normal and italic:
+ *
+ * <code>
+ * wp_enqueue_webfonts(
+ *      array(
+ *          'some-already-registered-font', // This requires the font to be registered beforehand.
+ *          array(
+ *              'id'          => 'source-serif-200-900-normal',
+ *              'provider'    => 'local',
+ *              'font_family' => 'Source Serif Pro',
+ *              'font_weight' => '200 900',
+ *              'font_style'  => 'normal',
+ *              'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
+ *          ),
+ *          array(
+ *              'id'          => 'source-serif-200-900-italic',
+ *              'provider'    => 'local',
+ *              'font_family' => 'Source Serif Pro',
+ *              'font_weight' => '200 900',
+ *              'font_style'  => 'italic',
+ *              'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2' ),
+ *          ),
+ *      )
+ * );
+ * </code>
+ *
+ * Webfonts should be enqueued in the `after_setup_theme` hook.
+ *
+ * @since 6.0.0
+ *
+ * @param array $webfonts Webfonts to be enqueued.
+ *                        This contains an array of webfonts to be enqueued.
+ *                        Each webfont is an array.
+ *                        See {@see WP_Webfonts_Registry::register()} for a list of
+ *                        supported arguments for each webfont.
+ */
+function wp_enqueue_webfonts( $webfonts = array() ) {
+	foreach ( $webfonts as $webfont ) {
+		if ( is_string( $webfont ) ) {
+			wp_enqueue_webfont( $webfont );
+			continue;
+		}
+
+		wp_enqueue_webfont( $webfont['id'], $webfont );
+	}
+}
+
+/**
  * Enqueue a single webfont.
  *
  * Register the webfont if $webfont is provided and enqueues.
