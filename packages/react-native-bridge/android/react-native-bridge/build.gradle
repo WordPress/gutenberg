@@ -1,5 +1,11 @@
 import groovy.json.JsonSlurper
 
+buildscript {
+    ext {
+        excludeAppGlideModule = true
+    }
+}
+
 plugins {
     id "com.android.library"
     id "org.jetbrains.kotlin.android"
