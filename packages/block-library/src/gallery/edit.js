@@ -473,7 +473,9 @@ function GalleryEdit( props ) {
 	}
 
 	const hasLinkTo = linkTo && linkTo !== 'none';
-
+	const style = attributes.style?.spacing?.blockGap
+		? `#block-${ clientId } { --wp--style--unstable-gallery-gap: ${ attributes.style.spacing.blockGap } }`
+		: undefined;
 	return (
 		<>
 			<InspectorControls>
@@ -548,6 +550,7 @@ function GalleryEdit( props ) {
 				/>
 			</BlockControls>
 			{ noticeUI }
+			<style>{ style }</style>
 			<Gallery
 				{ ...props }
 				images={ images }

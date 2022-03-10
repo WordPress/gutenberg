@@ -1,25 +1,17 @@
 // Import styles for rendering the static content of deprecated gallery versions.
 @import "./deprecated.scss";
 
+// The following is a temporary override until flex layout supports
+// an align items setting of normal.
+figure.wp-block-gallery.has-nested-images {
+	align-items: normal;
+}
 // Styles for current version of gallery block.
 .wp-block-gallery.has-nested-images {
-	display: flex;
-	flex-wrap: wrap;
 	// Need bogus :not(#individual-image) to override long :not()
 	// specificity chain on default image block on front end.
 	figure.wp-block-image:not(#individual-image) {
-		// Add space between thumbnails, and unset right most thumbnails later.
-		margin: 0 var(--gallery-block--gutter-size, #{$grid-unit-20}) var(--gallery-block--gutter-size, #{$grid-unit-20}) 0;
-
-		&:last-of-type:not(#individual-image) {
-			margin-right: 0;
-		}
-
-		width: calc(50% - (var(--gallery-block--gutter-size, #{$grid-unit-20}) / 2));
-
-		&:nth-of-type(even) {
-			margin-right: 0;
-		}
+		width: calc(50% - (var(--wp--style--unstable-gallery-gap, #{$grid-unit-20}) / 2));
 	}
 
 	figure.wp-block-image {
@@ -27,8 +19,6 @@
 		flex-grow: 1;
 		justify-content: center;
 		position: relative;
-		margin-top: auto;
-		margin-bottom: auto;
 		flex-direction: column;
 		max-width: 100%;
 
@@ -101,11 +91,11 @@
 			margin-top: 0;
 			margin-bottom: auto;
 			img {
-				margin-bottom: var(--gallery-block--gutter-size, #{$grid-unit-20});
+				margin-bottom: var(--wp--style--unstable-gallery-gap, #{$grid-unit-20});
 			}
 
 			figcaption {
-				bottom: var(--gallery-block--gutter-size, #{$grid-unit-20});
+				bottom: var(--wp--style--unstable-gallery-gap, #{$grid-unit-20});
 			}
 		}
 	}
@@ -128,7 +118,6 @@
 	}
 
 	&.columns-1 figure.wp-block-image:not(#individual-image) {
-		margin-right: 0;
 		width: 100%;
 	}
 
@@ -136,35 +125,20 @@
 	@include break-small {
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } figure.wp-block-image:not(#individual-image) {
-				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
-				width: calc(#{math.div(100%, $i)} - (var(--gallery-block--gutter-size, #{$grid-unit-20}) * #{math.div($i - 1, $i)}));
+				width: calc(#{math.div(100%, $i)} - (var(--wp--style--unstable-gallery-gap, #{$grid-unit-20}) * #{math.div($i - 1, $i)}));
 
-			}
-
-			// Prevent collapsing margin while sibling is being dragged.
-			&.columns-#{$i} figure.wp-block-image:not(#individual-image).is-dragging ~ figure.wp-block-image:not(#individual-image) {
-				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
-			}
-		}
-		// Unset the right margin on every rightmost gallery item to ensure center balance.
-		@for $column-count from 1 through 8 {
-			&.columns-#{$column-count} figure.wp-block-image:not(#individual-image):nth-of-type(#{ $column-count }n) {
-				margin-right: 0;
 			}
 		}
 		// If number of columns not explicitly set default to 3 columns if 3 or more images.
 		&.columns-default {
 			figure.wp-block-image:not(#individual-image) {
-				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
-				width: calc(33.33% - (var(--gallery-block--gutter-size, 16px) * #{math.div(2, 3)}));
-			}
-			figure.wp-block-image:not(#individual-image):nth-of-type(3n+3) {
-				margin-right: 0;
+
+				width: calc(33.33% - (var(--wp--style--unstable-gallery-gap, 16px) * #{math.div(2, 3)}));
 			}
 			// If only 2 child images use 2 columns.
 			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2),
 			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2) ~ figure.wp-block-image:not(#individual-image) {
-				width: calc(50% - (var(--gallery-block--gutter-size, 16px) * 0.5));
+				width: calc(50% - (var(--wp--style--unstable-gallery-gap, 16px) * 0.5));
 			}
 			// For a single image set to 100%.
 			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(1) {
