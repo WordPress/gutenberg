@@ -414,11 +414,6 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,
 		'core/edit-post',
-		'localAutosaveInterval'
-	);
-	migrateIndividualPreferenceToPreferencesStore(
-		persistence,
-		'core/edit-post',
 		'editorMode'
 	);
 	migrateFeaturePreferencesToPreferencesStore(

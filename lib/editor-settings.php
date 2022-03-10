@@ -24,6 +24,8 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 		$settings['defaultTemplatePartAreas'] = get_allowed_block_template_part_areas();
 	}
 
+	$settings['__experimentalLocalAutosaveInterval'] = 15;
+
 	return $settings;
 }
 add_filter( 'block_editor_settings_all', 'gutenberg_extend_post_editor_settings' );

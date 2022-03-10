@@ -8,13 +8,11 @@
 
 `LocalAutosaveMonitor` observes a saving interval defined specifically for local autosaves, in contrast with remote (server-side) autosaving.
 
-The interval used for the local autosave can be modified using the preferences store:
+The interval used for the local autosave can be modified by updating the editor settings
 ```js
-// Set the interval.
-wp.data.dispatch( 'core/preferences' ).set( 'core/edit-post', 'localAutosaveInterval', 100 );
-
-// Get the interval.
-wp.data.select( 'core/preferences' ).get( 'core/edit-post', 'localAutosaveInterval' ); // 100
+wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+	__experimentalLocalAutosaveInterval: 100000000000,
+} );
 ```
 
 ## Example
