@@ -18,6 +18,12 @@ const meta: ComponentMeta< typeof UnitControl > = {
 	component: UnitControl,
 	title: 'Components (Experimental)/UnitControl',
 	argTypes: {
+		__unstableInputWidth: {
+			control: { type: 'text' },
+		},
+		__unstableStateReducer: {
+			control: { type: null },
+		},
 		size: {
 			control: { type: 'select' },
 		},
