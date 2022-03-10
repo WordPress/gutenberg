@@ -12,10 +12,12 @@ const {
 	swipeFromTo,
 	longPressMiddleOfElement,
 	doubleTap,
+	isEditorVisible
 } = require( '../helpers/utils' );
 
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
+	await isEditorVisible( driver )
 	return new EditorPage( driver );
 };
 
@@ -36,8 +38,6 @@ class EditorPage {
 			this.accessibilityIdXPathAttrib = 'content-desc';
 			this.accessibilityIdKey = 'contentDescription';
 		}
-
-		driver.setImplicitWaitTimeout( 5000 );
 	}
 
 	async getBlockList() {
@@ -167,28 +167,6 @@ class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	async isEditorVisible( iteration = 0 ) {
-		if ( iteration >= 15 ) {
-			throw new Error(
-				`Gutenberg Editor is still not visible after ${ iteration } retries!`
-			);
-		} else if ( iteration !== 0 ) {
-			// wait 1 second before trying to locate element again
-			await this.driver.sleep( 1000 );
-		}
-
-		const blockLocator = isAndroid()
-			? `//android.widget.EditText[@content-desc="Post title. Welcome to Gutenberg!"]`
-			: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[@name="Post title. Welcome to Gutenberg!"])`;
-
-		const locator = await this.driver.elementsByXPath( blockLocator );
-		if ( locator.length !== 1 ) {
-			// if locator is not visible, try again
-			iteration++;
-			return await this.isEditorVisible( iteration );
-		}
-	}
-
 	// Returns html content
 	// Ensure to take additional steps to handle text being changed by auto correct.
 	async getHtmlContent() {
@@ -203,7 +181,6 @@ class EditorPage {
 
 	// Set html editor content explicitly.
 	async setHtmlContent( html ) {
-		await this.isEditorVisible();
 		await toggleHtmlMode( this.driver, true );
 
 		const base64String = Buffer.from( html ).toString( 'base64' );
