@@ -200,15 +200,15 @@ export const updatePreferredStyleVariations = ( blockName, blockStyle ) => ( {
 		return;
 	}
 
-	const existingVarations =
+	const existingVariations =
 		registry
 			.select( preferencesStore )
 			.get( 'core/edit-post', 'preferredStyleVariations' ) ?? {};
 
-	// When the blockStyle is ommitted, remove the block's preferred variation.
+	// When the blockStyle is omitted, remove the block's preferred variation.
 	if ( ! blockStyle ) {
 		const updatedVariations = {
-			...existingVarations,
+			...existingVariations,
 		};
 
 		delete updatedVariations[ blockName ];
@@ -225,7 +225,7 @@ export const updatePreferredStyleVariations = ( blockName, blockStyle ) => ( {
 		registry
 			.dispatch( preferencesStore )
 			.set( 'core/edit-post', 'preferredStyleVariations', {
-				...existingVarations,
+				...existingVariations,
 				[ blockName ]: blockStyle,
 			} );
 	}
