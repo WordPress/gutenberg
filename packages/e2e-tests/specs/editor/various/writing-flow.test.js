@@ -17,7 +17,7 @@ const getActiveBlockName = async () =>
 	);
 
 const addParagraphsAndColumnsDemo = async () => {
-	// Add demo content
+	// Add demo content.
 	await clickBlockAppender();
 	await page.keyboard.type( 'First paragraph' );
 	await page.keyboard.press( 'Enter' );
@@ -45,10 +45,10 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
 	await page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 
-	await page.keyboard.press( 'Escape' ); // Enter navigation mode
-	await page.keyboard.press( 'ArrowLeft' ); // move to the column block
-	await page.keyboard.press( 'ArrowLeft' ); // move to the columns block
-	await page.keyboard.press( 'Enter' ); // Enter edit mode with the columns block selected
+	await page.keyboard.press( 'Escape' ); // Enter navigation mode.
+	await page.keyboard.press( 'ArrowLeft' ); // Move to the column block.
+	await page.keyboard.press( 'ArrowLeft' ); // Move to the columns block.
+	await page.keyboard.press( 'Enter' ); // Enter edit mode with the columns block selected.
 	await page.keyboard.press( 'Enter' ); // Creates a paragraph after the columns block.
 	await page.keyboard.type( 'Second paragraph' );
 };
@@ -69,10 +69,10 @@ describe( 'Writing Flow', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/18928
 		let activeElementText, activeBlockName;
 
-		// Add demo content
+		// Add demo content.
 		await addParagraphsAndColumnsDemo();
 
-		// Arrow up into nested context focuses last text input
+		// Arrow up into nested context focuses last text input.
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
@@ -111,41 +111,41 @@ describe( 'Writing Flow', () => {
 		// In navigation mode the active element is the block name button, so we can't easily check the block content.
 		let activeBlockName;
 
-		// Add demo content
+		// Add demo content.
 		await addParagraphsAndColumnsDemo();
 
-		// Switch to navigation mode
+		// Switch to navigation mode.
 		await page.keyboard.press( 'Escape' );
-		// Arrow up to Columns block
+		// Arrow up to Columns block.
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/columns' );
-		// Arrow right into Column block
+		// Arrow right into Column block.
 		await page.keyboard.press( 'ArrowRight' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/column' );
-		// Arrow down to reach second Column block
+		// Arrow down to reach second Column block.
 		await page.keyboard.press( 'ArrowDown' );
-		// Arrow right again into Paragraph block
+		// Arrow right again into Paragraph block.
 		await page.keyboard.press( 'ArrowRight' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		// Arrow left back to Column block
+		// Arrow left back to Column block.
 		await page.keyboard.press( 'ArrowLeft' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/column' );
-		// Arrow left back to Columns block
+		// Arrow left back to Columns block.
 		await page.keyboard.press( 'ArrowLeft' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/columns' );
-		// Arrow up to first paragraph
+		// Arrow up to first paragraph.
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
 	} );
 
 	it( 'should navigate around inline boundaries', async () => {
-		// Add demo content
+		// Add demo content.
 		await clickBlockAppender();
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
@@ -153,10 +153,10 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Third' );
 
-		// Navigate to second paragraph
+		// Navigate to second paragraph.
 		await pressKeyTimes( 'ArrowLeft', 6 );
 
-		// Bold second paragraph text
+		// Bold second paragraph text.
 		await page.keyboard.down( 'Shift' );
 		await pressKeyTimes( 'ArrowLeft', 6 );
 		await page.keyboard.up( 'Shift' );
@@ -195,7 +195,7 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'After' );
 
 		// Finally, ensure that ArrowRight from end of unbolded text moves to
-		// the last paragraph
+		// the last paragraph.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'Before' );
 
@@ -453,6 +453,24 @@ describe( 'Writing Flow', () => {
 
 		<!-- wp:paragraph -->
 		<p>123</p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
+
+	it( 'should merge and then soft line break', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.up( 'Shift' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>1<br>2</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );

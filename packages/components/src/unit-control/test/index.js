@@ -1,17 +1,19 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import UnitControl from '../';
+import { parseQuantityAndUnitFromRawValue } from '../utils';
 
 const getComponent = () =>
 	document.body.querySelector( '.components-unit-control' );
@@ -24,6 +26,52 @@ const getUnitLabel = () =>
 
 const fireKeyDown = ( data ) =>
 	fireEvent.keyDown( document.activeElement || document.body, data );
+
+const ControlledSyncUnits = () => {
+	const [ state, setState ] = useState( { valueA: '', valueB: '' } );
+
+	// Keep the unit sync'd between the two `UnitControl` instances.
+	const onUnitControlChange = ( fieldName, newValue ) => {
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const [ quantity, newUnit ] = parseQuantityAndUnitFromRawValue(
+			newValue
+		);
+
+		if ( ! Number.isFinite( quantity ) ) {
+			return;
+		}
+
+		const nextState = { ...state, [ fieldName ]: newValue };
+
+		Object.entries( state ).forEach( ( [ stateProp, stateValue ] ) => {
+			const [
+				stateQuantity,
+				stateUnit,
+			] = parseQuantityAndUnitFromRawValue( stateValue );
+
+			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
+				nextState[ stateProp ] = `${ stateQuantity }${ newUnit }`;
+			}
+		} );
+
+		setState( nextState );
+	};
+
+	return (
+		<>
+			<UnitControl
+				label="Field A"
+				value={ state.valueA }
+				onChange={ ( v ) => onUnitControlChange( 'valueA', v ) }
+			/>
+			<UnitControl
+				label="Field B"
+				value={ state.valueB }
+				onChange={ ( v ) => onUnitControlChange( 'valueB', v ) }
+			/>
+		</>
+	);
+};
 
 describe( 'UnitControl', () => {
 	describe( 'Basic rendering', () => {
@@ -45,7 +93,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should not render select, if units are disabled', () => {
-			render( <UnitControl unit="em" units={ false } /> );
+			render( <UnitControl unit="em" units={ [] } /> );
 			const input = getInput();
 			const select = getSelect();
 
@@ -125,6 +173,32 @@ describe( 'UnitControl', () => {
 			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
 			expect( state ).toBe( '40px' );
+		} );
+
+		it( 'should cancel change when ESCAPE key is pressed', () => {
+			let state = 50;
+			const setState = ( nextState ) => ( state = nextState );
+
+			render(
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					isPressEnterToChange
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+
+			fireEvent.change( input, { target: { value: '300px' } } );
+
+			expect( input.value ).toBe( '300px' );
+			expect( state ).toBe( 50 );
+
+			fireKeyDown( { keyCode: ESCAPE } );
+
+			expect( input.value ).toBe( '50' );
+			expect( state ).toBe( 50 );
 		} );
 	} );
 
@@ -239,6 +313,31 @@ describe( 'UnitControl', () => {
 			fireEvent.change( input, { target: { value: 62 } } );
 
 			expect( state ).toBe( '62%' );
+		} );
+
+		it( 'should update unit value when a new raw value is passed', () => {
+			render( <ControlledSyncUnits /> );
+
+			const [ inputA, inputB ] = screen.getAllByRole( 'spinbutton' );
+			const [ selectA, selectB ] = screen.getAllByRole( 'combobox' );
+
+			inputA.focus();
+			fireEvent.change( inputA, { target: { value: '55' } } );
+
+			inputB.focus();
+			fireEvent.change( inputB, { target: { value: '14' } } );
+
+			selectA.focus();
+			fireEvent.change( selectA, { target: { value: 'rem' } } );
+
+			expect( selectA ).toHaveValue( 'rem' );
+			expect( selectB ).toHaveValue( 'rem' );
+
+			selectB.focus();
+			fireEvent.change( selectB, { target: { value: 'vw' } } );
+
+			expect( selectA ).toHaveValue( 'vw' );
+			expect( selectB ).toHaveValue( 'vw' );
 		} );
 	} );
 

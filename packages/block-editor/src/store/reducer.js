@@ -216,7 +216,7 @@ function updateParentInnerBlocksInTree(
 				controlledParents.add( current );
 				break;
 			} else {
-				// else continue traversing up through parents.
+				// Else continue traversing up through parents.
 				uncontrolledParents.add( current );
 				current = state.parents[ current ];
 			}
@@ -611,7 +611,7 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 		const subTree = buildBlockTree( newState, action.blocks );
 		newState.tree = {
 			...subTree,
-			// Root
+			// Root.
 			'': {
 				innerBlocks: action.blocks.map(
 					( subBlock ) => subTree[ subBlock.clientId ]
@@ -712,7 +712,7 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 	if ( state && action.type === 'SAVE_REUSABLE_BLOCK_SUCCESS' ) {
 		const { id, updatedId } = action;
 
-		// If a temporary reusable block is saved, we swap the temporary id with the final one
+		// If a temporary reusable block is saved, we swap the temporary id with the final one.
 		if ( id === updatedId ) {
 			return state;
 		}
@@ -769,10 +769,10 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
  */
 export const blocks = flow(
 	combineReducers,
-	withSaveReusableBlock, // needs to be before withBlockCache
-	withBlockTree, // needs to be before withInnerBlocksRemoveCascade
+	withSaveReusableBlock, // Needs to be before withBlockCache.
+	withBlockTree, // Needs to be before withInnerBlocksRemoveCascade.
 	withInnerBlocksRemoveCascade,
-	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
+	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.
 	withBlockReset,
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
@@ -788,7 +788,7 @@ export const blocks = flow(
 				};
 
 			case 'UPDATE_BLOCK':
-				// Ignore updates if block isn't known
+				// Ignore updates if block isn't known.
 				if ( ! state[ action.clientId ] ) {
 					return state;
 				}
@@ -947,7 +947,7 @@ export const blocks = flow(
 				} = action;
 				const { index = state[ toRootClientId ].length } = action;
 
-				// Moving inside the same parent block
+				// Moving inside the same parent block.
 				if ( fromRootClientId === toRootClientId ) {
 					const subState = state[ toRootClientId ];
 					const fromIndex = subState.indexOf( clientIds[ 0 ] );
@@ -962,7 +962,7 @@ export const blocks = flow(
 					};
 				}
 
-				// Moving from a parent block to another
+				// Moving from a parent block to another.
 				return {
 					...state,
 					[ fromRootClientId ]: without(
@@ -1068,10 +1068,10 @@ export const blocks = flow(
 
 			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				return flow( [
-					// Remove inner block ordering for removed blocks
+					// Remove inner block ordering for removed blocks.
 					( nextState ) => omit( nextState, action.removedClientIds ),
 
-					// Remove deleted blocks from other blocks' orderings
+					// Remove deleted blocks from other blocks' orderings.
 					( nextState ) =>
 						mapValues( nextState, ( subState ) =>
 							without( subState, ...action.removedClientIds )

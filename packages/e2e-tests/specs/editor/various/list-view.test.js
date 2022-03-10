@@ -51,7 +51,7 @@ describe( 'List view', () => {
 			'//a[contains(., "Paragraph")][@draggable="true"]'
 		);
 
-		// Drag above the heading block
+		// Drag above the heading block.
 		const headingBlock = await page.waitForXPath(
 			'//a[contains(., "Heading")][@draggable="true"]'
 		);
@@ -148,5 +148,51 @@ describe( 'List view', () => {
 		);
 
 		expect( selectedElementText ).toContain( 'Paragraph' );
+	} );
+
+	// Test keyboard Home/End keys.
+	it( 'ensures the Home/End keyboard keys move focus to start/end of list', async () => {
+		// Insert some blocks of different types.
+		await insertBlock( 'Image' );
+		await insertBlock( 'Heading' );
+		await insertBlock( 'Paragraph' );
+		await insertBlock( 'Columns' );
+		await insertBlock( 'Group' );
+
+		// Open list view.
+		await pressKeyWithModifier( 'access', 'o' );
+
+		// The last inserted group block should be selected in list view.
+		await page.waitForXPath( '//a[contains(., "Group(selected block)")]' );
+
+		// Press Home to go to the first inserted block (image).
+		await page.keyboard.press( 'Home' );
+		const listViewImageBlock = await page.waitForXPath(
+			'//a[contains(., "Image")]'
+		);
+		await expect( listViewImageBlock ).toHaveFocus();
+
+		// Press End followed by Arrow Up to go to the second to last block (columns).
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'ArrowUp' );
+		const listViewColumnsBlock = await page.waitForXPath(
+			'//a[contains(., "Columns")]'
+		);
+		await expect( listViewColumnsBlock ).toHaveFocus();
+
+		// Try navigating the right column to image block options button via Home key.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Home' );
+		const listViewImageBlockRight = await page.waitForSelector(
+			'button[aria-label="Options for Image block"]'
+		);
+		await expect( listViewImageBlockRight ).toHaveFocus();
+
+		// Try navigating the right column to group block options button.
+		await page.keyboard.press( 'End' );
+		const listViewGroupBlockRight = await page.waitForSelector(
+			'button[aria-label="Options for Group block"]'
+		);
+		await expect( listViewGroupBlockRight ).toHaveFocus();
 	} );
 } );

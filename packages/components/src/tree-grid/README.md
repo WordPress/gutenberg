@@ -114,7 +114,7 @@ Aside from the documented callback functions, any props specified will be passed
 
 ###### onFocusRow( event: Event, startRow: HTMLElement, destinationRow: HTMLElement )
 
-Callback that fires when focus is shifted from one row to another via the UP and DOWN keys.
+Callback that fires when focus is shifted from one row to another via the Up and Down keys. Callback is also fired on Home and End keys which move focus from the beginning row to the end row.
 The callback is passed the event, the start row element that the focus was on originally, and
 the destination row element after the focus has moved.
 

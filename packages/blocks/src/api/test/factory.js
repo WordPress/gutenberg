@@ -40,7 +40,7 @@ describe( 'block factory', () => {
 	};
 
 	beforeAll( () => {
-		// Load blocks store
+		// Load blocks store.
 		require( '../../store' );
 	} );
 
@@ -2093,7 +2093,7 @@ describe( 'block factory', () => {
 			const validWildcardBlockTransform = {
 				type: 'block',
 				blocks: [
-					'core/some-other-block-first', // unlikely to happen but...
+					'core/some-other-block-first', // Unlikely to happen but...
 					'*',
 				],
 				blockName: 'core/test-block',

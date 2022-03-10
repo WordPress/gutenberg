@@ -79,7 +79,7 @@ function SelectControl(
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
 
-	// Disable reason: A select with an onchange throws a warning
+	// Disable reason: A select with an onchange throws a warning.
 	if ( isEmpty( options ) && ! children ) return null;
 
 	const handleOnBlur = ( event: FocusEvent< HTMLSelectElement > ) => {

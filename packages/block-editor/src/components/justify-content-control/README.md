@@ -20,7 +20,7 @@ const MyJustifyToolbar = ( { attributes, setAttributes } ) => (
 		<JustifyContentControl
 			value={ attributes.justification }
 			onChange={ ( next ) => {
-				setAttributes( { justfication: next } );
+				setAttributes( { justification: next } );
 			} }
 		/>
 	</BlockControls>

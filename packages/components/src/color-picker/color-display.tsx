@@ -139,7 +139,7 @@ export const ColorDisplay = ( {
 		}
 	);
 	useEffect( () => {
-		// clear copyTimer on component unmount.
+		// Clear copyTimer on component unmount.
 		return () => {
 			if ( copyTimer.current ) {
 				clearTimeout( copyTimer.current );

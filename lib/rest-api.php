@@ -209,14 +209,3 @@ function gutenberg_rest_user_collection_params_has_published_posts( $query_param
 	return $query_params;
 }
 add_filter( 'rest_user_collection_params', 'gutenberg_rest_user_collection_params_has_published_posts' );
-
-/**
- * Registers the Edit Site's Export REST API routes.
- *
- * @return void
- */
-function gutenberg_register_edit_site_export_endpoint() {
-	$editor_settings = new WP_REST_Edit_Site_Export_Controller();
-	$editor_settings->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_endpoint' );

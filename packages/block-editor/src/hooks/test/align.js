@@ -167,7 +167,7 @@ describe( 'align', () => {
 					isSelected
 				/>
 			);
-			// when there's only one child, `rendered` in the tree is an object not an array.
+			// When there's only one child, `rendered` in the tree is an object not an array.
 			expect( wrapper.toTree().rendered ).toBeInstanceOf( Object );
 		} );
 

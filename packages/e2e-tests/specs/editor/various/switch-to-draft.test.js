@@ -67,7 +67,9 @@ async function scheduleTestPost( postType, viewport ) {
 	);
 
 	await (
-		await page.$x( '//td[@role="button"]/*[text() = "15"]' )
+		await page.$x(
+			'//*[@role="application"][@aria-label="Calendar"]//td[@role="button"]/*[text() = "15"]'
+		)
 	 )[ 0 ].click();
 
 	await page.click( '.edit-post-post-schedule__toggle' );

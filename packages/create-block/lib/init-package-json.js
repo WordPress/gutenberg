@@ -16,6 +16,7 @@ module.exports = async ( {
 	author,
 	description,
 	license,
+	pluginURI,
 	slug,
 	version,
 	wpEnv,
@@ -37,6 +38,7 @@ module.exports = async ( {
 				description,
 				author,
 				license,
+				homepage: pluginURI,
 				main: wpScripts && 'build/index.js',
 				scripts: {
 					...( wpScripts && {

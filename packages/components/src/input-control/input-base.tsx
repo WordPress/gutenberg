@@ -72,7 +72,7 @@ export function InputBase(
 	const hideLabel = hideLabelFromVision || ! label;
 
 	return (
-		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions
+		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
 		<Root
 			{ ...props }
 			{ ...getUIFlexProps( labelPosition ) }

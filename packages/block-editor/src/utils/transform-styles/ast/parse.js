@@ -240,7 +240,7 @@ export default function ( css, options ) {
 	function declaration() {
 		const pos = position();
 
-		// prop
+		// prop.
 		let prop = match( /^(\*?[-#\/\*\\\w]+(\[[0-9a-z_-]+\])?)\s*/ );
 		if ( ! prop ) {
 			return;
@@ -252,7 +252,7 @@ export default function ( css, options ) {
 			return error( "property missing ':'" );
 		}
 
-		// val
+		// val.
 		const val = match(
 			/^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^\)]*?\)|[^};])+)/
 		);
@@ -281,7 +281,7 @@ export default function ( css, options ) {
 		}
 		comments( decls );
 
-		// declarations
+		// declarations.
 		let decl;
 		// eslint-disable-next-line no-cond-assign
 		while ( ( decl = declaration() ) ) {
@@ -491,7 +491,7 @@ export default function ( css, options ) {
 		}
 		let decls = comments();
 
-		// declarations
+		// declarations.
 		let decl;
 		// eslint-disable-next-line no-cond-assign
 		while ( ( decl = declaration() ) ) {
@@ -558,7 +558,7 @@ export default function ( css, options ) {
 		}
 		let decls = comments();
 
-		// declarations
+		// declarations.
 		let decl;
 		// eslint-disable-next-line no-cond-assign
 		while ( ( decl = declaration() ) ) {

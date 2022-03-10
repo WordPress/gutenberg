@@ -13,6 +13,7 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { __ } from '@wordpress/i18n';
 import { store as viewportStore } from '@wordpress/viewport';
 import { getQueryArgs } from '@wordpress/url';
@@ -24,7 +25,6 @@ import './hooks';
 import { store as editSiteStore } from './store';
 import EditSiteApp from './components/app';
 import getIsListPage from './utils/get-is-list-page';
-import redirectToHomepage from './components/routes/redirect-to-homepage';
 import ErrorBoundaryWarning from './components/error-boundary/warning';
 
 /**
@@ -35,20 +35,14 @@ import ErrorBoundaryWarning from './components/error-boundary/warning';
  * @param {Element} target   DOM node in which editor is rendered.
  * @param {?Object} settings Editor settings object.
  */
-export async function reinitializeEditor( target, settings ) {
-	// The site editor relies on `postType` and `postId` params in the URL to
-	// define what's being edited. When visiting via the dashboard link, these
-	// won't be present. Do a client side redirect to the 'homepage' if that's
-	// the case.
-	try {
-		await redirectToHomepage( settings.siteUrl );
-	} catch ( error ) {
+export function reinitializeEditor( target, settings ) {
+	// Display warning if editor wasn't able to resolve homepage template.
+	if ( ! settings.__unstableHomeTemplate ) {
 		render(
 			<ErrorBoundaryWarning
 				message={ __(
 					'The editor is unable to find a block template for the homepage.'
 				) }
-				error={ error }
 				dashboardLink="index.php"
 			/>,
 			target
@@ -63,6 +57,14 @@ export async function reinitializeEditor( target, settings ) {
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	{
+		dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
+			editorMode: 'visual',
+			fixedToolbar: false,
+			focusMode: false,
+			welcomeGuide: true,
+			welcomeGuideStyles: true,
+		} );
+
 		dispatch( editSiteStore ).updateSettings( settings );
 
 		// Keep the defaultTemplateTypes in the core/editor settings too,
