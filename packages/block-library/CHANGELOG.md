@@ -10,6 +10,7 @@
 
 ### Bug Fix
 
+-   Gallery block: disable edit as html support ([#39318](https://github.com/WordPress/gutenberg/pull/39318)).
 -   Removed unused `@wordpress/escape-html` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
 ## 6.1.0 (2022-01-27)

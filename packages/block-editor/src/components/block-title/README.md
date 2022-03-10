@@ -1,6 +1,11 @@
 # Block Title
 
-Renders the block's configured title as a string, or empty if the title cannot be determined.
+The Block Title component renders a block's configured title as a string.
+
+It prioritizes contextual titles such as block variation and reusable block labels when returning a value. If none is found, it will return the display title specified in the block's metadata.
+
+The component will be empty if a title cannot be determined.
+
 
 ## Usage
 
@@ -20,6 +25,8 @@ The client ID of a block.
 #### maximumLength
 
 The maximum length that the block title string may be before truncated. If `undefined` no truncation will take place.
+
+Truncation only affects contextual titles, for example block variation and reusable block labels. Display titles specified in the block's metadata will not be truncated even if a valid `maximumLength` value is passed.
 
 -   Type: `Number`
 -   Required: No

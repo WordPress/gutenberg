@@ -6,7 +6,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { LEFT, RIGHT, UP, DOWN } from '@wordpress/keycodes';
+import { LEFT, RIGHT, UP, DOWN, HOME, END } from '@wordpress/keycodes';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -68,10 +68,10 @@ describe( 'TreeGrid', () => {
 						level={ 1 }
 						positionInSet={ 1 }
 						setSize={ 3 }
-						isExpanded={ true }
+						isExpanded={ false }
 					>
 						<TreeGridCell withoutGridItem>
-							<TestButton>Row 1</TestButton>
+							<TestButton aria-expanded="false">Row 1</TestButton>
 						</TreeGridCell>
 					</TreeGridRow>
 					<TreeGridRow
@@ -88,7 +88,7 @@ describe( 'TreeGrid', () => {
 						level={ 1 }
 						positionInSet={ 3 }
 						setSize={ 3 }
-						isExpanded={ true }
+						isExpanded={ false }
 					>
 						<TreeGridCell withoutGridItem>
 							<TestButton>Row 3</TestButton>
@@ -97,16 +97,16 @@ describe( 'TreeGrid', () => {
 				</TreeGrid>
 			);
 
-			screen.getByText( 'Row 2' ).focus();
-			const row2Element = screen.getByText( 'Row 2' ).closest( 'tr' );
+			screen.getByText( 'Row 1' ).focus();
+			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
 
-			fireEvent.keyDown( screen.getByText( 'Row 2' ), {
+			fireEvent.keyDown( screen.getByText( 'Row 1' ), {
 				key: 'ArrowRight',
 				keyCode: RIGHT,
-				currentTarget: row2Element,
+				currentTarget: row1Element,
 			} );
 
-			expect( onExpandRow ).toHaveBeenCalledWith( row2Element );
+			expect( onExpandRow ).toHaveBeenCalledWith( row1Element );
 		} );
 	} );
 
@@ -120,17 +120,17 @@ describe( 'TreeGrid', () => {
 						level={ 1 }
 						positionInSet={ 1 }
 						setSize={ 3 }
-						isExpanded={ false }
+						isExpanded={ true }
 					>
 						<TreeGridCell withoutGridItem>
-							<TestButton>Row 1</TestButton>
+							<TestButton aria-expanded="true">Row 1</TestButton>
 						</TreeGridCell>
 					</TreeGridRow>
 					<TreeGridRow
 						level={ 1 }
 						positionInSet={ 2 }
 						setSize={ 3 }
-						isExpanded={ true }
+						isExpanded={ false }
 					>
 						<TreeGridCell withoutGridItem>
 							<TestButton>Row 2</TestButton>
@@ -149,16 +149,16 @@ describe( 'TreeGrid', () => {
 				</TreeGrid>
 			);
 
-			screen.getByText( 'Row 2' ).focus();
-			const row2Element = screen.getByText( 'Row 2' ).closest( 'tr' );
+			screen.getByText( 'Row 1' ).focus();
+			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
 
-			fireEvent.keyDown( screen.getByText( 'Row 2' ), {
+			fireEvent.keyDown( screen.getByText( 'Row 1' ), {
 				key: 'ArrowLeft',
 				keyCode: LEFT,
-				currentTarget: row2Element,
+				currentTarget: row1Element,
 			} );
 
-			expect( onCollapseRow ).toHaveBeenCalledWith( row2Element );
+			expect( onCollapseRow ).toHaveBeenCalledWith( row1Element );
 		} );
 	} );
 
@@ -205,6 +205,28 @@ describe( 'TreeGrid', () => {
 			);
 		} );
 
+		it( 'should call onFocusRow with event, start and end nodes when pressing End', () => {
+			const onFocusRow = jest.fn();
+			render( <TestTree onFocusRow={ onFocusRow } /> );
+
+			screen.getByText( 'Row 1' ).focus();
+
+			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
+			const row3Element = screen.getByText( 'Row 3' ).closest( 'tr' );
+
+			fireEvent.keyDown( screen.getByText( 'Row 1' ), {
+				key: 'End',
+				keyCode: END,
+				currentTarget: row1Element,
+			} );
+
+			expect( onFocusRow ).toHaveBeenCalledWith(
+				expect.objectContaining( { key: 'End', keyCode: END } ),
+				row1Element,
+				row3Element
+			);
+		} );
+
 		it( 'should call onFocusRow with event, start and end nodes when pressing Up Arrow', () => {
 			const onFocusRow = jest.fn();
 			render( <TestTree onFocusRow={ onFocusRow } /> );
@@ -223,6 +245,28 @@ describe( 'TreeGrid', () => {
 			expect( onFocusRow ).toHaveBeenCalledWith(
 				expect.objectContaining( { key: 'ArrowUp', keyCode: UP } ),
 				row2Element,
+				row1Element
+			);
+		} );
+
+		it( 'should call onFocusRow with event, start and end nodes when pressing Home', () => {
+			const onFocusRow = jest.fn();
+			render( <TestTree onFocusRow={ onFocusRow } /> );
+
+			screen.getByText( 'Row 3' ).focus();
+
+			const row3Element = screen.getByText( 'Row 3' ).closest( 'tr' );
+			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
+
+			fireEvent.keyDown( screen.getByText( 'Row 3' ), {
+				key: 'Home',
+				keyCode: HOME,
+				currentTarget: row3Element,
+			} );
+
+			expect( onFocusRow ).toHaveBeenCalledWith(
+				expect.objectContaining( { key: 'Home', keyCode: HOME } ),
+				row3Element,
 				row1Element
 			);
 		} );
