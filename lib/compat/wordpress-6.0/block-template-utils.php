@@ -8,6 +8,23 @@
  */
 
 /**
+ * Filters theme directories that should be ignored during export.
+ *
+ * @since 6.0.0
+ * @return Bool Whether this file is in an ignored directory.
+ */
+function gutenberg_directory_ignored( $path ) {
+	$directories_to_ignore = array( '.git', 'node_modules', 'vendor' );
+	foreach( $directories_to_ignore as $directory ) {
+		if ( strpos( $path, $directory ) === 0 ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
  * Creates an export of the current templates and
  * template parts from the site editor at the
  * specified path in a ZIP file.
@@ -46,14 +63,16 @@ function gutenberg_generate_block_templates_export_file() {
 	);
 
 	// Make a copy of the current theme.
-	foreach ($theme_files as $name => $file ) {
+	foreach ( $theme_files as $name => $file ) {
 		// Skip directories as they are added automatically.
 		if ( ! $file->isDir() ) {
 			// Get real and relative path for current file.
 			$file_path = wp_normalize_path( $file->getRealPath() );
-			$relative_path = substr( $file_path, strlen( $theme_path) + 1 );
+			$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
 
-			$zip->addFile( $file_path, $theme_name . '/' . $relative_path );
+			if ( ! gutenberg_directory_ignored( $relative_path ) ) {
+				$zip->addFile( $file_path, $theme_name . '/' . $relative_path );
+			}
 		}
 	}
 
@@ -84,16 +103,6 @@ function gutenberg_generate_block_templates_export_file() {
 	$zip->addFromString(
 		$theme_name . '/theme.json',
 		wp_json_encode( $tree->get_data(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
-	);
-
-	$zip->addFile(
-		wp_normalize_path( get_stylesheet_directory() ) . '/index.php',
-		'theme/index.php'
-	);
-
-	$zip->addFile(
-		wp_normalize_path( get_stylesheet_directory() ) . '/style.css',
-		'theme/style.css'
 	);
 
 	// Save changes to the zip file.
