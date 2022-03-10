@@ -383,7 +383,8 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 								entityRecord[
 									entityConfig.key || DEFAULT_ENTITY_KEY
 								],
-							title: entityConfig?.getTitle?.( entityRecord ) || '',
+							title:
+								entityConfig?.getTitle?.( entityRecord ) || '',
 							name,
 							kind,
 						} );
@@ -434,7 +435,8 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 								entityRecord[
 									entityConfig.key || DEFAULT_ENTITY_KEY
 								],
-							title: entityConfig?.getTitle?.( entityRecord ) || '',
+							title:
+								entityConfig?.getTitle?.( entityRecord ) || '',
 							name,
 							kind,
 						} );

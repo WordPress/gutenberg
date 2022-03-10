@@ -30,7 +30,11 @@ jest.mock( '../batch', () => {
 
 describe( 'editEntityRecord', () => {
 	it( 'throws when the edited entity does not have a loaded config.', async () => {
-		const entityConfig = { kind: 'someKind', name: 'someName', id: 'someId' };
+		const entityConfig = {
+			kind: 'someKind',
+			name: 'someName',
+			id: 'someId',
+		};
 		const select = {
 			getEntityConfig: jest.fn(),
 		};
