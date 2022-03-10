@@ -28,6 +28,7 @@ const meta: ComponentMeta< typeof UnitControl > = {
 			control: { type: 'select' },
 		},
 		onChange: {
+			action: 'onChange',
 			control: { type: null },
 		},
 		onUnitChange: {
