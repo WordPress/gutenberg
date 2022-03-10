@@ -37,7 +37,7 @@ import type { StateReducer } from '../input-control/reducer/state';
 
 function UnitControl(
 	{
-		__unstableStateReducer: stateReducer,
+		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
 		className,
 		disabled = false,
@@ -201,8 +201,16 @@ function UnitControl(
 			}
 		}
 
-		return stateReducer?.( nextState, action ) ?? nextState;
+		return state;
 	};
+
+	let stateReducer: StateReducer = unitControlStateReducer;
+	if ( stateReducerProp ) {
+		stateReducer = ( state, action ) => {
+			const baseState = unitControlStateReducer( state, action );
+			return stateReducerProp( baseState, action );
+		};
+	}
 
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
@@ -247,7 +255,7 @@ function UnitControl(
 				suffix={ inputSuffix }
 				value={ parsedQuantity ?? '' }
 				step={ step }
-				__unstableStateReducer={ unitControlStateReducer }
+				__unstableStateReducer={ stateReducer }
 			/>
 		</Root>
 	);

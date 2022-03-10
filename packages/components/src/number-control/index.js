@@ -20,7 +20,7 @@ import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
 	{
-		__unstableStateReducer: stateReducer,
+		__unstableStateReducer: stateReducerProp,
 		className,
 		dragDirection = 'n',
 		hideHTMLArrows = false,
@@ -161,7 +161,7 @@ export function NumberControl(
 				: constrainValue( currentValue );
 		}
 
-		return stateReducer?.( nextState, action ) ?? nextState;
+		return state;
 	};
 
 	return (
@@ -181,7 +181,10 @@ export function NumberControl(
 			step={ step }
 			type={ typeProp }
 			value={ valueProp }
-			__unstableStateReducer={ numberControlStateReducer }
+			__unstableStateReducer={ ( state, action ) => { 
+				const baseState = numberControlStateReducer( state, action );
+				return stateReducerProp?.( baseState, action ) ?? baseState;
+			} }
 		/>
 	);
 }
