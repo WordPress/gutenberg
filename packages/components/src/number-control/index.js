@@ -61,9 +61,11 @@ export function NumberControl(
 	 * @return {Object} The updated state to apply to InputControl
 	 */
 	const numberControlStateReducer = ( state, action ) => {
+		const nextState = { ...state };
+
 		const { type, payload } = action;
 		const event = payload?.event;
-		const currentValue = state.value;
+		const currentValue = nextState.value;
 
 		/**
 		 * Handles custom UP and DOWN Keyboard events
@@ -93,7 +95,7 @@ export function NumberControl(
 				nextValue = subtract( nextValue, incrementalValue );
 			}
 
-			state.value = constrainValue(
+			nextState.value = constrainValue(
 				nextValue,
 				enableShift ? incrementalValue : null
 			);
@@ -138,7 +140,7 @@ export function NumberControl(
 				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
 				const distance = delta * modifier * directionModifier;
 
-				state.value = constrainValue(
+				nextState.value = constrainValue(
 					add( currentValue, distance ),
 					enableShift ? modifier : null
 				);
@@ -154,12 +156,12 @@ export function NumberControl(
 		) {
 			const applyEmptyValue = required === false && currentValue === '';
 
-			state.value = applyEmptyValue
+			nextState.value = applyEmptyValue
 				? currentValue
 				: constrainValue( currentValue );
 		}
 
-		return stateReducer?.( state, action ) ?? state;
+		return stateReducer?.( nextState, action ) ?? nextState;
 	};
 
 	return (

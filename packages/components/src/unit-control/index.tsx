@@ -185,6 +185,8 @@ function UnitControl(
 	 * @return The updated state to apply to InputControl
 	 */
 	const unitControlStateReducer: StateReducer = ( state, action ) => {
+		const nextState = { ...state };
+
 		/*
 		 * On commits (when pressing ENTER and on blur if
 		 * isPressEnterToChange is true), if a parse has been performed
@@ -192,12 +194,14 @@ function UnitControl(
 		 */
 		if ( action.type === inputControlActionTypes.COMMIT ) {
 			if ( refParsedQuantity.current !== undefined ) {
-				state.value = ( refParsedQuantity.current ?? '' ).toString();
+				nextState.value = (
+					refParsedQuantity.current ?? ''
+				).toString();
 				refParsedQuantity.current = undefined;
 			}
 		}
 
-		return stateReducer?.( state, action ) ?? state;
+		return stateReducer?.( nextState, action ) ?? nextState;
 	};
 
 	const inputSuffix = ! disableUnits ? (
