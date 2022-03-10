@@ -61,7 +61,9 @@ const DefaultTemplate: ComponentStory< typeof UnitControl > = ( {
 export const Default: ComponentStory<
 	typeof UnitControl
 > = DefaultTemplate.bind( {} );
-Default.args = {};
+Default.args = {
+	label: 'Label',
+};
 
 /**
  * If the `isPressEnterToChange` prop is set to `true`, the `onChange` callback
