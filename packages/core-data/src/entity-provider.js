@@ -61,7 +61,7 @@ const getEntity = ( kind, type ) => {
  *                   the entity's context provider.
  */
 export default function EntityProvider( { kind, type, id, children } ) {
-	const Provider = getEntity( kind, type ).context.Provider;
+	const Provider = getEntityConfig( kind, type ).context.Provider;
 	return <Provider value={ id }>{ children }</Provider>;
 }
 
@@ -73,7 +73,7 @@ export default function EntityProvider( { kind, type, id, children } ) {
  * @param {string} type The entity type.
  */
 export function useEntityId( kind, type ) {
-	return useContext( getEntity( kind, type ).context );
+	return useContext( getEntityConfig( kind, type ).context );
 }
 
 /**

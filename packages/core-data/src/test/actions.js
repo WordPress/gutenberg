@@ -32,7 +32,7 @@ describe( 'editEntityRecord', () => {
 	it( 'throws when the edited entity does not have a loaded config.', async () => {
 		const entity = { kind: 'someKind', name: 'someName', id: 'someId' };
 		const select = {
-			getEntity: jest.fn(),
+			getEntityConfig: jest.fn(),
 		};
 		const fulfillment = () =>
 			editEntityRecord(
@@ -44,7 +44,7 @@ describe( 'editEntityRecord', () => {
 		expect( fulfillment ).toThrow(
 			`The entity being edited (${ entity.kind }, ${ entity.name }) does not have a loaded config.`
 		);
-		expect( select.getEntity ).toHaveBeenCalledTimes( 1 );
+		expect( select.getEntityConfig ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
 

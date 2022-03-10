@@ -109,13 +109,31 @@ export function getEntitiesByKind( state, kind ) {
 /**
  * Returns the entity object given its kind and name.
  *
+ * @deprecated since ??. Use getEntityConfig instead
  * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
  * @param {string} name  Entity name.
  *
- * @return {Object} Entity
+ * @return {Object} Entity config
  */
 export function getEntity( state, kind, name ) {
+	deprecated( "wp.data.select( 'core' ).getEntity()", {
+		since: '6.0',
+		alternative: "wp.data.select( 'core' ).getEntityConfig()",
+	} );
+	return getEntityConfig( state, kind, name );
+}
+
+/**
+ * Returns the entity object given its kind and name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} kind  Entity kind.
+ * @param {string} name  Entity name.
+ *
+ * @return {Object} Entity config
+ */
+export function getEntityConfig( state, kind, name ) {
 	return find( state.entities.config, { kind, name } );
 }
 
@@ -226,7 +244,9 @@ export const getRawEntityRecord = createSelector(
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				if ( isRawAttribute( getEntity( state, kind, name ), _key ) ) {
+				if (
+					isRawAttribute( getEntityConfig( state, kind, name ), _key )
+				) {
 					// Because edits are the "raw" attribute values,
 					// we return those from record selectors to make rendering,
 					// comparisons, and joins with edits easier.
@@ -331,7 +351,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 				);
 
 				if ( primaryKeys.length ) {
-					const entity = getEntity( state, kind, name );
+					const entity = getEntityConfig( state, kind, name );
 					primaryKeys.forEach( ( primaryKey ) => {
 						const entityRecord = getEditedEntityRecord(
 							state,
@@ -382,7 +402,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 				);
 
 				if ( primaryKeys.length ) {
-					const entity = getEntity( state, kind, name );
+					const entity = getEntityConfig( state, kind, name );
 					primaryKeys.forEach( ( primaryKey ) => {
 						const entityRecord = getEditedEntityRecord(
 							state,
@@ -440,7 +460,7 @@ export function getEntityRecordEdits( state, kind, name, recordId ) {
  */
 export const getEntityRecordNonTransientEdits = createSelector(
 	( state, kind, name, recordId ) => {
-		const { transientEdits } = getEntity( state, kind, name ) || {};
+		const { transientEdits } = getEntityConfig( state, kind, name ) || {};
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
 		if ( ! transientEdits ) {
 			return edits;
@@ -780,7 +800,7 @@ export function canUser( state, action, resource, id ) {
  * or `undefined` if the OPTIONS request is still being made.
  */
 export function canUserEditEntityRecord( state, kind, name, recordId ) {
-	const entity = getEntity( state, kind, name );
+	const entity = getEntityConfig( state, kind, name );
 	if ( ! entity ) {
 		return false;
 	}

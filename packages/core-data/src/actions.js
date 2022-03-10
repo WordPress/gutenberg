@@ -299,7 +299,7 @@ export const editEntityRecord = (
 	edits,
 	options = {}
 ) => ( { select, dispatch } ) => {
-	const entity = select.getEntity( kind, name );
+	const entity = select.getEntityConfig( kind, name );
 	if ( ! entity ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
