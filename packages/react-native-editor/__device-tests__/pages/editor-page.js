@@ -167,6 +167,28 @@ class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
+	async isEditorVisible( iteration = 0 ) {
+		if ( iteration >= 25 ) {
+			throw new Error(
+				`Gutenberg Editor is still not visible after ${ iteration } retries!`
+			);
+		} else if ( iteration !== 0 ) {
+			// wait 1 second before trying to locate element again
+			await this.driver.sleep( 1000 );
+		}
+
+		const locator = await this.driver.elementsByXPath(
+			`//*[contains(@content-desc, "Post title.")]`
+		);
+		if ( locator.length === 2 ) {
+			// if locator exists, move along
+		} else {
+			// else, try again
+			iteration++;
+			return await this.isEditorVisible( iteration );
+		}
+	}
+
 	// Returns html content
 	// Ensure to take additional steps to handle text being changed by auto correct
 	async getHtmlContent() {
@@ -181,6 +203,7 @@ class EditorPage {
 
 	// set html editor content explicitly
 	async setHtmlContent( html ) {
+		await this.isEditorVisible();
 		await toggleHtmlMode( this.driver, true );
 
 		const base64String = Buffer.from( html ).toString( 'base64' );

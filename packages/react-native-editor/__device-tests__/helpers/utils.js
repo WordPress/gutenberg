@@ -157,8 +157,8 @@ const setupDriver = async () => {
 	// eslint-disable-next-line no-console
 	console.log( status );
 
-	await driver.setImplicitWaitTimeout( 5000 );
-	await timer( 5000 );
+	// await driver.setImplicitWaitTimeout( 5000 );
+	// await timer( 5000 );
 
 	await driver.setOrientation( 'PORTRAIT' );
 	return driver;
