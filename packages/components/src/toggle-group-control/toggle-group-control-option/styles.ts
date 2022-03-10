@@ -61,22 +61,10 @@ export const buttonActive = css`
 export const ButtonContentView = styled.div`
 	font-size: ${ CONFIG.fontSize };
 	line-height: 1;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate( -50%, -50% );
 `;
 
 export const separatorActive = css`
 	background: transparent;
-`;
-
-export const LabelPlaceholderView = styled.div`
-	font-size: ${ CONFIG.fontSize };
-	font-weight: bold;
-	height: 0;
-	overflow: hidden;
-	visibility: hidden;
 `;
 
 export const medium = css`
