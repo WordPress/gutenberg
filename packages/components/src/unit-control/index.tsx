@@ -36,7 +36,7 @@ import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import type { StateReducer } from '../input-control/reducer/state';
 
-function UnconnectedUnitControl(
+function UnforwardedUnitControl(
 	{
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		autoComplete = 'off',
@@ -269,7 +269,7 @@ function UnconnectedUnitControl(
  * };
  * ```
  */
-export const UnitControl = forwardRef( UnconnectedUnitControl );
+export const UnitControl = forwardRef( UnforwardedUnitControl );
 
 export { parseQuantityAndUnitFromRawValue, useCustomUnits } from './utils';
 export default UnitControl;
