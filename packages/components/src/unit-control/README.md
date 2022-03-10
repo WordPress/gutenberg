@@ -66,14 +66,12 @@ The position of the label (`top`, `side`, `bottom`, or `edge`).
 Callback when the `value` changes.
 
 -   Required: No
--   Default: `noop`
 
 ### `onUnitChange`: `UnitControlOnChangeCallback`
 
 Callback when the `unit` changes.
 
 -   Required: No
--   Default: `noop`
 
 ### `size`: `string`
 

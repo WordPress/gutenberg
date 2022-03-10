@@ -52,14 +52,12 @@ export type UnitSelectControlProps = {
 	isUnitSelectTabbable?: boolean;
 	/**
 	 * A callback function invoked when the value is changed.
-	 *
-	 * @default noop
 	 */
 	onChange?: UnitControlOnChangeCallback;
 	/**
 	 * Size of the control option. Supports "default" and "small".
 	 *
-	 * @default 'default'
+	 * @default default
 	 */
 	size?: SelectSize;
 	/**
@@ -105,8 +103,6 @@ export type UnitControlProps = UnitSelectControlProps &
 		label?: string;
 		/**
 		 * Callback when the `unit` changes.
-		 *
-		 * @default noop
 		 */
 		onUnitChange?: UnitControlOnChangeCallback;
 		/**

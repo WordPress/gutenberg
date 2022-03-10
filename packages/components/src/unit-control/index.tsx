@@ -8,7 +8,7 @@ import type {
 	SyntheticEvent,
 	ChangeEvent,
 } from 'react';
-import { noop, omit } from 'lodash';
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -47,8 +47,8 @@ function UnforwardedUnitControl(
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = true,
 		label,
-		onChange = noop,
-		onUnitChange = noop,
+		onChange,
+		onUnitChange,
 		size = 'default',
 		style,
 		unit: unitProp,
@@ -98,7 +98,7 @@ function UnforwardedUnitControl(
 			typeof nextQuantityValue === 'undefined' ||
 			nextQuantityValue === null
 		) {
-			onChange( '', changeProps );
+			onChange?.( '', changeProps );
 			return;
 		}
 
@@ -113,7 +113,7 @@ function UnforwardedUnitControl(
 			unit
 		).join( '' );
 
-		onChange( onChangeValue, changeProps );
+		onChange?.( onChangeValue, changeProps );
 	};
 
 	const handleOnUnitChange: UnitControlOnChangeCallback = (
@@ -128,8 +128,8 @@ function UnforwardedUnitControl(
 			nextValue = `${ data.default }${ nextUnitValue }`;
 		}
 
-		onChange( nextValue, changeProps );
-		onUnitChange( nextUnitValue, changeProps );
+		onChange?.( nextValue, changeProps );
+		onUnitChange?.( nextUnitValue, changeProps );
 
 		setUnit( nextUnitValue );
 	};
@@ -157,11 +157,11 @@ function UnforwardedUnitControl(
 				: undefined;
 			const changeProps = { event, data };
 
-			onChange(
+			onChange?.(
 				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
 				changeProps
 			);
-			onUnitChange( validParsedUnit, changeProps );
+			onUnitChange?.( validParsedUnit, changeProps );
 
 			setUnit( validParsedUnit );
 		}
