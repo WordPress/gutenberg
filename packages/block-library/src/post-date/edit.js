@@ -113,7 +113,7 @@ export default function PostDateEdit( {
 			</BlockControls>
 
 			<InspectorControls>
-				<PanelBody title={ __( 'Format settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<DateFormatControl
 						format={ format }
 						siteFormat={ siteFormat }
@@ -121,8 +121,6 @@ export default function PostDateEdit( {
 							setAttributes( { format: nextFormat } )
 						}
 					/>
-				</PanelBody>
-				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
 						label={ sprintf(
 							// translators: %s: Name of the post type e.g: "post".

@@ -35,7 +35,7 @@ export default function Edit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Format settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<DateFormatControl
 					format={ format }
 					siteFormat={ siteFormat }
@@ -43,8 +43,6 @@ export default function Edit( {
 						setAttributes( { format: nextFormat } )
 					}
 				/>
-			</PanelBody>
-			<PanelBody title={ __( 'Link settings' ) }>
 				<ToggleControl
 					label={ __( 'Link to comment' ) }
 					onChange={ () => setAttributes( { isLink: ! isLink } ) }
