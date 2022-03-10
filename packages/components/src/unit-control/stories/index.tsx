@@ -27,6 +27,9 @@ const meta: ComponentMeta< typeof UnitControl > = {
 		onUnitChange: {
 			control: { type: null },
 		},
+		value: {
+			control: { type: null },
+		},
 	},
 	parameters: {
 		controls: {
