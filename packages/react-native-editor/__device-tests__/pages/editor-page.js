@@ -177,9 +177,9 @@ class EditorPage {
 			await this.driver.sleep( 1000 );
 		}
 
-		const blockLocator = isAndroid() 
+		const blockLocator = isAndroid()
 			? `//android.widget.EditText[@content-desc="Post title. Welcome to Gutenberg!"]`
-			: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[@name="Post title. Welcome to Gutenberg!"])`
+			: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[@name="Post title. Welcome to Gutenberg!"])`;
 
 		const locator = await this.driver.elementsByXPath( blockLocator );
 		if ( locator.length !== 1 ) {
