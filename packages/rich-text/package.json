@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "5.2.0",
+	"version": "5.2.1",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

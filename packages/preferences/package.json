@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences",
-	"version": "1.0.0-prerelease",
+	"version": "1.0.0",
 	"description": "Utilities for managing WordPress preferences.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
