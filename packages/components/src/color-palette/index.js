@@ -147,7 +147,10 @@ const extractColorNameFromCurrentValue = (
 				name: colorName,
 				color: colorValue,
 			} of colorPaletteColors ) {
-				if ( currentValue === colorValue ) {
+				if (
+					colord( currentValue ).toHex() ===
+					colord( colorValue ).toHex()
+				) {
 					return sprintf(
 						// translators: %1$s: The name of the color e.g: "vivid red"; %2$s: the color palette name (e.g. 'Theme', 'Default', 'Custom'...).
 						__( '%1$s (%2$s)' ),
@@ -160,7 +163,9 @@ const extractColorNameFromCurrentValue = (
 	} else {
 		for ( const { name: colorName, color: colorValue } of colors ) {
 			/* eslint-disable @wordpress/i18n-no-placeholders-only */
-			if ( currentValue === colorValue ) {
+			if (
+				colord( currentValue ).toHex() === colord( colorValue ).toHex()
+			) {
 				// translators: %s: The name of the color e.g: "vivid red".
 				return sprintf( __( '%s' ), colorName );
 			}
