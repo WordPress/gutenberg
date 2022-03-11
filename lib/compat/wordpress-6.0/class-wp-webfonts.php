@@ -301,10 +301,16 @@ class WP_Webfonts {
 	 * @return void
 	 */
 	function preload_webfonts() {
+		$allowed_types = array( 'woff', 'woff2', 'ttf', 'eot', 'otf' );
 		foreach ( $this->get_fonts() as $font ) {
+			var_dump( $font );
 			foreach( $font['src'] as $src ) {
 				$srcAsArray = explode( '.', $src );
-				echo '<link rel="preload" href="' . $src . '" as="font" type="font/' . end( $srcAsArray ) . '" crossorigin />';
+				$file_type = end( $srcAsArray );
+				if ( ! in_array( $file_type, $allowed_types ) ) {
+					$file_type = '';
+				}
+				echo '<link rel="preload" href="' . $src . '" as="font" type="font/' . $type . '" crossorigin />';
 			}
 		}
 	}
