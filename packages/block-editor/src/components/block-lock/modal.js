@@ -84,7 +84,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			>
 				<p>
 					{ __(
-						'Locking a block allows you to restrict which attributes of the block are editable.'
+						'Choose specific attributes to restrict or lock all available options.'
 					) }
 				</p>
 				<div
@@ -95,9 +95,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					<CheckboxControl
 						className="block-editor-block-lock-modal__options-title"
 						label={
-							<span id={ instanceId }>
-								{ __( 'Lock Everything' ) }
-							</span>
+							<span id={ instanceId }>{ __( 'Lock all' ) }</span>
 						}
 						checked={ isAllChecked }
 						aria-checked={ ariaChecked }

@@ -74,7 +74,7 @@ describe( 'Block Grouping', () => {
 			await clickMenuItem( 'Lock Paragraph' );
 
 			const [ checkbox ] = await page.$x(
-				'//label//*[contains(text(), "Lock Everything")]'
+				'//label//*[contains(text(), "Lock all")]'
 			);
 			await checkbox.click();
 
@@ -95,7 +95,7 @@ describe( 'Block Grouping', () => {
 			await clickMenuItem( 'Lock Paragraph' );
 
 			const [ lockCheckbox ] = await page.$x(
-				'//label//*[contains(text(), "Lock Everything")]'
+				'//label//*[contains(text(), "Lock all")]'
 			);
 			await lockCheckbox.click();
 
@@ -104,7 +104,7 @@ describe( 'Block Grouping', () => {
 			await clickBlockToolbarButton( 'Unlock Paragraph' );
 
 			const [ unlockCheckbox ] = await page.$x(
-				'//label//*[contains(text(), "Lock Everything")]'
+				'//label//*[contains(text(), "Lock all")]'
 			);
 			await unlockCheckbox.click();
 
