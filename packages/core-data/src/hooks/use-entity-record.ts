@@ -24,7 +24,7 @@ interface EntityRecordResolution< RecordType > {
 }
 
 interface Options {
-	execute: boolean;
+	__experimentalExecute: boolean;
 }
 
 /**
@@ -64,16 +64,16 @@ export default function __experimentalUseEntityRecord< RecordType >(
 	kind: string,
 	name: string,
 	recordId: string | number,
-	options: Options = { execute: true }
+	options: Options = { __experimentalExecute: true }
 ): EntityRecordResolution< RecordType > {
 	const { data: record, ...rest } = useQuerySelect(
 		( query ) => {
-			if ( ! options.execute ) {
-				return {};
+			if ( ! options.__experimentalExecute ) {
+				return null;
 			}
-			query( coreStore ).getEntityRecord( kind, name, recordId );
+			return query( coreStore ).getEntityRecord( kind, name, recordId );
 		},
-		[ kind, name, recordId ]
+		[ kind, name, recordId, options.__experimentalExecute ]
 	);
 
 	return {

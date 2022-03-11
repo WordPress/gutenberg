@@ -29,7 +29,7 @@ interface EntityRecordsResolution< RecordType > {
 }
 
 interface Options {
-	execute: boolean;
+	__experimentalExecute: boolean;
 }
 
 /**
@@ -74,7 +74,7 @@ export default function __experimentalUseEntityRecords< RecordType >(
 	kind: string,
 	name: string,
 	queryArgs: unknown = {},
-	options: Options = { execute: true }
+	options: Options = { __experimentalExecute: true }
 ): EntityRecordsResolution< RecordType > {
 	// Serialize queryArgs to a string that can be safely used as a React dep.
 	// We can't just pass queryArgs as one of the deps, because if it is passed
@@ -84,12 +84,12 @@ export default function __experimentalUseEntityRecords< RecordType >(
 
 	const { data: records, ...rest } = useQuerySelect(
 		( query ) => {
-			if ( ! options.execute ) {
+			if ( ! options.__experimentalExecute ) {
 				return {};
 			}
 			return query( coreStore ).getEntityRecords( kind, name, queryArgs );
 		},
-		[ kind, name, queryAsString, options.execute ]
+		[ kind, name, queryAsString, options.__experimentalExecute ]
 	);
 
 	return {
