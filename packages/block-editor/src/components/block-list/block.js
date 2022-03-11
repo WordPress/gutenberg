@@ -75,7 +75,7 @@ function Block( { children, isHtml, ...props } ) {
 }
 
 function BlockListBlock( {
-	block: { source },
+	block: { __unstableBlockSource },
 	mode,
 	isLocked,
 	canRemove,
@@ -157,8 +157,8 @@ function BlockListBlock( {
 	let block;
 
 	if ( ! isValid ) {
-		const saveContent = source
-			? serializeRawBlock( source )
+		const saveContent = __unstableBlockSource
+			? serializeRawBlock( __unstableBlockSource )
 			: getSaveContent( blockType, attributes );
 
 		block = (

@@ -41,13 +41,13 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  *
  * @typedef WPBlock
  *
- * @property {string}     name             Block name
- * @property {Object }    attributes       Block raw or comment attributes.
- * @property {WPBlock[]}  innerBlocks      Inner Blocks.
- * @property {string}     originalContent  Original content of the block before validation fixes.
- * @property {boolean}    isValid          Whether the block is valid.
- * @property {Object[]}   validationIssues Validation issues.
- * @property {WPRawBlock} [source]         Un-processed original copy of block if created through parser.
+ * @property {string}     name                    Block name
+ * @property {Object }    attributes              Block raw or comment attributes.
+ * @property {WPBlock[]}  innerBlocks             Inner Blocks.
+ * @property {string}     originalContent         Original content of the block before validation fixes.
+ * @property {boolean}    isValid                 Whether the block is valid.
+ * @property {Object[]}   validationIssues        Validation issues.
+ * @property {WPRawBlock} [__unstableBlockSource] Un-processed original copy of block if created through parser.
  */
 
 /**
@@ -247,7 +247,7 @@ export function parseRawBlock( rawBlock ) {
 		// Preserve the original unprocessed version of the block
 		// that we received so that we can preserve it in its
 		// existing state when we save.
-		updatedBlock.source = rawBlock;
+		updatedBlock.__unstableBlockSource = rawBlock;
 	}
 
 	if ( ! validatedBlock.isValid && updatedBlock.isValid ) {
