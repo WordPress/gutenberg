@@ -54,7 +54,7 @@ export default function useNavigationEntities( menuId ) {
 			per_page: -1,
 			context: 'view',
 		},
-		{ __experimentalExecute: !! menuId }
+		{ __experimentalEnabled: !! menuId }
 	);
 
 	return {
