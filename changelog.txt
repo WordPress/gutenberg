@@ -1,5 +1,23 @@
 == Changelog ==
 
+= 12.7.2 =
+
+
+
+## Changelog
+
+### Enhancements
+
+- Block Editor: Improve Global Styles filtering order. ([39364](https://github.com/WordPress/gutenberg/pull/39364))
+- getQueryArgs: Improvement to prototype handling. ([39365](https://github.com/WordPress/gutenberg/pull/39365))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@jorgefilipecosta
+
+
 = 12.8.0-rc.1 =
 
 
