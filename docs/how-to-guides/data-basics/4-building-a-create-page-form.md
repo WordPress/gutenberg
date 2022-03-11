@@ -73,14 +73,14 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	// ...
 	return (
 		<PageForm
-			title={page.title}
-			onChangeTitle={handleChange}
-			hasEdits={hasEdits}
-			lastError={lastError}
-			isSaving={isSaving}
-			onCancel={onCancel}
-			onSave={handleSave}
-			/>
+			title={ page.title }
+			onChangeTitle={ handleChange }
+			hasEdits={ hasEdits }
+			lastError={ lastError }
+			isSaving={ isSaving }
+			onCancel={ onCancel }
+			onSave={ handleSave }
+		/>
 	);
 }
 
@@ -121,6 +121,7 @@ This code quality change should not change anything about how the application wo
 Great! The edit form is still there, and now we have a building block to power the new `CreatePageForm`.
 
 ### Step 3: Build a CreatePageForm
+
 The only thing that `CreatePageForm` component must do is to provide the following seven properties needed to render the `PageForm` component:
 
 * title
@@ -175,7 +176,11 @@ export function CreatePageForm( { onSaveFinished, onCancel } ) {
 	// ...
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 	const handleSave = async () => {
-		const savedRecord = await saveEntityRecord( 'postType', 'page', { title } );
+		const savedRecord = await saveEntityRecord(
+			'postType',
+			'page',
+			{ title }
+		);
 		if ( savedRecord ) {
 			onSaveFinished();
 		}
@@ -197,7 +202,11 @@ export function CreatePageForm( { onSaveFinished, onCancel } ) {
 	// ...
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 	const handleSave = async () => {
-		const savedRecord = await saveEntityRecord( 'postType', 'page', { title, status: 'publish } );
+		const savedRecord = await saveEntityRecord(
+			'postType',
+			'page',
+			{ title, status: 'publish' }
+		);
 		if ( savedRecord ) {
 			onSaveFinished();
 		}
@@ -225,8 +234,12 @@ export function CreatePageForm( { onCancel, onSaveFinished } ) {
 	// ...
 	const { lastError, isSaving } = useSelect(
 		( select ) => ( {
-			lastError: select( coreDataStore ).getLastEntitySaveError( 'postType', 'page' ), // Notice the missing pageId argument
-			isSaving: select( coreDataStore ).isSavingEntityRecord( 'postType', 'page' ), // Notice the missing pageId argument
+			// Notice the missing pageId argument:
+			lastError: select( coreDataStore )
+				.getLastEntitySaveError( 'postType', 'page' ),
+			// Notice the missing pageId argument
+			isSaving: select( coreDataStore )
+				.isSavingEntityRecord( 'postType', 'page' ),
 		} ),
 		[]
 	);
@@ -255,15 +268,21 @@ export function CreatePageForm( { onCancel, onSaveFinished } ) {
 	const [ title, setTitle ] = useState();
 	const { lastError, isSaving } = useSelect(
 		( select ) => ( {
-			lastError: select( coreDataStore ).getLastEntitySaveError( 'postType', 'page' ),
-			isSaving: select( coreDataStore ).isSavingEntityRecord( 'postType', 'page' ),
+			lastError: select( coreDataStore )
+			  .getLastEntitySaveError( 'postType', 'page' ),
+			isSaving: select( coreDataStore )
+			  .isSavingEntityRecord( 'postType', 'page' ),
 		} ),
 		[]
 	);
 
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 	const handleSave = async () => {
-		const savedRecord = await saveEntityRecord( 'postType', 'page', { title, status: 'publish' } );
+		const savedRecord = await saveEntityRecord(
+			'postType',
+			'page',
+			{ title, status: 'publish' }
+		);
 		if ( savedRecord ) {
 			onSaveFinished();
 		}
