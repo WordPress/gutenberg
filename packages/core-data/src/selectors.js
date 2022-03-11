@@ -97,7 +97,7 @@ export const getUserQueryResults = createSelector(
 /**
  * Returns the loaded entities for the given kind.
  *
- * @deprecated since ??. Use getEntitiesConfig instead
+ * @deprecated since WordPress 6.0. Use getEntitiesConfig instead
  * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
  *
@@ -126,7 +126,7 @@ export function getEntitiesConfig( state, kind ) {
 /**
  * Returns the entity config given its kind and name.
  *
- * @deprecated since ??. Use getEntityConfig instead
+ * @deprecated since WordPress 6.0. Use getEntityConfig instead
  * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
  * @param {string} name  Entity name.
