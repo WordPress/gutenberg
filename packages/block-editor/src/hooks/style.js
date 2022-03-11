@@ -331,13 +331,17 @@ const withElementsStyles = createHigherOrderComponent(
 			BlockListBlock
 		) }`;
 
-		const skipSerialization = shouldSkipSerialization(
+		const skipLinkColorSerialization = shouldSkipSerialization(
 			props.name,
 			COLOR_SUPPORT_KEY,
 			'link'
 		);
 
-		const elements = skipSerialization
+		// The Elements API only supports link colors for now,
+		// hence the specific omission of `link` in the elements styles.
+		// This might need to be refactored or removed if the Elements API
+		// changes or `link` supports styles beyond `color`.
+		const elements = skipLinkColorSerialization
 			? omit( props.attributes.style?.elements, [ 'link' ] )
 			: props.attributes.style?.elements;
 
