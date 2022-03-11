@@ -17,7 +17,7 @@ import './style.scss';
 /**
  * Internal dependencies
  */
-import Edit from './edit';
+import edit from './edit';
 import save from './save';
 
 /**
@@ -29,9 +29,9 @@ registerBlockType( '{{namespace}}/{{slug}}', {
 	/**
 	 * @see ./edit.js
 	 */
-	edit: Edit,
+	edit: edit,
 	/**
 	 * @see ./save.js
 	 */
-	save,
+	save: save,
 } );
