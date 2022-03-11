@@ -245,8 +245,11 @@ export function parseRawBlock( rawBlock ) {
 
 	if ( ! updatedBlock.isValid ) {
 		// Preserve the original unprocessed version of the block
-		// that we received so that we can preserve it in its
-		// existing state when we save.
+		// that we received (no fixes, no deprecations) so that
+		// we can save it as close to exactly the same way as
+		// we loaded it. This is important to avoid corruption
+		// and data loss caused by block implementations trying
+		// to process data that isn't fully recognized.
 		updatedBlock.__unstableBlockSource = rawBlock;
 	}
 
