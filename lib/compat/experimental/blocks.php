@@ -64,6 +64,10 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			}
 		}
 
+		if ('' == $page && $comment_args['paged']){
+			set_query_var('cpage', $comment_args['paged']);
+		}
+
 		return $comment_args;
 	}
 }
