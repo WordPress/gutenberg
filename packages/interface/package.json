@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interface",
-	"version": "4.3.0-prerelease",
+	"version": "4.3.0",
 	"description": "Interface module for WordPress. The package contains shared functionality across the modern JavaScript-based WordPress screens.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
