@@ -74,10 +74,10 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;

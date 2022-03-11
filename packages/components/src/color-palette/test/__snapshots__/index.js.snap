@@ -16,10 +16,10 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
 }
 
 .emotion-1 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
@@ -42,10 +42,10 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
@@ -119,6 +119,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
 }
 
 <Flex
+  align="flex-start"
   aria-expanded={true}
   aria-haspopup="true"
   aria-label="Custom color picker"
@@ -252,10 +253,10 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
 }
 
 .emotion-1 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
@@ -278,10 +279,10 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
@@ -364,6 +365,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
     tabIndex="-1"
   >
     <Flex
+      align="flex-start"
       aria-expanded={false}
       aria-haspopup="true"
       aria-label="Custom color picker"
@@ -581,10 +583,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
 }
 
 .emotion-7 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
@@ -607,10 +609,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
@@ -734,6 +736,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               tabIndex="-1"
             >
               <Flex
+                align="flex-start"
                 aria-expanded={false}
                 aria-haspopup="true"
                 aria-label="Custom color picker"
