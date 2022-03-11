@@ -157,7 +157,7 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 				'description' => __( 'Displays latest posts with single post tag.', 'gutenberg' ),
 			),
 			'attachment'     => array(
-				'title'       => __( 'Media', 'gutenberg' ),
+				'title'       => __( 'Attachment', 'gutenberg' ),
 				'description' => __( 'Displays individual media items or attachments.', 'gutenberg' ),
 			),
 			'search'         => array(
