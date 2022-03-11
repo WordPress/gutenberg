@@ -127,14 +127,6 @@ export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
 	);
 }
 
-const formatValueForCustomColorButton = ( value = '' ) => {
-	const withoutStartingHash = value.startsWith( '#' )
-		? value.substring( 1 )
-		: value;
-
-	return withoutStartingHash.toUpperCase();
-};
-
 const extractColorNameFromCurrentValue = (
 	currentValue,
 	colors = [],
@@ -211,7 +203,9 @@ export default function ColorPalette( {
 
 	const colordColor = colord( value );
 
-	const buttonLabelValue = formatValueForCustomColorButton( value );
+	const buttonLabelValue = value?.startsWith( '#' )
+		? value.substring( 1 )
+		: value ?? '';
 	const buttonLabelName = extractColorNameFromCurrentValue(
 		value,
 		colors,
