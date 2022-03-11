@@ -74,7 +74,7 @@
 		"react-native-url-polyfill": "^1.1.2",
 		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/5.2.0-wp-2/react-native-video-5.2.0-wp-2.tgz",
 		"react-native-webview": "https://raw.githubusercontent.com/wordpress-mobile/react-native-webview/v11.6.5-wp-2/react-native-webview-11.6.5-wp-2.tgz",
-		"react-native-fast-image": "8.5.11"
+		"react-native-fast-image": "https://raw.githubusercontent.com/wordpress-mobile/react-native-fast-image/v8.5.11-wp-2-alpha/react-native-fast-image-8.5.11-wp-2.tgz"
 	},
 	"publishConfig": {
 		"access": "public"
