@@ -473,8 +473,9 @@ const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	const locator = await driver.elementsByXPath( elementLocator );
 	if ( locator.length !== 1 ) {
 		// if locator is not visible, try again
-		return await waitForVisible( driver, elementLocator, iteration + 1 );
+		return waitForVisible( driver, elementLocator, iteration + 1 );
 	}
+	return locator[ 0 ];
 };
 
 module.exports = {
