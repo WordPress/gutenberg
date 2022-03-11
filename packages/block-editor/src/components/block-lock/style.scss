@@ -53,3 +53,15 @@
 .block-editor-block-lock-modal__actions {
 	margin-top: $grid-unit-30;
 }
+
+.block-editor-block-lock-toolbar {
+	.components-button.has-icon {
+		min-width: $button-size-small + $grid-unit-15 !important;
+		padding-left: 0 !important;
+
+		&:focus::before {
+			left: 0 !important;
+			right: $grid-unit-15 !important;
+		}
+	}
+}
