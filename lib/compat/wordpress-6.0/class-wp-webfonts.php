@@ -81,9 +81,19 @@ class WP_Webfonts {
 
 		add_action( 'save_post_wp_template', array( $this, 'invalidate_template_webfonts_cache' ) );
 		add_action( 'save_post_wp_template_part', array( $this, 'invalidate_template_webfonts_cache' ) );
+		add_action( 'save_post_wp_global_styles', array( $this, 'invalidate_global_styles_webfonts_cache' ) );
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+	}
+
+	/**
+	 * Invalidate global styles webfonts cache.
+	 */
+	public function invalidate_global_styles_webfonts_cache() {
+		$global_styles_post_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
+
+		delete_post_meta( $global_styles_post_id, self::$webfonts_cache_meta_attribute );
 	}
 
 	/**
