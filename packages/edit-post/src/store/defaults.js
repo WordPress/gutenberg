@@ -1,5 +1,4 @@
 export const PREFERENCES_DEFAULTS = {
-	editorMode: 'visual',
 	panels: {
 		'post-status': {
 			opened: true,
@@ -7,5 +6,4 @@ export const PREFERENCES_DEFAULTS = {
 	},
 	hiddenBlockTypes: [],
 	preferredStyleVariations: {},
-	localAutosaveInterval: 15,
 };
