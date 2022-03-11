@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { dateI18n } from '@wordpress/date';
+import {
+	dateI18n,
+	__experimentalGetSettings as getDateSettings,
+} from '@wordpress/date';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -31,7 +34,11 @@ export default function Edit( {
 } ) {
 	const blockProps = useBlockProps();
 	const [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
-	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
+	const [ siteFormat = getDateSettings().formats.date ] = useEntityProp(
+		'root',
+		'site',
+		'date_format'
+	);
 
 	const inspectorControls = (
 		<InspectorControls>

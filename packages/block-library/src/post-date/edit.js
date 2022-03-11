@@ -8,7 +8,10 @@ import classnames from 'classnames';
  */
 import { useEntityProp } from '@wordpress/core-data';
 import { useRef } from '@wordpress/element';
-import { dateI18n } from '@wordpress/date';
+import {
+	dateI18n,
+	__experimentalGetSettings as getDateSettings,
+} from '@wordpress/date';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -40,8 +43,17 @@ export default function PostDateEdit( {
 	} );
 	const timeRef = useRef();
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
-	const [ siteTimeFormat ] = useEntityProp( 'root', 'site', 'time_format' );
+	const dateSettings = getDateSettings();
+	const [ siteFormat = dateSettings.formats.date ] = useEntityProp(
+		'root',
+		'site',
+		'date_format'
+	);
+	const [ siteTimeFormat = dateSettings.formats.time ] = useEntityProp(
+		'root',
+		'site',
+		'time_format'
+	);
 	const [ date, setDate ] = useEntityProp(
 		'postType',
 		postType,
