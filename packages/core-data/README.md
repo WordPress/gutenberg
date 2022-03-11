@@ -393,7 +393,7 @@ _Returns_
 
 ### getEntitiesByKind
 
-> **Deprecated** since ??. Use getEntitiesConfig instead
+> **Deprecated** since WordPress 6.0. Use getEntitiesConfig instead
 
 Returns the loaded entities for the given kind.
 
@@ -421,7 +421,7 @@ _Returns_
 
 ### getEntity
 
-> **Deprecated** since ??. Use getEntityConfig instead
+> **Deprecated** since WordPress 6.0. Use getEntityConfig instead
 
 Returns the entity config given its kind and name.
 
