@@ -59,6 +59,7 @@
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
+		"alpinejs": "^3.9.1",
 		"classnames": "^2.3.1",
 		"colord": "^2.7.0",
 		"fast-average-color": "4.3.0",

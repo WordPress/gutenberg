@@ -58,11 +58,22 @@ function render_block_core_comment_reply_link( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
-	return sprintf(
-		'<div %1$s>%2$s</div>',
+	ob_start();
+	comment_form( );
+	$form               = ob_get_clean();
+
+	$comment_toggled_form = sprintf(
+		'<div x-data="{ open: false }" %1$s>
+		<div @click.prevent="open = ! open">%2$s</div>
+		<div x-show="open" x-transition>
+			%3$s
+		</div>
+		</div>',
 		$wrapper_attributes,
-		$comment_reply_link
+		$comment_reply_link,
+		$form
 	);
+	return $comment_toggled_form;
 }
 
 /**

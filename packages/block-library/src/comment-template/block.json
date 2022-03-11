@@ -13,5 +13,12 @@
 		"html": false,
 		"align": true
 	},
-	"style": "wp-block-comment-template"
+	"attributes": {
+		"likes": {
+			"type": "number",
+			"default": 0
+		}
+	},
+	"style": "wp-block-comment-template",
+	"viewScript": "file:./view.min.js"
 }
