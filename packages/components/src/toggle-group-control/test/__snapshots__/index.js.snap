@@ -122,21 +122,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
 .emotion-11 {
   font-size: 13px;
   line-height: 1;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate( -50%, -50% );
-  -moz-transform: translate( -50%, -50% );
-  -ms-transform: translate( -50%, -50% );
-  transform: translate( -50%, -50% );
-}
-
-.emotion-13 {
-  font-size: 13px;
-  font-weight: bold;
-  height: 0;
-  overflow: hidden;
-  visibility: hidden;
 }
 
 <div
@@ -180,12 +165,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
           >
             R
           </div>
-          <div
-            aria-hidden="true"
-            class="emotion-13 emotion-14"
-          >
-            R
-          </div>
         </button>
       </div>
       <div
@@ -205,12 +184,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
         >
           <div
             class="emotion-11 emotion-12"
-          >
-            J
-          </div>
-          <div
-            aria-hidden="true"
-            class="emotion-13 emotion-14"
           >
             J
           </div>
