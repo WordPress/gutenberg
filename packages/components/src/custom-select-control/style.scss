@@ -10,15 +10,22 @@
 .components-custom-select-control__button {
 	border: 1px solid $gray-700;
 	border-radius: $radius-block-ui;
-	min-height: 30px;
 	min-width: 130px;
 	position: relative;
 	text-align: left;
 
+	&:not(.is-next-36px-default-size) {
+		min-height: 30px;
+	}
+
 	// For all button sizes allow sufficient space for the
 	// dropdown "arrow" icon to display.
 	&.components-custom-select-control__button {
-		padding-right: $icon-size;
+		padding-right: $icon-size + $grid-unit-05;
+
+		&:not(.is-next-36px-default-size) {
+			padding-right: $icon-size;
+		}
 	}
 
 	&:focus:not(:disabled) {
@@ -61,9 +68,13 @@
 	display: grid;
 	grid-template-columns: auto auto;
 	list-style-type: none;
-	padding: $grid-unit-10;
+	padding: $grid-unit-10 $grid-unit-15;
 	cursor: default;
 	line-height: $icon-size + $grid-unit-05;
+
+	&:not(.is-next-36px-default-size) {
+		padding: $grid-unit-10;
+	}
 
 	&.has-hint {
 		grid-template-columns: auto auto 30px;

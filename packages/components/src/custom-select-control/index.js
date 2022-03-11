@@ -56,6 +56,8 @@ const stateReducer = (
 	}
 };
 export default function CustomSelectControl( {
+	/** Start opting into the larger default height that will become the default size in a future version. */
+	__next36pxDefaultSize = false,
 	className,
 	hideLabelFromVision,
 	label,
@@ -141,8 +143,11 @@ export default function CustomSelectControl( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
 					'aria-label': label,
 					'aria-labelledby': undefined,
-					className: 'components-custom-select-control__button',
-					isSmall: true,
+					className: classnames(
+						'components-custom-select-control__button',
+						{ 'is-next-36px-default-size': __next36pxDefaultSize }
+					),
+					isSmall: ! __next36pxDefaultSize,
 					describedBy: getDescribedBy(),
 				} ) }
 			>
@@ -169,6 +174,7 @@ export default function CustomSelectControl( {
 										'is-highlighted':
 											index === highlightedIndex,
 										'has-hint': !! item.__experimentalHint,
+										'is-next-36px-default-size': __next36pxDefaultSize,
 									}
 								),
 								style: item.style,
