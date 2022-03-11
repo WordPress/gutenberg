@@ -79,21 +79,48 @@ class WP_Webfonts {
 		add_action( 'init', array( $this, 'register_filter_for_current_template_webfonts_enqueuing' ) );
 		add_action( 'wp_loaded', array( $this, 'enqueue_webfonts_used_in_global_styles' ) );
 
-		add_action( 'save_post_wp_template', array( $this, 'invalidate_template_webfonts_cache' ) );
-		add_action( 'save_post_wp_template_part', array( $this, 'invalidate_template_webfonts_cache' ) );
-		add_action( 'save_post_wp_global_styles', array( $this, 'invalidate_global_styles_webfonts_cache' ) );
+		$this->register_webfont_cache_invalidation_actions();
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
 	}
 
 	/**
-	 * Invalidate global styles webfonts cache.
+	 * Set up the actions to invalidate webfont cache.
 	 */
-	public function invalidate_global_styles_webfonts_cache() {
-		$global_styles_post_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
+	private function register_webfont_cache_invalidation_actions() {
+		$post_types_using_meta_attribute = array_diff(
+			get_post_types_by_support( 'editor' ),
+			array( 'wp_template', 'wp_template_part' )
+		);
 
-		delete_post_meta( $global_styles_post_id, self::$webfonts_cache_meta_attribute );
+		foreach ( $post_types_using_meta_attribute as $post_type ) {
+			add_action( "save_post_$post_type", array( $this, 'invalidate_meta_attribute_webfonts_cache' ), 10, 2 );
+		}
+
+		/**
+		 * Template and template parts are using a theme_mod.
+		 *
+		 * Because of the nature of templates and template parts,
+		 * we cannot take for granted there a post in the database
+		 * will exist because original templates (i.e. with no
+		 * modifications) are read directly from disk.
+		 *
+		 * Using a theme_mod -- instead of an option for example -- gives
+		 * us auto cleanup on theme switch for free, and that's exactly
+		 * what we want!
+		 */
+		add_action( 'save_post_wp_template', array( $this, 'invalidate_template_webfonts_cache' ) );
+		add_action( 'save_post_wp_template_part', array( $this, 'invalidate_template_webfonts_cache' ) );
+	}
+
+	/**
+	 * Invalidate meta attribute webfonts cache.
+	 *
+	 * @param integer $post_id The post ID.
+	 */
+	public function invalidate_meta_attribute_webfonts_cache( $post_id ) {
+		delete_post_meta( $post_id, self::$webfonts_cache_meta_attribute );
 	}
 
 	/**
