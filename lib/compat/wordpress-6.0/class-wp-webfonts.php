@@ -173,6 +173,7 @@ class WP_Webfonts {
 			'font-feature-settings',
 			'font-variation-settings',
 			'line-gap-override',
+			'preload',
 			'size-adjust',
 			'src',
 			'unicode-range',
@@ -307,13 +308,15 @@ class WP_Webfonts {
 	 */
 	public function preload_webfonts() {
 		foreach ( $this->get_fonts() as $font ) {
-			foreach( $font['src'] as $src ) {
-				$srcAsArray = explode( '.', $src );
-				$file_type = end( $srcAsArray );
-				if ( ! in_array( $file_type, self::$allowed_types ) ) {
-					$file_type = '';
+			if ( $font['preload'] ) {
+				foreach( $font['src'] as $src ) {
+					$srcAsArray = explode( '.', $src );
+					$file_type = end( $srcAsArray );
+					if ( ! in_array( $file_type, self::$allowed_types ) ) {
+						$file_type = '';
+					}
+					echo '<link rel="preload" href="' . $src . '" as="font" type="font/' . $file_type . '" crossorigin />';
 				}
-				echo '<link rel="preload" href="' . $src . '" as="font" type="font/' . $file_type . '" crossorigin />';
 			}
 		}
 	}
