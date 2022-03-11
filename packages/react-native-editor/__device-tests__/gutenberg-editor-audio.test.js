@@ -3,7 +3,6 @@
  */
 import { blockNames } from './pages/editor-page';
 import testData from './helpers/test-data';
-import { isAndroid } from './helpers/utils';
 
 describe( 'Gutenberg Editor Audio Block tests', () => {
 	it( 'should be able to add an audio block', async () => {
@@ -20,12 +19,7 @@ describe( 'Gutenberg Editor Audio Block tests', () => {
 		const block = await editorPage.getFirstBlockVisible();
 
 		block.click();
-
-		if ( isAndroid() ) {
-			await editorPage.driver.sleep( 5000 );
-		} else {
-			await editorPage.driver.sleep( 1000 );
-		}
+		await editorPage.driver.sleep( 5000 );
 
 		await editorPage.chooseMediaLibrary();
 
