@@ -331,9 +331,9 @@ _Related_
 _Parameters_
 
 -   _props_ `Object`:
--   _props.format_ `string|null`: The selected date format.
+-   _props.format_ `string|null`: The selected date format. If `null`, _Default_ is selected.
 -   _props.defaultFormat_ `string`: The date format that will be used if the user selects 'Default'.
--   _props.onChange_ `( format: string|null ) => void`: Called when a selection is made.
+-   _props.onChange_ `( format: string|null ) => void`: Called when a selection is made. If `null`, _Default_ is selected.
 
 ### DefaultBlockAppender
 
