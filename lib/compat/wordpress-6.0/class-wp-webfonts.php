@@ -55,6 +55,9 @@ class WP_Webfonts {
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+
+		// Preload the font files.
+		add_action( 'wp_head', array( $this, 'preload_webfonts' ) );
 	}
 
 	/**
@@ -290,5 +293,19 @@ class WP_Webfonts {
 		}
 
 		return $styles;
+	}
+
+	/**
+	 * Preload webfonts to improve performance
+	 *
+	 * @return void
+	 */
+	function preload_webfonts() {
+		foreach ( $this->get_fonts() as $font ) {
+			foreach( $font['src'] as $src ) {
+				$srcAsArray = explode( '.', $src );
+				echo '<link rel="preload" href="' . $src . '" as="font" type="font/' . end( $srcAsArray ) . '" crossorigin />';
+			}
+		}
 	}
 }
