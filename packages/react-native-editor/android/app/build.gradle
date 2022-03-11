@@ -186,7 +186,7 @@ dependencies {
     implementation "com.github.wordpress-mobile:react-native-slider:${extractPackageVersion(packageJson, '@react-native-community/slider', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-get-random-values:${extractPackageVersion(packageJson, 'react-native-get-random-values', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-masked-view:${extractPackageVersion(packageJson, '@react-native-masked-view/masked-view', 'dependencies')}"
-    implementation "org.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-screens:${extractPackageVersion(packageJson, 'react-native-screens', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"
     implementation "com.github.wordpress-mobile:react-native-reanimated:${extractPackageVersion(packageJson, 'react-native-reanimated', 'dependencies')}"
