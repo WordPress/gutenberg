@@ -185,6 +185,18 @@
 			],
 			"text": true
 		},
+		"layout": {
+			"types": [
+				{
+					"slug": "flow",
+					"type": "flow"
+				},
+				{
+					"slug": "flex",
+					"type": "flex"
+				}
+			]
+		},
 		"spacing": {
 			"blockGap": null,
 			"margin": false,

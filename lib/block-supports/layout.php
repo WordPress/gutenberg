@@ -25,6 +25,108 @@ function gutenberg_register_layout_support( $block_type ) {
 	}
 }
 
+function gutenberg_generate_common_flow_layout_styles() {
+	$style_engine = WP_Style_Engine_Gutenberg::get_instance();
+
+	$style_engine->add_style(
+		'wp-layout-flow',
+		array(
+			'selector' => '.alignleft',
+			'rules'    => array(
+				'float'        => 'left',
+				'margin-right' => '2em',
+				'margin-left'  => '0',
+			),
+		)
+	);
+
+	$style_engine->add_style(
+		'wp-layout-flow',
+		array(
+			'selector' => '.alignright',
+			'rules'    => array(
+				'float'        => 'right',
+				'margin-left'  => '2em',
+				'margin-right' => '0',
+			),
+		)
+	);
+
+	$style_engine->add_style(
+		'wp-layout-flow',
+		array(
+			'selector' => '> .alignfull',
+			'rules'    => array(
+				'max-width' => 'none',
+			),
+		)
+	);
+
+	$style_engine->add_style(
+		'wp-layout-flow--global-gap',
+		array(
+			'selector' => '> *',
+			'rules'    => array(
+				'margin-top'    => '0',
+				'margin-bottom' => '0',
+			),
+		)
+	);
+
+	$style_engine->add_style(
+		'wp-layout-flow--global-gap',
+		array(
+			'selector' => '> * + *',
+			'rules'    => array(
+				'margin-top'    => 'var( --wp--style--block-gap )',
+				'margin-bottom' => '0',
+			),
+		)
+	);
+}
+
+function gutenberg_generate_common_flex_layout_styles() {
+	$style_engine = WP_Style_Engine_Gutenberg::get_instance();
+
+	$style_engine->add_style(
+		'wp-layout-flex',
+		array(
+			'rules' => array(
+				'display' => 'flex',
+				'gap'     => '0.5em',
+			),
+		)
+	);
+
+	$style_engine->add_style(
+		'wp-layout-flex',
+		array(
+			'selector' => '> *',
+			'rules'    => array(
+				'margin' => '0',
+			),
+		)
+	);
+}
+
+function gutenberg_get_layout_preset_styles( $preset_metadata, $presets_by_origin ) {
+	WP_Style_Engine_Gutenberg::get_instance()->reset();
+
+	$presets = end( $presets_by_origin );
+
+	foreach ( $presets as $preset ) {
+		if ( isset( $preset['type'] ) ) {
+			if ( 'flow' === $preset['type'] ) {
+				$output_styles = gutenberg_generate_common_flow_layout_styles();
+			} else if ( 'flex' === $preset['type'] ) {
+				$output_styles = gutenberg_generate_common_flex_layout_styles();
+			}
+		}
+	}
+
+	return WP_Style_Engine_Gutenberg::get_instance()->get_generated_styles();
+}
+
 /**
  * Generates the CSS corresponding to the provided layout.
  *

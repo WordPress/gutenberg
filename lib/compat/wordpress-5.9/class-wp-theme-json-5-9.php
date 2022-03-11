@@ -948,6 +948,20 @@ class WP_Theme_JSON_5_9 {
 
 		$stylesheet = '';
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+			if ( isset( $preset_metadata['type'] ) && 'layout' === $preset_metadata['type'] ) {
+
+				$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
+
+				if ( ! empty( $preset_per_origin ) ) {
+					if ( isset( $preset_metadata['value_func'] ) &&
+						is_callable( $preset_metadata['value_func'] )
+					) {
+						$value_func  = $preset_metadata['value_func'];
+						$stylesheet .= call_user_func( $value_func, $preset_metadata, $preset_per_origin );
+						continue;
+					}
+				}
+			}
 			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
 			foreach ( $preset_metadata['classes'] as $class => $property ) {
 				foreach ( $slugs as $slug ) {
@@ -1135,6 +1149,9 @@ class WP_Theme_JSON_5_9 {
 	protected static function compute_preset_vars( $settings, $origins ) {
 		$declarations = array();
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+			if ( isset( $preset_metadata['type'] ) && 'layout' === $preset_metadata['type'] ) {
+				continue;
+			}
 			$values_by_slug = static::get_settings_values_by_slug( $settings, $preset_metadata, $origins );
 			foreach ( $values_by_slug as $slug => $value ) {
 				$declarations[] = array(
