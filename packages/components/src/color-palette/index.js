@@ -151,25 +151,19 @@ const extractColorNameFromCurrentValue = (
 					colord( currentValue ).toHex() ===
 					colord( colorValue ).toHex()
 				) {
-					return sprintf(
-						// translators: %1$s: The name of the color e.g: "vivid red"; %2$s: the color palette name (e.g. 'Theme', 'Default', 'Custom'...).
-						__( '%1$s (%2$s)' ),
-						colorName,
-						colorPaletteName
-					);
+					return `${ colorName }${
+						colorPaletteName ? ` (${ colorPaletteName })` : ''
+					}`;
 				}
 			}
 		}
 	} else {
 		for ( const { name: colorName, color: colorValue } of colors ) {
-			/* eslint-disable @wordpress/i18n-no-placeholders-only */
 			if (
 				colord( currentValue ).toHex() === colord( colorValue ).toHex()
 			) {
-				// translators: %s: The name of the color e.g: "vivid red".
-				return sprintf( __( '%s' ), colorName );
+				return colorName;
 			}
-			/* eslint-enable @wordpress/i18n-no-placeholders-only */
 		}
 	}
 
