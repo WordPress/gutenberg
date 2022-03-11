@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.0.0 (2022-03-11)
+
 ### Breaking Changes
 
 -   The integration with [Prettier](https://prettier.io) is now optional and gets activated when the `prettier` package is installed in the project ([#39244](https://github.com/WordPress/gutenberg/pull/39244)).

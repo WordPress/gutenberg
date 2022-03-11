@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/date",
-	"version": "4.3.1",
+	"version": "4.4.0-prerelease",
 	"description": "Date module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

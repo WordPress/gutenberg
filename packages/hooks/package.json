@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/hooks",
-	"version": "3.3.1",
+	"version": "3.4.0-prerelease",
 	"description": "WordPress hooks library.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
