@@ -219,7 +219,7 @@ export function receiveEmbedPreview( url, preview ) {
  *                                                call instead of `apiFetch()`.
  *                                                Must return a promise.
  * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
- *                                                the exceptions.
+ *                                                the exceptions. Defaults to false.
  */
 export const deleteEntityRecord = (
 	kind,
@@ -401,7 +401,7 @@ export function __unstableCreateUndoLevel() {
  *                                                call instead of `apiFetch()`.
  *                                                Must return a promise.
  * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
- *                                                the exceptions.
+ *                                                the exceptions. Defaults to false.
  */
 export const saveEntityRecord = (
 	kind,
