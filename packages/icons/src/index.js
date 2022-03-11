@@ -84,6 +84,7 @@ export { default as formatRtl } from './library/format-rtl';
 export { default as formatStrikethrough } from './library/format-strikethrough';
 export { default as formatUnderline } from './library/format-underline';
 export { default as formatUppercase } from './library/format-uppercase';
+export { default as fourZeroFour } from './library/four-zero-four';
 export { default as fullscreen } from './library/fullscreen';
 export { default as gallery } from './library/gallery';
 export { default as globe } from './library/globe';
