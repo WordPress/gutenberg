@@ -473,7 +473,7 @@ const waitForVisible = async ( driver, blockLocator, iteration = 0 ) => {
 	const locator = await driver.elementsByXPath( blockLocator );
 	if ( locator.length !== 1 ) {
 		// if locator is not visible, try again
-		return await isEditorVisible( driver, iteration + 1 );
+		return await waitForVisible( driver, blockLocator, iteration + 1 );
 	}
 };
 
