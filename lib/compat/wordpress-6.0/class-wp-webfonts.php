@@ -69,8 +69,18 @@ class WP_Webfonts {
 
 		add_action( 'init', array( $this, 'register_filter_for_current_template_webfonts_enqueuing' ) );
 
+		add_action( 'save_post_wp_template', array( $this, 'invalidate_template_webfonts_cache' ) );
+		add_action( 'save_post_wp_template_part', array( $this, 'invalidate_template_webfonts_cache' ) );
+
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+	}
+
+	/**
+	 * Invalidate template webfonts cache.
+	 */
+	public function invalidate_template_webfonts_cache() {
+		remove_theme_mod( self::$template_webfonts_cache_theme_mod );
 	}
 
 	/**
