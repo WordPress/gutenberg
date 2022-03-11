@@ -164,7 +164,7 @@ class EditorPage {
 			? `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`
 			: `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
 
-		waitForVisible( this.driver, blockLocator );
+		await waitForVisible( this.driver, blockLocator );
 
 		return await this.driver.elementByXPath( blockLocator );
 	}
