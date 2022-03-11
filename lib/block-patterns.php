@@ -225,7 +225,7 @@ add_action(
  *
  * If applicable, this will collect from both parent and child theme.
  *
- * @since 5.9.0
+ * @since 6.0.0
  * @access private
  * @internal
  */
