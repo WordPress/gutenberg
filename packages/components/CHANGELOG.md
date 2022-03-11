@@ -7,6 +7,7 @@
 -   `BaseControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#39325](https://github.com/WordPress/gutenberg/pull/39325)).
 -   `Divider`: Make the divider visible by default (`display: inline`) in flow layout containers when the divider orientation is vertical ([#39316](https://github.com/WordPress/gutenberg/pull/39316)).
 -   Stop using deprecated `event.keyCode` in favor of `event.key` for keyboard events in `UnitControl` and `InputControl`.  ([#39360](https://github.com/WordPress/gutenberg/pull/39360))
+-   `ColorPalette`: : refine custom color button's label. ([#39386](https://github.com/WordPress/gutenberg/pull/39386))
 
 ### Internal
 
