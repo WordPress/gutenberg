@@ -36,6 +36,11 @@ class WP_Webfonts {
 	private $stylesheet_handle = '';
 
 	/**
+	 * Allowed file types
+	 */
+	private static $allowed_types = array( 'woff', 'woff2', 'ttf', 'eot', 'otf' );
+
+	/**
 	 * Init.
 	 */
 	public function init() {
@@ -300,17 +305,15 @@ class WP_Webfonts {
 	 *
 	 * @return void
 	 */
-	function preload_webfonts() {
-		$allowed_types = array( 'woff', 'woff2', 'ttf', 'eot', 'otf' );
+	public function preload_webfonts() {
 		foreach ( $this->get_fonts() as $font ) {
-			var_dump( $font );
 			foreach( $font['src'] as $src ) {
 				$srcAsArray = explode( '.', $src );
 				$file_type = end( $srcAsArray );
-				if ( ! in_array( $file_type, $allowed_types ) ) {
+				if ( ! in_array( $file_type, self::$allowed_types ) ) {
 					$file_type = '';
 				}
-				echo '<link rel="preload" href="' . $src . '" as="font" type="font/' . $type . '" crossorigin />';
+				echo '<link rel="preload" href="' . $src . '" as="font" type="font/' . $file_type . '" crossorigin />';
 			}
 		}
 	}
