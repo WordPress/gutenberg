@@ -1,5 +1,11 @@
 <?php
 /**
+ * Adds settings to the block editor.
+ *
+ * @package gutenberg
+ */
+
+/**
  * Extends the block editor with settings that are only in the plugin.
  *
  * This is a temporary solution until the Gutenberg plugin sets
