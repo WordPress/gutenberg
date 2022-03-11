@@ -22,9 +22,9 @@ const EMPTY_ARRAY = [];
  *
  * @return {string} Editing mode.
  */
-export function getEditorMode( state ) {
-	return getPreference( state, 'editorMode', 'visual' );
-}
+export const getEditorMode = createRegistrySelector( ( select ) => () =>
+	select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ?? 'visual'
+);
 
 /**
  * Returns true if the editor sidebar is opened.
@@ -91,7 +91,7 @@ export const getActiveGeneralSidebarName = createRegistrySelector(
 
 // The current list of preference keys that have been migrated to the
 // preferences package.
-const MIGRATED_KEYS = [ 'hiddenBlockTypes' ];
+const MIGRATED_KEYS = [ 'hiddenBlockTypes', 'editorMode' ];
 
 /**
  * Returns the preferences (these preferences are persisted locally).
