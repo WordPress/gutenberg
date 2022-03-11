@@ -86,6 +86,12 @@ function DropdownMenu( {
 					toggleProps
 				);
 
+				const isSelected = flatMap( controlSets, ( controlSet ) =>
+					controlSet.map(
+						( control ) => control.isActive && control.title
+					)
+				);
+
 				const toolbarButton = () => (
 					<Button
 						{ ...mergedToggleProps }
@@ -117,6 +123,7 @@ function DropdownMenu( {
 						aria-expanded={ isOpen }
 						label={ label }
 						leftAlign
+						value={ isSelected }
 					>
 						<Icon icon={ chevronRight }></Icon>
 					</BottomSheet.Cell>
