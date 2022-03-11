@@ -463,7 +463,7 @@ const isEditorVisible = async ( driver, iteration = 0 ) => {
 	}
 
 	const blockLocator = isAndroid()
-		?  `//android.widget.EditText[contains(@content-desc, "Post title")]`
+		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
 		: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[contains(@name, "Post title")])`;
 
 	const locator = await driver.elementsByXPath( blockLocator );

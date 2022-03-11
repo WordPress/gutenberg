@@ -157,14 +157,32 @@ class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
-	async getTextViewForHtmlViewContent() {
+	async getTextViewForHtmlViewContent( iteration = 0 ) {
 		const accessibilityId = 'html-view-content';
-		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
+		const maxIteration = 25;
+		const timeout = 1000;
 
-		if ( ! isAndroid() ) {
-			blockLocator = `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
+		if ( iteration >= maxIteration ) {
+			throw new Error(
+				`Text View is still not visible after ${ iteration } retries!`
+			);
+		} else if ( iteration !== 0 ) {
+			// wait 1 second before trying to locate element again
+			await this.driver.sleep( timeout );
 		}
-		return await this.driver.elementByXPath( blockLocator );
+
+		const blockLocator = isAndroid()
+			? `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`
+			: `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
+
+		const locator = await this.driver.elementByXPath( blockLocator );
+		if ( locator === undefined ) {
+			// if locator does not exist, try again
+			return await this.getTextViewForHtmlViewContent( iteration + 1 );
+		}
+
+		return locator;
+		
 	}
 
 	// Returns html content
