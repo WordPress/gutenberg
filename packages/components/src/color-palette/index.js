@@ -202,7 +202,7 @@ export default function ColorPalette( {
 
 	const colordColor = colord( value );
 
-	const buttonLabelValue = value?.startsWith( '#' )
+	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
 		: value ?? '';
 	const buttonLabelName = useMemo(
@@ -251,7 +251,7 @@ export default function ColorPalette( {
 								as="span"
 								className="components-color-palette__custom-color-value"
 							>
-								{ buttonLabelValue }
+								{ valueWithoutLeadingHash }
 							</FlexItem>
 						</Flex>
 					) }
