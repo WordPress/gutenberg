@@ -218,10 +218,8 @@ export function receiveEmbedPreview( url, preview ) {
  * @param {Function} [options.__unstableFetch]    Internal use only. Function to
  *                                                call instead of `apiFetch()`.
  *                                                Must return a promise.
- * @param {boolean}  [options.throwOnError=false] Whether to re-throw exceptions.
- *                                                If false, dispatching this action
- *                                                always resolves successfully and.
- *                                                never rejects.
+ * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
+ *                                                the exceptions.
  */
 export const deleteEntityRecord = (
 	kind,
@@ -402,10 +400,8 @@ export function __unstableCreateUndoLevel() {
  * @param {Function} [options.__unstableFetch]    Internal use only. Function to
  *                                                call instead of `apiFetch()`.
  *                                                Must return a promise.
- * @param {boolean}  [options.throwOnError=false] Whether to re-throw exceptions.
- *                                                If false, dispatching this action
- *                                                always resolves successfully and.
- *                                                never rejects.
+ * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
+ *                                                the exceptions.
  */
 export const saveEntityRecord = (
 	kind,

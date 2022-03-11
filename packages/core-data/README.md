@@ -70,7 +70,7 @@ _Parameters_
 -   _query_ `?Object`: Special query parameters for the DELETE API call.
 -   _options_ `[Object]`: Delete options.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
--   _options.throwOnError_ `[boolean]`: Whether to re-throw exceptions. If false, dispatching this action always resolves successfully and. never rejects.
+-   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions.
 
 ### editEntityRecord
 
@@ -238,7 +238,7 @@ _Parameters_
 -   _options_ `Object`: Saving options.
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
--   _options.throwOnError_ `[boolean]`: Whether to re-throw exceptions. If false, dispatching this action always resolves successfully and. never rejects.
+-   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions.
 
 ### undo
 
