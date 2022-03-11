@@ -211,10 +211,14 @@ export default function ColorPalette( {
 	const buttonLabelValue = value?.startsWith( '#' )
 		? value.substring( 1 )
 		: value ?? '';
-	const buttonLabelName = extractColorNameFromCurrentValue(
-		value,
-		colors,
-		showMultiplePalettes
+	const buttonLabelName = useMemo(
+		() =>
+			extractColorNameFromCurrentValue(
+				value,
+				colors,
+				showMultiplePalettes
+			),
+		[ value, colors, showMultiplePalettes ]
 	);
 
 	return (
