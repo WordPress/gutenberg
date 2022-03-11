@@ -20,10 +20,10 @@ const frenchLocale = {
 
 const localeData = {
 	'': {
-		// Domain name
+		// Domain name.
 		domain: 'test_domain',
 		lang: 'fr',
-		// Plural form function for language
+		// Plural form function for language.
 		plural_forms: 'nplurals=2; plural=(n != 1);',
 	},
 

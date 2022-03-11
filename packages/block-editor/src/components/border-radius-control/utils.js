@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalParseUnit as parseUnit } from '@wordpress/components';
+import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue } from '@wordpress/components';
 
 /**
  * Gets the (non-undefined) item with the highest occurrence within an array
@@ -36,12 +36,12 @@ export function mode( inputArray ) {
  */
 export function getAllUnit( values = {} ) {
 	if ( typeof values === 'string' ) {
-		const [ , unit ] = parseUnit( values );
+		const [ , unit ] = parseQuantityAndUnitFromRawValue( values );
 		return unit || 'px';
 	}
 
 	const allUnits = Object.values( values ).map( ( value ) => {
-		const [ , unit ] = parseUnit( value );
+		const [ , unit ] = parseQuantityAndUnitFromRawValue( value );
 		return unit;
 	} );
 
@@ -64,19 +64,21 @@ export function getAllValue( values = {} ) {
 		return values;
 	}
 
-	const parsedValues = Object.values( values ).map( ( value ) =>
-		parseUnit( value )
+	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) =>
+		parseQuantityAndUnitFromRawValue( value )
 	);
 
-	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
-	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
+	const allValues = parsedQuantitiesAndUnits.map(
+		( value ) => value[ 0 ] ?? ''
+	);
+	const allUnits = parsedQuantitiesAndUnits.map( ( value ) => value[ 1 ] );
 
 	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
 		? allValues[ 0 ]
 		: '';
 	const unit = mode( allUnits );
 
-	const allValue = value === 0 || value ? `${ value }${ unit }` : null;
+	const allValue = value === 0 || value ? `${ value }${ unit }` : undefined;
 
 	return allValue;
 }

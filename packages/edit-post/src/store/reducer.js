@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, get, includes, omit, union, without } from 'lodash';
+import { flow, get, includes, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -81,17 +81,6 @@ export const preferences = flow( [
 	editorMode( state, action ) {
 		if ( action.type === 'SWITCH_MODE' ) {
 			return action.mode;
-		}
-
-		return state;
-	},
-	hiddenBlockTypes( state, action ) {
-		switch ( action.type ) {
-			case 'SHOW_BLOCK_TYPES':
-				return without( state, ...action.blockNames );
-
-			case 'HIDE_BLOCK_TYPES':
-				return union( state, action.blockNames );
 		}
 
 		return state;

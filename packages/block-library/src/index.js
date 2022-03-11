@@ -96,7 +96,6 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as table from './table';
-// import * as tableOfContents from './table-of-contents';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termDescription from './term-description';
@@ -145,7 +144,7 @@ export const __experimentalGetCoreBlocks = () => [
 	buttons,
 	calendar,
 	categories,
-	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
+	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context.
 	code,
 	column,
 	columns,
@@ -205,7 +204,6 @@ export const __experimentalGetCoreBlocks = () => [
 	logInOut,
 	termDescription,
 	queryTitle,
-	postAuthorName,
 	postAuthorBiography,
 ];
 
@@ -251,6 +249,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 			[
 				// Experimental blocks.
 				homeLink,
+				postAuthorName,
 
 				// Full Site Editing blocks.
 				...( enableFSEBlocks

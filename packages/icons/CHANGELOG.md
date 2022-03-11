@@ -2,7 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Changed `dragHandle` footprint from 18x18 to 24x24 to match other icons.  ([#39342](https://github.com/WordPress/gutenberg/pull/39342))
+
 ## 7.0.0 (2022-02-23)
+
+### New Features
+
+- Added new icon: `post`, and refreshed the existing `pin` icon. ([#39139](https://github.com/WordPress/gutenberg/pull/39139))
 
 ### Breaking Changes
 

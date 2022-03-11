@@ -37,7 +37,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 			'vw',
 			'vh',
 		],
-		defaultValues: { px: '100', em: '10', rem: '10', vw: '10', vh: '25' },
+		defaultValues: { px: 100, em: 10, rem: 10, vw: 10, vh: 25 },
 	} );
 
 	const handleOnChange = ( unprocessedValue ) => {

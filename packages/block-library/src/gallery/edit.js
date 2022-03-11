@@ -412,7 +412,7 @@ function GalleryEdit( props ) {
 	}
 
 	useEffect( () => {
-		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php
+		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
 		if ( ! linkTo ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {

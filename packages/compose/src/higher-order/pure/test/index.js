@@ -20,13 +20,13 @@ describe( 'pure', () => {
 			return <p>{ ++i }</p>;
 		} );
 		const wrapper = mount( <MyComp /> );
-		wrapper.update(); // Updating with same props doesn't rerender
+		wrapper.update(); // Updating with same props doesn't rerender.
 		expect( wrapper.html() ).toBe( '<p>1</p>' );
-		wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender
+		wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender.
 		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender
+		wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender.
 		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender
+		wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender.
 		expect( wrapper.html() ).toBe( '<p>3</p>' );
 	} );
 
@@ -44,17 +44,17 @@ describe( 'pure', () => {
 			}
 		);
 		const wrapper = mount( <MyComp /> );
-		wrapper.update(); // Updating with same props doesn't rerender
+		wrapper.update(); // Updating with same props doesn't rerender.
 		expect( wrapper.html() ).toBe( '<p>1</p>' );
-		wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender
+		wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender.
 		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender
+		wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender.
 		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender
+		wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender.
 		expect( wrapper.html() ).toBe( '<p>3</p>' );
-		wrapper.setState( { state: 'a' } ); // New state value should trigger a rerender
+		wrapper.setState( { state: 'a' } ); // New state value should trigger a rerender.
 		expect( wrapper.html() ).toBe( '<p>4</p>' );
-		wrapper.setState( { state: 'a' } ); // Keeping the same state value should not trigger a rerender
+		wrapper.setState( { state: 'a' } ); // Keeping the same state value should not trigger a rerender.
 		expect( wrapper.html() ).toBe( '<p>4</p>' );
 	} );
 } );

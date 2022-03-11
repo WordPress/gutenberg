@@ -23,9 +23,9 @@ class HTMLInputContainer extends Component {
 
 			onPanResponderMove: ( e, gestureState ) => {
 				if ( gestureState.dy > 100 && gestureState.dy < 110 ) {
-					//Keyboard.dismiss() and this.textInput.blur() are not working here
-					//They require to know the currentlyFocusedID under the hood but
-					//during this gesture there's no currentlyFocusedID
+					// Keyboard.dismiss() and this.textInput.blur() are not working here
+					// They require to know the currentlyFocusedID under the hood but
+					// during this gesture there's no currentlyFocusedID.
 					UIManager.blur( e.target );
 				}
 			},

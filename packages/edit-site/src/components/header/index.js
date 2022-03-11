@@ -91,7 +91,7 @@ export default function Header( {
 
 	const openInserter = useCallback( () => {
 		if ( isInserterOpen ) {
-			// Focusing the inserter button closes the inserter popover
+			// Focusing the inserter button closes the inserter popover.
 			inserterButton.current.focus();
 		} else {
 			setIsInserterOpened( true );
