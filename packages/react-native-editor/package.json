@@ -73,7 +73,7 @@
 		"react-native-svg": "9.13.6",
 		"react-native-url-polyfill": "^1.1.2",
 		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/5.2.0-wp-2/react-native-video-5.2.0-wp-2.tgz",
-		"react-native-webview": "11.6.5"
+		"react-native-webview": "11.6.2"
 	},
 	"publishConfig": {
 		"access": "public"
