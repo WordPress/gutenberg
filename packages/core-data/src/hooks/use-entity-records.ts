@@ -35,10 +35,12 @@ interface Options {
 /**
  * Resolves the specified entity records.
  *
- * @param  kind      Kind of the requested entities.
- * @param  name      Name of the requested entities.
- * @param  queryArgs HTTP query for the requested entities.
- * @param  options
+ * @param  kind                                 Kind of the requested entities.
+ * @param  name                                 Name of the requested entities.
+ * @param  queryArgs                            HTTP query for the requested entities.
+ * @param  options                              Hook options.
+ * @param  [options.__experimentalEnabled=true] Whether to run the query or short-circuit and return null. Defaults to true.
+ *
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
