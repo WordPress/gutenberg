@@ -209,22 +209,26 @@ export function receiveEmbedPreview( url, preview ) {
 /**
  * Action triggered to delete an entity record.
  *
- * @param {string}   kind                      Kind of the deleted entity record.
- * @param {string}   name                      Name of the deleted entity record.
- * @param {string}   recordId                  Record ID of the deleted entity record.
- * @param {?Object}  query                     Special query parameters for the
- *                                             DELETE API call.
- * @param {Object}   [options]                 Delete options.
- * @param {Function} [options.__unstableFetch] Internal use only. Function to
- *                                             call instead of `apiFetch()`.
- *                                             Must return a promise.
+ * @param {string}   kind                         Kind of the deleted entity.
+ * @param {string}   name                         Name of the deleted entity.
+ * @param {string}   recordId                     Record ID of the deleted entity.
+ * @param {?Object}  query                        Special query parameters for the
+ *                                                DELETE API call.
+ * @param {Object}   [options]                    Delete options.
+ * @param {Function} [options.__unstableFetch]    Internal use only. Function to
+ *                                                call instead of `apiFetch()`.
+ *                                                Must return a promise.
+ * @param {boolean}  [options.throwOnError=false] Whether to re-throw exceptions.
+ *                                                If false, dispatching this action
+ *                                                always resolves successfully and.
+ *                                                never rejects.
  */
 export const deleteEntityRecord = (
 	kind,
 	name,
 	recordId,
 	query,
-	{ __unstableFetch = apiFetch } = {}
+	{ __unstableFetch = apiFetch, throwOnError = false } = {}
 ) => async ( { dispatch } ) => {
 	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
 	const entityConfig = find( configs, { kind, name } );
@@ -272,6 +276,10 @@ export const deleteEntityRecord = (
 			recordId,
 			error,
 		} );
+
+		if ( error && throwOnError ) {
+			throw error;
+		}
 
 		return deletedRecord;
 	} finally {
@@ -386,20 +394,28 @@ export function __unstableCreateUndoLevel() {
 /**
  * Action triggered to save an entity record.
  *
- * @param {string}   kind                       Kind of the received entity.
- * @param {string}   name                       Name of the received entity.
- * @param {Object}   record                     Record to be saved.
- * @param {Object}   options                    Saving options.
- * @param {boolean}  [options.isAutosave=false] Whether this is an autosave.
- * @param {Function} [options.__unstableFetch]  Internal use only. Function to
- *                                              call instead of `apiFetch()`.
- *                                              Must return a promise.
+ * @param {string}   kind                         Kind of the received entity.
+ * @param {string}   name                         Name of the received entity.
+ * @param {Object}   record                       Record to be saved.
+ * @param {Object}   options                      Saving options.
+ * @param {boolean}  [options.isAutosave=false]   Whether this is an autosave.
+ * @param {Function} [options.__unstableFetch]    Internal use only. Function to
+ *                                                call instead of `apiFetch()`.
+ *                                                Must return a promise.
+ * @param {boolean}  [options.throwOnError=false] Whether to re-throw exceptions.
+ *                                                If false, dispatching this action
+ *                                                always resolves successfully and.
+ *                                                never rejects.
  */
 export const saveEntityRecord = (
 	kind,
 	name,
 	record,
-	{ isAutosave = false, __unstableFetch = apiFetch } = {}
+	{
+		isAutosave = false,
+		__unstableFetch = apiFetch,
+		throwOnError = false,
+	} = {}
 ) => async ( { select, resolveSelect, dispatch } ) => {
 	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
 	const entityConfig = find( configs, { kind, name } );
@@ -577,6 +593,10 @@ export const saveEntityRecord = (
 			error,
 			isAutosave,
 		} );
+
+		if ( error && throwOnError ) {
+			throw error;
+		}
 
 		return updatedRecord;
 	} finally {
@@ -759,69 +779,3 @@ export function receiveAutosaves( postId, autosaves ) {
 		autosaves: castArray( autosaves ),
 	};
 }
-
-export const throwingSaveEntityRecord = ( ...args ) => async ( {
-	dispatch,
-	select,
-} ) => {
-	const [ kind, name, record ] = args;
-	const recordId = await dispatch( getRecordPk( kind, name, record ) );
-
-	const result = await dispatch( saveEntityRecord( ...args ) );
-	if ( ! result ) {
-		if ( recordId ) {
-			const error = select.getLastEntitySaveError( kind, name, recordId );
-			throw error;
-		} else {
-			throw new Error( 'Something went wrong' );
-		}
-	}
-
-	const resultId = await dispatch( getRecordPk( kind, name, result ) );
-	const error = select.getLastEntitySaveError( kind, name, resultId );
-
-	if ( error ) {
-		throw error;
-	}
-	return result;
-};
-
-export const throwingSaveEditedEntityRecord = ( ...args ) => async ( {
-	dispatch,
-	select,
-} ) => {
-	const result = await dispatch( saveEditedEntityRecord( ...args ) );
-
-	const [ kind, name, id ] = args;
-	const error = select.getLastEntitySaveError( kind, name, id );
-
-	if ( error || ! result ) {
-		throw error;
-	}
-	return result;
-};
-
-export const throwingDeleteEntityRecord = ( ...args ) => async ( {
-	dispatch,
-	select,
-} ) => {
-	const result = await dispatch( deleteEntityRecord( ...args ) );
-
-	const [ kind, name, id ] = args;
-	const error = select.getLastEntityDeleteError( kind, name, id );
-
-	if ( error || ! result ) {
-		throw error;
-	}
-	return result;
-};
-
-const getRecordPk = ( kind, name, record ) => async ( { dispatch } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
-	const entity = find( entities, { kind, name } );
-	if ( ! entity || entity?.__experimentalNoFetch ) {
-		return;
-	}
-	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
-	return record[ entityIdKey ];
-};

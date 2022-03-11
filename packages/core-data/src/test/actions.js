@@ -110,6 +110,68 @@ describe( 'deleteEntityRecord', () => {
 
 		expect( result ).toBe( deletedRecord );
 	} );
+
+	it( 'throws on error when throwOnError is true', async () => {
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		apiFetch.mockImplementation( () => {
+			throw new Error( 'API error' );
+		} );
+
+		await expect(
+			deleteEntityRecord(
+				'postType',
+				'post',
+				10,
+				{},
+				{
+					throwOnError: true,
+				}
+			)( { dispatch } )
+		).rejects.toEqual( new Error( 'API error' ) );
+	} );
+
+	it( 'resolves on error when throwOnError is false', async () => {
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		apiFetch.mockImplementation( () => {
+			throw new Error( 'API error' );
+		} );
+
+		await expect(
+			deleteEntityRecord(
+				'postType',
+				'post',
+				10,
+				{},
+				{
+					throwOnError: false,
+				}
+			)( { dispatch } )
+		).resolves.toBe( false );
+	} );
 } );
 
 describe( 'saveEditedEntityRecord', () => {
@@ -201,9 +263,15 @@ describe( 'saveEditedEntityRecord', () => {
 } );
 
 describe( 'saveEntityRecord', () => {
+	let dispatch;
 	beforeEach( async () => {
 		apiFetch.mockReset();
 		jest.useFakeTimers();
+		dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
 	} );
 
 	it( 'triggers a POST request for a new record', async () => {
@@ -215,11 +283,6 @@ describe( 'saveEntityRecord', () => {
 			getRawEntityRecord: () => post,
 		};
 
-		const dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
-		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( configs );
 
@@ -278,6 +341,54 @@ describe( 'saveEntityRecord', () => {
 		expect( result ).toBe( updatedRecord );
 	} );
 
+	it( 'throws on error when throwOnError is true', async () => {
+		const post = { title: 'new post' };
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		apiFetch.mockImplementation( () => {
+			throw new Error( 'API error' );
+		} );
+
+		await expect(
+			saveEntityRecord( 'postType', 'post', post, {
+				throwOnError: true,
+			} )( { select, dispatch } )
+		).rejects.toEqual( new Error( 'API error' ) );
+	} );
+
+	it( 'resolves on error when throwOnError is false', async () => {
+		const post = { title: 'new post' };
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		apiFetch.mockImplementation( () => {
+			throw new Error( 'API error' );
+		} );
+
+		await expect(
+			saveEntityRecord( 'postType', 'post', post, {
+				throwOnError: false,
+			} )( { select, dispatch } )
+		).resolves.toEqual( undefined );
+	} );
+
 	it( 'triggers a PUT request for an existing record', async () => {
 		const post = { id: 10, title: 'new post' };
 		const configs = [
@@ -287,11 +398,6 @@ describe( 'saveEntityRecord', () => {
 			getRawEntityRecord: () => post,
 		};
 
-		const dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
-		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( configs );
 
@@ -364,11 +470,6 @@ describe( 'saveEntityRecord', () => {
 			getRawEntityRecord: () => ( {} ),
 		};
 
-		const dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
-		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( configs );
 
