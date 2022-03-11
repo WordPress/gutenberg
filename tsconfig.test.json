@@ -7,8 +7,9 @@
 			"gutenberg-env",
 			"jest",
 			"@testing-library/jest-dom",
-			"snapshot-diff"
-		]
+			"snapshot-diff",
+			"@emotion/core"
+		],
 	},
 	"references": [
 		{ "path": "packages/a11y" },
