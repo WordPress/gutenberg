@@ -449,26 +449,29 @@ const toggleOrientation = async ( driver ) => {
 	}
 };
 
-const isEditorVisible = async ( driver, iteration = 0 )  => {
-	if ( iteration >= 25 ) {
+const isEditorVisible = async ( driver, iteration = 0 ) => {
+	const maxIteration = 25;
+	const timeout = 1000;
+
+	if ( iteration >= maxIteration ) {
 		throw new Error(
 			`Gutenberg Editor is still not visible after ${ iteration } retries!`
 		);
 	} else if ( iteration !== 0 ) {
 		// wait 1 second before trying to locate element again
-		await driver.sleep( 1000 );
+		await driver.sleep( timeout );
 	}
 
 	const blockLocator = isAndroid()
-		? `//android.widget.EditText[@content-desc="Post title. Welcome to Gutenberg!"]`
-		: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[@name="Post title. Welcome to Gutenberg!"])`;
+		? // ? `//android.widget.EditText[@content-desc="Post title. Welcome to Gutenberg!"]`
+		  `//android.widget.EditText[contains(@content-desc, "Post title")]`
+		: // : `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[@name="Post title. Welcome to Gutenberg!"])`;
+		  `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[contains(@name, "Post title")])`;
 
 	const locator = await driver.elementsByXPath( blockLocator );
-
 	if ( locator.length !== 1 ) {
 		// if locator is not visible, try again
-		iteration++;
-		return await isEditorVisible( driver, iteration );
+		return await isEditorVisible( driver, iteration + 1 );
 	}
 };
 
@@ -492,5 +495,5 @@ module.exports = {
 	toggleHtmlMode,
 	toggleOrientation,
 	doubleTap,
-	isEditorVisible
+	isEditorVisible,
 };

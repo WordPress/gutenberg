@@ -12,12 +12,12 @@ const {
 	swipeFromTo,
 	longPressMiddleOfElement,
 	doubleTap,
-	isEditorVisible
+	isEditorVisible,
 } = require( '../helpers/utils' );
 
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
-	await isEditorVisible( driver )
+	await isEditorVisible( driver );
 	return new EditorPage( driver );
 };
 
