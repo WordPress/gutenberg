@@ -8,11 +8,123 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
 `;
 
 exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
-<button
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.emotion-1 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-2>*+*:not( marquee ) {
+  margin-left: calc(4px * 2);
+}
+
+.emotion-3>* {
+  min-width: 0;
+}
+
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-4>*+*:not( marquee ) {
+  margin-left: calc(4px * 2);
+}
+
+.emotion-4>* {
+  min-width: 0;
+}
+
+.emotion-6 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.emotion-8 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-9 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-11 {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emotion-15 {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-19 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+<Flex
   aria-expanded={true}
   aria-haspopup="true"
   aria-label="Custom color picker"
+  as="button"
   className="components-color-palette__custom-color"
+  justify="space-between"
   onClick={[MockFunction]}
   style={
     Object {
@@ -21,11 +133,227 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
     }
   }
 >
-  #f00
-</button>
+  <View
+    aria-expanded={true}
+    aria-haspopup="true"
+    aria-label="Custom color picker"
+    as="button"
+    className="emotion-0 emotion-1 emotion-2 emotion-3 components-flex components-color-palette__custom-color"
+    data-wp-c16t={true}
+    data-wp-component="Flex"
+    onClick={[MockFunction]}
+    style={
+      Object {
+        "background": "#f00",
+        "color": "#000",
+      }
+    }
+  >
+    <Noop />
+    <button
+      aria-expanded={true}
+      aria-haspopup="true"
+      aria-label="Custom color picker"
+      className="components-flex components-color-palette__custom-color emotion-4 emotion-5"
+      data-wp-c16t={true}
+      data-wp-component="Flex"
+      onClick={[MockFunction]}
+      style={
+        Object {
+          "background": "#f00",
+          "color": "#000",
+        }
+      }
+    >
+      <FlexItem
+        as={
+          Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "__contextSystemKey__": Array [
+              "Truncate",
+            ],
+            "render": [Function],
+            "selector": ".components-truncate",
+          }
+        }
+        className="components-color-palette__custom-color-name"
+        isBlock={true}
+      >
+        <View
+          as={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "__contextSystemKey__": Array [
+                "Truncate",
+              ],
+              "render": [Function],
+              "selector": ".components-truncate",
+            }
+          }
+          className="emotion-6 emotion-7 emotion-8 components-flex-item components-color-palette__custom-color-name"
+          data-wp-c16t={true}
+          data-wp-component="FlexItem"
+        >
+          <Noop />
+          <Truncate
+            className="components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
+            data-wp-c16t={true}
+            data-wp-component="FlexItem"
+          >
+            <View
+              as="span"
+              className="emotion-11 components-truncate components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
+              data-wp-c16t={true}
+              data-wp-component="FlexItem"
+            >
+              <Noop />
+              <span
+                className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-15 emotion-5"
+                data-wp-c16t={true}
+                data-wp-component="FlexItem"
+              >
+                red
+              </span>
+            </View>
+          </Truncate>
+        </View>
+      </FlexItem>
+      <FlexItem
+        as="span"
+        className="components-color-palette__custom-color-value"
+      >
+        <View
+          as="span"
+          className="emotion-6 emotion-7 components-flex-item components-color-palette__custom-color-value"
+          data-wp-c16t={true}
+          data-wp-component="FlexItem"
+        >
+          <Noop />
+          <span
+            className="components-flex-item components-color-palette__custom-color-value emotion-19 emotion-5"
+            data-wp-c16t={true}
+            data-wp-component="FlexItem"
+          >
+            f00
+          </span>
+        </View>
+      </FlexItem>
+    </button>
+  </View>
+</Flex>
 `;
 
 exports[`ColorPalette Dropdown should render it correctly 1`] = `
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.emotion-1 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-2>*+*:not( marquee ) {
+  margin-left: calc(4px * 2);
+}
+
+.emotion-3>* {
+  min-width: 0;
+}
+
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-4>*+*:not( marquee ) {
+  margin-left: calc(4px * 2);
+}
+
+.emotion-4>* {
+  min-width: 0;
+}
+
+.emotion-6 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.emotion-8 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-9 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-11 {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emotion-15 {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-19 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
 <Dropdown
   contentClassName="components-color-palette__custom-color-dropdown-content"
   renderContent={[Function]}
@@ -35,11 +363,13 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
     className="components-dropdown"
     tabIndex="-1"
   >
-    <button
+    <Flex
       aria-expanded={false}
       aria-haspopup="true"
       aria-label="Custom color picker"
+      as="button"
       className="components-color-palette__custom-color"
+      justify="space-between"
       onClick={[Function]}
       style={
         Object {
@@ -48,8 +378,114 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
         }
       }
     >
-      #f00
-    </button>
+      <View
+        aria-expanded={false}
+        aria-haspopup="true"
+        aria-label="Custom color picker"
+        as="button"
+        className="emotion-0 emotion-1 emotion-2 emotion-3 components-flex components-color-palette__custom-color"
+        data-wp-c16t={true}
+        data-wp-component="Flex"
+        onClick={[Function]}
+        style={
+          Object {
+            "background": "#f00",
+            "color": "#000",
+          }
+        }
+      >
+        <Noop />
+        <button
+          aria-expanded={false}
+          aria-haspopup="true"
+          aria-label="Custom color picker"
+          className="components-flex components-color-palette__custom-color emotion-4 emotion-5"
+          data-wp-c16t={true}
+          data-wp-component="Flex"
+          onClick={[Function]}
+          style={
+            Object {
+              "background": "#f00",
+              "color": "#000",
+            }
+          }
+        >
+          <FlexItem
+            as={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "__contextSystemKey__": Array [
+                  "Truncate",
+                ],
+                "render": [Function],
+                "selector": ".components-truncate",
+              }
+            }
+            className="components-color-palette__custom-color-name"
+            isBlock={true}
+          >
+            <View
+              as={
+                Object {
+                  "$$typeof": Symbol(react.forward_ref),
+                  "__contextSystemKey__": Array [
+                    "Truncate",
+                  ],
+                  "render": [Function],
+                  "selector": ".components-truncate",
+                }
+              }
+              className="emotion-6 emotion-7 emotion-8 components-flex-item components-color-palette__custom-color-name"
+              data-wp-c16t={true}
+              data-wp-component="FlexItem"
+            >
+              <Noop />
+              <Truncate
+                className="components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
+                data-wp-c16t={true}
+                data-wp-component="FlexItem"
+              >
+                <View
+                  as="span"
+                  className="emotion-11 components-truncate components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
+                  data-wp-c16t={true}
+                  data-wp-component="FlexItem"
+                >
+                  <Noop />
+                  <span
+                    className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-15 emotion-5"
+                    data-wp-c16t={true}
+                    data-wp-component="FlexItem"
+                  >
+                    red
+                  </span>
+                </View>
+              </Truncate>
+            </View>
+          </FlexItem>
+          <FlexItem
+            as="span"
+            className="components-color-palette__custom-color-value"
+          >
+            <View
+              as="span"
+              className="emotion-6 emotion-7 components-flex-item components-color-palette__custom-color-value"
+              data-wp-c16t={true}
+              data-wp-component="FlexItem"
+            >
+              <Noop />
+              <span
+                className="components-flex-item components-color-palette__custom-color-value emotion-19 emotion-5"
+                data-wp-c16t={true}
+                data-wp-component="FlexItem"
+              >
+                f00
+              </span>
+            </View>
+          </FlexItem>
+        </button>
+      </View>
+    </Flex>
   </div>
 </Dropdown>
 `;
@@ -144,6 +580,109 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   min-height: 0;
 }
 
+.emotion-7 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-8>*+*:not( marquee ) {
+  margin-left: calc(4px * 2);
+}
+
+.emotion-9>* {
+  min-width: 0;
+}
+
+.emotion-10 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-10>*+*:not( marquee ) {
+  margin-left: calc(4px * 2);
+}
+
+.emotion-10>* {
+  min-width: 0;
+}
+
+.emotion-12 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.emotion-14 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-15 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-17 {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emotion-21 {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-25 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
 <ColorPalette
   colors={
     Array [
@@ -194,11 +733,13 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               className="components-dropdown"
               tabIndex="-1"
             >
-              <button
+              <Flex
                 aria-expanded={false}
                 aria-haspopup="true"
                 aria-label="Custom color picker"
+                as="button"
                 className="components-color-palette__custom-color"
+                justify="space-between"
                 onClick={[Function]}
                 style={
                   Object {
@@ -207,8 +748,114 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   }
                 }
               >
-                #f00
-              </button>
+                <View
+                  aria-expanded={false}
+                  aria-haspopup="true"
+                  aria-label="Custom color picker"
+                  as="button"
+                  className="emotion-0 emotion-7 emotion-8 emotion-9 components-flex components-color-palette__custom-color"
+                  data-wp-c16t={true}
+                  data-wp-component="Flex"
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "background": "#f00",
+                      "color": "#000",
+                    }
+                  }
+                >
+                  <Noop />
+                  <button
+                    aria-expanded={false}
+                    aria-haspopup="true"
+                    aria-label="Custom color picker"
+                    className="components-flex components-color-palette__custom-color emotion-10 emotion-5"
+                    data-wp-c16t={true}
+                    data-wp-component="Flex"
+                    onClick={[Function]}
+                    style={
+                      Object {
+                        "background": "#f00",
+                        "color": "#000",
+                      }
+                    }
+                  >
+                    <FlexItem
+                      as={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "__contextSystemKey__": Array [
+                            "Truncate",
+                          ],
+                          "render": [Function],
+                          "selector": ".components-truncate",
+                        }
+                      }
+                      className="components-color-palette__custom-color-name"
+                      isBlock={true}
+                    >
+                      <View
+                        as={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "__contextSystemKey__": Array [
+                              "Truncate",
+                            ],
+                            "render": [Function],
+                            "selector": ".components-truncate",
+                          }
+                        }
+                        className="emotion-12 emotion-13 emotion-14 components-flex-item components-color-palette__custom-color-name"
+                        data-wp-c16t={true}
+                        data-wp-component="FlexItem"
+                      >
+                        <Noop />
+                        <Truncate
+                          className="components-flex-item components-color-palette__custom-color-name emotion-15 emotion-5"
+                          data-wp-c16t={true}
+                          data-wp-component="FlexItem"
+                        >
+                          <View
+                            as="span"
+                            className="emotion-17 components-truncate components-flex-item components-color-palette__custom-color-name emotion-15 emotion-5"
+                            data-wp-c16t={true}
+                            data-wp-component="FlexItem"
+                          >
+                            <Noop />
+                            <span
+                              className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-21 emotion-5"
+                              data-wp-c16t={true}
+                              data-wp-component="FlexItem"
+                            >
+                              red
+                            </span>
+                          </View>
+                        </Truncate>
+                      </View>
+                    </FlexItem>
+                    <FlexItem
+                      as="span"
+                      className="components-color-palette__custom-color-value"
+                    >
+                      <View
+                        as="span"
+                        className="emotion-12 emotion-13 components-flex-item components-color-palette__custom-color-value"
+                        data-wp-c16t={true}
+                        data-wp-component="FlexItem"
+                      >
+                        <Noop />
+                        <span
+                          className="components-flex-item components-color-palette__custom-color-value emotion-25 emotion-5"
+                          data-wp-c16t={true}
+                          data-wp-component="FlexItem"
+                        >
+                          f00
+                        </span>
+                      </View>
+                    </FlexItem>
+                  </button>
+                </View>
+              </Flex>
             </div>
           </Dropdown>
         </CustomColorPickerDropdown>
