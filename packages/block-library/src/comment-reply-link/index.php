@@ -59,8 +59,8 @@ function render_block_core_comment_reply_link( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	ob_start();
-	comment_form( );
-	$form               = ob_get_clean();
+	comment_form();
+	$form = ob_get_clean();
 
 	$comment_toggled_form = sprintf(
 		'<div x-data="{ open: false }" %1$s>
