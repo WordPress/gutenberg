@@ -158,6 +158,7 @@ class EditorPage {
 	}
 
 	async getTextViewForHtmlViewContent( iteration = 0 ) {
+		// to be removed
 		const accessibilityId = 'html-view-content';
 		const maxIteration = 25;
 		const timeout = 1000;
