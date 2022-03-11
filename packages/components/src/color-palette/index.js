@@ -21,6 +21,8 @@ import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
+import { Flex, FlexItem } from '../flex';
+import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
 
 extend( [ namesPlugin, a11yPlugin ] );
@@ -125,6 +127,59 @@ export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
 	);
 }
 
+const formatValueForCustomColorButton = ( value = '' ) => {
+	const withoutStartingHash = value.startsWith( '#' )
+		? value.substring( 1 )
+		: value;
+
+	return withoutStartingHash.toUpperCase();
+};
+
+const extractColorNameFromCurrentValue = (
+	currentValue,
+	colors = [],
+	showMultiplePalettes = false
+) => {
+	if ( ! currentValue ) {
+		return '';
+	}
+
+	let colorNameToReturn;
+
+	if ( showMultiplePalettes ) {
+		for ( const {
+			name: colorPaletteName,
+			colors: colorPaletteColors,
+		} of colors ) {
+			for ( const {
+				name: colorName,
+				color: colorValue,
+			} of colorPaletteColors ) {
+				if ( currentValue === colorValue ) {
+					return sprintf(
+						// translators: %1$s: The name of the color e.g: "vivid red"; %2$s: the color palette name (e.g. 'Theme', 'Default', 'Custom'...).
+						__( '%1$s (%2$s)' ),
+						colorName,
+						colorPaletteName
+					);
+				}
+			}
+		}
+	} else {
+		for ( const { name: colorName, color: colorValue } of colors ) {
+			/* eslint-disable @wordpress/i18n-no-placeholders-only */
+			if ( currentValue === colorValue ) {
+				// translators: %s: The name of the color e.g: "vivid red".
+				return sprintf( __( '%s' ), colorName );
+			}
+			/* eslint-enable @wordpress/i18n-no-placeholders-only */
+		}
+	}
+
+	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
+	return colorNameToReturn ?? __( 'Custom' );
+};
+
 export default function ColorPalette( {
 	clearable = true,
 	className,
@@ -137,10 +192,9 @@ export default function ColorPalette( {
 	__experimentalIsRenderedInSidebar = false,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
-	const Component =
-		__experimentalHasMultipleOrigins && colors?.length
-			? MultiplePalettes
-			: SinglePalette;
+	const showMultiplePalettes =
+		__experimentalHasMultipleOrigins && colors?.length;
+	const Component = showMultiplePalettes ? MultiplePalettes : SinglePalette;
 
 	const renderCustomColorPicker = () => (
 		<ColorPicker
@@ -157,6 +211,13 @@ export default function ColorPalette( {
 
 	const colordColor = colord( value );
 
+	const buttonLabelValue = formatValueForCustomColorButton( value );
+	const buttonLabelName = extractColorNameFromCurrentValue(
+		value,
+		colors,
+		showMultiplePalettes
+	);
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
@@ -165,7 +226,9 @@ export default function ColorPalette( {
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<button
+						<Flex
+							as={ 'button' }
+							justify="space-between"
 							className="components-color-palette__custom-color"
 							aria-expanded={ isOpen }
 							aria-haspopup="true"
@@ -180,8 +243,20 @@ export default function ColorPalette( {
 										: '#000',
 							} }
 						>
-							{ value }
-						</button>
+							<FlexItem
+								isBlock
+								as={ Truncate }
+								className="components-color-palette__custom-color-name"
+							>
+								{ buttonLabelName }
+							</FlexItem>
+							<FlexItem
+								as="span"
+								className="components-color-palette__custom-color-value"
+							>
+								{ buttonLabelValue }
+							</FlexItem>
+						</Flex>
 					) }
 				/>
 			) }
