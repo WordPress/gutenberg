@@ -42,7 +42,7 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  * @typedef WPBlock
  *
  * @property {string}     name                    Block name
- * @property {Object }    attributes              Block raw or comment attributes.
+ * @property {Object}     attributes              Block raw or comment attributes.
  * @property {WPBlock[]}  innerBlocks             Inner Blocks.
  * @property {string}     originalContent         Original content of the block before validation fixes.
  * @property {boolean}    isValid                 Whether the block is valid.
