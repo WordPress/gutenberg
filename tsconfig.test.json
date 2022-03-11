@@ -1,6 +1,16 @@
 {
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+		"types": [
+			"gutenberg-env",
+			"jest",
+			"@testing-library/jest-dom",
+			"snapshot-diff"
+		]
+	},
 	"references": [
-		{ "path": "bin" },
 		{ "path": "packages/a11y" },
 		{ "path": "packages/api-fetch" },
 		{ "path": "packages/autop" },
@@ -32,8 +42,8 @@
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },
 		{ "path": "packages/warning" },
-		{ "path": "packages/wordcount" },
-		{ "path": "./tsconfig.test.json" }
+		{ "path": "packages/wordcount" }
 	],
-	"files": []
+	"include": [ "packages/**/test/*.ts", "packages/**/test/*.tsx" ],
+	"exclude": []
 }

@@ -3,12 +3,7 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [
-			"gutenberg-env",
-			"jest",
-			"@testing-library/jest-dom",
-			"snapshot-diff"
-		],
+		"types": [ "gutenberg-env" ],
 		// Some errors in Reakit types with TypeScript 4.3
 		// Remove the following line when they've been addressed.
 		"skipLibCheck": true,
@@ -92,7 +87,7 @@
 		"src/**/*.native.js",
 		"src/**/react-native-*",
 		"src/**/stories/**.js", // only exclude js files, tsx files should be checked
-		"src/**/test/**.js", // only exclude js files, ts{x} files should be checked
+		"src/**/test",
 		"src/ui/__storybook-utils",
 		"src/ui/font-size-control"
 	]
