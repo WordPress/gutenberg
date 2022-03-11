@@ -14,7 +14,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
-	DateFormatControl,
+	DateFormatPicker,
 } from '@wordpress/block-editor';
 import {
 	Dropdown,
@@ -114,9 +114,9 @@ export default function PostDateEdit( {
 
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					<DateFormatControl
+					<DateFormatPicker
 						format={ format }
-						siteFormat={ siteFormat }
+						defaultFormat={ siteFormat }
 						onChange={ ( nextFormat ) =>
 							setAttributes( { format: nextFormat } )
 						}

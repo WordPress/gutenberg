@@ -319,10 +319,10 @@ _Returns_
 
 -   `Function`: Higher-order component.
 
-### DateFormatControl
+### DateFormatPicker
 
-The `DateFormatControl` component renders a dropdown that lets the user
-choose a _date format_. That is, how they want their dates to be formatted.
+The `DateFormatPicker` component renders controls that let the user choose a
+_date format_. That is, how they want their dates to be formatted.
 
 _Related_
 
@@ -332,8 +332,8 @@ _Parameters_
 
 -   _props_ `Object`:
 -   _props.format_ `string|null`: The selected date format.
--   _props.siteFormat_ `string`: The site's date format, used to show what the date will look like if user selects _Site default_.
--   _props.onChange_ `( format: string ) => void`: Called when a selection is made.
+-   _props.defaultFormat_ `string`: The date format that will be used if the user selects 'Default'.
+-   _props.onChange_ `( format: string|null ) => void`: Called when a selection is made.
 
 ### DefaultBlockAppender
 

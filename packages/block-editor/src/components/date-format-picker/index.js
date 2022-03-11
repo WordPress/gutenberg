@@ -26,30 +26,33 @@ import {
 const EXAMPLE_DATE = new Date( 2022, 0, 25 );
 
 /**
- * The `DateFormatControl` component renders a dropdown that lets the user
- * choose a _date format_. That is, how they want their dates to be formatted.
+ * The `DateFormatPicker` component renders controls that let the user choose a
+ * _date format_. That is, how they want their dates to be formatted.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/date-format-picker/README.md
  *
- * @param {Object}                     props
- * @param {string|null}                props.format     The selected date
- *                                                      format.
- * @param {string}                     props.siteFormat The site's date format,
- *                                                      used to show what the
- *                                                      date will look like if
- *                                                      user selects _Site
- *                                                      default_.
- * @param {( format: string ) => void} props.onChange   Called when a selection
- *                                                      is made.
+ * @param {Object}                          props
+ * @param {string|null}                     props.format        The selected date
+ *                                                              format.
+ * @param {string}                          props.defaultFormat The date format that
+ *                                                              will be used if the
+ *                                                              user selects
+ *                                                              'Default'.
+ * @param {( format: string|null ) => void} props.onChange      Called when a
+ *                                                              selection is made.
  */
-export default function DateFormatPicker( { format, siteFormat, onChange } ) {
+export default function DateFormatPicker( {
+	format,
+	defaultFormat,
+	onChange,
+} ) {
 	return (
 		<fieldset className="block-editor-date-format-picker">
 			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
 			<div className="block-editor-date-format-picker__header">
 				{ __( 'Format' ) }
 				<span className="block-editor-date-format-picker__header__hint">
-					{ dateI18n( format || siteFormat, EXAMPLE_DATE ) }
+					{ dateI18n( format || defaultFormat, EXAMPLE_DATE ) }
 				</span>
 			</div>
 			<ToggleGroupControl
@@ -61,7 +64,7 @@ export default function DateFormatPicker( { format, siteFormat, onChange } ) {
 					if ( value === 'default' ) {
 						onChange( null );
 					} else if ( value === 'custom' ) {
-						onChange( siteFormat );
+						onChange( defaultFormat );
 					}
 				} }
 			>
@@ -126,9 +129,11 @@ function CustomControls( { format, onChange } ) {
 					label={ __( 'Choose a format' ) }
 					options={ [ ...suggestedOptions, otherOption ] }
 					value={
-						suggestedOptions.find(
-							( option ) => option.format === format
-						) ?? otherOption
+						isOther
+							? otherOption
+							: suggestedOptions.find(
+									( option ) => option.format === format
+							  ) ?? otherOption
 					}
 					onChange={ ( { selectedItem } ) => {
 						if ( selectedItem === otherOption ) {
@@ -145,7 +150,9 @@ function CustomControls( { format, onChange } ) {
 					label={ __( 'Format string' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(
-						__( 'Enter a date <Link>format string</Link>.' ),
+						__(
+							'Enter a date or time <Link>format string</Link>.'
+						),
 						{
 							Link: (
 								<ExternalLink

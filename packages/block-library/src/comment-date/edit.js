@@ -6,7 +6,7 @@ import { dateI18n } from '@wordpress/date';
 import {
 	InspectorControls,
 	useBlockProps,
-	DateFormatControl,
+	DateFormatPicker,
 } from '@wordpress/block-editor';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -36,9 +36,9 @@ export default function Edit( {
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
-				<DateFormatControl
+				<DateFormatPicker
 					format={ format }
-					siteFormat={ siteFormat }
+					defaultFormat={ siteFormat }
 					onChange={ ( nextFormat ) =>
 						setAttributes( { format: nextFormat } )
 					}
