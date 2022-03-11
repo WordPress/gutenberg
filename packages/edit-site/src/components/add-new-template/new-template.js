@@ -42,16 +42,16 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
 	'single-post',
 	'page',
-	'archive',
-	'search',
-	'404',
 	'index',
-	'category',
+	'archive',
+	'attachment',
 	'author',
-	'taxonomy',
+	'category',
 	'date',
 	'tag',
-	'attachment',
+	'taxonomy',
+	'search',
+	'404',
 ];
 
 const TEMPLATE_ICONS = {
@@ -147,6 +147,11 @@ export default function NewTemplate( { postType } ) {
 	if ( ! missingTemplates.length ) {
 		return null;
 	}
+
+	// Update the sort order to match the DEFAULT_TEMPLATE_SLUGS order.
+	missingTemplates.sort( ( template1, template2 ) => {
+		return DEFAULT_TEMPLATE_SLUGS.indexOf( template1.slug ) - DEFAULT_TEMPLATE_SLUGS.indexOf( template2.slug );
+	} );
 
 	return (
 		<DropdownMenu
