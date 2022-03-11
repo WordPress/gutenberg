@@ -128,6 +128,127 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test wp_enqueue_webfonts() bulk enqueue webfonts.
+	 *
+	 * @covers wp_enqueue_webfonts
+	 * @covers WP_Webfonts::enqueue_font
+	 * @covers WP_Webfonts::get_enqueued_fonts
+	 * @covers WP_Webfonts::get_registered_fonts
+	 */
+	public function test_wp_enqueue_webfonts() {
+		$fonts = array(
+			array(
+				'id'           => 'source-serif-pro-200-900-normal-local',
+				'provider'     => 'local',
+				'font-family'  => 'Source Serif Pro',
+				'font-style'   => 'normal',
+				'font-weight'  => '200 900',
+				'font-stretch' => 'normal',
+				'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+				'font-display' => 'fallback',
+			),
+			array(
+				'id'           => 'source-serif-pro-200-900-italic-local',
+				'provider'     => 'local',
+				'font-family'  => 'Source Serif Pro',
+				'font-style'   => 'italic',
+				'font-weight'  => '200 900',
+				'font-stretch' => 'normal',
+				'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
+				'font-display' => 'fallback',
+			),
+		);
+
+		$expected = array(
+			$fonts[0]['id'] => array_filter( $fonts[0], fn( $key ) => 'id' !== $key, ARRAY_FILTER_USE_KEY ),
+			$fonts[1]['id'] => array_filter( $fonts[1], fn( $key ) => 'id' !== $key, ARRAY_FILTER_USE_KEY ),
+		);
+
+		wp_enqueue_webfonts( $fonts );
+		$this->assertEquals( $expected, wp_webfonts()->get_enqueued_fonts() );
+		$this->assertEquals( array(), wp_webfonts()->get_registered_fonts() );
+	}
+
+	/**
+	 * Test wp_enqueue_font() enqueues a registered webfont.
+	 *
+	 * @covers wp_enqueue_webfont
+	 * @covers WP_Webfonts::enqueued_font
+	 * @covers WP_Webfonts::get_enqueued_fonts
+	 * @covers WP_Webfonts::get_registered_fonts
+	 */
+	public function test_wp_enqueue_webfont_enqueues_registered_webfont() {
+		$id = 'source-serif-pro-200-900-normal-local';
+
+		$font = array(
+			'provider'     => 'local',
+			'font-family'  => 'Source Serif Pro',
+			'font-style'   => 'normal',
+			'font-weight'  => '200 900',
+			'font-stretch' => 'normal',
+			'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+			'font-display' => 'fallback',
+		);
+
+		$expected = array(
+			$id => $font,
+		);
+
+		wp_register_webfont( $id, $font );
+		wp_enqueue_webfont( $id );
+
+		$this->assertEquals( array(), wp_webfonts()->get_registered_fonts() );
+		$this->assertEquals( $expected, wp_webfonts()->get_enqueued_fonts() );
+	}
+
+	/**
+	 * Test wp_enqueue_font() register and enqueues a webfont if given as an argument.
+	 *
+	 * @covers wp_enqueue_webfont
+	 * @covers WP_Webfonts::enqueued_font
+	 * @covers WP_Webfonts::get_enqueued_fonts
+	 */
+	public function test_wp_enqueue_webfont_register_and_enqueues_if_webfont_given_as_argument() {
+		$id = 'source-serif-pro-200-900-normal-local';
+
+		$font = array(
+			'provider'     => 'local',
+			'font-family'  => 'Source Serif Pro',
+			'font-style'   => 'normal',
+			'font-weight'  => '200 900',
+			'font-stretch' => 'normal',
+			'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+			'font-display' => 'fallback',
+		);
+
+		$expected = array(
+			$id => $font,
+		);
+
+		wp_enqueue_webfont( $id, $font );
+
+		$this->assertEquals( array(), wp_webfonts()->get_registered_fonts() );
+		$this->assertEquals( $expected, wp_webfonts()->get_enqueued_fonts() );
+	}
+
+	/**
+	 * Test wp_enqueue_font() does not enqueue a webfont that was not registered.
+	 *
+	 * @covers wp_enqueue_webfont
+	 * @covers WP_Webfonts::enqueued_font
+	 * @covers WP_Webfonts::get_enqueued_fonts
+	 * @covers WP_Webfonts::get_registered_fonts
+	 */
+	public function test_wp_enqueue_webfont_does_not_enqueue_unregistered_webfont() {
+		$id = 'source-serif-pro-200-900-normal-local';
+
+		wp_enqueue_webfont( $id );
+
+		$this->assertEquals( array(), wp_webfonts()->get_registered_fonts() );
+		$this->assertEquals( array(), wp_webfonts()->get_enqueued_fonts() );
+	}
+
+	/**
 	 * @covers wp_register_webfont
 	 * @covers WP_Webfonts::register_provider
 	 * @covers WP_Webfonts::get_providers
