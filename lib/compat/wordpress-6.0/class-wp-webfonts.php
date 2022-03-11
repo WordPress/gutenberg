@@ -19,6 +19,15 @@ class WP_Webfonts {
 	private static $template_webfonts_cache_theme_mod = 'template_webfonts';
 
 	/**
+	 * The name of the meta attribute that stores the post's webfonts cache.
+	 *
+	 * @static
+	 * @access private
+	 * @var string
+	 */
+	private static $webfonts_cache_meta_attribute = '_webfonts';
+
+	/**
 	 * An array of registered webfonts.
 	 *
 	 * @access private
@@ -68,12 +77,103 @@ class WP_Webfonts {
 		add_action( $hook, array( $this, 'generate_and_enqueue_styles' ) );
 
 		add_action( 'init', array( $this, 'register_filter_for_current_template_webfonts_enqueuing' ) );
+		add_action( 'wp_loaded', array( $this, 'enqueue_webfonts_used_in_global_styles' ) );
 
 		add_action( 'save_post_wp_template', array( $this, 'invalidate_template_webfonts_cache' ) );
 		add_action( 'save_post_wp_template_part', array( $this, 'invalidate_template_webfonts_cache' ) );
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+	}
+
+	/**
+	 * Enqueue the webfonts used in global styles by scanning the settings.
+	 */
+	public function enqueue_webfonts_used_in_global_styles() {
+		$global_styles_post_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
+
+		$webfonts_used_in_global_styles = get_post_meta( $global_styles_post_id, self::$webfonts_cache_meta_attribute, true );
+
+		if ( ! $webfonts_used_in_global_styles ) {
+			$webfonts_used_in_global_styles = $this->collect_webfonts_used_in_global_styles();
+
+			if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+				update_post_meta( $global_styles_post_id, self::$webfonts_cache_meta_attribute, $webfonts_used_in_global_styles );
+			}
+		}
+
+		$font_slugs = array_keys( $webfonts_used_in_global_styles );
+
+		foreach ( $font_slugs as $font_slug ) {
+			$this->enqueue_fonts_by_theme_json_slug( $font_slug );
+		}
+	}
+
+	/**
+	 * Collect globally used webfonts.
+	 *
+	 * @return array
+	 */
+	private function collect_webfonts_used_in_global_styles() {
+		$global_styles                  = gutenberg_get_global_styles();
+		$webfonts_used_in_global_styles = array();
+
+		if ( isset( $global_styles['blocks'] ) ) {
+			// Register used fonts from blocks.
+			foreach ( $global_styles['blocks'] as $setting ) {
+				$font_family_slug = $this->get_font_family_from_setting( $setting );
+
+				if ( $font_family_slug ) {
+					$webfonts_used_in_global_styles[ $font_family_slug ] = 1;
+				}
+			}
+		}
+
+		if ( isset( $global_styles['elements'] ) ) {
+			// Register used fonts from elements.
+			foreach ( $global_styles['elements'] as $setting ) {
+				$font_family_slug = $this->get_font_family_from_setting( $setting );
+
+				if ( $font_family_slug ) {
+					$webfonts_used_in_global_styles[ $font_family_slug ] = 1;
+				}
+			}
+		}
+
+		// Get global font.
+		$font_family_slug = $this->get_font_family_from_setting( $global_styles );
+
+		if ( $font_family_slug ) {
+			$webfonts_used_in_global_styles[ $font_family_slug ] = 1;
+		}
+
+		return $webfonts_used_in_global_styles;
+	}
+
+	/**
+	 * Get font family from global setting.
+	 *
+	 * @param mixed $setting The global setting.
+	 * @return string|false
+	 */
+	private function get_font_family_from_setting( $setting ) {
+		if ( isset( $setting['typography'] ) && isset( $setting['typography']['fontFamily'] ) ) {
+			$font_family = $setting['typography']['fontFamily'];
+
+			preg_match( '/var\(--wp--(?:preset|custom)--font-family--(?P<slug>.+)\)/', $font_family, $matches );
+
+			if ( isset( $matches['slug'] ) ) {
+				return _wp_to_kebab_case( $matches['slug'] );
+			}
+
+			preg_match( '/var:(?:preset|custom)\|font-family\|(?P<slug>.+)/', $font_family, $matches );
+
+			if ( isset( $matches['slug'] ) ) {
+				return _wp_to_kebab_case( $matches['slug'] );
+			}
+		}
+
+		return false;
 	}
 
 	/**
