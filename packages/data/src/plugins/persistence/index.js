@@ -411,6 +411,11 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 		'core/edit-post',
 		'hiddenBlockTypes'
 	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		'core/edit-post',
+		'editorMode'
+	);
 	migrateFeaturePreferencesToPreferencesStore(
 		persistence,
 		'core/edit-site'

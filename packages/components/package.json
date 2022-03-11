@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "19.5.0",
+	"version": "19.6.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
