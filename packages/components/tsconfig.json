@@ -3,7 +3,12 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ],
+		"types": [
+			"gutenberg-env",
+			"jest",
+			"@testing-library/jest-dom",
+			"snapshot-diff"
+		],
 		// Some errors in Reakit types with TypeScript 4.3
 		// Remove the following line when they've been addressed.
 		"skipLibCheck": true,

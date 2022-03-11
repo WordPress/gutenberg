@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { describe, expect, it } from '@jest/globals';
 import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
