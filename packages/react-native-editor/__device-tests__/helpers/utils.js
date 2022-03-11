@@ -454,7 +454,7 @@ const isEditorVisible = async ( driver ) => {
 		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
 		: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[contains(@name, "Post title")])`;
 
-	waitForVisible( driver, blockLocator)
+	waitForVisible( driver, blockLocator );
 };
 
 const waitForVisible = async ( driver, blockLocator, iteration = 0 ) => {
@@ -498,5 +498,5 @@ module.exports = {
 	toggleOrientation,
 	doubleTap,
 	isEditorVisible,
-	waitForVisible
+	waitForVisible,
 };
