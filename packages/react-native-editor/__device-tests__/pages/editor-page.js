@@ -159,6 +159,7 @@ class EditorPage {
 	}
 
 	async getTextViewForHtmlViewContent() {
+		// to be removed
 		const accessibilityId = 'html-view-content';
 		const blockLocator = isAndroid()
 			? `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`
