@@ -45,7 +45,10 @@ export default function EntityTypeList( {
 	const firstRecord = list[ 0 ];
 	const entityConfig = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityConfig( firstRecord.kind, firstRecord.name ),
+			select( coreStore ).getEntityConfig(
+				firstRecord.kind,
+				firstRecord.name
+			),
 		[ firstRecord.kind, firstRecord.name ]
 	);
 	const { name } = firstRecord;
