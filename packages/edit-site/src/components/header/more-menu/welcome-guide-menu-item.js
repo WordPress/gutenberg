@@ -4,17 +4,13 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { MenuItem } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../../store';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 export default function WelcomeGuideMenuItem() {
-	const { toggleFeature } = useDispatch( editSiteStore );
+	const { toggle } = useDispatch( preferencesStore );
 
 	return (
-		<MenuItem onClick={ () => toggleFeature( 'welcomeGuide' ) }>
+		<MenuItem onClick={ () => toggle( 'core/edit-site', 'welcomeGuide' ) }>
 			{ __( 'Welcome Guide' ) }
 		</MenuItem>
 	);

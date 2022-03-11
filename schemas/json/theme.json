@@ -73,6 +73,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"defaultDuotone": {
+							"description": "Allow users to choose filters from the default duotone filter presets.",
+							"type": "boolean",
+							"default": true
+						},
 						"defaultGradients": {
 							"description": "Allow users to choose colors from the default gradients.",
 							"type": "boolean",
@@ -642,7 +647,7 @@
 				}
 			},
 			"patternProperties": {
-				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
+				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				}
 			},

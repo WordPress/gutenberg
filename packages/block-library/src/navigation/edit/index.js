@@ -61,6 +61,11 @@ import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_PENDING,
 	CLASSIC_MENU_CONVERSION_SUCCESS,
 } from './use-convert-classic-menu-to-block-menu';
+import useCreateNavigationMenu, {
+	CREATE_NAVIGATION_MENU_ERROR,
+	CREATE_NAVIGATION_MENU_PENDING,
+	CREATE_NAVIGATION_MENU_SUCCESS,
+} from './use-create-navigation-menu';
 
 const EMPTY_ARRAY = [];
 
@@ -162,6 +167,51 @@ function Navigation( {
 	// the Select Menu dropdown.
 	useNavigationEntities();
 
+	const [
+		showNavigationMenuCreateNotice,
+		hideNavigationMenuCreateNotice,
+	] = useNavigationNotice( {
+		name: 'block-library/core/navigation/create',
+	} );
+
+	const {
+		create: createNavigationMenu,
+		status: createNavigationMenuStatus,
+		error: createNavigationMenuError,
+		value: createNavigationMenuPost,
+	} = useCreateNavigationMenu( clientId );
+
+	const isCreatingNavigationMenu =
+		createNavigationMenuStatus === CREATE_NAVIGATION_MENU_PENDING;
+
+	useEffect( () => {
+		hideNavigationMenuCreateNotice();
+
+		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_PENDING ) {
+			speak( __( `Creating Navigation Menu.` ) );
+		}
+
+		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_SUCCESS ) {
+			setRef( createNavigationMenuPost.id );
+			selectBlock( clientId );
+
+			showNavigationMenuCreateNotice(
+				__( `Navigation Menu successfully created.` )
+			);
+		}
+
+		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_ERROR ) {
+			showNavigationMenuCreateNotice(
+				__( 'Failed to create Navigation Menu.' )
+			);
+		}
+	}, [
+		createNavigationMenu,
+		createNavigationMenuStatus,
+		createNavigationMenuError,
+		createNavigationMenuPost,
+	] );
+
 	const {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
@@ -251,12 +301,14 @@ function Navigation( {
 	const TagName = 'nav';
 
 	// "placeholder" shown if:
-	// - we don't have a ref attribute pointing to a Navigation Post.
-	// - we are not running a menu conversion process.
-	// - we don't have uncontrolled blocks.
-	// - (legacy) we have a Navigation Area without a ref attribute pointing to a Navigation Post.
+	// - there is no ref attribute pointing to a Navigation Post.
+	// - there is no classic menu conversion process in progress.
+	// - there is no menu creation process in progress.
+	// - there are no uncontrolled blocks.
+	// - (legacy) there is a Navigation Area without a ref attribute pointing to a Navigation Post.
 	const isPlaceholder =
 		! ref &&
+		! isCreatingNavigationMenu &&
 		! isConvertingClassicMenu &&
 		( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
 
@@ -264,11 +316,13 @@ function Navigation( {
 		! isNavigationMenuMissing && isNavigationMenuResolved;
 
 	// "loading" state:
-	// - we are running the Classic Menu conversion process.
+	// - there is a menu creation process in progress.
+	// - there is a classic menu conversion process in progress.
 	// OR
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
 	const isLoading =
+		isCreatingNavigationMenu ||
 		isConvertingClassicMenu ||
 		!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu );
 
@@ -466,7 +520,7 @@ function Navigation( {
 		[ convert, handleUpdateMenu ]
 	);
 
-	const startWithEmptyMenu = useCallback( () => {
+	const resetToEmptyBlock = useCallback( () => {
 		registry.batch( () => {
 			if ( navigationArea ) {
 				setAreaMenu( 0 );
@@ -528,7 +582,7 @@ function Navigation( {
 					{ __(
 						'Navigation menu has been deleted or is unavailable. '
 					) }
-					<Button onClick={ startWithEmptyMenu } variant="link">
+					<Button onClick={ resetToEmptyBlock } variant="link">
 						{ __( 'Create a new menu?' ) }
 					</Button>
 				</Warning>
@@ -569,6 +623,7 @@ function Navigation( {
 						isResolvingCanUserCreateNavigationMenu
 					}
 					onFinish={ handleSelectNavigation }
+					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
 				/>
 			</TagName>
 		);
@@ -584,7 +639,7 @@ function Navigation( {
 								currentMenuId={ ref }
 								clientId={ clientId }
 								onSelect={ handleSelectNavigation }
-								onCreateNew={ startWithEmptyMenu }
+								onCreateNew={ resetToEmptyBlock }
 								/* translators: %s: The name of a menu. */
 								actionLabel={ __( "Switch to '%s'" ) }
 								showManageActions
@@ -739,7 +794,7 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationMenu &&
 							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
-									onDelete={ startWithEmptyMenu }
+									onDelete={ resetToEmptyBlock }
 								/>
 							) }
 					</InspectorControls>

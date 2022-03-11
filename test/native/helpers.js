@@ -11,11 +11,8 @@ import {
 	subscribeParentGetHtml,
 	provideToNative_Html as provideToNativeHtml,
 } from '@wordpress/react-native-bridge';
-// Editor component is not exposed in the pacakge because is meant to be consumed
-// internally, however we require it for rendering the editor in integration tests,
-// for this reason it's imported with path access.
-// eslint-disable-next-line no-restricted-syntax
-import Editor from '@wordpress/edit-post/src/editor';
+import { initializeEditor as internalInitializeEditor } from '@wordpress/edit-post';
+import { createElement, cloneElement } from '@wordpress/element';
 
 // Set up the mocks for getting the HTML output of the editor.
 let triggerHtmlSerialization;
@@ -87,16 +84,18 @@ export async function waitForStoreResolvers( fn ) {
  * @param {import('react').ReactNode} [options.component] A specific editor component to render.
  * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
  */
-export async function initializeEditor( props, { component = Editor } = {} ) {
+export async function initializeEditor( props, { component } = {} ) {
+	const uniqueId = uuid();
+	const postId = `post-id-${ uniqueId }`;
+	const postType = 'post';
+
 	return waitForStoreResolvers( () => {
-		const EditorComponent = component;
+		const editorElement = component
+			? createElement( component, { postType, postId } )
+			: internalInitializeEditor( uniqueId, postType, postId );
+
 		const screen = render(
-			<EditorComponent
-				postId={ `post-id-${ uuid() }` }
-				postType="post"
-				initialTitle="test"
-				{ ...props }
-			/>
+			cloneElement( editorElement, { initialTitle: 'test', ...props } )
 		);
 
 		// A layout event must be explicitly dispatched in BlockList component,

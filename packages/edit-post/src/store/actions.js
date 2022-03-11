@@ -155,11 +155,10 @@ export const toggleFeature = ( feature ) => ( { registry } ) =>
  *
  * @param {string} mode The editor mode.
  */
-export const switchEditorMode = ( mode ) => ( { dispatch, registry } ) => {
-	dispatch( {
-		type: 'SWITCH_MODE',
-		mode,
-	} );
+export const switchEditorMode = ( mode ) => ( { registry } ) => {
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/edit-post', 'editorMode', mode );
 
 	// Unselect blocks when we switch to the code editor.
 	if ( mode !== 'visual' ) {
@@ -201,20 +200,6 @@ export function updatePreferredStyleVariations( blockName, blockStyle ) {
 		type: 'UPDATE_PREFERRED_STYLE_VARIATIONS',
 		blockName,
 		blockStyle,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the editor should attempt
- * to locally autosave the current post every `interval` seconds.
- *
- * @param {number} interval The new interval, in seconds.
- * @return {Object} Action object.
- */
-export function __experimentalUpdateLocalAutosaveInterval( interval ) {
-	return {
-		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',
-		interval,
 	};
 }
 
