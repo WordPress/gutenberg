@@ -348,8 +348,8 @@ export default function NavigationSubmenuEdit( {
 
 			return {
 				isAtMaxNesting:
-					getBlockParentsByBlockName( clientId, name ).length >=
-					maxNestingLevel,
+					getBlockParentsByBlockName( selectedBlockId, name )
+						.length >= maxNestingLevel,
 				isTopLevelItem:
 					getBlockParentsByBlockName( clientId, name ).length === 0,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
