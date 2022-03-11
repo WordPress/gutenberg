@@ -524,7 +524,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// to the name to ensure uniqueness across a given post.
 	if ( isset( $seen_menu_names[ $nav_menu_name ] ) && $seen_menu_names[ $nav_menu_name ] > 1 ) {
 		$count         = $seen_menu_names[ $nav_menu_name ];
-		$nav_menu_name = $nav_menu_name . ' ' . ( $count - 1 );
+		$nav_menu_name = $nav_menu_name . ' ' . ( $count );
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes(
