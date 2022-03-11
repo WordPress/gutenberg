@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/notices",
-	"version": "3.4.0-prerelease",
+	"version": "3.4.0",
 	"description": "State management for notices.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
