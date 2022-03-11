@@ -103,6 +103,14 @@ type Resolvable<
 	? F
 	: ( ...args: Parameters< F > ) => Promise< ReturnType< F > >;
 
+type ResolvedThunks< Actions extends AnyConfig[ 'actions' ] > = {
+	[ Action in keyof Actions ]: Actions[ Action ] extends (
+		...args: infer P
+	) => ( thunkArgs: { select?: () => any; dispatch?: () => any } ) => infer R
+		? ( ...args: P ) => R
+		: Actions[ Action ];
+};
+
 /**
  * These fields are excluded from the resolveSelect mapping.
  *
@@ -122,7 +130,7 @@ export interface DataRegistry {
 	/** Returns the available actions for a given store. */
 	dispatch< StoreRef extends Stores[ keyof Stores ] | keyof Stores >(
 		store: StoreRef
-	): NonNullable< Store< StoreRef >[ 'actions' ] >;
+	): ResolvedThunks< NonNullable< Store< StoreRef >[ 'actions' ] > >;
 
 	/** Registers a new store into the registry. */
 	register( store: StoreDescriptor< any > ): void;
