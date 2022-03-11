@@ -159,15 +159,14 @@ class EditorPage {
 	}
 
 	async getTextViewForHtmlViewContent() {
-		// to be removed
 		const accessibilityId = 'html-view-content';
-		const blockLocator = isAndroid()
+		const htmlViewLocator = isAndroid()
 			? `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`
 			: `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
 
-		await waitForVisible( this.driver, blockLocator );
+		await waitForVisible( this.driver, htmlViewLocator );
 
-		return await this.driver.elementByXPath( blockLocator );
+		return await this.driver.elementByXPath( htmlViewLocator );
 	}
 
 	// Returns html content

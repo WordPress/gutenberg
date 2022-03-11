@@ -450,30 +450,30 @@ const toggleOrientation = async ( driver ) => {
 };
 
 const isEditorVisible = async ( driver ) => {
-	const blockLocator = isAndroid()
+	const postTitleLocator = isAndroid()
 		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
 		: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[contains(@name, "Post title")])`;
 
-	await waitForVisible( driver, blockLocator );
+	await waitForVisible( driver, postTitleLocator );
 };
 
-const waitForVisible = async ( driver, blockLocator, iteration = 0 ) => {
+const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	const maxIteration = 25;
 	const timeout = 1000;
 
 	if ( iteration >= maxIteration ) {
 		throw new Error(
-			`"${ blockLocator }" is still not visible after ${ iteration } retries!`
+			`"${ elementLocator }" is still not visible after ${ iteration } retries!`
 		);
 	} else if ( iteration !== 0 ) {
 		// wait 1 second before trying to locate element again
 		await driver.sleep( timeout );
 	}
 
-	const locator = await driver.elementsByXPath( blockLocator );
+	const locator = await driver.elementsByXPath( elementLocator );
 	if ( locator.length !== 1 ) {
 		// if locator is not visible, try again
-		return await waitForVisible( driver, blockLocator, iteration + 1 );
+		return await waitForVisible( driver, elementLocator, iteration + 1 );
 	}
 };
 
