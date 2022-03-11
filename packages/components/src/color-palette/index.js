@@ -226,6 +226,7 @@ export default function ColorPalette( {
 						<Flex
 							as={ 'button' }
 							justify="space-between"
+							align="flex-start"
 							className="components-color-palette__custom-color"
 							aria-expanded={ isOpen }
 							aria-haspopup="true"
