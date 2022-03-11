@@ -449,22 +449,26 @@ const toggleOrientation = async ( driver ) => {
 	}
 };
 
-const isEditorVisible = async ( driver, iteration = 0 ) => {
+const isEditorVisible = async ( driver ) => {
+	const blockLocator = isAndroid()
+		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
+		: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[contains(@name, "Post title")])`;
+
+	waitForVisible( driver, blockLocator)
+};
+
+const waitForVisible = async ( driver, blockLocator, iteration = 0 ) => {
 	const maxIteration = 25;
 	const timeout = 1000;
 
 	if ( iteration >= maxIteration ) {
 		throw new Error(
-			`Gutenberg Editor is still not visible after ${ iteration } retries!`
+			`"${ blockLocator }" is still not visible after ${ iteration } retries!`
 		);
 	} else if ( iteration !== 0 ) {
 		// wait 1 second before trying to locate element again
 		await driver.sleep( timeout );
 	}
-
-	const blockLocator = isAndroid()
-		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
-		: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[contains(@name, "Post title")])`;
 
 	const locator = await driver.elementsByXPath( blockLocator );
 	if ( locator.length !== 1 ) {
@@ -494,4 +498,5 @@ module.exports = {
 	toggleOrientation,
 	doubleTap,
 	isEditorVisible,
+	waitForVisible
 };

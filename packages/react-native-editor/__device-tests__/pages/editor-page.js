@@ -13,6 +13,7 @@ const {
 	longPressMiddleOfElement,
 	doubleTap,
 	isEditorVisible,
+	waitForVisible,
 } = require( '../helpers/utils' );
 
 const initializeEditorPage = async () => {
@@ -157,30 +158,13 @@ class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
-	async getTextViewForHtmlViewContent( iteration = 0 ) {
-		// to be removed
+	async getTextViewForHtmlViewContent() {
 		const accessibilityId = 'html-view-content';
-		const maxIteration = 25;
-		const timeout = 1000;
-
-		if ( iteration >= maxIteration ) {
-			throw new Error(
-				`Text View is still not visible after ${ iteration } retries!`
-			);
-		} else if ( iteration !== 0 ) {
-			// wait 1 second before trying to locate element again
-			await this.driver.sleep( timeout );
-		}
-
 		const blockLocator = isAndroid()
 			? `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`
 			: `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
 
-		const locator = await this.driver.elementsByXPath( blockLocator );
-		if ( locator.length !== 1 ) {
-			// if locator is not visible, try again
-			return await this.getTextViewForHtmlViewContent( iteration + 1 );
-		}
+		waitForVisible( this.driver, blockLocator );
 
 		return await this.driver.elementByXPath( blockLocator );
 	}
