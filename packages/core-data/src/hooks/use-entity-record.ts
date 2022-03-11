@@ -23,6 +23,10 @@ interface EntityRecordResolution< RecordType > {
 	status: Status;
 }
 
+interface Options {
+	execute: boolean;
+}
+
 /**
  * Resolves the specified entity record.
  *
@@ -30,6 +34,7 @@ interface EntityRecordResolution< RecordType > {
  * @param  name     Name of the requested  entity.
  * @param  recordId Record ID of the requested entity.
  *
+ * @param  options
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -58,10 +63,16 @@ interface EntityRecordResolution< RecordType > {
 export default function __experimentalUseEntityRecord< RecordType >(
 	kind: string,
 	name: string,
-	recordId: string | number
+	recordId: string | number,
+	options: Options = { execute: true }
 ): EntityRecordResolution< RecordType > {
 	const { data: record, ...rest } = useQuerySelect(
-		( query ) => query( coreStore ).getEntityRecord( kind, name, recordId ),
+		( query ) => {
+			if ( ! options.execute ) {
+				return {};
+			}
+			query( coreStore ).getEntityRecord( kind, name, recordId );
+		},
 		[ kind, name, recordId ]
 	);
 
