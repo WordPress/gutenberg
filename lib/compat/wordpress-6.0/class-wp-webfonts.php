@@ -79,10 +79,41 @@ class WP_Webfonts {
 		add_action( 'init', array( $this, 'register_filter_for_current_template_webfonts_enqueuing' ) );
 		add_action( 'wp_loaded', array( $this, 'enqueue_webfonts_used_in_global_styles' ) );
 
+		add_filter( 'the_content', array( $this, 'enqueue_webfonts_used_in_content' ) );
+
 		$this->register_webfont_cache_invalidation_actions();
 
 		// Enqueue webfonts in the block editor.
 		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
+	}
+
+	/**
+	 * Enqueue the webfonts used in the content.
+	 *
+	 * @param string $content The post content.
+	 *
+	 * @return string
+	 */
+	public function enqueue_webfonts_used_in_content( $content ) {
+		global $post;
+
+		$webfonts_used_in_post_cache = get_post_meta( $post->ID, self::$webfonts_cache_meta_attribute, true );
+
+		if ( ! $webfonts_used_in_post_cache ) {
+			$webfonts_used_in_post_cache = $this->collect_fonts_from_block_markup( $post->post_content );
+
+			if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+				update_post_meta( $post->ID, self::$webfonts_cache_meta_attribute, $webfonts_used_in_post_cache );
+			}
+		}
+
+		$font_slugs = array_keys( $webfonts_used_in_post_cache );
+
+		foreach ( $font_slugs as $font_slug ) {
+			$this->enqueue_fonts_by_theme_json_slug( $font_slug );
+		}
+
+		return $content;
 	}
 
 	/**
@@ -251,7 +282,7 @@ class WP_Webfonts {
 		$webfonts_used_in_templates = get_theme_mod( self::$template_webfonts_cache_theme_mod, array() );
 
 		if ( ! isset( $webfonts_used_in_templates[ $template_slug ] ) ) {
-			$webfonts_used_in_templates[ $template_slug ] = $this->collect_fonts_from_template( $_wp_current_template_content );
+			$webfonts_used_in_templates[ $template_slug ] = $this->collect_fonts_from_block_markup( $_wp_current_template_content );
 
 			if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
 				set_theme_mod( self::$template_webfonts_cache_theme_mod, $webfonts_used_in_templates );
@@ -312,35 +343,35 @@ class WP_Webfonts {
 	}
 
 	/**
-	 * Collect webfonts used in the template.
+	 * Collect webfonts used in block markup.
 	 *
-	 * @param string $template_content The template content.
+	 * @param string $block_markup The block markup.
 	 *
 	 * @return array
 	 */
-	private function collect_fonts_from_template( $template_content ) {
-		$webfonts_used_in_template = array();
+	private function collect_fonts_from_block_markup( $block_markup ) {
+		$webfonts_used_in_block_markup = array();
 
-		$template_blocks = parse_blocks( $template_content );
+		$template_blocks = parse_blocks( $block_markup );
 		$template_blocks = _flatten_blocks( $template_blocks );
 
 		foreach ( $template_blocks as $block ) {
 			if ( 'core/template-part' === $block['blockName'] ) {
 				$template_part          = get_block_template( get_stylesheet() . '//' . $block['attrs']['slug'], 'wp_template_part' );
-				$fonts_in_template_part = $this->collect_fonts_from_template( $template_part->content );
+				$fonts_in_template_part = $this->collect_fonts_from_block_markup( $template_part->content );
 
-				$webfonts_used_in_template = array_merge(
-					$webfonts_used_in_template,
+				$webfonts_used_in_block_markup = array_merge(
+					$webfonts_used_in_block_markup,
 					$fonts_in_template_part
 				);
 			}
 
 			if ( isset( $block['attrs']['fontFamily'] ) ) {
-				$webfonts_used_in_template[ $block['attrs']['fontFamily'] ] = 1;
+				$webfonts_used_in_block_markup[ $block['attrs']['fontFamily'] ] = 1;
 			}
 		}
 
-		return $webfonts_used_in_template;
+		return $webfonts_used_in_block_markup;
 	}
 
 	/**
