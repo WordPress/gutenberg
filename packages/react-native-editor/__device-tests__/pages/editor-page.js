@@ -176,13 +176,13 @@ class EditorPage {
 			? `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`
 			: `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
 
-		const locator = await this.driver.elementByXPath( blockLocator );
-		if ( locator === undefined ) {
-			// if locator does not exist, try again
+		const locator = await this.driver.elementsByXPath( blockLocator );
+		if ( locator.length !== 1 ) {
+			// if locator is not visible, try again
 			return await this.getTextViewForHtmlViewContent( iteration + 1 );
 		}
 
-		return locator;
+		return await this.driver.elementByXPath( blockLocator );
 	}
 
 	// Returns html content
