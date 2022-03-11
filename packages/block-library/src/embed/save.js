@@ -9,7 +9,7 @@ import classnames from 'classnames/dedupe';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { url, caption, type, providerNameSlug,margins } = attributes;
+	const { url, caption, type, providerNameSlug, margins } = attributes;
 
 	if ( ! url ) {
 		return null;
@@ -18,8 +18,8 @@ export default function save( { attributes } ) {
 	const spacings = {
 		marginTop: margins.top,
 		marginBottom: margins.bottom,
-		marginLeft: "auto",
-		marginRight: "auto",
+		marginLeft: 'auto',
+		marginRight: 'auto',
 	};
 
 	const className = classnames( 'wp-block-embed', {

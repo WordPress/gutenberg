@@ -88,8 +88,8 @@ class EmbedPreview extends Component {
 		const spacings = {
 			marginTop: margins.top,
 			marginBottom: margins.bottom,
-			marginLeft: "auto",
-			marginRight: "auto",
+			marginLeft: 'auto',
+			marginRight: 'auto',
 		};
 
 		// Disabled because the overlay div doesn't actually have a role or functionality
