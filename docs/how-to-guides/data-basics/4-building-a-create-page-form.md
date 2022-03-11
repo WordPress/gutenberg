@@ -68,7 +68,6 @@ Now that the button is in place, we may focus entirely on building the form. Thi
 Luckily, the `EditPageForm` we have built in [part three](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) already takes us 80% there. The bulk of the user interface is already there, and we will reuse it in the `CreatePageForm`. Let’s start by extracting the form UI into a separate component:
 
 ```js
-
 export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	// ...
 	return (
@@ -298,6 +297,68 @@ export function CreatePageForm( { onCancel, onSaveFinished } ) {
 			onCancel={ onCancel }
 			isSaving={ isSaving }
 		/>
+	);
+}
+
+export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+	const { page, lastError, isSaving, hasEdits } = useSelect(
+		( select ) => ( {
+			page: select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
+			lastError: select( coreDataStore ).getLastEntitySaveError( 'postType', 'page', pageId ),
+			isSaving: select( coreDataStore ).isSavingEntityRecord( 'postType', 'page', pageId ),
+			hasEdits: select( coreDataStore ).hasEditsForEntityRecord( 'postType', 'page', pageId ),
+		} ),
+		[ pageId ]
+	);
+
+	const { saveEditedEntityRecord, editEntityRecord } = useDispatch( coreDataStore );
+	const handleSave = async () => {
+		const savedRecord = await saveEditedEntityRecord( 'postType', 'page', pageId );
+		if ( savedRecord ) {
+			onSaveFinished();
+		}
+	};
+	const handleChange = ( title ) =>  editEntityRecord( 'postType', 'page', page.id, { title } );
+
+	return (
+		<PageForm
+			title={ page.title }
+			onChangeTitle={ handleChange }
+			hasEdits={ hasEdits }
+			lastError={ lastError }
+			isSaving={ isSaving }
+			onCancel={ onCancel }
+			onSave={ handleSave }
+		/>
+	);
+}
+
+export function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCancel, onSave } ) {
+	return (
+		<div className="my-gutenberg-form">
+			<TextControl
+				label="Page title:"
+				value={ title }
+				onChange={ onChangeTitle }
+			/>
+			{ lastError ? (
+				<div className="form-error">Error: { lastError.message }</div>
+			) : (
+				false
+			) }
+			<div className="form-buttons">
+				<Button
+					onClick={ onSave }
+					variant="primary"
+					disabled={ ! hasEdits || isSaving }
+				>
+					{ isSaving ? <Spinner /> : 'Save' }
+				</Button>
+				<Button onClick={ onCancel } variant="tertiary">
+					Cancel
+				</Button>
+			</div>
+		</div>
 	);
 }
 ```
