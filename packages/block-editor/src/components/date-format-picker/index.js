@@ -113,7 +113,7 @@ function CustomControls( { format, onChange } ) {
 		name: __( 'Other' ),
 		className:
 			'block-editor-date-format-picker__custom-format-select-control__other-option',
-		__experimentalHint: __( 'Choose your own date string' ),
+		__experimentalHint: __( 'Enter your own date format' ),
 	};
 
 	const [ isOther, setIsOther ] = useState(
