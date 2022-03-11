@@ -67,6 +67,7 @@ function BlockAlignmentUI( {
 	controls,
 	isToolbar,
 	isCollapsed = true,
+	isBottomSheetControl = false,
 } ) {
 	const enabledControls = useAvailableAlignments( controls );
 	const hasEnabledControls = !! enabledControls.length;
@@ -92,6 +93,7 @@ function BlockAlignmentUI( {
 		label: __( 'Align' ),
 		toggleProps: { describedBy: __( 'Change alignment' ) },
 	};
+
 	const extraProps =
 		isToolbar || Platform.isNative
 			? {
@@ -108,6 +110,9 @@ function BlockAlignmentUI( {
 							};
 						}
 					),
+					...( Platform.isNative && {
+						isBottomSheetControl,
+					} ),
 			  }
 			: {
 					children: ( { onClose } ) => {

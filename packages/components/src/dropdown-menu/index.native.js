@@ -10,7 +10,7 @@ import { Platform } from 'react-native';
 import { DOWN } from '@wordpress/keycodes';
 import { BottomSheet, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { menu } from '@wordpress/icons';
+import { Icon, chevronRight, menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -42,6 +42,7 @@ function DropdownMenu( {
 	label,
 	popoverProps,
 	toggleProps,
+	isBottomSheetControl = false,
 } ) {
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
@@ -85,7 +86,7 @@ function DropdownMenu( {
 					toggleProps
 				);
 
-				return (
+				const toolbarButton = () => (
 					<Button
 						{ ...mergedToggleProps }
 						icon={ icon }
@@ -108,6 +109,22 @@ function DropdownMenu( {
 						{ mergedToggleProps.children }
 					</Button>
 				);
+
+				const bottomSheetControl = () => (
+					<BottomSheet.Cell
+						onPress={ ( event ) => onToggle( event ) }
+						aria-haspopup="true"
+						aria-expanded={ isOpen }
+						label={ label }
+						leftAlign
+					>
+						<Icon icon={ chevronRight }></Icon>
+					</BottomSheet.Cell>
+				);
+
+				return isBottomSheetControl
+					? bottomSheetControl()
+					: toolbarButton();
 			} }
 			renderContent={ ( { isOpen, onClose, ...props } ) => {
 				return (
