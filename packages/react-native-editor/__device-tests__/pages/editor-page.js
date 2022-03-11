@@ -12,10 +12,13 @@ const {
 	swipeFromTo,
 	longPressMiddleOfElement,
 	doubleTap,
+	isEditorVisible,
+	waitForVisible,
 } = require( '../helpers/utils' );
 
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
+	await isEditorVisible( driver );
 	return new EditorPage( driver );
 };
 
@@ -36,8 +39,6 @@ class EditorPage {
 			this.accessibilityIdXPathAttrib = 'content-desc';
 			this.accessibilityIdKey = 'contentDescription';
 		}
-
-		driver.setImplicitWaitTimeout( 5000 );
 	}
 
 	async getBlockList() {
@@ -159,12 +160,13 @@ class EditorPage {
 
 	async getTextViewForHtmlViewContent() {
 		const accessibilityId = 'html-view-content';
-		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
+		const htmlViewLocator = isAndroid()
+			? `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`
+			: `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
 
-		if ( ! isAndroid() ) {
-			blockLocator = `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
-		}
-		return await this.driver.elementByXPath( blockLocator );
+		await waitForVisible( this.driver, htmlViewLocator );
+
+		return await this.driver.elementByXPath( htmlViewLocator );
 	}
 
 	// Returns html content
