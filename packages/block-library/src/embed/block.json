@@ -32,6 +32,15 @@
 		"previewable": {
 			"type": "boolean",
 			"default": true
+		},
+		"margins" :{
+			"type": "string",
+			"default" : {
+				"top": "10px",
+				"left": "10px",
+				"right": "10px",
+				"bottom": "10px"
+			}
 		}
 	},
 	"supports": {

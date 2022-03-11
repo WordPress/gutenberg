@@ -36,6 +36,7 @@ const EmbedEdit = ( props ) => {
 			previewable,
 			responsive,
 			url: attributesUrl,
+			margins,
 		},
 		attributes,
 		isSelected,
@@ -130,6 +131,10 @@ const EmbedEdit = ( props ) => {
 		} );
 	};
 
+	const addMargin = ( newMargins ) => {
+		setAttributes( { margins: newMargins } );
+	};
+
 	useEffect( () => {
 		if ( ! preview?.html || ! cannotEmbed || fetching ) {
 			return;
@@ -205,6 +210,7 @@ const EmbedEdit = ( props ) => {
 					tryAgain={ () => {
 						invalidateResolution( 'getEmbedPreview', [ url ] );
 					} }
+					margins={ margins }
 				/>
 			</View>
 		);
@@ -234,6 +240,7 @@ const EmbedEdit = ( props ) => {
 				blockSupportsResponsive={ responsive }
 				allowResponsive={ allowResponsive }
 				toggleResponsive={ toggleResponsive }
+				addMargin={ addMargin }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>
 			<View { ...blockProps }>
@@ -247,10 +254,17 @@ const EmbedEdit = ( props ) => {
 					onCaptionChange={ ( value ) =>
 						setAttributes( { caption: value } )
 					}
+					style={ {
+						marginTop: margins.top,
+						marginBottom: margins.bottom,
+						marginLeft: margins.left,
+						marginsRight: margins.right,
+					} }
 					isSelected={ isSelected }
 					icon={ icon }
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
+					margins={ margins }
 				/>
 			</View>
 		</>

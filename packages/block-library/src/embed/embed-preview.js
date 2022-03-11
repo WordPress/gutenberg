@@ -64,6 +64,7 @@ class EmbedPreview extends Component {
 			icon,
 			label,
 			insertBlocksAfter,
+			margins,
 		} = this.props;
 		const { scripts } = preview;
 		const { interactive } = this.state;
@@ -83,6 +84,13 @@ class EmbedPreview extends Component {
 			className,
 			'wp-block-embed__wrapper'
 		);
+
+		const spacings = {
+			marginTop: margins.top,
+			marginBottom: margins.bottom,
+			marginLeft: margins.left,
+			marginRight: margins.right,
+		};
 
 		// Disabled because the overlay div doesn't actually have a role or functionality
 		// as far as the user is concerned. We're just catching the first click so that
@@ -115,6 +123,7 @@ class EmbedPreview extends Component {
 				className={ classnames( className, 'wp-block-embed', {
 					'is-type-video': 'video' === type,
 				} ) }
+				style={ spacings }
 			>
 				{ previewable ? (
 					embedWrapper
