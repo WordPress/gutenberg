@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Add featured image settings to Latest Posts block [#39257]
 -   [*] Add GIF badge for animated GIFs uploaded to Image blocks [#38996]
 
 -   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
