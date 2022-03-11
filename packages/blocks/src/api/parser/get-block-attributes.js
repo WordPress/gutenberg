@@ -100,10 +100,10 @@ export function isOfTypes( value, types ) {
  * commentAttributes returns the attribute value depending on its source
  * definition of the given attribute key.
  *
- * @param {string} attributeKey      Attribute key.
- * @param {Object} attributeSchema   Attribute's schema.
- * @param {string} innerHTML         Block's raw content.
- * @param {Object} commentAttributes Block's comment attributes.
+ * @param {string}      attributeKey      Attribute key.
+ * @param {Object}      attributeSchema   Attribute's schema.
+ * @param {string|Node} innerHTML         Block's raw content.
+ * @param {Object}      commentAttributes Block's comment attributes.
  *
  * @return {*} Attribute value.
  */
@@ -113,7 +113,6 @@ export function getBlockAttribute(
 	innerHTML,
 	commentAttributes
 ) {
-	const { type, enum: enumSet } = attributeSchema;
 	let value;
 
 	switch ( attributeSchema.source ) {
@@ -136,14 +135,17 @@ export function getBlockAttribute(
 			break;
 	}
 
-	if ( ! isValidByType( value, type ) || ! isValidByEnum( value, enumSet ) ) {
+	if (
+		! isValidByType( value, attributeSchema.type ) ||
+		! isValidByEnum( value, attributeSchema.enum )
+	) {
 		// Reject the value if it is not valid. Reverting to the undefined
 		// value ensures the default is respected, if applicable.
 		value = undefined;
 	}
 
 	if ( value === undefined ) {
-		return attributeSchema.default;
+		value = attributeSchema.default;
 	}
 
 	return value;
@@ -222,23 +224,34 @@ export function matcherFromSource( sourceConfig ) {
 }
 
 /**
+ * Parse a HTML string into DOM tree.
+ *
+ * @param {string|Node} innerHTML HTML string or already parsed DOM node.
+ *
+ * @return {Node} Parsed DOM node.
+ */
+function parseHtml( innerHTML ) {
+	return hpqParse( innerHTML, ( h ) => h );
+}
+
+/**
  * Given a block's raw content and an attribute's schema returns the attribute's
  * value depending on its source.
  *
- * @param {string} innerHTML       Block's raw content.
- * @param {Object} attributeSchema Attribute's schema.
+ * @param {string|Node} innerHTML       Block's raw content.
+ * @param {Object}      attributeSchema Attribute's schema.
  *
  * @return {*} Attribute value.
  */
 export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
-	return hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+	return matcherFromSource( attributeSchema )( parseHtml( innerHTML ) );
 }
 
 /**
  * Returns the block attributes of a registered block node given its type.
  *
  * @param {string|Object} blockTypeOrName Block type or name.
- * @param {string}        innerHTML       Raw block content.
+ * @param {string|Node}   innerHTML       Raw block content.
  * @param {?Object}       attributes      Known block attributes (from delimiters).
  *
  * @return {Object} All block attributes.
@@ -248,17 +261,11 @@ export function getBlockAttributes(
 	innerHTML,
 	attributes = {}
 ) {
+	const doc = parseHtml( innerHTML );
 	const blockType = normalizeBlockType( blockTypeOrName );
-	const blockAttributes = mapValues(
-		blockType.attributes,
-		( attributeSchema, attributeKey ) => {
-			return getBlockAttribute(
-				attributeKey,
-				attributeSchema,
-				innerHTML,
-				attributes
-			);
-		}
+
+	const blockAttributes = mapValues( blockType.attributes, ( schema, key ) =>
+		getBlockAttribute( key, schema, doc, attributes )
 	);
 
 	return applyFilters(
