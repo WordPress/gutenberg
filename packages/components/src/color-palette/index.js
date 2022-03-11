@@ -139,10 +139,7 @@ const extractColorNameFromCurrentValue = (
 	let colorNameToReturn;
 
 	if ( showMultiplePalettes ) {
-		for ( const {
-			name: colorPaletteName,
-			colors: colorPaletteColors,
-		} of colors ) {
+		for ( const { colors: colorPaletteColors } of colors ) {
 			for ( const {
 				name: colorName,
 				color: colorValue,
@@ -151,9 +148,7 @@ const extractColorNameFromCurrentValue = (
 					colord( currentValue ).toHex() ===
 					colord( colorValue ).toHex()
 				) {
-					return `${ colorName }${
-						colorPaletteName ? ` (${ colorPaletteName })` : ''
-					}`;
+					return colorName;
 				}
 			}
 		}
