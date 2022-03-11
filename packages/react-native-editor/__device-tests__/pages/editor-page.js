@@ -182,7 +182,6 @@ class EditorPage {
 		}
 
 		return locator;
-		
 	}
 
 	// Returns html content
