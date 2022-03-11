@@ -93,14 +93,12 @@ function CustomControls( { format, onChange } ) {
 	// languages will use the same format string for short, medium, and long
 	// formats.
 	const suggestedFormats = uniq( [
-		_x( 'n/j/Y', 'short date format' ),
-		_x( 'M j, Y', 'medium date format' ),
-		_x( 'F j, Y', 'long date format' ),
-		_x( 'l, F j, Y', 'full date format' ),
-		_x( 'n/j/Y g:i A', 'short date format with time' ),
-		_x( 'M j, Y g:i A', 'medium date format with time' ),
-		_x( 'F j, Y g:i A', 'long date format with time' ),
 		'Y-m-d',
+		_x( 'n/j/Y', 'short date format' ),
+		_x( 'n/j/Y g:i A', 'short date format with time' ),
+		_x( 'M j, Y', 'medium date format' ),
+		_x( 'M j, Y g:i A', 'medium date format with time' ),
+		_x( 'F j, Y', 'long date format' ),
 	] );
 
 	const suggestedOptions = suggestedFormats.map(
