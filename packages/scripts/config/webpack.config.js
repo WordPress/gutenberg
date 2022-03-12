@@ -192,13 +192,22 @@ const config = {
 				],
 			},
 			{
-				test: /\.svg$/,
+				test: /\.svg$/i,
 				issuer: /\.(j|t)sx?$/,
-				use: [ '@svgr/webpack', 'url-loader' ],
-				type: 'javascript/auto',
+				type: 'asset/resource',
+				resourceQuery: /url/, // *.svg?url
+				generator: {
+					filename: 'images/[name].[hash:8][ext]',
+				},
 			},
 			{
-				test: /\.svg$/,
+				test: /\.svg$/i,
+				issuer: /\.(j|t)sx?$/,
+				resourceQuery: { not: [ /url/ ] }, // exclude react component if *.svg?url
+				use: [ '@svgr/webpack' ],
+			},
+			{
+				test: /\.svg$/i,
 				issuer: /\.(sc|sa|c)ss$/,
 				type: 'asset/inline',
 			},

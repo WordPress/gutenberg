@@ -6,6 +6,9 @@ const { hasBabelConfig } = require( '../utils' );
 const eslintConfig = {
 	root: true,
 	extends: [ 'plugin:@wordpress/eslint-plugin/recommended' ],
+	settings: {
+		'import/resolver': 'webpack',
+	},
 };
 
 if ( ! hasBabelConfig() ) {
