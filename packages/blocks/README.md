@@ -631,6 +631,7 @@ _Related_
 _Parameters_
 
 -   _content_ `string`: The post content.
+-   _options_ `ParseOptions`: Extra options for handling block parsing.
 
 _Returns_
 

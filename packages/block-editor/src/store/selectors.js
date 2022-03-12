@@ -1914,7 +1914,9 @@ export const __experimentalGetParsedPattern = createSelector(
 		}
 		return {
 			...pattern,
-			blocks: parse( pattern.content ),
+			blocks: parse( pattern.content, {
+				__unstableSkipMigrationLogs: true,
+			} ),
 		};
 	},
 	( state ) => [ state.settings.__experimentalBlockPatterns ]

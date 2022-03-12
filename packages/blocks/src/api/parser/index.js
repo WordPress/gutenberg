@@ -51,6 +51,11 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  */
 
 /**
+ * @typedef  {Object}  ParseOptions
+ * @property {boolean} __unstableSkipMigrationLogs If a block is migrated from a deprecated version, skip logging the migration details.
+ */
+
+/**
  * Convert legacy blocks to their canonical form. This function is used
  * both in the parser level for previous content and to convert such blocks
  * used in Custom Post Types templates.
@@ -179,11 +184,12 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
 /**
  * Given a raw block returned by grammar parsing, returns a fully parsed block.
  *
- * @param {WPRawBlock} rawBlock The raw block object.
+ * @param {WPRawBlock}   rawBlock The raw block object.
+ * @param {ParseOptions} options  Extra options for handling block parsing.
  *
  * @return {WPBlock} Fully parsed block.
  */
-export function parseRawBlock( rawBlock ) {
+export function parseRawBlock( rawBlock, options ) {
 	let normalizedBlock = normalizeRawBlock( rawBlock );
 
 	// During the lifecycle of the project, we renamed some old blocks
@@ -214,7 +220,7 @@ export function parseRawBlock( rawBlock ) {
 
 	// Parse inner blocks recursively.
 	const parsedInnerBlocks = normalizedBlock.innerBlocks
-		.map( parseRawBlock )
+		.map( ( innerBlock ) => parseRawBlock( innerBlock, options ) )
 		// See https://github.com/WordPress/gutenberg/pull/17164.
 		.filter( ( innerBlock ) => !! innerBlock );
 
@@ -253,7 +259,11 @@ export function parseRawBlock( rawBlock ) {
 		updatedBlock.__unstableBlockSource = rawBlock;
 	}
 
-	if ( ! validatedBlock.isValid && updatedBlock.isValid ) {
+	if (
+		! validatedBlock.isValid &&
+		updatedBlock.isValid &&
+		! options?.__unstableSkipMigrationLogs
+	) {
 		/* eslint-disable no-console */
 		console.groupCollapsed( 'Updated Block: %s', blockType.name );
 		console.info(
@@ -288,13 +298,14 @@ export function parseRawBlock( rawBlock ) {
  * @see
  * https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/
  *
- * @param {string} content The post content.
+ * @param {string}       content The post content.
+ * @param {ParseOptions} options Extra options for handling block parsing.
  *
  * @return {Array} Block list.
  */
-export default function parse( content ) {
+export default function parse( content, options ) {
 	return grammarParse( content ).reduce( ( accumulator, rawBlock ) => {
-		const block = parseRawBlock( rawBlock );
+		const block = parseRawBlock( rawBlock, options );
 		if ( block ) {
 			accumulator.push( block );
 		}
