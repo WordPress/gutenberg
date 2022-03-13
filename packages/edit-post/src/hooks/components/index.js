@@ -58,14 +58,17 @@ const addFeaturedImageToolbarItem = createHigherOrderComponent(
 				}
 			}, [ mediaUrl ] );
 
-			if ( 'core/image' !== blockName && 'core/cover' !== blockName ) {
+			if (
+				( 'core/image' !== blockName && 'core/cover' !== blockName ) ||
+				! mediaUrl
+			) {
 				return <BlockEdit { ...props } />;
 			}
 			return (
 				<>
 					<BlockControls group="other">
 						<ToolbarButton
-							icon={ group }
+							icon={ group /*this is temporary*/ }
 							label={ __( 'Use featured image' ) }
 							onClick={ () => {
 								setBindFeaturedImage( ! bindFeaturedImage );
