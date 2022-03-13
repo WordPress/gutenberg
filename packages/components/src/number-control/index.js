@@ -147,10 +147,12 @@ export function NumberControl(
 		}
 
 		/**
-		 * Handles commit (ENTER key press or on blur if isPressEnterToChange)
+		 * Handles ENTER key press or commits. The latter originates from blur
+		 * events or ENTER key presses when isPressEnterToChange is true).
 		 */
 		if (
-			type === inputControlActionTypes.PRESS_ENTER ||
+			( type === inputControlActionTypes.PRESS_ENTER &&
+				! state.isPressEnterToChange ) ||
 			type === inputControlActionTypes.COMMIT
 		) {
 			const applyEmptyValue = required === false && currentValue === '';
@@ -158,9 +160,18 @@ export function NumberControl(
 			state.value = applyEmptyValue
 				? currentValue
 				: constrainValue( currentValue );
+
+			state.error = null;
 		}
 
 		return state;
+	};
+
+	const onValidate = ( nextValue, event ) => {
+		props.onValidate?.( nextValue, event );
+		if ( ! event.target.validity.valid ) {
+			throw new Error( event.target.validationMessage );
+		}
 	};
 
 	return (
@@ -175,6 +186,7 @@ export function NumberControl(
 			label={ label }
 			max={ max }
 			min={ min }
+			onValidate={ onValidate }
 			ref={ ref }
 			required={ required }
 			step={ step }
