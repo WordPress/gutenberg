@@ -57,7 +57,7 @@ function block_core_gallery_render( $attributes, $content ) {
 		$content,
 		1
 	);
-	$gap_value = $gap ? $gap : 'var( --wp--style--block-gap, 0.5em )';
+	$gap_value = $gap ? $gap : 'var( --wp--style--block-gap, 16px )';
 	$style     = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_value . '}';
 	// Ideally styles should be loaded in the head, but blocks may be parsed
 	// after that, so loading in the footer for now.

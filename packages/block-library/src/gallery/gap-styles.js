@@ -9,7 +9,7 @@ export default function GapStyles( { blockGap, clientId } ) {
 
 	const gap = blockGap
 		? `#block-${ clientId } { --wp--style--unstable-gallery-gap: ${ blockGap } }`
-		: `#block-${ clientId } { --wp--style--unstable-gallery-gap: var( --wp--style--block-gap, 0.5em ) }`;
+		: `#block-${ clientId } { --wp--style--unstable-gallery-gap: var( --wp--style--block-gap, 16px ) }`;
 
 	const GapStyle = () => {
 		return <style>{ gap }</style>;
