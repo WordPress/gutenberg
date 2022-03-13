@@ -28,6 +28,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 	$ancestor_ids       = array();
 	$has_post_hierarchy = is_post_type_hierarchical( $post_type );
+	$show_current_page  = ! empty( $attributes['showCurrentPageTitle'] );
 
 	if ( $has_post_hierarchy ) {
 		$ancestor_ids = get_post_ancestors( $post_id );
@@ -38,7 +39,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	} else {
 		$terms = get_the_terms( $post_id, 'category' );
 
-		if ( ! $terms || is_wp_error( $terms ) ) {
+		if ( empty( $terms ) || is_wp_error( $terms ) ) {
 			return '';
 		}
 
@@ -81,7 +82,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	}
 
 	// Append current page title if set to show.
-	if ( ! empty( $attributes['showCurrentPageTitle'] ) ) {
+	if ( $show_current_page ) {
 		$breadcrumbs[] = array(
 			'url'   => get_the_permalink( $post_id ),
 			'title' => get_the_title( $post_id ),
@@ -97,7 +98,8 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$breadcrumb['title'],
 			$attributes,
 			$index,
-			$show_separator
+			$show_separator,
+			( $show_current_page && $index === count( $breadcrumbs ) -1 )
 		);
 	}
 
@@ -117,7 +119,12 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class'      => $classnames,
+			'aria-label' => __( 'Breadcrumb' ),
+		)
+	);
 
 	return sprintf(
 		'<nav %1$s><ol itemscope itemtype="https://schema.org/BreadcrumbList">%2$s</ol></nav>',
@@ -139,7 +146,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
  *
  * @return string The markup for a single breadcrumb item wrapped in an `li` element.
  */
-function build_block_core_breadcrumbs_inner_markup_item( $url, $title, $attributes, $index, $show_separator = true ) {
+function build_block_core_breadcrumbs_inner_markup_item( $url, $title, $attributes, $index, $show_separator = true, $is_current_page = false ) {
 	$li_class        = 'wp-block-breadcrumbs__item';
 	$separator_class = 'wp-block-breadcrumbs__separator';
 
@@ -159,8 +166,9 @@ function build_block_core_breadcrumbs_inner_markup_item( $url, $title, $attribut
 	}
 
 	$markup .= sprintf(
-		'<a itemprop="item" href="%s">%s%s</a>',
+		'<a itemprop="item" href="%s"%s>%s%s</a>',
 		esc_url( $url ),
+		$is_current_page ? ' aria-current="page"' : '',
 		sprintf( '<span itemprop="name">%s</span>', wp_kses_post( $title ) ),
 		sprintf( '<meta itemprop="position" content="%s" />', $index + 1 )
 	);
@@ -170,7 +178,7 @@ function build_block_core_breadcrumbs_inner_markup_item( $url, $title, $attribut
 		! empty( $attributes['separator'] )
 	) {
 		$markup .= sprintf(
-			'<span class="%1$s">%2$s</span>',
+			'<span class="%1$s" aria-hidden="true">%2$s</span>',
 			$separator_class,
 			wp_kses_post( $attributes['separator'] )
 		);

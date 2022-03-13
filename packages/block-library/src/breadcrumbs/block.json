@@ -43,13 +43,6 @@
 			}
 		},
 		"html": false,
-		"spacing": {
-			"padding": true,
-			"blockGap": true,
-			"__experimentalDefaultControls": {
-				"blockGap": true
-			}
-		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

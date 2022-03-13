@@ -51,7 +51,7 @@ Displays breadcrumbs of a page's hierarchy, or a post's categories ([Source](htt
 
 -	**Name:** core/breadcrumbs
 -	**Category:** design
--	**Supports:** align (full, wide), color (link, text, ~~background~~), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (link, text, ~~background~~), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** contentJustification, separator, showCurrentPageTitle, showLeadingSeparator, showSiteTitle, siteTitleOverride
 
 ## Button
