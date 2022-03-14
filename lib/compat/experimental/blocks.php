@@ -63,8 +63,7 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 				$comment_args['paged'] = ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
 			}
 		}
-
-		if ( '' === $page && $comment_args['paged'] ) {
+		if ( empty($page) && $comment_args['paged'] ) {
 			set_query_var( 'cpage', $comment_args['paged'] );
 		}
 
