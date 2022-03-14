@@ -30,6 +30,10 @@ import { getEditedPostContent } from './get-edited-post-content';
 import { wpDataSelect } from './wp-data-select';
 import { toggleMoreMenu } from './toggle-more-menu';
 import { saveDraft } from './save-draft';
+import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
+import { togglePreferencesOption } from './toggle-preferences-option';
+import { getAllBlockInserterItemTitles } from './get-all-block-inserter-item-titles';
+import { closeGlobalBlockInserter } from './inserter/close-global-block-interser';
 
 class PageUtils {
 	browser: Browser;
@@ -66,6 +70,10 @@ class PageUtils {
 	wpDataSelect = wpDataSelect;
 	toggleMoreMenu = toggleMoreMenu;
 	saveDraft = saveDraft;
+	openDocumentSettingsSidebar = openDocumentSettingsSidebar;
+	togglePreferencesOption = togglePreferencesOption;
+	getAllBlockInserterItemTitles = getAllBlockInserterItemTitles;
+	closeGlobalBlockInserter = closeGlobalBlockInserter;
 }
 
 export { PageUtils };
