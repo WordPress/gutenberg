@@ -28,12 +28,16 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 	$ancestor_ids       = array();
 	$has_post_hierarchy = is_post_type_hierarchical( $post_type );
+	$show_site_title    = ! empty( $attributes['showSiteTitle'] );
 	$show_current_page  = ! empty( $attributes['showCurrentPageTitle'] );
 
 	if ( $has_post_hierarchy ) {
 		$ancestor_ids = get_post_ancestors( $post_id );
 
-		if ( empty( $ancestor_ids ) ) {
+		if (
+			empty( $ancestor_ids ) &&
+			! ( $show_site_title && $show_current_page )
+		) {
 			return '';
 		}
 	} else {
@@ -53,7 +57,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 	// Prepend site title breadcrumb if available and set to show.
 	$site_title = get_bloginfo( 'name' );
-	if ( $site_title && ! empty( $attributes['showSiteTitle'] ) ) {
+	if ( $site_title && $show_site_title ) {
 		$site_title = ! empty( $attributes['siteTitleOverride'] ) ?
 			$attributes['siteTitleOverride'] :
 			$site_title;
