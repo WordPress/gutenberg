@@ -258,21 +258,16 @@ test( 'fires onChange when a new value is typed', () => {
 
 ```javascript
 
-import { render as RTLrender, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-function render(jsx) {
-	return {
-		user: userEvent.setup(),
-		...RTLrender(jsx),
-	}
-}
-
 test('fires onChange when a new value is typed', async () => {
+	const user = userEvent.setup();
+
 	const spyOnChange = jest.fn();
 
 	// A component with one `input` and one `select`.
-	const { user } = render( <MyComponent onChange={ spyOnChange } /> );
+	render( <MyComponent onChange={ spyOnChange } /> );
 
 	const input = screen.getByRole( 'textbox' );
 	// Focus element, select all contents, delete contents as per browser menu
