@@ -182,13 +182,33 @@ export function isValidByEnum( value, enumSet ) {
 }
 
 /**
+ * Memoize one-parameter function using a WeakMap.
+ *
+ * @param {Function} fn Function to memoize.
+ *
+ * @return {Function} The same function memoized.
+ */
+function memoize( fn ) {
+	const cache = new WeakMap();
+
+	return function ( param ) {
+		let result = cache.get( param );
+		if ( result === undefined ) {
+			result = fn( param );
+			cache.set( param, result );
+		}
+		return result;
+	};
+}
+
+/**
  * Returns an hpq matcher given a source object.
  *
  * @param {Object} sourceConfig Attribute Source object.
  *
  * @return {Function} A hpq Matcher.
  */
-export function matcherFromSource( sourceConfig ) {
+export const matcherFromSource = memoize( ( sourceConfig ) => {
 	switch ( sourceConfig.source ) {
 		case 'attribute':
 			let matcher = attr( sourceConfig.selector, sourceConfig.attribute );
@@ -221,7 +241,7 @@ export function matcherFromSource( sourceConfig ) {
 			// eslint-disable-next-line no-console
 			console.error( `Unknown source type "${ sourceConfig.source }"` );
 	}
-}
+} );
 
 /**
  * Parse a HTML string into DOM tree.
