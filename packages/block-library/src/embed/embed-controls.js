@@ -7,7 +7,6 @@ import {
 	PanelBody,
 	ToggleControl,
 	ToolbarGroup,
-	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { edit } from '@wordpress/icons';
@@ -29,7 +28,6 @@ const EmbedControls = ( {
 	allowResponsive,
 	toggleResponsive,
 	switchBackToURLInput,
-	addMargin,
 } ) => (
 	<>
 		<BlockControls>
@@ -46,15 +44,6 @@ const EmbedControls = ( {
 		</BlockControls>
 		{ themeSupportsResponsive && blockSupportsResponsive && (
 			<InspectorControls>
-				<PanelBody
-					title={ __( 'Spacing settings' ) }
-					className="blocks-responsive"
-				>
-					<BoxControl
-						label={ __( 'Margin' ) }
-						onChange={ addMargin }
-					/>
-				</PanelBody>
 				<PanelBody
 					title={ __( 'Media settings' ) }
 					className="blocks-responsive"

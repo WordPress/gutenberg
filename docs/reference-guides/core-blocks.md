@@ -221,8 +221,8 @@ Add a block that displays content pulled from other sites, like Twitter or YouTu
 
 -	**Name:** core/embed
 -	**Category:** embed
--	**Supports:** align
--	**Attributes:** allowResponsive, caption, margins, previewable, providerNameSlug, responsive, type, url
+-	**Supports:** align, spacing (margin)
+-	**Attributes:** allowResponsive, caption, previewable, providerNameSlug, responsive, type, url
 
 ## File
 

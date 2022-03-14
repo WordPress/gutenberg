@@ -9,18 +9,11 @@ import classnames from 'classnames/dedupe';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { url, caption, type, providerNameSlug, margins } = attributes;
+	const { url, caption, type, providerNameSlug } = attributes;
 
 	if ( ! url ) {
 		return null;
 	}
-
-	const spacings = {
-		marginTop: margins.top,
-		marginBottom: margins.bottom,
-		marginLeft: 'auto',
-		marginRight: 'auto',
-	};
 
 	const className = classnames( 'wp-block-embed', {
 		[ `is-type-${ type }` ]: type,
@@ -29,7 +22,7 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<figure { ...useBlockProps.save( { className } ) } style={ spacings }>
+		<figure { ...useBlockProps.save( { className } ) }>
 			<div className="wp-block-embed__wrapper">
 				{ `\n${ url }\n` /* URL needs to be on its own line. */ }
 			</div>
