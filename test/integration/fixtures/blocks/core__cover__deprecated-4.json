@@ -5,6 +5,7 @@
 		"attributes": {
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"id": 35,
+			"isRepeated": false,
 			"hasParallax": false,
 			"dimRatio": 50,
 			"backgroundType": "image",

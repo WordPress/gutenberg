@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import { identity, xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
+import { identity, xor, fromPairs, includes, stubTrue } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -407,9 +407,7 @@ export const isEqualAttributesOfName = {
 			...[ actual, expected ].map( getTextPiecesSplitOnWhitespace )
 		).length;
 	},
-	style: ( actual, expected ) => {
-		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
-	},
+	style: () => true,
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
 	...fromPairs(
