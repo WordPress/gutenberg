@@ -14,7 +14,16 @@
  *
  * @return string Returns the next posts link for the query pagination.
  */
+
+
+function alpineJS() {
+    return '@click.prevent="count++"';
+}
+
 function render_block_core_query_pagination_next( $attributes, $content, $block ) {
+	if( ! wp_script_is( 'alpine', 'enqueued' ) ) {
+		wp_enqueue_script( 'alpine', 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js', null, '1.0', true );
+	}
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
@@ -25,22 +34,23 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	$pagination_arrow   = get_query_pagination_arrow( $block, true );
 
 	if ( $pagination_arrow ) {
-		$label .= $pagination_arrow;
+		$label .= $pagination_arrow.'';
 	}
 	$content = '';
-
 	// Check if the pagination is for Query that inherits the global context.
 	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
 		$filter_link_attributes = function() use ( $wrapper_attributes ) {
 			return $wrapper_attributes;
 		};
 		add_filter( 'next_posts_link_attributes', $filter_link_attributes );
+		
 		// Take into account if we have set a bigger `max page`
 		// than what the query has.
 		global $wp_query;
 		if ( $max_page > $wp_query->max_num_pages ) {
 			$max_page = $wp_query->max_num_pages;
 		}
+		add_filter('next_posts_link_attributes', 'alpineJS');
 		$content = get_next_posts_link( $label, $max_page );
 		remove_filter( 'next_posts_link_attributes', $filter_link_attributes );
 	} elseif ( ! $max_page || $max_page > $page ) {
@@ -51,12 +61,13 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 				'<a href="%1$s" %2$s>%3$s</a>',
 				esc_url( add_query_arg( $page_key, $page + 1 ) ),
 				$wrapper_attributes,
-				$label
+				$label,
 			);
 		}
 		wp_reset_postdata(); // Restore original Post Data.
 	}
-	return $content;
+
+	return sprintf('%1$s %2$s', alpineJS(), $content);
 }
 
 /**
