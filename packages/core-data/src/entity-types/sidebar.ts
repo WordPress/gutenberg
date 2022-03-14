@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-import { Widget } from './widget';
-import { Context, OmitNevers } from './helpers';
+import type { Widget } from './widget';
+import type { Context, OmitNevers } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface Sidebar< C extends Context > {
 			/**
 			 * ID of sidebar.
@@ -56,5 +56,5 @@ declare module './base-entity-types' {
 type SidebarStatus = 'active' | 'inactive';
 
 export type Sidebar< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Sidebar< C >
+	_BaseEntityRecords.Sidebar< C >
 >;
