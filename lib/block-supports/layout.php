@@ -233,6 +233,7 @@ add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container'
  * to avoid breaking styles relying on that div.
  *
  * @param string $block_content Rendered block content.
+ * @param  array  $block        Block object.
  * @return string Filtered block content.
  */
 function gutenberg_restore_image_outer_container( $block_content, $block ) {
