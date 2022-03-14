@@ -81,10 +81,13 @@ export function isItemPinned( state, scope, item ) {
  */
 export const isFeatureActive = createRegistrySelector(
 	( select ) => ( state, scope, featureName ) => {
-		deprecated( `wp.select( 'core/interface' ).isFeatureActive`, {
-			version: '6.0',
-			alternative: `wp.select( 'core/preferences' ).isFeatureActive`,
-		} );
+		deprecated(
+			`wp.select( 'core/interface' ).isFeatureActive( scope, featureName )`,
+			{
+				version: '6.0',
+				alternative: `!! wp.select( 'core/preferences' ).isFeatureActive( scope, featureName )`,
+			}
+		);
 
 		return !! select( preferencesStore ).get( scope, featureName );
 	}
