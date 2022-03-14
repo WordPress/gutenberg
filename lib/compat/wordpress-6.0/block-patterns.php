@@ -79,6 +79,7 @@ function gutenberg_register_theme_block_patterns() {
 		'categories'    => 'Categories',
 		'keywords'      => 'Keywords',
 		'blockTypes'    => 'Block Types',
+		'inserter'      => 'Inserter',
 	);
 
 	// Register patterns for the active theme, for both parent and child theme,
@@ -105,24 +106,31 @@ function gutenberg_register_theme_block_patterns() {
 
 					// For properties of type array, parse data as comma-separated.
 					foreach ( array( 'categories', 'keywords', 'blockTypes' ) as $property ) {
-						$pattern_data[ $property ] = array_filter(
-							preg_split(
-								'/[\s,]+/',
-								(string) $pattern_data[ $property ]
-							)
-						);
+						if ( ! empty( $pattern_data[ $property ] ) ) {
+							$pattern_data[ $property ] = array_filter(
+								preg_split(
+									'/[\s,]+/',
+									(string) $pattern_data[ $property ]
+								)
+							);
+						} else unset( $pattern_data[ $property ] );
 					}
 
 					// Parse properties of type int.
 					foreach ( array( 'viewportWidth' ) as $property ) {
-						$pattern_data[ $property ] = (int) $pattern_data[ $property ];
+						if ( ! empty( $pattern_data[ $property ] ) ) {
+							$pattern_data[ $property ] = (int) $pattern_data[ $property ];
+						} else unset( $pattern_data[ $property ] );
 					}
 
-					// Remove up empty values, so as not to override defaults.
-					foreach ( array_keys( $default_headers ) as $property ) {
-						if ( empty( $pattern_data[ $property ] ) ) {
-							unset( $pattern_data[ $property ] );
-						}
+					// Parse properties of type bool.
+					foreach ( array( 'inserter' ) as $property ) {
+						if ( ! empty( $pattern_data[ $property ] ) ) {
+							$pattern_data[ $property ] = in_array(
+								strtolower( $pattern_data[ $property ] ),
+								array( "yes", "true" )
+							);
+						} else unset( $pattern_data[ $property ] );
 					}
 
 					// The actual pattern content is the output of the file.
