@@ -29,6 +29,7 @@ import { clickOnMoreMenuItem } from './click-on-more-menu-item';
 import { getEditedPostContent } from './get-edited-post-content';
 import { wpDataSelect } from './wp-data-select';
 import { toggleMoreMenu } from './toggle-more-menu';
+import { saveDraft } from './save-draft';
 
 class PageUtils {
 	browser: Browser;
@@ -64,6 +65,7 @@ class PageUtils {
 	getEditedPostContent = getEditedPostContent;
 	wpDataSelect = wpDataSelect;
 	toggleMoreMenu = toggleMoreMenu;
+	saveDraft = saveDraft;
 }
 
 export { PageUtils };
