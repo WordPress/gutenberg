@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/custom-templated-path-webpack-plugin",
-	"version": "2.1.1",
+	"version": "2.1.2",
 	"description": "Webpack plugin for creating custom path template tags.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+export type { Context, Updatable } from './helpers';
 import type { Attachment } from './attachment';
 import type { Comment } from './comment';
 import type { MenuLocation } from './menu-location';
@@ -20,13 +21,10 @@ import type { Widget } from './widget';
 import type { WidgetType } from './widget-type';
 import type { WpTemplate } from './wp-template';
 import type { WpTemplatePart } from './wp-template-part';
-import type { Context, Updatable } from './helpers';
 
-export type { BaseEntityTypes } from './base-entity-types';
+export type { BaseEntityRecords } from './base-entity-records';
 
 export type {
-	Context,
-	Updatable,
 	Attachment,
 	Comment,
 	MenuLocation,

@@ -201,7 +201,7 @@ describe( 'getEntityRecords', () => {
 			dispatch.__unstableAcquireStoreLock
 		).toHaveBeenCalledWith(
 			'core',
-			[ 'entities', 'data', 'root', 'postType' ],
+			[ 'entities', 'records', 'root', 'postType' ],
 			{ exclusive: false }
 		);
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
@@ -393,14 +393,14 @@ describe( 'getAutosaves', () => {
 		const postType = 'post';
 		const postId = 1;
 		const restBase = 'posts';
-		const postEntity = { rest_base: restBase };
+		const postEntityConfig = { rest_base: restBase };
 
 		triggerFetch.mockImplementation( () => SUCCESSFUL_RESPONSE );
 		const dispatch = Object.assign( jest.fn(), {
 			receiveAutosaves: jest.fn(),
 		} );
 		const resolveSelect = Object.assign( jest.fn(), {
-			getPostType: jest.fn( () => postEntity ),
+			getPostType: jest.fn( () => postEntityConfig ),
 		} );
 		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
@@ -417,14 +417,14 @@ describe( 'getAutosaves', () => {
 		const postType = 'post';
 		const postId = 1;
 		const restBase = 'posts';
-		const postEntity = { rest_base: restBase };
+		const postEntityConfig = { rest_base: restBase };
 
 		triggerFetch.mockImplementation( () => [] );
 		const dispatch = Object.assign( jest.fn(), {
 			receiveAutosaves: jest.fn(),
 		} );
 		const resolveSelect = Object.assign( jest.fn(), {
-			getPostType: jest.fn( () => postEntity ),
+			getPostType: jest.fn( () => postEntityConfig ),
 		} );
 		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 

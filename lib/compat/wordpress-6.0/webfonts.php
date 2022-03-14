@@ -16,14 +16,14 @@
  * @return WP_Webfonts Instance of the controller.
  */
 function wp_webfonts() {
-	static $instance;
+	global $wp_webfonts;
 
-	if ( ! $instance instanceof WP_Webfonts ) {
-		$instance = new WP_Webfonts();
-		$instance->init();
+	if ( ! $wp_webfonts instanceof WP_Webfonts ) {
+		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts->init();
 	}
 
-	return $instance;
+	return $wp_webfonts;
 }
 
 /**

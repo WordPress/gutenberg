@@ -24,7 +24,7 @@ import * as styles from './styles';
 import { useCx } from '../../utils/hooks';
 import Tooltip from '../../tooltip';
 
-const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
+const { ButtonContentView, LabelView } = styles;
 
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
@@ -88,9 +88,6 @@ function ToggleGroupControlOption(
 					value={ value }
 				>
 					<ButtonContentView>{ label }</ButtonContentView>
-					<LabelPlaceholderView aria-hidden>
-						{ label }
-					</LabelPlaceholderView>
 				</Radio>
 			</WithToolTip>
 		</LabelView>

@@ -106,7 +106,8 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true
+		"align": true,
+		"html": false
 	},
 	"editorStyle": "wp-block-gallery-editor",
 	"style": "wp-block-gallery"
