@@ -155,7 +155,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             <button
               aria-expanded={false}
               aria-haspopup="true"
-              aria-label="Custom color picker"
+              aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
               className="components-flex components-color-palette__custom-color emotion-10 emotion-5"
               data-wp-c16t={true}
               data-wp-component="Flex"
