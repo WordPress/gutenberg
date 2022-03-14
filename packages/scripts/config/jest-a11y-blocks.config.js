@@ -21,7 +21,7 @@ const jestA11yBlocks = {
 	],
 	setupFilesAfterEnv: [ 'expect-puppeteer' ],
 	testEnvironment: path.join( __dirname, 'jest-environment-puppeteer' ),
-	testMatch: [ '**/tests-a11y-blocks/specs/**/*.[jt]s?(x)' ],
+	testMatch: [ '**/a11y-blocks/?(*.)spec.[jt]s?(x)' ],
 	testPathIgnorePatterns: [ '/node_modules/' ],
 	testRunner: 'jest-circus/runner',
 	testTimeout: 30000,
