@@ -19,11 +19,11 @@ const NAVIGATION_MENUS_QUERY = [ { per_page: -1, status: 'publish' } ];
 
 export default function NavigationInspector() {
 	const {
-		selectedNavigationId,
+		selectedNavigationBlockId,
 		clientIdToRef,
 		navigationMenus,
 		hasResolvedNavigationMenus,
-		firstNavigationId,
+		firstNavigationBlockId,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetActiveBlockIdByBlockNames,
@@ -34,17 +34,23 @@ export default function NavigationInspector() {
 		const { getNavigationMenus, hasFinishedResolution } = select(
 			coreStore
 		);
+
+		// Get the active Navigation block (if present).
 		const selectedNavId = __experimentalGetActiveBlockIdByBlockNames(
 			'core/navigation'
 		);
-		const navIds = __experimentalGetGlobalBlocksByName( 'core/navigation' );
+
+		// Get all Navigation blocks currently within the editor canvas.
+		const navBlockIds = __experimentalGetGlobalBlocksByName(
+			'core/navigation'
+		);
 		const idToRef = {};
-		navIds.forEach( ( id ) => {
+		navBlockIds.forEach( ( id ) => {
 			idToRef[ id ] = getBlock( id )?.attributes?.ref;
 		} );
 		return {
-			selectedNavigationId: selectedNavId,
-			firstNavigationId: navIds?.[ 0 ],
+			selectedNavigationBlockId: selectedNavId,
+			firstNavigationBlockId: navBlockIds?.[ 0 ],
 			clientIdToRef: idToRef,
 			navigationMenus: getNavigationMenus( NAVIGATION_MENUS_QUERY[ 0 ] ),
 			hasResolvedNavigationMenus: hasFinishedResolution(
@@ -54,17 +60,24 @@ export default function NavigationInspector() {
 		};
 	}, [] );
 
-	const firstNavRefInTemplate = clientIdToRef[ firstNavigationId ];
-	const firstNavRef = navigationMenus?.[ 0 ]?.id;
-	const defaultValue = firstNavRefInTemplate || firstNavRef;
+	const firstNavRefInTemplate = clientIdToRef[ firstNavigationBlockId ];
+	const firstNavigationMenuRef = navigationMenus?.[ 0 ]?.id;
+
+	// Default Navigation Menu `ref` is either:
+	// - the Navigation Menu referenced by the first Nav block within the template.
+	// - the first of the available Navigation Menus (`wp_navigation`) posts.
+	const defaultNavigationMenu =
+		firstNavRefInTemplate || firstNavigationMenuRef;
 
 	const [ menu, setCurrentMenu ] = useState( firstNavRefInTemplate );
 
+	// If a Nav block is selected within the canvas then set it to be
+	// active within the Navigation sidebar.
 	useEffect( () => {
-		if ( selectedNavigationId ) {
-			setCurrentMenu( clientIdToRef[ selectedNavigationId ] );
+		if ( selectedNavigationBlockId ) {
+			setCurrentMenu( clientIdToRef[ selectedNavigationBlockId ] );
 		}
-	}, [ selectedNavigationId ] );
+	}, [ selectedNavigationBlockId ] );
 
 	let options = [];
 	if ( navigationMenus ) {
@@ -77,7 +90,7 @@ export default function NavigationInspector() {
 	const [ innerBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_navigation',
-		{ id: menu || defaultValue }
+		{ id: menu || defaultNavigationMenu }
 	);
 
 	const { hasLoadedInnerBlocks } = useSelect(
@@ -86,11 +99,15 @@ export default function NavigationInspector() {
 			return {
 				hasLoadedInnerBlocks: hasFinishedResolution(
 					'getEntityRecord',
-					[ 'postType', 'wp_navigation', menu || defaultValue ]
+					[
+						'postType',
+						'wp_navigation',
+						menu || defaultNavigationMenu,
+					]
 				),
 			};
 		},
-		[ menu, defaultValue ]
+		[ menu, defaultNavigationMenu ]
 	);
 
 	const isLoading = ! ( hasResolvedNavigationMenus && hasLoadedInnerBlocks );
@@ -102,9 +119,9 @@ export default function NavigationInspector() {
 			) }
 			{ hasResolvedNavigationMenus && (
 				<SelectControl
-					value={ menu || defaultValue }
+					value={ menu || defaultNavigationMenu }
 					options={ options }
-					onChange={ setCurrentMenu }
+					onChange={ ( val ) => setCurrentMenu( Number( val ) ) }
 				/>
 			) }
 			{ isLoading && (
