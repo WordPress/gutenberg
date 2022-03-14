@@ -28,6 +28,7 @@ import { clickOnCloseModalButton } from './click-on-close-modal-button';
 import { clickOnMoreMenuItem } from './click-on-more-menu-item';
 import { getEditedPostContent } from './get-edited-post-content';
 import { wpDataSelect } from './wp-data-select';
+import { toggleMoreMenu } from './toggle-more-menu';
 
 class PageUtils {
 	browser: Browser;
@@ -62,6 +63,7 @@ class PageUtils {
 	clickOnMoreMenuItem = clickOnMoreMenuItem;
 	getEditedPostContent = getEditedPostContent;
 	wpDataSelect = wpDataSelect;
+	toggleMoreMenu = toggleMoreMenu;
 }
 
 export { PageUtils };
