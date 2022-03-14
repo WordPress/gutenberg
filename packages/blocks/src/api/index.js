@@ -34,6 +34,7 @@ export {
 // components whose mechanisms can be shielded from the `edit` implementation
 // and just passed along.
 export { default as parse } from './parser';
+export { serializeRawBlock } from './parser/serialize-raw-block';
 export {
 	getBlockAttributes,
 	parseWithAttributeSchema,
