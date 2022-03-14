@@ -1,4 +1,4 @@
-name: End-to-End Tests
+name: Test-a11y-blocks
 
 on:
     pull_request:

@@ -80,4 +80,4 @@ Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
 const cleanUpPrefixes = [ '--puppeteer-', '--wordpress-' ];
 
 // jest.run( [ ...config, ...runInBand, ...getArgsFromCLI( cleanUpPrefixes ) ] );
-console.log("TESTING");
+console.log( 'TESTING' );
