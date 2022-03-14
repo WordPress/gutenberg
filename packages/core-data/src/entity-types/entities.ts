@@ -5,35 +5,6 @@ import type { Context } from './helpers';
 import type { CoreEntityConfig } from '../entities';
 
 /**
- * An entity type configuration entry as seen in src/entities.js.
- *
- * @example
- * ```ts
- * export const attachment = {
- * 	name: 'media',
- * 	kind: 'root',
- * 	baseURL: '/wp/v2/media',
- * 	baseURLParams: { context: 'edit' },
- * 	plural: 'mediaItems',
- * 	label: __( 'Media' ),
- * } as const;
- * ```
- */
-export interface EntityDeclaration {
-	baseURL?: string;
-	baseURLParams?: EntityQuery< any >;
-	getTitle?: ( record: unknown ) => string;
-	key?: string;
-	kind: string;
-	label?: string;
-	name: string;
-	plural?: string;
-	rawAttributes?: readonly string[];
-	title?: string;
-	transientEdits?: { blocks: boolean };
-}
-
-/**
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
 export type EntityQuery<
@@ -56,7 +27,15 @@ export type EntityQuery<
  * @see EntityRecordOf
  * @see EntityInterface
  */
-export type EntityConfigTypeFromConst< E extends EntityDeclaration, R > = {
+export type EntityConfigTypeFromConst<
+	E extends {
+		kind: string;
+		name: string;
+		baseURLParams?: EntityQuery< any >;
+		key?: string;
+	},
+	R
+> = {
 	kind: E[ 'kind' ];
 	name: E[ 'name' ];
 	recordType: R;
