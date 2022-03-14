@@ -6,7 +6,8 @@
 			"displayAsDropdown": false,
 			"showHierarchy": false,
 			"showPostCounts": false,
-			"showOnlyTopLevel": false
+			"showOnlyTopLevel": false,
+			"showEmpty": false
 		},
 		"innerBlocks": []
 	}
