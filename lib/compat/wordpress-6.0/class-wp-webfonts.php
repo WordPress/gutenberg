@@ -16,16 +16,15 @@ class WP_Webfonts {
 	 * @access private
 	 * @var array
 	 */
-	private static $registered_webfonts = array();
+	private $registered_webfonts = array();
 
 	/**
 	 * An array of enqueued webfonts.
 	 *
-	 * @static
 	 * @access private
 	 * @var array
 	 */
-	private static $enqueued_webfonts = array();
+	private $enqueued_webfonts = array();
 
 	/**
 	 * An array of registered providers.
