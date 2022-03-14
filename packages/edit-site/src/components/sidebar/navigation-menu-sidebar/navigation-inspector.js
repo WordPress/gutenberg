@@ -63,12 +63,13 @@ export default function NavigationInspector() {
 	const firstNavRefInTemplate = clientIdToRef[ firstNavigationBlockId ];
 	const firstNavigationMenuRef = navigationMenus?.[ 0 ]?.id;
 
-	// Default Navigation Menu `ref` is either:
+	// Default Navigation Menu is either:
 	// - the Navigation Menu referenced by the first Nav block within the template.
 	// - the first of the available Navigation Menus (`wp_navigation`) posts.
-	const defaultNavigationMenu =
+	const defaultNavigationMenuId =
 		firstNavRefInTemplate || firstNavigationMenuRef;
 
+	// The Navigation Menu manually selected by the user within the Nav inspector.
 	const [ menu, setCurrentMenu ] = useState( firstNavRefInTemplate );
 
 	// If a Nav block is selected within the canvas then set it to be
@@ -90,7 +91,7 @@ export default function NavigationInspector() {
 	const [ innerBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_navigation',
-		{ id: menu || defaultNavigationMenu }
+		{ id: menu || defaultNavigationMenuId }
 	);
 
 	const { hasLoadedInnerBlocks } = useSelect(
@@ -102,12 +103,12 @@ export default function NavigationInspector() {
 					[
 						'postType',
 						'wp_navigation',
-						menu || defaultNavigationMenu,
+						menu || defaultNavigationMenuId,
 					]
 				),
 			};
 		},
-		[ menu, defaultNavigationMenu ]
+		[ menu, defaultNavigationMenuId ]
 	);
 
 	const isLoading = ! ( hasResolvedNavigationMenus && hasLoadedInnerBlocks );
@@ -119,9 +120,11 @@ export default function NavigationInspector() {
 			) }
 			{ hasResolvedNavigationMenus && (
 				<SelectControl
-					value={ menu || defaultNavigationMenu }
+					value={ menu || defaultNavigationMenuId }
 					options={ options }
-					onChange={ ( val ) => setCurrentMenu( Number( val ) ) }
+					onChange={ ( newMenuId ) =>
+						setCurrentMenu( Number( newMenuId ) )
+					}
 				/>
 			) }
 			{ isLoading && (
