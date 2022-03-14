@@ -250,7 +250,7 @@ type PluginConfig< C extends Context > = EntityConfigTypeFromConst<
 	Records.Plugin< C >
 >;
 
-const rootEntitiesConfig = [
+export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
 		kind: 'root',
@@ -318,7 +318,7 @@ export type CoreEntityConfig< C extends Context > =
 	| WpTemplateConfig< C >
 	| WpTemplatePartConfig< C >;
 
-const additionalEntityConfigLoaders = [
+export const additionalEntityConfigLoaders = [
 	{ kind: 'postType', loadEntities: loadPostTypeEntities },
 	{ kind: 'taxonomy', loadEntities: loadTaxonomyEntities },
 ];
