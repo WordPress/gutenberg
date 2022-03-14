@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { render } from '@testing-library/react';
 
 /**
