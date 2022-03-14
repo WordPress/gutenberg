@@ -161,4 +161,72 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		return $flattened_theme_json;
 	}
 
+	/**
+	 * Takes the root level settings from theme JSON and creates variables for them.
+	 *
+	 * @param array $settings Settings from theme.json to process.
+	 *
+	 * @return array Returns $declarations to add to global styles CSS.
+	 */
+	private static function compute_root_vars( $settings ) {
+		if ( empty( $settings['styles'] ) ) {
+			return;
+		}
+
+		$theme_json_styles = _wp_array_get( $settings, array( 'styles' ) );
+		unset( $theme_json_styles['blocks'] );
+		unset( $theme_json_styles['elements'] );
+
+		$css_vars      = self::flatten_tree( $theme_json_styles );
+
+
+		foreach ( $css_vars as $key => $value ) {
+			$declarations[] = array(
+				'name'  => '--wp--styles--' . $key,
+				'value' => $value,
+			);
+		}
+		return $declarations;
+	}
+
+	/**
+	 * Converts each styles section into a list of rulesets
+	 * to be appended to the stylesheet.
+	 * These rulesets contain all the css variables (custom variables and preset variables).
+	 *
+	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
+	 *
+	 * For each section this creates a new ruleset such as:
+	 *
+	 *     block-selector {
+	 *       --wp--preset--category--slug: value;
+	 *       --wp--custom--variable: value;
+	 *     }
+	 *
+	 * @param array $nodes Nodes with settings.
+	 * @param array $origins List of origins to process.
+	 * @return string The new stylesheet.
+	 */
+	protected function get_css_variables( $nodes, $origins ) {
+		$stylesheet = '';
+		foreach ( $nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
+				continue;
+			}
+
+			$selector = $metadata['selector'];
+
+			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$declarations = array_merge( static::compute_preset_vars( $node, $origins ), static::compute_theme_vars( $node ) );
+
+			$stylesheet .= static::to_ruleset( $selector, $declarations );
+		}
+
+		// Create variables for body level styles
+		$declarations = self::compute_root_vars( $this->theme_json );
+		$stylesheet .= self::to_ruleset( 'body', $declarations );
+
+		return $stylesheet;
+	}
+
 }
