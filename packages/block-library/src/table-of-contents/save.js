@@ -15,11 +15,11 @@ export default function save( { attributes: { headings = [] } } ) {
 	}
 	return (
 		<nav { ...useBlockProps.save() }>
-			<ul>
+			<ol>
 				<TableOfContentsList
 					nestedHeadingList={ linearToNestedHeadingList( headings ) }
 				/>
-			</ul>
+			</ol>
 		</nav>
 	);
 }

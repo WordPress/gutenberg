@@ -190,6 +190,7 @@ export default function TableOfContentsEdit( {
 						replaceBlocks(
 							clientId,
 							createBlock( 'core/list', {
+								ordered: true,
 								values: renderToString(
 									<TableOfContentsList
 										nestedHeadingList={ headingTree }
@@ -251,9 +252,9 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ul>
+				<ol>
 					<TableOfContentsList nestedHeadingList={ headingTree } />
-				</ul>
+				</ol>
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }

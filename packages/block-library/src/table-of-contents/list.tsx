@@ -32,11 +32,11 @@ export default function TableOfContentsList( {
 					<li key={ index }>
 						{ entry }
 						{ node.children ? (
-							<ul>
+							<ol>
 								<TableOfContentsList
 									nestedHeadingList={ node.children }
 								/>
-							</ul>
+							</ol>
 						) : null }
 					</li>
 				);

@@ -16,9 +16,9 @@
 			]
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<nav class=\"wp-block-table-of-contents\"><ul><li><a class=\"wp-block-table-of-contents__entry\" href=\"#heading-id-1\">Heading text</a><ul><li><a class=\"wp-block-table-of-contents__entry\" href=\"#heading-id-2\">A sub-heading</a></li></ul></li></ul></nav>\n",
+		"innerHTML": "\n<nav class=\"wp-block-table-of-contents\"><ol><li><a class=\"wp-block-table-of-contents__entry\" href=\"#heading-id-1\">Heading text</a><ol><li><a class=\"wp-block-table-of-contents__entry\" href=\"#heading-id-2\">A sub-heading</a></li></ol></li></ol></nav>\n",
 		"innerContent": [
-			"\n<nav class=\"wp-block-table-of-contents\"><ul><li><a class=\"wp-block-table-of-contents__entry\" href=\"#heading-id-1\">Heading text</a><ul><li><a class=\"wp-block-table-of-contents__entry\" href=\"#heading-id-2\">A sub-heading</a></li></ul></li></ul></nav>\n"
+			"\n<nav class=\"wp-block-table-of-contents\"><ol><li><a class=\"wp-block-table-of-contents__entry\" href=\"#heading-id-1\">Heading text</a><ol><li><a class=\"wp-block-table-of-contents__entry\" href=\"#heading-id-2\">A sub-heading</a></li></ol></li></ol></nav>\n"
 		]
 	}
 ]
