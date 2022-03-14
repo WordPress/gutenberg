@@ -910,6 +910,35 @@ describe( 'Navigation', () => {
 		} );
 	} );
 
+	it( 'applies accessible label to block element', async () => {
+		await createNewPost();
+		await insertBlock( 'Navigation' );
+		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
+		await startEmptyButton.click();
+
+		const appender = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appender.click();
+
+		// Add a link to the Link block.
+		await updateActiveNavigationLink( {
+			url: 'https://wordpress.org',
+			label: 'WP',
+			type: 'url',
+		} );
+
+		const previewPage = await openPreviewPage();
+		await previewPage.bringToFront();
+		await previewPage.waitForNetworkIdle();
+
+		const isAccessibleLabelPresent = await previewPage.$(
+			'nav[aria-label="Navigation"]'
+		);
+
+		expect( isAccessibleLabelPresent ).toBeTruthy();
+	} );
+
 	it( 'does not load the frontend script if no navigation blocks are present', async () => {
 		await createNewPost();
 		await insertBlock( 'Paragraph' );

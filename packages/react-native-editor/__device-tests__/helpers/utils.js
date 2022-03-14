@@ -46,6 +46,8 @@ const strToKeycode = {
 	[ backspace ]: 67,
 };
 
+const editorReadyTimeout = 8000;
+
 const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
@@ -157,8 +159,8 @@ const setupDriver = async () => {
 	// eslint-disable-next-line no-console
 	console.log( status );
 
-	await driver.setImplicitWaitTimeout( 5000 );
-	await timer( 5000 );
+	await driver.setImplicitWaitTimeout( editorReadyTimeout );
+	await timer( editorReadyTimeout );
 
 	await driver.setOrientation( 'PORTRAIT' );
 	return driver;
