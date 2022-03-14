@@ -16,6 +16,7 @@ async function expectLabelToHaveFocus( label ) {
 	let ariaLabel = await page.evaluate( () =>
 		document.activeElement.getAttribute( 'aria-label' )
 	);
+	// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
 	if ( ariaLabel !== label ) {
 		await page.keyboard.press( 'ArrowUp' );
 		ariaLabel = await page.evaluate( () =>
