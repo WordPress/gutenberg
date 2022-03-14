@@ -82,9 +82,11 @@ function gutenberg_register_theme_block_patterns() {
 		'inserter'      => 'Inserter',
 	);
 
-	// Register patterns for the active theme, for both parent and child theme,
-	// if applicable.
-	foreach ( wp_get_active_and_valid_themes() as $theme ) {
+	// Register patterns for the active theme. If the theme is a child theme,
+	// let it register its patterns last, thereby overriding any of the
+	// parent's patterns sharing the same slug.
+	$parent_then_child_themes = array_reverse( wp_get_active_and_valid_themes() );
+	foreach ( $parent_then_child_themes as $theme ) {
 		$dirpath = $theme . '/patterns/';
 		if ( file_exists( $dirpath ) ) {
 			$files = glob( $dirpath . '*.php' );
