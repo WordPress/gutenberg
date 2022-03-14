@@ -78,7 +78,7 @@ class WP_Webfonts {
 	 * @return array
 	 */
 	public function get_enqueued_fonts() {
-		return self::$enqueued_webfonts;
+		return $this->enqueued_webfonts;
 	}
 
 	/**
@@ -130,13 +130,13 @@ class WP_Webfonts {
 
 		if ( $font ) {
 			$font                           = $this->validate_font( $font );
-			self::$enqueued_webfonts[ $id ] = $font;
+			$this->enqueued_webfonts[ $id ] = $font;
 
 			if ( isset( $this->registered_webfonts[ $id ] ) ) {
 				unset( $this->registered_webfonts[ $id ] );
 			}
 		} elseif ( isset( $this->registered_webfonts[ $id ] ) ) {
-			self::$enqueued_webfonts[ $id ] = $this->registered_webfonts[ $id ];
+			$this->enqueued_webfonts[ $id ] = $this->registered_webfonts[ $id ];
 
 			unset( $this->registered_webfonts[ $id ] );
 		} else {
