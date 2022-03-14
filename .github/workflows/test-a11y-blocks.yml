@@ -1,0 +1,60 @@
+name: End-to-End Tests
+
+on:
+    pull_request:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    admin:
+        name: Admin - ${{ matrix.part }}
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+            matrix:
+                part: [1, 2, 3, 4]
+                node: ['14']
+
+        steps:
+            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: npm
+
+            - name: Npm install and build
+              run: |
+                  npm ci
+                  npm run build
+
+            - name: Install WordPress
+              run: |
+                  npm run wp-env start
+
+            - name: Running the tests
+              run: |
+                  $( npm bin )/wp-scripts test-a11y-blocks
+
+            - name: Archive debug artifacts (screenshots, HTML snapshots)
+              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              if: always()
+              with:
+                  name: failures-artifacts
+                  path: artifacts
+                  if-no-files-found: ignore
+
+            - name: Archive flaky tests report
+              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              if: always()
+              with:
+                  name: flaky-tests-report
+                  path: flaky-tests
+                  if-no-files-found: ignore
