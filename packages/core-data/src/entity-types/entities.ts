@@ -20,12 +20,14 @@ export type EntityQuery<
 };
 
 /**
- * Helped type to turn an entity type configuration entry into a lookup
- * type adhering to EntityInterface used by RecordOf to find the record
- * type related to the specified kind and name.
+ * Helper type that transforms "raw" entity configuration from entities.ts
+ * into a format that makes searching by root and kind easy and extensible.
+ *
+ * This is the foundation of return type inference in calls such as:
+ * `getEntityRecord( "root", "comment", 15 )`.
  *
  * @see EntityRecordOf
- * @see EntityInterface
+ * @see getEntityRecord
  */
 export type EntityConfigTypeFromConst<
 	E extends {
@@ -46,44 +48,6 @@ export type EntityConfigTypeFromConst<
 		? C
 		: 'view';
 };
-
-/**
- * The type that the entries of PerPackageEntities must adhere to. This is for reference only,
- * there is no type checking in place.
- *
- * An entity is like a data type. Core-data knows how to handle data requests
- * similar to `getEntityRecord( "root", "comment", 15 )` thanks to the entity configuration
- * that ties the entity kind (a namespace) and name ("root" and "comment") to information
- * such as the REST API endpoint URL and the primary key field.
- *
- * Core-data TypeScript types also associate the same kinds and names to their related
- * Record data type so that calling `getEntityRecord( "root", "comment", 15 )` returns
- * a list of a Comment objects.
- */
-export interface EntityInterface< C extends Context > {
-	/**
-	 * The namespace of the current Entity.
-	 */
-	kind: string;
-	/**
-	 * The name of the current Entity, unique within the `kind` namespace.
-	 */
-	name: string;
-	/**
-	 * The type of the records of the current Entity. It can be optionally parametrized
-	 * by Context.
-	 */
-	recordType: Object;
-	/**
-	 * The name of the primary key field of the current Entity.
-	 */
-	key: string;
-	/**
-	 * The default value of the `context` query parameter that the related API
-	 * endpoint assumes when no context is given.
-	 */
-	defaultContext: Context;
-}
 
 /**
  * An interface that may be extended to add types for new entities. Each entry
