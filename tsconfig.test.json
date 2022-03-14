@@ -9,8 +9,7 @@
 			"jest",
 			"@testing-library/jest-dom",
 			"snapshot-diff",
-			"@emotion/core",
-			"@types/node"
+			"@emotion/core"
 		],
 	},
 	"references": [
