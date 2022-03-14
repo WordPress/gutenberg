@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { render } from '@testing-library/react';
 
 /**
@@ -59,7 +60,7 @@ describe( 'Text', () => {
 
 	test( 'should render as another element', () => {
 		const { container } = render( <Text as="div">Lorem ipsum.</Text> );
-		expect( container.firstChild.nodeName ).toBe( 'DIV' );
+		expect( container.firstChild?.nodeName ).toBe( 'DIV' );
 	} );
 
 	test( 'should render align', () => {
@@ -89,7 +90,7 @@ describe( 'Text', () => {
 		const wrapper = render(
 			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
 		);
-		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 5 );
+		expect( wrapper.container.firstChild?.childNodes ).toHaveLength( 5 );
 		const words = await wrapper.findAllByText( 'm' );
 		expect( words ).toHaveLength( 2 );
 		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
@@ -100,7 +101,7 @@ describe( 'Text', () => {
 			<Text highlightWords={ undefined }>Lorem ipsum.</Text>
 		);
 		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered.
-		expect( container.firstChild.childNodes ).toHaveLength( 1 );
+		expect( container.firstChild?.childNodes ).toHaveLength( 1 );
 	} );
 
 	test( 'should render highlighted words with highlightCaseSensitive', () => {
@@ -112,7 +113,7 @@ describe( 'Text', () => {
 
 		expect( container.firstChild ).toMatchSnapshot();
 		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered.
-		expect( container.firstChild.childNodes ).toHaveLength( 1 );
+		expect( container.firstChild?.childNodes ).toHaveLength( 1 );
 	} );
 
 	test( 'should render isBlock', () => {
