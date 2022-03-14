@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { Context } from './helpers';
-import type { CoreEntity } from '../entities';
+import type { CoreEntityConfig } from '../entities';
 
 /**
  * An entity type configuration entry as seen in src/entities.js.
@@ -53,10 +53,10 @@ export type EntityQuery<
  * type adhering to EntityInterface used by RecordOf to find the record
  * type related to the specified kind and name.
  *
- * @see RecordOf
+ * @see EntityRecordOf
  * @see EntityInterface
  */
-export type EntityFromConfig< E extends EntityDeclaration, R > = {
+export type EntityConfigTypeFromConst< E extends EntityDeclaration, R > = {
 	kind: E[ 'kind' ];
 	name: E[ 'name' ];
 	recordType: R;
@@ -138,43 +138,43 @@ export interface EntityInterface< C extends Context > {
  * // c is of the type Order
  * ```
  */
-export interface PerPackageEntities< C extends Context > {
-	core: CoreEntity< C >;
+export interface PerPackageEntityConfig< C extends Context > {
+	core: CoreEntityConfig< C >;
 }
 
 /**
  * A union of all the registered entities.
  */
-type Entity<
+type EntityConfig<
 	C extends Context = any
-> = PerPackageEntities< C >[ keyof PerPackageEntities< C > ];
+> = PerPackageEntityConfig< C >[ keyof PerPackageEntityConfig< C > ];
 
 /**
  * A union of all known record types.
  */
 export type EntityRecord<
 	C extends Context = any
-> = Entity< C >[ 'recordType' ];
+> = EntityConfig< C >[ 'recordType' ];
 
 /**
  * An entity corresponding to a specified record type.
  */
-export type EntityOf<
+export type EntityConfigOf<
 	RecordOrKind extends EntityRecord | Kind,
 	N extends Name = undefined
 > = RecordOrKind extends EntityRecord
-	? Extract< Entity, { recordType: RecordOrKind } >
-	: Extract< Entity, { kind: RecordOrKind; name: N } >;
+	? Extract< EntityConfig, { recordType: RecordOrKind } >
+	: Extract< EntityConfig, { kind: RecordOrKind; name: N } >;
 
 /**
  * Name of the requested entity.
  */
-export type NameOf< R extends EntityRecord > = EntityOf< R >[ 'name' ];
+export type NameOf< R extends EntityRecord > = EntityConfigOf< R >[ 'name' ];
 
 /**
  * Kind of the requested entity.
  */
-export type KindOf< R extends EntityRecord > = EntityOf< R >[ 'kind' ];
+export type KindOf< R extends EntityRecord > = EntityConfigOf< R >[ 'kind' ];
 
 /**
  * Primary key type of the requested entity, sourced from PerPackageEntities.
@@ -184,7 +184,7 @@ export type KindOf< R extends EntityRecord > = EntityOf< R >[ 'kind' ];
 export type KeyOf<
 	RecordOrKind extends EntityRecord | Kind,
 	N extends Name = undefined,
-	E extends Entity = EntityOf< RecordOrKind, N >
+	E extends EntityConfig = EntityConfigOf< RecordOrKind, N >
 > = E[ 'key' ] extends keyof E[ 'recordType' ]
 	? E[ 'recordType' ][ E[ 'key' ] ]
 	: never;
@@ -198,22 +198,22 @@ export type KeyOf<
 export type DefaultContextOf<
 	RecordOrKind extends EntityRecord | Kind,
 	N extends Name = undefined
-> = EntityOf< RecordOrKind, N >[ 'defaultContext' ];
+> = EntityConfigOf< RecordOrKind, N >[ 'defaultContext' ];
 
 /**
  * An entity record type associated with specified kind and name, sourced from PerPackageEntities.
  */
-export type RecordOf<
+export type EntityRecordOf<
 	K extends Kind,
 	N extends Name,
 	C extends Context = DefaultContextOf< K, N >
-> = Extract< Entity< C >, { kind: K; name: N } >[ 'recordType' ];
+> = Extract< EntityConfig< C >, { kind: K; name: N } >[ 'recordType' ];
 
 /**
  * A union of all known entity kinds.
  */
-export type Kind = Entity[ 'kind' ];
+export type Kind = EntityConfig[ 'kind' ];
 /**
  * A union of all known entity names.
  */
-export type Name = Entity[ 'name' ];
+export type Name = EntityConfig[ 'name' ];

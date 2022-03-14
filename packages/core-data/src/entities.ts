@@ -15,13 +15,13 @@ import { __ } from '@wordpress/i18n';
 import { addEntities } from './actions';
 import type * as Records from './entity-types';
 import type { Context } from './entity-types';
-import type { EntityFromConfig, Kind, Name } from './entity-types/entities';
+import type { EntityConfigTypeFromConst } from './entity-types/entities';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
-export const attachment = {
+const attachmentConfig = {
 	name: 'media',
 	kind: 'root',
 	baseURL: '/wp/v2/media',
@@ -30,12 +30,12 @@ export const attachment = {
 	label: __( 'Media' ),
 } as const;
 
-type AttachmentEntity< C extends Context > = EntityFromConfig<
-	typeof attachment,
+type AttachmentConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof attachmentConfig,
 	Records.Attachment< C >
 >;
 
-export const site = {
+const siteConfig = {
 	label: __( 'Site' ),
 	name: 'site',
 	kind: 'root',
@@ -45,12 +45,12 @@ export const site = {
 	},
 } as const;
 
-type SiteEntity< C extends Context > = EntityFromConfig<
-	typeof site,
+type SiteConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof siteConfig,
 	Records.Settings< C >
 >;
 
-export const postType = {
+const postTypeConfig = {
 	label: __( 'Post Type' ),
 	name: 'postType',
 	kind: 'root',
@@ -60,12 +60,12 @@ export const postType = {
 	rawAttributes: POST_RAW_ATTRIBUTES,
 } as const;
 
-type TypeEntity< C extends Context > = EntityFromConfig<
-	typeof postType,
+type TypeConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof postTypeConfig,
 	Records.Type< C >
 >;
 
-export const taxonomy = {
+const taxonomyConfig = {
 	name: 'taxonomy',
 	kind: 'root',
 	key: 'slug',
@@ -75,12 +75,12 @@ export const taxonomy = {
 	label: __( 'Taxonomy' ),
 } as const;
 
-type TaxonomyEntity< C extends Context > = EntityFromConfig<
-	typeof taxonomy,
+type TaxonomyConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof taxonomyConfig,
 	Records.Taxonomy< C >
 >;
 
-export const sidebar = {
+const sidebarConfig = {
 	name: 'sidebar',
 	kind: 'root',
 	baseURL: '/wp/v2/sidebars',
@@ -89,12 +89,12 @@ export const sidebar = {
 	label: __( 'Widget areas' ),
 } as const;
 
-type SidebarEntity< C extends Context > = EntityFromConfig<
-	typeof sidebar,
+type SidebarConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof sidebarConfig,
 	Records.Sidebar< C >
 >;
 
-export const widget = {
+const widgetConfig = {
 	name: 'widget',
 	kind: 'root',
 	baseURL: '/wp/v2/widgets',
@@ -104,12 +104,12 @@ export const widget = {
 	label: __( 'Widgets' ),
 } as const;
 
-type WidgetEntity< C extends Context > = EntityFromConfig<
-	typeof widget,
+type WidgetConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof widgetConfig,
 	Records.Widget< C >
 >;
 
-export const widgetType = {
+const widgetTypeConfig = {
 	name: 'widgetType',
 	kind: 'root',
 	baseURL: '/wp/v2/widget-types',
@@ -118,12 +118,12 @@ export const widgetType = {
 	label: __( 'Widget types' ),
 } as const;
 
-type WidgetTypeEntity< C extends Context > = EntityFromConfig<
-	typeof widgetType,
+type WidgetTypeConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof widgetTypeConfig,
 	Records.WidgetType< C >
 >;
 
-export const user = {
+const userConfig = {
 	label: __( 'User' ),
 	name: 'user',
 	kind: 'root',
@@ -132,12 +132,12 @@ export const user = {
 	plural: 'users',
 } as const;
 
-type UserEntity< C extends Context > = EntityFromConfig<
-	typeof user,
+type UserConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof userConfig,
 	Records.User< C >
 >;
 
-export const comment = {
+const commentConfig = {
 	name: 'comment',
 	kind: 'root',
 	baseURL: '/wp/v2/comments',
@@ -146,12 +146,12 @@ export const comment = {
 	label: __( 'Comment' ),
 } as const;
 
-type CommentEntity< C extends Context > = EntityFromConfig<
-	typeof comment,
+type CommentConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof commentConfig,
 	Records.Comment< C >
 >;
 
-export const menu = {
+const menuConfig = {
 	name: 'menu',
 	kind: 'root',
 	baseURL: '/wp/v2/menus',
@@ -160,12 +160,12 @@ export const menu = {
 	label: __( 'Menu' ),
 } as const;
 
-type NavMenuEntity< C extends Context > = EntityFromConfig<
-	typeof menu,
+type NavMenuConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof menuConfig,
 	Records.NavMenu< C >
 >;
 
-export const menuItem = {
+const menuItemConfig = {
 	name: 'menuItem',
 	kind: 'root',
 	baseURL: '/wp/v2/menu-items',
@@ -175,12 +175,12 @@ export const menuItem = {
 	rawAttributes: [ 'title', 'content' ],
 } as const;
 
-type NavMenuItemEntity< C extends Context > = EntityFromConfig<
-	typeof menuItem,
+type NavMenuItemConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof menuItemConfig,
 	Records.NavMenu< C >
 >;
 
-export const menuLocation = {
+const menuLocationConfig = {
 	name: 'menuLocation',
 	kind: 'root',
 	baseURL: '/wp/v2/menu-locations',
@@ -190,12 +190,12 @@ export const menuLocation = {
 	key: 'name',
 } as const;
 
-type MenuLocationEntity< C extends Context > = EntityFromConfig<
-	typeof menuLocation,
+type MenuLocationConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof menuLocationConfig,
 	Records.MenuLocation< C >
 >;
 
-export const navigationArea = {
+const navigationAreaConfig = {
 	name: 'navigationArea',
 	kind: 'root',
 	baseURL: '/wp/v2/block-navigation-areas',
@@ -207,12 +207,12 @@ export const navigationArea = {
 		record?.description,
 } as const;
 
-type NavigationAreaEntity< C extends Context > = EntityFromConfig<
-	typeof navigationArea,
+type NavigationAreaConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof navigationAreaConfig,
 	Records.NavigationArea< C >
 >;
 
-export const globalStyle = {
+const globalStyleConfig = {
 	label: __( 'Global Styles' ),
 	name: 'globalStyles',
 	kind: 'root',
@@ -222,7 +222,7 @@ export const globalStyle = {
 	getTitle: ( record: any ) => record?.title?.rendered || record?.title,
 } as const;
 
-export const theme = {
+const themeConfig = {
 	label: __( 'Themes' ),
 	name: 'theme',
 	kind: 'root',
@@ -231,12 +231,12 @@ export const theme = {
 	key: 'stylesheet',
 } as const;
 
-type ThemeEntity< C extends Context > = EntityFromConfig<
-	typeof theme,
+type ThemeConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof themeConfig,
 	Records.Theme< C >
 >;
 
-export const plugin = {
+const pluginConfig = {
 	label: __( 'Plugins' ),
 	name: 'plugin',
 	kind: 'root',
@@ -245,33 +245,33 @@ export const plugin = {
 	key: 'plugin',
 } as const;
 
-type PluginEntity< C extends Context > = EntityFromConfig<
-	typeof plugin,
+type PluginConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof pluginConfig,
 	Records.Plugin< C >
 >;
 
-export const defaultEntities = [
+const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
 		kind: 'root',
 		name: '__unstableBase',
 		baseURL: '/',
 	},
-	site,
-	postType,
-	attachment,
-	taxonomy,
-	sidebar,
-	widget,
-	widgetType,
-	user,
-	comment,
-	menu,
-	menuItem,
-	menuLocation,
-	globalStyle,
-	theme,
-	plugin,
+	siteConfig,
+	postTypeConfig,
+	attachmentConfig,
+	taxonomyConfig,
+	sidebarConfig,
+	widgetConfig,
+	widgetTypeConfig,
+	userConfig,
+	commentConfig,
+	menuConfig,
+	menuItemConfig,
+	menuLocationConfig,
+	globalStyleConfig,
+	themeConfig,
+	pluginConfig,
 ];
 
 type PostTypeConfig = {
@@ -280,45 +280,45 @@ type PostTypeConfig = {
 	defaultContext: 'edit';
 };
 
-type Post< C extends Context > = PostTypeConfig & {
+type PostConfig< C extends Context > = PostTypeConfig & {
 	name: 'post';
 	recordType: Records.Post< C >;
 };
-type Page< C extends Context > = PostTypeConfig & {
+type PageConfig< C extends Context > = PostTypeConfig & {
 	name: 'page';
 	recordType: Records.Page< C >;
 };
-type WpTemplate< C extends Context > = PostTypeConfig & {
+type WpTemplateConfig< C extends Context > = PostTypeConfig & {
 	name: 'wp_template';
 	recordType: Records.WpTemplate< C >;
 };
-type WpTemplatePart< C extends Context > = PostTypeConfig & {
+type WpTemplatePartConfig< C extends Context > = PostTypeConfig & {
 	name: 'wp_template_part';
 	recordType: Records.WpTemplatePart< C >;
 };
 
-export type CoreEntity< C extends Context > =
-	| SiteEntity< C >
-	| TypeEntity< C >
-	| AttachmentEntity< C >
-	| TaxonomyEntity< C >
-	| SidebarEntity< C >
-	| WidgetEntity< C >
-	| WidgetTypeEntity< C >
-	| UserEntity< C >
-	| CommentEntity< C >
-	| NavMenuEntity< C >
-	| NavMenuItemEntity< C >
-	| NavigationAreaEntity< C >
-	| MenuLocationEntity< C >
-	| ThemeEntity< C >
-	| PluginEntity< C >
-	| Post< C >
-	| Page< C >
-	| WpTemplate< C >
-	| WpTemplatePart< C >;
+export type CoreEntityConfig< C extends Context > =
+	| SiteConfig< C >
+	| TypeConfig< C >
+	| AttachmentConfig< C >
+	| TaxonomyConfig< C >
+	| SidebarConfig< C >
+	| WidgetConfig< C >
+	| WidgetTypeConfig< C >
+	| UserConfig< C >
+	| CommentConfig< C >
+	| NavMenuConfig< C >
+	| NavMenuItemConfig< C >
+	| NavigationAreaConfig< C >
+	| MenuLocationConfig< C >
+	| ThemeConfig< C >
+	| PluginConfig< C >
+	| PostConfig< C >
+	| PageConfig< C >
+	| WpTemplateConfig< C >
+	| WpTemplatePartConfig< C >;
 
-export const additionalEntityConfigLoaders = [
+const additionalEntityConfigLoaders = [
 	{ kind: 'postType', loadEntities: loadPostTypeEntities },
 	{ kind: 'taxonomy', loadEntities: loadTaxonomyEntities },
 ];
@@ -330,7 +330,7 @@ export const additionalEntityConfigLoaders = [
  * @param {Object} edits           Edits.
  * @return {Object} Updated edits.
  */
-export const prePersistPostType = ( persistedRecord: any, edits: any ) => {
+export const prePersistPostType = ( persistedRecord, edits ) => {
 	const newEdits = {} as any;
 
 	if ( persistedRecord?.status === 'auto-draft' ) {
@@ -379,7 +379,7 @@ async function loadPostTypeEntities() {
 			},
 			mergedEdits: { meta: true },
 			rawAttributes: POST_RAW_ATTRIBUTES,
-			getTitle: ( record: any ) =>
+			getTitle: ( record ) =>
 				record?.title?.rendered ||
 				record?.title ||
 				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
@@ -430,18 +430,18 @@ async function loadTaxonomyEntities() {
  * @return {string} Method name
  */
 export const getMethodName = (
-	kind: Kind,
-	name: Name,
+	kind,
+	name,
 	prefix = 'get',
 	usePlural = false
 ) => {
-	const entity = find( defaultEntities, { kind, name } ) as any;
+	const entityConfig = find( rootEntitiesConfig, { kind, name } ) as any;
 	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && 'plural' in entity && entity?.plural
-			? upperFirst( camelCase( entity.plural ) )
+		usePlural && entityConfig.plural
+			? upperFirst( camelCase( entityConfig.plural ) )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
@@ -453,13 +453,10 @@ export const getMethodName = (
  *
  * @return {Array} Entities
  */
-export const getKindEntities = ( kind: Kind ) => async ( {
-	select,
-	dispatch,
-}: any ) => {
-	let entities = select.getEntitiesByKind( kind );
-	if ( entities && entities.length !== 0 ) {
-		return entities;
+const getOrLoadEntitiesConfig = ( kind ) => async ( { select, dispatch } ) => {
+	let configs = select.getEntitiesConfig( kind );
+	if ( configs && configs.length !== 0 ) {
+		return configs;
 	}
 
 	const loader = find( additionalEntityConfigLoaders, { kind } );

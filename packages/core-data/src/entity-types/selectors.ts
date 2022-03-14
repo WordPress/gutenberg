@@ -12,14 +12,14 @@ import type {
 import type {
 	DefaultContextOf,
 	EntityDeclaration,
-	EntityOf,
+	EntityConfigOf,
 	EntityQuery,
 	KeyOf,
 	Kind,
 	KindOf,
 	Name,
 	NameOf,
-	RecordOf,
+	EntityRecordOf,
 } from './entities';
 
 type State = any;
@@ -50,7 +50,7 @@ export type getEntity = (
 ) => EntityDeclaration | undefined;
 
 export type getEntityRecord = <
-	R extends RecordOf< K, N >,
+	R extends EntityRecordOf< K, N >,
 	C extends Context = DefaultContextOf< R >,
 	K extends Kind = KindOf< R >,
 	N extends Name = NameOf< R >,
@@ -67,8 +67,8 @@ export type getEntityRecord = <
 	query?: EntityQuery< C, Fields >
 ) =>
 	| ( Fields extends undefined
-			? RecordOf< K, N, C >
-			: Partial< RecordOf< K, N, C > > )
+			? EntityRecordOf< K, N, C >
+			: Partial< EntityRecordOf< K, N, C > > )
 	| null
 	| undefined;
 
@@ -77,7 +77,7 @@ export type __experimentalGetEntityRecordNoResolver = getEntityRecord;
 export type getRawEntityRecord = getEditedEntityRecord;
 
 export type hasEntityRecords = <
-	R extends RecordOf< K, N >,
+	R extends EntityRecordOf< K, N >,
 	C extends Context = DefaultContextOf< R >,
 	K extends Kind = KindOf< R >,
 	N extends Name = NameOf< R >
@@ -91,7 +91,7 @@ export type hasEntityRecords = <
 ) => boolean;
 
 export type getEntityRecords = <
-	R extends RecordOf< K, N >,
+	R extends EntityRecordOf< K, N >,
 	C extends Context = DefaultContextOf< R >,
 	K extends Kind = KindOf< R >,
 	N extends Name = NameOf< R >,
@@ -108,8 +108,8 @@ export type getEntityRecords = <
 ) =>
 	| Array<
 			Fields extends undefined
-				? RecordOf< K, N, C >
-				: Partial< RecordOf< K, N, C > >
+				? EntityRecordOf< K, N, C >
+				: Partial< EntityRecordOf< K, N, C > >
 	  >
 	| null
 	| undefined;
@@ -124,7 +124,7 @@ export type __experimentalGetDirtyEntityRecords = <
 export type __experimentalGetEntitiesBeingSaved = __experimentalGetDirtyEntityRecords;
 
 export type getEntityRecordEdits = <
-	R extends RecordOf< K, N >,
+	R extends EntityRecordOf< K, N >,
 	K extends Kind = KindOf< R >,
 	N extends Name = NameOf< R >
 >(
@@ -132,12 +132,12 @@ export type getEntityRecordEdits = <
 	kind: K,
 	name: N,
 	key: KeyOf< R >
-) => Partial< RecordOf< K, N > >[] | undefined;
+) => Partial< EntityRecordOf< K, N > >[] | undefined;
 
 export type getEntityRecordNonTransientEdits = getEntityRecordEdits;
 
 type recordToBoolean = <
-	R extends RecordOf< K, N >,
+	R extends EntityRecordOf< K, N >,
 	K extends Kind = KindOf< R >,
 	N extends Name = NameOf< R >
 >(
@@ -150,7 +150,7 @@ type recordToBoolean = <
 export type hasEditsForEntityRecord = recordToBoolean;
 
 export type getEditedEntityRecord = <
-	R extends RecordOf< K, N >,
+	R extends EntityRecordOf< K, N >,
 	K extends Kind = KindOf< R >,
 	N extends Name = NameOf< R >
 >(
@@ -158,14 +158,14 @@ export type getEditedEntityRecord = <
 	kind: K,
 	name: N,
 	recordId: KeyOf< R >
-) => Updatable< RecordOf< K, N > > | null | undefined;
+) => Updatable< EntityRecordOf< K, N > > | null | undefined;
 
 export type isAutosavingEntityRecord = recordToBoolean;
 export type isSavingEntityRecord = recordToBoolean;
 export type isDeletingEntityRecord = recordToBoolean;
 
 export type getLastEntitySaveError = <
-	R extends RecordOf< K, N >,
+	R extends EntityRecordOf< K, N >,
 	K extends Kind = KindOf< R >,
 	N extends Name = NameOf< R >
 >(
@@ -195,21 +195,25 @@ export type canUser = (
 ) => boolean | undefined;
 export type canUserEditEntityRecord = recordToBoolean;
 
-export type getAutosaves = < N extends EntityOf< 'postType', any >[ 'name' ] >(
+export type getAutosaves = <
+	N extends EntityConfigOf< 'postType', any >[ 'name' ]
+>(
 	state: State,
 	postType: N,
 	postId: number
-) => Partial< RecordOf< 'postType', N > >[] | undefined;
+) => Partial< EntityRecordOf< 'postType', N > >[] | undefined;
 
-export type getAutosave = < N extends EntityOf< 'postType', any >[ 'name' ] >(
+export type getAutosave = <
+	N extends EntityConfigOf< 'postType', any >[ 'name' ]
+>(
 	state: State,
 	postType: N,
 	postId: number,
 	authorId: number
-) => Partial< RecordOf< 'postType', N > > | undefined;
+) => Partial< EntityRecordOf< 'postType', N > > | undefined;
 
 export type hasFetchedAutosaves = <
-	N extends EntityOf< 'postType', any >[ 'name' ]
+	N extends EntityConfigOf< 'postType', any >[ 'name' ]
 >(
 	state: State,
 	postType: N,

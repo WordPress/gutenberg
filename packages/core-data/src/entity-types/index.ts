@@ -47,7 +47,7 @@ export type {
 	WpTemplatePart,
 };
 
-export type { PerPackageEntities, EntityRecord } from './entities';
+export type { PerPackageEntityConfig, EntityRecord } from './entities';
 
 export type {
 	getEntityRecord,
