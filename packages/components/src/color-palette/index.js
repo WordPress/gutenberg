@@ -136,8 +136,6 @@ const extractColorNameFromCurrentValue = (
 		return '';
 	}
 
-	let colorNameToReturn;
-
 	if ( showMultiplePalettes ) {
 		for ( const { colors: colorPaletteColors } of colors ) {
 			for ( const {
@@ -163,7 +161,7 @@ const extractColorNameFromCurrentValue = (
 	}
 
 	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
-	return colorNameToReturn ?? __( 'Custom' );
+	return __( 'Custom' );
 };
 
 export default function ColorPalette( {
