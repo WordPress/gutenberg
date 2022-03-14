@@ -73,7 +73,7 @@ describe( 'actions', () => {
 				registry
 					.select( interfaceStore )
 					.getActiveComplementaryArea( 'my-plugin' )
-			).toBeNull();
+			).toBeUndefined();
 		} );
 	} );
 

@@ -50,7 +50,7 @@ describe( 'actions', () => {
 			registry
 				.select( interfaceStore )
 				.getActiveComplementaryArea( 'core/edit-post' )
-		).toBeNull();
+		).toBeUndefined();
 	} );
 
 	it( 'toggleFeature', () => {

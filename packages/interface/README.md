@@ -46,7 +46,7 @@ wp.data
 wp.data
 	.select( 'core/interface' )
 	.getActiveComplementaryArea( 'core/edit-post' );
-// -> null
+// -> undefined
 ```
 
 ### Pinned Items
