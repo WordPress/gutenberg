@@ -45,10 +45,9 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			),
 		);
 		$block_content = '<figure class="wp-block-image alignright size-full"><img src="/my-image.jpg"/></figure>';
-		$actual        = gutenberg_restore_image_outer_container( $block_content, $block );
 		$expected      = '<div class="wp-block-image "><figure class=" alignright size-full"><img src="/my-image.jpg"/></figure></div>';
 
-		$this->assertSame( $expected, $actual );
+		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_content, $block ) );
 	}
 
 	function test_additional_styles_moved_to_restored_outer_container_for_aligned_image_block_with_non_themejson_theme() {
@@ -61,10 +60,9 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			),
 		);
 		$block_content = '<figure class="wp-block-image alignright size-full is-style-round my-custom-classname"><img src="/my-image.jpg"/></figure>';
-		$actual        = gutenberg_restore_image_outer_container( $block_content, $block );
 		$expected      = '<div class="wp-block-image is-style-round my-custom-classname"><figure class=" alignright size-full "><img src="/my-image.jpg"/></figure></div>';
 
-		$this->assertSame( $expected, $actual );
+		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_content, $block ) );
 	}
 
 	function test_outer_container_not_restored_for_aligned_image_block_with_themejson_theme() {
@@ -76,9 +74,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			),
 		);
 		$block_content = '<figure class="wp-block-image alignright size-full is-style-round my-custom-classname"><img src="/my-image.jpg"/></figure>';
-		$actual        = gutenberg_restore_image_outer_container( $block_content, $block );
 		$expected      = '<figure class="wp-block-image alignright size-full is-style-round my-custom-classname"><img src="/my-image.jpg"/></figure>';
 
-		$this->assertSame( $expected, $actual );
+		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_content, $block ) );
 	}
 }
