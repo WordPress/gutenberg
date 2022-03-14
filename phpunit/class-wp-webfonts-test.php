@@ -73,6 +73,7 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 			array(
 				'local'         => 'WP_Webfonts_Provider_Local',
 				'test-provider' => 'Test_Provider',
+				'google'        => 'WP_Webfonts_Provider_Google',
 			),
 			wp_get_webfont_providers()
 		);
