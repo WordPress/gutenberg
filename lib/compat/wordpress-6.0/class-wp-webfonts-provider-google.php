@@ -294,7 +294,7 @@ class WP_Webfonts_Provider_Google extends WP_Webfonts_Provider_Local {
 	/**
 	 * Get the local webfonts array from a remote URL.
 	 *
-	 * @since 5.9.0
+	 * @since 6.0
 	 *
 	 * @param string $remote_url The remote URL.
 	 *
