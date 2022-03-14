@@ -44,7 +44,6 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'page',
 	'index',
 	'archive',
-	'attachment',
 	'author',
 	'category',
 	'date',
