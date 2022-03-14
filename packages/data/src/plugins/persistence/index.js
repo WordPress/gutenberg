@@ -252,29 +252,29 @@ export function migrateFeaturePreferencesToPreferencesStore(
 		: sourceFeatures;
 
 	if ( featuresToMigrate ) {
-		const targetFeatures = state[ preferencesStoreName ]?.preferences;
+		const existingPreferences = state[ preferencesStoreName ]?.preferences;
 
 		// Avoid migrating features again if they've previously been migrated.
-		if ( ! targetFeatures?.[ sourceStoreName ] ) {
+		if ( ! existingPreferences?.[ sourceStoreName ] ) {
 			// Set the feature values in the interface store, the features
 			// object is keyed by 'scope', which matches the store name for
 			// the source.
 			persistence.set( preferencesStoreName, {
 				preferences: {
-					...targetFeatures,
+					...existingPreferences,
 					[ sourceStoreName ]: featuresToMigrate,
 				},
 			} );
 
 			// Remove migrated feature preferences from `interface`.
 			if ( interfaceFeatures ) {
-				const otherInterfaceFeatures =
+				const otherInterfaceScopes =
 					state[ interfaceStoreName ]?.preferences?.features;
 
 				persistence.set( interfaceStoreName, {
 					preferences: {
 						features: {
-							...otherInterfaceFeatures,
+							...otherInterfaceScopes,
 							[ sourceStoreName ]: undefined,
 						},
 					},
@@ -344,56 +344,60 @@ export function migrateIndividualPreferenceToPreferencesStore(
 	} );
 }
 
-/**
- * Move the 'features' object in local storage from the sourceStoreName to the
- * interface store.
- *
- * @param {Object} persistence     The persistence interface.
- * @param {string} sourceStoreName The name of the store that has persisted
- *                                 preferences to migrate to the interface
- *                                 package.
- */
-export function migrateFeaturePreferencesToInterfaceStore(
-	persistence,
-	sourceStoreName
+export function migrateThirdPartyFeaturePreferencesToPreferencesStore(
+	persistence
 ) {
 	const interfaceStoreName = 'core/interface';
-	const state = persistence.get();
-	const sourcePreferences = state[ sourceStoreName ]?.preferences;
-	const sourceFeatures = sourcePreferences?.features;
+	const preferencesStoreName = 'core/preferences';
 
-	if ( sourceFeatures ) {
-		const targetFeatures =
+	let state = persistence.get();
+
+	const interfaceScopes = state[ interfaceStoreName ]?.preferences?.features;
+
+	for ( const scope in interfaceScopes ) {
+		// Don't migrate any core 'scopes'.
+		if ( scope.startsWith( 'core' ) ) {
+			continue;
+		}
+
+		// Skip this scope if there are no features to migrates
+		const featuresToMigrate = interfaceScopes[ scope ];
+		if ( ! featuresToMigrate ) {
+			continue;
+		}
+
+		const existingPreferences = state[ preferencesStoreName ]?.preferences;
+
+		// Add the data to the preferences store structure.
+		persistence.set( preferencesStoreName, {
+			preferences: {
+				...existingPreferences,
+				[ scope ]: featuresToMigrate,
+			},
+		} );
+
+		// Remove the data from the interface store structure.
+		// Call `persistence.get` again to make sure `state` is up-to-date with
+		// any changes from the previous iteration of this loop.
+		state = persistence.get();
+		const otherInterfaceScopes =
 			state[ interfaceStoreName ]?.preferences?.features;
 
-		// Avoid migrating features again if they've previously been migrated.
-		if ( ! targetFeatures?.[ sourceStoreName ] ) {
-			// Set the feature values in the interface store, the features
-			// object is keyed by 'scope', which matches the store name for
-			// the source.
-			persistence.set( interfaceStoreName, {
-				preferences: {
-					features: {
-						...targetFeatures,
-						[ sourceStoreName ]: sourceFeatures,
-					},
+		persistence.set( interfaceStoreName, {
+			preferences: {
+				features: {
+					...otherInterfaceScopes,
+					[ scope ]: undefined,
 				},
-			} );
-
-			// Remove feature preferences from the source.
-			persistence.set( sourceStoreName, {
-				preferences: {
-					...sourcePreferences,
-					features: undefined,
-				},
-			} );
-		}
+			},
+		} );
 	}
 }
 
 persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const persistence = createPersistenceInterface( pluginOptions );
 
+	// Boolean feature preferences.
 	migrateFeaturePreferencesToPreferencesStore(
 		persistence,
 		'core/edit-widgets'
@@ -406,6 +410,13 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 		persistence,
 		'core/edit-post'
 	);
+	migrateFeaturePreferencesToPreferencesStore(
+		persistence,
+		'core/edit-site'
+	);
+	migrateThirdPartyFeaturePreferencesToPreferencesStore( persistence );
+
+	// Other ad-hoc preferences.
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,
 		'core/edit-post',
@@ -420,10 +431,6 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 		persistence,
 		'core/edit-post',
 		'preferredStyleVariations'
-	);
-	migrateFeaturePreferencesToPreferencesStore(
-		persistence,
-		'core/edit-site'
 	);
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,
