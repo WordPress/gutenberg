@@ -20,4 +20,5 @@ export const settings = {
 	edit,
 	save,
 	deprecated,
+	ignoreStylesInValidation: true,
 };

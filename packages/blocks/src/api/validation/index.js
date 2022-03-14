@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import { identity, xor, fromPairs, includes, stubTrue } from 'lodash';
+import { identity, xor, fromPairs, includes, isEqual, stubTrue } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ import { getSaveContent } from '../serializer';
 import {
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
+	getBlockType,
 } from '../registration';
 import { normalizeBlockType } from '../utils';
 
@@ -407,7 +408,11 @@ export const isEqualAttributesOfName = {
 			...[ actual, expected ].map( getTextPiecesSplitOnWhitespace )
 		).length;
 	},
-	style: () => true,
+	style: ( actual, expected, ignoreStylesInValidation ) => {
+		return ignoreStylesInValidation === true
+			? true
+			: isEqual( ...[ actual, expected ].map( getStyleProperties ) );
+	},
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
 	...fromPairs(
@@ -428,6 +433,7 @@ export const isEqualAttributesOfName = {
 export function isEqualTagAttributePairs(
 	actual,
 	expected,
+	ignoreStylesInValidation = false,
 	logger = createLogger()
 ) {
 	// Attributes is tokenized as tuples. Their lengths should match. This also
@@ -466,7 +472,13 @@ export function isEqualTagAttributePairs(
 
 		if ( isEqualAttributes ) {
 			// Defer custom attribute equality handling.
-			if ( ! isEqualAttributes( actualValue, expectedValue ) ) {
+			if (
+				! isEqualAttributes(
+					actualValue,
+					expectedValue,
+					ignoreStylesInValidation
+				)
+			) {
 				logger.warning(
 					'Expected attribute `%s` of value `%s`, saw `%s`.',
 					name,
@@ -496,7 +508,12 @@ export function isEqualTagAttributePairs(
  * @type {Object}
  */
 export const isEqualTokensOfType = {
-	StartTag: ( actual, expected, logger = createLogger() ) => {
+	StartTag: (
+		actual,
+		expected,
+		ignoreStylesInValidation = false,
+		logger = createLogger()
+	) => {
 		if (
 			actual.tagName !== expected.tagName &&
 			// Optimization: Use short-circuit evaluation to defer case-
@@ -514,6 +531,7 @@ export const isEqualTokensOfType = {
 
 		return isEqualTagAttributePairs(
 			...[ actual, expected ].map( getMeaningfulAttributePairs ),
+			ignoreStylesInValidation,
 			logger
 		);
 	},
@@ -600,7 +618,12 @@ export function isClosedByToken( currentToken, nextToken ) {
  *
  * @return {boolean} Whether HTML strings are equivalent.
  */
-export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
+export function isEquivalentHTML(
+	actual,
+	expected,
+	ignoreStylesInValidation = false,
+	logger = createLogger()
+) {
 	// Short-circuit if markup is identical.
 	if ( actual === expected ) {
 		return true;
@@ -647,7 +670,12 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 		const isEqualTokens = isEqualTokensOfType[ actualToken.type ];
 		if (
 			isEqualTokens &&
-			! isEqualTokens( actualToken, expectedToken, logger )
+			! isEqualTokens(
+				actualToken,
+				expectedToken,
+				ignoreStylesInValidation,
+				logger
+			)
 		) {
 			return false;
 		}
@@ -726,10 +754,11 @@ export function validateBlock( block, blockTypeOrName ) {
 
 		return [ false, logger.getItems() ];
 	}
-
+	const { ignoreStylesInValidation } = getBlockType( block.name );
 	const isValid = isEquivalentHTML(
 		block.originalContent,
 		generatedBlockContent,
+		ignoreStylesInValidation,
 		logger
 	);
 
