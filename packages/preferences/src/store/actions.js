@@ -32,6 +32,23 @@ export function set( scope, name, value ) {
 }
 
 /**
+ * Returns an action object used in signalling that a preference should be
+ * removed.
+ *
+ * @param {string} scope The preference scope (e.g. core/edit-post).
+ * @param {string} name  The preference name.
+ *
+ * @return {Object} Action object.
+ */
+export function unset( scope, name ) {
+	return {
+		type: 'UNSET_PREFERENCE_VALUE',
+		scope,
+		name,
+	};
+}
+
+/**
  * Returns an action object used in signalling that preference defaults should
  * be set.
  *

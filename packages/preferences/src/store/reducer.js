@@ -49,6 +49,19 @@ export function preferences( state = {}, action ) {
 		};
 	}
 
+	if ( action.type === 'UNSET_PREFERENCE_VALUE' ) {
+		const { scope, name } = action;
+
+		// Copy the state so that it isn't mutated directly.
+		const newState = { ...state[ scope ] };
+		delete newState[ name ];
+
+		return {
+			...state,
+			[ scope ]: newState,
+		};
+	}
+
 	return state;
 }
 
