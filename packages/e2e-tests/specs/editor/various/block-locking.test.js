@@ -21,7 +21,7 @@ describe( 'Block Grouping', () => {
 			await page.keyboard.type( 'Some paragraph' );
 
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Lock Paragraph' );
+			await clickMenuItem( 'Lock' );
 
 			const [ checkbox ] = await page.$x(
 				'//label[contains(text(), "Prevent removal")]'
@@ -45,7 +45,7 @@ describe( 'Block Grouping', () => {
 			await page.keyboard.type( 'Second paragraph' );
 
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Lock Paragraph' );
+			await clickMenuItem( 'Lock' );
 
 			const [ checkbox ] = await page.$x(
 				'//label[contains(text(), "Disable movement")]'
@@ -71,7 +71,7 @@ describe( 'Block Grouping', () => {
 			await page.keyboard.type( 'Some paragraph' );
 
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Lock Paragraph' );
+			await clickMenuItem( 'Lock' );
 
 			const [ checkbox ] = await page.$x(
 				'//label//*[contains(text(), "Lock all")]'
@@ -92,7 +92,7 @@ describe( 'Block Grouping', () => {
 			await page.keyboard.type( 'Some paragraph' );
 
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Lock Paragraph' );
+			await clickMenuItem( 'Lock' );
 
 			const [ lockCheckbox ] = await page.$x(
 				'//label//*[contains(text(), "Lock all")]'

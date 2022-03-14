@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useReducer } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -11,11 +11,9 @@ import { lock, unlock } from '@wordpress/icons';
  * Internal dependencies
  */
 import BlockLockModal from './modal';
-import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockMenuItem( { clientId } ) {
-	const blockInformation = useBlockDisplayInformation( clientId );
 	const { isLocked } = useSelect(
 		( select ) => {
 			const { canMoveBlock, canRemoveBlock } = select( blockEditorStore );
@@ -33,17 +31,7 @@ export default function BlockLockMenuItem( { clientId } ) {
 		false
 	);
 
-	const label = isLocked
-		? sprintf(
-				/* translators: %s: block name */
-				__( 'Unlock %s' ),
-				blockInformation.title
-		  )
-		: sprintf(
-				/* translators: %s: block name */
-				__( 'Lock %s' ),
-				blockInformation.title
-		  );
+	const label = isLocked ? __( 'Unlock' ) : __( 'Lock' );
 
 	return (
 		<>
