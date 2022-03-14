@@ -46,7 +46,7 @@ if (
 	process.env.JEST_PUPPETEER_CONFIG = fromConfigRoot( 'puppeteer.config.js' );
 }
 
-const configFile = getJestOverrideConfigFile( 'e2e' );
+const configFile = getJestOverrideConfigFile( 'a11y-blocks' );
 
 const config = configFile
 	? [ '--config', JSON.stringify( require( configFile ) ) ]
@@ -79,5 +79,5 @@ Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
 
 const cleanUpPrefixes = [ '--puppeteer-', '--wordpress-' ];
 
-// jest.run( [ ...config, ...runInBand, ...getArgsFromCLI( cleanUpPrefixes ) ] );
+jest.run( [ ...config, ...runInBand, ...getArgsFromCLI( cleanUpPrefixes ) ] );
 console.log( 'TESTING' );
