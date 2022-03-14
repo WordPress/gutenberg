@@ -196,6 +196,15 @@ export default function ColorPalette( {
 		[ value, colors, showMultiplePalettes ]
 	);
 
+	const customColorAccessibleLabel = sprintf(
+		// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
+		__(
+			'Custom color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
+		),
+		buttonLabelName,
+		valueWithoutLeadingHash
+	);
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
@@ -212,7 +221,7 @@ export default function ColorPalette( {
 							aria-expanded={ isOpen }
 							aria-haspopup="true"
 							onClick={ onToggle }
-							aria-label={ __( 'Custom color picker' ) }
+							aria-label={ customColorAccessibleLabel }
 							style={ {
 								background: value,
 								color:
