@@ -34,6 +34,8 @@ import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 import { togglePreferencesOption } from './toggle-preferences-option';
 import { getAllBlockInserterItemTitles } from './get-all-block-inserter-item-titles';
 import { closeGlobalBlockInserter } from './inserter/close-global-block-interser';
+import { openPublishPanel } from './open-publish-panel';
+import { publishPost } from './publish-post';
 
 class PageUtils {
 	browser: Browser;
@@ -74,6 +76,8 @@ class PageUtils {
 	togglePreferencesOption = togglePreferencesOption;
 	getAllBlockInserterItemTitles = getAllBlockInserterItemTitles;
 	closeGlobalBlockInserter = closeGlobalBlockInserter;
+	openPublishPanel = openPublishPanel;
+	publishPost = publishPost;
 }
 
 export { PageUtils };
