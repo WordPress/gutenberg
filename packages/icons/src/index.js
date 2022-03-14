@@ -84,7 +84,6 @@ export { default as formatRtl } from './library/format-rtl';
 export { default as formatStrikethrough } from './library/format-strikethrough';
 export { default as formatUnderline } from './library/format-underline';
 export { default as formatUppercase } from './library/format-uppercase';
-export { default as notFound } from './library/not-found';
 export { default as fullscreen } from './library/fullscreen';
 export { default as gallery } from './library/gallery';
 export { default as globe } from './library/globe';
@@ -133,6 +132,7 @@ export { default as moreHorizontalMobile } from './library/more-horizontal-mobil
 export { default as moreVertical } from './library/more-vertical';
 export { default as moveTo } from './library/move-to';
 export { default as navigation } from './library/navigation';
+export { default as notFound } from './library/not-found';
 export { default as overlayText } from './library/overlay-text';
 export { default as pageBreak } from './library/page-break';
 export { default as customLink } from './library/custom-link';
