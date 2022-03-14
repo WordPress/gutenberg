@@ -232,11 +232,11 @@ For the above reasons, **the `user-event` library is the recommended way to simu
 ```javascript
 import { render, screen } from '@testing-library/react';
 
-test('fires onChange when a new value is typed', () => {
+test( 'fires onChange when a new value is typed', () => {
 	const spyOnChange = jest.fn();
 
 	// A component with one `input` and one `select`.
-	const { user } = render(<MyComponent onChange={spyOnChange} />)
+	render( <MyComponent onChange={ spyOnChange } /> );
 
 	const input = screen.getByRole( 'textbox' );
 	input.focus();
@@ -244,7 +244,7 @@ test('fires onChange when a new value is typed', () => {
 	fireEvent.change( input, { target: { value: 62 } } );
 
 	// The `onChange` callback gets called once with '62' as the argument.
-	expect( setState ).toHaveBeenCalledTimes( 1 );
+	expect( spyOnChange ).toHaveBeenCalledTimes( 1 );
 
 	const select = screen.getByRole( 'listbox' );
 	select.focus();
@@ -272,7 +272,7 @@ test('fires onChange when a new value is typed', async () => {
 	const spyOnChange = jest.fn();
 
 	// A component with one `input` and one `select`.
-	const { user } = render(<MyComponent onChange={spyOnChange} />)
+	const { user } = render( <MyComponent onChange={ spyOnChange } /> );
 
 	const input = screen.getByRole( 'textbox' );
 	// Focus element, select all contents, delete contents as per browser menu
@@ -285,7 +285,7 @@ test('fires onChange when a new value is typed', async () => {
 	// - 1: clear ('')
 	// - 2: '6'
 	// - 3: '62'
-	expect( setState ).toHaveBeenCalledTimes( 3 );
+	expect( spyOnChange ).toHaveBeenCalledTimes( 3 );
 
 	const select = screen.getByRole( 'listbox' );
 	// Focus, pointer events, change events
