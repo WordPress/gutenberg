@@ -136,22 +136,10 @@ const extractColorNameFromCurrentValue = (
 		return '';
 	}
 
-	if ( showMultiplePalettes ) {
-		for ( const { colors: colorPaletteColors } of colors ) {
-			for ( const {
-				name: colorName,
-				color: colorValue,
-			} of colorPaletteColors ) {
-				if (
-					colord( currentValue ).toHex() ===
-					colord( colorValue ).toHex()
-				) {
-					return colorName;
-				}
-			}
-		}
-	} else {
-		for ( const { name: colorName, color: colorValue } of colors ) {
+	// Normalize format of `colors` to simplify the following loop
+	const colorPalettes = showMultiplePalettes ? colors : [ { colors } ];
+	for ( const { colors: paletteColors } of colorPalettes ) {
+		for ( const { name: colorName, color: colorValue } of paletteColors ) {
 			if (
 				colord( currentValue ).toHex() === colord( colorValue ).toHex()
 			) {
