@@ -235,8 +235,9 @@ add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container'
  * @param string $block_content Rendered block content.
  * @return string Filtered block content.
  */
-function gutenberg_restore_image_outer_container( $block_content ) {
-	$image_with_align = '/(^\s*<figure\b[^>]*)\bwp-block-image\b([^"]*\b(?:alignleft|alignright|aligncenter)\b[^>]*>.*<\/figure>)/U';
+function gutenberg_restore_image_outer_container( $block_content, $block ) {
+	$block_classnames = isset( $block['attrs']['className'] ) ? $block['attrs']['className'] : '';
+	$image_with_align = '/(^\s*<figure\b[^>]*)\bwp-block-image\b([^"]*\b(?:alignleft|alignright|aligncenter).*)\b(?:' . $block_classnames . ')([^>]*>.*<\/figure>)/U';
 
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() ||
@@ -245,16 +246,12 @@ function gutenberg_restore_image_outer_container( $block_content ) {
 		return $block_content;
 	}
 
-	$block_classnames                 = isset( $block['attrs']['className'] ) ? $block['attrs']['className'] : '';
-	$remove_classnames_pattern        = '/(<figure.*?class=".*)\s' . $block_classnames . '(.*?">)/';
-	$content_without_block_classnames = preg_replace( $remove_classnames_pattern, '$1 $2', $block_content );
-
 	$updated_content = preg_replace_callback(
 		$image_with_align,
 		static function( $matches ) use ( $block_classnames ) {
-			return '<div class="wp-block-image ' . $block_classnames . '">' . $matches[1] . $matches[2] . '</div>';
+			return '<div class="wp-block-image ' . $block_classnames . '">' . $matches[1] . $matches[2] . $matches[3] . '</div>';
 		},
-		$content_without_block_classnames
+		$block_content
 	);
 	return $updated_content;
 }

@@ -41,6 +41,22 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$block         = array(
 			'blockName' => 'core/image',
 			'attrs'     => array(
+				'className' => '',
+			),
+		);
+		$block_content = '<figure class="wp-block-image alignright size-full"><img src="/my-image.jpg"/></figure>';
+		$actual        = gutenberg_restore_image_outer_container( $block_content, $block );
+		$expected      = '<div class="wp-block-image "><figure class=" alignright size-full"><img src="/my-image.jpg"/></figure></div>';
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	function test_additional_styles_moved_to_restored_outer_container_for_aligned_image_block_with_non_themejson_theme() {
+		// The "default" theme doesn't have theme.json support.
+		switch_theme( 'default' );
+		$block         = array(
+			'blockName' => 'core/image',
+			'attrs'     => array(
 				'className' => 'is-style-round my-custom-classname',
 			),
 		);
