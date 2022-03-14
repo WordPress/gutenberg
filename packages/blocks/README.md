@@ -892,12 +892,12 @@ invalid, this function returns all validations issues as well.
 
 _Parameters_
 
--   _block_ `import('../parser').WPBlock`: block object.
--   _blockTypeOrName_ `[import('../registration').WPBlockType]`: Block type or name, inferred from block if not given.
+-   _block_ `WPBlock`: block object.
+-   _blockTypeOrName_ `[WPBlockType|string]`: Block type or name, inferred from block if not given.
 
 _Returns_
 
--   `[boolean,Object]`: validation results.
+-   `[boolean,Array<LoggerItem>]`: validation results.
 
 ### withBlockContentContext
 

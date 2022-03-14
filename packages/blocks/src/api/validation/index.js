@@ -21,6 +21,10 @@ import {
 } from '../registration';
 import { normalizeBlockType } from '../utils';
 
+/** @typedef {import('../parser').WPBlock} WPBlock */
+/** @typedef {import('../registration').WPBlockType} WPBlockType */
+/** @typedef {import('./logger').LoggerItem} LoggerItem */
+
 /**
  * Globally matches any consecutive whitespace
  *
@@ -701,10 +705,10 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  * with assumed attributes, the content matches the original value. If block is
  * invalid, this function returns all validations issues as well.
  *
- * @param {import('../parser').WPBlock}           block             block object.
- * @param {import('../registration').WPBlockType} [blockTypeOrName] Block type or name, inferred from block if not given.
+ * @param {WPBlock}            block                          block object.
+ * @param {WPBlockType|string} [blockTypeOrName = block.name] Block type or name, inferred from block if not given.
  *
- * @return {[boolean,Object]} validation results.
+ * @return {[boolean,Array<LoggerItem>]} validation results.
  */
 export function validateBlock( block, blockTypeOrName = block.name ) {
 	const isFallbackBlock =
@@ -713,7 +717,7 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 
 	// Shortcut to avoid costly validation.
 	if ( isFallbackBlock ) {
-		return [ true ];
+		return [ true, [] ];
 	}
 
 	const logger = createQueuedLogger();
