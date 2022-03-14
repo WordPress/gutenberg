@@ -196,14 +196,16 @@ export default function ColorPalette( {
 		[ value, colors, showMultiplePalettes ]
 	);
 
-	const customColorAccessibleLabel = sprintf(
-		// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
-		__(
-			'Custom color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
-		),
-		buttonLabelName,
-		valueWithoutLeadingHash
-	);
+	const customColorAccessibleLabel = !! valueWithoutLeadingHash
+		? sprintf(
+				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
+				__(
+					'Custom color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
+				),
+				buttonLabelName,
+				valueWithoutLeadingHash
+		  )
+		: __( 'Custom color picker.' );
 
 	return (
 		<VStack spacing={ 3 } className={ className }>
