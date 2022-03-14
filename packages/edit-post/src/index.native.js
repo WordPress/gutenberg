@@ -3,6 +3,8 @@
  */
 import '@wordpress/core-data';
 import '@wordpress/format-library';
+import { dispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -19,5 +21,13 @@ import Editor from './editor';
  * @param {Object} postId   ID of the post to edit (unused right now)
  */
 export function initializeEditor( id, postType, postId ) {
+	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		editorMode: 'visual',
+		fixedToolbar: false,
+		fullscreenMode: true,
+		hiddenBlockTypes: [],
+		welcomeGuide: true,
+	} );
+
 	return <Editor postId={ postId } postType={ postType } />;
 }

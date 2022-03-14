@@ -24,6 +24,19 @@ export const defaultEntities = [
 		name: '__unstableBase',
 		kind: 'root',
 		baseURL: '/',
+		baseURLParams: {
+			_fields: [
+				'description',
+				'gmt_offset',
+				'home',
+				'name',
+				'site_icon',
+				'site_icon_url',
+				'site_logo',
+				'timezone_string',
+				'url',
+			].join( ',' ),
+		},
 	},
 	{
 		label: __( 'Site' ),

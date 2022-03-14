@@ -7,7 +7,6 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	getEditorMode,
 	getPreference,
 	isEditorPanelOpened,
 	isModalActive,
@@ -22,24 +21,6 @@ import {
 } from '../selectors';
 
 describe( 'selectors', () => {
-	describe( 'getEditorMode', () => {
-		it( 'should return the selected editor mode', () => {
-			const state = {
-				preferences: { editorMode: 'text' },
-			};
-
-			expect( getEditorMode( state ) ).toEqual( 'text' );
-		} );
-
-		it( 'should fallback to visual if not set', () => {
-			const state = {
-				preferences: {},
-			};
-
-			expect( getEditorMode( state ) ).toEqual( 'visual' );
-		} );
-	} );
-
 	describe( 'getPreference', () => {
 		it( 'should return the preference value if set', () => {
 			const state = {
