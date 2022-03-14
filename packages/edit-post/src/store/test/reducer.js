@@ -142,43 +142,6 @@ describe( 'state', () => {
 				'post-status': { opened: false },
 			} );
 		} );
-
-		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( { editorMode: 'visual' } ), {
-				type: 'SWITCH_MODE',
-				mode: 'text',
-			} );
-
-			expect( state.editorMode ).toBe( 'text' );
-		} );
-
-		describe( 'hiddenBlockTypes', () => {
-			it( 'concatenates unique names on disable', () => {
-				const original = deepFreeze( {
-					hiddenBlockTypes: [ 'a', 'b' ],
-				} );
-
-				const state = preferences( original, {
-					type: 'HIDE_BLOCK_TYPES',
-					blockNames: [ 'b', 'c' ],
-				} );
-
-				expect( state.hiddenBlockTypes ).toEqual( [ 'a', 'b', 'c' ] );
-			} );
-
-			it( 'omits present names by enable', () => {
-				const original = deepFreeze( {
-					hiddenBlockTypes: [ 'a', 'b' ],
-				} );
-
-				const state = preferences( original, {
-					type: 'SHOW_BLOCK_TYPES',
-					blockNames: [ 'b', 'c' ],
-				} );
-
-				expect( state.hiddenBlockTypes ).toEqual( [ 'a' ] );
-			} );
-		} );
 	} );
 
 	describe( 'activeModal', () => {

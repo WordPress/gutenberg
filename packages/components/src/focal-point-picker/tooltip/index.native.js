@@ -79,7 +79,7 @@ function Label( { align, text, xOffset, yOffset } ) {
 		} ).start();
 	};
 
-	// Transforms rely upon onLayout to enable custom offsets additions
+	// Transforms rely upon onLayout to enable custom offsets additions.
 	let tooltipTransforms;
 	if ( dimensions ) {
 		tooltipTransforms = [

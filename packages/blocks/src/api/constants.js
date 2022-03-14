@@ -15,7 +15,7 @@ export const DEPRECATED_ENTRY_KEYS = [
 ];
 
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
-	//kept for back-compatibility purposes.
+	// Kept for back-compatibility purposes.
 	'--wp--style--color--link': {
 		value: [ 'color', 'link' ],
 		support: [ 'color', 'link' ],

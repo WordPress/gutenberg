@@ -192,27 +192,23 @@ The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wor
 
 -   The `wp/trunk` branch contains the same version of packages published to npm with the `latest` distribution tag. The WordPress core consumes those packages directly in the `trunk` branch and uses them for public releases.
 -   The `wp/next` branch contains the same version of packages published to npm with the `next` distribution tag. Projects should use those packages for development purposes only.
--   A Gutenberg branch targeting a specific WordPress major release (including its further minor increments) is created (example `wp/5.2`) based on the `wp/trunk` Gutenberg branch when the corresponding WordPress release branch is created. (This usually happens when the first `RC` of the next WordPress major version is released).
+-   A Gutenberg branch targeting a specific WordPress major release (including its further minor increments) is created (example `wp/5.2`) based on the `wp/trunk` Gutenberg branch when the corresponding WordPress release branch is created. (This usually happens when the `beta` or `RC` of the next WordPress major version is released).
 
 Release types and their schedule:
 
--   [Synchronizing WordPress Trunk](#synchronizing-wordpress-trunk) (`latest` dist tag) – when there is no "feature-freeze" mode in WordPress Core, publishing happens every two weeks based on the newly created RC1 version of the Gutenberg plugin. Otherwise, only bug fixes get manually included and published to npm before every next beta and RC version of the following WordPress release.
--   [Minor WordPress Releases](#minor-wordpress-releases) (`patch` dist tag) – only when bug fixes or security releases need to be backported into WordPress Core.
--   [Development Releases](#development-releases) (`next` dist tag) – when there is a "feature-freeze" mode in WordPress Core, publishing can still happen every two weeks based on the new RC1 version of the Gutenberg plugin. It is also possible to perform development releases at any time when there is a need to test the upcoming changes.
+-   [Synchronizing Gutenberg Plugin](#synchronizing-gutenberg-plugin) (`latest` dist tag) – publishing happens every two weeks based on the newly created RC1 version of the Gutenberg plugin.
+-   [WordPress Releases](#wordpress-releases) (`patch` dist tag) – only when bug or security fixes need to be backported into WordPress Core.
+-   [Development Releases](#development-releases) (`next` dist tag) – it is also possible to perform development releases at any time when there is a need to test the upcoming changes.
 
-There is also an option to perform [Standalone Bugfix Package Releases](#standalone-bugfix-package-releases) at will. It should be reserved only for critical bug fixes or security releases that must be published to _npm_ outside of a regular WordPress release cycle.
+There is also an option to perform [Standalone Bugfix Package Releases](#standalone-bugfix-package-releases) at will. It should be reserved only for critical bug fixes or security releases that must be published to _npm_ outside of regular cycles.
 
-### Synchronizing WordPress Trunk
+### Synchronizing Gutenberg Plugin
 
-For each Gutenberg plugin release, WordPress trunk should be synchronized.
+For each Gutenberg plugin release, we also publish to npm an updated version of WordPress packages. This is automated with the [Release Tool](#release-tool) that handles releases for the Gutenberg plugin.
 
-Note that the WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, feature freeze in WordPress Core happens about 2 weeks before Beta 1 and remains in effect until RC1 when the `trunk` gets branched. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
+We deliberately update the `wp/trunk` branch within the Gutenberg repo with the content from the Gutenberg release `release/*` (example `release/12.7`) branch at the time of the Gutenberg RC1 release. This is done to ensure that the `wp/trunk` branch is as close as possible to the latest version of the Gutenberg plugin. It also practically removes the chances of conflicts while backporting to `trunk` commits with updates applied during publishing to `package.json` and `CHANGELOG.md` files. In the past, we had many issues in that aspect when doing npm publishing after the regular Gutenberg release a week later. When publishing the new package versions to npm, we pick at least the `minor` version bump to account for future bugfix or security releases.
 
-A different person usually synchronizes the WordPress `trunk` branch and publishes the npm packages. Therefore, you typically shouldn't need to worry about handling this for the normal plugin release process. However, if you are still unsure, ask in [the #core-editor Slack channel](https://wordpress.slack.com/archives/C02QB2JS7).
-
-The process has three steps: 1) update the `wp/trunk` branch within the Gutenberg repo 2) publish the new package versions to npm 3) update the WordPress `trunk` branch.
-
-The first step is automated via `./bin/plugin/cli.js npm-latest` command. You only have to run the command, but, for the record, the manual process would look very close to the following steps:
+All steps are automated via `./bin/plugin/cli.js npm-latest` command. For the record, the manual process would look very close to the following steps:
 
 1. Ensure the WordPress `trunk` branch is open for enhancements.
 2. Get the last published Gutenberg release branch with `git fetch`.
@@ -220,21 +216,20 @@ The first step is automated via `./bin/plugin/cli.js npm-latest` command. You on
 4. Remove all files from the current branch: `git rm -r .`.
 5. Check out all the files from the release branch: `git checkout release/x.x -- .`.
 6. Commit all changes to the `wp/trunk` branch with `git commit -m "Merge changes published in the Gutenberg plugin vX.X release"` and push to the repository.
-7. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch. Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number after every major WordPress release. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version. This is important as the patch version numbers should be reserved in case bug fixes are needed for a minor WordPress release (see below).
+7. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch. Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version bumps gets applied. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version. This is important as the patch version numbers should be reserved in case bug fixes are needed for a minor WordPress release (see below).
 8. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
 9. From the `wp/trunk` branch, install npm dependencies with `npm ci`.
 10. Run the script `npm run publish:latest`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
     - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
+11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
-Finally, now that the npm packages are ready, a patch can be created and committed into WordPress `trunk`. You should also cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
+### WordPress Releases
 
-### Minor WordPress Releases
+The following workflow is needed when bug or security fixes need to be backported into WordPress Core. This can happen in a few use-cases:
 
-The following workflow is needed when bug fixes or security releases need to be backported into WordPress Core. This can happen in a few use-cases:
-
--   During the `RC` period of the WordPress release cycle when `wp/X.Y` (example `wp/5.7`) branch for the release is already present.
+-   During the `beta` and `RC` periods of the WordPress release cycle when `wp/X.Y` (example `wp/5.7`) branch for the release is already present.
 -   For WordPress minor releases and WordPress security releases (example `5.1.1`).
 
 1. Check out the relevant WordPress major branch (If the minor release is 5.2.1, check out `wp/5.2`).
@@ -257,7 +252,7 @@ Now, the npm packages should be ready and a patch can be created and committed i
 
 ### Standalone Bugfix Package Releases
 
-The following workflow is needed when packages require bug fixes or security releases to be published to _npm_ outside of a regular WordPress release cycle.
+The following workflow is needed when packages require bug fixes or security releases to be published to _npm_ outside of a regular release cycle.
 
 Note: Both the `trunk` and `wp/trunk` branches are restricted and can only be _pushed_ to by the Gutenberg Core team.
 
@@ -300,101 +295,21 @@ Check the versions listed in the current `CHANGELOG.md` file, looking through th
 
 Note: You may discover the current version of each package is not up to date, if so updating the previously released versions would be appreciated.
 
-The good news is that the rest of the process is automated with `./bin/plugin/cli.js npm-bugfix` command. The rest of the section covers all the necessary steps for publishing the packages if you prefer to do it manually.
+The good news is that the rest of the process is automated with `./bin/plugin/cli.js npm-bugfix` command. For the record, the manual process would look very close to the following steps:
 
-Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#maintaining-changelogs) documentation and commit the changes:
-
-1. `git checkout wp/trunk`
-2. Update each of the `CHANGELOG.md` files
-3. Stage the _changelog_ changes `git add packages/`
-4. `git commit -m "Update changelogs"`
-5. Make a note of the commit hash of this commit
-    > Example
-    >
-    > ```
-    > [trunk 278f524f16] Update changelogs` 278f524
-    > ```
-6. `git push`
-
-Now that the changes have been committed to the `wp/trunk` branch and the Travis CI builds for the `wp/trunk` [branch are passing](https://travis-ci.com/WordPress/gutenberg/branches) it's time to publish the packages to npm:
-
-1. Once again run `npm run publish:check` to confirm there are no unexpected packages ready to be published:
-    > Example
-    >
-    > ```shell
-    > npm run publish:check
-    > @wordpress/e2e-tests
-    > @wordpress/jest-preset-default
-    > @wordpress/scripts
-    > lerna success found 3 packages ready to publish
-    > ```
-2. Run the `npm run publish:latest` command (see more in [package release process]) but when asked for the version numbers to choose for each package use the versions you made note of above when updating each packages `CHANGELOG.md` file.
-    > Truncated example of publishing process output
-    >
-    > ```
-    > npm run publish:latest
-    >
-    > Build Progress: [==============================] 100%
-    > lerna notice cli v3.18.2
-    > lerna info versioning independent
-    > ? Select a new version for @wordpress/e2e-tests (currently 1.9.0) Patch (1.9.1)
-    > ? Select a new version for @wordpress/jest-preset-default (currently 5.3.0) Patch (5.3.1)
-    > ? Select a new version for @wordpress/scripts (currently 6.1.0) Patch (6.1.1)
-    >
-    > Changes:
-    >  - @wordpress/e2e-tests: 1.9.0 => 1.9.1
-    >  - @wordpress/jest-preset-default: 5.3.0 => 5.3.1
-    >  - @wordpress/scripts: 6.1.0 => 6.1.1
-    >
-    > ? Are you sure you want to publish these packages? Yes
-    > lerna info execute Skipping releases
-    > lerna info git Pushing tags...
-    > lerna info publish Publishing packages to npm...
-    > lerna info Verifying npm credentials
-    > lerna info Checking two-factor auth mode
-    > ? Enter OTP: 753566
-    > lerna success published @wordpress/jest-preset-default 5.3.1
-    > lerna success published @wordpress/scripts 6.1.1
-    > lerna success published @wordpress/e2e-tests 1.9.1
-    > Successfully published:
-    >  - @wordpress/e2e-tests@1.9.1
-    >  - @wordpress/jest-preset-default@5.3.1
-    >  - @wordpress/scripts@6.1.1
-    > lerna success published 3 packages
-    > ```
-
-Now that the packages have been published the _"chore(release): publish"_ and _"Update changelogs"_ commits to `wp/trunk` need to be ported to the `trunk` branch:
-
-1. `git checkout trunk`
-2. `git pull`
-3. Cherry-pick the `278f524`hash you noted above from the _"Update changelogs"_ commit made to `wp/trunk`
-4. `git cherry-pick 278f524`
-5. Get the commit hash from the lerna publish commit either from the terminal or [wp/trunk commits](https://github.com/WordPress/gutenberg/commits/wp/trunk)
-6. Cherry-pick the `fe6ae0d` "chore(release): publish"\_ commit made to `wp/trunk`
-7. `git cherry-pick fe6ae0d`
-8. `git push`
-
-Confirm the packages dependencies do not contain `file://` links in the `dependencies` or `devdependencies` section of the packages released, e.g:
-
-> https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json > https://unpkg.com/browse/@wordpress/scripts@6.1.1/package.json > https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json
-
-Time to announce the published changes in the #core-js and #core-editor Slack channels
-
-> ```
-> 📣 Successfully published:
-> • @wordpress/e2e-tests@1.9.1
-> • @wordpress/jest-preset-default@5.3.1
-> • @wordpress/scripts@6.1.1
-> Lerna success published 3 packages
-> ```
-
----
-
-Ta-da! 🎉
+1. Check out the `wp/trunk` branch.
+2. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch.
+3. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
+4. From the `wp/trunk` branch, install npm dependencies with `npm ci`.
+5. Run the script `npm run publish:latest`.
+    - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
+    - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
+    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
+6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### Development Releases
 
-As noted in the [Synchronizing WordPress Trunk](#synchronizing-wordpress-trunk) section, the WordPress trunk branch can be closed or in "feature-freeze" mode. Usually, this happens during the WordPress ongoing release cycle, which takes several weeks. It means that packages don't get any enhancements and new features during the ongoing WordPress major release process. Another type of release is available to address the limitation mentioned earlier and unblock ongoing development for projects that depend on WordPress packages. We are taking advantage of [package distribution tags](https://docs.npmjs.com/cli/v7/commands/npm-dist-tag) that make it possible to consume the future version of the codebase according to npm guidelines:
+As noted in the [Synchronizing Gutenberg Plugin](#synchronizing-gutenberg-plugin) section, packages publishing happens every two weeks from the `wp/trunk` branch. It's also possible to use the development release to test the upcoming changes present in the `trunk` branch at any time. We are taking advantage of [package distribution tags](https://docs.npmjs.com/cli/v7/commands/npm-dist-tag) that make it possible to consume the future version of the codebase according to npm guidelines:
 
 > By default, the `latest` tag is used by npm to identify the current version of a package, and `npm install <pkg>` (without any `@<version>` or `@<tag>` specifier) installs the `latest` tag. Typically, projects only use the `latest` tag for stable release versions, and use other tags for unstable versions such as prereleases.
 

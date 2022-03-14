@@ -33,14 +33,33 @@ export function finishResolution( selectorName, args ) {
 }
 
 /**
+ * Returns an action object used in signalling that selector resolution has
+ * failed.
+ *
+ * @param {string}        selectorName Name of selector for which resolver triggered.
+ * @param {unknown[]}     args         Arguments to associate for uniqueness.
+ * @param {Error|unknown} error        The error that caused the failure.
+ *
+ * @return {{ type: 'FAIL_RESOLUTION', selectorName: string, args: unknown[], error: Error|unknown }} Action object.
+ */
+export function failResolution( selectorName, args, error ) {
+	return {
+		type: 'FAIL_RESOLUTION',
+		selectorName,
+		args,
+		error,
+	};
+}
+
+/**
  * Returns an action object used in signalling that a batch of selector resolutions has
  * started.
  *
- * @param {string}    selectorName Name of selector for which resolver triggered.
- * @param {unknown[]} args         Array of arguments to associate for uniqueness, each item
- *                                 is associated to a resolution.
+ * @param {string}      selectorName Name of selector for which resolver triggered.
+ * @param {unknown[][]} args         Array of arguments to associate for uniqueness, each item
+ *                                   is associated to a resolution.
  *
- * @return {{ type: 'START_RESOLUTIONS', selectorName: string, args: unknown[] }} Action object.
+ * @return {{ type: 'START_RESOLUTIONS', selectorName: string, args: unknown[][] }} Action object.
  */
 export function startResolutions( selectorName, args ) {
 	return {
@@ -54,17 +73,37 @@ export function startResolutions( selectorName, args ) {
  * Returns an action object used in signalling that a batch of selector resolutions has
  * completed.
  *
- * @param {string}    selectorName Name of selector for which resolver triggered.
- * @param {unknown[]} args         Array of arguments to associate for uniqueness, each item
- *                                 is associated to a resolution.
+ * @param {string}      selectorName Name of selector for which resolver triggered.
+ * @param {unknown[][]} args         Array of arguments to associate for uniqueness, each item
+ *                                   is associated to a resolution.
  *
- * @return {{ type: 'FINISH_RESOLUTIONS', selectorName: string, args: unknown[] }} Action object.
+ * @return {{ type: 'FINISH_RESOLUTIONS', selectorName: string, args: unknown[][] }} Action object.
  */
 export function finishResolutions( selectorName, args ) {
 	return {
 		type: 'FINISH_RESOLUTIONS',
 		selectorName,
 		args,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that a batch of selector resolutions has
+ * completed and at least one of them has failed.
+ *
+ * @param {string}            selectorName Name of selector for which resolver triggered.
+ * @param {unknown[]}         args         Array of arguments to associate for uniqueness, each item
+ *                                         is associated to a resolution.
+ * @param {(Error|unknown)[]} errors       Array of errors to associate for uniqueness, each item
+ *                                         is associated to a resolution.
+ * @return {{ type: 'FAIL_RESOLUTIONS', selectorName: string, args: unknown[], errors: Array<Error|unknown> }} Action object.
+ */
+export function failResolutions( selectorName, args, errors ) {
+	return {
+		type: 'FAIL_RESOLUTIONS',
+		selectorName,
+		args,
+		errors,
 	};
 }
 

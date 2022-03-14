@@ -98,7 +98,7 @@ describe( 'Toolbar roving tabindex', () => {
 	it( 'ensures table block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Table' );
 		await testBlockToolbarKeyboardNavigation( 'Block: Table', 'Table' );
-		// Move focus to the first toolbar item
+		// Move focus to the first toolbar item.
 		await page.keyboard.press( 'Home' );
 		await expectLabelToHaveFocus( 'Table' );
 		await page.click( '.blocks-table__placeholder-button' );

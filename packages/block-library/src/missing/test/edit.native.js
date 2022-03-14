@@ -49,7 +49,7 @@ describe( 'Missing block', () => {
 			const testInstance = getTestComponentWithContent();
 			const bottomSheet = testInstance.UNSAFE_getByType( BottomSheet );
 			const children = bottomSheet.props.children[ 0 ].props.children;
-			expect( children.length ).toBe( 3 ); // 4 children in the bottom sheet: the icon, the "isn't yet supported" title and the "We are working hard..." message
+			expect( children.length ).toBe( 3 ); // 4 children in the bottom sheet: the icon, the "isn't yet supported" title and the "We are working hard..." message.
 			expect( children[ 0 ].props.icon ).toBe( help );
 		} );
 
@@ -66,7 +66,7 @@ describe( 'Missing block', () => {
 
 		describe( 'Unsupported block editor (UBE)', () => {
 			beforeEach( () => {
-				// By default we set the web editor as available
+				// By default we set the web editor as available.
 				storeConfig.selectors.getSettings.mockReturnValue( {
 					unsupportedBlockEditor: true,
 				} );

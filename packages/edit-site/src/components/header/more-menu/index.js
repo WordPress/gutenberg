@@ -5,33 +5,20 @@ import { __, _x } from '@wordpress/i18n';
 import { useReducer } from '@wordpress/element';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { displayShortcut } from '@wordpress/keycodes';
-import { external, moreVertical } from '@wordpress/icons';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	VisuallyHidden,
-} from '@wordpress/components';
-import { ActionItem } from '@wordpress/interface';
+import { external } from '@wordpress/icons';
+import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
+import { ActionItem, MoreMenuDropdown } from '@wordpress/interface';
+import { PreferenceToggleMenuItem } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import KeyboardShortcutHelpModal from '../../keyboard-shortcut-help-modal';
-import FeatureToggle from '../feature-toggle';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
-
-const POPOVER_PROPS = {
-	className: 'edit-site-more-menu__content',
-	position: 'bottom left',
-};
-const TOGGLE_PROPS = {
-	tooltipPosition: 'bottom',
-};
 
 export default function MoreMenu() {
 	const [ isModalActive, toggleModal ] = useReducer(
@@ -43,18 +30,13 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<DropdownMenu
-				className="edit-site-more-menu"
-				icon={ moreVertical }
-				label={ __( 'More tools & options' ) }
-				popoverProps={ POPOVER_PROPS }
-				toggleProps={ TOGGLE_PROPS }
-			>
+			<MoreMenuDropdown>
 				{ ( { onClose } ) => (
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
-							<FeatureToggle
-								feature="fixedToolbar"
+							<PreferenceToggleMenuItem
+								scope="core/edit-site"
+								name="fixedToolbar"
 								label={ __( 'Top toolbar' ) }
 								info={ __(
 									'Access all block and document tools in a single place'
@@ -66,8 +48,9 @@ export default function MoreMenu() {
 									'Top toolbar deactivated'
 								) }
 							/>
-							<FeatureToggle
-								feature="focusMode"
+							<PreferenceToggleMenuItem
+								scope="core/edit-site"
+								name="focusMode"
 								label={ __( 'Spotlight mode' ) }
 								info={ __( 'Focus on one block at a time' ) }
 								messageActivated={ __(
@@ -118,7 +101,7 @@ export default function MoreMenu() {
 						</MenuGroup>
 					</>
 				) }
-			</DropdownMenu>
+			</MoreMenuDropdown>
 			<KeyboardShortcutHelpModal
 				isModalActive={ isModalActive }
 				toggleModal={ toggleModal }

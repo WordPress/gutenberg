@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Radio } from 'reakit';
 
@@ -24,7 +24,7 @@ import * as styles from './styles';
 import { useCx } from '../../utils/hooks';
 import Tooltip from '../../tooltip';
 
-const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
+const { ButtonContentView, LabelView } = styles;
 
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
@@ -39,7 +39,7 @@ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 
 function ToggleGroupControlOption(
 	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const toggleGroupControlContext = useToggleGroupControlContext();
 	const id = useInstanceId(
@@ -88,9 +88,6 @@ function ToggleGroupControlOption(
 					value={ value }
 				>
 					<ButtonContentView>{ label }</ButtonContentView>
-					<LabelPlaceholderView aria-hidden>
-						{ label }
-					</LabelPlaceholderView>
 				</Radio>
 			</WithToolTip>
 		</LabelView>

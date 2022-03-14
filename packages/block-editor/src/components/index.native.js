@@ -1,4 +1,4 @@
-// Block Creation Components
+// Block Creation Components.
 export {
 	BlockAlignmentControl,
 	BlockAlignmentToolbar,
@@ -44,7 +44,13 @@ export {
 	MEDIA_TYPE_AUDIO,
 	MEDIA_TYPE_ANY,
 } from './media-upload';
-export { default as MediaUploadProgress } from './media-upload-progress';
+export {
+	default as MediaUploadProgress,
+	MEDIA_UPLOAD_STATE_UPLOADING,
+	MEDIA_UPLOAD_STATE_SUCCEEDED,
+	MEDIA_UPLOAD_STATE_FAILED,
+	MEDIA_UPLOAD_STATE_RESET,
+} from './media-upload-progress';
 export { default as BlockMediaUpdateProgress } from './block-media-update-progress';
 export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
@@ -65,7 +71,7 @@ export {
 } from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
-// Content Related Components
+// Content Related Components.
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';
@@ -77,5 +83,5 @@ export { default as Inserter } from './inserter';
 export { useBlockProps } from './block-list/use-block-props';
 export { default as FloatingToolbar } from './floating-toolbar';
 
-// State Related Components
+// State Related Components.
 export { default as BlockEditorProvider } from './provider';

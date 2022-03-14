@@ -9,7 +9,7 @@ import type {
 	KeyboardEvent,
 	PointerEvent,
 	FocusEvent,
-	Ref,
+	ForwardedRef,
 	MouseEvent,
 } from 'react';
 
@@ -17,7 +17,7 @@ import type {
  * WordPress dependencies
  */
 import { forwardRef, useRef } from '@wordpress/element';
-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
@@ -25,7 +25,6 @@ import type { WordPressComponentProps } from '../ui/context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
-import { isValueEmpty } from '../utils/values';
 import { useUpdateEffect } from '../utils';
 import type { InputFieldProps } from './types';
 
@@ -53,12 +52,12 @@ function InputField(
 		type,
 		...props
 	}: WordPressComponentProps< InputFieldProps, 'input', false >,
-	ref: Ref< HTMLInputElement >
+	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		// State
+		// State.
 		state,
-		// Actions
+		// Actions.
 		change,
 		commit,
 		drag,
@@ -112,11 +111,7 @@ function InputField(
 		 */
 		if ( isPressEnterToChange && isDirty ) {
 			wasDirtyOnBlur.current = true;
-			if ( ! isValueEmpty( value ) ) {
-				handleOnCommit( event );
-			} else {
-				reset( valueProp, event );
-			}
+			handleOnCommit( event );
 		}
 	};
 
@@ -162,6 +157,13 @@ function InputField(
 					handleOnCommit( event );
 				}
 				break;
+
+			case ESCAPE:
+				if ( isPressEnterToChange && isDirty ) {
+					event.preventDefault();
+					reset( valueProp, event );
+				}
+				break;
 		}
 	};
 
@@ -191,6 +193,7 @@ function InputField(
 			}
 		},
 		{
+			axis: dragDirection === 'e' || dragDirection === 'w' ? 'x' : 'y',
 			threshold: dragThreshold,
 			enabled: isDragEnabled,
 			pointer: { capture: false },

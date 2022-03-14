@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -88,7 +89,7 @@ export default function PostTermsEdit( {
 								href={ postTerm.link }
 								onClick={ ( event ) => event.preventDefault() }
 							>
-								{ postTerm.name }
+								{ unescape( postTerm.name ) }
 							</a>
 						) )
 						.reduce( ( prev, curr ) => (

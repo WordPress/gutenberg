@@ -29,6 +29,7 @@ export const buttonView = css`
 	color: ${ COLORS.gray[ 700 ] };
 	cursor: pointer;
 	display: flex;
+	font-family: inherit;
 	height: 100%;
 	justify-content: center;
 	line-height: 100%;
@@ -60,22 +61,10 @@ export const buttonActive = css`
 export const ButtonContentView = styled.div`
 	font-size: ${ CONFIG.fontSize };
 	line-height: 1;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate( -50%, -50% );
 `;
 
 export const separatorActive = css`
 	background: transparent;
-`;
-
-export const LabelPlaceholderView = styled.div`
-	font-size: ${ CONFIG.fontSize };
-	font-weight: bold;
-	height: 0;
-	overflow: hidden;
-	visibility: hidden;
 `;
 
 export const medium = css`

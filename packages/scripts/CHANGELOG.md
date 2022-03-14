@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 22.2.0 (2022-03-11)
+
+### Enhancement
+
+-   The bundled `@wordpress/eslint-plugin` package got updated to the new major version, but the breaking changes included don't affect this package ([#39244](https://github.com/WordPress/gutenberg/pull/39244)).
+
+## 22.1.0 (2022-03-03)
+
+### New Feature
+
+-   Add `--webpack-copy-php` CLI flag to opt-in to copying php files from `src` and its subfolders to the output directory (`build` by default) ([#39171](https://github.com/WordPress/gutenberg/pull/39171)).
+
+## 22.0.0 (2022-02-22)
+
 ### Breaking Changes
 
 -   The bundled `@svgr/webpack` dependency has been updated from requiring `^5.5.0` to requiring `^6.2.1` ([#38866](https://github.com/WordPress/gutenberg/pull/38866)). See [official migration guide to v6](https://react-svgr.com/docs/migrate/) for details.

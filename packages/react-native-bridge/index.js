@@ -23,13 +23,13 @@ export const actionButtons = {
 	missingBlockAlertActionButton: 'missing_block_alert_action_button',
 };
 
-// Console polyfill from react-native
+// Console polyfill from react-native.
 
 export function nativeLoggingHook( message, logLevel ) {
 	RNReactNativeGutenbergBridge.editorDidEmitLog( message, logLevel );
 }
 
-// Send messages
+// Send messages.
 
 export function sendNativeEditorDidLayout() {
 	// For now, this is only needed on iOS to solve layout issues with the toolbar.
@@ -40,7 +40,7 @@ export function sendNativeEditorDidLayout() {
 	}
 }
 
-// Register listeners
+// Register listeners.
 
 export function subscribeParentGetHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'requestGetHtml', callback );

@@ -126,7 +126,7 @@ export default function Sandbox( {
 			return;
 		}
 
-		// put the html snippet into a html document, and then write it to the iframe's document
+		// Put the html snippet into a html document, and then write it to the iframe's document
 		// we can use this in the future to inject custom styles or scripts.
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
 		// that expect the scripts to be part of the body.
@@ -163,9 +163,9 @@ export default function Sandbox( {
 			</html>
 		);
 
-		// writing the document like this makes it act in the same way as if it was
+		// Writing the document like this makes it act in the same way as if it was
 		// loaded over the network, so DOM creation and mutation, script execution, etc.
-		// all work as expected
+		// all work as expected.
 		contentDocument.open();
 		contentDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
 		contentDocument.close();
@@ -181,12 +181,12 @@ export default function Sandbox( {
 		function checkMessageForResize( event ) {
 			const iframe = ref.current;
 
-			// Verify that the mounted element is the source of the message
+			// Verify that the mounted element is the source of the message.
 			if ( ! iframe || iframe.contentWindow !== event.source ) {
 				return;
 			}
 
-			// Attempt to parse the message data as JSON if passed as string
+			// Attempt to parse the message data as JSON if passed as string.
 			let data = event.data || {};
 
 			if ( 'string' === typeof data ) {

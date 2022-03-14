@@ -115,16 +115,17 @@ export default {
 		let output =
 			!! contentSize || !! wideSize
 				? `
-					${ appendSelectors( selector, '> :not(.alignleft):not(.alignright)' ) } {
+					${ appendSelectors(
+						selector,
+						'> :where(:not(.alignleft):not(.alignright))'
+					) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;
 						margin-right: auto !important;
 					}
-
 					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };
 					}
-
 					${ appendSelectors( selector, '> .alignfull' ) } {
 						max-width: none;
 					}
@@ -134,26 +135,24 @@ export default {
 		output += `
 			${ appendSelectors( selector, '> .alignleft' ) } {
 				float: left;
-				margin-right: 2em;
-				margin-left: 0;
+				margin-inline-start: 0;
+				margin-inline-end: 2em;
 			}
-
 			${ appendSelectors( selector, '> .alignright' ) } {
 				float: right;
-				margin-left: 2em;
-				margin-right: 0;
+				margin-inline-start: 2em;
+				margin-inline-end: 0;
 			}
-
 		`;
 
 		if ( hasBlockGapStylesSupport ) {
 			output += `
 				${ appendSelectors( selector, '> *' ) } {
-					margin-top: 0;
-					margin-bottom: 0;
+					margin-block-start: 0;
+					margin-block-end: 0;
 				}
 				${ appendSelectors( selector, '> * + *' ) } {
-					margin-top: ${ blockGapValue };
+					margin-block-start: ${ blockGapValue };
 				}
 			`;
 		}

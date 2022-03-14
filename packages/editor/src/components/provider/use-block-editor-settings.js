@@ -39,20 +39,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const {
-			canUser,
-			getUnstableBase,
-			hasFinishedResolution,
-			getEntityRecord,
-		} = select( coreStore );
+		const { canUser, getEntityRecord } = select( coreStore );
 
 		const siteSettings = getEntityRecord( 'root', 'site' );
-
-		const siteData = getUnstableBase();
-
-		const hasFinishedResolvingSiteData = hasFinishedResolution(
-			'getUnstableBase'
-		);
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -67,8 +56,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				canUser( 'create', 'media' ),
 				true
 			),
-			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
-			baseUrl: siteData?.url || '',
 			userCanCreatePages: canUser( 'create', 'pages' ),
 			pageOnFront: siteSettings?.page_on_front,
 		};

@@ -77,3 +77,4 @@ export { default as __experimentalUseEntityRecord } from './hooks/use-entity-rec
 export { default as __experimentalUseEntityRecords } from './hooks/use-entity-records';
 export * from './entity-provider';
 export * from './fetch';
+export * from './entity-types';

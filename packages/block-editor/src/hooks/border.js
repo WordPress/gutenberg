@@ -37,8 +37,6 @@ export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 
 export function BorderPanel( props ) {
 	const { clientId } = props;
-	const isDisabled = useIsBorderDisabled( props );
-	const isSupported = hasBorderSupport( props.name );
 
 	const isColorSupported =
 		useSetting( 'border.color' ) && hasBorderSupport( props.name, 'color' );
@@ -53,7 +51,14 @@ export function BorderPanel( props ) {
 	const isWidthSupported =
 		useSetting( 'border.width' ) && hasBorderSupport( props.name, 'width' );
 
-	if ( isDisabled || ! isSupported ) {
+	const isDisabled = [
+		! isColorSupported,
+		! isRadiusSupported,
+		! isStyleSupported,
+		! isWidthSupported,
+	].every( Boolean );
+
+	if ( isDisabled ) {
 		return null;
 	}
 
@@ -178,22 +183,6 @@ export function shouldSkipSerialization( blockType ) {
 
 	return support?.__experimentalSkipSerialization;
 }
-
-/**
- * Determines if all border support features have been disabled.
- *
- * @return {boolean} If border support is completely disabled.
- */
-const useIsBorderDisabled = () => {
-	const configs = [
-		! useSetting( 'border.color' ),
-		! useSetting( 'border.radius' ),
-		! useSetting( 'border.style' ),
-		! useSetting( 'border.width' ),
-	];
-
-	return configs.every( Boolean );
-};
 
 /**
  * Returns a new style object where the specified border attribute has been

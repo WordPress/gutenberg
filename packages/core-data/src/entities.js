@@ -24,6 +24,19 @@ export const defaultEntities = [
 		name: '__unstableBase',
 		kind: 'root',
 		baseURL: '/',
+		baseURLParams: {
+			_fields: [
+				'description',
+				'gmt_offset',
+				'home',
+				'name',
+				'site_icon',
+				'site_icon_url',
+				'site_logo',
+				'timezone_string',
+				'url',
+			].join( ',' ),
+		},
 	},
 	{
 		label: __( 'Site' ),
@@ -143,7 +156,7 @@ export const defaultEntities = [
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
 		baseURLParams: { context: 'edit' },
-		plural: 'globalStylesVariations', // should be different than name
+		plural: 'globalStylesVariations', // Should be different than name.
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
 	},
 	{
