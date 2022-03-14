@@ -21,9 +21,13 @@
 	// For all button sizes allow sufficient space for the
 	// dropdown "arrow" icon to display.
 	&.components-custom-select-control__button {
-		padding-right: $icon-size + $grid-unit-05;
+		// TODO: Some of these can be removed after some internal inconsistencies are addressed, such as the chevron
+		// (https://github.com/WordPress/gutenberg/issues/39400) and Button padding (https://github.com/WordPress/gutenberg/issues/39431)
+		padding-left: $grid-unit-20;
+		padding-right: $icon-size + $grid-unit-10;
 
 		&:not(.is-next-36px-default-size) {
+			padding-left: $grid-unit-10;
 			padding-right: $icon-size;
 		}
 	}
@@ -68,7 +72,7 @@
 	display: grid;
 	grid-template-columns: auto auto;
 	list-style-type: none;
-	padding: $grid-unit-10 $grid-unit-15;
+	padding: $grid-unit-10 $grid-unit-20;
 	cursor: default;
 	line-height: $icon-size + $grid-unit-05;
 
