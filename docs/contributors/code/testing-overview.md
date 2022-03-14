@@ -263,8 +263,8 @@ import userEvent from '@testing-library/user-event';
 
 function render(jsx) {
 	return {
-			user: userEvent.setup(),
-			...RTLrender(jsx),
+		user: userEvent.setup(),
+		...RTLrender(jsx),
 	}
 }
 
