@@ -16,11 +16,17 @@ import { store as blockEditorStore } from '../../store';
 export default function BlockLockMenuItem( { clientId } ) {
 	const { isLocked } = useSelect(
 		( select ) => {
-			const { canMoveBlock, canRemoveBlock } = select( blockEditorStore );
+			const {
+				canMoveBlock,
+				canRemoveBlock,
+				getBlockRootClientId,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
 
 			return {
 				isLocked:
-					! canMoveBlock( clientId ) || ! canRemoveBlock( clientId ),
+					! canMoveBlock( clientId, rootClientId ) ||
+					! canRemoveBlock( clientId, rootClientId ),
 			};
 		},
 		[ clientId ]
