@@ -5,6 +5,7 @@
 		"emitDeclarationOnly": false,
 		"types": [
 			"gutenberg-env",
+			"testing-library",
 			"jest",
 			"@testing-library/jest-dom",
 			"snapshot-diff",
