@@ -16,19 +16,19 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import {
-	home,
-	post,
-	page,
 	archive,
-	search,
-	notFound,
-	list,
+	blockMeta,
 	category,
+	home,
+	list,
+	media,
+	notFound,
+	page,
+	post,
 	postAuthor,
 	postDate,
-	postTerms,
+	search,
 	tag,
-	media,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -63,7 +63,7 @@ const TEMPLATE_ICONS = {
 	index: list,
 	category,
 	author: postAuthor,
-	taxonomy: postTerms,
+	taxonomy: blockMeta,
 	date: postDate,
 	tag,
 	attachment: media,
