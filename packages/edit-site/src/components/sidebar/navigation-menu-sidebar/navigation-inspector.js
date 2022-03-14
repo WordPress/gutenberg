@@ -70,13 +70,16 @@ export default function NavigationInspector() {
 		firstNavRefInTemplate || firstNavigationMenuRef;
 
 	// The Navigation Menu manually selected by the user within the Nav inspector.
-	const [ menu, setCurrentMenu ] = useState( firstNavRefInTemplate );
+	const [ currentMenuId, setCurrentMenuId ] = useState(
+		firstNavRefInTemplate
+	);
 
-	// If a Nav block is selected within the canvas then set it to be
+	// If a Nav block is selected within the canvas then set the
+	// Navigation Menu referenced by it's `ref` attribute  to be
 	// active within the Navigation sidebar.
 	useEffect( () => {
 		if ( selectedNavigationBlockId ) {
-			setCurrentMenu( clientIdToRef[ selectedNavigationBlockId ] );
+			setCurrentMenuId( clientIdToRef[ selectedNavigationBlockId ] );
 		}
 	}, [ selectedNavigationBlockId ] );
 
@@ -91,7 +94,7 @@ export default function NavigationInspector() {
 	const [ innerBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_navigation',
-		{ id: menu || defaultNavigationMenuId }
+		{ id: currentMenuId || defaultNavigationMenuId }
 	);
 
 	const { hasLoadedInnerBlocks } = useSelect(
@@ -103,12 +106,12 @@ export default function NavigationInspector() {
 					[
 						'postType',
 						'wp_navigation',
-						menu || defaultNavigationMenuId,
+						currentMenuId || defaultNavigationMenuId,
 					]
 				),
 			};
 		},
-		[ menu, defaultNavigationMenuId ]
+		[ currentMenuId, defaultNavigationMenuId ]
 	);
 
 	const isLoading = ! ( hasResolvedNavigationMenus && hasLoadedInnerBlocks );
@@ -120,10 +123,10 @@ export default function NavigationInspector() {
 			) }
 			{ hasResolvedNavigationMenus && (
 				<SelectControl
-					value={ menu || defaultNavigationMenuId }
+					value={ currentMenuId || defaultNavigationMenuId }
 					options={ options }
 					onChange={ ( newMenuId ) =>
-						setCurrentMenu( Number( newMenuId ) )
+						setCurrentMenuId( Number( newMenuId ) )
 					}
 				/>
 			) }
