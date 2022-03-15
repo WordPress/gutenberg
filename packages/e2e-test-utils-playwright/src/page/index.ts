@@ -36,6 +36,9 @@ import { getAllBlockInserterItemTitles } from './get-all-block-inserter-item-tit
 import { closeGlobalBlockInserter } from './inserter/close-global-block-interser';
 import { openPublishPanel } from './open-publish-panel';
 import { publishPost } from './publish-post';
+import { findSidebarPanelWithTitle } from './find-sidebar-panel-with-title';
+import { openSidebarPanelWithTitle } from './open-sidebar-panel-with-title';
+import { clickBlockAppender } from './click-block-appender';
 
 class PageUtils {
 	browser: Browser;
@@ -78,6 +81,9 @@ class PageUtils {
 	closeGlobalBlockInserter = closeGlobalBlockInserter;
 	openPublishPanel = openPublishPanel;
 	publishPost = publishPost;
+	findSidebarPanelWithTitle = findSidebarPanelWithTitle;
+	openSidebarPanelWithTitle = openSidebarPanelWithTitle;
+	clickBlockAppender = clickBlockAppender;
 }
 
 export { PageUtils };
