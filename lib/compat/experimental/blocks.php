@@ -159,3 +159,14 @@ if ( ! function_exists( 'gutenberg_rest_comment_set_children_as_embeddable' ) ) 
 	}
 }
 add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable' );
+
+/**
+ * Sets a global JS variable used to trigger the availability of the experimental list block.
+ */
+function gutenberg_enable_experimental_list_block() {
+	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-list-v2', get_option( 'gutenberg-experiments' ) ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableListBlockV2 = true', 'before' );
+	}
+}
+
+add_action( 'admin_init', 'gutenberg_enable_experimental_list_block' );
