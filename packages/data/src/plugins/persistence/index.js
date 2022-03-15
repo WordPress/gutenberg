@@ -268,10 +268,12 @@ export function migrateFeaturePreferencesToPreferencesStore(
 
 			// Remove migrated feature preferences from `interface`.
 			if ( interfaceFeatures ) {
+				const otherInterfaceState = state[ interfaceStoreName ];
 				const otherInterfaceScopes =
 					state[ interfaceStoreName ]?.preferences?.features;
 
 				persistence.set( interfaceStoreName, {
+					...otherInterfaceState,
 					preferences: {
 						features: {
 							...otherInterfaceScopes,
@@ -283,9 +285,11 @@ export function migrateFeaturePreferencesToPreferencesStore(
 
 			// Remove migrated feature preferences from the source.
 			if ( sourceFeatures ) {
+				const otherSourceState = state[ sourceStoreName ];
 				const sourcePreferences = state[ sourceStoreName ]?.preferences;
 
 				persistence.set( sourceStoreName, {
+					...otherSourceState,
 					preferences: {
 						...sourcePreferences,
 						features: undefined,
@@ -335,8 +339,10 @@ export function migrateIndividualPreferenceToPreferencesStore(
 	} );
 
 	// Remove migrated feature preferences from the source.
+	const otherSourceState = state[ sourceStoreName ];
 	const allSourcePreferences = state[ sourceStoreName ]?.preferences;
 	persistence.set( sourceStoreName, {
+		...otherSourceState,
 		preferences: {
 			...allSourcePreferences,
 			[ key ]: undefined,
@@ -380,10 +386,12 @@ export function migrateThirdPartyFeaturePreferencesToPreferencesStore(
 		// Call `persistence.get` again to make sure `state` is up-to-date with
 		// any changes from the previous iteration of this loop.
 		state = persistence.get();
+		const otherInterfaceState = state[ interfaceStoreName ];
 		const otherInterfaceScopes =
 			state[ interfaceStoreName ]?.preferences?.features;
 
 		persistence.set( interfaceStoreName, {
+			...otherInterfaceState,
 			preferences: {
 				features: {
 					...otherInterfaceScopes,

@@ -477,6 +477,9 @@ describe( 'migrateFeaturePreferencesToPreferencesStore', () => {
 		};
 
 		const interfaceState = {
+			otherData: {
+				test: 1,
+			},
 			preferences: {
 				features: {
 					'core/test-a': {
@@ -523,6 +526,9 @@ describe( 'migrateFeaturePreferencesToPreferencesStore', () => {
 				},
 			},
 			'core/interface': {
+				otherData: {
+					test: 1,
+				},
 				preferences: {
 					features: {
 						'core/test-a': undefined,
@@ -543,12 +549,15 @@ describe( 'migrateFeaturePreferencesToPreferencesStore', () => {
 		} );
 	} );
 
-	it( 'only migrates persisted data for the source name from source stores', () => {
+	it( 'only migrates persisted preference data for the source name from source stores', () => {
 		const persistenceInterface = createPersistenceInterface( {
 			storageKey: 'test-username',
 		} );
 
 		const sourceStateA = {
+			otherData: {
+				test: 1,
+			},
 			preferences: {
 				features: {
 					featureA: true,
@@ -559,6 +568,9 @@ describe( 'migrateFeaturePreferencesToPreferencesStore', () => {
 		};
 
 		const sourceStateB = {
+			otherData: {
+				test: 2,
+			},
 			preferences: {
 				features: {
 					featureD: true,
@@ -587,11 +599,17 @@ describe( 'migrateFeaturePreferencesToPreferencesStore', () => {
 				},
 			},
 			'core/test-a': {
+				otherData: {
+					test: 1,
+				},
 				preferences: {
 					features: undefined,
 				},
 			},
 			'core/test-b': {
+				otherData: {
+					test: 2,
+				},
 				preferences: {
 					features: {
 						featureD: true,
@@ -700,6 +718,9 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 		} );
 
 		const initialState = {
+			otherData: {
+				test: 1,
+			},
 			preferences: {
 				myPreference: '123',
 			},
@@ -738,6 +759,9 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 				},
 			},
 			'core/test': {
+				otherData: {
+					test: 1,
+				},
 				preferences: {
 					myPreference: undefined,
 				},
@@ -794,6 +818,9 @@ describe( 'migrateThirdPartyFeaturePreferencesToPreferencesStore', () => {
 		} );
 
 		const interfaceState = {
+			otherData: {
+				test: 1,
+			},
 			preferences: {
 				features: {
 					'plugin-a': {
@@ -831,6 +858,9 @@ describe( 'migrateThirdPartyFeaturePreferencesToPreferencesStore', () => {
 				},
 			},
 			'core/interface': {
+				otherData: {
+					test: 1,
+				},
 				preferences: {
 					features: {
 						'plugin-a': undefined,
