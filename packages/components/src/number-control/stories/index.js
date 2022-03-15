@@ -46,13 +46,7 @@ function Example() {
 				value={ value }
 				onChange={ ( v, extra ) => {
 					setValue( v );
-					// Given how the component works internally, the `validity` property
-					// is not guaranteed to always be defined on `event.target`. When the
-					// `validity` property is not defined, you can assume the value
-					// received as valid.
-					setIsValidValue(
-						extra.event.target.validity?.valid ?? true
-					);
+					setIsValidValue( extra.event.target.validity.valid );
 				} }
 			/>
 			<p>Is valid? { isValidValue ? 'Yes' : 'No' }</p>
