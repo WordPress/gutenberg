@@ -308,24 +308,46 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test generate_and_enqueue_styles outputs only enqueued webfonts.
+	 *
 	 * @covers WP_Webfonts::generate_styles
 	 */
 	public function test_generate_styles() {
-		$font = array(
-			'provider'     => 'local',
-			'font-family'  => 'Source Serif Pro',
-			'font-style'   => 'normal',
-			'font-weight'  => '200 900',
-			'font-stretch' => 'normal',
-			'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
-			'font-display' => 'fallback',
+		wp_register_webfont(
+			'source-serif-pro-200-900-italic-local',
+			array(
+				'provider'     => 'local',
+				'font-family'  => 'Source Serif Pro',
+				'font-style'   => 'italic',
+				'font-weight'  => '200 900',
+				'font-stretch' => 'normal',
+				'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
+				'font-display' => 'fallback',
+			)
 		);
 
-		wp_register_webfont( $font );
+		wp_enqueue_webfont(
+			'source-serif-pro-200-900-normal-local', // This is different from the webfont registered above.
+			array(
+				'provider'     => 'local',
+				'font-family'  => 'Source Serif Pro',
+				'font-style'   => 'normal',
+				'font-weight'  => '200 900',
+				'font-stretch' => 'normal',
+				'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+				'font-display' => 'fallback',
+			)
+		);
 
-		$this->assertEquals(
-			'@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url(\'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2\') format(\'woff2\');}',
-			wp_webfonts()->generate_styles()
+		wp_webfonts()->generate_and_enqueue_styles();
+
+		$expected = <<<EOF
+@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}
+EOF;
+
+		$this->assertContains(
+			$expected,
+			get_echo( 'wp_print_styles' )
 		);
 	}
 }
