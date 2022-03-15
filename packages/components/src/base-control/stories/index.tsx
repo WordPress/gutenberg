@@ -39,13 +39,14 @@ export const Default: ComponentStory<
 > = BaseControlWithTextarea.bind( {} );
 Default.args = {
 	__nextHasNoMarginBottom: true,
-	id: 'textarea-1',
+	id: 'textarea-default-1',
 	label: 'Label text',
 };
 
 export const WithHelpText = BaseControlWithTextarea.bind( {} );
 WithHelpText.args = {
 	...Default.args,
+	id: 'textarea-with-help-text-1',
 	help: 'Help text adds more explanation.',
 };
 
