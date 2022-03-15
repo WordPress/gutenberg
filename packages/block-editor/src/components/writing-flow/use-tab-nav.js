@@ -10,17 +10,8 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { isFormElement } from './utils';
 import { store as blockEditorStore } from '../../store';
-
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
-	);
-}
 
 export default function useTabNav() {
 	const container = useRef();

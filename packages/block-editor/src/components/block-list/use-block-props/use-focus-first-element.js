@@ -13,6 +13,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { isFormElement } from '../../writing-flow/utils';
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { setContentEditableWrapper } from './use-multi-selection';
@@ -49,16 +50,6 @@ function useInitialPosition( clientId ) {
 			return getSelectedBlocksInitialCaretPosition();
 		},
 		[ clientId ]
-	);
-}
-
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
 	);
 }
 
