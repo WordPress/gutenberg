@@ -26,8 +26,3 @@
 	margin-left: $grid-unit-30;
 	width: 50%;
 }
-
-.edit-site-navigation-inspector .block-editor-list-view-tree {
-	// do not allow width to expand beyond containing element width.
-	table-layout: fixed;
-}
