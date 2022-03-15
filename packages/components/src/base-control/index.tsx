@@ -2,11 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import type { FunctionComponent } from 'react';
 
 /**
  * Internal dependencies
  */
 import { VisuallyHidden } from '../visually-hidden';
+import type { BaseControlProps, BaseControlVisualLabelProps } from './types';
 import {
 	Wrapper,
 	StyledField,
@@ -16,35 +18,29 @@ import {
 } from './styles/base-control-styles';
 
 /**
- * @typedef Props
- * @property {boolean}                   [__nextHasNoMarginBottom] Start opting into the new margin-free styles that will become the default in a future version.
- * @property {string}                    [id]                      The id of the element to which labels and help text are being generated.
- *                                                                 That element should be passed as a child.
- * @property {import('react').ReactNode} help                      If this property is added, a help text will be
- *                                                                 generated using help property as the content.
- * @property {import('react').ReactNode} [label]                   If this property is added, a label will be generated
- *                                                                 using label property as the content.
- * @property {boolean}                   [hideLabelFromVision]     If true, the label will only be visible to screen readers.
- * @property {string}                    [className]               The class that will be added with "components-base-control" to the
- *                                                                 classes of the wrapper div. If no className is passed only
- *                                                                 components-base-control is used.
- * @property {import('react').ReactNode} [children]                The content to be displayed within
- *                                                                 the BaseControl.
+ * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
+ *
+ * @example
+ * // Render a `BaseControl` for a textarea input
+ * import { BaseControl } from '@wordpress/components';
+ *
+ * const MyBaseControl = () => (
+ *   <BaseControl id="textarea-1" label="Text" help="Enter some text" __nextHasNoMarginBottom={ true }>
+ *     <textarea id="textarea-1" />
+ *   </BaseControl>
+ * );
  */
-
-/**
- * @param {Props} props
- * @return {JSX.Element} Element
- */
-function BaseControl( {
+export const BaseControl: FunctionComponent< BaseControlProps > & {
+	VisualLabel: typeof VisualLabel;
+} = ( {
 	__nextHasNoMarginBottom = false,
 	id,
 	label,
-	hideLabelFromVision,
+	hideLabelFromVision = false,
 	help,
 	className,
 	children,
-} ) {
+} ) => {
 	return (
 		<Wrapper
 			className={ classnames( 'components-base-control', className ) }
@@ -90,19 +86,29 @@ function BaseControl( {
 			) }
 		</Wrapper>
 	);
-}
+};
 
 /**
- * @typedef VisualLabelProps
- * @property {string}                    [className] Class name
- * @property {import('react').ReactNode} [children]  Children
+ * `BaseControl.VisualLabel` is used to render a purely visual label inside a `BaseControl` component.
+ *
+ * It should only be used in cases where the children being rendered inside `BaseControl` are already accessibly labeled,
+ * e.g., a button, but we want an additional visual label for that section equivalent to the labels `BaseControl` would
+ * otherwise use if the `label` prop was passed.
+ *
+ * @example
+ * import { BaseControl } from '@wordpress/components';
+ *
+ * const MyBaseControl = () => (
+ * 	<BaseControl help="This button is already accessibly labeled.">
+ * 		<BaseControl.VisualLabel>Author</BaseControl.VisualLabel>
+ * 		<Button>Select an author</Button>
+ * 	</BaseControl>
+ * );
  */
-
-/**
- * @param {VisualLabelProps} Props
- * @return {JSX.Element} Element
- */
-BaseControl.VisualLabel = ( { className, children } ) => {
+export const VisualLabel: FunctionComponent< BaseControlVisualLabelProps > = ( {
+	className,
+	children,
+} ) => {
 	return (
 		<StyledVisualLabel
 			className={ classnames(
@@ -114,5 +120,6 @@ BaseControl.VisualLabel = ( { className, children } ) => {
 		</StyledVisualLabel>
 	);
 };
+BaseControl.VisualLabel = VisualLabel;
 
 export default BaseControl;
