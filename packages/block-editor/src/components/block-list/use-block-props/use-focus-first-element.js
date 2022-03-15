@@ -109,15 +109,11 @@ export function useFocusFirstElement( clientId ) {
 		// Check to see if element is focussable before a generic caret insert.
 		if ( ! target.getAttribute( 'contenteditable' ) ) {
 			const focusElement = focus.tabbable.findNext( target );
-			// Make sure focusElement is valid, form field, and within the current target element.
-			// Ensure is not block inserter trigger, don't want to focus that in the event of the group block which doesn't contain any other focussable elements.
+			// Make sure focusElement is valid, contained in the same block, and a form field.
 			if (
 				focusElement &&
-				isFormElement( focusElement ) &&
-				target.contains( focusElement ) &&
-				! focusElement.classList.contains(
-					'block-editor-button-block-appender'
-				)
+				isInsideRootBlock( ref.current, target ) &&
+				isFormElement( focusElement )
 			) {
 				focusElement.focus();
 				return;
