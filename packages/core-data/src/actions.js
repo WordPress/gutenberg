@@ -250,6 +250,7 @@ export const deleteEntityRecord = (
 			recordId,
 		} );
 
+		let hasError = false;
 		try {
 			let path = `${ entityConfig.baseURL }/${ recordId }`;
 
@@ -264,6 +265,7 @@ export const deleteEntityRecord = (
 
 			await dispatch( removeItems( kind, name, recordId, true ) );
 		} catch ( _error ) {
+			hasError = true;
 			error = _error;
 		}
 
@@ -275,7 +277,7 @@ export const deleteEntityRecord = (
 			error,
 		} );
 
-		if ( error && throwOnError ) {
+		if ( hasError && throwOnError ) {
 			throw error;
 		}
 
@@ -457,6 +459,7 @@ export const saveEntityRecord = (
 		} );
 		let updatedRecord;
 		let error;
+		let hasError = false;
 		try {
 			const path = `${ entityConfig.baseURL }${
 				recordId ? '/' + recordId : ''
@@ -579,6 +582,7 @@ export const saveEntityRecord = (
 				);
 			}
 		} catch ( _error ) {
+			hasError = true;
 			error = _error;
 		}
 		dispatch( {
@@ -590,7 +594,7 @@ export const saveEntityRecord = (
 			isAutosave,
 		} );
 
-		if ( error && throwOnError ) {
+		if ( hasError && throwOnError ) {
 			throw error;
 		}
 

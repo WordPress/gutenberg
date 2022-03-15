@@ -64,9 +64,9 @@ Action triggered to delete an entity record.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the deleted entity record.
--   _name_ `string`: Name of the deleted entity record.
--   _recordId_ `string`: Record ID of the deleted entity record.
+-   _kind_ `string`: Kind of the deleted entity.
+-   _name_ `string`: Name of the deleted entity.
+-   _recordId_ `string`: Record ID of the deleted entity.
 -   _query_ `?Object`: Special query parameters for the DELETE API call.
 -   _options_ `[Object]`: Delete options.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
