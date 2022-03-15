@@ -1,15 +1,11 @@
 // Import styles for rendering the static content of deprecated gallery versions.
 @import "./deprecated.scss";
 
-// The following are temporary overrides until flex layout supports
-// an align items setting of normal, and the ability to specify a
-// fallback gap setting (currently it defaults to 0.5em, but Gallery
-// default is 16px for backwards compatibility.
+// The following is a temporary override until flex layout supports
+// an align items setting of normal.
 figure.wp-block-gallery.has-nested-images {
 	align-items: normal;
-	gap: var(--wp--style--unstable-gallery-gap, #{$grid-unit-20});
 }
-
 // Styles for current version of gallery block.
 .wp-block-gallery.has-nested-images {
 	// Need bogus :not(#individual-image) to override long :not()
