@@ -66,7 +66,7 @@ function ColorGradientControlInner( {
 				className
 			) }
 		>
-			<fieldset>
+			<fieldset className="block-editor-color-gradient-control__fieldset">
 				<VStack spacing={ 1 }>
 					{ showTitle && (
 						<legend>

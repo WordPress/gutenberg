@@ -8,6 +8,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  */
 import { Text } from '../../text';
 import { Divider } from '..';
+import { Flex } from '../../flex';
 
 const meta: ComponentMeta< typeof Divider > = {
 	component: Divider,
@@ -30,7 +31,7 @@ const meta: ComponentMeta< typeof Divider > = {
 };
 export default meta;
 
-const HorizontalTemplate: ComponentStory< typeof Divider > = ( args ) => (
+const Template: ComponentStory< typeof Divider > = ( args ) => (
 	<div>
 		<Text>Some text before the divider</Text>
 		<Divider { ...args } />
@@ -38,33 +39,35 @@ const HorizontalTemplate: ComponentStory< typeof Divider > = ( args ) => (
 	</div>
 );
 
-const VerticalTemplate: ComponentStory< typeof Divider > = ( args ) => {
-	const styles = {
-		display: 'flex',
-		alignItems: 'stretch',
-		justifyContent: 'start',
-	};
-
-	return (
-		<div style={ styles }>
-			<Text>Some text before the divider</Text>
-			<Divider { ...args } />
-			<Text>Some text after the divider</Text>
-		</div>
-	);
-};
-
-export const Horizontal: ComponentStory<
-	typeof Divider
-> = HorizontalTemplate.bind( {} );
+export const Horizontal: ComponentStory< typeof Divider > = Template.bind( {} );
 Horizontal.args = {
 	margin: 2,
 };
 
-export const Vertical: ComponentStory< typeof Divider > = VerticalTemplate.bind(
-	{}
-);
+export const Vertical: ComponentStory< typeof Divider > = Template.bind( {} );
 Vertical.args = {
 	...Horizontal.args,
 	orientation: 'vertical',
+};
+
+// Inside a `flex` container, the divider will need to be `stretch` aligned in order to be visible.
+export const InFlexContainer: ComponentStory< typeof Divider > = ( args ) => {
+	return (
+		<Flex align="stretch">
+			<Text>
+				Some text before the divider Some text before the divider Some
+				text before the divider Some text before the divider Some text
+				before the divider Some text before the divider Some text before
+				the divider
+			</Text>
+			<Divider { ...args } />
+			<Text>
+				Some text after the divider Some text after the divider Some
+				text after the divider
+			</Text>
+		</Flex>
+	);
+};
+InFlexContainer.args = {
+	...Vertical.args,
 };

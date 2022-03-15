@@ -1,5 +1,5 @@
 # Documentation
-/docs                                           @ajitbohra @mkaz @ryanwelcher
+/docs                                           @ajitbohra @mkaz @ryanwelcher @juanmaguitar
 
 # Schemas
 /schemas                                        @mkaz
@@ -21,6 +21,8 @@
 /packages/block-library/src/navigation-link     @tellthemachines
 /packages/block-library/src/navigation-submenu  @tellthemachines
 /packages/block-library/src/page-list           @tellthemachines
+/packages/block-library/src/comment-template    @michalczaplinski
+/packages/block-library/src/comments-query-loop @michalczaplinski
 
 # Duotone
 /lib/block-supports/duotone.php                       @ajlende

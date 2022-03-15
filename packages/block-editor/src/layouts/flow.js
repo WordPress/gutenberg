@@ -143,6 +143,11 @@ export default {
 				margin-inline-start: 2em;
 				margin-inline-end: 0;
 			}
+
+			${ appendSelectors( selector, '> .aligncenter' ) } {
+				margin-left: auto !important;
+				margin-right: auto !important;
+			}
 		`;
 
 		if ( hasBlockGapStylesSupport ) {
