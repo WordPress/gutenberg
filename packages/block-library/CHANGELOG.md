@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Table block: Background color is not kept ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).
+
 ## 7.1.0 (2022-03-11)
 
 ## 7.0.0 (2022-02-10)
