@@ -25,13 +25,13 @@ export function isInSameBlock( a, b ) {
  *                   its inner blocks or appender.
  */
 export function isInsideRootBlock( blockElement, element ) {
+	if ( element.classList.contains( BLOCK_APPENDER_CLASS ) ) {
+		return false;
+	}
 	const parentBlock = element.closest(
 		[ BLOCK_SELECTOR, APPENDER_SELECTOR ].join( ',' )
 	);
-	return (
-		parentBlock === blockElement &&
-		! element.classList.contains( BLOCK_APPENDER_CLASS )
-	);
+	return parentBlock === blockElement;
 }
 
 /**
