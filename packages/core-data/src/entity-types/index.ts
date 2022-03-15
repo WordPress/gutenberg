@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-export type { Context, Updatable } from './helpers';
+import type { Context, Updatable } from './helpers';
 import type { Attachment } from './attachment';
 import type { Comment } from './comment';
 import type { MenuLocation } from './menu-location';
@@ -27,6 +27,7 @@ export type { BaseEntityRecords } from './base-entity-records';
 export type {
 	Attachment,
 	Comment,
+	Context,
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
@@ -38,6 +39,7 @@ export type {
 	Sidebar,
 	Taxonomy,
 	Theme,
+	Updatable,
 	User,
 	Type,
 	Widget,
