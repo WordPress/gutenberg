@@ -15,9 +15,10 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseColorProps as useColorProps,
 	store as blockEditorStore,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
@@ -236,54 +237,43 @@ export default function SearchEdit( {
 		);
 	};
 
-	const renderButton = () => {
-		// If the button is inside the wrapper, the wrapper gets the border color styles/classes, not the button.
-		const buttonClasses = classnames(
-			'wp-block-search__button',
-			colorProps.className,
-			isButtonPositionInside ? undefined : borderProps.className,
-			buttonUseIcon ? 'has-icon' : undefined
-		);
-		const buttonStyles = {
-			...colorProps.style,
-			...( isButtonPositionInside
-				? { borderRadius }
-				: borderProps.style ),
-		};
-
-		return (
-			<>
-				{ buttonUseIcon && (
-					<button
-						type="button"
-						className={ buttonClasses }
-						style={ buttonStyles }
-						aria-label={
-							buttonText
-								? stripHTML( buttonText )
-								: __( 'Search' )
-						}
-					>
-						<Icon icon={ search } />
-					</button>
-				) }
-
-				{ ! buttonUseIcon && (
-					<RichText
-						className={ buttonClasses }
-						style={ buttonStyles }
-						aria-label={ __( 'Button text' ) }
-						placeholder={ __( 'Add button text…' ) }
-						withoutInteractiveFormatting
-						value={ buttonText }
-						onChange={ ( html ) =>
-							setAttributes( { buttonText: html } )
-						}
-					/>
-				) }
-			</>
-		);
-	};
+	const ALLOWED_BLOCKS = [ 'core/button' ];
+	const blockProps = useBlockProps( {
+		className: getBlockClassNames(),
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		orientation: 'horizontal',
+		renderAppender: false,
+		template: [
+			[
+				'core/button',
+				{
+					text: [
+						buttonUseIcon ? <Icon icon={ search } /> : false, // get the icon to render
+						'Search',
+					],
+					className: classnames(
+						{
+							[ borderProps.className ]: isButtonPositionInside,
+						},
+						colorProps.className
+					),
+					style: {
+						...( isButtonPositionInside
+							? { borderRadius }
+							: borderProps.style ),
+					},
+				},
+				[],
+			],
+		],
+		templateLock: 'all',
+		allowedBlocks: ALLOWED_BLOCKS,
+		onChange: ( html ) => {
+			setAttributes( { buttonText: html } );
+		},
+	} );
+	const button = <div { ...innerBlocksProps } />;
 
 	const controls = (
 		<>
@@ -439,10 +429,6 @@ export default function SearchEdit( {
 		return styles;
 	};
 
-	const blockProps = useBlockProps( {
-		className: getBlockClassNames(),
-	} );
-
 	return (
 		<div { ...blockProps }>
 			{ controls }
@@ -457,7 +443,6 @@ export default function SearchEdit( {
 					onChange={ ( html ) => setAttributes( { label: html } ) }
 				/>
 			) }
-
 			<ResizableBox
 				size={ {
 					width: `${ width }${ widthUnit }`,
@@ -487,11 +472,11 @@ export default function SearchEdit( {
 				{ ( isButtonPositionInside || isButtonPositionOutside ) && (
 					<>
 						{ renderTextField() }
-						{ renderButton() }
+						{ button }
 					</>
 				) }
 
-				{ hasOnlyButton && renderButton() }
+				{ hasOnlyButton && button }
 				{ hasNoButton && renderTextField() }
 			</ResizableBox>
 		</div>
