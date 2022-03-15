@@ -6,9 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useEffect, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-import { Icon, check } from '@wordpress/icons';
+import { Icon, check, reset } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,6 +21,7 @@ export default function CheckboxControl( {
 	className,
 	heading,
 	checked,
+	indeterminate,
 	help,
 	onChange,
 	...props
@@ -31,9 +33,14 @@ export default function CheckboxControl( {
 		} );
 	}
 
+	const ref = useRef();
 	const instanceId = useInstanceId( CheckboxControl );
 	const id = `inspector-checkbox-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.checked );
+
+	useEffect( () => {
+		ref.current.indeterminate = !! indeterminate;
+	}, [ indeterminate ] );
 
 	return (
 		<BaseControl
@@ -44,15 +51,23 @@ export default function CheckboxControl( {
 		>
 			<span className="components-checkbox-control__input-container">
 				<input
+					ref={ ref }
 					id={ id }
 					className="components-checkbox-control__input"
 					type="checkbox"
 					value="1"
 					onChange={ onChangeValue }
-					checked={ checked }
+					checked={ ! indeterminate && checked }
 					aria-describedby={ !! help ? id + '__help' : undefined }
 					{ ...props }
 				/>
+				{ indeterminate && ! checked ? (
+					<Icon
+						icon={ reset }
+						className="components-checkbox-control__indeterminate"
+						role="presentation"
+					/>
+				) : null }
 				{ checked ? (
 					<Icon
 						icon={ check }
