@@ -11,7 +11,7 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
 import createLocksActions from './locks/actions';
-import { defaultEntities, getMethodName } from './entities';
+import { rootEntitiesConfig, getMethodName } from './entities';
 import { STORE_NAME } from './name';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
@@ -19,7 +19,7 @@ import { STORE_NAME } from './name';
 // Instead of getEntityRecord, the consumer could use more user-frieldly named selector: getPostType, getTaxonomy...
 // The "kind" and the "name" of the entity are combined to generate these shortcuts.
 
-const entitySelectors = defaultEntities.reduce( ( result, entity ) => {
+const entitySelectors = rootEntitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name ) ] = ( state, key, query ) =>
 		selectors.getEntityRecord( state, kind, name, key, query );
@@ -28,7 +28,7 @@ const entitySelectors = defaultEntities.reduce( ( result, entity ) => {
 	return result;
 }, {} );
 
-const entityResolvers = defaultEntities.reduce( ( result, entity ) => {
+const entityResolvers = rootEntitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name ) ] = ( key, query ) =>
 		resolvers.getEntityRecord( kind, name, key, query );
@@ -45,7 +45,7 @@ const entityResolvers = defaultEntities.reduce( ( result, entity ) => {
 	return result;
 }, {} );
 
-const entityActions = defaultEntities.reduce( ( result, entity ) => {
+const entityActions = rootEntitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name, 'save' ) ] = ( key ) =>
 		actions.saveEntityRecord( kind, name, key );

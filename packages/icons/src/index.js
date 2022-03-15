@@ -18,6 +18,7 @@ export { default as aspectRatio } from './library/aspect-ratio';
 export { default as audio } from './library/audio';
 export { default as backup } from './library/backup';
 export { default as blockDefault } from './library/block-default';
+export { default as blockMeta } from './library/block-meta';
 export { default as blockTable } from './library/block-table';
 export { default as box } from './library/box';
 export { default as brush } from './library/brush';
@@ -132,6 +133,7 @@ export { default as moreHorizontalMobile } from './library/more-horizontal-mobil
 export { default as moreVertical } from './library/more-vertical';
 export { default as moveTo } from './library/move-to';
 export { default as navigation } from './library/navigation';
+export { default as notFound } from './library/not-found';
 export { default as overlayText } from './library/overlay-text';
 export { default as pageBreak } from './library/page-break';
 export { default as customLink } from './library/custom-link';
