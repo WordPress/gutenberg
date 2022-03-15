@@ -7,7 +7,7 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import * as styles from '../styles';
-import { parseUnit } from '../../unit-control/utils';
+import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 
@@ -38,7 +38,9 @@ export function useBorderControl(
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
 
-	const [ widthValue, originalWidthUnit ] = parseUnit( border?.width );
+	const [ widthValue, originalWidthUnit ] = parseQuantityAndUnitFromRawValue(
+		border?.width
+	);
 	const widthUnit = originalWidthUnit || 'px';
 	const hadPreviousZeroWidth = widthValue === 0;
 
@@ -59,7 +61,9 @@ export function useBorderControl(
 	const onWidthChange = useCallback(
 		( newWidth?: string ) => {
 			const newWidthValue = newWidth === '' ? undefined : newWidth;
-			const [ parsedValue ] = parseUnit( newWidth );
+			const [ parsedValue ] = parseQuantityAndUnitFromRawValue(
+				newWidth
+			);
 			const hasZeroWidth = parsedValue === 0;
 
 			const updatedBorder = { ...border, width: newWidthValue };

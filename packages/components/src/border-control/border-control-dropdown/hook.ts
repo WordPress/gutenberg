@@ -7,7 +7,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import * as styles from '../styles';
-import { parseUnit } from '../../unit-control/utils';
+import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 
@@ -25,7 +25,7 @@ export function useBorderControlDropdown(
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
 
-	const [ widthValue ] = parseUnit( border?.width );
+	const [ widthValue ] = parseQuantityAndUnitFromRawValue( border?.width );
 	const hasZeroWidth = widthValue === 0;
 
 	const onColorChange = ( color?: string ) => {
