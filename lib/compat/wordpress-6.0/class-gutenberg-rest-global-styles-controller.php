@@ -232,7 +232,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 				$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
 				if ( is_array( $decoded_file ) ) {
 					$variation = ( new WP_Theme_JSON_Gutenberg( $decoded_file ) )->get_raw_data();
-					if ( ! isset( $variation['name'] ) ) {
+					if ( empty( $variation['name'] ) ) {
 						$variation['name'] = basename( $path, '.json' );
 					}
 					$variations[] = $variation;
