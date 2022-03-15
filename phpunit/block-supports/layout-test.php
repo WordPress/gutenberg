@@ -35,17 +35,28 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		return $this->theme_root;
 	}
 
+	function test_outer_container_not_restored_for_non_aligned_image_block_with_non_themejson_theme() {
+		// The "default" theme doesn't have theme.json support.
+		switch_theme( 'default' );
+		$block         = array(
+			'blockName' => 'core/image',
+			'attrs'     => array(),
+		);
+		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg"/></figure>';
+		$expected      = '<figure class="wp-block-image size-full"><img src="/my-image.jpg"/></figure>';
+
+		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_content, $block ) );
+	}
+
 	function test_outer_container_restored_for_aligned_image_block_with_non_themejson_theme() {
 		// The "default" theme doesn't have theme.json support.
 		switch_theme( 'default' );
 		$block         = array(
 			'blockName' => 'core/image',
-			'attrs'     => array(
-				'className' => '',
-			),
+			'attrs'     => array(),
 		);
 		$block_content = '<figure class="wp-block-image alignright size-full"><img src="/my-image.jpg"/></figure>';
-		$expected      = '<div class="wp-block-image "><figure class=" alignright size-full"><img src="/my-image.jpg"/></figure></div>';
+		$expected      = '<div class="wp-block-image"><figure class="alignright size-full"><img src="/my-image.jpg"/></figure></div>';
 
 		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_content, $block ) );
 	}
@@ -59,10 +70,17 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				'className' => 'is-style-round my-custom-classname',
 			),
 		);
-		$block_content = '<figure class="wp-block-image alignright size-full is-style-round my-custom-classname"><img src="/my-image.jpg"/></figure>';
-		$expected      = '<div class="wp-block-image is-style-round my-custom-classname"><figure class=" alignright size-full "><img src="/my-image.jpg"/></figure></div>';
 
-		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_content, $block ) );
+		$block_classes_end_placement    = '<figure class="wp-block-image alignright size-full is-style-round my-custom-classname"><img src="/my-image.jpg"/></figure>';
+		$block_classes_start_placement  = '<figure class="is-style-round my-custom-classname wp-block-image alignright size-full"><img src="/my-image.jpg"/></figure>';
+		$block_classes_middle_placement = '<figure class="wp-block-image is-style-round my-custom-classname alignright size-full"><img src="/my-image.jpg"/></figure>';
+		$block_classes_random_placement = '<figure class="is-style-round wp-block-image alignright my-custom-classname size-full"><img src="/my-image.jpg"/></figure>';
+		$expected                       = '<div class="wp-block-image is-style-round my-custom-classname"><figure class="alignright size-full"><img src="/my-image.jpg"/></figure></div>';
+
+		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_classes_end_placement, $block ) );
+		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_classes_start_placement, $block ) );
+		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_classes_middle_placement, $block ) );
+		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_classes_random_placement, $block ) );
 	}
 
 	function test_outer_container_not_restored_for_aligned_image_block_with_themejson_theme() {
