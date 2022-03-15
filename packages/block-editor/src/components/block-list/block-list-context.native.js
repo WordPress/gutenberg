@@ -6,6 +6,7 @@ import { createContext, useContext } from '@wordpress/element';
 export const DEFAULT_BLOCK_LIST_CONTEXT = {
 	scrollRef: null,
 	blocksLayouts: { current: {} },
+	findBlockLayoutByClientId,
 	updateBlocksLayouts,
 };
 
