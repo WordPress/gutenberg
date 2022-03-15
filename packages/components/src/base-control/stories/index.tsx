@@ -1,17 +1,32 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * Internal dependencies
  */
-import BaseControl from '../';
+import BaseControl from '..';
 import Button from '../../button';
-import { Spacer } from '../../spacer';
 
-export default {
+const meta: ComponentMeta< typeof BaseControl > = {
 	title: 'Components/BaseControl',
 	component: BaseControl,
-	subcomponents: { BaseControl: BaseControl.VisualLabel },
+	argTypes: {
+		help: { control: { type: 'text' } },
+		label: { control: { type: 'text' } },
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
 };
+export default meta;
 
-const BaseControlWithTextarea = ( { id, ...props } ) => {
+const BaseControlWithTextarea: ComponentStory< typeof BaseControl > = ( {
+	id,
+	...props
+} ) => {
 	return (
 		<BaseControl id={ id } { ...props }>
 			<textarea style={ { display: 'block' } } id={ id } />
@@ -19,63 +34,45 @@ const BaseControlWithTextarea = ( { id, ...props } ) => {
 	);
 };
 
-export const Default = BaseControlWithTextarea.bind( {} );
+export const Default: ComponentStory<
+	typeof BaseControl
+> = BaseControlWithTextarea.bind( {} );
 Default.args = {
 	__nextHasNoMarginBottom: true,
 	id: 'textarea-1',
-	label: '',
-	hideLabelFromVision: false,
-	help: '',
-};
-
-export const WithLabel = BaseControlWithTextarea.bind( {} );
-WithLabel.args = {
-	...Default.args,
 	label: 'Label text',
 };
 
 export const WithHelpText = BaseControlWithTextarea.bind( {} );
 WithHelpText.args = {
-	...WithLabel.args,
+	...Default.args,
 	help: 'Help text adds more explanation.',
 };
 
-export const WithVisualLabel = ( { visualLabelChildren, ...props } ) => {
+/**
+ * `BaseControl.VisualLabel` is used to render a purely visual label inside a `BaseControl` component.
+ *
+ * It should only be used in cases where the children being rendered inside `BaseControl` are already accessibly labeled,
+ * e.g., a button, but we want an additional visual label for that section equivalent to the labels `BaseControl` would
+ * otherwise use if the `label` prop was passed.
+ */
+export const WithVisualLabel: ComponentStory< typeof BaseControl > = (
+	props
+) => {
+	BaseControl.VisualLabel.displayName = 'BaseControl.VisualLabel';
+
 	return (
-		<>
-			<BaseControl { ...props }>
-				<div>
-					<BaseControl.VisualLabel>
-						{ visualLabelChildren }
-					</BaseControl.VisualLabel>
-				</div>
+		<BaseControl { ...props }>
+			<BaseControl.VisualLabel>Visual label</BaseControl.VisualLabel>
+			<div>
 				<Button variant="secondary">Select an author</Button>
-			</BaseControl>
-			<Spacer marginTop={ 12 }>
-				<p>
-					<code>BaseControl.VisualLabel</code> is used to render a
-					purely visual label inside a <code>BaseControl</code>{ ' ' }
-					component.
-				</p>
-				<p>
-					It should <strong>only</strong> be used in cases where the
-					children being rendered inside BaseControl are already
-					accessibly labeled, e.g., a button, but we want an
-					additional visual label for that section equivalent to the
-					labels BaseControl would otherwise use if the{ ' ' }
-					<code>label</code> prop was passed.
-				</p>
-			</Spacer>
-		</>
+			</div>
+		</BaseControl>
 	);
 };
 WithVisualLabel.args = {
 	...Default.args,
 	help: 'This button is already accessibly labeled.',
-	visualLabelChildren: 'Author',
-};
-WithVisualLabel.argTypes = {
-	visualLabelChildren: {
-		name: 'VisualLabel children',
-	},
+	id: undefined,
+	label: undefined,
 };
