@@ -60,13 +60,17 @@ function gutenberg_get_layout_preset_styles( $preset_metadata, $presets_by_origi
  * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
  * @param string  $gap_value The block gap value to apply.
  *
- * @return string CSS style.
+ * @return array CSS style and CSS classes.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
+	$classes = array();
+
 	$style = '';
 	if ( 'default' === $layout_type ) {
+		$classes[] = 'wp-layout-flow';
+
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
 
@@ -89,15 +93,15 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector .alignfull { max-width: none; }";
 		}
 
-		$style .= "$selector > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }";
-		$style .= "$selector > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }";
-		$style .= "$selector > .aligncenter { margin-left: auto !important; margin-right: auto !important; }";
 		if ( $has_block_gap_support ) {
+			$classes[] = 'wp-layout-flow--global-gap';
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
 			$style    .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
 			$style    .= "$selector > * + * { margin-block-start: $gap_style; margin-block-end: 0; }";
 		}
 	} elseif ( 'flex' === $layout_type ) {
+		$classes[] = 'wp-layout-flex';
+
 		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
 
 		$justify_content_options = array(
@@ -116,7 +120,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			'wrap';
 
 		$style  = "$selector {";
-		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
 			$style    .= "gap: $gap_style;";
@@ -143,11 +146,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 		$style .= '}';
-
-		$style .= "$selector > * { margin: 0; }";
 	}
 
-	return $style;
+	return array(
+		'style'   => $style,
+		'classes' => $classes
+	);
 }
 
 /**
@@ -183,17 +187,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
 	$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
-	$style     = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value );
+	$styles    = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . esc_attr( $class_name ) . ' ',
+		'class="' . esc_attr( implode( ' ', array_merge( array( $class_name ), $styles['classes'] ) ) ) . ' ',
 		$block_content,
 		1
 	);
 
-	gutenberg_enqueue_block_support_styles( $style );
+	gutenberg_enqueue_block_support_styles( $styles['style'] );
 
 	return $content;
 }

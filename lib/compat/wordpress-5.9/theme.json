@@ -192,19 +192,26 @@
 					"type": "flow",
 					"styles": [
 						{
-							"selector": ".alignleft",
+							"selector": "> .alignleft",
 							"rules": {
 								"float": "left",
-								"margin-right": "2em",
-								"margin-left": "0"
+								"margin-inline-end": "2em",
+								"margin-inline-start": "0"
 							}
 						},
 						{
-							"selector": ".alignright",
+							"selector": "> .alignright",
 							"rules": {
 								"float": "right",
-								"margin-left": "2em",
-								"margin-right": "0"
+								"margin-inline-start": "2em",
+								"margin-inline-end": "0"
+							}
+						},
+						{
+							"selector": "> .aligncenter",
+							"rules": {
+								"margin-left": "auto !important",
+								"margin-right": "auto !important"
 							}
 						},
 						{
