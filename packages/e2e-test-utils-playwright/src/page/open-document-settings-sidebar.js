@@ -10,7 +10,7 @@ export async function openDocumentSettingsSidebar() {
 
 	const isSidebarOpened = snapshot.expanded;
 
-	if ( isSidebarOpened ) {
+	if ( ! isSidebarOpened ) {
 		await element.click();
 		await this.page.waitForSelector( '.edit-post-sidebar' );
 	}
