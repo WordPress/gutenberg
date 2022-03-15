@@ -310,8 +310,8 @@ class WP_Webfonts {
 		foreach ( $this->get_fonts() as $font ) {
 			if ( $font['preload'] ) {
 				foreach( $font['src'] as $src ) {
-					$srcAsArray = explode( '.', $src );
-					$file_type = end( $srcAsArray );
+					$src_as_array = explode( '.', $src );
+					$file_type    = end( $src_as_array );
 					if ( ! in_array( $file_type, self::$allowed_types ) ) {
 						$file_type = '';
 					}
