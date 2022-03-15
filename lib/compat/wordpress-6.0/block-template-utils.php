@@ -12,7 +12,7 @@
  *
  * @since 6.0.0
  *
- * @param string $path The path of the file in the theme
+ * @param string $path The path of the file in the theme.
  * @return Bool Whether this file is in an ignored directory.
  */
 function gutenberg_is_theme_directory_ignored( $path ) {
