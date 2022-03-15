@@ -250,7 +250,7 @@ function gutenberg_restore_image_outer_container( $block_content, $block ) {
 
 	// If the block has a classNames attribute these classnames need to be removed from the content and added back
 	// to the new wrapper div also.
-	if ( isset( $block['attrs']['className'] ) && ! empty( $block['attrs']['className'] ) ) {
+	if ( ! empty( $block['attrs']['className'] ) ) {
 		$wrapper_classnames = array_merge( $wrapper_classnames, explode( ' ', $block['attrs']['className'] ) );
 	}
 	$content_classnames          = explode( ' ', $matches[2] );
