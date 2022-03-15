@@ -267,6 +267,6 @@ function gutenberg_restore_image_outer_container( $block_content, $block ) {
 }
 
 if ( function_exists( 'wp_restore_image_outer_container' ) ) {
-	remove_filter( 'render_block_core/image', 'wp_restore_image_outer_container', 10, 1 );
+	remove_filter( 'render_block_core/image', 'wp_restore_image_outer_container', 10, 2 );
 }
-add_filter( 'render_block_core/image', 'gutenberg_restore_image_outer_container', 10, 1 );
+add_filter( 'render_block_core/image', 'gutenberg_restore_image_outer_container', 10, 2 );
