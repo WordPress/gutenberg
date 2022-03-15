@@ -39,7 +39,7 @@ export type WPUnitControlUnit = {
 };
 
 export type UnitControlOnChangeCallback = InputChangeCallback<
-	SyntheticEvent< HTMLSelectElement | HTMLInputElement >,
+	SyntheticEvent< HTMLSelectElement | HTMLInputElement | Element >,
 	{ data?: WPUnitControlUnit }
 >;
 

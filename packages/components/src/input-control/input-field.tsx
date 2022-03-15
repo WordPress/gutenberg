@@ -93,7 +93,7 @@ function InputField(
 			commit( valueProp, _event as SyntheticEvent );
 		} else if ( ! isDirty ) {
 			onChange( value, {
-				event: _event as ChangeEvent< HTMLInputElement >,
+				event: _event as ChangeEvent< HTMLInputElement > | PointerEvent,
 			} );
 			wasDirtyOnBlur.current = false;
 		}
