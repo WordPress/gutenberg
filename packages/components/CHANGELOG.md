@@ -22,6 +22,10 @@
 -   Fix input value selection of `InputControl`-based controls in Firefox and Safari with axial constraint of drag gesture ([#38968](https://github.com/WordPress/gutenberg/pull/38968)).
 -   Fix `UnitControl`'s behavior around updating the unit when a new `value` is passed (i.e. in controlled mode). ([#39148](https://github.com/WordPress/gutenberg/pull/39148)).
 
+### Internal
+
+-   Delete the `composeStateReducers` utility function ([#39262](https://github.com/WordPress/gutenberg/pull/39262)).
+
 ## 19.5.0 (2022-02-23)
 
 ### Bug Fix
