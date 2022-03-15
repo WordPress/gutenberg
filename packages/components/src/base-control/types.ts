@@ -20,8 +20,8 @@ export type BaseControlProps = {
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**
-	 * The id of the element to which labels and help text are being generated.
-	 * That element should be passed as a child.
+	 * The HTML `id` of the element (passed in as a child to `BaseControl`) to which labels and help text are being generated.
+	 * This is necessary to accessibly associate the label with that element.
 	 */
 	id?: string;
 	/**

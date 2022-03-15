@@ -24,6 +24,7 @@ import {
  * // Render a `BaseControl` for a textarea input
  * import { BaseControl } from '@wordpress/components';
  *
+ * // The `id` prop is necessary to accessibly associate the label with the textarea
  * const MyBaseControl = () => (
  *   <BaseControl id="textarea-1" label="Text" help="Enter some text" __nextHasNoMarginBottom={ true }>
  *     <textarea id="textarea-1" />
