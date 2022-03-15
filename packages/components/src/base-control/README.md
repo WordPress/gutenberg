@@ -51,8 +51,7 @@ If this property is added, a help text will be generated using help property as 
 
 ### className
 
-The class that will be added with "components-base-control" to the classes of the wrapper div.
-If no className is passed only components-base-control is used.
+Any other classes to add to the wrapper div.
 
 -   Type: `String`
 -   Required: No
@@ -95,8 +94,7 @@ const MyBaseControl = () => (
 
 #### className
 
-The class that will be added with `components-base-control__label` to the classes of the wrapper div.
-If no className is passed only `components-base-control__label` is used.
+Any other classes to add to the wrapper div.
 
 -   Type: `String`
 -   Required: No
