@@ -159,6 +159,8 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['spacing']['padding'] );
 	}
 
+	$settings['localAutosaveInterval'] = 15;
+
 	return $settings;
 }
 

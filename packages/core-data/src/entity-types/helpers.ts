@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { EntityRecord } from './index';
+import type { EntityRecord } from './index';
 
 export interface AvatarUrls {
 	/**

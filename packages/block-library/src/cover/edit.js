@@ -22,7 +22,6 @@ import {
 	Spinner,
 	TextareaControl,
 	ToggleControl,
-	withNotices,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -50,6 +49,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -266,12 +266,10 @@ const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 function CoverPlaceholder( {
 	disableMediaButtons = false,
 	children,
-	noticeUI,
-	noticeOperations,
 	onSelectMedia,
+	onError,
 	style,
 } ) {
-	const { removeAllNotices, createErrorNotice } = noticeOperations;
 	return (
 		<MediaPlaceholder
 			icon={ <BlockIcon icon={ icon } /> }
@@ -284,12 +282,8 @@ function CoverPlaceholder( {
 			onSelect={ onSelectMedia }
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			notices={ noticeUI }
 			disableMediaButtons={ disableMediaButtons }
-			onError={ ( message ) => {
-				removeAllNotices();
-				createErrorNotice( message );
-			} }
+			onError={ onError }
 			style={ style }
 		>
 			{ children }
@@ -301,8 +295,6 @@ function CoverEdit( {
 	attributes,
 	clientId,
 	isSelected,
-	noticeUI,
-	noticeOperations,
 	overlayColor,
 	setAttributes,
 	setOverlayColor,
@@ -328,6 +320,7 @@ function CoverEdit( {
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		gradientClass,
 		gradientValue,
@@ -379,6 +372,12 @@ function CoverEdit( {
 	const toggleIsRepeated = () => {
 		setAttributes( {
 			isRepeated: ! isRepeated,
+		} );
+	};
+
+	const onUploadError = ( message ) => {
+		createErrorNotice( Array.isArray( message ) ? message[ 2 ] : message, {
+			type: 'snackbar',
 		} );
 	};
 
@@ -640,9 +639,8 @@ function CoverEdit( {
 					) }
 				>
 					<CoverPlaceholder
-						noticeUI={ noticeUI }
 						onSelectMedia={ onSelectMedia }
-						noticeOperations={ noticeOperations }
+						onError={ onUploadError }
 						style={ {
 							minHeight: minHeightWithUnit || undefined,
 						} }
@@ -763,9 +761,8 @@ function CoverEdit( {
 				{ isUploadingMedia && <Spinner /> }
 				<CoverPlaceholder
 					disableMediaButtons
-					noticeUI={ noticeUI }
 					onSelectMedia={ onSelectMedia }
-					noticeOperations={ noticeOperations }
+					onError={ onUploadError }
 				/>
 				<div { ...innerBlocksProps } />
 			</div>
@@ -775,5 +772,4 @@ function CoverEdit( {
 
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
-	withNotices,
 ] )( CoverEdit );

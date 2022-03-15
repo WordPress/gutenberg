@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
+import type {
 	CommentingStatus,
 	Context,
 	ContextualField,
@@ -12,10 +12,10 @@ import {
 	OmitNevers,
 } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface Post< C extends Context > {
 			/**
 			 * The date the post was published, in the site's timezone.
@@ -149,5 +149,5 @@ declare module './base-entity-types' {
 }
 
 export type Post< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Post< C >
+	_BaseEntityRecords.Post< C >
 >;

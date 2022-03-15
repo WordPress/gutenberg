@@ -155,11 +155,10 @@ export const toggleFeature = ( feature ) => ( { registry } ) =>
  *
  * @param {string} mode The editor mode.
  */
-export const switchEditorMode = ( mode ) => ( { dispatch, registry } ) => {
-	dispatch( {
-		type: 'SWITCH_MODE',
-		mode,
-	} );
+export const switchEditorMode = ( mode ) => ( { registry } ) => {
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/edit-post', 'editorMode', mode );
 
 	// Unselect blocks when we switch to the code editor.
 	if ( mode !== 'visual' ) {
@@ -193,30 +192,44 @@ export const togglePinnedPluginItem = ( pluginName ) => ( { registry } ) => {
  *
  * @param {string}  blockName  Name of the block.
  * @param {?string} blockStyle Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
- *
- * @return {Object} Action object.
  */
-export function updatePreferredStyleVariations( blockName, blockStyle ) {
-	return {
-		type: 'UPDATE_PREFERRED_STYLE_VARIATIONS',
-		blockName,
-		blockStyle,
-	};
-}
+export const updatePreferredStyleVariations = ( blockName, blockStyle ) => ( {
+	registry,
+} ) => {
+	if ( ! blockName ) {
+		return;
+	}
 
-/**
- * Returns an action object used in signalling that the editor should attempt
- * to locally autosave the current post every `interval` seconds.
- *
- * @param {number} interval The new interval, in seconds.
- * @return {Object} Action object.
- */
-export function __experimentalUpdateLocalAutosaveInterval( interval ) {
-	return {
-		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',
-		interval,
-	};
-}
+	const existingVariations =
+		registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'preferredStyleVariations' ) ?? {};
+
+	// When the blockStyle is omitted, remove the block's preferred variation.
+	if ( ! blockStyle ) {
+		const updatedVariations = {
+			...existingVariations,
+		};
+
+		delete updatedVariations[ blockName ];
+
+		registry
+			.dispatch( preferencesStore )
+			.set(
+				'core/edit-post',
+				'preferredStyleVariations',
+				updatedVariations
+			);
+	} else {
+		// Else add the variation.
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'preferredStyleVariations', {
+				...existingVariations,
+				[ blockName ]: blockStyle,
+			} );
+	}
+};
 
 /**
  * Update the provided block types to be visible.

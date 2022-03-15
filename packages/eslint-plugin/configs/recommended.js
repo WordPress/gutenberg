@@ -13,19 +13,20 @@ const defaultPrettierConfig = require( '@wordpress/prettier-config' );
  */
 const { isPackageInstalled } = require( '../utils' );
 
-const { config: localPrettierConfig } =
-	cosmiconfigSync( 'prettier' ).search() || {};
-const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
-
 const config = {
-	extends: [
-		require.resolve( './recommended-with-formatting.js' ),
-		'plugin:prettier/recommended',
-	],
-	rules: {
-		'prettier/prettier': [ 'error', prettierConfig ],
-	},
+	extends: [ require.resolve( './recommended-with-formatting.js' ) ],
 };
+
+if ( isPackageInstalled( 'prettier' ) ) {
+	config.extends.push( 'plugin:prettier/recommended' );
+
+	const { config: localPrettierConfig } =
+		cosmiconfigSync( 'prettier' ).search() || {};
+	const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
+	config.rules = {
+		'prettier/prettier': [ 'error', prettierConfig ],
+	};
+}
 
 if ( isPackageInstalled( 'typescript' ) ) {
 	config.settings = {

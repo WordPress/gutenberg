@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 22.2.0 (2022-03-11)
+
+### Enhancement
+
+-   The bundled `@wordpress/eslint-plugin` package got updated to the new major version, but the breaking changes included don't affect this package ([#39244](https://github.com/WordPress/gutenberg/pull/39244)).
+
 ## 22.1.0 (2022-03-03)
 
 ### New Feature

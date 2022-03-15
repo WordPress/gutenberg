@@ -8,7 +8,7 @@ import type {
 	SyntheticEvent,
 	ChangeEvent,
 } from 'react';
-import { noop, omit } from 'lodash';
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -23,7 +23,6 @@ import { ENTER } from '@wordpress/keycodes';
  */
 import type { WordPressComponentProps } from '../ui/context';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
-import { composeStateReducers } from '../input-control/reducer/reducer';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
@@ -36,9 +35,9 @@ import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import type { StateReducer } from '../input-control/reducer/state';
 
-function UnitControl(
+function UnforwardedUnitControl(
 	{
-		__unstableStateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
 		className,
 		disabled = false,
@@ -47,8 +46,8 @@ function UnitControl(
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = true,
 		label,
-		onChange = noop,
-		onUnitChange = noop,
+		onChange,
+		onUnitChange,
 		size = 'default',
 		style,
 		unit: unitProp,
@@ -98,7 +97,7 @@ function UnitControl(
 			typeof nextQuantityValue === 'undefined' ||
 			nextQuantityValue === null
 		) {
-			onChange( '', changeProps );
+			onChange?.( '', changeProps );
 			return;
 		}
 
@@ -113,7 +112,7 @@ function UnitControl(
 			unit
 		).join( '' );
 
-		onChange( onChangeValue, changeProps );
+		onChange?.( onChangeValue, changeProps );
 	};
 
 	const handleOnUnitChange: UnitControlOnChangeCallback = (
@@ -128,8 +127,8 @@ function UnitControl(
 			nextValue = `${ data.default }${ nextUnitValue }`;
 		}
 
-		onChange( nextValue, changeProps );
-		onUnitChange( nextUnitValue, changeProps );
+		onChange?.( nextValue, changeProps );
+		onUnitChange?.( nextUnitValue, changeProps );
 
 		setUnit( nextUnitValue );
 	};
@@ -157,11 +156,11 @@ function UnitControl(
 				: undefined;
 			const changeProps = { event, data };
 
-			onChange(
+			onChange?.(
 				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
 				changeProps
 			);
-			onUnitChange( validParsedUnit, changeProps );
+			onUnitChange?.( validParsedUnit, changeProps );
 
 			setUnit( validParsedUnit );
 		}
@@ -186,6 +185,8 @@ function UnitControl(
 	 * @return The updated state to apply to InputControl
 	 */
 	const unitControlStateReducer: StateReducer = ( state, action ) => {
+		const nextState = { ...state };
+
 		/*
 		 * On commits (when pressing ENTER and on blur if
 		 * isPressEnterToChange is true), if a parse has been performed
@@ -193,13 +194,23 @@ function UnitControl(
 		 */
 		if ( action.type === inputControlActionTypes.COMMIT ) {
 			if ( refParsedQuantity.current !== undefined ) {
-				state.value = ( refParsedQuantity.current ?? '' ).toString();
+				nextState.value = (
+					refParsedQuantity.current ?? ''
+				).toString();
 				refParsedQuantity.current = undefined;
 			}
 		}
 
-		return state;
+		return nextState;
 	};
+
+	let stateReducer: StateReducer = unitControlStateReducer;
+	if ( stateReducerProp ) {
+		stateReducer = ( state, action ) => {
+			const baseState = unitControlStateReducer( state, action );
+			return stateReducerProp( baseState, action );
+		};
+	}
 
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
@@ -244,17 +255,14 @@ function UnitControl(
 				suffix={ inputSuffix }
 				value={ parsedQuantity ?? '' }
 				step={ step }
-				__unstableStateReducer={ composeStateReducers(
-					unitControlStateReducer,
-					stateReducer
-				) }
+				__unstableStateReducer={ stateReducer }
 			/>
 		</Root>
 	);
 }
 
 /**
- * `UnitControl` allows the user to set a value as well as a unit (e.g. `px`).
+ * `UnitControl` allows the user to set a numeric quantity as well as a unit (e.g. `px`).
  *
  *
  * @example
@@ -269,7 +277,7 @@ function UnitControl(
  * };
  * ```
  */
-const ForwardedUnitControl = forwardRef( UnitControl );
+export const UnitControl = forwardRef( UnforwardedUnitControl );
 
 export { parseQuantityAndUnitFromRawValue, useCustomUnits } from './utils';
-export default ForwardedUnitControl;
+export default UnitControl;
