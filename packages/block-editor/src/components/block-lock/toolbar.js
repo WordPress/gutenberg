@@ -38,8 +38,8 @@ export default function BlockLockToolbar( { clientId } ) {
 	}
 
 	return (
-		<div className="block-editor-block-lock-toolbar">
-			<ToolbarGroup>
+		<>
+			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
 					icon={ lock }
 					label={ sprintf(
@@ -53,6 +53,6 @@ export default function BlockLockToolbar( { clientId } ) {
 			{ isModalOpen && (
 				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
 			) }
-		</div>
+		</>
 	);
 }
