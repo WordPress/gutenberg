@@ -158,4 +158,4 @@ function gutenberg_register_theme_block_patterns() {
 		}
 	}
 }
-add_action( 'admin_init', 'gutenberg_register_theme_block_patterns' );
+add_action( 'init', 'gutenberg_register_theme_block_patterns' );
