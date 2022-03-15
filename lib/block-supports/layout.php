@@ -237,11 +237,11 @@ add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container'
  * @return string Filtered block content.
  */
 function gutenberg_restore_image_outer_container( $block_content, $block ) {
-	$image_with_align = '/(^\s*<figure\b[^>]*)\bwp-block-image\b([^"]*\b(?:alignleft|alignright|aligncenter)\b[^>]*>.*<\/figure>)/U';
+	$image_with_align = '/(^\s*<figure.*?class=["\'])(.*\bwp-block-image\b[^"\']*\b(?:alignleft|alignright|aligncenter)\b[^"\']*)(["\'][^>]*>.*<\/figure>)/U';
 
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() ||
-		0 === preg_match( $image_with_align, $block_content )
+		0 === preg_match( $image_with_align, $block_content, $matches )
 	) {
 		return $block_content;
 	}
@@ -253,17 +253,10 @@ function gutenberg_restore_image_outer_container( $block_content, $block ) {
 	if ( isset( $block['attrs']['className'] ) && ! empty( $block['attrs']['className'] ) ) {
 		$wrapper_classnames = array_merge( $wrapper_classnames, explode( ' ', $block['attrs']['className'] ) );
 	}
+	$content_classnames          = explode( ' ', $matches[2] );
+	$filtered_content_classnames = array_diff( $content_classnames, $wrapper_classnames );
 
-	$updated_content = preg_replace_callback(
-		'/(<figure.*?class=")(.*)?(">.*<\/figure>)/U',
-		static function( $matches ) use ( $wrapper_classnames ) {
-			$content_classnames          = explode( ' ', $matches[2] );
-			$filtered_content_classnames = array_diff( $content_classnames, $wrapper_classnames );
-			return '<div class="' . implode( ' ', $wrapper_classnames ) . '">' . $matches[1] . implode( ' ', $filtered_content_classnames ) . $matches[3] . '</div>';
-		},
-		$block_content
-	);
-	return $updated_content;
+	return '<div class="' . implode( ' ', $wrapper_classnames ) . '">' . $matches[1] . implode( ' ', $filtered_content_classnames ) . $matches[3] . '</div>';
 }
 
 if ( function_exists( 'wp_restore_image_outer_container' ) ) {
