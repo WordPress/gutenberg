@@ -457,6 +457,13 @@ const isEditorVisible = async ( driver ) => {
 	await waitForVisible( driver, postTitleLocator );
 };
 
+const waitForMediaLibrary = async ( driver ) => {
+	const accessibilityIdXPathAttrib = isAndroid() ? 'content-desc' : 'name';
+	const accessibilityId = 'WordPress Media Library';
+	const locator = `//*[@${ accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
+	await waitForVisible( driver, locator );
+};
+
 const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	const maxIteration = 25;
 	const timeout = 1000;
@@ -499,5 +506,6 @@ module.exports = {
 	toggleOrientation,
 	doubleTap,
 	isEditorVisible,
+	waitForMediaLibrary,
 	waitForVisible,
 };
