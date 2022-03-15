@@ -62,7 +62,7 @@ const BorderControl = (
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
 			<HStack spacing={ 3 }>
-				<HStack className={ innerWrapperClassName }>
+				<HStack className={ innerWrapperClassName } alignment="stretch">
 					<BorderControlDropdown
 						border={ border }
 						colors={ colors }
