@@ -16,7 +16,6 @@ import classnames from 'classnames';
  */
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -169,8 +168,8 @@ function UnforwardedUnitControl(
 	const handleOnBlur: FocusEventHandler< HTMLInputElement > = mayUpdateUnit;
 
 	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
-		const { keyCode } = event;
-		if ( keyCode === ENTER ) {
+		const { key } = event;
+		if ( key === 'Enter' ) {
 			mayUpdateUnit( event );
 		}
 	};
