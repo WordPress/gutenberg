@@ -84,7 +84,12 @@ function Variation( { variation } ) {
 					<div className="edit-site-global-styles-variations_item-preview">
 						<StylesPreview height={ 80 } />
 					</div>
-					<HStack alignment="center">{ variation?.name }</HStack>
+					<HStack
+						className="edit-site-global-styles-variations_item-label"
+						alignment="center"
+					>
+						{ variation?.name }
+					</HStack>
 				</VStack>
 			</div>
 		</GlobalStylesContext.Provider>

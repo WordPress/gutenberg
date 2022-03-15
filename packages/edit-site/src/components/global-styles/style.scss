@@ -92,3 +92,7 @@
 		border: var(--wp-admin-theme-color) $border-width solid;
 	}
 }
+
+.edit-site-global-styles-variations_item-label {
+	word-break: break-all;
+}
