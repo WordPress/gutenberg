@@ -189,11 +189,65 @@
 			"types": [
 				{
 					"slug": "flow",
-					"type": "flow"
+					"type": "flow",
+					"styles": [
+						{
+							"selector": ".alignleft",
+							"rules": {
+								"float": "left",
+								"margin-right": "2em",
+								"margin-left": "0"
+							}
+						},
+						{
+							"selector": ".alignright",
+							"rules": {
+								"float": "right",
+								"margin-left": "2em",
+								"margin-right": "0"
+							}
+						},
+						{
+							"selector": "> .alignfull",
+							"rules": {
+								"max-width": "none"
+							}
+						},
+						{
+							"suffix": "global-gap",
+							"selector": "> *",
+							"rules": {
+								"margin-top": "0",
+								"margin-bottom": "0"
+							}
+						},
+						{
+							"suffix": "global-gap",
+							"selector": "> * + *",
+							"rules": {
+								"margin-top": "var( --wp--style--block-gap )",
+								"margin-bottom": 0
+							}
+						}
+					]
 				},
 				{
 					"slug": "flex",
-					"type": "flex"
+					"type": "flex",
+					"styles": [
+						{
+							"rules": {
+								"display": "flex",
+								"gap": "0.5em"
+							}
+						},
+						{
+							"selector": "> *",
+							"rules": {
+								"margin": "0"
+							}
+						}
+					]
 				}
 			]
 		},
