@@ -111,7 +111,7 @@ function ListViewBlock( {
 		[ clientId, selectBlock ]
 	);
 
-	const selectDuplicatedBlock = useCallback(
+	const updateSelection = useCallback(
 		( newClientId ) => {
 			selectBlock( undefined, newClientId );
 		},
@@ -257,7 +257,7 @@ function ListViewBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ selectDuplicatedBlock }
+							__experimentalSelectBlock={ updateSelection }
 						/>
 					) }
 				</TreeGridCell>
