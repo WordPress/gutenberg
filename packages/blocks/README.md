@@ -566,6 +566,8 @@ _Returns_
 
 ### isValidBlockContent
 
+> **Deprecated** Use validateBlock instead to avoid data loss.
+
 Returns true if the parsed block is valid given the input content. A block
 is considered valid if, when serialized with assumed attributes, the content
 matches the original value.
@@ -735,6 +737,30 @@ _Returns_
 
 -   `string`: The post content.
 
+### serializeRawBlock
+
+Serializes a block node into the native HTML-comment-powered block format.
+CAVEAT: This function is intended for re-serializing blocks as parsed by
+valid parsers and skips any validation steps. This is NOT a generic
+serialization function for in-memory blocks. For most purposes, see the
+following functions available in the `@wordpress/blocks` package:
+
+_Related_
+
+-   serializeBlock
+-   serialize For more on the format of block nodes as returned by valid parsers:
+-   `@wordpress/block-serialization-default-parser` package
+-   `@wordpress/block-serialization-spec-parser` package
+
+_Parameters_
+
+-   _rawBlock_ `WPRawBlock`: A block node as returned by a valid parser.
+-   _options_ `[Options]`: Serialization options.
+
+_Returns_
+
+-   `string`: An HTML string representing a block.
+
 ### setCategories
 
 Sets the block categories.
@@ -856,6 +882,22 @@ _Parameters_
 
 -   _slug_ `string`: Block category slug.
 -   _category_ `WPBlockCategory`: Object containing the category properties that should be updated.
+
+### validateBlock
+
+Returns an object with `isValid` property set to `true` if the parsed block
+is valid given the input content. A block is considered valid if, when serialized
+with assumed attributes, the content matches the original value. If block is
+invalid, this function returns all validations issues as well.
+
+_Parameters_
+
+-   _block_ `WPBlock`: block object.
+-   _blockTypeOrName_ `[WPBlockType|string]`: Block type or name, inferred from block if not given.
+
+_Returns_
+
+-   `[boolean,Array<LoggerItem>]`: validation results.
 
 ### withBlockContentContext
 

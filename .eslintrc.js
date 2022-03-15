@@ -248,5 +248,12 @@ module.exports = {
 				'jsdoc/valid-types': 'off',
 			},
 		},
+		{
+			files: [ '**/@(storybook|stories)/*' ],
+			rules: {
+				// Useful to add story descriptions via JSdoc without specifying params.
+				'jsdoc/require-param': 'off',
+			},
+		},
 	],
 };

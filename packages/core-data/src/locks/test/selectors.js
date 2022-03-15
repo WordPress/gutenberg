@@ -116,7 +116,7 @@ describe( 'isLockAvailable', () => {
 													store: 'core',
 													path: [
 														'entities',
-														'data',
+														'records',
 														'postType',
 														'post',
 														16,
@@ -163,7 +163,7 @@ describe( 'isLockAvailable', () => {
 								entities: {
 									locks: [],
 									children: {
-										data: {
+										records: {
 											locks: [],
 											children: {
 												postType: {
@@ -178,7 +178,7 @@ describe( 'isLockAvailable', () => {
 																			path: [
 																				'core',
 																				'entities',
-																				'data',
+																				'records',
 																				'postType',
 																				'book',
 																				67,
@@ -205,7 +205,7 @@ describe( 'isLockAvailable', () => {
 				isLockAvailable(
 					deepFreeze( subState ),
 					'core',
-					[ 'entities', 'data', 'postType', 'book', 67 ],
+					[ 'entities', 'records', 'postType', 'book', 67 ],
 					{ exclusive: false }
 				)
 			).toBe( false );
