@@ -106,7 +106,7 @@ The callback receives two arguments:
 1. `newValue`: the new value of the input
 2. `extra`: an object containing, under the `event` key, the original browser event.
 
-Note that the value received as the first argument of the callback is _not_ guaranteed to be a valid value (e.g. it could be outside of the range defined by the [`min`, `max`] props, or it could not match the `step`). In order to check the value's validity, check the `event.target.validity.valid` property from the callback's second argument.
+Note that the value received as the first argument of the callback is _not_ guaranteed to be a valid value (e.g. it could be outside of the range defined by the [`min`, `max`] props, or it could not match the `step`). In order to check the value's validity, check the `event.target?.validity.valid` property from the callback's second argument (_note: given how the component works internally, the `validity` property is not guaranteed to always be defined on `event.target`. When the `validity` property is not defined, you can assume the value received as valid_).
 
 -   Type: `(newValue, extra) => void`
 -   Required: No
