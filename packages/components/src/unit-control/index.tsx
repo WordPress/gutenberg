@@ -90,7 +90,11 @@ function UnforwardedUnitControl(
 
 	const handleOnQuantityChange = (
 		nextQuantityValue: number | string | undefined,
-		changeProps: { event: ChangeEvent< HTMLInputElement > | PointerEvent }
+		changeProps: {
+			event:
+				| ChangeEvent< HTMLInputElement >
+				| PointerEvent< HTMLInputElement >;
+		}
 	) => {
 		if (
 			nextQuantityValue === '' ||

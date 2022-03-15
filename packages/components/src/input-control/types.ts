@@ -34,7 +34,7 @@ interface BaseProps {
 }
 
 export type InputChangeCallback<
-	E = ChangeEvent< HTMLInputElement > | PointerEvent,
+	E = ChangeEvent< HTMLInputElement > | PointerEvent< HTMLInputElement >,
 	P = {}
 > = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
 
