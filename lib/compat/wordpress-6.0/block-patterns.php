@@ -92,10 +92,9 @@ function gutenberg_register_theme_block_patterns() {
 	);
 
 	// Register patterns for the active theme. If the theme is a child theme,
-	// let it register its patterns last, thereby overriding any of the
-	// parent's patterns sharing the same slug.
-	$parent_then_child_themes = array_reverse( wp_get_active_and_valid_themes() );
-	foreach ( $parent_then_child_themes as $theme ) {
+	// let it override any patterns from the parent theme that shares the same
+	// slug.
+	foreach ( wp_get_active_and_valid_themes() as $theme ) {
 		$dirpath = $theme . '/patterns/';
 		if ( file_exists( $dirpath ) ) {
 			$files = glob( $dirpath . '*.php' );
@@ -107,6 +106,10 @@ function gutenberg_register_theme_block_patterns() {
 					}
 					// Example name: twentytwentytwo/query-grid-posts.
 					$pattern_name = get_stylesheet() . '/' . $matches['slug'];
+
+					if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_name ) ) {
+						continue;
+					}
 
 					$pattern_data = get_file_data( $file, $default_headers );
 
