@@ -45,18 +45,33 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 
 	$has_padding_support = gutenberg_block_has_support( $block_type, array( 'spacing', 'padding' ), false );
 	$has_margin_support  = gutenberg_block_has_support( $block_type, array( 'spacing', 'margin' ), false );
+	$classes             = array();
 	$styles              = array();
+	$style_engine        = WP_Style_Engine_Gutenberg::get_instance();
 
 	if ( $has_padding_support ) {
 		$padding_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'padding' ), null );
 
-		if ( is_array( $padding_value ) ) {
-			foreach ( $padding_value as $key => $value ) {
-				$styles[] = sprintf( 'padding-%s: %s;', $key, $value );
-			}
-		} elseif ( null !== $padding_value ) {
-			$styles[] = sprintf( 'padding: %s;', $padding_value );
+		if ( null !== $padding_value ) {
+			// Challenge: deal with specificity that inline styles bring us.
+			// We could flag to use `! important` or just leave inline styles for now.
+			$classes[] = $style_engine->add_style_from_attributes(
+				'wp-block-supports',
+				$block_attributes['style'],
+				array( 'spacing', 'padding' ),
+				array(
+					'obfuscate' => true,
+				)
+			);
 		}
+
+//		if ( is_array( $padding_value ) ) {
+//			foreach ( $padding_value as $key => $value ) {
+//				$styles[] = sprintf( 'padding-%s: %s;', $key, $value );
+//			}
+//		} elseif ( null !== $padding_value ) {
+//			$styles[] = sprintf( 'padding: %s;', $padding_value );
+//		}
 	}
 
 	if ( $has_margin_support ) {
@@ -71,7 +86,18 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	return empty( $styles ) ? array() : array( 'style' => implode( ' ', $styles ) );
+	// Collect classes and styles.
+	$attributes = array();
+
+	if ( ! empty( $classes ) ) {
+		$attributes['class'] = implode( ' ', $classes );
+	}
+
+	if ( ! empty( $styles ) ) {
+		$attributes['style'] = implode( ' ', $styles );
+	}
+
+	return $attributes;
 }
 
 /**
