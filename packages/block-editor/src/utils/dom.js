@@ -1,6 +1,6 @@
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
 const APPENDER_SELECTOR = '.block-list-appender';
-const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
+//const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
 
 /**
  * Returns true if two elements are contained within the same block.
@@ -28,10 +28,7 @@ export function isInsideRootBlock( blockElement, element ) {
 	const parentBlock = element.closest(
 		[ BLOCK_SELECTOR, APPENDER_SELECTOR ].join( ',' )
 	);
-	return (
-		parentBlock === blockElement &&
-		parentBlock.classList.contains( BLOCK_APPENDER_CLASS ) === false
-	);
+	return parentBlock === blockElement;
 }
 
 /**
