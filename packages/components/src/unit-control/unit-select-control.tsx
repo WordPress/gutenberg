@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
 import type { ChangeEvent } from 'react';
 
@@ -16,7 +15,7 @@ import type { UnitSelectControlProps } from './types';
 export default function UnitSelectControl( {
 	className,
 	isUnitSelectTabbable: isTabbable = true,
-	onChange = noop,
+	onChange,
 	size = 'default',
 	unit = 'px',
 	units = CSS_UNITS,
@@ -37,7 +36,7 @@ export default function UnitSelectControl( {
 		const { value: unitValue } = event.target;
 		const data = units.find( ( option ) => option.value === unitValue );
 
-		onChange( unitValue, { event, data } );
+		onChange?.( unitValue, { event, data } );
 	};
 
 	const classes = classnames( 'components-unit-control__select', className );
