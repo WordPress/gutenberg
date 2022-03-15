@@ -45,6 +45,14 @@ const renderMargin = ( {
 		} )()
 	);
 
+const renderDisplay = ( {
+	'aria-orientation': orientation = 'horizontal',
+}: Props ) => {
+	return orientation === 'vertical'
+		? css( { display: 'inline' } )
+		: undefined;
+};
+
 const renderBorder = ( {
 	'aria-orientation': orientation = 'horizontal',
 }: Props ) => {
@@ -67,6 +75,7 @@ export const DividerView = styled.hr< Props >`
 	border: 0;
 	margin: 0;
 
+	${ renderDisplay }
 	${ renderBorder }
 	${ renderSize }
 	${ renderMargin }

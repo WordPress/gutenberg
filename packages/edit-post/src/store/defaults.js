@@ -4,6 +4,4 @@ export const PREFERENCES_DEFAULTS = {
 			opened: true,
 		},
 	},
-	hiddenBlockTypes: [],
-	preferredStyleVariations: {},
 };

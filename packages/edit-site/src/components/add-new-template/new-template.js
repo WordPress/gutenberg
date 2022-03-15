@@ -15,6 +15,21 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import {
+	archive,
+	blockMeta,
+	category,
+	home,
+	list,
+	media,
+	notFound,
+	page,
+	post,
+	postAuthor,
+	postDate,
+	search,
+	tag,
+} from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -27,11 +42,32 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
 	'single-post',
 	'page',
+	'index',
 	'archive',
+	'author',
+	'category',
+	'date',
+	'tag',
+	'taxonomy',
 	'search',
 	'404',
-	'index',
 ];
+
+const TEMPLATE_ICONS = {
+	'front-page': home,
+	'single-post': post,
+	page,
+	archive,
+	search,
+	404: notFound,
+	index: list,
+	category,
+	author: postAuthor,
+	taxonomy: blockMeta,
+	date: postDate,
+	tag,
+	attachment: media,
+};
 
 export default function NewTemplate( { postType } ) {
 	const history = useHistory();
@@ -111,6 +147,14 @@ export default function NewTemplate( { postType } ) {
 		return null;
 	}
 
+	// Update the sort order to match the DEFAULT_TEMPLATE_SLUGS order.
+	missingTemplates.sort( ( template1, template2 ) => {
+		return (
+			DEFAULT_TEMPLATE_SLUGS.indexOf( template1.slug ) -
+			DEFAULT_TEMPLATE_SLUGS.indexOf( template2.slug )
+		);
+	} );
+
 	return (
 		<DropdownMenu
 			className="edit-site-new-template-dropdown"
@@ -131,6 +175,8 @@ export default function NewTemplate( { postType } ) {
 							missingTemplates,
 							( { title, description, slug } ) => (
 								<MenuItem
+									icon={ TEMPLATE_ICONS[ slug ] }
+									iconPosition="left"
 									info={ description }
 									key={ slug }
 									onClick={ () => {
