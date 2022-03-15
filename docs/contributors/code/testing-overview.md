@@ -225,7 +225,7 @@ The built-in `fireEvent` is a utility for dispatching DOM events. It dispatches 
 
 On the other hand, the `user-event` library exposes higher-level methods (e.g. `type`, `selectOptions`, `clear`, `doubleClick`...), that dispatch events like they would happen if a user interacted with the document, and take care of any react-specific quirks.
 
-For the above reasons, **the `user-event` library is the recommended way to simulate user events when writing tests**.
+For the above reasons, **the `user-event` library is recommended when writing tests for user interactions**.
 
 **Not so good**: using `fireEvent` to dispatch DOM events.
 
@@ -270,10 +270,10 @@ test('fires onChange when a new value is typed', async () => {
 	render( <MyComponent onChange={ spyOnChange } /> );
 
 	const input = screen.getByRole( 'textbox' );
-	// Focus element, select all contents, delete contents as per browser menu
+	// Focus the element, select and delete all its contents.
 	await user.clear( input );
-	// Click the element, type each characted separately (generating keydown,
-	// keypress and keyup events), release all pressed key.
+	// Click the element, type each character separately (generating keydown,
+	// keypress and keyup events).
 	await user.type( input, '62' );
 
 	// The `onChange` callback gets called 3 times with the following arguments:
@@ -283,7 +283,7 @@ test('fires onChange when a new value is typed', async () => {
 	expect( spyOnChange ).toHaveBeenCalledTimes( 3 );
 
 	const select = screen.getByRole( 'listbox' );
-	// Focus, pointer events, change events
+	// Dispatches events for focus, pointer, mouse, click and change.
 	await user.selectOptions( select, [ 'optionValue' ] );
 
 	// ...
