@@ -280,6 +280,8 @@ export default function useArrowNav() {
 					isNavEdge( target, isReverse )
 				) {
 					node.contentEditable = true;
+					// Firefox doesn't automatically move focus.
+					node.focus();
 				}
 			} else if (
 				isVertical &&
