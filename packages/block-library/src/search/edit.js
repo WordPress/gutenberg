@@ -18,7 +18,7 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useCallback } from '@wordpress/element';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
@@ -52,6 +52,8 @@ import {
 	MIN_WIDTH,
 	MIN_WIDTH_UNIT,
 } from './utils.js';
+import { cloneBlock, createBlock } from '@wordpress/blocks';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
@@ -241,37 +243,91 @@ export default function SearchEdit( {
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
 	} );
+
+	const { getBlocks } = useSelect( blockEditorStore );
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlocks( clientId ).length > 0,
+		[ clientId ]
+	);
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	useEffect( () => {
+		if ( ! hasInnerBlocks ) {
+			replaceInnerBlocks(
+				clientId,
+				[
+					createBlock(
+						'core/button',
+						{
+							text: [
+								buttonUseIcon ? (
+									<Icon icon={ search } />
+								) : (
+									false
+								), // todo: get the icon to render
+								buttonUseIcon ? 'icon' : false,
+								'Search',
+							],
+							className: classnames(
+								{
+									[ borderProps.className ]: isButtonPositionInside,
+								},
+								colorProps.className
+							),
+							style: {
+								...( isButtonPositionInside
+									? { borderRadius }
+									: borderProps.style ),
+							},
+						},
+						[]
+					),
+				],
+				true
+			);
+		}
+	}, [ hasInnerBlocks, clientId ] );
+
+	const updateButtonAttrs = useCallback(
+		( mapper ) => {
+			const prevBlocks = getBlocks( clientId );
+			const nextBlocks = prevBlocks
+				.map( ( block ) => cloneBlock( block ) )
+				.map( ( block ) => ( {
+					...block,
+					attributes: mapper( block.attributes ),
+				} ) );
+			replaceInnerBlocks( clientId, nextBlocks );
+		},
+		[ clientId ]
+	);
+
+	useEffect( () => {
+		updateButtonAttrs( ( prev ) => ( {
+			...prev,
+			className: classnames( prev.className, {
+				[ borderProps.className ]: isButtonPositionInside,
+				// How to use colorProps.className ?
+			} ),
+			style: isButtonPositionInside
+				? { borderRadius }
+				: borderProps.style,
+			text: buttonUseIcon
+				? [ <Icon icon={ search } />, 'icon', prev.text ]
+				: prev.text.slice( 2 ), // super naive for now
+		} ) );
+	}, [
+		isButtonPositionInside,
+		buttonUseIcon,
+		// colorProps, TODO
+		// borderProps,
+		clientId,
+	] );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		orientation: 'horizontal',
 		renderAppender: false,
-		template: [
-			[
-				'core/button',
-				{
-					text: [
-						buttonUseIcon ? <Icon icon={ search } /> : false, // get the icon to render
-						'Search',
-					],
-					className: classnames(
-						{
-							[ borderProps.className ]: isButtonPositionInside,
-						},
-						colorProps.className
-					),
-					style: {
-						...( isButtonPositionInside
-							? { borderRadius }
-							: borderProps.style ),
-					},
-				},
-				[],
-			],
-		],
-		templateLock: 'all',
 		allowedBlocks: ALLOWED_BLOCKS,
-		onChange: ( html ) => {
-			setAttributes( { buttonText: html } );
-		},
 	} );
 	const button = <div { ...innerBlocksProps } />;
 
