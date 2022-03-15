@@ -81,6 +81,11 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_classes_start_placement, $block ) );
 		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_classes_middle_placement, $block ) );
 		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_classes_random_placement, $block ) );
+
+		$block_classes_other_attributes = '<figure style="color: red" class="is-style-round wp-block-image alignright my-custom-classname size-full" data-random-tag=">"><img src="/my-image.jpg"/></figure>';
+		$expected_other_attributes      = '<div class="wp-block-image is-style-round my-custom-classname"><figure style="color: red" class="alignright size-full" data-random-tag=">"><img src="/my-image.jpg"/></figure></div>';
+
+		$this->assertSame( $expected_other_attributes, gutenberg_restore_image_outer_container( $block_classes_other_attributes, $block ) );
 	}
 
 	function test_outer_container_not_restored_for_aligned_image_block_with_themejson_theme() {
