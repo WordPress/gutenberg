@@ -287,4 +287,53 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
+	describe( 'updatePreferredStyleVariations', () => {
+		it( 'sets a preferred style variation for a block when a style name is passed', () => {
+			registry
+				.dispatch( 'core/edit-post' )
+				.updatePreferredStyleVariations( 'core/paragraph', 'fancy' );
+			registry
+				.dispatch( 'core/edit-post' )
+				.updatePreferredStyleVariations( 'core/quote', 'posh' );
+
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'preferredStyleVariations' )
+			).toEqual( {
+				'core/paragraph': 'fancy',
+				'core/quote': 'posh',
+			} );
+		} );
+
+		it( 'removes a preferred style variation for a block when a style name is omitted', () => {
+			registry
+				.dispatch( 'core/edit-post' )
+				.updatePreferredStyleVariations( 'core/paragraph', 'fancy' );
+			registry
+				.dispatch( 'core/edit-post' )
+				.updatePreferredStyleVariations( 'core/quote', 'posh' );
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'preferredStyleVariations' )
+			).toEqual( {
+				'core/paragraph': 'fancy',
+				'core/quote': 'posh',
+			} );
+
+			registry
+				.dispatch( 'core/edit-post' )
+				.updatePreferredStyleVariations( 'core/paragraph' );
+
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'preferredStyleVariations' )
+			).toEqual( {
+				'core/quote': 'posh',
+			} );
+		} );
+	} );
 } );

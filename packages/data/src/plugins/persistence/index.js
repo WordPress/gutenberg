@@ -416,6 +416,11 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 		'core/edit-post',
 		'editorMode'
 	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		'core/edit-post',
+		'preferredStyleVariations'
+	);
 	migrateFeaturePreferencesToPreferencesStore(
 		persistence,
 		'core/edit-site'
