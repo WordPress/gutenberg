@@ -112,7 +112,7 @@ export function useFocusFirstElement( clientId ) {
 			// Make sure focusElement is valid, contained in the same block, and a form field.
 			if (
 				focusElement &&
-				isInsideRootBlock( ref.current, target ) &&
+				isInsideRootBlock( ref.current, focusElement ) &&
 				isFormElement( focusElement )
 			) {
 				focusElement.focus();

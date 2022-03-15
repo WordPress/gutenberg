@@ -30,7 +30,7 @@ export function isInsideRootBlock( blockElement, element ) {
 	);
 	return (
 		parentBlock === blockElement &&
-		element.classList.contains( BLOCK_APPENDER_CLASS )
+		! element.classList.contains( BLOCK_APPENDER_CLASS )
 	);
 }
 
