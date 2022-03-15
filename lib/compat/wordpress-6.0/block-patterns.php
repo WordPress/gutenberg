@@ -103,7 +103,7 @@ function gutenberg_register_theme_block_patterns() {
 				foreach ( $files as $file ) {
 					// Parse pattern slug from file name.
 					if ( ! preg_match( '#/(?P<slug>[A-z0-9_-]+)\.php$#', $file, $matches ) ) {
-						continue; // FIXME: Consider logging notice.
+						continue;
 					}
 					// Example name: twentytwentytwo/query-grid-posts.
 					$pattern_name = get_stylesheet() . '/' . $matches['slug'];
