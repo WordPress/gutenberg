@@ -67,6 +67,15 @@ add_action(
  *
  * If applicable, this will collect from both parent and child theme.
  *
+ * Other settable fields include:
+ *
+ *   - Description
+ *   - Viewport Width
+ *   - Categories       (comma-separated values)
+ *   - Keywords         (comma-separated values)
+ *   - Block Types      (comma-separated values)
+ *   - Inserter         (yes/no)
+ *
  * @since 6.0.0
  * @access private
  * @internal
