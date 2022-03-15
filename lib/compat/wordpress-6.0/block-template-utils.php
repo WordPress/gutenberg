@@ -13,7 +13,7 @@
  * @since 6.0.0
  * @return Bool Whether this file is in an ignored directory.
  */
-function gutenberg_directory_ignored( $path ) {
+function gutenberg_is_theme_directory_ignored( $path ) {
 	$directories_to_ignore = array( '.git', 'node_modules', 'vendor' );
 	foreach( $directories_to_ignore as $directory ) {
 		if ( strpos( $path, $directory ) === 0 ) {
@@ -70,7 +70,7 @@ function gutenberg_generate_block_templates_export_file() {
 			$file_path = wp_normalize_path( $file->getRealPath() );
 			$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
 
-			if ( ! gutenberg_directory_ignored( $relative_path ) ) {
+			if ( ! gutenberg_is_theme_directory_ignored( $relative_path ) ) {
 				$zip->addFile( $file_path, $theme_name . '/' . $relative_path );
 			}
 		}
