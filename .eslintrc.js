@@ -249,9 +249,10 @@ module.exports = {
 			},
 		},
 		{
-			files: [ '**/@(storybook|stories)/*' ],
+			files: [ '**/@(storybook|stories)/*', '**/*.{ts,tsx}' ],
 			rules: {
-				// Useful to add story descriptions via JSdoc without specifying params.
+				// Useful to add story descriptions via JSDoc without specifying params,
+				// or in TypeScript files where the param types are already specified outside of the JSDoc.
 				'jsdoc/require-param': 'off',
 			},
 		},
