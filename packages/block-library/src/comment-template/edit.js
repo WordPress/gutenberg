@@ -103,7 +103,10 @@ function CommentTemplateInnerBlocks( {
 	);
 	return (
 		<li { ...innerBlocksProps }>
-			{ comment === ( activeComment || firstComment ) ? children : null }
+			{ comment.commentId ===
+			( activeComment?.commentId || firstComment?.commentId )
+				? children
+				: null }
 
 			{ /* To avoid flicker when switching active block contexts, a preview
 			is ALWAYS rendered and the preview for the active block is hidden.
@@ -116,7 +119,10 @@ function CommentTemplateInnerBlocks( {
 				blocks={ blocks }
 				comment={ comment }
 				setActiveComment={ setActiveComment }
-				isHidden={ comment === ( activeComment || firstComment ) }
+				isHidden={
+					comment.commentId ===
+					( activeComment?.commentId || firstComment?.commentId )
+				}
 			/>
 
 			{ comment?.children?.length > 0 ? (
@@ -142,7 +148,7 @@ const CommentTemplatePreview = ( {
 	} );
 
 	const handleOnClick = () => {
-		setActiveComment( comment );
+		setActiveComment( comment?.commentId );
 	};
 
 	// We have to hide the preview block if the `comment` props points to
