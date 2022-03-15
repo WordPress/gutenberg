@@ -194,7 +194,7 @@ module.exports = {
 		{
 			files: [ 'packages/react-native-*/**/*.js' ],
 			settings: {
-				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549.
 			},
 		},
 		{
@@ -246,6 +246,13 @@ module.exports = {
 			rules: {
 				'jsdoc/no-undefined-types': 'off',
 				'jsdoc/valid-types': 'off',
+			},
+		},
+		{
+			files: [ '**/@(storybook|stories)/*' ],
+			rules: {
+				// Useful to add story descriptions via JSdoc without specifying params.
+				'jsdoc/require-param': 'off',
 			},
 		},
 	],

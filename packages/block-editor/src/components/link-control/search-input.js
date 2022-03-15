@@ -94,7 +94,7 @@ const LinkControlSearchInput = forwardRef(
 		const onSuggestionSelected = async ( selectedSuggestion ) => {
 			let suggestion = selectedSuggestion;
 			if ( CREATE_TYPE === selectedSuggestion.type ) {
-				// Create a new page and call onSelect with the output from the onCreateSuggestion callback
+				// Create a new page and call onSelect with the output from the onCreateSuggestion callback.
 				try {
 					suggestion = await onCreateSuggestion(
 						selectedSuggestion.title

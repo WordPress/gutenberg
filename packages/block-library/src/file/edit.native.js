@@ -370,7 +370,7 @@ export class FileEdit extends Component {
 	// Render `Text` with `placeholderText` styled as a placeholder
 	// to calculate its width which then is set as a `minWidth`
 	// This should be fixed on RNAztec level. In the mean time,
-	// We use the same strategy implemented in Button block
+	// We use the same strategy implemented in Button block.
 	getPlaceholderWidth( placeholderText ) {
 		const { maxWidth, placeholderTextWidth } = this.state;
 		return (

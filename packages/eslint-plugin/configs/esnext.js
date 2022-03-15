@@ -16,7 +16,7 @@ const config = {
 		// Disable ES5-specific (extended from ES5)
 		'vars-on-top': 'off',
 
-		// Enable ESNext-specific
+		// Enable ESNext-specific.
 		'arrow-parens': [ 'error', 'always' ],
 		'arrow-spacing': 'error',
 		'computed-property-spacing': [ 'error', 'always' ],

@@ -35,6 +35,8 @@ function ConfirmDialog(
 		onConfirm,
 		onCancel,
 		children,
+		confirmButtonText,
+		cancelButtonText,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
@@ -75,8 +77,8 @@ function ConfirmDialog(
 		[ handleEvent, onConfirm ]
 	);
 
-	const cancelLabel = __( 'Cancel' );
-	const confirmLabel = __( 'OK' );
+	const cancelLabel = cancelButtonText ?? __( 'Cancel' );
+	const confirmLabel = confirmButtonText ?? __( 'OK' );
 
 	return (
 		<>

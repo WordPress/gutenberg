@@ -10,9 +10,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
-
 import { Children, cloneElement, useCallback } from '@wordpress/element';
-import { serialize, store as blocksStore } from '@wordpress/blocks';
+import { serialize } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useCopyToClipboard } from '@wordpress/compose';
 
@@ -25,6 +24,7 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -48,7 +48,6 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {
 		onlyBlock,
-		title,
 		previousBlockClientId,
 		nextBlockClientId,
 		selectedBlockClientIds,
@@ -56,16 +55,12 @@ export function BlockSettingsDropdown( {
 		( select ) => {
 			const {
 				getBlockCount,
-				getBlockName,
 				getPreviousBlockClientId,
 				getNextBlockClientId,
 				getSelectedBlockClientIds,
 			} = select( blockEditorStore );
-			const { getBlockType } = select( blocksStore );
 			return {
 				onlyBlock: 1 === getBlockCount(),
-				title: getBlockType( getBlockName( firstBlockClientId ) )
-					?.title,
 				previousBlockClientId: getPreviousBlockClientId(
 					firstBlockClientId
 				),
@@ -104,6 +99,8 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
+	const blockTitle = useBlockDisplayTitle( firstBlockClientId, 25 );
+
 	const updateSelectionAfterRemove = useCallback(
 		__experimentalSelectBlock
 			? () => {
@@ -116,7 +113,7 @@ export function BlockSettingsDropdown( {
 						// in this case, it's not necessary to update the selection since the selected block wasn't removed.
 						selectedBlockClientIds.includes( firstBlockClientId ) &&
 						// Don't update selection when next/prev block also is in the selection ( and gets removed ),
-						// it's only possible when someone selects all blocks and removes them at once.
+						// In case someone selects all blocks and removes them at once.
 						! selectedBlockClientIds.includes( blockToSelect )
 					) {
 						__experimentalSelectBlock( blockToSelect );
@@ -134,7 +131,7 @@ export function BlockSettingsDropdown( {
 	const label = sprintf(
 		/* translators: %s: block name */
 		__( 'Remove %s' ),
-		title
+		blockTitle
 	);
 	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
 

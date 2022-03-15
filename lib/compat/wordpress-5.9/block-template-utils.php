@@ -154,7 +154,7 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 			),
 			'tag'            => array(
 				'title'       => _x( 'Tag', 'Template name', 'gutenberg' ),
-				'description' => __( 'Displays latest posts with single post tag.', 'gutenberg' ),
+				'description' => __( 'Displays latest posts with a single post tag.', 'gutenberg' ),
 			),
 			'attachment'     => array(
 				'title'       => __( 'Media', 'gutenberg' ),
@@ -892,59 +892,5 @@ if ( ! function_exists( 'block_footer_area' ) ) {
 	 */
 	function block_footer_area() {
 		block_template_part( 'footer' );
-	}
-}
-
-if ( ! function_exists( 'wp_generate_block_templates_export_file' ) ) {
-	/**
-	 * Creates an export of the current templates and
-	 * template parts from the site editor at the
-	 * specified path in a ZIP file.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @return WP_Error|string Path of the ZIP file or error on failure.
-	 */
-	function wp_generate_block_templates_export_file() {
-		if ( ! class_exists( 'ZipArchive' ) ) {
-			return new WP_Error( 'missing_zip_package', __( 'Zip Export not supported.', 'gutenberg' ) );
-		}
-
-		$obscura  = wp_generate_password( 12, false, false );
-		$filename = get_temp_dir() . 'edit-site-export-' . $obscura . '.zip';
-
-		$zip = new ZipArchive();
-		if ( true !== $zip->open( $filename, ZipArchive::CREATE ) ) {
-			return new WP_Error( 'unable_to_create_zip', __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
-		}
-
-		$zip->addEmptyDir( 'theme' );
-		$zip->addEmptyDir( 'theme/templates' );
-		$zip->addEmptyDir( 'theme/parts' );
-
-		// Load templates into the zip file.
-		$templates = gutenberg_get_block_templates();
-		foreach ( $templates as $template ) {
-			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
-
-			$zip->addFromString(
-				'theme/templates/' . $template->slug . '.html',
-				$template->content
-			);
-		}
-
-		// Load template parts into the zip file.
-		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
-		foreach ( $template_parts as $template_part ) {
-			$zip->addFromString(
-				'theme/parts/' . $template_part->slug . '.html',
-				$template_part->content
-			);
-		}
-
-		// Save changes to the zip file.
-		$zip->close();
-
-		return $filename;
 	}
 }

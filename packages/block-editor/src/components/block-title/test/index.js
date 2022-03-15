@@ -55,7 +55,7 @@ jest.mock( '../../use-block-display-information', () => {
 } );
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
@@ -106,7 +106,23 @@ describe( 'BlockTitle', () => {
 		expect( wrapper.text() ).toBe( 'Test Label' );
 	} );
 
-	it( 'truncates the label if it is too long', () => {
+	it( 'truncates the label with custom truncate length', () => {
+		useSelect.mockImplementation( () => ( {
+			name: 'name-with-long-label',
+			attributes: null,
+		} ) );
+
+		const wrapper = shallow(
+			<BlockTitle
+				clientId="id-name-with-long-label"
+				maximumLength={ 12 }
+			/>
+		);
+
+		expect( wrapper.text() ).toBe( 'This is a...' );
+	} );
+
+	it( 'should not truncate the label if maximum length is undefined', () => {
 		useSelect.mockImplementation( () => ( {
 			name: 'name-with-long-label',
 			attributes: null,
@@ -116,6 +132,8 @@ describe( 'BlockTitle', () => {
 			<BlockTitle clientId="id-name-with-long-label" />
 		);
 
-		expect( wrapper.text() ).toBe( 'This is a longer label than typi...' );
+		expect( wrapper.text() ).toBe(
+			'This is a longer label than typical for blocks to have.'
+		);
 	} );
 } );

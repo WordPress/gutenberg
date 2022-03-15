@@ -6,14 +6,15 @@ import type {
 	KeyboardEvent,
 	ForwardedRef,
 	SyntheticEvent,
+	ChangeEvent,
 } from 'react';
-import { noop, omit } from 'lodash';
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { forwardRef, useMemo, useRef } from '@wordpress/element';
+import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ENTER } from '@wordpress/keycodes';
 
@@ -22,22 +23,21 @@ import { ENTER } from '@wordpress/keycodes';
  */
 import type { WordPressComponentProps } from '../ui/context';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
-import { composeStateReducers } from '../input-control/reducer/reducer';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
 	CSS_UNITS,
-	getParsedValue,
+	getParsedQuantityAndUnit,
 	getUnitsWithCurrentUnit,
-	getValidParsedUnit,
+	getValidParsedQuantityAndUnit,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import type { StateReducer } from '../input-control/reducer/state';
 
-function UnitControl(
+function UnforwardedUnitControl(
 	{
-		__unstableStateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
 		className,
 		disabled = false,
@@ -46,8 +46,8 @@ function UnitControl(
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = true,
 		label,
-		onChange = noop,
-		onUnitChange = noop,
+		onChange,
+		onUnitChange,
 		size = 'default',
 		style,
 		unit: unitProp,
@@ -57,30 +57,47 @@ function UnitControl(
 	}: WordPressComponentProps< UnitControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
+	// The `value` prop, in theory, should not be `null`, but the following line
+	// ensures it fallback to `undefined` in case a consumer of `UnitControl`
+	// still passes `null` as a `value`.
+	const nonNullValueProp = valueProp ?? undefined;
 	const units = useMemo(
-		() => getUnitsWithCurrentUnit( valueProp, unitProp, unitsProp ),
-		[ valueProp, unitProp, unitsProp ]
+		() => getUnitsWithCurrentUnit( nonNullValueProp, unitProp, unitsProp ),
+		[ nonNullValueProp, unitProp, unitsProp ]
 	);
-	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
+	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
+		nonNullValueProp,
+		unitProp,
+		units
+	);
+
 	const [ unit, setUnit ] = useControlledState< string | undefined >(
 		unitProp,
 		{
-			initial: initialUnit,
+			initial: parsedUnit,
 			fallback: '',
 		}
 	);
 
-	// Stores parsed value for hand-off in state reducer
-	const refParsedValue = useRef< string | null >( null );
+	useEffect( () => {
+		setUnit( parsedUnit );
+	}, [ parsedUnit ] );
+
+	// Stores parsed value for hand-off in state reducer.
+	const refParsedQuantity = useRef< number | undefined >( undefined );
 
 	const classes = classnames( 'components-unit-control', className );
 
-	const handleOnChange: UnitControlOnChangeCallback = (
-		next,
-		changeProps
+	const handleOnQuantityChange = (
+		nextQuantityValue: number | string | undefined,
+		changeProps: { event: ChangeEvent< HTMLInputElement > }
 	) => {
-		if ( next === '' ) {
-			onChange( '', changeProps );
+		if (
+			nextQuantityValue === '' ||
+			typeof nextQuantityValue === 'undefined' ||
+			nextQuantityValue === null
+		) {
+			onChange?.( '', changeProps );
 			return;
 		}
 
@@ -88,53 +105,64 @@ function UnitControl(
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
 		 */
-		next = getValidParsedUnit( next, units, value, unit ).join( '' );
+		const onChangeValue = getValidParsedQuantityAndUnit(
+			nextQuantityValue,
+			units,
+			parsedQuantity,
+			unit
+		).join( '' );
 
-		onChange( next, changeProps );
+		onChange?.( onChangeValue, changeProps );
 	};
 
 	const handleOnUnitChange: UnitControlOnChangeCallback = (
-		next,
+		nextUnitValue,
 		changeProps
 	) => {
 		const { data } = changeProps;
 
-		let nextValue = `${ value }${ next }`;
+		let nextValue = `${ parsedQuantity ?? '' }${ nextUnitValue }`;
 
 		if ( isResetValueOnUnitChange && data?.default !== undefined ) {
-			nextValue = `${ data.default }${ next }`;
+			nextValue = `${ data.default }${ nextUnitValue }`;
 		}
 
-		onChange( nextValue, changeProps );
-		onUnitChange( next, changeProps );
+		onChange?.( nextValue, changeProps );
+		onUnitChange?.( nextUnitValue, changeProps );
 
-		setUnit( next );
+		setUnit( nextUnitValue );
 	};
 
 	const mayUpdateUnit = ( event: SyntheticEvent< HTMLInputElement > ) => {
 		if ( ! isNaN( Number( event.currentTarget.value ) ) ) {
-			refParsedValue.current = null;
+			refParsedQuantity.current = undefined;
 			return;
 		}
-		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
+		const [
+			validParsedQuantity,
+			validParsedUnit,
+		] = getValidParsedQuantityAndUnit(
 			event.currentTarget.value,
 			units,
-			value,
+			parsedQuantity,
 			unit
 		);
 
-		refParsedValue.current = parsedValue.toString();
+		refParsedQuantity.current = validParsedQuantity;
 
-		if ( isPressEnterToChange && parsedUnit !== unit ) {
+		if ( isPressEnterToChange && validParsedUnit !== unit ) {
 			const data = Array.isArray( units )
-				? units.find( ( option ) => option.value === parsedUnit )
+				? units.find( ( option ) => option.value === validParsedUnit )
 				: undefined;
 			const changeProps = { event, data };
 
-			onChange( `${ parsedValue }${ parsedUnit }`, changeProps );
-			onUnitChange( parsedUnit, changeProps );
+			onChange?.(
+				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
+				changeProps
+			);
+			onUnitChange?.( validParsedUnit, changeProps );
 
-			setUnit( parsedUnit );
+			setUnit( validParsedUnit );
 		}
 	};
 
@@ -157,20 +185,32 @@ function UnitControl(
 	 * @return The updated state to apply to InputControl
 	 */
 	const unitControlStateReducer: StateReducer = ( state, action ) => {
+		const nextState = { ...state };
+
 		/*
 		 * On commits (when pressing ENTER and on blur if
 		 * isPressEnterToChange is true), if a parse has been performed
 		 * then use that result to update the state.
 		 */
 		if ( action.type === inputControlActionTypes.COMMIT ) {
-			if ( refParsedValue.current !== null ) {
-				state.value = refParsedValue.current;
-				refParsedValue.current = null;
+			if ( refParsedQuantity.current !== undefined ) {
+				nextState.value = (
+					refParsedQuantity.current ?? ''
+				).toString();
+				refParsedQuantity.current = undefined;
 			}
 		}
 
-		return state;
+		return nextState;
 	};
+
+	let stateReducer: StateReducer = unitControlStateReducer;
+	if ( stateReducerProp ) {
+		stateReducer = ( state, action ) => {
+			const baseState = unitControlStateReducer( state, action );
+			return stateReducerProp( baseState, action );
+		};
+	}
 
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
@@ -209,23 +249,20 @@ function UnitControl(
 				label={ label }
 				onBlur={ handleOnBlur }
 				onKeyDown={ handleOnKeyDown }
-				onChange={ handleOnChange }
+				onChange={ handleOnQuantityChange }
 				ref={ forwardedRef }
 				size={ size }
 				suffix={ inputSuffix }
-				value={ value }
+				value={ parsedQuantity ?? '' }
 				step={ step }
-				__unstableStateReducer={ composeStateReducers(
-					unitControlStateReducer,
-					stateReducer
-				) }
+				__unstableStateReducer={ stateReducer }
 			/>
 		</Root>
 	);
 }
 
 /**
- * `UnitControl` allows the user to set a value as well as a unit (e.g. `px`).
+ * `UnitControl` allows the user to set a numeric quantity as well as a unit (e.g. `px`).
  *
  *
  * @example
@@ -240,7 +277,7 @@ function UnitControl(
  * };
  * ```
  */
-const ForwardedUnitControl = forwardRef( UnitControl );
+export const UnitControl = forwardRef( UnforwardedUnitControl );
 
-export { parseUnit, useCustomUnits } from './utils';
-export default ForwardedUnitControl;
+export { parseQuantityAndUnitFromRawValue, useCustomUnits } from './utils';
+export default UnitControl;

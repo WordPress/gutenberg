@@ -2,6 +2,8 @@
 	margin: 0 0 1em 0;
 
 	img {
+		height: auto;
+		max-width: 100%;
 		vertical-align: bottom;
 	}
 
@@ -56,6 +58,7 @@
 		margin-bottom: 0.5em;
 	}
 
+	// This is needed for classic themes where the align class is not on the container.
 	.aligncenter {
 		margin-left: auto;
 		margin-right: auto;
@@ -69,7 +72,8 @@
 	}
 
 	// Variations
-	&.is-style-rounded img {
+	&.is-style-rounded img,
+	.is-style-rounded img {
 		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 		// to rectangular images. A pill-shape is better than otherwise.
 		border-radius: 9999px;

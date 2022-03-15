@@ -107,7 +107,7 @@ function gutenberg_navigation_init( $hook ) {
 			/*'blockNavMenus' => get_theme_support( 'block-nav-menus' ),*/
 		)
 	);
-	$settings = gutenberg_experimental_global_styles_settings( $settings );
+	$settings = gutenberg_get_block_editor_settings( $settings );
 
 	gutenberg_initialize_editor(
 		'navigation_editor',

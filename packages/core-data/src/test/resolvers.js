@@ -46,12 +46,12 @@ describe( 'getEntityRecord', () => {
 
 		await getEntityRecord( 'root', 'postType', 'post' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
@@ -59,7 +59,7 @@ describe( 'getEntityRecord', () => {
 			undefined
 		);
 
-		// Locks should have been acquired and released
+		// Locks should have been acquired and released.
 		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
 			1
 		);
@@ -94,19 +94,19 @@ describe( 'getEntityRecord', () => {
 			query
 		)( { dispatch, select } );
 
-		// Check resolution cache for an existing entity that fulfills the request with query
+		// Check resolution cache for an existing entity that fulfills the request with query.
 		expect( select.hasEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			queryObj
 		);
 
-		// Trigger apiFetch, test that the query is present in the url
+		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=view&_envelope=1',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
@@ -114,7 +114,7 @@ describe( 'getEntityRecord', () => {
 			queryObj
 		);
 
-		// Locks should have been acquired and released
+		// Locks should have been acquired and released.
 		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
 			1
 		);
@@ -163,12 +163,12 @@ describe( 'getEntityRecords', () => {
 
 		await getEntityRecords( 'root', 'postType' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
@@ -191,17 +191,17 @@ describe( 'getEntityRecords', () => {
 
 		await getEntityRecords( 'root', 'postType' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect(
 			dispatch.__unstableAcquireStoreLock
 		).toHaveBeenCalledWith(
 			'core',
-			[ 'entities', 'data', 'root', 'postType' ],
+			[ 'entities', 'records', 'root', 'postType' ],
 			{ exclusive: false }
 		);
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
@@ -223,12 +223,12 @@ describe( 'getEntityRecords', () => {
 
 		await getEntityRecords( 'root', 'postType' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'START_RESOLUTIONS',
 			selectorName: 'getEntityRecord',
@@ -393,14 +393,14 @@ describe( 'getAutosaves', () => {
 		const postType = 'post';
 		const postId = 1;
 		const restBase = 'posts';
-		const postEntity = { rest_base: restBase };
+		const postEntityConfig = { rest_base: restBase };
 
 		triggerFetch.mockImplementation( () => SUCCESSFUL_RESPONSE );
 		const dispatch = Object.assign( jest.fn(), {
 			receiveAutosaves: jest.fn(),
 		} );
 		const resolveSelect = Object.assign( jest.fn(), {
-			getPostType: jest.fn( () => postEntity ),
+			getPostType: jest.fn( () => postEntityConfig ),
 		} );
 		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
@@ -417,14 +417,14 @@ describe( 'getAutosaves', () => {
 		const postType = 'post';
 		const postId = 1;
 		const restBase = 'posts';
-		const postEntity = { rest_base: restBase };
+		const postEntityConfig = { rest_base: restBase };
 
 		triggerFetch.mockImplementation( () => [] );
 		const dispatch = Object.assign( jest.fn(), {
 			receiveAutosaves: jest.fn(),
 		} );
 		const resolveSelect = Object.assign( jest.fn(), {
-			getPostType: jest.fn( () => postEntity ),
+			getPostType: jest.fn( () => postEntityConfig ),
 		} );
 		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 

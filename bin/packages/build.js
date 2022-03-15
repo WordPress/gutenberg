@@ -134,10 +134,10 @@ function createStyleEntryTransform() {
 			entries.forEach( ( entry ) => this.push( entry ) );
 
 			// Find other stylesheets that need to be rebuilt because
-			// they import the styles that are being transformed
+			// they import the styles that are being transformed.
 			const styleEntries = findStyleEntriesThatImportFile( file );
 
-			// Rebuild stylesheets that import the styles being transformed
+			// Rebuild stylesheets that import the styles being transformed.
 			if ( styleEntries.length ) {
 				styleEntries.forEach( ( entry ) => stream.push( entry ) );
 			}

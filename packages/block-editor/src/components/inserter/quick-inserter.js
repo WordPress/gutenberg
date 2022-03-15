@@ -87,7 +87,7 @@ export default function QuickInserter( {
 	}, [ setInserterIsOpened ] );
 
 	// When clicking Browse All select the appropriate block so as
-	// the insertion point can work as expected
+	// the insertion point can work as expected.
 	const onBrowseAll = () => {
 		setInserterIsOpened( { rootClientId, insertionIndex, filterValue } );
 	};

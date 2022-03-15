@@ -1,25 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	MenuGroup,
+	MenuItem,
+	MenuItemsChoice,
+	ToolbarDropdownMenu,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
-import useConvertClassicMenu from '../use-convert-classic-menu';
-import useCreateNavigationMenu from './use-create-navigation-menu';
 
 export default function NavigationMenuSelector( {
-	clientId,
+	currentMenuId,
 	onSelect,
 	onCreateNew,
 	showManageActions = false,
 	actionLabel,
+	toggleProps = {},
 } ) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
@@ -35,26 +40,36 @@ export default function NavigationMenuSelector( {
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
-	const createNavigationMenu = useCreateNavigationMenu( clientId );
-
-	const onFinishMenuCreation = async (
-		blocks,
-		navigationMenuTitle = null
-	) => {
-		if ( ! canUserCreateNavigationMenu ) {
-			return;
-		}
-
-		const navigationMenu = await createNavigationMenu(
-			navigationMenuTitle,
-			blocks
-		);
-		onSelect( navigationMenu );
-	};
-
-	const convertClassicMenuToBlocks = useConvertClassicMenu(
-		onFinishMenuCreation
+	const handleSelect = useCallback(
+		( _onClose ) => ( selectedId ) => {
+			_onClose();
+			onSelect(
+				navigationMenus?.find( ( post ) => post.id === selectedId )
+			);
+		},
+		[ navigationMenus ]
 	);
+
+	const handleSelectClassic = useCallback(
+		( _onClose, menu ) => () => {
+			_onClose();
+			onSelect( menu );
+		},
+		[]
+	);
+
+	const menuChoices = useMemo( () => {
+		return (
+			navigationMenus?.map( ( { id, title } ) => {
+				const label = decodeEntities( title.rendered );
+				return {
+					value: id,
+					label,
+					ariaLabel: sprintf( actionLabel, label ),
+				};
+			} ) || []
+		);
+	}, [ navigationMenus ] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
@@ -62,75 +77,78 @@ export default function NavigationMenuSelector( {
 	const showClassicMenus = !! canUserCreateNavigationMenu;
 	const hasManagePermissions =
 		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
+
+	// Show the selector if:
+	// - has switch or create permissions and there are block or classic menus.
+	// - user has create or update permisisons and component should show the menu actions.
 	const showSelectMenus =
-		( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
-		( hasNavigationMenus || hasClassicMenus );
+		( ( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
+			( hasNavigationMenus || hasClassicMenus ) ) ||
+		( hasManagePermissions && showManageActions );
 
 	if ( ! showSelectMenus ) {
 		return null;
 	}
 
 	return (
-		<>
-			{ showNavigationMenus && hasNavigationMenus && (
-				<MenuGroup label={ __( 'Menus' ) }>
-					{ navigationMenus.map( ( menu ) => {
-						const label = decodeEntities( menu.title.rendered );
-						return (
-							<MenuItem
-								onClick={ () => {
-									onSelect( menu );
-								} }
-								key={ menu.id }
-								aria-label={ sprintf( actionLabel, label ) }
-							>
-								{ label }
-							</MenuItem>
-						);
-					} ) }
-				</MenuGroup>
-			) }
-			{ showClassicMenus && hasClassicMenus && (
-				<MenuGroup label={ __( 'Classic Menus' ) }>
-					{ classicMenus.map( ( menu ) => {
-						const label = decodeEntities( menu.name );
-						return (
-							<MenuItem
-								onClick={ () => {
-									convertClassicMenuToBlocks(
-										menu.id,
-										menu.name
-									);
-								} }
-								key={ menu.id }
-								aria-label={ sprintf(
-									createActionLabel,
-									label
-								) }
-							>
-								{ label }
-							</MenuItem>
-						);
-					} ) }
-				</MenuGroup>
-			) }
-
-			{ showManageActions && hasManagePermissions && (
-				<MenuGroup label={ __( 'Tools' ) }>
-					{ canUserCreateNavigationMenu && (
-						<MenuItem onClick={ onCreateNew }>
-							{ __( 'Create new menu' ) }
-						</MenuItem>
+		<ToolbarDropdownMenu
+			label={ __( 'Select Menu' ) }
+			text={ __( 'Select Menu' ) }
+			icon={ null }
+			toggleProps={ toggleProps }
+		>
+			{ ( { onClose } ) => (
+				<>
+					{ showNavigationMenus && hasNavigationMenus && (
+						<MenuGroup label={ __( 'Menus' ) }>
+							<MenuItemsChoice
+								value={ currentMenuId }
+								onSelect={ handleSelect( onClose ) }
+								choices={ menuChoices }
+							/>
+						</MenuGroup>
 					) }
-					<MenuItem
-						href={ addQueryArgs( 'edit.php', {
-							post_type: 'wp_navigation',
-						} ) }
-					>
-						{ __( 'Manage menus' ) }
-					</MenuItem>
-				</MenuGroup>
+					{ showClassicMenus && hasClassicMenus && (
+						<MenuGroup label={ __( 'Classic Menus' ) }>
+							{ classicMenus?.map( ( menu ) => {
+								const label = decodeEntities( menu.name );
+								return (
+									<MenuItem
+										onClick={ handleSelectClassic(
+											onClose,
+											menu
+										) }
+										key={ menu.id }
+										aria-label={ sprintf(
+											createActionLabel,
+											label
+										) }
+									>
+										{ label }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+
+					{ showManageActions && hasManagePermissions && (
+						<MenuGroup label={ __( 'Tools' ) }>
+							{ canUserCreateNavigationMenu && (
+								<MenuItem onClick={ onCreateNew }>
+									{ __( 'Create new menu' ) }
+								</MenuItem>
+							) }
+							<MenuItem
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</MenuItem>
+						</MenuGroup>
+					) }
+				</>
 			) }
-		</>
+		</ToolbarDropdownMenu>
 	);
 }

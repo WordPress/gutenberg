@@ -22,10 +22,10 @@ import {
 	Spinner,
 	TextareaControl,
 	ToggleControl,
-	withNotices,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { compose, useInstanceId } from '@wordpress/compose';
 import {
@@ -41,7 +41,6 @@ import {
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
-	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
@@ -50,6 +49,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -110,7 +110,7 @@ function CoverHeightInput( {
 			'vw',
 			'vh',
 		],
-		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
+		defaultValues: { px: 430, '%': 20, em: 20, rem: 20, vw: 20, vh: 50 },
 	} );
 
 	const handleOnChange = ( unprocessedValue ) => {
@@ -125,9 +125,6 @@ function CoverHeightInput( {
 		}
 		setTemporaryInput( null );
 		onChange( inputValue );
-		if ( inputValue === undefined ) {
-			onUnitChange();
-		}
 	};
 
 	const handleOnBlur = () => {
@@ -244,7 +241,7 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
 	useEffect( () => {
 		if ( ! url && ! overlayColor ) {
-			// Reset isDark
+			// Reset isDark.
 			setIsDark( false );
 		}
 	}, [ ! url && ! overlayColor, setIsDark ] );
@@ -269,12 +266,10 @@ const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 function CoverPlaceholder( {
 	disableMediaButtons = false,
 	children,
-	noticeUI,
-	noticeOperations,
 	onSelectMedia,
+	onError,
 	style,
 } ) {
-	const { removeAllNotices, createErrorNotice } = noticeOperations;
 	return (
 		<MediaPlaceholder
 			icon={ <BlockIcon icon={ icon } /> }
@@ -287,12 +282,8 @@ function CoverPlaceholder( {
 			onSelect={ onSelectMedia }
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			notices={ noticeUI }
 			disableMediaButtons={ disableMediaButtons }
-			onError={ ( message ) => {
-				removeAllNotices();
-				createErrorNotice( message );
-			} }
+			onError={ onError }
 			style={ style }
 		>
 			{ children }
@@ -304,8 +295,6 @@ function CoverEdit( {
 	attributes,
 	clientId,
 	isSelected,
-	noticeUI,
-	noticeOperations,
 	overlayColor,
 	setAttributes,
 	setOverlayColor,
@@ -331,6 +320,7 @@ function CoverEdit( {
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		gradientClass,
 		gradientValue,
@@ -385,6 +375,12 @@ function CoverEdit( {
 		} );
 	};
 
+	const onUploadError = ( message ) => {
+		createErrorNotice( Array.isArray( message ) ? message[ 2 ] : message, {
+			type: 'snackbar',
+		} );
+	};
+
 	const isDarkElement = useRef();
 	const isCoverDark = useCoverIsDark(
 		url,
@@ -402,9 +398,10 @@ function CoverEdit( {
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
-	const minHeightWithUnit = minHeightUnit
-		? `${ minHeight }${ minHeightUnit }`
-		: minHeight;
+	const minHeightWithUnit =
+		minHeight && minHeightUnit
+			? `${ minHeight }${ minHeightUnit }`
+			: minHeight;
 
 	const isImgElement = ! ( hasParallax || isRepeated );
 
@@ -642,9 +639,8 @@ function CoverEdit( {
 					) }
 				>
 					<CoverPlaceholder
-						noticeUI={ noticeUI }
 						onSelectMedia={ onSelectMedia }
-						noticeOperations={ noticeOperations }
+						onError={ onUploadError }
 						style={ {
 							minHeight: minHeightWithUnit || undefined,
 						} }
@@ -765,9 +761,8 @@ function CoverEdit( {
 				{ isUploadingMedia && <Spinner /> }
 				<CoverPlaceholder
 					disableMediaButtons
-					noticeUI={ noticeUI }
 					onSelectMedia={ onSelectMedia }
-					noticeOperations={ noticeOperations }
+					onError={ onUploadError }
 				/>
 				<div { ...innerBlocksProps } />
 			</div>
@@ -777,5 +772,4 @@ function CoverEdit( {
 
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
-	withNotices,
 ] )( CoverEdit );

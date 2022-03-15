@@ -388,7 +388,7 @@ export default function NavigationSubmenuEdit( {
 		}
 	}, [] );
 
-	// Store the colors from context as attributes for rendering
+	// Store the colors from context as attributes for rendering.
 	useEffect( () => {
 		// This side-effect should not create an undo level as those should
 		// only be created via user interactions. Mark this change as
@@ -500,7 +500,7 @@ export default function NavigationSubmenuEdit( {
 		onKeyDown,
 	} );
 
-	// Always use overlay colors for submenus
+	// Always use overlay colors for submenus.
 	const innerBlocksColors = getColors( context, true );
 
 	if ( isAtMaxNesting ) {

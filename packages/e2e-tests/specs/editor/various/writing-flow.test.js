@@ -17,7 +17,7 @@ const getActiveBlockName = async () =>
 	);
 
 const addParagraphsAndColumnsDemo = async () => {
-	// Add demo content
+	// Add demo content.
 	await clickBlockAppender();
 	await page.keyboard.type( 'First paragraph' );
 	await page.keyboard.press( 'Enter' );
@@ -26,8 +26,8 @@ const addParagraphsAndColumnsDemo = async () => {
 		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Columns')]`
 	);
 	await page.keyboard.press( 'Enter' );
-	await page.click( ':focus [aria-label="Two columns; equal split"]' );
-	await page.click( ':focus .block-editor-button-block-appender' );
+	await page.click( 'button[aria-label="Two columns; equal split"]' );
+	await page.click( '.block-editor-button-block-appender' );
 	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
 	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -45,10 +45,10 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
 	await page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 
-	await page.keyboard.press( 'Escape' ); // Enter navigation mode
-	await page.keyboard.press( 'ArrowLeft' ); // move to the column block
-	await page.keyboard.press( 'ArrowLeft' ); // move to the columns block
-	await page.keyboard.press( 'Enter' ); // Enter edit mode with the columns block selected
+	await page.keyboard.press( 'Escape' ); // Enter navigation mode.
+	await page.keyboard.press( 'ArrowLeft' ); // Move to the column block.
+	await page.keyboard.press( 'ArrowLeft' ); // Move to the columns block.
+	await page.keyboard.press( 'Enter' ); // Enter edit mode with the columns block selected.
 	await page.keyboard.press( 'Enter' ); // Creates a paragraph after the columns block.
 	await page.keyboard.type( 'Second paragraph' );
 };
@@ -69,10 +69,10 @@ describe( 'Writing Flow', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/18928
 		let activeElementText, activeBlockName;
 
-		// Add demo content
+		// Add demo content.
 		await addParagraphsAndColumnsDemo();
 
-		// Arrow up into nested context focuses last text input
+		// Arrow up into nested context focuses last text input.
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
@@ -111,41 +111,41 @@ describe( 'Writing Flow', () => {
 		// In navigation mode the active element is the block name button, so we can't easily check the block content.
 		let activeBlockName;
 
-		// Add demo content
+		// Add demo content.
 		await addParagraphsAndColumnsDemo();
 
-		// Switch to navigation mode
+		// Switch to navigation mode.
 		await page.keyboard.press( 'Escape' );
-		// Arrow up to Columns block
+		// Arrow up to Columns block.
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/columns' );
-		// Arrow right into Column block
+		// Arrow right into Column block.
 		await page.keyboard.press( 'ArrowRight' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/column' );
-		// Arrow down to reach second Column block
+		// Arrow down to reach second Column block.
 		await page.keyboard.press( 'ArrowDown' );
-		// Arrow right again into Paragraph block
+		// Arrow right again into Paragraph block.
 		await page.keyboard.press( 'ArrowRight' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		// Arrow left back to Column block
+		// Arrow left back to Column block.
 		await page.keyboard.press( 'ArrowLeft' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/column' );
-		// Arrow left back to Columns block
+		// Arrow left back to Columns block.
 		await page.keyboard.press( 'ArrowLeft' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/columns' );
-		// Arrow up to first paragraph
+		// Arrow up to first paragraph.
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
 	} );
 
 	it( 'should navigate around inline boundaries', async () => {
-		// Add demo content
+		// Add demo content.
 		await clickBlockAppender();
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
@@ -153,10 +153,10 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Third' );
 
-		// Navigate to second paragraph
+		// Navigate to second paragraph.
 		await pressKeyTimes( 'ArrowLeft', 6 );
 
-		// Bold second paragraph text
+		// Bold second paragraph text.
 		await page.keyboard.down( 'Shift' );
 		await pressKeyTimes( 'ArrowLeft', 6 );
 		await page.keyboard.up( 'Shift' );
@@ -195,7 +195,7 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'After' );
 
 		// Finally, ensure that ArrowRight from end of unbolded text moves to
-		// the last paragraph
+		// the last paragraph.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'Before' );
 
@@ -628,8 +628,11 @@ describe( 'Writing Flow', () => {
 			`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Wide width')]`
 		);
 		await wideButton.click();
+		// Focus the block content
+		await page.keyboard.press( 'Tab' );
 
 		// Select the previous block.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Confirm correct setup.
@@ -650,13 +653,17 @@ describe( 'Writing Flow', () => {
 		const inserter = await page.$(
 			'.block-editor-block-list__insertion-point'
 		);
+		// Find the space between the inserter and the image block.
 		const inserterRect = await inserter.boundingBox();
 		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
 
+		// Clicking that in-between space should select the image block.
 		await page.mouse.click( x, lowerInserterY );
 
 		const type = await page.evaluate( () =>
-			document.activeElement.getAttribute( 'data-type' )
+			document.activeElement
+				.closest( '[data-block]' )
+				.getAttribute( 'data-type' )
 		);
 
 		expect( type ).toBe( 'core/image' );
@@ -666,8 +673,6 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
 		await page.keyboard.press( 'Enter' );
-		// Move into the placeholder UI.
-		await page.keyboard.press( 'ArrowDown' );
 		// Tab to the "Create table" button.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );

@@ -11,11 +11,11 @@ import { getColorClassName, useBlockProps } from '@wordpress/block-editor';
 export default function separatorSave( { attributes } ) {
 	const { color, customColor } = attributes;
 
-	// the hr support changing color using border-color, since border-color
-	// is not yet supported in the color palette, we use background-color
+	// The hr support changing color using border-color, since border-color
+	// is not yet supported in the color palette, we use background-color.
 	const backgroundClass = getColorClassName( 'background-color', color );
-	// the dots styles uses text for the dots, to change those dots color is
-	// using color, not backgroundColor
+	// The dots styles uses text for the dots, to change those dots color is
+	// using color, not backgroundColor.
 	const colorClass = getColorClassName( 'color', color );
 
 	const className = classnames( {

@@ -655,7 +655,6 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		// Select two columns.
 		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 		// Navigate to appender.
 		await page.keyboard.press( 'ArrowRight' );
@@ -694,12 +693,12 @@ describe( 'Multi-block selection', () => {
 		// Select a paragraph.
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		// Add a list
+		// Add a list.
 		await page.keyboard.type( '/list' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 
-		// Confirm correct setup: a paragraph and a list
+		// Confirm correct setup: a paragraph and a list.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await pressKeyWithModifier( 'primary', 'a' );

@@ -16,7 +16,7 @@ import { addFilter } from '@wordpress/hooks';
  * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
-	// allow blocks to specify their own attribute definition with default values if needed.
+	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( has( settings.attributes, [ 'lock', 'type' ] ) ) {
 		return settings;
 	}

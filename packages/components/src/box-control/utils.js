@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { parseUnit } from '../unit-control/utils';
+import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 
 export const LABELS = {
 	all: __( 'All' ),
@@ -25,10 +25,10 @@ export const LABELS = {
 };
 
 export const DEFAULT_VALUES = {
-	top: null,
-	right: null,
-	bottom: null,
-	left: null,
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
 };
 
 export const DEFAULT_VISUALIZER_VALUES = {
@@ -67,9 +67,13 @@ function mode( arr ) {
  */
 export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
 	const sides = normalizeSides( availableSides );
-	const parsedValues = sides.map( ( side ) => parseUnit( values[ side ] ) );
-	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
-	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
+	const parsedQuantitiesAndUnits = sides.map( ( side ) =>
+		parseQuantityAndUnitFromRawValue( values[ side ] )
+	);
+	const allValues = parsedQuantitiesAndUnits.map(
+		( value ) => value[ 0 ] ?? ''
+	);
+	const allUnits = parsedQuantitiesAndUnits.map( ( value ) => value[ 1 ] );
 
 	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
 		? allValues[ 0 ]
@@ -85,7 +89,7 @@ export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
 	 * isNumber() is more specific for these cases, rather than relying on a
 	 * simple truthy check.
 	 */
-	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
+	const allValue = isNumber( value ) ? `${ value }${ unit }` : undefined;
 
 	return allValue;
 }
