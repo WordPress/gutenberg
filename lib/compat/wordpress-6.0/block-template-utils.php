@@ -11,11 +11,13 @@
  * Filters theme directories that should be ignored during export.
  *
  * @since 6.0.0
+ *
+ * @param string $path The path of the file in the theme
  * @return Bool Whether this file is in an ignored directory.
  */
 function gutenberg_is_theme_directory_ignored( $path ) {
 	$directories_to_ignore = array( '.git', 'node_modules', 'vendor' );
-	foreach( $directories_to_ignore as $directory ) {
+	foreach ( $directories_to_ignore as $directory ) {
 		if ( strpos( $path, $directory ) === 0 ) {
 			return true;
 		}
@@ -47,7 +49,7 @@ function gutenberg_generate_block_templates_export_file() {
 		return new WP_Error( 'unable_to_create_zip', __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
 	}
 
-	$theme_name = wp_get_theme()->get('TextDomain');
+	$theme_name = wp_get_theme()->get( 'TextDomain' );
 
 	$zip->addEmptyDir( $theme_name );
 	$zip->addEmptyDir( $theme_name . '/templates' );
@@ -63,11 +65,11 @@ function gutenberg_generate_block_templates_export_file() {
 	);
 
 	// Make a copy of the current theme.
-	foreach ( $theme_files as $name => $file ) {
+	foreach ( $theme_files as $file ) {
 		// Skip directories as they are added automatically.
 		if ( ! $file->isDir() ) {
 			// Get real and relative path for current file.
-			$file_path = wp_normalize_path( $file->getRealPath() );
+			$file_path     = wp_normalize_path( $file->getRealPath() );
 			$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
 
 			if ( ! gutenberg_is_theme_directory_ignored( $relative_path ) ) {
