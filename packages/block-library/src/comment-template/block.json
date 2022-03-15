@@ -19,6 +19,5 @@
 			"default": 0
 		}
 	},
-	"style": "wp-block-comment-template",
-	"viewScript": "file:./view.min.js"
+	"style": "wp-block-comment-template"
 }

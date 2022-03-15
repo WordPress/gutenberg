@@ -5,6 +5,20 @@
  * @package gutenberg
  */
 
+if ( ! function_exists( 'require_alpine_js' ) ) {
+	/**
+	 * Helper function that enqueues Alpine JS.
+	 *
+	 * It's used with the Comment Query Loop inner blocks.
+	 *
+	 * @return void
+	 */
+	function require_alpine_js() {
+		if ( ! wp_script_is( 'alpine', 'enqueued' ) ) {
+			wp_enqueue_script( 'alpine', 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js', null, '1.0', true );
+		}
+	}
+}
 if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 	/**
 	 * Helper function that constructs a comment query vars array from the passed block properties.

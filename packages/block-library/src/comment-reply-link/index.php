@@ -14,6 +14,7 @@
  * @return string Return the post comment's reply link.
  */
 function render_block_core_comment_reply_link( $attributes, $content, $block ) {
+	require_alpine_js();
 	if ( ! isset( $block->context['commentId'] ) ) {
 		return '';
 	}
@@ -64,10 +65,10 @@ function render_block_core_comment_reply_link( $attributes, $content, $block ) {
 
 	$comment_toggled_form = sprintf(
 		'<div x-data="{ open: false }" %1$s>
-		<div @click.prevent="open = ! open">%2$s</div>
-		<div x-show="open" x-transition>
-			%3$s
-		</div>
+			<div @click.prevent="open = ! open">%2$s</div>
+			<div x-show="open" x-transition>
+				%3$s
+			</div>
 		</div>',
 		$wrapper_attributes,
 		$comment_reply_link,

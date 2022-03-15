@@ -13,8 +13,8 @@
  * @return string
  */
 function block_core_comment_template_render_comments( $comments, $block ) {
-	$content    = '';
-	$likeButton = '<div x-data="{ likes: 0 }"><button x-on:click="likes++">Like</button><span x-text="likes"></span></div>';
+	$content     = '';
+	$like_button = '<div x-data="{ likes: 0 }"><button x-on:click="likes++">Like</button><span x-text="likes"></span></div>';
 	foreach ( $comments as $comment ) {
 
 		$block_content = ( new WP_Block(
@@ -36,7 +36,7 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 			$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
 		}
 
-		$content .= '<li>' . $block_content . '</li>' . $likeButton;
+		$content .= '<li>' . $block_content . '</li>' . $like_button;
 	}
 
 	return $content;
@@ -54,18 +54,7 @@ function block_core_comment_template_render_comments( $comments, $block ) {
  * defined by the block's inner blocks.
  */
 function render_block_core_comment_template( $attributes, $content, $block ) {
-
-	$should_load_view_script = ! wp_script_is( 'wp-block-comment-template-view' );
-	if ( $should_load_view_script ) {
-		wp_enqueue_script(
-			'wp-block-comment-template-view',
-			'',
-			null,
-			false,
-			true
-		);
-	}
-
+	require_alpine_js();
 	// Bail out early if the post ID is not set for some reason.
 	if ( empty( $block->context['postId'] ) ) {
 		return '';
