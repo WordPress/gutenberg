@@ -98,6 +98,7 @@
 		"@octokit/rest": "16.26.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.2",
 		"@storybook/addon-a11y": "6.4.9",
+		"@storybook/addon-actions": "6.4.19",
 		"@storybook/addon-controls": "6.4.9",
 		"@storybook/addon-docs": "6.4.9",
 		"@storybook/addon-knobs": "6.2.9",

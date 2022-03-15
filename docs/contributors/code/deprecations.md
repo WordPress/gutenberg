@@ -2,6 +2,10 @@
 
 For features included in the Gutenberg plugin, the deprecation policy is intended to support backward compatibility for two minor plugin releases, when possible. Features and code included in a stable release of WordPress are not included in this deprecation timeline, and are instead subject to the [versioning policies of the WordPress project](https://make.wordpress.org/core/handbook/about/release-cycle/version-numbering/). The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## Unreleased
+
+-   `wp.blocks.isValidBlockContent` has been removed. Please use `wp.blocks.validateBlock` instead.
+
 ## 11.0.0
 
 -   `wp.blocks.registerBlockTypeFromMetadata` method has been removed. Use `wp.blocks.registerBlockType` method instead.
