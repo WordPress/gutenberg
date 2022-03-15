@@ -26,7 +26,5 @@ The client ID of a block.
 
 The maximum length that the block title string may be before truncated. If `undefined` no truncation will take place.
 
-Truncation only affects contextual titles, for example block variation and reusable block labels. Display titles specified in the block's metadata will not be truncated even if a valid `maximumLength` value is passed.
-
 -   Type: `Number`
 -   Required: No
