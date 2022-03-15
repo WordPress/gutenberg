@@ -308,7 +308,7 @@ class WP_Webfonts {
 	 */
 	public function preload_webfonts() {
 		foreach ( $this->get_fonts() as $font ) {
-			if ( $font['preload'] ) {
+			if ( ! empty( $font['preload'] ) && $font['preload'] ) {
 				foreach( $font['src'] as $src ) {
 					$src_as_array = explode( '.', $src );
 					$file_type    = end( $src_as_array );
