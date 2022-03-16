@@ -766,7 +766,7 @@ export const deleteSelection = ( isForward ) => ( {
 	// is to insert a special character at the position and then recover it.
 	const START_OF_SELECTED_AREA = '\u0086';
 
-	valueA = insert( valueA, '', selectionA.offset, valueA.text.length );
+	valueA = remove( valueA, selectionA.offset, valueA.text.length );
 	valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
 
 	cloneA.attributes[ selectionA.attributeKey ] = toHTMLString( {
@@ -934,8 +934,8 @@ export const splitSelection = () => ( { select, dispatch } ) => {
 		...mapRichTextSettings( attributeDefinitionB ),
 	} );
 
-	valueA = insert( valueA, '', selectionA.offset, valueA.text.length );
-	valueB = insert( valueB, '', 0, selectionB.offset );
+	valueA = remove( valueA, selectionA.offset, valueA.text.length );
+	valueB = remove( valueB, 0, selectionB.offset );
 
 	cloneA.attributes[ selectionA.attributeKey ] = toHTMLString( {
 		value: valueA,
