@@ -11,6 +11,7 @@ import {
 } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
 import { useInstanceId } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -139,6 +140,8 @@ export default function NavigationInspector() {
 
 	const isLoading = ! ( hasResolvedNavigationMenus && hasLoadedInnerBlocks );
 
+	const hasMoreThanOneNavigationMenu = navigationMenus?.length > 1;
+
 	useEffect( () => {
 		if ( isResolvingNavigationMenus ) {
 			speak( 'Loading Navigation sidebar menus.' );
@@ -159,12 +162,25 @@ export default function NavigationInspector() {
 		}
 	}, [ isLoadingInnerBlocks, hasLoadedInnerBlocks ] );
 
+	const hasNavigationMenus =
+		hasResolvedNavigationMenus && navigationMenus?.length;
+
+	if ( ! hasNavigationMenus ) {
+		return (
+			<div className="edit-site-navigation-inspector">
+				<p className="edit-site-navigation-inspector__empty-msg">
+					{ __( 'There are no Navigation Menus.' ) }
+				</p>
+			</div>
+		);
+	}
+
 	return (
 		<div className="edit-site-navigation-inspector">
 			{ ! hasResolvedNavigationMenus && (
 				<div className="edit-site-navigation-inspector__placeholder" />
 			) }
-			{ hasResolvedNavigationMenus && (
+			{ hasResolvedNavigationMenus && hasMoreThanOneNavigationMenu && (
 				<SelectControl
 					aria-controls={
 						// aria-controls should only apply when referenced element is in DOM
