@@ -3,6 +3,7 @@
  */
 import { parse as hpqParse } from 'hpq';
 import { flow, mapValues, castArray } from 'lodash';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -179,26 +180,6 @@ export function isValidByType( value, type ) {
  */
 export function isValidByEnum( value, enumSet ) {
 	return ! Array.isArray( enumSet ) || enumSet.includes( value );
-}
-
-/**
- * Memoize one-parameter function using a WeakMap.
- *
- * @param {Function} fn Function to memoize.
- *
- * @return {Function} The same function memoized.
- */
-function memoize( fn ) {
-	const cache = new WeakMap();
-
-	return function ( param ) {
-		let result = cache.get( param );
-		if ( result === undefined ) {
-			result = fn( param );
-			cache.set( param, result );
-		}
-		return result;
-	};
 }
 
 /**
