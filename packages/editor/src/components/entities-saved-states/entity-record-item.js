@@ -36,7 +36,7 @@ export default function EntityRecordItem( {
 		return parents[ parents.length - 1 ];
 	}, [] );
 
-	// Handle templates that might use default descriptive titles
+	// Handle templates that might use default descriptive titles.
 	const entityRecordTitle = useSelect(
 		( select ) => {
 			if ( 'postType' !== kind || 'wp_template' !== name ) {

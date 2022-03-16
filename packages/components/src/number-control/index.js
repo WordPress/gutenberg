@@ -15,13 +15,12 @@ import { isRTL } from '@wordpress/i18n';
  */
 import { Input } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
-import { composeStateReducers } from '../input-control/reducer/reducer';
 import { add, subtract, roundClamp } from '../utils/math';
 import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
 	{
-		__unstableStateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducerProp,
 		className,
 		dragDirection = 'n',
 		hideHTMLArrows = false,
@@ -43,7 +42,7 @@ export function NumberControl(
 	const baseStep = isStepAny ? 1 : parseFloat( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = ( value, stepOverride ) => {
-		// When step is "any" clamp the value, otherwise round and clamp it
+		// When step is "any" clamp the value, otherwise round and clamp it.
 		return isStepAny
 			? Math.min( max, Math.max( min, value ) )
 			: roundClamp( value, min, max, stepOverride ?? baseStep );
@@ -62,9 +61,11 @@ export function NumberControl(
 	 * @return {Object} The updated state to apply to InputControl
 	 */
 	const numberControlStateReducer = ( state, action ) => {
+		const nextState = { ...state };
+
 		const { type, payload } = action;
 		const event = payload?.event;
-		const currentValue = state.value;
+		const currentValue = nextState.value;
 
 		/**
 		 * Handles custom UP and DOWN Keyboard events
@@ -94,7 +95,7 @@ export function NumberControl(
 				nextValue = subtract( nextValue, incrementalValue );
 			}
 
-			state.value = constrainValue(
+			nextState.value = constrainValue(
 				nextValue,
 				enableShift ? incrementalValue : null
 			);
@@ -139,7 +140,7 @@ export function NumberControl(
 				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
 				const distance = delta * modifier * directionModifier;
 
-				state.value = constrainValue(
+				nextState.value = constrainValue(
 					add( currentValue, distance ),
 					enableShift ? modifier : null
 				);
@@ -155,12 +156,12 @@ export function NumberControl(
 		) {
 			const applyEmptyValue = required === false && currentValue === '';
 
-			state.value = applyEmptyValue
+			nextState.value = applyEmptyValue
 				? currentValue
 				: constrainValue( currentValue );
 		}
 
-		return state;
+		return nextState;
 	};
 
 	return (
@@ -180,10 +181,10 @@ export function NumberControl(
 			step={ step }
 			type={ typeProp }
 			value={ valueProp }
-			__unstableStateReducer={ composeStateReducers(
-				numberControlStateReducer,
-				stateReducer
-			) }
+			__unstableStateReducer={ ( state, action ) => {
+				const baseState = numberControlStateReducer( state, action );
+				return stateReducerProp?.( baseState, action ) ?? baseState;
+			} }
 		/>
 	);
 }

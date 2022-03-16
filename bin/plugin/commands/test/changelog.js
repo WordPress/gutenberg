@@ -204,7 +204,7 @@ describe( 'getIssueFeature', () => {
 					name: 'Some Label',
 				},
 				{
-					name: '[Package] Example Package', // 1. has explicit mapping
+					name: '[Package] Example Package', // 1. has explicit mapping.
 				},
 				{
 					name: '[Package] Another One',
@@ -219,10 +219,10 @@ describe( 'getIssueFeature', () => {
 		const result = getIssueFeature( {
 			labels: [
 				{
-					name: '[Block] Some Block', // 3. Block-specific label
+					name: '[Block] Some Block', // 3. Block-specific label.
 				},
 				{
-					name: '[Package] Edit Widgets', // 1. has explicit mapping
+					name: '[Package] Edit Widgets', // 1. has explicit mapping.
 				},
 				{
 					name: '[Feature] Some Feature', // 2. Feature label.
@@ -242,13 +242,13 @@ describe( 'getIssueFeature', () => {
 		const result = getIssueFeature( {
 			labels: [
 				{
-					name: '[Block] Some Block', // block specific label
+					name: '[Block] Some Block', // Block specific label.
 				},
 				{
 					name: '[Package] This package',
 				},
 				{
-					name: '[Feature] Cool Feature', // should have priority despite prescence of block specific label
+					name: '[Feature] Cool Feature', // Should have priority despite prescence of block specific label.
 				},
 				{
 					name: '[Package] Another One',

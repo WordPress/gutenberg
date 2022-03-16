@@ -235,3 +235,45 @@ describe( 'controls', () => {
 		} );
 	} );
 } );
+
+describe( 'resolveSelect', () => {
+	let registry;
+	let shouldFail;
+
+	beforeEach( () => {
+		shouldFail = false;
+		registry = createRegistry();
+
+		registry.registerStore( 'store', {
+			reducer: ( state = null ) => {
+				return state;
+			},
+			selectors: {
+				getItems: () => 'items',
+			},
+			resolvers: {
+				getItems: () => {
+					if ( shouldFail ) {
+						throw new Error( 'cannot fetch items' );
+					}
+				},
+			},
+		} );
+	} );
+
+	it( 'resolves when the resolution succeeded', async () => {
+		shouldFail = false;
+		const promise = registry.resolveSelect( 'store' ).getItems();
+		jest.runAllTimers();
+		await expect( promise ).resolves.toEqual( 'items' );
+	} );
+
+	it( 'rejects when the resolution failed', async () => {
+		shouldFail = true;
+		const promise = registry.resolveSelect( 'store' ).getItems();
+		jest.runAllTimers();
+		await expect( promise ).rejects.toEqual(
+			new Error( 'cannot fetch items' )
+		);
+	} );
+} );

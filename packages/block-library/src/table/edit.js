@@ -241,7 +241,7 @@ function TableEdit( {
 				rowIndex: newRowIndex,
 			} )
 		);
-		// Select the first cell of the new row
+		// Select the first cell of the new row.
 		setSelectedCell( {
 			sectionName,
 			rowIndex: newRowIndex,
@@ -296,7 +296,7 @@ function TableEdit( {
 				columnIndex: newColumnIndex,
 			} )
 		);
-		// Select the first cell of the new column
+		// Select the first cell of the new column.
 		setSelectedCell( {
 			rowIndex: 0,
 			columnIndex: newColumnIndex,

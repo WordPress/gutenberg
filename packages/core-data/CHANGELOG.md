@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 4.2.0 (2022-03-11)
+
+## 4.1.2 (2022-02-23)
+
 ### Bug Fixes
 
 -   The `canUser` no longer uses the `GET` request with the resource ID argument [#38901](https://github.com/WordPress/gutenberg/pull/38901).

@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	__experimentalUseEntityRecords as useEntityRecords,
+} from '@wordpress/core-data';
 
 /**
  * @typedef {Object} NavigationEntitiesData
@@ -34,31 +37,17 @@ export default function useNavigationEntities( menuId ) {
 }
 
 function useMenuEntities() {
-	const { menus, isResolvingMenus, hasResolvedMenus } = useSelect(
-		( select ) => {
-			const { getMenus, isResolving, hasFinishedResolution } = select(
-				coreStore
-			);
-
-			const menusParameters = [ { per_page: -1, context: 'view' } ];
-
-			return {
-				menus: getMenus( ...menusParameters ),
-				isResolvingMenus: isResolving( 'getMenus', menusParameters ),
-				hasResolvedMenus: hasFinishedResolution(
-					'getMenus',
-					menusParameters
-				),
-			};
-		},
-		[]
+	const { records, isResolving, hasResolved } = useEntityRecords(
+		'root',
+		'menu',
+		{ per_page: -1, context: 'view' }
 	);
 
 	return {
-		menus,
-		isResolvingMenus,
-		hasResolvedMenus,
-		hasMenus: !! ( hasResolvedMenus && menus?.length ),
+		menus: records,
+		isResolvingMenus: isResolving,
+		hasResolvedMenus: hasResolved,
+		hasMenus: !! ( hasResolved && records?.length ),
 	};
 }
 
@@ -100,45 +89,22 @@ function useMenuItemEntities( menuId ) {
 }
 
 function usePageEntities() {
-	const { pages, isResolvingPages, hasResolvedPages } = useSelect(
-		( select ) => {
-			const {
-				getEntityRecords,
-				isResolving,
-				hasFinishedResolution,
-			} = select( coreStore );
-
-			const pagesParameters = [
-				'postType',
-				'page',
-				{
-					parent: 0,
-					order: 'asc',
-					orderby: 'id',
-					per_page: -1,
-					context: 'view',
-				},
-			];
-
-			return {
-				pages: getEntityRecords( ...pagesParameters ) || null,
-				isResolvingPages: isResolving(
-					'getEntityRecords',
-					pagesParameters
-				),
-				hasResolvedPages: hasFinishedResolution(
-					'getEntityRecords',
-					pagesParameters
-				),
-			};
-		},
-		[]
+	const { records, isResolving, hasResolved } = useEntityRecords(
+		'postType',
+		'page',
+		{
+			parent: 0,
+			order: 'asc',
+			orderby: 'id',
+			per_page: -1,
+			context: 'view',
+		}
 	);
 
 	return {
-		pages,
-		isResolvingPages,
-		hasResolvedPages,
-		hasPages: !! ( hasResolvedPages && pages?.length ),
+		pages: records,
+		isResolvingPages: isResolving,
+		hasResolvedPages: hasResolved,
+		hasPages: !! ( hasResolved && records?.length ),
 	};
 }

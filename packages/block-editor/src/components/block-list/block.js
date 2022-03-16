@@ -17,6 +17,7 @@ import {
 	getBlockType,
 	getSaveContent,
 	isUnmodifiedDefaultBlock,
+	serializeRawBlock,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import {
@@ -74,6 +75,7 @@ function Block( { children, isHtml, ...props } ) {
 }
 
 function BlockListBlock( {
+	block: { __unstableBlockSource },
 	mode,
 	isLocked,
 	canRemove,
@@ -155,7 +157,9 @@ function BlockListBlock( {
 	let block;
 
 	if ( ! isValid ) {
-		const saveContent = getSaveContent( blockType, attributes );
+		const saveContent = __unstableBlockSource
+			? serializeRawBlock( __unstableBlockSource )
+			: getSaveContent( blockType, attributes );
 
 		block = (
 			<Block className="has-warning">
@@ -330,7 +334,7 @@ export default compose(
 	pure,
 	applyWithSelect,
 	applyWithDispatch,
-	// block is sometimes not mounted at the right time, causing it be undefined
+	// Block is sometimes not mounted at the right time, causing it be undefined
 	// see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
 	ifCondition( ( { block } ) => !! block ),

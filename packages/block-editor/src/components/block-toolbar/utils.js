@@ -44,7 +44,6 @@ export function useDebouncedShowMovers( {
 
 	const shouldHideMovers = () => {
 		const isHovered = getIsHovered();
-
 		return ! isFocused && ! isHovered;
 	};
 
@@ -82,7 +81,18 @@ export function useDebouncedShowMovers( {
 		}, debounceTimeout );
 	};
 
-	useEffect( () => () => clearTimeoutRef(), [] );
+	useEffect(
+		() => () => {
+			/**
+			 * We need to call the change handler with `isFocused`
+			 * set to false on unmount because we also clear the
+			 * timeout that would handle that.
+			 */
+			handleOnChange( false );
+			clearTimeoutRef();
+		},
+		[]
+	);
 
 	return {
 		showMovers,

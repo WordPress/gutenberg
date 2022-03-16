@@ -119,6 +119,7 @@ function gutenberg_edit_site_init( $hook ) {
 		'styles'                               => gutenberg_get_editor_styles(),
 		'defaultTemplateTypes'                 => $indexed_template_types,
 		'defaultTemplatePartAreas'             => get_allowed_block_template_part_areas(),
+		'__unstableHomeTemplate'               => gutenberg_resolve_home_template(),
 		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
 		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
 	);
@@ -142,11 +143,10 @@ function gutenberg_edit_site_init( $hook ) {
 			'preload_paths'    => array_merge(
 				array(
 					array( '/wp/v2/media', 'OPTIONS' ),
-					'/',
-					'/wp/v2/types?context=edit',
+					'/wp/v2/types?context=view',
 					'/wp/v2/types/wp_template?context=edit',
 					'/wp/v2/types/wp_template-part?context=edit',
-					'/wp/v2/taxonomies?context=edit',
+					'/wp/v2/taxonomies?context=view',
 					'/wp/v2/pages?context=edit',
 					'/wp/v2/categories?context=edit',
 					'/wp/v2/posts?context=edit',
@@ -248,3 +248,27 @@ function gutenberg_site_editor_load_block_editor_scripts_and_styles( $is_block_e
 		: $is_block_editor_screen;
 }
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_site_editor_load_block_editor_scripts_and_styles' );
+
+/**
+ * Do a server-side redirection if missing `postType` and `postId`
+ * query args when visiting site editor.
+ *
+ * Note: The `site-editor.php` should handle redirection when migrated into the WP core.
+ *
+ * @return void
+ */
+function gutenberg_maybe_redirect_to_homepage() {
+	if ( empty( $_GET['postType'] ) && empty( $_GET['postId'] ) ) {
+		$template = gutenberg_resolve_home_template();
+		if ( ! $template ) {
+			return;
+		}
+
+		$redirect_url = add_query_arg(
+			$template,
+			admin_url( 'themes.php?page=gutenberg-edit-site' )
+		);
+		wp_safe_redirect( $redirect_url );
+	}
+}
+add_action( 'load-appearance_page_gutenberg-edit-site', 'gutenberg_maybe_redirect_to_homepage' );

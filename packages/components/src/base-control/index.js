@@ -17,18 +17,19 @@ import {
 
 /**
  * @typedef Props
- * @property {string}                    [id]                  The id of the element to which labels and help text are being generated.
- *                                                             That element should be passed as a child.
- * @property {import('react').ReactNode} help                  If this property is added, a help text will be
- *                                                             generated using help property as the content.
- * @property {import('react').ReactNode} [label]               If this property is added, a label will be generated
- *                                                             using label property as the content.
- * @property {boolean}                   [hideLabelFromVision] If true, the label will only be visible to screen readers.
- * @property {string}                    [className]           The class that will be added with "components-base-control" to the
- *                                                             classes of the wrapper div. If no className is passed only
- *                                                             components-base-control is used.
- * @property {import('react').ReactNode} [children]            The content to be displayed within
- *                                                             the BaseControl.
+ * @property {boolean}                   [__nextHasNoMarginBottom] Start opting into the new margin-free styles that will become the default in a future version.
+ * @property {string}                    [id]                      The id of the element to which labels and help text are being generated.
+ *                                                                 That element should be passed as a child.
+ * @property {import('react').ReactNode} help                      If this property is added, a help text will be
+ *                                                                 generated using help property as the content.
+ * @property {import('react').ReactNode} [label]                   If this property is added, a label will be generated
+ *                                                                 using label property as the content.
+ * @property {boolean}                   [hideLabelFromVision]     If true, the label will only be visible to screen readers.
+ * @property {string}                    [className]               The class that will be added with "components-base-control" to the
+ *                                                                 classes of the wrapper div. If no className is passed only
+ *                                                                 components-base-control is used.
+ * @property {import('react').ReactNode} [children]                The content to be displayed within
+ *                                                                 the BaseControl.
  */
 
 /**
@@ -36,6 +37,7 @@ import {
  * @return {JSX.Element} Element
  */
 function BaseControl( {
+	__nextHasNoMarginBottom = false,
 	id,
 	label,
 	hideLabelFromVision,
@@ -47,7 +49,11 @@ function BaseControl( {
 		<Wrapper
 			className={ classnames( 'components-base-control', className ) }
 		>
-			<StyledField className="components-base-control__field">
+			<StyledField
+				className="components-base-control__field"
+				// TODO: Official deprecation for this should start after all internal usages have been migrated
+				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			>
 				{ label &&
 					id &&
 					( hideLabelFromVision ? (
@@ -77,6 +83,7 @@ function BaseControl( {
 				<StyledHelp
 					id={ id ? id + '__help' : undefined }
 					className="components-base-control__help"
+					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				>
 					{ help }
 				</StyledHelp>

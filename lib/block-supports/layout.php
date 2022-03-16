@@ -51,9 +51,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
-		$style = '';
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > :not(.alignleft):not(.alignright) {";
+			$style  = "$selector > :where(:not(.alignleft):not(.alignright)) {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 			$style .= 'margin-left: auto !important;';
 			$style .= 'margin-right: auto !important;';
@@ -63,12 +62,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector .alignfull { max-width: none; }";
 		}
 
-		$style .= "$selector .alignleft { float: left; margin-right: 2em; margin-left: 0; }";
-		$style .= "$selector .alignright { float: right; margin-left: 2em; margin-right: 0; }";
+		$style .= "$selector > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }";
+		$style .= "$selector > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }";
+		$style .= "$selector > .aligncenter { margin-left: auto !important; margin-right: auto !important; }";
 		if ( $has_block_gap_support ) {
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
-			$style    .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
-			$style    .= "$selector > * + * { margin-top: $gap_style;  margin-bottom: 0; }";
+			$style    .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
+			$style    .= "$selector > * + * { margin-block-start: $gap_style; margin-block-end: 0; }";
 		}
 	} elseif ( 'flex' === $layout_type ) {
 		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
@@ -150,18 +150,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout = $default_layout;
 	}
 
-	$id        = uniqid();
-	$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+	$class_name = wp_unique_id( 'wp-container-' );
+	$gap_value  = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
 	$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
-	$style     = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support, $gap_value );
+	$style     = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="wp-container-' . $id . ' ',
+		'class="' . esc_attr( $class_name ) . ' ',
 		$block_content,
 		1
 	);
@@ -199,7 +199,6 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		preg_quote( $tag_name, '/' )
 	);
 	if (
-		'core/group' !== $block['blockName'] ||
 		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
 		( isset( $block['attrs']['layout']['type'] ) && 'default' !== $block['attrs']['layout']['type'] )
@@ -223,8 +222,9 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 
 if ( function_exists( 'wp_restore_group_inner_container' ) ) {
 	remove_filter( 'render_block', 'wp_restore_group_inner_container', 10, 2 );
+	remove_filter( 'render_block_core/group', 'wp_restore_group_inner_container', 10, 2 );
 }
-add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container', 10, 2 );
 
 
 /**
@@ -233,14 +233,12 @@ add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
  * to avoid breaking styles relying on that div.
  *
  * @param string $block_content Rendered block content.
- * @param array  $block         Block object.
  * @return string Filtered block content.
  */
-function gutenberg_restore_image_outer_container( $block_content, $block ) {
+function gutenberg_restore_image_outer_container( $block_content ) {
 	$image_with_align = '/(^\s*<figure\b[^>]*)\bwp-block-image\b([^"]*\b(?:alignleft|alignright|aligncenter)\b[^>]*>.*<\/figure>)/U';
 
 	if (
-		'core/image' !== $block['blockName'] ||
 		WP_Theme_JSON_Resolver::theme_has_support() ||
 		0 === preg_match( $image_with_align, $block_content )
 	) {
@@ -257,4 +255,7 @@ function gutenberg_restore_image_outer_container( $block_content, $block ) {
 	return $updated_content;
 }
 
-add_filter( 'render_block', 'gutenberg_restore_image_outer_container', 10, 2 );
+if ( function_exists( 'wp_restore_image_outer_container' ) ) {
+	remove_filter( 'render_block_core/image', 'wp_restore_image_outer_container', 10, 1 );
+}
+add_filter( 'render_block_core/image', 'gutenberg_restore_image_outer_container', 10, 1 );

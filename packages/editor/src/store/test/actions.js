@@ -38,19 +38,19 @@ const postTypeEntity = {
 };
 
 function createRegistryWithStores() {
-	// create a registry
+	// Create a registry.
 	const registry = createRegistry();
 
-	// register stores
+	// Register stores.
 	registry.register( blockEditorStore );
 	registry.register( coreStore );
 	registry.register( editorStore );
 	registry.register( noticesStore );
 
-	// register post type entity
+	// Register post type entity.
 	registry.dispatch( coreStore ).addEntities( [ postTypeConfig ] );
 
-	// store post type entity
+	// Store post type entity.
 	registry
 		.dispatch( coreStore )
 		.receiveEntityRecords( 'root', 'postType', [ postTypeEntity ] );
@@ -73,7 +73,7 @@ describe( 'Post actions', () => {
 				status: 'draft',
 			};
 
-			// mock apiFetch response
+			// Mock apiFetch response.
 			apiFetch.setFetchHandler( async ( options ) => {
 				const method = getMethod( options );
 				const { path, data } = options;
@@ -83,6 +83,13 @@ describe( 'Post actions', () => {
 					path.startsWith( `/wp/v2/posts/${ postId }` )
 				) {
 					return { ...post, ...data };
+				} else if (
+					// This URL is requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {};
 				}
 
 				throw {
@@ -91,39 +98,39 @@ describe( 'Post actions', () => {
 				};
 			} );
 
-			// create registry
+			// Create registry.
 			const registry = createRegistryWithStores();
 
-			// store post
+			// Store post.
 			registry
 				.dispatch( coreStore )
 				.receiveEntityRecords( 'postType', 'post', post );
 
-			// setup editor with post and initial edits
+			// Setup editor with post and initial edits.
 			registry.dispatch( editorStore ).setupEditor( post, {
 				content: 'new bar',
 			} );
 
-			// check that the post is dirty
+			// Check that the post is dirty.
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				true
 			);
 
-			// save the post
+			// Save the post.
 			await registry.dispatch( editorStore ).savePost();
 
-			// check the new content
+			// Check the new content.
 			const content = registry
 				.select( editorStore )
 				.getEditedPostContent();
 			expect( content ).toBe( 'new bar' );
 
-			// check that the post is no longer dirty
+			// Check that the post is no longer dirty.
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				false
 			);
 
-			// check that a success notice has been shown
+			// Check that a success notice has been shown.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toMatchObject( [
 				{
@@ -145,7 +152,7 @@ describe( 'Post actions', () => {
 				status: 'draft',
 			};
 
-			// mock apiFetch response
+			// Mock apiFetch response.
 			apiFetch.setFetchHandler( async ( options ) => {
 				const method = getMethod( options );
 				const { path, data } = options;
@@ -163,6 +170,15 @@ describe( 'Post actions', () => {
 					} else if ( method === 'GET' ) {
 						return [];
 					}
+				} else if ( method === 'GET' ) {
+					// These URLs are requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+					if (
+						path.startsWith( '/wp/v2/types/post' ) ||
+						path.startsWith( `/wp/v2/posts/${ postId }` )
+					) {
+						return {};
+					}
 				}
 
 				throw {
@@ -171,42 +187,42 @@ describe( 'Post actions', () => {
 				};
 			} );
 
-			// create registry
+			// Create registry.
 			const registry = createRegistryWithStores();
 
-			// set current user
+			// Set current user.
 			registry.dispatch( coreStore ).receiveCurrentUser( { id: 1 } );
 
-			// store post
+			// Store post.
 			registry
 				.dispatch( coreStore )
 				.receiveEntityRecords( 'postType', 'post', post );
 
-			// setup editor with post and initial edits
+			// Setup editor with post and initial edits.
 			registry.dispatch( editorStore ).setupEditor( post, {
 				content: 'new bar',
 			} );
 
-			// check that the post is dirty
+			// Check that the post is dirty.
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				true
 			);
 
-			// autosave the post
+			// Autosave the post.
 			await registry.dispatch( editorStore ).autosave();
 
-			// check the new content
+			// Check the new content.
 			const content = registry
 				.select( editorStore )
 				.getEditedPostContent();
 			expect( content ).toBe( 'new bar' );
 
-			// check that the post is no longer dirty
+			// Check that the post is no longer dirty.
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				false
 			);
 
-			// check that no notice has been shown on autosave
+			// Check that no notice has been shown on autosave.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toMatchObject( [] );
 		} );
@@ -223,7 +239,7 @@ describe( 'Post actions', () => {
 
 			let gotTrashed = false;
 
-			// mock apiFetch response
+			// Mock apiFetch response.
 			apiFetch.setFetchHandler( async ( options ) => {
 				const method = getMethod( options );
 				const { path, data } = options;
@@ -239,6 +255,13 @@ describe( 'Post actions', () => {
 							...data,
 						};
 					}
+					// This URL is requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+				} else if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {};
 				}
 
 				throw {
@@ -247,25 +270,25 @@ describe( 'Post actions', () => {
 				};
 			} );
 
-			// create registry
+			// Create registry.
 			const registry = createRegistryWithStores();
 
-			// store post
+			// Store post.
 			registry
 				.dispatch( coreStore )
 				.receiveEntityRecords( 'postType', 'post', post );
 
-			// setup editor with post
+			// Setup editor with post.
 			registry.dispatch( editorStore ).setupEditor( post );
 
-			// trash the post
+			// Trash the post.
 			await registry.dispatch( editorStore ).trashPost();
 
-			// check that there are no notices
+			// Check that there are no notices.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toEqual( [] );
 
-			// check the new status
+			// Check the new status.
 			const { status } = registry.select( editorStore ).getCurrentPost();
 			expect( status ).toBe( 'trash' );
 		} );
@@ -275,7 +298,7 @@ describe( 'Post actions', () => {
 describe( 'Editor actions', () => {
 	describe( 'setupEditor()', () => {
 		it( 'should setup the editor', () => {
-			// create registry
+			// Create registry.
 			const registry = createRegistryWithStores();
 
 			registry

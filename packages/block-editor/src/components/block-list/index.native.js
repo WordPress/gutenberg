@@ -189,7 +189,7 @@ export class BlockList extends Component {
 
 	render() {
 		const { isRootList } = this.props;
-		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
+		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks.
 		const blockList = isRootList ? (
 			<BlockListProvider
 				value={ {
@@ -246,7 +246,7 @@ export class BlockList extends Component {
 
 		const containerStyle = {
 			flex: isRootList ? 1 : 0,
-			// We set negative margin in the parent to remove the edge spacing between parent block and child block in ineer blocks
+			// We set negative margin in the parent to remove the edge spacing between parent block and child block in ineer blocks.
 			marginVertical: isRootList ? 0 : -marginVertical,
 			marginHorizontal: isRootList ? 0 : -marginHorizontal,
 		};
@@ -412,7 +412,7 @@ export default compose( [
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			let blockClientIds = getBlockOrder( rootClientId );
-			// Display only block which fulfill the condition in passed `filterInnerBlocks` function
+			// Display only block which fulfill the condition in passed `filterInnerBlocks` function.
 			if ( filterInnerBlocks ) {
 				blockClientIds = filterInnerBlocks( blockClientIds );
 			}
@@ -501,9 +501,9 @@ const EmptyListComponentCompose = compose( [
 			! isStackedHorizontally &&
 			blockInsertionPointIsVisible &&
 			insertionPoint.rootClientId === rootClientId &&
-			// if list is empty, show the insertion point (via the default appender)
+			// If list is empty, show the insertion point (via the default appender)
 			( blockClientIds.length === 0 ||
-				// or if the insertion point is right before the denoted block
+				// Or if the insertion point is right before the denoted block.
 				! blockClientIds[ insertionPoint.index ] );
 
 		return {

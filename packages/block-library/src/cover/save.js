@@ -49,9 +49,10 @@ export default function save( { attributes } ) {
 		overlayColor
 	);
 	const gradientClass = __experimentalGetGradientClass( gradient );
-	const minHeight = minHeightUnit
-		? `${ minHeightProp }${ minHeightUnit }`
-		: minHeightProp;
+	const minHeight =
+		minHeightProp && minHeightUnit
+			? `${ minHeightProp }${ minHeightUnit }`
+			: minHeightProp;
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;

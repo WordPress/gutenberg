@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "19.4.0",
+	"version": "19.6.1",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -56,7 +56,7 @@
 		"colord": "^2.7.0",
 		"dom-scroll-into-view": "^1.2.1",
 		"downshift": "^6.0.15",
-		"framer-motion": "^4.1.17",
+		"framer-motion": "^6.2.8",
 		"gradient-parser": "^0.1.5",
 		"highlight-words-core": "^1.2.2",
 		"lodash": "^4.17.21",

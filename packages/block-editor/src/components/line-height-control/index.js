@@ -25,7 +25,7 @@ export default function LineHeightControl( {
 	const isDefined = isLineHeightDefined( lineHeight );
 
 	const adjustNextValue = ( nextValue, wasTypedOrPasted ) => {
-		// Set the next value without modification if lineHeight has been defined
+		// Set the next value without modification if lineHeight has been defined.
 		if ( isDefined ) return nextValue;
 
 		/**
@@ -37,15 +37,15 @@ export default function LineHeightControl( {
 		 * Step up/down actions can be triggered by keydowns of the up/down arrow keys,
 		 * or by clicking the spin buttons.
 		 */
-		switch ( nextValue ) {
+		switch ( `${ nextValue }` ) {
 			case `${ STEP }`:
-				// Increment by step value
+				// Increment by step value.
 				return BASE_DEFAULT_VALUE + STEP;
 			case '0': {
 				// This means the user explicitly input '0', rather than stepped down
-				// from an undefined value state
+				// from an undefined value state.
 				if ( wasTypedOrPasted ) return nextValue;
-				// Decrement by step value
+				// Decrement by step value.
 				return BASE_DEFAULT_VALUE - STEP;
 			}
 			case '':
@@ -61,10 +61,10 @@ export default function LineHeightControl( {
 		// For example, Firefox emits an input event with inputType="insertReplacementText"
 		// on spin button clicks, while other browsers do not even emit an input event.
 		const wasTypedOrPasted = [ 'insertText', 'insertFromPaste' ].includes(
-			action.payload.event.nativeEvent.inputType
+			action.payload.event.nativeEvent?.inputType
 		);
-		state.value = adjustNextValue( state.value, wasTypedOrPasted );
-		return state;
+		const value = adjustNextValue( state.value, wasTypedOrPasted );
+		return { ...state, value };
 	};
 
 	const value = isDefined ? lineHeight : RESET_VALUE;

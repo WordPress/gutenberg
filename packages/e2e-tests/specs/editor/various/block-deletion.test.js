@@ -15,7 +15,7 @@ import {
 const addThreeParagraphsToNewPost = async () => {
 	await createNewPost();
 
-	// Add demo content
+	// Add demo content.
 	await clickBlockAppender();
 	await page.keyboard.type( 'First paragraph' );
 	await page.keyboard.press( 'Enter' );
@@ -40,7 +40,7 @@ const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
 		( btns ) => btns.length
 	);
 
-	// Limit by the number of buttons available
+	// Limit by the number of buttons available.
 	while ( --numButtons ) {
 		await page.keyboard.press( 'Tab' );
 
@@ -50,14 +50,14 @@ const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
 			);
 		} );
 
-		// Stop looping once we find the button
+		// Stop looping once we find the button.
 		if ( isRemoveButton ) {
 			await pressKeyTimes( 'Enter', 1 );
 			break;
 		}
 	}
 
-	// Makes failures more explicit
+	// Makes failures more explicit.
 	await expect( isRemoveButton ).toBe( true );
 };
 
@@ -66,7 +66,7 @@ describe( 'block deletion -', () => {
 
 	describe( 'deleting the third block using the Remove Block menu item', () => {
 		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
-			// The blocks can't be empty to trigger the toolbar
+			// The blocks can't be empty to trigger the toolbar.
 			await page.keyboard.type( 'Paragraph to remove' );
 			await clickOnBlockSettingsMenuRemoveBlockButton();
 
@@ -192,6 +192,7 @@ describe( 'deleting all blocks', () => {
 		// Add and remove a block.
 		await insertBlock( 'Image' );
 		await page.waitForSelector( 'figure[data-type="core/image"]' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Verify there is no selected block.

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-directory",
-	"version": "3.1.1",
+	"version": "3.2.1",
 	"description": "Extend editor with block directory features to search, download and install blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,6 +45,10 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/url": "file:../url",
 		"lodash": "^4.17.21"
+	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

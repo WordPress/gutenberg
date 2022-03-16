@@ -13,19 +13,20 @@ const defaultPrettierConfig = require( '@wordpress/prettier-config' );
  */
 const { isPackageInstalled } = require( '../utils' );
 
-const { config: localPrettierConfig } =
-	cosmiconfigSync( 'prettier' ).search() || {};
-const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
-
 const config = {
-	extends: [
-		require.resolve( './recommended-with-formatting.js' ),
-		'plugin:prettier/recommended',
-	],
-	rules: {
-		'prettier/prettier': [ 'error', prettierConfig ],
-	},
+	extends: [ require.resolve( './recommended-with-formatting.js' ) ],
 };
+
+if ( isPackageInstalled( 'prettier' ) ) {
+	config.extends.push( 'plugin:prettier/recommended' );
+
+	const { config: localPrettierConfig } =
+		cosmiconfigSync( 'prettier' ).search() || {};
+	const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
+	config.rules = {
+		'prettier/prettier': [ 'error', prettierConfig ],
+	};
+}
 
 if ( isPackageInstalled( 'typescript' ) ) {
 	config.settings = {
@@ -48,7 +49,7 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				// Don't require redundant JSDoc types in TypeScript files.
 				'jsdoc/require-param-type': 'off',
 				'jsdoc/require-returns-type': 'off',
-				// handled by TS itself
+				// Handled by TS itself.
 				'no-unused-vars': 'off',
 				// no-shadow doesn't work correctly in TS, so let's use a TS-dedicated version instead.
 				'no-shadow': 'off',

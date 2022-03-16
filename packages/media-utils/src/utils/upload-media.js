@@ -73,7 +73,7 @@ export async function uploadMedia( {
 	onFileChange,
 	wpAllowedMimeTypes = null,
 } ) {
-	// Cast filesList to array
+	// Cast filesList to array.
 	const files = [ ...filesList ];
 
 	const filesSet = [];
@@ -83,7 +83,7 @@ export async function uploadMedia( {
 		onFileChange( compact( filesSet ) );
 	};
 
-	// Allowed type specified by consumer
+	// Allowed type specified by consumer.
 	const isAllowedType = ( fileType ) => {
 		if ( ! allowedTypes ) {
 			return true;
@@ -98,13 +98,13 @@ export async function uploadMedia( {
 		} );
 	};
 
-	// Allowed types for the current WP_User
+	// Allowed types for the current WP_User.
 	const allowedMimeTypesForUser = getMimeTypesArray( wpAllowedMimeTypes );
 	const isAllowedMimeTypeForUser = ( fileType ) => {
 		return includes( allowedMimeTypesForUser, fileType );
 	};
 
-	// Build the error message including the filename
+	// Build the error message including the filename.
 	const triggerError = ( error ) => {
 		error.message = [
 			<strong key="filename">{ error.file.name }</strong>,
@@ -146,7 +146,7 @@ export async function uploadMedia( {
 			continue;
 		}
 
-		// verify if file is greater than the maximum file upload size allowed for the site.
+		// Verify if file is greater than the maximum file upload size allowed for the site.
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
 			triggerError( {
 				code: 'SIZE_ABOVE_LIMIT',
@@ -171,7 +171,7 @@ export async function uploadMedia( {
 		validFiles.push( mediaFile );
 
 		// Set temporary URL to create placeholder media file, this is replaced
-		// with final file from media gallery when upload is `done` below
+		// with final file from media gallery when upload is `done` below.
 		filesSet.push( { url: createBlobURL( mediaFile ) } );
 		onFileChange( filesSet );
 	}
@@ -220,7 +220,7 @@ export async function uploadMedia( {
  * @return {Promise} Media Object Promise.
  */
 function createMediaFromFile( file, additionalData ) {
-	// Create upload payload
+	// Create upload payload.
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
 	forEach( additionalData, ( value, key ) => data.append( key, value ) );

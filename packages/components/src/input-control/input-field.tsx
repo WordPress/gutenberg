@@ -9,7 +9,7 @@ import type {
 	KeyboardEvent,
 	PointerEvent,
 	FocusEvent,
-	Ref,
+	ForwardedRef,
 	MouseEvent,
 } from 'react';
 
@@ -17,7 +17,6 @@ import type {
  * WordPress dependencies
  */
 import { forwardRef, useRef } from '@wordpress/element';
-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
@@ -25,7 +24,6 @@ import type { WordPressComponentProps } from '../ui/context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
-import { isValueEmpty } from '../utils/values';
 import { useUpdateEffect } from '../utils';
 import type { InputFieldProps } from './types';
 
@@ -53,12 +51,12 @@ function InputField(
 		type,
 		...props
 	}: WordPressComponentProps< InputFieldProps, 'input', false >,
-	ref: Ref< HTMLInputElement >
+	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		// State
+		// State.
 		state,
-		// Actions
+		// Actions.
 		change,
 		commit,
 		drag,
@@ -112,11 +110,7 @@ function InputField(
 		 */
 		if ( isPressEnterToChange && isDirty ) {
 			wasDirtyOnBlur.current = true;
-			if ( ! isValueEmpty( value ) ) {
-				handleOnCommit( event );
-			} else {
-				reset( valueProp, event );
-			}
+			handleOnCommit( event );
 		}
 	};
 
@@ -142,24 +136,31 @@ function InputField(
 	};
 
 	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
-		const { keyCode } = event;
+		const { key } = event;
 		onKeyDown( event );
 
-		switch ( keyCode ) {
-			case UP:
+		switch ( key ) {
+			case 'ArrowUp':
 				pressUp( event );
 				break;
 
-			case DOWN:
+			case 'ArrowDown':
 				pressDown( event );
 				break;
 
-			case ENTER:
+			case 'Enter':
 				pressEnter( event );
 
 				if ( isPressEnterToChange ) {
 					event.preventDefault();
 					handleOnCommit( event );
+				}
+				break;
+
+			case 'Escape':
+				if ( isPressEnterToChange && isDirty ) {
+					event.preventDefault();
+					reset( valueProp, event );
 				}
 				break;
 		}
@@ -191,6 +192,7 @@ function InputField(
 			}
 		},
 		{
+			axis: dragDirection === 'e' || dragDirection === 'w' ? 'x' : 'y',
 			threshold: dragThreshold,
 			enabled: isDragEnabled,
 			pointer: { capture: false },

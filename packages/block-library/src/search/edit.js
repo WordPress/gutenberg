@@ -12,7 +12,6 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
-	__experimentalUnitControl as UnitControl,
 	__experimentalUseColorProps as useColorProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -28,10 +27,12 @@ import {
 	PanelBody,
 	BaseControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -257,6 +258,11 @@ export default function SearchEdit( {
 						type="button"
 						className={ buttonClasses }
 						style={ buttonStyles }
+						aria-label={
+							buttonText
+								? stripHTML( buttonText )
+								: __( 'Search' )
+						}
 					>
 						<Icon icon={ search } />
 					</button>

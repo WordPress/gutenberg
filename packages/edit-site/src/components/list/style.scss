@@ -46,6 +46,7 @@
 			background: $white;
 			align-items: center;
 			padding: $grid-unit-20;
+			z-index: z-index(".edit-site-list.interface-interface-skeleton__content");
 
 			@include break-medium() {
 				padding: $grid-unit * 9;

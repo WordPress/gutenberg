@@ -24,7 +24,7 @@ describe( 'new editor filtered state', () => {
 	} );
 
 	it( 'should respect default content', async () => {
-		// get the values that should have their defaults changed.
+		// Get the values that should have their defaults changed.
 		const title = await page.$eval(
 			'.editor-post-title__input',
 			( element ) => element.innerHTML
@@ -44,7 +44,7 @@ describe( 'new editor filtered state', () => {
 			( element ) => element.innerHTML
 		);
 
-		// assert they match what the plugin set.
+		// Assert they match what the plugin set.
 		expect( title ).toBe( 'My default title' );
 		expect( content ).toBe( 'My default content' );
 		expect( excerpt ).toBe( 'My default excerpt' );

@@ -103,7 +103,7 @@ const fetchLinkSuggestions = async (
 						};
 					} );
 				} )
-				.catch( () => [] ) // fail by returning no results
+				.catch( () => [] ) // Fail by returning no results.
 		);
 	}
 
@@ -156,7 +156,7 @@ const fetchLinkSuggestions = async (
 	return Promise.all( queries ).then( ( results ) => {
 		return results
 			.reduce(
-				( accumulator, current ) => accumulator.concat( current ), //flatten list
+				( accumulator, current ) => accumulator.concat( current ), // Flatten list.
 				[]
 			)
 			.filter(
@@ -170,7 +170,7 @@ const fetchLinkSuggestions = async (
 			.slice( 0, perPage )
 			.map(
 				/**
-				 * @param {{ id: number, url:string, title?:string, subtype?: string, type?: string }} result
+				 * @param {{ id: number, meta?: object, url:string, title?:string, subtype?: string, type?: string }} result
 				 */
 				( result ) => {
 					return {

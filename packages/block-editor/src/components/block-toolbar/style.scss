@@ -91,6 +91,10 @@
 	.block-editor-block-mover {
 		margin-left: -$grid-unit-15 * 0.5;
 	}
+
+	.block-editor-block-lock-toolbar {
+		margin-left: -$grid-unit-15 * 0.5 !important;
+	}
 }
 
 .block-editor-block-toolbar,

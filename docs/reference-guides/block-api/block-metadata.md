@@ -172,7 +172,9 @@ The name for a block is a unique string that identifies a block. Names have to b
 { "title": "Heading" }
 ```
 
-This is the display title for your block, which can be translated with our translation functions. The block inserter will show this name.
+This is the display title for your block, which can be translated with our translation functions. The title will display in the Inserter and in other areas of the editor.
+
+**Note:** To keep your block titles readable and accessible in the UI, try to avoid very long titles.
 
 ### Category
 
@@ -407,7 +409,7 @@ See the [the example documentation](/docs/reference-guides/block-api/block-regis
 
 ### Editor Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorScript`
@@ -420,7 +422,7 @@ Block type editor script definition. It will only be enqueued in the context of 
 
 ### Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `script`
@@ -433,7 +435,7 @@ Block type frontend and editor script definition. It will be enqueued both in th
 
 ### View Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `viewScript`
@@ -447,7 +449,7 @@ Block type frontend script definition. It will be enqueued only when viewing the
 
 ### Editor Style
 
--   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorStyle`
@@ -462,7 +464,7 @@ _Note: An option to pass also an array of editor styles exists since WordPress `
 
 ### Style
 
--   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `style`

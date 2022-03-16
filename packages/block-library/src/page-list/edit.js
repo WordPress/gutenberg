@@ -12,16 +12,14 @@ import {
 	useBlockProps,
 	getColorClassName,
 } from '@wordpress/block-editor';
-import {
-	ToolbarButton,
-	Placeholder,
-	Spinner,
-	Notice,
-} from '@wordpress/components';
+import { ToolbarButton, Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	__experimentalUseEntityRecords as useEntityRecords,
+} from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -77,9 +75,7 @@ export default function PageListEdit( { context, clientId } ) {
 			) }
 			{ ! hasResolvedPages && (
 				<div { ...blockProps }>
-					<Placeholder>
-						<Spinner />
-					</Placeholder>
+					<Spinner />
 				</div>
 			) }
 
@@ -120,28 +116,16 @@ function useFrontPageId() {
 }
 
 function usePageData() {
-	const { pages, hasResolvedPages } = useSelect( ( select ) => {
-		const { getEntityRecords, hasFinishedResolution } = select( coreStore );
-
-		return {
-			pages: getEntityRecords( 'postType', 'page', {
-				orderby: 'menu_order',
-				order: 'asc',
-				_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
-				per_page: -1,
-			} ),
-			hasResolvedPages: hasFinishedResolution( 'getEntityRecords', [
-				'postType',
-				'page',
-				{
-					orderby: 'menu_order',
-					order: 'asc',
-					_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
-					per_page: -1,
-				},
-			] ),
-		};
-	}, [] );
+	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
+		'postType',
+		'page',
+		{
+			orderby: 'menu_order',
+			order: 'asc',
+			_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
+			per_page: -1,
+		}
+	);
 
 	return useMemo( () => {
 		// TODO: Once the REST API supports passing multiple values to
