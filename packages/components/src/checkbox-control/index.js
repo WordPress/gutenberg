@@ -39,7 +39,9 @@ export default function CheckboxControl( {
 	const onChangeValue = ( event ) => onChange( event.target.checked );
 
 	useEffect( () => {
-		ref.current.indeterminate = !! indeterminate;
+		if ( ref.current ) {
+			ref.current.indeterminate = !! indeterminate;
+		}
 	}, [ indeterminate ] );
 
 	return (
@@ -57,7 +59,7 @@ export default function CheckboxControl( {
 					type="checkbox"
 					value="1"
 					onChange={ onChangeValue }
-					checked={ ! indeterminate && checked }
+					checked={ checked }
 					aria-describedby={ !! help ? id + '__help' : undefined }
 					{ ...props }
 				/>
