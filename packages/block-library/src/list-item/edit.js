@@ -10,15 +10,12 @@ import { __ } from '@wordpress/i18n';
 
 export default function ListItemEdit( { attributes, setAttributes } ) {
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps(
-		{},
-		{
-			allowedBlocks: [ 'core/list' ],
-		}
-	);
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: [ 'core/list' ],
+	} );
 
 	return (
-		<li { ...blockProps }>
+		<li { ...innerBlocksProps }>
 			<RichText
 				identifier="content"
 				tagName="div"
@@ -29,7 +26,7 @@ export default function ListItemEdit( { attributes, setAttributes } ) {
 				aria-label={ __( 'List text' ) }
 				placeholder={ attributes.placeholder || __( 'List' ) }
 			/>
-			<div { ...innerBlocksProps } />
+			{ innerBlocksProps.children }
 		</li>
 	);
 }
