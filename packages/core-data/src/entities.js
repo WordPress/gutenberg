@@ -63,6 +63,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'mediaItems',
 		label: __( 'Media' ),
+		rawAttributes: [ 'caption', 'title', 'description' ],
 	},
 	{
 		name: 'taxonomy',
