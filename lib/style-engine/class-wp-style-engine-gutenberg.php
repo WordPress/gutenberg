@@ -2,9 +2,12 @@
 /**
  * WP_Style_Engine class
  *
+ * Generates classnames and block styles.
+ *
  * @package Gutenberg
  */
 
+// Load utilities.
 require_once __DIR__ . '/style-definition-utils.php';
 
 /**
@@ -34,17 +37,22 @@ class WP_Style_Engine_Gutenberg {
 
 	/**
 	 * Style definitions that contain the instructions to
-	 * parse/output valid Gutenberg styles.
+	 * parse/output valid Gutenberg styles from a block's attributes.
+	 * For every style definition, the follow properties are valid:
+	 *
+	 *  - property_key => the key that represents a valid CSS property, e.g., "margin" or "border".
+	 *  - value_func   => a function to generate an array of valid CSS rules for a particular style object.
+	 *                    For example, `'padding' => 'array( 'top' => '1em' )` will return `array( 'padding-top' => '1em' )`
 	 */
-	const STYLE_DEFINITIONS_METADATA = array(
+	const BLOCK_STYLE_DEFINITIONS_METADATA = array(
 		'spacing' => array(
 			'padding' => array(
-				'value_key'  => 'padding',
-				'value_func' => 'gutenberg_get_style_engine_css_box_rules',
+				'property_key' => 'padding',
+				'value_func'   => 'gutenberg_get_style_engine_css_box_rules',
 			),
-			'margin' => array(
-				'value_key'  => 'margin',
-				'value_func' => 'gutenberg_get_style_engine_css_box_rules',
+			'margin'  => array(
+				'property_key' => 'margin',
+				'value_func'   => 'gutenberg_get_style_engine_css_box_rules',
 			),
 		),
 	);
@@ -79,10 +87,18 @@ class WP_Style_Engine_Gutenberg {
 		return self::$instance;
 	}
 
+	/**
+	 * Resets the style store.
+	 */
 	public function reset() {
 		$this->registered_styles = array();
 	}
 
+	/**
+	 * Compiles and returns styles to be included in an HTML document.
+	 *
+	 * @return string CSS rules to embed in a `<style />`.
+	 */
 	public function get_generated_styles() {
 		$output = '';
 		foreach ( $this->registered_styles as $selector => $rules ) {
@@ -133,22 +149,22 @@ class WP_Style_Engine_Gutenberg {
 	}
 
 	/**
-	 * Returns a CSS ruleset based on the instructions in STYLE_DEFINITIONS_METADATA.
+	 * Returns a CSS ruleset based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
 	 * @param string|array $style_value A single raw Gutenberg style attributes value for a CSS property.
 	 * @param array        $path        An array of strings representing a path to the style value.
 	 *
 	 * @return array The class name for the added style.
 	 */
-	protected function get_style_css_rules( $style_value, $path ) {
-		$style_definition = _wp_array_get( static::STYLE_DEFINITIONS_METADATA, $path, null );
+	protected function get_block_style_css_rules( $style_value, $path ) {
+		$style_definition = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $path, null );
 
 		if ( $style_definition ) {
 			if (
 				isset( $style_definition['value_func'] ) &&
 				is_callable( $style_definition['value_func'] )
 			) {
-				return call_user_func( $style_definition['value_func'], $style_value, $style_definition['value_key'] );
+				return call_user_func( $style_definition['value_func'], $style_value, $style_definition['property_key'] );
 			}
 		}
 
@@ -157,24 +173,30 @@ class WP_Style_Engine_Gutenberg {
 
 	/**
 	 * Returns an CSS ruleset destined to be inserted in an HTML `style` attribute.
-	 * Styles are bundled based on the instructions in STYLE_DEFINITIONS_METADATA.
+	 * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
-	 * @param array $block_attributes An array of styles from a block's attributes.
-	 * @param array $path             An array of strings representing a path to the style value.
+	 * @param array $block_styles An array of styles from a block's attributes.
+	 * @param array $path         An array of strings representing a path to the style value.
 	 *
 	 * @return string A CSS ruleset formatted to be placed in an HTML `style` attribute.
 	 */
-	public function get_inline_styles_from_attributes( $block_attributes, $path ) {
-		if ( ! is_array( $block_attributes ) || ! is_array( $path ) ) {
-			return;
+	public function get_inline_styles_from_attributes( $block_styles, $path ) {
+		$output = '';
+
+		if ( empty( $block_styles ) || empty( $path ) ) {
+			return $output;
 		}
 
-		$style_value = _wp_array_get( $block_attributes, $path, null );
-		$rules       = $this->get_style_css_rules( $style_value, $path );
-		$output      = '';
+		$style_value = _wp_array_get( $block_styles, $path, null );
+
+		if ( empty( $style_value ) ) {
+			return $output;
+		}
+
+		$rules = $this->get_block_style_css_rules( $style_value, $path );
 
 		foreach ( $rules as $rule => $value ) {
-			$output .= "{$rule}: {$value}; ";
+			$output .= "{$rule}:{$value};";
 		}
 		return $output;
 	}
@@ -184,20 +206,20 @@ class WP_Style_Engine_Gutenberg {
 	 * Stores style rules for a given CSS selector (the key) and returns an associated classname.
 	 *
 	 * @param string $key              A class name used to construct a key.
-	 * @param array  $block_attributes An array of styles from a block's attributes.
+	 * @param array  $block_styles     An array of styles from a block's attributes.
 	 * @param array  $path             An array of strings representing a path to the style value.
 	 * @param array  $options          An array of options that add_style() accepts.
 	 *
 	 * @return string The class name for the added style.
 	 */
-	public function add_style_from_attributes( $key, $block_attributes, $path, $options ) {
-		if ( ! is_array( $block_attributes ) || ! is_array( $path ) ) {
+	public function add_style_from_attributes( $key, $block_styles, $path, $options ) {
+		if ( empty( $block_styles ) || empty( $path ) ) {
 			return;
 		}
 
-		$style_value = _wp_array_get( $block_attributes, $path, null );
+		$style_value = _wp_array_get( $block_styles, $path, null );
 
-		if ( ! $style_value ) {
+		if ( empty( $style_value ) ) {
 			return;
 		}
 

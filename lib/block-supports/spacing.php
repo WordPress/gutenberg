@@ -45,38 +45,45 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 
 	$has_padding_support = gutenberg_block_has_support( $block_type, array( 'spacing', 'padding' ), false );
 	$has_margin_support  = gutenberg_block_has_support( $block_type, array( 'spacing', 'margin' ), false );
+	$block_styles        = isset( $block_attributes['style'] ) ? $block_attributes['style'] : null;
 	$classes             = array();
 	$styles              = array();
 	$style_engine        = WP_Style_Engine_Gutenberg::get_instance();
 
 	if ( $has_padding_support ) {
-
-/*
-		// We can also return an obfuscated classname.
-		// Do we need to add !important rules to the stylesheet in this case
-		// seeing as they're not inline?
-		$classes[] = $style_engine->add_style_from_attributes(
-			'wp-block-supports',
-			$block_attributes['style'],
-			array( 'spacing', 'padding' ),
-			array(
-				'obfuscate' => true,
-			)
-		);
-*/
-
-		$styles[] = $style_engine->get_inline_styles_from_attributes(
-			$block_attributes['style'],
+		/*
+			// We can also return an obfuscated classname.
+			// Do we need to add !important rules to the stylesheet in this case
+			// seeing as they're not inline?
+			$classes[] = $style_engine->add_style_from_attributes(
+				'wp-block-supports',
+				$attributes_styles,
+				array( 'spacing', 'padding' ),
+				array(
+					'obfuscate' => true,
+				)
+			);
+		*/
+		$padding_styles = $style_engine->get_inline_styles_from_attributes(
+			$block_styles,
 			array( 'spacing', 'padding' )
 		);
+
+		if ( $padding_styles ) {
+			$styles[] = $padding_styles;
+		}
 	}
 
 	if ( $has_margin_support ) {
 		// As with padding above.
-		$styles[] = $style_engine->get_inline_styles_from_attributes(
-			$block_attributes['style'],
+		$margin_styles = $style_engine->get_inline_styles_from_attributes(
+			$block_styles,
 			array( 'spacing', 'margin' )
 		);
+
+		if ( $margin_styles ) {
+			$styles[] = $margin_styles;
+		}
 	}
 
 	// Collect classes and styles.
@@ -87,7 +94,7 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 	}
 
 	if ( ! empty( $styles ) ) {
-		$attributes['style'] = implode( ' ', $styles );
+		$attributes['style'] = implode( '', $styles );
 	}
 
 	return $attributes;
