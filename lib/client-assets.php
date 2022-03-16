@@ -54,6 +54,12 @@ function gutenberg_url( $path ) {
  *                                    Default 'false'.
  */
 function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
+	/*
+	 * Force all scripts to be registered for in the <head> as a
+	 * temporary workaround for https://meta.trac.wordpress.org/ticket/6195.
+	 */
+	$in_footer = false;
+
 	$script = $scripts->query( $handle, 'registered' );
 	if ( $script ) {
 		/*
