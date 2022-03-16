@@ -64,6 +64,13 @@ export default function TableOfContentsEdit( {
 		replaceBlocks,
 	} = useDispatch( blockEditorStore );
 
+	/**
+	 * The latest heading data, or null if the new data deeply equals the saved headings attribute.
+	 *
+	 * Since useSelect forces a re-render when its return value is shallowly inequal to its prior call, we would be re-rendering this block every time the stores change, even if the latest headings were deeply equal to the ones saved in the block attributes.
+	 *
+	 * By returning null when they're equal, we reduce that to 2 renders: one when there are new latest headings (and so it returns them), and one when they haven't changed (so it returns null). As long as the latest heading data remains the same, further calls of the useSelect callback will continue to return null, thus preventing any forced re-renders.
+	 */
 	const latestHeadings = useSelect(
 		( select ) => {
 			const {
@@ -167,18 +174,21 @@ export default function TableOfContentsEdit( {
 				}
 			}
 
+			if ( isEqual( headings, _latestHeadings ) ) {
+				return null;
+			}
 			return _latestHeadings;
 		},
-		[ clientId, onlyIncludeCurrentPage ]
+		[ clientId, onlyIncludeCurrentPage, headings ]
 	);
 
 	useEffect( () => {
-		if ( ! isEqual( headings, latestHeadings ) ) {
+		if ( latestHeadings !== null ) {
 			// This is required to keep undo working and not create 2 undo steps for each heading change.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { headings: latestHeadings } );
 		}
-	} );
+	}, [ latestHeadings ] );
 
 	const headingTree = linearToNestedHeadingList( headings );
 
