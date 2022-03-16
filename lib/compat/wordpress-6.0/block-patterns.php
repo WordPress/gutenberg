@@ -59,6 +59,7 @@ add_action(
  *
  *     /**
  *      * Pattern Name: My Pattern
+ *      * Namespace: my-theme
  *      *
  *
  * The output of the PHP source corresponds to the content of the pattern, e.g.:
@@ -83,6 +84,7 @@ add_action(
 function gutenberg_register_theme_block_patterns() {
 	$default_headers = array(
 		'title'         => 'Pattern Name',
+		'namespace'     => 'Namespace',
 		'description'   => 'Description',
 		'viewportWidth' => 'Viewport Width',
 		'categories'    => 'Categories',
@@ -104,14 +106,19 @@ function gutenberg_register_theme_block_patterns() {
 					if ( ! preg_match( '#/(?P<slug>[A-z0-9_-]+)\.php$#', $file, $matches ) ) {
 						continue;
 					}
+
+					$pattern_data = get_file_data( $file, $default_headers );
+
+					if ( empty( $pattern_data[ 'namespace' ] ) ) {
+						continue;
+					}
+
 					// Example name: twentytwentytwo/query-grid-posts.
-					$pattern_name = get_stylesheet() . '/' . $matches['slug'];
+					$pattern_name = $pattern_data[ 'namespace' ] . "/" . $matches['slug'];
 
 					if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_name ) ) {
 						continue;
 					}
-
-					$pattern_data = get_file_data( $file, $default_headers );
 
 					// Title is a required property.
 					if ( ! $pattern_data['title'] ) {
