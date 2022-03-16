@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import FormFileUpload from '../';
 
+const { File } = window;
+
 function render( jsx ) {
 	return {
 		user: userEvent.setup( {
@@ -24,7 +26,7 @@ describe( 'FormFileUpload', () => {
 		render( <FormFileUpload>My Upload Button</FormFileUpload> );
 
 		const button = screen.getByText( 'My Upload Button' );
-		const input = screen.getByTestId( 'input' );
+		const input = screen.getByTestId( 'form-file-upload-input' );
 		expect( button ).toBeInTheDocument();
 		expect( input.style.display ).toBe( 'none' );
 	} );
@@ -38,12 +40,11 @@ describe( 'FormFileUpload', () => {
 			</FormFileUpload>
 		);
 
-		// eslint-disable-next-line no-undef
 		const file = new File( [ 'hello' ], 'hello.png', {
 			type: 'image/png',
 		} );
 
-		const input = screen.getByTestId( 'input' );
+		const input = screen.getByTestId( 'form-file-upload-input' );
 
 		await user.upload( input, file );
 
@@ -64,12 +65,11 @@ describe( 'FormFileUpload', () => {
 			</FormFileUpload>
 		);
 
-		// eslint-disable-next-line no-undef
 		const file = new File( [ 'hello' ], 'hello.png', {
 			type: 'image/png',
 		} );
 
-		const input = screen.getByTestId( 'input' );
+		const input = screen.getByTestId( 'form-file-upload-input' );
 		await user.upload( input, file );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );

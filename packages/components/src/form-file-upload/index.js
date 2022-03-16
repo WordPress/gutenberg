@@ -40,7 +40,7 @@ function FormFileUpload( {
 				accept={ accept }
 				onChange={ onChange }
 				onClick={ onClick }
-				data-testid="input"
+				data-testid="form-file-upload-input"
 			/>
 		</div>
 	);
