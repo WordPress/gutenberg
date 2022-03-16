@@ -148,7 +148,7 @@ const CommentTemplatePreview = ( {
 	} );
 
 	const handleOnClick = () => {
-		setActiveComment( comment?.commentId );
+		setActiveComment( comment );
 	};
 
 	// We have to hide the preview block if the `comment` props points to
