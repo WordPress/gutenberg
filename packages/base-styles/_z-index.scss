@@ -33,7 +33,8 @@ $z-layers: (
 	".block-editor-url-input__suggestions": 30,
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
-	".interface-interface-skeleton__content": 20,
+	".interface-interface-skeleton__content": 91,
+	".edit-site-list.interface-interface-skeleton__content": 29, // The content area needs to be lower than the header so tools dropdowns appear over the content.
 	".edit-site-header": 62,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
@@ -145,6 +146,7 @@ $z-layers: (
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".edit-site-create-template-part-modal": 1000001,
+	".block-editor-block-lock-modal": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.
@@ -152,7 +154,6 @@ $z-layers: (
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
 	".components-popover.block-editor-inserter__popover": 99999,
 	".components-popover.table-of-contents__popover": 99998,
-	".components-popover.edit-site-more-menu__content": 99998,
 	".components-popover.interface-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,

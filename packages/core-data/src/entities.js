@@ -18,12 +18,25 @@ export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
-export const defaultEntities = [
+export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
 		name: '__unstableBase',
 		kind: 'root',
 		baseURL: '/',
+		baseURLParams: {
+			_fields: [
+				'description',
+				'gmt_offset',
+				'home',
+				'name',
+				'site_icon',
+				'site_icon_url',
+				'site_logo',
+				'timezone_string',
+				'url',
+			].join( ',' ),
+		},
 	},
 	{
 		label: __( 'Site' ),
@@ -164,9 +177,9 @@ export const defaultEntities = [
 	},
 ];
 
-export const kinds = [
-	{ name: 'postType', loadEntities: loadPostTypeEntities },
-	{ name: 'taxonomy', loadEntities: loadTaxonomyEntities },
+export const additionalEntityConfigLoaders = [
+	{ kind: 'postType', loadEntities: loadPostTypeEntities },
+	{ kind: 'taxonomy', loadEntities: loadTaxonomyEntities },
 ];
 
 /**
@@ -257,6 +270,15 @@ async function loadTaxonomyEntities() {
 /**
  * Returns the entity's getter method name given its kind and name.
  *
+ * @example
+ * ```js
+ * const nameSingular = getMethodName( 'root', 'theme', 'get' );
+ * // nameSingular is getRootTheme
+ *
+ * const namePlural = getMethodName( 'root', 'theme', 'set' );
+ * // namePlural is setRootThemes
+ * ```
+ *
  * @param {string}  kind      Entity kind.
  * @param {string}  name      Entity name.
  * @param {string}  prefix    Function prefix.
@@ -270,13 +292,13 @@ export const getMethodName = (
 	prefix = 'get',
 	usePlural = false
 ) => {
-	const entity = find( defaultEntities, { kind, name } );
+	const entityConfig = find( rootEntitiesConfig, { kind, name } );
 	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && entity.plural
-			? upperFirst( camelCase( entity.plural ) )
+		usePlural && entityConfig?.plural
+			? upperFirst( camelCase( entityConfig.plural ) )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
@@ -288,19 +310,22 @@ export const getMethodName = (
  *
  * @return {Array} Entities
  */
-export const getKindEntities = ( kind ) => async ( { select, dispatch } ) => {
-	let entities = select.getEntitiesByKind( kind );
-	if ( entities && entities.length !== 0 ) {
-		return entities;
+export const getOrLoadEntitiesConfig = ( kind ) => async ( {
+	select,
+	dispatch,
+} ) => {
+	let configs = select.getEntitiesConfig( kind );
+	if ( configs && configs.length !== 0 ) {
+		return configs;
 	}
 
-	const kindConfig = find( kinds, { name: kind } );
-	if ( ! kindConfig ) {
+	const loader = find( additionalEntityConfigLoaders, { kind } );
+	if ( ! loader ) {
 		return [];
 	}
 
-	entities = await kindConfig.loadEntities();
-	dispatch( addEntities( entities ) );
+	configs = await loader.loadEntities();
+	dispatch( addEntities( configs ) );
 
-	return entities;
+	return configs;
 };

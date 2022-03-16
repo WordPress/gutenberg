@@ -54,7 +54,7 @@ async function waitForPreviewNavigation( previewPage ) {
  * @param {boolean} shouldBeChecked If true, turns the option on. If false, off.
  */
 async function toggleCustomFieldsOption( shouldBeChecked ) {
-	const baseXPath = '//*[contains(@class, "edit-post-preferences-modal")]';
+	const baseXPath = '//*[contains(@class, "interface-preferences-modal")]';
 	const paneslXPath = `${ baseXPath }//button[contains(text(), "Panels")]`;
 	const checkboxXPath = `${ baseXPath }//label[contains(text(), "Custom fields")]`;
 	await clickOnMoreMenuItem( 'Preferences' );
@@ -83,7 +83,7 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 		return;
 	}
 
-	await clickOnCloseModalButton( '.edit-post-preferences-modal' );
+	await clickOnCloseModalButton( '.interface-preferences-modal' );
 }
 
 describe( 'Preview', () => {

@@ -26,6 +26,9 @@ jest.mock( '@wordpress/blocks', () => {
 				case 'name-with-label':
 					return { title: 'Block With Label' };
 
+				case 'name-with-custom-label':
+					return { title: 'Block With Custom Label' };
+
 				case 'name-with-long-label':
 					return { title: 'Block With Long Label' };
 			}
@@ -37,6 +40,9 @@ jest.mock( '@wordpress/blocks', () => {
 
 				case 'Block With Long Label':
 					return 'This is a longer label than typical for blocks to have.';
+
+				case 'Block With Custom Label':
+					return 'A Custom Label like a Block Variation Label';
 
 				default:
 					return title;
@@ -61,7 +67,7 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 } );
 
 describe( 'BlockTitle', () => {
-	it( 'renders nothing if name is falsey2', () => {
+	it( 'renders nothing if name is falsey', () => {
 		useSelect.mockImplementation( () => ( {
 			name: null,
 			attributes: null,
@@ -106,7 +112,59 @@ describe( 'BlockTitle', () => {
 		expect( wrapper.text() ).toBe( 'Test Label' );
 	} );
 
-	it( 'truncates the label if it is too long', () => {
+	it( 'should prioritize reusable block title over title', () => {
+		useSelect.mockImplementation( () => ( {
+			name: 'name-with-label',
+			reusableBlockTitle: 'Reuse me!',
+			attributes: null,
+		} ) );
+
+		const wrapper = shallow( <BlockTitle clientId="id-name-with-label" /> );
+
+		expect( wrapper.text() ).toBe( 'Reuse me!' );
+	} );
+
+	it( 'should prioritize block label over title', () => {
+		useSelect.mockImplementation( () => ( {
+			name: 'name-with-custom-label',
+			attributes: null,
+		} ) );
+
+		const wrapper = shallow( <BlockTitle clientId="id-name-with-label" /> );
+
+		expect( wrapper.text() ).toBe(
+			'A Custom Label like a Block Variation Label'
+		);
+	} );
+
+	it( 'should default to block information title if no reusable title or block name is available', () => {
+		useSelect.mockImplementation( () => ( {
+			name: 'some-rando-name',
+			attributes: null,
+		} ) );
+
+		const wrapper = shallow( <BlockTitle clientId="id-name-with-label" /> );
+
+		expect( wrapper.text() ).toBe( 'Block With Label' );
+	} );
+
+	it( 'truncates the label with custom truncate length', () => {
+		useSelect.mockImplementation( () => ( {
+			name: 'name-with-long-label',
+			attributes: null,
+		} ) );
+
+		const wrapper = shallow(
+			<BlockTitle
+				clientId="id-name-with-long-label"
+				maximumLength={ 12 }
+			/>
+		);
+
+		expect( wrapper.text() ).toBe( 'This is a...' );
+	} );
+
+	it( 'should not truncate the label if maximum length is undefined', () => {
 		useSelect.mockImplementation( () => ( {
 			name: 'name-with-long-label',
 			attributes: null,
@@ -116,6 +174,8 @@ describe( 'BlockTitle', () => {
 			<BlockTitle clientId="id-name-with-long-label" />
 		);
 
-		expect( wrapper.text() ).toBe( 'This is a longer label than typi...' );
+		expect( wrapper.text() ).toBe(
+			'This is a longer label than typical for blocks to have.'
+		);
 	} );
 } );

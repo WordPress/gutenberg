@@ -88,7 +88,7 @@ describe( 'Heading', () => {
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '0782f6' );
 		await page.click( 'h3[data-type="core/heading"]' );
-		await page.waitForXPath( '//button[text()="#0782f6"]' );
+		await page.waitForXPath( '//button//span[contains(text(), "0782f6")]' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

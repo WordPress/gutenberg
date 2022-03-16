@@ -2,11 +2,15 @@
 
 ## Unreleased
 
+## 6.4.0 (2022-03-11)
+
 ## 6.3.0 (2022-02-23)
 
 ### New Features
 
 - Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
+- Store the resolution errors in store metadata and expose them using `hasResolutionFailed` the `getResolutionError` meta-selectors ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+- Expose the resolution status (undefined, resolving, finished, error) via the `getResolutionState` meta-selector ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
 
 ## 6.2.1 (2022-02-10)
 

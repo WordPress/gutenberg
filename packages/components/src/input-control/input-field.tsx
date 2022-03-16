@@ -17,7 +17,6 @@ import type {
  * WordPress dependencies
  */
 import { forwardRef, useRef } from '@wordpress/element';
-import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
@@ -137,19 +136,19 @@ function InputField(
 	};
 
 	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
-		const { keyCode } = event;
+		const { key } = event;
 		onKeyDown( event );
 
-		switch ( keyCode ) {
-			case UP:
+		switch ( key ) {
+			case 'ArrowUp':
 				pressUp( event );
 				break;
 
-			case DOWN:
+			case 'ArrowDown':
 				pressDown( event );
 				break;
 
-			case ENTER:
+			case 'Enter':
 				pressEnter( event );
 
 				if ( isPressEnterToChange ) {
@@ -158,7 +157,7 @@ function InputField(
 				}
 				break;
 
-			case ESCAPE:
+			case 'Escape':
 				if ( isPressEnterToChange && isDirty ) {
 					event.preventDefault();
 					reset( valueProp, event );

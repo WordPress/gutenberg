@@ -218,13 +218,13 @@ PODS:
     - glog
   - react-native-blur (0.8.0):
     - React-Core
-  - react-native-get-random-values (1.4.0-wp-2):
+  - react-native-get-random-values (1.4.0):
     - React-Core
   - react-native-keyboard-aware-scroll-view (0.8.8-wp-1):
     - React-Core
   - react-native-safe-area (0.5.1):
     - React-Core
-  - react-native-safe-area-context (3.2.0-wp-2):
+  - react-native-safe-area-context (3.2.0):
     - React-Core
   - react-native-slider (3.0.2-wp-2):
     - React-Core
@@ -233,7 +233,7 @@ PODS:
     - react-native-video/Video (= 5.2.0-wp-2)
   - react-native-video/Video (5.2.0-wp-2):
     - React-Core
-  - react-native-webview (11.6.5-wp-2):
+  - react-native-webview (11.6.2):
     - React-Core
   - React-perflogger (0.66.2)
   - React-RCTActionSheet (0.66.2):
@@ -300,9 +300,9 @@ PODS:
     - React-jsi (= 0.66.2)
     - React-logger (= 0.66.2)
     - React-perflogger (= 0.66.2)
-  - RNCClipboard (1.9.0-wp-1):
+  - RNCClipboard (1.9.0):
     - React-Core
-  - RNCMaskedView (0.1.11-wp-2):
+  - RNCMaskedView (0.2.6):
     - React-Core
   - RNGestureHandler (2.2.0-wp-3):
     - React-Core
@@ -334,9 +334,9 @@ PODS:
     - React-RCTVibration
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (2.9.0-wp-2):
+  - RNScreens (2.9.0):
     - React-Core
-  - RNSVG (9.13.7-wp-2):
+  - RNSVG (9.13.6):
     - React-Core
   - RNTAztecView (1.71.3):
     - React-Core
@@ -387,7 +387,7 @@ DEPENDENCIES:
   - React-runtimeexecutor (from `../../../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
   - "RNCClipboard (from `../../../node_modules/@react-native-clipboard/clipboard`)"
-  - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
+  - "RNCMaskedView (from `../../../node_modules/@react-native-masked-view/masked-view`)"
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
@@ -482,7 +482,7 @@ EXTERNAL SOURCES:
   RNCClipboard:
     :path: "../../../node_modules/@react-native-clipboard/clipboard"
   RNCMaskedView:
-    :path: "../../../node_modules/@react-native-community/masked-view"
+    :path: "../../../node_modules/@react-native-masked-view/masked-view"
   RNGestureHandler:
     :path: "../../../node_modules/react-native-gesture-handler"
   RNReanimated:
@@ -526,13 +526,13 @@ SPEC CHECKSUMS:
   React-jsinspector: b08b2d5e86cef9dc4bb69f0aa0bbe6d210fb7da5
   React-logger: faee236598b0f7e1a5e3b68577016ac451f1f993
   react-native-blur: ef741a08d020010ba65e411be0ab82d1d325e7ad
-  react-native-get-random-values: 6296ac9e84928625ffb34ca74ab684bbda8747a8
+  react-native-get-random-values: b6fb85e7169b9822976793e467458c151c3e8b69
   react-native-keyboard-aware-scroll-view: 0bc6c2dfe9056935a40dc1a70e764b7a1bbf6568
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
-  react-native-safe-area-context: fb0338ddfcd1b163e1506d5ebd9b4444348e7501
+  react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   react-native-slider: d4c3367c5db5d2bec3ac0ab9d15ebb73d896034c
   react-native-video: 0b09cc469df0249509def5dc1484e0419342de9b
-  react-native-webview: 8480d6e71b06e3d1d2fd644de6313108e7b65f90
+  react-native-webview: 193d233c29eacce1f42ca2637dab7ba79c25a6de
   React-perflogger: 5ab487cacfe6ec19bfe3d3f8072bf71eb07d63da
   React-RCTActionSheet: 03f25695e095fb5aa003828620943c74cc281fec
   React-RCTAnimation: eaf82da39f0c36fb0ef2a28df797c5f73a2a98ea
@@ -545,12 +545,12 @@ SPEC CHECKSUMS:
   React-RCTVibration: 3e815c3d2dd2e0e931b68595b5b92d23ba38b3fb
   React-runtimeexecutor: 393e26602c1b248683372051e34db63e359e3b01
   ReactCommon: c0263c1a41509aeb94be3214fa7bc3b71eae5ef6
-  RNCClipboard: def60a5048b473addc5dbac5abee5d896c08ec1b
-  RNCMaskedView: 1c8ad5b657280e8c7ebf7866277e1ff820ae48c9
+  RNCClipboard: 99fc8ad669a376b756fbc8098ae2fd05c0ed0668
+  RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNGestureHandler: 73184394c98d543e6a24ab26dba4169824e85288
   RNReanimated: 6aee4bed42a400d9472b7e843762ab4119cf201c
-  RNScreens: ec0e85d1babdd61d7ec78c98072d9e6b62d96ff6
-  RNSVG: b3b9c40381636e5116894398d72a830be15b7258
+  RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
+  RNSVG: 36a7359c428dcb7c6bce1cc546fbfebe069809b0
   RNTAztecView: 9c5f318a1a73d246160432dd478ca4d1fcb0a1e5
   WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504
   Yoga: 9a08effa851c1d8cc1647691895540bc168ea65f

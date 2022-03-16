@@ -2,7 +2,15 @@
 
 ## Unreleased
 
-–   Replaced no-shadow eslint rule with @typescript-eslint/no-shadow ([#38665](https://github.com/WordPress/gutenberg/pull/38665)).
+## 11.0.0 (2022-03-11)
+
+### Breaking Changes
+
+-   The integration with [Prettier](https://prettier.io) is now optional and gets activated when the `prettier` package is installed in the project ([#39244](https://github.com/WordPress/gutenberg/pull/39244)).
+
+### Bug Fix
+
+-   Replaced no-shadow eslint rule with @typescript-eslint/no-shadow ([#38665](https://github.com/WordPress/gutenberg/pull/38665)).
 
 ## 10.0.0 (2022-01-27)
 

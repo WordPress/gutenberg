@@ -275,6 +275,10 @@ function TreeGrid(
 				);
 				focusablesInNextRow[ nextIndex ].focus();
 
+				// Let consumers know the row that was originally focused,
+				// and the row that is now in focus.
+				onFocusRow( event, activeRow, rows[ nextRowIndex ] );
+
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
 				event.preventDefault();
