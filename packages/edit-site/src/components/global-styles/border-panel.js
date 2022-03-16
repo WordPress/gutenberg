@@ -12,13 +12,17 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import {
+	getSupportedGlobalStylesPanels,
+	useColorsPerOrigin,
+	useSetting,
+	useStyle,
+} from './hooks';
 
 const MIN_BORDER_WIDTH = 0;
 
@@ -63,52 +67,6 @@ function useHasBorderWidthControl( name ) {
 		useSetting( 'border.width', name )[ 0 ] &&
 		supports.includes( 'borderWidth' )
 	);
-}
-
-function useMultiOriginColors( name ) {
-	const [ customColors ] = useSetting( 'color.palette.custom', name );
-	const [ themeColors ] = useSetting( 'color.palette.theme', name );
-	const [ defaultColors ] = useSetting( 'color.palette.default', name );
-	const [ defaultPaletteEnabled ] = useSetting(
-		'color.defaultPalette',
-		name
-	);
-
-	return useMemo( () => {
-		const result = [];
-
-		if ( themeColors && themeColors.length ) {
-			result.push( {
-				name: _x(
-					'Theme',
-					'Indicates this palette comes from the theme.'
-				),
-				colors: themeColors,
-			} );
-		}
-
-		if ( defaultPaletteEnabled && defaultColors && defaultColors.length ) {
-			result.push( {
-				name: _x(
-					'Default',
-					'Indicates this palette comes from WordPress.'
-				),
-				colors: defaultColors,
-			} );
-		}
-
-		if ( customColors && customColors.length ) {
-			result.push( {
-				name: _x(
-					'Custom',
-					'Indicates this palette comes from the theme.'
-				),
-				colors: customColors,
-			} );
-		}
-
-		return result;
-	}, [ customColors, defaultColors, defaultPaletteEnabled, themeColors ] );
 }
 
 export default function BorderPanel( { name } ) {
@@ -162,7 +120,7 @@ export default function BorderPanel( { name } ) {
 	const borderColorSettings = [
 		{
 			label: __( 'Color' ),
-			colors: useMultiOriginColors(),
+			colors: useColorsPerOrigin( name ),
 			colorValue: borderColor,
 			onColorChange: handleOnChangeWithStyle( setBorderColor ),
 			clearable: false,
