@@ -103,8 +103,8 @@ function CommentTemplateInnerBlocks( {
 	);
 	return (
 		<li { ...innerBlocksProps }>
-			{ comment.commentId ===
-			( activeComment?.commentId || firstComment?.commentId )
+			{ comment.commentId === activeComment?.commentId ||
+			comment.commentId === firstComment?.commentId
 				? children
 				: null }
 
@@ -120,8 +120,8 @@ function CommentTemplateInnerBlocks( {
 				comment={ comment }
 				setActiveComment={ setActiveComment }
 				isHidden={
-					comment.commentId ===
-					( activeComment?.commentId || firstComment?.commentId )
+					comment.commentId === activeComment?.commentId ||
+					comment.commentId === firstComment?.commentId
 				}
 			/>
 
