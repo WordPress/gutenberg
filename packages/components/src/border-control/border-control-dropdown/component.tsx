@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import type { CSSProperties } from 'react';
+
+/**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 
 /**
@@ -18,8 +23,107 @@ import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 
-import type { DropdownProps, PopoverProps } from '../types';
+import type {
+	Color,
+	ColorOrigin,
+	Colors,
+	DropdownProps,
+	PopoverProps,
+} from '../types';
+
 const noop = () => undefined;
+const getColorObject = (
+	colorValue: CSSProperties[ 'borderColor' ],
+	colors: Colors | undefined,
+	hasMultipleColorOrigins: boolean
+) => {
+	if ( ! colorValue || ! colors ) {
+		return;
+	}
+
+	if ( hasMultipleColorOrigins ) {
+		let matchedColor;
+
+		( colors as ColorOrigin[] ).some( ( origin ) =>
+			origin.colors.some( ( color ) => {
+				if ( color.color === colorValue ) {
+					matchedColor = color;
+					return true;
+				}
+
+				return false;
+			} )
+		);
+
+		return matchedColor;
+	}
+
+	return ( colors as Color[] ).find(
+		( color ) => color.color === colorValue
+	);
+};
+
+const getToggleAriaLabel = (
+	colorValue: CSSProperties[ 'borderColor' ],
+	colorObject: Color | undefined,
+	style: CSSProperties[ 'borderStyle' ],
+	isStyleEnabled: boolean
+) => {
+	if ( isStyleEnabled ) {
+		if ( colorObject ) {
+			return style
+				? sprintf(
+						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:". %3$s: The current border style selection e.g. "solid".
+						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s". The currently selected style is "%3$s".',
+						colorObject.name,
+						colorObject.color,
+						style
+				  )
+				: sprintf(
+						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:".
+						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
+						colorObject.name,
+						colorObject.color
+				  );
+		}
+
+		if ( colorValue ) {
+			return style
+				? sprintf(
+						// translators: %1$s: The color's hex code e.g.: "#f00:". %2$s: The current border style selection e.g. "solid".
+						'Border color and style picker. The currently selected color has a value of "%1$s". The currently selected style is "%2$s".',
+						colorValue,
+						style
+				  )
+				: sprintf(
+						// translators: %1$s: The color's hex code e.g.: "#f00:".
+						'Border color and style picker. The currently selected color has a value of "%1$s".',
+						colorValue
+				  );
+		}
+
+		return __( 'Border color and style picker.' );
+	}
+
+	if ( colorObject ) {
+		return sprintf(
+			// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:".
+			'Border color picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
+			colorObject.name,
+			colorObject.color
+		);
+	}
+
+	if ( colorValue ) {
+		return sprintf(
+			// translators: %1$s: The color's hex code e.g.: "#f00:".
+			'Border color picker. The currently selected color has a value of "%1$s".',
+			colorValue
+		);
+	}
+
+	return __( 'Border color picker.' );
+};
 
 const BorderControlDropdown = (
 	props: WordPressComponentProps< DropdownProps, 'div' >,
@@ -46,12 +150,24 @@ const BorderControlDropdown = (
 	} = useBorderControlDropdown( props );
 
 	const { color, style } = border || {};
+	const colorObject = getColorObject(
+		color,
+		colors,
+		!! __experimentalHasMultipleOrigins
+	);
+
+	const toggleAriaLabel = getToggleAriaLabel(
+		color,
+		colorObject,
+		style,
+		enableStyle
+	);
 
 	const renderToggle = ( { onToggle = noop } ) => (
 		<Button
 			onClick={ onToggle }
 			variant="tertiary"
-			aria-label={ __( 'Open border options' ) }
+			aria-label={ toggleAriaLabel }
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator

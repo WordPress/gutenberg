@@ -31,6 +31,8 @@ const props = {
 	value: defaultBorder,
 };
 
+const toggleLabelRegex = /Border color( and style)* picker/;
+
 const renderBorderControl = ( customProps ) => {
 	return render( <BorderControl { ...{ ...props, ...customProps } } /> );
 };
@@ -39,9 +41,8 @@ const rerenderBorderControl = ( rerender, customProps ) => {
 	return rerender( <BorderControl { ...{ ...props, ...customProps } } /> );
 };
 
-const openPopover = ( dropdownToggle ) => {
-	const toggleButton =
-		dropdownToggle || screen.getByLabelText( 'Open border options' );
+const openPopover = () => {
+	const toggleButton = screen.getByLabelText( toggleLabelRegex );
 	fireEvent.click( toggleButton );
 };
 
@@ -71,7 +72,7 @@ describe( 'BorderControl', () => {
 			renderBorderControl();
 
 			const label = screen.getByText( props.label );
-			const colorButton = screen.getByLabelText( 'Open border options' );
+			const colorButton = screen.getByLabelText( toggleLabelRegex );
 			const widthInput = screen.getByRole( 'spinbutton' );
 			const unitSelect = screen.getByRole( 'combobox' );
 			const slider = screen.queryByRole( 'slider' );
@@ -116,7 +117,7 @@ describe( 'BorderControl', () => {
 
 			const headerLabel = screen.getByText( 'Border color' );
 			const closeButton = getButton( 'Close border color' );
-			const customColorPicker = getButton( 'Custom color picker' );
+			const customColorPicker = getButton( /Custom color picker/ );
 			const colorSwatchButtons = screen.getAllByRole( 'button', {
 				name: /^Color:/,
 			} );
@@ -150,6 +151,98 @@ describe( 'BorderControl', () => {
 			expect( solidButton ).not.toBeInTheDocument();
 			expect( dashedButton ).not.toBeInTheDocument();
 			expect( dottedButton ).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'color and style picker aria labels', () => {
+		describe( 'with style selection enabled', () => {
+			it( 'should include both color and style in label', () => {
+				renderBorderControl( { value: undefined } );
+
+				expect(
+					screen.getByLabelText( 'Border color and style picker.' )
+				).toBeInTheDocument();
+			} );
+
+			it( 'should correctly describe named color selection', () => {
+				renderBorderControl( { value: { color: '#72aee6' } } );
+
+				expect(
+					screen.getByLabelText(
+						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#72aee6".'
+					)
+				).toBeInTheDocument();
+			} );
+
+			it( 'should correctly describe custom color selection', () => {
+				renderBorderControl( { value: { color: '#4b1d80' } } );
+
+				expect(
+					screen.getByLabelText(
+						'Border color and style picker. The currently selected color has a value of "#4b1d80".'
+					)
+				).toBeInTheDocument();
+			} );
+
+			it( 'should correctly describe named color and style selections', () => {
+				renderBorderControl( {
+					value: { color: '#72aee6', style: 'dotted' },
+				} );
+
+				expect(
+					screen.getByLabelText(
+						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#72aee6". The currently selected style is "dotted".'
+					)
+				).toBeInTheDocument();
+			} );
+
+			it( 'should correctly describe custom color and style selections', () => {
+				renderBorderControl( {
+					value: { color: '#4b1d80', style: 'dashed' },
+				} );
+
+				expect(
+					screen.getByLabelText(
+						'Border color and style picker. The currently selected color has a value of "#4b1d80". The currently selected style is "dashed".'
+					)
+				).toBeInTheDocument();
+			} );
+		} );
+
+		describe( 'with style selection disabled', () => {
+			it( 'should only include color in the label', () => {
+				renderBorderControl( { value: undefined, enableStyle: false } );
+
+				expect(
+					screen.getByLabelText( 'Border color picker.' )
+				).toBeInTheDocument();
+			} );
+
+			it( 'should correctly describe named color selection', () => {
+				renderBorderControl( {
+					value: { color: '#72aee6' },
+					enableStyle: false,
+				} );
+
+				expect(
+					screen.getByLabelText(
+						'Border color picker. The currently selected color is called "Blue" and has a value of "#72aee6".'
+					)
+				).toBeInTheDocument();
+			} );
+
+			it( 'should correctly describe custom color selection', () => {
+				renderBorderControl( {
+					value: { color: '#4b1d80' },
+					enableStyle: false,
+				} );
+
+				expect(
+					screen.getByLabelText(
+						'Border color picker. The currently selected color has a value of "#4b1d80".'
+					)
+				).toBeInTheDocument();
+			} );
 		} );
 	} );
 
