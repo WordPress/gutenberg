@@ -72,6 +72,8 @@ const BorderControlStylePicker = (
 							)
 						}
 						aria-label={ borderStyle.label }
+						label={ borderStyle.label }
+						showTooltip={ true }
 					/>
 				) ) }
 			</Flex>
