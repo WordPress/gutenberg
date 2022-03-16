@@ -36,10 +36,12 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.3.1",
 		"lodash": "^4.17.21"
