@@ -51,6 +51,17 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-navigation',
 		)
 	);
+	add_settings_field(
+		'gutenberg-list-v2',
+		__( 'List block v2', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test a new list block that uses nested list item blocks (Warning: The new block is not ready. You may experience content loss, avoid using it on production sites)', 'gutenberg' ),
+			'id'    => 'gutenberg-list-v2',
+		)
+	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
