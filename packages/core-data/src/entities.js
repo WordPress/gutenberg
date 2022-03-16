@@ -175,6 +175,14 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
 	},
+	{
+		label: __( 'Navigation' ),
+		name: 'navigationMenu',
+		kind: 'root',
+		baseURL: '/wp/v2/navigation',
+		baseURLParams: { context: 'edit' },
+		plural: 'navigationMenus',
+	},
 ];
 
 export const additionalEntityConfigLoaders = [
