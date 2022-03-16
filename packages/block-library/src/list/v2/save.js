@@ -1,5 +1,12 @@
-function Save() {
-	return <div>List block v2</div>;
-}
+/**
+ * WordPress dependencies
+ */
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-export default Save;
+export default function save() {
+	return (
+		<ul { ...useBlockProps.save() }>
+			<InnerBlocks.Content />
+		</ul>
+	);
+}

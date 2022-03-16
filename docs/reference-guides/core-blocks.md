@@ -323,6 +323,15 @@ Create a bulleted or numbered list. ([Source](https://github.com/WordPress/guten
 -	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
+## List item
+
+Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item))
+
+-	**Name:** core/list-item
+-	**Category:** text
+-	**Supports:** ~~className~~
+-	**Attributes:** content, placeholder
+
 ## Login/out
 
 Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/loginout))
