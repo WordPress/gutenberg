@@ -18,7 +18,7 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useCallback } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
@@ -33,7 +33,6 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -52,8 +51,7 @@ import {
 	MIN_WIDTH,
 	MIN_WIDTH_UNIT,
 } from './utils.js';
-import { cloneBlock, createBlock } from '@wordpress/blocks';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { createBlock } from '@wordpress/blocks';
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
@@ -250,83 +248,53 @@ export default function SearchEdit( {
 			select( blockEditorStore ).getBlocks( clientId ).length > 0,
 		[ clientId ]
 	);
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-	useEffect( () => {
-		if ( ! hasInnerBlocks ) {
-			replaceInnerBlocks(
-				clientId,
-				[
-					createBlock(
-						'core/button',
-						{
-							text: [
-								buttonUseIcon ? (
-									<Icon icon={ search } />
-								) : (
-									false
-								), // todo: get the icon to render
-								buttonUseIcon ? 'icon' : false,
-								'Search',
-							],
-							className: classnames(
-								{
-									[ borderProps.className ]: isButtonPositionInside,
-								},
-								colorProps.className
-							),
-							style: {
-								...( isButtonPositionInside
-									? { borderRadius }
-									: borderProps.style ),
-							},
-						},
-						[]
-					),
-				],
-				true
-			);
-		}
-	}, [ hasInnerBlocks, clientId ] );
 
-	const updateButtonAttrs = useCallback(
-		( mapper ) => {
-			const prevBlocks = getBlocks( clientId );
-			const nextBlocks = prevBlocks
-				.map( ( block ) => cloneBlock( block ) )
-				.map( ( block ) => ( {
-					...block,
-					attributes: mapper( block.attributes ),
-				} ) );
-			replaceInnerBlocks( clientId, nextBlocks );
+	// borderColor, style, backgroundColor, textColor, gradient
+	const getNextButtonAttrs = ( prevAttrs = {} ) => ( {
+		borderColor: isButtonPositionInside ? attributes.borderColor : {},
+		style: {
+			...attributes.style,
+			...( isButtonPositionInside ? { borderRadius } : {} ),
 		},
-		[ clientId ]
-	);
+		backgroundColor: attributes.backgroundColor,
+		textColor: attributes.textColor,
+		gradient: attributes.gradient,
+		text: [
+			// TODO: get that icon to render:
+			buttonUseIcon ? <Icon icon={ search } /> : false,
+			buttonUseIcon ? 'icon' : false,
+			// Naive for now:
+			prevAttrs.text
+				? prevAttrs.text[ prevAttrs.text.length - 1 ]
+				: 'Search',
+		],
+	} );
 
-	useEffect( () => {
-		updateButtonAttrs( ( prev ) => ( {
-			...prev,
-			className: classnames( prev.className, {
-				[ borderProps.className ]: isButtonPositionInside,
-				// How to use colorProps.className ?
-			} ),
-			style: isButtonPositionInside
-				? { borderRadius }
-				: borderProps.style,
-			text: buttonUseIcon
-				? [ <Icon icon={ search } />, 'icon', prev.text ]
-				: prev.text.slice( 2 ), // super naive for now
-		} ) );
+	const template = useMemo(
+		() => [ [ 'core/button', getNextButtonAttrs() ] ],
+		[]
+	);
+	const value = useMemo( () => {
+		const prevAttrs = getBlocks( clientId )[ 0 ]?.attributes;
+		const nextAttrs = getNextButtonAttrs( prevAttrs );
+		return [ createBlock( 'core/button', nextAttrs, [] ) ];
 	}, [
 		isButtonPositionInside,
 		buttonUseIcon,
-		// colorProps, TODO
-		// borderProps,
+		colorProps,
+		borderProps,
+		hasInnerBlocks,
 		clientId,
 	] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		orientation: 'horizontal',
 		renderAppender: false,
+		value,
+		onChange: () => {},
+		onInput: () => {},
+		template,
+		templateLock: 'all',
 		allowedBlocks: ALLOWED_BLOCKS,
 	} );
 	const button = <div { ...innerBlocksProps } />;
