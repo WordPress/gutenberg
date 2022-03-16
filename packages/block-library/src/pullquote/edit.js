@@ -69,7 +69,7 @@ function PullQuoteEdit( {
 					{ shouldShowCitation && (
 						<RichText
 							identifier="citation"
-					 		tagName={ isWebPlatform ? 'cite' : undefined }
+							tagName={ isWebPlatform ? 'cite' : undefined }
 							style={ { display: 'block' } }
 							value={ citation }
 							aria-label={ __( 'Pullquote citation text' ) }
