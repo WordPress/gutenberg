@@ -2,7 +2,7 @@
 
 This part is about adding an *Edit* feature to our app. Here's a glimpse of what we're going to build:
 
-![](/docs/how-to-guides/data-basics/media/edit-form/form-finished.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-finished.png)
 
 ### Step 1: Add an _Edit_ button
 
@@ -51,7 +51,7 @@ function PagesList( { hasResolved, pages } ) {
 
 The only change in `PagesList` is the additional column labeled _Actions_:
 
-![](/docs/how-to-guides/data-basics/media/edit-form/edit-button.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/edit-button.png)
 
 ### Step 2: Display an _Edit_ form
 
@@ -112,7 +112,7 @@ function PageEditButton({ pageId }) {
 
 When you click the *Edit* button now, you should see the following modal:
 
-![](/docs/how-to-guides/data-basics/media/edit-form/form-scaffold.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-scaffold.png)
 
 Great! We now have a basic user interface to work with.
 
