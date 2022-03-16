@@ -95,8 +95,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
 			if ( is_array( $gap_value ) ) {
-				$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : 'var( --wp--style--block-gap, 0.5em )';
-				$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : 'var( --wp--style--block-gap, 0.5em )';
+				$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : '0.5em';
+				$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : '0.5em';
 				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 			}
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
