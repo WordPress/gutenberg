@@ -8,9 +8,10 @@ import {
 	PanelBody,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -51,7 +52,15 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 		}
 	};
 
-	const inputValue = temporaryInput !== null ? temporaryInput : value;
+	const computedValue = useMemo( () => {
+		const inputValue = temporaryInput !== null ? temporaryInput : value;
+		const [ parsedQuantity, parsedUnit ] = parseQuantityAndUnitFromRawValue(
+			inputValue
+		);
+
+		// Force the unit to update to `px` when the Spacer is being resized.
+		return [ parsedQuantity, isResizing ? 'px' : parsedUnit ].join( '' );
+	}, [ isResizing, temporaryInput, value ] );
 
 	return (
 		<BaseControl label={ label } id={ inputId }>
@@ -63,10 +72,8 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				style={ { maxWidth: 80 } }
-				value={ inputValue }
+				value={ computedValue }
 				units={ units }
-				// Force the unit to update to `px` when the Spacer is being resized.
-				unit={ isResizing ? 'px' : undefined }
 			/>
 		</BaseControl>
 	);
