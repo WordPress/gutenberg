@@ -186,8 +186,8 @@
 			"text": true
 		},
 		"layout": {
-			"types": [
-				{
+			"types": {
+				"flow": {
 					"slug": "flow",
 					"type": "flow",
 					"styles": [
@@ -238,7 +238,7 @@
 						}
 					]
 				},
-				{
+				"flex": {
 					"slug": "flex",
 					"type": "flex",
 					"styles": [
@@ -253,10 +253,45 @@
 							"rules": {
 								"margin": "0"
 							}
+						},
+						{
+							"suffix": "h-justify",
+							"rules": {
+								"align-items": "center"
+							}
 						}
-					]
+					],
+					"controlledSets": {
+						"flexWrap": {
+							"suffix": "wrap",
+							"property": "flex-wrap",
+							"options": {
+								"wrap": "wrap",
+								"nowrap": "nowrap"
+							}
+						},
+						"horizontalJustification": {
+							"suffix": "h-justify",
+							"property": "justify-content",
+							"options": {
+								"left": "flex-start",
+								"right": "flex-end",
+								"center": "center",
+								"space-between": "space-between"
+							}
+						},
+						"verticalJustification": {
+							"suffix": "v-justify",
+							"property": "align-items",
+							"options": {
+								"left": "flex-start",
+								"right": "flex-end",
+								"center": "center"
+							}
+						}
+					}
 				}
-			]
+			}
 		},
 		"spacing": {
 			"blockGap": null,

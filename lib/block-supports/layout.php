@@ -25,25 +25,42 @@ function gutenberg_register_layout_support( $block_type ) {
 	}
 }
 
-function gutenberg_get_layout_preset_styles( $preset_metadata, $presets_by_origin ) {
+function gutenberg_get_layout_preset_styles( $preset_metadata, $presets ) {
 	$style_engine = WP_Style_Engine_Gutenberg::get_instance();
 	$style_engine->reset();
 
-	$presets = end( $presets_by_origin );
-
-	foreach ( $presets as $preset ) {
+	foreach ( $presets as $key => $preset ) {
 		if ( ! empty( $preset['type'] ) && ! empty( $preset['styles'] ) ) {
 			$slug       = ! empty( $preset['slug'] ) ? $preset['slug'] : $preset['type'];
 			$base_class = 'wp-layout-' . sanitize_title( $slug );
 
-			foreach ( $preset['styles'] as $style ) {
-				if ( ! empty( $style['rules'] ) && is_array( $style['rules'] ) ) {
-					$options = array(
-						'selector' => ! empty( $style['selector'] ) ? $style['selector'] : null,
-						'suffix'   => ! empty( $style['suffix'] ) ? sanitize_title( $style['suffix'] ) : null,
-						'rules'    => $style['rules'],
-					);
-					$style_engine->add_style( $base_class, $options );
+			if ( ! empty( $preset['styles'] ) ) {
+				foreach ( $preset['styles'] as $style ) {
+					if ( ! empty( $style['rules'] ) && is_array( $style['rules'] ) ) {
+						$args = array(
+							'selector' => ! empty( $style['selector'] ) ? $style['selector'] : null,
+							'suffix'   => ! empty( $style['suffix'] ) ? sanitize_title( $style['suffix'] ) : null,
+							'rules'    => $style['rules'],
+						);
+						$style_engine->add_style( $base_class, $args );
+					}
+				}
+			}
+
+			if ( ! empty( $preset['controlledSets'] ) ) {
+				foreach ( $preset['controlledSets'] as $controlled_set ) {
+					$property = ! empty( $controlled_set['property'] ) ? sanitize_title( $controlled_set['property'] ) : null;
+					$suffix = ! empty( $controlled_set['suffix'] ) ? sanitize_title( $controlled_set['suffix'] ) : null;
+
+					if ( $property && $suffix && ! empty( $controlled_set['options'] ) ) {
+						foreach( $controlled_set['options'] as $option_setting => $option_value ) {
+							$args = array(
+								'suffix' => array( $suffix, sanitize_title( $option_setting ) ),
+								'rules'  => array( $property => $option_value ),
+							);
+							$style_engine->add_style( $base_class, $args );
+						}
+					}
 				}
 			}
 		}
@@ -90,13 +107,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= '}';
 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
 		}
 
 		if ( $has_block_gap_support ) {
 			$classes[] = 'wp-layout-flow--global-gap';
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
-			$style    .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
 			$style    .= "$selector > * + * { margin-block-start: $gap_style; margin-block-end: 0; }";
 		}
 	} elseif ( 'flex' === $layout_type ) {
@@ -123,12 +138,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		if ( $has_block_gap_support ) {
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
 			$style    .= "gap: $gap_style;";
-		} else {
-			$style .= 'gap: 0.5em;';
 		}
+
 		$style .= "flex-wrap: $flex_wrap;";
 		if ( 'horizontal' === $layout_orientation ) {
-			$style .= 'align-items: center;';
+			$classes[] = 'wp-layout-flex--horizontal';
 			/**
 			 * Add this style only if is not empty for backwards compatibility,
 			 * since we intend to convert blocks that had flex layout implemented

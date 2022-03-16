@@ -91,7 +91,8 @@ class WP_Style_Engine_Gutenberg {
 	 * @return string The class name for the added style.
 	 */
 	public function add_style( $key, $options ) {
-		$class    = ! empty( $options['suffix'] ) ? $key . '--' . sanitize_title( $options['suffix'] ) : $key;
+		$suffix   = ! empty( $options['suffix'] ) && is_array( $options['suffix'] ) ? implode( '--', $options['suffix'] ) : $options['suffix'];
+		$class    = ! empty( $suffix ) ? $key . '--' . sanitize_key( $suffix ) : $key;
 		$selector = ! empty( $options['selector'] ) ? ' ' . trim( $options['selector'] ) : '';
 		$rules    = ! empty( $options['rules'] ) ? $options['rules'] : array();
 		$prefix   = ! empty( $options['prefix'] ) ? $options['prefix'] : '.';
