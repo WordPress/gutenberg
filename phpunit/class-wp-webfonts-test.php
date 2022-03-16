@@ -58,8 +58,8 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			$fonts[0]['id'] => array_filter( $fonts[0], fn( $key ) => 'id' !== $key, ARRAY_FILTER_USE_KEY ),
-			$fonts[1]['id'] => array_filter( $fonts[1], fn( $key ) => 'id' !== $key, ARRAY_FILTER_USE_KEY ),
+			$fonts[0]['id'] => $fonts[0],
+			$fonts[1]['id'] => $fonts[1],
 		);
 
 		wp_register_webfonts( $fonts );
@@ -79,6 +79,7 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 		$id = 'source-serif-pro-200-900-normal-local';
 
 		$font = array(
+			'id'           => $id,
 			'provider'     => 'local',
 			'font-family'  => 'Source Serif Pro',
 			'font-style'   => 'normal',
@@ -109,6 +110,7 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 		$id = 'source-serif-pro-200-900-normal-local';
 
 		$font = array(
+			'id'           => $id,
 			'provider'     => 'local',
 			'font-family'  => 'Source Serif Pro',
 			'font-style'   => 'normal',
@@ -160,8 +162,8 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			$fonts[0]['id'] => array_filter( $fonts[0], fn( $key ) => 'id' !== $key, ARRAY_FILTER_USE_KEY ),
-			$fonts[1]['id'] => array_filter( $fonts[1], fn( $key ) => 'id' !== $key, ARRAY_FILTER_USE_KEY ),
+			$fonts[0]['id'] => $fonts[0],
+			$fonts[1]['id'] => $fonts[1],
 		);
 
 		wp_enqueue_webfonts( $fonts );
@@ -181,6 +183,7 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 		$id = 'source-serif-pro-200-900-normal-local';
 
 		$font = array(
+			'id'           => $id,
 			'provider'     => 'local',
 			'font-family'  => 'Source Serif Pro',
 			'font-style'   => 'normal',
@@ -212,6 +215,7 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 		$id = 'source-serif-pro-200-900-normal-local';
 
 		$font = array(
+			'id'           => $id,
 			'provider'     => 'local',
 			'font-family'  => 'Source Serif Pro',
 			'font-style'   => 'normal',
@@ -342,7 +346,7 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 		wp_webfonts()->generate_and_enqueue_styles();
 
 		$expected = <<<EOF
-@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}
+@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');id:source-serif-pro-200-900-normal-local;}
 EOF;
 
 		$this->assertContains(
@@ -387,7 +391,7 @@ EOF;
 		wp_webfonts()->generate_and_enqueue_editor_styles();
 
 		$expected = <<<EOF
-@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}
+@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');id:source-serif-pro-200-900-italic-local;}@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');id:source-serif-pro-200-900-normal-local;}
 EOF;
 
 		$this->assertContains(

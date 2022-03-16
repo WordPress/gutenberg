@@ -106,7 +106,9 @@ class WP_Webfonts {
 			return;
 		}
 
-		$font = $this->validate_font( $font );
+		$font['id'] = $id;
+		$font       = $this->validate_font( $font );
+
 		if ( $font ) {
 			$this->registered_webfonts[ $id ] = $font;
 		}
@@ -129,7 +131,9 @@ class WP_Webfonts {
 		}
 
 		if ( $font ) {
-			$font                           = $this->validate_font( $font );
+			$font['id'] = $id;
+			$font       = $this->validate_font( $font );
+
 			$this->enqueued_webfonts[ $id ] = $font;
 
 			if ( isset( $this->registered_webfonts[ $id ] ) ) {
@@ -216,6 +220,7 @@ class WP_Webfonts {
 			'unicode-range',
 
 			// Exceptions.
+			'id',
 			'provider',
 		);
 
