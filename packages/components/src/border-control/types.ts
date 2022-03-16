@@ -14,12 +14,19 @@ export type Color = {
 	color: CSSProperties[ 'color' ];
 };
 
+export type ColorOrigin = {
+	name: string;
+	colors: Color[];
+};
+
+export type Colors = ColorOrigin[] | Color[];
+
 export type ColorProps = {
 	/**
 	 * An array of color definitions. This may also be a multi-dimensional array
 	 * where colors are organized by multiple origins.
 	 */
-	colors?: Color[];
+	colors?: Colors;
 	/**
 	 * This toggles the ability to choose custom colors.
 	 */
