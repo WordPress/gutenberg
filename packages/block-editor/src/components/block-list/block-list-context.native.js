@@ -45,7 +45,7 @@ function findBlockLayoutByClientId( data, clientId ) {
  *
  * @return {Object} Updated data object.
  */
-function deleteBlockLayoutByClientId( data, clientId ) {
+export function deleteBlockLayoutByClientId( data, clientId ) {
 	return Object.keys( data ).reduce( ( acc, key ) => {
 		if ( key !== clientId ) {
 			acc[ key ] = data[ key ];
