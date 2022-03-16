@@ -61,7 +61,6 @@ class WP_REST_Post_Lock_Controller extends WP_REST_Controller {
 	/**
 	 * Registers the routes for post locking.
 	 *
-	 * @since 4.7.0
 	 *
 	 * @see register_rest_route()
 	 */
