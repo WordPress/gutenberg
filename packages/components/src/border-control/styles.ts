@@ -89,7 +89,12 @@ export const ColorIndicatorWrapper = ( border?: Border ) => {
 		height: 28px;
 		padding: 2px;
 
-		/* ColorIndicator */
+		/*
+		 * ColorIndicator
+		 *
+		 * The transparent colors used here ensure visibility of the indicator
+		 * over the active state of the border control dropdown's toggle button.
+		 */
 		& > span {
 			background: linear-gradient(
 				-45deg,
