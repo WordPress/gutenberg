@@ -64,12 +64,12 @@ export function getGapValueFromStyle( rawBlockGapValue ) {
  *
  * @param {string? | Object?} blockGapValue A style object.
  * @param {string?}           defaultValue  A default gap value.
- * @return {string?}                        The concatenated gap value (row and column).
+ * @return {string|null}                    The concatenated gap value (row and column).
  */
 export function getGapCSSValue( blockGapValue, defaultValue = '0' ) {
 	const blockGapBoxControlValue = getGapValueFromStyle( blockGapValue );
 	if ( ! blockGapBoxControlValue ) {
-		return blockGapBoxControlValue;
+		return null;
 	}
 
 	const row = blockGapBoxControlValue?.top || defaultValue;
@@ -174,6 +174,9 @@ export function GapEdit( props ) {
 	const splitOnAxis =
 		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const gapValue = getGapValueFromStyle( style?.spacing?.blockGap );
+
+	// The BoxControl component expects a full complement of side values.
+	// Gap row and column values translate to top/bottom and left/right respectively.
 	const boxControlGapValue = splitOnAxis
 		? {
 				...gapValue,

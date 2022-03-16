@@ -5,8 +5,9 @@ import { getGapCSSValue } from '../gap';
 
 describe( 'gap', () => {
 	describe( 'getGapCSSValue()', () => {
-		it( 'should return argument if argument is falsey', () => {
-			expect( getGapCSSValue( undefined ) ).toBeUndefined();
+		it( 'should return `null` if argument is falsey', () => {
+			expect( getGapCSSValue( undefined ) ).toBeNull();
+			expect( getGapCSSValue( '' ) ).toBeNull();
 		} );
 
 		it( 'should return single value for gap if argument is valid string', () => {
