@@ -5,7 +5,7 @@
  */
 export async function openPublishPanel() {
 	const publishPanelToggle = await this.page.locator(
-		'[aria-disabled="true"].editor-post-publish-panel__toggle'
+		'[aria-disabled="false"].editor-post-publish-panel__toggle'
 	);
 
 	const isEntityPublishToggle = await publishPanelToggle.evaluate(
