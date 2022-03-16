@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
+import { useInstanceId, useRefEffect } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 import { Icon, check, reset } from '@wordpress/icons';
 
@@ -33,16 +33,29 @@ export default function CheckboxControl( {
 		} );
 	}
 
-	const ref = useRef();
+	const [ showCheckedIcon, setShowCheckedIcon ] = useState( false );
+	const [ showIndeterminateIcon, setShowIndeterminateIcon ] = useState(
+		false
+	);
+
+	// Run the following callback everytime the `ref` (and the additional
+	// dependencies) change.
+	const ref = useRefEffect(
+		( node ) => {
+			if ( ! node ) {
+				return;
+			}
+
+			node.indeterminate = !! indeterminate;
+
+			setShowCheckedIcon( node.matches( ':checked' ) );
+			setShowIndeterminateIcon( node.matches( ':indeterminate' ) );
+		},
+		[ checked, indeterminate ]
+	);
 	const instanceId = useInstanceId( CheckboxControl );
 	const id = `inspector-checkbox-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.checked );
-
-	useEffect( () => {
-		if ( ref.current ) {
-			ref.current.indeterminate = !! indeterminate;
-		}
-	}, [ indeterminate ] );
 
 	return (
 		<BaseControl
@@ -63,14 +76,14 @@ export default function CheckboxControl( {
 					aria-describedby={ !! help ? id + '__help' : undefined }
 					{ ...props }
 				/>
-				{ indeterminate && ! checked ? (
+				{ showIndeterminateIcon ? (
 					<Icon
 						icon={ reset }
 						className="components-checkbox-control__indeterminate"
 						role="presentation"
 					/>
 				) : null }
-				{ checked ? (
+				{ showCheckedIcon ? (
 					<Icon
 						icon={ check }
 						className="components-checkbox-control__checked"
