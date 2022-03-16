@@ -62,8 +62,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector .alignfull { max-width: none; }";
 		}
 
-		$style .= "$selector .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }";
-		$style .= "$selector .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }";
+		$style .= "$selector > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }";
+		$style .= "$selector > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }";
+		$style .= "$selector > .aligncenter { margin-left: auto !important; margin-right: auto !important; }";
 		if ( $has_block_gap_support ) {
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
 			$style    .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";

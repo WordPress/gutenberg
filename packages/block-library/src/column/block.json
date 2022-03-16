@@ -39,6 +39,7 @@
 			"__experimentalDefaultControls": {
 				"padding": true
 			}
-		}
+		},
+		"__experimentalLayout": true
 	}
 }

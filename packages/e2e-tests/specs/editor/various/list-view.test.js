@@ -86,12 +86,13 @@ describe( 'List view', () => {
 		// Select the image block in the canvas.
 		await page.keyboard.press( 'Enter' );
 
-		const canvasImageBlock = await page.waitForSelector(
-			'figure[aria-label="Block: Image"]'
+		const uploadButton = await page.waitForXPath(
+			'//button[contains( text(), "Upload" ) ]'
 		);
-		expect( canvasImageBlock ).toHaveFocus();
+		expect( uploadButton ).toHaveFocus();
 
 		// Delete the image block in the canvas.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Backspace' );
 
 		// List view should have two rows.
@@ -101,6 +102,131 @@ describe( 'List view', () => {
 		// The console didn't throw an error as reported in
 		// https://github.com/WordPress/gutenberg/issues/38763.
 		expect( console ).not.toHaveErrored();
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026
+	it( 'should select previous block after removing selected one', async () => {
+		// Insert some blocks of different types.
+		await insertBlock( 'Image' );
+		await insertBlock( 'Heading' );
+		await insertBlock( 'Paragraph' );
+
+		// Open list view.
+		await openListView();
+
+		// The last inserted paragraph block should be selected in List View.
+		await page.waitForXPath(
+			'//a[contains(., "Paragraph(selected block)")]'
+		);
+
+		// Paragraph options button.
+		const paragraphOptionsButton = await page.waitForSelector(
+			'tr.block-editor-list-view-leaf:last-child button[aria-label="Options for Paragraph block"]'
+		);
+
+		await paragraphOptionsButton.click();
+
+		const paragraphRemoveButton = await page.waitForXPath(
+			'//button[contains(., "Remove Paragraph")]'
+		);
+
+		// Remove paragraph.
+		await paragraphRemoveButton.click();
+
+		// Heading block should be selected as previous block.
+		await page.waitForXPath(
+			'//a[contains(., "Heading(selected block)")]'
+		);
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026
+	it( 'should select next block after removing the very first block', async () => {
+		// Insert some blocks of different types.
+		await insertBlock( 'Image' );
+		await insertBlock( 'Heading' );
+		await insertBlock( 'Paragraph' );
+
+		// Open list view.
+		await openListView();
+
+		// The last inserted paragraph block should be selected in List View.
+		await page.waitForXPath(
+			'//a[contains(., "Paragraph(selected block)")]'
+		);
+
+		// Go to the image block in list view.
+		await pressKeyTimes( 'ArrowUp', 2 );
+		await pressKeyTimes( 'Enter', 1 );
+
+		// Image block should have selected.
+		await page.waitForXPath( '//a[contains(., "Image(selected block)")]' );
+
+		// Image options dropdown.
+		const imageOptionsButton = await page.waitForSelector(
+			'tr.block-editor-list-view-leaf:first-child button[aria-label="Options for Image block"]'
+		);
+
+		await imageOptionsButton.click();
+
+		const imageRemoveButton = await page.waitForXPath(
+			'//button[contains(., "Remove Image")]'
+		);
+
+		// Remove Image block.
+		await imageRemoveButton.click();
+
+		// Heading block should be selected as next block.
+		await page.waitForXPath(
+			'//a[contains(., "Heading(selected block)")]'
+		);
+	} );
+
+	/**
+	 * When all the blocks gets removed from the editor, it inserts a default paragraph block;
+	 * make sure that paragraph block gets selected after removing blocks from ListView.
+	 */
+	it( 'should select default paragraph block after removing all blocks', async () => {
+		// Insert some blocks of different types.
+		await insertBlock( 'Image' );
+		await insertBlock( 'Heading' );
+
+		// Open list view.
+		await openListView();
+
+		// The last inserted heading block should be selected in List View.
+		const headingBlock = await page.waitForXPath(
+			'//a[contains(., "Heading(selected block)")]'
+		);
+
+		await headingBlock.click();
+
+		// Select all two blocks.
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+
+		// Both Image and Heading blocks should have selected.
+		await page.waitForXPath(
+			'//a[contains(., "Heading(selected block)")]'
+		);
+		await page.waitForXPath( '//a[contains(., "Image(selected block)")]' );
+
+		const imageOptionsButton = await page.waitForSelector(
+			'tr.block-editor-list-view-leaf:first-child button[aria-label="Options for Image block"]'
+		);
+
+		// Blocks options dropdown.
+		await imageOptionsButton.click();
+
+		const blocksRemoveButton = await page.waitForXPath(
+			'//button[contains(., "Remove blocks")]'
+		);
+
+		// Remove all blocks.
+		await blocksRemoveButton.click();
+
+		// Newly created default paragraph block should be selected.
+		await page.waitForXPath(
+			'//a[contains(., "Paragraph(selected block)")]'
+		);
 	} );
 
 	it( 'should expand nested list items', async () => {
