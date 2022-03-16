@@ -39,6 +39,7 @@ import { publishPost } from './publish-post';
 import { findSidebarPanelWithTitle } from './find-sidebar-panel-with-title';
 import { openSidebarPanelWithTitle } from './open-sidebar-panel-with-title';
 import { clickBlockAppender } from './click-block-appender';
+import { findSidebarPanelToggleButtonWithTitle } from './find-sidebar-panel-toggle-button-with-title';
 
 class PageUtils {
 	browser: Browser;
@@ -84,6 +85,7 @@ class PageUtils {
 	findSidebarPanelWithTitle = findSidebarPanelWithTitle;
 	openSidebarPanelWithTitle = openSidebarPanelWithTitle;
 	clickBlockAppender = clickBlockAppender;
+	findSidebarPanelToggleButtonWithTitle = findSidebarPanelToggleButtonWithTitle;
 }
 
 export { PageUtils };
