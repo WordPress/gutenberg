@@ -15,6 +15,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -57,6 +58,15 @@ function UnforwardedUnitControl(
 	}: WordPressComponentProps< UnitControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
+	if ( typeof unitProp !== 'undefined' ) {
+		deprecated( 'UnitControl unit prop', {
+			since: '5.6',
+			hint:
+				'Please provide a unit with a value through the `value` prop.',
+			version: '6.2',
+		} );
+	}
+
 	// The `value` prop, in theory, should not be `null`, but the following line
 	// ensures it fallback to `undefined` in case a consumer of `UnitControl`
 	// still passes `null` as a `value`.
