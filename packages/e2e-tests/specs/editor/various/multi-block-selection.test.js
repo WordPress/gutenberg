@@ -79,14 +79,13 @@ async function testNativeSelection() {
 
 		const firstElement = elements[ 0 ];
 		const lastElement = elements[ elements.length - 1 ];
-		const { startContainer, endContainer } = selection.getRangeAt( 0 );
 
-		if ( ! firstElement.contains( startContainer ) ) {
-			throw 'expected selection to start in the first selected block';
+		if ( ! selection.containsNode( firstElement, true ) ) {
+			throw 'expected selection to include in the first selected block';
 		}
 
-		if ( ! lastElement.contains( endContainer ) ) {
-			throw 'expected selection to end in the last selected block';
+		if ( ! selection.containsNode( lastElement, true ) ) {
+			throw 'expected selection to include in the last selected block';
 		}
 	} );
 }
