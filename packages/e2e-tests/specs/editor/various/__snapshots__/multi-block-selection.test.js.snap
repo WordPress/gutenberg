@@ -90,7 +90,7 @@ exports[`Multi-block selection should forward delete across blocks 1`] = `
 
 exports[`Multi-block selection should forward delete across blocks 2`] = `
 "<!-- wp:heading -->
-<h2>12</h2>
+<h2>1&amp;2</h2>
 <!-- /wp:heading -->"
 `;
 
@@ -138,7 +138,7 @@ exports[`Multi-block selection should handle Enter across blocks 2`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p>&amp;</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->

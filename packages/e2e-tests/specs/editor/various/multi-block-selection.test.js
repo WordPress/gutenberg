@@ -851,7 +851,10 @@ describe( 'Multi-block selection', () => {
 
 		await page.keyboard.press( 'Delete' );
 
-		// Expect a heading with "12" as its content.
+		// Ensure selection is in the correct place.
+		await page.keyboard.type( '&' );
+
+		// Expect a heading with "1&2" as its content.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -876,7 +879,10 @@ describe( 'Multi-block selection', () => {
 
 		await page.keyboard.press( 'Enter' );
 
-		// Expect a heading with "12" as its content.
+		// Ensure selection is in the correct place.
+		await page.keyboard.type( '&' );
+
+		// Expect two blocks with "&" in between.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

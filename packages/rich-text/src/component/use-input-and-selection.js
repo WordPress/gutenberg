@@ -259,20 +259,6 @@ export function useInputAndSelection( props ) {
 				applyRecord,
 			} = propsRef.current;
 
-			// This is a little hack to work around focus issues with nested
-			// editable elements in Firefox. For some reason the editable child
-			// element sometimes regains focus, while it should not be focusable
-			// and focus should remain on the editable parent element.
-			// To do: try to find the cause of the shifting focus.
-			const parentEditable = element.parentElement.closest(
-				'[contenteditable="true"]'
-			);
-
-			if ( parentEditable ) {
-				parentEditable.focus();
-				return;
-			}
-
 			if ( ! isSelected ) {
 				// We know for certain that on focus, the old selection is invalid.
 				// It will be recalculated on the next mouseup, keyup, or touchend
