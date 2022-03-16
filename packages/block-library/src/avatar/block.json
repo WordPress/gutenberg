@@ -4,7 +4,7 @@
 	"name": "core/avatar",
 	"title": "Avatar",
 	"category": "theme",
-	"description": "Add the avatar of an user.",
+	"description": "Add a user's avatar.",
 	"textdomain": "default",
 	"attributes": {
 		"userId": {

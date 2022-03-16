@@ -28,7 +28,7 @@ Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tr
 
 ## Avatar
 
-Add the avatar of an user. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/avatar))
+Add a user's avatar. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/avatar))
 
 -	**Name:** core/avatar
 -	**Category:** theme
