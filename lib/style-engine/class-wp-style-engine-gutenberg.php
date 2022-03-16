@@ -5,6 +5,8 @@
  * @package Gutenberg
  */
 
+require_once __DIR__ . '/style-definition-utils.php';
+
 /**
  * Singleton class representing the style engine.
  *
@@ -29,6 +31,19 @@ class WP_Style_Engine_Gutenberg {
 	 * @var WP_Style_Engine_Gutenberg|null
 	 */
 	private static $instance = null;
+
+	/**
+	 * Style definitions that contain the instructions to
+	 * parse/output valid Gutenberg styles.
+	 */
+	const STYLE_DEFINITIONS_METADATA = array(
+		'spacing' => array(
+			'padding' => array(
+				'value_key'  => 'padding',
+				'value_func' => 'gutenberg_get_style_engine_css_box_rules',
+			),
+		),
+	);
 
 	/**
 	 * Register action for outputting styles when the class is constructed.
@@ -112,11 +127,34 @@ class WP_Style_Engine_Gutenberg {
 	}
 
 	/**
+	 * Returns a CSS ruleset based on the instructions in STYLE_DEFINITIONS_METADATA.
+	 *
+	 * @param string|array $style_value A single raw Gutenberg style attributes value for a CSS property.
+	 * @param array        $path        An array of strings representing a path to the style value.
+	 *
+	 * @return array The class name for the added style.
+	 */
+	protected function get_style_css_rules( $style_value, $path ) {
+		$style_definition = _wp_array_get( static::STYLE_DEFINITIONS_METADATA, $path, null );
+
+		if ( $style_definition ) {
+			if (
+				isset( $style_definition['value_func'] ) &&
+				is_callable( $style_definition['value_func'] )
+			) {
+				return call_user_func( $style_definition['value_func'], $style_value, $style_definition['value_key'] );
+			}
+		}
+
+		return array();
+	}
+
+	/**
 	 * Accepts and parses a Gutenberg attributes->style object and returns add_style()
 	 * Stores style rules for a given CSS selector (the key) and returns an associated classname.
 	 *
 	 * @param string $key              A class name used to construct a key.
-	 * @param array  $block_styles     An array of styles from a block's attributes.
+	 * @param array  $block_attributes An array of styles from a block's attributes.
 	 * @param array  $path             An array of strings representing a path to the style value.
 	 * @param array  $options          An array of options that add_style() accepts.
 	 *
@@ -128,31 +166,13 @@ class WP_Style_Engine_Gutenberg {
 		}
 
 		$style_value = _wp_array_get( $block_attributes, $path, null );
-		$rules       = array();
+		$rules       = $this->get_style_css_rules( $style_value, $path );
 		$suffix      = '';
 
-		/*
-			// Only expecting padding for now. This will be extracted/abstracted.
-			// Possibly we'd have parsing rules and extra metadata, e.g.,
-			const STYLE_DEFINITIONS_METADATA = array(
-				'spacing'     => array(
-					'margin' => array(
-						'value_func' => 'gutenberg_get_style_engine_css_box_rules',
-					),
-					'padding' => array(
-						'value_func' => 'gutenberg_get_style_engine_css_box_rules',
-					),
-				),
-			);
-		  */
 		if ( is_array( $style_value ) ) {
-			foreach ( $style_value as $property => $value ) {
-				$rules[ "padding-$property" ] = $value . '  !important'; // Challenge: deal with specificity that inline styles bring us. Maybe we could pass an option.
-			}
 			$suffix = implode( '-', array_values( $style_value ) );
 		} elseif ( null !== $style_value ) {
-			$rules[] = sprintf( 'padding: %s !important;', $style_value );
-			$suffix  = str_replace( ' ', '-', $style_value );
+			$suffix = str_replace( ' ', '-', $style_value );
 		}
 
 		$options = array_merge(
