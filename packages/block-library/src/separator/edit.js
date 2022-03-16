@@ -20,8 +20,8 @@ import useDeprecatedOpacity from './use-deprecated-opacity';
 
 export default function SeparatorEdit( { attributes, setAttributes } ) {
 	const { backgroundColor, opacity, style, className } = attributes;
-	const color = useColorProps( attributes );
-	const currentColor = color?.style?.backgroundColor;
+	const colorProps = useColorProps( attributes );
+	const currentColor = colorProps?.style?.backgroundColor;
 	const hasCustomColor = !! style?.color?.background;
 
 	useDeprecatedOpacity( opacity, currentColor, setAttributes );
@@ -30,7 +30,7 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 	// using color, not backgroundColor.
 	const colorClass = getColorClassName( 'color', backgroundColor );
 
-	const classNames = classnames( {
+	const classNames = classnames( colorProps.classname, {
 		'has-text-color': backgroundColor || currentColor,
 		[ colorClass ]: colorClass,
 		'has-css-opacity': opacity === 'css',

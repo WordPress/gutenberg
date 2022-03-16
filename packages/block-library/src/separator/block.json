@@ -17,6 +17,7 @@
 		"anchor": true,
 		"align": [ "center", "wide", "full" ],
 		"color": {
+			"__experimentalSkipSerialization": true,
 			"gradients": true,
 			"background": true,
 			"text": false,
