@@ -10,9 +10,6 @@ const { v4: uuidv4 } = require( 'uuid' );
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'changing image size', () => {
