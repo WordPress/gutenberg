@@ -46,7 +46,9 @@ if (
 	process.env.JEST_PUPPETEER_CONFIG = fromConfigRoot( 'puppeteer.config.js' );
 }
 
-const configFile = getJestOverrideConfigFile( 'e2e' );
+const configFile = getJestOverrideConfigFile(
+	getArgFromCLI( '--jest-override-config' ) || 'e2e'
+);
 
 const config = configFile
 	? [ '--config', JSON.stringify( require( configFile ) ) ]

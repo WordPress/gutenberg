@@ -6,31 +6,16 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-const { hasBabelConfig } = require( '../utils' );
+const jestE2EConfig = require( './jest-e2e.config' );
 
 const jestA11yBlocks = {
-	globalSetup: path.join( __dirname, 'jest-environment-puppeteer', 'setup' ),
-	globalTeardown: path.join(
-		__dirname,
-		'jest-environment-puppeteer',
-		'teardown'
-	),
-	reporters: [
-		'default',
-		path.join( __dirname, 'jest-github-actions-reporter', 'index.js' ),
+	...jestE2EConfig,
+	setupFilesAfterEnv: [
+		'@wordpress/jest-console',
+		'@wordpress/jest-puppeteer-axe',
+		'expect-puppeteer',
 	],
-	setupFilesAfterEnv: [ 'expect-puppeteer' ],
-	testEnvironment: path.join( __dirname, 'jest-environment-puppeteer' ),
 	testMatch: [ '**/a11y-blocks/?(*.)spec.[jt]s?(x)' ],
-	testPathIgnorePatterns: [ '/node_modules/' ],
-	testRunner: 'jest-circus/runner',
-	testTimeout: 30000,
 };
-
-if ( ! hasBabelConfig() ) {
-	jestA11yBlocks.transform = {
-		'\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
-	};
-}
 
 module.exports = jestA11yBlocks;

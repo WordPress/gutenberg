@@ -1,18 +1,57 @@
-const apiFetch = require( '@wordpress/api-fetch' );
+import { loginUser } from '@wordpress/e2e-test-utils';
+import apiFetch from '@wordpress/api-fetch';
+import path from 'path';
+import fs from 'fs';
 
-describe( 'A test suite', () => {
-	let post;
-	beforeEach( async () => {
-		post = await apiFetch( {
-			path: '/wp/v2/posts/',
-			method: 'POST',
-			data: { title: 'New Post Title' },
+const FIXTURES_FOLDER_PATH = './test/integration/fixtures/blocks';
+
+function getFixtureFiles( fixturesFolderPath ) {
+	const fixtureFolder = fs.readdirSync( fixturesFolderPath );
+	return fixtureFolder.filter(
+		( file ) =>
+			file.endsWith( '.html' ) &&
+			! file.endsWith( '.serialized.html' ) &&
+			! file.includes( '_deprecated' )
+	);
+}
+
+function readFixtureContent( fixturePath ) {
+	return fs.readFileSync( fixturePath, 'utf8' );
+}
+
+describe( 'A11y tests for Gutenberg Blocks', () => {
+	const fixtures = getFixtureFiles( FIXTURES_FOLDER_PATH );
+
+	beforeAll( async () => {
+		// Avoids a race condition that makes fail the first requests to the API
+		await loginUser();
+	} );
+
+	for ( const fixture of fixtures.slice( 0, 10 ) ) {
+		const blockName = fixture.replace( '.html', '' );
+		const fixtureContent = readFixtureContent(
+			path.join( FIXTURES_FOLDER_PATH, fixture )
+		);
+
+		it( `${ blockName } should pass a11y tests`, async () => {
+			// Create a new post contining the block
+			const post = await apiFetch( {
+				path: '/wp/v2/posts',
+				method: 'POST',
+				data: {
+					title: blockName,
+					content: fixtureContent,
+					status: 'publish',
+				},
+			} );
+			// Navigate to the post
+			await page.goto( post.link, {
+				waitUntil: 'networkidle0',
+			} );
+			// Test the block for a11y issues
+			await expect( page ).toPassAxeTests( {
+				include: '.entry-content',
+			} );
 		} );
-		console.log( post );
-	} );
-
-	it( 'should pass', () => {
-		expect( post ).toBeTruthy();
-		console.log( post );
-	} );
+	}
 } );

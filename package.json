@@ -270,6 +270,8 @@
 		"publish:latest": "lerna publish --no-private",
 		"test": "npm run lint && npm run test-unit",
 		"test:create-block": "./bin/test-create-block.sh",
+		"test-a11y-blocks": "wp-scripts test-e2e --jest-override-config=a11y-blocks",
+		"test-a11y-blocks:debug": "wp-scripts test-e2e --jest-override-config=a11y-blocks --puppeteer-devtools",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test-e2e:debug": "wp-scripts --inspect-brk test-e2e --config packages/e2e-tests/jest.config.js --puppeteer-devtools",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
