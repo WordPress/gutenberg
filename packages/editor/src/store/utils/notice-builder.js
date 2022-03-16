@@ -44,7 +44,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	// Always should a notice, which will be spoken for accessibility.
 	if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
-		noticeMessage = __( 'Draft saved' );
+		noticeMessage = __( 'Draft saved.' );
 		isDraft = true;
 	} else if ( isPublished && ! willPublish ) {
 		// If undoing publish status, show specific notice.
@@ -66,7 +66,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	const actions = [];
 	if ( shouldShowLink ) {
 		actions.push( {
-			label: isDraft ? 'View Preview' : postType.labels.view_item,
+			label: isDraft ? __( 'View Preview' ) : postType.labels.view_item,
 			url: post.link,
 		} );
 	}
