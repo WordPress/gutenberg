@@ -23,39 +23,59 @@ import { isClientIdSelected } from './utils';
  * When a block is collapsed, we do not count their children as part of that total. In the current drag
  * implementation dragged blocks and their children are not counted.
  *
- * @param {Object} block            block tree
- * @param {Object} expandedState    state that notes which branches are collapsed
- * @param {Array}  draggedClientIds a list of dragged client ids
+ * @param {Object}  block               block tree
+ * @param {Object}  expandedState       state that notes which branches are collapsed
+ * @param {Array}   draggedClientIds    a list of dragged client ids
+ * @param {boolean} isExpandedByDefault flag to determine the default fallback expanded state.
  * @return {number} block count
  */
-function countBlocks( block, expandedState, draggedClientIds ) {
+function countBlocks(
+	block,
+	expandedState,
+	draggedClientIds,
+	isExpandedByDefault
+) {
 	const isDragged = draggedClientIds?.includes( block.clientId );
 	if ( isDragged ) {
 		return 0;
 	}
-	const isExpanded = expandedState[ block.clientId ] ?? true;
+	const isExpanded = expandedState[ block.clientId ] ?? isExpandedByDefault;
+
 	if ( isExpanded ) {
 		return (
 			1 +
 			block.innerBlocks.reduce(
-				countReducer( expandedState, draggedClientIds ),
+				countReducer(
+					expandedState,
+					draggedClientIds,
+					isExpandedByDefault
+				),
 				0
 			)
 		);
 	}
 	return 1;
 }
-const countReducer = ( expandedState, draggedClientIds ) => (
-	count,
-	block
-) => {
+const countReducer = (
+	expandedState,
+	draggedClientIds,
+	isExpandedByDefault
+) => ( count, block ) => {
 	const isDragged = draggedClientIds?.includes( block.clientId );
 	if ( isDragged ) {
 		return count;
 	}
-	const isExpanded = expandedState[ block.clientId ] ?? true;
+	const isExpanded = expandedState[ block.clientId ] ?? isExpandedByDefault;
 	if ( isExpanded && block.innerBlocks.length > 0 ) {
-		return count + countBlocks( block, expandedState, draggedClientIds );
+		return (
+			count +
+			countBlocks(
+				block,
+				expandedState,
+				draggedClientIds,
+				isExpandedByDefault
+			)
+		);
 	}
 	return count + 1;
 };
@@ -94,14 +114,14 @@ function ListViewBranch( props ) {
 					nextPosition += countBlocks(
 						filteredBlocks[ index - 1 ],
 						expandedState,
-						draggedClientIds
+						draggedClientIds,
+						expandNested
 					);
 				}
 
 				const usesWindowing = __experimentalPersistentListViewFeatures;
 
 				const { itemInView } = fixedListWindow;
-
 				const blockInView =
 					! usesWindowing || itemInView( nextPosition );
 
