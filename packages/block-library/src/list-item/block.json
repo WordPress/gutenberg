@@ -14,7 +14,7 @@
 		"content": {
 			"type": "string",
 			"source": "html",
-            "selector": "li",
+    		"selector": "li",
 			"default": "",
 			"__experimentalRole": "content"
 		}
@@ -22,7 +22,5 @@
 	"supports": {
 		"className": false,
 		"__experimentalSelector": "li"
-	},
-	"editorStyle": "wp-block-list-item-editor",
-	"style": "wp-block-list-item"
+	}
 }
