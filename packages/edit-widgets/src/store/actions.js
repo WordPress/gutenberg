@@ -284,12 +284,9 @@ export const saveWidgetArea = ( widgetAreaId ) => async ( {
 const trySaveWidgetArea = ( widgetAreaId ) => ( { registry } ) => {
 	registry
 		.dispatch( coreStore )
-		.saveEditedEntityRecord(
-			KIND,
-			WIDGET_AREA_ENTITY_TYPE,
-			widgetAreaId,
-			{ throwOnError: true }
-		);
+		.saveEditedEntityRecord( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId, {
+			throwOnError: true,
+		} );
 };
 
 /**
