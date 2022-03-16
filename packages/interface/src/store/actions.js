@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+import { store as preferencesStore } from '@wordpress/preferences';
+
+/**
  * Returns an action object used in signalling that an active area should be changed.
  *
  * @param {string} itemType Type of item.
@@ -90,9 +96,13 @@ export function unpinItem( scope, itemId ) {
  * @param {string} featureName The feature name.
  */
 export function toggleFeature( scope, featureName ) {
-	return function ( { select, dispatch } ) {
-		const currentValue = select.isFeatureActive( scope, featureName );
-		dispatch.setFeatureValue( scope, featureName, ! currentValue );
+	return function ( { registry } ) {
+		deprecated( `wp.dispatch( 'core/interface' ).toggleFeature`, {
+			version: '6.0',
+			alternative: `wp.dispatch( 'core/preferences' ).toggle`,
+		} );
+
+		registry.dispatch( preferencesStore ).toggle( scope, featureName );
 	};
 }
 
@@ -107,11 +117,15 @@ export function toggleFeature( scope, featureName ) {
  * @return {Object} Action object.
  */
 export function setFeatureValue( scope, featureName, value ) {
-	return {
-		type: 'SET_FEATURE_VALUE',
-		scope,
-		featureName,
-		value: !! value,
+	return function ( { registry } ) {
+		deprecated( `wp.dispatch( 'core/interface' ).setFeatureValue`, {
+			version: '6.0',
+			alternative: `wp.dispatch( 'core/preferences' ).set`,
+		} );
+
+		registry
+			.dispatch( preferencesStore )
+			.set( scope, featureName, !! value );
 	};
 }
 
@@ -124,9 +138,12 @@ export function setFeatureValue( scope, featureName, value ) {
  * @return {Object} Action object.
  */
 export function setFeatureDefaults( scope, defaults ) {
-	return {
-		type: 'SET_FEATURE_DEFAULTS',
-		scope,
-		defaults,
+	return function ( { registry } ) {
+		deprecated( `wp.dispatch( 'core/interface' ).setFeatureDefaults`, {
+			version: '6.0',
+			alternative: `wp.dispatch( 'core/preferences' ).setDefaults`,
+		} );
+
+		registry.dispatch( preferencesStore ).setDefaults( scope, defaults );
 	};
 }
