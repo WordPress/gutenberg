@@ -9,14 +9,32 @@ import { pressKeyWithModifier } from './press-key-with-modifier';
 /**
  * Sets a site option, from the options-general admin page.
  *
- * @param {string} setting The option, used to get the option by id.
- * @param {string} value   The value to set the option to.
+ * @param {string} setting   The option, used to get the option by id.
+ * @param {string} value     The value to set the option to.
+ * @param {string} adminPage The url of the admin page to visit.
  */
-export async function setOption( setting, value ) {
+export async function setOption(
+	setting,
+	value,
+	adminPage = 'options-general.php'
+) {
 	await switchUserToAdmin();
-	await visitAdminPage( 'options-general.php' );
+	await visitAdminPage( adminPage );
 
 	await page.focus( `#${ setting }` );
+
+	if ( typeof value === 'boolean' ) {
+		const currentValue = await page.$eval(
+			`#${ setting }`,
+			( element ) => element.value
+		);
+		// Update the checkbox.
+		if ( ( currentValue && ! value ) || ( ! currentValue && value ) ) {
+			await page.click( `#${ setting }` );
+		}
+	}
+
+	// Update a text field.
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.type( `#${ setting }`, value );
 
