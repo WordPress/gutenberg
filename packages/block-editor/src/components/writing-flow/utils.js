@@ -1,10 +1,8 @@
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
-
 /**
  *
  * Detects if element is a form element.
  *
- * @param {RefObject} element The element to check.
+ * @param {Element} element The element to check.
  *
  * @return {boolean} True if form element and false otherwise.
  */

@@ -1,6 +1,6 @@
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
 const APPENDER_SELECTOR = '.block-list-appender';
-//const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
+const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
 
 /**
  * Returns true if two elements are contained within the same block.
@@ -18,16 +18,28 @@ export function isInSameBlock( a, b ) {
  * Returns true if an element is considered part of the block and not its inner
  * blocks or appender.
  *
- * @param {Element} blockElement Block container element.
- * @param {Element} element      Element.
+ * @param {Element}                        blockElement Block container element.
+ * @param {Element}                        element      Element.
+ * @param {{ skipBlockInserter: boolean }} options      Custom options to set.
  *
  * @return {boolean} Whether an element is considered part of the block and not
  *                   its inner blocks or appender.
  */
-export function isInsideRootBlock( blockElement, element ) {
+export function isInsideRootBlock(
+	blockElement,
+	element,
+	options = { skipBlockInserter: false }
+) {
 	const parentBlock = element.closest(
 		[ BLOCK_SELECTOR, APPENDER_SELECTOR ].join( ',' )
 	);
+	// Skip inserter for blocks such as group block.
+	if (
+		options.skipBlockInserter &&
+		parentBlock?.classList.contains( BLOCK_APPENDER_CLASS )
+	) {
+		return false;
+	}
 	return parentBlock === blockElement;
 }
 
