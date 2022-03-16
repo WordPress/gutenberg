@@ -131,6 +131,7 @@ function CommentTemplateInnerBlocks( {
 					activeComment={ activeComment }
 					setActiveComment={ setActiveComment }
 					blocks={ blocks }
+					firstComment={ firstComment }
 				/>
 			) : null }
 		</li>
@@ -184,6 +185,8 @@ const MemoizedCommentTemplatePreview = memo( CommentTemplatePreview );
  * @param {Array}  [props.activeComment]    - The block that is currently active.
  * @param {Array}  [props.setActiveComment] - The setter for activeComment.
  * @param {Array}  [props.blocks]           - Array of blocks returned from
+ * @param {Object} [props.firstComment]     - The first comment in the array of
+ *                                          comment objects.
  *                                          getBlocks() in parent .
  * @return {WPElement}                 		List of comments.
  */
@@ -193,6 +196,7 @@ const CommentsList = ( {
 	activeComment,
 	setActiveComment,
 	blocks,
+	firstComment,
 } ) => (
 	<ol { ...blockProps }>
 		{ comments &&
@@ -206,7 +210,7 @@ const CommentsList = ( {
 						activeComment={ activeComment }
 						setActiveComment={ setActiveComment }
 						blocks={ blocks }
-						firstComment={ comments[ 0 ] }
+						firstComment={ firstComment }
 					/>
 				</BlockContextProvider>
 			) ) }
@@ -293,6 +297,7 @@ export default function CommentTemplateEdit( {
 			blocks={ blocks }
 			activeComment={ activeComment }
 			setActiveComment={ setActiveComment }
+			firstComment={ commentTree[ 0 ] }
 		/>
 	);
 }
