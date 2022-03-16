@@ -24,16 +24,17 @@ interface EntityRecordResolution< RecordType > {
 }
 
 interface Options {
-	__experimentalEnabled: boolean;
+	enabled: boolean;
 }
 
 /**
  * Resolves the specified entity record.
  *
- * @param  kind     Kind of the requested entity.
- * @param  name     Name of the requested  entity.
- * @param  recordId Record ID of the requested entity.
- * @param  options
+ * @param  kind                                 Kind of the requested entity.
+ * @param  name                                 Name of the requested  entity.
+ * @param  recordId                             Record ID of the requested entity.
+ * @param  options                              Hook options.
+ * @param  [options.enabled=true] Whether to run the query or short-circuit and return null. Defaults to true.
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -63,16 +64,16 @@ export default function __experimentalUseEntityRecord< RecordType >(
 	kind: string,
 	name: string,
 	recordId: string | number,
-	options: Options = { __experimentalEnabled: true }
+	options: Options = { enabled: true }
 ): EntityRecordResolution< RecordType > {
 	const { data: record, ...rest } = useQuerySelect(
 		( query ) => {
-			if ( ! options.__experimentalEnabled ) {
+			if ( ! options.enabled ) {
 				return null;
 			}
 			return query( coreStore ).getEntityRecord( kind, name, recordId );
 		},
-		[ kind, name, recordId, options.__experimentalEnabled ]
+		[ kind, name, recordId, options.enabled ]
 	);
 
 	return {

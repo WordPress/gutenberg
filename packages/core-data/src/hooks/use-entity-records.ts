@@ -29,7 +29,7 @@ interface EntityRecordsResolution< RecordType > {
 }
 
 interface Options {
-	__experimentalEnabled: boolean;
+	enabled: boolean;
 }
 
 /**
@@ -39,8 +39,7 @@ interface Options {
  * @param  name                                 Name of the requested entities.
  * @param  queryArgs                            HTTP query for the requested entities.
  * @param  options                              Hook options.
- * @param  [options.__experimentalEnabled=true] Whether to run the query or short-circuit and return null. Defaults to true.
- *
+ * @param  [options.enabled=true] Whether to run the query or short-circuit and return null. Defaults to true.
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -76,7 +75,7 @@ export default function __experimentalUseEntityRecords< RecordType >(
 	kind: string,
 	name: string,
 	queryArgs: unknown = {},
-	options: Options = { __experimentalEnabled: true }
+	options: Options = { enabled: true }
 ): EntityRecordsResolution< RecordType > {
 	// Serialize queryArgs to a string that can be safely used as a React dep.
 	// We can't just pass queryArgs as one of the deps, because if it is passed
@@ -86,12 +85,12 @@ export default function __experimentalUseEntityRecords< RecordType >(
 
 	const { data: records, ...rest } = useQuerySelect(
 		( query ) => {
-			if ( ! options.__experimentalEnabled ) {
+			if ( ! options.enabled ) {
 				return {};
 			}
 			return query( coreStore ).getEntityRecords( kind, name, queryArgs );
 		},
-		[ kind, name, queryAsString, options.__experimentalEnabled ]
+		[ kind, name, queryAsString, options.enabled ]
 	);
 
 	return {
