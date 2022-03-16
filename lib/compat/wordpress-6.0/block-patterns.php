@@ -35,9 +35,13 @@ function gutenberg_register_remote_theme_patterns() {
 add_action(
 	'current_screen',
 	function( $current_screen ) {
-		$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
-		$theme_has_support  = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
-		if ( ! get_theme_support( 'core-block-patterns' ) || ! $should_load_remote || ! $theme_has_support ) {
+		if ( ! get_theme_support( 'core-block-patterns' ) ) {
+			return;
+		}
+		if ( ! apply_filters( 'should_load_remote_block_patterns', true ) ) {
+			return;
+		}
+		if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 			return;
 		}
 
