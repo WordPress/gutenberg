@@ -1,11 +1,3 @@
-/**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
- * Internal dependencies
- */
 const jestE2EConfig = require( './jest-e2e.config' );
 
 const jestA11yBlocks = {
