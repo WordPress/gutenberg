@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import UnitControl from './unit-control';
 import { LABELS } from './utils';
 import { Layout } from './styles/box-control-styles';
@@ -113,27 +114,37 @@ export default function AxialInputControls( {
 			align="top"
 			className="component-box-control__vertical-horizontal-input-controls"
 		>
-			{ filteredSides.map( ( side ) => (
-				<UnitControl
-					{ ...props }
-					isFirst={ first === side }
-					isLast={ last === side }
-					isOnly={ only === side }
-					value={ side === 'vertical' ? values.top : values.left }
-					unit={
-						side === 'vertical'
-							? selectedUnits.top
-							: selectedUnits.left
-					}
-					onChange={ createHandleOnChange( side ) }
-					onUnitChange={ createHandleOnUnitChange( side ) }
-					onFocus={ createHandleOnFocus( side ) }
-					onHoverOn={ createHandleOnHoverOn( side ) }
-					onHoverOff={ createHandleOnHoverOff( side ) }
-					label={ LABELS[ side ] }
-					key={ side }
-				/>
-			) ) }
+			{ filteredSides.map( ( side ) => {
+				const [
+					parsedQuantity,
+					parsedUnit,
+				] = parseQuantityAndUnitFromRawValue(
+					side === 'vertical' ? values.top : values.left
+				);
+				const selectedUnit =
+					side === 'vertical'
+						? selectedUnits.top
+						: selectedUnits.left;
+				return (
+					<UnitControl
+						{ ...props }
+						isFirst={ first === side }
+						isLast={ last === side }
+						isOnly={ only === side }
+						value={ [
+							parsedQuantity,
+							selectedUnit ?? parsedUnit,
+						].join( '' ) }
+						onChange={ createHandleOnChange( side ) }
+						onUnitChange={ createHandleOnUnitChange( side ) }
+						onFocus={ createHandleOnFocus( side ) }
+						onHoverOn={ createHandleOnHoverOn( side ) }
+						onHoverOff={ createHandleOnHoverOff( side ) }
+						label={ LABELS[ side ] }
+						key={ side }
+					/>
+				);
+			} ) }
 		</Layout>
 	);
 }
