@@ -227,9 +227,9 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 		$src = "local($font_family)";
 
 		foreach ( $value as $item ) {
-
-			if ( 0 === strpos( $item['url'], get_site_url() ) ) {
-				$item['url'] = wp_make_link_relative( $item['url'] );
+			if ( 0 === strpos( $item['url'], 'file:./' ) ) {
+				$absolute_path_to_url = get_stylesheet_directory_uri() . '/' . str_replace( 'file:./', '', $item['url'] );
+				$item['url']          = wp_make_link_relative( $absolute_path_to_url );
 			}
 
 			$src .= ( 'data' === $item['format'] )
