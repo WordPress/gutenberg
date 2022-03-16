@@ -9,6 +9,9 @@ import userEvent from '@testing-library/user-event';
  */
 import FormFileUpload from '../';
 
+/**
+ * Browser dependencies
+ */
 const { File } = window;
 
 function render( jsx ) {
