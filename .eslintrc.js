@@ -251,7 +251,7 @@ module.exports = {
 		{
 			files: [
 				'**/@(storybook|stories)/*',
-				'packages/components/src/**/*.{ts,tsx}',
+				'packages/components/src/**/*.tsx',
 			],
 			rules: {
 				// Useful to add story descriptions via JSDoc without specifying params,
