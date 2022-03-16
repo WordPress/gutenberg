@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
@@ -29,11 +28,14 @@ function getMediaSourceUrlBySizeSlug( media, slug ) {
 const addFeaturedImageToolbarItem = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
-			const { attributes, setAttributes, name: blockName } = props;
+			const {
+				attributesContext = [],
+				attributes,
+				setAttributes,
+				name: blockName,
+			} = props;
 
-			const [ bindFeaturedImage, setBindFeaturedImage ] = useState(
-				false
-			);
+			const { useFeaturedImage } = attributes;
 
 			const { sizeSlug } = attributes;
 			const [ featuredImage ] = useEntityProp(
@@ -52,11 +54,9 @@ const addFeaturedImageToolbarItem = createHigherOrderComponent(
 			);
 			const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 
-			useEffect( () => {
-				if ( bindFeaturedImage ) {
-					setAttributes( { url: mediaUrl } );
-				}
-			}, [ mediaUrl ] );
+			if ( useFeaturedImage ) {
+				attributesContext.push( { url: mediaUrl } );
+			}
 
 			if (
 				( 'core/image' !== blockName && 'core/cover' !== blockName ) ||
@@ -71,12 +71,16 @@ const addFeaturedImageToolbarItem = createHigherOrderComponent(
 							icon={ group /*this is temporary*/ }
 							label={ __( 'Use featured image' ) }
 							onClick={ () => {
-								setBindFeaturedImage( ! bindFeaturedImage );
-								setAttributes( { url: mediaUrl } );
+								setAttributes( {
+									useFeaturedImage: ! useFeaturedImage,
+								} );
 							} }
 						/>
 					</BlockControls>
-					<BlockEdit { ...props } />
+					<BlockEdit
+						{ ...props }
+						attributesContext={ attributesContext }
+					/>
 				</>
 			);
 		};
@@ -86,6 +90,6 @@ const addFeaturedImageToolbarItem = createHigherOrderComponent(
 
 addFilter(
 	'editor.BlockEdit',
-	'my-plugin/with-inspector-controls',
+	'core/edit-post/bind-featured-image',
 	addFeaturedImageToolbarItem
 );

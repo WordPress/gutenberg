@@ -66,6 +66,9 @@
 		"sizeSlug": {
 			"type": "string"
 		},
+		"useFeaturedImage": {
+			"type": "boolean"
+		},
 		"linkDestination": {
 			"type": "string"
 		},

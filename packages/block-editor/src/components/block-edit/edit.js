@@ -13,7 +13,7 @@ import {
 	hasBlockSupport,
 	getBlockType,
 } from '@wordpress/blocks';
-import { useContext, useMemo } from '@wordpress/element';
+import { useContext, useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,9 +31,18 @@ import BlockContext from '../block-context';
 const DEFAULT_BLOCK_CONTEXT = {};
 
 export const Edit = ( props ) => {
-	const { attributes = {}, name } = props;
+	const {
+		attributesContext = [],
+		setAttributes,
+		attributes = {},
+		name,
+	} = props;
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
+
+	useEffect( () => {
+		attributesContext.map( ( ctxAttr ) => setAttributes( ctxAttr ) );
+	}, [ attributesContext ] );
 
 	// Assign context values using the block type's declared context needs.
 	const context = useMemo( () => {
