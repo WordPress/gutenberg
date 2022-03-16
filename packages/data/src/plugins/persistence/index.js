@@ -422,7 +422,7 @@ export function migrateThirdPartyFeaturePreferencesToPreferencesStore(
 			continue;
 		}
 
-		// Skip this scope if there are no features to migrates
+		// Skip this scope if there are no features to migrate.
 		const featuresToMigrate = interfaceScopes[ scope ];
 		if ( ! featuresToMigrate ) {
 			continue;
