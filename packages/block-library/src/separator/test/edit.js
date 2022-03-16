@@ -69,7 +69,7 @@ describe( 'Separator block edit method', () => {
 			className: 'has-text-color has-alpha-channel-opacity',
 			style: {
 				backgroundColor: '#ff0000',
-				color: undefined,
+				color: '#ff0000',
 			},
 		} );
 	} );
@@ -87,7 +87,7 @@ describe( 'Separator block edit method', () => {
 		expect( useBlockProps ).toHaveBeenCalledWith( {
 			className: 'has-text-color has-alpha-channel-opacity',
 			style: {
-				backgroundColor: undefined,
+				backgroundColor: '#ff0000',
 				color: '#ff0000',
 			},
 		} );

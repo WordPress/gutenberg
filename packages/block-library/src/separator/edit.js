@@ -19,7 +19,7 @@ import {
 import useDeprecatedOpacity from './use-deprecated-opacity';
 
 export default function SeparatorEdit( { attributes, setAttributes } ) {
-	const { backgroundColor, opacity, style, className } = attributes;
+	const { backgroundColor, opacity, style } = attributes;
 	const colorProps = useColorProps( attributes );
 	const currentColor = colorProps?.style?.backgroundColor;
 	const hasCustomColor = !! style?.color?.background;
@@ -30,29 +30,26 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 	// using color, not backgroundColor.
 	const colorClass = getColorClassName( 'color', backgroundColor );
 
-	const classNames = classnames( colorProps.classname, {
-		'has-text-color': backgroundColor || currentColor,
-		[ colorClass ]: colorClass,
-		'has-css-opacity': opacity === 'css',
-		'has-alpha-channel-opacity': opacity === 'alpha-channel',
-	} );
+	const className = classnames(
+		{
+			'has-text-color': backgroundColor || currentColor,
+			[ colorClass ]: colorClass,
+			'has-css-opacity': opacity === 'css',
+			'has-alpha-channel-opacity': opacity === 'alpha-channel',
+		},
+		colorProps.classname
+	);
 
 	const styles = {
-		color:
-			className === 'is-style-dots' && hasCustomColor
-				? currentColor
-				: undefined,
-		backgroundColor:
-			className !== 'is-style-dots' && hasCustomColor
-				? currentColor
-				: undefined,
+		color: currentColor,
+		backgroundColor: currentColor,
 	};
 
 	return (
 		<>
 			<HorizontalRule
 				{ ...useBlockProps( {
-					className: classNames,
+					className,
 					style: hasCustomColor ? styles : undefined,
 				} ) }
 			/>

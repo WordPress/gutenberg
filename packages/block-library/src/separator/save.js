@@ -23,14 +23,18 @@ export default function separatorSave( { attributes } ) {
 	// using color, not backgroundColor.
 	const colorClass = getColorClassName( 'color', backgroundColor );
 
-	const className = classnames( colorProps.className, {
-		'has-text-color': backgroundColor || customColor,
-		[ colorClass ]: colorClass,
-		'has-css-opacity': opacity === 'css',
-		'has-alpha-channel-opacity': opacity === 'alpha-channel',
-	} );
+	const className = classnames(
+		{
+			'has-text-color': backgroundColor || customColor,
+			[ colorClass ]: colorClass,
+			'has-css-opacity': opacity === 'css',
+			'has-alpha-channel-opacity': opacity === 'alpha-channel',
+		},
+		colorProps.className
+	);
 
 	const styles = {
+		backgroundColor: colorProps?.style?.backgroundColor,
 		color: colorClass ? undefined : customColor,
 	};
 	return <hr { ...useBlockProps.save( { className, style: styles } ) } />;
