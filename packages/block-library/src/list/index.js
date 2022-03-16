@@ -43,6 +43,6 @@ const settingsV1 = {
 	deprecated,
 };
 
-export const settings = window.__experimentalEnableListBlockV2
+export const settings = window?.__experimentalEnableListBlockV2
 	? settingsV2
 	: settingsV1;
