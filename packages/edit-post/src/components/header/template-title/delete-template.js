@@ -28,7 +28,7 @@ export default function DeleteTemplate() {
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const { getEditorSettings } = useSelect( editorStore );
 	const { updateEditorSettings, editPost } = useDispatch( editorStore );
-	const { throwingDeleteEntityRecord } = useDispatch( coreStore );
+	const { deleteEntityRecord } = useDispatch( coreStore );
 	const { template } = useSelect( ( select ) => {
 		const { isEditingTemplate, getEditedPostTemplate } = select(
 			editPostStore
@@ -67,7 +67,7 @@ export default function DeleteTemplate() {
 			...settings,
 			availableTemplates: newAvailableTemplates,
 		} );
-		throwingDeleteEntityRecord( 'postType', 'wp_template', template.id );
+		deleteEntityRecord( 'postType', 'wp_template', template.id, { throwOnError: true } );
 	};
 
 	return (

@@ -23,7 +23,7 @@ export default function NewTemplatePart( { postType } ) {
 	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { throwingSaveEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
 
 	async function createTemplatePart( { title, area } ) {
 		if ( ! title ) {
@@ -40,7 +40,7 @@ export default function NewTemplatePart( { postType } ) {
 				kebabCase( title ).replace( /[^\w-]+/g, '' ) ||
 				'wp-custom-part';
 
-			const templatePart = await throwingSaveEntityRecord(
+			const templatePart = await saveEntityRecord(
 				'postType',
 				'wp_template_part',
 				{
@@ -48,7 +48,8 @@ export default function NewTemplatePart( { postType } ) {
 					title,
 					content: '',
 					area,
-				}
+				},
+				{ throwOnError: true }
 			);
 
 			setIsModalOpen( false );

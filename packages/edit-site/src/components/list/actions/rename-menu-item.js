@@ -19,7 +19,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 	const [ title, setTitle ] = useState( () => template.title.rendered );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	const { editEntityRecord, throwingSaveEditedEntityRecord } = useDispatch(
+	const { editEntityRecord, saveEditedEntityRecord } = useDispatch(
 		coreStore
 	);
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
@@ -44,10 +44,11 @@ export default function RenameMenuItem( { template, onClose } ) {
 			onClose();
 
 			// Persist edited entity.
-			await throwingSaveEditedEntityRecord(
+			await saveEditedEntityRecord(
 				'postType',
 				template.type,
-				template.id
+				template.id,
+				{ throwOnError: true }
 			);
 
 			createSuccessNotice( __( 'Entity renamed.' ), {
