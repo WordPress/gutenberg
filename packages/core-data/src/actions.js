@@ -209,22 +209,24 @@ export function receiveEmbedPreview( url, preview ) {
 /**
  * Action triggered to delete an entity record.
  *
- * @param {string}   kind                      Kind of the deleted entity record.
- * @param {string}   name                      Name of the deleted entity record.
- * @param {string}   recordId                  Record ID of the deleted entity record.
- * @param {?Object}  query                     Special query parameters for the
- *                                             DELETE API call.
- * @param {Object}   [options]                 Delete options.
- * @param {Function} [options.__unstableFetch] Internal use only. Function to
- *                                             call instead of `apiFetch()`.
- *                                             Must return a promise.
+ * @param {string}   kind                         Kind of the deleted entity.
+ * @param {string}   name                         Name of the deleted entity.
+ * @param {string}   recordId                     Record ID of the deleted entity.
+ * @param {?Object}  query                        Special query parameters for the
+ *                                                DELETE API call.
+ * @param {Object}   [options]                    Delete options.
+ * @param {Function} [options.__unstableFetch]    Internal use only. Function to
+ *                                                call instead of `apiFetch()`.
+ *                                                Must return a promise.
+ * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
+ *                                                the exceptions. Defaults to false.
  */
 export const deleteEntityRecord = (
 	kind,
 	name,
 	recordId,
 	query,
-	{ __unstableFetch = apiFetch } = {}
+	{ __unstableFetch = apiFetch, throwOnError = false } = {}
 ) => async ( { dispatch } ) => {
 	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
 	const entityConfig = find( configs, { kind, name } );
@@ -248,6 +250,7 @@ export const deleteEntityRecord = (
 			recordId,
 		} );
 
+		let hasError = false;
 		try {
 			let path = `${ entityConfig.baseURL }/${ recordId }`;
 
@@ -262,6 +265,7 @@ export const deleteEntityRecord = (
 
 			await dispatch( removeItems( kind, name, recordId, true ) );
 		} catch ( _error ) {
+			hasError = true;
 			error = _error;
 		}
 
@@ -272,6 +276,10 @@ export const deleteEntityRecord = (
 			recordId,
 			error,
 		} );
+
+		if ( hasError && throwOnError ) {
+			throw error;
+		}
 
 		return deletedRecord;
 	} finally {
@@ -386,20 +394,26 @@ export function __unstableCreateUndoLevel() {
 /**
  * Action triggered to save an entity record.
  *
- * @param {string}   kind                       Kind of the received entity.
- * @param {string}   name                       Name of the received entity.
- * @param {Object}   record                     Record to be saved.
- * @param {Object}   options                    Saving options.
- * @param {boolean}  [options.isAutosave=false] Whether this is an autosave.
- * @param {Function} [options.__unstableFetch]  Internal use only. Function to
- *                                              call instead of `apiFetch()`.
- *                                              Must return a promise.
+ * @param {string}   kind                         Kind of the received entity.
+ * @param {string}   name                         Name of the received entity.
+ * @param {Object}   record                       Record to be saved.
+ * @param {Object}   options                      Saving options.
+ * @param {boolean}  [options.isAutosave=false]   Whether this is an autosave.
+ * @param {Function} [options.__unstableFetch]    Internal use only. Function to
+ *                                                call instead of `apiFetch()`.
+ *                                                Must return a promise.
+ * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
+ *                                                the exceptions. Defaults to false.
  */
 export const saveEntityRecord = (
 	kind,
 	name,
 	record,
-	{ isAutosave = false, __unstableFetch = apiFetch } = {}
+	{
+		isAutosave = false,
+		__unstableFetch = apiFetch,
+		throwOnError = false,
+	} = {}
 ) => async ( { select, resolveSelect, dispatch } ) => {
 	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
 	const entityConfig = find( configs, { kind, name } );
@@ -445,6 +459,7 @@ export const saveEntityRecord = (
 		} );
 		let updatedRecord;
 		let error;
+		let hasError = false;
 		try {
 			const path = `${ entityConfig.baseURL }${
 				recordId ? '/' + recordId : ''
@@ -567,6 +582,7 @@ export const saveEntityRecord = (
 				);
 			}
 		} catch ( _error ) {
+			hasError = true;
 			error = _error;
 		}
 		dispatch( {
@@ -577,6 +593,10 @@ export const saveEntityRecord = (
 			error,
 			isAutosave,
 		} );
+
+		if ( hasError && throwOnError ) {
+			throw error;
+		}
 
 		return updatedRecord;
 	} finally {

@@ -64,12 +64,13 @@ Action triggered to delete an entity record.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the deleted entity record.
--   _name_ `string`: Name of the deleted entity record.
--   _recordId_ `string`: Record ID of the deleted entity record.
+-   _kind_ `string`: Kind of the deleted entity.
+-   _name_ `string`: Name of the deleted entity.
+-   _recordId_ `string`: Record ID of the deleted entity.
 -   _query_ `?Object`: Special query parameters for the DELETE API call.
 -   _options_ `[Object]`: Delete options.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+-   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### editEntityRecord
 
@@ -237,6 +238,7 @@ _Parameters_
 -   _options_ `Object`: Saving options.
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+-   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### undo
 
