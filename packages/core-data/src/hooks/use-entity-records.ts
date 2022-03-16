@@ -86,7 +86,9 @@ export default function __experimentalUseEntityRecords< RecordType >(
 	const { data: records, ...rest } = useQuerySelect(
 		( query ) => {
 			if ( ! options.enabled ) {
-				return {};
+				return {
+					data: []
+				};
 			}
 			return query( coreStore ).getEntityRecords( kind, name, queryArgs );
 		},
