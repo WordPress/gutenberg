@@ -100,7 +100,13 @@ export function useFocusFirstElement( clientId ) {
 		const target =
 			( isReverse ? last : first )( textInputs ) || ref.current;
 
-		if ( ! isInsideRootBlock( ref.current, target ) ) {
+		// Backspacing into a caption field should select the parent block
+		// see https://github.com/WordPress/gutenberg/issues/7422
+		// This prevents situation where the caption 'hijacks' focus
+		// and the caret is stuck inside the caption input.
+		const targetIsCaption = target?.nodeName === 'FIGCAPTION';
+
+		if ( targetIsCaption || ! isInsideRootBlock( ref.current, target ) ) {
 			ref.current.focus();
 			return;
 		}
