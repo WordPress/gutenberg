@@ -948,7 +948,7 @@ export const splitSelection = () => ( { select, dispatch } ) => {
 
 	dispatch.replaceBlocks(
 		select.getSelectedBlockClientIds(),
-		[ cloneA, createBlock( 'core/paragraph' ), cloneB ],
+		[ cloneA, createBlock( getDefaultBlockName() ), cloneB ],
 		1, // If we don't pass the `indexToSelect` it will default to the last block.
 		select.getSelectedBlocksInitialCaretPosition()
 	);
