@@ -15,6 +15,22 @@ global $block_core_latest_posts_excerpt_length;
 $block_core_latest_posts_excerpt_length = 0;
 
 /**
+ * Callback for the safecss_filter_attr_allow_css filter used by
+ * the Latest Posts block at render time.
+ *
+ * @param bool   $allow_css       Whether the CSS in the test string is considered safe.
+ * @param string $css_test_string The CSS string to test.
+ * @return bool Whether the CSS in the test string is considered safe.
+ */
+function gutenberg_block_core_latest_posts_filter_allow_css( $allow_css, $css_test_string ) {
+	// Allow transparent background color that is assigned automatically to highlighted text as safe CSS.
+	if ( 'background-color:rgba(0, 0, 0, 0)' === $css_test_string ) {
+		return true;
+	}
+	return $allow_css;
+}
+
+/**
  * Callback for the excerpt_length filter used by
  * the Latest Posts block at render time.
  *
@@ -156,10 +172,14 @@ function render_block_core_latest_posts( $attributes ) {
 				$post_content = __( 'This content is password protected.' );
 			}
 
+			add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_block_core_latest_posts_filter_allow_css', 10, 2 );
+
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-full-content">%1$s</div>',
 				wp_kses_post( $post_content )
 			);
+
+			remove_filter( 'safecss_filter_attr_allow_css', 'gutenberg_block_core_latest_posts_filter_allow_css' );
 		}
 
 		$list_items_markup .= "</li>\n";
