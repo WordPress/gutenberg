@@ -50,40 +50,33 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 	$style_engine        = WP_Style_Engine_Gutenberg::get_instance();
 
 	if ( $has_padding_support ) {
-		$padding_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'padding' ), null );
 
-		if ( null !== $padding_value ) {
-			// Challenge: deal with specificity that inline styles bring us.
-			// We could flag to use `! important` or just leave inline styles for now.
-			$classes[] = $style_engine->add_style_from_attributes(
-				'wp-block-supports',
-				$block_attributes['style'],
-				array( 'spacing', 'padding' ),
-				array(
-					'obfuscate' => true,
-				)
-			);
-		}
+/*
+		// We can also return an obfuscated classname.
+		// Do we need to add !important rules to the stylesheet in this case
+		// seeing as they're not inline?
+		$classes[] = $style_engine->add_style_from_attributes(
+			'wp-block-supports',
+			$block_attributes['style'],
+			array( 'spacing', 'padding' ),
+			array(
+				'obfuscate' => true,
+			)
+		);
+*/
 
-//		if ( is_array( $padding_value ) ) {
-//			foreach ( $padding_value as $key => $value ) {
-//				$styles[] = sprintf( 'padding-%s: %s;', $key, $value );
-//			}
-//		} elseif ( null !== $padding_value ) {
-//			$styles[] = sprintf( 'padding: %s;', $padding_value );
-//		}
+		$styles[] = $style_engine->get_inline_styles_from_attributes(
+			$block_attributes['style'],
+			array( 'spacing', 'padding' )
+		);
 	}
 
 	if ( $has_margin_support ) {
-		$margin_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'margin' ), null );
-
-		if ( is_array( $margin_value ) ) {
-			foreach ( $margin_value as $key => $value ) {
-				$styles[] = sprintf( 'margin-%s: %s;', $key, $value );
-			}
-		} elseif ( null !== $margin_value ) {
-			$styles[] = sprintf( 'margin: %s;', $margin_value );
-		}
+		// As with padding above.
+		$styles[] = $style_engine->get_inline_styles_from_attributes(
+			$block_attributes['style'],
+			array( 'spacing', 'margin' )
+		);
 	}
 
 	// Collect classes and styles.

@@ -42,6 +42,10 @@ class WP_Style_Engine_Gutenberg {
 				'value_key'  => 'padding',
 				'value_func' => 'gutenberg_get_style_engine_css_box_rules',
 			),
+			'margin' => array(
+				'value_key'  => 'margin',
+				'value_func' => 'gutenberg_get_style_engine_css_box_rules',
+			),
 		),
 	);
 
@@ -115,9 +119,11 @@ class WP_Style_Engine_Gutenberg {
 			return;
 		}
 
-		if ( ! empty( $options['obfuscate'] ) && $options['obfuscate'] === true ) {
+		if ( ! empty( $options['obfuscate'] ) && true === $options['obfuscate'] ) {
+			// Generate a consistent, obfuscated key by hashing a unique class based on the rules.
+			// Outputs something like .wp-my-key__002d308c.
 			// Will we ever need to decode/decrypt the classname?
-			// If so, look at openssl_encrypt()
+			// If so, look at openssl_encrypt().
 			$class = $key . '__' . hash( 'crc32', $class );
 		}
 
@@ -150,6 +156,30 @@ class WP_Style_Engine_Gutenberg {
 	}
 
 	/**
+	 * Returns an CSS ruleset destined to be inserted in an HTML `style` attribute.
+	 * Styles are bundled based on the instructions in STYLE_DEFINITIONS_METADATA.
+	 *
+	 * @param array $block_attributes An array of styles from a block's attributes.
+	 * @param array $path             An array of strings representing a path to the style value.
+	 *
+	 * @return string A CSS ruleset formatted to be placed in an HTML `style` attribute.
+	 */
+	public function get_inline_styles_from_attributes( $block_attributes, $path ) {
+		if ( ! is_array( $block_attributes ) || ! is_array( $path ) ) {
+			return;
+		}
+
+		$style_value = _wp_array_get( $block_attributes, $path, null );
+		$rules       = $this->get_style_css_rules( $style_value, $path );
+		$output      = '';
+
+		foreach ( $rules as $rule => $value ) {
+			$output .= "{$rule}: {$value}; ";
+		}
+		return $output;
+	}
+
+	/**
 	 * Accepts and parses a Gutenberg attributes->style object and returns add_style()
 	 * Stores style rules for a given CSS selector (the key) and returns an associated classname.
 	 *
@@ -166,14 +196,15 @@ class WP_Style_Engine_Gutenberg {
 		}
 
 		$style_value = _wp_array_get( $block_attributes, $path, null );
-		$rules       = $this->get_style_css_rules( $style_value, $path );
-		$suffix      = '';
 
-		if ( is_array( $style_value ) ) {
-			$suffix = implode( '-', array_values( $style_value ) );
-		} elseif ( null !== $style_value ) {
-			$suffix = str_replace( ' ', '-', $style_value );
+		if ( ! $style_value ) {
+			return;
 		}
+
+		$rules = $this->get_style_css_rules( $style_value, $path );
+
+		// Collect individual CSS property values so we can build a unique classname.
+		$suffix = is_array( $style_value ) ? implode( '-', array_values( $style_value ) ) : str_replace( ' ', '-', $style_value );
 
 		$options = array_merge(
 			$options,
