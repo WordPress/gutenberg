@@ -7,8 +7,8 @@
 				"blockName": "core/paragraph",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n<p></p>\n",
-				"innerContent": [ "\n<p></p>\n" ]
+				"innerHTML": "\n<p>No results found</p>\n",
+				"innerContent": [ "\n<p>No results found</p>\n" ]
 			}
 		],
 		"innerHTML": "\n\n",

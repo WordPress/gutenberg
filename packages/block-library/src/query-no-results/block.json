@@ -4,7 +4,7 @@
 	"name": "core/query-no-results",
 	"title": "No results",
 	"category": "theme",
-	"description": "Displays when no content is found.",
+	"description": "Contains the block elements used to render content when no query results are found.",
 	"parent": [ "core/query" ],
 	"textdomain": "default",
 	"usesContext": [ "queryId", "query" ],

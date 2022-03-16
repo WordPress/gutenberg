@@ -8,7 +8,7 @@
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"content": "",
+					"content": "No results found",
 					"dropCap": false
 				},
 				"innerBlocks": []
