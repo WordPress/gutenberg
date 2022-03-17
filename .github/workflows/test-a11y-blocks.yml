@@ -1,4 +1,4 @@
-name: Test-a11y-blocks
+name: A11y tests for rendered blocks
 
 on:
     pull_request:
