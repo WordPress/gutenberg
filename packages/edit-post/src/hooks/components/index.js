@@ -70,6 +70,7 @@ const addFeaturedImageToolbarItem = createHigherOrderComponent(
 						<ToolbarButton
 							icon={ group /*this is temporary*/ }
 							label={ __( 'Use featured image' ) }
+							isPressed={ useFeaturedImage }
 							onClick={ () => {
 								setAttributes( {
 									useFeaturedImage: ! useFeaturedImage,
