@@ -98,8 +98,8 @@ export function useFocusFirstElement( clientId ) {
 		}
 
 		// Check to see if element is focussable before a generic caret insert.
-		if ( ! target.getAttribute( 'contenteditable' ) ) {
-			const focusElement = focus.tabbable.findNext( target );
+		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
+			const focusElement = focus.tabbable.findNext( ref.current );
 			const rootBlockOptions = {
 				skipBlockInserter: true,
 			};
