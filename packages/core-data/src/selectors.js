@@ -165,7 +165,7 @@ export function getEntityConfig( state, kind, name ) {
  * @param {number}  key   Record's key
  * @param {?Object} query Optional query.
  *
- * @return {Object?} Record.
+ * @return {Object|undefined} Record.
  */
 export const getEntityRecord = createSelector(
 	( state, kind, name, key, query ) => {
@@ -191,7 +191,7 @@ export const getEntityRecord = createSelector(
 		const item = queriedState.items[ context ]?.[ key ];
 		if ( item && query._fields ) {
 			const filteredItem = {};
-			const fields = getNormalizedCommaSeparable( query._fields );
+			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
 			for ( let f = 0; f < fields.length; f++ ) {
 				const field = fields[ f ].split( '.' );
 				const value = get( item, field );
@@ -520,10 +520,10 @@ export function hasEditsForEntityRecord( state, kind, name, recordId ) {
 /**
  * Returns the specified entity record, merged with its edits.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param {Object}        state    State tree.
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Record ID.
  *
  * @return {Object?} The entity record, merged with its edits.
  */
@@ -579,10 +579,10 @@ export function isAutosavingEntityRecord( state, kind, name, recordId ) {
 /**
  * Returns true if the specified entity record is saving, and false otherwise.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param {Object}        state    State tree.
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Record ID.
  *
  * @return {boolean} Whether the entity record is saving or not.
  */
@@ -938,7 +938,7 @@ export function __experimentalGetTemplateForLink( state, link ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {Object?} The Global Styles object.
+ * @return {Object|null} The Global Styles object.
  */
 export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
 	const currentTheme = getCurrentTheme( state );
@@ -953,7 +953,7 @@ export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
  *
  * @param {Object} state Data state.
  *
- * @return {string} The current global styles ID.
+ * @return {string|null} The current global styles ID.
  */
 export function __experimentalGetCurrentThemeGlobalStylesVariations( state ) {
 	const currentTheme = getCurrentTheme( state );
