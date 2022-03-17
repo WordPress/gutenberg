@@ -44,9 +44,6 @@ export interface DataRegistry {
 export interface DataEmitter {
 	emit: () => void;
 	subscribe: ( listener: () => void ) => () => void;
-	pause: () => void;
-	resume: () => void;
-	isPaused: boolean;
 }
 
 // Type Helpers.

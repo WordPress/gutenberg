@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, isObject, forEach } from 'lodash';
+import { mapValues, isObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -177,28 +177,13 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		if ( typeof store.subscribe !== 'function' ) {
 			throw new TypeError( 'store.subscribe must be a function' );
 		}
-		// The emitter is used to keep track of active listeners when the registry
-		// get paused, that way, when resumed we should be able to call all these
-		// pending listeners.
 		store.emitter = createEmitter();
-		const currentSubscribe = store.subscribe;
-		store.subscribe = ( listener ) => {
-			const unsubscribeFromEmitter = store.emitter.subscribe( listener );
-			const unsubscribeFromStore = currentSubscribe( () => {
-				if ( store.emitter.isPaused ) {
-					store.emitter.emit();
-					return;
-				}
-				listener();
-			} );
-
-			return () => {
-				unsubscribeFromStore?.();
-				unsubscribeFromEmitter?.();
-			};
-		};
+		store.subscribe( () => {
+			store.emitter.emit();
+			globalListener();
+		} );
+		store.subscribe = store.emitter.subscribe;
 		stores[ name ] = store;
-		store.subscribe( globalListener );
 	}
 
 	/**
@@ -262,11 +247,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	function batch( callback ) {
-		emitter.pause();
-		forEach( stores, ( store ) => store.emitter.pause() );
 		callback();
-		emitter.resume();
-		forEach( stores, ( store ) => store.emitter.resume() );
 	}
 
 	let registry = {
