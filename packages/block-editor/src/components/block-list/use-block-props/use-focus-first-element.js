@@ -7,13 +7,17 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	focus,
+	isFormElement,
+	isTextField,
+	placeCaretAtHorizontalEdge,
+} from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { isFormElement } from '../../writing-flow/utils';
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { setContentEditableWrapper } from './use-multi-selection';

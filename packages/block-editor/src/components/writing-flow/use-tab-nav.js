@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { focus } from '@wordpress/dom';
+import { focus, isFormElement } from '@wordpress/dom';
 import { TAB, ESCAPE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
@@ -10,7 +10,6 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { isFormElement } from './utils';
 import { store as blockEditorStore } from '../../store';
 
 export default function useTabNav() {
