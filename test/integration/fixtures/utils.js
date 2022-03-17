@@ -6,6 +6,7 @@ import path from 'path';
 import { uniq } from 'lodash';
 
 const FIXTURES_DIR = path.join( __dirname, 'blocks' );
+const STORIES_DIR = path.join( __dirname, '../../../storybook/stories/blocks' );
 
 function readFixtureFile( fixturesDir, filename ) {
 	try {
@@ -18,6 +19,25 @@ function readFixtureFile( fixturesDir, filename ) {
 function writeFixtureFile( fixturesDir, filename, content ) {
 	const file = path.join( fixturesDir, filename );
 	fs.writeFileSync( file, content );
+}
+
+function writeStoryFile( basename ) {
+	const underscoresBasename = basename.replace( /-/g, '_' );
+	const content = `
+		/**
+		 * Internal dependencies
+		 */
+		import ${ underscoresBasename } from '../../../test/integration/fixtures/blocks/${ basename }.serialized.html';
+
+		export default {
+			title: 'Blocks/${ underscoresBasename }',
+		};
+
+		export const _default = () => {
+			return <div dangerouslySetInnerHTML={ { __html: ${ underscoresBasename } } }></div>;
+		};
+	`;
+	return content;
 }
 
 export function blockNameToFixtureBasename( blockName ) {
@@ -93,4 +113,9 @@ export function writeBlockFixtureParsedJSON( basename, fixture ) {
 
 export function writeBlockFixtureSerializedHTML( basename, fixture ) {
 	writeFixtureFile( FIXTURES_DIR, `${ basename }.serialized.html`, fixture );
+}
+
+export function writeBlockFixtureStory( basename ) {
+	const content = writeStoryFile( basename );
+	writeFixtureFile( STORIES_DIR, `${ basename }.js`, content );
 }

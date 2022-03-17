@@ -9,4 +9,5 @@ export {
 	writeBlockFixtureJSON,
 	writeBlockFixtureParsedJSON,
 	writeBlockFixtureSerializedHTML,
+	writeBlockFixtureStory,
 } from './utils';
