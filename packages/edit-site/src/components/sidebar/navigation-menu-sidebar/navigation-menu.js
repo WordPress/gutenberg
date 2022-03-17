@@ -51,7 +51,7 @@ export default function NavigationMenu( { innerBlocks, id } ) {
 	return (
 		<>
 			<ListView
-				instanceId={ id }
+				id={ id }
 				showNestedBlocks
 				showBlockMovers
 				__experimentalFeatures
