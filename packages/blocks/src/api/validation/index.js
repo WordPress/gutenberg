@@ -408,8 +408,8 @@ export const isEqualAttributesOfName = {
 			...[ actual, expected ].map( getTextPiecesSplitOnWhitespace )
 		).length;
 	},
-	style: ( actual, expected, ignoreStylesInValidation ) => {
-		return ignoreStylesInValidation === true
+	style: ( actual, expected, validationRules ) => {
+		return validationRules.ignoreStyles === true
 			? true
 			: isEqual( ...[ actual, expected ].map( getStyleProperties ) );
 	},
@@ -433,7 +433,7 @@ export const isEqualAttributesOfName = {
 export function isEqualTagAttributePairs(
 	actual,
 	expected,
-	ignoreStylesInValidation = false,
+	validationRules = {},
 	logger = createLogger()
 ) {
 	// Attributes is tokenized as tuples. Their lengths should match. This also
@@ -476,7 +476,7 @@ export function isEqualTagAttributePairs(
 				! isEqualAttributes(
 					actualValue,
 					expectedValue,
-					ignoreStylesInValidation
+					validationRules
 				)
 			) {
 				logger.warning(
@@ -511,7 +511,7 @@ export const isEqualTokensOfType = {
 	StartTag: (
 		actual,
 		expected,
-		ignoreStylesInValidation = false,
+		validationRules = {},
 		logger = createLogger()
 	) => {
 		if (
@@ -531,7 +531,7 @@ export const isEqualTokensOfType = {
 
 		return isEqualTagAttributePairs(
 			...[ actual, expected ].map( getMeaningfulAttributePairs ),
-			ignoreStylesInValidation,
+			validationRules,
 			logger
 		);
 	},
@@ -621,7 +621,7 @@ export function isClosedByToken( currentToken, nextToken ) {
 export function isEquivalentHTML(
 	actual,
 	expected,
-	ignoreStylesInValidation = false,
+	validationRules = {},
 	logger = createLogger()
 ) {
 	// Short-circuit if markup is identical.
@@ -673,7 +673,7 @@ export function isEquivalentHTML(
 			! isEqualTokens(
 				actualToken,
 				expectedToken,
-				ignoreStylesInValidation,
+				validationRules,
 				logger
 			)
 		) {
@@ -754,11 +754,11 @@ export function validateBlock( block, blockTypeOrName ) {
 
 		return [ false, logger.getItems() ];
 	}
-	const { ignoreStylesInValidation } = getBlockType( block.name );
+	const { validationRules } = getBlockType( block.name );
 	const isValid = isEquivalentHTML(
 		block.originalContent,
 		generatedBlockContent,
-		ignoreStylesInValidation,
+		validationRules,
 		logger
 	);
 

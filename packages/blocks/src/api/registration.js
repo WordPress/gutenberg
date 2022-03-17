@@ -265,9 +265,9 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		supports: {},
 		styles: [],
 		variations: [],
-		ignoreStylesInValidation: settings.ignoreStylesInValidation
-			? settings.ignoreStylesInValidation
-			: false,
+		validationRules: settings.validationRules
+			? settings.validationRules
+			: {},
 		save: () => null,
 		...serverSideBlockDefinitions?.[ name ],
 		...settings,

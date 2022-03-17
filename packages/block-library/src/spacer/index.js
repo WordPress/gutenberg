@@ -20,5 +20,5 @@ export const settings = {
 	edit,
 	save,
 	deprecated,
-	ignoreStylesInValidation: true,
+	validationRules: { ignoreStyles: true },
 };
