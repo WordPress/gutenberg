@@ -57,15 +57,22 @@ function block_core_gallery_render( $attributes, $content ) {
 		$content,
 		1
 	);
-	$gap_value = $gap ? $gap : 'var( --wp--style--block-gap, 0.5em )';
-	$style     = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_value . '}';
+	$gap_fallback = WP_Theme_JSON_Resolver::theme_has_support() ? '0.5em' : '16px';
+	$gap_value    = $gap ? $gap : 'var( --wp--style--block-gap, ' . $gap_fallback . ' )';
+	$style        = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_value . '}';
+
+	$backwards_compat_style = '';
+	if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) {
+		$backwards_compat_style = '.' . $class . '.wp-block-gallery' . '{ gap: ' . $gap_value . '}';
+	}
+
 	// Ideally styles should be loaded in the head, but blocks may be parsed
 	// after that, so loading in the footer for now.
 	// See https://core.trac.wordpress.org/ticket/53494.
 	add_action(
 		'wp_footer',
-		function () use ( $style ) {
-			echo '<style> ' . $style . '</style>';
+		function () use ( $style, $backwards_compat_style ) {
+			echo '<style> ' . $style . ' ' . $backwards_compat_style . '</style>';
 		}
 	);
 	return $content;
