@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { loginUser } from '@wordpress/e2e-test-utils';
+import { installTheme, activateTheme } from '@wordpress/e2e-test-utils';
 import apiFetch from '@wordpress/api-fetch';
 /**
  * External dependencies
@@ -29,8 +29,9 @@ describe( 'A11y tests for Gutenberg Blocks', () => {
 	const fixtures = getFixtureFiles( FIXTURES_FOLDER_PATH );
 
 	beforeAll( async () => {
-		// Avoids a race condition that makes fail the first requests to the API
-		await loginUser();
+		// Activates the latest default theme
+		await installTheme("twentytwentytwo");
+		await activateTheme("twentytwentytwo");
 	} );
 
 	for ( const fixture of fixtures ) {
