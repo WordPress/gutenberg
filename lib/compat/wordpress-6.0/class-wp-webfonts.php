@@ -23,17 +23,22 @@ class WP_Webfonts {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @access private
-	 * @var array
+	 * @var array[]
 	 */
-	private $webfonts = array();
+	private $registered_webfonts = array();
+
+	/**
+	 * An array of enqueued webfonts.
+	 *
+	 * @var array[]
+	 */
+	private $enqueued_webfonts = array();
 
 	/**
 	 * An array of registered providers.
 	 *
 	 * @since 6.0.0
 	 *
-	 * @access private
 	 * @var array
 	 */
 	private $providers = array();
@@ -72,14 +77,32 @@ class WP_Webfonts {
 	}
 
 	/**
-	 * Get the list of fonts.
+	 * Get the list of registered fonts.
 	 *
 	 * @since 6.0.0
 	 *
-	 * @return array
+	 * @return array[]
 	 */
-	public function get_fonts() {
-		return $this->webfonts;
+	public function get_registered_webfonts() {
+			return $this->registered_webfonts;
+	}
+
+	/**
+	 * Get the list of enqueued fonts.
+	 *
+	 * @return array[]
+	 */
+	public function get_enqueued_webfonts() {
+		return $this->enqueued_webfonts;
+	}
+
+	/**
+	 * Get the list of all fonts.
+	 *
+	 * @return array[]
+	 */
+	public function get_all_webfonts() {
+		return array_merge( $this->get_registered_webfonts(), $this->get_enqueued_webfonts() );
 	}
 
 	/**
@@ -111,11 +134,41 @@ class WP_Webfonts {
 		$slug = $this->get_font_slug( $font );
 
 		// Initialize a new font-family collection.
-		if ( ! isset( $this->webfonts[ $slug ] ) ) {
-			$this->webfonts[ $slug ] = array();
+		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
+			$this->registered_webfonts[ $slug ] = array();
 		}
 
-		$this->webfonts[ $slug ][] = $font;
+		$this->registered_webfonts[ $slug ][] = $font;
+	}
+
+	/**
+	 * Enqueue a font-family that has been already registered.
+	 *
+	 * @param string $font_family_name The font family name to be enqueued.
+	 */
+	public function enqueue_webfont( $font_family_name ) {
+		$slug = $this->get_font_slug( $font_family_name );
+
+		if ( isset( $this->enqueued_webfonts[ $slug ] ) ) {
+			trigger_error(
+				sprintf(
+					/* translators: %s unique slug to identify the webfont */
+					__( 'The "%s" font family is already enqueued.', 'gutenberg' ),
+					$slug
+				)
+			);
+
+			return false;
+		}
+
+		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
+			_doing_it_wrong( __FUNCTION__, sprintf( __( 'The "%s" font family is not registered.' ), $slug ), '6.0.0' );
+
+			return false;
+		}
+
+		$this->enqueued_webfonts[ $slug ] = $this->registered_webfonts[ $slug ];
+		unset( $this->registered_webfonts[ $slug ] );
 	}
 
 	/**
@@ -244,7 +297,7 @@ class WP_Webfonts {
 	 */
 	public function generate_and_enqueue_styles() {
 		// Generate the styles.
-		$styles = $this->generate_styles();
+		$styles = $this->generate_styles( $this->get_enqueued_webfonts() );
 
 		// Bail out if there are no styles to enqueue.
 		if ( '' === $styles ) {
@@ -266,7 +319,7 @@ class WP_Webfonts {
 	 */
 	public function generate_and_enqueue_editor_styles() {
 		// Generate the styles.
-		$styles = $this->generate_styles();
+		$styles = $this->generate_styles( $this->get_all_webfonts() );
 
 		// Bail out if there are no styles to enqueue.
 		if ( '' === $styles ) {
@@ -281,16 +334,17 @@ class WP_Webfonts {
 	 *
 	 * @since 6.0.0
 	 *
+	 * @param array[] $font_families Font families and each of their webfonts.
 	 * @return string $styles Generated styles.
 	 */
-	public function generate_styles() {
+	public function generate_styles( $font_families ) {
 		$styles    = '';
 		$providers = $this->get_providers();
 
 		$webfonts = array();
 
 		// Grab only the font face declarations from $font_families.
-		foreach ( $this->get_fonts() as $font_family ) {
+		foreach ( $font_families as $font_family ) {
 			foreach ( $font_family as $font_face ) {
 				$webfonts[] = $font_face;
 			}
