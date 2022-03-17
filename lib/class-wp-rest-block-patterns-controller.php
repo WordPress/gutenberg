@@ -91,12 +91,12 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'title'      => array(
-					'description' => __( 'The title of the block pattern.', 'gutenberg' ),
+					'description' => __( 'The pattern title, in human readable format.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 				),
 				'name'       => array(
-					'description' => __( 'The name of the block pattern.', 'gutenberg' ),
+					'description' => __( "The pattern name.", 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 				),
@@ -106,12 +106,12 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'categories' => array(
-					'description' => __( 'Categories that the block pattern belongs to.', 'gutenberg' ),
+					'description' => __( "The pattern's category slugs.", 'gutenberg' ),
 					'type'        => 'array',
 					'readonly'    => true,
 				),
 				'content'    => array(
-					'description' => __( 'Block HTML Markup for the pattern.', 'gutenberg' ),
+					'description' => __( 'The pattern content.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 				),
