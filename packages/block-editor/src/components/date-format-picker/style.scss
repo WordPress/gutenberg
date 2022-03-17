@@ -2,15 +2,6 @@
 	margin-bottom: $grid-unit-20;
 }
 
-.block-editor-date-format-picker__header {
-	margin-bottom: $grid-unit-10;
-}
-
-.block-editor-date-format-picker__header__hint {
-	color: $gray-700;
-	margin-left: 4px;
-}
-
 .block-editor-date-format-picker__custom-format-select-control {
 	&.components-base-control {
 		margin-bottom: 0;
@@ -21,7 +12,7 @@
 	}
 }
 
-.block-editor-date-format-picker__custom-format-select-control__other-option {
+.block-editor-date-format-picker__custom-format-select-control__custom-option {
 	border-top: 1px solid $gray-300;
 
 	&.has-hint {

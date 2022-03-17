@@ -6,17 +6,16 @@ import { uniq } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { _x, __ } from '@wordpress/i18n';
+import { _x, __, sprintf } from '@wordpress/i18n';
 import { dateI18n } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';
 import {
 	TextControl,
 	ExternalLink,
 	VisuallyHidden,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	CustomSelectControl,
 	BaseControl,
+	ToggleControl,
 } from '@wordpress/components';
 
 // So that we can illustrate the different formats in the dropdown properly,
@@ -55,42 +54,25 @@ export default function DateFormatPicker( {
 	return (
 		<fieldset className="block-editor-date-format-picker">
 			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
-			<div className="block-editor-date-format-picker__header">
-				{ __( 'Format' ) }
-				<span className="block-editor-date-format-picker__header__hint">
-					{ dateI18n( format || defaultFormat, EXAMPLE_DATE ) }
-				</span>
-			</div>
-			<ToggleGroupControl
-				label={ __( 'Date format' ) }
-				isBlock
-				hideLabelFromVision
-				value={ format ? 'custom' : 'default' }
-				onChange={ ( value ) => {
-					if ( value === 'default' ) {
-						onChange( null );
-					} else if ( value === 'custom' ) {
-						onChange( defaultFormat );
-					}
-				} }
-			>
-				<ToggleGroupControlOption
-					value="default"
-					label={ __( 'Default' ) }
-				/>
-				<ToggleGroupControlOption
-					value="custom"
-					label={ __( 'Custom' ) }
-				/>
-			</ToggleGroupControl>
+			<ToggleControl
+				label={ sprintf(
+					// translators: %s: Example of how the date will be formatted.
+					__( 'Default format (%s)' ),
+					dateI18n( defaultFormat, EXAMPLE_DATE )
+				) }
+				checked={ ! format }
+				onChange={ ( checked ) =>
+					onChange( checked ? null : defaultFormat )
+				}
+			/>
 			{ format && (
-				<CustomControls format={ format } onChange={ onChange } />
+				<NonDefaultControls format={ format } onChange={ onChange } />
 			) }
 		</fieldset>
 	);
 }
 
-function CustomControls( { format, onChange } ) {
+function NonDefaultControls( { format, onChange } ) {
 	// Suggest a short format, medium format, long format, and a standardised
 	// (YYYY-MM-DD) format. The short, medium, and long formats are localised as
 	// different languages have different ways of writing these. For example, 'F
@@ -114,15 +96,15 @@ function CustomControls( { format, onChange } ) {
 			format: suggestedFormat,
 		} )
 	);
-	const otherOption = {
-		key: 'other',
-		name: __( 'Other' ),
+	const customOption = {
+		key: 'custom',
+		name: __( 'Custom' ),
 		className:
-			'block-editor-date-format-picker__custom-format-select-control__other-option',
+			'block-editor-date-format-picker__custom-format-select-control__custom-option',
 		__experimentalHint: __( 'Enter your own date format' ),
 	};
 
-	const [ isOther, setIsOther ] = useState(
+	const [ isCustom, setIsCustom ] = useState(
 		() => !! format && ! suggestedFormats.includes( format )
 	);
 
@@ -131,27 +113,27 @@ function CustomControls( { format, onChange } ) {
 			<BaseControl className="block-editor-date-format-picker__custom-format-select-control">
 				<CustomSelectControl
 					label={ __( 'Choose a format' ) }
-					options={ [ ...suggestedOptions, otherOption ] }
+					options={ [ ...suggestedOptions, customOption ] }
 					value={
-						isOther
-							? otherOption
+						isCustom
+							? customOption
 							: suggestedOptions.find(
 									( option ) => option.format === format
-							  ) ?? otherOption
+							  ) ?? customOption
 					}
 					onChange={ ( { selectedItem } ) => {
-						if ( selectedItem === otherOption ) {
-							setIsOther( true );
+						if ( selectedItem === customOption ) {
+							setIsCustom( true );
 						} else {
-							setIsOther( false );
+							setIsCustom( false );
 							onChange( selectedItem.format );
 						}
 					} }
 				/>
 			</BaseControl>
-			{ isOther && (
+			{ isCustom && (
 				<TextControl
-					label={ __( 'Format string' ) }
+					label={ __( 'Custom format' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(
 						__(

@@ -3,11 +3,11 @@
 The `DateFormatPicker` component renders controls that let the user choose a
 _date format_. That is, how they want their dates to be formatted.
 
-A user can pick either _Default_ to use the site's default date format or
-_Custom_ to choose a date format.
+A user can pick _Default_ to use the default date format (usually set at the
+site level).
 
-Within _Custom_, a user may choose a suggested date format or type in their own
-date format by selecting _Other_.
+Otherwise, a user may choose a suggested date format or type in their own date
+format by selecting _Custom_.
 
 All date format strings should be in the format accepted by by the [`dateI18n`
 function in
@@ -41,7 +41,7 @@ The current date format selected by the user. If `null`, _Default_ is selected.
 -   Type: `string|null`
 -   Required: Yes
 
-### `siteFormat`
+### `defaultFormat`
 
 The default format string. Used to show to the user what the date will look like
 if _Default_ is selected.
