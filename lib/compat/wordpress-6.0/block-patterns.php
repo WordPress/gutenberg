@@ -45,16 +45,6 @@ function gutenberg_register_remote_theme_patterns() {
 	}
 }
 
-add_action(
-	'current_screen',
-	function( $current_screen ) {
-		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
-		if ( $current_screen->is_block_editor || $is_site_editor ) {
-			gutenberg_register_remote_theme_patterns();
-		}
-	}
-);
-
 /**
  * Register any patterns that the active theme may provide under its
  * `./patterns/` directory. Each pattern is defined as a PHP file and defines
