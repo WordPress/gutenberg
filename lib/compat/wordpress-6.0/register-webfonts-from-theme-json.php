@@ -31,6 +31,10 @@ function gutenberg_register_webfonts_from_theme_json() {
 			$font_family['fontFace'] = (array) $font_family['fontFace'];
 
 			foreach ( $font_family['fontFace'] as $font_face ) {
+				if ( isset( $font_face['origin'] ) && 'gutenberg_wp_webfonts_api' === $font_face['origin'] ) {
+					// This webfont was already registered programmatically through the Webfonts API.
+					continue;
+				}
 
 				// Convert keys to kebab-case.
 				foreach ( $font_face as $property => $value ) {
@@ -59,44 +63,6 @@ function gutenberg_register_webfonts_from_theme_json() {
  */
 function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 	$font_families_registered = wp_webfonts()->get_fonts();
-	$font_families_from_theme = array();
-	if ( ! empty( $data['settings'] ) && ! empty( $data['settings']['typography'] ) && ! empty( $data['settings']['typography']['fontFamilies'] ) ) {
-		$font_families_from_theme = $data['settings']['typography']['fontFamilies'];
-	}
-
-	/**
-	 * Helper to get an array of the font-families.
-	 *
-	 * @param array $families_data The font-families data.
-	 *
-	 * @return array The font-families array.
-	 */
-	$get_families = function( $families_data ) {
-		$families = array();
-		foreach ( $families_data as $family ) {
-			if ( isset( $family['font-family'] ) ) {
-				$families[] = $family['font-family'];
-			} elseif ( isset( $family['fontFamily'] ) ) {
-				$families[] = $family['fontFamily'];
-			}
-		}
-
-		// Micro-optimization: Use array_flip( array_flip( $array ) )
-		// instead of array_unique( $array ) because it's faster.
-		// The result is the same.
-		return array_flip( array_flip( $families ) );
-	};
-
-	// Diff the arrays to find the missing fonts.
-	$to_add = array_diff(
-		$get_families( $font_families_registered ),
-		$get_families( $font_families_from_theme )
-	);
-
-	// Bail out early if there are no missing fonts.
-	if ( empty( $to_add ) ) {
-		return $data;
-	}
 
 	// Make sure the path to settings.typography.fontFamilies.theme exists
 	// before adding missing fonts.
@@ -110,24 +76,24 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 		$data['settings']['typography']['fontFamilies'] = array();
 	}
 
-	// Add missing fonts.
-	foreach ( $to_add as $family ) {
-		$font_face = array();
-		foreach ( $font_families_registered as $font_family ) {
-			if ( $family !== $font_family['font-family'] ) {
-				continue;
-			}
-			$camel_cased = array();
-			foreach ( $font_family as $key => $value ) {
+	foreach ( $font_families_registered as $slug => $font_faces_for_family ) {
+		$family = $font_faces_for_family[0]['font-family'];
+
+		$font_faces = array();
+
+		foreach ( $font_faces_for_family as $font_face ) {
+			$camel_cased = array( 'origin' => 'gutenberg_wp_webfonts_api' );
+			foreach ( $font_face as $key => $value ) {
 				$camel_cased[ lcfirst( str_replace( '-', '', ucwords( $key, '-' ) ) ) ] = $value;
 			}
-			$font_face[] = $camel_cased;
+			$font_faces[] = $camel_cased;
 		}
+
 		$data['settings']['typography']['fontFamilies'][] = array(
 			'fontFamily' => false !== strpos( $family, ' ' ) ? "'{$family}'" : $family,
 			'name'       => $family,
-			'slug'       => sanitize_title( $family ),
-			'fontFace'   => $font_face,
+			'slug'       => $slug,
+			'fontFace'   => $font_faces,
 		);
 	}
 
