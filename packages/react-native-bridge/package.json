@@ -1,31 +1,31 @@
 {
-	"name": "@wordpress/react-native-bridge",
-	"version": "1.71.3",
-	"description": "Native bridge library used to integrate the block editor into a native App.",
-	"private": true,
-	"author": "The WordPress Contributors",
-	"license": "GPL-2.0-or-later",
-	"keywords": [
-		"react-native"
-	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-bridge/README.md",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/react-native-bridge"
-	},
-	"bugs": {
-		"url": "https://github.com/WordPress/gutenberg/issues"
-	},
-	"main": "index.js",
-	"react-native": "index",
-	"dependencies": {
-		"@wordpress/react-native-aztec": "file:../react-native-aztec"
-	},
-	"peerDependencies": {
-		"react-native": "*"
-	},
-	"publishConfig": {
-		"access": "public"
-	}
+  "name": "@wordpress/react-native-bridge",
+  "version": "1.72.0",
+  "description": "Native bridge library used to integrate the block editor into a native App.",
+  "private": true,
+  "author": "The WordPress Contributors",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+    "react-native"
+  ],
+  "homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-bridge/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WordPress/gutenberg.git",
+    "directory": "packages/react-native-bridge"
+  },
+  "bugs": {
+    "url": "https://github.com/WordPress/gutenberg/issues"
+  },
+  "main": "index.js",
+  "react-native": "index",
+  "dependencies": {
+    "@wordpress/react-native-aztec": "file:../react-native-aztec"
+  },
+  "peerDependencies": {
+    "react-native": "*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

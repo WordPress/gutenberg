@@ -1,43 +1,43 @@
 {
-	"name": "@wordpress/react-native-aztec",
-	"version": "1.71.3",
-	"description": "Aztec view for react-native.",
-	"private": true,
-	"author": "The WordPress Contributors",
-	"license": "GPL-2.0-or-later",
-	"keywords": [
-		"wordpress",
-		"react-native"
-	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-aztec/README.md",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/react-native-aztec"
-	},
-	"bugs": {
-		"url": "https://github.com/WordPress/gutenberg/issues"
-	},
-	"dependencies": {
-		"@wordpress/element": "file:../element",
-		"@wordpress/keycodes": "file:../keycodes"
-	},
-	"peerDependencies": {
-		"react": "*",
-		"react-native": "*"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"scripts": {
-		"install-aztec-ios": "cd ./ios && carthage bootstrap --platform iOS --cache-builds --use-xcframeworks",
-		"update-aztec-ios": "cd ./ios && carthage update --platform iOS --cache-builds --use-xcframeworks",
-		"clean": "npm run clean-watchman; npm run clean-node; npm run clean-react; npm run clean-metro; npm run clean-jest;",
-		"clean-jest": "rm -rf $TMPDIR/jest_*;",
-		"clean-metro": "rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/metro-bundler-cache-*;",
-		"clean-node": "rm -rf node_modules/;",
-		"clean-react": "rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/react-native-packager-cache-*;",
-		"clean-watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all;",
-		"clean:install": "npm run clean && npm install"
-	}
+  "name": "@wordpress/react-native-aztec",
+  "version": "1.72.0",
+  "description": "Aztec view for react-native.",
+  "private": true,
+  "author": "The WordPress Contributors",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+    "wordpress",
+    "react-native"
+  ],
+  "homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-aztec/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WordPress/gutenberg.git",
+    "directory": "packages/react-native-aztec"
+  },
+  "bugs": {
+    "url": "https://github.com/WordPress/gutenberg/issues"
+  },
+  "dependencies": {
+    "@wordpress/element": "file:../element",
+    "@wordpress/keycodes": "file:../keycodes"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "install-aztec-ios": "cd ./ios && carthage bootstrap --platform iOS --cache-builds --use-xcframeworks",
+    "update-aztec-ios": "cd ./ios && carthage update --platform iOS --cache-builds --use-xcframeworks",
+    "clean": "npm run clean-watchman; npm run clean-node; npm run clean-react; npm run clean-metro; npm run clean-jest;",
+    "clean-jest": "rm -rf $TMPDIR/jest_*;",
+    "clean-metro": "rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/metro-bundler-cache-*;",
+    "clean-node": "rm -rf node_modules/;",
+    "clean-react": "rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/react-native-packager-cache-*;",
+    "clean-watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all;",
+    "clean:install": "npm run clean && npm install"
+  }
 }
