@@ -237,7 +237,31 @@ add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container'
  * @return string Filtered block content.
  */
 function gutenberg_restore_image_outer_container( $block_content, $block ) {
-	$image_with_align = '/(^\s*<figure.*?class=["\'])(.*\bwp-block-image\b[^"\']*\b(?:alignleft|alignright|aligncenter)\b[^"\']*)(["\'][^>]*>.*<\/figure>)/iU';
+	$image_with_align = "
+/# 1) everything up to the class attribute contents
+(
+	^\s*
+	<figure\b
+	[^>]*
+	\bclass=
+	[\"']
+)
+# 2) the class attribute contents
+(
+	[^\"']*
+	\bwp-block-image\b
+	[^\"']*
+	\b(?:alignleft|alignright|aligncenter)\b
+	[^\"']*
+)
+# 3) everything after the class attribute contents
+(
+	[\"']
+	[^>]*
+	>
+	.*
+	<\/figure>
+)/iUx";
 
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() ||
