@@ -1,0 +1,28 @@
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.edit-site-navigation-inspector {
+	padding: $grid-unit-20;
+}
+
+.edit-site-navigation-inspector__placeholder {
+	padding: $grid-unit-10;
+	margin: $grid-unit-10;
+	background-color: $gray-100;
+	animation: loadingpulse 1s linear infinite;
+	animation-delay: 0.5s; // avoid animating for fast network responses
+}
+
+.edit-site-navigation-inspector__placeholder.is-child {
+	margin-left: $grid-unit-30;
+	width: 50%;
+}
