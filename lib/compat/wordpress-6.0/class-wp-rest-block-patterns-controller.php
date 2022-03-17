@@ -76,15 +76,15 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		// Load block patterns from w.org.
-		_load_remote_block_patterns(); // patterns with the `core` keyword
-		_load_remote_featured_patterns(); // patterns in the `featured` category
-		gutenberg_register_remote_theme_patterns(); // patterns requested by current theme
+		_load_remote_block_patterns(); // Patterns with the `core` keyword.
+		_load_remote_featured_patterns(); // Patterns in the `featured` category.
+		gutenberg_register_remote_theme_patterns(); // Patterns requested by current theme.
 
 		$response = array();
 		$patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
 		foreach ( $patterns as $pattern ) {
 			$prepared_pattern = $this->prepare_item_for_response( $pattern, $request );
-			$response[] = $this->prepare_response_for_collection( $prepared_pattern );
+			$response[]       = $this->prepare_response_for_collection( $prepared_pattern );
 		}
 		return rest_ensure_response( $response );
 	}
@@ -98,11 +98,11 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$prepared_pattern = array(
-			'name'           => $item['name'],
-			'title'          => $item['title'],
-			'blockTypes'     => $item['blockTypes'],
-			'categories'     => $item['categories'],
-			'content'        => $item['content'],
+			'name'       => $item['name'],
+			'title'      => $item['title'],
+			'blockTypes' => $item['blockTypes'],
+			'categories' => $item['categories'],
+			'content'    => $item['content'],
 		);
 
 		$prepared_pattern = $this->add_additional_fields_to_object( $prepared_pattern, $request );
@@ -127,7 +127,7 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'name'       => array(
-					'description' => __( "The pattern name.", 'gutenberg' ),
+					'description' => __( 'The pattern name.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 				),
