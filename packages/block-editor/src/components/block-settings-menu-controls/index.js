@@ -26,11 +26,13 @@ import { store as blockEditorStore } from '../../store';
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
 const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
-	const { selectedBlocks, selectedClientIds } = useSelect(
+	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
 		( select ) => {
-			const { getBlocksByClientId, getSelectedBlockClientIds } = select(
-				blockEditorStore
-			);
+			const {
+				getBlocksByClientId,
+				getSelectedBlockClientIds,
+				canRemoveBlocks,
+			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
@@ -39,6 +41,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 					( block ) => block.name
 				),
 				selectedClientIds: ids,
+				canRemove: canRemoveBlocks( ids ),
 			};
 		},
 		[ clientIds ]
@@ -50,7 +53,8 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	// and pass this props down to ConvertToGroupButton.
 	const convertToGroupButtonProps = useConvertToGroupButtonProps();
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
-	const showConvertToGroupButton = isGroupable || isUngroupable;
+	const showConvertToGroupButton =
+		( isGroupable || isUngroupable ) && canRemove;
 
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks, selectedClientIds } }>
