@@ -147,7 +147,7 @@ function CoverHeightInput( {
 		);
 
 		return [ parsedQuantity, unit ].join( '' );
-	}, [ temporaryInput, value ] );
+	}, [ temporaryInput, unit, value ] );
 
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
