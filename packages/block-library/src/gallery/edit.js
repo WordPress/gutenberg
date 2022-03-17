@@ -54,6 +54,7 @@ import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
+import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -548,6 +549,12 @@ function GalleryEdit( props ) {
 				/>
 			</BlockControls>
 			{ noticeUI }
+			{ Platform.isWeb && (
+				<GapStyles
+					blockGap={ attributes.style?.spacing?.blockGap }
+					clientId={ clientId }
+				/>
+			) }
 			<Gallery
 				{ ...props }
 				images={ images }
