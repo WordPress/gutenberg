@@ -308,7 +308,7 @@ export const getMethodName = (
  *
  * @param {string} kind Kind
  *
- * @return {Array} Entities
+ * @return {(thunkArgs: object) => Promise<Array>} Entities
  */
 export const getOrLoadEntitiesConfig = ( kind ) => async ( {
 	select,

@@ -51,7 +51,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
 	const size = Math.max(
-		itemIds.length,
+		itemIds?.length ?? 0,
 		nextItemIdsStartIndex + nextItemIds.length
 	);
 
@@ -66,7 +66,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 		mergedItemIds[ i ] = isInNextItemsRange
 			? nextItemIds[ i - nextItemIdsStartIndex ]
-			: itemIds[ i ];
+			: itemIds?.[ i ];
 	}
 
 	return mergedItemIds;
@@ -116,10 +116,10 @@ export function items( state = {}, action ) {
  * In such cases, completeness is used as an indication of whether it would be
  * safe to use queried data for a non-`_fields`-limited request.
  *
- * @param {Object<string,boolean>} state  Current state.
- * @param {Object}                 action Dispatched action.
+ * @param {Object<string,Object<string,boolean>>} state  Current state.
+ * @param {Object}                                action Dispatched action.
  *
- * @return {Object<string,boolean>} Next state.
+ * @return {Object<string,Object<string,boolean>>} Next state.
  */
 export function itemIsComplete( state = {}, action ) {
 	switch ( action.type ) {
