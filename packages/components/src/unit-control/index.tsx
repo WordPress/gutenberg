@@ -61,8 +61,7 @@ function UnforwardedUnitControl(
 	if ( typeof unitProp !== 'undefined' ) {
 		deprecated( 'UnitControl unit prop', {
 			since: '5.6',
-			hint:
-				'Please provide a unit with a value through the `value` prop.',
+			hint: 'The unit should be provided within the `value` prop.',
 			version: '6.2',
 		} );
 	}
