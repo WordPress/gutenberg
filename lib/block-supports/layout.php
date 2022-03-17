@@ -233,29 +233,57 @@ add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container'
  * to avoid breaking styles relying on that div.
  *
  * @param string $block_content Rendered block content.
+ * @param  array  $block        Block object.
  * @return string Filtered block content.
  */
-function gutenberg_restore_image_outer_container( $block_content ) {
-	$image_with_align = '/(^\s*<figure\b[^>]*)\bwp-block-image\b([^"]*\b(?:alignleft|alignright|aligncenter)\b[^>]*>.*<\/figure>)/U';
+function gutenberg_restore_image_outer_container( $block_content, $block ) {
+	$image_with_align = "
+/# 1) everything up to the class attribute contents
+(
+	^\s*
+	<figure\b
+	[^>]*
+	\bclass=
+	[\"']
+)
+# 2) the class attribute contents
+(
+	[^\"']*
+	\bwp-block-image\b
+	[^\"']*
+	\b(?:alignleft|alignright|aligncenter)\b
+	[^\"']*
+)
+# 3) everything after the class attribute contents
+(
+	[\"']
+	[^>]*
+	>
+	.*
+	<\/figure>
+)/iUx";
 
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() ||
-		0 === preg_match( $image_with_align, $block_content )
+		0 === preg_match( $image_with_align, $block_content, $matches )
 	) {
 		return $block_content;
 	}
 
-	$updated_content = preg_replace_callback(
-		$image_with_align,
-		static function( $matches ) {
-			return '<div class="wp-block-image">' . $matches[1] . $matches[2] . '</div>';
-		},
-		$block_content
-	);
-	return $updated_content;
+	$wrapper_classnames = array( 'wp-block-image' );
+
+	// If the block has a classNames attribute these classnames need to be removed from the content and added back
+	// to the new wrapper div also.
+	if ( ! empty( $block['attrs']['className'] ) ) {
+		$wrapper_classnames = array_merge( $wrapper_classnames, explode( ' ', $block['attrs']['className'] ) );
+	}
+	$content_classnames          = explode( ' ', $matches[2] );
+	$filtered_content_classnames = array_diff( $content_classnames, $wrapper_classnames );
+
+	return '<div class="' . implode( ' ', $wrapper_classnames ) . '">' . $matches[1] . implode( ' ', $filtered_content_classnames ) . $matches[3] . '</div>';
 }
 
 if ( function_exists( 'wp_restore_image_outer_container' ) ) {
-	remove_filter( 'render_block_core/image', 'wp_restore_image_outer_container', 10, 1 );
+	remove_filter( 'render_block_core/image', 'wp_restore_image_outer_container', 10, 2 );
 }
-add_filter( 'render_block_core/image', 'gutenberg_restore_image_outer_container', 10, 1 );
+add_filter( 'render_block_core/image', 'gutenberg_restore_image_outer_container', 10, 2 );

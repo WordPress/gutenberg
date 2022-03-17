@@ -70,19 +70,19 @@ export function getQueryParts( query ) {
 				// While in theory, we could exclude "_fields" from the stableKey
 				// because two request with different fields have the same results
 				// We're not able to ensure that because the server can decide to omit
-				// fields from the response even if we explicitely asked for it.
+				// fields from the response even if we explicitly asked for it.
 				// Example: Asking for titles in posts without title support.
 				if ( key === '_fields' ) {
-					parts.fields = getNormalizedCommaSeparable( value );
+					parts.fields = getNormalizedCommaSeparable( value ) ?? [];
 					// Make sure to normalize value for `stableKey`
 					value = parts.fields.join();
 				}
 
 				// Two requests with different include values cannot have same results.
 				if ( key === 'include' ) {
-					parts.include = getNormalizedCommaSeparable( value ).map(
-						Number
-					);
+					parts.include = (
+						getNormalizedCommaSeparable( value ) ?? []
+					).map( Number );
 					// Normalize value for `stableKey`.
 					value = parts.include.join();
 				}

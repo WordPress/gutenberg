@@ -10,12 +10,6 @@
  * `theme.json` file.
  */
 function gutenberg_register_remote_theme_patterns() {
-	$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
-	$theme_has_support  = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
-	if ( ! get_theme_support( 'core-block-patterns' ) || ! $should_load_remote || ! $theme_has_support ) {
-		return;
-	}
-
 	$pattern_settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_patterns();
 	if ( empty( $pattern_settings ) ) {
 		return;
@@ -38,4 +32,22 @@ function gutenberg_register_remote_theme_patterns() {
 	}
 }
 
-add_action( 'init', 'gutenberg_register_remote_theme_patterns' );
+add_action(
+	'current_screen',
+	function( $current_screen ) {
+		if ( ! get_theme_support( 'core-block-patterns' ) ) {
+			return;
+		}
+		if ( ! apply_filters( 'should_load_remote_block_patterns', true ) ) {
+			return;
+		}
+		if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+			return;
+		}
+
+		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
+		if ( $current_screen->is_block_editor || $is_site_editor ) {
+			gutenberg_register_remote_theme_patterns();
+		}
+	}
+);

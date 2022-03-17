@@ -107,7 +107,22 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
-		"html": false
+		"html": false,
+		"units": [ "px", "em", "rem", "vh", "vw" ],
+		"spacing": {
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		},
+		"__experimentalLayout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"allowEditing": false,
+			"default": {
+				"type": "flex"
+			}
+		}
 	},
 	"editorStyle": "wp-block-gallery-editor",
 	"style": "wp-block-gallery"

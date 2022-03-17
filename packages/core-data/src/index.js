@@ -15,16 +15,16 @@ import { rootEntitiesConfig, getMethodName } from './entities';
 import { STORE_NAME } from './name';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
-// (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecordss)
-// Instead of getEntityRecord, the consumer could use more user-frieldly named selector: getPostType, getTaxonomy...
+// (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
+// Instead of getEntityRecord, the consumer could use more user-friendly named selector: getPostType, getTaxonomy...
 // The "kind" and the "name" of the entity are combined to generate these shortcuts.
 
 const entitySelectors = rootEntitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name ) ] = ( state, key, query ) =>
 		selectors.getEntityRecord( state, kind, name, key, query );
-	result[ getMethodName( kind, name, 'get', true ) ] = ( state, ...args ) =>
-		selectors.getEntityRecords( state, kind, name, ...args );
+	result[ getMethodName( kind, name, 'get', true ) ] = ( state, query ) =>
+		selectors.getEntityRecords( state, kind, name, query );
 	return result;
 }, {} );
 
@@ -35,13 +35,8 @@ const entityResolvers = rootEntitiesConfig.reduce( ( result, entity ) => {
 	const pluralMethodName = getMethodName( kind, name, 'get', true );
 	result[ pluralMethodName ] = ( ...args ) =>
 		resolvers.getEntityRecords( kind, name, ...args );
-	result[ pluralMethodName ].shouldInvalidate = ( action, ...args ) =>
-		resolvers.getEntityRecords.shouldInvalidate(
-			action,
-			kind,
-			name,
-			...args
-		);
+	result[ pluralMethodName ].shouldInvalidate = ( action ) =>
+		resolvers.getEntityRecords.shouldInvalidate( action, kind, name );
 	return result;
 }, {} );
 
