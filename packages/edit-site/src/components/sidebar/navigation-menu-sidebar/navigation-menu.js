@@ -31,7 +31,7 @@ const ALLOWED_BLOCKS = {
 	],
 };
 
-export default function NavigationMenu( { innerBlocks } ) {
+export default function NavigationMenu( { innerBlocks, id } ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
 	//TODO: Block settings are normally updated as a side effect of rendering InnerBlocks in BlockList
@@ -51,6 +51,7 @@ export default function NavigationMenu( { innerBlocks } ) {
 	return (
 		<>
 			<ListView
+				instanceId={ id }
 				showNestedBlocks
 				showBlockMovers
 				__experimentalFeatures

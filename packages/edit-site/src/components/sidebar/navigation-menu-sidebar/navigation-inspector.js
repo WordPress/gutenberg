@@ -9,6 +9,8 @@ import {
 	store as blockEditorStore,
 	BlockEditorProvider,
 } from '@wordpress/block-editor';
+import { speak } from '@wordpress/a11y';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,6 +24,7 @@ export default function NavigationInspector() {
 		selectedNavigationBlockId,
 		clientIdToRef,
 		navigationMenus,
+		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
 		firstNavigationBlockId,
 	} = useSelect( ( select ) => {
@@ -31,9 +34,11 @@ export default function NavigationInspector() {
 			getBlock,
 		} = select( blockEditorStore );
 
-		const { getNavigationMenus, hasFinishedResolution } = select(
-			coreStore
-		);
+		const {
+			getNavigationMenus,
+			hasFinishedResolution,
+			isResolving,
+		} = select( coreStore );
 
 		// Get the active Navigation block (if present).
 		const selectedNavId = __experimentalGetActiveBlockIdByBlockNames(
@@ -53,12 +58,21 @@ export default function NavigationInspector() {
 			firstNavigationBlockId: navBlockIds?.[ 0 ],
 			clientIdToRef: idToRef,
 			navigationMenus: getNavigationMenus( NAVIGATION_MENUS_QUERY[ 0 ] ),
+			isResolvingNavigationMenus: isResolving(
+				'getNavigationMenus',
+				NAVIGATION_MENUS_QUERY
+			),
 			hasResolvedNavigationMenus: hasFinishedResolution(
 				'getNavigationMenus',
 				NAVIGATION_MENUS_QUERY
 			),
 		};
 	}, [] );
+
+	const navMenuListId = useInstanceId(
+		NavigationMenu,
+		'edit-site-navigation-inspector-menu'
+	);
 
 	const firstNavRefInTemplate = clientIdToRef[ firstNavigationBlockId ];
 	const firstNavigationMenuRef = navigationMenus?.[ 0 ]?.id;
@@ -97,10 +111,15 @@ export default function NavigationInspector() {
 		{ id: currentMenuId || defaultNavigationMenuId }
 	);
 
-	const { hasLoadedInnerBlocks } = useSelect(
+	const { isLoadingInnerBlocks, hasLoadedInnerBlocks } = useSelect(
 		( select ) => {
-			const { hasFinishedResolution } = select( coreStore );
+			const { isResolving, hasFinishedResolution } = select( coreStore );
 			return {
+				isLoadingInnerBlocks: isResolving( 'getEntityRecord', [
+					'postType',
+					'wp_navigation',
+					currentMenuId || defaultNavigationMenuId,
+				] ),
 				hasLoadedInnerBlocks: hasFinishedResolution(
 					'getEntityRecord',
 					[
@@ -116,6 +135,26 @@ export default function NavigationInspector() {
 
 	const isLoading = ! ( hasResolvedNavigationMenus && hasLoadedInnerBlocks );
 
+	useEffect( () => {
+		if ( isResolvingNavigationMenus ) {
+			speak( 'Loading Navigation sidebar menus.' );
+		}
+
+		if ( hasResolvedNavigationMenus ) {
+			speak( 'Navigation sidebar menus have loaded.' );
+		}
+	}, [ isResolvingNavigationMenus, hasResolvedNavigationMenus ] );
+
+	useEffect( () => {
+		if ( isLoadingInnerBlocks ) {
+			speak( 'Loading Navigation sidebar selected menu items.' );
+		}
+
+		if ( hasLoadedInnerBlocks ) {
+			speak( 'Navigation sidebar selected menu items have loaded.' );
+		}
+	}, [ isLoadingInnerBlocks, hasLoadedInnerBlocks ] );
+
 	return (
 		<div className="edit-site-navigation-inspector">
 			{ ! hasResolvedNavigationMenus && (
@@ -123,6 +162,10 @@ export default function NavigationInspector() {
 			) }
 			{ hasResolvedNavigationMenus && (
 				<SelectControl
+					aria-controls={
+						// aria-controls should only apply when referenced element is in DOM
+						hasLoadedInnerBlocks ? navMenuListId : undefined
+					}
 					value={ currentMenuId || defaultNavigationMenuId }
 					options={ options }
 					onChange={ ( newMenuId ) =>
@@ -143,7 +186,10 @@ export default function NavigationInspector() {
 					onChange={ onChange }
 					onInput={ onInput }
 				>
-					<NavigationMenu innerBlocks={ innerBlocks } />
+					<NavigationMenu
+						id={ navMenuListId }
+						innerBlocks={ innerBlocks }
+					/>
 				</BlockEditorProvider>
 			) }
 		</div>
