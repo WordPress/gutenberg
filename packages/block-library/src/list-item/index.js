@@ -18,4 +18,10 @@ export const settings = {
 	icon,
 	edit,
 	save,
+	merge( attributes, attributesToMerge ) {
+		return {
+			...attributes,
+			content: attributes.content + attributesToMerge.content,
+		};
+	},
 };
