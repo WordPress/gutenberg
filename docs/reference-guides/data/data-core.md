@@ -127,7 +127,7 @@ _Parameters_
 -   _state_ `Object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `number|string`: Record ID.
 
 _Returns_
 
@@ -220,7 +220,7 @@ _Parameters_
 
 _Returns_
 
--   `Object?`: Record.
+-   `Object|undefined`: Record.
 
 ### getEntityRecordEdits
 
@@ -531,7 +531,7 @@ _Parameters_
 -   _state_ `Object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `number|string`: Record ID.
 
 _Returns_
 

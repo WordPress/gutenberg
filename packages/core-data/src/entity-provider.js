@@ -15,6 +15,8 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
  */
 import { STORE_NAME } from './name';
 
+/** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
+
 const EMPTY_ARRAY = [];
 
 /**

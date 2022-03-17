@@ -8,7 +8,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
-import { Status } from './constants';
+import type { Status } from './constants';
 
 interface EntityRecordsResolution< RecordType > {
 	/** The requested entity record */
@@ -29,6 +29,11 @@ interface EntityRecordsResolution< RecordType > {
 }
 
 interface Options {
+	/**
+	 * Whether to run the query or short-circuit and return null.
+	 *
+	 * @default true
+	 */
 	enabled: boolean;
 }
 
@@ -39,7 +44,6 @@ interface Options {
  * @param  name                                 Name of the requested entities.
  * @param  queryArgs                            HTTP query for the requested entities.
  * @param  options                              Hook options.
- * @param  [options.enabled=true] Whether to run the query or short-circuit and return null. Defaults to true.
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -68,13 +72,13 @@ interface Options {
  * application, the list of records and the resolution details will be retrieved from
  * the store state using `getEntityRecords()`, or resolved if missing.
  *
- * @return {EntityRecordsResolution<RecordType>} Entity records data.
+ * @return Entity records data.
  * @template RecordType
  */
 export default function __experimentalUseEntityRecords< RecordType >(
 	kind: string,
 	name: string,
-	queryArgs: unknown = {},
+	queryArgs: Record< string, unknown > = {},
 	options: Options = { enabled: true }
 ): EntityRecordsResolution< RecordType > {
 	// Serialize queryArgs to a string that can be safely used as a React dep.
