@@ -41,7 +41,7 @@ jobs:
 
             - name: Running the tests
               run: |
-                  $( npm bin )/wp-scripts test-a11y-blocks
+                  $( npm bin )/wp-scripts test-e2e --jest-override-config=a11y-blocks
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
               uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
