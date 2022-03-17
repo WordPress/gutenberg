@@ -14,10 +14,6 @@ describe( 'Gutenberg Editor Audio Block tests', () => {
 
 		const block = await editorPage.getFirstBlockVisible();
 		await expect( block ).toBeTruthy();
-	} );
-
-	it( 'should add an audio file to the block', async () => {
-		const block = await editorPage.getFirstBlockVisible();
 
 		block.click();
 
