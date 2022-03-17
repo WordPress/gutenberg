@@ -11,7 +11,7 @@ import {
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { useState, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,8 +19,6 @@ import { useState, useMemo } from '@wordpress/element';
 import { MAX_SPACER_SIZE } from './edit';
 
 function DimensionInput( { label, onChange, isResizing, value = '' } ) {
-	const [ temporaryInput, setTemporaryInput ] = useState( null );
-
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
 
 	// In most contexts the spacer size cannot meaningfully be set to a
@@ -42,34 +40,23 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	} );
 
 	const handleOnChange = ( unprocessedValue ) => {
-		setTemporaryInput( null );
 		onChange( unprocessedValue );
 	};
 
-	const handleOnBlur = () => {
-		if ( temporaryInput !== null ) {
-			setTemporaryInput( null );
-		}
-	};
-
 	const computedValue = useMemo( () => {
-		const inputValue = temporaryInput !== null ? temporaryInput : value;
 		const [ parsedQuantity, parsedUnit ] = parseQuantityAndUnitFromRawValue(
-			inputValue
+			value
 		);
-
 		// Force the unit to update to `px` when the Spacer is being resized.
 		return [ parsedQuantity, isResizing ? 'px' : parsedUnit ].join( '' );
-	}, [ isResizing, temporaryInput, value ] );
+	}, [ isResizing, value ] );
 
 	return (
 		<BaseControl label={ label } id={ inputId }>
 			<UnitControl
 				id={ inputId }
-				isResetValueOnUnitChange
 				min={ 0 }
 				max={ MAX_SPACER_SIZE }
-				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				style={ { maxWidth: 80 } }
 				value={ computedValue }
