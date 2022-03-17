@@ -51,7 +51,7 @@ import {
 	MIN_WIDTH,
 	MIN_WIDTH_UNIT,
 } from './utils.js';
-import { createBlock } from '@wordpress/blocks';
+import { cloneBlock } from '@wordpress/blocks';
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
@@ -72,7 +72,6 @@ export default function SearchEdit( {
 		width,
 		widthUnit,
 		align,
-		buttonText,
 		buttonPosition,
 		buttonUseIcon,
 		style,
@@ -90,9 +89,10 @@ export default function SearchEdit( {
 		},
 		[ clientId ]
 	);
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const {
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceInnerBlocks,
+	} = useDispatch( blockEditorStore );
 	useEffect( () => {
 		if ( ! insertedInNavigationBlock ) return;
 		// This side-effect should not create an undo level.
@@ -259,30 +259,29 @@ export default function SearchEdit( {
 		backgroundColor: attributes.backgroundColor,
 		textColor: attributes.textColor,
 		gradient: attributes.gradient,
-		text: [
-			// TODO: get that icon to render:
-			buttonUseIcon ? <Icon icon={ search } /> : false,
-			buttonUseIcon ? 'icon' : false,
-			// Naive for now:
-			prevAttrs.text
-				? prevAttrs.text[ prevAttrs.text.length - 1 ]
-				: 'Search',
-		],
+		// TODO: Use icon when needed
+		text: prevAttrs.text || 'Search',
 	} );
 
 	const template = useMemo(
 		() => [ [ 'core/button', getNextButtonAttrs() ] ],
 		[]
 	);
-	const value = useMemo( () => {
-		const prevAttrs = getBlocks( clientId )[ 0 ]?.attributes;
-		const nextAttrs = getNextButtonAttrs( prevAttrs );
-		return [ createBlock( 'core/button', nextAttrs, [] ) ];
+	useEffect( () => {
+		const prevBlock = getBlocks( clientId )[ 0 ];
+		const nextBlock = cloneBlock(
+			prevBlock,
+			getNextButtonAttrs( prevBlock?.attributes ),
+			[]
+		);
+		replaceInnerBlocks( clientId, [ nextBlock ] );
 	}, [
 		isButtonPositionInside,
 		buttonUseIcon,
-		colorProps,
-		borderProps,
+		// Must serialize these two, they are new objects each time and
+		// keep triggering the effect
+		JSON.stringify( colorProps ),
+		JSON.stringify( borderProps ),
 		hasInnerBlocks,
 		clientId,
 	] );
@@ -290,11 +289,7 @@ export default function SearchEdit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		orientation: 'horizontal',
 		renderAppender: false,
-		value,
-		onChange: () => {},
-		onInput: () => {},
 		template,
-		templateLock: 'all',
 		allowedBlocks: ALLOWED_BLOCKS,
 	} );
 	const button = <div { ...innerBlocksProps } />;

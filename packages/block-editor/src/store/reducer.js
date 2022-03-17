@@ -1276,6 +1276,15 @@ function selectionHelper( state = {}, action ) {
  * @return {boolean} Updated state.
  */
 export function selection( state = {}, action ) {
+	if (
+		action.clientId ===
+		document.querySelector( '.wp-block-button' )?.dataset?.block
+	) {
+		action.clientId = document.querySelector(
+			'.wp-block-search'
+		)?.dataset?.block;
+	}
+
 	switch ( action.type ) {
 		case 'SELECTION_CHANGE':
 			return {
