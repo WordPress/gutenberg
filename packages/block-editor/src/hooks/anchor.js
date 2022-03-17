@@ -25,6 +25,13 @@ import { InspectorControls } from '../components';
  */
 const ANCHOR_REGEX = /[\s#]/g;
 
+const ANCHOR_SCHEMA = {
+	type: 'string',
+	source: 'attribute',
+	attribute: 'id',
+	selector: '*',
+};
+
 /**
  * Filters registered block settings, extending attributes with anchor using ID
  * of the first node.
@@ -42,12 +49,7 @@ export function addAttribute( settings ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
-			anchor: {
-				type: 'string',
-				source: 'attribute',
-				attribute: 'id',
-				selector: '*',
-			},
+			anchor: ANCHOR_SCHEMA,
 		};
 	}
 
