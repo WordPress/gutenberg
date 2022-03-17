@@ -302,7 +302,7 @@ jobs:
     npm-publish:
         name: Publish WordPress packages to npm
         runs-on: ubuntu-latest
-        environment: npm organization
+        environment: WordPress packages
         needs: [bump-version, build]
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
