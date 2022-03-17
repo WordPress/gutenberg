@@ -219,6 +219,53 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
 	return sprintf( '%s:var(--wp--preset--%s--%s);', $css_property, $css_property, $slug );
 }
 
+function gutenberg_get_typography_font_size_value( $preset ) {
+	// This is where we'll keep options I guess.
+	// Comment out to show how things work.
+	$typography_settings = gutenberg_get_global_settings( array( 'typography' ) );
+
+//	if ( ! isset( $typography_settings['fluid'] ) ) {
+//		return $preset['size'];
+//	}
+
+	// Should be defined by theme.json, maybe take from layout?
+	$minimum_viewport_width = 640 / 16; // rem for now. 1200(px) / 16 to get rem.
+	$maximum_viewport_width = 1600 / 16; // Ditto.
+
+	/*
+	Up next;
+	 - Challenge: looping through fontSizes and calculating clamp functions for every size relies preferably on rem/px or unitless values.
+	 - Apply this to custom font-size values.
+	 */
+
+	// Matches rem or unitless values only.
+	$pattern = '/^(\d*\.?\d+)(rem|px)?$/';
+	preg_match_all( $pattern, $preset['size'], $matches );
+
+	if ( isset( $matches[1][0] ) ) {
+		$base_value = intval( $matches[1][0] );
+
+		if ( isset( $matches[2][0] ) && 'px' === $matches[2][0] ) {
+			// Calculate rem to px.
+
+			$base_value = $base_value / 16;
+		}
+
+		$minimum_font_size = $base_value * 1; // A min value should ideally be coming from theme.json.
+		$maximum_font_size = $base_value * 1.5; // Ditto on the max.
+		$factor            = ( 1 / ( $maximum_viewport_width - $minimum_viewport_width ) ) * ( $maximum_font_size - $minimum_font_size );
+		$calc_rem          = $minimum_font_size - ( $minimum_viewport_width * $factor );
+		$calc_vw           = 100 * $factor;
+		$min               = min( $minimum_font_size, $maximum_font_size );
+		$max               = max( $minimum_font_size, $maximum_font_size );
+
+		return "clamp({$min}rem, {$calc_rem}rem + {$calc_vw}vw, {$max}rem)";
+
+	} else {
+		return $preset['size'];
+	}
+}
+
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'typography',
