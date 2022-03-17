@@ -14,6 +14,7 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	clickButton,
+	openListView,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -61,7 +62,7 @@ describe( 'Gallery', () => {
 
 		// The Gallery needs to be selected from the List view panel due to the
 		// way that Image uploads take and lose focus.
-		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+		await openListView();
 		const galleryListLink = await page.waitForXPath(
 			`//a[contains(text(), 'Gallery')]`
 		);
