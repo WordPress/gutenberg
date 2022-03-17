@@ -344,9 +344,9 @@ const variations = [
 	},
 	{
 		name: 'wolfram-cloud',
-		title: 'Wolfram Cloud',
+		title: 'Wolfram',
 		icon: embedWolframIcon,
-		description: __( 'Embed Wolfram Cloud notebook content.' ),
+		description: __( 'Embed Wolfram notebook content.' ),
 		patterns: [ /^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+/i ],
 		attributes: { providerNameSlug: 'wolfram-cloud', responsive: true },
 	},
