@@ -58,7 +58,7 @@ add_action(
  * its metadata using plugin-style headers. The minimum required definition is:
  *
  *     /**
- *      * Pattern Name: My Pattern
+ *      * Title: My Pattern
  *      *
  *
  * The output of the PHP source corresponds to the content of the pattern, e.g.:
@@ -83,7 +83,7 @@ add_action(
  */
 function gutenberg_register_theme_block_patterns() {
 	$default_headers = array(
-		'title'         => 'Pattern Name',
+		'title'         => 'Title',
 		'slug'          => 'Slug',
 		'description'   => 'Description',
 		'viewportWidth' => 'Viewport Width',
