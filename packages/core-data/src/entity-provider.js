@@ -29,7 +29,9 @@ const entityContexts = {
 		if ( ! acc[ loader.kind ] ) {
 			acc[ loader.kind ] = {};
 		}
-		acc[ loader.kind ][ loader.name ] = { context: createContext() };
+		acc[ loader.kind ][ loader.name ] = {
+			context: createContext( undefined ),
+		};
 		return acc;
 	}, {} ),
 	...additionalEntityConfigLoaders.reduce( ( acc, loader ) => {
@@ -43,7 +45,9 @@ const getEntityContext = ( kind, name ) => {
 	}
 
 	if ( ! entityContexts[ kind ][ name ] ) {
-		entityContexts[ kind ][ name ] = { context: createContext() };
+		entityContexts[ kind ][ name ] = {
+			context: createContext( undefined ),
+		};
 	}
 
 	return entityContexts[ kind ][ name ].context;
