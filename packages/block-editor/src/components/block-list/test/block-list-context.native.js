@@ -77,9 +77,7 @@ describe( 'deleteBlockLayoutByClientId', () => {
 			ROOT_LEVEL_ID
 		);
 
-		expect( findDeletedBlock ).toEqual(
-			expect.not.objectContaining( { clientId: ROOT_LEVEL_ID } )
-		);
+		expect( findDeletedBlock ).toBeNull();
 	} );
 
 	it( "deletes a nested block's layout data with inner blocks", () => {
@@ -95,11 +93,7 @@ describe( 'deleteBlockLayoutByClientId', () => {
 			NESTED_WITH_INNER_BLOCKS_ID
 		);
 
-		expect( findDeletedBlock ).toEqual(
-			expect.not.objectContaining( {
-				clientId: NESTED_WITH_INNER_BLOCKS_ID,
-			} )
-		);
+		expect( findDeletedBlock ).toBeNull();
 	} );
 
 	it( "deletes a deep nested block's layout data", () => {
@@ -115,16 +109,12 @@ describe( 'deleteBlockLayoutByClientId', () => {
 			DEEP_NESTED_ID
 		);
 
-		expect( findDeletedBlock ).toEqual(
-			expect.not.objectContaining( {
-				clientId: DEEP_NESTED_ID,
-			} )
-		);
+		expect( findDeletedBlock ).toBeNull();
 	} );
 } );
 
 describe( 'updateBlocksLayouts', () => {
-	it( "adds a new block's layout data at root level im an empty object", () => {
+	it( "adds a new block's layout data at root level with an empty object", () => {
 		const {
 			blocksLayouts,
 			findBlockLayoutByClientId,
@@ -141,7 +131,10 @@ describe( 'updateBlocksLayouts', () => {
 		);
 
 		expect( findAddedBlock ).toEqual(
-			expect.objectContaining( { clientId: BLOCK_CLIENT_ID } )
+			expect.objectContaining( {
+				clientId: BLOCK_CLIENT_ID,
+				rootClientId: undefined,
+			} )
 		);
 	} );
 
@@ -181,11 +174,12 @@ describe( 'updateBlocksLayouts', () => {
 		expect( findAddedInnerBlock ).toEqual(
 			expect.objectContaining( {
 				clientId: PARAGRAPH_BLOCK_LAYOUT_DATA.clientId,
+				rootClientId: PARENT_BLOCK_CLIENT_ID,
 			} )
 		);
 	} );
 
-	it( "adds a new block's layout data at a deep level", () => {
+	it( "adds a new block's layout data at deep level", () => {
 		const {
 			findBlockLayoutByClientId,
 			updateBlocksLayouts,
@@ -208,11 +202,12 @@ describe( 'updateBlocksLayouts', () => {
 		expect( findAddedInnerBlock ).toEqual(
 			expect.objectContaining( {
 				clientId: PARAGRAPH_BLOCK_LAYOUT_DATA.clientId,
+				rootClientId: NESTED_WITH_INNER_BLOCKS_ID,
 			} )
 		);
 	} );
 
-	it( "deletes a block's layout data at a root level", () => {
+	it( "deletes a block's layout data at root level", () => {
 		const {
 			findBlockLayoutByClientId,
 			updateBlocksLayouts,
@@ -231,11 +226,7 @@ describe( 'updateBlocksLayouts', () => {
 			ROOT_LEVEL_ID
 		);
 
-		expect( findDeletedBlock ).toEqual(
-			expect.not.objectContaining( {
-				clientId: ROOT_LEVEL_ID,
-			} )
-		);
+		expect( findDeletedBlock ).toBeNull();
 	} );
 
 	it( "deletes a block's layout data at a deep level", () => {
@@ -257,10 +248,6 @@ describe( 'updateBlocksLayouts', () => {
 			DEEP_NESTED_ID
 		);
 
-		expect( findDeletedBlock ).toEqual(
-			expect.not.objectContaining( {
-				clientId: DEEP_NESTED_ID,
-			} )
-		);
+		expect( findDeletedBlock ).toBeNull();
 	} );
 } );
