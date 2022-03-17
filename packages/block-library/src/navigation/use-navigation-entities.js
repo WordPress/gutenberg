@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import {
-	store as coreStore,
-	__experimentalUseEntityRecords as useEntityRecords,
-} from '@wordpress/core-data';
+import { __experimentalUseEntityRecords as useEntityRecords } from '@wordpress/core-data';
 
 /**
  * @typedef {Object} NavigationEntitiesData
@@ -29,82 +25,50 @@ import {
  * @return { NavigationEntitiesData } the entity data.
  */
 export default function useNavigationEntities( menuId ) {
-	return {
-		...usePageEntities(),
-		...useMenuEntities(),
-		...useMenuItemEntities( menuId ),
-	};
-}
+	const {
+		records: menus,
+		isResolving: isResolvingMenus,
+		hasResolved: hasResolvedMenus,
+	} = useEntityRecords( 'root', 'menu', { per_page: -1, context: 'view' } );
 
-function useMenuEntities() {
-	const { records, isResolving, hasResolved } = useEntityRecords(
+	const {
+		records: pages,
+		isResolving: isResolvingPages,
+		hasResolved: hasResolvedPages,
+	} = useEntityRecords( 'postType', 'page', {
+		parent: 0,
+		order: 'asc',
+		orderby: 'id',
+		per_page: -1,
+		context: 'view',
+	} );
+
+	const {
+		records: menuItems,
+		hasResolved: hasResolvedMenuItems,
+	} = useEntityRecords(
 		'root',
-		'menu',
-		{ per_page: -1, context: 'view' }
-	);
-
-	return {
-		menus: records,
-		isResolvingMenus: isResolving,
-		hasResolvedMenus: hasResolved,
-		hasMenus: !! ( hasResolved && records?.length ),
-	};
-}
-
-function useMenuItemEntities( menuId ) {
-	const { menuItems, hasResolvedMenuItems } = useSelect(
-		( select ) => {
-			const { getMenuItems, hasFinishedResolution } = select( coreStore );
-
-			const hasSelectedMenu = menuId !== undefined;
-			const menuItemsParameters = hasSelectedMenu
-				? [
-						{
-							menus: menuId,
-							per_page: -1,
-							context: 'view',
-						},
-				  ]
-				: undefined;
-
-			return {
-				menuItems: hasSelectedMenu
-					? getMenuItems( ...menuItemsParameters )
-					: undefined,
-				hasResolvedMenuItems: hasSelectedMenu
-					? hasFinishedResolution(
-							'getMenuItems',
-							menuItemsParameters
-					  )
-					: false,
-			};
-		},
-		[ menuId ]
-	);
-
-	return {
-		menuItems,
-		hasResolvedMenuItems,
-	};
-}
-
-function usePageEntities() {
-	const { records, isResolving, hasResolved } = useEntityRecords(
-		'postType',
-		'page',
+		'menuItem',
 		{
-			parent: 0,
-			order: 'asc',
-			orderby: 'id',
+			menus: menuId,
 			per_page: -1,
 			context: 'view',
-		}
+		},
+		{ enabled: !! menuId }
 	);
 
 	return {
-		pages: records,
-		isResolvingPages: isResolving,
-		hasResolvedPages: hasResolved,
-		hasPages: !! ( hasResolved && records?.length ),
+		pages,
+		isResolvingPages,
+		hasResolvedPages,
+		hasPages: !! ( hasResolvedPages && pages?.length ),
+
+		menus,
+		isResolvingMenus,
+		hasResolvedMenus,
+		hasMenus: !! ( hasResolvedMenus && menus?.length ),
+
+		menuItems,
+		hasResolvedMenuItems,
 	};
 }

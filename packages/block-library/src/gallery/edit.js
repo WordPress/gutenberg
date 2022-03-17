@@ -54,6 +54,7 @@ import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
+import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -99,7 +100,8 @@ function GalleryEdit( props ) {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
-		multiSelect,
+		selectBlock,
+		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -155,13 +157,8 @@ function GalleryEdit( props ) {
 				align: undefined,
 			} );
 		} );
-
-		// If new blocks added select the first of these so they scroll into view.
-		if ( newImages?.length ) {
-			multiSelect(
-				newImages[ 0 ].clientId,
-				newImages[ newImages?.length - 1 ].clientId
-			);
+		if ( newImages?.length > 0 ) {
+			clearSelectedBlock();
 		}
 	}, [ newImages ] );
 
@@ -295,6 +292,10 @@ function GalleryEdit( props ) {
 				alt: image.alt,
 			} );
 		} );
+
+		if ( newBlocks?.length > 0 ) {
+			selectBlock( newBlocks[ 0 ].clientId );
+		}
 
 		replaceInnerBlocks(
 			clientId,
@@ -548,6 +549,12 @@ function GalleryEdit( props ) {
 				/>
 			</BlockControls>
 			{ noticeUI }
+			{ Platform.isWeb && (
+				<GapStyles
+					blockGap={ attributes.style?.spacing?.blockGap }
+					clientId={ clientId }
+				/>
+			) }
 			<Gallery
 				{ ...props }
 				images={ images }
