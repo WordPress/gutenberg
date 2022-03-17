@@ -63,7 +63,6 @@ export default function ListViewSidebar() {
 					showNestedBlocks
 					__experimentalFeatures
 					__experimentalPersistentListViewFeatures
-					expandNested={ false }
 				/>
 			</div>
 		</div>
