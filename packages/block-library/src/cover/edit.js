@@ -103,8 +103,6 @@ function CoverHeightInput( {
 	unit = 'px',
 	value = '',
 } ) {
-	const [ temporaryInput, setTemporaryInput ] = useState( null );
-
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
@@ -127,27 +125,15 @@ function CoverHeightInput( {
 				: undefined;
 
 		if ( isNaN( inputValue ) && inputValue !== undefined ) {
-			setTemporaryInput( unprocessedValue );
 			return;
 		}
-		setTemporaryInput( null );
 		onChange( inputValue );
 	};
 
-	const handleOnBlur = () => {
-		if ( temporaryInput !== null ) {
-			setTemporaryInput( null );
-		}
-	};
-
 	const computedValue = useMemo( () => {
-		const inputValue = temporaryInput !== null ? temporaryInput : value;
-		const [ parsedQuantity ] = parseQuantityAndUnitFromRawValue(
-			inputValue
-		);
-
+		const [ parsedQuantity ] = parseQuantityAndUnitFromRawValue( value );
 		return [ parsedQuantity, unit ].join( '' );
-	}, [ temporaryInput, unit, value ] );
+	}, [ unit, value ] );
 
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
@@ -157,7 +143,6 @@ function CoverHeightInput( {
 				id={ inputId }
 				isResetValueOnUnitChange
 				min={ min }
-				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				onUnitChange={ onUnitChange }
 				style={ { maxWidth: 80 } }
