@@ -9,6 +9,11 @@ import {
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import EnableFeature from './enable-feature';
+
 export default function EditSitePreferencesModal( {
 	isModalActive,
 	toggleModal,
@@ -23,7 +28,15 @@ export default function EditSitePreferencesModal( {
 					description={ __(
 						'Customize options related to the block editor interface and editing flow.'
 					) }
-				></PreferencesModalSection>
+				>
+					<EnableFeature
+						featureName="focusMode"
+						help={ __(
+							'Highlights the current block and fades other content.'
+						) }
+						label={ __( 'Spotlight mode' ) }
+					/>
+				</PreferencesModalSection>
 			),
 		},
 	] );
