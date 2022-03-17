@@ -25,7 +25,7 @@ function gutenberg_get_style_engine_css_box_rules( $style_value, $style_property
 			$rules[ "$style_property-$key" ] = $value; // . ' !important'; Challenge: deal with specificity that inline styles bring us. Maybe we could pass an option.
 		}
 	} else {
-		$rules[] = sprintf( "$style_property:%s;", $style_value );
+		$rules[ $style_property ] = $style_value;
 	}
 	return $rules;
 }

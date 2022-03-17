@@ -51,19 +51,6 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 	$style_engine        = WP_Style_Engine_Gutenberg::get_instance();
 
 	if ( $has_padding_support ) {
-		/*
-			// We can also return an obfuscated classname.
-			// Do we need to add !important rules to the stylesheet in this case
-			// seeing as they're not inline?
-			$classes[] = $style_engine->add_style_from_attributes(
-				'wp-block-supports',
-				$attributes_styles,
-				array( 'spacing', 'padding' ),
-				array(
-					'obfuscate' => true,
-				)
-			);
-		*/
 		$padding_styles = $style_engine->get_inline_styles_from_attributes(
 			$block_styles,
 			array( 'spacing', 'padding' )
