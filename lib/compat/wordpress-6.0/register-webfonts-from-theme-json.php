@@ -62,7 +62,7 @@ function gutenberg_register_webfonts_from_theme_json() {
  * @return array The global styles with missing fonts data.
  */
 function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
-	$font_families_registered = wp_webfonts()->get_fonts();
+	$font_families_registered = wp_webfonts()->get_all_webfonts();
 
 	// Make sure the path to settings.typography.fontFamilies.theme exists
 	// before adding missing fonts.
