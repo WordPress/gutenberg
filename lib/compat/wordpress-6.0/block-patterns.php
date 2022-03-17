@@ -59,6 +59,7 @@ add_action(
  *
  *     /**
  *      * Title: My Pattern
+ *      * Slug: my-theme/my-pattern
  *      *
  *
  * The output of the PHP source corresponds to the content of the pattern, e.g.:
@@ -69,7 +70,6 @@ add_action(
  *
  * Other settable fields include:
  *
- *   - Slug             (otherwise inferred from filename)
  *   - Description
  *   - Viewport Width
  *   - Categories       (comma-separated values)
@@ -104,26 +104,27 @@ function gutenberg_register_theme_block_patterns() {
 				foreach ( $files as $file ) {
 					$pattern_data = get_file_data( $file, $default_headers );
 
-					$pattern_slug = $pattern_data[ 'slug' ];
-
-					// Compute slug from the theme and the basename of the pattern file.
-					//
-					// Example: twentytwentytwo/query-grid-posts.
-					if ( empty( $pattern_slug ) ) {
-						if ( ! preg_match( '#/(?P<slug>[A-z0-9_-]+)\.php$#', $file, $matches ) ) {
-							trigger_error(
-								sprintf(
-									__( 'Could not register file "%s" as a block pattern ("Slug" field missing)', 'gutenberg' ),
-									$file
-								)
-							);
-							continue;
-						}
-
-						$pattern_slug = get_stylesheet() . "/" . $matches[ 'slug' ];
+					if ( empty( $pattern_data[ 'slug' ] ) ) {
+						trigger_error(
+							sprintf(
+								__( 'Could not register file "%s" as a block pattern ("Slug" field missing)', 'gutenberg' ),
+								$file
+							)
+						);
+						continue;
 					}
 
-					if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_slug ) ) {
+					if ( ! preg_match( '/^[A-z0-9\/_-]+$/', $pattern_data[ 'slug' ] ) ) {
+						trigger_error(
+							sprintf(
+								__( 'Could not register file "%1s" as a block pattern (invalid slug "%2s")', 'gutenberg' ),
+								$file,
+								$pattern_data[ 'slug' ]
+							)
+						);
+					}
+
+					if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_data[ 'slug' ] ) ) {
 						continue;
 					}
 
@@ -175,7 +176,7 @@ function gutenberg_register_theme_block_patterns() {
 						continue;
 					}
 
-					register_block_pattern( $pattern_slug, $pattern_data );
+					register_block_pattern( $pattern_data[ 'slug' ], $pattern_data );
 				}
 			}
 		}
