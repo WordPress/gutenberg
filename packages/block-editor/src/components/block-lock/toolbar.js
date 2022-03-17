@@ -44,22 +44,31 @@ export default function BlockLockToolbar( { clientId } ) {
 		return null;
 	}
 
+	const label = canLockBlocks
+		? sprintf(
+				/* translators: %s: block name */
+				__( 'Unlock %s' ),
+				blockInformation.title
+		  )
+		: sprintf(
+				/* translators: %s: block name */
+				__( 'Locked %s' ),
+				blockInformation.title
+		  );
+
 	return (
 		<>
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
 					icon={ lock }
-					label={ sprintf(
-						/* translators: %s: block name */
-						__( 'Unlock %s' ),
-						blockInformation.title
-					) }
-					onClick={ toggleModal }
+					label={ label }
+					onClick={ canLockBlocks ? toggleModal : undefined }
+					disabled={ ! canLockBlocks }
 				/>
 			</ToolbarGroup>
-			{ isModalOpen && (
+			{ isModalOpen && canLockBlocks ? (
 				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
-			) }
+			) : null }
 		</>
 	);
 }
