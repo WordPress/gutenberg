@@ -341,9 +341,21 @@ _Returns_
 
 -   `?Array`: An array of autosaves for the post, or undefined if there is none.
 
+### getBlockPatternCategories
+
+Retrieve the list of registered block pattern categories.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+
+_Returns_
+
+-   `Array`: Block pattern category list.
+
 ### getBlockPatterns
 
-Retrieve the list of registered block patterns
+Retrieve the list of registered block patterns.
 
 _Parameters_
 

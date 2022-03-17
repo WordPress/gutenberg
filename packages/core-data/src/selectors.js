@@ -964,7 +964,7 @@ export function __experimentalGetCurrentThemeGlobalStylesVariations( state ) {
 }
 
 /**
- * Retrieve the list of registered block patterns
+ * Retrieve the list of registered block patterns.
  *
  * @param {Object} state Data state.
  *
@@ -972,4 +972,15 @@ export function __experimentalGetCurrentThemeGlobalStylesVariations( state ) {
  */
 export function getBlockPatterns( state ) {
 	return state.blockPatterns;
+}
+
+/**
+ * Retrieve the list of registered block pattern categories.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Block pattern category list.
+ */
+export function getBlockPatternCategories( state ) {
+	return state.blockPatternCategories;
 }
