@@ -76,8 +76,9 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		// Load block patterns from w.org.
-		_load_remote_block_patterns();
-		_load_remote_featured_patterns();
+		_load_remote_block_patterns(); // patterns with the `core` keyword
+		_load_remote_featured_patterns(); // patterns in the `featured` category
+		gutenberg_register_remote_theme_patterns(); // patterns requested by current theme
 
 		$response = array();
 		$patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
