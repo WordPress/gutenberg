@@ -27,7 +27,9 @@ export const enableComplementaryArea = ( scope, area ) => ( { registry } ) => {
  * @param {string} scope Complementary area scope.
  */
 export const disableComplementaryArea = ( scope ) => ( { registry } ) => {
-	registry.dispatch( preferencesStore ).unset( scope, 'complementaryArea' );
+	registry
+		.dispatch( preferencesStore )
+		.set( scope, 'complementaryArea', null );
 };
 
 /**

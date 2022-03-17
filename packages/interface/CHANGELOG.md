@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Breaking Change
-
--   `getActiveComplementaryArea` now returns `undefined` instead of `null` after `disableComplementaryArea` has been called. ([#TBC](https://github.com/WordPress/gutenberg/pull/TBC)).
-
 ## 4.4.0 (2022-03-23)
 
 ## 4.3.0 (2022-03-11)
