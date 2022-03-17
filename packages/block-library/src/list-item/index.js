@@ -19,13 +19,9 @@ export const settings = {
 	edit,
 	save,
 	merge( attributes, attributesToMerge ) {
-		const { content } = attributesToMerge;
-		if ( ! content || content === '<li></li>' ) {
-			return attributes;
-		}
 		return {
 			...attributes,
-			content: attributes.content + content,
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 };
