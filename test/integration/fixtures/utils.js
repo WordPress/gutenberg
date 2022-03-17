@@ -23,20 +23,16 @@ function writeFixtureFile( fixturesDir, filename, content ) {
 
 function writeStoryFile( basename ) {
 	const underscoresBasename = basename.replace( /-/g, '_' );
-	const content = `
-		/**
-		 * Internal dependencies
-		 */
-		import ${ underscoresBasename } from '../../../test/integration/fixtures/blocks/${ basename }.serialized.html';
+	const content = `/**
+ * Internal dependencies
+ */
+import ${ underscoresBasename } from '../../../test/integration/fixtures/blocks/${ basename }.serialized.html';
 
-		export default {
-			title: 'Blocks/${ underscoresBasename }',
-		};
+export default {
+	title: 'Blocks/${ underscoresBasename }',
+};
 
-		export const _default = () => {
-			return <div dangerouslySetInnerHTML={ { __html: ${ underscoresBasename } } }></div>;
-		};
-	`;
+export const _default = () => return <div dangerouslySetInnerHTML={ { __html: ${ underscoresBasename } } }></div>;`;
 	return content;
 }
 
