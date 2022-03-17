@@ -79,8 +79,34 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 		_load_remote_block_patterns();
 		_load_remote_featured_patterns();
 
-		$data = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
-		return rest_ensure_response( $data );
+		$response = array();
+		$patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
+		foreach ( $patterns as $pattern ) {
+			$prepared_pattern = $this->prepare_item_for_response( $pattern, $request );
+			$response[] = $this->prepare_response_for_collection( $prepared_pattern );
+		}
+		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Prepare a raw block pattern before it gets output in a REST API response.
+	 *
+	 * @param object          $item    Raw pattern as registered, before any changes.
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response
+	 */
+	public function prepare_item_for_response( $item, $request ) {
+		$prepared_pattern = array(
+			'name'           => $item['name'],
+			'title'          => $item['title'],
+			'blockTypes'     => $item['blockTypes'],
+			'categories'     => $item['categories'],
+			'content'        => $item['content'],
+		);
+
+		$prepared_pattern = $this->add_additional_fields_to_object( $prepared_pattern, $request );
+
+		return new WP_REST_Response( $prepared_pattern );
 	}
 
 	/**
