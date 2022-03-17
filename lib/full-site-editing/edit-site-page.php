@@ -114,12 +114,12 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 
 	$custom_settings = array(
-		'siteUrl'                              => site_url(),
-		'postsPerPage'                         => get_option( 'posts_per_page' ),
-		'styles'                               => gutenberg_get_editor_styles(),
-		'defaultTemplateTypes'                 => $indexed_template_types,
-		'defaultTemplatePartAreas'             => get_allowed_block_template_part_areas(),
-		'__unstableHomeTemplate'               => gutenberg_resolve_home_template(),
+		'siteUrl'                  => site_url(),
+		'postsPerPage'             => get_option( 'posts_per_page' ),
+		'styles'                   => gutenberg_get_editor_styles(),
+		'defaultTemplateTypes'     => $indexed_template_types,
+		'defaultTemplatePartAreas' => get_allowed_block_template_part_areas(),
+		'__unstableHomeTemplate'   => gutenberg_resolve_home_template(),
 	);
 
 	/**

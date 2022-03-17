@@ -75,7 +75,7 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$response = array();
+		$response   = array();
 		$categories = WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered();
 		foreach ( $categories as $category ) {
 			$prepared_category = $this->prepare_item_for_response( $category, $request );
@@ -93,8 +93,8 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$data = array(
-			'name'       => $item['name'],
-			'label'      => $item['label'],
+			'name'  => $item['name'],
+			'label' => $item['label'],
 		);
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -114,13 +114,13 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 			'title'      => 'block-pattern-category',
 			'type'       => 'object',
 			'properties' => array(
-				'name'       => array(
+				'name'  => array(
 					'description' => __( 'The category name.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'embed' ),
 				),
-				'label'      => array(
+				'label' => array(
 					'description' => __( 'The category label, in human readable format.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
