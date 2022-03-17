@@ -569,7 +569,9 @@ export function migrateInterfaceEnableItemsToPreferencesStore( persistence ) {
 	} );
 
 	// Remove migrated preferences.
+	const otherInterfaceItems = state[ interfaceStoreName ];
 	persistence.set( interfaceStoreName, {
+		...otherInterfaceItems,
 		enableItems: undefined,
 	} );
 }
