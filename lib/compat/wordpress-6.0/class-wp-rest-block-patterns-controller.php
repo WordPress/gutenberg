@@ -97,7 +97,7 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function prepare_item_for_response( $item, $request ) {
-		$prepared_pattern = array(
+		$data = array(
 			'name'       => $item['name'],
 			'title'      => $item['title'],
 			'blockTypes' => $item['blockTypes'],
@@ -105,9 +105,10 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 			'content'    => $item['content'],
 		);
 
-		$prepared_pattern = $this->add_additional_fields_to_object( $prepared_pattern, $request );
-
-		return new WP_REST_Response( $prepared_pattern );
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
+		return rest_ensure_response( $data );
 	}
 
 	/**
@@ -125,26 +126,31 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 					'description' => __( 'The pattern title, in human readable format.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
+					'context'     => array( 'view', 'embed' ),
 				),
 				'name'       => array(
 					'description' => __( 'The pattern name.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
+					'context'     => array( 'view', 'embed' ),
 				),
 				'blockTypes' => array(
 					'description' => __( 'Block types that the pattern is intended to be used with.', 'gutenberg' ),
 					'type'        => 'array',
 					'readonly'    => true,
+					'context'     => array( 'view', 'embed' ),
 				),
 				'categories' => array(
 					'description' => __( "The pattern's category slugs.", 'gutenberg' ),
 					'type'        => 'array',
 					'readonly'    => true,
+					'context'     => array( 'view', 'embed' ),
 				),
 				'content'    => array(
 					'description' => __( 'The pattern content.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
+					'context'     => array( 'view', 'embed' ),
 				),
 			),
 		);
