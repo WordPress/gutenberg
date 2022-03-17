@@ -34,11 +34,15 @@ export default function NavigationInspector() {
 			getBlock,
 		} = select( blockEditorStore );
 
-		const {
-			getNavigationMenus,
-			hasFinishedResolution,
-			isResolving,
-		} = select( coreStore );
+		const { getEntityRecords, hasFinishedResolution, isResolving } = select(
+			coreStore
+		);
+
+		const navigationMenusQuery = [
+			'postType',
+			'wp_navigation',
+			NAVIGATION_MENUS_QUERY[ 0 ],
+		];
 
 		// Get the active Navigation block (if present).
 		const selectedNavId = __experimentalGetActiveBlockIdByBlockNames(
@@ -57,14 +61,14 @@ export default function NavigationInspector() {
 			selectedNavigationBlockId: selectedNavId,
 			firstNavigationBlockId: navBlockIds?.[ 0 ],
 			clientIdToRef: idToRef,
-			navigationMenus: getNavigationMenus( NAVIGATION_MENUS_QUERY[ 0 ] ),
+			navigationMenus: getEntityRecords( ...navigationMenusQuery ),
 			isResolvingNavigationMenus: isResolving(
-				'getNavigationMenus',
-				NAVIGATION_MENUS_QUERY
+				'getEntityRecords',
+				navigationMenusQuery
 			),
 			hasResolvedNavigationMenus: hasFinishedResolution(
-				'getNavigationMenus',
-				NAVIGATION_MENUS_QUERY
+				'getEntityRecords',
+				navigationMenusQuery
 			),
 		};
 	}, [] );
