@@ -227,6 +227,7 @@ export function BlockSettingsDropdown( {
 							<BlockSettingsMenuControls.Slot
 								fillProps={ { onClose } }
 								clientIds={ clientIds }
+								canRemove={ canRemove }
 							/>
 							{ typeof children === 'function'
 								? children( { onClose } )
