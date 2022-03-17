@@ -27,7 +27,7 @@ describe( 'A11y tests for Gutenberg Blocks', () => {
 		await loginUser();
 	} );
 
-	for ( const fixture of fixtures.slice( 0, 10 ) ) {
+	for ( const fixture of fixtures ) {
 		const blockName = fixture.replace( '.html', '' );
 		const fixtureContent = readFixtureContent(
 			path.join( FIXTURES_FOLDER_PATH, fixture )
