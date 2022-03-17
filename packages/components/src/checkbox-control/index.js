@@ -58,15 +58,6 @@ export default function CheckboxControl( {
 	const id = `inspector-checkbox-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.checked );
 
-	let ariaChecked;
-	if ( showCheckedIcon ) {
-		ariaChecked = 'true';
-	} else if ( showIndeterminateIcon ) {
-		ariaChecked = 'mixed';
-	} else {
-		ariaChecked = 'false';
-	}
-
 	return (
 		<BaseControl
 			label={ heading }
@@ -84,7 +75,6 @@ export default function CheckboxControl( {
 					onChange={ onChangeValue }
 					checked={ checked }
 					aria-describedby={ !! help ? id + '__help' : undefined }
-					aria-checked={ ariaChecked }
 					{ ...props }
 				/>
 				{ showIndeterminateIcon ? (
