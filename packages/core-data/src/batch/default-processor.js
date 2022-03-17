@@ -12,7 +12,8 @@ import apiFetch from '@wordpress/api-fetch';
  * Maximum number of requests to place in a single batch request. Obtained by
  * sending a preflight OPTIONS request to /batch/v1/.
  *
- * @type {number?}
+ * @type {number|null}
+ * @default 25 (set by Core)
  */
 let maxItems = null;
 
@@ -36,7 +37,7 @@ export default async function defaultProcessor( requests ) {
 
 	const results = [];
 
-	for ( const batchRequests of chunk( requests, maxItems ) ) {
+	for ( const batchRequests of chunk( requests, maxItems ?? 25 ) ) {
 		const batchResponse = await apiFetch( {
 			path: '/batch/v1',
 			method: 'POST',
