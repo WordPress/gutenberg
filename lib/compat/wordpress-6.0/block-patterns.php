@@ -59,7 +59,6 @@ add_action(
  *
  *     /**
  *      * Pattern Name: My Pattern
- *      * Namespace: my-theme
  *      *
  *
  * The output of the PHP source corresponds to the content of the pattern, e.g.:
@@ -70,6 +69,7 @@ add_action(
  *
  * Other settable fields include:
  *
+ *   - Slug             (otherwise inferred from filename)
  *   - Description
  *   - Viewport Width
  *   - Categories       (comma-separated values)
@@ -84,7 +84,7 @@ add_action(
 function gutenberg_register_theme_block_patterns() {
 	$default_headers = array(
 		'title'         => 'Pattern Name',
-		'namespace'     => 'Namespace',
+		'slug'          => 'Slug',
 		'description'   => 'Description',
 		'viewportWidth' => 'Viewport Width',
 		'categories'    => 'Categories',
@@ -102,21 +102,22 @@ function gutenberg_register_theme_block_patterns() {
 			$files = glob( $dirpath . '*.php' );
 			if ( $files ) {
 				foreach ( $files as $file ) {
-					// Parse pattern slug from file name.
-					if ( ! preg_match( '#/(?P<slug>[A-z0-9_-]+)\.php$#', $file, $matches ) ) {
-						continue;
-					}
-
 					$pattern_data = get_file_data( $file, $default_headers );
 
-					if ( empty( $pattern_data[ 'namespace' ] ) ) {
-						continue;
+					$pattern_slug = $pattern_data[ 'slug' ];
+
+					// Compute slug from the theme and the basename of the pattern file.
+					//
+					// Example: twentytwentytwo/query-grid-posts.
+					if ( empty( $pattern_slug ) ) {
+						if ( ! preg_match( '#/(?P<slug>[A-z0-9_-]+)\.php$#', $file, $matches ) ) {
+							continue;
+						}
+
+						$pattern_slug = get_stylesheet() . "/" . $matches[ 'slug' ];
 					}
 
-					// Example name: twentytwentytwo/query-grid-posts.
-					$pattern_name = $pattern_data[ 'namespace' ] . "/" . $matches['slug'];
-
-					if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_name ) ) {
+					if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_slug ) ) {
 						continue;
 					}
 
@@ -162,7 +163,7 @@ function gutenberg_register_theme_block_patterns() {
 						continue;
 					}
 
-					register_block_pattern( $pattern_name, $pattern_data );
+					register_block_pattern( $pattern_slug, $pattern_data );
 				}
 			}
 		}
