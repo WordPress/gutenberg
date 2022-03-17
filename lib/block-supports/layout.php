@@ -70,7 +70,7 @@ function gutenberg_get_layout_preset_styles( $preset_metadata, $presets ) {
 }
 
 /**
- * Generates the CSS corresponding to the provided layout.
+ * Generates the CSS and classes corresponding to the provided layout.
  *
  * @param string  $selector CSS selector.
  * @param array   $layout   Layout object. The one that is passed has already checked the existence of default block layout.
@@ -82,12 +82,37 @@ function gutenberg_get_layout_preset_styles( $preset_metadata, $presets ) {
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
+	// Generate classes for preset styles.
 	$classes = array();
-
-	$style = '';
 	if ( 'default' === $layout_type ) {
 		$classes[] = 'wp-layout-flow';
+		if ( $has_block_gap_support ) {
+			$classes[] = 'wp-layout-flow--global-gap';
+		}
+	} else if ( 'flex' === $layout_type ) {
+		$classes[] = 'wp-layout-flex';
 
+		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
+		$orientation_key    = 'horizontal' === $layout_orientation ? 'h-justify' : 'v-justify';
+
+		$classes[] = "wp-layout-flex--$orientation_key";
+
+		if ( ! empty( $layout['flexWrap'] ) ) {
+			$classes[] = 'wp-layout-flex--wrap--' . sanitize_key( $layout['flexWrap'] );
+		}
+
+		if ( ! empty( $layout['justifyContent'] ) ) {
+			$classes[] = sprintf(
+				'wp-layout-flex--%s--%s',
+				$orientation_key,
+				sanitize_key( $layout['justifyContent'] )
+			);
+		}
+	}
+
+	// Generate one-off style values.
+	$style = '';
+	if ( 'default' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
 
@@ -110,56 +135,16 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 
 		if ( $has_block_gap_support ) {
-			$classes[] = 'wp-layout-flow--global-gap';
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
 			$style    .= "$selector > * + * { margin-block-start: $gap_style; margin-block-end: 0; }";
 		}
 	} elseif ( 'flex' === $layout_type ) {
-		$classes[] = 'wp-layout-flex';
-
-		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
-
-		$justify_content_options = array(
-			'left'   => 'flex-start',
-			'right'  => 'flex-end',
-			'center' => 'center',
-		);
-
-		if ( 'horizontal' === $layout_orientation ) {
-			$justify_content_options += array( 'space-between' => 'space-between' );
-		}
-
-		$flex_wrap_options = array( 'wrap', 'nowrap' );
-		$flex_wrap         = ! empty( $layout['flexWrap'] ) && in_array( $layout['flexWrap'], $flex_wrap_options, true ) ?
-			$layout['flexWrap'] :
-			'wrap';
-
-		$style  = "$selector {";
 		if ( $has_block_gap_support ) {
+			$style     = "$selector {";
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
 			$style    .= "gap: $gap_style;";
+			$style    .= '}';
 		}
-
-		$style .= "flex-wrap: $flex_wrap;";
-		if ( 'horizontal' === $layout_orientation ) {
-			$classes[] = 'wp-layout-flex--horizontal';
-			/**
-			 * Add this style only if is not empty for backwards compatibility,
-			 * since we intend to convert blocks that had flex layout implemented
-			 * by custom css.
-			 */
-			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
-			}
-		} else {
-			$style .= 'flex-direction: column;';
-			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
-			} else {
-				$style .= 'align-items: flex-start;';
-			}
-		}
-		$style .= '}';
 	}
 
 	return array(

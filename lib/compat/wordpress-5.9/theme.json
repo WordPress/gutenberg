@@ -259,6 +259,13 @@
 							"rules": {
 								"align-items": "center"
 							}
+						},
+						{
+							"suffix": "v-justify",
+							"rules": {
+								"align-items": "flex-start",
+								"flex-direction": "column"
+							}
 						}
 					],
 					"controlledSets": {
