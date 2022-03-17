@@ -115,7 +115,7 @@ export const rootEntitiesConfig = [
 		label: __( 'Comment' ),
 	},
 	{
-		name: 'menu',
+		name: 'menu', // Classic Menus
 		kind: 'root',
 		baseURL: '/wp/v2/menus',
 		baseURLParams: { context: 'edit' },
@@ -123,7 +123,7 @@ export const rootEntitiesConfig = [
 		label: __( 'Menu' ),
 	},
 	{
-		name: 'menuItem',
+		name: 'menuItem', // Classic Menu Items
 		kind: 'root',
 		baseURL: '/wp/v2/menu-items',
 		baseURLParams: { context: 'edit' },
@@ -132,7 +132,7 @@ export const rootEntitiesConfig = [
 		rawAttributes: [ 'title', 'content' ],
 	},
 	{
-		name: 'menuLocation',
+		name: 'menuLocation', // Classic Menu Locations
 		kind: 'root',
 		baseURL: '/wp/v2/menu-locations',
 		baseURLParams: { context: 'edit' },
@@ -141,7 +141,7 @@ export const rootEntitiesConfig = [
 		key: 'name',
 	},
 	{
-		name: 'navigationArea',
+		name: 'navigationArea', // Deprecated - can be removed once the concepts of Navigation Areas is removed from the codebase.
 		kind: 'root',
 		baseURL: '/wp/v2/block-navigation-areas',
 		baseURLParams: { context: 'edit' },
@@ -174,6 +174,14 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
+	},
+	{
+		label: __( 'Navigation' ), // Block based Navigation Menus
+		name: 'navigationMenu',
+		kind: 'root',
+		baseURL: '/wp/v2/navigation',
+		baseURLParams: { context: 'edit' },
+		plural: 'navigationMenus',
 	},
 ];
 
@@ -297,7 +305,7 @@ export const getMethodName = (
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && entityConfig.plural
+		usePlural && entityConfig?.plural
 			? upperFirst( camelCase( entityConfig.plural ) )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
@@ -308,7 +316,7 @@ export const getMethodName = (
  *
  * @param {string} kind Kind
  *
- * @return {Array} Entities
+ * @return {(thunkArgs: object) => Promise<Array>} Entities
  */
 export const getOrLoadEntitiesConfig = ( kind ) => async ( {
 	select,

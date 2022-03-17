@@ -40,7 +40,7 @@ function optimize_preload_paths( $preload_paths ) {
 
 	// modify the preload of `/users/me` to match the real request.
 	foreach ( $preload_paths as $user_index => $user_path ) {
-		if ( 0 === strpos( $user_path, '/wp/v2/users/me' ) ) {
+		if ( is_string( $user_path ) && 0 === strpos( $user_path, '/wp/v2/users/me' ) ) {
 			$preload_paths[ $user_index ] = '/wp/v2/users/me';
 			break;
 		}

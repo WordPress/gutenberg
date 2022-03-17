@@ -59,6 +59,8 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {boolean} props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean} props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
  * @param {boolean} props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
+ * @param {string}  props.id                                       Unique identifier for the root list element (primarily for a11y purposes).
+ * @param {boolean} props.expandNested                             Flag to determine whether nested levels are expanded by default.
  * @param {Object}  ref                                            Forwarded ref
  */
 function ListView(
@@ -69,6 +71,8 @@ function ListView(
 		__experimentalHideContainerBlockActions,
 		showNestedBlocks,
 		showBlockMovers,
+		id,
+		expandNested,
 		...props
 	},
 	ref
@@ -205,6 +209,7 @@ function ListView(
 				blockDropTarget={ blockDropTarget }
 			/>
 			<TreeGrid
+				id={ id }
 				className="block-editor-list-view-tree"
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
@@ -220,6 +225,7 @@ function ListView(
 						showBlockMovers={ showBlockMovers }
 						fixedListWindow={ fixedListWindow }
 						selectedClientIds={ selectedClientIds }
+						expandNested={ expandNested }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>

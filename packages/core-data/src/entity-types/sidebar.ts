@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import type { Widget } from './widget';
 import type { Context, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
@@ -48,7 +47,7 @@ declare module './base-entity-records' {
 			/**
 			 * Nested widgets.
 			 */
-			widgets: ( Widget< C > | string )[];
+			widgets: ( BaseEntityRecords.Widget< C > | string )[];
 		}
 	}
 }

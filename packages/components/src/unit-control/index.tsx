@@ -8,7 +8,7 @@ import type {
 	SyntheticEvent,
 	ChangeEvent,
 } from 'react';
-import { noop, omit } from 'lodash';
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -16,7 +16,6 @@ import classnames from 'classnames';
  */
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -35,7 +34,7 @@ import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import type { StateReducer } from '../input-control/reducer/state';
 
-function UnitControl(
+function UnforwardedUnitControl(
 	{
 		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
@@ -46,8 +45,8 @@ function UnitControl(
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = true,
 		label,
-		onChange = noop,
-		onUnitChange = noop,
+		onChange,
+		onUnitChange,
 		size = 'default',
 		style,
 		unit: unitProp,
@@ -97,7 +96,7 @@ function UnitControl(
 			typeof nextQuantityValue === 'undefined' ||
 			nextQuantityValue === null
 		) {
-			onChange( '', changeProps );
+			onChange?.( '', changeProps );
 			return;
 		}
 
@@ -112,7 +111,7 @@ function UnitControl(
 			unit
 		).join( '' );
 
-		onChange( onChangeValue, changeProps );
+		onChange?.( onChangeValue, changeProps );
 	};
 
 	const handleOnUnitChange: UnitControlOnChangeCallback = (
@@ -127,8 +126,8 @@ function UnitControl(
 			nextValue = `${ data.default }${ nextUnitValue }`;
 		}
 
-		onChange( nextValue, changeProps );
-		onUnitChange( nextUnitValue, changeProps );
+		onChange?.( nextValue, changeProps );
+		onUnitChange?.( nextUnitValue, changeProps );
 
 		setUnit( nextUnitValue );
 	};
@@ -156,11 +155,11 @@ function UnitControl(
 				: undefined;
 			const changeProps = { event, data };
 
-			onChange(
+			onChange?.(
 				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
 				changeProps
 			);
-			onUnitChange( validParsedUnit, changeProps );
+			onUnitChange?.( validParsedUnit, changeProps );
 
 			setUnit( validParsedUnit );
 		}
@@ -169,8 +168,8 @@ function UnitControl(
 	const handleOnBlur: FocusEventHandler< HTMLInputElement > = mayUpdateUnit;
 
 	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
-		const { keyCode } = event;
-		if ( keyCode === ENTER ) {
+		const { key } = event;
+		if ( key === 'Enter' ) {
 			mayUpdateUnit( event );
 		}
 	};
@@ -262,7 +261,7 @@ function UnitControl(
 }
 
 /**
- * `UnitControl` allows the user to set a value as well as a unit (e.g. `px`).
+ * `UnitControl` allows the user to set a numeric quantity as well as a unit (e.g. `px`).
  *
  *
  * @example
@@ -277,7 +276,7 @@ function UnitControl(
  * };
  * ```
  */
-const ForwardedUnitControl = forwardRef( UnitControl );
+export const UnitControl = forwardRef( UnforwardedUnitControl );
 
 export { parseQuantityAndUnitFromRawValue, useCustomUnits } from './utils';
-export default ForwardedUnitControl;
+export default UnitControl;

@@ -655,7 +655,6 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		// Select two columns.
 		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 		// Navigate to appender.
 		await page.keyboard.press( 'ArrowRight' );
