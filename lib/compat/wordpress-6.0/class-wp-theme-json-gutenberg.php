@@ -122,7 +122,6 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			'properties'          => array( 'font-family' ),
 		),
 		array(
-			'type'                => 'layout',
 			'path'                => array( 'layout', 'types' ),
 			'prevent_override'    => false,
 			'use_default_presets' => true,

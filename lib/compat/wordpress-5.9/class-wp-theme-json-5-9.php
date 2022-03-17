@@ -948,7 +948,7 @@ class WP_Theme_JSON_5_9 {
 
 		$stylesheet = '';
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
-			if ( isset( $preset_metadata['type'] ) && 'layout' === $preset_metadata['type'] ) {
+			if ( ! empty( $preset_metadata['path'] ) && 'layout' === $preset_metadata['path'][0] ) {
 
 				$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
 
