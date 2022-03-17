@@ -42,8 +42,9 @@ export default {
 	inspectorControls: function FlexLayoutInspectorControls( {
 		layout = {},
 		onChange,
+		layoutBlockSupport = {},
 	} ) {
-		const { allowOrientation = true } = layout;
+		const { allowOrientation = true } = layoutBlockSupport;
 		return (
 			<>
 				<Flex>
