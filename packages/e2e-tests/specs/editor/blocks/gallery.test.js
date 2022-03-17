@@ -59,11 +59,16 @@ describe( 'Gallery', () => {
 		await upload( '.wp-block-gallery input[type="file"]' );
 		await page.waitForSelector( '.wp-block-gallery .wp-block-image' );
 
-		// The newly added image gets the focus, so refocus parent Gallery
-		// block before trying to edit caption.
-		await clickButton( 'Gallery' );
+		// The Gallery needs to be selected from the List view panel due to the
+		// way that Image uploads take and lose focus.
+		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+		const galleryListLink = await page.waitForXPath(
+			`//a[contains(text(), 'Gallery')]`
+		);
+		await galleryListLink.click();
 
 		await page.click( '.wp-block-gallery .blocks-gallery-caption' );
+
 		await page.keyboard.type( galleryCaption );
 
 		expect( await getEditedPostContent() ).toMatch(
