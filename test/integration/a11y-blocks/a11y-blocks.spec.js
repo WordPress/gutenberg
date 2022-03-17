@@ -1,5 +1,11 @@
+/**
+ * WordPress dependencies
+ */
 import { loginUser } from '@wordpress/e2e-test-utils';
 import apiFetch from '@wordpress/api-fetch';
+/**
+ * External dependencies
+ */
 import path from 'path';
 import fs from 'fs';
 
