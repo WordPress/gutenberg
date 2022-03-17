@@ -54,6 +54,8 @@ add_filter( 'block_editor_rest_api_preload_paths', 'optimize_preload_paths' );
  * Disables loading remote block patterns from REST while initializing the editor.
  * Nowadays these loads are done in the `block-patterns/patterns` REST endpoint, and
  * are undesired when initializing the block editor page, both in post and site editor.
+ *
+ * @param WP_Screen $current_screen WordPress current screen object.
  */
 function disable_load_remote_patterns( $current_screen ) {
 	$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
