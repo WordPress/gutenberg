@@ -24,7 +24,7 @@ function render( jsx ) {
 	};
 }
 
-// @testing-library/user-event considers changing <input type="file"> to a string as a change, but it do not occur on real browsers, so the comparisions will be agains this result
+// @testing-library/user-event considers changing <input type="file"> to a string as a change, but it do not occur on real browsers, so the comparisons will be against this result
 const fakePath = expect.objectContaining( {
 	target: expect.objectContaining( {
 		value: 'C:\\fakepath\\hello.png',
