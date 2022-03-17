@@ -1,24 +1,24 @@
 <?php
 /**
- * REST API: WP_REST_Block_Patterns_Controller class
+ * REST API: WP_REST_Block_Pattern_Catergories_Controller class
  *
  * @subpackage REST_API
  * @package    WordPress
  */
 
 /**
- * Core class used to access block patterns via the REST API.
+ * Core class used to access block pattern categories via the REST API.
  *
  * @see   WP_REST_Controller
  */
-class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
+class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->namespace = '__experimental';
-		$this->rest_base = 'block-patterns/patterns';
+		$this->rest_base = 'block-patterns/categories';
 	}
 
 	/**
@@ -62,47 +62,39 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 
 		return new WP_Error(
 			'rest_cannot_view',
-			__( 'Sorry, you are not allowed to view the registered block patterns.', 'gutenberg' ),
+			__( 'Sorry, you are not allowed to view the registered block pattern categories.', 'gutenberg' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
 	}
 
 	/**
-	 * Retrieves all block patterns.
+	 * Retrieves all block pattern categories.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		// Load block patterns from w.org.
-		_load_remote_block_patterns(); // Patterns with the `core` keyword.
-		_load_remote_featured_patterns(); // Patterns in the `featured` category.
-		gutenberg_register_remote_theme_patterns(); // Patterns requested by current theme.
-
 		$response = array();
-		$patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
-		foreach ( $patterns as $pattern ) {
-			$prepared_pattern = $this->prepare_item_for_response( $pattern, $request );
-			$response[]       = $this->prepare_response_for_collection( $prepared_pattern );
+		$categories = WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered();
+		foreach ( $categories as $category ) {
+			$prepared_category = $this->prepare_item_for_response( $category, $request );
+			$response[]        = $this->prepare_response_for_collection( $prepared_category );
 		}
 		return rest_ensure_response( $response );
 	}
 
 	/**
-	 * Prepare a raw block pattern before it gets output in a REST API response.
+	 * Prepare a raw block pattern category before it gets output in a REST API response.
 	 *
-	 * @param object          $item    Raw pattern as registered, before any changes.
+	 * @param object          $item    Raw category as registered, before any changes.
 	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$data = array(
 			'name'       => $item['name'],
-			'title'      => $item['title'],
-			'blockTypes' => $item['blockTypes'],
-			'categories' => $item['categories'],
-			'content'    => $item['content'],
+			'label'      => $item['label'],
 		);
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -112,42 +104,24 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves the block pattern schema, conforming to JSON Schema.
+	 * Retrieves the block pattern category schema, conforming to JSON Schema.
 	 *
 	 * @return array Item schema data.
 	 */
 	public function get_item_schema() {
 		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'block-pattern',
+			'title'      => 'block-pattern-category',
 			'type'       => 'object',
 			'properties' => array(
-				'title'      => array(
-					'description' => __( 'The pattern title, in human readable format.', 'gutenberg' ),
-					'type'        => 'string',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
-				),
 				'name'       => array(
-					'description' => __( 'The pattern name.', 'gutenberg' ),
+					'description' => __( 'The category name.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'embed' ),
 				),
-				'blockTypes' => array(
-					'description' => __( 'Block types that the pattern is intended to be used with.', 'gutenberg' ),
-					'type'        => 'array',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
-				),
-				'categories' => array(
-					'description' => __( "The pattern's category slugs.", 'gutenberg' ),
-					'type'        => 'array',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
-				),
-				'content'    => array(
-					'description' => __( 'The pattern content.', 'gutenberg' ),
+				'label'      => array(
+					'description' => __( 'The category label, in human readable format.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'embed' ),
