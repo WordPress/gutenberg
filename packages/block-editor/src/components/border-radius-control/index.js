@@ -79,7 +79,6 @@ export default function BorderRadiusControl( { onChange, values } ) {
 							values={ values }
 							min={ MIN_BORDER_RADIUS_VALUE }
 							onChange={ onChange }
-							unit={ unit }
 							units={ units }
 						/>
 						<RangeControl
