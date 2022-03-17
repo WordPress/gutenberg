@@ -111,6 +111,12 @@ function gutenberg_register_theme_block_patterns() {
 					// Example: twentytwentytwo/query-grid-posts.
 					if ( empty( $pattern_slug ) ) {
 						if ( ! preg_match( '#/(?P<slug>[A-z0-9_-]+)\.php$#', $file, $matches ) ) {
+							trigger_error(
+								sprintf(
+									__( 'Could not register file "%s" as a block pattern ("Slug" field missing)', 'gutenberg' ),
+									$file
+								)
+							);
 							continue;
 						}
 
@@ -123,6 +129,12 @@ function gutenberg_register_theme_block_patterns() {
 
 					// Title is a required property.
 					if ( ! $pattern_data['title'] ) {
+						trigger_error(
+							sprintf(
+								__( 'Could not register file "%s" as a block pattern ("Title" field missing)', 'gutenberg' ),
+								$file
+							)
+						);
 						continue;
 					}
 
