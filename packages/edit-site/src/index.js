@@ -61,6 +61,7 @@ export function reinitializeEditor( target, settings ) {
 			editorMode: 'visual',
 			fixedToolbar: false,
 			focusMode: false,
+			keepCaretInsideBlock: false,
 			welcomeGuide: true,
 			welcomeGuideStyles: true,
 		} );

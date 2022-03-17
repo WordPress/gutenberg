@@ -39,6 +39,26 @@ export default function EditSitePreferencesModal( {
 				</PreferencesModalSection>
 			),
 		},
+		{
+			name: 'blocks',
+			tabLabel: __( 'Blocks' ),
+			content: (
+				<PreferencesModalSection
+					title={ __( 'Block interactions' ) }
+					description={ __(
+						'Customize how you interact with blocks in the block library and editing canvas.'
+					) }
+				>
+					<EnableFeature
+						featureName="keepCaretInsideBlock"
+						help={ __(
+							'Aids screen readers by stopping text caret from leaving blocks.'
+						) }
+						label={ __( 'Contain text cursor inside block' ) }
+					/>
+				</PreferencesModalSection>
+			),
+		},
 	] );
 	if ( ! isModalActive ) {
 		return null;
