@@ -3,6 +3,7 @@
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const { join } = require( 'path' );
+const { flatMap } = require( 'lodash' );
 
 /**
  * WordPress dependencies
@@ -45,6 +46,32 @@ const exportDefaultPackages = [
 	'warning',
 ];
 
+const vendors = {
+	react: [
+		'react/umd/react.development.js',
+		'react/umd/react.production.min.js',
+	],
+	'react-dom': [
+		'react-dom/umd/react-dom.development.js',
+		'react-dom/umd/react-dom.production.min.js',
+	],
+};
+const vendorsCopyConfig = flatMap(
+	vendors,
+	( [ devFilename, prodFilename ], key ) => {
+		return [
+			{
+				from: `node_modules/${ devFilename }`,
+				to: `build/vendors/${ key }/dev.js`,
+			},
+			{
+				from: `node_modules/${ prodFilename }`,
+				to: `build/vendors/${ key }/prod.js`,
+			},
+		];
+	}
+);
+
 module.exports = {
 	...baseConfig,
 	name: 'packages',
@@ -72,13 +99,15 @@ module.exports = {
 		...plugins,
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 		new CopyWebpackPlugin( {
-			patterns: gutenbergPackages.map( ( packageName ) => ( {
-				from: '*.css',
-				context: `./packages/${ packageName }/build-style`,
-				to: `./build/${ packageName }`,
-				transform: stylesTransform,
-				noErrorOnMissing: true,
-			} ) ),
+			patterns: gutenbergPackages
+				.map( ( packageName ) => ( {
+					from: '*.css',
+					context: `./packages/${ packageName }/build-style`,
+					to: `./build/${ packageName }`,
+					transform: stylesTransform,
+					noErrorOnMissing: true,
+				} ) )
+				.concat( vendorsCopyConfig ),
 		} ),
 	].filter( Boolean ),
 };
