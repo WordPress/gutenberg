@@ -12,7 +12,7 @@
 		},
 		"size": {
 			"type": "number",
-			"default": 60
+			"default": 96
 		},
 		"isLink": {
 			"type": "boolean",

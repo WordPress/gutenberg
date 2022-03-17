@@ -37,9 +37,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 			// Apply styles for individual corner border radii.
 			foreach ( $border_radius as $key => $value ) {
 				if ( null !== $value ) {
-					// Convert camelCase key to kebab-case.
-					$name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
-
+					$name = _wp_to_kebab_case( $key );
 					// Add shared styles for individual border radii.
 					$border_style   = sprintf(
 						'border-%s-radius: %s;',

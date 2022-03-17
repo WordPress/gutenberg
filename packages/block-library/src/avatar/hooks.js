@@ -16,13 +16,13 @@ function getAvatarSizes( sizes ) {
 	};
 }
 
-function useAvatar( avatarUrls ) {
+function useDefaultAvatar() {
 	const { avatarURL: defaultAvatarUrl } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
 		return __experimentalDiscussionSettings;
 	} );
-	return avatarUrls ? avatarUrls[ avatarUrls.length - 1 ] : defaultAvatarUrl;
+	return defaultAvatarUrl;
 }
 
 export function useCommentAvatar( { commentId } ) {
@@ -42,8 +42,9 @@ export function useCommentAvatar( { commentId } ) {
 	const avatarUrls = avatars ? Object.values( avatars ) : null;
 	const sizes = avatars ? Object.keys( avatars ) : null;
 	const { minSize, maxSize } = getAvatarSizes( sizes );
+	const defaultAvatar = useDefaultAvatar();
 	return {
-		src: useAvatar( avatarUrls ),
+		src: avatarUrls ? avatarUrls[ avatarUrls.length - 1 ] : defaultAvatar,
 		minSize,
 		maxSize,
 		// translators: %s is the Author name.
@@ -82,8 +83,9 @@ export function useUserAvatar( { userId, postId, postType } ) {
 		? Object.keys( authorDetails.avatar_urls )
 		: null;
 	const { minSize, maxSize } = getAvatarSizes( sizes );
+	const defaultAvatar = useDefaultAvatar();
 	return {
-		src: useAvatar( avatarUrls ),
+		src: avatarUrls ? avatarUrls[ avatarUrls.length - 1 ] : defaultAvatar,
 		minSize,
 		maxSize,
 		alt: authorDetails
