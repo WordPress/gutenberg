@@ -57,6 +57,15 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				};
 			}
 
+			if ( ! storedSettings.__experimentalBlockPatternCategories ) {
+				storedSettings = {
+					...storedSettings,
+					__experimentalBlockPatternCategories: select(
+						coreStore
+					).getBlockPatternCategories(),
+				};
+			}
+
 			return {
 				settings: storedSettings,
 			};
