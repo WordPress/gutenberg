@@ -42,7 +42,7 @@ export {
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
 export { default as ContrastChecker } from './contrast-checker';
-export { default as DateFormatPicker } from './date-format-picker';
+export { default as __experimentalDateFormatPicker } from './date-format-picker';
 export { default as __experimentalDuotoneControl } from './duotone-control';
 export { default as __experimentalFontAppearanceControl } from './font-appearance-control';
 export { default as __experimentalFontFamilyControl } from './font-family';

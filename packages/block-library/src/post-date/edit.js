@@ -17,7 +17,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
-	DateFormatPicker,
+	__experimentalDateFormatPicker as DateFormatPicker,
 } from '@wordpress/block-editor';
 import {
 	Dropdown,

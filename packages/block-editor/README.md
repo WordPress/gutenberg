@@ -319,22 +319,6 @@ _Returns_
 
 -   `Function`: Higher-order component.
 
-### DateFormatPicker
-
-The `DateFormatPicker` component renders controls that let the user choose a
-_date format_. That is, how they want their dates to be formatted.
-
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/date-format-picker/README.md>
-
-_Parameters_
-
--   _props_ `Object`:
--   _props.format_ `string|null`: The selected date format. If `null`, _Default_ is selected.
--   _props.defaultFormat_ `string`: The date format that will be used if the user selects 'Default'.
--   _props.onChange_ `( format: string|null ) => void`: Called when a selection is made. If `null`, _Default_ is selected.
-
 ### DefaultBlockAppender
 
 Undocumented declaration.

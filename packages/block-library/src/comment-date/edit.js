@@ -9,7 +9,7 @@ import {
 import {
 	InspectorControls,
 	useBlockProps,
-	DateFormatPicker,
+	__experimentalDateFormatPicker as DateFormatPicker,
 } from '@wordpress/block-editor';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
