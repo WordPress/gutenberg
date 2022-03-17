@@ -44,19 +44,28 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		[ clientIds ]
 	);
 
-	const isMultiSelected = selectedClientIds.length > 1;
+	const showLockButton = selectedClientIds.length === 1;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
 	const convertToGroupButtonProps = useConvertToGroupButtonProps();
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton = isGroupable || isUngroupable;
+
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks, selectedClientIds } }>
 			{ ( fills ) => {
+				if (
+					! fills?.length > 0 &&
+					! showConvertToGroupButton &&
+					! showLockButton
+				) {
+					return null;
+				}
+
 				return (
 					<MenuGroup>
-						{ ! isMultiSelected && (
+						{ showLockButton && (
 							<BlockLockMenuItem
 								clientId={ selectedClientIds[ 0 ] }
 							/>
