@@ -61,6 +61,7 @@ export {
 	filterUnitsWithSettings as filterUnitsWithSettings,
 } from './unit-control/utils';
 export { default as Disabled } from './disabled';
+export { default as Draggable } from './draggable';
 
 // Higher-Order Components.
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
