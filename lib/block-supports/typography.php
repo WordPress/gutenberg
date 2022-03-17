@@ -219,40 +219,71 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
 	return sprintf( '%s:var(--wp--preset--%s--%s);', $css_property, $css_property, $slug );
 }
 
+/**
+ * Returns a font-size value based on a given font-size preset. If typography.fluid is enabled it will calculate clamp values.
+ *
+ * @param array $preset Duotone preset value as seen in theme.json.
+ * @return string        Font-size value.
+ */
 function gutenberg_get_typography_font_size_value( $preset ) {
-	// This is where we'll keep options I guess.
-	// Comment out to show how things work.
 	$typography_settings = gutenberg_get_global_settings( array( 'typography' ) );
 
-//	if ( ! isset( $typography_settings['fluid'] ) ) {
-//		return $preset['size'];
-//	}
+	// This is where we'll keep options I guess.
+	if ( ! isset( $typography_settings['fluid'] ) ) {
+		return $preset['size'];
+	}
 
-	// Should be defined by theme.json, maybe take from layout?
-	$minimum_viewport_width = 640 / 16; // rem for now. 1200(px) / 16 to get rem.
-	$maximum_viewport_width = 1600 / 16; // Ditto.
+	// Up for discussion.
+	$default_unit                   = 'rem';
+	$default_minimum_viewport_width = '1600px';
+	$default_maximum_viewport_width = '650px';
 
-	/*
-	Up next;
-	 - Challenge: looping through fontSizes and calculating clamp functions for every size relies preferably on rem/px or unitless values.
-	 - Apply this to custom font-size values.
-	 */
-
-	// Matches rem or unitless values only.
+	// Matches rem or px values only.
 	$pattern = '/^(\d*\.?\d+)(rem|px)?$/';
-	preg_match_all( $pattern, $preset['size'], $matches );
+	// Could we also take these from layout? contentSize and wideSize?
+	$minimum_viewport_width      = isset( $typography_settings['minViewportWidth'] ) ? $typography_settings['minViewportWidth'] : $default_minimum_viewport_width;
+	$minimum_viewport_width_unit = $default_unit;
+	$maximum_viewport_width      = isset( $typography_settings['maxViewportWidth'] ) ? $typography_settings['maxViewportWidth'] : $default_maximum_viewport_width;
+	$maximum_viewport_width_unit = $default_unit;
 
-	if ( isset( $matches[1][0] ) ) {
-		$base_value = intval( $matches[1][0] );
+	// Minimum viewport size.
+	preg_match_all( $pattern, $minimum_viewport_width, $minimum_viewport_width_matches );
+	if ( isset( $minimum_viewport_width_matches[1][0] ) ) {
+		$minimum_viewport_width      = intval( $minimum_viewport_width_matches[1][0] );
+		$minimum_viewport_width_unit = isset( $minimum_viewport_width_matches[2][0] ) ? $minimum_viewport_width_matches[2][0] : $minimum_viewport_width_unit;
+		if ( 'px' === $minimum_viewport_width_unit ) {
+			// Default is rem so we convert px to rem.
+			$minimum_viewport_width = $minimum_viewport_width / 16;
+		}
+	}
 
-		if ( isset( $matches[2][0] ) && 'px' === $matches[2][0] ) {
-			// Calculate rem to px.
+	// Maximum viewport size.
+	preg_match_all( $pattern, $maximum_viewport_width, $maximum_viewport_width_matches );
+	if ( isset( $maximum_viewport_width_matches[1][0] ) ) {
+		$maximum_viewport_width      = intval( $maximum_viewport_width_matches[1][0] );
+		$maximum_viewport_width_unit = isset( $maximum_viewport_width_matches[2][0] ) ? $maximum_viewport_width_matches[2][0] : $maximum_viewport_width_unit;
+		if ( 'px' === $maximum_viewport_width_unit ) {
+			// Default is rem so we convert px to rem.
+			$maximum_viewport_width = $maximum_viewport_width / 16;
+		}
+	}
 
-			$base_value = $base_value / 16;
+	// Font sizes.
+	preg_match_all( $pattern, $preset['size'], $size_matches );
+	if ( isset( $size_matches[1][0] ) ) {
+		$base_size_value = $size_matches[1][0];
+
+		if ( isset( $size_matches[2][0] ) && 'px' === $size_matches[2][0] ) {
+			// Default is rem so we convert px to rem.
+			$base_size_value = $base_size_value / 16;
 		}
 
-		$minimum_font_size = $base_value * 1; // A min value should ideally be coming from theme.json.
-		$maximum_font_size = $base_value * 1.5; // Ditto on the max.
+		// How can we offer control over this?
+		// Maybe typography.fluid.{min|max}FontSizeFactor.
+		// Or picking the first and last sizes in the fontSizes array?
+		// Another option is here to accept fontSizes[0]['min'] and fontSizes[0]['max'] from a preset item.
+		$minimum_font_size = $base_size_value * 0.9;
+		$maximum_font_size = $base_size_value * 1.75;
 		$factor            = ( 1 / ( $maximum_viewport_width - $minimum_viewport_width ) ) * ( $maximum_font_size - $minimum_font_size );
 		$calc_rem          = $minimum_font_size - ( $minimum_viewport_width * $factor );
 		$calc_vw           = 100 * $factor;
@@ -260,7 +291,6 @@ function gutenberg_get_typography_font_size_value( $preset ) {
 		$max               = max( $minimum_font_size, $maximum_font_size );
 
 		return "clamp({$min}rem, {$calc_rem}rem + {$calc_vw}vw, {$max}rem)";
-
 	} else {
 		return $preset['size'];
 	}

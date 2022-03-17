@@ -253,6 +253,20 @@
 							"type": "boolean",
 							"default": true
 						},
+						"fluid": {
+							"description": "Enables fluid typography and allows users to set global fluid typography parameters.",
+							"type": "object",
+							"properties": {
+								"maxViewportWidth": {
+									"description": "Allow users to set custom a max viewport width.",
+									"type": "string"
+								},
+								"minViewportWidth": {
+									"description": "Allow users to set custom a min viewport width.",
+									"type": "string"
+								}
+							}
+						},
 						"letterSpacing": {
 							"description": "Allow users to set custom letter spacing.",
 							"type": "boolean",
