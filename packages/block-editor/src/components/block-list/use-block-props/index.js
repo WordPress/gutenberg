@@ -72,6 +72,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
+		blockListSettings,
+		hasChildBlocks,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -84,6 +86,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected,
 				isAncestorMultiSelected,
 				isFirstMultiSelectedBlock,
+				getBlockListSettings,
+				getBlockOrder,
 			} = select( blockEditorStore );
 			const isSelected = isBlockSelected( clientId );
 			const isPartOfMultiSelection =
@@ -104,6 +108,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+				blockListSettings: getBlockListSettings( clientId ),
+				hasChildBlocks: getBlockOrder( clientId ).length > 0,
 			};
 		},
 		[ clientId ]
@@ -111,6 +117,21 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
+	const blockDescription = hasChildBlocks
+		? sprintf(
+				// translators: 1: Block title to lowercase for better sentence structure.
+				__(
+					'Press Escape followed by Left and Right Arrows to explore child blocks of the %s block.'
+				),
+				blockTitle.toLowerCase()
+		  )
+		: sprintf(
+				// translators: 1: Block title to lowercase for better sentence structure.
+				__(
+					'Press Tab followed by Enter to add a child block of the %s block.'
+				),
+				blockTitle.toLowerCase()
+		  );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
 		props.ref,
@@ -148,6 +169,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		tabIndex: 0,
 		role: 'document',
 		'aria-label': blockLabel,
+		'aria-description': blockListSettings ? blockDescription : undefined,
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
