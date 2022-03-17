@@ -24,6 +24,13 @@ function render( jsx ) {
 	};
 }
 
+// @testing-library/user-event considers changing <input type="file"> to a string as a change, but it do not occur on real browsers, so the comparisions will be agains this result
+const fakePath = expect.objectContaining( {
+	target: expect.objectContaining( {
+		value: 'C:\\fakepath\\hello.png',
+	} ),
+} );
+
 describe( 'FormFileUpload', () => {
 	it( 'should show an Icon Button and a hidden input', () => {
 		render( <FormFileUpload>My Upload Button</FormFileUpload> );
@@ -51,19 +58,19 @@ describe( 'FormFileUpload', () => {
 
 		await user.upload( input, file );
 
-		// await last upload event propagation
-		setTimeout( async () => {
-			await user.upload( input, file );
+		await user.upload( input, file );
 
-			expect( onChange ).toHaveBeenCalledTimes( 1 );
-		}, 0 );
+		expect( onChange ).toHaveBeenNthCalledWith( 1, fakePath );
 	} );
 
 	it( 'should fire a change event after selecting the same file if there is a onClick', async () => {
 		const onChange = jest.fn();
 
 		const { user } = render(
-			<FormFileUpload onClick={ jest.fn() } onChange={ onChange }>
+			<FormFileUpload
+				onClick={ jest.fn( ( e ) => ( e.target.value = '' ) ) }
+				onChange={ onChange }
+			>
 				My Upload Button
 			</FormFileUpload>
 		);
@@ -75,13 +82,10 @@ describe( 'FormFileUpload', () => {
 		const input = screen.getByTestId( 'form-file-upload-input' );
 		await user.upload( input, file );
 
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenNthCalledWith( 1, fakePath );
 
-		// await last upload event propagation and onClick event run
-		setTimeout( async () => {
-			await user.upload( input, file );
+		await user.upload( input, file );
 
-			expect( onChange ).toHaveBeenCalledTimes( 2 );
-		}, 0 );
+		expect( onChange ).toHaveBeenNthCalledWith( 2, fakePath );
 	} );
 } );
