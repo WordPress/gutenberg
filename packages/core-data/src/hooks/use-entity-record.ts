@@ -3,7 +3,7 @@
  */
 import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
-import { Status } from './constants';
+import type { Status } from './constants';
 
 interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
