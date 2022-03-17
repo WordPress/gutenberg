@@ -25,16 +25,14 @@ import { store as blockEditorStore } from '../../store';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
-const BlockSettingsMenuControlsSlot = ( {
-	fillProps,
-	clientIds = null,
-	canRemove,
-} ) => {
-	const { selectedBlocks, selectedClientIds } = useSelect(
+const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
+	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
 		( select ) => {
-			const { getBlocksByClientId, getSelectedBlockClientIds } = select(
-				blockEditorStore
-			);
+			const {
+				getBlocksByClientId,
+				getSelectedBlockClientIds,
+				canRemoveBlocks,
+			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
@@ -43,6 +41,7 @@ const BlockSettingsMenuControlsSlot = ( {
 					( block ) => block.name
 				),
 				selectedClientIds: ids,
+				canRemove: canRemoveBlocks( ids ),
 			};
 		},
 		[ clientIds ]
