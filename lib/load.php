@@ -40,9 +40,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Block_Navigation_Areas_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-block-navigation-areas-controller.php';
 	}
-	if ( ! class_exists( 'WP_REST_Block_Patterns_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-block-patterns-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Menu_Locations_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menu-locations-controller.php';
 	}
@@ -97,6 +94,7 @@ require __DIR__ . '/compat/wordpress-5.9/move-theme-editor-menu-item.php';
 require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
 require __DIR__ . '/compat/wordpress-6.0/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-template-utils.php';
+require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-block-patterns-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
