@@ -6,7 +6,7 @@ import { waitForMediaLibrary } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor File Block tests', () => {
-	it( 'should be able to add a file block', async () => {
+	it( 'should be able to add a file block and a file to it', async () => {
 		// add a file block
 		await editorPage.addNewBlock( blockNames.file );
 

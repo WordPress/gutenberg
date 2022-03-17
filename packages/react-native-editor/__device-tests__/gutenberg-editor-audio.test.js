@@ -6,7 +6,7 @@ import { waitForMediaLibrary } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor Audio Block tests', () => {
-	it( 'should be able to add an audio block', async () => {
+	it( 'should be able to add an audio block and a file to it', async () => {
 		// add an audio block
 		await editorPage.addNewBlock( blockNames.audio );
 
