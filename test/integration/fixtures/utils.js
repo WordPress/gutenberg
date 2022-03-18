@@ -5,6 +5,11 @@ import fs from 'fs';
 import path from 'path';
 import { uniq } from 'lodash';
 
+/**
+ * Internal dependencies
+ */
+import { excludedBlocks } from './excluded-blocks';
+
 const FIXTURES_DIR = path.join( __dirname, 'blocks' );
 const STORIES_DIR = path.join( __dirname, '../../../storybook/stories/blocks' );
 
@@ -22,6 +27,9 @@ function writeFixtureFile( fixturesDir, filename, content ) {
 }
 
 function writeStoryFile( basename ) {
+	if ( excludedBlocks.indexOf( basename ) >= 0 ) {
+		return;
+	}
 	const underscoresBasename = basename.replace( /-/g, '_' );
 	const content = `/**
  * Internal dependencies
@@ -113,5 +121,7 @@ export function writeBlockFixtureSerializedHTML( basename, fixture ) {
 
 export function writeBlockFixtureStory( basename ) {
 	const content = writeStoryFile( basename );
-	writeFixtureFile( STORIES_DIR, `${ basename }.js`, content );
+	if ( content ) {
+		writeFixtureFile( STORIES_DIR, `${ basename }.js`, content );
+	}
 }
