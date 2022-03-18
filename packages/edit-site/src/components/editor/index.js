@@ -21,6 +21,7 @@ import {
 	ShortcutProvider,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -72,7 +73,6 @@ function Editor( { onError } ) {
 			getPage,
 			isNavigationOpened,
 			getEditorMode,
-			isFeatureActive,
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
 		const postType = getEditedPostType();
@@ -107,7 +107,10 @@ function Editor( { onError } ) {
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
 			editorMode: getEditorMode(),
-			showIconLabels: isFeatureActive( 'showIconLabels' ),
+			showIconLabels: select( preferencesStore ).get(
+				'core/edit-site',
+				'showIconLabels'
+			),
 		};
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
