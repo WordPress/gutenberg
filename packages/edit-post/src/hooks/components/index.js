@@ -12,7 +12,7 @@ import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { MediaUpload } from '@wordpress/media-utils';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { group } from '@wordpress/icons';
+import { postFeaturedImage } from '@wordpress/icons';
 import { BlockControls } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -86,7 +86,7 @@ const addFeaturedImageToolbarItem = createHigherOrderComponent(
 				<>
 					<BlockControls group="other">
 						<ToolbarButton
-							icon={ group /*this is temporary*/ }
+							icon={ postFeaturedImage /*this is temporary*/ }
 							label={ __( 'Use featured image' ) }
 							isPressed={ hasContextualAttribute }
 							onClick={ () => {
