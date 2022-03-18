@@ -35,7 +35,7 @@ const BorderLabel = ( props: LabelProps ) => {
 
 const BorderBoxControl = (
 	props: WordPressComponentProps< BorderBoxControlProps, 'div' >,
-	forwardedRef: React.Ref< any >
+	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
 		className,
