@@ -11,7 +11,6 @@ import {
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -43,13 +42,14 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 		onChange( unprocessedValue );
 	};
 
-	const computedValue = useMemo( () => {
-		const [ parsedQuantity, parsedUnit ] = parseQuantityAndUnitFromRawValue(
-			value
-		);
-		// Force the unit to update to `px` when the Spacer is being resized.
-		return [ parsedQuantity, isResizing ? 'px' : parsedUnit ].join( '' );
-	}, [ isResizing, value ] );
+	// Force the unit to update to `px` when the Spacer is being resized.
+	const [ parsedQuantity, parsedUnit ] = parseQuantityAndUnitFromRawValue(
+		value
+	);
+	const computedValue = [
+		parsedQuantity,
+		isResizing ? 'px' : parsedUnit,
+	].join( '' );
 
 	return (
 		<BaseControl label={ label } id={ inputId }>
