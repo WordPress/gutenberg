@@ -194,12 +194,12 @@ function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_vendor_scripts( $scripts ) {
-	$filename = SCRIPT_DEBUG ? 'dev.js' : 'prod.js';
+	$extension = SCRIPT_DEBUG ? 'min.js' : '.js';
 
 	gutenberg_override_script(
 		$scripts,
 		'react',
-		gutenberg_url( 'build/vendors/react/' . $filename ),
+		gutenberg_url( 'build/vendors/react' . $extension ),
 		// See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
 		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' )
 	);

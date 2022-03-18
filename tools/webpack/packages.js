@@ -62,11 +62,11 @@ const vendorsCopyConfig = flatMap(
 		return [
 			{
 				from: `node_modules/${ devFilename }`,
-				to: `build/vendors/${ key }/dev.js`,
+				to: `build/vendors/${ key }.js`,
 			},
 			{
 				from: `node_modules/${ prodFilename }`,
-				to: `build/vendors/${ key }/prod.js`,
+				to: `build/vendors/${ key }.min.js`,
 			},
 		];
 	}
