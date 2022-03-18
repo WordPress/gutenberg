@@ -5,6 +5,7 @@ import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/compo
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ import {
 	resetPadding,
 	useIsPaddingDisabled,
 } from './padding';
+import { store as blockEditorStore } from '../store';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -50,6 +52,18 @@ export function DimensionsPanel( props ) {
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
 
+	const { setToolsPanelState, resetToolsPanelState } = useDispatch(
+		blockEditorStore
+	);
+
+	const toolsPanelState = useSelect(
+		( select ) => {
+			const { getToolsPanelState } = select( blockEditorStore );
+			return getToolsPanelState( props.name, 'spacing' );
+		},
+		[ props.name ]
+	);
+
 	if ( isDisabled || ! isSupported ) {
 		return null;
 	}
@@ -59,16 +73,27 @@ export function DimensionsPanel( props ) {
 		'__experimentalDefaultControls',
 	] );
 
-	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
-		...newAttributes,
-		style: {
-			...newAttributes.style,
-			spacing: {
-				...newAttributes.style?.spacing,
-				[ attribute ]: undefined,
+	const setDimensionsToolsPanelState = ( panelItem, state ) => {
+		setToolsPanelState( props.name, 'spacing', { [ panelItem ]: state } );
+	};
+
+	const resetDimensionsToolsPanelState = () => {
+		resetToolsPanelState( props.name, 'spacing' );
+	};
+
+	const createResetAllFilter = ( attribute ) => ( newAttributes ) => {
+		resetDimensionsToolsPanelState();
+		return {
+			...newAttributes,
+			style: {
+				...newAttributes.style,
+				spacing: {
+					...newAttributes.style?.spacing,
+					[ attribute ]: undefined,
+				},
 			},
-		},
-	} );
+		};
+	};
 
 	return (
 		<InspectorControls __experimentalGroup="dimensions">
@@ -76,7 +101,13 @@ export function DimensionsPanel( props ) {
 				<ToolsPanelItem
 					hasValue={ () => hasPaddingValue( props ) }
 					label={ __( 'Padding' ) }
-					onDeselect={ () => resetPadding( props ) }
+					onSelect={ () =>
+						setDimensionsToolsPanelState( 'padding', true )
+					}
+					onDeselect={ () => {
+						resetPadding( props );
+						setDimensionsToolsPanelState( 'padding', false );
+					} }
 					resetAllFilter={ createResetAllFilter( 'padding' ) }
 					isShownByDefault={ defaultSpacingControls?.padding }
 					panelId={ props.clientId }
@@ -86,9 +117,17 @@ export function DimensionsPanel( props ) {
 			) }
 			{ ! isMarginDisabled && (
 				<ToolsPanelItem
-					hasValue={ () => hasMarginValue( props ) }
+					hasValue={ () =>
+						hasMarginValue( props ) || toolsPanelState?.margin
+					}
 					label={ __( 'Margin' ) }
-					onDeselect={ () => resetMargin( props ) }
+					onSelect={ () =>
+						setDimensionsToolsPanelState( 'margin', true )
+					}
+					onDeselect={ () => {
+						resetMargin( props );
+						setDimensionsToolsPanelState( 'margin', false );
+					} }
 					resetAllFilter={ createResetAllFilter( 'margin' ) }
 					isShownByDefault={ defaultSpacingControls?.margin }
 					panelId={ props.clientId }
@@ -100,7 +139,13 @@ export function DimensionsPanel( props ) {
 				<ToolsPanelItem
 					hasValue={ () => hasGapValue( props ) }
 					label={ __( 'Block spacing' ) }
-					onDeselect={ () => resetGap( props ) }
+					onSelect={ () =>
+						setDimensionsToolsPanelState( 'blockGap', true )
+					}
+					onDeselect={ () => {
+						resetGap( props );
+						setDimensionsToolsPanelState( 'blockGap', false );
+					} }
 					resetAllFilter={ createResetAllFilter( 'blockGap' ) }
 					isShownByDefault={ defaultSpacingControls?.blockGap }
 					panelId={ props.clientId }

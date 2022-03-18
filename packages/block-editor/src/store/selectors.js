@@ -32,6 +32,8 @@ import {
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
+import { createRegistrySelector } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * A block selection object.
@@ -2312,3 +2314,16 @@ export function wasBlockJustInserted( state, clientId, source ) {
 		lastBlockInserted.source === source
 	);
 }
+
+// This should not be here probably, just experimenting.
+export const getToolsPanelState = createRegistrySelector(
+	( select ) => ( state, blockName, panelName ) => {
+		const existingState =
+			select( preferencesStore ).get(
+				'core/block-inspector',
+				'toolsPanel'
+			) ?? {};
+
+		return existingState?.[ blockName ]?.[ panelName ] || {};
+	}
+);

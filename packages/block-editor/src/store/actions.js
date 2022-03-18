@@ -21,6 +21,7 @@ import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Action which will insert a default block insert action if there
@@ -1282,3 +1283,55 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+// This should not be here probably, just experimenting.
+
+/**
+ * Returns an action object used in storing tools panel states for specific blocks.
+ *
+ * @param {string}  blockName Name of the block.
+ * @param {?string} panelName Name of the ToolsPanel/block support
+ */
+
+export const setToolsPanelState = (
+	blockName,
+	panelName,
+	panelItemState
+) => ( { registry } ) => {
+	const existingState =
+		registry
+			.select( preferencesStore )
+			.get( 'core/block-inspector', 'toolsPanel' ) ?? {};
+
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/block-inspector', 'toolsPanel', {
+			...existingState,
+			[ blockName ]: {
+				...existingState?.[ blockName ],
+				[ panelName ]: {
+					...existingState?.[ blockName ]?.[ panelName ],
+					...panelItemState,
+				},
+			},
+		} );
+};
+
+export const resetToolsPanelState = ( blockName, panelName ) => ( {
+	registry,
+} ) => {
+	const existingState =
+		registry
+			.select( preferencesStore )
+			.get( 'core/block-inspector', 'toolsPanel' ) ?? {};
+
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/block-inspector', 'toolsPanel', {
+			...existingState,
+			[ blockName ]: {
+				...existingState?.[ blockName ],
+				[ panelName ]: {},
+			},
+		} );
+};

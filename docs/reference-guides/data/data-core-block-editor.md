@@ -774,6 +774,10 @@ _Returns_
 
 -   `?string`: Block Template Lock
 
+### getToolsPanelState
+
+Undocumented declaration.
+
 ### hasBlockMovingClientId
 
 Returns whether block moving mode is enabled.
@@ -1368,6 +1372,10 @@ _Returns_
 
 -   `Object`: Action object.
 
+### resetToolsPanelState
+
+Undocumented declaration.
+
 ### selectBlock
 
 Returns an action object used in signalling that the block with the
@@ -1453,6 +1461,15 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### setToolsPanelState
+
+Returns an action object used in storing tools panel states for specific blocks.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of the block.
+-   _panelName_ `?string`: Name of the ToolsPanel/block support
 
 ### showInsertionPoint
 
