@@ -59,7 +59,7 @@ export default function BlockLockToolbar( { clientId } ) {
 					icon={ lock }
 					label={ label }
 					onClick={ canLockBlocks ? toggleModal : undefined }
-					disabled={ ! canLockBlocks }
+					aria-disabled={ ! canLockBlocks }
 				/>
 			</ToolbarGroup>
 			{ isModalOpen && canLockBlocks ? (
