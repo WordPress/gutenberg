@@ -330,7 +330,6 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.up( 'Shift' );
 		await transformBlockTo( 'Group' );
-		await page.keyboard.press( 'ArrowDown' );
 
 		// Click the first paragraph in the first Group block while pressing `shift` key.
 		const firstParagraph = await page.waitForXPath( "//p[text()='first']" );
