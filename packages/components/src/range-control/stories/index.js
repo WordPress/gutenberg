@@ -29,6 +29,7 @@ export default {
 		color: { control: { type: 'color' } },
 		disabled: { control: { type: 'boolean' } },
 		help: { control: { type: 'text' } },
+		initialPosition: { control: { type: 'number' } },
 		marks: { control: { type: 'object' } },
 		min: { control: { type: 'number' } },
 		max: { control: { type: 'number' } },
