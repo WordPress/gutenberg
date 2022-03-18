@@ -196,6 +196,32 @@ function setupWPTimezone() {
 	);
 }
 
+/**
+ * Gets the ordinal suffix for a month number (e.g. 'nd' for 2).
+ *
+ * Marked as unstable because it's only exported for testing.
+ *
+ * @param {string|number} dayOfMonth The day of month
+ * @return {string} The suffix (e.g. 'st' for the number 1)
+ */
+export function __unstableGetMonthNumberOrdinalSuffix( dayOfMonth ) {
+	if ( typeof dayOfMonth === 'number' ) {
+		dayOfMonth = dayOfMonth.toString();
+	}
+
+	if ( dayOfMonth !== '11' && dayOfMonth.endsWith( '1' ) ) {
+		return 'st';
+	}
+	if ( dayOfMonth !== '12' && dayOfMonth.endsWith( '2' ) ) {
+		return 'nd';
+	}
+	if ( dayOfMonth !== '13' && dayOfMonth.endsWith( '3' ) ) {
+		return 'rd';
+	}
+
+	return 'th';
+}
+
 // Date constants.
 /**
  * Number of seconds in one minute.
@@ -242,10 +268,9 @@ const formatMap = {
 	 * @return {string} Formatted date.
 	 */
 	S( momentDate ) {
-		// Do - D.
-		const num = momentDate.format( 'D' );
-		const withOrdinal = momentDate.format( 'Do' );
-		return withOrdinal.replace( num, '' );
+		return __unstableGetMonthNumberOrdinalSuffix(
+			momentDate.format( 'D' )
+		);
 	},
 
 	w: 'd',

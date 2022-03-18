@@ -10,6 +10,7 @@ import {
 	gmdateI18n,
 	isInTheFuture,
 	setSettings,
+	__unstableGetMonthNumberOrdinalSuffix,
 } from '../';
 
 describe( 'isInTheFuture', () => {
@@ -505,4 +506,88 @@ describe( 'Moment.js Localization', () => {
 		// Restore default settings.
 		setSettings( settings );
 	} );
+} );
+
+describe( '__unstableGetMonthNumberOrdinalSuffix', () => {
+	it.each( [
+		{ monthNumber: 1, expected: 'st' },
+		{ monthNumber: 2, expected: 'nd' },
+		{ monthNumber: 3, expected: 'rd' },
+		{ monthNumber: 4, expected: 'th' },
+		{ monthNumber: 5, expected: 'th' },
+		{ monthNumber: 6, expected: 'th' },
+		{ monthNumber: 7, expected: 'th' },
+		{ monthNumber: 8, expected: 'th' },
+		{ monthNumber: 9, expected: 'th' },
+		{ monthNumber: 10, expected: 'th' },
+		{ monthNumber: 11, expected: 'th' },
+		{ monthNumber: 12, expected: 'th' },
+		{ monthNumber: 13, expected: 'th' },
+		{ monthNumber: 14, expected: 'th' },
+		{ monthNumber: 15, expected: 'th' },
+		{ monthNumber: 16, expected: 'th' },
+		{ monthNumber: 17, expected: 'th' },
+		{ monthNumber: 18, expected: 'th' },
+		{ monthNumber: 19, expected: 'th' },
+		{ monthNumber: 20, expected: 'th' },
+		{ monthNumber: 21, expected: 'st' },
+		{ monthNumber: 22, expected: 'nd' },
+		{ monthNumber: 23, expected: 'rd' },
+		{ monthNumber: 24, expected: 'th' },
+		{ monthNumber: 25, expected: 'th' },
+		{ monthNumber: 26, expected: 'th' },
+		{ monthNumber: 27, expected: 'th' },
+		{ monthNumber: 28, expected: 'th' },
+		{ monthNumber: 29, expected: 'th' },
+		{ monthNumber: 30, expected: 'th' },
+		{ monthNumber: 31, expected: 'st' },
+	] )(
+		'outputs $expected for the integer month number $monthNumber',
+		( { monthNumber, expected } ) => {
+			expect( __unstableGetMonthNumberOrdinalSuffix( monthNumber ) ).toBe(
+				expected
+			);
+		}
+	);
+
+	it.each( [
+		{ monthNumber: '1', expected: 'st' },
+		{ monthNumber: '2', expected: 'nd' },
+		{ monthNumber: '3', expected: 'rd' },
+		{ monthNumber: '4', expected: 'th' },
+		{ monthNumber: '5', expected: 'th' },
+		{ monthNumber: '6', expected: 'th' },
+		{ monthNumber: '7', expected: 'th' },
+		{ monthNumber: '8', expected: 'th' },
+		{ monthNumber: '9', expected: 'th' },
+		{ monthNumber: '10', expected: 'th' },
+		{ monthNumber: '11', expected: 'th' },
+		{ monthNumber: '12', expected: 'th' },
+		{ monthNumber: '13', expected: 'th' },
+		{ monthNumber: '14', expected: 'th' },
+		{ monthNumber: '15', expected: 'th' },
+		{ monthNumber: '16', expected: 'th' },
+		{ monthNumber: '17', expected: 'th' },
+		{ monthNumber: '18', expected: 'th' },
+		{ monthNumber: '19', expected: 'th' },
+		{ monthNumber: '20', expected: 'th' },
+		{ monthNumber: '21', expected: 'st' },
+		{ monthNumber: '22', expected: 'nd' },
+		{ monthNumber: '23', expected: 'rd' },
+		{ monthNumber: '24', expected: 'th' },
+		{ monthNumber: '25', expected: 'th' },
+		{ monthNumber: '26', expected: 'th' },
+		{ monthNumber: '27', expected: 'th' },
+		{ monthNumber: '28', expected: 'th' },
+		{ monthNumber: '29', expected: 'th' },
+		{ monthNumber: '30', expected: 'th' },
+		{ monthNumber: '31', expected: 'st' },
+	] )(
+		'outputs $expected for the string month number $monthNumber',
+		( { monthNumber, expected } ) => {
+			expect( __unstableGetMonthNumberOrdinalSuffix( monthNumber ) ).toBe(
+				expected
+			);
+		}
+	);
 } );
