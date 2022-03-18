@@ -61,6 +61,7 @@ function UnforwardedUnitControl(
 		unit: unitProp,
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
+		onBlur: onBlurProp,
 		...props
 	} = unitControlProps;
 
@@ -187,7 +188,10 @@ function UnforwardedUnitControl(
 		}
 	};
 
-	const handleOnBlur: FocusEventHandler< HTMLInputElement > = mayUpdateUnit;
+	const handleOnBlur: FocusEventHandler< HTMLInputElement > = ( event ) => {
+		mayUpdateUnit( event );
+		onBlurProp?.( event );
+	};
 
 	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
 		const { key } = event;
@@ -242,6 +246,7 @@ function UnforwardedUnitControl(
 			size={ size }
 			unit={ unit }
 			units={ units }
+			onBlur={ onBlurProp }
 		/>
 	) : null;
 
