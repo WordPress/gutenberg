@@ -15,7 +15,6 @@ import { useSelect } from '@wordpress/data';
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
-import { setContentEditableWrapper } from './use-multi-selection';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -130,7 +129,9 @@ export function useFocusFirstElement( clientId ) {
 			}
 		}
 
-		setContentEditableWrapper( ref.current, false );
+		ref.current.parentElement.closest(
+			'[contenteditable]'
+		).contentEditable = false;
 
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition, clientId ] );
