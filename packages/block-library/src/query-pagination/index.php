@@ -18,10 +18,12 @@ function render_block_core_query_pagination( $attributes, $content ) {
 		return '';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array(
-		'role' => 'navigation',
-		'aria-label' => __( 'Pagination Navigation' ),
-	) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'role'       => 'navigation',
+			'aria-label' => __( 'Pagination Navigation' ),
+		)
+	);
 
 	return sprintf(
 		'<nav %1$s>
