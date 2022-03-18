@@ -6,9 +6,9 @@ import type { Store as ReduxStore } from 'redux';
 
 type MapOf< T > = { [ name: string ]: T };
 
-export type ActionCreator = Function | Generator;
-export type Resolver = Function | Generator;
-export type Selector = Function;
+export type ActionCreator = ( ...args: any[] ) => any | Generator;
+export type Resolver = ( ...args: any[] ) => any | Generator;
+export type Selector = ( ...args: any[] ) => any;
 
 export type AnyConfig = ReduxStoreConfig< any, any, any >;
 
@@ -38,7 +38,7 @@ export interface ReduxStoreConfig<
 	initialState?: State;
 	reducer: ( state: any, action: any ) => any;
 	actions?: ActionCreators;
-	resolvers?: MapOf< Resolver >;
+	resolvers?: ResolversOf< Selectors >;
 	selectors?: Selectors;
 	controls?: MapOf< Function >;
 }
@@ -103,13 +103,33 @@ type Resolvable<
 	? F
 	: ( ...args: Parameters< F > ) => Promise< ReturnType< F > >;
 
+/**
+ * "Unwraps" thunks, whereby Redux considers any function is a thunk.
+ */
 type ResolvedThunks< Actions extends AnyConfig[ 'actions' ] > = {
 	[ Action in keyof Actions ]: Actions[ Action ] extends (
 		...args: infer P
-	) => ( thunkArgs: { select?: () => any; dispatch?: () => any } ) => infer R
+	) => ( ...thunkArgs: any ) => infer R
 		? ( ...args: P ) => R
 		: Actions[ Action ];
 };
+
+/**
+ * For every defined selector returns a function with the same arguments
+ * except for the initial `state` parameter.
+ *
+ * Excludes specific fields that are ignored when creating resolvers.
+ *
+ * @see mapResolveSelectors
+ */
+type ResolversOf< Selectors extends MapOf< Selector > > = NonNullable<
+	{
+		[ Name in keyof Selectors as Exclude<
+			Name,
+			NonResolveSelectFields
+		> ]?: Resolvable< CurriedState< Selectors[ Name ] > >;
+	}
+>;
 
 /**
  * These fields are excluded from the resolveSelect mapping.
@@ -147,14 +167,9 @@ export interface DataRegistry {
 		Selectors extends Store< StoreRef >[ 'selectors' ]
 	>(
 		store: StoreRef
-	): NonNullable<
-		{
-			[ Name in keyof Selectors as Exclude<
-				Name,
-				NonResolveSelectFields
-			> ]: Resolvable< CurriedState< Selectors[ Name ] > >;
-		}
-	>;
+	): Selectors extends MapOf< Selector >
+		? Required< ResolversOf< Selectors > >
+		: {};
 
 	/** Returns the available selectors for a given store. */
 	select<
