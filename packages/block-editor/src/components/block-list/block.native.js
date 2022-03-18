@@ -30,6 +30,7 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
+import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
 
 const emptyArray = [];
@@ -77,25 +78,30 @@ function BlockForType( {
 
 	return (
 		<GlobalStylesContext.Provider value={ mergedStyle }>
-			<BlockEdit
-				name={ name }
-				isSelected={ isSelected }
-				attributes={ attributes }
-				setAttributes={ onChange }
-				onFocus={ onBlockFocus }
-				onReplace={ onReplace }
-				insertBlocksAfter={ insertBlocksAfter }
-				mergeBlocks={ mergeBlocks }
-				// Block level styles.
-				wrapperProps={ wrapperProps }
-				// Inherited styles merged with block level styles.
-				style={ mergedStyle }
-				clientId={ clientId }
-				parentWidth={ parentWidth }
-				contentStyle={ contentStyle }
-				onDeleteBlock={ onDeleteBlock }
-				blockWidth={ blockWidth }
-			/>
+			<BlockDraggable clientIds={ [ clientId ] }>
+				{ () => (
+					<BlockEdit
+						name={ name }
+						isSelected={ isSelected }
+						attributes={ attributes }
+						setAttributes={ onChange }
+						onFocus={ onBlockFocus }
+						onReplace={ onReplace }
+						insertBlocksAfter={ insertBlocksAfter }
+						mergeBlocks={ mergeBlocks }
+						// Block level styles.
+						wrapperProps={ wrapperProps }
+						// Inherited styles merged with block level styles.
+						style={ mergedStyle }
+						clientId={ clientId }
+						parentWidth={ parentWidth }
+						contentStyle={ contentStyle }
+						onDeleteBlock={ onDeleteBlock }
+						blockWidth={ blockWidth }
+					/>
+				) }
+			</BlockDraggable>
+
 			<View onLayout={ getBlockWidth } />
 		</GlobalStylesContext.Provider>
 	);

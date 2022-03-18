@@ -31,6 +31,7 @@ import {
 	BlockListConsumer,
 	DEFAULT_BLOCK_LIST_CONTEXT,
 } from './block-list-context';
+import { BlockDraggableWrapper } from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
 
 export const OnCaretVerticalPositionChange = createContext();
@@ -197,7 +198,9 @@ export class BlockList extends Component {
 					scrollRef: this.scrollViewRef,
 				} }
 			>
-				{ this.renderList() }
+				<BlockDraggableWrapper>
+					{ ( { onScroll } ) => this.renderList( { onScroll } ) }
+				</BlockDraggableWrapper>
 			</BlockListProvider>
 		) : (
 			<BlockListConsumer>
@@ -235,7 +238,7 @@ export class BlockList extends Component {
 			contentResizeMode,
 			blockWidth,
 		} = this.props;
-		const { parentScrollRef } = extraProps;
+		const { parentScrollRef, onScroll } = extraProps;
 
 		const {
 			blockToolbar,
@@ -310,6 +313,7 @@ export class BlockList extends Component {
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
+					onScroll={ onScroll }
 				/>
 				{ this.shouldShowInnerBlockAppender() && (
 					<View
