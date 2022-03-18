@@ -16,8 +16,10 @@ import { View } from '@wordpress/primitives';
  */
 import SpacerControls from './controls';
 
-export const MIN_SPACER_SIZE = 10;
-export const MAX_SPACER_SIZE = 500;
+export const MIN_SPACER_WIDTH = 1;
+export const MAX_SPACER_WIDTH = 500;
+export const MIN_SPACER_HEIGHT = 10;
+export const MAX_SPACER_HEIGHT = 500;
 
 const ResizableSpacer = ( {
 	orientation,
@@ -59,7 +61,9 @@ const ResizableSpacer = ( {
 			} }
 			onResizeStop={ ( _event, _direction, elt ) => {
 				const nextVal = Math.min(
-					MAX_SPACER_SIZE,
+					orientation === 'horizontal'
+						? MAX_SPACER_WIDTH
+						: MAX_SPACER_HEIGHT,
 					getCurrentSize( elt )
 				);
 				onResizeStop( `${ nextVal }px` );
@@ -122,8 +126,7 @@ const SpacerEdit = ( {
 		if ( blockOrientation === 'horizontal' ) {
 			return (
 				<ResizableSpacer
-					minWidth={ MIN_SPACER_SIZE }
-					maxWidth={ MAX_SPACER_SIZE }
+					minWidth={ MIN_SPACER_WIDTH }
 					enable={ {
 						top: false,
 						right: true,
@@ -148,8 +151,7 @@ const SpacerEdit = ( {
 		return (
 			<>
 				<ResizableSpacer
-					minHeight={ MIN_SPACER_SIZE }
-					maxHeight={ MAX_SPACER_SIZE }
+					minHeight={ MIN_SPACER_HEIGHT }
 					enable={ {
 						top: false,
 						right: false,
