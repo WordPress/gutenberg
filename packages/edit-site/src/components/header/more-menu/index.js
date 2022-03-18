@@ -66,19 +66,6 @@ export default function MoreMenu() {
 									'Spotlight mode deactivated'
 								) }
 							/>
-							<FeatureToggle
-								feature="showIconLabels"
-								label={ __( 'Show button text labels' ) }
-								info={ __(
-									'Show text instead of icons on buttons'
-								) }
-								messageActivated={ __(
-									'Button labels activated'
-								) }
-								messageDeactivated={ __(
-									'Button labels deactivated'
-								) }
-							/>
 							<ModeSwitcher />
 							<ActionItem.Slot
 								name="core/edit-site/plugin-more-menu"
