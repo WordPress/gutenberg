@@ -48,7 +48,7 @@ _Returns_
 
 -   `boolean`: Whether the given block type is allowed to be inserted.
 
-### canLockBlocks
+### canLockBlockType
 
 Determines if the given block type can be locked/unlocked by a user.
 

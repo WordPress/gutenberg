@@ -21,14 +21,14 @@ export default function BlockLockToolbar( { clientId } ) {
 			const {
 				canMoveBlock,
 				canRemoveBlock,
-				canLockBlocks,
+				canLockBlockType,
 				getBlockName,
 			} = select( blockEditorStore );
 
 			return {
 				canMove: canMoveBlock( clientId ),
 				canRemove: canRemoveBlock( clientId ),
-				canLockBlock: canLockBlocks( getBlockName( clientId ) ),
+				canLockBlock: canLockBlockType( getBlockName( clientId ) ),
 			};
 		},
 		[ clientId ]

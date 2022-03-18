@@ -19,14 +19,14 @@ export default function BlockLockMenuItem( { clientId } ) {
 			const {
 				canMoveBlock,
 				canRemoveBlock,
-				canLockBlocks,
+				canLockBlockType,
 				getBlockName,
 				getBlockRootClientId,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 
 			return {
-				canLockBlock: canLockBlocks( getBlockName( clientId ) ),
+				canLockBlock: canLockBlockType( getBlockName( clientId ) ),
 				isLocked:
 					! canMoveBlock( clientId, rootClientId ) ||
 					! canRemoveBlock( clientId, rootClientId ),
