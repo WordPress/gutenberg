@@ -30,6 +30,26 @@ const defaultColorVariants = {
 	},
 };
 
+const typographyVariants = {
+	start: {
+		opacity: 1,
+	},
+	hover: {
+		opacity: 0,
+	},
+};
+
+const labelVariants = {
+	start: {
+		opacity: 0,
+		display: 'none',
+	},
+	hover: {
+		opacity: 1,
+		display: 'block',
+	},
+};
+
 const paletteMotionVariants = {
 	start: {
 		y: '100%',
@@ -45,7 +65,7 @@ const paletteMotionVariants = {
 
 const normalizedWidth = 250;
 
-const StylesPreview = () => {
+const StylesPreview = ( { label } ) => {
 	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
 	const [ textColor = 'black' ] = useStyle( 'color.text' );
 	const [ linkColor = 'blue' ] = useStyle( 'elements.link.color.text' );
@@ -81,22 +101,39 @@ const StylesPreview = () => {
 				animate={ isHovered && ! disableMotion ? 'hover' : 'start' }
 				layout={ ! disableMotion }
 			>
+				{ label && (
+					<motion.div
+						style={ {
+							fontSize: 30 * ratio,
+							position: 'absolute',
+							left: 10 * ratio,
+							bottom: 10 * ratio,
+							zIndex: 1,
+						} }
+						variants={ labelVariants }
+						transition={ { duration: 0.5 } }
+					>
+						{ label }
+					</motion.div>
+				) }
 				<HStack
 					style={ {
 						height: '100%',
 						overflow: 'hidden',
 					} }
-					spacing={ 4 * ratio }
+					spacing={ 10 * ratio }
 					justify="center"
 				>
-					<div
+					<motion.div
 						style={ {
 							fontFamily,
 							fontSize: 65 * ratio,
 						} }
+						variants={ label ? typographyVariants : {} }
+						transition={ { duration: 0.5 } }
 					>
 						Aa
-					</div>
+					</motion.div>
 					<motion.div
 						variants={ defaultColorVariants }
 						transition={ { duration: 0.5 } }
