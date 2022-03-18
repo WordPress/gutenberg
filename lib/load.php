@@ -153,7 +153,9 @@ add_filter( 'block_type_metadata_settings', 'filter_metadata_registration', 10, 
  * @param array  $block         The block instance.
  */
 function update_featured_image( $block_content, $block ) {
-	if ( 'core/image' !== $block['blockName'] ) {
+	if ( 'core/image' !== $block['blockName'] ||
+		'core/cover' !== $block['blockName']
+	) {
 		return $block_content;
 	}
 
