@@ -43,8 +43,8 @@ export default {
 	},
 };
 
-const RangeControlWithState = ( { initialValue, ...props } ) => {
-	const [ value, setValue ] = useState( initialValue );
+const RangeControlWithState = ( props ) => {
+	const [ value, setValue ] = useState();
 
 	return <RangeControl { ...props } value={ value } onChange={ setValue } />;
 };
