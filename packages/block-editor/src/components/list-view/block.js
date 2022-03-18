@@ -49,6 +49,7 @@ function ListViewBlock( {
 	path,
 	isExpanded,
 	selectedClientIds,
+	preventAnnouncement,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -207,6 +208,7 @@ function ListViewBlock( {
 							onFocus={ onFocus }
 							isExpanded={ isExpanded }
 							selectedClientIds={ selectedClientIds }
+							preventAnnouncement={ preventAnnouncement }
 						/>
 					</div>
 				) }

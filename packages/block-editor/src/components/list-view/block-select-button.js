@@ -7,8 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Button, VisuallyHidden } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
-import { forwardRef } from '@wordpress/element';
+import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -37,6 +37,7 @@ function ListViewBlockSelectButton(
 		onDragEnd,
 		draggable,
 		isExpanded,
+		preventAnnouncement,
 	},
 	ref
 ) {
@@ -48,6 +49,11 @@ function ListViewBlockSelectButton(
 		siblingBlockCount,
 		level
 	);
+	const [ ariaHidden, setAriaHidden ] = useState( undefined );
+
+	// This debounced version is used so that while moving out of focus,
+	// the block isn't updated and then re-announced.
+	const delaySetAriaHidden = useDebounce( setAriaHidden, 200 );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -63,6 +69,21 @@ function ListViewBlockSelectButton(
 			onClick( event );
 		}
 	}
+
+	const previousPreventAnnouncement = usePrevious( preventAnnouncement );
+
+	useEffect( () => {
+		// If we prevent screen readers from announcing the block,
+		// we should apply this immediately.
+		if ( preventAnnouncement ) {
+			setAriaHidden( true );
+		}
+		// Delay re-enabling so that if focus is being moved between
+		// buttons, we don't accidentally re-announce a focused button.
+		if ( ! preventAnnouncement && previousPreventAnnouncement ) {
+			delaySetAriaHidden( undefined );
+		}
+	}, [ preventAnnouncement ] );
 
 	return (
 		<>
@@ -82,6 +103,7 @@ function ListViewBlockSelectButton(
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
 				aria-expanded={ isExpanded }
+				aria-hidden={ ariaHidden }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
