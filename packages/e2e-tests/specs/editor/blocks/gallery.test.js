@@ -85,7 +85,10 @@ describe( 'Gallery', () => {
 			'.wp-block-gallery .wp-block-image'
 		);
 
-		await figureElement.click();
+		// The Image needs to be selected from the List view panel due to the
+		// way that Image uploads take and lose focus.
+		await openListView();
+		await clickButton( 'Image' );
 
 		const captionElement = await figureElement.$(
 			'.block-editor-rich-text__editable'
