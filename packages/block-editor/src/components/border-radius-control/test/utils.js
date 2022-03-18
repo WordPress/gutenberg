@@ -150,6 +150,10 @@ describe( 'hasMixedValues', () => {
 		expect( hasMixedValues( '2px' ) ).toBe( false );
 	} );
 
+	it( 'should return false when passed a string value containing a unit with no quantity', () => {
+		expect( hasMixedValues( 'em' ) ).toBe( false );
+	} );
+
 	it( 'should return true when passed mixed values', () => {
 		const values = {
 			bottomLeft: '1em',

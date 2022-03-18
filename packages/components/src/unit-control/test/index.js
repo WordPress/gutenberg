@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render as RTLrender, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
-import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
 import { useState } from '@wordpress/element';
 
 /**
@@ -14,6 +14,16 @@ import { useState } from '@wordpress/element';
  */
 import UnitControl from '../';
 import { parseQuantityAndUnitFromRawValue } from '../utils';
+
+function render( jsx ) {
+	return {
+		user: userEvent.setup( {
+			// Avoids timeout errors (https://github.com/testing-library/user-event/issues/565#issuecomment-1064579531).
+			delay: null,
+		} ),
+		...RTLrender( jsx ),
+	};
+}
 
 const getComponent = () =>
 	document.body.querySelector( '.components-unit-control' );
@@ -23,9 +33,6 @@ const getSelect = () =>
 	document.body.querySelector( '.components-unit-control select' );
 const getUnitLabel = () =>
 	document.body.querySelector( '.components-unit-control__unit-label' );
-
-const fireKeyDown = ( data ) =>
-	fireEvent.keyDown( document.activeElement || document.body, data );
 
 const ControlledSyncUnits = () => {
 	const [ state, setState ] = useState( { valueA: '', valueB: '' } );
@@ -113,73 +120,87 @@ describe( 'UnitControl', () => {
 	} );
 
 	describe( 'Value', () => {
-		it( 'should update value on change', () => {
+		it( 'should update value on change', async () => {
 			let state = '50px';
 			const setState = jest.fn( ( value ) => ( state = value ) );
 
-			render( <UnitControl value={ state } onChange={ setState } /> );
+			const { user } = render(
+				<UnitControl value={ state } onChange={ setState } />
+			);
 
 			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: 62 } } );
+			await user.clear( input );
+			await user.type( input, '62' );
 
-			expect( setState ).toHaveBeenCalledTimes( 1 );
+			// 3 times:
+			// - 1: clear
+			// - 2: type '6'
+			// - 3: type '62'
+			expect( setState ).toHaveBeenCalledTimes( 3 );
 			expect( state ).toBe( '62px' );
 		} );
 
-		it( 'should increment value on UP press', () => {
+		it( 'should increment value on UP press', async () => {
 			let state = '50px';
 			const setState = ( nextState ) => ( state = nextState );
 
-			render( <UnitControl value={ state } onChange={ setState } /> );
+			const { user } = render(
+				<UnitControl value={ state } onChange={ setState } />
+			);
 
-			getInput().focus();
-			fireKeyDown( { keyCode: UP } );
+			const input = getInput();
+			await user.type( input, '{ArrowUp}' );
 
 			expect( state ).toBe( '51px' );
 		} );
 
-		it( 'should increment value on UP + SHIFT press, with step', () => {
+		it( 'should increment value on UP + SHIFT press, with step', async () => {
 			let state = '50px';
 			const setState = ( nextState ) => ( state = nextState );
 
-			render( <UnitControl value={ state } onChange={ setState } /> );
+			const { user } = render(
+				<UnitControl value={ state } onChange={ setState } />
+			);
 
-			getInput().focus();
-			fireKeyDown( { keyCode: UP, shiftKey: true } );
+			const input = getInput();
+			await user.type( input, '{Shift>}{ArrowUp}{/Shift}' );
 
 			expect( state ).toBe( '60px' );
 		} );
 
-		it( 'should decrement value on DOWN press', () => {
+		it( 'should decrement value on DOWN press', async () => {
 			let state = 50;
 			const setState = ( nextState ) => ( state = nextState );
 
-			render( <UnitControl value={ state } onChange={ setState } /> );
+			const { user } = render(
+				<UnitControl value={ state } onChange={ setState } />
+			);
 
-			getInput().focus();
-			fireKeyDown( { keyCode: DOWN } );
+			const input = getInput();
+			await user.type( input, '{ArrowDown}' );
 
 			expect( state ).toBe( '49px' );
 		} );
 
-		it( 'should decrement value on DOWN + SHIFT press, with step', () => {
+		it( 'should decrement value on DOWN + SHIFT press, with step', async () => {
 			let state = 50;
 			const setState = ( nextState ) => ( state = nextState );
 
-			render( <UnitControl value={ state } onChange={ setState } /> );
+			const { user } = render(
+				<UnitControl value={ state } onChange={ setState } />
+			);
 
-			getInput().focus();
-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
+			const input = getInput();
+			await user.type( input, '{Shift>}{ArrowDown}{/Shift}' );
 
 			expect( state ).toBe( '40px' );
 		} );
 
-		it( 'should cancel change when ESCAPE key is pressed', () => {
+		it( 'should cancel change when ESCAPE key is pressed', async () => {
 			let state = 50;
 			const setState = ( nextState ) => ( state = nextState );
 
-			render(
+			const { user } = render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -188,14 +209,13 @@ describe( 'UnitControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
-
-			fireEvent.change( input, { target: { value: '300px' } } );
+			await user.clear( input );
+			await user.type( input, '300px' );
 
 			expect( input.value ).toBe( '300px' );
 			expect( state ).toBe( 50 );
 
-			fireKeyDown( { keyCode: ESCAPE } );
+			user.keyboard( '{Escape}' );
 
 			expect( input.value ).toBe( '50' );
 			expect( state ).toBe( 50 );
@@ -203,15 +223,16 @@ describe( 'UnitControl', () => {
 	} );
 
 	describe( 'Unit', () => {
-		it( 'should update unit value on change', () => {
+		it( 'should update unit value on change', async () => {
 			let state = 'px';
 			const setState = ( nextState ) => ( state = nextState );
 
-			render( <UnitControl unit={ state } onUnitChange={ setState } /> );
+			const { user } = render(
+				<UnitControl unit={ state } onUnitChange={ setState } />
+			);
 
 			const select = getSelect();
-			select.focus();
-			fireEvent.change( select, { target: { value: 'em' } } );
+			await user.selectOptions( select, [ 'em' ] );
 
 			expect( state ).toBe( 'em' );
 		} );
@@ -235,7 +256,7 @@ describe( 'UnitControl', () => {
 			expect( vmax.value ).toBe( 'vmax' );
 		} );
 
-		it( 'should reset value on unit change, if unit has default value', () => {
+		it( 'should reset value on unit change, if unit has default value', async () => {
 			let state = 50;
 			const setState = ( nextState ) => ( state = nextState );
 
@@ -244,7 +265,7 @@ describe( 'UnitControl', () => {
 				{ value: 'vmax', label: 'vmax', default: 75 },
 			];
 
-			render(
+			const { user } = render(
 				<UnitControl
 					isResetValueOnUnitChange
 					units={ units }
@@ -254,18 +275,16 @@ describe( 'UnitControl', () => {
 			);
 
 			const select = getSelect();
-			select.focus();
-
-			fireEvent.change( select, { target: { value: 'vmax' } } );
+			await user.selectOptions( select, [ 'vmax' ] );
 
 			expect( state ).toBe( '75vmax' );
 
-			fireEvent.change( select, { target: { value: 'pt' } } );
+			await user.selectOptions( select, [ 'pt' ] );
 
 			expect( state ).toBe( '25pt' );
 		} );
 
-		it( 'should not reset value on unit change, if disabled', () => {
+		it( 'should not reset value on unit change, if disabled', async () => {
 			let state = 50;
 			const setState = ( nextState ) => ( state = nextState );
 
@@ -274,7 +293,7 @@ describe( 'UnitControl', () => {
 				{ value: 'vmax', label: 'vmax', default: 75 },
 			];
 
-			render(
+			const { user } = render(
 				<UnitControl
 					isResetValueOnUnitChange={ false }
 					value={ state }
@@ -284,22 +303,20 @@ describe( 'UnitControl', () => {
 			);
 
 			const select = getSelect();
-			select.focus();
-
-			fireEvent.change( select, { target: { value: 'vmax' } } );
+			await user.selectOptions( select, [ 'vmax' ] );
 
 			expect( state ).toBe( '50vmax' );
 
-			fireEvent.change( select, { target: { value: 'pt' } } );
+			await user.selectOptions( select, [ 'pt' ] );
 
 			expect( state ).toBe( '50pt' );
 		} );
 
-		it( 'should set correct unit if single units', () => {
+		it( 'should set correct unit if single units', async () => {
 			let state = '50%';
 			const setState = ( value ) => ( state = value );
 
-			render(
+			const { user } = render(
 				<UnitControl
 					value={ state }
 					unit="%"
@@ -309,34 +326,37 @@ describe( 'UnitControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: 62 } } );
+			await user.clear( input );
+			await user.type( input, '62' );
 
-			expect( state ).toBe( '62%' );
+			await waitFor( () => expect( state ).toBe( '62%' ) );
 		} );
 
-		it( 'should update unit value when a new raw value is passed', () => {
-			render( <ControlledSyncUnits /> );
+		it( 'should update unit value when a new raw value is passed', async () => {
+			const { user } = render( <ControlledSyncUnits /> );
 
 			const [ inputA, inputB ] = screen.getAllByRole( 'spinbutton' );
 			const [ selectA, selectB ] = screen.getAllByRole( 'combobox' );
 
-			inputA.focus();
-			fireEvent.change( inputA, { target: { value: '55' } } );
+			const [ remOptionA ] = screen.getAllByRole( 'option', {
+				name: 'rem',
+			} );
+			const [ , vwOptionB ] = screen.getAllByRole( 'option', {
+				name: 'vw',
+			} );
 
-			inputB.focus();
-			fireEvent.change( inputB, { target: { value: '14' } } );
+			await user.type( inputA, '55' );
 
-			selectA.focus();
-			fireEvent.change( selectA, { target: { value: 'rem' } } );
+			await user.type( inputB, '14' );
 
+			await user.selectOptions( selectA, remOptionA );
+
+			await waitFor( () => expect( selectB ).toHaveValue( 'rem' ) );
 			expect( selectA ).toHaveValue( 'rem' );
-			expect( selectB ).toHaveValue( 'rem' );
 
-			selectB.focus();
-			fireEvent.change( selectB, { target: { value: 'vw' } } );
+			await user.selectOptions( selectB, vwOptionB );
 
-			expect( selectA ).toHaveValue( 'vw' );
+			await waitFor( () => expect( selectA ).toHaveValue( 'vw' ) );
 			expect( selectB ).toHaveValue( 'vw' );
 		} );
 	} );
@@ -345,8 +365,8 @@ describe( 'UnitControl', () => {
 		let state = '10px';
 		const setState = jest.fn( ( nextState ) => ( state = nextState ) );
 
-		it( 'should parse unit from input', () => {
-			render(
+		it( 'should parse unit from input', async () => {
+			const { user } = render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -355,15 +375,15 @@ describe( 'UnitControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: '55 em' } } );
-			fireKeyDown( { keyCode: ENTER } );
+			await user.clear( input );
+			await user.type( input, '55 em' );
+			user.keyboard( '{Enter}' );
 
 			expect( state ).toBe( '55em' );
 		} );
 
-		it( 'should parse PX unit from input', () => {
-			render(
+		it( 'should parse PX unit from input', async () => {
+			const { user } = render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -372,15 +392,15 @@ describe( 'UnitControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: '61   PX' } } );
-			fireKeyDown( { keyCode: ENTER } );
+			await user.clear( input );
+			await user.type( input, '61   PX' );
+			user.keyboard( '{Enter}' );
 
 			expect( state ).toBe( '61px' );
 		} );
 
-		it( 'should parse EM unit from input', () => {
-			render(
+		it( 'should parse EM unit from input', async () => {
+			const { user } = render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -389,15 +409,15 @@ describe( 'UnitControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: '55 em' } } );
-			fireKeyDown( { keyCode: ENTER } );
+			await user.clear( input );
+			await user.type( input, '55 em' );
+			user.keyboard( '{Enter}' );
 
 			expect( state ).toBe( '55em' );
 		} );
 
-		it( 'should parse % unit from input', () => {
-			render(
+		it( 'should parse % unit from input', async () => {
+			const { user } = render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -406,15 +426,15 @@ describe( 'UnitControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: '-10  %' } } );
-			fireKeyDown( { keyCode: ENTER } );
+			await user.clear( input );
+			await user.type( input, '-10  %' );
+			user.keyboard( '{Enter}' );
 
 			expect( state ).toBe( '-10%' );
 		} );
 
-		it( 'should parse REM unit from input', () => {
-			render(
+		it( 'should parse REM unit from input', async () => {
+			const { user } = render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -423,11 +443,9 @@ describe( 'UnitControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
-			fireEvent.change( input, {
-				target: { value: '123       rEm  ' },
-			} );
-			fireKeyDown( { keyCode: ENTER } );
+			await user.clear( input );
+			await user.type( input, '123       rEm  ' );
+			user.keyboard( '{Enter}' );
 
 			expect( state ).toBe( '123rem' );
 		} );

@@ -39,6 +39,47 @@ const POSTS_ENDPOINT = '/wp/v2/posts';
 const PAGES_ENDPOINT = '/wp/v2/pages';
 const DRAFT_PAGES_ENDPOINT = [ PAGES_ENDPOINT, { status: 'draft' } ];
 const NAVIGATION_MENUS_ENDPOINT = '/wp/v2/navigation';
+// todo: consolidate with logic found in navigation-editor tests
+// https://github.com/WordPress/gutenberg/blob/trunk/packages/e2e-tests/specs/experiments/navigation-editor.test.js#L71
+const REST_PAGES_ROUTES = [
+	'/wp/v2/pages',
+	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
+];
+
+/**
+ * Determines if a given URL matches any of a given collection of
+ * routes (expressed as substrings).
+ *
+ * @param {string} reqUrl the full URL to be tested for matches.
+ * @param {Array}  routes array of strings to match against the URL.
+ */
+function matchUrlToRoute( reqUrl, routes ) {
+	return routes.some( ( route ) => reqUrl.includes( route ) );
+}
+
+function getEndpointMocks( matchingRoutes, responsesByMethod ) {
+	return [ 'GET', 'POST', 'DELETE', 'PUT' ].reduce( ( mocks, restMethod ) => {
+		if ( responsesByMethod[ restMethod ] ) {
+			return [
+				...mocks,
+				{
+					match: ( request ) =>
+						matchUrlToRoute( request.url(), matchingRoutes ) &&
+						request.method() === restMethod,
+					onRequestMatch: createJSONResponse(
+						responsesByMethod[ restMethod ]
+					),
+				},
+			];
+		}
+
+		return mocks;
+	}, [] );
+}
+
+function getPagesMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod );
+}
 
 async function mockSearchResponse( items ) {
 	const mappedItems = items.map( ( { title, slug }, index ) => ( {
@@ -48,7 +89,6 @@ async function mockSearchResponse( items ) {
 		type: 'post',
 		url: `https://this/is/a/test/search/${ slug }`,
 	} ) );
-
 	await setUpResponseMocking( [
 		{
 			match: ( request ) =>
@@ -56,6 +96,18 @@ async function mockSearchResponse( items ) {
 				request.url().includes( `search` ),
 			onRequestMatch: createJSONResponse( mappedItems ),
 		},
+		...getPagesMocks( {
+			GET: [
+				{
+					type: 'page',
+					id: 1,
+					link: 'https://example.com/1',
+					title: {
+						rendered: 'My page',
+					},
+				},
+			],
+		} ),
 	] );
 }
 
@@ -908,6 +960,35 @@ describe( 'Navigation', () => {
 			await page.waitForXPath( NAV_ENTITY_SELECTOR );
 			expect( await page.$x( NAV_ENTITY_SELECTOR ) ).toHaveLength( 1 );
 		} );
+	} );
+
+	it( 'applies accessible label to block element', async () => {
+		await createNewPost();
+		await insertBlock( 'Navigation' );
+		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
+		await startEmptyButton.click();
+
+		const appender = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appender.click();
+
+		// Add a link to the Link block.
+		await updateActiveNavigationLink( {
+			url: 'https://wordpress.org',
+			label: 'WP',
+			type: 'url',
+		} );
+
+		const previewPage = await openPreviewPage();
+		await previewPage.bringToFront();
+		await previewPage.waitForNetworkIdle();
+
+		const isAccessibleLabelPresent = await previewPage.$(
+			'nav[aria-label="Navigation"]'
+		);
+
+		expect( isAccessibleLabelPresent ).toBeTruthy();
 	} );
 
 	it( 'does not load the frontend script if no navigation blocks are present', async () => {

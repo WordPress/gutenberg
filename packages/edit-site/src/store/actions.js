@@ -333,11 +333,11 @@ export const revertTemplate = (
 	}
 
 	try {
-		const templateEntity = registry
+		const templateEntityConfig = registry
 			.select( coreStore )
-			.getEntity( 'postType', template.type );
+			.getEntityConfig( 'postType', template.type );
 
-		if ( ! templateEntity ) {
+		if ( ! templateEntityConfig ) {
 			registry
 				.dispatch( noticesStore )
 				.createErrorNotice(
@@ -350,7 +350,7 @@ export const revertTemplate = (
 		}
 
 		const fileTemplatePath = addQueryArgs(
-			`${ templateEntity.baseURL }/${ template.id }`,
+			`${ templateEntityConfig.baseURL }/${ template.id }`,
 			{ context: 'edit', source: 'theme' }
 		);
 

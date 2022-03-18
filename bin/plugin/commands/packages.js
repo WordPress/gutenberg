@@ -535,7 +535,7 @@ function getConfig( releaseType, { ci, repositoryPath, semver } ) {
 			repositoryPath && join( process.cwd(), repositoryPath ),
 		interactive: ! ci,
 		minimumVersionBump: semver,
-		npmReleaseBranch: releaseType === 'next' ? 'wp/next' : 'wp/trunk',
+		npmReleaseBranch: releaseType === 'next' ? 'wp/next' : 'wp/latest',
 		releaseType,
 	};
 }

@@ -56,15 +56,9 @@ export const saveNavigationPost = ( post ) => async ( {
 		// Save menu.
 		await registry
 			.dispatch( coreDataStore )
-			.saveEditedEntityRecord( 'root', 'menu', menuId );
-
-		const error = registry
-			.select( coreDataStore )
-			.getLastEntitySaveError( 'root', 'menu', menuId );
-
-		if ( error ) {
-			throw new Error( error.message );
-		}
+			.saveEditedEntityRecord( 'root', 'menu', menuId, {
+				throwOnError: true,
+			} );
 
 		// Save menu items.
 		const updatedBlocks = await dispatch(

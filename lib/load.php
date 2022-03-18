@@ -61,6 +61,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 require __DIR__ . '/compat.php';
 require __DIR__ . '/compat/wordpress-5.9/widget-render-api-endpoint/index.php';
 require __DIR__ . '/compat/wordpress-5.9/blocks.php';
+require __DIR__ . '/compat/wordpress-5.9/block-editor-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/block-patterns.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';

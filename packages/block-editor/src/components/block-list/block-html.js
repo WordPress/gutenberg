@@ -12,8 +12,8 @@ import {
 	getBlockAttributes,
 	getBlockContent,
 	getBlockType,
-	isValidBlockContent,
 	getSaveContent,
+	validateBlock,
 } from '@wordpress/blocks';
 
 /**
@@ -43,9 +43,13 @@ function BlockHTML( { clientId } ) {
 
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
 		const content = html ? html : getSaveContent( blockType, attributes );
-		const isValid = html
-			? isValidBlockContent( blockType, attributes, content )
-			: true;
+		const [ isValid ] = html
+			? validateBlock( {
+					...block,
+					attributes,
+					originalContent: content,
+			  } )
+			: [ true ];
 
 		updateBlock( clientId, {
 			attributes,

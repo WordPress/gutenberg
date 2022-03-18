@@ -172,7 +172,9 @@ The name for a block is a unique string that identifies a block. Names have to b
 { "title": "Heading" }
 ```
 
-This is the display title for your block, which can be translated with our translation functions. The block inserter will show this name.
+This is the display title for your block, which can be translated with our translation functions. The title will display in the Inserter and in other areas of the editor.
+
+**Note:** To keep your block titles readable and accessible in the UI, try to avoid very long titles.
 
 ### Category
 

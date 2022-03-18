@@ -361,9 +361,13 @@ function block_core_navigation_get_fallback_blocks() {
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
 
+	static $seen_menu_names = array();
+
 	// Flag used to indicate whether the rendered output is considered to be
 	// a fallback (i.e. the block has no menu associated with it).
 	$is_fallback = false;
+
+	$nav_menu_name = '';
 
 	/**
 	 * Deprecated:
@@ -426,6 +430,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
 			return '';
+		}
+
+		$nav_menu_name = $navigation_post->post_title;
+
+		if ( isset( $seen_menu_names[ $nav_menu_name ] ) ) {
+			++$seen_menu_names[ $nav_menu_name ];
+		} else {
+			$seen_menu_names[ $nav_menu_name ] = 1;
 		}
 
 		$parsed_blocks = parse_blocks( $navigation_post->post_content );
@@ -508,10 +520,18 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
 
+	// If the menu name has been used previously then append an ID
+	// to the name to ensure uniqueness across a given post.
+	if ( isset( $seen_menu_names[ $nav_menu_name ] ) && $seen_menu_names[ $nav_menu_name ] > 1 ) {
+		$count         = $seen_menu_names[ $nav_menu_name ];
+		$nav_menu_name = $nav_menu_name . ' ' . ( $count );
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => implode( ' ', $classes ),
-			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+			'class'      => implode( ' ', $classes ),
+			'style'      => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+			'aria-label' => $nav_menu_name,
 		)
 	);
 

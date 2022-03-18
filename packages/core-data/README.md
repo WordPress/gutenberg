@@ -70,6 +70,7 @@ _Parameters_
 -   _query_ `?Object`: Special query parameters for the DELETE API call.
 -   _options_ `[Object]`: Delete options.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+-   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### editEntityRecord
 
@@ -147,8 +148,8 @@ Returns an action object used in signalling that entity records have been receiv
 
 _Parameters_
 
--   _kind_ `string`: Kind of the received entity.
--   _name_ `string`: Name of the received entity.
+-   _kind_ `string`: Kind of the received entity record.
+-   _name_ `string`: Name of the received entity record.
 -   _records_ `Array|Object`: Records received.
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
@@ -237,6 +238,7 @@ _Parameters_
 -   _options_ `Object`: Saving options.
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+-   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### undo
 
@@ -372,7 +374,7 @@ _Parameters_
 -   _state_ `Object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `number|string`: Record ID.
 
 _Returns_
 
@@ -393,7 +395,22 @@ _Returns_
 
 ### getEntitiesByKind
 
-Returns whether the entities for the give kind are loaded.
+> **Deprecated** since WordPress 6.0. Use getEntitiesConfig instead
+
+Returns the loaded entities for the given kind.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+-   _kind_ `string`: Entity kind.
+
+_Returns_
+
+-   `Array<Object>`: Array of entities with config matching kind.
+
+### getEntitiesConfig
+
+Returns the loaded entities for the given kind.
 
 _Parameters_
 
@@ -406,7 +423,9 @@ _Returns_
 
 ### getEntity
 
-Returns the entity object given its kind and name.
+> **Deprecated** since WordPress 6.0. Use getEntityConfig instead
+
+Returns the entity config given its kind and name.
 
 _Parameters_
 
@@ -416,7 +435,21 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Entity
+-   `Object`: Entity config
+
+### getEntityConfig
+
+Returns the entity config given its kind and name.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+
+_Returns_
+
+-   `Object`: Entity config
 
 ### getEntityRecord
 
@@ -434,7 +467,7 @@ _Parameters_
 
 _Returns_
 
--   `Object?`: Record.
+-   `Object|undefined`: Record.
 
 ### getEntityRecordEdits
 
@@ -745,7 +778,7 @@ _Parameters_
 -   _state_ `Object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `number|string`: Record ID.
 
 _Returns_
 
