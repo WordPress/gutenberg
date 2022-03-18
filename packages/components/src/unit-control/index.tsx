@@ -37,7 +37,14 @@ import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import type { StateReducer } from '../input-control/reducer/state';
 
 function UnforwardedUnitControl(
-	{
+	unitControlProps: WordPressComponentProps<
+		UnitControlProps,
+		'input',
+		false
+	>,
+	forwardedRef: ForwardedRef< any >
+) {
+	const {
 		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
 		className,
@@ -55,10 +62,9 @@ function UnforwardedUnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		...props
-	}: WordPressComponentProps< UnitControlProps, 'input', false >,
-	forwardedRef: ForwardedRef< any >
-) {
-	if ( typeof unitProp !== 'undefined' ) {
+	} = unitControlProps;
+
+	if ( 'unit' in unitControlProps ) {
 		deprecated( 'UnitControl unit prop', {
 			since: '5.6',
 			hint: 'The unit should be provided within the `value` prop.',
