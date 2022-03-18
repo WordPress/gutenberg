@@ -7,8 +7,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 
 export default function EnableFeature( props ) {
 	const { featureName, ...remainingProps } = props;
-	const isChecked = useSelect( ( select ) =>
-		select( preferencesStore ).get( 'core/edit-site', featureName )
+	const isChecked = useSelect(
+		( select ) =>
+			!! select( preferencesStore ).get( 'core/edit-site', featureName ),
+		[ featureName ]
 	);
 	const { toggle } = useDispatch( preferencesStore );
 	const onChange = () => toggle( 'core/edit-site', featureName );
