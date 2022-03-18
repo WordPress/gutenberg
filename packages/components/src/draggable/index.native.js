@@ -14,6 +14,7 @@ export default function Draggable( {
 	wrapperAnimatedStyles,
 } ) {
 	const isDragging = useSharedValue( false );
+	const hasPanStarted = useSharedValue( false );
 
 	const longPressGesture = Gesture.LongPress()
 		.onStart( ( ev ) => {
@@ -22,6 +23,15 @@ export default function Draggable( {
 
 			if ( onDragStart ) {
 				onDragStart( ev );
+			}
+		} )
+		.onEnd( () => {
+			if ( ! hasPanStarted.value && isDragging.value ) {
+				isDragging.value = false;
+
+				if ( onDragEnd ) {
+					onDragEnd();
+				}
 			}
 		} )
 		.maxDistance( maxDistance )
@@ -33,6 +43,7 @@ export default function Draggable( {
 		.onTouchesMove( ( _, state ) => {
 			'worklet';
 			if ( isDragging.value ) {
+				hasPanStarted.value = true;
 				state.activate();
 			} else {
 				state.fail();
@@ -53,6 +64,7 @@ export default function Draggable( {
 				onDragEnd();
 			}
 			isDragging.value = false;
+			hasPanStarted.value = false;
 		} )
 		.simultaneousWithExternalGesture( longPressGesture );
 
