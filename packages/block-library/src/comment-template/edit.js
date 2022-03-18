@@ -109,8 +109,7 @@ function CommentTemplateInnerBlocks( {
 
 	return (
 		<li { ...innerBlocksProps }>
-			{ comment.commentId ===
-			( activeComment?.commentId || firstComment?.commentId )
+			{ comment.commentId === ( activeComment || firstComment )
 				? children
 				: null }
 
@@ -123,11 +122,10 @@ function CommentTemplateInnerBlocks( {
 			block. */ }
 			<MemoizedCommentTemplatePreview
 				blocks={ blocks }
-				comment={ comment }
+				commentId={ comment.commentId }
 				setActiveComment={ setActiveComment }
 				isHidden={
-					comment.commentId ===
-					( activeComment?.commentId || firstComment?.commentId )
+					comment.commentId === ( activeComment || firstComment )
 				}
 			/>
 
@@ -146,7 +144,7 @@ function CommentTemplateInnerBlocks( {
 
 const CommentTemplatePreview = ( {
 	blocks,
-	comment,
+	commentId,
 	setActiveComment,
 	isHidden,
 } ) => {
@@ -155,7 +153,7 @@ const CommentTemplatePreview = ( {
 	} );
 
 	const handleOnClick = () => {
-		setActiveComment( comment );
+		setActiveComment( commentId );
 	};
 
 	// We have to hide the preview block if the `comment` props points to
@@ -303,7 +301,7 @@ export default function CommentTemplateEdit( {
 			blocks={ blocks }
 			activeComment={ activeComment }
 			setActiveComment={ setActiveComment }
-			firstComment={ commentTree[ 0 ] }
+			firstComment={ commentTree[ 0 ]?.commentId }
 		/>
 	);
 }
