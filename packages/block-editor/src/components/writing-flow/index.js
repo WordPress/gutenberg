@@ -18,6 +18,7 @@ import useMultiSelection from './use-multi-selection';
 import useTabNav from './use-tab-nav';
 import useArrowNav from './use-arrow-nav';
 import useSelectAll from './use-select-all';
+import useSelectionObserver from './use-selection-observer';
 import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
@@ -31,6 +32,7 @@ export function useWritingFlow() {
 		before,
 		useMergeRefs( [
 			ref,
+			useSelectionObserver(),
 			useMultiSelection(),
 			useSelectAll(),
 			useArrowNav(),

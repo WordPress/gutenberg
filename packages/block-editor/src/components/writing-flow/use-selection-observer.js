@@ -7,8 +7,11 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../../store';
-import { getBlockClientId } from '../../../utils/dom';
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+import { getBlockClientId } from '../../utils/dom';
 
 /**
  * Sets the `contenteditable` wrapper element to `value`.
@@ -17,19 +20,16 @@ import { getBlockClientId } from '../../../utils/dom';
  * @param {boolean}     value `contentEditable` value (true or false)
  */
 export function setContentEditableWrapper( node, value ) {
-	const editor = node.parentElement.closest( '[contenteditable]' );
 	// Since `closest` considers `node` as a candidate, use `parentElement`.
-	editor.contentEditable = value;
+	node.contentEditable = value;
 	// Firefox doesn't automatically move focus.
-	if ( value ) editor.focus();
+	if ( value ) node.focus();
 }
 
 /**
  * Sets a multi-selection based on the native selection across blocks.
- *
- * @param {string} clientId Block client ID.
  */
-export function useMultiSelection( clientId ) {
+export default function useSelectionObserver() {
 	const {
 		startMultiSelect,
 		stopMultiSelect,
@@ -63,6 +63,7 @@ export function useMultiSelection( clientId ) {
 					return;
 				}
 
+				const clientId = getBlockClientId( selection.anchorNode );
 				const endClientId = getBlockClientId( selection.focusNode );
 				const isSingularSelection = clientId === endClientId;
 
@@ -135,14 +136,18 @@ export function useMultiSelection( clientId ) {
 				} );
 			}
 
-			function onMouseLeave( { buttons } ) {
+			function onMouseLeave( { buttons, target } ) {
 				// The primary button must be pressed to initiate selection.
 				// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
 				if ( buttons !== 1 ) {
 					return;
 				}
 
-				if ( ! isSelectionEnabled() || ! isBlockSelected( clientId ) ) {
+				if ( ! target.contentEditable ) {
+					return;
+				}
+
+				if ( ! isSelectionEnabled() ) {
 					return;
 				}
 
@@ -171,6 +176,8 @@ export function useMultiSelection( clientId ) {
 				if ( ! isSelectionEnabled() || event.button !== 0 ) {
 					return;
 				}
+
+				const clientId = getBlockClientId( event.target );
 
 				if ( event.shiftKey ) {
 					const blockSelectionStart = getBlockSelectionStart();
@@ -217,11 +224,11 @@ export function useMultiSelection( clientId ) {
 			}
 
 			node.addEventListener( 'mousedown', onMouseDown );
-			node.addEventListener( 'mouseleave', onMouseLeave );
+			node.addEventListener( 'mouseout', onMouseLeave );
 
 			return () => {
 				node.removeEventListener( 'mousedown', onMouseDown );
-				node.removeEventListener( 'mouseleave', onMouseLeave );
+				node.removeEventListener( 'mouseout', onMouseLeave );
 				ownerDocument.removeEventListener(
 					'selectionchange',
 					onSelectionChange
@@ -231,7 +238,6 @@ export function useMultiSelection( clientId ) {
 			};
 		},
 		[
-			clientId,
 			startMultiSelect,
 			stopMultiSelect,
 			multiSelect,
