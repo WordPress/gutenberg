@@ -6,7 +6,7 @@ import { uniq } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { _x, __, sprintf } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 import { dateI18n } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';
 import {
@@ -55,11 +55,14 @@ export default function DateFormatPicker( {
 		<fieldset className="block-editor-date-format-picker">
 			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
 			<ToggleControl
-				label={ sprintf(
-					// translators: %s: Example of how the date will be formatted.
-					__( 'Default format (%s)' ),
-					dateI18n( defaultFormat, EXAMPLE_DATE )
-				) }
+				label={
+					<>
+						{ __( 'Default format' ) }
+						<span className="block-editor-date-format-picker__default-format-toggle-control__hint">
+							{ dateI18n( defaultFormat, EXAMPLE_DATE ) }
+						</span>
+					</>
+				}
 				checked={ ! format }
 				onChange={ ( checked ) =>
 					onChange( checked ? null : defaultFormat )
