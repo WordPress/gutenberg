@@ -41,9 +41,9 @@ function gutenberg_generate_block_templates_export_file() {
 		return new WP_Error( 'missing_zip_package', __( 'Zip Export not supported.', 'gutenberg' ) );
 	}
 
-	$obscura  = wp_generate_password( 12, false, false );
+	$obscura    = wp_generate_password( 12, false, false );
 	$theme_name = wp_get_theme()->get( 'TextDomain' );
-	$filename = get_temp_dir() . $theme_name . $obscura . '.zip';
+	$filename   = get_temp_dir() . $theme_name . $obscura . '.zip';
 
 	$zip = new ZipArchive();
 	if ( true !== $zip->open( $filename, ZipArchive::CREATE | ZipArchive::OVERWRITE ) ) {
