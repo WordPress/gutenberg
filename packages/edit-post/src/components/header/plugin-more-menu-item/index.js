@@ -3,6 +3,7 @@
  */
 import { ActionItem } from '@wordpress/interface';
 import { compose } from '@wordpress/compose';
+import { MenuItem } from '@wordpress/components';
 import { withPluginContext } from '@wordpress/plugins';
 
 /**
@@ -64,6 +65,7 @@ import { withPluginContext } from '@wordpress/plugins';
 export default compose(
 	withPluginContext( ( context, ownProps ) => {
 		return {
+			as: ownProps.as ?? MenuItem,
 			icon: ownProps.icon || context.icon,
 			name: 'core/edit-post/plugin-more-menu',
 		};
