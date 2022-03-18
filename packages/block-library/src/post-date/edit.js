@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useRef } from '@wordpress/element';
 import {
 	dateI18n,
@@ -30,10 +30,11 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
+import { useSelect } from '@wordpress/data';
 
 export default function PostDateEdit( {
 	attributes: { textAlign, format, isLink },
-	context: { postId, postType, queryId },
+	context: { postId, postType: postTypeSlug, queryId },
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps( {
@@ -56,9 +57,16 @@ export default function PostDateEdit( {
 	);
 	const [ date, setDate ] = useEntityProp(
 		'postType',
-		postType,
+		postTypeSlug,
 		'date',
 		postId
+	);
+	const postType = useSelect(
+		( select ) =>
+			postTypeSlug
+				? select( coreStore ).getPostType( postTypeSlug )
+				: null,
+		[ postTypeSlug ]
 	);
 
 	let postDate = date ? (
@@ -134,11 +142,15 @@ export default function PostDateEdit( {
 						}
 					/>
 					<ToggleControl
-						label={ sprintf(
-							// translators: %s: Name of the post type e.g: "post".
-							__( 'Link to %s' ),
-							postType
-						) }
+						label={
+							postType?.labels.singular_name
+								? sprintf(
+										// translators: %s: Name of the post type e.g: "post".
+										__( 'Link to %s' ),
+										postType.labels.singular_name.toLowerCase()
+								  )
+								: __( 'Link to post' )
+						}
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
 					/>
