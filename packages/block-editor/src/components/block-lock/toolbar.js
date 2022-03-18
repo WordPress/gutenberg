@@ -16,16 +16,19 @@ import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockToolbar( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { canMove, canRemove, canLockBlocks } = useSelect(
+	const { canMove, canRemove, canLockBlock } = useSelect(
 		( select ) => {
-			const { canMoveBlock, canRemoveBlock, getSettings } = select(
-				blockEditorStore
-			);
+			const {
+				canMoveBlock,
+				canRemoveBlock,
+				canLockBlocks,
+				getBlockName,
+			} = select( blockEditorStore );
 
 			return {
 				canMove: canMoveBlock( clientId ),
 				canRemove: canRemoveBlock( clientId ),
-				canLockBlocks: getSettings().__experimentalCanLockBlocks,
+				canLockBlock: canLockBlocks( getBlockName( clientId ) ),
 			};
 		},
 		[ clientId ]
@@ -44,7 +47,7 @@ export default function BlockLockToolbar( { clientId } ) {
 		return null;
 	}
 
-	const label = canLockBlocks
+	const label = canLockBlock
 		? sprintf(
 				/* translators: %s: block name */
 				__( 'Unlock %s' ),
@@ -62,11 +65,11 @@ export default function BlockLockToolbar( { clientId } ) {
 				<ToolbarButton
 					icon={ lock }
 					label={ label }
-					onClick={ canLockBlocks ? toggleModal : undefined }
-					aria-disabled={ ! canLockBlocks }
+					onClick={ canLockBlock ? toggleModal : undefined }
+					aria-disabled={ ! canLockBlock }
 				/>
 			</ToolbarGroup>
-			{ isModalOpen && canLockBlocks ? (
+			{ isModalOpen && canLockBlock ? (
 				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
 			) : null }
 		</>

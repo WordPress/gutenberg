@@ -48,6 +48,19 @@ _Returns_
 
 -   `boolean`: Whether the given block type is allowed to be inserted.
 
+### canLockBlocks
+
+Determines if the given block type can be locked/unlocked by a user.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _nameOrType_ `(string|Object)`: Block name or type object.
+
+_Returns_
+
+-   `boolean`: Whether a given block type can be locked/unlocked.
+
 ### canMoveBlock
 
 Determines if the given block is allowed to be moved.
