@@ -115,7 +115,7 @@ export const rootEntitiesConfig = [
 		label: __( 'Comment' ),
 	},
 	{
-		name: 'menu', // Classic Menus
+		name: 'menu',
 		kind: 'root',
 		baseURL: '/wp/v2/menus',
 		baseURLParams: { context: 'edit' },
@@ -123,7 +123,7 @@ export const rootEntitiesConfig = [
 		label: __( 'Menu' ),
 	},
 	{
-		name: 'menuItem', // Classic Menu Items
+		name: 'menuItem',
 		kind: 'root',
 		baseURL: '/wp/v2/menu-items',
 		baseURLParams: { context: 'edit' },
@@ -132,7 +132,7 @@ export const rootEntitiesConfig = [
 		rawAttributes: [ 'title', 'content' ],
 	},
 	{
-		name: 'menuLocation', // Classic Menu Locations
+		name: 'menuLocation',
 		kind: 'root',
 		baseURL: '/wp/v2/menu-locations',
 		baseURLParams: { context: 'edit' },
@@ -141,7 +141,7 @@ export const rootEntitiesConfig = [
 		key: 'name',
 	},
 	{
-		name: 'navigationArea', // Deprecated - can be removed once the concepts of Navigation Areas is removed from the codebase.
+		name: 'navigationArea',
 		kind: 'root',
 		baseURL: '/wp/v2/block-navigation-areas',
 		baseURLParams: { context: 'edit' },
@@ -174,14 +174,6 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
-	},
-	{
-		label: __( 'Navigation' ), // Block based Navigation Menus
-		name: 'navigationMenu',
-		kind: 'root',
-		baseURL: '/wp/v2/navigation',
-		baseURLParams: { context: 'edit' },
-		plural: 'navigationMenus',
 	},
 ];
 
