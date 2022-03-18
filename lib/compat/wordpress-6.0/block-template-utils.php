@@ -120,8 +120,13 @@ function gutenberg_generate_block_templates_export_file() {
 	if ( file_exists( $theme_path . '/theme.json' ) ) {
 		$theme_json_data = wp_json_file_decode( $theme_path . '/theme.json', array( 'associative' => true ) );
 		if ( ! empty( $theme_json_data ) ) {
-			$merged_data['$schema'] = $theme_json_data['$schema'];
-			$merged_data['settings']['appearanceTools'] = $theme_json_data['settings']['appearanceTools'];
+			if ( ! empty( $theme_json_data['$schema'] ) ) {
+				$merged_data['$schema'] = $theme_json_data['$schema'];
+			}
+
+			if ( ! empty( $theme_json_data['settings']['appearanceTools'] ) ) {
+				$merged_data['settings']['appearanceTools'] = $theme_json_data['settings']['appearanceTools'];
+			}
 		}
 	}
 
