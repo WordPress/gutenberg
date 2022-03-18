@@ -194,7 +194,7 @@ function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_vendor_scripts( $scripts ) {
-	$extension = SCRIPT_DEBUG ? 'min.js' : '.js';
+	$extension = SCRIPT_DEBUG ? '.js' : '.min.js';
 
 	gutenberg_override_script(
 		$scripts,
@@ -206,7 +206,7 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	gutenberg_override_script(
 		$scripts,
 		'react-dom',
-		gutenberg_url( 'build/vendors/react-dom/' . $filename ),
+		gutenberg_url( 'build/vendors/react-dom' . $extension ),
 		array( 'react' )
 	);
 }
