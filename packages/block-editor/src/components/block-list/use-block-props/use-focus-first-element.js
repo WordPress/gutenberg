@@ -104,17 +104,10 @@ export function useFocusFirstElement( clientId ) {
 		// Check to see if element is focussable before a generic caret insert.
 		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
 			const focusElement = focus.tabbable.findNext( ref.current );
-			const rootBlockOptions = {
-				skipBlockInserter: true,
-			};
 			// Make sure focusElement is valid, contained in the same block, and a form field.
 			if (
 				focusElement &&
-				isInsideRootBlock(
-					ref.current,
-					focusElement,
-					rootBlockOptions
-				) &&
+				isInsideRootBlock( ref.current, focusElement ) &&
 				isFormElement( focusElement )
 			) {
 				focusElement.focus();

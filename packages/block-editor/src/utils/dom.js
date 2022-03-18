@@ -18,28 +18,16 @@ export function isInSameBlock( a, b ) {
  * Returns true if an element is considered part of the block and not its inner
  * blocks or appender.
  *
- * @param {Element}                        blockElement Block container element.
- * @param {Element}                        element      Element.
- * @param {{ skipBlockInserter: boolean }} options      Custom options to set.
+ * @param {Element} blockElement Block container element.
+ * @param {Element} element      Element.
  *
  * @return {boolean} Whether an element is considered part of the block and not
  *                   its inner blocks or appender.
  */
-export function isInsideRootBlock(
-	blockElement,
-	element,
-	options = { skipBlockInserter: false }
-) {
+export function isInsideRootBlock( blockElement, element ) {
 	const parentBlock = element.closest(
-		[ BLOCK_SELECTOR, APPENDER_SELECTOR ].join( ',' )
+		[ BLOCK_SELECTOR, APPENDER_SELECTOR, BLOCK_APPENDER_CLASS ].join( ',' )
 	);
-	// Skip inserter for blocks such as group block.
-	if (
-		options.skipBlockInserter &&
-		parentBlock?.classList.contains( BLOCK_APPENDER_CLASS )
-	) {
-		return false;
-	}
 	return parentBlock === blockElement;
 }
 
