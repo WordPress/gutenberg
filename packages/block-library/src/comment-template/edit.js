@@ -86,20 +86,20 @@ const getCommentsPlaceholder = ( {
 /**
  * Component which renders the inner blocks of the Comment Template.
  *
- * @param {Object} props                    Component props.
- * @param {Array}  [props.comment]          - A comment object.
- * @param {Array}  [props.activeComment]    - The block that is currently active.
- * @param {Array}  [props.setActiveComment] - The setter for activeComment.
- * @param {Array}  [props.firstComment]     - First comment in the array.
- * @param {Array}  [props.blocks]           - Array of blocks returned from
- *                                          getBlocks() in parent .
+ * @param {Object} props                      Component props.
+ * @param {Array}  [props.comment]            - A comment object.
+ * @param {Array}  [props.activeCommentId]    - The ID of the comment that is currently active.
+ * @param {Array}  [props.setActiveCommentId] - The setter for activeCommentId.
+ * @param {Array}  [props.firstCommentId]     - First ID of the first comment in the array.
+ * @param {Array}  [props.blocks]             - Array of blocks returned from
+ *                                            getBlocks() in parent .
  * @return {WPElement}                 		Inner blocks of the Comment Template
  */
 function CommentTemplateInnerBlocks( {
 	comment,
-	activeComment,
-	setActiveComment,
-	firstComment,
+	activeCommentId,
+	setActiveCommentId,
+	firstCommentId,
 	blocks,
 } ) {
 	const { children, ...innerBlocksProps } = useInnerBlocksProps(
@@ -109,7 +109,7 @@ function CommentTemplateInnerBlocks( {
 
 	return (
 		<li { ...innerBlocksProps }>
-			{ comment.commentId === ( activeComment || firstComment )
+			{ comment.commentId === ( activeCommentId || firstCommentId )
 				? children
 				: null }
 
@@ -123,19 +123,19 @@ function CommentTemplateInnerBlocks( {
 			<MemoizedCommentTemplatePreview
 				blocks={ blocks }
 				commentId={ comment.commentId }
-				setActiveComment={ setActiveComment }
+				setActiveCommentId={ setActiveCommentId }
 				isHidden={
-					comment.commentId === ( activeComment || firstComment )
+					comment.commentId === ( activeCommentId || firstCommentId )
 				}
 			/>
 
 			{ comment?.children?.length > 0 ? (
 				<CommentsList
 					comments={ comment.children }
-					activeComment={ activeComment }
-					setActiveComment={ setActiveComment }
+					activeCommentId={ activeCommentId }
+					setActiveCommentId={ setActiveCommentId }
 					blocks={ blocks }
-					firstComment={ firstComment }
+					firstCommentId={ firstCommentId }
 				/>
 			) : null }
 		</li>
@@ -145,7 +145,7 @@ function CommentTemplateInnerBlocks( {
 const CommentTemplatePreview = ( {
 	blocks,
 	commentId,
-	setActiveComment,
+	setActiveCommentId,
 	isHidden,
 } ) => {
 	const blockPreviewProps = useBlockPreview( {
@@ -153,7 +153,7 @@ const CommentTemplatePreview = ( {
 	} );
 
 	const handleOnClick = () => {
-		setActiveComment( commentId );
+		setActiveCommentId( commentId );
 	};
 
 	// We have to hide the preview block if the `comment` props points to
@@ -183,24 +183,23 @@ const MemoizedCommentTemplatePreview = memo( CommentTemplatePreview );
 /**
  * Component that renders a list of (nested) comments. It is called recursively.
  *
- * @param {Object} props                    Component props.
- * @param {Array}  [props.comments]         - Array of comment objects.
- * @param {Array}  [props.blockProps]       - Props from parent's `useBlockProps()`.
- * @param {Array}  [props.activeComment]    - The block that is currently active.
- * @param {Array}  [props.setActiveComment] - The setter for activeComment.
- * @param {Array}  [props.blocks]           - Array of blocks returned from
- * @param {Object} [props.firstComment]     - The first comment in the array of
- *                                          comment objects.
- *                                          getBlocks() in parent .
+ * @param {Object} props                      Component props.
+ * @param {Array}  [props.comments]           - Array of comment objects.
+ * @param {Array}  [props.blockProps]         - Props from parent's `useBlockProps()`.
+ * @param {Array}  [props.activeCommentId]    - The ID of the comment that is currently active.
+ * @param {Array}  [props.setActiveCommentId] - The setter for activeCommentId.
+ * @param {Array}  [props.blocks]             - Array of blocks returned from getBlocks() in parent.
+ * @param {Object} [props.firstCommentId]     - The ID of the first comment in the array of
+ *                                            comment objects.
  * @return {WPElement}                 		List of comments.
  */
 const CommentsList = ( {
 	comments,
 	blockProps,
-	activeComment,
-	setActiveComment,
+	activeCommentId,
+	setActiveCommentId,
 	blocks,
-	firstComment,
+	firstCommentId,
 } ) => (
 	<ol { ...blockProps }>
 		{ comments &&
@@ -211,10 +210,10 @@ const CommentsList = ( {
 				>
 					<CommentTemplateInnerBlocks
 						comment={ comment }
-						activeComment={ activeComment }
-						setActiveComment={ setActiveComment }
+						activeCommentId={ activeCommentId }
+						setActiveCommentId={ setActiveCommentId }
 						blocks={ blocks }
-						firstComment={ firstComment }
+						firstCommentId={ firstCommentId }
 					/>
 				</BlockContextProvider>
 			) ) }
@@ -233,7 +232,7 @@ export default function CommentTemplateEdit( {
 } ) {
 	const blockProps = useBlockProps();
 
-	const [ activeComment, setActiveComment ] = useState();
+	const [ activeCommentId, setActiveCommentId ] = useState();
 	const { commentOrder, threadCommentsDepth, threadComments } = useSelect(
 		( select ) => {
 			const { getSettings } = select( blockEditorStore );
@@ -299,9 +298,9 @@ export default function CommentTemplateEdit( {
 			comments={ commentTree }
 			blockProps={ blockProps }
 			blocks={ blocks }
-			activeComment={ activeComment }
-			setActiveComment={ setActiveComment }
-			firstComment={ commentTree[ 0 ]?.commentId }
+			activeCommentId={ activeCommentId }
+			setActiveCommentId={ setActiveCommentId }
+			firstCommentId={ commentTree[ 0 ]?.commentId }
 		/>
 	);
 }
