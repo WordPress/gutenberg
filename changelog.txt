@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 12.8.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- Templates page: reduce z-index of content area [39331](https://github.com/WordPress/gutenberg/pull/39331)
+
+
 = 12.8.0 =
 
 
