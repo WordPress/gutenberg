@@ -12,6 +12,8 @@ import { pressKeyWithModifier } from './press-key-with-modifier';
  * @param {string} setting   The option, used to get the option by id.
  * @param {string} value     The value to set the option to.
  * @param {string} adminPage The url of the admin page to visit.
+ *
+ * @return {Promise<string>} The current value of the option.
  */
 export async function setOption(
 	setting,
@@ -21,17 +23,20 @@ export async function setOption(
 	await switchUserToAdmin();
 	await visitAdminPage( adminPage );
 
-	const currentValue = await page.$eval(
+	const optionType = await page.$eval(
 		`#${ setting }`,
-		( element ) => element.value
+		( element ) => element.type
 	);
-	if ( typeof value === 'boolean' ) {
-		// Update the checkbox.
-		if ( ( currentValue && ! value ) || ( ! currentValue && value ) ) {
+	if ( optionType === 'checkbox' ) {
+		const isChecked = await page.$eval(
+			`#${ setting }`,
+			( element ) => element.checked === true
+		);
+		if ( ( value && ! isChecked ) || ( ! value && isChecked ) ) {
 			await page.click( `#${ setting }` );
 		}
 	} else {
-		// Update a text field.
+		// Update other options types.
 		await page.focus( `#${ setting }` );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.type( `#${ setting }`, value );
@@ -42,5 +47,4 @@ export async function setOption(
 		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
 	] );
 	await switchUserToTest();
-	return currentValue;
 }

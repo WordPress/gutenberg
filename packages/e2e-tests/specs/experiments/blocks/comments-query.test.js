@@ -2,22 +2,18 @@
  * WordPress dependencies
  */
 import {
-	insertBlock,
-	createNewPost,
 	activateTheme,
-	getEditedPostContent,
 	clickBlockAppender,
+	createNewPost,
+	getEditedPostContent,
+	insertBlock,
+	setOption,
 } from '@wordpress/e2e-test-utils';
-/**
- * WordPress dependencies
- */
 
-// It might make sense to include a similar test in WP core (or move this one over).
-// See discussion here: https://github.com/WordPress/gutenberg/pull/32797#issuecomment-864192088.
 describe( 'Comment Query Loop', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		// await setOption( 'page_comments', true, 'options-discussion.php' );
+		await setOption( 'page_comments', true, 'options-discussion.php' );
 		await createNewPost();
 	} );
 	it( 'Comment Query block insertion', async () => {

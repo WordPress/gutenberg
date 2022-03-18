@@ -757,6 +757,10 @@ _Parameters_
 -   _value_ `string`: The value to set the option to.
 -   _adminPage_ `string`: The url of the admin page to visit.
 
+_Returns_
+
+-   `Promise<string>`: The current value of the option.
+
 ### setPostContent
 
 Sets code editor content
