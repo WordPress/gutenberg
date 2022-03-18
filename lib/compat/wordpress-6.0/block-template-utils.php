@@ -27,6 +27,19 @@ function gutenberg_is_theme_directory_ignored( $path ) {
 }
 
 /**
+ * Recursively applies ksort to an array.
+ * From tests/phpunit/tests/theme/wpThemeJsonResolver.php
+ */
+function gutenburg_recursive_ksort( &$array ) {
+	foreach ( $array as &$value ) {
+		if ( is_array( $value ) ) {
+			gutenburg_recursive_ksort( $value );
+		}
+	}
+	ksort( $array );
+}
+
+/**
  * Creates an export of the current templates and
  * template parts from the site editor at the
  * specified path in a ZIP file.
@@ -101,10 +114,23 @@ function gutenberg_generate_block_templates_export_file() {
 	// Load theme.json into the zip file.
 	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
 	$tree->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
+	$merged_data = $tree->get_data();
+
+	// Update settings that aren't present in the $tree.
+	if ( file_exists( $theme_path . '/theme.json' ) ) {
+		$theme_json_data = wp_json_file_decode( $theme_path . '/theme.json', array( 'associative' => true ) );
+		if ( ! empty( $theme_json_data ) ) {
+			$merged_data['$schema'] = $theme_json_data['$schema'];
+			$merged_data['settings']['appearanceTools'] = $theme_json_data['settings']['appearanceTools'];
+		}
+	}
+
+	// Sort keys alphabetically.
+	gutenburg_recursive_ksort( $merged_data );
 
 	$zip->addFromString(
 		$theme_name . '/theme.json',
-		wp_json_encode( $tree->get_data(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
+		wp_json_encode( $merged_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
 	);
 
 	// Save changes to the zip file.
