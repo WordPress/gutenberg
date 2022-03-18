@@ -99,7 +99,6 @@ const StylesPreview = ( { label } ) => {
 				} }
 				initial="start"
 				animate={ isHovered && ! disableMotion ? 'hover' : 'start' }
-				layout={ ! disableMotion }
 			>
 				{ label && (
 					<motion.div
