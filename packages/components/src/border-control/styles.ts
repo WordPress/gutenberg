@@ -74,17 +74,25 @@ export const BorderControlDropdown = css`
 	}
 `;
 
-export const ColorIndicatorWrapper = ( border?: Border ) => {
+export const ColorIndicatorBorder = ( border?: Border ) => {
 	const { color, style } = border || {};
 
 	const fallbackColor =
 		!! style && style !== 'none' ? COLORS.gray[ 300 ] : undefined;
 
 	return css`
-		border-radius: 9999px;
-		border: 2px solid transparent;
 		border-style: ${ style === 'none' ? 'solid' : style };
 		border-color: ${ color || fallbackColor };
+	`;
+};
+
+export const ColorIndicatorWrapper = ( border?: Border ) => {
+	const { style } = border || {};
+
+	return css`
+		border-radius: 9999px;
+		border: 2px solid transparent;
+		${ style ? ColorIndicatorBorder( border ) : undefined }
 		width: 28px;
 		height: 28px;
 		padding: 2px;
