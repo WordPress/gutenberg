@@ -76,13 +76,13 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 function gutenberg_get_global_stylesheet( $types = array() ) {
 	// Return cached value if it can be used and exists.
 	// It's cached by theme to make sure that theme switching clears the cache.
-	$can_use_cached = (
+	$can_use_cached = false; /* (
 		( empty( $types ) ) &&
 		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
 		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
 		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
 		! is_admin()
-	);
+	);*/
 	$transient_name = 'gutenberg_global_styles_' . get_stylesheet();
 	if ( $can_use_cached ) {
 		$cached = get_transient( $transient_name );

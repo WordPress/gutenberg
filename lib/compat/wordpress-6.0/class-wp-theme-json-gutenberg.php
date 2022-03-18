@@ -94,7 +94,17 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 
 			// 2. Generate the rules that use the general selector.
-			$block_rules .= static::to_ruleset( $selector, $declarations );
+			// If the block is not used on this page, return.
+			$general_selector_rules = static::to_ruleset( $selector, $declarations );
+			if ( 'styles' === $metadata['path'][0] && 'blocks' === $metadata['path'][1] ) {
+				$block_name = str_replace( 'core/', '', $metadata['path'][2] );
+				wp_add_inline_style(
+					"wp-block-{$block_name}",
+					$general_selector_rules
+				);
+			} else {
+				$block_rules .= $general_selector_rules;
+			}
 
 			// 3. Generate the rules that use the duotone selector.
 			if ( isset( $metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
