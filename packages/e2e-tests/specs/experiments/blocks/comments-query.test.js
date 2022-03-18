@@ -14,6 +14,7 @@ describe( 'Comment Query Loop', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
 		await setOption( 'page_comments', true, 'options-discussion.php' );
+		await setOption( 'comments_per_page', '2', 'options-discussion.php' );
 		await createNewPost();
 	} );
 	it( 'Comment Query block insertion', async () => {
@@ -34,5 +35,7 @@ describe( 'Comment Query Loop', () => {
 	} );
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
+		await setOption( 'page_comments', false, 'options-discussion.php' );
+		await setOption( 'comments_per_page', '50', 'options-discussion.php' );
 	} );
 } );
