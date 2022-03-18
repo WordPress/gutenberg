@@ -7,7 +7,7 @@ import Animated, { useSharedValue } from 'react-native-reanimated';
 export default function Draggable( {
 	children,
 	maxDistance = 1000,
-	minDuration = 10,
+	minDuration = 500,
 	onDragEnd,
 	onDragOver,
 	onDragStart,
@@ -15,45 +15,51 @@ export default function Draggable( {
 } ) {
 	const isDragging = useSharedValue( false );
 
-	const dragHandler = Gesture.Simultaneous(
-		Gesture.LongPress().onStart( ( ev ) => {
+	const longPressGesture = Gesture.LongPress()
+		.onStart( ( ev ) => {
 			'worklet';
 			isDragging.value = true;
 
 			if ( onDragStart ) {
 				onDragStart( ev );
 			}
-		} ),
-		Gesture.Pan()
-			.onEnd( () => {
-				'worklet';
-				isDragging.value = false;
-			} )
-			.onUpdate( ( ev ) => {
-				'worklet';
-				if ( isDragging.value ) {
-					if ( onDragOver ) {
-						onDragOver( ev );
-					}
-				}
-			} )
-			.onFinalize( () => {
-				'worklet';
-				isDragging.value = false;
+		} )
+		.maxDistance( maxDistance )
+		.minDuration( minDuration )
+		.shouldCancelWhenOutside( false );
 
-				if ( onDragEnd ) {
-					onDragEnd();
+	const panGesture = Gesture.Pan()
+		.manualActivation( true )
+		.onTouchesMove( ( _, state ) => {
+			'worklet';
+			if ( isDragging.value ) {
+				state.activate();
+			} else {
+				state.fail();
+			}
+		} )
+		.onUpdate( ( ev ) => {
+			'worklet';
+			if ( isDragging.value ) {
+				if ( onDragOver ) {
+					onDragOver( ev );
 				}
-			} )
-	);
+			}
+		} )
+		.onEnd( () => {
+			'worklet';
+
+			if ( isDragging.value && onDragEnd ) {
+				onDragEnd();
+			}
+			isDragging.value = false;
+		} )
+		.simultaneousWithExternalGesture( longPressGesture );
+
+	const dragHandler = Gesture.Race( panGesture, longPressGesture );
 
 	return (
-		<GestureDetector
-			shouldCancelWhenOutside={ false }
-			maxDistance={ maxDistance }
-			minDuration={ minDuration }
-			gesture={ dragHandler }
-		>
+		<GestureDetector gesture={ dragHandler }>
 			<Animated.View style={ wrapperAnimatedStyles }>
 				{ children }
 			</Animated.View>
