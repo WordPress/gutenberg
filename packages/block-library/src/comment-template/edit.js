@@ -31,6 +31,10 @@ const TEMPLATE = [
 /**
  * Function that returns a comment structure that will be rendered with default placehoders.
  *
+ * Each comment has a `commentId` property that is always a negative number in
+ * case of the placeholders. This is to ensure that the comment does not
+ * conflict with the actual (real) comments.
+ *
  * @param {Object}  settings                       Discussion Settings.
  * @param {number}  [settings.perPage]             - Comments per page setting or block attribute.
  * @param {boolean} [settings.threadComments]      - Enable threaded (nested) comments setting.
@@ -54,12 +58,13 @@ const getCommentsPlaceholder = ( {
 		perPage <= commentsDepth ? perPage : commentsDepth;
 	if ( ! threadComments || defaultCommentsToShow === 1 ) {
 		// If displaying threaded comments is disabled, we only show one comment
-		return [ { commentId: null, children: [] } ];
+		// A commentId is negative in order to avoid conflicts with the actual comments.
+		return [ { commentId: -1, children: [] } ];
 	} else if ( defaultCommentsToShow === 2 ) {
 		return [
 			{
-				commentId: null,
-				children: [ { commentId: null, children: [] } ],
+				commentId: -1,
+				children: [ { commentId: -2, children: [] } ],
 			},
 		];
 	}
@@ -67,11 +72,11 @@ const getCommentsPlaceholder = ( {
 	// In case that the value is set but larger than 3 we truncate it to 3.
 	return [
 		{
-			commentId: null,
+			commentId: -1,
 			children: [
 				{
-					commentId: null,
-					children: [ { commentId: null, children: [] } ],
+					commentId: -2,
+					children: [ { commentId: -3, children: [] } ],
 				},
 			],
 		},
@@ -101,6 +106,7 @@ function CommentTemplateInnerBlocks( {
 		{},
 		{ template: TEMPLATE }
 	);
+
 	return (
 		<li { ...innerBlocksProps }>
 			{ comment.commentId ===
