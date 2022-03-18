@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG } from '../utils';
+import { COLORS, CONFIG, rtl } from '../utils';
 import { space } from '../ui/utils/space';
 
 export const BorderBoxControl = css``;
@@ -35,7 +35,7 @@ export const BorderBoxControlSplitControls = css`
 	position: relative;
 	gap: ${ space( 4 ) };
 	flex: 1;
-	margin-right: ${ space( 3 ) };
+	${ rtl( { marginRight: space( 3 ) }, { marginLeft: space( 3 ) } )() }
 `;
 
 export const CenteredBorderControl = css`

@@ -8,7 +8,7 @@ import { useMemo } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
-import { useCx } from '../../utils/hooks/use-cx';
+import { useCx, rtl } from '../../utils/';
 
 import type { SplitControlsProps } from '../types';
 
@@ -24,7 +24,7 @@ export function useBorderBoxControlSplitControls(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.BorderBoxControlSplitControls, className );
-	}, [ className ] );
+	}, [ className, rtl.watch() ] );
 
 	const centeredClassName = useMemo( () => {
 		return cx( styles.CenteredBorderControl, className );
