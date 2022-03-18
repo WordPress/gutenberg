@@ -226,7 +226,9 @@ function LinkControl( {
 			...updatedValue,
 			title: internalTextValue || updatedValue?.title,
 		} );
-		stopEditing();
+		queueMicrotask( () => {
+			stopEditing();
+		} );
 	};
 
 	const handleSubmit = () => {
@@ -239,7 +241,9 @@ function LinkControl( {
 				title: internalTextValue,
 			} );
 		}
-		stopEditing();
+		queueMicrotask( () => {
+			stopEditing();
+		} );
 	};
 
 	const handleSubmitWithEnter = ( event ) => {
