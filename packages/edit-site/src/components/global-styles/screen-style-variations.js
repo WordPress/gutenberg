@@ -82,7 +82,7 @@ function Variation( { variation } ) {
 			>
 				<VStack spacing="2">
 					<div className="edit-site-global-styles-variations_item-preview">
-						<StylesPreview height={ 80 } />
+						<StylesPreview />
 					</div>
 					<HStack
 						className="edit-site-global-styles-variations_item-label"

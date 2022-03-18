@@ -10,7 +10,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useReducedMotion } from '@wordpress/compose';
+import { useReducedMotion, useResizeObserver } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 
 /**
@@ -43,7 +43,9 @@ const paletteMotionVariants = {
 	},
 };
 
-const StylesPreview = ( { height = 150 } ) => {
+const normalizedWidth = 250;
+
+const StylesPreview = () => {
 	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
 	const [ textColor = 'black' ] = useStyle( 'color.text' );
 	const [ linkColor = 'blue' ] = useStyle( 'elements.link.color.text' );
@@ -54,15 +56,20 @@ const StylesPreview = ( { height = 150 } ) => {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ themeColors ] = useSetting( 'color.palette.theme' );
 	const [ customColors ] = useSetting( 'color.palette.custom' );
-
+	const [ containerResizeListener, { width } ] = useResizeObserver();
+	const ratio = width ? width / normalizedWidth : 1;
 	return (
 		<Iframe
 			className="edit-site-global-styles-preview__iframe"
 			head={ <EditorStyles styles={ styles } /> }
-			style={ { height } }
+			style={ {
+				height: 150 * ratio,
+				visibility: ! width ? 'hidden' : 'visible',
+			} }
 			onMouseEnter={ () => setIsHovered( true ) }
 			onMouseLeave={ () => setIsHovered( false ) }
 		>
+			{ containerResizeListener }
 			<motion.div
 				style={ {
 					height: '100%',
@@ -79,41 +86,45 @@ const StylesPreview = ( { height = 150 } ) => {
 						height: '100%',
 						overflow: 'hidden',
 					} }
-					spacing={ 4 }
+					spacing={ 4 * ratio }
 					justify="center"
 				>
 					<div
 						style={ {
 							fontFamily,
-							fontSize: ( 65 * height ) / 150,
+							fontSize: 65 * ratio,
 						} }
 					>
 						Aa
 					</div>
-					<motion.div variants={ defaultColorVariants }>
-						<VStack>
+					<motion.div
+						variants={ defaultColorVariants }
+						transition={ { duration: 0.5 } }
+					>
+						<VStack spacing={ 2 * ratio }>
 							<div
 								style={ {
-									height: ( 30 * height ) / 150,
-									width: ( 30 * height ) / 150,
+									height: 30 * ratio,
+									width: 30 * ratio,
 									background: textColor,
-									borderRadius: ( 15 * height ) / 150,
-									border: '1px solid #f0f0f0',
+									borderRadius: 15 * ratio,
 								} }
 							/>
 							<div
 								style={ {
-									height: ( 30 * height ) / 150,
-									width: ( 30 * height ) / 150,
+									height: 30 * ratio,
+									width: 30 * ratio,
 									background: linkColor,
-									borderRadius: ( 15 * height ) / 150,
-									border: '1px solid #f0f0f0',
+									borderRadius: 15 * ratio,
 								} }
 							/>
 						</VStack>
 					</motion.div>
-					<motion.div variants={ paletteMotionVariants }>
-						<VStack>
+					<motion.div
+						variants={ paletteMotionVariants }
+						transition={ { duration: 0.5 } }
+					>
+						<VStack spacing={ 2 * ratio }>
 							{ themeColors
 								.concat( customColors )
 								.slice( 0, 4 )
@@ -121,11 +132,10 @@ const StylesPreview = ( { height = 150 } ) => {
 									<div
 										key={ index }
 										style={ {
-											height: ( 30 * height ) / 150,
-											width: ( 30 * height ) / 150,
+											height: 30 * ratio,
+											width: 30 * ratio,
 											background: color,
-											borderRadius: ( 15 * height ) / 150,
-											border: '1px solid #f0f0f0',
+											borderRadius: 15 * ratio,
 										} }
 									/>
 								) ) }
