@@ -1,6 +1,12 @@
 /**
+ * External dependencies
+ */
+import { has } from 'lodash';
+
+/**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
@@ -28,14 +34,16 @@ function getMediaSourceUrlBySizeSlug( media, slug ) {
 const addFeaturedImageToolbarItem = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
-			const {
-				attributesContext = [],
-				attributes,
-				setAttributes,
-				name: blockName,
-			} = props;
+			const { attributes, setAttributes, name: blockName } = props;
 
-			const { useFeaturedImage } = attributes;
+			const { contextualAttributes = {} } = attributes;
+
+			let attributesContext = {};
+
+			const [
+				hasContextualAttribute,
+				setHasContextualAttribute,
+			] = useState( has( contextualAttributes, 'url' ) );
 
 			const { sizeSlug } = attributes;
 			const [ featuredImage ] = useEntityProp(
@@ -54,8 +62,18 @@ const addFeaturedImageToolbarItem = createHigherOrderComponent(
 			);
 			const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 
-			if ( useFeaturedImage ) {
-				attributesContext.push( { url: mediaUrl } );
+			const toggleContextualAttributes = ( ctxAttr ) => {
+				if ( has( ctxAttr, 'url' ) ) {
+					delete ctxAttr.url;
+				} else {
+					ctxAttr.url = mediaUrl;
+				}
+
+				return ctxAttr;
+			};
+
+			if ( hasContextualAttribute ) {
+				attributesContext = { url: mediaUrl };
 			}
 
 			if (
@@ -70,11 +88,17 @@ const addFeaturedImageToolbarItem = createHigherOrderComponent(
 						<ToolbarButton
 							icon={ group /*this is temporary*/ }
 							label={ __( 'Use featured image' ) }
-							isPressed={ useFeaturedImage }
+							isPressed={ hasContextualAttribute }
 							onClick={ () => {
+								const newContextualAttributes = toggleContextualAttributes(
+									contextualAttributes
+								);
 								setAttributes( {
-									useFeaturedImage: ! useFeaturedImage,
+									contextualAttributes: newContextualAttributes,
 								} );
+								setHasContextualAttribute(
+									! hasContextualAttribute
+								);
 							} }
 						/>
 					</BlockControls>

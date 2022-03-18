@@ -129,3 +129,45 @@ require __DIR__ . '/block-supports/layout.php';
 require __DIR__ . '/block-supports/spacing.php';
 require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
+
+/**
+ * Adds the contextual attributes storage to
+ * core blocks to be used in the post editor.
+ *
+ * @param Array $settings block settings.
+ */
+function filter_metadata_registration( $settings ) {
+	$settings['attributes']['contextualAttributes'] = array(
+		'type' => 'object',
+	);
+	return $settings;
+};
+add_filter( 'block_type_metadata_settings', 'filter_metadata_registration', 10, 2 );
+
+/**
+ * Keeps blocks bound to featured image
+ * up to date in case it has been changed outside
+ * of the block editor
+ *
+ * @param string $block_content Block content.
+ * @param array  $block         The block instance.
+ */
+function update_featured_image( $block_content, $block ) {
+	if ( 'core/image' !== $block['blockName'] ) {
+		return $block_content;
+	}
+
+	if ( isset( $block['attrs']['contextualAttributes'] ) &&
+		isset( $block['attrs']['contextualAttributes']['url'] )
+	) {
+		$block_content = str_replace(
+			$block['attrs']['contextualAttributes']['url'],
+			get_the_post_thumbnail_url(),
+			$block_content
+		);
+	}
+
+	return $block_content;
+}
+
+add_filter( 'render_block', 'update_featured_image', 10, 2 );

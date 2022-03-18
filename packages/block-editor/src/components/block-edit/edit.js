@@ -41,7 +41,7 @@ export const Edit = ( props ) => {
 	const blockContext = useContext( BlockContext );
 
 	useEffect( () => {
-		attributesContext.map( ( ctxAttr ) => setAttributes( ctxAttr ) );
+		setAttributes( attributesContext );
 	}, [ attributesContext ] );
 
 	// Assign context values using the block type's declared context needs.
