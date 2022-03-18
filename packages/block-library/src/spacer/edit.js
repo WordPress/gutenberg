@@ -123,6 +123,7 @@ const SpacerEdit = ( {
 			return (
 				<ResizableSpacer
 					minWidth={ MIN_SPACER_SIZE }
+					maxWidth={ MAX_SPACER_SIZE }
 					enable={ {
 						top: false,
 						right: true,
@@ -147,6 +148,8 @@ const SpacerEdit = ( {
 		return (
 			<>
 				<ResizableSpacer
+					minHeight={ MIN_SPACER_SIZE }
+					maxHeight={ MAX_SPACER_SIZE }
 					enable={ {
 						top: false,
 						right: false,
