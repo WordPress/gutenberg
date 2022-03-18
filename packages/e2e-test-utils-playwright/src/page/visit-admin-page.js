@@ -4,7 +4,7 @@
 import { join } from 'path';
 
 /**
- * Visits admin page; if user is not logged in then it logging in it first, then visits admin page.
+ * Visits admin page and handle errors.
  *
  * @this {import('./').PageUtils}
  * @param {string} adminPath String to be serialized as pathname.
