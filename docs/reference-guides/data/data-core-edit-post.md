@@ -508,15 +508,11 @@ _Returns_
 
 ### toggleEditorPanelOpened
 
-Returns an action object used to open or close a panel in the editor.
+Opens a closed panel and closes an open panel.
 
 _Parameters_
 
 -   _panelName_ `string`: A string that identifies the panel to open or close.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### toggleFeature
 
