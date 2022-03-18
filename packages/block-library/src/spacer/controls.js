@@ -55,6 +55,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 		<BaseControl label={ label } id={ inputId }>
 			<UnitControl
 				id={ inputId }
+				isResetValueOnUnitChange
 				min={ 0 }
 				max={ MAX_SPACER_SIZE }
 				onChange={ handleOnChange }
