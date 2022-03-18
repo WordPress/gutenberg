@@ -19,7 +19,7 @@ import { getBlockClientId } from '../../utils/dom';
  * @param {HTMLElement} node  Block element.
  * @param {boolean}     value `contentEditable` value (true or false)
  */
-export function setContentEditableWrapper( node, value ) {
+function setContentEditableWrapper( node, value ) {
 	// Since `closest` considers `node` as a candidate, use `parentElement`.
 	node.contentEditable = value;
 	// Firefox doesn't automatically move focus.
@@ -39,10 +39,7 @@ export default function useSelectionObserver() {
 	} = useDispatch( blockEditorStore );
 	const {
 		isSelectionEnabled,
-		isBlockSelected,
 		getBlockParents,
-		getBlockSelectionStart,
-		hasMultiSelection,
 		isSelectionMergeable,
 	} = useSelect( blockEditorStore );
 	return useRefEffect(
@@ -170,64 +167,9 @@ export default function useSelectionObserver() {
 				setContentEditableWrapper( node, true );
 			}
 
-			function onMouseDown( event ) {
-				// The main button.
-				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-				if ( ! isSelectionEnabled() || event.button !== 0 ) {
-					return;
-				}
-
-				const clientId = getBlockClientId( event.target );
-
-				if ( event.shiftKey ) {
-					const blockSelectionStart = getBlockSelectionStart();
-					// By checking `blockSelectionStart` to be set, we handle the
-					// case where we select a single block. We also have to check
-					// the selectionEnd (clientId) not to be included in the
-					// `blockSelectionStart`'s parents because the click event is
-					// propagated.
-					const startParents = getBlockParents( blockSelectionStart );
-					if (
-						blockSelectionStart &&
-						blockSelectionStart !== clientId &&
-						! startParents?.includes( clientId )
-					) {
-						const startPath = [
-							...startParents,
-							blockSelectionStart,
-						];
-						const endPath = [
-							...getBlockParents( clientId ),
-							clientId,
-						];
-						const depth =
-							Math.min( startPath.length, endPath.length ) - 1;
-						const start = startPath[ depth ];
-						const end = endPath[ depth ];
-						// Handle the case of having selected a parent block and
-						// then shift+click on a child.
-						if ( start !== end ) {
-							setContentEditableWrapper( node, true );
-							multiSelect( start, end );
-							event.preventDefault();
-						}
-					}
-				} else if ( hasMultiSelection() ) {
-					// Allow user to escape out of a multi-selection to a
-					// singular selection of a block via click. This is handled
-					// here since focus handling excludes blocks when there is
-					// multiselection, as focus can be incurred by starting a
-					// multiselection (focus moved to first block's multi-
-					// controls).
-					selectBlock( clientId );
-				}
-			}
-
-			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'mouseout', onMouseLeave );
 
 			return () => {
-				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'mouseout', onMouseLeave );
 				ownerDocument.removeEventListener(
 					'selectionchange',
@@ -242,9 +184,10 @@ export default function useSelectionObserver() {
 			stopMultiSelect,
 			multiSelect,
 			selectBlock,
+			selectionChange,
 			isSelectionEnabled,
-			isBlockSelected,
 			getBlockParents,
+			isSelectionMergeable,
 		]
 	);
 }
