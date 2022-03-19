@@ -7,9 +7,6 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
 
