@@ -59,6 +59,7 @@
 	}
 
 	// This is needed for classic themes where the align class is not on the container.
+	&.aligncenter,
 	.aligncenter {
 		margin-left: auto;
 		margin-right: auto;
