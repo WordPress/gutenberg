@@ -2,14 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { BentoBaseCarousel } from '@bentoproject/base-carousel/react';
 
 /**
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { createContext, useState, useMemo, useRef } from '@wordpress/element';
+import {
+	createContext,
+	useState,
+	useMemo,
+	cloneElement,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -89,6 +93,7 @@ function Items( {
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
+	__experimentalBlocksListItemsWrapper,
 	__experimentalLayout: layout = defaultLayout,
 } ) {
 	const [ intersectingBlocks, setIntersectingBlocks ] = useState( new Set() );
@@ -142,7 +147,7 @@ function Items( {
 			</AsyncModeProvider>
 		);
 	} );
-	const carouselRef = useRef();
+
 	/**
 	 * This is an attempt to use inner blocks as BentoBaseCarousel slides.
 	 *
@@ -156,30 +161,15 @@ function Items( {
 	 * between that root component and the actual list of specific child block components. There are
 	 * ContextProviders, layouts, and more.
 	 *
-	 * The workaround: support wrapping the list of inner blocks in a custom wrapper. The code below
-	 * is a hacky proof of concept that uses an `__experimentalAppenderTagName` option since it can store
-	 * a unique identifier and is passed through all the wrapping layer all the way down to this component.
-	 *
-	 * An ideal implementation would accept an arbitrary wrapper component.
+	 * The workaround: support wrapping the list of inner blocks in a custom wrapper.
 	 *
 	 * Potential problems: Bento components may have event handlers or portals that are incompatible with
 	 * Gutenberg event handlers or portals.
 	 */
-	if (
-		__experimentalAppenderTagName ===
-		'wrap-my-blocks-in-a-bento-carousel-pretty-please'
-	) {
-		blocks = (
-			<BentoBaseCarousel
-				ref={ carouselRef }
-				dir={ 'ltr' }
-				autoAdvance={ false }
-				loop={ true }
-				snap={ true }
-			>
-				{ blocks }
-			</BentoBaseCarousel>
-		);
+	if ( __experimentalBlocksListItemsWrapper ) {
+		blocks = cloneElement( __experimentalBlocksListItemsWrapper, {
+			children: blocks,
+		} );
 	}
 
 	return (
