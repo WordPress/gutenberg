@@ -73,6 +73,7 @@ function BlockListAppender( {
 				'block-list-appender wp-block',
 				className
 			) }
+			contentEditable={ false }
 			// The appender exists to let you add the first Paragraph before
 			// any is inserted. To that end, this appender should visually be
 			// presented as a block. That means theme CSS should style it as if
