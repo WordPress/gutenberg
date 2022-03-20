@@ -6,11 +6,7 @@ The block editor provides a number of options for theme designers and developers
 
 ### Classic theme
 
-In terms of block editor terminology this is any theme that defines its templates in the traditional `.php` file format, and that doesn't have an `index.html` format template in the `/block-templates` or `/templates` folders. A `Classic` theme still has the ability to provide configuration and styling options to the block editor, and block content, via [Theme Supports](/docs/how-to-guides/themes/theme-support.md). 
-
-### Hybrid theme
-
-As well as using [Theme Supports](/docs/how-to-guides/themes/theme-support.md) to configure the block editor and block content, a `Classic` theme can also include a [theme.json](/docs/how-to-guides/themes/theme-json.md) file to achieve this. A theme does not have to be a `Block` theme in order to take advantage of some of the flexibility provided by the use of a `theme.json` file.
+In terms of block editor terminology this is any theme that defines its templates in the traditional `.php` file format, and that doesn't have an `index.html` format template in the `/block-templates` or `/templates` folders. A `Classic` theme has the ability to provide configuration and styling options to the block editor, and block content, via [Theme Supports](/docs/how-to-guides/themes/theme-support.md), or by including a [theme.json](/docs/how-to-guides/themes/theme-json.md) file. A theme does not have to be a `Block` theme in order to take advantage of some of the flexibility provided by the use of a `theme.json` file.
 
 ### Block theme
 
