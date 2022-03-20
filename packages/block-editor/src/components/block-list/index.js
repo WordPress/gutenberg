@@ -2,13 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { BentoBaseCarousel } from '@bentoproject/base-carousel/react';
 
 /**
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { createContext, useState, useMemo } from '@wordpress/element';
+import { createContext, useState, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -123,25 +124,68 @@ function Items( {
 		[ rootClientId ]
 	);
 
+	let blocks = order.map( ( clientId ) => {
+		return (
+			<AsyncModeProvider
+				key={ clientId }
+				value={
+					// Only provide data asynchronously if the block is
+					// not visible and not selected.
+					! intersectingBlocks.has( clientId ) &&
+					! selectedBlocks.includes( clientId )
+				}
+			>
+				<BlockListBlock
+					rootClientId={ rootClientId }
+					clientId={ clientId }
+				/>
+			</AsyncModeProvider>
+		);
+	} );
+	const carouselRef = useRef();
+	/**
+	 * This is an attempt to use inner blocks as BentoBaseCarousel slides.
+	 *
+	 * The problem: BentoBaseCarousel expects its immediate children to be
+	 * the slides:
+	 *
+	 * https://github.com/ampproject/amphtml/blob/5d52f0fcd377dd9049e8be5c58bcb6a5b0b51646/src/bento/components/bento-base-carousel/1.0/component.js#L104-L108
+	 *
+	 * However, we cannot easily pass a list of components representing Gutenberg inner blocks.
+	 * We can only render a <div {...innerBlocksProps} /> which then embers a number of intermediate layers
+	 * between that root component and the actual list of specific child block components. There are
+	 * ContextProviders, layouts, and more.
+	 *
+	 * The workaround: support wrapping the list of inner blocks in a custom wrapper. The code below
+	 * is a hacky proof of concept that uses an `__experimentalAppenderTagName` option since it can store
+	 * a unique identifier and is passed through all the wrapping layer all the way down to this component.
+	 *
+	 * An ideal implementation would accept an arbitrary wrapper component.
+	 *
+	 * Potential problems: Bento components may have event handlers or portals that are incompatible with
+	 * Gutenberg event handlers or portals.
+	 */
+	if (
+		__experimentalAppenderTagName ===
+		'wrap-my-blocks-in-a-bento-carousel-pretty-please'
+	) {
+		blocks = (
+			<BentoBaseCarousel
+				ref={ carouselRef }
+				dir={ 'ltr' }
+				autoAdvance={ false }
+				loop={ true }
+				snap={ true }
+			>
+				{ blocks }
+			</BentoBaseCarousel>
+		);
+	}
+
 	return (
 		<LayoutProvider value={ layout }>
 			<IntersectionObserver.Provider value={ intersectionObserver }>
-				{ order.map( ( clientId ) => (
-					<AsyncModeProvider
-						key={ clientId }
-						value={
-							// Only provide data asynchronously if the block is
-							// not visible and not selected.
-							! intersectingBlocks.has( clientId ) &&
-							! selectedBlocks.includes( clientId )
-						}
-					>
-						<BlockListBlock
-							rootClientId={ rootClientId }
-							clientId={ clientId }
-						/>
-					</AsyncModeProvider>
-				) ) }
+				{ blocks }
 			</IntersectionObserver.Provider>
 			{ order.length < 1 && placeholder }
 			<BlockListAppender
