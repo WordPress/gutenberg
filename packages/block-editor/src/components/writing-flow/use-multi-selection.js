@@ -22,7 +22,6 @@ function selector( select ) {
 		hasMultiSelection,
 		getSelectedBlockClientId,
 		getSelectedBlocksInitialCaretPosition,
-		getSelectionStart,
 	} = select( blockEditorStore );
 
 	return {
@@ -31,7 +30,6 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		selectedBlockClientId: getSelectedBlockClientId(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
-		isFullSelection: ! getSelectionStart().attributeKey,
 	};
 }
 
@@ -42,7 +40,6 @@ export default function useMultiSelection() {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		selectedBlockClientId,
-		isFullSelection,
 	} = useSelect( selector, [] );
 	const selectedRef = useBlockRef( selectedBlockClientId );
 	// These must be in the right DOM order.
@@ -97,10 +94,6 @@ export default function useMultiSelection() {
 				return;
 			}
 
-			if ( ! isFullSelection ) {
-				return;
-			}
-
 			// Allow cross contentEditable selection by temporarily making
 			// all content editable. We can't rely on using the store and
 			// React because re-rending happens too slowly. We need to be
@@ -118,6 +111,15 @@ export default function useMultiSelection() {
 			}
 
 			const selection = defaultView.getSelection();
+
+			// Abort if the blocks already contain selection.
+			if (
+				selection.containsNode( startRef.current, true ) &&
+				selection.containsNode( endRef.current, true )
+			) {
+				return;
+			}
+
 			const range = ownerDocument.createRange();
 
 			// These must be in the right DOM order.
@@ -133,7 +135,6 @@ export default function useMultiSelection() {
 			multiSelectedBlockClientIds,
 			selectedBlockClientId,
 			initialPosition,
-			isFullSelection,
 		]
 	);
 }
