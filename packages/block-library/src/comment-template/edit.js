@@ -90,7 +90,7 @@ const getCommentsPlaceholder = ( {
  * @param {Array}  [props.comment]            - A comment object.
  * @param {Array}  [props.activeCommentId]    - The ID of the comment that is currently active.
  * @param {Array}  [props.setActiveCommentId] - The setter for activeCommentId.
- * @param {Array}  [props.firstCommentId]     - First ID of the first comment in the array.
+ * @param {Array}  [props.firstCommentId]     - ID of the first comment in the array.
  * @param {Array}  [props.blocks]             - Array of blocks returned from
  *                                            getBlocks() in parent .
  * @return {WPElement}                 		Inner blocks of the Comment Template
