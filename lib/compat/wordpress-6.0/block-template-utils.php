@@ -30,7 +30,7 @@ function gutenberg_is_theme_directory_ignored( $path ) {
  * Recursively applies ksort to an array.
  * From tests/phpunit/tests/theme/wpThemeJsonResolver.php
  */
-function gutenburg_recursive_ksort( &$array ) {
+function gutenberg_recursive_ksort( &$array ) {
 	foreach ( $array as &$value ) {
 		if ( is_array( $value ) ) {
 			gutenburg_recursive_ksort( $value );
