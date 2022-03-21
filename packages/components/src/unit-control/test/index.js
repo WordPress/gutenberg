@@ -365,6 +365,25 @@ describe( 'UnitControl', () => {
 			await waitFor( () => expect( selectA ).toHaveValue( 'vw' ) );
 			expect( selectB ).toHaveValue( 'vw' );
 		} );
+
+		it( 'should maintain the chosen non-default unit when value is cleared', async () => {
+			const units = [
+				{ value: 'pt', label: 'pt' },
+				{ value: 'vmax', label: 'vmax' },
+			];
+
+			const { user } = render(
+				<UnitControl units={ units } value="5" />
+			);
+
+			const select = getSelect();
+			await user.selectOptions( select, [ 'vmax' ] );
+
+			const input = getInput();
+			await user.clear( input );
+
+			expect( select ).toHaveValue( 'vmax' );
+		} );
 	} );
 
 	describe( 'Unit Parser', () => {
