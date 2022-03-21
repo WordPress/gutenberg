@@ -16,8 +16,7 @@ import { View } from '@wordpress/primitives';
  */
 import SpacerControls from './controls';
 
-export const MIN_SPACER_WIDTH = 0;
-export const MIN_SPACER_HEIGHT = 0;
+export const MIN_SPACER_SIZE = 0;
 
 const ResizableSpacer = ( {
 	orientation,
@@ -119,7 +118,7 @@ const SpacerEdit = ( {
 		if ( blockOrientation === 'horizontal' ) {
 			return (
 				<ResizableSpacer
-					minWidth={ MIN_SPACER_WIDTH }
+					minWidth={ MIN_SPACER_SIZE }
 					enable={ {
 						top: false,
 						right: true,
@@ -144,7 +143,7 @@ const SpacerEdit = ( {
 		return (
 			<>
 				<ResizableSpacer
-					minHeight={ MIN_SPACER_HEIGHT }
+					minHeight={ MIN_SPACER_SIZE }
 					enable={ {
 						top: false,
 						right: false,

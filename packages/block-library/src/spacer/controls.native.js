@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { MIN_SPACER_WIDTH, MIN_SPACER_HEIGHT } from './edit';
+import { MIN_SPACER_SIZE } from './edit';
 import styles from './style.scss';
 
 const DEFAULT_VALUES = { px: 100, em: 10, rem: 10, vw: 10, vh: 25 };
@@ -67,11 +67,7 @@ function Controls( { attributes, context, setAttributes } ) {
 			<PanelBody title={ __( 'Dimensions' ) }>
 				<UnitControl
 					label={ label }
-					min={
-						orientation === 'horizontal'
-							? MIN_SPACER_WIDTH
-							: MIN_SPACER_HEIGHT
-					}
+					min={ MIN_SPACER_SIZE }
 					value={ value }
 					onChange={ handleChange }
 					onUnitChange={ handleUnitChange }

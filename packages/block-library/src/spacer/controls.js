@@ -15,16 +15,9 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { MIN_SPACER_WIDTH, MIN_SPACER_HEIGHT } from './edit';
+import { MIN_SPACER_SIZE } from './edit';
 
-function DimensionInput( {
-	label,
-	onChange,
-	isResizing,
-	value = '',
-	min,
-	max,
-} ) {
+function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
 
 	// In most contexts the spacer size cannot meaningfully be set to a
@@ -63,8 +56,7 @@ function DimensionInput( {
 			<UnitControl
 				id={ inputId }
 				isResetValueOnUnitChange
-				min={ min }
-				max={ max }
+				min={ MIN_SPACER_SIZE }
 				onChange={ handleOnChange }
 				style={ { maxWidth: 80 } }
 				value={ computedValue }
@@ -92,7 +84,6 @@ export default function SpacerControls( {
 							setAttributes( { width: nextWidth } )
 						}
 						isResizing={ isResizing }
-						min={ MIN_SPACER_WIDTH }
 					/>
 				) }
 				{ orientation !== 'horizontal' && (
@@ -103,7 +94,6 @@ export default function SpacerControls( {
 							setAttributes( { height: nextHeight } )
 						}
 						isResizing={ isResizing }
-						min={ MIN_SPACER_HEIGHT }
 					/>
 				) }
 			</PanelBody>
