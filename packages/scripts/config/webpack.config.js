@@ -233,7 +233,7 @@ const config = {
 			patterns: [
 				{
 					from: copyWebPackPattens,
-					context: 'src',
+					context: process.env.WP_SRC_DIRECTORY,
 					noErrorOnMissing: true,
 				},
 			],
