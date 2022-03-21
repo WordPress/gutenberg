@@ -79,16 +79,26 @@ export default function TableOfContentsEdit( {
 				getBlockName,
 				getBlockOrder,
 				getClientIdsOfDescendants,
-				getGlobalBlockCount,
+				__experimentalGetGlobalBlocksByName: getGlobalBlocksByName,
 			} = select( blockEditorStore );
 
 			// Disable reason: blocks can be loaded into a *non-post* block editor, so to avoid declaring @wordpress/editor as a dependency, we must access its store by string. When the store is not available, editorSelectors will be null, and the block's saved markup will lack permalinks.
 			// eslint-disable-next-line @wordpress/data-no-store-string-literals
 			const editorSelectors = select( 'core/editor' );
 
-			const isPaginated = getGlobalBlockCount( 'core/nextpage' ) !== 0;
+			const pageBreakClientIds = getGlobalBlocksByName( 'core/nextpage' );
 
-			const blockIndex = getBlockIndex( clientId );
+			const isPaginated = pageBreakClientIds.length !== 0;
+
+			const tocIndex = getBlockIndex( clientId );
+
+			// Calculate the page (of a paginated post) this Table of Contents block is part of. Note that pageBreakClientIds may not be in the order they appear on the page, so we have to iterate over all of them.
+			let tocPage = 1;
+			for ( const pageBreakClientId of pageBreakClientIds ) {
+				if ( tocIndex > getBlockIndex( pageBreakClientId ) ) {
+					tocPage++;
+				}
+			}
 
 			// Get the top-level block client ids, and add them and the client ids of their children to an ordered list. We don't use getClientIdsWithDescendants because it returns ids in the wrong order.
 			const allBlockClientIds = [];
@@ -100,17 +110,6 @@ export default function TableOfContentsEdit( {
 			}
 
 			const _latestHeadings = [];
-
-			// Calculate the page (of a paginated post) the Table of Contents block is part of.
-			let tocPage = 1;
-			for ( const [ i, blockClientId ] of allBlockClientIds.entries() ) {
-				if ( i > blockIndex ) {
-					break;
-				}
-				if ( getBlockName( blockClientId ) === 'core/nextpage' ) {
-					tocPage++;
-				}
-			}
 
 			/** The page (of a paginated post) a heading will be part of. */
 			let headingPage = 1;
