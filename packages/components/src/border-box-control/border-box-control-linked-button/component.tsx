@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Button from '../../button';
 import Tooltip from '../../tooltip';
+import { View } from '../../view';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderBoxControlLinkedButton } from './hook';
 
@@ -27,7 +28,7 @@ const BorderBoxControlLinkedButton = (
 
 	return (
 		<Tooltip text={ label }>
-			<div className={ className }>
+			<View className={ className }>
 				<Button
 					{ ...buttonProps }
 					variant={ isLinked ? 'primary' : 'secondary' }
@@ -37,7 +38,7 @@ const BorderBoxControlLinkedButton = (
 					aria-label={ label }
 					ref={ forwardedRef }
 				/>
-			</div>
+			</View>
 		</Tooltip>
 	);
 };
