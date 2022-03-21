@@ -136,11 +136,18 @@ let settings = {
 export function setSettings( dateSettings ) {
 	settings = dateSettings;
 
-	// Backup and restore current locale.
 	const currentLocale = momentLib.locale();
-	momentLib.updateLocale( dateSettings.l10n.locale, {
-		// Inherit anything missing from the default locale.
-		parentLocale: currentLocale,
+
+	// Delete any existing locale, in case setSettings() was already called.
+	// @ts-ignore Type defitions are wrong - null is permitted.
+	momentLib.defineLocale( 'wp-date-' + dateSettings.l10n.locale, null );
+
+	// Define a Moment.js locale given the WP_Locale data we have. Note that
+	// WordPress does not provide enough for a complete configuration object.
+	// For example, 'ordinal' is missing. In these cases we fallback to English
+	// which is what `wp_date()` does.
+	momentLib.defineLocale( 'wp-date-' + dateSettings.l10n.locale, {
+		parentLocale: 'en',
 		months: dateSettings.l10n.months,
 		monthsShort: dateSettings.l10n.monthsShort,
 		weekdays: dateSettings.l10n.weekdays,
@@ -155,21 +162,13 @@ export function setSettings( dateSettings ) {
 				? dateSettings.l10n.meridiem.pm
 				: dateSettings.l10n.meridiem.PM;
 		},
-		longDateFormat: {
-			LT: dateSettings.formats.time,
-			// @ts-ignore Forcing this to `null`
-			LTS: null,
-			// @ts-ignore Forcing this to `null`
-			L: null,
-			LL: dateSettings.formats.date,
-			LLL: dateSettings.formats.datetime,
-			// @ts-ignore Forcing this to `null`
-			LLLL: null,
+		relativetime: {
+			future: dateSettings.l10n.relative?.future,
+			past: dateSettings.l10n.relative?.past,
 		},
-		// From human_time_diff?
-		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
-		relativeTime: dateSettings.l10n.relative,
 	} );
+
+	// defineLocale() will update the locale, so set it back to what it was.
 	momentLib.locale( currentLocale );
 
 	setupWPTimezone();
@@ -479,7 +478,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 	}
 
 	const dateMoment = buildMoment( dateValue, timezone );
-	dateMoment.locale( settings.l10n.locale );
+	dateMoment.locale( 'wp-date-' + settings.l10n.locale );
 	return format( dateFormat, dateMoment );
 }
 
@@ -496,7 +495,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
  */
 export function gmdateI18n( dateFormat, dateValue = new Date() ) {
 	const dateMoment = momentLib( dateValue ).utc();
-	dateMoment.locale( settings.l10n.locale );
+	dateMoment.locale( 'wp-date-' + settings.l10n.locale );
 	return format( dateFormat, dateMoment );
 }
 

@@ -81,6 +81,16 @@ describe( 'Function date', () => {
 		setSettings( settings );
 	} );
 
+	it( 'should format date with ordinals', () => {
+		// Check.
+		const formattedDate = dateI18n(
+			'jS F Y',
+			'2019-06-18T11:00:00.000Z',
+			true
+		);
+		expect( formattedDate ).toBe( '18th June 2019' );
+	} );
+
 	it( 'should format date into a date that uses site’s timezone, if no timezone was provided and there’s a site timezone set', () => {
 		const settings = __experimentalGetSettings();
 
@@ -268,6 +278,39 @@ describe( 'Function dateI18n', () => {
 			true
 		);
 		expect( formattedDate ).toBe( 'es_June es_Jun es_Tuesday es_Tue' );
+
+		// Restore default settings.
+		setSettings( settings );
+	} );
+
+	it( 'should format date with ordinals into date with English ordinals', () => {
+		const settings = __experimentalGetSettings();
+
+		// Simulate different locale.
+		const l10n = settings.l10n;
+		setSettings( {
+			...settings,
+			l10n: {
+				...l10n,
+				locale: 'es',
+				months: l10n.months.map( ( month ) => `es_${ month }` ),
+				monthsShort: l10n.monthsShort.map(
+					( month ) => `es_${ month }`
+				),
+				weekdays: l10n.weekdays.map( ( weekday ) => `es_${ weekday }` ),
+				weekdaysShort: l10n.weekdaysShort.map(
+					( weekday ) => `es_${ weekday }`
+				),
+			},
+		} );
+
+		// Check.
+		const formattedDate = dateI18n(
+			'jS F Y',
+			'2019-06-18T11:00:00.000Z',
+			true
+		);
+		expect( formattedDate ).toBe( '18th es_June 2019' );
 
 		// Restore default settings.
 		setSettings( settings );

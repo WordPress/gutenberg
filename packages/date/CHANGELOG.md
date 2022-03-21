@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+<<<<<<< Updated upstream
+=======
+### Bug Fixes
+
+-   `dateI18n` and `gmdateI18n` will fallback to English for format strings such as `S` that cannot be localised.
+
+## 4.4.0 (2022-03-11)
+
+>>>>>>> Stashed changes
 ## 4.3.0 (2022-01-27)
 
 ## 4.2.0 (2021-07-21)
