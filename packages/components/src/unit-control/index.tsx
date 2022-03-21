@@ -7,6 +7,7 @@ import type {
 	ForwardedRef,
 	SyntheticEvent,
 	ChangeEvent,
+	PointerEvent,
 } from 'react';
 import { omit } from 'lodash';
 import classnames from 'classnames';
@@ -45,7 +46,7 @@ function UnforwardedUnitControl(
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = true,
 		label,
-		onChange,
+		onChange: onChangeProp,
 		onUnitChange,
 		size = 'default',
 		style,
@@ -89,14 +90,18 @@ function UnforwardedUnitControl(
 
 	const handleOnQuantityChange = (
 		nextQuantityValue: number | string | undefined,
-		changeProps: { event: ChangeEvent< HTMLInputElement > }
+		changeProps: {
+			event:
+				| ChangeEvent< HTMLInputElement >
+				| PointerEvent< HTMLInputElement >;
+		}
 	) => {
 		if (
 			nextQuantityValue === '' ||
 			typeof nextQuantityValue === 'undefined' ||
 			nextQuantityValue === null
 		) {
-			onChange?.( '', changeProps );
+			onChangeProp?.( '', changeProps );
 			return;
 		}
 
@@ -111,7 +116,7 @@ function UnforwardedUnitControl(
 			unit
 		).join( '' );
 
-		onChange?.( onChangeValue, changeProps );
+		onChangeProp?.( onChangeValue, changeProps );
 	};
 
 	const handleOnUnitChange: UnitControlOnChangeCallback = (
@@ -126,7 +131,7 @@ function UnforwardedUnitControl(
 			nextValue = `${ data.default }${ nextUnitValue }`;
 		}
 
-		onChange?.( nextValue, changeProps );
+		onChangeProp?.( nextValue, changeProps );
 		onUnitChange?.( nextUnitValue, changeProps );
 
 		setUnit( nextUnitValue );
@@ -155,7 +160,7 @@ function UnforwardedUnitControl(
 				: undefined;
 			const changeProps = { event, data };
 
-			onChange?.(
+			onChangeProp?.(
 				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
 				changeProps
 			);
