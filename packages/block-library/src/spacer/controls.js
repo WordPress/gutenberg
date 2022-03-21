@@ -15,12 +15,7 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import {
-	MIN_SPACER_WIDTH,
-	MAX_SPACER_WIDTH,
-	MIN_SPACER_HEIGHT,
-	MAX_SPACER_HEIGHT,
-} from './edit';
+import { MIN_SPACER_WIDTH, MIN_SPACER_HEIGHT } from './edit';
 
 function DimensionInput( {
 	label,
@@ -98,7 +93,6 @@ export default function SpacerControls( {
 						}
 						isResizing={ isResizing }
 						min={ MIN_SPACER_WIDTH }
-						max={ MAX_SPACER_WIDTH }
 					/>
 				) }
 				{ orientation !== 'horizontal' && (
@@ -110,7 +104,6 @@ export default function SpacerControls( {
 						}
 						isResizing={ isResizing }
 						min={ MIN_SPACER_HEIGHT }
-						max={ MAX_SPACER_HEIGHT }
 					/>
 				) }
 			</PanelBody>

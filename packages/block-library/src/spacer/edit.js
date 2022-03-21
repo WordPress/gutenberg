@@ -17,9 +17,7 @@ import { View } from '@wordpress/primitives';
 import SpacerControls from './controls';
 
 export const MIN_SPACER_WIDTH = 0;
-export const MAX_SPACER_WIDTH = 500;
 export const MIN_SPACER_HEIGHT = 0;
-export const MAX_SPACER_HEIGHT = 500;
 
 const ResizableSpacer = ( {
 	orientation,
@@ -60,12 +58,7 @@ const ResizableSpacer = ( {
 				}
 			} }
 			onResizeStop={ ( _event, _direction, elt ) => {
-				const nextVal = Math.min(
-					orientation === 'horizontal'
-						? MAX_SPACER_WIDTH
-						: MAX_SPACER_HEIGHT,
-					getCurrentSize( elt )
-				);
+				const nextVal = getCurrentSize( elt );
 				onResizeStop( `${ nextVal }px` );
 				setIsResizing( false );
 			} }
