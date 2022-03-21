@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__social_link_github',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__social_link_github } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__social_link_github } }
+		></div>
+	);
+};

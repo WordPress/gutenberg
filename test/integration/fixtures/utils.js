@@ -40,7 +40,9 @@ export default {
 	title: 'Blocks/${ underscoresBasename }',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: ${ underscoresBasename } } }></div>;`;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: ${ underscoresBasename } } }></div>
+};`;
 	return content;
 }
 

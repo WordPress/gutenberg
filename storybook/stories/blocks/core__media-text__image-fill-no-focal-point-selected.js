@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__media_text__image_fill_no_focal_point_selected',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__media_text__image_fill_no_focal_point_selected } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__media_text__image_fill_no_focal_point_selected,
+			} }
+		></div>
+	);
+};

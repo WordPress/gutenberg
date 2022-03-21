@@ -7,4 +7,8 @@ export default {
 	title: 'Blocks/core__site_tagline',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__site_tagline } }></div>;
+export const _default = () => {
+	return (
+		<div dangerouslySetInnerHTML={ { __html: core__site_tagline } }></div>
+	);
+};

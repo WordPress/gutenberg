@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__missing',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__missing } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__missing } }></div>;
+};

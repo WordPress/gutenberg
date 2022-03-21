@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__media_text__vertical_align_bottom',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__media_text__vertical_align_bottom } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__media_text__vertical_align_bottom,
+			} }
+		></div>
+	);
+};

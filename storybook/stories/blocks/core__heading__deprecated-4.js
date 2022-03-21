@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__heading__deprecated_4',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__heading__deprecated_4 } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__heading__deprecated_4 } }
+		></div>
+	);
+};

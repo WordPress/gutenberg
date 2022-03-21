@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__group__deprecated_inner_container',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__group__deprecated_inner_container } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__group__deprecated_inner_container,
+			} }
+		></div>
+	);
+};

@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__post_author_name',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__post_author_name } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__post_author_name } }
+		></div>
+	);
+};

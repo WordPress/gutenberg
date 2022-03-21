@@ -7,4 +7,8 @@ export default {
 	title: 'Blocks/core__social_link_vk',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__social_link_vk } }></div>;
+export const _default = () => {
+	return (
+		<div dangerouslySetInnerHTML={ { __html: core__social_link_vk } }></div>
+	);
+};

@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__spacer',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__spacer } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__spacer } }></div>;
+};

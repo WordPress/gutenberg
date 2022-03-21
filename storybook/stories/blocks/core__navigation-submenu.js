@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__navigation_submenu',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__navigation_submenu } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__navigation_submenu } }
+		></div>
+	);
+};

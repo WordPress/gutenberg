@@ -7,4 +7,8 @@ export default {
 	title: 'Blocks/core__post_excerpt',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__post_excerpt } }></div>;
+export const _default = () => {
+	return (
+		<div dangerouslySetInnerHTML={ { __html: core__post_excerpt } }></div>
+	);
+};

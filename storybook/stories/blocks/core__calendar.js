@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__calendar',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__calendar } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__calendar } }></div>;
+};

@@ -7,4 +7,8 @@ export default {
 	title: 'Blocks/core__heading__h2',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__heading__h2 } }></div>;
+export const _default = () => {
+	return (
+		<div dangerouslySetInnerHTML={ { __html: core__heading__h2 } }></div>
+	);
+};

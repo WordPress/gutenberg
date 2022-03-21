@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__cover__gradient_image',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__cover__gradient_image } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__cover__gradient_image } }
+		></div>
+	);
+};

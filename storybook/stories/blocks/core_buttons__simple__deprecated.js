@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core_buttons__simple__deprecated',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core_buttons__simple__deprecated } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core_buttons__simple__deprecated,
+			} }
+		></div>
+	);
+};

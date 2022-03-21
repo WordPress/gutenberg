@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__post_comments_count',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__post_comments_count } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__post_comments_count } }
+		></div>
+	);
+};

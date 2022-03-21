@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__media_text__media_right_custom_width',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__media_text__media_right_custom_width } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__media_text__media_right_custom_width,
+			} }
+		></div>
+	);
+};

@@ -7,4 +7,8 @@ export default {
 	title: 'Blocks/core__text_columns',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__text_columns } }></div>;
+export const _default = () => {
+	return (
+		<div dangerouslySetInnerHTML={ { __html: core__text_columns } }></div>
+	);
+};

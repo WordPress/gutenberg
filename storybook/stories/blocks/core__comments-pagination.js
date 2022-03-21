@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__comments_pagination',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__comments_pagination } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__comments_pagination } }
+		></div>
+	);
+};

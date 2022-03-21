@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__table__scope_attribute',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__table__scope_attribute } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__table__scope_attribute } }
+		></div>
+	);
+};

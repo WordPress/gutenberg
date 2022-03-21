@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__code',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__code } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__code } }></div>;
+};

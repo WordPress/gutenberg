@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__verse__deprecated_v1',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__verse__deprecated_v1 } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__verse__deprecated_v1 } }
+		></div>
+	);
+};

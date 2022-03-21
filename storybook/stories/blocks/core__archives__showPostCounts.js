@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__archives__showPostCounts',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__archives__showPostCounts } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__archives__showPostCounts,
+			} }
+		></div>
+	);
+};

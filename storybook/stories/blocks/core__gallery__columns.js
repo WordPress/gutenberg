@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__gallery__columns',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__gallery__columns } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__gallery__columns } }
+		></div>
+	);
+};

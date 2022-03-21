@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__button__border_radius__deprecated',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__button__border_radius__deprecated } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__button__border_radius__deprecated,
+			} }
+		></div>
+	);
+};

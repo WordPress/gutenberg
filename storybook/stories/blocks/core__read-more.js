@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__read_more',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__read_more } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__read_more } }></div>;
+};

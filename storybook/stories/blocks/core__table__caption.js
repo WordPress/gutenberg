@@ -7,4 +7,8 @@ export default {
 	title: 'Blocks/core__table__caption',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__table__caption } }></div>;
+export const _default = () => {
+	return (
+		<div dangerouslySetInnerHTML={ { __html: core__table__caption } }></div>
+	);
+};

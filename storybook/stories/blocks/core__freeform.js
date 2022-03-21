@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__freeform',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__freeform } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__freeform } }></div>;
+};

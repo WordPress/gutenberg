@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__query',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__query } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__query } }></div>;
+};

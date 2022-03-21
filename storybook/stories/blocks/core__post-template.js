@@ -7,4 +7,8 @@ export default {
 	title: 'Blocks/core__post_template',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__post_template } }></div>;
+export const _default = () => {
+	return (
+		<div dangerouslySetInnerHTML={ { __html: core__post_template } }></div>
+	);
+};

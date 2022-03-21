@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__cover__gradient__deprecated_8',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__cover__gradient__deprecated_8 } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__cover__gradient__deprecated_8,
+			} }
+		></div>
+	);
+};

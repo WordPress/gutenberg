@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__cover__deprecated_7',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__cover__deprecated_7 } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__cover__deprecated_7 } }
+		></div>
+	);
+};

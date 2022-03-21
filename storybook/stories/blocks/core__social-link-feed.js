@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__social_link_feed',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__social_link_feed } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__social_link_feed } }
+		></div>
+	);
+};

@@ -7,4 +7,8 @@ export default {
 	title: 'Blocks/core__latest_posts',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__latest_posts } }></div>;
+export const _default = () => {
+	return (
+		<div dangerouslySetInnerHTML={ { __html: core__latest_posts } }></div>
+	);
+};

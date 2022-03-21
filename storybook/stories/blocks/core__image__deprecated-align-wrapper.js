@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__image__deprecated_align_wrapper',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__image__deprecated_align_wrapper } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__image__deprecated_align_wrapper,
+			} }
+		></div>
+	);
+};

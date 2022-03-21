@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__image__custom_link_class',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__image__custom_link_class } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__image__custom_link_class,
+			} }
+		></div>
+	);
+};

@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__audio',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__audio } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__audio } }></div>;
+};

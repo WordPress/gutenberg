@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__paragraph__deprecated_4',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__paragraph__deprecated_4 } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__paragraph__deprecated_4,
+			} }
+		></div>
+	);
+};

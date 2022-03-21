@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__pullquote',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__pullquote } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__pullquote } }></div>;
+};

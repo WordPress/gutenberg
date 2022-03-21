@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__site_logo',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__site_logo } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__site_logo } }></div>;
+};

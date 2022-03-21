@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__video',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__video } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__video } }></div>;
+};

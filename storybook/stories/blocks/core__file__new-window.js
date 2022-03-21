@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__file__new_window',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__file__new_window } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__file__new_window } }
+		></div>
+	);
+};

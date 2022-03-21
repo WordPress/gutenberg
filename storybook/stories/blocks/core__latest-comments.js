@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__latest_comments',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__latest_comments } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__latest_comments } }
+		></div>
+	);
+};

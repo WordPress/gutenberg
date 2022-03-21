@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__columns__deprecated',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__columns__deprecated } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__columns__deprecated } }
+		></div>
+	);
+};

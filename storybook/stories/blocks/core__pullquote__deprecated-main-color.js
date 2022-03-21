@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__pullquote__deprecated_main_color',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__pullquote__deprecated_main_color } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__pullquote__deprecated_main_color,
+			} }
+		></div>
+	);
+};

@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__site_tagline__deprecated_v1',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__site_tagline__deprecated_v1 } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__site_tagline__deprecated_v1,
+			} }
+		></div>
+	);
+};

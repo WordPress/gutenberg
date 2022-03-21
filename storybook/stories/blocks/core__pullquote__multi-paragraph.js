@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__pullquote__multi_paragraph',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__pullquote__multi_paragraph } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__pullquote__multi_paragraph,
+			} }
+		></div>
+	);
+};

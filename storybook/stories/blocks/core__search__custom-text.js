@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__search__custom_text',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__search__custom_text } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__search__custom_text } }
+		></div>
+	);
+};

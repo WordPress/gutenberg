@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__file__no_text_link',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__file__no_text_link } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__file__no_text_link } }
+		></div>
+	);
+};

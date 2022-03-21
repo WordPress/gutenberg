@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__paragraph__align_right',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__paragraph__align_right } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__paragraph__align_right } }
+		></div>
+	);
+};

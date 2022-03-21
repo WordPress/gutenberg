@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__spacer__deprecated_1',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__spacer__deprecated_1 } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__spacer__deprecated_1 } }
+		></div>
+	);
+};

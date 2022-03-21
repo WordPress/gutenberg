@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__image__deprecated_1',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__image__deprecated_1 } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__image__deprecated_1 } }
+		></div>
+	);
+};

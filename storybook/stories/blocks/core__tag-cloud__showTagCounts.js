@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__tag_cloud__showTagCounts',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__tag_cloud__showTagCounts } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__tag_cloud__showTagCounts,
+			} }
+		></div>
+	);
+};

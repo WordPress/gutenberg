@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__media_text',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__media_text } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__media_text } }></div>;
+};

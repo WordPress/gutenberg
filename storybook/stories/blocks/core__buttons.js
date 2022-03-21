@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__buttons',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__buttons } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__buttons } }></div>;
+};

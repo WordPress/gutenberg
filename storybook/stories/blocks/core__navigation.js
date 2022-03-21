@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__navigation',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__navigation } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__navigation } }></div>;
+};

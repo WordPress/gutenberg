@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__heading__h2_color',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__heading__h2_color } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__heading__h2_color } }
+		></div>
+	);
+};

@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__more__custom_text_teaser',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__more__custom_text_teaser } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__more__custom_text_teaser,
+			} }
+		></div>
+	);
+};

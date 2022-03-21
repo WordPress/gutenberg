@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__post_date',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__post_date } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__post_date } }></div>;
+};

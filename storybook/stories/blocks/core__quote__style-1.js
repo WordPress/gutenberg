@@ -7,4 +7,8 @@ export default {
 	title: 'Blocks/core__quote__style_1',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__quote__style_1 } }></div>;
+export const _default = () => {
+	return (
+		<div dangerouslySetInnerHTML={ { __html: core__quote__style_1 } }></div>
+	);
+};

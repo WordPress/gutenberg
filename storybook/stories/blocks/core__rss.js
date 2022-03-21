@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__rss',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__rss } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__rss } }></div>;
+};

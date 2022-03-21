@@ -7,4 +7,10 @@ export default {
 	title: 'Blocks/core__comment_author_avatar',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__comment_author_avatar } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ { __html: core__comment_author_avatar } }
+		></div>
+	);
+};

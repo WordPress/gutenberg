@@ -7,4 +7,8 @@ export default {
 	title: 'Blocks/core__preformatted',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__preformatted } }></div>;
+export const _default = () => {
+	return (
+		<div dangerouslySetInnerHTML={ { __html: core__preformatted } }></div>
+	);
+};

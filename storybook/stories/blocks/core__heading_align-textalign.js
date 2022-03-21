@@ -7,4 +7,12 @@ export default {
 	title: 'Blocks/core__heading_align_textalign',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__heading_align_textalign } }></div>;
+export const _default = () => {
+	return (
+		<div
+			dangerouslySetInnerHTML={ {
+				__html: core__heading_align_textalign,
+			} }
+		></div>
+	);
+};

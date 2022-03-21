@@ -7,4 +7,6 @@ export default {
 	title: 'Blocks/core__search',
 };
 
-export const _default = () => return <div dangerouslySetInnerHTML={ { __html: core__search } }></div>;
+export const _default = () => {
+	return <div dangerouslySetInnerHTML={ { __html: core__search } }></div>;
+};
