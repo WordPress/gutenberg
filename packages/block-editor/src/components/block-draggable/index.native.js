@@ -25,11 +25,13 @@ import { useEffect, createContext, useContext } from '@wordpress/element';
 import useScrollWhenDragging from './use-scroll-when-dragging';
 import DraggableChip from './draggable-chip';
 import { store as blockEditorStore } from '../../store';
+import { useBlockListContext } from '../block-list/block-list-context';
 import styles from './style.scss';
 
 const Context = createContext( { dragHandler: () => null } );
 const { Provider } = Context;
 
+const CHIP_POSITION_PADDING = 32;
 const BLOCK_PLACEHOLDER_HEIGHT = 20;
 
 const BlockDraggableWrapper = ( { children } ) => {
@@ -37,13 +39,23 @@ const BlockDraggableWrapper = ( { children } ) => {
 		blockEditorStore
 	);
 
-	const translation = {
+	const { scrollRef } = useBlockListContext();
+	const animatedScrollRef = useAnimatedRef();
+	animatedScrollRef( scrollRef );
+
+	const scroll = {
+		x: useSharedValue( 0 ),
+		y: useSharedValue( 0 ),
+	};
+	const chip = {
 		x: useSharedValue( 0 ),
 		y: useSharedValue( 0 ),
 		startX: useSharedValue( 0 ),
 		startY: useSharedValue( 0 ),
+		width: useSharedValue( 0 ),
+		height: useSharedValue( 0 ),
+		opacity: useSharedValue( 0 ),
 	};
-	const scale = useSharedValue( 0 );
 	const isDragging = useSharedValue( false );
 
 	const [
@@ -62,15 +74,25 @@ const BlockDraggableWrapper = ( { children } ) => {
 		};
 	}, [] );
 
+	const onChipLayout = ( { nativeEvent: { layout } } ) => {
+		chip.width.value = layout.width;
+		chip.height.value = layout.height;
+	};
+
 	const startDragging = ( clientIds, { absoluteX: x, absoluteY: y } ) => {
 		'worklet';
 		runOnJS( startDraggingBlocks )( clientIds );
 
-		translation.x.value = x;
-		translation.y.value = y;
+		const scrollLayout = measure( animatedScrollRef );
+		scroll.x.value = scrollLayout.pageX;
+		scroll.y.value = scrollLayout.pageY;
+
+		chip.x.value = x - scroll.x.value - chip.width.value / 2;
+		chip.y.value =
+			y - scroll.y.value - chip.height.value - CHIP_POSITION_PADDING;
 
 		isDragging.value = true;
-		scale.value = withSpring( 1 );
+		chip.opacity.value = withTiming( 1 );
 
 		startScrolling( y );
 	};
@@ -80,13 +102,14 @@ const BlockDraggableWrapper = ( { children } ) => {
 		// Update scrolling velocity
 		scrollOnDragOver( y );
 
-		translation.x.value = x;
-		translation.y.value = y;
+		chip.x.value = x - scroll.x.value - chip.width.value / 2;
+		chip.y.value =
+			y - scroll.y.value - chip.height.value - CHIP_POSITION_PADDING;
 	};
 
 	const stopDragging = () => {
 		'worklet';
-		scale.value = withSpring( 0, ( completed ) => {
+		chip.opacity.value = withTiming( 0.2, ( completed ) => {
 			if ( completed ) {
 				isDragging.value = false;
 				runOnJS( stopDraggingBlocks )();
@@ -96,16 +119,13 @@ const BlockDraggableWrapper = ( { children } ) => {
 		stopScrolling();
 	};
 
-	const dragStyles = useAnimatedStyle( () => {
+	const chipStyles = useAnimatedStyle( () => {
 		return {
 			position: 'absolute',
-			top: 0,
-			left: 0,
+			opacity: chip.opacity.value,
 			transform: [
-				{ translateX: translation.x.value },
-				{ translateY: translation.y.value },
-				{ scaleX: scale.value },
-				{ scaleY: scale.value },
+				{ translateX: chip.x.value },
+				{ translateY: chip.y.value },
 			],
 		};
 	} );
@@ -119,7 +139,11 @@ const BlockDraggableWrapper = ( { children } ) => {
 			} }
 		>
 			{ children( { onScroll: scrollHandler } ) }
-			<Animated.View style={ dragStyles }>
+			<Animated.View
+				onLayout={ onChipLayout }
+				style={ chipStyles }
+				pointerEvents="none"
+			>
 				<DraggableChip />
 			</Animated.View>
 		</Provider>
