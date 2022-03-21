@@ -45,6 +45,9 @@ const props = {
 	value: undefined,
 };
 
+const toggleLabelRegex = /Border color( and style)* picker/;
+const colorPickerRegex = /Border color picker/;
+
 const renderBorderBoxControl = ( customProps ) => {
 	return render( <BorderBoxControl { ...{ ...props, ...customProps } } /> );
 };
@@ -75,7 +78,7 @@ describe( 'BorderBoxControl', () => {
 			renderBorderBoxControl();
 
 			const label = screen.getByText( props.label );
-			const colorButton = screen.getByLabelText( 'Open border options' );
+			const colorButton = screen.getByLabelText( toggleLabelRegex );
 			const widthInput = screen.getByRole( 'spinbutton' );
 			const unitSelect = screen.getByRole( 'combobox' );
 			const slider = screen.getByRole( 'slider' );
@@ -148,7 +151,7 @@ describe( 'BorderBoxControl', () => {
 		it( 'should omit style options when requested', () => {
 			renderBorderBoxControl( { enableStyle: false } );
 
-			const colorButton = screen.getByLabelText( 'Open border options' );
+			const colorButton = screen.getByLabelText( colorPickerRegex );
 			fireEvent.click( colorButton );
 
 			const styleLabel = screen.queryByText( 'Style' );
@@ -167,9 +170,7 @@ describe( 'BorderBoxControl', () => {
 		it( 'should render split view by default when mixed values provided', () => {
 			renderBorderBoxControl( { value: mixedBorders } );
 
-			const colorButtons = screen.getAllByLabelText(
-				'Open border options'
-			);
+			const colorButtons = screen.getAllByLabelText( toggleLabelRegex );
 			const widthInputs = screen.getAllByRole( 'spinbutton' );
 			const unitSelects = screen.getAllByRole( 'combobox' );
 			const sliders = screen.queryAllByRole( 'slider' );
@@ -208,9 +209,7 @@ describe( 'BorderBoxControl', () => {
 			renderBorderBoxControl( { enableStyle: false } );
 			clickButton( 'Unlink sides' );
 
-			const colorButtons = screen.getAllByLabelText(
-				'Open border options'
-			);
+			const colorButtons = screen.getAllByLabelText( colorPickerRegex );
 
 			colorButtons.forEach( ( button ) => {
 				fireEvent.click( button );
