@@ -95,7 +95,9 @@ function UnforwardedUnitControl(
 	);
 
 	useEffect( () => {
-		setUnit( parsedUnit );
+		if ( parsedUnit !== undefined ) {
+			setUnit( parsedUnit );
+		}
 	}, [ parsedUnit ] );
 
 	// Stores parsed value for hand-off in state reducer.
