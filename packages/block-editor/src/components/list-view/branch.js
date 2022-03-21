@@ -93,7 +93,6 @@ function ListViewBranch( props ) {
 		listPosition = 0,
 		fixedListWindow,
 		expandNested = true,
-		preventAnnouncement,
 	} = props;
 
 	const {
@@ -168,7 +167,6 @@ function ListViewBranch( props ) {
 								isExpanded={ isExpanded }
 								listPosition={ nextPosition }
 								selectedClientIds={ selectedClientIds }
-								preventAnnouncement={ preventAnnouncement }
 							/>
 						) }
 						{ ! showBlock && (

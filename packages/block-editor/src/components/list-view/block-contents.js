@@ -28,7 +28,6 @@ const ListViewBlockContents = forwardRef(
 			level,
 			isExpanded,
 			selectedClientIds,
-			preventAnnouncement,
 			...props
 		},
 		ref
@@ -81,7 +80,6 @@ const ListViewBlockContents = forwardRef(
 						onDragStart={ onDragStart }
 						onDragEnd={ onDragEnd }
 						isExpanded={ isExpanded }
-						preventAnnouncement={ preventAnnouncement }
 						{ ...props }
 					/>
 				) }

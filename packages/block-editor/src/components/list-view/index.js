@@ -13,10 +13,8 @@ import {
 	useMemo,
 	useRef,
 	useReducer,
-	useState,
 	forwardRef,
 } from '@wordpress/element';
-import { HOME, END } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -104,7 +102,6 @@ function ListView(
 	const { updateBlockSelection } = useBlockSelection();
 
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
-	const [ preventAnnouncement, setPreventAnnouncement ] = useState( false );
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
 	const elementRef = useRef();
@@ -119,7 +116,6 @@ function ListView(
 		( event, clientId ) => {
 			updateBlockSelection( event, clientId );
 			setSelectedTreeId( clientId );
-			setPreventAnnouncement( false );
 		},
 		[ setSelectedTreeId, updateBlockSelection ]
 	);
@@ -178,11 +174,6 @@ function ListView(
 					startRow?.dataset?.block,
 					endRow?.dataset?.block
 				);
-				if ( event.keyCode === HOME || event.keyCode === END ) {
-					setPreventAnnouncement( true );
-				}
-			} else {
-				setPreventAnnouncement( false );
 			}
 		},
 		[ updateBlockSelection ]
@@ -235,7 +226,6 @@ function ListView(
 						fixedListWindow={ fixedListWindow }
 						selectedClientIds={ selectedClientIds }
 						expandNested={ expandNested }
-						preventAnnouncement={ preventAnnouncement }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>
