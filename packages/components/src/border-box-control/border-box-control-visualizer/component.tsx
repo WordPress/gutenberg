@@ -16,9 +16,9 @@ const BorderBoxControlVisualizer = (
 	props: WordPressComponentProps< VisualizerProps, 'div' >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
-	const visualizerProps = useBorderBoxControlVisualizer( props );
+	const { value, ...otherProps } = useBorderBoxControlVisualizer( props );
 
-	return <View { ...visualizerProps } ref={ forwardedRef } />;
+	return <View { ...otherProps } ref={ forwardedRef } />;
 };
 
 const ConnectedBorderBoxControlVisualizer = contextConnect(
