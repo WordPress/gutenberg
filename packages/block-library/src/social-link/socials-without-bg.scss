@@ -9,6 +9,9 @@
 .wp-social-link-behance {
 	color: #0757fe;
 }
+.wp-social-link-bitbucket {
+	color: #2684ff;
+}
 
 .wp-social-link-codepen {
 	color: #1e1f26;
@@ -76,6 +79,10 @@
 
 .wp-social-link-medium {
 	color: #02ab6c;
+}
+
+.wp-social-link-messenger {
+	color: #448aff;
 }
 
 .wp-social-link-meetup {
@@ -147,10 +154,30 @@
 	color: #3499cd;
 }
 
+.wp-social-link-whatsapp {
+	color: #49c859;
+}
+
 .wp-social-link-yelp {
 	color: #d32422;
 }
 
 .wp-social-link-youtube {
 	color: #f00;
+}
+
+.wp-social-link-slack path:nth-child(1) {
+	fill: #36c5f0;
+}
+
+.wp-social-link-slack path:nth-child(2) {
+	fill: #2eb67d;
+}
+
+.wp-social-link-slack path:nth-child(3) {
+	fill: #ecb22e;
+}
+
+.wp-social-link-slack path:nth-child(4) {
+	fill: #e01e5a;
 }

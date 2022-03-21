@@ -103,6 +103,38 @@
 	}
 }
 
+// This needs specificity because themes usually override it with things like .widget-area a.
+.wp-block-social-links .wp-social-link-slack .wp-block-social-link-anchor {
+	&,
+	&:hover,
+	&:active,
+	&:visited,
+	svg path {
+		color: currentColor;
+		fill: currentColor;
+	}
+}
+
+.wp-block-social-links.is-style-default .wp-social-link-slack path:nth-child(1),
+.wp-block-social-links.is-style-pill-shape .wp-social-link-slack path:nth-child(1) {
+	fill: #36c5f0 !important;
+}
+
+.wp-block-social-links.is-style-default .wp-social-link-slack path:nth-child(2),
+.wp-block-social-links.is-style-pill-shape .wp-social-link-slack path:nth-child(2) {
+	fill: #2eb67d !important;
+}
+
+.wp-block-social-links.is-style-default .wp-social-link-slack path:nth-child(3),
+.wp-block-social-links.is-style-pill-shape .wp-social-link-slack path:nth-child(3) {
+	fill: #ecb22e !important;
+}
+
+.wp-block-social-links.is-style-default .wp-social-link-slack path:nth-child(4),
+.wp-block-social-links.is-style-pill-shape .wp-social-link-slack path:nth-child(4) {
+	fill: #e01e5a !important;
+}
+
 // Provide colors for a range of icons.
 .wp-block-social-links:not(.is-style-logos-only) {
 	// Generic items such as mail, feed, etc.
