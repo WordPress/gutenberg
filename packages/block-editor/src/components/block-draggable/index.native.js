@@ -12,7 +12,6 @@ import Animated, {
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, createContext, useContext } from '@wordpress/element';
@@ -47,18 +46,6 @@ const BlockDraggableWrapper = ( { children } ) => {
 		stopScrolling,
 		scrollHandler,
 	] = useScrollWhenDragging();
-
-	const { blockIcon } = useSelect( ( select ) => {
-		const { getBlockName, getDraggedBlockClientIds } = select(
-			blockEditorStore
-		);
-		const draggedBlockClientIds = getDraggedBlockClientIds();
-		const blockName = getBlockName( draggedBlockClientIds[ 0 ] );
-
-		return {
-			blockIcon: getBlockType( blockName )?.icon,
-		};
-	} );
 
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
@@ -127,7 +114,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 		>
 			{ children( { onScroll: scrollHandler } ) }
 			<Animated.View style={ dragStyles }>
-				<DraggableChip icon={ blockIcon } />
+				<DraggableChip />
 			</Animated.View>
 		</Provider>
 	);
