@@ -51,9 +51,7 @@ export const BorderBoxControlVisualizer = ( borders?: Borders ) => {
 };
 
 export const BorderBoxControlSplitControls = css`
-	display: grid;
 	position: relative;
-	gap: ${ space( 4 ) };
 	flex: 1;
 	${ rtl( { marginRight: space( 3 ) }, { marginLeft: space( 3 ) } )() }
 `;

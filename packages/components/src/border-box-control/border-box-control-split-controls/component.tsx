@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import BorderBoxControlVisualizer from '../border-box-control-visualizer';
 import { BorderControl } from '../../border-control';
-import { View } from '../../view';
+import { Grid } from '../../grid';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderBoxControlSplitControls } from './hook';
 
@@ -42,7 +42,7 @@ const BorderBoxControlSplitControls = (
 	};
 
 	return (
-		<View { ...otherProps } ref={ forwardedRef }>
+		<Grid { ...otherProps } ref={ forwardedRef } gap={ 4 }>
 			<BorderBoxControlVisualizer value={ value } />
 			<BorderControl
 				className={ centeredClassName }
@@ -66,7 +66,7 @@ const BorderBoxControlSplitControls = (
 				value={ value?.bottom }
 				{ ...sharedBorderControlProps }
 			/>
-		</View>
+		</Grid>
 	);
 };
 
