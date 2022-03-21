@@ -60,10 +60,11 @@ describe( 'FormFileUpload', () => {
 
 		await user.upload( input, file );
 
-		expect( onChange ).toHaveBeenNthCalledWith( 1, fakePath );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenCalledWith( fakePath );
 	} );
 
-	it( 'should fire a change event after selecting the same file if there is a onClick', async () => {
+	it( 'should fire a change event after selecting the same file if the value was reset in between', async () => {
 		const onChange = jest.fn();
 
 		const { user } = render(
