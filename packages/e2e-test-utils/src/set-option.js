@@ -13,7 +13,6 @@ import { pressKeyWithModifier } from './press-key-with-modifier';
  * @param {string} value     The value to set the option to.
  * @param {string} adminPage The url of the admin page to visit.
  *
- * @return {Promise<string>} The current value of the option.
  */
 export async function setOption(
 	setting,

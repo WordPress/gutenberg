@@ -174,7 +174,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$comment_query_max_num_pages = 5;
 		// We substract 1 because we created 1 comment at the beggining.
 		$post_comments_numbers = ( self::$per_page * $comment_query_max_num_pages ) - 1;
-		self::$comment_ids     = self::factory()->comment->create_post_comments(
+		self::factory()->comment->create_post_comments(
 			self::$custom_post->ID,
 			$post_comments_numbers,
 			array(
@@ -183,32 +183,19 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 				'comment_content'      => 'Hello world',
 			)
 		);
-		$parsed_blocks         = parse_blocks(
+		$parsed_blocks = parse_blocks(
 			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
 		);
 
-		$block = new WP_Block(
+		$block  = new WP_Block(
 			$parsed_blocks[0],
 			array(
 				'postId'           => self::$custom_post->ID,
 				'comments/inherit' => true,
 			)
 		);
-
-		$this->assertEquals(
-			build_comment_query_vars_from_block( $block ),
-			array(
-				'orderby'                   => 'comment_date_gmt',
-				'order'                     => 'ASC',
-				'status'                    => 'approve',
-				'no_found_rows'             => false,
-				'update_comment_meta_cache' => false,
-				'post_id'                   => self::$custom_post->ID,
-				'hierarchical'              => 'threaded',
-				'number'                    => self::$per_page,
-				'paged'                     => $comment_query_max_num_pages,
-			)
-		);
+		$actual = build_comment_query_vars_from_block( $block );
+		$this->assertEquals( $actual['paged'], $comment_query_max_num_pages );
 		$this->assertEquals( get_query_var( 'cpage' ), $comment_query_max_num_pages );
 	}
 }
