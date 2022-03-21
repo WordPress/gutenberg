@@ -36,35 +36,30 @@ export default function BlockLockToolbar( { clientId } ) {
 		false
 	);
 
-	if ( canMove && canRemove ) {
+	if ( ! canLockBlocks ) {
 		return null;
 	}
 
-	const label = canLockBlocks
-		? sprintf(
-				/* translators: %s: block name */
-				__( 'Unlock %s' ),
-				blockInformation.title
-		  )
-		: sprintf(
-				/* translators: %s: block name */
-				__( 'Locked %s' ),
-				blockInformation.title
-		  );
+	if ( canMove && canRemove ) {
+		return null;
+	}
 
 	return (
 		<>
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
 					icon={ lock }
-					label={ label }
-					onClick={ canLockBlocks ? toggleModal : undefined }
-					aria-disabled={ ! canLockBlocks }
+					label={ sprintf(
+						/* translators: %s: block name */
+						__( 'Unlock %s' ),
+						blockInformation.title
+					) }
+					onClick={ toggleModal }
 				/>
 			</ToolbarGroup>
-			{ isModalOpen && canLockBlocks ? (
+			{ isModalOpen && (
 				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
-			) : null }
+			) }
 		</>
 	);
 }
