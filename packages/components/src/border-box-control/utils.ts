@@ -127,32 +127,25 @@ export const getCommonBorder = ( borders?: Borders ) => {
 	};
 };
 
-export const getShorthandBorderStyle = ( border?: Border ) => {
+export const getShorthandBorderStyle = (
+	border?: Border,
+	fallbackBorder?: Border
+) => {
 	if ( isEmptyBorder( border ) ) {
-		return undefined;
+		return fallbackBorder;
 	}
 
-	const { color, style, width } = border as Border;
+	const { color: fallbackColor, style: fallbackStyle, width: fallbackWidth } =
+		fallbackBorder || {};
+
+	const {
+		color = fallbackColor,
+		style = fallbackStyle,
+		width = fallbackWidth,
+	} = border as Border;
+
 	const hasVisibleBorder = ( !! width && width !== '0' ) || !! color;
 	const borderStyle = hasVisibleBorder ? style || 'solid' : style;
 
 	return [ width, borderStyle, color ].filter( Boolean ).join( ' ' );
-};
-
-export const getClampedWidthBorderStyle = (
-	border: Border | undefined,
-	min = '1px',
-	max = '10px'
-) => {
-	if ( ! border ) {
-		return undefined;
-	}
-
-	return getShorthandBorderStyle( {
-		...border,
-		width:
-			border.width !== undefined
-				? `clamp(${ min }, ${ border.width }, ${ max })`
-				: undefined,
-	} );
 };

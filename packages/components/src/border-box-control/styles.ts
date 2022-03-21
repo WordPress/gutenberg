@@ -8,7 +8,6 @@ import { css } from '@emotion/react';
  */
 import { COLORS, CONFIG, rtl } from '../utils';
 import { space } from '../ui/utils/space';
-import { getClampedWidthBorderStyle } from './utils';
 
 import type { Border } from '../border-control/types';
 import type { Borders } from './types';
@@ -25,11 +24,19 @@ export const BorderBoxControlLinkedButton = css`
 	margin-top: 7px;
 `;
 
-export const BorderBoxStyleWithFallback = ( border?: Border ) => {
-	return (
-		getClampedWidthBorderStyle( border ) ||
-		`${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] }`
-	);
+const BorderBoxStyleWithFallback = ( border?: Border ) => {
+	const {
+		color = COLORS.gray[ 200 ],
+		style = 'solid',
+		width = CONFIG.borderWidth,
+	} = border || {};
+
+	const clampedWidth =
+		width !== CONFIG.borderWidth ? `clamp(1px, ${ width }, 10px)` : width;
+	const hasVisibleBorder = ( !! width && width !== '0' ) || !! color;
+	const borderStyle = hasVisibleBorder ? style || 'solid' : style;
+
+	return `${ color } ${ borderStyle } ${ clampedWidth }`;
 };
 
 export const BorderBoxControlVisualizer = ( borders?: Borders ) => {

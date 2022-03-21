@@ -3,7 +3,6 @@
  */
 import {
 	getBorderDiff,
-	getClampedWidthBorderStyle,
 	getCommonBorder,
 	getShorthandBorderStyle,
 	getSplitBorders,
@@ -279,39 +278,28 @@ describe( 'BorderBoxControl Utils', () => {
 			const zeroWidthStyle = getShorthandBorderStyle( { width: '0' } );
 			expect( zeroWidthStyle ).toEqual( '0' );
 		} );
-	} );
 
-	describe( 'getClampedWidthBorderStyle', () => {
-		it( 'should return undefined when no border provided', () => {
-			const style = getClampedWidthBorderStyle( undefined );
-			expect( style ).toEqual( undefined );
+		it( 'should return undefined when no border or fallback supplied', () => {
+			expect( getShorthandBorderStyle() ).toBe( undefined );
 		} );
 
-		it( 'should wrap defined width within clamp() in generated style', () => {
-			const style = getClampedWidthBorderStyle(
-				completeBorder,
-				'2px',
-				'3em'
-			);
-			expect( style ).toEqual(
-				`clamp(2px, ${ completeBorder.width }, 3em) solid #000`
-			);
-
-			const zeroWidthStyle = getClampedWidthBorderStyle(
-				{ color: '#fff', style: 'solid', width: 0 },
-				'2px',
-				'3em'
-			);
-			expect( zeroWidthStyle ).toEqual( `clamp(2px, 0, 3em) solid #fff` );
+		it( 'should return fallback border when border is undefined', () => {
+			const result = getShorthandBorderStyle( undefined, completeBorder );
+			expect( result ).toEqual( completeBorder );
 		} );
 
-		it( 'should not add clamp() when border width is undefined', () => {
-			const style = getClampedWidthBorderStyle( {
-				color: '#fff',
-				style: 'dashed',
-				width: undefined,
-			} );
-			expect( style ).toEqual( `dashed #fff` );
+		it( 'should return fallback border when empty border supplied', () => {
+			const result = getShorthandBorderStyle( {}, completeBorder );
+			expect( result ).toEqual( completeBorder );
+		} );
+
+		it( 'should use fallback border properties if missing from border', () => {
+			const result = getShorthandBorderStyle(
+				{ width: '1em' },
+				{ width: '5px', style: 'dashed', color: '#72aee6' }
+			);
+
+			expect( result ).toEqual( `1em dashed #72aee6` );
 		} );
 	} );
 } );
