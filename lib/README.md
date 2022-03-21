@@ -8,7 +8,7 @@ release. Some features remain in the plugin forever or are removed.
 
 To make it easier for contribtors to know which features need to be merged to
 Core and which features can be deleted, Gutenberg uses the following file
-strucutre for its PHP code:
+structure for its PHP code:
 
 - `lib/experimental` - Experimental features that exist only in the plugin. They
   are not ready to be merged to Core.
@@ -27,25 +27,20 @@ For features that may be merged to Core, it's best to use a `wp_` prefix for
 functions or a `WP_` prefix for classes. This applies to both experimental and
 stable features.
 
-This meakes it easier for contributors and plugin developers as there is less
-cumbersome renaming of functions and classes from `gutenberg_` to `wp_` if the
-feature is merged to Core.
+This minimizes the cumbersome process of renaming functions and classes from `gutenberg_` to `wp_` if the feature is merged to Core.
 
-Functions that are intended solely for the plugin, e.g. plugin infastrucutre,
-should use the `gutenberg_` prefix.
-
-#### Bad
-
-```php
-function gutenberg_get_navigation( $slug ) {
-}
-```
+Functions that are intended solely for the plugin, e.g. plugin infrastructure, should use the `gutenberg_` prefix.
 
 #### Good
 
 ```php
-function wp_get_navigation( $slug ) {
-}
+function wp_get_navigation( $slug ) {}
+```
+
+#### Not so good
+
+```php
+function gutenberg_get_navigation( $slug ) {}
 ```
 
 ### Group PHP code by _feature_
@@ -53,64 +48,48 @@ function wp_get_navigation( $slug ) {
 Developers should organize their PHP into files or folders by _feature_, not by
 _component_.
 
-Relatedly, developers should call `add_action` and `add_filter` immediately
+Also, developers should call `add_action` and `add_filter` immediately
 after the function being hooked is defined.
 
 These two practices make it easier for PHP code to start in one folder (e.g.
 `lib/experimental`) and eventually move to another using a simple `git mv`.
-
-#### Bad
-
-```php
-// lib/experimental/functions.php
-
-function wp_get_navigation( $slug ) {
-}
-
-// lib/experimental/post-types.php
-
-function wp_register_navigation_cpt() {
-}
-
-// lib/experimental/init.php
-add_action( 'init', 'wp_register_navigation_cpt' );
-```
 
 #### Good
 
 ```php
 // lib/experimental/navigation.php
 
-function wp_get_navigation( $slug ) {
-}
+function wp_get_navigation( $slug ) { ... }
 
-function wp_register_navigation_cpt() {
-}
+function wp_register_navigation_cpt() { ... }
+
+add_action( 'init', 'wp_register_navigation_cpt' );
+```
+
+#### Not so goo
+
+```php
+// lib/experimental/functions.php
+
+function wp_get_navigation( $slug ) { ... }
+
+// lib/experimental/post-types.php
+
+function wp_register_navigation_cpt() { ... }
+
+// lib/experimental/init.php
 add_action( 'init', 'wp_register_navigation_cpt' );
 ```
 
 ### Wrap functions and classes with `! function_exists` and `! class_exists`
 
-Developers should take care to not define a function or class if it already
-is defined.
+Developers should take care to not define functions and classes that are already defined.
 
-This ensures that, if the feature is merged to Core, that there are no fatal
-errors caused by Core defining the symbol once and then Gutenberg defining it a
-second time.
+When writing new function and classes, it's good practice to use `! function_exists` and `! class_exists`.
 
-#### Bad
+If Core has defined a symbol once and then Gutenberg defines it a second time, fatal errors will occur.
 
-```php
-// lib/experimental/navigation/navigation.php
-
-function wp_get_navigation( $slug ) {
-}
-
-// lib/experimental/navigation/class-gutenberg-navigation.php
-
-class WP_Navigation {
-}
-```
+Wrapping functions and classes avoids such errors if the feature is merged to Core. 
 
 #### Good
 
@@ -118,8 +97,7 @@ class WP_Navigation {
 // lib/experimental/navigation/navigation.php
 
 if ( ! function_exists( 'wp_get_navigation' ) ) {
-	function wp_get_navigation( $slug ) {
-	}
+	function wp_get_navigation( $slug ) { ... }
 }
 
 // lib/experimental/navigation/class-wp-navigation.php
@@ -128,9 +106,22 @@ if ( class_exists( 'WP_Navigation' ) ) {
 	return;
 }
 
-class WP_Navigation {
-}
+class WP_Navigation { ... }
 ```
+
+#### Not so good
+
+```php
+// lib/experimental/navigation/navigation.php
+
+function wp_get_navigation( $slug ) { ... }
+
+// lib/experimental/navigation/class-gutenberg-navigation.php
+
+class WP_Navigation { ... }
+```
+
+Furthermore, a quick codebase search will also help you know if your new method is unique.
 
 ### Note how your feature should look when merged to Core
 
@@ -153,6 +144,5 @@ into Core.
  *
  * @return WP_Navigation
  */
-function wp_get_navigation( $slug ) {
-}
+function wp_get_navigation( $slug ) { ... }
 ```
