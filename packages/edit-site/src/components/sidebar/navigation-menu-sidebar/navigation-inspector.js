@@ -144,6 +144,10 @@ export default function NavigationInspector() {
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 
+	// Entity block editor will return entities that are not currently published.
+	// Guard by only allowing their usage if there are published Nav Menus.
+	const publishedInnerBlocks = hasNavigationMenus ? innerBlocks : [];
+
 	useEffect( () => {
 		if ( isResolvingNavigationMenus ) {
 			speak( 'Loading Navigation sidebar menus.' );
@@ -197,13 +201,13 @@ export default function NavigationInspector() {
 			) }
 			{ ! isLoading && (
 				<BlockEditorProvider
-					value={ innerBlocks }
+					value={ publishedInnerBlocks }
 					onChange={ onChange }
 					onInput={ onInput }
 				>
 					<NavigationMenu
 						id={ navMenuListId }
-						innerBlocks={ innerBlocks }
+						innerBlocks={ publishedInnerBlocks }
 					/>
 				</BlockEditorProvider>
 			) }
