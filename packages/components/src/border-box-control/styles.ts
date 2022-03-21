@@ -34,15 +34,19 @@ export const BorderBoxStyleWithFallback = ( border?: Border ) => {
 
 export const BorderBoxControlVisualizer = ( borders?: Borders ) => {
 	return css`
-		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
-		border-right: ${ BorderBoxStyleWithFallback( borders?.right ) };
-		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };
-		border-left: ${ BorderBoxStyleWithFallback( borders?.left ) };
 		position: absolute;
 		top: 20px;
 		right: 30px;
 		bottom: 20px;
 		left: 30px;
+		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
+		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };
+		${ rtl( {
+			borderLeft: BorderBoxStyleWithFallback( borders?.left ),
+		} )() }
+		${ rtl( {
+			borderRight: BorderBoxStyleWithFallback( borders?.right ),
+		} )() }
 	`;
 };
 

@@ -8,7 +8,7 @@ import { useMemo } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
-import { useCx } from '../../utils/hooks/use-cx';
+import { useCx, rtl } from '../../utils';
 
 import type { VisualizerProps } from '../types';
 
@@ -24,7 +24,7 @@ export function useBorderBoxControlVisualizer(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.BorderBoxControlVisualizer( value ), className );
-	}, [ className, value ] );
+	}, [ className, value, rtl.watch() ] );
 
 	return { ...otherProps, className: classes, value };
 }
