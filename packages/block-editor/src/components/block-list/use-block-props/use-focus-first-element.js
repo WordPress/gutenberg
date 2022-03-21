@@ -129,6 +129,8 @@ export function useFocusFirstElement( clientId ) {
 			}
 		}
 
+		// This is needed because this hook is called before the writing flow
+		// hook has the chance to turn off content editable.
 		ref.current.parentElement.closest(
 			'[contenteditable]'
 		).contentEditable = false;
