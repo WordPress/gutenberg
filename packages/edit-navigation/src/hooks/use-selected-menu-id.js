@@ -1,12 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { store as editNavigationStore } from '../store';
+import { useCallback, useDispatch, useSelect } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Returns selected menu ID and the setter.
@@ -16,11 +12,21 @@ import { store as editNavigationStore } from '../store';
  *                              the setter.
  */
 export default function useSelectedMenuId() {
-	const selectedMenuId = useSelect(
-		( select ) => select( editNavigationStore ).getSelectedMenuId(),
-		[]
+	const selectedMenuId =
+		useSelect(
+			( select ) =>
+				select( preferencesStore ).get(
+					'core/edit-navigation',
+					'selectedMenuId'
+				),
+			[]
+		) ?? null;
+
+	const { set } = useDispatch( preferencesStore );
+	const setSelectedMenuId = useCallback(
+		( menuId ) => set( 'core/edit-navigation', selectedMenuId, menuId ),
+		[ set ]
 	);
-	const { setSelectedMenuId } = useDispatch( editNavigationStore );
 
 	return [ selectedMenuId, setSelectedMenuId ];
 }
