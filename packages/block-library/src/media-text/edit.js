@@ -161,7 +161,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const image = useSelect(
 		( select ) =>
 			mediaId && isSelected
-				? select( coreStore ).getMedia( mediaId )
+				? select( coreStore ).getMedia( mediaId, { context: 'view' } )
 				: null,
 		[ isSelected, mediaId ]
 	);
