@@ -220,6 +220,42 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
 }
 
 /**
+ * Checks a string for a px or rem value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
+ *
+ * @param string $raw_value      Raw size value from theme.json.
+ * @param string $preferred_unit Whether to coerce the value to rem or px. Default `'rem'`.
+ * @return array                 An array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ]
+ */
+function gutenberg_get_typography_value_and_unit( $raw_value, $preferred_unit = 'rem' ) {
+	$pattern = '/^(\d*\.?\d+)(rem|px){1,1}$/';
+
+	preg_match( $pattern, $raw_value, $matches );
+
+	// We need a number value and a px or rem unit.
+	if ( ! isset( $matches[1] ) && isset( $matches[2] ) ) {
+		return null;
+	}
+
+	$value = $matches[1];
+	$unit  = $matches[2];
+
+	if ( 'rem' === $preferred_unit && 'px' === $unit ) {
+		// Preferred is rem so we convert px to rem.
+		$value = $value / 16;
+	}
+
+	if ( 'px' === $preferred_unit && 'rem' === $unit ) {
+		// Preferred is px so we convert rem to px.
+		$value = $value * 16;
+	}
+
+	return array(
+		'value' => $value,
+		'unit'  => $unit,
+	);
+}
+
+/**
  * Returns a font-size value based on a given font-size preset. If typography.fluid is enabled it will calculate clamp values.
  *
  * @param array $preset Duotone preset value as seen in theme.json.
@@ -229,71 +265,49 @@ function gutenberg_get_typography_font_size_value( $preset ) {
 	$typography_settings = gutenberg_get_global_settings( array( 'typography' ) );
 
 	// This is where we'll keep options I guess.
-	if ( ! isset( $typography_settings['fluid'] ) ) {
+	if ( ! isset( $typography_settings['responsive'] ) ) {
 		return $preset['size'];
 	}
 
+	$responsive_settings = $typography_settings['responsive'];
+
+	// Defaults.
 	// Up for discussion.
-	$default_unit                   = 'rem';
-	$default_minimum_viewport_width = '1600px';
-	$default_maximum_viewport_width = '650px';
-
-	// Matches rem or px values only.
-	$pattern = '/^(\d*\.?\d+)(rem|px)?$/';
-	// Could we also take these from layout? contentSize and wideSize?
-	$minimum_viewport_width      = isset( $typography_settings['minViewportWidth'] ) ? $typography_settings['minViewportWidth'] : $default_minimum_viewport_width;
-	$minimum_viewport_width_unit = $default_unit;
-	$maximum_viewport_width      = isset( $typography_settings['maxViewportWidth'] ) ? $typography_settings['maxViewportWidth'] : $default_maximum_viewport_width;
-	$maximum_viewport_width_unit = $default_unit;
-
-	// Minimum viewport size.
-	preg_match_all( $pattern, $minimum_viewport_width, $minimum_viewport_width_matches );
-	if ( isset( $minimum_viewport_width_matches[1][0] ) ) {
-		$minimum_viewport_width      = intval( $minimum_viewport_width_matches[1][0] );
-		$minimum_viewport_width_unit = isset( $minimum_viewport_width_matches[2][0] ) ? $minimum_viewport_width_matches[2][0] : $minimum_viewport_width_unit;
-		if ( 'px' === $minimum_viewport_width_unit ) {
-			// Default is rem so we convert px to rem.
-			$minimum_viewport_width = $minimum_viewport_width / 16;
-		}
-	}
-
-	// Maximum viewport size.
-	preg_match_all( $pattern, $maximum_viewport_width, $maximum_viewport_width_matches );
-	if ( isset( $maximum_viewport_width_matches[1][0] ) ) {
-		$maximum_viewport_width      = intval( $maximum_viewport_width_matches[1][0] );
-		$maximum_viewport_width_unit = isset( $maximum_viewport_width_matches[2][0] ) ? $maximum_viewport_width_matches[2][0] : $maximum_viewport_width_unit;
-		if ( 'px' === $maximum_viewport_width_unit ) {
-			// Default is rem so we convert px to rem.
-			$maximum_viewport_width = $maximum_viewport_width / 16;
-		}
-	}
+	// We expect these to be in `px`.
+	$default_minimum_viewport_width   = '1600px';
+	$default_maximum_viewport_width   = '650px';
+	$default_minimum_font_size_factor = 0.75;
+	$default_maximum_font_size_factor = 1.5;
 
 	// Font sizes.
-	preg_match_all( $pattern, $preset['size'], $size_matches );
-	if ( isset( $size_matches[1][0] ) ) {
-		$base_size_value = $size_matches[1][0];
+	$preferred_size = gutenberg_get_typography_value_and_unit( $preset['size'] );
 
-		if ( isset( $size_matches[2][0] ) && 'px' === $size_matches[2][0] ) {
-			// Default is rem so we convert px to rem.
-			$base_size_value = $base_size_value / 16;
-		}
-
-		// How can we offer control over this?
-		// Maybe typography.fluid.{min|max}FontSizeFactor.
-		// Or picking the first and last sizes in the fontSizes array?
-		// Another option is here to accept fontSizes[0]['min'] and fontSizes[0]['max'] from a preset item.
-		$minimum_font_size = $base_size_value * 0.9;
-		$maximum_font_size = $base_size_value * 1.75;
-		$factor            = ( 1 / ( $maximum_viewport_width - $minimum_viewport_width ) ) * ( $maximum_font_size - $minimum_font_size );
-		$calc_rem          = $minimum_font_size - ( $minimum_viewport_width * $factor );
-		$calc_vw           = 100 * $factor;
-		$min               = min( $minimum_font_size, $maximum_font_size );
-		$max               = max( $minimum_font_size, $maximum_font_size );
-
-		return "clamp({$min}rem, {$calc_rem}rem + {$calc_vw}vw, {$max}rem)";
-	} else {
+	if ( empty( $preferred_size ) ) {
 		return $preset['size'];
 	}
+
+	$preferred_unit        = $preferred_size['unit'];
+	$maximum_font_size_raw = isset( $preset['max'] ) ? $preset['max'] : $preferred_size['value'] * $default_minimum_font_size_factor . $preferred_unit;
+	$minimum_font_size_raw = isset( $preset['min'] ) ? $preset['min'] : $preferred_size['value'] * $default_maximum_font_size_factor . $preferred_unit;
+	$maximum_font_size     = gutenberg_get_typography_value_and_unit( $maximum_font_size_raw, $preferred_unit )['value'];
+	$minimum_font_size     = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw, $preferred_unit )['value'];
+
+	// Viewport widths.
+	// Could we also take these from layout? contentSize and wideSize?
+	$maximum_viewport_width_raw = isset( $responsive_settings['maxViewportWidth'] ) ? $responsive_settings['maxViewportWidth'] : $default_maximum_viewport_width;
+	$minimum_viewport_width_raw = isset( $responsive_settings['minViewportWidth'] ) ? $responsive_settings['minViewportWidth'] : $default_minimum_viewport_width;
+	$maximum_viewport_width     = gutenberg_get_typography_value_and_unit( $maximum_viewport_width_raw, $preferred_unit )['value'];
+	$minimum_viewport_width     = gutenberg_get_typography_value_and_unit( $minimum_viewport_width_raw, $preferred_unit )['value'];
+
+	// Calculate fluid font size.
+	$rise               = $maximum_font_size - $minimum_font_size;
+	$run                = $maximum_viewport_width - $minimum_viewport_width;
+	$slope              = $rise / $run;
+	$max_font_size_calc = "calc($maximum_font_size * 1{$preferred_unit})";
+	$min_font_size_calc = "calc($minimum_font_size * 1{$preferred_unit})";
+	$fluid_font_size    = "calc($slope * (100vw - calc($minimum_viewport_width * 1{$preferred_unit})) + $min_font_size_calc)";
+
+	return "clamp($min_font_size_calc, $fluid_font_size, $max_font_size_calc);";
 }
 
 // Register the block support.
