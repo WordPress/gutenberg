@@ -88,7 +88,10 @@ describe( 'Gallery', () => {
 		// The Image needs to be selected from the List view panel due to the
 		// way that Image uploads take and lose focus.
 		await openListView();
-		await clickButton( 'Image' );
+		const imageListLink = await page.waitForXPath(
+			`//a[contains(text(), 'Image')]`
+		);
+		await imageListLink.click();
 
 		const captionElement = await figureElement.$(
 			'.block-editor-rich-text__editable'
