@@ -27,40 +27,10 @@ export default function useClickSelection() {
 					return;
 				}
 
-				const clientId = getBlockClientId( event.target );
-
 				if ( event.shiftKey ) {
-					const blockSelectionStart = getBlockSelectionStart();
-					// By checking `blockSelectionStart` to be set, we handle the
-					// case where we select a single block. We also have to check
-					// the selectionEnd (clientId) not to be included in the
-					// `blockSelectionStart`'s parents because the click event is
-					// propagated.
-					const startParents = getBlockParents( blockSelectionStart );
-					if (
-						blockSelectionStart &&
-						blockSelectionStart !== clientId &&
-						! startParents?.includes( clientId )
-					) {
-						const startPath = [
-							...startParents,
-							blockSelectionStart,
-						];
-						const endPath = [
-							...getBlockParents( clientId ),
-							clientId,
-						];
-						const depth =
-							Math.min( startPath.length, endPath.length ) - 1;
-						const start = startPath[ depth ];
-						const end = endPath[ depth ];
-						// Handle the case of having selected a parent block and
-						// then shift+click on a child.
-						if ( start !== end ) {
-							multiSelect( start, end );
-							event.preventDefault();
-						}
-					}
+					node.contentEditable = true;
+					// Firefox doesn't automatically move focus.
+					node.focus();
 				} else if ( hasMultiSelection() ) {
 					// Allow user to escape out of a multi-selection to a
 					// singular selection of a block via click. This is handled
@@ -68,7 +38,7 @@ export default function useClickSelection() {
 					// multiselection, as focus can be incurred by starting a
 					// multiselection (focus moved to first block's multi-
 					// controls).
-					selectBlock( clientId );
+					selectBlock( getBlockClientId( event.target ) );
 				}
 			}
 

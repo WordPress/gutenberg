@@ -1491,7 +1491,7 @@ _Returns_
 
 ### splitSelection
 
-Undocumented declaration.
+Split the current selection.
 
 ### startDraggingBlocks
 

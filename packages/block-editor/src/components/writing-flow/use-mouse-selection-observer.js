@@ -17,7 +17,6 @@ import { getBlockClientId } from '../../utils/dom';
  * @param {boolean}     value `contentEditable` value (true or false)
  */
 function setContentEditableWrapper( node, value ) {
-	// Since `closest` considers `node` as a candidate, use `parentElement`.
 	node.contentEditable = value;
 	// Firefox doesn't automatically move focus.
 	if ( value ) node.focus();

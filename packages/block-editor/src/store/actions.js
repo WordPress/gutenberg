@@ -858,6 +858,9 @@ export const deleteSelection = ( isForward ) => ( {
 	} );
 };
 
+/**
+ * Split the current selection.
+ */
 export const splitSelection = () => ( { select, dispatch } ) => {
 	const selectionAnchor = select.getSelectionStart();
 	const selectionFocus = select.getSelectionEnd();
