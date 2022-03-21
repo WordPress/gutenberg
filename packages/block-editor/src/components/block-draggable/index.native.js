@@ -54,7 +54,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 		startY: useSharedValue( 0 ),
 		width: useSharedValue( 0 ),
 		height: useSharedValue( 0 ),
-		opacity: useSharedValue( 0 ),
+		scale: useSharedValue( 0 ),
 	};
 	const isDragging = useSharedValue( false );
 
@@ -87,12 +87,11 @@ const BlockDraggableWrapper = ( { children } ) => {
 		scroll.x.value = scrollLayout.pageX;
 		scroll.y.value = scrollLayout.pageY;
 
-		chip.x.value = x - scroll.x.value - chip.width.value / 2;
-		chip.y.value =
-			y - scroll.y.value - chip.height.value - CHIP_POSITION_PADDING;
+		chip.x.value = x - scroll.x.value;
+		chip.y.value = y - scroll.y.value;
 
 		isDragging.value = true;
-		chip.opacity.value = withTiming( 1 );
+		chip.scale.value = withTiming( 1 );
 
 		startScrolling( y );
 	};
@@ -102,14 +101,13 @@ const BlockDraggableWrapper = ( { children } ) => {
 		// Update scrolling velocity
 		scrollOnDragOver( y );
 
-		chip.x.value = x - scroll.x.value - chip.width.value / 2;
-		chip.y.value =
-			y - scroll.y.value - chip.height.value - CHIP_POSITION_PADDING;
+		chip.x.value = x - scroll.x.value;
+		chip.y.value = y - scroll.y.value;
 	};
 
 	const stopDragging = () => {
 		'worklet';
-		chip.opacity.value = withTiming( 0.2, ( completed ) => {
+		chip.scale.value = withTiming( 0, ( completed ) => {
 			if ( completed ) {
 				isDragging.value = false;
 				runOnJS( stopDraggingBlocks )();
@@ -122,10 +120,16 @@ const BlockDraggableWrapper = ( { children } ) => {
 	const chipStyles = useAnimatedStyle( () => {
 		return {
 			position: 'absolute',
-			opacity: chip.opacity.value,
 			transform: [
-				{ translateX: chip.x.value },
-				{ translateY: chip.y.value },
+				{ translateX: chip.x.value - chip.width.value / 2 },
+				{
+					translateY:
+						chip.y.value -
+						chip.height.value -
+						CHIP_POSITION_PADDING,
+				},
+				{ scaleX: chip.scale.value },
+				{ scaleY: chip.scale.value },
 			],
 		};
 	} );
