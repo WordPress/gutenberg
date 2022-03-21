@@ -698,8 +698,8 @@ Create a break between ideas or sections with a horizontal separator. ([Source](
 
 -	**Name:** core/separator
 -	**Category:** design
--	**Supports:** align (center, full, wide), anchor
--	**Attributes:** color, customColor
+-	**Supports:** align (center, full, wide), anchor, color (background, gradients, ~~text~~)
+-	**Attributes:** opacity
 
 ## Shortcode
 

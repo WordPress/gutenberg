@@ -3,7 +3,12 @@
 		"name": "core/separator",
 		"isValid": true,
 		"attributes": {
-			"opacity": "alpha-channel"
+			"opacity": "css",
+			"style": {
+				"color": {
+					"background": "#cc1d1d"
+				}
+			}
 		},
 		"innerBlocks": []
 	}
