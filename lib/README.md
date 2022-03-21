@@ -23,36 +23,33 @@ structure for its PHP code:
 
 ### Prefer the `wp` prefix
 
-For features that may be merged to Core, it's best to use a `wp_` prefix for
-functions or a `WP_` prefix for classes. This applies to both experimental and
-stable features.
+For features that may be merged to Core, it's best to use a `wp_` prefix for functions or a `WP_` prefix for classes. 
 
-This minimizes the cumbersome process of renaming functions and classes from `gutenberg_` to `wp_` if the feature is merged to Core.
+This applies to both experimental and stable features.
 
-Functions that are intended solely for the plugin, e.g. plugin infrastructure, should use the `gutenberg_` prefix.
+Using the `wp_` prefix facilitates the process of renaming functions and classes from `gutenberg_` to `wp_` if the feature is merged to Core.
+
+Functions that are intended solely for the plugin, e.g., plugin infrastructure, should use the `gutenberg_` prefix.
 
 #### Good
 
 ```php
-function wp_get_navigation( $slug ) {}
+function wp_get_navigation( $slug ) { ... }
 ```
 
 #### Not so good
 
 ```php
-function gutenberg_get_navigation( $slug ) {}
+function gutenberg_get_navigation( $slug ) { ... }
 ```
 
 ### Group PHP code by _feature_
 
-Developers should organize their PHP into files or folders by _feature_, not by
-_component_.
+Developers should organize PHP into files or folders by _feature_, not by _component_.
 
-Also, developers should call `add_action` and `add_filter` immediately
-after the function being hooked is defined.
+Also, developers should call `add_action` and `add_filter` immediately after the function being hooked is defined.
 
-These two practices make it easier for PHP code to start in one folder (e.g.
-`lib/experimental`) and eventually move to another using a simple `git mv`.
+These two practices make it easier for PHP code to start in one folder (e.g., `lib/experimental`) and eventually move to another using a simple `git mv`.
 
 #### Good
 
@@ -66,7 +63,7 @@ function wp_register_navigation_cpt() { ... }
 add_action( 'init', 'wp_register_navigation_cpt' );
 ```
 
-#### Not so goo
+#### Not so good
 
 ```php
 // lib/experimental/functions.php
@@ -125,12 +122,11 @@ Furthermore, a quick codebase search will also help you know if your new method 
 
 ### Note how your feature should look when merged to Core
 
-Developers should write a brief note about how their feature should be merged to
-Core. For example, which Core file or function should be patched. This can be
-included in the doc comment.
+Developers should write a brief note about how their feature should be merged to Core, for example, which Core file or function should be patched. 
 
-This helps future developers know what to do when merging Gutenberg features
-into Core.
+Notes can be included in the doc comment.
+
+This helps future developers know what to do when merging Gutenberg features into Core.
 
 #### Good
 
