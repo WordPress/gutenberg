@@ -2,7 +2,7 @@
 
 ## Unreleased
 
--   Add `onClick` prop on `FormFileUpload`.
+-   Add `onClick` prop on `FormFileUpload`. ([#39268](https://github.com/WordPress/gutenberg/pull/39268))
 
 ### Enhancements
 
