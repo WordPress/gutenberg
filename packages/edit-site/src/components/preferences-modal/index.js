@@ -36,6 +36,11 @@ export default function EditSitePreferencesModal( {
 						) }
 						label={ __( 'Spotlight mode' ) }
 					/>
+					<EnableFeature
+						featureName="showIconLabels"
+						label={ __( 'Show button text labels' ) }
+						help={ __( 'Show text instead of icons on buttons' ) }
+					/>
 				</PreferencesModalSection>
 			),
 		},
