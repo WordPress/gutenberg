@@ -160,7 +160,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		)
 	);
 	$html               = '<li ' . $wrapper_attributes . '>' .
-		'<a class="wp-block-navigation-item__content" ';
+		'<a data-micromodal-close class="wp-block-navigation-item__content" ';
 
 	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['url'] ) ) {
