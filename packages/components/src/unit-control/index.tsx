@@ -15,6 +15,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -36,7 +37,14 @@ import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import type { StateReducer } from '../input-control/reducer/state';
 
 function UnforwardedUnitControl(
-	{
+	unitControlProps: WordPressComponentProps<
+		UnitControlProps,
+		'input',
+		false
+	>,
+	forwardedRef: ForwardedRef< any >
+) {
+	const {
 		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
 		className,
@@ -54,9 +62,16 @@ function UnforwardedUnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		...props
-	}: WordPressComponentProps< UnitControlProps, 'input', false >,
-	forwardedRef: ForwardedRef< any >
-) {
+	} = unitControlProps;
+
+	if ( 'unit' in unitControlProps ) {
+		deprecated( 'UnitControl unit prop', {
+			since: '5.6',
+			hint: 'The unit should be provided within the `value` prop.',
+			version: '6.2',
+		} );
+	}
+
 	// The `value` prop, in theory, should not be `null`, but the following line
 	// ensures it fallback to `undefined` in case a consumer of `UnitControl`
 	// still passes `null` as a `value`.

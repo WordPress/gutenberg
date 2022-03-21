@@ -20,6 +20,10 @@
 
 -   `NumberControl`: commit (and constrain) value on `blur` event ([#39186](https://github.com/WordPress/gutenberg/pull/39186)).
 
+### Deprecation
+
+-   `unit` prop in `UnitControl` marked as deprecated ([#39503](https://github.com/WordPress/gutenberg/pull/39503)).
+
 ## 19.6.0 (2022-03-11)
 
 ### Enhancements
