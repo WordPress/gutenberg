@@ -186,6 +186,7 @@ function ListViewBlock( {
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
 			isExpanded={ isExpanded }
+			isSelected={ isSelected }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"

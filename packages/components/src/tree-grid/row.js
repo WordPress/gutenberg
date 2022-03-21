@@ -4,7 +4,15 @@
 import { forwardRef } from '@wordpress/element';
 
 function TreeGridRow(
-	{ children, level, positionInSet, setSize, isExpanded, ...props },
+	{
+		children,
+		level,
+		positionInSet,
+		setSize,
+		isExpanded,
+		isSelected,
+		...props
+	},
 	ref
 ) {
 	return (
@@ -22,6 +30,7 @@ function TreeGridRow(
 			aria-posinset={ positionInSet }
 			aria-setsize={ setSize }
 			aria-expanded={ isExpanded }
+			aria-selected={ !! isSelected }
 		>
 			{ children }
 		</tr>

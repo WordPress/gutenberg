@@ -294,6 +294,7 @@ function TreeGrid(
 			<table
 				{ ...props }
 				role="treegrid"
+				aria-multiselectable="true"
 				onKeyDown={ onKeyDown }
 				ref={ ref }
 			>

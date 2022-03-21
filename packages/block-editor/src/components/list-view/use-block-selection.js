@@ -10,7 +10,7 @@ import { speak } from '@wordpress/a11y';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-import { UP, DOWN } from '@wordpress/keycodes';
+import { UP, DOWN, HOME, END } from '@wordpress/keycodes';
 import { store as blocksStore } from '@wordpress/blocks';
 
 /**
@@ -49,7 +49,10 @@ export default function useBlockSelection() {
 
 			const isKeyPress =
 				event.type === 'keydown' &&
-				( event.keyCode === UP || event.keyCode === DOWN );
+				( event.keyCode === UP ||
+					event.keyCode === DOWN ||
+					event.keyCode === HOME ||
+					event.keyCode === END );
 
 			// Handle clicking on a block when no blocks are selected, and return early.
 			if (

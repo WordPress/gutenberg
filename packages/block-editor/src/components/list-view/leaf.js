@@ -40,6 +40,7 @@ export default function ListViewLeaf( {
 			level={ level }
 			positionInSet={ position }
 			setSize={ rowCount }
+			isSelected={ isSelected }
 			{ ...props }
 		>
 			{ children }
