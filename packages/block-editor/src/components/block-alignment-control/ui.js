@@ -93,7 +93,6 @@ function BlockAlignmentUI( {
 		label: __( 'Align' ),
 		toggleProps: { describedBy: __( 'Change alignment' ) },
 	};
-
 	const extraProps =
 		isToolbar || Platform.isNative
 			? {
