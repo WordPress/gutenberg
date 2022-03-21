@@ -39,7 +39,10 @@ async function setup( jestConfig = {} ) {
 	if ( config.connect ) {
 		browser = await puppeteer.connect( config.connect );
 	} else {
-		browser = await puppeteer.launch( config.launch );
+		browser = await puppeteer.launch( {
+			...config.launch,
+			executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+		} );
 	}
 	process.env.PUPPETEER_WS_ENDPOINT = browser.wsEndpoint();
 
