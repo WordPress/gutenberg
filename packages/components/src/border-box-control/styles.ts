@@ -8,6 +8,10 @@ import { css } from '@emotion/react';
  */
 import { COLORS, CONFIG, rtl } from '../utils';
 import { space } from '../ui/utils/space';
+import { getClampedWidthBorderStyle } from './utils';
+
+import type { Border } from '../border-control/types';
+import type { Borders } from './types';
 
 export const BorderBoxControl = css``;
 
@@ -21,14 +25,26 @@ export const BorderBoxControlLinkedButton = css`
 	margin-top: 7px;
 `;
 
-export const BorderBoxControlVisualizer = css`
-	border: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
-	position: absolute;
-	top: 20px;
-	right: 30px;
-	bottom: 20px;
-	left: 30px;
-`;
+export const BorderBoxStyleWithFallback = ( border?: Border ) => {
+	return (
+		getClampedWidthBorderStyle( border ) ||
+		`${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] }`
+	);
+};
+
+export const BorderBoxControlVisualizer = ( borders?: Borders ) => {
+	return css`
+		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
+		border-right: ${ BorderBoxStyleWithFallback( borders?.right ) };
+		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };
+		border-left: ${ BorderBoxStyleWithFallback( borders?.left ) };
+		position: absolute;
+		top: 20px;
+		right: 30px;
+		bottom: 20px;
+		left: 30px;
+	`;
+};
 
 export const BorderBoxControlSplitControls = css`
 	display: grid;
