@@ -30,6 +30,16 @@ function extractSelectionEndNode( selection ) {
 	return focusNode.childNodes[ focusOffset - 1 ];
 }
 
+function findDepth( a, b ) {
+	let depth = 0;
+
+	while ( a[ depth ] === b[ depth ] ) {
+		depth++;
+	}
+
+	return depth;
+}
+
 /**
  * Sets the `contenteditable` wrapper element to `value`.
  *
@@ -87,8 +97,7 @@ export default function useKeyboardSelectionObserver() {
 						...getBlockParents( endClientId ),
 						endClientId,
 					];
-					const depth =
-						Math.min( startPath.length, endPath.length ) - 1;
+					const depth = findDepth( startPath, endPath );
 
 					// Check if selection is already set by rich text.
 					multiSelect( startPath[ depth ], endPath[ depth ] );

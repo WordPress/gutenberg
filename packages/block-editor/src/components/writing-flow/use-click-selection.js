@@ -42,10 +42,27 @@ export default function useClickSelection() {
 				}
 			}
 
+			function onMouseUp() {
+				const { ownerDocument } = node;
+				const { defaultView } = ownerDocument;
+				const selection = defaultView.getSelection();
+
+				if (
+					! selection.rangeCount ||
+					selection.isCollapsed ||
+					getBlockClientId( selection.anchorNode ) ===
+						getBlockClientId( selection.focusNode )
+				) {
+					node.contentEditable = false;
+				}
+			}
+
 			node.addEventListener( 'mousedown', onMouseDown );
+			node.addEventListener( 'mouseup', onMouseUp );
 
 			return () => {
 				node.removeEventListener( 'mousedown', onMouseDown );
+				node.removeEventListener( 'mouseup', onMouseUp );
 			};
 		},
 		[

@@ -14,6 +14,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
+import { getBlockClientId } from '../../utils/dom';
 
 function selector( select ) {
 	const {
@@ -114,8 +115,15 @@ export default function useMultiSelection() {
 
 			// Abort if the blocks already contain selection.
 			if (
+				selection.rangeCount &&
 				selection.containsNode( startRef.current, true ) &&
-				selection.containsNode( endRef.current, true )
+				getBlockClientId( startRef.current ) ===
+					getBlockClientId(
+						selection.getRangeAt( 0 ).startContainer
+					) &&
+				selection.containsNode( endRef.current, true ) &&
+				getBlockClientId( endRef.current ) ===
+					getBlockClientId( selection.getRangeAt( 0 ).endContainer )
 			) {
 				return;
 			}

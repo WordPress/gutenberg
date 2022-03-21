@@ -22,6 +22,16 @@ function setContentEditableWrapper( node, value ) {
 	if ( value ) node.focus();
 }
 
+function findDepth( a, b ) {
+	let depth = 0;
+
+	while ( a[ depth ] === b[ depth ] ) {
+		depth++;
+	}
+
+	return depth;
+}
+
 /**
  * Sets a multi-selection based on the native selection across blocks.
  */
@@ -94,8 +104,7 @@ export default function useSelectionObserver() {
 						...getBlockParents( endClientId ),
 						endClientId,
 					];
-					const depth =
-						Math.min( startPath.length, endPath.length ) - 1;
+					const depth = findDepth( startPath, endPath );
 
 					// Check if selection is already set by rich text.
 					multiSelect( startPath[ depth ], endPath[ depth ] );

@@ -353,6 +353,7 @@ describe( 'Multi-block selection', () => {
 		await page.mouse.move( x + 20, y );
 		await page.mouse.down();
 		await page.keyboard.up( 'Shift' );
+		await page.mouse.up();
 		await page.keyboard.type( 'hi' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:group -->
