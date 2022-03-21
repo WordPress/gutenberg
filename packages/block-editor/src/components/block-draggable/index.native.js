@@ -159,18 +159,21 @@ const BlockDraggable = ( { clientIds, children } ) => {
 		Context
 	);
 
-	const animatedContainerRef = useAnimatedRef();
 	const container = {
 		height: useSharedValue( 0 ),
 		opacity: useSharedValue( 1 ),
+	};
+	const startDraggingContainerHeight = useSharedValue( 0 );
+
+	const onContainerLayout = ( { nativeEvent: { layout } } ) => {
+		container.height.value = layout.height;
 	};
 
 	const startBlockDragging = ( event ) => {
 		'worklet';
 		startDragging( clientIds, event );
 
-		const containerLayout = measure( animatedContainerRef );
-		container.height.value = containerLayout.height;
+		startDraggingContainerHeight.value = container.height.value;
 
 		container.opacity.value = withTiming( 0 );
 	};
@@ -202,12 +205,12 @@ const BlockDraggable = ( { clientIds, children } ) => {
 		const height = interpolate(
 			container.opacity.value,
 			[ 0, 1 ],
-			[ BLOCK_PLACEHOLDER_HEIGHT, container.height.value ]
+			[ BLOCK_PLACEHOLDER_HEIGHT, startDraggingContainerHeight.value ]
 		);
 
 		return {
 			opacity: container.opacity.value,
-			height: container.opacity.value === 1 ? 'auto' : height,
+			height: startDraggingContainerHeight.value !== 0 ? height : 'auto',
 		};
 	} );
 
@@ -215,7 +218,7 @@ const BlockDraggable = ( { clientIds, children } ) => {
 		const height = interpolate(
 			container.opacity.value,
 			[ 0, 1 ],
-			[ BLOCK_PLACEHOLDER_HEIGHT, container.height.value ]
+			[ BLOCK_PLACEHOLDER_HEIGHT, startDraggingContainerHeight.value ]
 		);
 
 		return {
@@ -230,7 +233,7 @@ const BlockDraggable = ( { clientIds, children } ) => {
 	}
 
 	return (
-		<View ref={ animatedContainerRef }>
+		<View onLayout={ onContainerLayout }>
 			<Draggable
 				onDragStart={ startBlockDragging }
 				onDragOver={ updateDragging }
