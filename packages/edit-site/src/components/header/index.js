@@ -159,6 +159,7 @@ export default function Header( {
 							: 'template'
 					}
 					isLoaded={ isLoaded }
+					showIconLabels={ showIconLabels }
 				>
 					{ ( { onClose } ) => (
 						<TemplateDetails
