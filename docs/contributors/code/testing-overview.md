@@ -212,6 +212,86 @@ describe( 'my module', () => {
 } );
 ```
 
+### User interactions
+
+Simulating user interactions is a great way to **write tests from the user's perspective**, and therefore avoid testing implementation details.
+
+When writing tests with Testing Library, there are two main alternatives for simulating user interactions:
+
+1. The [`fireEvent`](https://testing-library.com/docs/dom-testing-library/api-events/#fireevent) API, a utility for firing DOM events part of the Testing Library core API.
+2. The [`user-event`](https://testing-library.com/docs/user-event/intro/) library, a companion library to Testing Library that simulates user interactions by dispatching the events that would happen if the interaction took place in a browser.
+
+The built-in `fireEvent` is a utility for dispatching DOM events. It dispatches exactly the events that are described in the test spec - even if those exact events never had been dispatched in a real interaction in a browser.
+
+On the other hand, the `user-event` library exposes higher-level methods (e.g. `type`, `selectOptions`, `clear`, `doubleClick`...), that dispatch events like they would happen if a user interacted with the document, and take care of any react-specific quirks.
+
+For the above reasons, **the `user-event` library is recommended when writing tests for user interactions**.
+
+**Not so good**: using `fireEvent` to dispatch DOM events.
+
+```javascript
+import { render, screen } from '@testing-library/react';
+
+test( 'fires onChange when a new value is typed', () => {
+	const spyOnChange = jest.fn();
+
+	// A component with one `input` and one `select`.
+	render( <MyComponent onChange={ spyOnChange } /> );
+
+	const input = screen.getByRole( 'textbox' );
+	input.focus();
+	// No clicks, no key events.
+	fireEvent.change( input, { target: { value: 62 } } );
+
+	// The `onChange` callback gets called once with '62' as the argument.
+	expect( spyOnChange ).toHaveBeenCalledTimes( 1 );
+
+	const select = screen.getByRole( 'listbox' );
+	select.focus();
+	// No pointer events dispatched.
+	fireEvent.change( select, { target: { value: 'optionValue' } } );
+
+	// ...
+```
+
+**Good**: using `user-event` to simulate user events.
+
+```javascript
+
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+test('fires onChange when a new value is typed', async () => {
+	const user = userEvent.setup();
+
+	const spyOnChange = jest.fn();
+
+	// A component with one `input` and one `select`.
+	render( <MyComponent onChange={ spyOnChange } /> );
+
+	const input = screen.getByRole( 'textbox' );
+	// Focus the element, select and delete all its contents.
+	await user.clear( input );
+	// Click the element, type each character separately (generating keydown,
+	// keypress and keyup events).
+	await user.type( input, '62' );
+
+	// The `onChange` callback gets called 3 times with the following arguments:
+	// - 1: clear ('')
+	// - 2: '6'
+	// - 3: '62'
+	expect( spyOnChange ).toHaveBeenCalledTimes( 3 );
+
+	const select = screen.getByRole( 'listbox' );
+	// Dispatches events for focus, pointer, mouse, click and change.
+	await user.selectOptions( select, [ 'optionValue' ] );
+
+	// ...
+})
+```
+
+
+
 ### Snapshot testing
 
 This is an overview of [snapshot testing] and how to best leverage snapshot tests.

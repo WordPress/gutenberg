@@ -29,33 +29,4 @@ project(':react-native-aztec').projectDir = new File(rootProject.projectDir, '..
 
 if (hasProperty("willPublishReactNativeBridgeBinary")) {
     assert file("./react-native-bridge/build/assets/index.android.bundle").exists() : "index.android.bundle is necessary to publish a new version!"
-} else {
-    assert file("../../../node_modules").exists() : "node_modules folder is missing. Please run `npm install` from the root Gutenberg project"
-
-    include ':react-native-linear-gradient'
-    project(':react-native-linear-gradient').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-linear-gradient/android')
-    include ':react-native-svg'
-    project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-svg/android')
-    include ':react-native-video'
-    project(':react-native-video').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-video/android-exoplayer')
-    include ':@react-native-community_slider'
-    project(':@react-native-community_slider').projectDir = new File(rootProject.projectDir, '../../../node_modules/@react-native-community/slider/src/android')
-    include ':react-native-get-random-values'
-    project(':react-native-get-random-values').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-get-random-values/android')
-    include ':@react-native-community_masked-view'
-    project(':@react-native-community_masked-view').projectDir = new File(rootProject.projectDir, '../../../node_modules/@react-native-community/masked-view/android')
-    include ':react-native-gesture-handler'
-    project(':react-native-gesture-handler').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-gesture-handler/android')
-    include ':react-native-screens'
-    project(':react-native-screens').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-screens/android')
-    include ':react-native-safe-area-context'
-    project(':react-native-safe-area-context').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-safe-area-context/android')
-    include ':react-native-reanimated'
-    project(':react-native-reanimated').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-reanimated/android')
-    include ':react-native-prompt-android'
-    project(':react-native-prompt-android').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-prompt-android/android')
-    include ':react-native-webview'
-    project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-webview/android')
-    include ':@react-native-clipboard_clipboard'
-    project(':@react-native-clipboard_clipboard').projectDir = new File(rootProject.projectDir, '../../../node_modules/@react-native-clipboard/clipboard/android')
 }

@@ -1,65 +1,89 @@
 /**
  * WordPress dependencies
  */
-import { isValidBlockContent } from '@wordpress/blocks';
 import { createElement } from '@wordpress/element';
+import {
+	getBlockTypes,
+	registerBlockType,
+	unregisterBlockType,
+	validateBlock,
+} from '@wordpress/blocks';
 
-describe( 'isValidBlockContent', () => {
+describe( 'validateBlock', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks.
 		require( '../../packages/editor/src/hooks' );
 	} );
 
+	afterEach( () => {
+		getBlockTypes().forEach( ( block ) => {
+			unregisterBlockType( block.name );
+		} );
+	} );
+
 	it( 'should use the namespace in the classname for non-core blocks', () => {
-		const valid = isValidBlockContent(
-			{
-				save: ( { attributes } ) =>
-					createElement( 'div', null, attributes.fruit ),
-				name: 'myplugin/fruit',
+		registerBlockType( 'myplugin/fruit', {
+			save: ( { attributes } ) =>
+				createElement( 'div', null, attributes.fruit ),
+			name: 'myplugin/fruit',
+			category: 'text',
+			title: 'Fruit block',
+		} );
+
+		const [ valid ] = validateBlock( {
+			name: 'myplugin/fruit',
+			attributes: {
+				fruit: 'Bananas',
 			},
-			{ fruit: 'Bananas' },
-			'<div class="wp-block-myplugin-fruit">Bananas</div>'
-		);
+			originalContent:
+				'<div class="wp-block-myplugin-fruit">Bananas</div>',
+		} );
 
 		expect( valid ).toBe( true );
 	} );
 
 	it( 'should include additional classes in block attributes', () => {
-		const valid = isValidBlockContent(
-			{
-				save: ( { attributes } ) =>
-					createElement(
-						'div',
-						{
-							className: 'fruit',
-						},
-						attributes.fruit
-					),
-				name: 'myplugin/fruit',
-			},
-			{
-				fruit: 'Bananas',
-				className: 'fresh',
-			},
-			'<div class="wp-block-myplugin-fruit fruit fresh">Bananas</div>'
-		);
+		registerBlockType( 'muplugin/fruit', {
+			save: ( { attributes } ) =>
+				createElement(
+					'div',
+					{
+						className: 'fruit',
+					},
+					attributes.fruit
+				),
+			name: 'myplugin/fruit',
+			category: 'text',
+			title: 'Fruit block',
+		} );
+
+		const [ valid ] = validateBlock( {
+			name: 'myplugin/fruit',
+			attributes: { fruit: 'Bananas', className: 'fresh' },
+			originalContent:
+				'<div class="wp-block-myplugin-fruit fruit fresh">Bananas</div>',
+		} );
 
 		expect( valid ).toBe( true );
 	} );
 
 	it( 'should not add a className if falsy', () => {
-		const valid = isValidBlockContent(
-			{
-				save: ( { attributes } ) =>
-					createElement( 'div', null, attributes.fruit ),
-				name: 'myplugin/fruit',
-				supports: {
-					className: false,
-				},
+		registerBlockType( 'myplugin/fruit', {
+			save: ( { attributes } ) =>
+				createElement( 'div', null, attributes.fruit ),
+			name: 'myplugin/fruit',
+			category: 'text',
+			title: 'Fruit block',
+			supports: {
+				className: false,
 			},
-			{ fruit: 'Bananas' },
-			'<div>Bananas</div>'
-		);
+		} );
+
+		const [ valid ] = validateBlock( {
+			name: 'myplugin/fruit',
+			attributes: { fruit: 'Bananas' },
+			originalContent: '<div>Bananas</div>',
+		} );
 
 		expect( valid ).toBe( true );
 	} );

@@ -60,7 +60,7 @@ Most of the properties are set in the `block.json` file.
 }
 ```
 
-The **title** is the title of the block shown in the Inserter.
+The **title** is the title of the block shown in the Inserter and in other areas of the editor.
 
 The **icon** is the icon shown in the Inserter. The icon property expects any Dashicon name as a string, see [list of available icons](https://developer.wordpress.org/resource/dashicons/). You can also provide an SVG object, but for now it's easiest to just pick a Dashicon name.
 

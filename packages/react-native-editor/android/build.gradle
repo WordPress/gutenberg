@@ -24,17 +24,14 @@ allprojects {
         mavenCentral()
         mavenLocal()
         maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url("$rootDir/../../../node_modules/react-native/android")
-        }
-
-        maven {
             url "https://a8c-libs.s3.amazonaws.com/android"
             content {
                 includeGroup "org.wordpress"
                 includeGroup "org.wordpress.aztec"
+                includeGroup "org.wordpress-mobile"
             }
         }
+        maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
         maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
         maven { url 'https://www.jitpack.io' }
         google()

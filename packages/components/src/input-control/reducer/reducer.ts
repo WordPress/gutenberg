@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import type { SyntheticEvent } from 'react';
 
 /**
@@ -37,27 +36,6 @@ function mergeInitialState(
 		initialValue: value,
 	} as InputState;
 }
-
-/**
- * Composes multiple stateReducers into a single stateReducer, building
- * the pipeline to control the flow for state and actions.
- *
- * @param  fns State reducers.
- * @return The single composed stateReducer.
- */
-export const composeStateReducers = (
-	...fns: StateReducer[]
-): StateReducer => {
-	return ( ...args ) => {
-		return fns.reduceRight( ( state, fn ) => {
-			// TODO: Assess whether this can be replaced with a more standard `compose` implementation
-			// like wp.data.compose() (aka lodash flowRight) or Redux compose().
-			// The current implementation only works by functions mutating the original state object.
-			const fnState = fn( ...args );
-			return isEmpty( fnState ) ? state : { ...state, ...fnState };
-		}, {} as InputState );
-	};
-};
 
 /**
  * Creates a reducer that opens the channel for external state subscription
@@ -120,11 +98,6 @@ function inputControlStateReducer(
 				nextState.error = null;
 				nextState.isDirty = false;
 				nextState.value = action.payload.value || state.initialValue;
-				break;
-
-			case actions.UPDATE:
-				nextState.value = action.payload.value;
-				nextState.isDirty = false;
 				break;
 
 			/**
@@ -219,7 +192,6 @@ export function useInputControlStateReducer(
 		dispatch( { type: actions.INVALIDATE, payload: { error, event } } );
 	const reset = createChangeEvent( actions.RESET );
 	const commit = createChangeEvent( actions.COMMIT );
-	const update = createChangeEvent( actions.UPDATE );
 
 	const dragStart = createDragEvent( actions.DRAG_START );
 	const drag = createDragEvent( actions.DRAG );
@@ -242,6 +214,5 @@ export function useInputControlStateReducer(
 		pressUp,
 		reset,
 		state,
-		update,
 	} as const;
 }

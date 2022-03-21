@@ -248,7 +248,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 
 -	**Name:** core/gallery
 -	**Category:** media
--	**Supports:** align, anchor, ~~html~~
+-	**Supports:** align, anchor, spacing (blockGap), units (em, px, rem, vh, vw), ~~html~~
 -	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, shortCodeTransforms, sizeSlug
 
 ## Group
@@ -322,6 +322,15 @@ Create a bulleted or numbered list. ([Source](https://github.com/WordPress/guten
 -	**Category:** text
 -	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
+
+## List item
+
+Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item))
+
+-	**Name:** core/list-item
+-	**Category:** text
+-	**Supports:** ~~className~~
+-	**Attributes:** content, placeholder
 
 ## Login/out
 
@@ -689,8 +698,8 @@ Create a break between ideas or sections with a horizontal separator. ([Source](
 
 -	**Name:** core/separator
 -	**Category:** design
--	**Supports:** align (center, full, wide), anchor
--	**Attributes:** color, customColor
+-	**Supports:** align (center, full, wide), anchor, color (background, gradients, ~~text~~)
+-	**Attributes:** opacity
 
 ## Shortcode
 

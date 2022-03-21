@@ -92,7 +92,7 @@ describe( 'ColorPalette', () => {
 			const isOpen = true;
 			const onToggle = jest.fn();
 
-			const renderedToggleButton = shallow(
+			const renderedToggleButton = mount(
 				dropdown.props().renderToggle( { isOpen, onToggle } )
 			);
 

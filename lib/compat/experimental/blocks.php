@@ -60,7 +60,12 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			} elseif ( 'oldest' === $default_page ) {
 				$comment_args['paged'] = 1;
 			} elseif ( 'newest' === $default_page ) {
-				$comment_args['paged'] = ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
+				$comment_args['paged'] = (int) ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
+			}
+			// Set the `cpage` query var to ensure the previous and next pagination links are correct
+			// when inheriting the Discussion Settings.
+			if ( 0 === $page && isset( $comment_args['paged'] ) && $comment_args['paged'] > 0 ) {
+				set_query_var( 'cpage', $comment_args['paged'] );
 			}
 		}
 
@@ -159,3 +164,14 @@ if ( ! function_exists( 'gutenberg_rest_comment_set_children_as_embeddable' ) ) 
 	}
 }
 add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable' );
+
+/**
+ * Sets a global JS variable used to trigger the availability of the experimental list block.
+ */
+function gutenberg_enable_experimental_list_block() {
+	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-list-v2', get_option( 'gutenberg-experiments' ) ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableListBlockV2 = true', 'before' );
+	}
+}
+
+add_action( 'admin_init', 'gutenberg_enable_experimental_list_block' );

@@ -2,11 +2,10 @@
 	position: relative;
 	border: none;
 	background: none;
-	display: block;
 	border-radius: $radius-block-ui;
-	height: $grid-unit-60;
+	height: $grid-unit-80;
+	padding: $grid-unit-15;
 	font-family: inherit;
-	text-align: right;
 	width: 100%;
 	background-image:
 		repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200),
@@ -54,4 +53,13 @@
 			margin-bottom: #{ -($grid-unit-60 + $grid-unit-15) };
 		}
 	}
+}
+
+.components-color-palette__custom-color-name {
+	text-align: left;
+}
+
+.components-color-palette__custom-color-value {
+	margin-left: $grid-unit-20;
+	text-transform: uppercase;
 }

@@ -14,7 +14,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
-import { defaultEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -105,10 +105,10 @@ export function taxonomies( state = [], action ) {
 /**
  * Reducer managing the current theme.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string|undefined} Updated state.
  */
 export function currentTheme( state = undefined, action ) {
 	switch ( action.type ) {
@@ -122,10 +122,10 @@ export function currentTheme( state = undefined, action ) {
 /**
  * Reducer managing the current global styles id.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string|undefined} Updated state.
  */
 export function currentGlobalStylesId( state = undefined, action ) {
 	switch ( action.type ) {
@@ -139,10 +139,10 @@ export function currentGlobalStylesId( state = undefined, action ) {
 /**
  * Reducer managing the theme base global styles.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Record<string, object>} Updated state.
  */
 export function themeBaseGlobalStyles( state = {}, action ) {
 	switch ( action.type ) {
@@ -159,10 +159,10 @@ export function themeBaseGlobalStyles( state = {}, action ) {
 /**
  * Reducer managing the theme global styles variations.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Record<string, object>} Updated state.
  */
 export function themeGlobalStyleVariations( state = {}, action ) {
 	switch ( action.type ) {
@@ -335,7 +335,7 @@ function entity( entityConfig ) {
  *
  * @return {Object} Updated state.
  */
-export function entitiesConfig( state = defaultEntities, action ) {
+export function entitiesConfig( state = rootEntitiesConfig, action ) {
 	switch ( action.type ) {
 		case 'ADD_ENTITIES':
 			return [ ...state, ...action.entities ];
@@ -380,10 +380,10 @@ export const entities = ( state = {}, action ) => {
 		);
 	}
 
-	const newData = entitiesDataReducer( state.data, action );
+	const newData = entitiesDataReducer( state.records, action );
 
 	if (
-		newData === state.data &&
+		newData === state.records &&
 		newConfig === state.config &&
 		entitiesDataReducer === state.reducer
 	) {
@@ -392,7 +392,7 @@ export const entities = ( state = {}, action ) => {
 
 	return {
 		reducer: entitiesDataReducer,
-		data: newData,
+		records: newData,
 		config: newConfig,
 	};
 };

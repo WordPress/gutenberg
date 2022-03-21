@@ -37,7 +37,7 @@ export default function LineHeightControl( {
 		 * Step up/down actions can be triggered by keydowns of the up/down arrow keys,
 		 * or by clicking the spin buttons.
 		 */
-		switch ( nextValue ) {
+		switch ( `${ nextValue }` ) {
 			case `${ STEP }`:
 				// Increment by step value.
 				return BASE_DEFAULT_VALUE + STEP;
@@ -63,8 +63,8 @@ export default function LineHeightControl( {
 		const wasTypedOrPasted = [ 'insertText', 'insertFromPaste' ].includes(
 			action.payload.event.nativeEvent?.inputType
 		);
-		state.value = adjustNextValue( state.value, wasTypedOrPasted );
-		return state;
+		const value = adjustNextValue( state.value, wasTypedOrPasted );
+		return { ...state, value };
 	};
 
 	const value = isDefined ? lineHeight : RESET_VALUE;

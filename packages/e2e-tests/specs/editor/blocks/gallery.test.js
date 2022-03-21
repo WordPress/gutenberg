@@ -14,6 +14,7 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	clickButton,
+	openListView,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -47,7 +48,7 @@ describe( 'Gallery', () => {
 		const filename = await upload( '.wp-block-gallery input[type="file"]' );
 
 		const regex = new RegExp(
-			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"full\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image size-full\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
+			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
@@ -59,11 +60,16 @@ describe( 'Gallery', () => {
 		await upload( '.wp-block-gallery input[type="file"]' );
 		await page.waitForSelector( '.wp-block-gallery .wp-block-image' );
 
-		// The newly added image gets the focus, so refocus parent Gallery
-		// block before trying to edit caption.
-		await clickButton( 'Gallery' );
+		// The Gallery needs to be selected from the List view panel due to the
+		// way that Image uploads take and lose focus.
+		await openListView();
+		const galleryListLink = await page.waitForXPath(
+			`//a[contains(text(), 'Gallery')]`
+		);
+		await galleryListLink.click();
 
 		await page.click( '.wp-block-gallery .blocks-gallery-caption' );
+
 		await page.keyboard.type( galleryCaption );
 
 		expect( await getEditedPostContent() ).toMatch(
