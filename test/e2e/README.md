@@ -2,7 +2,7 @@
 
 End-To-End (E2E) tests for WordPress.
 
-This directory is the new place for E2E tests in Gutenberg. We expect new tests to be placed here and follow the [best practices](#best-practices) listed below. We use [Playwright](https://playwright.dev/) and its test runner to run the tests in Chromium by default. [`@wordpress/e2e-test-utils`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/e2e-test-utils-playwright) is used as a helper package to simplify the usages. See the documentation of both for more information.
+This directory is the new place for E2E tests in Gutenberg. We expect new tests to be placed here and follow the [best practices](#best-practices) listed below. We use [Playwright](https://playwright.dev/) and its test runner to run the tests in Chromium by default. [`@wordpress/e2e-test-utils-playwright`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/e2e-test-utils-playwright) is used as a helper package to simplify the usages. See the documentation of both for more information.
 
 See the [migration guide](https://github.com/WordPress/gutenberg/tree/HEAD/test/e2e/MIGRATION.md) if you're coming from the previous Jest + Puppeteer framework.
 
