@@ -203,13 +203,20 @@ const CommentsList = ( {
 } ) => (
 	<ol { ...blockProps }>
 		{ comments &&
-			comments.map( ( comment, index ) => (
+			comments.map( ( { commentId, ...comment }, index ) => (
 				<BlockContextProvider
 					key={ comment.commentId || index }
-					value={ comment }
+					value={ {
+						// If the commentId is negative it means that this comment is a
+						// "placeholder" and that the block is most likely being used in the
+						// site editor. In this case, we have to set the commentId to `null`
+						// because otherwise the (non-existent) comment with a negative ID
+						// would be reqested from the REST API.
+						commentId: commentId < 0 ? null : commentId,
+					} }
 				>
 					<CommentTemplateInnerBlocks
-						comment={ comment }
+						comment={ { commentId, ...comment } }
 						activeCommentId={ activeCommentId }
 						setActiveCommentId={ setActiveCommentId }
 						blocks={ blocks }
