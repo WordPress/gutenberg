@@ -142,6 +142,8 @@ export default function NavigationInspector() {
 
 	const hasMoreThanOneNavigationMenu = navigationMenus?.length > 1;
 
+	const hasNavigationMenus = !! navigationMenus?.length;
+
 	useEffect( () => {
 		if ( isResolvingNavigationMenus ) {
 			speak( 'Loading Navigation sidebar menus.' );
@@ -162,21 +164,14 @@ export default function NavigationInspector() {
 		}
 	}, [ isLoadingInnerBlocks, hasLoadedInnerBlocks ] );
 
-	const hasNavigationMenus =
-		hasResolvedNavigationMenus && navigationMenus?.length;
-
-	if ( ! hasNavigationMenus ) {
-		return (
-			<div className="edit-site-navigation-inspector">
+	return (
+		<div className="edit-site-navigation-inspector">
+			{ hasResolvedNavigationMenus && ! hasNavigationMenus && (
 				<p className="edit-site-navigation-inspector__empty-msg">
 					{ __( 'There are no Navigation Menus.' ) }
 				</p>
-			</div>
-		);
-	}
+			) }
 
-	return (
-		<div className="edit-site-navigation-inspector">
 			{ ! hasResolvedNavigationMenus && (
 				<div className="edit-site-navigation-inspector__placeholder" />
 			) }
