@@ -3,6 +3,15 @@
 	padding: 16px;
 	background-color: #f7f7f7;
 	border-radius: 8px;
-	top: -50%;
-	left: -50%;
+}
+
+.draggable-placeholder__container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 10;
+	background-color: $gray-lighten-30;
+	border-radius: 8px;
 }
