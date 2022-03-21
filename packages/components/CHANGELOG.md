@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Fix `UnitControl`’s reset of unit when the quantity value is cleared. ([#39531](https://github.com/WordPress/gutenberg/pull/39531/)).
+
 ### Enhancements
 
 -   `BaseControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#39325](https://github.com/WordPress/gutenberg/pull/39325)).
