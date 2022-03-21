@@ -7,7 +7,6 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import Edit from './edit';
-
 import { BlockEditContextProvider, useBlockEditContext } from './context';
 
 /**
