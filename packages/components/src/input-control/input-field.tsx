@@ -67,7 +67,6 @@ function InputField(
 		pressEnter,
 		pressUp,
 		reset,
-		update,
 	} = useInputControlStateReducer( stateReducer, {
 		isDragEnabled,
 		value: valueProp,
@@ -91,10 +90,12 @@ function InputField(
 			return;
 		}
 		if ( ! isFocused && ! wasDirtyOnBlur.current ) {
-			update( valueProp, _event as SyntheticEvent );
+			commit( valueProp, _event as SyntheticEvent );
 		} else if ( ! isDirty ) {
 			onChange( value, {
-				event: _event as ChangeEvent< HTMLInputElement >,
+				event: _event as
+					| ChangeEvent< HTMLInputElement >
+					| PointerEvent< HTMLInputElement >,
 			} );
 			wasDirtyOnBlur.current = false;
 		}
@@ -108,7 +109,7 @@ function InputField(
 		 * If isPressEnterToChange is set, this commits the value to
 		 * the onChange callback.
 		 */
-		if ( isPressEnterToChange && isDirty ) {
+		if ( isDirty || ! event.target.validity.valid ) {
 			wasDirtyOnBlur.current = true;
 			handleOnCommit( event );
 		}
@@ -168,7 +169,18 @@ function InputField(
 
 	const dragGestureProps = useDrag< PointerEvent< HTMLInputElement > >(
 		( dragProps ) => {
-			const { distance, dragging, event } = dragProps;
+			const { distance, dragging, event, target } = dragProps;
+
+			// The `target` prop always references the `input` element while, by
+			// default, the `dragProps.event.target` property would reference the real
+			// event target (i.e. any DOM element that the pointer is hovering while
+			// dragging). Ensuring that the `target` is always the `input` element
+			// allows consumers of `InputControl` (or any higher-level control) to
+			// check the input's validity by accessing `event.target.validity.valid`.
+			dragProps.event = {
+				...dragProps.event,
+				target,
+			};
 
 			if ( ! distance ) return;
 			event.stopPropagation();

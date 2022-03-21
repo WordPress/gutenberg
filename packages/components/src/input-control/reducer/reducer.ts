@@ -100,11 +100,6 @@ function inputControlStateReducer(
 				nextState.value = action.payload.value || state.initialValue;
 				break;
 
-			case actions.UPDATE:
-				nextState.value = action.payload.value;
-				nextState.isDirty = false;
-				break;
-
 			/**
 			 * Validation
 			 */
@@ -197,7 +192,6 @@ export function useInputControlStateReducer(
 		dispatch( { type: actions.INVALIDATE, payload: { error, event } } );
 	const reset = createChangeEvent( actions.RESET );
 	const commit = createChangeEvent( actions.COMMIT );
-	const update = createChangeEvent( actions.UPDATE );
 
 	const dragStart = createDragEvent( actions.DRAG_START );
 	const drag = createDragEvent( actions.DRAG );
@@ -220,6 +214,5 @@ export function useInputControlStateReducer(
 		pressUp,
 		reset,
 		state,
-		update,
 	} as const;
 }
