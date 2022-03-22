@@ -13,6 +13,7 @@ import {
  * Internal dependencies
  */
 import * as archives from './archives';
+import * as avatar from './avatar';
 import * as audio from './audio';
 import * as button from './button';
 import * as buttons from './buttons';
@@ -251,10 +252,10 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	? ( { enableFSEBlocks } = {} ) => {
 			[
 				// Experimental blocks.
+				avatar,
 				homeLink,
 				postAuthorName,
 				queryNoResults,
-
 				// Full Site Editing blocks.
 				...( enableFSEBlocks
 					? [
