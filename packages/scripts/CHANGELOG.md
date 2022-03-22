@@ -1,7 +1,7 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
-
+-   Parse block.json files to look for a `files` property and generate a list of files to be copied from `src` to the output directory (`build` by default)([39653](https://github.com/WordPress/gutenberg/pull/39653)
 ## 22.2.0 (2022-03-11)
 
 ### Enhancement
