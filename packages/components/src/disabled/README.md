@@ -33,7 +33,7 @@ const MyDisabled = () => {
 };
 ```
 
-A component can detect if it has been wrapped in a `<Disabled>` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Context` and `useContext`.
+A component can detect if it has been wrapped in a `<Disabled />` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Context`.
 
 ```jsx
 function CustomButton() {
