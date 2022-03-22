@@ -109,23 +109,23 @@ export function useBorderControl(
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.BorderControl, className );
+		return cx( styles.borderControl, className );
 	}, [ className, cx ] );
 
 	const innerWrapperClassName = useMemo( () => {
 		const wrapperWidth = isCompact ? '90px' : width;
 		const widthStyle =
-			!! wrapperWidth && styles.WrapperWidth( wrapperWidth );
+			!! wrapperWidth && styles.wrapperWidth( wrapperWidth );
 
-		return cx( styles.InnerWrapper, widthStyle );
+		return cx( styles.innerWrapper(), widthStyle );
 	}, [ isCompact, width, cx ] );
 
 	const widthControlClassName = useMemo( () => {
-		return cx( styles.BorderWidthControl );
+		return cx( styles.borderWidthControl() );
 	}, [ cx ] );
 
 	const sliderClassName = useMemo( () => {
-		return cx( styles.BorderSlider );
+		return cx( styles.borderSlider() );
 	}, [ cx ] );
 
 	return {

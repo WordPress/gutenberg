@@ -22,11 +22,11 @@ const labelStyles = css`
 	font-weight: 500;
 `;
 
-export const BorderControl = css`
+export const borderControl = css`
 	position: relative;
 `;
 
-export const InnerWrapper = css`
+export const innerWrapper = () => css`
 	border: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
 	border-radius: 2px;
 	flex: 1 0 40%;
@@ -48,14 +48,14 @@ export const InnerWrapper = css`
 	}
 `;
 
-export const WrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
+export const wrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
 	return css`
 		width: ${ width };
 		flex: 0 0 auto;
 	`;
 };
 
-export const BorderControlDropdown = css`
+export const borderControlDropdown = () => css`
 	background: #fff;
 	${ rtl(
 		{
@@ -74,7 +74,7 @@ export const BorderControlDropdown = css`
 	}
 `;
 
-export const ColorIndicatorBorder = ( border?: Border ) => {
+export const colorIndicatorBorder = ( border?: Border ) => {
 	const { color, style } = border || {};
 
 	const fallbackColor =
@@ -86,13 +86,13 @@ export const ColorIndicatorBorder = ( border?: Border ) => {
 	`;
 };
 
-export const ColorIndicatorWrapper = ( border?: Border ) => {
+export const colorIndicatorWrapper = ( border?: Border ) => {
 	const { style } = border || {};
 
 	return css`
 		border-radius: 9999px;
 		border: 2px solid transparent;
-		${ style ? ColorIndicatorBorder( border ) : undefined }
+		${ style ? colorIndicatorBorder( border ) : undefined }
 		width: 28px;
 		height: 28px;
 		padding: 2px;
@@ -115,14 +115,14 @@ export const ColorIndicatorWrapper = ( border?: Border ) => {
 	`;
 };
 
-export const BorderControlPopover = css`
+export const borderControlPopover = css`
 	/* Remove padding from content, this will be re-added via inner elements*/
 	&& > div > div {
 		padding: 0;
 	}
 `;
 
-export const BorderControlPopoverControls = css`
+export const borderControlPopoverControls = css`
 	padding: ${ space( 4 ) };
 
 	> div:first-of-type > ${ StyledLabel } {
@@ -136,10 +136,10 @@ export const BorderControlPopoverControls = css`
 	}
 `;
 
-export const BorderControlPopoverContent = css``;
-export const BorderColorIndicator = css``;
+export const borderControlPopoverContent = css``;
+export const borderColorIndicator = css``;
 
-export const ResetButton = css`
+export const resetButton = css`
 	justify-content: center;
 	width: 100%;
 
@@ -150,7 +150,7 @@ export const ResetButton = css`
 	}
 `;
 
-export const BorderWidthControl = css`
+export const borderWidthControl = () => css`
 	/* Target the InputControl's backdrop */
 	&&& ${ BackdropUI } {
 		border: none;
@@ -163,13 +163,13 @@ export const BorderWidthControl = css`
 	}
 `;
 
-export const BorderControlStylePicker = css`
+export const borderControlStylePicker = css`
 	${ StyledLabel } {
 		${ labelStyles }
 	}
 `;
 
-export const BorderStyleButton = css`
+export const borderStyleButton = css`
 	&&&&& {
 		min-width: 30px;
 		width: 30px;
@@ -178,7 +178,7 @@ export const BorderStyleButton = css`
 	}
 `;
 
-export const BorderSlider = css`
+export const borderSlider = () => css`
 	flex: 1 1 60%;
 	${ rtl( { marginRight: space( 3 ) } )() }
 

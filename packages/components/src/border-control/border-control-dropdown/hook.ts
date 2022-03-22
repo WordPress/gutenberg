@@ -52,31 +52,31 @@ export function useBorderControlDropdown(
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.BorderControlDropdown, className );
+		return cx( styles.borderControlDropdown(), className );
 	}, [ className, cx ] );
 
 	const indicatorClassName = useMemo( () => {
-		return cx( styles.BorderColorIndicator );
+		return cx( styles.borderColorIndicator );
 	}, [ cx ] );
 
 	const indicatorWrapperClassName = useMemo( () => {
-		return cx( styles.ColorIndicatorWrapper( border ) );
+		return cx( styles.colorIndicatorWrapper( border ) );
 	}, [ border, cx ] );
 
 	const popoverClassName = useMemo( () => {
-		return cx( styles.BorderControlPopover );
+		return cx( styles.borderControlPopover );
 	}, [ cx ] );
 
 	const popoverControlsClassName = useMemo( () => {
-		return cx( styles.BorderControlPopoverControls );
+		return cx( styles.borderControlPopoverControls );
 	}, [ cx ] );
 
 	const popoverContentClassName = useMemo( () => {
-		return cx( styles.BorderControlPopoverContent );
+		return cx( styles.borderControlPopoverContent );
 	}, [ cx ] );
 
 	const resetButtonClassName = useMemo( () => {
-		return cx( styles.ResetButton );
+		return cx( styles.resetButton );
 	}, [ cx ] );
 
 	return {

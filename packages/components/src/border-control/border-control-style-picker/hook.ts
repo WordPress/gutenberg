@@ -23,11 +23,11 @@ export function useBorderControlStylePicker(
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.BorderControlStylePicker, className );
+		return cx( styles.borderControlStylePicker, className );
 	}, [ className, cx ] );
 
 	const buttonClassName = useMemo( () => {
-		return cx( styles.BorderStyleButton );
+		return cx( styles.borderStyleButton );
 	}, [ cx ] );
 
 	return { ...otherProps, className: classes, buttonClassName };
