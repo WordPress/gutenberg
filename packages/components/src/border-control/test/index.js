@@ -115,8 +115,6 @@ describe( 'BorderControl', () => {
 			renderBorderControl();
 			openPopover();
 
-			const headerLabel = screen.getByText( 'Border color' );
-			const closeButton = getButton( 'Close border color' );
 			const customColorPicker = getButton( /Custom color picker/ );
 			const colorSwatchButtons = screen.getAllByRole( 'button', {
 				name: /^Color:/,
@@ -127,8 +125,6 @@ describe( 'BorderControl', () => {
 			const dottedButton = getButton( 'Dotted' );
 			const resetButton = getButton( 'Reset to default' );
 
-			expect( headerLabel ).toBeInTheDocument();
-			expect( closeButton ).toBeInTheDocument();
 			expect( customColorPicker ).toBeInTheDocument();
 			expect( colorSwatchButtons.length ).toEqual( colors.length );
 			expect( styleLabel ).toBeInTheDocument();
@@ -136,6 +132,17 @@ describe( 'BorderControl', () => {
 			expect( dashedButton ).toBeInTheDocument();
 			expect( dottedButton ).toBeInTheDocument();
 			expect( resetButton ).toBeInTheDocument();
+		} );
+
+		it( 'should render color and style popover header', () => {
+			renderBorderControl( { showDropdownHeader: true } );
+			openPopover();
+
+			const headerLabel = screen.getByText( 'Border color' );
+			const closeButton = getButton( 'Close border color' );
+
+			expect( headerLabel ).toBeInTheDocument();
+			expect( closeButton ).toBeInTheDocument();
 		} );
 
 		it( 'should not render style options when opted out of', () => {
@@ -303,7 +310,7 @@ describe( 'BorderControl', () => {
 		} );
 
 		it( 'should take no action when color and style popover is closed', () => {
-			renderBorderControl();
+			renderBorderControl( { showDropdownHeader: true } );
 			openPopover();
 			clickButton( 'Close border color' );
 
