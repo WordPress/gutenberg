@@ -26,9 +26,7 @@ function render_block_core_query_pagination( $attributes, $content ) {
 	);
 
 	return sprintf(
-		'<nav %1$s>
-			%2$s
-		</nav>',
+		'<nav %1$s>%2$s</nav>',
 		$wrapper_attributes,
 		$content
 	);
