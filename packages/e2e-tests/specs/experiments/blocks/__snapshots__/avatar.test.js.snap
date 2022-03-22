@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Avatar block can be created by typing "/avatar" 1`] = `"<!-- wp:avatar /-->"`;
-
-exports[`Avatar block can be inserted 1`] = `"<!-- wp:avatar /-->"`;
