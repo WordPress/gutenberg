@@ -214,8 +214,14 @@ export function useRichText( {
 			return;
 		}
 
-		if ( ref.current.ownerDocument.activeElement !== ref.current )
+		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
+			// Can't focus if there is a parent content editable.
+			ref.current.parentElement.closest(
+				'[contenteditable]'
+			).contentEditable = false;
 			ref.current.focus();
+		}
+
 		applyFromProps();
 		hadSelectionUpdate.current = false;
 	}, [ hadSelectionUpdate.current ] );
