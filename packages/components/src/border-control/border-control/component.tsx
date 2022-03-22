@@ -44,6 +44,7 @@ const BorderControl = (
 		onWidthChange,
 		placeholder,
 		previousStyleSelection,
+		showDropdownHeader,
 		sliderClassName,
 		value: border,
 		widthControlClassName,
@@ -71,6 +72,7 @@ const BorderControl = (
 						enableStyle={ enableStyle }
 						onChange={ onBorderChange }
 						previousStyleSelection={ previousStyleSelection }
+						showDropdownHeader={ showDropdownHeader }
 						__experimentalHasMultipleOrigins={
 							__experimentalHasMultipleOrigins
 						}

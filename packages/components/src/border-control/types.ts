@@ -70,9 +70,9 @@ export type BorderControlProps = ColorProps &
 		 */
 		enableStyle?: boolean;
 		/**
-		 * This flags the `BorderControl` to render with a more compact appearance.
-		 * It restricts the width of the control and prevents it from expanding to
-		 * take up additional space.
+		 * This flags the `BorderControl` to render with a more compact
+		 * appearance. It restricts the width of the control and prevents it
+		 * from expanding to take up additional space.
 		 */
 		isCompact?: boolean;
 		/**
@@ -81,16 +81,22 @@ export type BorderControlProps = ColorProps &
 		 */
 		onChange: ( value?: Border ) => void;
 		/**
-		 * If opted into, sanitizing the border means that if no width or color have
-		 * been selected, the border style is also cleared and `undefined`
+		 * If opted into, sanitizing the border means that if no width or color
+		 * have been selected, the border style is also cleared and `undefined`
 		 * is returned as the new border value.
 		 *
 		 * @default true
 		 */
 		shouldSanitizeBorder?: boolean;
 		/**
-		 * An object representing a border or `undefined`. Used to set the current
-		 * border configuration for this component.
+		 * Whether or not to show the header for the border color and style
+		 * picker dropdown. The header includes a label for the color picker
+		 * and a close button.
+		 */
+		showDropdownHeader?: boolean;
+		/**
+		 * An object representing a border or `undefined`. Used to set the
+		 * current border configuration for this component.
 		 */
 		value?: Border;
 		/**
@@ -99,8 +105,8 @@ export type BorderControlProps = ColorProps &
 		 */
 		width?: CSSProperties[ 'width' ];
 		/**
-		 * Flags whether this `BorderControl` should also render a `RangeControl`
-		 * for additional control over a border's width.
+		 * Flags whether this `BorderControl` should also render a
+		 * `RangeControl` for additional control over a border's width.
 		 */
 		withSlider?: boolean;
 	};
@@ -128,6 +134,12 @@ export type DropdownProps = ColorProps & {
 	 * to a non-zero value.
 	 */
 	previousStyleSelection?: string;
+	/**
+	 * Whether or not to render a header for the border color and style picker
+	 * dropdown. The header includes a label for the color picker and a
+	 * close button.
+	 */
+	showDropdownHeader?: boolean;
 };
 
 export type StylePickerProps = LabelProps & {

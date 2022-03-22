@@ -101,6 +101,7 @@ Default.args = {
 	enableStyle: true,
 	isCompact: true,
 	shouldSanitizeBorder: true,
+	showDropdownHeader: false,
 	width: '110px',
 	withSlider: true,
 	__experimentalIsRenderedInSidebar: false,

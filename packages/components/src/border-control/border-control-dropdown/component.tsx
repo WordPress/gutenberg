@@ -145,6 +145,7 @@ const BorderControlDropdown = (
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
+		showDropdownHeader,
 		enableStyle = true,
 		...otherProps
 	} = useBorderControlDropdown( props );
@@ -186,15 +187,17 @@ const BorderControlDropdown = (
 	const renderContent = ( { onClose }: PopoverProps ) => (
 		<>
 			<VStack className={ popoverControlsClassName } spacing={ 6 }>
-				<HStack>
-					<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
-					<Button
-						isSmall
-						label={ __( 'Close border color' ) }
-						icon={ closeSmall }
-						onClick={ onClose }
-					/>
-				</HStack>
+				{ showDropdownHeader ? (
+					<HStack>
+						<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
+						<Button
+							isSmall
+							label={ __( 'Close border color' ) }
+							icon={ closeSmall }
+							onClick={ onClose }
+						/>
+					</HStack>
+				) : undefined }
 				<ColorPalette
 					className={ popoverContentClassName }
 					value={ color }

@@ -116,6 +116,13 @@ new border value.
 - Required: No
 - Default: true
 
+### `showDropdownHeader`: `boolean`
+
+Whether or not to render a header for the border color and style picker
+dropdown. The header includes a label for the color picker and a close button.
+
+- Required: No
+
 ### `value`: `Object`
 
 An object representing a border or `undefined`. Used to set the current border
