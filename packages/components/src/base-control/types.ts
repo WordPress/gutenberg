@@ -39,7 +39,7 @@ export type BaseControlProps = {
 	 */
 	hideLabelFromVision?: boolean;
 	className?: HTMLAttributes< typeof Wrapper >[ 'className' ];
-	children?: HTMLAttributes< typeof StyledField >[ 'children' ];
+	children: HTMLAttributes< typeof StyledField >[ 'children' ];
 };
 
 export type BaseControlVisualLabelProps = Pick<
