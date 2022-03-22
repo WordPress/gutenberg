@@ -18,7 +18,7 @@ const variations = [
 		name: 'group-row',
 		title: __( 'Row' ),
 		description: __( 'Blocks shown in a row.' ),
-		attributes: { layout: { type: 'flex', allowOrientation: false } },
+		attributes: { layout: { type: 'flex' } },
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes.layout?.type === 'flex',
