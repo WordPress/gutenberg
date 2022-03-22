@@ -333,6 +333,7 @@ function RichTextWrapper(
 					forwardedRef,
 					autocompleteProps.ref,
 					props.ref,
+					forwardedRef,
 					richTextRef,
 					useInputRules( {
 						value,
