@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { Button, Flex, FlexItem, Modal } from '@wordpress/components';
-import {
-	store as coreStore,
-	useEntityId,
-	useEntityProp,
-} from '@wordpress/core-data';
+import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -15,7 +11,7 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 	const [ isConfirmModalVisible, setIsConfirmModalVisible ] = useState(
 		false
 	);
-	const id = useEntityId( 'postType', 'wp_navigation' );
+	const [ id ] = useEntityProp( 'postType', 'wp_navigation', 'id' );
 	const [ title ] = useEntityProp( 'postType', 'wp_navigation', 'title' );
 	const { deleteEntityRecord } = useDispatch( coreStore );
 
