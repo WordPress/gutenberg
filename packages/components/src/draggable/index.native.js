@@ -1,9 +1,13 @@
 /**
  * External dependencies
  */
-import { Platform } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue } from 'react-native-reanimated';
+
+/**
+ * WordPress dependencies
+ */
+import { Platform } from '@wordpress/element';
 
 /**
  * Draggable component
@@ -29,7 +33,6 @@ export default function Draggable( {
 	wrapperAnimatedStyles,
 } ) {
 	const isDragging = useSharedValue( false );
-	const isIOS = Platform.OS === 'ios';
 
 	const longPressGesture = Gesture.LongPress()
 		.onStart( ( ev ) => {
@@ -56,7 +59,7 @@ export default function Draggable( {
 			'worklet';
 			if ( isDragging.value ) {
 				state.activate();
-			} else if ( isIOS ) {
+			} else if ( Platform.isIOS ) {
 				state.fail();
 			}
 		} )
