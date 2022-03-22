@@ -2,6 +2,6 @@
 
 exports[`Separator can be created by three dashes and enter 1`] = `
 "<!-- wp:separator -->
-<hr class=\\"wp-block-separator\\"/>
+<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
 <!-- /wp:separator -->"
 `;

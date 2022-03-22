@@ -15,7 +15,7 @@ const storeConfig = {
 	reducer,
 	actions,
 	selectors,
-	persist: [ 'enableItems', 'preferences' ],
+	persist: [ 'enableItems' ],
 };
 
 /**

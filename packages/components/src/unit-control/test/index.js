@@ -100,7 +100,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should not render select, if units are disabled', () => {
-			render( <UnitControl unit="em" units={ [] } /> );
+			render( <UnitControl value="3em" units={ [] } /> );
 			const input = getInput();
 			const select = getSelect();
 
@@ -224,17 +224,24 @@ describe( 'UnitControl', () => {
 
 	describe( 'Unit', () => {
 		it( 'should update unit value on change', async () => {
-			let state = 'px';
+			let state = '14rem';
 			const setState = ( nextState ) => ( state = nextState );
 
+			const spy = jest.fn();
+
 			const { user } = render(
-				<UnitControl unit={ state } onUnitChange={ setState } />
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					onUnitChange={ spy }
+				/>
 			);
 
 			const select = getSelect();
-			await user.selectOptions( select, [ 'em' ] );
+			await user.selectOptions( select, [ 'px' ] );
 
-			expect( state ).toBe( 'em' );
+			expect( spy ).toHaveBeenCalledWith( 'px', expect.anything() );
+			expect( state ).toBe( '14px' );
 		} );
 
 		it( 'should render customized units, if defined', () => {
@@ -319,7 +326,6 @@ describe( 'UnitControl', () => {
 			const { user } = render(
 				<UnitControl
 					value={ state }
-					unit="%"
 					units={ [ { value: '%', label: '%' } ] }
 					onChange={ setState }
 				/>
@@ -358,6 +364,25 @@ describe( 'UnitControl', () => {
 
 			await waitFor( () => expect( selectA ).toHaveValue( 'vw' ) );
 			expect( selectB ).toHaveValue( 'vw' );
+		} );
+
+		it( 'should maintain the chosen non-default unit when value is cleared', async () => {
+			const units = [
+				{ value: 'pt', label: 'pt' },
+				{ value: 'vmax', label: 'vmax' },
+			];
+
+			const { user } = render(
+				<UnitControl units={ units } value="5" />
+			);
+
+			const select = getSelect();
+			await user.selectOptions( select, [ 'vmax' ] );
+
+			const input = getInput();
+			await user.clear( input );
+
+			expect( select ).toHaveValue( 'vmax' );
 		} );
 	} );
 
@@ -450,16 +475,16 @@ describe( 'UnitControl', () => {
 			expect( state ).toBe( '123rem' );
 		} );
 
-		it( 'should update unit after initial render and with new unit prop', () => {
+		it( 'should update unit after initial render and with new unit prop', async () => {
 			const { rerender } = render( <UnitControl value={ '10%' } /> );
 
 			const select = getSelect();
 
 			expect( select.value ).toBe( '%' );
 
-			rerender( <UnitControl value={ '20' } unit="em" /> );
+			rerender( <UnitControl value={ '20vh' } /> );
 
-			expect( select.value ).toBe( 'em' );
+			await waitFor( () => expect( select.value ).toBe( 'vh' ) );
 		} );
 
 		it( 'should fallback to default unit if parsed unit is invalid', () => {

@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/list-item",
+		"isValid": true,
+		"attributes": {
+			"content": ""
+		},
+		"innerBlocks": []
+	}
+]

@@ -1,0 +1,9 @@
+[
+	{
+		"blockName": "core/list-item",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "<li></li>",
+		"innerContent": [ "<li></li>" ]
+	}
+]

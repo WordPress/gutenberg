@@ -225,14 +225,39 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/jest*/**/*.js' ],
+			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
+			excludedFiles: [ 'test/e2e/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
-			files: [ 'packages/e2e-test*/**/*.js' ],
+			files: [
+				'packages/e2e-tests/**/*.js',
+				'packages/e2e-test-utils/**/*.js',
+			],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
+		},
+		{
+			files: [
+				'test/e2e/**/*.[tj]s',
+				'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			],
+			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e-playwright' ],
 			rules: {
-				'jest/expect-expect': 'off',
+				'@wordpress/no-global-active-element': 'off',
+				'@wordpress/no-global-get-selection': 'off',
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector: 'CallExpression[callee.name="$"]',
+						message:
+							'`$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector: 'CallExpression[callee.name="$$"]',
+						message:
+							'`$$` is discouraged, please use `locator` instead',
+					},
+				],
 			},
 		},
 		{
@@ -249,9 +274,13 @@ module.exports = {
 			},
 		},
 		{
-			files: [ '**/@(storybook|stories)/*' ],
+			files: [
+				'**/@(storybook|stories)/*',
+				'packages/components/src/**/*.tsx',
+			],
 			rules: {
-				// Useful to add story descriptions via JSdoc without specifying params.
+				// Useful to add story descriptions via JSDoc without specifying params,
+				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
 			},
 		},

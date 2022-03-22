@@ -178,7 +178,7 @@ Once all the dependencies are in place, all that's left is to run `npm start` an
 
 If you now go to the Plugins page, you should see a plugin called **My first Gutenberg App**. Go ahead and activate it. A new menu item labeled _My first Gutenberg app_ should show up. Once you click it, you will see a page that says _Hello from JavaScript!_:
 
-![](/docs/how-to-guides/data-basics/media/setup/hello-from-js.jpg)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/setup/hello-from-js.jpg)
 
 Congratulations! You are now ready to start building the app!
 

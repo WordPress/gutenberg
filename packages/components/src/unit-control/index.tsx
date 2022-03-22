@@ -7,6 +7,7 @@ import type {
 	ForwardedRef,
 	SyntheticEvent,
 	ChangeEvent,
+	PointerEvent,
 } from 'react';
 import { omit } from 'lodash';
 import classnames from 'classnames';
@@ -14,6 +15,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -35,7 +37,14 @@ import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import type { StateReducer } from '../input-control/reducer/state';
 
 function UnforwardedUnitControl(
-	{
+	unitControlProps: WordPressComponentProps<
+		UnitControlProps,
+		'input',
+		false
+	>,
+	forwardedRef: ForwardedRef< any >
+) {
+	const {
 		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
 		className,
@@ -45,7 +54,7 @@ function UnforwardedUnitControl(
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = true,
 		label,
-		onChange,
+		onChange: onChangeProp,
 		onUnitChange,
 		size = 'default',
 		style,
@@ -53,9 +62,16 @@ function UnforwardedUnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		...props
-	}: WordPressComponentProps< UnitControlProps, 'input', false >,
-	forwardedRef: ForwardedRef< any >
-) {
+	} = unitControlProps;
+
+	if ( 'unit' in unitControlProps ) {
+		deprecated( 'UnitControl unit prop', {
+			since: '5.6',
+			hint: 'The unit should be provided within the `value` prop.',
+			version: '6.2',
+		} );
+	}
+
 	// The `value` prop, in theory, should not be `null`, but the following line
 	// ensures it fallback to `undefined` in case a consumer of `UnitControl`
 	// still passes `null` as a `value`.
@@ -79,7 +95,9 @@ function UnforwardedUnitControl(
 	);
 
 	useEffect( () => {
-		setUnit( parsedUnit );
+		if ( parsedUnit !== undefined ) {
+			setUnit( parsedUnit );
+		}
 	}, [ parsedUnit ] );
 
 	// Stores parsed value for hand-off in state reducer.
@@ -89,14 +107,18 @@ function UnforwardedUnitControl(
 
 	const handleOnQuantityChange = (
 		nextQuantityValue: number | string | undefined,
-		changeProps: { event: ChangeEvent< HTMLInputElement > }
+		changeProps: {
+			event:
+				| ChangeEvent< HTMLInputElement >
+				| PointerEvent< HTMLInputElement >;
+		}
 	) => {
 		if (
 			nextQuantityValue === '' ||
 			typeof nextQuantityValue === 'undefined' ||
 			nextQuantityValue === null
 		) {
-			onChange?.( '', changeProps );
+			onChangeProp?.( '', changeProps );
 			return;
 		}
 
@@ -111,7 +133,7 @@ function UnforwardedUnitControl(
 			unit
 		).join( '' );
 
-		onChange?.( onChangeValue, changeProps );
+		onChangeProp?.( onChangeValue, changeProps );
 	};
 
 	const handleOnUnitChange: UnitControlOnChangeCallback = (
@@ -126,7 +148,7 @@ function UnforwardedUnitControl(
 			nextValue = `${ data.default }${ nextUnitValue }`;
 		}
 
-		onChange?.( nextValue, changeProps );
+		onChangeProp?.( nextValue, changeProps );
 		onUnitChange?.( nextUnitValue, changeProps );
 
 		setUnit( nextUnitValue );
@@ -155,7 +177,7 @@ function UnforwardedUnitControl(
 				: undefined;
 			const changeProps = { event, data };
 
-			onChange?.(
+			onChangeProp?.(
 				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
 				changeProps
 			);

@@ -23,8 +23,17 @@ export default function SiteExport() {
 				parse: false,
 			} );
 			const blob = await response.blob();
+			const contentDisposition = response.headers.get(
+				'content-disposition'
+			);
+			const contentDispositionMatches = contentDisposition.match(
+				/=(.+)\.zip/
+			);
+			const fileName = contentDispositionMatches[ 1 ]
+				? contentDispositionMatches[ 1 ]
+				: 'edit-site-export';
 
-			downloadjs( blob, 'edit-site-export.zip', 'application/zip' );
+			downloadjs( blob, fileName + '.zip', 'application/zip' );
 		} catch ( errorResponse ) {
 			let error = {};
 			try {
