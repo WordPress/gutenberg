@@ -167,6 +167,11 @@ function Navigation( {
 	// the Select Menu dropdown.
 	useNavigationEntities();
 
+	const [ showNavigationMenuDeleteNotice ] = useNavigationNotice( {
+		name: 'block-library/core/navigation/delete',
+		message: __( 'Navigation Menu successfully deleted.' ),
+	} );
+
 	const [
 		showNavigationMenuCreateNotice,
 		hideNavigationMenuCreateNotice,
@@ -794,7 +799,10 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationMenu &&
 							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
-									onDelete={ resetToEmptyBlock }
+									onDelete={ () => {
+										resetToEmptyBlock();
+										showNavigationMenuDeleteNotice();
+									} }
 								/>
 							) }
 					</InspectorControls>
