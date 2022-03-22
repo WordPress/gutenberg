@@ -22,6 +22,10 @@
 			"default": false
 		}
 	},
+	"styles": [
+		{ "name": "default", "label": "Default", "isDefault": true },
+		{ "name": "outline", "label": "Outline" }
+	],
 	"supports": {
 		"html": false,
 		"align": true

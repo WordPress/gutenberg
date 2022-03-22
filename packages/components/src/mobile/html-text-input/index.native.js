@@ -52,7 +52,7 @@ export class HTMLTextInput extends Component {
 
 	componentWillUnmount() {
 		removeFilter( 'native.persist-html', 'html-text-input' );
-		//TODO: Blocking main thread
+		// TODO: Blocking main thread.
 		this.stopEditing();
 	}
 

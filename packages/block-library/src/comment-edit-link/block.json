@@ -22,7 +22,11 @@
 		"color": {
 			"link": true,
 			"gradients": true,
-			"text": false
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"link": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

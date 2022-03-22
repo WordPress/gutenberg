@@ -25,7 +25,7 @@ function RadioGroup(
 	const radioContext = {
 		...radioState,
 		disabled,
-		// controlled or uncontrolled
+		// Controlled or uncontrolled.
 		state: checked ?? radioState.state,
 		setState: onChange ?? radioState.setState,
 	};

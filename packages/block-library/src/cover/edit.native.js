@@ -31,6 +31,7 @@ import {
 	ColorPicker,
 	BottomSheetConsumer,
 	useConvertUnitToMobile,
+	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -43,12 +44,17 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
-	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useRef,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 import { store as editPostStore } from '@wordpress/edit-post';
@@ -115,7 +121,7 @@ const Cover = ( {
 	useEffect( () => {
 		let isCurrent = true;
 
-		// sync with local media store
+		// Sync with local media store.
 		mediaUploadSync();
 		const a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
@@ -142,11 +148,13 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
-	const colorsDefault = useSetting( 'color.palette' ) || [];
-	const coverDefaultPalette = {
-		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
-	};
-	const gradients = useSetting( 'color.gradients' ) || [];
+	const colorsDefault = useMobileGlobalStylesColors();
+	const coverDefaultPalette = useMemo( () => {
+		return {
+			colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
+		};
+	}, [ colorsDefault ] );
+	const gradients = useMobileGlobalStylesColors( 'gradients' );
 	const gradientValue =
 		customGradient || getGradientValueBySlug( gradients, gradient );
 	const overlayColorValue = getColorObjectByAttributeValues(
@@ -178,21 +186,21 @@ const Cover = ( {
 	// parent styles for the current block. If there are,
 	// it will use that color instead.
 	useEffect( () => {
-		// While we don't support theme colors
+		// While we don't support theme colors.
 		if ( ! attributes.overlayColor || ( ! attributes.overlay && url ) ) {
 			setAttributes( { childrenStyles: styles.defaultColor } );
 		}
 	}, [ setAttributes ] );
 
-	// initialize uploading flag to false, awaiting sync
+	// Initialize uploading flag to false, awaiting sync.
 	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
 
-	// initialize upload failure flag to true if url is local
+	// Initialize upload failure flag to true if url is local.
 	const [ didUploadFail, setDidUploadFail ] = useState(
 		id && getProtocol( url ) === 'file:'
 	);
 
-	// don't show failure if upload is in progress
+	// Don't show failure if upload is in progress.
 	const shouldShowFailure = didUploadFail && ! isUploadInProgress;
 
 	const onSelectMedia = ( media ) => {
@@ -235,7 +243,7 @@ const Cover = ( {
 		const colorValue = getColorObjectByColorValue( colorsDefault, color );
 
 		setAttributes( {
-			// clear all related attributes (only one should be set)
+			// Clear all related attributes (only one should be set).
 			overlayColor: colorValue?.slug ?? undefined,
 			customOverlayColor: ( ! colorValue?.slug && color ) ?? undefined,
 			gradient: undefined,
@@ -264,7 +272,7 @@ const Cover = ( {
 				style?.color?.background ||
 				styles.overlay?.color,
 		},
-		// While we don't support theme colors we add a default bg color
+		// While we don't support theme colors we add a default bg color.
 		! overlayColorValue.color && ! url ? backgroundColor : {},
 		isImage &&
 			isParentSelected &&
@@ -432,7 +440,7 @@ const Cover = ( {
 						onLoadStart={ onVideoLoadStart }
 						style={ [
 							styles.background,
-							// Hide Video component since it has black background while loading the source
+							// Hide Video component since it has black background while loading the source.
 							{ opacity: isVideoLoading ? 0 : 1 },
 						] }
 					/>

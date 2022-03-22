@@ -49,9 +49,10 @@ export default function save( { attributes } ) {
 		overlayColor
 	);
 	const gradientClass = __experimentalGetGradientClass( gradient );
-	const minHeight = minHeightUnit
-		? `${ minHeightProp }${ minHeightUnit }`
-		: minHeightProp;
+	const minHeight =
+		minHeightProp && minHeightUnit
+			? `${ minHeightProp }${ minHeightUnit }`
+			: minHeightProp;
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -88,19 +89,25 @@ export default function save( { attributes } ) {
 		getPositionClassName( contentPosition )
 	);
 
+	const gradientValue = gradient || customGradient;
+
 	return (
 		<div { ...useBlockProps.save( { className: classes, style } ) }>
 			<span
 				aria-hidden="true"
 				className={ classnames(
+					'wp-block-cover__background',
 					overlayColorClass,
 					dimRatioToClass( dimRatio ),
-					'wp-block-cover__gradient-background',
-					gradientClass,
 					{
 						'has-background-dim': dimRatio !== undefined,
-						'has-background-gradient': gradient || customGradient,
-						[ gradientClass ]: ! url && gradientClass,
+						// For backwards compatibility. Former versions of the Cover Block applied
+						// `.wp-block-cover__gradient-background` in the presence of
+						// media, a gradient and a dim.
+						'wp-block-cover__gradient-background':
+							url && gradientValue && dimRatio !== 0,
+						'has-background-gradient': gradientValue,
+						[ gradientClass ]: gradientClass,
 					}
 				) }
 				style={ bgStyle }

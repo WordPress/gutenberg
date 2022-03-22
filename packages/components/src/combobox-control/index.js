@@ -181,7 +181,7 @@ function ComboboxControl( {
 		}
 	}, [ matchingSuggestions, selectedSuggestion ] );
 
-	// Announcements
+	// Announcements.
 	useEffect( () => {
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 		if ( isExpanded ) {

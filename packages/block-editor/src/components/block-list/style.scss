@@ -321,7 +321,9 @@
 }
 
 .wp-block[data-align="left"] > *,
-.wp-block[data-align="right"] > * {
+.wp-block[data-align="right"] > *,
+.wp-block.alignleft,
+.wp-block.alignright {
 	// Without z-index, won't be clickable as "above" adjacent content.
 	z-index: z-index("{core/image aligned left or right} .wp-block");
 }

@@ -36,6 +36,10 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
+const copyWebPackPattens = process.env.WP_COPY_PHP_FILES_TO_DIST
+	? '**/{block.json,*.php}'
+	: '**/block.json';
+
 const cssLoaders = [
 	{
 		loader: MiniCSSExtractPlugin.loader,
@@ -228,7 +232,7 @@ const config = {
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
-					from: '**/block.json',
+					from: copyWebPackPattens,
 					context: 'src',
 					noErrorOnMissing: true,
 				},

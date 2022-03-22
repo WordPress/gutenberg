@@ -10,7 +10,7 @@ import ToggleControl from '../';
 
 describe( 'ToggleControl', () => {
 	it( 'triggers change callback with numeric value', () => {
-		// Mount: With shallow, cannot find input child of BaseControl
+		// Mount: With shallow, cannot find input child of BaseControl.
 		const onChange = jest.fn();
 		const wrapper = renderer.create(
 			<ToggleControl onChange={ onChange } />
@@ -24,7 +24,7 @@ describe( 'ToggleControl', () => {
 
 	describe( 'help', () => {
 		it( 'does not render input with describedby if no help prop', () => {
-			// Mount: With shallow, cannot find input child of BaseControl
+			// Mount: With shallow, cannot find input child of BaseControl.
 			const onChange = jest.fn();
 			const wrapper = renderer.create(
 				<ToggleControl onChange={ onChange } />
@@ -36,7 +36,7 @@ describe( 'ToggleControl', () => {
 		} );
 
 		it( 'renders input with describedby if help prop', () => {
-			// Mount: With shallow, cannot find input child of BaseControl
+			// Mount: With shallow, cannot find input child of BaseControl.
 			const onChange = jest.fn();
 			const wrapper = renderer.create(
 				<ToggleControl onChange={ onChange } help={ true } />

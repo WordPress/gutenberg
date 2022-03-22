@@ -99,8 +99,7 @@ function ScreenTypography( { name } ) {
 					</VStack>
 				</div>
 			) }
-
-			{ /* no typography elements support yet for blocks */ }
+			{ /* No typography elements support yet for blocks. */ }
 			{ !! name && <TypographyPanel name={ name } element="text" /> }
 		</>
 	);

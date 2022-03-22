@@ -1208,11 +1208,7 @@ _Parameters_
 
 -   _attributes_ `?Object`: Optional attributes of the block to assign.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to append.
--   _index_ `?number`: Optional index where to insert the default block
-
-_Returns_
-
--   `Object`: Action object
+-   _index_ `?number`: Optional index where to insert the default block.
 
 ### mergeBlocks
 
@@ -1261,6 +1257,7 @@ _Parameters_
 
 -   _start_ `string`: First block of the multi selection.
 -   _end_ `string`: Last block of the multiselection.
+-   _\_\_experimentalInitialPosition_ `number|null`: Optional initial position. Pass as null to skip focus within editor canvas.
 
 ### receiveBlocks
 

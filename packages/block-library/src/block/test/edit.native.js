@@ -46,12 +46,12 @@ const getMockedReusableBlock = ( id ) => ( {
 } );
 
 beforeAll( () => {
-	// Register all core blocks
+	// Register all core blocks.
 	registerCoreBlocks();
 } );
 
 afterAll( () => {
-	// Clean up registered blocks
+	// Clean up registered blocks.
 	getBlockTypes().forEach( ( block ) => {
 		unregisterBlockType( block.name );
 	} );
@@ -74,17 +74,21 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel, getByTestId, getByText } = initializeEditor( {
+		const {
+			getByA11yLabel,
+			getByTestId,
+			getByText,
+		} = await initializeEditor( {
 			initialHtml: '',
 			capabilities: { reusableBlock: true },
 		} );
 
-		// Open the inserter menu
+		// Open the inserter menu.
 		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
 
-		// Navigate to reusable tab
+		// Navigate to reusable tab.
 		const reusableSegment = await waitFor( () => getByText( 'Reusable' ) );
-		// onLayout event is required by Segment component
+		// onLayout event is required by Segment component.
 		fireEvent( reusableSegment, 'layout', {
 			nativeEvent: {
 				layout: {
@@ -95,7 +99,7 @@ describe( 'Reusable block', () => {
 		fireEvent.press( reusableSegment );
 
 		const reusableBlockList = getByTestId( 'InserterUI-ReusableBlocks' );
-		// onScroll event used to force the FlatList to render all items
+		// onScroll event used to force the FlatList to render all items.
 		fireEvent.scroll( reusableBlockList, {
 			nativeEvent: {
 				contentOffset: { y: 0, x: 0 },
@@ -104,12 +108,12 @@ describe( 'Reusable block', () => {
 			},
 		} );
 
-		// Insert a reusable block
+		// Insert a reusable block.
 		fireEvent.press(
 			await waitFor( () => getByText( `Reusable block - 1` ) )
 		);
 
-		// Get the reusable block
+		// Get the reusable block.
 		const reusableBlock = await waitFor( () =>
 			getByA11yLabel( /Reusable block Block\. Row 1/ )
 		);
@@ -123,7 +127,7 @@ describe( 'Reusable block', () => {
 		const id = 3;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
 
-		const { getByA11yLabel } = initializeEditor( {
+		const { getByA11yLabel } = await initializeEditor( {
 			initialHtml,
 		} );
 
@@ -142,7 +146,7 @@ describe( 'Reusable block', () => {
 	} );
 
 	// Skipped until `pointerEvents: 'none'` no longer erroneously prevents
-	// triggering `onLayout*` on the element: https://git.io/JSHZt
+	// triggering `onLayout*` on the element: https://git.io/JSHZt.
 	it.skip( 'renders block content', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 4;
@@ -158,7 +162,7 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel } = initializeEditor( {
+		const { getByA11yLabel } = await initializeEditor( {
 			initialHtml,
 		} );
 

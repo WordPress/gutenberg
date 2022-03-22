@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/navigation-link",
 		"isValid": true,
 		"attributes": {
@@ -8,7 +7,6 @@
 			"opensInNewTab": false,
 			"url": "https://wordpress.org/"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

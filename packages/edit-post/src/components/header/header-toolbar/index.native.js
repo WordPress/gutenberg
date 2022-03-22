@@ -53,7 +53,7 @@ function HeaderToolbar( {
 	};
 	const renderHistoryButtons = () => {
 		const buttons = [
-			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */
+			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo. */
 			<ToolbarButton
 				key="undoButton"
 				title={ __( 'Undo' ) }

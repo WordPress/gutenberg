@@ -516,29 +516,6 @@ _Related_
 
 -   getPreviousBlockClientId in core/block-editor store.
 
-### getReferenceByDistinctEdits
-
-> **Deprecated** since Gutenberg 6.5.0.
-
-Returns a new reference when edited values have changed. This is useful in
-inferring where an edit has been made between states by comparison of the
-return values using strict equality.
-
-_Usage_
-
-    const hasEditOccurred = (
-       getReferenceByDistinctEdits( beforeState ) !==
-       getReferenceByDistinctEdits( afterState )
-    );
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `*`: A value whose reference will change only when an edit occurs.
-
 ### getSelectedBlock
 
 _Related_
@@ -1049,7 +1026,7 @@ _Related_
 
 ### autosave
 
-Action generator used in signalling that the post should autosave. This
+Action that autosaves the current post. This
 includes server-side autosaving (default) and client-side (a.k.a. local)
 autosaving (e.g. on the Web, the post might be committed to Session
 Storage).
@@ -1066,17 +1043,13 @@ _Related_
 
 ### createUndoLevel
 
-Returns an action object used in signalling that undo history record should
-be created.
+> **Deprecated** Since WordPress 6.0
 
-_Returns_
-
--   `Object`: Action object.
+Action that creates an undo history record.
 
 ### disablePublishSidebar
 
-Returns an action object used in signalling that the user has disabled the
-publish sidebar.
+Action that disables the publish sidebar.
 
 _Returns_
 
@@ -1094,8 +1067,7 @@ _Parameters_
 
 ### enablePublishSidebar
 
-Returns an action object used in signalling that the user has enabled the
-publish sidebar.
+Action that enables the publish sidebar.
 
 _Returns_
 
@@ -1139,7 +1111,7 @@ _Related_
 
 ### lockPostAutosaving
 
-Returns an action object used to signal that post autosaving is locked.
+Action that locks post autosaving.
 
 _Usage_
 
@@ -1156,7 +1128,7 @@ _Returns_
 
 ### lockPostSaving
 
-Returns an action object used to signal that post saving is locked.
+Action that locks post saving.
 
 _Usage_
 
@@ -1239,12 +1211,13 @@ _Related_
 
 ### redo
 
-Returns an action object used in signalling that undo history should
-restore last popped state.
+Action that restores last popped state in undo history.
 
 ### refreshPost
 
-Action generator for handling refreshing the current post.
+> **Deprecated** Since WordPress 6.0.
+
+Action for refreshing the current post.
 
 ### removeBlock
 
@@ -1287,20 +1260,14 @@ _Parameters_
 
 ### resetPost
 
+> **Deprecated** Since WordPress 6.0.
+
 Returns an action object used in signalling that the latest version of the
 post has been received, either by initialization or save.
 
-_Parameters_
-
--   _post_ `Object`: Post object.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### savePost
 
-Action generator for saving the current post in the editor.
+Action for saving the current post in the editor.
 
 _Parameters_
 
@@ -1392,15 +1359,15 @@ _Related_
 
 ### trashPost
 
-Action generator for trashing the current post in the editor.
+Action for trashing the current post in the editor.
 
 ### undo
 
-Returns an action object used in signalling that undo history should pop.
+Action that pops a record from undo history and undoes the edit.
 
 ### unlockPostAutosaving
 
-Returns an action object used to signal that post autosaving is unlocked.
+Action that unlocks post autosaving.
 
 _Usage_
 
@@ -1417,7 +1384,7 @@ _Returns_
 
 ### unlockPostSaving
 
-Returns an action object used to signal that post saving is unlocked.
+Action that unlocks post saving.
 
 _Usage_
 
@@ -1467,7 +1434,7 @@ _Returns_
 
 ### updatePostLock
 
-Returns an action object used to lock the editor.
+Action that locks the editor.
 
 _Parameters_
 

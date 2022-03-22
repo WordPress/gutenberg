@@ -1,20 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Navigation allows an empty navigation block to be created and manually populated using a mixture of internal and external links 1`] = `
-"<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
-
-<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"
-`;
-
-exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `"<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"`;
-
-exports[`Navigation encodes URL when create block if needed 1`] = `
-"<!-- wp:navigation-link {\\"label\\":\\"wordpress.org/шеллы\\",\\"url\\":\\"https://wordpress.org/%D1%88%D0%B5%D0%BB%D0%BB%D1%8B\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
-
-<!-- wp:navigation-link {\\"label\\":\\"お問い合わせ\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"https://this/is/a/test/search/%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"
-`;
-
-exports[`Navigation placeholder allows a navigation block to be created from existing menus 1`] = `
+exports[`Navigation Placeholder placeholder actions allows a navigation block to be created from existing menus 1`] = `
 "<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"url\\":\\"http://localhost:8889/\\",\\"kind\\":\\"custom\\"} /-->
 
 <!-- wp:navigation-submenu {\\"label\\":\\"About\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} -->
@@ -42,6 +28,20 @@ exports[`Navigation placeholder allows a navigation block to be created from exi
 <!-- /wp:navigation-submenu -->"
 `;
 
-exports[`Navigation placeholder creates an empty navigation block when the selected existing menu is also empty 1`] = `""`;
+exports[`Navigation Placeholder placeholder actions creates an empty navigation block when the selected existing menu is also empty 1`] = `""`;
+
+exports[`Navigation allows an empty navigation block to be created and manually populated using a mixture of internal and external links 1`] = `
+"<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"
+`;
+
+exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `"<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"`;
+
+exports[`Navigation encodes URL when create block if needed 1`] = `
+"<!-- wp:navigation-link {\\"label\\":\\"wordpress.org/шеллы\\",\\"url\\":\\"https://wordpress.org/%D1%88%D0%B5%D0%BB%D0%BB%D1%8B\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"お問い合わせ\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"https://this/is/a/test/search/%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"
+`;
 
 exports[`Navigation supports navigation blocks that have inner blocks within their markup and converts them to wp_navigation posts 1`] = `"<!-- wp:page-list /-->"`;

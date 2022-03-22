@@ -212,6 +212,7 @@ export const Input = styled.input< InputProps >`
 		box-shadow: none !important;
 		color: ${ COLORS.black };
 		display: block;
+		font-family: inherit;
 		margin: 0;
 		outline: none;
 		width: 100%;

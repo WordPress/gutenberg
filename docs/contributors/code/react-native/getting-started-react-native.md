@@ -124,10 +124,10 @@ and for Android:
 npm run native test:e2e:android:local
 ```
 
-To run a single test instead of the entire suite, use `npm run native device-tests:local`. Here's an example that runs only `gutenberg-editor-gallery.test.js`:
+To run a single test instead of the entire suite, use `npm run native device-tests:local`. Here's an example that runs only `gutenberg-editor-paragraph.test.js`:
 
 ```sh
-npm run native test:e2e:android:local gutenberg-editor-gallery.test.js
+npm run native test:e2e:android:local gutenberg-editor-paragraph.test.js
 ```
 
 Note: You might experience problems that seem to be related to the tests starting the Appium server, e.g. errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. For now, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the CLI, then change the port number in the tests while (optionally) commenting out related code in the `beforeAll` and `afterAll` block.

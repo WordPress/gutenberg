@@ -113,7 +113,7 @@ export const Gallery = ( props ) => {
 						  )
 				}
 				onFocus={ focusGalleryCaption }
-				onBlur={ onBlur } // always assign onBlur as props
+				onBlur={ onBlur } // Always assign onBlur as props.
 				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</View>

@@ -75,7 +75,7 @@ describe( 'FormTokenField', () => {
 
 		// This suggestion is part of a partial match; return up to three
 		// sections of the suggestion (before match, match, and after
-		// match)
+		// match).
 		const div = document.createElement( 'div' );
 		div.innerHTML = node.querySelector( 'span' ).outerHTML;
 		return map(
@@ -247,21 +247,21 @@ describe( 'FormTokenField', () => {
 				fixtures.matchingSuggestions.th
 			);
 			expect( getSelectedSuggestion() ).toBe( null );
-			sendKeyDown( keyCodes.downArrow ); // 'the'
+			sendKeyDown( keyCodes.downArrow ); // 'the'.
 			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'e' ] );
-			sendKeyDown( keyCodes.downArrow ); // 'that'
+			sendKeyDown( keyCodes.downArrow ); // 'that'.
 			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'at' ] );
 
 			const hoverSuggestion = wrapperElement().querySelectorAll(
 				'.components-form-token-field__suggestion'
-			)[ 3 ]; // 'with'
+			)[ 3 ]; // 'with'.
 			expect( getSuggestionNodeText( hoverSuggestion ) ).toEqual( [
 				'wi',
 				'th',
 			] );
 
-			// before sending a hover event, we need to wait for
-			// SuggestionList#_scrollingIntoView to become false
+			// Before sending a hover event, we need to wait for
+			// SuggestionList#_scrollingIntoView to become false.
 			act( () => {
 				jest.advanceTimersByTime( 100 );
 			} );

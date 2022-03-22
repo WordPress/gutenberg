@@ -20,8 +20,8 @@ export function togglePostTitleSelection( isSelected = true ) {
 }
 
 /**
- * Action generator used in signalling that the post should autosave.
+ * Action that autosaves the post.
  */
-export function* autosave() {
+export const autosave = () => () => {
 	RNReactNativeGutenbergBridge.editorDidAutosave();
-}
+};

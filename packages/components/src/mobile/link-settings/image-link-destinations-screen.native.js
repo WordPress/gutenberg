@@ -86,9 +86,9 @@ function ImageLinkDestinationsScreen( props ) {
 		navigation.navigate( blockSettingsScreens.settings, {
 			// The `inputValue` name is reused from LinkPicker, as it helps avoid
 			// bugs from stale values remaining in the React Navigation route
-			// parameters
+			// parameters.
 			inputValue: newUrl,
-			// Clear link text value that may be set from LinkPicker
+			// Clear link text value that may be set from LinkPicker.
 			text: '',
 		} );
 	};

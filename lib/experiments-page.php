@@ -51,6 +51,17 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-navigation',
 		)
 	);
+	add_settings_field(
+		'gutenberg-list-v2',
+		__( 'List block v2', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test a new list block that uses nested list item blocks (Warning: The new block is not ready. You may experience content loss, avoid using it on production sites)', 'gutenberg' ),
+			'id'    => 'gutenberg-list-v2',
+		)
+	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -105,9 +116,5 @@ function gutenberg_experiments_editor_settings( $settings ) {
 	);
 	return array_merge( $settings, $experiments_settings );
 }
-// This can be removed when plugin support requires WordPress 5.8.0+.
-if ( function_exists( 'get_block_editor_settings' ) ) {
-	add_filter( 'block_editor_settings_all', 'gutenberg_experiments_editor_settings' );
-} else {
-	add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );
-}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_experiments_editor_settings' );

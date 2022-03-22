@@ -99,7 +99,7 @@ const defaultFetchHandler = ( nextOptions ) => {
 	}
 
 	const responsePromise = window.fetch(
-		// fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed
+		// Fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed.
 		url || path || window.location.href,
 		{
 			...DEFAULT_OPTIONS,

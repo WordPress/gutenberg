@@ -5,10 +5,12 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
-import { __, _x, isRTL } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { __, isRTL } from '@wordpress/i18n';
 
 export default function Edit( {
 	attributes,
@@ -38,6 +40,11 @@ export default function Edit( {
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 	const maxSizeBuffer = Math.floor( maxSize * 2.5 );
+	const { avatarURL } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings;
+	} );
 
 	const inspectorControls = (
 		<InspectorControls>
@@ -59,7 +66,7 @@ export default function Edit( {
 		</InspectorControls>
 	);
 
-	const displayAvatar = avatarUrls ? (
+	const resizableAvatar = (
 		<ResizableBox
 			size={ {
 				width,
@@ -83,21 +90,19 @@ export default function Edit( {
 			maxWidth={ maxSizeBuffer }
 		>
 			<img
-				src={ avatarUrls[ avatarUrls.length - 1 ] }
+				src={
+					avatarUrls ? avatarUrls[ avatarUrls.length - 1 ] : avatarURL
+				}
 				alt={ `${ authorName } ${ __( 'Avatar' ) }` }
 				{ ...blockProps }
 			/>
 		</ResizableBox>
-	) : (
-		<p { ...blockProps }>
-			{ _x( 'Comment Author Avatar', 'block title' ) }
-		</p>
 	);
 
 	return (
 		<>
 			{ inspectorControls }
-			<div { ...spacingProps }>{ displayAvatar }</div>
+			<div { ...spacingProps }>{ resizableAvatar }</div>
 		</>
 	);
 }

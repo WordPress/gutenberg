@@ -1913,7 +1913,7 @@ describe( 'selectors', () => {
 
 	describe( 'isEditedPostBeingScheduled', () => {
 		it( 'should return true for posts with a future date', () => {
-			const time = Date.now() + 1000 * 3600 * 24 * 7; // 7 days in the future
+			const time = Date.now() + 1000 * 3600 * 24 * 7; // 7 days in the future.
 			const date = new Date( time );
 			const state = {
 				editor: {

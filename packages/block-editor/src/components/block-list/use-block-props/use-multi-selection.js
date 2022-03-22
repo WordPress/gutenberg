@@ -10,18 +10,15 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { getBlockClientId } from '../../../utils/dom';
 
-function toggleRichText( container, toggle ) {
-	Array.from(
-		container
-			.closest( '.is-root-container' )
-			.querySelectorAll( '.rich-text' )
-	).forEach( ( node ) => {
-		if ( toggle ) {
-			node.setAttribute( 'contenteditable', true );
-		} else {
-			node.removeAttribute( 'contenteditable' );
-		}
-	} );
+/**
+ * Sets the `contenteditable` wrapper element to `value`.
+ *
+ * @param {HTMLElement} node  Block element.
+ * @param {boolean}     value `contentEditable` value (true or false)
+ */
+export function setContentEditableWrapper( node, value ) {
+	// Since `closest` considers `node` as a candidate, use `parentElement`.
+	node.parentElement.closest( '[contenteditable]' ).contentEditable = value;
 }
 
 /**
@@ -54,10 +51,10 @@ export function useMultiSelection( clientId ) {
 			function onSelectionChange( { isSelectionEnd } ) {
 				const selection = defaultView.getSelection();
 
-				// If no selection is found, end multi selection and enable all rich
-				// text areas.
+				// If no selection is found, end multi selection and disable the
+				// contentEditable wrapper.
 				if ( ! selection.rangeCount || selection.isCollapsed ) {
-					toggleRichText( node, true );
+					setContentEditableWrapper( node, false );
 					return;
 				}
 
@@ -70,10 +67,10 @@ export function useMultiSelection( clientId ) {
 					// If the selection is complete (on mouse up), and no
 					// multiple blocks have been selected, set focus back to the
 					// anchor element. if the anchor element contains the
-					// selection. Additionally, rich text elements that were
-					// previously disabled can now be enabled again.
+					// selection. Additionally, the contentEditable wrapper can
+					// now be disabled again.
 					if ( isSelectionEnd ) {
-						toggleRichText( node, true );
+						setContentEditableWrapper( node, false );
 
 						if ( selection.rangeCount ) {
 							const {
@@ -144,16 +141,11 @@ export function useMultiSelection( clientId ) {
 				);
 				defaultView.addEventListener( 'mouseup', onSelectionEnd );
 
-				// Removing the contenteditable attributes within the block
-				// editor is essential for selection to work across editable
-				// areas. The edible hosts are removed, allowing selection to be
-				// extended outside the DOM element. `startMultiSelect` sets a
-				// flag in the store so the rich text components are updated,
-				// but the rerender may happen very slowly, especially in Safari
-				// for the blocks that are asynchonously rendered. To ensure the
-				// browser instantly removes the selection boundaries, we remove
-				// the contenteditable attributes manually.
-				toggleRichText( node, false );
+				// Allow cross contentEditable selection by temporarily making
+				// all content editable. We can't rely on using the store and
+				// React because re-rending happens too slowly. We need to be
+				// able to select across instances immediately.
+				setContentEditableWrapper( node, true );
 			}
 
 			function onMouseDown( event ) {
@@ -189,9 +181,9 @@ export function useMultiSelection( clientId ) {
 						const start = startPath[ depth ];
 						const end = endPath[ depth ];
 						// Handle the case of having selected a parent block and
-						// then sfift+click on a child.
+						// then shift+click on a child.
 						if ( start !== end ) {
-							toggleRichText( node, false );
+							setContentEditableWrapper( node, true );
 							multiSelect( start, end );
 							event.preventDefault();
 						}

@@ -68,7 +68,7 @@ export function BorderColorEdit( props ) {
 
 	// Detect changes in the color attributes and update the colorValue to keep the
 	// UI in sync. This is necessary for situations when border controls interact with
-	// eachother: eg, setting the border width to zero causes the color and style
+	// each other: eg, setting the border width to zero causes the color and style
 	// selections to be cleared.
 	useEffect( () => {
 		setColorValue(

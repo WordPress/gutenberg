@@ -171,6 +171,12 @@ export function ImageEdit( {
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			url: undefined,
+		} );
+		setTemporaryURL( undefined );
 	}
 
 	function onSelectImage( media ) {
@@ -306,12 +312,7 @@ export function ImageEdit( {
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
 					isTemp = false;
-					noticeOperations.createErrorNotice( message );
-					setAttributes( {
-						src: undefined,
-						id: undefined,
-						url: undefined,
-					} );
+					onUploadError( message );
 				},
 			} );
 		}

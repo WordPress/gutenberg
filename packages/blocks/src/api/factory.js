@@ -184,7 +184,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	}
 
 	// Check non-wildcard transforms to ensure that transform is valid
-	// for a block selection of multiple blocks of different types
+	// for a block selection of multiple blocks of different types.
 	if (
 		! isWildcardBlockTransform( transform ) &&
 		! every( blocks, { name: firstBlockName } )

@@ -14,7 +14,7 @@ import { withSafeTimeout, useRefEffect } from '@wordpress/compose';
 const emptyList = Object.freeze( [] );
 
 const handleMouseDown = ( e ) => {
-	// By preventing default here, we will not lose focus of <input> when clicking a suggestion
+	// By preventing default here, we will not lose focus of <input> when clicking a suggestion.
 	e.preventDefault();
 };
 
@@ -34,7 +34,7 @@ function SuggestionsList( {
 	const listRef = useRefEffect(
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
-			// when already expanded
+			// when already expanded.
 			if (
 				selectedIndex > -1 &&
 				scrollIntoView &&

@@ -630,7 +630,7 @@ describe( 'state', () => {
 					controlledInnerBlocks: {},
 				} );
 
-				// the block object of the parent should be updated
+				// The block object of the parent should be updated.
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
 				);
@@ -2186,6 +2186,15 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( -1 );
+		} );
+
+		it( 'should allow setting null value in multi selection', () => {
+			const state = initialPosition( undefined, {
+				type: 'MULTI_SELECT',
+				initialPosition: null,
+			} );
+
+			expect( state ).toBe( null );
 		} );
 	} );
 

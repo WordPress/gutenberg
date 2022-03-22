@@ -83,6 +83,8 @@ function getColorFromLegacyProps( props: LegacyProps ): string | undefined {
 	if ( props.color.hex ) {
 		return props.color.hex;
 	}
+
+	return undefined;
 }
 
 const transformColorStringToLegacyColor = memoize(

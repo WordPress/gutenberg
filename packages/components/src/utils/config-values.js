@@ -44,7 +44,7 @@ export default {
 	borderWidth: '1px',
 	borderWidthFocus: '1.5px',
 	borderWidthTab: '4px',
-	spinnerSize: '18px',
+	spinnerSize: 16,
 	fontSize: '13px',
 	fontSizeH1: 'calc(2.44 * 13px)',
 	fontSizeH2: 'calc(1.95 * 13px)',

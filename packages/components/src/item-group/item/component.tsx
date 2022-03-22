@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ import { View } from '../../view';
 
 function Item(
 	props: WordPressComponentProps< ItemProps, 'div' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const { role, wrapperClassName, ...otherProps } = useItem( props );
 

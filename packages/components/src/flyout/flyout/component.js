@@ -22,7 +22,7 @@ import { useFlyout } from './hook';
 /**
  *
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div', false>} props
- * @param {import('react').Ref<any>}                                                                   forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                                          forwardedRef
  */
 function Flyout( props, forwardedRef ) {
 	const {

@@ -15,6 +15,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
+import { setContentEditableWrapper } from './use-multi-selection';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -48,6 +49,16 @@ function useInitialPosition( clientId ) {
 			return getSelectedBlocksInitialCaretPosition();
 		},
 		[ clientId ]
+	);
+}
+
+function isFormElement( element ) {
+	const { tagName } = element;
+	return (
+		tagName === 'INPUT' ||
+		tagName === 'BUTTON' ||
+		tagName === 'SELECT' ||
+		tagName === 'TEXTAREA'
 	);
 }
 
@@ -94,6 +105,26 @@ export function useFocusFirstElement( clientId ) {
 			ref.current.focus();
 			return;
 		}
+
+		// Check to see if element is focussable before a generic caret insert.
+		if ( ! target.getAttribute( 'contenteditable' ) ) {
+			const focusElement = focus.tabbable.findNext( target );
+			// Make sure focusElement is valid, form field, and within the current target element.
+			// Ensure is not block inserter trigger, don't want to focus that in the event of the group block which doesn't contain any other focussable elements.
+			if (
+				focusElement &&
+				isFormElement( focusElement ) &&
+				target.contains( focusElement ) &&
+				! focusElement.classList.contains(
+					'block-editor-button-block-appender'
+				)
+			) {
+				focusElement.focus();
+				return;
+			}
+		}
+
+		setContentEditableWrapper( ref.current, false );
 
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition ] );

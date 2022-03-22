@@ -221,17 +221,21 @@ cannot be determined.
 _Usage_
 
 ```jsx
-<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+<BlockTitle
+	clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1"
+	maximumLength={ 17 }
+/>
 ```
 
 _Parameters_
 
 -   _props_ `Object`:
 -   _props.clientId_ `string`: Client ID of block.
+-   _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
 
 _Returns_
 
--   `?string`: Block title.
+-   `JSX.Element`: Block title.
 
 ### BlockToolbar
 
@@ -524,10 +528,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
 
-### PreserveScrollInReorder
-
-Undocumented declaration.
-
 ### RichText
 
 _Related_
@@ -569,6 +569,7 @@ _Properties_
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
+-   _\_\_experimentalGenerateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _\_\_unstableGalleryWithImageBlocks_ `boolean`: Whether the user has enabled the refactored gallery block which uses InnerBlocks
 
 ### SkipToSelectedBlock
@@ -740,30 +741,6 @@ _Parameters_
 _Returns_
 
 -   `any`: Returns the value defined for the setting.
-
-### validateThemeColors
-
-Given an array of theme colors checks colors for validity
-
-_Parameters_
-
--   _colors_ `Array`: The array of theme colors
-
-_Returns_
-
--   `Array`: The array of valid theme colors or the default colors
-
-### validateThemeGradients
-
-Given an array of theme gradients checks gradients for validity
-
-_Parameters_
-
--   _gradients_ `Array`: The array of theme gradients
-
-_Returns_
-
--   `Array`: The array of valid theme gradients or the default gradients
 
 ### Warning
 

@@ -13,6 +13,7 @@ import {
 	deleteAllMenus,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	setBrowserViewport,
 	setUpResponseMocking,
 	visitAdminPage,
 	__experimentalRest as rest,
@@ -175,6 +176,27 @@ async function deleteAllLinkedResources() {
 			} );
 		}
 	} );
+}
+
+async function openMenuActionsDropdown() {
+	const menuActionsDropdown = await page.waitForXPath(
+		'//*[@role="region"][@aria-label="Navigation top bar"]//*[@class="edit-navigation-menu-actions"]//button[@aria-expanded="false"]'
+	);
+	await menuActionsDropdown.click();
+}
+
+async function getMenuItem( menuItemName ) {
+	return await page
+		.waitForXPath(
+			`//*[@role="group"]//*[@role="menuitemradio"]/span[text()="${ menuItemName }"]`
+		)
+		.catch( ( error ) => {
+			if ( error.name !== 'TimeoutError' ) {
+				throw error;
+			} else {
+				return null;
+			}
+		} );
 }
 
 describe.skip( 'Navigation editor', () => {
@@ -345,7 +367,7 @@ describe.skip( 'Navigation editor', () => {
 		} );
 		expect( submenuLinkVisible ).toBeDefined();
 
-		// click in the top left corner of the canvas.
+		// Click in the top left corner of the canvas.
 		const canvas = await page.$( '.edit-navigation-layout__content-area' );
 		const boundingBox = await canvas.boundingBox();
 		await page.mouse.click( boundingBox.x + 5, boundingBox.y + 5 );
@@ -523,7 +545,7 @@ describe.skip( 'Navigation editor', () => {
 				name: 'Block: Navigation',
 			} ).toBeFound();
 
-			// Check for the placeholder state
+			// Check for the placeholder state.
 			await expect( {
 				role: 'button',
 				name: 'Start blank',
@@ -674,9 +696,152 @@ describe.skip( 'Navigation editor', () => {
 				return attributes;
 			} );
 
-			// Check the last item is the one we just inserted
+			// Check the last item is the one we just inserted.
 			expect( lastItemAttributes.label ).toEqual( itemToSelect.title );
 			expect( lastItemAttributes.isTopLevelLink ).toBeTruthy();
 		} );
 	} );
+} );
+
+describe( 'Delete menu button', () => {
+	useExperimentalFeatures( [ '#gutenberg-navigation' ] );
+
+	beforeAll( async () => {
+		await deleteAllMenus();
+		await deleteAllLinkedResources();
+	} );
+
+	afterEach( async () => {
+		await deleteAllMenus();
+		await deleteAllLinkedResources();
+	} );
+
+	afterEach( async () => {
+		await setBrowserViewport( 'large' );
+	} );
+	it.each( [ 'large', 'small' ] )(
+		`should retain menu when confirmation is canceled and the viewport is %s`,
+		async ( viewport ) => {
+			const menuName = 'Menu delete test';
+			await createMenu( { name: menuName }, menuItemsFixture );
+			await visitNavigationEditor();
+			await setBrowserViewport( viewport );
+			// Wait for the header to show the menu name.
+			await page.waitForXPath(
+				`//*[@role="region"][@aria-label="Navigation top bar"]//h2[contains(text(), "${ menuName }")]`
+			);
+
+			if ( viewport === 'small' ) {
+				const openSettingsSidebar = await page.waitForXPath(
+					'//button[@aria-label="Settings"][@aria-expanded="false"]'
+				);
+				await openSettingsSidebar.click();
+			}
+
+			const deleteMenuButton = await page.waitForXPath(
+				'//*[@role="region"][@aria-label="Navigation settings"]//button[text()="Delete menu"]'
+			);
+			await deleteMenuButton.click();
+
+			const cancelButton = await page.waitForXPath(
+				'//*[@role="dialog"]//button[text()="Cancel"]'
+			);
+			await cancelButton.click();
+
+			const menuActionsDropdown = await page.waitForXPath(
+				`//*[contains(@class,"edit-navigation-menu-actions")]//h2[text()="${ menuName }"]`
+			);
+			const currentSelectedMenu = await page.evaluate(
+				( el ) => el.textContent,
+				menuActionsDropdown
+			);
+
+			expect( currentSelectedMenu ).toBe( menuName );
+		}
+	);
+	it.each( [ 'large', 'small' ] )(
+		`should delete menu when confirmation is confirmed and there are no other menus and the viewport is %s`,
+		async ( viewport ) => {
+			const menuName = 'Menu delete test';
+			await createMenu( { name: menuName }, menuItemsFixture );
+			await visitNavigationEditor();
+			await setBrowserViewport( viewport );
+			// Wait for the header to show the menu name.
+			await page.waitForXPath(
+				`//*[@role="region"][@aria-label="Navigation top bar"]//h2[contains(text(), "${ menuName }")]`
+			);
+			if ( viewport === 'small' ) {
+				const openSettingsSidebar = await page.waitForXPath(
+					'//button[@aria-label="Settings"][@aria-expanded="false"]'
+				);
+				await openSettingsSidebar.click();
+			}
+
+			const deleteMenuButton = await page.waitForXPath(
+				'//*[@role="region"][@aria-label="Navigation settings"]//button[text()="Delete menu"]'
+			);
+			await deleteMenuButton.click();
+
+			const confirmButton = await page.waitForXPath(
+				'//*[@role="dialog"]//button[text()="OK"]'
+			);
+			await confirmButton.click();
+
+			await page.waitForXPath(
+				`//*[@role="button"][@aria-label="Dismiss this notice"]//*[text()='"${ menuName }" menu has been deleted']`
+			);
+
+			// If the "Create your first menu" prompt appears, we know there are no remaining menus,
+			// so our test menu must have been deleted successfully.
+			const createFirstMenuPrompt = await page.waitForXPath(
+				'//h3[.="Create your first menu"]',
+				{
+					visible: true,
+				}
+			);
+			const noMenusRemaining = createFirstMenuPrompt ? true : false;
+			expect( noMenusRemaining ).toBe( true );
+		}
+	);
+
+	it.each( [ 'large', 'small' ] )(
+		`should delete menu when confirmation is confirmed and there are other existing menus and the viewport is %s`,
+		async () => {
+			const menuName = 'Menu delete test';
+			await createMenu( { name: menuName }, menuItemsFixture );
+			await createMenu( { name: `${ menuName } 2` }, menuItemsFixture );
+			await visitNavigationEditor();
+			// Wait for the header to show the menu name
+			await page.waitForXPath(
+				`//*[@role="region"][@aria-label="Navigation top bar"]//h2[contains(text(), "${ menuName }")]`
+			);
+
+			// Confirm both test menus are present
+			openMenuActionsDropdown();
+			const firstTestMenuItem = await getMenuItem( menuName );
+			const secondTestMenuItem = await getMenuItem( `${ menuName } 2` );
+
+			expect( firstTestMenuItem ).not.toBeNull();
+			expect( secondTestMenuItem ).not.toBeNull();
+
+			// Delete the first test menu
+			const deleteMenuButton = await page.waitForXPath(
+				'//*[@role="region"][@aria-label="Navigation settings"]//button[text()="Delete menu"]'
+			);
+			await deleteMenuButton.click();
+
+			const confirmButton = await page.waitForXPath(
+				'//*[@role="dialog"]//button[text()="OK"]'
+			);
+			await confirmButton.click();
+
+			await page.waitForXPath(
+				`//*[@role="button"][@aria-label="Dismiss this notice"]//*[text()='"${ menuName }" menu has been deleted']`
+			);
+
+			openMenuActionsDropdown();
+			const deletedTestMenuItem = await getMenuItem( menuName );
+			expect( deletedTestMenuItem ).toBeNull();
+		}
+	);
 } );

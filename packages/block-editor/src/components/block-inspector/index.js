@@ -68,6 +68,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				<MultiSelectionInspector />
 				<InspectorControls.Slot />
 				<InspectorControls.Slot
+					__experimentalGroup="color"
+					label={ __( 'Color' ) }
+				/>
+				<InspectorControls.Slot
 					__experimentalGroup="typography"
 					label={ __( 'Typography' ) }
 				/>
@@ -139,6 +143,11 @@ const BlockInspectorSingleBlock = ( {
 				</div>
 			) }
 			<InspectorControls.Slot />
+			<InspectorControls.Slot
+				__experimentalGroup="color"
+				label={ __( 'Color' ) }
+				className="color-block-support-panel__inner-wrapper"
+			/>
 			<InspectorControls.Slot
 				__experimentalGroup="typography"
 				label={ __( 'Typography' ) }

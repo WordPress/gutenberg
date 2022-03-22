@@ -25,6 +25,12 @@ export default function save( { attributes } ) {
 				fileName
 		  );
 
+	const hasFilename = ! RichText.isEmpty( fileName );
+
+	// Only output an `aria-describedby` when the element it's referring to is
+	// actually rendered.
+	const describedById = hasFilename ? fileId : undefined;
+
 	return (
 		href && (
 			<div { ...useBlockProps.save() }>
@@ -42,9 +48,9 @@ export default function save( { attributes } ) {
 						/>
 					</>
 				) }
-				{ ! RichText.isEmpty( fileName ) && (
+				{ hasFilename && (
 					<a
-						id={ fileId }
+						id={ describedById }
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={
@@ -59,7 +65,7 @@ export default function save( { attributes } ) {
 						href={ href }
 						className="wp-block-file__button"
 						download={ true }
-						aria-describedby={ fileId }
+						aria-describedby={ describedById }
 					>
 						<RichText.Content value={ downloadButtonText } />
 					</a>

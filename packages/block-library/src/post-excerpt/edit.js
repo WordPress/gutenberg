@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useMemo, RawHTML } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
@@ -16,7 +16,7 @@ import {
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, ToggleControl, Disabled } from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -83,12 +83,12 @@ export default function PostExcerptEditor( {
 			withoutInteractiveFormatting={ true }
 		/>
 	);
+	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {
+		'is-inline': ! showMoreOnNewLine,
+	} );
 	const excerptContent = isEditable ? (
 		<RichText
-			className={
-				! showMoreOnNewLine &&
-				'wp-block-post-excerpt__excerpt is-inline'
-			}
+			className={ excerptClassName }
 			aria-label={ __( 'Post excerpt text' ) }
 			value={
 				rawExcerpt ||
@@ -99,12 +99,9 @@ export default function PostExcerptEditor( {
 			tagName="p"
 		/>
 	) : (
-		( renderedExcerpt && (
-			<Disabled>
-				<RawHTML key="html">{ renderedExcerpt }</RawHTML>
-			</Disabled>
-		) ) ||
-		__( 'No post excerpt found' )
+		<p className={ excerptClassName }>
+			{ strippedRenderedExcerpt || __( 'No post excerpt found' ) }
+		</p>
 	);
 	return (
 		<>

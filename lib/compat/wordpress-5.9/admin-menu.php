@@ -22,8 +22,11 @@ function gutenberg_remove_legacy_pages() {
 	$customize_menu    = null;
 	foreach ( $submenu['themes.php'] as $index => $menu_item ) {
 		if ( false !== strpos( $menu_item[2], 'customize.php' ) ) {
-			$indexes_to_remove[] = $index;
-			$customize_menu      = $menu_item;
+			// Assume the first entry is the Customizer proper, if customize.php is linked > once.
+			if ( is_null( $customize_menu ) ) {
+				$indexes_to_remove[] = $index;
+				$customize_menu      = $menu_item;
+			}
 		}
 
 		if ( false !== strpos( $menu_item[2], 'site-editor.php' ) ) {

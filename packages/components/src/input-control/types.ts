@@ -6,8 +6,9 @@ import type {
 	ReactNode,
 	ChangeEvent,
 	SyntheticEvent,
+	PointerEvent,
 } from 'react';
-import type { useDrag } from 'react-use-gesture';
+import type { useDrag } from '@use-gesture/react';
 
 /**
  * Internal dependencies
@@ -33,7 +34,7 @@ interface BaseProps {
 }
 
 export type InputChangeCallback<
-	E = ChangeEvent< HTMLInputElement >,
+	E = ChangeEvent< HTMLInputElement > | PointerEvent< HTMLInputElement >,
 	P = {}
 > = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
 

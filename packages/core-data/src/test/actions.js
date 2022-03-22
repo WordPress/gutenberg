@@ -30,21 +30,25 @@ jest.mock( '../batch', () => {
 
 describe( 'editEntityRecord', () => {
 	it( 'throws when the edited entity does not have a loaded config.', async () => {
-		const entity = { kind: 'someKind', name: 'someName', id: 'someId' };
+		const entityConfig = {
+			kind: 'someKind',
+			name: 'someName',
+			id: 'someId',
+		};
 		const select = {
-			getEntity: jest.fn(),
+			getEntityConfig: jest.fn(),
 		};
 		const fulfillment = () =>
 			editEntityRecord(
-				entity.kind,
-				entity.name,
-				entity.id,
+				entityConfig.kind,
+				entityConfig.name,
+				entityConfig.id,
 				{}
 			)( { select } );
 		expect( fulfillment ).toThrow(
-			`The entity being edited (${ entity.kind }, ${ entity.name }) does not have a loaded config.`
+			`The entity being edited (${ entityConfig.kind }, ${ entityConfig.name }) does not have a loaded config.`
 		);
-		expect( select.getEntity ).toHaveBeenCalledTimes( 1 );
+		expect( select.getEntityConfig ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
 
@@ -56,7 +60,7 @@ describe( 'deleteEntityRecord', () => {
 
 	it( 'triggers a DELETE request for an existing record', async () => {
 		const deletedRecord = { title: 'new post', id: 10 };
-		const entities = [
+		const configs = [
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 
@@ -66,7 +70,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		apiFetch.mockImplementation( () => deletedRecord );
@@ -106,6 +110,68 @@ describe( 'deleteEntityRecord', () => {
 
 		expect( result ).toBe( deletedRecord );
 	} );
+
+	it( 'throws on error when throwOnError is true', async () => {
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		apiFetch.mockImplementation( () => {
+			throw new Error( 'API error' );
+		} );
+
+		await expect(
+			deleteEntityRecord(
+				'postType',
+				'post',
+				10,
+				{},
+				{
+					throwOnError: true,
+				}
+			)( { dispatch } )
+		).rejects.toEqual( new Error( 'API error' ) );
+	} );
+
+	it( 'resolves on error when throwOnError is false', async () => {
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		apiFetch.mockImplementation( () => {
+			throw new Error( 'API error' );
+		} );
+
+		await expect(
+			deleteEntityRecord(
+				'postType',
+				'post',
+				10,
+				{},
+				{
+					throwOnError: false,
+				}
+			)( { dispatch } )
+		).resolves.toBe( false );
+	} );
 } );
 
 describe( 'saveEditedEntityRecord', () => {
@@ -116,7 +182,7 @@ describe( 'saveEditedEntityRecord', () => {
 
 	it( 'Uses "id" as a key when no entity key is provided', async () => {
 		const area = { id: 1, menu: 0 };
-		const entities = [
+		const configs = [
 			{
 				kind: 'root',
 				name: 'navigationArea',
@@ -132,7 +198,7 @@ describe( 'saveEditedEntityRecord', () => {
 			saveEntityRecord: jest.fn(),
 		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		const updatedRecord = { ...area, menu: 10 };
@@ -156,7 +222,7 @@ describe( 'saveEditedEntityRecord', () => {
 
 	it( 'Uses the entity key when provided', async () => {
 		const area = { area: 'primary', menu: 0 };
-		const entities = [
+		const configs = [
 			{
 				kind: 'root',
 				name: 'navigationArea',
@@ -173,7 +239,7 @@ describe( 'saveEditedEntityRecord', () => {
 			saveEntityRecord: jest.fn(),
 		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		const updatedRecord = { ...area, menu: 10 };
@@ -197,27 +263,28 @@ describe( 'saveEditedEntityRecord', () => {
 } );
 
 describe( 'saveEntityRecord', () => {
+	let dispatch;
 	beforeEach( async () => {
 		apiFetch.mockReset();
 		jest.useFakeTimers();
+		dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
 	} );
 
 	it( 'triggers a POST request for a new record', async () => {
 		const post = { title: 'new post' };
-		const entities = [
+		const configs = [
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 		const select = {
 			getRawEntityRecord: () => post,
 		};
 
-		const dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
-		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		const updatedRecord = { ...post, id: 10 };
@@ -274,8 +341,8 @@ describe( 'saveEntityRecord', () => {
 		expect( result ).toBe( updatedRecord );
 	} );
 
-	it( 'triggers a PUT request for an existing record', async () => {
-		const post = { id: 10, title: 'new post' };
+	it( 'throws on error when throwOnError is true', async () => {
+		const post = { title: 'new post' };
 		const entities = [
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
@@ -283,13 +350,56 @@ describe( 'saveEntityRecord', () => {
 			getRawEntityRecord: () => post,
 		};
 
-		const dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
-		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		apiFetch.mockImplementation( () => {
+			throw new Error( 'API error' );
+		} );
+
+		await expect(
+			saveEntityRecord( 'postType', 'post', post, {
+				throwOnError: true,
+			} )( { select, dispatch } )
+		).rejects.toEqual( new Error( 'API error' ) );
+	} );
+
+	it( 'resolves on error when throwOnError is false', async () => {
+		const post = { title: 'new post' };
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		apiFetch.mockImplementation( () => {
+			throw new Error( 'API error' );
+		} );
+
+		await expect(
+			saveEntityRecord( 'postType', 'post', post, {
+				throwOnError: false,
+			} )( { select, dispatch } )
+		).resolves.toEqual( undefined );
+	} );
+
+	it( 'triggers a PUT request for an existing record', async () => {
+		const post = { id: 10, title: 'new post' };
+		const configs = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+
+		// Provide entities
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		const updatedRecord = { ...post, id: 10 };
@@ -348,7 +458,7 @@ describe( 'saveEntityRecord', () => {
 
 	it( 'triggers a PUT request for an existing record with a custom key', async () => {
 		const postType = { slug: 'page', title: 'Pages' };
-		const entities = [
+		const configs = [
 			{
 				name: 'postType',
 				kind: 'root',
@@ -360,13 +470,8 @@ describe( 'saveEntityRecord', () => {
 			getRawEntityRecord: () => ( {} ),
 		};
 
-		const dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
-		} );
 		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
 		apiFetch.mockImplementation( () => postType );

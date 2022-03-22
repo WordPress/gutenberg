@@ -181,12 +181,15 @@ describe( 'Register Gutenberg', () => {
 		expect( hookCallOrder ).toBeGreaterThan( onRenderEditorCallOrder );
 	} );
 
-	it( 'initializes the editor', () => {
+	it( 'initializes the editor', async () => {
 		// Unmock setup module to render the actual editor component.
 		jest.unmock( '../setup' );
 
 		const EditorComponent = getEditorComponent();
-		const screen = initializeEditor( {}, { component: EditorComponent } );
+		const screen = await initializeEditor(
+			{},
+			{ component: EditorComponent }
+		);
 		const blockList = screen.getByTestId( 'block-list-wrapper' );
 
 		expect( blockList ).toBeVisible();

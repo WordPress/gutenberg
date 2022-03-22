@@ -9,7 +9,7 @@ import {
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -106,19 +106,22 @@ export function initializeEditor(
 		initialEdits
 	);
 
-	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-post', {
+	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		editorMode: 'visual',
 		fixedToolbar: false,
-		welcomeGuide: true,
 		fullscreenMode: true,
+		hiddenBlockTypes: [],
+		preferredStyleVariations: {},
+		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		themeStyles: true,
-		showBlockBreadcrumbs: true,
+		welcomeGuide: true,
 		welcomeGuideTemplate: true,
 	} );
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );

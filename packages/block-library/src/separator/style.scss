@@ -3,11 +3,6 @@
 	border-bottom: 1px solid currentColor;
 	// Default, thin style, is stored in theme.scss so it can be opted out of
 
-	// Wide style
-	&.is-style-wide {
-		border-bottom-width: 1px;
-	}
-
 	// Dots style
 	&.is-style-dots {
 		// Override any background themes often set on the hr tag for this style.

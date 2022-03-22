@@ -138,25 +138,7 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 	$html .= '>';
 
 	if ( isset( $attributes['label'] ) ) {
-		$html .= wp_kses(
-			$attributes['label'],
-			array(
-				'code'   => array(),
-				'em'     => array(),
-				'img'    => array(
-					'scale' => array(),
-					'class' => array(),
-					'style' => array(),
-					'src'   => array(),
-					'alt'   => array(),
-				),
-				's'      => array(),
-				'span'   => array(
-					'style' => array(),
-				),
-				'strong' => array(),
-			)
-		);
+		$html .= wp_kses_post( $attributes['label'] );
 	}
 
 	$html .= '</a></li>';

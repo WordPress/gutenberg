@@ -150,7 +150,7 @@ export const ADMIN = {
 	themeDark10: `var( --wp-admin-theme-color-darker-10, ${ BLUE.medium.focus })`,
 };
 
-// Namespaced values for raw colors hex codes
+// Namespaced values for raw colors hex codes.
 export const UI = {
 	theme: ADMIN.theme,
 	background: BASE.white,

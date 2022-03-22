@@ -1,25 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
+import {
+	deleteAllTemplates,
+	activateTheme,
+	visitSiteEditor,
+} from '@wordpress/e2e-test-utils';
 
 describe( 'Site Editor Inserter', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
 	} );
 	beforeEach( async () => {
-		await siteEditor.visit();
-		await siteEditor.disableWelcomeGuide();
+		await visitSiteEditor();
 	} );
 
 	it( 'inserter toggle button should toggle global inserter', async () => {

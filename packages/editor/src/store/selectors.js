@@ -13,7 +13,7 @@ import {
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
-import { addQueryArgs } from '@wordpress/url';
+import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
@@ -32,7 +32,6 @@ import {
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import { cleanForSlug } from '../utils/url';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 
 /**
@@ -278,41 +277,6 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
 } );
 
 /**
- * Returns a new reference when edited values have changed. This is useful in
- * inferring where an edit has been made between states by comparison of the
- * return values using strict equality.
- *
- * @deprecated since Gutenberg 6.5.0.
- *
- * @example
- *
- * ```
- * const hasEditOccurred = (
- *    getReferenceByDistinctEdits( beforeState ) !==
- *    getReferenceByDistinctEdits( afterState )
- * );
- * ```
- *
- * @param {Object} state Editor state.
- *
- * @return {*} A value whose reference will change only when an edit occurs.
- */
-export const getReferenceByDistinctEdits = createRegistrySelector(
-	( select ) => (/* state */) => {
-		deprecated(
-			"`wp.data.select( 'core/editor' ).getReferenceByDistinctEdits`",
-			{
-				since: '5.4',
-				alternative:
-					"`wp.data.select( 'core' ).getReferenceByDistinctEdits`",
-			}
-		);
-
-		return select( coreStore ).getReferenceByDistinctEdits();
-	}
-);
-
-/**
  * Returns an attribute value of the saved post.
  *
  * @param {Object} state         Global application state.
@@ -371,7 +335,7 @@ const getNestedEditedPostProperty = ( state, attributeName ) => {
  * @return {*} Post attribute value.
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	// Special cases
+	// Special cases.
 	switch ( attributeName ) {
 		case 'content':
 			return getEditedPostContent( state );
@@ -512,7 +476,7 @@ export function isEditedPostPublishable( state ) {
 	// TODO: Post being publishable should be superset of condition of post
 	// being saveable. Currently this restriction is imposed at UI.
 	//
-	//  See: <PostPublishButton /> (`isButtonEnabled` assigned by `isSaveable`)
+	//  See: <PostPublishButton /> (`isButtonEnabled` assigned by `isSaveable`).
 
 	return (
 		isEditedPostDirty( state ) ||
@@ -541,7 +505,7 @@ export function isEditedPostSaveable( state ) {
 	//  See: `isEditedPostPublishable` (includes `isEditedPostDirty` condition)
 	//  See: <PostSavedState /> (`forceIsDirty` prop)
 	//  See: <PostPublishButton /> (`forceIsDirty` prop)
-	//  See: https://github.com/WordPress/gutenberg/pull/4184
+	//  See: https://github.com/WordPress/gutenberg/pull/4184.
 
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
@@ -678,7 +642,7 @@ export const isEditedPostAutosaveable = createRegistrySelector(
  */
 export function isEditedPostBeingScheduled( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
-	// Offset the date by one minute (network latency)
+	// Offset the date by one minute (network latency).
 	const checkedDate = new Date(
 		Number( getDate( date ) ) - ONE_MINUTE_IN_MS
 	);
@@ -706,7 +670,7 @@ export function isEditedPostDateFloating( state ) {
 	// This should be the status of the persisted post
 	// It shouldn't use the "edited" status otherwise it breaks the
 	// inferred post data floating status
-	// See https://github.com/WordPress/gutenberg/issues/28083
+	// See https://github.com/WordPress/gutenberg/issues/28083.
 	const status = getCurrentPost( state ).status;
 	if (
 		status === 'draft' ||
@@ -843,7 +807,7 @@ export function getEditedPostPreviewLink( state ) {
 	// If the post is draft, ignore the preview link from the autosave record,
 	// because the preview could be a stale autosave if the post was switched from
 	// published to draft.
-	// See: https://github.com/WordPress/gutenberg/pull/37952
+	// See: https://github.com/WordPress/gutenberg/pull/37952.
 	if ( ! previewLink || 'draft' === getCurrentPost( state ).status ) {
 		previewLink = getEditedPostAttribute( state, 'link' );
 		if ( previewLink ) {
@@ -878,7 +842,7 @@ export function getSuggestedPostFormat( state ) {
 	// so we can derive a suitable post format from it.
 	if ( blocks.length === 1 ) {
 		name = blocks[ 0 ].name;
-		// check for core/embed `video` and `audio` eligible suggestions
+		// Check for core/embed `video` and `audio` eligible suggestions.
 		if ( name === 'core/embed' ) {
 			const provider = blocks[ 0 ].attributes?.providerNameSlug;
 			if ( [ 'youtube', 'vimeo' ].includes( provider ) ) {

@@ -11,22 +11,6 @@ import {
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
-	it( 'should be able to add a new Paragraph block', async () => {
-		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.paragraph
-		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
-
-		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
-			testData.shortText
-		);
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
-	} );
-
 	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
@@ -158,7 +142,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 <p>E</p>
 <!-- /wp:paragraph -->` );
 
-		// // Merge paragraphs
+		// // Merge paragraphs.
 		const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			2
@@ -172,7 +156,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			backspace
 		);
 
-		// verify the editor has not crashed
+		// Verify the editor has not crashed.
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text.length ).not.toEqual( 0 );
 
@@ -190,7 +174,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 <p></p>
 <!-- /wp:paragraph -->` );
 
-		// // Merge paragraphs
+		// // Merge paragraphs.
 		const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			2
@@ -201,7 +185,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			backspace
 		);
 
-		// verify the editor has not crashed
+		// Verify the editor has not crashed.
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text.length ).not.toEqual( 0 );
 

@@ -21,7 +21,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$default_label      = __( 'Next Page' );
-	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
+	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
 	$pagination_arrow   = get_query_pagination_arrow( $block, true );
 
 	if ( $pagination_arrow ) {
@@ -51,7 +51,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 				'<a href="%1$s" %2$s>%3$s</a>',
 				esc_url( add_query_arg( $page_key, $page + 1 ) ),
 				$wrapper_attributes,
-				esc_html( $label )
+				$label
 			);
 		}
 		wp_reset_postdata(); // Restore original Post Data.

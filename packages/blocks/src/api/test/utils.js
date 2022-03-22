@@ -23,7 +23,7 @@ import {
 
 describe( 'block helpers', () => {
 	beforeAll( () => {
-		// Initialize the block store
+		// Initialize the block store.
 		require( '../../store' );
 	} );
 

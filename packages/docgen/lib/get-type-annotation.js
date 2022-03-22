@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-// See https://babeljs.io/docs/en/babel-types
+// See https://babeljs.io/docs/en/babel-types.
 const { types: babelTypes } = require( '@babel/core' );
 
 /* eslint-disable jsdoc/valid-types */
@@ -270,14 +270,14 @@ function getTypeAnnotation( typeAnnotation ) {
 			return 'boolean';
 		}
 		case 'TSConditionalType': {
-			// Unsure what this is
+			// Unsure what this is.
 			return '';
 		}
 		case 'TSConstructorType': {
 			return `new ${ getFunctionTypeAnnotation( typeAnnotation, ': ' ) }`;
 		}
 		case 'TSExpressionWithTypeArguments': {
-			// Unsure with this is
+			// Unsure with this is.
 			return '';
 		}
 		case 'TSFunctionType': {
@@ -349,7 +349,7 @@ function getTypeAnnotation( typeAnnotation ) {
 			) }`;
 		}
 		case 'TSTypeQuery': {
-			// unsure what this is
+			// Unsure what this is.
 			return '';
 		}
 		case 'TSTypeReference': {
@@ -388,7 +388,7 @@ function getFunctionToken( token ) {
 	}
 
 	if ( babelTypes.isVariableDeclaration( resolvedToken ) ) {
-		// ignore multiple variable declarations
+		// Ignore multiple variable declarations.
 		resolvedToken = resolvedToken.declarations[ 0 ].init;
 	}
 
@@ -418,7 +418,7 @@ function getArrayTagNamePosition( tag ) {
 function getQualifiedArrayPatternTypeAnnotation( tag, paramType ) {
 	if ( babelTypes.isTSArrayType( paramType ) ) {
 		if ( babelTypes.isTSTypeReference( paramType.elementType ) ) {
-			// just get the element type for the array
+			// Just get the element type for the array.
 			return paramType.elementType.typeName.name;
 		}
 		return getTypeAnnotation( paramType.elementType.typeAnnotation );
@@ -428,7 +428,7 @@ function getQualifiedArrayPatternTypeAnnotation( tag, paramType ) {
 		);
 	}
 
-	// anything else, `Alias[ position ]`
+	// Anything else, `Alias[ position ]`.
 	return `( ${ getTypeAnnotation( paramType ) } )[ ${ getArrayTagNamePosition(
 		tag
 	) } ]`;
@@ -437,7 +437,7 @@ function getQualifiedArrayPatternTypeAnnotation( tag, paramType ) {
 function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 	const memberName = tag.name.split( '.' ).slice( -1 )[ 0 ];
 	if ( babelTypes.isTSTypeLiteral( paramType ) ) {
-		// if it's a type literal we can try to find the member on the type
+		// If it's a type literal we can try to find the member on the type.
 		const member = paramType.members.find(
 			( m ) => m.key.name === memberName
 		);
@@ -445,7 +445,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 			return getTypeAnnotation( member.typeAnnotation.typeAnnotation );
 		}
 	}
-	// If we couldn't find a specific member for the type then we'll just return something like `Type[ memberName ]` to indicate the parameter is a member of that type
+	// If we couldn't find a specific member for the type then we'll just return something like `Type[ memberName ]` to indicate the parameter is a member of that type.
 	const typeAnnotation = getTypeAnnotation( paramType );
 	return `${ typeAnnotation }[ '${ memberName }' ]`;
 }
@@ -459,7 +459,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
 
-	// otherwise find the corresponding parameter token for the documented parameter
+	// Otherwise find the corresponding parameter token for the documented parameter.
 	let paramToken = functionToken.params[ paramIndex ];
 
 	// This shouldn't happen due to our ESLint enforcing correctly documented parameter names but just in case
@@ -525,7 +525,7 @@ function getVariableTypeAnnotation( declarationToken ) {
 	}
 
 	if ( babelTypes.isClassDeclaration( resolvedToken ) ) {
-		// just use the classname if we're exporting a class
+		// Just use the classname if we're exporting a class.
 		return resolvedToken.id.name;
 	}
 
@@ -536,7 +536,7 @@ function getVariableTypeAnnotation( declarationToken ) {
 	try {
 		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
 	} catch ( e ) {
-		// assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
+		// Assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
 	}
 }
 

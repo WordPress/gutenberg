@@ -230,7 +230,7 @@ npm run native test:e2e:ios:local
 Passing a filename should also work to run a subset of tests:
 
 ```sh
-npm run native test:e2e:ios:local gutenberg-editor-gallery.test.js
+npm run native test:e2e:ios:local gutenberg-editor-paragraph.test.js
 ```
 
 If all things go well, it should look like:
@@ -256,7 +256,7 @@ npm run native test:e2e:android:local
 Passing a filename should also work to run a subset of tests:
 
 ```
-npm run native test:e2e:android:local gutenberg-editor-gallery.test.js
+npm run native test:e2e:android:local gutenberg-editor-paragraph.test.js
 ```
 
 After a bit of a wait we should see:

@@ -84,7 +84,7 @@ class VideoEdit extends Component {
 	}
 
 	componentWillUnmount() {
-		// this action will only exist if the user pressed the trash button on the block holder
+		// This action will only exist if the user pressed the trash button on the block holder.
 		if (
 			hasAction( 'blocks.onRemoveBlockCheckUpload' ) &&
 			this.state.isUploadInProgress
@@ -98,7 +98,7 @@ class VideoEdit extends Component {
 
 	static getDerivedStateFromProps( props, state ) {
 		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
-		// is updated immediately any time the isSelected prop becomes false
+		// is updated immediately any time the isSelected prop becomes false.
 		return {
 			isCaptionSelected: props.isSelected && state.isCaptionSelected,
 		};
@@ -362,7 +362,7 @@ class VideoEdit extends Component {
 						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
 						onFocus={ this.onFocusCaption }
-						onBlur={ this.props.onBlur } // always assign onBlur as props
+						onBlur={ this.props.onBlur } // Always assign onBlur as props.
 						insertBlocksAfter={ this.props.insertBlocksAfter }
 					/>
 				</View>

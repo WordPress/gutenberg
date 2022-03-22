@@ -20,7 +20,7 @@ import { BlockBreadcrumb, BlockStyles } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	ComplementaryArea,
 	FullscreenMode,
@@ -29,6 +29,7 @@ import {
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -37,7 +38,7 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import PreferencesModal from '../preferences-modal';
+import EditPostPreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
@@ -70,6 +71,7 @@ function Layout( { styles } ) {
 		closeGeneralSidebar,
 		setIsInserterOpened,
 	} = useDispatch( editPostStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -178,6 +180,18 @@ function Layout( { styles } ) {
 		return null;
 	};
 
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
+		);
+	}
+
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -269,11 +283,11 @@ function Layout( { styles } ) {
 					next: nextShortcut,
 				} }
 			/>
-			<PreferencesModal />
+			<EditPostPreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
 			<Popover.Slot />
-			<PluginArea />
+			<PluginArea onError={ onPluginAreaError } />
 		</>
 	);
 }

@@ -4,6 +4,7 @@
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	useInnerBlocksProps,
+	InnerBlocks,
 	__experimentalBlockContentOverlay as BlockContentOverlay,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -37,9 +38,7 @@ const LAYOUT = {
 };
 
 export default function NavigationInnerBlocks( {
-	isVisible,
 	clientId,
-	appender: CustomAppender,
 	hasCustomPlaceholder,
 	orientation,
 } ) {
@@ -66,7 +65,7 @@ export default function NavigationInnerBlocks( {
 				] )?.length,
 
 				// This prop is already available but computing it here ensures it's
-				// fresh compared to isImmediateParentOfSelectedBlock
+				// fresh compared to isImmediateParentOfSelectedBlock.
 				isSelected: selectedBlockId === clientId,
 			};
 		},
@@ -95,9 +94,17 @@ export default function NavigationInnerBlocks( {
 	const parentOrChildHasSelection =
 		isSelected ||
 		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants );
-	const appender = isVisible && parentOrChildHasSelection ? undefined : false;
 
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
+
+	const hasMenuItems = !! blocks?.length;
+
+	// If there is a `ref` attribute pointing to a `wp_navigation` but
+	// that menu has no **items** (i.e. empty) then show a placeholder.
+	// The block must also be selected else the placeholder will display
+	// alongside the appender.
+	const showPlaceholder =
+		! hasCustomPlaceholder && ! hasMenuItems && ! isSelected;
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -111,14 +118,27 @@ export default function NavigationInnerBlocks( {
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: shouldDirectInsert,
 			orientation,
-			renderAppender: CustomAppender || appender,
+
+			// As an exception to other blocks which feature nesting, show
+			// the block appender even when a child block is selected.
+			// This should be a temporary fix, to be replaced by improvements to
+			// the sibling inserter.
+			// See https://github.com/WordPress/gutenberg/issues/37572.
+			renderAppender:
+				isSelected ||
+				( isImmediateParentOfSelectedBlock &&
+					! selectedBlockHasDescendants ) ||
+				// Show the appender while dragging to allow inserting element between item and the appender.
+				parentOrChildHasSelection
+					? InnerBlocks.ButtonBlockAppender
+					: false,
+
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
-			placeholder:
-				! isVisible || hasCustomPlaceholder ? undefined : placeholder,
+			placeholder: showPlaceholder ? placeholder : undefined,
 		}
 	);
 

@@ -65,14 +65,6 @@ export default function save( { attributes } ) {
 		</>
 	);
 
-	if ( 'left' === align || 'right' === align || 'center' === align ) {
-		return (
-			<div { ...useBlockProps.save() }>
-				<figure className={ classes }>{ figure }</figure>
-			</div>
-		);
-	}
-
 	return (
 		<figure { ...useBlockProps.save( { className: classes } ) }>
 			{ figure }

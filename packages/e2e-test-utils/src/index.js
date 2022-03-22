@@ -93,10 +93,27 @@ export { showBlockToolbar } from './show-block-toolbar';
 export { openPreviewPage } from './preview';
 export { wpDataSelect } from './wp-data-select';
 export { deleteAllWidgets } from './widgets';
+export { deleteAllTemplates } from './templates';
 export {
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
 } from './rest-api';
 export { openListView, closeListView } from './list-view';
+export {
+	clickSiteEditorMenuItem,
+	closeSiteEditorNavigationPanel,
+	disableSiteEditorWelcomeGuide,
+	getCurrentSiteEditorContent,
+	getSiteEditorMenuItem,
+	isSiteEditorRoot,
+	navigateSiteEditorBack,
+	navigateSiteEditorBackToRoot,
+	openSiteEditorNavigationPanel,
+	siteEditorNavigateSequence,
+	visitSiteEditor,
+	toggleGlobalStyles,
+	openGlobalStylesPanel,
+	openPreviousGlobalStylesPanel,
+} from './site-editor';
 
 export * from './mocks';

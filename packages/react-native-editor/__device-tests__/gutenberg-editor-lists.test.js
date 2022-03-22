@@ -16,16 +16,16 @@ describe( 'Gutenberg Editor tests for List block', () => {
 			await listBlockElement.click();
 		}
 
-		// Send the list item text
+		// Send the list item text.
 		await editorPage.sendTextToListBlock( listBlockElement, '  a' );
 
-		// send an Enter
+		// Send an Enter.
 		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
 
-		// send a backspace
+		// Send a backspace.
 		await editorPage.sendTextToListBlock( listBlockElement, backspace );
 
-		// switch to html and verify html
+		// Switch to html and verify html.
 		const html = await editorPage.getHtmlContent();
 
 		expect( html.toLowerCase() ).toBe(
@@ -34,7 +34,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 <!-- /wp:list -->`
 		);
 
-		// Remove list block to reset editor to clean state
+		// Remove list block to reset editor to clean state.
 		listBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.list
 		);

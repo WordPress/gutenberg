@@ -120,3 +120,12 @@ html :where(.has-border-color) {
 html :where([style*="border-width"]) {
 	border-style: solid;
 }
+
+
+/**
+ * Provide baseline responsiveness for images.
+ */
+html :where(img[class*="wp-image-"]) {
+	height: auto;
+	max-width: 100%;
+}

@@ -144,7 +144,6 @@ function FontSizePicker(
 									? __( 'Use size preset' )
 									: __( 'Set custom size' )
 							}
-							showTooltip={ false }
 							icon={ settings }
 							onClick={ () => {
 								setShowCustomValueControl(
@@ -232,7 +231,7 @@ function FontSizePicker(
 											);
 										}
 									} }
-									units={ hasUnits ? units : false }
+									units={ hasUnits ? units : [] }
 								/>
 							</FlexItem>
 							{ withReset && (

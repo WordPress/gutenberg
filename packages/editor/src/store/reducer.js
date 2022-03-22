@@ -84,7 +84,6 @@ export function shouldOverwriteState( action, previousAction ) {
 export function postId( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
 			return action.post.id;
 	}
 
@@ -94,7 +93,6 @@ export function postId( state = null, action ) {
 export function postType( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
 			return action.post.type;
 	}
 

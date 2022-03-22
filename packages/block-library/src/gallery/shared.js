@@ -31,7 +31,7 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 export function isGalleryV2Enabled() {
 	// Only run the Gallery version compat check if the plugin is running, otherwise
 	// assume we are in 5.9 core and enable by default.
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		// We want to fail early here, at least during beta testing phase, to ensure
 		// there aren't instances where undefined values cause false negatives.
 		if (

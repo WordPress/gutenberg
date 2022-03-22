@@ -96,4 +96,20 @@ This is an individual package that's part of the Gutenberg project. The project 
 
 To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
 
+### Adding new blocks
+
+⚠️ Adding new blocks to this package **requires** additional steps!
+
+1.  Do not forget to register your new block in the [`index.js`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/index.js) file of this package. For example, if you were to add a new core block called `core/blinking-paragraph`, you would have to add something like:
+
+    ```js
+    // packages/block-library/src/index.js
+    import * as blinkingParagraph from './blinking-paragraph';
+
+    // Then add `blinkingParagraph` to either `__experimentalGetCoreBlocks()`
+    // or `__experimentalRegisterExperimentalCoreBlocks()`
+    ```
+
+2.  Register your block in the `gutenberg_reregister_core_block_types()` function of the [`lib/blocks.php`](https://github.com/WordPress/gutenberg/blob/trunk/lib/blocks.php) file. Add it to the `block_folders` array if it's a [static block](https://developer.wordpress.org/block-editor/explanations/glossary/#static-block) or to the `block_names` array if it's a [dynamic block](https://developer.wordpress.org/block-editor/explanations/glossary/#dynamic-block).
+
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

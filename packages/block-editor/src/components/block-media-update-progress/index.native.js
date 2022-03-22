@@ -124,7 +124,7 @@ export class BlockMediaUpdateProgress extends Component {
 		}
 	}
 
-	// ---- Block media save actions
+	// ---- Block media save actions.
 	updateMediaSaveProgress( payload ) {
 		this.setState( {
 			progress: payload.progress,
@@ -184,7 +184,7 @@ export class BlockMediaUpdateProgress extends Component {
 		}
 	}
 
-	// ---- Block media upload actions
+	// ---- Block media upload actions.
 	updateMediaUploadProgress( payload ) {
 		this.setState( {
 			progress: payload.progress,
@@ -220,7 +220,7 @@ export class BlockMediaUpdateProgress extends Component {
 	}
 
 	addMediaUploadListener() {
-		//if we already have a subscription not worth doing it again
+		// If we already have a subscription not worth doing it again.
 		if ( this.subscriptionParentMediaUpload ) {
 			return;
 		}
@@ -238,7 +238,7 @@ export class BlockMediaUpdateProgress extends Component {
 	}
 
 	addMediaSaveListener() {
-		//if we already have a subscription not worth doing it again
+		// If we already have a subscription not worth doing it again.
 		if ( this.subscriptionParentMediaSave ) {
 			return;
 		}

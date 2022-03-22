@@ -15,21 +15,21 @@ import { setLocaleData } from '@wordpress/i18n';
 import { registerCoreBlocks } from '../..';
 
 beforeAll( () => {
-	// Mock translations
+	// Mock translations.
 	setLocaleData( {
 		'block title\u0004Table': [ 'Tabla' ],
 		"'%s' is not fully-supported": [ '«%s» no es totalmente compatible' ],
 	} );
 
-	// Register all core blocks
+	// Register all core blocks.
 	registerCoreBlocks();
 } );
 
 afterAll( () => {
-	// Clean up translations
+	// Clean up translations.
 	setLocaleData( {} );
 
-	// Clean up registered blocks
+	// Clean up registered blocks.
 	getBlockTypes().forEach( ( block ) => {
 		unregisterBlockType( block.name );
 	} );
@@ -40,7 +40,7 @@ describe( 'Unsupported block', () => {
 		const initialHtml = `<!-- wp:table -->
 			 <figure class="wp-block-table"><table><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table></figure>
 			 <!-- /wp:table -->`;
-		const { getByA11yLabel } = initializeEditor( {
+		const { getByA11yLabel } = await initializeEditor( {
 			initialHtml,
 		} );
 
@@ -59,7 +59,7 @@ describe( 'Unsupported block', () => {
 		const initialHtml = `<!-- wp:table -->
 		 <figure class="wp-block-table"><table><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table></figure>
 		 <!-- /wp:table -->`;
-		const { getByA11yLabel, getByText } = initializeEditor( {
+		const { getByA11yLabel, getByText } = await initializeEditor( {
 			initialHtml,
 		} );
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.1.0 (2022-03-11)
+
 ## 6.0.0 (2022-01-27)
 
 ### Breaking changes

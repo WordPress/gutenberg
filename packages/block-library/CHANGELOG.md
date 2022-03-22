@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Social Icons: Avoid loss of previously selected background color when switching back from "Logos Only" style ([#39276](https://github.com/WordPress/gutenberg/pull/39276)).
+
+## 7.1.0 (2022-03-11)
+
+## 7.0.0 (2022-02-10)
+
+### Breaking Change
+
+-   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
+
+### Bug Fix
+
+-   Gallery block: disable edit as html support ([#39318](https://github.com/WordPress/gutenberg/pull/39318)).
+-   Removed unused `@wordpress/escape-html` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
 ## 6.1.0 (2022-01-27)
 
 -   Code quality: Add block schema to each core block ([#35900](https://github.com/WordPress/gutenberg/pull/35900)).

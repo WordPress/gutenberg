@@ -227,7 +227,7 @@ const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
  * directly.
  */
 const formatMap = {
-	// Day
+	// Day.
 	d: 'DD',
 	D: 'ddd',
 	j: 'D',
@@ -242,7 +242,7 @@ const formatMap = {
 	 * @return {string} Formatted date.
 	 */
 	S( momentDate ) {
-		// Do - D
+		// Do - D.
 		const num = momentDate.format( 'D' );
 		const withOrdinal = momentDate.format( 'Do' );
 		return withOrdinal.replace( num, '' );
@@ -257,14 +257,14 @@ const formatMap = {
 	 * @return {string} Formatted date.
 	 */
 	z( momentDate ) {
-		// DDD - 1
+		// DDD - 1.
 		return ( parseInt( momentDate.format( 'DDD' ), 10 ) - 1 ).toString();
 	},
 
-	// Week
+	// Week.
 	W: 'W',
 
-	// Month
+	// Month.
 	F: 'MMMM',
 	m: 'MM',
 	M: 'MMM',
@@ -280,7 +280,7 @@ const formatMap = {
 		return momentDate.daysInMonth();
 	},
 
-	// Year
+	// Year.
 	/**
 	 * Gets whether the current year is a leap year.
 	 *
@@ -295,7 +295,7 @@ const formatMap = {
 	Y: 'YYYY',
 	y: 'YY',
 
-	// Time
+	// Time.
 	a: 'a',
 	A: 'A',
 	/**
@@ -328,7 +328,7 @@ const formatMap = {
 	s: 'ss',
 	u: 'SSSSSS',
 	v: 'SSS',
-	// Timezone
+	// Timezone.
 	e: 'zz',
 	/**
 	 * Gets whether the timezone is in DST currently.
@@ -364,8 +364,8 @@ const formatMap = {
 			MINUTE_IN_SECONDS
 		);
 	},
-	// Full date/time
-	c: 'YYYY-MM-DDTHH:mm:ssZ', // .toISOString
+	// Full date/time.
+	c: 'YYYY-MM-DDTHH:mm:ssZ', // .toISOString.
 	r: 'ddd, D MMM YYYY HH:mm:ss ZZ',
 	U: 'X',
 };

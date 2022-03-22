@@ -78,7 +78,7 @@ function mapMenuItemsToBlocks( menuItems ) {
 		// Create block with nested "innerBlocks".
 		const block = createBlock( blockType, attributes, nestedBlocks );
 
-		// Create mapping for menuItem -> block
+		// Create mapping for menuItem -> block.
 		mapping[ menuItem.id ] = block.clientId;
 
 		return block;

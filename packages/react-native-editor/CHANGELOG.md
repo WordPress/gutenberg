@@ -11,8 +11,38 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
--   [**] [Gallery block] Fix crash when adding images and selecting a gallery item [#38238]
+## 1.72.0
+
+-   [*] Add GIF badge for animated GIFs uploaded to Image blocks [#38996]
+-   [*] Small refinement to media upload errors, including centring and tweaking copy. [#38951]
+-   [*] Update gesture handler and reanimated libraries [#39098]
+-   [*] Fix issue with list's starting index and the order [#39354]
+
+## 1.71.3
+
+-   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
+-   [***] Support for multiple color palettes [#38417]
+
+## 1.71.1
+
+-   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
+
+## 1.71.0
+
+-   [*] Image block: Replacing the media for an image set as featured prompts to update the featured image [#34666]
 -   [***] Font size and line-height support for text-based blocks used in block-based themes [#38205]
+
+## 1.70.3
+
+-   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
+
+## 1.70.2
+
+-   [**] Rich Text - Validate link colors [#38474]
+
+## 1.70.1
+
+-   [**] [Gallery block] Fix crash when adding images and selecting a gallery item [#38238]
 
 ## 1.70.0
 

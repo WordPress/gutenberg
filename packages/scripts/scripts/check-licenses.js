@@ -235,7 +235,7 @@ function detectTypeFromLicenseFiles( path ) {
 		if ( existsSync( licensePath ) ) {
 			const licenseText = readFileSync( licensePath ).toString();
 
-			// Check if the file contains any of the strings in licenseFileStrings
+			// Check if the file contains any of the strings in licenseFileStrings.
 			return Object.keys( licenseFileStrings ).reduce(
 				( stringDetectedType, licenseStringType ) => {
 					const licenseFileString =

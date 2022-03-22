@@ -125,7 +125,7 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 			// Open the datepicker.
 			await page.click( '.edit-post-post-schedule__toggle' );
 
-			// Clear the date
+			// Clear the date.
 			await page.click( '.components-datetime__date-reset-button' );
 
 			const publishingDate = await getPublishingDate();

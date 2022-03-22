@@ -103,9 +103,10 @@ describe( 'Image', () => {
 			`<!-- wp:image {"id":\\d+,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename2 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
-		// For some reason just clicking the block wrapper causes figcaption to get focus
-		// in puppeteer but not in live browser, so clicking on the image wrapper div here instead.
-		await page.click( '.wp-block-image > div' );
+		// Focus outside the block to avoid the image caption being selected
+		// It can happen on CI specially.
+		await page.click( '.wp-block-post-title' );
+		await page.click( '.wp-block-image img' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toBe( '' );

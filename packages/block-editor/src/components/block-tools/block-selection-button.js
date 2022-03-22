@@ -262,7 +262,10 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 						label={ label }
 						className="block-selection-button_select-button"
 					>
-						<BlockTitle clientId={ clientId } />
+						<BlockTitle
+							clientId={ clientId }
+							maximumLength={ 35 }
+						/>
 					</Button>
 				</FlexItem>
 			</Flex>

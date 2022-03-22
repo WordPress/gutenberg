@@ -33,6 +33,7 @@ const transforms = {
 						createBlock( 'core/paragraph', {
 							content: caption,
 							fontSize: 'large',
+							align: 'center',
 						} ),
 					]
 				),
@@ -55,6 +56,7 @@ const transforms = {
 						createBlock( 'core/paragraph', {
 							content: caption,
 							fontSize: 'large',
+							align: 'center',
 						} ),
 					]
 				),

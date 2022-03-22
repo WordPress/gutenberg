@@ -21,11 +21,12 @@ jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 describe( 'ContrastChecker', () => {
 	const backgroundColor = '#ffffff';
 	const textColor = '#000000';
+	const linkColor = '#0040ff';
 	const isLargeText = true;
 	const fallbackBackgroundColor = '#fff';
 	const fallbackTextColor = '#000';
 	const sameShade = '#666';
-	const colorWithTransparency = 'rgba(102,102,102,0.5)';
+	const colorWithTransparency = 'rgba(102,102,102,0.5)'; // #666 with opacity.
 
 	beforeEach( () => {
 		speak.mockReset();
@@ -35,11 +36,25 @@ describe( 'ContrastChecker', () => {
 		expect( mount( <ContrastChecker /> ).html() ).toBeNull();
 	} );
 
+	test( 'should render null when no background or fallback background color is provided', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				textColor={ textColor }
+				linkColor={ linkColor }
+				isLargeText={ isLargeText }
+			/>
+		);
+
+		expect( speak ).not.toHaveBeenCalled();
+		expect( wrapper.html() ).toBeNull();
+	} );
+
 	test( 'should render null when the colors meet AA WCAG guidelines.', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
 				textColor={ textColor }
+				linkColor={ linkColor }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
 				fallbackTextColor={ fallbackTextColor }
@@ -50,25 +65,51 @@ describe( 'ContrastChecker', () => {
 		expect( wrapper.html() ).toBeNull();
 	} );
 
-	test( 'should render null when the colors meet AA WCAG guidelines and alpha checker enabled.', () => {
-		const wrapper = mount(
-			<ContrastChecker
-				backgroundColor={ backgroundColor }
-				textColor={ textColor }
-				isLargeText={ isLargeText }
-				enableAlphaChecker={ true }
-			/>
-		);
-
-		expect( speak ).not.toHaveBeenCalled();
-		expect( wrapper.html() ).toBeNull();
-	} );
-
-	test( 'should render component when the colors do not meet AA WCAG guidelines.', () => {
+	test( 'should render component when the text and background colors do not meet AA WCAG guidelines.', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ sameShade }
 				textColor={ sameShade }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor }
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
+		expect( wrapper.find( Notice ).children().text() ).toBe(
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+		);
+	} );
+
+	test( 'should render component when the link and background colors do not meet AA WCAG guidelines.', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				backgroundColor={ sameShade }
+				textColor={ textColor }
+				linkColor={ sameShade }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor }
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
+		expect( wrapper.find( Notice ).children().text() ).toBe(
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color.'
+		);
+	} );
+
+	test( 'should render component when the link and text and background colors do not meet AA WCAG guidelines.', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				backgroundColor={ sameShade }
+				textColor={ sameShade }
+				linkColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
 				fallbackTextColor={ fallbackTextColor }
@@ -88,6 +129,7 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				backgroundColor={ colorWithTransparency }
 				textColor={ sameShade }
+				linkColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
 				fallbackTextColor={ fallbackTextColor }
@@ -103,6 +145,22 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				backgroundColor={ sameShade }
 				textColor={ colorWithTransparency }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor }
+			/>
+		);
+
+		expect( speak ).not.toHaveBeenCalled();
+		expect( wrapper.html() ).toBeNull();
+	} );
+
+	test( 'should render render null if link color contains a transparency', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				backgroundColor={ backgroundColor }
+				textColor={ textColor }
+				linkColor={ colorWithTransparency }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
 				fallbackTextColor={ fallbackTextColor }
@@ -247,6 +305,22 @@ describe( 'ContrastChecker', () => {
 		);
 	} );
 
+	test( 'should render messages when the linkColor is valid, but the fallback backgroundColor conflicts.', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				linkColor={ linkColor }
+				fallbackBackgroundColor={ linkColor }
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
+		expect( wrapper.find( Notice ).children().text() ).toBe(
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color.'
+		);
+	} );
+
 	test( 'should re-announce if colors change, but still insufficient contrast', () => {
 		const appRoot = document.createElement( 'div' );
 
@@ -274,11 +348,45 @@ describe( 'ContrastChecker', () => {
 	} );
 
 	// enableAlphaChecker tests
+	test( 'should render null when the colors meet AA WCAG guidelines and alpha checker enabled.', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				backgroundColor={ backgroundColor }
+				textColor={ textColor }
+				isLargeText={ isLargeText }
+				enableAlphaChecker={ true }
+			/>
+		);
+
+		expect( speak ).not.toHaveBeenCalled();
+		expect( wrapper.html() ).toBeNull();
+	} );
+
 	test( 'should render component when the colors meet AA WCAG guidelines but the text color only has alpha transparency with alpha checker enabled.', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
 				textColor={ 'rgba(0,0,0,0.9)' }
+				linkColor={ linkColor }
+				isLargeText={ isLargeText }
+				enableAlphaChecker={ true }
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			'Transparent text may be hard for people to read.'
+		);
+		expect( wrapper.find( Notice ).children().text() ).toBe(
+			'Transparent text may be hard for people to read.'
+		);
+	} );
+
+	test( 'should render component when the colors meet AA WCAG guidelines but the link color only has alpha transparency with alpha checker enabled.', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				backgroundColor={ backgroundColor }
+				linkColor={ 'rgba(0,0,0,0.9)' }
+				textColor={ textColor }
 				isLargeText={ isLargeText }
 				enableAlphaChecker={ true }
 			/>
@@ -297,6 +405,7 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				backgroundColor={ 'rgba(255,255,255,0.7)' }
 				textColor={ textColor }
+				linkColor={ linkColor }
 				isLargeText={ isLargeText }
 				enableAlphaChecker={ true }
 			/>
@@ -306,10 +415,70 @@ describe( 'ContrastChecker', () => {
 		expect( wrapper.html() ).toBeNull();
 	} );
 
+	test( 'should render null if background color contains a transparency with alpha checker enabled.', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				backgroundColor={ colorWithTransparency }
+				textColor={ sameShade }
+				linkColor={ sameShade }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor }
+				enableAlphaChecker={ true }
+			/>
+		);
+
+		expect( speak ).not.toHaveBeenCalled();
+		expect( wrapper.html() ).toBeNull();
+	} );
+
+	test( 'should render transparency warning only if one text is not readable but the other is transparent and the background color contains a transparency with alpha checker enabled.', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				backgroundColor={ colorWithTransparency }
+				textColor={ sameShade }
+				linkColor={ 'rgba(0,0,0,0.9)' }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor }
+				enableAlphaChecker={ true }
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			'Transparent text may be hard for people to read.'
+		);
+		expect( wrapper.find( Notice ).children().text() ).toBe(
+			'Transparent text may be hard for people to read.'
+		);
+	} );
+
+	test( 'should render component and prioritize contrast warning when the colors do no meet AA WCAG guidelines and text has alpha transparency with the alpha checker enabled.', () => {
+		const wrapper = mount(
+			<ContrastChecker
+				backgroundColor={ sameShade }
+				textColor={ 'rgba(0,0,0,0.9)' }
+				linkColor={ sameShade }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor }
+				enableAlphaChecker={ true }
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
+		expect( wrapper.find( Notice ).children().text() ).toBe(
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color.'
+		);
+	} );
+
 	test( 'should render component when the colors meet AA WCAG guidelines but all colors have alpha transparency with alpha checker enabled.', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ 'rgba(255,255,255,0.7)' }
+				linkColor={ 'rgba(0,0,0,0.7)' }
 				textColor={ 'rgba(0,0,0,0.7)' }
 				isLargeText={ isLargeText }
 				enableAlphaChecker={ true }

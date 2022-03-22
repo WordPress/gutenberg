@@ -204,7 +204,7 @@ An advanced block that allows displaying post comments based on different query 
 -	**Name:** core/comments-query-loop
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** inherit, order, perPage, tagName
+-	**Attributes:** defaultPage, inherit, order, perPage, tagName
 
 ## Cover
 
@@ -248,7 +248,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 
 -	**Name:** core/gallery
 -	**Category:** media
--	**Supports:** align, anchor
+-	**Supports:** align, anchor, spacing (blockGap), units (em, px, rem, vh, vw), ~~html~~
 -	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, shortCodeTransforms, sizeSlug
 
 ## Group
@@ -257,7 +257,7 @@ Combine blocks into a group. ([Source](https://github.com/WordPress/gutenberg/tr
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** tagName, templateLock
 
 ## Heading
@@ -322,6 +322,15 @@ Create a bulleted or numbered list. ([Source](https://github.com/WordPress/guten
 -	**Category:** text
 -	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
+
+## List item
+
+Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item))
+
+-	**Name:** core/list-item
+-	**Category:** text
+-	**Supports:** ~~className~~
+-	**Attributes:** content, placeholder
 
 ## Login/out
 
@@ -439,6 +448,15 @@ Display post author details such as name, avatar, and bio. ([Source](https://git
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** avatarSize, byline, showAvatar, showBio, textAlign
+
+## Post Author Biography
+
+The author biography. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-biography))
+
+-	**Name:** core/post-author-biography
+-	**Category:** theme
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Attributes:** textAlign
 
 ## Post Author Name
 
@@ -593,6 +611,15 @@ An advanced block that allows displaying post types based on different query par
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
 -	**Attributes:** displayLayout, query, queryId, tagName
 
+## No results
+
+Contains the block elements used to render content when no query results are found. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-no-results))
+
+-	**Name:** core/query-no-results
+-	**Category:** theme
+-	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
+-	**Attributes:** 
+
 ## Pagination
 
 Displays a paginated navigation to next/previous set of posts, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination))
@@ -647,6 +674,15 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 -	**Supports:** anchor, typography (fontSize, lineHeight)
 -	**Attributes:** align, citation, value
 
+## Read More
+
+Displays the link of a post, page, or any other content-type. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/read-more))
+
+-	**Name:** core/read-more
+-	**Category:** theme
+-	**Supports:** color (background, gradients, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** content, linkTarget
+
 ## RSS
 
 Display entries from any RSS or Atom feed. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/rss))
@@ -671,8 +707,8 @@ Create a break between ideas or sections with a horizontal separator. ([Source](
 
 -	**Name:** core/separator
 -	**Category:** design
--	**Supports:** align (center, full, wide), anchor
--	**Attributes:** color, customColor
+-	**Supports:** align (center, full, wide), anchor, color (background, gradients, ~~text~~)
+-	**Attributes:** opacity
 
 ## Shortcode
 

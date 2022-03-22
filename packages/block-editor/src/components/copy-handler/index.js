@@ -19,7 +19,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getPasteEventData } from '../../utils/get-paste-event-data';
+import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 
 export function useNotifyCopy() {
@@ -132,7 +132,7 @@ export function useClipboardHandler() {
 				removeBlocks( selectedBlockClientIds );
 			} else if ( event.type === 'paste' ) {
 				if ( eventDefaultPrevented ) {
-					// This was likely already handled in rich-text/use-paste-handler.js
+					// This was likely already handled in rich-text/use-paste-handler.js.
 					return;
 				}
 				const {

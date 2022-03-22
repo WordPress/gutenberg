@@ -55,7 +55,7 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 
 	window.addEventListener( 'orientationchange', setIsMatching );
 
-	// Set initial values
+	// Set initial values.
 	setIsMatching();
 	setIsMatching.flush();
 };

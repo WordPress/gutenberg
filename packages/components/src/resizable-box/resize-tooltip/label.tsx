@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -33,7 +33,7 @@ type LabelProps = React.DetailedHTMLProps<
 
 function Label(
 	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
-	ref: Ref< HTMLDivElement >
+	ref: ForwardedRef< HTMLDivElement >
 ): JSX.Element | null {
 	const showLabel = !! label;
 

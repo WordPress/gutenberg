@@ -1,12 +1,10 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/navigation-area",
 		"isValid": true,
 		"attributes": {
 			"area": "secondary"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

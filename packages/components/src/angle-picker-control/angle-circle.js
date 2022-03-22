@@ -32,7 +32,7 @@ function AngleCircle( { value, onChange, ...props } ) {
 		// Prevent (drag) mouse events from selecting and accidentally
 		// triggering actions from other elements.
 		event.preventDefault();
-		// Ensure the input isn't focused as preventDefault would leave it
+		// Ensure the input isn't focused as preventDefault would leave it.
 		ownerDocument.activeElement.blur();
 		onChange( getAngle( centerX, centerY, event.clientX, event.clientY ) );
 	};

@@ -1,0 +1,43 @@
+{
+	"name": "@wordpress/preferences",
+	"version": "1.0.0",
+	"description": "Utilities for managing WordPress preferences.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"preferences",
+		"settings",
+		"options"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/preferences/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/preferences"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"classnames": "^2.3.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

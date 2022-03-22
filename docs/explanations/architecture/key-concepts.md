@@ -57,6 +57,8 @@ While the post editor concentrates on the content of a post, the [template](/doc
 
 Note: custom post types can also be initialized with a starting `post_content` template that should not be confused with the theme template system described above.
 
-## Global Styles (in progress)
+## Global Styles
 
-Describes a set of configuration and default properties of blocks and their visual aspects. Global Styles is both an interface (which users access through the site editor) and a configuration system done through [a `theme.json` file](/docs/how-to-guides/themes/theme-json.md). This file absorbs most of the configuration aspects usually scattered through various `add_theme_support` calls to simplify communicating with the editor. It thus aims to improve declaring what settings should be enabled, what attributes are supported, what specific tools a theme offers (like a custom color palette), the available design tools present both globally and on each block, and an infrastructure that allows to enqueue only the relevant CSS based on what blocks are used on a page.
+Global Styles is both an interface (which users access through the site editor) and a configuration system done through [a `theme.json` file](/docs/how-to-guides/themes/theme-json.md). This file absorbs most of the configuration aspects usually scattered through various `add_theme_support` calls to simplify communicating with the editor. It thus aims to improve declaring what settings should be enabled, what specific tools a theme offers (like a custom color palette), the available design tools present, and an infrastructure that allows to coordinate the styles coming from WordPress, the active theme, and the user.
+
+Learn more about [Global Styles](/docs/explanations/architecture/styles.md#global-styles).

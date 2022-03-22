@@ -72,7 +72,9 @@ export default function UnsavedInnerBlocks( {
 
 	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
 
-	const createNavigationMenu = useCreateNavigationMenu( clientId );
+	const { create: createNavigationMenu } = useCreateNavigationMenu(
+		clientId
+	);
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( async () => {

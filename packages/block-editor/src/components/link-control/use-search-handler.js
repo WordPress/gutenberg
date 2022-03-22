@@ -115,8 +115,8 @@ const handleEntitySearch = async (
 				// the `id` prop is intentionally ommitted here because it
 				// is never exposed as part of the component's public API.
 				// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
-				title: val, // must match the existing `<input>`s text value
-				url: val, // must match the existing `<input>`s text value
+				title: val, // Must match the existing `<input>`s text value.
+				url: val, // Must match the existing `<input>`s text value.
 				type: CREATE_TYPE,
 		  } );
 };

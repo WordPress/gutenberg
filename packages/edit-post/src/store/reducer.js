@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, get, includes, omit, union, without } from 'lodash';
+import { flow, get, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -74,49 +74,6 @@ export const preferences = flow( [
 					},
 				};
 			}
-		}
-
-		return state;
-	},
-	editorMode( state, action ) {
-		if ( action.type === 'SWITCH_MODE' ) {
-			return action.mode;
-		}
-
-		return state;
-	},
-	hiddenBlockTypes( state, action ) {
-		switch ( action.type ) {
-			case 'SHOW_BLOCK_TYPES':
-				return without( state, ...action.blockNames );
-
-			case 'HIDE_BLOCK_TYPES':
-				return union( state, action.blockNames );
-		}
-
-		return state;
-	},
-	preferredStyleVariations( state, action ) {
-		switch ( action.type ) {
-			case 'UPDATE_PREFERRED_STYLE_VARIATIONS': {
-				if ( ! action.blockName ) {
-					return state;
-				}
-				if ( ! action.blockStyle ) {
-					return omit( state, [ action.blockName ] );
-				}
-				return {
-					...state,
-					[ action.blockName ]: action.blockStyle,
-				};
-			}
-		}
-		return state;
-	},
-	localAutosaveInterval( state, action ) {
-		switch ( action.type ) {
-			case 'UPDATE_LOCAL_AUTOSAVE_INTERVAL':
-				return action.interval;
 		}
 
 		return state;

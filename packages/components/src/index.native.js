@@ -62,7 +62,7 @@ export {
 } from './unit-control/utils';
 export { default as Disabled } from './disabled';
 
-// Higher-Order Components
+// Higher-Order Components.
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
@@ -73,7 +73,7 @@ export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 export * from './text';
 
-// Mobile Components
+// Mobile Components.
 export {
 	__unstableAutocompletionItemsFill,
 	__unstableAutocompletionItemsSlot,
@@ -113,7 +113,7 @@ export { default as AudioPlayer } from './mobile/audio-player';
 export { default as Badge } from './mobile/badge';
 export { default as Gridicons } from './mobile/gridicons';
 
-// Utils
+// Utils.
 export { colorsUtils } from './mobile/color-settings/utils';
 export {
 	WIDE_ALIGNMENTS,
@@ -121,7 +121,7 @@ export {
 	alignmentHelpers,
 } from './mobile/utils/alignments';
 
-// Hooks
+// Hooks.
 export {
 	convertUnitToMobile,
 	useConvertUnitToMobile,
@@ -134,4 +134,8 @@ export {
 	withGlobalStyles,
 	getMergedGlobalStyles,
 } from './mobile/global-styles-context';
-export { getGlobalStyles } from './mobile/global-styles-context/utils';
+export {
+	getGlobalStyles,
+	getColorsAndGradients,
+	useMobileGlobalStylesColors,
+} from './mobile/global-styles-context/utils';

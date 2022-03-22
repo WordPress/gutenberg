@@ -21,10 +21,20 @@ const orderOptions = [
 	},
 ];
 
+const defaultPageOptions = [
+	{
+		label: __( 'Newest' ),
+		value: 'newest',
+	},
+	{
+		label: __( 'Oldest' ),
+		value: 'oldest',
+	},
+];
+
 export default function CommentsInspectorControls( {
-	attributes: { TagName, perPage, order, inherit },
+	attributes: { TagName, perPage, order, inherit, defaultPage },
 	setAttributes,
-	defaultSettings: { defaultPerPage, defaultOrder },
 } ) {
 	return (
 		<InspectorControls>
@@ -35,8 +45,6 @@ export default function CommentsInspectorControls( {
 					onChange={ () => {
 						setAttributes( {
 							inherit: ! inherit,
-							order: inherit ? defaultOrder : null,
-							perPage: inherit ? defaultPerPage : null,
 						} );
 					} }
 				/>
@@ -49,6 +57,16 @@ export default function CommentsInspectorControls( {
 							onChange={ ( value ) => {
 								setAttributes( {
 									order: value,
+								} );
+							} }
+						/>
+						<SelectControl
+							label={ __( 'Default page' ) }
+							value={ defaultPage }
+							options={ defaultPageOptions }
+							onChange={ ( value ) => {
+								setAttributes( {
+									defaultPage: value,
 								} );
 							} }
 						/>

@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
+
 function addManifest( manifest ) {
 	const link = document.createElement( 'link' );
 	link.rel = 'manifest';
@@ -164,6 +169,8 @@ window.addEventListener( 'load', () => {
 		),
 	] ).then( () => {
 		addManifest( manifest );
-		window.navigator.serviceWorker.register( adminUrl + '?service-worker' );
+		window.navigator.serviceWorker.register(
+			addQueryArgs( adminUrl, { 'service-worker': true } )
+		);
 	} );
 } );

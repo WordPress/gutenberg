@@ -277,7 +277,7 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 					$config['settings'] = $existing_config['settings'];
 				}
 				$config['isGlobalStylesUserThemeJSON'] = true;
-				$config['version']                     = WP_Theme_JSON::LATEST_SCHEMA;
+				$config['version']                     = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
 				$changes->post_content                 = wp_json_encode( $config );
 			}
 
@@ -307,7 +307,7 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 			$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
 			$config                           = array();
 			if ( $is_global_styles_user_theme_json ) {
-				$config = ( new WP_Theme_JSON( $raw_config, 'custom' ) )->get_raw_data();
+				$config = ( new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' ) )->get_raw_data();
 			}
 
 			// Base fields for every post.
@@ -555,7 +555,7 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 				);
 			}
 
-			$theme  = WP_Theme_JSON_Resolver::get_merged_data( 'theme' );
+			$theme  = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
 			$data   = array();
 			$fields = $this->get_fields_for_response( $request );
 
@@ -564,8 +564,10 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 			}
 
 			if ( rest_is_field_included( 'styles', $fields ) ) {
-				$raw_data       = $theme->get_raw_data();
-				$data['styles'] = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
+				$raw_data = $theme->get_raw_data();
+				if ( isset( $raw_data['styles'] ) ) {
+					$data['styles'] = $raw_data['styles'];
+				}
 			}
 
 			$context = ! empty( $request['context'] ) ? $request['context'] : 'view';

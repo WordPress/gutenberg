@@ -49,65 +49,6 @@ const migrateWithLayout = ( attributes ) => {
 
 // Social Links block deprecations.
 const deprecated = [
-	// Implement `flex` layout.
-	{
-		attributes: {
-			iconColor: {
-				type: 'string',
-			},
-			customIconColor: {
-				type: 'string',
-			},
-			iconColorValue: {
-				type: 'string',
-			},
-			iconBackgroundColor: {
-				type: 'string',
-			},
-			customIconBackgroundColor: {
-				type: 'string',
-			},
-			iconBackgroundColorValue: {
-				type: 'string',
-			},
-			openInNewTab: {
-				type: 'boolean',
-				default: false,
-			},
-			size: {
-				type: 'string',
-			},
-		},
-		supports: {
-			align: [ 'left', 'center', 'right' ],
-			anchor: true,
-			__experimentalExposeControlsToChildren: true,
-		},
-		isEligible: ( { layout } ) => ! layout,
-		migrate: migrateWithLayout,
-		save( props ) {
-			const {
-				attributes: {
-					iconBackgroundColorValue,
-					iconColorValue,
-					itemsJustification,
-					size,
-				},
-			} = props;
-
-			const className = classNames( size, {
-				'has-icon-color': iconColorValue,
-				'has-icon-background-color': iconBackgroundColorValue,
-				[ `items-justified-${ itemsJustification }` ]: itemsJustification,
-			} );
-
-			return (
-				<ul { ...useBlockProps.save( { className } ) }>
-					<InnerBlocks.Content />
-				</ul>
-			);
-		},
-	},
 	// V1. Remove CSS variable use for colors.
 	{
 		attributes: {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref, KeyboardEvent } from 'react';
+import type { ForwardedRef, KeyboardEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -28,13 +28,15 @@ import { useCx } from '../utils/hooks/use-cx';
 
 function ConfirmDialog(
 	props: WordPressComponentProps< OwnProps, 'div', false >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		isOpen: isOpenProp,
 		onConfirm,
 		onCancel,
 		children,
+		confirmButtonText,
+		cancelButtonText,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
@@ -75,8 +77,8 @@ function ConfirmDialog(
 		[ handleEvent, onConfirm ]
 	);
 
-	const cancelLabel = __( 'Cancel' );
-	const confirmLabel = __( 'OK' );
+	const cancelLabel = cancelButtonText ?? __( 'Cancel' );
+	const confirmLabel = confirmButtonText ?? __( 'OK' );
 
 	return (
 		<>

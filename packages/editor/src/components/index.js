@@ -1,7 +1,7 @@
-// Block Creation Components
+// Block Creation Components.
 export * from './autocompleters';
 
-// Post Related Components
+// Post Related Components.
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
@@ -48,6 +48,8 @@ export { default as PostSticky } from './post-sticky';
 export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostSwitchToDraftButton } from './post-switch-to-draft-button';
 export { default as PostTaxonomies } from './post-taxonomies';
+export { default as PostTaxonomiesFlatTermSelector } from './post-taxonomies/flat-term-selector';
+export { default as PostTaxonomiesHierarchicalTermSelector } from './post-taxonomies/hierarchical-term-selector';
 export { default as PostTaxonomiesCheck } from './post-taxonomies/check';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
@@ -62,7 +64,7 @@ export { default as ThemeSupportCheck } from './theme-support-check';
 export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
 
-// State Related Components
+// State Related Components.
 export { default as EditorProvider } from './provider';
 
 export * from './deprecated';
