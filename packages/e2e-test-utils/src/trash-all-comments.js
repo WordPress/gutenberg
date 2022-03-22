@@ -15,7 +15,7 @@ export async function trashAllComments() {
 	// Visit `/wp-admin/edit-comments.php` so we can see a list of comments and delete them.
 	await visitAdminPage( 'edit-comments.php' );
 
-	// If this selector doesn't exist there are no posts for us to delete.
+	// If this selector doesn't exist there are no comments for us to delete.
 	const bulkSelector = await page.$( '#bulk-action-selector-top' );
 	if ( ! bulkSelector ) {
 		return;

@@ -7,13 +7,17 @@ import {
 	insertBlock,
 	pressKeyTimes,
 	publishPost,
+	getOption,
 	setOption,
 	trashAllComments,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Comment Query Loop', () => {
+	let defaultPageComments, defaultCommentsPerPage;
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
+		defaultPageComments = await getOption( 'page_comments' );
+		defaultCommentsPerPage = await getOption( 'comments_per_page' );
 		await setOption( 'page_comments', true, 'options-discussion.php' );
 		await setOption( 'comments_per_page', '1', 'options-discussion.php' );
 		await createNewPost();
@@ -29,6 +33,7 @@ describe( 'Comment Query Loop', () => {
 			'.post-publish-panel__postpublish-buttons .is-primary'
 		);
 
+		// TODO: We can extract this into a util once we find we need it elsewhere.
 		// Create three comments for that post.
 		for ( let i = 0; i < 3; i++ ) {
 			await page.waitForSelector( 'textarea#comment' );
@@ -42,7 +47,7 @@ describe( 'Comment Query Loop', () => {
 			await page.waitForNavigation();
 		}
 
-		// We should have a previous comments page link.
+		// We check that there is a previous comments page link.
 		await page.waitForSelector( '.wp-block-comments-pagination-previous' );
 		expect(
 			await page.$( '.wp-block-comments-pagination-previous' )
@@ -53,7 +58,7 @@ describe( 'Comment Query Loop', () => {
 
 		await page.click( '.wp-block-comments-pagination-previous' );
 
-		// We should have a previous and a next link.
+		// We check that there are a previous and a next link.
 		expect(
 			await page.$( '.wp-block-comments-pagination-previous' )
 		).not.toBeNull();
@@ -62,19 +67,26 @@ describe( 'Comment Query Loop', () => {
 		).not.toBeNull();
 		await page.click( '.wp-block-comments-pagination-previous' );
 
-		// We should only have a next link
+		// We check that there is only have a next link
 		expect(
 			await page.$( '.wp-block-comments-pagination-previous' )
 		).toBeNull();
 		expect(
 			await page.$( '.wp-block-comments-pagination-next' )
 		).not.toBeNull();
-		// Return to the editor and trash all comments.
 	} );
 	afterAll( async () => {
 		await trashAllComments();
 		await activateTheme( 'twentytwentyone' );
-		await setOption( 'page_comments', false, 'options-discussion.php' );
-		await setOption( 'comments_per_page', '50', 'options-discussion.php' );
+		await setOption(
+			'page_comments',
+			defaultPageComments === '1',
+			'options-discussion.php'
+		);
+		await setOption(
+			'comments_per_page',
+			defaultCommentsPerPage,
+			'options-discussion.php'
+		);
 	} );
 } );
