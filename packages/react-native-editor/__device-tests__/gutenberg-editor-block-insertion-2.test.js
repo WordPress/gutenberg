@@ -66,7 +66,7 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 <!-- /wp:image -->
 
 <!-- wp:separator -->
-<hr class="wp-block-separator" has-alpha-channel-opacity/>
+<hr class="wp-block-separator has-alpha-channel-opacity" />
 <!-- /wp:separator -->
 
 <!-- wp:list -->
@@ -89,7 +89,7 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 <!-- /wp:image -->
 
 <!-- wp:separator -->
-<hr class="wp-block-separator" has-alpha-channel-opacity/>
+<hr class="wp-block-separator has-alpha-channel-opacity" />
 <!-- /wp:separator -->
 
 <!-- wp:list -->
@@ -116,7 +116,7 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 <!-- /wp:image -->
 
 <!-- wp:separator -->
-<hr class="wp-block-separator" has-alpha-channel-opacity/>
+<hr class="wp-block-separator has-alpha-channel-opacity" />
 <!-- /wp:separator -->
 
 <!-- wp:list -->
