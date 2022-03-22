@@ -31,13 +31,13 @@ Using the `wp_` prefix avoids us having to rename functions and classes from `gu
 
 Functions that are intended solely for the plugin, e.g., plugin infrastructure, should use the `gutenberg_` prefix.
 
-#### Good
+#### Feature that might be merged to Core
 
 ```php
 function wp_get_navigation( $slug ) { ... }
 ```
 
-#### Not so good
+#### Plugin infrastructure that will never be merged to Core
 
 ```php
 function gutenberg_get_navigation( $slug ) { ... }
