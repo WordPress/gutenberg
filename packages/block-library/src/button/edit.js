@@ -7,7 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useState,
+	useRef,
+	useContext,
+} from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -29,6 +35,11 @@ import {
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { MyContext } from '../buttons/utils';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
@@ -83,6 +94,8 @@ function ButtonEdit( props ) {
 		url,
 		width,
 	} = attributes;
+	const { someKey } = useContext( MyContext );
+	console.log( 'Test using context', someKey );
 	const onSetLinkRel = useCallback(
 		( value ) => {
 			setAttributes( { rel: value } );

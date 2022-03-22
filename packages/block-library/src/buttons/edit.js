@@ -7,11 +7,13 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { name as buttonBlockName } from '../button';
+import { MyContext } from './utils';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 
@@ -53,10 +55,21 @@ function ButtonsEdit( { attributes: { layout = {} } } ) {
 		templateInsertUpdatesSelection: true,
 	} );
 
+	const [ state, setState ] = useState( false );
+
+	const myCustomHandler = () => {
+		setState( ( prevState ) => ! prevState );
+	};
+
+	const ctxValue = {
+		someKey: state,
+	};
+
 	return (
-		<>
+		<MyContext.Provider value={ ctxValue }>
+			<button onClick={ myCustomHandler }>Click Me</button>
 			<div { ...innerBlocksProps } />
-		</>
+		</MyContext.Provider>
 	);
 }
 
