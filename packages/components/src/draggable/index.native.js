@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { Platform } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 
@@ -28,7 +29,7 @@ export default function Draggable( {
 	wrapperAnimatedStyles,
 } ) {
 	const isDragging = useSharedValue( false );
-	const hasPanStarted = useSharedValue( false );
+	const isIOS = Platform.OS === 'ios';
 
 	const longPressGesture = Gesture.LongPress()
 		.onStart( ( ev ) => {
@@ -40,12 +41,9 @@ export default function Draggable( {
 			}
 		} )
 		.onEnd( () => {
-			if ( ! hasPanStarted.value && isDragging.value ) {
-				isDragging.value = false;
-
-				if ( onDragEnd ) {
-					onDragEnd();
-				}
+			'worklet';
+			if ( onDragEnd ) {
+				onDragEnd();
 			}
 		} )
 		.maxDistance( maxDistance )
@@ -57,32 +55,20 @@ export default function Draggable( {
 		.onTouchesMove( ( _, state ) => {
 			'worklet';
 			if ( isDragging.value ) {
-				hasPanStarted.value = true;
 				state.activate();
-			} else {
+			} else if ( isIOS ) {
 				state.fail();
 			}
 		} )
 		.onUpdate( ( ev ) => {
 			'worklet';
-			if ( isDragging.value ) {
-				if ( onDragOver ) {
-					onDragOver( ev );
-				}
+			if ( onDragOver ) {
+				onDragOver( ev );
 			}
 		} )
-		.onEnd( () => {
-			'worklet';
+		.shouldCancelWhenOutside( false );
 
-			if ( isDragging.value && onDragEnd ) {
-				onDragEnd();
-			}
-			isDragging.value = false;
-			hasPanStarted.value = false;
-		} )
-		.simultaneousWithExternalGesture( longPressGesture );
-
-	const dragHandler = Gesture.Race( panGesture, longPressGesture );
+	const dragHandler = Gesture.Simultaneous( panGesture, longPressGesture );
 
 	return (
 		<GestureDetector gesture={ dragHandler }>
