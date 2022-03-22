@@ -8,8 +8,8 @@
 .draggable-placeholder__container {
 	position: absolute;
 	top: 0;
-	left: $block-selected-margin;
-	right: $block-selected-margin;
+	left: $solid-border-space;
+	right: $solid-border-space;
 	bottom: 0;
 	z-index: 10;
 	background-color: $gray-lighten-30;

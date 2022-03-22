@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
@@ -32,7 +31,7 @@ const Context = createContext( { dragHandler: () => null } );
 const { Provider } = Context;
 
 const CHIP_POSITION_PADDING = 32;
-const BLOCK_PLACEHOLDER_HEIGHT = 20;
+const BLOCK_COLLAPSED_HEIGHT = 20;
 
 const BlockDraggableWrapper = ( { children } ) => {
 	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
@@ -161,9 +160,9 @@ const BlockDraggable = ( { clientIds, children } ) => {
 
 	const container = {
 		height: useSharedValue( 0 ),
-		opacity: useSharedValue( 1 ),
 	};
-	const startDraggingContainerHeight = useSharedValue( 0 );
+	const containerHeightBeforeDragging = useSharedValue( 0 );
+	const collapseAnimation = useSharedValue( 0 );
 
 	const onContainerLayout = ( { nativeEvent: { layout } } ) => {
 		container.height.value = layout.height;
@@ -172,16 +171,14 @@ const BlockDraggable = ( { clientIds, children } ) => {
 	const startBlockDragging = ( event ) => {
 		'worklet';
 		startDragging( clientIds, event );
-
-		startDraggingContainerHeight.value = container.height.value;
-
-		container.opacity.value = withTiming( 0 );
+		containerHeightBeforeDragging.value = container.height.value;
+		collapseAnimation.value = withTiming( 1 );
 	};
 
 	const stopBlockDragging = () => {
 		'worklet';
 		stopDragging();
-		container.opacity.value = withTiming( 1 );
+		collapseAnimation.value = withTiming( 0 );
 	};
 
 	const { isDraggable } = useSelect(
@@ -201,30 +198,31 @@ const BlockDraggable = ( { clientIds, children } ) => {
 		[ clientIds ]
 	);
 
-	const blockStyles = useAnimatedStyle( () => {
+	const containerStyles = useAnimatedStyle( () => {
 		const height = interpolate(
-			container.opacity.value,
+			collapseAnimation.value,
 			[ 0, 1 ],
-			[ BLOCK_PLACEHOLDER_HEIGHT, startDraggingContainerHeight.value ]
+			[ containerHeightBeforeDragging.value, BLOCK_COLLAPSED_HEIGHT ]
 		);
-
 		return {
-			opacity: container.opacity.value,
-			height: startDraggingContainerHeight.value !== 0 ? height : 'auto',
+			height:
+				containerHeightBeforeDragging.value === 0 ||
+				collapseAnimation.value === 0
+					? 'auto'
+					: height,
+		};
+	} );
+
+	const blockStyles = useAnimatedStyle( () => {
+		return {
+			opacity: 1 - collapseAnimation.value,
 		};
 	} );
 
 	const placeholderStyles = useAnimatedStyle( () => {
-		const height = interpolate(
-			container.opacity.value,
-			[ 0, 1 ],
-			[ BLOCK_PLACEHOLDER_HEIGHT, startDraggingContainerHeight.value ]
-		);
-
 		return {
-			display: container.opacity.value === 1 ? 'none' : 'flex',
-			opacity: 1 - container.opacity.value,
-			height,
+			display: collapseAnimation.value === 0 ? 'none' : 'flex',
+			opacity: collapseAnimation.value,
 		};
 	} );
 
@@ -233,7 +231,7 @@ const BlockDraggable = ( { clientIds, children } ) => {
 	}
 
 	return (
-		<View onLayout={ onContainerLayout }>
+		<Animated.View onLayout={ onContainerLayout } style={ containerStyles }>
 			<Draggable
 				onDragStart={ startBlockDragging }
 				onDragOver={ updateDragging }
@@ -249,7 +247,7 @@ const BlockDraggable = ( { clientIds, children } ) => {
 				] }
 				pointerEvents="none"
 			/>
-		</View>
+		</Animated.View>
 	);
 };
 
