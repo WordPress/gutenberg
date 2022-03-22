@@ -82,7 +82,7 @@ add_action( 'init', 'wp_register_navigation_cpt' );
 
 Developers should take care to not define functions and classes that are already defined.
 
-When writing new function and classes, it's good practice to use `! function_exists` and `! class_exists`.
+When writing new functions and classes, it's good practice to use `! function_exists` and `! class_exists`.
 
 If Core has defined a symbol once and then Gutenberg defines it a second time, fatal errors will occur.
 
