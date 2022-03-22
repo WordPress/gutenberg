@@ -38,7 +38,7 @@ import {
 	Button,
 	Spinner,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -169,7 +169,6 @@ function Navigation( {
 
 	const [ showNavigationMenuDeleteNotice ] = useNavigationNotice( {
 		name: 'block-library/core/navigation/delete',
-		message: __( 'Navigation Menu successfully deleted.' ),
 	} );
 
 	const [
@@ -799,9 +798,17 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationMenu &&
 							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
-									onDelete={ () => {
+									onDelete={ ( deletedMenuTitle = '' ) => {
 										resetToEmptyBlock();
-										showNavigationMenuDeleteNotice();
+										showNavigationMenuDeleteNotice(
+											sprintf(
+												// translators: %s: the name of a menu (e.g. Header navigation).
+												__(
+													'Navigation menu %s successfully deleted.'
+												),
+												deletedMenuTitle
+											)
+										);
 									} }
 								/>
 							) }
