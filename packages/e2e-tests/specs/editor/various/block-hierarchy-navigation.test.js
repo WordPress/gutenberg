@@ -30,9 +30,9 @@ async function tabToColumnsControl() {
 	} while ( ! isColumnsControl );
 }
 
-async function selectBlocksInListView( blockLabel ) {
-	return await page.$x(
-		`//table[contains(@aria-label,'Block navigation structure')]//span[contains(@class,'block-editor-list-view-block__title') and contains(text(), ${ blockLabel })]`
+async function getListViewBlocks( blockLabel ) {
+	return page.$x(
+		`//table[contains(@aria-label,'Block navigation structure')]//span[contains(@class,'block-editor-list-view-block__title') and text()='${ blockLabel }']`
 	);
 }
 
@@ -57,7 +57,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
 
 		const firstColumnsBlockMenuItem = (
-			await selectBlocksInListView( 'Columns' )
+			await getListViewBlocks( 'Columns' )
 		 )[ 0 ];
 		await firstColumnsBlockMenuItem.click();
 
@@ -79,7 +79,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the last column block.
 		const lastColumnsBlockMenuItem = (
-			await await selectBlocksInListView( 'Column' )
+			await await getListViewBlocks( 'Column' )
 		 )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
 
@@ -189,7 +189,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Try selecting the group block using the Outline.
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
-		const groupMenuItem = ( await selectBlocksInListView( 'Group' ) )[ 0 ];
+		const groupMenuItem = ( await getListViewBlocks( 'Group' ) )[ 0 ];
 		await groupMenuItem.click();
 
 		// The group block's wrapper should be selected.
