@@ -398,16 +398,28 @@ export const entities = ( state = {}, action ) => {
 };
 
 /**
+ * @typedef {Object} UndoStateMeta
+ *
+ * @property {number} offset          Where in the undo stack we are.
+ * @property {Object} [flattenedUndo] Flattened form of undo stack.
+ */
+
+/** @typedef {Array<Object> & UndoStateMeta} UndoState */
+
+/** @type {UndoState} */
+const UNDO_INITIAL_STATE = Object.assign( [], { offset: 0 } );
+
+/** @type {Object} */
+let lastEditAction;
+
+/**
  * Reducer keeping track of entity edit undo history.
  *
- * @param {Object} state  Current state.
+ * @param {UndoState} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {UndoState} Updated state.
  */
-const UNDO_INITIAL_STATE = [];
-UNDO_INITIAL_STATE.offset = 0;
-let lastEditAction;
 export function undo( state = UNDO_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
@@ -439,7 +451,9 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				}
 			}
 
+			/** @type {UndoState} */
 			let nextState;
+
 			if ( isUndoOrRedo ) {
 				nextState = [ ...state ];
 				nextState.offset =
