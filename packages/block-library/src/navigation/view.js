@@ -44,6 +44,15 @@ window.addEventListener( 'load', () => {
 		button.addEventListener( 'click', toggleSubmenuOnClick );
 	} );
 
+	// Close on clicking internal and external links inside modal.
+	const navigationLinks = document.querySelectorAll(
+		'.wp-block-navigation-item__content'
+	);
+
+	navigationLinks.forEach( function ( link ) {
+		link.addEventListener( 'click', () => MicroModal.close() );
+	} );
+
 	// Close on click outside.
 	document.addEventListener( 'click', function ( event ) {
 		const navigationBlocks = document.querySelectorAll(
