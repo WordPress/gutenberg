@@ -7,14 +7,14 @@ import Animated, { useSharedValue } from 'react-native-reanimated';
 /**
  * Draggable component
  *
- * @param {Object}                                      props                       Component props.
- * @param {JSX.Element}                                 props.children              Children to be rendered.
- * @param {?number}                                     props.maxDistance           Maximum distance, that defines how far the finger is allowed to travel during a long press gesture.
- * @param {?number}                                     props.minDuration           Minimum time, that a finger must remain pressed on the corresponding view.
- * @param {Function}                                    props.onDragEnd             Callback when dragging happens over an element.
- * @param {Function}                                    props.onDragOver            Callback when dragging ends.
- * @param {Function}                                    props.onDragStart           Callback when dragging stars.
- * @param {import('react-native-reanimated').StyleProp} props.wrapperAnimatedStyles Animated styles for the wrapper component.
+ * @param {Object}                                      props                         Component props.
+ * @param {JSX.Element}                                 props.children                Children to be rendered.
+ * @param {number}                                      [props.maxDistance]           Maximum distance, that defines how far the finger is allowed to travel during a long press gesture.
+ * @param {number}                                      [props.minDuration]           Minimum time, that a finger must remain pressed on the corresponding view.
+ * @param {Function}                                    [props.onDragEnd]             Callback when dragging ends.
+ * @param {Function}                                    [props.onDragOver]            Callback when dragging happens over an element.
+ * @param {Function}                                    [props.onDragStart]           Callback when dragging starts.
+ * @param {import('react-native-reanimated').StyleProp} [props.wrapperAnimatedStyles] Animated styles for the wrapper component.
  *
  * @return {JSX.Element} The component to be rendered.
  */
