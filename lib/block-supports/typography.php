@@ -220,14 +220,17 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
 }
 
 /**
- * Checks a string for a px or rem value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
+ * Checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
  *
- * @param string $raw_value      Raw size value from theme.json.
- * @param string $preferred_unit Whether to coerce the value to rem or px. Default `'rem'`.
- * @return array                 An array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ]
+ * @param string $raw_value            Raw size value from theme.json.
+ * @param string $coerce_to            Coerce the value to rem or px. Default `'rem'`.
+ * @param number $root_font_size_value Value of root font size for rem|em <-> px conversion.
+ * @param array  $acceptable_units     An array of font size units.
+ * @return array                       An array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ]
  */
-function gutenberg_get_typography_value_and_unit( $raw_value, $preferred_unit = 'rem' ) {
-	$pattern = '/^(\d*\.?\d+)(rem|px){1,1}$/';
+function gutenberg_get_typography_value_and_unit( $raw_value, $coerce_to = 'rem', $root_font_size_value = 16, $acceptable_units = array( 'rem', 'px', 'em' ) ) {
+	$acceptable_units_group = implode( '|', $acceptable_units );
+	$pattern                = '/^(\d*\.?\d+)(' . $acceptable_units_group . '){1,1}$/';
 
 	preg_match( $pattern, $raw_value, $matches );
 
@@ -239,14 +242,13 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $preferred_unit = 
 	$value = $matches[1];
 	$unit  = $matches[2];
 
-	if ( 'rem' === $preferred_unit && 'px' === $unit ) {
-		// Preferred is rem so we convert px to rem.
-		$value = $value / 16;
+	// Default browser font size. Later we could inject some JS to compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
+	if ( 'px' === $coerce_to && ( 'em' === $unit || 'rem' === $unit ) ) {
+		$value = $value * $root_font_size_value;
 	}
 
-	if ( 'px' === $preferred_unit && 'rem' === $unit ) {
-		// Preferred is px so we convert rem to px.
-		$value = $value * 16;
+	if ( 'px' === $unit && ( 'em' === $coerce_to || 'rem' === $coerce_to ) ) {
+		$value = $value / $root_font_size_value;
 	}
 
 	return array(
@@ -265,49 +267,49 @@ function gutenberg_get_typography_font_size_value( $preset ) {
 	$typography_settings = gutenberg_get_global_settings( array( 'typography' ) );
 
 	// This is where we'll keep options I guess.
-	if ( ! isset( $typography_settings['responsive'] ) ) {
+	if ( ! isset( $typography_settings['fluid'] ) ) {
 		return $preset['size'];
 	}
 
-	$responsive_settings = $typography_settings['responsive'];
+	$fluid_settings = $typography_settings['fluid'];
 
-	// Defaults.
-	// Up for discussion.
-	// We expect these to be in `px`.
-	$default_minimum_viewport_width   = '1600px';
-	$default_maximum_viewport_width   = '650px';
+	$default_maximum_viewport_width_px = '1900px';
+	$default_minimum_viewport_width_px = '800px';
+	// Used to compute min and max font sizes.
+	// We could also use values directly from fontSize items, e.g., fontSizes[n]['maxSize'] and fontSizes[n]['minSize'].
 	$default_minimum_font_size_factor = 0.75;
-	$default_maximum_font_size_factor = 1.5;
+	$default_maximum_font_size_factor = 1;
 
 	// Font sizes.
-	$preferred_size = gutenberg_get_typography_value_and_unit( $preset['size'] );
+	$relative_font_size = gutenberg_get_typography_value_and_unit( $preset['size'] );
 
-	if ( empty( $preferred_size ) ) {
+	if ( empty( $relative_font_size ) ) {
 		return $preset['size'];
 	}
 
-	$preferred_unit        = $preferred_size['unit'];
-	$maximum_font_size_raw = isset( $preset['max'] ) ? $preset['max'] : $preferred_size['value'] * $default_minimum_font_size_factor . $preferred_unit;
-	$minimum_font_size_raw = isset( $preset['min'] ) ? $preset['min'] : $preferred_size['value'] * $default_maximum_font_size_factor . $preferred_unit;
-	$maximum_font_size     = gutenberg_get_typography_value_and_unit( $maximum_font_size_raw, $preferred_unit )['value'];
-	$minimum_font_size     = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw, $preferred_unit )['value'];
+	// We need to get the unit to "normalize" rem/em and px.
+	$relative_font_size_unit = $relative_font_size['unit'];
+	$maximum_font_size_raw   = ( $relative_font_size['value'] * $default_maximum_font_size_factor ) . $relative_font_size_unit;
+	$minimum_font_size_raw   = ( $relative_font_size['value'] * $default_minimum_font_size_factor ) . $relative_font_size_unit;
+	$maximum_font_size       = gutenberg_get_typography_value_and_unit( $maximum_font_size_raw, $relative_font_size_unit );
+	$minimum_font_size       = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw, $relative_font_size_unit );
+	$minimum_font_size_rem   = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw, 'rem' );
 
 	// Viewport widths.
 	// Could we also take these from layout? contentSize and wideSize?
-	$maximum_viewport_width_raw = isset( $responsive_settings['maxViewportWidth'] ) ? $responsive_settings['maxViewportWidth'] : $default_maximum_viewport_width;
-	$minimum_viewport_width_raw = isset( $responsive_settings['minViewportWidth'] ) ? $responsive_settings['minViewportWidth'] : $default_minimum_viewport_width;
-	$maximum_viewport_width     = gutenberg_get_typography_value_and_unit( $maximum_viewport_width_raw, $preferred_unit )['value'];
-	$minimum_viewport_width     = gutenberg_get_typography_value_and_unit( $minimum_viewport_width_raw, $preferred_unit )['value'];
+	$maximum_viewport_width_raw = isset( $fluid_settings['maxViewportWidth'] ) ? $fluid_settings['maxViewportWidth'] : $default_maximum_viewport_width_px;
+	$minimum_viewport_width_raw = isset( $fluid_settings['minViewportWidth'] ) ? $fluid_settings['minViewportWidth'] : $default_minimum_viewport_width_px;
+	$maximum_viewport_width     = gutenberg_get_typography_value_and_unit( $maximum_viewport_width_raw, $relative_font_size_unit );
+	$minimum_viewport_width     = gutenberg_get_typography_value_and_unit( $minimum_viewport_width_raw, $relative_font_size_unit );
 
-	// Calculate fluid font size.
-	$rise               = $maximum_font_size - $minimum_font_size;
-	$run                = $maximum_viewport_width - $minimum_viewport_width;
-	$slope              = $rise / $run;
-	$max_font_size_calc = "calc($maximum_font_size * 1{$preferred_unit})";
-	$min_font_size_calc = "calc($minimum_font_size * 1{$preferred_unit})";
-	$fluid_font_size    = "calc($slope * (100vw - calc($minimum_viewport_width * 1{$preferred_unit})) + $min_font_size_calc)";
-
-	return "clamp($min_font_size_calc, $fluid_font_size, $max_font_size_calc);";
+	// Build CSS rule.
+	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
+	$view_port_width_offset = ( $minimum_viewport_width['value'] / 100 ) . $relative_font_size_unit;
+	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
+	$fluid_target_font_size = 'calc(' . implode( '', $minimum_font_size_rem ) . " + ((1vw - $view_port_width_offset) * $linear_factor))";
+	$minimum_font_size      = implode( '', $minimum_font_size );
+	$maximum_font_size      = implode( '', $maximum_font_size );
+	return "clamp($minimum_font_size, $fluid_target_font_size, $maximum_font_size)";
 }
 
 // Register the block support.
