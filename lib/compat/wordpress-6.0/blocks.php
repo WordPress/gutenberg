@@ -157,7 +157,7 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 		$view_asset               = file_exists( $view_asset_file ) ? require( $view_asset_file ) : null;
 		$view_script_dependencies = isset( $view_asset['dependencies'] ) ? $view_asset['dependencies'] : array();
 		$view_script_version      = isset( $view_asset['version'] ) ? $view_asset['version'] : false;
-		$result = wp_register_script(
+		$result                   = wp_register_script(
 			$view_script_handle,
 			gutenberg_url( str_replace( gutenberg_dir_path(), '', $view_script_path ) ),
 			$view_script_dependencies,
