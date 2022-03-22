@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import debounceAsync from '../debounce-async';
+import createAsyncDebouncer from '../create-async-debouncer';
 
 // See https://stackoverflow.com/questions/52177631/jest-timer-and-promise-dont-work-well-settimeout-and-async-function.
 // Jest fake timers and async functions don't mix too well, since queued up
@@ -17,25 +17,25 @@ function timeout( milliseconds ) {
 }
 
 describe( 'debounceAsync', () => {
-	it( 'uses a leading debounce, the first call happens immediately', () => {
+	it( 'uses a leading debounce by default, the first call happens immediately', () => {
 		const fn = jest.fn( async () => {} );
-		const debounced = debounceAsync( fn, 20 );
-		debounced();
+		const debounce = createAsyncDebouncer();
+		debounce( () => fn(), { delayMS: 20 } );
 		expect( fn ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'calls the function on the leading edge and then once on the trailing edge when there are multiple calls', async () => {
+	it( 'calls the function on the leading edge and then once on the trailing edge when there are multiple leading edge calls', async () => {
 		jest.useFakeTimers();
 		const fn = jest.fn( async () => {} );
-		const debounced = debounceAsync( fn, 20 );
+		const debounce = createAsyncDebouncer();
 
-		debounced( 'A' );
+		debounce( () => fn( 'A' ), { delayMS: 20 } );
 
 		expect( fn ).toHaveBeenCalledTimes( 1 );
 
-		debounced( 'B' );
-		debounced( 'C' );
-		debounced( 'D' );
+		debounce( () => fn( 'B' ), { delayMS: 20 } );
+		debounce( () => fn( 'C' ), { delayMS: 20 } );
+		debounce( () => fn( 'D' ), { delayMS: 20 } );
 
 		await flushPromises();
 		jest.runAllTimers();
@@ -48,16 +48,50 @@ describe( 'debounceAsync', () => {
 		jest.useRealTimers();
 	} );
 
+	it( 'can be configured to use a trailing edge debounce, the first call happens after the delay', () => {
+		jest.useFakeTimers();
+		const fn = jest.fn( async () => {} );
+		const debounce = createAsyncDebouncer();
+		debounce( () => fn(), { delayMS: 20, isTrailing: true } );
+
+		// The function isn't called immediately.
+		expect( fn ).toHaveBeenCalledTimes( 0 );
+
+		// After the delay, the function is called.
+		jest.advanceTimersByTime( 20 );
+		expect( fn ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'calls the function on the trailing edge only once when there are multiple trailing edge calls', async () => {
+		jest.useFakeTimers();
+		const fn = jest.fn( async () => {} );
+		const debounce = createAsyncDebouncer();
+
+		debounce( () => fn( 'A' ), { delayMS: 20, isTrailing: true } );
+		debounce( () => fn( 'B' ), { delayMS: 20, isTrailing: true } );
+		debounce( () => fn( 'C' ), { delayMS: 20, isTrailing: true } );
+		debounce( () => fn( 'D' ), { delayMS: 20, isTrailing: true } );
+
+		await flushPromises();
+		jest.runAllTimers();
+
+		expect( fn ).toHaveBeenCalledTimes( 1 );
+		expect( fn ).toHaveBeenCalledWith( 'D' );
+
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+	} );
+
 	it( 'ensures the delay has elapsed between calls', async () => {
 		jest.useFakeTimers();
 		const fn = jest.fn( async () => timeout( 10 ) );
-		const debounced = debounceAsync( fn, 20 );
+		const debounce = createAsyncDebouncer();
 
 		// The first call has been triggered, but will take 10ms to resolve.
-		debounced();
-		debounced();
-		debounced();
-		debounced();
+		debounce( () => fn(), { delayMS: 20 } );
+		debounce( () => fn(), { delayMS: 20 } );
+		debounce( () => fn(), { delayMS: 20 } );
+		debounce( () => fn(), { delayMS: 20 } );
 		expect( fn ).toHaveBeenCalledTimes( 1 );
 
 		// The first call has resolved. The delay period has started but has yet to finish.
@@ -87,16 +121,18 @@ describe( 'debounceAsync', () => {
 	it( 'is thenable, returning any data from promise resolution of the debounced function', async () => {
 		expect.assertions( 2 );
 		const fn = async () => 'test';
-		const debounced = debounceAsync( fn, 20 );
+		const debounce = createAsyncDebouncer();
 
 		// Test the return value via awaiting.
-		const returnValue = await debounced();
+		const returnValue = await debounce( () => fn(), {
+			delayMS: 20,
+		} );
 		expect( returnValue ).toBe( 'test' );
 
 		// Test then-ing.
-		await debounced().then( ( thenValue ) =>
-			expect( thenValue ).toBe( 'test' )
-		);
+		await debounce( () => fn(), {
+			delayMS: 20,
+		} ).then( ( thenValue ) => expect( thenValue ).toBe( 'test' ) );
 	} );
 
 	it( 'is catchable', async () => {
@@ -106,11 +142,13 @@ describe( 'debounceAsync', () => {
 			throw expectedError;
 		};
 
-		const debounced = debounceAsync( fn, 20 );
+		const debounce = createAsyncDebouncer();
 
 		// Test traditional try/catch.
 		try {
-			await debounced();
+			await debounce( () => fn(), {
+				delayMS: 20,
+			} );
 		} catch ( error ) {
 			// Disable reason - the test uses `expect.assertions` to ensure
 			// conditional assertions are called.
@@ -119,7 +157,9 @@ describe( 'debounceAsync', () => {
 		}
 
 		// Test chained .catch().
-		await debounced().catch( ( error ) => {
+		await await debounce( () => fn(), {
+			delayMS: 20,
+		} ).catch( ( error ) => {
 			// Disable reason - the test uses `expect.assertions` to ensure
 			// conditional assertions are called.
 			// eslint-disable-next-line jest/no-conditional-expect

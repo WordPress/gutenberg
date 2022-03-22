@@ -4,6 +4,40 @@
 import { convertLegacyData } from '..';
 
 const legacyData = {
+	'core/block-editor': {
+		preferences: {
+			insertUsage: {
+				'core/paragraph': {
+					time: 1649320988011,
+					count: 2,
+					insert: {
+						name: 'core/paragraph',
+					},
+				},
+				'core/quote': {
+					time: 1649320934860,
+					count: 1,
+					insert: {
+						name: 'core/quote',
+					},
+				},
+				'core/image': {
+					time: 1649321017053,
+					count: 1,
+					insert: {
+						name: 'core/image',
+					},
+				},
+				'core/group': {
+					time: 1649321017077,
+					count: 1,
+					insert: {
+						name: 'core/group',
+					},
+				},
+			},
+		},
+	},
 	'core/interface': {
 		enableItems: {
 			singleEnableItems: {
@@ -65,42 +99,44 @@ const legacyData = {
 };
 
 const alreadyConvertedData = {
-	'core/block-editor': {
+	'core/preferences': {
 		preferences: {
-			insertUsage: {
-				'core/paragraph': {
-					time: 1649320988011,
-					count: 2,
-					insert: {
-						name: 'core/paragraph',
+			core: {
+				insertUsage: {
+					'core/paragraph': {
+						time: 1649320988011,
+						count: 2,
+						insert: {
+							name: 'core/paragraph',
+						},
 					},
-				},
-				'core/quote': {
-					time: 1649320934860,
-					count: 1,
-					insert: {
-						name: 'core/quote',
+					'core/quote': {
+						time: 1649320934860,
+						count: 1,
+						insert: {
+							name: 'core/quote',
+						},
 					},
-				},
-				'core/image': {
-					time: 1649321017053,
-					count: 1,
-					insert: {
-						name: 'core/image',
+					'core/image': {
+						time: 1649321017053,
+						count: 1,
+						insert: {
+							name: 'core/image',
+						},
 					},
-				},
-				'core/group': {
-					time: 1649321017077,
-					count: 1,
-					insert: {
-						name: 'core/group',
+					'core/group': {
+						time: 1649321017077,
+						count: 1,
+						insert: {
+							name: 'core/group',
+						},
 					},
 				},
 			},
-		},
-	},
-	'core/preferences': {
-		preferences: {
+			'core/customize-widgets': {
+				welcomeGuide: false,
+				fixedToolbar: true,
+			},
 			'core/edit-widgets': {
 				welcomeGuide: false,
 				fixedToolbar: true,
@@ -134,6 +170,38 @@ describe( 'convertLegacyData', () => {
 	it( 'converts to the expected format', () => {
 		expect( convertLegacyData( legacyData ) ).toMatchInlineSnapshot( `
 		{
+		  "core": {
+		    "insertUsage": {
+		      "core/group": {
+		        "count": 1,
+		        "insert": {
+		          "name": "core/group",
+		        },
+		        "time": 1649321017077,
+		      },
+		      "core/image": {
+		        "count": 1,
+		        "insert": {
+		          "name": "core/image",
+		        },
+		        "time": 1649321017053,
+		      },
+		      "core/paragraph": {
+		        "count": 2,
+		        "insert": {
+		          "name": "core/paragraph",
+		        },
+		        "time": 1649320988011,
+		      },
+		      "core/quote": {
+		        "count": 1,
+		        "insert": {
+		          "name": "core/quote",
+		        },
+		        "time": 1649320934860,
+		      },
+		    },
+		  },
 		  "core/customize-widgets": {
 		    "fixedToolbar": true,
 		    "keepCaretInsideBlock": true,
@@ -183,6 +251,42 @@ describe( 'convertLegacyData', () => {
 		expect( convertLegacyData( alreadyConvertedData ) )
 			.toMatchInlineSnapshot( `
 		{
+		  "core": {
+		    "insertUsage": {
+		      "core/group": {
+		        "count": 1,
+		        "insert": {
+		          "name": "core/group",
+		        },
+		        "time": 1649321017077,
+		      },
+		      "core/image": {
+		        "count": 1,
+		        "insert": {
+		          "name": "core/image",
+		        },
+		        "time": 1649321017053,
+		      },
+		      "core/paragraph": {
+		        "count": 2,
+		        "insert": {
+		          "name": "core/paragraph",
+		        },
+		        "time": 1649320988011,
+		      },
+		      "core/quote": {
+		        "count": 1,
+		        "insert": {
+		          "name": "core/quote",
+		        },
+		        "time": 1649320934860,
+		      },
+		    },
+		  },
+		  "core/customize-widgets": {
+		    "fixedToolbar": true,
+		    "welcomeGuide": false,
+		  },
 		  "core/edit-post": {
 		    "complementaryArea": "edit-post/block",
 		    "editorMode": "visual",

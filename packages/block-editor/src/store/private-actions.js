@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -381,4 +383,72 @@ export const modifyContentLockBlock =
 			clientId,
 			focusModeToRevert
 		);
+	};
+
+/**
+ * Updates the inserter usage statistics in the preferences store.
+ *
+ * Note: this function is an internal and not intended to ever be made
+ * non-private.
+ *
+ * @param {Array} blocks The array of blocks that were inserted.
+ */
+export const updateInsertUsage =
+	( blocks ) =>
+	( { registry } ) => {
+		const previousInsertUsage =
+			registry.select( preferencesStore ).get( 'core', 'insertUsage' ) ??
+			{};
+
+		const time = Date.now();
+
+		let updatedInsertUsage = blocks.reduce( ( previousState, block ) => {
+			const { attributes, name: blockName } = block;
+			let id = blockName;
+			const variation = registry
+				.select( blocksStore )
+				.getActiveBlockVariation( blockName, attributes );
+
+			if ( variation?.name ) {
+				id += '/' + variation.name;
+			}
+
+			if ( blockName === 'core/block' ) {
+				id += '/' + attributes.ref;
+			}
+
+			const previousCount = previousState?.[ id ]?.count ?? 0;
+
+			return {
+				...previousState,
+				[ id ]: {
+					time,
+					count: previousCount + 1,
+				},
+			};
+		}, previousInsertUsage );
+
+		// Ensure the list of blocks doesn't grow above `limit` items.
+		// This is to ensure the preferences store data doesn't grow too big
+		// given it's persisted in the database.
+		const limit = 100;
+		const entries = Object.entries( updatedInsertUsage );
+		if ( entries.length > limit ) {
+			// Most recently inserted blocks first.
+			entries.sort( ( entryLeft, entryRight ) => {
+				const [ , { time: timeLeft } ] = entryLeft;
+				const [ , { time: timeRight } ] = entryRight;
+				return timeRight - timeLeft;
+			} );
+
+			// Slice an array of items that are the newest and convert them
+			// back into object form.
+			const entriesToKeep = entries.slice( 0, limit );
+			updatedInsertUsage = Object.fromEntries( entriesToKeep );
+		}
+
+		registry.dispatch( preferencesStore );
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'insertUsage', updatedInsertUsage );
 	};

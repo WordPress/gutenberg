@@ -3,10 +3,6 @@
  */
 import { __, _x } from '@wordpress/i18n';
 
-export const PREFERENCES_DEFAULTS = {
-	insertUsage: {},
-};
-
 /**
  * The default editor settings
  *

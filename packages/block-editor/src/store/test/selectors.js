@@ -15,6 +15,7 @@ import { select, dispatch } from '@wordpress/data';
  */
 import * as selectors from '../selectors';
 import { store } from '../';
+import { getInsertUsage } from '../private-selectors';
 
 const {
 	getBlockName,
@@ -72,6 +73,11 @@ const {
 	getBlocksByName,
 	getBlockEditingMode,
 } = selectors;
+
+jest.mock( '../private-selectors', () => ( {
+	...jest.requireActual( '../private-selectors' ),
+	getInsertUsage: jest.fn(),
+} ) );
 
 describe( 'selectors', () => {
 	let cachedSelectors;
@@ -3287,14 +3293,9 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getInserterItems', () => {
-		afterAll( async () => {
-			await dispatch( store ).updateSettings( {
-				__experimentalReusableBlocks: [],
-			} );
-			await dispatch( store ).resetBlocks( [] );
-		} );
-
 		it( 'should properly list block type and reusable block items', async () => {
+			getInsertUsage.mockImplementation( () => ( {} ) );
+
 			await dispatch( store ).updateSettings( {
 				__experimentalReusableBlocks: [
 					{
@@ -3348,6 +3349,10 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should correctly cache the return values', async () => {
+			// Define the empty object here to simulate that the preferences
+			// store won't return a new object every time.
+			const EMPTY_OBJECT = {};
+			getInsertUsage.mockImplementation( () => EMPTY_OBJECT );
 			await dispatch( store ).updateSettings( {
 				__experimentalReusableBlocks: [
 					{
@@ -3424,6 +3429,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should set isDisabled when a block with `multiple: false` has been used', async () => {
+			getInsertUsage.mockImplementation( () => ( {} ) );
 			await dispatch( store ).resetBlocks( [
 				{
 					clientId: 'block1',
@@ -3439,16 +3445,9 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should set a frecency', async () => {
-			for ( let i = 0; i < 10; i++ ) {
-				await dispatch( store ).insertBlocks( [
-					{
-						clientId: 'block1',
-						name: 'core/test-block-b',
-						innerBlocks: [],
-					},
-				] );
-			}
-
+			getInsertUsage.mockImplementation( () => ( {
+				'core/test-block-b': { count: 10, time: 1000 },
+			} ) );
 			const items = select( store ).getInserterItems();
 			const reusableBlock2Item = items.find(
 				( item ) => item.id === 'core/test-block-b'
@@ -3686,6 +3685,10 @@ describe( 'selectors', () => {
 			);
 		} );
 		it( 'should set frecency', () => {
+			getInsertUsage.mockImplementation( () => ( {
+				'core/with-tranforms-a': { count: 10, time: 1000 },
+			} ) );
+
 			const state = {
 				blocks: {
 					byClientId: new Map(),

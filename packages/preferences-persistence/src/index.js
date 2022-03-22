@@ -2,7 +2,11 @@
  * Internal dependencies
  */
 import create from './create';
-import convertLegacyLocalStorageData from './migrations/legacy-local-storage-data';
+import {
+	getLegacyData,
+	convertLegacyData,
+	convertLegacyInsertUsageData,
+} from './migrations/legacy-local-storage-data';
 import convertPreferencesPackageData from './migrations/preferences-package-data';
 
 export { create };
@@ -38,9 +42,31 @@ export function __unstableCreatePersistenceLayer( serverData, userId ) {
 		preloadedData = convertPreferencesPackageData( serverData );
 	} else if ( localData ) {
 		preloadedData = convertPreferencesPackageData( localData );
-	} else {
+	}
+
+	// Handle legacy data migrations.
+	if ( ! preloadedData ) {
 		// Check if there is data in the legacy format from the old persistence system.
-		preloadedData = convertLegacyLocalStorageData( userId );
+		const legacyData = getLegacyData( userId );
+		preloadedData = convertLegacyData( legacyData );
+	}
+
+	// The insertUsage preference was migrated later than others, the following code
+	// performs a separate migration just for this data.
+	if ( preloadedData && ! preloadedData?.core?.insertUsage ) {
+		const legacyData = getLegacyData( userId );
+
+		// Only run the migration if there's something to migrate.
+		if ( legacyData?.[ 'core/block-editor' ]?.preferences?.insertUsage ) {
+			// Check if there is data in the legacy format from the old persistence system.
+			preloadedData = {
+				...preloadedData,
+				core: {
+					...preloadedData.core,
+					insertUsage: convertLegacyInsertUsageData( legacyData ),
+				},
+			};
+		}
 	}
 
 	return create( {

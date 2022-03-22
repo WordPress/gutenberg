@@ -7,12 +7,12 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { pipe } from '@wordpress/compose';
-import { combineReducers, select } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
+import { combineReducers } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
+import { SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 
 const identity = ( x ) => x;
@@ -1677,58 +1677,6 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 }
 
 /**
- * Reducer returning the user preferences.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
-		case 'INSERT_BLOCKS':
-		case 'REPLACE_BLOCKS': {
-			const nextInsertUsage = action.blocks.reduce(
-				( prevUsage, block ) => {
-					const { attributes, name: blockName } = block;
-					let id = blockName;
-					// If a block variation match is found change the name to be the same with the
-					// one that is used for block variations in the Inserter (`getItemFromVariation`).
-					const match = select( blocksStore ).getActiveBlockVariation(
-						blockName,
-						attributes
-					);
-					if ( match?.name ) {
-						id += '/' + match.name;
-					}
-					if ( blockName === 'core/block' ) {
-						id += '/' + attributes.ref;
-					}
-
-					return {
-						...prevUsage,
-						[ id ]: {
-							time: action.time,
-							count: prevUsage[ id ]
-								? prevUsage[ id ].count + 1
-								: 1,
-						},
-					};
-				},
-				state.insertUsage
-			);
-
-			return {
-				...state,
-				insertUsage: nextInsertUsage,
-			};
-		}
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning an object where each key is a block client ID, its value
  * representing the settings for its nested blocks.
  *
@@ -2083,7 +2031,6 @@ const combinedReducers = combineReducers( {
 	insertionPoint,
 	template,
 	settings,
-	preferences,
 	lastBlockAttributesChange,
 	lastFocus,
 	editorMode,
