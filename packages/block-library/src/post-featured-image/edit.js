@@ -179,7 +179,7 @@ function PostFeaturedImageDisplay( {
 		) : (
 			<img
 				src={ mediaUrl }
-				alt={ media.alt_text || __( 'Featured image' ) }
+				alt={ __( 'Featured image' ) }
 				style={ { height, objectFit: height && scale } }
 			/>
 		);
