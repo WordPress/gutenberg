@@ -213,7 +213,7 @@ An advanced block that allows displaying post comments based on different query 
 -	**Name:** core/comments-query-loop
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** defaultPage, inherit, order, perPage, tagName
+-	**Attributes:** tagName
 
 ## Cover
 
