@@ -97,13 +97,14 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function prepare_item_for_response( $item, $request ) {
-		$data = array(
-			'name'       => $item['name'],
-			'title'      => $item['title'],
-			'blockTypes' => $item['blockTypes'],
-			'categories' => $item['categories'],
-			'content'    => $item['content'],
-		);
+		$fields = $this->get_fields_for_response( $request );
+		$keys   = array( 'name', 'title', 'blockTypes', 'categories', 'content' );
+		$data   = array();
+		foreach ( $keys as $key ) {
+			if ( rest_is_field_included( $key, $fields ) ) {
+				$data[ $key ] = $item[ $key ];
+			}
+		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->add_additional_fields_to_object( $data, $request );
