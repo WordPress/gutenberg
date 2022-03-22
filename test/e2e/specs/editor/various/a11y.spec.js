@@ -37,14 +37,19 @@ test.describe( 'a11y', () => {
 		await expect( closeButton ).toBeFocused();
 	} );
 
-	test.skip( 'returns focus to the first tabbable in a modal after blurring a tabbable', async ( {
+	test( 'returns focus to the first tabbable in a modal after blurring a tabbable', async ( {
 		page,
 	} ) => {
 		await page.keyboard.press( 'Control+Alt+H' );
 
-		// Click to move focus to an element after the last tabbable within the
-		// modal.
-		await page.click( '.components-modal__content *:last-child' );
+		// Click to move focus to an element after the last tabbable within the modal.
+		const lastTabbable = page
+			.locator(
+				'.components-modal__content .edit-post-keyboard-shortcut-help-modal__section'
+			)
+			.last();
+
+		await lastTabbable.click();
 
 		await page.keyboard.press( 'Tab' );
 
