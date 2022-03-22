@@ -755,7 +755,7 @@ _Parameters_
 
 -   _setting_ `string`: The option, used to get the option by id.
 -   _value_ `string`: The value to set the option to.
--   _adminPage_ `string`: The url of the admin page to visit.
+-   _adminPage_ `string`: The url of the admin page to visit. Default: options-general.php.
 
 ### setPostContent
 
@@ -868,6 +868,14 @@ Converts editor's block type.
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+### trashAllComments
+
+Navigates to the comments listing screen and bulk-trashes any comments which exist.
+
+_Returns_
+
+-   `Promise`: Promise resolving once comments have been trashed.
 
 ### trashAllPosts
 

@@ -11,7 +11,7 @@ import { pressKeyWithModifier } from './press-key-with-modifier';
  *
  * @param {string} setting   The option, used to get the option by id.
  * @param {string} value     The value to set the option to.
- * @param {string} adminPage The url of the admin page to visit.
+ * @param {string} adminPage The url of the admin page to visit. Default: options-general.php.
  *
  */
 export async function setOption(

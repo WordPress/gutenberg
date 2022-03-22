@@ -5,9 +5,10 @@ import {
 	activateTheme,
 	createNewPost,
 	insertBlock,
+	pressKeyTimes,
 	publishPost,
 	setOption,
-	pressKeyTimes,
+	trashAllComments,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Comment Query Loop', () => {
@@ -68,12 +69,12 @@ describe( 'Comment Query Loop', () => {
 		expect(
 			await page.$( '.wp-block-comments-pagination-next' )
 		).not.toBeNull();
-
 		// Return to the editor and trash all comments.
 	} );
 	afterAll( async () => {
+		await trashAllComments();
 		await activateTheme( 'twentytwentyone' );
-		// await setOption( 'page_comments', false, 'options-discussion.php' );
-		// await setOption( 'comments_per_page', '50', 'options-discussion.php' );
+		await setOption( 'page_comments', false, 'options-discussion.php' );
+		await setOption( 'comments_per_page', '50', 'options-discussion.php' );
 	} );
 } );
