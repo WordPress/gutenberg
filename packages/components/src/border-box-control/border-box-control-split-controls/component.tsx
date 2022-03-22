@@ -46,22 +46,30 @@ const BorderBoxControlSplitControls = (
 			<BorderBoxControlVisualizer value={ value } />
 			<BorderControl
 				className={ centeredClassName }
+				hideLabelFromVision={ true }
+				label={ __( 'Top border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
 				value={ value?.top }
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
+				hideLabelFromVision={ true }
+				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
 				value={ value?.left }
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
+				hideLabelFromVision={ true }
+				label={ __( 'Right border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
 				value={ value?.right }
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
 				className={ centeredClassName }
+				hideLabelFromVision={ true }
+				label={ __( 'Bottom border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'bottom' ) }
 				value={ value?.bottom }
 				{ ...sharedBorderControlProps }
