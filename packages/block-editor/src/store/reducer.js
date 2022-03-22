@@ -19,12 +19,12 @@ import {
 /**
  * WordPress dependencies
  */
-import { combineReducers, select } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
+import { combineReducers } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
+import { SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 
 /**
@@ -1486,54 +1486,6 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 }
 
 /**
- * Reducer returning the user preferences.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
-		case 'INSERT_BLOCKS':
-		case 'REPLACE_BLOCKS':
-			return action.blocks.reduce( ( prevState, block ) => {
-				const { attributes, name: blockName } = block;
-				const match = select( blocksStore ).getActiveBlockVariation(
-					blockName,
-					attributes
-				);
-				// If a block variation match is found change the name to be the same with the
-				// one that is used for block variations in the Inserter (`getItemFromVariation`).
-				let id = match?.name
-					? `${ blockName }/${ match.name }`
-					: blockName;
-				const insert = { name: id };
-				if ( blockName === 'core/block' ) {
-					insert.ref = attributes.ref;
-					id += '/' + attributes.ref;
-				}
-
-				return {
-					...prevState,
-					insertUsage: {
-						...prevState.insertUsage,
-						[ id ]: {
-							time: action.time,
-							count: prevState.insertUsage[ id ]
-								? prevState.insertUsage[ id ].count + 1
-								: 1,
-							insert,
-						},
-					},
-				};
-			}, state );
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning an object where each key is a block client ID, its value
  * representing the settings for its nested blocks.
  *
@@ -1754,7 +1706,6 @@ export default combineReducers( {
 	insertionPoint,
 	template,
 	settings,
-	preferences,
 	lastBlockAttributesChange,
 	isNavigationMode,
 	hasBlockMovingClientId,

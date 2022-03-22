@@ -77,6 +77,8 @@ const {
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
+	__unstableGetInsertUsage,
+	__unstableGetInsertUsageForBlock,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2744,6 +2746,12 @@ describe( 'selectors', () => {
 
 	describe( 'getInserterItems', () => {
 		it( 'should properly list block type and reusable block items', () => {
+			const registry = {
+				select: () => ( { get: () => ( {} ) } ),
+			};
+			__unstableGetInsertUsage.registry = registry;
+			__unstableGetInsertUsageForBlock.registry = registry;
+
 			const state = {
 				blocks: {
 					byClientId: {},
@@ -2767,11 +2775,6 @@ describe( 'selectors', () => {
 						},
 					],
 				},
-				// Intentionally include a test case which considers
-				// `insertUsage` as not present within preferences.
-				//
-				// See: https://github.com/WordPress/gutenberg/issues/14580
-				preferences: {},
 				blockListSettings: {},
 			};
 			const items = getInserterItems( state );
@@ -2813,6 +2816,15 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should correctly cache the return values', () => {
+			// Define the empty object here to simulate that the preferences
+			// store won't return a new object every time.
+			const EMPTY_OBJECT = {};
+			const registry = {
+				select: () => ( { get: () => EMPTY_OBJECT } ),
+			};
+			__unstableGetInsertUsage.registry = registry;
+			__unstableGetInsertUsageForBlock.registry = registry;
+
 			const state = {
 				blocks: {
 					byClientId: {
@@ -2863,9 +2875,6 @@ describe( 'selectors', () => {
 							content: { raw: '<!-- /wp:test-block-b -->' },
 						},
 					],
-				},
-				preferences: {
-					insertUsage: {},
 				},
 				blockListSettings: {
 					block3: {},
@@ -2920,6 +2929,12 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
+			const registry = {
+				select: () => ( { get: () => ( {} ) } ),
+			};
+			__unstableGetInsertUsage.registry = registry;
+			__unstableGetInsertUsageForBlock.registry = registry;
+
 			const state = {
 				blocks: {
 					byClientId: {
@@ -2945,9 +2960,6 @@ describe( 'selectors', () => {
 					controlledInnerBlocks: {},
 					parents: {},
 				},
-				preferences: {
-					insertUsage: {},
-				},
 				blockListSettings: {},
 				settings: {},
 			};
@@ -2959,6 +2971,16 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should set a frecency', () => {
+			// Simulate returning block insertUsage from the preferences store.
+			const registry = {
+				select: () => ( {
+					get: () => ( {
+						'core/test-block-b': { count: 10, time: 1000 },
+					} ),
+				} ),
+			};
+			__unstableGetInsertUsage.registry = registry;
+			__unstableGetInsertUsageForBlock.registry = registry;
 			const state = {
 				blocks: {
 					byClientId: {},
@@ -2966,11 +2988,6 @@ describe( 'selectors', () => {
 					order: {},
 					parents: {},
 					cache: {},
-				},
-				preferences: {
-					insertUsage: {
-						'core/test-block-b': { count: 10, time: 1000 },
-					},
 				},
 				blockListSettings: {},
 				settings: {},
@@ -3177,6 +3194,17 @@ describe( 'selectors', () => {
 			);
 		} );
 		it( 'should set frecency', () => {
+			// Simulate returning block insertUsage from the preferences store.
+			const registry = {
+				select: () => ( {
+					get: () => ( {
+						'core/with-tranforms-a': { count: 10, time: 1000 },
+					} ),
+				} ),
+			};
+			__unstableGetInsertUsage.registry = registry;
+			__unstableGetInsertUsageForBlock.registry = registry;
+
 			const state = {
 				blocks: {
 					byClientId: {},
