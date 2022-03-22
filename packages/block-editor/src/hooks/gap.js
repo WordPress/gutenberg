@@ -6,6 +6,7 @@ import { Platform } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalBoxControl as BoxControl,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 
@@ -14,14 +15,14 @@ import {
  */
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY } from './dimensions';
+import { AXIAL_SIDES, SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
  * Determines if there is gap support.
  *
  * @param {string|Object} blockType Block name or Block Type object.
- * @return {boolean}                 Whether there is support.
+ * @return {boolean}                Whether there is support.
  */
 export function hasGapSupport( blockType ) {
 	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
@@ -36,6 +37,45 @@ export function hasGapSupport( blockType ) {
  */
 export function hasGapValue( props ) {
 	return props.attributes.style?.spacing?.blockGap !== undefined;
+}
+
+/**
+ * Returns a BoxControl object value from a given blockGap style.
+ * The string check is for backwards compatibility before Gutenberg supported
+ * split gap values (row and column) and the value was a string n + unit.
+ *
+ * @param {string? | Object?} rawBlockGapValue A style object.
+ * @return {Object?}                           A value to pass to the BoxControl component.
+ */
+export function getGapValueFromStyle( rawBlockGapValue ) {
+	if ( ! rawBlockGapValue ) {
+		return rawBlockGapValue;
+	}
+
+	const isValueString = typeof rawBlockGapValue === 'string';
+	return {
+		top: isValueString ? rawBlockGapValue : rawBlockGapValue?.top,
+		left: isValueString ? rawBlockGapValue : rawBlockGapValue?.left,
+	};
+}
+
+/**
+ * Returns a CSS value for the `gap` property from a given blockGap style.
+ *
+ * @param {string? | Object?} blockGapValue A style object.
+ * @param {string?}           defaultValue  A default gap value.
+ * @return {string|null}                    The concatenated gap value (row and column).
+ */
+export function getGapCSSValue( blockGapValue, defaultValue = '0' ) {
+	const blockGapBoxControlValue = getGapValueFromStyle( blockGapValue );
+	if ( ! blockGapBoxControlValue ) {
+		return null;
+	}
+
+	const row = blockGapBoxControlValue?.top || defaultValue;
+	const column = blockGapBoxControlValue?.left || defaultValue;
+
+	return row === column ? row : `${ row } ${ column }`;
 }
 
 /**
@@ -82,6 +122,7 @@ export function GapEdit( props ) {
 	const {
 		clientId,
 		attributes: { style },
+		name: blockName,
 		setAttributes,
 	} = props;
 
@@ -94,7 +135,7 @@ export function GapEdit( props ) {
 			'vw',
 		],
 	} );
-
+	const sides = useCustomSides( blockName, 'blockGap' );
 	const ref = useBlockRef( clientId );
 
 	if ( useIsGapDisabled( props ) ) {
@@ -106,7 +147,9 @@ export function GapEdit( props ) {
 			...style,
 			spacing: {
 				...style?.spacing,
-				blockGap: next,
+				blockGap: {
+					...getGapValueFromStyle( next ),
+				},
 			},
 		};
 
@@ -128,17 +171,45 @@ export function GapEdit( props ) {
 		}
 	};
 
+	const splitOnAxis =
+		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+	const gapValue = getGapValueFromStyle( style?.spacing?.blockGap );
+
+	// The BoxControl component expects a full complement of side values.
+	// Gap row and column values translate to top/bottom and left/right respectively.
+	const boxControlGapValue = splitOnAxis
+		? {
+				...gapValue,
+				right: gapValue?.left,
+				bottom: gapValue?.top,
+		  }
+		: gapValue?.top;
+
 	return Platform.select( {
 		web: (
 			<>
-				<UnitControl
-					label={ __( 'Block spacing' ) }
-					__unstableInputWidth="80px"
-					min={ 0 }
-					onChange={ onChange }
-					units={ units }
-					value={ style?.spacing?.blockGap }
-				/>
+				{ splitOnAxis ? (
+					<BoxControl
+						label={ __( 'Block spacing' ) }
+						min={ 0 }
+						onChange={ onChange }
+						units={ units }
+						sides={ sides }
+						values={ boxControlGapValue }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				) : (
+					<UnitControl
+						label={ __( 'Block spacing' ) }
+						__unstableInputWidth="80px"
+						min={ 0 }
+						onChange={ onChange }
+						units={ units }
+						// Default to `row` for combined values.
+						value={ boxControlGapValue }
+					/>
+				) }
 			</>
 		),
 		native: null,

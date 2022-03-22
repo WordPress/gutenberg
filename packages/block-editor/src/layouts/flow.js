@@ -14,6 +14,7 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
  */
 import useSetting from '../components/use-setting';
 import { appendSelectors } from './utils';
+import { getGapValueFromStyle } from '../hooks/gap';
 
 export default {
 	name: 'default',
@@ -109,8 +110,11 @@ export default {
 		const { contentSize, wideSize } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
+		const blockGapStyleValue = getGapValueFromStyle(
+			style?.spacing?.blockGap
+		);
 		const blockGapValue =
-			style?.spacing?.blockGap ?? 'var( --wp--style--block-gap )';
+			blockGapStyleValue?.top ?? 'var( --wp--style--block-gap )';
 
 		let output =
 			!! contentSize || !! wideSize
