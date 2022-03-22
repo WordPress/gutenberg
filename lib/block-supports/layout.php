@@ -66,6 +66,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style .= "$selector > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }";
 		$style .= "$selector > .aligncenter { margin-left: auto !important; margin-right: auto !important; }";
 		if ( $has_block_gap_support ) {
+			if ( is_array( $gap_value ) ) {
+				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
+			}
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
 			$style    .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
 			$style    .= "$selector > * + * { margin-block-start: $gap_style; margin-block-end: 0; }";
@@ -91,11 +94,17 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style  = "$selector {";
 		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
+			if ( is_array( $gap_value ) ) {
+				$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : '0.5em';
+				$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : '0.5em';
+				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
+			}
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
 			$style    .= "gap: $gap_style;";
 		} else {
 			$style .= 'gap: 0.5em;';
 		}
+
 		$style .= "flex-wrap: $flex_wrap;";
 		if ( 'horizontal' === $layout_orientation ) {
 			$style .= 'align-items: center;';
@@ -155,8 +164,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
-	$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
-	$style     = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value );
+	if ( is_array( $gap_value ) ) {
+		foreach ( $gap_value as $key => $value ) {
+			$gap_value[ $key ] = preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+		}
+	} else {
+		$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
+	}
+
+	$style = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
