@@ -4,7 +4,7 @@
 
 ### Bug Fix
 
--   Table block: Background color is not kept ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).
+-   Table block: Fix deprecation eligibility to prevent loss of named (color palette) background color ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).
 
 ## 7.1.0 (2022-03-11)
 
