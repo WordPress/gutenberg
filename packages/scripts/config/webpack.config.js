@@ -26,6 +26,7 @@ const {
 	hasCssnanoConfig,
 	hasPostCSSConfig,
 	getWebpackEntryPoints,
+	getFilesToCopy,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -36,9 +37,7 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-const copyWebPackPattens = process.env.WP_COPY_PHP_FILES_TO_DIST
-	? '**/{block.json,*.php}'
-	: '**/block.json';
+const copyWebPackPattens = getFilesToCopy();
 
 const cssLoaders = [
 	{

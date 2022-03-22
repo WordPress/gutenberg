@@ -284,7 +284,46 @@ function getWebpackEntryPoints() {
 	};
 }
 
+/**
+ * Generates a list of files to be copied from the src directory to the build directory based on a "files"
+ * property in block.json
+ *
+ * @return {string} The copy pattern passed to the CopyWebpackPlugin
+ */
+function getFilesToCopy() {
+	// Continue only if the `src` directory exists.
+	if ( ! hasProjectFile( 'src' ) ) {
+		return {};
+	}
+
+	// 2. Checks whether any block metadata files can be detected in the `src` directory.
+	//    It scans all discovered files looking for JavaScript assets and converts them to entry points.
+	const blockMetadataFiles = glob( 'src/**/block.json', {
+		absolute: true,
+	} );
+
+	const filesArray = process.env.WP_COPY_PHP_FILES_TO_DIST
+		? [ 'block.json', '*.php' ]
+		: [ 'block.json' ];
+
+	if ( blockMetadataFiles.length > 0 ) {
+		const fileList = blockMetadataFiles.reduce(
+			( array, blockMetadataFile ) => {
+				const { files } = require( blockMetadataFile );
+				return files ? [ ...array, ...files.split( ',' ) ] : array;
+			},
+			filesArray
+		);
+
+		// Create the pattern to be used.
+		return `**/{${ fileList.join( ',' ) }}`;
+	}
+	// Return the default pattern
+	return `**/{${ filesArray.join( ',' ) }}`;
+}
+
 module.exports = {
+	getFilesToCopy,
 	getJestOverrideConfigFile,
 	getWebpackArgs,
 	getWebpackEntryPoints,

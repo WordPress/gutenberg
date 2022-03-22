@@ -11,6 +11,7 @@ const {
 	spawnScript,
 } = require( './cli' );
 const {
+	getFilesToCopy,
 	getJestOverrideConfigFile,
 	getWebpackArgs,
 	getWebpackEntryPoints,
@@ -29,6 +30,7 @@ module.exports = {
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
+	getFilesToCopy,
 	getJestOverrideConfigFile,
 	getNodeArgsFromCLI,
 	getPackageProp,
