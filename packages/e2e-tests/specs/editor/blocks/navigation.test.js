@@ -356,6 +356,7 @@ describe( 'Navigation', () => {
 			await setUpResponseMocking( [
 				{
 					match: ( request ) =>
+						request.method() === 'GET' &&
 						request.url().includes( `rest_route` ) &&
 						request.url().includes( `navigation` ) &&
 						request.url().includes( testNavId ),
@@ -390,7 +391,9 @@ describe( 'Navigation', () => {
 			await navBlock.waitForSelector( '.components-spinner' );
 
 			// Resolve the controlled mocked API request.
-			resolveNavigationRequest();
+			if ( typeof resolveNavigationRequest === 'function' ) {
+				resolveNavigationRequest();
+			}
 		} );
 
 		it( 'shows a loading indicator whilst empty Navigation menu is being created', async () => {
@@ -437,7 +440,9 @@ describe( 'Navigation', () => {
 			await navBlock.waitForSelector( '.components-spinner' );
 
 			// Resolve the controlled mocked API request.
-			resolveNavigationRequest();
+			if ( typeof resolveNavigationRequest === 'function' ) {
+				resolveNavigationRequest();
+			}
 		} );
 	} );
 
