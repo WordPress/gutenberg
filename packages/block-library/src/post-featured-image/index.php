@@ -20,7 +20,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$post_ID = $block->context['postId'];
 
 	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
-	$post_title     = get_the_title( $post_ID );
+	$post_title     = trim( strip_tags( get_the_title( $post_ID ) ) );
 	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, array( 'alt' => $post_title ) );
 	if ( ! $featured_image ) {
 		return '';
