@@ -37,10 +37,12 @@ class WP_Style_Engine_Gutenberg {
 		'spacing' => array(
 			'padding' => array(
 				'property_key' => 'padding',
+				'path'         => array( 'spacing', 'padding' ),
 				'value_func'   => 'gutenberg_get_style_engine_css_box_rules',
 			),
 			'margin'  => array(
 				'property_key' => 'margin',
+				'path'         => array( 'spacing', 'margin' ),
 				'value_func'   => 'gutenberg_get_style_engine_css_box_rules',
 			),
 		),
@@ -85,32 +87,55 @@ class WP_Style_Engine_Gutenberg {
 	}
 
 	/**
-	 * Returns an CSS ruleset destined to be inserted in an HTML `style` attribute.
+	 * Returns an CSS ruleset.
 	 * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
-	 * @param array         $block_styles An array of styles from a block's attributes.
-	 * @param array<string> $path         An array of strings representing a path to the style value.
+	 * @param array $block_styles An array of styles from a block's attributes.
+	 * @param array $options = array(
+	 *     'inline' => (boolean) Whether to return inline CSS rules destined to be inserted in an HTML `style` attribute.
+	 *     'path'   => (array)   Specify a block style to generate, otherwise it'll try all in BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * );.
 	 *
 	 * @return string A CSS ruleset formatted to be placed in an HTML `style` attribute.
 	 */
-	public function get_inline_css_from_block_styles( $block_styles, $path ) {
+	public function generate( $block_styles, $options = array() ) {
 		$output = '';
 
-		if ( empty( $block_styles ) || empty( $path ) ) {
+		if ( empty( $block_styles ) ) {
 			return $output;
 		}
 
-		$style_value = _wp_array_get( $block_styles, $path, null );
+		$rules = array();
 
-		if ( empty( $style_value ) ) {
-			return $output;
+		// If a path to a specific block style is defined, only return rules for that style.
+		if ( isset( $options['path'] ) && is_array( $options['path'] ) ) {
+			$style_value = _wp_array_get( $block_styles, $options['path'], null );
+			if ( empty( $style_value ) ) {
+				return $output;
+			}
+			$rules = array_merge( $rules, $this->get_block_style_css_rules( $style_value, $options['path'] ) );
+			// Otherwise build them all.
+		} else {
+			foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
+				foreach ( $definition_group as $style_definition ) {
+					$style_value = _wp_array_get( $block_styles, $style_definition['path'], null );
+					if ( empty( $style_value ) ) {
+						continue;
+					}
+					$rules = array_merge( $rules, $this->get_block_style_css_rules( $style_value, $style_definition['path'] ) );
+				}
+			}
 		}
 
-		$rules = $this->get_block_style_css_rules( $style_value, $path );
-
-		foreach ( $rules as $rule => $value ) {
-			$output .= "{$rule}:{$value};";
+		if ( ! empty( $rules ) ) {
+			// Generate inline style rules.
+			if ( isset( $options['inline'] ) && true === $options['inline'] ) {
+				foreach ( $rules as $rule => $value ) {
+					$output .= "{$rule}:{$value};";
+				}
+			}
 		}
+
 		return $output;
 	}
 }
