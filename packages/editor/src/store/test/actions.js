@@ -135,7 +135,7 @@ describe( 'Post actions', () => {
 			expect( notices ).toMatchObject( [
 				{
 					status: 'success',
-					content: 'Draft saved',
+					content: 'Draft saved.',
 				},
 			] );
 		} );
