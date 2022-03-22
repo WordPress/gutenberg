@@ -6,7 +6,7 @@ Gutenberg adds features to WordPress Core using PHP hooks and filters. Some
 features, once considered stable and useful, are merged into Core during a Core
 release. Some features remain in the plugin forever or are removed.
 
-To make it easier for contribtors to know which features need to be merged to
+To make it easier for contributors to know which features need to be merged to
 Core and which features can be deleted, Gutenberg uses the following file
 structure for its PHP code:
 
