@@ -26,6 +26,15 @@ Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Supports:** align, anchor
 -	**Attributes:** autoplay, caption, id, loop, preload, src
 
+## Avatar
+
+Add a user's avatar. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/avatar))
+
+-	**Name:** core/avatar
+-	**Category:** theme
+-	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin), ~~alignWide~~, ~~html~~
+-	**Attributes:** isLink, linkTarget, size, userId
+
 ## Reusable block
 
 Create and save content to reuse across your site. Update the block, and the changes apply everywhere it’s used. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/block))
@@ -104,7 +113,7 @@ Add the avatar of this comment's author. ([Source](https://github.com/WordPress/
 
 -	**Name:** core/comment-author-avatar
 -	**Category:** theme
--	**Supports:** color (background, ~~text~~), spacing (margin, padding), ~~html~~
+-	**Supports:** color (background, ~~text~~), spacing (margin, padding), ~~html~~, ~~inserter~~
 -	**Attributes:** height, width
 
 ## Comment Author Name
