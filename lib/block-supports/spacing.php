@@ -51,7 +51,7 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 	$style_engine        = WP_Style_Engine_Gutenberg::get_instance();
 
 	if ( $has_padding_support ) {
-		$padding_styles = $style_engine->get_inline_styles_from_attributes(
+		$padding_styles = $style_engine->get_inline_css_from_block_styles(
 			$block_styles,
 			array( 'spacing', 'padding' )
 		);
@@ -63,7 +63,7 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 
 	if ( $has_margin_support ) {
 		// As with padding above.
-		$margin_styles = $style_engine->get_inline_styles_from_attributes(
+		$margin_styles = $style_engine->get_inline_css_from_block_styles(
 			$block_styles,
 			array( 'spacing', 'margin' )
 		);

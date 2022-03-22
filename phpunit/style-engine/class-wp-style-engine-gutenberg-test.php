@@ -17,7 +17,7 @@ class WP_Style_Engine_Gutenberg_Test extends WP_UnitTestCase {
 				'padding' => '111px',
 			),
 		);
-		$padding_styles = $style_engine->get_inline_styles_from_attributes(
+		$padding_styles = $style_engine->get_inline_css_from_block_styles(
 			$block_styles,
 			array( 'spacing', 'padding' )
 		);
@@ -37,7 +37,7 @@ class WP_Style_Engine_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		$padding_styles = $style_engine->get_inline_styles_from_attributes(
+		$padding_styles = $style_engine->get_inline_css_from_block_styles(
 			$block_styles,
 			array( 'spacing', 'padding' )
 		);
@@ -52,7 +52,7 @@ class WP_Style_Engine_Gutenberg_Test extends WP_UnitTestCase {
 				'padding' => '111px',
 			),
 		);
-		$padding_styles = $style_engine->get_inline_styles_from_attributes(
+		$padding_styles = $style_engine->get_inline_css_from_block_styles(
 			$block_styles,
 			null
 		);
