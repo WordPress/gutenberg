@@ -161,4 +161,104 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		return $flattened_theme_json;
 	}
 
+	/**
+	 * Merge new incoming data.
+	 *
+	 * @since 5.8.0
+	 * @since 5.9.0 Duotone preset also has origins.
+	 * @since 6.0.0 Calls functional_merge internally
+	 *
+	 * @param WP_Theme_JSON $incoming Data to merge.
+	 */
+	public function merge( $incoming ) {
+		$this->theme_json = static::functional_merge( $this->theme_json, $incoming->get_raw_data() );
+	}
+
+	/**
+	 * Merge two theme.json data structures
+	 *
+	 * @since 6.0.0
+	 *
+	 * @param array $base Data to merge onto.
+	 * @param array $replacements Data to add onto $base
+	 * @return array The result of the merge
+	 */
+	public static function functional_merge( $base, $replacements ) {
+		$merged_data = array_replace_recursive( $base, $replacements );
+
+		/*
+		 * The array_replace_recursive algorithm merges at the leaf level,
+		 * but we don't want leaf arrays to be merged, so we overwrite it.
+		 *
+		 * For leaf values that are sequential arrays it will use the numeric indexes for replacement.
+		 * We rather replace the existing with the incoming value, if it exists.
+		 * This is the case of spacing.units.
+		 *
+		 * For leaf values that are associative arrays it will merge them as expected.
+		 * This is also not the behavior we want for the current associative arrays (presets).
+		 * We rather replace the existing with the incoming value, if it exists.
+		 * This happens, for example, when we merge data from theme.json upon existing
+		 * theme supports or when we merge anything coming from the same source twice.
+		 * This is the case of color.palette, color.gradients, color.duotone,
+		 * typography.fontSizes, or typography.fontFamilies.
+		 *
+		 * Additionally, for some preset types, we also want to make sure the
+		 * values they introduce don't conflict with default values. We do so
+		 * by checking the incoming slugs for theme presets and compare them
+		 * with the equivalent default presets: if a slug is present as a default
+		 * we remove it from the theme presets.
+		 */
+		$nodes        = static::get_setting_nodes( $replacements );
+		$slugs_global = static::get_default_slugs( $base, array( 'settings' ) );
+		foreach ( $nodes as $node ) {
+			$slugs_node = static::get_default_slugs( $base, $node['path'] );
+			$slugs      = array_merge_recursive( $slugs_global, $slugs_node );
+
+			// Replace the spacing.units.
+			$path    = array_merge( $node['path'], array( 'spacing', 'units' ) );
+			$content = _wp_array_get( $replacements, $path, null );
+			if ( isset( $content ) ) {
+				_wp_array_set( $merged_data, $path, $content );
+			}
+
+			// Replace the presets.
+			foreach ( static::PRESETS_METADATA as $preset ) {
+				$override_preset = ! static::get_metadata_boolean( $base['settings'], $preset['prevent_override'], true );
+
+				foreach ( static::VALID_ORIGINS as $origin ) {
+					$base_path = array_merge( $node['path'], $preset['path'] );
+					$path      = array_merge( $base_path, array( $origin ) );
+					$content   = _wp_array_get( $replacements, $path, null );
+					if ( ! isset( $content ) ) {
+						continue;
+					}
+
+					if ( 'theme' === $origin && $preset['use_default_names'] ) {
+						foreach ( $content as &$item ) {
+							if ( ! array_key_exists( 'name', $item ) ) {
+								$name = static::get_name_from_defaults( $item['slug'], $base_path );
+								if ( null !== $name ) {
+									$item['name'] = $name;
+								}
+							}
+						}
+					}
+
+					if (
+						( 'theme' !== $origin ) ||
+						( 'theme' === $origin && $override_preset )
+					) {
+						_wp_array_set( $base, $path, $content );
+					} else {
+						$slugs_for_preset = _wp_array_get( $slugs, $preset['path'], array() );
+						$content          = static::filter_slugs( $content, $slugs_for_preset );
+						_wp_array_set( $base, $path, $content );
+					}
+				}
+			}
+		}
+
+		return $merged_data;
+	}
+
 }
