@@ -267,7 +267,10 @@ export const isEditorPanelEnabled = createRegistrySelector(
 			'core/edit-post',
 			'inactivePanels'
 		);
-		return ! inactivePanels?.includes( panelName );
+		return (
+			! isEditorPanelRemoved( state, panelName ) &&
+			! inactivePanels?.includes( panelName )
+		);
 	}
 );
 
