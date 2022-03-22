@@ -47,7 +47,7 @@ function gutenberg_get_navigation( $slug ) { ... }
 
 Developers should organize PHP into files or folders by _feature_, not by _component_.
 
-Also, developers should call `add_action` and `add_filter` immediately after the function being hooked is defined.
+When defining a function that will be hooked, developers should call `add_action` and `add_filter` immediately after the function declaration.
 
 These two practices make it easier for PHP code to start in one folder (e.g., `lib/experimental`) and eventually move to another using a simple `git mv`.
 
