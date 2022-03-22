@@ -4,6 +4,8 @@ End-To-End (E2E) test utils for WordPress.
 
 _It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
+**Note that there's currently an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate E2E tests to Playwright instead. This package is deprecated and will only accept bug fixes until fully migrated.**
+
 ## Installation
 
 Install the module
