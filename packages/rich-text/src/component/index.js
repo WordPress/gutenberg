@@ -216,9 +216,14 @@ export function useRichText( {
 
 		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
 			// Can't focus if there is a parent content editable.
-			ref.current.parentElement.closest(
-				'[contenteditable]'
-			).contentEditable = false;
+			if (
+				typeof record.current.start !== 'undefined' &&
+				typeof record.current.end !== 'undefined'
+			) {
+				ref.current.parentElement.closest(
+					'[contenteditable]'
+				).contentEditable = false;
+			}
 			ref.current.focus();
 		}
 
