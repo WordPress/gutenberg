@@ -41,6 +41,9 @@ const MIN_TAGS = 1;
  */
 const MAX_TAGS = 100;
 
+const MIN_FONT_SIZE = 1;
+const MAX_FONT_SIZE = 100;
+
 function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 	const {
 		taxonomy,
@@ -83,7 +86,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		const [ quantity, newUnit ] = parseQuantityAndUnitFromRawValue(
 			newValue
 		);
-		if ( ! Number.isFinite( quantity ) || quantity < 0 || quantity > 100 ) {
+		if ( ! Number.isFinite( quantity ) ) {
 			return;
 		}
 		const updateObj = { [ fontSizeLabel ]: newValue };
@@ -142,6 +145,8 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 								onFontSizeChange( 'smallestFontSize', value );
 							} }
 							units={ units }
+							min={ MIN_FONT_SIZE }
+							max={ MAX_FONT_SIZE }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -152,6 +157,8 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 								onFontSizeChange( 'largestFontSize', value );
 							} }
 							units={ units }
+							min={ MIN_FONT_SIZE }
+							max={ MAX_FONT_SIZE }
 						/>
 					</FlexItem>
 				</Flex>
