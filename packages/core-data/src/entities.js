@@ -63,6 +63,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'mediaItems',
 		label: __( 'Media' ),
+		rawAttributes: [ 'caption', 'title', 'description' ],
 	},
 	{
 		name: 'taxonomy',
@@ -297,7 +298,7 @@ export const getMethodName = (
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && entityConfig.plural
+		usePlural && entityConfig?.plural
 			? upperFirst( camelCase( entityConfig.plural ) )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
@@ -308,7 +309,7 @@ export const getMethodName = (
  *
  * @param {string} kind Kind
  *
- * @return {Array} Entities
+ * @return {(thunkArgs: object) => Promise<Array>} Entities
  */
 export const getOrLoadEntitiesConfig = ( kind ) => async ( {
 	select,

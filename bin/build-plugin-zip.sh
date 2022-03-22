@@ -30,8 +30,7 @@ status "💃 Time to build the Gutenberg plugin ZIP file 🕺"
 
 if [ -z "$NO_CHECKS" ]; then
 	# Make sure there are no changes in the working tree. Release builds should be
-	# traceable to a particular commit and reliably reproducible. (This is not
-	# totally true at the moment because we download nightly vendor scripts).
+	# traceable to a particular commit and reliably reproducible.
 	changed=
 	if ! git diff --exit-code > /dev/null; then
 		changed="file(s) modified"
@@ -66,37 +65,6 @@ if [ -z "$NO_CHECKS" ]; then
 	fi
 fi
 
-# Download all vendor scripts
-status "Downloading remote vendor scripts... 🛵"
-vendor_scripts=""
-# Using `command | while read...` is more typical, but the inside of the `while`
-# loop will run under a separate process this way, meaning that it cannot
-# modify $vendor_scripts. See: https://stackoverflow.com/a/16855194
-exec 3< <(
-	# Get minified versions of vendor scripts.
-	php bin/get-vendor-scripts.php
-	# Get non-minified versions of vendor scripts (for SCRIPT_DEBUG).
-	php bin/get-vendor-scripts.php debug
-)
-while IFS='|' read -u 3 url filename; do
-	echo "$url"
-	echo -n " > vendor/$filename ... "
-	http_status=$( curl \
-		--location \
-		--silent \
-		"$url" \
-		--output "vendor/_download.tmp.js" \
-		--write-out "%{http_code}"
-	)
-	if [ "$http_status" != 200 ]; then
-		error "HTTP $http_status"
-		exit 1
-	fi
-	mv -f "vendor/_download.tmp.js" "vendor/$filename"
-	echo -e "${GREEN_BOLD}done!${COLOR_RESET}"
-	vendor_scripts="$vendor_scripts vendor/$filename"
-done
-
 # Run the build.
 status "Installing dependencies... 📦"
 npm cache verify
@@ -128,7 +96,6 @@ zip -r gutenberg.zip \
 	lib \
 	packages/block-serialization-default-parser/*.php \
 	post-content.php \
-	$vendor_scripts \
 	$build_files \
 	readme.txt \
 	changelog.txt \

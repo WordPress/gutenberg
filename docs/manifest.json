@@ -192,6 +192,12 @@
 		"parent": "data-basics"
 	},
 	{
+		"title": "Building an edit form",
+		"slug": "3-building-an-edit-form",
+		"markdown_source": "../docs/how-to-guides/data-basics/3-building-an-edit-form.md",
+		"parent": "data-basics"
+	},
+	{
 		"title": "Feature Flags",
 		"slug": "feature-flags",
 		"markdown_source": "../docs/how-to-guides/feature-flags.md",
@@ -1497,12 +1503,6 @@
 		"title": "@wordpress/e2e-test-utils",
 		"slug": "packages-e2e-test-utils",
 		"markdown_source": "../packages/e2e-test-utils/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/e2e-tests",
-		"slug": "packages-e2e-tests",
-		"markdown_source": "../packages/e2e-tests/README.md",
 		"parent": "packages"
 	},
 	{

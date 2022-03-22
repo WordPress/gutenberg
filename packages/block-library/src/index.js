@@ -46,6 +46,7 @@ import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as listItem from './list-item';
 import * as logInOut from './loginout';
 import * as mediaText from './media-text';
 import * as missing from './missing';
@@ -77,6 +78,7 @@ import * as postTitle from './post-title';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as query from './query';
+import * as queryNoResults from './query-no-results';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
 import * as queryPaginationNumbers from './query-pagination-numbers';
@@ -135,6 +137,7 @@ export const __experimentalGetCoreBlocks = () => [
 	heading,
 	gallery,
 	list,
+	listItem,
 	quote,
 
 	// Register all remaining core blocks.
@@ -250,6 +253,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 				// Experimental blocks.
 				homeLink,
 				postAuthorName,
+				queryNoResults,
 
 				// Full Site Editing blocks.
 				...( enableFSEBlocks

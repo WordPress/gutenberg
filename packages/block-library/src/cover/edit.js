@@ -9,7 +9,13 @@ import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
-import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	Fragment,
+	useEffect,
+	useRef,
+	useState,
+	useMemo,
+} from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
@@ -25,6 +31,8 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUnitControl as UnitControl,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { compose, useInstanceId } from '@wordpress/compose';
 import {
@@ -40,7 +48,6 @@ import {
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
-	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
@@ -96,8 +103,6 @@ function CoverHeightInput( {
 	unit = 'px',
 	value = '',
 } ) {
-	const [ temporaryInput, setTemporaryInput ] = useState( null );
-
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
@@ -120,20 +125,16 @@ function CoverHeightInput( {
 				: undefined;
 
 		if ( isNaN( inputValue ) && inputValue !== undefined ) {
-			setTemporaryInput( unprocessedValue );
 			return;
 		}
-		setTemporaryInput( null );
 		onChange( inputValue );
 	};
 
-	const handleOnBlur = () => {
-		if ( temporaryInput !== null ) {
-			setTemporaryInput( null );
-		}
-	};
+	const computedValue = useMemo( () => {
+		const [ parsedQuantity ] = parseQuantityAndUnitFromRawValue( value );
+		return [ parsedQuantity, unit ].join( '' );
+	}, [ unit, value ] );
 
-	const inputValue = temporaryInput !== null ? temporaryInput : value;
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
@@ -142,13 +143,11 @@ function CoverHeightInput( {
 				id={ inputId }
 				isResetValueOnUnitChange
 				min={ min }
-				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				onUnitChange={ onUnitChange }
 				style={ { maxWidth: 80 } }
-				unit={ unit }
 				units={ units }
-				value={ inputValue }
+				value={ computedValue }
 			/>
 		</BaseControl>
 	);

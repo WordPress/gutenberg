@@ -6,6 +6,7 @@ import type {
 	ReactNode,
 	ChangeEvent,
 	SyntheticEvent,
+	PointerEvent,
 } from 'react';
 import type { useDrag } from '@use-gesture/react';
 
@@ -33,7 +34,7 @@ interface BaseProps {
 }
 
 export type InputChangeCallback<
-	E = ChangeEvent< HTMLInputElement >,
+	E = ChangeEvent< HTMLInputElement > | PointerEvent< HTMLInputElement >,
 	P = {}
 > = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
 

@@ -26,8 +26,8 @@ const addParagraphsAndColumnsDemo = async () => {
 		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Columns')]`
 	);
 	await page.keyboard.press( 'Enter' );
-	await page.click( ':focus [aria-label="Two columns; equal split"]' );
-	await page.click( ':focus .block-editor-button-block-appender' );
+	await page.click( 'button[aria-label="Two columns; equal split"]' );
+	await page.click( '.block-editor-button-block-appender' );
 	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
 	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -628,8 +628,11 @@ describe( 'Writing Flow', () => {
 			`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Wide width')]`
 		);
 		await wideButton.click();
+		// Focus the block content
+		await page.keyboard.press( 'Tab' );
 
 		// Select the previous block.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Confirm correct setup.
@@ -650,13 +653,17 @@ describe( 'Writing Flow', () => {
 		const inserter = await page.$(
 			'.block-editor-block-list__insertion-point'
 		);
+		// Find the space between the inserter and the image block.
 		const inserterRect = await inserter.boundingBox();
 		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
 
+		// Clicking that in-between space should select the image block.
 		await page.mouse.click( x, lowerInserterY );
 
 		const type = await page.evaluate( () =>
-			document.activeElement.getAttribute( 'data-type' )
+			document.activeElement
+				.closest( '[data-block]' )
+				.getAttribute( 'data-type' )
 		);
 
 		expect( type ).toBe( 'core/image' );
@@ -666,8 +673,6 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
 		await page.keyboard.press( 'Enter' );
-		// Move into the placeholder UI.
-		await page.keyboard.press( 'ArrowDown' );
 		// Tab to the "Create table" button.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );

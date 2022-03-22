@@ -4,8 +4,27 @@
 
 ### Enhancements
 
+-   `CustomSelectControl`: Add `__next36pxDefaultSize` flag for larger default size ([#39401](https://github.com/WordPress/gutenberg/pull/39401)).
 -   `BaseControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#39325](https://github.com/WordPress/gutenberg/pull/39325)).
 -   `Divider`: Make the divider visible by default (`display: inline`) in flow layout containers when the divider orientation is vertical ([#39316](https://github.com/WordPress/gutenberg/pull/39316)).
+-   Stop using deprecated `event.keyCode` in favor of `event.key` for keyboard events in `UnitControl` and `InputControl`.  ([#39360](https://github.com/WordPress/gutenberg/pull/39360))
+-   `ColorPalette`: refine custom color button's label. ([#39386](https://github.com/WordPress/gutenberg/pull/39386))
+-   `FocalPointPicker`: stop using `UnitControl`'s deprecated `unit` prop ([#39504](https://github.com/WordPress/gutenberg/pull/39504)).
+-   `CheckboxControl`: Add support for the `indeterminate` state ([#39462](https://github.com/WordPress/gutenberg/pull/39462)).
+
+### Internal
+
+-   Delete the `composeStateReducers` utility function ([#39262](https://github.com/WordPress/gutenberg/pull/39262)).
+-   `BoxControl`: stop using `UnitControl`'s deprecated `unit` prop ([#39511](https://github.com/WordPress/gutenberg/pull/39511)).
+
+### Bug Fix
+
+-   `NumberControl`: commit (and constrain) value on `blur` event ([#39186](https://github.com/WordPress/gutenberg/pull/39186)).
+-   Fix `UnitControl`'s reset of unit when the quantity value is cleared. ([#39531](https://github.com/WordPress/gutenberg/pull/39531/)).
+
+### Deprecation
+
+-   `unit` prop in `UnitControl` marked as deprecated ([#39503](https://github.com/WordPress/gutenberg/pull/39503)).
 
 ## 19.6.0 (2022-03-11)
 
@@ -21,10 +40,6 @@
 -   Normalize `font-family` on `Button`, `ColorPalette`, `ComoboboxControl`, `DateTimePicker`, `FormTokenField`, `InputControl`, `SelectControl`, and `ToggleGroupControl` ([#38969](https://github.com/WordPress/gutenberg/pull/38969)).
 -   Fix input value selection of `InputControl`-based controls in Firefox and Safari with axial constraint of drag gesture ([#38968](https://github.com/WordPress/gutenberg/pull/38968)).
 -   Fix `UnitControl`'s behavior around updating the unit when a new `value` is passed (i.e. in controlled mode). ([#39148](https://github.com/WordPress/gutenberg/pull/39148)).
-
-### Internal
-
--   Delete the `composeStateReducers` utility function ([#39262](https://github.com/WordPress/gutenberg/pull/39262)).
 
 ## 19.5.0 (2022-02-23)
 

@@ -6,6 +6,10 @@
 
 -   Table block: Fix deprecation eligibility to prevent loss of named (color palette) background color ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).
 
+### Enhancement
+
+-   Social Icons: Avoid loss of previously selected background color when switching back from "Logos Only" style ([#39276](https://github.com/WordPress/gutenberg/pull/39276)).
+
 ## 7.1.0 (2022-03-11)
 
 ## 7.0.0 (2022-02-10)

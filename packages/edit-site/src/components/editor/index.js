@@ -21,6 +21,7 @@ import {
 	ShortcutProvider,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -61,6 +62,7 @@ function Editor( { onError } ) {
 		previousShortcut,
 		nextShortcut,
 		editorMode,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -105,6 +107,10 @@ function Editor( { onError } ) {
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
 			editorMode: getEditorMode(),
+			showIconLabels: select( preferencesStore ).get(
+				'core/edit-site',
+				'showIconLabels'
+			),
 		};
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
@@ -203,6 +209,10 @@ function Editor( { onError } ) {
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
 											labels={ interfaceLabels }
+											className={
+												showIconLabels &&
+												'show-icon-labels'
+											}
 											secondarySidebar={ secondarySidebar() }
 											sidebar={
 												sidebarIsOpened && (
@@ -216,6 +226,9 @@ function Editor( { onError } ) {
 												<Header
 													openEntitiesSavedStates={
 														openEntitiesSavedStates
+													}
+													showIconLabels={
+														showIconLabels
 													}
 												/>
 											}

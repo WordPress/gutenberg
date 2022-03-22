@@ -95,7 +95,10 @@ export default function Image( {
 			);
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
-				image: id && isSelected ? getMedia( id ) : null,
+				image:
+					id && isSelected
+						? getMedia( id, { context: 'view' } )
+						: null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(

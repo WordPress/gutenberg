@@ -86,7 +86,6 @@ export default function NewTemplate( { postType } ) {
 	);
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { getLastEntitySaveError } = useSelect( coreStore );
 
 	async function createTemplate( { slug } ) {
 		try {
@@ -103,17 +102,9 @@ export default function NewTemplate( { postType } ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-				}
+				},
+				{ throwOnError: true }
 			);
-
-			const lastEntitySaveError = getLastEntitySaveError(
-				'postType',
-				'wp_template',
-				template.id
-			);
-			if ( lastEntitySaveError ) {
-				throw lastEntitySaveError;
-			}
 
 			// Navigate to the created template editor.
 			history.push( {
