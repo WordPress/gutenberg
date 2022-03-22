@@ -27,7 +27,7 @@ For features that may be merged to Core, it's best to use a `wp_` prefix for fun
 
 This applies to both experimental and stable features.
 
-Using the `wp_` prefix facilitates the process of renaming functions and classes from `gutenberg_` to `wp_` if the feature is merged to Core.
+Using the `wp_` prefix avoids us having to rename functions and classes from `gutenberg_` to `wp_` if the feature is merged to Core.
 
 Functions that are intended solely for the plugin, e.g., plugin infrastructure, should use the `gutenberg_` prefix.
 
