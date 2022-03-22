@@ -1,3 +1,3 @@
 export interface AnyFunction {
-	(...args: any[]): any;
+	( ...args: any[] ): any;
 }
