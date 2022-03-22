@@ -33,8 +33,8 @@ import {
 	PocketIcon,
 	RedditIcon,
 	SkypeIcon,
-	SnapchatIcon,
 	SlackIcon,
+	SnapchatIcon,
 	SoundCloudIcon,
 	SpotifyIcon,
 	TelegramIcon,
@@ -247,16 +247,16 @@ const variations = [
 		icon: SkypeIcon,
 	},
 	{
-		name: 'snapchat',
-		attributes: { service: 'snapchat' },
-		title: 'Snapchat',
-		icon: SnapchatIcon,
-	},
-	{
 		name: 'slack',
 		attributes: { service: 'slack' },
 		title: 'Slack',
 		icon: SlackIcon,
+	},
+	{
+		name: 'snapchat',
+		attributes: { service: 'snapchat' },
+		title: 'Snapchat',
+		icon: SnapchatIcon,
 	},
 	{
 		name: 'soundcloud',
