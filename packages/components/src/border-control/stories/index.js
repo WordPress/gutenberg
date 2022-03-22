@@ -64,6 +64,7 @@ Default.args = {
 	shouldSanitizeBorder: true,
 	width: '110px',
 	withSlider: true,
+	__experimentalIsRenderedInSidebar: false,
 };
 
 const WrapperView = styled.div`

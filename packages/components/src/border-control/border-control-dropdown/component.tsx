@@ -163,11 +163,16 @@ const BorderControlDropdown = (
 		enableStyle
 	);
 
+	const dropdownPosition = __experimentalIsRenderedInSidebar
+		? 'bottom left'
+		: undefined;
+
 	const renderToggle = ( { onToggle = noop } ) => (
 		<Button
 			onClick={ onToggle }
 			variant="tertiary"
 			aria-label={ toggleAriaLabel }
+			position={ dropdownPosition }
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator
