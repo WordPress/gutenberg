@@ -33,9 +33,7 @@ const MyDisabled = () => {
 };
 ```
 
-A component can detect if it has been wrapped in a `<Disabled>` by accessing its [context](https://reactjs.org/docs/context.html).
-
-A newly written code should read context with `useContext`:
+A component can detect if it has been wrapped in a `<Disabled>` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Context` and `useContext`.
 
 ```jsx
 function CustomButton() {
@@ -44,23 +42,6 @@ function CustomButton() {
 		<button
 			style={ { opacity: isDisabled ? 0.5 : 1 } }
 		/>
-	);
-}
-```
-
-A legacy way (not recommended) with `Disabled.Consumer`:
-
-```jsx
-function CustomButton() {
-	return (
-		<Disabled.Consumer>
-			{ ( isDisabled ) => (
-				<button
-					{ ...this.props }
-					style={ { opacity: isDisabled ? 0.5 : 1 } }
-				/>
-			) }
-		</Disabled.Consumer>
 	);
 }
 ```
@@ -74,5 +55,4 @@ The component accepts the following props:
 Whether to disable all the descendant fields. Defaults to `true`.
 
 -   Type: `Boolean`
--   Required: No
 -   Default: `true`
