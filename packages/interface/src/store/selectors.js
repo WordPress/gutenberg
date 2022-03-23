@@ -84,7 +84,7 @@ export const isFeatureActive = createRegistrySelector(
 		deprecated(
 			`wp.select( 'core/interface' ).isFeatureActive( scope, featureName )`,
 			{
-				version: '6.0',
+				since: '6.0',
 				alternative: `!! wp.select( 'core/preferences' ).isFeatureActive( scope, featureName )`,
 			}
 		);
