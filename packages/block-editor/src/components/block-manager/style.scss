@@ -1,14 +1,14 @@
-.edit-post-block-manager__no-results {
+.block-editor-block-manager__no-results {
 	font-style: italic;
 	padding: $grid-unit-30 0;
 	text-align: center;
 }
 
-.edit-post-block-manager__search {
+.block-editor-block-manager__search {
 	margin: $grid-unit-20 0;
 }
 
-.edit-post-block-manager__disabled-blocks-count {
+.block-editor-block-manager__disabled-blocks-count {
 	border: 1px solid $gray-300;
 	border-width: 1px 0;
 	// Cover up horizontal areas off the sides of the box rectangle
@@ -20,36 +20,36 @@
 	position: sticky;
 	// When sticking, tuck the top border beneath the modal header border
 	top: -1px;
-	z-index: z-index(".edit-post-block-manager__disabled-blocks-count");
+	z-index: z-index(".block-editor-block-manager__disabled-blocks-count");
 
 	// Stick the category titles to the bottom
-	~ .edit-post-block-manager__results .edit-post-block-manager__category-title {
+	~ .block-editor-block-manager__results .block-editor-block-manager__category-title {
 		top: 35px;
 	}
 }
 
-.edit-post-block-manager__category {
+.block-editor-block-manager__category {
 	margin: 0 0 $grid-unit-30 0;
 }
 
-.edit-post-block-manager__category-title {
+.block-editor-block-manager__category-title {
 	position: sticky;
 	top: 0;
 	padding: $grid-unit-20 0;
 	background-color: $white;
-	z-index: z-index(".edit-post-block-manager__category-title");
+	z-index: z-index(".block-editor-block-manager__category-title");
 
 	.components-checkbox-control__label {
 		font-weight: 600;
 	}
 }
 
-.edit-post-block-manager__checklist {
+.block-editor-block-manager__checklist {
 	margin-top: 0;
 }
 
-.edit-post-block-manager__category-title,
-.edit-post-block-manager__checklist-item {
+.block-editor-block-manager__category-title,
+.block-editor-block-manager__checklist-item {
 	border-bottom: 1px solid $gray-300;
 
 	.components-base-control__field {
@@ -59,7 +59,7 @@
 	}
 }
 
-.edit-post-block-manager__checklist-item {
+.block-editor-block-manager__checklist-item {
 	margin-bottom: 0;
 	padding-left: $grid-unit-20;
 
@@ -81,11 +81,11 @@
 	}
 }
 
-.edit-post-block-manager__results {
+.block-editor-block-manager__results {
 	border-top: $border-width solid $gray-300;
 }
 
 // Remove the top border from results when adjacent to the disabled block count
-.edit-post-block-manager__disabled-blocks-count + .edit-post-block-manager__results {
+.block-editor-block-manager__disabled-blocks-count + .block-editor-block-manager__results {
 	border-top-width: 0;
 }

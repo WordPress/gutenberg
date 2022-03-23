@@ -10,11 +10,11 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { CheckboxControl } from '@wordpress/components';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../store';
 import BlockTypesChecklist from './checklist';
 import useHiddenBlockTypes from './use-hidden-block-types';
 
@@ -26,10 +26,10 @@ function BlockManagerCategory( { scope, title, blockTypes } ) {
 	} = useHiddenBlockTypes( scope );
 	const instanceId = useInstanceId( BlockManagerCategory );
 	const defaultAllowedBlockTypes = useSelect( ( select ) => {
-		const { getEditorSettings } = select( editorStore );
+		const { getSettings } = select( blockEditorStore );
 		return {
-			defaultAllowedBlockTypes: getEditorSettings()
-				.defaultAllowedBlockTypes,
+			defaultAllowedBlockTypes:
+				getSettings()?.defaultAllowedBlockTypes ?? [],
 		};
 	}, [] );
 	const filteredBlockTypes = useMemo( () => {
@@ -68,7 +68,7 @@ function BlockManagerCategory( { scope, title, blockTypes } ) {
 		...hiddenBlockTypes
 	);
 
-	const titleId = 'edit-post-block-manager__category-title-' + instanceId;
+	const titleId = 'block-editor-block-manager__category-title-' + instanceId;
 
 	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
 
@@ -85,12 +85,12 @@ function BlockManagerCategory( { scope, title, blockTypes } ) {
 		<div
 			role="group"
 			aria-labelledby={ titleId }
-			className="edit-post-block-manager__category"
+			className="block-editor-block-manager__category"
 		>
 			<CheckboxControl
 				checked={ isAllChecked }
 				onChange={ toggleAllVisible }
-				className="edit-post-block-manager__category-title"
+				className="block-editor-block-manager__category-title"
 				aria-checked={ ariaChecked }
 				label={ <span id={ titleId }>{ title }</span> }
 			/>

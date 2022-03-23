@@ -74,9 +74,9 @@ export default function BlockManager( { scope } ) {
 	}, [ filteredBlockTypes.length, search, debouncedSpeak ] );
 
 	return (
-		<div className="edit-post-block-manager__content">
+		<div className="block-editor-block-manager__content">
 			{ !! numberOfHiddenBlocks && (
-				<div className="edit-post-block-manager__disabled-blocks-count">
+				<div className="block-editor-block-manager__disabled-blocks-count">
 					{ sprintf(
 						/* translators: %d: number of blocks. */
 						_n(
@@ -93,16 +93,16 @@ export default function BlockManager( { scope } ) {
 				placeholder={ __( 'Search for a block' ) }
 				value={ search }
 				onChange={ ( nextSearch ) => setSearch( nextSearch ) }
-				className="edit-post-block-manager__search"
+				className="block-editor-block-manager__search"
 			/>
 			<div
 				tabIndex="0"
 				role="region"
 				aria-label={ __( 'Available block types' ) }
-				className="edit-post-block-manager__results"
+				className="block-editor-block-manager__results"
 			>
 				{ filteredBlockTypes.length === 0 && (
-					<p className="edit-post-block-manager__no-results">
+					<p className="block-editor-block-manager__no-results">
 						{ __( 'No blocks found.' ) }
 					</p>
 				) }
