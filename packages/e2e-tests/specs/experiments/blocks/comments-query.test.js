@@ -7,21 +7,22 @@ import {
 	insertBlock,
 	pressKeyTimes,
 	publishPost,
-	getOption,
 	setOption,
 	trashAllComments,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Comment Query Loop', () => {
-	let defaultPageComments, defaultCommentsPerPage, defaultCommentsPage;
+	let previousPageComments,
+		previousCommentsPerPage,
+		previousDefaultCommentsPage;
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		defaultPageComments = await getOption( 'page_comments' );
-		defaultCommentsPerPage = await getOption( 'comments_per_page' );
-		defaultCommentsPage = await getOption( 'default_comments_page' );
-		await setOption( 'page_comments', true );
-		await setOption( 'comments_per_page', '1' );
-		await setOption( 'default_comments_page', 'newest' );
+		previousPageComments = await setOption( 'page_comments', true );
+		previousCommentsPerPage = await setOption( 'comments_per_page', '1' );
+		previousDefaultCommentsPage = await setOption(
+			'default_comments_page',
+			'newest'
+		);
 	} );
 	beforeEach( async () => {
 		await createNewPost();
@@ -82,8 +83,8 @@ describe( 'Comment Query Loop', () => {
 	afterAll( async () => {
 		await trashAllComments();
 		await activateTheme( 'twentytwentyone' );
-		await setOption( 'page_comments', defaultPageComments === '1' );
-		await setOption( 'comments_per_page', defaultCommentsPerPage );
-		await setOption( 'default_comments_page', defaultCommentsPage );
+		await setOption( 'page_comments', previousPageComments );
+		await setOption( 'comments_per_page', previousCommentsPerPage );
+		await setOption( 'default_comments_page', previousDefaultCommentsPage );
 	} );
 } );

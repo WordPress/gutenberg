@@ -756,6 +756,10 @@ _Parameters_
 -   _setting_ `string`: The option, used to get the option by id.
 -   _value_ `string`: The value to set the option to.
 
+_Returns_
+
+-   `string`: The previous value of the option.
+
 ### setPostContent
 
 Sets code editor content

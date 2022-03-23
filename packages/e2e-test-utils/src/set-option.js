@@ -12,13 +12,21 @@ import { pressKeyWithModifier } from './press-key-with-modifier';
  * @param {string} setting The option, used to get the option by id.
  * @param {string} value   The value to set the option to.
  *
+ * @return {string} The previous value of the option.
+ *
  */
 export async function setOption( setting, value ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'options.php' );
 
+	let previousValue = await page.$eval(
+		`#${ setting }`,
+		( element ) => element.value
+	);
+
 	if ( typeof value === 'boolean' ) {
 		value = value ? '1' : '0';
+		previousValue = previousValue === '1';
 	}
 
 	await page.focus( `#${ setting }` );
@@ -30,4 +38,5 @@ export async function setOption( setting, value ) {
 		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
 	] );
 	await switchUserToTest();
+	return previousValue;
 }
