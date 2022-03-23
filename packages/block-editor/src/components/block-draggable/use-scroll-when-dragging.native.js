@@ -47,20 +47,11 @@ export default function useScrollWhenDragging() {
 		scroll.maxOffsetY.value = contentSize.height - layoutMeasurement.height;
 	};
 
-	const animateVelocity = ( value ) => {
-		'worklet';
-		if ( value === 0 ) {
-			velocityY.value = withTiming( 0, { duration: 150 } );
-		} else {
-			velocityY.value = withTiming( value, { duration: 150 } );
-		}
-	};
-
 	const stopScrolling = () => {
 		'worklet';
 		isAnimationTimerActive.value = false;
 		isScrollActive.value = false;
-		animateVelocity( 0 );
+		velocityY.value = 0;
 	};
 
 	const startScrolling = ( y ) => {
@@ -93,12 +84,12 @@ export default function useScrollWhenDragging() {
 			isScrollActive.value = dragDistance > 0;
 		} else if ( y > dragStartY.value ) {
 			// User is dragging downwards.
-			animateVelocity( VELOCITY_MULTIPLIER * distancePercentage );
+			velocityY.value = VELOCITY_MULTIPLIER * distancePercentage;
 		} else if ( y < dragStartY.value ) {
 			// User is dragging upwards.
-			animateVelocity( -VELOCITY_MULTIPLIER * distancePercentage );
+			velocityY.value = -VELOCITY_MULTIPLIER * distancePercentage;
 		} else {
-			animateVelocity( 0 );
+			velocityY.value = 0;
 		}
 	};
 
