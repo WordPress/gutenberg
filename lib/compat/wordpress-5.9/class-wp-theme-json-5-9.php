@@ -14,7 +14,7 @@
  *
  * @access private
  */
-class WP_Theme_JSON_5_9 extends WP_Theme_JSON {
+class WP_Theme_JSON_5_9 {
 
 	/**
 	 * Container of data in theme.json format.

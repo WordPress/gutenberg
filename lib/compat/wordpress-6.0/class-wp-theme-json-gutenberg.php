@@ -175,6 +175,29 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	}
 
 	/**
+	 * Get a `default`'s preset name by a provided slug.
+	 *
+	 * @param array $default_array The slug we want to find a match from default presets.
+	 * @param string $slug The slug we want to find a match from default presets.
+	 * @param array  $base_path The path to inspect. It's 'settings' by default.
+	 *
+	 * @return string|null
+	 */
+	protected function get_name_from_defaults( $default_array, $slug, $base_path ) {
+		$path            = array_merge( $base_path, array( 'default' ) );
+		$default_content = _wp_array_get( $default_array, $path, null );
+		if ( ! $default_content ) {
+			return null;
+		}
+		foreach ( $default_content as $item ) {
+			if ( $slug === $item['slug'] ) {
+				return $item['name'];
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Merge two theme.json data structures
 	 *
 	 * @since 6.0.0
@@ -236,7 +259,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 					if ( 'theme' === $origin && $preset['use_default_names'] ) {
 						foreach ( $content as &$item ) {
 							if ( ! array_key_exists( 'name', $item ) ) {
-								$name = static::get_name_from_defaults( $item['slug'], $base_path );
+								$name = static::get_name_from_defaults( $base, $item['slug'], $base_path );
 								if ( null !== $name ) {
 									$item['name'] = $name;
 								}
