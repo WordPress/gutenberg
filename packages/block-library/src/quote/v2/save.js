@@ -1,5 +1,9 @@
-function Save() {
-	return <div>Quote block v2</div>;
-}
+/**
+ * WordPress dependencies
+ */
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
-export default Save;
+export default function save() {
+	const innerBlocksProps = useInnerBlocksProps.save( useBlockProps.save() );
+	return <blockquote { ...innerBlocksProps } />;
+}
