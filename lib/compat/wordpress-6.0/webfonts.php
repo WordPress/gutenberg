@@ -96,7 +96,7 @@ if ( ! function_exists( 'wp_register_webfont' ) ) {
 	 * @param array $webfont Webfont to be registered.
 	 */
 	function wp_register_webfont( array $webfont ) {
-		wp_webfonts()->register_font( $webfont );
+		wp_webfonts()->register_webfont( $webfont );
 	}
 }
 
@@ -143,7 +143,7 @@ if ( ! function_exists( 'wp_enqueue_webfont' ) ) {
 	 * @param string $webfont Font family to be enqueued.
 	 */
 	function wp_enqueue_webfont( $webfont ) {
-		wp_webfonts()->enqueue_font( $webfont );
+		wp_webfonts()->enqueue_webfont( $webfont );
 	}
 }
 

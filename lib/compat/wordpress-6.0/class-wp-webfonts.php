@@ -84,7 +84,7 @@ class WP_Webfonts {
 	 * @return array[]
 	 */
 	public function get_registered_webfonts() {
-			return $this->registered_webfonts;
+		return $this->registered_webfonts;
 	}
 
 	/**
@@ -121,24 +121,24 @@ class WP_Webfonts {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param array $font The font arguments.
+	 * @param array $webfont The font argument.
 	 */
-	public function register_font( $font ) {
-		$font = $this->validate_font( $font );
+	public function register_webfont( $webfont ) {
+		$webfont = $this->validate_webfont( $webfont );
 
 		// If not valid, bail out.
-		if ( ! $font ) {
+		if ( ! $webfont ) {
 			return false;
 		}
 
-		$slug = $this->get_font_slug( $font );
+		$slug = $this->get_font_slug( $webfont );
 
 		// Initialize a new font-family collection.
 		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
 			$this->registered_webfonts[ $slug ] = array();
 		}
 
-		$this->registered_webfonts[ $slug ][] = $font;
+		$this->registered_webfonts[ $slug ][] = $webfont;
 	}
 
 	/**
@@ -194,17 +194,17 @@ class WP_Webfonts {
 	}
 
 	/**
-	 * Validate a font.
+	 * Validate a webfont.
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param array $font The font arguments.
+	 * @param array $webfont The webfont arguments.
 	 *
-	 * @return array|false The validated font arguments, or false if the font is invalid.
+	 * @return array|false The validated webfont arguments, or false if the webfont is invalid.
 	 */
-	public function validate_font( $font ) {
-		$font = wp_parse_args(
-			$font,
+	public function validate_webfont( $webfont ) {
+		$webfont = wp_parse_args(
+			$webfont,
 			array(
 				'provider'     => 'local',
 				'font-family'  => '',
@@ -215,23 +215,23 @@ class WP_Webfonts {
 		);
 
 		// Check the font-family.
-		if ( empty( $font['font-family'] ) || ! is_string( $font['font-family'] ) ) {
+		if ( empty( $webfont['font-family'] ) || ! is_string( $webfont['font-family'] ) ) {
 			trigger_error( __( 'Webfont font family must be a non-empty string.', 'gutenberg' ) );
 			return false;
 		}
 
 		// Local fonts need a "src".
-		if ( 'local' === $font['provider'] ) {
+		if ( 'local' === $webfont['provider'] ) {
 			// Make sure that local fonts have 'src' defined.
-			if ( empty( $font['src'] ) || ( ! is_string( $font['src'] ) && ! is_array( $font['src'] ) ) ) {
+			if ( empty( $webfont['src'] ) || ( ! is_string( $webfont['src'] ) && ! is_array( $webfont['src'] ) ) ) {
 				trigger_error( __( 'Webfont src must be a non-empty string or an array of strings.', 'gutenberg' ) );
 				return false;
 			}
 		}
 
 		// Validate the 'src' property.
-		if ( ! empty( $font['src'] ) ) {
-			foreach ( (array) $font['src'] as $src ) {
+		if ( ! empty( $webfont['src'] ) ) {
+			foreach ( (array) $webfont['src'] as $src ) {
 				if ( empty( $src ) || ! is_string( $src ) ) {
 					trigger_error( __( 'Each webfont src must be a non-empty string.', 'gutenberg' ) );
 					return false;
@@ -240,14 +240,14 @@ class WP_Webfonts {
 		}
 
 		// Check the font-weight.
-		if ( ! is_string( $font['font-weight'] ) && ! is_int( $font['font-weight'] ) ) {
+		if ( ! is_string( $webfont['font-weight'] ) && ! is_int( $webfont['font-weight'] ) ) {
 			trigger_error( __( 'Webfont font weight must be a properly formatted string or integer.', 'gutenberg' ) );
 			return false;
 		}
 
 		// Check the font-display.
-		if ( ! in_array( $font['font-display'], array( 'auto', 'block', 'fallback', 'swap' ), true ) ) {
-			$font['font-display'] = 'fallback';
+		if ( ! in_array( $webfont['font-display'], array( 'auto', 'block', 'fallback', 'swap' ), true ) ) {
+			$webfont['font-display'] = 'fallback';
 		}
 
 		$valid_props = array(
@@ -270,13 +270,13 @@ class WP_Webfonts {
 			'provider',
 		);
 
-		foreach ( $font as $prop => $value ) {
+		foreach ( $webfont as $prop => $value ) {
 			if ( ! in_array( $prop, $valid_props, true ) ) {
-				unset( $font[ $prop ] );
+				unset( $webfont[ $prop ] );
 			}
 		}
 
-		return $font;
+		return $webfont;
 	}
 
 	/**
