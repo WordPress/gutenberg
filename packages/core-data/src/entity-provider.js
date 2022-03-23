@@ -76,6 +76,8 @@ export default function EntityProvider( { kind, type: name, id, children } ) {
  * Hook that returns the ID for the nearest
  * provided entity of the specified type.
  *
+ * @deprecated since 12.9. Callers should use the useEntityProviderId hook instead.
+ *
  * @param {string} kind The entity kind.
  * @param {string} type The entity type.
  */
