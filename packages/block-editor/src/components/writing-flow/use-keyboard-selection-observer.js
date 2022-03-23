@@ -60,9 +60,7 @@ export default function useKeyboardSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } = useDispatch(
 		blockEditorStore
 	);
-	const { getBlockParents, isSelectionMergeable } = useSelect(
-		blockEditorStore
-	);
+	const { getBlockParents } = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -101,17 +99,6 @@ export default function useKeyboardSelectionObserver() {
 
 					// Check if selection is already set by rich text.
 					multiSelect( startPath[ depth ], endPath[ depth ] );
-
-					if ( ! isSelectionMergeable() ) {
-						selectionChange( {
-							start: {
-								clientId: startPath[ depth ],
-							},
-							end: {
-								clientId: endPath[ depth ],
-							},
-						} );
-					}
 				}
 			}
 
@@ -127,12 +114,6 @@ export default function useKeyboardSelectionObserver() {
 				);
 			};
 		},
-		[
-			multiSelect,
-			selectBlock,
-			selectionChange,
-			getBlockParents,
-			isSelectionMergeable,
-		]
+		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
 	);
 }

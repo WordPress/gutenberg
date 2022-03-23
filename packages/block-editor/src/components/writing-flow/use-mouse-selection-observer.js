@@ -43,11 +43,9 @@ export default function useSelectionObserver() {
 		selectBlock,
 		selectionChange,
 	} = useDispatch( blockEditorStore );
-	const {
-		isSelectionEnabled,
-		getBlockParents,
-		isSelectionMergeable,
-	} = useSelect( blockEditorStore );
+	const { isSelectionEnabled, getBlockParents } = useSelect(
+		blockEditorStore
+	);
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -108,17 +106,6 @@ export default function useSelectionObserver() {
 
 					// Check if selection is already set by rich text.
 					multiSelect( startPath[ depth ], endPath[ depth ] );
-
-					if ( ! isSelectionMergeable() ) {
-						selectionChange( {
-							start: {
-								clientId: startPath[ depth ],
-							},
-							end: {
-								clientId: endPath[ depth ],
-							},
-						} );
-					}
 				}
 			}
 
@@ -192,7 +179,6 @@ export default function useSelectionObserver() {
 			selectionChange,
 			isSelectionEnabled,
 			getBlockParents,
-			isSelectionMergeable,
 		]
 	);
 }
