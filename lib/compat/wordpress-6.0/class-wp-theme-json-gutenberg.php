@@ -287,4 +287,28 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		return $merged_data;
 	}
 
+	/**
+	 * Gets the result of merging the theme's theme.json and the user settings
+	 *
+	 * @since 6.0.0
+	 *
+	 * @return array The result of the merge
+	 */
+	public static function get_merged_theme_json() {
+		// Get the user data
+		$user_data = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
+
+		// Get the raw theme.json file from the theme.
+		$theme_path = wp_normalize_path( get_stylesheet_directory() );
+		if ( file_exists( $theme_path . '/theme.json' ) ) {
+			$theme_json_data = wp_json_file_decode( $theme_path . '/theme.json', array( 'associative' => true ) );
+			if ( ! empty( $theme_json_data ) ) {
+				// Merge the theme's theme.json with the user settings.
+				return WP_Theme_JSON_Gutenberg::functional_merge( $theme_json_data, $user_data->get_raw_data() );
+			}
+		}
+
+		// If there's no theme.json file in the theme, just use the user settings.
+		return $user_data;
+	}
 }

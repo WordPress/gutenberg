@@ -99,20 +99,9 @@ function gutenberg_generate_block_templates_export_file() {
 	}
 
 	// Load theme.json into the zip file.
-	$user_data = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
-	// Update settings that aren't present in the $tree.
-	if ( file_exists( $theme_path . '/theme.json' ) ) {
-		$theme_json_data = wp_json_file_decode( $theme_path . '/theme.json', array( 'associative' => true ) );
-		if ( ! empty( $theme_json_data ) ) {
-			$merged_data = WP_Theme_JSON_Gutenberg::functional_merge( $theme_json_data, $user_data->get_raw_data() );
-		}
-	} else {
-		$merged_data = $user_data;
-	}
-
 	$zip->addFromString(
 		$theme_name . '/theme.json',
-		wp_json_encode( $merged_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
+		wp_json_encode( WP_Theme_JSON_Gutenberg::get_merged_theme_json(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
 	);
 
 	// Save changes to the zip file.
