@@ -66,6 +66,8 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 				'update_comment_meta_cache' => false,
 				'post_id'                   => self::$custom_post->ID,
 				'hierarchical'              => 'threaded',
+				'number'                    => 5,
+				'paged'                     => 1,
 			)
 		);
 	}
@@ -86,6 +88,8 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 				'no_found_rows'             => false,
 				'update_comment_meta_cache' => false,
 				'hierarchical'              => 'threaded',
+				'number'                    => 5,
+				'paged'                     => 1,
 			)
 		);
 	}
