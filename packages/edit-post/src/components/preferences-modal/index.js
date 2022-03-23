@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-
+import { BlockManager } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -29,7 +29,6 @@ import {
 /**
  * Internal dependencies
  */
-
 import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
@@ -38,7 +37,6 @@ import {
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 import { store as editPostStore } from '../../store';
-import BlockManager from '../block-manager';
 
 const MODAL_NAME = 'edit-post/preferences';
 
