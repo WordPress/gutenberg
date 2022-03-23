@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody, SelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 
@@ -11,7 +11,6 @@ export default function CommentsInspectorControls( {
 } ) {
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }></PanelBody>
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
