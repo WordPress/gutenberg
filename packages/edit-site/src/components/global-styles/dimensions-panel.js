@@ -6,7 +6,6 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
-	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
@@ -21,9 +20,8 @@ const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 export function useHasDimensionsPanel( name ) {
 	const hasPadding = useHasPadding( name );
 	const hasMargin = useHasMargin( name );
-	const hasGap = useHasGap( name );
 
-	return hasPadding || hasMargin || hasGap;
+	return hasPadding || hasMargin;
 }
 
 function useHasPadding( name ) {
@@ -38,13 +36,6 @@ function useHasMargin( name ) {
 	const [ settings ] = useSetting( 'spacing.margin', name );
 
 	return settings && supports.includes( 'margin' );
-}
-
-function useHasGap( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.blockGap', name );
-
-	return settings && supports.includes( '--wp--style--block-gap' );
 }
 
 function filterValuesBySides( values, sides ) {
@@ -88,7 +79,6 @@ function splitStyleValue( value ) {
 export default function DimensionsPanel( { name } ) {
 	const showPaddingControl = useHasPadding( name );
 	const showMarginControl = useHasMargin( name );
-	const showGapControl = useHasGap( name );
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units', name )[ 0 ] || [
 			'%',
@@ -128,15 +118,9 @@ export default function DimensionsPanel( { name } ) {
 	const resetMarginValue = () => setMarginValues( {} );
 	const hasMarginValue = () =>
 		!! marginValues && Object.keys( marginValues ).length;
-
-	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
-	const resetGapValue = () => setGapValue( undefined );
-	const hasGapValue = () => !! gapValue;
-
 	const resetAll = () => {
 		resetPaddingValue();
 		resetMarginValue();
-		resetGapValue();
 	};
 
 	return (
@@ -174,23 +158,6 @@ export default function DimensionsPanel( { name } ) {
 						units={ units }
 						allowReset={ false }
 						splitOnAxis={ isAxialMargin }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ showGapControl && (
-				<ToolsPanelItem
-					hasValue={ hasGapValue }
-					label={ __( 'Block spacing' ) }
-					onDeselect={ resetGapValue }
-					isShownByDefault={ true }
-				>
-					<UnitControl
-						label={ __( 'Block spacing' ) }
-						__unstableInputWidth="80px"
-						min={ 0 }
-						onChange={ setGapValue }
-						units={ units }
-						value={ gapValue }
 					/>
 				</ToolsPanelItem>
 			) }

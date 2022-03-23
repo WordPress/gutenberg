@@ -91,7 +91,8 @@ export function getAllValue( values = {} ) {
  */
 export function hasMixedValues( values = {} ) {
 	const allValue = getAllValue( values );
-	const isMixed = isNaN( parseFloat( allValue ) );
+	const isMixed =
+		typeof values === 'string' ? false : isNaN( parseFloat( allValue ) );
 
 	return isMixed;
 }

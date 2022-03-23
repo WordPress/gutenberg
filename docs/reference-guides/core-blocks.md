@@ -611,6 +611,15 @@ An advanced block that allows displaying post types based on different query par
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
 -	**Attributes:** displayLayout, query, queryId, tagName
 
+## No results
+
+Contains the block elements used to render content when no query results are found. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-no-results))
+
+-	**Name:** core/query-no-results
+-	**Category:** theme
+-	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
+-	**Attributes:** 
+
 ## Pagination
 
 Displays a paginated navigation to next/previous set of posts, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination))
@@ -698,8 +707,8 @@ Create a break between ideas or sections with a horizontal separator. ([Source](
 
 -	**Name:** core/separator
 -	**Category:** design
--	**Supports:** align (center, full, wide), anchor
--	**Attributes:** color, customColor
+-	**Supports:** align (center, full, wide), anchor, color (background, gradients, ~~text~~)
+-	**Attributes:** opacity
 
 ## Shortcode
 

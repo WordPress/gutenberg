@@ -11,9 +11,12 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.72.0
+
 -   [*] Add GIF badge for animated GIFs uploaded to Image blocks [#38996]
 -   [*] Small refinement to media upload errors, including centring and tweaking copy. [#38951]
 -   [*] Update gesture handler and reanimated libraries [#39098]
+-   [*] Fix issue with list's starting index and the order [#39354]
 
 ## 1.71.3
 

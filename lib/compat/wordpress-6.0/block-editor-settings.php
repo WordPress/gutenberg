@@ -18,6 +18,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	if (
 		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
+		is_object( get_current_screen() ) &&
 		gutenberg_is_edit_site_page( get_current_screen()->id )
 	) {
 		$context = 'site-editor';

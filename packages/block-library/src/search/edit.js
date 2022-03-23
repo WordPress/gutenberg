@@ -352,7 +352,6 @@ export default function SearchEdit( {
 							} }
 							style={ { maxWidth: 80 } }
 							value={ `${ width }${ widthUnit }` }
-							unit={ widthUnit }
 							units={ units }
 						/>
 

@@ -26,11 +26,13 @@ import { store as blockEditorStore } from '../../store';
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
 const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
-	const { selectedBlocks, selectedClientIds } = useSelect(
+	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
 		( select ) => {
-			const { getBlocksByClientId, getSelectedBlockClientIds } = select(
-				blockEditorStore
-			);
+			const {
+				getBlocksByClientId,
+				getSelectedBlockClientIds,
+				canRemoveBlocks,
+			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
@@ -39,24 +41,35 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 					( block ) => block.name
 				),
 				selectedClientIds: ids,
+				canRemove: canRemoveBlocks( ids ),
 			};
 		},
 		[ clientIds ]
 	);
 
-	const isMultiSelected = selectedClientIds.length > 1;
+	const showLockButton = selectedClientIds.length === 1;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
 	const convertToGroupButtonProps = useConvertToGroupButtonProps();
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
-	const showConvertToGroupButton = isGroupable || isUngroupable;
+	const showConvertToGroupButton =
+		( isGroupable || isUngroupable ) && canRemove;
+
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks, selectedClientIds } }>
 			{ ( fills ) => {
+				if (
+					! fills?.length > 0 &&
+					! showConvertToGroupButton &&
+					! showLockButton
+				) {
+					return null;
+				}
+
 				return (
 					<MenuGroup>
-						{ ! isMultiSelected && (
+						{ showLockButton && (
 							<BlockLockMenuItem
 								clientId={ selectedClientIds[ 0 ] }
 							/>

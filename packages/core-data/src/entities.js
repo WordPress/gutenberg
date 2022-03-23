@@ -63,6 +63,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'mediaItems',
 		label: __( 'Media' ),
+		rawAttributes: [ 'caption', 'title', 'description' ],
 	},
 	{
 		name: 'taxonomy',
@@ -308,7 +309,7 @@ export const getMethodName = (
  *
  * @param {string} kind Kind
  *
- * @return {Array} Entities
+ * @return {(thunkArgs: object) => Promise<Array>} Entities
  */
 export const getOrLoadEntitiesConfig = ( kind ) => async ( {
 	select,
