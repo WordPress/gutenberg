@@ -23,6 +23,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import useScrollWhenDragging from './use-scroll-when-dragging';
 import DraggableChip from './draggable-chip';
 import { store as blockEditorStore } from '../../store';
 import { useBlockListContext } from '../block-list/block-list-context';
@@ -59,10 +60,19 @@ const BlockDraggableWrapper = ( { children } ) => {
 	const isDragging = useSharedValue( false );
 	const scrollAnimation = useSharedValue( 0 );
 
+	const [
+		startScrolling,
+		scrollOnDragOver,
+		stopScrolling,
+		draggingScrollHandler,
+	] = useScrollWhenDragging();
+
 	const scrollHandler = ( event ) => {
 		'worklet';
 		const { contentOffset } = event;
 		scroll.offsetY.value = contentOffset.y;
+
+		draggingScrollHandler( event );
 	};
 
 	// Stop dragging blocks if the block draggable is unmounted.
@@ -95,9 +105,13 @@ const BlockDraggableWrapper = ( { children } ) => {
 						( scroll.offsetY.value - blockLayout.y ) -
 						EXTRA_OFFSET_WHEN_CLOSE_TO_TOP_EDGE
 				);
-				scrollAnimation.value = withTiming( scrollOffsetTarget, {
-					duration: SCROLL_ANIMATION_DURATION,
-				} );
+				scrollAnimation.value = withTiming(
+					scrollOffsetTarget,
+					{ duration: SCROLL_ANIMATION_DURATION },
+					() => startScrolling( position.y )
+				);
+			} else {
+				runOnUI( startScrolling )( position.y );
 			}
 		} else {
 			// We stop dragging If no block is found.
@@ -137,6 +151,9 @@ const BlockDraggableWrapper = ( { children } ) => {
 		const dragPosition = { x, y };
 		chip.x.value = dragPosition.x;
 		chip.y.value = dragPosition.y;
+
+		// Update scrolling velocity
+		scrollOnDragOver( dragPosition.y );
 	};
 
 	const stopDragging = () => {
@@ -145,6 +162,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 
 		chip.scale.value = withTiming( 0 );
 		runOnJS( stopDraggingBlocks )();
+		stopScrolling();
 	};
 
 	const chipStyles = useAnimatedStyle( () => {
