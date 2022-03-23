@@ -330,6 +330,7 @@ function RichTextWrapper(
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
+					forwardedRef,
 					autocompleteProps.ref,
 					props.ref,
 					richTextRef,
@@ -371,7 +372,6 @@ function RichTextWrapper(
 						onSplitAtEnd,
 					} ),
 					anchorRef,
-					forwardedRef,
 				] ) }
 				contentEditable={ true }
 				suppressContentEditableWarning={ true }
