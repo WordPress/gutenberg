@@ -10,6 +10,8 @@ import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
 	withTiming,
+	scrollTo,
+	useAnimatedReaction,
 } from 'react-native-reanimated';
 
 /**
@@ -30,19 +32,26 @@ import styles from './style.scss';
 
 const CHIP_POSITION_PADDING = 32;
 const BLOCK_COLLAPSED_HEIGHT = 20;
+const EXTRA_OFFSET_WHEN_CLOSE_TO_TOP_EDGE = 80;
+const SCROLL_ANIMATION_DURATION = 350;
 
 const BlockDraggableWrapper = ( { children } ) => {
-	const { /*startDraggingBlocks,*/ stopDraggingBlocks } = useDispatch(
+	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
 		blockEditorStore
 	);
 
-	const { scrollRef } = useBlockListContext();
+	const {
+		blocksLayouts,
+		scrollRef,
+		findBlockLayoutByPosition,
+	} = useBlockListContext();
 	const animatedScrollRef = useAnimatedRef();
 	animatedScrollRef( scrollRef );
 
 	const scroll = {
 		x: useSharedValue( 0 ),
 		y: useSharedValue( 0 ),
+		offsetY: useSharedValue( 0 ),
 	};
 	const chip = {
 		x: useSharedValue( 0 ),
@@ -54,13 +63,22 @@ const BlockDraggableWrapper = ( { children } ) => {
 		scale: useSharedValue( 0 ),
 	};
 	const isDragging = useSharedValue( false );
+	const scrollAnimation = useSharedValue( 0 );
 
 	const [
 		startScrolling,
 		scrollOnDragOver,
 		stopScrolling,
-		scrollHandler,
+		draggingScrollHandler,
 	] = useScrollWhenDragging();
+
+	const scrollHandler = ( event ) => {
+		'worklet';
+		const { contentOffset } = event;
+		scroll.offsetY.value = contentOffset.y;
+
+		draggingScrollHandler( event );
+	};
 
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
@@ -71,10 +89,47 @@ const BlockDraggableWrapper = ( { children } ) => {
 		};
 	}, [] );
 
-	const setDraggingBlockByPosition = () => {
-		// TODO: Get clientId from blocks layouts data by position
-		// startDraggingBlocks( [ clientIdFromBlocksLayouts ] );
+	const setupDraggingBlock = ( position ) => {
+		const blockLayout = findBlockLayoutByPosition( blocksLayouts.current, {
+			x: position.x,
+			y: position.y + scroll.offsetY.value,
+		} );
+
+		const foundClientId = blockLayout?.clientId;
+		if ( foundClientId ) {
+			startDraggingBlocks( [ foundClientId ] );
+
+			const isBlockOutOfScrollView = blockLayout.y < scroll.offsetY.value;
+			// If the dragging block is out of the scroll view, we have to
+			// scroll the block list to show the origin position of the block.
+			if ( isBlockOutOfScrollView ) {
+				scrollAnimation.value = scroll.offsetY.value;
+				const scrollOffsetTarget = Math.max(
+					0,
+					scroll.offsetY.value -
+						( scroll.offsetY.value - blockLayout.y ) -
+						EXTRA_OFFSET_WHEN_CLOSE_TO_TOP_EDGE
+				);
+				scrollAnimation.value = withTiming(
+					scrollOffsetTarget,
+					{ duration: SCROLL_ANIMATION_DURATION },
+					() => startScrolling( position.y )
+				);
+			} else {
+				runOnUI( startScrolling )( position.y );
+			}
+		}
 	};
+
+	// This hook is used for animating the scroll via a shared value.
+	useAnimatedReaction(
+		() => scrollAnimation.value,
+		( value ) => {
+			if ( isDragging.value ) {
+				scrollTo( animatedScrollRef, 0, value, false );
+			}
+		}
+	);
 
 	const onChipLayout = ( { nativeEvent: { layout } } ) => {
 		chip.width.value = layout.width;
@@ -97,17 +152,21 @@ const BlockDraggableWrapper = ( { children } ) => {
 		isDragging.value = true;
 
 		chip.scale.value = withTiming( 1 );
-		runOnJS( setDraggingBlockByPosition )( dragPosition );
-		startScrolling( absoluteY );
+		runOnJS( setupDraggingBlock )( dragPosition );
 	};
 
 	const updateDragging = ( { absoluteX, absoluteY } ) => {
 		'worklet';
-		chip.x.value = absoluteX - scroll.x.value;
-		chip.y.value = absoluteY - scroll.y.value;
+		const dragPosition = {
+			x: absoluteX - scroll.x.value,
+			y: absoluteY - scroll.y.value,
+		};
+
+		chip.x.value = dragPosition.x;
+		chip.y.value = dragPosition.y;
 
 		// Update scrolling velocity
-		scrollOnDragOver( absoluteY );
+		scrollOnDragOver( dragPosition.y );
 	};
 
 	const stopDragging = () => {
@@ -142,6 +201,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 				onDragStart={ startDragging }
 				onDragOver={ updateDragging }
 				onDragEnd={ stopDragging }
+				wrapperAnimatedStyles={ { flex: 1 } }
 			>
 				{ children( { onScroll: scrollHandler } ) }
 			</Draggable>
