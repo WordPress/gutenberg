@@ -117,6 +117,16 @@ export default function useBlockSelection() {
 			// the total number of blocks deselected is greater than one.
 			const updatedSelectedBlocks = getSelectedBlockClientIds();
 
+			// If the selection is greater than 1 and the Home or End keys
+			// were used to generate the selection, then skip announcing the
+			// deselected blocks.
+			if (
+				( event.keyCode === HOME || event.keyCode === END ) &&
+				updatedSelectedBlocks.length > 1
+			) {
+				return;
+			}
+
 			const selectionDiff = difference(
 				selectedBlocks,
 				updatedSelectedBlocks
