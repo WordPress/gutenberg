@@ -176,6 +176,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 
 	/**
 	 * Get a `default`'s preset name by a provided slug.
+	 * Renamed from get_name_from_default
 	 *
 	 * @param array $default_array The slug we want to find a match from default presets.
 	 * @param string $slug The slug we want to find a match from default presets.
@@ -183,7 +184,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	 *
 	 * @return string|null
 	 */
-	protected function get_name_from_defaults( $default_array, $slug, $base_path ) {
+	protected static function get_name_from_array( $default_array, $slug, $base_path ) {
 		$path            = array_merge( $base_path, array( 'default' ) );
 		$default_content = _wp_array_get( $default_array, $path, null );
 		if ( ! $default_content ) {
@@ -246,7 +247,9 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 
 			// Replace the presets.
 			foreach ( static::PRESETS_METADATA as $preset ) {
-				$override_preset = ! static::get_metadata_boolean( $base['settings'], $preset['prevent_override'], true );
+				if ( array_key_exists( 'settings', $base ) ) {
+					$override_preset = ! static::get_metadata_boolean( $base['settings'], $preset['prevent_override'], true );
+				}
 
 				foreach ( static::VALID_ORIGINS as $origin ) {
 					$base_path = array_merge( $node['path'], $preset['path'] );
@@ -259,7 +262,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 					if ( 'theme' === $origin && $preset['use_default_names'] ) {
 						foreach ( $content as &$item ) {
 							if ( ! array_key_exists( 'name', $item ) ) {
-								$name = static::get_name_from_defaults( $base, $item['slug'], $base_path );
+								$name = static::get_name_from_array( $base, $item['slug'], $base_path );
 								if ( null !== $name ) {
 									$item['name'] = $name;
 								}
