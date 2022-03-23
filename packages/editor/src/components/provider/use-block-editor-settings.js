@@ -112,6 +112,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'canLockBlocks',
 				'codeEditingEnabled',
 				'colors',
+				'defaultAllowedBlockTypes',
 				'disableCustomColors',
 				'disableCustomFontSizes',
 				'disableCustomGradients',

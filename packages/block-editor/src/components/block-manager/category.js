@@ -27,10 +27,7 @@ function BlockManagerCategory( { scope, title, blockTypes } ) {
 	const instanceId = useInstanceId( BlockManagerCategory );
 	const defaultAllowedBlockTypes = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return {
-			defaultAllowedBlockTypes:
-				getSettings()?.defaultAllowedBlockTypes ?? [],
-		};
+		return getSettings()?.defaultAllowedBlockTypes ?? [];
 	}, [] );
 	const filteredBlockTypes = useMemo( () => {
 		if ( defaultAllowedBlockTypes === true ) {
