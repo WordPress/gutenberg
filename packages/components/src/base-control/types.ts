@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import type { HTMLAttributes, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
-import type {
-	Wrapper,
-	StyledField,
-	StyledVisualLabel,
-} from './styles/base-control-styles';
+import type { ReactNode } from 'react';
 
 export type BaseControlProps = {
 	/**
@@ -38,14 +29,14 @@ export type BaseControlProps = {
 	 * @default false
 	 */
 	hideLabelFromVision?: boolean;
-	className?: HTMLAttributes< typeof Wrapper >[ 'className' ];
+	className?: string;
 	/**
 	 * The content to be displayed within the `BaseControl`.
 	 */
-	children: HTMLAttributes< typeof StyledField >[ 'children' ];
+	children: ReactNode;
 };
 
-export type BaseControlVisualLabelProps = Pick<
-	HTMLAttributes< typeof StyledVisualLabel >,
-	'className' | 'children'
->;
+export type BaseControlVisualLabelProps = {
+	className?: string;
+	children: ReactNode;
+};
