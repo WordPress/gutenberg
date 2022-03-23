@@ -107,7 +107,7 @@ describe( 'block parser', () => {
 			} );
 			expect( block ).toBeUndefined();
 		} );
-		describe( 'fallback to an older version of the block if the current one is invalid', () => {
+		describe( 'fall back to an older version of the block if the current one is invalid', () => {
 			beforeEach( () => {
 				registerBlockType( 'core/test-block', {
 					...defaultBlockSettings,
