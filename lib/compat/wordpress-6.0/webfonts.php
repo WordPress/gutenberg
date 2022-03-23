@@ -98,6 +98,49 @@ function wp_register_webfont( array $webfont ) {
 }
 
 /**
+ * Enqueues a collection of font families.
+ *
+ * Example of how to enqueue Source Serif Pro and Roboto font families, both registered beforehand.
+ *
+ * <code>
+ * wp_enqueue_webfonts(
+ *  'Roboto',
+ *  'Sans Serif Pro'
+ * );
+ * </code>
+ *
+ * Font families should be enqueued from the `init` hook or later.
+ *
+ * @since 6.0.0
+ *
+ * @param string[] $webfonts Font families to be enqueued.
+ */
+function wp_enqueue_webfonts( $webfonts ) {
+	foreach ( $webfonts as $webfont ) {
+		wp_enqueue_webfont( $webfont );
+	}
+}
+
+/**
+ * Enqueue a single font family that has been registered beforehand.
+ *
+ * Example of how to enqueue Source Serif Pro font:
+ *
+ * <code>
+ * wp_enqueue_webfont( 'Source Serif Pro' );
+ * </code>
+ *
+ * Font families should be enqueued from the `init` hook or later.
+ *
+ * @since 6.0.0
+ *
+ * @param string $webfont Font family to be enqueued.
+ */
+function wp_enqueue_webfont( $webfont ) {
+	wp_webfonts()->enqueue_font( $webfont );
+}
+
+/**
  * Registers a custom font service provider.
  *
  * A webfont provider contains the business logic for how to
