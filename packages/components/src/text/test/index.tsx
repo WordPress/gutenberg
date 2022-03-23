@@ -63,10 +63,16 @@ describe( 'Text', () => {
 	} );
 
 	test( 'should render align', () => {
-		const { container } = render(
+		const { container: centerAlignedContainer } = render(
 			<Text align="center">Lorem ipsum.</Text>
 		);
-		expect( container.firstChild ).toHaveStyle( { textAlign: 'center' } );
+		const { container: defaultAlignedContainer } = render(
+			<Text>Lorem ipsum.</Text>
+		);
+
+		expect(
+			defaultAlignedContainer.children[ 0 ]
+		).toMatchStyleDiffSnapshot( centerAlignedContainer.children[ 0 ] );
 	} );
 
 	test( 'should render color', () => {
