@@ -39,6 +39,9 @@ export type BaseControlProps = {
 	 */
 	hideLabelFromVision?: boolean;
 	className?: HTMLAttributes< typeof Wrapper >[ 'className' ];
+	/**
+	 * The content to be displayed within the `BaseControl`.
+	 */
 	children: HTMLAttributes< typeof StyledField >[ 'children' ];
 };
 
