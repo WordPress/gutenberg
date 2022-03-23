@@ -21,7 +21,16 @@ const variations = [
 		attributes: { layout: { type: 'flex' } },
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
-			blockAttributes.layout?.type === 'flex',
+			blockAttributes.layout?.type === 'flex' && ( ! blockAttributes.layout?.orientation || blockAttributes.layout?.orientation === 'horizontal' ),
+	},
+	{
+		name: 'group-stack',
+		title: __( 'Stack' ),
+		description: __( 'Blocks stacked in a column.' ),
+		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
+		scope: [ 'inserter', 'transform' ],
+		isActive: ( blockAttributes ) =>
+			blockAttributes.layout?.type === 'flex' && blockAttributes.layout?.orientation === 'vertical',
 	},
 ];
 
