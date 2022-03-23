@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, includes, isArray } from 'lodash';
+import { filter, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,15 +18,18 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import BlockManagerCategory from './category';
-import { store as editPostStore } from '../../store';
+import useHiddenBlockTypes from './use-hidden-block-types';
 
 function BlockManager( {
+	scope,
 	blockTypes,
 	categories,
 	hasBlockSupport,
 	isMatchingSearchTerm,
-	numberOfHiddenBlocks,
 } ) {
+	const { hiddenBlockTypes } = useHiddenBlockTypes( scope );
+	const numberOfHiddenBlocks = hiddenBlockTypes?.length ?? 0;
+
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ search, setSearch ] = useState( '' );
 
@@ -91,6 +94,7 @@ function BlockManager( {
 				{ categories.map( ( category ) => (
 					<BlockManagerCategory
 						key={ category.slug }
+						scope={ scope }
 						title={ category.title }
 						blockTypes={ filter( blockTypes, {
 							category: category.slug,
@@ -98,6 +102,7 @@ function BlockManager( {
 					/>
 				) ) }
 				<BlockManagerCategory
+					scope={ scope }
 					title={ __( 'Uncategorized' ) }
 					blockTypes={ filter(
 						blockTypes,
@@ -116,16 +121,11 @@ export default withSelect( ( select ) => {
 		hasBlockSupport,
 		isMatchingSearchTerm,
 	} = select( blocksStore );
-	const { getHiddenBlockTypes } = select( editPostStore );
-	const hiddenBlockTypes = getHiddenBlockTypes();
-	const numberOfHiddenBlocks =
-		isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 
 	return {
 		blockTypes: getBlockTypes(),
 		categories: getCategories(),
 		hasBlockSupport,
 		isMatchingSearchTerm,
-		numberOfHiddenBlocks,
 	};
 } )( BlockManager );

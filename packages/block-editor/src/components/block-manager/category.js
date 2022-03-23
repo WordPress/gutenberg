@@ -7,7 +7,7 @@ import { includes, map, without } from 'lodash';
  * WordPress dependencies
  */
 import { useMemo, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { CheckboxControl } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
@@ -16,22 +16,22 @@ import { store as editorStore } from '@wordpress/editor';
  * Internal dependencies
  */
 import BlockTypesChecklist from './checklist';
-import { store as editPostStore } from '../../store';
+import useHiddenBlockTypes from './use-hidden-block-types';
 
-function BlockManagerCategory( { title, blockTypes } ) {
+function BlockManagerCategory( { scope, title, blockTypes } ) {
+	const {
+		hiddenBlockTypes,
+		showBlockTypes,
+		hideBlockTypes,
+	} = useHiddenBlockTypes( scope );
 	const instanceId = useInstanceId( BlockManagerCategory );
-	const { defaultAllowedBlockTypes, hiddenBlockTypes } = useSelect(
-		( select ) => {
-			const { getEditorSettings } = select( editorStore );
-			const { getHiddenBlockTypes } = select( editPostStore );
-			return {
-				defaultAllowedBlockTypes: getEditorSettings()
-					.defaultAllowedBlockTypes,
-				hiddenBlockTypes: getHiddenBlockTypes(),
-			};
-		},
-		[]
-	);
+	const defaultAllowedBlockTypes = useSelect( ( select ) => {
+		const { getEditorSettings } = select( editorStore );
+		return {
+			defaultAllowedBlockTypes: getEditorSettings()
+				.defaultAllowedBlockTypes,
+		};
+	}, [] );
 	const filteredBlockTypes = useMemo( () => {
 		if ( defaultAllowedBlockTypes === true ) {
 			return blockTypes;
@@ -40,7 +40,6 @@ function BlockManagerCategory( { title, blockTypes } ) {
 			return includes( defaultAllowedBlockTypes || [], name );
 		} );
 	}, [ defaultAllowedBlockTypes, blockTypes ] );
-	const { showBlockTypes, hideBlockTypes } = useDispatch( editPostStore );
 	const toggleVisible = useCallback( ( blockName, nextIsChecked ) => {
 		if ( nextIsChecked ) {
 			showBlockTypes( blockName );
