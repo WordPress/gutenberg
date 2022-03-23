@@ -692,11 +692,20 @@ export const deleteSelection = ( isForward ) => ( {
 		return;
 	}
 
+	function expandSelection() {
+		dispatch.selectionChange( {
+			start: { clientId: selectionAnchor.clientId },
+			end: { clientId: selectionFocus.clientId },
+		} );
+	}
+
 	if (
 		typeof selectionAnchor.offset === 'undefined' ||
 		typeof selectionFocus.offset === 'undefined'
-	)
+	) {
+		expandSelection();
 		return;
+	}
 
 	const anchorRootClientId = select.getBlockRootClientId(
 		selectionAnchor.clientId
@@ -729,6 +738,12 @@ export const deleteSelection = ( isForward ) => ( {
 	const targetSelection = isForward ? selectionEnd : selectionStart;
 	const targetBlock = select.getBlock( targetSelection.clientId );
 	const targetBlockType = getBlockType( targetBlock.name );
+
+	if ( ! targetBlockType.merge ) {
+		expandSelection();
+		return;
+	}
+
 	const selectionA = selectionStart;
 	const selectionB = selectionEnd;
 
@@ -759,19 +774,9 @@ export const deleteSelection = ( isForward ) => ( {
 		...mapRichTextSettings( attributeDefinitionB ),
 	} );
 
-	const followingBlock = isForward ? cloneA : cloneB;
-	let blocksWithTheSameType =
-		blockA.name === blockB.name
-			? [ followingBlock ]
-			: switchToBlockType( followingBlock, targetBlockType.name );
-	const canMerge =
-		targetBlockType.merge &&
-		blocksWithTheSameType &&
-		blocksWithTheSameType.length;
-
 	// A robust way to retain selection position through various transforms
 	// is to insert a special character at the position and then recover it.
-	const START_OF_SELECTED_AREA = canMerge ? '\u0086' : '';
+	const START_OF_SELECTED_AREA = '\u0086';
 
 	valueA = remove( valueA, selectionA.offset, valueA.text.length );
 	valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
@@ -785,49 +790,20 @@ export const deleteSelection = ( isForward ) => ( {
 		...mapRichTextSettings( attributeDefinitionB ),
 	} );
 
-	if ( ! canMerge ) {
-		const selectedBlockClientIds = select.getSelectedBlockClientIds();
-		const replacement = [
-			{
-				...blockA,
-				attributes: {
-					...blockA.attributes,
-					...cloneA.attributes,
-				},
-			},
-			{
-				...blockB,
-				attributes: {
-					...blockB.attributes,
-					...cloneB.attributes,
-				},
-			},
-		];
-
-		registry.batch( () => {
-			dispatch.replaceBlocks(
-				selectedBlockClientIds,
-				replacement,
-				0, // If we don't pass the `indexToSelect` it will default to the last block.
-				select.getSelectedBlocksInitialCaretPosition()
-			);
-
-			dispatch.selectionChange(
-				blockB.clientId,
-				selectionB.attributeKey,
-				0,
-				0
-			);
-		} );
-		return;
-	}
+	const followingBlock = isForward ? cloneA : cloneB;
 
 	// We can only merge blocks with similar types
 	// thus, we transform the block to merge first
-	blocksWithTheSameType =
+	const blocksWithTheSameType =
 		blockA.name === blockB.name
 			? [ followingBlock ]
 			: switchToBlockType( followingBlock, targetBlockType.name );
+
+	// If the block types can not match, do nothing
+	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+		expandSelection();
+		return;
+	}
 
 	let updatedAttributes;
 
@@ -869,6 +845,7 @@ export const deleteSelection = ( isForward ) => ( {
 	const replacement = [
 		...( isForward ? blocksWithTheSameType : [] ),
 		{
+			// Preserve the original client ID.
 			...targetBlock,
 			attributes: {
 				...targetBlock.attributes,
@@ -988,7 +965,25 @@ export const splitSelection = () => ( { select, dispatch } ) => {
 
 	dispatch.replaceBlocks(
 		select.getSelectedBlockClientIds(),
-		[ cloneA, createBlock( getDefaultBlockName() ), cloneB ],
+		[
+			{
+				// Preserve the original client ID.
+				...blockA,
+				attributes: {
+					...blockA.attributes,
+					...cloneA.attributes,
+				},
+			},
+			createBlock( getDefaultBlockName() ),
+			{
+				// Preserve the original client ID.
+				...blockB,
+				attributes: {
+					...blockB.attributes,
+					...cloneB.attributes,
+				},
+			},
+		],
 		1, // If we don't pass the `indexToSelect` it will default to the last block.
 		select.getSelectedBlocksInitialCaretPosition()
 	);

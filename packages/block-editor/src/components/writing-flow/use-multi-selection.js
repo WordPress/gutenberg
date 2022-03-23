@@ -14,7 +14,6 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
-import { getBlockClientId } from '../../utils/dom';
 
 function selector( select ) {
 	const {
@@ -23,6 +22,7 @@ function selector( select ) {
 		hasMultiSelection,
 		getSelectedBlockClientId,
 		getSelectedBlocksInitialCaretPosition,
+		getSelectionStart,
 	} = select( blockEditorStore );
 
 	return {
@@ -31,6 +31,7 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		selectedBlockClientId: getSelectedBlockClientId(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
+		isFullSelection: ! getSelectionStart().attributeKey,
 	};
 }
 
@@ -41,6 +42,7 @@ export default function useMultiSelection() {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		selectedBlockClientId,
+		isFullSelection,
 	} = useSelect( selector, [] );
 	const selectedRef = useBlockRef( selectedBlockClientId );
 	// These must be in the right DOM order.
@@ -95,6 +97,10 @@ export default function useMultiSelection() {
 				return;
 			}
 
+			if ( ! isFullSelection ) {
+				return;
+			}
+
 			// Allow cross contentEditable selection by temporarily making
 			// all content editable. We can't rely on using the store and
 			// React because re-rending happens too slowly. We need to be
@@ -112,22 +118,6 @@ export default function useMultiSelection() {
 			}
 
 			const selection = defaultView.getSelection();
-
-			// Abort if the blocks already contain selection.
-			if (
-				selection.rangeCount &&
-				selection.containsNode( startRef.current, true ) &&
-				getBlockClientId( startRef.current ) ===
-					getBlockClientId(
-						selection.getRangeAt( 0 ).startContainer
-					) &&
-				selection.containsNode( endRef.current, true ) &&
-				getBlockClientId( endRef.current ) ===
-					getBlockClientId( selection.getRangeAt( 0 ).endContainer )
-			) {
-				return;
-			}
-
 			const range = ownerDocument.createRange();
 
 			// These must be in the right DOM order.
@@ -143,6 +133,7 @@ export default function useMultiSelection() {
 			multiSelectedBlockClientIds,
 			selectedBlockClientId,
 			initialPosition,
+			isFullSelection,
 		]
 	);
 }

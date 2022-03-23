@@ -66,6 +66,8 @@ export default function useKeyboardSelectionObserver() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
+			let rafId;
+
 			function onSelectionChange() {
 				const selection = defaultView.getSelection();
 
@@ -97,8 +99,12 @@ export default function useKeyboardSelectionObserver() {
 					];
 					const depth = findDepth( startPath, endPath );
 
-					// Check if selection is already set by rich text.
-					multiSelect( startPath[ depth ], endPath[ depth ] );
+					// We must allow rich text to set selection first. This
+					// `selectionchange` listener was added first so it will be
+					// called before the rich text one.
+					rafId = defaultView.requestAnimationFrame( () => {
+						multiSelect( startPath[ depth ], endPath[ depth ] );
+					} );
 				}
 			}
 
@@ -108,6 +114,7 @@ export default function useKeyboardSelectionObserver() {
 			);
 
 			return () => {
+				defaultView.cancelAnimationFrame( rafId );
 				ownerDocument.removeEventListener(
 					'selectionchange',
 					onSelectionChange
