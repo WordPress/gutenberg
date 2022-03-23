@@ -98,6 +98,72 @@ function wp_register_webfont( array $webfont ) {
 }
 
 /**
+ * Enqueues a collection of webfonts.
+ *
+ * Example of how to enqueue Source Serif Pro font with font-weight range of 200-900
+ * and font-style of normal and italic:
+ *
+ * <code>
+ * wp_enqueue_webfonts(
+ *      // Pass an ID for an already-registered font:
+ *      'some-already-registered-font',
+ *      // Register and enqueue some new fonts:
+ *      array(
+ *          'provider'    => 'local',
+ *          'font-family' => 'Source Serif Pro',
+ *          'font-weight' => '200 900',
+ *          'font-style'  => 'normal',
+ *          'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
+ *      )
+ * );
+ * </code>
+ *
+ * Webfonts should be enqueued in the `after_setup_theme` hook.
+ *
+ * @since 6.0.0
+ *
+ * @param (string|array)[] $webfonts Webfonts to be enqueued.
+ *                         This contains an array of webfonts to be enqueued.
+ *                         Each webfont could be an array (register and enqueue) or a string (enqueue already registered webfont).
+ */
+function wp_enqueue_webfonts( $webfonts ) {
+	foreach ( $webfonts as $webfont ) {
+		wp_enqueue_webfont( $webfont );
+	}
+}
+
+/**
+ * Enqueue a single webfont.
+ *
+ * Register the webfont if $webfont is provided and enqueues.
+ *
+ * Example of how to register Source Serif Pro font with font-weight range of 200-900:
+ *
+ * If the font file is contained within the theme:
+ *
+ * <code>
+ * wp_enqueue_webfont(
+ *      array(
+ *          'provider'    => 'local',
+ *          'font_family' => 'Source Serif Pro',
+ *          'font_weight' => '200 900',
+ *          'font_style'  => 'normal',
+ *          'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
+ *      )
+ * );
+ * </code>
+ *
+ * @since 6.0.0
+ *
+ * @param array|string $webfont Webfont to be enqueued.
+ *                              If string, enqueues an already registered webfont.
+ *                              If array, register and enqueues a new webfont.
+ */
+function wp_enqueue_webfont( $webfont ) {
+	wp_webfonts()->enqueue_font( $webfont );
+}
+
+/**
  * Registers a custom font service provider.
  *
  * A webfont provider contains the business logic for how to
