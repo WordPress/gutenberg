@@ -462,8 +462,8 @@ export const getBlockPatterns = () => async ( { dispatch } ) => {
 };
 
 export const getBlockPatternCategories = () => async ( { dispatch } ) => {
-	const patterns = await apiFetch( {
+	const categories = await apiFetch( {
 		path: '/__experimental/block-patterns/categories',
 	} );
-	dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', patterns } );
+	dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
 };
