@@ -73,8 +73,14 @@ function isFormElement( element ) {
 export function useFocusFirstElement( clientId ) {
 	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
+	const { isBlockSelected } = useSelect( blockEditorStore );
 
 	useEffect( () => {
+		// Check if the block is still selected at the time this effect runs.
+		if ( ! isBlockSelected( clientId ) ) {
+			return;
+		}
+
 		if ( initialPosition === undefined || initialPosition === null ) {
 			return;
 		}
@@ -127,7 +133,7 @@ export function useFocusFirstElement( clientId ) {
 		setContentEditableWrapper( ref.current, false );
 
 		placeCaretAtHorizontalEdge( target, isReverse );
-	}, [ initialPosition ] );
+	}, [ initialPosition, clientId ] );
 
 	return ref;
 }
