@@ -4,10 +4,8 @@
 
 ### Enhancement
 
--   Added a `adminPage` parameter to `setOption` function so we can update options for other Settings pages. [#39502] (https://github.com/WordPress/gutenberg/pull/39502)
--   Added the capability of handling checkboxes to `setOption` function. [#39502] (https://github.com/WordPress/gutenberg/pull/39502)
+-   Changed `setOption` to use `options.php`, to allow setting any option (and to be more consistent with `getOption`). [#39502] (https://github.com/WordPress/gutenberg/pull/39502)
 -   Added a new `trashAllComments` function.
-
 
 ## 7.0.0 (2022-03-11)
 

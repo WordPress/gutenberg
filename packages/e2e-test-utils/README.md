@@ -755,7 +755,6 @@ _Parameters_
 
 -   _setting_ `string`: The option, used to get the option by id.
 -   _value_ `string`: The value to set the option to.
--   _adminPage_ `string`: The url of the admin page to visit. Default: options-general.php.
 
 ### setPostContent
 

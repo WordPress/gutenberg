@@ -19,8 +19,8 @@ describe( 'Comment Query Loop', () => {
 		defaultPageComments = await getOption( 'page_comments' );
 		defaultCommentsPerPage = await getOption( 'comments_per_page' );
 		defaultCommentsPage = await getOption( 'default_comments_page' );
-		await setOption( 'page_comments', true, 'options-discussion.php' );
-		await setOption( 'comments_per_page', '1', 'options-discussion.php' );
+		await setOption( 'page_comments', true );
+		await setOption( 'comments_per_page', '1' );
 		await setOption(
 			'default_comments_page',
 			'newest',
@@ -86,20 +86,8 @@ describe( 'Comment Query Loop', () => {
 	afterAll( async () => {
 		await trashAllComments();
 		await activateTheme( 'twentytwentyone' );
-		await setOption(
-			'page_comments',
-			defaultPageComments === '1',
-			'options-discussion.php'
-		);
-		await setOption(
-			'comments_per_page',
-			defaultCommentsPerPage,
-			'options-discussion.php'
-		);
-		await setOption(
-			'default_comments_page',
-			defaultCommentsPage,
-			'options-discussion.php'
-		);
+		await setOption( 'page_comments', defaultPageComments === '1' );
+		await setOption( 'comments_per_page', defaultCommentsPerPage );
+		await setOption( 'default_comments_page', defaultCommentsPage );
 	} );
 } );
