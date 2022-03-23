@@ -25,18 +25,18 @@ function BlockManagerCategory( { scope, title, blockTypes } ) {
 		hideBlockTypes,
 	} = useHiddenBlockTypes( scope );
 	const instanceId = useInstanceId( BlockManagerCategory );
-	const defaultAllowedBlockTypes = useSelect( ( select ) => {
+	const allowedBlockTypes = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings()?.defaultAllowedBlockTypes ?? [];
+		return getSettings()?.allowedBlockTypes ?? [];
 	}, [] );
 	const filteredBlockTypes = useMemo( () => {
-		if ( defaultAllowedBlockTypes === true ) {
+		if ( allowedBlockTypes === true ) {
 			return blockTypes;
 		}
 		return blockTypes.filter( ( { name } ) => {
-			return includes( defaultAllowedBlockTypes || [], name );
+			return includes( allowedBlockTypes || [], name );
 		} );
-	}, [ defaultAllowedBlockTypes, blockTypes ] );
+	}, [ allowedBlockTypes, blockTypes ] );
 	const toggleVisible = useCallback( ( blockName, nextIsChecked ) => {
 		if ( nextIsChecked ) {
 			showBlockTypes( blockName );

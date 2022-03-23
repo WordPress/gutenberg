@@ -2310,6 +2310,23 @@ describe( 'selectors', () => {
 			);
 		} );
 
+		it( 'should deny blocks that are hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+				},
+				blockListSettings: {},
+				settings: {
+					allowedBlockTypes: [ 'core/test-block-a' ],
+					hiddenBlockTypes: [ 'core/test-block-a' ],
+				},
+			};
+			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
+				false
+			);
+		} );
+
 		it( 'should deny blocks when the editor has a template lock', () => {
 			const state = {
 				blocks: {

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import memize from 'memize';
-import { size, map, without } from 'lodash';
 import { I18nManager } from 'react-native';
 
 /**
@@ -51,36 +50,15 @@ class Editor extends Component {
 		settings,
 		hasFixedToolbar,
 		focusMode,
-		hiddenBlockTypes,
-		blockTypes
+		hiddenBlockTypes
 	) {
 		settings = {
 			...settings,
 			isRTL: I18nManager.isRTL,
 			hasFixedToolbar,
 			focusMode,
+			hiddenBlockTypes,
 		};
-
-		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
-			if ( settings.allowedBlockTypes === undefined ) {
-				// If no specific flags for allowedBlockTypes are set, assume `true`
-				// meaning allow all block types.
-				settings.allowedBlockTypes = true;
-			}
-			// Defer to passed setting for `allowedBlockTypes` if provided as
-			// anything other than `true` (where `true` is equivalent to allow
-			// all block types).
-			const defaultAllowedBlockTypes =
-				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
-					: settings.allowedBlockTypes || [];
-
-			settings.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
-			);
-		}
 
 		return settings;
 	}

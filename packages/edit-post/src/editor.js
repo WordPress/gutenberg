@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, size, map, without } from 'lodash';
+import { forEach } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -118,30 +118,12 @@ function Editor( {
 			hasFixedToolbar,
 			focusMode,
 			hasReducedUI,
+			hiddenBlockTypes,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			keepCaretInsideBlock,
-			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
-			// where we need to differentiate if a block is disabled by the user or some plugin.
-			defaultAllowedBlockTypes: settings.allowedBlockTypes,
 		};
-
-		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
-			// Defer to passed setting for `allowedBlockTypes` if provided as
-			// anything other than `true` (where `true` is equivalent to allow
-			// all block types).
-			const defaultAllowedBlockTypes =
-				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
-					: settings.allowedBlockTypes || [];
-
-			result.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
-			);
-		}
 
 		return result;
 	}, [
