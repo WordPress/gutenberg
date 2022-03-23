@@ -15,6 +15,5 @@ This is any theme that has, at a minimum, an `index.html` format template in the
 **Contents**
 
 - [Block Theme Overview](/docs/how-to-guides/themes/block-theme-overview.md)
-- [Create a Block Theme](/docs/how-to-guides/themes/create-block-theme.md)
 - [Global Settings (theme.json)](/docs/how-to-guides/themes/theme-json.md)
 - [Theme Support](/docs/how-to-guides/themes/theme-support.md)
