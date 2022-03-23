@@ -26,5 +26,10 @@
 		"html": false
 	},
 	"editorStyle": "wp-block-home-link-editor",
-	"style": "wp-block-home-link"
+	"style": "wp-block-home-link",
+	"a11y": {
+		"disabledRules": [
+			"listitem"
+		]
+	}
 }

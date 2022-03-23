@@ -60,5 +60,10 @@
 		"html": false
 	},
 	"editorStyle": "wp-block-navigation-submenu-editor",
-	"style": "wp-block-navigation-submenu"
+	"style": "wp-block-navigation-submenu",
+	"a11y": {
+		"disabledRules": [
+			"listitem"
+		]
+	}
 }

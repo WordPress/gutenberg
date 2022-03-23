@@ -28,5 +28,10 @@
 		"reusable": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-social-link-editor"
+	"editorStyle": "wp-block-social-link-editor",
+	"a11y": {
+		"disabledRules": [
+			"listitem"
+		]
+	}
 }

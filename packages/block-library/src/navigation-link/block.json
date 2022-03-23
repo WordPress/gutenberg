@@ -60,5 +60,10 @@
 		"__experimentalSlashInserter": true
 	},
 	"editorStyle": "wp-block-navigation-link-editor",
-	"style": "wp-block-navigation-link"
+	"style": "wp-block-navigation-link",
+	"a11y": {
+		"disabledRules": [
+			"listitem"
+		]
+	}
 }
