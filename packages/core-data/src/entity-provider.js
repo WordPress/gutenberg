@@ -9,6 +9,7 @@ import {
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -69,6 +70,21 @@ const getEntityContext = ( kind, name ) => {
 export default function EntityProvider( { kind, type: name, id, children } ) {
 	const Provider = getEntityContext( kind, name ).Provider;
 	return <Provider value={ id }>{ children }</Provider>;
+}
+
+/**
+ * Hook that returns the ID for the nearest
+ * provided entity of the specified type.
+ *
+ * @param {string} kind The entity kind.
+ * @param {string} type The entity type.
+ */
+export function useEntityId( kind, type ) {
+	deprecated( 'the @wordpress/core-data useEntityId() hook', {
+		since: '6.0',
+		alternative: 'the @wordpress/core-data useEntityProviderId() hook',
+	} );
+	return useEntityProviderId( kind, type );
 }
 
 /**
