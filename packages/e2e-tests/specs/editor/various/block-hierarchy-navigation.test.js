@@ -78,10 +78,10 @@ describe( 'Navigating the block hierarchy', () => {
 		);
 
 		// Navigate to the last column block.
-		const lastColumnsBlockMenuItem = (
-			await await getListViewBlocks( 'Column' )
-		 )[ 3 ];
-		await lastColumnsBlockMenuItem.click();
+		const lastColumnBlockMenuItem = (
+			await getListViewBlocks( 'Column' )
+		 )[ 2 ];
+		await lastColumnBlockMenuItem.click();
 
 		// Insert text in the last column block.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
