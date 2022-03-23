@@ -12,6 +12,8 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { BorderControl } from '../';
+import { Provider as SlotFillProvider } from '../../slot-fill';
+import Popover from '../../popover';
 
 export default {
 	title: 'Components (Experimental)/BorderControl',
@@ -77,20 +79,23 @@ const _default = ( props ) => {
 	const { __experimentalHasMultipleOrigins } = props;
 
 	return (
-		<WrapperView>
-			<BorderControl
-				{ ...props }
-				colors={
-					__experimentalHasMultipleOrigins
-						? multipleOriginColors
-						: colors
-				}
-				label="Border"
-				onChange={ onChange }
-				value={ border }
-				width={ ! props.isCompact && props.width }
-			/>
-		</WrapperView>
+		<SlotFillProvider>
+			<WrapperView>
+				<BorderControl
+					{ ...props }
+					colors={
+						__experimentalHasMultipleOrigins
+							? multipleOriginColors
+							: colors
+					}
+					label="Border"
+					onChange={ onChange }
+					value={ border }
+					width={ ! props.isCompact && props.width }
+				/>
+			</WrapperView>
+			<Popover.Slot />
+		</SlotFillProvider>
 	);
 };
 
