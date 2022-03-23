@@ -76,6 +76,40 @@ function gutenberg_register_webfonts_from_theme_json() {
  */
 function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 	$font_families_registered = wp_webfonts()->get_all_webfonts();
+	$font_families_from_theme = array();
+	if ( ! empty( $data['settings'] ) && ! empty( $data['settings']['typography'] ) && ! empty( $data['settings']['typography']['fontFamilies'] ) ) {
+		$font_families_from_theme = $data['settings']['typography']['fontFamilies'];
+	}
+
+	/**
+	 * Helper to get an array of the font-families.
+	 *
+	 * @param array $families_data The font-families data.
+	 *
+	 * @return array The font-families array.
+	 */
+	$get_families = function( $families_data ) {
+		$families = array();
+		foreach ( $families_data as $family ) {
+			$families[] = WP_Webfonts::get_font_slug( $family );
+		}
+
+		// Micro-optimization: Use array_flip( array_flip( $array ) )
+		// instead of array_unique( $array ) because it's faster.
+		// The result is the same.
+		return array_flip( array_flip( $families ) );
+	};
+
+	// Diff the arrays to find the missing fonts.
+	$to_add = array_diff(
+		array_keys( $font_families_registered ),
+		$get_families( $font_families_from_theme )
+	);
+
+	// Bail out early if there are no missing fonts.
+	if ( empty( $to_add ) ) {
+		return $data;
+	}
 
 	// Make sure the path to settings.typography.fontFamilies.theme exists
 	// before adding missing fonts.
@@ -89,10 +123,10 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 		$data['settings']['typography']['fontFamilies'] = array();
 	}
 
-	foreach ( $font_families_registered as $slug => $font_faces_for_family ) {
-		$family = $font_faces_for_family[0]['font-family'];
-
-		$font_faces = array();
+	foreach ( $to_add as $slug ) {
+		$font_faces_for_family = $font_families_registered[ $slug ];
+		$family_name           = $font_faces_for_family[0]['font-family'];
+		$font_faces            = array();
 
 		foreach ( $font_faces_for_family as $font_face ) {
 			$camel_cased = array( 'origin' => 'gutenberg_wp_webfonts_api' );
@@ -103,8 +137,8 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 		}
 
 		$data['settings']['typography']['fontFamilies'][] = array(
-			'fontFamily' => false !== strpos( $family, ' ' ) ? "'{$family}'" : $family,
-			'name'       => $family,
+			'fontFamily' => false !== strpos( $family_name, ' ' ) ? "'{$family_name}'" : $family_name,
+			'name'       => $family_name,
 			'slug'       => $slug,
 			'fontFace'   => $font_faces,
 		);
