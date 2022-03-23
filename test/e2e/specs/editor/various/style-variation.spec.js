@@ -22,7 +22,7 @@ test.describe( 'adding blocks', () => {
 		await plainStyleButton.click();
 
 		// Check the content
-		const quoteContent = `<!-- wp:quote {\\"className\\":\\"is-style-plain\\"} --><blockquote class="\\"wp-block-quote" is-style-plain\\"><p>Quote content</p></blockquote><!-- /wp:quote -->`;
+		const quoteContent = `<!-- wp:quote {"className":"is-style-plain"} -->\n<blockquote class="wp-block-quote is-style-plain"><p>Quote content</p></blockquote>\n<!-- /wp:quote -->`;
 
 		const content = await pageUtils.getEditedPostContent();
 		expect( content ).toBe( quoteContent );
