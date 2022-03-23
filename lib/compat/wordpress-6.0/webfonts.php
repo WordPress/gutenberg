@@ -40,16 +40,16 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	 *      array(
 	 *          array(
 	 *              'provider'    => 'local',
-	 *              'font_family' => 'Source Serif Pro',
-	 *              'font_weight' => '200 900',
-	 *              'font_style'  => 'normal',
+	 *              'font-family' => 'Source Serif Pro',
+	 *              'font-weight' => '200 900',
+	 *              'font-style'  => 'normal',
 	 *              'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
 	 *          ),
 	 *          array(
 	 *              'provider'    => 'local',
-	 *              'font_family' => 'Source Serif Pro',
-	 *              'font_weight' => '200 900',
-	 *              'font_style'  => 'italic',
+	 *              'font-family' => 'Source Serif Pro',
+	 *              'font-weight' => '200 900',
+	 *              'font-style'  => 'italic',
 	 *              'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2' ),
 	 *          ),
 	 *      )
@@ -63,8 +63,6 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	 * @param array $webfonts Webfonts to be registered.
 	 *                        This contains an array of webfonts to be registered.
 	 *                        Each webfont is an array.
-	 *                        See {@see WP_Webfonts_Registry::register()} for a list of
-	 *                        supported arguments for each webfont.
 	 */
 	function wp_register_webfonts( array $webfonts = array() ) {
 		foreach ( $webfonts as $webfont ) {
@@ -80,22 +78,22 @@ if ( ! function_exists( 'wp_register_webfont' ) ) {
 	 * Example of how to register Source Serif Pro font with font-weight range of 200-900:
 	 *
 	 * If the font file is contained within the theme:
-	 * ```
+	 *
+	 * <code>
 	 * wp_register_webfont(
 	 *      array(
 	 *          'provider'    => 'local',
-	 *          'font_family' => 'Source Serif Pro',
-	 *          'font_weight' => '200 900',
-	 *          'font_style'  => 'normal',
+	 *          'font-family' => 'Source Serif Pro',
+	 *          'font-weight' => '200 900',
+	 *          'font-style'  => 'normal',
 	 *          'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
 	 *      )
 	 * );
-	 * ```
+	 * </code>
 	 *
 	 * @since 6.0.0
 	 *
 	 * @param array $webfont Webfont to be registered.
-	 *                       See {@see WP_Webfonts_Registry::register()} for a list of supported arguments.
 	 */
 	function wp_register_webfont( array $webfont ) {
 		wp_webfonts()->register_font( $webfont );
