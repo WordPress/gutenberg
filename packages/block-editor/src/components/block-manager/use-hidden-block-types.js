@@ -12,7 +12,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 
 const EMPTY_ARRAY = [];
 
-export default function useHiddenBlockTypes( { scope } ) {
+export default function useHiddenBlockTypes( scope ) {
 	const hiddenBlockTypes = useSelect(
 		( select ) =>
 			select( preferencesStore ).get( scope, 'hiddenBlockTypes' ) ??

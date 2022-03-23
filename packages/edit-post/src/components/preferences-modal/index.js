@@ -172,7 +172,7 @@ export default function EditPostPreferencesModal() {
 								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
 							) }
 						>
-							<BlockManager />
+							<BlockManager scope="core/edit-post" />
 						</PreferencesModalSection>
 					</>
 				),
