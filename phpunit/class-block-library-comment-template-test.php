@@ -52,7 +52,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$block = new WP_Block(
 			$parsed_blocks[0],
 			array(
-				'postId'           => self::$custom_post->ID,
+				'postId' => self::$custom_post->ID,
 			)
 		);
 
@@ -101,7 +101,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$block = new WP_Block(
 			$parsed_blocks[0],
 			array(
-				'postId'           => self::$custom_post->ID,
+				'postId' => self::$custom_post->ID,
 			)
 		);
 
@@ -150,7 +150,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$block = new WP_Block(
 			$parsed_blocks[0],
 			array(
-				'postId'           => self::$custom_post->ID,
+				'postId' => self::$custom_post->ID,
 			)
 		);
 
