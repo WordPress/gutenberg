@@ -152,7 +152,7 @@ function convertPanelsToOldFormat( inactivePanels, openPanels ) {
  */
 export const getPreferences = createRegistrySelector( ( select ) => () => {
 	deprecated( `wp.data.select( 'core/edit-post' ).getPreferences`, {
-		version: '6.0',
+		since: '6.0',
 		alternative: `wp.data.select( 'core/preferences' ).get`,
 	} );
 
@@ -204,7 +204,7 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
  */
 export function getPreference( state, preferenceKey, defaultValue ) {
 	deprecated( `wp.data.select( 'core/edit-post' ).getPreference`, {
-		version: '6.0',
+		since: '6.0',
 		alternative: `wp.data.select( 'core/preferences' ).get`,
 	} );
 
