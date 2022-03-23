@@ -41,7 +41,7 @@ const MIN_TAGS = 1;
  */
 const MAX_TAGS = 100;
 
-const MIN_FONT_SIZE = 1;
+const MIN_FONT_SIZE = 0.1;
 const MAX_FONT_SIZE = 100;
 
 function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
