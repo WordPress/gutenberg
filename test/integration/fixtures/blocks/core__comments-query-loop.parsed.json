@@ -1,12 +1,7 @@
 [
 	{
 		"blockName": "core/comments-query-loop",
-		"attrs": {
-			"inherit": false,
-			"perPage": 2,
-			"order": "desc",
-			"defaultPage": "oldest"
-		},
+		"attrs": {},
 		"innerBlocks": [
 			{
 				"blockName": "core/comment-template",
@@ -55,29 +50,29 @@
 						"innerContent": []
 					}
 				],
-				"innerHTML": "\n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    ",
+				"innerHTML": "\n\t\n\n\t\n\n\t\n\n\t\n\n\t\n\n\t\n\t",
 				"innerContent": [
-					"\n    ",
+					"\n\t",
 					null,
-					"\n    \n    ",
+					"\n\n\t",
 					null,
-					"\n    \n    ",
+					"\n\n\t",
 					null,
-					"\n    \n    ",
+					"\n\n\t",
 					null,
-					"\n    \n    ",
+					"\n\n\t",
 					null,
-					"\n    \n    ",
+					"\n\n\t",
 					null,
-					"\n    "
+					"\n\t"
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-comments-query-loop\"></div>\n    ",
+		"innerHTML": "\n<div class=\"wp-block-comments-query-loop\">\n\t\n</div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-comments-query-loop\">",
+			"\n<div class=\"wp-block-comments-query-loop\">\n\t",
 			null,
-			"</div>\n    "
+			"\n</div>\n"
 		]
 	}
 ]
