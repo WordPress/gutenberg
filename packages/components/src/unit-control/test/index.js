@@ -259,11 +259,10 @@ describe( 'UnitControl', () => {
 			);
 		} );
 
-		it( 'should run onBlur, onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
+		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
 			let state = '15px';
 
 			const onUnitChangeSpy = jest.fn();
-			const onBlurSpy = jest.fn();
 			const onChangeSpy = jest.fn();
 
 			const setState = ( nextState ) => {
@@ -278,7 +277,6 @@ describe( 'UnitControl', () => {
 						value={ state }
 						onChange={ setState }
 						onUnitChange={ onUnitChangeSpy }
-						onBlur={ onBlurSpy }
 						isPressEnterToChange
 					/>
 				</>
@@ -296,10 +294,9 @@ describe( 'UnitControl', () => {
 			await user.click( button );
 
 			await waitFor( () =>
-				expect( onBlurSpy ).toHaveBeenCalledTimes( 1 )
+				expect( onChangeSpy ).toHaveBeenCalledTimes( 1 )
 			);
 
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41vh' );
 
 			expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 );
