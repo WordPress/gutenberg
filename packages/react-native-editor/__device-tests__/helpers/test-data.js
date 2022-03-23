@@ -147,7 +147,7 @@ exports.headingExpectedHTML = `<!-- wp:heading -->
 <!-- /wp:heading -->`;
 
 exports.separatorExpectedHTML = `<!-- wp:separator -->
-<hr class="wp-block-separator"/>
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
 <!-- /wp:separator -->`;
 
 exports.listExpectedHTML = `<!-- wp:list -->
