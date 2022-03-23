@@ -107,9 +107,11 @@ export function initializeEditor(
 	);
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		editorMode: 'visual',
 		fixedToolbar: false,
 		fullscreenMode: true,
 		hiddenBlockTypes: [],
+		preferredStyleVariations: {},
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		themeStyles: true,

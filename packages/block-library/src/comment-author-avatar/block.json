@@ -20,6 +20,7 @@
 	"usesContext": [ "commentId" ],
 	"supports": {
 		"html": false,
+		"inserter": false,
 		"__experimentalBorder": {
 			"radius": true,
 			"width": true,

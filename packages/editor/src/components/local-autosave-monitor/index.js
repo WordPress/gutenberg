@@ -178,7 +178,7 @@ function LocalAutosaveMonitor() {
 	const { localAutosaveInterval } = useSelect(
 		( select ) => ( {
 			localAutosaveInterval: select( editorStore ).getEditorSettings()
-				.__experimentalLocalAutosaveInterval,
+				.localAutosaveInterval,
 		} ),
 		[]
 	);

@@ -71,6 +71,11 @@ describe( 'actions', () => {
 
 	describe( 'switchEditorMode', () => {
 		it( 'to visual', () => {
+			// Switch to text first, since the default is visual.
+			registry.dispatch( editPostStore ).switchEditorMode( 'text' );
+			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
+				'text'
+			);
 			registry.dispatch( editPostStore ).switchEditorMode( 'visual' );
 			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
 				'visual'
@@ -78,6 +83,10 @@ describe( 'actions', () => {
 		} );
 
 		it( 'to text', () => {
+			// It defaults to visual.
+			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
 			// Add a selected client id and make sure it's there.
 			const clientId = 'clientId_1';
 			registry.dispatch( blockEditorStore ).selectionChange( clientId );
@@ -89,6 +98,9 @@ describe( 'actions', () => {
 			expect(
 				registry.select( blockEditorStore ).getSelectedBlockClientId()
 			).toBeNull();
+			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
+				'text'
+			);
 		} );
 	} );
 
@@ -196,21 +208,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( '__experimentalUpdateLocalAutosaveInterval', () => {
-		it( 'sets the local autosave interval', () => {
-			registry
-				.dispatch( editPostStore )
-				.__experimentalUpdateLocalAutosaveInterval( 42 );
-
-			// TODO - remove once `getPreference` is deprecated.
-			expect(
-				registry
-					.select( editPostStore )
-					.getPreference( 'localAutosaveInterval' )
-			).toBe( 42 );
-		} );
-	} );
-
 	describe( 'toggleEditorPanelEnabled', () => {
 		it( 'toggles panels to be enabled and not enabled', () => {
 			const defaultState = {
@@ -287,6 +284,55 @@ describe( 'actions', () => {
 				'control-panel': {
 					opened: false,
 				},
+			} );
+		} );
+	} );
+
+	describe( 'updatePreferredStyleVariations', () => {
+		it( 'sets a preferred style variation for a block when a style name is passed', () => {
+			registry
+				.dispatch( 'core/edit-post' )
+				.updatePreferredStyleVariations( 'core/paragraph', 'fancy' );
+			registry
+				.dispatch( 'core/edit-post' )
+				.updatePreferredStyleVariations( 'core/quote', 'posh' );
+
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'preferredStyleVariations' )
+			).toEqual( {
+				'core/paragraph': 'fancy',
+				'core/quote': 'posh',
+			} );
+		} );
+
+		it( 'removes a preferred style variation for a block when a style name is omitted', () => {
+			registry
+				.dispatch( 'core/edit-post' )
+				.updatePreferredStyleVariations( 'core/paragraph', 'fancy' );
+			registry
+				.dispatch( 'core/edit-post' )
+				.updatePreferredStyleVariations( 'core/quote', 'posh' );
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'preferredStyleVariations' )
+			).toEqual( {
+				'core/paragraph': 'fancy',
+				'core/quote': 'posh',
+			} );
+
+			registry
+				.dispatch( 'core/edit-post' )
+				.updatePreferredStyleVariations( 'core/paragraph' );
+
+			expect(
+				registry
+					.select( editPostStore )
+					.getPreference( 'preferredStyleVariations' )
+			).toEqual( {
+				'core/quote': 'posh',
 			} );
 		} );
 	} );

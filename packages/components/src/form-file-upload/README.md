@@ -57,6 +57,24 @@ Callback function passed directly to the `input` file element.
 -   Type: `Function`
 -   Required: Yes
 
+### onClick
+
+Callback function passed directly to the `input` file element.
+
+This can be useful when you want to force a `change` event to fire when the user chooses the same file again. To do this, set the target value to an empty string in the `onClick` function.
+
+```jsx
+<FormFileUpload
+	onClick={ ( event ) => ( event.target.value = '' ) }
+	onChange={ onChange }
+>
+	Upload
+</FormFileUpload>
+```
+
+-   Type: `Function`
+-   Required: No
+
 ### render
 
 Optional callback function used to render the UI. If passed the component does not render any UI and calls this function to render it.

@@ -13,20 +13,18 @@ class WP_Webfonts {
 	/**
 	 * An array of registered webfonts.
 	 *
-	 * @static
 	 * @access private
 	 * @var array
 	 */
-	private static $webfonts = array();
+	private $webfonts = array();
 
 	/**
 	 * An array of registered providers.
 	 *
-	 * @static
 	 * @access private
 	 * @var array
 	 */
-	private static $providers = array();
+	private $providers = array();
 
 	/**
 	 * Stylesheet handle.
@@ -63,7 +61,7 @@ class WP_Webfonts {
 	 * @return array
 	 */
 	public function get_fonts() {
-		return self::$webfonts;
+		return $this->webfonts;
 	}
 
 	/**
@@ -72,7 +70,7 @@ class WP_Webfonts {
 	 * @return array
 	 */
 	public function get_providers() {
-		return self::$providers;
+		return $this->providers;
 	}
 
 	/**
@@ -84,7 +82,7 @@ class WP_Webfonts {
 		$font = $this->validate_font( $font );
 		if ( $font ) {
 			$id                    = $this->get_font_id( $font );
-			self::$webfonts[ $id ] = $font;
+			$this->webfonts[ $id ] = $font;
 		}
 	}
 
@@ -194,7 +192,7 @@ class WP_Webfonts {
 		if ( empty( $provider ) || empty( $class ) ) {
 			return false;
 		}
-		self::$providers[ $provider ] = $class;
+		$this->providers[ $provider ] = $class;
 		return true;
 	}
 

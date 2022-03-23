@@ -56,9 +56,9 @@ async function getCurrentPostId() {
 
 async function setLocalAutosaveInterval( value ) {
 	return page.evaluate( ( _value ) => {
-		window.wp.data
-			.dispatch( 'core/edit-post' )
-			.__experimentalUpdateLocalAutosaveInterval( _value );
+		window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+			localAutosaveInterval: _value,
+		} );
 	}, value );
 }
 

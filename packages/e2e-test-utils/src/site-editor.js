@@ -98,6 +98,7 @@ export async function disableSiteEditorWelcomeGuide() {
 				wp.data
 					.dispatch( 'core/edit-site' )
 					.toggleFeature( 'welcomeGuide' );
+				return;
 			}
 
 			wp.data
@@ -113,6 +114,7 @@ export async function disableSiteEditorWelcomeGuide() {
 				wp.data
 					.dispatch( 'core/edit-site' )
 					.toggleFeature( 'welcomeGuideStyles' );
+				return;
 			}
 			wp.data
 				.dispatch( 'core/preferences' )

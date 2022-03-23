@@ -170,7 +170,7 @@ const fetchLinkSuggestions = async (
 			.slice( 0, perPage )
 			.map(
 				/**
-				 * @param {{ id: number, url:string, title?:string, subtype?: string, type?: string }} result
+				 * @param {{ id: number, meta?: object, url:string, title?:string, subtype?: string, type?: string }} result
 				 */
 				( result ) => {
 					return {

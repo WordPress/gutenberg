@@ -9,7 +9,13 @@ import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
-import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	Fragment,
+	useEffect,
+	useRef,
+	useState,
+	useMemo,
+} from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
@@ -22,10 +28,11 @@ import {
 	Spinner,
 	TextareaControl,
 	ToggleControl,
-	withNotices,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUnitControl as UnitControl,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { compose, useInstanceId } from '@wordpress/compose';
 import {
@@ -41,7 +48,6 @@ import {
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
-	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
@@ -50,6 +56,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -96,8 +103,6 @@ function CoverHeightInput( {
 	unit = 'px',
 	value = '',
 } ) {
-	const [ temporaryInput, setTemporaryInput ] = useState( null );
-
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
@@ -120,20 +125,16 @@ function CoverHeightInput( {
 				: undefined;
 
 		if ( isNaN( inputValue ) && inputValue !== undefined ) {
-			setTemporaryInput( unprocessedValue );
 			return;
 		}
-		setTemporaryInput( null );
 		onChange( inputValue );
 	};
 
-	const handleOnBlur = () => {
-		if ( temporaryInput !== null ) {
-			setTemporaryInput( null );
-		}
-	};
+	const computedValue = useMemo( () => {
+		const [ parsedQuantity ] = parseQuantityAndUnitFromRawValue( value );
+		return [ parsedQuantity, unit ].join( '' );
+	}, [ unit, value ] );
 
-	const inputValue = temporaryInput !== null ? temporaryInput : value;
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
@@ -142,13 +143,11 @@ function CoverHeightInput( {
 				id={ inputId }
 				isResetValueOnUnitChange
 				min={ min }
-				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				onUnitChange={ onUnitChange }
 				style={ { maxWidth: 80 } }
-				unit={ unit }
 				units={ units }
-				value={ inputValue }
+				value={ computedValue }
 			/>
 		</BaseControl>
 	);
@@ -266,12 +265,10 @@ const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 function CoverPlaceholder( {
 	disableMediaButtons = false,
 	children,
-	noticeUI,
-	noticeOperations,
 	onSelectMedia,
+	onError,
 	style,
 } ) {
-	const { removeAllNotices, createErrorNotice } = noticeOperations;
 	return (
 		<MediaPlaceholder
 			icon={ <BlockIcon icon={ icon } /> }
@@ -284,12 +281,8 @@ function CoverPlaceholder( {
 			onSelect={ onSelectMedia }
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			notices={ noticeUI }
 			disableMediaButtons={ disableMediaButtons }
-			onError={ ( message ) => {
-				removeAllNotices();
-				createErrorNotice( message );
-			} }
+			onError={ onError }
 			style={ style }
 		>
 			{ children }
@@ -301,8 +294,6 @@ function CoverEdit( {
 	attributes,
 	clientId,
 	isSelected,
-	noticeUI,
-	noticeOperations,
 	overlayColor,
 	setAttributes,
 	setOverlayColor,
@@ -328,6 +319,7 @@ function CoverEdit( {
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		gradientClass,
 		gradientValue,
@@ -379,6 +371,12 @@ function CoverEdit( {
 	const toggleIsRepeated = () => {
 		setAttributes( {
 			isRepeated: ! isRepeated,
+		} );
+	};
+
+	const onUploadError = ( message ) => {
+		createErrorNotice( Array.isArray( message ) ? message[ 2 ] : message, {
+			type: 'snackbar',
 		} );
 	};
 
@@ -640,9 +638,8 @@ function CoverEdit( {
 					) }
 				>
 					<CoverPlaceholder
-						noticeUI={ noticeUI }
 						onSelectMedia={ onSelectMedia }
-						noticeOperations={ noticeOperations }
+						onError={ onUploadError }
 						style={ {
 							minHeight: minHeightWithUnit || undefined,
 						} }
@@ -763,9 +760,8 @@ function CoverEdit( {
 				{ isUploadingMedia && <Spinner /> }
 				<CoverPlaceholder
 					disableMediaButtons
-					noticeUI={ noticeUI }
 					onSelectMedia={ onSelectMedia }
-					noticeOperations={ noticeOperations }
+					onError={ onUploadError }
 				/>
 				<div { ...innerBlocksProps } />
 			</div>
@@ -775,5 +771,4 @@ function CoverEdit( {
 
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
-	withNotices,
 ] )( CoverEdit );

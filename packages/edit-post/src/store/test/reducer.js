@@ -142,15 +142,6 @@ describe( 'state', () => {
 				'post-status': { opened: false },
 			} );
 		} );
-
-		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( { editorMode: 'visual' } ), {
-				type: 'SWITCH_MODE',
-				mode: 'text',
-			} );
-
-			expect( state.editorMode ).toBe( 'text' );
-		} );
 	} );
 
 	describe( 'activeModal', () => {

@@ -61,6 +61,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 require __DIR__ . '/compat.php';
 require __DIR__ . '/compat/wordpress-5.9/widget-render-api-endpoint/index.php';
 require __DIR__ . '/compat/wordpress-5.9/blocks.php';
+require __DIR__ . '/compat/wordpress-5.9/block-editor-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/block-patterns.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
@@ -106,6 +107,7 @@ require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider-local.php';
 require __DIR__ . '/compat/wordpress-6.0/webfonts.php';
+require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
 require __DIR__ . '/compat/experimental/blocks.php';
 
 require __DIR__ . '/blocks.php';

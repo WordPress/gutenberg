@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Table block: Fix deprecation eligibility to prevent loss of named (color palette) background color ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).
+
+### Enhancement
+
+-   Social Icons: Avoid loss of previously selected background color when switching back from "Logos Only" style ([#39276](https://github.com/WordPress/gutenberg/pull/39276)).
+
 ## 7.1.0 (2022-03-11)
 
 ## 7.0.0 (2022-02-10)
@@ -12,6 +20,7 @@
 
 ### Bug Fix
 
+-   Gallery block: disable edit as html support ([#39318](https://github.com/WordPress/gutenberg/pull/39318)).
 -   Removed unused `@wordpress/escape-html` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
 ## 6.1.0 (2022-01-27)

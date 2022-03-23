@@ -13,7 +13,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 
 /**
@@ -52,15 +52,15 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 	select,
 	dispatch,
 } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
-	const entity = find( entities, { kind, name } );
-	if ( ! entity || entity?.__experimentalNoFetch ) {
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
+	if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 		return;
 	}
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
-		[ 'entities', 'data', kind, name, key ],
+		[ 'entities', 'records', kind, name, key ],
 		{ exclusive: false }
 	);
 
@@ -73,7 +73,7 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 				...query,
 				_fields: uniq( [
 					...( getNormalizedCommaSeparable( query._fields ) || [] ),
-					entity.key || DEFAULT_ENTITY_KEY,
+					entityConfig.key || DEFAULT_ENTITY_KEY,
 				] ).join(),
 			};
 		}
@@ -85,10 +85,13 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 		// for how the request is made to the REST API.
 
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const path = addQueryArgs( entity.baseURL + ( key ? '/' + key : '' ), {
-			...entity.baseURLParams,
-			...query,
-		} );
+		const path = addQueryArgs(
+			entityConfig.baseURL + ( key ? '/' + key : '' ),
+			{
+				...entityConfig.baseURLParams,
+				...query,
+			}
+		);
 
 		if ( query !== undefined ) {
 			query = { ...query, include: [ key ] };
@@ -104,10 +107,6 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 
 		const record = await apiFetch( { path } );
 		dispatch.receiveEntityRecords( kind, name, record, query );
-	} catch ( error ) {
-		// We need a way to handle and access REST API errors in state
-		// Until then, catching the error ensures the resolver is marked as resolved.
-		// See similar implementation in `getEntityRecords()`.
 	} finally {
 		dispatch.__unstableReleaseStoreLock( lock );
 	}
@@ -133,15 +132,15 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
 export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 	dispatch,
 } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
-	const entity = find( entities, { kind, name } );
-	if ( ! entity || entity?.__experimentalNoFetch ) {
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
+	if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 		return;
 	}
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
-		[ 'entities', 'data', kind, name ],
+		[ 'entities', 'records', kind, name ],
 		{ exclusive: false }
 	);
 
@@ -154,13 +153,13 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 				...query,
 				_fields: uniq( [
 					...( getNormalizedCommaSeparable( query._fields ) || [] ),
-					entity.key || DEFAULT_ENTITY_KEY,
+					entityConfig.key || DEFAULT_ENTITY_KEY,
 				] ).join(),
 			};
 		}
 
-		const path = addQueryArgs( entity.baseURL, {
-			...entity.baseURLParams,
+		const path = addQueryArgs( entityConfig.baseURL, {
+			...entityConfig.baseURLParams,
 			...query,
 		} );
 
@@ -186,7 +185,7 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 		// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
 		// See https://github.com/WordPress/gutenberg/pull/26575
 		if ( ! query?._fields && ! query.context ) {
-			const key = entity.key || DEFAULT_ENTITY_KEY;
+			const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 			const resolutionsArgs = records
 				.filter( ( record ) => record[ key ] )
 				.map( ( record ) => [ kind, name, record[ key ] ] );
@@ -202,10 +201,6 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 				args: resolutionsArgs,
 			} );
 		}
-	} catch ( error ) {
-		// We need a way to handle and access REST API errors in state
-		// Until then, catching the error ensures the resolver is marked as resolved.
-		// See similar implementation in `getEntityRecord()`.
 	} finally {
 		dispatch.__unstableReleaseStoreLock( lock );
 	}
@@ -312,13 +307,13 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 export const canUserEditEntityRecord = ( kind, name, recordId ) => async ( {
 	dispatch,
 } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
-	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
+	if ( ! entityConfig ) {
 		return;
 	}
 
-	const resource = entity.__unstable_rest_base;
+	const resource = entityConfig.__unstable_rest_base;
 	await dispatch( canUser( 'update', resource, recordId ) );
 };
 

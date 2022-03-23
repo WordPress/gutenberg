@@ -34,14 +34,15 @@ function gutenberg_global_styles_filter_post( $content ) {
  * Adds the filters to filter global styles user theme.json.
  */
 function gutenberg_global_styles_kses_init_filters() {
-	add_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
+	// Global Styles filters should be executed before normal post_kses HTML filters which has the default priority of 10.
+	add_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post', 9 );
 }
 
 /**
  * Removes the filters to filter global styles user theme.json.
  */
 function gutenberg_global_styles_kses_remove_filters() {
-	remove_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
+	remove_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post', 9 );
 }
 
 /**

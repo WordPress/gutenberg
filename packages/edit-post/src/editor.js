@@ -43,7 +43,6 @@ function Editor( {
 		preferredStyleVariations,
 		hiddenBlockTypes,
 		blockTypes,
-		__experimentalLocalAutosaveInterval,
 		keepCaretInsideBlock,
 		isTemplateMode,
 		template,
@@ -92,9 +91,6 @@ function Editor( {
 				),
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
-				__experimentalLocalAutosaveInterval: getPreference(
-					'localAutosaveInterval'
-				),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 				isTemplateMode: isEditingTemplate(),
 				template:
@@ -121,7 +117,6 @@ function Editor( {
 			hasFixedToolbar,
 			focusMode,
 			hasReducedUI,
-			__experimentalLocalAutosaveInterval,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
@@ -156,7 +151,6 @@ function Editor( {
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
-		__experimentalLocalAutosaveInterval,
 		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
