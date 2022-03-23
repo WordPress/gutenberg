@@ -16,7 +16,8 @@ export default function useHiddenBlockTypes( scope ) {
 	const hiddenBlockTypes = useSelect(
 		( select ) =>
 			select( preferencesStore ).get( scope, 'hiddenBlockTypes' ) ??
-			EMPTY_ARRAY
+			EMPTY_ARRAY,
+		[ scope ]
 	);
 
 	const { set } = useDispatch( preferencesStore );

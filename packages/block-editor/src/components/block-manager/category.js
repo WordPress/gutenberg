@@ -37,13 +37,16 @@ function BlockManagerCategory( { scope, title, blockTypes } ) {
 			return includes( allowedBlockTypes || [], name );
 		} );
 	}, [ allowedBlockTypes, blockTypes ] );
-	const toggleVisible = useCallback( ( blockName, nextIsChecked ) => {
-		if ( nextIsChecked ) {
-			showBlockTypes( blockName );
-		} else {
-			hideBlockTypes( blockName );
-		}
-	}, [] );
+	const toggleVisible = useCallback(
+		( blockName, nextIsChecked ) => {
+			if ( nextIsChecked ) {
+				showBlockTypes( blockName );
+			} else {
+				hideBlockTypes( blockName );
+			}
+		},
+		[ showBlockTypes, hideBlockTypes ]
+	);
 	const toggleAllVisible = useCallback(
 		( nextIsChecked ) => {
 			const blockNames = map( blockTypes, 'name' );
@@ -53,7 +56,7 @@ function BlockManagerCategory( { scope, title, blockTypes } ) {
 				hideBlockTypes( blockNames );
 			}
 		},
-		[ blockTypes ]
+		[ blockTypes, showBlockTypes, hideBlockTypes ]
 	);
 
 	if ( ! filteredBlockTypes.length ) {
