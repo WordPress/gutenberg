@@ -28,6 +28,7 @@ import {
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
+	switchToBlockType,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
@@ -893,6 +894,102 @@ export function getMultiSelectedBlocksEndClientId( state ) {
 	}
 
 	return selectionEnd.clientId || null;
+}
+
+/**
+ * Returns true if the selection is not partial.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Wether the selection is mergeable.
+ */
+export function __unstableIsFullySelected( state ) {
+	const selectionAnchor = getSelectionStart( state );
+	const selectionFocus = getSelectionEnd( state );
+	return (
+		! selectionAnchor.attributeKey &&
+		! selectionFocus.attributeKey &&
+		typeof selectionAnchor.offset === 'undefined' &&
+		typeof selectionFocus.offset === 'undefined'
+	);
+}
+
+/**
+ * Check wether the selection is mergeable.
+ *
+ * @param {Object}  state     Editor state.
+ * @param {boolean} isForward Wether to merge forwards.
+ *
+ * @return {boolean} Wether the selection is mergeable.
+ */
+export function __unstableIsSelectionMergeable( state, isForward ) {
+	const selectionAnchor = getSelectionStart( state );
+	const selectionFocus = getSelectionEnd( state );
+
+	// It's not mergeable if the start and end are within the same block.
+	if ( selectionAnchor.clientId === selectionFocus.clientId ) return false;
+
+	// It's not mergeable if there's no rich text selection.
+	if (
+		! selectionAnchor.attributeKey ||
+		! selectionFocus.attributeKey ||
+		typeof selectionAnchor.offset === 'undefined' ||
+		typeof selectionFocus.offset === 'undefined'
+	)
+		return false;
+
+	const anchorRootClientId = getBlockRootClientId(
+		state,
+		selectionAnchor.clientId
+	);
+	const focusRootClientId = getBlockRootClientId(
+		state,
+		selectionFocus.clientId
+	);
+
+	// It's not mergeable if the selection doesn't start and end in the same
+	// block list. Maybe in the future it should be allowed.
+	if ( anchorRootClientId !== focusRootClientId ) {
+		return false;
+	}
+
+	const blockOrder = getBlockOrder( state, anchorRootClientId );
+	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
+	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+
+	// Reassign selection start and end based on order.
+	let selectionStart, selectionEnd;
+
+	if ( anchorIndex > focusIndex ) {
+		selectionStart = selectionFocus;
+		selectionEnd = selectionAnchor;
+	} else {
+		selectionStart = selectionAnchor;
+		selectionEnd = selectionFocus;
+	}
+
+	const targetBlockClientId = isForward
+		? selectionEnd.clientId
+		: selectionStart.clientId;
+	const blockToMergeClientId = isForward
+		? selectionStart.clientId
+		: selectionEnd.clientId;
+
+	const targetBlock = getBlock( state, targetBlockClientId );
+	const targetBlockType = getBlockType( targetBlock.name );
+
+	if ( ! targetBlockType.merge ) return false;
+
+	const blockToMerge = getBlock( state, blockToMergeClientId );
+
+	// It's mergeable if the blocks are of the same type.
+	if ( blockToMerge.name === targetBlock.name ) return true;
+
+	// If the blocks are of a different type, try to transform the block being
+	// merged into the same type of block.
+	const blocksToMerge = switchToBlockType( blockToMerge, targetBlock.name );
+
+	return blocksToMerge && blocksToMerge.length;
 }
 
 /**

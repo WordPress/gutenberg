@@ -11,6 +11,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { DELETE, ENTER, BACKSPACE } from '@wordpress/keycodes';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -41,9 +42,12 @@ export default function BlockTools( {
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const { getSelectedBlockClientIds, getBlockRootClientId } = useSelect(
-		blockEditorStore
-	);
+	const {
+		getSelectedBlockClientIds,
+		getBlockRootClientId,
+		__unstableIsSelectionMergeable,
+		__unstableIsFullySelected,
+	} = useSelect( blockEditorStore );
 	const {
 		duplicateBlocks,
 		removeBlocks,
@@ -54,6 +58,8 @@ export default function BlockTools( {
 		moveBlocksDown,
 		deleteSelection,
 		splitSelection,
+		__unstableExpandSelection,
+		replaceBlocks,
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
@@ -108,21 +114,35 @@ export default function BlockTools( {
 		}
 
 		if ( event.keyCode === ENTER ) {
-			splitSelection();
 			event.preventDefault();
-		} else if ( event.keyCode === DELETE ) {
-			deleteSelection( true );
+			if ( __unstableIsFullySelected() ) {
+				replaceBlocks(
+					clientIds,
+					createBlock( getDefaultBlockName() )
+				);
+			} else {
+				splitSelection();
+			}
+		} else if ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) {
 			event.preventDefault();
-		} else if ( event.keyCode === BACKSPACE ) {
-			deleteSelection();
-			event.preventDefault();
+			if ( __unstableIsFullySelected() ) {
+				removeBlocks( clientIds );
+			} else if ( __unstableIsSelectionMergeable() ) {
+				deleteSelection( event.keyCode === DELETE );
+			} else {
+				__unstableExpandSelection();
+			}
 		} else if (
 			// If key.length is longer than 1, it's a control key that doesn't
 			// input anything.
 			event.key.length === 1 &&
 			! ( event.metaKey || event.ctrlKey )
 		) {
-			deleteSelection();
+			if ( __unstableIsSelectionMergeable() ) {
+				deleteSelection( event.keyCode === DELETE );
+			} else {
+				event.preventDefault();
+			}
 		}
 	}
 

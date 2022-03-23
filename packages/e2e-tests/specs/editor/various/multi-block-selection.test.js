@@ -873,6 +873,7 @@ describe( 'Multi-block selection', () => {
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await page.evaluate( () => new Promise( requestAnimationFrame ) );
 
 		// Test setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();

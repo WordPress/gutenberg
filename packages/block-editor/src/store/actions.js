@@ -686,26 +686,14 @@ export const deleteSelection = ( isForward ) => ( {
 
 	if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
 
-	// Remove the blocks if the whole blocks are selected.
-	if ( ! selectionAnchor.attributeKey || ! selectionFocus.attributeKey ) {
-		dispatch.removeBlocks( select.getSelectedBlockClientIds() );
-		return;
-	}
-
-	function expandSelection() {
-		dispatch.selectionChange( {
-			start: { clientId: selectionAnchor.clientId },
-			end: { clientId: selectionFocus.clientId },
-		} );
-	}
-
+	// It's not mergeable if there's no rich text selection.
 	if (
+		! selectionAnchor.attributeKey ||
+		! selectionFocus.attributeKey ||
 		typeof selectionAnchor.offset === 'undefined' ||
 		typeof selectionFocus.offset === 'undefined'
-	) {
-		expandSelection();
-		return;
-	}
+	)
+		return false;
 
 	const anchorRootClientId = select.getBlockRootClientId(
 		selectionAnchor.clientId
@@ -740,7 +728,6 @@ export const deleteSelection = ( isForward ) => ( {
 	const targetBlockType = getBlockType( targetBlock.name );
 
 	if ( ! targetBlockType.merge ) {
-		expandSelection();
 		return;
 	}
 
@@ -801,7 +788,6 @@ export const deleteSelection = ( isForward ) => ( {
 
 	// If the block types can not match, do nothing
 	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
-		expandSelection();
 		return;
 	}
 
@@ -881,13 +867,10 @@ export const splitSelection = () => ( { select, dispatch } ) => {
 
 	if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
 
-	// Remove the blocks if the whole blocks are selected.
-	if ( ! selectionAnchor.attributeKey || ! selectionFocus.attributeKey ) {
-		dispatch.removeBlocks( select.getSelectedBlockClientIds() );
-		return;
-	}
-
+	// Can't split if the selection is not set.
 	if (
+		! selectionAnchor.attributeKey ||
+		! selectionFocus.attributeKey ||
 		typeof selectionAnchor.offset === 'undefined' ||
 		typeof selectionFocus.offset === 'undefined'
 	)
@@ -900,7 +883,7 @@ export const splitSelection = () => ( { select, dispatch } ) => {
 		selectionFocus.clientId
 	);
 
-	// It's not mergeable if the selection doesn't start and end in the same
+	// It's not splittable if the selection doesn't start and end in the same
 	// block list. Maybe in the future it should be allowed.
 	if ( anchorRootClientId !== focusRootClientId ) {
 		return;
@@ -987,6 +970,18 @@ export const splitSelection = () => ( { select, dispatch } ) => {
 		1, // If we don't pass the `indexToSelect` it will default to the last block.
 		select.getSelectedBlocksInitialCaretPosition()
 	);
+};
+
+/**
+ * Expand the selection to cover the entire blocks, removing partial selection.
+ */
+export const __unstableExpandSelection = () => ( { select, dispatch } ) => {
+	const selectionAnchor = select.getSelectionStart();
+	const selectionFocus = select.getSelectionEnd();
+	dispatch.selectionChange( {
+		start: { clientId: selectionAnchor.clientId },
+		end: { clientId: selectionFocus.clientId },
+	} );
 };
 
 /**

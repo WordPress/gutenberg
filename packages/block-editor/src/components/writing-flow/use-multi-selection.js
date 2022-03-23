@@ -22,7 +22,7 @@ function selector( select ) {
 		hasMultiSelection,
 		getSelectedBlockClientId,
 		getSelectedBlocksInitialCaretPosition,
-		getSelectionStart,
+		__unstableIsFullySelected,
 	} = select( blockEditorStore );
 
 	return {
@@ -31,7 +31,7 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		selectedBlockClientId: getSelectedBlockClientId(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
-		isFullSelection: ! getSelectionStart().attributeKey,
+		isFullSelection: __unstableIsFullySelected(),
 	};
 }
 
