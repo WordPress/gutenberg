@@ -38,6 +38,12 @@ async function upload( selector ) {
 	return filename;
 }
 
+async function getListViewBlocks( blockLabel ) {
+	return page.$x(
+		`//table[contains(@aria-label,'Block navigation structure')]//span[contains(@class,'block-editor-list-view-block__title') and text()='${ blockLabel }']`
+	);
+}
+
 describe( 'Gallery', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -63,9 +69,8 @@ describe( 'Gallery', () => {
 		// The Gallery needs to be selected from the List view panel due to the
 		// way that Image uploads take and lose focus.
 		await openListView();
-		const galleryListLink = await page.waitForXPath(
-			`//a[contains(text(), 'Gallery')]`
-		);
+
+		const galleryListLink = ( await getListViewBlocks( 'Gallery' ) )[ 0 ];
 		await galleryListLink.click();
 
 		await page.click( '.wp-block-gallery .blocks-gallery-caption' );
