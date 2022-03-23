@@ -56,8 +56,8 @@ export default function BlockTools( {
 		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
-		deleteSelection,
-		splitSelection,
+		__unstableDeleteSelection,
+		__unstableSplitSelection,
 		__unstableExpandSelection,
 		replaceBlocks,
 	} = useDispatch( blockEditorStore );
@@ -121,14 +121,14 @@ export default function BlockTools( {
 					createBlock( getDefaultBlockName() )
 				);
 			} else {
-				splitSelection();
+				__unstableSplitSelection();
 			}
 		} else if ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) {
 			event.preventDefault();
 			if ( __unstableIsFullySelected() ) {
 				removeBlocks( clientIds );
 			} else if ( __unstableIsSelectionMergeable() ) {
-				deleteSelection( event.keyCode === DELETE );
+				__unstableDeleteSelection( event.keyCode === DELETE );
 			} else {
 				__unstableExpandSelection();
 			}
@@ -139,7 +139,7 @@ export default function BlockTools( {
 			! ( event.metaKey || event.ctrlKey )
 		) {
 			if ( __unstableIsSelectionMergeable() ) {
-				deleteSelection( event.keyCode === DELETE );
+				__unstableDeleteSelection( event.keyCode === DELETE );
 			} else {
 				event.preventDefault();
 			}

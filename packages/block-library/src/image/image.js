@@ -589,7 +589,6 @@ export default function Image( {
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
 					ref={ captionRef }
-					identifier="caption"
 					tagName="figcaption"
 					aria-label={ __( 'Image caption text' ) }
 					placeholder={ __( 'Add caption' ) }

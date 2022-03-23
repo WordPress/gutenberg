@@ -266,6 +266,22 @@ exports[`Multi-block selection should select all from empty selection 1`] = `
 
 exports[`Multi-block selection should select all from empty selection 2`] = `""`;
 
+exports[`Multi-block selection should select separator (single element block) 1`] = `
+"<!-- wp:separator -->
+<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
+<!-- /wp:separator -->
+
+<!-- wp:paragraph -->
+<p>a</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should select separator (single element block) 2`] = `
+"<!-- wp:paragraph -->
+<p>&amp;</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Multi-block selection should set attributes for multiple paragraphs 1`] = `
 "<!-- wp:paragraph {\\"align\\":\\"center\\"} -->
 <p class=\\"has-text-align-center\\">1</p>

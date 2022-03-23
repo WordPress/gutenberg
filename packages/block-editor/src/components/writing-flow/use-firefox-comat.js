@@ -9,7 +9,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-export function useFocus() {
+export default function useFirefoxCompat() {
 	const { isMultiSelecting } = useSelect( blockEditorStore );
 	return useRefEffect( ( element ) => {
 		function onFocus() {
@@ -22,18 +22,12 @@ export function useFocus() {
 			// element sometimes regains focus, while it should not be focusable
 			// and focus should remain on the editable parent element.
 			// To do: try to find the cause of the shifting focus.
-			const parentEditable = element.parentElement.closest(
-				'[contenteditable="true"]'
-			);
-
-			if ( parentEditable ) {
-				parentEditable.focus();
-			}
+			element.focus();
 		}
 
-		element.addEventListener( 'focus', onFocus );
+		element.addEventListener( 'focusin', onFocus );
 		return () => {
-			element.removeEventListener( 'focus', onFocus );
+			element.removeEventListener( 'focusin', onFocus );
 		};
 	}, [] );
 }

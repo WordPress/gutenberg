@@ -910,4 +910,24 @@ describe( 'Multi-block selection', () => {
 		// Expect two blocks with "&" in between.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should select separator (single element block)', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '/hr' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+
+		// Test setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' );
+
+		// Ensure selection is in the correct place.
+		await page.keyboard.type( '&' );
+
+		// Expect two blocks with "&" in between.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

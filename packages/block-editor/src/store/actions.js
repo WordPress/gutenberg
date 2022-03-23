@@ -100,6 +100,15 @@ export const validateBlocksToTemplate = ( blocks ) => ( {
  *                                 text value. See `wp.richText.create`.
  */
 
+/**
+ * A selection object.
+ *
+ * @typedef {Object} WPSelection
+ *
+ * @property {WPBlockSelection} start The selection start.
+ * @property {WPBlockSelection} end   The selection end.
+ */
+
 /* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that selection state should be
@@ -676,7 +685,7 @@ function mapRichTextSettings( attributeDefinition ) {
  *
  * @param {boolean} isForward
  */
-export const deleteSelection = ( isForward ) => ( {
+export const __unstableDeleteSelection = ( isForward ) => ( {
 	registry,
 	select,
 	dispatch,
@@ -861,7 +870,7 @@ export const deleteSelection = ( isForward ) => ( {
 /**
  * Split the current selection.
  */
-export const splitSelection = () => ( { select, dispatch } ) => {
+export const __unstableSplitSelection = () => ( { select, dispatch } ) => {
 	const selectionAnchor = select.getSelectionStart();
 	const selectionFocus = select.getSelectionEnd();
 
@@ -995,7 +1004,6 @@ export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
 	dispatch,
 } ) => {
 	const blocks = [ firstBlockClientId, secondBlockClientId ];
-
 	dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
 	const [ clientIdA, clientIdB ] = blocks;
@@ -1289,10 +1297,10 @@ export function exitFormattedText() {
 /**
  * Action that changes the position of the user caret.
  *
- * @param {string|Object} clientId     The selected block client ID.
- * @param {string}        attributeKey The selected block attribute key.
- * @param {number}        startOffset  The start offset.
- * @param {number}        endOffset    The end offset.
+ * @param {string|WPSelection} clientId     The selected block client ID.
+ * @param {string}             attributeKey The selected block attribute key.
+ * @param {number}             startOffset  The start offset.
+ * @param {number}             endOffset    The end offset.
  *
  * @return {Object} Action object.
  */

@@ -1110,14 +1110,6 @@ _Returns_
 
 -   `Object`: Action object.
 
-### deleteSelection
-
-Delete the current selection.
-
-_Parameters_
-
--   _isForward_ `boolean`:
-
 ### duplicateBlocks
 
 Action that duplicates a list of blocks.
@@ -1398,7 +1390,7 @@ Action that changes the position of the user caret.
 
 _Parameters_
 
--   _clientId_ `string|Object`: The selected block client ID.
+-   _clientId_ `string|WPSelection`: The selected block client ID.
 -   _attributeKey_ `string`: The selected block attribute key.
 -   _startOffset_ `number`: The start offset.
 -   _endOffset_ `number`: The end offset.
@@ -1475,10 +1467,6 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
-
-### splitSelection
-
-Split the current selection.
 
 ### startDraggingBlocks
 
