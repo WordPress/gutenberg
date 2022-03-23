@@ -31,9 +31,7 @@ import {
  *   </BaseControl>
  * );
  */
-export const BaseControl: FunctionComponent< BaseControlProps > & {
-	VisualLabel: typeof VisualLabel;
-} = ( {
+export const BaseControl = ( {
 	__nextHasNoMarginBottom = false,
 	id,
 	label,
@@ -41,7 +39,7 @@ export const BaseControl: FunctionComponent< BaseControlProps > & {
 	help,
 	className,
 	children,
-} ) => {
+}: BaseControlProps ) => {
 	return (
 		<Wrapper
 			className={ classnames( 'components-base-control', className ) }
