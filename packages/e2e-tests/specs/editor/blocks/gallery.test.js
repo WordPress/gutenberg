@@ -100,7 +100,7 @@ describe( 'Gallery', () => {
 		await openListView();
 
 		const galleryListViewItem = await page.waitForXPath(
-			`//a[contains(text(), 'Gallery')]`
+			`//a[contains(text(), 'Gallery')]/span[contains(@class, 'block-editor-list-view__expander')]`
 		);
 		await galleryListViewItem.click();
 
