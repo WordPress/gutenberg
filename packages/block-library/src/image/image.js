@@ -22,6 +22,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
+	useSetting,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
@@ -141,6 +142,7 @@ export default function Image( {
 		},
 		[ clientId ]
 	);
+	const wideSize = useSetting( 'layout.wideSize' );
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
@@ -498,15 +500,12 @@ export default function Image( {
 			naturalHeight < naturalWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
 		// With the current implementation of ResizableBox, an image needs an
-		// explicit pixel value for the max-width. In absence of being able to
-		// set the content-width, this max-width is currently dictated by the
-		// vanilla editor style. The following variable adds a buffer to this
-		// vanilla style, so 3rd party themes have some wiggleroom. This does,
-		// in most cases, allow you to scale the image beyond the width of the
-		// main column, though not infinitely.
-		// @todo It would be good to revisit this once a content-width variable
-		// becomes available.
-		const maxWidthBuffer = maxWidth * 2.5;
+		// explicit pixel value for the max-width.
+		// The block will try to use a wide layout size defined in the `theme.json`
+		// or fall back to the editor max-width + some wiggle-room.
+		const maxWidthBuffer = wideSize
+			? parseInt( wideSize, 10 )
+			: maxWidth * 2;
 
 		let showRightHandle = false;
 		let showLeftHandle = false;
