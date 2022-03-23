@@ -73,7 +73,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
               description="Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
               title="Visible blocks"
             >
-              <WithSelect(BlockManager) />
+              <BlockManager
+                scope="core/edit-post"
+              />
             </Section>
           </React.Fragment>,
           "name": "blocks",
@@ -199,7 +201,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
               description="Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
               title="Visible blocks"
             >
-              <WithSelect(BlockManager) />
+              <BlockManager
+                scope="core/edit-post"
+              />
             </Section>
           </React.Fragment>,
           "name": "blocks",
