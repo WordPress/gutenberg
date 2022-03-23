@@ -42,52 +42,28 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 	if ( gutenberg_skip_spacing_serialization( $block_type ) ) {
 		return array();
 	}
-
+	$attributes          = array();
 	$has_padding_support = gutenberg_block_has_support( $block_type, array( 'spacing', 'padding' ), false );
 	$has_margin_support  = gutenberg_block_has_support( $block_type, array( 'spacing', 'margin' ), false );
 	$block_styles        = isset( $block_attributes['style'] ) ? $block_attributes['style'] : null;
-	$classes             = array();
-	$styles              = array();
-	$style_engine        = WP_Style_Engine_Gutenberg::get_instance();
 
-	if ( $has_padding_support ) {
-		$padding_styles = $style_engine->generate(
-			$block_styles,
-			array(
-				'path'   => array( 'spacing', 'padding' ),
-				'inline' => true,
-			)
-		);
-
-		if ( $padding_styles ) {
-			$styles[] = $padding_styles;
-		}
+	if ( ! $block_styles ) {
+		return $attributes;
 	}
 
-	if ( $has_margin_support ) {
-		// As with padding above.
-		$margin_styles = $style_engine->generate(
-			$block_styles,
-			array(
-				'path'   => array( 'spacing', 'margin' ),
-				'inline' => true,
-			)
-		);
+	$style_engine                    = WP_Style_Engine_Gutenberg::get_instance();
+	$spacing_block_styles            = array();
+	$spacing_block_styles['padding'] = $has_padding_support ? _wp_array_get( $block_styles, array( 'spacing', 'padding' ), null ) : null;
+	$spacing_block_styles['margin']  = $has_margin_support ? _wp_array_get( $block_styles, array( 'spacing', 'margin' ), null ) : null;
+	$inline_styles                   = $style_engine->generate(
+		array( 'spacing' => $spacing_block_styles ),
+		array(
+			'inline' => true,
+		)
+	);
 
-		if ( $margin_styles ) {
-			$styles[] = $margin_styles;
-		}
-	}
-
-	// Collect classes and styles.
-	$attributes = array();
-
-	if ( ! empty( $classes ) ) {
-		$attributes['class'] = implode( ' ', $classes );
-	}
-
-	if ( ! empty( $styles ) ) {
-		$attributes['style'] = implode( '', $styles );
+	if ( ! empty( $inline_styles ) ) {
+		$attributes['style'] = $inline_styles;
 	}
 
 	return $attributes;
