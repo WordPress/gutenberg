@@ -6,17 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, VisuallyHidden } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { Button } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
-import { getBlockPositionDescription } from './utils';
 import BlockTitle from '../block-title';
 import ListViewExpander from './expander';
 import { SPACE, ENTER } from '@wordpress/keycodes';
@@ -25,29 +22,17 @@ function ListViewBlockSelectButton(
 	{
 		className,
 		block: { clientId },
-		isSelected,
 		onClick,
 		onToggleExpanded,
-		position,
-		siblingBlockCount,
-		level,
 		tabIndex,
 		onFocus,
 		onDragStart,
 		onDragEnd,
 		draggable,
-		isExpanded,
 	},
 	ref
 ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const instanceId = useInstanceId( ListViewBlockSelectButton );
-	const descriptionId = `list-view-block-select-button__${ instanceId }`;
-	const blockPositionDescription = getBlockPositionDescription(
-		position,
-		siblingBlockCount,
-		level
-	);
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -73,7 +58,6 @@ function ListViewBlockSelectButton(
 				) }
 				onClick={ onClick }
 				onKeyDown={ onKeyDownHandler }
-				aria-describedby={ descriptionId }
 				ref={ ref }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
@@ -81,7 +65,7 @@ function ListViewBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
-				aria-expanded={ isExpanded }
+				aria-hidden={ true }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
@@ -91,18 +75,7 @@ function ListViewBlockSelectButton(
 						{ blockInformation.anchor }
 					</span>
 				) }
-				{ isSelected && (
-					<VisuallyHidden>
-						{ __( '(selected block)' ) }
-					</VisuallyHidden>
-				) }
 			</Button>
-			<div
-				className="block-editor-list-view-block-select-button__description"
-				id={ descriptionId }
-			>
-				{ blockPositionDescription }
-			</div>
 		</>
 	);
 }

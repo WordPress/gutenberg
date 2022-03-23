@@ -72,8 +72,8 @@ describe( 'List view', () => {
 		await pressKeyWithModifier( 'access', 'o' );
 
 		// The last inserted paragraph block should be selected in List View.
-		await page.waitForXPath(
-			'//a[contains(., "Paragraph(selected block)")]'
+		await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Paragraph"]'
 		);
 
 		// Go to the image block in list view.
@@ -115,8 +115,8 @@ describe( 'List view', () => {
 		await openListView();
 
 		// The last inserted paragraph block should be selected in List View.
-		await page.waitForXPath(
-			'//a[contains(., "Paragraph(selected block)")]'
+		await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Paragraph"]'
 		);
 
 		// Paragraph options button.
@@ -134,8 +134,8 @@ describe( 'List view', () => {
 		await paragraphRemoveButton.click();
 
 		// Heading block should be selected as previous block.
-		await page.waitForXPath(
-			'//a[contains(., "Heading(selected block)")]'
+		await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Heading"]'
 		);
 	} );
 
@@ -150,8 +150,8 @@ describe( 'List view', () => {
 		await openListView();
 
 		// The last inserted paragraph block should be selected in List View.
-		await page.waitForXPath(
-			'//a[contains(., "Paragraph(selected block)")]'
+		await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Paragraph"]'
 		);
 
 		// Go to the image block in list view.
@@ -159,7 +159,9 @@ describe( 'List view', () => {
 		await pressKeyTimes( 'Enter', 1 );
 
 		// Image block should have selected.
-		await page.waitForXPath( '//a[contains(., "Image(selected block)")]' );
+		await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Image"]'
+		);
 
 		// Image options dropdown.
 		const imageOptionsButton = await page.waitForSelector(
@@ -176,8 +178,8 @@ describe( 'List view', () => {
 		await imageRemoveButton.click();
 
 		// Heading block should be selected as next block.
-		await page.waitForXPath(
-			'//a[contains(., "Heading(selected block)")]'
+		await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Heading"]'
 		);
 	} );
 
@@ -194,8 +196,8 @@ describe( 'List view', () => {
 		await openListView();
 
 		// The last inserted heading block should be selected in List View.
-		const headingBlock = await page.waitForXPath(
-			'//a[contains(., "Heading(selected block)")]'
+		const headingBlock = await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Heading"]'
 		);
 
 		await headingBlock.click();
@@ -204,10 +206,12 @@ describe( 'List view', () => {
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
 
 		// Both Image and Heading blocks should have selected.
-		await page.waitForXPath(
-			'//a[contains(., "Heading(selected block)")]'
+		await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Heading"]'
 		);
-		await page.waitForXPath( '//a[contains(., "Image(selected block)")]' );
+		await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Image"]'
+		);
 
 		const imageOptionsButton = await page.waitForSelector(
 			'tr.block-editor-list-view-leaf:first-child button[aria-label="Options for Image block"]'
@@ -224,8 +228,8 @@ describe( 'List view', () => {
 		await blocksRemoveButton.click();
 
 		// Newly created default paragraph block should be selected.
-		await page.waitForXPath(
-			'//a[contains(., "Paragraph(selected block)")]'
+		await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Paragraph"]'
 		);
 	} );
 
@@ -289,7 +293,9 @@ describe( 'List view', () => {
 		await pressKeyWithModifier( 'access', 'o' );
 
 		// The last inserted group block should be selected in list view.
-		await page.waitForXPath( '//a[contains(., "Group(selected block)")]' );
+		await page.waitForSelector(
+			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Group"]'
+		);
 
 		// Press Home to go to the first inserted block (image).
 		await page.keyboard.press( 'Home' );
