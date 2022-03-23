@@ -2,13 +2,14 @@
  * External dependencies
  */
 import Animated, {
-	useSharedValue,
-	useAnimatedStyle,
-	runOnJS,
-	withTiming,
 	interpolate,
-	useAnimatedRef,
 	measure,
+	runOnJS,
+	runOnUI,
+	useAnimatedRef,
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming,
 } from 'react-native-reanimated';
 
 /**
@@ -16,7 +17,7 @@ import Animated, {
  */
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, createContext, useContext } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,14 +28,11 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockListContext } from '../block-list/block-list-context';
 import styles from './style.scss';
 
-const Context = createContext( { dragHandler: () => null } );
-const { Provider } = Context;
-
 const CHIP_POSITION_PADDING = 32;
 const BLOCK_COLLAPSED_HEIGHT = 20;
 
 const BlockDraggableWrapper = ( { children } ) => {
-	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
+	const { /*startDraggingBlocks,*/ stopDraggingBlocks } = useDispatch(
 		blockEditorStore
 	);
 
@@ -73,46 +71,51 @@ const BlockDraggableWrapper = ( { children } ) => {
 		};
 	}, [] );
 
+	const setDraggingBlockByPosition = () => {
+		// TODO: Get clientId from blocks layouts data by position
+		// startDraggingBlocks( [ clientIdFromBlocksLayouts ] );
+	};
+
 	const onChipLayout = ( { nativeEvent: { layout } } ) => {
 		chip.width.value = layout.width;
 		chip.height.value = layout.height;
 	};
 
-	const startDragging = ( clientIds, { absoluteX: x, absoluteY: y } ) => {
+	const startDragging = ( { absoluteX, absoluteY } ) => {
 		'worklet';
-		runOnJS( startDraggingBlocks )( clientIds );
-
 		const scrollLayout = measure( animatedScrollRef );
 		scroll.x.value = scrollLayout.pageX;
 		scroll.y.value = scrollLayout.pageY;
 
-		chip.x.value = x - scroll.x.value;
-		chip.y.value = y - scroll.y.value;
+		const dragPosition = {
+			x: absoluteX - scroll.x.value,
+			y: absoluteY - scroll.y.value,
+		};
+		chip.x.value = dragPosition.x;
+		chip.y.value = dragPosition.y;
 
 		isDragging.value = true;
-		chip.scale.value = withTiming( 1 );
 
-		startScrolling( y );
+		chip.scale.value = withTiming( 1 );
+		runOnJS( setDraggingBlockByPosition )( dragPosition );
+		startScrolling( absoluteY );
 	};
 
-	const updateDragging = ( { absoluteX: x, absoluteY: y } ) => {
+	const updateDragging = ( { absoluteX, absoluteY } ) => {
 		'worklet';
-		// Update scrolling velocity
-		scrollOnDragOver( y );
+		chip.x.value = absoluteX - scroll.x.value;
+		chip.y.value = absoluteY - scroll.y.value;
 
-		chip.x.value = x - scroll.x.value;
-		chip.y.value = y - scroll.y.value;
+		// Update scrolling velocity
+		scrollOnDragOver( absoluteY );
 	};
 
 	const stopDragging = () => {
 		'worklet';
-		chip.scale.value = withTiming( 0, ( completed ) => {
-			if ( completed ) {
-				isDragging.value = false;
-				runOnJS( stopDraggingBlocks )();
-			}
-		} );
+		isDragging.value = false;
 
+		chip.scale.value = withTiming( 0 );
+		runOnJS( stopDraggingBlocks )();
 		stopScrolling();
 	};
 
@@ -134,14 +137,14 @@ const BlockDraggableWrapper = ( { children } ) => {
 	} );
 
 	return (
-		<Provider
-			value={ {
-				startDragging,
-				updateDragging,
-				stopDragging,
-			} }
-		>
-			{ children( { onScroll: scrollHandler } ) }
+		<>
+			<Draggable
+				onDragStart={ startDragging }
+				onDragOver={ updateDragging }
+				onDragEnd={ stopDragging }
+			>
+				{ children( { onScroll: scrollHandler } ) }
+			</Draggable>
 			<Animated.View
 				onLayout={ onChipLayout }
 				style={ chipStyles }
@@ -149,15 +152,11 @@ const BlockDraggableWrapper = ( { children } ) => {
 			>
 				<DraggableChip />
 			</Animated.View>
-		</Provider>
+		</>
 	);
 };
 
 const BlockDraggable = ( { clientIds, children } ) => {
-	const { startDragging, updateDragging, stopDragging } = useContext(
-		Context
-	);
-
 	const container = {
 		height: useSharedValue( 0 ),
 	};
@@ -168,35 +167,44 @@ const BlockDraggable = ( { clientIds, children } ) => {
 		container.height.value = layout.height;
 	};
 
-	const startBlockDragging = ( event ) => {
+	const startBlockDragging = () => {
 		'worklet';
-		startDragging( clientIds, event );
 		containerHeightBeforeDragging.value = container.height.value;
 		collapseAnimation.value = withTiming( 1 );
 	};
 
 	const stopBlockDragging = () => {
 		'worklet';
-		stopDragging();
 		collapseAnimation.value = withTiming( 0 );
 	};
 
-	const { isDraggable } = useSelect(
+	const { isDraggable, isBeingDragged } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getTemplateLock } = select(
-				blockEditorStore
-			);
+			const {
+				getBlockRootClientId,
+				getTemplateLock,
+				isBlockBeingDragged,
+			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
 
 			return {
+				isBeingDragged: isBlockBeingDragged( clientIds[ 0 ] ),
 				isDraggable: 'all' !== templateLock,
 			};
 		},
 		[ clientIds ]
 	);
+
+	useEffect( () => {
+		if ( isBeingDragged ) {
+			runOnUI( startBlockDragging )();
+		} else {
+			runOnUI( stopBlockDragging )();
+		}
+	}, [ isBeingDragged ] );
 
 	const containerStyles = useAnimatedStyle( () => {
 		const height = interpolate(
@@ -232,14 +240,9 @@ const BlockDraggable = ( { clientIds, children } ) => {
 
 	return (
 		<Animated.View onLayout={ onContainerLayout } style={ containerStyles }>
-			<Draggable
-				onDragStart={ startBlockDragging }
-				onDragOver={ updateDragging }
-				onDragEnd={ stopBlockDragging }
-				wrapperAnimatedStyles={ blockStyles }
-			>
+			<Animated.View style={ blockStyles }>
 				{ children( { isDraggable: true } ) }
-			</Draggable>
+			</Animated.View>
 			<Animated.View
 				style={ [
 					styles[ 'draggable-placeholder__container' ],
