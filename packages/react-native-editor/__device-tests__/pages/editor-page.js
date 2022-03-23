@@ -258,19 +258,25 @@ class EditorPage {
 	// =========================
 
 	async addNewBlock( blockName, relativePosition ) {
-		const addBlockButtonLocator = isAndroid() 
-			? '//android.widget.Button[@content-desc="Add block, Double tap to add a block"]' 
+		const addBlockButtonLocator = isAndroid()
+			? '//android.widget.Button[@content-desc="Add block, Double tap to add a block"]'
 			: '//XCUIElementTypeButton[@name="add-block-button"]';
-		
-		const addButton = await waitForVisible( this.driver, addBlockButtonLocator );
+
+		const addButton = await waitForVisible(
+			this.driver,
+			addBlockButtonLocator
+		);
 
 		if ( relativePosition === 'before' ) {
 			await longPressMiddleOfElement( this.driver, addButton );
-			const addBlockBeforeButtonLocator = isAndroid() 
-				? '//android.widget.Button[@content-desc="Add Block Before"]' 
+			const addBlockBeforeButtonLocator = isAndroid()
+				? '//android.widget.Button[@content-desc="Add Block Before"]'
 				: '//XCUIElementTypeButton[@name="Add Block Before"]';
 
-			const addBlockBeforeButton = await waitForVisible( this.driver, addBlockBeforeButtonLocator)
+			const addBlockBeforeButton = await waitForVisible(
+				this.driver,
+				addBlockBeforeButtonLocator
+			);
 			await addBlockBeforeButton.click();
 		} else {
 			await addButton.click();
@@ -283,9 +289,10 @@ class EditorPage {
 			await blockButton.click();
 
 			// For certain blocks, clicking on it will display additional options that the test should wait for before next steps
-			if (blockName === 'Image' ) {
-				const locator = '//android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup'
-				await waitForVisible( this.driver, locator )
+			if ( blockName === 'Image' ) {
+				const locator =
+					'//android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup';
+				await waitForVisible( this.driver, locator );
 			}
 		} else {
 			await this.driver.execute( 'mobile: tap', {
@@ -304,11 +311,11 @@ class EditorPage {
 	// Attempts to find the given block button in the block inserter control.
 	async findBlockButton( blockName ) {
 		// Wait for the first block, Paragraph block, to load before looking for other blocks
-		const paragraphBlockLocator = isAndroid() 
+		const paragraphBlockLocator = isAndroid()
 			? '//android.widget.Button[@content-desc="Paragraph block"]/android.widget.TextView'
-			: '//XCUIElementTypeButton[@name="Paragraph block"]'
+			: '//XCUIElementTypeButton[@name="Paragraph block"]';
 
-		await waitForVisible( this.driver, paragraphBlockLocator )
+		await waitForVisible( this.driver, paragraphBlockLocator );
 		const blockAccessibilityLabel = `${ blockName } block`;
 		const blockAccessibilityLabelNewBlock = `${ blockAccessibilityLabel }, newly available`;
 
@@ -624,7 +631,10 @@ class EditorPage {
 		if ( isAndroid() ) {
 			await swipeDown( this.driver );
 		} else {
-			const cancelButton = await waitForVisible ( this.driver, '//XCUIElementTypeButton[@name="Cancel"]' )
+			const cancelButton = await waitForVisible(
+				this.driver,
+				'//XCUIElementTypeButton[@name="Cancel"]'
+			);
 			await cancelButton.click();
 		}
 	}
