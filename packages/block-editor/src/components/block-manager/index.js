@@ -7,7 +7,7 @@ import { filter, includes } from 'lodash';
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { SearchControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
@@ -20,13 +20,28 @@ import { speak } from '@wordpress/a11y';
 import BlockManagerCategory from './category';
 import useHiddenBlockTypes from './use-hidden-block-types';
 
-function BlockManager( {
-	scope,
-	blockTypes,
-	categories,
-	hasBlockSupport,
-	isMatchingSearchTerm,
-} ) {
+export default function BlockManager( { scope } ) {
+	const {
+		blockTypes,
+		categories,
+		hasBlockSupport,
+		isMatchingSearchTerm,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockTypes,
+			getCategories,
+			hasBlockSupport: _hasBlockSupport,
+			isMatchingSearchTerm: _isMatchingSearchTerm,
+		} = select( blocksStore );
+
+		return {
+			blockTypes: getBlockTypes(),
+			categories: getCategories(),
+			hasBlockSupport: _hasBlockSupport,
+			isMatchingSearchTerm: _isMatchingSearchTerm,
+		};
+	} );
+
 	const { hiddenBlockTypes } = useHiddenBlockTypes( scope );
 	const numberOfHiddenBlocks = hiddenBlockTypes?.length ?? 0;
 
@@ -36,7 +51,7 @@ function BlockManager( {
 	// Filtering occurs here (as opposed to `withSelect`) to avoid
 	// wasted renders by consequence of `Array#filter` producing
 	// a new value reference on each call.
-	blockTypes = blockTypes.filter(
+	const filteredBlockTypes = blockTypes.filter(
 		( blockType ) =>
 			hasBlockSupport( blockType, 'inserter', true ) &&
 			( ! search || isMatchingSearchTerm( blockType, search ) ) &&
@@ -49,14 +64,14 @@ function BlockManager( {
 		if ( ! search ) {
 			return;
 		}
-		const count = blockTypes.length;
+		const count = filteredBlockTypes.length;
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
 			_n( '%d result found.', '%d results found.', count ),
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ blockTypes.length, search, debouncedSpeak ] );
+	}, [ filteredBlockTypes.length, search, debouncedSpeak ] );
 
 	return (
 		<div className="edit-post-block-manager__content">
@@ -86,7 +101,7 @@ function BlockManager( {
 				aria-label={ __( 'Available block types' ) }
 				className="edit-post-block-manager__results"
 			>
-				{ blockTypes.length === 0 && (
+				{ filteredBlockTypes.length === 0 && (
 					<p className="edit-post-block-manager__no-results">
 						{ __( 'No blocks found.' ) }
 					</p>
@@ -96,7 +111,7 @@ function BlockManager( {
 						key={ category.slug }
 						scope={ scope }
 						title={ category.title }
-						blockTypes={ filter( blockTypes, {
+						blockTypes={ filter( filteredBlockTypes, {
 							category: category.slug,
 						} ) }
 					/>
@@ -105,7 +120,7 @@ function BlockManager( {
 					scope={ scope }
 					title={ __( 'Uncategorized' ) }
 					blockTypes={ filter(
-						blockTypes,
+						filteredBlockTypes,
 						( { category } ) => ! category
 					) }
 				/>
@@ -113,19 +128,3 @@ function BlockManager( {
 		</div>
 	);
 }
-
-export default withSelect( ( select ) => {
-	const {
-		getBlockTypes,
-		getCategories,
-		hasBlockSupport,
-		isMatchingSearchTerm,
-	} = select( blocksStore );
-
-	return {
-		blockTypes: getBlockTypes(),
-		categories: getCategories(),
-		hasBlockSupport,
-		isMatchingSearchTerm,
-	};
-} )( BlockManager );
