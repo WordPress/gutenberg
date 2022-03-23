@@ -271,47 +271,106 @@ function gutenberg_get_typography_font_size_value( $preset ) {
 	}
 
 	// Font sizes.
-	// $preset['size'] acts as the minimum size of the font.
-	$minimum_font_size     = gutenberg_get_typography_value_and_unit( $preset['size'] );
+	$fluid_font_size_settings = isset( $preset['fluidSize'] ) ? $preset['fluidSize'] : null;
 
-	// If the minimum fontsize isn't successfully parsed,
-	// or there's no defined `maxSize` skip the font.
-	// Defining a `maxSize` provides a way for theme.json to specify which
-	// font-sizes receive the clamp treatment.
-	if ( empty( $minimum_font_size || isset( $preset['maxSize'] ) ) ) {
+	if ( ! $fluid_font_size_settings ) {
 		return $preset['size'];
 	}
 
+	$minimum_font_size_raw = isset( $fluid_font_size_settings['minSize'] ) ? $fluid_font_size_settings['minSize'] : null;
+	$maximum_font_size_raw = isset( $fluid_font_size_settings['maxSize'] ) ? $fluid_font_size_settings['maxSize'] : null;
+	$fluid_formula         = isset( $fluid_font_size_settings['fluidFormula'] ) ? $fluid_font_size_settings['fluidFormula'] : null;
+
 	// Fluid typography general settings.
-	$fluid_settings = $typography_settings['fluid'];
+	// Gutenberg's internal implementation.
+	// If a minimum and maximum viewport width is set, let's try to use it.
+	$fluid_settings             = $typography_settings['fluid'];
+	$maximum_viewport_width_raw = isset( $fluid_settings['maxViewportWidth'] ) ? $fluid_settings['maxViewportWidth'] : null;
+	$minimum_viewport_width_raw = isset( $fluid_settings['minViewportWidth'] ) ? $fluid_settings['minViewportWidth'] : null;
 
-	// Set some defaults for the case that `"fluid": true,`.
-	$default_maximum_viewport_width_px = '1900px';
-	$default_minimum_viewport_width_px = '800px';
+	// Expect all required variables except formula to trigger internal clamp() implementation based on min/max viewport width.
 
-	// Use rem for accessible fluid target font scaling.
-	$minimum_font_size_rem = gutenberg_get_typography_value_and_unit( $preset['size'], 'rem' );
+	/*
+		"fluid": {
+			"maxViewportWidth": "1600px",
+			"minViewportWidth": "768px"
+		},
+		"fontSizes": [
+			{
+				"size": "5.25rem",
+				"fluidSize": {
+					"minSize": "5.25rem",
+					"maxSize": "9rem"
+				},
+				"slug": "colossal",
+				"name": "Colossal"
+			}
+	*/
+	if ( $minimum_viewport_width_raw && $maximum_viewport_width_raw && $minimum_font_size_raw && $maximum_font_size_raw && ! $fluid_formula ) {
+		// In order to do fluid calculations, we need a "preferred" unit so the base values have the same ratio.
+		// We need to get the unit to "normalize" rem/em and px.
+		$preferred_font_size = gutenberg_get_typography_value_and_unit( $preset['size'] );
+		$font_size_unit      = $preferred_font_size['unit'];
+		$minimum_font_size   = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw );
+		// Grab the maximum font size and normalize it in order to use the value for calculations.
+		$maximum_font_size = gutenberg_get_typography_value_and_unit( $maximum_font_size_raw, $font_size_unit );
+		// Use rem for accessible fluid target font scaling.
+		$minimum_font_size_rem = gutenberg_get_typography_value_and_unit( $minimum_font_size, 'rem' );
 
-	// We need to get the unit to "normalize" rem/em and px.
-	$font_size_unit = $minimum_font_size['unit'];
+		// Viewport widths defined for fluid typography. Normalize units.
+		$maximum_viewport_width = gutenberg_get_typography_value_and_unit( $maximum_viewport_width_raw, $font_size_unit );
+		$minimum_viewport_width = gutenberg_get_typography_value_and_unit( $minimum_viewport_width_raw, $font_size_unit );
 
-	// Grab the maximum font size and normalize it so we can use the value for calculations.
-	$maximum_font_size = gutenberg_get_typography_value_and_unit( $preset['maxSize'], $font_size_unit );
+		// Build CSS rule.
+		// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
+		$view_port_width_offset = round( $minimum_viewport_width['value'] / 100, 3 ) . $font_size_unit;
+		$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
+		$linear_factor          = round( $linear_factor, 3 );
+		$fluid_target_font_size = 'calc(' . implode( '', $minimum_font_size_rem ) . " + ((1vw - $view_port_width_offset) * $linear_factor))";
 
-	// Viewport widths defined for fluid typography.
-	$maximum_viewport_width_raw = isset( $fluid_settings['maxViewportWidth'] ) ? $fluid_settings['maxViewportWidth'] : $default_maximum_viewport_width_px;
-	$minimum_viewport_width_raw = isset( $fluid_settings['minViewportWidth'] ) ? $fluid_settings['minViewportWidth'] : $default_minimum_viewport_width_px;
-	$maximum_viewport_width     = gutenberg_get_typography_value_and_unit( $maximum_viewport_width_raw, $font_size_unit );
-	$minimum_viewport_width     = gutenberg_get_typography_value_and_unit( $minimum_viewport_width_raw, $font_size_unit );
+		return "clamp({$minimum_font_size_raw}, $fluid_target_font_size, {$maximum_font_size_raw})";
+	}
 
-	// Build CSS rule.
-	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
-	$view_port_width_offset = round( $minimum_viewport_width['value'] / 100, 3 ) . $font_size_unit;
-	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
-	$linear_factor          = round( $linear_factor, 3 );
-	$fluid_target_font_size = 'calc(' . implode( '', $minimum_font_size_rem ) . " + ((1vw - $view_port_width_offset) * $linear_factor))";
+	// If there's no min or max viewport, use custom implementation.
+	// min, max sizes and fluid formula? Use clamp().
 
-	return "clamp({$preset['size']}, $fluid_target_font_size, {$preset['maxSize']})";
+	/*
+		"fluid": true,
+		"fontSizes": [
+			{
+				"size": "2rem",
+				"fluidSize": {
+					"minSize": "2rem",
+					"fluidFormula": "calc(2.5 / 100 * 100vw)",
+					"maxSize": "2.5rem"
+				},
+				"slug": "large",
+				"name": "Large"
+			},
+	*/
+	if ( $fluid_formula && $minimum_font_size_raw && $maximum_font_size_raw ) {
+		return "clamp($minimum_font_size_raw, $fluid_formula, $maximum_font_size_raw)";
+	}
+
+	// Use a custom formula. Could be clamp(), could be anything.
+
+	/*
+		"fluid": true,
+		"fontSizes": [
+			{
+				"size": "3.7rem",
+				"fluidSize": {
+					"fluidFormula": "calc(3.7rem * 1px + 2 * 1vw)"
+				},
+				"slug": "huge",
+				"name": "Huge"
+			},
+	*/
+	if ( $fluid_formula && ! $minimum_font_size_raw && ! $maximum_font_size_raw ) {
+		return $fluid_formula;
+	}
+
+	return $preset['size'];
 }
 
 // Register the block support.
