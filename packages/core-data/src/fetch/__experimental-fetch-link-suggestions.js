@@ -153,6 +153,27 @@ const fetchLinkSuggestions = async (
 		);
 	}
 
+	if ( ! type || type === 'media' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/media', {
+					search,
+					page,
+					per_page: perPage,
+				} ),
+			} )
+				.then( ( results ) => {
+					return results.map( ( result ) => {
+						return {
+							...result,
+							meta: { kind: 'media' },
+						};
+					} );
+				} )
+				.catch( () => [] )
+		);
+	}
+
 	return Promise.all( queries ).then( ( results ) => {
 		return results
 			.reduce(
@@ -173,12 +194,17 @@ const fetchLinkSuggestions = async (
 				 * @param {{ id: number, meta?: object, url:string, title?:string, subtype?: string, type?: string }} result
 				 */
 				( result ) => {
+					const isMedia = result.type === 'attachment';
+
 					return {
 						id: result.id,
-						url: result.url,
+						url: isMedia ? result.source_url : result.url,
 						title:
-							decodeEntities( result.title || '' ) ||
-							__( '(no title)' ),
+							decodeEntities(
+								isMedia
+									? result.title.rendered
+									: result.title || ''
+							) || __( '(no title)' ),
 						type: result.subtype || result.type,
 						kind: result?.meta?.kind,
 					};
