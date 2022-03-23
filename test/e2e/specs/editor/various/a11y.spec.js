@@ -22,7 +22,7 @@ test.describe( 'a11y', () => {
 
 	test( 'constrains focus to a modal when tabbing', async ( { page } ) => {
 		// Open keyboard help modal.
-		await page.keyboard.press( 'Control+Alt+H' );
+		await page.keyboard.press( 'Shift+Alt+H' );
 
 		// The close button should not be focused by default; this is a strange UX
 		// experience.
@@ -40,7 +40,7 @@ test.describe( 'a11y', () => {
 	test( 'returns focus to the first tabbable in a modal after blurring a tabbable', async ( {
 		page,
 	} ) => {
-		await page.keyboard.press( 'Control+Alt+H' );
+		await page.keyboard.press( 'Shift+Alt+H' );
 
 		// Click to move focus to an element after the last tabbable within the modal.
 		const lastTabbable = page
@@ -61,7 +61,7 @@ test.describe( 'a11y', () => {
 	test( 'returns focus to the last tabbable in a modal after blurring a tabbable and tabbing in reverse direction', async ( {
 		page,
 	} ) => {
-		await page.keyboard.press( 'Control+Alt+H' );
+		await page.keyboard.press( 'Shift+Alt+H' );
 
 		// Click to move focus to an element before the first tabbable within
 		// the modal.
