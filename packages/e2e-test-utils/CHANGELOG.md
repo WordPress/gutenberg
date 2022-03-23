@@ -4,7 +4,7 @@
 
 ### Enhancement
 
--   Changed `setOption` to use `options.php`, to allow setting any option (and to be more consistent with `getOption`). [#39502] (https://github.com/WordPress/gutenberg/pull/39502)
+-   Changed `setOption` to use `options.php`, to allow setting any option (and to be more consistent with `getOption`). [#39502](https://github.com/WordPress/gutenberg/pull/39502)
 -   Added a new `trashAllComments` function.
 
 ## 7.0.0 (2022-03-11)
