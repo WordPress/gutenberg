@@ -43,10 +43,14 @@ const secondFrame = {
 
 const normalizedWidth = 250;
 
-const StylesPreview = ( { label } ) => {
+const StylesPreview = ( { label, isFocused } ) => {
+	const [ fontWeight ] = useStyle( 'typography.fontWeight' );
 	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
 	const [ headingFontFamily = fontFamily ] = useStyle(
 		'elements.h1.typography.fontFamily'
+	);
+	const [ headingFontWeight = fontWeight ] = useStyle(
+		'elements.h1.typography.fontWeight'
 	);
 	const [ textColor = 'black' ] = useStyle( 'color.text' );
 	const [ headingColor = textColor ] = useStyle( 'elements.h1.color.text' );
@@ -55,10 +59,10 @@ const StylesPreview = ( { label } ) => {
 	const [ gradientValue ] = useStyle( 'color.gradient' );
 	const [ styles ] = useGlobalStylesOutput();
 	const disableMotion = useReducedMotion();
-	const [ isHovered, setIsHovered ] = useState( false );
 	const [ coreColors ] = useSetting( 'color.palette.core' );
 	const [ themeColors ] = useSetting( 'color.palette.theme' );
 	const [ customColors ] = useSetting( 'color.palette.custom' );
+	const [ isHovered, setIsHovered ] = useState( false );
 	const [ containerResizeListener, { width } ] = useResizeObserver();
 	const ratio = width ? width / normalizedWidth : 1;
 
@@ -66,7 +70,10 @@ const StylesPreview = ( { label } ) => {
 		.concat( customColors ?? [] )
 		.concat( coreColors ?? [] );
 	const highlightedColors = paletteColors
-		.filter( ( { color } ) => color !== backgroundColor )
+		.filter(
+			// we exclude these two colors because they are already visible in the preview.
+			( { color } ) => color !== backgroundColor && color !== headingColor
+		)
 		.slice( 0, 2 );
 
 	return (
@@ -79,6 +86,7 @@ const StylesPreview = ( { label } ) => {
 			} }
 			onMouseEnter={ () => setIsHovered( true ) }
 			onMouseLeave={ () => setIsHovered( false ) }
+			tabIndex={ -1 }
 		>
 			{ containerResizeListener }
 			<motion.div
@@ -89,7 +97,11 @@ const StylesPreview = ( { label } ) => {
 					cursor: 'pointer',
 				} }
 				initial="start"
-				animate={ isHovered && ! disableMotion ? 'hover' : 'start' }
+				animate={
+					( isHovered || isFocused ) && ! disableMotion
+						? 'hover'
+						: 'start'
+				}
 			>
 				<motion.div
 					variants={ firstFrame }
@@ -111,14 +123,15 @@ const StylesPreview = ( { label } ) => {
 								fontFamily: headingFontFamily,
 								fontSize: 65 * ratio,
 								color: headingColor,
+								fontWeight: headingFontWeight,
 							} }
 						>
 							Aa
 						</div>
 						<VStack spacing={ 2 * ratio }>
-							{ highlightedColors.map( ( { color } ) => (
+							{ highlightedColors.map( ( { slug, color } ) => (
 								<div
-									key={ color }
+									key={ slug }
 									style={ {
 										height: 30 * ratio,
 										width: 30 * ratio,
@@ -153,6 +166,7 @@ const StylesPreview = ( { label } ) => {
 									fontSize: 35 * ratio,
 									fontFamily: headingFontFamily,
 									color: headingColor,
+									fontWeight: headingFontWeight,
 									lineHeight: '1em',
 								} }
 							>
