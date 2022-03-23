@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.1.0 (2022-03-23)
+
 ## 8.0.0 (2022-03-11)
 
 ### Breaking Changes

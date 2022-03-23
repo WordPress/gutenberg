@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.7.0 (2022-03-23)
+
 ### Enhancements
 
 -   `CustomSelectControl`: Add `__next36pxDefaultSize` flag for larger default size ([#39401](https://github.com/WordPress/gutenberg/pull/39401)).
