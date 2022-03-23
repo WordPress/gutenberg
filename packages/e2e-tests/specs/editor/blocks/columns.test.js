@@ -11,7 +11,7 @@ import {
 
 async function getListViewBlocks( blockLabel ) {
 	return page.$x(
-		`//table[contains(@aria-label,'Block navigation structure')]//span[contains(@class,'block-editor-list-view-block__title') and text()='${ blockLabel }']`
+		`//table[contains(@aria-label,'Block navigation structure')]//span[contains(@class,'block-editor-list-view-block-select-button__title') and text()='${ blockLabel }']`
 	);
 }
 

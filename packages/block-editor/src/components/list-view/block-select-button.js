@@ -69,7 +69,7 @@ function ListViewBlockSelectButton(
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
-				<span className="block-editor-list-view-block__title">
+				<span className="block-editor-list-view-block-select-button__title">
 					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
 				</span>
 				{ blockInformation?.anchor && (
