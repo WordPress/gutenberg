@@ -19,7 +19,7 @@ import { useState } from '@wordpress/element';
 import { useSetting, useStyle } from './hooks';
 import { useGlobalStylesOutput } from './use-global-styles-output';
 
-const defaultColorVariants = {
+const firstFrame = {
 	start: {
 		opacity: 1,
 		display: 'block',
@@ -30,36 +30,14 @@ const defaultColorVariants = {
 	},
 };
 
-const typographyVariants = {
-	start: {
-		opacity: 1,
-	},
-	hover: {
-		opacity: 0,
-	},
-};
-
-const labelVariants = {
-	start: {
-		opacity: 0,
-		display: 'none',
-	},
+const secondFrame = {
 	hover: {
 		opacity: 1,
 		display: 'block',
 	},
-};
-
-const paletteMotionVariants = {
 	start: {
-		y: '100%',
 		opacity: 0,
 		display: 'none',
-	},
-	hover: {
-		y: 0,
-		opacity: 1,
-		display: 'block',
 	},
 };
 
@@ -67,17 +45,30 @@ const normalizedWidth = 250;
 
 const StylesPreview = ( { label } ) => {
 	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
+	const [ headingFontFamily = fontFamily ] = useStyle(
+		'elements.h1.typography.fontFamily'
+	);
 	const [ textColor = 'black' ] = useStyle( 'color.text' );
+	const [ headingColor = textColor ] = useStyle( 'elements.h1.color.text' );
 	const [ linkColor = 'blue' ] = useStyle( 'elements.link.color.text' );
 	const [ backgroundColor = 'white' ] = useStyle( 'color.background' );
 	const [ gradientValue ] = useStyle( 'color.gradient' );
 	const [ styles ] = useGlobalStylesOutput();
 	const disableMotion = useReducedMotion();
 	const [ isHovered, setIsHovered ] = useState( false );
+	const [ coreColors ] = useSetting( 'color.palette.core' );
 	const [ themeColors ] = useSetting( 'color.palette.theme' );
 	const [ customColors ] = useSetting( 'color.palette.custom' );
 	const [ containerResizeListener, { width } ] = useResizeObserver();
 	const ratio = width ? width / normalizedWidth : 1;
+
+	const paletteColors = ( themeColors ?? [] )
+		.concat( customColors ?? [] )
+		.concat( coreColors ?? [] );
+	const highlightedColors = paletteColors
+		.filter( ( { color } ) => color !== backgroundColor )
+		.slice( 0, 2 );
+
 	return (
 		<Iframe
 			className="edit-site-global-styles-preview__iframe"
@@ -100,84 +91,113 @@ const StylesPreview = ( { label } ) => {
 				initial="start"
 				animate={ isHovered && ! disableMotion ? 'hover' : 'start' }
 			>
-				{ label && (
-					<motion.div
-						style={ {
-							fontSize: 30 * ratio,
-							position: 'absolute',
-							left: 10 * ratio,
-							bottom: 10 * ratio,
-							zIndex: 1,
-						} }
-						variants={ labelVariants }
-						transition={ { duration: 0.5 } }
-					>
-						{ label }
-					</motion.div>
-				) }
-				<HStack
+				<motion.div
+					variants={ firstFrame }
 					style={ {
 						height: '100%',
 						overflow: 'hidden',
 					} }
-					spacing={ 10 * ratio }
-					justify="center"
 				>
-					<motion.div
+					<HStack
+						spacing={ 10 * ratio }
+						justify="center"
 						style={ {
-							fontFamily,
-							fontSize: 65 * ratio,
+							height: '100%',
+							overflow: 'hidden',
 						} }
-						variants={ label ? typographyVariants : {} }
-						transition={ { duration: 0.5 } }
 					>
-						Aa
-					</motion.div>
-					<motion.div
-						variants={ defaultColorVariants }
-						transition={ { duration: 0.5 } }
-					>
+						<div
+							style={ {
+								fontFamily: headingFontFamily,
+								fontSize: 65 * ratio,
+								color: headingColor,
+							} }
+						>
+							Aa
+						</div>
 						<VStack spacing={ 2 * ratio }>
+							{ highlightedColors.map( ( { color } ) => (
+								<div
+									key={ color }
+									style={ {
+										height: 30 * ratio,
+										width: 30 * ratio,
+										background: color,
+										borderRadius: 15 * ratio,
+									} }
+								/>
+							) ) }
+						</VStack>
+					</HStack>
+				</motion.div>
+				<motion.div
+					variants={ secondFrame }
+					style={ {
+						height: '100%',
+						overflow: 'hidden',
+					} }
+				>
+					<VStack
+						spacing={ 3 * ratio }
+						justify="center"
+						style={ {
+							height: '100%',
+							overflow: 'hidden',
+							padding: 10 * ratio,
+							boxSizing: 'border-box',
+						} }
+					>
+						{ label && (
 							<div
 								style={ {
-									height: 30 * ratio,
-									width: 30 * ratio,
-									background: textColor,
-									borderRadius: 15 * ratio,
+									fontSize: 35 * ratio,
+									fontFamily: headingFontFamily,
+									color: headingColor,
+									lineHeight: '1em',
 								} }
-							/>
+							>
+								{ label }
+							</div>
+						) }
+						<HStack spacing={ 2 * ratio } justify="flex-start">
 							<div
 								style={ {
-									height: 30 * ratio,
-									width: 30 * ratio,
-									background: linkColor,
-									borderRadius: 15 * ratio,
+									fontFamily,
+									fontSize: 24 * ratio,
+									color: textColor,
 								} }
-							/>
-						</VStack>
-					</motion.div>
-					<motion.div
-						variants={ paletteMotionVariants }
-						transition={ { duration: 0.5 } }
-					>
-						<VStack spacing={ 2 * ratio }>
-							{ themeColors
-								.concat( customColors )
-								.slice( 0, 4 )
-								.map( ( { color }, index ) => (
-									<div
-										key={ index }
-										style={ {
-											height: 30 * ratio,
-											width: 30 * ratio,
-											background: color,
-											borderRadius: 15 * ratio,
-										} }
-									/>
-								) ) }
-						</VStack>
-					</motion.div>
-				</HStack>
+							>
+								Aa
+							</div>
+							<div
+								style={ {
+									fontFamily,
+									fontSize: 24 * ratio,
+									color: linkColor,
+								} }
+							>
+								Aa
+							</div>
+						</HStack>
+						{ paletteColors && (
+							<HStack spacing={ 0 }>
+								{ paletteColors
+									.slice( 0, 4 )
+									.map( ( { color }, index ) => (
+										<div
+											key={ index }
+											style={ {
+												height: 10 * ratio,
+												width: 30 * ratio,
+												background: color,
+												flexGrow: 1,
+											} }
+										/>
+									) ) }
+							</HStack>
+						) }
+					</VStack>
+				</motion.div>
 			</motion.div>
 		</Iframe>
 	);
