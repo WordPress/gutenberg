@@ -21,11 +21,7 @@ describe( 'Comment Query Loop', () => {
 		defaultCommentsPage = await getOption( 'default_comments_page' );
 		await setOption( 'page_comments', true );
 		await setOption( 'comments_per_page', '1' );
-		await setOption(
-			'default_comments_page',
-			'newest',
-			'options-discussion.php'
-		);
+		await setOption( 'default_comments_page', 'newest' );
 	} );
 	beforeEach( async () => {
 		await createNewPost();
