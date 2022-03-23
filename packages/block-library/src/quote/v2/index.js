@@ -18,6 +18,9 @@ export { metadata, name };
 const settings = {
 	icon,
 	example: {
+		attributes: {
+			attribution: 'Julio Cortázar',
+		},
 		innerBlocks: [
 			{
 				name: 'core/paragraph',
