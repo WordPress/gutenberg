@@ -98,7 +98,7 @@ export function unpinItem( scope, itemId ) {
 export function toggleFeature( scope, featureName ) {
 	return function ( { registry } ) {
 		deprecated( `wp.dispatch( 'core/interface' ).toggleFeature`, {
-			version: '6.0',
+			since: '6.0',
 			alternative: `wp.dispatch( 'core/preferences' ).toggle`,
 		} );
 
@@ -119,7 +119,7 @@ export function toggleFeature( scope, featureName ) {
 export function setFeatureValue( scope, featureName, value ) {
 	return function ( { registry } ) {
 		deprecated( `wp.dispatch( 'core/interface' ).setFeatureValue`, {
-			version: '6.0',
+			since: '6.0',
 			alternative: `wp.dispatch( 'core/preferences' ).set`,
 		} );
 
@@ -140,7 +140,7 @@ export function setFeatureValue( scope, featureName, value ) {
 export function setFeatureDefaults( scope, defaults ) {
 	return function ( { registry } ) {
 		deprecated( `wp.dispatch( 'core/interface' ).setFeatureDefaults`, {
-			version: '6.0',
+			since: '6.0',
 			alternative: `wp.dispatch( 'core/preferences' ).setDefaults`,
 		} );
 
