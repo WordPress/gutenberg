@@ -17,7 +17,7 @@ describe( 'Comment Query Loop', () => {
 		previousDefaultCommentsPage;
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		previousPageComments = await setOption( 'page_comments', true );
+		previousPageComments = await setOption( 'page_comments', '1' );
 		previousCommentsPerPage = await setOption( 'comments_per_page', '1' );
 		previousDefaultCommentsPage = await setOption(
 			'default_comments_page',

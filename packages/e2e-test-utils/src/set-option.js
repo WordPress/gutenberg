@@ -19,15 +19,10 @@ export async function setOption( setting, value ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'options.php' );
 
-	let previousValue = await page.$eval(
+	const previousValue = await page.$eval(
 		`#${ setting }`,
 		( element ) => element.value
 	);
-
-	if ( typeof value === 'boolean' ) {
-		value = value ? '1' : '0';
-		previousValue = previousValue === '1';
-	}
 
 	await page.focus( `#${ setting }` );
 	await pressKeyWithModifier( 'primary', 'a' );
