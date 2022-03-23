@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `BaseControl`: Convert to TypeScript ([#39468](https://github.com/WordPress/gutenberg/pull/39468)).
+
 ## 19.7.0 (2022-03-23)
 
 ### Enhancements
