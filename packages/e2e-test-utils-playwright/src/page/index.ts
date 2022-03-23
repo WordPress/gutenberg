@@ -23,7 +23,7 @@ import { openGlobalBlockInserter } from './inserter/open-global-block-inserter';
 import { searchForBlock } from './inserter/search-for-block';
 import { toggleGlobalBlockInserter } from './inserter/toggle-global-block-inserter';
 import { waitForInserterCloseAndContentFocus } from './inserter/wait-for-inserter-close-and-focus-content';
-import { canvas } from './canva';
+import { canvas } from './canvas';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
 import { showBlockToolbar } from '../show-block-toolbar';
 import { getEditedPostContent } from './get-edited-post-content';
