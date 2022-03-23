@@ -13,13 +13,19 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Comment Query Loop', () => {
-	let defaultPageComments, defaultCommentsPerPage;
+	let defaultPageComments, defaultCommentsPerPage, defaultCommentsPage;
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
 		defaultPageComments = await getOption( 'page_comments' );
 		defaultCommentsPerPage = await getOption( 'comments_per_page' );
+		defaultCommentsPage = await getOption( 'default_comments_page' );
 		await setOption( 'page_comments', true, 'options-discussion.php' );
 		await setOption( 'comments_per_page', '1', 'options-discussion.php' );
+		await setOption(
+			'default_comments_page',
+			'newest',
+			'options-discussion.php'
+		);
 	} );
 	beforeEach( async () => {
 		await createNewPost();
@@ -88,6 +94,11 @@ describe( 'Comment Query Loop', () => {
 		await setOption(
 			'comments_per_page',
 			defaultCommentsPerPage,
+			'options-discussion.php'
+		);
+		await setOption(
+			'default_comments_page',
+			defaultCommentsPage,
 			'options-discussion.php'
 		);
 	} );

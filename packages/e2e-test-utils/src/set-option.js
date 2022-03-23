@@ -34,6 +34,8 @@ export async function setOption(
 		if ( ( value && ! isChecked ) || ( ! value && isChecked ) ) {
 			await page.click( `#${ setting }` );
 		}
+	} else if ( optionType === 'select-one' ) {
+		await page.select( `#${ setting }`, value );
 	} else {
 		// Update other options types.
 		await page.focus( `#${ setting }` );
