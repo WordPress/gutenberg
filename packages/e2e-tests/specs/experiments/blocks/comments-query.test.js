@@ -20,6 +20,8 @@ describe( 'Comment Query Loop', () => {
 		defaultCommentsPerPage = await getOption( 'comments_per_page' );
 		await setOption( 'page_comments', true, 'options-discussion.php' );
 		await setOption( 'comments_per_page', '1', 'options-discussion.php' );
+	} );
+	beforeEach( async () => {
 		await createNewPost();
 	} );
 	it( 'Pagination links are working as expected', async () => {
