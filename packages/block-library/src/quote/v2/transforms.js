@@ -11,12 +11,6 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
-			blocks: [ 'core/group' ],
-			transform: ( {}, innerBlocks ) =>
-				createBlock( 'core/quote', {}, innerBlocks ),
-		},
-		{
-			type: 'block',
 			blocks: [ 'core/pullquote' ],
 			transform: ( { value, citation } ) => {
 				return createBlock(
@@ -48,8 +42,29 @@ const transforms = {
 					createBlock( 'core/paragraph', { content } ),
 				] ),
 		},
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			transform: ( {}, innerBlocks ) =>
+				createBlock( 'core/quote', {}, innerBlocks ),
+		},
 	],
 	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/pullquote' ],
+			isMatch: ( attributes, block ) => {
+				return block.innerBlocks.every(
+					( { name } ) => name === 'core/paragraph'
+				);
+			},
+			transform: ( { attribution }, innerBlocks ) => {
+				return createBlock( 'core/pullquote', {
+					value: serialize( innerBlocks ),
+					citation: attribution,
+				} );
+			},
+		},
 		{
 			type: 'block',
 			blocks: [ 'core/group' ],
@@ -66,21 +81,6 @@ const transforms = {
 						  ]
 						: innerBlocks
 				),
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/pullquote' ],
-			isMatch: ( attributes, block ) => {
-				return block.innerBlocks.every(
-					( { name } ) => name === 'core/paragraph'
-				);
-			},
-			transform: ( { attribution }, innerBlocks ) => {
-				return createBlock( 'core/pullquote', {
-					value: serialize( innerBlocks ),
-					citation: attribution,
-				} );
-			},
 		},
 	],
 };
