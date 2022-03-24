@@ -15,6 +15,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import {
 	Icon,
+	plus,
 	plusCircle,
 	plusCircleFilled,
 	insertAfter,
@@ -43,11 +44,18 @@ const defaultRenderToggle = ( {
 		title={ _x( 'Add block', 'Generic label for block inserter button' ) }
 		icon={
 			<Icon
-				icon={ plusCircleFilled }
-				style={ style }
+				icon={ isDefaultView ? plus : plusCircleFilled }
+				style={
+					isDefaultView
+						? styles[
+								'inserter-menu__add-block-button-icon-default'
+						  ]
+						: style
+				}
 				color={ style.color }
 			/>
 		}
+		iconSize={ isDefaultView ? 22 : 24 }
 		onClick={ onToggle }
 		extraProps={ {
 			hint: __( 'Double tap to add a block' ),
@@ -57,6 +65,10 @@ const defaultRenderToggle = ( {
 			onLongPress,
 		} }
 		isDisabled={ disabled }
+		customContainerStyles={
+			isDefaultView && styles[ 'inserter-menu__add-block-button' ]
+		}
+		fixedRatio={ ! isDefaultView }
 	>
 		{ isDefaultView && (
 			<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
