@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [**] Update "add block" button that's shown in default editor view.
+
 ## 1.72.0
 
 -   [*] Add GIF badge for animated GIFs uploaded to Image blocks [#38996]
