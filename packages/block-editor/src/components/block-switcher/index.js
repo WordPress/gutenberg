@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, uniq } from 'lodash';
+import { uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -174,7 +174,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds } ) => {
 								/>
 								{ clientIds.length === 1 && (
 									<BlockStylesMenu
-										hoveredBlock={ clientIds[ 0 ] }
+										hoveredBlockClientId={ clientIds[ 0 ] }
 										onSwitch={ onClose }
 									/>
 								) }
@@ -192,7 +192,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 		return null;
 	}
 
-	return <BlockSwitcherDropdownMenu clientIds={ castArray( clientIds ) } />;
+	return <BlockSwitcherDropdownMenu clientIds={ clientIds } />;
 };
 
 export default BlockSwitcher;
