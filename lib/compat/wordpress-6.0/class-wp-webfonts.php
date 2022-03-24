@@ -130,16 +130,28 @@ class WP_Webfonts {
 	public function enqueue_webfont( $webfont ) {
 		$slug = $this->get_font_slug( $webfont );
 
-		if ( isset( $this->enqueued_webfonts[ $slug ] ) ) {
-			trigger_error(
-				sprintf(
-					/* translators: %s unique slug to identify the webfont */
-					__( 'The "%s" font family is already enqueued.', 'gutenberg' ),
-					$slug
-				)
-			);
+		if ( ! isset( $this->enqueued_webfonts[ $slug ] ) ) {
+			$this->enqueued_webfonts[ $slug ] = array();
+		}
 
-			return false;
+		if ( isset( $this->enqueued_webfonts[ $slug ] ) ) {
+			$enqueued_font_faces = $this->enqueued_webfonts[ $slug ];
+			foreach ( $enqueued_font_faces as $enqueued_font_face ) {
+				if (
+					$enqueued_font_face['font-style'] === $webfont['font-style'] &&
+					$enqueued_font_face['font-display'] === $webfont['font-display']
+				) {
+					trigger_error(
+						sprintf(
+							/* translators: %s unique slug to identify the webfont */
+							__( 'The "%s" font family is already enqueued.', 'gutenberg' ),
+							$slug
+						)
+					);
+
+					return false;
+				}
+			}
 		}
 
 		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
@@ -151,8 +163,26 @@ class WP_Webfonts {
 			$this->register_webfont( $webfont );
 		}
 
-		$this->enqueued_webfonts[ $slug ] = $this->registered_webfonts[ $slug ];
-		unset( $this->registered_webfonts[ $slug ] );
+		$this->enqueued_webfonts[ $slug ][] = $webfont;
+
+		// Finds any registered font faces that match the enqueued font faces
+		// and removes it from the registered webfonts registry.
+		$this->registered_webfonts[ $slug ] = array_filter(
+			$this->registered_webfonts[ $slug ],
+			function ( $registered_webfont ) use ( $webfont ) {
+				if (
+					$registered_webfont['font-style'] === $webfont['font-style'] &&
+					$registered_webfont['font-display'] === $webfont['font-display']
+				) {
+					return false;
+				}
+				return true;
+			}
+		);
+
+		if ( empty( $this->registered_webfonts[ $slug ] ) ) {
+			unset( $this->registered_webfonts[ $slug ] );
+		}
 	}
 
 	/**
