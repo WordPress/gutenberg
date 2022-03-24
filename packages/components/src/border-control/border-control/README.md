@@ -43,6 +43,11 @@ const MyBorderControl = () => {
 };
 ```
 
+To [ensure `ToolTip` positioning](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/README.md#popovers-and-tooltips)
+for the `BorderControl`'s color swatches, render your `BorderControl` with a
+`Popover.Slot` further up the element tree and within a
+`SlotFillProvider` overall.
+
 ## Props
 
 ### `colors`: `Array`
