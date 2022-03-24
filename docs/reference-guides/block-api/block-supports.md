@@ -524,7 +524,7 @@ supports: {
 -   Type: `boolean`
 -   Default value: `true`
 
-A block may want to disable the ability to toggle the lock state. A lock state can be changed from the block "Options" dropdown by default. To disable this behavior, set `lock` to `false`.
+A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block "Options" dropdown by default. To disable this behavior, set `lock` to `false`.
 
 ```js
 supports: {
