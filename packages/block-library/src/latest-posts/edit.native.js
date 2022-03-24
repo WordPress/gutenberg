@@ -11,10 +11,14 @@ import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { postList as icon } from '@wordpress/icons';
 import {
-	InspectorControls,
-} from '@wordpress/block-editor';
+	postList as icon,
+	alignNone,
+	positionCenter,
+	positionLeft,
+	positionRight,
+} from '@wordpress/icons';
+import { InspectorControls } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import {
 	Icon,
@@ -22,6 +26,7 @@ import {
 	ToggleControl,
 	RangeControl,
 	QueryControls,
+	BottomSheetSelectControl,
 } from '@wordpress/components';
 import { store as blocksStore } from '@wordpress/blocks';
 
@@ -46,6 +51,9 @@ class LatestPostsEdit extends Component {
 		this.onSetExcerptLength = this.onSetExcerptLength.bind( this );
 		this.onSetDisplayPostDate = this.onSetDisplayPostDate.bind( this );
 		this.onSetDisplayFeaturedImage = this.onSetDisplayFeaturedImage.bind(
+			this
+		);
+		this.onSetFeaturedImageAlign = this.onSetFeaturedImageAlign.bind(
 			this
 		);
 		this.onSetAddLinkToFeaturedImage = this.onSetAddLinkToFeaturedImage.bind(
@@ -113,6 +121,11 @@ class LatestPostsEdit extends Component {
 		setAttributes( { addLinkToFeaturedImage: value } );
 	}
 
+	onSetFeaturedImageAlign( value ) {
+		const { setAttributes } = this.props;
+		setAttributes( { featuredImageAlign: value } );
+	}
+
 	onSetOrder( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { order: value } );
@@ -143,6 +156,7 @@ class LatestPostsEdit extends Component {
 			excerptLength,
 			displayPostDate,
 			displayFeaturedImage,
+			featuredImageAlign,
 			addLinkToFeaturedImage,
 			order,
 			orderBy,
@@ -152,6 +166,17 @@ class LatestPostsEdit extends Component {
 
 		const { categoriesList } = this.state;
 		const displayExcerptPostContent = displayPostContentRadio === 'excerpt';
+
+		const BLOCK_ALIGNMENTS_CONTROLS = [
+			{ value: undefined, label: __( 'None' ), icon: alignNone },
+			{ value: 'left', label: __( 'Align left' ), icon: positionLeft },
+			{
+				value: 'center',
+				label: __( 'Align center' ),
+				icon: positionCenter,
+			},
+			{ value: 'right', label: __( 'Align right' ), icon: positionRight },
+		];
 
 		return (
 			<InspectorControls>
@@ -195,6 +220,12 @@ class LatestPostsEdit extends Component {
 					/>
 					{ displayFeaturedImage && (
 						<>
+							<BottomSheetSelectControl
+								label={ __( 'Image alignment' ) }
+								options={ BLOCK_ALIGNMENTS_CONTROLS }
+								onChange={ this.onSetFeaturedImageAlign }
+								value={ featuredImageAlign }
+							/>
 							<ToggleControl
 								label={ __( 'Add link to featured image' ) }
 								checked={ addLinkToFeaturedImage }
