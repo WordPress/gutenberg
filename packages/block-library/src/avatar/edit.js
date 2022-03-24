@@ -18,6 +18,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
+import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -85,6 +86,12 @@ const ResizableAvatar = ( {
 	isSelected,
 } ) => {
 	const borderProps = useBorderProps( attributes );
+	const doubledSizedSrc = addQueryArgs(
+		removeQueryArgs( avatar?.src, [ 's' ] ),
+		{
+			s: attributes?.size * 2,
+		}
+	);
 	return (
 		<div { ...blockProps }>
 			<ResizableBox
@@ -112,7 +119,7 @@ const ResizableAvatar = ( {
 				maxWidth={ avatar.maxSize }
 			>
 				<img
-					src={ avatar.src }
+					src={ doubledSizedSrc }
 					alt={ avatar.alt }
 					{ ...borderProps }
 					className={ classnames(
