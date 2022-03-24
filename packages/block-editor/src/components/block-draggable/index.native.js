@@ -102,6 +102,9 @@ const BlockDraggableWrapper = ( { children } ) => {
 					duration: SCROLL_ANIMATION_DURATION,
 				} );
 			}
+		} else {
+			// We stop dragging If no block is found.
+			runOnUI( stopDragging )();
 		}
 	};
 
