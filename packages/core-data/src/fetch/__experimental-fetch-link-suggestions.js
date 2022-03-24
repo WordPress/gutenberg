@@ -153,7 +153,7 @@ const fetchLinkSuggestions = async (
 		);
 	}
 
-	if ( ! type || type === 'media' ) {
+	if ( ! type || type === 'attachment' ) {
 		queries.push(
 			apiFetch( {
 				path: addQueryArgs( '/wp/v2/media', {
