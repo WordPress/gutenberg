@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { AccessibilityInfo, Platform } from 'react-native';
+import { AccessibilityInfo, Platform, Text } from 'react-native';
 import { delay } from 'lodash';
 
 /**
@@ -51,7 +51,11 @@ const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 			onLongPress,
 		} }
 		isDisabled={ disabled }
-	/>
+	>
+			<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
+				{ __( 'Add content' ) }
+			</Text>
+	</ToolbarButton>
 );
 
 export class Inserter extends Component {
