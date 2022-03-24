@@ -22,22 +22,31 @@ import { useGlobalStylesOutput } from './use-global-styles-output';
 const firstFrame = {
 	start: {
 		opacity: 1,
-		display: 'block',
+		transition: { delay: 0.5 },
 	},
 	hover: {
 		opacity: 0,
-		display: 'none',
+	},
+};
+
+const midFrame = {
+	hover: {
+		x: [ '100%', '-100%', '-100%' ],
+		transition: { type: 'spring', duration: 1, delay: 0.2 },
+	},
+	start: {
+		x: '100%',
+		transition: { type: 'spring', duration: 1, delay: 0.2 },
 	},
 };
 
 const secondFrame = {
 	hover: {
 		opacity: 1,
-		display: 'block',
+		transition: { delay: 0.6 },
 	},
 	start: {
 		opacity: 0,
-		display: 'none',
 	},
 };
 
@@ -57,7 +66,6 @@ const StylesPreview = ( { label, isFocused } ) => {
 	);
 	const [ textColor = 'black' ] = useStyle( 'color.text' );
 	const [ headingColor = textColor ] = useStyle( 'elements.h1.color.text' );
-	const [ linkColor = 'blue' ] = useStyle( 'elements.link.color.text' );
 	const [ backgroundColor = 'white' ] = useStyle( 'color.background' );
 	const [ gradientValue ] = useStyle( 'color.gradient' );
 	const [ styles ] = useGlobalStylesOutput();
@@ -167,10 +175,49 @@ const StylesPreview = ( { label, isFocused } ) => {
 					</HStack>
 				</motion.div>
 				<motion.div
+					variants={ midFrame }
+					style={ {
+						height: '100%',
+						width: '100%',
+						position: 'absolute',
+						top: 0,
+					} }
+				>
+					<HStack
+						spacing={ 0 }
+						justify="flex-start"
+						style={ {
+							height: '100%',
+							overflow: 'hidden',
+						} }
+					>
+						{ paletteColors
+							.slice( 0, 4 )
+							.map( ( { color }, index ) => (
+								<div
+									key={ index }
+									style={ {
+										height: '100%',
+										width:
+											( index === 0 && 100 * ratio ) ||
+											( index === 1 && 20 * ratio ) ||
+											( index === 2 && 30 * ratio ) ||
+											60 * ratio,
+										background: color,
+										flexGrow: 1,
+									} }
+								/>
+							) ) }
+					</HStack>
+				</motion.div>
+				<motion.div
 					variants={ secondFrame }
 					style={ {
 						height: '100%',
+						width: '100%',
 						overflow: 'hidden',
+						position: 'absolute',
+						top: 0,
 					} }
 				>
 					<VStack
@@ -186,7 +233,7 @@ const StylesPreview = ( { label, isFocused } ) => {
 						{ label && (
 							<div
 								style={ {
-									fontSize: 35 * ratio,
+									fontSize: 40 * ratio,
 									fontFamily: headingFontFamily,
 									color: headingColor,
 									fontWeight: headingFontWeight,
@@ -196,26 +243,6 @@ const StylesPreview = ( { label, isFocused } ) => {
 								{ label }
 							</div>
 						) }
-						<HStack spacing={ 2 * ratio } justify="flex-start">
-							<div
-								style={ {
-									fontFamily,
-									fontSize: 24 * ratio,
-									color: textColor,
-								} }
-							>
-								Aa
-							</div>
-							<div
-								style={ {
-									fontFamily,
-									fontSize: 24 * ratio,
-									color: linkColor,
-								} }
-							>
-								Aa
-							</div>
-						</HStack>
 						{ paletteColors && (
 							<HStack spacing={ 0 }>
 								{ paletteColors
