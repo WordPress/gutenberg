@@ -341,7 +341,7 @@ export function getCommentDelimitedContent(
  * serialized attributes and content form from the current state of the block.
  *
  * @param {WPBlock}                      block   Block instance.
- * @param {WPBlockSerializationOptions} options Serialization options.
+ * @param {WPBlockSerializationOptions}  options Serialization options.
  *
  * @return {string} Serialized block.
  */

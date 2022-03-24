@@ -324,7 +324,7 @@ describe( 'block serializer', () => {
 					attrs: {},
 					innerHTML: '<p>Not a quote</p>',
 					innerBlocks: [],
-					innerContent: ['<p>Not a quote</p>'],
+					innerContent: [ '<p>Not a quote</p>' ],
 				},
 			};
 
