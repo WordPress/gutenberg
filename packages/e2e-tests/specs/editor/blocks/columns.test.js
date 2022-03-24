@@ -7,13 +7,8 @@ import {
 	insertBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
-
-async function getListViewBlocks( blockLabel ) {
-	return page.$x(
-		`//table[contains(@aria-label,'Block navigation structure')]//a[span[text()='${ blockLabel }']]`
-	);
-}
 
 describe( 'Columns', () => {
 	beforeEach( async () => {

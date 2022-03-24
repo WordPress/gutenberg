@@ -15,6 +15,7 @@ import {
 	createNewPost,
 	clickButton,
 	openListView,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -36,12 +37,6 @@ async function upload( selector ) {
 		`.wp-block-gallery img[src$="${ filename }.png"]`
 	);
 	return filename;
-}
-
-async function getListViewBlocks( blockLabel ) {
-	return page.$x(
-		`//table[contains(@aria-label,'Block navigation structure')]//a[span[text()='${ blockLabel }']]`
-	);
 }
 
 describe( 'Gallery', () => {

@@ -8,6 +8,7 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	openDocumentSettingsSidebar,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 
 async function openListViewSidebar() {
@@ -28,12 +29,6 @@ async function tabToColumnsControl() {
 			);
 		} );
 	} while ( ! isColumnsControl );
-}
-
-async function getListViewBlocks( blockLabel ) {
-	return page.$x(
-		`//table[contains(@aria-label,'Block navigation structure')]//a[span[text()='${ blockLabel }']]`
-	);
 }
 
 describe( 'Navigating the block hierarchy', () => {
