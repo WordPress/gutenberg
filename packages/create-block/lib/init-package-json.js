@@ -22,6 +22,7 @@ module.exports = async ( {
 	wpEnv,
 	wpScripts,
 	npmDependencies,
+	npmDevDependencies,
 	customScripts,
 } ) => {
 	const cwd = join( process.cwd(), slug );
@@ -58,29 +59,61 @@ module.exports = async ( {
 		)
 	);
 
-	if ( wpScripts && size( npmDependencies ) ) {
+	/**
+	 * Helper to determine if we can install this package.
+	 *
+	 * @param {string} packageArg The package to install.
+	 */
+	function checkDependency( packageArg ) {
+		const { type } = npmPackageArg( packageArg );
+		if (
+			! [ 'git', 'tag', 'version', 'range', 'remote' ].includes( type )
+		) {
+			throw new Error(
+				`Provided package type "${ type }" is not supported.`
+			);
+		}
+	}
+
+	if (
+		wpScripts &&
+		( size( npmDependencies ) || size( npmDevDependencies ) )
+	) {
 		info( '' );
 		info(
 			'Installing npm dependencies. It might take a couple of minutes...'
 		);
 		for ( const packageArg of npmDependencies ) {
 			try {
-				const { type } = npmPackageArg( packageArg );
-				if (
-					! [ 'git', 'tag', 'version', 'range', 'remote' ].includes(
-						type
-					)
-				) {
-					throw new Error(
-						`Provided package type "${ type }" is not supported.`
-					);
-				}
+				checkDependency( packageArg );
+				info( '' );
+				info( `Installing "${ packageArg }".` );
 				await command( `npm install ${ packageArg }`, {
 					cwd,
 				} );
 			} catch ( { message } ) {
 				info( '' );
 				info( `Skipping "${ packageArg }" npm dependency. Reason:` );
+				error( message );
+			}
+		}
+		info( '' );
+		info(
+			'Installing npm devDependencies. It might take a couple of minutes...'
+		);
+		for ( const packageArg of npmDevDependencies ) {
+			try {
+				checkDependency( packageArg );
+				info( '' );
+				info( `Installing "${ packageArg }".` );
+				await command( `npm install ${ packageArg } --save-dev`, {
+					cwd,
+				} );
+			} catch ( { message } ) {
+				info( '' );
+				info(
+					`Skipping "${ packageArg }" npm dev dependency. Reason:`
+				);
 				error( message );
 			}
 		}
