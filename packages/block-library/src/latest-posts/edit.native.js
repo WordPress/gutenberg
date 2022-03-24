@@ -11,13 +11,7 @@ import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import {
-	postList as icon,
-	alignNone,
-	positionCenter,
-	positionLeft,
-	positionRight,
-} from '@wordpress/icons';
+import { postList as icon } from '@wordpress/icons';
 import { InspectorControls } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import {
@@ -34,7 +28,11 @@ import { store as blocksStore } from '@wordpress/blocks';
  * Internal dependencies
  */
 import styles from './style.scss';
-import { MIN_EXCERPT_LENGTH, MAX_EXCERPT_LENGTH } from './constants';
+import {
+	MIN_EXCERPT_LENGTH,
+	MAX_EXCERPT_LENGTH,
+	BLOCK_ALIGNMENTS_CONTROLS,
+} from './constants';
 
 class LatestPostsEdit extends Component {
 	constructor() {
@@ -166,17 +164,6 @@ class LatestPostsEdit extends Component {
 
 		const { categoriesList } = this.state;
 		const displayExcerptPostContent = displayPostContentRadio === 'excerpt';
-
-		const BLOCK_ALIGNMENTS_CONTROLS = [
-			{ value: undefined, label: __( 'None' ), icon: alignNone },
-			{ value: 'left', label: __( 'Align left' ), icon: positionLeft },
-			{
-				value: 'center',
-				label: __( 'Align center' ),
-				icon: positionCenter,
-			},
-			{ value: 'right', label: __( 'Align right' ), icon: positionRight },
-		];
 
 		return (
 			<InspectorControls>
