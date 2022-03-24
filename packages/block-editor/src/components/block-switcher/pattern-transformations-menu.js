@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { chevronRight } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 
 import {
 	MenuGroup,
@@ -19,15 +20,31 @@ import {
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../store';
 import BlockPreview from '../block-preview';
 import useTransformedPatterns from './use-transformed-patterns';
 
-function PatternTransformationsMenu( {
-	blocks,
-	patterns: statePatterns,
-	onSelect,
-} ) {
+function PatternTransformationsMenu( { clientIds, onSelect } ) {
 	const [ showTransforms, setShowTransforms ] = useState( false );
+	const { blocks, statePatterns } = useSelect(
+		( select ) => {
+			const {
+				getBlocksByClientId,
+				__experimentalGetPatternTransformItems,
+				getBlockRootClientId,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+
+			return {
+				blocks: getBlocksByClientId( clientIds ),
+				patterns: __experimentalGetPatternTransformItems(
+					clientIds,
+					rootClientId
+				),
+			};
+		},
+		[ clientIds ]
+	);
 	const patterns = useTransformedPatterns( statePatterns, blocks );
 	if ( ! patterns.length ) return null;
 

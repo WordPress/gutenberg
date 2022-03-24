@@ -8,23 +8,45 @@ import {
 	switchToBlockType,
 } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
 
-const BlockTransformationsMenu = ( {
-	className,
-	possibleBlockTransformations,
-	onSelect,
-	blocks,
-} ) => {
+const BlockTransformationsMenu = ( { className, onSelect, clientIds } ) => {
 	const [
 		hoveredTransformItemName,
 		setHoveredTransformItemName,
 	] = useState();
+	const { blocks, transformations } = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockTransformItems,
+				getBlocksByClientId,
+			} = select( blockEditorStore );
+
+			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+			const _blocks = getBlocksByClientId( clientIds );
+			return {
+				blocks: _blocks,
+				transformations: getBlockTransformItems(
+					_blocks,
+					rootClientId
+				),
+			};
+		},
+		[ clientIds ]
+	);
+
+	if ( ! transformations.length ) {
+		return null;
+	}
+
 	return (
 		<MenuGroup label={ __( 'Transform to' ) } className={ className }>
 			{ hoveredTransformItemName && (
@@ -35,7 +57,7 @@ const BlockTransformationsMenu = ( {
 					) }
 				/>
 			) }
-			{ possibleBlockTransformations.map( ( item ) => {
+			{ transformations.map( ( item ) => {
 				const { name, icon, title, isDisabled } = item;
 				return (
 					<MenuItem

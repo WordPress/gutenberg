@@ -2050,8 +2050,8 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
  * @return {WPBlockPattern[]} Items that are eligible for a pattern transformation.
  */
 export const __experimentalGetPatternTransformItems = createSelector(
-	( state, blocks, rootClientId = null ) => {
-		if ( ! blocks ) return EMPTY_ARRAY;
+	( state, clientIds, rootClientId = null ) => {
+		if ( ! clientIds ) return EMPTY_ARRAY;
 		/**
 		 * For now we only handle blocks without InnerBlocks and take into account
 		 * the `__experimentalRole` property of blocks' attributes for the transformation.
@@ -2060,9 +2060,9 @@ export const __experimentalGetPatternTransformItems = createSelector(
 		 * to check for this case too.
 		 */
 		if (
-			blocks.some(
-				( { clientId, innerBlocks } ) =>
-					innerBlocks.length ||
+			clientIds.some(
+				( clientId ) =>
+					getBlock( state, clientId )?.innerBlocks?.length ||
 					areInnerBlocksControlled( state, clientId )
 			)
 		) {
@@ -2071,7 +2071,9 @@ export const __experimentalGetPatternTransformItems = createSelector(
 
 		// Create a Set of the selected block names that is used in patterns filtering.
 		const selectedBlockNames = Array.from(
-			new Set( blocks.map( ( { name } ) => name ) )
+			new Set(
+				clientIds.map( ( clientId ) => getBlockName( state, clientId ) )
+			)
 		);
 		/**
 		 * Here we will return first set of possible eligible block patterns,

@@ -95,7 +95,7 @@ export const getPatternTransformedBlocks = (
 const useTransformedPatterns = ( patterns, selectedBlocks ) => {
 	return useMemo(
 		() =>
-			patterns.reduce( ( accumulator, _pattern ) => {
+			( patterns ?? [] ).reduce( ( accumulator, _pattern ) => {
 				const transformedBlocks = getPatternTransformedBlocks(
 					selectedBlocks,
 					_pattern.blocks
