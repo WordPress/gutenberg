@@ -3,7 +3,6 @@
  */
 import Animated, {
 	interpolate,
-	measure,
 	runOnJS,
 	runOnUI,
 	useAnimatedRef,
@@ -48,8 +47,6 @@ const BlockDraggableWrapper = ( { children } ) => {
 	animatedScrollRef( scrollRef );
 
 	const scroll = {
-		x: useSharedValue( 0 ),
-		y: useSharedValue( 0 ),
 		offsetY: useSharedValue( 0 ),
 	};
 	const chip = {
@@ -123,16 +120,9 @@ const BlockDraggableWrapper = ( { children } ) => {
 		chip.height.value = layout.height;
 	};
 
-	const startDragging = ( { absoluteX, absoluteY } ) => {
+	const startDragging = ( { x, y } ) => {
 		'worklet';
-		const scrollLayout = measure( animatedScrollRef );
-		scroll.x.value = scrollLayout.pageX;
-		scroll.y.value = scrollLayout.pageY;
-
-		const dragPosition = {
-			x: absoluteX - scroll.x.value,
-			y: absoluteY - scroll.y.value,
-		};
+		const dragPosition = { x, y };
 		chip.x.value = dragPosition.x;
 		chip.y.value = dragPosition.y;
 
@@ -142,13 +132,9 @@ const BlockDraggableWrapper = ( { children } ) => {
 		runOnJS( setupDraggingBlock )( dragPosition );
 	};
 
-	const updateDragging = ( { absoluteX, absoluteY } ) => {
+	const updateDragging = ( { x, y } ) => {
 		'worklet';
-		const dragPosition = {
-			x: absoluteX - scroll.x.value,
-			y: absoluteY - scroll.y.value,
-		};
-
+		const dragPosition = { x, y };
 		chip.x.value = dragPosition.x;
 		chip.y.value = dragPosition.y;
 	};
