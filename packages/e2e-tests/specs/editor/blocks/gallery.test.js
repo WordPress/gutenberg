@@ -15,6 +15,7 @@ import {
 	createNewPost,
 	clickButton,
 	openListView,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -63,9 +64,8 @@ describe( 'Gallery', () => {
 		// The Gallery needs to be selected from the List view panel due to the
 		// way that Image uploads take and lose focus.
 		await openListView();
-		const galleryListLink = await page.waitForXPath(
-			`//a[contains(text(), 'Gallery')]`
-		);
+
+		const galleryListLink = ( await getListViewBlocks( 'Gallery' ) )[ 0 ];
 		await galleryListLink.click();
 
 		await page.click( '.wp-block-gallery .blocks-gallery-caption' );
@@ -99,14 +99,16 @@ describe( 'Gallery', () => {
 		// way that Image uploads take and lose focus.
 		await openListView();
 
-		const galleryListViewItem = await page.waitForXPath(
-			`//a[contains(text(), 'Gallery')]/span[contains(@class, 'block-editor-list-view__expander')]`
+		// Due to collapsed state of ListView nodes Gallery must be expanded to reveal the child blocks.
+		// This xpath selects the anchor node for the block which has a child span which contains the text
+		// label of the block and then selects the expander span for that node.
+		const galleryExpander = await page.waitForXPath(
+			`//a[span[text()='Gallery']]/span[contains(@class, 'block-editor-list-view__expander')]`
 		);
-		await galleryListViewItem.click();
 
-		const imageListLink = await page.waitForXPath(
-			`//a[contains(text(), 'Image')]`
-		);
+		await galleryExpander.click();
+
+		const imageListLink = ( await getListViewBlocks( 'Image' ) )[ 0 ];
 		await imageListLink.click();
 
 		const captionElement = await figureElement.$(
