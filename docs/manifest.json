@@ -612,6 +612,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BorderControl",
+		"slug": "border-control",
+		"markdown_source": "../packages/components/src/border-control/border-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "BoxControl",
 		"slug": "box-control",
 		"markdown_source": "../packages/components/src/box-control/README.md",
