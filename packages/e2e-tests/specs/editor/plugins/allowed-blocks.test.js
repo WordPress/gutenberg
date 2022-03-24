@@ -47,7 +47,7 @@ describe( 'Allowed Blocks Filter', () => {
 		await blocksTab.click();
 
 		const BLOCK_LABEL_SELECTOR =
-			'.edit-post-block-manager__checklist-item .components-checkbox-control__label';
+			'.block-editor-block-manager__checklist-item .components-checkbox-control__label';
 		await page.waitForSelector( BLOCK_LABEL_SELECTOR );
 		const blocks = await page.evaluate( ( selector ) => {
 			return Array.from( document.querySelectorAll( selector ) )
