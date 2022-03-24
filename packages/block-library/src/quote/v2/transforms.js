@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, serialize } from '@wordpress/blocks';
+import {
+	createBlock,
+	parseWithAttributeSchema,
+	serialize,
+} from '@wordpress/blocks';
 
 const transforms = {
 	from: [
@@ -10,6 +14,31 @@ const transforms = {
 			blocks: [ 'core/group' ],
 			transform: ( {}, innerBlocks ) =>
 				createBlock( 'core/quote', {}, innerBlocks ),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/pullquote' ],
+			transform: ( { value, citation } ) => {
+				return createBlock(
+					'core/quote',
+					{
+						attribution: citation,
+					},
+					parseWithAttributeSchema( value, {
+						type: 'array',
+						source: 'query',
+						selector: 'p',
+						query: {
+							content: {
+								type: 'string',
+								source: 'text',
+							},
+						},
+					} ).map( ( { content } ) =>
+						createBlock( 'core/paragraph', { content } )
+					)
+				);
+			},
 		},
 	],
 	to: [
