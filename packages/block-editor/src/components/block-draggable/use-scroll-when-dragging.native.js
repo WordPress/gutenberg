@@ -49,6 +49,8 @@ export default function useScrollWhenDragging() {
 
 	const stopScrolling = () => {
 		'worklet';
+		cancelAnimation( animationTimer );
+
 		isAnimationTimerActive.value = false;
 		isScrollActive.value = false;
 		velocityY.value = 0;
@@ -96,6 +98,10 @@ export default function useScrollWhenDragging() {
 	useAnimatedReaction(
 		() => animationTimer.value,
 		( value, previous ) => {
+			if ( velocityY.value === 0 ) {
+				return;
+			}
+
 			const delta = Math.abs( value - previous );
 			let newOffset = offsetY.value + delta * velocityY.value;
 
@@ -110,13 +116,9 @@ export default function useScrollWhenDragging() {
 				// new offset value.
 				newOffset = Math.max( 0, newOffset );
 			}
-			offsetY.value = newOffset;
 
-			if ( velocityY.value !== 0 ) {
-				scrollTo( animatedScrollRef, 0, offsetY.value, false );
-			} else if ( ! isAnimationTimerActive.value ) {
-				cancelAnimation( animationTimer );
-			}
+			offsetY.value = newOffset;
+			scrollTo( animatedScrollRef, 0, offsetY.value, false );
 		}
 	);
 
