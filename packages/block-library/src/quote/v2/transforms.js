@@ -4,6 +4,7 @@
 import {
 	createBlock,
 	parseWithAttributeSchema,
+	rawHandler,
 	serialize,
 } from '@wordpress/blocks';
 
@@ -41,6 +42,38 @@ const transforms = {
 				createBlock( 'core/quote', {}, [
 					createBlock( 'core/paragraph', { content } ),
 				] ),
+		},
+		{
+			type: 'raw',
+			schema: ( { phrasingContentSchema } ) => ( {
+				figure: {
+					require: [ 'blockquote' ],
+					children: {
+						blockquote: {
+							children: '*',
+						},
+						figcaption: {
+							children: phrasingContentSchema,
+						},
+					},
+				},
+			} ),
+			isMatch: ( node ) =>
+				node.nodeName === 'FIGURE' &&
+				!! node.querySelector( 'blockquote' ),
+			transform: ( node ) => {
+				return createBlock(
+					'core/quote',
+					{
+						attribution: node.querySelector( 'figcaption' )
+							?.innerHTML,
+					},
+					rawHandler( {
+						HTML: node.querySelector( 'blockquote' ).innerHTML,
+						mode: 'BLOCKS',
+					} )
+				);
+			},
 		},
 		{
 			type: 'block',
