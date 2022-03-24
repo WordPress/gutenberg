@@ -235,7 +235,7 @@ function gutenberg_apply_layout_support( $block_type, $block_attributes ) {
 		$classes[] = 'has-layout-vertical';
 		// Space-between doesn't work on vertical layouts so use default.
 		if ( $justify_content === 'space-between') {
-			$classes[] = 'has-layout-vertical-left'
+			$classes[] = 'has-layout-vertical-left';
 		} else {
 			$classes[] = sprintf( 'has-layout-vertical-%s', _wp_to_kebab_case( $justify_content ) );
 		}
