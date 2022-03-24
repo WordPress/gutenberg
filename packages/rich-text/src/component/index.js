@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
+import { useRef, useLayoutEffect } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 
@@ -38,7 +38,6 @@ export function useRichText( {
 	__unstableAddInvisibleFormats,
 } ) {
 	const registry = useRegistry();
-	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const ref = useRef();
 
 	function createRecord() {
@@ -165,7 +164,6 @@ export function useRichText( {
 				__unstableText: text,
 			} );
 		} );
-		forceRender();
 	}
 
 	function handleChangesUponInit( newRecord ) {
@@ -190,7 +188,6 @@ export function useRichText( {
 				__unstableText: text,
 			} );
 		} );
-		forceRender();
 	}
 
 	function applyFromProps() {
@@ -204,7 +201,6 @@ export function useRichText( {
 	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
-			forceRender();
 		}
 	}, [ value ] );
 
