@@ -12,7 +12,10 @@ import { isCurrentURL } from './is-current-url';
 import { visitAdminPage } from './visit-admin-page';
 import { openGlobalBlockInserter } from './inserter/open-global-block-inserter';
 import { searchForBlock } from './inserter/search-for-block';
+import { isGlobalInserterOpen } from './inserter/is-global-inserter-open';
 import { toggleGlobalBlockInserter } from './inserter/toggle-global-block-inserter';
+import { clickOnMoreMenuItem } from './click-on-more-menu-item';
+import { toggleMoreMenu } from './toggle-more-menu';
 class PageUtils {
 	browser: Browser;
 	page: Page;
@@ -30,7 +33,10 @@ class PageUtils {
 	visitAdminPage = visitAdminPage;
 	openGlobalBlockInserter = openGlobalBlockInserter;
 	searchForBlock = searchForBlock;
+	isGlobalInserterOpen = isGlobalInserterOpen;
 	toggleGlobalBlockInserter = toggleGlobalBlockInserter;
+	clickOnMoreMenuItem = clickOnMoreMenuItem;
+	toggleMoreMenu = toggleMoreMenu;
 }
 
 export { PageUtils };
