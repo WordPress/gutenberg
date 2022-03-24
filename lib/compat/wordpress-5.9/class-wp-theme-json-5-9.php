@@ -157,6 +157,66 @@ class WP_Theme_JSON_5_9 {
 			'classes'             => array( '.has-$slug-font-family' => 'font-family' ),
 			'properties'          => array( 'font-family' ),
 		),
+		array(
+			'path'                => array( 'layout', 'flex' ),
+			'prevent_override'    => false,
+			'use_default_presets' => true,
+			'use_default_names'   => false,
+			'value_key'           => 'value',
+			'css_vars'            => '--wp--preset--layout--$slug',
+			'classes'             => array( 
+				'.has-layout-$slug' => 'display',
+			),
+			'properties'          => array( 'display' ),
+		),
+		array(
+			'path'                => array( 'layout', 'flexWrap' ),
+			'prevent_override'    => false,
+			'use_default_presets' => true,
+			'use_default_names'   => false,
+			'value_key'           => 'value',
+			'css_vars'            => '--wp--preset--layout--$slug',
+			'classes'             => array( 
+				'.has-layout-$slug' => 'flex-wrap',
+			),
+			'properties'          => array( 'flex-wrap' ),
+		),
+		array(
+			'path'                => array( 'layout', 'flexDirection' ),
+			'prevent_override'    => false,
+			'use_default_presets' => true,
+			'use_default_names'   => false,
+			'value_key'           => 'value',
+			'css_vars'            => '--wp--preset--layout--$slug',
+			'classes'             => array( 
+				'.has-layout-$slug' => 'flex-direction',
+			),
+			'properties'          => array( 'flex-direction' ),
+		),
+		array(
+			'path'                => array( 'layout', 'flexJustify' ),
+			'prevent_override'    => false,
+			'use_default_presets' => true,
+			'use_default_names'   => false,
+			'value_key'           => 'value',
+			'css_vars'            => '--wp--preset--layout--$slug',
+			'classes'             => array( 
+				'.has-layout-$slug' => 'justify-content',
+			),
+			'properties'          => array( 'justify-content' ),
+		),
+		array(
+			'path'                => array( 'layout', 'flexAlign' ),
+			'prevent_override'    => false,
+			'use_default_presets' => true,
+			'use_default_names'   => false,
+			'value_key'           => 'value',
+			'css_vars'            => '--wp--preset--layout--$slug',
+			'classes'             => array( 
+				'.has-layout-$slug' => 'align-items',
+			),
+			'properties'          => array( 'align-items' ),
+		),
 	);
 
 	/**
@@ -256,6 +316,11 @@ class WP_Theme_JSON_5_9 {
 		'layout'          => array(
 			'contentSize' => null,
 			'wideSize'    => null,
+			'flex'        => null,
+			'flexWrap'    => null,
+			'flexDirection' => null,
+			'flexJustify'   => null,
+			'flexAlign'     => null,
 		),
 		'spacing'         => array(
 			'blockGap' => null,
@@ -311,6 +376,13 @@ class WP_Theme_JSON_5_9 {
 			'lineHeight'     => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
+		),
+		'layout'   => array(
+			'display'         => null,
+			'flex-wrap'       => null,
+			'flex-direction'  => null,
+			'justify-content' => null,
+			'align-items'     => null,
 		),
 	);
 

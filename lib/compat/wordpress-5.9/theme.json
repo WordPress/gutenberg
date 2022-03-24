@@ -185,6 +185,79 @@
 			],
 			"text": true
 		},
+		"layout": {
+			"flow": [],
+			"flex":[
+				{
+					"name": "Flexbox",
+					"slug": "flex",
+					"value": "flex"
+				}
+			],
+			"flexWrap": [
+				{
+					"name": "Wrap",
+					"slug": "wrap",
+					"value": "wrap"
+				},
+				{
+					"name": "Nowrap",
+					"slug": "nowrap",
+					"value": "nowrap"
+				}
+			],
+			"flexDirection": [
+				{
+					"name": "Horizontal",
+					"slug": "horizontal",
+					"value": "row"
+				},
+				{
+					"name": "Vertical",
+					"slug": "vertical",
+					"value": "column"
+				}
+			],
+			"flexJustify": [
+				{
+					"name": "Justify left",
+					"slug": "horizontal-left",
+					"value": "flex-start"
+				},
+				{
+					"name": "Justify center",
+					"slug": "horizontal-center",
+					"value": "center"
+				},
+				{
+					"name": "Justify right",
+					"slug": "horizontal-right",
+					"value": "flex-end"
+				},
+				{
+					"name": "Justify space between",
+					"slug": "horizontal-space-between",
+					"value": "space-between"
+				}
+			],
+			"flexAlign": [
+				{
+					"name": "Align left",
+					"slug": "vertical-left",
+					"value": "flex-start"
+				},
+				{
+					"name": "Align center",
+					"slug": "vertical-center",
+					"value": "center"
+				},
+				{
+					"name": "Align right",
+					"slug": "vertical-right",
+					"value": "flex-end"
+				}
+			]
+		},
 		"spacing": {
 			"blockGap": null,
 			"margin": false,

@@ -191,17 +191,78 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	return $content;
 }
 
+/*
+* Add CSS classes and inline styles for layouts to the incoming attributes array.
+* This will be applied to the block markup in the front-end.
+*
+* @param  WP_Block_Type $block_type       Block type.
+* @param  array         $block_attributes Block attributes.
+*
+* @return array layouts CSS classes and inline styles.
+*/
+function gutenberg_apply_layout_support( $block_type, $block_attributes ) {
+   $layout_support = _wp_array_get( $block_type->supports, array( '__experimentalLayout' ), false );
+
+   if (
+	   is_array( $layout_support ) &&
+	   array_key_exists( '__experimentalSkipSerialization', $layout_support ) &&
+	   $layout_support['__experimentalSkipSerialization']
+   ) {
+	   return array();
+   }
+
+   $layout = isset( $block_attributes['layout'] ) ? $block_attributes['layout'] : null;
+
+   $has_flex_layout_support = isset($layout['type']) && $layout['type'] === 'flex';
+
+   $classes                 = array();
+   $styles                  = array();
+
+   // flex layouts.
+   if ( $has_flex_layout_support ) {
+	   $classes[] = 'has-layout-flex';
+
+	   $justify_content = isset( $layout['justifyContent'] ) ? $layout['justifyContent'] : 'left';
+	   $orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
+	   $flex_wrap = isset( $layout['flexWrap'] ) ? $layout['flexWrap'] : 'wrap';
+
+	   $classes[] = sprintf( 'has-layout-%s', _wp_to_kebab_case( $flex_wrap ) );
+
+	   if ( $orientation === 'horizontal' ) {
+		   $classes[] = 'has-layout-horizontal';
+		   $classes[] = sprintf( 'has-layout-horizontal-%s', _wp_to_kebab_case( $justify_content ) );
+	   } else {
+		$classes[] = 'has-layout-vertical';
+		// Space-between doesn't work on vertical layouts so use default.
+		if ( $justify_content === 'space-between') {
+			$classes[] = 'has-layout-vertical-left'
+		} else {
+			$classes[] = sprintf( 'has-layout-vertical-%s', _wp_to_kebab_case( $justify_content ) );
+		}
+		
+	   }
+   }
+
+   $attributes = array();
+   if ( ! empty( $classes ) ) {
+	   $attributes['class'] = implode( ' ', $classes );
+   }
+
+   return $attributes;
+}
+
 // Register the block support. (overrides core one).
 WP_Block_Supports::get_instance()->register(
 	'layout',
 	array(
 		'register_attribute' => 'gutenberg_register_layout_support',
+		'apply'              => 'gutenberg_apply_layout_support',
 	)
 );
 if ( function_exists( 'wp_render_layout_support_flag' ) ) {
 	remove_filter( 'render_block', 'wp_render_layout_support_flag' );
 }
-add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
+// add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
 
 /**
  * For themes without theme.json file, make sure
