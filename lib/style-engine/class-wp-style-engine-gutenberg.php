@@ -1,13 +1,13 @@
 <?php
 /**
- * WP_Style_Engine class
+ * WP_Style_Engine_Gutenberg class
  *
  * Generates classnames and block styles.
  *
  * @package Gutenberg
  */
 
-if ( class_exists( 'WP_Style_Engine' ) ) {
+if ( class_exists( 'WP_Style_Engine_Gutenberg' ) ) {
 	return;
 }
 
@@ -19,7 +19,14 @@ if ( class_exists( 'WP_Style_Engine' ) ) {
  *
  * @since 6.0.0
  */
-class WP_Style_Engine {
+class WP_Style_Engine_Gutenberg {
+	/**
+	 * Container for the main instance of the class.
+	 *
+	 * @var WP_Style_Engine_Gutenberg|null
+	 */
+	private static $instance = null;
+
 	/**
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
@@ -46,6 +53,21 @@ class WP_Style_Engine {
 	);
 
 	/**
+	 * Utility method to retrieve the main instance of the class.
+	 *
+	 * The instance will be created if it does not exist yet.
+	 *
+	 * @return WP_Style_Engine_Gutenberg The main instance.
+	 */
+	public static function get_instance() {
+		if ( null === self::$instance ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	/**
 	 * Returns a CSS ruleset based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
 	 * @param string|array  $style_value A single raw Gutenberg style attributes value for a CSS property.
@@ -53,7 +75,7 @@ class WP_Style_Engine {
 	 *
 	 * @return array A CSS ruleset compatible with generate().
 	 */
-	protected static function get_block_style_css_rules( $style_value, $path ) {
+	protected function get_block_style_css_rules( $style_value, $path ) {
 		$style_definition = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $path, null );
 
 		if ( ! empty( $style_definition ) ) {
@@ -80,7 +102,7 @@ class WP_Style_Engine {
 	 *
 	 * @return string A CSS ruleset formatted to be placed in an HTML `style` attribute.
 	 */
-	public static function generate( $block_styles, $options = array() ) {
+	public function generate( $block_styles, $options = array() ) {
 		$output = '';
 
 		if ( empty( $block_styles ) ) {
@@ -95,7 +117,7 @@ class WP_Style_Engine {
 			if ( empty( $style_value ) ) {
 				return $output;
 			}
-			$rules = array_merge( $rules, static::get_block_style_css_rules( $style_value, $options['path'] ) );
+			$rules = array_merge( $rules, $this->get_block_style_css_rules( $style_value, $options['path'] ) );
 		} else {
 			// Otherwise build them all.
 			foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
@@ -104,7 +126,7 @@ class WP_Style_Engine {
 					if ( empty( $style_value ) ) {
 						continue;
 					}
-					$rules = array_merge( $rules, static::get_block_style_css_rules( $style_value, $style_definition['path'] ) );
+					$rules = array_merge( $rules, $this->get_block_style_css_rules( $style_value, $style_definition['path'] ) );
 				}
 			}
 		}
@@ -132,7 +154,7 @@ class WP_Style_Engine {
 	 *
 	 * @return array The class name for the added style.
 	 */
-	protected static function get_css_box_rules( $style_value, $style_property ) {
+	public static function get_css_box_rules( $style_value, $style_property ) {
 		$rules = array();
 
 		if ( ! $style_value ) {

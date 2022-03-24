@@ -51,10 +51,11 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 		return $attributes;
 	}
 
+	$style_engine                    = WP_Style_Engine_Gutenberg::get_instance();
 	$spacing_block_styles            = array();
 	$spacing_block_styles['padding'] = $has_padding_support ? _wp_array_get( $block_styles, array( 'spacing', 'padding' ), null ) : null;
 	$spacing_block_styles['margin']  = $has_margin_support ? _wp_array_get( $block_styles, array( 'spacing', 'margin' ), null ) : null;
-	$inline_styles                   = WP_Style_Engine_Gutenberg::generate(
+	$inline_styles                   = $style_engine->generate(
 		array( 'spacing' => $spacing_block_styles ),
 		array(
 			'inline' => true,
