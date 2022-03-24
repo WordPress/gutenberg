@@ -30,17 +30,16 @@ const openSidebarPanelWithTitle = async ( title ) => {
 
 const disableTemplateWelcomeGuide = async () => {
 	// Turn off the welcome guide if it's visible.
-	const isWelcomeGuideActive = await page.evaluate(
-		() =>
-			!! wp.data
-				.select( 'core/preferences' )
-				.get( 'core/edit-post', 'welcomeGuide' )
+	const isWelcomeGuideActive = await page.evaluate( () =>
+		wp.data
+			.select( 'core/edit-post' )
+			.isFeatureActive( 'welcomeGuideTemplate' )
 	);
 	if ( isWelcomeGuideActive ) {
 		await page.evaluate( () =>
 			wp.data
-				.dispatch( 'core/preferences' )
-				.toggle( 'core/edit-post', 'welcomeGuide' )
+				.dispatch( 'core/edit-post' )
+				.toggleFeature( 'welcomeGuideTemplate' )
 		);
 	}
 };
