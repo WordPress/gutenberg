@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { TextControl, PanelBody, ToggleControl } from '@wordpress/components';
+const MAX_INT = Math.pow( 2, 31 ) - 1;
 
 const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
 	<InspectorControls>
@@ -12,7 +13,7 @@ const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
 				label={ __( 'Start value' ) }
 				type="number"
 				onChange={ ( value ) => {
-					const int = parseInt( value, 10 );
+					const int = Math.min( parseInt( value, 10 ), MAX_INT );
 
 					setAttributes( {
 						// It should be possible to unset the value,
