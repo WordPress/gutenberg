@@ -17,6 +17,8 @@ import {
 import { useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 
+const TEMPLATE = [ [ 'core/paragraph', {} ] ];
+
 export default function QuoteEdit( {
 	attributes: { attribution },
 	setAttributes,
@@ -37,7 +39,7 @@ export default function QuoteEdit( {
 	const innerBlocksProps = useInnerBlocksProps(
 		showAttribution ? blockProps : {},
 		{
-			template: [ [ 'core/paragraph', {} ] ],
+			template: TEMPLATE,
 			templateInsertUpdatesSelection: true,
 		}
 	);
