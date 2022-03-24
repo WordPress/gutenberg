@@ -406,6 +406,18 @@ _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
 
+### getListViewBlocks
+
+Gets all block anchor nodes in the list view that match a given block name label.
+
+_Parameters_
+
+-   _blockLabel_ `string`: the label of the block as displayed in the ListView.
+
+_Returns_
+
+-   `Promise`: all the blocks anchor nodes matching the lable in the ListView.
+
 ### getOption
 
 Returns a site option, from the options admin page.
