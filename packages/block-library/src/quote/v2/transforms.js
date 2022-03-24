@@ -81,6 +81,26 @@ const transforms = {
 		},
 		{
 			type: 'block',
+			isMultiBlock: true,
+			blocks: [ '*' ],
+			isMatch: ( attributes, blocks ) => {
+				return ! blocks.some( ( { name } ) => name === 'core/quote' );
+			},
+			__experimentalConvert: ( blocks ) =>
+				createBlock(
+					'core/quote',
+					{},
+					blocks.map( ( block ) =>
+						createBlock(
+							block.name,
+							block.attributes,
+							block.innerBlocks
+						)
+					)
+				),
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/group' ],
 			transform: ( {}, innerBlocks ) =>
 				createBlock( 'core/quote', {}, innerBlocks ),
