@@ -167,7 +167,7 @@ function UnforwardedUnitControl(
 		};
 	}
 
-	const refInputSuffix = useRef< HTMLSelectElement | null >( null );
+	const refInputSuffix = useRef< HTMLSelectElement >( null );
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
 			ref={ refInputSuffix }
