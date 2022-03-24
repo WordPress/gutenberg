@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { row, stack } from '@wordpress/icons';
 
 const variations = [
 	{
@@ -21,7 +22,10 @@ const variations = [
 		attributes: { layout: { type: 'flex' } },
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
-			blockAttributes.layout?.type === 'flex' && ( ! blockAttributes.layout?.orientation || blockAttributes.layout?.orientation === 'horizontal' ),
+			blockAttributes.layout?.type === 'flex' &&
+			( ! blockAttributes.layout?.orientation ||
+				blockAttributes.layout?.orientation === 'horizontal' ),
+		icon: row,
 	},
 	{
 		name: 'group-stack',
@@ -30,7 +34,9 @@ const variations = [
 		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
-			blockAttributes.layout?.type === 'flex' && blockAttributes.layout?.orientation === 'vertical',
+			blockAttributes.layout?.type === 'flex' &&
+			blockAttributes.layout?.orientation === 'vertical',
+		icon: stack,
 	},
 ];
 
