@@ -14,7 +14,6 @@ import { __ } from '@wordpress/i18n';
 import { postList as icon } from '@wordpress/icons';
 import {
 	InspectorControls,
-	BlockAlignmentControl,
 } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import {
@@ -47,9 +46,6 @@ class LatestPostsEdit extends Component {
 		this.onSetExcerptLength = this.onSetExcerptLength.bind( this );
 		this.onSetDisplayPostDate = this.onSetDisplayPostDate.bind( this );
 		this.onSetDisplayFeaturedImage = this.onSetDisplayFeaturedImage.bind(
-			this
-		);
-		this.onSetFeaturedImageAlign = this.onSetFeaturedImageAlign.bind(
 			this
 		);
 		this.onSetAddLinkToFeaturedImage = this.onSetAddLinkToFeaturedImage.bind(
@@ -117,11 +113,6 @@ class LatestPostsEdit extends Component {
 		setAttributes( { addLinkToFeaturedImage: value } );
 	}
 
-	onSetFeaturedImageAlign( value ) {
-		const { setAttributes } = this.props;
-		setAttributes( { featuredImageAlign: value } );
-	}
-
 	onSetOrder( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { order: value } );
@@ -152,7 +143,6 @@ class LatestPostsEdit extends Component {
 			excerptLength,
 			displayPostDate,
 			displayFeaturedImage,
-			featuredImageAlign,
 			addLinkToFeaturedImage,
 			order,
 			orderBy,
@@ -205,12 +195,6 @@ class LatestPostsEdit extends Component {
 					/>
 					{ displayFeaturedImage && (
 						<>
-							<BlockAlignmentControl
-								value={ featuredImageAlign }
-								onChange={ this.onSetFeaturedImageAlign }
-								controls={ [ 'left', 'center', 'right' ] }
-								isBottomSheetControl={ true }
-							/>
 							<ToggleControl
 								label={ __( 'Add link to featured image' ) }
 								checked={ addLinkToFeaturedImage }
