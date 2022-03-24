@@ -64,6 +64,8 @@ describe( 'Comment Query Loop', () => {
 		await page.click( '.wp-block-comments-pagination-previous' );
 
 		// We check that there are a previous and a next link.
+		await page.waitForSelector( '.wp-block-comments-pagination-previous' );
+		await page.waitForSelector( '.wp-block-comments-pagination-next' );
 		expect(
 			await page.$( '.wp-block-comments-pagination-previous' )
 		).not.toBeNull();
@@ -73,6 +75,7 @@ describe( 'Comment Query Loop', () => {
 		await page.click( '.wp-block-comments-pagination-previous' );
 
 		// We check that there is only have a next link
+		await page.waitForSelector( '.wp-block-comments-pagination-next' );
 		expect(
 			await page.$( '.wp-block-comments-pagination-previous' )
 		).toBeNull();
