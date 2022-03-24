@@ -40,6 +40,14 @@ const transforms = {
 				);
 			},
 		},
+		{
+			type: 'prefix',
+			prefix: '>',
+			transform: ( content ) =>
+				createBlock( 'core/quote', {}, [
+					createBlock( 'core/paragraph', { content } ),
+				] ),
+		},
 	],
 	to: [
 		{
