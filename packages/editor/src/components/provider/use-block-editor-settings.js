@@ -92,6 +92,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
 				'__experimentalGenerateAnchors',
+				'__experimentalCanLockBlocks',
 				'__unstableGalleryWithImageBlocks',
 				'alignWide',
 				'allowedBlockTypes',
