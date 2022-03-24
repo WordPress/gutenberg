@@ -29,7 +29,7 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockListContext } from '../block-list/block-list-context';
 import styles from './style.scss';
 
-const CHIP_POSITION_PADDING = 32;
+const CHIP_OFFSET_TO_TOUCH_POSITION = 32;
 const BLOCK_COLLAPSED_HEIGHT = 20;
 const EXTRA_OFFSET_WHEN_CLOSE_TO_TOP_EDGE = 80;
 const SCROLL_ANIMATION_DURATION = 350;
@@ -169,7 +169,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 					translateY:
 						chip.y.value -
 						chip.height.value -
-						CHIP_POSITION_PADDING,
+						CHIP_OFFSET_TO_TOUCH_POSITION,
 				},
 				{ scaleX: chip.scale.value },
 				{ scaleY: chip.scale.value },
