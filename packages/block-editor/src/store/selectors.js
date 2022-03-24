@@ -33,6 +33,7 @@ import {
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * A block selection object.
@@ -1864,6 +1865,7 @@ export const getInserterItems = createSelector(
  */
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
+		const [ sourceBlock ] = blocks;
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
 		} );
@@ -1877,20 +1879,32 @@ export const getBlockTransformItems = createSelector(
 			blockTypeTransformItems,
 			( { name } ) => name
 		);
+
+		// Consider unwraping the highest priority.
+		itemsByName[ '*' ] = {
+			frecency: +Infinity,
+			id: '*',
+			isDisabled: false,
+			name: '*',
+			title: __( 'Unwrap' ),
+			icon: itemsByName[ sourceBlock.name ]?.icon,
+		};
+
 		const possibleTransforms = getPossibleBlockTransformations(
 			blocks
 		).reduce( ( accumulator, block ) => {
-			if ( itemsByName[ block?.name ] ) {
+			if ( block === '*' ) {
+				accumulator.push( itemsByName[ '*' ] );
+			} else if ( itemsByName[ block?.name ] ) {
 				accumulator.push( itemsByName[ block.name ] );
 			}
 			return accumulator;
 		}, [] );
-		const possibleBlockTransformations = orderBy(
+		return orderBy(
 			possibleTransforms,
 			( block ) => itemsByName[ block.name ].frecency,
 			'desc'
 		);
-		return possibleBlockTransformations;
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],

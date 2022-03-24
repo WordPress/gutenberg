@@ -124,6 +124,19 @@ const transforms = {
 		},
 		{
 			type: 'block',
+			blocks: [ '*' ],
+			transform: ( { attribution }, innerBlocks ) =>
+				attribution
+					? [
+							...innerBlocks,
+							createBlock( 'core/paragraph', {
+								content: attribution,
+							} ),
+					  ]
+					: innerBlocks,
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/group' ],
 			transform: ( { attribution }, innerBlocks ) =>
 				createBlock(
