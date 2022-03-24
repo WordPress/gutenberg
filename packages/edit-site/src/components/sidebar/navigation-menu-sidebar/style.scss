@@ -10,9 +10,20 @@
 	}
 }
 
+
 .edit-site-navigation-inspector {
 	padding: $grid-unit-20;
+
+	.block-editor-list-view-leaf .block-editor-list-view-block-contents {
+		align-items: flex-start;
+		white-space: normal;
+	}
+
+	.block-editor-list-view-block__title {
+		margin-top: 3px;
+	}
 }
+
 
 .edit-site-navigation-inspector__placeholder {
 	padding: $grid-unit-10;
@@ -20,9 +31,9 @@
 	background-color: $gray-100;
 	animation: loadingpulse 1s linear infinite;
 	animation-delay: 0.5s; // avoid animating for fast network responses
-}
 
-.edit-site-navigation-inspector__placeholder.is-child {
-	margin-left: $grid-unit-30;
-	width: 50%;
+	&.is-child {
+		margin-left: $grid-unit-30;
+		width: 50%;
+	}
 }
