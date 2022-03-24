@@ -12,7 +12,9 @@ import { useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../../button';
+import Popover from '../../popover';
 import { BorderBoxControl } from '../';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 
 // Available border colors.
 const colors = [
@@ -48,7 +50,7 @@ const _default = ( props ) => {
 	useEffect( () => setBorders( defaultBorder ), [ defaultBorder ] );
 
 	return (
-		<>
+		<SlotFillProvider>
 			<WrapperView>
 				<BorderBoxControl
 					colors={ colors }
@@ -67,7 +69,8 @@ const _default = ( props ) => {
 			<Button variant="primary" onClick={ () => setBorders( undefined ) }>
 				Reset
 			</Button>
-		</>
+			<Popover.Slot />
+		</SlotFillProvider>
 	);
 };
 
