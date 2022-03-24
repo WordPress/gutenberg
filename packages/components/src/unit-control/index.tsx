@@ -208,6 +208,7 @@ function UnforwardedUnitControl(
 			ref={ forwardedRef }
 			size={ size }
 			suffix={ inputSuffix }
+			type={ isPressEnterToChange ? 'text' : 'number' }
 			value={ parsedQuantity ?? '' }
 			step={ step }
 			onFocus={ onFocusProp }
