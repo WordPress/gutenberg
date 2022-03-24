@@ -30,16 +30,17 @@ const openSidebarPanelWithTitle = async ( title ) => {
 
 const disableTemplateWelcomeGuide = async () => {
 	// Turn off the welcome guide if it's visible.
-	const isWelcomeGuideActive = await page.evaluate( () =>
-		wp.data
-			.select( 'core/edit-post' )
-			.isFeatureActive( 'welcomeGuideTemplate' )
+	const isWelcomeGuideActive = await page.evaluate(
+		() =>
+			!! wp.data
+				.select( 'core/preferences' )
+				.get( 'core/edit-post', 'welcomeGuide' )
 	);
 	if ( isWelcomeGuideActive ) {
 		await page.evaluate( () =>
 			wp.data
-				.dispatch( 'core/edit-post' )
-				.toggleFeature( 'welcomeGuideTemplate' )
+				.dispatch( 'core/preferences' )
+				.toggle( 'core/edit-post', 'welcomeGuide' )
 		);
 	}
 };
@@ -239,7 +240,7 @@ describe( 'Delete Post Template Confirmation Dialog', () => {
 			if ( isWelcomeGuideActive === true ) {
 				await page.evaluate( () =>
 					wp.data
-						.dispatch( 'core/edit-post' )
+						.dispatch( 'core/preferences' )
 						.toggle( 'core/edit-post', 'welcomeGuide' )
 				);
 				await page.reload();
