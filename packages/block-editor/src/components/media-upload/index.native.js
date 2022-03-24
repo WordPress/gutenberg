@@ -15,16 +15,16 @@ import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
 import {
 	getOtherMediaOptions,
-	requestMediaPicker,
 	mediaSources,
+	requestMediaPicker,
 } from '@wordpress/react-native-bridge';
 import {
 	capturePhoto,
 	captureVideo,
-	image,
-	wordpress,
-	mobile,
 	globe,
+	image,
+	mobile,
+	wordpress,
 } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
@@ -144,26 +144,38 @@ export class MediaUpload extends Component {
 			allowedTypes = [],
 			__experimentalOnlyMediaLibrary,
 			isAudioBlockMediaUploadEnabled,
+			canUploadMedia,
 		} = this.props;
 
 		return this.getAllSources()
 			.filter( ( source ) => {
 				if ( __experimentalOnlyMediaLibrary ) {
 					return source.mediaLibrary;
-				} else if (
-					allowedTypes.every(
-						( allowedType ) =>
-							allowedType === MEDIA_TYPE_AUDIO &&
-							source.types.includes( allowedType )
-					) &&
-					source.id !== URL_MEDIA_SOURCE
-				) {
+				}
+
+				const sourceIsAllowed = allowedTypes.some( ( allowedType ) =>
+					source.types.includes( allowedType )
+				);
+				if ( ! sourceIsAllowed ) {
+					return false;
+				}
+
+				if ( ! canUploadMedia ) {
+					// If the user can't upload media, they can only select media
+					// that has already been uploaded
+					return source.id === mediaSources.siteMediaLibrary;
+				}
+
+				const onlyAudioAllowed = allowedTypes.every(
+					( allowedType ) =>
+						allowedType === MEDIA_TYPE_AUDIO &&
+						source.types.includes( allowedType )
+				);
+				if ( onlyAudioAllowed && source.id !== URL_MEDIA_SOURCE ) {
 					return isAudioBlockMediaUploadEnabled === true;
 				}
 
-				return allowedTypes.some( ( allowedType ) =>
-					source.types.includes( allowedType )
-				);
+				return true;
 			} )
 			.map( ( source ) => {
 				return {
@@ -311,6 +323,9 @@ export default compose( [
 			isAudioBlockMediaUploadEnabled:
 				select( blockEditorStore ).getSettings( 'capabilities' )
 					.isAudioBlockMediaUploadEnabled === true,
+			canUploadMedia:
+				select( blockEditorStore ).getSettings( 'capabilities' )
+					.canUploadMedia === true,
 		};
 	} ),
 ] )( MediaUpload );
