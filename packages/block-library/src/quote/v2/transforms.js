@@ -4,7 +4,14 @@
 import { createBlock, serialize } from '@wordpress/blocks';
 
 const transforms = {
-	from: [],
+	from: [
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			transform: ( {}, innerBlocks ) =>
+				createBlock( 'core/quote', {}, innerBlocks ),
+		},
+	],
 	to: [
 		{
 			type: 'block',
