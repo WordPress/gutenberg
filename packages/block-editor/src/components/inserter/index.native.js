@@ -237,8 +237,8 @@ export class Inserter extends Component {
 			return <BlockInsertionPoint />;
 		}
 		const style = getStylesFromColorScheme(
-			styles.addBlockButton,
-			styles.addBlockButtonDark
+			styles[ 'inserter-menu__add-block-button-icon' ],
+			styles[ 'inserter-menu__add-block-button-icon-dark' ]
 		);
 
 		const onPress = () => {
