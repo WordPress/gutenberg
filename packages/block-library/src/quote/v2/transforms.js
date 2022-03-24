@@ -62,11 +62,15 @@ const transforms = {
 				node.nodeName === 'FIGURE' &&
 				!! node.querySelector( 'blockquote' ),
 			transform: ( node ) => {
+				const cite = node.querySelector( 'cite' );
+				const attribution =
+					cite?.innerHTML ??
+					node.querySelector( 'figcaption' )?.innerHTML;
+				cite?.parentNode?.removeChild( cite );
 				return createBlock(
 					'core/quote',
 					{
-						attribution: node.querySelector( 'figcaption' )
-							?.innerHTML,
+						attribution,
 					},
 					rawHandler( {
 						HTML: node.querySelector( 'blockquote' ).innerHTML,
