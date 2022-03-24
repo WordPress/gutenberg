@@ -19,7 +19,6 @@ class WP_Style_Engine_Gutenberg {
 	/**
 	 * Container for the main instance of the class.
 	 *
-	 * @since 5.5.0
 	 * @var WP_Style_Engine_Gutenberg|null
 	 */
 	private static $instance = null;
@@ -30,6 +29,7 @@ class WP_Style_Engine_Gutenberg {
 	 * For every style definition, the follow properties are valid:
 	 *
 	 *  - property_key => the key that represents a valid CSS property, e.g., "margin" or "border".
+	 *  - path         => a path that accesses the corresponding style value in the block style object.
 	 *  - value_func   => a function to generate an array of valid CSS rules for a particular style object.
 	 *                    For example, `'padding' => 'array( 'top' => '1em' )` will return `array( 'padding-top' => '1em' )`
 	 */
@@ -38,12 +38,12 @@ class WP_Style_Engine_Gutenberg {
 			'padding' => array(
 				'property_key' => 'padding',
 				'path'         => array( 'spacing', 'padding' ),
-				'value_func'   => 'gutenberg_get_style_engine_css_box_rules',
+				'value_func'   => 'self::get_css_box_rules',
 			),
 			'margin'  => array(
 				'property_key' => 'margin',
 				'path'         => array( 'spacing', 'margin' ),
-				'value_func'   => 'gutenberg_get_style_engine_css_box_rules',
+				'value_func'   => 'self::get_css_box_rules',
 			),
 		),
 	);
@@ -69,7 +69,7 @@ class WP_Style_Engine_Gutenberg {
 	 * @param string|array  $style_value A single raw Gutenberg style attributes value for a CSS property.
 	 * @param array<string> $path        An array of strings representing a path to the style value.
 	 *
-	 * @return array A CSS ruleset compatible with add_style().
+	 * @return array A CSS ruleset compatible with generate().
 	 */
 	protected function get_block_style_css_rules( $style_value, $path ) {
 		$style_definition = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $path, null );
@@ -114,8 +114,8 @@ class WP_Style_Engine_Gutenberg {
 				return $output;
 			}
 			$rules = array_merge( $rules, $this->get_block_style_css_rules( $style_value, $options['path'] ) );
-			// Otherwise build them all.
 		} else {
+			// Otherwise build them all.
 			foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
 				foreach ( $definition_group as $style_definition ) {
 					$style_value = _wp_array_get( $block_styles, $style_definition['path'], null );
@@ -131,36 +131,39 @@ class WP_Style_Engine_Gutenberg {
 			// Generate inline style rules.
 			if ( isset( $options['inline'] ) && true === $options['inline'] ) {
 				foreach ( $rules as $rule => $value ) {
-					$output .= "{$rule}:{$value};";
+					$filtered_css = esc_html( safecss_filter_attr( "{$rule}:{$value}" ) );
+					if ( ! empty( $filtered_css ) ) {
+						$output .= $filtered_css . ';';
+					}
 				}
 			}
 		}
 
 		return $output;
 	}
-}
 
-/**
- * Returns a CSS ruleset for box model styles such as margins, padding, and borders.
- *
- * @param string|array $style_value    A single raw Gutenberg style attributes value for a CSS property.
- * @param string       $style_property The CSS property for which we're creating a rule.
- *
- * @return array The class name for the added style.
- */
-function gutenberg_get_style_engine_css_box_rules( $style_value, $style_property ) {
-	$rules = array();
+	/**
+	 * Returns a CSS ruleset for box model styles such as margins, padding, and borders.
+	 *
+	 * @param string|array $style_value    A single raw Gutenberg style attributes value for a CSS property.
+	 * @param string       $style_property The CSS property for which we're creating a rule.
+	 *
+	 * @return array The class name for the added style.
+	 */
+	public static function get_css_box_rules( $style_value, $style_property ) {
+		$rules = array();
 
-	if ( ! $style_value ) {
+		if ( ! $style_value ) {
+			return $rules;
+		}
+
+		if ( is_array( $style_value ) ) {
+			foreach ( $style_value as $key => $value ) {
+				$rules[ "$style_property-$key" ] = $value;
+			}
+		} else {
+			$rules[ $style_property ] = $style_value;
+		}
 		return $rules;
 	}
-
-	if ( is_array( $style_value ) ) {
-		foreach ( $style_value as $key => $value ) {
-			$rules[ "$style_property-$key" ] = $value;
-		}
-	} else {
-		$rules[ $style_property ] = $style_value;
-	}
-	return $rules;
 }

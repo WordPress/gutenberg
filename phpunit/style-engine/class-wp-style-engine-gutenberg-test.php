@@ -70,7 +70,7 @@ class WP_Style_Engine_Gutenberg_Test extends WP_UnitTestCase {
 			'inline_invalid_block_styles_unknown_property' => array(
 				'block_styles'    => array(
 					'spacing' => array(
-						'gavin' => '1000vw',
+						'gap' => '1000vw',
 					),
 				),
 				'options'         => array(
