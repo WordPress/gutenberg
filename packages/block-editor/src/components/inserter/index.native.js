@@ -32,7 +32,13 @@ import { store as blockEditorStore } from '../../store';
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
-const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
+const defaultRenderToggle = ( {
+	onToggle,
+	disabled,
+	style,
+	onLongPress,
+	isDefaultView,
+} ) => (
 	<ToolbarButton
 		title={ _x( 'Add block', 'Generic label for block inserter button' ) }
 		icon={
@@ -52,9 +58,11 @@ const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 		} }
 		isDisabled={ disabled }
 	>
+		{ isDefaultView && (
 			<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
 				{ __( 'Add content' ) }
 			</Text>
+		) }
 	</ToolbarButton>
 );
 
@@ -223,6 +231,7 @@ export class Inserter extends Component {
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
 			showSeparator,
+			isDefaultView,
 		} = this.props;
 		if ( showSeparator && isOpen ) {
 			return <BlockInsertionPoint />;
@@ -270,6 +279,7 @@ export class Inserter extends Component {
 					disabled,
 					style,
 					onLongPress,
+					isDefaultView,
 				} ) }
 				<Picker
 					ref={ ( instance ) => ( this.picker = instance ) }
@@ -405,6 +415,7 @@ export default compose( [
 			insertionIndexEnd,
 			isAnyBlockSelected: !! isAnyBlockSelected,
 			isSelectedBlockReplaceable: isSelectedUnmodifiedDefaultBlock,
+			isDefaultView: ! isAnyBlockSelected,
 		};
 	} ),
 
