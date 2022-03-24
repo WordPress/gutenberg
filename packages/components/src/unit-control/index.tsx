@@ -41,7 +41,7 @@ function UnforwardedUnitControl(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
-		__unstableStateReducer: stateReducerProp,
+		__unstableStateReducer,
 		autoComplete = 'off',
 		className,
 		disabled = false,
@@ -212,6 +212,7 @@ function UnforwardedUnitControl(
 				suffix={ inputSuffix }
 				value={ parsedQuantity ?? '' }
 				step={ step }
+				__unstableStateReducer={ __unstableStateReducer }
 			/>
 		</Root>
 	);
