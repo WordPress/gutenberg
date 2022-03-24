@@ -19,10 +19,11 @@ const config: PlaywrightTestConfig = {
 	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 100_000, // Defaults to 100 seconds.
 	// Don't report slow test "files", as we will be running our tests in serial.
 	reportSlowTests: null,
-	testDir: new URL( './specs', 'file:' + __filename ).pathname,
+	// testDir: new URL( './specs', 'file:' + __filename ).pathname,
+	testDir: './specs',
 	outputDir: path.join( process.cwd(), 'artifacts/test-results' ),
-	globalSetup: new URL( './config/global-setup.ts', 'file:' + __filename )
-		.pathname,
+	// globalSetup: new URL( './config/global-setup.ts', 'file:' + __filename ).pathname,
+	globalSetup: './config/global-setup.ts',
 	use: {
 		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
 		headless: true,
