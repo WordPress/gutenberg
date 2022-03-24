@@ -35,7 +35,7 @@ function UnforwardedUnitControl(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
-		__unstableStateReducer: stateReducerProp,
+		__unstableStateReducer,
 		autoComplete = 'off',
 		// @ts-expect-error Ensure that children is omitted from restProps
 		children,
@@ -212,6 +212,7 @@ function UnforwardedUnitControl(
 			value={ parsedQuantity ?? '' }
 			step={ step }
 			onFocus={ onFocusProp }
+			__unstableStateReducer={ __unstableStateReducer }
 		/>
 	);
 }
