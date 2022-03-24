@@ -16,6 +16,32 @@ class WP_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Controller_Tes
 		);
 	}
 
+	public function setup_mock_registry() {
+		$block_patterns_reflection        = new ReflectionClass( 'WP_Block_Patterns_Registry' );
+		$block_patterns_instance_property = $block_patterns_reflection->getProperty( 'instance' );
+		$block_patterns_instance_property->setAccessible( true );
+		$block_patterns_instance = new WP_Block_Patterns_Registry();
+		$block_patterns_reflection->setStaticPropertyValue( 'instance', $block_patterns_instance );
+
+		$block_patterns_instance->register(
+			'test/one',
+			array(
+				'title'         => 'Pattern One',
+				'categories'    => array( 'test' ),
+				'viewportWidth' => 1440,
+				'content'       => '<!-- wp:heading {"level":1} --><h1>One</h1><!-- /wp:heading -->',
+			)
+		);
+		$block_patterns_instance->register(
+			'test/two',
+			array(
+				'title'      => 'Pattern Two',
+				'categories' => array( 'test' ),
+				'content'    => '<!-- wp:paragraph --><p>Two</p><!-- /wp:paragraph -->',
+			)
+		);
+	}
+
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey(
@@ -26,19 +52,11 @@ class WP_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Controller_Tes
 	}
 
 	public function test_get_items() {
-		// Change this when the registered Core patterns change.
-		$expected_names  = array(
-			'core/query-standard-posts',
-			'core/query-medium-posts',
-			'core/query-small-posts',
-			'core/query-grid-posts',
-			'core/query-large-title-posts',
-			'core/query-offset-posts',
-			'core/social-links-shared-background-color',
-		);
-		$expected_fields = array( 'name', 'content' );
-
+		$this->setup_mock_registry();
 		wp_set_current_user( self::$admin_id );
+
+		$expected_names  = array( 'test/one', 'test/two' );
+		$expected_fields = array( 'name', 'content' );
 
 		$request            = new WP_REST_Request( 'GET', '/__experimental/block-patterns/patterns' );
 		$request['_fields'] = 'name,content';

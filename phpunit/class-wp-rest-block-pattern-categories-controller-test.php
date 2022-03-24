@@ -16,6 +16,17 @@ class WP_REST_Block_Pattern_Categories_Controller_Test extends WP_Test_REST_Cont
 		);
 	}
 
+	public function setup_mock_registry() {
+		$categories_reflection        = new ReflectionClass( 'WP_Block_Pattern_Categories_Registry' );
+		$categories_instance_property = $categories_reflection->getProperty( 'instance' );
+		$categories_instance_property->setAccessible( true );
+		$categories_instance = new WP_Block_Pattern_Categories_Registry();
+		$categories_reflection->setStaticPropertyValue( 'instance', $categories_instance );
+
+		$categories_instance->register( 'test', array( 'label' => 'Test' ) );
+		$categories_instance->register( 'query', array( 'label' => 'Query' ) );
+	}
+
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey(
@@ -26,18 +37,11 @@ class WP_REST_Block_Pattern_Categories_Controller_Test extends WP_Test_REST_Cont
 	}
 
 	public function test_get_items() {
-		// Change this when the registered Core categories change.
-		$expected_names  = array(
-			'buttons',
-			'columns',
-			'gallery',
-			'header',
-			'text',
-			'query',
-		);
-		$expected_fields = array( 'name', 'label' );
-
+		$this->setup_mock_registry();
 		wp_set_current_user( self::$admin_id );
+
+		$expected_names  = array( 'test', 'query' );
+		$expected_fields = array( 'name', 'label' );
 
 		$request            = new WP_REST_Request( 'GET', '/__experimental/block-patterns/categories' );
 		$request['_fields'] = 'name,label';
