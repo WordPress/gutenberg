@@ -124,7 +124,7 @@ const StylesPreview = ( { label, isFocused } ) => {
 				} }
 				initial="start"
 				animate={
-					( isHovered || isFocused ) && ! disableMotion
+					( isHovered || isFocused ) && ! disableMotion && label
 						? 'hover'
 						: 'start'
 				}
@@ -144,33 +144,45 @@ const StylesPreview = ( { label, isFocused } ) => {
 							overflow: 'hidden',
 						} }
 					>
-						<div
+						<motion.div
 							style={ {
 								fontFamily: headingFontFamily,
 								fontSize: 65 * ratio,
 								color: headingColor,
 								fontWeight: headingFontWeight,
 							} }
+							animate={ { scale: 1, opacity: 1 } }
+							initial={ { scale: 0.8, opacity: 0 } }
+							transition={ { delay: 0.2 } }
 						>
 							Aa
-						</div>
+						</motion.div>
 						<VStack spacing={ 4 * ratio }>
-							{ highlightedColors.map( ( { slug, color } ) => (
-								<div
-									key={ slug }
-									style={ {
-										height:
-											normalizedColorSwatchSize * ratio,
-										width:
-											normalizedColorSwatchSize * ratio,
-										background: color,
-										borderRadius:
-											( normalizedColorSwatchSize *
-												ratio ) /
-											2,
-									} }
-								/>
-							) ) }
+							{ highlightedColors.map(
+								( { slug, color }, index ) => (
+									<motion.div
+										key={ slug }
+										style={ {
+											height:
+												normalizedColorSwatchSize *
+												ratio,
+											width:
+												normalizedColorSwatchSize *
+												ratio,
+											background: color,
+											borderRadius:
+												( normalizedColorSwatchSize *
+													ratio ) /
+												2,
+										} }
+										animate={ { scale: 1, opacity: 1 } }
+										initial={ { scale: 0.1, opacity: 0 } }
+										transition={ {
+											delay: index === 1 ? 0.4 : 0.3,
+										} }
+									/>
+								)
+							) }
 						</VStack>
 					</HStack>
 				</motion.div>
