@@ -68,9 +68,7 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$comment_order = empty( $block->context['comments/inherit'] ) && ! empty( $block->context['comments/order'] )
-		? $block->context['comments/order']
-		: get_option( 'comment_order' );
+	$comment_order = get_option( 'comment_order' );
 
 	if ( 'desc' === $comment_order ) {
 		$comments = array_reverse( $comments );
