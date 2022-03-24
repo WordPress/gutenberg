@@ -55,8 +55,6 @@ const BlockDraggableWrapper = ( { children } ) => {
 	const chip = {
 		x: useSharedValue( 0 ),
 		y: useSharedValue( 0 ),
-		startX: useSharedValue( 0 ),
-		startY: useSharedValue( 0 ),
 		width: useSharedValue( 0 ),
 		height: useSharedValue( 0 ),
 		scale: useSharedValue( 0 ),
