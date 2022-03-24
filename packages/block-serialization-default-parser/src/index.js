@@ -286,6 +286,28 @@ function proceed() {
 }
 
 /**
+ * Reverses the serialization performed when saving
+ * attributes, which goes beyond JSON serialization
+ * to offer additional safeguards against unintended
+ * transforms on the server that corrupt attributes.
+ *
+ * @param {string}  _key  Key name of property in JSON blob.
+ * @param {unknown} value Property value in JSON blob.
+ */
+function unserializeAttribute( _key, value ) {
+	if ( 'string' !== typeof value ) {
+		return value;
+	}
+
+	return value
+		.replace(/\\u002d\\u002d/g, '--')
+		.replace(/\\u003c/g, '<')
+		.replace(/\\u003e/g, '>')
+		.replace(/\\u0026/g, '&')
+		.replace(/\\u0022/g, '\\"');
+}
+
+/**
  * Parse JSON if valid, otherwise return null
  *
  * Note that JSON coming from the block comment
@@ -297,7 +319,7 @@ function proceed() {
  */
 function parseJSON( input ) {
 	try {
-		return JSON.parse( input );
+		return JSON.parse( input, unserializeAttribute );
 	} catch ( e ) {
 		return null;
 	}
