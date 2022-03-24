@@ -132,7 +132,7 @@ export function createBlocksFromInnerBlocksTemplate(
  * @param {Object}   mergeAttributes              Block attributes.
  * @param {?Array}   newInnerBlocks               Nested blocks.
  * @param {?Object}  __experimentalOptions                      Cloning options.
- * @param {?Object} __experimentalOptions.__experimentalExcludeAttributes Attributes with these supports will be excluded from the cloned block.
+ * @param {?Object} __experimentalOptions.__experimentalExcludeAttributes Attributes matching this filter will be excluded from the cloned block.
  *
  * @return {Object} A cloned block.
  */
@@ -153,9 +153,10 @@ export function cloneBlock(
 	if ( __experimentalExcludeAttributes ) {
 		attributes = omit(
 			attributes,
-			__experimentalFilterBlockAttributes( block.name, {
-				__experimentalSupports: __experimentalExcludeAttributes,
-			} )
+			__experimentalFilterBlockAttributes(
+				block.name,
+				__experimentalExcludeAttributes
+			)
 		);
 	}
 

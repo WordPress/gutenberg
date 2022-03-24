@@ -36,7 +36,9 @@ function CopyMenuItem( { blocks, onCopy } ) {
 	const ref = useCopyToClipboard( () => {
 		blocks = blocks.map( ( block ) =>
 			cloneBlock( block, {}, null, {
-				__experimentalExcludeAttributes: { copy: false },
+				__experimentalExcludeAttributes: {
+					__experimentalSupports: { copy: false },
+				},
 			} )
 		);
 		return serialize( blocks );

@@ -126,7 +126,9 @@ export function useClipboardHandler() {
 				if ( event.type === 'copy' ) {
 					blocks = blocks.map( ( block ) =>
 						cloneBlock( block, {}, null, {
-							__experimentalExcludeAttributes: { copy: false },
+							__experimentalExcludeAttributes: {
+								__experimentalSupports: { copy: false },
+							},
 						} )
 					);
 				}
