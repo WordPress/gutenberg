@@ -24,19 +24,6 @@ export default function QuoteEdit( {
 	insertBlocksAfter,
 	clientId,
 } ) {
-	const wrapperProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps(
-		{},
-		{
-			template: [ [ 'core/paragraph', {} ] ],
-			templateInsertUpdatesSelection: true,
-		}
-	);
-	const allBlockProps = useInnerBlocksProps( wrapperProps, {
-		template: [ [ 'core/paragraph', {} ] ],
-		templateInsertUpdatesSelection: true,
-	} );
-
 	const isAncestorOfSelectedBlock = useSelect( ( select ) =>
 		select( blockEditorStore ).hasSelectedInnerBlock( clientId )
 	);
@@ -45,6 +32,15 @@ export default function QuoteEdit( {
 	const showAttribution =
 		( isEditingQuote && hasAttribution ) ||
 		! RichText.isEmpty( attribution );
+
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps(
+		showAttribution ? blockProps : {},
+		{
+			template: [ [ 'core/paragraph', {} ] ],
+			templateInsertUpdatesSelection: true,
+		}
+	);
 
 	return (
 		<>
@@ -64,7 +60,7 @@ export default function QuoteEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			{ showAttribution ? (
-				<figure { ...wrapperProps }>
+				<figure { ...blockProps }>
 					<BlockQuotation { ...innerBlocksProps } />
 					<RichText
 						identifier="attribution"
@@ -87,7 +83,7 @@ export default function QuoteEdit( {
 					/>
 				</figure>
 			) : (
-				<BlockQuotation { ...allBlockProps } />
+				<BlockQuotation { ...innerBlocksProps } />
 			) }
 		</>
 	);
