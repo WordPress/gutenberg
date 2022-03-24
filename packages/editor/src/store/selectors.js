@@ -1097,7 +1097,7 @@ export function canUserUseUnfilteredHTML( state ) {
  */
 export const isPublishSidebarEnabled = createRegistrySelector(
 	( select ) => () =>
-		select( preferencesStore ).get(
+		!! select( preferencesStore ).get(
 			'core/edit-post',
 			'isPublishSidebarEnabled'
 		)
