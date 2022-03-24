@@ -148,6 +148,8 @@ export default function NavigationInspector() {
 	// Guard by only allowing their usage if there are published Nav Menus.
 	const publishedInnerBlocks = hasNavigationMenus ? innerBlocks : [];
 
+	const hasInnerBlocks = !! publishedInnerBlocks?.length;
+
 	useEffect( () => {
 		if ( isResolvingNavigationMenus ) {
 			speak( 'Loading Navigation sidebar menus.' );
@@ -199,7 +201,7 @@ export default function NavigationInspector() {
 					<div className="edit-site-navigation-inspector__placeholder is-child" />
 				</>
 			) }
-			{ ! isLoading && (
+			{ hasInnerBlocks && ! isLoading && (
 				<BlockEditorProvider
 					value={ publishedInnerBlocks }
 					onChange={ onChange }
@@ -210,6 +212,12 @@ export default function NavigationInspector() {
 						innerBlocks={ publishedInnerBlocks }
 					/>
 				</BlockEditorProvider>
+			) }
+
+			{ ! hasInnerBlocks && ! isLoading && (
+				<p className="edit-site-navigation-inspector__empty-msg">
+					{ __( 'Navigation Menu is empty.' ) }
+				</p>
 			) }
 		</div>
 	);
