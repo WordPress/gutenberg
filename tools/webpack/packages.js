@@ -26,6 +26,15 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/style-engine',
 ];
 
+// PHP files in packages that have to be copied over to /lib.
+const BUNDLED_PACKAGES_PHP = [
+	{
+		from: './packages/style-engine/',
+		to: 'lib/style-engine/',
+		replaceClasses: [ 'WP_Style_Engine' ],
+	},
+];
+
 const gutenbergPackages = Object.keys( dependencies )
 	.filter(
 		( packageName ) =>
@@ -99,15 +108,38 @@ module.exports = {
 		...plugins,
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 		new CopyWebpackPlugin( {
-			patterns: gutenbergPackages
-				.map( ( packageName ) => ( {
+			patterns: [].concat(
+				gutenbergPackages.map( ( packageName ) => ( {
 					from: '*.css',
-					context: `./packages/${ packageName }/build-style`,
 					to: `./build/${ packageName }`,
 					transform: stylesTransform,
 					noErrorOnMissing: true,
-				} ) )
-				.concat( vendorsCopyConfig ),
+				} ) ),
+				// Packages with PHP files to be parsed and copied to ./lib.
+				BUNDLED_PACKAGES_PHP.map(
+					( { from, to, replaceClasses } ) => ( {
+						from: `${ from }/*.php`,
+						to: ( { absoluteFilename } ) => {
+							const [ , filename ] = absoluteFilename.match(
+								/([\w-]+)(\.php){1,1}$/
+							);
+							return join( to, `${ filename }-gutenberg.php` );
+						},
+						transform: ( content ) => {
+							const classSuffix = '_Gutenberg';
+							content = content.toString();
+							// Replace class names.
+							content = content.replace(
+								new RegExp( replaceClasses.join( '|' ), 'g' ),
+								( match ) => `${ match }${ classSuffix }`
+							);
+							return content;
+						},
+						noErrorOnMissing: true,
+					} )
+				),
+				vendorsCopyConfig
+			),
 		} ),
 	].filter( Boolean ),
 };

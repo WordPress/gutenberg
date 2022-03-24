@@ -16,8 +16,7 @@ class WP_Style_Engine_Gutenberg_Test extends WP_UnitTestCase {
 	 * @dataProvider data_block_styles_fixtures
 	 */
 	function test_generate_css( $block_styles, $options, $expected_output ) {
-		$style_engine     = WP_Style_Engine_Gutenberg::get_instance();
-		$generated_styles = $style_engine->generate(
+		$generated_styles = WP_Style_Engine_Gutenberg::generate(
 			$block_styles,
 			$options
 		);
