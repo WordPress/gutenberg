@@ -39,44 +39,55 @@ const defaultRenderToggle = ( {
 	style,
 	onLongPress,
 	isDefaultView,
-} ) => (
-	<ToolbarButton
-		title={ _x( 'Add block', 'Generic label for block inserter button' ) }
-		icon={
+} ) => {
+	const defaultViewProps = isDefaultView && {
+		icon: (
 			<Icon
-				icon={ isDefaultView ? plus : plusCircleFilled }
+				icon={ plus }
 				style={
-					isDefaultView
-						? styles[
-								'inserter-menu__add-block-button-icon-default'
-						  ]
-						: style
+					styles[ 'inserter-menu__add-block-button-icon-default' ]
 				}
-				color={ style.color }
 			/>
-		}
-		iconSize={ isDefaultView ? 22 : 24 }
-		onClick={ onToggle }
-		extraProps={ {
-			hint: __( 'Double tap to add a block' ),
-			// testID is present to disambiguate this element for native UI tests. It's not
-			// usually required for components. See: https://git.io/JeQ7G.
-			testID: 'add-block-button',
-			onLongPress,
-		} }
-		isDisabled={ disabled }
-		customContainerStyles={
-			isDefaultView && styles[ 'inserter-menu__add-block-button' ]
-		}
-		fixedRatio={ ! isDefaultView }
-	>
-		{ isDefaultView && (
-			<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
-				{ __( 'Add content' ) }
-			</Text>
-		) }
-	</ToolbarButton>
-);
+		),
+		customContainerStyles: styles[ 'inserter-menu__add-block-button' ],
+		fixedRatio: false,
+		iconSize: 22,
+	};
+
+	return (
+		<ToolbarButton
+			title={ _x(
+				'Add block',
+				'Generic label for block inserter button'
+			) }
+			icon={
+				<Icon
+					icon={ plusCircleFilled }
+					style={ style }
+					color={ style.color }
+				/>
+			}
+			onClick={ onToggle }
+			extraProps={ {
+				hint: __( 'Double tap to add a block' ),
+				// testID is present to disambiguate this element for native UI tests. It's not
+				// usually required for components. See: https://git.io/JeQ7G.
+				testID: 'add-block-button',
+				onLongPress,
+			} }
+			isDisabled={ disabled }
+			{ ...defaultViewProps }
+		>
+			{ isDefaultView && (
+				<Text
+					style={ styles[ 'inserter-menu__add-block-button-text' ] }
+				>
+					{ __( 'Add content' ) }
+				</Text>
+			) }
+		</ToolbarButton>
+	);
+};
 
 export class Inserter extends Component {
 	constructor() {
