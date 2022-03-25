@@ -85,6 +85,11 @@ function fromFormat( {
 			: false;
 
 		if ( key ) {
+			// If the format prop/attribute is an object then it is complex
+			// and cannot be mapped 1:1 with an HTML attribute in the DOM.
+			// Invoke the handler function to compute passing all of the current
+			// HTML attributes allowing them to be overwritten as required based
+			// on the current format value.
 			if ( key.hasOwnProperty( 'target' ) ) {
 				const newElementAttributes = key.toElement(
 					attributes[ name ],

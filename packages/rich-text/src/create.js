@@ -90,6 +90,10 @@ function toFormat( { type, attributes } ) {
 
 	for ( const key in formatType.attributes ) {
 		const name = formatType.attributes[ key ];
+
+		// If the value is an object then it's a complex
+		// attribute that cannot be mapped 1:1. Invoke
+		// function to compute the value of the format's prop/attribute.
 		if ( name.hasOwnProperty( 'target' ) ) {
 			registeredAttributes[ key ] = name.toFormat(
 				_attributes[ name.target ]
