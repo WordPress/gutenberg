@@ -18,6 +18,11 @@ export type ToggleGroupControlOptionProps = {
 	 */
 	label: string;
 	/**
+	 * Icon for the option. If `icon` is provided it will be used instead of the `label`
+	 * and will show a tooltip automatically.
+	 */
+	icon?: JSX.Element;
+	/**
 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
 	 * show the aria-label or the label prop text.
 	 *

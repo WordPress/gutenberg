@@ -7,6 +7,11 @@ import { boolean, text } from '@storybook/addon-knobs';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import {
+	formatCapitalize,
+	formatLowercase,
+	formatUppercase,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -57,25 +62,26 @@ const _default = ( { options } ) => {
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 
-	const controlOptions = options.map( ( opt, index ) => (
+	const controlOptions = options.map( ( option, index ) => (
 		<ToggleGroupControlOption
-			key={ opt.value }
-			value={ opt.value }
+			key={ option.value }
+			value={ option.value }
 			label={ text(
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
-				opt.label,
+				option.label,
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
 			aria-label={ text(
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }: aria-label`,
-				opt[ 'aria-label' ],
+				option[ 'aria-label' ],
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
 			showTooltip={ boolean(
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }: showTooltip`,
-				opt.showTooltip,
+				option.showTooltip,
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
+			icon={ option.icon ?? null }
 		/>
 	) );
 
@@ -122,6 +128,28 @@ WithAriaLabel.args = {
 	options: [
 		{ value: 'asc', label: 'A→Z', 'aria-label': 'Ascending' },
 		{ value: 'desc', label: 'Z→A', 'aria-label': 'Descending' },
+	],
+};
+
+export const WithIcons = _default.bind( {} );
+WithIcons.args = {
+	...Default.args,
+	options: [
+		{
+			label: 'Uppercase',
+			value: 'uppercase',
+			icon: formatUppercase,
+		},
+		{
+			label: 'Lowercase',
+			value: 'lowercase',
+			icon: formatLowercase,
+		},
+		{
+			label: 'Capitalize',
+			value: 'capitalize',
+			icon: formatCapitalize,
+		},
 	],
 };
 

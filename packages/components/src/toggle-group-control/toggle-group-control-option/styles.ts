@@ -55,6 +55,7 @@ export const buttonView = css`
 
 export const buttonActive = css`
 	color: ${ COLORS.white };
+	fill: ${ COLORS.white };
 	background-color: ${ COLORS.gray[ 900 ] };
 `;
 

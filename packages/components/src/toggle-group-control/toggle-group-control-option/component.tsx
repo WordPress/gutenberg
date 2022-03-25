@@ -9,6 +9,7 @@ import { Radio } from 'reakit';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -56,6 +57,7 @@ function ToggleGroupControlOption(
 		isBlock = false,
 		label,
 		value,
+		icon,
 		showTooltip = false,
 		...radioProps
 	} = {
@@ -75,9 +77,13 @@ function ToggleGroupControlOption(
 		? radioProps[ 'aria-label' ]
 		: label;
 
+	const content = !! icon ? <Icon icon={ icon } /> : label;
 	return (
 		<LabelView className={ labelViewClasses } data-active={ isActive }>
-			<WithToolTip showTooltip={ showTooltip } text={ optionLabel }>
+			<WithToolTip
+				showTooltip={ !! icon ? true : showTooltip }
+				text={ optionLabel }
+			>
 				<Radio
 					{ ...radioProps }
 					as="button"
@@ -87,7 +93,7 @@ function ToggleGroupControlOption(
 					ref={ forwardedRef }
 					value={ value }
 				>
-					<ButtonContentView>{ label }</ButtonContentView>
+					<ButtonContentView>{ content }</ButtonContentView>
 				</Radio>
 			</WithToolTip>
 		</LabelView>
