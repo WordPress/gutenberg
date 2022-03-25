@@ -126,7 +126,7 @@ const fetchLinkSuggestions = async (
 						};
 					} );
 				} )
-				.catch( () => [] )
+				.catch( () => [] ) // Fail by returning no results.
 		);
 	}
 
@@ -149,7 +149,7 @@ const fetchLinkSuggestions = async (
 						};
 					} );
 				} )
-				.catch( () => [] )
+				.catch( () => [] ) // Fail by returning no results.
 		);
 	}
 
@@ -170,7 +170,7 @@ const fetchLinkSuggestions = async (
 						};
 					} );
 				} )
-				.catch( () => [] )
+				.catch( () => [] ) // Fail by returning no results.
 		);
 	}
 
