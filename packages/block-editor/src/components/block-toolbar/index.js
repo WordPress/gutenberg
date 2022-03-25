@@ -21,6 +21,7 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
+import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import { useShowMoversGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 
@@ -127,6 +128,9 @@ export default function BlockToolbar( { hideDragHandle } ) {
 					</ToolbarGroup>
 				) }
 			</div>
+			{ shouldShowVisualToolbar && isMultiToolbar && (
+				<BlockGroupToolbar />
+			) }
 			{ shouldShowVisualToolbar && (
 				<>
 					<BlockControls.Slot
