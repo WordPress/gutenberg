@@ -21,3 +21,19 @@ $textColorDark: $white;
 .placeholderDark {
 	color: $gray-50;
 }
+
+.htmlView {
+	font-family: $htmlFont;
+	padding-left: $padding;
+	padding-right: $padding;
+	padding-top: $padding;
+	padding-bottom: $padding + 16;
+}
+
+.htmlViewDark {
+	color: $textColorDark;
+}
+
+.scrollView {
+	flex: 1;
+}
