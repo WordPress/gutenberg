@@ -13,11 +13,5 @@
 		"html": false,
 		"align": true
 	},
-	"attributes": {
-		"likes": {
-			"type": "number",
-			"default": 0
-		}
-	},
 	"style": "wp-block-comment-template"
 }

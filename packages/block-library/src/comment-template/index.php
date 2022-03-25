@@ -13,8 +13,7 @@
  * @return string
  */
 function block_core_comment_template_render_comments( $comments, $block ) {
-	$content     = '';
-	$like_button = '<div x-data="{ likes: 0 }"><button x-on:click="likes++">Like</button><span x-text="likes"></span></div>';
+	$content = '';
 	foreach ( $comments as $comment ) {
 
 		$block_content = ( new WP_Block(
@@ -36,7 +35,7 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 			$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
 		}
 
-		$content .= '<li>' . $block_content . '</li>' . $like_button;
+		$content .= '<li>' . $block_content . '</li>';
 	}
 
 	return $content;

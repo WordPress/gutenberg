@@ -112,6 +112,7 @@ require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider-local.php';
 require __DIR__ . '/compat/wordpress-6.0/webfonts.php';
 require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
 require __DIR__ . '/experimental/blocks.php';
+require __DIR__ . '/compat/experimental/rest-api.php';
 
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';

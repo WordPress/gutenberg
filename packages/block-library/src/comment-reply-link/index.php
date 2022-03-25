@@ -4,6 +4,30 @@
  *
  * @package WordPress
  */
+function render_js_comment_post_form() {
+	return "
+		async createComment({ content, parent }) {
+			const commentPosted = await fetch( apiSettings.root + 'wp/v2/comments/', {
+				method: 'POST',
+				body: JSON.stringify({
+					post: 1,
+					author_name: 'admin',
+					author_email: 'wordpress@example.com',
+					'parent': parent,
+					'content': content,
+				}),
+				headers: {
+					'Content-type': 'application/json; charset=UTF-8',
+					'X-WP-Nonce': apiSettings.nonce,
+				},
+			});
+			const comment = await commentPosted.json();
+			if (comment) {
+				location.reload();
+			}
+		}
+	";
+}
 
 /**
  * Renders the `core/comment-reply-link` block on the server.
@@ -59,12 +83,21 @@ function render_block_core_comment_reply_link( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
+	$comment_field = '<p class="comment-form-comment"><label for="comment">' . _x( 'Comment', 'noun' ) . '</label><br /><textarea x-model="commentContent" id="comment" name="comment" aria-required="true"></textarea></p>';
 	ob_start();
-	comment_form();
-	$form = ob_get_clean();
+	comment_form(
+		array(
+			'comment_field' => $comment_field,
+		)
+	);
+	$form = str_replace(
+		'<form',
+		'<form x-on:submit.prevent="createComment({ parent:' . $block->context['commentId'] . ', content: commentContent })" ',
+		ob_get_clean()
+	);
 
 	$comment_toggled_form = sprintf(
-		'<div x-data="{ open: false }" %1$s>
+		'<div x-data="{ commentContent: \'\', open: false, ' . render_js_comment_post_form() . '  }" %1$s>
 			<div @click.prevent="open = ! open">%2$s</div>
 			<div x-show="open" x-transition>
 				%3$s
