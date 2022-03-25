@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Add `vendor/` to `.markdownlintignore`, to match `lint-md-docs` docs ([#39724](https://github.com/WordPress/gutenberg/pull/39724)).
+
 ## 22.2.0 (2022-03-11)
 
 ### Enhancement
