@@ -408,12 +408,15 @@ export default compose( [
 				getBlockOrder,
 				getSelectedBlockClientId,
 				isBlockInsertionPointVisible,
+				isDraggingBlocks,
 				getSettings,
 			} = select( blockEditorStore );
 
 			const isStackedHorizontally = orientation === 'horizontal';
 
 			const selectedBlockClientId = getSelectedBlockClientId();
+
+			const isDragging = isDraggingBlocks();
 
 			let blockClientIds = getBlockOrder( rootClientId );
 			// Display only block which fulfill the condition in passed `filterInnerBlocks` function.
@@ -433,7 +436,9 @@ export default compose( [
 				blockClientIds,
 				blockCount,
 				isBlockInsertionPointVisible:
-					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
+					! isDragging &&
+					Platform.OS === 'ios' &&
+					isBlockInsertionPointVisible(),
 				isReadOnly,
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible,
@@ -495,13 +500,16 @@ const EmptyListComponentCompose = compose( [
 			getBlockOrder,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
+			isDraggingBlocks,
 		} = select( blockEditorStore );
 
 		const isStackedHorizontally = orientation === 'horizontal';
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
+		const isDragging = isDraggingBlocks();
 		const shouldShowInsertionPoint =
+			! isDragging &&
 			! isStackedHorizontally &&
 			blockInsertionPointIsVisible &&
 			insertionPoint.rootClientId === rootClientId &&
