@@ -128,13 +128,13 @@ const linkFormatAttributes = applyFilters( 'editor.linkFormat.attributes', {
 			// `nofollow`.
 			return relAttribute?.split( ' ' )?.includes( 'nofollow' );
 		},
-		toElement( noFollowAttribute, elementAttributes ) {
-			const currentRelOrEmpty = elementAttributes?.rel ?? '';
+		toElement( noFollowAttribute, allElementAttributes ) {
+			const currentRelOrEmpty = allElementAttributes?.rel ?? '';
 
 			const rel = ( currentRelOrEmpty + ' nofollow' ).trim();
 
 			return {
-				...elementAttributes,
+				...allElementAttributes,
 				// if `noFollow` is true then add a rel
 				// attribute to any existing rel attr.
 				...( noFollowAttribute && { rel } ),
@@ -149,17 +149,17 @@ const linkFormatAttributes = applyFilters( 'editor.linkFormat.attributes', {
 			// `nofollow`.
 			return targetAttribute?.split( ' ' )?.includes( '_blank' );
 		},
-		toElement( targetAttribute, elementAttributes ) {
+		toElement( opensInNewTabAttribute, elementAttributes ) {
 			const currentRelOrEmpty = elementAttributes?.rel ?? '';
 
 			const rel = ( currentRelOrEmpty + ' noreferrer noopener' ).trim();
 
 			return {
 				...elementAttributes,
-				...( targetAttribute && { target: '_blank' } ),
-				// if `noFollow` is true then add a rel
-				// attribute to any existing rel attr.
-				...( targetAttribute && { rel } ),
+				...( opensInNewTabAttribute && { target: '_blank' } ),
+				// if `noFollow` is true then add the related `rel`
+				// attributes to any existing rel attr.
+				...( opensInNewTabAttribute && { rel } ),
 			};
 		},
 	},
