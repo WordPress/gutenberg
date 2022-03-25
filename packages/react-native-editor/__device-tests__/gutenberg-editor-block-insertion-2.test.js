@@ -18,7 +18,6 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 
 		const expectedHtml = `${ headingExpectedHTML }\n\n${ listExpectedHTML }`;
 		const html = await editorPage.getHtmlContent();
-
 		expect( html.toLowerCase() ).toBe( expectedHtml );
 	} );
 
@@ -32,7 +31,6 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 
 		const expectedHtml = `${ headingExpectedHTML }\n\n${ separatorExpectedHTML }\n\n${ listExpectedHTML }`;
 		const html = await editorPage.getHtmlContent();
-
 		expect( html.toLowerCase() ).toBe( expectedHtml );
 	} );
 
@@ -48,7 +46,6 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 
 		const expectedHtml = `${ headingExpectedHTML }\n\n${ imageExpectedHTML }\n\n${ separatorExpectedHTML }\n\n${ listExpectedHTML }`;
 		const html = await editorPage.getHtmlContent();
-
 		expect( html.toLowerCase() ).toBe( expectedHtml );
 	} );
 
@@ -57,7 +54,6 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 
 		const expectedHtml = `${ headingExpectedHTML }\n\n${ imageExpectedHTML }\n\n${ separatorExpectedHTML }\n\n${ listExpectedHTML }\n\n${ moreExpectedHTML }`;
 		const html = await editorPage.getHtmlContent();
-
 		expect( html.toLowerCase() ).toBe( expectedHtml );
 	} );
 
