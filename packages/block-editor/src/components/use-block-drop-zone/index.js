@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useSelectors } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import {
 	useThrottle,
@@ -100,7 +100,7 @@ export default function useBlockDropZone( {
 		[ targetRootClientId ]
 	);
 
-	const { getBlockListSettings } = useSelect( blockEditorStore );
+	const { getBlockListSettings } = useSelectors( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
 		blockEditorStore
 	);

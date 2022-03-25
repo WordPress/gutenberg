@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect, useSelectors } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
 	store as blockEditorStore,
@@ -10,7 +10,7 @@ import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function ConvertToRegularBlocks( { clientId } ) {
-	const { getBlocks } = useSelect( blockEditorStore );
+	const { getBlocks } = useSelectors( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
 	const canRemove = useSelect(

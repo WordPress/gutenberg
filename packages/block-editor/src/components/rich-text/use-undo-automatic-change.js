@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelectors } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { BACKSPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
 
@@ -11,7 +11,9 @@ import { BACKSPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '../../store';
 
 export function useUndoAutomaticChange() {
-	const { didAutomaticChange, getSettings } = useSelect( blockEditorStore );
+	const { didAutomaticChange, getSettings } = useSelectors(
+		blockEditorStore
+	);
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode } = event;

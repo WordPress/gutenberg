@@ -11,7 +11,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelectors } from '@wordpress/data';
 import { ToolbarGroup } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -46,7 +46,7 @@ export default function ClassicEdit( {
 	setAttributes,
 	onReplace,
 } ) {
-	const { getMultiSelectedBlockClientIds } = useSelect( blockEditorStore );
+	const { getMultiSelectedBlockClientIds } = useSelectors( blockEditorStore );
 	const didMount = useRef( false );
 
 	useEffect( () => {

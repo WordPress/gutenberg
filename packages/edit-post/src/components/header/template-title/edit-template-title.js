@@ -8,7 +8,7 @@ import { mapValues } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useSelectors } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -26,7 +26,7 @@ export default function EditTemplateTitle() {
 	}, [] );
 
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { getEditorSettings } = useSelect( editorStore );
+	const { getEditorSettings } = useSelectors( editorStore );
 	const { updateEditorSettings } = useDispatch( editorStore );
 
 	if ( template.has_theme_file ) {

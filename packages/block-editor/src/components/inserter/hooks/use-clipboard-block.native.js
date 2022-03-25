@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelectors } from '@wordpress/data';
 import { rawHandler, store as blocksStore } from '@wordpress/blocks';
 import { getClipboard } from '@wordpress/components';
 
@@ -11,8 +11,8 @@ import { getClipboard } from '@wordpress/components';
 import { store as blockEditorStore } from '../../../store';
 
 export default function useClipboardBlock( destinationRootClientId ) {
-	const { canInsertBlockType } = useSelect( blockEditorStore );
-	const { getBlockType } = useSelect( blocksStore );
+	const { canInsertBlockType } = useSelectors( blockEditorStore );
+	const { getBlockType } = useSelectors( blocksStore );
 
 	const clipboard = getClipboard();
 	const clipboardBlock = rawHandler( { HTML: clipboard } )[ 0 ];

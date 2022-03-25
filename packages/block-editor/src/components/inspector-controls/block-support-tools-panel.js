@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelectors } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 
 /**
@@ -18,7 +18,7 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 		getMultiSelectedBlockClientIds,
 		getSelectedBlockClientId,
 		hasMultiSelection,
-	} = useSelect( blockEditorStore );
+	} = useSelectors( blockEditorStore );
 
 	const panelId = getSelectedBlockClientId();
 	const resetAll = useCallback(

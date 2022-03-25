@@ -11,7 +11,7 @@ import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
 } from '@wordpress/dom';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelectors } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useRefEffect } from '@wordpress/compose';
@@ -23,8 +23,8 @@ import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 
 export function useNotifyCopy() {
-	const { getBlockName } = useSelect( blockEditorStore );
-	const { getBlockType } = useSelect( blocksStore );
+	const { getBlockName } = useSelectors( blockEditorStore );
+	const { getBlockType } = useSelectors( blocksStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	return useCallback( ( eventType, selectedBlockClientIds ) => {
@@ -78,7 +78,7 @@ export function useClipboardHandler() {
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
-	} = useSelect( blockEditorStore );
+	} = useSelectors( blockEditorStore );
 	const { flashBlock, removeBlocks, replaceBlocks } = useDispatch(
 		blockEditorStore
 	);

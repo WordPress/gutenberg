@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelectors } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -17,7 +17,7 @@ import { store as blockEditorStore } from '../../store';
  * @return {import('react').RefCallback} Ref callback.
  */
 export function useBlockSelectionClearer() {
-	const { hasSelectedBlock, hasMultiSelection } = useSelect(
+	const { hasSelectedBlock, hasMultiSelection } = useSelectors(
 		blockEditorStore
 	);
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );

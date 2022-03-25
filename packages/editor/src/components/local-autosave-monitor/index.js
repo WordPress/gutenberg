@@ -8,7 +8,7 @@ import { once, uniqueId, omit } from 'lodash';
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { ifCondition, usePrevious } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSelectors } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -59,7 +59,7 @@ function useAutosaveNotice() {
 		} ),
 		[]
 	);
-	const { getEditedPostAttribute } = useSelect( editorStore );
+	const { getEditedPostAttribute } = useSelectors( editorStore );
 
 	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 	const { editPost, resetEditorBlocks } = useDispatch( editorStore );

@@ -6,7 +6,7 @@ import { castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useSelectors } from '@wordpress/data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -45,7 +45,7 @@ function useInsertionPoint( {
 	onSelect,
 	shouldFocusBlock = true,
 } ) {
-	const { getSelectedBlock } = useSelect( blockEditorStore );
+	const { getSelectedBlock } = useSelectors( blockEditorStore );
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
 			const {

@@ -17,7 +17,7 @@ import {
 	ToolbarButton,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSelectors } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
@@ -85,7 +85,7 @@ export default function Image( {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
 	const { allowResize = true } = context;
-	const { getBlock } = useSelect( blockEditorStore );
+	const { getBlock } = useSelectors( blockEditorStore );
 
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {

@@ -7,7 +7,7 @@ import {
 	getBlockTransforms,
 	pasteHandler,
 } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useSelectors } from '@wordpress/data';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 
 /**
@@ -221,7 +221,7 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		canInsertBlockType,
 		getBlockIndex,
 		getClientIdsOfDescendants,
-	} = useSelect( blockEditorStore );
+	} = useSelectors( blockEditorStore );
 	const {
 		insertBlocks,
 		moveBlocksToPosition,

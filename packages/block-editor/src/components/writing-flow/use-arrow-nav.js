@@ -16,7 +16,7 @@ import {
 	isRTL,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
-import { useSelect } from '@wordpress/data';
+import { useSelectors } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -125,7 +125,7 @@ export default function useArrowNav() {
 		getNextBlockClientId,
 		getSettings,
 		hasMultiSelection,
-	} = useSelect( blockEditorStore );
+	} = useSelectors( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to

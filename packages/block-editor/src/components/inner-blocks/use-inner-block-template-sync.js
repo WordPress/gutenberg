@@ -7,7 +7,7 @@ import { isEqual } from 'lodash';
  * WordPress dependencies
  */
 import { useRef, useLayoutEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSelectors } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 
 /**
@@ -40,7 +40,7 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
-	const { getSelectedBlocksInitialCaretPosition } = useSelect(
+	const { getSelectedBlocksInitialCaretPosition } = useSelectors(
 		blockEditorStore
 	);
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );

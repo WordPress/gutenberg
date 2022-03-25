@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelectors } from '@wordpress/data';
 import { isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
@@ -12,11 +12,11 @@ import { store as keyboardShortcutsStore } from '../store';
 /**
  * Returns a function to check if a keyboard event matches a shortcut name.
  *
- * @return {Function} A function to to check if a keyboard event matches a
+ * @return {Function} A function to check if a keyboard event matches a
  *                    predefined shortcut combination.
  */
 export default function useShortcutEventMatch() {
-	const { getAllShortcutKeyCombinations } = useSelect(
+	const { getAllShortcutKeyCombinations } = useSelectors(
 		keyboardShortcutsStore
 	);
 

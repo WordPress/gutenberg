@@ -7,7 +7,7 @@ import { AccessibilityInfo, TouchableHighlight, Platform } from 'react-native';
  * WordPress dependencies
  */
 import { useEffect, useState, useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSelectors } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import {
 	BottomSheet,
@@ -80,7 +80,7 @@ function InserterMenu( {
 		}
 	);
 
-	const { getBlockOrder, getBlockCount } = useSelect( blockEditorStore );
+	const { getBlockOrder, getBlockCount } = useSelectors( blockEditorStore );
 
 	useEffect( () => {
 		// Show/Hide insertion point on Mount/Dismount
