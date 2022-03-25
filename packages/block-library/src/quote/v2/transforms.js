@@ -105,8 +105,8 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/group' ],
-			transform: ( {}, innerBlocks ) =>
-				createBlock( 'core/quote', {}, innerBlocks ),
+			transform: ( { anchor }, innerBlocks ) =>
+				createBlock( 'core/quote', { anchor }, innerBlocks ),
 		},
 	],
 	to: [
@@ -147,10 +147,10 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/group' ],
-			transform: ( { attribution }, innerBlocks ) =>
+			transform: ( { attribution, anchor }, innerBlocks ) =>
 				createBlock(
 					'core/group',
-					{},
+					{ anchor },
 					attribution
 						? [
 								...innerBlocks,
