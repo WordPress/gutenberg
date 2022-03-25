@@ -123,12 +123,17 @@ const linkFormatAttributes = applyFilters( 'editor.linkFormat.attributes', {
 	target: 'target',
 	noFollow: {
 		target: 'rel',
-		toFormat( attributeValue ) {
-			return attributeValue?.includes( 'nofollow' );
+		toFormat( relAttribute ) {
+			// Set the Boolean value of the `noFollow` prop
+			// based on the whether the HTML `rel` attribute contains
+			// `nofollow`.
+			return relAttribute?.split?.includes( 'nofollow' );
 		},
-		toElement( value, currentAttributes ) {
+		toElement( noFollowAttribute, currentAttributes ) {
 			const currentRelOrEmpty = currentAttributes?.rel ?? '';
-			return value ? ( currentRelOrEmpty + ' nofollow' ).trim() : null;
+			return noFollowAttribute
+				? ( currentRelOrEmpty + ' nofollow' ).trim()
+				: null;
 		},
 	},
 } );
