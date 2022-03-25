@@ -59,7 +59,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= '}';
 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; width: 100vw; margin-left: 50%; transform: translateX(-50%); }";
+			$style .= "$selector .alignfull { max-width: none; width: 100vw; margin-left: 50% ! important; transform: translateX(-50%); }";
 		}
 
 		$style .= "$selector > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }";
