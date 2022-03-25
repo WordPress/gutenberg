@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, SyntheticEvent } from 'react';
+import type { CSSProperties, FocusEventHandler, SyntheticEvent } from 'react';
 
 /**
  * Internal dependencies
@@ -73,7 +73,7 @@ export type UnitSelectControlProps = {
 };
 
 // TODO: when available, should (partially) extend `NumberControl` props.
-export type UnitControlProps = UnitSelectControlProps &
+export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 	Pick< InputControlProps, 'hideLabelFromVision' > & {
 		__unstableStateReducer?: StateReducer;
 		__unstableInputWidth?: CSSProperties[ 'width' ];
@@ -106,6 +106,12 @@ export type UnitControlProps = UnitSelectControlProps &
 		 */
 		onUnitChange?: UnitControlOnChangeCallback;
 		/**
+		 * Current unit. _Note: this prop is deprecated. Instead, provide a unit with a value through the `value` prop._
+		 *
+		 * @deprecated
+		 */
+		unit?: string;
+		/**
 		 * Current value. If passed as a string, the current unit will be inferred from this value.
 		 * For example, a `value` of "50%" will set the current unit to `%`.
 		 */
@@ -125,4 +131,8 @@ export type UnitControlProps = UnitSelectControlProps &
 		 * @default 10
 		 */
 		shiftStep?: number;
+		/**
+		 * Callback when either the quantity or the unit inputs lose focus.
+		 */
+		onBlur?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
 	};

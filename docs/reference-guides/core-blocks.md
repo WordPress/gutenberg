@@ -26,6 +26,15 @@ Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Supports:** align, anchor
 -	**Attributes:** autoplay, caption, id, loop, preload, src
 
+## Avatar
+
+Add a user's avatar. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/avatar))
+
+-	**Name:** core/avatar
+-	**Category:** theme
+-	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin), ~~alignWide~~, ~~html~~
+-	**Attributes:** isLink, linkTarget, size, userId
+
 ## Reusable block
 
 Create and save content to reuse across your site. Update the block, and the changes apply everywhere it’s used. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/block))
@@ -104,7 +113,7 @@ Add the avatar of this comment's author. ([Source](https://github.com/WordPress/
 
 -	**Name:** core/comment-author-avatar
 -	**Category:** theme
--	**Supports:** color (background, ~~text~~), spacing (margin, padding), ~~html~~
+-	**Supports:** color (background, ~~text~~), spacing (margin, padding), ~~html~~, ~~inserter~~
 -	**Attributes:** height, width
 
 ## Comment Author Name
@@ -204,7 +213,7 @@ An advanced block that allows displaying post comments based on different query 
 -	**Name:** core/comments-query-loop
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** defaultPage, inherit, order, perPage, tagName
+-	**Attributes:** tagName
 
 ## Cover
 
@@ -611,6 +620,15 @@ An advanced block that allows displaying post types based on different query par
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
 -	**Attributes:** displayLayout, query, queryId, tagName
 
+## No results
+
+Contains the block elements used to render content when no query results are found. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-no-results))
+
+-	**Name:** core/query-no-results
+-	**Category:** theme
+-	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
+-	**Attributes:** 
+
 ## Pagination
 
 Displays a paginated navigation to next/previous set of posts, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination))
@@ -789,7 +807,7 @@ A cloud of your most used tags. ([Source](https://github.com/WordPress/gutenberg
 -	**Name:** core/tag-cloud
 -	**Category:** widgets
 -	**Supports:** align, ~~html~~
--	**Attributes:** numberOfTags, showTagCounts, taxonomy
+-	**Attributes:** largestFontSize, numberOfTags, showTagCounts, smallestFontSize, taxonomy
 
 ## Template Part
 

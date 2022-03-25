@@ -37,6 +37,7 @@ export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
 export { getCurrentPostContent } from './get-current-post-content';
+export { getListViewBlocks } from './get-list-view-blocks';
 export { hasBlockSwitcher } from './has-block-switcher';
 export { getPageError } from './get-page-error';
 export { getOption } from './get-option';

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "11.0.1",
+	"version": "11.1.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -42,6 +42,7 @@
 		"eslint-plugin-jest": "^25.2.3",
 		"eslint-plugin-jsdoc": "^37.0.3",
 		"eslint-plugin-jsx-a11y": "^6.5.1",
+		"eslint-plugin-playwright": "^0.8.0",
 		"eslint-plugin-prettier": "^3.3.0",
 		"eslint-plugin-react": "^7.27.0",
 		"eslint-plugin-react-hooks": "^4.3.0",

@@ -2,6 +2,8 @@ name: Report Flaky Tests
 
 on:
     workflow_run:
+        # We should also add 'End-to-End Tests Playwright' here but that
+        # wil run this workflow whenever either one of them completes.
         workflows: ['End-to-End Tests']
         types:
             - completed

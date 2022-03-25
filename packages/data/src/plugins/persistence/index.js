@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject } from 'lodash';
+import { merge, isPlainObject, identity } from 'lodash';
 
 /**
  * Internal dependencies
@@ -303,7 +303,8 @@ export function migrateFeaturePreferencesToPreferencesStore(
 export function migrateIndividualPreferenceToPreferencesStore(
 	persistence,
 	sourceStoreName,
-	key
+	key,
+	convert = identity
 ) {
 	const preferencesStoreName = 'core/preferences';
 	const state = persistence.get();
@@ -324,16 +325,20 @@ export function migrateIndividualPreferenceToPreferencesStore(
 		return;
 	}
 
-	const allPreferences = state[ preferencesStoreName ]?.preferences;
-	const targetPreferences =
+	const otherScopes = state[ preferencesStoreName ]?.preferences;
+	const otherPreferences =
 		state[ preferencesStoreName ]?.preferences?.[ sourceStoreName ];
+
+	// Pass an object with the key and value as this allows the convert
+	// function to convert to a data structure that has different keys.
+	const convertedPreferences = convert( { [ key ]: sourcePreference } );
 
 	persistence.set( preferencesStoreName, {
 		preferences: {
-			...allPreferences,
+			...otherScopes,
 			[ sourceStoreName ]: {
-				...targetPreferences,
-				[ key ]: sourcePreference,
+				...otherPreferences,
+				...convertedPreferences,
 			},
 		},
 	} );
@@ -348,6 +353,57 @@ export function migrateIndividualPreferenceToPreferencesStore(
 			[ key ]: undefined,
 		},
 	} );
+}
+
+/**
+ * Convert from:
+ * ```
+ * {
+ *     panels: {
+ *         tags: {
+ *             enabled: true,
+ *             opened: true,
+ *         },
+ *         permalinks: {
+ *             enabled: false,
+ *             opened: false,
+ *         },
+ *     },
+ * }
+ * ```
+ *
+ * to:
+ * {
+ *     inactivePanels: [
+ *         'permalinks',
+ *     ],
+ *     openPanels: [
+ *         'tags',
+ *     ],
+ * }
+ *
+ * @param {Object} preferences A preferences object.
+ *
+ * @return {Object} The converted data.
+ */
+export function convertEditPostPanels( preferences ) {
+	const panels = preferences?.panels ?? {};
+	return Object.keys( panels ).reduce(
+		( convertedData, panelName ) => {
+			const panel = panels[ panelName ];
+
+			if ( panel?.enabled === false ) {
+				convertedData.inactivePanels.push( panelName );
+			}
+
+			if ( panel?.opened === true ) {
+				convertedData.openPanels.push( panelName );
+			}
+
+			return convertedData;
+		},
+		{ inactivePanels: [], openPanels: [] }
+	);
 }
 
 export function migrateThirdPartyFeaturePreferencesToPreferencesStore(
@@ -366,7 +422,7 @@ export function migrateThirdPartyFeaturePreferencesToPreferencesStore(
 			continue;
 		}
 
-		// Skip this scope if there are no features to migrates
+		// Skip this scope if there are no features to migrate.
 		const featuresToMigrate = interfaceScopes[ scope ];
 		if ( ! featuresToMigrate ) {
 			continue;
@@ -400,6 +456,125 @@ export function migrateThirdPartyFeaturePreferencesToPreferencesStore(
 			},
 		} );
 	}
+}
+
+/**
+ * Migrates interface 'enableItems' data to the preferences store.
+ *
+ * The interface package stores this data in this format:
+ * ```js
+ * {
+ *     enableItems: {
+ *         singleEnableItems: {
+ * 	           complementaryArea: {
+ *                 'core/edit-post': 'edit-post/document',
+ *                 'core/edit-site': 'edit-site/global-styles',
+ *             }
+ *         },
+ *         multipleEnableItems: {
+ *             pinnedItems: {
+ *                 'core/edit-post': {
+ *                     'plugin-1': true,
+ *                 },
+ *                 'core/edit-site': {
+ *                     'plugin-2': true,
+ *                 },
+ *             },
+ *         }
+ *     }
+ * }
+ * ```
+ * and it should be migrated it to:
+ * ```js
+ * {
+ *     'core/edit-post': {
+ *         complementaryArea: 'edit-post/document',
+ *         pinnedItems: {
+ *             'plugin-1': true,
+ *         },
+ *     },
+ *     'core/edit-site': {
+ *         complementaryArea: 'edit-site/global-styles',
+ *         pinnedItems: {
+ *             'plugin-2': true,
+ *         },
+ *     },
+ * }
+ * ```
+ *
+ * @param {Object} persistence The persistence interface.
+ */
+export function migrateInterfaceEnableItemsToPreferencesStore( persistence ) {
+	const interfaceStoreName = 'core/interface';
+	const preferencesStoreName = 'core/preferences';
+	const state = persistence.get();
+	const sourceEnableItems = state[ interfaceStoreName ]?.enableItems;
+
+	// There's nothing to migrate, exit early.
+	if ( ! sourceEnableItems ) {
+		return;
+	}
+
+	const allPreferences = state[ preferencesStoreName ]?.preferences ?? {};
+
+	// First convert complementaryAreas into the right format.
+	// Use the existing preferences as the accumulator so that the data is
+	// merged.
+	const sourceComplementaryAreas =
+		sourceEnableItems?.singleEnableItems?.complementaryArea ?? {};
+
+	const convertedComplementaryAreas = Object.keys(
+		sourceComplementaryAreas
+	).reduce( ( accumulator, scope ) => {
+		const data = sourceComplementaryAreas[ scope ];
+
+		// Don't overwrite any existing data in the preferences store.
+		if ( accumulator[ scope ]?.complementaryArea ) {
+			return accumulator;
+		}
+
+		return {
+			...accumulator,
+			[ scope ]: {
+				...accumulator[ scope ],
+				complementaryArea: data,
+			},
+		};
+	}, allPreferences );
+
+	// Next feed the converted complementary areas back into a reducer that
+	// converts the pinned items, resulting in the fully migrated data.
+	const sourcePinnedItems =
+		sourceEnableItems?.multipleEnableItems?.pinnedItems ?? {};
+	const allConvertedData = Object.keys( sourcePinnedItems ).reduce(
+		( accumulator, scope ) => {
+			const data = sourcePinnedItems[ scope ];
+			// Don't overwrite any existing data in the preferences store.
+			if ( accumulator[ scope ]?.pinnedItems ) {
+				return accumulator;
+			}
+
+			return {
+				...accumulator,
+				[ scope ]: {
+					...accumulator[ scope ],
+					pinnedItems: data,
+				},
+			};
+		},
+		convertedComplementaryAreas
+	);
+
+	persistence.set( preferencesStoreName, {
+		preferences: allConvertedData,
+	} );
+
+	// Remove migrated preferences.
+	const otherInterfaceItems = state[ interfaceStoreName ];
+	persistence.set( interfaceStoreName, {
+		...otherInterfaceItems,
+		enableItems: undefined,
+	} );
 }
 
 persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
@@ -442,9 +617,16 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	);
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,
+		'core/edit-post',
+		'panels',
+		convertEditPostPanels
+	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
 		'core/edit-site',
 		'editorMode'
 	);
+	migrateInterfaceEnableItemsToPreferencesStore( persistence );
 };
 
 export default persistencePlugin;

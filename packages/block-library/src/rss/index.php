@@ -83,10 +83,19 @@ function render_block_core_rss( $attributes ) {
 	if ( isset( $attributes['blockLayout'] ) && 'grid' === $attributes['blockLayout'] ) {
 		$classnames[] = 'is-grid';
 	}
-
 	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['blockLayout'] ) {
 		$classnames[] = 'columns-' . $attributes['columns'];
 	}
+	if ( $attributes['displayDate'] ) {
+		$classnames[] = 'has-dates';
+	}
+	if ( $attributes['displayAuthor'] ) {
+		$classnames[] = 'has-authors';
+	}
+	if ( $attributes['displayExcerpt'] ) {
+		$classnames[] = 'has-excerpts';
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
 
 	return sprintf( '<ul %s>%s</ul>', $wrapper_attributes, $list_items );

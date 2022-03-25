@@ -100,7 +100,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should not render select, if units are disabled', () => {
-			render( <UnitControl unit="em" units={ [] } /> );
+			render( <UnitControl value="3em" units={ [] } /> );
 			const input = getInput();
 			const select = getSelect();
 
@@ -220,21 +220,113 @@ describe( 'UnitControl', () => {
 			expect( input.value ).toBe( '50' );
 			expect( state ).toBe( 50 );
 		} );
+
+		it( 'should run onBlur callback when quantity input is blurred', async () => {
+			let state = '33%';
+			const onChangeSpy = jest.fn();
+			const onBlurSpy = jest.fn();
+			const setState = ( nextState ) => {
+				onChangeSpy( nextState );
+				state = nextState;
+			};
+
+			const { user } = render(
+				<>
+					<button>Click me</button>
+					<UnitControl
+						value={ state }
+						onChange={ setState }
+						onBlur={ onBlurSpy }
+					/>
+				</>
+			);
+
+			const input = getInput();
+			await user.clear( input );
+			await user.type( input, '41' );
+
+			await waitFor( () =>
+				expect( onChangeSpy ).toHaveBeenCalledTimes( 3 )
+			);
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41%' );
+
+			// Clicking on the button should cause the `onBlur` callback to fire.
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+
+			await waitFor( () =>
+				expect( onBlurSpy ).toHaveBeenCalledTimes( 1 )
+			);
+		} );
+
+		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
+			let state = '15px';
+
+			const onUnitChangeSpy = jest.fn();
+			const onChangeSpy = jest.fn();
+
+			const setState = ( nextState ) => {
+				onChangeSpy( nextState );
+				state = nextState;
+			};
+
+			const { user } = render(
+				<>
+					<button>Click me</button>
+					<UnitControl
+						value={ state }
+						onChange={ setState }
+						onUnitChange={ onUnitChangeSpy }
+						isPressEnterToChange
+					/>
+				</>
+			);
+
+			const input = getInput();
+			await user.clear( input );
+			await user.type( input, '41vh' );
+
+			// This is because `isPressEnterToChange` is `true`
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+
+			// Clicking on the button should cause the `onBlur` callback to fire.
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+
+			await waitFor( () =>
+				expect( onChangeSpy ).toHaveBeenCalledTimes( 1 )
+			);
+
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41vh' );
+
+			expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onUnitChangeSpy ).toHaveBeenLastCalledWith(
+				'vh',
+				expect.anything()
+			);
+		} );
 	} );
 
 	describe( 'Unit', () => {
 		it( 'should update unit value on change', async () => {
-			let state = 'px';
+			let state = '14rem';
 			const setState = ( nextState ) => ( state = nextState );
 
+			const spy = jest.fn();
+
 			const { user } = render(
-				<UnitControl unit={ state } onUnitChange={ setState } />
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					onUnitChange={ spy }
+				/>
 			);
 
 			const select = getSelect();
-			await user.selectOptions( select, [ 'em' ] );
+			await user.selectOptions( select, [ 'px' ] );
 
-			expect( state ).toBe( 'em' );
+			expect( spy ).toHaveBeenCalledWith( 'px', expect.anything() );
+			expect( state ).toBe( '14px' );
 		} );
 
 		it( 'should render customized units, if defined', () => {
@@ -319,7 +411,6 @@ describe( 'UnitControl', () => {
 			const { user } = render(
 				<UnitControl
 					value={ state }
-					unit="%"
 					units={ [ { value: '%', label: '%' } ] }
 					onChange={ setState }
 				/>
@@ -358,6 +449,60 @@ describe( 'UnitControl', () => {
 
 			await waitFor( () => expect( selectA ).toHaveValue( 'vw' ) );
 			expect( selectB ).toHaveValue( 'vw' );
+		} );
+
+		it( 'should maintain the chosen non-default unit when value is cleared', async () => {
+			const units = [
+				{ value: 'pt', label: 'pt' },
+				{ value: 'vmax', label: 'vmax' },
+			];
+
+			const { user } = render(
+				<UnitControl units={ units } value="5" />
+			);
+
+			const select = getSelect();
+			await user.selectOptions( select, [ 'vmax' ] );
+
+			const input = getInput();
+			await user.clear( input );
+
+			expect( select ).toHaveValue( 'vmax' );
+		} );
+
+		it( 'should run onBlur callback when the unit select is blurred', async () => {
+			const onUnitChangeSpy = jest.fn();
+			const onBlurSpy = jest.fn();
+
+			const { user } = render(
+				<>
+					<button>Click me</button>
+					<UnitControl
+						value="15px"
+						onUnitChange={ onUnitChangeSpy }
+						onBlur={ onBlurSpy }
+					/>
+				</>
+			);
+
+			const select = getSelect();
+			await user.selectOptions( select, [ 'em' ] );
+
+			await waitFor( () =>
+				expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 )
+			);
+			expect( onUnitChangeSpy ).toHaveBeenLastCalledWith(
+				'em',
+				expect.anything()
+			);
+
+			// Clicking on the button should cause the `onBlur` callback to fire.
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+
+			await waitFor( () =>
+				expect( onBlurSpy ).toHaveBeenCalledTimes( 1 )
+			);
 		} );
 	} );
 
@@ -450,16 +595,16 @@ describe( 'UnitControl', () => {
 			expect( state ).toBe( '123rem' );
 		} );
 
-		it( 'should update unit after initial render and with new unit prop', () => {
+		it( 'should update unit after initial render and with new unit prop', async () => {
 			const { rerender } = render( <UnitControl value={ '10%' } /> );
 
 			const select = getSelect();
 
 			expect( select.value ).toBe( '%' );
 
-			rerender( <UnitControl value={ '20' } unit="em" /> );
+			rerender( <UnitControl value={ '20vh' } /> );
 
-			expect( select.value ).toBe( 'em' );
+			await waitFor( () => expect( select.value ).toBe( 'vh' ) );
 		} );
 
 		it( 'should fallback to default unit if parsed unit is invalid', () => {
