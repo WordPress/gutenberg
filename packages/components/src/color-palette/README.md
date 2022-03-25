@@ -75,6 +75,6 @@ const MyColorPalette = () => {
 } );
 ```
 
-To [ensure `ToolTip` positioning](/packages/components/README.md#popovers-and-tooltips)
+To [ensure `Tooltip` positioning](/packages/components/README.md#popovers-and-tooltips)
 when hovering the `ColorPalette`'s swatches, render your `ColorPalette` with a
 `Popover.Slot` further up the element tree and within a `SlotFillProvider` overall.

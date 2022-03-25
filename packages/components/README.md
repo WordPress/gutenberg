@@ -42,7 +42,7 @@ This issue can be solved by rendering popovers to a specific location in the DOM
 `Popover.Slot`. For this to work, you will need your use of the `Popover`
 component and its `Slot` to be wrapped in a [`SlotFill`](/packages/components/src/slot-fill/README.md) provider.
 
-A `Popover` is also used as the underlying mechanism to display `ToolTip` components.
+A `Popover` is also used as the underlying mechanism to display `Tooltip` components.
 So the same considerations should be applied to them.
 
 The following example illustrates how you can wrap a component using a
