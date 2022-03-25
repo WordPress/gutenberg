@@ -9,6 +9,7 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
 import { getPageError } from './get-page-error';
 import { isCurrentURL } from './is-current-url';
 import { visitAdminPage } from './visit-admin-page';
+import { createNewPost } from './create-new-post';
 
 class PageUtils {
 	browser: Browser;
@@ -24,6 +25,7 @@ class PageUtils {
 	getPageError = getPageError;
 	isCurrentURL = isCurrentURL;
 	visitAdminPage = visitAdminPage;
+	createNewPost = createNewPost;
 }
 
 export { PageUtils };

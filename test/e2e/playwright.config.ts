@@ -38,7 +38,7 @@ const config: PlaywrightTestConfig = {
 			strictSelectors: true,
 		},
 		storageState: STORAGE_STATE_PATH,
-		actionTimeout: 10_000, // 10 seconds.
+		actionTimeout: 20_000, // 20 seconds.
 		trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
 		screenshot: 'only-on-failure',
 		video: 'on-first-retry',
