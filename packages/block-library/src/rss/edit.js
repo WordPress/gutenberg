@@ -19,6 +19,7 @@ import {
 import { useState } from '@wordpress/element';
 import { grid, list, edit, rss } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { prependHTTP } from '@wordpress/url';
 import ServerSideRender from '@wordpress/server-side-render';
 
 const DEFAULT_MIN_ITEMS = 1;
@@ -50,6 +51,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		event.preventDefault();
 
 		if ( feedURL ) {
+			setAttributes( { feedURL: prependHTTP( feedURL ) } );
 			setIsEditing( false );
 		}
 	}
