@@ -30,7 +30,7 @@ const variations = [
 	{
 		name: 'group-stack',
 		title: __( 'Stack' ),
-		description: __( 'Blocks stacked in a column.' ),
+		description: __( 'Blocks stacked vertically.' ),
 		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
