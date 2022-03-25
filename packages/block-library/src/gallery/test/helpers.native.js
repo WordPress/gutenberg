@@ -105,7 +105,12 @@ export const initializeWithGalleryBlock = async ( {
 		generateGalleryBlock( numberOfItems, media, {
 			useLocalUrl,
 		} );
-	const screen = await initializeEditor( { initialHtml } );
+	const screen = await initializeEditor( {
+		initialHtml,
+		capabilities: {
+			canUploadMedia: true,
+		},
+	} );
 	const { getByA11yLabel } = screen;
 
 	const galleryBlock = getByA11yLabel( /Gallery Block\. Row 1/ );
