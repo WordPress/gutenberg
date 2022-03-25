@@ -13,11 +13,12 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation } ) => {
+			transform: ( { value, citation, anchor } ) => {
 				return createBlock(
 					'core/quote',
 					{
 						attribution: citation,
+						anchor,
 					},
 					parseWithAttributeSchema( value, {
 						type: 'array',
@@ -115,10 +116,11 @@ const transforms = {
 					( { name } ) => name === 'core/paragraph'
 				);
 			},
-			transform: ( { attribution }, innerBlocks ) => {
+			transform: ( { attribution, anchor }, innerBlocks ) => {
 				return createBlock( 'core/pullquote', {
 					value: serialize( innerBlocks ),
 					citation: attribution,
+					anchor,
 				} );
 			},
 		},
