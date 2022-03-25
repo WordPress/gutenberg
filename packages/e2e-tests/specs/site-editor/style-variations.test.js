@@ -22,19 +22,21 @@ async function getAvailableStyleVariations() {
 	return page.$$( VARIATION_ITEMS_STYLES_SELECTOR );
 }
 
-async function applyVariation( number ) {
+async function applyVariation( label ) {
 	await toggleGlobalStyles();
 	await openOtherStyles();
-	const variations = await getAvailableStyleVariations();
-	await variations[ number ].click();
+	const variation = await page.waitForXPath(
+		`//*[@role="button"][@aria-label="${ label }"]`
+	);
+	await variation.click();
 }
 
 async function applyPinkVariation() {
-	await applyVariation( 1 );
+	await applyVariation( 'pink' );
 }
 
 async function applyYellowVariation() {
-	await applyVariation( 2 );
+	await applyVariation( 'yellow' );
 }
 
 async function openColorsPanel() {
