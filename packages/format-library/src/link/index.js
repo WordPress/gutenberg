@@ -208,7 +208,6 @@ export const link = {
 			url,
 			type,
 			id,
-			// eslint
 			title: __IGNORED, // eslint-disable-line no-unused-vars
 			...otherOptions
 		} = options;
@@ -231,17 +230,6 @@ export const link = {
 
 		if ( type ) format.attributes.type = type;
 		if ( newId ) format.attributes.id = newId;
-
-		// Bug where this will be overwritten because `_target` is included in ...otherOptions
-		// Also means the object based attribute format will not work for more complex
-		// cases.
-		// if ( opensInNewTab ) {
-		// 	const currentRelOrEmpty = format.attributes?.rel ?? '';
-		// 	format.attributes.target = '_blank';
-		// 	format.attributes.rel = (
-		// 		currentRelOrEmpty + ' noreferrer noopener'
-		// 	).trim();
-		// }
 
 		return format;
 	},
