@@ -22,14 +22,13 @@ async function getAvailableStyleVariations() {
 	return page.$$( VARIATION_ITEMS_STYLES_SELECTOR );
 }
 
-async function applyVariation( title ) {
+async function applyVariation( label ) {
 	await toggleGlobalStyles();
 	await openOtherStyles();
 	const variation = await await page.waitForXPath(
-		`//*[@role="button"][@aria-label="${ title }"]`
+		`//*[@role="button"][@aria-label="${ label }"]`
 	);
-	await variation.focus();
-	await page.keyboard.press( 'Enter' );
+	await variation.click();
 }
 
 async function applyPinkVariation() {
