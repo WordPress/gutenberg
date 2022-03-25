@@ -419,9 +419,7 @@ describe( 'block factory', () => {
 			} );
 
 			const clonedBlock = cloneBlock( block, {}, null, {
-				__experimentalExcludeAttributes: {
-					__experimentalSupports: { copy: false },
-				},
+				__experimentalRequiredAttributeSupports: [ 'copy' ],
 			} );
 
 			expect( clonedBlock.attributes ).toEqual( {

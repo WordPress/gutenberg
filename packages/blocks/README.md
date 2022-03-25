@@ -194,8 +194,7 @@ _Parameters_
 -   _block_ `Object`: Block instance.
 -   _mergeAttributes_ `Object`: Block attributes.
 -   _newInnerBlocks_ `?Array`: Nested blocks.
--   _\_\_experimentalOptions_ `?Object`: Cloning options.
--   _**experimentalOptions.**experimentalExcludeAttributes_ `?Object`: Attributes matching this filter will be excluded from the cloned block.
+-   _\_\_experimentalOptions_ `?WPBlockCloneOptions`: Cloning options.
 
 _Returns_
 

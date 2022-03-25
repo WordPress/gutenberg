@@ -124,15 +124,20 @@ export function createBlocksFromInnerBlocksTemplate(
 }
 
 /**
+ * @typedef {Object} WPBlockCloneOptions Cloning Options.
+ *
+ * @property {Array} __experimentalRequiredAttributeSupports Attributes missing these support keys will be excluded from the cloned block.
+ */
+
+/**
  * Given a block object, returns a copy of the block object,
  * optionally merging new attributes, replacing its inner blocks, and/or
  * filtering out attributes which do not have copy support.
  *
- * @param {Object}   block                        Block instance.
- * @param {Object}   mergeAttributes              Block attributes.
- * @param {?Array}   newInnerBlocks               Nested blocks.
- * @param {?Object}  __experimentalOptions                      Cloning options.
- * @param {?Object} __experimentalOptions.__experimentalExcludeAttributes Attributes matching this filter will be excluded from the cloned block.
+ * @param {Object}                block                 Block instance.
+ * @param {Object}                mergeAttributes       Block attributes.
+ * @param {?Array}                newInnerBlocks        Nested blocks.
+ * @param {?WPBlockCloneOptions}  __experimentalOptions Cloning options.
  *
  * @return {Object} A cloned block.
  */
@@ -142,7 +147,9 @@ export function cloneBlock(
 	newInnerBlocks,
 	__experimentalOptions = {}
 ) {
-	const { __experimentalExcludeAttributes } = __experimentalOptions;
+	const {
+		__experimentalRequiredAttributeSupports: requiredSupportKeys,
+	} = __experimentalOptions;
 	const clientId = uuid();
 
 	let attributes = {
@@ -150,13 +157,17 @@ export function cloneBlock(
 		...mergeAttributes,
 	};
 
-	if ( __experimentalExcludeAttributes ) {
+	if ( requiredSupportKeys ) {
+		// Exclude attributes that do not have the required supports.
+		const attributesFilter = {
+			__experimentalSupports: requiredSupportKeys.reduce(
+				( acc, supportKey ) => ( { ...acc, [ supportKey ]: false } ),
+				{}
+			),
+		};
 		attributes = omit(
 			attributes,
-			__experimentalFilterBlockAttributes(
-				block.name,
-				__experimentalExcludeAttributes
-			)
+			__experimentalFilterBlockAttributes( block.name, attributesFilter )
 		);
 	}
 
