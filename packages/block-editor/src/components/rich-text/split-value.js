@@ -20,12 +20,8 @@ export function splitValue( {
 		return;
 	}
 
-	// Ensure the value has a selection. This might happen when trying to split
-	// an empty value before there was a `selectionchange` event.
-	const { start = 0, end = 0 } = value;
-	const valueWithSelection = { ...value, start, end };
 	const blocks = [];
-	const [ before, after ] = split( valueWithSelection );
+	const [ before, after ] = split( value );
 	const hasPastedBlocks = pastedBlocks.length > 0;
 	let lastPastedBlockIndex = -1;
 
