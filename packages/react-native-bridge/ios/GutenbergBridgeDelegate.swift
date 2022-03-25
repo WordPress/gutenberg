@@ -24,6 +24,7 @@ public enum Capabilities: String {
     case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
+    case canUploadMedia
     case isAudioBlockMediaUploadEnabled
     case reusableBlock
     case facebookEmbed
