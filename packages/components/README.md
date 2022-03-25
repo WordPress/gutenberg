@@ -33,7 +33,9 @@ In non-WordPress projects, link to the `build-style/style.css` file directly, it
 
 ### Popovers and Tooltips
 
-By default, the [`Popover`](/packages/components/src/popover/README.md) component will render inline i.e. within its
+_If you're using [`Popover`](/packages/components/src/popover/README.md) or [`Tooltip`](/packages/components/src/tooltip/README.md) components outside of the editor, make sure they are rendered within a `SlotFillProvider` and with a `Popover.Slot` somewhere up the element tree._
+
+By default, the `Popover` component will render inline i.e. within its
 parent to which it should anchor. Depending upon the context in which the
 `Popover` is being consumed, this might lead to incorrect positioning. For
 example, when being nested within another popover.

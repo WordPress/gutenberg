@@ -43,9 +43,10 @@ const MyBorderControl = () => {
 };
 ```
 
-To [ensure `Tooltip` positioning](/packages/components/README.md#popovers-and-tooltips)
-for the `BorderControl`'s color swatches, render your `BorderControl` with a
-`Popover.Slot` further up the element tree and within a
+If you're using this component outside the editor, you can
+[ensure `Tooltip` positioning](/packages/components/README.md#popovers-and-tooltips)
+for the `BorderControl`'s color and style options, by rendering your
+`BorderControl` with a `Popover.Slot` further up the element tree and within a
 `SlotFillProvider` overall.
 
 ## Props
