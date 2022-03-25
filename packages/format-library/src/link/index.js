@@ -121,7 +121,29 @@ const linkFormatAttributes = applyFilters( 'editor.linkFormat.attributes', {
 	type: 'data-type',
 	id: 'data-id',
 	target: 'target',
+	noFollow: {
+		target: 'rel',
+		toFormat( attributeValue ) {
+			return attributeValue?.includes( 'nofollow' );
+		},
+		toElement( value, currentAttributes ) {
+			const currentRelOrEmpty = currentAttributes?.rel ?? '';
+			return value ? ( currentRelOrEmpty + ' nofollow' ).trim() : null;
+		},
+	},
 } );
+
+addFilter(
+	'editor.linkFormat.inlineLinkControlSettings',
+	'core',
+	function ( settings ) {
+		settings.push( {
+			id: 'noFollow',
+			title: 'Mark as "nofollow"',
+		} );
+		return settings;
+	}
+);
 
 export const link = {
 	name,
@@ -135,6 +157,7 @@ export const link = {
 		pendingLinkValueChanges
 	) {
 		const linkValue = {
+			...activeAttributes,
 			url: activeAttributes.url,
 			type: activeAttributes.type,
 			id: activeAttributes.id,
@@ -156,7 +179,15 @@ export const link = {
 	// from a LinkControl value object.
 	// TODO: we need TypeScript here to define the type of `options`.
 	__experimentalToLinkFormat( options ) {
-		const { url, type, id, opensInNewTab } = options;
+		const {
+			url,
+			type,
+			id,
+			opensInNewTab,
+			// eslint
+			title: __IGNORED, // eslint-disable-line no-unused-vars
+			...otherOptions
+		} = options;
 
 		const newUrl = prependHTTP( url );
 
@@ -170,9 +201,17 @@ export const link = {
 			},
 		};
 
+		format.attributes = {
+			...format.attributes,
+			...otherOptions,
+		};
+
 		if ( type ) format.attributes.type = type;
 		if ( newId ) format.attributes.id = newId;
 
+		// Bug where this will be overwritten because `_target` is included in ...otherOptions
+		// Also means the object based attribute format will not work for more complex
+		// cases.
 		if ( opensInNewTab ) {
 			const currentRelOrEmpty = format.attributes?.rel ?? '';
 			format.attributes.target = '_blank';
@@ -213,49 +252,3 @@ export const link = {
 	},
 	edit: Edit,
 };
-
-// TODO - REVOVE, testing only.
-
-// Handle converting `rel="nofollow"` into the `noFollow` setting on the Link Value
-addFilter(
-	'editor.linkFormat.toLinkValue',
-	'core',
-	function ( linkValue, activeAttributes ) {
-		linkValue.noFollow = activeAttributes?.rel?.includes( 'nofollow' );
-		return linkValue;
-	}
-);
-
-// Handle converting `noFollow` of link value setting to `rel="nofollow"` attribute.
-addFilter(
-	'editor.linkFormat.toLinkFormat',
-	'core',
-	function ( format, nextValue ) {
-		const currentRelOrEmpty = format.attributes?.rel ?? '';
-		if ( nextValue.noFollow ) {
-			format.attributes = {
-				...format.attributes,
-				rel: ( currentRelOrEmpty + ' nofollow' ).trim(),
-			};
-		}
-		return format;
-	}
-);
-
-// Add 'rel' as a default attribute of `core/link` format.
-addFilter( 'editor.linkFormat.attributes', 'core', function ( attrs ) {
-	attrs.rel = 'rel';
-	return attrs;
-} );
-
-addFilter(
-	'editor.linkFormat.inlineLinkControlSettings',
-	'core',
-	function ( settings ) {
-		settings.push( {
-			id: 'noFollow',
-			title: __( 'Mark as "nofollow"' ),
-		} );
-		return settings;
-	}
-);

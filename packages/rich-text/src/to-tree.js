@@ -85,7 +85,17 @@ function fromFormat( {
 			: false;
 
 		if ( key ) {
-			elementAttributes[ key ] = attributes[ name ];
+			if ( key.hasOwnProperty( 'target' ) ) {
+				const computed = key.toElement(
+					attributes[ name ],
+					elementAttributes
+				);
+				if ( !! computed ) {
+					elementAttributes[ key.target ] = computed;
+				}
+			} else {
+				elementAttributes[ key ] = attributes[ name ];
+			}
 		} else {
 			elementAttributes[ name ] = attributes[ name ];
 		}

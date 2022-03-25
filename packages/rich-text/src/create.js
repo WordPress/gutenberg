@@ -90,8 +90,13 @@ function toFormat( { type, attributes } ) {
 
 	for ( const key in formatType.attributes ) {
 		const name = formatType.attributes[ key ];
-
-		registeredAttributes[ key ] = _attributes[ name ];
+		if ( name.hasOwnProperty( 'target' ) ) {
+			registeredAttributes[ key ] = name.toFormat(
+				_attributes[ name.target ]
+			);
+		} else {
+			registeredAttributes[ key ] = _attributes[ name ];
+		}
 
 		if ( formatType.__unstableFilterAttributeValue ) {
 			registeredAttributes[
