@@ -121,13 +121,12 @@ export const link = {
 	title,
 	tagName: 'a',
 	className: null,
-	attributes: {
+	attributes: applyFilters( 'editor.linkFormat.attributes', {
 		url: 'href',
 		type: 'data-type',
 		id: 'data-id',
 		target: 'target',
-		rel: 'rel',
-	},
+	} ),
 	__experimentalToLinkValue(
 		activeAttributes,
 		richTextText,
@@ -144,7 +143,7 @@ export const link = {
 		};
 
 		return applyFilters(
-			'editor.InlineLinkControl.toLinkValue',
+			'editor.linkFormat.toLinkValue',
 			linkValue,
 			activeAttributes,
 			pendingLinkValueChanges
@@ -181,7 +180,7 @@ export const link = {
 		}
 
 		return applyFilters(
-			'editor.InlineLinkControl.toLinkFormat',
+			'editor.linkFormat.toLinkFormat',
 			format,
 			options
 		);
@@ -214,8 +213,10 @@ export const link = {
 };
 
 // TODO - REVOVE, testing only.
+
+// Handle converting `rel="nofollow"` into the `noFollow` setting on the Link Value
 addFilter(
-	'editor.InlineLinkControl.toLinkValue',
+	'editor.linkFormat.toLinkValue',
 	'core',
 	function ( linkValue, activeAttributes ) {
 		linkValue.noFollow = activeAttributes?.rel?.includes( 'nofollow' );
@@ -223,8 +224,9 @@ addFilter(
 	}
 );
 
+// Handle converting `noFollow` of link value setting to `rel="nofollow"` attribute.
 addFilter(
-	'editor.InlineLinkControl.toLinkFormat',
+	'editor.linkFormat.toLinkFormat',
 	'core',
 	function ( format, nextValue ) {
 		const currentRelOrEmpty = format.attributes?.rel ?? '';
@@ -237,3 +239,9 @@ addFilter(
 		return format;
 	}
 );
+
+// Add 'rel' as a default attribute of `core/link` format.
+addFilter( 'editor.linkFormat.attributes', 'core', function ( attrs ) {
+	attrs.rel = 'rel';
+	return attrs;
+} );
