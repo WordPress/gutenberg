@@ -39,6 +39,12 @@ const transforms = {
 			},
 		},
 		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			transform: ( { anchor }, innerBlocks ) =>
+				createBlock( 'core/quote', { anchor }, innerBlocks ),
+		},
+		{
 			type: 'prefix',
 			prefix: '>',
 			transform: ( content ) =>
@@ -102,12 +108,6 @@ const transforms = {
 					)
 				),
 		},
-		{
-			type: 'block',
-			blocks: [ 'core/group' ],
-			transform: ( { anchor }, innerBlocks ) =>
-				createBlock( 'core/quote', { anchor }, innerBlocks ),
-		},
 	],
 	to: [
 		{
@@ -133,19 +133,6 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ '*' ],
-			transform: ( { attribution }, innerBlocks ) =>
-				attribution
-					? [
-							...innerBlocks,
-							createBlock( 'core/paragraph', {
-								content: attribution,
-							} ),
-					  ]
-					: innerBlocks,
-		},
-		{
-			type: 'block',
 			blocks: [ 'core/group' ],
 			transform: ( { attribution, anchor }, innerBlocks ) =>
 				createBlock(
@@ -160,6 +147,19 @@ const transforms = {
 						  ]
 						: innerBlocks
 				),
+		},
+		{
+			type: 'block',
+			blocks: [ '*' ],
+			transform: ( { attribution }, innerBlocks ) =>
+				attribution
+					? [
+							...innerBlocks,
+							createBlock( 'core/paragraph', {
+								content: attribution,
+							} ),
+					  ]
+					: innerBlocks,
 		},
 	],
 };
