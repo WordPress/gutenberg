@@ -749,12 +749,8 @@ export const __unstableDeleteSelection = ( isForward ) => ( {
 	const blockB = select.getBlock( selectionB.clientId );
 	const blockBType = getBlockType( blockB.name );
 
-	// Clone the blocks so we don't insert the character in a "live" block.
-	const cloneA = cloneBlock( blockA );
-	const cloneB = cloneBlock( blockB );
-
-	const htmlA = cloneA.attributes[ selectionA.attributeKey ];
-	const htmlB = cloneB.attributes[ selectionB.attributeKey ];
+	const htmlA = blockA.attributes[ selectionA.attributeKey ];
+	const htmlB = blockB.attributes[ selectionB.attributeKey ];
 
 	const attributeDefinitionA =
 		blockAType.attributes[ selectionA.attributeKey ];
@@ -777,13 +773,18 @@ export const __unstableDeleteSelection = ( isForward ) => ( {
 	valueA = remove( valueA, selectionA.offset, valueA.text.length );
 	valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
 
-	cloneA.attributes[ selectionA.attributeKey ] = toHTMLString( {
-		value: valueA,
-		...mapRichTextSettings( attributeDefinitionA ),
+	// Clone the blocks so we don't manipulate the original.
+	const cloneA = cloneBlock( blockA, {
+		[ selectionA.attributeKey ]: toHTMLString( {
+			value: valueA,
+			...mapRichTextSettings( attributeDefinitionA ),
+		} ),
 	} );
-	cloneB.attributes[ selectionB.attributeKey ] = toHTMLString( {
-		value: valueB,
-		...mapRichTextSettings( attributeDefinitionB ),
+	const cloneB = cloneBlock( blockB, {
+		[ selectionB.attributeKey ]: toHTMLString( {
+			value: valueB,
+			...mapRichTextSettings( attributeDefinitionB ),
+		} ),
 	} );
 
 	const followingBlock = isForward ? cloneA : cloneB;
@@ -922,12 +923,8 @@ export const __unstableSplitSelection = () => ( { select, dispatch } ) => {
 	const blockB = select.getBlock( selectionB.clientId );
 	const blockBType = getBlockType( blockB.name );
 
-	// Clone the blocks so we don't insert the character in a "live" block.
-	const cloneA = cloneBlock( blockA );
-	const cloneB = cloneBlock( blockB );
-
-	const htmlA = cloneA.attributes[ selectionA.attributeKey ];
-	const htmlB = cloneB.attributes[ selectionB.attributeKey ];
+	const htmlA = blockA.attributes[ selectionA.attributeKey ];
+	const htmlB = blockB.attributes[ selectionB.attributeKey ];
 
 	const attributeDefinitionA =
 		blockAType.attributes[ selectionA.attributeKey ];
@@ -946,15 +943,6 @@ export const __unstableSplitSelection = () => ( { select, dispatch } ) => {
 	valueA = remove( valueA, selectionA.offset, valueA.text.length );
 	valueB = remove( valueB, 0, selectionB.offset );
 
-	cloneA.attributes[ selectionA.attributeKey ] = toHTMLString( {
-		value: valueA,
-		...mapRichTextSettings( attributeDefinitionA ),
-	} );
-	cloneB.attributes[ selectionB.attributeKey ] = toHTMLString( {
-		value: valueB,
-		...mapRichTextSettings( attributeDefinitionB ),
-	} );
-
 	dispatch.replaceBlocks(
 		select.getSelectedBlockClientIds(),
 		[
@@ -963,7 +951,10 @@ export const __unstableSplitSelection = () => ( { select, dispatch } ) => {
 				...blockA,
 				attributes: {
 					...blockA.attributes,
-					...cloneA.attributes,
+					[ selectionA.attributeKey ]: toHTMLString( {
+						value: valueA,
+						...mapRichTextSettings( attributeDefinitionA ),
+					} ),
 				},
 			},
 			createBlock( getDefaultBlockName() ),
@@ -972,7 +963,10 @@ export const __unstableSplitSelection = () => ( { select, dispatch } ) => {
 				...blockB,
 				attributes: {
 					...blockB.attributes,
-					...cloneB.attributes,
+					[ selectionB.attributeKey ]: toHTMLString( {
+						value: valueB,
+						...mapRichTextSettings( attributeDefinitionB ),
+					} ),
 				},
 			},
 		],
