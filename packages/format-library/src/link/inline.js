@@ -4,7 +4,6 @@
 import { useState, useRef, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { withSpokenMessages, Popover } from '@wordpress/components';
-import { prependHTTP } from '@wordpress/url';
 import {
 	create,
 	insert,
@@ -20,13 +19,12 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { applyFilters, addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
-import { link as settings } from './index';
+import { isValidHref, getFormatBoundary } from './utils';
+import { link as linkFormatSettings } from './index';
 import useLinkInstanceKey from './use-link-instance-key';
 
 function InlineLinkUI( {
@@ -52,7 +50,7 @@ function InlineLinkUI( {
 	 *
 	 * @type {[Object|undefined,Function]}
 	 */
-	const [ nextLinkValue, setNextLinkValue ] = useState();
+	const [ pendingLinkValueChanges, setPendingLinkValueChanges ] = useState();
 
 	const { createPageEntity, userCanCreatePages } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -64,22 +62,11 @@ function InlineLinkUI( {
 		};
 	}, [] );
 
-	let linkValue = {
-		url: activeAttributes.url,
-		type: activeAttributes.type,
-		id: activeAttributes.id,
-		opensInNewTab: activeAttributes.target === '_blank',
-		title: richTextText,
-		// Todo - a filter to deserialize activeAttributes to link props
-		// perhaps the filter can be `toLinkValue` or something?
-		...nextLinkValue,
-	};
-
-	linkValue = applyFilters(
-		'editor.InlineLinkControl.toLinkValue',
-		linkValue,
+	// The controlled link value object to be passed to the <LinkControl> as the value prop.
+	const linkValue = linkFormatSettings.__experimentalToLinkValue(
 		activeAttributes,
-		nextLinkValue
+		richTextText,
+		pendingLinkValueChanges
 	);
 
 	function removeLink() {
@@ -94,7 +81,7 @@ function InlineLinkUI( {
 		// next state value, and for use in constructing the new link format if
 		// the link is ready to be applied.
 		nextValue = {
-			...nextLinkValue,
+			...pendingLinkValueChanges,
 			...nextValue,
 		};
 
@@ -111,23 +98,19 @@ function InlineLinkUI( {
 
 		// If link will be assigned, the state value can be considered flushed.
 		// Otherwise, persist the pending changes.
-		setNextLinkValue( didToggleSettingForNewLink ? nextValue : undefined );
+		setPendingLinkValueChanges(
+			didToggleSettingForNewLink ? nextValue : undefined
+		);
 
 		if ( didToggleSettingForNewLink ) {
 			return;
 		}
-		const newUrl = prependHTTP( nextValue.url );
 
-		const nextFormat = {
-			...nextValue,
-			url: newUrl,
-			id:
-				nextValue.id !== undefined && nextValue.id !== null
-					? String( nextValue.id )
-					: undefined,
-		};
+		const linkFormat = linkFormatSettings.__experimentalToLinkFormat(
+			nextValue
+		);
 
-		const linkFormat = createLinkFormat( nextFormat );
+		const newUrl = linkFormat.attributes.url;
 
 		const newText = nextValue.title || newUrl;
 		if ( isCollapsed( value ) && ! isActive ) {
@@ -194,7 +177,11 @@ function InlineLinkUI( {
 		}
 	}
 
-	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
+	const anchorRef = useAnchorRef( {
+		ref: contentRef,
+		value,
+		linkFormatSettings,
+	} );
 
 	// Generate a string based key that is unique to this anchor reference.
 	// This is used to force re-mount the LinkControl component to avoid
@@ -288,18 +275,5 @@ function getRichTextValueFromSelection( value, isActive ) {
 	// Get a RichTextValue containing the selected text content.
 	return slice( value, textStart, textEnd );
 }
-
-addFilter(
-	'editor.InlineLinkControl.toLinkValue',
-	'core',
-	function ( linkValue, activeAttributes ) {
-		linkValue = {
-			...linkValue,
-			noFollow: activeAttributes?.rel?.includes( 'nofollow' ),
-		};
-
-		return linkValue;
-	}
-);
 
 export default withSpokenMessages( InlineLinkUI );

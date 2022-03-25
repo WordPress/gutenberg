@@ -10,7 +10,7 @@ import {
 	slice,
 	isCollapsed,
 } from '@wordpress/rich-text';
-import { isURL, isEmail } from '@wordpress/url';
+import { isURL, isEmail, prependHTTP } from '@wordpress/url';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
@@ -18,6 +18,7 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, linkOff } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
+import { applyFilters, addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -125,6 +126,65 @@ export const link = {
 		type: 'data-type',
 		id: 'data-id',
 		target: 'target',
+		rel: 'rel',
+	},
+	__experimentalToLinkValue(
+		activeAttributes,
+		richTextText,
+		pendingLinkValueChanges
+	) {
+		const linkValue = {
+			url: activeAttributes.url,
+			type: activeAttributes.type,
+			id: activeAttributes.id,
+			opensInNewTab: activeAttributes.target === '_blank',
+			title: richTextText,
+			// Todo - perhaps pending changes can be applied later.
+			...pendingLinkValueChanges,
+		};
+
+		return applyFilters(
+			'editor.InlineLinkControl.toLinkValue',
+			linkValue,
+			activeAttributes,
+			pendingLinkValueChanges
+		);
+	},
+
+	// Defines how to generate the format object (that will be applied to the link text)
+	// from a LinkControl value object.
+	// TODO: we need TypeScript here to define the type of `options`.
+	__experimentalToLinkFormat( options ) {
+		const { url, type, id, opensInNewTab } = options;
+
+		const newUrl = prependHTTP( url );
+
+		const newId =
+			id !== undefined && id !== null ? String( id ) : undefined;
+
+		const format = {
+			type: 'core/link',
+			attributes: {
+				url: newUrl,
+			},
+		};
+
+		if ( type ) format.attributes.type = type;
+		if ( newId ) format.attributes.id = newId;
+
+		if ( opensInNewTab ) {
+			const currentRelOrEmpty = format.attributes?.rel ?? '';
+			format.attributes.target = '_blank';
+			format.attributes.rel = (
+				currentRelOrEmpty + ' noreferrer noopener'
+			).trim();
+		}
+
+		return applyFilters(
+			'editor.InlineLinkControl.toLinkFormat',
+			format,
+			options
+		);
 	},
 	__unstablePasteRule( value, { html, plainText } ) {
 		if ( isCollapsed( value ) ) {
@@ -152,3 +212,28 @@ export const link = {
 	},
 	edit: Edit,
 };
+
+// TODO - REVOVE, testing only.
+addFilter(
+	'editor.InlineLinkControl.toLinkValue',
+	'core',
+	function ( linkValue, activeAttributes ) {
+		linkValue.noFollow = activeAttributes?.rel?.includes( 'nofollow' );
+		return linkValue;
+	}
+);
+
+addFilter(
+	'editor.InlineLinkControl.toLinkFormat',
+	'core',
+	function ( format, nextValue ) {
+		const currentRelOrEmpty = format.attributes?.rel ?? '';
+		if ( nextValue.noFollow ) {
+			format.attributes = {
+				...format.attributes,
+				rel: ( currentRelOrEmpty + ' nofollow' ).trim(),
+			};
+		}
+		return format;
+	}
+);

@@ -19,7 +19,10 @@ import {
 	isValidFragment,
 } from '@wordpress/url';
 
-import { applyFilters, addFilter } from '@wordpress/hooks';
+/**
+ * Internal dependencies
+ */
+import { link as linkFormat } from './';
 
 /**
  * Check for issues with the provided href.
@@ -96,43 +99,8 @@ export function isValidHref( href ) {
  * @return {Object} The final format object.
  */
 export function createLinkFormat( options ) {
-	const { url, type, id, opensInNewTab } = options;
-
-	const format = {
-		type: 'core/link',
-		attributes: {
-			url,
-		},
-	};
-
-	if ( type ) format.attributes.type = type;
-	if ( id ) format.attributes.id = id;
-
-	if ( opensInNewTab ) {
-		format.attributes.target = '_blank';
-		format.attributes.rel = 'noreferrer noopener';
-	}
-
-	return applyFilters(
-		'editor.InlineLinkControl.toLinkFormat',
-		format,
-		options
-	);
+	return linkFormat.__experimentalToLinkFormat( options );
 }
-
-addFilter(
-	'editor.InlineLinkControl.toLinkFormat',
-	'core',
-	function ( format, nextValue ) {
-		if ( nextValue.noFollow ) {
-			format.attributes = {
-				...format.attributes,
-				rel: format.attributes.rel + ' nofollow',
-			};
-		}
-		return format;
-	}
-);
 
 /* eslint-disable jsdoc/no-undefined-types */
 /**
