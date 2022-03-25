@@ -120,20 +120,47 @@ const linkFormatAttributes = applyFilters( 'editor.linkFormat.attributes', {
 	url: 'href',
 	type: 'data-type',
 	id: 'data-id',
-	target: 'target',
 	noFollow: {
 		target: 'rel',
 		toFormat( relAttribute ) {
 			// Set the Boolean value of the `noFollow` prop
 			// based on the whether the HTML `rel` attribute contains
 			// `nofollow`.
-			return relAttribute?.split?.includes( 'nofollow' );
+			return relAttribute?.split( ' ' )?.includes( 'nofollow' );
 		},
-		toElement( noFollowAttribute, currentAttributes ) {
-			const currentRelOrEmpty = currentAttributes?.rel ?? '';
-			return noFollowAttribute
-				? ( currentRelOrEmpty + ' nofollow' ).trim()
-				: null;
+		toElement( noFollowAttribute, elementAttributes ) {
+			const currentRelOrEmpty = elementAttributes?.rel ?? '';
+
+			const rel = ( currentRelOrEmpty + ' nofollow' ).trim();
+
+			return {
+				...elementAttributes,
+				// if `noFollow` is true then add a rel
+				// attribute to any existing rel attr.
+				...( noFollowAttribute && { rel } ),
+			};
+		},
+	},
+	opensInNewTab: {
+		target: 'target',
+		toFormat( targetAttribute ) {
+			// Set the Boolean value of the `noFollow` prop
+			// based on the whether the HTML `rel` attribute contains
+			// `nofollow`.
+			return targetAttribute?.split( ' ' )?.includes( '_blank' );
+		},
+		toElement( targetAttribute, elementAttributes ) {
+			const currentRelOrEmpty = elementAttributes?.rel ?? '';
+
+			const rel = ( currentRelOrEmpty + ' noreferrer noopener' ).trim();
+
+			return {
+				...elementAttributes,
+				...( targetAttribute && { target: '_blank' } ),
+				// if `noFollow` is true then add a rel
+				// attribute to any existing rel attr.
+				...( targetAttribute && { rel } ),
+			};
 		},
 	},
 } );
@@ -166,7 +193,7 @@ export const link = {
 			url: activeAttributes.url,
 			type: activeAttributes.type,
 			id: activeAttributes.id,
-			opensInNewTab: activeAttributes.target === '_blank',
+			// opensInNewTab: activeAttributes.target === '_blank',
 			title: richTextText,
 			// Todo - perhaps pending changes can be applied later.
 			...pendingLinkValueChanges,
@@ -188,12 +215,10 @@ export const link = {
 			url,
 			type,
 			id,
-			opensInNewTab,
 			// eslint
 			title: __IGNORED, // eslint-disable-line no-unused-vars
 			...otherOptions
 		} = options;
-
 		const newUrl = prependHTTP( url );
 
 		const newId =
@@ -217,13 +242,13 @@ export const link = {
 		// Bug where this will be overwritten because `_target` is included in ...otherOptions
 		// Also means the object based attribute format will not work for more complex
 		// cases.
-		if ( opensInNewTab ) {
-			const currentRelOrEmpty = format.attributes?.rel ?? '';
-			format.attributes.target = '_blank';
-			format.attributes.rel = (
-				currentRelOrEmpty + ' noreferrer noopener'
-			).trim();
-		}
+		// if ( opensInNewTab ) {
+		// 	const currentRelOrEmpty = format.attributes?.rel ?? '';
+		// 	format.attributes.target = '_blank';
+		// 	format.attributes.rel = (
+		// 		currentRelOrEmpty + ' noreferrer noopener'
+		// 	).trim();
+		// }
 
 		return applyFilters(
 			'editor.linkFormat.toLinkFormat',

@@ -86,12 +86,13 @@ function fromFormat( {
 
 		if ( key ) {
 			if ( key.hasOwnProperty( 'target' ) ) {
-				const computed = key.toElement(
+				const newElementAttributes = key.toElement(
 					attributes[ name ],
 					elementAttributes
 				);
-				if ( !! computed ) {
-					elementAttributes[ key.target ] = computed;
+				// If the object has been changed then overwrite the reference.
+				if ( newElementAttributes !== elementAttributes ) {
+					elementAttributes = newElementAttributes;
 				}
 			} else {
 				elementAttributes[ key ] = attributes[ name ];
