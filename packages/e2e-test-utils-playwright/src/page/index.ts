@@ -10,6 +10,7 @@ import { getPageError } from './get-page-error';
 import { isCurrentURL } from './is-current-url';
 import { visitAdminPage } from './visit-admin-page';
 import { createNewPost } from './create-new-post';
+import { clickOnMoreMenuItem } from './click-on-more-menu-item';
 
 class PageUtils {
 	browser: Browser;
@@ -26,6 +27,7 @@ class PageUtils {
 	isCurrentURL = isCurrentURL;
 	visitAdminPage = visitAdminPage;
 	createNewPost = createNewPost;
+	clickOnMoreMenuItem = clickOnMoreMenuItem;
 }
 
 export { PageUtils };
