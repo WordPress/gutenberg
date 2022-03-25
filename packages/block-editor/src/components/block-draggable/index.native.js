@@ -28,6 +28,8 @@ import useScrollWhenDragging from './use-scroll-when-dragging';
 import DraggableChip from './draggable-chip';
 import { store as blockEditorStore } from '../../store';
 import { useBlockListContext } from '../block-list/block-list-context';
+import DroppingInsertionPoint from '../block-list/dropping-insertion-point';
+import useBlockDropZone from '../use-block-drop-zone';
 import styles from './style.scss';
 
 const CHIP_OFFSET_TO_TOUCH_POSITION = 32;
@@ -90,6 +92,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 	};
 	const isDragging = useSharedValue( false );
 	const scrollAnimation = useSharedValue( 0 );
+	const hasStartedDraggingOver = useSharedValue( false );
 
 	const [
 		startScrolling,
@@ -105,6 +108,8 @@ const BlockDraggableWrapper = ( { children } ) => {
 
 		draggingScrollHandler( event );
 	};
+
+	const { onBlockDragOver, onBlockDragEnd } = useBlockDropZone();
 
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
@@ -181,6 +186,10 @@ const BlockDraggableWrapper = ( { children } ) => {
 		chip.x.value = dragPosition.x;
 		chip.y.value = dragPosition.y;
 
+		hasStartedDraggingOver.value = true;
+
+		runOnJS( onBlockDragOver )( { x, y: y + scroll.offsetY.value } );
+
 		// Update scrolling velocity
 		scrollOnDragOver( dragPosition.y );
 	};
@@ -188,8 +197,10 @@ const BlockDraggableWrapper = ( { children } ) => {
 	const stopDragging = () => {
 		'worklet';
 		isDragging.value = false;
+		hasStartedDraggingOver.value = false;
 
 		chip.scale.value = withTiming( 0 );
+		runOnJS( onBlockDragEnd )();
 		runOnJS( stopDraggingBlocks )();
 		stopScrolling();
 	};
@@ -216,6 +227,12 @@ const BlockDraggableWrapper = ( { children } ) => {
 
 	return (
 		<>
+			{
+				<DroppingInsertionPoint
+					scroll={ scroll }
+					hasStartedDraggingOver={ hasStartedDraggingOver }
+				/>
+			}
 			<Draggable
 				onDragStart={ startDragging }
 				onDragOver={ updateDragging }

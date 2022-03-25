@@ -7,6 +7,7 @@ export const DEFAULT_BLOCK_LIST_CONTEXT = {
 	scrollRef: null,
 	blocksLayouts: { current: {} },
 	findBlockLayoutByClientId,
+	getBlockLayoutsOrderedByYCoord,
 	findBlockLayoutByPosition,
 	updateBlocksLayouts,
 };
@@ -86,6 +87,15 @@ export function deleteBlockLayoutByClientId( data, clientId ) {
 		}
 		return acc;
 	}, {} );
+}
+
+function getBlockLayoutsOrderedByYCoord( data ) {
+	// Only enabled for root level blocks
+	return Object.entries( data )
+		.sort( ( blockA, blockB ) => {
+			return blockB[ 1 ].y < blockA[ 1 ].y;
+		} )
+		.map( ( block ) => block[ 1 ] );
 }
 
 /**
