@@ -33,7 +33,7 @@ const AvatarInspectorControls = ( {
 	selectUser,
 } ) => (
 	<InspectorControls>
-		<PanelBody title={ __( 'Avatar Settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<RangeControl
 				label={ __( 'Image size' ) }
 				onChange={ ( newSize ) =>
@@ -46,16 +46,6 @@ const AvatarInspectorControls = ( {
 				initialPosition={ attributes?.size }
 				value={ attributes?.size }
 			/>
-			{ selectUser && (
-				<UserControl
-					value={ attributes?.userId }
-					onChange={ ( value ) => {
-						setAttributes( {
-							userId: value,
-						} );
-					} }
-				/>
-			) }
 			<ToggleControl
 				label={ __( 'Link to user profile' ) }
 				onChange={ () =>
@@ -72,6 +62,16 @@ const AvatarInspectorControls = ( {
 						} )
 					}
 					checked={ attributes.linkTarget === '_blank' }
+				/>
+			) }
+			{ selectUser && (
+				<UserControl
+					value={ attributes?.userId }
+					onChange={ ( value ) => {
+						setAttributes( {
+							userId: value,
+						} );
+					} }
 				/>
 			) }
 		</PanelBody>
