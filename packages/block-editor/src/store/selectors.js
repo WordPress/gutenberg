@@ -901,7 +901,7 @@ export function getMultiSelectedBlocksEndClientId( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {boolean} Wether the selection is mergeable.
+ * @return {boolean} Whether the selection is mergeable.
  */
 export function __unstableIsFullySelected( state ) {
 	const selectionAnchor = getSelectionStart( state );
@@ -915,12 +915,12 @@ export function __unstableIsFullySelected( state ) {
 }
 
 /**
- * Check wether the selection is mergeable.
+ * Check whether the selection is mergeable.
  *
  * @param {Object}  state     Editor state.
- * @param {boolean} isForward Wether to merge forwards.
+ * @param {boolean} isForward Whether to merge forwards.
  *
- * @return {boolean} Wether the selection is mergeable.
+ * @return {boolean} Whether the selection is mergeable.
  */
 export function __unstableIsSelectionMergeable( state, isForward ) {
 	const selectionAnchor = getSelectionStart( state );

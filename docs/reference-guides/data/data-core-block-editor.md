@@ -1462,7 +1462,7 @@ _Parameters_
 
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _index_ `?number`: Index at which block should be inserted.
--   _\_\_unstableOptions_ `Object`: Wether or not to show an inserter button.
+-   _\_\_unstableOptions_ `Object`: Whether or not to show an inserter button.
 
 _Returns_
 

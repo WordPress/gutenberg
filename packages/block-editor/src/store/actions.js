@@ -610,7 +610,7 @@ export const insertBlocks = (
  * @param {?string} rootClientId      Optional root client ID of block list on
  *                                    which to insert.
  * @param {?number} index             Index at which block should be inserted.
- * @param {Object}  __unstableOptions Wether or not to show an inserter button.
+ * @param {Object}  __unstableOptions Whether or not to show an inserter button.
  *
  * @return {Object} Action object.
  */
