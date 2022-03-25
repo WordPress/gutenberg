@@ -38,6 +38,7 @@ describe( 'MediaUpload component', () => {
 			const wrapper = render(
 				<MediaUpload
 					allowedTypes={ [ mediaType ] }
+					canUploadMedia={ true }
 					render={ ( { open, getMediaOptions } ) => {
 						return (
 							<>
@@ -59,13 +60,9 @@ describe( 'MediaUpload component', () => {
 		expectOptionForMediaType( MEDIA_TYPE_AUDIO, OPTION_INSERT_FROM_URL );
 	} );
 
-	const expectMediaPickerForOption = (
-		option,
-		allowMultiple,
-		requestFunction
-	) => {
+	function openMediaPicker( requestFunction, allowMultiple, canUploadMedia ) {
 		requestFunction.mockImplementation(
-			( source, mediaTypes, multiple, callback ) => {
+			( _source, mediaTypes, multiple, callback ) => {
 				expect( mediaTypes[ 0 ] ).toEqual( MEDIA_TYPE_VIDEO );
 				if ( multiple ) {
 					callback( [ { id: MEDIA_ID, url: MEDIA_URL } ] );
@@ -82,6 +79,7 @@ describe( 'MediaUpload component', () => {
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 				onSelect={ onSelect }
 				multiple={ allowMultiple }
+				canUploadMedia={ canUploadMedia }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<>
@@ -94,51 +92,96 @@ describe( 'MediaUpload component', () => {
 				} }
 			/>
 		);
+
 		fireEvent.press( wrapper.getByText( 'Open Picker' ) );
-		fireEvent.press( wrapper.getByText( option ) );
-		const media = { id: MEDIA_ID, url: MEDIA_URL };
+		return { onSelect, wrapper };
+	}
 
-		expect( requestFunction ).toHaveBeenCalledTimes( 1 );
+	describe( 'selecting media', () => {
+		const expectMediaPickerForOption = (
+			option,
+			allowMultiple,
+			canUploadMedia,
+			exists
+		) => {
+			const { onSelect, wrapper } = openMediaPicker(
+				requestMediaPicker,
+				allowMultiple,
+				canUploadMedia
+			);
 
-		expect( onSelect ).toHaveBeenCalledTimes( 1 );
-		expect( onSelect ).toHaveBeenCalledWith(
-			allowMultiple ? [ media ] : media
-		);
-	};
+			const optionInstance = wrapper.queryByText( option );
+			if ( exists ) {
+				expect( optionInstance ).toBeDefined();
+				fireEvent.press( optionInstance );
+				const media = { id: MEDIA_ID, url: MEDIA_URL };
 
-	it( 'can select media from device library', () => {
-		expectMediaPickerForOption(
-			'Choose from device',
-			false,
-			requestMediaPicker
-		);
-	} );
+				expect( requestMediaPicker ).toHaveBeenCalledTimes( 1 );
 
-	it( 'can select media from WP media library', () => {
-		expectMediaPickerForOption(
-			'WordPress Media Library',
-			false,
-			requestMediaPicker
-		);
-	} );
+				expect( onSelect ).toHaveBeenCalledTimes( 1 );
+				expect( onSelect ).toHaveBeenCalledWith(
+					allowMultiple ? [ media ] : media
+				);
+			} else {
+				expect( optionInstance ).toBeNull();
+			}
+		};
 
-	it( 'can select media by capturing', () => {
-		expectMediaPickerForOption( 'Take a Video', false, requestMediaPicker );
-	} );
+		describe( 'when uploads are enabled', () => {
+			const expectWhenUploadsEnabled = ( option, allowMultiple ) => {
+				expectMediaPickerForOption( option, allowMultiple, true, true );
+			};
 
-	it( 'can select multiple media from device library', () => {
-		expectMediaPickerForOption(
-			'Choose from device',
-			true,
-			requestMediaPicker
-		);
-	} );
+			it( 'from WP media library', () => {
+				expectWhenUploadsEnabled( 'WordPress Media Library', true );
+			} );
 
-	it( 'can select multiple media from WP media library', () => {
-		expectMediaPickerForOption(
-			'WordPress Media Library',
-			true,
-			requestMediaPicker
-		);
+			it( 'can select media from device library', () => {
+				expectWhenUploadsEnabled( 'Choose from device', false );
+			} );
+
+			it( 'can select media by capturing', () => {
+				expectWhenUploadsEnabled( 'Take a Video', false );
+			} );
+
+			it( 'can select multiple media from device library', () => {
+				expectWhenUploadsEnabled( 'Choose from device', true );
+			} );
+		} );
+
+		describe( 'when uploads are disabled', () => {
+			const expectWhenUploadsDisabled = (
+				option,
+				allowMultiple,
+				exists
+			) => {
+				expectMediaPickerForOption(
+					option,
+					allowMultiple,
+					false,
+					exists
+				);
+			};
+
+			it( 'from WP media library', () => {
+				expectWhenUploadsDisabled(
+					'WordPress Media Library',
+					true,
+					true
+				);
+			} );
+
+			it( 'can select media from device library', () => {
+				expectWhenUploadsDisabled( 'Choose from device', false, false );
+			} );
+
+			it( 'can select media by capturing', () => {
+				expectWhenUploadsDisabled( 'Take a Video', false, false );
+			} );
+
+			it( 'can select multiple media from device library', () => {
+				expectWhenUploadsDisabled( 'Choose from device', true, false );
+			} );
+		} );
 	} );
 } );
