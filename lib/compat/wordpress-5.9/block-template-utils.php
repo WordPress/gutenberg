@@ -586,11 +586,12 @@ if ( ! function_exists( '_build_block_template_result_from_post' ) ) {
 	}
 }
 
-
 /**
  * Retrieves a list of unified template objects based on a query.
  *
- * @param array $query {
+ * @since 5.8.0
+ *
+ * @param array  $query {
  *     Optional. Arguments to retrieve templates.
  *
  *     @type array  $slug__in  List of slugs to include.
@@ -598,7 +599,7 @@ if ( ! function_exists( '_build_block_template_result_from_post' ) ) {
  *     @type string $area      A 'wp_template_part_area' taxonomy value to filter by (for wp_template_part template type only).
  *     @type string $post_type Post type to get the templates for.
  * }
- * @param array $template_type wp_template or wp_template_part.
+ * @param string $template_type 'wp_template' or 'wp_template_part'.
  *
  * @return array Templates.
  */
@@ -608,18 +609,19 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	 *
 	 * Return a non-null value to bypass the WordPress queries.
 	 *
-	 * @since 10.8
+	 * @since 5.9.0
 	 *
-	 * @param Gutenberg_Block_Template[]|null $block_templates Return an array of block templates to short-circuit the default query,
+	 * @param WP_Block_Template[]|null $block_templates Return an array of block templates to short-circuit the default query,
 	 *                                                  or null to allow WP to run it's normal queries.
-	 * @param array $query {
+	 * @param array  $query {
 	 *     Optional. Arguments to retrieve templates.
 	 *
 	 *     @type array  $slug__in List of slugs to include.
 	 *     @type int    $wp_id Post ID of customized template.
 	 *     @type string $post_type Post type to get the templates for.
+	 *     @type strong $theme The theme to filter templates by.
 	 * }
-	 * @param array $template_type wp_template or wp_template_part.
+	 * @param string $template_type wp_template or wp_template_part.
 	 */
 	$templates = apply_filters( 'pre_get_block_templates', null, $query, $template_type );
 	if ( ! is_null( $templates ) ) {
@@ -632,14 +634,16 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		'post_type'      => $template_type,
 		'posts_per_page' => -1,
 		'no_found_rows'  => true,
-		'tax_query'      => array(
-			array(
-				'taxonomy' => 'wp_theme',
-				'field'    => 'name',
-				'terms'    => wp_get_theme()->get_stylesheet(),
-			),
-		),
+		'tax_query'      => array(),
 	);
+
+	if ( isset( $query['theme'] ) ) {
+		$wp_query_args['tax_query'][]           = array(
+			'taxonomy' => 'wp_theme',
+			'field'    => 'name',
+			'terms'    => wp_get_theme()->get_stylesheet(),
+		);
+	}
 
 	if ( 'wp_template_part' === $template_type && isset( $query['area'] ) ) {
 		$wp_query_args['tax_query'][]           = array(
@@ -654,7 +658,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$wp_query_args['post_name__in'] = $query['slug__in'];
 	}
 
-	// This is only needed for the regular templates/template parts CPT listing and editor.
+	// This is only needed for the regular templates/template parts post type listing and editor.
 	if ( isset( $query['wp_id'] ) ) {
 		$wp_query_args['p'] = $query['wp_id'];
 	} else {
@@ -708,19 +712,20 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 			}
 		}
 	}
+
 	/**
 	 * Filters the array of queried block templates array after they've been fetched.
 	 *
-	 * @since 10.8
+	 * @since 5.9.0
 	 *
-	 * @param Gutenberg_Block_Template[] $query_result Array of found block templates.
-	 * @param array $query {
+	 * @param WP_Block_Template[] $query_result Array of found block templates.
+	 * @param array  $query {
 	 *     Optional. Arguments to retrieve templates.
 	 *
 	 *     @type array  $slug__in List of slugs to include.
 	 *     @type int    $wp_id Post ID of customized template.
 	 * }
-	 * @param array $template_type wp_template or wp_template_part.
+	 * @param string $template_type wp_template or wp_template_part.
 	 */
 	return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 }

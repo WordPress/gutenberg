@@ -11,9 +11,7 @@
  * @package gutenberg
  */
 
-// Only run any of the code in this file if the version is less than 5.9.
-// wp_list_users was introduced in 5.9.
-if ( ! function_exists( 'wp_list_users' ) ) {
+
 	/**
 	 * Registers block editor 'wp_template_part' post type.
 	 */
@@ -65,8 +63,11 @@ if ( ! function_exists( 'wp_list_users' ) ) {
 
 		register_post_type( 'wp_template_part', $args );
 	}
-	add_action( 'init', 'gutenberg_register_template_part_post_type' );
 
+	add_action( 'init', 'gutenberg_register_template_part_post_type' );
+// Only run any of the code in this file if the version is less than 5.9.
+// wp_list_users was introduced in 5.9.
+if ( ! function_exists( 'wp_list_users' ) ) {
 	/**
 	 * Registers the 'wp_template_part_area' taxonomy.
 	 */
