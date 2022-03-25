@@ -66,6 +66,8 @@ function RichTextWrapper(
 	{
 		children,
 		tagName,
+		start,
+		reversed,
 		value: originalValue,
 		onChange: originalOnChange,
 		isSelected: originalIsSelected,
@@ -214,8 +216,13 @@ function RichTextWrapper(
 	}
 
 	const onSelectionChange = useCallback(
-		( start, end ) => {
-			selectionChange( clientId, identifier, start, end );
+		( selectionChangeStart, selectionChangeEnd ) => {
+			selectionChange(
+				clientId,
+				identifier,
+				selectionChangeStart,
+				selectionChangeEnd
+			);
 		},
 		[ clientId, identifier ]
 	);
@@ -349,9 +356,11 @@ function RichTextWrapper(
 					onChange( insertLineSeparator( value ) );
 				}
 			} else {
-				const { text, start, end } = value;
+				const { text, start: splitStart, end: splitEnd } = value;
 				const canSplitAtEnd =
-					onSplitAtEnd && start === end && end === text.length;
+					onSplitAtEnd &&
+					splitStart === splitEnd &&
+					splitEnd === text.length;
 
 				if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
 					if ( ! disableLineBreaks ) {
@@ -530,15 +539,18 @@ function RichTextWrapper(
 				return;
 			}
 
-			const { start, text } = value;
-			const characterBefore = text.slice( start - 1, start );
+			const { start: startPosition, text } = value;
+			const characterBefore = text.slice(
+				startPosition - 1,
+				startPosition
+			);
 
 			// The character right before the caret must be a plain space.
 			if ( characterBefore !== ' ' ) {
 				return;
 			}
 
-			const trimmedTextBefore = text.slice( 0, start ).trim();
+			const trimmedTextBefore = text.slice( 0, startPosition ).trim();
 			const prefixTransforms = getBlockTransforms( 'from' ).filter(
 				( { type } ) => type === 'prefix'
 			);
@@ -553,7 +565,9 @@ function RichTextWrapper(
 				return;
 			}
 
-			const content = valueToFormat( slice( value, start, text.length ) );
+			const content = valueToFormat(
+				slice( value, startPosition, text.length )
+			);
 			const block = transformation.transform( content );
 
 			onReplace( [ block ] );
@@ -575,6 +589,8 @@ function RichTextWrapper(
 			selectionEnd={ selectionEnd }
 			onSelectionChange={ onSelectionChange }
 			tagName={ tagName }
+			start={ start }
+			reversed={ reversed }
 			placeholder={ placeholder }
 			allowedFormats={ adjustedAllowedFormats }
 			withoutInteractiveFormatting={ withoutInteractiveFormatting }
