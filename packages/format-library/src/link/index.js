@@ -116,17 +116,19 @@ function Edit( {
 	);
 }
 
+const linkFormatAttributes = applyFilters( 'editor.linkFormat.attributes', {
+	url: 'href',
+	type: 'data-type',
+	id: 'data-id',
+	target: 'target',
+} );
+
 export const link = {
 	name,
 	title,
 	tagName: 'a',
 	className: null,
-	attributes: applyFilters( 'editor.linkFormat.attributes', {
-		url: 'href',
-		type: 'data-type',
-		id: 'data-id',
-		target: 'target',
-	} ),
+	attributes: linkFormatAttributes,
 	__experimentalToLinkValue(
 		activeAttributes,
 		richTextText,
@@ -245,3 +247,15 @@ addFilter( 'editor.linkFormat.attributes', 'core', function ( attrs ) {
 	attrs.rel = 'rel';
 	return attrs;
 } );
+
+addFilter(
+	'editor.linkFormat.inlineLinkControlSettings',
+	'core',
+	function ( settings ) {
+		settings.push( {
+			id: 'noFollow',
+			title: __( 'Mark as "nofollow"' ),
+		} );
+		return settings;
+	}
+);

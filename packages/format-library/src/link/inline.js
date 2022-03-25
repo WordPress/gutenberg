@@ -19,6 +19,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -237,16 +238,15 @@ function InlineLinkUI( {
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
-				settings={ [
-					{
-						id: 'opensInNewTab',
-						title: __( 'Open in new tab' ),
-					},
-					{
-						id: 'noFollow',
-						title: __( 'Mark as "nofollow"' ),
-					},
-				] }
+				settings={ applyFilters(
+					'editor.linkFormat.inlineLinkControlSettings',
+					[
+						{
+							id: 'opensInNewTab',
+							title: __( 'Open in new tab' ),
+						},
+					]
+				) }
 			/>
 		</Popover>
 	);
