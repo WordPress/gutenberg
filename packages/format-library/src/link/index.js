@@ -188,7 +188,7 @@ export const link = {
 		richTextText,
 		pendingLinkValueChanges
 	) {
-		const linkValue = {
+		return {
 			...activeAttributes,
 			url: activeAttributes.url,
 			type: activeAttributes.type,
@@ -198,13 +198,6 @@ export const link = {
 			// Todo - perhaps pending changes can be applied later.
 			...pendingLinkValueChanges,
 		};
-
-		return applyFilters(
-			'editor.linkFormat.toLinkValue',
-			linkValue,
-			activeAttributes,
-			pendingLinkValueChanges
-		);
 	},
 
 	// Defines how to generate the format object (that will be applied to the link text)
@@ -250,11 +243,7 @@ export const link = {
 		// 	).trim();
 		// }
 
-		return applyFilters(
-			'editor.linkFormat.toLinkFormat',
-			format,
-			options
-		);
+		return format;
 	},
 	__unstablePasteRule( value, { html, plainText } ) {
 		if ( isCollapsed( value ) ) {
