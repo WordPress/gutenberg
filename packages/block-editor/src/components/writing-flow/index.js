@@ -21,7 +21,6 @@ import useSelectAll from './use-select-all';
 import useMouseSelectionObserver from './use-mouse-selection-observer';
 import useKeyboardSelectionObserver from './use-keyboard-selection-observer';
 import useClickSelection from './use-click-selection';
-import useFirefoxCompat from './use-firefox-comat';
 import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
@@ -35,7 +34,6 @@ export function useWritingFlow() {
 		before,
 		useMergeRefs( [
 			ref,
-			useFirefoxCompat(),
 			useMouseSelectionObserver(),
 			useKeyboardSelectionObserver(),
 			useClickSelection(),

@@ -45,6 +45,7 @@ import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
 import { useShortcuts } from './use-shortcuts';
 import { useInputEvents } from './use-input-events';
+import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
 
@@ -391,6 +392,7 @@ function RichTextWrapper(
 						disableLineBreaks,
 						onSplitAtEnd,
 					} ),
+					useFirefoxCompat(),
 					anchorRef,
 				] ) }
 				contentEditable={ true }
