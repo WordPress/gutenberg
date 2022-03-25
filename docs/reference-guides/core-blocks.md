@@ -118,7 +118,7 @@ Displays the avatar of the comment's author. ([Source](https://github.com/WordPr
 
 ## Comment Author Name
 
-Display the name of the author of the comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-name))
+Displays the name of the author of the comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-name))
 
 -	**Name:** core/comment-author-name
 -	**Category:** theme
@@ -199,7 +199,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 
 ## Previous Page
 
-Displays the previous comments page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-previous))
+Displays the previous comment's page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-previous))
 
 -	**Name:** core/comments-pagination-previous
 -	**Category:** theme
