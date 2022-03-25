@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.73.0
+
+- [**] Remove upload options for users without permission to upload media [#39769]
+
 ## 1.70.1
 
 -   [***] Fix launching video preview on Android 11+ [#38377]
