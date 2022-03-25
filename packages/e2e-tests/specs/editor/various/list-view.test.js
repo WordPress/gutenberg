@@ -81,7 +81,7 @@ describe( 'List view', () => {
 		const listViewImageBlock = await page.waitForXPath(
 			'//a[contains(., "Image")]'
 		);
-		expect( listViewImageBlock ).toHaveFocus();
+		await expect( listViewImageBlock ).toHaveFocus();
 
 		// Select the image block in the canvas.
 		await page.keyboard.press( 'Enter' );
@@ -89,7 +89,7 @@ describe( 'List view', () => {
 		const uploadButton = await page.waitForXPath(
 			'//button[contains( text(), "Upload" ) ]'
 		);
-		expect( uploadButton ).toHaveFocus();
+		await expect( uploadButton ).toHaveFocus();
 
 		// Delete the image block in the canvas.
 		await page.keyboard.press( 'ArrowUp' );
