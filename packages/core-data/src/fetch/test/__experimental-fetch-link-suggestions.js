@@ -75,7 +75,7 @@ jest.mock( '@wordpress/api-fetch', () =>
 					{
 						id: 54,
 						title: {
-							rendered: 'Media',
+							rendered: 'Some Test Media Title',
 						},
 						type: 'attachment',
 						source_url:
@@ -174,7 +174,7 @@ describe( 'fetchLinkSuggestions', () => {
 			expect( suggestions ).toEqual( [
 				{
 					id: 54,
-					title: 'Media',
+					title: 'Some Test Media Title',
 					url:
 						'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
 					type: 'attachment',
@@ -224,7 +224,7 @@ describe( 'fetchLinkSuggestions', () => {
 				},
 				{
 					id: 54,
-					title: 'Media',
+					title: 'Some Test Media Title',
 					url:
 						'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
 					type: 'attachment',
