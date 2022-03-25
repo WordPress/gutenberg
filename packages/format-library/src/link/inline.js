@@ -20,6 +20,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { applyFilters, addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -63,14 +64,23 @@ function InlineLinkUI( {
 		};
 	}, [] );
 
-	const linkValue = {
+	let linkValue = {
 		url: activeAttributes.url,
 		type: activeAttributes.type,
 		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
 		title: richTextText,
+		// Todo - a filter to deserialize activeAttributes to link props
+		// perhaps the filter can be `toLinkValue` or something?
 		...nextLinkValue,
 	};
+
+	linkValue = applyFilters(
+		'editor.InlineLinkControl.toLinkValue',
+		linkValue,
+		activeAttributes,
+		nextLinkValue
+	);
 
 	function removeLink() {
 		const newValue = removeFormat( value, 'core/link' );
@@ -106,17 +116,18 @@ function InlineLinkUI( {
 		if ( didToggleSettingForNewLink ) {
 			return;
 		}
-
 		const newUrl = prependHTTP( nextValue.url );
-		const linkFormat = createLinkFormat( {
+
+		const nextFormat = {
+			...nextValue,
 			url: newUrl,
-			type: nextValue.type,
 			id:
 				nextValue.id !== undefined && nextValue.id !== null
 					? String( nextValue.id )
 					: undefined,
-			opensInNewWindow: nextValue.opensInNewTab,
-		} );
+		};
+
+		const linkFormat = createLinkFormat( nextFormat );
 
 		const newText = nextValue.title || newUrl;
 		if ( isCollapsed( value ) && ! isActive ) {
@@ -239,6 +250,16 @@ function InlineLinkUI( {
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
+				settings={ [
+					{
+						id: 'opensInNewTab',
+						title: __( 'Open in new tab' ),
+					},
+					{
+						id: 'noFollow',
+						title: __( 'Mark as "nofollow"' ),
+					},
+				] }
 			/>
 		</Popover>
 	);
@@ -267,5 +288,18 @@ function getRichTextValueFromSelection( value, isActive ) {
 	// Get a RichTextValue containing the selected text content.
 	return slice( value, textStart, textEnd );
 }
+
+addFilter(
+	'editor.InlineLinkControl.toLinkValue',
+	'core',
+	function ( linkValue, activeAttributes ) {
+		linkValue = {
+			...linkValue,
+			noFollow: activeAttributes?.rel?.includes( 'nofollow' ),
+		};
+
+		return linkValue;
+	}
+);
 
 export default withSpokenMessages( InlineLinkUI );
