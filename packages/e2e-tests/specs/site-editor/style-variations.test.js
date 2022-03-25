@@ -11,7 +11,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 async function openOtherStyles() {
-	const OTHER_STYLES_SELECTOR = '//div[contains(text(),"Other styles")]';
+	const OTHER_STYLES_SELECTOR = '//div[contains(text(),"Browse styles")]';
 	await ( await page.waitForXPath( OTHER_STYLES_SELECTOR ) ).click();
 }
 
