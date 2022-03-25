@@ -22,6 +22,141 @@ describe( 'actions', () => {
 		registry = createRegistryWithStores();
 	} );
 
+	describe( 'enableComplementaryArea', () => {
+		it( 'sets a single area as active in the complementary area', () => {
+			// Starts off as `undefined`.
+			expect(
+				registry
+					.select( interfaceStore )
+					.getActiveComplementaryArea( 'my-plugin' )
+			).toBeUndefined();
+
+			registry
+				.dispatch( interfaceStore )
+				.enableComplementaryArea( 'my-plugin', 'custom-sidebar-1' );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.getActiveComplementaryArea( 'my-plugin' )
+			).toBe( 'custom-sidebar-1' );
+
+			registry
+				.dispatch( interfaceStore )
+				.enableComplementaryArea( 'my-plugin', 'custom-sidebar-2' );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.getActiveComplementaryArea( 'my-plugin' )
+			).toBe( 'custom-sidebar-2' );
+		} );
+	} );
+
+	describe( 'disableComplementaryArea', () => {
+		it( 'removes any assignment to a complementary area', () => {
+			registry
+				.dispatch( interfaceStore )
+				.enableComplementaryArea( 'my-plugin', 'custom-sidebar' );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.getActiveComplementaryArea( 'my-plugin' )
+			).toBe( 'custom-sidebar' );
+
+			registry
+				.dispatch( interfaceStore )
+				.disableComplementaryArea( 'my-plugin' );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.getActiveComplementaryArea( 'my-plugin' )
+			).toBeNull();
+		} );
+	} );
+
+	describe( 'pinItem / unpinItem', () => {
+		it( 'can be used to pin and unpin multiple items using successive calls', () => {
+			// Items are pinned by default.
+			expect(
+				registry
+					.select( interfaceStore )
+					.isItemPinned( 'my-plugin', 'ui-item-1' )
+			).toBe( true );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.isItemPinned( 'my-plugin', 'ui-item-2' )
+			).toBe( true );
+
+			// Unpinning the default value works.
+			registry
+				.dispatch( interfaceStore )
+				.unpinItem( 'my-plugin', 'ui-item-1' );
+
+			registry
+				.dispatch( interfaceStore )
+				.unpinItem( 'my-plugin', 'ui-item-2' );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.isItemPinned( 'my-plugin', 'ui-item-1' )
+			).toBe( false );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.isItemPinned( 'my-plugin', 'ui-item-2' )
+			).toBe( false );
+
+			// Now explicitly set the items to be pinned.
+			registry
+				.dispatch( interfaceStore )
+				.pinItem( 'my-plugin', 'ui-item-1' );
+
+			registry
+				.dispatch( interfaceStore )
+				.pinItem( 'my-plugin', 'ui-item-2' );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.isItemPinned( 'my-plugin', 'ui-item-1' )
+			).toBe( true );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.isItemPinned( 'my-plugin', 'ui-item-2' )
+			).toBe( true );
+
+			// Unpinning should still work.
+			registry
+				.dispatch( interfaceStore )
+				.unpinItem( 'my-plugin', 'ui-item-1' );
+
+			registry
+				.dispatch( interfaceStore )
+				.unpinItem( 'my-plugin', 'ui-item-2' );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.isItemPinned( 'my-plugin', 'ui-item-1' )
+			).toBe( false );
+
+			expect(
+				registry
+					.select( interfaceStore )
+					.isItemPinned( 'my-plugin', 'ui-item-2' )
+			).toBe( false );
+		} );
+	} );
+
 	describe( 'setFeatureDefaults', () => {
 		it( 'results in default values being present', () => {
 			registry.dispatch( interfaceStore ).setFeatureDefaults( 'test', {
