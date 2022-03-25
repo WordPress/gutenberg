@@ -5,7 +5,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { switchToBlockType } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { group } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
 
-function BlockGroupToolbar( { label = __( 'Group' ) } ) {
+function BlockGroupToolbar( { label = _x( 'Group', 'verb' ) } ) {
 	const {
 		blocksSelection,
 		clientIds,
