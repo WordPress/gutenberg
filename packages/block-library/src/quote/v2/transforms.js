@@ -92,7 +92,7 @@ const transforms = {
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ '*' ],
-			isMatch: ( attributes, blocks ) => {
+			isMatch: ( {}, blocks ) => {
 				return ! blocks.some( ( { name } ) => name === 'core/quote' );
 			},
 			__experimentalConvert: ( blocks ) =>
@@ -113,7 +113,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			isMatch: ( attributes, block ) => {
+			isMatch: ( {}, block ) => {
 				return block.innerBlocks.every(
 					( { name } ) => name === 'core/paragraph'
 				);
