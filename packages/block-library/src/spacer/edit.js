@@ -80,7 +80,14 @@ const SpacerEdit = ( {
 	toggleSelection,
 	context,
 } ) => {
-	const { orientation } = context;
+	const { layout, orientation: orientationContext } = context;
+
+	let orientation = orientationContext || layout?.orientation;
+
+	if ( ! orientation && layout?.type === 'flex' ) {
+		orientation = 'horizontal';
+	}
+
 	const { height, width } = attributes;
 
 	const [ isResizing, setIsResizing ] = useState( false );

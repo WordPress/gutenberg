@@ -15,7 +15,10 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [ "orientation" ],
+	"usesContext": [
+		"layout",
+		"orientation"
+	],
 	"supports": {
 		"anchor": true
 	},

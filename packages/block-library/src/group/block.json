@@ -17,6 +17,10 @@
 			"enum": [ "all", "insert", false ]
 		}
 	},
+	"providesContext": {
+		"layout": "layout",
+		"orientation": "orientation"
+	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"anchor": true,
