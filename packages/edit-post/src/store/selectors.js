@@ -177,7 +177,8 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 
 	// Panels were a preference, but the data structure changed when the state
 	// was migrated to the preferences store. They need to be converted from
-	// the old to new format.
+	// the new preferences store format to old format to ensure no breaking
+	// changes for plugins.
 	const inactivePanels = select( preferencesStore ).get(
 		'core/edit-post',
 		'inactivePanels'
