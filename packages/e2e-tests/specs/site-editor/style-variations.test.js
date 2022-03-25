@@ -25,7 +25,7 @@ async function getAvailableStyleVariations() {
 async function applyVariation( label ) {
 	await toggleGlobalStyles();
 	await openOtherStyles();
-	const variation = await await page.waitForXPath(
+	const variation = await page.waitForXPath(
 		`//*[@role="button"][@aria-label="${ label }"]`
 	);
 	await variation.click();
