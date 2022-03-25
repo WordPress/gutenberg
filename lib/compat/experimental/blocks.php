@@ -35,21 +35,8 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			$comment_args['hierarchical'] = false;
 		}
 
-		$inherit = ! empty( $block->context['comments/inherit'] );
-
-		$per_page = 0;
-		if ( $inherit && get_option( 'page_comments' ) ) {
-			$per_page = get_option( 'comments_per_page' );
-		}
-
-		if ( ! $inherit && ! empty( $block->context['comments/perPage'] ) ) {
-			$per_page = (int) $block->context['comments/perPage'];
-		}
-
+		$per_page     = get_option( 'comments_per_page' );
 		$default_page = get_option( 'default_comments_page' );
-		if ( ! $inherit && ! empty( $block->context['comments/defaultPage'] ) ) {
-			$default_page = $block->context['comments/defaultPage'];
-		}
 
 		if ( $per_page > 0 ) {
 			$comment_args['number'] = $per_page;
