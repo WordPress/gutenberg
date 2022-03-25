@@ -121,7 +121,7 @@ require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/global-styles.php';
 require __DIR__ . '/pwa.php';
 
-// TODO: Before this PR merges, move this to be a part of the style engine package.
+// TODO: Move this to be loaded from the style engine package, via the build directory.
 // Part of the build process should be to copy the PHP file to the correct location,
 // similar to the loading behaviour in `blocks.php`.
 require __DIR__ . '/style-engine/class-wp-style-engine-gutenberg.php';

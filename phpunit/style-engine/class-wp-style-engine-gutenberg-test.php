@@ -3,7 +3,7 @@
  * Tests the Style Engine class and associated functionality.
  *
  * @package    Gutenberg
- * @subpackage block-library
+ * @subpackage style-engine
  */
 
 /**
