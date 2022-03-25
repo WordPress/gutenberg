@@ -42,7 +42,7 @@ function ScreenRoot() {
 					{ !! variations?.length && (
 						<NavigationButton path="/variations">
 							<HStack justify="space-between">
-								<FlexItem>{ __( 'Other styles' ) }</FlexItem>
+								<FlexItem>{ __( 'Browse styles' ) }</FlexItem>
 								<FlexItem>
 									<Icon
 										icon={
