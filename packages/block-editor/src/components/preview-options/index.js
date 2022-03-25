@@ -10,6 +10,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+import { PluginPreview } from '@wordpress/interface';
 
 export default function PreviewOptions( {
 	children,
@@ -18,6 +19,12 @@ export default function PreviewOptions( {
 	deviceType,
 	setDeviceType,
 } ) {
+	const coreDeviceTypes = [
+		{ type: 'Desktop', label: __( 'Desktop' ) },
+		{ type: 'Tablet', label: __( 'Tablet' ) },
+		{ type: 'Mobile', label: __( 'Mobile' ) },
+	];
+
 	const isMobile = useViewportMatch( 'small', '<' );
 	if ( isMobile ) return null;
 
@@ -45,28 +52,24 @@ export default function PreviewOptions( {
 			{ () => (
 				<>
 					<MenuGroup>
-						<MenuItem
-							className="block-editor-post-preview__button-resize"
-							onClick={ () => setDeviceType( 'Desktop' ) }
-							icon={ deviceType === 'Desktop' && check }
-						>
-							{ __( 'Desktop' ) }
-						</MenuItem>
-						<MenuItem
-							className="block-editor-post-preview__button-resize"
-							onClick={ () => setDeviceType( 'Tablet' ) }
-							icon={ deviceType === 'Tablet' && check }
-						>
-							{ __( 'Tablet' ) }
-						</MenuItem>
-						<MenuItem
-							className="block-editor-post-preview__button-resize"
-							onClick={ () => setDeviceType( 'Mobile' ) }
-							icon={ deviceType === 'Mobile' && check }
-						>
-							{ __( 'Mobile' ) }
-						</MenuItem>
+						{ coreDeviceTypes.map( ( device ) => (
+							<MenuItem
+								key={ device.type }
+								className="block-editor-post-preview__button-resize"
+								onClick={ () => setDeviceType( device.type ) }
+								icon={ deviceType === device.type && check }
+							>
+								{ device.label }
+							</MenuItem>
+						) ) }
 					</MenuGroup>
+					<PluginPreview.Slot
+						coreDevices={ coreDeviceTypes }
+						fillProps={ {
+							deviceType,
+							setDeviceType,
+						} }
+					/>
 					{ children }
 				</>
 			) }
