@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject, identity, reduce } from 'lodash';
+import { merge, isPlainObject, identity } from 'lodash';
 
 /**
  * Internal dependencies
@@ -521,33 +521,34 @@ export function migrateInterfaceEnableItemsToPreferencesStore( persistence ) {
 	// Use the existing preferences as the accumulator so that the data is
 	// merged.
 	const sourceComplementaryAreas =
-		sourceEnableItems?.singleEnableItems?.complementaryArea;
-	const convertedComplementaryAreas = reduce(
-		sourceComplementaryAreas,
-		( accumulator, data, scope ) => {
-			// Don't overwrite any existing data in the preferences store.
-			if ( accumulator[ scope ]?.complementaryArea ) {
-				return accumulator;
-			}
+		sourceEnableItems?.singleEnableItems?.complementaryArea ?? {};
 
-			return {
-				...accumulator,
-				[ scope ]: {
-					...accumulator[ scope ],
-					complementaryArea: data,
-				},
-			};
-		},
-		allPreferences
-	);
+	const convertedComplementaryAreas = Object.keys(
+		sourceComplementaryAreas
+	).reduce( ( accumulator, scope ) => {
+		const data = sourceComplementaryAreas[ scope ];
+
+		// Don't overwrite any existing data in the preferences store.
+		if ( accumulator[ scope ]?.complementaryArea ) {
+			return accumulator;
+		}
+
+		return {
+			...accumulator,
+			[ scope ]: {
+				...accumulator[ scope ],
+				complementaryArea: data,
+			},
+		};
+	}, allPreferences );
 
 	// Next feed the converted complementary areas back into a reducer that
 	// converts the pinned items, resulting in the fully migrated data.
 	const sourcePinnedItems =
-		sourceEnableItems?.multipleEnableItems?.pinnedItems;
-	const allConvertedData = reduce(
-		sourcePinnedItems,
-		( accumulator, data, scope ) => {
+		sourceEnableItems?.multipleEnableItems?.pinnedItems ?? {};
+	const allConvertedData = Object.keys( sourcePinnedItems ).reduce(
+		( accumulator, scope ) => {
+			const data = sourcePinnedItems[ scope ];
 			// Don't overwrite any existing data in the preferences store.
 			if ( accumulator[ scope ]?.pinnedItems ) {
 				return accumulator;
