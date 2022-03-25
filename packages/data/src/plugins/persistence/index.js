@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject } from 'lodash';
+import { merge, isPlainObject, identity } from 'lodash';
 
 /**
  * Internal dependencies
@@ -303,7 +303,8 @@ export function migrateFeaturePreferencesToPreferencesStore(
 export function migrateIndividualPreferenceToPreferencesStore(
 	persistence,
 	sourceStoreName,
-	key
+	key,
+	convert = identity
 ) {
 	const preferencesStoreName = 'core/preferences';
 	const state = persistence.get();
@@ -324,16 +325,20 @@ export function migrateIndividualPreferenceToPreferencesStore(
 		return;
 	}
 
-	const allPreferences = state[ preferencesStoreName ]?.preferences;
-	const targetPreferences =
+	const otherScopes = state[ preferencesStoreName ]?.preferences;
+	const otherPreferences =
 		state[ preferencesStoreName ]?.preferences?.[ sourceStoreName ];
+
+	// Pass an object with the key and value as this allows the convert
+	// function to convert to a data structure that has different keys.
+	const convertedPreferences = convert( { [ key ]: sourcePreference } );
 
 	persistence.set( preferencesStoreName, {
 		preferences: {
-			...allPreferences,
+			...otherScopes,
 			[ sourceStoreName ]: {
-				...targetPreferences,
-				[ key ]: sourcePreference,
+				...otherPreferences,
+				...convertedPreferences,
 			},
 		},
 	} );
@@ -348,6 +353,57 @@ export function migrateIndividualPreferenceToPreferencesStore(
 			[ key ]: undefined,
 		},
 	} );
+}
+
+/**
+ * Convert from:
+ * ```
+ * {
+ *     panels: {
+ *         tags: {
+ *             enabled: true,
+ *             opened: true,
+ *         },
+ *         permalinks: {
+ *             enabled: false,
+ *             opened: false,
+ *         },
+ *     },
+ * }
+ * ```
+ *
+ * to:
+ * {
+ *     inactivePanels: [
+ *         'permalinks',
+ *     ],
+ *     openPanels: [
+ *         'tags',
+ *     ],
+ * }
+ *
+ * @param {Object} preferences A preferences object.
+ *
+ * @return {Object} The converted data.
+ */
+export function convertEditPostPanels( preferences ) {
+	const panels = preferences?.panels ?? {};
+	return Object.keys( panels ).reduce(
+		( convertedData, panelName ) => {
+			const panel = panels[ panelName ];
+
+			if ( panel?.enabled === false ) {
+				convertedData.inactivePanels.push( panelName );
+			}
+
+			if ( panel?.opened === true ) {
+				convertedData.openPanels.push( panelName );
+			}
+
+			return convertedData;
+		},
+		{ inactivePanels: [], openPanels: [] }
+	);
 }
 
 export function migrateThirdPartyFeaturePreferencesToPreferencesStore(
@@ -439,6 +495,12 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 		persistence,
 		'core/edit-post',
 		'preferredStyleVariations'
+	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		'core/edit-post',
+		'panels',
+		convertEditPostPanels
 	);
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,

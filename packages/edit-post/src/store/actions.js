@@ -107,26 +107,58 @@ export function togglePublishSidebar() {
  *
  * @return {Object} Action object.
  */
-export function toggleEditorPanelEnabled( panelName ) {
-	return {
-		type: 'TOGGLE_PANEL_ENABLED',
-		panelName,
-	};
-}
+export const toggleEditorPanelEnabled = ( panelName ) => ( { registry } ) => {
+	const inactivePanels =
+		registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'inactivePanels' ) ?? [];
+
+	const isPanelInactive = !! inactivePanels?.includes( panelName );
+
+	// If the panel is inactive, remove it to enable it, else add it to
+	// make it inactive.
+	let updatedInactivePanels;
+	if ( isPanelInactive ) {
+		updatedInactivePanels = inactivePanels.filter(
+			( invactivePanelName ) => invactivePanelName !== panelName
+		);
+	} else {
+		updatedInactivePanels = [ ...inactivePanels, panelName ];
+	}
+
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/edit-post', 'inactivePanels', updatedInactivePanels );
+};
 
 /**
- * Returns an action object used to open or close a panel in the editor.
+ * Opens a closed panel and closes an open panel.
  *
  * @param {string} panelName A string that identifies the panel to open or close.
- *
- * @return {Object} Action object.
  */
-export function toggleEditorPanelOpened( panelName ) {
-	return {
-		type: 'TOGGLE_PANEL_OPENED',
-		panelName,
-	};
-}
+export const toggleEditorPanelOpened = ( panelName ) => ( { registry } ) => {
+	const openPanels =
+		registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'openPanels' ) ?? [];
+
+	const isPanelOpen = !! openPanels?.includes( panelName );
+
+	// If the panel is open, remove it to close it, else add it to
+	// make it open.
+	let updatedOpenPanels;
+	if ( isPanelOpen ) {
+		updatedOpenPanels = openPanels.filter(
+			( openPanelName ) => openPanelName !== panelName
+		);
+	} else {
+		updatedOpenPanels = [ ...openPanels, panelName ];
+	}
+
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/edit-post', 'openPanels', updatedOpenPanels );
+};
 
 /**
  * Returns an action object used to remove a panel from the editor.

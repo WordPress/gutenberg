@@ -26,6 +26,8 @@ export function initializeEditor( id, postType, postId ) {
 		fixedToolbar: false,
 		fullscreenMode: true,
 		hiddenBlockTypes: [],
+		inactivePanels: [],
+		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
 		welcomeGuide: true,
 	} );
