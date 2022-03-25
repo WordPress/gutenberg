@@ -5,7 +5,7 @@
 	"title": "Next Page",
 	"category": "theme",
 	"parent": [ "core/comments-pagination" ],
-	"description": "Displays the next comments page link.",
+	"description": "Displays the next comment's page link.",
 	"textdomain": "default",
 	"attributes": {
 		"label": {

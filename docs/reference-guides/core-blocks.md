@@ -109,7 +109,7 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 
 ## Comment Author Avatar
 
-Add the avatar of this comment's author. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar))
+Displays the avatar of the comment's author. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar))
 
 -	**Name:** core/comment-author-avatar
 -	**Category:** theme
@@ -118,7 +118,7 @@ Add the avatar of this comment's author. ([Source](https://github.com/WordPress/
 
 ## Comment Author Name
 
-Add the author name of this comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-name))
+Display the name of the author of the comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-name))
 
 -	**Name:** core/comment-author-name
 -	**Category:** theme
@@ -136,7 +136,7 @@ Displays the contents of a comment. ([Source](https://github.com/WordPress/guten
 
 ## Comment Date
 
-Add the date of this comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-date))
+Displays the date on which the comment was posted. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-date))
 
 -	**Name:** core/comment-date
 -	**Category:** theme
@@ -163,7 +163,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 
 ## Comment Template
 
-Contains the block elements used to render a comment, like the title, date, author, avatar and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-template))
+Contains the block elements used to display a comment, like the title, date, author, avatar and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-template))
 
 -	**Name:** core/comment-template
 -	**Category:** design
@@ -181,7 +181,7 @@ Displays a paginated navigation to next/previous set of comments, when applicabl
 
 ## Next Page
 
-Displays the next comments page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-next))
+Displays the next comment's page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-next))
 
 -	**Name:** core/comments-pagination-next
 -	**Category:** theme
@@ -208,7 +208,7 @@ Displays the previous comments page link. ([Source](https://github.com/WordPress
 
 ## Comments Query Loop
 
-An advanced block that allows displaying post comments based on different query parameters and visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-query-loop))
+An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-query-loop))
 
 -	**Name:** core/comments-query-loop
 -	**Category:** theme
