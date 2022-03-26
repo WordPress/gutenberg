@@ -10,8 +10,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { DELETE, ENTER, BACKSPACE } from '@wordpress/keycodes';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -42,12 +40,9 @@ export default function BlockTools( {
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const {
-		getSelectedBlockClientIds,
-		getBlockRootClientId,
-		__unstableIsSelectionMergeable,
-		__unstableIsFullySelected,
-	} = useSelect( blockEditorStore );
+	const { getSelectedBlockClientIds, getBlockRootClientId } = useSelect(
+		blockEditorStore
+	);
 	const {
 		duplicateBlocks,
 		removeBlocks,
@@ -56,92 +51,55 @@ export default function BlockTools( {
 		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
-		__unstableDeleteSelection,
-		__unstableSplitSelection,
-		__unstableExpandSelection,
-		replaceBlocks,
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
-		const clientIds = getSelectedBlockClientIds();
-
-		if ( ! clientIds.length ) return;
-
 		if ( isMatch( 'core/block-editor/move-up', event ) ) {
-			event.preventDefault();
-			const rootClientId = getBlockRootClientId( first( clientIds ) );
-			moveBlocksUp( clientIds, rootClientId );
-		} else if ( isMatch( 'core/block-editor/move-down', event ) ) {
-			event.preventDefault();
-			const rootClientId = getBlockRootClientId( first( clientIds ) );
-			moveBlocksDown( clientIds, rootClientId );
-		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
-			event.preventDefault();
-			duplicateBlocks( clientIds );
-		} else if ( isMatch( 'core/block-editor/remove', event ) ) {
-			event.preventDefault();
-			removeBlocks( clientIds );
-		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
-			event.preventDefault();
-			insertAfterBlock( last( clientIds ) );
-		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
-			event.preventDefault();
-			insertBeforeBlock( first( clientIds ) );
-		}
-
-		/**
-		 * Check if the target element is a text area, input or
-		 * event.defaultPrevented and return early. In all these
-		 * cases backspace could be handled elsewhere.
-		 */
-		if (
-			[ 'INPUT', 'TEXTAREA' ].includes( event.target.nodeName ) ||
-			event.defaultPrevented
-		) {
-			return;
-		}
-
-		if ( clientIds.length === 1 ) {
-			return;
-		}
-
-		if ( isMatch( 'core/block-editor/unselect', event ) ) {
-			event.preventDefault();
-			clearSelectedBlock();
-			event.target.ownerDocument.defaultView
-				.getSelection()
-				.removeAllRanges();
-		}
-
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-			if ( __unstableIsFullySelected() ) {
-				replaceBlocks(
-					clientIds,
-					createBlock( getDefaultBlockName() )
-				);
-			} else {
-				__unstableSplitSelection();
-			}
-		} else if ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) {
-			event.preventDefault();
-			if ( __unstableIsFullySelected() ) {
-				removeBlocks( clientIds );
-			} else if ( __unstableIsSelectionMergeable() ) {
-				__unstableDeleteSelection( event.keyCode === DELETE );
-			} else {
-				__unstableExpandSelection();
-			}
-		} else if (
-			// If key.length is longer than 1, it's a control key that doesn't
-			// input anything.
-			event.key.length === 1 &&
-			! ( event.metaKey || event.ctrlKey )
-		) {
-			if ( __unstableIsSelectionMergeable() ) {
-				__unstableDeleteSelection( event.keyCode === DELETE );
-			} else {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
 				event.preventDefault();
+				const rootClientId = getBlockRootClientId( first( clientIds ) );
+				moveBlocksUp( clientIds, rootClientId );
+			}
+		} else if ( isMatch( 'core/block-editor/move-down', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				const rootClientId = getBlockRootClientId( first( clientIds ) );
+				moveBlocksDown( clientIds, rootClientId );
+			}
+		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				duplicateBlocks( clientIds );
+			}
+		} else if ( isMatch( 'core/block-editor/remove', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				removeBlocks( clientIds );
+			}
+		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				insertAfterBlock( last( clientIds ) );
+			}
+		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				insertBeforeBlock( first( clientIds ) );
+			}
+		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length > 1 ) {
+				event.preventDefault();
+				clearSelectedBlock();
+				event.target.ownerDocument.defaultView
+					.getSelection()
+					.removeAllRanges();
 			}
 		}
 	}

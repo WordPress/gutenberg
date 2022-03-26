@@ -21,6 +21,7 @@ import useSelectAll from './use-select-all';
 import useMouseSelectionObserver from './use-mouse-selection-observer';
 import useKeyboardSelectionObserver from './use-keyboard-selection-observer';
 import useClickSelection from './use-click-selection';
+import useInput from './use-input';
 import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
@@ -34,6 +35,7 @@ export function useWritingFlow() {
 		before,
 		useMergeRefs( [
 			ref,
+			useInput(),
 			useMouseSelectionObserver(),
 			useKeyboardSelectionObserver(),
 			useClickSelection(),
