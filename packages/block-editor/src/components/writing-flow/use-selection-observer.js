@@ -72,7 +72,7 @@ function setContentEditableWrapper( node, value ) {
 /**
  * Sets a multi-selection based on the native selection across blocks.
  */
-export default function useKeyboardSelectionObserver() {
+export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } = useDispatch(
 		blockEditorStore
 	);
