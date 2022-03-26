@@ -150,7 +150,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 
 Now it should look like that:
 
-![](/docs/how-to-guides/data-basics/media/edit-form/form-populated.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-populated.png)
 
 ### Step 4: Making the Page title field editable
 
@@ -213,7 +213,7 @@ wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title
 
 As you can see, the `title` of an Entity Record is an object, but the `title` of an Edited Entity record is a string.
 
-This is no accident. Fields like `title`, `excerpt`, and `content` may contain [shortcodes](https://codex.wordpress.org/Shortcode_API) or [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md), which means they can only be rendered on the server. For such fields, the REST API exposes both the `raw` markup _and_ the `rendered` string. For example, in the block editor, `content.rendered` could used as a visual preview, and `content.raw` could be used to populate the code editor.
+This is no accident. Fields like `title`, `excerpt`, and `content` may contain [shortcodes](https://developer.wordpress.org/apis/handbook/shortcode/) or [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md), which means they can only be rendered on the server. For such fields, the REST API exposes both the `raw` markup _and_ the `rendered` string. For example, in the block editor, `content.rendered` could used as a visual preview, and `content.raw` could be used to populate the code editor.
 
 So why is the `content` of an Edited Entity Record a string? Since Javascript is not be able to properly render arbitrary block markup, it stores only the `raw` markup without the `rendered` part. And since that's a string, the entire field becomes a string.
 
@@ -254,7 +254,7 @@ We added an `onChange` handler to keep track of edits via the `editEntityRecord`
 
 This is what it looks like now:
 
-![](/docs/how-to-guides/data-basics/media/edit-form/form-editable.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-editable.png)
 
 ### Step 5: Saving the form data
 
@@ -384,7 +384,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 
 Once you refresh the page, open the form, change the title, and hit save, you should see the following error message:
 
-![](./media/edit-form/form-error.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-error.png)
 
 Fantastic! We can now **restore the previous version of `handleChange`** and move on to the next step.
 
@@ -432,8 +432,8 @@ Note that we disable the save button when there are no edits and when the page i
 
 Here's what it looks like in action:
 
-![](./media/edit-form/form-inactive.png)
-![](./media/edit-form/form-spinner.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-inactive.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-spinner.png)
 
 ### Wiring it all together
 
