@@ -6,6 +6,7 @@ import type {
 	ForwardedRef,
 	ChangeEvent,
 	PointerEvent,
+	ClipboardEvent,
 } from 'react';
 import { omit } from 'lodash';
 import classnames from 'classnames';
@@ -28,6 +29,7 @@ import {
 	getParsedQuantityAndUnit,
 	getUnitsWithCurrentUnit,
 	getValidParsedQuantityAndUnit,
+	parseQuantityAndUnitFromRawValue,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
@@ -111,7 +113,8 @@ function UnforwardedUnitControl(
 		changeProps: {
 			event:
 				| ChangeEvent< HTMLInputElement >
-				| PointerEvent< HTMLInputElement >;
+				| PointerEvent< HTMLInputElement >
+				| ClipboardEvent< HTMLInputElement >;
 		}
 	) => {
 		if (
@@ -155,7 +158,7 @@ function UnforwardedUnitControl(
 		setUnit( nextUnitValue );
 	};
 
-	let handleOnKeyDown;
+	let handleOnKeyDown, onPaste;
 	if ( ! disableUnits && isUnitSelectTabbable && units.length ) {
 		handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
 			props.onKeyDown?.( event );
@@ -167,6 +170,49 @@ function UnforwardedUnitControl(
 				// Moves focus to the UnitSelectControl.
 				refInputSuffix.current?.focus();
 			}
+		};
+		onPaste = ( event: ClipboardEvent< HTMLInputElement > ) => {
+			props.onPaste?.( event );
+			const pastedText = event.clipboardData.getData( 'text' );
+			const parsed = parseQuantityAndUnitFromRawValue(
+				pastedText,
+				units
+			);
+			// If no unit parsed, returns early to let the default paste happen.
+			if ( ! parsed[ 1 ] ) return;
+			const [ quantityPasted, unitPasted ] = parsed;
+			event.preventDefault();
+			const changeProps = {
+				event,
+				data: units.find( ( item ) => item.value === unitPasted ),
+			};
+
+			if ( quantityPasted ) {
+				let {
+					value,
+					selectionStart: headIndex,
+					selectionEnd: tailIndex,
+				} = event.target as HTMLInputElement;
+				headIndex ??= 0;
+				tailIndex ??= 0;
+				if ( headIndex !== tailIndex ) {
+					// Replaces selection with the pasted quantity.
+					const selected = value.substring( headIndex, tailIndex );
+					value = value.replace( selected, `${ quantityPasted }` );
+				} else {
+					// Inserts the pasted quantity at caret.
+					const head = value.substring( 0, headIndex );
+					const tail = value.substring( headIndex, value.length );
+					value = `${ head }${ quantityPasted }${ tail }`;
+				}
+				onChangeProp?.( `${ value }${ unitPasted }`, changeProps );
+			}
+			// Moves focus to the UnitSelectControl.
+			refInputSuffix.current?.focus();
+
+			if ( unitPasted === parsedUnit ) return;
+			onUnitChange?.( unitPasted, changeProps );
+			setUnit( unitPasted );
 		};
 	}
 
@@ -200,7 +246,7 @@ function UnforwardedUnitControl(
 		<Root className="components-unit-control-wrapper" style={ style }>
 			<ValueInput
 				aria-label={ label }
-				type={ isPressEnterToChange ? 'text' : 'number' }
+				type="text"
 				{ ...omit( props, [ 'children' ] ) }
 				autoComplete={ autoComplete }
 				className={ classes }
@@ -210,6 +256,7 @@ function UnforwardedUnitControl(
 				label={ label }
 				onKeyDown={ handleOnKeyDown }
 				onChange={ handleOnQuantityChange }
+				onPaste={ onPaste }
 				ref={ forwardedRef }
 				size={ size }
 				suffix={ inputSuffix }
