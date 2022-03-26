@@ -192,6 +192,12 @@
 		"parent": "data-basics"
 	},
 	{
+		"title": "Building an edit form",
+		"slug": "3-building-an-edit-form",
+		"markdown_source": "../docs/how-to-guides/data-basics/3-building-an-edit-form.md",
+		"parent": "data-basics"
+	},
+	{
 		"title": "Feature Flags",
 		"slug": "feature-flags",
 		"markdown_source": "../docs/how-to-guides/feature-flags.md",
@@ -291,12 +297,6 @@
 		"title": "Block Theme",
 		"slug": "block-theme-overview",
 		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Create a block theme",
-		"slug": "create-block-theme",
-		"markdown_source": "../docs/how-to-guides/themes/create-block-theme.md",
 		"parent": "themes"
 	},
 	{
@@ -609,6 +609,18 @@
 		"title": "BaseField",
 		"slug": "base-field",
 		"markdown_source": "../packages/components/src/base-field/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "BorderBoxControl",
+		"slug": "border-box-control",
+		"markdown_source": "../packages/components/src/border-box-control/border-box-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "BorderControl",
+		"slug": "border-control",
+		"markdown_source": "../packages/components/src/border-control/border-control/README.md",
 		"parent": "components"
 	},
 	{

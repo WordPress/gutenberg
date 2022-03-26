@@ -98,17 +98,15 @@ function gutenberg_navigation_init( $hook ) {
 		$preload_paths[] = gutenberg_navigation_get_menu_items_endpoint( $first_menu_id );
 	}
 
-	$settings = array_merge(
-		get_default_block_editor_settings(),
-		array(
-			'blockNavMenus' => false,
-			// We should uncomment the line below when the block-nav-menus feature becomes stable.
-			// @see https://github.com/WordPress/gutenberg/issues/34265.
-			/*'blockNavMenus' => get_theme_support( 'block-nav-menus' ),*/
-		)
+	$custom_settings = array(
+		'blockNavMenus' => false,
+		// We should uncomment the line below when the block-nav-menus feature becomes stable.
+		// @see https://github.com/WordPress/gutenberg/issues/34265.
+		/*'blockNavMenus' => get_theme_support( 'block-nav-menus' ),*/
 	);
-	$settings = gutenberg_get_block_editor_settings( $settings );
 
+	$context  = new WP_Block_Editor_Context( array( 'name' => 'core/edit-navigation' ) );
+	$settings = get_block_editor_settings( $custom_settings, $context );
 	gutenberg_initialize_editor(
 		'navigation_editor',
 		'edit-navigation',

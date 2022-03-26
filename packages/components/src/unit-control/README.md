@@ -61,6 +61,12 @@ The position of the label (`top`, `side`, `bottom`, or `edge`).
 
 -   Required: No
 
+### `onBlur`: `FocusEventHandler< HTMLInputElement | HTMLSelectElement >`
+
+Callback invoked when either the quantity or unit inputs fire the `blur` event.
+
+-   Required: No
+
 ### `onChange`: `UnitControlOnChangeCallback`
 
 Callback when the `value` changes.

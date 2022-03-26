@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 4.3.0 (2022-03-23)
+
+### New Features
+–   The saveEntityRecord, saveEditedEntityRecord, and deleteEntityRecord actions now accept an optional throwOnError option (defaults to false). When set to true, any exceptions occurring when the action was executing are re-thrown, causing dispatch().saveEntityRecord() to reject with an error. ([#39258](https://github.com/WordPress/gutenberg/pull/39258))
+
 ## 4.2.0 (2022-03-11)
 
 ## 4.1.2 (2022-02-23)
