@@ -1512,6 +1512,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/e2e-tests",
+		"slug": "packages-e2e-tests",
+		"markdown_source": "../packages/e2e-tests/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "../packages/edit-post/README.md",
