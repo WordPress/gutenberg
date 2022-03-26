@@ -215,7 +215,9 @@ export function useRichText( {
 		}
 
 		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
-			// Can't focus if there is a parent content editable.
+			// Can't focus if there is a parent content editable. WritingFlow
+			// should turn this off, but this component (child) renders before
+			// WritingFlow (parent) renders.
 			if (
 				typeof record.current.start !== 'undefined' &&
 				typeof record.current.end !== 'undefined'
