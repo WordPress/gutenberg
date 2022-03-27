@@ -873,8 +873,6 @@ describe( 'Multi-block selection', () => {
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-		// Delay from writing-flow/use-keyboard-selection-observer.js
-		await page.evaluate( () => new Promise( requestAnimationFrame ) );
 
 		// Test setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();

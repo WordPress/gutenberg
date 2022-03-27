@@ -100,7 +100,7 @@ describe( 'Copy/cut/paste of whole blocks', () => {
 		await page.click( '.editor-block-list-item-paragraph' );
 		await page.keyboard.type( 'P' );
 		await page.keyboard.press( 'ArrowLeft' );
-		// Delay from writing-flow/use-keyboard-selection-observer.js
+		// Needs to be investigated why this is needed.
 		await page.evaluate( () => new Promise( requestAnimationFrame ) );
 		await page.keyboard.press( 'ArrowLeft' );
 		// Cut group.
@@ -147,7 +147,7 @@ describe( 'Copy/cut/paste of whole blocks', () => {
 		await page.click( '.editor-block-list-item-paragraph' );
 		await page.keyboard.type( 'P' );
 		await page.keyboard.press( 'ArrowLeft' );
-		// Delay from writing-flow/use-keyboard-selection-observer.js
+		// Needs to be investigated why this is needed.
 		await page.evaluate( () => new Promise( requestAnimationFrame ) );
 		await page.keyboard.press( 'ArrowLeft' );
 		// Cut group.
