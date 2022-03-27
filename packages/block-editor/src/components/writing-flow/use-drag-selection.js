@@ -40,6 +40,7 @@ export default function useDragSelection() {
 			let rafId;
 
 			function onMouseUp() {
+				stopMultiSelect();
 				// Equivalent to attaching the listener once.
 				defaultView.removeEventListener( 'mouseup', onMouseUp );
 				// The browser selection won't have updated yet at this point,
@@ -70,7 +71,6 @@ export default function useDragSelection() {
 							anchorElement.focus();
 						}
 					}
-					stopMultiSelect();
 				} );
 			}
 

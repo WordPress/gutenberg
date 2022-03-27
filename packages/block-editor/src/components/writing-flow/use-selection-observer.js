@@ -128,6 +128,7 @@ export default function useSelectionObserver() {
 				'selectionchange',
 				onSelectionChange
 			);
+			defaultView.addEventListener( 'mouseup', onSelectionChange );
 
 			return () => {
 				defaultView.cancelAnimationFrame( rafId );
@@ -135,6 +136,7 @@ export default function useSelectionObserver() {
 					'selectionchange',
 					onSelectionChange
 				);
+				defaultView.removeEventListener( 'mouseup', onSelectionChange );
 			};
 		},
 		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
