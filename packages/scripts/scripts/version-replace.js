@@ -33,7 +33,9 @@ let pluginFiles = glob(
 
 stdout.write( `Replacing version string for \`${ name }\` plugin... 🔥\n\n` );
 
-let pluginVersionConstant = `${ name.replace( /-/g, '_' ).toUpperCase() }_SINCE`;
+let pluginVersionConstant = `${ name
+	.replace( /-/g, '_' )
+	.toUpperCase() }_SINCE`;
 
 if ( hasPackageProp( 'version-replace' ) ) {
 	const versionReplace = getPackageProp( 'version-replace' );
@@ -43,12 +45,9 @@ if ( hasPackageProp( 'version-replace' ) ) {
 			'Using the `version-replace` field from `package.json` to detect files...\n'
 		);
 
-		pluginFiles = glob(
-			versionReplace.files,
-			{
-				caseSensitiveMatch: false,
-			}
-		);
+		pluginFiles = glob( versionReplace.files, {
+			caseSensitiveMatch: false,
+		} );
 	}
 
 	if ( 'constant' in getPackageProp( 'version-replace' ) ) {
@@ -64,7 +63,9 @@ if ( hasPackageProp( 'version-replace' ) ) {
 	);
 }
 
-stdout.write( `\nFound ${ pluginFiles.length } files to replace the version string\n\n` );
+stdout.write(
+	`\nFound ${ pluginFiles.length } files to replace the version string\n\n`
+);
 
 if ( pluginFiles.length > 0 ) {
 	stdout.write( 'Replacing version in files... ⏳\n\n' );
@@ -74,9 +75,11 @@ if ( pluginFiles.length > 0 ) {
 		from: new RegExp( pluginVersionConstant, 'g' ),
 		to: version,
 		allowEmptyPaths: true,
-	} ).then( () => {
-		stdout.write( 'Version replaced successfully 👍\n\n' );
-	} ).catch( ( error ) => {
-		stdout.write( `Error occurred: ${ error } ❌\n\n` );
-	} );
+	} )
+		.then( () => {
+			stdout.write( 'Version replaced successfully 👍\n\n' );
+		} )
+		.catch( ( error ) => {
+			stdout.write( `Error occurred: ${ error } ❌\n\n` );
+		} );
 }
