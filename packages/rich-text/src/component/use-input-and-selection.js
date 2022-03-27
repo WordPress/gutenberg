@@ -259,6 +259,12 @@ export function useInputAndSelection( props ) {
 				applyRecord,
 			} = propsRef.current;
 
+			// When the whole editor is editable, let writing flow handle
+			// selection.
+			if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
+				return;
+			}
+
 			if ( ! isSelected ) {
 				// We know for certain that on focus, the old selection is invalid.
 				// It will be recalculated on the next mouseup, keyup, or touchend
