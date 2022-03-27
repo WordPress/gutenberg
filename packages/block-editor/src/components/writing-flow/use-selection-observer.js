@@ -82,8 +82,6 @@ export default function useSelectionObserver() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
-			let rafId;
-
 			function onSelectionChange() {
 				const selection = defaultView.getSelection();
 
@@ -115,28 +113,39 @@ export default function useSelectionObserver() {
 					];
 					const depth = findDepth( startPath, endPath );
 
-					// We must allow rich text to set selection first. This
-					// `selectionchange` listener was added first so it will be
-					// called before the rich text one.
-					rafId = defaultView.requestAnimationFrame( () => {
-						multiSelect( startPath[ depth ], endPath[ depth ] );
-					} );
+					multiSelect( startPath[ depth ], endPath[ depth ] );
 				}
 			}
 
-			ownerDocument.addEventListener(
-				'selectionchange',
-				onSelectionChange
-			);
-			defaultView.addEventListener( 'mouseup', onSelectionChange );
+			function addListeners() {
+				ownerDocument.addEventListener(
+					'selectionchange',
+					onSelectionChange
+				);
+				defaultView.addEventListener( 'mouseup', onSelectionChange );
+			}
 
-			return () => {
-				defaultView.cancelAnimationFrame( rafId );
+			function removeListeners() {
 				ownerDocument.removeEventListener(
 					'selectionchange',
 					onSelectionChange
 				);
 				defaultView.removeEventListener( 'mouseup', onSelectionChange );
+			}
+
+			function resetListeners() {
+				removeListeners();
+				addListeners();
+			}
+
+			addListeners();
+			// We must allow rich text to set selection first. This ensures that
+			// our `selectionchange` listener is always reset to be called after
+			// the rich text one.
+			node.addEventListener( 'focusin', resetListeners );
+			return () => {
+				removeListeners();
+				node.removeEventListener( 'focusin', resetListeners );
 			};
 		},
 		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
