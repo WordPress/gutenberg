@@ -24,7 +24,6 @@ let pluginFiles = glob(
 		`${ name }.php`,
 		'uninstall.php',
 		'changelog.*',
-		'license.*',
 		'readme.*',
 	],
 	{
@@ -68,7 +67,7 @@ if ( hasPackageProp( 'version-replace' ) ) {
 stdout.write( `\nFound ${ pluginFiles.length } files to replace the version string\n\n` );
 
 if ( pluginFiles.length > 0 ) {
-	stdout.write( 'Replacing version in files...\n\n' );
+	stdout.write( 'Replacing version in files... ⏳\n\n' );
 
 	replace( {
 		files: pluginFiles,
@@ -76,8 +75,8 @@ if ( pluginFiles.length > 0 ) {
 		to: version,
 		allowEmptyPaths: true,
 	} ).then( () => {
-		stdout.write( 'Version replaced successfully!\n\n' );
+		stdout.write( 'Version replaced successfully 👍\n\n' );
 	} ).catch( ( error ) => {
-		stdout.write( `Error occurred: ${ error }\n\n` );
+		stdout.write( `Error occurred: ${ error } ❌\n\n` );
 	} );
 }
