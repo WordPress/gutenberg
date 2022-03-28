@@ -57,7 +57,9 @@ describe( 'getCSSRules', () => {
 					},
 					spacing: { padding: '10px' },
 				},
-				'.some-selector'
+				{
+					selector: '.some-selector',
+				}
 			)
 		).toEqual( [
 			{
