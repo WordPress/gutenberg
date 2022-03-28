@@ -16,7 +16,10 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 		await editorPage.addNewBlock( blockNames.heading );
 		await editorPage.addNewBlock( blockNames.list );
 
-		const expectedHtml = `${ headerBlockEmpty }\n\n${ listBlockEmpty }`;
+		const expectedHtml = [
+			headerBlockEmpty,
+			listBlockEmpty,
+		].join( '\n\n' );
 		const html = await editorPage.getHtmlContent();
 		expect( html.toLowerCase() ).toBe( expectedHtml );
 	} );
