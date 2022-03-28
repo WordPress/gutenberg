@@ -9,6 +9,7 @@ import {
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
+import createPersistenceLayer from '@wordpress/persistence-local-storage';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -106,6 +107,12 @@ export function initializeEditor(
 		initialEdits
 	);
 
+	const localStoragePersistenceLayer = createPersistenceLayer( {
+		storageKey: 'WP_DATA_TEST',
+	} );
+	dispatch( preferencesStore ).setPersistenceLayer(
+		localStoragePersistenceLayer
+	);
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		editorMode: 'visual',
 		fixedToolbar: false,
