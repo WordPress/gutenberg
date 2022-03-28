@@ -321,7 +321,7 @@ export function migrateIndividualPreferenceToPreferencesStore(
 	const sourcePreference = state[ sourceStoreName ]?.preferences?.[ key ];
 
 	// There's nothing to migrate, exit early.
-	if ( ! sourcePreference ) {
+	if ( sourcePreference === undefined ) {
 		return;
 	}
 

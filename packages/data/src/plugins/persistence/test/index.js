@@ -846,6 +846,37 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 			},
 		} );
 	} );
+
+	it( 'migrates preferences that has a `false` value', () => {
+		const persistenceInterface = createPersistenceInterface( {
+			storageKey: 'test-username',
+		} );
+
+		persistenceInterface.set( 'core/test', {
+			preferences: {
+				myFalsePreference: false,
+			},
+		} );
+
+		migrateIndividualPreferenceToPreferencesStore(
+			persistenceInterface,
+			{ from: 'core/test', scope: 'core/test' },
+			'myFalsePreference'
+		);
+
+		expect( persistenceInterface.get() ).toEqual( {
+			'core/preferences': {
+				preferences: {
+					'core/test': {
+						myFalsePreference: false,
+					},
+				},
+			},
+			'core/test': {
+				preferences: {},
+			},
+		} );
+	} );
 } );
 
 describe( 'migrateThirdPartyFeaturePreferencesToPreferencesStore', () => {
