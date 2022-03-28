@@ -135,7 +135,7 @@ export const registerBlock = ( block ) => {
 		{
 			name,
 			...metadata,
-			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT
+			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT.
 			...( ! ALLOWED_BLOCKS_GRADIENT_SUPPORT.includes( name ) &&
 			supports?.color?.gradients
 				? {
@@ -171,7 +171,7 @@ const registerBlockVariations = ( block ) => {
 	} );
 };
 
-// only enable code block for development
+// Only enable code block for development
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 

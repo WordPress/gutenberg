@@ -28,14 +28,14 @@ describe( 'Managing reusable blocks', () => {
 	it( 'Should import reusable blocks', async () => {
 		const originalEntries = await getNumberOfEntries();
 
-		// Import Reusable block
+		// Import Reusable block.
 		await page.waitForSelector( '.list-reusable-blocks__container' );
 		const importButton = await page.$(
 			'.list-reusable-blocks__container button'
 		);
 		await importButton.click();
 
-		// Select the file to upload
+		// Select the file to upload.
 		const testReusableBlockFile = path.join(
 			__dirname,
 			'..',
@@ -47,13 +47,13 @@ describe( 'Managing reusable blocks', () => {
 		const input = await page.$( '.list-reusable-blocks-import-form input' );
 		await input.uploadFile( testReusableBlockFile );
 
-		// Submit the form
+		// Submit the form.
 		const button = await page.$(
 			'.list-reusable-blocks-import-form__button'
 		);
 		await button.click();
 
-		// Wait for the success notice
+		// Wait for the success notice.
 		await page.waitForSelector( '.notice-success' );
 		const noticeContent = await page.$eval(
 			'.notice-success',
@@ -63,7 +63,7 @@ describe( 'Managing reusable blocks', () => {
 			'Reusable block imported successfully!'
 		);
 
-		// Refresh the page
+		// Refresh the page.
 		await visitAdminPage( 'edit.php', 'post_type=wp_block' );
 
 		const expectedEntries = originalEntries + 1;

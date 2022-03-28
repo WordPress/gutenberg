@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -114,7 +114,7 @@ const OptionalControlsGroup = ( {
 
 const ToolsPanelHeader = (
 	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
 		areAllOptionalControlsHidden,

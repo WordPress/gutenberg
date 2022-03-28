@@ -7,6 +7,7 @@ import { default as TestRenderer, act } from 'react-test-renderer';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
+import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -15,7 +16,6 @@ import {
 	EnableCustomFieldsOption,
 	CustomFieldsConfirmation,
 } from '../enable-custom-fields';
-import BaseOption from '../base';
 
 describe( 'EnableCustomFieldsOption', () => {
 	it( 'renders a checked checkbox when custom fields are enabled', () => {

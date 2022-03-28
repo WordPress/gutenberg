@@ -76,10 +76,10 @@ const BlockMobileToolbar = ( {
 			<View style={ styles.spacer } />
 
 			<BlockSettingsButton.Slot>
-				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
+				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls. */ }
 				{ ( fills = [ null ] ) => (
 					// The purpose of BlockSettingsButtonFill component is only to provide a way
-					// to pass data upstream from the slot rendering
+					// to pass data upstream from the slot rendering.
 					<BlockSettingsButtonFill
 						fillsLength={ fills.length }
 						onChangeFillsLength={ setFillsLength }

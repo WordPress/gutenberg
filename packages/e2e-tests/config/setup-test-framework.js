@@ -65,7 +65,7 @@ const OBSERVED_CONSOLE_MESSAGE_TYPES = {
  */
 const pageEvents = [];
 
-// The Jest timeout is increased because these tests are a bit slow
+// The Jest timeout is increased because these tests are a bit slow.
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
 // Retry failed tests at most 2 times in CI.

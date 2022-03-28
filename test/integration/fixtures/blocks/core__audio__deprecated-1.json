@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/audio",
 		"isValid": true,
 		"attributes": {
@@ -8,7 +7,6 @@
 			"autoplay": false,
 			"loop": false
 		},
-		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-audio\"><audio controls></audio></figure>"
+		"innerBlocks": []
 	}
 ]

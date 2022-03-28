@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 4.5.0 (2022-03-23)
+
+## 4.4.0 (2022-03-11)
+
 ## 4.3.0 (2022-01-27)
 
 - Add new `addLocaleData` method to merge locale data into the Tannin instance by domain.

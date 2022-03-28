@@ -48,6 +48,19 @@ _Returns_
 
 -   `boolean`: Whether the given block type is allowed to be inserted.
 
+### canLockBlockType
+
+Determines if the given block type can be locked/unlocked by a user.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _nameOrType_ `(string|Object)`: Block name or type object.
+
+_Returns_
+
+-   `boolean`: Whether a given block type can be locked/unlocked.
+
 ### canMoveBlock
 
 Determines if the given block is allowed to be moved.
@@ -1208,11 +1221,7 @@ _Parameters_
 
 -   _attributes_ `?Object`: Optional attributes of the block to assign.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to append.
--   _index_ `?number`: Optional index where to insert the default block
-
-_Returns_
-
--   `Object`: Action object
+-   _index_ `?number`: Optional index where to insert the default block.
 
 ### mergeBlocks
 
@@ -1261,6 +1270,7 @@ _Parameters_
 
 -   _start_ `string`: First block of the multi selection.
 -   _end_ `string`: Last block of the multiselection.
+-   _\_\_experimentalInitialPosition_ `number|null`: Optional initial position. Pass as null to skip focus within editor canvas.
 
 ### receiveBlocks
 
@@ -1393,7 +1403,7 @@ Action that changes the position of the user caret.
 
 _Parameters_
 
--   _clientId_ `string`: The selected block client ID.
+-   _clientId_ `string|WPSelection`: The selected block client ID.
 -   _attributeKey_ `string`: The selected block attribute key.
 -   _startOffset_ `number`: The start offset.
 -   _endOffset_ `number`: The end offset.
@@ -1465,7 +1475,7 @@ _Parameters_
 
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _index_ `?number`: Index at which block should be inserted.
--   _\_\_unstableOptions_ `Object`: Wether or not to show an inserter button.
+-   _\_\_unstableOptions_ `Object`: Whether or not to show an inserter button.
 
 _Returns_
 

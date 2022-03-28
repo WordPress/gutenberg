@@ -20,6 +20,7 @@ import { isURL } from '@wordpress/url';
 import { filePasteHandler } from './file-paste-handler';
 import { addActiveFormats, isShortcode } from './utils';
 import { splitValue } from './split-value';
+import { shouldDismissPastedFiles } from '../../utils/pasting';
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
@@ -62,7 +63,6 @@ export function usePasteHandler( props ) {
 			} = propsRef.current;
 
 			if ( ! isSelected ) {
-				event.preventDefault();
 				return;
 			}
 
@@ -155,9 +155,15 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
-			// Only process file if no HTML is present.
-			// Note: a pasted file may have the URL as plain text.
-			if ( files && files.length && ! html ) {
+			// Process any attached files, unless we infer that the files in
+			// question are redundant "screenshots" of the actual HTML payload,
+			// as created by certain office-type programs.
+			//
+			// @see shouldDismissPastedFiles
+			if (
+				files?.length &&
+				! shouldDismissPastedFiles( files, html, plainText )
+			) {
 				const content = pasteHandler( {
 					HTML: filePasteHandler( files ),
 					mode: 'BLOCKS',

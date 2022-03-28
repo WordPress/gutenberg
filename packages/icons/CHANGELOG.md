@@ -2,9 +2,34 @@
 
 ## Unreleased
 
+## 8.1.0 (2022-03-23)
+
+## 8.0.0 (2022-03-11)
+
+### Breaking Changes
+
+-   Changed `dragHandle` footprint from 18x18 to 24x24 to match other icons.  ([#39342](https://github.com/WordPress/gutenberg/pull/39342))
+
+### New Features
+
+- Add new `row` and `copy` icons. 
+
+## 7.0.0 (2022-02-23)
+
+### New Features
+
+- Added new icon: `post`, and refreshed the existing `pin` icon. ([#39139](https://github.com/WordPress/gutenberg/pull/39139))
+
+### Breaking Changes
+
+-   Removed icons that were added by mistake: `alignJustifyAlt`, `cogAlt`, `sparkles`, `trashFilled`. ([#38849](https://github.com/WordPress/gutenberg/pull/38849))
+
+## 6.3.0 (2022-02-10)
+
 ### New Features
 
 -   Added new block icon: `tip` ([#38424](https://github.com/WordPress/gutenberg/pull/38424)).
+-   Added new query title, post terms icons, updated pagination, pagination next/prev, and pagination numbers icons: `tip` ([#38521](https://github.com/WordPress/gutenberg/pull/38521)).
 
 ## 6.2.0 (2022-01-27)
 

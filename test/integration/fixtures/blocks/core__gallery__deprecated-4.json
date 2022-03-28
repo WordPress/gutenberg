@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/gallery",
 		"isValid": true,
 		"attributes": {
@@ -12,7 +11,6 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
@@ -25,7 +23,6 @@
 				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_1",
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
@@ -38,7 +35,6 @@
 				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_2",
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
@@ -50,7 +46,6 @@
 				},
 				"innerBlocks": []
 			}
-		],
-		"originalContent": "<figure class=\"wp-block-gallery columns-3 is-cropped alignwide\">\n\t<ul class=\"blocks-gallery-grid\">\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2016/09/cropped-img_9054-1.jpg?w=190\" alt=\"\" data-id=\"1421\" class=\"wp-image-1421\"/>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2017/09/cropped-l1001498-1.jpg?w=580\" alt=\"\" data-id=\"1440\" class=\"wp-image-1440\"/>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2017/05/cropped-l1005945-2-2.jpg?w=580\" alt=\"\" data-id=\"1362\" class=\"wp-image-1362\"/>\n\t\t\t</figure>\n\t\t</li>\n\t</ul>\n</figure>"
+		]
 	}
 ]

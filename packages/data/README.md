@@ -139,7 +139,7 @@ A **control** defines the execution flow behavior associated with a specific act
 
 The `controls` option should be passed as an object where each key is the name of the action type to act upon, the value a function which receives the original action object. It should returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
 
-Refer to the [documentation of `@wordpress/redux-routine`](/packages/redux-routine/README.md) for more information.
+Refer to the [documentation of `@wordpress/redux-routine`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/redux-routine/README.md) for more information.
 
 #### `initialState`
 
@@ -247,7 +247,7 @@ register( customStore );
 
 The data module shares many of the same [core principles](https://redux.js.org/introduction/three-principles) and [API method naming](https://redux.js.org/api/api-reference) of [Redux](https://redux.js.org/). In fact, it is implemented atop Redux. Where it differs is in establishing a modularization pattern for creating separate but interdependent stores, and in codifying conventions such as selector functions as the primary entry point for data access.
 
-The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](/packages/compose/README.md)).
+The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](https://github.com/WordPress/gutenberg/tree/HEAD/packages/compose/README.md)).
 
 The data module also has built-in solutions for handling asynchronous side-effects, through [resolvers](#resolvers) and [controls](#controls). These differ slightly from [standard redux async solutions](https://redux.js.org/advanced/async-actions) like [`redux-thunk`](https://github.com/gaearon/redux-thunk) or [`redux-saga`](https://redux-saga.js.org/).
 

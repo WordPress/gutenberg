@@ -288,10 +288,10 @@ function HierarchicalTermSelector( { slug } ) {
 			return;
 		}
 
-		// check if the term we are adding already exists
+		// Check if the term we are adding already exists.
 		const existingTerm = findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
-			// if the term we are adding exists but is not selected select it
+			// If the term we are adding exists but is not selected select it.
 			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ] );
 			}

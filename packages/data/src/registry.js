@@ -150,7 +150,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	//
 	// Deprecated
 	// TODO: Remove this after `use()` is removed.
-	//
 	function withPlugins( attributes ) {
 		return mapValues( attributes, ( attribute, key ) => {
 			if ( typeof attribute !== 'function' ) {
@@ -289,8 +288,11 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	//
 	// TODO:
 	// This function will be deprecated as soon as it is no longer internally referenced.
-	//
 	function use( plugin, options ) {
+		if ( ! plugin ) {
+			return;
+		}
+
 		registry = {
 			...registry,
 			...plugin( registry, options ),

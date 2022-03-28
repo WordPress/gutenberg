@@ -17,7 +17,7 @@ const alignmentOptions = ALIGNMENTS.reduce( ( options, item ) => {
 }, {} );
 
 export default {
-	title: 'Components/AlignmentMatrixControl',
+	title: 'Components (Experimental)/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
 	parameters: {
 		knobs: { disable: false },

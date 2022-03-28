@@ -210,10 +210,20 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 "
 `;
 
-exports[`getContributors verify that the contributors list is properly formatted 1`] = `
+exports[`getContributorList verify that the contributors list is properly formatted 1`] = `
+"
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aaronrobertshaw @Addison-Stavlo @alexstine @amir2mi @annezazu @antonis @ceyhun @christianztamayo @chrisvanpatten @ciampo @dcalhoun @desrosj @fluiddot @geriux @getdave @glendaviesnz @guarani @gwwar @gziolo @hypest @jasmussen @jeremyfelt @jeyip @jhnstn @johngodley @kapilpaul @kevin940726 @MaggieCabrera @Mamaduka @mkaz @mrleemon @mtias @nosolosw @ntsekouras @rbrishabh @RhnSharma @ryelle @sarayourfriend @scruffian @SiobhyB @stacimc @StevenDufresne @talldan @torounit @walbo @youknowriad"
+`;
+
+exports[`getContributorProps verify that the contributors props are properly formatted 1`] = `
 "## First time contributors
 
-The following PRs were merged by first time contrbutors:
+The following PRs were merged by first time contributors:
 
 - @alexstine: Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))
 - @amir2mi: Example for rest_endpoints filter in PHP. ([33738](https://github.com/WordPress/gutenberg/pull/33738))

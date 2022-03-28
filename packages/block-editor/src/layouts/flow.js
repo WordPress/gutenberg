@@ -14,6 +14,7 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
  */
 import useSetting from '../components/use-setting';
 import { appendSelectors } from './utils';
+import { getGapBoxControlValueFromStyle } from '../hooks/gap';
 
 export default {
 	name: 'default',
@@ -109,49 +110,58 @@ export default {
 		const { contentSize, wideSize } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
+		const blockGapStyleValue = getGapBoxControlValueFromStyle(
+			style?.spacing?.blockGap
+		);
 		const blockGapValue =
-			style?.spacing?.blockGap ?? 'var( --wp--style--block-gap )';
+			blockGapStyleValue?.top ?? 'var( --wp--style--block-gap )';
 
 		let output =
 			!! contentSize || !! wideSize
 				? `
-					${ appendSelectors( selector, '> *' ) } {
+					${ appendSelectors(
+						selector,
+						'> :where(:not(.alignleft):not(.alignright))'
+					) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;
 						margin-right: auto !important;
 					}
-
-					${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
+					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };
 					}
-
-					${ appendSelectors( selector, '> [data-align="full"]' ) } {
+					${ appendSelectors( selector, '> .alignfull' ) } {
 						max-width: none;
 					}
 				`
 				: '';
 
 		output += `
-			${ appendSelectors( selector, '> [data-align="left"]' ) } {
+			${ appendSelectors( selector, '> .alignleft' ) } {
 				float: left;
-				margin-right: 2em;
+				margin-inline-start: 0;
+				margin-inline-end: 2em;
 			}
-
-			${ appendSelectors( selector, '> [data-align="right"]' ) } {
+			${ appendSelectors( selector, '> .alignright' ) } {
 				float: right;
-				margin-left: 2em;
+				margin-inline-start: 2em;
+				margin-inline-end: 0;
 			}
 
+			${ appendSelectors( selector, '> .aligncenter' ) } {
+				margin-left: auto !important;
+				margin-right: auto !important;
+			}
 		`;
 
 		if ( hasBlockGapStylesSupport ) {
 			output += `
 				${ appendSelectors( selector, '> *' ) } {
-					margin-top: 0;
-					margin-bottom: 0;
+					margin-block-start: 0;
+					margin-block-end: 0;
 				}
 				${ appendSelectors( selector, '> * + *' ) } {
-					margin-top: ${ blockGapValue };
+					margin-block-start: ${ blockGapValue };
 				}
 			`;
 		}

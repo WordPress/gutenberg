@@ -17,7 +17,7 @@ import Button from '../../button';
 
 export default {
 	component: ToggleGroupControl,
-	title: 'Components/ToggleGroupControl',
+	title: 'Components (Experimental)/ToggleGroupControl',
 	parameters: {
 		knobs: { disable: false },
 	},

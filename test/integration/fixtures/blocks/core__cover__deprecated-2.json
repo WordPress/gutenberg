@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/cover",
 		"isValid": true,
 		"attributes": {
@@ -12,7 +11,6 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
@@ -24,7 +22,6 @@
 				},
 				"innerBlocks": []
 			}
-		],
-		"originalContent": "<div class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\"><p class=\"wp-block-cover-image-text\"><strong>Cover Block</strong></p></div>"
+		]
 	}
 ]

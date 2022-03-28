@@ -213,7 +213,7 @@ export default function useSelect( mapSelect, deps ) {
 			}
 		};
 
-		// catch any possible state changes during mount before the subscription
+		// Catch any possible state changes during mount before the subscription
 		// could be set.
 		if ( latestIsAsync.current ) {
 			renderQueue.add( queueContext, onStoreChange );

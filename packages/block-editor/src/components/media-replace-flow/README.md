@@ -56,6 +56,13 @@ Callback used when media is replaced with an URL. It is called with one argument
 -   Type: `func`
 -   Required: Yes
 
+### onError
+
+Callback called when an upload error happens and receives an error message as an argument.
+
+-   Type: `func`
+-   Required: No
+
 ### name
 
 The label of the replace button.

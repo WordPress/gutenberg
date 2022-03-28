@@ -5,7 +5,7 @@ import createLocks from '../engine';
 
 jest.useRealTimers();
 
-// we correctly await all promises with expect calls, but the rule doesn't detect that
+// We correctly await all promises with expect calls, but the rule doesn't detect that.
 /* eslint-disable jest/valid-expect-in-promise */
 
 describe( 'Locks engine', () => {
@@ -15,11 +15,11 @@ describe( 'Locks engine', () => {
 		let l1Granted = false;
 		let l2Granted = false;
 
-		// request two locks
+		// Request two locks.
 		const l1 = locks.acquire( 'store', [ 'root' ], true );
 		const l2 = locks.acquire( 'store', [ 'root' ], true );
 
-		// on each grant, verify that the other lock is not granted at the same time
+		// On each grant, verify that the other lock is not granted at the same time.
 		const check1 = l1.then( () => {
 			l1Granted = true;
 			expect( l2Granted ).toBe( false );
@@ -30,7 +30,7 @@ describe( 'Locks engine', () => {
 			expect( l1Granted ).toBe( false );
 		} );
 
-		// unlock both
+		// Unlock both.
 		const lock1 = await l1;
 		locks.release( lock1 );
 		l1Granted = false;
@@ -39,7 +39,7 @@ describe( 'Locks engine', () => {
 		locks.release( lock2 );
 		l2Granted = false;
 
-		// ensure that both locks were granted and checked
+		// Ensure that both locks were granted and checked.
 		return await Promise.all( [ check1, check2 ] );
 	} );
 
@@ -49,11 +49,11 @@ describe( 'Locks engine', () => {
 		let l1Granted = false;
 		let l2Granted = false;
 
-		// request two locks
+		// Request two locks.
 		const l1 = locks.acquire( 'store', [ 'root' ], false );
 		const l2 = locks.acquire( 'store', [ 'root' ], true );
 
-		// on each grant, verify that the other lock is not granted at the same time
+		// On each grant, verify that the other lock is not granted at the same time.
 		const check1 = l1.then( () => {
 			l1Granted = true;
 			expect( l2Granted ).toBe( false );
@@ -64,7 +64,7 @@ describe( 'Locks engine', () => {
 			expect( l1Granted ).toBe( false );
 		} );
 
-		// unlock both
+		// Unlock both.
 		const lock1 = await l1;
 		locks.release( lock1 );
 		l1Granted = false;
@@ -73,7 +73,7 @@ describe( 'Locks engine', () => {
 		locks.release( lock2 );
 		l2Granted = false;
 
-		// ensure that both locks were granted and checked
+		// Ensure that both locks were granted and checked.
 		return await Promise.all( [ check1, check2 ] );
 	} );
 
@@ -83,11 +83,11 @@ describe( 'Locks engine', () => {
 		let l1Granted = false;
 		let l2Granted = false;
 
-		// request two locks
+		// Request two locks.
 		const l1 = locks.acquire( 'store', [ 'root' ], true );
 		const l2 = locks.acquire( 'store', [ 'root', 'child' ], true );
 
-		// on each grant, verify that the other lock is not granted at the same time
+		// On each grant, verify that the other lock is not granted at the same time.
 		const check1 = l1.then( () => {
 			l1Granted = true;
 			expect( l2Granted ).toBe( false );
@@ -98,7 +98,7 @@ describe( 'Locks engine', () => {
 			expect( l1Granted ).toBe( false );
 		} );
 
-		// unlock both
+		// Unlock both.
 		const lock1 = await l1;
 		locks.release( lock1 );
 		l1Granted = false;
@@ -107,7 +107,7 @@ describe( 'Locks engine', () => {
 		locks.release( lock2 );
 		l2Granted = false;
 
-		// ensure that both locks were granted and checked
+		// Ensure that both locks were granted and checked.
 		return await Promise.all( [ check1, check2 ] );
 	} );
 

@@ -3,6 +3,10 @@
  */
 import { SlotFillProvider } from '@wordpress/components';
 import { UnsavedChangesWarning } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
+import { useDispatch } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -14,6 +18,20 @@ import NavigationSidebar from '../navigation-sidebar';
 import getIsListPage from '../../utils/get-is-list-page';
 
 export default function EditSiteApp( { reboot } ) {
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
+		);
+	}
+
 	return (
 		<SlotFillProvider>
 			<UnsavedChangesWarning />
@@ -29,6 +47,7 @@ export default function EditSiteApp( { reboot } ) {
 							) : (
 								<Editor onError={ reboot } />
 							) }
+							<PluginArea onError={ onPluginAreaError } />
 							{ /* Keep the instance of the sidebar to ensure focus will not be lost
 							 * when navigating to other pages. */ }
 							<NavigationSidebar

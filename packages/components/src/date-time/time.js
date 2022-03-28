@@ -36,12 +36,19 @@ function from12hTo24h( hours, isPm ) {
  * <UpdateOnBlurAsIntegerField>
  * A shared component to parse, validate, and handle remounting of the underlying form field element like <input> and <select>.
  *
- * @param {Object}        props          Component props.
- * @param {string}        props.as       Render the component as specific element tag, defaults to "input".
- * @param {number|string} props.value    The default value of the component which will be parsed to integer.
- * @param {Function}      props.onUpdate Call back when blurred and validated.
+ * @param {Object}        props             Component props.
+ * @param {string}        props.as          Render the component as specific element tag, defaults to "input".
+ * @param {number|string} props.value       The default value of the component which will be parsed to integer.
+ * @param {Function}      props.onUpdate    Call back when blurred and validated.
+ * @param {string}        [props.className]
  */
-function UpdateOnBlurAsIntegerField( { as, value, onUpdate, ...props } ) {
+function UpdateOnBlurAsIntegerField( {
+	as,
+	value,
+	onUpdate,
+	className,
+	...props
+} ) {
 	function handleBlur( event ) {
 		const { target } = event;
 
@@ -70,6 +77,10 @@ function UpdateOnBlurAsIntegerField( { as, value, onUpdate, ...props } ) {
 		key: value,
 		defaultValue: value,
 		onBlur: handleBlur,
+		className: classnames(
+			'components-datetime__time-field-integer-field',
+			className
+		),
 		...props,
 	} );
 }

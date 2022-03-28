@@ -78,6 +78,125 @@ const hasTextColorSupport = ( blockType ) => {
 };
 
 /**
+ * Checks whether a color has been set either with a named preset color in
+ * a top level block attribute or as a custom value within the style attribute
+ * object.
+ *
+ * @param {string} name Name of the color to check.
+ * @return {boolean} Whether or not a color has a value.
+ */
+const hasColor = ( name ) => ( props ) => {
+	if ( name === 'background' ) {
+		return (
+			!! props.attributes.backgroundColor ||
+			!! props.attributes.style?.color?.background ||
+			!! props.attributes.gradient ||
+			!! props.attributes.style?.color?.gradient
+		);
+	}
+
+	if ( name === 'link' ) {
+		return !! props.attributes.style?.elements?.link?.color?.text;
+	}
+
+	return (
+		!! props.attributes[ `${ name }Color` ] ||
+		!! props.attributes.style?.color?.[ name ]
+	);
+};
+
+/**
+ * Clears a single color property from a style object.
+ *
+ * @param {Array}  path  Path to color property to clear within styles object.
+ * @param {Object} style Block attributes style object.
+ * @return {Object} Styles with the color property omitted.
+ */
+const clearColorFromStyles = ( path, style ) =>
+	cleanEmptyObject( immutableSet( style, path, undefined ) );
+
+/**
+ * Resets the block attributes for text color.
+ *
+ * @param {Object}   props               Current block props.
+ * @param {Object}   props.attributes    Block attributes.
+ * @param {Function} props.setAttributes Block's setAttributes prop used to apply reset.
+ */
+const resetTextColor = ( { attributes, setAttributes } ) => {
+	setAttributes( {
+		textColor: undefined,
+		style: clearColorFromStyles( [ 'color', 'text' ], attributes.style ),
+	} );
+};
+
+/**
+ * Clears text color related properties from supplied attributes.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {Object} Update block attributes with text color properties omitted.
+ */
+const resetAllTextFilter = ( attributes ) => ( {
+	textColor: undefined,
+	style: clearColorFromStyles( [ 'color', 'text' ], attributes.style ),
+} );
+
+/**
+ * Resets the block attributes for link color.
+ *
+ * @param {Object}   props               Current block props.
+ * @param {Object}   props.attributes    Block attributes.
+ * @param {Function} props.setAttributes Block's setAttributes prop used to apply reset.
+ */
+const resetLinkColor = ( { attributes, setAttributes } ) => {
+	const path = [ 'elements', 'link', 'color', 'text' ];
+	setAttributes( { style: clearColorFromStyles( path, attributes.style ) } );
+};
+
+/**
+ * Clears link color related properties from supplied attributes.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {Object} Update block attributes with link color properties omitted.
+ */
+const resetAllLinkFilter = ( attributes ) => ( {
+	style: clearColorFromStyles(
+		[ 'elements', 'link', 'color', 'text' ],
+		attributes.style
+	),
+} );
+
+/**
+ * Clears all background color related properties including gradients from
+ * supplied block attributes.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {Object} Block attributes with background and gradient omitted.
+ */
+const clearBackgroundAndGradient = ( attributes ) => ( {
+	backgroundColor: undefined,
+	gradient: undefined,
+	style: {
+		...attributes.style,
+		color: {
+			...attributes.style?.color,
+			background: undefined,
+			gradient: undefined,
+		},
+	},
+} );
+
+/**
+ * Resets the block attributes for both background color and gradient.
+ *
+ * @param {Object}   props               Current block props.
+ * @param {Object}   props.attributes    Block attributes.
+ * @param {Function} props.setAttributes Block's setAttributes prop used to apply reset.
+ */
+const resetBackgroundAndGradient = ( { attributes, setAttributes } ) => {
+	setAttributes( clearBackgroundAndGradient( attributes ) );
+};
+
+/**
  * Filters registered block settings, extending attributes to include
  * `backgroundColor` and `textColor` attribute.
  *
@@ -90,7 +209,7 @@ function addAttributes( settings ) {
 		return settings;
 	}
 
-	// allow blocks to specify their own attribute definition with default values if needed.
+	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( ! settings.attributes.backgroundColor ) {
 		Object.assign( settings.attributes, {
 			backgroundColor: {
@@ -136,7 +255,7 @@ export function addSaveProps( props, blockType, attributes ) {
 
 	const hasGradient = hasGradientSupport( blockType );
 
-	// I'd have prefered to avoid the "style" attribute usage here
+	// I'd have preferred to avoid the "style" attribute usage here
 	const { backgroundColor, textColor, gradient, style } = attributes;
 
 	const backgroundClass = getColorClassName(
@@ -150,7 +269,7 @@ export function addSaveProps( props, blockType, attributes ) {
 		textClass,
 		gradientClass,
 		{
-			// Don't apply the background class if there's a custom gradient
+			// Don't apply the background class if there's a custom gradient.
 			[ backgroundClass ]:
 				( ! hasGradient || ! style?.color?.gradient ) &&
 				!! backgroundClass,
@@ -168,7 +287,7 @@ export function addSaveProps( props, blockType, attributes ) {
 }
 
 /**
- * Filters registered block settings to extand the block edit wrapper
+ * Filters registered block settings to extend the block edit wrapper
  * to apply the desired styles and classnames properly.
  *
  * @param {Object} settings Original block settings.
@@ -370,6 +489,11 @@ export function ColorEdit( props ) {
 	const enableContrastChecking =
 		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
 
+	const defaultColorControls = getBlockSupport( props.name, [
+		COLOR_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
 	return (
 		<ColorPanel
 			enableContrastChecking={ enableContrastChecking }
@@ -386,6 +510,10 @@ export function ColorEdit( props ) {
 									textColor,
 									style?.color?.text
 								).color,
+								isShownByDefault: defaultColorControls?.text,
+								hasValue: () => hasColor( 'text' )( props ),
+								onDeselect: () => resetTextColor( props ),
+								resetAllFilter: resetAllTextFilter,
 							},
 					  ]
 					: [] ),
@@ -405,6 +533,13 @@ export function ColorEdit( props ) {
 								onGradientChange: hasGradientColor
 									? onChangeGradient
 									: undefined,
+								isShownByDefault:
+									defaultColorControls?.background,
+								hasValue: () =>
+									hasColor( 'background' )( props ),
+								onDeselect: () =>
+									resetBackgroundAndGradient( props ),
+								resetAllFilter: clearBackgroundAndGradient,
 							},
 					  ]
 					: [] ),
@@ -419,6 +554,10 @@ export function ColorEdit( props ) {
 								),
 								clearable: !! style?.elements?.link?.color
 									?.text,
+								isShownByDefault: defaultColorControls?.link,
+								hasValue: () => hasColor( 'link' )( props ),
+								onDeselect: () => resetLinkColor( props ),
+								resetAllFilter: resetAllLinkFilter,
 							},
 					  ]
 					: [] ),

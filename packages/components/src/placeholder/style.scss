@@ -77,6 +77,18 @@
 	}
 }
 
+// Overrides for browser and editor fieldset styles.
+.components-placeholder__fieldset.components-placeholder__fieldset {
+	border: none;
+	padding: 0;
+
+	.components-placeholder__instructions {
+		padding: 0;
+		font-weight: normal;
+		font-size: 1em;
+	}
+}
+
 .components-placeholder__fieldset.is-column-layout,
 .components-placeholder__fieldset.is-column-layout form {
 	flex-direction: column;

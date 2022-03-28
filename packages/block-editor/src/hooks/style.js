@@ -27,6 +27,7 @@ import {
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { getCSSRules } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -85,19 +86,33 @@ export function getInlineStyles( styles = {} ) {
 			// option and backwards compatibility for border radius support.
 			const styleValue = get( styles, path );
 
-			if ( !! subPaths && ! isString( styleValue ) ) {
-				Object.entries( subPaths ).forEach( ( entry ) => {
-					const [ name, subPath ] = entry;
-					const value = get( styleValue, [ subPath ] );
+			if ( ! STYLE_PROPERTY[ propKey ].useEngine ) {
+				if ( !! subPaths && ! isString( styleValue ) ) {
+					Object.entries( subPaths ).forEach( ( entry ) => {
+						const [ name, subPath ] = entry;
+						const value = get( styleValue, [ subPath ] );
 
-					if ( value ) {
-						output[ name ] = compileStyleValue( value );
-					}
-				} );
-			} else if ( ! ignoredStyles.includes( path.join( '.' ) ) ) {
-				output[ propKey ] = compileStyleValue( get( styles, path ) );
+						if ( value ) {
+							output[ name ] = compileStyleValue( value );
+						}
+					} );
+				} else if ( ! ignoredStyles.includes( path.join( '.' ) ) ) {
+					output[ propKey ] = compileStyleValue(
+						get( styles, path )
+					);
+				}
 			}
 		}
+	} );
+
+	// The goal is to move everything to server side generated engine styles
+	// This is temporary as we absorb more and more styles into the engine.
+	const extraRules = getCSSRules( styles, { selector: 'self' } );
+	extraRules.forEach( ( rule ) => {
+		if ( rule.selector !== 'self' ) {
+			throw "This style can't be added as inline style";
+		}
+		output[ rule.key ] = rule.value;
 	} );
 
 	return output;
@@ -107,8 +122,11 @@ function compileElementsStyles( selector, elements = {} ) {
 	return map( elements, ( styles, element ) => {
 		const elementStyles = getInlineStyles( styles );
 		if ( ! isEmpty( elementStyles ) ) {
+			// The .editor-styles-wrapper selector is required on elements styles. As it is
+			// added to all other editor styles, not providing it causes reset and global
+			// styles to override element styles because of higher specificity.
 			return [
-				`.${ selector } ${ ELEMENTS[ element ] }{`,
+				`.editor-styles-wrapper .${ selector } ${ ELEMENTS[ element ] }{`,
 				...map(
 					elementStyles,
 					( value, property ) =>
@@ -133,7 +151,7 @@ function addAttribute( settings ) {
 		return settings;
 	}
 
-	// allow blocks to specify their own attribute definition with default values if needed.
+	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( ! settings.attributes.style ) {
 		Object.assign( settings.attributes, {
 			style: {

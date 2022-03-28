@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { getBlockTypes } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	FlexItem,
@@ -18,6 +19,29 @@ import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
 import ScreenHeader from './header';
 import { NavigationButton } from './navigation-button';
+
+function useSortedBlockTypes() {
+	const blockItems = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
+	);
+	// Ensure core blocks are prioritized in the returned results,
+	// because third party blocks can be registered earlier than
+	// the core blocks (usually by using the `init` action),
+	// thus affecting the display order.
+	// We don't sort reusable blocks as they are handled differently.
+	const groupByType = ( blocks, block ) => {
+		const { core, noncore } = blocks;
+		const type = block.name.startsWith( 'core/' ) ? core : noncore;
+		type.push( block );
+		return blocks;
+	};
+	const {
+		core: coreItems,
+		noncore: nonCoreItems,
+	} = blockItems.reduce( groupByType, { core: [], noncore: [] } );
+	return [ ...coreItems, ...nonCoreItems ];
+}
 
 function BlockMenuItem( { block } ) {
 	const hasTypographyPanel = useHasTypographyPanel( block.name );
@@ -45,6 +69,7 @@ function BlockMenuItem( { block } ) {
 }
 
 function ScreenBlockList() {
+	const sortedBlockTypes = useSortedBlockTypes();
 	return (
 		<>
 			<ScreenHeader
@@ -53,7 +78,7 @@ function ScreenBlockList() {
 					'Customize the appearance of specific blocks and for the whole site.'
 				) }
 			/>
-			{ getBlockTypes().map( ( block ) => (
+			{ sortedBlockTypes.map( ( block ) => (
 				<BlockMenuItem
 					block={ block }
 					key={ 'menu-itemblock-' + block.name }

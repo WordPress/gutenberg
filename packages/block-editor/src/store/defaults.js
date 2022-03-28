@@ -28,6 +28,8 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean}       __experimentalBlockDirectory           Whether the user has enabled the Block Directory
  * @property {Array}         __experimentalBlockPatterns            Array of objects representing the block patterns
  * @property {Array}         __experimentalBlockPatternCategories   Array of objects representing the block pattern categories
+ * @property {boolean}       __experimentalGenerateAnchors          Enable/Disable auto anchor generation for Heading blocks
+ * @property {boolean}       __experimentalCanLockBlocks            Whether the user can manage Block Lock state
  * @property {boolean}       __unstableGalleryWithImageBlocks       Whether the user has enabled the refactored gallery block which uses InnerBlocks
  */
 export const SETTINGS_DEFAULTS = {
@@ -134,7 +136,7 @@ export const SETTINGS_DEFAULTS = {
 		{ slug: 'full', name: __( 'Full Size' ) },
 	],
 
-	// Allow plugin to disable Image Editor if need be
+	// Allow plugin to disable Image Editor if need be.
 	imageEditing: true,
 
 	// This is current max width of the block inner area
@@ -156,8 +158,9 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
 	__experimentalSpotlightEntityBlocks: [],
+	__experimentalGenerateAnchors: false,
+	__experimentalCanLockBlocks: true,
 	__unstableGalleryWithImageBlocks: false,
-
 	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	gradients: [

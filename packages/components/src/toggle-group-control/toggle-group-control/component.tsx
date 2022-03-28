@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
 
@@ -31,7 +31,7 @@ const noop = () => {};
 
 function ToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		className,
@@ -57,7 +57,7 @@ function ToggleGroupControl(
 	} );
 	const previousValue = usePrevious( value );
 
-	// Propagate radio.state change
+	// Propagate radio.state change.
 	useUpdateEffect( () => {
 		// Avoid calling onChange if radio state changed
 		// from incoming value.
@@ -66,7 +66,7 @@ function ToggleGroupControl(
 		}
 	}, [ radio.state ] );
 
-	// Sync incoming value with radio.state
+	// Sync incoming value with radio.state.
 	useUpdateEffect( () => {
 		if ( value !== radio.state ) {
 			radio.setState( value );
@@ -81,7 +81,7 @@ function ToggleGroupControl(
 				'medium',
 				className
 			),
-		[ className, isBlock ]
+		[ className, cx, isBlock ]
 	);
 	return (
 		<BaseControl help={ help }>

@@ -44,7 +44,8 @@ function render_block_core_site_title( $attributes ) {
 		'<%1$s %2$s>%3$s</%1$s>',
 		$tag_name,
 		$wrapper_attributes,
-		$site_title
+		// already pre-escaped if it is a link.
+		$attributes['isLink'] ? $site_title : esc_html( $site_title )
 	);
 }
 

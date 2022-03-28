@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import InputControl from '../';
 
 export default {
-	title: 'Components/InputControl',
+	title: 'Components (Experimental)/InputControl',
 	component: InputControl,
 	parameters: {
 		knobs: { disable: false },

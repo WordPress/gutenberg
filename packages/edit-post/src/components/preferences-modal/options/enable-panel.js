@@ -3,11 +3,11 @@
  */
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import BaseOption from './base';
 import { store as editPostStore } from '../../../store';
 
 export default compose(

@@ -112,7 +112,7 @@ class Layout extends Component {
 
 		const isHtmlView = mode === 'text';
 
-		// add a margin view at the bottom for the header
+		// Add a margin view at the bottom for the header.
 		const marginBottom =
 			Platform.OS === 'android' && ! isHtmlView
 				? headerToolbarStyles.container.height

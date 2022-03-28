@@ -148,6 +148,7 @@ export function useToolsPanelItem(
 		isShown,
 		shouldRenderPlaceholder,
 		className,
+		cx,
 		firstDisplayedItem,
 		lastDisplayedItem,
 		__experimentalFirstVisibleItemClass,

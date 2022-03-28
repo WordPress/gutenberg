@@ -10,9 +10,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
-
 import { Children, cloneElement, useCallback } from '@wordpress/element';
-import { serialize, store as blocksStore } from '@wordpress/blocks';
+import { serialize } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useCopyToClipboard } from '@wordpress/compose';
 
@@ -25,6 +24,7 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -46,14 +46,26 @@ export function BlockSettingsDropdown( {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
-	const { onlyBlock, title } = useSelect(
+	const {
+		onlyBlock,
+		previousBlockClientId,
+		nextBlockClientId,
+		selectedBlockClientIds,
+	} = useSelect(
 		( select ) => {
-			const { getBlockCount, getBlockName } = select( blockEditorStore );
-			const { getBlockType } = select( blocksStore );
+			const {
+				getBlockCount,
+				getPreviousBlockClientId,
+				getNextBlockClientId,
+				getSelectedBlockClientIds,
+			} = select( blockEditorStore );
 			return {
 				onlyBlock: 1 === getBlockCount(),
-				title: getBlockType( getBlockName( firstBlockClientId ) )
-					?.title,
+				previousBlockClientId: getPreviousBlockClientId(
+					firstBlockClientId
+				),
+				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
+				selectedBlockClientIds: getSelectedBlockClientIds(),
 			};
 		},
 		[ firstBlockClientId ]
@@ -75,7 +87,7 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 
-	const updateSelection = useCallback(
+	const updateSelectionAfterDuplicate = useCallback(
 		__experimentalSelectBlock
 			? async ( clientIdsPromise ) => {
 					const ids = await clientIdsPromise;
@@ -87,10 +99,39 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
+	const blockTitle = useBlockDisplayTitle( firstBlockClientId, 25 );
+
+	const updateSelectionAfterRemove = useCallback(
+		__experimentalSelectBlock
+			? () => {
+					const blockToSelect =
+						previousBlockClientId || nextBlockClientId;
+
+					if (
+						blockToSelect &&
+						// From the block options dropdown, it's possible to remove a block that is not selected,
+						// in this case, it's not necessary to update the selection since the selected block wasn't removed.
+						selectedBlockClientIds.includes( firstBlockClientId ) &&
+						// Don't update selection when next/prev block also is in the selection ( and gets removed ),
+						// In case someone selects all blocks and removes them at once.
+						! selectedBlockClientIds.includes( blockToSelect )
+					) {
+						__experimentalSelectBlock( blockToSelect );
+					}
+			  }
+			: noop,
+		[
+			__experimentalSelectBlock,
+			previousBlockClientId,
+			nextBlockClientId,
+			selectedBlockClientIds,
+		]
+	);
+
 	const label = sprintf(
 		/* translators: %s: block name */
 		__( 'Remove %s' ),
-		title
+		blockTitle
 	);
 	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
 
@@ -140,7 +181,7 @@ export function BlockSettingsDropdown( {
 										onClick={ flow(
 											onClose,
 											onDuplicate,
-											updateSelection
+											updateSelectionAfterDuplicate
 										) }
 										shortcut={ shortcuts.duplicate }
 									>
@@ -198,7 +239,7 @@ export function BlockSettingsDropdown( {
 										onClick={ flow(
 											onClose,
 											onRemove,
-											updateSelection
+											updateSelectionAfterRemove
 										) }
 										shortcut={ shortcuts.remove }
 									>

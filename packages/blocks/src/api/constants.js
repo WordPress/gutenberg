@@ -15,7 +15,7 @@ export const DEPRECATED_ENTRY_KEYS = [
 ];
 
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
-	//kept for back-compatibility purposes.
+	// Kept for back-compatibility purposes.
 	'--wp--style--color--link': {
 		value: [ 'color', 'link' ],
 		support: [ 'color', 'link' ],
@@ -89,6 +89,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 			marginBottom: 'bottom',
 			marginLeft: 'left',
 		},
+		useEngine: true,
 	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
@@ -99,6 +100,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 			paddingBottom: 'bottom',
 			paddingLeft: 'left',
 		},
+		useEngine: true,
 	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],

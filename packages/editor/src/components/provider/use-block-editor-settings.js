@@ -39,20 +39,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const {
-			canUser,
-			getUnstableBase,
-			hasFinishedResolution,
-			getEntityRecord,
-		} = select( coreStore );
+		const { canUser, getEntityRecord } = select( coreStore );
 
 		const siteSettings = getEntityRecord( 'root', 'site' );
-
-		const siteData = getUnstableBase();
-
-		const hasFinishedResolvingSiteData = hasFinishedResolution(
-			'getUnstableBase'
-		);
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -67,12 +56,26 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				canUser( 'create', 'media' ),
 				true
 			),
-			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
-			baseUrl: siteData?.url || '',
 			userCanCreatePages: canUser( 'create', 'pages' ),
 			pageOnFront: siteSettings?.page_on_front,
 		};
 	}, [] );
+
+	const {
+		__experimentalBlockPatterns: settingsBlockPatterns,
+		__experimentalBlockPatternCategories: settingsBlockPatternCategories,
+	} = settings;
+
+	const { blockPatterns, blockPatternCategories } = useSelect(
+		( select ) => ( {
+			blockPatterns:
+				settingsBlockPatterns ?? select( coreStore ).getBlockPatterns(),
+			blockPatternCategories:
+				settingsBlockPatternCategories ??
+				select( coreStore ).getBlockPatternCategories(),
+		} ),
+		[ settingsBlockPatterns, settingsBlockPatternCategories ]
+	);
 
 	const { undo } = useDispatch( editorStore );
 
@@ -98,12 +101,12 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		() => ( {
 			...pick( settings, [
 				'__experimentalBlockDirectory',
-				'__experimentalBlockPatternCategories',
-				'__experimentalBlockPatterns',
 				'__experimentalDiscussionSettings',
 				'__experimentalFeatures',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
+				'__experimentalGenerateAnchors',
+				'__experimentalCanLockBlocks',
 				'__unstableGalleryWithImageBlocks',
 				'alignWide',
 				'allowedBlockTypes',
@@ -139,6 +142,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalBlockPatterns: blockPatterns,
+			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			__experimentalFetchRichUrlData: fetchUrlData,
@@ -148,11 +153,14 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
 			pageOnFront,
+			__experimentalPreferPatternsOnRoot: hasTemplate,
 		} ),
 		[
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
+			blockPatterns,
+			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,

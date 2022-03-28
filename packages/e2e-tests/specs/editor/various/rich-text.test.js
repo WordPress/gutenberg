@@ -402,7 +402,7 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// Dismiss color picker popover
+		// Dismiss color picker popover.
 		await page.keyboard.press( 'Escape' );
 
 		// Navigate to the block.

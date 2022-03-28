@@ -48,7 +48,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 				spacedAround && styles.spacedAround,
 				className
 			),
-		[ as, className, size, spacedAround ]
+		[ as, className, cx, size, spacedAround ]
 	);
 
 	const wrapperClassName = cx( styles.itemWrapper );

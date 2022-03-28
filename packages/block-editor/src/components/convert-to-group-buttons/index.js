@@ -11,6 +11,7 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import useConvertToGroupButtonProps from './use-convert-to-group-button-props';
+import BlockGroupToolbar from './toolbar';
 
 function ConvertToGroupButton( {
 	clientIds,
@@ -22,7 +23,7 @@ function ConvertToGroupButton( {
 } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const onConvertToGroup = () => {
-		// Activate the `transform` on the Grouping Block which does the conversion
+		// Activate the `transform` on the Grouping Block which does the conversion.
 		const newBlocks = switchToBlockType(
 			blocksSelection,
 			groupingBlockName
@@ -73,4 +74,8 @@ function ConvertToGroupButton( {
 	);
 }
 
-export { useConvertToGroupButtonProps, ConvertToGroupButton };
+export {
+	BlockGroupToolbar,
+	ConvertToGroupButton,
+	useConvertToGroupButtonProps,
+};

@@ -45,6 +45,7 @@ Settings related to colors.
 | custom | boolean | true |  |
 | customDuotone | boolean | true |  |
 | customGradient | boolean | true |  |
+| defaultDuotone | boolean | true |  |
 | defaultGradients | boolean | true |  |
 | defaultPalette | boolean | true |  |
 | duotone | array |  | colors, name, slug |

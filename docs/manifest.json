@@ -96,18 +96,6 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Backward Compatibility",
-		"slug": "backward-compatibility",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Deprecations",
-		"slug": "deprecations",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/deprecations.md",
-		"parent": "backward-compatibility"
-	},
-	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/README.md",
@@ -139,8 +127,8 @@
 	},
 	{
 		"title": "Block Supports",
-		"slug": "block-supports",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports.md",
+		"slug": "block-supports-in-static-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-static-blocks.md",
 		"parent": "block-tutorial"
 	},
 	{
@@ -168,36 +156,6 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Designer Documentation",
-		"slug": "designers",
-		"markdown_source": "../docs/how-to-guides/designers/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Block Design",
-		"slug": "block-design",
-		"markdown_source": "../docs/how-to-guides/designers/block-design.md",
-		"parent": "designers"
-	},
-	{
-		"title": "User Interface",
-		"slug": "user-interface",
-		"markdown_source": "../docs/how-to-guides/designers/user-interface.md",
-		"parent": "designers"
-	},
-	{
-		"title": "Resources",
-		"slug": "design-resources",
-		"markdown_source": "../docs/how-to-guides/designers/design-resources.md",
-		"parent": "designers"
-	},
-	{
-		"title": "Animation",
-		"slug": "animation",
-		"markdown_source": "../docs/how-to-guides/designers/animation.md",
-		"parent": "designers"
-	},
-	{
 		"title": "Development Platform",
 		"slug": "platform",
 		"markdown_source": "../docs/how-to-guides/platform/README.md",
@@ -214,6 +172,30 @@
 		"slug": "tutorial",
 		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
 		"parent": "custom-block-editor"
+	},
+	{
+		"title": "Create your First App with Gutenberg Data",
+		"slug": "data-basics",
+		"markdown_source": "../docs/how-to-guides/data-basics/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Setup",
+		"slug": "1-data-basics-setup",
+		"markdown_source": "../docs/how-to-guides/data-basics/1-data-basics-setup.md",
+		"parent": "data-basics"
+	},
+	{
+		"title": "Building a list of pages",
+		"slug": "2-building-a-list-of-pages",
+		"markdown_source": "../docs/how-to-guides/data-basics/2-building-a-list-of-pages.md",
+		"parent": "data-basics"
+	},
+	{
+		"title": "Building an edit form",
+		"slug": "3-building-an-edit-form",
+		"markdown_source": "../docs/how-to-guides/data-basics/3-building-an-edit-form.md",
+		"parent": "data-basics"
 	},
 	{
 		"title": "Feature Flags",
@@ -315,12 +297,6 @@
 		"title": "Block Theme",
 		"slug": "block-theme-overview",
 		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Create a block theme",
-		"slug": "create-block-theme",
-		"markdown_source": "../docs/how-to-guides/themes/create-block-theme.md",
 		"parent": "themes"
 	},
 	{
@@ -633,6 +609,18 @@
 		"title": "BaseField",
 		"slug": "base-field",
 		"markdown_source": "../packages/components/src/base-field/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "BorderBoxControl",
+		"slug": "border-box-control",
+		"markdown_source": "../packages/components/src/border-box-control/border-box-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "BorderControl",
+		"slug": "border-control",
+		"markdown_source": "../packages/components/src/border-control/border-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1023,6 +1011,18 @@
 		"title": "Navigation",
 		"slug": "navigation",
 		"markdown_source": "../packages/components/src/navigation/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorBackButton",
+		"slug": "navigator-back-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorButton",
+		"slug": "navigator-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
 		"parent": "components"
 	},
 	{
@@ -1698,6 +1698,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/preferences",
+		"slug": "packages-preferences",
+		"markdown_source": "../packages/preferences/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/prettier-config",
 		"slug": "packages-prettier-config",
 		"markdown_source": "../packages/prettier-config/README.md",
@@ -1767,6 +1773,12 @@
 		"title": "@wordpress/shortcode",
 		"slug": "packages-shortcode",
 		"markdown_source": "../packages/shortcode/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/style-engine",
+		"slug": "packages-style-engine",
+		"markdown_source": "../packages/style-engine/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1920,6 +1932,36 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Styles",
+		"slug": "styles",
+		"markdown_source": "../docs/explanations/architecture/styles.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "User Interface",
+		"slug": "user-interface",
+		"markdown_source": "../docs/explanations/user-interface/README.md",
+		"parent": "explanations"
+	},
+	{
+		"title": "Block Design",
+		"slug": "block-design",
+		"markdown_source": "../docs/explanations/user-interface/block-design.md",
+		"parent": "user-interface"
+	},
+	{
+		"title": "Animation",
+		"slug": "animation",
+		"markdown_source": "../docs/explanations/user-interface/animation.md",
+		"parent": "user-interface"
+	},
+	{
+		"title": "Resources",
+		"slug": "design-resources",
+		"markdown_source": "../docs/explanations/user-interface/design-resources.md",
+		"parent": "user-interface"
+	},
+	{
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "../docs/explanations/faq.md",
@@ -2026,6 +2068,18 @@
 		"slug": "internationalization-guide",
 		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
 		"parent": "react-native"
+	},
+	{
+		"title": "Backward Compatibility",
+		"slug": "backward-compatibility",
+		"markdown_source": "../docs/contributors/code/backward-compatibility.md",
+		"parent": "code"
+	},
+	{
+		"title": "Deprecations",
+		"slug": "deprecations",
+		"markdown_source": "../docs/contributors/code/deprecations.md",
+		"parent": "code"
 	},
 	{
 		"title": "Design Contributions",

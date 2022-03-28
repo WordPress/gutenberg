@@ -60,7 +60,7 @@ function useDialog( options ) {
 		node.addEventListener( 'keydown', (
 			/** @type {KeyboardEvent} */ event
 		) => {
-			// Close on escape
+			// Close on escape.
 			if (
 				event.keyCode === ESCAPE &&
 				! event.defaultPrevented &&

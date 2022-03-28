@@ -204,6 +204,7 @@ export function useRichText( {
 	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
+			forceRender();
 		}
 	}, [ value ] );
 
@@ -211,6 +212,10 @@ export function useRichText( {
 	useLayoutEffect( () => {
 		if ( ! hadSelectionUpdate.current ) {
 			return;
+		}
+
+		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
+			ref.current.focus();
 		}
 
 		applyFromProps();

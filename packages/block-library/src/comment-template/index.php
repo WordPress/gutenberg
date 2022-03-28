@@ -68,6 +68,12 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$comment_order = get_option( 'comment_order' );
+
+	if ( 'desc' === $comment_order ) {
+		$comments = array_reverse( $comments );
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes();
 
 	return sprintf(

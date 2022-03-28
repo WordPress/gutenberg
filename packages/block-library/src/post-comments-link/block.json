@@ -16,7 +16,11 @@
 		"html": false,
 		"color": {
 			"link": true,
-			"text": false
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"link": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

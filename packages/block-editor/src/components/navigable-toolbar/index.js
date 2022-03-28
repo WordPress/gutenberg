@@ -73,7 +73,7 @@ function useIsAccessibleToolbar( ref ) {
 
 	useLayoutEffect( () => {
 		// Toolbar buttons may be rendered asynchronously, so we use
-		// MutationObserver to check if the toolbar subtree has been modified
+		// MutationObserver to check if the toolbar subtree has been modified.
 		const observer = new window.MutationObserver(
 			determineIsAccessibleToolbar
 		);
@@ -91,7 +91,7 @@ function useToolbarFocus(
 	defaultIndex,
 	onIndexChange
 ) {
-	// Make sure we don't use modified versions of this prop
+	// Make sure we don't use modified versions of this prop.
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const [ initialIndex ] = useState( defaultIndex );
 
@@ -99,7 +99,7 @@ function useToolbarFocus(
 		focusFirstTabbableIn( ref.current );
 	}, [] );
 
-	// Focus on toolbar when pressing alt+F10 when the toolbar is visible
+	// Focus on toolbar when pressing alt+F10 when the toolbar is visible.
 	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar );
 
 	useEffect( () => {

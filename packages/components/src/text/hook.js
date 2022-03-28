@@ -126,6 +126,7 @@ export default function useText( props ) {
 		align,
 		className,
 		color,
+		cx,
 		display,
 		isBlock,
 		isCaption,

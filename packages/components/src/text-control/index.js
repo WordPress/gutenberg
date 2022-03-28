@@ -24,8 +24,8 @@ import BaseControl from '../base-control';
 
 /**
  *
- * @param {Props}                                 props Props
- * @param {import('react').Ref<HTMLInputElement>} [ref]
+ * @param {Props}                                          props Props
+ * @param {import('react').ForwardedRef<HTMLInputElement>} ref
  */
 function TextControl(
 	{

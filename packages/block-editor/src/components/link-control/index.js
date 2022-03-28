@@ -246,7 +246,7 @@ function LinkControl( {
 		const { keyCode } = event;
 		if (
 			keyCode === ENTER &&
-			! currentInputIsEmpty // disallow submitting empty values.
+			! currentInputIsEmpty // Disallow submitting empty values.
 		) {
 			event.preventDefault();
 			handleSubmit();
@@ -319,7 +319,7 @@ function LinkControl( {
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
 									className="block-editor-link-control__search-submit"
-									disabled={ currentInputIsEmpty } // disallow submitting empty values.
+									disabled={ currentInputIsEmpty } // Disallow submitting empty values.
 								/>
 							</div>
 						</LinkControlSearchInput>

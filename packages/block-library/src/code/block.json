@@ -15,7 +15,6 @@
 	},
 	"supports": {
 		"anchor": true,
-		"__experimentalSelector": ".wp-block-code > code",
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -44,7 +43,11 @@
 		"color": {
 			"text": true,
 			"background": true,
-			"gradients": true
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		}
 	},
 	"style": "wp-block-code"

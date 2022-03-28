@@ -10,7 +10,6 @@ buildscript {
         wordpressUtilsVersion = '2.3.0'
         espressoVersion = '3.0.1'
         aztecVersion = 'v1.5.4'
-        willPublishReactNativeAztecBinary = properties["willPublishReactNativeAztecBinary"]?.toBoolean() ?: false
     }
 }
 
@@ -75,12 +74,7 @@ repositories {
         }
     }
     maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
-
-    if (willPublishReactNativeAztecBinary) {
-        maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
-    } else {
-        maven { url("$rootDir/../../../node_modules/react-native/android") }
-    }
+    maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
     google()
     mavenCentral()
 }
@@ -99,13 +93,9 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     testImplementation 'junit:junit:4.13'
 
-    if (willPublishReactNativeAztecBinary) {
-        def rnVersion = readReactNativeVersion('../../../package.json', 'devDependencies')
-        println "react-native version for react-native-aztec: $rnVersion"
-        implementation "com.facebook.react:react-native:$rnVersion"
-    } else {
-        implementation "com.facebook.react:react-native:+"
-    }
+    def rnVersion = readReactNativeVersion('../../../package.json', 'devDependencies')
+    println "react-native version for react-native-aztec: $rnVersion"
+    implementation "com.facebook.react:react-native:$rnVersion"
 }
 
 project.afterEvaluate {

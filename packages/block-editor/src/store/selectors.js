@@ -28,10 +28,12 @@ import {
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
+	switchToBlockType,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * A block selection object.
@@ -44,7 +46,7 @@ import { symbol } from '@wordpress/icons';
  *                                 text value. See `wp.richText.create`.
  */
 
-// Module constants
+// Module constants.
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
@@ -274,6 +276,29 @@ export const getGlobalBlockCount = createSelector(
 			},
 			0
 		);
+	},
+	( state ) => [ state.blocks.order, state.blocks.byClientId ]
+);
+
+/**
+ * Returns all global blocks that match a blockName. Results include nested blocks.
+ *
+ * @param {Object}  state     Global application state.
+ * @param {?string} blockName Optional block name, if not specified, returns an empty array.
+ *
+ * @return {Array} Array of clientIds of blocks with name equal to blockName.
+ */
+export const __experimentalGetGlobalBlocksByName = createSelector(
+	( state, blockName ) => {
+		if ( ! blockName ) {
+			return EMPTY_ARRAY;
+		}
+		const clientIds = getClientIdsWithDescendants( state );
+		const foundBlocks = clientIds.filter( ( clientId ) => {
+			const block = state.blocks.byClientId[ clientId ];
+			return block.name === blockName;
+		} );
+		return foundBlocks.length > 0 ? foundBlocks : EMPTY_ARRAY;
 	},
 	( state ) => [ state.blocks.order, state.blocks.byClientId ]
 );
@@ -873,6 +898,102 @@ export function getMultiSelectedBlocksEndClientId( state ) {
 }
 
 /**
+ * Returns true if the selection is not partial.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether the selection is mergeable.
+ */
+export function __unstableIsFullySelected( state ) {
+	const selectionAnchor = getSelectionStart( state );
+	const selectionFocus = getSelectionEnd( state );
+	return (
+		! selectionAnchor.attributeKey &&
+		! selectionFocus.attributeKey &&
+		typeof selectionAnchor.offset === 'undefined' &&
+		typeof selectionFocus.offset === 'undefined'
+	);
+}
+
+/**
+ * Check whether the selection is mergeable.
+ *
+ * @param {Object}  state     Editor state.
+ * @param {boolean} isForward Whether to merge forwards.
+ *
+ * @return {boolean} Whether the selection is mergeable.
+ */
+export function __unstableIsSelectionMergeable( state, isForward ) {
+	const selectionAnchor = getSelectionStart( state );
+	const selectionFocus = getSelectionEnd( state );
+
+	// It's not mergeable if the start and end are within the same block.
+	if ( selectionAnchor.clientId === selectionFocus.clientId ) return false;
+
+	// It's not mergeable if there's no rich text selection.
+	if (
+		! selectionAnchor.attributeKey ||
+		! selectionFocus.attributeKey ||
+		typeof selectionAnchor.offset === 'undefined' ||
+		typeof selectionFocus.offset === 'undefined'
+	)
+		return false;
+
+	const anchorRootClientId = getBlockRootClientId(
+		state,
+		selectionAnchor.clientId
+	);
+	const focusRootClientId = getBlockRootClientId(
+		state,
+		selectionFocus.clientId
+	);
+
+	// It's not mergeable if the selection doesn't start and end in the same
+	// block list. Maybe in the future it should be allowed.
+	if ( anchorRootClientId !== focusRootClientId ) {
+		return false;
+	}
+
+	const blockOrder = getBlockOrder( state, anchorRootClientId );
+	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
+	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+
+	// Reassign selection start and end based on order.
+	let selectionStart, selectionEnd;
+
+	if ( anchorIndex > focusIndex ) {
+		selectionStart = selectionFocus;
+		selectionEnd = selectionAnchor;
+	} else {
+		selectionStart = selectionAnchor;
+		selectionEnd = selectionFocus;
+	}
+
+	const targetBlockClientId = isForward
+		? selectionEnd.clientId
+		: selectionStart.clientId;
+	const blockToMergeClientId = isForward
+		? selectionStart.clientId
+		: selectionEnd.clientId;
+
+	const targetBlock = getBlock( state, targetBlockClientId );
+	const targetBlockType = getBlockType( targetBlock.name );
+
+	if ( ! targetBlockType.merge ) return false;
+
+	const blockToMerge = getBlock( state, blockToMergeClientId );
+
+	// It's mergeable if the blocks are of the same type.
+	if ( blockToMerge.name === targetBlock.name ) return true;
+
+	// If the blocks are of a different type, try to transform the block being
+	// merged into the same type of block.
+	const blocksToMerge = switchToBlockType( blockToMerge, targetBlock.name );
+
+	return blocksToMerge && blocksToMerge.length;
+}
+
+/**
  * Returns an array containing all block client IDs in the editor in the order
  * they appear. Optionally accepts a root client ID of the block list for which
  * the order should be returned, defaulting to the top-level block order.
@@ -1359,7 +1480,7 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 		return ! parentIsLocked;
 	}
 
-	// when remove is true, it means we cannot remove it.
+	// When remove is true, it means we cannot remove it.
 	return ! lock?.remove;
 }
 
@@ -1400,7 +1521,7 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 		return ! parentIsLocked;
 	}
 
-	// when move is true, it means we cannot move it.
+	// When move is true, it means we cannot move it.
 	return ! lock?.move;
 }
 
@@ -1417,6 +1538,23 @@ export function canMoveBlocks( state, clientIds, rootClientId = null ) {
 	return clientIds.every( ( clientId ) =>
 		canMoveBlock( state, clientId, rootClientId )
 	);
+}
+
+/**
+ * Determines if the given block type can be locked/unlocked by a user.
+ *
+ * @param {Object}          state      Editor state.
+ * @param {(string|Object)} nameOrType Block name or type object.
+ *
+ * @return {boolean} Whether a given block type can be locked/unlocked.
+ */
+export function canLockBlockType( state, nameOrType ) {
+	if ( ! hasBlockSupport( nameOrType, '__experimentalLock', true ) ) {
+		return false;
+	}
+
+	// Use block editor settings as the default value.
+	return !! state.settings?.__experimentalCanLockBlocks;
 }
 
 /**
@@ -1554,7 +1692,7 @@ const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
 		keywords: blockType.keywords,
 		variations: inserterVariations,
 		example: blockType.example,
-		utility: 1, // deprecated
+		utility: 1, // Deprecated.
 	};
 };
 
@@ -1654,7 +1792,7 @@ export const getInserterItems = createSelector(
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
-				utility: 1, // deprecated
+				utility: 1, // Deprecated.
 				frecency,
 			};
 		};
@@ -1675,7 +1813,7 @@ export const getInserterItems = createSelector(
 
 		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
 			const { variations = [] } = item;
-			// Exclude any block type item that is to be replaced by a default variation
+			// Exclude any block type item that is to be replaced by a default variation.
 			if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
 				accumulator.push( item );
 			}
@@ -1744,6 +1882,7 @@ export const getInserterItems = createSelector(
  */
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
+		const [ sourceBlock ] = blocks;
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
 		} );
@@ -1757,20 +1896,32 @@ export const getBlockTransformItems = createSelector(
 			blockTypeTransformItems,
 			( { name } ) => name
 		);
+
+		// Consider unwraping the highest priority.
+		itemsByName[ '*' ] = {
+			frecency: +Infinity,
+			id: '*',
+			isDisabled: false,
+			name: '*',
+			title: __( 'Unwrap' ),
+			icon: itemsByName[ sourceBlock.name ]?.icon,
+		};
+
 		const possibleTransforms = getPossibleBlockTransformations(
 			blocks
 		).reduce( ( accumulator, block ) => {
-			if ( itemsByName[ block?.name ] ) {
+			if ( block === '*' ) {
+				accumulator.push( itemsByName[ '*' ] );
+			} else if ( itemsByName[ block?.name ] ) {
 				accumulator.push( itemsByName[ block.name ] );
 			}
 			return accumulator;
 		}, [] );
-		const possibleBlockTransformations = orderBy(
+		return orderBy(
 			possibleTransforms,
 			( block ) => itemsByName[ block.name ].frecency,
 			'desc'
 		);
-		return possibleBlockTransformations;
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
@@ -1914,7 +2065,9 @@ export const __experimentalGetParsedPattern = createSelector(
 		}
 		return {
 			...pattern,
-			blocks: parse( pattern.content ),
+			blocks: parse( pattern.content, {
+				__unstableSkipMigrationLogs: true,
+			} ),
 		};
 	},
 	( state ) => [ state.settings.__experimentalBlockPatterns ]

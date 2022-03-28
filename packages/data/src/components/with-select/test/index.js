@@ -131,7 +131,7 @@ describe( 'withSelect', () => {
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 1 );
 
-		// Simulate a click on the button
+		// Simulate a click on the button.
 		act( () => {
 			testInstance.findByType( 'button' ).props.onClick();
 		} );
@@ -139,7 +139,7 @@ describe( 'withSelect', () => {
 		expect( testInstance.findByType( 'button' ).props.children ).toBe( 1 );
 		// 2 times =
 		//  1. Initial mount
-		//  2. When click handler is called
+		// 2. When click handler is called.
 		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 2 );
 		// 4 times
 		// - 1 on initial render
@@ -147,7 +147,7 @@ describe( 'withSelect', () => {
 		// - 1 on click triggering subscription firing.
 		// - 1 on rerender.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
-		// verifies component only renders twice.
+		// Verifies component only renders twice.
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 

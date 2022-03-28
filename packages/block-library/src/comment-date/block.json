@@ -5,7 +5,7 @@
 	"title": "Comment Date",
 	"category": "theme",
 	"parent": [ "core/comment-template" ],
-	"description": "Add the date of this comment.",
+	"description": "Displays the date on which the comment was posted.",
 	"textdomain": "default",
 	"attributes": {
 		"format": {
@@ -21,7 +21,12 @@
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

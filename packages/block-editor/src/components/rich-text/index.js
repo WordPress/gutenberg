@@ -45,6 +45,7 @@ import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
 import { useShortcuts } from './use-shortcuts';
 import { useInputEvents } from './use-input-events';
+import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
 
@@ -120,12 +121,9 @@ function RichTextWrapper(
 	const anchorRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const selector = ( select ) => {
-		const {
-			getSelectionStart,
-			getSelectionEnd,
-			isMultiSelecting,
-			hasMultiSelection,
-		} = select( blockEditorStore );
+		const { getSelectionStart, getSelectionEnd } = select(
+			blockEditorStore
+		);
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -134,6 +132,7 @@ function RichTextWrapper(
 		if ( originalIsSelected === undefined ) {
 			isSelected =
 				selectionStart.clientId === clientId &&
+				selectionEnd.clientId === clientId &&
 				selectionStart.attributeKey === identifier;
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
@@ -143,15 +142,12 @@ function RichTextWrapper(
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			disabled: isMultiSelecting() || hasMultiSelection(),
 		};
 	};
 	// This selector must run on every render so the right selection state is
 	// retreived from the store on merge.
 	// To do: fix this somehow.
-	const { selectionStart, selectionEnd, isSelected, disabled } = useSelect(
-		selector
-	);
+	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
@@ -177,7 +173,26 @@ function RichTextWrapper(
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {
-			selectionChange( clientId, identifier, start, end );
+			const selection = {};
+			const unset = start === undefined && end === undefined;
+
+			if ( typeof start === 'number' || unset ) {
+				selection.start = {
+					clientId,
+					attributeKey: identifier,
+					offset: start,
+				};
+			}
+
+			if ( typeof end === 'number' || unset ) {
+				selection.end = {
+					clientId,
+					attributeKey: identifier,
+					offset: end,
+				};
+			}
+
+			selectionChange( selection );
 		},
 		[ clientId, identifier ]
 	);
@@ -331,11 +346,12 @@ function RichTextWrapper(
 			<TagName
 				// Overridable props.
 				role="textbox"
-				aria-multiline={ true }
+				aria-multiline={ ! disableLineBreaks }
 				aria-label={ placeholder }
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
+					forwardedRef,
 					autocompleteProps.ref,
 					props.ref,
 					richTextRef,
@@ -376,12 +392,11 @@ function RichTextWrapper(
 						disableLineBreaks,
 						onSplitAtEnd,
 					} ),
+					useFirefoxCompat(),
 					anchorRef,
-					forwardedRef,
 				] ) }
-				// Do not set the attribute if disabled.
-				contentEditable={ disabled ? undefined : true }
-				suppressContentEditableWarning={ ! disabled }
+				contentEditable={ true }
+				suppressContentEditableWarning={ true }
 				className={ classnames(
 					'block-editor-rich-text__editable',
 					props.className,
@@ -400,6 +415,7 @@ function RichTextWrapper(
 	deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
 		since: '5.4',
 		alternative: 'className prop or create your own wrapper div',
+		version: '6.2',
 	} );
 
 	const className = classnames( 'block-editor-rich-text', wrapperClassName );
