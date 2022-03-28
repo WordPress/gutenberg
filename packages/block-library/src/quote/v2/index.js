@@ -10,6 +10,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 import edit from './edit';
 import save from './save';
+import transforms from './transforms';
 
 const settings = {
 	icon,
@@ -26,6 +27,7 @@ const settings = {
 			},
 		],
 	},
+	transforms,
 	edit,
 	save,
 };
