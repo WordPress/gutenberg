@@ -164,6 +164,10 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 		);
 		if ( $result ) {
 			$settings['view_script'] = $view_script_handle;
+
+			if ( ! empty( $metadata['textdomain'] ) && in_array( 'wp-i18n', $view_script_dependencies, true ) ) {
+				wp_set_script_translations( $view_script_handle, $metadata['textdomain'] );
+			}
 		}
 	}
 	return $settings;
