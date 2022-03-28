@@ -185,5 +185,6 @@ export const borderSlider = () => css`
 	${ StyledField } {
 		margin-bottom: 0;
 		font-size: 0;
+		display: flex;
 	}
 `;
