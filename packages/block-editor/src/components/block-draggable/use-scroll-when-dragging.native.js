@@ -22,6 +22,15 @@ const SCROLL_INACTIVE_DISTANCE_PX = 50;
 const SCROLL_INTERVAL_MS = 1000;
 const VELOCITY_MULTIPLIER = 5000;
 
+/**
+ * React hook that scrolls the scroll container when a block is being dragged.
+ *
+ * @return {Function[]} `startScrolling`, `scrollOnDragOver`, `stopScrolling`
+ *                      functions to be called in `onDragStart`, `onDragOver`
+ *                      and `onDragEnd` events respectively. Additionally,
+ * 						`scrollHandler` function is returned which should be
+ * 						called in the `onScroll` event of the block list.
+ */
 export default function useScrollWhenDragging() {
 	const { scrollRef } = useBlockListContext();
 	const animatedScrollRef = useAnimatedRef();
