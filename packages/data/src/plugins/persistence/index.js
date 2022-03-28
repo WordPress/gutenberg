@@ -300,9 +300,19 @@ export function migrateFeaturePreferencesToPreferencesStore(
 	}
 }
 
+/**
+ * Migrates an individual item inside the `preferences` object for a store.
+ *
+ * @param {Object}    persistence   The persistence interface.
+ * @param {Object}    migrate       An options object that contains details of the migration.
+ * @param {string}    migrate.from  The name of the store to migrate from.
+ * @param {string}    migrate.scope The scope in the preferences store to migrate to.
+ * @param {string}    key           The key in the preferences object to migrate.
+ * @param {?Function} convert       A function that converts preferences from one format to another.
+ */
 export function migrateIndividualPreferenceToPreferencesStore(
 	persistence,
-	sourceStoreName,
+	{ from: sourceStoreName, scope },
 	key,
 	convert = identity
 ) {
@@ -311,14 +321,12 @@ export function migrateIndividualPreferenceToPreferencesStore(
 	const sourcePreference = state[ sourceStoreName ]?.preferences?.[ key ];
 
 	// There's nothing to migrate, exit early.
-	if ( ! sourcePreference ) {
+	if ( sourcePreference === undefined ) {
 		return;
 	}
 
 	const targetPreference =
-		state[ preferencesStoreName ]?.preferences?.[ sourceStoreName ]?.[
-			key
-		];
+		state[ preferencesStoreName ]?.preferences?.[ scope ]?.[ key ];
 
 	// There's existing data at the target, so don't overwrite it, exit early.
 	if ( targetPreference ) {
@@ -327,7 +335,7 @@ export function migrateIndividualPreferenceToPreferencesStore(
 
 	const otherScopes = state[ preferencesStoreName ]?.preferences;
 	const otherPreferences =
-		state[ preferencesStoreName ]?.preferences?.[ sourceStoreName ];
+		state[ preferencesStoreName ]?.preferences?.[ scope ];
 
 	// Pass an object with the key and value as this allows the convert
 	// function to convert to a data structure that has different keys.
@@ -336,7 +344,7 @@ export function migrateIndividualPreferenceToPreferencesStore(
 	persistence.set( preferencesStoreName, {
 		preferences: {
 			...otherScopes,
-			[ sourceStoreName ]: {
+			[ scope ]: {
 				...otherPreferences,
 				...convertedPreferences,
 			},
@@ -602,28 +610,33 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	// Other ad-hoc preferences.
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,
-		'core/edit-post',
+		{ from: 'core/edit-post', scope: 'core/edit-post' },
 		'hiddenBlockTypes'
 	);
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,
-		'core/edit-post',
+		{ from: 'core/edit-post', scope: 'core/edit-post' },
 		'editorMode'
 	);
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,
-		'core/edit-post',
+		{ from: 'core/edit-post', scope: 'core/edit-post' },
 		'preferredStyleVariations'
 	);
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,
-		'core/edit-post',
+		{ from: 'core/edit-post', scope: 'core/edit-post' },
 		'panels',
 		convertEditPostPanels
 	);
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,
-		'core/edit-site',
+		{ from: 'core/editor', scope: 'core/edit-post' },
+		'isPublishSidebarEnabled'
+	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		{ from: 'core/edit-site', scope: 'core/edit-site' },
 		'editorMode'
 	);
 	migrateInterfaceEnableItemsToPreferencesStore( persistence );
