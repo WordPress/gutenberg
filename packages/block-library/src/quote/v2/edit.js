@@ -37,7 +37,7 @@ export default function QuoteEdit( {
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps(
-		showAttribution ? blockProps : {},
+		{},
 		{
 			template: TEMPLATE,
 			templateInsertUpdatesSelection: true,
@@ -61,32 +61,36 @@ export default function QuoteEdit( {
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			{ showAttribution ? (
+			{
 				<figure { ...blockProps }>
 					<BlockQuotation { ...innerBlocksProps } />
-					<RichText
-						identifier="attribution"
-						tagName={ 'figcaption' }
-						style={ { display: 'block' } }
-						value={ attribution ?? '' }
-						onChange={ ( nextAttribution ) => {
-							setAttributes( { attribution: nextAttribution } );
-						} }
-						__unstableMobileNoFocusOnMount
-						aria-label={ __( 'Quote attribution' ) }
-						placeholder={
-							// translators: placeholder text used for the attribution
-							__( 'Add attribution' )
-						}
-						className="wp-block-quote__attribution"
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
-						}
-					/>
+					{ showAttribution && (
+						<RichText
+							identifier="attribution"
+							tagName={ 'figcaption' }
+							style={ { display: 'block' } }
+							value={ attribution ?? '' }
+							onChange={ ( nextAttribution ) => {
+								setAttributes( {
+									attribution: nextAttribution,
+								} );
+							} }
+							__unstableMobileNoFocusOnMount
+							aria-label={ __( 'Quote attribution' ) }
+							placeholder={
+								// translators: placeholder text used for the attribution
+								__( 'Add attribution' )
+							}
+							className="wp-block-quote__attribution"
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( 'core/paragraph' )
+								)
+							}
+						/>
+					) }
 				</figure>
-			) : (
-				<BlockQuotation { ...innerBlocksProps } />
-			) }
+			}
 		</>
 	);
 }
