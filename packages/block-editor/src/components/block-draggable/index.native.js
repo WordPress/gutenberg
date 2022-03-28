@@ -19,6 +19,7 @@ import Animated, {
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -50,6 +51,11 @@ const SCROLL_ANIMATION_DURATION = 350;
  * @return {Function} Render function that passes `onScroll` event handler.
  */
 const BlockDraggableWrapper = ( { children } ) => {
+	const wrapperStyles = usePreferredColorSchemeStyle(
+		styles[ 'draggable-wrapper__container' ],
+		styles[ 'draggable-wrapper__container--dark' ]
+	);
+
 	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
 		blockEditorStore
 	);
@@ -184,9 +190,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 				onDragStart={ startDragging }
 				onDragOver={ updateDragging }
 				onDragEnd={ stopDragging }
-				wrapperAnimatedStyles={
-					styles[ 'draggable-wrapper__container' ]
-				}
+				wrapperAnimatedStyles={ wrapperStyles }
 			>
 				{ children( { onScroll: scrollHandler } ) }
 			</Draggable>
@@ -284,12 +288,20 @@ const BlockDraggable = ( { clientId, children } ) => {
 		};
 	} );
 
-	const placeholderStyles = useAnimatedStyle( () => {
+	const placeholderDynamicStyles = useAnimatedStyle( () => {
 		return {
 			display: collapseAnimation.value === 0 ? 'none' : 'flex',
 			opacity: collapseAnimation.value,
 		};
 	} );
+	const placeholderStaticStyles = usePreferredColorSchemeStyle(
+		styles[ 'draggable-placeholder__container' ],
+		styles[ 'draggable-placeholder__container--dark' ]
+	);
+	const placeholderStyles = [
+		placeholderStaticStyles,
+		placeholderDynamicStyles,
+	];
 
 	if ( ! isDraggable ) {
 		return children( { isDraggable: false } );
@@ -300,13 +312,7 @@ const BlockDraggable = ( { clientId, children } ) => {
 			<Animated.View style={ blockStyles }>
 				{ children( { isDraggable: true } ) }
 			</Animated.View>
-			<Animated.View
-				style={ [
-					styles[ 'draggable-placeholder__container' ],
-					placeholderStyles,
-				] }
-				pointerEvents="none"
-			/>
+			<Animated.View style={ placeholderStyles } pointerEvents="none" />
 		</Animated.View>
 	);
 };
