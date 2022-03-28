@@ -622,7 +622,8 @@ class EditorPage {
 	async closePicker() {
 		if ( isAndroid() ) {
 			// Wait for media block picker to load before closing
-			const locator = '//android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup';
+			const locator =
+				'//android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup';
 			await waitForVisible( this.driver, locator );
 
 			await swipeDown( this.driver );
