@@ -847,7 +847,7 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 		} );
 	} );
 
-	it( 'migrates preferences that has a `false` value', () => {
+	it( 'migrates preferences that have a `false` value', () => {
 		const persistenceInterface = createPersistenceInterface( {
 			storageKey: 'test-username',
 		} );
