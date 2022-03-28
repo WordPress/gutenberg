@@ -16,7 +16,7 @@ const settings = {
 	icon,
 	example: {
 		attributes: {
-			attribution: 'Julio Cortázar',
+			citation: 'Julio Cortázar',
 		},
 		innerBlocks: [
 			{
@@ -51,20 +51,8 @@ function registerQuoteV2Attributes( blockSettings, blockName ) {
 		return blockSettings;
 	}
 
-	// Register the new attribute.
-	Object.assign( blockSettings.attributes, {
-		attribution: {
-			type: 'string',
-			source: 'html',
-			selector: 'figcaption',
-			default: '',
-			__experimentalRole: 'content',
-		},
-	} );
-
 	// Deregister the old ones.
 	delete blockSettings.attributes.value;
-	delete blockSettings.attributes.citation;
 
 	return blockSettings;
 }

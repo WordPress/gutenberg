@@ -17,7 +17,7 @@ const transforms = {
 				return createBlock(
 					'core/quote',
 					{
-						attribution: citation,
+						citation,
 						anchor,
 						fontSize,
 						style,
@@ -54,31 +54,23 @@ const transforms = {
 		},
 		{
 			type: 'raw',
-			schema: ( { phrasingContentSchema } ) => ( {
-				figure: {
-					require: [ 'blockquote' ],
-					children: {
-						blockquote: {
-							children: '*',
-						},
-						figcaption: {
-							children: phrasingContentSchema,
-						},
-					},
+			schema: () => ( {
+				blockquote: {
+					children: '*',
 				},
 			} ),
-			isMatch: ( node ) =>
-				node.nodeName === 'FIGURE' &&
-				!! node.querySelector( 'blockquote' ),
+			selector: 'blockquote',
 			transform: ( node ) => {
 				return createBlock(
 					'core/quote',
-					{
-						attribution: node.querySelector( 'figcaption' )
-							?.innerHTML,
-					},
+					// Don't try to parse any `cite` out of this content.
+					// * There may be more than one cite.
+					// * There may be more attribution text than just the cite.
+					// * If the cite is nested in the quoted text, it's wrong to
+					//   remove it.
+					{},
 					rawHandler( {
-						HTML: node.querySelector( 'blockquote' ).innerHTML,
+						HTML: node.innerHTML,
 						mode: 'BLOCKS',
 					} )
 				);
@@ -115,12 +107,12 @@ const transforms = {
 				);
 			},
 			transform: (
-				{ attribution, anchor, fontSize, style },
+				{ citation, anchor, fontSize, style },
 				innerBlocks
 			) => {
 				return createBlock( 'core/pullquote', {
 					value: serialize( innerBlocks ),
-					citation: attribution,
+					citation,
 					anchor,
 					fontSize,
 					style,
@@ -130,15 +122,15 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/group' ],
-			transform: ( { attribution, anchor }, innerBlocks ) =>
+			transform: ( { citation, anchor }, innerBlocks ) =>
 				createBlock(
 					'core/group',
 					{ anchor },
-					attribution
+					citation
 						? [
 								...innerBlocks,
 								createBlock( 'core/paragraph', {
-									content: attribution,
+									content: citation,
 								} ),
 						  ]
 						: innerBlocks
@@ -147,12 +139,12 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ '*' ],
-			transform: ( { attribution }, innerBlocks ) =>
-				attribution
+			transform: ( { citation }, innerBlocks ) =>
+				citation
 					? [
 							...innerBlocks,
 							createBlock( 'core/paragraph', {
-								content: attribution,
+								content: citation,
 							} ),
 					  ]
 					: innerBlocks,
