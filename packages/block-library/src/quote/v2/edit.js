@@ -11,7 +11,9 @@ import {
 import { BlockQuotation } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
+import { Platform } from '@wordpress/element';
 
+const isWebPlatform = Platform.OS === 'web';
 const TEMPLATE = [ [ 'core/paragraph', {} ] ];
 
 export default function QuoteEdit( {
@@ -38,7 +40,7 @@ export default function QuoteEdit( {
 				{ ( ! RichText.isEmpty( citation ) || hasSelection ) && (
 					<RichText
 						identifier="citation"
-						tagName={ 'cite' }
+						tagName={ isWebPlatform ? 'cite' : undefined }
 						style={ { display: 'block' } }
 						value={ citation }
 						onChange={ ( nextCitation ) => {
