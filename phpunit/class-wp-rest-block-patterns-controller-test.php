@@ -2,28 +2,26 @@
 
 class WP_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	protected static $admin_id;
+	protected static $orig_registry;
 
 	public function set_up() {
 		parent::set_up();
 		switch_theme( 'emptytheme' );
 	}
 
-	public static function wpSetupBeforeClass( $factory ) {
-		self::$admin_id = $factory->user->create(
-			array(
-				'role' => 'administrator',
-			)
-		);
-	}
+	public static function wpSetUpBeforeClass( $factory ) {
+		// Create a test user.
+		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
 
-	public function setup_mock_registry() {
-		$block_patterns_reflection        = new ReflectionClass( 'WP_Block_Patterns_Registry' );
-		$block_patterns_instance_property = $block_patterns_reflection->getProperty( 'instance' );
-		$block_patterns_instance_property->setAccessible( true );
-		$block_patterns_instance = new WP_Block_Patterns_Registry();
-		$block_patterns_reflection->setStaticPropertyValue( 'instance', $block_patterns_instance );
+		// Setup an empty testing instance of `WP_Block_Patterns_Registry` and save the original.
+		$reflection = new ReflectionClass( 'WP_Block_Patterns_Registry' );
+		$reflection->getProperty( 'instance' )->setAccessible( true );
+		self::$orig_registry = $reflection->getStaticPropertyValue( 'instance' );
+		$test_registry       = new WP_Block_Patterns_Registry();
+		$reflection->setStaticPropertyValue( 'instance', $test_registry );
 
-		$block_patterns_instance->register(
+		// Register some patterns in the test registry.
+		$test_registry->register(
 			'test/one',
 			array(
 				'title'         => 'Pattern One',
@@ -32,7 +30,8 @@ class WP_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Controller_Tes
 				'content'       => '<!-- wp:heading {"level":1} --><h1>One</h1><!-- /wp:heading -->',
 			)
 		);
-		$block_patterns_instance->register(
+
+		$test_registry->register(
 			'test/two',
 			array(
 				'title'      => 'Pattern Two',
@@ -40,6 +39,15 @@ class WP_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Controller_Tes
 				'content'    => '<!-- wp:paragraph --><p>Two</p><!-- /wp:paragraph -->',
 			)
 		);
+	}
+
+	public static function wpTearDownAfterClass() {
+		// Delete the test user.
+		self::delete_user( self::$admin_id );
+
+		// Restore the original registry instance.
+		$reflection = new ReflectionClass( 'WP_Block_Patterns_Registry' );
+		$reflection->setStaticPropertyValue( 'instance', self::$orig_registry );
 	}
 
 	public function test_register_routes() {
@@ -52,7 +60,6 @@ class WP_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Controller_Tes
 	}
 
 	public function test_get_items() {
-		$this->setup_mock_registry();
 		wp_set_current_user( self::$admin_id );
 
 		$expected_names  = array( 'test/one', 'test/two' );
