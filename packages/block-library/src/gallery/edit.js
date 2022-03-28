@@ -542,7 +542,7 @@ function GalleryEdit( props ) {
 					accept="image/*"
 					handleUpload={ false }
 					onSelect={ updateImages }
-					name={ __( 'Add' ) }
+					name={ __( 'Replace' ) }
 					multiple={ true }
 					mediaIds={ images.map( ( image ) => image.id ) }
 					addToGallery={ hasImageIds }
