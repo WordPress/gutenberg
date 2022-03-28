@@ -14,7 +14,7 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
  */
 import useSetting from '../components/use-setting';
 import { appendSelectors } from './utils';
-import { getGapValueFromStyle } from '../hooks/gap';
+import { getGapBoxControlValueFromStyle } from '../hooks/gap';
 
 export default {
 	name: 'default',
@@ -110,7 +110,7 @@ export default {
 		const { contentSize, wideSize } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
-		const blockGapStyleValue = getGapValueFromStyle(
+		const blockGapStyleValue = getGapBoxControlValueFromStyle(
 			style?.spacing?.blockGap
 		);
 		const blockGapValue =
