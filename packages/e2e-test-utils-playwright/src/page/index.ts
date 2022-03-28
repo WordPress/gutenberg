@@ -8,9 +8,14 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
  */
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
 import { createNewPost } from './create-new-post';
+import { getEditedPostContent } from './get-edited-post-content';
 import { getPageError } from './get-page-error';
+import { insertBlock } from './insert-block';
 import { isCurrentURL } from './is-current-url';
-import { showBlockToolbar } from './show-block-toolbar';
+import {
+	setClipboardData,
+	pressKeyWithModifier,
+} from './press-key-with-modifier';
 import { visitAdminPage } from './visit-admin-page';
 
 class PageUtils {
@@ -26,9 +31,12 @@ class PageUtils {
 
 	clickBlockToolbarButton = clickBlockToolbarButton;
 	createNewPost = createNewPost;
+	getEditedPostContent = getEditedPostContent;
 	getPageError = getPageError;
+	insertBlock = insertBlock;
 	isCurrentURL = isCurrentURL;
-	showBlockToolbar = showBlockToolbar;
+	pressKeyWithModifier = pressKeyWithModifier;
+	setClipboardData = setClipboardData;
 	visitAdminPage = visitAdminPage;
 }
 
