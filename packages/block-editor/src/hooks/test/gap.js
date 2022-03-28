@@ -14,7 +14,9 @@ describe( 'gap', () => {
 				top: '88rem',
 				left: '88rem',
 			};
-			expect( getGapBoxControlValueFromStyle( '88rem' ) ).toEqual( expectedValue );
+			expect( getGapBoxControlValueFromStyle( '88rem' ) ).toEqual(
+				expectedValue
+			);
 		} );
 		it( 'should return box control value from object', () => {
 			const blockGapValue = {
