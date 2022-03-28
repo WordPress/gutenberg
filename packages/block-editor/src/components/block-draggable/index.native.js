@@ -184,7 +184,9 @@ const BlockDraggableWrapper = ( { children } ) => {
 				onDragStart={ startDragging }
 				onDragOver={ updateDragging }
 				onDragEnd={ stopDragging }
-				wrapperAnimatedStyles={ { flex: 1 } }
+				wrapperAnimatedStyles={
+					styles[ 'draggable-wrapper__container' ]
+				}
 			>
 				{ children( { onScroll: scrollHandler } ) }
 			</Draggable>
