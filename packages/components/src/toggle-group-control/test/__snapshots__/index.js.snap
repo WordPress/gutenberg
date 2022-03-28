@@ -79,6 +79,7 @@ exports[`ToggleGroupControl should render correctly 1`] = `
   border: none;
   border-radius: 2px;
   color: #757575;
+  fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
   display: -webkit-flex;
