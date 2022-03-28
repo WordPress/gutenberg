@@ -63,6 +63,7 @@
 		"@wordpress/media-utils": "file:packages/media-utils",
 		"@wordpress/notices": "file:packages/notices",
 		"@wordpress/nux": "file:packages/nux",
+		"@wordpress/persistence-local-storage": "file:packages/persistence-local-storage",
 		"@wordpress/plugins": "file:packages/plugins",
 		"@wordpress/preferences": "file:packages/preferences",
 		"@wordpress/primitives": "file:packages/primitives",
