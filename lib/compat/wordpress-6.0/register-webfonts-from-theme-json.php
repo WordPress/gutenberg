@@ -147,4 +147,4 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 	return $data;
 }
 
-add_action( 'wp_loaded', 'gutenberg_register_webfonts_from_theme_json' );
+add_action( 'init', 'gutenberg_register_webfonts_from_theme_json' );
