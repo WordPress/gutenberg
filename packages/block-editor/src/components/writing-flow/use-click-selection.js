@@ -27,10 +27,15 @@ export default function useClickSelection() {
 					return;
 				}
 
+				const startClientId = getBlockSelectionStart();
+				const clickedClientId = getBlockClientId( event.target );
+
 				if ( event.shiftKey ) {
-					node.contentEditable = true;
-					// Firefox doesn't automatically move focus.
-					node.focus();
+					if ( startClientId !== clickedClientId ) {
+						node.contentEditable = true;
+						// Firefox doesn't automatically move focus.
+						node.focus();
+					}
 				} else if ( hasMultiSelection() ) {
 					// Allow user to escape out of a multi-selection to a
 					// singular selection of a block via click. This is handled
@@ -38,7 +43,7 @@ export default function useClickSelection() {
 					// multiselection, as focus can be incurred by starting a
 					// multiselection (focus moved to first block's multi-
 					// controls).
-					selectBlock( getBlockClientId( event.target ) );
+					selectBlock( clickedClientId );
 				}
 			}
 
