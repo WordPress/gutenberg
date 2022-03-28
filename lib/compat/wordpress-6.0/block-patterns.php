@@ -99,6 +99,10 @@ function gutenberg_register_theme_block_patterns() {
 	foreach ( wp_get_active_and_valid_themes() as $theme ) {
 		$dirpath = $theme . '/patterns/';
 		if ( file_exists( $dirpath ) ) {
+			$category_name = 'wc-athens';
+			if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( $category_name ) ) {
+				register_block_pattern_category( $category_name, array( 'label' => __( 'WC Athens', 'default' ) ) );
+			}
 			$files = glob( $dirpath . '*.php' );
 			if ( $files ) {
 				foreach ( $files as $file ) {
