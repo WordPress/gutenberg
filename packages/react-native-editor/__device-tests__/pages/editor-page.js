@@ -287,13 +287,6 @@ class EditorPage {
 
 		if ( isAndroid() ) {
 			await blockButton.click();
-
-			// For certain blocks, clicking on it will display additional options that the test should wait for before next steps
-			if ( blockName === 'Image' ) {
-				const locator =
-					'//android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup';
-				await waitForVisible( this.driver, locator );
-			}
 		} else {
 			await this.driver.execute( 'mobile: tap', {
 				element: blockButton,
@@ -322,7 +315,6 @@ class EditorPage {
 		if ( isAndroid() ) {
 			const size = await this.driver.getWindowSize();
 			const x = size.width / 2;
-
 			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
 			while (
 				! ( await this.driver.hasElementByAccessibilityId(
@@ -629,6 +621,10 @@ class EditorPage {
 
 	async closePicker() {
 		if ( isAndroid() ) {
+			// Wait for media block picker to load before closing
+			const locator = '//android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup';
+			await waitForVisible( this.driver, locator );
+
 			await swipeDown( this.driver );
 		} else {
 			const cancelButton = await waitForVisible(

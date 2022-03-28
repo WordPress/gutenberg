@@ -142,26 +142,26 @@ exports.audioBlockPlaceholder = `<!-- wp:audio {"id":5} -->
 <figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
 <!-- /wp:audio -->`;
 
-exports.headingExpectedHTML = `<!-- wp:heading -->
+exports.headerBlockEmpty = `<!-- wp:heading -->
 <h2></h2>
 <!-- /wp:heading -->`;
 
-exports.separatorExpectedHTML = `<!-- wp:separator -->
+exports.separatorBlockEmpty = `<!-- wp:separator -->
 <hr class="wp-block-separator has-alpha-channel-opacity"/>
 <!-- /wp:separator -->`;
 
-exports.listExpectedHTML = `<!-- wp:list -->
+exports.listBlockEmpty = `<!-- wp:list -->
 <ul><li></li></ul>
 <!-- /wp:list -->`;
 
-exports.imageExpectedHTML = `<!-- wp:image -->
+exports.imageBlockEmpty = `<!-- wp:image -->
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->`;
 
-exports.moreExpectedHTML = `<!-- wp:more -->
+exports.moreBlockEmpty = `<!-- wp:more -->
 <!--more-->
 <!-- /wp:more -->`;
 
-exports.paragraphExpectedHTML = `<!-- wp:paragraph -->
+exports.paragraphBlockEmpty = `<!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->`;
