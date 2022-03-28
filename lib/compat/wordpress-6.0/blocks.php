@@ -160,8 +160,7 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 			$view_script_handle,
 			gutenberg_url( str_replace( gutenberg_dir_path(), '', $view_script_path ) ),
 			$view_script_dependencies,
-			$view_script_version,
-			true
+			$view_script_version
 		);
 		if ( $result ) {
 			$settings['view_script'] = $view_script_handle;
