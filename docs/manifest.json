@@ -1692,6 +1692,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/persistence-local-storage",
+		"slug": "packages-persistence-local-storage",
+		"markdown_source": "../packages/persistence-local-storage/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
