@@ -1,7 +1,9 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
--   Add `--webpack-src-dir` CLI flag to allow customizing the source code directory. (`src` by default) ([#39618](https://github.com/WordPress/gutenberg/pull/39618)).
+### New Feature
+
+-   Add `--webpack-src-dir` CLI flag to allow customizing the source code directory (`src` by default) ([#39618](https://github.com/WordPress/gutenberg/pull/39618)).
 ## 22.2.0 (2022-03-11)
 
 ### Enhancement
