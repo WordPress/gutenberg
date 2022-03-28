@@ -1,6 +1,5 @@
 /**
- * Opens the inserter, searches for the given term, then selects the first
- * result that appears. It then waits briefly for the block list to update.
+ * Use wp.data to insert a block given its name.
  *
  * @this {import('./').PageUtils}
  * @param {string} blockName The name of the block to insert.
