@@ -16,6 +16,7 @@ import {
 	setClipboardData,
 	pressKeyWithModifier,
 } from './press-key-with-modifier';
+import { showBlockToolbar } from './show-block-toolbar';
 import { visitAdminPage } from './visit-admin-page';
 
 class PageUtils {
@@ -37,6 +38,7 @@ class PageUtils {
 	isCurrentURL = isCurrentURL;
 	pressKeyWithModifier = pressKeyWithModifier;
 	setClipboardData = setClipboardData;
+	showBlockToolbar = showBlockToolbar;
 	visitAdminPage = visitAdminPage;
 }
 

@@ -4,13 +4,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Copy/cut/paste of whole blocks', () => {
-	test.beforeEach( async ( { context } ) => {
-		await context.grantPermissions( [
-			'clipboard-read',
-			'clipboard-write',
-		] );
-	} );
-
 	test( 'should copy and paste individual blocks', async ( {
 		page,
 		pageUtils,
@@ -26,11 +19,11 @@ test.describe( 'Copy/cut/paste of whole blocks', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
 
-		await page.keyboard.press( 'Meta+c' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'c' );
 		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
 
 		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'Meta+v' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
 		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
