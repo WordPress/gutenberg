@@ -132,6 +132,8 @@ Example:
 }
 ```
 
+By default, popovers are displayed relative to the button that initiated the popover. By supplying classnames for each individual popover, it is possible to add styling rules to align the popover positions to an unrelated design element, for example, the sidebar inspector in the block editor.
+
 - Required: No
 
 ### `value`: `Object`
