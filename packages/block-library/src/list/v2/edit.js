@@ -14,7 +14,7 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { useDispatch, useSelect, select } from '@wordpress/data';
-import { isRTL, __, _x } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
 import {
 	formatListBullets,
 	formatListBulletsRTL,
@@ -34,28 +34,6 @@ import OrderedListSettings from '../ordered-list-settings';
 const TEMPLATE = [ [ 'core/list-item' ] ];
 
 function useOutdentList( clientId ) {
-	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
-	return useCallback( () => {
-		const { getBlockRootClientId, getBlockAttributes, getBlock } = select(
-			blockEditorStore
-		);
-		const parentBlockId = getBlockRootClientId( clientId );
-		const parentBlockAttributes = getBlockAttributes( parentBlockId );
-		// Create a new parent block without the inner blocks.
-		const newParentBlock = createBlock(
-			'core/list-item',
-			parentBlockAttributes
-		);
-		const { innerBlocks } = getBlock( clientId );
-		// Replace the parent block with a new parent block without inner blocks,
-		// and make the inner blocks siblings of the parent.
-		replaceBlocks( [ parentBlockId ], [ newParentBlock, ...innerBlocks ] );
-		// Select the last child of the list being outdent.
-		selectionChange( last( innerBlocks ).clientId );
-	}, [ clientId ] );
-}
-
-function IndentUI( { clientId } ) {
 	const { canOutdent } = useSelect(
 		( innerSelect ) => {
 			const { getBlockRootClientId, getBlock } = innerSelect(
@@ -70,9 +48,37 @@ function IndentUI( { clientId } ) {
 		},
 		[ clientId ]
 	);
+	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+	return [
+		canOutdent,
+		useCallback( () => {
+			const {
+				getBlockRootClientId,
+				getBlockAttributes,
+				getBlock,
+			} = select( blockEditorStore );
+			const parentBlockId = getBlockRootClientId( clientId );
+			const parentBlockAttributes = getBlockAttributes( parentBlockId );
+			// Create a new parent block without the inner blocks.
+			const newParentBlock = createBlock(
+				'core/list-item',
+				parentBlockAttributes
+			);
+			const { innerBlocks } = getBlock( clientId );
+			// Replace the parent block with a new parent block without inner blocks,
+			// and make the inner blocks siblings of the parent.
+			replaceBlocks(
+				[ parentBlockId ],
+				[ newParentBlock, ...innerBlocks ]
+			);
+			// Select the last child of the list being outdent.
+			selectionChange( last( innerBlocks ).clientId );
+		}, [ clientId ] ),
+	];
+}
 
-	const outdentList = useOutdentList( clientId );
-
+function IndentUI( { clientId } ) {
+	const [ canOutdent, outdentList ] = useOutdentList( clientId );
 	return (
 		<>
 			<ToolbarButton
