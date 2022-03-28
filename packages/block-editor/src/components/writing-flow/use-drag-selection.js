@@ -81,7 +81,11 @@ export default function useDragSelection() {
 					return;
 				}
 
-				if ( ! target.contentEditable ) {
+				// Check the attribute, not the contentEditable attribute. All
+				// child elements of the content editable wrapper are editable
+				// and return true for this property. We only want to start
+				// multi selecting when the mouse leaves the wrapper.
+				if ( ! target.getAttribute( 'contenteditable' ) ) {
 					return;
 				}
 
