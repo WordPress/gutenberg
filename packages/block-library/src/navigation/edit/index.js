@@ -38,7 +38,7 @@ import {
 	Button,
 	Spinner,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -166,6 +166,10 @@ function Navigation( {
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
 	useNavigationEntities();
+
+	const [ showNavigationMenuDeleteNotice ] = useNavigationNotice( {
+		name: 'block-library/core/navigation/delete',
+	} );
 
 	const [
 		showNavigationMenuCreateNotice,
@@ -794,7 +798,18 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationMenu &&
 							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
-									onDelete={ resetToEmptyBlock }
+									onDelete={ ( deletedMenuTitle = '' ) => {
+										resetToEmptyBlock();
+										showNavigationMenuDeleteNotice(
+											sprintf(
+												// translators: %s: the name of a menu (e.g. Header navigation).
+												__(
+													'Navigation menu %s successfully deleted.'
+												),
+												deletedMenuTitle
+											)
+										);
+									} }
 								/>
 							) }
 					</InspectorControls>
