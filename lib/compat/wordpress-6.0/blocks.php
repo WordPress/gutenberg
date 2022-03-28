@@ -147,7 +147,6 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 	$view_script_path = realpath( dirname( $metadata['file'] ) . '/' . remove_block_asset_path_prefix( $metadata['viewScript'] ) );
 
 	if ( file_exists( $view_script_path ) ) {
-		$view_script_handle = str_replace( 'core/', 'wp-block-', $metadata['name'] ) . '-view';
 		$view_script_id     = str_replace( array( '.min.js', '.js' ), '', basename( remove_block_asset_path_prefix( $metadata['viewScript'] ) ) );
 		$view_script_handle = str_replace( 'core/', 'wp-block-', $metadata['name'] ) . '-' . $view_script_id;
 		wp_deregister_script( $view_script_handle );
