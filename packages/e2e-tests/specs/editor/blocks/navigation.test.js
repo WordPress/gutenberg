@@ -356,17 +356,20 @@ describe( 'Navigation', () => {
 			await setUpResponseMocking( [
 				{
 					match: ( request ) =>
+						request.method() === 'GET' &&
 						request.url().includes( `rest_route` ) &&
 						request.url().includes( `navigation` ) &&
 						request.url().includes( testNavId ),
-					onRequestMatch: () => {
+					onRequestMatch: ( request ) => {
 						// The Promise simulates a REST API request whose resolultion
 						// the test has full control over.
 						return new Promise( ( resolve ) => {
 							// Assign the resolution function to the var in the
 							// upper scope to afford control over resolution.
 							resolveNavigationRequest = resolve;
-						} );
+
+							// Call request.continue() is required to fully resolve the mock.
+						} ).then( () => request.continue() );
 					},
 				},
 			] );
@@ -390,7 +393,9 @@ describe( 'Navigation', () => {
 			await navBlock.waitForSelector( '.components-spinner' );
 
 			// Resolve the controlled mocked API request.
-			resolveNavigationRequest();
+			if ( typeof resolveNavigationRequest === 'function' ) {
+				resolveNavigationRequest();
+			}
 		} );
 
 		it( 'shows a loading indicator whilst empty Navigation menu is being created', async () => {
@@ -408,14 +413,16 @@ describe( 'Navigation', () => {
 						request.url().includes( `rest_route` ) &&
 						request.url().includes( `navigation` ) &&
 						request.url().includes( testNavId ),
-					onRequestMatch: () => {
+					onRequestMatch: ( request ) => {
 						// The Promise simulates a REST API request whose resolultion
 						// the test has full control over.
 						return new Promise( ( resolve ) => {
 							// Assign the resolution function to the var in the
 							// upper scope to afford control over resolution.
 							resolveNavigationRequest = resolve;
-						} );
+
+							// Call request.continue() is required to fully resolve the mock.
+						} ).then( () => request.continue() );
 					},
 				},
 			] );
@@ -437,7 +444,9 @@ describe( 'Navigation', () => {
 			await navBlock.waitForSelector( '.components-spinner' );
 
 			// Resolve the controlled mocked API request.
-			resolveNavigationRequest();
+			if ( typeof resolveNavigationRequest === 'function' ) {
+				resolveNavigationRequest();
+			}
 		} );
 	} );
 
