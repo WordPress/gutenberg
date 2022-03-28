@@ -6,9 +6,10 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import migrateFontFamily from '../utils/migrate-font-family';
+import initialDeprecations from '../deprecated';
+import { migrateToListV2 } from './migrate';
 
-const v0 = {
+const v1 = {
 	attributes: {
 		ordered: {
 			type: 'boolean',
@@ -43,10 +44,22 @@ const v0 = {
 		typography: {
 			fontSize: true,
 			__experimentalFontFamily: true,
+			lineHeight: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalLetterSpacing: true,
+			__experimentalTextTransform: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
 		},
 		color: {
 			gradients: true,
 			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
 		},
 		__unstablePasteTextInline: true,
 		__experimentalSelector: 'ol,ul',
@@ -62,10 +75,7 @@ const v0 = {
 			</TagName>
 		);
 	},
-	migrate: migrateFontFamily,
-	isEligible( { style } ) {
-		return style?.typography?.fontFamily;
-	},
+	migrate: migrateToListV2,
 };
 
 /**
@@ -76,4 +86,4 @@ const v0 = {
  *
  * See block-deprecation.md
  */
-export default [ v0 ];
+export default [ v1, ...initialDeprecations ];
