@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -17,10 +18,15 @@ import EditableText from '../editable-text';
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md
  */
-const PlainText = forwardRef( ( { __experimentalVersion, ...props }, ref ) => {
-	if ( __experimentalVersion === 2 ) {
+const PlainText = forwardRef( ( { version, ...props }, ref ) => {
+	if ( version === 2 ) {
 		return <EditableText ref={ ref } { ...props } />;
 	}
+
+	deprecated( 'Version 1 of `<PlainText>`', {
+		since: '6.0',
+		alternative: '`version={2}`',
+	} );
 
 	const { className, onChange, ...remainingProps } = props;
 

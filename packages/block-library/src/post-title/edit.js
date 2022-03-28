@@ -56,7 +56,7 @@ export default function PostTitleEdit( {
 					placeholder={ __( 'No Title' ) }
 					value={ rawTitle }
 					onChange={ setTitle }
-					__experimentalVersion={ 2 }
+					version={ 2 }
 					{ ...blockProps }
 				/>
 			) : (
@@ -81,7 +81,7 @@ export default function PostTitleEdit( {
 						}
 						value={ rawTitle }
 						onChange={ setTitle }
-						__experimentalVersion={ 2 }
+						version={ 2 }
 					/>
 				</TagName>
 			) : (

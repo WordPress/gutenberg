@@ -30,7 +30,7 @@ export default function CommentsPaginationPreviousEdit( {
 				</span>
 			) }
 			<PlainText
-				__experimentalVersion={ 2 }
+				version={ 2 }
 				tagName="span"
 				aria-label={ __( 'Older comments page link' ) }
 				placeholder={ __( 'Older Comments' ) }
