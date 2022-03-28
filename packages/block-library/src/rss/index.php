@@ -14,7 +14,7 @@
  */
 function render_block_core_rss( $attributes ) {
 	if ( in_array( untrailingslashit( $attributes['feedURL'] ), array( site_url(), home_url() ), true ) ) {
-		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'To avoid a loop slowing down your site, adding an RSS feed to this site’s home page is not supported. Try using another block, like the <strong>Latest Posts</strong> block, to list posts from the site.' ) . '</div></div>';
+		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'Adding an RSS feed to this site’s homepage is not supported, as it could lead to a loop that slows down your site. Try using another block, like the <strong>Latest Posts</strong> block, to list posts from the site.' ) . '</div></div>';
 	}
 
 	$rss = fetch_feed( $attributes['feedURL'] );
