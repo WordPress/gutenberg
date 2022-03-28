@@ -114,7 +114,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 				} );
 			}
 		} else {
-			// We stop dragging If no block is found.
+			// We stop dragging if no block is found.
 			runOnUI( stopDragging )();
 		}
 	};
@@ -203,7 +203,7 @@ const BlockDraggableWrapper = ( { children } ) => {
  * Block draggable component
  *
  * This component serves for animating the block when it is being dragged.
- * Hence, It should be wrapped around the rendering of a block.
+ * Hence, it should be wrapped around the rendering of a block.
  *
  * @param {Object}      props          Component props.
  * @param {JSX.Element} props.children Children to be rendered.
