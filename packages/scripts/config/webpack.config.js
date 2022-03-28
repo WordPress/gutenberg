@@ -90,7 +90,7 @@ const cssLoaders = [
 const config = {
 	mode,
 	target,
-	entry: getWebpackEntryPoints(),
+	entry: getWebpackEntryPoints,
 	output: {
 		filename: '[name].js',
 		path: resolve( process.cwd(), 'build' ),
