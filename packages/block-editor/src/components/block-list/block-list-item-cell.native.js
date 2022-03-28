@@ -39,7 +39,7 @@ function BlockListItemCell( { children, clientId, rootClientId } ) {
 
 	return (
 		<View onLayout={ onLayout }>
-			<BlockDraggable clientIds={ [ clientId ] }>
+			<BlockDraggable clientId={ clientId }>
 				{ () => children }
 			</BlockDraggable>
 		</View>

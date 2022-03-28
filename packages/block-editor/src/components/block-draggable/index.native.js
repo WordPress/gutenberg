@@ -185,7 +185,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 	);
 };
 
-const BlockDraggable = ( { clientIds, children } ) => {
+const BlockDraggable = ( { clientId, children } ) => {
 	const container = {
 		height: useSharedValue( 0 ),
 	};
@@ -214,17 +214,17 @@ const BlockDraggable = ( { clientIds, children } ) => {
 				getTemplateLock,
 				isBlockBeingDragged,
 			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+			const rootClientId = getBlockRootClientId( clientId );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
 
 			return {
-				isBeingDragged: isBlockBeingDragged( clientIds[ 0 ] ),
+				isBeingDragged: isBlockBeingDragged( clientId ),
 				isDraggable: 'all' !== templateLock,
 			};
 		},
-		[ clientIds ]
+		[ clientId ]
 	);
 
 	useEffect( () => {
