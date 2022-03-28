@@ -33,6 +33,22 @@ const BLOCK_COLLAPSED_HEIGHT = 20;
 const EXTRA_OFFSET_WHEN_CLOSE_TO_TOP_EDGE = 80;
 const SCROLL_ANIMATION_DURATION = 350;
 
+/**
+ * Block draggable wrapper component
+ *
+ * This component handles all the interactions for dragging blocks.
+ * It relies on the block list and its context for dragging, hence it
+ * should be rendered between the `BlockListProvider` component and the
+ * block list rendering. It also requires listening to scroll events,
+ * therefore for this purpose, it returns the `onScroll` event handler
+ * that should be attached to the list that renders the blocks.
+ *
+ *
+ * @param {Object}      props          Component props.
+ * @param {JSX.Element} props.children Children to be rendered.
+ *
+ * @return {Function} Render function that passes `onScroll` event handler.
+ */
 const BlockDraggableWrapper = ( { children } ) => {
 	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
 		blockEditorStore
@@ -185,6 +201,18 @@ const BlockDraggableWrapper = ( { children } ) => {
 	);
 };
 
+/**
+ * Block draggable component
+ *
+ * This component serves for animating the block when it is being dragged.
+ * Hence, It should be wrapped around the rendering of a block.
+ *
+ * @param {Object}      props          Component props.
+ * @param {JSX.Element} props.children Children to be rendered.
+ * @param {string[]}    props.clientId Client id of the block.
+ *
+ * @return {Function} Render function which includes the parameter `isDraggable` to determine if the block can be dragged.
+ */
 const BlockDraggable = ( { clientId, children } ) => {
 	const container = {
 		height: useSharedValue( 0 ),
