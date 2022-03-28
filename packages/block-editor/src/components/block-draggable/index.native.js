@@ -18,7 +18,7 @@ import Animated, {
  */
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -63,6 +63,8 @@ const COLLAPSE_OPACITY_ANIMATION_CONFIG = { duration: 150 };
  * @return {Function} Render function that passes `onScroll` event handler.
  */
 const BlockDraggableWrapper = ( { children } ) => {
+	const currentClientId = useRef();
+
 	const wrapperStyles = usePreferredColorSchemeStyle(
 		styles[ 'draggable-wrapper__container' ],
 		styles[ 'draggable-wrapper__container--dark' ]
@@ -130,6 +132,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 		} );
 
 		const foundClientId = blockLayout?.clientId;
+		currentClientId.current = foundClientId;
 		if ( foundClientId ) {
 			startDraggingBlocks( [ foundClientId ] );
 
