@@ -58,7 +58,7 @@ function withPersistenceLayer( reducer ) {
 			};
 		}
 
-		persistenceLayer.set( nextState );
+		persistenceLayer?.set( nextState );
 
 		return nextState;
 	};
