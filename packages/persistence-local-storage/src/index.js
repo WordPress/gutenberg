@@ -6,7 +6,7 @@
 const DEFAULT_STORAGE_KEY = 'PERSISTENCE_LOCAL_STORAGE_DATA';
 const EMPTY_OBJECT = {};
 
-export function createPersistenceLayer( options ) {
+export default function createPersistenceLayer( options ) {
 	const { storageKey = DEFAULT_STORAGE_KEY } = options;
 
 	const storage = window.localStorage;
@@ -17,7 +17,7 @@ export function createPersistenceLayer( options ) {
 	 *
 	 * @return {Object} Persisted data.
 	 */
-	function get() {
+	async function get() {
 		// If unset, getItem is expected to return null. Fall back to
 		// empty object.
 		const persisted = storage.getItem( storageKey );
