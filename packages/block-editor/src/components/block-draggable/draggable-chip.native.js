@@ -9,6 +9,7 @@ import { View } from 'react-native';
 import { dragHandle } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -35,6 +36,11 @@ const shadowStyle = {
  * @return {JSX.Element} Chip component.
  */
 export default function BlockDraggableChip() {
+	const containerStyle = usePreferredColorSchemeStyle(
+		styles[ 'draggable-chip__container' ],
+		styles[ 'draggable-chip__container--dark' ]
+	);
+
 	const { blockIcon } = useSelect( ( select ) => {
 		const { getBlockName, getDraggedBlockClientIds } = select(
 			blockEditorStore
@@ -48,7 +54,7 @@ export default function BlockDraggableChip() {
 	} );
 
 	return (
-		<View style={ [ styles[ 'draggable-chip__container' ], shadowStyle ] }>
+		<View style={ [ containerStyle, shadowStyle ] }>
 			<BlockIcon icon={ dragHandle } />
 			<BlockIcon icon={ blockIcon } />
 		</View>
