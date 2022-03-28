@@ -20,7 +20,6 @@ import { useSelect } from '@wordpress/data';
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
-import { setContentEditableWrapper } from './use-multi-selection';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -37,7 +36,6 @@ function useInitialPosition( clientId ) {
 		( select ) => {
 			const {
 				getSelectedBlocksInitialCaretPosition,
-				isMultiSelecting,
 				isNavigationMode,
 				isBlockSelected,
 			} = select( blockEditorStore );
@@ -46,7 +44,7 @@ function useInitialPosition( clientId ) {
 				return;
 			}
 
-			if ( isMultiSelecting() || isNavigationMode() ) {
+			if ( isNavigationMode() ) {
 				return;
 			}
 
@@ -68,11 +66,11 @@ function useInitialPosition( clientId ) {
 export function useFocusFirstElement( clientId ) {
 	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
-	const { isBlockSelected } = useSelect( blockEditorStore );
+	const { isBlockSelected, isMultiSelecting } = useSelect( blockEditorStore );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
-		if ( ! isBlockSelected( clientId ) ) {
+		if ( ! isBlockSelected( clientId ) || isMultiSelecting() ) {
 			return;
 		}
 
@@ -120,8 +118,6 @@ export function useFocusFirstElement( clientId ) {
 				return;
 			}
 		}
-
-		setContentEditableWrapper( ref.current, false );
 
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition, clientId ] );
