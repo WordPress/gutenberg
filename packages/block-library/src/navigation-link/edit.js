@@ -43,6 +43,7 @@ import {
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -507,12 +508,21 @@ export default function NavigationLinkEdit( {
 		replaceBlock( clientId, newSubmenu );
 	}
 
-	const featuredBlocks = [
+	const defaultFeaturedBlocks = [
 		'core/site-logo',
 		'core/social-links',
 		'core/search',
 	];
 	const featuredTransforms = blockTransforms.filter( ( item ) => {
+		/**
+		 * Filters the featured blocks in the transform control panel.
+		 *
+		 * @param {Array} defaultFeaturedBlocks The default blocks to display.
+		 */
+		const featuredBlocks = applyFilters(
+			'allow_additional_featured_block_in_navigation',
+			defaultFeaturedBlocks
+		);
 		return featuredBlocks.includes( item.name );
 	} );
 
