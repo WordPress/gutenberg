@@ -469,9 +469,11 @@ const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	const timeout = 1000;
 
 	if ( iteration >= maxIteration ) {
-		throw new Error(
+		// eslint-disable-next-line no-console
+		console.error(
 			`"${ elementLocator }" is still not visible after ${ iteration } retries!`
 		);
+		return false;
 	} else if ( iteration !== 0 ) {
 		// wait before trying to locate element again
 		await driver.sleep( timeout );

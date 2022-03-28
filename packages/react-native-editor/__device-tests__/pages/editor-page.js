@@ -45,6 +45,14 @@ class EditorPage {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
+	async getParagraphBlockLocatorAtPosition( position ) {
+		const paragraphBlockLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row ${ position }.")]/android.widget.EditText`
+			: `(//*[contains(@name, "Paragraph Block. Row ${ position }.")])[1]`;
+
+		return await waitForVisible( this.driver, paragraphBlockLocator );
+	}
+
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering.
@@ -53,7 +61,15 @@ class EditorPage {
 		position = 1,
 		options = { autoscroll: false }
 	) {
-		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
+		let blockLocator;
+		if ( isAndroid() ) {
+			blockLocator = `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
+
+			await waitForVisible( this.driver, blockLocator );
+		} else {
+			blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
+		}
+
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
@@ -315,6 +331,7 @@ class EditorPage {
 		if ( isAndroid() ) {
 			const size = await this.driver.getWindowSize();
 			const x = size.width / 2;
+
 			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
 			while (
 				! ( await this.driver.hasElementByAccessibilityId(
@@ -443,14 +460,16 @@ class EditorPage {
 			}
 		}
 
-		const blockActionsMenuButton = await this.driver.elementByXPath(
+		const blockActionsMenuButton = await waitForVisible(
+			this.driver,
 			blockActionsMenuButtonLocator
 		);
 		await blockActionsMenuButton.click();
 
 		const removeActionButtonIdentifier = 'Remove block';
 		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
-		const removeActionButton = await this.driver.elementByXPath(
+		const removeActionButton = await waitForVisible(
+			this.driver,
 			removeActionButtonLocator
 		);
 
@@ -477,19 +496,17 @@ class EditorPage {
 	}
 
 	async typeTextToParagraphBlock( block, text, clear ) {
-		const textViewElement = await this.getTextViewForParagraphBlock(
-			block
-		);
-		await typeString( this.driver, textViewElement, text, clear );
-		await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
+		// const textViewElement = await this.getTextViewForParagraphBlock(
+		// 	block
+		// );
+		await typeString( this.driver, block, text, clear );
+		// await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
 	}
 
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
-			// Select block first.
-			const block = await this.getBlockAtPosition(
-				this.paragraphBlockName,
+			const block = await this.getParagraphBlockLocatorAtPosition(
 				position + i
 			);
 			await block.click();
@@ -506,26 +523,20 @@ class EditorPage {
 	}
 
 	async getTextForParagraphBlock( block ) {
-		const textViewElement = await this.getTextViewForParagraphBlock(
-			block
-		);
-		const text = await textViewElement.text();
+		const text = await block.text();
 		return text.toString();
 	}
 
 	async getTextForParagraphBlockAtPosition( position ) {
-		// Select block first.
-		let block = await this.getBlockAtPosition(
-			this.paragraphBlockName,
-			position
-		);
+		const block = await this.getParagraphBlockLocatorAtPosition( position );
 		await block.click();
 
-		block = await this.getBlockAtPosition(
-			this.paragraphBlockName,
-			position
-		);
 		const text = await this.getTextForParagraphBlock( block );
+
+		if ( isAndroid() ) {
+			return text.toString();
+		}
+
 		return text.toString();
 	}
 
