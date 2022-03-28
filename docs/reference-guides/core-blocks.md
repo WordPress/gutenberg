@@ -689,7 +689,7 @@ Displays the link of a post, page, or any other content-type. ([Source](https://
 
 -	**Name:** core/read-more
 -	**Category:** theme
--	**Supports:** color (background, gradients, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** content, linkTarget
 
 ## RSS
