@@ -1,0 +1,11 @@
+<!-- wp:paragraph -->
+<p>Here is a unique string so we can test copying.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Here is a unique string so we can test copying.</p>
+<!-- /wp:paragraph -->
