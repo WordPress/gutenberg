@@ -113,6 +113,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 	const {
 		onBlockDragOver,
 		onBlockDragEnd,
+		onBlockDrop,
 		targetBlockIndex,
 	} = useBlockDropZone();
 
@@ -125,7 +126,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 		};
 	}, [] );
 
-	const setupDraggingBlock = ( position ) => {
+	const onStartDragging = ( position ) => {
 		const blockLayout = findBlockLayoutByPosition( blocksLayouts.current, {
 			x: position.x,
 			y: position.y + scroll.offsetY.value,
@@ -159,6 +160,19 @@ const BlockDraggableWrapper = ( { children } ) => {
 		}
 	};
 
+	const onStopDragging = () => {
+		if ( currentClientId.current ) {
+			onBlockDrop( {
+				// Dropping is only allowed at root level
+				srcRootClientId: '',
+				srcClientIds: [ currentClientId.current ],
+				type: 'block',
+			} );
+		}
+		onBlockDragEnd();
+		stopDraggingBlocks();
+	};
+
 	// This hook is used for animating the scroll via a shared value.
 	useAnimatedReaction(
 		() => scrollAnimation.value,
@@ -183,7 +197,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 		isDragging.value = true;
 
 		chip.scale.value = withTiming( 1 );
-		runOnJS( setupDraggingBlock )( dragPosition );
+		runOnJS( onStartDragging )( dragPosition );
 	};
 
 	const updateDragging = ( { x, y } ) => {
@@ -203,9 +217,8 @@ const BlockDraggableWrapper = ( { children } ) => {
 		isDragging.value = false;
 
 		chip.scale.value = withTiming( 0 );
-		runOnJS( onBlockDragEnd )();
-		runOnJS( stopDraggingBlocks )();
 		stopScrolling();
+		runOnJS( onStopDragging )();
 	};
 
 	const chipDynamicStyles = useAnimatedStyle( () => {
