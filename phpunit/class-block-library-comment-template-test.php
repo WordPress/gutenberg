@@ -163,4 +163,39 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 			'<ol ><li><div class="wp-block-comment-author-name">Test</div><div class="wp-block-comment-content">Hello world</div><ol><li><div class="wp-block-comment-author-name">Test</div><div class="wp-block-comment-content">Hello world</div><ol><li><div class="wp-block-comment-author-name">Test</div><div class="wp-block-comment-content">Hello world</div></li></ol></li></ol></li></ol>'
 		);
 	}
+	/**
+	 * Test that both "Older Comments" and "Newer Comments" are displayed in the correct order
+	 * inside the Comment Query Loop when we enable pagination on Discussion Settings.
+	 * In order to do that, it should exist a query var 'cpage' set with the $comment_args['paged'] value.
+	 */
+	function test_build_comment_query_vars_from_block_sets_cpage_var() {
+
+		// This could be any number, we set a fixed one instead of a random for better performance.
+		$comment_query_max_num_pages = 5;
+		// We substract 1 because we created 1 comment at the beggining.
+		$post_comments_numbers = ( self::$per_page * $comment_query_max_num_pages ) - 1;
+		self::factory()->comment->create_post_comments(
+			self::$custom_post->ID,
+			$post_comments_numbers,
+			array(
+				'comment_author'       => 'Test',
+				'comment_author_email' => 'test@example.org',
+				'comment_content'      => 'Hello world',
+			)
+		);
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+
+		$block  = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId'           => self::$custom_post->ID,
+				'comments/inherit' => true,
+			)
+		);
+		$actual = build_comment_query_vars_from_block( $block );
+		$this->assertEquals( $actual['paged'], $comment_query_max_num_pages );
+		$this->assertEquals( get_query_var( 'cpage' ), $comment_query_max_num_pages );
+	}
 }
