@@ -114,7 +114,6 @@ function IndentUI( { attributes, clientId } ) {
 						[ newListItemParent, newItem ]
 					);
 
-
 					// Restore the selection state.
 					selectionChange(
 						newItem.clientId,
@@ -151,27 +150,30 @@ function IndentUI( { attributes, clientId } ) {
 					const previousSibling = getBlock( previousSiblingId );
 					const previousSiblingChildren =
 						first( previousSibling.innerBlocks )?.innerBlocks || [];
-					const previousSiblingAttributes =
+					const previousSiblingListAttributes =
 						first( previousSibling.innerBlocks )?.attributes || {};
 					const block = getBlock( clientId );
+
+					const childListAttributes = first( block.innerBlocks )?.attributes;
 					const childItemBlocks =
 						first( block.innerBlocks )?.innerBlocks || [];
 
-					const newBlock = createListItem( block.attributes );
+
+					const newBlock = createListItem(
+						block.attributes,
+						childListAttributes,
+						childItemBlocks
+					);
 					// Replace the previous sibling of the block being indented and the indented block,
 					// with a new block whose attributes are equal to the ones of the previous sibling and
-					// whose descendants are the children of the previous sibling, followed by the indented block followed by the children of the indented block.
+					// whose descendants are the children of the previous sibling, followed by the indented block.
 					replaceBlocks(
 						[ previousSiblingId, clientId ],
 						[
 							createListItem(
 								previousSibling.attributes,
-								previousSiblingAttributes,
-								[
-									...previousSiblingChildren,
-									newBlock,
-									...childItemBlocks,
-								]
+								previousSiblingListAttributes,
+								[ ...previousSiblingChildren, newBlock ]
 							),
 						]
 					);
