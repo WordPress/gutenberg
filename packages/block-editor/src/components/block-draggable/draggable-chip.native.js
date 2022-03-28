@@ -29,6 +29,11 @@ const shadowStyle = {
 	elevation: 5,
 };
 
+/**
+ * Block draggable chip component
+ *
+ * @return {JSX.Element} Chip component.
+ */
 export default function BlockDraggableChip() {
 	const { blockIcon } = useSelect( ( select ) => {
 		const { getBlockName, getDraggedBlockClientIds } = select(
