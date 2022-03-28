@@ -15,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { isRTL, __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect, select } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { ToolbarButton } from '@wordpress/components';
 import {
 	formatOutdent,
@@ -46,18 +46,18 @@ function useIndentListItem( clientId ) {
 		[ clientId ]
 	);
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+	const {
+		getBlockRootClientId,
+		getBlock,
+		getBlockOrder,
+		getSelectionStart,
+		getSelectionEnd,
+		getBlockIndex,
+	} = useSelect( blockEditorStore );
+
 	return [
 		canIndent,
 		useCallback( () => {
-			const {
-				getBlockRootClientId,
-				getBlock,
-				getBlockOrder,
-				getSelectionStart,
-				getSelectionEnd,
-				getBlockIndex,
-			} = select( blockEditorStore );
-
 			const selectionStart = getSelectionStart();
 			const selectionEnd = getSelectionEnd();
 
@@ -122,17 +122,18 @@ function useOutdentListItem( clientId ) {
 		[ clientId ]
 	);
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+	const {
+		getBlockRootClientId,
+		getBlockAttributes,
+		getBlock,
+		getBlockIndex,
+		getSelectionStart,
+		getSelectionEnd,
+	} = useSelect( blockEditorStore );
+
 	return [
 		canOutdent,
 		useCallback( () => {
-			const {
-				getBlockRootClientId,
-				getBlockAttributes,
-				getBlock,
-				getBlockIndex,
-				getSelectionStart,
-				getSelectionEnd,
-			} = select( blockEditorStore );
 			const selectionStart = getSelectionStart();
 			const selectionEnd = getSelectionEnd();
 
