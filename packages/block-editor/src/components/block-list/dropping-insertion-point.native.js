@@ -62,6 +62,7 @@ export default function DroppingInsertionPoint( {
 	const { blocksLayouts, findBlockLayoutByClientId } = useBlockListContext();
 
 	const blockYPosition = useSharedValue( 0 );
+	const opacity = useSharedValue( 0 );
 
 	useAnimatedReaction(
 		() => hasStartedDraggingOver.value,
@@ -82,22 +83,27 @@ export default function DroppingInsertionPoint( {
 
 		if ( ! hasStartedDragging || ( previousElement && ! nextElement ) ) {
 			blockYPosition.value = 0;
+			opacity.value = withTiming( 0 );
 		} else {
-			blockYPosition.value =
-				( previousElement
-					? previousElement.y + previousElement.height
-					: nextElement.y ) - scroll.offsetY.value;
+			const nextPosition = previousElement
+				? previousElement.y + previousElement.height
+				: nextElement.y;
+			if ( blockYPosition.value !== nextPosition ) {
+				opacity.value = 0;
+				blockYPosition.value = nextPosition;
+				opacity.value = withTiming( 1 );
+			}
 		}
 	}, [ previousClientId, nextClientId, blocksLayouts.current ] );
 
 	const insertionPointStyles = useAnimatedStyle( () => {
 		return {
 			...styles[ 'dropping-insertion-point' ],
-			opacity: withTiming( blockYPosition.value !== 0 ? 1 : 0 ),
+			opacity: opacity.value,
 			transform: [
 				{ translateX: 0 },
 				{
-					translateY: blockYPosition.value,
+					translateY: blockYPosition.value - scroll.offsetY.value,
 				},
 			],
 		};
