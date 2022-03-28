@@ -2,6 +2,7 @@
  * External dependencies
  */
 const chalk = require( 'chalk' );
+const { readFileSync } = require( 'fs' );
 const { basename, dirname, extname, join, sep } = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
 
@@ -212,7 +213,9 @@ function getWebpackEntryPoints() {
 					editorScript,
 					script,
 					viewScript,
-				} = require( blockMetadataFile );
+				} = JSON.parse(
+					readFileSync( blockMetadataFile )
+				);
 				[ editorScript, script, viewScript ]
 					.flat()
 					.filter( ( value ) => value && value.startsWith( 'file:' ) )
