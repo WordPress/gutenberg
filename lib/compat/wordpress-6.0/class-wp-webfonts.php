@@ -333,6 +333,7 @@ class WP_Webfonts {
 			return;
 		}
 
+		wp_enqueue_style( 'wp-block-library' );
 		wp_add_inline_style( 'wp-block-library', $styles );
 	}
 
