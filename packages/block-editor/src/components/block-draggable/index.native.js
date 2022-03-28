@@ -107,9 +107,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 				scrollAnimation.value = scroll.offsetY.value;
 				const scrollOffsetTarget = Math.max(
 					0,
-					scroll.offsetY.value -
-						( scroll.offsetY.value - blockLayout.y ) -
-						EXTRA_OFFSET_WHEN_CLOSE_TO_TOP_EDGE
+					blockLayout.y - EXTRA_OFFSET_WHEN_CLOSE_TO_TOP_EDGE
 				);
 				scrollAnimation.value = withTiming( scrollOffsetTarget, {
 					duration: SCROLL_ANIMATION_DURATION,
