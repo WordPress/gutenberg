@@ -228,7 +228,7 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
  * @param array  $acceptable_units     An array of font size units.
  * @return array                       An array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ]
  */
-function gutenberg_get_typography_value_and_unit( $raw_value, $coerce_to = 'rem', $root_font_size_value = 16, $acceptable_units = array( 'rem', 'px', 'em' ) ) {
+function gutenberg_get_typography_value_and_unit( $raw_value, $coerce_to = '', $root_font_size_value = 16, $acceptable_units = array( 'rem', 'px', 'em' ) ) {
 	$acceptable_units_group = implode( '|', $acceptable_units );
 	$pattern                = '/^(\d*\.?\d+)(' . $acceptable_units_group . '){1,1}$/';
 
@@ -245,10 +245,12 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $coerce_to = 'rem'
 	// Default browser font size. Later we could inject some JS to compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
 	if ( 'px' === $coerce_to && ( 'em' === $unit || 'rem' === $unit ) ) {
 		$value = $value * $root_font_size_value;
+		$unit  = $coerce_to;
 	}
 
 	if ( 'px' === $unit && ( 'em' === $coerce_to || 'rem' === $coerce_to ) ) {
 		$value = $value / $root_font_size_value;
+		$unit  = $coerce_to;
 	}
 
 	return array(
@@ -258,9 +260,41 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $coerce_to = 'rem'
 }
 
 /**
- * Returns a font-size value based on a given font-size preset. If typography.fluid is enabled it will calculate clamp values.
+ * Internal implementation of clamp() based on available min/max viewport width, and min/max font sizes..
  *
- * @param array $preset Duotone preset value as seen in theme.json.
+ * @param array  $fluid_settings        Possible values: array( 'minViewportWidth' => string, 'maxViewportWidth' => string ).
+ * @param string $minimum_font_size_raw Minimumn font size for any clamp() calculation.
+ * @param string $maximum_font_size_raw Maximumn font size for any clamp() calculation.
+ * @return string                        A font-size value using clamp().
+ */
+function gutenberg_get_computed_typography_clamp_value( $fluid_settings, $minimum_font_size_raw, $maximum_font_size_raw ) {
+	$minimum_font_size = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw );
+	// We get a 'preferred' unit to keep units across the calc as consistent as possible.
+	$font_size_unit = $minimum_font_size['unit'];
+
+	// Grab the maximum font size and normalize it in order to use the value for calculations.
+	$maximum_font_size = gutenberg_get_typography_value_and_unit( $maximum_font_size_raw, $font_size_unit );
+	// Use rem for accessible fluid target font scaling.
+	$minimum_font_size_rem = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw, 'rem' );
+
+	// Viewport widths defined for fluid typography. Normalize units.
+	$maximum_viewport_width = gutenberg_get_typography_value_and_unit( $fluid_settings['maxViewportWidth'], $font_size_unit );
+	$minimum_viewport_width = gutenberg_get_typography_value_and_unit( $fluid_settings['minViewportWidth'], $font_size_unit );
+
+	// Build CSS rule.
+	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
+	$view_port_width_offset = round( $minimum_viewport_width['value'] / 100, 3 ) . $font_size_unit;
+	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
+	$linear_factor          = round( $linear_factor, 3 );
+	$fluid_target_font_size = 'calc(' . implode( '', $minimum_font_size_rem ) . " + ((1vw - $view_port_width_offset) * $linear_factor))";
+
+	return "clamp({$minimum_font_size_raw}, $fluid_target_font_size, {$maximum_font_size_raw})";
+}
+
+/**
+ * Returns a font-size value based on a given font-size preset. If typography.fluid is enabled it will try to return a fluid string.
+ *
+ * @param array $preset  fontSizes preset value as seen in theme.json.
  * @return string        Font-size value.
  */
 function gutenberg_get_typography_font_size_value( $preset ) {
@@ -269,6 +303,8 @@ function gutenberg_get_typography_font_size_value( $preset ) {
 	if ( ! isset( $typography_settings['fluid'] ) ) {
 		return $preset['size'];
 	}
+
+	$fluid_settings = $typography_settings['fluid'];
 
 	// Font sizes.
 	$fluid_font_size_settings = isset( $preset['fluidSize'] ) ? $preset['fluidSize'] : null;
@@ -280,15 +316,9 @@ function gutenberg_get_typography_font_size_value( $preset ) {
 	$minimum_font_size_raw = isset( $fluid_font_size_settings['minSize'] ) ? $fluid_font_size_settings['minSize'] : null;
 	$maximum_font_size_raw = isset( $fluid_font_size_settings['maxSize'] ) ? $fluid_font_size_settings['maxSize'] : null;
 	$fluid_formula         = isset( $fluid_font_size_settings['fluidFormula'] ) ? $fluid_font_size_settings['fluidFormula'] : null;
+	$viewport_widths_set   = isset( $fluid_settings['minViewportWidth'] ) && isset( $fluid_settings['maxViewportWidth'] );
 
-	// Fluid typography general settings.
 	// Gutenberg's internal implementation.
-	// If a minimum and maximum viewport width is set, let's try to use it.
-	$fluid_settings             = $typography_settings['fluid'];
-	$maximum_viewport_width_raw = isset( $fluid_settings['maxViewportWidth'] ) ? $fluid_settings['maxViewportWidth'] : null;
-	$minimum_viewport_width_raw = isset( $fluid_settings['minViewportWidth'] ) ? $fluid_settings['minViewportWidth'] : null;
-
-	// Expect all required variables except formula to trigger internal clamp() implementation based on min/max viewport width.
 
 	/*
 		"fluid": {
@@ -306,32 +336,12 @@ function gutenberg_get_typography_font_size_value( $preset ) {
 				"name": "Colossal"
 			}
 	*/
-	if ( $minimum_viewport_width_raw && $maximum_viewport_width_raw && $minimum_font_size_raw && $maximum_font_size_raw && ! $fluid_formula ) {
-		// In order to do fluid calculations, we need a "preferred" unit so the base values have the same ratio.
-		// We need to get the unit to "normalize" rem/em and px.
-		$preferred_font_size = gutenberg_get_typography_value_and_unit( $preset['size'] );
-		$font_size_unit      = $preferred_font_size['unit'];
-		$minimum_font_size   = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw );
-		// Grab the maximum font size and normalize it in order to use the value for calculations.
-		$maximum_font_size = gutenberg_get_typography_value_and_unit( $maximum_font_size_raw, $font_size_unit );
-		// Use rem for accessible fluid target font scaling.
-		$minimum_font_size_rem = gutenberg_get_typography_value_and_unit( $minimum_font_size, 'rem' );
-
-		// Viewport widths defined for fluid typography. Normalize units.
-		$maximum_viewport_width = gutenberg_get_typography_value_and_unit( $maximum_viewport_width_raw, $font_size_unit );
-		$minimum_viewport_width = gutenberg_get_typography_value_and_unit( $minimum_viewport_width_raw, $font_size_unit );
-
-		// Build CSS rule.
-		// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
-		$view_port_width_offset = round( $minimum_viewport_width['value'] / 100, 3 ) . $font_size_unit;
-		$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
-		$linear_factor          = round( $linear_factor, 3 );
-		$fluid_target_font_size = 'calc(' . implode( '', $minimum_font_size_rem ) . " + ((1vw - $view_port_width_offset) * $linear_factor))";
-
-		return "clamp({$minimum_font_size_raw}, $fluid_target_font_size, {$maximum_font_size_raw})";
+	// Expect all required variables except formula to trigger internal clamp() implementation based on min/max viewport width.
+	if ( ! $fluid_formula && $minimum_font_size_raw && $maximum_font_size_raw && $viewport_widths_set ) {
+		return gutenberg_get_computed_typography_clamp_value( $fluid_settings, $minimum_font_size_raw, $maximum_font_size_raw );
 	}
 
-	// If there's no min or max viewport, use custom implementation.
+	// If there are min or max viewport widths, use custom implementation if values available.
 	// min, max sizes and fluid formula? Use clamp().
 
 	/*
