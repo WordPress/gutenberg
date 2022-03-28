@@ -116,6 +116,26 @@ _Note: The will be `undefined` if a user clears all borders._
 
 - Required: Yes
 
+### `popoverClassNames`: `Object`
+
+An object defining CSS classnames for all the inner `BorderControl` popover
+content.
+
+Example:
+```js
+{
+	linked: 'linked-border-popover-content',
+	top: 'top-border-popover-content',
+	right: 'right-border-popover-content',
+	bottom: 'bottom-border-popover-content',
+	left: 'left-border-popover-content',
+}
+```
+
+By default, popovers are displayed relative to the button that initiated the popover. By supplying classnames for each individual popover, it is possible to add styling rules to align the popover positions to an unrelated design element, for example, the sidebar inspector in the block editor.
+
+- Required: No
+
 ### `value`: `Object`
 
 An object representing the current border configuration.
