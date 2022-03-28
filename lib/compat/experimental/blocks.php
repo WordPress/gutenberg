@@ -35,21 +35,8 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			$comment_args['hierarchical'] = false;
 		}
 
-		$inherit = ! empty( $block->context['comments/inherit'] );
-
-		$per_page = 0;
-		if ( $inherit && get_option( 'page_comments' ) ) {
-			$per_page = get_option( 'comments_per_page' );
-		}
-
-		if ( ! $inherit && ! empty( $block->context['comments/perPage'] ) ) {
-			$per_page = (int) $block->context['comments/perPage'];
-		}
-
+		$per_page     = get_option( 'comments_per_page' );
 		$default_page = get_option( 'default_comments_page' );
-		if ( ! $inherit && ! empty( $block->context['comments/defaultPage'] ) ) {
-			$default_page = $block->context['comments/defaultPage'];
-		}
 
 		if ( $per_page > 0 ) {
 			$comment_args['number'] = $per_page;
@@ -166,12 +153,16 @@ if ( ! function_exists( 'gutenberg_rest_comment_set_children_as_embeddable' ) ) 
 add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable' );
 
 /**
- * Sets a global JS variable used to trigger the availability of the experimental list block.
+ * Sets a global JS variable used to trigger the availability of the experimental blocks.
  */
-function gutenberg_enable_experimental_list_block() {
+function gutenberg_enable_experimental_blocks() {
 	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-list-v2', get_option( 'gutenberg-experiments' ) ) ) {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableListBlockV2 = true', 'before' );
 	}
+
+	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-quote-v2', get_option( 'gutenberg-experiments' ) ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableQuoteBlockV2 = true', 'before' );
+	}
 }
 
-add_action( 'admin_init', 'gutenberg_enable_experimental_list_block' );
+add_action( 'admin_init', 'gutenberg_enable_experimental_blocks' );

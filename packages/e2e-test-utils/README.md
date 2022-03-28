@@ -4,6 +4,8 @@ End-To-End (E2E) test utils for WordPress.
 
 _It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
+**Note that there's currently an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate E2E tests to Playwright instead. This package is deprecated and will only accept bug fixes until fully migrated.**
+
 ## Installation
 
 Install the module
@@ -403,6 +405,18 @@ Returns a promise which resolves with the edited post content (HTML string).
 _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
+
+### getListViewBlocks
+
+Gets all block anchor nodes in the list view that match a given block name label.
+
+_Parameters_
+
+-   _blockLabel_ `string`: the label of the block as displayed in the ListView.
+
+_Returns_
+
+-   `Promise`: all the blocks anchor nodes matching the lable in the ListView.
 
 ### getOption
 

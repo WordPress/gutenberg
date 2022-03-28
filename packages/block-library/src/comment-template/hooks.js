@@ -11,21 +11,13 @@ import apiFetch from '@wordpress/api-fetch';
  * Return an object with the query args needed to fetch the default page of
  * comments.
  *
- * @param {Object}  props             Hook props.
- * @param {number}  props.postId      ID of the post that contains the comments.
- * @param {number}  props.perPage     The number of comments included per page.
- * @param {string}  props.defaultPage Page shown by default (newest/oldest).
- * @param {boolean} props.inherit     Overwrite props with values from WP
- *                                    discussion settings.
+ * @param {Object} props        Hook props.
+ * @param {number} props.postId ID of the post that contains the comments.
+ *                              discussion settings.
  *
  * @return {Object} Query args to retrieve the comments.
  */
-export const useCommentQueryArgs = ( {
-	postId,
-	perPage,
-	defaultPage,
-	inherit,
-} ) => {
+export const useCommentQueryArgs = ( { postId } ) => {
 	// Initialize the query args that are not going to change.
 	const queryArgs = {
 		status: 'approve',
@@ -36,22 +28,14 @@ export const useCommentQueryArgs = ( {
 	};
 
 	// Get the Discussion settings that may be needed to query the comments.
-	const { commentsPerPage, defaultCommentsPage } = useSelect( ( select ) => {
+	const {
+		commentsPerPage: perPage,
+		defaultCommentsPage: defaultPage,
+	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
 		return __experimentalDiscussionSettings;
 	} );
-
-	// Overwrite the received attributes if `inherit` is true.
-	if ( inherit ) {
-		perPage = commentsPerPage;
-		defaultPage = defaultCommentsPage;
-	}
-
-	// If a block props is not set, use the settings value to generate the
-	// appropriate query arg.
-	perPage = perPage || commentsPerPage;
-	defaultPage = defaultPage || defaultCommentsPage;
 
 	// Get the number of the default page.
 	const page = useDefaultPageIndex( {

@@ -52,8 +52,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$block = new WP_Block(
 			$parsed_blocks[0],
 			array(
-				'postId'           => self::$custom_post->ID,
-				'comments/perPage' => 77,
+				'postId' => self::$custom_post->ID,
 			)
 		);
 
@@ -67,38 +66,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 				'update_comment_meta_cache' => false,
 				'post_id'                   => self::$custom_post->ID,
 				'hierarchical'              => 'threaded',
-				'number'                    => 77,
-				'paged'                     => 1,
-			)
-		);
-	}
-
-	function test_build_comment_query_vars_from_block_with_context_and_inherit() {
-		$parsed_blocks = parse_blocks(
-			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
-		);
-
-		$block = new WP_Block(
-			$parsed_blocks[0],
-			array(
-				'postId'           => self::$custom_post->ID,
-				'comments/perPage' => 77,
-				'comments/order'   => 'desc',
-				'comments/inherit' => true,
-			)
-		);
-
-		$this->assertEquals(
-			build_comment_query_vars_from_block( $block ),
-			array(
-				'orderby'                   => 'comment_date_gmt',
-				'order'                     => 'ASC',
-				'status'                    => 'approve',
-				'no_found_rows'             => false,
-				'update_comment_meta_cache' => false,
-				'post_id'                   => self::$custom_post->ID,
-				'hierarchical'              => 'threaded',
-				'number'                    => self::$per_page,
+				'number'                    => 5,
 				'paged'                     => 1,
 			)
 		);
@@ -120,32 +88,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 				'no_found_rows'             => false,
 				'update_comment_meta_cache' => false,
 				'hierarchical'              => 'threaded',
-			)
-		);
-	}
-
-	function test_build_comment_query_vars_from_block_with_context_and_pagination() {
-		$parsed_blocks = parse_blocks(
-			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
-		);
-
-		$block = new WP_Block(
-			$parsed_blocks[0],
-			array(
-				'comments/perPage' => 77,
-			)
-		);
-
-		$this->assertEquals(
-			build_comment_query_vars_from_block( $block ),
-			array(
-				'orderby'                   => 'comment_date_gmt',
-				'order'                     => 'ASC',
-				'status'                    => 'approve',
-				'no_found_rows'             => false,
-				'update_comment_meta_cache' => false,
-				'hierarchical'              => 'threaded',
-				'number'                    => 77,
+				'number'                    => 5,
 				'paged'                     => 1,
 			)
 		);
@@ -162,8 +105,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$block = new WP_Block(
 			$parsed_blocks[0],
 			array(
-				'postId'           => self::$custom_post->ID,
-				'comments/perPage' => 10,
+				'postId' => self::$custom_post->ID,
 			)
 		);
 
@@ -212,8 +154,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$block = new WP_Block(
 			$parsed_blocks[0],
 			array(
-				'postId'           => self::$custom_post->ID,
-				'comments/perPage' => 10,
+				'postId' => self::$custom_post->ID,
 			)
 		);
 

@@ -7,7 +7,12 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	focus,
+	isFormElement,
+	isTextField,
+	placeCaretAtHorizontalEdge,
+} from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -52,16 +57,6 @@ function useInitialPosition( clientId ) {
 	);
 }
 
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
-	);
-}
-
 /**
  * Transitions focus to the block or inner tabbable when the block becomes
  * selected and an initial position is set.
@@ -73,8 +68,14 @@ function isFormElement( element ) {
 export function useFocusFirstElement( clientId ) {
 	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
+	const { isBlockSelected } = useSelect( blockEditorStore );
 
 	useEffect( () => {
+		// Check if the block is still selected at the time this effect runs.
+		if ( ! isBlockSelected( clientId ) ) {
+			return;
+		}
+
 		if ( initialPosition === undefined || initialPosition === null ) {
 			return;
 		}
@@ -107,17 +108,13 @@ export function useFocusFirstElement( clientId ) {
 		}
 
 		// Check to see if element is focussable before a generic caret insert.
-		if ( ! target.getAttribute( 'contenteditable' ) ) {
-			const focusElement = focus.tabbable.findNext( target );
-			// Make sure focusElement is valid, form field, and within the current target element.
-			// Ensure is not block inserter trigger, don't want to focus that in the event of the group block which doesn't contain any other focussable elements.
+		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
+			const focusElement = focus.tabbable.findNext( ref.current );
+			// Make sure focusElement is valid, contained in the same block, and a form field.
 			if (
 				focusElement &&
-				isFormElement( focusElement ) &&
-				target.contains( focusElement ) &&
-				! focusElement.classList.contains(
-					'block-editor-button-block-appender'
-				)
+				isInsideRootBlock( ref.current, focusElement ) &&
+				isFormElement( focusElement )
 			) {
 				focusElement.focus();
 				return;
@@ -127,7 +124,7 @@ export function useFocusFirstElement( clientId ) {
 		setContentEditableWrapper( ref.current, false );
 
 		placeCaretAtHorizontalEdge( target, isReverse );
-	}, [ initialPosition ] );
+	}, [ initialPosition, clientId ] );
 
 	return ref;
 }

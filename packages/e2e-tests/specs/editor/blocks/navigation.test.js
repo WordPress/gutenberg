@@ -485,6 +485,11 @@ describe( 'Navigation', () => {
 				);
 				await startEmptyButton.click();
 
+				// Wait for Navigation creation to complete.
+				await page.waitForXPath(
+					'//*[contains(@class, "components-snackbar")]/*[text()="Navigation Menu successfully created."]'
+				);
+
 				// Wait for block to resolve
 				let navBlock = await waitForBlock( 'Navigation' );
 

@@ -16,13 +16,16 @@ import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockToolbar( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { canMove, canRemove } = useSelect(
+	const { canMove, canRemove, canLockBlocks } = useSelect(
 		( select ) => {
-			const { canMoveBlock, canRemoveBlock } = select( blockEditorStore );
+			const { canMoveBlock, canRemoveBlock, getSettings } = select(
+				blockEditorStore
+			);
 
 			return {
 				canMove: canMoveBlock( clientId ),
 				canRemove: canRemoveBlock( clientId ),
+				canLockBlocks: getSettings().__experimentalCanLockBlocks,
 			};
 		},
 		[ clientId ]
@@ -32,6 +35,10 @@ export default function BlockLockToolbar( { clientId } ) {
 		( isActive ) => ! isActive,
 		false
 	);
+
+	if ( ! canLockBlocks ) {
+		return null;
+	}
 
 	if ( canMove && canRemove ) {
 		return null;

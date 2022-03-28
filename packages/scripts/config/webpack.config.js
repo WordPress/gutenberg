@@ -99,7 +99,7 @@ const config = {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.ts', '.tsx', '...' ],
+		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.

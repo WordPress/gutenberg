@@ -16,6 +16,7 @@ import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
  * Internal dependencies
  */
 import { appendSelectors } from './utils';
+import { getGapCSSValue } from '../hooks/gap';
 import useSetting from '../components/use-setting';
 import { BlockControls, JustifyContentControl } from '../components';
 
@@ -90,7 +91,8 @@ export default {
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		const blockGapValue =
-			style?.spacing?.blockGap ?? 'var( --wp--style--block-gap, 0.5em )';
+			getGapCSSValue( style?.spacing?.blockGap, '0.5em' ) ??
+			'var( --wp--style--block-gap, 0.5em )';
 		const justifyContent =
 			justifyContentMap[ layout.justifyContent ] ||
 			justifyContentMap.left;
@@ -113,8 +115,8 @@ export default {
 			<style>{ `
 				${ appendSelectors( selector ) } {
 					display: flex;
-					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
 					flex-wrap: ${ flexWrap };
+					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
 					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
 				}
 

@@ -23,19 +23,6 @@ import { blockToMenuItem, menuItemToBlockAttributes } from './transform';
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 
 /**
- * Returns an action object used to select menu.
- *
- * @param {number} menuId The menu ID.
- * @return {Object} Action object.
- */
-export function setSelectedMenuId( menuId ) {
-	return {
-		type: 'SET_SELECTED_MENU_ID',
-		menuId,
-	};
-}
-
-/**
  * Converts all the blocks into menu items and submits a batch request to save everything at once.
  *
  * @param {Object} post A navigation post to process

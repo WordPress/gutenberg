@@ -61,7 +61,9 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": true
+		"__experimentalLayout": {
+			"allowOrientation": false
+		}
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"
