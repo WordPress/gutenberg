@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, first } from 'lodash';
+import { first } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,17 @@ import {
 	formatIndent,
 } from '@wordpress/icons';
 
-function IdentUI( { attributes, clientId } ) {
+function createListItem( listItemAttributes, listAttributes, children ) {
+	return createBlock(
+		'core/list-item',
+		listItemAttributes,
+		! children || ! children.length
+			? []
+			: [ createBlock( 'core/list', listAttributes, children ) ]
+	);
+}
+
+function IndentUI( { attributes, clientId } ) {
 	const { canOutdent, blockIndex } = useSelect(
 		( innerSelect ) => {
 			const { getBlockRootClientId, getBlockIndex } = innerSelect(
@@ -40,7 +50,7 @@ function IdentUI( { attributes, clientId } ) {
 		},
 		[ clientId ]
 	);
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
 	return (
 		<>
 			<ToolbarButton
@@ -55,7 +65,12 @@ function IdentUI( { attributes, clientId } ) {
 						getBlockAttributes,
 						getBlock,
 						getBlockIndex,
+						getSelectionStart,
+						getSelectionEnd,
 					} = select( blockEditorStore );
+					const selectionStart = getSelectionStart();
+					const selectionEnd = getSelectionEnd();
+
 					const listParentId = getBlockRootClientId( clientId );
 					const listAttributes = getBlockAttributes( listParentId );
 					const listItemParentId = getBlockRootClientId(
@@ -67,47 +82,47 @@ function IdentUI( { attributes, clientId } ) {
 
 					const index = getBlockIndex( clientId );
 					const siblingBlocks = getBlock( listParentId ).innerBlocks;
+					const previousSiblings = siblingBlocks.slice( 0, index );
+					const afterSiblings = siblingBlocks.slice( index + 1 );
 
-					const newListItemParent = createBlock(
-						'core/list-item',
+					// Create a new parent list item block with just the siblings
+					// that existed before the child item being outdent.
+					const newListItemParent = createListItem(
 						listItemParentAttributes,
-						index === 0
-							? []
-							: [
-									createBlock(
-										'core/list',
-										listAttributes,
-										siblingBlocks.slice( 0, index )
-									),
-							  ]
+						listAttributes,
+						previousSiblings
 					);
 
 					const childList = first( getBlock( clientId ).innerBlocks );
 					const childItems = childList?.innerBlocks || [];
 					const hasChildItems = !! childItems.length;
 
-					const newItem = createBlock(
-						'core/list-item',
+					// Create a new list item block whose attributes are equal to the
+					// block being outdent and whose children are the children that it had (if any)
+					// followed by the siblings that existed after it.
+					const newItem = createListItem(
 						attributes,
-						hasChildItems || index < siblingBlocks.length - 1
-							? [
-									createBlock(
-										'core/list',
-										hasChildItems
-											? childList.attributes
-											: listAttributes,
-										[
-											...childItems,
-											...siblingBlocks.slice( index + 1 ),
-										]
-									),
-							  ]
-							: []
+						hasChildItems ? childList.attributes : listAttributes,
+						[ ...childItems, ...afterSiblings ]
 					);
 
+					// Replace the parent list item block, with a new block containing
+					// the previous siblings, followed by another block containing after siblings
+					// in relation to the block being outdent.
 					replaceBlocks(
 						[ listItemParentId ],
 						[ newListItemParent, newItem ]
+					);
+
+
+					// Restore the selection state.
+					selectionChange(
+						newItem.clientId,
+						selectionEnd.attributeKey,
+						selectionEnd.clientId === selectionStart.clientId
+							? selectionStart.offset
+							: selectionEnd.offset,
+						selectionEnd.offset
 					);
 				} }
 			/>
@@ -122,7 +137,13 @@ function IdentUI( { attributes, clientId } ) {
 						getBlockRootClientId,
 						getBlock,
 						getBlockOrder,
+						getSelectionStart,
+						getSelectionEnd,
 					} = select( blockEditorStore );
+
+					const selectionStart = getSelectionStart();
+					const selectionEnd = getSelectionEnd();
+
 					const parentId = getBlockRootClientId( clientId );
 					const previousSiblingId = getBlockOrder( parentId )[
 						blockIndex - 1
@@ -130,35 +151,39 @@ function IdentUI( { attributes, clientId } ) {
 					const previousSibling = getBlock( previousSiblingId );
 					const previousSiblingChildren =
 						first( previousSibling.innerBlocks )?.innerBlocks || [];
-					const previousSiblingAttributes = first( previousSibling.innerBlocks )?.attributes || {};
+					const previousSiblingAttributes =
+						first( previousSibling.innerBlocks )?.attributes || {};
 					const block = getBlock( clientId );
 					const childItemBlocks =
 						first( block.innerBlocks )?.innerBlocks || [];
-					// Replace the block previous sibling of the block being indented and the indented block
-					// with a new block equal whose attributes are equal to the ones of the previous sibling and
+
+					const newBlock = createListItem( block.attributes );
+					// Replace the previous sibling of the block being indented and the indented block,
+					// with a new block whose attributes are equal to the ones of the previous sibling and
 					// whose descendants are the children of the previous sibling, followed by the indented block followed by the children of the indented block.
 					replaceBlocks(
 						[ previousSiblingId, clientId ],
 						[
-							createBlock(
-								'core/list-item',
+							createListItem(
 								previousSibling.attributes,
+								previousSiblingAttributes,
 								[
-									createBlock(
-										'core/list',
-										previousSiblingAttributes,
-										[
-											...previousSiblingChildren,
-											createBlock(
-												'core/list-item',
-												block.attributes
-											),
-											...childItemBlocks,
-										]
-									),
+									...previousSiblingChildren,
+									newBlock,
+									...childItemBlocks,
 								]
 							),
 						]
+					);
+
+					// Restore the selection state.
+					selectionChange(
+						newBlock.clientId,
+						selectionEnd.attributeKey,
+						selectionEnd.clientId === selectionStart.clientId
+							? selectionStart.offset
+							: selectionEnd.offset,
+						selectionEnd.offset
 					);
 				} }
 			/>
@@ -203,7 +228,7 @@ export default function ListItemEdit( {
 				{ innerBlocksProps.children }
 			</li>
 			<BlockControls group="block">
-				<IdentUI clientId={ clientId } attributes={ attributes } />
+				<IndentUI clientId={ clientId } attributes={ attributes } />
 			</BlockControls>
 		</>
 	);
