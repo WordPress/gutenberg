@@ -30,6 +30,41 @@ export function defaults( state = {}, action ) {
 }
 
 /**
+ * Higher order reducer that does the following:
+ * - Merges any data from the persistence layer into the state when the
+ *   `SET_PERSISTENCE_LAYER` action is received.
+ * - Passes any preferences changes to the persistence layer.
+ *
+ * @param {Function} reducer The preferences reducer.
+ *
+ * @return {Function} The enhanced reducer.
+ */
+function withPersistenceLayer( reducer ) {
+	let persistenceLayer;
+
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+
+		if ( action.type === 'SET_PERSISTENCE_LAYER' ) {
+			const { persistenceLayer: persistence, persistedData } = action;
+
+			persistenceLayer = persistence;
+
+			// TODO - is this the best strategy?
+			// Prioritize any user changes to state.
+			return {
+				...persistedData,
+				...nextState,
+			};
+		}
+
+		persistenceLayer.set( nextState );
+
+		return nextState;
+	};
+}
+
+/**
  * Reducer returning the user preferences.
  *
  * @param {Object} state  Current state.
@@ -37,7 +72,7 @@ export function defaults( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function preferences( state = {}, action ) {
+const preferences = withPersistenceLayer( ( state = {}, action ) => {
 	if ( action.type === 'SET_PREFERENCE_VALUE' ) {
 		const { scope, name, value } = action;
 		return {
@@ -50,7 +85,7 @@ export function preferences( state = {}, action ) {
 	}
 
 	return state;
-}
+} );
 
 export default combineReducers( {
 	defaults,

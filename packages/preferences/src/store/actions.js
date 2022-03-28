@@ -47,3 +47,17 @@ export function setDefaults( scope, defaults ) {
 		defaults,
 	};
 }
+
+/**
+ * Sets the persistence layer.
+ *
+ * @param {Object} persistenceLayer Sets the persistence layer.
+ */
+export async function setPersistenceLayer( persistenceLayer ) {
+	const persistedData = await persistenceLayer.get();
+	return {
+		type: 'SET_PERSISTENCE_LAYER',
+		persistenceLayer,
+		persistedData,
+	};
+}

@@ -130,6 +130,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+#### setPersistenceLayer
+
+Sets the persistence layer.
+
+_Parameters_
+
+-   _persistenceLayer_ `Object`: Sets the persistence layer.
+
 #### toggle
 
 Returns an action object used in signalling that a preference should be
