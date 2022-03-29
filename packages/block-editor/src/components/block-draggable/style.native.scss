@@ -2,6 +2,11 @@
 	flex: 1;
 }
 
+.draggable-chip__wrapper {
+	position: absolute;
+	z-index: 10;
+}
+
 .draggable-chip__container {
 	flex-direction: row;
 	padding: 16px;

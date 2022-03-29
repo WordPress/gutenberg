@@ -176,9 +176,8 @@ const BlockDraggableWrapper = ( { children } ) => {
 		runOnJS( stopDraggingBlocks )();
 	};
 
-	const chipStyles = useAnimatedStyle( () => {
+	const chipDynamicStyles = useAnimatedStyle( () => {
 		return {
-			position: 'absolute',
 			transform: [
 				{ translateX: chip.x.value - chip.width.value / 2 },
 				{
@@ -192,6 +191,10 @@ const BlockDraggableWrapper = ( { children } ) => {
 			],
 		};
 	} );
+	const chipStyles = [
+		chipDynamicStyles,
+		styles[ 'draggable-chip__wrapper' ],
+	];
 
 	return (
 		<>
