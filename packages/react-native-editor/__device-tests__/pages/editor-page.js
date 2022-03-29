@@ -331,7 +331,6 @@ class EditorPage {
 		if ( isAndroid() ) {
 			const size = await this.driver.getWindowSize();
 			const x = size.width / 2;
-
 			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
 			while (
 				! ( await this.driver.hasElementByAccessibilityId(
@@ -494,11 +493,7 @@ class EditorPage {
 	}
 
 	async typeTextToParagraphBlock( block, text, clear ) {
-		// const textViewElement = await this.getTextViewForParagraphBlock(
-		// 	block
-		// );
 		await typeString( this.driver, block, text, clear );
-		// await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
 	}
 
 	async sendTextToParagraphBlock( position, text, clear ) {

@@ -59,7 +59,5 @@ describe( 'Gutenberg Editor tests', () => {
 			paragraphBlockElement,
 			testData.mediumText
 		);
-
-		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 3 );
 	} );
 } );
