@@ -12,6 +12,7 @@ import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { Platform, useEffect } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -48,9 +49,9 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 
 		deprecated( 'Value attribute on the quote block', {
 			since: '6.0', // WP version
-			version: '6.5'
-			alternative: 'inner blocks'
-		});
+			version: '6.5',
+			alternative: 'inner blocks',
+		} );
 
 		registry.batch( () => {
 			updateBlockAttributes( clientId, newAttributes );
