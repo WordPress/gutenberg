@@ -12,7 +12,7 @@ import Animated, {
 /**
  * WordPress dependencies
  */
-import { memo } from '@wordpress/element';
+import { memo, useCallback, useRef } from '@wordpress/element';
 
 const List = memo( FlatList, isEqual );
 const AnimatedKeyboardAwareScrollView = Animated.createAnimatedComponent(
@@ -29,7 +29,11 @@ export const KeyboardAwareFlatList = ( {
 	onScroll,
 	...listProps
 } ) => {
+	const scrollViewRef = useRef();
+	const keyboardWillShowIndicator = useRef();
+
 	const latestContentOffsetY = useSharedValue( -1 );
+
 	const scrollHandler = useAnimatedScrollHandler( {
 		onScroll: ( event ) => {
 			const { contentOffset } = event;
@@ -37,6 +41,42 @@ export const KeyboardAwareFlatList = ( {
 			onScroll( event );
 		},
 	} );
+
+	const getRef = useCallback(
+		( ref ) => {
+			scrollViewRef.current = ref;
+			innerRef( ref );
+		},
+		[ scrollViewRef, innerRef ]
+	);
+	const onKeyboardWillHide = useCallback( () => {
+		keyboardWillShowIndicator.current = false;
+	}, [ keyboardWillShowIndicator ] );
+	const onKeyboardDidHide = useCallback( () => {
+		setTimeout( () => {
+			if (
+				! keyboardWillShowIndicator.current &&
+				latestContentOffsetY.value !== -1 &&
+				! shouldPreventAutomaticScroll()
+			) {
+				// Reset the content position if keyboard is still closed.
+				scrollViewRef.current?.scrollToPosition(
+					0,
+					latestContentOffsetY.value,
+					true
+				);
+			}
+		}, 50 );
+	}, [
+		keyboardWillShowIndicator,
+		latestContentOffsetY,
+		shouldPreventAutomaticScroll,
+		scrollViewRef,
+	] );
+	const onKeyboardWillShow = useCallback( () => {
+		keyboardWillShowIndicator.current = true;
+	}, [ keyboardWillShowIndicator ] );
+
 	return (
 		<AnimatedKeyboardAwareScrollView
 			style={ [ { flex: 1 }, scrollViewStyle ] }
@@ -49,34 +89,10 @@ export const KeyboardAwareFlatList = ( {
 			enableAutomaticScroll={
 				autoScroll === undefined ? false : autoScroll
 			}
-			ref={ ( ref ) => {
-				this.scrollViewRef = ref;
-				innerRef( ref );
-			} }
-			onKeyboardWillHide={ () => {
-				this.keyboardWillShowIndicator = false;
-			} }
-			onKeyboardDidHide={ () => {
-				setTimeout( () => {
-					if (
-						! this.keyboardWillShowIndicator &&
-						latestContentOffsetY.value !== -1 &&
-						! shouldPreventAutomaticScroll()
-					) {
-						// Reset the content position if keyboard is still closed.
-						if ( this.scrollViewRef ) {
-							this.scrollViewRef.scrollToPosition(
-								0,
-								latestContentOffsetY.value,
-								true
-							);
-						}
-					}
-				}, 50 );
-			} }
-			onKeyboardWillShow={ () => {
-				this.keyboardWillShowIndicator = true;
-			} }
+			ref={ getRef }
+			onKeyboardWillHide={ onKeyboardWillHide }
+			onKeyboardDidHide={ onKeyboardDidHide }
+			onKeyboardWillShow={ onKeyboardWillShow }
 			scrollEnabled={ listProps.scrollEnabled }
 			onScroll={ scrollHandler }
 		>
