@@ -216,7 +216,7 @@
 		"sass": "1.35.2",
 		"sass-loader": "12.1.0",
 		"semver": "7.3.5",
-		"simple-git": "^2.35.0",
+		"simple-git": "^3.3.0",
 		"snapshot-diff": "0.8.1",
 		"source-map-loader": "3.0.0",
 		"sprintf-js": "1.1.1",
