@@ -72,6 +72,8 @@ export default function useInput() {
 				} else {
 					event.preventDefault();
 				}
+			} else {
+				event.preventDefault();
 			}
 		}
 
