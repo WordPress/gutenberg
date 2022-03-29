@@ -22,6 +22,7 @@ function render_js_comment_post_form() {
 				},
 			});
 			const comment = await commentPosted.json();
+			console.log(comment);
 			if (comment) {
 				location.reload();
 			}

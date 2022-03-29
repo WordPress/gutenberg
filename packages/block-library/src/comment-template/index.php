@@ -13,20 +13,28 @@
  * @return string
  */
 function block_core_comment_template_render_comments( $comments, $block ) {
-	$content = '';
+	$content        = '';
+	$comments_array = array();
 	foreach ( $comments as $comment ) {
-
-		$block_content = ( new WP_Block(
+		$block_content       = ( new WP_Block(
 			$block->parsed_block,
 			array(
 				'commentId' => $comment->comment_ID,
 			)
 		) )->render( array( 'dynamic' => false ) );
+		$array_render_alpine = array(
+			'commentId' => $comment->comment_ID,
+			// 'comment_author'  => $comment->comment_author,
+			// 'comment_date'    => $comment->comment_date,
+			// 'comment_content' => htmlspecialchars( str_replace( '"', '&quot;', $comment->comment_content ) ),
+		);
+		array_push( $comments_array, json_encode( $array_render_alpine ) );
 
 		$children = $comment->get_children();
 
 		// If the comment has children, recurse to create the HTML for the nested
 		// comments.
+
 		if ( ! empty( $children ) ) {
 			$inner_content  = block_core_comment_template_render_comments(
 				$children,
@@ -37,6 +45,8 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 
 		$content .= '<li>' . $block_content . '</li>';
 	}
+	$x_data  = sprintf( 'x-data={ comments: [ %1$s ]}', json_encode( $comments_array ) );
+	$content = sprintf( '<div %1$s></div>', $x_data );
 
 	return $content;
 
