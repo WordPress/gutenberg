@@ -15,7 +15,7 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
  */
 import deprecationsForV1Block from '../deprecated';
 
-const migrateToQuoteV2 = ( attributes ) => {
+export const migrateToQuoteV2 = ( attributes ) => {
 	const { value } = attributes;
 
 	return [

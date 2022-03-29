@@ -9,24 +9,66 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { Platform } from '@wordpress/element';
+import { Platform, useEffect } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { migrateToQuoteV2 } from './deprecated';
 
 const isWebPlatform = Platform.OS === 'web';
 const TEMPLATE = [ [ 'core/paragraph', {} ] ];
 
+/**
+ * At the moment, deprecations don't handle create blocks from attributes
+ * (like when using CPT templates). For this reason, this hook is necessary
+ * to avoid breaking templates using the old quote block format.
+ *
+ * @param {Object} attributes Block attributes.
+ * @param {string} clientId   Block client ID.
+ */
+const useMigrateOnLoad = ( attributes, clientId ) => {
+	const registry = useRegistry();
+	const { updateBlockAttributes, replaceInnerBlocks } = useDispatch(
+		blockEditorStore
+	);
+	useEffect( () => {
+		// As soon as the block is loaded, migrate it to the new version.
+
+		if ( ! attributes.value ) {
+			// No need to migrate if it doesn't have the value attribute.
+			return;
+		}
+
+		const [ newAttributes, newInnerBlocks ] = migrateToQuoteV2(
+			attributes
+		);
+
+		registry.batch( () => {
+			updateBlockAttributes( clientId, newAttributes );
+			replaceInnerBlocks( clientId, newInnerBlocks );
+		} );
+	}, [ attributes.value ] );
+};
+
 export default function QuoteEdit( {
-	attributes: { citation },
+	attributes,
 	setAttributes,
 	isSelected,
 	insertBlocksAfter,
 	clientId,
 } ) {
+	const { citation } = attributes;
+
+	useMigrateOnLoad( attributes, clientId );
+
 	const isAncestorOfSelectedBlock = useSelect( ( select ) =>
 		select( blockEditorStore ).hasSelectedInnerBlock( clientId )
 	);
 	const hasSelection = isSelected || isAncestorOfSelectedBlock;
+
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
