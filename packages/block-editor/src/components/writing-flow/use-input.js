@@ -39,6 +39,8 @@ export default function useInput() {
 				return;
 			}
 
+			node.contentEditable = false;
+
 			if ( event.keyCode === ENTER ) {
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
@@ -64,22 +66,46 @@ export default function useInput() {
 			} else if (
 				// If key.length is longer than 1, it's a control key that doesn't
 				// input anything.
-				( event.key.length === 1 || event.key === 'Dead' ) &&
+				event.key.length === 1 &&
 				! ( event.metaKey || event.ctrlKey )
 			) {
 				if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {
 					event.preventDefault();
+					// Safari does not stop default behaviour with either
+					// event.preventDefault() or node.contentEditable = false, so
+					// remove the selection to stop browser manipulation.
+					node.ownerDocument.defaultView
+						.getSelection()
+						.removeAllRanges();
 				}
+			}
+		}
+
+		function onCompositionStart( event ) {
+			if ( ! hasMultiSelection() ) {
+				return;
+			}
+
+			node.contentEditable = false;
+
+			if ( __unstableIsSelectionMergeable() ) {
+				__unstableDeleteSelection();
 			} else {
 				event.preventDefault();
+				// Safari does not stop default behaviour with either
+				// event.preventDefault() or node.contentEditable = false, so
+				// remove the selection to stop browser manipulation.
+				node.ownerDocument.defaultView.getSelection().removeAllRanges();
 			}
 		}
 
 		node.addEventListener( 'keydown', onKeyDown );
+		node.addEventListener( 'compositionstart', onCompositionStart );
 		return () => {
 			node.removeEventListener( 'keydown', onKeyDown );
+			node.removeEventListener( 'compositionstart', onCompositionStart );
 		};
 	}, [] );
 }
