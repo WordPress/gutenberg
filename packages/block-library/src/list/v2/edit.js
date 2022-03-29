@@ -13,7 +13,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
-import { useDispatch, useSelect, select } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { isRTL, __ } from '@wordpress/i18n';
 import {
 	formatListBullets,
@@ -49,14 +49,13 @@ function useOutdentList( clientId ) {
 		[ clientId ]
 	);
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+	const { getBlockRootClientId, getBlockAttributes, getBlock } = useSelect(
+		blockEditorStore
+	);
+
 	return [
 		canOutdent,
 		useCallback( () => {
-			const {
-				getBlockRootClientId,
-				getBlockAttributes,
-				getBlock,
-			} = select( blockEditorStore );
 			const parentBlockId = getBlockRootClientId( clientId );
 			const parentBlockAttributes = getBlockAttributes( parentBlockId );
 			// Create a new parent block without the inner blocks.
