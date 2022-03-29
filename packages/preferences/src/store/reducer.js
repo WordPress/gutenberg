@@ -51,14 +51,20 @@ function withPersistenceLayer( reducer ) {
 			persistenceLayer = persistence;
 
 			// TODO - is this the best strategy?
-			// Prioritize any user changes to state.
-			return {
+			// Handle any changes to state that may have ocurred before
+			// preferences were loaded.
+			const mergedState = {
 				...persistedData,
 				...nextState,
 			};
+			persistenceLayer?.set( mergedState );
+
+			return mergedState;
 		}
 
-		persistenceLayer?.set( nextState );
+		if ( action.type === 'SET_PREFERENCE_VALUE' ) {
+			persistenceLayer?.set( nextState );
+		}
 
 		return nextState;
 	};
