@@ -14,18 +14,19 @@ import BlockLockModal from './modal';
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockMenuItem( { clientId } ) {
-	const { canLockBlocks, isLocked } = useSelect(
+	const { canLockBlock, isLocked } = useSelect(
 		( select ) => {
 			const {
 				canMoveBlock,
 				canRemoveBlock,
+				canLockBlockType,
+				getBlockName,
 				getBlockRootClientId,
-				getSettings,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 
 			return {
-				canLockBlocks: getSettings().__experimentalCanLockBlocks,
+				canLockBlock: canLockBlockType( getBlockName( clientId ) ),
 				isLocked:
 					! canMoveBlock( clientId, rootClientId ) ||
 					! canRemoveBlock( clientId, rootClientId ),
@@ -39,7 +40,7 @@ export default function BlockLockMenuItem( { clientId } ) {
 		false
 	);
 
-	if ( ! canLockBlocks ) {
+	if ( ! canLockBlock ) {
 		return null;
 	}
 

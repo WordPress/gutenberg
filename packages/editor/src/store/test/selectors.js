@@ -22,7 +22,6 @@ import { layout, footer, header } from '@wordpress/icons';
  * Internal dependencies
  */
 import * as _selectors from '../selectors';
-import { PREFERENCES_DEFAULTS } from '../defaults';
 
 const selectors = { ..._selectors };
 const selectorNames = Object.keys( selectors );
@@ -182,7 +181,6 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getEditedPostContent,
-	isPublishSidebarEnabled,
 	isPermalinkEditable,
 	getPermalink,
 	getPermalinkParts,
@@ -2566,39 +2564,6 @@ describe( 'selectors', () => {
 
 			expect( content ).toBe(
 				'<!-- wp:test-default {"modified":true} /-->'
-			);
-		} );
-	} );
-
-	describe( 'isPublishSidebarEnabled', () => {
-		it( 'should return the value on state if it is thruthy', () => {
-			const state = {
-				preferences: {
-					isPublishSidebarEnabled: true,
-				},
-			};
-			expect( isPublishSidebarEnabled( state ) ).toBe(
-				state.preferences.isPublishSidebarEnabled
-			);
-		} );
-
-		it( 'should return the value on state if it is falsy', () => {
-			const state = {
-				preferences: {
-					isPublishSidebarEnabled: false,
-				},
-			};
-			expect( isPublishSidebarEnabled( state ) ).toBe(
-				state.preferences.isPublishSidebarEnabled
-			);
-		} );
-
-		it( 'should return the default value if there is no isPublishSidebarEnabled key on state', () => {
-			const state = {
-				preferences: {},
-			};
-			expect( isPublishSidebarEnabled( state ) ).toBe(
-				PREFERENCES_DEFAULTS.isPublishSidebarEnabled
 			);
 		} );
 	} );

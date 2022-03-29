@@ -592,6 +592,24 @@ export function autosaves( state = {}, action ) {
 	return state;
 }
 
+export function blockPatterns( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERNS':
+			return action.patterns;
+	}
+
+	return state;
+}
+
+export function blockPatternCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERN_CATEGORIES':
+			return action.categories;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -606,4 +624,6 @@ export default combineReducers( {
 	embedPreviews,
 	userPermissions,
 	autosaves,
+	blockPatterns,
+	blockPatternCategories,
 } );

@@ -123,7 +123,7 @@ export const borderControlPopover = css`
 `;
 
 export const borderControlPopoverControls = css`
-	padding: ${ space( 4 ) };
+	padding: ${ space( 2 ) };
 
 	> div:first-of-type > ${ StyledLabel } {
 		margin-bottom: 0;
@@ -185,5 +185,6 @@ export const borderSlider = () => css`
 	${ StyledField } {
 		margin-bottom: 0;
 		font-size: 0;
+		display: flex;
 	}
 `;

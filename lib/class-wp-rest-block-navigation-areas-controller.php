@@ -37,8 +37,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => $this->get_collection_params(),
 				),
-				'schema'      => array( $this, 'get_public_item_schema' ),
-				'allow_batch' => array( 'v1' => true ),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 
@@ -46,7 +45,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<area>[\w-]+)',
 			array(
-				'args'   => array(
+				'args'        => array(
 					'area' => array(
 						'description' => __( 'An alphanumeric identifier for the navigation area.', 'gutenberg' ),
 						'type'        => 'string',
@@ -66,7 +65,8 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
 				),
-				'schema' => array( $this, 'get_public_item_schema' ),
+				'schema'      => array( $this, 'get_public_item_schema' ),
+				'allow_batch' => array( 'v1' => true ),
 			)
 		);
 	}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Patches preload paths for post editor.
+ * Patches resources loaded by the block editor page.
  *
  * @package gutenberg
  */
@@ -48,5 +48,19 @@ function optimize_preload_paths( $preload_paths ) {
 
 	return $preload_paths;
 }
-
 add_filter( 'block_editor_rest_api_preload_paths', 'optimize_preload_paths' );
+
+/**
+ * Disables loading remote block patterns from REST while initializing the editor.
+ * Nowadays these loads are done in the `block-patterns/patterns` REST endpoint, and
+ * are undesired when initializing the block editor page, both in post and site editor.
+ *
+ * @param WP_Screen $current_screen WordPress current screen object.
+ */
+function disable_load_remote_patterns( $current_screen ) {
+	$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
+	if ( $is_site_editor || $current_screen->is_block_editor() ) {
+		add_filter( 'should_load_remote_block_patterns', '__return_false' );
+	}
+}
+add_action( 'current_screen', 'disable_load_remote_patterns' );

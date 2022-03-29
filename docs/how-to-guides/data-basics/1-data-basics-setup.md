@@ -6,7 +6,7 @@ Also, this tutorial will lean heavily on Redux concepts such as state, actions, 
 
 ## Creating a plugin
 
-We'll do all the development inside of a WordPress plugin. Let's start by creating a `wp-content/plugins/my-first-gutenberg-app` directory in your local WordPress environment. We will need to create three files inside that directory:
+We'll do all the development inside of a WordPress plugin. Let's start by creating a `wp-content/plugins/my-first-gutenberg-app` directory in your local WordPress environment. We will need to create four files inside that directory:
 
 * my-first-gutenberg-app.php – to create a new admin page
 * src/index.js – for our JavaScript application
@@ -168,7 +168,7 @@ add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_scripts' );
 
 ## Setting up the build pipeline
 
-This tutorial will proceed assuming the reader is familiar with ESNext syntax and the concept of build tools (like webpack). If that sounds confusing, you may want to review the [Getting started with JavaScript Build Setup](/how-to-guides/javascript/js-build-setup.md) first.
+This tutorial will proceed assuming the reader is familiar with ESNext syntax and the concept of build tools (like webpack). If that sounds confusing, you may want to review the [Getting started with JavaScript Build Setup](/docs/how-to-guides/javascript/js-build-setup.md) first.
 
 To install the build tool, navigate to the plugin directory using your terminal and run `npm install`.
 

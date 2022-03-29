@@ -78,13 +78,13 @@ function Variation( { variation } ) {
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
-				aria-label={ variation?.name }
+				aria-label={ variation?.title }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
 				<div className="edit-site-global-styles-variations_item-preview">
 					<StylesPreview
-						label={ variation?.name }
+						label={ variation?.title }
 						isFocused={ isFocused }
 					/>
 				</div>
@@ -105,7 +105,7 @@ function ScreenStyleVariations() {
 	const withEmptyVariation = useMemo( () => {
 		return [
 			{
-				name: __( 'Default' ),
+				title: __( 'Default' ),
 				settings: {},
 				styles: {},
 			},
@@ -117,7 +117,7 @@ function ScreenStyleVariations() {
 		<>
 			<ScreenHeader
 				back="/"
-				title={ __( 'Other styles' ) }
+				title={ __( 'Browse styles' ) }
 				description={ __(
 					'Choose a different style combination for the theme styles'
 				) }

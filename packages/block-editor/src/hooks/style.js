@@ -42,6 +42,7 @@ import {
 } from './typography';
 import { SPACING_SUPPORT_KEY, DimensionsPanel } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
+import { shouldSkipSerialization } from './utils';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -201,6 +202,19 @@ const skipSerializationPathsSave = {
 };
 
 /**
+ * A dictionary used to normalize feature names between support flags, style
+ * object properties and __experimentSkipSerialization configuration arrays.
+ *
+ * This allows not having to provide a migration for a support flag and possible
+ * backwards compatibility bridges, while still achieving consistency between
+ * the support flag and the skip serialization array.
+ *
+ * @constant
+ * @type {Record<string, string>}
+ */
+const renamedFeatures = { gradients: 'gradient' };
+
+/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param {Object}                    props      Additional props applied to save element.
@@ -223,8 +237,17 @@ export function addSaveProps(
 	let { style } = attributes;
 
 	forEach( skipPaths, ( path, indicator ) => {
-		if ( getBlockSupport( blockType, indicator ) ) {
+		const skipSerialization = getBlockSupport( blockType, indicator );
+
+		if ( skipSerialization === true ) {
 			style = omit( style, path );
+		}
+
+		if ( Array.isArray( skipSerialization ) ) {
+			skipSerialization.forEach( ( featureName ) => {
+				const feature = renamedFeatures[ featureName ] || featureName;
+				style = omit( style, [ [ ...path, feature ] ] );
+			} );
 		}
 	} );
 
@@ -304,14 +327,27 @@ export const withBlockControls = createHigherOrderComponent(
  */
 const withElementsStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const elements = props.attributes.style?.elements;
-
 		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 			BlockListBlock
 		) }`;
+
+		const skipLinkColorSerialization = shouldSkipSerialization(
+			props.name,
+			COLOR_SUPPORT_KEY,
+			'link'
+		);
+
+		// The Elements API only supports link colors for now,
+		// hence the specific omission of `link` in the elements styles.
+		// This might need to be refactored or removed if the Elements API
+		// changes or `link` supports styles beyond `color`.
+		const elements = skipLinkColorSerialization
+			? omit( props.attributes.style?.elements, [ 'link' ] )
+			: props.attributes.style?.elements;
+
 		const styles = compileElementsStyles(
 			blockElementsContainerIdentifier,
-			props.attributes.style?.elements
+			elements
 		);
 		const element = useContext( BlockList.__unstableElementContext );
 

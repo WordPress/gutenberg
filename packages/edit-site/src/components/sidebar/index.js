@@ -14,6 +14,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import DefaultSidebar from './default-sidebar';
 import GlobalStylesSidebar from './global-styles-sidebar';
+import NavigationMenuSidebar from './navigation-menu-sidebar';
 import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import TemplateCard from './template-card';
@@ -77,6 +78,7 @@ export function SidebarComplementaryAreaFills() {
 				) }
 			</DefaultSidebar>
 			<GlobalStylesSidebar />
+			<NavigationMenuSidebar />
 		</>
 	);
 }

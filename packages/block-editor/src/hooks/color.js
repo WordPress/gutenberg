@@ -26,7 +26,12 @@ import {
 	getGradientValueBySlug,
 	getGradientSlugByValue,
 } from '../components/gradients';
-import { cleanEmptyObject, transformStyles, immutableSet } from './utils';
+import {
+	cleanEmptyObject,
+	transformStyles,
+	immutableSet,
+	shouldSkipSerialization,
+} from './utils';
 import ColorPanel from './color-panel';
 import useSetting from '../components/use-setting';
 
@@ -41,12 +46,6 @@ const hasColorSupport = ( blockType ) => {
 			colorSupport.background !== false ||
 			colorSupport.text !== false )
 	);
-};
-
-const shouldSkipSerialization = ( blockType ) => {
-	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
-
-	return colorSupport?.__experimentalSkipSerialization;
 };
 
 const hasLinkColorSupport = ( blockType ) => {
@@ -248,7 +247,7 @@ function addAttributes( settings ) {
 export function addSaveProps( props, blockType, attributes ) {
 	if (
 		! hasColorSupport( blockType ) ||
-		shouldSkipSerialization( blockType )
+		shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY )
 	) {
 		return props;
 	}
@@ -258,12 +257,31 @@ export function addSaveProps( props, blockType, attributes ) {
 	// I'd have preferred to avoid the "style" attribute usage here
 	const { backgroundColor, textColor, gradient, style } = attributes;
 
-	const backgroundClass = getColorClassName(
-		'background-color',
-		backgroundColor
-	);
-	const gradientClass = __experimentalGetGradientClass( gradient );
-	const textClass = getColorClassName( 'color', textColor );
+	const shouldSerialize = ( feature ) =>
+		! shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY, feature );
+
+	// Primary color classes must come before the `has-text-color`,
+	// `has-background` and `has-link-color` classes to maintain backwards
+	// compatibility and avoid block invalidations.
+	const textClass = shouldSerialize( 'text' )
+		? getColorClassName( 'color', textColor )
+		: undefined;
+
+	const gradientClass = shouldSerialize( 'gradients' )
+		? __experimentalGetGradientClass( gradient )
+		: undefined;
+
+	const backgroundClass = shouldSerialize( 'background' )
+		? getColorClassName( 'background-color', backgroundColor )
+		: undefined;
+
+	const serializeHasBackground =
+		shouldSerialize( 'background' ) || shouldSerialize( 'gradients' );
+	const hasBackground =
+		backgroundColor ||
+		style?.color?.background ||
+		( hasGradient && ( gradient || style?.color?.gradient ) );
+
 	const newClassName = classnames(
 		props.className,
 		textClass,
@@ -273,12 +291,12 @@ export function addSaveProps( props, blockType, attributes ) {
 			[ backgroundClass ]:
 				( ! hasGradient || ! style?.color?.gradient ) &&
 				!! backgroundClass,
-			'has-text-color': textColor || style?.color?.text,
-			'has-background':
-				backgroundColor ||
-				style?.color?.background ||
-				( hasGradient && ( gradient || style?.color?.gradient ) ),
-			'has-link-color': style?.elements?.link?.color,
+			'has-text-color':
+				shouldSerialize( 'text' ) &&
+				( textColor || style?.color?.text ),
+			'has-background': serializeHasBackground && hasBackground,
+			'has-link-color':
+				shouldSerialize( 'link' ) && style?.elements?.link?.color,
 		}
 	);
 	props.className = newClassName ? newClassName : undefined;
@@ -297,7 +315,7 @@ export function addSaveProps( props, blockType, attributes ) {
 export function addEditProps( settings ) {
 	if (
 		! hasColorSupport( settings ) ||
-		shouldSkipSerialization( settings )
+		shouldSkipSerialization( settings, COLOR_SUPPORT_KEY )
 	) {
 		return settings;
 	}
@@ -589,18 +607,27 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 			],
 			[ userPalette, themePalette, defaultPalette ]
 		);
-		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
+		if (
+			! hasColorSupport( name ) ||
+			shouldSkipSerialization( name, COLOR_SUPPORT_KEY )
+		) {
 			return <BlockListBlock { ...props } />;
 		}
 		const extraStyles = {};
 
-		if ( textColor ) {
+		if (
+			textColor &&
+			! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'text' )
+		) {
 			extraStyles.color = getColorObjectByAttributeValues(
 				colors,
 				textColor
 			)?.color;
 		}
-		if ( backgroundColor ) {
+		if (
+			backgroundColor &&
+			! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'background' )
+		) {
 			extraStyles.backgroundColor = getColorObjectByAttributeValues(
 				colors,
 				backgroundColor

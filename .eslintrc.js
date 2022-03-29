@@ -230,18 +230,19 @@ module.exports = {
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
-			files: [
-				'packages/e2e-tests/**/*.js',
-				'packages/e2e-test-utils/**/*.js',
-			],
+			files: [ 'packages/e2e-test*/**/*.js' ],
+			excludedFiles: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
+			rules: {
+				'jest/expect-expect': 'off',
+			},
 		},
 		{
 			files: [
 				'test/e2e/**/*.[tj]s',
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
 			],
-			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e-playwright' ],
+			extends: [ 'plugin:eslint-plugin-playwright/playwright-test' ],
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',

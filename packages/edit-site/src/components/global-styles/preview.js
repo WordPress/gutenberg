@@ -91,7 +91,7 @@ const StylesPreview = ( { label, isFocused } ) => {
 			{ containerResizeListener }
 			<motion.div
 				style={ {
-					height: '100%',
+					height: 150 * ratio,
 					width: '100%',
 					background: gradientValue ?? backgroundColor,
 					cursor: 'pointer',
