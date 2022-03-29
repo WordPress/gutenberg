@@ -45,7 +45,7 @@ const defaultRenderToggle = ( {
 			<Icon
 				icon={ plus }
 				style={
-					styles[ 'inserter-menu__add-block-button-icon-default' ]
+					styles[ 'inserter-menu__add-block-button-icon--default' ]
 				}
 			/>
 		),
@@ -261,7 +261,7 @@ export class Inserter extends Component {
 		}
 		const style = getStylesFromColorScheme(
 			styles[ 'inserter-menu__add-block-button-icon' ],
-			styles[ 'inserter-menu__add-block-button-icon-dark' ]
+			styles[ 'inserter-menu__add-block-button-icon--dark' ]
 		);
 
 		const onPress = () => {

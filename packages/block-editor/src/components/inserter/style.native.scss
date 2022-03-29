@@ -1,26 +1,26 @@
 /** @format */
 
+.inserter-menu__add-block-button-icon {
+	color: $blue-wordpress;
+}
+
+.inserter-menu__add-block-button-icon--dark {
+	color: $blue-30;
+}
+
+.inserter-menu__add-block-button-icon--default {
+	color: $white;
+	margin-left: 4px;
+}
+
 .inserter-menu__add-block-button {
 	border-radius: 16px;
 	margin: 6px 12px;
 	background-color: $blue-wordpress;
 }
 
-.inserter-menu__add-block-button-icon {
-	color: $blue-wordpress;
-}
-
-.inserter-menu__add-block-button-icon-dark {
-	color: $blue-30;
-}
-
-.inserter-menu__add-block-button-icon-default {
-	color: #fff;
-	margin-left: 4px;
-}
-
 .inserter-menu__add-block-button-text {
-	color: #fff;
+	color: $white;
 	font-size: 12px;
 	font-weight: 500;
 	padding-top: 4px;
