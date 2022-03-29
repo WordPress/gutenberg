@@ -35,7 +35,10 @@ function findSelection( blocks ) {
 		);
 
 		if ( attributeKey ) {
-			return [ blocks[ i ].clientId, attributeKey, 0 ];
+			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
+				attributeKey
+			].replace( START_OF_SELECTED_AREA, '' );
+			return blocks[ i ].clientId;
 		}
 
 		const nestedSelection = findSelection( blocks[ i ].innerBlocks );
@@ -89,8 +92,8 @@ export function useInputRules( props ) {
 			} );
 			const block = transformation.transform( content );
 
+			selectionChange( findSelection( [ block ] ) );
 			onReplace( [ block ] );
-			selectionChange( ...findSelection( [ block ] ) );
 			__unstableMarkAutomaticChange();
 		}
 
