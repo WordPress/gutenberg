@@ -21,32 +21,47 @@ import { useGlobalStylesOutput } from './use-global-styles-output';
 
 const firstFrame = {
 	start: {
-		opacity: 1,
+		clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
 		transition: { delay: 0.5 },
 	},
 	hover: {
-		opacity: 0,
+		clipPath: [
+			'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+			'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+			'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
+		],
 	},
 };
 
 const midFrame = {
 	hover: {
-		x: [ '100%', '-100%', '-100%' ],
-		transition: { type: 'spring', duration: 1, delay: 0.2 },
+		scaleX: [ 1, 1.3, 1.6 ],
+		// x: [ '0%', '10%', '20%' ],
+		clipPath: [
+			'polygon(0 0, 0 0, 0 100%, 0% 100%)',
+			'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+			'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
+		],
+		transition: { type: 'tween', duration: 1, delay: 0.2 },
 	},
 	start: {
-		x: '100%',
-		transition: { type: 'spring', duration: 1, delay: 0.2 },
+		// x: '70%',
+		clipPath: 'polygon(0 0, 0 0, 0 100%, 0% 100%)',
+		transition: { type: 'tween', duration: 1, delay: 0.2 },
 	},
 };
 
 const secondFrame = {
 	hover: {
-		opacity: 1,
-		transition: { delay: 0.6 },
+		clipPath: [
+			'polygon(0 0, 0 0, 0 100%, 0 100%)',
+			'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+			'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+		],
+		transition: { delay: 0.8 },
 	},
 	start: {
-		opacity: 0,
+		clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
 	},
 };
 
@@ -144,19 +159,16 @@ const StylesPreview = ( { label, isFocused } ) => {
 							overflow: 'hidden',
 						} }
 					>
-						<motion.div
+						<div
 							style={ {
 								fontFamily: headingFontFamily,
 								fontSize: 65 * ratio,
 								color: headingColor,
 								fontWeight: headingFontWeight,
 							} }
-							animate={ { scale: 1, opacity: 1 } }
-							initial={ { scale: 0.8, opacity: 0 } }
-							transition={ { delay: 0.2 } }
 						>
 							Aa
-						</motion.div>
+						</div>
 						<VStack spacing={ 4 * ratio }>
 							{ highlightedColors.map(
 								( { slug, color }, index ) => (
@@ -193,6 +205,7 @@ const StylesPreview = ( { label, isFocused } ) => {
 						width: '100%',
 						position: 'absolute',
 						top: 0,
+						overflow: 'hidden',
 					} }
 				>
 					<HStack
