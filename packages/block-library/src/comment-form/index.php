@@ -25,14 +25,11 @@ function render_block_core_comment_form( $attributes, $content, $block ) {
 
 	$form_contents = <<<END
 	<turbo-frame id="new_comment">
-	<form action="/wp-comments-post.php" method="post">
-	<label for="name">Name:</label>
-	<input type="text" id="name" name="name" required size="10">
-
-	<label for="comment">Tell us your story:</label>
-	<textarea id="comment" name="comment" rows="5" cols="33">
-		It was a dark and stormy night...
-	</textarea>
+	<h3 id="reply-title" class="comment-reply-title">Leave a Reply</h3>
+	<form action="/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
+	<p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> <span class="required-field-message" aria-hidden="true">Required fields are marked <span class="required" aria-hidden="true">*</span></span></p>
+	<p class="comment-form-comment"><label for="comment">Comment <span class="required" aria-hidden="true">*</span></label><textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required></textarea></p>
+	<p class="comment-form-author"><label for="author">Name <span class="required" aria-hidden="true">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" required /></p>
 	<input type="hidden" name="comment_post_ID" value="{$block->context['postId']}">
 	<input type="submit" value="Submit">
 	<form>
