@@ -30,7 +30,7 @@ export const migrateToQuoteV2 = ( attributes ) => {
 					query: {
 						content: {
 							type: 'string',
-							source: 'text',
+							source: 'html',
 						},
 					},
 			  } ).map( ( { content } ) =>

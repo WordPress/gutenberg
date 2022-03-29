@@ -65,4 +65,28 @@ describe( 'Migrate quote block', () => {
 <!-- /wp:paragraph -->`
 		);
 	} );
+
+	it( 'should keep the formats of the value', () => {
+		const [ attributes, innerBlocks ] = migrateToQuoteV2( {
+			value:
+				'<p><strong>Bold</strong></p><p> and </p><p><em>italic</em></p>',
+			citation: 'Author',
+		} );
+		expect( attributes ).toEqual( {
+			citation: 'Author',
+		} );
+		expect( serialize( innerBlocks ) ).toEqual(
+			`<!-- wp:paragraph -->
+<p><strong>Bold</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p> and </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><em>italic</em></p>
+<!-- /wp:paragraph -->`
+		);
+	} );
 } );
