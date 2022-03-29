@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import { findKey } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-import { slice, toHTMLString } from '@wordpress/rich-text';
+import { insert, toHTMLString } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -12,6 +17,34 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { preventEventDiscovery } from './prevent-event-discovery';
+
+// A robust way to retain selection position through various
+// transforms is to insert a special character at the position and
+// then recover it.
+const START_OF_SELECTED_AREA = '\u0086';
+
+function findSelection( blocks ) {
+	let i = blocks.length;
+
+	while ( i-- ) {
+		const attributeKey = findKey(
+			blocks[ i ].attributes,
+			( v ) =>
+				typeof v === 'string' &&
+				v.indexOf( START_OF_SELECTED_AREA ) !== -1
+		);
+
+		if ( attributeKey ) {
+			return [ blocks[ i ].clientId, attributeKey, 0 ];
+		}
+
+		const nestedSelection = findSelection( blocks[ i ].innerBlocks );
+
+		if ( nestedSelection ) {
+			return nestedSelection;
+		}
+	}
+}
 
 export function useInputRules( props ) {
 	const {
@@ -22,7 +55,7 @@ export function useInputRules( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function inputRule() {
-			const { value, onReplace } = propsRef.current;
+			const { value, onReplace, selectionChange } = propsRef.current;
 
 			if ( ! onReplace ) {
 				return;
@@ -52,11 +85,12 @@ export function useInputRules( props ) {
 			}
 
 			const content = toHTMLString( {
-				value: slice( value, start, text.length ),
+				value: insert( value, START_OF_SELECTED_AREA, 0, start ),
 			} );
 			const block = transformation.transform( content );
 
 			onReplace( [ block ] );
+			selectionChange( ...findSelection( [ block ] ) );
 			__unstableMarkAutomaticChange();
 		}
 
