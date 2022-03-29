@@ -133,6 +133,18 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		'title',
 	);
 
+	const TO_OPT_IN = array(
+		array( 'border', 'color' ),
+		array( 'border', 'radius' ),
+		array( 'border', 'style' ),
+		array( 'border', 'width' ),
+		array( 'color', 'link' ),
+		array( 'spacing', 'blockGap' ),
+		array( 'spacing', 'margin' ),
+		array( 'spacing', 'padding' ),
+		array( 'typography', 'lineHeight' ),
+	);
+
 	/**
 	 * The valid properties under the settings key.
 	 *
@@ -465,8 +477,38 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 		}
 
+		$flattened_theme_json = static::do_opt_out_of_settings( $flattened_theme_json );
+
 		wp_recursive_ksort( $flattened_theme_json );
 
 		return $flattened_theme_json;
+	}
+
+	protected static function do_opt_in_into_settings( &$context ) {
+		foreach ( static::TO_OPT_IN as $path ) {
+			// Use "unset prop" as a marker instead of "null" because
+			// "null" can be a valid value for some props (e.g. blockGap).
+			if ( 'unset prop' === _wp_array_get( $context, $path, 'unset prop' ) ) {
+				_wp_array_set( $context, $path, true );
+			}
+		}
+	}
+
+	protected static function do_opt_out_of_settings( $theme_json ) {
+		if ( array_key_exists( 'appearanceTools', $theme_json['settings'] ) ) { // Is it safe to assume that 'settings' always exsits?
+			foreach ( static::TO_OPT_IN as $path ) {
+				// Remove the path.
+				if ( ! empty( $theme_json['settings'][ $path[ 0 ] ][ $path[ 1 ] ] ) ) {
+					unset( $theme_json['settings'][ $path[ 0 ] ][ $path[ 1 ] ] );
+				}
+
+				// If the setting is now empty then we can remove it.
+				if ( empty( $theme_json['settings'][ $path[ 0 ] ] ) ) {
+					unset( $theme_json['settings'][ $path[ 0 ] ] );
+				}
+			}
+		}
+
+		return $theme_json;
 	}
 }
