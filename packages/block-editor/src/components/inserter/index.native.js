@@ -40,6 +40,10 @@ const defaultRenderToggle = ( {
 	onLongPress,
 	isDefaultView,
 } ) => {
+	// The "default view" refers to the editor's appearance when no blocks
+	// are currently selected. The "add block" button has a separate style
+	// for the "default view", which are added via the below "defaultViewProps"
+	// and "defaultViewText" variables.
 	const defaultViewProps = isDefaultView && {
 		icon: (
 			<Icon
@@ -53,6 +57,11 @@ const defaultRenderToggle = ( {
 		fixedRatio: false,
 		iconSize: 22,
 	};
+	const defaultViewText = (
+		<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
+			{ __( 'Add content' ) }
+		</Text>
+	);
 
 	return (
 		<ToolbarButton
@@ -78,13 +87,7 @@ const defaultRenderToggle = ( {
 			isDisabled={ disabled }
 			{ ...defaultViewProps }
 		>
-			{ isDefaultView && (
-				<Text
-					style={ styles[ 'inserter-menu__add-block-button-text' ] }
-				>
-					{ __( 'Add content' ) }
-				</Text>
-			) }
+			{ isDefaultView && defaultViewText }
 		</ToolbarButton>
 	);
 };
