@@ -36,8 +36,7 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
-				'schema'      => array( $this, 'get_public_item_schema' ),
-				'allow_batch' => array( 'v1' => true ),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 	}
