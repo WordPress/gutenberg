@@ -117,7 +117,7 @@ function ScreenStyleVariations() {
 		<>
 			<ScreenHeader
 				back="/"
-				title={ __( 'Other styles' ) }
+				title={ __( 'Browse styles' ) }
 				description={ __(
 					'Choose a different style combination for the theme styles'
 				) }

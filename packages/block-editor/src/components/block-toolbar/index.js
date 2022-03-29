@@ -19,10 +19,13 @@ import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
 import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
+import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
+import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import { useShowMoversGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
+import __unstableBlockNameContext from './block-name-context';
 
 export default function BlockToolbar( { hideDragHandle } ) {
 	const {
@@ -127,6 +130,9 @@ export default function BlockToolbar( { hideDragHandle } ) {
 					</ToolbarGroup>
 				) }
 			</div>
+			{ shouldShowVisualToolbar && isMultiToolbar && (
+				<BlockGroupToolbar />
+			) }
 			{ shouldShowVisualToolbar && (
 				<>
 					<BlockControls.Slot
@@ -146,6 +152,11 @@ export default function BlockToolbar( { hideDragHandle } ) {
 						group="other"
 						className="block-editor-block-toolbar__slot"
 					/>
+					<__unstableBlockNameContext.Provider
+						value={ blockType?.name }
+					>
+						<__unstableBlockToolbarLastItem.Slot />
+					</__unstableBlockNameContext.Provider>
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />

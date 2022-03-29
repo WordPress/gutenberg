@@ -16,16 +16,19 @@ import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockToolbar( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { canMove, canRemove, canLockBlocks } = useSelect(
+	const { canMove, canRemove, canLockBlock } = useSelect(
 		( select ) => {
-			const { canMoveBlock, canRemoveBlock, getSettings } = select(
-				blockEditorStore
-			);
+			const {
+				canMoveBlock,
+				canRemoveBlock,
+				canLockBlockType,
+				getBlockName,
+			} = select( blockEditorStore );
 
 			return {
 				canMove: canMoveBlock( clientId ),
 				canRemove: canRemoveBlock( clientId ),
-				canLockBlocks: getSettings().__experimentalCanLockBlocks,
+				canLockBlock: canLockBlockType( getBlockName( clientId ) ),
 			};
 		},
 		[ clientId ]
@@ -36,7 +39,7 @@ export default function BlockLockToolbar( { clientId } ) {
 		false
 	);
 
-	if ( ! canLockBlocks ) {
+	if ( ! canLockBlock ) {
 		return null;
 	}
 
@@ -55,6 +58,7 @@ export default function BlockLockToolbar( { clientId } ) {
 						blockInformation.title
 					) }
 					onClick={ toggleModal }
+					aria-disabled={ ! canLockBlock }
 				/>
 			</ToolbarGroup>
 			{ isModalOpen && (

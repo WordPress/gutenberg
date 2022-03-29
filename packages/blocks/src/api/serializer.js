@@ -24,7 +24,10 @@ import {
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
 } from './registration';
+import { serializeRawBlock } from './parser/serialize-raw-block';
 import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
+
+/** @typedef {import('./parser').WPBlock} WPBlock */
 
 /**
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
@@ -337,12 +340,16 @@ export function getCommentDelimitedContent(
  * Returns the content of a block, including comment delimiters, determining
  * serialized attributes and content form from the current state of the block.
  *
- * @param {Object}                      block   Block instance.
- * @param {WPBlockSerializationOptions} options Serialization options.
+ * @param {WPBlock}                      block   Block instance.
+ * @param {WPBlockSerializationOptions}  options Serialization options.
  *
  * @return {string} Serialized block.
  */
 export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
+	if ( ! block.isValid && block.__unstableBlockSource ) {
+		return serializeRawBlock( block.__unstableBlockSource );
+	}
+
 	const blockName = block.name;
 	const saveContent = getBlockInnerHTML( block );
 

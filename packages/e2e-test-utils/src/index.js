@@ -87,6 +87,7 @@ export { toggleMoreMenu } from './toggle-more-menu';
 export { toggleOfflineMode, isOfflineMode } from './offline-mode';
 export { togglePreferencesOption } from './toggle-preferences-option';
 export { transformBlockTo } from './transform-block-to';
+export { trashAllComments } from './trash-all-comments';
 export { uninstallPlugin } from './uninstall-plugin';
 export { visitAdminPage } from './visit-admin-page';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';

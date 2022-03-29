@@ -2,9 +2,18 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Update `BorderControl` and `BorderBoxControl` to allow the passing of custom class names to popovers ([#39753](https://github.com/WordPress/gutenberg/pull/39753)).
+
 ### Internal
 
 -   `BaseControl`: Convert to TypeScript ([#39468](https://github.com/WordPress/gutenberg/pull/39468)).
+
+### New Features
+
+- Add `BorderControl` component ([#37769](https://github.com/WordPress/gutenberg/pull/37769)).
+- Add `BorderBoxControl` component ([#38876](https://github.com/WordPress/gutenberg/pull/38876)).
 
 ## 19.7.0 (2022-03-23)
 

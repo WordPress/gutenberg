@@ -38,13 +38,12 @@ import {
 	Button,
 	Spinner,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
-import useListViewModal from './use-list-view-modal';
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
@@ -167,6 +166,10 @@ function Navigation( {
 	// the Select Menu dropdown.
 	useNavigationEntities();
 
+	const [ showNavigationMenuDeleteNotice ] = useNavigationNotice( {
+		name: 'block-library/core/navigation/delete',
+	} );
+
 	const [
 		showNavigationMenuCreateNotice,
 		hideNavigationMenuCreateNotice,
@@ -282,10 +285,6 @@ function Navigation( {
 
 	const navRef = useRef();
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
-
-	const { listViewToolbarButton, listViewModal } = useListViewModal(
-		clientId
-	);
 
 	const {
 		convert,
@@ -646,9 +645,7 @@ function Navigation( {
 							/>
 						</ToolbarGroup>
 					) }
-					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
 				</BlockControls>
-				{ listViewModal }
 				<InspectorControls>
 					{ hasSubmenuIndicatorSetting && (
 						<PanelBody title={ __( 'Display' ) }>
@@ -794,7 +791,18 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationMenu &&
 							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
-									onDelete={ resetToEmptyBlock }
+									onDelete={ ( deletedMenuTitle = '' ) => {
+										resetToEmptyBlock();
+										showNavigationMenuDeleteNotice(
+											sprintf(
+												// translators: %s: the name of a menu (e.g. Header navigation).
+												__(
+													'Navigation menu %s successfully deleted.'
+												),
+												deletedMenuTitle
+											)
+										);
+									} }
 								/>
 							) }
 					</InspectorControls>

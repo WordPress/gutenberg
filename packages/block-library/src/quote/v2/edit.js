@@ -3,24 +3,21 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	BlockControls,
 	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	BlockQuotation,
-	ToolbarGroup,
-	ToolbarButton,
-} from '@wordpress/components';
+import { BlockQuotation } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
+import { Platform } from '@wordpress/element';
 
+const isWebPlatform = Platform.OS === 'web';
 const TEMPLATE = [ [ 'core/paragraph', {} ] ];
 
 export default function QuoteEdit( {
-	attributes: { attribution },
+	attributes: { citation },
 	setAttributes,
 	isSelected,
 	insertBlocksAfter,
@@ -29,64 +26,42 @@ export default function QuoteEdit( {
 	const isAncestorOfSelectedBlock = useSelect( ( select ) =>
 		select( blockEditorStore ).hasSelectedInnerBlock( clientId )
 	);
-	const hasAttribution = attribution !== null;
-	const isEditingQuote = isSelected || isAncestorOfSelectedBlock;
-	const showAttribution =
-		( isEditingQuote && hasAttribution ) ||
-		! RichText.isEmpty( attribution );
-
+	const hasSelection = isSelected || isAncestorOfSelectedBlock;
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps(
-		showAttribution ? blockProps : {},
-		{
-			template: TEMPLATE,
-			templateInsertUpdatesSelection: true,
-		}
-	);
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+		templateInsertUpdatesSelection: true,
+	} );
 
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						isActive={ hasAttribution }
-						label={ __( 'Toggle attribution visibility' ) }
-						onClick={ () =>
-							setAttributes( {
-								attribution: hasAttribution ? null : '',
-							} )
-						}
-					>
-						{ __( 'Add attribution' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
-			</BlockControls>
-			{ showAttribution ? (
-				<figure { ...blockProps }>
-					<BlockQuotation { ...innerBlocksProps } />
+			<BlockQuotation { ...innerBlocksProps }>
+				{ innerBlocksProps.children }
+				{ ( ! RichText.isEmpty( citation ) || hasSelection ) && (
 					<RichText
-						identifier="attribution"
-						tagName={ 'figcaption' }
+						identifier="citation"
+						tagName={ isWebPlatform ? 'cite' : undefined }
 						style={ { display: 'block' } }
-						value={ attribution ?? '' }
-						onChange={ ( nextAttribution ) => {
-							setAttributes( { attribution: nextAttribution } );
+						value={ citation }
+						onChange={ ( nextCitation ) => {
+							setAttributes( {
+								citation: nextCitation,
+							} );
 						} }
 						__unstableMobileNoFocusOnMount
-						aria-label={ __( 'Quote attribution' ) }
+						aria-label={ __( 'Quote citation' ) }
 						placeholder={
-							// translators: placeholder text used for the attribution
-							__( 'Add attribution' )
+							// translators: placeholder text used for the
+							// citation
+							__( 'Add citation' )
 						}
-						className="wp-block-quote__attribution"
+						className="wp-block-quote__citation"
 						__unstableOnSplitAtEnd={ () =>
 							insertBlocksAfter( createBlock( 'core/paragraph' ) )
 						}
 					/>
-				</figure>
-			) : (
-				<BlockQuotation { ...innerBlocksProps } />
-			) }
+				) }
+			</BlockQuotation>
 		</>
 	);
 }
