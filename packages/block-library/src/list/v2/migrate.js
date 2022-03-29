@@ -21,7 +21,11 @@ function createListBlockFromDOMElement( listElement ) {
 
 	const innerBlocks = Array.from( listElement.children ).map(
 		( listItem ) => {
-			const children = Array.from( listItem.childNodes );
+			const children = Array.from( listItem.childNodes ).filter(
+				( node ) =>
+					node.nodeType !== node.TEXT_NODE ||
+					node.textContent.trim().length !== 0
+			);
 			children.reverse();
 			const [ nestedList, ...nodes ] = children;
 
@@ -34,7 +38,7 @@ function createListBlockFromDOMElement( listElement ) {
 			}
 			const htmlNodes = nodes.map( ( node ) => {
 				if ( node.nodeType === node.TEXT_NODE ) {
-					return node.textContent;
+					return node.textContent.trim();
 				}
 				return node.outerHTML;
 			} );

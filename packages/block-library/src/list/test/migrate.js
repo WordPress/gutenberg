@@ -60,4 +60,38 @@ describe( 'Migrate list block', () => {
 <!-- /wp:list --></li>
 <!-- /wp:list-item -->` );
 	} );
+
+	it( 'should handle empty space properly', () => {
+		const [ updatedAttributes, updatedInnerBlocks ] = migrateToListV2( {
+			values: `<li>Europe</li>
+                <li>
+                    \tAfrica
+                    <ol>
+                        <li>Algeria</li>
+                    </ol>
+                    \t
+                </li>`,
+			ordered: false,
+		} );
+
+		expect( updatedAttributes ).toEqual( {
+			ordered: false,
+			// Ideally the values attributes shouldn't be here
+			// but since we didn't enable v2 by default yet,
+			// we're keeping the old default value in block.json
+			values: '',
+		} );
+		expect( serialize( updatedInnerBlocks ) )
+			.toEqual( `<!-- wp:list-item -->
+<li>Europe</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Africa<!-- wp:list {\"ordered\":true} -->
+<ol><!-- wp:list-item -->
+<li>Algeria</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->` );
+	} );
 } );
