@@ -47,11 +47,11 @@ export const KeyboardAwareFlatList = ( {
 			scrollViewRef.current = ref;
 			innerRef( ref );
 		},
-		[ scrollViewRef, innerRef ]
+		[ innerRef ]
 	);
 	const onKeyboardWillHide = useCallback( () => {
 		keyboardWillShowIndicator.current = false;
-	}, [ keyboardWillShowIndicator ] );
+	}, [] );
 	const onKeyboardDidHide = useCallback( () => {
 		setTimeout( () => {
 			if (
@@ -67,15 +67,10 @@ export const KeyboardAwareFlatList = ( {
 				);
 			}
 		}, 50 );
-	}, [
-		keyboardWillShowIndicator,
-		latestContentOffsetY,
-		shouldPreventAutomaticScroll,
-		scrollViewRef,
-	] );
+	}, [ latestContentOffsetY, shouldPreventAutomaticScroll ] );
 	const onKeyboardWillShow = useCallback( () => {
 		keyboardWillShowIndicator.current = true;
-	}, [ keyboardWillShowIndicator ] );
+	}, [] );
 
 	return (
 		<AnimatedKeyboardAwareScrollView
