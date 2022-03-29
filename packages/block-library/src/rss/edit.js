@@ -23,7 +23,7 @@ import { prependHTTP } from '@wordpress/url';
 import ServerSideRender from '@wordpress/server-side-render';
 
 const DEFAULT_MIN_ITEMS = 1;
-const DEFAULT_MAX_ITEMS = 10;
+const DEFAULT_MAX_ITEMS = 20;
 
 export default function RSSEdit( { attributes, setAttributes } ) {
 	const [ isEditing, setIsEditing ] = useState( ! attributes.feedURL );
