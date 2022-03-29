@@ -775,9 +775,11 @@ export default function NavigationLinkEdit( {
 											}
 										} }
 									/>
+									{ description && (
 									<span className="wp-block-navigation-item__description">
 										{ description || '' }
 									</span>
+									)}
 								</>
 							) }
 							{ ( isInvalid || isDraft ) && (
