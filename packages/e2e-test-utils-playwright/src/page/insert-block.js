@@ -26,7 +26,7 @@ async function insertBlock( blockRepresentation ) {
 		}
 		const block = recursiveCreateBlock( _blockRepresentation );
 
-		window.wp.data.dispatch( 'core/editor' ).insertBlock( block );
+		window.wp.data.dispatch( 'core/block-editor' ).insertBlock( block );
 	}, blockRepresentation );
 }
 
