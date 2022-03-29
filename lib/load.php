@@ -102,6 +102,7 @@ require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.0/block-template.php';
 require __DIR__ . '/compat/wordpress-6.0/register-webfonts-from-theme-json.php';
+require __DIR__ . '/compat/wordpress-6.0/scan-webfonts-used-in-global-styles.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider.php';
