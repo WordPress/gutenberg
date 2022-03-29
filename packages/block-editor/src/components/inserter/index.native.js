@@ -69,13 +69,7 @@ const defaultRenderToggle = ( {
 				'Add block',
 				'Generic label for block inserter button'
 			) }
-			icon={
-				<Icon
-					icon={ plusCircleFilled }
-					style={ style }
-					color={ style.color }
-				/>
-			}
+			icon={ <Icon icon={ plusCircleFilled } style={ style } /> }
 			onClick={ onToggle }
 			extraProps={ {
 				hint: __( 'Double tap to add a block' ),
