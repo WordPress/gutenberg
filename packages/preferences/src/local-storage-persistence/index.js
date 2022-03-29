@@ -10,7 +10,6 @@ export default function createLocalStoragePersistenceLayer( {
 	storageKey = DEFAULT_STORAGE_KEY,
 } = {} ) {
 	const storage = window.localStorage;
-	let data;
 
 	/**
 	 * Returns the persisted data as an object, defaulting to an empty object.
@@ -25,6 +24,8 @@ export default function createLocalStoragePersistenceLayer( {
 		if ( persisted === null ) {
 			return EMPTY_OBJECT;
 		}
+
+		let data;
 
 		try {
 			data = JSON.parse( persisted );
@@ -43,7 +44,7 @@ export default function createLocalStoragePersistenceLayer( {
 	 * @param {Object} newData The data to persist.
 	 */
 	function set( newData ) {
-		data = { ...newData };
+		const data = { ...newData };
 		storage.setItem( storageKey, JSON.stringify( data ) );
 	}
 

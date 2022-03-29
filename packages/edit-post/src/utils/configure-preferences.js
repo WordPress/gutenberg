@@ -1,22 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
-import { dispatch, resolveSelect } from '@wordpress/data';
-import {
-	createLocalStoragePersistenceLayer,
-	store as preferencesStore,
-} from '@wordpress/preferences';
+import { dispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { createDatabasePersistenceLayer } from '@wordpress/wp-preferences';
 
 export default async function configurePreferences( defaults ) {
-	const currentUser = await resolveSelect( coreStore ).getCurrentUser();
-	const localStoragePersistenceLayer = createLocalStoragePersistenceLayer( {
-		storageKey: currentUser
-			? `WP_DATA_USER_${ currentUser?.id }`
-			: 'WP_DATA',
-	} );
+	const databasePersistenceLayer = createDatabasePersistenceLayer();
 	await dispatch( preferencesStore ).setPersistenceLayer(
-		localStoragePersistenceLayer
+		databasePersistenceLayer
 	);
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', defaults );
 }
