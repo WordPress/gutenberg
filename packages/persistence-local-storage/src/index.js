@@ -6,9 +6,9 @@
 const DEFAULT_STORAGE_KEY = 'PERSISTENCE_LOCAL_STORAGE_DATA';
 const EMPTY_OBJECT = {};
 
-export default function createPersistenceLayer( options ) {
-	const { storageKey = DEFAULT_STORAGE_KEY } = options;
-
+export default function createPersistenceLayer( {
+	storageKey = DEFAULT_STORAGE_KEY,
+} = {} ) {
 	const storage = window.localStorage;
 	let data;
 

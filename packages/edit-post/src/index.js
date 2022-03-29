@@ -9,8 +9,6 @@ import {
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-import createPersistenceLayer from '@wordpress/persistence-local-storage';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -19,6 +17,7 @@ import './hooks';
 import './plugins';
 import Editor from './editor';
 import { store as editPostStore } from './store';
+import configurePreferences from './utils/configure-preferences';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -74,7 +73,7 @@ export function reinitializeEditor(
  *                               considered as non-user-initiated (bypass for
  *                               unsaved changes prompt).
  */
-export function initializeEditor(
+export async function initializeEditor(
 	id,
 	postType,
 	postId,
@@ -107,13 +106,7 @@ export function initializeEditor(
 		initialEdits
 	);
 
-	const localStoragePersistenceLayer = createPersistenceLayer( {
-		storageKey: 'WP_DATA_TEST',
-	} );
-	dispatch( preferencesStore ).setPersistenceLayer(
-		localStoragePersistenceLayer
-	);
-	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+	await configurePreferences( {
 		editorMode: 'visual',
 		fixedToolbar: false,
 		fullscreenMode: true,
