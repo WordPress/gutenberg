@@ -30,7 +30,12 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/data": "file:../data"
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"classnames": "^2.3.1"
 	},
 	"peerDependencies": {
 		"react": "^17.0.0",
