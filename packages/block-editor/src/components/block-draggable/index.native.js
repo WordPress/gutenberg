@@ -2,7 +2,6 @@
  * External dependencies
  */
 import Animated, {
-	interpolate,
 	runOnJS,
 	runOnUI,
 	useAnimatedRef,
@@ -11,6 +10,7 @@ import Animated, {
 	withTiming,
 	scrollTo,
 	useAnimatedReaction,
+	Easing,
 } from 'react-native-reanimated';
 
 /**
@@ -33,6 +33,15 @@ const CHIP_OFFSET_TO_TOUCH_POSITION = 32;
 const BLOCK_COLLAPSED_HEIGHT = 20;
 const EXTRA_OFFSET_WHEN_CLOSE_TO_TOP_EDGE = 80;
 const SCROLL_ANIMATION_DURATION = 350;
+const COLLAPSE_HEIGHT_ANIMATION_CONFIG = {
+	duration: 350,
+	easing: Easing.out( Easing.exp ),
+};
+const EXPAND_HEIGHT_ANIMATION_CONFIG = {
+	duration: 350,
+	easing: Easing.in( Easing.exp ),
+};
+const COLLAPSE_OPACITY_ANIMATION_CONFIG = { duration: 150 };
 
 /**
  * Block draggable wrapper component
@@ -220,26 +229,48 @@ const BlockDraggableWrapper = ( { children } ) => {
 const BlockDraggable = ( { clientId, children } ) => {
 	const { blocksLayouts, findBlockLayoutByClientId } = useBlockListContext();
 
-	const containerHeightBeforeDragging = useSharedValue( 0 );
-	const collapseAnimation = useSharedValue( 0 );
+	const collapseAnimation = {
+		opacity: useSharedValue( 0 ),
+		height: useSharedValue( 0 ),
+		initialHeight: useSharedValue( 0 ),
+	};
 
-	const setContainerHeightBeforeDragging = () => {
+	const startBlockDragging = () => {
 		const blockLayout = findBlockLayoutByClientId(
 			blocksLayouts.current,
 			clientId
 		);
-		containerHeightBeforeDragging.value = blockLayout?.height ?? 0;
-	};
-
-	const startBlockDragging = () => {
-		'worklet';
-		runOnJS( setContainerHeightBeforeDragging )();
-		collapseAnimation.value = withTiming( 1 );
+		if ( blockLayout?.height > 0 ) {
+			collapseAnimation.initialHeight.value = blockLayout.height;
+			collapseAnimation.height.value = blockLayout.height;
+			collapseAnimation.opacity.value = withTiming(
+				1,
+				COLLAPSE_OPACITY_ANIMATION_CONFIG,
+				( completed ) => {
+					if ( completed ) {
+						collapseAnimation.height.value = withTiming(
+							BLOCK_COLLAPSED_HEIGHT,
+							COLLAPSE_HEIGHT_ANIMATION_CONFIG
+						);
+					}
+				}
+			);
+		}
 	};
 
 	const stopBlockDragging = () => {
-		'worklet';
-		collapseAnimation.value = withTiming( 0 );
+		collapseAnimation.height.value = withTiming(
+			collapseAnimation.initialHeight.value,
+			EXPAND_HEIGHT_ANIMATION_CONFIG,
+			( completed ) => {
+				if ( completed ) {
+					collapseAnimation.opacity.value = withTiming(
+						0,
+						COLLAPSE_OPACITY_ANIMATION_CONFIG
+					);
+				}
+			}
+		);
 	};
 
 	const { isDraggable, isBeingDragged } = useSelect(
@@ -264,37 +295,31 @@ const BlockDraggable = ( { clientId, children } ) => {
 
 	useEffect( () => {
 		if ( isBeingDragged ) {
-			runOnUI( startBlockDragging )();
+			startBlockDragging();
 		} else {
-			runOnUI( stopBlockDragging )();
+			stopBlockDragging();
 		}
 	}, [ isBeingDragged ] );
 
 	const containerStyles = useAnimatedStyle( () => {
-		const height = interpolate(
-			collapseAnimation.value,
-			[ 0, 1 ],
-			[ containerHeightBeforeDragging.value, BLOCK_COLLAPSED_HEIGHT ]
-		);
+		const canAnimateHeight =
+			collapseAnimation.height.value !== 0 &&
+			collapseAnimation.opacity.value !== 0;
 		return {
-			height:
-				containerHeightBeforeDragging.value === 0 ||
-				collapseAnimation.value === 0
-					? 'auto'
-					: height,
+			height: canAnimateHeight ? collapseAnimation.height.value : 'auto',
 		};
 	} );
 
 	const blockStyles = useAnimatedStyle( () => {
 		return {
-			opacity: 1 - collapseAnimation.value,
+			opacity: 1 - collapseAnimation.opacity.value,
 		};
 	} );
 
 	const placeholderDynamicStyles = useAnimatedStyle( () => {
 		return {
-			display: collapseAnimation.value === 0 ? 'none' : 'flex',
-			opacity: collapseAnimation.value,
+			display: collapseAnimation.opacity.value === 0 ? 'none' : 'flex',
+			opacity: collapseAnimation.opacity.value,
 		};
 	} );
 	const placeholderStaticStyles = usePreferredColorSchemeStyle(
