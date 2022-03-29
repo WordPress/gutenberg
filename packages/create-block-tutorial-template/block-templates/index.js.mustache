@@ -20,7 +20,7 @@ import './editor.scss';
  * Internal dependencies
  */
 import Edit from './edit';
-import save from './save';
+import Save from './save';
 
 /**
  * Every block starts by registering a new block type definition.
@@ -43,5 +43,5 @@ registerBlockType( '{{namespace}}/{{slug}}', {
 	/**
 	 * @see ./save.js
 	 */
-	save,
+	save: Save,
 } );

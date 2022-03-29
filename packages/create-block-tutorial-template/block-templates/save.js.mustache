@@ -7,7 +7,7 @@
 import { useBlockProps } from '@wordpress/block-editor';
 
 /**
- * The save function defines the way in which the different attributes should
+ * The Save function defines the way in which the different attributes should
  * be combined into the final markup, which is then serialized by the block
  * editor into `post_content`.
  *
@@ -17,7 +17,7 @@ import { useBlockProps } from '@wordpress/block-editor';
  * @param {Object} props.attributes Available block attributes.
  * @return {WPElement} Element to render.
  */
-export default function save( { attributes } ) {
+export default function Save( { attributes } ) {
 	const blockProps = useBlockProps.save();
 	return <div { ...blockProps }>{ attributes.message }</div>;
 }
