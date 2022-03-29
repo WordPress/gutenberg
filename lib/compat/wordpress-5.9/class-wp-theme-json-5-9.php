@@ -232,7 +232,6 @@ class WP_Theme_JSON_5_9 {
 	 */
 	const VALID_SETTINGS = array(
 		'appearanceTools'       => null,
-		'prioritiseUserPresets' => null,
 		'border'                => array(
 			'color'  => null,
 			'radius' => null,
@@ -954,13 +953,12 @@ class WP_Theme_JSON_5_9 {
 				foreach ( $slugs as $slug ) {
 					$css_var     = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
 					$class_name  = static::replace_slug_in_string( $class, $slug );
-					$prioritise_user_presets = ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() && true === $settings['prioritiseUserPresets'] ) ? '!important' : '';
 					$stylesheet .= static::to_ruleset(
 						static::append_to_selector( $selector, $class_name ),
 						array(
 							array(
 								'name'  => $property,
-								'value' => 'var(' . $css_var . ')' . $prioritise_user_presets,
+								'value' => 'var(' . $css_var . ') !important',
 							),
 						)
 					);

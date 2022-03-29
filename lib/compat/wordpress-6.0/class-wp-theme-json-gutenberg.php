@@ -31,6 +31,59 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	);
 
 	/**
+	 * The valid properties under the settings key.
+	 *
+	 * @var array
+	 */
+	const VALID_SETTINGS = array(
+		'appearanceTools'       => null,
+		'prioritiseUserPresets' => null,
+		'border'                => array(
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
+		),
+		'color'           => array(
+			'background'       => null,
+			'custom'           => null,
+			'customDuotone'    => null,
+			'customGradient'   => null,
+			'defaultDuotone'   => null,
+			'defaultGradients' => null,
+			'defaultPalette'   => null,
+			'duotone'          => null,
+			'gradients'        => null,
+			'link'             => null,
+			'palette'          => null,
+			'text'             => null,
+		),
+		'custom'          => null,
+		'layout'          => array(
+			'contentSize' => null,
+			'wideSize'    => null,
+		),
+		'spacing'         => array(
+			'blockGap' => null,
+			'margin'   => null,
+			'padding'  => null,
+			'units'    => null,
+		),
+		'typography'      => array(
+			'customFontSize' => null,
+			'dropCap'        => null,
+			'fontFamilies'   => null,
+			'fontSizes'      => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
+		),
+	);
+
+	/**
 	 * Returns the current theme's wanted patterns(slugs) to be
 	 * registered from Pattern Directory.
 	 *
@@ -161,4 +214,43 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		return $flattened_theme_json;
 	}
 
+	/**
+	 * Given a settings array, it returns the generated rulesets
+	 * for the preset classes.
+	 *
+	 * @param array  $settings Settings to process.
+	 * @param string $selector Selector wrapping the classes.
+	 * @param array  $origins  List of origins to process.
+	 * @return string The result of processing the presets.
+	 */
+	protected static function compute_preset_classes( $settings, $selector, $origins ) {
+		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+			// Classes at the global level do not need any CSS prefixed,
+			// and we don't want to increase its specificity.
+			$selector = '';
+		}
+
+		$stylesheet = '';
+		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
+			foreach ( $preset_metadata['classes'] as $class => $property ) {
+				foreach ( $slugs as $slug ) {
+					$css_var     = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
+					$class_name  = static::replace_slug_in_string( $class, $slug );
+					$prioritise_user_presets = ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() && true === $settings['prioritiseUserPresets'] ) ? '!important' : '';
+					$stylesheet .= static::to_ruleset(
+						static::append_to_selector( $selector, $class_name ),
+						array(
+							array(
+								'name'  => $property,
+								'value' => 'var(' . $css_var . ')' . $prioritise_user_presets,
+							),
+						)
+					);
+				}
+			}
+		}
+
+		return $stylesheet;
+	}
 }
