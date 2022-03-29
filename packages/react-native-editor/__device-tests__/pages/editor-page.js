@@ -753,6 +753,15 @@ class EditorPage {
 	async sauceJobStatus( allPassed ) {
 		await this.driver.sauceJobStatus( allPassed );
 	}
+
+	async getNumberOfParagraphBlocks() {
+		const paragraphBlockLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]/android.widget.EditText`
+			: `(//*[contains(@name, "Paragraph Block. Row")])[1]`;
+
+		const locator = await this.driver.elementsByXPath( paragraphBlockLocator );
+		return locator.length;
+	}
 }
 
 const blockNames = {
