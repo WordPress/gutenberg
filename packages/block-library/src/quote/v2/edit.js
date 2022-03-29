@@ -48,7 +48,7 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 
 		deprecated( 'Value attribute on the quote block', {
 			since: '6.0', // WP version
-			version: '6.5' // when the attribute gets removed. We can drop this property to never remove the deprecation
+			version: '6.5'
 			alternative: 'inner blocks'
 		});
 
