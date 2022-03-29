@@ -231,8 +231,8 @@ class WP_Theme_JSON_5_9 {
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
-		'appearanceTools'       => null,
-		'border'                => array(
+		'appearanceTools' => null,
+		'border'          => array(
 			'color'  => null,
 			'radius' => null,
 			'style'  => null,
