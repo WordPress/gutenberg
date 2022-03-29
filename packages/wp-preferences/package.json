@@ -1,20 +1,20 @@
 {
-	"name": "@wordpress/persistence-local-storage",
+	"name": "@wordpress/wp-preferences",
 	"version": "1.0.0",
-	"description": "A local storage persistence layer for preferences.",
+	"description": "Wordpress-specific utilities for preferences.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"gutenberg",
-		"persistence",
-		"localStorage"
+		"preferences",
+		"settings"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/persistence-local-storage/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/wp-preferences/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/persistence-local-storage"
+		"directory": "packages/wp-preferences"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -28,7 +28,13 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.16.0"
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/preferences": "file:../preferences"
 	},
 	"publishConfig": {
 		"access": "public"

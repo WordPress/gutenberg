@@ -1692,12 +1692,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/persistence-local-storage",
-		"slug": "packages-persistence-local-storage",
-		"markdown_source": "../packages/persistence-local-storage/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
@@ -1839,6 +1833,12 @@
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "../packages/wordcount/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/wp-preferences",
+		"slug": "packages-wp-preferences",
+		"markdown_source": "../packages/wp-preferences/README.md",
 		"parent": "packages"
 	},
 	{
