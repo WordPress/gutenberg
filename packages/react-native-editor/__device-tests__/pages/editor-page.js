@@ -64,7 +64,6 @@ class EditorPage {
 		let blockLocator;
 		if ( isAndroid() ) {
 			blockLocator = `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
-
 			await waitForVisible( this.driver, blockLocator );
 		} else {
 			blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
@@ -446,7 +445,10 @@ class EditorPage {
 			: '//XCUIElementTypeButton';
 		const blockActionsMenuButtonIdentifier = `Open Block Actions Menu`;
 		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
-
+		const blockActionsMenuButton = await waitForVisible(
+			this.driver,
+			blockActionsMenuButtonLocator
+		);
 		if ( isAndroid() ) {
 			const block = await this.getBlockAtPosition( blockName, position );
 			let checkList = await this.driver.elementsByXPath(
@@ -460,12 +462,7 @@ class EditorPage {
 			}
 		}
 
-		const blockActionsMenuButton = await waitForVisible(
-			this.driver,
-			blockActionsMenuButtonLocator
-		);
 		await blockActionsMenuButton.click();
-
 		const removeActionButtonIdentifier = 'Remove block';
 		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
 		const removeActionButton = await waitForVisible(

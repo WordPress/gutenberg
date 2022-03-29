@@ -29,24 +29,15 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			'\n',
 			false
 		);
-		expect(
-			( await editorPage.hasBlockAtPosition(
-				1,
-				blockNames.paragraph
-			) ) &&
-				( await editorPage.hasBlockAtPosition(
-					2,
-					blockNames.paragraph
-				) )
-		).toBe( true );
-
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
 		expect( text0 ).not.toBe( '' );
 		expect( text1 ).not.toBe( '' );
 		expect( testData.shortText ).toMatch(
 			new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` )
 		);
+
 		await editorPage.removeBlockAtPosition( blockNames.paragraph, 2 );
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
@@ -73,6 +64,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			2

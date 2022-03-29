@@ -35,11 +35,8 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.dismissKeyboard();
 		}
 		await editorPage.addNewBlock( blockNames.paragraph );
-		// const paragraphBlockElement = await editorPage.getBlockAtPosition(
-		// 	blockNames.paragraph,
-		// 	2
-		// );
-		const paragraphBlockElement = await editorPage.getParagraphBlockLocatorAtPosition(
+		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+			blockNames.paragraph,
 			2
 		);
 		if ( isAndroid() ) {
