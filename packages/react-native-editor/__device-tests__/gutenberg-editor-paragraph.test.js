@@ -92,7 +92,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( text );
-		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 1 )
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 1 );
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 

@@ -759,7 +759,9 @@ class EditorPage {
 			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]/android.widget.EditText`
 			: `(//*[contains(@name, "Paragraph Block. Row")])[1]`;
 
-		const locator = await this.driver.elementsByXPath( paragraphBlockLocator );
+		const locator = await this.driver.elementsByXPath(
+			paragraphBlockLocator
+		);
 		return locator.length;
 	}
 }
