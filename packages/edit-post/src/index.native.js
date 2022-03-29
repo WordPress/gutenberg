@@ -19,8 +19,8 @@ import configurePreferences from './utils/configure-preferences';
  * @param {Object} postType Post type of the post to edit.
  * @param {Object} postId   ID of the post to edit (unused right now)
  */
-export function initializeEditor( id, postType, postId ) {
-	configurePreferences( {
+export async function initializeEditor( id, postType, postId ) {
+	await configurePreferences( {
 		editorMode: 'visual',
 		fixedToolbar: false,
 		fullscreenMode: true,
