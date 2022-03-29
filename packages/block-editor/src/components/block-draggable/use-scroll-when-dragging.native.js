@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Dimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import {
 	useSharedValue,
 	useAnimatedRef,
@@ -36,7 +36,7 @@ export default function useScrollWhenDragging() {
 	const animatedScrollRef = useAnimatedRef();
 	animatedScrollRef( scrollRef );
 
-	const windowHeight = Dimensions.get( 'window' ).height;
+	const { height: windowHeight } = useWindowDimensions();
 
 	const velocityY = useSharedValue( 0 );
 	const offsetY = useSharedValue( 0 );
