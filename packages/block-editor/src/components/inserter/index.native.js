@@ -37,6 +37,7 @@ const defaultRenderToggle = ( {
 	onToggle,
 	disabled,
 	style,
+	containerStyle,
 	onLongPress,
 	isDefaultView,
 } ) => {
@@ -45,15 +46,8 @@ const defaultRenderToggle = ( {
 	// for the "default view", which are added via the below "defaultViewProps"
 	// and "defaultViewText" variables.
 	const defaultViewProps = isDefaultView && {
-		icon: (
-			<Icon
-				icon={ plus }
-				style={
-					styles[ 'inserter-menu__add-block-button-icon--default' ]
-				}
-			/>
-		),
-		customContainerStyles: styles[ 'inserter-menu__add-block-button' ],
+		icon: <Icon icon={ plus } style={ style } />,
+		customContainerStyles: containerStyle,
 		fixedRatio: false,
 		iconSize: 22,
 	};
@@ -256,9 +250,16 @@ export class Inserter extends Component {
 		if ( showSeparator && isOpen ) {
 			return <BlockInsertionPoint />;
 		}
-		const style = getStylesFromColorScheme(
-			styles[ 'inserter-menu__add-block-button-icon' ],
-			styles[ 'inserter-menu__add-block-button-icon--dark' ]
+		const style = isDefaultView
+			? styles[ 'inserter-menu__add-block-button-icon--default' ]
+			: getStylesFromColorScheme(
+					styles[ 'inserter-menu__add-block-button-icon' ],
+					styles[ 'inserter-menu__add-block-button-icon--dark' ]
+			  );
+
+		const containerStyle = getStylesFromColorScheme(
+			styles[ 'inserter-menu__add-block-button' ],
+			styles[ 'inserter-menu__add-block-button--dark' ]
 		);
 
 		const onPress = () => {
@@ -298,6 +299,7 @@ export class Inserter extends Component {
 					isOpen,
 					disabled,
 					style,
+					containerStyle,
 					onLongPress,
 					isDefaultView,
 				} ) }
