@@ -42,6 +42,7 @@ export {
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
 export { default as ContrastChecker } from './contrast-checker';
+export { default as __experimentalDateFormatPicker } from './date-format-picker';
 export { default as __experimentalDuotoneControl } from './duotone-control';
 export { default as __experimentalFontAppearanceControl } from './font-appearance-control';
 export { default as __experimentalFontFamilyControl } from './font-family';
@@ -98,6 +99,8 @@ export { default as withColorContext } from './color-palette/with-color-context'
  */
 
 export { default as __unstableBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
+export { default as __unstableBlockToolbarLastItem } from './block-toolbar/block-toolbar-last-item';
+export { default as __unstableBlockNameContext } from './block-toolbar/block-name-context';
 export { default as __unstableInserterMenuExtension } from './inserter-menu-extension';
 export { default as __experimentalPreviewOptions } from './preview-options';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';

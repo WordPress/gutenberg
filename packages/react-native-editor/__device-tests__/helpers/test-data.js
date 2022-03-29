@@ -141,3 +141,27 @@ exports.fileBlockPlaceholder = `<!-- wp:file {"id":3,"href":"https://wordpress.o
 exports.audioBlockPlaceholder = `<!-- wp:audio {"id":5} -->
 <figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
 <!-- /wp:audio -->`;
+
+exports.headerBlockEmpty = `<!-- wp:heading -->
+<h2></h2>
+<!-- /wp:heading -->`;
+
+exports.separatorBlockEmpty = `<!-- wp:separator -->
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<!-- /wp:separator -->`;
+
+exports.listBlockEmpty = `<!-- wp:list -->
+<ul><li></li></ul>
+<!-- /wp:list -->`;
+
+exports.imageBlockEmpty = `<!-- wp:image -->
+<figure class="wp-block-image"><img alt=""/></figure>
+<!-- /wp:image -->`;
+
+exports.moreBlockEmpty = `<!-- wp:more -->
+<!--more-->
+<!-- /wp:more -->`;
+
+exports.paragraphBlockEmpty = `<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->`;

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Revert the removal of the automatic environment detection of `test-unit` and `test-e2e` for the `recommended` preset. However, They will still be disabled if `@playwright/test` is installed in the project.
+
 ## 11.0.0 (2022-03-11)
 
 ### Breaking Changes
@@ -11,6 +15,10 @@
 ### Bug Fix
 
 -   Replaced no-shadow eslint rule with @typescript-eslint/no-shadow ([#38665](https://github.com/WordPress/gutenberg/pull/38665)).
+
+### Breaking Changes
+
+-   Remove automatic environment detection of `test-unit` and `test-e2e` for the `recommended` preset. It's now recommended to opt-in to specific preset explicitly.
 
 ## 10.0.0 (2022-01-27)
 

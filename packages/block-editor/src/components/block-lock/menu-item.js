@@ -14,16 +14,19 @@ import BlockLockModal from './modal';
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockMenuItem( { clientId } ) {
-	const { isLocked } = useSelect(
+	const { canLockBlock, isLocked } = useSelect(
 		( select ) => {
 			const {
 				canMoveBlock,
 				canRemoveBlock,
+				canLockBlockType,
+				getBlockName,
 				getBlockRootClientId,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 
 			return {
+				canLockBlock: canLockBlockType( getBlockName( clientId ) ),
 				isLocked:
 					! canMoveBlock( clientId, rootClientId ) ||
 					! canRemoveBlock( clientId, rootClientId ),
@@ -36,6 +39,10 @@ export default function BlockLockMenuItem( { clientId } ) {
 		( isActive ) => ! isActive,
 		false
 	);
+
+	if ( ! canLockBlock ) {
+		return null;
+	}
 
 	const label = isLocked ? __( 'Unlock' ) : __( 'Lock' );
 

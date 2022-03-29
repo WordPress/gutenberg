@@ -15,6 +15,7 @@
 		{ "path": "packages/dom" },
 		{ "path": "packages/element" },
 		{ "path": "packages/dom-ready" },
+		{ "path": "packages/e2e-test-utils-playwright" },
 		{ "path": "packages/escape-html" },
 		{ "path": "packages/eslint-plugin" },
 		{ "path": "packages/html-entities" },

@@ -18,6 +18,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	if (
 		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
+		is_object( get_current_screen() ) &&
 		gutenberg_is_edit_site_page( get_current_screen()->id )
 	) {
 		$context = 'site-editor';
@@ -165,3 +166,18 @@ function gutenberg_get_block_editor_settings( $settings ) {
 }
 
 add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', PHP_INT_MAX );
+
+/**
+ * Removes the unwanted block patterns fields from block editor settings.
+ *
+ * @param array $settings Existing block editor settings.
+ *
+ * @return array New block editor settings.
+ */
+function gutenberg_remove_block_patterns_settings( $settings ) {
+	unset( $settings['__experimentalBlockPatterns'] );
+	unset( $settings['__experimentalBlockPatternCategories'] );
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_remove_block_patterns_settings', PHP_INT_MAX );

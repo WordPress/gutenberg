@@ -5,7 +5,7 @@
 	"title": "Comment Author Name",
 	"category": "theme",
 	"parent": [ "core/comment-template" ],
-	"description": "Add the author name of this comment.",
+	"description": "Displays the name of the author of the comment.",
 	"textdomain": "default",
 	"attributes": {
 		"isLink": {
