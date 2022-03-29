@@ -46,6 +46,12 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 			attributes
 		);
 
+		deprecated( 'Value attribute on the quote block', {
+			since: '6.0', // WP version
+			version: '6.5' // when the attribute gets removed. We can drop this property to never remove the deprecation
+			alternative: 'inner blocks'
+		});
+
 		registry.batch( () => {
 			updateBlockAttributes( clientId, newAttributes );
 			replaceInnerBlocks( clientId, newInnerBlocks );
