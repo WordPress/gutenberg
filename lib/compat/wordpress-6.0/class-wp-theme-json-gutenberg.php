@@ -159,9 +159,27 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 		}
 
+		$flattened_theme_json = static::unset_default_properties( $flattened_theme_json );
+
 		wp_recursive_ksort( $flattened_theme_json );
 
 		return $flattened_theme_json;
+	}
+
+	protected static function unset_default_properties( $theme_json ) {
+		if ( isset( $theme_json['settings']['color']['custom'] ) && $theme_json['settings']['color']['custom'] ) {
+			unset( $theme_json['settings']['color']['custom'] );
+		}
+
+		if ( isset( $theme_json['settings']['color']['customGradient'] ) && $theme_json['settings']['color']['customGradient'] ) {
+			unset( $theme_json['settings']['color']['customGradient'] );
+		}
+
+		if ( isset( $theme_json['settings']['typography']['customFontSize'] ) && $theme_json['settings']['typography']['customFontSize'] ) {
+			unset( $theme_json['settings']['typography']['customFontSize'] );
+		}
+
+		return $theme_json;
 	}
 
 }
