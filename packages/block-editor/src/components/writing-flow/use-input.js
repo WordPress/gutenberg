@@ -64,7 +64,7 @@ export default function useInput() {
 			} else if (
 				// If key.length is longer than 1, it's a control key that doesn't
 				// input anything.
-				event.key.length === 1 &&
+				( event.key.length === 1 || event.key === 'Dead' ) &&
 				! ( event.metaKey || event.ctrlKey )
 			) {
 				if ( __unstableIsSelectionMergeable() ) {
