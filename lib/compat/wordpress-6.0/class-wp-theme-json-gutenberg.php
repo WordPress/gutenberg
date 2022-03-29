@@ -235,9 +235,13 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
 			foreach ( $preset_metadata['classes'] as $class => $property ) {
 				foreach ( $slugs as $slug ) {
-					$css_var     = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
-					$class_name  = static::replace_slug_in_string( $class, $slug );
-					$prioritise_user_presets = ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() && true === $settings['prioritiseUserPresets'] ) ? '!important' : '';
+					$css_var                 = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
+					$class_name              = static::replace_slug_in_string( $class, $slug );
+					$prioritise_user_presets = ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
+												isset( $settings['prioritiseUserPresets'] ) &&
+												true === $settings['prioritiseUserPresets'] )
+												? '!important' : '';
+
 					$stylesheet .= static::to_ruleset(
 						static::append_to_selector( $selector, $class_name ),
 						array(
