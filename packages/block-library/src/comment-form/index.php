@@ -24,7 +24,6 @@ function render_block_core_comment_form( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes();
 
 	$form_contents = <<<END
-	<turbo-frame id="new_comment">
 	<h3 id="reply-title" class="comment-reply-title">Leave a Reply</h3>
 	<form action="/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
 	<p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> <span class="required-field-message" aria-hidden="true">Required fields are marked <span class="required" aria-hidden="true">*</span></span></p>
@@ -33,7 +32,6 @@ function render_block_core_comment_form( $attributes, $content, $block ) {
 	<input type="hidden" name="comment_post_ID" value="{$block->context['postId']}">
 	<input type="submit" value="Submit">
 	<form>
-	</turbo-frame>
 	END;
 
 
@@ -57,12 +55,3 @@ function register_block_core_comment_form() {
 	);
 }
 add_action( 'init', 'register_block_core_comment_form' );
-
-function hook_javascript() {
-    ?>
-		<script type="module">
-			import hotwiredTurbo from 'https://cdn.skypack.dev/@hotwired/turbo';
-		</script>
-    <?php
-}
-add_action('wp_head', 'hook_javascript');
