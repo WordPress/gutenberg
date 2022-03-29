@@ -44,7 +44,7 @@ function createListBlockFromDOMElement( listElement ) {
 			} );
 			htmlNodes.reverse();
 			const childAttributes = {
-				content: htmlNodes.concat( '' ),
+				content: htmlNodes.join( ' ' ),
 			};
 			const childInnerBlocks = [
 				createListBlockFromDOMElement( nestedList ),

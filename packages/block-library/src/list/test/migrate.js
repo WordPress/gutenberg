@@ -94,4 +94,39 @@ describe( 'Migrate list block', () => {
 <!-- /wp:list --></li>
 <!-- /wp:list-item -->` );
 	} );
+
+	it( 'should handle formats properly', () => {
+		const [ updatedAttributes, updatedInnerBlocks ] = migrateToListV2( {
+			values: `<li>Europe<ul><li>France<ul><li>Lyon <strong>Rhone</strong>s</li><li>Paris <em>Ile de france</em><ul><li><em>1er</em></li></ul></li></ul></li></ul></li></ul></li>`,
+			ordered: false,
+		} );
+
+		expect( updatedAttributes ).toEqual( {
+			ordered: false,
+			// Ideally the values attributes shouldn't be here
+			// but since we didn't enable v2 by default yet,
+			// we're keeping the old default value in block.json
+			values: '',
+		} );
+		expect( serialize( updatedInnerBlocks ) )
+			.toEqual( `<!-- wp:list-item -->
+<li>Europe<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>France<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>Lyon <strong>Rhone</strong>s</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Paris <em>Ile de france</em><!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li><em>1er</em></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->` );
+	} );
 } );
