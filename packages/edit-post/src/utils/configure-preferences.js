@@ -3,12 +3,14 @@
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { dispatch, resolveSelect } from '@wordpress/data';
-import createPersistenceLayer from '@wordpress/persistence-local-storage';
-import { store as preferencesStore } from '@wordpress/preferences';
+import {
+	createLocalStoragePersistenceLayer,
+	store as preferencesStore,
+} from '@wordpress/preferences';
 
 export default async function configurePreferences( defaults ) {
 	const currentUser = await resolveSelect( coreStore ).getCurrentUser();
-	const localStoragePersistenceLayer = createPersistenceLayer( {
+	const localStoragePersistenceLayer = createLocalStoragePersistenceLayer( {
 		storageKey: currentUser
 			? `WP_DATA_USER_${ currentUser?.id }`
 			: 'WP_DATA',
