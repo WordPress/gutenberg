@@ -218,19 +218,22 @@ const BlockDraggableWrapper = ( { children } ) => {
  * @return {Function} Render function which includes the parameter `isDraggable` to determine if the block can be dragged.
  */
 const BlockDraggable = ( { clientId, children } ) => {
-	const container = {
-		height: useSharedValue( 0 ),
-	};
+	const { blocksLayouts, findBlockLayoutByClientId } = useBlockListContext();
+
 	const containerHeightBeforeDragging = useSharedValue( 0 );
 	const collapseAnimation = useSharedValue( 0 );
 
-	const onContainerLayout = ( { nativeEvent: { layout } } ) => {
-		container.height.value = layout.height;
+	const setContainerHeightBeforeDragging = () => {
+		const blockLayout = findBlockLayoutByClientId(
+			blocksLayouts.current,
+			clientId
+		);
+		containerHeightBeforeDragging.value = blockLayout?.height ?? 0;
 	};
 
 	const startBlockDragging = () => {
 		'worklet';
-		containerHeightBeforeDragging.value = container.height.value;
+		runOnJS( setContainerHeightBeforeDragging )();
 		collapseAnimation.value = withTiming( 1 );
 	};
 
@@ -308,7 +311,7 @@ const BlockDraggable = ( { clientId, children } ) => {
 	}
 
 	return (
-		<Animated.View onLayout={ onContainerLayout } style={ containerStyles }>
+		<Animated.View style={ containerStyles }>
 			<Animated.View style={ blockStyles }>
 				{ children( { isDraggable: true } ) }
 			</Animated.View>
