@@ -13,8 +13,8 @@ import testData from './helpers/test-data';
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getParagraphBlockLocatorAtPosition(
-			1
+		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -44,8 +44,8 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		let paragraphBlockElement = await editorPage.getParagraphBlockLocatorAtPosition(
-			1
+		let paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+			blockNames.paragraph
 		);
 
 		if ( isAndroid() ) {
@@ -90,8 +90,8 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getParagraphBlockLocatorAtPosition(
-			1
+		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();

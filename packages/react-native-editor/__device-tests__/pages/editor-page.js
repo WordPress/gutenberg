@@ -45,12 +45,13 @@ class EditorPage {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
-	async getParagraphBlockLocatorAtPosition( position ) {
-		const paragraphBlockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row ${ position }.")]/android.widget.EditText`
-			: `(//*[contains(@name, "Paragraph Block. Row ${ position }.")])[1]`;
+	// For text blocks - can be Paragraph or Heading
+	async getTextBlockLocatorAtPosition( blockName, position = 1 ) {
+		const blockLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@content-desc, "${ blockName } Block. Row ${ position }.")]/android.widget.EditText`
+			: `(//*[contains(@name, "${ blockName } Block. Row ${ position }.")])[1]`;
 
-		return await waitForVisible( this.driver, paragraphBlockLocator );
+		return await waitForVisible( this.driver, blockLocator );
 	}
 
 	// Finds the wd element for new block that was added and sets the element attribute
@@ -503,7 +504,8 @@ class EditorPage {
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
-			const block = await this.getParagraphBlockLocatorAtPosition(
+			const block = await this.getTextBlockLocatorAtPosition(
+				blockNames.paragraph,
 				position + i
 			);
 			await block.click();
@@ -525,10 +527,13 @@ class EditorPage {
 	}
 
 	async getTextForParagraphBlockAtPosition( position ) {
-		const block = await this.getParagraphBlockLocatorAtPosition( position );
-		await block.click();
+		const blockLocator = await this.getTextBlockLocatorAtPosition(
+			blockNames.paragraph,
+			position
+		);
+		await blockLocator.click();
 
-		const text = await this.getTextForParagraphBlock( block );
+		const text = await this.getTextForParagraphBlock( blockLocator );
 
 		if ( isAndroid() ) {
 			return text.toString();

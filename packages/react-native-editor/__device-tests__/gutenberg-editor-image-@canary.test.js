@@ -8,7 +8,6 @@ import testData from './helpers/test-data';
 describe( 'Gutenberg Editor Image Block tests', () => {
 	it( 'should be able to add an image block', async () => {
 		await editorPage.addNewBlock( blockNames.image );
-		// await editorPage.driver.sleep( 1000 );
 		await editorPage.closePicker();
 
 		let imageBlock = await editorPage.getBlockAtPosition(
@@ -35,7 +34,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.dismissKeyboard();
 		}
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
 			2
 		);
