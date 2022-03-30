@@ -45,11 +45,17 @@ class EditorPage {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
-	// For text blocks - can be Paragraph or Heading
+	async clickBlockParagraphAtPosition ( position = 1 ){
+		const paragraphBlockLocator = `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`
+		const paragraphBlock =  await this.driver.elementByXPath( paragraphBlockLocator )
+		paragraphBlock.click()
+	}
+
+	// For text blocks - blockName can be Paragraph or Heading
 	async getTextBlockLocatorAtPosition( blockName, position = 1 ) {
 		const blockLocator = isAndroid()
 			? `//android.view.ViewGroup[contains(@content-desc, "${ blockName } Block. Row ${ position }.")]/android.widget.EditText`
-			: `(//*[contains(@name, "${ blockName } Block. Row ${ position }.")])[1]`;
+			: `(//XCUIElementTypeOther[contains(@name, "${ blockName } Block. Row ${ position }.")])[1]`;
 
 		return await waitForVisible( this.driver, blockLocator );
 	}
@@ -62,14 +68,11 @@ class EditorPage {
 		position = 1,
 		options = { autoscroll: false }
 	) {
-		let blockLocator;
-		if ( isAndroid() ) {
-			blockLocator = `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
-			await waitForVisible( this.driver, blockLocator );
-		} else {
-			blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
-		}
+		const blockLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
+			: `(//XCUIElementTypeOther[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[1]`;
 
+		await waitForVisible( this.driver, blockLocator );
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
@@ -503,8 +506,11 @@ class EditorPage {
 				blockNames.paragraph,
 				position + i
 			);
-			await block.click();
-
+			
+			if ( isAndroid() ) {
+				await block.click();
+			}
+			
 			await this.typeTextToParagraphBlock(
 				block,
 				paragraphs[ i ],
@@ -517,8 +523,16 @@ class EditorPage {
 	}
 
 	async getTextForParagraphBlock( block ) {
-		const text = await block.text();
-		return text.toString();
+		let text
+		if ( isAndroid() ) {
+			text = await block.text();
+		} else {
+			const textViewElement = await this.getTextViewForParagraphBlock(
+				block
+			);
+			text = await textViewElement.text();
+		}
+		return text;
 	}
 
 	async getTextForParagraphBlockAtPosition( position ) {
@@ -526,14 +540,13 @@ class EditorPage {
 			blockNames.paragraph,
 			position
 		);
-		await blockLocator.click();
-
-		const text = await this.getTextForParagraphBlock( blockLocator );
-
-		if ( isAndroid() ) {
-			return text.toString();
+		if ( isAndroid() ){
+			await blockLocator.click();
+		} else {
+			await this.clickBlockParagraphAtPosition( position )
 		}
 
+		const text = await this.getTextForParagraphBlock( blockLocator );
 		return text.toString();
 	}
 
@@ -585,9 +598,11 @@ class EditorPage {
 	}
 
 	async chooseMediaLibrary() {
-		const mediaLibraryButton = await this.driver.elementByAccessibilityId(
-			'WordPress Media Library'
-		);
+		const mediaLibraryLocator = isAndroid()
+			? `//android.widget.Button[@content-desc="WordPress Media Library"]`
+			: `//XCUIElementTypeButton[@name="WordPress Media Library"]`
+
+		const mediaLibraryButton = await waitForVisible ( this.driver, mediaLibraryLocator)
 		await mediaLibraryButton.click();
 	}
 
@@ -754,8 +769,7 @@ class EditorPage {
 	async getNumberOfParagraphBlocks() {
 		const paragraphBlockLocator = isAndroid()
 			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]/android.widget.EditText`
-			: `(//*[contains(@name, "Paragraph Block. Row")])[1]`;
-
+			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row")])`;
 		const locator = await this.driver.elementsByXPath(
 			paragraphBlockLocator
 		);

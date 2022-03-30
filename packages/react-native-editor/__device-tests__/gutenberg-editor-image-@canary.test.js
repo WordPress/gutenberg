@@ -10,7 +10,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		await editorPage.addNewBlock( blockNames.image );
 		await editorPage.closePicker();
 
-		let imageBlock = await editorPage.getBlockAtPosition(
+		const imageBlock = await editorPage.getBlockAtPosition(
 			blockNames.image
 		);
 
@@ -25,7 +25,6 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.dismissKeyboard();
 			// End workaround.
 
-			imageBlock = await editorPage.getBlockAtPosition( imageBlock );
 			await swipeUp( editorPage.driver, imageBlock );
 			await editorPage.enterCaptionToSelectedImageBlock(
 				testData.imageCaption,

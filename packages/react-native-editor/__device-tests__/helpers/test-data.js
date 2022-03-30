@@ -174,6 +174,6 @@ exports.unknownElementBlock = `<!-- wp:paragraph -->
 <p><unknownhtmlelement>abc</unknownhtmlelement>D</p>
 <!-- /wp:paragraph -->`;
 
-exports.letterInParagraphBlock = `<!-- wp:paragraph -->
-<p>E</p>
+exports.lettersInParagraphBlock = `<!-- wp:paragraph -->
+<p>ABCD</p>
 <!-- /wp:paragraph -->`;
