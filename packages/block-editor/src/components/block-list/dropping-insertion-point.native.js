@@ -6,14 +6,13 @@ import Animated, {
 	useAnimatedStyle,
 	withTiming,
 	useAnimatedReaction,
-	runOnJS,
 } from 'react-native-reanimated';
 
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,13 +30,15 @@ export default function DroppingInsertionPoint( {
 			getBlockOrder,
 			getBlockInsertionPoint,
 			isBlockBeingDragged,
+			isDraggingBlocks,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 		} = select( blockEditorStore );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
+		const isDraggingAnyBlocks = isDraggingBlocks();
 
-		if ( ! order.length ) {
+		if ( ! isDraggingAnyBlocks || ! order.length ) {
 			return {};
 		}
 
@@ -57,7 +58,6 @@ export default function DroppingInsertionPoint( {
 			nextClientId: _nextClientId,
 		};
 	}, [] );
-	const [ hasStartedDragging, setHasStartedDragging ] = useState( false );
 
 	const { blocksLayouts, findBlockLayoutByClientId } = useBlockListContext();
 
@@ -67,34 +67,34 @@ export default function DroppingInsertionPoint( {
 	useAnimatedReaction(
 		() => hasStartedDraggingOver.value,
 		( value ) => {
-			runOnJS( setHasStartedDragging )( value );
+			if ( ! value ) {
+				opacity.value = 0;
+				blockYPosition.value = 0;
+			}
 		}
 	);
 
 	useEffect( () => {
-		const previousElement = findBlockLayoutByClientId(
-			blocksLayouts.current,
-			previousClientId
-		);
-		const nextElement = findBlockLayoutByClientId(
-			blocksLayouts.current,
-			nextClientId
-		);
+		const previousElement = previousClientId
+			? findBlockLayoutByClientId(
+					blocksLayouts.current,
+					previousClientId
+			  )
+			: null;
+		const nextElement = nextClientId
+			? findBlockLayoutByClientId( blocksLayouts.current, nextClientId )
+			: null;
 
-		if ( ! hasStartedDragging || ( previousElement && ! nextElement ) ) {
-			blockYPosition.value = 0;
-			opacity.value = withTiming( 0 );
-		} else {
-			const nextPosition = previousElement
-				? previousElement.y + previousElement.height
-				: nextElement.y;
-			if ( blockYPosition.value !== nextPosition ) {
-				opacity.value = 0;
-				blockYPosition.value = nextPosition;
-				opacity.value = withTiming( 1 );
-			}
+		const nextPosition = previousElement
+			? previousElement.y + previousElement.height
+			: nextElement?.y;
+
+		if ( nextPosition && blockYPosition.value !== nextPosition ) {
+			opacity.value = 0;
+			blockYPosition.value = nextPosition;
+			opacity.value = withTiming( 1 );
 		}
-	}, [ previousClientId, nextClientId, blocksLayouts.current ] );
+	}, [ previousClientId, nextClientId, blocksLayouts ] );
 
 	const insertionPointStyles = useAnimatedStyle( () => {
 		return {
