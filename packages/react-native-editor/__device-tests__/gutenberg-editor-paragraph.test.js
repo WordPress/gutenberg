@@ -76,7 +76,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			2,
-			{ 
+			{
 				useWaitForVisible: true,
 			}
 		);
@@ -132,7 +132,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			2,
-			{ 
+			{
 				useWaitForVisible: true,
 			}
 		);

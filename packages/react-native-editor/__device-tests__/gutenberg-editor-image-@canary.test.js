@@ -13,7 +13,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		const imageBlock = await editorPage.getBlockAtPosition(
 			blockNames.image,
 			1,
-			{ 
+			{
 				useWaitForVisible: true,
 			}
 		);

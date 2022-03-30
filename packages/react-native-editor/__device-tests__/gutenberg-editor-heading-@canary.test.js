@@ -11,7 +11,7 @@ describe( 'Gutenberg Editor tests', () => {
 		let headingBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.heading,
 			1,
-			{ 
+			{
 				useWaitForVisible: true,
 			}
 		);

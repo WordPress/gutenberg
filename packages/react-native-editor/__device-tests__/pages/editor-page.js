@@ -68,19 +68,19 @@ class EditorPage {
 	async getBlockAtPosition(
 		blockName,
 		position = 1,
-		options = { autoscroll: false, useWaitForVisible: false },
+		options = { autoscroll: false, useWaitForVisible: false }
 	) {
-		let blockLocator
+		let blockLocator;
 
 		// Make it optional to use waitForVisible() because the behavior is not consistent everywhere.
-		if (options.useWaitForVisible) {
-			let elementType
-			switch (blockName) {
+		if ( options.useWaitForVisible ) {
+			let elementType;
+			switch ( blockName ) {
 				case blockNames.cover:
-					elementType = 'XCUIElementTypeButton'
+					elementType = 'XCUIElementTypeButton';
 					break;
 				default:
-					elementType = 'XCUIElementTypeOther'
+					elementType = 'XCUIElementTypeOther';
 					break;
 			}
 
@@ -153,7 +153,9 @@ class EditorPage {
 	async hasBlockAtPosition( position = 1, blockName = '' ) {
 		return (
 			undefined !==
-			( await this.getBlockAtPosition( blockName, position, { useWaitForVisible: true, } ) )
+			( await this.getBlockAtPosition( blockName, position, {
+				useWaitForVisible: true,
+			} ) )
 		);
 	}
 
@@ -473,7 +475,9 @@ class EditorPage {
 			blockActionsMenuButtonLocator
 		);
 		if ( isAndroid() ) {
-			const block = await this.getBlockAtPosition( blockName, position , { useWaitForVisible: true, });
+			const block = await this.getBlockAtPosition( blockName, position, {
+				useWaitForVisible: true,
+			} );
 			let checkList = await this.driver.elementsByXPath(
 				blockActionsMenuButtonLocator
 			);
