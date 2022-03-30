@@ -7,16 +7,16 @@ import { boolean, text } from '@storybook/addon-knobs';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import {
-	formatCapitalize,
-	formatLowercase,
-	formatUppercase,
-} from '@wordpress/icons';
+import { formatLowercase, formatUppercase } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
+import {
+	ToggleGroupControl,
+	ToggleGroupControlOption,
+	ToggleGroupControlOptionIcon,
+} from '../index';
 import { View } from '../../view';
 import Button from '../../button';
 
@@ -81,7 +81,6 @@ const _default = ( { options } ) => {
 				option.showTooltip,
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
-			icon={ option.icon ?? null }
 		/>
 	) );
 
@@ -131,26 +130,27 @@ WithAriaLabel.args = {
 	],
 };
 
-export const WithIcons = _default.bind( {} );
-WithIcons.args = {
-	...Default.args,
-	options: [
-		{
-			label: 'Uppercase',
-			value: 'uppercase',
-			icon: formatUppercase,
-		},
-		{
-			label: 'Lowercase',
-			value: 'lowercase',
-			icon: formatLowercase,
-		},
-		{
-			label: 'Capitalize',
-			value: 'capitalize',
-			icon: formatCapitalize,
-		},
-	],
+export const WithIcons = () => {
+	const [ state, setState ] = useState();
+	return (
+		<ToggleGroupControl
+			onChange={ setState }
+			value={ state }
+			label={ 'With icons' }
+			hideLabelFromVision
+		>
+			<ToggleGroupControlOptionIcon
+				value="uppercase"
+				icon={ formatUppercase }
+				showTooltip={ true }
+			/>
+			<ToggleGroupControlOptionIcon
+				value="lowercase"
+				icon={ formatLowercase }
+				showTooltip={ true }
+			/>
+		</ToggleGroupControl>
+	);
 };
 
 export const WithReset = () => {

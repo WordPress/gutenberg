@@ -10,18 +10,9 @@ import type { RadioStateReturn } from 'reakit';
  */
 import type { FormElementProps } from '../utils/types';
 
-export type ToggleGroupControlOptionProps = {
+export type ToggleGroupControlOptionBaseProps = {
+	children: ReactNode;
 	value: ReactText;
-	/**
-	 * Label for the option. If needed, the `aria-label` prop can be used in addition
-	 * to specify a different label for assistive technologies.
-	 */
-	label: string;
-	/**
-	 * Icon for the option. If `icon` is provided it will be used instead of the `label`
-	 * and will show a tooltip automatically.
-	 */
-	icon?: JSX.Element;
 	/**
 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
 	 * show the aria-label or the label prop text.
@@ -29,6 +20,27 @@ export type ToggleGroupControlOptionProps = {
 	 * @default false
 	 */
 	showTooltip?: boolean;
+};
+
+export type ToggleGroupControlOptionIconProps = Omit<
+	ToggleGroupControlOptionBaseProps,
+	'children'
+> & {
+	/**
+	 * Icon for the option.
+	 */
+	icon: JSX.Element;
+};
+
+export type ToggleGroupControlOptionProps = Omit<
+	ToggleGroupControlOptionBaseProps,
+	'children'
+> & {
+	/**
+	 * Label for the option. If needed, the `aria-label` prop can be used in addition
+	 * to specify a different label for assistive technologies.
+	 */
+	label: string;
 };
 
 export type WithToolTipProps = {
@@ -39,7 +51,7 @@ export type WithToolTipProps = {
 	/**
 	 * Label for the Tooltip component.
 	 */
-	text: string;
+	text?: string;
 	/**
 	 * Whether to wrap the control option in a Tooltip component.
 	 *

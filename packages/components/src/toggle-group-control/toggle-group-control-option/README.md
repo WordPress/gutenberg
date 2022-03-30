@@ -43,12 +43,6 @@ The value of the `ToggleGroupControlOption`.
 
 -   Required: Yes
 
-### `icon`: `WPComponent`
-
-Icon for the option. If `icon` is provided it will be used instead of the `label` and will show a tooltip automatically.
-
--   Required: No
-
 ### `showTooltip`: `boolean`
 
 Whether to show a tooltip when hovering over the option. The tooltip will attempt to use the `aria-label` prop text first, then the `label` prop text if no `aria-label` prop is found.
