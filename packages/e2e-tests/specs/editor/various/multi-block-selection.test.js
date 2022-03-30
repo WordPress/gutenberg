@@ -907,30 +907,6 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should merge into quote with correct selection', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( '> 1[' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( ']2' );
-		await page.keyboard.press( 'ArrowLeft' );
-		// Select everything between [].
-		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-
-		// Test setup.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Ensure selection is in the correct place.
-		await page.keyboard.type( '&' );
-
-		// Expect two blocks with "&" in between.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'should select separator (single element block)', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/hr' );
