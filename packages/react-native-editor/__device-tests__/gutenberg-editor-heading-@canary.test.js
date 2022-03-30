@@ -27,10 +27,13 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		if ( ! isAndroid() ) {
-			await editorPage.clickBlockParagraphAtPosition( 2 )
+			await editorPage.clickBlockParagraphAtPosition( 2 );
 		}
 
-		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock(
+			paragraphBlockElement,
+			testData.mediumText
+		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
 		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
@@ -39,10 +42,13 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		if ( ! isAndroid() ) {
-			await editorPage.clickBlockParagraphAtPosition( 3 )
+			await editorPage.clickBlockParagraphAtPosition( 3 );
 		}
 
-		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock(
+			paragraphBlockElement,
+			testData.mediumText
+		);
 
 		await editorPage.addNewBlock( blockNames.heading );
 		headingBlockElement = await editorPage.getTextBlockLocatorAtPosition(
@@ -61,9 +67,12 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		if ( ! isAndroid() ) {
-			await editorPage.clickBlockParagraphAtPosition( 5 )
+			await editorPage.clickBlockParagraphAtPosition( 5 );
 		}
 
-		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock(
+			paragraphBlockElement,
+			testData.mediumText
+		);
 	} );
 } );
