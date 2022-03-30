@@ -30,6 +30,7 @@
 	"supports": {
 		"anchor": true,
 		"__experimentalSlashInserter": true,
+		"__experimentalExitOnEnterAtEnd": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
