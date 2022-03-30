@@ -12,15 +12,35 @@ function gutenberg_register_webfonts_from_theme_json() {
 	// Get settings from theme.json.
 	$theme_settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
 
+	// Get variations.
+	$variations = gutenberg_get_theme_styles_variations();
+
+	// Merge settings with variations.
+	$settings = $theme_settings;
+	foreach ( $variations as $variation ) {
+
+		// Sanity check: Skip if fontFamilies are not defined in the variation.
+		if (
+			empty( $variation['settings'] ) ||
+			empty( $variation['settings']['typography'] ) ||
+			empty( $variation['settings']['typography']['fontFamilies'] )
+		) {
+			continue;
+		}
+		$settings['typography']                 = empty( $settings['typography'] ) ? array() : $settings['typography'];
+		$settings['typography']['fontFamilies'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
+		$settings['typography']['fontFamilies'] = array_merge( $settings['typography']['fontFamilies'], $variation['settings']['typography']['fontFamilies'] );
+	}
+
 	// Bail out early if there are no settings for webfonts.
-	if ( empty( $theme_settings['typography'] ) || empty( $theme_settings['typography']['fontFamilies'] ) ) {
+	if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
 		return;
 	}
 
 	$webfonts = array();
 
 	// Look for fontFamilies.
-	foreach ( $theme_settings['typography']['fontFamilies'] as $font_families ) {
+	foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 		foreach ( $font_families as $font_family ) {
 
 			// Skip if fontFace is not defined.
