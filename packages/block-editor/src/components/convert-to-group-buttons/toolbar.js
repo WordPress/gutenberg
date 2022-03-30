@@ -4,7 +4,7 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { switchToBlockType } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { group } from '@wordpress/icons';
+import { group, row, stack } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -13,7 +13,7 @@ import { _x } from '@wordpress/i18n';
 import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
 
-function BlockGroupToolbar( { label = _x( 'Group', 'verb' ) } ) {
+function BlockGroupToolbar() {
 	const {
 		blocksSelection,
 		clientIds,
@@ -32,15 +32,28 @@ function BlockGroupToolbar( { label = _x( 'Group', 'verb' ) } ) {
 		[ clientIds ]
 	);
 
-	const onConvertToGroup = () => {
+	const variationAttributes = {
+		row: { type: 'flex' },
+		stack: { type: 'flex', orientation: 'vertical' },
+	};
+
+	const onConvertToGroup = ( variation = 'group' ) => {
 		const newBlocks = switchToBlockType(
 			blocksSelection,
 			groupingBlockName
 		);
+
 		if ( newBlocks ) {
+			newBlocks[ 0 ].attributes.layout =
+				variation !== 'group'
+					? variationAttributes[ variation ]
+					: undefined;
 			replaceBlocks( clientIds, newBlocks );
 		}
 	};
+
+	const onConvertToRow = () => onConvertToGroup( 'row' );
+	const onConvertToStack = () => onConvertToGroup( 'stack' );
 
 	// Don't render the button if the current selection cannot be grouped.
 	// A good example is selecting multiple button blocks within a Buttons block:
@@ -54,8 +67,18 @@ function BlockGroupToolbar( { label = _x( 'Group', 'verb' ) } ) {
 		<ToolbarGroup>
 			<ToolbarButton
 				icon={ group }
-				label={ label }
+				label={ _x( 'Group', 'verb' ) }
 				onClick={ onConvertToGroup }
+			/>
+			<ToolbarButton
+				icon={ row }
+				label={ _x( 'Row', 'verb' ) }
+				onClick={ onConvertToRow }
+			/>
+			<ToolbarButton
+				icon={ stack }
+				label={ _x( 'Stack', 'verb' ) }
+				onClick={ onConvertToStack }
 			/>
 		</ToolbarGroup>
 	);
