@@ -139,7 +139,12 @@ export default function useBlockDropZone( {
 					showInsertionPoint( targetRootClientId, targetIndex );
 				}
 			},
-			[ getSortedBlocksLayouts ]
+			[
+				getSortedBlocksLayouts,
+				getNearestBlockIndex,
+				getBlockListSettings,
+				showInsertionPoint,
+			]
 		),
 		200
 	);
