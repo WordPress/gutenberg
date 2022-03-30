@@ -30,6 +30,7 @@ function gutenberg_register_layout_support( $block_type ) {
  *
  * @param string  $selector                      CSS selector.
  * @param array   $layout                        Layout object. The one that is passed has already checked the existence of default block layout.
+ * @param array|null $padding                    Padding applied to the current block.
  * @param boolean $has_block_gap_support         Whether the theme has support for the block gap.
  * @param string  $gap_value                     The block gap value to apply.
  * @param boolean $should_skip_gap_serialization Whether to skip applying the user-defined value set in the editor.
@@ -37,7 +38,7 @@ function gutenberg_register_layout_support( $block_type ) {
  *
  * @return string                                CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em' ) {
+function gutenberg_get_layout_style( $selector, $layout, $padding, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em' ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
@@ -54,6 +55,17 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
 		if ( $content_size || $wide_size ) {
+			$style = "$selector {";
+			// Using important here to override the inline padding that could be potentially
+			// applied using the custom padding control before the layout inheritance is applied.
+			$style .= sprintf(
+				'padding: %s %s %s %s !important',
+				isset( $padding['top'] ) ? $padding['top'] : 0,
+				isset( $padding['right'] ) ? $padding['right'] : 0,
+				isset( $padding['bottom'] ) ? $padding['bottom'] : 0,
+				isset( $padding['left'] ) ? $padding['left'] : 0
+			);
+			$style .= '}';
 			$style  = "$selector > :where(:not(.alignleft):not(.alignright)) {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 			$style .= 'margin-left: auto !important;';
@@ -61,7 +73,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= '}';
 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
+			$style .= "$selector .alignfull {";
+			$style .= 'max-width: none;';
+			$style .= isset( $padding['left'] ) ? sprintf( 'margin-left: calc( -1 * %s ) !important;', $padding['left'] ) : '';
+			$style .= isset( $padding['right'] ) ? sprintf( 'margin-right: calc( -1 * %s ) !important;', $padding['right'] ) : '';
+			$style .= '}';
 		}
 
 		$style .= "$selector > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }";
@@ -162,6 +178,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$block_gap             = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
 	$default_layout        = gutenberg_get_global_settings( array( 'layout' ) );
+	$padding               = _wp_array_get( $block, array( 'attrs', 'style', 'padding' ), null );
 	$has_block_gap_support = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout  = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout           = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
@@ -170,6 +187,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			return $block_content;
 		}
 		$used_layout = $default_layout;
+		$padding     = isset( $default_layout['padding'] ) ? $default_layout['padding'] : null;
 	}
 
 	$class_names     = array();
@@ -209,7 +227,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.
 	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( ".$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
+	$style                         = gutenberg_get_layout_style( ".$container_class", $used_layout, $padding, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
