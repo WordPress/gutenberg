@@ -610,11 +610,14 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 		$args = wp_parse_args(
 			$args,
 			array(
-				'handle'    => '',
-				'src'       => '',
-				'deps'      => array(),
-				'ver'       => false,
-				'in_footer' => false,
+				'handle'     => '',
+				'src'        => '',
+				'deps'       => array(),
+				'ver'        => false,
+				'in_footer'  => false,
+
+				// Additional arg to allow translations for the script's textdomain.
+				'textdomain' => '',
 			)
 		);
 
@@ -633,6 +636,11 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 				return $content;
 			}
 
+			// If a textdomain is defined, ensure that `wp-i18n` is enqueued.
+			if ( ! empty( $args['textdomain'] ) && ! in_array( 'wp-i18n', $args['deps'], true ) ) {
+				$args['deps'][] = 'wp-i18n';
+			}
+
 			// Register the stylesheet.
 			if ( ! empty( $args['src'] ) ) {
 				wp_register_script( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['in_footer'] );
@@ -640,6 +648,11 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 
 			// Enqueue the stylesheet.
 			wp_enqueue_script( $args['handle'] );
+
+			// If a textdomain is defined, use it to set the script translations.
+			if ( ! empty( $metadata['textdomain'] ) ) {
+				wp_set_script_translations( $args['handle'], $args['textdomain'] );
+			}
 
 			return $content;
 		};
