@@ -165,7 +165,7 @@ export default function UnsavedInnerBlocks( {
 
 	return (
 		<div className="wp-block-navigation__unsaved-changes">
-			<Disabled
+			<div
 				className={ classnames(
 					'wp-block-navigation__unsaved-changes-overlay',
 					{
@@ -174,7 +174,7 @@ export default function UnsavedInnerBlocks( {
 				) }
 			>
 				<div { ...innerBlocksProps } />
-			</Disabled>
+			</div>
 			{ isSaving && <Spinner /> }
 		</div>
 	);
