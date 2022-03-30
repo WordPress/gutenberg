@@ -54,3 +54,26 @@ function register_block_core_comment_date() {
 	);
 }
 add_action( 'init', 'register_block_core_comment_date' );
+
+function define_comment_date_custom_element() {
+    ?>
+		<template id="wp-comment-date">
+			<div><time><slot name="date"></slot></time></div>
+		</template>
+		<script>
+		customElements.define( 'wp-comment-date',
+			class extends HTMLElement {
+				constructor() {
+					super();
+					const template = document.getElementById( 'wp-comment-date' );
+					const templateContent = template.content;
+
+					const shadowRoot = this.attachShadow( { mode: 'open' } );
+					shadowRoot.appendChild( templateContent.cloneNode( true ) );
+				}
+			}
+		);
+		</script>
+    <?php
+}
+add_action('wp_head', 'define_comment_date_custom_element');
