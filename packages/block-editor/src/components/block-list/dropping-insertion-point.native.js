@@ -6,13 +6,14 @@ import Animated, {
 	useAnimatedStyle,
 	withTiming,
 	useAnimatedReaction,
+	runOnJS,
 } from 'react-native-reanimated';
 
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -29,46 +30,22 @@ import styles from './dropping-insertion-point.scss';
  * @param {Object}                                        props                        Component props.
  * @param {Object}                                        props.scroll                 Scroll offset object.
  * @param {import('react-native-reanimated').SharedValue} props.hasStartedDraggingOver Whether or not the block has started moving.
+ * @param {import('react-native-reanimated').SharedValue} props.targetBlockIndex       Current block target index.
  *
  * @return {JSX.Element} The component to be rendered.
  */
 export default function DroppingInsertionPoint( {
 	scroll,
 	hasStartedDraggingOver,
+	targetBlockIndex,
 } ) {
-	const { previousClientId, nextClientId } = useSelect( ( select ) => {
-		const {
-			getBlockOrder,
-			getBlockInsertionPoint,
-			isBlockBeingDragged,
-			isDraggingBlocks,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
-		} = select( blockEditorStore );
-		const insertionPoint = getBlockInsertionPoint();
-		const order = getBlockOrder( insertionPoint.rootClientId );
-		const isDraggingAnyBlocks = isDraggingBlocks();
-
-		if ( ! isDraggingAnyBlocks || ! order.length ) {
-			return {};
-		}
-
-		let _previousClientId = order[ insertionPoint.index - 1 ];
-		let _nextClientId = order[ insertionPoint.index ];
-
-		while ( isBlockBeingDragged( _previousClientId ) ) {
-			_previousClientId = getPreviousBlockClientId( _previousClientId );
-		}
-
-		while ( isBlockBeingDragged( _nextClientId ) ) {
-			_nextClientId = getNextBlockClientId( _nextClientId );
-		}
-
-		return {
-			previousClientId: _previousClientId,
-			nextClientId: _nextClientId,
-		};
-	}, [] );
+	const {
+		getBlockOrder,
+		isBlockBeingDragged,
+		isDraggingBlocks,
+		getPreviousBlockClientId,
+		getNextBlockClientId,
+	} = useSelect( blockEditorStore );
 
 	const { blocksLayouts, findBlockLayoutByClientId } = useBlockListContext();
 
@@ -85,27 +62,71 @@ export default function DroppingInsertionPoint( {
 		}
 	);
 
-	useEffect( () => {
-		const previousElement = previousClientId
-			? findBlockLayoutByClientId(
-					blocksLayouts.current,
-					previousClientId
-			  )
-			: null;
-		const nextElement = nextClientId
-			? findBlockLayoutByClientId( blocksLayouts.current, nextClientId )
-			: null;
+	const setIndicatorPosition = useCallback(
+		( index ) => {
+			const insertionPointIndex = index;
+			const order = getBlockOrder();
+			const isDraggingAnyBlocks = isDraggingBlocks();
 
-		const nextPosition = previousElement
-			? previousElement.y + previousElement.height
-			: nextElement?.y;
+			if (
+				! isDraggingAnyBlocks ||
+				insertionPointIndex === null ||
+				! order.length
+			) {
+				return;
+			}
 
-		if ( nextPosition && blockYPosition.value !== nextPosition ) {
-			opacity.value = 0;
-			blockYPosition.value = nextPosition;
-			opacity.value = withTiming( 1 );
+			let previousClientId = order[ insertionPointIndex - 1 ];
+			let nextClientId = order[ insertionPointIndex ];
+
+			while ( isBlockBeingDragged( previousClientId ) ) {
+				previousClientId = getPreviousBlockClientId( previousClientId );
+			}
+
+			while ( isBlockBeingDragged( nextClientId ) ) {
+				nextClientId = getNextBlockClientId( nextClientId );
+			}
+
+			const previousElement = previousClientId
+				? findBlockLayoutByClientId(
+						blocksLayouts.current,
+						previousClientId
+				  )
+				: null;
+			const nextElement = nextClientId
+				? findBlockLayoutByClientId(
+						blocksLayouts.current,
+						nextClientId
+				  )
+				: null;
+
+			const nextPosition = previousElement
+				? previousElement.y + previousElement.height
+				: nextElement?.y;
+
+			if ( nextPosition && blockYPosition.value !== nextPosition ) {
+				opacity.value = 0;
+				blockYPosition.value = nextPosition;
+				opacity.value = withTiming( 1 );
+			}
+		},
+		[
+			getBlockOrder,
+			isBlockBeingDragged,
+			isDraggingBlocks,
+			getPreviousBlockClientId,
+			getNextBlockClientId,
+			findBlockLayoutByClientId,
+			blocksLayouts,
+		]
+	);
+
+	useAnimatedReaction(
+		() => targetBlockIndex.value,
+		( value ) => {
+			runOnJS( setIndicatorPosition )( value );
 		}
-	}, [ previousClientId, nextClientId, blocksLayouts ] );
+	);
 
 	const insertionPointStyles = useAnimatedStyle( () => {
 		return {

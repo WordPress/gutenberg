@@ -109,7 +109,11 @@ const BlockDraggableWrapper = ( { children } ) => {
 		draggingScrollHandler( event );
 	};
 
-	const { onBlockDragOver, onBlockDragEnd } = useBlockDropZone();
+	const {
+		onBlockDragOver,
+		onBlockDragEnd,
+		targetBlockIndex,
+	} = useBlockDropZone();
 
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
@@ -231,6 +235,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 				<DroppingInsertionPoint
 					scroll={ scroll }
 					hasStartedDraggingOver={ hasStartedDraggingOver }
+					targetBlockIndex={ targetBlockIndex }
 				/>
 			}
 			<Draggable

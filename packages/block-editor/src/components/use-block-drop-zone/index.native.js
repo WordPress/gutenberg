@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import { useSharedValue } from 'react-native-reanimated';
+
+/**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { useThrottle } from '@wordpress/compose';
 
 /**
@@ -95,7 +100,8 @@ export function getNearestBlockIndex(
  *
  * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
  *
- * @return {Object} An object that contains the event handlers `onBlockDragOver` and `onBlockDragEnd`.
+ * @return {Object} An object that contains `targetBlockIndex` and the event
+ * handlers `onBlockDragOver` and `onBlockDragEnd`.
  */
 export default function useBlockDropZone( {
 	// An undefined value represents a top-level block. Default to an empty
@@ -104,13 +110,9 @@ export default function useBlockDropZone( {
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
 } = {} ) {
-	// eslint-disable-next-line no-unused-vars
-	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
+	const targetBlockIndex = useSharedValue( null );
 
 	const { getBlockListSettings, getSettings } = useSelect( blockEditorStore );
-	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
-		blockEditorStore
-	);
 	const {
 		blocksLayouts,
 		getBlockLayoutsOrderedByYCoord,
@@ -122,7 +124,6 @@ export default function useBlockDropZone( {
 
 	const isRTL = getSettings().isRTL;
 
-	//const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 	const throttled = useThrottle(
 		useCallback(
 			( event ) => {
@@ -134,16 +135,15 @@ export default function useBlockDropZone( {
 					getBlockListSettings( targetRootClientId )?.orientation,
 					isRTL
 				);
-				//setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
 				if ( targetIndex !== null ) {
-					showInsertionPoint( targetRootClientId, targetIndex );
+					targetBlockIndex.value = targetIndex ?? 0;
 				}
 			},
 			[
 				getSortedBlocksLayouts,
 				getNearestBlockIndex,
 				getBlockListSettings,
-				showInsertionPoint,
+				targetBlockIndex,
 			]
 		),
 		200
@@ -155,8 +155,8 @@ export default function useBlockDropZone( {
 		},
 		onBlockDragEnd() {
 			throttled.cancel();
-			hideInsertionPoint();
-			setTargetBlockIndex( null );
+			targetBlockIndex.value = null;
 		},
+		targetBlockIndex,
 	};
 }
