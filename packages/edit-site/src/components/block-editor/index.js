@@ -170,8 +170,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					/>
 				</ResizableEditor>
 				<__unstableBlockSettingsMenuFirstItem>
-					{ ( { onClose } ) => (
-						<BlockInspectorButton onClick={ onClose } />
+					{ ( { onClose, blocks } ) => (
+						<BlockInspectorButton
+							onClick={ onClose }
+							blocks={ blocks }
+						/>
 					) }
 				</__unstableBlockSettingsMenuFirstItem>
 				<__unstableBlockToolbarLastItem>

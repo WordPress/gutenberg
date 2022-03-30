@@ -7,6 +7,7 @@ import { MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -15,7 +16,8 @@ import { store as editSiteStore } from '../../store';
 import { STORE_NAME } from '../../store/constants';
 import { SIDEBAR_BLOCK } from '../sidebar/constants';
 
-export default function BlockInspectorButton( { onClick = () => {} } ) {
+export default function BlockInspectorButton( { blocks, onClick = () => {} } ) {
+	const { isBlockSelected } = useSelect( blockEditorStore );
 	const { shortcut, isBlockInspectorOpen } = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -37,6 +39,17 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 	const label = isBlockInspectorOpen
 		? __( 'Hide more settings' )
 		: __( 'Show more settings' );
+
+	// If blocks are passed to this component then check whether any of the blocks are selected.
+	if ( blocks ) {
+		// If none of the blocks are selected then don't show this option.
+		if (
+			blocks.filter( ( block ) => isBlockSelected( block.clientId ) )
+				.length === 0
+		) {
+			return null;
+		}
+	}
 
 	return (
 		<MenuItem

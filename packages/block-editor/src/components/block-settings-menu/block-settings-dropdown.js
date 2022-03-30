@@ -165,7 +165,7 @@ export function BlockSettingsDropdown( {
 						<>
 							<MenuGroup>
 								<__unstableBlockSettingsMenuFirstItem.Slot
-									fillProps={ { onClose } }
+									fillProps={ { onClose, blocks } }
 								/>
 								{ count === 1 && (
 									<BlockHTMLConvertButton
