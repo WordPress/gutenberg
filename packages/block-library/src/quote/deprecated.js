@@ -110,6 +110,7 @@ const v2 = {
 			type: 'string',
 		},
 	},
+	migrate: migrateToQuoteV2,
 	save( { attributes } ) {
 		const { align, value, citation } = attributes;
 
@@ -150,15 +151,15 @@ const v1 = {
 
 	migrate( attributes ) {
 		if ( attributes.style === 2 ) {
-			return {
+			return migrateToQuoteV2( {
 				...omit( attributes, [ 'style' ] ),
 				className: attributes.className
 					? attributes.className + ' is-style-large'
 					: 'is-style-large',
-			};
+			} );
 		}
 
-		return attributes;
+		return migrateToQuoteV2( attributes );
 	},
 
 	save( { attributes } ) {
@@ -204,12 +205,12 @@ const v0 = {
 
 	migrate( attributes ) {
 		if ( ! isNaN( parseInt( attributes.style ) ) ) {
-			return {
+			return migrateToQuoteV2( {
 				...omit( attributes, [ 'style' ] ),
-			};
+			} );
 		}
 
-		return attributes;
+		return migrateToQuoteV2( attributes );
 	},
 
 	save( { attributes } ) {
