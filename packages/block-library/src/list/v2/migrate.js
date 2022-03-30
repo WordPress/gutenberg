@@ -38,13 +38,13 @@ function createListBlockFromDOMElement( listElement ) {
 			}
 			const htmlNodes = nodes.map( ( node ) => {
 				if ( node.nodeType === node.TEXT_NODE ) {
-					return node.textContent;
+					return node.textContent.trim();
 				}
 				return node.outerHTML;
 			} );
 			htmlNodes.reverse();
 			const childAttributes = {
-				content: htmlNodes.join( '' ).trim(),
+				content: htmlNodes.join( ' ' ),
 			};
 			const childInnerBlocks = [
 				createListBlockFromDOMElement( nestedList ),
