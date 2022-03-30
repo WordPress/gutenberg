@@ -28,34 +28,6 @@ exports[`Blocks raw handling pasteHandler should strip windows data 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Blocks raw handling should convert to paragraph quotes with more than one cite 1`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><!-- wp:html -->
-<cite>ribs</cite>
-<!-- /wp:html -->
-
-<!-- wp:html -->
-<cite>ribs</cite>
-<!-- /wp:html --></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Blocks raw handling should convert to paragraph quotes with more than one cite and at least one paragraph 1`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
-<p>chicken</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:html -->
-<cite>ribs</cite>
-<!-- /wp:html -->
-
-<!-- wp:html -->
-<cite>ribs</cite>
-<!-- /wp:html --></blockquote>
-<!-- /wp:quote -->"
-`;
-
 exports[`Blocks raw handling should correctly handle quotes with mixed content 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><!-- wp:heading {\\"level\\":1} -->
