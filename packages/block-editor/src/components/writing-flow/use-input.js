@@ -39,9 +39,8 @@ export default function useInput() {
 				return;
 			}
 
-			node.contentEditable = false;
-
 			if ( event.keyCode === ENTER ) {
+				node.contentEditable = false;
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					replaceBlocks(
@@ -55,6 +54,7 @@ export default function useInput() {
 				event.keyCode === BACKSPACE ||
 				event.keyCode === DELETE
 			) {
+				node.contentEditable = false;
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					removeBlocks( getSelectedBlockClientIds() );
@@ -69,6 +69,7 @@ export default function useInput() {
 				event.key.length === 1 &&
 				! ( event.metaKey || event.ctrlKey )
 			) {
+				node.contentEditable = false;
 				if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {

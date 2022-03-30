@@ -317,3 +317,19 @@ exports[`Multi-block selection should use selection direction to determine verti
 <p>3</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`Multi-block selection should write over selection 1`] = `
+"<!-- wp:paragraph -->
+<p>1[</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>]2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should write over selection 2`] = `
+"<!-- wp:paragraph -->
+<p>1...2</p>
+<!-- /wp:paragraph -->"
+`;
