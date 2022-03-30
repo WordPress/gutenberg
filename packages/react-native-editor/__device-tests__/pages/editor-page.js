@@ -47,7 +47,10 @@ class EditorPage {
 
 	async clickParagraphBlockAtPosition( position = 1 ) {
 		const paragraphBlockLocator = `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`;
-		const paragraphBlock = await waitForVisible( this.driver, paragraphBlockLocator )
+		const paragraphBlock = await waitForVisible(
+			this.driver,
+			paragraphBlockLocator
+		);
 		await paragraphBlock.click();
 	}
 
