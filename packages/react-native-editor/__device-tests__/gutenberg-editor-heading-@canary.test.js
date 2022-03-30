@@ -7,10 +7,6 @@ import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests', () => {
 	it( 'should be able to create a post with heading and paragraph blocks', async () => {
-		let block;
-		let paragraphBlockElement;
-		let textViewElement;
-
 		await editorPage.addNewBlock( blockNames.heading );
 		let headingBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.heading
@@ -25,21 +21,16 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		let paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
 			2
 		);
 
-		// Extra step for iOS only
 		if ( ! isAndroid() ) {
-			textViewElement = await editorPage.getTextViewForParagraphBlock(
-				paragraphBlockElement
-			);
+			await editorPage.clickBlockParagraphAtPosition( 2 )
 		}
 
-		block = isAndroid() ? paragraphBlockElement : textViewElement;
-
-		await editorPage.typeTextToParagraphBlock( block, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
 		await editorPage.addNewBlock( blockNames.paragraph );
 		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
@@ -47,23 +38,17 @@ describe( 'Gutenberg Editor tests', () => {
 			3
 		);
 
-		// Extra step for iOS only
 		if ( ! isAndroid() ) {
-			textViewElement = await editorPage.getTextViewForParagraphBlock(
-				paragraphBlockElement
-			);
+			await editorPage.clickBlockParagraphAtPosition( 3 )
 		}
 
-		block = isAndroid() ? paragraphBlockElement : textViewElement;
-
-		await editorPage.typeTextToParagraphBlock( block, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
 		await editorPage.addNewBlock( blockNames.heading );
 		headingBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.heading,
 			4
 		);
-
 		await editorPage.typeTextToParagraphBlock(
 			headingBlockElement,
 			testData.heading
@@ -75,15 +60,10 @@ describe( 'Gutenberg Editor tests', () => {
 			5
 		);
 
-		// Extra step for iOS only
 		if ( ! isAndroid() ) {
-			textViewElement = await editorPage.getTextViewForParagraphBlock(
-				paragraphBlockElement
-			);
+			await editorPage.clickBlockParagraphAtPosition( 5 )
 		}
 
-		block = isAndroid() ? paragraphBlockElement : textViewElement;
-
-		await editorPage.typeTextToParagraphBlock( block, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 	} );
 } );
