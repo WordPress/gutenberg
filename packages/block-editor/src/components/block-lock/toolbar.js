@@ -58,7 +58,6 @@ export default function BlockLockToolbar( { clientId } ) {
 						blockInformation.title
 					) }
 					onClick={ toggleModal }
-					aria-disabled={ ! canLockBlock }
 				/>
 			</ToolbarGroup>
 			{ isModalOpen && (
