@@ -18,6 +18,10 @@ function render_block_core_comment_content( $attributes, $content, $block ) {
 		return '';
 	}
 
+	if ( 0 === $block->context['commentId'] ) {
+		return '<wp-comment-content></wp-comment-content>';
+	}
+
 	$comment = get_comment( $block->context['commentId'] );
 	if ( empty( $comment ) ) {
 		return '';

@@ -58,6 +58,15 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$block_content = '<wp-comment-template>';
+	$block_content .= ( new WP_Block(
+		$block->parsed_block,
+		array(
+			'commentId' => 0,
+		)
+	) )->render( array( 'dynamic' => false ) );
+	$block_content .= '</wp-comment-template>';
+
 	$comment_query = new WP_Comment_Query(
 		build_comment_query_vars_from_block( $block )
 	);
@@ -80,7 +89,7 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		'<ol %1$s>%2$s</ol>',
 		$wrapper_attributes,
 		block_core_comment_template_render_comments( $comments, $block )
-	);
+	) . $block_content;
 }
 
 /**
