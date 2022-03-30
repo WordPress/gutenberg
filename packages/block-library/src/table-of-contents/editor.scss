@@ -1,0 +1,4 @@
+// The links in the block don't work in the editor, so we prevent them from being clicked.
+.wp-block-table-of-contents a {
+	pointer-events: none;
+}
