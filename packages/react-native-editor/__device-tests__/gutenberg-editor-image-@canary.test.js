@@ -39,11 +39,12 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
-		} else {
-			await editorPage.clickBlockParagraphAtPosition( 2 );
 		}
 
-		await editorPage.sendTextToParagraphBlock( 2, testData.shortText );
+		await editorPage.typeTextToParagraphBlock(
+			paragraphBlockElement,
+			testData.shortText
+		);
 
 		// skip HTML check for Android since we couldn't add image from media library
 		/* eslint-disable jest/no-conditional-expect */
