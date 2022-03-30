@@ -4,7 +4,7 @@
 import {
 	__experimentalBorderRadiusControl as BorderRadiusControl,
 	__experimentalBorderStyleControl as BorderStyleControl,
-	__experimentalColorGradientControl as ColorGradientControl,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 } from '@wordpress/block-editor';
 import {
 	__experimentalToolsPanel as ToolsPanel,
@@ -17,13 +17,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import {
+	getSupportedGlobalStylesPanels,
+	useColorsPerOrigin,
+	useSetting,
+	useStyle,
+} from './hooks';
 
 const MIN_BORDER_WIDTH = 0;
-
-// Defining empty array here instead of inline avoids unnecessary re-renders of
-// color control.
-const EMPTY_ARRAY = [];
 
 export function useHasBorderPanel( name ) {
 	const controls = [
@@ -100,12 +101,31 @@ export default function BorderPanel( { name } ) {
 	const showBorderStyle = useHasBorderStyleControl( name );
 	const [ borderStyle, setBorderStyle ] = useStyle( 'border.style', name );
 
+	// When we set a border color or width ensure we have a style so the user
+	// can see a visible border.
+	const handleOnChangeWithStyle = ( setStyle ) => ( value ) => {
+		if ( !! value && ! borderStyle ) {
+			setBorderStyle( 'solid' );
+		}
+
+		setStyle( value || undefined );
+	};
+
 	// Border color.
 	const showBorderColor = useHasBorderColorControl( name );
 	const [ borderColor, setBorderColor ] = useStyle( 'border.color', name );
-	const [ colors = EMPTY_ARRAY ] = useSetting( 'color.palette' );
 	const disableCustomColors = ! useSetting( 'color.custom' )[ 0 ];
 	const disableCustomGradients = ! useSetting( 'color.customGradient' )[ 0 ];
+
+	const borderColorSettings = [
+		{
+			label: __( 'Color' ),
+			colors: useColorsPerOrigin( name ),
+			colorValue: borderColor,
+			onColorChange: handleOnChangeWithStyle( setBorderColor ),
+			clearable: false,
+		},
+	];
 
 	// Border radius.
 	const showBorderRadius = useHasBorderRadiusControl( name );
@@ -126,16 +146,6 @@ export default function BorderPanel( { name } ) {
 		setBorderRadius( undefined );
 		setBorderStyle( undefined );
 		setBorderWidth( undefined );
-	};
-
-	// When we set a border color or width ensure we have a style so the user
-	// can see a visible border.
-	const handleOnChangeWithStyle = ( setStyle ) => ( value ) => {
-		if ( !! value && ! borderStyle ) {
-			setBorderStyle( 'solid' );
-		}
-
-		setStyle( value || undefined );
 	};
 
 	return (
@@ -178,17 +188,13 @@ export default function BorderPanel( { name } ) {
 					onDeselect={ createResetCallback( setBorderColor ) }
 					isShownByDefault={ true }
 				>
-					<ColorGradientControl
-						label={ __( 'Color' ) }
-						colorValue={ borderColor }
-						colors={ colors }
-						gradients={ undefined }
+					<ColorGradientSettingsDropdown
+						__experimentalHasMultipleOrigins
+						__experimentalIsRenderedInSidebar
 						disableCustomColors={ disableCustomColors }
 						disableCustomGradients={ disableCustomGradients }
-						onColorChange={ handleOnChangeWithStyle(
-							setBorderColor
-						) }
-						clearable={ false }
+						enableAlpha
+						settings={ borderColorSettings }
 					/>
 				</ToolsPanelItem>
 			) }

@@ -46,11 +46,26 @@ export function BlockSettingsDropdown( {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
-	const { onlyBlock } = useSelect(
+	const {
+		onlyBlock,
+		previousBlockClientId,
+		nextBlockClientId,
+		selectedBlockClientIds,
+	} = useSelect(
 		( select ) => {
-			const { getBlockCount } = select( blockEditorStore );
+			const {
+				getBlockCount,
+				getPreviousBlockClientId,
+				getNextBlockClientId,
+				getSelectedBlockClientIds,
+			} = select( blockEditorStore );
 			return {
 				onlyBlock: 1 === getBlockCount(),
+				previousBlockClientId: getPreviousBlockClientId(
+					firstBlockClientId
+				),
+				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
+				selectedBlockClientIds: getSelectedBlockClientIds(),
 			};
 		},
 		[ firstBlockClientId ]
@@ -72,7 +87,7 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 
-	const updateSelection = useCallback(
+	const updateSelectionAfterDuplicate = useCallback(
 		__experimentalSelectBlock
 			? async ( clientIdsPromise ) => {
 					const ids = await clientIdsPromise;
@@ -85,6 +100,33 @@ export function BlockSettingsDropdown( {
 	);
 
 	const blockTitle = useBlockDisplayTitle( firstBlockClientId, 25 );
+
+	const updateSelectionAfterRemove = useCallback(
+		__experimentalSelectBlock
+			? () => {
+					const blockToSelect =
+						previousBlockClientId || nextBlockClientId;
+
+					if (
+						blockToSelect &&
+						// From the block options dropdown, it's possible to remove a block that is not selected,
+						// in this case, it's not necessary to update the selection since the selected block wasn't removed.
+						selectedBlockClientIds.includes( firstBlockClientId ) &&
+						// Don't update selection when next/prev block also is in the selection ( and gets removed ),
+						// In case someone selects all blocks and removes them at once.
+						! selectedBlockClientIds.includes( blockToSelect )
+					) {
+						__experimentalSelectBlock( blockToSelect );
+					}
+			  }
+			: noop,
+		[
+			__experimentalSelectBlock,
+			previousBlockClientId,
+			nextBlockClientId,
+			selectedBlockClientIds,
+		]
+	);
 
 	const label = sprintf(
 		/* translators: %s: block name */
@@ -139,7 +181,7 @@ export function BlockSettingsDropdown( {
 										onClick={ flow(
 											onClose,
 											onDuplicate,
-											updateSelection
+											updateSelectionAfterDuplicate
 										) }
 										shortcut={ shortcuts.duplicate }
 									>
@@ -197,7 +239,7 @@ export function BlockSettingsDropdown( {
 										onClick={ flow(
 											onClose,
 											onRemove,
-											updateSelection
+											updateSelectionAfterRemove
 										) }
 										shortcut={ shortcuts.remove }
 									>

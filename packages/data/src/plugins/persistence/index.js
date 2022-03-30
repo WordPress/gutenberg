@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject } from 'lodash';
+import { merge, isPlainObject, identity } from 'lodash';
 
 /**
  * Internal dependencies
@@ -252,29 +252,31 @@ export function migrateFeaturePreferencesToPreferencesStore(
 		: sourceFeatures;
 
 	if ( featuresToMigrate ) {
-		const targetFeatures = state[ preferencesStoreName ]?.preferences;
+		const existingPreferences = state[ preferencesStoreName ]?.preferences;
 
 		// Avoid migrating features again if they've previously been migrated.
-		if ( ! targetFeatures?.[ sourceStoreName ] ) {
+		if ( ! existingPreferences?.[ sourceStoreName ] ) {
 			// Set the feature values in the interface store, the features
 			// object is keyed by 'scope', which matches the store name for
 			// the source.
 			persistence.set( preferencesStoreName, {
 				preferences: {
-					...targetFeatures,
+					...existingPreferences,
 					[ sourceStoreName ]: featuresToMigrate,
 				},
 			} );
 
 			// Remove migrated feature preferences from `interface`.
 			if ( interfaceFeatures ) {
-				const otherInterfaceFeatures =
+				const otherInterfaceState = state[ interfaceStoreName ];
+				const otherInterfaceScopes =
 					state[ interfaceStoreName ]?.preferences?.features;
 
 				persistence.set( interfaceStoreName, {
+					...otherInterfaceState,
 					preferences: {
 						features: {
-							...otherInterfaceFeatures,
+							...otherInterfaceScopes,
 							[ sourceStoreName ]: undefined,
 						},
 					},
@@ -283,9 +285,11 @@ export function migrateFeaturePreferencesToPreferencesStore(
 
 			// Remove migrated feature preferences from the source.
 			if ( sourceFeatures ) {
+				const otherSourceState = state[ sourceStoreName ];
 				const sourcePreferences = state[ sourceStoreName ]?.preferences;
 
 				persistence.set( sourceStoreName, {
+					...otherSourceState,
 					preferences: {
 						...sourcePreferences,
 						features: undefined,
@@ -296,47 +300,62 @@ export function migrateFeaturePreferencesToPreferencesStore(
 	}
 }
 
+/**
+ * Migrates an individual item inside the `preferences` object for a store.
+ *
+ * @param {Object}    persistence   The persistence interface.
+ * @param {Object}    migrate       An options object that contains details of the migration.
+ * @param {string}    migrate.from  The name of the store to migrate from.
+ * @param {string}    migrate.scope The scope in the preferences store to migrate to.
+ * @param {string}    key           The key in the preferences object to migrate.
+ * @param {?Function} convert       A function that converts preferences from one format to another.
+ */
 export function migrateIndividualPreferenceToPreferencesStore(
 	persistence,
-	sourceStoreName,
-	key
+	{ from: sourceStoreName, scope },
+	key,
+	convert = identity
 ) {
 	const preferencesStoreName = 'core/preferences';
 	const state = persistence.get();
 	const sourcePreference = state[ sourceStoreName ]?.preferences?.[ key ];
 
 	// There's nothing to migrate, exit early.
-	if ( ! sourcePreference ) {
+	if ( sourcePreference === undefined ) {
 		return;
 	}
 
 	const targetPreference =
-		state[ preferencesStoreName ]?.preferences?.[ sourceStoreName ]?.[
-			key
-		];
+		state[ preferencesStoreName ]?.preferences?.[ scope ]?.[ key ];
 
 	// There's existing data at the target, so don't overwrite it, exit early.
 	if ( targetPreference ) {
 		return;
 	}
 
-	const allPreferences = state[ preferencesStoreName ]?.preferences;
-	const targetPreferences =
-		state[ preferencesStoreName ]?.preferences?.[ sourceStoreName ];
+	const otherScopes = state[ preferencesStoreName ]?.preferences;
+	const otherPreferences =
+		state[ preferencesStoreName ]?.preferences?.[ scope ];
+
+	// Pass an object with the key and value as this allows the convert
+	// function to convert to a data structure that has different keys.
+	const convertedPreferences = convert( { [ key ]: sourcePreference } );
 
 	persistence.set( preferencesStoreName, {
 		preferences: {
-			...allPreferences,
-			[ sourceStoreName ]: {
-				...targetPreferences,
-				[ key ]: sourcePreference,
+			...otherScopes,
+			[ scope ]: {
+				...otherPreferences,
+				...convertedPreferences,
 			},
 		},
 	} );
 
 	// Remove migrated feature preferences from the source.
+	const otherSourceState = state[ sourceStoreName ];
 	const allSourcePreferences = state[ sourceStoreName ]?.preferences;
 	persistence.set( sourceStoreName, {
+		...otherSourceState,
 		preferences: {
 			...allSourcePreferences,
 			[ key ]: undefined,
@@ -345,55 +364,231 @@ export function migrateIndividualPreferenceToPreferencesStore(
 }
 
 /**
- * Move the 'features' object in local storage from the sourceStoreName to the
- * interface store.
+ * Convert from:
+ * ```
+ * {
+ *     panels: {
+ *         tags: {
+ *             enabled: true,
+ *             opened: true,
+ *         },
+ *         permalinks: {
+ *             enabled: false,
+ *             opened: false,
+ *         },
+ *     },
+ * }
+ * ```
  *
- * @param {Object} persistence     The persistence interface.
- * @param {string} sourceStoreName The name of the store that has persisted
- *                                 preferences to migrate to the interface
- *                                 package.
+ * to:
+ * {
+ *     inactivePanels: [
+ *         'permalinks',
+ *     ],
+ *     openPanels: [
+ *         'tags',
+ *     ],
+ * }
+ *
+ * @param {Object} preferences A preferences object.
+ *
+ * @return {Object} The converted data.
  */
-export function migrateFeaturePreferencesToInterfaceStore(
-	persistence,
-	sourceStoreName
+export function convertEditPostPanels( preferences ) {
+	const panels = preferences?.panels ?? {};
+	return Object.keys( panels ).reduce(
+		( convertedData, panelName ) => {
+			const panel = panels[ panelName ];
+
+			if ( panel?.enabled === false ) {
+				convertedData.inactivePanels.push( panelName );
+			}
+
+			if ( panel?.opened === true ) {
+				convertedData.openPanels.push( panelName );
+			}
+
+			return convertedData;
+		},
+		{ inactivePanels: [], openPanels: [] }
+	);
+}
+
+export function migrateThirdPartyFeaturePreferencesToPreferencesStore(
+	persistence
 ) {
 	const interfaceStoreName = 'core/interface';
-	const state = persistence.get();
-	const sourcePreferences = state[ sourceStoreName ]?.preferences;
-	const sourceFeatures = sourcePreferences?.features;
+	const preferencesStoreName = 'core/preferences';
 
-	if ( sourceFeatures ) {
-		const targetFeatures =
+	let state = persistence.get();
+
+	const interfaceScopes = state[ interfaceStoreName ]?.preferences?.features;
+
+	for ( const scope in interfaceScopes ) {
+		// Don't migrate any core 'scopes'.
+		if ( scope.startsWith( 'core' ) ) {
+			continue;
+		}
+
+		// Skip this scope if there are no features to migrate.
+		const featuresToMigrate = interfaceScopes[ scope ];
+		if ( ! featuresToMigrate ) {
+			continue;
+		}
+
+		const existingPreferences = state[ preferencesStoreName ]?.preferences;
+
+		// Add the data to the preferences store structure.
+		persistence.set( preferencesStoreName, {
+			preferences: {
+				...existingPreferences,
+				[ scope ]: featuresToMigrate,
+			},
+		} );
+
+		// Remove the data from the interface store structure.
+		// Call `persistence.get` again to make sure `state` is up-to-date with
+		// any changes from the previous iteration of this loop.
+		state = persistence.get();
+		const otherInterfaceState = state[ interfaceStoreName ];
+		const otherInterfaceScopes =
 			state[ interfaceStoreName ]?.preferences?.features;
 
-		// Avoid migrating features again if they've previously been migrated.
-		if ( ! targetFeatures?.[ sourceStoreName ] ) {
-			// Set the feature values in the interface store, the features
-			// object is keyed by 'scope', which matches the store name for
-			// the source.
-			persistence.set( interfaceStoreName, {
-				preferences: {
-					features: {
-						...targetFeatures,
-						[ sourceStoreName ]: sourceFeatures,
-					},
+		persistence.set( interfaceStoreName, {
+			...otherInterfaceState,
+			preferences: {
+				features: {
+					...otherInterfaceScopes,
+					[ scope ]: undefined,
 				},
-			} );
-
-			// Remove feature preferences from the source.
-			persistence.set( sourceStoreName, {
-				preferences: {
-					...sourcePreferences,
-					features: undefined,
-				},
-			} );
-		}
+			},
+		} );
 	}
+}
+
+/**
+ * Migrates interface 'enableItems' data to the preferences store.
+ *
+ * The interface package stores this data in this format:
+ * ```js
+ * {
+ *     enableItems: {
+ *         singleEnableItems: {
+ * 	           complementaryArea: {
+ *                 'core/edit-post': 'edit-post/document',
+ *                 'core/edit-site': 'edit-site/global-styles',
+ *             }
+ *         },
+ *         multipleEnableItems: {
+ *             pinnedItems: {
+ *                 'core/edit-post': {
+ *                     'plugin-1': true,
+ *                 },
+ *                 'core/edit-site': {
+ *                     'plugin-2': true,
+ *                 },
+ *             },
+ *         }
+ *     }
+ * }
+ * ```
+ * and it should be migrated it to:
+ * ```js
+ * {
+ *     'core/edit-post': {
+ *         complementaryArea: 'edit-post/document',
+ *         pinnedItems: {
+ *             'plugin-1': true,
+ *         },
+ *     },
+ *     'core/edit-site': {
+ *         complementaryArea: 'edit-site/global-styles',
+ *         pinnedItems: {
+ *             'plugin-2': true,
+ *         },
+ *     },
+ * }
+ * ```
+ *
+ * @param {Object} persistence The persistence interface.
+ */
+export function migrateInterfaceEnableItemsToPreferencesStore( persistence ) {
+	const interfaceStoreName = 'core/interface';
+	const preferencesStoreName = 'core/preferences';
+	const state = persistence.get();
+	const sourceEnableItems = state[ interfaceStoreName ]?.enableItems;
+
+	// There's nothing to migrate, exit early.
+	if ( ! sourceEnableItems ) {
+		return;
+	}
+
+	const allPreferences = state[ preferencesStoreName ]?.preferences ?? {};
+
+	// First convert complementaryAreas into the right format.
+	// Use the existing preferences as the accumulator so that the data is
+	// merged.
+	const sourceComplementaryAreas =
+		sourceEnableItems?.singleEnableItems?.complementaryArea ?? {};
+
+	const convertedComplementaryAreas = Object.keys(
+		sourceComplementaryAreas
+	).reduce( ( accumulator, scope ) => {
+		const data = sourceComplementaryAreas[ scope ];
+
+		// Don't overwrite any existing data in the preferences store.
+		if ( accumulator[ scope ]?.complementaryArea ) {
+			return accumulator;
+		}
+
+		return {
+			...accumulator,
+			[ scope ]: {
+				...accumulator[ scope ],
+				complementaryArea: data,
+			},
+		};
+	}, allPreferences );
+
+	// Next feed the converted complementary areas back into a reducer that
+	// converts the pinned items, resulting in the fully migrated data.
+	const sourcePinnedItems =
+		sourceEnableItems?.multipleEnableItems?.pinnedItems ?? {};
+	const allConvertedData = Object.keys( sourcePinnedItems ).reduce(
+		( accumulator, scope ) => {
+			const data = sourcePinnedItems[ scope ];
+			// Don't overwrite any existing data in the preferences store.
+			if ( accumulator[ scope ]?.pinnedItems ) {
+				return accumulator;
+			}
+
+			return {
+				...accumulator,
+				[ scope ]: {
+					...accumulator[ scope ],
+					pinnedItems: data,
+				},
+			};
+		},
+		convertedComplementaryAreas
+	);
+
+	persistence.set( preferencesStoreName, {
+		preferences: allConvertedData,
+	} );
+
+	// Remove migrated preferences.
+	const otherInterfaceItems = state[ interfaceStoreName ];
+	persistence.set( interfaceStoreName, {
+		...otherInterfaceItems,
+		enableItems: undefined,
+	} );
 }
 
 persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const persistence = createPersistenceInterface( pluginOptions );
 
+	// Boolean feature preferences.
 	migrateFeaturePreferencesToPreferencesStore(
 		persistence,
 		'core/edit-widgets'
@@ -406,30 +601,45 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 		persistence,
 		'core/edit-post'
 	);
-	migrateIndividualPreferenceToPreferencesStore(
-		persistence,
-		'core/edit-post',
-		'hiddenBlockTypes'
-	);
-	migrateIndividualPreferenceToPreferencesStore(
-		persistence,
-		'core/edit-post',
-		'editorMode'
-	);
-	migrateIndividualPreferenceToPreferencesStore(
-		persistence,
-		'core/edit-post',
-		'preferredStyleVariations'
-	);
 	migrateFeaturePreferencesToPreferencesStore(
 		persistence,
 		'core/edit-site'
 	);
+	migrateThirdPartyFeaturePreferencesToPreferencesStore( persistence );
+
+	// Other ad-hoc preferences.
 	migrateIndividualPreferenceToPreferencesStore(
 		persistence,
-		'core/edit-site',
+		{ from: 'core/edit-post', scope: 'core/edit-post' },
+		'hiddenBlockTypes'
+	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		{ from: 'core/edit-post', scope: 'core/edit-post' },
 		'editorMode'
 	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		{ from: 'core/edit-post', scope: 'core/edit-post' },
+		'preferredStyleVariations'
+	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		{ from: 'core/edit-post', scope: 'core/edit-post' },
+		'panels',
+		convertEditPostPanels
+	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		{ from: 'core/editor', scope: 'core/edit-post' },
+		'isPublishSidebarEnabled'
+	);
+	migrateIndividualPreferenceToPreferencesStore(
+		persistence,
+		{ from: 'core/edit-site', scope: 'core/edit-site' },
+		'editorMode'
+	);
+	migrateInterfaceEnableItemsToPreferencesStore( persistence );
 };
 
 export default persistencePlugin;

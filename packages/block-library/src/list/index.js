@@ -11,12 +11,13 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import settingsV2 from './v2';
 
 const { name } = metadata;
 
 export { metadata, name };
 
-export const settings = {
+const settingsV1 = {
 	icon,
 	example: {
 		attributes: {
@@ -41,3 +42,7 @@ export const settings = {
 	save,
 	deprecated,
 };
+
+export const settings = window?.__experimentalEnableListBlockV2
+	? settingsV2
+	: settingsV1;

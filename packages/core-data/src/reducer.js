@@ -105,10 +105,10 @@ export function taxonomies( state = [], action ) {
 /**
  * Reducer managing the current theme.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string|undefined} Updated state.
  */
 export function currentTheme( state = undefined, action ) {
 	switch ( action.type ) {
@@ -122,10 +122,10 @@ export function currentTheme( state = undefined, action ) {
 /**
  * Reducer managing the current global styles id.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string|undefined} Updated state.
  */
 export function currentGlobalStylesId( state = undefined, action ) {
 	switch ( action.type ) {
@@ -139,10 +139,10 @@ export function currentGlobalStylesId( state = undefined, action ) {
 /**
  * Reducer managing the theme base global styles.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Record<string, object>} Updated state.
  */
 export function themeBaseGlobalStyles( state = {}, action ) {
 	switch ( action.type ) {
@@ -159,10 +159,10 @@ export function themeBaseGlobalStyles( state = {}, action ) {
 /**
  * Reducer managing the theme global styles variations.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Record<string, object>} Updated state.
  */
 export function themeGlobalStyleVariations( state = {}, action ) {
 	switch ( action.type ) {
@@ -592,6 +592,24 @@ export function autosaves( state = {}, action ) {
 	return state;
 }
 
+export function blockPatterns( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERNS':
+			return action.patterns;
+	}
+
+	return state;
+}
+
+export function blockPatternCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERN_CATEGORIES':
+			return action.categories;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -606,4 +624,6 @@ export default combineReducers( {
 	embedPreviews,
 	userPermissions,
 	autosaves,
+	blockPatterns,
+	blockPatternCategories,
 } );

@@ -21,6 +21,8 @@ import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
+import { Flex, FlexItem } from '../flex';
+import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
 
 extend( [ namesPlugin, a11yPlugin ] );
@@ -125,6 +127,31 @@ export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
 	);
 }
 
+const extractColorNameFromCurrentValue = (
+	currentValue,
+	colors = [],
+	showMultiplePalettes = false
+) => {
+	if ( ! currentValue ) {
+		return '';
+	}
+
+	// Normalize format of `colors` to simplify the following loop
+	const colorPalettes = showMultiplePalettes ? colors : [ { colors } ];
+	for ( const { colors: paletteColors } of colorPalettes ) {
+		for ( const { name: colorName, color: colorValue } of paletteColors ) {
+			if (
+				colord( currentValue ).toHex() === colord( colorValue ).toHex()
+			) {
+				return colorName;
+			}
+		}
+	}
+
+	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
+	return __( 'Custom' );
+};
+
 export default function ColorPalette( {
 	clearable = true,
 	className,
@@ -137,10 +164,9 @@ export default function ColorPalette( {
 	__experimentalIsRenderedInSidebar = false,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
-	const Component =
-		__experimentalHasMultipleOrigins && colors?.length
-			? MultiplePalettes
-			: SinglePalette;
+	const showMultiplePalettes =
+		__experimentalHasMultipleOrigins && colors?.length;
+	const Component = showMultiplePalettes ? MultiplePalettes : SinglePalette;
 
 	const renderCustomColorPicker = () => (
 		<ColorPicker
@@ -157,6 +183,30 @@ export default function ColorPalette( {
 
 	const colordColor = colord( value );
 
+	const valueWithoutLeadingHash = value?.startsWith( '#' )
+		? value.substring( 1 )
+		: value ?? '';
+	const buttonLabelName = useMemo(
+		() =>
+			extractColorNameFromCurrentValue(
+				value,
+				colors,
+				showMultiplePalettes
+			),
+		[ value, colors, showMultiplePalettes ]
+	);
+
+	const customColorAccessibleLabel = !! valueWithoutLeadingHash
+		? sprintf(
+				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
+				__(
+					'Custom color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
+				),
+				buttonLabelName,
+				valueWithoutLeadingHash
+		  )
+		: __( 'Custom color picker.' );
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
@@ -165,12 +215,15 @@ export default function ColorPalette( {
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<button
+						<Flex
+							as={ 'button' }
+							justify="space-between"
+							align="flex-start"
 							className="components-color-palette__custom-color"
 							aria-expanded={ isOpen }
 							aria-haspopup="true"
 							onClick={ onToggle }
-							aria-label={ __( 'Custom color picker' ) }
+							aria-label={ customColorAccessibleLabel }
 							style={ {
 								background: value,
 								color:
@@ -180,8 +233,20 @@ export default function ColorPalette( {
 										: '#000',
 							} }
 						>
-							{ value }
-						</button>
+							<FlexItem
+								isBlock
+								as={ Truncate }
+								className="components-color-palette__custom-color-name"
+							>
+								{ buttonLabelName }
+							</FlexItem>
+							<FlexItem
+								as="span"
+								className="components-color-palette__custom-color-value"
+							>
+								{ valueWithoutLeadingHash }
+							</FlexItem>
+						</Flex>
 					) }
 				/>
 			) }

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### New Features
+-    Add `npmDevDependencies` template variable to allow definition of `devDependencies` as part of a template ([#39723](https://github.com/WordPress/gutenberg/pull/39723)).
+
 ## 3.0.0 (2022-03-03)
 
 ### Breaking Changes

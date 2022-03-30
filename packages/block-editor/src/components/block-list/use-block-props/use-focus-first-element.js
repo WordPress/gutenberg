@@ -7,7 +7,12 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	focus,
+	isFormElement,
+	isTextField,
+	placeCaretAtHorizontalEdge,
+} from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -15,7 +20,6 @@ import { useSelect } from '@wordpress/data';
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
-import { setContentEditableWrapper } from './use-multi-selection';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -32,7 +36,6 @@ function useInitialPosition( clientId ) {
 		( select ) => {
 			const {
 				getSelectedBlocksInitialCaretPosition,
-				isMultiSelecting,
 				isNavigationMode,
 				isBlockSelected,
 			} = select( blockEditorStore );
@@ -41,7 +44,7 @@ function useInitialPosition( clientId ) {
 				return;
 			}
 
-			if ( isMultiSelecting() || isNavigationMode() ) {
+			if ( isNavigationMode() ) {
 				return;
 			}
 
@@ -63,8 +66,14 @@ function useInitialPosition( clientId ) {
 export function useFocusFirstElement( clientId ) {
 	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
+	const { isBlockSelected, isMultiSelecting } = useSelect( blockEditorStore );
 
 	useEffect( () => {
+		// Check if the block is still selected at the time this effect runs.
+		if ( ! isBlockSelected( clientId ) || isMultiSelecting() ) {
+			return;
+		}
+
 		if ( initialPosition === undefined || initialPosition === null ) {
 			return;
 		}
@@ -96,10 +105,22 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
-		setContentEditableWrapper( ref.current, false );
+		// Check to see if element is focussable before a generic caret insert.
+		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
+			const focusElement = focus.tabbable.findNext( ref.current );
+			// Make sure focusElement is valid, contained in the same block, and a form field.
+			if (
+				focusElement &&
+				isInsideRootBlock( ref.current, focusElement ) &&
+				isFormElement( focusElement )
+			) {
+				focusElement.focus();
+				return;
+			}
+		}
 
 		placeCaretAtHorizontalEdge( target, isReverse );
-	}, [ initialPosition ] );
+	}, [ initialPosition, clientId ] );
 
 	return ref;
 }

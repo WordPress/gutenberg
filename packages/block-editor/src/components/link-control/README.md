@@ -85,7 +85,7 @@ Value change handler, called with the updated value if the user selects a new li
 <LinkControl
 	onChange={ ( nextValue ) => {
 		console.log( `The selected item URL: ${ nextValue.url }.` );
-	}
+	} }
 />
 ```
 

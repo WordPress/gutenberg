@@ -114,14 +114,12 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 
 	$custom_settings = array(
-		'siteUrl'                              => site_url(),
-		'postsPerPage'                         => get_option( 'posts_per_page' ),
-		'styles'                               => gutenberg_get_editor_styles(),
-		'defaultTemplateTypes'                 => $indexed_template_types,
-		'defaultTemplatePartAreas'             => get_allowed_block_template_part_areas(),
-		'__unstableHomeTemplate'               => gutenberg_resolve_home_template(),
-		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
-		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
+		'siteUrl'                  => site_url(),
+		'postsPerPage'             => get_option( 'posts_per_page' ),
+		'styles'                   => gutenberg_get_editor_styles(),
+		'defaultTemplateTypes'     => $indexed_template_types,
+		'defaultTemplatePartAreas' => get_allowed_block_template_part_areas(),
+		'__unstableHomeTemplate'   => gutenberg_resolve_home_template(),
 	);
 
 	/**
@@ -132,7 +130,7 @@ function gutenberg_edit_site_init( $hook ) {
 	 */
 	$current_screen->is_block_editor( true );
 
-	$site_editor_context     = new WP_Block_Editor_Context();
+	$site_editor_context     = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
 	$settings                = get_block_editor_settings( $custom_settings, $site_editor_context );
 	$active_global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
 	$active_theme            = wp_get_theme()->get_stylesheet();

@@ -519,6 +519,20 @@ supports: {
 }
 ```
 
+## __experimentalLock
+
+-   Type: `boolean`
+-   Default value: `true`
+
+A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block "Options" dropdown by default. To disable this behavior, set `__experimentalLock` to `false`.
+
+```js
+supports: {
+	// Remove support for locking UI.
+	__experimentalLock: false
+}
+```
+
 ## spacing
 
 -   Type: `Object`
