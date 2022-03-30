@@ -4,8 +4,6 @@
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	// await this.toggleMoreMenu( 'open' );
-
 	const menuSelector = await this.page.locator(
 		'.interface-more-menu-dropdown [aria-label="Options"]'
 	);

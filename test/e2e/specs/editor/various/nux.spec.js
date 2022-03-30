@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-// import { createNewPost, clickOnMoreMenuItem } from '@wordpress/e2e-test-utils';
 
 test.describe( 'New User Experience (NUX)', () => {
 	test( 'should show the guide to first-time users', async ( {
