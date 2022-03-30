@@ -17,6 +17,8 @@ describe( 'adding blocks', () => {
 		// Inserting a quote block.
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'Quote content' );
+		// Select the quote block.
+		await page.keyboard.press( 'ArrowDown' );
 
 		await clickBlockToolbarButton( 'Quote' );
 
@@ -29,7 +31,9 @@ describe( 'adding blocks', () => {
 		const content = await getEditedPostContent();
 		expect( content ).toMatchInlineSnapshot( `
 		"<!-- wp:quote {\\"className\\":\\"is-style-plain\\"} -->
-		<blockquote class=\\"wp-block-quote is-style-plain\\"><p>Quote content</p></blockquote>
+		<blockquote class=\\"wp-block-quote is-style-plain\\"><!-- wp:paragraph -->
+		<p>Quote content</p>
+		<!-- /wp:paragraph --></blockquote>
 		<!-- /wp:quote -->"
 	` );
 	} );
