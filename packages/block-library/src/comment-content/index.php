@@ -54,3 +54,26 @@ function register_block_core_comment_content() {
 	);
 }
 add_action( 'init', 'register_block_core_comment_content' );
+
+function define_comment_content_custom_element() {
+    ?>
+		<template id="wp-comment-content">
+			<div><slot></slot></div>
+		</template>
+		<script>
+		customElements.define( 'wp-comment-content',
+			class extends HTMLElement {
+				constructor() {
+					super();
+					const template = document.getElementById( 'wp-comment-content' );
+					const templateContent = template.content;
+
+					const shadowRoot = this.attachShadow( { mode: 'open' } );
+					shadowRoot.appendChild( templateContent.cloneNode( true ) );
+				}
+			}
+		);
+		</script>
+    <?php
+}
+add_action('wp_head', 'define_comment_content_custom_element');

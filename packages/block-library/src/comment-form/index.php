@@ -72,7 +72,11 @@ function add_comment_form_onsubmit_handler() {
 					hour: 'numeric', minute: 'numeric'
 				};
 				const form = document.querySelector( '.comment-form' );
-				form.innerHTML = `<wp-comment-date>${ date.toLocaleDateString( 'en', dateOptions ) }</wp-comment-date>`;
+
+				const content = document.querySelector( '#comment' ).value;
+				form.innerHTML = `<wp-comment-content>${ content }</wp-comment-content>`;
+				form.innerHTML += `<wp-comment-date>${ date.toLocaleDateString( 'en', dateOptions ) }</wp-comment-date>`;
+
 			}
 		</script>
     <?php
