@@ -281,7 +281,7 @@ describe( 'Writing Flow', () => {
 	} );
 
 	it( 'should not create extra line breaks in multiline value', async () => {
-		await insertBlock( 'Quote' );
+		await insertBlock( 'List' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Backspace' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();

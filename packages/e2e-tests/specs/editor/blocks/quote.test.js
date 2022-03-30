@@ -77,7 +77,9 @@ describe( 'Quote', () => {
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'two' );
-			await transformBlockTo( 'Paragraph' );
+			// Navigate to the citation to select the block.
+			await page.keyboard.press( 'ArrowRight' );
+			await transformBlockTo( 'Unwrap' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -89,7 +91,7 @@ describe( 'Quote', () => {
 			await page.keyboard.type( 'two' );
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.type( 'cite' );
-			await transformBlockTo( 'Paragraph' );
+			await transformBlockTo( 'Unwrap' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -98,14 +100,14 @@ describe( 'Quote', () => {
 			await insertBlock( 'Quote' );
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.type( 'cite' );
-			await transformBlockTo( 'Paragraph' );
+			await transformBlockTo( 'Unwrap' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
 		it( 'and renders a void paragraph if both the cite and quote are void', async () => {
 			await insertBlock( 'Quote' );
-			await transformBlockTo( 'Paragraph' );
+			await transformBlockTo( 'Unwrap' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -116,56 +118,6 @@ describe( 'Quote', () => {
 		await page.keyboard.type( 'test' );
 		await transformBlockTo( 'Quote' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'is transformed to an empty heading if the quote is empty', async () => {
-		await insertBlock( 'Quote' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'is transformed to a heading if the quote just contains one paragraph', async () => {
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'one' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'is transformed to a heading and a quote if the quote contains multiple paragraphs', async () => {
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'two' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'three' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'is transformed to a heading and a quote if the quote contains a citation', async () => {
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'cite' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'the resuling quote after transforming to a heading can be transformed again', async () => {
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'two' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'cite' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-		await page.click( '[data-type="core/quote"]' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-		await page.click( '[data-type="core/quote"]' );
-		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

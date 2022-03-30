@@ -2,7 +2,9 @@
 
 exports[`List can be converted to a quote 1`] = `
 "<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>one</p><p>two</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:list -->
+<ul><li>one</li><li>two</li></ul>
+<!-- /wp:list --></blockquote>
 <!-- /wp:quote -->"
 `;
 
@@ -33,12 +35,6 @@ exports[`List can be created by converting a paragraph 1`] = `
 `;
 
 exports[`List can be created by converting a paragraph with line breaks 1`] = `
-"<!-- wp:list -->
-<ul><li>one</li><li>two</li></ul>
-<!-- /wp:list -->"
-`;
-
-exports[`List can be created by converting a quote 1`] = `
 "<!-- wp:list -->
 <ul><li>one</li><li>two</li></ul>
 <!-- /wp:list -->"
@@ -200,9 +196,9 @@ exports[`List should insert a line break on shift+enter in a non trailing list i
 <!-- /wp:list -->"
 `;
 
-exports[`List should not change the contents when you change the list type to Unordered 1`] = `"<li>a</li><li>b</li><li>c</li>"`;
-
 exports[`List should not change the contents when you change the list type to Ordered 1`] = `"<li>1</li><li>2</li><li>3</li>"`;
+
+exports[`List should not change the contents when you change the list type to Unordered 1`] = `"<li>a</li><li>b</li><li>c</li>"`;
 
 exports[`List should not indent list on space with modifier 1`] = `
 "<!-- wp:list -->
