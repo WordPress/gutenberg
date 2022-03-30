@@ -159,10 +159,6 @@ function gutenberg_enable_experimental_blocks() {
 	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-list-v2', get_option( 'gutenberg-experiments' ) ) ) {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableListBlockV2 = true', 'before' );
 	}
-
-	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-quote-v2', get_option( 'gutenberg-experiments' ) ) ) {
-		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableQuoteBlockV2 = true', 'before' );
-	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experimental_blocks' );
