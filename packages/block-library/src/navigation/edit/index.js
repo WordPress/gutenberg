@@ -270,6 +270,7 @@ function Navigation( {
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
 	const {
+		isResolvingNavigationMenus,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
 		navigationMenus,
@@ -283,7 +284,16 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
+	useEffect( () => {
+		if ( ! navigationMenus?.length || navigationMenus?.length > 1 ) {
+			return;
+		}
+
+		setRef( navigationMenus[ 0 ]?.id );
+	}, [ navigationMenus ] );
+
 	const navRef = useRef();
+
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
 
 	const {
@@ -321,6 +331,7 @@ function Navigation( {
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
 	const isLoading =
+		isResolvingNavigationMenus ||
 		isCreatingNavigationMenu ||
 		isConvertingClassicMenu ||
 		!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu );
