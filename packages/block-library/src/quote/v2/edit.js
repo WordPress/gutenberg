@@ -1,8 +1,15 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import {
+	AlignmentControl,
+	BlockControls,
 	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
@@ -66,8 +73,9 @@ export default function QuoteEdit( {
 	isSelected,
 	insertBlocksAfter,
 	clientId,
+	className,
 } ) {
-	const { citation } = attributes;
+	const { citation, align } = attributes;
 
 	useMigrateOnLoad( attributes, clientId );
 
@@ -76,7 +84,11 @@ export default function QuoteEdit( {
 	);
 	const hasSelection = isSelected || isAncestorOfSelectedBlock;
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classNames( className, {
+			[ `has-text-align-${ align }` ]: align,
+		} ),
+	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 		templateInsertUpdatesSelection: true,
@@ -84,6 +96,14 @@ export default function QuoteEdit( {
 
 	return (
 		<>
+			<BlockControls group="block">
+				<AlignmentControl
+					value={ align }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { align: nextAlign } );
+					} }
+				/>
+			</BlockControls>
 			<BlockQuotation { ...innerBlocksProps }>
 				{ innerBlocksProps.children }
 				{ ( ! RichText.isEmpty( citation ) || hasSelection ) && (
