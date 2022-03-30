@@ -112,6 +112,7 @@ export default {
 		layout = {},
 		style,
 		blockName,
+		padding,
 	} ) {
 		const { contentSize, wideSize } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
@@ -126,10 +127,17 @@ export default {
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
 				? blockGapStyleValue?.top
 				: 'var( --wp--style--block-gap )';
+		// Using important here for the padding to override the inline padding that could be potentially
+		// applied using the custom padding control before the layout inheritance is applied.
 
 		let output =
 			!! contentSize || !! wideSize
 				? `
+					${ appendSelectors( selector ) } {
+						padding: ${ padding?.top || 0 } ${ padding?.right || 0 } ${
+						padding?.bottom || 0
+				  } ${ padding?.left || 0 } !important;
+					}
 					${ appendSelectors(
 						selector,
 						'> :where(:not(.alignleft):not(.alignright))'
@@ -143,6 +151,8 @@ export default {
 					}
 					${ appendSelectors( selector, '> .alignfull' ) } {
 						max-width: none;
+						margin-left: calc( -1 * ${ padding?.left || 0 } ) !important;
+						margin-right: calc( -1 * ${ padding?.right || 0 } ) !important;
 					}
 				`
 				: '';

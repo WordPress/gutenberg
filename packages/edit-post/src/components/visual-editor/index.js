@@ -198,6 +198,14 @@ export default function VisualEditor( { styles } ) {
 		titleRef?.current?.focus();
 	}, [ isWelcomeGuideVisible, isCleanNewPost ] );
 
+	const padding = useMemo( () => {
+		if ( isTemplateMode || ! themeSupportsLayout ) {
+			return undefined;
+		}
+
+		return defaultLayout?.padding;
+	} );
+
 	return (
 		<BlockTools
 			__unstableContentRef={ ref }
@@ -245,6 +253,7 @@ export default function VisualEditor( { styles } ) {
 							<LayoutStyle
 								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
 								layout={ defaultLayout }
+								padding={ padding }
 							/>
 						) }
 						{ ! isTemplateMode && (
