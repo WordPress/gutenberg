@@ -55,3 +55,21 @@ function register_block_core_comment_form() {
 	);
 }
 add_action( 'init', 'register_block_core_comment_form' );
+
+function add_comment_form_onsubmit_handler() {
+    ?>
+		<script>
+			window.onload = function() {
+				const form = document.querySelector( '.comment-form' );
+				form.addEventListener( 'submit', submitted, false );
+			}
+
+			function submitted( event ) {
+				event.preventDefault();
+				const el = document.createElement( 'wp-comment-date' );
+				document.body.append( el );
+			}
+		</script>
+    <?php
+}
+add_action('wp_head', 'add_comment_form_onsubmit_handler');
