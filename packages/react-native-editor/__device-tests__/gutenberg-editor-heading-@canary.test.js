@@ -7,6 +7,10 @@ import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests', () => {
 	it( 'should be able to create a post with heading and paragraph blocks', async () => {
+		let block
+		let paragraphBlockElement
+		let textViewElement
+
 		await editorPage.addNewBlock( blockNames.heading );
 		let headingBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.heading
@@ -21,12 +25,24 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		let paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
 			2
 		);
+
+		// Extra step for iOS only
+		if ( ! isAndroid() ) {
+			textViewElement = await editorPage.getTextViewForParagraphBlock(
+				paragraphBlockElement
+			);
+		}
+
+		block = isAndroid()
+			? paragraphBlockElement
+			: textViewElement
+
 		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
+			block,
 			testData.mediumText
 		);
 
@@ -35,8 +51,20 @@ describe( 'Gutenberg Editor tests', () => {
 			blockNames.paragraph,
 			3
 		);
+
+		// Extra step for iOS only
+		if ( ! isAndroid() ) {
+			textViewElement = await editorPage.getTextViewForParagraphBlock(
+				paragraphBlockElement
+			);
+		}
+
+		block = isAndroid()
+			? paragraphBlockElement
+			: textViewElement
+
 		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
+			block,
 			testData.mediumText
 		);
 
@@ -45,6 +73,7 @@ describe( 'Gutenberg Editor tests', () => {
 			blockNames.heading,
 			4
 		);
+
 		await editorPage.typeTextToParagraphBlock(
 			headingBlockElement,
 			testData.heading
@@ -55,8 +84,20 @@ describe( 'Gutenberg Editor tests', () => {
 			blockNames.paragraph,
 			5
 		);
+
+		// Extra step for iOS only
+		if ( ! isAndroid() ) {
+			textViewElement = await editorPage.getTextViewForParagraphBlock(
+				paragraphBlockElement
+			);
+		}
+
+		block = isAndroid()
+			? paragraphBlockElement
+			: textViewElement
+
 		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
+			block,
 			testData.mediumText
 		);
 	} );
