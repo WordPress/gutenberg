@@ -89,21 +89,4 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 
 		return $with_theme_supports;
 	}
-
-	/**
-	 * Return core's origin config.
-	 *
-	 * @return WP_Theme_JSON_Gutenberg Entity that holds core data.
-	 */
-	public static function get_core_data() {
-		if ( null !== static::$core ) {
-			return static::$core;
-		}
-
-		$config       = static::read_json_file( __DIR__ . '/theme.json' );
-		$config       = static::translate( $config );
-		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
-
-		return static::$core;
-	}
 }
