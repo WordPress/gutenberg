@@ -129,4 +129,31 @@ describe( 'Migrate list block', () => {
 <!-- /wp:list --></li>
 <!-- /wp:list-item -->` );
 	} );
+
+	it( 'should not add random space', () => {
+		const [ updatedAttributes, updatedInnerBlocks ] = migrateToListV2( {
+			values: `<li>Europe<ul><li>F<strong>ranc</strong>e<ul><li>Paris</li></ul></li></ul></li>`,
+			ordered: false,
+		} );
+
+		expect( updatedAttributes ).toEqual( {
+			ordered: false,
+			// Ideally the values attributes shouldn't be here
+			// but since we didn't enable v2 by default yet,
+			// we're keeping the old default value in block.json
+			values: '',
+		} );
+		expect( serialize( updatedInnerBlocks ) )
+			.toEqual( `<!-- wp:list-item -->
+<li>Europe<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>F<strong>ranc</strong>e<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>Paris</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->` );
+	} );
 } );
