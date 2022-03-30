@@ -594,9 +594,9 @@ function gutenberg_multiple_block_styles( $metadata ) {
 }
 add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
 
-if ( ! function_exists( 'wp_enqueue_block_script' ) ) {
+if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	/**
-	 * Enqueue a script for a specific block.
+	 * Enqueue a frontend script for a specific block.
 	 *
 	 * Scripts enqueued using this function will only get printed
 	 * when the block gets rendered on the frontend.
@@ -606,7 +606,7 @@ if ( ! function_exists( 'wp_enqueue_block_script' ) ) {
 	 *
 	 * @return void
 	 */
-	function wp_enqueue_block_script( $block_name, $args ) {
+	function wp_enqueue_block_view_script( $block_name, $args ) {
 		$args = wp_parse_args(
 			$args,
 			array(
