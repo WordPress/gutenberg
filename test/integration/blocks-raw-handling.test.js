@@ -290,112 +290,15 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should correctly handle quotes with one paragraphs and no citation', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><p>chicken</p></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p></blockquote>'
+	it( 'should correctly handle quotes with mixed content', () => {
+		const filtered = serialize(
+			pasteHandler( {
+				HTML: '<blockquote><h1>chicken</h1><p>ribs</p></blockquote>',
+				mode: 'AUTO',
+			} )
 		);
-		expect( console ).toHaveLogged();
-	} );
-	it( 'should correctly handle quotes with multiple paragraphs and no citation', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><p>chicken</p><p>ribs</p></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
 
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should correctly handle quotes with paragraph and citation at the end', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><p>chicken</p><cite>ribs</cite></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p><cite>ribs</cite></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should handle a citation before the content', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><cite>ribs</cite><p>ribs</p></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>ribs</p><cite>ribs</cite></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should handle a citation in the middle of the content', () => {
-		const filtered = pasteHandler( {
-			HTML:
-				'<blockquote><p>chicken</p><cite>ribs</cite><p>ribs</p></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p><cite>ribs</cite></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should correctly handle quotes with only a citation', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><cite>ribs</cite></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p></p><cite>ribs</cite></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should convert to paragraph quotes with more than one cite', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><cite>ribs</cite><cite>ribs</cite></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe( '<p>ribsribs</p>' );
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should convert to paragraph quotes with more than one cite and at least one paragraph', () => {
-		const filtered = pasteHandler( {
-			HTML:
-				'<blockquote><p>chicken</p><cite>ribs</cite><cite>ribs</cite></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe( '<p>chickenribsribs</p>' );
+		expect( filtered ).toMatchSnapshot();
 		expect( console ).toHaveLogged();
 	} );
 
