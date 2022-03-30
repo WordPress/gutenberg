@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Add `vendor/` to `.markdownlintignore`, to match `lint-md-docs` docs ([#39724](https://github.com/WordPress/gutenberg/pull/39724)).
+-   Include files with `.jsx` extension in the build process ([#39613](https://github.com/WordPress/gutenberg/pull/39613)).
+
 ## 22.2.0 (2022-03-11)
 
 ### Enhancement

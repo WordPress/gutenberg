@@ -163,3 +163,48 @@ body.is-navigation-sidebar-open {
 		}
 	}
 }
+
+// Button text label styles
+
+.show-icon-labels .edit-site-header {
+	.components-button.has-icon {
+		width: auto;
+
+		// Hide the button icons when labels are set to display...
+		svg {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+		}
+		&[aria-disabled="true"] {
+			background-color: transparent;
+		}
+	}
+	.is-tertiary {
+		&:active {
+			box-shadow: 0 0 0 1.5px var(--wp-admin-theme-color);
+			background-color: transparent;
+		}
+	}
+	// Some margins and padding have to be adjusted so the buttons can still fit on smaller screens.
+	.edit-site-save-button__button {
+		padding-left: 6px;
+		padding-right: 6px;
+		margin-right: $grid-unit-05;
+	}
+	.block-editor-post-preview__button-toggle {
+		margin-right: $grid-unit-05;
+	}
+	// The inserter and the template details toggle have custom labels, different from their aria-label, so we don't want to display both.
+	.edit-site-header-toolbar__inserter-toggle.edit-site-header-toolbar__inserter-toggle,
+	.edit-site-document-actions__get-info.edit-site-document-actions__get-info.edit-site-document-actions__get-info {
+		&::after {
+			content: none;
+		}
+
+		height: 36px;
+		padding: 0 6px;
+	}
+}

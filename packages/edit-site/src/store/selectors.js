@@ -120,6 +120,14 @@ export const getSettings = createSelector(
 				state,
 				'fixedToolbar'
 			),
+			keepCaretInsideBlock: !! __unstableGetPreference(
+				state,
+				'keepCaretInsideBlock'
+			),
+			showIconLabels: !! __unstableGetPreference(
+				state,
+				'showIconLabels'
+			),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 			__experimentalReusableBlocks: getReusableBlocks( state ),
 			__experimentalPreferPatternsOnRoot:
@@ -145,6 +153,8 @@ export const getSettings = createSelector(
 		state.settings,
 		__unstableGetPreference( state, 'focusMode' ),
 		__unstableGetPreference( state, 'fixedToolbar' ),
+		__unstableGetPreference( state, 'keepCaretInsideBlock' ),
+		__unstableGetPreference( state, 'showIconLabels' ),
 		getReusableBlocks( state ),
 		getEditedPostType( state ),
 	]

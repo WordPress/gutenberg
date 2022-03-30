@@ -17,9 +17,11 @@ if ( ! function_exists( '_load_remote_featured_patterns' ) ) {
 		 *
 		 * @param bool $should_load_remote
 		 */
-		$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
+		if ( ! apply_filters( 'should_load_remote_block_patterns', true ) ) {
+			return;
+		}
 
-		if ( ! $should_load_remote ) {
+		if ( ! get_theme_support( 'core-block-patterns' ) ) {
 			return;
 		}
 
@@ -43,18 +45,4 @@ if ( ! function_exists( '_load_remote_featured_patterns' ) ) {
 			}
 		}
 	}
-
-	add_action(
-		'current_screen',
-		function( $current_screen ) {
-			if ( ! get_theme_support( 'core-block-patterns' ) ) {
-				return;
-			}
-
-			$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
-			if ( $current_screen->is_block_editor || $is_site_editor ) {
-				_load_remote_featured_patterns();
-			}
-		}
-	);
 }

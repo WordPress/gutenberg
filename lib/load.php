@@ -97,6 +97,8 @@ require __DIR__ . '/compat/wordpress-6.0/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-patterns-controller.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
@@ -119,8 +121,13 @@ require __DIR__ . '/navigation-theme-opt-in.php';
 require __DIR__ . '/navigation-page.php';
 require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/global-styles.php';
-require __DIR__ . '/pwa.php';
 
+// TODO: Move this to be loaded from the style engine package, via the build directory.
+// Part of the build process should be to copy the PHP file to the correct location,
+// similar to the loading behaviour in `blocks.php`.
+require __DIR__ . '/style-engine/class-wp-style-engine-gutenberg.php';
+
+require __DIR__ . '/block-supports/utils.php';
 require __DIR__ . '/block-supports/elements.php';
 require __DIR__ . '/block-supports/colors.php';
 require __DIR__ . '/block-supports/typography.php';

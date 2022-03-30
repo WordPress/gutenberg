@@ -2,5 +2,6 @@
  * Internal dependencies
  */
 import padding from './padding';
+import margin from './margin';
 
-export const styleDefinitions = [ padding ];
+export const styleDefinitions = [ margin, padding ];
