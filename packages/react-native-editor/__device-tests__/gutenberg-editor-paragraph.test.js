@@ -173,7 +173,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 		// iOS needs this extra step to click on the right block
 		if ( ! isAndroid() ) {
-			await editorPage.clickBlockParagraphAtPosition( 2 );
+			await editorPage.clickParagraphBlockAtPosition( 2 );
 		}
 		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(

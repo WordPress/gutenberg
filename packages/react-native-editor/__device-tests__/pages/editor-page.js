@@ -45,12 +45,10 @@ class EditorPage {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
-	async clickBlockParagraphAtPosition( position = 1 ) {
+	async clickParagraphBlockAtPosition( position = 1 ) {
 		const paragraphBlockLocator = `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`;
-		const paragraphBlock = await this.driver.elementByXPath(
-			paragraphBlockLocator
-		);
-		paragraphBlock.click();
+		const paragraphBlock = await waitForVisible( this.driver, paragraphBlockLocator )
+		await paragraphBlock.click();
 	}
 
 	// For text blocks - blockName can be Paragraph or Heading
@@ -567,7 +565,7 @@ class EditorPage {
 		if ( isAndroid() ) {
 			await blockLocator.click();
 		} else {
-			await this.clickBlockParagraphAtPosition( position );
+			await this.clickParagraphBlockAtPosition( position );
 		}
 
 		const text = await this.getTextForParagraphBlock( blockLocator );

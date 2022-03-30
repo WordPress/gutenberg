@@ -31,7 +31,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		if ( ! isAndroid() ) {
-			await editorPage.clickBlockParagraphAtPosition( 2 );
+			await editorPage.clickParagraphBlockAtPosition( 2 );
 		}
 
 		await editorPage.typeTextToParagraphBlock(
@@ -46,7 +46,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		if ( ! isAndroid() ) {
-			await editorPage.clickBlockParagraphAtPosition( 3 );
+			await editorPage.clickParagraphBlockAtPosition( 3 );
 		}
 
 		await editorPage.typeTextToParagraphBlock(
@@ -71,7 +71,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		if ( ! isAndroid() ) {
-			await editorPage.clickBlockParagraphAtPosition( 5 );
+			await editorPage.clickParagraphBlockAtPosition( 5 );
 		}
 
 		await editorPage.typeTextToParagraphBlock(
