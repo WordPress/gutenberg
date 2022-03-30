@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
+import { act, render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -42,10 +43,11 @@ describe( 'PostSavedState', () => {
 			isSaveable: false,
 			isSaving: true,
 		} ) );
-
-		const wrapper = mount( <PostSavedState /> );
-
-		expect( wrapper.text() ).toContain( 'Saving' );
+		let container;
+		act( () => {
+			container = render( <PostSavedState /> ).container;
+		} );
+		expect( container.textContent ).toContain( 'Saving' );
 	} );
 
 	it( 'returns a disabled button if the post is not saveable', () => {

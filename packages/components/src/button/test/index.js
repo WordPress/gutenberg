@@ -2,11 +2,10 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import TestUtils from 'react-dom/test-utils';
 /**
  * WordPress dependencies
  */
-import { createRef } from '@wordpress/element';
+import { createRef, createRoot } from '@wordpress/element';
 import { plusCircle } from '@wordpress/icons';
 
 /**
@@ -245,10 +244,11 @@ describe( 'Button', () => {
 	describe( 'ref forwarding', () => {
 		it( 'should enable access to DOM element', () => {
 			const ref = createRef();
+			const container = document.createElement( 'div' );
+			const root = createRoot( container );
+			root.render( <ButtonWithForwardedRef ref={ ref } /> );
+			jest.runAllTimers();
 
-			TestUtils.renderIntoDocument(
-				<ButtonWithForwardedRef ref={ ref } />
-			);
 			expect( ref.current.type ).toBe( 'button' );
 		} );
 	} );

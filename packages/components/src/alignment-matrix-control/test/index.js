@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { render, unmountComponentAtNode } from 'react-dom';
-import { act } from 'react-dom/test-utils';
+import { render, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -21,17 +20,6 @@ afterAll( () => {
 
 let container = null;
 
-beforeEach( () => {
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
-
-afterEach( () => {
-	unmountComponentAtNode( container );
-	container.remove();
-	container = null;
-} );
-
 const getControl = () => {
 	return container.querySelector( '.component-alignment-matrix-control' );
 };
@@ -45,7 +33,7 @@ describe( 'AlignmentMatrixControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
 			act( () => {
-				render( <AlignmentMatrixControl />, container );
+				container = render( <AlignmentMatrixControl /> ).container;
 			} );
 			const control = getControl();
 
@@ -58,13 +46,12 @@ describe( 'AlignmentMatrixControl', () => {
 			const spy = jest.fn();
 
 			act( () => {
-				render(
+				container = render(
 					<AlignmentMatrixControl
 						value={ 'center' }
 						onChange={ spy }
-					/>,
-					container
-				);
+					/>
+				).container;
 			} );
 
 			const cells = getCells();

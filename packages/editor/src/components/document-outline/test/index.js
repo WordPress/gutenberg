@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
+import { act, render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -139,44 +140,47 @@ describe( 'DocumentOutline', () => {
 
 	describe( 'nested headings', () => {
 		it( 'should render even if the heading is nested', () => {
-			const tableOfContentItemsSelector = 'TableOfContentsItem';
+			const tableOfContentItemsSelector = '.document-outline__item';
 			const outlineLevelsSelector = '.document-outline__level';
 			const outlineItemContentSelector =
 				'.document-outline__item-content';
 
 			const blocks = [ headingH2, nestedHeading ];
-			const wrapper = mount( <DocumentOutline blocks={ blocks } /> );
+
+			let container;
+			act( () => {
+				container = render( <DocumentOutline blocks={ blocks } /> )
+					.container;
+			} );
 
 			// Unnested heading and nested heading should appear as items.
-			const tableOfContentItems = wrapper.find(
+			const tableOfContentItems = container.querySelectorAll(
 				tableOfContentItemsSelector
 			);
 			expect( tableOfContentItems ).toHaveLength( 2 );
 
 			// Unnested heading test.
-			const firstItemLevels = tableOfContentItems
-				.at( 0 )
-				.find( outlineLevelsSelector );
+			const firstItemLevels = tableOfContentItems[ 0 ].querySelectorAll(
+				outlineLevelsSelector
+			);
 			expect( firstItemLevels ).toHaveLength( 1 );
-			expect( firstItemLevels.at( 0 ).text() ).toEqual( 'H2' );
+			expect( firstItemLevels[ 0 ].textContent ).toEqual( 'H2' );
 			expect(
-				tableOfContentItems
-					.at( 0 )
-					.find( outlineItemContentSelector )
-					.text()
+				tableOfContentItems[ 0 ].querySelector(
+					outlineItemContentSelector
+				).textContent
 			).toEqual( 'Heading 2' );
 
 			// Nested heading test.
-			const secondItemLevels = tableOfContentItems
-				.at( 1 )
-				.find( outlineLevelsSelector );
+			const secondItemLevels = tableOfContentItems[ 1 ].querySelectorAll(
+				outlineLevelsSelector
+			);
 			expect( secondItemLevels ).toHaveLength( 1 );
-			expect( secondItemLevels.at( 0 ).text() ).toEqual( 'H3' );
+			expect( secondItemLevels[ 0 ].textContent ).toEqual( 'H3' );
 			expect(
-				tableOfContentItems
-					.at( 1 )
-					.find( outlineItemContentSelector )
-					.text()
+				tableOfContentItems[ 1 ].querySelector(
+					outlineItemContentSelector
+				).textContent
 			).toEqual( 'Heading 3' );
 		} );
 	} );

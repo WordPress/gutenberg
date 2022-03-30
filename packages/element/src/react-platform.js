@@ -6,8 +6,8 @@ import {
 	findDOMNode,
 	render,
 	unmountComponentAtNode,
-	createRoot,
 } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 /**
  * Creates a portal into which a component can be rendered.

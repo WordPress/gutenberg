@@ -11,36 +11,12 @@ import TabPanel from '../';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { createRoot } from '@wordpress/element';
 
 describe( 'TabPanel', () => {
-	const getElementByClass = ( wrapper, className ) => {
-		return TestUtils.findRenderedDOMComponentWithClass(
-			wrapper,
-			className
-		);
-	};
-
-	const getElementsByClass = ( wrapper, className ) => {
-		return TestUtils.scryRenderedDOMComponentsWithClass(
-			wrapper,
-			className
-		);
-	};
-
 	const elementClick = ( element ) => {
 		TestUtils.Simulate.click( element );
-	};
-
-	// This is needed because TestUtils does not accept a stateless component.
-	// anything run through a HOC ends up as a stateless component.
-	const getTestComponent = ( WrappedComponent, props ) => {
-		class TestComponent extends Component {
-			render() {
-				return <WrappedComponent { ...props } />;
-			}
-		}
-		return <TestComponent />;
+		jest.runAllTimers();
 	};
 
 	describe( 'basic rendering', () => {
@@ -74,31 +50,26 @@ describe( 'TabPanel', () => {
 				},
 			};
 
-			let wrapper;
-			TestUtils.act( () => {
-				wrapper = TestUtils.renderIntoDocument(
-					getTestComponent( TabPanel, props )
-				);
-			} );
+			const container = document.createElement( 'div' );
+			const root = createRoot( container );
+			root.render( <TabPanel { ...props } /> );
+			jest.runAllTimers();
 
-			const alphaTab = getElementByClass( wrapper, 'alpha' );
-			const betaTab = getElementByClass( wrapper, 'beta' );
-			const gammaTab = getElementByClass( wrapper, 'gamma' );
+			const alphaTab = container.querySelector( '.alpha' );
+			const betaTab = container.querySelector( '.beta' );
+			const gammaTab = container.querySelector( '.gamma' );
 
 			const getAlphaViews = () =>
-				getElementsByClass( wrapper, 'alpha-view' );
+				container.querySelectorAll( '.alpha-view' );
 			const getBetaViews = () =>
-				getElementsByClass( wrapper, 'beta-view' );
+				container.querySelectorAll( '.beta-view' );
 			const getGammaViews = () =>
-				getElementsByClass( wrapper, 'gamma-view' );
+				container.querySelectorAll( '.gamma-view' );
 
-			const getActiveTab = () =>
-				getElementByClass( wrapper, 'active-tab' );
+			const getActiveTab = () => container.querySelector( '.active-tab' );
 			const getActiveView = () =>
-				getElementByClass(
-					wrapper,
-					'components-tab-panel__tab-content'
-				).firstChild.textContent;
+				container.querySelector( '.components-tab-panel__tab-content' )
+					.firstChild.textContent;
 
 			expect( getActiveTab().innerHTML ).toBe( 'Alpha' );
 			expect( getAlphaViews() ).toHaveLength( 1 );
@@ -166,14 +137,12 @@ describe( 'TabPanel', () => {
 			},
 		};
 
-		let wrapper;
-		TestUtils.act( () => {
-			wrapper = TestUtils.renderIntoDocument(
-				getTestComponent( TabPanel, props )
-			);
-		} );
+		const container = document.createElement( 'div' );
+		const root = createRoot( container );
+		root.render( <TabPanel { ...props } /> );
+		jest.runAllTimers();
 
-		const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
+		const getActiveTab = () => container.querySelector( '.active-tab' );
 		expect( getActiveTab().innerHTML ).toBe( 'Beta' );
 	} );
 } );

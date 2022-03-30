@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
 import { noop } from 'lodash';
+import { render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -91,13 +92,13 @@ describe( 'Edit', () => {
 			save: noop,
 		} );
 
-		const wrapper = mount(
+		const { container } = render(
 			<BlockContextProvider value={ { value: 'Ok' } }>
 				<Edit name="core/test-block" />
 			</BlockContextProvider>
 		);
 
-		expect( wrapper.html() ).toBe( 'Ok' );
+		expect( container.innerHTML ).toBe( 'Ok' );
 	} );
 
 	describe( 'light wrapper', () => {
@@ -112,13 +113,13 @@ describe( 'Edit', () => {
 				save: noop,
 			} );
 
-			const wrapper = mount(
+			const { container } = render(
 				<BlockContextProvider value={ { value: 'Ok' } }>
 					<Edit name="core/test-block" />
 				</BlockContextProvider>
 			);
 
-			expect( wrapper.html() ).toBe( 'Ok' );
+			expect( container.innerHTML ).toBe( 'Ok' );
 		} );
 	} );
 } );

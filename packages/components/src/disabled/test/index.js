@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import TestUtils from 'react-dom/test-utils';
-
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
+import { act, render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -65,30 +60,17 @@ describe( 'Disabled', () => {
 		</form>
 	);
 
-	// This is needed because TestUtils does not accept a stateless component.
-	class DisabledComponent extends Component {
-		render() {
-			const { children, isDisabled } = this.props;
-
-			return <Disabled isDisabled={ isDisabled }>{ children }</Disabled>;
-		}
-	}
-
 	it( 'will disable all fields', () => {
-		const wrapper = TestUtils.renderIntoDocument(
-			<DisabledComponent>
-				<Form />
-			</DisabledComponent>
-		);
-
-		const input = TestUtils.findRenderedDOMComponentWithTag(
-			wrapper,
-			'input'
-		);
-		const div = TestUtils.scryRenderedDOMComponentsWithTag(
-			wrapper,
-			'div'
-		)[ 1 ];
+		let container;
+		act( () => {
+			container = render(
+				<Disabled>
+					<Form />
+				</Disabled>
+			).container;
+		} );
+		const input = container.querySelector( 'input' );
+		const div = container.querySelectorAll( 'div' )[ 1 ];
 
 		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
 		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
@@ -96,83 +78,32 @@ describe( 'Disabled', () => {
 		expect( div.hasAttribute( 'disabled' ) ).toBe( false );
 	} );
 
-	it( 'should cleanly un-disable via reconciliation', () => {
-		// If this test suddenly starts failing, it means React has become
-		// smarter about reusing children into grandfather element when the
-		// parent is dropped, so we'd need to find another way to restore
-		// original form state.
-		// Using state for this test for easier manipulation of the child props.
-		class MaybeDisable extends Component {
-			constructor() {
-				super( ...arguments );
-				this.state = { isDisabled: true };
-			}
-
-			render() {
-				return this.state.isDisabled ? (
-					<Disabled>
-						<Form />
-					</Disabled>
-				) : (
-					<Form />
-				);
-			}
-		}
-
-		const wrapper = TestUtils.renderIntoDocument( <MaybeDisable /> );
-		wrapper.setState( { isDisabled: false } );
-
-		const input = TestUtils.findRenderedDOMComponentWithTag(
-			wrapper,
-			'input'
-		);
-		const div = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'div' );
-
-		expect( input.hasAttribute( 'disabled' ) ).toBe( false );
-		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'true' );
-		expect( div.hasAttribute( 'tabindex' ) ).toBe( true );
-	} );
-
 	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
-		class MaybeDisable extends Component {
-			constructor() {
-				super( ...arguments );
-				this.state = { isDisabled: true };
-			}
-
-			render() {
-				return (
-					<DisabledComponent isDisabled={ this.state.isDisabled }>
-						<Form />
-					</DisabledComponent>
-				);
-			}
+		function MaybeDisable( props ) {
+			return (
+				<Disabled { ...props }>
+					<Form />
+				</Disabled>
+			);
 		}
 
-		const wrapper = TestUtils.renderIntoDocument( <MaybeDisable /> );
+		let container;
+		let rerender;
+		act( () => {
+			( { container, rerender } = render(
+				<MaybeDisable isDisabled={ true } />
+			) );
+		} );
 
-		const input = TestUtils.findRenderedDOMComponentWithTag(
-			wrapper,
-			'input'
-		);
-		const div = TestUtils.scryRenderedDOMComponentsWithTag(
-			wrapper,
-			'div'
-		)[ 1 ];
+		const input = container.querySelector( 'input' );
+		const div = container.querySelectorAll( 'div' )[ 1 ];
 
 		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
 		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
+		rerender( <MaybeDisable isDisabled={ false } /> );
 
-		wrapper.setState( { isDisabled: false } );
-
-		const input2 = TestUtils.findRenderedDOMComponentWithTag(
-			wrapper,
-			'input'
-		);
-		const div2 = TestUtils.scryRenderedDOMComponentsWithTag(
-			wrapper,
-			'div'
-		)[ 0 ];
+		const input2 = container.querySelector( 'input' );
+		const div2 = container.querySelector( 'div' );
 
 		expect( input2.hasAttribute( 'disabled' ) ).toBe( false );
 		expect( div2.getAttribute( 'contenteditable' ) ).not.toBe( 'false' );
@@ -188,52 +119,50 @@ describe( 'Disabled', () => {
 	//  https://github.com/jsdom/jsdom/issues/639
 
 	describe( 'Consumer', () => {
-		class DisabledStatus extends Component {
-			render() {
-				return (
-					<p>
-						<Disabled.Consumer>
-							{ ( isDisabled ) =>
-								isDisabled ? 'Disabled' : 'Not disabled'
-							}
-						</Disabled.Consumer>
-					</p>
-				);
-			}
+		function DisabledStatus() {
+			return (
+				<p>
+					<Disabled.Consumer>
+						{ ( isDisabled ) =>
+							isDisabled ? 'Disabled' : 'Not disabled'
+						}
+					</Disabled.Consumer>
+				</p>
+			);
 		}
 
 		test( "lets components know that they're disabled via context", () => {
-			const wrapper = TestUtils.renderIntoDocument(
-				<DisabledComponent>
-					<DisabledStatus />
-				</DisabledComponent>
-			);
-			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
-				wrapper,
-				'p'
-			);
+			let container;
+			act( () => {
+				container = render(
+					<Disabled>
+						<DisabledStatus />
+					</Disabled>
+				).container;
+			} );
+			const wrapperElement = container.querySelector( 'p' );
 			expect( wrapperElement.textContent ).toBe( 'Disabled' );
 		} );
 
 		test( "lets components know that they're not disabled via context when isDisabled is false", () => {
-			const wrapper = TestUtils.renderIntoDocument(
-				<DisabledComponent isDisabled={ false }>
-					<DisabledStatus />
-				</DisabledComponent>
-			);
-			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
-				wrapper,
-				'p'
-			);
+			let container;
+			act( () => {
+				container = render(
+					<Disabled isDisabled={ false }>
+						<DisabledStatus />
+					</Disabled>
+				).container;
+			} );
+			const wrapperElement = container.querySelector( 'p' );
 			expect( wrapperElement.textContent ).toBe( 'Not disabled' );
 		} );
 
 		test( "lets components know that they're not disabled via context", () => {
-			const wrapper = TestUtils.renderIntoDocument( <DisabledStatus /> );
-			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
-				wrapper,
-				'p'
-			);
+			let container;
+			act( () => {
+				container = render( <DisabledStatus /> ).container;
+			} );
+			const wrapperElement = container.querySelector( 'p' );
 			expect( wrapperElement.textContent ).toBe( 'Not disabled' );
 		} );
 	} );

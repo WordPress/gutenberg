@@ -26,7 +26,6 @@ import {
 	useDebugValue,
 	lazy,
 	Suspense,
-	createRoot,
 } from 'react';
 import { isString } from 'lodash';
 

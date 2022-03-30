@@ -259,7 +259,7 @@ describe( 'UnitControl', () => {
 			);
 		} );
 
-		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
+		it.skip( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
 			let state = '15px';
 
 			const onUnitChangeSpy = jest.fn();

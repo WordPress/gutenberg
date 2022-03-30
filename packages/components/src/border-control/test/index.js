@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -43,7 +43,9 @@ const rerenderBorderControl = ( rerender, customProps ) => {
 
 const openPopover = () => {
 	const toggleButton = screen.getByLabelText( toggleLabelRegex );
-	fireEvent.click( toggleButton );
+	act( () => {
+		fireEvent.click( toggleButton );
+	} );
 };
 
 const getButton = ( name ) => {
@@ -55,13 +57,17 @@ const queryButton = ( name ) => {
 };
 
 const clickButton = ( name ) => {
-	fireEvent.click( getButton( name ) );
+	act( () => {
+		fireEvent.click( getButton( name ) );
+	} );
 };
 
 const setWidthInput = ( value ) => {
 	const widthInput = screen.getByRole( 'spinbutton' );
-	widthInput.focus();
-	fireEvent.change( widthInput, { target: { value } } );
+	act( () => {
+		widthInput.focus();
+		fireEvent.change( widthInput, { target: { value } } );
+	} );
 };
 
 const clearWidthInput = () => setWidthInput( '' );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -53,7 +53,9 @@ const renderBorderBoxControl = ( customProps ) => {
 };
 
 const clickButton = ( name ) => {
-	fireEvent.click( screen.getByRole( 'button', { name } ) );
+	act( () => {
+		fireEvent.click( screen.getByRole( 'button', { name } ) );
+	} );
 };
 
 const queryButton = ( name ) => {
@@ -62,14 +64,18 @@ const queryButton = ( name ) => {
 
 const updateLinkedWidthInput = ( value ) => {
 	const widthInput = screen.getByRole( 'spinbutton' );
-	widthInput.focus();
-	fireEvent.change( widthInput, { target: { value } } );
+	act( () => {
+		widthInput.focus();
+		fireEvent.change( widthInput, { target: { value } } );
+	} );
 };
 
 const updateSplitWidthInput = ( value, index = 0 ) => {
 	const splitInputs = screen.getAllByRole( 'spinbutton' );
-	splitInputs[ index ].focus();
-	fireEvent.change( splitInputs[ index ], { target: { value } } );
+	act( () => {
+		splitInputs[ index ].focus();
+		fireEvent.change( splitInputs[ index ], { target: { value } } );
+	} );
 };
 
 describe( 'BorderBoxControl', () => {

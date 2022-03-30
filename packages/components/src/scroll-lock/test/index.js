@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { mount } from 'enzyme';
+import { createRoot } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,7 +12,7 @@ describe( 'scroll-lock', () => {
 	const lockingClassName = 'lockscroll';
 
 	// Use a separate document to reduce the risk of test side-effects.
-	let wrapper = null;
+	let root = null;
 
 	function expectLocked( locked ) {
 		expect(
@@ -25,22 +25,28 @@ describe( 'scroll-lock', () => {
 	}
 
 	afterEach( () => {
-		if ( wrapper && wrapper.length ) {
-			wrapper.unmount();
-			wrapper = null;
+		if ( root ) {
+			root.unmount();
 		}
 	} );
 
 	it( 'locks when mounted', () => {
 		expectLocked( false );
-		wrapper = mount( <ScrollLock /> );
+		const container = document.createElement( 'div' );
+		root = createRoot( container );
+		root.render( <ScrollLock /> );
+		jest.runAllTimers();
 		expectLocked( true );
 	} );
 
 	it( 'unlocks when unmounted', () => {
-		wrapper = mount( <ScrollLock /> );
+		const container = document.createElement( 'div' );
+		root = createRoot( container );
+		root.render( <ScrollLock /> );
+		jest.runAllTimers();
 		expectLocked( true );
-		wrapper.unmount();
+		root.unmount();
+		jest.runAllTimers();
 
 		// Running cleanup functions now works asynchronously. the unofficial
 		// enzyme adapter for react 17 we're currently using does not account

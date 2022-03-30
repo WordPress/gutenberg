@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
+import { render, act, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -38,14 +39,21 @@ describe( 'createCustomColorsHOC', () => {
 
 		const setAttributes = jest.fn();
 
-		const wrapper = mount(
-			<EnhancedComponent
-				attributes={ { backgroundColor: null } }
-				setAttributes={ setAttributes }
-			/>
-		);
+		let container;
+		act( () => {
+			container = render(
+				<EnhancedComponent
+					attributes={ { backgroundColor: null } }
+					setAttributes={ setAttributes }
+				/>
+			).container;
+		} );
 
-		wrapper.find( 'button' ).simulate( 'click' );
+		act( () => {
+			const button = container.querySelector( 'button' );
+			fireEvent.click( button );
+		} );
+
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			backgroundColor: 'red',
 			customBackgroundColor: undefined,
@@ -66,14 +74,20 @@ describe( 'createCustomColorsHOC', () => {
 
 		const setAttributes = jest.fn();
 
-		const wrapper = mount(
-			<EnhancedComponent
-				attributes={ { backgroundColor: null } }
-				setAttributes={ setAttributes }
-			/>
-		);
+		let container;
+		act( () => {
+			container = render(
+				<EnhancedComponent
+					attributes={ { backgroundColor: null } }
+					setAttributes={ setAttributes }
+				/>
+			).container;
+		} );
+		act( () => {
+			const button = container.querySelector( 'button' );
+			fireEvent.click( button );
+		} );
 
-		wrapper.find( 'button' ).simulate( 'click' );
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			backgroundColor: undefined,
 			customBackgroundColor: '000000',

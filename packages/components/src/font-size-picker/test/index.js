@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -37,8 +37,10 @@ describe( 'FontSizePicker', () => {
 				selector: 'input',
 			} );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: 16 } } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: 16 } } );
+			} );
 
 			expect( unitSelect ).toBeFalsy();
 			expect( unitLabel ).toBeTruthy();
@@ -61,8 +63,10 @@ describe( 'FontSizePicker', () => {
 				selector: 'input',
 			} );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: 16 } } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: 16 } } );
+			} );
 
 			expect( unitSelect ).toBeTruthy();
 			expect( unitLabel ).toBeFalsy();
@@ -97,8 +101,10 @@ describe( 'FontSizePicker', () => {
 				selector: 'input',
 			} );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: 16 } } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: 16 } } );
+			} );
 
 			expect( unitSelect ).toBeFalsy();
 			expect( unitLabel ).toBeTruthy();
@@ -133,8 +139,10 @@ describe( 'FontSizePicker', () => {
 				selector: 'input',
 			} );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: 16 } } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: 16 } } );
+			} );
 
 			expect( unitSelect ).toBeTruthy();
 			expect( unitLabel ).toBeFalsy();
@@ -186,9 +194,11 @@ describe( 'FontSizePicker', () => {
 			);
 			// Trigger click to open the select menu and take into account
 			// the two extra options (default, custom);
-			fireEvent.click(
-				screen.getByLabelText( 'Font size', { selector: 'button' } )
-			);
+			act( () => {
+				fireEvent.click(
+					screen.getByLabelText( 'Font size', { selector: 'button' } )
+				);
+			} );
 			const element = screen.getAllByRole( 'option' );
 			expect( element ).toHaveLength( fontSizes.length + 2 );
 		} );

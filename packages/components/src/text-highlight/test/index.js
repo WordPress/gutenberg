@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { render, unmountComponentAtNode } from 'react-dom';
-import { act } from 'react-dom/test-utils';
+import { render, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,19 +9,6 @@ import { act } from 'react-dom/test-utils';
 import TextHighlight from '../index';
 
 let container = null;
-
-beforeEach( () => {
-	// Setup a DOM element as a render target.
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
-
-afterEach( () => {
-	// Cleanup on exiting.
-	unmountComponentAtNode( container );
-	container.remove();
-	container = null;
-} );
 
 const defaultText =
 	'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.';
@@ -32,13 +18,12 @@ describe( 'Basic rendering', () => {
 		'should highlight the singular occurance of the text "%s" in the text if it exists',
 		( highlight ) => {
 			act( () => {
-				render(
+				container = render(
 					<TextHighlight
 						text={ defaultText }
 						highlight={ highlight }
-					/>,
-					container
-				);
+					/>
+				).container;
 			} );
 
 			const highlightedEls = Array.from(
@@ -57,10 +42,9 @@ describe( 'Basic rendering', () => {
 		const highlight = 'edit';
 
 		act( () => {
-			render(
-				<TextHighlight text={ defaultText } highlight={ highlight } />,
-				container
-			);
+			container = render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />
+			).container;
 		} );
 
 		const highlightedEls = Array.from(
@@ -80,10 +64,9 @@ describe( 'Basic rendering', () => {
 		const highlight = 'The'; // Note this occurs in both sentance of lowercase forms.
 
 		act( () => {
-			render(
-				<TextHighlight text={ defaultText } highlight={ highlight } />,
-				container
-			);
+			container = render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />
+			).container;
 		} );
 
 		const highlightedEls = Array.from(
@@ -105,10 +88,9 @@ describe( 'Basic rendering', () => {
 		const highlight = 'Antidisestablishmentarianism';
 
 		act( () => {
-			render(
-				<TextHighlight text={ defaultText } highlight={ highlight } />,
-				container
-			);
+			container = render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />
+			).container;
 		} );
 
 		const highlightedEls = Array.from(

@@ -6,15 +6,14 @@ import TestUtils from 'react-dom/test-utils';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { createRoot } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import useFocusOutside from '../';
-import ReactDOM from 'react-dom';
 
-let wrapper, onFocusOutside;
+let container, onFocusOutside, root;
 
 describe( 'useFocusOutside', () => {
 	let origHasFocus;
@@ -26,22 +25,8 @@ describe( 'useFocusOutside', () => {
 		</div>
 	);
 
-	// This is needed because TestUtils does not accept a stateless component.
-	// anything run through a HOC ends up as a stateless component.
-	const getTestComponent = ( WrappedComponent, props ) => {
-		class TestComponent extends Component {
-			render() {
-				return <WrappedComponent { ...props } />;
-			}
-		}
-		return <TestComponent />;
-	};
-
 	const simulateEvent = ( event, index = 0 ) => {
-		const element = TestUtils.scryRenderedDOMComponentsWithTag(
-			wrapper,
-			'input'
-		);
+		const element = container.querySelectorAll( 'input' );
 		TestUtils.Simulate[ event ]( element[ index ] );
 	};
 
@@ -52,9 +37,13 @@ describe( 'useFocusOutside', () => {
 		document.hasFocus = () => true;
 
 		onFocusOutside = jest.fn();
-		wrapper = TestUtils.renderIntoDocument(
-			getTestComponent( FocusOutsideComponent, { onFocusOutside } )
+
+		container = document.createElement( 'div' );
+		root = createRoot( container );
+		root.render(
+			<FocusOutsideComponent onFocusOutside={ onFocusOutside } />
 		);
+		jest.runAllTimers();
 	} );
 
 	afterEach( () => {
@@ -112,11 +101,7 @@ describe( 'useFocusOutside', () => {
 		simulateEvent( 'focus' );
 		simulateEvent( 'input' );
 
-		ReactDOM.unmountComponentAtNode(
-			// eslint-disable-next-line react/no-find-dom-node
-			ReactDOM.findDOMNode( wrapper ).parentNode
-		);
-
+		root.unmount();
 		jest.runAllTimers();
 
 		expect( onFocusOutside ).not.toHaveBeenCalled();

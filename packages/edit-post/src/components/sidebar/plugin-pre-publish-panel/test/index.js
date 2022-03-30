@@ -1,8 +1,12 @@
 /**
+ * External dependencies
+ */
+import { render } from '@testing-library/react';
+
+/**
  * WordPress dependencies
  */
 import { SlotFillProvider } from '@wordpress/components';
-import { render } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,8 +15,7 @@ import PluginPrePublishPanel from '../';
 
 describe( 'PluginPrePublishPanel', () => {
 	test( 'renders fill properly', () => {
-		const div = document.createElement( 'div' );
-		render(
+		const { container } = render(
 			<SlotFillProvider>
 				<PluginPrePublishPanel
 					className="my-plugin-pre-publish-panel"
@@ -22,10 +25,9 @@ describe( 'PluginPrePublishPanel', () => {
 					My panel content
 				</PluginPrePublishPanel>
 				<PluginPrePublishPanel.Slot />
-			</SlotFillProvider>,
-			div
+			</SlotFillProvider>
 		);
 
-		expect( div.innerHTML ).toMatchSnapshot();
+		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 } );

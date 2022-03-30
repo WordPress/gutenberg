@@ -1,8 +1,10 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
 import { uniqueId } from 'lodash';
+import { Simulate } from 'react-dom/test-utils';
+import { render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -87,7 +89,7 @@ describe( 'DimensionControl', () => {
 
 	describe( 'callbacks', () => {
 		it( 'should call onChange handler with correct args on size change', () => {
-			const wrapper = mount(
+			const { container } = render(
 				<DimensionControl
 					instanceId={ uniqueId() }
 					label={ 'Padding' }
@@ -95,23 +97,17 @@ describe( 'DimensionControl', () => {
 				/>
 			);
 
-			wrapper
-				.find( 'select' )
-				.at( 0 )
-				.simulate( 'change', {
-					target: {
-						value: 'small',
-					},
-				} );
-
-			wrapper
-				.find( 'select' )
-				.at( 0 )
-				.simulate( 'change', {
-					target: {
-						value: 'medium',
-					},
-				} );
+			const select = container.querySelector( 'select' );
+			Simulate.change( select, {
+				target: {
+					value: 'small',
+				},
+			} );
+			Simulate.change( select, {
+				target: {
+					value: 'medium',
+				},
+			} );
 
 			expect( onChangeHandler ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeHandler.mock.calls[ 0 ][ 0 ] ).toEqual( 'small' );
@@ -119,7 +115,7 @@ describe( 'DimensionControl', () => {
 		} );
 
 		it( 'should call onChange handler with undefined value when no size is provided on change', () => {
-			const wrapper = mount(
+			const { container } = render(
 				<DimensionControl
 					instanceId={ uniqueId() }
 					label={ 'Padding' }
@@ -127,14 +123,12 @@ describe( 'DimensionControl', () => {
 				/>
 			);
 
-			wrapper
-				.find( 'select' )
-				.at( 0 )
-				.simulate( 'change', {
-					target: {
-						value: '', // This happens when you select the "default" <option />
-					},
-				} );
+			const select = container.querySelector( 'select' );
+			Simulate.change( select, {
+				target: {
+					value: '',
+				},
+			} );
 
 			expect( onChangeHandler ).toHaveBeenNthCalledWith( 1, undefined );
 		} );

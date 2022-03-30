@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import { render, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -16,17 +16,19 @@ describe( 'KeyboardShortcuts', () => {
 	} );
 
 	function keyPress( which, target ) {
-		[ 'keydown', 'keypress', 'keyup' ].forEach( ( eventName ) => {
-			const event = new window.Event( eventName, { bubbles: true } );
-			event.keyCode = which;
-			event.which = which;
-			target.dispatchEvent( event );
+		act( () => {
+			[ 'keydown', 'keypress', 'keyup' ].forEach( ( eventName ) => {
+				const event = new window.Event( eventName, { bubbles: true } );
+				event.keyCode = which;
+				event.which = which;
+				target.dispatchEvent( event );
+			} );
 		} );
 	}
 
 	it( 'should capture key events', () => {
 		const spy = jest.fn();
-		mount(
+		render(
 			<KeyboardShortcuts
 				shortcuts={ {
 					d: spy,
@@ -44,7 +46,7 @@ describe( 'KeyboardShortcuts', () => {
 		const attachNode = document.createElement( 'div' );
 		document.body.appendChild( attachNode );
 
-		const wrapper = mount(
+		const { container } = render(
 			<div>
 				<KeyboardShortcuts
 					bindGlobal
@@ -57,7 +59,7 @@ describe( 'KeyboardShortcuts', () => {
 			{ attachTo: attachNode }
 		);
 
-		keyPress( 68, wrapper.find( 'textarea' ).getDOMNode() );
+		keyPress( 68, container.querySelector( 'textarea' ) );
 
 		expect( spy ).toHaveBeenCalled();
 	} );
@@ -67,7 +69,7 @@ describe( 'KeyboardShortcuts', () => {
 		const attachNode = document.createElement( 'div' );
 		document.body.appendChild( attachNode );
 
-		const wrapper = mount(
+		const { container } = render(
 			<div>
 				<KeyboardShortcuts
 					eventName="keyup"
@@ -80,7 +82,7 @@ describe( 'KeyboardShortcuts', () => {
 			{ attachTo: attachNode }
 		);
 
-		keyPress( 68, wrapper.find( 'textarea' ).getDOMNode() );
+		keyPress( 68, container.querySelector( 'textarea' ) );
 
 		expect( spy ).toHaveBeenCalled();
 		expect( spy.mock.calls[ 0 ][ 0 ].type ).toBe( 'keyup' );
@@ -91,7 +93,7 @@ describe( 'KeyboardShortcuts', () => {
 		const attachNode = document.createElement( 'div' );
 		document.body.appendChild( attachNode );
 
-		const wrapper = mount(
+		const { container } = render(
 			<div>
 				<KeyboardShortcuts
 					shortcuts={ {
@@ -105,14 +107,14 @@ describe( 'KeyboardShortcuts', () => {
 			{ attachTo: attachNode }
 		);
 
-		const textareas = wrapper.find( 'textarea' );
+		const textareas = container.querySelectorAll( 'textarea' );
 
 		// Outside scope
-		keyPress( 68, textareas.at( 1 ).getDOMNode() );
+		keyPress( 68, textareas[ 1 ] );
 		expect( spy ).not.toHaveBeenCalled();
 
 		// Inside scope
-		keyPress( 68, textareas.at( 0 ).getDOMNode() );
+		keyPress( 68, textareas[ 0 ] );
 		expect( spy ).toHaveBeenCalled();
 	} );
 } );

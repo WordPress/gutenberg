@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen, act } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -28,9 +28,11 @@ describe( 'BoxControl', () => {
 			const input = container.querySelector( 'input' );
 			const unitSelect = container.querySelector( 'select' );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100%' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: '100%' } } );
+				fireEvent.keyDown( input, { keyCode: ENTER } );
+			} );
 
 			expect( input.value ).toBe( '100' );
 			expect( unitSelect.value ).toBe( '%' );
@@ -44,15 +46,19 @@ describe( 'BoxControl', () => {
 			const unitSelect = container.querySelector( 'select' );
 			const reset = getByText( /Reset/ );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: '100px' } } );
+				fireEvent.keyDown( input, { keyCode: ENTER } );
+			} );
 
 			expect( input.value ).toBe( '100' );
 			expect( unitSelect.value ).toBe( 'px' );
 
-			reset.focus();
-			fireEvent.click( reset );
+			act( () => {
+				reset.focus();
+				fireEvent.click( reset );
+			} );
 
 			expect( input.value ).toBe( '' );
 			expect( unitSelect.value ).toBe( 'px' );
@@ -74,15 +80,19 @@ describe( 'BoxControl', () => {
 			const unitSelect = container.querySelector( 'select' );
 			const reset = getByText( /Reset/ );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: '100px' } } );
+				fireEvent.keyDown( input, { keyCode: ENTER } );
+			} );
 
 			expect( input.value ).toBe( '100' );
 			expect( unitSelect.value ).toBe( 'px' );
 
-			reset.focus();
-			fireEvent.click( reset );
+			act( () => {
+				reset.focus();
+				fireEvent.click( reset );
+			} );
 
 			expect( input.value ).toBe( '' );
 			expect( unitSelect.value ).toBe( 'px' );
@@ -111,15 +121,19 @@ describe( 'BoxControl', () => {
 			const unitSelect = container.querySelector( 'select' );
 			const reset = getByText( /Reset/ );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: '100px' } } );
+				fireEvent.keyDown( input, { keyCode: ENTER } );
+			} );
 
 			expect( input.value ).toBe( '100' );
 			expect( unitSelect.value ).toBe( 'px' );
 
-			reset.focus();
-			fireEvent.click( reset );
+			act( () => {
+				reset.focus();
+				fireEvent.click( reset );
+			} );
 
 			expect( input.value ).toBe( '' );
 			expect( unitSelect.value ).toBe( 'px' );
@@ -132,15 +146,19 @@ describe( 'BoxControl', () => {
 			} );
 			const unitSelect = screen.getByLabelText( 'Select unit' );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100%' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: '100%' } } );
+				fireEvent.keyDown( input, { keyCode: ENTER } );
+			} );
 
 			expect( input.value ).toBe( '100' );
 			expect( unitSelect.value ).toBe( '%' );
 
-			fireEvent.change( input, { target: { value: '' } } );
-			fireEvent.blur( input );
+			act( () => {
+				fireEvent.change( input, { target: { value: '' } } );
+				fireEvent.blur( input );
+			} );
 
 			expect( input.value ).toBe( '' );
 		} );
@@ -159,14 +177,19 @@ describe( 'BoxControl', () => {
 			);
 
 			const unlink = getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+
+			act( () => {
+				fireEvent.click( unlink );
+			} );
 
 			const input = container.querySelector( 'input' );
 			const unitSelect = container.querySelector( 'select' );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: '100px' } } );
+				fireEvent.keyDown( input, { keyCode: ENTER } );
+			} );
 
 			expect( input.value ).toBe( '100' );
 			expect( unitSelect.value ).toBe( 'px' );
@@ -192,14 +215,19 @@ describe( 'BoxControl', () => {
 			);
 
 			const unlink = getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+
+			act( () => {
+				fireEvent.click( unlink );
+			} );
 
 			const input = container.querySelector( 'input' );
 			const unitSelect = container.querySelector( 'select' );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: '100px' } } );
+				fireEvent.keyDown( input, { keyCode: ENTER } );
+			} );
 
 			expect( input.value ).toBe( '100' );
 			expect( unitSelect.value ).toBe( 'px' );
@@ -220,12 +248,18 @@ describe( 'BoxControl', () => {
 
 			// Make unit selection on all input control.
 			const allUnitSelect = screen.getByLabelText( 'Select unit' );
-			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'em' } } );
+
+			act( () => {
+				allUnitSelect.focus();
+				fireEvent.change( allUnitSelect, { target: { value: 'em' } } );
+			} );
 
 			// Unlink the controls.
 			const unlink = screen.getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+
+			act( () => {
+				fireEvent.click( unlink );
+			} );
 
 			// Confirm that each individual control has the selected unit
 			const unlinkedSelects = screen.getAllByDisplayValue( 'em' );
@@ -238,12 +272,18 @@ describe( 'BoxControl', () => {
 
 			// Make unit selection on all input control.
 			const allUnitSelect = screen.getByLabelText( 'Select unit' );
-			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'vw' } } );
+
+			act( () => {
+				allUnitSelect.focus();
+				fireEvent.change( allUnitSelect, { target: { value: 'vw' } } );
+			} );
 
 			// Unlink the controls.
 			const unlink = screen.getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+
+			act( () => {
+				fireEvent.click( unlink );
+			} );
 
 			// Confirm that each individual control has the selected unit
 			const unlinkedSelects = screen.getAllByDisplayValue( 'vw' );
@@ -270,9 +310,11 @@ describe( 'BoxControl', () => {
 				selector: 'input',
 			} );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '7.5rem' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: '7.5rem' } } );
+				fireEvent.keyDown( input, { keyCode: ENTER } );
+			} );
 
 			expect( setState ).toHaveBeenCalledWith( {
 				top: '7.5rem',
@@ -288,8 +330,10 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ setState } /> );
 
 			const allUnitSelect = screen.getByLabelText( 'Select unit' );
-			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'rem' } } );
+			act( () => {
+				allUnitSelect.focus();
+				fireEvent.change( allUnitSelect, { target: { value: 'rem' } } );
+			} );
 
 			expect( setState ).toHaveBeenCalledWith( {
 				top: undefined,

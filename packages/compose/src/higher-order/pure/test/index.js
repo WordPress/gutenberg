@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { mount } from 'enzyme';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRoot } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,15 +14,20 @@ describe( 'pure', () => {
 		const MyComp = pure( () => {
 			return <p>{ ++i }</p>;
 		} );
-		const wrapper = mount( <MyComp /> );
-		wrapper.update(); // Updating with same props doesn't rerender.
-		expect( wrapper.html() ).toBe( '<p>1</p>' );
-		wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender.
-		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender.
-		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender.
-		expect( wrapper.html() ).toBe( '<p>3</p>' );
+		const container = document.createElement( 'div' );
+		const root = createRoot( container );
+		root.render( <MyComp /> );
+		jest.runAllTimers();
+		expect( container.innerHTML ).toBe( '<p>1</p>' );
+		root.render( <MyComp prop="a" /> ); // New prop should trigger a rerender.
+		jest.runAllTimers();
+		expect( container.innerHTML ).toBe( '<p>2</p>' );
+		root.render( <MyComp prop="a" /> ); // Keeping the same prop value should not rerender.
+		jest.runAllTimers();
+		expect( container.innerHTML ).toBe( '<p>2</p>' );
+		root.render( <MyComp prop="b" /> ); // Changing the prop value should rerender.
+		jest.runAllTimers();
+		expect( container.innerHTML ).toBe( '<p>3</p>' );
 	} );
 
 	it( 'class component should rerender if the props or state change', () => {
@@ -43,18 +43,26 @@ describe( 'pure', () => {
 				}
 			}
 		);
-		const wrapper = mount( <MyComp /> );
-		wrapper.update(); // Updating with same props doesn't rerender.
-		expect( wrapper.html() ).toBe( '<p>1</p>' );
-		wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender.
-		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender.
-		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender.
-		expect( wrapper.html() ).toBe( '<p>3</p>' );
-		wrapper.setState( { state: 'a' } ); // New state value should trigger a rerender.
-		expect( wrapper.html() ).toBe( '<p>4</p>' );
-		wrapper.setState( { state: 'a' } ); // Keeping the same state value should not trigger a rerender.
-		expect( wrapper.html() ).toBe( '<p>4</p>' );
+		const ref = { current: null };
+		const container = document.createElement( 'div' );
+		const root = createRoot( container );
+		root.render( <MyComp ref={ ref } /> );
+		jest.runAllTimers();
+		expect( container.innerHTML ).toBe( '<p>1</p>' );
+		root.render( <MyComp ref={ ref } prop="a" /> ); // New prop should trigger a rerender.
+		jest.runAllTimers();
+		expect( container.innerHTML ).toBe( '<p>2</p>' );
+		root.render( <MyComp ref={ ref } prop="a" /> ); // Keeping the same prop value should not rerender.
+		jest.runAllTimers();
+		expect( container.innerHTML ).toBe( '<p>2</p>' );
+		root.render( <MyComp ref={ ref } prop="b" /> ); // Changing the prop value should rerender.
+		jest.runAllTimers();
+		expect( container.innerHTML ).toBe( '<p>3</p>' );
+		ref.current.setState( { state: 'a' } ); // New state value should trigger a rerender.
+		jest.runAllTimers();
+		expect( container.innerHTML ).toBe( '<p>4</p>' );
+		ref.current.setState( { state: 'a' } ); // Keeping the same state value should not trigger a rerender.
+		jest.runAllTimers();
+		expect( container.innerHTML ).toBe( '<p>4</p>' );
 	} );
 } );

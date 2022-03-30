@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen, fireEvent } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
@@ -59,8 +60,10 @@ describe( 'InputControl', () => {
 			render( <InputControl value="Hello" onChange={ spy } /> );
 
 			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: 'There' } } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: 'There' } } );
+			} );
 
 			expect( input.value ).toBe( 'There' );
 			expect( spy ).toHaveBeenCalledTimes( 1 );
@@ -74,11 +77,13 @@ describe( 'InputControl', () => {
 
 			const input = getInput();
 
-			input.focus();
-			fireEvent.change( input, { target: { value: 'two' } } );
+			act( () => {
+				input.focus();
+				fireEvent.change( input, { target: { value: 'two' } } );
 
-			// Ensuring <InputControl /> is controlled.
-			fireEvent.blur( input );
+				// Ensuring <InputControl /> is controlled.
+				fireEvent.blur( input );
+			} );
 
 			// Updating the value.
 			rerender( <InputControl value="three" onChange={ spy } /> );

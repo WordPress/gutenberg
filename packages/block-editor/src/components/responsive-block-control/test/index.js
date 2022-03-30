@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { render, unmountComponentAtNode } from 'react-dom';
-import { act, Simulate } from 'react-dom/test-utils';
+import { act, render } from '@testing-library/react';
+import { Simulate } from 'react-dom/test-utils';
 import { uniqueId } from 'lodash';
 
 /**
@@ -18,19 +18,6 @@ import { SelectControl } from '@wordpress/components';
 import ResponsiveBlockControl from '../index';
 
 let container = null;
-beforeEach( () => {
-	// Setup a DOM element as a render target.
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
-
-afterEach( () => {
-	// Cleanup on exiting.
-	unmountComponentAtNode( container );
-	container.remove();
-	container = null;
-} );
-
 const inputId = uniqueId();
 
 const sizeOptions = [
@@ -67,14 +54,13 @@ const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 describe( 'Basic rendering', () => {
 	it( 'should render with required props', () => {
 		act( () => {
-			render(
+			container = render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>,
-				container
-			);
+				/>
+			).container;
 		} );
 
 		const activePropertyLabel = Array.from(
@@ -122,13 +108,12 @@ describe( 'Basic rendering', () => {
 
 	it( 'should not render without valid legend', () => {
 		act( () => {
-			render(
+			container = render(
 				<ResponsiveBlockControl
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>,
-				container
-			);
+				/>
+			).container;
 		} );
 
 		expect( container.innerHTML ).toBe( '' );
@@ -136,13 +121,12 @@ describe( 'Basic rendering', () => {
 
 	it( 'should not render without valid property', () => {
 		act( () => {
-			render(
+			container = render(
 				<ResponsiveBlockControl
 					title="Padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>,
-				container
-			);
+				/>
+			).container;
 		} );
 
 		expect( container.innerHTML ).toBe( '' );
@@ -150,10 +134,9 @@ describe( 'Basic rendering', () => {
 
 	it( 'should not render without valid default control render prop', () => {
 		act( () => {
-			render(
-				<ResponsiveBlockControl title="Padding" property="padding" />,
-				container
-			);
+			container = render(
+				<ResponsiveBlockControl title="Padding" property="padding" />
+			).container;
 		} );
 
 		expect( container.innerHTML ).toBe( '' );
@@ -163,15 +146,14 @@ describe( 'Basic rendering', () => {
 		const customToggleLabel =
 			'Utilise a matching padding value on all viewports';
 		act( () => {
-			render(
+			container = render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
 					toggleLabel={ customToggleLabel }
-				/>,
-				container
-			);
+				/>
+			).container;
 		} );
 
 		const actualToggleLabel = container.querySelector(
@@ -185,15 +167,14 @@ describe( 'Basic rendering', () => {
 		const customDefaultControlGroupLabel = 'Everything';
 
 		act( () => {
-			render(
+			container = render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
 					defaultLabel={ customDefaultControlGroupLabel }
-				/>,
-				container
-			);
+				/>
+			).container;
 		} );
 
 		const defaultControlLabel = Array.from(
@@ -207,15 +188,14 @@ describe( 'Basic rendering', () => {
 describe( 'Default and Responsive modes', () => {
 	it( 'should render in responsive mode when isResponsive prop is set to true', () => {
 		act( () => {
-			render(
+			container = render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
 					isResponsive={ true }
 					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>,
-				container
-			);
+				/>
+			).container;
 		} );
 
 		const defaultControlGroup = container.querySelector(
@@ -254,16 +234,15 @@ describe( 'Default and Responsive modes', () => {
 		);
 
 		act( () => {
-			render(
+			container = render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
 					isResponsive={ true }
 					renderDefaultControl={ mockRenderDefaultControl }
 					viewports={ customViewportSet }
-				/>,
-				container
-			);
+				/>
+			).container;
 		} );
 
 		const defaultRenderControlCall = 1;
@@ -305,7 +284,7 @@ describe( 'Default and Responsive modes', () => {
 		};
 
 		act( () => {
-			render( <ResponsiveBlockControlConsumer />, container );
+			container = render( <ResponsiveBlockControlConsumer /> ).container;
 		} );
 
 		let defaultControlGroup = container.querySelector(
@@ -383,16 +362,15 @@ describe( 'Default and Responsive modes', () => {
 		} );
 
 		act( () => {
-			render(
+			container = render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
 					isResponsive={ true }
 					renderDefaultControl={ spyRenderDefaultControl }
 					renderResponsiveControls={ mockRenderResponsiveControls }
-				/>,
-				container
-			);
+				/>
+			).container;
 		} );
 
 		// The user should see "range" controls so we can legitimately query for them here.

@@ -2,8 +2,6 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import TestUtils from 'react-dom/test-utils';
-import ReactDOM from 'react-dom';
 
 /**
  * Internal dependencies
@@ -69,23 +67,5 @@ describe( 'URLInputButton', () => {
 		expect( wrapper.state().expanded ).toBe( true );
 		wrapper.find( '.block-editor-url-input__back' ).simulate( 'click' );
 		expect( wrapper.state().expanded ).toBe( false );
-	} );
-	it( 'should close the form when user submits it', () => {
-		const wrapper = TestUtils.renderIntoDocument( <URLInputButton /> );
-		const buttonElement = () =>
-			TestUtils.scryRenderedDOMComponentsWithClass(
-				wrapper,
-				'components-toolbar__control'
-			);
-		const formElement = () =>
-			TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'form' );
-		TestUtils.Simulate.click( buttonElement().shift() );
-		expect( wrapper.state.expanded ).toBe( true );
-		TestUtils.Simulate.submit( formElement().shift() );
-		expect( wrapper.state.expanded ).toBe( false );
-		ReactDOM.unmountComponentAtNode(
-			// eslint-disable-next-line react/no-find-dom-node
-			ReactDOM.findDOMNode( wrapper ).parentNode
-		);
 	} );
 } );

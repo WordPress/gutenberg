@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -27,11 +27,13 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			rangeInput.focus();
-			fireEvent.change( rangeInput, { target: { value: '5' } } );
+			act( () => {
+				rangeInput.focus();
+				fireEvent.change( rangeInput, { target: { value: '5' } } );
 
-			numberInput.focus();
-			fireEvent.change( numberInput, { target: { value: '10' } } );
+				numberInput.focus();
+				fireEvent.change( numberInput, { target: { value: '10' } } );
+			} );
 
 			expect( onChange ).toHaveBeenCalledWith( 5 );
 			expect( onChange ).toHaveBeenCalledWith( 10 );
@@ -64,8 +66,10 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			fireEvent.change( numberInput, { target: { value: '10' } } );
-			fireEvent.blur( numberInput );
+			act( () => {
+				fireEvent.change( numberInput, { target: { value: '10' } } );
+				fireEvent.blur( numberInput );
+			} );
 
 			expect( rangeInput.value ).not.toBe( '10' );
 		} );
@@ -76,8 +80,10 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			fireEvent.change( numberInput, { target: { value: '21' } } );
-			fireEvent.blur( numberInput );
+			act( () => {
+				fireEvent.change( numberInput, { target: { value: '21' } } );
+				fireEvent.blur( numberInput );
+			} );
 
 			expect( rangeInput.value ).not.toBe( '21' );
 		} );
@@ -90,8 +96,10 @@ describe( 'RangeControl', () => {
 
 			const numberInput = getNumberInput( container );
 
-			numberInput.focus();
-			fireEvent.change( numberInput, { target: { value: '25e' } } );
+			act( () => {
+				numberInput.focus();
+				fireEvent.change( numberInput, { target: { value: '25e' } } );
+			} );
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
@@ -105,13 +113,18 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			numberInput.focus();
-			fireEvent.change( numberInput, { target: { value: '-1.1' } } );
+			act( () => {
+				numberInput.focus();
+				fireEvent.change( numberInput, { target: { value: '-1.1' } } );
+			} );
 
 			expect( numberInput.value ).toBe( '-1.1' );
 			expect( rangeInput.value ).toBe( '-1' );
 
-			fireEvent.blur( numberInput );
+			act( () => {
+				fireEvent.blur( numberInput );
+			} );
+
 			expect( onChange ).toHaveBeenCalledWith( -1 );
 			expect( numberInput.value ).toBe( '-1' );
 		} );
@@ -124,9 +137,11 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			numberInput.focus();
-			fireEvent.change( numberInput, { target: { value: '1' } } );
-			fireEvent.blur( numberInput );
+			act( () => {
+				numberInput.focus();
+				fireEvent.change( numberInput, { target: { value: '1' } } );
+				fireEvent.blur( numberInput );
+			} );
 
 			expect( rangeInput.value ).toBe( '0' );
 		} );
@@ -139,15 +154,20 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			numberInput.focus();
-
-			fireEvent.change( numberInput, { target: { value: '-101' } } );
+			act( () => {
+				numberInput.focus();
+				fireEvent.change( numberInput, { target: { value: '-101' } } );
+			} );
 			expect( rangeInput.value ).toBe( '-100' );
 
-			fireEvent.change( numberInput, { target: { value: '-49' } } );
+			act( () => {
+				fireEvent.change( numberInput, { target: { value: '-49' } } );
+			} );
 			expect( rangeInput.value ).toBe( '-50' );
 
-			fireEvent.change( numberInput, { target: { value: '-50' } } );
+			act( () => {
+				fireEvent.change( numberInput, { target: { value: '-50' } } );
+			} );
 			expect( rangeInput.value ).toBe( '-50' );
 		} );
 
@@ -164,13 +184,17 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			numberInput.focus();
-			fireEvent.change( numberInput, { target: { value: '0.125' } } );
+			act( () => {
+				numberInput.focus();
+				fireEvent.change( numberInput, { target: { value: '0.125' } } );
+			} );
 
 			expect( onChange ).toHaveBeenCalledWith( 0.125 );
 			expect( rangeInput.value ).toBe( '0.125' );
 
-			fireEvent.change( numberInput, { target: { value: '0.225' } } );
+			act( () => {
+				fireEvent.change( numberInput, { target: { value: '0.225' } } );
+			} );
 
 			expect( onChange ).toHaveBeenCalledWith( 0.225 );
 			expect( rangeInput.value ).toBe( '0.225' );
@@ -244,14 +268,18 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			rangeInput.focus();
-			fireEvent.change( rangeInput, { target: { value: 13 } } );
+			act( () => {
+				rangeInput.focus();
+				fireEvent.change( rangeInput, { target: { value: 13 } } );
+			} );
 
 			expect( rangeInput.value ).toBe( '13' );
 			expect( numberInput.value ).toBe( '13' );
 
-			numberInput.focus();
-			fireEvent.change( numberInput, { target: { value: 7 } } );
+			act( () => {
+				numberInput.focus();
+				fireEvent.change( numberInput, { target: { value: 7 } } );
+			} );
 
 			expect( rangeInput.value ).toBe( '7' );
 			expect( numberInput.value ).toBe( '7' );
@@ -263,8 +291,10 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			fireEvent.change( numberInput, { target: { value: '' } } );
-			fireEvent.blur( numberInput );
+			act( () => {
+				fireEvent.change( numberInput, { target: { value: '' } } );
+				fireEvent.blur( numberInput );
+			} );
 
 			// Reset to 50. Median value of min: 0, max: 100.
 			expect( rangeInput.value ).toBe( '50' );
@@ -289,7 +319,9 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			fireEvent.click( resetButton );
+			act( () => {
+				fireEvent.click( resetButton );
+			} );
 
 			expect( rangeInput.value ).toBe( '33' );
 			expect( numberInput.value ).toBe( '33' );
@@ -311,7 +343,9 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			fireEvent.click( resetButton );
+			act( () => {
+				fireEvent.click( resetButton );
+			} );
 
 			expect( rangeInput.value ).toBe( '50' );
 			expect( numberInput.value ).toBe( '' );

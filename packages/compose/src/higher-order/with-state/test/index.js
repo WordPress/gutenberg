@@ -11,18 +11,7 @@ import withState from '../';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-
-// This is needed because TestUtils does not accept a stateless component.
-// anything run through a HOC ends up as a stateless component.
-const getTestComponent = ( WrappedComponent ) => {
-	class TestComponent extends Component {
-		render() {
-			return <WrappedComponent { ...this.props } />;
-		}
-	}
-	return <TestComponent />;
-};
+import { createRoot } from '@wordpress/element';
 
 describe( 'withState', () => {
 	it( 'should pass initial state and allow updates', () => {
@@ -38,16 +27,16 @@ describe( 'withState', () => {
 			</button>
 		) );
 
-		const wrapper = TestUtils.renderIntoDocument(
-			getTestComponent( EnhancedComponent )
-		);
-
-		const buttonElement = () =>
-			TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
+		const container = document.createElement( 'div' );
+		const root = createRoot( container );
+		root.render( <EnhancedComponent /> );
+		jest.runAllTimers();
+		const buttonElement = () => container.querySelector( 'button' );
 
 		expect( console ).toHaveWarned();
 		expect( buttonElement().outerHTML ).toBe( '<button>0</button>' );
 		TestUtils.Simulate.click( buttonElement() );
+		jest.runAllTimers();
 		expect( buttonElement().outerHTML ).toBe( '<button>1</button>' );
 	} );
 } );

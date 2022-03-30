@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import ReactDOM from 'react-dom';
-
-/**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, createRoot } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -80,8 +75,9 @@ describe( 'useMergeRefs', () => {
 
 	it( 'should work', () => {
 		const rootElement = document.getElementById( 'root' );
-
-		ReactDOM.render( <MergedRefs />, rootElement );
+		const root = createRoot( rootElement );
+		root.render( <MergedRefs /> );
+		jest.runAllTimers();
 
 		const originalElement = rootElement.firstElementChild;
 
@@ -90,7 +86,8 @@ describe( 'useMergeRefs', () => {
 			[ [ originalElement ], [ originalElement ] ],
 		] );
 
-		ReactDOM.render( <MergedRefs />, rootElement );
+		root.render( <MergedRefs /> );
+		jest.runAllTimers();
 
 		// Render 2: the new callback functions should not be called! There has
 		// been no dependency change.
@@ -99,7 +96,8 @@ describe( 'useMergeRefs', () => {
 			[ [], [] ],
 		] );
 
-		ReactDOM.render( null, rootElement );
+		root.render( null );
+		jest.runAllTimers();
 
 		// Unmount: the initial callback functions should receive null.
 		expect( renderCallback.history ).toEqual( [
@@ -113,12 +111,14 @@ describe( 'useMergeRefs', () => {
 
 	it( 'should work for node change', () => {
 		const rootElement = document.getElementById( 'root' );
-
-		ReactDOM.render( <MergedRefs />, rootElement );
+		const root = createRoot( rootElement );
+		root.render( <MergedRefs /> );
+		jest.runAllTimers();
 
 		const originalElement = rootElement.firstElementChild;
 
-		ReactDOM.render( <MergedRefs tagName="button" />, rootElement );
+		root.render( <MergedRefs tagName="button" /> );
+		jest.runAllTimers();
 
 		const newElement = rootElement.firstElementChild;
 
@@ -135,7 +135,8 @@ describe( 'useMergeRefs', () => {
 			[ [], [] ],
 		] );
 
-		ReactDOM.render( null, rootElement );
+		root.render( null );
+		jest.runAllTimers();
 
 		// Unmount: the initial callback functions should receive null.
 		expect( renderCallback.history ).toEqual( [
@@ -149,8 +150,9 @@ describe( 'useMergeRefs', () => {
 
 	it( 'should work with dependencies', () => {
 		const rootElement = document.getElementById( 'root' );
-
-		ReactDOM.render( <MergedRefs count={ 1 } />, rootElement );
+		const root = createRoot( rootElement );
+		root.render( <MergedRefs count={ 1 } /> );
+		jest.runAllTimers();
 
 		const originalElement = rootElement.firstElementChild;
 
@@ -158,7 +160,8 @@ describe( 'useMergeRefs', () => {
 			[ [ originalElement ], [ originalElement ] ],
 		] );
 
-		ReactDOM.render( <MergedRefs count={ 2 } />, rootElement );
+		root.render( <MergedRefs count={ 2 } /> );
+		jest.runAllTimers();
 
 		// After a second render with a dependency change, expect the inital
 		// callback function to be called with null and the new callback
@@ -169,7 +172,8 @@ describe( 'useMergeRefs', () => {
 			[ [], [ originalElement ] ],
 		] );
 
-		ReactDOM.render( null, rootElement );
+		root.render( null );
+		jest.runAllTimers();
 
 		// Unmount: current callback functions should be called with null.
 		expect( renderCallback.history ).toEqual( [
@@ -183,8 +187,9 @@ describe( 'useMergeRefs', () => {
 
 	it( 'should simultaneously update node and dependencies', () => {
 		const rootElement = document.getElementById( 'root' );
-
-		ReactDOM.render( <MergedRefs count={ 1 } />, rootElement );
+		const root = createRoot( rootElement );
+		root.render( <MergedRefs count={ 1 } /> );
+		jest.runAllTimers();
 
 		const originalElement = rootElement.firstElementChild;
 
@@ -192,10 +197,8 @@ describe( 'useMergeRefs', () => {
 			[ [ originalElement ], [ originalElement ] ],
 		] );
 
-		ReactDOM.render(
-			<MergedRefs count={ 2 } tagName="button" />,
-			rootElement
-		);
+		root.render( <MergedRefs count={ 2 } tagName="button" /> );
+		jest.runAllTimers();
 
 		const newElement = rootElement.firstElementChild;
 
@@ -212,7 +215,8 @@ describe( 'useMergeRefs', () => {
 			[ [], [ newElement ] ],
 		] );
 
-		ReactDOM.render( null, rootElement );
+		root.render( null );
+		jest.runAllTimers();
 
 		// Unmount: current callback functions should be called with null.
 		expect( renderCallback.history ).toEqual( [
@@ -226,12 +230,14 @@ describe( 'useMergeRefs', () => {
 
 	it( 'should work for dependency change after node change', () => {
 		const rootElement = document.getElementById( 'root' );
-
-		ReactDOM.render( <MergedRefs />, rootElement );
+		const root = createRoot( rootElement );
+		root.render( <MergedRefs /> );
+		jest.runAllTimers();
 
 		const originalElement = rootElement.firstElementChild;
 
-		ReactDOM.render( <MergedRefs tagName="button" />, rootElement );
+		root.render( <MergedRefs tagName="button" /> );
+		jest.runAllTimers();
 
 		const newElement = rootElement.firstElementChild;
 
@@ -248,10 +254,8 @@ describe( 'useMergeRefs', () => {
 			[ [], [] ],
 		] );
 
-		ReactDOM.render(
-			<MergedRefs tagName="button" count={ 1 } />,
-			rootElement
-		);
+		root.render( <MergedRefs tagName="button" count={ 1 } /> );
+		jest.runAllTimers();
 
 		// After a third render with a dependency change, expect the inital
 		// callback function to be called with null and the new callback
@@ -266,7 +270,8 @@ describe( 'useMergeRefs', () => {
 			[ [], [ newElement ] ],
 		] );
 
-		ReactDOM.render( null, rootElement );
+		root.render( null );
+		jest.runAllTimers();
 
 		// Unmount: current callback functions should be called with null.
 		expect( renderCallback.history ).toEqual( [
@@ -281,8 +286,9 @@ describe( 'useMergeRefs', () => {
 
 	it( 'should allow disabling a ref', () => {
 		const rootElement = document.getElementById( 'root' );
-
-		ReactDOM.render( <MergedRefs disable1 />, rootElement );
+		const root = createRoot( rootElement );
+		root.render( <MergedRefs disable1 /> );
+		jest.runAllTimers();
 
 		const originalElement = rootElement.firstElementChild;
 
@@ -291,7 +297,8 @@ describe( 'useMergeRefs', () => {
 			[ [], [ originalElement ] ],
 		] );
 
-		ReactDOM.render( <MergedRefs disable2 />, rootElement );
+		root.render( <MergedRefs disable2 /> );
+		jest.runAllTimers();
 
 		// Render 2: ref 1 should be enabled and receive the ref. Note that the
 		// callback hasn't changed, so the original callback function will be
@@ -301,7 +308,8 @@ describe( 'useMergeRefs', () => {
 			[ [], [] ],
 		] );
 
-		ReactDOM.render( <MergedRefs disable1 count={ 1 } />, rootElement );
+		root.render( <MergedRefs disable1 count={ 1 } /> );
+		jest.runAllTimers();
 
 		// Render 3: ref 1 should again be disabled. Ref 2 to should receive a
 		// ref with the new callback function because the count has been
@@ -315,7 +323,8 @@ describe( 'useMergeRefs', () => {
 			[ [], [ originalElement ] ],
 		] );
 
-		ReactDOM.render( null, rootElement );
+		root.render( null );
+		jest.runAllTimers();
 
 		// Unmount: current callback functions should receive null.
 		expect( renderCallback.history ).toEqual( [

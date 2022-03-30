@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -11,18 +11,21 @@ import MediaReplaceFlow from '../';
 const noop = () => {};
 
 function setUpMediaReplaceFlow() {
-	const { container } = render(
-		<MediaReplaceFlow
-			mediaId={ 1 }
-			mediaURL={ 'https://example.media' }
-			allowedTypes={ [ 'png' ] }
-			accept="image/*"
-			onSelect={ noop }
-			onSelectURL={ noop }
-			onError={ noop }
-			onCloseModal={ noop }
-		/>
-	);
+	let container;
+	act( () => {
+		container = render(
+			<MediaReplaceFlow
+				mediaId={ 1 }
+				mediaURL={ 'https://example.media' }
+				allowedTypes={ [ 'png' ] }
+				accept="image/*"
+				onSelect={ noop }
+				onSelectURL={ noop }
+				onError={ noop }
+				onCloseModal={ noop }
+			/>
+		).container;
+	} );
 	return container;
 }
 
@@ -43,7 +46,9 @@ describe( 'General media replace flow', () => {
 		const mediaReplaceButton = container.querySelector(
 			'button[aria-expanded="false"]'
 		);
-		mediaReplaceButton.click();
+		act( () => {
+			mediaReplaceButton.click();
+		} );
 
 		const uploadMenu = container.querySelector(
 			'.block-editor-media-replace-flow__media-upload-menu'
@@ -58,7 +63,9 @@ describe( 'General media replace flow', () => {
 		const mediaReplaceButton = container.querySelector(
 			'button[aria-expanded="false"]'
 		);
-		mediaReplaceButton.click();
+		act( () => {
+			mediaReplaceButton.click();
+		} );
 
 		const mediaURL = container.querySelector( '.components-external-link' );
 
@@ -71,27 +78,35 @@ describe( 'General media replace flow', () => {
 		const mediaReplaceButton = container.querySelector(
 			'button[aria-expanded="false"]'
 		);
-		mediaReplaceButton.click();
+		act( () => {
+			mediaReplaceButton.click();
+		} );
 
 		const editMediaURL = container.querySelector(
 			'.block-editor-link-control__search-item-action'
 		);
 
-		editMediaURL.click();
+		act( () => {
+			editMediaURL.click();
+		} );
 
 		const mediaURLInput = container.querySelector(
 			'.block-editor-url-input__input'
 		);
 
-		fireEvent.change( mediaURLInput, {
-			target: { value: 'https://new.example.media' },
+		act( () => {
+			fireEvent.change( mediaURLInput, {
+				target: { value: 'https://new.example.media' },
+			} );
 		} );
 
 		const saveMediaURLButton = container.querySelector(
 			'.block-editor-link-control__search-submit'
 		);
 
-		saveMediaURLButton.click();
+		act( () => {
+			saveMediaURLButton.click();
+		} );
 
 		const mediaURL = container.querySelector( '.components-external-link' );
 
