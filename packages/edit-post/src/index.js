@@ -9,6 +9,8 @@ import {
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
+import { store as preferencesStore } from '@wordpress/preferences';
+import '@wordpress/database-persistence-layer';
 
 /**
  * Internal dependencies
@@ -17,7 +19,6 @@ import './hooks';
 import './plugins';
 import Editor from './editor';
 import { store as editPostStore } from './store';
-import configurePreferences from './utils/configure-preferences';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -73,7 +74,7 @@ export function reinitializeEditor(
  *                               considered as non-user-initiated (bypass for
  *                               unsaved changes prompt).
  */
-export async function initializeEditor(
+export function initializeEditor(
 	id,
 	postType,
 	postId,
@@ -106,7 +107,7 @@ export async function initializeEditor(
 		initialEdits
 	);
 
-	await configurePreferences( {
+	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		editorMode: 'visual',
 		fixedToolbar: false,
 		fullscreenMode: true,

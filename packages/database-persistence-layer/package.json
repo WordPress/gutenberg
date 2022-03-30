@@ -1,7 +1,7 @@
 {
-	"name": "@wordpress/wp-preferences",
+	"name": "@wordpress/database-persistence-layer",
 	"version": "1.0.0",
-	"description": "Wordpress-specific utilities for preferences.",
+	"description": "A persistence layer that stores data in the WordPress database.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -10,11 +10,11 @@
 		"preferences",
 		"settings"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/wp-preferences/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/database-persistence-layer/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/wp-preferences"
+		"directory": "packages/database-persistence-layer"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -29,12 +29,8 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/components": "file:../components",
 		"@wordpress/data": "file:../data",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
 		"@wordpress/preferences": "file:../preferences"
 	},
 	"publishConfig": {
