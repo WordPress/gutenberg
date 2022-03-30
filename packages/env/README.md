@@ -300,6 +300,7 @@ Positionals:
 The run command can be used to open shell sessions or invoke WP-CLI commands.
 
 <div class="callout callout-alert">
+
 To run a WP-CLI command that includes optional arguments, enclose the WP-CLI command in quotation marks; otherwise, the optional arguments are ignored. This is because flags are normally passed to `wp-env` itself, meaning that the flags are not considered part of the argument that specifies the WP-CLI command. With quotation marks, `wp-env` considers everything inside quotation marks the WP-CLI command argument.
 
 For example, to list cron schedules with optional arguments that specify the fields returned and the format of the output:
@@ -309,6 +310,7 @@ wp-env run cli "wp cron schedule list --fields=name --format=csv"
 ```
 
 Without the quotation marks, WP-CLI lists the schedule in its default format, ignoring the `fields` and `format` arguments.
+
 </div>
 
 Note that quotation marks are not required for a WP-CLI command that excludes optional arguments, although it does not hurt to include them. For example, the following command syntaxes return identical results: `wp-env run cli "wp cron schedule list"` or `wp-env run cli wp cron schedule list`.
