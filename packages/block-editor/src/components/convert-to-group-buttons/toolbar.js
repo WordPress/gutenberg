@@ -43,7 +43,7 @@ function BlockGroupToolbar() {
 			groupingBlockName
 		);
 
-		if ( newBlocks ) {
+		if ( newBlocks && newBlocks.length > 0 ) {
 			newBlocks[ 0 ].attributes.layout =
 				variation !== 'group'
 					? variationAttributes[ variation ]
