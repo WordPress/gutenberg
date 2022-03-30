@@ -290,6 +290,65 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 	);
 
 	/**
+	 * Sanitizes the input according to the schemas.
+	 *
+	 * @param array $input Structure to sanitize.
+	 * @param array $valid_block_names List of valid block names.
+	 * @param array $valid_element_names List of valid element names.
+	 * @return array The sanitized output.
+	 */
+	protected static function sanitize( $input, $valid_block_names, $valid_element_names ) {
+		$output = array();
+
+		if ( ! is_array( $input ) ) {
+			return $output;
+		}
+
+		$output = array_intersect_key( $input, array_flip( static::VALID_TOP_LEVEL_KEYS ) );
+
+		// Build the schema based on valid block & element names.
+		$schema                 = array();
+		$schema_styles_elements = array();
+		foreach ( $valid_element_names as $element ) {
+			$schema_styles_elements[ $element ] = static::VALID_STYLES;
+		}
+		$schema_styles_blocks   = array();
+		$schema_settings_blocks = array();
+		foreach ( $valid_block_names as $block ) {
+			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
+			$schema_styles_blocks[ $block ]             = static::VALID_STYLES;
+			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
+		}
+		$schema['styles']             = static::VALID_STYLES;
+		$schema['styles']['blocks']   = $schema_styles_blocks;
+		$schema['styles']['elements'] = $schema_styles_elements;
+		$schema['settings']           = static::VALID_SETTINGS;
+		$schema['settings']['blocks'] = $schema_settings_blocks;
+
+		// Remove anything that's not present in the schema.
+		foreach ( array( 'styles', 'settings' ) as $subtree ) {
+			if ( ! isset( $input[ $subtree ] ) ) {
+				continue;
+			}
+
+			if ( ! is_array( $input[ $subtree ] ) ) {
+				unset( $output[ $subtree ] );
+				continue;
+			}
+
+			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
+
+			if ( empty( $result ) ) {
+				unset( $output[ $subtree ] );
+			} else {
+				$output[ $subtree ] = $result;
+			}
+		}
+
+		return $output;
+	}
+
+	/**
 	 * Returns the current theme's wanted patterns(slugs) to be
 	 * registered from Pattern Directory.
 	 *
@@ -328,7 +387,7 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$selector     = $metadata['selector'];
 			$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
-			$declarations = static::compute_style_properties( $node, $settings );
+			$declarations = static::compute_style_properties( $node, $settings, null, $metadata['selector'] );
 
 			// 1. Separate the ones who use the general selector
 			// and the ones who use the duotone selector.
@@ -375,6 +434,69 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 		}
 
 		return $block_rules;
+	}
+
+	/**
+	 * Given a styles array, it extracts the style properties
+	 * and adds them to the $declarations array following the format:
+	 *
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
+	 *
+	 * @param array $styles Styles to process.
+	 * @param array $settings Theme settings.
+	 * @param array $properties Properties metadata.
+	 * @param string|null $selector Current selector.
+	 * @return array Returns the modified $declarations.
+	 */
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $selector = null ) {
+		if ( null === $properties ) {
+			$properties = static::PROPERTIES_METADATA;
+		}
+
+		$declarations = array();
+		if ( empty( $styles ) ) {
+			return $declarations;
+		}
+
+		foreach ( $properties as $css_property => $value_path ) {
+			// Some styles such as blockGap are only meant to be available at the top level (ROOT_BLOCK_SELECTOR),
+			// hence we only output styles at the top level.
+			if ( 'top' === _wp_array_get( self::VALID_STYLES, array( $value_path[0], $value_path[1] ), null ) && static::ROOT_BLOCK_SELECTOR !== $selector ) {
+				continue;
+			}
+
+			$value = static::get_property_value( $styles, $value_path );
+
+			// Look up protected properties, keyed by value path.
+			// Skip protected properties that are explicitly set to `null`.
+			if ( is_array( $value_path ) ) {
+				$path_string = implode( '.', $value_path );
+				if (
+					array_key_exists( $path_string, static::PROTECTED_PROPERTIES ) &&
+					_wp_array_get( $settings, static::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+				) {
+					continue;
+				}
+			}
+
+			// Skip if empty and not "0" or value represents array of longhand values.
+			$has_missing_value = empty( $value ) && ! is_numeric( $value );
+			if ( $has_missing_value || is_array( $value ) ) {
+				continue;
+			}
+
+			$declarations[] = array(
+				'name'  => $css_property,
+				'value' => $value,
+			);
+		}
+
+		return $declarations;
 	}
 
 	/**
