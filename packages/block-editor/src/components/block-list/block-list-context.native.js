@@ -7,11 +7,34 @@ export const DEFAULT_BLOCK_LIST_CONTEXT = {
 	scrollRef: null,
 	blocksLayouts: { current: {} },
 	findBlockLayoutByClientId,
+	findBlockLayoutByPosition,
 	updateBlocksLayouts,
 };
 
 const Context = createContext( DEFAULT_BLOCK_LIST_CONTEXT );
 const { Provider, Consumer } = Context;
+
+/**
+ * Finds a block's layout data by position.
+ *
+ * @param {Object} data       Blocks layouts object.
+ * @param {Object} position   Position to use for finding the block.
+ * @param {number} position.x X coordinate.
+ * @param {number} position.y Y coordinate.
+ *
+ * @return {Object|undefined} Found block layout data that matches the provided position. If none is found, `undefined` will be returned.
+ */
+function findBlockLayoutByPosition( data, position ) {
+	// Only enabled for root level blocks
+	return Object.values( data ).find( ( block ) => {
+		return (
+			position.x >= block.x &&
+			position.x <= block.x + block.width &&
+			position.y >= block.y &&
+			position.y <= block.y + block.height
+		);
+	} );
+}
 
 /**
  * Finds a block's layout data by its client Id.

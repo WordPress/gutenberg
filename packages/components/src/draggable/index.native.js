@@ -45,6 +45,7 @@ export default function Draggable( {
 		} )
 		.onEnd( () => {
 			'worklet';
+			isDragging.value = false;
 			if ( onDragEnd ) {
 				onDragEnd();
 			}
