@@ -645,7 +645,7 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 			wp_enqueue_script( $args['handle'] );
 
 			// If a textdomain is defined, use it to set the script translations.
-			if ( ! empty( $metadata['textdomain'] ) && in_array( 'wp-i18n', $args['deps'], true ) ) {
+			if ( ! empty( $args['textdomain'] ) && in_array( 'wp-i18n', $args['deps'], true ) ) {
 				wp_set_script_translations( $args['handle'], $args['textdomain'] );
 			}
 
