@@ -68,13 +68,31 @@ class EditorPage {
 	async getBlockAtPosition(
 		blockName,
 		position = 1,
-		options = { autoscroll: false }
+		options = { autoscroll: false, useWaitForVisible: false },
 	) {
-		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
-			: `(//XCUIElementTypeOther[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[1]`;
+		let blockLocator
 
-		await waitForVisible( this.driver, blockLocator );
+		// Make it optional to use waitForVisible() because the behavior is not consistent everywhere.
+		if (options.useWaitForVisible) {
+			let elementType
+			switch (blockName) {
+				case blockNames.cover:
+					elementType = 'XCUIElementTypeButton'
+					break;
+				default:
+					elementType = 'XCUIElementTypeOther'
+					break;
+			}
+
+			blockLocator = isAndroid()
+				? `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
+				: `(//${ elementType }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[1]`;
+
+			await waitForVisible( this.driver, blockLocator );
+		} else {
+			blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
+		}
+
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
@@ -135,7 +153,7 @@ class EditorPage {
 	async hasBlockAtPosition( position = 1, blockName = '' ) {
 		return (
 			undefined !==
-			( await this.getBlockAtPosition( blockName, position ) )
+			( await this.getBlockAtPosition( blockName, position, { useWaitForVisible: true, } ) )
 		);
 	}
 
@@ -455,7 +473,7 @@ class EditorPage {
 			blockActionsMenuButtonLocator
 		);
 		if ( isAndroid() ) {
-			const block = await this.getBlockAtPosition( blockName, position );
+			const block = await this.getBlockAtPosition( blockName, position , { useWaitForVisible: true, });
 			let checkList = await this.driver.elementsByXPath(
 				blockActionsMenuButtonLocator
 			);

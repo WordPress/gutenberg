@@ -75,7 +75,10 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
-			2
+			2,
+			{ 
+				useWaitForVisible: true,
+			}
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -128,7 +131,10 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
-			2
+			2,
+			{ 
+				useWaitForVisible: true,
+			}
 		);
 
 		const textViewElement = await editorPage.getTextViewForParagraphBlock(
