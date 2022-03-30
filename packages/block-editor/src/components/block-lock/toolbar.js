@@ -16,7 +16,7 @@ import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockToolbar( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { canMove, canRemove, canLockBlocks, canLockBlock } = useSelect(
+	const { canMove, canRemove, canLockBlock } = useSelect(
 		( select ) => {
 			const {
 				canLockBlockType,
@@ -39,7 +39,7 @@ export default function BlockLockToolbar( { clientId } ) {
 		false
 	);
 
-	if ( ! canLockBlocks ) {
+	if ( ! canLockBlock ) {
 		return null;
 	}
 
