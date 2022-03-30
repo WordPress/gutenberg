@@ -12,6 +12,25 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockListContext } from '../block-list/block-list-context';
 import { getDistanceToNearestEdge } from '../../utils/math';
 
+/** @typedef {import('../../utils/math').WPPoint} WPPoint */
+
+/**
+ * The orientation of a block list.
+ *
+ * @typedef {'horizontal'|'vertical'|undefined} WPBlockListOrientation
+ */
+
+/**
+ * Given a list of block layouts finds the index that a block should be dropped
+ * at.
+ *
+ * @param {Object}                 blocksLayouts Blocks layouts object.
+ * @param {WPPoint}                position      The position of the item being dragged.
+ * @param {WPBlockListOrientation} orientation   The orientation of a block list.
+ * @param {boolean}                isRTL         Check if current locale is RTL.
+ *
+ * @return {number|undefined} The block index that's closest to the drag position.
+ */
 export function getNearestBlockIndex(
 	blocksLayouts,
 	position,
@@ -66,6 +85,18 @@ export function getNearestBlockIndex(
 	return candidateIndex;
 }
 
+/**
+ * @typedef  {Object} WPBlockDropZoneConfig
+ * @property {string} rootClientId The root client id for the block list.
+ */
+
+/**
+ * A React hook that can be used to make a block list handle drag and drop.
+ *
+ * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
+ *
+ * @return {Object} An object that contains the event handlers `onBlockDragOver` and `onBlockDragEnd`.
+ */
 export default function useBlockDropZone( {
 	// An undefined value represents a top-level block. Default to an empty
 	// string for this so that `targetRootClientId` can be easily compared to
