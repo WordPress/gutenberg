@@ -66,8 +66,13 @@ function add_comment_form_onsubmit_handler() {
 
 			function submitted( event ) {
 				event.preventDefault();
-				const el = document.createElement( 'wp-comment-date' );
-				document.body.append( el );
+				const date = new Date();
+				const dateOptions = {
+					year: 'numeric', month: 'long', day: 'numeric',
+					hour: 'numeric', minute: 'numeric'
+				};
+				const form = document.querySelector( '.comment-form' );
+				form.innerHTML = `<wp-comment-date>${ date.toLocaleDateString( 'en', dateOptions ) }</wp-comment-date>`;
 			}
 		</script>
     <?php

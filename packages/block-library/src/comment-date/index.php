@@ -58,7 +58,7 @@ add_action( 'init', 'register_block_core_comment_date' );
 function define_comment_date_custom_element() {
     ?>
 		<template id="wp-comment-date">
-			<div><time><slot name="date"></slot></time></div>
+			<div><time><slot></slot></time></div>
 		</template>
 		<script>
 		customElements.define( 'wp-comment-date',
@@ -70,6 +70,13 @@ function define_comment_date_custom_element() {
 
 					const shadowRoot = this.attachShadow( { mode: 'open' } );
 					shadowRoot.appendChild( templateContent.cloneNode( true ) );
+					const slotDate = shadowRoot.querySelector( 'slot' ).assignedNodes()[ 0 ];
+					const datetime = new Date( slotDate.textContent );
+					const timeElement = shadowRoot.querySelector( 'time' );
+
+					if ( datetime ) {
+						timeElement.setAttribute ( 'datetime', datetime.toISOString() );
+					}
 				}
 			}
 		);
