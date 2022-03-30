@@ -11,6 +11,7 @@ import { getPageError } from './get-page-error';
 import { isCurrentURL } from './is-current-url';
 import { showBlockToolbar } from './show-block-toolbar';
 import { visitAdminPage } from './visit-admin-page';
+import { createNewPost } from './create-new-post';
 
 class PageUtils {
 	browser: Browser;
@@ -28,6 +29,7 @@ class PageUtils {
 	isCurrentURL = isCurrentURL;
 	showBlockToolbar = showBlockToolbar;
 	visitAdminPage = visitAdminPage;
+	createNewPost = createNewPost;
 }
 
 export { PageUtils };
