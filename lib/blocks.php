@@ -649,7 +649,7 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 		 * using a named function in this case is not possible.
 		 *
 		 * The function cannot be unhooked, however, users are still able
-		 * to dequeue the stylesheets registered/enqueued by the callback
+		 * to dequeue the script registered/enqueued by the callback
 		 * which is why in this case, using an anonymous function
 		 * was deemed acceptable.
 		 */
