@@ -7,9 +7,9 @@ import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests', () => {
 	it( 'should be able to create a post with heading and paragraph blocks', async () => {
-		let block
-		let paragraphBlockElement
-		let textViewElement
+		let block;
+		let paragraphBlockElement;
+		let textViewElement;
 
 		await editorPage.addNewBlock( blockNames.heading );
 		let headingBlockElement = await editorPage.getBlockAtPosition(
@@ -37,14 +37,9 @@ describe( 'Gutenberg Editor tests', () => {
 			);
 		}
 
-		block = isAndroid()
-			? paragraphBlockElement
-			: textViewElement
+		block = isAndroid() ? paragraphBlockElement : textViewElement;
 
-		await editorPage.typeTextToParagraphBlock(
-			block,
-			testData.mediumText
-		);
+		await editorPage.typeTextToParagraphBlock( block, testData.mediumText );
 
 		await editorPage.addNewBlock( blockNames.paragraph );
 		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
@@ -59,14 +54,9 @@ describe( 'Gutenberg Editor tests', () => {
 			);
 		}
 
-		block = isAndroid()
-			? paragraphBlockElement
-			: textViewElement
+		block = isAndroid() ? paragraphBlockElement : textViewElement;
 
-		await editorPage.typeTextToParagraphBlock(
-			block,
-			testData.mediumText
-		);
+		await editorPage.typeTextToParagraphBlock( block, testData.mediumText );
 
 		await editorPage.addNewBlock( blockNames.heading );
 		headingBlockElement = await editorPage.getTextBlockLocatorAtPosition(
@@ -92,13 +82,8 @@ describe( 'Gutenberg Editor tests', () => {
 			);
 		}
 
-		block = isAndroid()
-			? paragraphBlockElement
-			: textViewElement
+		block = isAndroid() ? paragraphBlockElement : textViewElement;
 
-		await editorPage.typeTextToParagraphBlock(
-			block,
-			testData.mediumText
-		);
+		await editorPage.typeTextToParagraphBlock( block, testData.mediumText );
 	} );
 } );
