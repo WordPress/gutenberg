@@ -25,6 +25,7 @@ import {
 } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useCallback, useEffect } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -54,7 +55,14 @@ function useMigrateOnLoad( attributes, clientId ) {
 		if ( ! attributes.values ) {
 			return;
 		}
+
 		const [ newAttributes, newInnerBlocks ] = migrateToListV2( attributes );
+
+		deprecated( 'Value attribute on the list block', {
+			since: '6.0',
+			version: '6.5',
+			alternative: 'inner blocks',
+		} );
 
 		registry.batch( () => {
 			updateBlockAttributes( clientId, newAttributes );

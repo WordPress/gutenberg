@@ -48,7 +48,7 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 		);
 
 		deprecated( 'Value attribute on the quote block', {
-			since: '6.0', // WP version
+			since: '6.0',
 			version: '6.5',
 			alternative: 'inner blocks',
 		} );
