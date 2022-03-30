@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { orderBy } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { createContext, useContext } from '@wordpress/element';
@@ -89,13 +94,19 @@ export function deleteBlockLayoutByClientId( data, clientId ) {
 	}, {} );
 }
 
+/**
+ * Orders the block's layout daya by it's Y coord.
+ *
+ * @param {Object} data Blocks layouts object.
+ *
+ * @return {Object} Blocks layouts object ordered by it's Y coord.
+ */
 function getBlockLayoutsOrderedByYCoord( data ) {
-	// Only enabled for root level blocks
-	return Object.entries( data )
-		.sort( ( blockA, blockB ) => {
-			return blockB[ 1 ].y < blockA[ 1 ].y;
-		} )
-		.map( ( block ) => block[ 1 ] );
+	// Only enabled for root level blocks.
+	// Using lodash orderBy due to hermes not having
+	// stable support for native .sort(). It will be
+	// supported in version 0.68.0.
+	return orderBy( data, [ 'y', 'asc' ] );
 }
 
 /**
