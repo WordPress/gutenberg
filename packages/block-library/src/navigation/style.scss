@@ -71,7 +71,7 @@ $navigation-icon-size: 24px;
 		}
 	}
 
-	&:not([class*="has-text-decoration"]) {
+	&:where(:not([class*="has-text-decoration"])) {
 		a {
 			text-decoration: none;
 
