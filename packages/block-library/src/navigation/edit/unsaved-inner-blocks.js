@@ -33,6 +33,20 @@ export default function UnsavedInnerBlocks( {
 	onSave,
 	hasSelection,
 } ) {
+	const originalBlocks = useRef();
+
+	// Initially store the uncontrolled inner blocks for
+	// dirty state comparison.
+	if ( ! originalBlocks?.current ) {
+		originalBlocks.current = blocks;
+	}
+
+	// If the current inner blocks object is different in any way
+	// from the original inner blocks from the post content then the
+	// user has made changes to the inner blocks. At this point the inner
+	// blocks can be considered "dirty".
+	const innerBlocksAreDirty = blocks !== originalBlocks.current;
+
 	// The block will be disabled in a block preview, use this as a way of
 	// avoiding the side-effects of this component for block previews.
 	const isDisabled = useContext( Disabled.Context );
@@ -97,7 +111,8 @@ export default function UnsavedInnerBlocks( {
 			savingLock.current ||
 			! hasResolvedDraftNavigationMenus ||
 			! hasResolvedNavigationMenus ||
-			! hasSelection
+			! hasSelection ||
+			! innerBlocksAreDirty
 		) {
 			return;
 		}
