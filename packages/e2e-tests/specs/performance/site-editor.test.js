@@ -14,7 +14,7 @@ import {
 	visitSiteEditor,
 	saveDraft,
 	insertBlock,
-	deleteAllTemplates,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -32,12 +32,12 @@ jest.setTimeout( 1000000 );
 describe( 'Site Editor Performance', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await deleteAllTemplates( 'wp_template' );
-		await deleteAllTemplates( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await deleteAllTemplates( 'wp_template' );
-		await deleteAllTemplates( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 

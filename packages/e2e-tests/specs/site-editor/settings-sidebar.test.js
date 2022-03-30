@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	deleteAllTemplates,
+	trashAllPosts,
 	activateTheme,
 	getAllBlocks,
 	selectBlockByClientId,
@@ -39,12 +39,12 @@ async function getTemplateCard() {
 describe( 'Settings sidebar', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await deleteAllTemplates( 'wp_template' );
-		await deleteAllTemplates( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await deleteAllTemplates( 'wp_template' );
-		await deleteAllTemplates( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 	beforeEach( async () => {

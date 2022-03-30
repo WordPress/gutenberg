@@ -4,7 +4,7 @@
 import {
 	insertBlock,
 	activateTheme,
-	deleteAllTemplates,
+	trashAllPosts,
 	visitSiteEditor,
 	getCurrentSiteEditorContent,
 } from '@wordpress/e2e-test-utils';
@@ -70,16 +70,16 @@ const revertTemplate = async () => {
 describe( 'Template Revert', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await deleteAllTemplates( 'wp_template' );
-		await deleteAllTemplates( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await deleteAllTemplates( 'wp_template' );
-		await deleteAllTemplates( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 	beforeEach( async () => {
-		await deleteAllTemplates( 'wp_template' );
+		await trashAllPosts( 'wp_template' );
 		await visitSiteEditor();
 	} );
 

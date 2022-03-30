@@ -10,7 +10,7 @@ import {
 	openDocumentSettingsSidebar,
 	activatePlugin,
 	deactivatePlugin,
-	deleteAllTemplates,
+	trashAllPosts,
 	setBrowserViewport,
 } from '@wordpress/e2e-test-utils';
 
@@ -93,8 +93,8 @@ const createNewTemplate = async ( templateName ) => {
 describe( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-block-templates' );
-		await deleteAllTemplates( 'wp_template' );
-		await deleteAllTemplates( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	afterAll( async () => {
@@ -201,8 +201,8 @@ describe( 'Post Editor Template mode', () => {
 describe( 'Delete Post Template Confirmation Dialog', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-block-templates' );
-		await deleteAllTemplates( 'wp_template' );
-		await deleteAllTemplates( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 		await createNewPost();
 		// Create a random post.
