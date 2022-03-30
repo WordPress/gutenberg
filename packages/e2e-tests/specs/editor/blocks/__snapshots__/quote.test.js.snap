@@ -40,37 +40,57 @@ exports[`Quote can be converted to paragraphs and renders only one paragraph for
 
 exports[`Quote can be created by converting a heading 1`] = `
 "<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>test</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:heading -->
+<h2>test</h2>
+<!-- /wp:heading --></blockquote>
 <!-- /wp:quote -->"
 `;
 
 exports[`Quote can be created by converting a paragraph 1`] = `
 "<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>test</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p>test</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->"
 `;
 
 exports[`Quote can be created by converting multiple paragraphs 1`] = `
 "<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>one</p><p>two</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p>one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->"
 `;
 
 exports[`Quote can be created by typing "/quote" 1`] = `
 "<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>I’m a quote</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p>I’m a quote</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->"
 `;
 
 exports[`Quote can be created by typing > in front of text of a paragraph block 1`] = `
 "<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>test</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p>test</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->"
 `;
 
 exports[`Quote can be created by using > at the start of a paragraph block 1`] = `
 "<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>A quote</p><p>Another paragraph</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p>A quote</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Another paragraph</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->"
 `;
 

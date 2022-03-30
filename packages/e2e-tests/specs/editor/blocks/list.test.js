@@ -202,16 +202,6 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'can be created by converting a quote', async () => {
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'two' );
-		await transformBlockTo( 'List' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'can be converted to a quote', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
