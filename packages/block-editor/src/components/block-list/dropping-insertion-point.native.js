@@ -21,6 +21,17 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockListContext } from './block-list-context';
 import styles from './dropping-insertion-point.scss';
 
+/**
+ * Dropping zone indicator component.
+ *
+ * This components shows where a block can be dropped when is being dragged.
+ *
+ * @param {Object}                                        props                        Component props.
+ * @param {Object}                                        props.scroll                 Scroll offset object.
+ * @param {import('react-native-reanimated').SharedValue} props.hasStartedDraggingOver Whether or not the block has started moving.
+ *
+ * @return {JSX.Element} The component to be rendered.
+ */
 export default function DroppingInsertionPoint( {
 	scroll,
 	hasStartedDraggingOver,
