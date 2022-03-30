@@ -139,13 +139,13 @@ export default function UnsavedInnerBlocks( {
 				className={ classnames(
 					'wp-block-navigation__unsaved-changes-overlay',
 					{
-						'is-saving': hasSelection,
+						'is-saving': isSaving,
 					}
 				) }
 			>
 				<div { ...innerBlocksProps } />
 			</Disabled>
-			{ hasSelection && <Spinner /> }
+			{ isSaving && <Spinner /> }
 		</div>
 	);
 }
