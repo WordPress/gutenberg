@@ -21,7 +21,8 @@ const config: PlaywrightTestConfig = {
 	reportSlowTests: null,
 	testDir: new URL( './specs', 'file:' + __filename ).pathname,
 	outputDir: path.join( process.cwd(), 'artifacts/test-results' ),
-	globalSetup: new URL( './config/global-setup.ts', 'file:' + __filename ).pathname,
+	globalSetup: new URL( './config/global-setup.ts', 'file:' + __filename )
+		.pathname,
 	use: {
 		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
 		headless: true,
