@@ -100,9 +100,11 @@ exports[`Quote can be merged into from a paragraph 1`] = `
 <!-- /wp:quote -->"
 `;
 
-exports[`Quote can be split at the end and merged back 1`] = `
+exports[`Quote can be split at the end 1`] = `
 "<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:paragraph -->
@@ -110,124 +112,10 @@ exports[`Quote can be split at the end and merged back 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Quote can be split at the end and merged back 2`] = `
+exports[`Quote can be split at the end 2`] = `
 "<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1</p><p></p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->"
-`;
-
-exports[`Quote can be split at the end and merged back 3`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1</p></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote can be split in the middle and merged back 1`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1</p><cite>c</cite></blockquote>
-<!-- /wp:quote -->
-
-<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->
-
-<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>2</p><cite>c</cite></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote can be split in the middle and merged back 2`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1</p><p></p><cite>c</cite></blockquote>
-<!-- /wp:quote -->
-
-<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>2</p><cite>c</cite></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote can be split in the middle and merged back 3`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1</p><cite>c</cite></blockquote>
-<!-- /wp:quote -->
-
-<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>2</p><cite>c</cite></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote can be split in the middle and merged back 4`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1</p><p>2</p><cite>c</cite></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote is transformed to a heading and a quote if the quote contains a citation 1`] = `
-"<!-- wp:heading -->
-<h2>one</h2>
-<!-- /wp:heading -->
-
-<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p></p><cite>cite</cite></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote is transformed to a heading and a quote if the quote contains multiple paragraphs 1`] = `
-"<!-- wp:heading -->
-<h2>one</h2>
-<!-- /wp:heading -->
-
-<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>two</p><p>three</p></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote is transformed to a heading if the quote just contains one paragraph 1`] = `
-"<!-- wp:heading -->
-<h2>one</h2>
-<!-- /wp:heading -->"
-`;
-
-exports[`Quote is transformed to an empty heading if the quote is empty 1`] = `
-"<!-- wp:heading -->
-<h2></h2>
-<!-- /wp:heading -->"
-`;
-
-exports[`Quote the resuling quote after transforming to a heading can be transformed again 1`] = `
-"<!-- wp:heading -->
-<h2>one</h2>
-<!-- /wp:heading -->
-
-<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>two</p><cite>cite</cite></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote the resuling quote after transforming to a heading can be transformed again 2`] = `
-"<!-- wp:heading -->
-<h2>one</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading -->
-<h2>two</h2>
-<!-- /wp:heading -->
-
-<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p></p><cite>cite</cite></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote the resuling quote after transforming to a heading can be transformed again 3`] = `
-"<!-- wp:heading -->
-<h2>one</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading -->
-<h2>two</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading -->
-<h2>cite</h2>
-<!-- /wp:heading -->"
 `;

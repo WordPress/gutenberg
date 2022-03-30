@@ -132,16 +132,7 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'can be merged into from a paragraph', async () => {
-		await insertBlock( 'Quote' );
-		await insertBlock( 'Paragraph' );
-		await page.keyboard.type( 'test' );
-		await pressKeyTimes( 'ArrowLeft', 'test'.length );
-		await page.keyboard.press( 'Backspace' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'can be split at the end and merged back', async () => {
+	it( 'can be split at the end', async () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -152,46 +143,7 @@ describe( 'Quote', () => {
 
 		await page.keyboard.press( 'Backspace' );
 
-		// Expect empty paragraph inside quote block.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Expect quote without empty paragraphs.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'can be split in the middle and merged back', async () => {
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'c' );
-		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-
-		// Expect two quote blocks and empty paragraph in the middle.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Expect two quote blocks and empty paragraph in the first quote.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Expect two quote blocks.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'Backspace' );
-
+		// Expect the paragraph to be deleted.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
