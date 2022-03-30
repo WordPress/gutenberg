@@ -361,6 +361,7 @@ function RichTextWrapper(
 						__unstableAllowPrefixTransformations,
 						formatTypes,
 						onReplace,
+						selectionChange,
 					} ),
 					useRemoveBrowserShortcuts(),
 					useShortcuts( keyboardShortcuts ),
