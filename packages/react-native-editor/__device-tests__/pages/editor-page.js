@@ -45,10 +45,12 @@ class EditorPage {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
-	async clickBlockParagraphAtPosition ( position = 1 ){
-		const paragraphBlockLocator = `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`
-		const paragraphBlock =  await this.driver.elementByXPath( paragraphBlockLocator )
-		paragraphBlock.click()
+	async clickBlockParagraphAtPosition( position = 1 ) {
+		const paragraphBlockLocator = `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`;
+		const paragraphBlock = await this.driver.elementByXPath(
+			paragraphBlockLocator
+		);
+		paragraphBlock.click();
 	}
 
 	// For text blocks - blockName can be Paragraph or Heading
@@ -506,11 +508,11 @@ class EditorPage {
 				blockNames.paragraph,
 				position + i
 			);
-			
+
 			if ( isAndroid() ) {
 				await block.click();
 			}
-			
+
 			await this.typeTextToParagraphBlock(
 				block,
 				paragraphs[ i ],
@@ -523,7 +525,7 @@ class EditorPage {
 	}
 
 	async getTextForParagraphBlock( block ) {
-		let text
+		let text;
 		if ( isAndroid() ) {
 			text = await block.text();
 		} else {
@@ -540,10 +542,10 @@ class EditorPage {
 			blockNames.paragraph,
 			position
 		);
-		if ( isAndroid() ){
+		if ( isAndroid() ) {
 			await blockLocator.click();
 		} else {
-			await this.clickBlockParagraphAtPosition( position )
+			await this.clickBlockParagraphAtPosition( position );
 		}
 
 		const text = await this.getTextForParagraphBlock( blockLocator );
@@ -600,9 +602,12 @@ class EditorPage {
 	async chooseMediaLibrary() {
 		const mediaLibraryLocator = isAndroid()
 			? `//android.widget.Button[@content-desc="WordPress Media Library"]`
-			: `//XCUIElementTypeButton[@name="WordPress Media Library"]`
+			: `//XCUIElementTypeButton[@name="WordPress Media Library"]`;
 
-		const mediaLibraryButton = await waitForVisible ( this.driver, mediaLibraryLocator)
+		const mediaLibraryButton = await waitForVisible(
+			this.driver,
+			mediaLibraryLocator
+		);
 		await mediaLibraryButton.click();
 	}
 

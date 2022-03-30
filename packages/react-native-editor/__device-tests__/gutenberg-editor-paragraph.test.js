@@ -23,7 +23,11 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			paragraphBlockElement,
 			testData.shortText
 		);
-		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement , true );
+		await clickMiddleOfElement(
+			editorPage.driver,
+			paragraphBlockElement,
+			true
+		);
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			'\n',
@@ -56,7 +60,11 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			testData.shortText
 		);
 
-		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement, true );
+		await clickMiddleOfElement(
+			editorPage.driver,
+			paragraphBlockElement,
+			true
+		);
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			'\n'
@@ -77,15 +85,17 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			paragraphBlockElement
 		);
 		await clickBeginningOfElement( editorPage.driver, textViewElement );
-		
-		const backspaceKey = isAndroid() ? backspace : '\b\b'
+
+		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			backspaceKey
 		);
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
-		expect( text0.replace(/\s/g, '') + text1.replace(/\s/g, '') ).toMatch( text.replace(/\s/g, '') );
+		expect(
+			text0.replace( /\s/g, '' ) + text1.replace( /\s/g, '' )
+		).toMatch( text.replace( /\s/g, '' ) );
 		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 1 );
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
@@ -115,7 +125,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		// Merge paragraphs.
-		await editorPage.getTextForParagraphBlockAtPosition( 2 )
+		await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			2
@@ -125,12 +135,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			paragraphBlockElement
 		);
 
-		await clickBeginningOfElement(
-			editorPage.driver,
-			textViewElement
-		);
+		await clickBeginningOfElement( editorPage.driver, textViewElement );
 
-		const backspaceKey = isAndroid() ? backspace : '\b\b'
+		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			backspaceKey
@@ -157,12 +164,12 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			blockNames.paragraph,
 			2
 		);
-		
+
 		// iOS needs this extra step to click on the right block
-		if( ! isAndroid() ) {
-			await editorPage.clickBlockParagraphAtPosition( 2 )
+		if ( ! isAndroid() ) {
+			await editorPage.clickBlockParagraphAtPosition( 2 );
 		}
-		const backspaceKey = isAndroid() ? backspace : '\b\b'
+		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			secondParagraphBlockElement,
 			backspaceKey
