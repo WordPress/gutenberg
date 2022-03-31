@@ -305,7 +305,9 @@ function Navigation( {
 			return;
 		}
 
-		setRef( navigationMenus[ 0 ]?.id );
+		const firstAndOnlyNavigationMenu = navigationMenus[ 0 ];
+
+		setRef( firstAndOnlyNavigationMenu.id );
 	}, [ navigationMenus ] );
 
 	const navRef = useRef();
