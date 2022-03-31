@@ -113,7 +113,7 @@ export function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving,
 }
 ```
 
-This code quality change should not change anything about how the application works. Let’s try to edit a page just to be sure:
+This code quality change should not alter anything about how the application works. Let’s try to edit a page just to be sure:
 
 ![](/docs/how-to-guides/data-basics/media/create-form/edit-page-form.png)
 
