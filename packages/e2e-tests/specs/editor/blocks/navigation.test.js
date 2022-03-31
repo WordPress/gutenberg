@@ -112,6 +112,29 @@ async function mockSearchResponse( items ) {
 	] );
 }
 
+async function forceSelectNavigationBlock() {
+	const navBlock = await waitForBlock( 'Navigation' );
+
+	if ( ! navBlock ) {
+		return;
+	}
+
+	await page.evaluate( () => {
+		const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
+		const navigationBlock = blocks.find(
+			( block ) => block.name === 'core/navigation'
+		);
+
+		if ( ! navigationBlock ) {
+			return;
+		}
+
+		return wp.data
+			.dispatch( 'core/block-editor' )
+			.selectBlock( navigationBlock?.clientId, 0 );
+	} );
+}
+
 /**
  * Interacts with the LinkControl to perform a search and select a returned suggestion
  *
@@ -424,7 +447,7 @@ describe( 'Navigation', () => {
 					match: ( request ) =>
 						request.url().includes( `rest_route` ) &&
 						request.url().includes( `navigation` ) &&
-						request.url().includes( testNavId ),
+						request.url().includes( `${ testNavId }?` ),
 					onRequestMatch: ( request ) => {
 						// The Promise simulates a REST API request whose resolultion
 						// the test has full control over.
@@ -1005,12 +1028,16 @@ describe( 'Navigation', () => {
 			await publishButton.click();
 
 			// A success notice should show up.
-			await page.waitForSelector( '.components-snackbar' );
+			await page.waitForXPath(
+				`//*[contains(@class, 'components-snackbar__content')][ text()="Post published." ]`
+			);
 
 			// Now try inserting another Link block via the quick inserter.
-			await page.click( 'nav[aria-label="Block: Navigation"]' );
+			// await page.click( 'nav[aria-label="Block: Navigation"]' );
+			await forceSelectNavigationBlock();
 
 			await resetNavBlockToInitialState();
+
 			const startEmptyButton2 = await page.waitForXPath(
 				START_EMPTY_XPATH
 			);
