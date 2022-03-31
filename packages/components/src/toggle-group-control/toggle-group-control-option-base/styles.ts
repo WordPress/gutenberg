@@ -27,6 +27,7 @@ export const buttonView = css`
 	border: none;
 	border-radius: ${ CONFIG.controlBorderRadius };
 	color: ${ COLORS.gray[ 700 ] };
+	fill: currentColor;
 	cursor: pointer;
 	display: flex;
 	font-family: inherit;
