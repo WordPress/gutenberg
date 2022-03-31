@@ -2,7 +2,8 @@
  * External dependencies
  */
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useSharedValue } from 'react-native-reanimated';
+import Animated, { useSharedValue, runOnJS } from 'react-native-reanimated';
+import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
 /**
  * WordPress dependencies
@@ -33,10 +34,24 @@ export default function Draggable( {
 	wrapperAnimatedStyles,
 } ) {
 	const isDragging = useSharedValue( false );
+	const isAnyTextInputFocused = useSharedValue( false );
+
+	const checkTextInputFocus = () => {
+		isAnyTextInputFocused.value =
+			TextInputState.currentlyFocusedInput() !== null;
+	};
 
 	const longPressGesture = Gesture.LongPress()
+		.onBegin( () => {
+			'worklet';
+			runOnJS( checkTextInputFocus )();
+		} )
 		.onStart( ( ev ) => {
 			'worklet';
+			if ( isAnyTextInputFocused.value ) {
+				return;
+			}
+
 			isDragging.value = true;
 
 			if ( onDragStart ) {
@@ -45,6 +60,10 @@ export default function Draggable( {
 		} )
 		.onEnd( () => {
 			'worklet';
+			if ( isAnyTextInputFocused.value ) {
+				return;
+			}
+
 			isDragging.value = false;
 			if ( onDragEnd ) {
 				onDragEnd();
@@ -60,7 +79,7 @@ export default function Draggable( {
 			'worklet';
 			if ( isDragging.value ) {
 				state.activate();
-			} else if ( Platform.isIOS ) {
+			} else if ( Platform.isIOS || isAnyTextInputFocused.value ) {
 				state.fail();
 			}
 		} )
