@@ -80,3 +80,38 @@
 	color: $gray-100;
 	fill: $gray-100;
 }
+
+.edit-site-templates-sidebar {
+	background: $gray-900;
+	color: $gray-100;
+	fill: $gray-100;
+
+	.components-panel {
+		background: $gray-900;
+	}
+
+	a {
+		color: $white;
+		text-decoration: none;
+	}
+}
+
+.edit-site-navigation-sidebar-template-list {
+
+	padding: $grid-unit-20;
+}
+
+.edit-site-navigation-sidebar-template-list__item {
+	display: flex;
+	justify-content: space-between;
+	line-height: 2.5;
+}
+
+.edit-site-navigation-sidebar-template-list__name {
+	display: flex;
+	align-items: center;
+
+	svg {
+		margin-right: $grid-unit-10;
+	}
+}
