@@ -220,7 +220,6 @@ async function populateNavWithOneItem() {
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
-const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select Menu']`;
 
 /**
  * Delete all items for the given REST resources using the REST API.
@@ -1257,18 +1256,9 @@ describe( 'Navigation', () => {
 
 			await createNewPost();
 
+			// At this point the block will automatically pick the first Navigation Menu
+			// which will be the one created by the Admin User.
 			await insertBlock( 'Navigation' );
-
-			// Select the Navigation post created by the Admin earlier
-			// in the test.
-			const navigationPostCreatedByAdminName = 'Navigation';
-
-			const dropdown = await page.waitForXPath( SELECT_MENU_XPATH );
-			await dropdown.click();
-			const theOption = await page.waitForXPath(
-				`//*[contains(@class, 'components-menu-item__item')][ text()="${ navigationPostCreatedByAdminName }" ]`
-			);
-			await theOption.click();
 
 			// Make sure the snackbar error shows up.
 			await page.waitForXPath(
