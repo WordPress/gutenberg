@@ -33,7 +33,7 @@ import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
  */
 import icon from './icon';
 import TableOfContentsList from './list';
-import { linearToNestedHeadingList } from './utils';
+import { comparePathAToB, linearToNestedHeadingList } from './utils';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
 
@@ -88,6 +88,7 @@ export default function TableOfContentsEdit( {
 				getBlockIndex,
 				getBlockName,
 				getBlockOrder,
+				getBlockParents,
 				getClientIdsOfDescendants,
 				__experimentalGetGlobalBlocksByName: getGlobalBlocksByName,
 			} = select( blockEditorStore );
@@ -104,14 +105,36 @@ export default function TableOfContentsEdit( {
 
 			const isPaginated = pageBreakClientIds.length !== 0;
 
-			const tocIndex = getBlockIndex( clientId );
+			/**
+			 * Get the relative indices of the block from top to bottom nesting
+			 * level.
+			 *
+			 * @param {string} blockClientId
+			 *
+			 * @return {number[]} The path of indices to the block.
+			 */
+			function getBlockPath( blockClientId ) {
+				const indices = getBlockParents(
+					blockClientId
+				).map( ( ancestorId ) => getBlockIndex( ancestorId ) );
+				indices.push( getBlockIndex( blockClientId ) );
+				return indices;
+			}
+
+			// We can't use just getBlockIndex because it only returns the index relative to sibling blocks, so we have to get all the indices from top to bottom.
+			const tocPath = getBlockPath( clientId );
 
 			// Calculate the page (of a paginated post) this block is part of.
 			// Note that pageBreakClientIds may not be in the order they appear on
 			// the page, so we have to iterate over all of them.
 			let tocPage = 1;
 			for ( const pageBreakClientId of pageBreakClientIds ) {
-				if ( tocIndex > getBlockIndex( pageBreakClientId ) ) {
+				if (
+					comparePathAToB(
+						tocPath,
+						getBlockPath( pageBreakClientId )
+					) < 0
+				) {
 					tocPage++;
 				}
 			}
