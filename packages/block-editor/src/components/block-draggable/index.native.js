@@ -227,13 +227,12 @@ const BlockDraggableWrapper = ( { children } ) => {
 
 	return (
 		<>
-			{
-				<DroppingInsertionPoint
-					scroll={ scroll }
-					isDragging={ isDragging }
-					targetBlockIndex={ targetBlockIndex }
-				/>
-			}
+			<DroppingInsertionPoint
+				scroll={ scroll }
+				isDragging={ isDragging }
+				targetBlockIndex={ targetBlockIndex }
+			/>
+
 			<Draggable
 				onDragStart={ startDragging }
 				onDragOver={ updateDragging }
