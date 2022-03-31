@@ -21,6 +21,7 @@ export default function useBlockLock( clientId, checkParent = false ) {
 	return useSelect(
 		( select ) => {
 			const {
+				canEditBlock,
 				canMoveBlock,
 				canRemoveBlock,
 				canLockBlockType,
@@ -32,6 +33,7 @@ export default function useBlockLock( clientId, checkParent = false ) {
 				: null;
 
 			return {
+				canEdit: canEditBlock( clientId ),
 				canMove: canMoveBlock( clientId, rootClientId ),
 				canRemove: canRemoveBlock( clientId, rootClientId ),
 				canLock: canLockBlockType( getBlockName( clientId ) ),

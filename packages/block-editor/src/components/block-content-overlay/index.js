@@ -64,6 +64,7 @@ export default function BlockContentOverlay( {
 	useEffect( () => {
 		// The overlay is always active when editing is locked.
 		if ( ! canEdit ) {
+			setIsOverlayActive( true );
 			return;
 		}
 
