@@ -26,8 +26,7 @@ import { getDistanceToNearestEdge } from '../../utils/math';
  */
 
 /**
- * Given a list of block layouts finds the index that a block should be dropped
- * at.
+ * Given a list of blocks layouts finds the index that a block should be dropped at.
  *
  * @param {Object}                 blocksLayouts Blocks layouts object.
  * @param {WPPoint}                position      The position of the item being dragged.
@@ -52,7 +51,7 @@ export function getNearestBlockIndex(
 	let candidateIndex;
 	let candidateDistance;
 
-	// Only enabled for root level blocks
+	// Only enabled for root level blocks.
 	blocksLayouts.forEach( ( element, index ) => {
 		const { x, y, width, height } = element;
 		const rect = {

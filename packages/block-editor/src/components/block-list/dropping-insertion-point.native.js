@@ -25,7 +25,7 @@ import styles from './dropping-insertion-point.scss';
 /**
  * Dropping zone indicator component.
  *
- * This components shows where a block can be dropped when is being dragged.
+ * This component shows where a block can be dropped when it's being dragged.
  *
  * @param {Object}                                        props                        Component props.
  * @param {Object}                                        props.scroll                 Scroll offset object.
