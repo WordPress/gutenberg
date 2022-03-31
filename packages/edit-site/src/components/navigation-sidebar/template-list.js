@@ -7,9 +7,7 @@ import {
 	__experimentalUseEntityRecords as useEntityRecords,
 } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Icon,
-} from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
 	archive,
