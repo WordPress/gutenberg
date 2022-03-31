@@ -137,7 +137,7 @@ Let’s see how we can do that:
 
 The `EditPageForm` updated and saved an existing entity record that lived in the Redux state. Because of that, we relied on the `editedEntityRecords` selector.
 
-In case of the `CreatePageForm`, however, there is no pre-existing entity record. There is only an empty form. Anything that the user types is local to that form, which means we can kep track of it using the React’s `useState` hook:
+In case of the `CreatePageForm` however, there is no pre-existing entity record. There is only an empty form. Anything that the user types is local to that form, which means we can keep track of it using the React’s `useState` hook:
 
 ```js
 export function CreatePageForm( { onCancel, onSaveFinished } ) {
