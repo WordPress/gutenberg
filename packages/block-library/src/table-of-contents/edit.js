@@ -22,6 +22,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { renderToString, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
@@ -163,7 +164,7 @@ export default function TableOfContentsEdit( {
 							headingAttributes.anchor !== '';
 
 						_latestHeadings.push( {
-							content: headingAttributes.content,
+							content: stripHTML( headingAttributes.content ),
 							level: headingAttributes.level,
 							link: canBeLinked
 								? `${ headingPageLink }#${ headingAttributes.anchor }`
