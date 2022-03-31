@@ -7,6 +7,10 @@
 	transition: width 100ms linear;
 	@include reduce-motion("transition");
 
+	h3 {
+		color: $white;
+	}
+
 	// Footer is visible from medium so we subtract footer's height
 	.interface-interface-skeleton.has-footer & {
 		@include break-medium() {
