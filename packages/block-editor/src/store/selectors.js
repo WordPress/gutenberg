@@ -1570,6 +1570,30 @@ export function canMoveBlocks( state, clientIds, rootClientId = null ) {
 }
 
 /**
+ * Determines if the given block is allowed to be edited.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId The block client Id.
+ *
+ * @return {boolean} Whether the given block is allowed to be edited.
+ */
+export function canEditBlock( state, clientId ) {
+	const attributes = getBlockAttributes( state, clientId );
+	if ( attributes === null ) {
+		return true;
+	}
+
+	const { lock } = attributes;
+	// No `lock` attribute means we can edit the block.
+	if ( lock === undefined || lock?.edit === undefined ) {
+		return true;
+	}
+
+	// When the edit is true, we cannot edit the block.
+	return ! lock?.edit;
+}
+
+/**
  * Determines if the given block type can be locked/unlocked by a user.
  *
  * @param {Object}          state      Editor state.
