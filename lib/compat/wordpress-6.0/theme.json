@@ -240,6 +240,14 @@
 		}
 	},
 	"styles": {
-		"spacing": { "blockGap": "24px" }
+		"spacing": { 
+			"blockGap": "24px", 
+			"padding": {
+				"top": "17px",
+				"right": "17px",
+				"bottom": "17px",
+				"left": "17px"
+			}  
+		}
 	}
 }

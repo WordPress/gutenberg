@@ -319,6 +319,11 @@
 	}
 }
 
+.is-root-container > .alignfull {
+	margin-right: calc(var(--wp--style--padding-right) * -1);
+	margin-left: calc(var(--wp--style--padding-left) * -1);
+}
+
 .wp-block[data-align="left"] > *,
 .wp-block[data-align="right"] > *,
 .wp-block.alignleft,

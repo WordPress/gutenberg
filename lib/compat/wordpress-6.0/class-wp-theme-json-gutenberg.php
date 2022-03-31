@@ -118,6 +118,46 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		),
 	);
 
+	/*
+	 * Metadata for style properties.
+	 *
+	 * Each element is a direct mapping from the CSS property name to the
+	 * path to the value in theme.json & block attributes.
+	 */
+	const PROPERTIES_METADATA = array(
+		'background'                  => array( 'color', 'gradient' ),
+		'background-color'            => array( 'color', 'background' ),
+		'border-radius'               => array( 'border', 'radius' ),
+		'border-top-left-radius'      => array( 'border', 'radius', 'topLeft' ),
+		'border-top-right-radius'     => array( 'border', 'radius', 'topRight' ),
+		'border-bottom-left-radius'   => array( 'border', 'radius', 'bottomLeft' ),
+		'border-bottom-right-radius'  => array( 'border', 'radius', 'bottomRight' ),
+		'border-color'                => array( 'border', 'color' ),
+		'border-width'                => array( 'border', 'width' ),
+		'border-style'                => array( 'border', 'style' ),
+		'color'                       => array( 'color', 'text' ),
+		'font-family'                 => array( 'typography', 'fontFamily' ),
+		'font-size'                   => array( 'typography', 'fontSize' ),
+		'font-style'                  => array( 'typography', 'fontStyle' ),
+		'font-weight'                 => array( 'typography', 'fontWeight' ),
+		'letter-spacing'              => array( 'typography', 'letterSpacing' ),
+		'line-height'                 => array( 'typography', 'lineHeight' ),
+		'margin'                      => array( 'spacing', 'margin' ),
+		'margin-top'                  => array( 'spacing', 'margin', 'top' ),
+		'margin-right'                => array( 'spacing', 'margin', 'right' ),
+		'margin-bottom'               => array( 'spacing', 'margin', 'bottom' ),
+		'margin-left'                 => array( 'spacing', 'margin', 'left' ),
+		'padding'                     => array( 'spacing', 'padding' ),
+		'--wp--style--padding-top'    => array( 'spacing', 'padding', 'top' ),
+		'--wp--style--padding-right'  => array( 'spacing', 'padding', 'right' ),
+		'--wp--style--padding-bottom' => array( 'spacing', 'padding', 'bottom' ),
+		'--wp--style--padding-left'   => array( 'spacing', 'padding', 'left' ),
+		'--wp--style--block-gap'      => array( 'spacing', 'blockGap' ),
+		'text-decoration'             => array( 'typography', 'textDecoration' ),
+		'text-transform'              => array( 'typography', 'textTransform' ),
+		'filter'                      => array( 'filter', 'duotone' ),
+	);
+
 	/**
 	 * The top-level keys a theme.json can have.
 	 *
@@ -270,6 +310,9 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 
 			if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--padding-top); padding-bottom: var(--wp--style--padding-bottom); }';
+				$block_rules .= '.wp-site-blocks > * { padding-right: var(--wp--style--padding-right); padding-left: var(--wp--style--padding-left); }';
+				$block_rules .= '.wp-site-blocks > * > .alignfull { margin-right: calc(var(--wp--style--padding-right) * -1); margin-left: calc(var(--wp--style--padding-left) * -1); }';
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';

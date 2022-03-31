@@ -142,11 +142,12 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object} blockStyles Block styles.
+ * @param {Object}  blockStyles Block styles.
  *
+ * @param {boolean} isRoot      Whether the styles apply to the root selector.
  * @return {Array} An array of style declarations.
  */
-function getStylesDeclarations( blockStyles = {} ) {
+function getStylesDeclarations( blockStyles = {}, isRoot = false ) {
 	const output = reduce(
 		STYLE_PROPERTY,
 		( declarations, { value, properties, useEngine }, key ) => {
@@ -189,6 +190,10 @@ function getStylesDeclarations( blockStyles = {} ) {
 		},
 		[]
 	);
+
+	if ( isRoot ) {
+		return output;
+	}
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
@@ -334,9 +339,10 @@ export const toStyles = ( tree, blockSelectors ) => {
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 
 	let ruleset =
-		'.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
+		'body { padding-right: 0; padding-left: 0; } .wp-site-blocks > * { margin-top: 0; margin-bottom: 0; padding-right: var(--wp--style--padding-right); padding-left: var(--wp--style--padding-left); }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
-		const declarations = getStylesDeclarations( styles );
+		const isRoot = ROOT_BLOCK_SELECTOR === selector;
+		const declarations = getStylesDeclarations( styles, isRoot );
 		if ( declarations.length === 0 ) {
 			return;
 		}
