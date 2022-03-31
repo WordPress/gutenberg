@@ -37,10 +37,7 @@ export function linearToNestedHeadingList(
 			// Check that the next iteration will return a value.
 			// If it does and the next level is greater than the current level,
 			// the next iteration becomes a child of the current iteration.
-			if (
-				headingList[ key + 1 ] !== undefined &&
-				headingList[ key + 1 ].level > heading.level
-			) {
+			if ( headingList[ key + 1 ]?.level > heading.level ) {
 				// We must calculate the last index before the next iteration that
 				// has the same level (siblings). We then use this index to slice
 				// the array for use in recursion. This prevents duplicate nodes.
