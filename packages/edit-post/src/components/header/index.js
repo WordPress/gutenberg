@@ -11,6 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __unstableMotion as motion } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -30,8 +31,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isPublishSidebarOpened,
 		isSaving,
 		showIconLabels,
-		hasReducedUI,
-		isNavigationMode,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -52,14 +51,23 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
-	if ( hasReducedUI && ! isNavigationMode ) {
-		return null;
-	}
+	// if ( hasReducedUI && ! isNavigationMode ) {
+	// 	return null;
+	// }
 
 	const classes = classnames( 'edit-post-header' );
 
+	const variants = {
+		initial: { y: '-100%' },
+		hover: { y: 0 },
+	};
+
 	return (
-		<div className={ classes }>
+		<motion.div
+			variants={ variants }
+			transition={ { type: 'tween' } }
+			className={ classes }
+		>
 			<MainDashboardButton.Slot>
 				<FullscreenModeClose showTooltip />
 			</MainDashboardButton.Slot>
@@ -102,7 +110,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					<MoreMenu showIconLabels={ showIconLabels } />
 				) }
 			</div>
-		</div>
+		</motion.div>
 	);
 }
 
