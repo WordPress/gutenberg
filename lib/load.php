@@ -32,27 +32,27 @@ function gutenberg_is_experiment_enabled( $name ) {
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-menus-controller.php';
+		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-menus-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Menu_Items_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-menu-items-controller.php';
+		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-menu-items-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Block_Navigation_Areas_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-block-navigation-areas-controller.php';
+		require_once __DIR__ . '/experimental/class-wp-rest-block-navigation-areas-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Menu_Locations_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-menu-locations-controller.php';
+		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-menu-locations-controller.php';
 	}
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
-		require_once __DIR__ . '/class-wp-rest-customizer-nonces.php';
+		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 	require_once __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-templates-controller.php';
 	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
-		require_once dirname( __FILE__ ) . '/class-wp-rest-block-editor-settings-controller.php';
+		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
 	if ( ! class_exists( 'WP_REST_URL_Details_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-url-details-controller.php';
+		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-url-details-controller.php';
 	}
 
 	require __DIR__ . '/rest-api.php';
@@ -68,7 +68,7 @@ require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/register-global-styles-cpt.php';
 require __DIR__ . '/compat/wordpress-5.9/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.0/block-editor-settings.php';
-require __DIR__ . '/compat/experimental/block-editor-settings-mobile.php';
+require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/compat/wordpress-6.0/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/render-svg-filters.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
@@ -110,10 +110,10 @@ require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-webfonts-provider-local.php';
 require __DIR__ . '/compat/wordpress-6.0/webfonts.php';
 require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
-require __DIR__ . '/compat/experimental/blocks.php';
+require __DIR__ . '/experimental/blocks.php';
 
 require __DIR__ . '/blocks.php';
-require __DIR__ . '/block-patterns.php';
+require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/navigation.php';
