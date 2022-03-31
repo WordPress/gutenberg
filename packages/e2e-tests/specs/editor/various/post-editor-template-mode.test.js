@@ -239,7 +239,7 @@ describe( 'Delete Post Template Confirmation Dialog', () => {
 			if ( isWelcomeGuideActive === true ) {
 				await page.evaluate( () =>
 					wp.data
-						.dispatch( 'core/edit-post' )
+						.dispatch( 'core/preferences' )
 						.toggle( 'core/edit-post', 'welcomeGuide' )
 				);
 				await page.reload();

@@ -203,14 +203,10 @@ function Iframe(
 			return true;
 		}
 
-		if ( setDocumentIfReady() ) {
-			return;
-		}
+		// Document set with srcDoc is not immediately ready.
+		node.addEventListener( 'load', setDocumentIfReady );
 
-		// Document is not immediately loaded in Firefox.
-		node.addEventListener( 'load', () => {
-			setDocumentIfReady();
-		} );
+		return () => node.removeEventListener( 'load', setDocumentIfReady );
 	}, [] );
 	const headRef = useRefEffect( ( element ) => {
 		scripts
@@ -264,6 +260,8 @@ function Iframe(
 				{ ...props }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
+				// Correct doctype is required to enable rendering in standards mode
+				srcDoc="<!doctype html>"
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&

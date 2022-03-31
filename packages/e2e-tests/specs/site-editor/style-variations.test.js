@@ -11,7 +11,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 async function openOtherStyles() {
-	const OTHER_STYLES_SELECTOR = '//div[contains(text(),"Other styles")]';
+	const OTHER_STYLES_SELECTOR = '//div[contains(text(),"Browse styles")]';
 	await ( await page.waitForXPath( OTHER_STYLES_SELECTOR ) ).click();
 }
 
@@ -22,19 +22,21 @@ async function getAvailableStyleVariations() {
 	return page.$$( VARIATION_ITEMS_STYLES_SELECTOR );
 }
 
-async function applyVariation( number ) {
+async function applyVariation( label ) {
 	await toggleGlobalStyles();
 	await openOtherStyles();
-	const variations = await getAvailableStyleVariations();
-	await variations[ number ].click();
+	const variation = await page.waitForXPath(
+		`//*[@role="button"][@aria-label="${ label }"]`
+	);
+	await variation.click();
 }
 
 async function applyPinkVariation() {
-	await applyVariation( 1 );
+	await applyVariation( 'pink' );
 }
 
 async function applyYellowVariation() {
-	await applyVariation( 2 );
+	await applyVariation( 'yellow' );
 }
 
 async function openColorsPanel() {
@@ -71,7 +73,7 @@ async function getCustomFontSizeValue() {
 async function getColorValue( colorType ) {
 	return page.evaluate( ( _colorType ) => {
 		return document.evaluate(
-			`substring-before(substring-after(//div[@aria-label="Settings"]//button[.//*[text()="${ _colorType }"]]//*[contains(@class,"component-color-indicator")]/@style, "background: "), ";")`,
+			`substring-before(substring-after(//div[contains(@class, "edit-site-global-styles-sidebar__panel")]//button[.//*[text()="${ _colorType }"]]//*[contains(@class,"component-color-indicator")]/@style, "background: "), ";")`,
 			document,
 			null,
 			XPathResult.ANY_TYPE,

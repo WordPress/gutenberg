@@ -16,8 +16,10 @@ import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
  * Internal dependencies
  */
 import { appendSelectors } from './utils';
+import { getGapCSSValue } from '../hooks/gap';
 import useSetting from '../components/use-setting';
 import { BlockControls, JustifyContentControl } from '../components';
+import { shouldSkipSerialization } from '../hooks/utils';
 
 // Used with the default, horizontal flex orientation.
 const justifyContentMap = {
@@ -42,8 +44,9 @@ export default {
 	inspectorControls: function FlexLayoutInspectorControls( {
 		layout = {},
 		onChange,
+		layoutBlockSupport = {},
 	} ) {
-		const { allowOrientation = true } = layout;
+		const { allowOrientation = true } = layoutBlockSupport;
 		return (
 			<>
 				<Flex>
@@ -84,12 +87,17 @@ export default {
 			</BlockControls>
 		);
 	},
-	save: function FlexLayoutStyle( { selector, layout, style } ) {
+	save: function FlexLayoutStyle( { selector, layout, style, blockName } ) {
 		const { orientation = 'horizontal' } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
+		// If a block's block.json skips serialization for spacing or spacing.blockGap,
+		// don't apply the user-defined value to the styles.
 		const blockGapValue =
-			style?.spacing?.blockGap ?? 'var( --wp--style--block-gap, 0.5em )';
+			style?.spacing?.blockGap &&
+			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
+				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
+				: 'var( --wp--style--block-gap, 0.5em )';
 		const justifyContent =
 			justifyContentMap[ layout.justifyContent ] ||
 			justifyContentMap.left;
@@ -112,8 +120,8 @@ export default {
 			<style>{ `
 				${ appendSelectors( selector ) } {
 					display: flex;
-					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
 					flex-wrap: ${ flexWrap };
+					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
 					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
 				}
 
