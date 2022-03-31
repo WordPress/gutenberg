@@ -534,6 +534,8 @@ class EditorPage {
 
 			if ( isAndroid() ) {
 				await block.click();
+			} else {
+				await this.clickParagraphBlockAtPosition( position + i );
 			}
 
 			await this.typeTextToParagraphBlock(
