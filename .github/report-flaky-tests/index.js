@@ -98,12 +98,12 @@ const metaData = {
 					)
 				);
 			// GitHub issues has character limits on issue's body,
-			// so we only preserve the first and the four latest results.
-			if ( testResultsList.length > 5 ) {
+			// so we only preserve the first and the 9 latest results.
+			if ( testResultsList.length > 10 ) {
 				testResultsList = [
 					testResultsList[ 0 ],
 					'...',
-					...testResultsList.slice( -4 ),
+					...testResultsList.slice( -9 ),
 				];
 			}
 
