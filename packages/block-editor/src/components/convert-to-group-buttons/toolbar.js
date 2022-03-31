@@ -13,6 +13,11 @@ import { _x } from '@wordpress/i18n';
 import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
 
+const variationAttributes = {
+	row: { type: 'flex' },
+	stack: { type: 'flex', orientation: 'vertical' },
+};
+
 function BlockGroupToolbar() {
 	const {
 		blocksSelection,
@@ -31,11 +36,6 @@ function BlockGroupToolbar() {
 		},
 		[ clientIds ]
 	);
-
-	const variationAttributes = {
-		row: { type: 'flex' },
-		stack: { type: 'flex', orientation: 'vertical' },
-	};
 
 	const onConvertToGroup = ( variation = 'group' ) => {
 		const newBlocks = switchToBlockType(
