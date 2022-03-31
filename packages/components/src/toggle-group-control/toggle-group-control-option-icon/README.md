@@ -22,11 +22,13 @@ function Example() {
 				value="uppercase"
 				icon={ formatUppercase }
 				showTooltip={ true }
+				aria-label="Uppercase"
 			/>
 			<ToggleGroupControlOptionIcon
 				value="lowercase"
 				icon={ formatLowercase }
 				showTooltip={ true }
+				aria-label="Lowercase"
 			/>
 		</ToggleGroupControl>
 	);
@@ -43,12 +45,12 @@ The value of the `ToggleGroupControlOption`.
 
 ### `icon`: `WPComponent`
 
-Icon for the option.
+Icon displayed as the content of the the `ToggleGroupControl` option.
 
 -   Required: Yes
 
 ### `showTooltip`: `boolean`
 
-Whether to show a tooltip when hovering over the option. The tooltip will use the `aria-label` prop text.
+Whether to show a tooltip when hovering over the option. The tooltip will only show if a label for it is provided using the `aria-label` prop.
 
 -   Required: No

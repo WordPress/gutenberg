@@ -43,7 +43,8 @@ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 function ToggleGroupControlOptionBase(
 	props: WordPressComponentProps<
 		ToggleGroupControlOptionBaseProps,
-		'button'
+		'button',
+		false
 	>,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -100,8 +101,8 @@ function ToggleGroupControlOptionBase(
 }
 
 /**
- * `ToggleGroupControlOptionBase` is a form component and is used to be used as a
- * child of `ToggleGroupControl`.
+ * `ToggleGroupControlOptionBase` is a form component and is meant to be used as an internal,
+ * generic component for any children of `ToggleGroupControl`.
  *
  * @example
  * ```jsx

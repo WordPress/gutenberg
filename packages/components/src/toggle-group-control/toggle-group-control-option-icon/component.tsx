@@ -13,7 +13,8 @@ import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-bas
 export default function ToggleGroupControlOptionIcon(
 	props: WordPressComponentProps<
 		ToggleGroupControlOptionIconProps,
-		'button'
+		'button',
+		false
 	>
 ) {
 	const { icon, ...restProps } = props;

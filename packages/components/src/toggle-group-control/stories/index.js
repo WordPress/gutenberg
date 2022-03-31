@@ -143,11 +143,13 @@ export const WithIcons = () => {
 				value="uppercase"
 				icon={ formatUppercase }
 				showTooltip={ true }
+				aria-label="Uppercase"
 			/>
 			<ToggleGroupControlOptionIcon
 				value="lowercase"
 				icon={ formatLowercase }
 				showTooltip={ true }
+				aria-label="Lowercase"
 			/>
 		</ToggleGroupControl>
 	);

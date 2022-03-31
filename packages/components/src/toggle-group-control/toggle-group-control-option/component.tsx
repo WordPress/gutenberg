@@ -6,7 +6,11 @@ import type { ToggleGroupControlOptionProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
 
 export default function ToggleGroupControlOption(
-	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >
+	props: WordPressComponentProps<
+		ToggleGroupControlOptionProps,
+		'button',
+		false
+	>
 ) {
 	const { label, ...restProps } = props;
 	const optionLabel = restProps[ 'aria-label' ] || label;
