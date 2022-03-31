@@ -6,7 +6,7 @@
 		"attributes": {
 			"displayAsDropdown": false,
 			"showPostCounts": true,
-			"archiveType": "monthly"
+			"type": "monthly"
 		},
 		"innerBlocks": [],
 		"originalContent": ""

@@ -16,7 +16,7 @@
  */
 function render_block_core_archives( $attributes ) {
 	$show_post_count = ! empty( $attributes['showPostCounts'] );
-	$type            = isset( $attributes['archiveType'] ) ? $attributes['archiveType'] : 'monthly';
+	$type            = isset( $attributes['type'] ) ? $attributes['type'] : 'monthly';
 	$class           = '';
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {

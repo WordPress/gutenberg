@@ -12,7 +12,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
-	const { showPostCounts, displayAsDropdown, archiveType } = attributes;
+	const { showPostCounts, displayAsDropdown, type } = attributes;
 
 	return (
 		<>
@@ -44,9 +44,9 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 							{ label: __( 'Week' ), value: 'weekly' },
 							{ label: __( 'Day' ), value: 'daily' },
 						] }
-						value={ archiveType }
+						value={ type }
 						onChange={ ( value ) =>
-							setAttributes( { archiveType: value } )
+							setAttributes( { type: value } )
 						}
 					/>
 				</PanelBody>

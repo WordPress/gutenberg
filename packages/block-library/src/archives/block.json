@@ -15,7 +15,7 @@
 			"type": "boolean",
 			"default": false
 		},
-		"archiveType": {
+		"type": {
 			"type": "string",
 			"default": "monthly"
 		}
