@@ -13,7 +13,6 @@ import apiFetch from '@wordpress/api-fetch';
  */
 export default function create( { preloadedData } ) {
 	let cache = preloadedData;
-	let abortController = null;
 
 	async function get() {
 		if ( cache ) {
@@ -32,14 +31,7 @@ export default function create( { preloadedData } ) {
 	async function set( newData ) {
 		cache = { ...newData };
 
-		abortController?.abort();
-
-		abortController =
-			typeof AbortController === 'undefined'
-				? undefined
-				: new AbortController();
-
-		const promise = apiFetch( {
+		return apiFetch( {
 			path: '/wp/v2/users/me',
 			method: 'PUT',
 			data: {
@@ -47,18 +39,7 @@ export default function create( { preloadedData } ) {
 					persisted_preferences: newData,
 				},
 			},
-			signal: abortController?.signal,
-		} )
-			.catch( ( error ) => {
-				if ( error.code !== error.ABORT_ERR ) {
-					throw error;
-				}
-			} )
-			.finally( () => {
-				abortController = null;
-			} );
-
-		return promise;
+		} );
 	}
 
 	return {
