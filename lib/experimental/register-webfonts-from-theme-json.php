@@ -42,7 +42,7 @@ function gutenberg_register_webfonts_from_theme_json() {
 
 					foreach ( $font_face['src'] as $src_key => $url ) {
 						// Tweak the URL to be relative to the theme root.
-						if ( 0 !== strpos( $url, 'file:./' ) ) {
+						if ( ! str_starts_with( $url, 'file:./' ) ) {
 							continue;
 						}
 						$font_face['src'][ $src_key ] = get_theme_file_uri( str_replace( 'file:./', '', $url ) );
@@ -71,7 +71,6 @@ function gutenberg_register_webfonts_from_theme_json() {
  * Add missing fonts data to the global styles.
  *
  * @param array $data The global styles.
- *
  * @return array The global styles with missing fonts data.
  */
 function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
@@ -85,10 +84,9 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 	 * Helper to get an array of the font-families.
 	 *
 	 * @param array $families_data The font-families data.
-	 *
 	 * @return array The font-families array.
 	 */
-	$get_families = function( $families_data ) {
+	$get_families = static function( $families_data ) {
 		$families = array();
 		foreach ( $families_data as $family ) {
 			$families[] = WP_Webfonts::get_font_slug( $family );
@@ -137,7 +135,7 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 		}
 
 		$data['settings']['typography']['fontFamilies'][] = array(
-			'fontFamily' => false !== strpos( $family_name, ' ' ) ? "'{$family_name}'" : $family_name,
+			'fontFamily' => str_contains( $family_name, ' ' ) ? "'{$family_name}'" : $family_name,
 			'name'       => $family_name,
 			'slug'       => $slug,
 			'fontFace'   => $font_faces,

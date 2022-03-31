@@ -120,7 +120,7 @@ class WP_Webfonts {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param array $webfont The font argument.
+	 * @param array $webfont Webfont to be registered.
 	 * @return bool True if successfully registered, else false.
 	 */
 	public function register_webfont( array $webfont ) {

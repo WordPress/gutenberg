@@ -60,11 +60,11 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param array $webfonts Webfonts to be registered.
+	 * @param array[] $webfonts Webfonts to be registered.
 	 *                        This contains an array of webfonts to be registered.
 	 *                        Each webfont is an array.
 	 */
-	function wp_register_webfonts( array $webfonts = array() ) {
+	function wp_register_webfonts( array $webfonts ) {
 		foreach ( $webfonts as $webfont ) {
 			wp_register_webfont( $webfont );
 		}
@@ -94,9 +94,10 @@ if ( ! function_exists( 'wp_register_webfont' ) ) {
 	 * @since 6.0.0
 	 *
 	 * @param array $webfont Webfont to be registered.
+	 * @return bool True if successfully registered, else false.
 	 */
 	function wp_register_webfont( array $webfont ) {
-		wp_webfonts()->register_webfont( $webfont );
+		return wp_webfonts()->register_webfont( $webfont );
 	}
 }
 
@@ -119,7 +120,7 @@ if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
 	 *
 	 * @param string[] $webfonts Font families to be enqueued.
 	 */
-	function wp_enqueue_webfonts( $webfonts ) {
+	function wp_enqueue_webfonts( array $webfonts ) {
 		foreach ( $webfonts as $webfont ) {
 			wp_enqueue_webfont( $webfont );
 		}
@@ -140,10 +141,11 @@ if ( ! function_exists( 'wp_enqueue_webfont' ) ) {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param string $webfont Font family to be enqueued.
+	 * @param string $font_family_name The font family name to be enqueued.
+	 * @return bool True if successfully enqueued, else false.
 	 */
-	function wp_enqueue_webfont( $webfont ) {
-		wp_webfonts()->enqueue_webfont( $webfont );
+	function wp_enqueue_webfont( $font_family_name ) {
+		return wp_webfonts()->enqueue_webfont( $font_family_name );
 	}
 }
 
