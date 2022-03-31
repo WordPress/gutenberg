@@ -143,6 +143,8 @@ function Navigation( {
 		);
 	}
 
+	const isCreatingEmpty = useRef( false );
+
 	const navigationAreaMenu = areaMenu === 0 ? undefined : areaMenu;
 
 	const ref = navigationArea ? navigationAreaMenu : attributes.ref;
@@ -284,8 +286,22 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
+	// Setup initial block insertion state.
+
+	// If:
+	// - not explicitly creating an **empty** menu.
+	// - there is not currently a ref to a Navigation Menu `wp_navigation`
+	// - there are some Navigation Menus
+	// - there is only a single Navigation Menu
+	//
+	// ...then automatically use that Navigation Menu by default.
 	useEffect( () => {
-		if ( ! navigationMenus?.length || navigationMenus?.length > 1 ) {
+		if (
+			isCreatingEmpty.current ||
+			ref ||
+			! navigationMenus?.length ||
+			navigationMenus?.length > 1
+		) {
 			return;
 		}
 
@@ -547,6 +563,13 @@ function Navigation( {
 		} );
 	}, [ clientId, ref ] );
 
+	function handleCreateEmptyMenu() {
+		isCreatingEmpty.current = true;
+		createNavigationMenu( '', [] ).finally(
+			() => ( isCreatingEmpty.current = false )
+		);
+	}
+
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
 	// Either this block was saved in the content or inserted by a pattern.
@@ -636,7 +659,7 @@ function Navigation( {
 						isResolvingCanUserCreateNavigationMenu
 					}
 					onFinish={ handleSelectNavigation }
-					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
+					onCreateEmpty={ handleCreateEmptyMenu }
 				/>
 			</TagName>
 		);
