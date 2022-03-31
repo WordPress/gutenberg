@@ -313,3 +313,20 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
 		context,
 	};
 }
+
+/**
+ * Returns an action object used in signalling that several notices are to be removed.
+ *
+ * @param {string[]} ids              List of unique notice identifiers.
+ * @param {string} [context='global'] Optional context (grouping) in which the notices are
+ *                                    intended to appear. Defaults to default context.
+ *
+ * @return {Object} Action object.
+ */
+export function removeNotices( ids, context = DEFAULT_CONTEXT ) {
+	return {
+		type: 'REMOVE_NOTICES',
+		ids,
+		context,
+	};
+}
