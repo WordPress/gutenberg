@@ -65,7 +65,7 @@ The final result should look as follows:
 
 Now that the button is in place, we can focus entirely on building the form. This tutorial is about managing data, so we will not build a complete page editor. Instead, the form will only contain one field: post title.
 
-Luckily, the `EditPageForm` we have built in [part three](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) already takes us 80% there. The bulk of the user interface is already there, and we will reuse it in the `CreatePageForm`. Let’s start by extracting the form UI into a separate component:
+Luckily, the `EditPageForm` we built in [part three](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) already takes us 80% of the way there. The bulk of the user interface is already available, and we will reuse it in the `CreatePageForm`. Let’s start by extracting the form UI into a separate component:
 
 ```js
 export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
