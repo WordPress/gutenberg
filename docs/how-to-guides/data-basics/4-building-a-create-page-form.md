@@ -226,7 +226,7 @@ Go ahead and apply that change to your local `CreatePageForm` component, and let
 
 The `EditPageForm`  retrieved the error and progress information via the `getLastEntitySaveError`  and `isSavingEntityRecord` selectors. In both cases, it passed the following three arguments: `( 'postType', 'page', pageId )`.
 
-In `CreatePageForm`, however, we do not have a `pageId`. What now? We skip the `pageId` argument to retrieve the information about the entity record without any id – which is the newly created one. The `useSelect` call is thus very similar to the one from `EditPageForm`:
+In `CreatePageForm` however, we do not have a `pageId`. What now? We can skip the `pageId` argument to retrieve the information about the entity record without any id – this will be the newly created one. The `useSelect` call is thus very similar to the one from `EditPageForm`:
 
 ```js
 export function CreatePageForm( { onCancel, onSaveFinished } ) {
