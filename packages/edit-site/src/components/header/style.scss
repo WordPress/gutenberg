@@ -64,14 +64,14 @@ body.is-navigation-sidebar-open {
 .edit-site-header__toolbar {
 	display: flex;
 	align-items: center;
-	padding-left: $grid-unit-20;
+	padding-left: $grid-unit-20 + 170;
 
 	@include break-small() {
-		padding-left: $grid-unit-20;
+		padding-left: $grid-unit-20 + 170;
 	}
 
 	@include break-wide() {
-		padding-right: $grid-unit-10;
+		padding-right: $grid-unit-10 + 170;
 	}
 
 	.edit-site-header-toolbar__inserter-toggle {

@@ -3,13 +3,13 @@
 
 .edit-site-navigation-toggle {
 	align-items: center;
-	background: $gray-900;
+	background: $black;
 	border-radius: 0;
 	display: flex;
+	position: absolute;
 	z-index: z-index(".edit-site-navigation-toggle");
 	height: $header-height;
-	width: $header-height;
-	flex-direction: column;
+	width: $header-height + 94px;
 
 	button {
 		color: $white;
@@ -18,9 +18,9 @@
 
 .edit-site-navigation-toggle__button.components-button {
 	align-items: center;
-	background: $gray-900;
+	background: $black;
 	border-radius: 0;
-	height: $header-height + $border-width;
+	height: $header-height - 1px;
 	width: $header-height;
 	z-index: 1;
 	margin-bottom: - $border-width;
@@ -60,6 +60,10 @@
 }
 
 .edit-site-navigation-toggle .interface-pinned-items {
-	padding-top: $grid-unit-20;
-	flex-direction: column;
+	button {
+		background: $black;
+	}
+	.is-pressed {
+		background: $gray-900;
+	}
 }
