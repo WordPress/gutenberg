@@ -64,10 +64,13 @@ export default function save( { attributes } ) {
 			) }
 		</>
 	);
-
-	return (
-		<figure { ...useBlockProps.save( { className: classes } ) }>
-			{ figure }
-		</figure>
-	);
+	if(attributes.url){
+		return (
+			<figure { ...useBlockProps.save( { className: classes } ) }>
+				{ figure }
+			</figure>
+		);
+	}
+	return null;
+	
 }
