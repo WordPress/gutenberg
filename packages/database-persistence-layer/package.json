@@ -29,9 +29,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/data": "file:../data",
-		"@wordpress/preferences": "file:../preferences"
+		"@wordpress/api-fetch": "file:../api-fetch"
 	},
 	"publishConfig": {
 		"access": "public"
