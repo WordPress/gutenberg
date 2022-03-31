@@ -5,7 +5,7 @@ declare namespace jest {
 		/**
 		 * Similar to the [`toMatchDiffSnapshot` matcher], this custom matcher
 		 * allows to snapshot only the difference between the _styles_ associated
-		 * to two different states of a component.
+		 * with different states of a component.
 		 *
 		 * @see [to-match-style-diff-snapshot.js]
 		 * @see [Testing Overview docs]
