@@ -226,6 +226,17 @@ async function deleteAll( endpoints ) {
 	}
 }
 
+async function resetNavBlockToInitialState() {
+	const selectMenuDropdown = await page.waitForSelector(
+		'[aria-label="Select Menu"]'
+	);
+	await selectMenuDropdown.click();
+	const newMenuButton = await page.waitForXPath(
+		'//span[text()="Create new menu"]'
+	);
+	newMenuButton.click();
+}
+
 /**
  * Replace unique ids in nav block content, since these won't be consistent
  * between test runs.
@@ -1269,20 +1280,17 @@ describe( 'Navigation', () => {
 		} );
 	} );
 
-	describe( 'Auto block empty state', () => {
-		beforeEach( async () => {
-			// Step 1. Create the menu.
+	describe( 'Initial block insertion state', () => {
+		async function createNavigationMenu( menu = {} ) {
 			return rest( {
 				method: 'POST',
 				path: '/wp/v2/navigation',
 				data: {
-					title: 'Example Navigation',
-					content:
-						'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
 					status: 'publish',
+					...menu,
 				},
 			} );
-		} );
+		}
 
 		afterEach( async () => {
 			const navMenusEndpoint = '/wp/v2/navigation';
@@ -1301,6 +1309,12 @@ describe( 'Navigation', () => {
 		} );
 
 		it( 'automatically uses the first Navigation Menu if only one available', async () => {
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
 			await createNewPost();
 
 			await insertBlock( 'Navigation' );
@@ -1317,6 +1331,57 @@ describe( 'Navigation', () => {
 			);
 
 			expect( linkText ).toBe( 'WordPress' );
+		} );
+
+		it( 'does not automatically use first Navigation Menu if be than one exists', async () => {
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNavigationMenu( {
+				title: 'Second Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			await waitForBlock( 'Navigation' );
+
+			await page.waitForXPath( START_EMPTY_XPATH );
+		} );
+
+		it( 'allows users to manually create new empty menu when block has automatically selected the first available Navigation Menu', async () => {
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			await waitForBlock( 'Navigation' );
+
+			await waitForBlock( 'Custom Link' );
+
+			// Reset the nav block to create a new entity.
+			await resetNavBlockToInitialState();
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+			await startEmptyButton.click();
+
+			// Wait for Navigation creation of empty Navigation to complete.
+			await page.waitForXPath(
+				'//*[contains(@class, "components-snackbar")]/*[text()="Navigation Menu successfully created."]'
+			);
 		} );
 	} );
 } );
