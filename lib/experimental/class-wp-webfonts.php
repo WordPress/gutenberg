@@ -309,7 +309,8 @@ class WP_Webfonts {
 	 */
 	public function generate_and_enqueue_styles() {
 		// Generate the styles.
-		$styles = $this->generate_styles( $this->get_enqueued_webfonts() );
+		$webfonts = $this->get_webfonts_by_provider( $this->get_enqueued_webfonts() );
+		$styles   = $this->generate_styles( $webfonts );
 
 		// Bail out if there are no styles to enqueue.
 		if ( '' === $styles ) {
@@ -331,7 +332,8 @@ class WP_Webfonts {
 	 */
 	public function generate_and_enqueue_editor_styles() {
 		// Generate the styles.
-		$styles = $this->generate_styles( $this->get_all_webfonts() );
+		$webfonts = $this->get_webfonts_by_provider( $this->get_all_webfonts() );
+		$styles   = $this->generate_styles( $webfonts );
 
 		// Bail out if there are no styles to enqueue.
 		if ( '' === $styles ) {
@@ -347,34 +349,12 @@ class WP_Webfonts {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param array[] $font_families Font families and each of their webfonts.
+	 * @param array[] $webfonts_by_provider Webfonts organized by provider.
 	 * @return string $styles Generated styles.
 	 */
-	public function generate_styles( $font_families ) {
+	private function generate_styles( array $webfonts_by_provider ) {
 		$styles    = '';
 		$providers = $this->get_providers();
-
-		$webfonts = array();
-
-		// Grab only the font face declarations from $font_families.
-		foreach ( $font_families as $font_family ) {
-			foreach ( $font_family as $font_face ) {
-				$webfonts[] = $font_face;
-			}
-		}
-
-		// Group webfonts by provider.
-		$webfonts_by_provider = array();
-		foreach ( $webfonts as $slug => $webfont ) {
-			$provider = $webfont['provider'];
-			if ( ! isset( $providers[ $provider ] ) ) {
-				/* translators: %s is the provider name. */
-				trigger_log( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider ) );
-				continue;
-			}
-			$webfonts_by_provider[ $provider ]          = isset( $webfonts_by_provider[ $provider ] ) ? $webfonts_by_provider[ $provider ] : array();
-			$webfonts_by_provider[ $provider ][ $slug ] = $webfont;
-		}
 
 		/*
 		 * Loop through each of the providers to get the CSS for their respective webfonts
@@ -385,7 +365,7 @@ class WP_Webfonts {
 			// Bail out if the provider class does not exist.
 			if ( ! class_exists( $provider_class ) ) {
 				/* translators: %s is the provider name. */
-				trigger_log( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider_id ) );
+				trigger_error( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider_id ) );
 				continue;
 			}
 
@@ -408,5 +388,38 @@ class WP_Webfonts {
 		}
 
 		return $styles;
+	}
+
+
+	/**
+	 * Reorganizes webfonts grouped by font-family into grouped by provider.
+	 *
+	 * @param array[] $font_families Font families and each of their webfonts.
+	 * @return array[] Webfonts organized by providers.
+	 */
+	private function get_webfonts_by_provider( array $font_families ) {
+		$providers            = $this->get_providers();
+		$webfonts_by_provider = array();
+
+		foreach ( $font_families as $webfonts ) {
+			foreach ( $webfonts as $webfont ) {
+				$provider = $webfont['provider'];
+
+				// Skip if the provider is not registered.
+				if ( ! isset( $providers[ $provider ] ) ) {
+					/* translators: %s is the provider name. */
+					trigger_error( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider ) );
+					continue;
+				}
+
+				// Initialize a new provider collection.
+				if ( ! isset( $webfonts_by_provider[ $provider ] ) ) {
+					$webfonts_by_provider[ $provider ] = array();
+				}
+				$webfonts_by_provider[ $provider ][] = $webfont;
+			}
+		}
+
+		return $webfonts_by_provider;
 	}
 }

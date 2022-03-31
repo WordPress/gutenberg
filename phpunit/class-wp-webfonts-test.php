@@ -365,7 +365,7 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 	/**
 	 * Test generate_and_enqueue_styles outputs only enqueued webfonts.
 	 *
-	 * @covers WP_Webfonts::generate_styles
+	 * @covers WP_Webfonts::generate_and_enqueue_styles
 	 */
 	public function test_generate_styles() {
 		wp_register_webfonts(
