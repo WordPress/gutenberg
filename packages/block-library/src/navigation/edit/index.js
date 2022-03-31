@@ -287,7 +287,6 @@ function Navigation( {
 	} = useNavigationMenu( ref );
 
 	// Setup initial block insertion state.
-
 	// If:
 	// - not explicitly creating an **empty** menu.
 	// - there is not currently a ref to a Navigation Menu `wp_navigation`
@@ -337,6 +336,7 @@ function Navigation( {
 		! ref &&
 		! isCreatingNavigationMenu &&
 		! isConvertingClassicMenu &&
+		! isResolvingNavigationMenus &&
 		( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
 
 	const isEntityAvailable =
