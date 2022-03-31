@@ -158,7 +158,7 @@ export function CreatePageForm( { onCancel, onSaveFinished } ) {
 
 In the `EditPageForm`, we dispatched the `saveEditedEntityRecord('postType', 'page', pageId )` action to save the edits that lived in the Redux state.
 
-In the `CreatePageForm`, however, we do not have any edits in the Redux state, nor we do have any `pageId`. The action we need to dispatch in this case is called [`saveEntityRecord`](https://developer.wordpress.org/block-editor/reference-guides/data/data-core/#saveentityrecord) (without the word _Edited_ in the name) and it accepts an object representing the new entity record instead of a `pageId`.
+In the `CreatePageForm` however, we do not have any edits in the Redux state, nor we do have a `pageId`. The action we need to dispatch in this case is called [`saveEntityRecord`](https://developer.wordpress.org/block-editor/reference-guides/data/data-core/#saveentityrecord) (without the word _Edited_ in the name) and it accepts an object representing the new entity record instead of a `pageId`.
 
 The data passed to `saveEntityRecord` is sent via a POST request to the appropriate REST API endpoint. For example, dispatching the following action:
 
