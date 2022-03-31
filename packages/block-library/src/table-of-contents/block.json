@@ -22,6 +22,5 @@
 	"supports": {
 		"html": false
 	},
-	"example": {},
-	"editorStyle": "wp-block-table-of-contents-editor"
+	"example": {}
 }

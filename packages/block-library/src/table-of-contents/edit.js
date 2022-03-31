@@ -15,6 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import {
+	Disabled,
 	PanelBody,
 	Placeholder,
 	ToggleControl,
@@ -262,9 +263,13 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ol>
-					<TableOfContentsList nestedHeadingList={ headingTree } />
-				</ol>
+				<Disabled>
+					<ol>
+						<TableOfContentsList
+							nestedHeadingList={ headingTree }
+						/>
+					</ol>
+				</Disabled>
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }
