@@ -92,7 +92,6 @@ const BlockDraggableWrapper = ( { children } ) => {
 	};
 	const isDragging = useSharedValue( false );
 	const scrollAnimation = useSharedValue( 0 );
-	const hasStartedDraggingOver = useSharedValue( false );
 
 	const [
 		startScrolling,
@@ -190,8 +189,6 @@ const BlockDraggableWrapper = ( { children } ) => {
 		chip.x.value = dragPosition.x;
 		chip.y.value = dragPosition.y;
 
-		hasStartedDraggingOver.value = true;
-
 		runOnJS( onBlockDragOver )( { x, y: y + scroll.offsetY.value } );
 
 		// Update scrolling velocity
@@ -201,7 +198,6 @@ const BlockDraggableWrapper = ( { children } ) => {
 	const stopDragging = () => {
 		'worklet';
 		isDragging.value = false;
-		hasStartedDraggingOver.value = false;
 
 		chip.scale.value = withTiming( 0 );
 		runOnJS( onBlockDragEnd )();
@@ -234,7 +230,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 			{
 				<DroppingInsertionPoint
 					scroll={ scroll }
-					hasStartedDraggingOver={ hasStartedDraggingOver }
+					isDragging={ isDragging }
 					targetBlockIndex={ targetBlockIndex }
 				/>
 			}

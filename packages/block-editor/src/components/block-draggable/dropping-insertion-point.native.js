@@ -26,16 +26,16 @@ import styles from './dropping-insertion-point.scss';
  *
  * This component shows where a block can be dropped when it's being dragged.
  *
- * @param {Object}                                        props                        Component props.
- * @param {Object}                                        props.scroll                 Scroll offset object.
- * @param {import('react-native-reanimated').SharedValue} props.hasStartedDraggingOver Whether or not the block has started moving.
- * @param {import('react-native-reanimated').SharedValue} props.targetBlockIndex       Current block target index.
+ * @param {Object}                                        props                  Component props.
+ * @param {Object}                                        props.scroll           Scroll offset object.
+ * @param {import('react-native-reanimated').SharedValue} props.isDragging       Whether or not dragging has started.
+ * @param {import('react-native-reanimated').SharedValue} props.targetBlockIndex Current block target index.
  *
  * @return {JSX.Element} The component to be rendered.
  */
 export default function DroppingInsertionPoint( {
 	scroll,
-	hasStartedDraggingOver,
+	isDragging,
 	targetBlockIndex,
 } ) {
 	const {
@@ -52,7 +52,7 @@ export default function DroppingInsertionPoint( {
 	const opacity = useSharedValue( 0 );
 
 	useAnimatedReaction(
-		() => hasStartedDraggingOver.value,
+		() => isDragging.value,
 		( value ) => {
 			if ( ! value ) {
 				opacity.value = 0;
