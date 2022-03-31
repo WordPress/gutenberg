@@ -858,6 +858,27 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should write over selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1[' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ']2' );
+		await page.keyboard.press( 'ArrowLeft' );
+		// Select everything between [].
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+
+		// Test setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Ensure selection is in the correct place.
+		await page.keyboard.type( '...' );
+
+		// Expect a heading with "1&2" as its content.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should handle Enter across blocks', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1[' );

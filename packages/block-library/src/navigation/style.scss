@@ -51,25 +51,27 @@ $navigation-icon-size: 24px;
 		padding: 0;
 	}
 
-	// Force links to inherit text decoration applied to navigation block.
-	// The extra selector adds specificity to ensure it works when user-set.
-	&[style*="text-decoration"] {
-		.wp-block-navigation-item,
-		.wp-block-navigation__submenu-container {
-			text-decoration: inherit;
-		}
+	// The following rules provide class based application of user selected text
+	// decoration via block supports.
+	&.has-text-decoration-underline .wp-block-navigation-item__content {
+		text-decoration: underline;
 
-		a {
-			text-decoration: inherit;
-
-			&:focus,
-			&:active {
-				text-decoration: inherit;
-			}
+		&:focus,
+		&:active {
+			text-decoration: underline;
 		}
 	}
 
-	&:not([style*="text-decoration"]) {
+	&.has-text-decoration-line-through .wp-block-navigation-item__content {
+		text-decoration: line-through;
+
+		&:focus,
+		&:active {
+			text-decoration: line-through;
+		}
+	}
+
+	&:where(:not([class*="has-text-decoration"])) {
 		a {
 			text-decoration: none;
 

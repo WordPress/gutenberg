@@ -13,6 +13,10 @@ For each user feature we should also add a importance categorization label  to i
 
 -   [**] Update "add block" button style in default editor view. [#39726]
 
+## 1.72.1
+
+-   [*] Detect GIF badge during render [#39882]
+
 ## 1.72.0
 
 -   [*] Add GIF badge for animated GIFs uploaded to Image blocks [#38996]
