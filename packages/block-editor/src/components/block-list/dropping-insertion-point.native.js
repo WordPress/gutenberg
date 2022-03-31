@@ -13,7 +13,6 @@ import Animated, {
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -62,64 +61,50 @@ export default function DroppingInsertionPoint( {
 		}
 	);
 
-	const setIndicatorPosition = useCallback(
-		( index ) => {
-			const insertionPointIndex = index;
-			const order = getBlockOrder();
-			const isDraggingAnyBlocks = isDraggingBlocks();
+	function setIndicatorPosition( index ) {
+		const insertionPointIndex = index;
+		const order = getBlockOrder();
+		const isDraggingAnyBlocks = isDraggingBlocks();
 
-			if (
-				! isDraggingAnyBlocks ||
-				insertionPointIndex === null ||
-				! order.length
-			) {
-				return;
-			}
+		if (
+			! isDraggingAnyBlocks ||
+			insertionPointIndex === null ||
+			! order.length
+		) {
+			return;
+		}
 
-			let previousClientId = order[ insertionPointIndex - 1 ];
-			let nextClientId = order[ insertionPointIndex ];
+		let previousClientId = order[ insertionPointIndex - 1 ];
+		let nextClientId = order[ insertionPointIndex ];
 
-			while ( isBlockBeingDragged( previousClientId ) ) {
-				previousClientId = getPreviousBlockClientId( previousClientId );
-			}
+		while ( isBlockBeingDragged( previousClientId ) ) {
+			previousClientId = getPreviousBlockClientId( previousClientId );
+		}
 
-			while ( isBlockBeingDragged( nextClientId ) ) {
-				nextClientId = getNextBlockClientId( nextClientId );
-			}
+		while ( isBlockBeingDragged( nextClientId ) ) {
+			nextClientId = getNextBlockClientId( nextClientId );
+		}
 
-			const previousElement = previousClientId
-				? findBlockLayoutByClientId(
-						blocksLayouts.current,
-						previousClientId
-				  )
-				: null;
-			const nextElement = nextClientId
-				? findBlockLayoutByClientId(
-						blocksLayouts.current,
-						nextClientId
-				  )
-				: null;
+		const previousElement = previousClientId
+			? findBlockLayoutByClientId(
+					blocksLayouts.current,
+					previousClientId
+			  )
+			: null;
+		const nextElement = nextClientId
+			? findBlockLayoutByClientId( blocksLayouts.current, nextClientId )
+			: null;
 
-			const nextPosition = previousElement
-				? previousElement.y + previousElement.height
-				: nextElement?.y;
+		const nextPosition = previousElement
+			? previousElement.y + previousElement.height
+			: nextElement?.y;
 
-			if ( nextPosition && blockYPosition.value !== nextPosition ) {
-				opacity.value = 0;
-				blockYPosition.value = nextPosition;
-				opacity.value = withTiming( 1 );
-			}
-		},
-		[
-			getBlockOrder,
-			isBlockBeingDragged,
-			isDraggingBlocks,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
-			findBlockLayoutByClientId,
-			blocksLayouts,
-		]
-	);
+		if ( nextPosition && blockYPosition.value !== nextPosition ) {
+			opacity.value = 0;
+			blockYPosition.value = nextPosition;
+			opacity.value = withTiming( 1 );
+		}
+	}
 
 	useAnimatedReaction(
 		() => targetBlockIndex.value,
