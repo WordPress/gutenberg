@@ -113,18 +113,21 @@ export default function DroppingInsertionPoint( {
 		}
 	);
 
-	const insertionPointStyles = useAnimatedStyle( () => {
+	const animatedStyles = useAnimatedStyle( () => {
 		return {
-			...styles[ 'dropping-insertion-point' ],
 			opacity: opacity.value,
 			transform: [
-				{ translateX: 0 },
 				{
 					translateY: blockYPosition.value - scroll.offsetY.value,
 				},
 			],
 		};
 	} );
+
+	const insertionPointStyles = [
+		styles[ 'dropping-insertion-point' ],
+		animatedStyles,
+	];
 
 	return (
 		<Animated.View pointerEvents="none" style={ insertionPointStyles } />
