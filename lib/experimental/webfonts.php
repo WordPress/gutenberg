@@ -171,7 +171,7 @@ if ( ! function_exists( 'wp_register_webfont_provider' ) ) {
 	 *                          The class should be a child of `WP_Webfonts_Provider`.
 	 *                          See {@see WP_Webfonts_Provider}.
 	 *
-	 * @return bool True when registered. False when provider does not exist.
+	 * @return bool True if successfully registered, else false.
 	 */
 	function wp_register_webfont_provider( $name, $classname ) {
 		return wp_webfonts()->register_provider( $name, $classname );
@@ -193,8 +193,7 @@ if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @return WP_Webfonts_Provider[] All registered providers,
-	 *                                each keyed by their unique ID.
+	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
 	 */
 	function wp_get_webfont_providers() {
 		return wp_webfonts()->get_providers();

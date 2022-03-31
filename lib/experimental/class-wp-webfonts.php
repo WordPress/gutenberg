@@ -58,7 +58,6 @@ class WP_Webfonts {
 	 * @since 6.0.0
 	 */
 	public function init() {
-
 		// Register default providers.
 		$this->register_provider( 'local', 'WP_Webfonts_Provider_Local' );
 
@@ -110,7 +109,7 @@ class WP_Webfonts {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @return array
+	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
 	 */
 	public function get_providers() {
 		return $this->providers;
@@ -122,8 +121,9 @@ class WP_Webfonts {
 	 * @since 6.0.0
 	 *
 	 * @param array $webfont The font argument.
+	 * @return bool True if successfully registered, else false.
 	 */
-	public function register_webfont( $webfont ) {
+	public function register_webfont( array $webfont ) {
 		$webfont = $this->validate_webfont( $webfont );
 
 		// If not valid, bail out.
@@ -139,12 +139,14 @@ class WP_Webfonts {
 		}
 
 		$this->registered_webfonts[ $slug ][] = $webfont;
+		return true;
 	}
 
 	/**
 	 * Enqueue a font-family that has been already registered.
 	 *
 	 * @param string $font_family_name The font family name to be enqueued.
+	 * @return bool True if successfully enqueued, else false.
 	 */
 	public function enqueue_webfont( $font_family_name ) {
 		$slug = $this->get_font_slug( $font_family_name );
@@ -170,6 +172,7 @@ class WP_Webfonts {
 
 		$this->enqueued_webfonts[ $slug ] = $this->registered_webfonts[ $slug ];
 		unset( $this->registered_webfonts[ $slug ] );
+		return true;
 	}
 
 	/**
@@ -177,7 +180,9 @@ class WP_Webfonts {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param array|string $to_convert The value to convert into a slug. Expected as the web font's array or a font-family as a string.
+	 * @param array|string $to_convert The value to convert into a slug. Expected as the web font's array
+	 *                                 or a font-family as a string.
+	 * @return string|false The font slug on success, or false if the font-family cannot be determined.
 	 */
 	public static function get_font_slug( $to_convert ) {
 		if ( is_array( $to_convert ) ) {
@@ -287,8 +292,7 @@ class WP_Webfonts {
 	 *
 	 * @param string $provider The provider name.
 	 * @param string $class    The provider class name.
-	 *
-	 * @return bool Whether the provider was registered successfully.
+	 * @return bool True if successfully registered, else false.
 	 */
 	public function register_provider( $provider, $class ) {
 		if ( empty( $provider ) || empty( $class ) ) {
