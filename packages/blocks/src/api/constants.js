@@ -203,6 +203,17 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'spacing', 'blockGap' ],
 		support: [ 'spacing', 'blockGap' ],
 	},
+	'--wp--style--root--padding': {
+		value: [ 'spacing', 'padding' ],
+		support: [ 'spacing', 'padding' ],
+		properties: {
+			'--wp--style--root--padding-top': 'top',
+			'--wp--style--root--padding-right': 'right',
+			'--wp--style--root--padding-bottom': 'bottom',
+			'--wp--style--root--padding-left': 'left',
+		},
+		rootOnly: true,
+	},
 };
 
 export const __EXPERIMENTAL_ELEMENTS = {

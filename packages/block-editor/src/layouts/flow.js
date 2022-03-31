@@ -140,7 +140,7 @@ export default {
 					}
 					${ appendSelectors(
 						selector,
-						'> :where(:not(.alignleft):not(.alignright))'
+						'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
 					) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;

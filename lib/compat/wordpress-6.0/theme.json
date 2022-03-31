@@ -2,6 +2,7 @@
 	"version": 2,
 	"settings": {
 		"appearanceTools": false,
+		"useRootVariables": false,
 		"border": {
 			"color": false,
 			"radius": false,
@@ -240,6 +241,14 @@
 		}
 	},
 	"styles": {
-		"spacing": { "blockGap": "24px" }
+		"spacing": {
+			"blockGap": "24px",
+			"padding": {
+				"top": "var(--wp--style--block-gap)",
+				"right": "var(--wp--style--block-gap)",
+				"bottom": "var(--wp--style--block-gap)",
+				"left": "var(--wp--style--block-gap)"
+			}
+		}
 	}
 }

@@ -68,6 +68,9 @@ export function getInlineStyles( styles = {} ) {
 	const ignoredStyles = [ 'spacing.blockGap' ];
 	const output = {};
 	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
+		if ( STYLE_PROPERTY[ propKey ].rootOnly ) {
+			return;
+		}
 		const path = STYLE_PROPERTY[ propKey ].value;
 		const subPaths = STYLE_PROPERTY[ propKey ].properties;
 		// Ignore styles on elements because they are handled on the server.
