@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
@@ -25,6 +25,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
@@ -39,6 +40,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 	const isMissing = hasResolved && ! record;
+
+	const canRemove = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+		[ clientId ]
+	);
 
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
@@ -104,14 +110,18 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		<RecursionProvider>
 			<div { ...blockProps }>
 				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ () => convertBlockToStatic( clientId ) }
-							label={ __( 'Convert to regular blocks' ) }
-							icon={ ungroup }
-							showTooltip
-						/>
-					</ToolbarGroup>
+					{ canRemove && (
+						<ToolbarGroup>
+							<ToolbarButton
+								onClick={ () =>
+									convertBlockToStatic( clientId )
+								}
+								label={ __( 'Convert to regular blocks' ) }
+								icon={ ungroup }
+								showTooltip
+							/>
+						</ToolbarGroup>
+					) }
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody>
