@@ -23,6 +23,11 @@ const notices = onSubKey( 'context' )( ( state = [], action ) => {
 
 		case 'REMOVE_NOTICE':
 			return state.filter( ( { id } ) => id !== action.id );
+
+		case 'REMOVE_NOTICES':
+			return reject( state, ( notice ) => {
+				return action.ids.includes( notice.id );
+			} );
 	}
 
 	return state;
