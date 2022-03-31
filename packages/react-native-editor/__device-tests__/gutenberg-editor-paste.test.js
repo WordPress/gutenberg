@@ -32,7 +32,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
-		};
+		}
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
@@ -40,8 +40,14 @@ describe( 'Gutenberg Editor paste tests', () => {
 		);
 
 		// Copy content to clipboard.
-		await longPressMiddleOfElement( editorPage.driver, paragraphBlockElement );
-		await tapSelectAllAboveElement( editorPage.driver, paragraphBlockElement );
+		await longPressMiddleOfElement(
+			editorPage.driver,
+			paragraphBlockElement
+		);
+		await tapSelectAllAboveElement(
+			editorPage.driver,
+			paragraphBlockElement
+		);
 		await tapCopyAboveElement( editorPage.driver, paragraphBlockElement );
 
 		// Create another paragraph block.
@@ -60,8 +66,14 @@ describe( 'Gutenberg Editor paste tests', () => {
 		}
 
 		// Paste into second paragraph block.
-		await longPressMiddleOfElement( editorPage.driver, secondParagraphBlockElement );
-		await tapPasteAboveElement( editorPage.driver, secondParagraphBlockElement );
+		await longPressMiddleOfElement(
+			editorPage.driver,
+			secondParagraphBlockElement
+		);
+		await tapPasteAboveElement(
+			editorPage.driver,
+			secondParagraphBlockElement
+		);
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		expect( text ).toBe( testData.pastePlainText );
@@ -81,8 +93,14 @@ describe( 'Gutenberg Editor paste tests', () => {
 		}
 
 		// Copy content to clipboard.
-		await longPressMiddleOfElement( editorPage.driver, paragraphBlockElement );
-		await tapSelectAllAboveElement( editorPage.driver, paragraphBlockElement );
+		await longPressMiddleOfElement(
+			editorPage.driver,
+			paragraphBlockElement
+		);
+		await tapSelectAllAboveElement(
+			editorPage.driver,
+			paragraphBlockElement
+		);
 		await tapCopyAboveElement( editorPage.driver, paragraphBlockElement );
 
 		// Create another paragraph block.
@@ -100,8 +118,14 @@ describe( 'Gutenberg Editor paste tests', () => {
 		}
 
 		// Paste into second paragraph block.
-		await longPressMiddleOfElement( editorPage.driver, secondParagraphBlockElement );
-		await tapPasteAboveElement( editorPage.driver, secondParagraphBlockElement );
+		await longPressMiddleOfElement(
+			editorPage.driver,
+			secondParagraphBlockElement
+		);
+		await tapPasteAboveElement(
+			editorPage.driver,
+			secondParagraphBlockElement
+		);
 
 		// Check styled text by verifying html contents.
 		const html = await editorPage.getHtmlContent();
