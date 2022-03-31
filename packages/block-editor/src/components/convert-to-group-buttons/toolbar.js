@@ -45,6 +45,8 @@ function BlockGroupToolbar() {
 
 		if ( newBlocks && newBlocks.length > 0 ) {
 			if ( variation !== 'group' ) {
+				// Because the block is not in the store yet we can't use
+				// updateBlockAttributes so need to manually update attributes.
 				newBlocks[ 0 ].attributes.layout =
 					variationAttributes[ variation ];
 			}
