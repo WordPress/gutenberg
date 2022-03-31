@@ -12,17 +12,20 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 	 */
 	private $old_wp_webfonts;
 
-	function setUp() {
+	public function set_up() {
+		parent::set_up();
+
 		global $wp_webfonts;
 		$this->old_wp_webfonts = $wp_webfonts;
 
 		$wp_webfonts = null;
 	}
 
-	function tearDown() {
+	public function tear_down() {
 		global $wp_webfonts;
 
 		$wp_webfonts = $this->old_wp_webfonts;
+		parent::tear_down();
 	}
 
 	/**
@@ -214,14 +217,16 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 	 * @covers WP_Webfonts::enqueued_font
 	 * @covers WP_Webfonts::get_enqueued_fonts
 	 * @covers WP_Webfonts::get_registered_fonts
+	 *
+	 * @expectedIncorrectUsage WP_Webfonts::enqueue_webfont
 	 */
 	public function test_wp_enqueue_webfont_does_not_enqueue_unregistered_webfont() {
 		$font_family_name = 'Source Serif Pro';
 
 		wp_enqueue_webfont( $font_family_name );
 
-		$this->assertEquals( array(), wp_webfonts()->get_registered_webfonts() );
-		$this->assertEquals( array(), wp_webfonts()->get_enqueued_webfonts() );
+		$this->assertSame( array(), wp_webfonts()->get_registered_webfonts(), 'WP_Webfonts::get_registered_webfonts should return an empty array' );
+		$this->assertSame( array(), wp_webfonts()->get_enqueued_webfonts(), 'WP_Webfonts::get_enqueued_webfonts should return an empty array' );
 	}
 
 	/**
@@ -241,20 +246,77 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers WP:Webfonts::get_font_slug
+	 * @dataProvider data_get_font_slug_when_cannot_determine_fontfamily
+	 * @covers       WP_Webfonts::get_font_slug
+	 *
+	 * @expectedIncorrectUsage WP_Webfonts::get_font_slug
 	 */
-	public function test_get_font_slug() {
-		// Test array without font family property.
-		$this->assertFalse( wp_webfonts()->get_font_slug( array() ) );
+	public function test_get_font_slug_when_cannot_determine_fontfamily( $to_convert ) {
+		$this->assertFalse( wp_webfonts()->get_font_slug( $to_convert ) );
+	}
 
-		// Test $webfont['fontFamily'] returns the correct slug.
-		$this->assertEquals( 'source-serif-pro', wp_webfonts()->get_font_slug( array( 'fontFamily' => 'Source Serif Pro' ) ) );
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_get_font_slug_when_cannot_determine_fontfamily() {
+		return array(
+			'empty array'                     => array( array() ),
+			'array without a font-family key' => array(
+				array(
+					'provider'     => 'local',
+					'font-style'   => 'normal',
+					'font-weight'  => '200 900',
+					'font-display' => 'fallback',
+					'font-stretch' => 'normal',
+					'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+				),
+			),
+			"array with 'font family' key"    => array(
+				array( 'font family' => 'Source Serif Pro' ),
+			),
+			"array with 'Font-Family' key"    => array(
+				array( 'Font-Family' => 'Source Serif Pro' ),
+			),
+			"array with 'FontFamily' key"     => array(
+				array( 'FontFamily' => 'Source Serif Pro' ),
+			),
+		);
+	}
 
-		// Test $webfont['font-family'] returns the correct slug.
-		$this->assertEquals( 'source-serif-pro', wp_webfonts()->get_font_slug( array( 'font-family' => 'Source Serif Pro' ) ) );
+	/**
+	 * @dataProvider data_get_font_slug
+	 * @covers       WP_Webfonts::get_font_slug
+	 */
+	public function test_get_font_slug( $to_convert, $expected ) {
+		$this->assertSame( $expected, wp_webfonts()->get_font_slug( $to_convert ) );
+	}
 
-		// Test a font family name returns the correct slug.
-		$this->assertEquals( 'source-serif-pro', wp_webfonts()->get_font_slug( 'Source Serif Pro' ) );
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_get_font_slug() {
+		return array(
+			"array using 'fontFamily' format"  => array(
+				'to_convert' => array( 'fontFamily' => 'Source Serif Pro' ),
+				'expected'   => 'source-serif-pro',
+			),
+			"array using 'font-family' format" => array(
+				'to_convert' => array( 'font-family' => 'Source Serif Pro' ),
+				'expected'   => 'source-serif-pro',
+			),
+			'string with font family name'     => array(
+				'to_convert' => 'Source Serif Pro',
+				'expected'   => 'source-serif-pro',
+			),
+			'empty string'                     => array(
+				'to_convert' => '',
+				'expected'   => '',
+			),
+		);
 	}
 
 	/**

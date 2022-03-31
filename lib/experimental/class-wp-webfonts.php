@@ -165,7 +165,7 @@ class WP_Webfonts {
 
 		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
 			/* translators: %s unique slug to identify the font family of the webfont */
-			_doing_it_wrong( __FUNCTION__, sprintf( __( 'The "%s" font family is not registered.', 'gutenberg' ), $slug ), '6.0.0' );
+			_doing_it_wrong( __METHOD__, sprintf( __( 'The "%s" font family is not registered.', 'gutenberg' ), $slug ), '6.0.0' );
 
 			return false;
 		}
@@ -191,7 +191,7 @@ class WP_Webfonts {
 			} elseif ( isset( $to_convert['fontFamily'] ) ) {
 				$to_convert = $to_convert['fontFamily'];
 			} else {
-				_doing_it_wrong( __FUNCTION__, __( 'Could not determine the font family name.', 'gutenberg' ), '6.0.0' );
+				_doing_it_wrong( __METHOD__, __( 'Could not determine the font family name.', 'gutenberg' ), '6.0.0' );
 				return false;
 			}
 		}
