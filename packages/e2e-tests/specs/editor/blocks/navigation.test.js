@@ -21,6 +21,7 @@ import {
 	openPreviewPage,
 	ensureSidebarOpened,
 	__experimentalRest as rest,
+	__experimentalBatch as batch,
 	publishPost,
 	createUser,
 	loginUser,
@@ -1265,6 +1266,57 @@ describe( 'Navigation', () => {
 			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
 			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
 			expect( console ).toHaveErrored();
+		} );
+	} );
+
+	describe( 'Auto block empty state', () => {
+		beforeEach( async () => {
+			// Step 1. Create the menu.
+			return rest( {
+				method: 'POST',
+				path: '/wp/v2/navigation',
+				data: {
+					title: 'Example Navigation',
+					content:
+						'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+					status: 'publish',
+				},
+			} );
+		} );
+
+		afterEach( async () => {
+			const navMenusEndpoint = '/wp/v2/navigation';
+			const allNavMenus = await rest( { path: navMenusEndpoint } );
+
+			if ( ! allNavMenus?.length ) {
+				return;
+			}
+
+			return batch(
+				allNavMenus.map( ( menu ) => ( {
+					method: 'DELETE',
+					path: `${ navMenusEndpoint }/${ menu.id }?force=true`,
+				} ) )
+			);
+		} );
+
+		it( 'automatically uses the first Navigation Menu if only one available', async () => {
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			await waitForBlock( 'Navigation' );
+
+			const innerLinkBlock = await waitForBlock( 'Custom Link' );
+
+			const linkText = await innerLinkBlock.$eval(
+				'[aria-label="Navigation link text"]',
+				( element ) => {
+					return element.innerText;
+				}
+			);
+
+			expect( linkText ).toBe( 'WordPress' );
 		} );
 	} );
 } );
