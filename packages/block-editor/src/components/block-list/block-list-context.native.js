@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { orderBy } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { createContext, useContext } from '@wordpress/element';
@@ -7,6 +12,7 @@ export const DEFAULT_BLOCK_LIST_CONTEXT = {
 	scrollRef: null,
 	blocksLayouts: { current: {} },
 	findBlockLayoutByClientId,
+	getBlockLayoutsOrderedByYCoord,
 	findBlockLayoutByPosition,
 	updateBlocksLayouts,
 };
@@ -86,6 +92,21 @@ export function deleteBlockLayoutByClientId( data, clientId ) {
 		}
 		return acc;
 	}, {} );
+}
+
+/**
+ * Orders the block's layout data by its Y coordinate.
+ *
+ * @param {Object} data Blocks layouts object.
+ *
+ * @return {Object} Blocks layouts object ordered by its Y coordinate.
+ */
+function getBlockLayoutsOrderedByYCoord( data ) {
+	// Only enabled for root level blocks.
+	// Using lodash orderBy due to hermes not having
+	// stable support for native .sort(). It will be
+	// supported in the React Native version 0.68.0.
+	return orderBy( data, [ 'y', 'asc' ] );
 }
 
 /**
