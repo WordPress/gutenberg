@@ -112,8 +112,35 @@
 		list-style: none;
 		line-height: inherit;
 
-		.block-editor-default-block-appender__content {
-			display: block;
+		// Handle both group (block), and row/stack (flex).
+		&,
+		.block-editor-default-block-appender__content,
+		.block-editor-inserter {
+			display: inherit;
+			width: 100%;
+			flex-direction: inherit;
+			flex: 1;
+		}
+
+		// Affect Row and Stack variants.
+		// @todo: this should only affect the stack and row setup states.
+		gap: inherit;
+
+		&::after {
+			content: "";
+			display: flex;
+			border: $border-width dashed currentColor;
+			opacity: 0.4;
+			border-radius: $radius-block-ui;
+			flex: 1;
+			pointer-events: none;
+			min-height: $grid-unit-60;
+		}
+
+		// Let the parent be selectable in the placeholder area.
+		pointer-events: none;
+		.block-editor-inserter {
+			pointer-events: all;
 		}
 	}
 }
