@@ -385,6 +385,38 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
+	function test_get_stylesheet_skips_top_level_properties_at_block_level() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'padding'  => true,
+						'blockGap' => true,
+					),
+				),
+				'styles'   => array(
+					'spacing' => array(
+						'padding'  => '1vw',
+						'blockGap' => '1em',
+					),
+					'blocks'  => array(
+						'core/columns' => array(
+							'spacing' => array(
+								'padding'  => '0.5rem',
+								'blockGap' => '24px',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'body { margin: 0; }body{padding: 1vw;--wp--style--block-gap: 1em;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }.wp-site-blocks > * + * { margin-block-start: var( --wp--style--block-gap ); }.wp-block-columns{padding: 0.5rem;}';
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+	}
+
 	function test_get_stylesheet_renders_enabled_protected_properties() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -2253,7 +2285,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'core/group' => array(
 							'spacing' => array(
 								'margin'   => 'valid value',
-								'blockGap' => 'invalid value',
+								'blockGap' => 'valid value',
 							),
 						),
 					),
@@ -2271,7 +2303,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'blocks'  => array(
 					'core/group' => array(
 						'spacing' => array(
-							'margin' => 'valid value',
+							'margin'   => 'valid value',
+							'blockGap' => 'valid value',
 						),
 					),
 				),
