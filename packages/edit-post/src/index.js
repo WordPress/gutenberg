@@ -10,7 +10,6 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import '@wordpress/database-persistence-layer';
 
 /**
  * Internal dependencies
