@@ -162,10 +162,12 @@ export default function createReduxStore( key, options ) {
 			}
 
 			const resolveSelectors = mapResolveSelectors( selectors, store );
+			const suspendSelectors = mapSuspendSelectors( selectors, store );
 
 			const getSelectors = () => selectors;
 			const getActions = () => actions;
 			const getResolveSelectors = () => resolveSelectors;
+			const getSuspendSelectors = () => suspendSelectors;
 
 			// We have some modules monkey-patching the store object
 			// It's wrong to do so but until we refactor all of our effects to controls
@@ -200,6 +202,7 @@ export default function createReduxStore( key, options ) {
 				resolvers,
 				getSelectors,
 				getResolveSelectors,
+				getSuspendSelectors,
 				getActions,
 				subscribe,
 			};
@@ -369,6 +372,42 @@ function mapResolveSelectors( selectors, store ) {
 					if ( hasFinished() ) {
 						unsubscribe();
 						finalize( getResult() );
+					}
+				} );
+			} );
+		};
+	} );
+}
+
+/**
+ * Maps selectors to functions that throw a suspense promise if not yet resolved.
+ *
+ * @param {Object} selectors Selectors to map.
+ * @param {Object} store     The redux store the selectors select from.
+ *
+ * @return {Object} Selectors mapped to their suspense functions.
+ */
+function mapSuspendSelectors( selectors, store ) {
+	return mapValues( selectors, ( selector, selectorName ) => {
+		// Selector without a resolver doesn't have any extra suspense behavior.
+		if ( ! selector.hasResolver ) {
+			return selector;
+		}
+
+		return ( ...args ) => {
+			const result = selector.apply( null, args );
+
+			if ( selectors.hasFinishedResolution( selectorName, args ) ) {
+				return result;
+			}
+
+			throw new Promise( ( resolve ) => {
+				const unsubscribe = store.subscribe( () => {
+					if (
+						selectors.hasFinishedResolution( selectorName, args )
+					) {
+						resolve();
+						unsubscribe();
 					}
 				} );
 			} );
