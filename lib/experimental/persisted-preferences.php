@@ -38,7 +38,7 @@ function gutenberg_configure_persisted_preferences() {
 	$preload_data = get_user_meta( $user_id, $meta_key, true );
 
 	wp_add_inline_script(
-		'wp-database-persistence-layer',
+		'wp-preferences',
 		sprintf(
 			'const { create } = wp.databasePersistenceLayer;
 			const persistenceLayer = create( { preloadedData: %s } );
@@ -62,51 +62,19 @@ add_action( 'init', 'gutenberg_configure_persisted_preferences' );
  * And make the same update to the gutenberg client assets file here:
  * https://github.com/WordPress/gutenberg/blob/3f3c8df23c70a37b7ac4dddebc82030362133593/lib/client-assets.php#L242-L254
  *
- * The update should be something like this:
+ * The update should be adding a new case like this like this:
  * ```
- * case 'wp-database-persistence-layer':
- *     array_push( $dependencies, 'wp-data', 'wp-preferences' );
- *     break;
- * case 'wp-edit-post':
- *     array_push( $dependencies, // ... other deps, 'wp-database-persistence-layer' );
- *     break;
- * case 'wp-edit-site':
- *     array_push( $dependencies, // ... other deps, 'wp-database-persistence-layer' );
- *     break;
- * case 'wp-edit-widgets':
- *     array_push( $dependencies, // ... other deps, 'wp-database-persistence-layer' );
- *     break;
- * case 'wp-customize-widgets':
- *     array_push( $dependencies, // ... other deps, 'wp-database-persistence-layer' );
+ * case 'wp-preferences':
+ *     array_push( $dependencies, 'wp-database-persistence-layer' );
  *     break;
  * ```
  *
  * @param WP_Scripts $scripts An instance of WP_Scripts.
  */
 function gutenberg_update_database_persistence_layer_deps( $scripts ) {
-	$persistence_script = $scripts->query( 'wp-database-persistence-layer', 'registered' );
+	$persistence_script = $scripts->query( 'wp-preferences', 'registered' );
 	if ( isset( $persistence_script->deps ) ) {
-		array_push( $persistence_script->deps, 'wp-data', 'wp-preferences' );
-	}
-
-	$edit_post_script = $scripts->query( 'wp-edit-post', 'registered' );
-	if ( isset( $edit_post_script->deps ) ) {
-		array_push( $edit_post_script->deps, 'wp-database-persistence-layer' );
-	}
-
-	$edit_site_script = $scripts->query( 'wp-edit-site', 'registered' );
-	if ( isset( $edit_site_script->deps ) ) {
-		array_push( $edit_site_script->deps, 'wp-database-persistence-layer' );
-	}
-
-	$edit_widgets_script = $scripts->query( 'wp-edit-widgets', 'registered' );
-	if ( isset( $edit_widgets_script->deps ) ) {
-		array_push( $edit_widgets_script->deps, 'wp-database-persistence-layer' );
-	}
-
-	$customize_widgets_script = $scripts->query( 'wp-customize-widgets', 'registered' );
-	if ( isset( $customize_widgets_script->deps ) ) {
-		array_push( $customize_widgets_script->deps, 'wp-database-persistence-layer' );
+		array_push( $persistence_script->deps, 'wp-database-persistence-layer' );
 	}
 }
 
