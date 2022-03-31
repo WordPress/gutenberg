@@ -7,7 +7,7 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { isRTL, __ } from '@wordpress/i18n';
+import { isRTL, __, _x } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { ToolbarButton } from '@wordpress/components';
 import {
@@ -24,6 +24,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import {
 	useEnter,
 	useBackspace,
+	useSpace,
 	useIndentListItem,
 	useOutdentListItem,
 } from './hooks';
@@ -45,6 +46,7 @@ function IndentUI( { clientId } ) {
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
 				title={ __( 'Indent' ) }
 				describedBy={ __( 'Indent list item' ) }
+				shortcut={ _x( 'Space', 'keyboard key' ) }
 				isDisabled={ ! canIndent }
 				onClick={ indentListItem }
 			/>
@@ -67,11 +69,16 @@ export default function ListItemEdit( {
 	} );
 	const useEnterRef = useEnter( { content, clientId } );
 	const useBackspaceRef = useBackspace( { clientId } );
+	const useSpaceRef = useSpace( clientId );
 	return (
 		<>
 			<li { ...innerBlocksProps }>
 				<RichText
-					ref={ useMergeRefs( [ useEnterRef, useBackspaceRef ] ) }
+					ref={ useMergeRefs( [
+						useEnterRef,
+						useBackspaceRef,
+						useSpaceRef,
+					] ) }
 					identifier="content"
 					tagName="div"
 					onChange={ ( nextContent ) =>
