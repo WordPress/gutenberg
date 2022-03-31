@@ -44,10 +44,10 @@ function BlockGroupToolbar() {
 		);
 
 		if ( newBlocks && newBlocks.length > 0 ) {
-			newBlocks[ 0 ].attributes.layout =
-				variation !== 'group'
-					? variationAttributes[ variation ]
-					: undefined;
+			if ( variation !== 'group' ) {
+				newBlocks[ 0 ].attributes.layout =
+					variationAttributes[ variation ];
+			}
 			replaceBlocks( clientIds, newBlocks );
 		}
 	};
