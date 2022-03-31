@@ -28,7 +28,6 @@ function gutenberg_register_layout_support( $block_type ) {
 /**
  * Generates the CSS corresponding to the provided layout.
  *
- * @param string  $block_name                    Name of the current block.
  * @param string  $selector                      CSS selector.
  * @param array   $layout                        Layout object. The one that is passed has already checked the existence of default block layout.
  * @param boolean $has_block_gap_support         Whether the theme has support for the block gap.
@@ -37,19 +36,8 @@ function gutenberg_register_layout_support( $block_type ) {
  *
  * @return string                                CSS style.
  */
-function gutenberg_get_layout_style( $block_name, $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false ) {
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
-
-	// If there is no block-level value for blockGap,
-	// but a global styles value available for blockGap,
-	// use the latter.
-	if ( $has_block_gap_support && empty( $gap_value ) ) {
-		$block_global_styles = gutenberg_get_global_styles( array( 'blocks', $block_name, 'spacing' ) );
-
-		if ( isset( $block_global_styles['blockGap'] ) && ! empty( $block_global_styles['blockGap'] ) ) {
-			$gap_value = $block_global_styles['blockGap'];
-		}
-	}
 
 	$style = '';
 	if ( 'default' === $layout_type ) {
@@ -185,6 +173,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$class_name = wp_unique_id( 'wp-container-' );
 	$gap_value  = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+
+	// If there is no block-level value for blockGap,
+	// but a global styles value available for blockGap,
+	// use the latter.
+	if ( empty( $gap_value ) ) {
+		$spacing_global_styles = gutenberg_get_global_styles( array( 'blocks', $block['blockName'], 'spacing' ) );
+		if ( isset( $spacing_global_styles['blockGap'] ) && ! empty( $spacing_global_styles['blockGap'] ) ) {
+			$gap_value = $spacing_global_styles['blockGap'];
+		}
+	}
+
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
@@ -199,7 +198,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.
 	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( $block['blockName'], ".$class_name", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization );
+	$style                         = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(

@@ -447,9 +447,9 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 	 * )
 	 * ```
 	 *
-	 * @param array $styles Styles to process.
-	 * @param array $settings Theme settings.
-	 * @param array $properties Properties metadata.
+	 * @param array       $styles Styles to process.
+	 * @param array       $settings Theme settings.
+	 * @param array       $properties Properties metadata.
 	 * @param string|null $selector Current selector.
 	 * @return array Returns the modified $declarations.
 	 */
