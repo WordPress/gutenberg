@@ -7,7 +7,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import reducer from '../reducer';
-import { createNotice, removeNotice } from '../actions';
+import { createNotice, removeNotice, removeNotices } from '../actions';
 import { getNotices } from '../selectors';
 import { DEFAULT_CONTEXT } from '../constants';
 
@@ -111,6 +111,23 @@ describe( 'reducer', () => {
 		const id = getNotices( original )[ 0 ].id;
 
 		const state = reducer( original, removeNotice( id ) );
+
+		expect( state ).toEqual( {
+			[ DEFAULT_CONTEXT ]: [],
+		} );
+	} );
+
+	it( 'should omit several removed notices', () => {
+		const action = createNotice( 'error', 'save error' );
+		const action2 = createNotice( 'error', 'second error' );
+		const stateWithOneNotice = reducer( undefined, action );
+		const original = deepFreeze( reducer( stateWithOneNotice, action2 ) );
+		const ids = [
+			getNotices( original )[ 0 ].id,
+			getNotices( original )[ 1 ].id,
+		];
+
+		const state = reducer( original, removeNotices( ids ) );
 
 		expect( state ).toEqual( {
 			[ DEFAULT_CONTEXT ]: [],
