@@ -43,7 +43,9 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
-		}
+		} else {
+			await editorPage.clickParagraphBlockAtPosition( 2 )
+		};
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
