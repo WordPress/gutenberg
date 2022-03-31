@@ -194,7 +194,7 @@ export function CreatePageForm( { onSaveFinished, onCancel } ) {
 }
 ```
 
-There is one more detail to address: our newly created pages are not yet picked up by the `PagesList`. Accordingly to the REST API documentation,  the `/wp/v2/pages` endpoint creates pages with `status=draft` by default, but returns pages with `status=publish`. The solution is to pass the `status` parameter explicitly:
+There is one more detail to address: our newly created pages are not yet picked up by the `PagesList`. Accordingly to the REST API documentation,  the `/wp/v2/pages` endpoint creates (`POST` requests) pages with `status=draft` by default, but _returns_ (`GET` requests) pages with `status=publish`. The solution is to pass the `status` parameter explicitly:
 
 ```js
 export function CreatePageForm( { onSaveFinished, onCancel } ) {
