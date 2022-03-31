@@ -117,23 +117,6 @@ describe( 'reducer', () => {
 		} );
 	} );
 
-	it( 'should omit several removed notices', () => {
-		const action = createNotice( 'error', 'save error' );
-		const action2 = createNotice( 'error', 'second error' );
-		const stateWithOneNotice = reducer( undefined, action );
-		const original = deepFreeze( reducer( stateWithOneNotice, action2 ) );
-		const ids = [
-			getNotices( original )[ 0 ].id,
-			getNotices( original )[ 1 ].id,
-		];
-
-		const state = reducer( original, removeNotices( ids ) );
-
-		expect( state ).toEqual( {
-			[ DEFAULT_CONTEXT ]: [],
-		} );
-	} );
-
 	it( 'should omit a removed notice by context', () => {
 		const action = createNotice( 'error', 'save error', {
 			context: 'foo',
@@ -154,6 +137,44 @@ describe( 'reducer', () => {
 		const id = getNotices( original )[ 0 ].id;
 
 		const state = reducer( original, removeNotice( id, 'foo' ) );
+
+		expect( state[ DEFAULT_CONTEXT ] ).toHaveLength( 1 );
+	} );
+
+	it( 'should omit several removed notices', () => {
+		const action = createNotice( 'error', 'save error' );
+		const action2 = createNotice( 'error', 'second error' );
+		const stateWithOneNotice = reducer( undefined, action );
+		const original = deepFreeze( reducer( stateWithOneNotice, action2 ) );
+		const ids = [
+			getNotices( original )[ 0 ].id,
+			getNotices( original )[ 1 ].id,
+		];
+
+		const state = reducer( original, removeNotices( ids ) );
+
+		expect( state ).toEqual( {
+			[ DEFAULT_CONTEXT ]: [],
+		} );
+	} );
+
+	it( 'should omit several removed notices across contexts', () => {
+		const action = createNotice( 'error', 'save error' );
+		const action2 = createNotice( 'error', 'second error', {
+			context: 'foo',
+		} );
+		const action3 = createNotice( 'error', 'third error', {
+			context: 'foo',
+		} );
+		const stateWithOneNotice = reducer( undefined, action );
+		const stateWithTwoNotices = reducer( stateWithOneNotice, action2 );
+		const original = deepFreeze( reducer( stateWithTwoNotices, action3 ) );
+		const ids = [
+			getNotices( original, 'foo' )[ 0 ].id,
+			getNotices( original, 'foo' )[ 1 ].id,
+		];
+
+		const state = reducer( original, removeNotices( ids, 'foo' ) );
 
 		expect( state[ DEFAULT_CONTEXT ] ).toHaveLength( 1 );
 	} );
