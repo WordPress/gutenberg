@@ -34,7 +34,7 @@ const TOGGLE_GROUP_CONTROL_PROPS = {
 };
 
 // Using Object.assign to avoid creating circular references when emitting
-// TypeScript type declarations
+// TypeScript type declarations.
 export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
