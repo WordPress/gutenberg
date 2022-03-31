@@ -43,25 +43,15 @@ function withPersistenceLayer( reducer ) {
 	let persistenceLayer;
 
 	return ( state, action ) => {
-		const nextState = reducer( state, action );
-
+		// Setup the persistence layer, and return the persisted data
+		// as the state.
 		if ( action.type === 'SET_PERSISTENCE_LAYER' ) {
 			const { persistenceLayer: persistence, persistedData } = action;
-
 			persistenceLayer = persistence;
-
-			// TODO - is this the best strategy?
-			// Handle any changes to state that may have ocurred before
-			// preferences were loaded.
-			const mergedState = {
-				...persistedData,
-				...nextState,
-			};
-			persistenceLayer?.set( mergedState );
-
-			return mergedState;
+			return persistedData;
 		}
 
+		const nextState = reducer( state, action );
 		if ( action.type === 'SET_PREFERENCE_VALUE' ) {
 			persistenceLayer?.set( nextState );
 		}
