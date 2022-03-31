@@ -110,6 +110,8 @@ export default function Header( {
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
 				<div className="edit-site-header__toolbar">
+					<PinnedItems.Slot scope="core/edit-global" />
+
 					<Button
 						ref={ inserterButton }
 						variant="primary"

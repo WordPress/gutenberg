@@ -64,15 +64,6 @@ body.is-navigation-sidebar-open {
 .edit-site-header__toolbar {
 	display: flex;
 	align-items: center;
-	padding-left: $grid-unit-20 + 170;
-
-	@include break-small() {
-		padding-left: $grid-unit-20 + 170;
-	}
-
-	@include break-wide() {
-		padding-right: $grid-unit-10 + 170;
-	}
 
 	.edit-site-header-toolbar__inserter-toggle {
 		margin-right: $grid-unit-10;
@@ -89,6 +80,22 @@ body.is-navigation-sidebar-open {
 		&.is-pressed {
 			svg {
 				transform: rotate(45deg);
+			}
+		}
+	}
+
+	.interface-pinned-items {
+		align-items: center;
+		background: $black;
+		height: $header-height + 2;
+		margin-right: $grid-unit-20;
+		padding-right: $grid-unit-20;
+
+		button {
+			color: $white;
+
+			&:active: {
+				color: $grey-90;
 			}
 		}
 	}

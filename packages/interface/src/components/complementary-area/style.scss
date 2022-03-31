@@ -1,7 +1,6 @@
 .interface-complementary-area {
 	background: $white;
 	color: $gray-900;
-	margin-top: $header-height;
 
 	@include break-small() {
 		-webkit-overflow-scrolling: touch;

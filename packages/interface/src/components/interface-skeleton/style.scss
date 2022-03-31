@@ -11,8 +11,6 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton {
-	display: flex;
-	flex-direction: row;
 	height: auto;
 	max-height: 100%;
 
@@ -41,6 +39,11 @@ html.interface-interface-skeleton__html-container {
 }
 
 @include editor-left(".interface-interface-skeleton");
+
+.interface-interface-skeleton__wrapper {
+	display: flex;
+	height: 100%;
+}
 
 .interface-interface-skeleton__body {
 	flex-grow: 1;
@@ -180,6 +183,6 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__drawer {
-	//background: $gray-900;
+	background: $gray-900;
 	display: flex;
 }

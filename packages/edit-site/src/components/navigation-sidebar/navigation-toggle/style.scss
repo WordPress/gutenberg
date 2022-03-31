@@ -6,10 +6,10 @@
 	background: $black;
 	border-radius: 0;
 	display: flex;
-	position: absolute;
+	margin-right: $grid-unit-20;
+	padding-right: $grid-unit-20;
 	z-index: z-index(".edit-site-navigation-toggle");
 	height: $header-height;
-	width: $header-height + 94px;
 
 	button {
 		color: $white;

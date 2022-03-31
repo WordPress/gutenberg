@@ -88,6 +88,7 @@ function ComplementaryArea( {
 	header,
 	headerClassName,
 	icon,
+	iconSize,
 	isPinnable = true,
 	panelClassName,
 	scope,
@@ -148,6 +149,7 @@ function ComplementaryArea( {
 							aria-expanded={ isActive }
 							label={ title }
 							icon={ showIconLabels ? check : icon }
+							iconSize={ iconSize }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
 						/>

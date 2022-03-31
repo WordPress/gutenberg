@@ -12,6 +12,7 @@ export default function DefaultSidebar( {
 	identifier,
 	title,
 	icon,
+	iconSize,
 	children,
 	closeLabel,
 	header,
@@ -26,6 +27,7 @@ export default function DefaultSidebar( {
 				identifier={ identifier }
 				title={ title }
 				icon={ icon }
+				iconSize={ iconSize }
 				closeLabel={ closeLabel }
 				header={ header }
 				headerClassName={ headerClassName }
