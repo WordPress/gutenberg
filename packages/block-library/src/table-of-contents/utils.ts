@@ -41,9 +41,9 @@ export function linearToNestedHeadingList(
 				headingList[ key + 1 ] !== undefined &&
 				headingList[ key + 1 ].level > heading.level
 			) {
-				// We need to calculate the last index before the next iteration that has the same level (siblings).
-				// We then use this last index to slice the array for use in recursion.
-				// This prevents duplicate nodes.
+				// We must calculate the last index before the next iteration that
+				// has the same level (siblings). We then use this index to slice
+				// the array for use in recursion. This prevents duplicate nodes.
 				let endOfSlice = headingList.length;
 				for ( let i = key + 1; i < headingList.length; i++ ) {
 					if ( headingList[ i ].level === heading.level ) {
@@ -52,7 +52,8 @@ export function linearToNestedHeadingList(
 					}
 				}
 
-				// We found a child node: Push a new node onto the return array with children.
+				// We found a child node: Push a new node onto the return array
+				// with children.
 				nestedHeadingList.push( {
 					heading,
 					children: linearToNestedHeadingList(

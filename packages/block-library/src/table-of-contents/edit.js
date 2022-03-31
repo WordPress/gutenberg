@@ -67,11 +67,19 @@ export default function TableOfContentsEdit( {
 	} = useDispatch( blockEditorStore );
 
 	/**
-	 * The latest heading data, or null if the new data deeply equals the saved headings attribute.
+	 * The latest heading data, or null if the new data deeply equals the saved
+	 * headings attribute.
 	 *
-	 * Since useSelect forces a re-render when its return value is shallowly inequal to its prior call, we would be re-rendering this block every time the stores change, even if the latest headings were deeply equal to the ones saved in the block attributes.
+	 * Since useSelect forces a re-render when its return value is shallowly
+	 * inequal to its prior call, we would be re-rendering this block every time
+	 * the stores change, even if the latest headings were deeply equal to the
+	 * ones saved in the block attributes.
 	 *
-	 * By returning null when they're equal, we reduce that to 2 renders: one when there are new latest headings (and so it returns them), and one when they haven't changed (so it returns null). As long as the latest heading data remains the same, further calls of the useSelect callback will continue to return null, thus preventing any forced re-renders.
+	 * By returning null when they're equal, we reduce that to 2 renders: one
+	 * when there are new latest headings (and so it returns them), and one when
+	 * they haven't changed (so it returns null). As long as the latest heading
+	 * data remains the same, further calls of the useSelect callback will
+	 * continue to return null, thus preventing any forced re-renders.
 	 */
 	const latestHeadings = useSelect(
 		( select ) => {
@@ -84,7 +92,11 @@ export default function TableOfContentsEdit( {
 				__experimentalGetGlobalBlocksByName: getGlobalBlocksByName,
 			} = select( blockEditorStore );
 
-			// Disable reason: blocks can be loaded into a *non-post* block editor, so to avoid declaring @wordpress/editor as a dependency, we must access its store by string. When the store is not available, editorSelectors will be null, and the block's saved markup will lack permalinks.
+			// Disable reason: blocks can be loaded into a *non-post* block
+			// editor, so to avoid declaring @wordpress/editor as a dependency, we
+			// must access its store by string. When the store is not available,
+			// editorSelectors will be null, and the block's saved markup will
+			// lack permalinks.
 			// eslint-disable-next-line @wordpress/data-no-store-string-literals
 			const editorSelectors = select( 'core/editor' );
 
@@ -94,7 +106,9 @@ export default function TableOfContentsEdit( {
 
 			const tocIndex = getBlockIndex( clientId );
 
-			// Calculate the page (of a paginated post) this Table of Contents block is part of. Note that pageBreakClientIds may not be in the order they appear on the page, so we have to iterate over all of them.
+			// Calculate the page (of a paginated post) this block is part of.
+			// Note that pageBreakClientIds may not be in the order they appear on
+			// the page, so we have to iterate over all of them.
 			let tocPage = 1;
 			for ( const pageBreakClientId of pageBreakClientIds ) {
 				if ( tocIndex > getBlockIndex( pageBreakClientId ) ) {
@@ -102,7 +116,9 @@ export default function TableOfContentsEdit( {
 				}
 			}
 
-			// Get the top-level block client ids, and add them and the client ids of their children to an ordered list. We don't use getClientIdsWithDescendants because it returns ids in the wrong order.
+			// Get the top-level block client ids, and add them and the client ids
+			// of their children to an ordered list. We don't use
+			// getClientIdsWithDescendants since it returns ids in the wrong order.
 			const allBlockClientIds = [];
 			for ( const blockClientId of getBlockOrder() ) {
 				allBlockClientIds.push(
@@ -116,12 +132,17 @@ export default function TableOfContentsEdit( {
 			/** The page (of a paginated post) a heading will be part of. */
 			let headingPage = 1;
 
-			/** If the core/editor store is available, we can add permalinks to the generated table of contents. This variable will be a link to current post including pagination query if necessary. */
+			/**
+			 * If the core/editor store is available, we can add permalinks to the
+			 * generated table of contents. This variable will be a link to
+			 * current post including pagination query if necessary.
+			 */
 			const permalink = editorSelectors?.getPermalink() ?? null;
 
 			let headingPageLink = null;
 
-			// If the core/editor store is available, we can add permalinks to the generated table of contents.
+			// If the core/editor store is available, we can add permalinks to the
+			// generated table of contents.
 			if ( typeof permalink === 'string' ) {
 				headingPageLink = isPaginated
 					? addQueryArgs( permalink, { page: headingPage } )
@@ -185,7 +206,8 @@ export default function TableOfContentsEdit( {
 
 	useEffect( () => {
 		if ( latestHeadings !== null ) {
-			// This is required to keep undo working and not create 2 undo steps for each heading change.
+			// This is required to keep undo working and not create 2 undo steps
+			// for each heading change.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { headings: latestHeadings } );
 		}
