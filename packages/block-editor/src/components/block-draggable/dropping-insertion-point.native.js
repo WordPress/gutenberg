@@ -18,7 +18,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { useBlockListContext } from './block-list-context';
+import { useBlockListContext } from '../block-list/block-list-context';
 import styles from './dropping-insertion-point.scss';
 
 /**

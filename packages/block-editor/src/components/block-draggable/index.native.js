@@ -28,7 +28,7 @@ import useScrollWhenDragging from './use-scroll-when-dragging';
 import DraggableChip from './draggable-chip';
 import { store as blockEditorStore } from '../../store';
 import { useBlockListContext } from '../block-list/block-list-context';
-import DroppingInsertionPoint from '../block-list/dropping-insertion-point';
+import DroppingInsertionPoint from './dropping-insertion-point';
 import useBlockDropZone from '../use-block-drop-zone';
 import styles from './style.scss';
 
