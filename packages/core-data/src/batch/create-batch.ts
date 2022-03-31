@@ -9,6 +9,38 @@ import { isFunction, zip } from 'lodash';
 import defaultProcessor from './default-processor';
 
 /**
+ * WordPress dependencies
+ */
+import type { APIFetchOptions } from '@wordpress/api-fetch';
+
+export interface BatchResponse< Data = unknown > {
+	output?: Data;
+	error?: unknown;
+}
+
+export type WrappedResponse< ReturnData extends any[] > = {
+	[ Index in keyof ReturnData ]: BatchResponse< ReturnData[ Index ] >;
+};
+
+export interface BatchProcessor {
+	< ReturnData extends any[] >( requests: APIFetchOptions[] ): Promise<
+		WrappedResponse< ReturnData >
+	>;
+}
+
+interface APIFetchOptionsProducer {
+	< Data, Result = Promise< Data > >(
+		add: ( input: APIFetchOptions ) => Result
+	): Result;
+}
+
+interface BatchItem< Data > {
+	input: APIFetchOptions;
+	resolve( value: Data ): void;
+	reject( error: unknown ): void;
+}
+
+/**
  * Creates a batch, which can be used to combine multiple API requests into one
  * API request using the WordPress batch processing API (/v1/batch).
  *
@@ -34,26 +66,24 @@ import defaultProcessor from './default-processor';
  * }
  * ```
  *
- * @param {Function} [processor] Processor function. Can be used to replace the
- *                               default functionality which is to send an API
- *                               request to /v1/batch. Is given an array of
- *                               inputs and must return a promise that
- *                               resolves to an array of objects containing
- *                               either `output` or `error`.
+ * @param processor Processor function. Can be used to replace the default
+ *                  functionality which is to send an API request to /v1/batch.
+ *                  Given an array of api request descriptions and resolves an
+ *                  array of objects containing either `output` or `error`.
  */
-export default function createBatch( processor = defaultProcessor ) {
+export default function createBatch< ReturnData extends any[] >(
+	processor: BatchProcessor = defaultProcessor
+) {
 	let lastId = 0;
-	/** @type {Array<{ input: any; resolve: ( value: any ) => void; reject: ( error: any ) => void }>} */
-	let queue = [];
-	const pending = new ObservableSet();
+	let queue: BatchItem< ReturnData[ number ] >[] = [];
+	const pending = new ObservableSet< number >();
 
 	return {
 		/**
-		 * Adds an input to the batch and returns a promise that is resolved or
-		 * rejected when the input is processed by `batch.run()`.
+		 * Adds an API request to the batch and returns a promise that is
+		 * resolved or rejected when the input is processed by `batch.run()`.
 		 *
-		 * You may also pass a thunk which allows inputs to be added
-		 * asychronously.
+		 * You may also pass a thunk for adding API requests asynchronously.
 		 *
 		 * ```
 		 * // Both are allowed:
@@ -67,44 +97,49 @@ export default function createBatch( processor = defaultProcessor ) {
 		 * - The thunk returns a promise and that promise resolves, or;
 		 * - The thunk returns a non-promise.
 		 *
-		 * @param {any|Function} inputOrThunk Input to add or thunk to execute.
+		 * @param  fetchOptionsProducer Input to add or thunk to execute.
 		 *
-		 * @return {Promise|any} If given an input, returns a promise that
-		 *                       is resolved or rejected when the batch is
-		 *                       processed. If given a thunk, returns the return
-		 *                       value of that thunk.
+		 * @return                      If given an input, returns a promise that
+		 *                              is resolved or rejected when the batch is
+		 *                              processed. If given a thunk, returns the return
+		 *                              value of that thunk.
 		 */
-		add( inputOrThunk ) {
+		add< Data >(
+			fetchOptionsProducer: APIFetchOptions | APIFetchOptionsProducer
+		): Promise< Data > {
 			const id = ++lastId;
 			pending.add( id );
 
-			const add = ( input ) =>
+			const queueForResolution = (
+				fetchOptions: APIFetchOptions
+			): Promise< Data > =>
 				new Promise( ( resolve, reject ) => {
 					queue.push( {
-						input,
+						input: fetchOptions,
 						resolve,
 						reject,
 					} );
 					pending.delete( id );
 				} );
 
-			if ( isFunction( inputOrThunk ) ) {
-				return Promise.resolve( inputOrThunk( add ) ).finally( () => {
+			if ( isFunction( fetchOptionsProducer ) ) {
+				return Promise.resolve(
+					fetchOptionsProducer< Data >( queueForResolution )
+				).finally( () => {
 					pending.delete( id );
 				} );
 			}
 
-			return add( inputOrThunk );
+			return queueForResolution( fetchOptionsProducer );
 		},
 
 		/**
 		 * Runs the batch. This calls `batchProcessor` and resolves or rejects
 		 * all promises returned by `add()`.
 		 *
-		 * @return {Promise<boolean>} A promise that resolves to a boolean that is true
-		 *                   if the processor returned no errors.
+		 * @return Resolves whether the processor succeeded without error.
 		 */
-		async run() {
+		async run(): Promise< boolean > {
 			if ( pending.size ) {
 				await new Promise( ( resolve ) => {
 					const unsubscribe = pending.subscribe( () => {
@@ -138,13 +173,7 @@ export default function createBatch( processor = defaultProcessor ) {
 
 			let isSuccess = true;
 
-			for ( const pair of zip( results, queue ) ) {
-				/** @type {{error?: unknown, output?: unknown}} */
-				const result = pair[ 0 ];
-
-				/** @type {{resolve: (value: any) => void; reject: (error: any) => void} | undefined} */
-				const queueItem = pair[ 1 ];
-
+			for ( const [ result, queueItem ] of zip( results, queue ) ) {
 				if ( result?.error ) {
 					queueItem?.reject( result.error );
 					isSuccess = false;
@@ -160,9 +189,12 @@ export default function createBatch( processor = defaultProcessor ) {
 	};
 }
 
-class ObservableSet {
-	constructor( ...args ) {
-		this.set = new Set( ...args );
+class ObservableSet< T > {
+	private set: Set< T >;
+	private subscribers: Set< () => void >;
+
+	constructor( ...args: T[] ) {
+		this.set = new Set( args );
 		this.subscribers = new Set();
 	}
 
@@ -170,19 +202,19 @@ class ObservableSet {
 		return this.set.size;
 	}
 
-	add( value ) {
+	add( value: T ) {
 		this.set.add( value );
 		this.subscribers.forEach( ( subscriber ) => subscriber() );
 		return this;
 	}
 
-	delete( value ) {
+	delete( value: T ) {
 		const isSuccess = this.set.delete( value );
 		this.subscribers.forEach( ( subscriber ) => subscriber() );
 		return isSuccess;
 	}
 
-	subscribe( subscriber ) {
+	subscribe( subscriber: () => void ) {
 		this.subscribers.add( subscriber );
 		return () => {
 			this.subscribers.delete( subscriber );
