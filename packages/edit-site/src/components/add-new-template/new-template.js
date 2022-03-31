@@ -24,6 +24,7 @@ import {
 	media,
 	notFound,
 	page,
+	plus,
 	post,
 	postAuthor,
 	postDate,
@@ -149,14 +150,14 @@ export default function NewTemplate( { postType } ) {
 	return (
 		<DropdownMenu
 			className="edit-site-new-template-dropdown"
-			icon={ null }
-			text={ postType.labels.add_new }
+			icon={ plus }
+			text=""
 			label={ postType.labels.add_new_item }
 			popoverProps={ {
 				noArrow: false,
 			} }
 			toggleProps={ {
-				variant: 'primary',
+				isLink: true,
 			} }
 		>
 			{ () => (

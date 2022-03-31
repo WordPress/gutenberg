@@ -12,6 +12,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,7 +20,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useHistory } from '../routes';
 import CreateTemplatePartModal from '../create-template-part-modal';
 
-export default function NewTemplatePart( { postType } ) {
+export default function NewTemplatePart() {
 	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -78,13 +79,12 @@ export default function NewTemplatePart( { postType } ) {
 	return (
 		<>
 			<Button
-				variant="primary"
+				isLink={ true }
+				icon={ plus }
 				onClick={ () => {
 					setIsModalOpen( true );
 				} }
-			>
-				{ postType.labels.add_new }
-			</Button>
+			/>
 			{ isModalOpen && (
 				<CreateTemplatePartModal
 					closeModal={ () => setIsModalOpen( false ) }

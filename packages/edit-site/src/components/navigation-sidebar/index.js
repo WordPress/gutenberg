@@ -16,7 +16,6 @@ import TemplatesSidebar from './templates-sidebar';
 import PartsSidebar from './parts-sidebar';
 import NavigationMenuSidebar from './navigation-menu-sidebar';
 
-
 export const {
 	Fill: NavigationPanelPreviewFill,
 	Slot: NavigationPanelPreviewSlot,

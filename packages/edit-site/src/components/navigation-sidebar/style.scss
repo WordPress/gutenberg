@@ -74,6 +74,7 @@
 .edit-site-global-styles-sidebar .edit-site-global-styles-sidebar__navigator-provider,
 .edit-site-global-styles-sidebar .components-card__body,
 .edit-site-global-styles-sidebar .components-card,
+.edit-site-global-styles-sidebar .components-button,
 .edit-site-global-styles-sidebar .components-flex-item,
 .edit-site-global-styles-sidebar .components-heading {
 	background: $gray-900;
@@ -93,6 +94,10 @@
 	a {
 		color: $white;
 		text-decoration: none;
+	}
+
+	.components-button {
+		color: $gray-100;
 	}
 }
 
