@@ -36,11 +36,7 @@ function BackgroundColorItem( { name, parentMenu } ) {
 			<HStack justify="flex-start">
 				<ColorIndicator
 					colorValue={ gradientValue ?? backgroundColor }
-					// TODO:
-					// - move to SCSS code + classname
-					// - consider using grid scss variables
-					// - consider adding a size prop to `ColorIndicator` ?
-					style={ { marginTop: '2px', marginBottom: '2px' } }
+					className="edit-site-global-styles__color-indicator-with-margin"
 				/>
 				<FlexItem>{ __( 'Background' ) }</FlexItem>
 			</HStack>
@@ -62,11 +58,7 @@ function TextColorItem( { name, parentMenu } ) {
 			<HStack justify="flex-start">
 				<ColorIndicator
 					colorValue={ color }
-					// TODO:
-					// - move to SCSS code + classname
-					// - consider using grid scss variables
-					// - consider adding a size prop to `ColorIndicator` ?
-					style={ { marginTop: '2px', marginBottom: '2px' } }
+					className="edit-site-global-styles__color-indicator-with-margin"
 				/>
 				<FlexItem>{ __( 'Text' ) }</FlexItem>
 			</HStack>
@@ -88,11 +80,7 @@ function LinkColorItem( { name, parentMenu } ) {
 			<HStack justify="flex-start">
 				<ColorIndicator
 					colorValue={ color }
-					// TODO:
-					// - move to SCSS code + classname
-					// - consider using grid scss variables
-					// - consider adding a size prop to `ColorIndicator` ?
-					style={ { marginTop: '2px', marginBottom: '2px' } }
+					className="edit-site-global-styles__color-indicator-with-margin"
 				/>
 				<FlexItem>{ __( 'Links' ) }</FlexItem>
 			</HStack>

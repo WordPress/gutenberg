@@ -93,3 +93,9 @@
 	}
 }
 
+.edit-site-global-styles__color-indicator-with-margin {
+	// Add 4px to compensate for the fact that `ColorIndicator` has a height
+	// of 20px, while all other icons have a height of 24px.
+	margin-top: $grid-unit * 0.25;
+	margin-bottom: $grid-unit * 0.25;
+}

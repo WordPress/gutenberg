@@ -63,19 +63,12 @@ function Palette( { name } ) {
 							colors.length === 0 ? 'row-reverse' : 'row'
 						}
 					>
-						<ZStack
-							isLayered={ false }
-							offset={ -8 }
-							// TODO:
-							// - move to SCSS code + classname
-							// - consider using grid scss variables
-							// - consider adding a size prop to `ColorIndicator` ?
-							style={ { marginTop: '2px', marginBottom: '2px' } }
-						>
+						<ZStack isLayered={ false } offset={ -8 }>
 							{ colors.slice( 0, 5 ).map( ( { color } ) => (
 								<ColorIndicator
 									key={ color }
 									colorValue={ color }
+									className="edit-site-global-styles__color-indicator-with-margin"
 								/>
 							) ) }
 						</ZStack>
