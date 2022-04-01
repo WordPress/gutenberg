@@ -51,7 +51,8 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 			foreach ( $nested_html_files as $path => $file ) {
 				$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
 				if ( is_array( $decoded_file ) ) {
-					$variation  = ( new WP_Theme_JSON_Gutenberg( $decoded_file ) )->get_raw_data();
+					$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
+					$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
 					if ( empty( $variation['title'] ) ) {
 						$variation['title'] = basename( $path, '.json' );
 					}
