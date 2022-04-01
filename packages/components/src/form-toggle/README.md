@@ -62,7 +62,7 @@ const MyFormToggle = () => {
 
 	<FormToggle
 		checked={ isChecked }
-		onChange={ () => setIsChecked( ( state ) => ! state ) }
+		onChange={ () => setChecked( ( state ) => ! state ) }
 	/>
 };
 ```
