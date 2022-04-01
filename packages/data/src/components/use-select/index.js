@@ -127,10 +127,10 @@ export default function useSelect( mapSelect, deps ) {
 	// Keep track of the stores being selected in the _mapSelect function,
 	// and only subscribe to those stores later.
 	const listeningStores = useRef( [] );
-	const trapSelect = useCallback(
+	const wrapSelect = useCallback(
 		( callback ) =>
 			registry.__experimentalMarkListeningStores(
-				callback,
+				() => callback( registry.select, registry ),
 				listeningStores
 			),
 		[ registry ]
@@ -150,9 +150,7 @@ export default function useSelect( mapSelect, deps ) {
 
 		if ( hasReplacedMapSelect || lastMapSelectFailed ) {
 			try {
-				mapOutput = trapSelect( () =>
-					_mapSelect( registry.select, registry )
-				);
+				mapOutput = wrapSelect( _mapSelect );
 			} catch ( error ) {
 				let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
 
@@ -196,9 +194,7 @@ export default function useSelect( mapSelect, deps ) {
 		const onStoreChange = () => {
 			if ( isMountedAndNotUnsubscribing.current ) {
 				try {
-					const newMapOutput = trapSelect( () =>
-						latestMapSelect.current( registry.select, registry )
-					);
+					const newMapOutput = wrapSelect( latestMapSelect.current );
 
 					if (
 						isShallowEqual( latestMapOutput.current, newMapOutput )
@@ -213,14 +209,6 @@ export default function useSelect( mapSelect, deps ) {
 			}
 		};
 
-		// Catch any possible state changes during mount before the subscription
-		// could be set.
-		if ( latestIsAsync.current ) {
-			renderQueue.add( queueContext, onStoreChange );
-		} else {
-			onStoreChange();
-		}
-
 		const onChange = () => {
 			if ( latestIsAsync.current ) {
 				renderQueue.add( queueContext, onStoreChange );
@@ -228,6 +216,10 @@ export default function useSelect( mapSelect, deps ) {
 				onStoreChange();
 			}
 		};
+
+		// Catch any possible state changes during mount before the subscription
+		// could be set.
+		onChange();
 
 		const unsubscribers = listeningStores.current.map( ( storeName ) =>
 			registry.__experimentalSubscribeStore( storeName, onChange )
@@ -242,7 +234,7 @@ export default function useSelect( mapSelect, deps ) {
 		// If you're tempted to eliminate the spread dependencies below don't do it!
 		// We're passing these in from the calling function and want to make sure we're
 		// examining every individual value inside the `deps` array.
-	}, [ registry, trapSelect, hasMappingFunction, depsChangedFlag ] );
+	}, [ registry, wrapSelect, hasMappingFunction, depsChangedFlag ] );
 
 	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }
