@@ -150,7 +150,10 @@ function flattenTree( input = {}, prefix, token ) {
 function getStylesDeclarations( blockStyles = {}, isRoot = false ) {
 	const output = reduce(
 		STYLE_PROPERTY,
-		( declarations, { value, properties, useEngine }, key ) => {
+		( declarations, { value, properties, useEngine, rootOnly }, key ) => {
+			if ( rootOnly && ! isRoot ) {
+				return declarations;
+			}
 			const pathToValue = value;
 			if ( first( pathToValue ) === 'elements' || useEngine ) {
 				return declarations;
@@ -339,7 +342,7 @@ export const toStyles = ( tree, blockSelectors ) => {
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 
 	let ruleset =
-		'body { padding-right: 0; padding-left: 0; } .wp-site-blocks > * { margin-top: 0; margin-bottom: 0; padding-right: var(--wp--style--padding-right); padding-left: var(--wp--style--padding-left); }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
+		'body { padding-right: 0; padding-left: 0; } .wp-site-blocks > * { margin-top: 0; margin-bottom: 0; padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
 		const isRoot = ROOT_BLOCK_SELECTOR === selector;
 		const declarations = getStylesDeclarations( styles, isRoot );
