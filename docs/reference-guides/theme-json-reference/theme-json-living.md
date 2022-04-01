@@ -115,13 +115,13 @@ Border styles.
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
 | color | string |  |
-| radius | string, object | topLeft, topRight, bottomLeft, bottomRight |
+| radius | undefined |  |
 | style | string |  |
 | width | string |  |
-| top | object | color, style, width |
-| right | object | color, style, width |
-| bottom | object | color, style, width |
-| left | object | color, style, width |
+| top | undefined |  |
+| right | undefined |  |
+| bottom | undefined |  |
+| left | undefined |  |
 
 ---
 
