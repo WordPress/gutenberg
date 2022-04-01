@@ -30,10 +30,6 @@ describe( 'Gutenberg Editor tests', () => {
 			2
 		);
 
-		if ( ! isAndroid() ) {
-			await editorPage.clickParagraphBlockAtPosition( 2 );
-		}
-
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			testData.mediumText
@@ -44,10 +40,6 @@ describe( 'Gutenberg Editor tests', () => {
 			blockNames.paragraph,
 			3
 		);
-
-		if ( ! isAndroid() ) {
-			await editorPage.clickParagraphBlockAtPosition( 3 );
-		}
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
@@ -69,10 +61,6 @@ describe( 'Gutenberg Editor tests', () => {
 			blockNames.paragraph,
 			5
 		);
-
-		if ( ! isAndroid() ) {
-			await editorPage.clickParagraphBlockAtPosition( 5 );
-		}
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
