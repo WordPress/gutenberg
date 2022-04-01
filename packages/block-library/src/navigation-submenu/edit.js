@@ -348,8 +348,8 @@ export default function NavigationSubmenuEdit( {
 
 			return {
 				isAtMaxNesting:
-					getBlockParentsByBlockName( selectedBlockId, name )
-						.length >= maxNestingLevel,
+					getBlockParentsByBlockName( clientId, name ).length >=
+					maxNestingLevel,
 				isTopLevelItem:
 					getBlockParentsByBlockName( clientId, name ).length === 0,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
@@ -501,10 +501,9 @@ export default function NavigationSubmenuEdit( {
 	// Always use overlay colors for submenus.
 	const innerBlocksColors = getColors( context, true );
 
-	let allowedBlocks = ALLOWED_BLOCKS;
-	if ( isAtMaxNesting ) {
-		allowedBlocks = without( ALLOWED_BLOCKS, 'core/navigation-submenu' );
-	}
+	const allowedBlocks = isAtMaxNesting
+		? without( ALLOWED_BLOCKS, 'core/navigation-submenu' )
+		: ALLOWED_BLOCKS;
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
