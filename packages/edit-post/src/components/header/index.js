@@ -57,25 +57,39 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const classes = classnames( 'edit-post-header' );
 
-	const variants = {
+	const slideY = {
 		initial: { y: '-100%' },
 		hover: { y: 0 },
 	};
 
+	const slideX = {
+		initial: { x: '-100%' },
+		hover: { x: 0 },
+	};
+
 	return (
-		<motion.div
-			variants={ variants }
-			transition={ { type: 'tween' } }
-			className={ classes }
-		>
+		<div className={ classes }>
 			<MainDashboardButton.Slot>
-				<FullscreenModeClose showTooltip />
+				<motion.div
+					variants={ slideX }
+					transition={ { type: 'tween' } }
+				>
+					<FullscreenModeClose showTooltip />
+				</motion.div>
 			</MainDashboardButton.Slot>
-			<div className="edit-post-header__toolbar">
+			<motion.div
+				variants={ slideY }
+				transition={ { type: 'tween' } }
+				className="edit-post-header__toolbar"
+			>
 				<HeaderToolbar />
 				<TemplateTitle />
-			</div>
-			<div className="edit-post-header__settings">
+			</motion.div>
+			<motion.div
+				variants={ slideY }
+				transition={ { type: 'tween' } }
+				className="edit-post-header__settings"
+			>
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because
@@ -109,8 +123,8 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				{ showIconLabels && ! isLargeViewport && (
 					<MoreMenu showIconLabels={ showIconLabels } />
 				) }
-			</div>
-		</motion.div>
+			</motion.div>
+		</div>
 	);
 }
 
