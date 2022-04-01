@@ -34,11 +34,14 @@ function BackgroundColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButton path={ parentMenu + '/colors/background' }>
 			<HStack justify="flex-start">
-				<FlexItem>
-					<ColorIndicator
-						colorValue={ gradientValue ?? backgroundColor }
-					/>
-				</FlexItem>
+				<ColorIndicator
+					colorValue={ gradientValue ?? backgroundColor }
+					// TODO:
+					// - move to SCSS code + classname
+					// - consider using grid scss variables
+					// - consider adding a size prop to `ColorIndicator` ?
+					style={ { marginTop: '2px', marginBottom: '2px' } }
+				/>
 				<FlexItem>{ __( 'Background' ) }</FlexItem>
 			</HStack>
 		</NavigationButton>
@@ -57,9 +60,14 @@ function TextColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButton path={ parentMenu + '/colors/text' }>
 			<HStack justify="flex-start">
-				<FlexItem>
-					<ColorIndicator colorValue={ color } />
-				</FlexItem>
+				<ColorIndicator
+					colorValue={ color }
+					// TODO:
+					// - move to SCSS code + classname
+					// - consider using grid scss variables
+					// - consider adding a size prop to `ColorIndicator` ?
+					style={ { marginTop: '2px', marginBottom: '2px' } }
+				/>
 				<FlexItem>{ __( 'Text' ) }</FlexItem>
 			</HStack>
 		</NavigationButton>
@@ -78,9 +86,14 @@ function LinkColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButton path={ parentMenu + '/colors/link' }>
 			<HStack justify="flex-start">
-				<FlexItem>
-					<ColorIndicator colorValue={ color } />
-				</FlexItem>
+				<ColorIndicator
+					colorValue={ color }
+					// TODO:
+					// - move to SCSS code + classname
+					// - consider using grid scss variables
+					// - consider adding a size prop to `ColorIndicator` ?
+					style={ { marginTop: '2px', marginBottom: '2px' } }
+				/>
 				<FlexItem>{ __( 'Links' ) }</FlexItem>
 			</HStack>
 		</NavigationButton>
