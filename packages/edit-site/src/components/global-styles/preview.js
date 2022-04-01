@@ -44,6 +44,8 @@ const secondFrame = {
 const normalizedWidth = 248;
 const normalizedHeight = 152;
 
+const normalizedColorSwatchSize = 32;
+
 const StylesPreview = ( { label, isFocused } ) => {
 	const [ fontWeight ] = useStyle( 'typography.fontWeight' );
 	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
@@ -134,10 +136,15 @@ const StylesPreview = ( { label, isFocused } ) => {
 								<div
 									key={ slug }
 									style={ {
-										height: 30 * ratio,
-										width: 30 * ratio,
+										height:
+											normalizedColorSwatchSize * ratio,
+										width:
+											normalizedColorSwatchSize * ratio,
 										background: color,
-										borderRadius: 15 * ratio,
+										borderRadius:
+											( normalizedColorSwatchSize *
+												ratio ) /
+											2,
 									} }
 								/>
 							) ) }
