@@ -35,12 +35,6 @@ export const BlockQuotation = withPreferredColorScheme( ( props ) => {
 				},
 			} );
 		}
-		if ( child && child.props.identifier === 'value' ) {
-			return cloneElement( child, {
-				tagsToEliminate: [ 'div' ],
-				style: colorStyle,
-			} );
-		}
 		return child;
 	} );
 	return <View style={ blockQuoteStyle }>{ newChildren }</View>;
