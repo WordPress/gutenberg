@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ExternalLink } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { RichText } from '@wordpress/block-editor';
 
@@ -29,13 +28,6 @@ function PostExcerpt2() {
 				}
 				tagName="p"
 			/>
-			<ExternalLink
-				href={ __(
-					'https://wordpress.org/support/article/settings-sidebar/#excerpt'
-				) }
-			>
-				{ __( 'Learn more about manual excerpts' ) }
-			</ExternalLink>
 		</div>
 	);
 }
