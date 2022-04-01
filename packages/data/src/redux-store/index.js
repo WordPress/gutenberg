@@ -398,6 +398,10 @@ function mapSuspendSelectors( selectors, store ) {
 			const result = selector.apply( null, args );
 
 			if ( selectors.hasFinishedResolution( selectorName, args ) ) {
+				if ( selectors.hasResolutionFailed( selectorName, args ) ) {
+					throw selectors.getResolutionError( selectorName, args );
+				}
+
 				return result;
 			}
 
