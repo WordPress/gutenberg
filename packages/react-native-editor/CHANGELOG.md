@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Remove banner error notification on upload failure [#39694]
+
 ## 1.73.0
 
 -   [*] Update react-native-reanimated version to 2.4.1 [#39430]
