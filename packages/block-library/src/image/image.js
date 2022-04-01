@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, map, pick, includes } from 'lodash';
+import { get, filter, isEmpty, map, pick, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -433,6 +433,8 @@ export default function Image( {
 
 	const borderProps = useBorderProps( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
+	const hasCustomBorder =
+		!! borderProps.className || ! isEmpty( borderProps.style );
 
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
@@ -538,7 +540,7 @@ export default function Image( {
 			<ResizableBox
 				size={ {
 					width: width ?? 'auto',
-					height: height ?? 'auto',
+					height: height && ! hasCustomBorder ? height : 'auto',
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
