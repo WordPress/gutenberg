@@ -117,12 +117,13 @@ require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';
 require __DIR__ . '/client-assets.php';
+require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/compat/wordpress-5.9/navigation.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 require __DIR__ . '/experimental/experiments-page.php';
-require __DIR__ . '/global-styles.php';
+require __DIR__ . '/compat/wordpress-6.0/global-styles.php';
 require __DIR__ . '/pwa.php';
 
 // TODO: Move this to be loaded from the style engine package, via the build directory.
