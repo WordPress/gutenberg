@@ -123,7 +123,7 @@ require __DIR__ . '/compat/wordpress-5.9/navigation.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 require __DIR__ . '/experimental/experiments-page.php';
-require __DIR__ . '/compat/wordpress-6.0/global-styles.php';
+require __DIR__ . '/compat/wordpress-5.9/kses.php';
 require __DIR__ . '/pwa.php';
 
 // TODO: Move this to be loaded from the style engine package, via the build directory.
