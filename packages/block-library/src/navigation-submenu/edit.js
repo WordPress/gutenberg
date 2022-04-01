@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, pull } from 'lodash';
+import { escape, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -501,8 +501,9 @@ export default function NavigationSubmenuEdit( {
 	// Always use overlay colors for submenus.
 	const innerBlocksColors = getColors( context, true );
 
+	let allowedBlocks = ALLOWED_BLOCKS;
 	if ( isAtMaxNesting ) {
-		pull( ALLOWED_BLOCKS, 'core/navigation-submenu' );
+		allowedBlocks = without( ALLOWED_BLOCKS, 'core/navigation-submenu' );
 	}
 
 	const innerBlocksProps = useInnerBlocksProps(
@@ -526,7 +527,7 @@ export default function NavigationSubmenuEdit( {
 			},
 		},
 		{
-			allowedBlocks: ALLOWED_BLOCKS,
+			allowedBlocks,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: true,
 
