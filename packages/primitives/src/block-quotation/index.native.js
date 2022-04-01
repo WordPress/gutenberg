@@ -23,6 +23,7 @@ export const BlockQuotation = withPreferredColorScheme( ( props ) => {
 		style?.color && {
 			borderLeftColor: style.color,
 		},
+		style,
 	];
 	const colorStyle = style?.color ? { color: style.color } : {};
 
