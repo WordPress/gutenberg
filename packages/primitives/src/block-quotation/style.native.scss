@@ -22,5 +22,5 @@
 }
 
 .paddingWithBackground {
-	padding-top: $block-edge-to-content;
+	padding-top: $block-edge-to-content - $block-selected-margin;
 }

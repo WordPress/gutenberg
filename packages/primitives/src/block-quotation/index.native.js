@@ -24,9 +24,7 @@ export const BlockQuotation = forwardRef( ( { ...props }, ref ) => {
 			borderLeftColor: style.color,
 		},
 		style,
-		style?.backgroundColor && {
-			paddingTop: styles.paddingWithBackground,
-		},
+		style?.backgroundColor && styles.paddingWithBackground,
 	];
 	const colorStyle = style?.color ? { color: style.color } : {};
 
