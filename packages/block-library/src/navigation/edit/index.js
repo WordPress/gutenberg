@@ -286,14 +286,7 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
-	// Setup initial block insertion state.
-	// If:
-	// - not explicitly creating an **empty** menu.
-	// - there is not currently a ref to a Navigation Menu `wp_navigation`
-	// - there are some Navigation Menus
-	// - there is only a single Navigation Menu
-	//
-	// ...then automatically use that Navigation Menu by default.
+	// Attempt to retrieve and prioritize any existing navigation menu
 	useEffect( () => {
 		if (
 			isCreatingEmpty.current ||
