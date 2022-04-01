@@ -47,6 +47,7 @@
 		}
 	}
 
+	&:focus-within .editor-post-featured-image__actions,
 	&:focus .editor-post-featured-image__actions,
 	&:hover .editor-post-featured-image__actions {
 		opacity: 1;
