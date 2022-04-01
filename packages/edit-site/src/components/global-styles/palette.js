@@ -7,7 +7,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
-	FlexBlock,
 	ColorIndicator,
 } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -64,16 +63,22 @@ function Palette( { name } ) {
 							colors.length === 0 ? 'row-reverse' : 'row'
 						}
 					>
-						<FlexBlock>
-							<ZStack isLayered={ false } offset={ -8 }>
-								{ colors.slice( 0, 5 ).map( ( { color } ) => (
-									<ColorIndicator
-										key={ color }
-										colorValue={ color }
-									/>
-								) ) }
-							</ZStack>
-						</FlexBlock>
+						<ZStack
+							isLayered={ false }
+							offset={ -8 }
+							// TODO:
+							// - move to SCSS code + classname
+							// - consider using grid scss variables
+							// - consider adding a size prop to `ColorIndicator` ?
+							style={ { marginTop: '2px', marginBottom: '2px' } }
+						>
+							{ colors.slice( 0, 5 ).map( ( { color } ) => (
+								<ColorIndicator
+									key={ color }
+									colorValue={ color }
+								/>
+							) ) }
+						</ZStack>
 						<FlexItem>{ paletteButtonText }</FlexItem>
 					</HStack>
 				</NavigationButton>
