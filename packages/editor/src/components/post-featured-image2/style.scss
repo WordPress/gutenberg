@@ -75,9 +75,24 @@
 	// Override generic focus styles to be inset.
 	&:focus:not(:disabled),
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: none;
+		outline: none;
 	}
 
-	transition: all 0.1s ease-out;
+	&:focus:not(:disabled)::after {
+		content: "";
+		display: block;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Shown for high contrast modes.
+		outline: 2px solid transparent;
+	}
+
+	transition: all 5.1s ease-out;
 	@include reduce-motion("transition");
 }
