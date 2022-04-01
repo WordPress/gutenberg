@@ -93,11 +93,11 @@ export default function TableOfContentsEdit( {
 				__experimentalGetGlobalBlocksByName: getGlobalBlocksByName,
 			} = select( blockEditorStore );
 
-			// Disable reason: blocks can be loaded into a *non-post* block
-			// editor, so to avoid declaring @wordpress/editor as a dependency, we
-			// must access its store by string. When the store is not available,
-			// editorSelectors will be null, and the block's saved markup will
-			// lack permalinks.
+			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+			// Blocks can be loaded into a *non-post* block editor, so to avoid
+			// declaring @wordpress/editor as a dependency, we must access its
+			// store by string. When the store is not available, editorSelectors
+			// will be null, and the block's saved markup will lack permalinks.
 			// eslint-disable-next-line @wordpress/data-no-store-string-literals
 			const editorSelectors = select( 'core/editor' );
 
