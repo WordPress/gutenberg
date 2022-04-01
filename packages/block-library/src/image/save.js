@@ -64,7 +64,7 @@ export default function save( { attributes } ) {
 			) }
 		</>
 	);
-	if(attributes.url){
+	if ( attributes.url ) {
 		return (
 			<figure { ...useBlockProps.save( { className: classes } ) }>
 				{ figure }
@@ -72,5 +72,4 @@ export default function save( { attributes } ) {
 		);
 	}
 	return null;
-	
 }
