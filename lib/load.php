@@ -56,6 +56,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 
 	require __DIR__ . '/rest-api.php';
+	require __DIR__ . '/compat/wordpress-5.9/rest-api.php';
 }
 
 require __DIR__ . '/compat.php';
@@ -78,7 +79,7 @@ require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/templates.php';
 require __DIR__ . '/compat/wordpress-5.9/template-parts.php';
 require __DIR__ . '/compat/wordpress-5.9/theme-templates.php';
-require __DIR__ . '/editor-settings.php';
+require __DIR__ . '/experimental/editor-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-5-9.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-5-9.php';
@@ -117,10 +118,10 @@ require __DIR__ . '/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
-require __DIR__ . '/navigation.php';
-require __DIR__ . '/navigation-theme-opt-in.php';
-require __DIR__ . '/navigation-page.php';
-require __DIR__ . '/experiments-page.php';
+require __DIR__ . '/compat/wordpress-5.9/navigation.php';
+require __DIR__ . '/experimental/navigation-theme-opt-in.php';
+require __DIR__ . '/experimental/navigation-page.php';
+require __DIR__ . '/experimental/experiments-page.php';
 require __DIR__ . '/global-styles.php';
 require __DIR__ . '/pwa.php';
 
