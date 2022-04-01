@@ -159,7 +159,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 		}
 
-		gutenberg_recursive_ksort( $flattened_theme_json );
+		wp_recursive_ksort( $flattened_theme_json );
 
 		return $flattened_theme_json;
 	}

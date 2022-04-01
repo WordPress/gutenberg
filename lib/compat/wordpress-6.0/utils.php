@@ -2,6 +2,7 @@
 /**
  * Generic helper functions
  *
+ * @package WordPress
  * @since 6.0
  */
 
@@ -12,10 +13,10 @@
  *
  * @param array $array The array to sort, passed by reference.
  */
-function gutenberg_recursive_ksort( &$array ) {
+function wp_recursive_ksort( &$array ) {
 	foreach ( $array as &$value ) {
 		if ( is_array( $value ) ) {
-			gutenberg_recursive_ksort( $value );
+			wp_recursive_ksort( $value );
 		}
 	}
 	ksort( $array );
