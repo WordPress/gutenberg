@@ -71,6 +71,20 @@
 			}
 		}
 	}
+
+	&:where(:not(.is-not-stacked-on-mobile)) {
+		@media (max-width: #{ ($break-medium - 1) }) {
+			& > .wp-block-column[class*="has-border-"], // Clear when color defined.
+			& > .wp-block-column[style*="border-style"], // Clear when border style set.
+			& > .wp-block-column[style*="border-width"],
+			& > .wp-block-column[style*="border-top-width"],
+			& > .wp-block-column[style*="border-right-width"],
+			& > .wp-block-column[style*="border-bottom-width"],
+			& > .wp-block-column[style*="border-left-width"] {
+				border-width: 0 !important;
+			}
+		}
+	}
 }
 
 // Add low specificity default padding to columns blocks with backgrounds.
