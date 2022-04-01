@@ -338,11 +338,10 @@ function CoverEdit( {
 	// we define the url and background type
 	// depending on the value of the useFeaturedImage flag
 	// to preview in edit the dynamic featured image
-	const url = useFeaturedImage && mediaUrl ? mediaUrl : attributes.url;
-	const backgroundType =
-		useFeaturedImage && mediaUrl
-			? IMAGE_BACKGROUND_TYPE
-			: attributes.backgroundType;
+	const url = useFeaturedImage ? mediaUrl : attributes.url;
+	const backgroundType = useFeaturedImage
+		? IMAGE_BACKGROUND_TYPE
+		: attributes.backgroundType;
 
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
