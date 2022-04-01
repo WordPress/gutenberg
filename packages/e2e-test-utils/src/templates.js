@@ -26,8 +26,6 @@ export async function deleteAllTemplates( type ) {
 		return;
 	}
 
-	const responses = [];
-
 	for ( const template of templates ) {
 		if ( ! template?.wp_id ) {
 			continue;
@@ -47,6 +45,4 @@ export async function deleteAllTemplates( type ) {
 			);
 		}
 	}
-
-	return responses;
 }
