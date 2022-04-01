@@ -10,12 +10,12 @@ Items marked with a strikeout (~~strikeout~~) are explicitly disabled.
 
 ## Archives
 
-Display a monthly archive of your posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/archives))
+Display a date archive of your posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/archives))
 
 -	**Name:** core/archives
 -	**Category:** widgets
 -	**Supports:** align, ~~html~~
--	**Attributes:** displayAsDropdown, showPostCounts
+-	**Attributes:** displayAsDropdown, showPostCounts, type
 
 ## Audio
 
@@ -680,7 +680,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** anchor, typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, link, text), typography (fontSize, lineHeight)
 -	**Attributes:** align, citation, value
 
 ## Read More

@@ -1206,6 +1206,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToggleGroupControlOptionBase",
+		"slug": "toggle-group-control-option-base",
+		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToggleGroupControlOptionIcon",
+		"slug": "toggle-group-control-option-icon",
+		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToggleGroupControlOption",
 		"slug": "toggle-group-control-option",
 		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option/README.md",

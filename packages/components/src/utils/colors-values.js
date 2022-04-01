@@ -166,8 +166,9 @@ export const UI = {
 	textLight: BASE.black,
 };
 
-export const COLORS = {
-	...BASE,
+// Using Object.assign instead of { ...spread } syntax helps TypeScript
+// to extract the correct type defs here.
+export const COLORS = Object.assign( {}, BASE, {
 	darkGray: merge( {}, DARK_GRAY, G2.darkGray ),
 	darkOpacity: DARK_OPACITY,
 	darkOpacityLight: DARK_OPACITY_LIGHT,
@@ -179,6 +180,6 @@ export const COLORS = {
 	alert: ALERT,
 	admin: ADMIN,
 	ui: UI,
-};
+} );
 
 export default COLORS;

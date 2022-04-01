@@ -103,7 +103,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 				$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
 			}
 
-			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+			if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';

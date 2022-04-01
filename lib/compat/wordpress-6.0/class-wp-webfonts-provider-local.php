@@ -7,6 +7,10 @@
  * @since      6.0.0
  */
 
+if ( class_exists( 'WP_Webfonts_Provider_Local' ) ) {
+	return;
+}
+
 /**
  * A core bundled provider for generating `@font-face` styles
  * from locally-hosted font files.

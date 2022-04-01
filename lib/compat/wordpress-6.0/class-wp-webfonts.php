@@ -2,16 +2,26 @@
 /**
  * Webfonts API class.
  *
- * @package Gutenberg
+ * @package    WordPress
+ * @subpackage WebFonts
+ * @since      6.0.0
  */
+
+if ( class_exists( 'WP_Webfonts' ) ) {
+	return;
+}
 
 /**
  * Class WP_Webfonts
+ *
+ * @since 6.0.0
  */
 class WP_Webfonts {
 
 	/**
 	 * An array of registered webfonts.
+	 *
+	 * @since 6.0.0
 	 *
 	 * @access private
 	 * @var array
@@ -21,6 +31,8 @@ class WP_Webfonts {
 	/**
 	 * An array of registered providers.
 	 *
+	 * @since 6.0.0
+	 *
 	 * @access private
 	 * @var array
 	 */
@@ -29,12 +41,16 @@ class WP_Webfonts {
 	/**
 	 * Stylesheet handle.
 	 *
+	 * @since 6.0.0
+	 *
 	 * @var string
 	 */
 	private $stylesheet_handle = '';
 
 	/**
 	 * Init.
+	 *
+	 * @since 6.0.0
 	 */
 	public function init() {
 
@@ -58,6 +74,8 @@ class WP_Webfonts {
 	/**
 	 * Get the list of fonts.
 	 *
+	 * @since 6.0.0
+	 *
 	 * @return array
 	 */
 	public function get_fonts() {
@@ -67,6 +85,8 @@ class WP_Webfonts {
 	/**
 	 * Get the list of providers.
 	 *
+	 * @since 6.0.0
+	 *
 	 * @return array
 	 */
 	public function get_providers() {
@@ -75,6 +95,8 @@ class WP_Webfonts {
 
 	/**
 	 * Register a webfont.
+	 *
+	 * @since 6.0.0
 	 *
 	 * @param array $font The font arguments.
 	 */
@@ -89,6 +111,8 @@ class WP_Webfonts {
 	/**
 	 * Get the font ID.
 	 *
+	 * @since 6.0.0
+	 *
 	 * @param array $font The font arguments.
 	 * @return string
 	 */
@@ -98,6 +122,8 @@ class WP_Webfonts {
 
 	/**
 	 * Validate a font.
+	 *
+	 * @since 6.0.0
 	 *
 	 * @param array $font The font arguments.
 	 *
@@ -183,6 +209,8 @@ class WP_Webfonts {
 	/**
 	 * Register a provider.
 	 *
+	 * @since 6.0.0
+	 *
 	 * @param string $provider The provider name.
 	 * @param string $class    The provider class name.
 	 *
@@ -198,6 +226,8 @@ class WP_Webfonts {
 
 	/**
 	 * Generate and enqueue webfonts styles.
+	 *
+	 * @since 6.0.0
 	 */
 	public function generate_and_enqueue_styles() {
 		// Generate the styles.
@@ -218,6 +248,8 @@ class WP_Webfonts {
 
 	/**
 	 * Generate and enqueue editor styles.
+	 *
+	 * @since 6.0.0
 	 */
 	public function generate_and_enqueue_editor_styles() {
 		// Generate the styles.
