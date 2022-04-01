@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { addEntities } from './actions';
+import type { Post, Taxonomy, Type, Updatable } from './entity-types';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -191,7 +192,7 @@ export const additionalEntityConfigLoaders = [
  * @return {Object} Updated edits.
  */
 export const prePersistPostType = ( persistedRecord, edits ) => {
-	const newEdits = {};
+	const newEdits = {} as Partial< Updatable< Post< 'edit' > > >;
 
 	if ( persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
@@ -219,7 +220,9 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypes = await apiFetch( { path: '/wp/v2/types?context=view' } );
+	const postTypes = ( await apiFetch( {
+		path: '/wp/v2/types?context=view',
+	} ) ) as Record< string, Type< 'view' > >;
 	return map( postTypes, ( postType, name ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
@@ -253,9 +256,9 @@ async function loadPostTypeEntities() {
  * @return {Promise} Entities promise
  */
 async function loadTaxonomyEntities() {
-	const taxonomies = await apiFetch( {
+	const taxonomies = ( await apiFetch( {
 		path: '/wp/v2/taxonomies?context=view',
-	} );
+	} ) ) as Record< string, Taxonomy< 'view' > >;
 	return map( taxonomies, ( taxonomy, name ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
