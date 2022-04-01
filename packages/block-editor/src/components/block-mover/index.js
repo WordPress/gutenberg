@@ -95,6 +95,9 @@ function BlockMover( {
 	);
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-mover/README.md
+ */
 export default withSelect( ( select, { clientIds } ) => {
 	const {
 		getBlock,

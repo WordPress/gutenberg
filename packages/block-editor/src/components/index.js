@@ -73,6 +73,9 @@ export { default as __experimentalLinkControlSearchResults } from './link-contro
 export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
 export { default as LineHeightControl } from './line-height-control';
 export { default as __experimentalListView } from './list-view';
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md
+ */
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
@@ -138,6 +141,9 @@ export {
 	useTypingObserver as __unstableUseTypingObserver,
 	useMouseMoveTypingReset as __unstableUseMouseMoveTypingReset,
 } from './observe-typing';
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md
+ */
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
 export {
 	default as Typewriter,

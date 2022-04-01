@@ -15,6 +15,9 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md
+ */
 export default function LineHeightControl( {
 	value: lineHeight,
 	onChange,

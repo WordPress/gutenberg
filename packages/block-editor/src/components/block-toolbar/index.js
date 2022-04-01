@@ -27,6 +27,9 @@ import { useShowMoversGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md
+ */
 export default function BlockToolbar( { hideDragHandle } ) {
 	const {
 		blockClientIds,
