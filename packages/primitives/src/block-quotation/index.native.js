@@ -12,7 +12,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-export const BlockQuotation = forwardRef( ( { ...props } ) => {
+export const BlockQuotation = forwardRef( ( { ...props }, ref ) => {
 	const { style } = props;
 
 	const blockQuoteStyle = [
@@ -38,5 +38,9 @@ export const BlockQuotation = forwardRef( ( { ...props } ) => {
 		}
 		return child;
 	} );
-	return <View style={ blockQuoteStyle }>{ newChildren }</View>;
+	return (
+		<View ref={ ref } style={ blockQuoteStyle }>
+			{ newChildren }
+		</View>
+	);
 } );
