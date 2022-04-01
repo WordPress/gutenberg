@@ -37,6 +37,32 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 	}
 
 	/**
+	 * Returns the style variations defined by the theme.
+	 *
+	 * @return array
+	 */
+	public static function get_style_variations() {
+		$variations     = array();
+		$base_directory = get_stylesheet_directory() . '/styles';
+		if ( is_dir( $base_directory ) ) {
+			$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory ) );
+			$nested_html_files = iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) );
+			ksort( $nested_html_files );
+			foreach ( $nested_html_files as $path => $file ) {
+				$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
+				if ( is_array( $decoded_file ) ) {
+					$variation  = ( new WP_Theme_JSON_Gutenberg( $decoded_file ) )->get_raw_data();
+					if ( empty( $variation['title'] ) ) {
+						$variation['title'] = basename( $path, '.json' );
+					}
+					$variations[] = $variation;
+				}
+			}
+		}
+		return $variations;
+	}
+
+	/**
 	 * Returns the theme's data.
 	 *
 	 * Data from theme.json will be backfilled from existing
