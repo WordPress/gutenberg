@@ -14,6 +14,8 @@ import { useSelect } from '@wordpress/data';
 
 const name = 'core/paragraph';
 
+const allowedParentBlockAlignments = [ 'left', 'center', 'right' ];
+
 function ParagraphBlock( {
 	attributes,
 	mergeBlocks,
@@ -41,6 +43,12 @@ function ParagraphBlock( {
 	const onAlignmentChange = useCallback( ( nextAlign ) => {
 		setAttributes( { align: nextAlign } );
 	}, [] );
+
+	const textAligment =
+		align ||
+		( allowedParentBlockAlignments.includes( parentBlockAlignment ) &&
+			parentBlockAlignment );
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -83,7 +91,7 @@ function ParagraphBlock( {
 				onReplace={ onReplace }
 				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 				placeholder={ placeholder || __( 'Start writing…' ) }
-				textAlign={ align || parentBlockAlignment }
+				textAlign={ textAligment }
 				__unstableEmbedURLOnPaste
 			/>
 		</>
