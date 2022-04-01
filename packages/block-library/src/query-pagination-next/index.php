@@ -5,14 +5,6 @@
  * @package WordPress
  */
 
-/**
- * Renders an alpine addon.
- *
- * @return string Returns the next posts link for the query pagination.
- */
-function alpine_js() {
-	return '@click.prevent="count++"';
-}
 
 /**
  * Renders the `core/query-pagination-next` block on the server.
@@ -52,9 +44,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		if ( $max_page > $wp_query->max_num_pages ) {
 			$max_page = $wp_query->max_num_pages;
 		}
-		add_filter( 'next_posts_link_attributes', 'alpine_js' );
 		$content = get_next_posts_link( $label, $max_page );
-		remove_filter( 'next_posts_link_attributes', $filter_link_attributes );
 	} elseif ( ! $max_page || $max_page > $page ) {
 		$custom_query           = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
 		$custom_query_max_pages = (int) $custom_query->max_num_pages;
@@ -63,13 +53,13 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 				'<a href="%1$s" %2$s>%3$s</a>',
 				esc_url( add_query_arg( $page_key, $page + 1 ) ),
 				$wrapper_attributes,
-				$label,
+				$label
 			);
 		}
 		wp_reset_postdata(); // Restore original Post Data.
 	}
 
-	return sprintf( '%1$s %2$s', alpine_js(), $content );
+	return $content;
 }
 
 /**

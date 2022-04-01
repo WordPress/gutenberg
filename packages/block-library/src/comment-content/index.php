@@ -18,16 +18,6 @@ function render_block_core_comment_content( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$comment = get_comment( $block->context['commentId'] );
-	if ( empty( $comment ) ) {
-		return '';
-	}
-
-	$comment_text = get_comment_text( $comment );
-	if ( ! $comment_text ) {
-		return '';
-	}
-
 	$classes = '';
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= 'has-text-align-' . $attributes['textAlign'];

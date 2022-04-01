@@ -29,15 +29,14 @@ function render_block_core_comment_author_name( $attributes, $content, $block ) 
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
-	$comment_author     = get_comment_author( $comment );
 	$link               = get_comment_author_url( $comment );
 
 	if ( ! empty( $attributes['isLink'] ) && ! empty( $attributes['linkTarget'] ) ) {
-		$comment_author = sprintf( '<a rel="external nofollow ugc" href="%1s" target="%2s" >%3s</a>', esc_url( $link ), esc_attr( $attributes['linkTarget'] ), $comment_author );
+		return sprintf( '<div %1$s><a rel="external nofollow ugc" x-text="comment.author" href="%2s" target="%3s" ></a>', $wrapper_attributes, esc_url( $link ), esc_attr( $attributes['linkTarget'] ) );
 	}
 
 	return sprintf(
-		'<div  x-text="comment.author" %1$s ></div>',
+		'<div x-text="comment.author" %1$s></div>',
 		$wrapper_attributes
 	);
 }

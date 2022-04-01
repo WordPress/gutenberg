@@ -24,19 +24,15 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$formatted_date     = get_comment_date(
-		isset( $attributes['format'] ) ? $attributes['format'] : '',
-		$comment
-	);
 	$link               = get_comment_link( $comment );
 
 	if ( ! empty( $attributes['isLink'] ) ) {
-		$formatted_date = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), $formatted_date );
+		return sprintf( '<a x-text="comment.date" href="%1s"></a>', esc_url( $link ) );
 	}
 
 	return sprintf(
 		'<div x-text="comment.date" %1$s></div>',
-		$wrapper_attributes,
+		$wrapper_attributes
 	);
 }
 
