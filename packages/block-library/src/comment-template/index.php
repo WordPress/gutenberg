@@ -16,40 +16,41 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 	$content        = '';
 	$comments_array = array();
 	foreach ( $comments as $comment ) {
-		$block_content       = ( new WP_Block(
+		$block_content    = ( new WP_Block(
 			$block->parsed_block,
 			array(
 				'commentId' => $comment->comment_ID,
 			)
 		) )->render( array( 'dynamic' => false ) );
-		$array_render_alpine = array(
-			'commentId' => $comment->comment_ID,
-			// 'comment_author'  => $comment->comment_author,
-			// 'comment_date'    => $comment->comment_date,
-			// 'comment_content' => htmlspecialchars( str_replace( '"', '&quot;', $comment->comment_content ) ),
+		$comments_array[] = (object) array(
+			'id'      => $comment->comment_ID,
+			'author'  => $comment->comment_author,
+			'date'    => $comment->comment_date,
+			'content' => htmlspecialchars( str_replace( '"', '&quot;', $comment->comment_content ) ),
 		);
-		array_push( $comments_array, json_encode( $array_render_alpine ) );
 
-		$children = $comment->get_children();
+		// $children = $comment->get_children();
 
 		// If the comment has children, recurse to create the HTML for the nested
 		// comments.
 
-		if ( ! empty( $children ) ) {
-			$inner_content  = block_core_comment_template_render_comments(
-				$children,
-				$block
-			);
-			$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
-		}
+		// if ( ! empty( $children ) ) {
+		// $inner_content  = gutenberg_block_core_comment_template_render_comments(
+		// $children,
+		// $block
+		// );
+		// $block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
+		// }.
 
 		$content .= '<li>' . $block_content . '</li>';
 	}
-	$x_data  = sprintf( 'x-data={ comments: [ %1$s ]}', json_encode( $comments_array ) );
-	$content = sprintf( '<div %1$s></div>', $x_data );
 
+	$content = sprintf(
+		'<div x-data=\'{ comments: %1$s }\'><template x-for="comment in comments" :key="comment.id"></div>%2$s</template></div>',
+		json_encode( $comments_array ),
+		$content
+	);
 	return $content;
-
 }
 
 /**

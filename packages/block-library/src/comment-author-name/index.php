@@ -37,9 +37,8 @@ function render_block_core_comment_author_name( $attributes, $content, $block ) 
 	}
 
 	return sprintf(
-		'<div %1$s>%2$s</div>',
-		$wrapper_attributes,
-		$comment_author
+		'<div  x-text="comment.author" %1$s ></div>',
+		$wrapper_attributes
 	);
 }
 

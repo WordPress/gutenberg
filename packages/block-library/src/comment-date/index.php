@@ -35,10 +35,8 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 	}
 
 	return sprintf(
-		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
+		'<div x-text="comment.date" %1$s></div>',
 		$wrapper_attributes,
-		esc_attr( get_comment_date( 'c', $comment ) ),
-		$formatted_date
 	);
 }
 
