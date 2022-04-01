@@ -199,6 +199,23 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			unset( $theme_json['settings']['spacing']['padding'] );
 		}
 
+		// Remove empty arrays.
+		if ( empty( $theme_json['settings']['color'] ) ) {
+			unset( $theme_json['settings']['color'] );
+		}
+
+		if ( empty( $theme_json['settings']['typography'] ) ) {
+			unset( $theme_json['settings']['typography'] );
+		}
+
+		if ( empty( $theme_json['settings']['spacing'] ) ) {
+			unset( $theme_json['settings']['spacing'] );
+		}
+
+		if ( empty( $theme_json['settings'] ) ) {
+			unset( $theme_json['settings'] );
+		}
+
 		return $theme_json;
 	}
 
