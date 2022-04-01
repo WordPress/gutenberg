@@ -44,10 +44,13 @@ function ParagraphBlock( {
 		setAttributes( { align: nextAlign } );
 	}, [] );
 
-	const textAligment =
-		align ||
-		( allowedParentBlockAlignments.includes( parentBlockAlignment ) &&
-			parentBlockAlignment );
+	const parentTextAlignment = allowedParentBlockAlignments.includes(
+		parentBlockAlignment
+	)
+		? parentBlockAlignment
+		: undefined;
+
+	const textAlignment = align || parentTextAlignment;
 
 	return (
 		<>
@@ -91,7 +94,7 @@ function ParagraphBlock( {
 				onReplace={ onReplace }
 				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 				placeholder={ placeholder || __( 'Start writing…' ) }
-				textAlign={ textAligment }
+				textAlign={ textAlignment }
 				__unstableEmbedURLOnPaste
 			/>
 		</>
