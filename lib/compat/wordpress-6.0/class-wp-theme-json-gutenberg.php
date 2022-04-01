@@ -159,6 +159,8 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 		}
 
+		wp_recursive_ksort( $flattened_theme_json );
+
 		return $flattened_theme_json;
 	}
 
