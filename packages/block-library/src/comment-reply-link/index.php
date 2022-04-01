@@ -22,9 +22,14 @@ function render_js_comment_post_form() {
 				},
 			});
 			const comment = await commentPosted.json();
-			console.log(comment);
 			if (comment) {
-				location.reload();
+				this.open = false;
+				this.comments.push({
+					'id': comment.id,
+					'author': comment.author_name,
+					'date': comment.date,
+					'content': comment.content?.rendered,
+				});
 			}
 		}
 	";

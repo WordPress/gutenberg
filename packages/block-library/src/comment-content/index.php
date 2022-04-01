@@ -36,7 +36,7 @@ function render_block_core_comment_content( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return sprintf(
-		'<div x-text="comment.content" %1$s></div>',
+		'<div x-html="comment.content" %1$s></div>',
 		$wrapper_attributes
 	);
 }
