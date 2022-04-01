@@ -2451,4 +2451,26 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	function test_export_data_deals_with_empty_data() {
+		$theme_v2 = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => 2,
+			),
+			'theme'
+		);
+		$actual_v2   = $theme_v2->get_data();
+		$expected_v2 = array( 'version' => 2 );
+		$this->assertEqualSetsWithIndex( $expected_v2, $actual_v2 );
+
+		$theme_v1 = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => 1,
+			),
+			'theme'
+		);
+		$actual_v1   = $theme_v1->get_data();
+		$expected_v1 = array( 'version' => 2 );
+		$this->assertEqualSetsWithIndex( $expected_v1, $actual_v1 );
+		
+	}
 }
