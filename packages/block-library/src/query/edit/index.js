@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore, cloneBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { useState, useEffect } from '@wordpress/element';
 import {
@@ -13,6 +13,7 @@ import {
 	store as blockEditorStore,
 	useInnerBlocksProps,
 	__experimentalGetMatchingVariation as getMatchingVariation,
+	__experimentalBlockPatternSetup as BlockPatternSetup,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -29,7 +30,7 @@ import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './inspector-controls';
 import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
-import PatternSelectionModal from './pattern-selection-modal';
+import { getFirstQueryClientIdFromBlocks } from '../utils';
 
 const TEMPLATE = [ [ 'core/post-template' ] ];
 export function QueryContent( {
@@ -211,17 +212,28 @@ function QueryPatternSetup( {
 }
 
 const QueryEdit = ( props ) => {
-	const { clientId } = props;
+	const { clientId, name } = props;
 	const [
 		isPatternSelectionModalOpen,
 		setIsPatternSelectionModalOpen,
 	] = useState( false );
+	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 	const hasInnerBlocks = useSelect(
 		( select ) =>
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
 	const Component = hasInnerBlocks ? QueryContent : QueryPatternSetup;
+	const onBlockPatternSelect = ( blocks ) => {
+		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+		const firstQueryClientId = getFirstQueryClientIdFromBlocks(
+			clonedBlocks
+		);
+		replaceBlock( clientId, clonedBlocks );
+		if ( firstQueryClientId ) {
+			selectBlock( firstQueryClientId );
+		}
+	};
 	return (
 		<>
 			<Component
@@ -232,16 +244,17 @@ const QueryEdit = ( props ) => {
 			/>
 			{ isPatternSelectionModalOpen && (
 				<Modal
-					className="block-editor-template-part__selection-modal"
+					className="block-editor-query-pattern__selection-modal"
 					title={ __( 'Choose a pattern' ) }
 					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () =>
 						setIsPatternSelectionModalOpen( false )
 					}
 				>
-					<PatternSelectionModal
+					<BlockPatternSetup
+						blockName={ name }
 						clientId={ clientId }
-						name={ props.name }
+						onBlockPatternSelect={ onBlockPatternSelect }
 					/>
 				</Modal>
 			) }

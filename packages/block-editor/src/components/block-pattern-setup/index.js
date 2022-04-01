@@ -152,6 +152,11 @@ const BlockPatternSetup = ( {
 	};
 	const onPatternSelectCallback =
 		onBlockPatternSelect || onBlockPatternSelectDefault;
+	const onStartBlank = startBlankComponent
+		? () => {
+				setShowBlank( true );
+		  }
+		: undefined;
 	return (
 		<div
 			className={ `block-editor-block-pattern-setup view-mode-${ viewMode }` }
@@ -170,9 +175,7 @@ const BlockPatternSetup = ( {
 				onBlockPatternSelect={ () => {
 					onPatternSelectCallback( patterns[ activeSlide ].blocks );
 				} }
-				onStartBlank={ () => {
-					setShowBlank( true );
-				} }
+				onStartBlank={ onStartBlank }
 			/>
 			<SetupContent
 				viewMode={ viewMode }
