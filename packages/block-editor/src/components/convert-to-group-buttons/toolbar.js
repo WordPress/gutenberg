@@ -74,7 +74,7 @@ function BlockGroupToolbar() {
 			/>
 			<ToolbarButton
 				icon={ row }
-				label={ _x( 'Row', 'verb' ) }
+				label={ _x( 'Row', 'single horizontal line' ) }
 				onClick={ onConvertToRow }
 			/>
 			<ToolbarButton
