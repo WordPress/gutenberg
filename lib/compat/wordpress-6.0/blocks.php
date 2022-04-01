@@ -101,7 +101,7 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 
 					$query['tax_query'][] = array(
 						'taxonomy'         => $taxonomy,
-						'terms'            => $terms,
+						'terms'            => $term_ids,
 						'include_children' => false,
 					);
 				}
