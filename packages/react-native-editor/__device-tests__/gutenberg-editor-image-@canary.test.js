@@ -37,15 +37,23 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.dismissKeyboard();
 		}
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.paragraph,
-			2,
-			{
-				useWaitForVisible: true,
-			}
-		);
+
+		// Adding this condition to separate iOS and Android, not sure why but this is the combination that works for both platforms.
+		let paragraphBlockElement
 		if ( isAndroid() ) {
+			paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+				blockNames.paragraph,
+				2
+			)
 			await paragraphBlockElement.click();
+		} else {
+			paragraphBlockElement = await editorPage.getBlockAtPosition(
+				blockNames.paragraph,
+				2,
+				{
+					useWaitForVisible: true,
+				}
+			);
 		}
 
 		await editorPage.typeTextToParagraphBlock(
