@@ -21,6 +21,7 @@ function ParagraphBlock( {
 	setAttributes,
 	style,
 	clientId,
+	parentBlockAlignment,
 } ) {
 	const isRTL = useSelect( ( select ) => {
 		return !! select( blockEditorStore ).getSettings().isRTL;
@@ -82,7 +83,7 @@ function ParagraphBlock( {
 				onReplace={ onReplace }
 				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 				placeholder={ placeholder || __( 'Start writing…' ) }
-				textAlign={ align }
+				textAlign={ align || parentBlockAlignment }
 				__unstableEmbedURLOnPaste
 			/>
 		</>

@@ -129,6 +129,7 @@ export default function QuoteEdit( {
 						__unstableOnSplitAtEnd={ () =>
 							insertBlocksAfter( createBlock( 'core/paragraph' ) )
 						}
+						{ ...( ! isWebPlatform ? { textAlign: align } : {} ) }
 					/>
 				) }
 			</BlockQuotation>
