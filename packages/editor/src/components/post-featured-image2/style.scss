@@ -1,61 +1,82 @@
 .editor-post-featured-image {
 	padding: 0;
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
 
-	&__container {
-		margin-bottom: 1em;
+	// Thumbnail container.
+	.editor-post-featured-image__container {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		position: relative;
 	}
 
+	// @todo: these rules can be removed if we retire post-featured-image.
 	.components-spinner {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		margin-top: -9px;
-		margin-left: -9px;
-	}
-
-	// Stack consecutive buttons.
-	.components-button + .components-button {
-		display: block;
-		margin-top: 1em;
+		position: relative;
+		margin-top: 0;
+		margin-left: 0;
 	}
 
 	// This keeps images at their intrinsic size (eg. a 50px
 	// image will never be wider than 50px).
+	// @todo: we should replace this with loading a higher resolution image and applying object-fit: cover;
+	// This would also afford a refactor to use the image as a background, which would fix the cropped inset focus style.
 	.components-responsive-wrapper__content {
 		max-width: 100%;
 		width: auto;
 	}
+
+	// Edit/Replace action buttons.
+	// @todo: container could be replaced with a flex container.
+	.editor-post-featured-image__actions {
+		position: absolute;
+		display: flex;
+		background: $white;
+		border-radius: $radius-block-ui;
+		bottom: $grid-unit-20;
+		right: $grid-unit-20;
+		opacity: 0;
+		transition: all 0.1s ease-out;
+		@include reduce-motion("transition");
+
+		// @todo: these rules can be removed if we retire post-featured-image.
+		.components-button + .components-button {
+			display: block;
+			margin-top: 0;
+		}
+	}
+
+	&:focus .editor-post-featured-image__actions,
+	&:hover .editor-post-featured-image__actions {
+		opacity: 1;
+	}
 }
 
+
+// Button to set featured image when an image is set.
 .editor-post-featured-image__toggle,
 .editor-post-featured-image__preview {
 	display: block;
 	width: 100%;
 	padding: 0;
-	transition: all 0.1s ease-out;
-	@include reduce-motion("transition");
-	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
-}
-
-.editor-post-featured-image__preview {
-	height: auto;
-}
-
-.editor-post-featured-image__preview:not(:disabled):not([aria-disabled="true"]):focus {
-	box-shadow: 0 0 0 4px var(--wp-admin-theme-color);
-}
-
-.editor-post-featured-image__toggle {
-	border-radius: $radius-block-ui;
 	background-color: $gray-100;
-	min-height: 90px;
-	line-height: 20px;
-	padding: $grid-unit-10 0;
+	border-radius: 0;
+	min-height: 140px;
+	height: auto;
 	text-align: center;
 
 	&:hover {
 		background: $gray-300;
 		color: $gray-900;
 	}
+
+	// Override generic focus styles to be inset.
+	&:focus:not(:disabled),
+	&:not(:disabled):not([aria-disabled="true"]):focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	transition: all 0.1s ease-out;
+	@include reduce-motion("transition");
 }
