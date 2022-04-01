@@ -419,7 +419,7 @@ function addAttributes( settings ) {
 function addSaveProps( props, blockType, attributes ) {
 	if (
 		! hasBorderSupport( blockType, 'color' ) ||
-		shouldSkipSerialization( blockType )
+		shouldSkipSerialization( blockType, BORDER_SUPPORT_KEY, 'color' )
 	) {
 		return props;
 	}
@@ -489,7 +489,7 @@ function getSideBorderClasses( attributes ) {
 function addEditProps( settings ) {
 	if (
 		! hasBorderSupport( settings, 'color' ) ||
-		shouldSkipSerialization( settings )
+		shouldSkipSerialization( settings, BORDER_SUPPORT_KEY, 'color' )
 	) {
 		return settings;
 	}
@@ -524,7 +524,7 @@ export const withBorderColorPaletteStyles = createHigherOrderComponent(
 
 		if (
 			! hasBorderSupport( name, 'color' ) ||
-			shouldSkipSerialization( name )
+			shouldSkipSerialization( name, BORDER_SUPPORT_KEY, 'color' )
 		) {
 			return <BlockListBlock { ...props } />;
 		}
