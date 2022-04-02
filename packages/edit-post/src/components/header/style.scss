@@ -31,6 +31,13 @@
 	}
 }
 
+.zen-edit-post-header {
+	position: absolute;
+	width: 100%;
+	flex: 0 0 100%;
+	border-bottom: 1px solid $gray-400;
+}
+
 .edit-post-header__toolbar {
 	display: flex;
 	flex-grow: 1;

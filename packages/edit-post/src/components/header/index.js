@@ -30,6 +30,8 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		hasActiveMetaboxes,
 		isPublishSidebarOpened,
 		isSaving,
+		hasReducedUI,
+		isNavigationMode,
 		showIconLabels,
 	} = useSelect(
 		( select ) => ( {
@@ -51,11 +53,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
-	// if ( hasReducedUI && ! isNavigationMode ) {
-	// 	return null;
-	// }
-
-	const classes = classnames( 'edit-post-header' );
+	const classes = classnames( 'edit-post-header', {
+		'zen-edit-post-header': hasReducedUI && ! isNavigationMode,
+	} );
 
 	const slideY = {
 		initial: { y: '-100%' },
