@@ -86,7 +86,9 @@ _Related_
 
 ### AlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### Autocomplete
 
@@ -96,7 +98,9 @@ _Related_
 
 ### BlockAlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockAlignmentToolbar
 
@@ -273,7 +277,9 @@ _Related_
 
 ### BlockVerticalAlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### ButtonBlockAppender
 
@@ -489,7 +495,9 @@ _Related_
 
 ### JustifyContentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### JustifyToolbar
 

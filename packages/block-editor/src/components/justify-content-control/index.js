@@ -3,13 +3,15 @@
  */
 import JustifyContentUI from './ui';
 
-export function JustifyContentControl( props ) {
+const JustifyContentControl = ( props ) => {
 	return <JustifyContentUI { ...props } isToolbar={ false } />;
-}
+};
+
+const JustifyToolbar = ( props ) => {
+	return <JustifyContentUI { ...props } isToolbar />;
+};
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md
  */
-export function JustifyToolbar( props ) {
-	return <JustifyContentUI { ...props } isToolbar />;
-}
+export { JustifyContentControl, JustifyToolbar };
