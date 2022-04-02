@@ -13,6 +13,20 @@ import { __ } from '@wordpress/i18n';
 import useSetting from '../../components/use-setting';
 
 /**
+ * Minimum space between letters
+ *
+ * @type {number}
+ */
+const MIN_LETTER_SPACE = 0.1;
+
+/**
+ * Maximum space between letters
+ *
+ * @type {number}
+ */
+const MAX_LETTER_SPACE = 100;
+
+/**
  * Control for letter-spacing.
  *
  * @param {Object}                  props                      Component props.
@@ -38,6 +52,8 @@ export default function LetterSpacingControl( {
 			__unstableInputWidth={ __unstableInputWidth }
 			units={ units }
 			onChange={ onChange }
+			min={ MIN_LETTER_SPACE }
+			max={ MAX_LETTER_SPACE }
 		/>
 	);
 }
