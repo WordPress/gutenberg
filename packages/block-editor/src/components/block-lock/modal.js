@@ -114,7 +114,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 											/>
 										</>
 									}
-									checked={ lock.edit }
+									checked={ !! lock.edit }
 									onChange={ ( edit ) =>
 										setLock( ( prevLock ) => ( {
 											...prevLock,
