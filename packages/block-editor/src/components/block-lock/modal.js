@@ -54,15 +54,8 @@ export default function BlockLockModal( { clientId, onClose } ) {
 	}, [ canMove, canRemove ] );
 
 	const isAllChecked = Object.values( lock ).every( Boolean );
-
-	let ariaChecked;
-	if ( isAllChecked ) {
-		ariaChecked = 'true';
-	} else if ( Object.values( lock ).some( Boolean ) ) {
-		ariaChecked = 'mixed';
-	} else {
-		ariaChecked = 'false';
-	}
+	const isIndeterminate =
+		Object.values( lock ).some( Boolean ) && ! isAllChecked;
 
 	return (
 		<Modal
@@ -98,7 +91,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							<span id={ instanceId }>{ __( 'Lock all' ) }</span>
 						}
 						checked={ isAllChecked }
-						aria-checked={ ariaChecked }
+						indeterminate={ isIndeterminate }
 						onChange={ ( newValue ) =>
 							setLock( {
 								move: newValue,
