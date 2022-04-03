@@ -11,7 +11,7 @@ import {
 	Icon,
 	Modal,
 } from '@wordpress/components';
-import { dragHandle, trash } from '@wordpress/icons';
+import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -112,7 +112,13 @@ export default function BlockLockModal( { clientId, onClose } ) {
 								label={
 									<>
 										{ __( 'Disable movement' ) }
-										<Icon icon={ dragHandle } />
+										<Icon
+											icon={
+												lock.move
+													? lockIcon
+													: unlockIcon
+											}
+										/>
 									</>
 								}
 								checked={ lock.move }
@@ -129,7 +135,13 @@ export default function BlockLockModal( { clientId, onClose } ) {
 								label={
 									<>
 										{ __( 'Prevent removal' ) }
-										<Icon icon={ trash } />
+										<Icon
+											icon={
+												lock.remove
+													? lockIcon
+													: unlockIcon
+											}
+										/>
 									</>
 								}
 								checked={ lock.remove }
