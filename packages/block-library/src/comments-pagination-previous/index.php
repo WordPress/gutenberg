@@ -35,6 +35,17 @@ function render_block_core_comments_pagination_previous( $attributes, $content, 
 		return '';
 	}
 
+	/**
+	 * Ensure that previous link markup is same with comment pagination number.
+	 *
+	 * @link https://github.com/WordPress/gutenberg/issues/37561
+	 */
+	$pos = strpos( $previous_comments_link, 'cpage' );
+	if ( false === $pos ) {
+		$page                   = get_query_var( 'cpage' );
+		$previous_comments_link = add_query_arg( 'cpage', $page - 1, $previous_comments_link );
+	}
+
 	return $previous_comments_link;
 }
 

@@ -42,6 +42,18 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 	if ( ! isset( $next_comments_link ) ) {
 		return '';
 	}
+
+	/**
+	 * Ensure that next link markup is same with comment pagination number.
+	 *
+	 * @link https://github.com/WordPress/gutenberg/issues/37561
+	 */
+	$pos = strpos( $next_comments_link, 'cpage' );
+	if ( false === $pos ) {
+		$page               = get_query_var( 'cpage' );
+		$next_comments_link = add_query_arg( 'cpage', $page + 1, $next_comments_link );
+	}
+
 	return $next_comments_link;
 }
 
