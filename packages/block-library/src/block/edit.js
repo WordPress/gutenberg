@@ -109,8 +109,8 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	return (
 		<RecursionProvider>
 			<div { ...blockProps }>
-				<BlockControls>
-					{ canRemove && (
+				{ canRemove && (
+					<BlockControls>
 						<ToolbarGroup>
 							<ToolbarButton
 								onClick={ () =>
@@ -121,8 +121,8 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 								showTooltip
 							/>
 						</ToolbarGroup>
-					) }
-				</BlockControls>
+					</BlockControls>
+				) }
 				<InspectorControls>
 					<PanelBody>
 						<TextControl
