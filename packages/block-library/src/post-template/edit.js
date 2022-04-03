@@ -38,6 +38,9 @@ function PostTemplateBlockPreview( {
 } ) {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
+		props: {
+			className: 'wp-block-post',
+		},
 	} );
 
 	const handleOnClick = () => {
