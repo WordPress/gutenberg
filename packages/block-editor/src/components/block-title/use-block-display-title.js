@@ -34,10 +34,10 @@ import { store as blockEditorStore } from '../../store';
  * @return {?string} Block title.
  */
 export default function useBlockDisplayTitle( clientId, maximumLength ) {
-	const { attributes, name, reusableBlockTitle } = useSelect(
+	const blockTitle = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return {};
+				return null;
 			}
 			const {
 				getBlockName,
@@ -45,42 +45,45 @@ export default function useBlockDisplayTitle( clientId, maximumLength ) {
 				__experimentalGetReusableBlockTitle,
 			} = select( blockEditorStore );
 			const blockName = getBlockName( clientId );
+
 			if ( ! blockName ) {
-				return {};
+				return null;
 			}
-			const isReusable = isReusableBlock( getBlockType( blockName ) );
-			return {
-				attributes: getBlockAttributes( clientId ),
-				name: blockName,
-				reusableBlockTitle:
-					isReusable &&
-					__experimentalGetReusableBlockTitle(
-						getBlockAttributes( clientId ).ref
-					),
-			};
+			const blockType = getBlockType( blockName );
+			const isReusable = isReusableBlock( blockType );
+			const attributes = getBlockAttributes( clientId );
+			const reusableBlockTitle =
+				isReusable &&
+				__experimentalGetReusableBlockTitle( attributes.ref );
+			const blockLabel = blockType
+				? getBlockLabel( blockType, attributes )
+				: null;
+			const displayLabel = reusableBlockTitle || blockLabel;
+			return displayLabel && displayLabel !== blockType.title
+				? displayLabel
+				: null;
 		},
 		[ clientId ]
 	);
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	if ( ! name || ! blockInformation ) {
+	if ( ! blockInformation ) {
 		return null;
 	}
-	const blockType = getBlockType( name );
-	const blockLabel = blockType
-		? getBlockLabel( blockType, attributes )
-		: null;
-
-	const label = reusableBlockTitle || blockLabel;
+	// const blockType = getBlockType( name );
+	// const blockLabel = blockType
+	// 	? getBlockLabel( blockType, attributes )
+	// 	: null;
+	//
+	// const label = reusableBlockTitle || blockLabel;
 	// Label will fallback to the title if no label is defined for the current
 	// label context. If the label is defined we prioritize it over a
 	// possible block variation title match.
-	const blockTitle =
-		label && label !== blockType.title ? label : blockInformation.title;
+	const blockDisplayTitle = blockTitle || blockInformation.title;
 
 	if ( maximumLength && maximumLength > 0 ) {
-		return truncate( blockTitle, { length: maximumLength } );
+		return truncate( blockDisplayTitle, { length: maximumLength } );
 	}
 
-	return blockTitle;
+	return blockDisplayTitle;
 }

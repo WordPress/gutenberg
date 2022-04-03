@@ -68,10 +68,7 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 
 describe( 'BlockTitle', () => {
 	it( 'renders nothing if name is falsey', () => {
-		useSelect.mockImplementation( () => ( {
-			name: null,
-			attributes: null,
-		} ) );
+		useSelect.mockImplementation( () => null );
 
 		const wrapper = shallow( <BlockTitle /> );
 
