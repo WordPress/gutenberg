@@ -49,8 +49,7 @@ function block_core_gallery_render( $attributes, $content ) {
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
 	$gap       = preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
-	$id        = uniqid();
-	$class     = 'wp-block-gallery-' . $id;
+	$class     = wp_unique_id( 'wp-block-gallery-' );
 	$content   = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
 		'class="' . $class . ' ',
