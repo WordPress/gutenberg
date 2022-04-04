@@ -221,6 +221,7 @@ Setting `parent` lets a block require that it is only available when nested with
 -   Optional
 -   Localized: No
 -   Property: `ancestor`
+-   Since: `WordPress 6.0.0`
 
 ```json
 { "ancestor": [ "my-block/product" ] }
