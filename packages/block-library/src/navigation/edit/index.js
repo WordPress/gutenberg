@@ -190,6 +190,17 @@ function Navigation( {
 		createNavigationMenuStatus === CREATE_NAVIGATION_MENU_PENDING;
 
 	useEffect( () => {
+		// Unset flag to indicate that user initiated manual
+		// creation of an empty/blank menu.
+		if (
+			createNavigationMenuStatus === CREATE_NAVIGATION_MENU_SUCCESS ||
+			createNavigationMenuStatus === CREATE_NAVIGATION_MENU_ERROR
+		) {
+			isCreatingEmpty.current = false;
+		}
+	}, [ createNavigationMenuStatus ] );
+
+	useEffect( () => {
 		hideNavigationMenuCreateNotice();
 
 		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_PENDING ) {
@@ -557,10 +568,10 @@ function Navigation( {
 	}, [ clientId, ref ] );
 
 	function handleCreateEmptyMenu() {
+		// Set flag to indicate that user initiated manual
+		// creation of an empty/blank menu.
 		isCreatingEmpty.current = true;
-		createNavigationMenu( '', [] ).finally(
-			() => ( isCreatingEmpty.current = false )
-		);
+		createNavigationMenu( '', [] );
 	}
 
 	// If the block has inner blocks, but no menu id, this was an older
