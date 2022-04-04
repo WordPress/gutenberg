@@ -6,12 +6,54 @@
  */
 
 /**
- * Register webfonts defined in theme.json.
+ * Transforms the keys of the webfont defined in theme.json into
+ * kebab case, so the Webfonts API can handle it.
+ *
+ * @param array $webfont The webfont to be tranformed.
+ *
+ * @return array The kebab-case version of the webfont.
  */
-function gutenberg_register_webfonts_from_theme_json() {
-	// Get settings.
-	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
+function gutenberg_webfont_to_kebab_case( $webfont ) {
+	$kebab_cased_webfont = array();
 
+	foreach ( $webfont as $key => $value ) {
+		$kebab_cased_webfont[ _wp_to_kebab_case( $key ) ] = $value;
+	}
+
+	return $kebab_cased_webfont;
+}
+
+/**
+ * Transforms the source of the font face from `file.:/` into an actual URI.
+ *
+ * @param array $font_face The font face.
+ *
+ * @return array The URI-resolved font face.
+ */
+function gutenberg_resolve_font_face_uri( $font_face ) {
+	if ( empty( $font_face['src'] ) ) {
+		return $font_face;
+	}
+
+	$font_face['src'] = (array) $font_face['src'];
+
+	foreach ( $font_face['src'] as $src_key => $url ) {
+		// Tweak the URL to be relative to the theme root.
+		if ( ! str_starts_with( $url, 'file:./' ) ) {
+			continue;
+		}
+		$font_face['src'][ $src_key ] = get_theme_file_uri( str_replace( 'file:./', '', $url ) );
+	}
+
+	return $font_face;
+}
+
+/**
+ * Register webfonts defined in theme.json
+ *
+ * @param array $settings The theme.json file.
+ */
+function gutenberg_register_webfonts_from_theme_json( $settings ) {
 	// If in the editor, add webfonts defined in variations.
 	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
@@ -43,55 +85,50 @@ function gutenberg_register_webfonts_from_theme_json() {
 		return;
 	}
 
-	$webfonts = array();
+	$font_faces_to_register = array();
 
-	// Look for fontFamilies.
-	foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
-		foreach ( $font_families as $font_family ) {
+	foreach ( $settings['typography']['fontFamilies'] as $font_families_by_origin ) {
+		foreach ( $font_families_by_origin as $font_family ) {
+			if ( isset( $font_family['provider'] ) ) {
+				if ( empty( $font_family['fontFaces'] ) ) {
+					trigger_error(
+						sprintf(
+							/* translators: %s: font family name */
+							esc_html__( 'The "%s" font family specifies a provider, but no font faces.', 'gutenberg' ),
+							esc_html( $font_family['fontFamily'] )
+						)
+					);
 
-			// Skip if fontFace is not defined.
-			if ( empty( $font_family['fontFace'] ) ) {
-				continue;
-			}
-
-			$font_family['fontFace'] = (array) $font_family['fontFace'];
-
-			foreach ( $font_family['fontFace'] as $font_face ) {
-				// Skip if the webfont was registered through the Webfonts API.
-				if ( isset( $font_face['origin'] ) && 'gutenberg_wp_webfonts_api' === $font_face['origin'] ) {
 					continue;
 				}
 
-				// Check if webfonts have a "src" param, and if they do account for the use of "file:./".
-				if ( ! empty( $font_face['src'] ) ) {
-					$font_face['src'] = (array) $font_face['src'];
+				foreach ( $font_family['fontFaces'] as $font_face ) {
+					$font_face['provider'] = $font_family['provider'];
+					$font_face             = gutenberg_resolve_font_face_uri( $font_face );
+					$font_face             = gutenberg_webfont_to_kebab_case( $font_face );
 
-					foreach ( $font_face['src'] as $src_key => $url ) {
-						// Tweak the URL to be relative to the theme root.
-						if ( ! str_starts_with( $url, 'file:./' ) ) {
-							continue;
-						}
-						$font_face['src'][ $src_key ] = get_theme_file_uri( str_replace( 'file:./', '', $url ) );
-					}
+					$font_faces_to_register[] = $font_face;
 				}
 
-				// Convert keys to kebab-case.
-				foreach ( $font_face as $property => $value ) {
-					$kebab_case               = _wp_to_kebab_case( $property );
-					$font_face[ $kebab_case ] = $value;
-					if ( $kebab_case !== $property ) {
-						unset( $font_face[ $property ] );
-					}
-				}
+				continue;
+			}
 
-				$webfonts[] = $font_face;
+			if ( ! isset( $font_family['fontFaces'] ) ) {
+				continue;
+			}
+
+			foreach ( $font_family['fontFaces'] as $font_face ) {
+				if ( isset( $font_face['provider'] ) ) {
+					$font_face = gutenberg_resolve_font_face_uri( $font_face );
+					$font_face = gutenberg_webfont_to_kebab_case( $font_face );
+
+					$font_faces_to_register[] = $font_face;
+				}
 			}
 		}
 	}
-	foreach ( $webfonts as $webfont ) {
-		wp_webfonts()->register_webfont( $webfont );
-		wp_webfonts()->enqueue_webfont( $webfont['font-family'] );
-	}
+
+	wp_register_webfonts( $font_faces_to_register );
 }
 
 /**
@@ -171,5 +208,3 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 
 	return $data;
 }
-
-add_action( 'init', 'gutenberg_register_webfonts_from_theme_json' );

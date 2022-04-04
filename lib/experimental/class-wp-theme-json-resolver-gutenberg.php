@@ -36,6 +36,10 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		if ( null === static::$theme ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+
+			$original_theme_json = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+			gutenberg_register_webfonts_from_theme_json( $original_theme_json->get_settings() );
+
 			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
 			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
@@ -43,8 +47,9 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 				// Get parent theme.json.
 				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
 				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
-				$parent_theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $parent_theme_json_data );
-				$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
+
+				$parent_theme = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
+				gutenberg_register_webfonts_from_theme_json( $parent_theme->get_settings() );
 
 				// Merge the child theme.json into the parent theme.json.
 				// The child theme takes precedence over the parent.
