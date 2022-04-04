@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraps Global Styles.
+ * Filters to adjust the KSES behavior.
  *
  * @package gutenberg
  */

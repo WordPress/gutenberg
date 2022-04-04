@@ -55,10 +55,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-url-details-controller.php';
 	}
 
-	require __DIR__ . '/rest-api.php';
+	require __DIR__ . '/experimental/rest-api.php';
+	require __DIR__ . '/compat/wordpress-5.9/rest-api.php';
 }
 
-require __DIR__ . '/compat.php';
+require __DIR__ . '/compat/wordpress-5.9/block-gallery.php';
 require __DIR__ . '/compat/wordpress-5.9/widget-render-api-endpoint/index.php';
 require __DIR__ . '/compat/wordpress-5.9/blocks.php';
 require __DIR__ . '/compat/wordpress-5.9/block-editor-settings.php';
@@ -78,13 +79,13 @@ require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/templates.php';
 require __DIR__ . '/compat/wordpress-5.9/template-parts.php';
 require __DIR__ . '/compat/wordpress-5.9/theme-templates.php';
-require __DIR__ . '/editor-settings.php';
+require __DIR__ . '/experimental/editor-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-5-9.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-5-9.php';
 require __DIR__ . '/compat/wordpress-5.9/theme.php';
 require __DIR__ . '/compat/wordpress-5.9/admin-menu.php';
-require __DIR__ . '/full-site-editing/edit-site-page.php';
+require __DIR__ . '/compat/wordpress-5.9/edit-site-page.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
@@ -99,7 +100,7 @@ require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-patterns-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
-require __DIR__ . '/compat/wordpress-6.0/utils.php';
+require __DIR__ . '/compat/wordpress-6.0/functions.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
@@ -116,18 +117,19 @@ require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';
 require __DIR__ . '/client-assets.php';
+require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
 require __DIR__ . '/demo.php';
-require __DIR__ . '/navigation.php';
-require __DIR__ . '/navigation-theme-opt-in.php';
-require __DIR__ . '/navigation-page.php';
-require __DIR__ . '/experiments-page.php';
-require __DIR__ . '/global-styles.php';
+require __DIR__ . '/compat/wordpress-5.9/navigation.php';
+require __DIR__ . '/experimental/navigation-theme-opt-in.php';
+require __DIR__ . '/experimental/navigation-page.php';
+require __DIR__ . '/experimental/experiments-page.php';
+require __DIR__ . '/compat/wordpress-5.9/kses.php';
 require __DIR__ . '/pwa.php';
 
 // TODO: Move this to be loaded from the style engine package, via the build directory.
 // Part of the build process should be to copy the PHP file to the correct location,
 // similar to the loading behaviour in `blocks.php`.
-require __DIR__ . '/style-engine/class-wp-style-engine-gutenberg.php';
+require __DIR__ . '/experimental/style-engine/class-wp-style-engine-gutenberg.php';
 
 require __DIR__ . '/block-supports/utils.php';
 require __DIR__ . '/block-supports/elements.php';
