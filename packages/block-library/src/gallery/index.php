@@ -56,7 +56,9 @@ function block_core_gallery_render( $attributes, $content ) {
 		$content,
 		1
 	);
-	$gap_value = $gap ? $gap : 'var( --wp--style--gallery-gap-default, var( --wp--style--block-gap, 0.5em ))';
+	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
+	// gap on the gallery.
+	$gap_value = $gap ? $gap : 'var( --gallery-block--gutter-size, var( --wp--style--gallery-gap-default, var( --wp--style--block-gap, 0.5em ) ) )';
 	$style     = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_value . '; gap: ' . $gap_value . '}';
 	// Ideally styles should be loaded in the head, but blocks may be parsed
 	// after that, so loading in the footer for now.
