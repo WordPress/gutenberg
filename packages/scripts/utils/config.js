@@ -209,11 +209,7 @@ function getWebpackEntryPoints() {
 		);
 		const entryPoints = blockMetadataFiles.reduce(
 			( accumulator, blockMetadataFile ) => {
-				const {
-					editorScript,
-					script,
-					viewScript,
-				} = JSON.parse(
+				const { editorScript, script, viewScript } = JSON.parse(
 					readFileSync( blockMetadataFile )
 				);
 				[ editorScript, script, viewScript ]
