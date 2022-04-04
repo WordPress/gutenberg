@@ -101,6 +101,7 @@ require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-c
 require __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-patterns-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/functions.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-6-0.php';
 require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
