@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
+import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,10 +16,24 @@ export interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
 	record: RecordType | null;
 
+	/** The edited entity record */
+	editedRecord: Partial< RecordType >;
+
+	/** Apply edits to the edited entity record */
+	edit: ( diff: Partial< RecordType > ) => void;
+
+	/** Persist the edits to the server */
+	save: () => Promise< void >;
+
 	/**
 	 * Is the record still being resolved?
 	 */
 	isResolving: boolean;
+
+	/**
+	 * Does the record have any edits?
+	 */
+	hasEdits: boolean;
 
 	/**
 	 * Is the record resolved by now?
@@ -75,7 +91,28 @@ export default function useEntityRecord< RecordType >(
 	recordId: string | number,
 	options: Options = { enabled: true }
 ): EntityRecordResolution< RecordType > {
-	const { data: record, ...rest } = useQuerySelect(
+	const { editEntityRecord, saveEditedEntityRecord } = useDispatch(
+		coreStore
+	);
+
+	const mutations = useMemo(
+		() => ( {
+			edit: ( record ) =>
+				editEntityRecord( kind, name, recordId, record ),
+			save: () => saveEditedEntityRecord( kind, name, recordId ),
+		} ),
+		[ recordId ]
+	);
+
+	const { editedRecord, hasEdits } = useSelect(
+		( select ) => ( {
+			editedRecord: select( coreStore ).getEditedEntityRecord(),
+			hasEdits: select( coreStore ).hasEditsForEntityRecord(),
+		} ),
+		[ kind, name, recordId ]
+	);
+
+	const { data: record, ...querySelectRest } = useQuerySelect(
 		( query ) => {
 			if ( ! options.enabled ) {
 				return null;
@@ -87,7 +124,10 @@ export default function useEntityRecord< RecordType >(
 
 	return {
 		record,
-		...rest,
+		editedRecord,
+		hasEdits,
+		...querySelectRest,
+		...mutations,
 	};
 }
 
