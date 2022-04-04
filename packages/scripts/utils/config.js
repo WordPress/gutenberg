@@ -2,6 +2,7 @@
  * External dependencies
  */
 const chalk = require( 'chalk' );
+const { readFileSync } = require( 'fs' );
 const { basename, dirname, extname, join, sep } = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
 
@@ -187,7 +188,7 @@ function getWebpackEntryPoints() {
 	if ( ! hasProjectFile( process.env.WP_SRC_DIRECTORY ) ) {
 		log(
 			chalk.yellow(
-				`Source directory"${ process.env.WP_SRC_DIRECTORY }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
+				`Source directory "${ process.env.WP_SRC_DIRECTORY }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
 			)
 		);
 		return {};
@@ -212,7 +213,9 @@ function getWebpackEntryPoints() {
 					editorScript,
 					script,
 					viewScript,
-				} = require( blockMetadataFile );
+				} = JSON.parse(
+					readFileSync( blockMetadataFile )
+				);
 				[ editorScript, script, viewScript ]
 					.flat()
 					.filter( ( value ) => value && value.startsWith( 'file:' ) )
