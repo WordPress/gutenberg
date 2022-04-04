@@ -14,7 +14,8 @@ function PostTitle() {
 	);
 	return (
 		<PlainText
-			tagName="h1"
+			className="edit-post-post-title"
+			tagName="span"
 			placeholder={ __( 'Add title' ) }
 			value={ postTitle }
 			onChange={ ( title ) => editPost( { title } ) }
