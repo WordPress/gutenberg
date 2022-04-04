@@ -556,10 +556,6 @@ function Navigation( {
 		} );
 	}, [ clientId, ref ] );
 
-	function handleCreateEmptyMenu() {
-		createNavigationMenu( '', [] );
-	}
-
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
 	// Either this block was saved in the content or inserted by a pattern.
@@ -649,7 +645,7 @@ function Navigation( {
 						isResolvingCanUserCreateNavigationMenu
 					}
 					onFinish={ handleSelectNavigation }
-					onCreateEmpty={ handleCreateEmptyMenu }
+					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
 				/>
 			</TagName>
 		);
