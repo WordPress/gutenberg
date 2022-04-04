@@ -129,7 +129,7 @@ require __DIR__ . '/pwa.php';
 // TODO: Move this to be loaded from the style engine package, via the build directory.
 // Part of the build process should be to copy the PHP file to the correct location,
 // similar to the loading behaviour in `blocks.php`.
-require __DIR__ . '/style-engine/class-wp-style-engine-gutenberg.php';
+require __DIR__ . '/experimental/style-engine/class-wp-style-engine-gutenberg.php';
 
 require __DIR__ . '/block-supports/utils.php';
 require __DIR__ . '/block-supports/elements.php';
