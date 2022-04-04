@@ -59,7 +59,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-5.9/rest-api.php';
 }
 
-require __DIR__ . '/compat.php';
+require __DIR__ . '/compat/wordpress-5.9/block-gallery.php';
 require __DIR__ . '/compat/wordpress-5.9/widget-render-api-endpoint/index.php';
 require __DIR__ . '/compat/wordpress-5.9/blocks.php';
 require __DIR__ . '/compat/wordpress-5.9/block-editor-settings.php';
@@ -85,7 +85,7 @@ require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-5-9.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-5-9.php';
 require __DIR__ . '/compat/wordpress-5.9/theme.php';
 require __DIR__ . '/compat/wordpress-5.9/admin-menu.php';
-require __DIR__ . '/full-site-editing/edit-site-page.php';
+require __DIR__ . '/compat/wordpress-5.9/edit-site-page.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
