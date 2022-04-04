@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString, reduce, maxBy } from 'lodash';
+import { every, has, isFunction, isMatch, isString, maxBy } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -240,63 +240,19 @@ export function getAccessibleBlockLabel(
 }
 
 /**
- * Ensure attributes contains only values defined by block type, and merge
- * default values for missing attributes.
+ * Filter block attributes by given options and return their names.
  *
- * @param {string} name       The block's name.
- * @param {Object} attributes The block's attributes.
- * @return {Object} The sanitized attributes.
+ * @param {string} name    Block attribute's name.
+ * @param {Object} options Attribute properties to filter by.
+ *
+ * @return {string[]} The attribute names that have the provided options.
  */
-export function __experimentalSanitizeBlockAttributes( name, attributes ) {
-	// Get the type definition associated with a registered block.
-	const blockType = getBlockType( name );
-
-	if ( undefined === blockType ) {
-		throw new Error( `Block type '${ name }' is not registered.` );
-	}
-
-	return reduce(
-		blockType.attributes,
-		( accumulator, schema, key ) => {
-			const value = attributes[ key ];
-
-			if ( undefined !== value ) {
-				accumulator[ key ] = value;
-			} else if ( schema.hasOwnProperty( 'default' ) ) {
-				accumulator[ key ] = schema.default;
-			}
-
-			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
-				// Ensure value passed is always an array, which we're expecting in
-				// the RichText component to handle the deprecated value.
-				if ( typeof accumulator[ key ] === 'string' ) {
-					accumulator[ key ] = [ accumulator[ key ] ];
-				} else if ( ! Array.isArray( accumulator[ key ] ) ) {
-					accumulator[ key ] = [];
-				}
-			}
-
-			return accumulator;
-		},
-		{}
-	);
-}
-
-/**
- * Filter block attributes by `role` and return their names.
- *
- * @param {string} name Block attribute's name.
- * @param {string} role The role of a block attribute.
- *
- * @return {string[]} The attribute names that have the provided role.
- */
-export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
+export function __experimentalFilterBlockAttributes( name, options ) {
 	const attributes = getBlockType( name )?.attributes;
 	if ( ! attributes ) return [];
+
 	const attributesNames = Object.keys( attributes );
-	if ( ! role ) return attributesNames;
-	return attributesNames.filter(
-		( attributeName ) =>
-			attributes[ attributeName ]?.__experimentalRole === role
+	return attributesNames.filter( ( attributeName ) =>
+		isMatch( attributes[ attributeName ], options )
 	);
 }

@@ -11,7 +11,6 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
-	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
 	getBlockTransforms,
@@ -90,9 +89,12 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
-					content: {
+					childrenContent: {
 						type: 'array',
 						source: 'children',
+					},
+					nodeContent: {
+						source: 'node',
 					},
 				},
 			} );
@@ -100,7 +102,8 @@ describe( 'block factory', () => {
 			const block = createBlock( 'core/test-block' );
 
 			expect( block.attributes ).toEqual( {
-				content: [],
+				childrenContent: [],
+				nodeContent: [],
 			} );
 		} );
 
@@ -176,6 +179,14 @@ describe( 'block factory', () => {
 			} );
 
 			expect( block.attributes ).toEqual( {} );
+		} );
+
+		it( 'throws error if the block is not registered', () => {
+			expect( () => {
+				createBlock( 'core/not-registered-test-block', {} );
+			} ).toThrowErrorMatchingInlineSnapshot(
+				`"Block type 'core/not-registered-test-block' is not registered."`
+			);
 		} );
 	} );
 
@@ -349,6 +360,74 @@ describe( 'block factory', () => {
 			expect( clonedBlock.clientId ).not.toBe( block.clientId );
 		} );
 
+		it( 'should retain all attributes by default', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					internalAttribute: {
+						type: 'string',
+						__experimentalSupports: {
+							copy: false,
+						},
+					},
+					contentAttribute: {
+						type: 'string',
+						__experimentalRole: 'content',
+					},
+				},
+			} );
+			const block = createBlock( 'core/test-block', {
+				internalAttribute: 'this-should-be-copied',
+				contentAttribute: 'some content',
+			} );
+
+			const clonedBlock = cloneBlock( block, {} );
+
+			expect( clonedBlock.attributes ).toEqual( {
+				internalAttribute: 'this-should-be-copied',
+				contentAttribute: 'some content',
+			} );
+		} );
+
+		it( 'should not duplicate attributes that do not support copy operation when configured with __experimentalSupports', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					internalAttribute: {
+						type: 'string',
+						__experimentalSupports: {
+							copy: false,
+						},
+					},
+					attributeWithExplicitCopySupport: {
+						type: 'string',
+						__experimentalSupports: {
+							copy: true,
+						},
+					},
+					contentAttribute: {
+						type: 'string',
+						__experimentalRole: 'content',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block', {
+				internalAttribute: 'this-should-not-be-copied',
+				contentAttribute: 'some content',
+				attributeWithExplicitCopySupport: 'another attribute',
+			} );
+
+			const clonedBlock = cloneBlock( block, {}, null, {
+				__experimentalRequiredAttributeSupports: [ 'copy' ],
+			} );
+
+			expect( clonedBlock.attributes ).toEqual( {
+				contentAttribute: 'some content',
+				attributeWithExplicitCopySupport: 'another attribute',
+			} );
+		} );
+
 		it( 'should replace inner blocks of the existing block', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
@@ -424,29 +503,6 @@ describe( 'block factory', () => {
 			expect( clonedBlock.innerBlocks[ 1 ].attributes ).toEqual(
 				block.innerBlocks[ 1 ].attributes
 			);
-		} );
-	} );
-
-	describe( '__experimentalCloneSanitizedBlock', () => {
-		it( 'should sanitize attributes not defined in the block type', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				attributes: {
-					align: {
-						type: 'string',
-					},
-				},
-			} );
-
-			const block = createBlock( 'core/test-block', {
-				notDefined: 'not-defined',
-			} );
-
-			const clonedBlock = __experimentalCloneSanitizedBlock( block, {
-				notDefined2: 'not-defined-2',
-			} );
-
-			expect( clonedBlock.attributes ).toEqual( {} );
 		} );
 	} );
 

@@ -15,6 +15,8 @@ import {
 	isFunction,
 	isEmpty,
 	map,
+	reduce,
+	omit,
 } from 'lodash';
 
 /**
@@ -32,7 +34,7 @@ import {
 } from './registration';
 import {
 	normalizeBlockType,
-	__experimentalSanitizeBlockAttributes,
+	__experimentalFilterBlockAttributes,
 } from './utils';
 
 /**
@@ -45,9 +47,37 @@ import {
  * @return {Object} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		name,
-		attributes
+	// Get the type definition associated with a registered block.
+	const blockType = getBlockType( name );
+
+	if ( undefined === blockType ) {
+		throw new Error( `Block type '${ name }' is not registered.` );
+	}
+
+	const sanitizedAttributes = reduce(
+		blockType.attributes,
+		( accumulator, schema, key ) => {
+			const value = attributes[ key ];
+
+			if ( undefined !== value ) {
+				accumulator[ key ] = value;
+			} else if ( schema.hasOwnProperty( 'default' ) ) {
+				accumulator[ key ] = schema.default;
+			}
+
+			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
+				// Ensure value passed is always an array, which we're expecting in
+				// the RichText component to handle the deprecated value.
+				if ( typeof accumulator[ key ] === 'string' ) {
+					accumulator[ key ] = [ accumulator[ key ] ];
+				} else if ( ! Array.isArray( accumulator[ key ] ) ) {
+					accumulator[ key ] = [];
+				}
+			}
+
+			return accumulator;
+		},
+		{}
 	);
 
 	const clientId = uuid();
@@ -94,62 +124,57 @@ export function createBlocksFromInnerBlocksTemplate(
 }
 
 /**
- * Given a block object, returns a copy of the block object while sanitizing its attributes,
- * optionally merging new attributes and/or replacing its inner blocks.
+ * @typedef {Object} WPBlockCloneOptions Cloning Options.
  *
- * @param {Object} block           Block instance.
- * @param {Object} mergeAttributes Block attributes.
- * @param {?Array} newInnerBlocks  Nested blocks.
- *
- * @return {Object} A cloned block.
+ * @property {Array} __experimentalRequiredAttributeSupports Attributes missing these support keys will be excluded from the cloned block.
  */
-export function __experimentalCloneSanitizedBlock(
-	block,
-	mergeAttributes = {},
-	newInnerBlocks
-) {
-	const clientId = uuid();
-
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		block.name,
-		{
-			...block.attributes,
-			...mergeAttributes,
-		}
-	);
-
-	return {
-		...block,
-		clientId,
-		attributes: sanitizedAttributes,
-		innerBlocks:
-			newInnerBlocks ||
-			block.innerBlocks.map( ( innerBlock ) =>
-				__experimentalCloneSanitizedBlock( innerBlock )
-			),
-	};
-}
 
 /**
  * Given a block object, returns a copy of the block object,
- * optionally merging new attributes and/or replacing its inner blocks.
+ * optionally merging new attributes, replacing its inner blocks, and/or
+ * filtering out attributes which do not have copy support.
  *
- * @param {Object} block           Block instance.
- * @param {Object} mergeAttributes Block attributes.
- * @param {?Array} newInnerBlocks  Nested blocks.
+ * @param {Object}                block                 Block instance.
+ * @param {Object}                mergeAttributes       Block attributes.
+ * @param {?Array}                newInnerBlocks        Nested blocks.
+ * @param {?WPBlockCloneOptions}  __experimentalOptions Cloning options.
  *
  * @return {Object} A cloned block.
  */
-export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
+export function cloneBlock(
+	block,
+	mergeAttributes = {},
+	newInnerBlocks,
+	__experimentalOptions = {}
+) {
+	const {
+		__experimentalRequiredAttributeSupports: requiredSupportKeys,
+	} = __experimentalOptions;
 	const clientId = uuid();
+
+	let attributes = {
+		...block.attributes,
+		...mergeAttributes,
+	};
+
+	if ( requiredSupportKeys ) {
+		// Exclude attributes that do not have the required supports.
+		const attributesFilter = {
+			__experimentalSupports: requiredSupportKeys.reduce(
+				( acc, supportKey ) => ( { ...acc, [ supportKey ]: false } ),
+				{}
+			),
+		};
+		attributes = omit(
+			attributes,
+			__experimentalFilterBlockAttributes( block.name, attributesFilter )
+		);
+	}
 
 	return {
 		...block,
 		clientId,
-		attributes: {
-			...block.attributes,
-			...mergeAttributes,
-		},
+		attributes,
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),

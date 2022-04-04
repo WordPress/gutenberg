@@ -186,13 +186,15 @@ In the random image block above, we've given the `alt` attribute of the image a 
 ### cloneBlock
 
 Given a block object, returns a copy of the block object,
-optionally merging new attributes and/or replacing its inner blocks.
+optionally merging new attributes, replacing its inner blocks, and/or
+filtering out attributes which do not have copy support.
 
 _Parameters_
 
 -   _block_ `Object`: Block instance.
 -   _mergeAttributes_ `Object`: Block attributes.
 -   _newInnerBlocks_ `?Array`: Nested blocks.
+-   _\_\_experimentalOptions_ `?WPBlockCloneOptions`: Cloning options.
 
 _Returns_
 

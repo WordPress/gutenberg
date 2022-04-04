@@ -11,7 +11,7 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 import { Children, cloneElement, useCallback } from '@wordpress/element';
-import { serialize } from '@wordpress/blocks';
+import { cloneBlock, serialize } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useCopyToClipboard } from '@wordpress/compose';
 
@@ -33,7 +33,14 @@ const POPOVER_PROPS = {
 };
 
 function CopyMenuItem( { blocks, onCopy } ) {
-	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
+	const ref = useCopyToClipboard( () => {
+		blocks = blocks.map( ( block ) =>
+			cloneBlock( block, {}, null, {
+				__experimentalRequiredAttributeSupports: [ 'copy' ],
+			} )
+		);
+		return serialize( blocks );
+	}, onCopy );
 	return <MenuItem ref={ ref }>{ __( 'Copy' ) }</MenuItem>;
 }
 

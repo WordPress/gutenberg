@@ -362,6 +362,7 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 
 	const blockType = getBlockType( blockName );
 	const saveAttributes = getCommentAttributes( blockType, block.attributes );
+
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 
