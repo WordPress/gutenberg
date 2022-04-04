@@ -17,7 +17,8 @@
 			"enum": [ "all", "insert", false ]
 		},
 		"verticalAlignment": {
-			"type": "string"
+			"type": "string",
+			"default": "center"
 		}
 	},
 	"supports": {
