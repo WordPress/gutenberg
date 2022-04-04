@@ -10,27 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-
-/**
- * Registers the REST API routes for URL Details.
- *
- * @since 5.0.0
- */
-function gutenberg_register_url_details_routes() {
-	$url_details_controller = new WP_REST_URL_Details_Controller();
-	$url_details_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_url_details_routes' );
-
-/**
- * Registers the menu locations REST API routes.
- */
-function gutenberg_register_rest_menu_location() {
-	$nav_menu_location = new WP_REST_Menu_Locations_Controller();
-	$nav_menu_location->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_menu_location' );
-
 /**
  * Registers the navigation areas REST API routes.
  */
@@ -57,44 +36,6 @@ function gutenberg_register_block_editor_settings() {
 	$editor_settings->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
-
-/**
- * Hook in to the nav menu item post type and enable a post type rest endpoint.
- *
- * @param array  $args Current registered post type args.
- * @param string $post_type Name of post type.
- *
- * @return array
- */
-function wp_api_nav_menus_post_type_args( $args, $post_type ) {
-	if ( 'nav_menu_item' === $post_type ) {
-		$args['show_in_rest']          = true;
-		$args['rest_base']             = 'menu-items';
-		$args['rest_controller_class'] = 'WP_REST_Menu_Items_Controller';
-	}
-
-	return $args;
-}
-add_filter( 'register_post_type_args', 'wp_api_nav_menus_post_type_args', 10, 2 );
-
-/**
- * Hook in to the nav_menu taxonomy and enable a taxonomy rest endpoint.
- *
- * @param array  $args Current registered taxonomy args.
- * @param string $taxonomy Name of taxonomy.
- *
- * @return array
- */
-function wp_api_nav_menus_taxonomy_args( $args, $taxonomy ) {
-	if ( 'nav_menu' === $taxonomy ) {
-		$args['show_in_rest']          = true;
-		$args['rest_base']             = 'menus';
-		$args['rest_controller_class'] = 'WP_REST_Menus_Controller';
-	}
-
-	return $args;
-}
-add_filter( 'register_taxonomy_args', 'wp_api_nav_menus_taxonomy_args', 10, 2 );
 
 /**
  * Shim for get_sample_permalink() to add support for auto-draft status.

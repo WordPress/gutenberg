@@ -55,7 +55,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-url-details-controller.php';
 	}
 
-	require __DIR__ . '/rest-api.php';
+	require __DIR__ . '/experimental/rest-api.php';
 	require __DIR__ . '/compat/wordpress-5.9/rest-api.php';
 }
 
@@ -100,7 +100,7 @@ require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-
 require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-patterns-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
-require __DIR__ . '/compat/wordpress-6.0/utils.php';
+require __DIR__ . '/compat/wordpress-6.0/functions.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
