@@ -97,7 +97,7 @@ function gutenberg_generate_block_templates_export_file() {
 	}
 
 	// Load theme.json into the zip file.
-	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data_without_supports();
 	$tree->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
 
 	$theme_json_raw = $tree->get_data();
