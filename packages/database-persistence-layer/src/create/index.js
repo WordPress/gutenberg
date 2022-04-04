@@ -43,6 +43,9 @@ export default function create( { preloadedData, requestThrottleMS = 2500 } ) {
 			apiFetch( {
 				path: '/wp/v2/users/me',
 				method: 'PUT',
+				// `keepalive` will still send the request in the background,
+				// even when a browser unload event might interrupt it.
+				keepalive: true,
 				data: {
 					meta: {
 						persisted_preferences: newData,
