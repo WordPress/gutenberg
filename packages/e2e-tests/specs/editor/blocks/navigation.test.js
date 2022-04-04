@@ -884,6 +884,46 @@ describe( 'Navigation', () => {
 			newMenuButton.click();
 		}
 
+		it( 'respects the nesting level', async () => {
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Create empty Navigation block with no items
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickOnMoreMenuItem( 'Code editor' );
+			const codeEditorInput = await page.waitForSelector(
+				'.editor-post-text-editor'
+			);
+
+			let code = await codeEditorInput.evaluate( ( el ) => el.value );
+			code = code.replace( '} /-->', ',"maxNestingLevel":0} /-->' );
+			await codeEditorInput.evaluate(
+				( el, newCode ) => ( el.value = newCode ),
+				code
+			);
+			await clickButton( 'Exit code editor' );
+
+			const blockAppender = navBlock.$( '.block-list-appender' );
+
+			expect( blockAppender ).not.toBeNull();
+
+			// Check the Submenu block is no longer present.
+			const navSubmenuSelector =
+				'[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]';
+			const submenuBlock = await page.$( navSubmenuSelector );
+
+			expect( submenuBlock ).toBeFalsy();
+		} );
+
 		it( 'does not retain uncontrolled inner blocks when creating a new entity', async () => {
 			await createNewPost();
 			await clickOnMoreMenuItem( 'Code editor' );
