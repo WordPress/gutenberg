@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { addEntities } from './actions';
 import type * as Records from './entity-types';
-import type { Context, Taxonomy, Type } from './entity-types';
+import type { Context, Post, Taxonomy, Type, Updatable } from './entity-types';
 import type { EntityConfigTypeFromConst } from './entity-types/entities';
 
 export const DEFAULT_ENTITY_KEY = 'id';
@@ -313,7 +313,7 @@ export const additionalEntityConfigLoaders = [
  * @return {Object} Updated edits.
  */
 export const prePersistPostType = ( persistedRecord, edits ) => {
-	const newEdits = {} as any;
+	const newEdits = {} as Partial< Updatable< Post< 'edit' > > >;
 
 	if ( persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
