@@ -36,7 +36,7 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-const copyWebPackPattens = process.env.WP_COPY_PHP_FILES_TO_DIST
+const copyWebPackPatterns = process.env.WP_COPY_PHP_FILES_TO_DIST
 	? '**/{block.json,*.php}'
 	: '**/block.json';
 
@@ -99,7 +99,7 @@ const config = {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.ts', '.tsx', '...' ],
+		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -232,7 +232,7 @@ const config = {
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
-					from: copyWebPackPattens,
+					from: copyWebPackPatterns,
 					context: 'src',
 					noErrorOnMissing: true,
 				},

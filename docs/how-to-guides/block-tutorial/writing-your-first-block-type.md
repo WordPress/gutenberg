@@ -21,7 +21,7 @@ Blocks are added to WordPress using plugins, so you will need:
 
 ### Step 1: Configure block.json
 
-The functions of a static block is defined in JavaScript, however the settings and other metadata should be defined in a block.json file.
+The functions of a static block are defined in JavaScript, however the settings and other metadata should be defined in a block.json file.
 
 Here are the basic settings:
 

@@ -80,11 +80,15 @@ registerCoreBlocks();
 
 ### AlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### AlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### Autocomplete
 
@@ -94,11 +98,15 @@ _Related_
 
 ### BlockAlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockAlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockBreadcrumb
 
@@ -151,11 +159,15 @@ Undocumented declaration.
 
 ### BlockIcon
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-icon/README.md>
 
 ### BlockInspector
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md>
 
 ### BlockList
 
@@ -163,7 +175,9 @@ Undocumented declaration.
 
 ### BlockMover
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-mover/README.md>
 
 ### BlockNavigationDropdown
 
@@ -239,7 +253,9 @@ _Returns_
 
 ### BlockToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md>
 
 ### BlockTools
 
@@ -255,11 +271,15 @@ _Parameters_
 
 ### BlockVerticalAlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### BlockVerticalAlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### ButtonBlockAppender
 
@@ -283,11 +303,15 @@ Undocumented declaration.
 
 ### ContrastChecker
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/contrast-checker/README.md>
 
 ### CopyHandler
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/copy-handler/README.md>
 
 ### createCustomColorsHOC
 
@@ -325,7 +349,9 @@ Undocumented declaration.
 
 ### FontSizePicker
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
 
 ### getColorClassName
 
@@ -469,15 +495,21 @@ _Related_
 
 ### JustifyContentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### JustifyToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### LineHeightControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
 
 ### MediaPlaceholder
 
@@ -487,7 +519,9 @@ _Related_
 
 ### MediaReplaceFlow
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md>
 
 ### MediaUpload
 
@@ -575,7 +609,9 @@ _Properties_
 
 ### SkipToSelectedBlock
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md>
 
 ### store
 

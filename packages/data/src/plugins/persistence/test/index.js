@@ -694,7 +694,7 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 
 		migrateIndividualPreferenceToPreferencesStore(
 			persistenceInterface,
-			'core/test',
+			{ from: 'core/test', scope: 'core/test' },
 			'myPreference'
 		);
 
@@ -743,7 +743,7 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 
 		migrateIndividualPreferenceToPreferencesStore(
 			persistenceInterface,
-			'core/test',
+			{ from: 'core/test', scope: 'core/test' },
 			'myPreference'
 		);
 
@@ -764,6 +764,41 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 				otherData: {
 					test: 1,
 				},
+				preferences: {
+					myPreference: undefined,
+				},
+			},
+		} );
+	} );
+
+	it( 'supports moving data to a scope that is differently named to the source store', () => {
+		const persistenceInterface = createPersistenceInterface( {
+			storageKey: 'test-username',
+		} );
+
+		const initialState = {
+			preferences: {
+				myPreference: '123',
+			},
+		};
+
+		persistenceInterface.set( 'core/source', initialState );
+
+		migrateIndividualPreferenceToPreferencesStore(
+			persistenceInterface,
+			{ from: 'core/source', scope: 'core/destination' },
+			'myPreference'
+		);
+
+		expect( persistenceInterface.get() ).toEqual( {
+			'core/preferences': {
+				preferences: {
+					'core/destination': {
+						myPreference: '123',
+					},
+				},
+			},
+			'core/source': {
 				preferences: {
 					myPreference: undefined,
 				},
@@ -792,7 +827,7 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 
 		migrateIndividualPreferenceToPreferencesStore(
 			persistenceInterface,
-			'core/test',
+			{ from: 'core/test', scope: 'core/test' },
 			'myPreference'
 		);
 
@@ -808,6 +843,37 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 				preferences: {
 					myPreference: '123',
 				},
+			},
+		} );
+	} );
+
+	it( 'migrates preferences that have a `false` value', () => {
+		const persistenceInterface = createPersistenceInterface( {
+			storageKey: 'test-username',
+		} );
+
+		persistenceInterface.set( 'core/test', {
+			preferences: {
+				myFalsePreference: false,
+			},
+		} );
+
+		migrateIndividualPreferenceToPreferencesStore(
+			persistenceInterface,
+			{ from: 'core/test', scope: 'core/test' },
+			'myFalsePreference'
+		);
+
+		expect( persistenceInterface.get() ).toEqual( {
+			'core/preferences': {
+				preferences: {
+					'core/test': {
+						myFalsePreference: false,
+					},
+				},
+			},
+			'core/test': {
+				preferences: {},
 			},
 		} );
 	} );

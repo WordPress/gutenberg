@@ -1,25 +1,26 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { attribution } = attributes;
-	const blockProps = useBlockProps.save();
-
-	const hasAttribution = ! RichText.isEmpty( attribution );
-	return hasAttribution ? (
-		<figure { ...blockProps }>
-			<blockquote>
-				<InnerBlocks.Content />
-			</blockquote>
-			<figcaption>
-				<RichText.Content value={ attribution } />
-			</figcaption>
-		</figure>
-	) : (
+	const { align, citation } = attributes;
+	const blockProps = useBlockProps.save( {
+		className: classNames( {
+			[ `has-text-align-${ align }` ]: align,
+		} ),
+	} );
+	return (
 		<blockquote { ...blockProps }>
 			<InnerBlocks.Content />
+			{ ! RichText.isEmpty( citation ) && (
+				<RichText.Content tagName="cite" value={ citation } />
+			) }
 		</blockquote>
 	);
 }

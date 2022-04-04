@@ -75,26 +75,50 @@ module.exports = async ( {
 		}
 	}
 
-	if (
-		wpScripts &&
-		( size( npmDependencies ) || size( npmDevDependencies ) )
-	) {
-		info( '' );
-		info(
-			'Installing npm dependencies. It might take a couple of minutes...'
-		);
-		for ( const packageArg of npmDependencies ) {
-			try {
-				checkDependency( packageArg );
-				info( '' );
-				info( `Installing "${ packageArg }".` );
-				await command( `npm install ${ packageArg }`, {
-					cwd,
-				} );
-			} catch ( { message } ) {
-				info( '' );
-				info( `Skipping "${ packageArg }" npm dependency. Reason:` );
-				error( message );
+	if ( wpScripts ) {
+		if ( size( npmDependencies ) ) {
+			info( '' );
+			info(
+				'Installing npm dependencies. It might take a couple of minutes...'
+			);
+			for ( const packageArg of npmDependencies ) {
+				try {
+					checkDependency( packageArg );
+					info( '' );
+					info( `Installing "${ packageArg }".` );
+					await command( `npm install ${ packageArg }`, {
+						cwd,
+					} );
+				} catch ( { message } ) {
+					info( '' );
+					info(
+						`Skipping "${ packageArg }" npm dependency. Reason:`
+					);
+					error( message );
+				}
+			}
+		}
+
+		if ( size( npmDevDependencies ) ) {
+			info( '' );
+			info(
+				'Installing npm devDependencies. It might take a couple of minutes...'
+			);
+			for ( const packageArg of npmDevDependencies ) {
+				try {
+					checkDependency( packageArg );
+					info( '' );
+					info( `Installing "${ packageArg }".` );
+					await command( `npm install ${ packageArg } --save-dev`, {
+						cwd,
+					} );
+				} catch ( { message } ) {
+					info( '' );
+					info(
+						`Skipping "${ packageArg }" npm dev dependency. Reason:`
+					);
+					error( message );
+				}
 			}
 		}
 		info( '' );

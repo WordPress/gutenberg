@@ -321,16 +321,26 @@ function mapActions( actions, store ) {
  * @return {Object} Selectors mapped to their resolution functions.
  */
 function mapResolveSelectors( selectors, store ) {
-	return mapValues(
-		omit( selectors, [
-			'getIsResolving',
-			'hasStartedResolution',
-			'hasFinishedResolution',
-			'isResolving',
-			'getCachedResolvers',
-		] ),
-		( selector, selectorName ) => ( ...args ) =>
-			new Promise( ( resolve, reject ) => {
+	const storeSelectors = omit( selectors, [
+		'getIsResolving',
+		'hasStartedResolution',
+		'hasFinishedResolution',
+		'hasResolutionFailed',
+		'isResolving',
+		'getCachedResolvers',
+		'getResolutionState',
+		'getResolutionError',
+	] );
+
+	return mapValues( storeSelectors, ( selector, selectorName ) => {
+		// If the selector doesn't have a resolver, just convert the return value
+		// (including exceptions) to a Promise, no additional extra behavior is needed.
+		if ( ! selector.hasResolver ) {
+			return async ( ...args ) => selector.apply( null, args );
+		}
+
+		return ( ...args ) => {
+			return new Promise( ( resolve, reject ) => {
 				const hasFinished = () =>
 					selectors.hasFinishedResolution( selectorName, args );
 				const finalize = ( result ) => {
@@ -361,8 +371,9 @@ function mapResolveSelectors( selectors, store ) {
 						finalize( getResult() );
 					}
 				} );
-			} )
-	);
+			} );
+		};
+	} );
 }
 
 /**

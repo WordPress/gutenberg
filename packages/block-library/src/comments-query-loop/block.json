@@ -4,7 +4,7 @@
 	"name": "core/comments-query-loop",
 	"title": "Comments Query Loop",
 	"category": "theme",
-	"description": "An advanced block that allows displaying post comments based on different query parameters and visual configurations.",
+	"description": "An advanced block that allows displaying post comments using different visual configurations.",
 	"textdomain": "default",
 	"attributes": {
 		"tagName": {

@@ -4,7 +4,7 @@
 	"name": "core/comment-content",
 	"title": "Comment Content",
 	"category": "theme",
-	"parent": [ "core/comment-template" ],
+	"ancestor": [ "core/comment-template" ],
 	"description": "Displays the contents of a comment.",
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],

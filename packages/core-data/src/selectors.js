@@ -501,10 +501,10 @@ export const getEntityRecordNonTransientEdits = createSelector(
  * Returns true if the specified entity record has edits,
  * and false otherwise.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param {Object}        state    State tree.
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Record ID.
  *
  * @return {boolean} Whether the entity record has edits or not.
  */
@@ -961,4 +961,26 @@ export function __experimentalGetCurrentThemeGlobalStylesVariations( state ) {
 		return null;
 	}
 	return state.themeGlobalStyleVariations[ currentTheme.stylesheet ];
+}
+
+/**
+ * Retrieve the list of registered block patterns.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Block pattern list.
+ */
+export function getBlockPatterns( state ) {
+	return state.blockPatterns;
+}
+
+/**
+ * Retrieve the list of registered block pattern categories.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Block pattern category list.
+ */
+export function getBlockPatternCategories( state ) {
+	return state.blockPatternCategories;
 }

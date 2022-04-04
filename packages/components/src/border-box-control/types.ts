@@ -14,6 +14,14 @@ export type AnyBorder = Border | Borders | undefined;
 export type BorderProp = keyof Border;
 export type BorderSide = keyof Borders;
 
+export type PopoverClassNames = {
+	linked?: string;
+	top?: string;
+	right?: string;
+	bottom?: string;
+	left?: string;
+};
+
 export type BorderBoxControlProps = ColorProps &
 	LabelProps & {
 		/**
@@ -26,6 +34,11 @@ export type BorderBoxControlProps = ColorProps &
 		 * individual side borders, or `undefined`.
 		 */
 		onChange: ( value: AnyBorder ) => void;
+		/**
+		 * An object defining CSS classnames for all the inner `BorderControl`
+		 * popover content.
+		 */
+		popoverClassNames?: PopoverClassNames;
 		/**
 		 * An object representing the current border configuration.
 		 *
@@ -71,6 +84,11 @@ export type SplitControlsProps = ColorProps & {
 	 * changed.
 	 */
 	onChange: ( value: Border | undefined, side: BorderSide ) => void;
+	/**
+	 * An object defining CSS classnames for the split side `BorderControl`s'
+	 * popover content.
+	 */
+	popoverClassNames?: PopoverClassNames;
 	/**
 	 * An object representing the current border configuration. It contains
 	 * properties for each side, with each side an object reflecting the border

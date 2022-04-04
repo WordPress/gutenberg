@@ -356,17 +356,20 @@ describe( 'Navigation', () => {
 			await setUpResponseMocking( [
 				{
 					match: ( request ) =>
+						request.method() === 'GET' &&
 						request.url().includes( `rest_route` ) &&
 						request.url().includes( `navigation` ) &&
 						request.url().includes( testNavId ),
-					onRequestMatch: () => {
+					onRequestMatch: ( request ) => {
 						// The Promise simulates a REST API request whose resolultion
 						// the test has full control over.
 						return new Promise( ( resolve ) => {
 							// Assign the resolution function to the var in the
 							// upper scope to afford control over resolution.
 							resolveNavigationRequest = resolve;
-						} );
+
+							// Call request.continue() is required to fully resolve the mock.
+						} ).then( () => request.continue() );
 					},
 				},
 			] );
@@ -390,7 +393,9 @@ describe( 'Navigation', () => {
 			await navBlock.waitForSelector( '.components-spinner' );
 
 			// Resolve the controlled mocked API request.
-			resolveNavigationRequest();
+			if ( typeof resolveNavigationRequest === 'function' ) {
+				resolveNavigationRequest();
+			}
 		} );
 
 		it( 'shows a loading indicator whilst empty Navigation menu is being created', async () => {
@@ -408,14 +413,16 @@ describe( 'Navigation', () => {
 						request.url().includes( `rest_route` ) &&
 						request.url().includes( `navigation` ) &&
 						request.url().includes( testNavId ),
-					onRequestMatch: () => {
+					onRequestMatch: ( request ) => {
 						// The Promise simulates a REST API request whose resolultion
 						// the test has full control over.
 						return new Promise( ( resolve ) => {
 							// Assign the resolution function to the var in the
 							// upper scope to afford control over resolution.
 							resolveNavigationRequest = resolve;
-						} );
+
+							// Call request.continue() is required to fully resolve the mock.
+						} ).then( () => request.continue() );
 					},
 				},
 			] );
@@ -437,7 +444,9 @@ describe( 'Navigation', () => {
 			await navBlock.waitForSelector( '.components-spinner' );
 
 			// Resolve the controlled mocked API request.
-			resolveNavigationRequest();
+			if ( typeof resolveNavigationRequest === 'function' ) {
+				resolveNavigationRequest();
+			}
 		} );
 	} );
 
@@ -874,6 +883,46 @@ describe( 'Navigation', () => {
 			);
 			newMenuButton.click();
 		}
+
+		it( 'respects the nesting level', async () => {
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Create empty Navigation block with no items
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickOnMoreMenuItem( 'Code editor' );
+			const codeEditorInput = await page.waitForSelector(
+				'.editor-post-text-editor'
+			);
+
+			let code = await codeEditorInput.evaluate( ( el ) => el.value );
+			code = code.replace( '} /-->', ',"maxNestingLevel":0} /-->' );
+			await codeEditorInput.evaluate(
+				( el, newCode ) => ( el.value = newCode ),
+				code
+			);
+			await clickButton( 'Exit code editor' );
+
+			const blockAppender = navBlock.$( '.block-list-appender' );
+
+			expect( blockAppender ).not.toBeNull();
+
+			// Check the Submenu block is no longer present.
+			const navSubmenuSelector =
+				'[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]';
+			const submenuBlock = await page.$( navSubmenuSelector );
+
+			expect( submenuBlock ).toBeFalsy();
+		} );
 
 		it( 'does not retain uncontrolled inner blocks when creating a new entity', async () => {
 			await createNewPost();

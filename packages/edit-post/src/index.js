@@ -112,6 +112,7 @@ export function initializeEditor(
 		fullscreenMode: true,
 		hiddenBlockTypes: [],
 		inactivePanels: [],
+		isPublishSidebarEnabled: true,
 		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
 		showBlockBreadcrumbs: true,

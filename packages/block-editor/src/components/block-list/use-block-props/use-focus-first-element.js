@@ -7,7 +7,12 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	focus,
+	isFormElement,
+	isTextField,
+	placeCaretAtHorizontalEdge,
+} from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -15,7 +20,6 @@ import { useSelect } from '@wordpress/data';
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
-import { setContentEditableWrapper } from './use-multi-selection';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -32,7 +36,6 @@ function useInitialPosition( clientId ) {
 		( select ) => {
 			const {
 				getSelectedBlocksInitialCaretPosition,
-				isMultiSelecting,
 				isNavigationMode,
 				isBlockSelected,
 			} = select( blockEditorStore );
@@ -41,7 +44,7 @@ function useInitialPosition( clientId ) {
 				return;
 			}
 
-			if ( isMultiSelecting() || isNavigationMode() ) {
+			if ( isNavigationMode() ) {
 				return;
 			}
 
@@ -49,16 +52,6 @@ function useInitialPosition( clientId ) {
 			return getSelectedBlocksInitialCaretPosition();
 		},
 		[ clientId ]
-	);
-}
-
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
 	);
 }
 
@@ -73,11 +66,11 @@ function isFormElement( element ) {
 export function useFocusFirstElement( clientId ) {
 	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
-	const { isBlockSelected } = useSelect( blockEditorStore );
+	const { isBlockSelected, isMultiSelecting } = useSelect( blockEditorStore );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
-		if ( ! isBlockSelected( clientId ) ) {
+		if ( ! isBlockSelected( clientId ) || isMultiSelecting() ) {
 			return;
 		}
 
@@ -113,24 +106,18 @@ export function useFocusFirstElement( clientId ) {
 		}
 
 		// Check to see if element is focussable before a generic caret insert.
-		if ( ! target.getAttribute( 'contenteditable' ) ) {
-			const focusElement = focus.tabbable.findNext( target );
-			// Make sure focusElement is valid, form field, and within the current target element.
-			// Ensure is not block inserter trigger, don't want to focus that in the event of the group block which doesn't contain any other focussable elements.
+		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
+			const focusElement = focus.tabbable.findNext( ref.current );
+			// Make sure focusElement is valid, contained in the same block, and a form field.
 			if (
 				focusElement &&
-				isFormElement( focusElement ) &&
-				target.contains( focusElement ) &&
-				! focusElement.classList.contains(
-					'block-editor-button-block-appender'
-				)
+				isInsideRootBlock( ref.current, focusElement ) &&
+				isFormElement( focusElement )
 			) {
 				focusElement.focus();
 				return;
 			}
 		}
-
-		setContentEditableWrapper( ref.current, false );
 
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition, clientId ] );

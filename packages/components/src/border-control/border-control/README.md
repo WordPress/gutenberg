@@ -43,6 +43,12 @@ const MyBorderControl = () => {
 };
 ```
 
+If you're using this component outside the editor, you can
+[ensure `Tooltip` positioning](/packages/components/README.md#popovers-and-tooltips)
+for the `BorderControl`'s color and style options, by rendering your
+`BorderControl` with a `Popover.Slot` further up the element tree and within a
+`SlotFillProvider` overall.
+
 ## Props
 
 ### `colors`: `Array`
@@ -106,6 +112,13 @@ that selects or clears, border color, style, or width.
 _Note: the value may be `undefined` if a user clears all border properties._
 
 - Required: Yes
+
+### `popoverContentClassName`: `string`
+
+A custom CSS class name to be assigned to the `BorderControl`'s dropdown
+popover content.
+
+- Required: No
 
 ### `shouldSanitizeBorder`: `boolean`
 

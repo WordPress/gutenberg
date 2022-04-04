@@ -756,6 +756,10 @@ _Parameters_
 -   _setting_ `string`: The option, used to get the option by id.
 -   _value_ `string`: The value to set the option to.
 
+_Returns_
+
+-   `string`: The previous value of the option.
+
 ### setPostContent
 
 Sets code editor content
@@ -867,6 +871,14 @@ Converts editor's block type.
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+### trashAllComments
+
+Navigates to the comments listing screen and bulk-trashes any comments which exist.
+
+_Returns_
+
+-   `Promise`: Promise resolving once comments have been trashed.
 
 ### trashAllPosts
 

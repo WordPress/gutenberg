@@ -4,8 +4,8 @@
 	"name": "core/comment-author-avatar",
 	"title": "Comment Author Avatar",
 	"category": "theme",
-	"parent": [ "core/comment-template" ],
-	"description": "Add the avatar of this comment's author.",
+	"ancestor": [ "core/comment-template" ],
+	"description": "Displays the avatar of the comment's author.",
 	"textdomain": "default",
 	"attributes": {
 		"width": {

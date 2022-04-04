@@ -172,19 +172,6 @@ export function hasBorderSupport( blockName, feature = 'any' ) {
 }
 
 /**
- * Check whether serialization of border classes and styles should be skipped.
- *
- * @param {string|Object} blockType Block name or block type object.
- *
- * @return {boolean} Whether serialization of border properties should occur.
- */
-export function shouldSkipSerialization( blockType ) {
-	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
-
-	return support?.__experimentalSkipSerialization;
-}
-
-/**
  * Returns a new style object where the specified border attribute has been
  * removed.
  *
