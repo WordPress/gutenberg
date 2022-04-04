@@ -1,21 +1,24 @@
 /**
- * Performs a leading edge throttle of async functions.
+ * Performs a leading edge debounce of async functions.
  *
  * If three functions are throttled at the same time:
  * - The first happens immediately.
  * - The second is never called.
  * - The third happens `delayMS` milliseconds after the first has resolved.
  *
+ * This is distinct from `lodash.debounce` in that it waits for promise
+ * resolution.
+ *
  * @param {number} delayMS A delay in milliseconds.
- * @return {Function} A function that throttle whatever function is passed
+ * @return {Function} A function that debounce whatever function is passed
  *                    to it.
  */
-export default function createAsyncThrottle( delayMS ) {
+export default function createAsyncDebounce( delayMS ) {
 	let timeoutId;
 	let activePromise;
 
-	return async function throttle( func ) {
-		// This is a leading edge throttle. If there's no promise or timeout
+	return async function debounce( func ) {
+		// This is a leading edge debounce. If there's no promise or timeout
 		// in progress,
 		if ( ! activePromise && ! timeoutId ) {
 			// Keep a reference to the promise.
