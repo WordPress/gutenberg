@@ -884,44 +884,32 @@ describe( 'Navigation', () => {
 			newMenuButton.click();
 		}
 
-		it( 'respects the nesting level', async () => {
+		it( 'retains uncontrolled inner blocks by default', async () => {
 			await createNewPost();
-
-			await insertBlock( 'Navigation' );
-
-			const navBlock = await waitForBlock( 'Navigation' );
-
-			// Create empty Navigation block with no items
-			const startEmptyButton = await page.waitForXPath(
-				START_EMPTY_XPATH
-			);
-			await startEmptyButton.click();
-
-			await populateNavWithOneItem();
-
 			await clickOnMoreMenuItem( 'Code editor' );
 			const codeEditorInput = await page.waitForSelector(
 				'.editor-post-text-editor'
 			);
+			await codeEditorInput.click();
 
-			let code = await codeEditorInput.evaluate( ( el ) => el.value );
-			code = code.replace( '} /-->', ',"maxNestingLevel":0} /-->' );
-			await codeEditorInput.evaluate(
-				( el, newCode ) => ( el.value = newCode ),
-				code
-			);
+			const markup =
+				'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
+			await page.keyboard.type( markup );
 			await clickButton( 'Exit code editor' );
 
-			const blockAppender = navBlock.$( '.block-list-appender' );
+			const navBlock = await waitForBlock( 'Navigation' );
 
-			expect( blockAppender ).not.toBeNull();
+			// Select the block
+			await navBlock.click();
 
-			// Check the Submenu block is no longer present.
-			const navSubmenuSelector =
-				'[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]';
-			const submenuBlock = await page.$( navSubmenuSelector );
+			const hasUncontrolledInnerBlocks = await page.evaluate( () => {
+				const blocks = wp.data
+					.select( 'core/block-editor' )
+					.getBlocks();
+				return !! blocks[ 0 ]?.innerBlocks?.length;
+			} );
 
-			expect( submenuBlock ).toBeFalsy();
+			expect( hasUncontrolledInnerBlocks ).toBe( true );
 		} );
 
 		it( 'does not retain uncontrolled inner blocks when creating a new entity', async () => {
