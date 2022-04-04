@@ -146,7 +146,7 @@ const getBorderObject = ( attributes, colors ) => {
 		return hydratedBorderStyles;
 	}
 
-	// No named colors selected all color values if any should already be in
+	// No named colors selected. All color values, if any, should already be in
 	// the style's border object.
 	return borderStyles;
 };
