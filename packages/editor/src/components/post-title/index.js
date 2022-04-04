@@ -196,6 +196,7 @@ export default function PostTitle() {
 			} );
 		},
 		__unstableDisableFormats: true,
+		__unstableHandleAsText: true,
 		preserveWhiteSpace: true,
 	} );
 

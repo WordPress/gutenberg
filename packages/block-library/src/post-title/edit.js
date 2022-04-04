@@ -57,6 +57,7 @@ export default function PostTitleEdit( {
 					value={ rawTitle }
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
+					__unstableHandleAsText
 					{ ...blockProps }
 				/>
 			) : (

@@ -109,6 +109,7 @@ function RichTextWrapper(
 		disableLineBreaks,
 		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
+		__unstableHandleAsText,
 		...props
 	},
 	forwardedRef
@@ -260,6 +261,7 @@ function RichTextWrapper(
 		__unstableAfterParse: addEditorOnlyFormats,
 		__unstableBeforeSerialize: removeEditorOnlyFormats,
 		__unstableAddInvisibleFormats: addInvisibleFormats,
+		__unstableHandleAsText,
 	} );
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,

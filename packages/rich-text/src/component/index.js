@@ -36,6 +36,7 @@ export function useRichText( {
 	__unstableAfterParse,
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
+	__unstableHandleAsText,
 } ) {
 	const registry = useRegistry();
 	const [ , forceRender ] = useReducer( () => ( {} ) );
@@ -80,6 +81,7 @@ export function useRichText( {
 	function setRecordFromProps() {
 		_value.current = value;
 		record.current = create( {
+			text: __unstableHandleAsText ? value : undefined,
 			html: value,
 			multilineTag,
 			multilineWrapperTags:
