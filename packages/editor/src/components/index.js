@@ -23,8 +23,6 @@ export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
 export { default as PostComments } from './post-comments';
 export { default as PostExcerpt } from './post-excerpt';
-// TODO: of course rename :) and check possible deprecations..
-export { default as PostExcerpt2 } from './post-excerpt2';
 export { default as PostExcerptCheck } from './post-excerpt/check';
 export { default as PostFeaturedImage } from './post-featured-image';
 export { default as PostFeaturedImageCheck } from './post-featured-image/check';
