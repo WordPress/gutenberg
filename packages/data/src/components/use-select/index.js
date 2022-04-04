@@ -129,7 +129,7 @@ export default function useSelect( mapSelect, deps ) {
 	const listeningStores = useRef( [] );
 	const wrapSelect = useCallback(
 		( callback ) =>
-			registry.__experimentalMarkListeningStores(
+			registry.__unstableMarkListeningStores(
 				() => callback( registry.select, registry ),
 				listeningStores
 			),
@@ -222,7 +222,7 @@ export default function useSelect( mapSelect, deps ) {
 		onChange();
 
 		const unsubscribers = listeningStores.current.map( ( storeName ) =>
-			registry.__experimentalSubscribeStore( storeName, onChange )
+			registry.__unstableSubscribeStore( storeName, onChange )
 		);
 
 		return () => {
