@@ -5,34 +5,34 @@
  * @package WordPress
  */
 function render_js_comment_post_form() {
-	return "
-		async createComment({ content, parent }) {
-			const commentPosted = await fetch( apiSettings.root + 'wp/v2/comments/', {
-				method: 'POST',
-				body: JSON.stringify({
-					post: 1,
-					author_name: 'admin',
-					author_email: 'wordpress@example.com',
-					'parent': parent,
-					'content': content,
-				}),
-				headers: {
-					'Content-type': 'application/json; charset=UTF-8',
-					'X-WP-Nonce': apiSettings.nonce,
-				},
+	return <<<END
+	async createComment({ content, parent }) {
+		const commentPosted = await fetch( apiSettings.root + 'wp/v2/comments/', {
+			method: 'POST',
+			body: JSON.stringify({
+				post: 1,
+				author_name: 'admin',
+				author_email: 'wordpress@example.com',
+				'parent': parent,
+				'content': content,
+			}),
+			headers: {
+				'Content-type': 'application/json; charset=UTF-8',
+				'X-WP-Nonce': apiSettings.nonce,
+			},
+		});
+		const comment = await commentPosted.json();
+		if (comment) {
+			this.open = false;
+			this.comments.push({
+				'id': comment.id,
+				'author': comment.author_name,
+				'date': comment.date,
+				'content': comment.content?.rendered,
 			});
-			const comment = await commentPosted.json();
-			if (comment) {
-				this.open = false;
-				this.comments.push({
-					'id': comment.id,
-					'author': comment.author_name,
-					'date': comment.date,
-					'content': comment.content?.rendered,
-				});
-			}
 		}
-	";
+	}
+	END;
 }
 
 /**
