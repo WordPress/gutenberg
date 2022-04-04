@@ -13,6 +13,7 @@ import {
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
+	resetPreferences,
 	setBrowserViewport,
 	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
@@ -242,6 +243,7 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
+	await resetPreferences();
 	await activateTheme( 'twentytwentyone' );
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
