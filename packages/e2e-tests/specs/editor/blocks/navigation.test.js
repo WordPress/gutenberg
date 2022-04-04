@@ -915,17 +915,6 @@ describe( 'Navigation', () => {
 		const NAV_ENTITY_SELECTOR =
 			'//div[@class="entities-saved-states__panel"]//label//strong[contains(text(), "Navigation")]';
 
-		async function resetNavBlockToInitialState() {
-			const selectMenuDropdown = await page.waitForSelector(
-				'[aria-label="Select Menu"]'
-			);
-			await selectMenuDropdown.click();
-			const newMenuButton = await page.waitForXPath(
-				'//span[text()="Create new menu"]'
-			);
-			newMenuButton.click();
-		}
-
 		it( 'respects the nesting level', async () => {
 			await createNewPost();
 
