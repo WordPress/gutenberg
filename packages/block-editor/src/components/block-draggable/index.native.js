@@ -366,6 +366,7 @@ const BlockDraggable = ( { clientId, children } ) => {
 
 	const blockStyles = useAnimatedStyle( () => {
 		return {
+			display: collapseAnimation.opacity.value !== 0 ? 'none' : 'flex',
 			opacity: 1 - collapseAnimation.opacity.value,
 		};
 	} );
