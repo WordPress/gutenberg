@@ -15,7 +15,7 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { MAX_SPACER_SIZE } from './edit';
+import { MIN_SPACER_SIZE } from './edit';
 
 function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
@@ -56,8 +56,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 			<UnitControl
 				id={ inputId }
 				isResetValueOnUnitChange
-				min={ 0 }
-				max={ MAX_SPACER_SIZE }
+				min={ MIN_SPACER_SIZE }
 				onChange={ handleOnChange }
 				style={ { maxWidth: 80 } }
 				value={ computedValue }

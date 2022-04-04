@@ -10,6 +10,7 @@ import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
 	useState,
@@ -32,6 +33,7 @@ import {
 import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useListViewContext } from './context';
+import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 
@@ -49,12 +51,38 @@ function ListViewBlock( {
 	path,
 	isExpanded,
 	selectedClientIds,
+	preventAnnouncement,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+
+	const blockInformation = useBlockDisplayInformation( clientId );
+	const instanceId = useInstanceId( ListViewBlock );
+	const descriptionId = `list-view-block-select-button__${ instanceId }`;
+	const blockPositionDescription = getBlockPositionDescription(
+		position,
+		siblingBlockCount,
+		level
+	);
+
+	const blockAriaLabel = blockInformation
+		? sprintf(
+				// translators: %s: The title of the block. This string indicates a link to select the block.
+				__( '%s link' ),
+				blockInformation.title
+		  )
+		: __( 'Link' );
+
+	const settingsAriaLabel = blockInformation
+		? sprintf(
+				// translators: %s: The title of the block.
+				__( 'Options for %s block' ),
+				blockInformation.title
+		  )
+		: __( 'Options' );
 
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
@@ -155,15 +183,6 @@ function ListViewBlock( {
 		'has-single-cell': hideBlockActions,
 	} );
 
-	const blockInformation = useBlockDisplayInformation( clientId );
-	const settingsAriaLabel = blockInformation
-		? sprintf(
-				// translators: %s: The title of the block.
-				__( 'Options for %s block' ),
-				blockInformation.title
-		  )
-		: __( 'Options' );
-
 	// Only include all selected blocks if the currently clicked on block
 	// is one of the selected blocks. This ensures that if a user attempts
 	// to alter a block that isn't part of the selection, they're still able
@@ -186,11 +205,16 @@ function ListViewBlock( {
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
 			isExpanded={ isExpanded }
+			aria-selected={ !! isSelected }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
 				colSpan={ colSpan }
 				ref={ cellRef }
+				aria-label={ blockAriaLabel }
+				aria-selected={ !! isSelected }
+				aria-expanded={ isExpanded }
+				aria-describedby={ descriptionId }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
@@ -207,7 +231,14 @@ function ListViewBlock( {
 							onFocus={ onFocus }
 							isExpanded={ isExpanded }
 							selectedClientIds={ selectedClientIds }
+							preventAnnouncement={ preventAnnouncement }
 						/>
+						<div
+							className="block-editor-list-view-block-select-button__description"
+							id={ descriptionId }
+						>
+							{ blockPositionDescription }
+						</div>
 					</div>
 				) }
 			</TreeGridCell>
@@ -244,7 +275,10 @@ function ListViewBlock( {
 			) }
 
 			{ showBlockActions && (
-				<TreeGridCell className={ listViewBlockSettingsClassName }>
+				<TreeGridCell
+					className={ listViewBlockSettingsClassName }
+					aria-selected={ !! isSelected }
+				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsDropdown
 							clientIds={ dropdownClientIds }

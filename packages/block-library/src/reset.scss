@@ -61,7 +61,7 @@ html :where(.editor-styles-wrapper) {
 		margin: revert;
 		padding: revert;
 		list-style-type: revert;
-		box-sizing: revert;
+		box-sizing: border-box;
 
 		// Remove bottom margin from nested lists.
 		ul,

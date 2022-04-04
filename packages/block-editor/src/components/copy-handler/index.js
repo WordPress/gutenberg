@@ -171,4 +171,7 @@ function CopyHandler( { children } ) {
 	return <div ref={ useClipboardHandler() }>{ children }</div>;
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/copy-handler/README.md
+ */
 export default CopyHandler;

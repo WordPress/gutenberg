@@ -187,4 +187,7 @@ const AdvancedControls = () => {
 	);
 };
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md
+ */
 export default BlockInspector;

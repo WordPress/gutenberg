@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { rest, batch } from './rest-api';
+import { rest } from './rest-api';
 
 const PATH_MAPPING = {
 	wp_template: '/wp/v2/templates',
@@ -22,12 +22,27 @@ export async function deleteAllTemplates( type ) {
 
 	const templates = await rest( { path } );
 
-	await batch(
-		templates
-			.filter( ( template ) => !! template.wp_id )
-			.map( ( template ) => ( {
+	if ( ! templates?.length ) {
+		return;
+	}
+
+	for ( const template of templates ) {
+		if ( ! template?.wp_id ) {
+			continue;
+		}
+
+		try {
+			await rest( {
+				path: `${ path }/${ template.id }?force=true`,
 				method: 'DELETE',
-				path: `/wp/v2/posts/${ template.wp_id }?force=true`,
-			} ) )
-	);
+			} );
+		} catch ( responseError ) {
+			// Disable reason - the error provides valuable feedback about issues with tests.
+			// eslint-disable-next-line no-console
+			console.warn(
+				'deleteAllTemplates failed to delete template with the following error',
+				responseError
+			);
+		}
+	}
 }

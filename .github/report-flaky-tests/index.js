@@ -46,6 +46,7 @@ const metaData = {
 
 	for ( const flakyTest of flakyTests ) {
 		const {
+			runner: testRunner = 'jest-circus',
 			title: testTitle,
 			path: testPath,
 			results: testResults,
@@ -64,6 +65,7 @@ const metaData = {
 			if ( isTrunk ) {
 				const headCommit = github.context.sha;
 				const baseCommit = meta.baseCommit || github.context.sha;
+				meta.baseCommit = baseCommit;
 
 				try {
 					const { data } = await octokit.rest.repos.compareCommits( {
@@ -84,15 +86,38 @@ const metaData = {
 				}
 			}
 
+			let testResultsList = body
+				.slice(
+					body.indexOf( TEST_RESULTS_LIST.open ) +
+						TEST_RESULTS_LIST.open.length,
+					body.indexOf( TEST_RESULTS_LIST.close )
+				)
+				.split(
+					new RegExp(
+						`(?<=${ TEST_RESULT.close })\n(?=${ TEST_RESULT.open })`
+					)
+				);
+			// GitHub issues has character limits on issue's body,
+			// so we only preserve the first and the 9 latest results.
+			if ( testResultsList.length > 10 ) {
+				testResultsList = [
+					testResultsList[ 0 ],
+					'...',
+					...testResultsList.slice( -9 ),
+				];
+			}
+
 			// Reconstruct the body with the description + previous errors + new error.
 			body =
 				renderIssueDescription( { meta, testTitle, testPath } ) +
-				body.slice(
-					body.indexOf( TEST_RESULTS_LIST.open ),
-					body.indexOf( TEST_RESULTS_LIST.close )
-				) +
 				[
-					renderTestErrorMessage( { testPath, testResults } ),
+					TEST_RESULTS_LIST.open,
+					...testResultsList,
+					renderTestErrorMessage( {
+						testRunner,
+						testPath,
+						testResults,
+					} ),
 					TEST_RESULTS_LIST.close,
 				].join( '\n' );
 
@@ -121,6 +146,7 @@ const metaData = {
 				title: issueTitle,
 				body: renderIssueBody( {
 					meta,
+					testRunner,
 					testTitle,
 					testPath,
 					testResults,
@@ -187,10 +213,16 @@ function getIssueTitle( testTitle ) {
 	return `[Flaky Test] ${ testTitle }`;
 }
 
-function renderIssueBody( { meta, testTitle, testPath, testResults } ) {
+function renderIssueBody( {
+	meta,
+	testRunner,
+	testTitle,
+	testPath,
+	testResults,
+} ) {
 	return (
 		renderIssueDescription( { meta, testTitle, testPath } ) +
-		renderTestResults( { testPath, testResults } )
+		renderTestResults( { testRunner, testPath, testResults } )
 	);
 }
 
@@ -211,14 +243,41 @@ ${ testTitle }
 `;
 }
 
-function renderTestResults( { testPath, testResults } ) {
+function renderTestResults( { testRunner, testPath, testResults } ) {
 	return `${ TEST_RESULTS_LIST.open }
-${ renderTestErrorMessage( { testPath, testResults } ) }
+${ renderTestErrorMessage( { testRunner, testPath, testResults } ) }
 ${ TEST_RESULTS_LIST.close }
 `;
 }
 
-function renderTestErrorMessage( { testPath, testResults } ) {
+function renderTestResults( { testRunner, testResults, testPath } ) {
+	switch ( testRunner ) {
+		case '@playwright/test': {
+			// Could do a slightly better formatting than this.
+			return stripAnsi(
+				testResults.map( ( result ) => result.error.stack ).join( '\n' )
+			);
+		}
+		case 'jest-circus':
+		default: {
+			return stripAnsi(
+				formatResultsErrors(
+					testResults,
+					{
+						rootDir: path.join(
+							process.cwd(),
+							'packages/e2e-tests'
+						),
+					},
+					{},
+					testPath
+				)
+			);
+		}
+	}
+}
+
+function renderTestErrorMessage( { testRunner, testPath, testResults } ) {
 	const date = new Date().toISOString();
 	// It will look something like this without formatting:
 	// ▶ [2021-08-31T16:15:19.875Z] Test passed after 2 failed attempts on trunk
@@ -231,14 +290,7 @@ function renderTestErrorMessage( { testPath, testResults } ) {
 </summary>
 
 \`\`\`
-${ stripAnsi(
-	formatResultsErrors(
-		testResults,
-		{ rootDir: path.join( process.cwd(), 'packages/e2e-tests' ) },
-		{},
-		testPath
-	)
-) }
+${ renderTestResults( { testRunner, testPath, testResults } ) }
 \`\`\`
 </details>${ TEST_RESULT.close }`;
 }

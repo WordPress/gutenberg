@@ -13,6 +13,7 @@ import {
  * Internal dependencies
  */
 import * as archives from './archives';
+import * as avatar from './avatar';
 import * as audio from './audio';
 import * as button from './button';
 import * as buttons from './buttons';
@@ -78,6 +79,7 @@ import * as postTitle from './post-title';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as query from './query';
+import * as queryNoResults from './query-no-results';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
 import * as queryPaginationNumbers from './query-pagination-numbers';
@@ -250,9 +252,10 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	? ( { enableFSEBlocks } = {} ) => {
 			[
 				// Experimental blocks.
+				avatar,
 				homeLink,
 				postAuthorName,
-
+				queryNoResults,
 				// Full Site Editing blocks.
 				...( enableFSEBlocks
 					? [

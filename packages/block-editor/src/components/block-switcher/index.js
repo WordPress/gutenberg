@@ -20,7 +20,7 @@ import {
 	isTemplatePart,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { stack } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -69,7 +69,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				// appropriate icon to communicate the non-uniformity.
 				_icon = isSelectionOfSameType
 					? getBlockType( firstBlockName )?.icon
-					: stack;
+					: copy;
 			}
 			return {
 				possibleBlockTransformations: getBlockTransformItems(
