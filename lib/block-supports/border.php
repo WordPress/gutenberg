@@ -44,7 +44,7 @@ function gutenberg_register_border_support( $block_type ) {
  * Adds CSS classes and inline styles for border styles to the incoming
  * attributes array. This will be applied to the block markup in the front-end.
  *
- * @param WP_Block_type $block_type       Block type.
+ * @param WP_Block_Type $block_type       Block type.
  * @param array         $block_attributes Block attributes.
  *
  * @return array Border CSS classes and inline styles.
@@ -159,7 +159,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 				}
 
 				if ( $split_border_attributes['styles'] ) {
-					$styles [] = $split_border_attributes['styles'];
+					$styles[] = $split_border_attributes['styles'];
 				}
 			}
 		}
@@ -188,7 +188,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
  *
  * @param string        $side       The side the classes and styles are being generated for.
  * @param array         $border     Array containing border color, style, and width values.
- * @param WP_Block_type $block_type Block type.
+ * @param WP_Block_Type $block_type Block type.
  *
  * @return array CSS classes and longhand border styles for a single side.
  */
