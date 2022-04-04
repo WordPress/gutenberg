@@ -222,7 +222,7 @@ Add an image or video with a text overlay — great for headers. ([Source](https
 -	**Name:** core/cover
 -	**Category:** media
 -	**Supports:** align, anchor, color (~~background~~, ~~text~~), spacing (padding), ~~html~~
--	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, minHeight, minHeightUnit, overlayColor, templateLock, url
+-	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, minHeight, minHeightUnit, overlayColor, templateLock, url, useFeaturedImage
 
 ## Embed
 
