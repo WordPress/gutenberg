@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Update `BorderControl` and `BorderBoxControl` to allow the passing of custom class names to popovers ([#39753](https://github.com/WordPress/gutenberg/pull/39753)).
+-   `ToggleGroupControl`: Reintroduce backdrop animation ([#40021](https://github.com/WordPress/gutenberg/pull/40021)).
 
 ### Internal
 
