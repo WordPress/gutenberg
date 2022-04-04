@@ -297,7 +297,9 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
-	// Attempt to retrieve and prioritize any existing navigation menu
+	// Attempt to retrieve and prioritize any existing navigation menu unless
+	// a specific ref is allocated or the user is explicitly creating a new menu. The aim is
+	// for the block to "just work" from a user perspective using existing data.
 	useEffect( () => {
 		if (
 			isCreatingEmpty.current ||
