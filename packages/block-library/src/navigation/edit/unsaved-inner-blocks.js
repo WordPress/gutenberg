@@ -82,7 +82,7 @@ export default function UnsavedInnerBlocks( {
 	const savingLock = useRef( false );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		// renderAppender: hasSelection ? undefined : false,
+		renderAppender: hasSelection ? undefined : false,
 		allowedBlocks: ALLOWED_BLOCKS,
 		__experimentalDefaultBlock: DEFAULT_BLOCK,
 		__experimentalDirectInsert: shouldDirectInsert,
