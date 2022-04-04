@@ -25,6 +25,11 @@ const daText = () =>
 
 const Template = ( args ) => {
 	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
+	const modalText = args.jsxMessage ? (
+		<Heading level={ 2 }>{ args.text }</Heading>
+	) : (
+		args.text
+	);
 
 	return (
 		<>
@@ -33,8 +38,9 @@ const Template = ( args ) => {
 				cancelButtonText={ args.cancelButtonText }
 				confirmButtonText={ args.confirmButtonText }
 			>
-				{ args.text }
+				{ modalText }
 			</ConfirmDialog>
+
 			<Heading level={ 1 }>{ confirmVal }</Heading>
 		</>
 	);
@@ -54,17 +60,11 @@ withCustomButtonLabels.args = {
 	confirmButtonText: 'Yes please!',
 };
 
-export const WithJSXMessage = () => {
-	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
-
-	return (
-		<>
-			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
-				<Heading level={ 2 }>{ daText() }</Heading>
-			</ConfirmDialog>
-			<Heading level={ 1 }>{ confirmVal }</Heading>
-		</>
-	);
+// To use a JSX message, wrap your text in the appropriate JSX tags.
+export const WithJSXMessage = Template.bind( {} );
+WithJSXMessage.args = {
+	text: daText(),
+	jsxMessage: true,
 };
 
 export const VeeeryLongMessage = Template.bind( {} );
