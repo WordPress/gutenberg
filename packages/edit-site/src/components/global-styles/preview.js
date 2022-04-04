@@ -131,7 +131,7 @@ const StylesPreview = ( { label, isFocused } ) => {
 						>
 							Aa
 						</div>
-						<VStack spacing={ 2 * ratio }>
+						<VStack spacing={ 4 * ratio }>
 							{ highlightedColors.map( ( { slug, color } ) => (
 								<div
 									key={ slug }
