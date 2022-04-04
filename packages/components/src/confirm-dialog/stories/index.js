@@ -25,6 +25,7 @@ const daText = () =>
 
 const Template = ( args ) => {
 	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
+	const confirmOutput = args.confirmOutput ?? 'Confirmed!';
 	const modalText = args.jsxMessage ? (
 		<Heading level={ 2 }>{ args.text }</Heading>
 	) : (
@@ -34,7 +35,12 @@ const Template = ( args ) => {
 	return (
 		<>
 			<ConfirmDialog
-				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
+				onConfirm={ () => setConfirmVal( confirmOutput ) }
+				onCancel={
+					args.cancelOutput
+						? () => setConfirmVal( args.cancelOutput )
+						: undefined
+				}
 				cancelButtonText={ args.cancelButtonText }
 				confirmButtonText={ args.confirmButtonText }
 			>
@@ -72,22 +78,11 @@ VeeeryLongMessage.args = {
 	text: daText().repeat( 20 ),
 };
 
-export const UncontrolledAndWithExplicitOnCancel = () => {
-	const [ confirmVal, setConfirmVal ] = useState(
-		"Hasn't confirmed or cancelled yet"
-	);
-
-	return (
-		<>
-			<ConfirmDialog
-				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
-				onCancel={ () => setConfirmVal( 'Cancelled' ) }
-			>
-				{ daText() }
-			</ConfirmDialog>
-			<Heading level={ 1 }>{ confirmVal }</Heading>
-		</>
-	);
+export const UncontrolledAndWithExplicitOnCancel = Template.bind( {} );
+UncontrolledAndWithExplicitOnCancel.args = {
+	text: daText(),
+	confirmOutput: 'Confirmed!',
+	cancelOutput: 'Cancelled',
 };
 
 // Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel to be passed
