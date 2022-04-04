@@ -10,6 +10,7 @@ import {
 	CardBody,
 	Card,
 	CardDivider,
+	CardMedia,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
@@ -37,7 +38,9 @@ function ScreenRoot() {
 			<CardBody>
 				<VStack spacing={ 2 }>
 					<Card>
-						<StylesPreview />
+						<CardMedia>
+							<StylesPreview />
+						</CardMedia>
 					</Card>
 					{ !! variations?.length && (
 						<NavigationButton path="/variations">
