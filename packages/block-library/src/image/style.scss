@@ -12,6 +12,12 @@
 		}
 	}
 
+	&.has-custom-border {
+		img {
+			box-sizing: border-box;
+		}
+	}
+
 	&.aligncenter {
 		text-align: center;
 	}
@@ -95,12 +101,6 @@
 			mask-size: contain;
 			mask-position: center;
 			border-radius: 0;
-		}
-	}
-
-	&.has-custom-border {
-		img {
-			box-sizing: border-box;
 		}
 	}
 }
