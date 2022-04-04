@@ -13,16 +13,13 @@ import { store as editorStore } from '../../store';
 
 function PostExcerptMinimal( { excerpt, onChange } ) {
 	return (
-		<div className="editor-post-excerpt">
-			<RichText
-				className=""
-				aria-label={ __( 'Post excerpt text' ) }
-				placeholder={ __( 'Add excerpt' ) }
-				value={ excerpt }
-				onChange={ onChange }
-				tagName="p"
-			/>
-		</div>
+		<RichText
+			aria-label={ __( 'Post excerpt text' ) }
+			placeholder={ __( 'Add excerpt' ) }
+			value={ excerpt }
+			onChange={ onChange }
+			tagName="p"
+		/>
 	);
 }
 
