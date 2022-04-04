@@ -10,7 +10,13 @@ import { useInnerBlocksProps } from '@wordpress/block-editor';
 import { Disabled, Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useRef,
+	useMemo,
+	createElement,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -165,8 +171,12 @@ export default function UnsavedInnerBlocks( {
 		blocks,
 	] );
 
-	return (
-		<div className="wp-block-navigation__unsaved-changes">
+	return createElement(
+		isSaving ? Disabled : 'div', // when saving make component disabled.
+		{
+			className: 'wp-block-navigation__unsaved-changes',
+		},
+		<>
 			<div
 				className={ classnames(
 					'wp-block-navigation__unsaved-changes-overlay',
@@ -178,6 +188,6 @@ export default function UnsavedInnerBlocks( {
 				<div { ...innerBlocksProps } />
 			</div>
 			{ isSaving && <Spinner /> }
-		</div>
+		</>
 	);
 }
