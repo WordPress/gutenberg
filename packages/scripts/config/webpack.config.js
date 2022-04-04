@@ -36,7 +36,7 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-const copyWebPackPatterns = process.env.WP_COPY_PHP_FILES_TO_DIST
+const copyWebpackPatterns = process.env.WP_COPY_PHP_FILES_TO_DIST
 	? '**/{block.json,*.php}'
 	: '**/block.json';
 
@@ -232,7 +232,7 @@ const config = {
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
-					from: copyWebPackPatterns,
+					from: copyWebpackPatterns,
 					context: process.env.WP_SRC_DIRECTORY,
 					noErrorOnMissing: true,
 				},
