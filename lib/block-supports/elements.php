@@ -51,6 +51,16 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 
 	$class_name = gutenberg_get_elements_class_name( $block );
 
+	if ( strpos( $link_color, 'var:preset|color|' ) !== false ) {
+		// Get the name from the string and add proper styles.
+		$index_to_splice = strrpos( $link_color, '|' ) + 1;
+		$link_color_name = substr( $link_color, $index_to_splice );
+		$link_color      = "var(--wp--preset--color--$link_color_name)";
+	}
+	$link_color_declaration = esc_html( safecss_filter_attr( "color: $link_color" ) );
+
+	$style = ".$class_name a{" . $link_color_declaration . ';}';
+
 	// Like the layout hook this assumes the hook only applies to blocks with a single wrapper.
 	// Retrieve the opening tag of the first HTML element.
 	$html_element_matches = array();
