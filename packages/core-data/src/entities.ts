@@ -13,162 +13,292 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { addEntities } from './actions';
-import type { Post, Taxonomy, Type, Updatable } from './entity-types';
+import type * as Records from './entity-types';
+import type { Context, Taxonomy, Type } from './entity-types';
+import type { EntityConfigTypeFromConst } from './entity-types/entities';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
+const attachmentConfig = {
+	name: 'media',
+	kind: 'root',
+	baseURL: '/wp/v2/media',
+	baseURLParams: { context: 'edit' },
+	plural: 'mediaItems',
+	label: __( 'Media' ),
+} as const;
+
+type AttachmentConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof attachmentConfig,
+	Records.Attachment< C >
+>;
+
+const siteConfig = {
+	label: __( 'Site' ),
+	name: 'site',
+	kind: 'root',
+	baseURL: '/wp/v2/settings',
+	getTitle: ( record: Records.Settings< 'edit' > ) => {
+		return get( record, [ 'title' ], __( 'Site Title' ) );
+	},
+} as const;
+
+type SiteConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof siteConfig,
+	Records.Settings< C >
+>;
+
+const postTypeConfig = {
+	label: __( 'Post Type' ),
+	name: 'postType',
+	kind: 'root',
+	key: 'slug',
+	baseURL: '/wp/v2/types',
+	baseURLParams: { context: 'edit' },
+	rawAttributes: POST_RAW_ATTRIBUTES,
+} as const;
+
+type TypeConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof postTypeConfig,
+	Records.Type< C >
+>;
+
+const taxonomyConfig = {
+	name: 'taxonomy',
+	kind: 'root',
+	key: 'slug',
+	baseURL: '/wp/v2/taxonomies',
+	baseURLParams: { context: 'edit' },
+	plural: 'taxonomies',
+	label: __( 'Taxonomy' ),
+} as const;
+
+type TaxonomyConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof taxonomyConfig,
+	Records.Taxonomy< C >
+>;
+
+const sidebarConfig = {
+	name: 'sidebar',
+	kind: 'root',
+	baseURL: '/wp/v2/sidebars',
+	plural: 'sidebars',
+	transientEdits: { blocks: true },
+	label: __( 'Widget areas' ),
+} as const;
+
+type SidebarConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof sidebarConfig,
+	Records.Sidebar< C >
+>;
+
+const widgetConfig = {
+	name: 'widget',
+	kind: 'root',
+	baseURL: '/wp/v2/widgets',
+	baseURLParams: { context: 'edit' },
+	plural: 'widgets',
+	transientEdits: { blocks: true },
+	label: __( 'Widgets' ),
+} as const;
+
+type WidgetConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof widgetConfig,
+	Records.Widget< C >
+>;
+
+const widgetTypeConfig = {
+	name: 'widgetType',
+	kind: 'root',
+	baseURL: '/wp/v2/widget-types',
+	baseURLParams: { context: 'edit' },
+	plural: 'widgetTypes',
+	label: __( 'Widget types' ),
+} as const;
+
+type WidgetTypeConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof widgetTypeConfig,
+	Records.WidgetType< C >
+>;
+
+const userConfig = {
+	label: __( 'User' ),
+	name: 'user',
+	kind: 'root',
+	baseURL: '/wp/v2/users',
+	baseURLParams: { context: 'edit' },
+	plural: 'users',
+} as const;
+
+type UserConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof userConfig,
+	Records.User< C >
+>;
+
+const commentConfig = {
+	name: 'comment',
+	kind: 'root',
+	baseURL: '/wp/v2/comments',
+	baseURLParams: { context: 'edit' },
+	plural: 'comments',
+	label: __( 'Comment' ),
+} as const;
+
+type CommentConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof commentConfig,
+	Records.Comment< C >
+>;
+
+const menuConfig = {
+	name: 'menu',
+	kind: 'root',
+	baseURL: '/wp/v2/menus',
+	baseURLParams: { context: 'edit' },
+	plural: 'menus',
+	label: __( 'Menu' ),
+} as const;
+
+type NavMenuConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof menuConfig,
+	Records.NavMenu< C >
+>;
+
+const menuItemConfig = {
+	name: 'menuItem',
+	kind: 'root',
+	baseURL: '/wp/v2/menu-items',
+	baseURLParams: { context: 'edit' },
+	plural: 'menuItems',
+	label: __( 'Menu Item' ),
+	rawAttributes: [ 'title', 'content' ],
+} as const;
+
+type NavMenuItemConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof menuItemConfig,
+	Records.NavMenu< C >
+>;
+
+const menuLocationConfig = {
+	name: 'menuLocation',
+	kind: 'root',
+	baseURL: '/wp/v2/menu-locations',
+	baseURLParams: { context: 'edit' },
+	plural: 'menuLocations',
+	label: __( 'Menu Location' ),
+	key: 'name',
+} as const;
+
+type MenuLocationConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof menuLocationConfig,
+	Records.MenuLocation< C >
+>;
+
+const globalStyleConfig = {
+	label: __( 'Global Styles' ),
+	name: 'globalStyles',
+	kind: 'root',
+	baseURL: '/wp/v2/global-styles',
+	baseURLParams: { context: 'edit' },
+	plural: 'globalStylesVariations', // should be different than name
+	getTitle: ( record: any ) => record?.title?.rendered || record?.title,
+} as const;
+
+const themeConfig = {
+	label: __( 'Themes' ),
+	name: 'theme',
+	kind: 'root',
+	baseURL: '/wp/v2/themes',
+	baseURLParams: { context: 'edit' },
+	key: 'stylesheet',
+} as const;
+
+type ThemeConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof themeConfig,
+	Records.Theme< C >
+>;
+
+const pluginConfig = {
+	label: __( 'Plugins' ),
+	name: 'plugin',
+	kind: 'root',
+	baseURL: '/wp/v2/plugins',
+	baseURLParams: { context: 'edit' },
+	key: 'plugin',
+} as const;
+
+type PluginConfig< C extends Context > = EntityConfigTypeFromConst<
+	typeof pluginConfig,
+	Records.Plugin< C >
+>;
+
 export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
+		kind: 'root',
 		name: '__unstableBase',
-		kind: 'root',
 		baseURL: '/',
-		baseURLParams: {
-			_fields: [
-				'description',
-				'gmt_offset',
-				'home',
-				'name',
-				'site_icon',
-				'site_icon_url',
-				'site_logo',
-				'timezone_string',
-				'url',
-			].join( ',' ),
-		},
 	},
-	{
-		label: __( 'Site' ),
-		name: 'site',
-		kind: 'root',
-		baseURL: '/wp/v2/settings',
-		getTitle: ( record ) => {
-			return get( record, [ 'title' ], __( 'Site Title' ) );
-		},
-	},
-	{
-		label: __( 'Post Type' ),
-		name: 'postType',
-		kind: 'root',
-		key: 'slug',
-		baseURL: '/wp/v2/types',
-		baseURLParams: { context: 'edit' },
-		rawAttributes: POST_RAW_ATTRIBUTES,
-	},
-	{
-		name: 'media',
-		kind: 'root',
-		baseURL: '/wp/v2/media',
-		baseURLParams: { context: 'edit' },
-		plural: 'mediaItems',
-		label: __( 'Media' ),
-		rawAttributes: [ 'caption', 'title', 'description' ],
-	},
-	{
-		name: 'taxonomy',
-		kind: 'root',
-		key: 'slug',
-		baseURL: '/wp/v2/taxonomies',
-		baseURLParams: { context: 'edit' },
-		plural: 'taxonomies',
-		label: __( 'Taxonomy' ),
-	},
-	{
-		name: 'sidebar',
-		kind: 'root',
-		baseURL: '/wp/v2/sidebars',
-		baseURLParams: { context: 'edit' },
-		plural: 'sidebars',
-		transientEdits: { blocks: true },
-		label: __( 'Widget areas' ),
-	},
-	{
-		name: 'widget',
-		kind: 'root',
-		baseURL: '/wp/v2/widgets',
-		baseURLParams: { context: 'edit' },
-		plural: 'widgets',
-		transientEdits: { blocks: true },
-		label: __( 'Widgets' ),
-	},
-	{
-		name: 'widgetType',
-		kind: 'root',
-		baseURL: '/wp/v2/widget-types',
-		baseURLParams: { context: 'edit' },
-		plural: 'widgetTypes',
-		label: __( 'Widget types' ),
-	},
-	{
-		label: __( 'User' ),
-		name: 'user',
-		kind: 'root',
-		baseURL: '/wp/v2/users',
-		baseURLParams: { context: 'edit' },
-		plural: 'users',
-	},
-	{
-		name: 'comment',
-		kind: 'root',
-		baseURL: '/wp/v2/comments',
-		baseURLParams: { context: 'edit' },
-		plural: 'comments',
-		label: __( 'Comment' ),
-	},
-	{
-		name: 'menu',
-		kind: 'root',
-		baseURL: '/wp/v2/menus',
-		baseURLParams: { context: 'edit' },
-		plural: 'menus',
-		label: __( 'Menu' ),
-	},
-	{
-		name: 'menuItem',
-		kind: 'root',
-		baseURL: '/wp/v2/menu-items',
-		baseURLParams: { context: 'edit' },
-		plural: 'menuItems',
-		label: __( 'Menu Item' ),
-		rawAttributes: [ 'title', 'content' ],
-	},
-	{
-		name: 'menuLocation',
-		kind: 'root',
-		baseURL: '/wp/v2/menu-locations',
-		baseURLParams: { context: 'edit' },
-		plural: 'menuLocations',
-		label: __( 'Menu Location' ),
-		key: 'name',
-	},
-	{
-		label: __( 'Global Styles' ),
-		name: 'globalStyles',
-		kind: 'root',
-		baseURL: '/wp/v2/global-styles',
-		baseURLParams: { context: 'edit' },
-		plural: 'globalStylesVariations', // Should be different than name.
-		getTitle: ( record ) => record?.title?.rendered || record?.title,
-	},
-	{
-		label: __( 'Themes' ),
-		name: 'theme',
-		kind: 'root',
-		baseURL: '/wp/v2/themes',
-		baseURLParams: { context: 'edit' },
-		key: 'stylesheet',
-	},
-	{
-		label: __( 'Plugins' ),
-		name: 'plugin',
-		kind: 'root',
-		baseURL: '/wp/v2/plugins',
-		baseURLParams: { context: 'edit' },
-		key: 'plugin',
-	},
+	siteConfig,
+	postTypeConfig,
+	attachmentConfig,
+	taxonomyConfig,
+	sidebarConfig,
+	widgetConfig,
+	widgetTypeConfig,
+	userConfig,
+	commentConfig,
+	menuConfig,
+	menuItemConfig,
+	menuLocationConfig,
+	globalStyleConfig,
+	themeConfig,
+	pluginConfig,
 ];
+
+type PostTypeConfig = {
+	kind: 'postType';
+	key: 'id';
+	defaultContext: 'edit';
+};
+
+type PostConfig< C extends Context > = PostTypeConfig & {
+	name: 'post';
+	recordType: Records.Post< C >;
+};
+type PageConfig< C extends Context > = PostTypeConfig & {
+	name: 'page';
+	recordType: Records.Page< C >;
+};
+type WpTemplateConfig< C extends Context > = PostTypeConfig & {
+	name: 'wp_template';
+	recordType: Records.WpTemplate< C >;
+};
+type WpTemplatePartConfig< C extends Context > = PostTypeConfig & {
+	name: 'wp_template_part';
+	recordType: Records.WpTemplatePart< C >;
+};
+
+export type CoreEntityConfig< C extends Context > =
+	| SiteConfig< C >
+	| TypeConfig< C >
+	| AttachmentConfig< C >
+	| TaxonomyConfig< C >
+	| SidebarConfig< C >
+	| WidgetConfig< C >
+	| WidgetTypeConfig< C >
+	| UserConfig< C >
+	| CommentConfig< C >
+	| NavMenuConfig< C >
+	| NavMenuItemConfig< C >
+	| MenuLocationConfig< C >
+	| ThemeConfig< C >
+	| PluginConfig< C >
+	| PostConfig< C >
+	| PageConfig< C >
+	| WpTemplateConfig< C >
+	| WpTemplatePartConfig< C >;
 
 export const additionalEntityConfigLoaders = [
 	{ kind: 'postType', loadEntities: loadPostTypeEntities },
@@ -183,7 +313,7 @@ export const additionalEntityConfigLoaders = [
  * @return {Object} Updated edits.
  */
 export const prePersistPostType = ( persistedRecord, edits ) => {
-	const newEdits = {} as Partial< Updatable< Post< 'edit' > > >;
+	const newEdits = {} as any;
 
 	if ( persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
@@ -292,7 +422,7 @@ export const getMethodName = (
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && entityConfig?.plural
+		usePlural && 'plural' in entityConfig && entityConfig?.plural
 			? upperFirst( camelCase( entityConfig.plural ) )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
