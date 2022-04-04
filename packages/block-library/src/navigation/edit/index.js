@@ -143,8 +143,6 @@ function Navigation( {
 		);
 	}
 
-	const isCreatingEmpty = useRef( false );
-
 	const navigationAreaMenu = areaMenu === 0 ? undefined : areaMenu;
 
 	const ref = navigationArea ? navigationAreaMenu : attributes.ref;
@@ -188,17 +186,6 @@ function Navigation( {
 
 	const isCreatingNavigationMenu =
 		createNavigationMenuStatus === CREATE_NAVIGATION_MENU_PENDING;
-
-	useEffect( () => {
-		// Unset flag to indicate that user initiated manual
-		// creation of an empty/blank menu.
-		if (
-			createNavigationMenuStatus === CREATE_NAVIGATION_MENU_SUCCESS ||
-			createNavigationMenuStatus === CREATE_NAVIGATION_MENU_ERROR
-		) {
-			isCreatingEmpty.current = false;
-		}
-	}, [ createNavigationMenuStatus ] );
 
 	useEffect( () => {
 		hideNavigationMenuCreateNotice();
@@ -302,7 +289,7 @@ function Navigation( {
 	// for the block to "just work" from a user perspective using existing data.
 	useEffect( () => {
 		if (
-			isCreatingEmpty.current ||
+			isCreatingNavigationMenu ||
 			ref ||
 			! navigationMenus?.length ||
 			navigationMenus?.length > 1
@@ -570,9 +557,6 @@ function Navigation( {
 	}, [ clientId, ref ] );
 
 	function handleCreateEmptyMenu() {
-		// Set flag to indicate that user initiated manual
-		// creation of an empty/blank menu.
-		isCreatingEmpty.current = true;
 		createNavigationMenu( '', [] );
 	}
 
