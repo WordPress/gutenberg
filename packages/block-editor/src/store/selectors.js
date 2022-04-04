@@ -1382,10 +1382,28 @@ const canInsertBlockTypeUnmemoized = (
 		parentName
 	);
 
+	let hasBlockAllowedAncestor = true;
+	const blockAllowedAncestorBlocks = blockType.ancestor;
+	if ( blockAllowedAncestorBlocks ) {
+		const ancestors = [
+			rootClientId,
+			...getBlockParents( state, rootClientId ),
+		];
+
+		hasBlockAllowedAncestor = some( ancestors, ( ancestorClientId ) =>
+			checkAllowList(
+				blockAllowedAncestorBlocks,
+				getBlockName( state, ancestorClientId )
+			)
+		);
+	}
+
 	const canInsert =
-		( hasParentAllowedBlock === null && hasBlockAllowedParent === null ) ||
-		hasParentAllowedBlock === true ||
-		hasBlockAllowedParent === true;
+		hasBlockAllowedAncestor &&
+		( ( hasParentAllowedBlock === null &&
+			hasBlockAllowedParent === null ) ||
+			hasParentAllowedBlock === true ||
+			hasBlockAllowedParent === true );
 
 	if ( ! canInsert ) {
 		return canInsert;
