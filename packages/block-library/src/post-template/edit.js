@@ -26,7 +26,10 @@ const TEMPLATE = [
 ];
 
 function PostTemplateInnerBlocks() {
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
+	const innerBlocksProps = useInnerBlocksProps(
+		{ className: 'wp-block-post' },
+		{ template: TEMPLATE }
+	);
 	return <li { ...innerBlocksProps } />;
 }
 
