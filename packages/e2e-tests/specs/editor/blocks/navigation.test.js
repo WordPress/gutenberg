@@ -351,9 +351,17 @@ describe( 'Navigation', () => {
 	} );
 
 	describe( 'loading states', () => {
-		it( 'does not show a loading indicator if there is no ref to a Navigation post', async () => {
+		it( 'does not show a loading indicator if there is no ref to a Navigation post and Nav Menus have loaded', async () => {
 			await createNewPost();
+
+			// Insert an empty block to trigger resolution of Nav Menu items.
+			await insertBlock( 'Navigation' );
+			await waitForBlock( 'Navigation' );
+			await page.waitForXPath( START_EMPTY_XPATH );
+
+			// Now we have Nav Menu items resolved. Continue to assert.
 			await clickOnMoreMenuItem( 'Code editor' );
+
 			const codeEditorInput = await page.waitForSelector(
 				'.editor-post-text-editor'
 			);
