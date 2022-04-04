@@ -13,7 +13,6 @@ import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
 import PostSticky from '../post-sticky';
-import PostAuthor from '../post-author';
 import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
@@ -42,7 +41,6 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 						<PostSticky />
 						<PostPendingStatus />
 						<PostSlug />
-						<PostAuthor />
 						{ fills }
 						<PostTrash />
 					</>
