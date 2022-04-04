@@ -43,6 +43,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Menu_Locations_Controller' ) ) {
 		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-menu-locations-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Post_Lock_Controller' ) ) {
+		require_once __DIR__ . '/class-wp-rest-post-lock-controller.php';
+	}
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
