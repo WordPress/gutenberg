@@ -67,17 +67,9 @@ export const WithJSXMessage = () => {
 	);
 };
 
-export const VeeeryLongMessage = () => {
-	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
-
-	return (
-		<>
-			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
-				{ daText().repeat( 20 ) }
-			</ConfirmDialog>
-			<Heading level={ 1 }>{ confirmVal }</Heading>
-		</>
-	);
+export const VeeeryLongMessage = Template.bind( {} );
+VeeeryLongMessage.args = {
+	text: daText().repeat( 20 ),
 };
 
 export const UncontrolledAndWithExplicitOnCancel = () => {
