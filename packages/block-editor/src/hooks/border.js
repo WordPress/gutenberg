@@ -273,6 +273,7 @@ export function BorderPanel( props ) {
 				>
 					<BorderBoxControl
 						colors={ colors }
+						enableAlpha={ true }
 						onChange={ onBorderChange }
 						popoverClassNames={ {
 							linked: 'block-editor__border-box-control__popover',

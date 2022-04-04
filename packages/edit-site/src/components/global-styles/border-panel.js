@@ -178,6 +178,7 @@ export default function BorderPanel( { name } ) {
 				>
 					<BorderBoxControl
 						colors={ colors }
+						enableAlpha={ true }
 						onChange={ onBorderChange }
 						showStyle={ showBorderStyle }
 						value={ border }
