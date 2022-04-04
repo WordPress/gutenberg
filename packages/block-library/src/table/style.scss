@@ -142,6 +142,11 @@
 			}
 		}
 
+		// Border support classes and styles are applied on the table block
+		// itself. This means that without the rule below every table row would
+		// have a bottom border matching the color of the table's border.
+		// This style gives the best visual appearance and most expected result
+		// until we can control individual table rows or cells via inner blocks.
 		tr:not(:last-child) {
 			border-bottom-color: currentColor;
 		}
