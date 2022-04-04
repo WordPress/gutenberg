@@ -18,7 +18,6 @@ import PostSummary from '../post-summary';
 import PostStatus from '../post-status';
 import LastRevision from '../last-revision';
 import PostTaxonomies from '../post-taxonomies';
-import FeaturedImage from '../featured-image';
 import PostExcerpt from '../post-excerpt';
 import PostLink from '../post-link';
 import DiscussionPanel from '../discussion-panel';
@@ -93,7 +92,6 @@ const SettingsSidebar = () => {
 					<LastRevision />
 					<PostLink />
 					<PostTaxonomies />
-					<FeaturedImage />
 					<PostExcerpt />
 					<DiscussionPanel />
 					<PageAttributes />

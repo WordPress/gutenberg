@@ -5,8 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	PostFeaturedImageCheck,
-	PostFeaturedImage2 as PostFeaturedImage,
 	PostExcerptCheck,
 	PostExcerpt2 as PostExcerpt,
 	PostAuthor,
@@ -16,6 +14,7 @@ import {
  * Internal dependencies
  */
 import PostTitle from '../post-title';
+import FeaturedImage from '../featured-image';
 import { store as editPostStore } from '../../../store';
 
 /**
@@ -49,9 +48,7 @@ function PostSummary() {
 			opened={ isOpened }
 			onToggle={ () => toggleEditorPanelOpened( PANEL_NAME ) }
 		>
-			<PostFeaturedImageCheck>
-				<PostFeaturedImage />
-			</PostFeaturedImageCheck>
+			<FeaturedImage />
 			<PanelRow>
 				<PostTitle />
 			</PanelRow>
