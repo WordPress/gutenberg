@@ -3,21 +3,37 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ExternalLink, TextareaControl } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
+import { RichText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
-function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
+function PostExcerptMinimal( { excerpt, onChange } ) {
 	return (
 		<div className="editor-post-excerpt">
+			<RichText
+				className=""
+				aria-label={ __( 'Post excerpt text' ) }
+				placeholder={ __( 'Add excerpt' ) }
+				value={ excerpt }
+				onChange={ onChange }
+				tagName="p"
+			/>
+		</div>
+	);
+}
+
+function PostExcerptVerbose( { excerpt, onChange } ) {
+	return (
+		<>
 			<TextareaControl
 				label={ __( 'Write an excerpt (optional)' ) }
 				className="editor-post-excerpt__textarea"
-				onChange={ ( value ) => onUpdateExcerpt( value ) }
+				onChange={ onChange }
 				value={ excerpt }
 			/>
 			<ExternalLink
@@ -27,19 +43,23 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 			>
 				{ __( 'Learn more about manual excerpts' ) }
 			</ExternalLink>
-		</div>
+		</>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			excerpt: select( editorStore ).getEditedPostAttribute( 'excerpt' ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateExcerpt( excerpt ) {
-			dispatch( editorStore ).editPost( { excerpt } );
-		},
-	} ) ),
-] )( PostExcerpt );
+export default function PostExcerpt( { isMinimal } ) {
+	const { editPost } = useDispatch( editorStore );
+	const excerpt = useSelect(
+		( select ) => select( editorStore ).getEditedPostAttribute( 'excerpt' ),
+		[]
+	);
+	const onChange = useCallback( () => {
+		return ( newExcerpt ) => editPost( { excerpt: newExcerpt } );
+	}, [] );
+	const Component = isMinimal ? PostExcerptMinimal : PostExcerptVerbose;
+	return (
+		<div className="editor-post-excerpt">
+			<Component excerpt={ excerpt } onChange={ onChange } />
+		</div>
+	);
+}
