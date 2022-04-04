@@ -250,7 +250,11 @@ export function BorderPanel( props ) {
 		setAttributes( {
 			style: newStyle,
 			borderColor: newBorderColor,
-			sideBorderColors: newSideBorderColors,
+			sideBorderColors:
+				!! newSideBorderColors &&
+				Object.keys( newSideBorderColors ).length > 0
+					? newSideBorderColors
+					: undefined,
 		} );
 	};
 
