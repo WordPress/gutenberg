@@ -33,7 +33,7 @@ import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
  */
 import icon from './icon';
 import TableOfContentsList from './list';
-import { comparePathAToB, linearToNestedHeadingList } from './utils';
+import { linearToNestedHeadingList } from './utils';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
 
@@ -85,11 +85,8 @@ export default function TableOfContentsEdit( {
 		( select ) => {
 			const {
 				getBlockAttributes,
-				getBlockIndex,
 				getBlockName,
-				getBlockOrder,
-				getBlockParents,
-				getClientIdsOfDescendants,
+				getClientIdsWithDescendants,
 				__experimentalGetGlobalBlocksByName: getGlobalBlocksByName,
 			} = select( blockEditorStore );
 
@@ -105,49 +102,30 @@ export default function TableOfContentsEdit( {
 
 			const isPaginated = pageBreakClientIds.length !== 0;
 
-			/**
-			 * Get the relative indices of the block from top to bottom nesting
-			 * level.
-			 *
-			 * @param {string} blockClientId
-			 *
-			 * @return {number[]} The path of indices to the block.
-			 */
-			function getBlockPath( blockClientId ) {
-				const indices = getBlockParents(
-					blockClientId
-				).map( ( ancestorId ) => getBlockIndex( ancestorId ) );
-				indices.push( getBlockIndex( blockClientId ) );
-				return indices;
-			}
-
-			// We can't use just getBlockIndex because it only returns the index relative to sibling blocks, so we have to get all the indices from top to bottom.
-			const tocPath = getBlockPath( clientId );
+			// Get the client ids of all blocks in the editor.
+			const allBlockClientIds = getClientIdsWithDescendants();
 
 			// Calculate the page (of a paginated post) this block is part of.
-			// Note that pageBreakClientIds may not be in the order they appear on
-			// the page, so we have to iterate over all of them.
 			let tocPage = 1;
-			for ( const pageBreakClientId of pageBreakClientIds ) {
-				if (
-					comparePathAToB(
-						tocPath,
-						getBlockPath( pageBreakClientId )
-					) < 0
-				) {
-					tocPage++;
-				}
-			}
 
-			// Get the top-level block client ids, and add them and the client ids
-			// of their children to an ordered list. We don't use
-			// getClientIdsWithDescendants since it returns ids in the wrong order.
-			const allBlockClientIds = [];
-			for ( const blockClientId of getBlockOrder() ) {
-				allBlockClientIds.push(
+			if ( isPaginated ) {
+				// We can't use getBlockIndex because it only returns the index
+				// relative to sibling blocks.
+				const tocIndex = allBlockClientIds.indexOf( clientId );
+
+				for ( const [
+					blockIndex,
 					blockClientId,
-					...getClientIdsOfDescendants( [ blockClientId ] )
-				);
+				] of allBlockClientIds.entries() ) {
+					// If we've reached blocks after the Table of Contents, we've
+					// finished calculating which page the block is on.
+					if ( blockIndex >= tocIndex ) {
+						break;
+					}
+					if ( getBlockName( blockClientId ) === 'core/nextpage' ) {
+						tocPage++;
+					}
+				}
 			}
 
 			const _latestHeadings = [];

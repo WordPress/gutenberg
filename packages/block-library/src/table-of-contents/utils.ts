@@ -1,33 +1,3 @@
-/**
- * Determines if the first path of indices leads to an earlier spot
- * than the second path.
- *
- * @param  pathA
- * @param  pathB
- * @return Negative: A is before B; positive: A is after B; zero: the paths are identical.
- */
-export function comparePathAToB( pathA: number[], pathB: number[] ): number {
-	let a: number | undefined = 0;
-	let b: number | undefined = 0;
-
-	// To avoid modifying the arrays passed into the function.
-	const clonedPathA = [ ...pathA ];
-	const clonedPathB = [ ...pathB ];
-
-	do {
-		a = clonedPathA.shift();
-		b = clonedPathB.shift();
-	} while ( a === b && a !== undefined && b !== undefined );
-
-	// Defaulting to -1 ensures that if a path terminates before the other, it
-	// is considered as leading to an earlier global index. This ensures that
-	// parent blocks are considered as coming before their first child.
-	// Technically, this isn't needed for the Table of Contents use-case, since
-	// neither it nor Page Break blocks support children, but it's good to play
-	// it safe in case this code gets reused elsewhere.
-	return ( a ?? -1 ) - ( b ?? -1 );
-}
-
 export interface HeadingData {
 	/** The plain text content of the heading. */
 	content: string;
