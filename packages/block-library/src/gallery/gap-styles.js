@@ -10,7 +10,7 @@ export default function GapStyles( { blockGap, clientId } ) {
 	// gap on the gallery.
 	const gapValue = blockGap
 		? blockGap
-		: `var( --gallery-block--gutter-size, var( --wp--style--gallery-gap-default, var( --wp--style--block-gap, 0.5em ) ) )`;
+		: `var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )`;
 	const gap = `#block-${ clientId } { 
 		--wp--style--unstable-gallery-gap: ${ gapValue };
 		gap: ${ gapValue } 

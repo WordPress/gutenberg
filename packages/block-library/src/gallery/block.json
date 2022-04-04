@@ -111,7 +111,7 @@
 		"units": [ "px", "em", "rem", "vh", "vw" ],
 		"spacing": {
 			"blockGap": true,
-			"__experimentalSkipSerialization": true,
+			"__experimentalSkipSerialization": [ "blockGap" ],
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}
