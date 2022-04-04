@@ -18,45 +18,40 @@ import { ConfirmDialog } from '..';
 export default {
 	component: ConfirmDialog,
 	title: 'Components (Experimental)/ConfirmDialog',
-	parameters: {
-		knobs: { disable: false },
-	},
 };
 
 const daText = () =>
 	text( 'message', 'Would you like to privately publish the post now?' );
-const daCancelText = () => text( 'cancel button', 'No thanks' );
-const daConfirmText = () => text( 'confirm button', 'Yes please!' );
 
-// Simplest usage: just declare the component with the required `onConfirm` prop.
-export const _default = () => {
-	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
-
-	return (
-		<>
-			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
-				{ daText() }
-			</ConfirmDialog>
-			<Heading level={ 1 }>{ confirmVal }</Heading>
-		</>
-	);
-};
-
-export const WithCustomButtonLabels = () => {
+const Template = ( args ) => {
 	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
 
 	return (
 		<>
 			<ConfirmDialog
 				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
-				cancelButtonText={ daCancelText() }
-				confirmButtonText={ daConfirmText() }
+				cancelButtonText={ args.cancelButtonText }
+				confirmButtonText={ args.confirmButtonText }
 			>
-				{ daText() }
+				{ args.text }
 			</ConfirmDialog>
 			<Heading level={ 1 }>{ confirmVal }</Heading>
 		</>
 	);
+};
+
+// Simplest usage: just declare the component with the required `onConfirm` prop.
+export const _default = Template.bind( {} );
+_default.args = {
+	text: daText(),
+};
+
+// To customize button text, decplace the `cancelButtonText` and/or `confirmButtonText` props.
+export const withCustomButtonLabels = Template.bind( {} );
+withCustomButtonLabels.args = {
+	text: daText(),
+	cancelButtonText: 'No thanks',
+	confirmButtonText: 'Yes please!',
 };
 
 export const WithJSXMessage = () => {
