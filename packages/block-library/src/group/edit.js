@@ -1,8 +1,15 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
 import {
+	BlockControls,
+	BlockVerticalAlignmentControl,
 	InnerBlocks,
 	useBlockProps,
 	InspectorControls,
@@ -47,12 +54,27 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		[ clientId ]
 	);
 	const defaultLayout = useSetting( 'layout' ) || {};
-	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const {
+		tagName: TagName = 'div',
+		templateLock,
+		layout = {},
+		verticalAlignment,
+	} = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const { type = 'default' } = usedLayout;
 	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
 
-	const blockProps = useBlockProps();
+	const classNames = classnames( {
+		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+	} );
+
+	const onVerticalAlignmentChange = ( alignment ) => {
+		setAttributes( { verticalAlignment: alignment } );
+	};
+
+	const blockProps = useBlockProps( {
+		className: classNames,
+	} );
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
 			? blockProps
@@ -68,6 +90,12 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<>
+			<BlockControls>
+				<BlockVerticalAlignmentControl
+					onChange={ onVerticalAlignmentChange }
+					value={ verticalAlignment }
+				/>
+			</BlockControls>
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
