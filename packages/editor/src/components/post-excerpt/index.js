@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { ExternalLink, TextareaControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import { RichText } from '@wordpress/block-editor';
 
 /**
@@ -53,13 +52,15 @@ export default function PostExcerpt( { isMinimal } ) {
 		( select ) => select( editorStore ).getEditedPostAttribute( 'excerpt' ),
 		[]
 	);
-	const onChange = useCallback( () => {
-		return ( newExcerpt ) => editPost( { excerpt: newExcerpt } );
-	}, [] );
 	const Component = isMinimal ? PostExcerptMinimal : PostExcerptVerbose;
 	return (
 		<div className="editor-post-excerpt">
-			<Component excerpt={ excerpt } onChange={ onChange } />
+			<Component
+				excerpt={ excerpt }
+				onChange={ ( newExcerpt ) =>
+					editPost( { excerpt: newExcerpt } )
+				}
+			/>
 		</div>
 	);
 }
