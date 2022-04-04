@@ -283,7 +283,7 @@ function Navigation( {
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
 	const {
-		isResolvingNavigationMenus,
+		hasResolvedNavigationMenus,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
 		navigationMenus,
@@ -338,7 +338,7 @@ function Navigation( {
 		! ref &&
 		! isCreatingNavigationMenu &&
 		! isConvertingClassicMenu &&
-		! isResolvingNavigationMenus &&
+		hasResolvedNavigationMenus &&
 		( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
 
 	const isEntityAvailable =
@@ -351,7 +351,7 @@ function Navigation( {
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
 	const isLoading =
-		isResolvingNavigationMenus ||
+		! hasResolvedNavigationMenus ||
 		isCreatingNavigationMenu ||
 		isConvertingClassicMenu ||
 		!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu );
