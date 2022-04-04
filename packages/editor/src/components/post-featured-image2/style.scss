@@ -3,25 +3,42 @@
 	margin-left: -$grid-unit-20;
 	margin-right: -$grid-unit-20;
 
+	// Ensure a consistent dropzone and avoid jumps when loading.
+	height: 140px;
+	overflow: hidden;
+
 	// Thumbnail container.
 	.editor-post-featured-image__container {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		position: relative;
+		height: 100%;
 	}
 
-	// @todo: these rules can be removed if we retire post-featured-image.
 	.components-spinner {
-		position: relative;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+
+		// @todo: these rules can be removed if we retire post-featured-image.
 		margin-top: 0;
 		margin-left: 0;
 	}
 
+	// Always center the content inside the cropped thumbnail.
+	.components-responsive-wrapper {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
 	// This keeps images at their intrinsic size (eg. a 50px
 	// image will never be wider than 50px).
-	// @todo: we should replace this with loading a higher resolution image and applying object-fit: cover;
-	// This would also afford a refactor to use the image as a background, which would fix the cropped inset focus style.
 	.components-responsive-wrapper__content {
 		max-width: 100%;
 		width: auto;
@@ -58,13 +75,13 @@
 // Button to set featured image when an image is set.
 .editor-post-featured-image__toggle,
 .editor-post-featured-image__preview {
+	position: relative;
 	display: block;
 	width: 100%;
 	padding: 0;
 	background-color: $gray-100;
 	border-radius: 0;
-	min-height: 140px;
-	height: auto;
+	height: 100%;
 	text-align: center;
 
 	&:hover {

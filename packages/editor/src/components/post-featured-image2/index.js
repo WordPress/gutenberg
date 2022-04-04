@@ -62,7 +62,7 @@ function PostFeaturedImage( {
 	if ( media ) {
 		const mediaSize = applyFilters(
 			'editor.PostFeaturedImage.imageSize',
-			'post-thumbnail',
+			'large',
 			media.id,
 			currentPostId
 		);
