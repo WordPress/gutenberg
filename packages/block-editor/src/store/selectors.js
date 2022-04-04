@@ -3,7 +3,6 @@
  */
 import {
 	castArray,
-	flatMap,
 	first,
 	isArray,
 	isBoolean,
@@ -217,8 +216,9 @@ export const __unstableGetClientIdsTree = createSelector(
 );
 
 /**
- * Returns an array containing the clientIds of all descendants
- * of the blocks given.
+ * Returns an array containing the clientIds of all descendants of the
+ * blocks given. Ids are returned in the same order that they appear in
+ * the editor.
  *
  * @param {Object} state     Global application state.
  * @param {Array}  clientIds Array of blocks to inspect.
@@ -226,30 +226,28 @@ export const __unstableGetClientIdsTree = createSelector(
  * @return {Array} ids of descendants.
  */
 export const getClientIdsOfDescendants = ( state, clientIds ) =>
-	flatMap( clientIds, ( clientId ) => {
-		const descendants = getBlockOrder( state, clientId );
-		return [
-			...descendants,
-			...getClientIdsOfDescendants( state, descendants ),
-		];
-	} );
+	clientIds.flatMap( ( clientId ) =>
+		getBlockOrder( state, clientId ).flatMap( ( descendantId ) => [
+			descendantId,
+			...getClientIdsOfDescendants( state, [ descendantId ] ),
+		] )
+	);
 
 /**
- * Returns an array containing the clientIds of the top-level blocks
- * and their descendants of any depth (for nested blocks).
+ * Returns an array containing the clientIds of the top-level blocks and
+ * their descendants of any depth (for nested blocks). Ids are returned
+ * in the same order that they appear in the editor.
  *
  * @param {Object} state Global application state.
  *
  * @return {Array} ids of top-level and descendant blocks.
  */
 export const getClientIdsWithDescendants = createSelector(
-	( state ) => {
-		const topLevelIds = getBlockOrder( state );
-		return [
-			...topLevelIds,
-			...getClientIdsOfDescendants( state, topLevelIds ),
-		];
-	},
+	( state ) =>
+		getBlockOrder( state ).flatMap( ( topLevelId ) => [
+			topLevelId,
+			...getClientIdsOfDescendants( state, [ topLevelId ] ),
+		] ),
 	( state ) => [ state.blocks.order ]
 );
 

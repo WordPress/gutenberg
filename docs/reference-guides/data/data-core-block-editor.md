@@ -436,8 +436,9 @@ _Properties_
 
 ### getClientIdsOfDescendants
 
-Returns an array containing the clientIds of all descendants
-of the blocks given.
+Returns an array containing the clientIds of all descendants of the
+blocks given. Ids are returned in the same order that they appear in
+the editor.
 
 _Parameters_
 
@@ -450,8 +451,9 @@ _Returns_
 
 ### getClientIdsWithDescendants
 
-Returns an array containing the clientIds of the top-level blocks
-and their descendants of any depth (for nested blocks).
+Returns an array containing the clientIds of the top-level blocks and
+their descendants of any depth (for nested blocks). Ids are returned
+in the same order that they appear in the editor.
 
 _Parameters_
 

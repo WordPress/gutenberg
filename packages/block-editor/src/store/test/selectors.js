@@ -487,7 +487,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getClientIdsOfDescendants', () => {
-		it( 'should return the ids of any descendants, given an array of clientIds', () => {
+		it( 'should return the ids of any descendants in sequential order, given an array of clientIds', () => {
 			const state = {
 				blocks: {
 					byClientId: {
@@ -580,8 +580,8 @@ describe( 'selectors', () => {
 				getClientIdsOfDescendants( state, [ 'uuid-10' ] )
 			).toEqual( [
 				'uuid-12',
-				'uuid-14',
 				'uuid-16',
+				'uuid-14',
 				'uuid-18',
 				'uuid-24',
 				'uuid-26',
@@ -592,7 +592,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getClientIdsWithDescendants', () => {
-		it( 'should return the ids for top-level blocks and their descendants of any depth (for nested blocks).', () => {
+		it( 'should return the ids for top-level blocks and their descendants of any depth (for nested blocks) in sequential order.', () => {
 			const state = {
 				blocks: {
 					byClientId: {
@@ -684,15 +684,15 @@ describe( 'selectors', () => {
 				'uuid-6',
 				'uuid-8',
 				'uuid-10',
-				'uuid-22',
 				'uuid-12',
-				'uuid-14',
 				'uuid-16',
+				'uuid-14',
 				'uuid-18',
 				'uuid-24',
 				'uuid-26',
 				'uuid-28',
 				'uuid-30',
+				'uuid-22',
 			] );
 		} );
 	} );
