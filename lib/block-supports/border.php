@@ -155,11 +155,11 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 				$split_border_attributes = gutenberg_generate_individual_border_classes_and_styles( $side, $border, $block_type );
 
 				if ( $split_border_attributes['classes'] ) {
-					$classes[] = $split_border_attributes['classes'];
+					$classes = array_merge( $classes, $split_border_attributes['classes'] );
 				}
 
 				if ( $split_border_attributes['styles'] ) {
-					$styles[] = $split_border_attributes['styles'];
+					$styles = array_merge( $styles, $split_border_attributes['styles'] );
 				}
 			}
 		}
@@ -222,8 +222,8 @@ function gutenberg_generate_individual_border_classes_and_styles( $side, $border
 	}
 
 	return array(
-		'classes' => implode( ' ', $classes ),
-		'styles'  => implode( ' ', $styles ),
+		'classes' => $classes,
+		'styles'  => $styles,
 	);
 }
 
