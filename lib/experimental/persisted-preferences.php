@@ -41,9 +41,9 @@ function gutenberg_configure_persisted_preferences() {
 		'wp-preferences',
 		sprintf(
 			'const serverData = %s;
-			const fallbackLocalStorageKey = "WP_PREFERENCES_USER_%s";
+			const localStorageRestoreKey = "WP_PREFERENCES_USER_%s";
 			const localData = JSON.parse(
-				localStorage.getItem( fallbackLocalStorageKey )
+				localStorage.getItem( localStorageRestoreKey )
 			);
 			const serverTimestamp = serverData?.__timestamp ?? 0;
 			const localTimestamp = localData?.__timestamp ?? 0;
@@ -58,7 +58,7 @@ function gutenberg_configure_persisted_preferences() {
 			}
 
 			const { create } = wp.databasePersistenceLayer;
-			const persistenceLayer = create( { preloadedData, fallbackLocalStorageKey } );
+			const persistenceLayer = create( { preloadedData, localStorageRestoreKey } );
 			const { store: preferencesStore } = wp.preferences;
 			wp.data.dispatch( "core/preferences" ).setPersistenceLayer( persistenceLayer );',
 			wp_json_encode( $preload_data ),

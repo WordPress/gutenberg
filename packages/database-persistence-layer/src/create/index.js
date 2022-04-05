@@ -11,15 +11,18 @@ import createAsyncDebounce from './create-async-debounce';
 /**
  * Creates a database persistence layer, storing data in the user meta.
  *
+ *
+ *
  * @param {Object} options
- * @param {Object} options.preloadedData           Any persisted data that should be preloaded.
- * @param {number} options.requestDebounceMS       Throttle requests to the API so that they only
- * @param {string} options.fallbackLocalStorageKey The key to use for restoring the localStorage backup.
+ * @param {Object} options.preloadedData          Any persisted data that should be preloaded.
+ * @param {number} options.requestDebounceMS      Debounce requests to the API so that they only occur
+ *                                                don't swamp the server.
+ * @param {string} options.localStorageRestoreKey The key to use for restoring the localStorage backup.
  *
  * @return {Object} A database persistence layer.
  */
 export default function create( {
-	fallbackLocalStorageKey,
+	localStorageRestoreKey,
 	preloadedData,
 	requestDebounceMS = 2500,
 } ) {
@@ -36,14 +39,15 @@ export default function create( {
 			path: '/wp/v2/users/me',
 		} );
 
-		// Restore data from local storage if it's more recent.
 		const serverData = user?.meta?.persisted_preferences;
 		const localData = JSON.parse(
-			localStorage.getItem( fallbackLocalStorageKey )
+			localStorage.getItem( localStorageRestoreKey )
 		);
 		const serverTimestamp = serverData?.__timestamp ?? 0;
 		const localTimestamp = localData?.__timestamp ?? 0;
 
+		// Prefer server data if it exists and is more recent.
+		// Otherwise fallback to localStorage data.
 		if ( serverData && serverTimestamp > localTimestamp ) {
 			cache = serverData;
 		} else if ( localData ) {
@@ -63,7 +67,7 @@ export default function create( {
 		// api request does not complete, this data can be used to restore
 		// preferences.
 		localStorage.setItem(
-			fallbackLocalStorageKey,
+			localStorageRestoreKey,
 			JSON.stringify( dataWithTimestamp )
 		);
 
@@ -76,6 +80,9 @@ export default function create( {
 				method: 'PUT',
 				// `keepalive` will still send the request in the background,
 				// even when a browser unload event might interrupt it.
+				// This should hopefully make things more resilient.
+				// This does have a size limit of 64kb, but the data is usually
+				// much less.
 				keepalive: true,
 				data: {
 					meta: {
