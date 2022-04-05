@@ -93,9 +93,8 @@ UncontrolledAndWithExplicitOnCancel.args = {
 	cancelOutput: 'Cancelled',
 };
 
-// Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel to be passed
-// It's expected that the user will then use it to hide the dialog, too (see the
-// `setIsOpen` calls below).
+// Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel` to be passed.
+// It's also necessary to explicitely close the dialog when needed. See `setIsOpen` calls below.
 export const Controlled = () => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ confirmVal, setConfirmVal ] = useState(
