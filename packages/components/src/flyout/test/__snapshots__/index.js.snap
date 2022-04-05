@@ -3,7 +3,7 @@
 exports[`props should render correctly 1`] = `
 .emotion-1 {
   background-color: #fff;
-  color: #000;
+  color: #1e1e1e;
   position: relative;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   outline: none;
