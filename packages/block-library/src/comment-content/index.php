@@ -19,18 +19,17 @@ function render_block_core_comment_content( $attributes, $content, $block ) {
 	}
 
 	if ( 0 === $block->context['commentId'] ) {
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
-		return sprintf( '<div %1$s>${ context.content }</div>', $wrapper_attributes );
-	}
+		$comment_text = '${ context.content }';
+	} else {
+		$comment = get_comment( $block->context['commentId'] );
+		if ( empty( $comment ) ) {
+			return '';
+		}
 
-	$comment = get_comment( $block->context['commentId'] );
-	if ( empty( $comment ) ) {
-		return '';
-	}
-
-	$comment_text = get_comment_text( $comment );
-	if ( ! $comment_text ) {
-		return '';
+		$comment_text = get_comment_text( $comment );
+		if ( ! $comment_text ) {
+			return '';
+		}
 	}
 
 	$classes = '';
