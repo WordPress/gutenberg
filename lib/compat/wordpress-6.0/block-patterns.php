@@ -87,10 +87,17 @@ function gutenberg_register_theme_block_patterns() {
 	);
 
 	// Register patterns for the active theme. If the theme is a child theme,
-	// let it override any patterns from the parent theme that shares the same
-	// slug.
-	foreach ( wp_get_active_and_valid_themes() as $theme ) {
-		$dirpath = $theme . '/patterns/';
+	// let it override any patterns from the parent theme that shares the same slug.
+	$themes     = array();
+	$stylesheet = get_stylesheet();
+	$template   = get_template();
+	if ( $stylesheet !== $template ) {
+		$themes[] = wp_get_theme( $stylesheet );
+	}
+	$themes[] = wp_get_theme( $template );
+
+	foreach ( $themes as $theme ) {
+		$dirpath = $theme->get_stylesheet_directory() . '/patterns/';
 		if ( file_exists( $dirpath ) ) {
 			$files = glob( $dirpath . '*.php' );
 			if ( $files ) {
@@ -172,7 +179,7 @@ function gutenberg_register_theme_block_patterns() {
 					}
 
 					// Translate the pattern metadata.
-					$text_domain = wp_get_theme()->get( 'TextDomain' );
+					$text_domain = $theme->get( 'TextDomain' );
 					//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralContext, WordPress.WP.I18n.NonSingularStringLiteralDomain, WordPress.WP.I18n.LowLevelTranslationFunction
 					$pattern_data['title'] = translate_with_gettext_context( $pattern_data['title'], 'Title of the pattern', $text_domain );
 					if ( ! empty( $pattern_data['description'] ) ) {
