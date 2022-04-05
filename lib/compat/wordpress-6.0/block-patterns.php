@@ -172,7 +172,7 @@ function gutenberg_register_theme_block_patterns() {
 					}
 
 					// Translate the pattern metadata.
-					$text_domain           = wp_get_theme()->get( 'TextDomain' );
+					$text_domain = wp_get_theme()->get( 'TextDomain' );
 					//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralContext, WordPress.WP.I18n.NonSingularStringLiteralDomain, WordPress.WP.I18n.LowLevelTranslationFunction
 					$pattern_data['title'] = translate_with_gettext_context( $pattern_data['title'], 'Title of the pattern', $text_domain );
 					if ( ! empty( $pattern_data['description'] ) ) {
