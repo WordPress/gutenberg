@@ -5,12 +5,12 @@
 		"emitDeclarationOnly": false,
 		"types": [
 			"gutenberg-env",
-			"testing-library",
+			"gutenberg-test-env",
 			"jest",
 			"@testing-library/jest-dom",
 			"snapshot-diff",
 			"@emotion/core"
-		],
+		]
 	},
 	"references": [
 		{ "path": "packages/a11y" },
