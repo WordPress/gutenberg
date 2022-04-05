@@ -8,6 +8,9 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import createAsyncDebounce from './create-async-debounce';
 
+const EMPTY_OBJECT = {};
+const localStorage = window.localStorage;
+
 /**
  * Creates a database persistence layer, storing data in the user meta.
  *
@@ -25,10 +28,9 @@ export default function create( {
 	localStorageRestoreKey,
 	preloadedData,
 	requestDebounceMS = 2500,
-} ) {
+} = {} ) {
 	let cache = preloadedData;
 	const debounce = createAsyncDebounce( requestDebounceMS );
-	const localStorage = window.localStorage;
 
 	async function get() {
 		if ( cache ) {
@@ -53,7 +55,7 @@ export default function create( {
 		} else if ( localData ) {
 			cache = localData;
 		} else {
-			cache = {};
+			cache = EMPTY_OBJECT;
 		}
 
 		return cache;
