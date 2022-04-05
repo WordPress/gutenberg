@@ -154,7 +154,7 @@ function FlexLayoutVerticalAlignmentControl( {
 	onChange,
 	isToolbar = false,
 } ) {
-	const { alignItems = 'center' } = layout;
+	const { alignItems = 'flex-start' } = layout;
 	const onVerticalAlignmentChange = ( value ) => {
 		onChange( {
 			...layout,
