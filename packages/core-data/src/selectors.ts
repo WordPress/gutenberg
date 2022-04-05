@@ -18,6 +18,9 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
+import { User, WpTemplate } from './entity-types';
+
+type State = any;
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -32,13 +35,13 @@ const EMPTY_OBJECT = {};
  * Returns true if a request is in progress for embed preview data, or false
  * otherwise.
  *
- * @param {Object} state Data state.
- * @param {string} url   URL the preview would be for.
+ * @param  state Data state.
+ * @param  url   URL the preview would be for.
  *
- * @return {boolean} Whether a request is in progress for an embed preview.
+ * @return Whether a request is in progress for an embed preview.
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
-	( select ) => ( state, url ) => {
+	( select ) => ( state: State, url: string ): boolean => {
 		return select( STORE_NAME ).isResolving( 'getEmbedPreview', [ url ] );
 	}
 );
@@ -48,12 +51,15 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  *
  * @deprecated since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
  *
- * @param {Object}           state Data state.
- * @param {Object|undefined} query Optional object of query parameters to
- *                                 include with request.
- * @return {Array} Authors list.
+ * @param  state Data state.
+ * @param  query Optional object of query parameters to
+ *               include with request.
+ * @return Authors list.
  */
-export function getAuthors( state, query ) {
+export function getAuthors(
+	state: State,
+	query?: Record< string, unknown >
+): User< 'edit' >[] {
 	deprecated( "select( 'core' ).getAuthors()", {
 		since: '5.9',
 		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
@@ -69,29 +75,32 @@ export function getAuthors( state, query ) {
 /**
  * Returns the current user.
  *
- * @param {Object} state Data state.
+ * @param  state Data state.
  *
- * @return {Object} Current user object.
+ * @return Current user object.
  */
-export function getCurrentUser( state ) {
+export function getCurrentUser( state: State ): User< 'edit' > {
 	return state.currentUser;
 }
 
 /**
  * Returns all the users returned by a query ID.
  *
- * @param {Object} state   Data state.
- * @param {string} queryID Query ID.
+ * @param  state   Data state.
+ * @param  queryID Query ID.
  *
- * @return {Array} Users list.
+ * @return Users list.
  */
 export const getUserQueryResults = createSelector(
-	( state, queryID ) => {
+	( state: State, queryID: string ): User< 'edit' >[] => {
 		const queryResults = state.users.queries[ queryID ];
 
 		return map( queryResults, ( id ) => state.users.byId[ id ] );
 	},
-	( state, queryID ) => [ state.users.queries[ queryID ], state.users.byId ]
+	( state: State, queryID: string ) => [
+		state.users.queries[ queryID ],
+		state.users.byId,
+	]
 );
 
 /**
@@ -659,11 +668,11 @@ export function getLastEntityDeleteError( state, kind, name, recordId ) {
  * of the history stack we are at. 0 is the
  * last edit, -1 is the second last, and so on.
  *
- * @param {Object} state State tree.
+ * @param  state State tree.
  *
- * @return {number} The current undo offset.
+ * @return The current undo offset.
  */
-function getCurrentUndoOffset( state ) {
+function getCurrentUndoOffset( state: State ): number {
 	return state.undo.offset;
 }
 
@@ -671,11 +680,11 @@ function getCurrentUndoOffset( state ) {
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param {Object} state State tree.
+ * @param  state State tree.
  *
- * @return {Object?} The edit.
+ * @return The edit.
  */
-export function getUndoEdit( state ) {
+export function getUndoEdit( state: State ): Object {
 	return state.undo[ state.undo.length - 2 + getCurrentUndoOffset( state ) ];
 }
 
@@ -683,11 +692,11 @@ export function getUndoEdit( state ) {
  * Returns the next edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param {Object} state State tree.
+ * @param  state State tree.
  *
- * @return {Object?} The edit.
+ * @return The edit.
  */
-export function getRedoEdit( state ) {
+export function getRedoEdit( state: State ): Object {
 	return state.undo[ state.undo.length + getCurrentUndoOffset( state ) ];
 }
 
@@ -695,11 +704,11 @@ export function getRedoEdit( state ) {
  * Returns true if there is a previous edit from the current undo offset
  * for the entity records edits history, and false otherwise.
  *
- * @param {Object} state State tree.
+ * @param  state State tree.
  *
- * @return {boolean} Whether there is a previous edit or not.
+ * @return Whether there is a previous edit or not.
  */
-export function hasUndo( state ) {
+export function hasUndo( state: State ): boolean {
 	return Boolean( getUndoEdit( state ) );
 }
 
@@ -707,11 +716,11 @@ export function hasUndo( state ) {
  * Returns true if there is a next edit from the current undo offset
  * for the entity records edits history, and false otherwise.
  *
- * @param {Object} state State tree.
+ * @param  state State tree.
  *
- * @return {boolean} Whether there is a next edit or not.
+ * @return Whether there is a next edit or not.
  */
-export function hasRedo( state ) {
+export function hasRedo( state: State ): boolean {
 	return Boolean( getRedoEdit( state ) );
 }
 
@@ -729,34 +738,34 @@ export function getCurrentTheme( state ) {
 /**
  * Return the ID of the current global styles object.
  *
- * @param {Object} state Data state.
+ * @param  state Data state.
  *
- * @return {string} The current global styles ID.
+ * @return The current global styles ID.
  */
-export function __experimentalGetCurrentGlobalStylesId( state ) {
+export function __experimentalGetCurrentGlobalStylesId( state: State ): string {
 	return state.currentGlobalStylesId;
 }
 
 /**
  * Return theme supports data in the index.
  *
- * @param {Object} state Data state.
+ * @param  state Data state.
  *
- * @return {*} Index data.
+ * @return Index data.
  */
-export function getThemeSupports( state ) {
+export function getThemeSupports( state: State ): Object {
 	return getCurrentTheme( state )?.theme_supports ?? EMPTY_OBJECT;
 }
 
 /**
  * Returns the embed preview for the given URL.
  *
- * @param {Object} state Data state.
- * @param {string} url   Embedded URL.
+ * @param  state Data state.
+ * @param  url   Embedded URL.
  *
- * @return {*} Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
+ * @return Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
  */
-export function getEmbedPreview( state, url ) {
+export function getEmbedPreview( state: State, url: string ): Object {
 	return state.embedPreviews[ url ];
 }
 
@@ -767,12 +776,12 @@ export function getEmbedPreview( state, url ) {
  * We need to be able to determine if a URL is embeddable or not, based on what we
  * get back from the oEmbed preview API.
  *
- * @param {Object} state Data state.
- * @param {string} url   Embedded URL.
+ * @param  state Data state.
+ * @param  url   Embedded URL.
  *
- * @return {boolean} Is the preview for the URL an oEmbed link fallback.
+ * @return Is the preview for the URL an oEmbed link fallback.
  */
-export function isPreviewEmbedFallback( state, url ) {
+export function isPreviewEmbedFallback( state: State, url: string ): boolean {
 	const preview = state.embedPreviews[ url ];
 	const oEmbedLinkCheck = '<a href="' + url + '">' + url + '</a>';
 	if ( ! preview ) {
@@ -790,15 +799,20 @@ export function isPreviewEmbedFallback( state, url ) {
  *
  * https://developer.wordpress.org/rest-api/reference/
  *
- * @param {Object}  state    Data state.
- * @param {string}  action   Action to check. One of: 'create', 'read', 'update', 'delete'.
- * @param {string}  resource REST resource to check, e.g. 'media' or 'posts'.
- * @param {string=} id       Optional ID of the rest resource to check.
+ * @param  state    Data state.
+ * @param  action   Action to check. One of: 'create', 'read', 'update', 'delete'.
+ * @param  resource REST resource to check, e.g. 'media' or 'posts'.
+ * @param  id       Optional ID of the rest resource to check.
  *
- * @return {boolean|undefined} Whether or not the user can perform the action,
+ * @return Whether or not the user can perform the action,
  *                             or `undefined` if the OPTIONS request is still being made.
  */
-export function canUser( state, action, resource, id ) {
+export function canUser(
+	state: State,
+	action: string,
+	resource: string,
+	id?: string
+): boolean | undefined {
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
 }
@@ -901,7 +915,7 @@ export const hasFetchedAutosaves = createRegistrySelector(
  */
 export const getReferenceByDistinctEdits = createSelector(
 	() => [],
-	( state ) => [
+	( state: State ) => [
 		state.undo.length,
 		state.undo.offset,
 		state.undo.flattenedUndo,
@@ -911,12 +925,15 @@ export const getReferenceByDistinctEdits = createSelector(
 /**
  * Retrieve the frontend template used for a given link.
  *
- * @param {Object} state Editor state.
- * @param {string} link  Link.
+ * @param  state Editor state.
+ * @param  link  Link.
  *
- * @return {Object?} The template record.
+ * @return The template record.
  */
-export function __experimentalGetTemplateForLink( state, link ) {
+export function __experimentalGetTemplateForLink(
+	state: State,
+	link: string
+): WpTemplate< 'edit' > | null {
 	const records = getEntityRecords( state, 'postType', 'wp_template', {
 		'find-template': link,
 	} );
@@ -936,11 +953,13 @@ export function __experimentalGetTemplateForLink( state, link ) {
 /**
  * Retrieve the current theme's base global styles
  *
- * @param {Object} state Editor state.
+ * @param  state Editor state.
  *
- * @return {Object|null} The Global Styles object.
+ * @return The Global Styles object.
  */
-export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
+export function __experimentalGetCurrentThemeBaseGlobalStyles(
+	state: State
+): Object | null {
 	const currentTheme = getCurrentTheme( state );
 	if ( ! currentTheme ) {
 		return null;
@@ -955,7 +974,9 @@ export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
  *
  * @return {string|null} The current global styles ID.
  */
-export function __experimentalGetCurrentThemeGlobalStylesVariations( state ) {
+export function __experimentalGetCurrentThemeGlobalStylesVariations(
+	state: State
+): Object | null {
 	const currentTheme = getCurrentTheme( state );
 	if ( ! currentTheme ) {
 		return null;
