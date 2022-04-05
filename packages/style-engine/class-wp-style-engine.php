@@ -1,13 +1,13 @@
 <?php
 /**
- * WP_Style_Engine_Gutenberg class
+ * WP_Style_Engine
  *
  * Generates classnames and block styles.
  *
  * @package Gutenberg
  */
 
-if ( class_exists( 'WP_Style_Engine_Gutenberg' ) ) {
+if ( class_exists( 'WP_Style_Engine' ) ) {
 	return;
 }
 
@@ -17,11 +17,11 @@ if ( class_exists( 'WP_Style_Engine_Gutenberg' ) ) {
  * Consolidates rendering block styles to reduce duplication and streamline
  * CSS styles generation.
  */
-class WP_Style_Engine_Gutenberg {
+class WP_Style_Engine {
 	/**
 	 * Container for the main instance of the class.
 	 *
-	 * @var WP_Style_Engine_Gutenberg|null
+	 * @var WP_Style_Engine|null
 	 */
 	private static $instance = null;
 
@@ -55,7 +55,7 @@ class WP_Style_Engine_Gutenberg {
 	 *
 	 * The instance will be created if it does not exist yet.
 	 *
-	 * @return WP_Style_Engine_Gutenberg The main instance.
+	 * @return WP_Style_Engine The main instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -167,5 +167,16 @@ class WP_Style_Engine_Gutenberg {
 			$rules[ $style_property ] = $style_value;
 		}
 		return $rules;
+	}
+}
+
+/**
+ * This function returns the Style Engine instance.
+ *
+ * @return WP_Style_Engine
+ */
+function wp_get_style_engine() {
+	if ( class_exists( 'WP_Style_Engine' ) ) {
+		return WP_Style_Engine::get_instance();
 	}
 }
