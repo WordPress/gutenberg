@@ -181,10 +181,10 @@ function gutenberg_register_theme_block_patterns() {
 					// Translate the pattern metadata.
 					$text_domain = $theme->get( 'TextDomain' );
 					//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralContext, WordPress.WP.I18n.NonSingularStringLiteralDomain, WordPress.WP.I18n.LowLevelTranslationFunction
-					$pattern_data['title'] = translate_with_gettext_context( $pattern_data['title'], 'Title of the pattern', $text_domain );
+					$pattern_data['title'] = translate_with_gettext_context( $pattern_data['title'], 'Pattern title', $text_domain );
 					if ( ! empty( $pattern_data['description'] ) ) {
 						//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralContext, WordPress.WP.I18n.NonSingularStringLiteralDomain, WordPress.WP.I18n.LowLevelTranslationFunction
-						$pattern_data['description'] = translate_with_gettext_context( $pattern_data['description'], 'Description of the pattern', $text_domain );
+						$pattern_data['description'] = translate_with_gettext_context( $pattern_data['description'], 'Pattern description', $text_domain );
 					}
 
 					// The actual pattern content is the output of the file.
