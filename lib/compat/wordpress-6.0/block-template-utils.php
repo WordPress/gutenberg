@@ -108,9 +108,8 @@ function gutenberg_generate_block_templates_export_file() {
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
 			$theme_json_version = 'trunk';
 		}
-		$theme_json_raw = array_reverse( $theme_json_raw );
-		$theme_json_raw['$schema'] = 'https://schemas.wp.org/wp/' . $theme_json_version . '/theme.json';
-		$theme_json_raw = array_reverse( $theme_json_raw );
+		$schema = array( '$schema' => 'https://schemas.wp.org/wp/' . $theme_json_version . '/theme.json' );
+		$theme_json_raw = array_merge( $schema, $theme_json_raw );
 	}
 
 	// Convert to a string.
