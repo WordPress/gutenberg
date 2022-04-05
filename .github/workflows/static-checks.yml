@@ -32,9 +32,11 @@ jobs:
 
             - name: Npm install
               # A "full" install is executed, since `npm ci` does not always exit
-              # with an error status code if the lock file is inaccurate.
+              # with an error status code if the lock file is inaccurate. This also
+              # helps to catch dependencies not being installed with exact version.
               #
               # See: https://github.com/WordPress/gutenberg/issues/16157
+              # See: https://github.com/WordPress/gutenberg/pull/39865
               run: npm install
 
             - name: Lint JavaScript and Styles
