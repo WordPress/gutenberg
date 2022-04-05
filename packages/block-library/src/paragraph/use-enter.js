@@ -4,17 +4,25 @@
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport, createBlock } from '@wordpress/blocks';
 
 export function useExitOnEnterAtEnd( props ) {
-	const { moveBlocksToPosition } = useDispatch( blockEditorStore );
+	const { batch } = useRegistry();
+	const {
+		moveBlocksToPosition,
+		replaceInnerBlocks,
+		duplicateBlocks,
+		insertBlock,
+	} = useDispatch( blockEditorStore );
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
 		getBlockOrder,
 		getBlockName,
+		getBlock,
+		getNextBlockClientId,
 	} = useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
@@ -49,19 +57,39 @@ export function useExitOnEnterAtEnd( props ) {
 
 			const order = getBlockOrder( wrapperClientId );
 
+			event.preventDefault();
+
+			const position = order.indexOf( clientId );
 			// It should be the last block.
-			if ( order.indexOf( clientId ) !== order.length - 1 ) {
+			if ( position === order.length - 1 ) {
+				moveBlocksToPosition(
+					[ clientId ],
+					wrapperClientId,
+					getBlockRootClientId( wrapperClientId ),
+					getBlockIndex( wrapperClientId ) + 1
+				);
 				return;
 			}
 
-			event.preventDefault();
-
-			moveBlocksToPosition(
-				[ clientId ],
-				wrapperClientId,
-				getBlockRootClientId( wrapperClientId ),
-				getBlockIndex( wrapperClientId ) + 1
-			);
+			const wrapperBlock = getBlock( wrapperClientId );
+			batch( () => {
+				duplicateBlocks( [ wrapperClientId ] );
+				const blockIndex = getBlockIndex( wrapperClientId );
+				replaceInnerBlocks(
+					wrapperClientId,
+					wrapperBlock.innerBlocks.splice( 0, position )
+				);
+				replaceInnerBlocks(
+					getNextBlockClientId( wrapperClientId ),
+					wrapperBlock.innerBlocks.splice( position )
+				);
+				insertBlock(
+					createBlock( 'core/paragraph' ),
+					blockIndex + 1,
+					getBlockRootClientId( wrapperClientId ),
+					true
+				);
+			} );
 		}
 
 		element.addEventListener( 'keydown', onKeyDown );
