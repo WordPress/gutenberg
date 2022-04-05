@@ -163,7 +163,8 @@ function FlexLayoutVerticalAlignmentControl( {
 	onChange,
 	isToolbar = false,
 } ) {
-	const { verticalAlignment = 'top' } = layout;
+	const { verticalAlignment = verticalAlignmentMap.center } = layout;
+
 	const onVerticalAlignmentChange = ( value ) => {
 		onChange( {
 			...layout,
