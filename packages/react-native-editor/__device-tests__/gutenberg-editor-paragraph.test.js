@@ -179,6 +179,8 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
+		} else {
+			await editorPage.clickParagraphBlockAtPosition( 1 );
 		}
 
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
