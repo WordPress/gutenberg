@@ -843,7 +843,7 @@ export function hasRedo( state: State ): boolean {
  *
  * @return The current theme.
  */
-export function getCurrentTheme( state ): any {
+export function getCurrentTheme( state: State ): any {
 	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
 }
 
