@@ -40,11 +40,21 @@ function gutenberg_configure_persisted_preferences() {
 	wp_add_inline_script(
 		'wp-preferences',
 		sprintf(
-			'const { create } = wp.databasePersistenceLayer;
-			const persistenceLayer = create( { preloadedData: %s } );
+			'const serverData = %s;
+			const fallbackLocalStorageKey = "WP_PREFERENCES_USER_%s";
+			const localData = JSON.parse(
+				localStorage.getItem( fallbackLocalStorageKey )
+			);
+			const serverTimestamp = serverData?.__timestamp ?? 0;
+			const localTimestamp = localData?.__timestamp ?? 0;
+			const preloadedData = serverTimestamp > localTimestamp ? serverData : localData;
+
+			const { create } = wp.databasePersistenceLayer;
+			const persistenceLayer = create( { preloadedData, fallbackLocalStorageKey } );
 			const { store: preferencesStore } = wp.preferences;
 			wp.data.dispatch( "core/preferences" ).setPersistenceLayer( persistenceLayer );',
-			wp_json_encode( $preload_data )
+			wp_json_encode( $preload_data ),
+			$user_id
 		),
 		'after'
 	);

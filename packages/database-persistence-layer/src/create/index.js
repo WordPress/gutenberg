@@ -12,15 +12,20 @@ import createAsyncDebounce from './create-async-debounce';
  * Creates a database persistence layer, storing data in the user meta.
  *
  * @param {Object} options
- * @param {Object} options.preloadedData     Any persisted data that should be preloaded.
- * @param {number} options.requestDebounceMS Throttle requests to the API so that they only
- *                                           happen every n milliseconds.
+ * @param {Object} options.preloadedData           Any persisted data that should be preloaded.
+ * @param {number} options.requestDebounceMS       Throttle requests to the API so that they only
+ * @param {string} options.fallbackLocalStorageKey The key to use for restoring the localStorage backup.
  *
  * @return {Object} A database persistence layer.
  */
-export default function create( { preloadedData, requestDebounceMS = 2500 } ) {
+export default function create( {
+	fallbackLocalStorageKey,
+	preloadedData,
+	requestDebounceMS = 2500,
+} ) {
 	let cache = preloadedData;
 	const debounce = createAsyncDebounce( requestDebounceMS );
+	const localStorage = window.localStorage;
 
 	async function get() {
 		if ( cache ) {
@@ -31,13 +36,29 @@ export default function create( { preloadedData, requestDebounceMS = 2500 } ) {
 			path: '/wp/v2/users/me',
 		} );
 
-		cache = user?.meta?.persisted_preferences;
+		// Restore data from local storage if it's more recent.
+		const serverData = user?.meta?.persisted_preferences;
+		const localData = JSON.parse(
+			localStorage.getItem( fallbackLocalStorageKey )
+		);
+		const serverTimestamp = serverData?.__timestamp ?? 0;
+		const localTimestamp = localData?.__timestamp ?? 0;
+		cache = serverTimestamp > localTimestamp ? serverData : localData;
 
 		return cache;
 	}
 
 	async function set( newData ) {
-		cache = { ...newData };
+		const dataWithTimestamp = { ...newData, __timestamp: Date.now() };
+		cache = dataWithTimestamp;
+
+		// Store data in local storage as a fallback. If for some reason the
+		// api request does not complete, this data can be used to restore
+		// preferences.
+		localStorage.setItem(
+			fallbackLocalStorageKey,
+			JSON.stringify( dataWithTimestamp )
+		);
 
 		// The user meta endpoint seems susceptible to errors when consecutive
 		// requests are made in quick succession. Ensure there's a gap between
@@ -51,7 +72,7 @@ export default function create( { preloadedData, requestDebounceMS = 2500 } ) {
 				keepalive: true,
 				data: {
 					meta: {
-						persisted_preferences: newData,
+						persisted_preferences: dataWithTimestamp,
 					},
 				},
 			} )
