@@ -66,14 +66,14 @@ function gutenberg_api_nav_menus_taxonomy_args( $args, $taxonomy ) {
 add_filter( 'register_taxonomy_args', 'gutenberg_api_nav_menus_taxonomy_args', 10, 2 );
 
 /**
-  * Exposes the site icon url to the Gutenberg editor through the WordPress REST
-  * API. The site icon url should instead be fetched from the wp/v2/settings
-  * endpoint when https://github.com/WordPress/gutenberg/pull/19967 is complete.
-  *
-  * @param WP_REST_Response $response Response data served by the WordPress REST index endpoint.
-  * @return WP_REST_Response
-  */
-  function gutenberg_register_site_icon_url( $response ) {
+ * Exposes the site icon url to the Gutenberg editor through the WordPress REST
+ * API. The site icon url should instead be fetched from the wp/v2/settings
+ * endpoint when https://github.com/WordPress/gutenberg/pull/19967 is complete.
+ *
+ * @param WP_REST_Response $response Response data served by the WordPress REST index endpoint.
+ * @return WP_REST_Response
+ */
+function gutenberg_register_site_icon_url( $response ) {
 	$data                  = $response->data;
 	$data['site_icon_url'] = get_site_icon_url();
 	$response->set_data( $data );
