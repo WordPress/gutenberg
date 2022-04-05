@@ -255,6 +255,7 @@ beforeAll( async () => {
 } );
 
 afterEach( async () => {
+	await resetPreferences();
 	await setupBrowser();
 } );
 
