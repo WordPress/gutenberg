@@ -62,11 +62,6 @@ describe( 'Gutenberg Editor tests', () => {
 			4
 		);
 
-		// iOS needs this extra step to click on the right block
-		if ( ! isAndroid() ) {
-			await editorPage.clickParagraphBlockAtPosition( 4 );
-		}
-
 		await editorPage.typeTextToParagraphBlock(
 			headingBlockElement,
 			testData.heading
