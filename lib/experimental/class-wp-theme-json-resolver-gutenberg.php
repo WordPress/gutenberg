@@ -72,7 +72,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		return $with_theme_supports;
 	}
 
-	public static function get_theme_data_without_supports() {
+	private static function get_theme_data_without_supports() {
 		if ( null === static::$theme ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
@@ -94,5 +94,33 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		}
 
 		return static::$theme;
+	}
+
+	/**
+	 * Prepares theme.json for export.
+	 */
+	public static function export() {
+		$tree = static::get_theme_data_without_supports();
+		$tree->merge( static::get_user_data() );
+
+		$theme_json_raw = $tree->get_data();
+		// If a version is defined, add a schema.
+		if ( $theme_json_raw['version'] ) {
+			global $wp_version;
+			$theme_json_version = substr( $wp_version, 0, strpos( $wp_version, '-' ) );
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
+				$theme_json_version = 'trunk';
+			}
+			$schema         = array( '$schema' => 'https://schemas.wp.org/wp/' . $theme_json_version . '/theme.json' );
+			$theme_json_raw = array_merge( $schema, $theme_json_raw );
+		}
+
+		// Convert to a string.
+		$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+
+		// Replace 4 spaces with a tab.
+		$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
+
+		return $theme_json_tabbed;
 	}
 }
