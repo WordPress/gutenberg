@@ -171,6 +171,13 @@ function gutenberg_register_theme_block_patterns() {
 						}
 					}
 
+					// Translate the pattern metadata.
+					$text_domain           = wp_get_theme()->get( 'TextDomain' );
+					$pattern_data['title'] = translate_with_gettext_context( $pattern_data['title'], 'Title of the pattern', $text_domain );
+					if ( ! empty( $pattern_data['description'] ) ) {
+						$pattern_data['description'] = translate_with_gettext_context( $pattern_data['description'], 'Description of the pattern', $text_domain );
+					}
+
 					// The actual pattern content is the output of the file.
 					ob_start();
 					include $file;
