@@ -1322,7 +1322,7 @@ describe( 'Navigation', () => {
 			);
 		} );
 
-		it( 'automatically uses the first Navigation Menu if only one available', async () => {
+		it( 'automatically uses the first Navigation Menu if only one is available', async () => {
 			await createNavigationMenu( {
 				title: 'Example Navigation',
 				content:
@@ -1347,7 +1347,7 @@ describe( 'Navigation', () => {
 			expect( linkText ).toBe( 'WordPress' );
 		} );
 
-		it( 'does not automatically use first Navigation Menu if be than one exists', async () => {
+		it( 'does not automatically use first Navigation Menu if more than one exists', async () => {
 			await createNavigationMenu( {
 				title: 'Example Navigation',
 				content:
