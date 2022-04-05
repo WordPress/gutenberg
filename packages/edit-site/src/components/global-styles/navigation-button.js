@@ -8,7 +8,11 @@ import {
 	FlexItem,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { Icon } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { IconWithCurrentColor } from './icon-with-current-color';
 
 function GenericNavigationButton( { icon, children, ...props } ) {
 	return (
@@ -16,7 +20,7 @@ function GenericNavigationButton( { icon, children, ...props } ) {
 			{ icon && (
 				<HStack justify="flex-start">
 					<FlexItem>
-						<Icon icon={ icon } size={ 24 } />
+						<IconWithCurrentColor icon={ icon } size={ 24 } />
 					</FlexItem>
 					<FlexItem>{ children }</FlexItem>
 				</HStack>
