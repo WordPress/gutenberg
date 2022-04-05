@@ -225,13 +225,18 @@ export const __unstableGetClientIdsTree = createSelector(
  *
  * @return {Array} ids of descendants.
  */
-export const getClientIdsOfDescendants = ( state, clientIds ) =>
-	clientIds.flatMap( ( clientId ) =>
-		getBlockOrder( state, clientId ).flatMap( ( descendantId ) => [
-			descendantId,
-			...getClientIdsOfDescendants( state, [ descendantId ] ),
-		] )
-	);
+export const getClientIdsOfDescendants = ( state, clientIds ) => {
+	const collectedIds = [];
+	for ( const givenId of clientIds ) {
+		for ( const descendantId of getBlockOrder( state, givenId ) ) {
+			collectedIds.push(
+				descendantId,
+				...getClientIdsOfDescendants( state, [ descendantId ] )
+			);
+		}
+	}
+	return collectedIds;
+};
 
 /**
  * Returns an array containing the clientIds of the top-level blocks and
@@ -243,11 +248,16 @@ export const getClientIdsOfDescendants = ( state, clientIds ) =>
  * @return {Array} ids of top-level and descendant blocks.
  */
 export const getClientIdsWithDescendants = createSelector(
-	( state ) =>
-		getBlockOrder( state ).flatMap( ( topLevelId ) => [
-			topLevelId,
-			...getClientIdsOfDescendants( state, [ topLevelId ] ),
-		] ),
+	( state ) => {
+		const collectedIds = [];
+		for ( const topLevelId of getBlockOrder( state ) ) {
+			collectedIds.push(
+				topLevelId,
+				...getClientIdsOfDescendants( state, [ topLevelId ] )
+			);
+		}
+		return collectedIds;
+	},
 	( state ) => [ state.blocks.order ]
 );
 
