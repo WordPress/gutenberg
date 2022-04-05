@@ -11,17 +11,32 @@
 	@include break-large() {
 		height: 70%;
 	}
+
+	// @todo: Consider this for a minimal modal prop.
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content::before {
+		content: none;
+	}
 }
 
+// 2 column masonry layout.
 .edit-post-start-page-options__modal-content .block-editor-block-patterns-list {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-gap: $grid-unit-10;
+	column-count: 2;
+	column-gap: $grid-unit-30;
 
 	.block-editor-block-patterns-list__list-item {
-		margin-bottom: 0;
+		break-inside: avoid-column;
+		margin-bottom: $grid-unit-30;
+
 		.block-editor-block-preview__container {
 			min-height: 100px;
+		}
+
+		.block-editor-block-preview__content {
+			width: 100%;
 		}
 	}
 }
