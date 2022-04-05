@@ -18,7 +18,11 @@ import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
 import { appendSelectors } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import useSetting from '../components/use-setting';
-import { BlockControls, JustifyContentControl } from '../components';
+import {
+	BlockControls,
+	JustifyContentControl,
+	BlockVerticalAlignmentControl,
+} from '../components';
 import { shouldSkipSerialization } from '../hooks/utils';
 
 // Used with the default, horizontal flex orientation.
@@ -84,6 +88,10 @@ export default {
 					onChange={ onChange }
 					isToolbar
 				/>
+				<FlexLayoutVerticalAlignmentControl
+					layout={ layout }
+					onChange={ onChange }
+				/>
 			</BlockControls>
 		);
 	},
@@ -139,6 +147,73 @@ export default {
 		return [];
 	},
 };
+
+function FlexLayoutVerticalAlignmentControl( {
+	layout,
+	onChange,
+	isToolbar = false,
+} ) {
+	const { alignItems = 'center', orientation = 'vertical' } = layout;
+	const onVerticalAlignmentChange = ( value ) => {
+		onChange( {
+			...layout,
+			alignItems: value,
+		} );
+	};
+	const allowedControls = [ 'flex-start', 'center', 'flex-end', 'stretch' ];
+	if ( orientation === 'vertical' ) {
+		allowedControls.push( 'stretch' );
+	}
+	if ( isToolbar ) {
+		<BlockVerticalAlignmentControl
+			allowedControls={ allowedControls }
+			value={ alignItems }
+			onChange={ onVerticalAlignmentChange }
+			popoverProps={ {
+				position: 'bottom right',
+				isAlternate: true,
+			} }
+		/>;
+	}
+
+	const verticalAlignmentOptions = [
+		{
+			value: 'flex-start',
+			label: __( 'Align items top' ),
+		},
+		{
+			value: 'center',
+			label: __( 'Align items center' ),
+		},
+		{
+			value: 'flex-end',
+			label: __( 'Align items bottom' ),
+		},
+		{
+			value: 'stretch',
+			label: __( 'Stretch items vertically' ),
+		},
+	];
+
+	return (
+		<fieldset className="block-editor-hooks__flex-layout-vertical-alignment-control">
+			<legend>{ __( 'Vertical alignment' ) }</legend>
+			<div>
+				{ verticalAlignmentOptions.map( ( value, icon, label ) => {
+					return (
+						<Button
+							key={ value }
+							label={ label }
+							icon={ icon }
+							isPressed={ alignItems === value }
+							onClick={ () => onVerticalAlignmentChange( value ) }
+						/>
+					);
+				} ) }
+			</div>
+		</fieldset>
+	);
+}
 
 function FlexLayoutJustifyContentControl( {
 	layout,
