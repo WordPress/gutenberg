@@ -145,26 +145,78 @@ class WP_Webfonts {
 	/**
 	 * Enqueue a font-family that has been already registered.
 	 *
-	 * @param string $font_family_name The font family name to be enqueued.
+	 * @param string     $font_family_name The font family name to be enqueued.
+	 * @param array|null $font_face The font face to selectively enqueue.
 	 * @return bool True if successfully enqueued, else false.
 	 */
-	public function enqueue_webfont( $font_family_name ) {
+	public function enqueue_webfont( $font_family_name, $font_face = null ) {
 		$slug = $this->get_font_slug( $font_family_name );
 
-		if ( isset( $this->enqueued_webfonts[ $slug ] ) ) {
+		// The font family is already enqueued and there are none left to enqueue.
+		if ( isset( $this->enqueued_webfonts[ $slug ] ) && ! isset( $this->registered_webfonts[ $slug ] ) ) {
 			return true;
 		}
 
 		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
-			/* translators: %s unique slug to identify the font family of the webfont */
-			_doing_it_wrong( __METHOD__, sprintf( __( 'The "%s" font family is not registered.', 'gutenberg' ), $slug ), '6.0.0' );
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s unique slug to identify the font family of the webfont */
+					esc_html__( 'The "%s" font family is not registered.', 'gutenberg' ),
+					esc_html( $slug )
+				),
+				'6.0.0'
+			);
 
 			return false;
 		}
 
-		$this->enqueued_webfonts[ $slug ] = $this->registered_webfonts[ $slug ];
-		unset( $this->registered_webfonts[ $slug ] );
+		// Enqueueing the font family completely.
+		if ( ! $font_face ) {
+			$font_family_to_enqueue           = $this->unregister_font_family( $font_family_name );
+			$this->enqueued_webfonts[ $slug ] = $font_family_to_enqueue;
+
+			return true;
+		}
+
+		// Enqueueing a single font face.
+
+		$font_face            = gutenberg_webfont_to_kebab_case( $font_face );
+		$font_face_to_enqueue = $this->unregister_font_face( $font_face );
+
+		if ( ! $font_face_to_enqueue ) {
+			trigger_error(
+				sprintf(
+					/* translators: %1$s: font family, %2$s: font weight, %3$s: font style */
+					esc_html__( 'The "%1$s:%2$s:%3$s" font face is not registered.', 'gutenberg' ),
+					esc_html( $font_face['font-family'] ),
+					esc_html( $font_face['font-weight'] ),
+					esc_html( $font_face['font-style'] )
+				)
+			);
+
+			return false;
+		}
+
+		if ( ! isset( $this->enqueued_webfonts[ $slug ] ) ) {
+			$this->enqueued_webfonts[ $slug ] = array();
+		}
+
+		$this->enqueued_webfonts[ $slug ][] = $font_face_to_enqueue;
+
 		return true;
+	}
+
+	/**
+	 * Checks if a font family is registered.
+	 *
+	 * @param string $font_family_name The font family name to check in the registry.
+	 * @return bool True if found, else false.
+	 */
+	public function is_font_family_registered( $font_family_name ) {
+		$slug = $this->get_font_slug( $font_family_name );
+
+		return isset( $this->registered_webfonts[ $slug ] );
 	}
 
 	/**
@@ -189,6 +241,53 @@ class WP_Webfonts {
 		}
 
 		return sanitize_title( $to_convert );
+	}
+
+	/**
+	 * Unregisters a font family.
+	 *
+	 * @param string $font_family_name The font family, by name, to unregister.
+	 * @return array[]|false The font face objects of the family if unregistered, false otherwise.
+	 */
+	private function unregister_font_family( $font_family_name ) {
+		$slug = $this->get_font_slug( $font_family_name );
+
+		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
+			return false;
+		}
+
+		$font_family = $this->registered_webfonts[ $slug ];
+		unset( $this->registered_webfonts[ $slug ] );
+
+		return $font_family;
+	}
+
+	/**
+	 * Unregisters a font face.
+	 *
+	 * @param array $font_face_to_unregister The font face object, to unregister.
+	 * @return array|false The font face object if unregistered, false otherwise.
+	 */
+	private function unregister_font_face( $font_face_to_unregister ) {
+		$font_family_slug = $this->get_font_slug( $font_face_to_unregister );
+
+		$font_family = $this->registered_webfonts[ $font_family_slug ];
+		$index       = gutenberg_find_webfont( $font_family, $font_face_to_unregister );
+
+		// Font face not found.
+		if ( false === $index ) {
+			return false;
+		}
+
+		$font_face = $this->registered_webfonts[ $font_family_slug ][ $index ];
+		unset( $this->registered_webfonts[ $font_family_slug ][ $index ] );
+
+		// No font faces left, let's remove the font family entry.
+		if ( 0 === count( $this->registered_webfonts[ $font_family_slug ] ) ) {
+			unset( $this->registered_webfonts[ $font_family_slug ] );
+		}
+
+		return $font_face;
 	}
 
 	/**

@@ -5,11 +5,15 @@
  * @package gutenberg
  */
 
-function gutenberg_is_webfont_equal( $a, $b ) {
-	$equality_attrs = array(
+function gutenberg_is_webfont_equal( $a, $b, $is_camel_case = true ) {
+	$equality_attrs = $is_camel_case ? array(
 		'fontFamily',
 		'fontStyle',
 		'fontWeight',
+	) : array(
+		'font-family',
+		'font-style',
+		'font-weight',
 	);
 
 	foreach ( $equality_attrs as $attr ) {
@@ -22,8 +26,14 @@ function gutenberg_is_webfont_equal( $a, $b ) {
 }
 
 function gutenberg_find_webfont( $webfonts, $webfont_to_find ) {
+	if ( ! count( $webfonts ) ) {
+		return false;
+	}
+
+	$is_camel_case = isset( $webfonts[0]['fontFamily'] );
+
 	foreach ( $webfonts as $index => $webfont ) {
-		if ( gutenberg_is_webfont_equal( $webfont, $webfont_to_find ) ) {
+		if ( gutenberg_is_webfont_equal( $webfont, $webfont_to_find, $is_camel_case ) ) {
 			return $index;
 		}
 	}
