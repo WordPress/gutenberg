@@ -91,6 +91,7 @@ export default {
 				<FlexLayoutVerticalAlignmentControl
 					layout={ layout }
 					onChange={ onChange }
+					isToolbar
 				/>
 			</BlockControls>
 		);
@@ -153,27 +154,20 @@ function FlexLayoutVerticalAlignmentControl( {
 	onChange,
 	isToolbar = false,
 } ) {
-	const { alignItems = 'center', orientation = 'vertical' } = layout;
+	const { alignItems = 'center' } = layout;
 	const onVerticalAlignmentChange = ( value ) => {
 		onChange( {
 			...layout,
 			alignItems: value,
 		} );
 	};
-	const allowedControls = [ 'flex-start', 'center', 'flex-end', 'stretch' ];
-	if ( orientation === 'vertical' ) {
-		allowedControls.push( 'stretch' );
-	}
 	if ( isToolbar ) {
-		<BlockVerticalAlignmentControl
-			allowedControls={ allowedControls }
-			value={ alignItems }
-			onChange={ onVerticalAlignmentChange }
-			popoverProps={ {
-				position: 'bottom right',
-				isAlternate: true,
-			} }
-		/>;
+		return (
+			<BlockVerticalAlignmentControl
+				onChange={ onVerticalAlignmentChange }
+				value={ alignItems }
+			/>
+		);
 	}
 
 	const verticalAlignmentOptions = [
@@ -188,10 +182,6 @@ function FlexLayoutVerticalAlignmentControl( {
 		{
 			value: 'flex-end',
 			label: __( 'Align items bottom' ),
-		},
-		{
-			value: 'stretch',
-			label: __( 'Stretch items vertically' ),
 		},
 	];
 
