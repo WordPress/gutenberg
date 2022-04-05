@@ -416,12 +416,11 @@ export default function LogoEdit( {
 		} );
 	};
 
-	const setIcon = ( newValue ) => {
+	const setIcon = ( newValue ) => 
 		// The new value needs to be `null` to reset the Site Icon.
-		editEntityRecord( 'root', 'site', undefined, { 
+		editEntityRecord( 'root', 'site', undefined, {
 			site_icon: newValue ?? null,
 		} );
-	};
 
 	let alt = null;
 	if ( mediaItemData ) {
