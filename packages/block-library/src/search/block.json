@@ -38,6 +38,9 @@
 		"buttonUseIcon": {
 			"type": "boolean",
 			"default": false
+		},
+		"postType": {
+			"type": "string"
 		}
 	},
 	"supports": {

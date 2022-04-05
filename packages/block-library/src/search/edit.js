@@ -68,6 +68,7 @@ export default function SearchEdit( {
 		label,
 		showLabel,
 		placeholder,
+		postType,
 		width,
 		widthUnit,
 		align,
@@ -216,6 +217,7 @@ export default function SearchEdit( {
 			: borderProps.style;
 
 		return (
+<<<<<<< HEAD
 			<input
 				type="search"
 				className={ textFieldClasses }
@@ -232,6 +234,28 @@ export default function SearchEdit( {
 					setAttributes( { placeholder: event.target.value } )
 				}
 			/>
+=======
+			<>
+				<input
+					className={ textFieldClasses }
+					style={ textFieldStyles }
+					aria-label={ __( 'Optional placeholder text' ) }
+					// We hide the placeholder field's placeholder when there is a value. This
+					// stops screen readers from reading the placeholder field's placeholder
+					// which is confusing.
+					placeholder={
+						placeholder ? undefined : __( 'Optional placeholder…' )
+					}
+					value={ placeholder }
+					onChange={ ( event ) =>
+						setAttributes( { placeholder: event.target.value } )
+					}
+				/>
+				{ !! postType && (
+					<input type="hidden" name="post_type" value={ postType } />
+				) }
+			</>
+>>>>>>> 1641205f40 (Add postType attribute to Search Block)
 		);
 	};
 

@@ -33,7 +33,9 @@ function render_block_core_search( $attributes ) {
 	$use_icon_button  = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
 	$show_input       = ( ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'] ) ? false : true;
 	$show_button      = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
+	$post_type        = $attributes['postType'];
 	$input_markup     = '';
+	$post_type_markup = '';
 	$button_markup    = '';
 	$inline_styles    = styles_for_block_core_search( $attributes );
 	$color_classes    = get_color_classes_for_block_core_search( $attributes );
@@ -66,6 +68,13 @@ function render_block_core_search( $attributes ) {
 			esc_attr( get_search_query() ),
 			esc_attr( $attributes['placeholder'] ),
 			$inline_styles['input']
+		);
+	}
+
+	if ( $post_type ) {
+		$post_type_markup = sprintf(
+			'<input type="hidden" name="post_type" value="%s" />',
+			esc_attr( $post_type )
 		);
 	}
 
@@ -105,7 +114,7 @@ function render_block_core_search( $attributes ) {
 		'<div class="wp-block-search__inside-wrapper %s" %s>%s</div>',
 		esc_attr( $field_markup_classes ),
 		$inline_styles['wrapper'],
-		$input_markup . $button_markup
+		$input_markup . $post_type_markup . $button_markup
 	);
 	$wrapper_attributes   = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 
