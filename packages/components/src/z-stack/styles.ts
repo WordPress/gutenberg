@@ -19,9 +19,6 @@ export const ZStackChildView = styled.div< {
 	offsetAmount: number;
 	zIndex: number;
 } >`
-	/* TODO: split this change to a separate PR */
-	display: flex;
-
 	${ ( { isLayered, offsetAmount } ) =>
 		isLayered
 			? css( rtl( { marginLeft: offsetAmount } )() )
