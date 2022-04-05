@@ -27,6 +27,8 @@ import {
 	deleteUser,
 	switchUserToAdmin,
 	clickBlockToolbarButton,
+	openListView,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -841,34 +843,6 @@ describe( 'Navigation', () => {
 		expect( quickInserter ).toBeTruthy();
 	} );
 
-	it( 'supports navigation blocks that have inner blocks within their markup and converts them to wp_navigation posts', async () => {
-		// Insert 'old-school' inner blocks via the code editor.
-		await createNewPost();
-		await clickOnMoreMenuItem( 'Code editor' );
-		const codeEditorInput = await page.waitForSelector(
-			'.editor-post-text-editor'
-		);
-		await codeEditorInput.click();
-		const markup =
-			'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
-		await page.keyboard.type( markup );
-
-		await clickButton( 'Exit code editor' );
-
-		const navBlock = await waitForBlock( 'Navigation' );
-
-		// Select the block to convert to a wp_navigation.
-		await navBlock.click();
-
-		// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
-		await waitForBlock( 'Page List' );
-
-		await publishPost();
-
-		// Check that the wp_navigation post has the page list block.
-		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
-	} );
-
 	describe( 'Creating and restarting', () => {
 		const NAV_ENTITY_SELECTOR =
 			'//div[@class="entities-saved-states__panel"]//label//strong[contains(text(), "Navigation")]';
@@ -924,7 +898,7 @@ describe( 'Navigation', () => {
 			expect( submenuBlock ).toBeFalsy();
 		} );
 
-		it( 'retains uncontrolled inner blocks by default', async () => {
+		it( 'retains initial uncontrolled inner blocks whilst there are no modifications to those blocks', async () => {
 			await createNewPost();
 			await clickOnMoreMenuItem( 'Code editor' );
 			const codeEditorInput = await page.waitForSelector(
@@ -950,6 +924,74 @@ describe( 'Navigation', () => {
 			} );
 
 			expect( hasUncontrolledInnerBlocks ).toBe( true );
+		} );
+
+		it( 'converts uncontrolled inner blocks to an entity when modifications are made to the blocks', async () => {
+			await rest( {
+				method: 'POST',
+				path: `/wp/v2/pages/`,
+				data: {
+					status: 'publish',
+					title: 'A Test Page',
+					content: 'Hello world',
+				},
+			} );
+
+			// Insert 'old-school' inner blocks via the code editor.
+			await createNewPost();
+			await clickOnMoreMenuItem( 'Code editor' );
+			const codeEditorInput = await page.waitForSelector(
+				'.editor-post-text-editor'
+			);
+			await codeEditorInput.click();
+			const markup =
+				'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
+			await page.keyboard.type( markup );
+
+			await clickButton( 'Exit code editor' );
+
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			await navBlock.click();
+
+			// Wait for the Page List to have resolved and render as a `<ul>`.
+			await page.waitForSelector(
+				`[aria-label="Editor content"][role="region"] ul[aria-label="Block: Page List"]`
+			);
+
+			// Select the Page List block.
+			await openListView();
+
+			const navExpander = await page.waitForXPath(
+				`//a[span[text()='Navigation']]/span[contains(@class, 'block-editor-list-view__expander')]`
+			);
+
+			await navExpander.click();
+
+			const pageListBlock = (
+				await getListViewBlocks( 'Page List' )
+			 )[ 0 ];
+
+			await pageListBlock.click();
+
+			// Modify the uncontrolled inner blocks by converting Page List.
+			await clickBlockToolbarButton( 'Edit' );
+
+			const convertButton = await page.waitForXPath(
+				`//button[text()="Convert"]`
+			);
+
+			await convertButton.click();
+
+			// Wait for new Nav Menu entity to be created as a result of the modification to inner blocks.
+			await page.waitForXPath(
+				`//*[contains(@class, 'components-snackbar__content')][ text()="New Navigation Menu created." ]`
+			);
+
+			await publishPost();
+
+			// Check that the wp_navigation post exists and has the page list block.
+			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 		} );
 
 		it( 'does not retain uncontrolled inner blocks when creating a new entity', async () => {

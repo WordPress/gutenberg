@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Navigation Creating and restarting converts uncontrolled inner blocks to an entity when modifications are made to the blocks 1`] = `"<!-- wp:navigation-link {\\"label\\":\\"A Test Page\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} /-->"`;
+
 exports[`Navigation Placeholder placeholder actions allows a navigation block to be created from existing menus 1`] = `
 "<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"url\\":\\"http://localhost:8889/\\",\\"kind\\":\\"custom\\"} /-->
 
