@@ -45,5 +45,3 @@ exports[`Navigation encodes URL when create block if needed 1`] = `
 
 <!-- wp:navigation-link {\\"label\\":\\"お問い合わせ\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"https://this/is/a/test/search/%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->"
 `;
-
-exports[`Navigation supports navigation blocks that have inner blocks within their markup and converts them to wp_navigation posts 1`] = `"<!-- wp:page-list /-->"`;
