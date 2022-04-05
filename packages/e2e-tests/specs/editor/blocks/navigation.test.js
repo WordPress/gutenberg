@@ -977,8 +977,9 @@ describe( 'Navigation', () => {
 			// Modify the uncontrolled inner blocks by converting Page List.
 			await clickBlockToolbarButton( 'Edit' );
 
+			// Must wait for button to be enabled.
 			const convertButton = await page.waitForXPath(
-				`//button[text()="Convert"]`
+				`//button[not(@disabled) and text()="Convert"]`
 			);
 
 			await convertButton.click();
