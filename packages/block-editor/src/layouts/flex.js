@@ -42,7 +42,7 @@ const alignItemsMap = {
 
 const verticalAlignmentMap = {
 	top: 'flex-start',
-	middle: 'center',
+	center: 'center',
 	bottom: 'flex-end',
 };
 
@@ -120,7 +120,8 @@ export default {
 			? layout.flexWrap
 			: 'wrap';
 		const verticalAlignment =
-			verticalAlignmentMap[ layout.verticalAlignment ];
+			verticalAlignmentMap[ layout.verticalAlignment ] ||
+			verticalAlignmentMap.center;
 		const rowOrientation = `
 		flex-direction: row;
 		align-items: ${ verticalAlignment };
