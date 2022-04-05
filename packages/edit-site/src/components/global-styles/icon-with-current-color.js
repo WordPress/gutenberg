@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
@@ -6,7 +11,10 @@ import { Icon } from '@wordpress/components';
 export function IconWithCurrentColor( { className, ...props } ) {
 	return (
 		<Icon
-			className={ `${ className } edit-site-global-styles-icon-with-current-color` }
+			className={ classnames(
+				className,
+				'edit-site-global-styles-icon-with-current-color'
+			) }
 			{ ...props }
 		/>
 	);
