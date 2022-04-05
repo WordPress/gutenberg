@@ -40,6 +40,12 @@ const alignItemsMap = {
 	center: 'center',
 };
 
+const verticalAlignmentMap = {
+	top: 'flex-start',
+	middle: 'center',
+	bottom: 'flex-end',
+};
+
 const flexWrapOptions = [ 'wrap', 'nowrap' ];
 
 export default {
@@ -113,9 +119,11 @@ export default {
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
 			? layout.flexWrap
 			: 'wrap';
+		const verticalAlignment =
+			verticalAlignmentMap[ layout.verticalAlignment ];
 		const rowOrientation = `
 		flex-direction: row;
-		align-items: center;
+		align-items: ${ verticalAlignment };
 		justify-content: ${ justifyContent };
 		`;
 		const alignItems =
@@ -154,18 +162,18 @@ function FlexLayoutVerticalAlignmentControl( {
 	onChange,
 	isToolbar = false,
 } ) {
-	const { alignItems = 'flex-start' } = layout;
+	const { verticalAlignment = 'top' } = layout;
 	const onVerticalAlignmentChange = ( value ) => {
 		onChange( {
 			...layout,
-			alignItems: value,
+			verticalAlignment: value,
 		} );
 	};
 	if ( isToolbar ) {
 		return (
 			<BlockVerticalAlignmentControl
 				onChange={ onVerticalAlignmentChange }
-				value={ alignItems }
+				value={ verticalAlignment }
 			/>
 		);
 	}
@@ -195,7 +203,7 @@ function FlexLayoutVerticalAlignmentControl( {
 							key={ value }
 							label={ label }
 							icon={ icon }
-							isPressed={ alignItems === value }
+							isPressed={ verticalAlignment === value }
 							onClick={ () => onVerticalAlignmentChange( value ) }
 						/>
 					);
