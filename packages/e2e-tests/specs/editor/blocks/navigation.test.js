@@ -994,45 +994,6 @@ describe( 'Navigation', () => {
 			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 		} );
 
-		it( 'does not retain uncontrolled inner blocks when creating a new entity', async () => {
-			await createNewPost();
-			await clickOnMoreMenuItem( 'Code editor' );
-			const codeEditorInput = await page.waitForSelector(
-				'.editor-post-text-editor'
-			);
-			await codeEditorInput.click();
-			const markup =
-				'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
-			await page.keyboard.type( markup );
-			await clickButton( 'Exit code editor' );
-
-			const navBlock = await waitForBlock( 'Navigation' );
-
-			// Select the block to convert to a wp_navigation.
-			await navBlock.click();
-
-			// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
-			await waitForBlock( 'Page List' );
-
-			// Reset the nav block to create a new entity.
-			await resetNavBlockToInitialState();
-
-			const startEmptyButton = await page.waitForXPath(
-				START_EMPTY_XPATH
-			);
-			await startEmptyButton.click();
-			await populateNavWithOneItem();
-
-			// Confirm that only the last menu entity was updated.
-			const publishPanelButton2 = await page.waitForSelector(
-				'.editor-post-publish-button__button:not([aria-disabled="true"])'
-			);
-			await publishPanelButton2.click();
-
-			await page.waitForXPath( NAV_ENTITY_SELECTOR );
-			expect( await page.$x( NAV_ENTITY_SELECTOR ) ).toHaveLength( 1 );
-		} );
-
 		it( 'only updates a single entity currently linked with the block', async () => {
 			await createNewPost();
 			await insertBlock( 'Navigation' );
