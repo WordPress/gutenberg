@@ -10,7 +10,7 @@ import { dispatch, useDispatch } from '@wordpress/data';
 import { render, useMemo } from '@wordpress/element';
 import {
 	__experimentalFetchUrlData,
-	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	fetchLinkSuggestions,
 	store as coreStore,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -31,7 +31,7 @@ function NavEditor( { settings } ) {
 	const __experimentalSetIsInserterOpened = setIsInserterOpened;
 
 	// Provide link suggestions handler to fetch search results for Link UI.
-	const __experimentalFetchLinkSuggestions = ( search, searchOptions ) => {
+	const _fetchLinkSuggestions = ( search, searchOptions ) => {
 		// Bump the default number of suggestions.
 		// See https://github.com/WordPress/gutenberg/issues/34283.
 		searchOptions.perPage = 10;
@@ -41,15 +41,11 @@ function NavEditor( { settings } ) {
 	const editorSettings = useMemo( () => {
 		return {
 			...settings,
-			__experimentalFetchLinkSuggestions,
+			fetchLinkSuggestions: _fetchLinkSuggestions,
 			__experimentalSetIsInserterOpened,
 			__experimentalFetchRichUrlData: __experimentalFetchUrlData,
 		};
-	}, [
-		settings,
-		__experimentalFetchLinkSuggestions,
-		__experimentalSetIsInserterOpened,
-	] );
+	}, [ settings, _fetchLinkSuggestions, __experimentalSetIsInserterOpened ] );
 
 	return <Layout blockEditorSettings={ editorSettings } />;
 }
