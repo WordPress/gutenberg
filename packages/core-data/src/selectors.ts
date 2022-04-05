@@ -22,6 +22,7 @@ import type { Context, User, WpTemplate } from './entity-types';
 
 type State = any;
 type RecordKey = number | string;
+type EntityRecord = any;
 
 /**
  * HTTP Query parameters sent with the API request to fetch the entity records.
@@ -287,7 +288,7 @@ export function __experimentalGetEntityRecordNoResolver(
 	kind: string,
 	name: string,
 	key: string | number
-): Object | null {
+): EntityRecord {
 	return getEntityRecord( state, kind, name, key );
 }
 
@@ -303,7 +304,12 @@ export function __experimentalGetEntityRecordNoResolver(
  * @return Object with the entity's raw attributes.
  */
 export const getRawEntityRecord = createSelector(
-	( state: State, kind: string, name: string, key: string | number ): any => {
+	(
+		state: State,
+		kind: string,
+		name: string,
+		key: string | number
+	): EntityRecord => {
 		const record = getEntityRecord( state, kind, name, key );
 		return (
 			record &&
@@ -391,7 +397,7 @@ export function getEntityRecords(
 	kind: string,
 	name: string,
 	query?: EntityQuery< any >
-): Array< any > {
+): Array< EntityRecord > {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState = get( state.entities.records, [
@@ -612,7 +618,7 @@ export const getEditedEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: RecordKey
-	): any => ( {
+	): EntityRecord => ( {
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
@@ -988,7 +994,7 @@ export function getAutosave(
 	postType: string,
 	postId: number,
 	authorId: number
-): any {
+): EntityRecord {
 	if ( authorId === undefined ) {
 		return;
 	}
