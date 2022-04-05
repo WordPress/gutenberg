@@ -19,7 +19,8 @@ function render_block_core_comment_content( $attributes, $content, $block ) {
 	}
 
 	if ( 0 === $block->context['commentId'] ) {
-		return "\${ wpCommentContent( context ) }";
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+		return sprintf( '<div %1$s>${ context.content }</div>', $wrapper_attributes );
 	}
 
 	$comment = get_comment( $block->context['commentId'] );
@@ -77,10 +78,6 @@ function define_comment_content_custom_element() {
 				}
 			}
 		);
-
-		function wpCommentContent( { content } ) {
-			return `<div>${ content }</div>`;
-		}
 		</script>
     <?php
 }
