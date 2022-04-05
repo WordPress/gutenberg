@@ -62,7 +62,10 @@ function block_core_comment_template_render_comments( $comments, $block ) {
  * defined by the block's inner blocks.
  */
 function render_block_core_comment_template( $attributes, $content, $block ) {
-	require_alpine_js();
+	$should_load_view_script = ! wp_script_is( 'wp-block-comment-template-view' );
+	if ( $should_load_view_script ) {
+		wp_enqueue_script( 'wp-block-comment-template-view', null, null, null, true );
+	}
 	// Bail out early if the post ID is not set for some reason.
 	if ( empty( $block->context['postId'] ) ) {
 		return '';

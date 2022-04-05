@@ -1,41 +1,5 @@
 <?php
 /**
- * Server-side rendering of the `core/comment-reply-link` block.
- *
- * @package WordPress
- */
-function render_js_comment_post_form() {
-	return <<<END
-	async createComment({ content, parent }) {
-		const commentPosted = await fetch( apiSettings.root + 'wp/v2/comments/', {
-			method: 'POST',
-			body: JSON.stringify({
-				post: 1,
-				author_name: 'admin',
-				author_email: 'wordpress@example.com',
-				'parent': parent,
-				'content': content,
-			}),
-			headers: {
-				'Content-type': 'application/json; charset=UTF-8',
-				'X-WP-Nonce': apiSettings.nonce,
-			},
-		});
-		const comment = await commentPosted.json();
-		if (comment) {
-			this.open = false;
-			this.comments.push({
-				'id': comment.id,
-				'author': comment.author_name,
-				'date': comment.date,
-				'content': comment.content?.rendered,
-			});
-		}
-	}
-	END;
-}
-
-/**
  * Renders the `core/comment-reply-link` block on the server.
  *
  * @param array    $attributes Block attributes.
@@ -44,7 +8,10 @@ function render_js_comment_post_form() {
  * @return string Return the post comment's reply link.
  */
 function render_block_core_comment_reply_link( $attributes, $content, $block ) {
-	require_alpine_js();
+	$should_load_view_script = ! wp_script_is( 'wp-block-comment-reply-link-view' );
+	if ( $should_load_view_script ) {
+		wp_enqueue_script( 'wp-block-comment-reply-link-view', null, array( 'wp-block-comment-template-view' ), null, true );
+	}
 	if ( ! isset( $block->context['commentId'] ) ) {
 		return '';
 	}
@@ -98,12 +65,12 @@ function render_block_core_comment_reply_link( $attributes, $content, $block ) {
 	);
 	$form = str_replace(
 		'<form',
-		'<form x-on:submit.prevent="createComment({ parent:' . $block->context['commentId'] . ', content: commentContent })" ',
+		'<form x-on:submit.prevent="postComment({ parent:' . $block->context['commentId'] . ', content: commentContent })" ',
 		ob_get_clean()
 	);
 
 	$comment_toggled_form = sprintf(
-		'<div x-data="{ commentContent: \'\', open: false, ' . render_js_comment_post_form() . '  }" %1$s>
+		'<div x-data="commentObject" %1$s>
 			<div @click.prevent="open = ! open">%2$s</div>
 			<div x-show="open" x-transition>
 				%3$s

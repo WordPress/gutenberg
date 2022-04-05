@@ -15,9 +15,7 @@
  *
  * @return string Returns the next posts link for the query pagination.
  */
-
 function render_block_core_query_pagination_next( $attributes, $content, $block ) {
-	require_alpine_js();
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
