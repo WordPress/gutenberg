@@ -21,6 +21,7 @@ import {
 	openPreviewPage,
 	ensureSidebarOpened,
 	__experimentalRest as rest,
+	__experimentalBatch as batch,
 	publishPost,
 	createUser,
 	loginUser,
@@ -113,6 +114,29 @@ async function mockSearchResponse( items ) {
 	] );
 }
 
+async function forceSelectNavigationBlock() {
+	const navBlock = await waitForBlock( 'Navigation' );
+
+	if ( ! navBlock ) {
+		return;
+	}
+
+	await page.evaluate( () => {
+		const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
+		const navigationBlock = blocks.find(
+			( block ) => block.name === 'core/navigation'
+		);
+
+		if ( ! navigationBlock ) {
+			return;
+		}
+
+		return wp.data
+			.dispatch( 'core/block-editor' )
+			.selectBlock( navigationBlock?.clientId, 0 );
+	} );
+}
+
 /**
  * Interacts with the LinkControl to perform a search and select a returned suggestion
  *
@@ -198,7 +222,6 @@ async function populateNavWithOneItem() {
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
-const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select Menu']`;
 
 /**
  * Delete all items for the given REST resources using the REST API.
@@ -225,6 +248,17 @@ async function deleteAll( endpoints ) {
 			} );
 		}
 	}
+}
+
+async function resetNavBlockToInitialState() {
+	const selectMenuDropdown = await page.waitForSelector(
+		'[aria-label="Select Menu"]'
+	);
+	await selectMenuDropdown.click();
+	const newMenuButton = await page.waitForXPath(
+		'//span[text()="Create new menu"]'
+	);
+	newMenuButton.click();
 }
 
 /**
@@ -319,9 +353,17 @@ describe( 'Navigation', () => {
 	} );
 
 	describe( 'loading states', () => {
-		it( 'does not show a loading indicator if there is no ref to a Navigation post', async () => {
+		it( 'does not show a loading indicator if there is no ref to a Navigation post and Nav Menus have loaded', async () => {
 			await createNewPost();
+
+			// Insert an empty block to trigger resolution of Nav Menu items.
+			await insertBlock( 'Navigation' );
+			await waitForBlock( 'Navigation' );
+			await page.waitForXPath( START_EMPTY_XPATH );
+
+			// Now we have Nav Menu items resolved. Continue to assert.
 			await clickOnMoreMenuItem( 'Code editor' );
+
 			const codeEditorInput = await page.waitForSelector(
 				'.editor-post-text-editor'
 			);
@@ -414,7 +456,7 @@ describe( 'Navigation', () => {
 					match: ( request ) =>
 						request.url().includes( `rest_route` ) &&
 						request.url().includes( `navigation` ) &&
-						request.url().includes( testNavId ),
+						request.url().includes( `${ testNavId }?` ),
 					onRequestMatch: ( request ) => {
 						// The Promise simulates a REST API request whose resolultion
 						// the test has full control over.
@@ -847,17 +889,6 @@ describe( 'Navigation', () => {
 		const NAV_ENTITY_SELECTOR =
 			'//div[@class="entities-saved-states__panel"]//label//strong[contains(text(), "Navigation")]';
 
-		async function resetNavBlockToInitialState() {
-			const selectMenuDropdown = await page.waitForSelector(
-				'[aria-label="Select Menu"]'
-			);
-			await selectMenuDropdown.click();
-			const newMenuButton = await page.waitForXPath(
-				'//span[text()="Create new menu"]'
-			);
-			newMenuButton.click();
-		}
-
 		it( 'respects the nesting level', async () => {
 			await createNewPost();
 
@@ -1025,12 +1056,16 @@ describe( 'Navigation', () => {
 			await publishButton.click();
 
 			// A success notice should show up.
-			await page.waitForSelector( '.components-snackbar' );
+			await page.waitForXPath(
+				`//*[contains(@class, 'components-snackbar__content')][ text()="Post published." ]`
+			);
 
 			// Now try inserting another Link block via the quick inserter.
-			await page.click( 'nav[aria-label="Block: Navigation"]' );
+			// await page.click( 'nav[aria-label="Block: Navigation"]' );
+			await forceSelectNavigationBlock();
 
 			await resetNavBlockToInitialState();
+
 			const startEmptyButton2 = await page.waitForXPath(
 				START_EMPTY_XPATH
 			);
@@ -1250,18 +1285,9 @@ describe( 'Navigation', () => {
 
 			await createNewPost();
 
+			// At this point the block will automatically pick the first Navigation Menu
+			// which will be the one created by the Admin User.
 			await insertBlock( 'Navigation' );
-
-			// Select the Navigation post created by the Admin earlier
-			// in the test.
-			const navigationPostCreatedByAdminName = 'Navigation';
-
-			const dropdown = await page.waitForXPath( SELECT_MENU_XPATH );
-			await dropdown.click();
-			const theOption = await page.waitForXPath(
-				`//*[contains(@class, 'components-menu-item__item')][ text()="${ navigationPostCreatedByAdminName }" ]`
-			);
-			await theOption.click();
 
 			// Make sure the snackbar error shows up.
 			await page.waitForXPath(
@@ -1297,6 +1323,111 @@ describe( 'Navigation', () => {
 			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
 			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
 			expect( console ).toHaveErrored();
+		} );
+	} );
+
+	describe( 'Initial block insertion state', () => {
+		async function createNavigationMenu( menu = {} ) {
+			return rest( {
+				method: 'POST',
+				path: '/wp/v2/navigation',
+				data: {
+					status: 'publish',
+					...menu,
+				},
+			} );
+		}
+
+		afterEach( async () => {
+			const navMenusEndpoint = '/wp/v2/navigation';
+			const allNavMenus = await rest( { path: navMenusEndpoint } );
+
+			if ( ! allNavMenus?.length ) {
+				return;
+			}
+
+			return batch(
+				allNavMenus.map( ( menu ) => ( {
+					method: 'DELETE',
+					path: `${ navMenusEndpoint }/${ menu.id }?force=true`,
+				} ) )
+			);
+		} );
+
+		it( 'automatically uses the first Navigation Menu if only one is available', async () => {
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			await waitForBlock( 'Navigation' );
+
+			const innerLinkBlock = await waitForBlock( 'Custom Link' );
+
+			const linkText = await innerLinkBlock.$eval(
+				'[aria-label="Navigation link text"]',
+				( element ) => {
+					return element.innerText;
+				}
+			);
+
+			expect( linkText ).toBe( 'WordPress' );
+		} );
+
+		it( 'does not automatically use first Navigation Menu if more than one exists', async () => {
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNavigationMenu( {
+				title: 'Second Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			await waitForBlock( 'Navigation' );
+
+			await page.waitForXPath( START_EMPTY_XPATH );
+		} );
+
+		it( 'allows users to manually create new empty menu when block has automatically selected the first available Navigation Menu', async () => {
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			await waitForBlock( 'Navigation' );
+
+			await waitForBlock( 'Custom Link' );
+
+			// Reset the nav block to create a new entity.
+			await resetNavBlockToInitialState();
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+			await startEmptyButton.click();
+
+			// Wait for Navigation creation of empty Navigation to complete.
+			await page.waitForXPath(
+				'//*[contains(@class, "components-snackbar")]/*[text()="Navigation Menu successfully created."]'
+			);
 		} );
 	} );
 } );
