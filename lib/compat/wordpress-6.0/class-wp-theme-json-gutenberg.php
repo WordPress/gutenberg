@@ -159,64 +159,8 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 		}
 
-		$flattened_theme_json = static::unset_default_properties( $flattened_theme_json );
-
 		wp_recursive_ksort( $flattened_theme_json );
 
 		return $flattened_theme_json;
 	}
-
-	/**
-	 * Removes default properties from theme.json
-	 *
-	 * @param array $theme_json The theme.json to update
-	 * @return array An updated version of theme.json
-	 */
-	protected static function unset_default_properties( $theme_json ) {
-		// Unset properties that default to true.
-		if ( isset( $theme_json['settings']['color']['custom'] ) && $theme_json['settings']['color']['custom'] ) {
-			unset( $theme_json['settings']['color']['custom'] );
-		}
-
-		if ( isset( $theme_json['settings']['color']['customGradient'] ) && $theme_json['settings']['color']['customGradient'] ) {
-			unset( $theme_json['settings']['color']['customGradient'] );
-		}
-
-		if ( isset( $theme_json['settings']['typography']['customFontSize'] ) && $theme_json['settings']['typography']['customFontSize'] ) {
-			unset( $theme_json['settings']['typography']['customFontSize'] );
-		}
-
-		// Unset properties that default to false.
-		if ( isset( $theme_json['settings']['typography']['lineHeight'] ) && ! $theme_json['settings']['typography']['lineHeight'] ) {
-			unset( $theme_json['settings']['typography']['lineHeight'] );
-		}
-
-		if ( isset( $theme_json['settings']['spacing']['units'] ) && ! $theme_json['settings']['spacing']['units'] ) {
-			unset( $theme_json['settings']['spacing']['units'] );
-		}
-
-		if ( isset( $theme_json['settings']['spacing']['padding'] ) && ! $theme_json['settings']['spacing']['padding'] ) {
-			unset( $theme_json['settings']['spacing']['padding'] );
-		}
-
-		// Remove empty arrays.
-		if ( empty( $theme_json['settings']['color'] ) ) {
-			unset( $theme_json['settings']['color'] );
-		}
-
-		if ( empty( $theme_json['settings']['typography'] ) ) {
-			unset( $theme_json['settings']['typography'] );
-		}
-
-		if ( empty( $theme_json['settings']['spacing'] ) ) {
-			unset( $theme_json['settings']['spacing'] );
-		}
-
-		if ( empty( $theme_json['settings'] ) ) {
-			unset( $theme_json['settings'] );
-		}
-
-		return $theme_json;
-	}
-
 }
