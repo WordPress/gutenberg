@@ -267,7 +267,7 @@ Combine blocks into a group. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Name:** core/group
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** tagName, templateLock, verticalAlignment
+-	**Attributes:** tagName, templateLock
 
 ## Heading
 

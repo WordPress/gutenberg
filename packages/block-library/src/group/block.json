@@ -15,9 +15,6 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", false ]
-		},
-		"verticalAlignment": {
-			"type": "string"
 		}
 	},
 	"supports": {
