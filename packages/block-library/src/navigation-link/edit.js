@@ -737,40 +737,49 @@ export default function NavigationLinkEdit( {
 					) : (
 						<>
 							{ ! isInvalid && ! isDraft && (
-								<RichText
-									ref={ ref }
-									identifier="label"
-									className="wp-block-navigation-item__label"
-									value={ label }
-									onChange={ ( labelValue ) =>
-										setAttributes( {
-											label: labelValue,
-										} )
-									}
-									onMerge={ mergeBlocks }
-									onReplace={ onReplace }
-									__unstableOnSplitAtEnd={ () =>
-										insertBlocksAfter(
-											createBlock(
-												'core/navigation-link'
-											)
-										)
-									}
-									aria-label={ __( 'Navigation link text' ) }
-									placeholder={ itemLabelPlaceholder }
-									withoutInteractiveFormatting
-									allowedFormats={ [
-										'core/bold',
-										'core/italic',
-										'core/image',
-										'core/strikethrough',
-									] }
-									onClick={ () => {
-										if ( ! url ) {
-											setIsLinkOpen( true );
+								<>
+									<RichText
+										ref={ ref }
+										identifier="label"
+										className="wp-block-navigation-item__label"
+										value={ label }
+										onChange={ ( labelValue ) =>
+											setAttributes( {
+												label: labelValue,
+											} )
 										}
-									} }
-								/>
+										onMerge={ mergeBlocks }
+										onReplace={ onReplace }
+										__unstableOnSplitAtEnd={ () =>
+											insertBlocksAfter(
+												createBlock(
+													'core/navigation-link'
+												)
+											)
+										}
+										aria-label={ __(
+											'Navigation link text'
+										) }
+										placeholder={ itemLabelPlaceholder }
+										withoutInteractiveFormatting
+										allowedFormats={ [
+											'core/bold',
+											'core/italic',
+											'core/image',
+											'core/strikethrough',
+										] }
+										onClick={ () => {
+											if ( ! url ) {
+												setIsLinkOpen( true );
+											}
+										} }
+									/>
+									{ description && (
+										<span className="wp-block-navigation-item__description">
+											{ description }
+										</span>
+									) }
+								</>
 							) }
 							{ ( isInvalid || isDraft ) && (
 								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
