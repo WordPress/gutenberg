@@ -11,13 +11,12 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { __experimentalGetMatchingVariation as getMatchingVariation } from '../../utils';
 import { store as blockEditorStore } from '../../store';
 
 function VariationsButtons( {
@@ -36,11 +35,15 @@ function VariationsButtons( {
 					key={ variation.name }
 					icon={ variation.icon }
 					isPressed={ selectedValue === variation.name }
-					label={ sprintf(
-						/* translators: %s: Name of the block variation */
-						__( 'Transform to %s' ),
-						variation.title
-					) }
+					label={
+						selectedValue === variation.name
+							? variation.title
+							: sprintf(
+									/* translators: %s: Name of the block variation */
+									__( 'Transform to %s' ),
+									variation.title
+							  )
+					}
 					onClick={ () => onSelectVariation( variation.name ) }
 					aria-label={ variation.title }
 					showTooltip
@@ -92,28 +95,36 @@ function VariationsDropdown( {
 }
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
-	const [ selectedValue, setSelectedValue ] = useState();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { variations, blockAttributes } = useSelect(
+	const { variations, blockAttributes, blockName } = useSelect(
 		( select ) => {
 			const { getBlockVariations } = select( blocksStore );
 			const { getBlockName, getBlockAttributes } = select(
 				blockEditorStore
 			);
-			const blockName = blockClientId && getBlockName( blockClientId );
+			const name = blockClientId && getBlockName( blockClientId );
 			return {
-				variations:
-					blockName && getBlockVariations( blockName, 'transform' ),
 				blockAttributes: getBlockAttributes( blockClientId ),
+				blockName: name,
+				variations: name && getBlockVariations( name, 'transform' ),
 			};
 		},
 		[ blockClientId ]
 	);
-	useEffect( () => {
-		setSelectedValue(
-			getMatchingVariation( blockAttributes, variations )?.name
-		);
-	}, [ blockAttributes, variations ] );
+	const { activeBlockVariation } = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation } = select( blocksStore );
+			return {
+				activeBlockVariation: getActiveBlockVariation(
+					blockName,
+					blockAttributes
+				),
+			};
+		},
+		[ blockAttributes, blockName ]
+	);
+
+	const selectedValue = activeBlockVariation?.name;
 
 	// Check if each variation has a unique icon.
 	const hasUniqueIcons = useMemo( () => {
@@ -126,15 +137,17 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		return variationIcons.size === variations.length;
 	}, [ variations ] );
 
-	if ( ! variations?.length ) return null;
-
 	const onSelectVariation = ( variationName ) => {
 		updateBlockAttributes( blockClientId, {
 			...variations.find( ( { name } ) => name === variationName )
 				.attributes,
 		} );
 	};
+
 	const baseClass = 'block-editor-block-variation-transforms';
+
+	// Skip rendering if there are no variations
+	if ( ! variations?.length ) return null;
 
 	// If each variation has a unique icon, then render the variations as a set of buttons.
 	if ( hasUniqueIcons ) {
