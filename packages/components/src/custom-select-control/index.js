@@ -154,7 +154,13 @@ export default function CustomSelectControl( {
 				{ itemToString( selectedItem ) }
 				<Icon
 					icon={ chevronDown }
-					className="components-custom-select-control__button-icon"
+					className={ classnames(
+						'components-custom-select-control__button-icon',
+						{
+							'is-next-36px-default-size': __next36pxDefaultSize,
+						}
+					) }
+					size={ 18 }
 				/>
 			</Button>
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
