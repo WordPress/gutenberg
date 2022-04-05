@@ -12,6 +12,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import SelectControl from '..';
+import CustomSelectControl from '../../custom-select-control';
 
 export default {
 	title: 'Components/SelectControl',
@@ -24,12 +25,42 @@ export default {
 const SelectControlWithState = ( props ) => {
 	const [ selection, setSelection ] = useState();
 
+	// TODO: Just for testing, remove changes before merging
 	return (
-		<SelectControl
-			{ ...props }
-			value={ selection }
-			onChange={ setSelection }
-		/>
+		<div style={ { width: 'min-content' } }>
+			<SelectControl
+				{ ...props }
+				label="SelectControl"
+				value={ selection }
+				onChange={ setSelection }
+			/>
+			<CustomSelectControl
+				{ ...props }
+				label="CustomSelectControl"
+				__next36pxDefaultSize={ false }
+				options={ [
+					{
+						key: 'a',
+						name: 'Option A',
+					},
+				] }
+				value={ selection }
+				onChange={ setSelection }
+			/>
+			<CustomSelectControl
+				{ ...props }
+				label="CustomSelectControl (36px)"
+				__next36pxDefaultSize={ true }
+				options={ [
+					{
+						key: 'a',
+						name: 'Option A',
+					},
+				] }
+				value={ selection }
+				onChange={ setSelection }
+			/>
+		</div>
 	);
 };
 
