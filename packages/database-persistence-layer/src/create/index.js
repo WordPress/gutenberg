@@ -43,7 +43,14 @@ export default function create( {
 		);
 		const serverTimestamp = serverData?.__timestamp ?? 0;
 		const localTimestamp = localData?.__timestamp ?? 0;
-		cache = serverTimestamp > localTimestamp ? serverData : localData;
+
+		if ( serverData && serverTimestamp > localTimestamp ) {
+			cache = serverData;
+		} else if ( localData ) {
+			cache = localData;
+		} else {
+			cache = {};
+		}
 
 		return cache;
 	}

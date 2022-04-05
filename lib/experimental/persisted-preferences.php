@@ -47,7 +47,15 @@ function gutenberg_configure_persisted_preferences() {
 			);
 			const serverTimestamp = serverData?.__timestamp ?? 0;
 			const localTimestamp = localData?.__timestamp ?? 0;
-			const preloadedData = serverTimestamp > localTimestamp ? serverData : localData;
+
+			let preloadedData;
+			if ( serverData && serverTimestamp > localTimestamp ) {
+				preloadedData = serverData;
+			} else if ( localData ) {
+				preloadedData = localData;
+			} else {
+				preloadedData = {};
+			}
 
 			const { create } = wp.databasePersistenceLayer;
 			const persistenceLayer = create( { preloadedData, fallbackLocalStorageKey } );
