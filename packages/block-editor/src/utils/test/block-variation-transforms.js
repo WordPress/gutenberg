@@ -40,6 +40,19 @@ describe( 'getMatchingVariation', () => {
 				getMatchingVariation( { level: 1, other: 'prop' }, variations )
 			).toBeUndefined();
 		} );
+		it( 'when isActive uses different logic to attributes, but attributes match', () => {
+			const variations = [
+				{
+					name: 'one',
+					attributes: { level: 1, content: 'hi' },
+					isActive: ( blockAttributes ) => ! blockAttributes.level,
+				},
+			];
+
+			expect(
+				getMatchingVariation( { level: 1, content: 'hi' }, variations )
+			).toBeUndefined();
+		} );
 	} );
 	describe( 'should find a match', () => {
 		it( 'when variation has one attribute', () => {
@@ -64,6 +77,35 @@ describe( 'getMatchingVariation', () => {
 					{ level: 1, content: 'hi', other: 'prop' },
 					variations
 				).name
+			).toEqual( 'one' );
+		} );
+		it( 'when isActive uses different logic to attributes, and attributes do not match', () => {
+			const variations = [
+				{
+					name: 'one',
+					attributes: { level: 1, content: 'hi' },
+					isActive: ( blockAttributes ) => ! blockAttributes.level,
+				},
+			];
+
+			expect(
+				getMatchingVariation( { content: 'hi' }, variations ).name
+			).toEqual( 'one' );
+		} );
+
+		it( 'when isActive uses different logic to attributes, and attributes do match', () => {
+			const variations = [
+				{
+					name: 'one',
+					attributes: { level: 1, content: 'hi' },
+					isActive: ( blockAttributes ) =>
+						! blockAttributes.level || blockAttributes.level === 1,
+				},
+			];
+
+			expect(
+				getMatchingVariation( { level: 1, content: 'hi' }, variations )
+					.name
 			).toEqual( 'one' );
 		} );
 	} );
