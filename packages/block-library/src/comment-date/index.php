@@ -18,8 +18,16 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 		return '';
 	}
 
+	// Comment Date Template.
 	if ( 0 === $block->context['commentId'] ) {
-		return '<wp-comment-date></wp-comment-date>';
+		// Block attributes are known at server-render time, so we can hard-wire them into the template.
+		$attrs = '{ ';
+		if ( isset( $attributes['format'] ) ) {
+			// TODO: Translate format to JS-style.
+			$attrs .= 'format: "' . $attributes['format'] . '" ';
+		}
+		$attrs .= '}';
+		return "\${ wpCommentDate( context, $attrs ) }";
 	}
 
 	$comment = get_comment( $block->context['commentId'] );
@@ -84,6 +92,16 @@ function define_comment_date_custom_element() {
 				}
 			}
 		);
+
+		function wpCommentDate( { timestamp }, { format } ) {
+			const dateOptions = { // TODO: Format datetime according to `format` arg.
+					year: 'numeric', month: 'long', day: 'numeric',
+					hour: 'numeric', minute: 'numeric'
+			};
+			const datetime = timestamp.toLocaleString( 'en', dateOptions );
+
+			return `<div><time datetime="${ timestamp.toISOString() }">${ datetime }</time></div>`;
+		}
 		</script>
     <?php
 }

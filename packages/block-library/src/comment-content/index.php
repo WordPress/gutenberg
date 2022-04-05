@@ -19,7 +19,7 @@ function render_block_core_comment_content( $attributes, $content, $block ) {
 	}
 
 	if ( 0 === $block->context['commentId'] ) {
-		return '<wp-comment-content></wp-comment-content>';
+		return "\${ wpCommentContent( context ) }";
 	}
 
 	$comment = get_comment( $block->context['commentId'] );
@@ -77,6 +77,10 @@ function define_comment_content_custom_element() {
 				}
 			}
 		);
+
+		function wpCommentContent( { content } ) {
+			return `<div>${ content }</div>`;
+		}
 		</script>
     <?php
 }
