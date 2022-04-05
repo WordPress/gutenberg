@@ -70,9 +70,11 @@ function add_comment_form_onsubmit_handler() {
 
 				const form = document.querySelector( '.comment-form' );
 
+				const author = document.querySelector( '#author' ).value;
 				const content = document.querySelector( '#comment' ).value;
 
 				const context = {
+					author,
 					content,
 					timestamp: date
 				};
