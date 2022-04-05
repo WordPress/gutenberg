@@ -7,7 +7,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	FlexItem,
-	ColorIndicator,
 } from '@wordpress/components';
 
 /**
@@ -18,6 +17,7 @@ import Palette from './palette';
 import { NavigationButton } from './navigation-button';
 import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
 import Subtitle from './subtitle';
+import ColorIndicatorWithSpacer from './color-indicator-spacer';
 
 function BackgroundColorItem( { name, parentMenu } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
@@ -34,9 +34,8 @@ function BackgroundColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButton path={ parentMenu + '/colors/background' }>
 			<HStack justify="flex-start">
-				<ColorIndicator
+				<ColorIndicatorWithSpacer
 					colorValue={ gradientValue ?? backgroundColor }
-					className="edit-site-global-styles__color-indicator-with-margin"
 				/>
 				<FlexItem>{ __( 'Background' ) }</FlexItem>
 			</HStack>
@@ -56,10 +55,7 @@ function TextColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButton path={ parentMenu + '/colors/text' }>
 			<HStack justify="flex-start">
-				<ColorIndicator
-					colorValue={ color }
-					className="edit-site-global-styles__color-indicator-with-margin"
-				/>
+				<ColorIndicatorWithSpacer colorValue={ color } />
 				<FlexItem>{ __( 'Text' ) }</FlexItem>
 			</HStack>
 		</NavigationButton>
@@ -78,10 +74,7 @@ function LinkColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButton path={ parentMenu + '/colors/link' }>
 			<HStack justify="flex-start">
-				<ColorIndicator
-					colorValue={ color }
-					className="edit-site-global-styles__color-indicator-with-margin"
-				/>
+				<ColorIndicatorWithSpacer colorValue={ color } />
 				<FlexItem>{ __( 'Links' ) }</FlexItem>
 			</HStack>
 		</NavigationButton>

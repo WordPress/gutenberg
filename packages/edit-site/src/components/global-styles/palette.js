@@ -7,7 +7,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
-	ColorIndicator,
 } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
@@ -18,6 +17,7 @@ import { useMemo } from '@wordpress/element';
 import Subtitle from './subtitle';
 import { NavigationButton } from './navigation-button';
 import { useSetting } from './hooks';
+import ColorIndicatorWithSpacer from './color-indicator-spacer';
 
 const EMPTY_COLORS = [];
 
@@ -65,10 +65,9 @@ function Palette( { name } ) {
 					>
 						<ZStack isLayered={ false } offset={ -8 }>
 							{ colors.slice( 0, 5 ).map( ( { color } ) => (
-								<ColorIndicator
+								<ColorIndicatorWithSpacer
 									key={ color }
 									colorValue={ color }
-									className="edit-site-global-styles__color-indicator-with-margin"
 								/>
 							) ) }
 						</ZStack>
