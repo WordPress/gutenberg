@@ -111,6 +111,10 @@
 		align-self: center;
 		list-style: none;
 		line-height: inherit;
+
+		.block-editor-default-block-appender__content {
+			display: block;
+		}
 	}
 }
 
