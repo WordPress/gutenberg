@@ -99,8 +99,21 @@ function gutenberg_generate_block_templates_export_file() {
 	// Load theme.json into the zip file.
 	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
 	$tree->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
+
+	$theme_json_raw = $tree->get_data();
+	// If a version is defined, add a schema.
+	if ( $theme_json_raw['version'] ) {
+		global $wp_version;
+		$theme_json_version = substr( $wp_version, 0, strpos( $wp_version, '-' ) );
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
+			$theme_json_version = 'trunk';
+		}
+		$schema         = array( '$schema' => 'https://schemas.wp.org/wp/' . $theme_json_version . '/theme.json' );
+		$theme_json_raw = array_merge( $schema, $theme_json_raw );
+	}
+
 	// Convert to a string.
-	$theme_json_encoded = wp_json_encode( $tree->get_data(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+	$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 	// Replace 4 spaces with a tab.
 	$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
 	// Add the theme.json file to the zip.
