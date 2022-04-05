@@ -152,6 +152,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		'padding-right'              		=> array( 'spacing', 'padding', 'right' ),
 		'padding-bottom'             		=> array( 'spacing', 'padding', 'bottom' ),
 		'padding-left'               		=> array( 'spacing', 'padding', 'left' ),
+		'--wp--style--root--padding'        => array( 'spacing', 'padding' ),
 		'--wp--style--root--padding-top'    => array( 'spacing', 'padding', 'top' ),
 		'--wp--style--root--padding-right'  => array( 'spacing', 'padding', 'right' ),
 		'--wp--style--root--padding-bottom' => array( 'spacing', 'padding', 'bottom' ),
@@ -314,9 +315,49 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 
 			if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
-				$block_rules .= '.wp-site-blocks > * { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
-				$block_rules .= '.wp-site-blocks > * > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
+
+				$shorthand_top = '17px';
+				$shorthand_right = '17px';
+				$shorthand_bottom = '17px';
+				$shorthand_left = '17px';
+
+				// Check if a shorthand padding value is provided, and if so break it up into its component parts and use the values as fallbacks.
+				if ( is_string( $node['spacing']['padding'] ) ) {
+
+					$shorthand_components = explode( ' ', $node['spacing']['padding'] );
+
+					switch ( count( $shorthand_components ) ) {
+						case 1:			
+							$shorthand_top = $shorthand_components[0];
+							$shorthand_right = $shorthand_components[0];
+							$shorthand_bottom = $shorthand_components[0];
+							$shorthand_left = $shorthand_components[0];
+							break;
+						case 2:
+							$shorthand_top = $shorthand_components[0];
+							$shorthand_right = $shorthand_components[1];
+							$shorthand_bottom = $shorthand_components[0];
+							$shorthand_left = $shorthand_components[1];
+							break;
+						case 3:
+							$shorthand_top = $shorthand_components[0];
+							$shorthand_right = $shorthand_components[1];
+							$shorthand_bottom = $shorthand_components[2];
+							$shorthand_left = $shorthand_components[1];
+							break;
+						case 4:
+							$shorthand_top = $shorthand_components[0];
+							$shorthand_right = $shorthand_components[1];
+							$shorthand_bottom = $shorthand_components[2];
+							$shorthand_left = $shorthand_components[3];
+							break;
+					}
+
+				}
+
+				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top, ' . $shorthand_top . '); padding-bottom: var(--wp--style--root--padding-bottom, ' . $shorthand_bottom . '); }';
+				$block_rules .= '.wp-site-blocks > * { padding-right: var(--wp--style--root--padding-right, ' . $shorthand_right . '); padding-left: var(--wp--style--root--padding-left, ' . $shorthand_left . '); }';
+				$block_rules .= '.wp-site-blocks > * > .alignfull { margin-right: calc(var(--wp--style--root--padding-right, ' . $shorthand_right . ') * -1); margin-left: calc(var(--wp--style--root--padding-left, ' . $shorthand_left . ') * -1); }';
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
