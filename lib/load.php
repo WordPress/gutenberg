@@ -115,6 +115,7 @@ require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.0/block-template.php';
 require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
 require __DIR__ . '/experimental/register-webfonts-from-theme-json.php';
+require __DIR__ . '/experimental/add-registered-webfonts-to-theme-json.php';
 require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/experimental/class-wp-webfonts.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
