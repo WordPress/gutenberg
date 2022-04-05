@@ -416,14 +416,12 @@ export default function LogoEdit( {
 		} );
 	};
 
-	const setIcon = ( newValue ) =>{
-		 
+	const setIcon = ( newValue ) => {
 		newValue = newValue === undefined ? null : newValue;
 		editEntityRecord( 'root', 'site', undefined, {
 			site_icon: newValue,
-		} ); 
-		
-	}
+		} );
+	};
 
 	let alt = null;
 	if ( mediaItemData ) {
