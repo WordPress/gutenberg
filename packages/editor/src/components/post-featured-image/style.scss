@@ -3,6 +3,10 @@
 	margin-left: -$grid-unit-20;
 	margin-right: -$grid-unit-20;
 
+	.components-panel__body-title + & {
+		margin-top: -5px;
+	}
+
 	// Ensure a consistent dropzone and avoid jumps when loading.
 	height: 140px;
 	overflow: hidden;
@@ -21,8 +25,6 @@
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-
-		// @todo: these rules can be removed if we retire post-featured-image.
 		margin-top: 0;
 		margin-left: 0;
 	}
@@ -56,12 +58,6 @@
 		opacity: 0;
 		transition: all 0.1s ease-out;
 		@include reduce-motion("transition");
-
-		// @todo: these rules can be removed if we retire post-featured-image.
-		.components-button + .components-button {
-			display: block;
-			margin-top: 0;
-		}
 	}
 
 	&:focus-within .editor-post-featured-image__actions,
