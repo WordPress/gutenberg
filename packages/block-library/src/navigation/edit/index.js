@@ -536,11 +536,12 @@ function Navigation( {
 		} );
 	}, [ clientId, ref ] );
 
-	// If the block has inner blocks, but no menu id, this was an older
-	// navigation block added before the block used a wp_navigation entity.
-	// Either this block was saved in the content or inserted by a pattern.
-	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
-	// that automatically saves the menu.
+	// If the block has inner blocks, but no menu id, then these blocks are either:
+	// - inserted via a pattern.
+	// - inserted directly via Code View (or otherwise).
+	// - from an older version of navigation block added before the block used a wp_navigation entity.
+	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
+	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 	if ( hasUnsavedBlocks ) {
 		return (
