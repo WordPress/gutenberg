@@ -522,10 +522,8 @@ class EditorPage {
 
 	async typeTextToParagraphBlock( block, text, clear ) {
 		let textViewElement = block;
-		if ( !isAndroid() ) {
-			textViewElement = await this.getTextViewForParagraphBlock(
-				block
-			);
+		if ( ! isAndroid() ) {
+			textViewElement = await this.getTextViewForParagraphBlock( block );
 		}
 
 		await typeString( this.driver, textViewElement, text, clear );
