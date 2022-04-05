@@ -16,6 +16,19 @@ const SIDEBAR_SELECTOR = '.edit-post-sidebar';
 const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
 const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Post';
 
+const openSidebarPanelWithTitle = async ( title ) => {
+	const panel = await page.waitForXPath(
+		`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ title }")]`
+	);
+	const expanded = await page.evaluate(
+		( element ) => element.getAttribute( 'aria-expanded' ),
+		panel
+	);
+	if ( expanded === 'false' ) {
+		return panel.click();
+	}
+};
+
 describe( 'Sidebar', () => {
 	afterEach( () => {
 		disableFocusLossObservation();
@@ -123,25 +136,23 @@ describe( 'Sidebar', () => {
 		await createNewPost();
 		await enableFocusLossObservation();
 		await openDocumentSettingsSidebar();
-
-		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Tags' ) ).toBeDefined();
-		expect(
-			await findSidebarPanelWithTitle( 'Featured image' )
-		).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeDefined();
-		expect(
-			await findSidebarPanelWithTitle( 'Status & visibility' )
-		).toBeDefined();
+		const panelNames = [
+			'Summary',
+			'Categories',
+			'Tags',
+			'Discussion',
+			'Status & visibility',
+		];
+		const panels = await Promise.all(
+			panelNames.map( findSidebarPanelWithTitle )
+		);
+		panels.forEach( ( panel ) => expect( panel ).toBeDefined() );
 
 		await page.evaluate( () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
 
 			removeEditorPanel( 'taxonomy-panel-category' );
 			removeEditorPanel( 'taxonomy-panel-post_tag' );
-			removeEditorPanel( 'featured-image' );
-			removeEditorPanel( 'post-excerpt' );
 			removeEditorPanel( 'discussion-panel' );
 			removeEditorPanel( 'post-status' );
 		} );
@@ -157,16 +168,35 @@ describe( 'Sidebar', () => {
 			[]
 		);
 		expect(
-			await page.$x( getPanelToggleSelector( 'Featured image' ) )
-		).toEqual( [] );
-		expect( await page.$x( getPanelToggleSelector( 'Excerpt' ) ) ).toEqual(
-			[]
-		);
-		expect(
 			await page.$x( getPanelToggleSelector( 'Discussion' ) )
 		).toEqual( [] );
 		expect(
 			await page.$x( getPanelToggleSelector( 'Status & visibility' ) )
 		).toEqual( [] );
+	} );
+	describe( 'Summary panel', () => {
+		beforeEach( async () => {
+			await createNewPost();
+			await enableFocusLossObservation();
+			await openDocumentSettingsSidebar();
+		} );
+		it( 'should show all elements', async () => {
+			await openSidebarPanelWithTitle( 'Summary' );
+			const getSelector = ( cssClass ) =>
+				`//div[contains(@class, "edit-post-sidebar")]//div[contains(@class, "edit-post-post-summary")]//*[contains(@class, "${ cssClass }")]`;
+			const panelElements = await Promise.all(
+				[
+					'editor-post-featured-image',
+					'edit-post-post-title',
+					'editor-post-excerpt',
+					'post-author-selector',
+				].map( ( target ) =>
+					page.waitForXPath( getSelector( target ) )
+				)
+			);
+			panelElements.forEach( ( element ) =>
+				expect( element ).toBeDefined()
+			);
+		} );
 	} );
 } );
