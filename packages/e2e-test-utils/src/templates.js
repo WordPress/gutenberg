@@ -31,8 +31,10 @@ export async function deleteAllTemplates( type ) {
 			continue;
 		}
 
+		let response;
+
 		try {
-			await rest( {
+			response = await rest( {
 				path: `${ path }/${ template.id }?force=true`,
 				method: 'DELETE',
 			} );
@@ -40,8 +42,17 @@ export async function deleteAllTemplates( type ) {
 			// Disable reason - the error provides valuable feedback about issues with tests.
 			// eslint-disable-next-line no-console
 			console.warn(
-				'deleteAllTemplates failed to delete template with the following error',
+				`deleteAllTemplates failed to delete template (id: ${ template.wp_id }) with the following error`,
 				responseError
+			);
+		}
+
+		if ( ! response.deleted ) {
+			// Disable reason - the error provides valuable feedback about issues with tests.
+			// eslint-disable-next-line no-console
+			console.warn(
+				`deleteAllTemplates failed to delete template (id: ${ template.wp_id }) with the following response`,
+				response
 			);
 		}
 	}
