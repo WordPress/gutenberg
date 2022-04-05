@@ -108,7 +108,7 @@ function gutenberg_generate_block_templates_export_file() {
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
 			$theme_json_version = 'trunk';
 		}
-		$schema = array( '$schema' => 'https://schemas.wp.org/wp/' . $theme_json_version . '/theme.json' );
+		$schema         = array( '$schema' => 'https://schemas.wp.org/wp/' . $theme_json_version . '/theme.json' );
 		$theme_json_raw = array_merge( $schema, $theme_json_raw );
 	}
 
