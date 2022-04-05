@@ -35,6 +35,7 @@ const Template = ( args ) => {
 	return (
 		<>
 			<ConfirmDialog
+				title={ args.title }
 				onConfirm={ () => setConfirmVal( confirmOutput ) }
 				onCancel={
 					args.cancelOutput
@@ -58,7 +59,14 @@ _default.args = {
 	text: daText(),
 };
 
-// To customize button text, decplace the `cancelButtonText` and/or `confirmButtonText` props.
+// To add a title, pass the `title` prop
+export const WithTitle = Template.bind( {} );
+WithTitle.args = {
+	title: 'Example Title',
+	text: daText(),
+};
+
+// To customize button text, pass the `cancelButtonText` and/or `confirmButtonText` props.
 export const withCustomButtonLabels = Template.bind( {} );
 withCustomButtonLabels.args = {
 	text: daText(),
