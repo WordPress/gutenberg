@@ -18,38 +18,40 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	// Comment Date Template.
 	if ( 0 === $block->context['commentId'] ) {
-		// Block attributes are known at server-render time, so we can hard-wire them into the template.
-		$attrs = '{ ';
-		if ( isset( $attributes['format'] ) ) {
-			// TODO: Translate format to JS-style.
-			$attrs .= 'format: "' . $attributes['format'] . '" ';
+		// TODO: Translate format to JS-style.
+		$formatted_date = <<<END
+		\${ context.timestamp.toLocaleString( "en", {
+			year: 'numeric', month: 'long', day: 'numeric',
+			hour: 'numeric', minute: 'numeric'
+		} ) }
+		END;
+		$timestamp = '${ context.timestamp.toISOString() }';
+	} else {
+		$comment = get_comment( $block->context['commentId'] );
+		if ( empty( $comment ) ) {
+			return '';
 		}
-		$attrs .= '}';
-		return "\${ wpCommentDate( context, $attrs ) }";
-	}
 
-	$comment = get_comment( $block->context['commentId'] );
-	if ( empty( $comment ) ) {
-		return '';
+		$formatted_date     = get_comment_date(
+			isset( $attributes['format'] ) ? $attributes['format'] : '',
+			$comment
+		);
+		$link               = get_comment_link( $comment );
+
+		if ( ! empty( $attributes['isLink'] ) ) {
+			$formatted_date = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), $formatted_date );
+		}
+
+		$timestamp = esc_attr( get_comment_date( 'c', $comment ) );
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$formatted_date     = get_comment_date(
-		isset( $attributes['format'] ) ? $attributes['format'] : '',
-		$comment
-	);
-	$link               = get_comment_link( $comment );
-
-	if ( ! empty( $attributes['isLink'] ) ) {
-		$formatted_date = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), $formatted_date );
-	}
 
 	return sprintf(
 		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
 		$wrapper_attributes,
-		esc_attr( get_comment_date( 'c', $comment ) ),
+		$timestamp,
 		$formatted_date
 	);
 }
@@ -92,16 +94,6 @@ function define_comment_date_custom_element() {
 				}
 			}
 		);
-
-		function wpCommentDate( { timestamp }, { format } ) {
-			const dateOptions = { // TODO: Format datetime according to `format` arg.
-					year: 'numeric', month: 'long', day: 'numeric',
-					hour: 'numeric', minute: 'numeric'
-			};
-			const datetime = timestamp.toLocaleString( 'en', dateOptions );
-
-			return `<div><time datetime="${ timestamp.toISOString() }">${ datetime }</time></div>`;
-		}
 		</script>
     <?php
 }
