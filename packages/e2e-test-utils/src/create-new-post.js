@@ -48,7 +48,8 @@ export async function createNewPost( {
 			wp.data.dispatch( 'core/edit-post' ).toggleFeature( 'welcomeGuide' )
 		);
 
-		await page.waitForSelector( '.components-guide', { hidden: true } );
+		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 	}
 
 	if ( isFullscreenMode ) {
