@@ -11,6 +11,7 @@ import CommentsInspectorControls from './edit/comments-inspector-controls';
 const TEMPLATE = [
 	[ 'core/comment-template' ],
 	[ 'core/comments-pagination' ],
+	[ 'core/post-comments-form' ],
 ];
 
 export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
