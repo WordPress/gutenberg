@@ -239,6 +239,7 @@ const BlockDraggableWrapper = ( { children } ) => {
  * @return {Function} Render function which includes the parameter `isDraggable` to determine if the block can be dragged.
  */
 const BlockDraggable = ( { clientId, children } ) => {
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const wasBeingDragged = useRef( false );
 
 	const draggingAnimation = {
@@ -257,6 +258,7 @@ const BlockDraggable = ( { clientId, children } ) => {
 			1,
 			BLOCK_OPACITY_ANIMATION_CONFIG
 		);
+		runOnJS( selectBlock )( clientId );
 	};
 
 	const { isDraggable, isBeingDragged } = useSelect(
