@@ -49,12 +49,12 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	const classes = classnames( 'edit-post-header' );
 
 	const slideY = {
-		initial: { y: '-100%' },
+		hidden: { y: '-50' },
 		hover: { y: 0 },
 	};
 
 	const slideX = {
-		initial: { x: '-100%' },
+		hidden: { x: '-100%' },
 		hover: { x: 0 },
 	};
 
