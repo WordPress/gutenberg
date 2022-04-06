@@ -6,7 +6,7 @@ import { castArray, flow, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getBlockType, serialize } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
@@ -18,7 +18,6 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { useCopyToClipboard } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -27,6 +26,7 @@ import BlockActions from '../block-actions';
 import BlockIcon from '../block-icon';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
+import CopyMenuItem from './block-copy-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
@@ -38,11 +38,6 @@ const POPOVER_PROPS = {
 	position: 'bottom right',
 	isAlternate: true,
 };
-
-function CopyMenuItem( { blocks, onCopy } ) {
-	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	return <MenuItem ref={ ref }>{ __( 'Copy' ) }</MenuItem>;
-}
 
 export function BlockSettingsDropdown( {
 	clientIds,

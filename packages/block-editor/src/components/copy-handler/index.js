@@ -131,7 +131,6 @@ export function useClipboardHandler() {
 				}
 				notifyCopy( event.type, selectedBlockClientIds );
 				let blocks;
-
 				// Check if we have partial selection.
 				if ( ! __unstableIsFullySelected() ) {
 					const [
