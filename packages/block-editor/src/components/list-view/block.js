@@ -7,12 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	Button,
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { lock, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import {
 	useState,
 	useRef,
@@ -20,7 +19,7 @@ import {
 	useCallback,
 	memo,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
 /**
@@ -67,15 +66,6 @@ function ListViewBlock( {
 		position,
 		siblingBlockCount,
 		level
-	);
-
-	const isLocked = useSelect(
-		( select ) => {
-			const { canMoveBlock, canRemoveBlock } = select( blockEditorStore );
-
-			return ! canMoveBlock( clientId ) || ! canRemoveBlock( clientId );
-		},
-		[ clientId ]
 	);
 
 	const blockAriaLabel = blockInformation
@@ -282,28 +272,6 @@ function ListViewBlock( {
 						</TreeGridItem>
 					</TreeGridCell>
 				</>
-			) }
-
-			{ isLocked && (
-				<TreeGridCell
-					className="block-editor-list-view-block__lock-cell"
-					aria-selected={ !! isSelected }
-				>
-					{ ( { ref, tabIndex, onFocus } ) => (
-						<Button
-							disabled
-							ref={ ref }
-							tabIndex={ tabIndex }
-							onFocus={ onFocus }
-							icon={ lock }
-							label={ sprintf(
-								/* translators: %s: block name */
-								__( 'Locked %s' ),
-								blockInformation.title
-							) }
-						/>
-					) }
-				</TreeGridCell>
 			) }
 
 			{ showBlockActions && (
