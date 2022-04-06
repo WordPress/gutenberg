@@ -24,12 +24,35 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 	 * is present in theme.json and in theme supports,
 	 * the theme.json takes precedence.
 	 *
+	 * @param array $deprecated Deprecated argument.
 	 * @param array $settings Contains a key called with_supports to determine whether to include theme supports in the data.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
-	public static function get_theme_data( $settings = array( 'with_supports' => true ) ) {
+	public static function get_theme_data( $deprecated = array(), $settings = array( 'with_supports' => true ) ) {
+		if ( ! empty( $deprecated ) ) {
+			_deprecated_argument( __METHOD__, '5.9' );
+		}
 
-		static::get_theme_data_without_supports();
+		if ( null === static::$theme ) {
+			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
+			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
+			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+
+			if ( wp_get_theme()->parent() ) {
+				// Get parent theme.json.
+				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
+				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
+				$parent_theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $parent_theme_json_data );
+				$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
+
+				// Merge the child theme.json into the parent theme.json.
+				// The child theme takes precedence over the parent.
+				$parent_theme->merge( static::$theme );
+				static::$theme = $parent_theme;
+			}
+		}
+
 		if ( ! $settings['with_supports'] ) {
 			return static::$theme;
 		}
@@ -70,33 +93,5 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		$with_theme_supports->merge( static::$theme );
 
 		return $with_theme_supports;
-	}
-
-	/**
-	 * Gets the data from the theme.json file and converts it to an object.
-	 * Also merges with the parent theme.
-	 */
-	protected static function get_theme_data_without_supports() {
-		if ( null === static::$theme ) {
-			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
-			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
-			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
-
-			if ( wp_get_theme()->parent() ) {
-				// Get parent theme.json.
-				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
-				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
-				$parent_theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $parent_theme_json_data );
-				$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
-
-				// Merge the child theme.json into the parent theme.json.
-				// The child theme takes precedence over the parent.
-				$parent_theme->merge( static::$theme );
-				static::$theme = $parent_theme;
-			}
-		}
-
-		return static::$theme;
 	}
 }
