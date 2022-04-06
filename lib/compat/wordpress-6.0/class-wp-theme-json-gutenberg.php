@@ -477,7 +477,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 		}
 
-		$flattened_theme_json = static::do_opt_out_of_settings( $flattened_theme_json );
+		$flattened_theme_json = static::use_appearance_tools_setting( $flattened_theme_json );
 
 		wp_recursive_ksort( $flattened_theme_json );
 
@@ -496,7 +496,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		unset( $context['appearanceTools'] );
 	}
 
-	protected static function do_opt_out_of_settings( $theme_json ) {
+	protected static function use_appearance_tools_setting( $theme_json ) {
 		if ( array_key_exists( 'appearanceTools', $theme_json['settings'] ) ) { // Is it safe to assume that 'settings' always exsits?
 			foreach ( static::APPEARANCE_TOOLS_OPT_INS as $path ) {
 				// Remove the path.
