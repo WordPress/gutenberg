@@ -10,6 +10,7 @@ import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
+import { __unstableMotion as motion } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -47,16 +48,41 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const classes = classnames( 'edit-post-header' );
 
+	const slideY = {
+		hidden: { y: '-50' },
+		hover: { y: 0 },
+	};
+
+	const slideX = {
+		hidden: { x: '-100%' },
+		hover: { x: 0 },
+	};
+
 	return (
 		<div className={ classes }>
 			<MainDashboardButton.Slot>
-				<FullscreenModeClose showTooltip />
+				<motion.div
+					variants={ slideX }
+					transition={ { type: 'tween' } }
+				>
+					<FullscreenModeClose showTooltip />
+				</motion.div>
 			</MainDashboardButton.Slot>
-			<div className="edit-post-header__toolbar">
+			<motion.div
+				initial={ 'hidden' }
+				variants={ slideY }
+				transition={ { type: 'tween' } }
+				className="edit-post-header__toolbar"
+			>
 				<HeaderToolbar />
 				<TemplateTitle />
-			</div>
-			<div className="edit-post-header__settings">
+			</motion.div>
+			<motion.div
+				initial={ 'hidden' }
+				variants={ slideY }
+				transition={ { type: 'tween' } }
+				className="edit-post-header__settings"
+			>
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because
@@ -90,7 +116,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				{ showIconLabels && ! isLargeViewport && (
 					<MoreMenu showIconLabels={ showIconLabels } />
 				) }
-			</div>
+			</motion.div>
 		</div>
 	);
 }
