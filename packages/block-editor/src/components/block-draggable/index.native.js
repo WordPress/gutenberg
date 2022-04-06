@@ -49,7 +49,7 @@ const BLOCK_OPACITY_ANIMATION_CONFIG = { duration: 350 };
  * @return {Function} Render function that passes `onScroll` event handler.
  */
 const BlockDraggableWrapper = ( { children } ) => {
-	const currentClientId = useRef();
+	const currentBlockLayout = useRef();
 
 	const wrapperStyles = usePreferredColorSchemeStyle(
 		styles[ 'draggable-wrapper__container' ],
@@ -118,7 +118,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 		} );
 
 		const foundClientId = blockLayout?.clientId;
-		currentClientId.current = foundClientId;
+		currentBlockLayout.current = blockLayout;
 		if ( foundClientId ) {
 			startDraggingBlocks( [ foundClientId ] );
 			runOnUI( startScrolling )( position.y );
@@ -129,11 +129,11 @@ const BlockDraggableWrapper = ( { children } ) => {
 	};
 
 	const onStopDragging = () => {
-		if ( currentClientId.current ) {
+		if ( currentBlockLayout.current ) {
 			onBlockDrop( {
 				// Dropping is only allowed at root level
 				srcRootClientId: '',
-				srcClientIds: [ currentClientId.current ],
+				srcClientIds: [ currentBlockLayout.current.clientId ],
 				type: 'block',
 			} );
 		}
