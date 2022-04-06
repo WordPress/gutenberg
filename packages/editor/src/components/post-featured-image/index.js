@@ -16,8 +16,10 @@ import {
 	withNotices,
 	withFilters,
 } from '@wordpress/components';
+import { isBlobURL } from '@wordpress/blob';
+import { useState } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	MediaUpload,
 	MediaUploadCheck,
@@ -38,63 +40,117 @@ const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured image' );
 const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
 const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
 
-function PostFeaturedImage( {
-	currentPostId,
-	featuredImageId,
-	onUpdateImage,
-	onDropImage,
-	onRemoveImage,
-	media,
-	postType,
-	noticeUI,
-} ) {
+const instructions = (
+	<p>
+		{ __(
+			'To edit the featured image, you need permission to upload media.'
+		) }
+	</p>
+);
+
+function getMediaDetails( media, postId ) {
+	if ( ! media ) {
+		return {};
+	}
+
+	const defaultSize = applyFilters(
+		'editor.PostFeaturedImage.imageSize',
+		'large',
+		media.id,
+		postId
+	);
+	if ( has( media, [ 'media_details', 'sizes', defaultSize ] ) ) {
+		return {
+			mediaWidth: media.media_details.sizes[ defaultSize ].width,
+			mediaHeight: media.media_details.sizes[ defaultSize ].height,
+			mediaSourceUrl: media.media_details.sizes[ defaultSize ].source_url,
+		};
+	}
+
+	// Use fallbackSize when defaultSize is not available.
+	const fallbackSize = applyFilters(
+		'editor.PostFeaturedImage.imageSize',
+		'thumbnail',
+		media.id,
+		postId
+	);
+	if ( has( media, [ 'media_details', 'sizes', fallbackSize ] ) ) {
+		return {
+			mediaWidth: media.media_details.sizes[ fallbackSize ].width,
+			mediaHeight: media.media_details.sizes[ fallbackSize ].height,
+			mediaSourceUrl:
+				media.media_details.sizes[ fallbackSize ].source_url,
+		};
+	}
+
+	// Use full image size when fallbackSize and defaultSize are not available.
+	return {
+		mediaWidth: media.media_details.width,
+		mediaHeight: media.media_details.height,
+		mediaSourceUrl: media.source_url,
+	};
+}
+
+function PostFeaturedImage( { noticeUI, noticeOperations } ) {
+	const [ isLoading, setIsLoading ] = useState( false );
+	const {
+		media,
+		mediaUpload,
+		currentPostId,
+		postType,
+		featuredImageId,
+	} = useSelect( ( select ) => {
+		const { getMedia, getPostType } = select( coreStore );
+		const { getSettings } = select( blockEditorStore );
+		const { getCurrentPostId, getEditedPostAttribute } = select(
+			editorStore
+		);
+		const featuredImage = getEditedPostAttribute( 'featured_media' );
+
+		return {
+			media: featuredImage
+				? getMedia( featuredImage, { context: 'view' } )
+				: null,
+			currentPostId: getCurrentPostId(),
+			postType: getPostType( getEditedPostAttribute( 'type' ) ),
+			featuredImageId: featuredImage,
+			mediaUpload: getSettings().mediaUpload,
+		};
+	}, [] );
+	const { editPost } = useDispatch( editorStore );
+
 	const postLabel = get( postType, [ 'labels' ], {} );
-	const instructions = (
-		<p>
-			{ __(
-				'To edit the featured image, you need permission to upload media.'
-			) }
-		</p>
+	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
+		media,
+		currentPostId
 	);
 
-	let mediaWidth, mediaHeight, mediaSourceUrl;
-	if ( media ) {
-		const mediaSize = applyFilters(
-			'editor.PostFeaturedImage.imageSize',
-			'post-thumbnail',
-			media.id,
-			currentPostId
-		);
-		if ( has( media, [ 'media_details', 'sizes', mediaSize ] ) ) {
-			// Use mediaSize when available.
-			mediaWidth = media.media_details.sizes[ mediaSize ].width;
-			mediaHeight = media.media_details.sizes[ mediaSize ].height;
-			mediaSourceUrl = media.media_details.sizes[ mediaSize ].source_url;
-		} else {
-			// Get fallbackMediaSize if mediaSize is not available.
-			const fallbackMediaSize = applyFilters(
-				'editor.PostFeaturedImage.imageSize',
-				'thumbnail',
-				media.id,
-				currentPostId
-			);
-			if (
-				has( media, [ 'media_details', 'sizes', fallbackMediaSize ] )
-			) {
-				// Use fallbackMediaSize when mediaSize is not available.
-				mediaWidth =
-					media.media_details.sizes[ fallbackMediaSize ].width;
-				mediaHeight =
-					media.media_details.sizes[ fallbackMediaSize ].height;
-				mediaSourceUrl =
-					media.media_details.sizes[ fallbackMediaSize ].source_url;
-			} else {
-				// Use full image size when mediaFallbackSize and mediaSize are not available.
-				mediaWidth = media.media_details.width;
-				mediaHeight = media.media_details.height;
-				mediaSourceUrl = media.source_url;
-			}
+	function onUpdateImage( image ) {
+		if ( isBlobURL( image.url ) ) {
+			setIsLoading( true );
+			return;
 		}
+
+		editPost( { featured_media: image.id } );
+		setIsLoading( false );
+	}
+
+	function onRemoveImage() {
+		editPost( { featured_media: 0 } );
+	}
+
+	function onDropImage( filesList ) {
+		mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList,
+			onFileChange( [ image ] ) {
+				onUpdateImage( image );
+			},
+			onError( message ) {
+				noticeOperations.removeAllNotices();
+				noticeOperations.createErrorNotice( message );
+			},
+		} );
 	}
 
 	return (
@@ -165,9 +221,7 @@ function PostFeaturedImage( {
 											/>
 										</ResponsiveWrapper>
 									) }
-									{ !! featuredImageId && ! media && (
-										<Spinner />
-									) }
+									{ isLoading && <Spinner /> }
 									{ ! featuredImageId &&
 										( postLabel.set_featured_image ||
 											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
@@ -178,7 +232,7 @@ function PostFeaturedImage( {
 						value={ featuredImageId }
 					/>
 				</MediaUploadCheck>
-				{ !! featuredImageId && media && ! media.isLoading && (
+				{ !! featuredImageId && media && (
 					<MediaUploadCheck>
 						<MediaUpload
 							title={
@@ -214,53 +268,7 @@ function PostFeaturedImage( {
 	);
 }
 
-const applyWithSelect = withSelect( ( select ) => {
-	const { getMedia, getPostType } = select( coreStore );
-	const { getCurrentPostId, getEditedPostAttribute } = select( editorStore );
-	const featuredImageId = getEditedPostAttribute( 'featured_media' );
-
-	return {
-		media: featuredImageId
-			? getMedia( featuredImageId, { context: 'view' } )
-			: null,
-		currentPostId: getCurrentPostId(),
-		postType: getPostType( getEditedPostAttribute( 'type' ) ),
-		featuredImageId,
-	};
-} );
-
-const applyWithDispatch = withDispatch(
-	( dispatch, { noticeOperations }, { select } ) => {
-		const { editPost } = dispatch( editorStore );
-		return {
-			onUpdateImage( image ) {
-				editPost( { featured_media: image.id } );
-			},
-			onDropImage( filesList ) {
-				select( blockEditorStore )
-					.getSettings()
-					.mediaUpload( {
-						allowedTypes: [ 'image' ],
-						filesList,
-						onFileChange( [ image ] ) {
-							editPost( { featured_media: image.id } );
-						},
-						onError( message ) {
-							noticeOperations.removeAllNotices();
-							noticeOperations.createErrorNotice( message );
-						},
-					} );
-			},
-			onRemoveImage() {
-				editPost( { featured_media: 0 } );
-			},
-		};
-	}
-);
-
 export default compose(
 	withNotices,
-	applyWithSelect,
-	applyWithDispatch,
 	withFilters( 'editor.PostFeaturedImage' )
 )( PostFeaturedImage );
