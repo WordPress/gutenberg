@@ -22,6 +22,10 @@
 		@include break-small() {
 			flex-direction: column;
 		}
+
+		// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+		// This is best fixed by making the mover control area a proper single toolbar group.
+		padding: 0;
 	}
 
 	&.is-horizontal .block-editor-block-mover__move-button-container,

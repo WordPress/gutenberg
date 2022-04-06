@@ -16,8 +16,6 @@ if ( class_exists( 'WP_Style_Engine_Gutenberg' ) ) {
  *
  * Consolidates rendering block styles to reduce duplication and streamline
  * CSS styles generation.
- *
- * @since 6.0.0
  */
 class WP_Style_Engine_Gutenberg {
 	/**

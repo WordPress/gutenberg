@@ -167,10 +167,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// because we only want to match against the value, not the CSS attribute.
 	if ( is_array( $gap_value ) ) {
 		foreach ( $gap_value as $key => $value ) {
-			$gap_value[ $key ] = preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
 		}
 	} else {
-		$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
+		$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
 	}
 
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,

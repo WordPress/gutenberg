@@ -270,6 +270,7 @@ function Navigation( {
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
 	const {
+		hasResolvedNavigationMenus,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
 		navigationMenus,
@@ -283,7 +284,24 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
+	// Attempt to retrieve and prioritize any existing navigation menu unless
+	// a specific ref is allocated or the user is explicitly creating a new menu. The aim is
+	// for the block to "just work" from a user perspective using existing data.
+	useEffect( () => {
+		if (
+			isCreatingNavigationMenu ||
+			ref ||
+			! navigationMenus?.length ||
+			navigationMenus?.length > 1
+		) {
+			return;
+		}
+
+		setRef( navigationMenus[ 0 ].id );
+	}, [ navigationMenus ] );
+
 	const navRef = useRef();
+
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
 
 	const {
@@ -309,6 +327,7 @@ function Navigation( {
 		! ref &&
 		! isCreatingNavigationMenu &&
 		! isConvertingClassicMenu &&
+		hasResolvedNavigationMenus &&
 		( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
 
 	const isEntityAvailable =
@@ -321,6 +340,7 @@ function Navigation( {
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
 	const isLoading =
+		! hasResolvedNavigationMenus ||
 		isCreatingNavigationMenu ||
 		isConvertingClassicMenu ||
 		!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu );
@@ -536,11 +556,12 @@ function Navigation( {
 		} );
 	}, [ clientId, ref ] );
 
-	// If the block has inner blocks, but no menu id, this was an older
-	// navigation block added before the block used a wp_navigation entity.
-	// Either this block was saved in the content or inserted by a pattern.
-	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
-	// that automatically saves the menu.
+	// If the block has inner blocks, but no menu id, then these blocks are either:
+	// - inserted via a pattern.
+	// - inserted directly via Code View (or otherwise).
+	// - from an older version of navigation block added before the block used a wp_navigation entity.
+	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
+	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 	if ( hasUnsavedBlocks ) {
 		return (
@@ -568,6 +589,10 @@ function Navigation( {
 							setHasSavedUnsavedInnerBlocks( true );
 							// Switch to using the wp_navigation entity.
 							setRef( post.id );
+
+							showNavigationMenuCreateNotice(
+								__( `New Navigation Menu created.` )
+							);
 						} }
 					/>
 				</ResponsiveWrapper>

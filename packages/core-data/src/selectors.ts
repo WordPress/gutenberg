@@ -501,10 +501,10 @@ export const getEntityRecordNonTransientEdits = createSelector(
  * Returns true if the specified entity record has edits,
  * and false otherwise.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param {Object}        state    State tree.
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Record ID.
  *
  * @return {boolean} Whether the entity record has edits or not.
  */

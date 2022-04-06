@@ -11,7 +11,14 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
--   [**] Update "add block" button style in default editor view. [#39726]
+-   [**] Update "add block" button's style in default editor view. [#39726]
+-   [*] Remove banner error notification on upload failure [#39694]
+
+## 1.73.0
+
+-   [*] Update react-native-reanimated version to 2.4.1 [#39430]
+-   [*] Upgrade Gradle to 7.4 & AGP to 7.1.1 [#39508]
+-   [*] Add waits to fix editor test flakiness [#39668]
 
 ## 1.72.1
 

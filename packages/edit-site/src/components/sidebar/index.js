@@ -58,6 +58,16 @@ export function SidebarComplementaryAreaFills() {
 	if ( ! isEditorSidebarOpened ) {
 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
 	}
+
+	// Conditionally include NavMenu sidebar in Plugin only.
+	// Optimise for dead code elimination.
+	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
+	let MaybeNavigationMenuSidebar = 'Fragment';
+
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		MaybeNavigationMenuSidebar = NavigationMenuSidebar;
+	}
+
 	return (
 		<>
 			<DefaultSidebar
@@ -78,7 +88,7 @@ export function SidebarComplementaryAreaFills() {
 				) }
 			</DefaultSidebar>
 			<GlobalStylesSidebar />
-			<NavigationMenuSidebar />
+			<MaybeNavigationMenuSidebar />
 		</>
 	);
 }

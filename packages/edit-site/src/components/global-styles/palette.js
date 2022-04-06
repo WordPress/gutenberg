@@ -7,7 +7,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
-	FlexBlock,
 	ColorIndicator,
 } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -19,6 +18,7 @@ import { useMemo } from '@wordpress/element';
 import Subtitle from './subtitle';
 import { NavigationButton } from './navigation-button';
 import { useSetting } from './hooks';
+import ColorIndicatorWrapper from './color-indicator-wrapper';
 
 const EMPTY_COLORS = [];
 
@@ -64,16 +64,13 @@ function Palette( { name } ) {
 							colors.length === 0 ? 'row-reverse' : 'row'
 						}
 					>
-						<FlexBlock>
-							<ZStack isLayered={ false } offset={ -8 }>
-								{ colors.slice( 0, 5 ).map( ( { color } ) => (
-									<ColorIndicator
-										key={ color }
-										colorValue={ color }
-									/>
-								) ) }
-							</ZStack>
-						</FlexBlock>
+						<ZStack isLayered={ false } offset={ -8 }>
+							{ colors.slice( 0, 5 ).map( ( { color } ) => (
+								<ColorIndicatorWrapper key={ color }>
+									<ColorIndicator colorValue={ color } />
+								</ColorIndicatorWrapper>
+							) ) }
+						</ZStack>
 						<FlexItem>{ paletteButtonText }</FlexItem>
 					</HStack>
 				</NavigationButton>

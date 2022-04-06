@@ -10,12 +10,12 @@ Items marked with a strikeout (~~strikeout~~) are explicitly disabled.
 
 ## Archives
 
-Display a monthly archive of your posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/archives))
+Display a date archive of your posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/archives))
 
 -	**Name:** core/archives
 -	**Category:** widgets
 -	**Supports:** align, ~~html~~
--	**Attributes:** displayAsDropdown, showPostCounts
+-	**Attributes:** displayAsDropdown, showPostCounts, type
 
 ## Audio
 
@@ -222,7 +222,7 @@ Add an image or video with a text overlay — great for headers. ([Source](https
 -	**Name:** core/cover
 -	**Category:** media
 -	**Supports:** align, anchor, color (~~background~~, ~~text~~), spacing (padding), ~~html~~
--	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, minHeight, minHeightUnit, overlayColor, templateLock, url
+-	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, minHeight, minHeightUnit, overlayColor, templateLock, url, useFeaturedImage
 
 ## Embed
 
@@ -384,7 +384,7 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 -	**Name:** core/navigation
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, inserter, spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, textColor
+-	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, maxNestingLevel, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, textColor
 
 ## Navigation Area
 
@@ -680,7 +680,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** anchor, typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, link, text), typography (fontSize, lineHeight)
 -	**Attributes:** align, citation, value
 
 ## Read More

@@ -3,7 +3,6 @@
  */
 import {
 	castArray,
-	flatMap,
 	first,
 	isArray,
 	isBoolean,
@@ -217,26 +216,32 @@ export const __unstableGetClientIdsTree = createSelector(
 );
 
 /**
- * Returns an array containing the clientIds of all descendants
- * of the blocks given.
+ * Returns an array containing the clientIds of all descendants of the blocks
+ * given. Returned ids are ordered first by the order of the ids given, then
+ * by the order that they appear in the editor.
  *
  * @param {Object} state     Global application state.
  * @param {Array}  clientIds Array of blocks to inspect.
  *
  * @return {Array} ids of descendants.
  */
-export const getClientIdsOfDescendants = ( state, clientIds ) =>
-	flatMap( clientIds, ( clientId ) => {
-		const descendants = getBlockOrder( state, clientId );
-		return [
-			...descendants,
-			...getClientIdsOfDescendants( state, descendants ),
-		];
-	} );
+export const getClientIdsOfDescendants = ( state, clientIds ) => {
+	const collectedIds = [];
+	for ( const givenId of clientIds ) {
+		for ( const descendantId of getBlockOrder( state, givenId ) ) {
+			collectedIds.push(
+				descendantId,
+				...getClientIdsOfDescendants( state, [ descendantId ] )
+			);
+		}
+	}
+	return collectedIds;
+};
 
 /**
- * Returns an array containing the clientIds of the top-level blocks
- * and their descendants of any depth (for nested blocks).
+ * Returns an array containing the clientIds of the top-level blocks and
+ * their descendants of any depth (for nested blocks). Ids are returned
+ * in the same order that they appear in the editor.
  *
  * @param {Object} state Global application state.
  *
@@ -244,11 +249,14 @@ export const getClientIdsOfDescendants = ( state, clientIds ) =>
  */
 export const getClientIdsWithDescendants = createSelector(
 	( state ) => {
-		const topLevelIds = getBlockOrder( state );
-		return [
-			...topLevelIds,
-			...getClientIdsOfDescendants( state, topLevelIds ),
-		];
+		const collectedIds = [];
+		for ( const topLevelId of getBlockOrder( state ) ) {
+			collectedIds.push(
+				topLevelId,
+				...getClientIdsOfDescendants( state, [ topLevelId ] )
+			);
+		}
+		return collectedIds;
 	},
 	( state ) => [ state.blocks.order ]
 );
@@ -1382,10 +1390,28 @@ const canInsertBlockTypeUnmemoized = (
 		parentName
 	);
 
+	let hasBlockAllowedAncestor = true;
+	const blockAllowedAncestorBlocks = blockType.ancestor;
+	if ( blockAllowedAncestorBlocks ) {
+		const ancestors = [
+			rootClientId,
+			...getBlockParents( state, rootClientId ),
+		];
+
+		hasBlockAllowedAncestor = some( ancestors, ( ancestorClientId ) =>
+			checkAllowList(
+				blockAllowedAncestorBlocks,
+				getBlockName( state, ancestorClientId )
+			)
+		);
+	}
+
 	const canInsert =
-		( hasParentAllowedBlock === null && hasBlockAllowedParent === null ) ||
-		hasParentAllowedBlock === true ||
-		hasBlockAllowedParent === true;
+		hasBlockAllowedAncestor &&
+		( ( hasParentAllowedBlock === null &&
+			hasBlockAllowedParent === null ) ||
+			hasParentAllowedBlock === true ||
+			hasBlockAllowedParent === true );
 
 	if ( ! canInsert ) {
 		return canInsert;

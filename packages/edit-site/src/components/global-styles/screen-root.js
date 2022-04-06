@@ -10,6 +10,7 @@ import {
 	CardBody,
 	Card,
 	CardDivider,
+	CardMedia,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
@@ -37,19 +38,19 @@ function ScreenRoot() {
 			<CardBody>
 				<VStack spacing={ 2 }>
 					<Card>
-						<StylesPreview />
+						<CardMedia>
+							<StylesPreview />
+						</CardMedia>
 					</Card>
 					{ !! variations?.length && (
 						<NavigationButton path="/variations">
 							<HStack justify="space-between">
 								<FlexItem>{ __( 'Browse styles' ) }</FlexItem>
-								<FlexItem>
-									<Icon
-										icon={
-											isRTL() ? chevronLeft : chevronRight
-										}
-									/>
-								</FlexItem>
+								<Icon
+									icon={
+										isRTL() ? chevronLeft : chevronRight
+									}
+								/>
 							</HStack>
 						</NavigationButton>
 					) }
@@ -72,13 +73,9 @@ function ScreenRoot() {
 					<NavigationButton path="/blocks">
 						<HStack justify="space-between">
 							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
-							<FlexItem>
-								<Icon
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
-								/>
-							</FlexItem>
+							<Icon
+								icon={ isRTL() ? chevronLeft : chevronRight }
+							/>
 						</HStack>
 					</NavigationButton>
 				</ItemGroup>

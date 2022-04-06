@@ -27,6 +27,7 @@ export const buttonView = css`
 	border: none;
 	border-radius: ${ CONFIG.controlBorderRadius };
 	color: ${ COLORS.gray[ 700 ] };
+	fill: currentColor;
 	cursor: pointer;
 	display: flex;
 	font-family: inherit;
@@ -55,7 +56,9 @@ export const buttonView = css`
 
 export const buttonActive = css`
 	color: ${ COLORS.white };
-	background-color: ${ COLORS.gray[ 900 ] };
+	&:active {
+		background: transparent;
+	}
 `;
 
 export const ButtonContentView = styled.div`
