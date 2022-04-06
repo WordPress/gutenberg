@@ -13,4 +13,10 @@
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
 	}
+
+	// Add a max-height to the excerpt panel.
+	p {
+		max-height: 320px;
+		overflow: auto;
+	}
 }
