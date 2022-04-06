@@ -9,6 +9,12 @@ import type { RadioStateReturn } from 'reakit';
  * Internal dependencies
  */
 import type { FormElementProps } from '../utils/types';
+import type { ToggleGroupControlOption } from './toggle-group-control-option';
+import type { ToggleGroupControlOptionIcon } from './toggle-group-control-option-icon';
+
+type AllowedToggleGroupControlOptionChild =
+	| typeof ToggleGroupControlOption
+	| typeof ToggleGroupControlOptionIcon;
 
 export type ToggleGroupControlOptionBaseProps = {
 	children: ReactNode;
@@ -98,7 +104,9 @@ export type ToggleGroupControlProps = Omit<
 	/**
 	 * React children
 	 */
-	children: ReactNode;
+	children:
+		| AllowedToggleGroupControlOptionChild
+		| AllowedToggleGroupControlOptionChild[];
 	/**
 	 * If this property is added, a help text will be generated
 	 * using help property as the content.
