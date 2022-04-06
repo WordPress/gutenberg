@@ -3,6 +3,8 @@
  */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+// eslint-disable-next-line no-restricted-imports
+import { motion } from 'framer-motion';
 
 /**
  * Internal dependencies
@@ -38,15 +40,13 @@ export const block = css`
 	width: 100%;
 `;
 
-export const BackdropView = styled.div`
+export const AnimatedBackdrop = styled( motion.div )`
 	background: ${ COLORS.gray[ 900 ] };
 	border-radius: ${ CONFIG.controlBorderRadius };
-	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
+	box-shadow: none;
 	left: 0;
 	position: absolute;
 	top: 2px;
 	bottom: 2px;
-	transition: transform ${ CONFIG.transitionDurationFast } ease;
-	${ reduceMotion( 'transition' ) }
 	z-index: 1;
 `;

@@ -116,8 +116,8 @@ export type ToggleGroupControlContextProps = RadioStateReturn & {
 };
 
 export type ToggleGroupControlBackdropProps = {
-	containerRef: MutableRefObject< HTMLElement | undefined >;
-	containerWidth?: number | null;
-	isAdaptiveWidth?: boolean;
-	state?: any;
+	containerSizes: {
+		width: number | null;
+		height: number | null;
+	};
 };

@@ -107,12 +107,7 @@ function ToggleGroupControl(
 					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
 				>
 					{ resizeListener }
-					<ToggleGroupControlBackdrop
-						{ ...radio }
-						containerRef={ containerRef }
-						containerWidth={ sizes.width }
-						isAdaptiveWidth={ isAdaptiveWidth }
-					/>
+					<ToggleGroupControlBackdrop containerSizes={ sizes } />
 					{ children }
 				</RadioGroup>
 			</ToggleGroupControlContext.Provider>

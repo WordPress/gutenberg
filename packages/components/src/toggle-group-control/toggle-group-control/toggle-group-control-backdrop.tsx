@@ -1,86 +1,92 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import { useReducedMotion } from 'framer-motion';
+
+/**
  * WordPress dependencies
  */
-import { useState, useEffect, memo } from '@wordpress/element';
+import { useLayoutEffect, useState, memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { ToggleGroupControlBackdropProps } from '../types';
-import { BackdropView } from './styles';
+import { useToggleGroupControlContext } from '../context';
+import { CONFIG } from '../../utils';
+import { AnimatedBackdrop } from './styles';
+
+const TRANSITION_CONFIG = {
+	type: 'spring',
+	bounce: 0.2,
+	// Transition durations in the config are expressed as a string in milliseconds,
+	// while `framer-motion` needs them as integers in seconds.
+	duration: parseInt( CONFIG.transitionDurationFast, 10 ) / 1000,
+};
 
 function ToggleGroupControlBackdrop( {
-	containerRef,
-	containerWidth,
-	isAdaptiveWidth,
-	state,
+	containerSizes,
 }: ToggleGroupControlBackdropProps ) {
-	const [ left, setLeft ] = useState( 0 );
-	const [ width, setWidth ] = useState( 0 );
-	const [ canAnimate, setCanAnimate ] = useState( false );
-	const [ renderBackdrop, setRenderBackdrop ] = useState( false );
+	const shouldReduceMotion = useReducedMotion();
+	const { items, state, isBlock } = useToggleGroupControlContext();
 
-	useEffect( () => {
-		const containerNode = containerRef?.current;
-		if ( ! containerNode ) return;
+	const [ itemSizes, setItemSizes ] = useState<
+		| null
+		| {
+				width: number;
+				left: number;
+		  }[]
+	>( null );
 
-		/**
-		 * Workaround for Reakit
-		 */
-		const targetNode = containerNode.querySelector(
-			`[data-value="${ state }"]`
+	const selectedItemIndex = items.findIndex(
+		// All valid children (e.g. extending `ToggleGroupControlOptionBase`)
+		// have a `data-value` attribute.
+		( item ) => item.ref.current?.dataset.value === state
+	);
+
+	// `useLayoutEffect` is necessary because we need to wait for the DOM
+	// mutations to take effect before reading the new element's sizes and offsets.
+	useLayoutEffect( () => {
+		setItemSizes(
+			items.map( ( item ) => {
+				// Using `offsetLeft` in order to get the gap with respect to the
+				// `offsetParent` element. This is different from the behavior of other
+				// functions (like `getBoundingClientRect`), which compute those figures
+				// relatively to the viewport.
+				// For this reason, it's important that the `offsetParent` of each `<Radio>`
+				// option is the inner wrapper of `ToggleGroupControl` — which means that in
+				// the DOM tree between that wrapper and each `<Radio>` component there
+				// can't be any element with `position: relative` or `position: absolute`.
+				// See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetLeft
+
+				const wrapperElement = item.ref.current;
+
+				return {
+					left: wrapperElement?.offsetLeft ?? -1,
+					width: wrapperElement?.offsetWidth ?? 0,
+				};
+			} )
 		);
-		setRenderBackdrop( !! targetNode );
-		if ( ! targetNode ) {
-			return;
-		}
+	}, [ containerSizes.width, containerSizes.height, items, isBlock ] );
 
-		const computeDimensions = () => {
-			const {
-				width: offsetWidth,
-				x,
-			} = targetNode.getBoundingClientRect();
-
-			const { x: parentX } = containerNode.getBoundingClientRect();
-
-			const borderWidth = 1;
-			const offsetLeft = x - parentX - borderWidth;
-
-			setLeft( offsetLeft );
-			setWidth( offsetWidth );
-		};
-		// Fix to make the component appear as expected inside popovers.
-		// If the targetNode width is 0 it means the element was not yet rendered we should allow
-		// some time for the render to happen.
-		// requestAnimationFrame instead of setTimeout with a small time does not seems to work.
-		const dimensionsRequestId = window.setTimeout( computeDimensions, 100 );
-
-		let animationRequestId: number;
-		if ( ! canAnimate ) {
-			animationRequestId = window.requestAnimationFrame( () => {
-				setCanAnimate( true );
-			} );
-		}
-		return () => {
-			window.clearTimeout( dimensionsRequestId );
-			window.cancelAnimationFrame( animationRequestId );
-		};
-	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
-
-	if ( ! renderBackdrop ) {
-		return null;
-	}
-
-	return (
-		<BackdropView
+	return selectedItemIndex >= 0 && itemSizes?.[ selectedItemIndex ] ? (
+		<AnimatedBackdrop
 			role="presentation"
-			style={ {
-				transform: `translateX(${ left }px)`,
-				transition: canAnimate ? undefined : 'none',
-				width,
+			transition={
+				shouldReduceMotion
+					? {
+							...TRANSITION_CONFIG,
+							duration: 0,
+					  }
+					: TRANSITION_CONFIG
+			}
+			animate={ {
+				width: itemSizes[ selectedItemIndex ].width,
+				x: `${ itemSizes[ selectedItemIndex ].left }px`,
 			} }
 		/>
-	);
+	) : null;
 }
 
 export default memo( ToggleGroupControlBackdrop );
