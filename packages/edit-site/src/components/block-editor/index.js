@@ -113,6 +113,26 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 
 	const isTemplatePart = templateType === 'wp_template_part';
 
+	const NavMenuSidebarToggle = () => (
+		<ToolbarGroup>
+			<ToolbarButton
+				className="components-toolbar__control"
+				label={ __( 'Open list view' ) }
+				onClick={ openNavigationSidebar }
+				icon={ listView }
+			/>
+		</ToolbarGroup>
+	);
+
+	// Conditionally include NavMenu sidebar in Plugin only.
+	// Optimise for dead code elimination.
+	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
+	let MaybeNavMenuSidebarToggle = 'Fragment';
+
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		MaybeNavMenuSidebarToggle = NavMenuSidebarToggle;
+	}
+
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -178,14 +198,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					<__unstableBlockNameContext.Consumer>
 						{ ( blockName ) =>
 							blockName === 'core/navigation' && (
-								<ToolbarGroup>
-									<ToolbarButton
-										className="components-toolbar__control"
-										label={ __( 'Open list view' ) }
-										onClick={ openNavigationSidebar }
-										icon={ listView }
-									/>
-								</ToolbarGroup>
+								<MaybeNavMenuSidebarToggle />
 							)
 						}
 					</__unstableBlockNameContext.Consumer>
