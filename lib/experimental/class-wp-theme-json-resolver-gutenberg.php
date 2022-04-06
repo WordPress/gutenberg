@@ -24,15 +24,15 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 	 * is present in theme.json and in theme supports,
 	 * the theme.json takes precedence.
 	 *
-	 * @param array $deprecated Deprecated argument.
+	 * @param array $settings Contains a key called with_supports to determine whether to include theme supports in the data.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
-	public static function get_theme_data( $deprecated = array() ) {
-		if ( ! empty( $deprecated ) ) {
-			_deprecated_argument( __METHOD__, '5.9' );
-		}
+	public static function get_theme_data( $settings = array( 'with_supports' => true ) ) {
 
 		static::get_theme_data_without_supports();
+		if ( ! $settings['with_supports'] ) {
+			return static::$theme;
+		}
 
 		/*
 		 * We want the presets and settings declared in theme.json
@@ -76,7 +76,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 	 * Gets the data from the theme.json file and converts it to an object.
 	 * Also merges with the parent theme.
 	 */
-	private static function get_theme_data_without_supports() {
+	protected static function get_theme_data_without_supports() {
 		if ( null === static::$theme ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
@@ -98,33 +98,5 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		}
 
 		return static::$theme;
-	}
-
-	/**
-	 * Prepares theme.json for export.
-	 */
-	public static function export() {
-		$tree = static::get_theme_data_without_supports();
-		$tree->merge( static::get_user_data() );
-
-		$theme_json_raw = $tree->get_data();
-		// If a version is defined, add a schema.
-		if ( $theme_json_raw['version'] ) {
-			global $wp_version;
-			$theme_json_version = substr( $wp_version, 0, strpos( $wp_version, '-' ) );
-			if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
-				$theme_json_version = 'trunk';
-			}
-			$schema         = array( '$schema' => 'https://schemas.wp.org/wp/' . $theme_json_version . '/theme.json' );
-			$theme_json_raw = array_merge( $schema, $theme_json_raw );
-		}
-
-		// Convert to a string.
-		$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-
-		// Replace 4 spaces with a tab.
-		$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
-
-		return $theme_json_tabbed;
 	}
 }
