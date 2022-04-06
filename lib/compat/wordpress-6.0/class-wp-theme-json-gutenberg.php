@@ -492,6 +492,8 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 				_wp_array_set( $context, $path, true );
 			}
 		}
+
+		unset( $context['appearanceTools'] );
 	}
 
 	protected static function do_opt_out_of_settings( $theme_json ) {
