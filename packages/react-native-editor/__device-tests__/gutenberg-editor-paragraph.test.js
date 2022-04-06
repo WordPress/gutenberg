@@ -51,7 +51,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		let paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph
 		);
-
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
@@ -59,7 +58,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			paragraphBlockElement,
 			testData.shortText
 		);
-
 		await clickMiddleOfElement(
 			editorPage.driver,
 			paragraphBlockElement,
@@ -101,6 +99,24 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		).toMatch( text.replace( /\s/g, '' ) );
 		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 1 );
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
+	} );
+
+	it( 'should be able to create a post with multiple paragraph blocks', async () => {
+		await editorPage.addNewBlock( blockNames.paragraph );
+		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+			blockNames.paragraph
+		);
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		} else {
+			await editorPage.clickParagraphBlockAtPosition( 1 );
+		}
+
+		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
+
+		for ( let i = 3; i > 0; i-- ) {
+			await editorPage.removeBlockAtPosition( blockNames.paragraph, i );
+		}
 	} );
 
 	it( 'should be able to merge blocks with unknown html elements', async () => {
@@ -170,23 +186,5 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		expect( text.length ).not.toEqual( 0 );
 
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
-	} );
-
-	it( 'should be able to create a post with multiple paragraph blocks', async () => {
-		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
-			blockNames.paragraph
-		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		} else {
-			await editorPage.clickParagraphBlockAtPosition( 1 );
-		}
-
-		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
-
-		for ( let i = 3; i > 0; i-- ) {
-			await editorPage.removeBlockAtPosition( blockNames.paragraph, i );
-		}
 	} );
 } );

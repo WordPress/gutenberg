@@ -37,21 +37,15 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.dismissKeyboard();
 		}
 		await editorPage.addNewBlock( blockNames.paragraph );
-
-		// Adding this condition to separate iOS and Android, not sure why but this is the combination that works for both platforms.
 		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
 			2
 		);
-
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
-			testData.shortText
-		);
+		await editorPage.sendTextToParagraphBlock( 2, testData.shortText );
 
 		// skip HTML check for Android since we couldn't add image from media library
 		/* eslint-disable jest/no-conditional-expect */

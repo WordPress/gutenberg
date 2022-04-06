@@ -62,7 +62,6 @@ describe( 'Gutenberg Editor tests', () => {
 			blockNames.paragraph,
 			5
 		);
-
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			testData.mediumText

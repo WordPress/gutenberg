@@ -29,7 +29,6 @@ describe( 'Gutenberg Editor paste tests', () => {
 		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph
 		);
-
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
@@ -60,7 +59,6 @@ describe( 'Gutenberg Editor paste tests', () => {
 			blockNames.paragraph,
 			2
 		);
-
 		if ( isAndroid() ) {
 			await secondParagraphBlockElement.click();
 		}
@@ -109,22 +107,22 @@ describe( 'Gutenberg Editor paste tests', () => {
 			// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
 			await editorPage.dismissAndroidClipboardSmartSuggestion();
 		}
-		const secondParagraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		const paragraphBlockElement2 = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
 			2
 		);
 		if ( isAndroid() ) {
-			await secondParagraphBlockElement.click();
+			await paragraphBlockElement2.click();
 		}
 
 		// Paste into second paragraph block.
 		await longPressMiddleOfElement(
 			editorPage.driver,
-			secondParagraphBlockElement
+			paragraphBlockElement2
 		);
 		await tapPasteAboveElement(
 			editorPage.driver,
-			secondParagraphBlockElement
+			paragraphBlockElement2
 		);
 
 		// Check styled text by verifying html contents.

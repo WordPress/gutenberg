@@ -287,8 +287,8 @@ const clickMiddleOfElement = async ( driver, element, isParagraph = false ) => {
 	const size = await element.getSize();
 
 	const action = await new wd.TouchAction( driver );
+	// Condition make it work on iOS Paragraph blocks, the default calculation somehow doesn't work just for this combination but worked for others.
 	if ( isParagraph === true && ! isAndroid() ) {
-		// To make it work on iOS Paragraph blocks, the default calculation somehow doesn't work just for this combination but worked for others.
 		action.press( { x: 183, y: 195 } );
 	} else {
 		action.press( { x: location.x + size.width / 2, y: location.y } );
