@@ -82,13 +82,13 @@ function HeaderToolbar( {
 
 	return (
 		<View
-			style={
-				( isDefaultView && styles.containerDefault,
+			style={ [
 				getStylesFromColorScheme(
 					styles.container,
 					styles.containerDark
-				) )
-			}
+				),
+				isDefaultView && styles.containerDefault,
+			] }
 		>
 			<ScrollView
 				ref={ scrollViewRef }
