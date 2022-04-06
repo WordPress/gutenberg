@@ -1,10 +1,11 @@
-.editor-post-excerpt__textarea {
-	width: 100%;
-	margin-bottom: 10px;
-}
+.edit-post-post-title {
+	font-size: 16px;
+	line-height: 1.6;
+	font-weight: 500;
+	margin: $grid-unit-15 0;
 
-.editor-post-excerpt {
 	// Focus style
+	width: 100%;
 	border-radius: $radius-block-ui - $border-width;
 
 	&:focus-within {

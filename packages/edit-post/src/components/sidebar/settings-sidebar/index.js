@@ -14,11 +14,10 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import SettingsHeader from '../settings-header';
+import PostSummary from '../post-summary';
 import PostStatus from '../post-status';
 import LastRevision from '../last-revision';
 import PostTaxonomies from '../post-taxonomies';
-import FeaturedImage from '../featured-image';
-import PostExcerpt from '../post-excerpt';
 import PostLink from '../post-link';
 import DiscussionPanel from '../discussion-panel';
 import PageAttributes from '../page-attributes';
@@ -85,14 +84,13 @@ const SettingsSidebar = () => {
 		>
 			{ ! isTemplateMode && sidebarName === 'edit-post/document' && (
 				<>
+					<PostSummary />
 					<PostStatus />
 					<Template />
 					<PluginDocumentSettingPanel.Slot />
 					<LastRevision />
 					<PostLink />
 					<PostTaxonomies />
-					<FeaturedImage />
-					<PostExcerpt />
 					<DiscussionPanel />
 					<PageAttributes />
 					<MetaBoxes location="side" />

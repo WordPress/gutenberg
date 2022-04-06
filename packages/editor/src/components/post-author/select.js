@@ -14,7 +14,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 import { AUTHORS_QUERY } from './constants';
 
-function PostAuthorSelect() {
+function PostAuthorSelect( { labelPosition } ) {
 	const { editPost } = useDispatch( editorStore );
 	const { postAuthor, authors } = useSelect( ( select ) => {
 		return {
@@ -46,6 +46,7 @@ function PostAuthorSelect() {
 			options={ authorOptions }
 			onChange={ setAuthorId }
 			value={ postAuthor }
+			labelPosition={ labelPosition }
 		/>
 	);
 }
