@@ -158,10 +158,10 @@ function gutenberg_register_gutenberg_patterns() {
 								<!-- /wp:social-links -->',
 		),
 		'author-biograhy-border' => array(
-			'title'         => _x( 'Post author biography with avatar and border', 'Block pattern title', 'gutenberg' ),
-			'categories'    => array( 'text' ),
-			'blockTypes'    => array( 'core/post-author-name', 'core/post-author-biography', 'core/avatar' ),
-			'content'       => '<!-- wp:group {"style":{"border":{"width":"1px","style":"solid"},"spacing":{"padding":{"top":"1rem","right":"1rem","bottom":"1rem","left":"1rem"}}},"borderColor":"cyan-bluish-gray","layout":{"type":"flex","justifyContent":"space-between","flexWrap":"nowrap"}} -->
+			'title'      => _x( 'Post author biography with avatar and border', 'Block pattern title', 'gutenberg' ),
+			'categories' => array( 'text' ),
+			'blockTypes' => array( 'core/post-author-name', 'core/post-author-biography', 'core/avatar' ),
+			'content'    => '<!-- wp:group {"style":{"border":{"width":"1px","style":"solid"},"spacing":{"padding":{"top":"1rem","right":"1rem","bottom":"1rem","left":"1rem"}}},"borderColor":"cyan-bluish-gray","layout":{"type":"flex","justifyContent":"space-between","flexWrap":"nowrap"}} -->
 								<div class="wp-block-group has-border-color has-cyan-bluish-gray-border-color" style="border-style:solid;border-width:1px;padding-top:1rem;padding-right:1rem;padding-bottom:1rem;padding-left:1rem">
 								<!-- wp:group --><div class="wp-block-group">
 								<!-- wp:post-author-name {"isLink":true,"style":{"typography":{"fontStyle":"normal","fontWeight":"600"}}} /--><!-- wp:post-author-biography {"fontSize":"small"} /-->
