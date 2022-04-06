@@ -236,6 +236,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'typography' => array(
 				'lineHeight' => true,
 			),
+			'appearanceTools' => true,
 			'blocks'     => array(
 				'core/paragraph' => array(
 					'typography' => array(
