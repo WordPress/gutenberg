@@ -152,15 +152,7 @@ class WP_Webfonts {
 		$slug = $this->get_font_slug( $font_family_name );
 
 		if ( isset( $this->enqueued_webfonts[ $slug ] ) ) {
-			trigger_error(
-				sprintf(
-					/* translators: %s unique slug to identify the font family of the webfont */
-					__( 'The "%s" font family is already enqueued.', 'gutenberg' ),
-					$slug
-				)
-			);
-
-			return false;
+			return true;
 		}
 
 		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
