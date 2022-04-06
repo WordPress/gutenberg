@@ -157,7 +157,7 @@ function gutenberg_register_gutenberg_patterns() {
 								<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
 								<!-- /wp:social-links -->',
 		),
-		'author-biograhy-border'             => array(
+		'author-biograhy-border'               => array(
 			'title'      => _x( 'Post author biography with avatar and border', 'Block pattern title', 'gutenberg' ),
 			'categories' => array( 'text' ),
 			'blockTypes' => array( 'core/post-author-name', 'core/post-author-biography', 'core/avatar' ),
