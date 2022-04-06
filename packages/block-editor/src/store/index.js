@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { createReduxStore, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -33,6 +33,11 @@ export const storeConfig = {
  */
 export const store = createReduxStore( STORE_NAME, {
 	...storeConfig,
+	persist: [ 'preferences' ],
 } );
 
-register( store );
+// Ideally we'd use register instead of register stores.
+registerStore( STORE_NAME, {
+	...storeConfig,
+	persist: [ 'preferences' ],
+} );

@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-import { SETTINGS_DEFAULTS as SETTINGS } from './defaults.js';
+import {
+	PREFERENCES_DEFAULTS,
+	SETTINGS_DEFAULTS as SETTINGS,
+} from './defaults.js';
 
 const SETTINGS_DEFAULTS = {
 	...SETTINGS,
@@ -20,4 +23,4 @@ const SETTINGS_DEFAULTS = {
 	},
 };
 
-export { SETTINGS_DEFAULTS };
+export { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS };

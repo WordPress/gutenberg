@@ -52,7 +52,6 @@
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",
-		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/shortcode": "file:../shortcode",
 		"@wordpress/style-engine": "file:../style-engine",

@@ -11,7 +11,6 @@ import {
 } from '@wordpress/blocks';
 
 import { store as coreStore } from '@wordpress/core-data';
-import { store as preferencesStore } from '@wordpress/preferences';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -32,7 +31,6 @@ function createRegistryWithStores() {
 	registry.register( blockEditorStore );
 	registry.register( reusableBlocksStore );
 	registry.register( blocksStore );
-	registry.register( preferencesStore );
 
 	// Register entity here instead of mocking API handlers for loadPostTypeEntities()
 	registry.dispatch( coreStore ).addEntities( [

@@ -639,12 +639,6 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 		{ from: 'core/edit-site', scope: 'core/edit-site' },
 		'editorMode'
 	);
-	migrateIndividualPreferenceToPreferencesStore(
-		persistence,
-		{ from: 'core/block-editor', scope: 'core' },
-		'insertUsage'
-	);
-
 	migrateInterfaceEnableItemsToPreferencesStore( persistence );
 };
 

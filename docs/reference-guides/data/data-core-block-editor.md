@@ -1632,14 +1632,6 @@ _Returns_
 
 -   `Object`: Action object
 
-### updateInsertUsage
-
-Updates the inserter usage statistics in the preferences store.
-
-_Parameters_
-
--   _blocks_ `Array`: The array of blocks that were inserted.
-
 ### updateSettings
 
 Action that updates the block editor settings.
