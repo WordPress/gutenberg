@@ -120,10 +120,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 			editorPage.driver,
 			paragraphBlockElement2
 		);
-		await tapPasteAboveElement(
-			editorPage.driver,
-			paragraphBlockElement2
-		);
+		await tapPasteAboveElement( editorPage.driver, paragraphBlockElement2 );
 
 		// Check styled text by verifying html contents.
 		const html = await editorPage.getHtmlContent();
