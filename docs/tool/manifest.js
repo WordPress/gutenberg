@@ -15,28 +15,49 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 		'packages/components/src/view/README.md',
 	],
 } );
-const packagePaths = glob( 'packages/*/package.json' )
-	.filter(
-		// Ignore private packages.
-		( fileName ) =>
-			! require( join( __dirname, '..', '..', fileName ) ).private
-	)
-	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
+const packagePaths = glob( 'packages/*/**/README.md', {
+	ignore: [
+		'packages/components/*/**/README.md',
+		'**/node_modules/**/README.md',
+	],
+} ).filter(
+	// Ignore private packages.
+	( fileName ) => {
+		const packageJsonPath = join(
+			__dirname,
+			'..',
+			'..',
+			'packages',
+			fileName.split( '/' )[ 1 ],
+			'package.json'
+		);
+		return ! require( packageJsonPath ).private;
+	}
+);
 
 /**
  * Generates the package manifest.
  *
- * @param {Array} packageFolderNames Package folder names.
+ * @param {Array} paths Paths for all packages
  *
  * @return {Array} Manifest
  */
-function getPackageManifest( packageFolderNames ) {
-	return packageFolderNames.map( ( folderName ) => {
-		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
+function getPackageManifest( paths ) {
+	return paths.map( ( filePath ) => {
+		const slug = nth( filePath.split( '/' ), -2 );
+		if ( nth( filePath.split( '/' ), -3 ) === 'packages' ) {
+			// Top-level package README.md
+			return {
+				title: `@wordpress/${ slug }`,
+				slug: `packages-${ slug }`,
+				markdown_source: `${ baseRepoUrl }/${ filePath }`,
+				parent: 'packages',
+			};
+		}
 		return {
-			title: `@wordpress/${ folderName }`,
-			slug: `packages-${ folderName }`,
-			markdown_source: path,
+			title: upperFirst( camelCase( slug ) ),
+			slug,
+			markdown_source: `${ baseRepoUrl }/${ filePath }`,
 			parent: 'packages',
 		};
 	} );
