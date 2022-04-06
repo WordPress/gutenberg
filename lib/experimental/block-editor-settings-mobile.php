@@ -23,11 +23,11 @@ function gutenberg_get_block_editor_settings_mobile( $settings ) {
 		'mobile' === $_GET['context']
 	) {
 		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			$settings['__experimentalStyles']             = gutenberg_get_global_styles();
+			$settings['__experimentalStyles'] = gutenberg_get_global_styles();
 		}
 
 		// To be set to true when the web makes quote v2 (inner blocks) the default.
-		// See https://github.com/WordPress/gutenberg/pull/25892
+		// See https://github.com/WordPress/gutenberg/pull/25892.
 		$settings['__experimentalEnableQuoteBlockV2'] = false;
 	}
 

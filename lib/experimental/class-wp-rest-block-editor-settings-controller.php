@@ -157,7 +157,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				),
 
 				'__experimentalEnableQuoteBlockV2'       => array(
-					'description' => _( 'Whether the V2 of the quote block that uses inner blocks should be enabled.', 'gutenberg' ),
+					'description' => __( 'Whether the V2 of the quote block that uses inner blocks should be enabled.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'mobile' ),
 				),
