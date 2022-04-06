@@ -41,7 +41,8 @@ function gutenberg_configure_persisted_preferences() {
 		'wp-preferences',
 		sprintf(
 			'const serverData = %s;
-			const localStorageRestoreKey = "WP_PREFERENCES_USER_%s";
+			const userId = "%s";
+			const localStorageRestoreKey = `WP_PREFERENCES_USER_${ userId }`;
 			const localData = JSON.parse(
 				localStorage.getItem( localStorageRestoreKey )
 			);
@@ -54,7 +55,9 @@ function gutenberg_configure_persisted_preferences() {
 			} else if ( localData ) {
 				preloadedData = localData;
 			} else {
-				preloadedData = {};
+				// Check if there is data in the old format.
+				const { __unstableConvertFromLocalStorage } = wp.databasePersistenceLayer;
+				preloadedData = __unstableConvertFromLocalStorage( userId );
 			}
 
 			const { create } = wp.databasePersistenceLayer;
