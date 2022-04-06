@@ -120,6 +120,23 @@ html.interface-interface-skeleton__html-container {
 	}
 }
 
+.is-distraction-free {
+
+	.interface-interface-skeleton__secondary-sidebar,
+	&.is-sidebar-opened .interface-interface-skeleton__sidebar {
+		border: $border-width solid $gray-200;
+		margin: $grid-unit-15;
+		border-radius: 2px;
+	}
+
+	.interface-interface-skeleton__body {
+		margin-top: -60px;
+
+		.interface-interface-skeleton__content {
+			padding-top: 60px;
+		}
+	}
+}
 .interface-interface-skeleton__secondary-sidebar {
 	@include break-medium() {
 		border-right: $border-width solid $gray-200;

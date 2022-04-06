@@ -136,6 +136,7 @@ function Layout( { styles } ) {
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,
+		'is-distraction-free': hasReducedUI,
 	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
