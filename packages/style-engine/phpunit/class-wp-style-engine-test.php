@@ -131,7 +131,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'expected_output' => 'padding-top:42px;padding-left:2%;padding-bottom:44px;padding-right:5rem;',
 			),
 
-			'inline_valid_multiple_style'                  => array(
+			'inline_valid_multiple_spacing_style'          => array(
 				'block_styles'    => array(
 					'spacing' => array(
 						'padding' => array(
@@ -152,6 +152,25 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'inline' => true,
 				),
 				'expected_output' => 'padding-top:42px;padding-left:2%;padding-bottom:44px;padding-right:5rem;margin-top:12rem;margin-left:2vh;margin-bottom:2px;margin-right:10em;',
+			),
+
+			'inline_valid_multiple_typography_style'       => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontSize'       => 'clamp(2em, 2vw, 4em)',
+						'fontFamily'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
+						'fontStyle'      => 'italic',
+						'fontWeight'     => '800',
+						'lineHeight'     => '1.3',
+						'textDecoration' => 'underline',
+						'textTransform'  => 'uppercase',
+						'letterSpacing'  => '2',
+					),
+				),
+				'options'         => array(
+					'inline' => true,
+				),
+				'expected_output' => 'font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
 			),
 		);
 	}
