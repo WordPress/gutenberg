@@ -437,7 +437,6 @@ export default compose( [
 			insertionIndexEnd,
 			isAnyBlockSelected: !! isAnyBlockSelected,
 			isSelectedBlockReplaceable: isSelectedUnmodifiedDefaultBlock,
-			isDefaultView: ! isAnyBlockSelected,
 		};
 	} ),
 

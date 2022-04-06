@@ -12,6 +12,10 @@
 	border-top-color: $background-dark-elevated;
 }
 
+.containerDefault {
+	height: $mobile-header-toolbar-default-height;
+}
+
 .scrollableContent {
 	flex-grow: 1; // Fixes RTL issue on Android.
 }

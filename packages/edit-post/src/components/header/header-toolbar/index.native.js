@@ -40,6 +40,7 @@ function HeaderToolbar( {
 	getStylesFromColorScheme,
 	onHideKeyboard,
 	isRTL,
+	isDefaultView,
 } ) {
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
@@ -81,10 +82,13 @@ function HeaderToolbar( {
 
 	return (
 		<View
-			style={ getStylesFromColorScheme(
-				styles.container,
-				styles.containerDark
-			) }
+			style={
+				( isDefaultView && styles.containerDefault,
+				getStylesFromColorScheme(
+					styles.container,
+					styles.containerDark
+				) )
+			}
 		>
 			<ScrollView
 				ref={ scrollViewRef }
@@ -95,7 +99,10 @@ function HeaderToolbar( {
 				alwaysBounceHorizontal={ false }
 				contentContainerStyle={ styles.scrollableContent }
 			>
-				<Inserter disabled={ ! showInserter } />
+				<Inserter
+					disabled={ ! showInserter }
+					isDefaultView={ isDefaultView }
+				/>
 				{ renderHistoryButtons() }
 				<BlockToolbar />
 			</ScrollView>
@@ -121,8 +128,10 @@ export default compose( [
 			getBlockRootClientId,
 			getBlockSelectionEnd,
 			hasInserterItems,
+			getSelectedBlockClientId,
 		} = select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
+		const isAnyBlockSelected = getSelectedBlockClientId();
 		return {
 			hasRedo: select( editorStore ).hasEditorRedo(),
 			hasUndo: select( editorStore ).hasEditorUndo(),
@@ -136,6 +145,7 @@ export default compose( [
 			isTextModeEnabled:
 				select( editPostStore ).getEditorMode() === 'text',
 			isRTL: select( blockEditorStore ).getSettings().isRTL,
+			isDefaultView: ! isAnyBlockSelected,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
