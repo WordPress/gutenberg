@@ -15,12 +15,30 @@ import Button from '../../button';
 import { Heading } from '../../heading';
 import { ConfirmDialog } from '..';
 
+const daText = () =>
+	text( 'message', 'Would you like to privately publish the post now?' );
+
 export default {
 	component: ConfirmDialog,
 	title: 'Components (Experimental)/ConfirmDialog',
 	argTypes: {
 		children: {
 			type: 'reactNode',
+		},
+		jsxChildren: {
+			type: 'select',
+			options: [
+				'<b>Bold text</b>',
+				'<i>Italic text</i>',
+				'<Heading level={ 2 }>A JSX Heading</Heading>',
+			],
+			mapping: {
+				'<b>Bold text</b>': <b>Bold text</b>,
+				'<i>Italic text</i>': <i>Italic text</i>,
+				'<Heading level={ 2 }>A JSX Heading</Heading>': (
+					<Heading level={ 2 }>A JSX Heading</Heading>
+				),
+			},
 		},
 		title: {
 			type: 'string',
@@ -35,19 +53,18 @@ export default {
 			type: 'boolean',
 		},
 	},
+	args: {
+		children: daText(),
+	},
+	parameters: {
+		controls: { exclude: [ 'jsxChildren' ] },
+	},
 };
-
-const daText = () =>
-	text( 'message', 'Would you like to privately publish the post now?' );
 
 const Template = ( args ) => {
 	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
 	const confirmOutput = args.confirmOutput ?? 'Confirmed!';
-	const modalText = args.jsxMessage ? (
-		<Heading level={ 2 }>{ args.children }</Heading>
-	) : (
-		args.children
-	);
+	const children = args.jsxChildren ?? args.children;
 
 	return (
 		<>
@@ -62,7 +79,7 @@ const Template = ( args ) => {
 				cancelButtonText={ args.cancelButtonText }
 				confirmButtonText={ args.confirmButtonText }
 			>
-				{ modalText }
+				{ children }
 			</ConfirmDialog>
 
 			<Heading level={ 1 }>{ confirmVal }</Heading>
@@ -91,15 +108,13 @@ withCustomButtonLabels.args = {
 	confirmButtonText: 'Yes please!',
 };
 
-// To use a JSX message, wrap your text in the appropriate JSX tags.
+// JSX elements can be passed as children to further customize the dialog.
 export const WithJSXMessage = Template.bind( {} );
 WithJSXMessage.args = {
-	children: daText(),
-	jsxMessage: true,
+	jsxChildren: '<Heading level={ 2 }>A JSX Heading</Heading>',
 };
-// Hide the jsxMessage control, as it isn't an actual prop
 WithJSXMessage.parameters = {
-	controls: { exclude: [ 'jsxMessage' ] },
+	controls: { exclude: [ 'children' ] },
 };
 
 export const VeeeryLongMessage = Template.bind( {} );
