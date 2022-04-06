@@ -498,64 +498,55 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	}
 
 	protected static function use_appearance_tools_setting( $theme_json ) {
-		// Top-level settings.
-		$all_opt_ins_are_set = true;
-		foreach( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
-			$full_path = array_merge( array( 'settings' ), $opt_in_path );
-			// Use "unset prop" as a marker instead of "null" because
-			// "null" can be a valid value for some props (e.g. blockGap).
-			$opt_in_value = _wp_array_get( $theme_json, $full_path, 'unset prop' );
-			if ( 'unset prop' === $opt_in_value ) {
-				$all_opt_ins_are_set = false;
-				break;
-			}
-		}
-
-		if ( $all_opt_ins_are_set ) {
-			_wp_array_set( $theme_json, array( 'settings', 'appearanceTools'), true );
+		$nodes = static::get_setting_nodes( $theme_json );
+		foreach ( $nodes as $node ) {
+			$all_opt_ins_are_set = true;
 			foreach( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
-				$full_path = array_merge( array( 'settings' ), $opt_in_path );
+				$full_path = array_merge( $node['path'], $opt_in_path );
 				// Use "unset prop" as a marker instead of "null" because
 				// "null" can be a valid value for some props (e.g. blockGap).
 				$opt_in_value = _wp_array_get( $theme_json, $full_path, 'unset prop' );
-				if ( true === $opt_in_value ) {
-					// This could be improved to be independent from the size of the opt in path.
-					// At the moment it relies on all opt-ins having a path of size 2.
-					unset( $theme_json['settings'][ $opt_in_path[0] ][ $opt_in_path[1] ]);
-					if ( empty( $theme_json['settings'][ $opt_in_path[0]] ) ) {
-						unset( $theme_json['settings'][ $opt_in_path[0] ]);
-					}
+				if ( 'unset prop' === $opt_in_value ) {
+					$all_opt_ins_are_set = false;
+					break;
 				}
 			}
-		}
 
-		// Block-level settings.
-		if ( isset( $theme_json['settings']['blocks'] ) && is_array( $theme_json['settings']['blocks'] ) ) {
-			foreach ( $theme_json['settings']['blocks'] as &$block ) {
-				$all_opt_ins_are_set = true;
+			if ( $all_opt_ins_are_set ) {
+				_wp_array_set( $theme_json, array_merge( $node['path'], array( 'appearanceTools' ) ), true );
 				foreach( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
+					$full_path = array_merge( $node['path'], $opt_in_path );
 					// Use "unset prop" as a marker instead of "null" because
 					// "null" can be a valid value for some props (e.g. blockGap).
-					$opt_in_value = _wp_array_get( $block, $opt_in_path, 'unset prop' );
-					if ( 'unset prop' === $opt_in_value ) {
-						$all_opt_ins_are_set = false;
-						break;
+					$opt_in_value = _wp_array_get( $theme_json, $full_path, 'unset prop' );
+					if ( true !== $opt_in_value ) {
+						continue;
 					}
-				}
-		
-				if ( $all_opt_ins_are_set ) {
-					_wp_array_set( $block, array( 'appearanceTools'), true );
-					foreach( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
-						// Use "unset prop" as a marker instead of "null" because
-						// "null" can be a valid value for some props (e.g. blockGap).
-						$opt_in_value = _wp_array_get( $block, $opt_in_path, 'unset prop' );
-						if ( true === $opt_in_value ) {
-							// This could be improved to be independent from the size of the opt in path.
-							// At the moment it relies on all opt-ins having a path of size 2.
-							unset( $block[ $opt_in_path[0] ][ $opt_in_path[1] ]);
-							if ( empty( $block[ $opt_in_path[0]] ) ) {
-								unset( $block[ $opt_in_path[0] ]);
-							}
+
+					// The following could be improved to be path independent.
+					// At the moment it relies on a couple of assumptions:
+					//
+					// - all opt-ins having a path of size 2
+					// - there's two sources of settings: the top-level and the block-level
+					if (
+						( 1 === count( $node['path'] ) ) &&
+						( 'settings' === $node['path'][0] )
+					) {
+						// Top-level settings.
+						unset( $theme_json['settings'][ $opt_in_path[0] ][ $opt_in_path[1] ] );
+						if ( empty( $theme_json['settings'][ $opt_in_path[0] ] ) ) {
+							unset( $theme_json['settings'][ $opt_in_path[0] ] );
+						}
+					} else if (
+						( 3 === count( $node['path'] ) ) &&
+						( 'settings' === $node['path'][0] ) &&
+						( 'blocks' === $node['path'][1] )
+					) {
+						// Block-level settings.
+						$block_name = $node['path'][2];
+						unset( $theme_json['settings']['blocks'][ $block_name ][ $opt_in_path[0] ][ $opt_in_path[1] ] );
+						if ( empty( $theme_json['settings']['blocks'][ $block_name ][ $opt_in_path[0] ] ) ) {
+							unset( $theme_json['settings']['blocks'][ $block_name ][ $opt_in_path[0] ] );
 						}
 					}
 				}
