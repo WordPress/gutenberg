@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * Internal dependencies
  */
-import InputControl from '../';
+import InputControl from '..';
 
-export default {
+const meta: ComponentMeta< typeof InputControl > = {
 	title: 'Components (Experimental)/InputControl',
 	component: InputControl,
 	argTypes: {
@@ -19,8 +24,11 @@ export default {
 		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-const Template = ( args ) => <InputControl { ...args } />;
+const Template: ComponentStory< typeof InputControl > = ( args ) => (
+	<InputControl { ...args } />
+);
 
 export const Default = Template.bind( {} );
 Default.args = {
