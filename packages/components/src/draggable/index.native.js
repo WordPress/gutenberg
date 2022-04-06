@@ -27,7 +27,7 @@ import { Platform } from '@wordpress/element';
 export default function Draggable( {
 	children,
 	maxDistance = 1000,
-	minDuration = 500,
+	minDuration = 450,
 	onDragEnd,
 	onDragOver,
 	onDragStart,
