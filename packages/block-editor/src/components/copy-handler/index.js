@@ -11,7 +11,7 @@ import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
 } from '@wordpress/dom';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useRefEffect } from '@wordpress/compose';
@@ -73,15 +73,24 @@ export function useNotifyCopy() {
 }
 
 export function useClipboardHandler() {
+	const registry = useRegistry();
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
+		getSelectionStart,
+		getSelectionEnd,
+		getSelectedBlocksInitialCaretPosition,
+		__unstableIsFullySelected,
+		__unstableGetSelectedBlocksWithPartialSelection,
 	} = useSelect( blockEditorStore );
-	const { flashBlock, removeBlocks, replaceBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const {
+		flashBlock,
+		removeBlocks,
+		selectionChange,
+		replaceBlocks,
+	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
 	return useRefEffect( ( node ) => {
@@ -121,7 +130,24 @@ export function useClipboardHandler() {
 					flashBlock( selectedBlockClientIds[ 0 ] );
 				}
 				notifyCopy( event.type, selectedBlockClientIds );
-				const blocks = getBlocksByClientId( selectedBlockClientIds );
+				let blocks;
+
+				// Check if we have partial selection.
+				if ( ! __unstableIsFullySelected() ) {
+					const [
+						head,
+						tail,
+					] = __unstableGetSelectedBlocksWithPartialSelection();
+					const inBetweenBlocks = getBlocksByClientId(
+						selectedBlockClientIds.slice(
+							1,
+							selectedBlockClientIds.length - 1
+						)
+					);
+					blocks = [ head, ...inBetweenBlocks, tail ];
+				} else {
+					blocks = getBlocksByClientId( selectedBlockClientIds );
+				}
 				const serialized = serialize( blocks );
 
 				event.clipboardData.setData( 'text/plain', serialized );
@@ -129,7 +155,39 @@ export function useClipboardHandler() {
 			}
 
 			if ( event.type === 'cut' ) {
-				removeBlocks( selectedBlockClientIds );
+				// Check if we have partial selection.
+				if ( ! __unstableIsFullySelected() ) {
+					const selectionAnchor = getSelectionStart();
+					const selectionFocus = getSelectionEnd();
+					const updatedBlocks = __unstableGetSelectedBlocksWithPartialSelection(
+						false
+					);
+					// We need to know the top block to restore selection there,
+					// independently of where the selection started.
+					const topBlockSelection = [
+						selectionAnchor,
+						selectionFocus,
+					].find(
+						( { clientId } ) =>
+							clientId === updatedBlocks[ 0 ].clientId
+					);
+					registry.batch( () => {
+						selectionChange(
+							topBlockSelection.clientId,
+							topBlockSelection.attributeKey,
+							topBlockSelection.offset,
+							topBlockSelection.offset
+						);
+						replaceBlocks(
+							selectedBlockClientIds,
+							updatedBlocks,
+							0, // Select top block.
+							getSelectedBlocksInitialCaretPosition()
+						);
+					} );
+				} else {
+					removeBlocks( selectedBlockClientIds );
+				}
 			} else if ( event.type === 'paste' ) {
 				if ( eventDefaultPrevented ) {
 					// This was likely already handled in rich-text/use-paste-handler.js.
