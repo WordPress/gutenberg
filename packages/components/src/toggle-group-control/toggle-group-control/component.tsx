@@ -10,8 +10,8 @@ import useResizeAware from 'react-resize-aware';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useMemo } from '@wordpress/element';
-import { useMergeRefs, useInstanceId, usePrevious } from '@wordpress/compose';
+import { useMemo } from '@wordpress/element';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -48,7 +48,6 @@ function ToggleGroupControl(
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
 	const cx = useCx();
-	const containerRef = useRef();
 	const [ resizeListener, sizes ] = useResizeAware();
 	const baseId = useInstanceId(
 		ToggleGroupControl,
@@ -104,7 +103,7 @@ function ToggleGroupControl(
 					as={ View }
 					className={ classes }
 					{ ...otherProps }
-					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+					ref={ forwardedRef }
 				>
 					{ resizeListener }
 					<ToggleGroupControlBackdrop containerSizes={ sizes } />
