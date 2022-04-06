@@ -13,6 +13,7 @@ const variations = [
 		scope: [ 'transform' ],
 		isActive: ( blockAttributes ) =>
 			! blockAttributes.layout ||
+			! blockAttributes.layout?.type ||
 			blockAttributes.layout?.type === 'default',
 		icon: group,
 	},
