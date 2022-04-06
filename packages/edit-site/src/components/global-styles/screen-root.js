@@ -47,13 +47,11 @@ function ScreenRoot() {
 						<NavigationButton path="/variations">
 							<HStack justify="space-between">
 								<FlexItem>{ __( 'Browse styles' ) }</FlexItem>
-								<FlexItem>
-									<IconWithCurrentColor
-										icon={
-											isRTL() ? chevronLeft : chevronRight
-										}
-									/>
-								</FlexItem>
+								<IconWithCurrentColor
+									icon={
+										isRTL() ? chevronLeft : chevronRight
+									}
+								/>
 							</HStack>
 						</NavigationButton>
 					) }
@@ -76,13 +74,9 @@ function ScreenRoot() {
 					<NavigationButton path="/blocks">
 						<HStack justify="space-between">
 							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
-							<FlexItem>
-								<IconWithCurrentColor
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
-								/>
-							</FlexItem>
+							<IconWithCurrentColor
+								icon={ isRTL() ? chevronLeft : chevronRight }
+							/>
 						</HStack>
 					</NavigationButton>
 				</ItemGroup>

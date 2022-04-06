@@ -103,19 +103,16 @@ describe( 'Meta boxes', () => {
 
 		// Open the excerpt panel.
 		await openDocumentSettingsSidebar();
-		const excerptButton = await findSidebarPanelToggleButtonWithTitle(
-			'Excerpt'
+		const summaryButton = await findSidebarPanelToggleButtonWithTitle(
+			'Summary'
 		);
-		if ( excerptButton ) {
-			await excerptButton.click( 'button' );
+		if ( summaryButton ) {
+			await summaryButton.click( 'button' );
 		}
 
-		await page.waitForSelector( '.editor-post-excerpt textarea' );
+		await page.waitForSelector( '.editor-post-excerpt p' );
 
-		await page.type(
-			'.editor-post-excerpt textarea',
-			'Explicitly set excerpt.'
-		);
+		await page.type( '.editor-post-excerpt p', 'Explicitly set excerpt.' );
 
 		await publishPost();
 
