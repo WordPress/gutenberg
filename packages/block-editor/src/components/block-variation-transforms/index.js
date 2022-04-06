@@ -96,32 +96,24 @@ function VariationsDropdown( {
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { variations, blockAttributes, blockName } = useSelect(
+	const { activeBlockVariation, variations } = useSelect(
 		( select ) => {
-			const { getBlockVariations } = select( blocksStore );
+			const { getActiveBlockVariation, getBlockVariations } = select(
+				blocksStore
+			);
 			const { getBlockName, getBlockAttributes } = select(
 				blockEditorStore
 			);
 			const name = blockClientId && getBlockName( blockClientId );
 			return {
-				blockAttributes: getBlockAttributes( blockClientId ),
-				blockName: name,
+				activeBlockVariation: getActiveBlockVariation(
+					name,
+					getBlockAttributes( blockClientId )
+				),
 				variations: name && getBlockVariations( name, 'transform' ),
 			};
 		},
 		[ blockClientId ]
-	);
-	const { activeBlockVariation } = useSelect(
-		( select ) => {
-			const { getActiveBlockVariation } = select( blocksStore );
-			return {
-				activeBlockVariation: getActiveBlockVariation(
-					blockName,
-					blockAttributes
-				),
-			};
-		},
-		[ blockAttributes, blockName ]
 	);
 
 	const selectedValue = activeBlockVariation?.name;
@@ -149,21 +141,10 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	// Skip rendering if there are no variations
 	if ( ! variations?.length ) return null;
 
-	// If each variation has a unique icon, then render the variations as a set of buttons.
-	if ( hasUniqueIcons ) {
-		return (
-			<VariationsButtons
-				className={ baseClass }
-				onSelectVariation={ onSelectVariation }
-				selectedValue={ selectedValue }
-				variations={ variations }
-			/>
-		);
-	}
+	const Component = hasUniqueIcons ? VariationsButtons : VariationsDropdown;
 
-	// Fallback to a dropdown list of options if each variation does not have a unique icon.
 	return (
-		<VariationsDropdown
+		<Component
 			className={ baseClass }
 			onSelectVariation={ onSelectVariation }
 			selectedValue={ selectedValue }
