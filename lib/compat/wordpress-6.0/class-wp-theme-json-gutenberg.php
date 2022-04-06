@@ -444,12 +444,37 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	 * @return array
 	 */
 	public function get_data() {
-		$flattened_theme_json = $this->theme_json;
-		$nodes                = static::get_setting_nodes( $this->theme_json );
+		$output = $this->theme_json;
+		$nodes  = static::get_setting_nodes( $output );
+
+		// Flatten the theme & custom origins into a single one.
+		//
+		// For example, the following:
+		//
+		// {
+		//   "settings": {
+		//     "color": {
+		//       "palette": {
+		//         "theme": [ {} ],
+		//         "custom": [ {} ]
+		//       }
+		//     }
+		//   }
+		// }
+		//
+		// will be converted to:
+		//
+		// {
+		//   "settings": {
+		//     "color": {
+		//       "palette": [ {} ]
+		//     }
+		//   }
+		// }
 		foreach ( $nodes as $node ) {
 			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
-				$preset = _wp_array_get( $flattened_theme_json, $path, null );
+				$preset = _wp_array_get( $output, $path, null );
 				if ( null === $preset ) {
 					continue;
 				}
@@ -473,39 +498,19 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 				foreach ( $items as $slug => $value ) {
 					$flattened_preset[] = array_merge( array( 'slug' => $slug ), $value );
 				}
-				_wp_array_set( $flattened_theme_json, $path, $flattened_preset );
+				_wp_array_set( $output, $path, $flattened_preset );
 			}
 		}
 
-		$flattened_theme_json = static::use_appearance_tools_setting( $flattened_theme_json );
-
-		wp_recursive_ksort( $flattened_theme_json );
-
-
-		return $flattened_theme_json;
-	}
-
-	protected static function do_opt_in_into_settings( &$context ) {
-		foreach ( static::APPEARANCE_TOOLS_OPT_INS as $path ) {
-			// Use "unset prop" as a marker instead of "null" because
-			// "null" can be a valid value for some props (e.g. blockGap).
-			if ( 'unset prop' === _wp_array_get( $context, $path, 'unset prop' ) ) {
-				_wp_array_set( $context, $path, true );
-			}
-		}
-
-		unset( $context['appearanceTools'] );
-	}
-
-	protected static function use_appearance_tools_setting( $theme_json ) {
-		$nodes = static::get_setting_nodes( $theme_json );
+		// If all of the static::APPEARANCE_TOOLS_OPT_INS are true,
+		// this code unsets them and sets 'appearanceTools' instead.
 		foreach ( $nodes as $node ) {
 			$all_opt_ins_are_set = true;
 			foreach( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
 				$full_path = array_merge( $node['path'], $opt_in_path );
 				// Use "unset prop" as a marker instead of "null" because
 				// "null" can be a valid value for some props (e.g. blockGap).
-				$opt_in_value = _wp_array_get( $theme_json, $full_path, 'unset prop' );
+				$opt_in_value = _wp_array_get( $output, $full_path, 'unset prop' );
 				if ( 'unset prop' === $opt_in_value ) {
 					$all_opt_ins_are_set = false;
 					break;
@@ -513,12 +518,12 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 
 			if ( $all_opt_ins_are_set ) {
-				_wp_array_set( $theme_json, array_merge( $node['path'], array( 'appearanceTools' ) ), true );
+				_wp_array_set( $output, array_merge( $node['path'], array( 'appearanceTools' ) ), true );
 				foreach( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
 					$full_path = array_merge( $node['path'], $opt_in_path );
 					// Use "unset prop" as a marker instead of "null" because
 					// "null" can be a valid value for some props (e.g. blockGap).
-					$opt_in_value = _wp_array_get( $theme_json, $full_path, 'unset prop' );
+					$opt_in_value = _wp_array_get( $output, $full_path, 'unset prop' );
 					if ( true !== $opt_in_value ) {
 						continue;
 					}
@@ -533,9 +538,9 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 						( 'settings' === $node['path'][0] )
 					) {
 						// Top-level settings.
-						unset( $theme_json['settings'][ $opt_in_path[0] ][ $opt_in_path[1] ] );
-						if ( empty( $theme_json['settings'][ $opt_in_path[0] ] ) ) {
-							unset( $theme_json['settings'][ $opt_in_path[0] ] );
+						unset( $output['settings'][ $opt_in_path[0] ][ $opt_in_path[1] ] );
+						if ( empty( $output['settings'][ $opt_in_path[0] ] ) ) {
+							unset( $output['settings'][ $opt_in_path[0] ] );
 						}
 					} else if (
 						( 3 === count( $node['path'] ) ) &&
@@ -544,15 +549,30 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 					) {
 						// Block-level settings.
 						$block_name = $node['path'][2];
-						unset( $theme_json['settings']['blocks'][ $block_name ][ $opt_in_path[0] ][ $opt_in_path[1] ] );
-						if ( empty( $theme_json['settings']['blocks'][ $block_name ][ $opt_in_path[0] ] ) ) {
-							unset( $theme_json['settings']['blocks'][ $block_name ][ $opt_in_path[0] ] );
+						unset( $output['settings']['blocks'][ $block_name ][ $opt_in_path[0] ][ $opt_in_path[1] ] );
+						if ( empty( $output['settings']['blocks'][ $block_name ][ $opt_in_path[0] ] ) ) {
+							unset( $output['settings']['blocks'][ $block_name ][ $opt_in_path[0] ] );
 						}
 					}
 				}
 			}
 		}
 
-		return $theme_json;
+		wp_recursive_ksort( $output );
+
+
+		return $output;
+	}
+
+	protected static function do_opt_in_into_settings( &$context ) {
+		foreach ( static::APPEARANCE_TOOLS_OPT_INS as $path ) {
+			// Use "unset prop" as a marker instead of "null" because
+			// "null" can be a valid value for some props (e.g. blockGap).
+			if ( 'unset prop' === _wp_array_get( $context, $path, 'unset prop' ) ) {
+				_wp_array_set( $context, $path, true );
+			}
+		}
+
+		unset( $context['appearanceTools'] );
 	}
 }
