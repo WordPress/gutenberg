@@ -40,7 +40,7 @@ function ListViewBlockSelectButton(
 	// inside the `useOnBlockDrop` hook.
 	const onDragStartHandler = ( event ) => {
 		event.dataTransfer.clearData();
-		onDragStart( event );
+		onDragStart?.( event );
 	};
 
 	function onKeyDownHandler( event ) {
