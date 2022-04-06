@@ -183,10 +183,6 @@ public class Gutenberg: UIResponder {
         sendEvent(.mediaAppend, body: data)
     }
 
-    public func setFocusOnTitle() {
-        bridgeModule.sendEventIfNeeded(.setFocusOnTitle, body: nil)
-    }
-
     public func updateEditorSettings(_ editorSettings: GutenbergEditorSettings?) {
         let settingsUpdates = properties(from: editorSettings)
         sendEvent(.updateEditorSettings, body: settingsUpdates)

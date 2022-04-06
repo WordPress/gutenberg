@@ -68,7 +68,6 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		setFeaturedImage: jest.fn(),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
-		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		subscribeFeaturedImageIdNativeUpdated: jest.fn(),
 		subscribeMediaAppend: jest.fn(),

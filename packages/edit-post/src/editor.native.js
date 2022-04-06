@@ -13,10 +13,7 @@ import { EditorProvider } from '@wordpress/editor';
 import { parse, serialize, store as blocksStore } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import {
-	subscribeSetFocusOnTitle,
-	subscribeFeaturedImageIdNativeUpdated,
-} from '@wordpress/react-native-bridge';
+import { subscribeFeaturedImageIdNativeUpdated } from '@wordpress/react-native-bridge';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -88,14 +85,6 @@ class Editor extends Component {
 	componentDidMount() {
 		const { editEntityRecord, postType, postId } = this.props;
 
-		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle(
-			() => {
-				if ( this.postTitleRef ) {
-					this.postTitleRef.focus();
-				}
-			}
-		);
-
 		this.subscriptionParentFeaturedImageIdNativeUpdated = subscribeFeaturedImageIdNativeUpdated(
 			( payload ) => {
 				editEntityRecord(
@@ -112,10 +101,6 @@ class Editor extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this.subscriptionParentSetFocusOnTitle ) {
-			this.subscriptionParentSetFocusOnTitle.remove();
-		}
-
 		if ( this.subscribeFeaturedImageIdNativeUpdated ) {
 			this.subscribeFeaturedImageIdNativeUpdated.remove();
 		}

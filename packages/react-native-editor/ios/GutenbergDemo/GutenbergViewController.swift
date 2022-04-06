@@ -59,10 +59,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("➡️ Editor Did Autosave")
     }
 
-    func gutenbergDidLoad() {
-        gutenberg.setFocusOnTitle()
-    }
-
     func gutenbergDidMount(unsupportedBlockNames: [String]) {
         print("gutenbergDidMount(unsupportedBlockNames: \(unsupportedBlockNames))")
         gutenberg.requestHTML()

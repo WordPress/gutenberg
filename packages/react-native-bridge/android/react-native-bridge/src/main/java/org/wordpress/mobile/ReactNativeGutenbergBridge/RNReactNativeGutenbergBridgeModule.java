@@ -39,7 +39,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_REQUEST_GET_HTML = "requestGetHtml";
     private static final String EVENT_NAME_UPDATE_HTML = "updateHtml";
     private static final String EVENT_NAME_UPDATE_TITLE = "setTitle";
-    private static final String EVENT_NAME_FOCUS_TITLE = "setFocusOnTitle";
     private static final String EVENT_NAME_MEDIA_APPEND = "mediaAppend";
     private static final String EVENT_NAME_TOGGLE_HTML_MODE = "toggleHTMLMode";
     private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
@@ -116,11 +115,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putString(MAP_KEY_UPDATE_TITLE, title);
         emitToJS(EVENT_NAME_UPDATE_TITLE, writableMap);
-    }
-
-    public void setFocusOnTitleInJS() {
-        WritableMap writableMap = new WritableNativeMap();
-        emitToJS(EVENT_NAME_FOCUS_TITLE, writableMap);
     }
 
     public void showNoticeInJS(String message) {

@@ -366,7 +366,6 @@ public class WPAndroidGlueCode {
                         .getRNReactNativeGutenbergBridgeModule());
                 mIsEditorMounted = true;
                 if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
-                    setFocusOnTitle();
                     // send signal to Editor to create a new image block and pass the media URL, start uploading, etc
                     // use mMediaUrlToAddAfterMounting
                     dispatchOneMediaToAddAtATimeIfAvailable();
@@ -759,10 +758,6 @@ public class WPAndroidGlueCode {
 
     public void showDevOptionsDialog() {
         mReactInstanceManager.showDevOptionsDialog();
-    }
-
-    public void setFocusOnTitle() {
-        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setFocusOnTitleInJS();
     }
 
     public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType) {
