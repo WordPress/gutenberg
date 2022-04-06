@@ -438,8 +438,11 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	}
 
 	/**
-	 * Returns a valid theme.json for a theme.
-	 * Essentially, it flattens the preset data.
+	 * Returns a valid theme.json as provided by a theme.
+	 *
+	 * Unlike get_raw_data() this returns the presets flattened,
+	 * as provided by a theme. This also uses appearanceTools
+	 * instead of their opt-ins if all of them are true.
 	 *
 	 * @return array
 	 */
