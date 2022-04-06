@@ -196,6 +196,14 @@
 		}
 	}
 
+	.block-editor-list-view-block__lock-cell {
+		line-height: 0;
+		width: 24px;
+		min-width: 24px;
+		padding: 0;
+		vertical-align: middle;
+	}
+
 	.block-editor-list-view-block__mover-cell-alignment-wrapper {
 		display: flex;
 		height: 100%;
