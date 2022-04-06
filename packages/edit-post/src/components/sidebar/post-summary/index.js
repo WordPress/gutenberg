@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { PostAuthor } from '@wordpress/editor';
+import { PostAuthor, PostTypeSupportCheck } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -33,13 +33,17 @@ function PostSummary() {
 			onToggle={ () => toggleEditorPanelOpened( PANEL_NAME ) }
 		>
 			<FeaturedImage />
-			<PanelRow>
-				<PostTitle />
-			</PanelRow>
+			<PostTypeSupportCheck supportKeys="title">
+				<PanelRow>
+					<PostTitle />
+				</PanelRow>
+			</PostTypeSupportCheck>
 			<PostExcerpt isMinimal />
-			<PanelRow>
-				<PostAuthor labelPosition="side" />
-			</PanelRow>
+			<PostTypeSupportCheck supportKeys="author">
+				<PanelRow>
+					<PostAuthor labelPosition="side" />
+				</PanelRow>
+			</PostTypeSupportCheck>
 		</PanelBody>
 	);
 }
