@@ -16,6 +16,54 @@
  */
 class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 
+	const VALID_SETTINGS = array(
+		'appearanceTools' => null,
+		'border'          => array(
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
+		),
+		'color'           => array(
+			'background'       => null,
+			'custom'           => null,
+			'customDuotone'    => null,
+			'customGradient'   => null,
+			'defaultDuotone'   => null,
+			'defaultGradients' => null,
+			'defaultPalette'   => null,
+			'duotone'          => null,
+			'gradients'        => null,
+			'link'             => null,
+			'palette'          => null,
+			'text'             => null,
+		),
+		'custom'          => null,
+		'defaultBlockStyles' => null,
+		'layout'          => array(
+			'contentSize' => null,
+			'wideSize'    => null,
+		),
+		'spacing'         => array(
+			'blockGap' => null,
+			'margin'   => null,
+			'padding'  => null,
+			'units'    => null,
+		),
+		'typography'      => array(
+			'customFontSize' => null,
+			'dropCap'        => null,
+			'fontFamilies'   => null,
+			'fontSizes'      => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
+		),
+	);
+
 	/**
 	 * The top-level keys a theme.json can have.
 	 *
@@ -30,6 +78,34 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		'version',
 		'title',
 	);
+
+	/**
+	 * Constructor.
+	 *
+	 * @param array  $theme_json A structure that follows the theme.json schema.
+	 * @param string $origin     Optional. What source of data this object represents.
+	 *                           One of 'default', 'theme', or 'custom'. Default 'theme'.
+	 */
+	public function __construct( $theme_json = array(), $origin = 'theme' ) {
+		parent::__construct( $theme_json, $origin );
+
+		static::maybe_opt_in_into_theme_supports( $theme_json );
+	}
+
+	/**
+	 * Enables some theme_supports if the theme.json declares support.
+	 *
+	 * @param array $theme_json A theme.json structure to modify.
+	 * @return null
+	 */
+	protected static function maybe_opt_in_into_theme_supports( $theme_json ) {
+		if (
+			isset( $theme_json['settings']['defaultBlockStyles'] ) &&
+			true === $theme_json['settings']['defaultBlockStyles']
+		) {
+			add_theme_support( 'wp-block-styles' );
+		}
+	}
 
 	/**
 	 * Returns the current theme's wanted patterns(slugs) to be
