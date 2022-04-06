@@ -450,30 +450,32 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		$output = $this->theme_json;
 		$nodes  = static::get_setting_nodes( $output );
 
-		// Flatten the theme & custom origins into a single one.
-		//
-		// For example, the following:
-		//
-		// {
-		//   "settings": {
-		//     "color": {
-		//       "palette": {
-		//         "theme": [ {} ],
-		//         "custom": [ {} ]
-		//       }
-		//     }
-		//   }
-		// }
-		//
-		// will be converted to:
-		//
-		// {
-		//   "settings": {
-		//     "color": {
-		//       "palette": [ {} ]
-		//     }
-		//   }
-		// }
+		/**
+		 * Flatten the theme & custom origins into a single one.
+		 *
+		 * For example, the following:
+		 *
+		 * {
+		 *   "settings": {
+		 *     "color": {
+		 *       "palette": {
+		 *         "theme": [ {} ],
+		 *         "custom": [ {} ]
+		 *       }
+		 *     }
+		 *   }
+		 * }
+		 *
+		 * will be converted to:
+		 *
+		 * {
+		 *   "settings": {
+		 *     "color": {
+		 *       "palette": [ {} ]
+		 *     }
+		 *   }
+		 * }
+		 */
 		foreach ( $nodes as $node ) {
 			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
