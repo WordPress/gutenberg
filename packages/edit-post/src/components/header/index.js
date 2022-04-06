@@ -50,12 +50,12 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const slideY = {
 		hidden: { y: '-50' },
-		hover: { y: 0 },
+		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
 	};
 
 	const slideX = {
 		hidden: { x: '-100%' },
-		hover: { x: 0 },
+		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 	};
 
 	return (
@@ -63,14 +63,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			<MainDashboardButton.Slot>
 				<motion.div
 					variants={ slideX }
-					transition={ { type: 'tween' } }
+					transition={ { type: 'tween', delay: 0.8 } }
 				>
 					<FullscreenModeClose showTooltip />
 				</motion.div>
 			</MainDashboardButton.Slot>
 			<motion.div
 				variants={ slideY }
-				transition={ { type: 'tween' } }
+				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
 				<HeaderToolbar />
@@ -78,7 +78,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			</motion.div>
 			<motion.div
 				variants={ slideY }
-				transition={ { type: 'tween' } }
+				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__settings"
 			>
 				{ ! isPublishSidebarOpened && (

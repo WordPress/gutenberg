@@ -72,7 +72,7 @@ function InterfaceSkeleton(
 
 	const headerVariants = {
 		hidden: { opacity: 0 },
-		hover: { opacity: 1, transition: { delay: 0.2, delayChildren: 0.2 } },
+		hover: { opacity: 1, transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 } },
 	};
 
 	return (
@@ -102,6 +102,7 @@ function InterfaceSkeleton(
 						initial="hidden"
 						whileHover="hover"
 						variants={ headerVariants }
+						transition={ { type: 'tween', delay: 0.8 } }
 						className="interface-interface-skeleton__header"
 						role="region"
 						aria-label={ mergedLabels.header }
