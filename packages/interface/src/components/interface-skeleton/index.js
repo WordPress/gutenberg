@@ -71,8 +71,8 @@ function InterfaceSkeleton(
 	const mergedLabels = { ...defaultLabels, ...labels };
 
 	const headerVariants = {
-		initial: { opacity: 0 },
-		hover: { opacity: 1 },
+		hidden: { opacity: 0 },
+		hover: { opacity: 1, transition: { delay: 0.2, delayChildren: 0.2 } },
 	};
 
 	return (
@@ -99,7 +99,7 @@ function InterfaceSkeleton(
 			<div className="interface-interface-skeleton__editor">
 				{ !! header && (
 					<motion.div
-						initial="initial"
+						initial="hidden"
 						whileHover="hover"
 						variants={ headerVariants }
 						className="interface-interface-skeleton__header"
