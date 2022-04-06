@@ -119,6 +119,7 @@ function gutenberg_generate_block_templates_export_file() {
 	// Replace 4 spaces with a tab.
 	$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
 
+	// Add the theme.json file to the zip.
 	$zip->addFromString(
 		'theme.json',
 		$theme_json_tabbed
