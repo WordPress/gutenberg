@@ -481,6 +481,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 
 		wp_recursive_ksort( $flattened_theme_json );
 
+
 		return $flattened_theme_json;
 	}
 
@@ -497,16 +498,31 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	}
 
 	protected static function use_appearance_tools_setting( $theme_json ) {
-		if ( array_key_exists( 'appearanceTools', $theme_json['settings'] ) ) { // Is it safe to assume that 'settings' always exsits?
-			foreach ( static::APPEARANCE_TOOLS_OPT_INS as $path ) {
-				// Remove the path.
-				if ( ! empty( $theme_json['settings'][ $path[ 0 ] ][ $path[ 1 ] ] ) ) {
-					unset( $theme_json['settings'][ $path[ 0 ] ][ $path[ 1 ] ] );
-				}
+		// Top-level settings.
+		$all_opt_ins_are_set = true;
+		foreach( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
+			$full_path = array_merge( array( 'settings' ), $opt_in_path );
+			// Use "unset prop" as a marker instead of "null" because
+			// "null" can be a valid value for some props (e.g. blockGap).
+			$opt_in_value = _wp_array_get( $theme_json, $full_path, 'unset prop' );
+			if ( 'unset prop' === $opt_in_value ) {
+				$all_opt_ins_are_set = false;
+				break;
+			}
+		}
 
-				// If the setting is now empty then we can remove it.
-				if ( empty( $theme_json['settings'][ $path[ 0 ] ] ) ) {
-					unset( $theme_json['settings'][ $path[ 0 ] ] );
+		if ( $all_opt_ins_are_set ) {
+			_wp_array_set( $theme_json, array( 'settings', 'appearanceTools'), true );
+			foreach( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
+				$full_path = array_merge( array( 'settings' ), $opt_in_path );
+				// Use "unset prop" as a marker instead of "null" because
+				// "null" can be a valid value for some props (e.g. blockGap).
+				$opt_in_value = _wp_array_get( $theme_json, $full_path, 'unset prop' );
+				if ( true === $opt_in_value ) {
+					unset( $theme_json['settings'][ $opt_in_path[0] ][ $opt_in_path[1] ]);
+					if ( empty( $theme_json['settings'][ $opt_in_path[0]] ) ) {
+						unset( $theme_json['settings'][ $opt_in_path[0] ]);
+					}
 				}
 			}
 		}
