@@ -222,7 +222,8 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 };
 
 export default function Edit( props ) {
-	if ( props?.context?.commentId ) {
+	// We set commentId as null if we are on the Site Editor. See "../src/comment-template/edit.js L215"
+	if ( props?.context?.commentId || props?.context?.commentId === null ) {
 		return <CommentEdit { ...props } />;
 	}
 	return <UserEdit { ...props } />;
