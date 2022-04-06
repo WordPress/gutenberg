@@ -10,7 +10,6 @@ import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __unstableMotion as motion } from '@wordpress/components';
 
 /**
@@ -30,8 +29,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		hasActiveMetaboxes,
 		isPublishSidebarOpened,
 		isSaving,
-		hasReducedUI,
-		isNavigationMode,
 		showIconLabels,
 	} = useSelect(
 		( select ) => ( {
@@ -43,19 +40,13 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
-			hasReducedUI: select( editPostStore ).isFeatureActive(
-				'reducedUI'
-			),
-			isNavigationMode: select( blockEditorStore ).isNavigationMode(),
 		} ),
 		[]
 	);
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
-	const classes = classnames( 'edit-post-header', {
-		'zen-edit-post-header': hasReducedUI && ! isNavigationMode,
-	} );
+	const classes = classnames( 'edit-post-header' );
 
 	const slideY = {
 		initial: { y: '-100%' },
