@@ -7,6 +7,7 @@ import type {
 	ChangeEvent,
 	SyntheticEvent,
 	PointerEvent,
+	HTMLInputTypeAttribute,
 } from 'react';
 import type { useDrag } from '@use-gesture/react';
 
@@ -26,9 +27,24 @@ export type Size = 'default' | 'small' | '__unstable-large';
 
 interface BaseProps {
 	__unstableInputWidth?: CSSProperties[ 'width' ];
+	/**
+	 * If true, the label will only be visible to screen readers.
+	 *
+	 * @default false
+	 */
 	hideLabelFromVision?: boolean;
 	isFocused: boolean;
+	/**
+	 * The position of the label.
+	 *
+	 * @default 'top'
+	 */
 	labelPosition?: LabelPosition;
+	/**
+	 * Adjusts the size of the input.
+	 *
+	 * @default 'default'
+	 */
 	size?: Size;
 }
 
@@ -38,10 +54,35 @@ export type InputChangeCallback<
 > = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
 
 export interface InputFieldProps extends BaseProps {
+	/**
+	 * Determines the drag axis.
+	 *
+	 * @default 'n'
+	 */
 	dragDirection?: DragDirection;
+	/**
+	 * If `isDragEnabled` is true, this controls the amount of `px` to have been dragged before
+	 * the drag gesture is actually triggered.
+	 *
+	 * @default 10
+	 */
 	dragThreshold?: number;
+	/**
+	 * If true, enables mouse drag gestures.
+	 *
+	 * @default false
+	 */
 	isDragEnabled?: boolean;
+	/**
+	 * If true, the `ENTER` key press is required in order to trigger an `onChange`.
+	 * If enabled, a change is also triggered when tabbing away (`onBlur`).
+	 *
+	 * @default false
+	 */
 	isPressEnterToChange?: boolean;
+	/**
+	 * A function that receives the value of the input.
+	 */
 	onChange?: InputChangeCallback;
 	onValidate?: (
 		nextValue: string,
@@ -49,19 +90,42 @@ export interface InputFieldProps extends BaseProps {
 	) => void;
 	setIsFocused: ( isFocused: boolean ) => void;
 	stateReducer?: StateReducer;
+	/**
+	 * The current value of the input.
+	 */
 	value?: string;
 	onDragEnd?: ( dragProps: DragProps ) => void;
 	onDragStart?: ( dragProps: DragProps ) => void;
 	onDrag?: ( dragProps: DragProps ) => void;
+	/**
+	 * Type of the input element to render.
+	 *
+	 * @default 'text'
+	 */
+	type?: HTMLInputTypeAttribute;
 }
 
 export interface InputBaseProps extends BaseProps {
 	children: ReactNode;
+	/**
+	 * Renders an element on the left side of the input.
+	 */
 	prefix?: ReactNode;
+	/**
+	 * Renders an element on the right side of the input.
+	 */
 	suffix?: ReactNode;
+	/**
+	 * If true, the `input` will be disabled.
+	 *
+	 * @default false
+	 */
 	disabled?: boolean;
 	className?: string;
 	id?: string;
+	/**
+	 * If this property is added, a label will be generated using label property as the content.
+	 */
 	label?: ReactNode;
 }
 
