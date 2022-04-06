@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { useMemoOne } from 'use-memo-one';
-
-/**
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
@@ -19,6 +14,36 @@ import useAsyncMode from '../async-mode-provider/use-async-mode';
 
 const noop = () => {};
 const renderQueue = createQueue();
+
+function useAsyncCallback( callback, deps ) {
+	const queueContext = useRef();
+	const isAsync = useAsyncMode();
+	const registry = useRegistry();
+
+	useIsomorphicLayoutEffect( () => {
+		if ( ! isAsync ) {
+			return;
+		}
+
+		// Create a new queue context when registry changes.
+		const newQueueContext = { queue: true };
+		queueContext.current = newQueueContext;
+
+		// Flush the old queue before replacing it with a new one.
+		return () => {
+			renderQueue.flush( newQueueContext );
+			queueContext.current = null;
+		};
+	}, [ isAsync, registry ] );
+
+	return useCallback( () => {
+		if ( queueContext.current ) {
+			renderQueue.add( queueContext.current, callback );
+		} else {
+			callback();
+		}
+	}, deps );
+}
 
 /** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
 
@@ -111,15 +136,9 @@ export default function useSelect( mapSelect, deps ) {
 	const _mapSelect = hasMappingFunction ? callbackMapper : null;
 
 	const registry = useRegistry();
-	const isAsync = useAsyncMode();
-	// React can sometimes clear the `useMemo` cache.
-	// We use the cache-stable `useMemoOne` to avoid
-	// losing queues.
-	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
 	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
 
 	const latestMapSelect = useRef();
-	const latestIsAsync = useRef( isAsync );
 	const latestMapOutput = useRef();
 	const latestMapOutputError = useRef();
 	const isMountedAndNotUnsubscribing = useRef();
@@ -175,50 +194,34 @@ export default function useSelect( mapSelect, deps ) {
 		latestMapOutput.current = mapOutput;
 		latestMapOutputError.current = undefined;
 		isMountedAndNotUnsubscribing.current = true;
-
-		// This has to run after the other ref updates
-		// to avoid using stale values in the flushed
-		// callbacks or potentially overwriting a
-		// changed `latestMapOutput.current`.
-		if ( latestIsAsync.current !== isAsync ) {
-			latestIsAsync.current = isAsync;
-			renderQueue.flush( queueContext );
-		}
 	} );
+
+	const onChange = useAsyncCallback( () => {
+		if ( isMountedAndNotUnsubscribing.current ) {
+			try {
+				const newMapOutput = wrapSelect( latestMapSelect.current );
+
+				if ( isShallowEqual( latestMapOutput.current, newMapOutput ) ) {
+					return;
+				}
+				latestMapOutput.current = newMapOutput;
+			} catch ( error ) {
+				latestMapOutputError.current = error;
+			}
+			forceRender();
+		}
+		// Creation of a new `onChange` callback and, in turn, re-subscription of listeners, can
+		// be trigger by either:
+		// - change in `wrapSelect`, which can be caused only by `registry` change;
+		// - or change in `_mapSelect` callback triggered by `deps` change.
+	}, [ wrapSelect, depsChangedFlag ] );
 
 	useIsomorphicLayoutEffect( () => {
 		if ( ! hasMappingFunction ) {
 			return;
 		}
 
-		const onStoreChange = () => {
-			if ( isMountedAndNotUnsubscribing.current ) {
-				try {
-					const newMapOutput = wrapSelect( latestMapSelect.current );
-
-					if (
-						isShallowEqual( latestMapOutput.current, newMapOutput )
-					) {
-						return;
-					}
-					latestMapOutput.current = newMapOutput;
-				} catch ( error ) {
-					latestMapOutputError.current = error;
-				}
-				forceRender();
-			}
-		};
-
-		const onChange = () => {
-			if ( latestIsAsync.current ) {
-				renderQueue.add( queueContext, onStoreChange );
-			} else {
-				onStoreChange();
-			}
-		};
-
-		// Catch any possible state changes during mount before the subscription
-		// could be set.
+		// Catch any possible state changes during mount before the subscription could be set.
 		onChange();
 
 		const unsubscribers = listeningStores.current.map( ( storeName ) =>
@@ -229,12 +232,8 @@ export default function useSelect( mapSelect, deps ) {
 			isMountedAndNotUnsubscribing.current = false;
 			// The return value of the subscribe function could be undefined if the store is a custom generic store.
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
-			renderQueue.flush( queueContext );
 		};
-		// If you're tempted to eliminate the spread dependencies below don't do it!
-		// We're passing these in from the calling function and want to make sure we're
-		// examining every individual value inside the `deps` array.
-	}, [ registry, wrapSelect, hasMappingFunction, depsChangedFlag ] );
+	}, [ onChange, hasMappingFunction ] );
 
 	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }
