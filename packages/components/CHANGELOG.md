@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ToggleGroupControl`: rewrite backdrop animation with `framer-motion` ([#40107](https://github.com/WordPress/gutenberg/pull/40107)).
+
 ## 19.8.0 (2022-04-08)
 
 ### Enhancements
@@ -10,6 +14,7 @@
 -   `ToggleGroupControl`: Reintroduce backdrop animation ([#40021](https://github.com/WordPress/gutenberg/pull/40021)).
 -   `Card`: Adjust border radius effective size ([#40032](https://github.com/WordPress/gutenberg/pull/40032)).
 -   `InputControl`: Improved TypeScript type annotations ([#40119](https://github.com/WordPress/gutenberg/pull/40119)).
+-   `ToggleGroupControl`: rewrite backdrop animation with `framer-motion` ([#40107](https://github.com/WordPress/gutenberg/pull/40107)).
 
 ### Internal
 
@@ -27,6 +32,7 @@
 -   `ItemGroup`: Ensure that the Item's text color is not overriden by the user agent's button color ([#40055](https://github.com/WordPress/gutenberg/pull/40055)).
 -   `Surface`: Use updated UI text color `#1e1e1e` instead of `#000` ([#40055](https://github.com/WordPress/gutenberg/pull/40055)).
 -   `CustomSelectControl`: Make chevron consistent with `SelectControl` ([#40049](https://github.com/WordPress/gutenberg/pull/40049)).
+-   `ToggleGroupControl`: fix rendering glitch when used in combination with `Popover` ([#40107](https://github.com/WordPress/gutenberg/pull/40107)).
 
 ## 19.7.0 (2022-03-23)
 
