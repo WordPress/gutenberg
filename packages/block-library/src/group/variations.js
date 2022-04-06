@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { row, stack } from '@wordpress/icons';
+import { group, row, stack } from '@wordpress/icons';
 
 const variations = [
 	{
@@ -14,6 +14,7 @@ const variations = [
 		isActive: ( blockAttributes ) =>
 			! blockAttributes.layout ||
 			blockAttributes.layout?.type === 'default',
+		icon: group,
 	},
 	{
 		name: 'group-row',
