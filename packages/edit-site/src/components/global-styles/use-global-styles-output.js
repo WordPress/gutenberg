@@ -342,7 +342,7 @@ export const toStyles = ( tree, blockSelectors ) => {
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 
 	let ruleset =
-		'body { padding-right: 0; padding-left: 0; } .wp-site-blocks > * { margin-top: 0; margin-bottom: 0; padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
+		'body { padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .wp-site-blocks > * { margin-top: 0; margin-bottom: 0; padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
 		const isRoot = ROOT_BLOCK_SELECTOR === selector;
 		const declarations = getStylesDeclarations( styles, isRoot );
