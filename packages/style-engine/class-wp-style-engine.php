@@ -36,16 +36,58 @@ class WP_Style_Engine {
 	 *                    For example, `'padding' => 'array( 'top' => '1em' )` will return `array( 'padding-top' => '1em' )`
 	 */
 	const BLOCK_STYLE_DEFINITIONS_METADATA = array(
-		'spacing' => array(
+		'spacing'    => array(
 			'padding' => array(
 				'property_key' => 'padding',
 				'path'         => array( 'spacing', 'padding' ),
-				'value_func'   => 'static::get_css_box_rules',
+				'value_func'   => 'static::get_css_rules',
 			),
 			'margin'  => array(
 				'property_key' => 'margin',
 				'path'         => array( 'spacing', 'margin' ),
-				'value_func'   => 'static::get_css_box_rules',
+				'value_func'   => 'static::get_css_rules',
+			),
+		),
+		'typography' => array(
+			'fontSize'       => array(
+				'property_key' => 'font-size',
+				'path'         => array( 'typography', 'fontSize' ),
+				'value_func'   => 'static::get_css_rules',
+			),
+			'fontFamily'     => array(
+				'property_key' => 'font-family',
+				'path'         => array( 'typography', 'fontFamily' ),
+				'value_func'   => 'static::get_css_rules',
+			),
+			'fontStyle'      => array(
+				'property_key' => 'font-style',
+				'path'         => array( 'typography', 'fontStyle' ),
+				'value_func'   => 'static::get_css_rules',
+			),
+			'fontWeight'     => array(
+				'property_key' => 'font-weight',
+				'path'         => array( 'typography', 'fontWeight' ),
+				'value_func'   => 'static::get_css_rules',
+			),
+			'lineHeight'     => array(
+				'property_key' => 'line-height',
+				'path'         => array( 'typography', 'lineHeight' ),
+				'value_func'   => 'static::get_css_rules',
+			),
+			'textDecoration' => array(
+				'property_key' => 'text-decoration',
+				'path'         => array( 'typography', 'textDecoration' ),
+				'value_func'   => 'static::get_css_rules',
+			),
+			'textTransform'  => array(
+				'property_key' => 'text-transform',
+				'path'         => array( 'typography', 'textTransform' ),
+				'value_func'   => 'static::get_css_rules',
+			),
+			'letterSpacing'  => array(
+				'property_key' => 'letter-spacing',
+				'path'         => array( 'typography', 'letterSpacing' ),
+				'value_func'   => 'static::get_css_rules',
 			),
 		),
 	);
@@ -145,20 +187,23 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns a CSS ruleset for box model styles such as margins, padding, and borders.
+	 * Default style value parser that returns a CSS ruleset.
+	 * If the input contains an array, it will treated like a box model
+	 * for styles such as margins, padding, and borders
 	 *
 	 * @param string|array $style_value    A single raw Gutenberg style attributes value for a CSS property.
 	 * @param string       $style_property The CSS property for which we're creating a rule.
 	 *
 	 * @return array The class name for the added style.
 	 */
-	public static function get_css_box_rules( $style_value, $style_property ) {
+	public static function get_css_rules( $style_value, $style_property ) {
 		$rules = array();
 
 		if ( ! $style_value ) {
 			return $rules;
 		}
 
+		// We assume box model-like properties.
 		if ( is_array( $style_value ) ) {
 			foreach ( $style_value as $key => $value ) {
 				$rules[ "$style_property-$key" ] = $value;
