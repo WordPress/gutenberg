@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { MutableRefObject, ReactNode, ReactText } from 'react';
+import type { ReactNode, ReactText } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type { RadioStateReturn } from 'reakit';
 
