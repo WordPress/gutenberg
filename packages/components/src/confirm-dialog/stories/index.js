@@ -23,7 +23,7 @@ export default {
 	title: 'Components (Experimental)/ConfirmDialog',
 	argTypes: {
 		children: {
-			type: 'reactNode',
+			type: 'string',
 		},
 		jsxChildren: {
 			type: 'select',
@@ -57,7 +57,9 @@ export default {
 		children: daText(),
 	},
 	parameters: {
-		controls: { exclude: [ 'jsxChildren' ] },
+		// Exclude jsxChildren by default becuase it's only used in one story.
+		// Because controls don't rerender the component, isOpen isn't actually useful.
+		controls: { exclude: [ 'jsxChildren', 'isOpen' ] },
 	},
 };
 
@@ -89,21 +91,17 @@ const Template = ( args ) => {
 
 // Simplest usage: just declare the component with the required `onConfirm` prop.
 export const _default = Template.bind( {} );
-_default.args = {
-	children: daText(),
-};
+_default.args = {};
 
 // To add a title, pass the `title` prop
 export const WithTitle = Template.bind( {} );
 WithTitle.args = {
 	title: 'Example Title',
-	children: daText(),
 };
 
 // To customize button text, pass the `cancelButtonText` and/or `confirmButtonText` props.
 export const withCustomButtonLabels = Template.bind( {} );
 withCustomButtonLabels.args = {
-	children: daText(),
 	cancelButtonText: 'No thanks',
 	confirmButtonText: 'Yes please!',
 };
@@ -114,7 +112,7 @@ WithJSXMessage.args = {
 	jsxChildren: '<Heading level={ 2 }>A JSX Heading</Heading>',
 };
 WithJSXMessage.parameters = {
-	controls: { exclude: [ 'children' ] },
+	controls: { exclude: [ 'children', 'isOpen' ] },
 };
 
 export const VeeeryLongMessage = Template.bind( {} );
@@ -124,7 +122,6 @@ VeeeryLongMessage.args = {
 
 export const UncontrolledAndWithExplicitOnCancel = Template.bind( {} );
 UncontrolledAndWithExplicitOnCancel.args = {
-	children: daText(),
 	confirmOutput: 'Confirmed!',
 	cancelOutput: 'Cancelled',
 };
