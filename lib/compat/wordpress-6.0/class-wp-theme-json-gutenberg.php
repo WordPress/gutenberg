@@ -133,7 +133,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		'title',
 	);
 
-	const TO_OPT_IN = array(
+	const APPEARANCE_TOOLS_OPT_INS = array(
 		array( 'border', 'color' ),
 		array( 'border', 'radius' ),
 		array( 'border', 'style' ),
@@ -485,7 +485,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	}
 
 	protected static function do_opt_in_into_settings( &$context ) {
-		foreach ( static::TO_OPT_IN as $path ) {
+		foreach ( static::APPEARANCE_TOOLS_OPT_INS as $path ) {
 			// Use "unset prop" as a marker instead of "null" because
 			// "null" can be a valid value for some props (e.g. blockGap).
 			if ( 'unset prop' === _wp_array_get( $context, $path, 'unset prop' ) ) {
@@ -496,7 +496,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 
 	protected static function do_opt_out_of_settings( $theme_json ) {
 		if ( array_key_exists( 'appearanceTools', $theme_json['settings'] ) ) { // Is it safe to assume that 'settings' always exsits?
-			foreach ( static::TO_OPT_IN as $path ) {
+			foreach ( static::APPEARANCE_TOOLS_OPT_INS as $path ) {
 				// Remove the path.
 				if ( ! empty( $theme_json['settings'][ $path[ 0 ] ][ $path[ 1 ] ] ) ) {
 					unset( $theme_json['settings'][ $path[ 0 ] ][ $path[ 1 ] ] );
