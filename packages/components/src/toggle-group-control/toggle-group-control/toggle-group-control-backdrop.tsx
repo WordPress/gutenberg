@@ -42,7 +42,9 @@ function ToggleGroupControlBackdrop( {
 	const selectedItemIndex = items.findIndex(
 		// All valid children (e.g. extending `ToggleGroupControlOptionBase`)
 		// have a `data-value` attribute.
-		( item ) => item.ref.current?.dataset.value === state
+		( item ) =>
+			typeof state !== 'undefined' &&
+			item.ref.current?.dataset.value === `${ state }`
 	);
 
 	// `useLayoutEffect` is necessary because we need to wait for the DOM
