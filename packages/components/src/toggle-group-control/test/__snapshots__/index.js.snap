@@ -32,14 +32,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   min-width: 0;
   padding: 2px;
   position: relative;
-  -webkit-transition: -webkit-transform 100ms linear;
-  transition: transform 100ms linear;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-6 {
-    transition-duration: 0ms;
-  }
 }
 
 .emotion-6:hover {
@@ -56,20 +48,12 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
 .emotion-8 {
   background: #1e1e1e;
   border-radius: 2px;
-  box-shadow: transparent;
+  box-shadow: none;
   left: 0;
   position: absolute;
   top: 2px;
   bottom: 2px;
-  -webkit-transition: -webkit-transform 160ms ease;
-  transition: transform 160ms ease;
   z-index: 1;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-8 {
-    transition-duration: 0ms;
-  }
 }
 
 .emotion-10 {
@@ -183,11 +167,11 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
       <div
         class="emotion-8 emotion-9"
         role="presentation"
-        style="transform: translateX(0px); transition: none; width: 0px;"
       />
       <div
         class="emotion-10 emotion-11"
         data-active="true"
+        data-toggle-group-control-option-wrapper="true"
       >
         <button
           aria-checked="true"
@@ -221,6 +205,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
       <div
         class="emotion-10 emotion-11"
         data-active="false"
+        data-toggle-group-control-option-wrapper="true"
       >
         <button
           aria-checked="false"
@@ -288,14 +273,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
   min-width: 0;
   padding: 2px;
   position: relative;
-  -webkit-transition: -webkit-transform 100ms linear;
-  transition: transform 100ms linear;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-6 {
-    transition-duration: 0ms;
-  }
 }
 
 .emotion-6:hover {
@@ -412,6 +389,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
       <div
         class="emotion-8 emotion-9"
         data-active="false"
+        data-toggle-group-control-option-wrapper="true"
       >
         <button
           aria-checked="false"
@@ -434,6 +412,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
       <div
         class="emotion-8 emotion-9"
         data-active="false"
+        data-toggle-group-control-option-wrapper="true"
       >
         <button
           aria-checked="false"
