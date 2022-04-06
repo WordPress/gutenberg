@@ -129,7 +129,7 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 		);
 		$this->assertSame(
 			$result,
-			'.wp-elements-1 a{color:var(--wp--preset--color--subtle-background);}'
+			'.wp-elements-1 a{color: var(--wp--preset--color--subtle-background);}'
 		);
 	}
 }
