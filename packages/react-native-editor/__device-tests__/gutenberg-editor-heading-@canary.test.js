@@ -25,24 +25,24 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const firstBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		let paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
 			2
 		);
 
 		await editorPage.typeTextToParagraphBlock(
-			firstBlockElement,
+			paragraphBlockElement,
 			testData.mediumText
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const secondBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
 			3
 		);
 
 		await editorPage.typeTextToParagraphBlock(
-			secondBlockElement,
+			paragraphBlockElement,
 			testData.mediumText
 		);
 
@@ -58,13 +58,13 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const thirdBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
 			5
 		);
 
 		await editorPage.typeTextToParagraphBlock(
-			thirdBlockElement,
+			paragraphBlockElement,
 			testData.mediumText
 		);
 	} );
