@@ -511,7 +511,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		// this code unsets them and sets 'appearanceTools' instead.
 		foreach ( $nodes as $node ) {
 			$all_opt_ins_are_set = true;
-			foreach( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
+			foreach ( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
 				$full_path = array_merge( $node['path'], $opt_in_path );
 				// Use "unset prop" as a marker instead of "null" because
 				// "null" can be a valid value for some props (e.g. blockGap).
@@ -524,7 +524,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 
 			if ( $all_opt_ins_are_set ) {
 				_wp_array_set( $output, array_merge( $node['path'], array( 'appearanceTools' ) ), true );
-				foreach( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
+				foreach ( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
 					$full_path = array_merge( $node['path'], $opt_in_path );
 					// Use "unset prop" as a marker instead of "null" because
 					// "null" can be a valid value for some props (e.g. blockGap).
@@ -536,8 +536,8 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 					// The following could be improved to be path independent.
 					// At the moment it relies on a couple of assumptions:
 					//
-					// - all opt-ins having a path of size 2
-					// - there's two sources of settings: the top-level and the block-level
+					// - all opt-ins having a path of size 2.
+					// - there's two sources of settings: the top-level and the block-level.
 					if (
 						( 1 === count( $node['path'] ) ) &&
 						( 'settings' === $node['path'][0] )
@@ -547,7 +547,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 						if ( empty( $output['settings'][ $opt_in_path[0] ] ) ) {
 							unset( $output['settings'][ $opt_in_path[0] ] );
 						}
-					} else if (
+					} elseif (
 						( 3 === count( $node['path'] ) ) &&
 						( 'settings' === $node['path'][0] ) &&
 						( 'blocks' === $node['path'][1] )
@@ -565,10 +565,16 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 
 		wp_recursive_ksort( $output );
 
-
 		return $output;
 	}
 
+	/**
+	 * Enables some settings.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param array $context The context to which the settings belong.
+	 */
 	protected static function do_opt_in_into_settings( &$context ) {
 		foreach ( static::APPEARANCE_TOOLS_OPT_INS as $path ) {
 			// Use "unset prop" as a marker instead of "null" because
