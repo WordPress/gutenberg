@@ -35,7 +35,7 @@ function BackgroundColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButton path={ parentMenu + '/colors/background' }>
 			<HStack justify="flex-start">
-				<ColorIndicatorWrapper>
+				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator
 						colorValue={ gradientValue ?? backgroundColor }
 					/>
@@ -58,7 +58,7 @@ function TextColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButton path={ parentMenu + '/colors/text' }>
 			<HStack justify="flex-start">
-				<ColorIndicatorWrapper>
+				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator colorValue={ color } />
 				</ColorIndicatorWrapper>
 				<FlexItem>{ __( 'Text' ) }</FlexItem>
@@ -79,7 +79,7 @@ function LinkColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButton path={ parentMenu + '/colors/link' }>
 			<HStack justify="flex-start">
-				<ColorIndicatorWrapper>
+				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator colorValue={ color } />
 				</ColorIndicatorWrapper>
 				<FlexItem>{ __( 'Links' ) }</FlexItem>
