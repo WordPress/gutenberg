@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import { CONFIG, COLORS } from '../../utils';
 
 export const ToggleGroupControl = css`
 	background: ${ COLORS.ui.background };
@@ -21,8 +21,6 @@ export const ToggleGroupControl = css`
 	min-width: 0;
 	padding: 2px;
 	position: relative;
-	transition: transform ${ CONFIG.transitionDurationFastest } linear;
-	${ reduceMotion( 'transition' ) }
 	&:hover {
 		border-color: ${ COLORS.ui.borderHover };
 	}
