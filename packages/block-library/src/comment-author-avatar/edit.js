@@ -42,8 +42,8 @@ export default function Edit( {
 	const maxSizeBuffer = Math.floor( maxSize * 2.5 );
 	const { avatarURL } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
+		const { discussionSettings } = getSettings();
+		return discussionSettings;
 	} );
 
 	const inspectorControls = (

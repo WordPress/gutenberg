@@ -23,6 +23,7 @@
 /packages/block-library/src/page-list           @tellthemachines
 /packages/block-library/src/comment-template    @michalczaplinski
 /packages/block-library/src/comments-query-loop @michalczaplinski
+/packages/block-library/src/avatar              @c4rl0sbr4v0
 
 # Duotone
 /lib/block-supports/duotone.php                       @ajlende

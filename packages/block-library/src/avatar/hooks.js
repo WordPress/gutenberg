@@ -19,8 +19,8 @@ function getAvatarSizes( sizes ) {
 function useDefaultAvatar() {
 	const { avatarURL: defaultAvatarUrl } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
+		const { discussionSettings } = getSettings();
+		return discussionSettings;
 	} );
 	return defaultAvatarUrl;
 }

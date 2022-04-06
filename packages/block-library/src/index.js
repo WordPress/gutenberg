@@ -144,6 +144,7 @@ export const __experimentalGetCoreBlocks = () => [
 	// Register all remaining core blocks.
 	archives,
 	audio,
+	avatar,
 	button,
 	buttons,
 	calendar,
@@ -252,7 +253,6 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	? ( { enableFSEBlocks } = {} ) => {
 			[
 				// Experimental blocks.
-				avatar,
 				homeLink,
 				postAuthorName,
 				queryNoResults,

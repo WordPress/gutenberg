@@ -33,8 +33,8 @@ export const useCommentQueryArgs = ( { postId } ) => {
 		defaultCommentsPage: defaultPage,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
+		const { discussionSettings } = getSettings();
+		return discussionSettings;
 	} );
 
 	// Get the number of the default page.

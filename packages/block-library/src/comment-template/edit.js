@@ -241,7 +241,7 @@ export default function CommentTemplateEdit( {
 		commentsPerPage,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings;
+		return getSettings().discussionSettings;
 	} );
 
 	const commentQuery = useCommentQueryArgs( {

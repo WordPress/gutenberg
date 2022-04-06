@@ -101,7 +101,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		() => ( {
 			...pick( settings, [
 				'__experimentalBlockDirectory',
-				'__experimentalDiscussionSettings',
 				'__experimentalFeatures',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
@@ -116,6 +115,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'disableCustomColors',
 				'disableCustomFontSizes',
 				'disableCustomGradients',
+				'discussionSettings',
 				'enableCustomLineHeight',
 				'enableCustomSpacing',
 				'enableCustomUnits',
