@@ -79,7 +79,12 @@ function ToggleGroupControlOptionBase(
 	);
 
 	return (
-		<LabelView className={ labelViewClasses } data-active={ isActive }>
+		<LabelView
+			className={ labelViewClasses }
+			data-active={ isActive }
+			// Necessary for the ToggleGroupControlBackdrop component to render properly
+			data-toggle-group-control-option-wrapper="true"
+		>
 			<WithToolTip
 				showTooltip={ showTooltip }
 				text={ radioProps[ 'aria-label' ] }
@@ -89,6 +94,7 @@ function ToggleGroupControlOptionBase(
 					as="button"
 					aria-label={ radioProps[ 'aria-label' ] }
 					className={ classes }
+					// Useful to find the `Radio` holding the selected value from outside this component
 					data-value={ value }
 					ref={ forwardedRef }
 					value={ value }

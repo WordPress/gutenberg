@@ -60,11 +60,13 @@ function ToggleGroupControlBackdrop( {
 				// can't be any element with `position: relative` or `position: absolute`.
 				// See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetLeft
 
-				const wrapperElement = item.ref.current;
+				const toggleGroupOptionWrapper = item.ref.current?.closest(
+					'[data-toggle-group-control-option-wrapper="true"]'
+				) as HTMLElement | null;
 
 				return {
-					left: wrapperElement?.offsetLeft ?? -1,
-					width: wrapperElement?.offsetWidth ?? 0,
+					left: toggleGroupOptionWrapper?.offsetLeft ?? -1,
+					width: toggleGroupOptionWrapper?.offsetWidth ?? 0,
 				};
 			} )
 		);
