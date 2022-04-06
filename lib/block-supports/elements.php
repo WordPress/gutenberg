@@ -51,16 +51,6 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 
 	$class_name = gutenberg_get_elements_class_name( $block );
 
-	if ( strpos( $link_color, 'var:preset|color|' ) !== false ) {
-		// Get the name from the string and add proper styles.
-		$index_to_splice = strrpos( $link_color, '|' ) + 1;
-		$link_color_name = substr( $link_color, $index_to_splice );
-		$link_color      = "var(--wp--preset--color--$link_color_name)";
-	}
-	$link_color_declaration = esc_html( safecss_filter_attr( "color: $link_color" ) );
-
-	$style = ".$class_name a{" . $link_color_declaration . ';}';
-
 	// Like the layout hook this assumes the hook only applies to blocks with a single wrapper.
 	// Retrieve the opening tag of the first HTML element.
 	$html_element_matches = array();
@@ -80,8 +70,6 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		$first_element_offset = $html_element_matches[0][1];
 		$content              = substr_replace( $block_content, ' class="' . $class_name . '"', $first_element_offset + strlen( $first_element ) - 1, 0 );
 	}
-
-	gutenberg_enqueue_block_support_styles( $style );
 
 	return $content;
 }
@@ -124,17 +112,9 @@ function gutenberg_render_elements_support_footer( $pre_render, $block ) {
 	}
 	$link_color_declaration = esc_html( safecss_filter_attr( "color: $link_color" ) );
 
-	$style = "<style>.$class_name a{" . $link_color_declaration . ";}</style>\n";
+	$style = ".$class_name a{" . $link_color_declaration . ';}';
 
-	// Ideally styles should be loaded in the head, but blocks may be parsed
-	// after that, so loading in the footer for now.
-	// See https://core.trac.wordpress.org/ticket/53494.
-	add_action(
-		'wp_footer',
-		function () use ( $style ) {
-			echo $style;
-		}
-	);
+	gutenberg_enqueue_block_support_styles( $style );
 }
 
 // Remove WordPress core filter to avoid rendering duplicate elements stylesheet.
