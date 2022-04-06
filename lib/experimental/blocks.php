@@ -152,6 +152,10 @@ if ( ! function_exists( 'gutenberg_rest_comment_set_children_as_embeddable' ) ) 
 }
 add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable' );
 
+function gutenberg_is_quote_v2_enabled() {
+	return get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-quote-v2', get_option( 'gutenberg-experiments' ) );
+}
+
 /**
  * Sets a global JS variable used to trigger the availability of the experimental blocks.
  */
@@ -160,7 +164,7 @@ function gutenberg_enable_experimental_blocks() {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableListBlockV2 = true', 'before' );
 	}
 
-	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-quote-v2', get_option( 'gutenberg-experiments' ) ) ) {
+	if ( gutenberg_is_quote_v2_enabled() ) {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableQuoteBlockV2 = true', 'before' );
 	}
 }
