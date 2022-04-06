@@ -134,11 +134,9 @@ describe( 'Cover', () => {
 			'.block-editor-list-view-block__contents-container a'
 		);
 
-		const heightInput = (
-			await page.$x(
-				'//div[./label[contains(text(),"Minimum height of cover")]]//input'
-			)
-		 )[ 0 ];
+		const heightInput = await page.waitForXPath(
+			'//div[./label[contains(text(),"Minimum height of cover")]]//input'
+		);
 
 		// Verify the height of the cover is not defined.
 		expect(

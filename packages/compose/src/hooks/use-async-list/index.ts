@@ -67,9 +67,17 @@ function useAsyncList< T >(
 				...list.slice( nextIndex, nextIndex + step ),
 			] );
 			nextIndex += step;
-			asyncQueue.add( {}, append );
+
+			// In React 18, queryMicrotask is needed to only add
+			// new items to the list after the next rerendering.
+			queueMicrotask( () => {
+				asyncQueue.add( {}, append );
+			} );
 		};
-		asyncQueue.add( {}, append );
+
+		queueMicrotask( () => {
+			asyncQueue.add( {}, append );
+		} );
 
 		return () => asyncQueue.reset();
 	}, [ list ] );

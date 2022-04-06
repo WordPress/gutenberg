@@ -94,6 +94,9 @@ describe( 'block deletion -', () => {
 	describe( 'deleting the third block using backspace in an empty block', () => {
 		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
 			await page.keyboard.press( 'Backspace' );
+			await page.evaluate(
+				() => new Promise( window.requestAnimationFrame )
+			);
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// Type additional text and assert that caret position is correct by comparing to snapshot.
@@ -119,7 +122,9 @@ describe( 'block deletion -', () => {
 				'.wp-block[data-type="core/image"] .components-placeholder__label'
 			);
 			await page.keyboard.press( 'Backspace' );
-
+			await page.evaluate(
+				() => new Promise( window.requestAnimationFrame )
+			);
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// Type additional text and assert that caret position is correct by comparing to snapshot.
@@ -139,6 +144,9 @@ describe( 'block deletion -', () => {
 
 			// Now that the block wrapper is selected, press backspace to delete it.
 			await page.keyboard.press( 'Backspace' );
+			await page.evaluate(
+				() => new Promise( window.requestAnimationFrame )
+			);
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// Type additional text and assert that caret position is correct by comparing to snapshot.
@@ -194,7 +202,9 @@ describe( 'deleting all blocks', () => {
 		await page.waitForSelector( 'figure[data-type="core/image"]' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Backspace' );
-
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 		// Verify there is no selected block.
 		// TODO: There should be expectations around where focus is placed in
 		// this scenario. Currently, a focus loss occurs (not acceptable).

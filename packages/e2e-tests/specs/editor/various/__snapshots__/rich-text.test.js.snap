@@ -72,6 +72,12 @@ exports[`RichText should not format text after code backtick 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should not highlight more than one format 1`] = `
+"<!-- wp:paragraph -->
+<p><strong>1</strong> <strong>2</strong></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should not lose selection direction 1`] = `
 "<!-- wp:paragraph -->
 <p><strong>1</strong>2-3</p>

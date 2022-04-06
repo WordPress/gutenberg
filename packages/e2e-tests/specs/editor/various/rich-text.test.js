@@ -80,6 +80,7 @@ describe( 'RichText', () => {
 					.length
 		);
 
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 		expect( count ).toBe( 1 );
 	} );
 
@@ -381,7 +382,9 @@ describe( 'RichText', () => {
 
 		// Add text and select to color.
 		await page.keyboard.type( '1' );
+
 		await pressKeyWithModifier( 'primary', 'a' );
+
 		await clickBlockToolbarButton( 'More' );
 
 		const button = await page.waitForXPath(
@@ -391,6 +394,9 @@ describe( 'RichText', () => {
 		await button.evaluate( ( element ) => element.scrollIntoView() );
 		await button.click();
 
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 		// Tab to the "Text" tab.
 		await page.keyboard.press( 'Tab' );
 		// Tab to black.

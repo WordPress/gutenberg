@@ -136,11 +136,20 @@ export function useInputRules( props ) {
 			}
 		}
 
-		element.addEventListener( 'input', onInput );
-		element.addEventListener( 'compositionend', onInput );
+		// We use queueMicrotask to dealy the onOnput event handler
+		// This was necessary after React 18 upgrade
+		// The reason is that propsRef is not updated yet
+		// when the event handler is called
+		// Ideally the event handled shouldn't be relying on propsRef
+		// but should be relying on DOM state.
+		const delayedOnInput = ( event ) =>
+			queueMicrotask( () => onInput( event ) );
+		element.addEventListener( 'input', delayedOnInput );
+		element.addEventListener( 'compositionend', delayedOnInput );
+
 		return () => {
-			element.removeEventListener( 'input', onInput );
-			element.removeEventListener( 'compositionend', onInput );
+			element.removeEventListener( 'input', delayedOnInput );
+			element.removeEventListener( 'compositionend', delayedOnInput );
 		};
 	}, [] );
 }
