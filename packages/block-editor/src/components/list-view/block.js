@@ -7,11 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
+	Button,
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { lock, moreVertical, Icon } from '@wordpress/icons';
+import { lock, moreVertical } from '@wordpress/icons';
 import {
 	useState,
 	useRef,
@@ -288,11 +289,18 @@ function ListViewBlock( {
 					className="block-editor-list-view-block__lock-cell"
 					aria-selected={ !! isSelected }
 				>
-					{ ( { tabIndex, onFocus } ) => (
-						<Icon
-							icon={ lock }
+					{ ( { ref, tabIndex, onFocus } ) => (
+						<Button
+							disabled
+							ref={ ref }
 							tabIndex={ tabIndex }
 							onFocus={ onFocus }
+							icon={ lock }
+							label={ sprintf(
+								/* translators: %s: block name */
+								__( 'Locked %s' ),
+								blockInformation.title
+							) }
 						/>
 					) }
 				</TreeGridCell>

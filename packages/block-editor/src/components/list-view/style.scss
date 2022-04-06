@@ -202,6 +202,10 @@
 		min-width: 24px;
 		padding: 0;
 		vertical-align: middle;
+
+		.components-button:disabled {
+			opacity: 1;
+		}
 	}
 
 	.block-editor-list-view-block__mover-cell-alignment-wrapper {
