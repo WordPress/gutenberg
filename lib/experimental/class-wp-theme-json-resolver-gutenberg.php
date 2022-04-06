@@ -72,6 +72,10 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		return $with_theme_supports;
 	}
 
+	/**
+	 * Gets the data from the theme.json file and converts it to an object.
+	 * Also merges with the parent theme.
+	 */
 	private static function get_theme_data_without_supports() {
 		if ( null === static::$theme ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
