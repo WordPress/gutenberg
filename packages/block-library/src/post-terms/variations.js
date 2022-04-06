@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { postCategories, tag } from '@wordpress/icons';
+import { postCategories, postTerms } from '@wordpress/icons';
 
 const variations = [
 	{
@@ -19,7 +19,7 @@ const variations = [
 		name: 'post_tag',
 		title: __( 'Post Tags' ),
 		description: __( "Display a post's tags." ),
-		icon: tag,
+		icon: postTerms,
 		attributes: { term: 'post_tag' },
 		isActive: ( blockAttributes ) => blockAttributes.term === 'post_tag',
 	},
