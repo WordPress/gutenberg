@@ -14,7 +14,6 @@ import type { useDrag } from '@use-gesture/react';
  * Internal dependencies
  */
 import type { StateReducer } from './reducer/state';
-import type { FlexProps } from '../flex/types';
 import type { WordPressComponentProps } from '../ui/context';
 
 export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
@@ -56,7 +55,7 @@ export interface InputFieldProps extends BaseProps {
 	onDrag?: ( dragProps: DragProps ) => void;
 }
 
-export interface InputBaseProps extends BaseProps, FlexProps {
+export interface InputBaseProps extends BaseProps {
 	children: ReactNode;
 	prefix?: ReactNode;
 	suffix?: ReactNode;
