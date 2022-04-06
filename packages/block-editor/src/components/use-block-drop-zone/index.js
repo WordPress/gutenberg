@@ -112,16 +112,25 @@ export default function useBlockDropZone( {
 				// Ensure the element is a block. It should have the `wp-block` class.
 				( element ) => element.classList.contains( 'wp-block' )
 			);
+			const targetBlock = () => {
+				if ( event.srcElement.dataset?.empty === 'true' ) {
+					return event.target;
+				}
+
+				return false;
+			};
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
 				{ x: event.clientX, y: event.clientY },
 				getBlockListSettings( targetRootClientId )?.orientation
 			);
 
-			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
+			if ( ! targetBlock() ) {
+				setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
 
-			if ( targetIndex !== null ) {
-				showInsertionPoint( targetRootClientId, targetIndex );
+				if ( targetIndex !== null ) {
+					showInsertionPoint( targetRootClientId, targetIndex );
+				}
 			}
 		}, [] ),
 		200
