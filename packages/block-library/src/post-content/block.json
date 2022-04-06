@@ -10,7 +10,30 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
-		"__experimentalLayout": true
+		"__experimentalLayout": true,
+		"spacing": {
+			"margin": [ "top", "bottom" ]
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		}
 	},
 	"editorStyle": "wp-block-post-content-editor"
 }
