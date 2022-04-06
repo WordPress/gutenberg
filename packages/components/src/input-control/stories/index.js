@@ -1,14 +1,4 @@
 /**
- * External dependencies
- */
-import { boolean, select, text } from '@storybook/addon-knobs';
-
-/**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import InputControl from '../';
@@ -16,56 +6,50 @@ import InputControl from '../';
 export default {
 	title: 'Components (Experimental)/InputControl',
 	component: InputControl,
+	argTypes: {
+		__unstableInputWidth: { control: { type: 'text' } },
+		__unstableStateReducer: { control: { type: null } },
+		onChange: { control: { type: null } },
+		prefix: { control: { type: null } },
+		suffix: { control: { type: null } },
+		type: { control: { type: 'text' } },
+	},
 	parameters: {
-		knobs: { disable: false },
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
 	},
 };
 
-function Example() {
-	const [ value, setValue ] = useState( '' );
+const Template = ( args ) => <InputControl { ...args } />;
 
-	const props = {
-		disabled: boolean( 'disabled', false ),
-		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
-		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
-		label: text( 'label', 'Value' ),
-		labelPosition: select(
-			'labelPosition',
-			{
-				top: 'top',
-				side: 'side',
-				bottom: 'bottom',
-			},
-			'top'
-		),
-		placeholder: text( 'placeholder', 'Placeholder' ),
-		size: select(
-			'size',
-			{
-				default: 'default',
-				small: 'small',
-				'__unstable-large': '__unstable-large',
-			},
-			'default'
-		),
-		suffix: text( 'suffix', '' ),
-		prefix: text( 'prefix', '' ),
-	};
+export const Default = Template.bind( {} );
+Default.args = {
+	label: 'Value',
+	placeholder: 'Placeholder',
+	value: '',
+};
 
-	const suffixMarkup = props.suffix ? <div>{ props.suffix }</div> : null;
-	const prefixMarkup = props.prefix ? <div>{ props.prefix }</div> : null;
+export const WithPrefix = Template.bind( {} );
+WithPrefix.args = {
+	...Default.args,
+	prefix: <span style={ { paddingLeft: 8 } }>@</span>,
+};
 
-	return (
-		<InputControl
-			{ ...props }
-			onChange={ ( v ) => setValue( v ) }
-			prefix={ prefixMarkup }
-			suffix={ suffixMarkup }
-			value={ value }
-		/>
-	);
-}
+export const WithSuffix = Template.bind( {} );
+WithSuffix.args = {
+	...Default.args,
+	suffix: <button style={ { marginRight: 4 } }>Send</button>,
+};
 
-export const _default = () => {
-	return <Example />;
+export const WithSideLabel = Template.bind( {} );
+WithSideLabel.args = {
+	...Default.args,
+	labelPosition: 'side',
+};
+
+export const WithEdgeLabel = Template.bind( {} );
+WithEdgeLabel.args = {
+	...Default.args,
+	__unstableInputWidth: '20em',
+	labelPosition: 'edge',
 };
