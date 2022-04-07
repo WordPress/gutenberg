@@ -118,14 +118,19 @@ function InterfaceSkeleton(
 				) }
 				<div className="interface-interface-skeleton__body">
 					{ !! secondarySidebar && (
-						<div
+						<motion.div
+							animate={ isDistractionFree ? 'hidden' : 'hover' }
+							initial="hidden"
+							whileHover="hover"
+							variants={ headerVariants }
+							transition={ { type: 'tween', delay: 0.8 } }
 							className="interface-interface-skeleton__secondary-sidebar"
 							role="region"
 							aria-label={ mergedLabels.secondarySidebar }
 							tabIndex="-1"
 						>
 							{ secondarySidebar }
-						</div>
+						</motion.div>
 					) }
 					{ !! notices && (
 						<div className="interface-interface-skeleton__notices">
@@ -141,14 +146,19 @@ function InterfaceSkeleton(
 						{ content }
 					</div>
 					{ !! sidebar && (
-						<div
+						<motion.div
+							animate={ isDistractionFree ? 'hidden' : 'hover' }
+							initial="hidden"
+							whileHover="hover"
+							variants={ headerVariants }
+							transition={ { type: 'tween', delay: 0.8 } }
 							className="interface-interface-skeleton__sidebar"
 							role="region"
 							aria-label={ mergedLabels.sidebar }
 							tabIndex="-1"
 						>
 							{ sidebar }
-						</div>
+						</motion.div>
 					) }
 					{ !! actions && (
 						<div

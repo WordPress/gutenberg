@@ -136,11 +136,6 @@ html.interface-interface-skeleton__html-container {
 		border-radius: 2px;
 		box-shadow: $shadow-popover;
 
-		&[aria-label="Editor settings"] { // There's certainly a better way to target the Inspector
-			bottom: auto;
-			max-height: calc(100vh - #{$header-height} - (#{$grid-unit-15} * 2)); // Probably a better way to do this too.
-		}
-
 		.components-panel__body {
 			border-bottom: 0;
 		}
@@ -160,12 +155,15 @@ html.interface-interface-skeleton__html-container {
 		right: 0;
 		top: $header-height;
 		left: inherit;
+		bottom: auto;
+		max-height: calc(100vh - #{$header-height} - (#{$grid-unit-15} * 2));
 	}
 
 	.interface-interface-skeleton__body {
 		margin-top: -60px;
 	}
 }
+
 .interface-interface-skeleton__secondary-sidebar {
 	@include break-medium() {
 		border-right: $border-width solid $gray-200;

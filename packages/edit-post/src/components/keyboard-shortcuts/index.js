@@ -55,8 +55,8 @@ function KeyboardShortcuts() {
 			category: 'global',
 			description: __( 'Toggle disrtaction free mode.' ),
 			keyCombination: {
-				modifier: 'secondary',
-				character: 'o',
+				modifier: 'primaryShift',
+				character: '\\',
 			},
 		} );
 
@@ -150,8 +150,7 @@ function KeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
-		//toggleFeature( 'reducedUI' );
-		//n
+		toggleFeature( 'reducedUI' );
 	} );
 
 	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {

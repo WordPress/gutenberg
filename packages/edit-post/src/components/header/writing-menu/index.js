@@ -1,13 +1,19 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
 import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function WritingMenu() {
+	const hasReducedUI = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().hasReducedUI,
+		[]
+	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	if ( ! isLargeViewport ) {
 		return null;
@@ -15,16 +21,18 @@ function WritingMenu() {
 
 	return (
 		<MenuGroup label={ _x( 'View', 'noun' ) }>
-			<PreferenceToggleMenuItem
-				scope="core/edit-post"
-				name="fixedToolbar"
-				label={ __( 'Top toolbar' ) }
-				info={ __(
-					'Access all block and document tools in a single place'
-				) }
-				messageActivated={ __( 'Top toolbar activated' ) }
-				messageDeactivated={ __( 'Top toolbar deactivated' ) }
-			/>
+			{ ! hasReducedUI && (
+				<PreferenceToggleMenuItem
+					scope="core/edit-post"
+					name="fixedToolbar"
+					label={ __( 'Top toolbar' ) }
+					info={ __(
+						'Access all block and document tools in a single place'
+					) }
+					messageActivated={ __( 'Top toolbar activated' ) }
+					messageDeactivated={ __( 'Top toolbar deactivated' ) }
+				/>
+			) }
 			<PreferenceToggleMenuItem
 				scope="core/edit-post"
 				name="focusMode"
@@ -49,7 +57,7 @@ function WritingMenu() {
 				info={ __( 'Work without distraction' ) }
 				messageActivated={ __( 'Distraction free mode activated' ) }
 				messageDeactivated={ __( 'Distraction free mode deactivated' ) }
-				shortcut={ displayShortcut.secondary( ',' ) }
+				shortcut={ displayShortcut.secondary( '\\' ) }
 			/>
 		</MenuGroup>
 	);
