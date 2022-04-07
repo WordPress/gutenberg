@@ -125,9 +125,13 @@ html.interface-interface-skeleton__html-container {
 		box-shadow: $shadow-popover;
 	}
 
+	.interface-interface-skeleton__header {
+		border-bottom: 0;
+	}
+
 	.interface-interface-skeleton__secondary-sidebar,
 	&.is-sidebar-opened .interface-interface-skeleton__sidebar {
-		border: $border-width solid $gray-200;
+		border: 0;
 		margin: $grid-unit-15;
 		border-radius: 2px;
 		box-shadow: $shadow-popover;
