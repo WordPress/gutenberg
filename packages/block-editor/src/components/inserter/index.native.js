@@ -53,7 +53,7 @@ const defaultRenderToggle = ( {
 	};
 	const defaultViewText = (
 		<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
-			{ __( 'Add block' ) }
+			{ __( 'Add Blocks' ) }
 		</Text>
 	);
 
