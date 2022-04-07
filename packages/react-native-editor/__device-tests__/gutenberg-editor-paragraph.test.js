@@ -135,7 +135,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	it( 'should be able to merge blocks with unknown html elements', async () => {
 		await editorPage.setHtmlContent(
 			[
-				testData.unknownElementBlock,
+				testData.unknownElementParagraphBlock,
 				testData.lettersInParagraphBlock,
 			].join( '\n\n' )
 		);
