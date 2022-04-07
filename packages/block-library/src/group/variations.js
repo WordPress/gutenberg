@@ -8,7 +8,7 @@ const variations = [
 	{
 		name: 'group',
 		title: __( 'Group' ),
-		description: __( 'Blocks shown in a column.' ),
+		description: __( 'Blocks placed together.' ),
 		attributes: { layout: { type: 'default' } },
 		scope: [ 'transform' ],
 		isActive: ( blockAttributes ) =>
@@ -20,7 +20,7 @@ const variations = [
 	{
 		name: 'group-row',
 		title: __( 'Row' ),
-		description: __( 'Blocks shown in a row.' ),
+		description: __( 'Blocks put in a row.' ),
 		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
