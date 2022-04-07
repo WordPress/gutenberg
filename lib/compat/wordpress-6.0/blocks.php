@@ -123,35 +123,33 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 	return $query;
 }
 
-if ( ! function_exists( 'extend_block_editor_settings_with_discussion_settings' ) ) {
-	/**
-	 * Workaround for getting discussion settings as block editor settings
-	 * so any user can access to them without needing to be an admin.
-	 *
-	 * @param array $settings Default editor settings.
-	 *
-	 * @return array Filtered editor settings.
-	 */
-	function extend_block_editor_settings_with_discussion_settings( $settings ) {
+/**
+ * Workaround for getting discussion settings as block editor settings
+ * so any user can access to them without needing to be an admin.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_block_editor_settings_with_discussion_settings( $settings ) {
 
-		$settings['discussionSettings'] = array(
-			'commentOrder'        => get_option( 'comment_order' ),
-			'commentsPerPage'     => get_option( 'comments_per_page' ),
-			'defaultCommentsPage' => get_option( 'default_comments_page' ),
-			'pageComments'        => get_option( 'page_comments' ),
-			'threadComments'      => get_option( 'thread_comments' ),
-			'threadCommentsDepth' => get_option( 'thread_comments_depth' ),
-			'avatarURL'           => get_avatar_url(
-				'',
-				array(
-					'size'          => 96,
-					'force_default' => true,
-					'default'       => get_option( 'avatar_default' ),
-				)
-			),
-		);
+	$settings['discussionSettings'] = array(
+		'commentOrder'        => get_option( 'comment_order' ),
+		'commentsPerPage'     => get_option( 'comments_per_page' ),
+		'defaultCommentsPage' => get_option( 'default_comments_page' ),
+		'pageComments'        => get_option( 'page_comments' ),
+		'threadComments'      => get_option( 'thread_comments' ),
+		'threadCommentsDepth' => get_option( 'thread_comments_depth' ),
+		'avatarURL'           => get_avatar_url(
+			'',
+			array(
+				'size'          => 96,
+				'force_default' => true,
+				'default'       => get_option( 'avatar_default' ),
+			)
+		),
+	);
 
-		return $settings;
-	}
+	return $settings;
 }
-add_filter( 'block_editor_settings_all', 'extend_block_editor_settings_with_discussion_settings' );
+add_filter( 'block_editor_settings_all', 'gutenberg_extend_block_editor_settings_with_discussion_settings' );
