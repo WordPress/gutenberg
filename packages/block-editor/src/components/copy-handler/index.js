@@ -11,7 +11,7 @@ import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
 } from '@wordpress/dom';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useRefEffect } from '@wordpress/compose';
@@ -73,23 +73,21 @@ export function useNotifyCopy() {
 }
 
 export function useClipboardHandler() {
-	const registry = useRegistry();
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
-		getSelectionStart,
-		getSelectionEnd,
-		getSelectedBlocksInitialCaretPosition,
 		__unstableIsFullySelected,
+		__unstableIsSelectionMergeable,
 		__unstableGetSelectedBlocksWithPartialSelection,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
 		removeBlocks,
-		selectionChange,
 		replaceBlocks,
+		__unstableDeleteSelection,
+		__unstableExpandSelection,
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
@@ -125,67 +123,52 @@ export function useClipboardHandler() {
 			const eventDefaultPrevented = event.defaultPrevented;
 			event.preventDefault();
 
+			const isFullySelected = __unstableIsFullySelected();
+			const isSelectionMergeable = __unstableIsSelectionMergeable();
+			const expandSelectionIsNeeded =
+				! isFullySelected && ! isSelectionMergeable;
 			if ( event.type === 'copy' || event.type === 'cut' ) {
 				if ( selectedBlockClientIds.length === 1 ) {
 					flashBlock( selectedBlockClientIds[ 0 ] );
 				}
-				notifyCopy( event.type, selectedBlockClientIds );
-				let blocks;
-				// Check if we have partial selection.
-				if ( ! __unstableIsFullySelected() ) {
-					const [
-						head,
-						tail,
-					] = __unstableGetSelectedBlocksWithPartialSelection();
-					const inBetweenBlocks = getBlocksByClientId(
-						selectedBlockClientIds.slice(
-							1,
-							selectedBlockClientIds.length - 1
-						)
-					);
-					blocks = [ head, ...inBetweenBlocks, tail ];
+				// If we have a partial selection that is not mergeable, just
+				// expand the selection to the whole blocks.
+				if ( expandSelectionIsNeeded ) {
+					__unstableExpandSelection();
 				} else {
-					blocks = getBlocksByClientId( selectedBlockClientIds );
-				}
-				const serialized = serialize( blocks );
+					notifyCopy( event.type, selectedBlockClientIds );
+					let blocks;
+					// Check if we have partial selection.
+					if ( isFullySelected ) {
+						blocks = getBlocksByClientId( selectedBlockClientIds );
+					} else {
+						const [
+							head,
+							tail,
+						] = __unstableGetSelectedBlocksWithPartialSelection();
+						const inBetweenBlocks = getBlocksByClientId(
+							selectedBlockClientIds.slice(
+								1,
+								selectedBlockClientIds.length - 1
+							)
+						);
+						blocks = [ head, ...inBetweenBlocks, tail ];
+					}
+					const serialized = serialize( blocks );
 
-				event.clipboardData.setData( 'text/plain', serialized );
-				event.clipboardData.setData( 'text/html', serialized );
+					event.clipboardData.setData( 'text/plain', serialized );
+					event.clipboardData.setData( 'text/html', serialized );
+				}
 			}
 
 			if ( event.type === 'cut' ) {
-				// Check if we have partial selection.
-				if ( ! __unstableIsFullySelected() ) {
-					const selectionAnchor = getSelectionStart();
-					const selectionFocus = getSelectionEnd();
-					const updatedBlocks = __unstableGetSelectedBlocksWithPartialSelection(
-						false
-					);
-					// We need to know the top block to restore selection there,
-					// independently of where the selection started.
-					const topBlockSelection = [
-						selectionAnchor,
-						selectionFocus,
-					].find(
-						( { clientId } ) =>
-							clientId === updatedBlocks[ 0 ].clientId
-					);
-					registry.batch( () => {
-						selectionChange(
-							topBlockSelection.clientId,
-							topBlockSelection.attributeKey,
-							topBlockSelection.offset,
-							topBlockSelection.offset
-						);
-						replaceBlocks(
-							selectedBlockClientIds,
-							updatedBlocks,
-							0, // Select top block.
-							getSelectedBlocksInitialCaretPosition()
-						);
-					} );
-				} else {
+				// We need to also check if at the start we needed to
+				// expand the selection, as in this point we might have
+				// programmatically fully selected the blocks above.
+				if ( isFullySelected && ! expandSelectionIsNeeded ) {
 					removeBlocks( selectedBlockClientIds );
+				} else {
+					__unstableDeleteSelection();
 				}
 			} else if ( event.type === 'paste' ) {
 				if ( eventDefaultPrevented ) {
