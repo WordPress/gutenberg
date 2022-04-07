@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import migrateIndividualPreferenceToPreferencesStore from '../migrate-individual-preference-to-preferences-store';
+import moveIndividualPreferenceToPreferences from '../move-individual-preference-to-preferences';
 
-describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
+describe( 'moveIndividualPreferenceToPreferences', () => {
 	it( 'migrates an individual preference from the source to the preferences store', () => {
 		const initialState = {
 			'core/test': {
@@ -13,7 +13,7 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 			},
 		};
 
-		const convertedData = migrateIndividualPreferenceToPreferencesStore(
+		const convertedData = moveIndividualPreferenceToPreferences(
 			initialState,
 			{ from: 'core/test', scope: 'core/test' },
 			'myPreference'
@@ -58,7 +58,7 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 			},
 		};
 
-		const convertedData = migrateIndividualPreferenceToPreferencesStore(
+		const convertedData = moveIndividualPreferenceToPreferences(
 			initialState,
 			{ from: 'core/test', scope: 'core/test' },
 			'myPreference'
@@ -97,7 +97,7 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 			},
 		};
 
-		const convertedData = migrateIndividualPreferenceToPreferencesStore(
+		const convertedData = moveIndividualPreferenceToPreferences(
 			initialState,
 			{ from: 'core/source', scope: 'core/destination' },
 			'myPreference'
@@ -135,7 +135,7 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 			},
 		};
 
-		const convertedData = migrateIndividualPreferenceToPreferencesStore(
+		const convertedData = moveIndividualPreferenceToPreferences(
 			initialState,
 			{ from: 'core/test', scope: 'core/test' },
 			'myPreference'
@@ -166,7 +166,7 @@ describe( 'migrateIndividualPreferenceToPreferencesStore', () => {
 			},
 		};
 
-		const convertedData = migrateIndividualPreferenceToPreferencesStore(
+		const convertedData = moveIndividualPreferenceToPreferences(
 			initialState,
 			{ from: 'core/test', scope: 'core/test' },
 			'myFalsePreference'

@@ -8,7 +8,7 @@
  *                                 package.
  * @return {Object} The migrated state
  */
-export default function migrateFeaturePreferencesToPreferencesStore(
+export default function moveFeaturePreferencesToPreferences(
 	state,
 	sourceStoreName
 ) {

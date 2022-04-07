@@ -10,7 +10,7 @@ const identity = ( arg ) => arg;
  * @param {string}    key           The key in the preferences object to migrate.
  * @param {?Function} convert       A function that converts preferences from one format to another.
  */
-export default function migrateIndividualPreferenceToPreferencesStore(
+export default function moveIndividualPreferenceToPreferences(
 	state,
 	{ from: sourceStoreName, scope },
 	key,

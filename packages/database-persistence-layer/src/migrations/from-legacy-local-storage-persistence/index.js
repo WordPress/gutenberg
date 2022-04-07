@@ -5,7 +5,7 @@
  *
  * @return {Object | undefined} The converted data or `undefined` if there was nothing to convert.
  */
-export default function convertFromLocalStorage( userId ) {
+export default function migrateFromLegacyLocalStoragePersistence( userId ) {
 	const key = `WP_DATA_USER_${ userId }`;
 	const unparsedData = window.localStorage.getItem( key );
 	const data = JSON.parse( unparsedData );
