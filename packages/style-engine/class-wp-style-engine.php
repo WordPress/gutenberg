@@ -175,15 +175,15 @@ class WP_Style_Engine {
 			// Generate inline style rules.
 			if ( isset( $options['inline'] ) && true === $options['inline'] ) {
 				foreach ( $rules as $rule => $value ) {
-					$filtered_css = esc_html( safecss_filter_attr( "{$rule}:{$value}" ) );
+					$filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
 					if ( ! empty( $filtered_css ) ) {
-						$output .= $filtered_css . ';';
+						$output .= $filtered_css . '; ';
 					}
 				}
 			}
 		}
 
-		return $output;
+		return trim( $output );
 	}
 
 	/**
