@@ -16,9 +16,14 @@ export default function CopyMenuItem( { blocks, onCopy } ) {
 	const {
 		hasMultiSelection,
 		__unstableIsFullySelected,
+		__unstableIsSelectionMergeable,
 		__unstableGetSelectedBlocksWithPartialSelection,
 	} = useSelect( blockEditorStore );
-	if ( hasMultiSelection() && ! __unstableIsFullySelected() ) {
+	if (
+		hasMultiSelection() &&
+		! __unstableIsFullySelected() &&
+		__unstableIsSelectionMergeable()
+	) {
 		const [
 			head,
 			tail,
