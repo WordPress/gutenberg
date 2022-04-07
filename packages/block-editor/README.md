@@ -599,11 +599,11 @@ _Properties_
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+-   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
--   _\_\_experimentalGenerateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _\_\_experimentalCanLockBlocks_ `boolean`: Whether the user can manage Block Lock state
 -   _\_\_unstableGalleryWithImageBlocks_ `boolean`: Whether the user has enabled the refactored gallery block which uses InnerBlocks
 
