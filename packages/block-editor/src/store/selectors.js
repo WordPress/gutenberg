@@ -225,18 +225,21 @@ export const __unstableGetClientIdsTree = createSelector(
  *
  * @return {Array} ids of descendants.
  */
-export const getClientIdsOfDescendants = ( state, clientIds ) => {
-	const collectedIds = [];
-	for ( const givenId of clientIds ) {
-		for ( const descendantId of getBlockOrder( state, givenId ) ) {
-			collectedIds.push(
-				descendantId,
-				...getClientIdsOfDescendants( state, [ descendantId ] )
-			);
+export const getClientIdsOfDescendants = createSelector(
+	( state, clientIds ) => {
+		const collectedIds = [];
+		for ( const givenId of clientIds ) {
+			for ( const descendantId of getBlockOrder( state, givenId ) ) {
+				collectedIds.push(
+					descendantId,
+					...getClientIdsOfDescendants( state, [ descendantId ] )
+				);
+			}
 		}
-	}
-	return collectedIds;
-};
+		return collectedIds;
+	},
+	( state ) => [ state.blocks.order ]
+);
 
 /**
  * Returns an array containing the clientIds of the top-level blocks and
