@@ -1,8 +1,10 @@
-.wp-block-search__button {
+:where(.wp-block-search__button) {
 	background: #f7f7f7;
 	border: 1px solid #ccc;
-	padding: 0.375em 0.625em;
 	color: #32373c;
+}
+.wp-block-search__button {
+	padding: 0.375em 0.625em;
 	margin-left: 0.625em;
 	word-break: normal;
 	font-size: inherit;

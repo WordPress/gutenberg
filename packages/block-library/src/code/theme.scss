@@ -1,6 +1,7 @@
-.wp-block-code {
-	border: 1px solid #ccc;
-	border-radius: 4px;
+:where(.wp-block-code) {
 	font-family: Menlo, Consolas, monaco, monospace;
+}
+.wp-block-code {
+	border-radius: 4px;
 	padding: 0.8em 1em;
 }
