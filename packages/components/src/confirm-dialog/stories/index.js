@@ -110,6 +110,7 @@ VeeeryLongMessage.args = {
 	children: daText().repeat( 20 ),
 };
 
+// You can pass explicit cacncel actions with the `onCancel` prop.
 export const UncontrolledAndWithExplicitOnCancel = Template.bind( {} );
 UncontrolledAndWithExplicitOnCancel.args = {
 	confirmOutput: 'Confirmed!',
@@ -117,7 +118,7 @@ UncontrolledAndWithExplicitOnCancel.args = {
 };
 
 // Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel` to be passed.
-// It's also necessary to explicitely close the dialog when needed. See `setIsOpen` calls below.
+// It's also necessary to explicitly close the dialog when needed. See `setIsOpen` calls below.
 export const Controlled = () => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ confirmVal, setConfirmVal ] = useState(
