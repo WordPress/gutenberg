@@ -71,25 +71,6 @@
 			}
 		}
 	}
-
-	// Hide individual left and right borders when the "stack on mobile" option
-	// is enabled and on the mobile viewport. This still allows for simple
-	// uniform flat border to retain its left/right borders.
-	&:where(:not(.is-not-stacked-on-mobile)) {
-		@media (max-width: #{ ($break-medium - 1) }) {
-			& > .wp-block-column[style*="border-left-width"],
-			& > .wp-block-column[style*="border-left-style"],
-			& > .wp-block-column[class*="has-border-left-color"] {
-				border-left-width: 0 !important;
-			}
-
-			& > .wp-block-column[style*="border-right-width"],
-			& > .wp-block-column[class*="has-border-right-color"],
-			& > .wp-block-column[style*="border-right-style"] {
-				border-right-width: 0 !important;
-			}
-		}
-	}
 }
 
 // Add low specificity default padding to columns blocks with backgrounds.
