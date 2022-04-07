@@ -13,7 +13,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.73.1
 
--   [*] [Space block] Fix crash when changing the height value using the text input [#40053]
+-   [*] [Spacer block] Fix crash when changing the height value using the text input [#40053]
 
 ## 1.73.0
 
