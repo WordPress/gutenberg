@@ -61,12 +61,14 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
 	 * the theme.json takes precedence.
 	 *
 	 * @param array $deprecated Deprecated argument.
+	 * @param array $settings Contains a key called with_supports to determine whether to include theme supports in the data.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
-	public static function get_theme_data( $deprecated = array() ) {
+	public static function get_theme_data( $deprecated = array(), $settings = array( 'with_supports' => true ) ) {
 		if ( ! empty( $deprecated ) ) {
 			_deprecated_argument( __METHOD__, '5.9' );
 		}
+
 		if ( null === static::$theme ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
@@ -85,12 +87,16 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
 			}
 		}
 
+		if ( ! $settings['with_supports'] ) {
+			return static::$theme;
+		}
+
 		/*
-		* We want the presets and settings declared in theme.json
-		* to override the ones declared via theme supports.
-		* So we take theme supports, transform it to theme.json shape
-		* and merge the static::$theme upon that.
-		*/
+		 * We want the presets and settings declared in theme.json
+		 * to override the ones declared via theme supports.
+		 * So we take theme supports, transform it to theme.json shape
+		 * and merge the static::$theme upon that.
+		 */
 		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
 		if ( ! static::theme_has_support() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
@@ -125,7 +131,6 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
 
 		return $with_theme_supports;
 	}
-
 	/**
 	 * Returns the style variations defined by the theme.
 	 *
