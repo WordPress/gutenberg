@@ -5,24 +5,26 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { Children, cloneElement, forwardRef } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-export const BlockQuotation = withPreferredColorScheme( ( props ) => {
-	const { getStylesFromColorScheme, style } = props;
+export const BlockQuotation = forwardRef( ( { ...props }, ref ) => {
+	const { style } = props;
 
 	const blockQuoteStyle = [
-		getStylesFromColorScheme(
+		usePreferredColorSchemeStyle(
 			styles.wpBlockQuoteLight,
 			styles.wpBlockQuoteDark
 		),
 		style?.color && {
 			borderLeftColor: style.color,
 		},
+		style,
+		style?.backgroundColor && styles.paddingWithBackground,
 	];
 	const colorStyle = style?.color ? { color: style.color } : {};
 
@@ -35,13 +37,11 @@ export const BlockQuotation = withPreferredColorScheme( ( props ) => {
 				},
 			} );
 		}
-		if ( child && child.props.identifier === 'value' ) {
-			return cloneElement( child, {
-				tagsToEliminate: [ 'div' ],
-				style: colorStyle,
-			} );
-		}
 		return child;
 	} );
-	return <View style={ blockQuoteStyle }>{ newChildren }</View>;
+	return (
+		<View ref={ ref } style={ blockQuoteStyle }>
+			{ newChildren }
+		</View>
+	);
 } );
