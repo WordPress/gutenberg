@@ -8,42 +8,25 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
-import type { Status } from './constants';
+import type { Options, EntityRecordResolution } from './use-entity-record';
 
-interface EntityRecordsResolution< RecordType > {
+type EntityRecordsResolution< RecordType > = Omit<
+	EntityRecordResolution< RecordType >,
+	'record'
+> & {
 	/** The requested entity record */
 	records: RecordType[] | null;
+};
 
-	/**
-	 * Is the record still being resolved?
-	 */
-	isResolving: boolean;
-
-	/**
-	 * Is the record resolved by now?
-	 */
-	hasResolved: boolean;
-
-	/** Resolution status */
-	status: Status;
-}
-
-interface Options {
-	/**
-	 * Whether to run the query or short-circuit and return null.
-	 *
-	 * @default true
-	 */
-	enabled: boolean;
-}
+const EMPTY_ARRAY = [];
 
 /**
  * Resolves the specified entity records.
  *
- * @param  kind      Kind of the requested entities.
- * @param  name      Name of the requested entities.
- * @param  queryArgs HTTP query for the requested entities.
- * @param  options   Hook options.
+ * @param  kind      Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+ * @param  name      Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+ * @param  queryArgs Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
+ * @param  options   Optional hook options.
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -91,7 +74,8 @@ export default function useEntityRecords< RecordType >(
 		( query ) => {
 			if ( ! options.enabled ) {
 				return {
-					data: [],
+					// Avoiding returning a new reference on every execution.
+					data: EMPTY_ARRAY,
 				};
 			}
 			return query( coreStore ).getEntityRecords( kind, name, queryArgs );

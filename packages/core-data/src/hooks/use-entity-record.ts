@@ -5,7 +5,7 @@ import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import type { Status } from './constants';
 
-interface EntityRecordResolution< RecordType > {
+export interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
 	record: RecordType | null;
 
@@ -23,17 +23,22 @@ interface EntityRecordResolution< RecordType > {
 	status: Status;
 }
 
-interface Options {
+export interface Options {
+	/**
+	 * Whether to run the query or short-circuit and return null.
+	 *
+	 * @default true
+	 */
 	enabled: boolean;
 }
 
 /**
  * Resolves the specified entity record.
  *
- * @param  kind                   Kind of the requested entity.
- * @param  name                   Name of the requested  entity.
- * @param  recordId               Record ID of the requested entity.
- * @param  options                Hook options.
+ * @param  kind                   Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+ * @param  name                   Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+ * @param  recordId               ID of the requested entity record.
+ * @param  options                Optional hook options.
  * @param  [options.enabled=true] Whether to run the query or short-circuit and return null. Defaults to true.
  * @example
  * ```js
@@ -57,7 +62,7 @@ interface Options {
  * application, the page and the resolution details will be retrieved from
  * the store state using `getEntityRecord()`, or resolved if missing.
  *
- * @return {EntityRecordResolution<RecordType>} Entity record data.
+ * @return Entity record data.
  * @template RecordType
  */
 export default function useEntityRecord< RecordType >(
