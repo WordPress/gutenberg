@@ -52,7 +52,7 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 		return $attributes;
 	}
 
-	$style_engine                    = WP_Style_Engine_Gutenberg::get_instance();
+	$style_engine                    = gutenberg_get_style_engine();
 	$skip_padding                    = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' );
 	$skip_margin                     = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' );
 	$spacing_block_styles            = array();

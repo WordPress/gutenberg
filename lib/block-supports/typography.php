@@ -175,7 +175,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	$style_engine  = WP_Style_Engine_Gutenberg::get_instance();
+	$style_engine  = gutenberg_get_style_engine();
 	$inline_styles = $style_engine->generate(
 		array( 'typography' => $styles ),
 		array(
@@ -183,10 +183,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		)
 	);
 
-	$classnames = $style_engine->generate(
+	$classnames = $style_engine->get_classnames(
 		array( 'typography' => $classes ),
 		array(
-			'classnames' => true,
+			'use_schema' => true,
 		)
 	);
 
