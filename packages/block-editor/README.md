@@ -604,7 +604,7 @@ _Properties_
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
--   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categorie
+-   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
 -   _\_\_unstableGalleryWithImageBlocks_ `boolean`: Whether the user has enabled the refactored gallery block which uses InnerBlocks
 
 ### SkipToSelectedBlock
