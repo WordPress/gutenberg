@@ -408,7 +408,7 @@ describe( 'UnitControl', () => {
 		it( 'should update unit value when a new raw value is passed', async () => {
 			const { user } = render( <ControlledSyncUnits /> );
 
-			const [ inputA, inputB ] = screen.getAllByRole( 'spinbutton' );
+			const [ inputA, inputB ] = screen.getAllByRole( 'textbox' );
 			const [ selectA, selectB ] = screen.getAllByRole( 'combobox' );
 
 			const [ remOptionA ] = screen.getAllByRole( 'option', {

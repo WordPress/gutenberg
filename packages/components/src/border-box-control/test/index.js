@@ -61,13 +61,13 @@ const queryButton = ( name ) => {
 };
 
 const updateLinkedWidthInput = ( value ) => {
-	const widthInput = screen.getByRole( 'spinbutton' );
+	const widthInput = screen.getByRole( 'textbox' );
 	widthInput.focus();
 	fireEvent.change( widthInput, { target: { value } } );
 };
 
 const updateSplitWidthInput = ( value, index = 0 ) => {
-	const splitInputs = screen.getAllByRole( 'spinbutton' );
+	const splitInputs = screen.getAllByRole( 'textbox' );
 	splitInputs[ index ].focus();
 	fireEvent.change( splitInputs[ index ], { target: { value } } );
 };
@@ -79,7 +79,7 @@ describe( 'BorderBoxControl', () => {
 
 			const label = screen.getByText( props.label );
 			const colorButton = screen.getByLabelText( toggleLabelRegex );
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = screen.getByRole( 'textbox' );
 			const unitSelect = screen.getByRole( 'combobox' );
 			const slider = screen.getByRole( 'slider' );
 			const linkedButton = screen.getByLabelText( 'Unlink sides' );
@@ -108,14 +108,14 @@ describe( 'BorderBoxControl', () => {
 
 		it( 'should show correct width value when flat border value provided', () => {
 			renderBorderBoxControl( { value: defaultBorder } );
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = screen.getByRole( 'textbox' );
 
 			expect( widthInput.value ).toBe( '1' );
 		} );
 
 		it( 'should show correct width value when consistent split borders provided', () => {
 			renderBorderBoxControl( { value: defaultBorders } );
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = screen.getByRole( 'textbox' );
 
 			expect( widthInput.value ).toBe( '1' );
 		} );
@@ -126,7 +126,7 @@ describe( 'BorderBoxControl', () => {
 			// First render of control with mixed values should show split view.
 			clickButton( 'Link sides' );
 
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = screen.getByRole( 'textbox' );
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
 		} );
 
@@ -143,7 +143,7 @@ describe( 'BorderBoxControl', () => {
 
 			// First render of control with mixed values should show split view.
 			clickButton( 'Link sides' );
-			const linkedInput = screen.getByRole( 'spinbutton' );
+			const linkedInput = screen.getByRole( 'textbox' );
 
 			expect( linkedInput.value ).toBe( '5' );
 		} );
@@ -171,7 +171,7 @@ describe( 'BorderBoxControl', () => {
 			renderBorderBoxControl( { value: mixedBorders } );
 
 			const colorButtons = screen.getAllByLabelText( toggleLabelRegex );
-			const widthInputs = screen.getAllByRole( 'spinbutton' );
+			const widthInputs = screen.getAllByRole( 'textbox' );
 			const unitSelects = screen.getAllByRole( 'combobox' );
 			const sliders = screen.queryAllByRole( 'slider' );
 			const linkedButton = screen.getByLabelText( 'Link sides' );
@@ -186,7 +186,7 @@ describe( 'BorderBoxControl', () => {
 		it( 'should render correct width values in appropriate inputs', () => {
 			renderBorderBoxControl( { value: mixedBorders } );
 
-			const widthInputs = screen.getAllByRole( 'spinbutton' );
+			const widthInputs = screen.getAllByRole( 'textbox' );
 
 			expect( widthInputs[ 0 ].value ).toBe( '1' ); // Top.
 			expect( widthInputs[ 1 ].value ).toBe( '0.75' ); // Left.
@@ -198,7 +198,7 @@ describe( 'BorderBoxControl', () => {
 			renderBorderBoxControl( { value: defaultBorders } );
 			clickButton( 'Unlink sides' );
 
-			const widthInputs = screen.getAllByRole( 'spinbutton' );
+			const widthInputs = screen.getAllByRole( 'textbox' );
 			expect( widthInputs[ 0 ].value ).toBe( '1' ); // Top.
 			expect( widthInputs[ 1 ].value ).toBe( '1' ); // Left.
 			expect( widthInputs[ 2 ].value ).toBe( '1' ); // Right.
