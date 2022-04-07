@@ -95,7 +95,7 @@ describe( 'FocalPointPicker', () => {
 			const { rerender, getByRole } = render(
 				<Picker value={ { x: 0.25, y: 0.5 } } />
 			);
-			const xInput = getByRole( 'spinbutton', { name: 'Left' } );
+			const xInput = getByRole( 'textbox', { name: 'Left' } );
 			rerender( <Picker value={ { x: 0.93, y: 0.5 } } /> );
 			expect( xInput.value ).toBe( '93' );
 		} );
