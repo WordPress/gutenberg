@@ -126,12 +126,12 @@ function PostFeaturedImage( { noticeUI, noticeOperations } ) {
 	);
 
 	function onUpdateImage( image ) {
-		if ( isBlobURL( image.url ) ) {
+		if ( isBlobURL( image?.url ) ) {
 			setIsLoading( true );
 			return;
 		}
 
-		editPost( { featured_media: image.id } );
+		editPost( { featured_media: image?.id } );
 		setIsLoading( false );
 	}
 
@@ -223,6 +223,7 @@ function PostFeaturedImage( { noticeUI, noticeOperations } ) {
 									) }
 									{ isLoading && <Spinner /> }
 									{ ! featuredImageId &&
+										! isLoading &&
 										( postLabel.set_featured_image ||
 											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
 								</Button>
@@ -232,27 +233,28 @@ function PostFeaturedImage( { noticeUI, noticeOperations } ) {
 						value={ featuredImageId }
 					/>
 				</MediaUploadCheck>
-				{ !! featuredImageId && media && (
-					<MediaUploadCheck>
-						<MediaUpload
-							title={
-								postLabel.featured_image ||
-								DEFAULT_FEATURE_IMAGE_LABEL
-							}
-							onSelect={ onUpdateImage }
-							unstableFeaturedImageFlow
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							modalClass="editor-post-featured-image__media-modal"
-							render={ ( { open } ) => (
-								<Button onClick={ open } variant="secondary">
-									{ __( 'Replace Image' ) }
-								</Button>
-							) }
-						/>
-					</MediaUploadCheck>
-				) }
 				{ !! featuredImageId && (
 					<MediaUploadCheck>
+						{ media && (
+							<MediaUpload
+								title={
+									postLabel.featured_image ||
+									DEFAULT_FEATURE_IMAGE_LABEL
+								}
+								onSelect={ onUpdateImage }
+								unstableFeaturedImageFlow
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								modalClass="editor-post-featured-image__media-modal"
+								render={ ( { open } ) => (
+									<Button
+										onClick={ open }
+										variant="secondary"
+									>
+										{ __( 'Replace Image' ) }
+									</Button>
+								) }
+							/>
+						) }
 						<Button
 							onClick={ onRemoveImage }
 							variant="link"
