@@ -1,42 +1,23 @@
 .editor-post-featured-image {
 	padding: 0;
-	margin-left: -$grid-unit-20;
-	margin-right: -$grid-unit-20;
 
-	.components-panel__body-title + & {
-		margin-top: -5px;
-	}
-
-	// Ensure a consistent dropzone and avoid jumps when loading.
-	height: 140px;
-	overflow: hidden;
-
-	// Thumbnail container.
-	.editor-post-featured-image__container {
-		display: flex;
-		align-items: center;
-		justify-content: center;
+	&__container {
+		margin-bottom: 1em;
 		position: relative;
-		height: 100%;
 	}
 
 	.components-spinner {
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%);
-		margin-top: 0;
-		margin-left: 0;
+		margin-top: -9px;
+		margin-left: -9px;
 	}
 
-	// Always center the content inside the cropped thumbnail.
-	.components-responsive-wrapper {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
+	// Stack consecutive buttons.
+	.components-button + .components-button {
+		display: block;
+		margin-top: 1em;
 	}
 
 	// This keeps images at their intrinsic size (eg. a 50px
@@ -45,66 +26,36 @@
 		max-width: 100%;
 		width: auto;
 	}
-
-	// Edit/Replace action buttons.
-	// @todo: container could be replaced with a flex container.
-	.editor-post-featured-image__actions {
-		position: absolute;
-		display: flex;
-		background: $white;
-		border-radius: $radius-block-ui;
-		bottom: $grid-unit-20;
-		right: $grid-unit-20;
-		opacity: 0;
-		transition: all 0.1s ease-out;
-		@include reduce-motion("transition");
-	}
-
-	&:focus-within .editor-post-featured-image__actions,
-	&:focus .editor-post-featured-image__actions,
-	&:hover .editor-post-featured-image__actions {
-		opacity: 1;
-	}
 }
 
-// Button to set featured image when an image is set.
 .editor-post-featured-image__toggle,
 .editor-post-featured-image__preview {
-	position: relative;
 	display: block;
 	width: 100%;
 	padding: 0;
+	transition: all 0.1s ease-out;
+	@include reduce-motion("transition");
+	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
+}
+
+.editor-post-featured-image__preview {
+	height: auto;
+}
+
+.editor-post-featured-image__preview:not(:disabled):not([aria-disabled="true"]):focus {
+	box-shadow: 0 0 0 4px var(--wp-admin-theme-color);
+}
+
+.editor-post-featured-image__toggle {
+	border-radius: $radius-block-ui;
 	background-color: $gray-100;
-	border-radius: 0;
-	height: 100%;
+	min-height: 90px;
+	line-height: 20px;
+	padding: $grid-unit-10 0;
 	text-align: center;
 
 	&:hover {
 		background: $gray-300;
 		color: $gray-900;
 	}
-
-	// Override generic focus styles to be inset.
-	&:focus:not(:disabled),
-	&:not(:disabled):not([aria-disabled="true"]):focus {
-		box-shadow: none;
-		outline: none;
-	}
-
-	&:focus:not(:disabled)::after {
-		content: "";
-		display: block;
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-		// Shown for high contrast modes.
-		outline: 2px solid transparent;
-	}
-
-	transition: all 5.1s ease-out;
-	@include reduce-motion("transition");
 }
