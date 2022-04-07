@@ -133,6 +133,18 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		'title',
 	);
 
+	const APPEARANCE_TOOLS_OPT_INS = array(
+		array( 'border', 'color' ),
+		array( 'border', 'radius' ),
+		array( 'border', 'style' ),
+		array( 'border', 'width' ),
+		array( 'color', 'link' ),
+		array( 'spacing', 'blockGap' ),
+		array( 'spacing', 'margin' ),
+		array( 'spacing', 'padding' ),
+		array( 'typography', 'lineHeight' ),
+	);
+
 	/**
 	 * The valid properties under the settings key.
 	 *
@@ -426,18 +438,48 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	}
 
 	/**
-	 * Returns a valid theme.json for a theme.
-	 * Essentially, it flattens the preset data.
+	 * Returns a valid theme.json as provided by a theme.
+	 *
+	 * Unlike get_raw_data() this returns the presets flattened,
+	 * as provided by a theme. This also uses appearanceTools
+	 * instead of their opt-ins if all of them are true.
 	 *
 	 * @return array
 	 */
 	public function get_data() {
-		$flattened_theme_json = $this->theme_json;
-		$nodes                = static::get_setting_nodes( $this->theme_json );
+		$output = $this->theme_json;
+		$nodes  = static::get_setting_nodes( $output );
+
+		/**
+		 * Flatten the theme & custom origins into a single one.
+		 *
+		 * For example, the following:
+		 *
+		 * {
+		 *   "settings": {
+		 *     "color": {
+		 *       "palette": {
+		 *         "theme": [ {} ],
+		 *         "custom": [ {} ]
+		 *       }
+		 *     }
+		 *   }
+		 * }
+		 *
+		 * will be converted to:
+		 *
+		 * {
+		 *   "settings": {
+		 *     "color": {
+		 *       "palette": [ {} ]
+		 *     }
+		 *   }
+		 * }
+		 */
 		foreach ( $nodes as $node ) {
 			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
-				$preset = _wp_array_get( $flattened_theme_json, $path, null );
+				$preset = _wp_array_get( $output, $path, null );
 				if ( null === $preset ) {
 					continue;
 				}
@@ -461,12 +503,87 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 				foreach ( $items as $slug => $value ) {
 					$flattened_preset[] = array_merge( array( 'slug' => $slug ), $value );
 				}
-				_wp_array_set( $flattened_theme_json, $path, $flattened_preset );
+				_wp_array_set( $output, $path, $flattened_preset );
 			}
 		}
 
-		wp_recursive_ksort( $flattened_theme_json );
+		// If all of the static::APPEARANCE_TOOLS_OPT_INS are true,
+		// this code unsets them and sets 'appearanceTools' instead.
+		foreach ( $nodes as $node ) {
+			$all_opt_ins_are_set = true;
+			foreach ( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
+				$full_path = array_merge( $node['path'], $opt_in_path );
+				// Use "unset prop" as a marker instead of "null" because
+				// "null" can be a valid value for some props (e.g. blockGap).
+				$opt_in_value = _wp_array_get( $output, $full_path, 'unset prop' );
+				if ( 'unset prop' === $opt_in_value ) {
+					$all_opt_ins_are_set = false;
+					break;
+				}
+			}
 
-		return $flattened_theme_json;
+			if ( $all_opt_ins_are_set ) {
+				_wp_array_set( $output, array_merge( $node['path'], array( 'appearanceTools' ) ), true );
+				foreach ( static::APPEARANCE_TOOLS_OPT_INS as $opt_in_path ) {
+					$full_path = array_merge( $node['path'], $opt_in_path );
+					// Use "unset prop" as a marker instead of "null" because
+					// "null" can be a valid value for some props (e.g. blockGap).
+					$opt_in_value = _wp_array_get( $output, $full_path, 'unset prop' );
+					if ( true !== $opt_in_value ) {
+						continue;
+					}
+
+					// The following could be improved to be path independent.
+					// At the moment it relies on a couple of assumptions:
+					//
+					// - all opt-ins having a path of size 2.
+					// - there's two sources of settings: the top-level and the block-level.
+					if (
+						( 1 === count( $node['path'] ) ) &&
+						( 'settings' === $node['path'][0] )
+					) {
+						// Top-level settings.
+						unset( $output['settings'][ $opt_in_path[0] ][ $opt_in_path[1] ] );
+						if ( empty( $output['settings'][ $opt_in_path[0] ] ) ) {
+							unset( $output['settings'][ $opt_in_path[0] ] );
+						}
+					} elseif (
+						( 3 === count( $node['path'] ) ) &&
+						( 'settings' === $node['path'][0] ) &&
+						( 'blocks' === $node['path'][1] )
+					) {
+						// Block-level settings.
+						$block_name = $node['path'][2];
+						unset( $output['settings']['blocks'][ $block_name ][ $opt_in_path[0] ][ $opt_in_path[1] ] );
+						if ( empty( $output['settings']['blocks'][ $block_name ][ $opt_in_path[0] ] ) ) {
+							unset( $output['settings']['blocks'][ $block_name ][ $opt_in_path[0] ] );
+						}
+					}
+				}
+			}
+		}
+
+		wp_recursive_ksort( $output );
+
+		return $output;
+	}
+
+	/**
+	 * Enables some settings.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param array $context The context to which the settings belong.
+	 */
+	protected static function do_opt_in_into_settings( &$context ) {
+		foreach ( static::APPEARANCE_TOOLS_OPT_INS as $path ) {
+			// Use "unset prop" as a marker instead of "null" because
+			// "null" can be a valid value for some props (e.g. blockGap).
+			if ( 'unset prop' === _wp_array_get( $context, $path, 'unset prop' ) ) {
+				_wp_array_set( $context, $path, true );
+			}
+		}
+
+		unset( $context['appearanceTools'] );
 	}
 }

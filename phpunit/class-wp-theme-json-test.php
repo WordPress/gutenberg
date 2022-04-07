@@ -2472,4 +2472,35 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected_v1 = array( 'version' => 2 );
 		$this->assertEqualSetsWithIndex( $expected_v1, $actual_v1 );
 	}
+
+	function test_export_data_sets_appearance_tools() {
+		$theme = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => 2,
+				'settings' => array(
+					'appearanceTools' => true,
+					'blocks'          => array(
+						'core/paragraph' => array(
+							'appearanceTools' => true,
+						),
+					),
+				),
+			)
+		);
+
+		$actual   = $theme->get_data();
+		$expected = array(
+			'version'  => 2,
+			'settings' => array(
+				'appearanceTools' => true,
+				'blocks'          => array(
+					'core/paragraph' => array(
+						'appearanceTools' => true,
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
 }
