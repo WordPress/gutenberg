@@ -529,7 +529,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$variables = 'body{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}';
 		$styles    = 'body { margin: 0; }body{color: var(--wp--preset--color--grey);}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }.wp-site-blocks > * + * { margin-block-start: var( --wp--style--block-gap ); }a{background-color: #333;color: #111;}.wp-block-group{border-radius: 10px;padding: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;}';
-		$presets   = '.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-small-font-family{font-family: var(--wp--preset--font-family--small) !important;}.has-big-font-family{font-family: var(--wp--preset--font-family--big) !important;}';
+		$presets   = '.has-grey-color{color: var(--wp--preset--color--grey);}.has-grey-background-color{background-color: var(--wp--preset--color--grey);}.has-grey-border-color{border-color: var(--wp--preset--color--grey);}.has-small-font-family{font-family: var(--wp--preset--font-family--small);}.has-big-font-family{font-family: var(--wp--preset--font-family--big);}';
 		$all       = $variables . $styles . $presets;
 		$this->assertEquals( $all, $theme_json->get_stylesheet() );
 		$this->assertEquals( $styles, $theme_json->get_stylesheet( array( 'styles' ) ) );
@@ -559,7 +559,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			'h1.has-white-color,h2.has-white-color,h3.has-white-color,h4.has-white-color,h5.has-white-color,h6.has-white-color{color: var(--wp--preset--color--white) !important;}h1.has-white-background-color,h2.has-white-background-color,h3.has-white-background-color,h4.has-white-background-color,h5.has-white-background-color,h6.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}h1.has-white-border-color,h2.has-white-border-color,h3.has-white-border-color,h4.has-white-border-color,h5.has-white-border-color,h6.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}',
+			'h1.has-white-color,h2.has-white-color,h3.has-white-color,h4.has-white-color,h5.has-white-color,h6.has-white-color{color: var(--wp--preset--color--white);}h1.has-white-background-color,h2.has-white-background-color,h3.has-white-background-color,h4.has-white-background-color,h5.has-white-background-color,h6.has-white-background-color{background-color: var(--wp--preset--color--white);}h1.has-white-border-color,h2.has-white-border-color,h3.has-white-border-color,h4.has-white-border-color,h5.has-white-border-color,h6.has-white-border-color{border-color: var(--wp--preset--color--white);}',
 			$theme_json->get_stylesheet( array( 'presets' ) )
 		);
 	}
@@ -595,7 +595,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$styles    = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-block-group{color: red;}';
-		$presets   = '.wp-block-group.has-grey-color{color: var(--wp--preset--color--grey) !important;}.wp-block-group.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.wp-block-group.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}';
+		$presets   = '.wp-block-group.has-grey-color{color: var(--wp--preset--color--grey);}.wp-block-group.has-grey-background-color{background-color: var(--wp--preset--color--grey);}.wp-block-group.has-grey-border-color{border-color: var(--wp--preset--color--grey);}';
 		$variables = '.wp-block-group{--wp--preset--color--grey: grey;}';
 		$all       = $variables . $styles . $presets;
 		$this->assertEquals( $all, $theme_json->get_stylesheet() );
@@ -637,7 +637,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			'.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-dark-grey-color{color: var(--wp--preset--color--dark-grey) !important;}.has-light-grey-color{color: var(--wp--preset--color--light-grey) !important;}.has-white-2-black-color{color: var(--wp--preset--color--white-2-black) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-dark-grey-background-color{background-color: var(--wp--preset--color--dark-grey) !important;}.has-light-grey-background-color{background-color: var(--wp--preset--color--light-grey) !important;}.has-white-2-black-background-color{background-color: var(--wp--preset--color--white-2-black) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-dark-grey-border-color{border-color: var(--wp--preset--color--dark-grey) !important;}.has-light-grey-border-color{border-color: var(--wp--preset--color--light-grey) !important;}.has-white-2-black-border-color{border-color: var(--wp--preset--color--white-2-black) !important;}',
+			'.has-grey-color{color: var(--wp--preset--color--grey);}.has-dark-grey-color{color: var(--wp--preset--color--dark-grey);}.has-light-grey-color{color: var(--wp--preset--color--light-grey);}.has-white-2-black-color{color: var(--wp--preset--color--white-2-black);}.has-grey-background-color{background-color: var(--wp--preset--color--grey);}.has-dark-grey-background-color{background-color: var(--wp--preset--color--dark-grey);}.has-light-grey-background-color{background-color: var(--wp--preset--color--light-grey);}.has-white-2-black-background-color{background-color: var(--wp--preset--color--white-2-black);}.has-grey-border-color{border-color: var(--wp--preset--color--grey);}.has-dark-grey-border-color{border-color: var(--wp--preset--color--dark-grey);}.has-light-grey-border-color{border-color: var(--wp--preset--color--light-grey);}.has-white-2-black-border-color{border-color: var(--wp--preset--color--white-2-black);}',
 			$theme_json->get_stylesheet( array( 'presets' ) )
 		);
 		$this->assertEquals(
@@ -645,44 +645,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			$theme_json->get_stylesheet( array( 'variables' ) )
 		);
 
-	}
-
-	public function test_get_stylesheet_preset_values_are_marked_as_important() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'settings' => array(
-					'color' => array(
-						'palette' => array(
-							array(
-								'slug'  => 'grey',
-								'color' => 'grey',
-							),
-						),
-					),
-				),
-				'styles'   => array(
-					'blocks' => array(
-						'core/paragraph' => array(
-							'color'      => array(
-								'text'       => 'red',
-								'background' => 'blue',
-							),
-							'typography' => array(
-								'fontSize'   => '12px',
-								'lineHeight' => '1.3',
-							),
-						),
-					),
-				),
-			),
-			'default'
-		);
-
-		$this->assertEquals(
-			'body{--wp--preset--color--grey: grey;}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }p{background-color: blue;color: red;font-size: 12px;line-height: 1.3;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}',
-			$theme_json->get_stylesheet()
-		);
 	}
 
 	public function test_merge_incoming_data() {
