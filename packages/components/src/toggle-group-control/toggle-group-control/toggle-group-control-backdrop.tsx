@@ -22,7 +22,7 @@ const TRANSITION_CONFIG = {
 	bounce: 0.2,
 	// Transition durations in the config are expressed as a string in milliseconds,
 	// while `framer-motion` needs them as integers in seconds.
-	duration: parseInt( CONFIG.transitionDurationFast, 10 ) / 1000,
+	duration: parseInt( CONFIG.transitionDuration, 10 ) / 1000,
 };
 
 function ToggleGroupControlBackdrop( {
