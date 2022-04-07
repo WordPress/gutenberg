@@ -9,6 +9,10 @@
  * @since      6.0.0
  */
 
+if ( class_exists( 'WP_Webfonts_Provider' ) ) {
+	return;
+}
+
 /**
  * Abstract class for Webfonts API providers.
  *

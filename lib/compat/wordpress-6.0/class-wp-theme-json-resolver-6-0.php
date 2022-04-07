@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Theme_JSON_Resolver_Gutenberg class
+ * WP_Theme_JSON_Resolver_6_0 class
  *
  * @package gutenberg
  */
@@ -15,7 +15,42 @@
  *
  * @access private
  */
-class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
+class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
+	/**
+	 * Given a theme.json structure modifies it in place
+	 * to update certain values by its translated strings
+	 * according to the language set by the user.
+	 *
+	 * @param array  $theme_json The theme.json to translate.
+	 * @param string $domain     Optional. Text domain. Unique identifier for retrieving translated strings.
+	 *                           Default 'default'.
+	 * @return array Returns the modified $theme_json_structure.
+	 */
+	protected static function translate( $theme_json, $domain = 'default' ) {
+		if ( null === static::$i18n_schema ) {
+			$i18n_schema         = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
+			static::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
+		}
+
+		return wp_translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
+	}
+
+	/**
+	 * Return core's origin config.
+	 *
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds core data.
+	 */
+	public static function get_core_data() {
+		if ( null !== static::$core ) {
+			return static::$core;
+		}
+
+		$config       = static::read_json_file( __DIR__ . '/theme.json' );
+		$config       = static::translate( $config );
+		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
+
+		return static::$core;
+	}
 
 	/**
 	 * Returns the theme's data.
@@ -26,23 +61,23 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 	 * the theme.json takes precedence.
 	 *
 	 * @param array $deprecated Deprecated argument.
+	 * @param array $settings Contains a key called with_supports to determine whether to include theme supports in the data.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
-	public static function get_theme_data( $deprecated = array() ) {
+	public static function get_theme_data( $deprecated = array(), $settings = array( 'with_supports' => true ) ) {
 		if ( ! empty( $deprecated ) ) {
 			_deprecated_argument( __METHOD__, '5.9' );
 		}
+
 		if ( null === static::$theme ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
 			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( wp_get_theme()->parent() ) {
 				// Get parent theme.json.
 				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
 				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
-				$parent_theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $parent_theme_json_data );
 				$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
 				// Merge the child theme.json into the parent theme.json.
@@ -50,6 +85,10 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 				$parent_theme->merge( static::$theme );
 				static::$theme = $parent_theme;
 			}
+		}
+
+		if ( ! $settings['with_supports'] ) {
+			return static::$theme;
 		}
 
 		/*
@@ -83,10 +122,39 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_5_9 {
 				$default_gradients = true;
 			}
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
+
+			// Classic themes without a theme.json don't support global duotone.
+			$theme_support_data['settings']['color']['defaultDuotone'] = false;
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
 
 		return $with_theme_supports;
+	}
+	/**
+	 * Returns the style variations defined by the theme.
+	 *
+	 * @return array
+	 */
+	public static function get_style_variations() {
+		$variations     = array();
+		$base_directory = get_stylesheet_directory() . '/styles';
+		if ( is_dir( $base_directory ) ) {
+			$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory ) );
+			$nested_html_files = iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) );
+			ksort( $nested_html_files );
+			foreach ( $nested_html_files as $path => $file ) {
+				$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
+				if ( is_array( $decoded_file ) ) {
+					$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
+					$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
+					if ( empty( $variation['title'] ) ) {
+						$variation['title'] = basename( $path, '.json' );
+					}
+					$variations[] = $variation;
+				}
+			}
+		}
+		return $variations;
 	}
 }

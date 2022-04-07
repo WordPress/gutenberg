@@ -26,8 +26,6 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withDispatch } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -152,10 +150,6 @@ class MediaContainer extends Component {
 	}
 
 	finishMediaUploadWithFailure() {
-		const { createErrorNotice } = this.props;
-
-		createErrorNotice( __( 'Failed to insert media.' ) );
-
 		this.setState( { isUploadInProgress: false } );
 	}
 
@@ -381,11 +375,4 @@ class MediaContainer extends Component {
 	}
 }
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { createErrorNotice } = dispatch( noticesStore );
-
-		return { createErrorNotice };
-	} ),
-	withPreferredColorScheme,
-] )( MediaContainer );
+export default compose( [ withPreferredColorScheme ] )( MediaContainer );

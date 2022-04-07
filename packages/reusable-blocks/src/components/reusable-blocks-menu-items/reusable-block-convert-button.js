@@ -15,7 +15,7 @@ import {
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
-import { reusableBlock } from '@wordpress/icons';
+import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -113,7 +113,7 @@ export default function ReusableBlockConvertButton( {
 			{ ( { onClose } ) => (
 				<>
 					<MenuItem
-						icon={ reusableBlock }
+						icon={ symbol }
 						onClick={ () => {
 							setIsModalOpen( true );
 						} }

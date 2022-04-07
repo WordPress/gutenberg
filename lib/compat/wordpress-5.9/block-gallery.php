@@ -1,32 +1,9 @@
 <?php
 /**
- * Temporary compatibility shims for features present in Gutenberg, pending
- * upstream commit to the WordPress core source repository. Functions here
- * exist only as long as necessary for corresponding WordPress support, and
- * each should be associated with a Trac ticket.
+ * Gallery block modifications.
  *
  * @package gutenberg
  */
-
-/**
- * Update allowed inline style attributes list.
- *
- * Note: This should be removed when the minimum required WP version is >= 5.9.
- *
- * @param string[] $attrs Array of allowed CSS attributes.
- * @return string[] CSS attributes.
- */
-function gutenberg_safe_style_attrs( $attrs ) {
-	$attrs[] = 'object-position';
-	$attrs[] = 'border-top-left-radius';
-	$attrs[] = 'border-top-right-radius';
-	$attrs[] = 'border-bottom-right-radius';
-	$attrs[] = 'border-bottom-left-radius';
-	$attrs[] = 'filter';
-
-	return $attrs;
-}
-add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs' );
 
 /**
  * The new gallery block format is not compatible with the use_BalanceTags option

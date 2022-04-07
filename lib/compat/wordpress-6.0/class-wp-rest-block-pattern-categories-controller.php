@@ -2,19 +2,28 @@
 /**
  * REST API: WP_REST_Block_Pattern_Catergories_Controller class
  *
- * @subpackage REST_API
  * @package    WordPress
+ * @subpackage REST_API
+ * @since      6.0.0
  */
+
+if ( class_exists( 'WP_REST_Block_Pattern_Categories_Controller' ) ) {
+	return;
+}
 
 /**
  * Core class used to access block pattern categories via the REST API.
  *
  * @see   WP_REST_Controller
+ *
+ * @since 6.0.0
  */
 class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructor.
+	 *
+	 * @since 6.0.0
 	 */
 	public function __construct() {
 		$this->namespace = '__experimental';
@@ -25,6 +34,8 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 	 * Registers the routes for the objects of the controller.
 	 *
 	 * @see   register_rest_route()
+	 *
+	 * @since 6.0.0
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -43,6 +54,8 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 
 	/**
 	 * Checks whether a given request has permission to read block patterns.
+	 *
+	 * @since 6.0.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
@@ -69,6 +82,8 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves all block pattern categories.
 	 *
+	 * @since 6.0.0
+	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
@@ -85,6 +100,8 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 
 	/**
 	 * Prepare a raw block pattern category before it gets output in a REST API response.
+	 *
+	 * @since 6.0.0
 	 *
 	 * @param object          $item    Raw category as registered, before any changes.
 	 * @param WP_REST_Request $request Request object.
@@ -108,6 +125,8 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 
 	/**
 	 * Retrieves the block pattern category schema, conforming to JSON Schema.
+	 *
+	 * @since 6.0.0
 	 *
 	 * @return array Item schema data.
 	 */

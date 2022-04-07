@@ -297,6 +297,10 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
  * @return string        Duotone filter CSS id.
  */
 function gutenberg_get_duotone_filter_id( $preset ) {
+	if ( ! isset( $preset['slug'] ) ) {
+		return '';
+	}
+
 	return 'wp-duotone-' . $preset['slug'];
 }
 
@@ -326,6 +330,11 @@ function gutenberg_get_duotone_filter_svg( $preset ) {
 		'b' => array(),
 		'a' => array(),
 	);
+
+	if ( ! isset( $preset['colors'] ) || ! is_array( $preset['colors'] ) ) {
+		$preset['colors'] = array();
+	}
+
 	foreach ( $preset['colors'] as $color_str ) {
 		$color = gutenberg_tinycolor_string_to_rgb( $color_str );
 
@@ -461,7 +470,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	add_action(
 		'wp_footer',
-		function () use ( $filter_svg, $selector ) {
+		static function () use ( $filter_svg, $selector ) {
 			echo $filter_svg;
 
 			// Safari renders elements incorrectly on first paint when the SVG

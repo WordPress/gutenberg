@@ -10,15 +10,17 @@ import {
 	CardBody,
 	Card,
 	CardDivider,
+	CardMedia,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
-import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
+import { IconWithCurrentColor } from './icon-with-current-color';
 import { NavigationButton } from './navigation-button';
 import ContextMenu from './context-menu';
 import StylesPreview from './preview';
@@ -37,19 +39,19 @@ function ScreenRoot() {
 			<CardBody>
 				<VStack spacing={ 2 }>
 					<Card>
-						<StylesPreview />
+						<CardMedia>
+							<StylesPreview />
+						</CardMedia>
 					</Card>
 					{ !! variations?.length && (
 						<NavigationButton path="/variations">
 							<HStack justify="space-between">
 								<FlexItem>{ __( 'Browse styles' ) }</FlexItem>
-								<FlexItem>
-									<Icon
-										icon={
-											isRTL() ? chevronLeft : chevronRight
-										}
-									/>
-								</FlexItem>
+								<IconWithCurrentColor
+									icon={
+										isRTL() ? chevronLeft : chevronRight
+									}
+								/>
 							</HStack>
 						</NavigationButton>
 					) }
@@ -72,13 +74,9 @@ function ScreenRoot() {
 					<NavigationButton path="/blocks">
 						<HStack justify="space-between">
 							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
-							<FlexItem>
-								<Icon
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
-								/>
-							</FlexItem>
+							<IconWithCurrentColor
+								icon={ isRTL() ? chevronLeft : chevronRight }
+							/>
 						</HStack>
 					</NavigationButton>
 				</ItemGroup>

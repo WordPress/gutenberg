@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Remove banner error notification on upload failure [#39694]
+
 ## 1.73.1
 
 -   [*] [Spacer block] Fix crash when changing the height value using the text input [#40053]
