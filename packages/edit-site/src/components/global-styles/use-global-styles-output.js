@@ -172,8 +172,9 @@ function getStylesDeclarations( blockStyles = {}, selector = '' ) {
 						// for sub-properties that don't have any value.
 						return;
 					}
-
-					const cssProperty = kebabCase( name );
+					const cssProperty = name.startsWith( '--' )
+						? name
+						: kebabCase( name );
 					declarations.push(
 						`${ cssProperty }: ${ compileStyleValue(
 							get( styleValue, [ prop ] )
