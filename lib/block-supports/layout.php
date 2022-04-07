@@ -6,7 +6,8 @@
  */
 
 /**
- * Registers the layout block attribute for block types that support it.
+ * Registers the layout block attribute for block types that support it,
+ * and sets `provides_context` to allow children to access the layout settings.
  *
  * @param WP_Block_Type $block_type Block Type.
  */
@@ -21,6 +22,14 @@ function gutenberg_register_layout_support( $block_type ) {
 			$block_type->attributes['layout'] = array(
 				'type' => 'object',
 			);
+		}
+
+		if ( ! isset( $block_type->provides_context ) ) {
+			$block_type->provides_context = array();
+		}
+
+		if ( ! array_key_exists( 'layout', $block_type->provides_context ) ) {
+			$block_type->provides_context['layout'] = 'layout';
 		}
 	}
 }

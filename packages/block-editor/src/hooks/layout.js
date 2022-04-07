@@ -167,6 +167,29 @@ export function addAttribute( settings ) {
 }
 
 /**
+ * Adds layout to `providesContext` so that the layout context can be accessed
+ * via child blocks.
+ *
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
+ */
+export function addProvidesContext( settings ) {
+	if ( settings.providesContext?.layout ) {
+		return settings;
+	}
+	if ( hasBlockSupport( settings, layoutBlockSupportKey ) ) {
+		const providesContext = settings.providesContext || {};
+		settings.providesContext = {
+			...providesContext,
+			layout: 'layout',
+		};
+	}
+
+	return settings;
+}
+
+/**
  * Override the default edit UI to include layout controls
  *
  * @param {Function} BlockEdit Original component.
@@ -239,6 +262,11 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/layout/addAttribute',
 	addAttribute
+);
+addFilter(
+	'blocks.registerBlockType',
+	'core/layout/addProvidesContext',
+	addProvidesContext
 );
 addFilter(
 	'editor.BlockListBlock',
