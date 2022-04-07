@@ -16,6 +16,7 @@ import { useThrottle } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { useBlockListContext } from '../block-list/block-list-context';
 import { getDistanceToNearestEdge } from '../../utils/math';
+import useOnBlockDrop from '../use-on-block-drop';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 
@@ -100,7 +101,7 @@ export function getNearestBlockIndex(
  * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
  *
  * @return {Object} An object that contains `targetBlockIndex` and the event
- * handlers `onBlockDragOver` and `onBlockDragEnd`.
+ * handlers `onBlockDragOver`, `onBlockDragEnd` and `onBlockDrop`.
  */
 export default function useBlockDropZone( {
 	// An undefined value represents a top-level block. Default to an empty
@@ -122,6 +123,8 @@ export default function useBlockDropZone( {
 	}, [ blocksLayouts.current ] );
 
 	const isRTL = getSettings().isRTL;
+
+	const onBlockDrop = useOnBlockDrop();
 
 	const throttled = useThrottle(
 		useCallback(
@@ -155,6 +158,15 @@ export default function useBlockDropZone( {
 		onBlockDragEnd() {
 			throttled.cancel();
 			targetBlockIndex.value = null;
+		},
+		onBlockDrop: ( event ) => {
+			if ( targetBlockIndex.value !== null ) {
+				onBlockDrop( {
+					...event,
+					targetRootClientId,
+					targetBlockIndex: targetBlockIndex.value,
+				} );
+			}
 		},
 		targetBlockIndex,
 	};
