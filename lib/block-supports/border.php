@@ -148,7 +148,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Generate styles for individual border sides.
 	if ( $has_border_color_support || $has_border_width_support ) {
-		foreach ( $sides  as $side ) {
+		foreach ( $sides as $side ) {
 			$border = _wp_array_get( $block_attributes, array( 'style', 'border', $side ), false );
 
 			if ( is_array( $border ) && ! empty( $border ) ) {
