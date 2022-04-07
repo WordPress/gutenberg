@@ -108,6 +108,7 @@ export default function moveInterfaceEnableItemsToPreferences( state ) {
 	const otherInterfaceItems = state[ interfaceStoreName ];
 
 	return {
+		...state,
 		[ preferencesStoreName ]: {
 			preferences: allConvertedData,
 		},
