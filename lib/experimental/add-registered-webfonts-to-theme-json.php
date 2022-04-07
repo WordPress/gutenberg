@@ -5,62 +5,6 @@
  * @package gutenberg
  */
 
-function gutenberg_is_webfont_equal( $a, $b, $is_camel_case = true ) {
-	$equality_attrs = $is_camel_case ? array(
-		'fontFamily',
-		'fontStyle',
-		'fontWeight',
-	) : array(
-		'font-family',
-		'font-style',
-		'font-weight',
-	);
-
-	foreach ( $equality_attrs as $attr ) {
-		if ( $a[ $attr ] !== $b[ $attr ] ) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-function gutenberg_find_webfont( $webfonts, $webfont_to_find ) {
-	if ( ! count( $webfonts ) ) {
-		return false;
-	}
-
-	$is_camel_case = isset( $webfonts[0]['fontFamily'] );
-
-	foreach ( $webfonts as $index => $webfont ) {
-		if ( gutenberg_is_webfont_equal( $webfont, $webfont_to_find, $is_camel_case ) ) {
-			return $index;
-		}
-	}
-
-	return false;
-}
-
-function gutenberg_webfont_to_camel_case( $webfont ) {
-	$camel_cased_webfont = array();
-
-	foreach ( $webfont as $key => $value ) {
-		$camel_cased_webfont[ lcfirst( str_replace( '-', '', ucwords( $key, '-' ) ) ) ] = $value;
-	}
-
-	return $camel_cased_webfont;
-}
-
-function gutenberg_get_font_family_indexes( $families ) {
-	$indexes = array();
-
-	foreach ( $families as $index => $family ) {
-		$indexes[ wp_webfonts()->get_font_slug( $family ) ] = $index;
-	}
-
-	return $indexes;
-}
-
 /**
  * Add missing fonts data to the global styles.
  *
@@ -86,7 +30,7 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 		$data['settings']['typography']['fontFamilies'] = array();
 	}
 
-	$font_family_indexes_in_theme_json = gutenberg_get_font_family_indexes( $data['settings']['typography']['fontFamilies'] );
+	$font_family_indexes_in_theme_json = gutenberg_map_font_family_indexes( $data['settings']['typography']['fontFamilies'] );
 
 	foreach ( $registered_font_families as $slug => $registered_font_faces ) {
 		// Font family not in theme.json, so let's add it.

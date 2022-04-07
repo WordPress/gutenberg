@@ -6,49 +6,6 @@
  */
 
 /**
- * Transforms the keys of the webfont defined in theme.json into
- * kebab case, so the Webfonts API can handle it.
- *
- * @param array $webfont The webfont to be tranformed.
- *
- * @return array The kebab-case version of the webfont.
- */
-function gutenberg_webfont_to_kebab_case( $webfont ) {
-	$kebab_cased_webfont = array();
-
-	foreach ( $webfont as $key => $value ) {
-		$kebab_cased_webfont[ _wp_to_kebab_case( $key ) ] = $value;
-	}
-
-	return $kebab_cased_webfont;
-}
-
-/**
- * Transforms the source of the font face from `file.:/` into an actual URI.
- *
- * @param array $font_face The font face.
- *
- * @return array The URI-resolved font face.
- */
-function gutenberg_resolve_font_face_uri( $font_face ) {
-	if ( empty( $font_face['src'] ) ) {
-		return $font_face;
-	}
-
-	$font_face['src'] = (array) $font_face['src'];
-
-	foreach ( $font_face['src'] as $src_key => $url ) {
-		// Tweak the URL to be relative to the theme root.
-		if ( ! str_starts_with( $url, 'file:./' ) ) {
-			continue;
-		}
-		$font_face['src'][ $src_key ] = get_theme_file_uri( str_replace( 'file:./', '', $url ) );
-	}
-
-	return $font_face;
-}
-
-/**
  * Register webfonts defined in theme.json
  *
  * @param array $settings The theme.json file.
