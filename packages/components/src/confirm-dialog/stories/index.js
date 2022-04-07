@@ -18,20 +18,22 @@ import { ConfirmDialog } from '..';
 const daText = () =>
 	text( 'message', 'Would you like to privately publish the post now?' );
 
-export default {
+const meta = {
 	component: ConfirmDialog,
 	title: 'Components (Experimental)/ConfirmDialog',
 	argTypes: {
 		children: {
-			type: 'string',
+			control: { type: 'text' },
 		},
 		jsxChildren: {
-			type: 'select',
-			options: [
-				'<b>Bold text</b>',
-				'<i>Italic text</i>',
-				'<Heading level={ 2 }>A JSX Heading</Heading>',
-			],
+			control: {
+				type: 'select',
+				options: [
+					'<b>Bold text</b>',
+					'<i>Italic text</i>',
+					'<Heading level={ 2 }>A JSX Heading</Heading>',
+				],
+			},
 			mapping: {
 				'<b>Bold text</b>': <b>Bold text</b>,
 				'<i>Italic text</i>': <i>Italic text</i>,
@@ -41,13 +43,19 @@ export default {
 			},
 		},
 		confirmButtonText: {
-			type: 'string',
+			control: { type: 'text' },
 		},
 		cancelButtonText: {
-			type: 'string',
+			control: { type: 'text' },
 		},
 		isOpen: {
-			type: 'boolean',
+			control: { type: null },
+		},
+		onConfirm: {
+			control: { type: null },
+		},
+		onCancel: {
+			control: { type: null },
 		},
 	},
 	args: {
@@ -55,10 +63,13 @@ export default {
 	},
 	parameters: {
 		// Exclude jsxChildren by default becuase it's only used in one story.
-		// Because controls don't rerender the component, isOpen isn't actually useful.
-		controls: { exclude: [ 'jsxChildren', 'isOpen' ] },
+		controls: {
+			exclude: 'jsxChildren',
+		},
 	},
 };
+
+export default meta;
 
 const Template = ( args ) => {
 	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
@@ -102,7 +113,7 @@ WithJSXMessage.args = {
 	jsxChildren: '<Heading level={ 2 }>A JSX Heading</Heading>',
 };
 WithJSXMessage.parameters = {
-	controls: { exclude: [ 'children', 'isOpen' ] },
+	controls: { exclude: 'children' },
 };
 
 export const VeeeryLongMessage = Template.bind( {} );
@@ -110,7 +121,7 @@ VeeeryLongMessage.args = {
 	children: daText().repeat( 20 ),
 };
 
-// You can pass explicit cacncel actions with the `onCancel` prop.
+// You can pass explicit cancel actions with the `onCancel` prop.
 export const UncontrolledAndWithExplicitOnCancel = Template.bind( {} );
 UncontrolledAndWithExplicitOnCancel.args = {
 	confirmOutput: 'Confirmed!',
