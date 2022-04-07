@@ -13,29 +13,39 @@
 		}
 
 		.block-editor-block-pattern-setup__container {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			grid-gap: $grid-unit-20;
-			padding: $grid-unit-20;
-			overflow: auto;
-			margin: 0 $border-width $border-width $border-width;
-			width: calc(100% - #{ $border-width * 2 });
-			background: $white;
+			column-gap: $grid-unit-30;
+			display: block;
+			width: 100%;
+			padding: $grid-unit-40;
+
+			@include break-small() {
+				column-count: 1;
+			}
+			@include break-medium() {
+				column-count: 2;
+			}
+			@include break-huge() {
+				column-count: 3;
+			}
 
 			.block-editor-block-preview__container,
 			div[role="button"] {
 				cursor: pointer;
 			}
 
-			.block-editor-block-pattern-setup-list__item-title {
-				padding: $grid-unit-05;
-				font-size: $helptext-font-size;
-				text-align: center;
-			}
+			.block-editor-block-pattern-setup-list__list-item {
+				break-inside: avoid-column;
+				margin-bottom: $grid-unit-30;
 
-			.block-editor-block-preview__container {
-				border-radius: $radius-block-ui;
-				border: $border-width solid $gray-300;
+				.block-editor-block-preview__container {
+					min-height: 100px;
+					border-radius: $radius-block-ui;
+					border: $border-width solid $gray-300;
+				}
+
+				.block-editor-block-preview__content {
+					width: 100%;
+				}
 			}
 		}
 	}
