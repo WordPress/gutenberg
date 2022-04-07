@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.73.1
+
+-   [*] [Space block] Fix crash when changing the height value using the text input [#40053]
+
 ## 1.73.0
 
 -   [*] Update react-native-reanimated version to 2.4.1 [#39430]
