@@ -33,7 +33,8 @@
 				"background": true,
 				"text": true
 			}
-		}
+		},
+		"inserter": false
 	},
 	"style": [
 		"wp-block-post-comments",
