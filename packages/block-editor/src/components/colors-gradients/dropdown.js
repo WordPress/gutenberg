@@ -63,50 +63,33 @@ const WithToolsPanelItem = ( {
 	);
 };
 
-const renderToggleItem = ( { gradientValue, colorValue, label } ) => ( {
-	onToggle,
-	isOpen,
-} ) => {
-	return (
-		<Item
-			onClick={ onToggle }
-			className={ classnames(
-				'block-editor-panel-color-gradient-settings__item',
-				{ 'is-open': isOpen }
-			) }
-		>
-			<HStack justify="flex-start">
-				<ColorIndicator
-					className="block-editor-panel-color-gradient-settings__color-indicator"
-					colorValue={ gradientValue ?? colorValue }
-				/>
-				<FlexItem>{ label }</FlexItem>
-			</HStack>
-		</Item>
-	);
-};
+const LabeledColorIndicator = ( { colorValue, label } ) => (
+	<HStack justify="flex-start">
+		<ColorIndicator
+			className="block-editor-panel-color-gradient-settings__color-indicator"
+			colorValue={ colorValue }
+		/>
+		<FlexItem>{ label }</FlexItem>
+	</HStack>
+);
 
-const renderToggleButton = ( { gradientValue, colorValue, label } ) => ( {
-	onToggle,
-	isOpen,
-} ) => {
+const renderToggle = ( settings ) => ( { onToggle, isOpen } ) => {
+	const { isItemGroup, colorValue, label } = settings;
+
+	const ToggleComponent = isItemGroup ? Item : Button;
+	const toggleClassName = isItemGroup
+		? 'block-editor-panel-color-gradient-settings__item'
+		: 'block-editor-panel-color-gradient-settings__dropdown';
+	const toggleProps = {
+		onClick: onToggle,
+		className: classnames( toggleClassName, { 'is-open': isOpen } ),
+		'aria-expanded': isItemGroup ? undefined : isOpen,
+	};
+
 	return (
-		<Button
-			onClick={ onToggle }
-			aria-expanded={ isOpen }
-			className={ classnames(
-				'block-editor-panel-color-gradient-settings__dropdown',
-				{ 'is-open': isOpen }
-			) }
-		>
-			<HStack justify="flex-start">
-				<ColorIndicator
-					className="block-editor-panel-color-gradient-settings__color-indicator"
-					colorValue={ gradientValue ?? colorValue }
-				/>
-				<FlexItem>{ label }</FlexItem>
-			</HStack>
-		</Button>
+		<ToggleComponent { ...toggleProps }>
+			<LabeledColorIndicator colorValue={ colorValue } label={ label } />
+		</ToggleComponent>
 	);
 };
 
@@ -150,6 +133,11 @@ export default function ColorGradientSettingsDropdown( {
 					__experimentalIsRenderedInSidebar,
 					...setting,
 				};
+				const toggleSettings = {
+					colorValue: setting.gradientValue ?? setting.colorValue,
+					isItemGroup,
+					label: setting.label,
+				};
 
 				return (
 					setting && (
@@ -163,11 +151,7 @@ export default function ColorGradientSettingsDropdown( {
 								position={ dropdownPosition }
 								className={ dropdownClassName }
 								contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
-								renderToggle={
-									isItemGroup
-										? renderToggleItem( setting )
-										: renderToggleButton( setting )
-								}
+								renderToggle={ renderToggle( toggleSettings ) }
 								renderContent={ () => (
 									<ColorGradientControl { ...controlProps } />
 								) }
