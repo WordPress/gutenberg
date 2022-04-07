@@ -13,6 +13,7 @@ import Animated, {
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { generateHapticFeedback } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -103,13 +104,16 @@ export default function DroppingInsertionPoint( {
 			opacity.value = 0;
 			blockYPosition.value = nextPosition;
 			opacity.value = withTiming( 1 );
+			generateHapticFeedback();
 		}
 	}
 
 	useAnimatedReaction(
 		() => targetBlockIndex.value,
-		( value ) => {
-			runOnJS( setIndicatorPosition )( value );
+		( value, previous ) => {
+			if ( value !== previous ) {
+				runOnJS( setIndicatorPosition )( value );
+			}
 		}
 	);
 
