@@ -92,9 +92,27 @@ const metaData = {
 						TEST_RESULTS_LIST.open.length,
 					body.indexOf( TEST_RESULTS_LIST.close )
 				)
+				/**
+				 * Split the text from:
+				 * ```
+				 * <!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->
+				 * ...
+				 * <!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->
+				 * <!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->
+				 * ```
+				 *
+				 * into:
+				 * ```
+				 * [
+				 *   '<!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->',
+				 *   '<!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->',
+				 *   '<!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->',
+				 * ]
+				 * ```
+				 */
 				.split(
 					new RegExp(
-						`(?<=${ TEST_RESULT.close })\n(?=${ TEST_RESULT.open })`
+						`(?<=${ TEST_RESULT.close })\n(?:\.\.\.\n)?(?=${ TEST_RESULT.open })`
 					)
 				);
 			// GitHub issues has character limits on issue's body,
