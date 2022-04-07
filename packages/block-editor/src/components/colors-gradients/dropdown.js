@@ -128,7 +128,7 @@ export default function ColorGradientSettingsDropdown( {
 
 	const dropdownClassName = isItemGroup
 		? 'block-editor-panel-color-gradient-settings__dropdown'
-		: 'block-editor-tools-panel-color-dropdown';
+		: 'block-editor-tools-panel-color-gradient-settings__dropdown';
 
 	return (
 		<WithItemGroup isItemGroup={ isItemGroup }>
