@@ -220,7 +220,7 @@ export function BlockSettingsDropdown( {
 									>
 										{ sprintf(
 											/* translators: %s: Name of the block's parent. */
-											__( 'Select parent (%s)' ),
+											__( 'Select parent block (%s)' ),
 											parentBlockType.title
 										) }
 									</MenuItem>
