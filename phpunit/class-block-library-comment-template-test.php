@@ -114,7 +114,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		// in the build step.
 		$this->assertEquals(
 			'<ol ><li><div class="has-small-font-size wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div></li></ol>',
-			gutenberg_render_block_core_comment_template( null, null, $block ),
+			gutenberg_render_block_core_comment_template( null, null, $block )
 		);
 	}
 
