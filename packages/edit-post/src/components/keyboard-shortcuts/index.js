@@ -51,6 +51,16 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
+			name: 'core/edit-post/toggle-distraction-free',
+			category: 'global',
+			description: __( 'Toggle disrtaction free mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'o',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/edit-post/toggle-fullscreen',
 			category: 'global',
 			description: __( 'Toggle fullscreen mode.' ),
@@ -137,6 +147,11 @@ function KeyboardShortcuts() {
 
 	useShortcut( 'core/edit-post/toggle-fullscreen', () => {
 		toggleFeature( 'fullscreenMode' );
+	} );
+
+	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
+		//toggleFeature( 'reducedUI' );
+		//n
 	} );
 
 	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {

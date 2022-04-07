@@ -37,10 +37,19 @@ function WritingMenu() {
 				scope="core/edit-post"
 				name="fullscreenMode"
 				label={ __( 'Fullscreen mode' ) }
-				info={ __( 'Work without distraction' ) }
+				info={ __( 'Show and hide admin UI' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
 				shortcut={ displayShortcut.secondary( 'f' ) }
+			/>
+			<PreferenceToggleMenuItem
+				scope="core/edit-post"
+				name="reducedUI"
+				label={ __( 'Distraction free' ) }
+				info={ __( 'Work without distraction' ) }
+				messageActivated={ __( 'Distraction free mode activated' ) }
+				messageDeactivated={ __( 'Distraction free mode deactivated' ) }
+				shortcut={ displayShortcut.secondary( ',' ) }
 			/>
 		</MenuGroup>
 	);
