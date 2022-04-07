@@ -103,7 +103,7 @@ if ( ! function_exists( 'wp_register_webfont' ) ) {
 	 * @since 6.0.0
 	 *
 	 * @param array $webfont Webfont to be registered.
-	 * @return string|bool The font family slug if successfully registered, else false.
+	 * @return string|false The font family slug if successfully registered, else false.
 	 */
 	function wp_register_webfont( array $webfont ) {
 		return wp_webfonts()->register_webfont( $webfont );

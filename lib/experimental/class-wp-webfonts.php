@@ -121,7 +121,7 @@ class WP_Webfonts {
 	 * @since 6.0.0
 	 *
 	 * @param array $webfont Webfont to be registered.
-	 * @return string|bool The font family slug if successfully registered, else false.
+	 * @return string|false The font family slug if successfully registered, else false.
 	 */
 	public function register_webfont( array $webfont ) {
 		$webfont = $this->validate_webfont( $webfont );
