@@ -13,7 +13,7 @@ import { AUTHORS_QUERY } from './constants';
 
 const minimumUsersForCombobox = 25;
 
-function PostAuthor( { labelPosition } ) {
+function PostAuthor() {
 	const showCombobox = useSelect( ( select ) => {
 		const authors = select( coreStore ).getUsers( AUTHORS_QUERY );
 
@@ -23,7 +23,7 @@ function PostAuthor( { labelPosition } ) {
 	if ( showCombobox ) {
 		return <PostAuthorCombobox />;
 	}
-	return <PostAuthorSelect labelPosition={ labelPosition } />;
+	return <PostAuthorSelect />;
 }
 
 export default PostAuthor;

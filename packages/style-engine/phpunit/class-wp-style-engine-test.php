@@ -6,17 +6,19 @@
  * @subpackage style-engine
  */
 
+require __DIR__ . '/../class-wp-style-engine.php';
+
 /**
  * Tests for registering, storing and generating styles.
  */
-class WP_Style_Engine_Gutenberg_Test extends WP_UnitTestCase {
+class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests various manifestations of the $block_styles argument.
 	 *
 	 * @dataProvider data_block_styles_fixtures
 	 */
 	function test_generate_css( $block_styles, $options, $expected_output ) {
-		$style_engine     = WP_Style_Engine_Gutenberg::get_instance();
+		$style_engine     = WP_Style_Engine::get_instance();
 		$generated_styles = $style_engine->generate(
 			$block_styles,
 			$options
