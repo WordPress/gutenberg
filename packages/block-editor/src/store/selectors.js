@@ -1580,7 +1580,7 @@ export function canLockBlockType( state, nameOrType ) {
 	}
 
 	// Use block editor settings as the default value.
-	return !! state.settings?.__experimentalCanLockBlocks;
+	return !! state.settings?.canLockBlocks;
 }
 
 /**
