@@ -1409,7 +1409,7 @@ class WP_Theme_JSON_5_9 {
 			foreach ( $theme_json['styles']['elements'] as $element => $node ) {
 				$nodes[] = array(
 					'path'     => array( 'styles', 'elements', $element ),
-					'selector' => static::ELEMENTS[ $element ],
+					'selector' => ':where(' . static::ELEMENTS[ $element ] . ')',
 				);
 			}
 		}
