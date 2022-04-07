@@ -121,19 +121,32 @@ html.interface-interface-skeleton__html-container {
 }
 
 .is-distraction-free {
+	.edit-post-header {
+		box-shadow: $shadow-popover;
+	}
 
 	.interface-interface-skeleton__secondary-sidebar,
 	&.is-sidebar-opened .interface-interface-skeleton__sidebar {
 		border: $border-width solid $gray-200;
 		margin: $grid-unit-15;
 		border-radius: 2px;
+		box-shadow: $shadow-popover;
+
+		&[aria-label="Editor settings"] { // There's certainly a better way to target the Inspector
+			bottom: auto;
+			max-height: calc(100vh - #{$header-height} - (#{$grid-unit-15} * 2)); // Probably a better way to do this too.
+		}
+
+		.components-panel__body {
+			border-bottom: 0;
+		}
 	}
 
 	.interface-interface-skeleton__secondary-sidebar {
 		position: absolute !important; // ignore the important for now
 		width: 350px;
 		right: inherit;
-		top: 0;
+		top: $header-height;
 		left: 0;
 	}
 
@@ -141,7 +154,7 @@ html.interface-interface-skeleton__html-container {
 		position: absolute !important; // ignore the important for now
 		width: $sidebar-width;
 		right: 0;
-		top: 0;
+		top: $header-height;
 		left: inherit;
 	}
 
