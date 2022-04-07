@@ -107,7 +107,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$has_custom_font_size = isset( $block_attributes['style']['typography']['fontSize'] );
 
 		if ( $has_named_font_size ) {
-			$classes[] = sprintf( 'has-%s-font-size', _wp_to_kebab_case( $block_attributes['fontSize'] ) );
+			$classes['fontSize'] = _wp_to_kebab_case( $block_attributes['fontSize'] );
 		} elseif ( $has_custom_font_size ) {
 			$styles['fontSize'] = $block_attributes['style']['typography']['fontSize'];
 		}
@@ -118,7 +118,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$has_custom_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
 
 		if ( $has_named_font_family ) {
-			$classes[] = sprintf( 'has-%s-font-family', _wp_to_kebab_case( $block_attributes['fontFamily'] ) );
+			$classes['fontFamily'] = _wp_to_kebab_case( $block_attributes['fontFamily'] );
 		} elseif ( $has_custom_font_family ) {
 			$font_family_custom = $block_attributes['style']['typography']['fontFamily'];
 			// Before using classes, the value was serialized as a CSS Custom Property.
@@ -175,10 +175,6 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	if ( ! empty( $classes ) ) {
-		$attributes['class'] = implode( ' ', $classes );
-	}
-
 	$style_engine  = WP_Style_Engine_Gutenberg::get_instance();
 	$inline_styles = $style_engine->generate(
 		array( 'typography' => $styles ),
@@ -186,6 +182,17 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 			'inline' => true,
 		)
 	);
+
+	$classnames = $style_engine->generate(
+		array( 'typography' => $classes ),
+		array(
+			'classnames' => true,
+		)
+	);
+
+	if ( ! empty( $classnames ) ) {
+		$attributes['class'] = $classnames;
+	}
 
 	if ( ! empty( $inline_styles ) ) {
 		$attributes['style'] = $inline_styles;
