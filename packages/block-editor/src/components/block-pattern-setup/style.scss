@@ -17,13 +17,8 @@
 			display: block;
 			width: 100%;
 			padding: $grid-unit-40;
+			column-count: 2;
 
-			@include break-small() {
-				column-count: 1;
-			}
-			@include break-medium() {
-				column-count: 2;
-			}
 			@include break-huge() {
 				column-count: 3;
 			}
