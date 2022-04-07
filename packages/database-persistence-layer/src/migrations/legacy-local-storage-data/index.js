@@ -10,7 +10,7 @@ import convertEditPostPanels from './convert-edit-post-panels';
 /**
  * Gets the legacy local storage data for a given user.
  *
- * @param {string} userId The user id.
+ * @param {string | number} userId The user id.
  *
  * @return {Object | null} The local storage data.
  */
@@ -82,11 +82,20 @@ export function convertLegacyData( data ) {
 		'editorMode'
 	);
 
-	// The previous legacy persistence system contained preferences for
-	// multiple stores
+	// The new system is only concerned with persisting
+	// 'core/preferences', so only return that.
 	return data?.[ 'core/preferences' ];
 }
 
+/**
+ * Gets the legacy local storage data for the given user and returns the
+ * data converted to the new format.
+ *
+ * @param {string | number} userId The user id.
+ *
+ * @return {Object | undefined} The converted data or undefined if no local
+ *                              storage data could be found.
+ */
 export default function convertLegacyLocalStorageData( userId ) {
 	const data = getLegacyData( userId );
 	return convertLegacyData( data );
