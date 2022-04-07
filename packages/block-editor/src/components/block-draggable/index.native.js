@@ -7,6 +7,7 @@ import Animated, {
 	useAnimatedRef,
 	useAnimatedStyle,
 	useSharedValue,
+	withDelay,
 	withTiming,
 } from 'react-native-reanimated';
 
@@ -31,6 +32,7 @@ import styles from './style.scss';
 
 const CHIP_OFFSET_TO_TOUCH_POSITION = 32;
 const BLOCK_OPACITY_ANIMATION_CONFIG = { duration: 350 };
+const BLOCK_OPACITY_ANIMATION_DELAY = 250;
 
 /**
  * Block draggable wrapper component
@@ -254,9 +256,9 @@ const BlockDraggable = ( { clientId, children } ) => {
 	};
 
 	const stopDraggingBlock = () => {
-		draggingAnimation.opacity.value = withTiming(
-			1,
-			BLOCK_OPACITY_ANIMATION_CONFIG
+		draggingAnimation.opacity.value = withDelay(
+			BLOCK_OPACITY_ANIMATION_DELAY,
+			withTiming( 1, BLOCK_OPACITY_ANIMATION_CONFIG )
 		);
 		runOnJS( selectBlock )( clientId );
 	};
