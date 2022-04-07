@@ -69,29 +69,30 @@ class WP_Theme_JSON_5_9 {
 	 *
 	 * This contains the necessary metadata to process them:
 	 *
-	 * - path       => where to find the preset within the settings section
-	 * - override   => whether a theme preset with the same slug as a default preset
-	 *                 can override it
-	 * - value_key  => the key that represents the value
-	 * - value_func => optionally, instead of value_key, a function to generate
-	 *                 the value that takes a preset as an argument
-	 *                 (either value_key or value_func should be present)
-	 * - css_vars   => template string to use in generating the CSS Custom Property.
-	 *                 Example output: "--wp--preset--duotone--blue: <value>" will generate as many CSS Custom Properties as presets defined
-	 *                 substituting the $slug for the slug's value for each preset value.
-	 * - classes    => array containing a structure with the classes to
-	 *                 generate for the presets, where for each array item
-	 *                 the key is the class name and the value the property name.
-	 *                 The "$slug" substring will be replaced by the slug of each preset.
-	 *                 For example:
-	 *                 'classes' => array(
-	 *                   '.has-$slug-color'            => 'color',
-	 *                   '.has-$slug-background-color' => 'background-color',
-	 *                   '.has-$slug-border-color'     => 'border-color',
-	 *                 )
-	 * - properties => array of CSS properties to be used by kses to
-	 *                 validate the content of each preset
-	 *                 by means of the remove_insecure_properties method.
+	 * - path              => where to find the preset within the settings section
+	 * - override          => whether a theme preset with the same slug as a default preset
+	 *                        can override it
+	 * - use_default_names => whether to use the default names
+	 * - value_key         => the key that represents the value
+	 * - value_func        => optionally, instead of value_key, a function to generate
+	 *                        the value that takes a preset as an argument
+	 *                        (either value_key or value_func should be present)
+	 * - css_vars          => template string to use in generating the CSS Custom Property.
+	 *                        Example output: "--wp--preset--duotone--blue: <value>" will generate as many CSS Custom Properties as presets defined
+	 *                        substituting the $slug for the slug's value for each preset value.
+	 * - classes           => array containing a structure with the classes to
+	 *                        generate for the presets, where for each array item
+	 *                        the key is the class name and the value the property name.
+	 *                        The "$slug" substring will be replaced by the slug of each preset.
+	 *                        For example:
+	 *                        'classes' => array(
+	 *                          '.has-$slug-color'            => 'color',
+	 *                          '.has-$slug-background-color' => 'background-color',
+	 *                          '.has-$slug-border-color'     => 'border-color',
+	 *                        )
+	 * - properties        => array of CSS properties to be used by kses to
+	 *                        validate the content of each preset
+	 *                        by means of the remove_insecure_properties method.
 	 */
 	const PRESETS_METADATA = array(
 		array(
@@ -1517,6 +1518,7 @@ class WP_Theme_JSON_5_9 {
 		$blocks_metadata = static::get_blocks_metadata();
 		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
+		$filters = '';
 		foreach ( $setting_nodes as $metadata ) {
 			$node = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			if ( empty( $node['color']['duotone'] ) ) {
@@ -1525,7 +1527,6 @@ class WP_Theme_JSON_5_9 {
 
 			$duotone_presets = $node['color']['duotone'];
 
-			$filters = '';
 			foreach ( $origins as $origin ) {
 				if ( ! isset( $duotone_presets[ $origin ] ) ) {
 					continue;
