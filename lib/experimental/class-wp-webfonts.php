@@ -455,8 +455,14 @@ class WP_Webfonts {
 
 			// Bail out if the provider class does not exist.
 			if ( ! class_exists( $provider_class ) ) {
-				/* translators: %s is the provider name. */
-				trigger_error( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider_id ) );
+				trigger_error(
+					sprintf(
+						/* translators: %s is the provider name. */
+						esc_html__( 'Webfont provider "%s" is not registered.', 'gutenberg' ),
+						esc_html( $provider_id )
+					)
+				);
+
 				continue;
 			}
 
@@ -498,8 +504,13 @@ class WP_Webfonts {
 
 				// Skip if the provider is not registered.
 				if ( ! isset( $providers[ $provider ] ) ) {
-					/* translators: %s is the provider name. */
-					trigger_error( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider ) );
+					trigger_error(
+						sprintf(
+							/* translators: %s is the provider name. */
+							esc_html__( 'Webfont provider "%s" is not registered.', 'gutenberg' ),
+							esc_html( $provider )
+						)
+					);
 					continue;
 				}
 
