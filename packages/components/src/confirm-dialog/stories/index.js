@@ -40,9 +40,6 @@ export default {
 				),
 			},
 		},
-		title: {
-			type: 'string',
-		},
 		confirmButtonText: {
 			type: 'string',
 		},
@@ -71,7 +68,6 @@ const Template = ( args ) => {
 	return (
 		<>
 			<ConfirmDialog
-				title={ args.title }
 				onConfirm={ () => setConfirmVal( confirmOutput ) }
 				onCancel={
 					args.cancelOutput
@@ -92,12 +88,6 @@ const Template = ( args ) => {
 // Simplest usage: just declare the component with the required `onConfirm` prop.
 export const _default = Template.bind( {} );
 _default.args = {};
-
-// To add a title, pass the `title` prop
-export const WithTitle = Template.bind( {} );
-WithTitle.args = {
-	title: 'Example Title',
-};
 
 // To customize button text, pass the `cancelButtonText` and/or `confirmButtonText` props.
 export const withCustomButtonLabels = Template.bind( {} );
