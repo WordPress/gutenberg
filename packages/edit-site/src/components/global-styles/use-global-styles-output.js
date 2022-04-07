@@ -178,6 +178,54 @@ function getStylesDeclarations( blockStyles = {}, isRoot = false ) {
 						) }`
 					);
 				} );
+			} else if ( !! properties && isString( styleValue ) && rootOnly ) {
+				const separateValues = styleValue.split( ' ' );
+
+				const sortedBoxValues = {
+					top: '17px',
+					right: '17px',
+					bottom: '17px',
+					left: '17px',
+				};
+
+				switch ( separateValues.length ) {
+					case 1:
+						sortedBoxValues.top = separateValues[ 0 ];
+						sortedBoxValues.right = separateValues[ 0 ];
+						sortedBoxValues.bottom = separateValues[ 0 ];
+						sortedBoxValues.left = separateValues[ 0 ];
+						break;
+					case 2:
+						sortedBoxValues.top = separateValues[ 0 ];
+						sortedBoxValues.right = separateValues[ 1 ];
+						sortedBoxValues.bottom = separateValues[ 0 ];
+						sortedBoxValues.left = separateValues[ 1 ];
+						break;
+					case 3:
+						sortedBoxValues.top = separateValues[ 0 ];
+						sortedBoxValues.right = separateValues[ 1 ];
+						sortedBoxValues.bottom = separateValues[ 2 ];
+						sortedBoxValues.left = separateValues[ 1 ];
+						break;
+					case 4:
+						sortedBoxValues.top = separateValues[ 0 ];
+						sortedBoxValues.right = separateValues[ 1 ];
+						sortedBoxValues.bottom = separateValues[ 2 ];
+						sortedBoxValues.left = separateValues[ 3 ];
+						break;
+				}
+
+				Object.entries( properties ).forEach( ( entry ) => {
+					const [ name, prop ] = entry;
+					const cssProperty = name.startsWith( '--' )
+						? name
+						: kebabCase( name );
+					declarations.push(
+						`${ cssProperty }: ${ compileStyleValue(
+							get( sortedBoxValues, [ prop ] )
+						) }`
+					);
+				} );
 			} else if ( get( blockStyles, pathToValue, false ) ) {
 				const cssProperty = key.startsWith( '--' )
 					? key

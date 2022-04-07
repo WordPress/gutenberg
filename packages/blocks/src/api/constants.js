@@ -118,24 +118,15 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'spacing', 'blockGap' ],
 		support: [ 'spacing', 'blockGap' ],
 	},
-	'--wp--style--root--padding-top': {
-		value: [ 'spacing', 'padding', 'top' ],
+	'--wp--style--root--padding': {
+		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
-		rootOnly: true,
-	},
-	'--wp--style--root--padding-right': {
-		value: [ 'spacing', 'padding', 'right' ],
-		support: [ 'spacing', 'padding' ],
-		rootOnly: true,
-	},
-	'--wp--style--root--padding-bottom': {
-		value: [ 'spacing', 'padding', 'bottom' ],
-		support: [ 'spacing', 'padding' ],
-		rootOnly: true,
-	},
-	'--wp--style--root--padding-left': {
-		value: [ 'spacing', 'padding', 'left' ],
-		support: [ 'spacing', 'padding' ],
+		properties: {
+			'--wp--style--root--padding-top': 'top',
+			'--wp--style--root--padding-right': 'right',
+			'--wp--style--root--padding-bottom': 'bottom',
+			'--wp--style--root--padding-left': 'left',
+		},
 		rootOnly: true,
 	},
 };
