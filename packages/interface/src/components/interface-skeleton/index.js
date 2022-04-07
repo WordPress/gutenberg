@@ -44,6 +44,7 @@ function InterfaceSkeleton(
 		labels,
 		className,
 		shortcuts,
+		isDistractionFree,
 	},
 	ref
 ) {
@@ -72,7 +73,10 @@ function InterfaceSkeleton(
 
 	const headerVariants = {
 		hidden: { opacity: 0 },
-		hover: { opacity: 1, transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 } },
+		hover: {
+			opacity: 1,
+			transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
+		},
 	};
 
 	return (
@@ -99,6 +103,7 @@ function InterfaceSkeleton(
 			<div className="interface-interface-skeleton__editor">
 				{ !! header && (
 					<motion.div
+						animate={ isDistractionFree ? 'hidden' : 'hover' }
 						initial="hidden"
 						whileHover="hover"
 						variants={ headerVariants }

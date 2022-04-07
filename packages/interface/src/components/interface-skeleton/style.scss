@@ -129,6 +129,22 @@ html.interface-interface-skeleton__html-container {
 		border-radius: 2px;
 	}
 
+	.interface-interface-skeleton__secondary-sidebar {
+		position: absolute !important; // ignore the important for now
+		width: 350px;
+		right: inherit;
+		top: 0;
+		left: 0;
+	}
+
+	&.is-sidebar-opened .interface-interface-skeleton__sidebar {
+		position: absolute !important; // ignore the important for now
+		width: $sidebar-width;
+		right: 0;
+		top: 0;
+		left: inherit;
+	}
+
 	.interface-interface-skeleton__body {
 		margin-top: -60px;
 	}
