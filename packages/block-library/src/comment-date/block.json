@@ -13,7 +13,11 @@
 		},
 		"isLink": {
 			"type": "boolean",
-			"default": false
+			"default": true
+		},
+		"fontSize": {
+			"type": "string",
+			"default": "small"
 		}
 	},
 	"usesContext": [ "commentId" ],
