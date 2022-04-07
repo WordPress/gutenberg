@@ -89,6 +89,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 			marginBottom: 'bottom',
 			marginLeft: 'left',
 		},
+		useEngine: true,
 	},
 	padding: {
 		value: [ 'spacing', 'padding' ],

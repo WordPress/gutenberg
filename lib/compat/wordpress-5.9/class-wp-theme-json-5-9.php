@@ -70,9 +70,7 @@ class WP_Theme_JSON_5_9 {
 	 * This contains the necessary metadata to process them:
 	 *
 	 * - path             => Where to find the preset within the settings section.
-	 * - prevent_override => Whether a theme preset with the same slug as a default preset
-	 *                       should not override it or the path to a setting for the same
-	 *                       When defaults.
+	 * - prevent_override => Disables override of default presets by theme presets.
 	 *                       The relationship between whether to override the defaults
 	 *                       and whether the defaults are enabled is inverse:
 	 *                         - If defaults are enabled  => theme presets should not be overriden
@@ -104,58 +102,53 @@ class WP_Theme_JSON_5_9 {
 	 */
 	const PRESETS_METADATA = array(
 		array(
-			'path'                => array( 'color', 'palette' ),
-			'prevent_override'    => array( 'color', 'defaultPalette' ),
-			'use_default_presets' => array( 'color', 'defaultPalette' ),
-			'use_default_names'   => false,
-			'value_key'           => 'color',
-			'css_vars'            => '--wp--preset--color--$slug',
-			'classes'             => array(
+			'path'              => array( 'color', 'palette' ),
+			'prevent_override'  => array( 'color', 'defaultPalette' ),
+			'use_default_names' => false,
+			'value_key'         => 'color',
+			'css_vars'          => '--wp--preset--color--$slug',
+			'classes'           => array(
 				'.has-$slug-color'            => 'color',
 				'.has-$slug-background-color' => 'background-color',
 				'.has-$slug-border-color'     => 'border-color',
 			),
-			'properties'          => array( 'color', 'background-color', 'border-color' ),
+			'properties'        => array( 'color', 'background-color', 'border-color' ),
 		),
 		array(
-			'path'                => array( 'color', 'gradients' ),
-			'prevent_override'    => array( 'color', 'defaultGradients' ),
-			'use_default_presets' => array( 'color', 'defaultGradients' ),
-			'use_default_names'   => false,
-			'value_key'           => 'gradient',
-			'css_vars'            => '--wp--preset--gradient--$slug',
-			'classes'             => array( '.has-$slug-gradient-background' => 'background' ),
-			'properties'          => array( 'background' ),
+			'path'              => array( 'color', 'gradients' ),
+			'prevent_override'  => array( 'color', 'defaultGradients' ),
+			'use_default_names' => false,
+			'value_key'         => 'gradient',
+			'css_vars'          => '--wp--preset--gradient--$slug',
+			'classes'           => array( '.has-$slug-gradient-background' => 'background' ),
+			'properties'        => array( 'background' ),
 		),
 		array(
-			'path'                => array( 'color', 'duotone' ),
-			'prevent_override'    => array( 'color', 'defaultDuotone' ),
-			'use_default_presets' => array( 'color', 'defaultDuotone' ),
-			'use_default_names'   => false,
-			'value_func'          => 'gutenberg_get_duotone_filter_property',
-			'css_vars'            => '--wp--preset--duotone--$slug',
-			'classes'             => array(),
-			'properties'          => array( 'filter' ),
+			'path'              => array( 'color', 'duotone' ),
+			'prevent_override'  => array( 'color', 'defaultDuotone' ),
+			'use_default_names' => false,
+			'value_func'        => 'gutenberg_get_duotone_filter_property',
+			'css_vars'          => '--wp--preset--duotone--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'filter' ),
 		),
 		array(
-			'path'                => array( 'typography', 'fontSizes' ),
-			'prevent_override'    => false,
-			'use_default_presets' => true,
-			'use_default_names'   => true,
-			'value_key'           => 'size',
-			'css_vars'            => '--wp--preset--font-size--$slug',
-			'classes'             => array( '.has-$slug-font-size' => 'font-size' ),
-			'properties'          => array( 'font-size' ),
+			'path'              => array( 'typography', 'fontSizes' ),
+			'prevent_override'  => false,
+			'use_default_names' => true,
+			'value_key'         => 'size',
+			'css_vars'          => '--wp--preset--font-size--$slug',
+			'classes'           => array( '.has-$slug-font-size' => 'font-size' ),
+			'properties'        => array( 'font-size' ),
 		),
 		array(
-			'path'                => array( 'typography', 'fontFamilies' ),
-			'prevent_override'    => false,
-			'use_default_presets' => true,
-			'use_default_names'   => false,
-			'value_key'           => 'fontFamily',
-			'css_vars'            => '--wp--preset--font-family--$slug',
-			'classes'             => array( '.has-$slug-font-family' => 'font-family' ),
-			'properties'          => array( 'font-family' ),
+			'path'              => array( 'typography', 'fontFamilies' ),
+			'prevent_override'  => false,
+			'use_default_names' => false,
+			'value_key'         => 'fontFamily',
+			'css_vars'          => '--wp--preset--font-family--$slug',
+			'classes'           => array( '.has-$slug-font-family' => 'font-family' ),
+			'properties'        => array( 'font-family' ),
 		),
 	);
 
@@ -1036,14 +1029,9 @@ class WP_Theme_JSON_5_9 {
 	protected static function get_settings_values_by_slug( $settings, $preset_metadata, $origins ) {
 		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
 
-		$skip_default_presets = ! static::get_metadata_boolean( $settings, $preset_metadata['use_default_presets'], true );
-
 		$result = array();
 		foreach ( $origins as $origin ) {
-			if (
-				! isset( $preset_per_origin[ $origin ] ) ||
-				( 'default' === $origin && $skip_default_presets )
-			) {
+			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
@@ -1085,14 +1073,9 @@ class WP_Theme_JSON_5_9 {
 
 		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
 
-		$skip_default_presets = ! static::get_metadata_boolean( $settings, $preset_metadata['use_default_presets'], true );
-
 		$result = array();
 		foreach ( $origins as $origin ) {
-			if (
-				! isset( $preset_per_origin[ $origin ] ) ||
-				( 'default' === $origin && $skip_default_presets )
-			) {
+			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
@@ -1552,10 +1535,7 @@ class WP_Theme_JSON_5_9 {
 			$duotone_presets = $node['color']['duotone'];
 
 			foreach ( $origins as $origin ) {
-				if (
-					! isset( $duotone_presets[ $origin ] ) ||
-					( 'default' === $origin && false === $node['color']['defaultDuotone'] )
-				) {
+				if ( ! isset( $duotone_presets[ $origin ] ) ) {
 					continue;
 				}
 				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {

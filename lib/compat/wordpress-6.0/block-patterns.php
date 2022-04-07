@@ -10,10 +10,23 @@
  * `theme.json` file.
  */
 function gutenberg_register_remote_theme_patterns() {
+	if ( ! get_theme_support( 'core-block-patterns' ) ) {
+		return;
+	}
+
+	if ( ! apply_filters( 'should_load_remote_block_patterns', true ) ) {
+		return;
+	}
+
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		return;
+	}
+
 	$pattern_settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_patterns();
 	if ( empty( $pattern_settings ) ) {
 		return;
 	}
+
 	$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 	$request['slug'] = implode( ',', $pattern_settings );
 	$response        = rest_do_request( $request );
@@ -31,26 +44,6 @@ function gutenberg_register_remote_theme_patterns() {
 		}
 	}
 }
-
-add_action(
-	'current_screen',
-	function( $current_screen ) {
-		if ( ! get_theme_support( 'core-block-patterns' ) ) {
-			return;
-		}
-		if ( ! apply_filters( 'should_load_remote_block_patterns', true ) ) {
-			return;
-		}
-		if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			return;
-		}
-
-		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
-		if ( $current_screen->is_block_editor || $is_site_editor ) {
-			gutenberg_register_remote_theme_patterns();
-		}
-	}
-);
 
 /**
  * Register any patterns that the active theme may provide under its
@@ -94,10 +87,17 @@ function gutenberg_register_theme_block_patterns() {
 	);
 
 	// Register patterns for the active theme. If the theme is a child theme,
-	// let it override any patterns from the parent theme that shares the same
-	// slug.
-	foreach ( wp_get_active_and_valid_themes() as $theme ) {
-		$dirpath = $theme . '/patterns/';
+	// let it override any patterns from the parent theme that shares the same slug.
+	$themes     = array();
+	$stylesheet = get_stylesheet();
+	$template   = get_template();
+	if ( $stylesheet !== $template ) {
+		$themes[] = wp_get_theme( $stylesheet );
+	}
+	$themes[] = wp_get_theme( $template );
+
+	foreach ( $themes as $theme ) {
+		$dirpath = $theme->get_stylesheet_directory() . '/patterns/';
 		if ( file_exists( $dirpath ) ) {
 			$files = glob( $dirpath . '*.php' );
 			if ( $files ) {
@@ -176,6 +176,15 @@ function gutenberg_register_theme_block_patterns() {
 						} else {
 							unset( $pattern_data[ $property ] );
 						}
+					}
+
+					// Translate the pattern metadata.
+					$text_domain = $theme->get( 'TextDomain' );
+					//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralContext, WordPress.WP.I18n.NonSingularStringLiteralDomain, WordPress.WP.I18n.LowLevelTranslationFunction
+					$pattern_data['title'] = translate_with_gettext_context( $pattern_data['title'], 'Pattern title', $text_domain );
+					if ( ! empty( $pattern_data['description'] ) ) {
+						//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralContext, WordPress.WP.I18n.NonSingularStringLiteralDomain, WordPress.WP.I18n.LowLevelTranslationFunction
+						$pattern_data['description'] = translate_with_gettext_context( $pattern_data['description'], 'Pattern description', $text_domain );
 					}
 
 					// The actual pattern content is the output of the file.

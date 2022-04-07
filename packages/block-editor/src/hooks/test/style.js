@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import { getInlineStyles } from '../style';
@@ -105,6 +110,95 @@ describe( 'getInlineStyles', () => {
 		).toEqual( {
 			margin: '10px',
 			padding: '20px',
+		} );
+	} );
+} );
+
+describe( 'addSaveProps', () => {
+	const addSaveProps = applyFilters.bind(
+		null,
+		'blocks.getSaveContent.extraProps'
+	);
+
+	const blockSettings = {
+		save: () => <div className="default" />,
+		category: 'text',
+		title: 'block title',
+		supports: {
+			spacing: { padding: true },
+			color: { gradients: true, text: true },
+			typography: {
+				fontSize: true,
+				__experimentalTextTransform: true,
+				__experimentalTextDecoration: true,
+			},
+		},
+	};
+
+	const applySkipSerialization = ( features ) => {
+		const updatedSettings = { ...blockSettings };
+		Object.keys( features ).forEach( ( key ) => {
+			updatedSettings.supports[ key ].__experimentalSkipSerialization =
+				features[ key ];
+		} );
+		return updatedSettings;
+	};
+
+	const attributes = {
+		style: {
+			color: {
+				text: '#d92828',
+				gradient:
+					'linear-gradient(135deg,rgb(6,147,227) 0%,rgb(223,13,13) 46%,rgb(155,81,224) 100%)',
+			},
+			spacing: { padding: '10px' },
+			typography: {
+				fontSize: '1rem',
+				textDecoration: 'underline',
+				textTransform: 'uppercase',
+			},
+		},
+	};
+
+	it( 'should serialize all styles by default', () => {
+		const extraProps = addSaveProps( {}, blockSettings, attributes );
+
+		expect( extraProps.style ).toEqual( {
+			background:
+				'linear-gradient(135deg,rgb(6,147,227) 0%,rgb(223,13,13) 46%,rgb(155,81,224) 100%)',
+			color: '#d92828',
+			padding: '10px',
+			fontSize: '1rem',
+			textDecoration: 'underline',
+			textTransform: 'uppercase',
+		} );
+	} );
+
+	it( 'should skip serialization of entire feature set if flag is true', () => {
+		const settings = applySkipSerialization( {
+			typography: true,
+		} );
+		const extraProps = addSaveProps( {}, settings, attributes );
+
+		expect( extraProps.style ).toEqual( {
+			background:
+				'linear-gradient(135deg,rgb(6,147,227) 0%,rgb(223,13,13) 46%,rgb(155,81,224) 100%)',
+			color: '#d92828',
+			padding: '10px',
+		} );
+	} );
+
+	it( 'should skip serialization of individual features if flag is an array', () => {
+		const settings = applySkipSerialization( {
+			color: [ 'gradient' ],
+			typography: [ 'textDecoration', 'textTransform' ],
+		} );
+		const extraProps = addSaveProps( {}, settings, attributes );
+
+		expect( extraProps.style ).toEqual( {
+			color: '#d92828',
+			padding: '10px',
+			fontSize: '1rem',
 		} );
 	} );
 } );

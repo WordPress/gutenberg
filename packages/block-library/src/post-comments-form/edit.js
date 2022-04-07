@@ -34,6 +34,8 @@ export default function PostCommentsFormEdit( {
 		} ),
 	} );
 
+	const isInSiteEditor = postType === undefined || postId === undefined;
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -45,7 +47,7 @@ export default function PostCommentsFormEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ ! commentStatus && (
+				{ ! commentStatus && ! isInSiteEditor && (
 					<Warning>
 						{ __(
 							'Post Comments Form block: comments are not enabled for this post type.'
@@ -53,7 +55,7 @@ export default function PostCommentsFormEdit( {
 					</Warning>
 				) }
 
-				{ 'open' !== commentStatus && (
+				{ 'open' !== commentStatus && ! isInSiteEditor && (
 					<Warning>
 						{ sprintf(
 							/* translators: 1: Post type (i.e. "post", "page") */
@@ -65,7 +67,8 @@ export default function PostCommentsFormEdit( {
 					</Warning>
 				) }
 
-				{ 'open' === commentStatus && __( 'Post Comments Form' ) }
+				{ ( 'open' === commentStatus || isInSiteEditor ) &&
+					__( 'Post Comments Form' ) }
 			</div>
 		</>
 	);

@@ -59,9 +59,7 @@ function BlockMenuItem( { block } ) {
 	return (
 		<NavigationButton path={ '/blocks/' + block.name }>
 			<HStack justify="flex-start">
-				<FlexItem>
-					<BlockIcon icon={ block.icon } />
-				</FlexItem>
+				<BlockIcon icon={ block.icon } />
 				<FlexItem>{ block.title }</FlexItem>
 			</HStack>
 		</NavigationButton>
