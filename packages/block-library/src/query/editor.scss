@@ -22,20 +22,11 @@
 .block-editor-query-pattern__selection-modal .components-modal__content {
 	padding: 0;
 	&::before {
-		margin-bottom: 0
-	}
-}
-
-.block-editor-query-pattern__selection-modal .block-editor-block-pattern-setup {
-	&, & .block-editor-block-pattern-setup__toolbar {
-		box-shadow: none;
+		margin-bottom: 0;
 	}
 }
 
 .block-editor-query-pattern__selection-modal {
-	.block-editor-block-pattern-setup.view-mode-grid .block-editor-block-pattern-setup__container {
-		max-height: unset;
-	}
 	// To keep modal dimensions consistent as subsections are navigated, width
 	// and height are used instead of max-(width/height).
 	@include break-small() {

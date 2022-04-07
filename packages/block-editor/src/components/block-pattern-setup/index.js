@@ -72,7 +72,7 @@ const SetupContent = ( {
 
 function BlockPattern( { pattern, onSelect, composite } ) {
 	const baseClassName = 'block-editor-block-pattern-setup-list';
-	const { blocks, title, description, viewportWidth = 700 } = pattern;
+	const { blocks, description, viewportWidth = 700 } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPattern,
 		`${ baseClassName }__item-description`
@@ -94,9 +94,6 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 					blocks={ blocks }
 					viewportWidth={ viewportWidth }
 				/>
-				<div className={ `${ baseClassName }__item-title` }>
-					{ title }
-				</div>
 			</CompositeItem>
 			{ !! description && (
 				<VisuallyHidden id={ descriptionId }>
@@ -119,7 +116,7 @@ function BlockPatternSlide( { className, pattern } ) {
 			aria-label={ title }
 			aria-describedby={ description ? descriptionId : undefined }
 		>
-			<BlockPreview blocks={ blocks } __experimentalLive />
+			<BlockPreview blocks={ blocks } />
 			{ !! description && (
 				<VisuallyHidden id={ descriptionId }>
 					{ description }
@@ -161,6 +158,12 @@ const BlockPatternSetup = ( {
 		<div
 			className={ `block-editor-block-pattern-setup view-mode-${ viewMode }` }
 		>
+			<SetupContent
+				viewMode={ viewMode }
+				activeSlide={ activeSlide }
+				patterns={ patterns }
+				onBlockPatternSelect={ onPatternSelectCallback }
+			/>
 			<SetupToolbar
 				viewMode={ viewMode }
 				setViewMode={ setViewMode }
@@ -176,12 +179,6 @@ const BlockPatternSetup = ( {
 					onPatternSelectCallback( patterns[ activeSlide ].blocks );
 				} }
 				onStartBlank={ onStartBlank }
-			/>
-			<SetupContent
-				viewMode={ viewMode }
-				activeSlide={ activeSlide }
-				patterns={ patterns }
-				onBlockPatternSelect={ onPatternSelectCallback }
 			/>
 		</div>
 	);
