@@ -49,7 +49,6 @@ const defaultRenderToggle = ( {
 		icon: <Icon icon={ plus } style={ style } />,
 		customContainerStyles: containerStyle,
 		fixedRatio: false,
-		iconSize: 22,
 	};
 	const defaultViewText = (
 		<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
