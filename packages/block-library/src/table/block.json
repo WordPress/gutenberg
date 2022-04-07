@@ -156,7 +156,7 @@
 				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-table > table"
+		"__experimentalSelector": ":where(.wp-block-table > table)"
 	},
 	"styles": [
 		{

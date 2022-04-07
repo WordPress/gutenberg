@@ -958,7 +958,7 @@ class WP_Theme_JSON_5_9 {
 						array(
 							array(
 								'name'  => $property,
-								'value' => 'var(' . $css_var . ') !important',
+								'value' => 'var(' . $css_var . ')',
 							),
 						)
 					);
