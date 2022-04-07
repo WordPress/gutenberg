@@ -71,7 +71,7 @@ require __DIR__ . '/compat/wordpress-5.9/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.0/block-editor-settings.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/compat/wordpress-6.0/get-global-styles-and-settings.php';
-require __DIR__ . '/compat/wordpress-5.9/render-svg-filters.php';
+require __DIR__ . '/compat/wordpress-6.0/render-svg-filters.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
 require __DIR__ . '/compat/wordpress-5.9/global-styles-css-custom-properties.php';

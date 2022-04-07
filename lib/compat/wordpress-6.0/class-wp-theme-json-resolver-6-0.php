@@ -36,6 +36,97 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
 	}
 
 	/**
+	 * Return core's origin config.
+	 *
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds core data.
+	 */
+	public static function get_core_data() {
+		if ( null !== static::$core ) {
+			return static::$core;
+		}
+
+		$config       = static::read_json_file( __DIR__ . '/theme.json' );
+		$config       = static::translate( $config );
+		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
+
+		return static::$core;
+	}
+
+	/**
+	 * Returns the theme's data.
+	 *
+	 * Data from theme.json will be backfilled from existing
+	 * theme supports, if any. Note that if the same data
+	 * is present in theme.json and in theme supports,
+	 * the theme.json takes precedence.
+	 *
+	 * @param array $deprecated Deprecated argument.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
+	 */
+	public static function get_theme_data( $deprecated = array() ) {
+		if ( ! empty( $deprecated ) ) {
+			_deprecated_argument( __METHOD__, '5.9' );
+		}
+		if ( null === static::$theme ) {
+			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
+			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+
+			if ( wp_get_theme()->parent() ) {
+				// Get parent theme.json.
+				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
+				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
+				$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
+
+				// Merge the child theme.json into the parent theme.json.
+				// The child theme takes precedence over the parent.
+				$parent_theme->merge( static::$theme );
+				static::$theme = $parent_theme;
+			}
+		}
+
+		/*
+		* We want the presets and settings declared in theme.json
+		* to override the ones declared via theme supports.
+		* So we take theme supports, transform it to theme.json shape
+		* and merge the static::$theme upon that.
+		*/
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
+		if ( ! static::theme_has_support() ) {
+			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
+				$theme_support_data['settings']['color'] = array();
+			}
+
+			$default_palette = false;
+			if ( current_theme_supports( 'default-color-palette' ) ) {
+				$default_palette = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['color']['palette'] ) ) {
+				// If the theme does not have any palette, we still want to show the core one.
+				$default_palette = true;
+			}
+			$theme_support_data['settings']['color']['defaultPalette'] = $default_palette;
+
+			$default_gradients = false;
+			if ( current_theme_supports( 'default-gradient-presets' ) ) {
+				$default_gradients = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['color']['gradients'] ) ) {
+				// If the theme does not have any gradients, we still want to show the core ones.
+				$default_gradients = true;
+			}
+			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
+
+			// Classic themes without a theme.json don't support global duotone.
+			$theme_support_data['settings']['color']['defaultDuotone'] = false;
+		}
+		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
+		$with_theme_supports->merge( static::$theme );
+
+		return $with_theme_supports;
+	}
+
+	/**
 	 * Returns the style variations defined by the theme.
 	 *
 	 * @return array
