@@ -86,7 +86,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$vertical_alignment_options = array(
 			'top'    => 'flex-start',
 			'center' => 'center',
-			'bottom' => 'flex-end'
+			'bottom' => 'flex-end',
 		);
 
 		if ( 'horizontal' === $layout_orientation ) {
