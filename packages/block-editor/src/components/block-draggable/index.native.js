@@ -131,11 +131,12 @@ const BlockDraggableWrapper = ( { children } ) => {
 	};
 
 	const onStopDragging = () => {
-		if ( currentBlockLayout.current ) {
+		const currentClientId = currentBlockLayout.current?.clientId;
+		if ( currentClientId ) {
 			onBlockDrop( {
 				// Dropping is only allowed at root level
 				srcRootClientId: '',
-				srcClientIds: [ currentBlockLayout.current.clientId ],
+				srcClientIds: [ currentClientId ],
 				type: 'block',
 			} );
 		}
