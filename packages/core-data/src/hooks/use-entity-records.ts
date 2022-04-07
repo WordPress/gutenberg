@@ -75,7 +75,7 @@ interface Options {
  * @return Entity records data.
  * @template RecordType
  */
-export default function __experimentalUseEntityRecords< RecordType >(
+export default function useEntityRecords< RecordType >(
 	kind: string,
 	name: string,
 	queryArgs: Record< string, unknown > = {},

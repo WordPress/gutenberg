@@ -18,7 +18,7 @@ import { useMemo, useState, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
-	__experimentalUseEntityRecords as useEntityRecords,
+	useEntityRecords as useEntityRecords,
 } from '@wordpress/core-data';
 
 /**

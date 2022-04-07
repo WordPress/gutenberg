@@ -60,7 +60,7 @@ interface Options {
  * @return {EntityRecordResolution<RecordType>} Entity record data.
  * @template RecordType
  */
-export default function __experimentalUseEntityRecord< RecordType >(
+export default function useEntityRecord< RecordType >(
 	kind: string,
 	name: string,
 	recordId: string | number,

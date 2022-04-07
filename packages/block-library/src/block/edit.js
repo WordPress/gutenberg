@@ -5,7 +5,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
-	__experimentalUseEntityRecord as useEntityRecord,
+	useEntityRecord as useEntityRecord,
 } from '@wordpress/core-data';
 import {
 	Placeholder,
