@@ -188,6 +188,7 @@ function UnforwardedUnitControl(
 			};
 
 			if ( quantityPasted ) {
+				const entry = `${ quantityPasted }`.replace( /^0*/, '' );
 				let {
 					value,
 					selectionStart: headIndex,
@@ -198,12 +199,12 @@ function UnforwardedUnitControl(
 				if ( headIndex !== tailIndex ) {
 					// Replaces selection with the pasted quantity.
 					const selected = value.substring( headIndex, tailIndex );
-					value = value.replace( selected, `${ quantityPasted }` );
+					value = value.replace( selected, `${ entry }` );
 				} else {
 					// Inserts the pasted quantity at caret.
 					const head = value.substring( 0, headIndex );
 					const tail = value.substring( headIndex, value.length );
-					value = `${ head }${ quantityPasted }${ tail }`;
+					value = `${ head }${ entry }${ tail }`;
 				}
 				onChangeProp?.( `${ value }${ unitPasted }`, changeProps );
 			}
