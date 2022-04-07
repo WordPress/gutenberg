@@ -19,7 +19,7 @@ import { AnimatedBackdrop } from './styles';
 
 const TRANSITION_CONFIG = {
 	type: 'spring',
-	bounce: 0.2,
+	bounce: 0,
 	// Transition durations in the config are expressed as a string in milliseconds,
 	// while `framer-motion` needs them as integers in seconds.
 	duration: parseInt( CONFIG.transitionDuration, 10 ) / 1000,
