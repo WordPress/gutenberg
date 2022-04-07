@@ -1,3 +1,10 @@
+.wp-block-group .wp-block-social-links {
+	&.alignleft,
+	&.alignright {
+		float: none;
+	}
+}
+
 .wp-block-social-links {
 	padding-left: 0;
 	padding-right: 0;
@@ -139,3 +146,4 @@
 		padding-right: calc((2/3) * 1em);
 	}
 }
+
