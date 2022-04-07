@@ -44,6 +44,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	 *                       making the default palette hidden from the user.
 	 *                       In that case, we want all the theme presets to be present,
 	 *                       so they should override the defaults by setting this false.
+	 * - use_default_names => whether to use the default names
 	 * - value_key        => the key that represents the value
 	 * - value_func       => optionally, instead of value_key, a function to generate
 	 *                       the value that takes a preset as an argument
