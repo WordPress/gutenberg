@@ -1012,19 +1012,13 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 
 /**
  * Get partial selected blocks with their content updated
- * based on the selection. Based on `innerSelection` flag
- * we can return the blocks updated with the selected part
- * or the content outside the selection.
+ * based on the selection.
  *
- * @param {Object}  state                 Editor state.
- * @param {boolean} [innerSelection=true] Whether to return blocks with the selection as content or the unselected part.
+ * @param {Object} state Editor state.
  *
  * @return {Object[]} Updated partial selected blocks.
  */
-export const __unstableGetSelectedBlocksWithPartialSelection = (
-	state,
-	innerSelection = true
-) => {
+export const __unstableGetSelectedBlocksWithPartialSelection = ( state ) => {
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
 
@@ -1090,15 +1084,8 @@ export const __unstableGetSelectedBlocksWithPartialSelection = (
 		...mapRichTextSettings( attributeDefinitionB ),
 	} );
 
-	// If we want `innerSelection` we remove the unselected part
-	// and if we don't we remove the selected part.
-	if ( innerSelection ) {
-		valueA = remove( valueA, 0, selectionStart.offset );
-		valueB = remove( valueB, selectionEnd.offset, valueB.text.length );
-	} else {
-		valueA = remove( valueA, selectionStart.offset, valueA.text.length );
-		valueB = remove( valueB, 0, selectionEnd.offset );
-	}
+	valueA = remove( valueA, 0, selectionStart.offset );
+	valueB = remove( valueB, selectionEnd.offset, valueB.text.length );
 
 	return [
 		{
