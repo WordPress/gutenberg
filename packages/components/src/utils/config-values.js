@@ -77,6 +77,7 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
 	surfaceBackgroundTertiaryColor: COLORS.white,
 	surfaceColor: COLORS.white,
+	transitionDurationSlow: '250ms',
 	transitionDuration: '200ms',
 	transitionDurationFast: '160ms',
 	transitionDurationFaster: '120ms',
