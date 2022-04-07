@@ -42,7 +42,7 @@ export default function moveIndividualPreferenceToPreferences(
 	convert = identity
 ) {
 	const preferencesStoreName = 'core/preferences';
-	const sourcePreference = state[ sourceStoreName ]?.preferences?.[ key ];
+	const sourcePreference = state?.[ sourceStoreName ]?.preferences?.[ key ];
 
 	// There's nothing to migrate, exit early.
 	if ( sourcePreference === undefined ) {
@@ -50,19 +50,19 @@ export default function moveIndividualPreferenceToPreferences(
 	}
 
 	const targetPreference =
-		state[ preferencesStoreName ]?.preferences?.[ scope ]?.[ key ];
+		state?.[ preferencesStoreName ]?.preferences?.[ scope ]?.[ key ];
 
 	// There's existing data at the target, so don't overwrite it, exit early.
 	if ( targetPreference ) {
 		return state;
 	}
 
-	const otherScopes = state[ preferencesStoreName ]?.preferences;
+	const otherScopes = state?.[ preferencesStoreName ]?.preferences;
 	const otherPreferences =
-		state[ preferencesStoreName ]?.preferences?.[ scope ];
+		state?.[ preferencesStoreName ]?.preferences?.[ scope ];
 
-	const otherSourceState = state[ sourceStoreName ];
-	const allSourcePreferences = state[ sourceStoreName ]?.preferences;
+	const otherSourceState = state?.[ sourceStoreName ];
+	const allSourcePreferences = state?.[ sourceStoreName ]?.preferences;
 
 	// Pass an object with the key and value as this allows the convert
 	// function to convert to a data structure that has different keys.

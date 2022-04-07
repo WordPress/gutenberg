@@ -83,8 +83,8 @@ export function convertLegacyData( data ) {
 	);
 
 	// The new system is only concerned with persisting
-	// 'core/preferences', so only return that.
-	return data?.[ 'core/preferences' ];
+	// 'core/preferences' preferences reducer, so only return that.
+	return data?.[ 'core/preferences' ]?.preferences;
 }
 
 /**

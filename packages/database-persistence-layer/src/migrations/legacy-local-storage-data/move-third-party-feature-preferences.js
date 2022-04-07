@@ -43,8 +43,11 @@ export default function moveThirdPartyFeaturePreferencesToPreferences( state ) {
 	const interfaceStoreName = 'core/interface';
 	const preferencesStoreName = 'core/preferences';
 
-	const interfaceScopes = state[ interfaceStoreName ]?.preferences?.features;
-	const interfaceScopeKeys = Object.keys( interfaceScopes );
+	const interfaceScopes =
+		state?.[ interfaceStoreName ]?.preferences?.features;
+	const interfaceScopeKeys = interfaceScopes
+		? Object.keys( interfaceScopes )
+		: [];
 
 	if ( ! interfaceScopeKeys?.length ) {
 		return state;
@@ -55,23 +58,23 @@ export default function moveThirdPartyFeaturePreferencesToPreferences( state ) {
 			return convertedState;
 		}
 
-		const featuresToMigrate = interfaceScopes[ scope ];
+		const featuresToMigrate = interfaceScopes?.[ scope ];
 		if ( ! featuresToMigrate ) {
 			return convertedState;
 		}
 
 		const existingMigratedData =
-			convertedState[ preferencesStoreName ]?.preferences?.[ scope ];
+			convertedState?.[ preferencesStoreName ]?.preferences?.[ scope ];
 
 		if ( existingMigratedData ) {
 			return convertedState;
 		}
 
 		const otherPreferencesScopes =
-			convertedState[ preferencesStoreName ]?.preferences;
-		const otherInterfaceState = convertedState[ interfaceStoreName ];
+			convertedState?.[ preferencesStoreName ]?.preferences;
+		const otherInterfaceState = convertedState?.[ interfaceStoreName ];
 		const otherInterfaceScopes =
-			convertedState[ interfaceStoreName ]?.preferences?.features;
+			convertedState?.[ interfaceStoreName ]?.preferences?.features;
 
 		return {
 			...convertedState,

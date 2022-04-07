@@ -64,8 +64,10 @@ export default function moveFeaturePreferences( state, sourceStoreName ) {
 	// also check the original package as the user may have updated from an
 	// older block editor version.
 	const interfaceFeatures =
-		state[ interfaceStoreName ]?.preferences?.features?.[ sourceStoreName ];
-	const sourceFeatures = state[ sourceStoreName ]?.preferences?.features;
+		state?.[ interfaceStoreName ]?.preferences?.features?.[
+			sourceStoreName
+		];
+	const sourceFeatures = state?.[ sourceStoreName ]?.preferences?.features;
 	const featuresToMigrate = interfaceFeatures
 		? interfaceFeatures
 		: sourceFeatures;
@@ -74,7 +76,7 @@ export default function moveFeaturePreferences( state, sourceStoreName ) {
 		return state;
 	}
 
-	const existingPreferences = state[ preferencesStoreName ]?.preferences;
+	const existingPreferences = state?.[ preferencesStoreName ]?.preferences;
 
 	// Avoid migrating features again if they've previously been migrated.
 	if ( existingPreferences?.[ sourceStoreName ] ) {
@@ -83,9 +85,9 @@ export default function moveFeaturePreferences( state, sourceStoreName ) {
 
 	let updatedInterfaceState;
 	if ( interfaceFeatures ) {
-		const otherInterfaceState = state[ interfaceStoreName ];
+		const otherInterfaceState = state?.[ interfaceStoreName ];
 		const otherInterfaceScopes =
-			state[ interfaceStoreName ]?.preferences?.features;
+			state?.[ interfaceStoreName ]?.preferences?.features;
 
 		updatedInterfaceState = {
 			[ interfaceStoreName ]: {
@@ -102,8 +104,8 @@ export default function moveFeaturePreferences( state, sourceStoreName ) {
 
 	let updatedSourceState;
 	if ( sourceFeatures ) {
-		const otherSourceState = state[ sourceStoreName ];
-		const sourcePreferences = state[ sourceStoreName ]?.preferences;
+		const otherSourceState = state?.[ sourceStoreName ];
+		const sourcePreferences = state?.[ sourceStoreName ]?.preferences;
 
 		updatedSourceState = {
 			[ sourceStoreName ]: {

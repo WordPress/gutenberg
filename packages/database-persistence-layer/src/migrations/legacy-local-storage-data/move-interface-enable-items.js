@@ -45,17 +45,17 @@
  *
  * @param {Object} state The local storage state.
  */
-export default function moveInterfaceEnableItemsToPreferences( state ) {
+export default function moveInterfaceEnableItems( state ) {
 	const interfaceStoreName = 'core/interface';
 	const preferencesStoreName = 'core/preferences';
-	const sourceEnableItems = state[ interfaceStoreName ]?.enableItems;
+	const sourceEnableItems = state?.[ interfaceStoreName ]?.enableItems;
 
 	// There's nothing to migrate, exit early.
 	if ( ! sourceEnableItems ) {
-		return;
+		return state;
 	}
 
-	const allPreferences = state[ preferencesStoreName ]?.preferences ?? {};
+	const allPreferences = state?.[ preferencesStoreName ]?.preferences ?? {};
 
 	// First convert complementaryAreas into the right format.
 	// Use the existing preferences as the accumulator so that the data is
@@ -69,7 +69,7 @@ export default function moveInterfaceEnableItemsToPreferences( state ) {
 		const data = sourceComplementaryAreas[ scope ];
 
 		// Don't overwrite any existing data in the preferences store.
-		if ( accumulator[ scope ]?.complementaryArea ) {
+		if ( accumulator?.[ scope ]?.complementaryArea ) {
 			return accumulator;
 		}
 
@@ -90,7 +90,7 @@ export default function moveInterfaceEnableItemsToPreferences( state ) {
 		( accumulator, scope ) => {
 			const data = sourcePinnedItems[ scope ];
 			// Don't overwrite any existing data in the preferences store.
-			if ( accumulator[ scope ]?.pinnedItems ) {
+			if ( accumulator?.[ scope ]?.pinnedItems ) {
 				return accumulator;
 			}
 

@@ -14,8 +14,6 @@ const localStorage = window.localStorage;
 /**
  * Creates a database persistence layer, storing data in the user meta.
  *
- *
- *
  * @param {Object} options
  * @param {Object} options.preloadedData          Any persisted data that should be preloaded.
  * @param {number} options.requestDebounceMS      Debounce requests to the API so that they only occur
@@ -61,7 +59,7 @@ export default function create( {
 		return cache;
 	}
 
-	async function set( newData ) {
+	function set( newData ) {
 		const dataWithTimestamp = { ...newData, __timestamp: Date.now() };
 		cache = dataWithTimestamp;
 
