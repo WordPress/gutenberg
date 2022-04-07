@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import moveInterfaceEnableItemsToPreferences from '../move-interface-enable-items-to-preferences';
+import moveInterfaceEnableItems from '../move-interface-enable-items';
 
-describe( 'moveInterfaceEnableItemsToPreferences', () => {
+describe( 'moveInterfaceEnableItems', () => {
 	it( 'migrates enableItems to the preferences store', () => {
 		const state = {
 			'core/interface': {
@@ -28,7 +28,7 @@ describe( 'moveInterfaceEnableItemsToPreferences', () => {
 			},
 		};
 
-		const convertedState = moveInterfaceEnableItemsToPreferences( state );
+		const convertedState = moveInterfaceEnableItems( state );
 
 		expect( convertedState ).toEqual( {
 			'core/preferences': {
@@ -88,7 +88,7 @@ describe( 'moveInterfaceEnableItemsToPreferences', () => {
 			},
 		};
 
-		const convertedState = moveInterfaceEnableItemsToPreferences( state );
+		const convertedState = moveInterfaceEnableItems( state );
 
 		expect( convertedState ).toEqual( {
 			'core/preferences': {

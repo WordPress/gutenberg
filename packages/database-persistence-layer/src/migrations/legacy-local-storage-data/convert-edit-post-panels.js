@@ -1,5 +1,5 @@
 /**
- * Convert from:
+ * Convert the post editor's panels state from:
  * ```
  * {
  *     panels: {
@@ -15,7 +15,7 @@
  * }
  * ```
  *
- * to:
+ * to a new, more concise data structure:
  * {
  *     inactivePanels: [
  *         'permalinks',

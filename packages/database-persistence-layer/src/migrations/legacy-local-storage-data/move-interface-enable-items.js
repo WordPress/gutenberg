@@ -24,6 +24,7 @@
  *     }
  * }
  * ```
+ *
  * and it should be converted it to:
  * ```js
  * {

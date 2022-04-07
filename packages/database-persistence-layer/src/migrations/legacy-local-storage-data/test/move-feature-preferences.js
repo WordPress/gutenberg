@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import moveFeaturePreferencesToPreferences from '../move-feature-preferences-to-preferences';
+import moveFeaturePreferences from '../move-feature-preferences';
 
-describe( 'moveFeaturePreferencesToPreferences', () => {
+describe( 'moveFeaturePreferences', () => {
 	it( 'migrates multiple preferences from persisted source stores to preferences without overwriting data', () => {
 		const state = {
 			'core/test-a': {
@@ -26,12 +26,9 @@ describe( 'moveFeaturePreferencesToPreferences', () => {
 			},
 		};
 
-		let convertedState = moveFeaturePreferencesToPreferences(
-			state,
-			'core/test-a'
-		);
+		let convertedState = moveFeaturePreferences( state, 'core/test-a' );
 
-		convertedState = moveFeaturePreferencesToPreferences(
+		convertedState = moveFeaturePreferences(
 			convertedState,
 			'core/test-b'
 		);
@@ -105,12 +102,9 @@ describe( 'moveFeaturePreferencesToPreferences', () => {
 			},
 		};
 
-		let convertedState = moveFeaturePreferencesToPreferences(
-			state,
-			'core/test-a'
-		);
+		let convertedState = moveFeaturePreferences( state, 'core/test-a' );
 
-		convertedState = moveFeaturePreferencesToPreferences(
+		convertedState = moveFeaturePreferences(
 			convertedState,
 			'core/test-b'
 		);
@@ -182,10 +176,7 @@ describe( 'moveFeaturePreferencesToPreferences', () => {
 			},
 		};
 
-		const convertedState = moveFeaturePreferencesToPreferences(
-			state,
-			'core/test-a'
-		);
+		const convertedState = moveFeaturePreferences( state, 'core/test-a' );
 
 		expect( convertedState ).toEqual( {
 			'core/preferences': {
@@ -240,10 +231,7 @@ describe( 'moveFeaturePreferencesToPreferences', () => {
 			},
 		};
 
-		const convertedState = moveFeaturePreferencesToPreferences(
-			state,
-			'core/test-a'
-		);
+		const convertedState = moveFeaturePreferences( state, 'core/test-a' );
 
 		expect( convertedState ).toEqual( {
 			'core/preferences': {

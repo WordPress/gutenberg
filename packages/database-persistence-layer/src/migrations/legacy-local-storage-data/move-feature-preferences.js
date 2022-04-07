@@ -1,6 +1,53 @@
 /**
  * Move the 'features' object in local storage from the sourceStoreName to the
- * preferences store.
+ * preferences store data structure.
+ *
+ * Previously, editors used a data structure like this for feature preferences:
+ * ```js
+ * {
+ *     'core/edit-post': {
+ *         preferences: {
+ *             features; {
+ *                 topToolbar: true,
+ *                 // ... other boolean 'feature' preferences
+ *             },
+ *         },
+ *     },
+ * }
+ * ```
+ *
+ * And for a while these feature preferences lived in the interface package:
+ * ```js
+ * {
+ *     'core/interface': {
+ *         preferences: {
+ *             features: {
+ *                 'core/edit-post': {
+ *                     topToolbar: true
+ *                 }
+ *             }
+ *         }
+ *     }
+ * }
+ * ```
+ *
+ * In the preferences store, 'features' aren't considered special, they're
+ * merged to the root level of the scope along with other preferences:
+ * ```js
+ * {
+ *     'core/preferences': {
+ *         preferences: {
+ *             'core/edit-post': {
+ *                 topToolbar: true,
+ *                 // ... any other preferences.
+ *             }
+ *         }
+ *     }
+ * }
+ * ```
+ *
+ * This function handles moving from either the source store or the interface
+ * store to the preferences data structure.
  *
  * @param {Object} state           The state before migration.
  * @param {string} sourceStoreName The name of the store that has persisted
@@ -8,10 +55,7 @@
  *                                 package.
  * @return {Object} The migrated state
  */
-export default function moveFeaturePreferencesToPreferences(
-	state,
-	sourceStoreName
-) {
+export default function moveFeaturePreferences( state, sourceStoreName ) {
 	const preferencesStoreName = 'core/preferences';
 	const interfaceStoreName = 'core/interface';
 

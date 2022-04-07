@@ -1,18 +1,43 @@
 const identity = ( arg ) => arg;
 
 /**
- * Migrates an individual item inside the `preferences` object for a store.
+ * Migrates an individual item inside the `preferences` object for a package's store.
  *
- * @param {Object}    state         The original state.
- * @param {Object}    migrate       An options object that contains details of the migration.
- * @param {string}    migrate.from  The name of the store to migrate from.
- * @param {string}    migrate.scope The scope in the preferences store to migrate to.
- * @param {string}    key           The key in the preferences object to migrate.
- * @param {?Function} convert       A function that converts preferences from one format to another.
+ * Previously, some packages had individual 'preferences' of any data type, and many used
+ * complex nested data structures. For example:
+ * ```js
+ * {
+ *     'core/edit-post': {
+ *         preferences: {
+ *             panels: {
+ *                 publish: {
+ *                     opened: true,
+ *                     enabled: true,
+ *                 }
+ *             },
+ *             // ...other preferences.
+ *         },
+ *     },
+ * }
+ *
+ * This function supports moving an individual preference like 'panels' above into the
+ * preferences package data structure.
+ *
+ * It supports moving a preference to a particular scope in the preferences store and
+ * optionally converting the data using a `convert` function.
+ *
+ * ```
+ *
+ * @param {Object}    state        The original state.
+ * @param {Object}    migrate      An options object that contains details of the migration.
+ * @param {string}    migrate.from The name of the store to migrate from.
+ * @param {string}    migrate.to   The scope in the preferences store to migrate to.
+ * @param {string}    key          The key in the preferences object to migrate.
+ * @param {?Function} convert      A function that converts preferences from one format to another.
  */
 export default function moveIndividualPreferenceToPreferences(
 	state,
-	{ from: sourceStoreName, scope },
+	{ from: sourceStoreName, to: scope },
 	key,
 	convert = identity
 ) {

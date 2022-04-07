@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import moveThirdPartyFeaturePreferencesToPreferences from '../move-third-party-feature-preferences-to-preferences';
+import moveThirdPartyFeaturePreferences from '../move-third-party-feature-preferences';
 
-describe( 'moveThirdPartyFeaturePreferencesToPreferences', () => {
+describe( 'moveThirdPartyFeaturePreferences', () => {
 	it( 'migrates multiple scopes from the interface package to the preferences package', () => {
 		const state = {
 			'core/interface': {
@@ -27,9 +27,7 @@ describe( 'moveThirdPartyFeaturePreferencesToPreferences', () => {
 			},
 		};
 
-		const convertedState = moveThirdPartyFeaturePreferencesToPreferences(
-			state
-		);
+		const convertedState = moveThirdPartyFeaturePreferences( state );
 
 		expect( convertedState ).toEqual( {
 			'core/preferences': {
@@ -80,9 +78,7 @@ describe( 'moveThirdPartyFeaturePreferencesToPreferences', () => {
 			},
 		};
 
-		const convertedState = moveThirdPartyFeaturePreferencesToPreferences(
-			state
-		);
+		const convertedState = moveThirdPartyFeaturePreferences( state );
 
 		expect( convertedState ).toEqual( {
 			'core/preferences': {

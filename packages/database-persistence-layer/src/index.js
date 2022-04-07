@@ -1,2 +1,2 @@
 export { default as create } from './create';
-export { default as __unstableConvertFromLocalStorage } from './migrations/convert-from-local-storage';
+export { default as __unstableConvertLegacyLocalStorageData } from './migrations/legacy-local-storage-data';

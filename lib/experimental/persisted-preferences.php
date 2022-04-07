@@ -55,9 +55,9 @@ function gutenberg_configure_persisted_preferences() {
 			} else if ( localData ) {
 				preloadedData = localData;
 			} else {
-				// Check if there is data in the old format.
-				const { __unstableConvertFromLocalStorage } = wp.databasePersistenceLayer;
-				preloadedData = __unstableConvertFromLocalStorage( userId );
+				// Check if there is data in the legacy format from the old persistence system.
+				const { __unstableConvertLegacyLocalStorageData } = wp.databasePersistenceLayer;
+				preloadedData = __unstableConvertLegacyLocalStorageData( userId );
 			}
 
 			const { create } = wp.databasePersistenceLayer;

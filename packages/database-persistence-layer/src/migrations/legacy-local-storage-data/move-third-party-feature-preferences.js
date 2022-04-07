@@ -1,3 +1,44 @@
+/**
+ * The interface package previously had a public API that could be used by
+ * plugins to set persisted boolean 'feature' preferences.
+ *
+ * While usage was likely non-existent or very small, this function ensures
+ * those are migrated to the preferences data structure. The interface
+ * package's APIs have now been deprecated and use the preferences store.
+ *
+ * This will convert data that looks like this:
+ * ```js
+ * {
+ *     'core/interface': {
+ *         preferences: {
+ *             features: {
+ *                 'my-plugin': {
+ *                     myPluginFeature: true
+ *                 }
+ *             }
+ *         }
+ *     }
+ * }
+ * ```
+ *
+ * To this:
+ * ```js
+ *  * {
+ *     'core/preferences': {
+ *         preferences: {
+ *             'my-plugin': {
+ *                 myPluginFeature: true
+ *             }
+ *         }
+ *     }
+ * }
+ * ```
+ *
+ * @param {Object} state The local storage state
+ *
+ * @return {Object} The state with third party preferences moved to the
+ *                  preferences data structure.
+ */
 export default function moveThirdPartyFeaturePreferencesToPreferences( state ) {
 	const interfaceStoreName = 'core/interface';
 	const preferencesStoreName = 'core/preferences';
