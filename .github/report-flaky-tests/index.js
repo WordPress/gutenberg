@@ -94,7 +94,7 @@ const metaData = {
 				)
 				.split(
 					new RegExp(
-						`(?<=${ TEST_RESULT.close })\n(?=${ TEST_RESULT.open })`
+						`(?<=${ TEST_RESULT.close })\n(?:...\n)?(?=${ TEST_RESULT.open })`
 					)
 				);
 			// GitHub issues has character limits on issue's body,
