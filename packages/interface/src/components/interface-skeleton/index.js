@@ -85,6 +85,7 @@ function InterfaceSkeleton(
 		},
 		hover: {
 			opacity: 1,
+			transition: { type: 'tween', delay: 0 },
 		},
 	};
 
