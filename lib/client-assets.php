@@ -1,7 +1,7 @@
 <?php
 /**
- * Functions to register client-side assets (scripts and stylesheets) for the
- * Gutenberg editor plugin.
+ * Functions to register client-side assets (scripts and stylesheets) specific
+ * for the Gutenberg editor plugin.
  *
  * @package gutenberg
  */
