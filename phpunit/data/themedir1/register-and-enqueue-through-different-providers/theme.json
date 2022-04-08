@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "settings": {
+      "typography": {
+          "fontFamilies": [
+            {
+              "fontFamily": "Roboto",
+              "slug": "roboto",
+              "name": "Roboto",
+              "fontFaces": [
+                {
+                  "provider": "mock",
+                  "fontFamily": "Roboto",
+                  "fontWeight": "400",
+                  "fontStyle": "regular",
+                  "src": "file:./assets/fonts/Roboto-Regular.ttf"
+                },
+                {
+                  "provider": "local",
+                  "fontFamily": "Roboto",
+                  "fontWeight": "900",
+                  "fontStyle": "bold",
+                  "src": "file:./assets/fonts/Roboto-Bold.ttf"
+                }
+              ]
+            }
+          ]
+      }
+  }
+}

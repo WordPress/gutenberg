@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "settings": {
+      "typography": {
+          "fontFamilies": [
+              {
+                "fontFamily": "Roboto",
+                "slug": "roboto",
+                "name": "Roboto"
+              }
+          ]
+      }
+  }
+}

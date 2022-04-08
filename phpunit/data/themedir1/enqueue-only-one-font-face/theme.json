@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "settings": {
+      "typography": {
+          "fontFamilies": [
+            {
+              "fontFamily": "Roboto",
+              "slug": "roboto",
+              "name": "Roboto",
+              "fontFaces": [
+                {
+                  "fontFamily": "Roboto",
+                  "fontWeight": "900",
+                  "fontStyle": "bold"
+                }
+              ]
+            }
+          ]
+      }
+  }
+}
