@@ -149,18 +149,18 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		'margin-left'                       => array( 'spacing', 'margin', 'left' ),
 		'padding'                           => array( 'spacing', 'padding' ),
 		'padding-top'                       => array( 'spacing', 'padding', 'top' ),
-		'padding-right'              		=> array( 'spacing', 'padding', 'right' ),
-		'padding-bottom'             		=> array( 'spacing', 'padding', 'bottom' ),
-		'padding-left'               		=> array( 'spacing', 'padding', 'left' ),
+		'padding-right'                     => array( 'spacing', 'padding', 'right' ),
+		'padding-bottom'                    => array( 'spacing', 'padding', 'bottom' ),
+		'padding-left'                      => array( 'spacing', 'padding', 'left' ),
 		'--wp--style--root--padding'        => array( 'spacing', 'padding' ),
 		'--wp--style--root--padding-top'    => array( 'spacing', 'padding', 'top' ),
 		'--wp--style--root--padding-right'  => array( 'spacing', 'padding', 'right' ),
 		'--wp--style--root--padding-bottom' => array( 'spacing', 'padding', 'bottom' ),
 		'--wp--style--root--padding-left'   => array( 'spacing', 'padding', 'left' ),
-		'--wp--style--block-gap'      		=> array( 'spacing', 'blockGap' ),
-		'text-decoration'             		=> array( 'typography', 'textDecoration' ),
-		'text-transform'             		=> array( 'typography', 'textTransform' ),
-		'filter'                     		=> array( 'filter', 'duotone' ),
+		'--wp--style--block-gap'            => array( 'spacing', 'blockGap' ),
+		'text-decoration'                   => array( 'typography', 'textDecoration' ),
+		'text-transform'                    => array( 'typography', 'textTransform' ),
+		'filter'                            => array( 'filter', 'duotone' ),
 	);
 
 	/**
@@ -497,9 +497,9 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	 * )
 	 * ```
 	 *
-	 * @param array $styles Styles to process.
-	 * @param array $settings Theme settings.
-	 * @param array $properties Properties metadata.
+	 * @param array  $styles Styles to process.
+	 * @param array  $settings Theme settings.
+	 * @param array  $properties Properties metadata.
 	 * @param string $selector Selector for styles.
 	 * @return array Returns the modified $declarations.
 	 */
@@ -508,7 +508,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			$properties = static::PROPERTIES_METADATA;
 		}
 
-		$declarations = array();
+		$declarations             = array();
 		$root_variable_duplicates = array();
 
 		if ( empty( $styles ) ) {
@@ -518,73 +518,73 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = static::get_property_value( $styles, $value_path );
 
-			if ( strpos( $css_property, '--wp--style--root--') === 0 && static::ROOT_BLOCK_SELECTOR !== $selector ) {			
+			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && static::ROOT_BLOCK_SELECTOR !== $selector ) {
 				continue;
 			}
 
-			if ( strpos( $css_property, '--wp--style--root--') === 0 ) {
-				$root_variable_duplicates[] = substr( $css_property, strlen('--wp--style--root--') );
+			if ( strpos( $css_property, '--wp--style--root--' ) === 0 ) {
+				$root_variable_duplicates[] = substr( $css_property, strlen( '--wp--style--root--' ) );
 			}
 
 			// Root padding requires special logic to split shorthand values.
-			if ( '--wp--style--root--padding' === $css_property && is_string($value) ) {
+			if ( '--wp--style--root--padding' === $css_property && is_string( $value ) ) {
 
-				$shorthand_top = '0';
-				$shorthand_right = '0';
+				$shorthand_top    = '0';
+				$shorthand_right  = '0';
 				$shorthand_bottom = '0';
-				$shorthand_left = '0';
-				
+				$shorthand_left   = '0';
+		
 				$separate_values = explode( ' ', $value );
 
-					switch ( count( $separate_values ) ) {
-						case 1:			
-							$shorthand_top = $separate_values[0];
-							$shorthand_right = $separate_values[0];
-							$shorthand_bottom = $separate_values[0];
-							$shorthand_left = $separate_values[0];
-							break;
-						case 2:
-							$shorthand_top = $separate_values[0];
-							$shorthand_right = $separate_values[1];
-							$shorthand_bottom = $separate_values[0];
-							$shorthand_left = $separate_values[1];
-							break;
-						case 3:
-							$shorthand_top = $separate_values[0];
-							$shorthand_right = $separate_values[1];
-							$shorthand_bottom = $separate_values[2];
-							$shorthand_left = $separate_values[1];
-							break;
-						case 4:
-							$shorthand_top = $separate_values[0];
-							$shorthand_right = $separate_values[1];
-							$shorthand_bottom = $separate_values[2];
-							$shorthand_left = $separate_values[3];
-							break;
-					}
+				switch ( count( $separate_values ) ) {
+					case 1:			
+						$shorthand_top    = $separate_values[0];
+						$shorthand_right  = $separate_values[0];
+						$shorthand_bottom = $separate_values[0];
+						$shorthand_left   = $separate_values[0];
+						break;
+					case 2:
+						$shorthand_top    = $separate_values[0];
+						$shorthand_right  = $separate_values[1];
+						$shorthand_bottom = $separate_values[0];
+						$shorthand_left   = $separate_values[1];
+						break;
+					case 3:
+						$shorthand_top    = $separate_values[0];
+						$shorthand_right  = $separate_values[1];
+						$shorthand_bottom = $separate_values[2];
+						$shorthand_left   = $separate_values[1];
+						break;
+					case 4:
+						$shorthand_top    = $separate_values[0];
+						$shorthand_right  = $separate_values[1];
+						$shorthand_bottom = $separate_values[2];
+						$shorthand_left   = $separate_values[3];
+						break;
+				}
 
-					$all_properties = array(
-						array(
-							'name'  => '--wp--style--root--padding-top',
-							'value' => $shorthand_top,
-						),
-						array(
-							'name'  => '--wp--style--root--padding-right',
-							'value' => $shorthand_right,
-						),
-						array(
-							'name'  => '--wp--style--root--padding-bottom',
-							'value' => $shorthand_bottom,
-						),
-						array(
-							'name'  => '--wp--style--root--padding-left',
-							'value' => $shorthand_left,
-						),
-					);
+				$all_properties = array(
+					array(
+						'name'  => '--wp--style--root--padding-top',
+						'value' => $shorthand_top,
+					),
+					array(
+						'name'  => '--wp--style--root--padding-right',
+						'value' => $shorthand_right,
+					),
+					array(
+						'name'  => '--wp--style--root--padding-bottom',
+						'value' => $shorthand_bottom,
+					),
+					array(
+						'name'  => '--wp--style--root--padding-left',
+						'value' => $shorthand_left,
+					),
+				);
 
-					$declarations = array_merge($declarations,$all_properties);
+				$declarations = array_merge( $declarations, $all_properties );
 
-					continue;
+				continue;
 			}
 
 			// Look up protected properties, keyed by value path.
@@ -613,9 +613,9 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 
 		// If a variable value is added to the root, the corresponding property should be removed.
 		foreach ( $root_variable_duplicates as $duplicate ) {
-			$discard = array_search($duplicate,array_column($declarations, 'name'));
+			$discard = array_search( $duplicate,array_column( $declarations, 'name' ) );
 			if ( $discard ) {
-				array_splice($declarations, $discard, 1);
+				array_splice( $declarations, $discard, 1 );
 			}
 		}
 
