@@ -87,6 +87,7 @@ export default {
 		if ( layoutBlockSupport?.allowSwitching ) {
 			return null;
 		}
+		const { allowVerticalAlignment = true } = layoutBlockSupport;
 		return (
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<FlexLayoutJustifyContentControl
@@ -94,11 +95,13 @@ export default {
 					onChange={ onChange }
 					isToolbar
 				/>
-				<FlexLayoutVerticalAlignmentControl
-					layout={ layout }
-					onChange={ onChange }
-					isToolbar
-				/>
+				{ allowVerticalAlignment && layout?.orientation !== 'vertical' && (
+					<FlexLayoutVerticalAlignmentControl
+						layout={ layout }
+						onChange={ onChange }
+						isToolbar
+					/>
+				) }
 			</BlockControls>
 		);
 	},
