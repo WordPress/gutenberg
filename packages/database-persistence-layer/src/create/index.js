@@ -12,19 +12,24 @@ const EMPTY_OBJECT = {};
 const localStorage = window.localStorage;
 
 /**
- * Creates a database persistence layer, storing data in the user meta.
+ * Creates a database persistence layer, storing data in WordPress user meta.
  *
- * @param {Object} options
- * @param {Object} options.preloadedData          Any persisted data that should be preloaded.
- * @param {number} options.requestDebounceMS      Debounce requests to the API so that they only occur
- *                                                don't swamp the server.
- * @param {string} options.localStorageRestoreKey The key to use for restoring the localStorage backup.
+ * @param {Object}  options
+ * @param {?Object} options.preloadedData          Any persisted preferences data that should be preloaded.
+ *                                                 When set, the persistence layer will avoid fetching data
+ *                                                 from the REST API.
+ * @param {?string} options.localStorageRestoreKey The key to use for restoring the localStorage backup, used
+ *                                                 when the persistence layer calls `localStorage.getItem` or
+ *                                                 `localStorage.setItem`.
+ * @param {?number} options.requestDebounceMS      Debounce requests to the API so that they only occur at
+ *                                                 minimum every `requestDebounceMS` milliseconds, and don't
+ *                                                 swamp the server. Defaults to 2500ms.
  *
  * @return {Object} A database persistence layer.
  */
 export default function create( {
-	localStorageRestoreKey,
 	preloadedData,
+	localStorageRestoreKey = 'WP_PREFERENCES_RESTORE_DATA',
 	requestDebounceMS = 2500,
 } = {} ) {
 	let cache = preloadedData;
@@ -64,8 +69,8 @@ export default function create( {
 		cache = dataWithTimestamp;
 
 		// Store data in local storage as a fallback. If for some reason the
-		// api request does not complete, this data can be used to restore
-		// preferences.
+		// api request does not complete or becomes unavailable, this data
+		// can be used to restore preferences.
 		localStorage.setItem(
 			localStorageRestoreKey,
 			JSON.stringify( dataWithTimestamp )
