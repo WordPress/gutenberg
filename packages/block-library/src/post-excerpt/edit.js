@@ -59,9 +59,16 @@ export default function PostExcerptEditor( {
 	if ( ! postType || ! postId ) {
 		return (
 			<div { ...blockProps }>
-				{ __(
-					'Welcome to WordPress! This is a placeholder for your excerpt. In the WordPress editor, each paragraph, image, or video is presented as a distinct “block” of content. When you view your site, this block displays the excerpt of the post or page that you have assigned.'
-				) }
+				<p>
+					{ __(
+						'This is the Post Excerpt block, it will display the excerpt from single posts.'
+					) }
+				</p>
+				<p>
+					{ __(
+						'If there are any Custom Post Types with support for excerpts, the Post Excerpt block can display the excerpts of those entries as well.'
+					) }
+				</p>
 			</div>
 		);
 	}
