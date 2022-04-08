@@ -173,3 +173,107 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 	return $settings;
 }
 add_filter( 'block_type_metadata_settings', 'gutenberg_block_type_metadata_view_script', 10, 2 );
+
+if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
+	/**
+	 * Enqueues a frontend script for a specific block.
+	 *
+	 * Scripts enqueued using this function will only get printed
+	 * when the block gets rendered on the frontend.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @param string $block_name The block name, including namespace.
+	 * @param array  $args       An array of arguments [handle,src,deps,ver,media,textdomain].
+	 *
+	 * @return void
+	 */
+	function wp_enqueue_block_view_script( $block_name, $args ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'handle'     => '',
+				'src'        => '',
+				'deps'       => array(),
+				'ver'        => false,
+				'in_footer'  => false,
+
+				// Additional arg to allow translations for the script's textdomain.
+				'textdomain' => '',
+			)
+		);
+
+		/**
+		 * Callback function to register and enqueue scripts.
+		 *
+		 * @param string $content When the callback is used for the render_block filter,
+		 *                        the content needs to be returned so the function parameter
+		 *                        is to ensure the content exists.
+		 * @return string Block content.
+		 */
+		$callback = static function( $content, $block ) use ( $args, $block_name ) {
+
+			// Sanity check.
+			if ( empty( $block['blockName'] ) || $block_name !== $block['blockName'] ) {
+				return $content;
+			}
+
+			// Register the stylesheet.
+			if ( ! empty( $args['src'] ) ) {
+				wp_register_script( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['in_footer'] );
+			}
+
+			// Enqueue the stylesheet.
+			wp_enqueue_script( $args['handle'] );
+
+			// If a textdomain is defined, use it to set the script translations.
+			if ( ! empty( $args['textdomain'] ) && in_array( 'wp-i18n', $args['deps'], true ) ) {
+				wp_set_script_translations( $args['handle'], $args['textdomain'] );
+			}
+
+			return $content;
+		};
+
+		/*
+		 * The filter's callback here is an anonymous function because
+		 * using a named function in this case is not possible.
+		 *
+		 * The function cannot be unhooked, however, users are still able
+		 * to dequeue the script registered/enqueued by the callback
+		 * which is why in this case, using an anonymous function
+		 * was deemed acceptable.
+		 */
+		add_filter( 'render_block', $callback, 10, 2 );
+	}
+}
+
+/**
+ * Allow multiple view scripts per block.
+ *
+ * Filters the metadata provided for registering a block type.
+ *
+ * @since 6.0.0
+ *
+ * @param array $metadata Metadata for registering a block type.
+ *
+ * @return array
+ */
+function gutenberg_block_type_metadata_multiple_view_scripts( $metadata ) {
+
+	// Early return if viewScript is empty, or not an array.
+	if ( ! isset( $metadata['viewScript'] ) || ! is_array( $metadata['viewScript'] ) ) {
+		return $metadata;
+	}
+
+	// Register all viewScript items.
+	foreach ( $metadata['viewScript'] as $view_script ) {
+		$item_metadata               = $metadata;
+		$item_metadata['viewScript'] = $view_script;
+		gutenberg_block_type_metadata_view_script( array(), $item_metadata );
+	}
+
+	// Proceed with the default behavior.
+	$metadata['viewScript'] = $metadata['viewScript'][0];
+	return $metadata;
+}
+add_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_scripts' );
