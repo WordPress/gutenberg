@@ -4,7 +4,8 @@
 	justify-content: center;
 	align-items: flex-start;
 	width: 100%;
-	border-radius: $radius-block-ui;
+	height: calc(100% - 60px); // 60px offset to account for modal footer
+	overflow: scroll;
 
 	// TODO change to check parent.
 	&.view-mode-grid {
@@ -61,7 +62,8 @@
 		align-items: center;
 		justify-content: space-between;
 		border-top: 1px solid $gray-300;
-		align-self: flex-end;
+		position: absolute;
+		bottom: 0;
 
 		.block-editor-block-pattern-setup__display-controls {
 			display: flex;
