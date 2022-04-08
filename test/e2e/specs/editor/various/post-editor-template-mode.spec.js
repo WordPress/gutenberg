@@ -254,22 +254,16 @@ class PostEditorTemplateMode {
 			'role=region[name="Editor settings"i]'
 		);
 		this.editorTopBar = this.page.locator(
-			'role=region[name="Editor top bar"]'
+			'role=region[name="Editor top bar"i]'
 		);
 	}
 
 	async disableTemplateWelcomeGuide() {
-		// Turn off the welcome guide if it's visible.
+		// Turn off the welcome guide.
 		await this.page.evaluate( () => {
-			if (
-				window.wp.data
-					.select( 'core/edit-post' )
-					.isFeatureActive( 'welcomeGuideTemplate' )
-			) {
-				window.wp.data
-					.dispatch( 'core/edit-post' )
-					.toggleFeature( 'welcomeGuideTemplate' );
-			}
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-post', 'welcomeGuideTemplate', false );
 		} );
 	}
 
