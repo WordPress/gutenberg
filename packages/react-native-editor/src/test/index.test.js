@@ -190,8 +190,7 @@ describe( 'Register Gutenberg', () => {
 			{},
 			{ component: EditorComponent }
 		);
-		// Inner blocks create BlockLists so let's take into account selecting the main one
-		const blockList = screen.getAllByTestId( 'block-list-wrapper' )[ 0 ];
+		const blockList = screen.getByTestId( 'block-list-wrapper' );
 
 		expect( blockList ).toBeVisible();
 		expect( console ).toHaveLoggedWith( 'Hermes is: true' );
