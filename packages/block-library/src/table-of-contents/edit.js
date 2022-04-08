@@ -105,10 +105,10 @@ export default function TableOfContentsEdit( {
 			// Get the client ids of all blocks in the editor.
 			const allBlockClientIds = getClientIdsWithDescendants();
 
-			// Calculate the page (of a paginated post) this block is part of.
+			// If onlyIncludeCurrentPage is true, calculate the page (of a paginated post) this block is part of, so we know which headings to include; otherwise, skip the calculation.
 			let tocPage = 1;
 
-			if ( isPaginated ) {
+			if ( isPaginated && onlyIncludeCurrentPage ) {
 				// We can't use getBlockIndex because it only returns the index
 				// relative to sibling blocks.
 				const tocIndex = allBlockClientIds.indexOf( clientId );
