@@ -85,7 +85,23 @@ function Placeholder() {
 	const blockProps = useBlockProps();
 	return (
 		<div { ...blockProps }>
-			<p>{ __( 'Post Content' ) }</p>
+			<p>{ __( 'Welcome to WordPress!' ) }</p>
+			<p>{ __( 'This is a placeholder for your content.' ) }</p>
+			<p>
+				{ __(
+					'In the WordPress editor, each paragraph, image, or video is presented as a distinct “block” of content. When you view your site, this block displays the content of the post or page that you have assigned.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'Each block has controls for changing things like color, width, and alignment. These controls will show and hide automatically when you have a block selected.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'Experience the flexibility that blocks bring, whether you are building your first site, or write code for a living. Start writing!'
+				) }
+			</p>
 		</div>
 	);
 }
