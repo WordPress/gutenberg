@@ -31,7 +31,7 @@ function render_block_core_comment_form( $attributes, $content, $block ) {
 	<p class="comment-form-author"><label for="author">Name <span class="required" aria-hidden="true">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" required /></p>
 	<input type="hidden" name="comment_post_ID" value="{$block->context['postId']}">
 	<input type="submit" value="Submit">
-	<form>
+	</form>
 	END;
 
 
