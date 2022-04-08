@@ -277,3 +277,34 @@ function gutenberg_block_type_metadata_multiple_view_scripts( $metadata ) {
 	return $metadata;
 }
 add_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_scripts' );
+
+/**
+ * Workaround for getting discussion settings as block editor settings
+ * so any user can access to them without needing to be an admin.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_block_editor_settings_with_discussion_settings( $settings ) {
+
+	$settings['__experimentalDiscussionSettings'] = array(
+		'commentOrder'        => get_option( 'comment_order' ),
+		'commentsPerPage'     => get_option( 'comments_per_page' ),
+		'defaultCommentsPage' => get_option( 'default_comments_page' ),
+		'pageComments'        => get_option( 'page_comments' ),
+		'threadComments'      => get_option( 'thread_comments' ),
+		'threadCommentsDepth' => get_option( 'thread_comments_depth' ),
+		'avatarURL'           => get_avatar_url(
+			'',
+			array(
+				'size'          => 96,
+				'force_default' => true,
+				'default'       => get_option( 'avatar_default' ),
+			)
+		),
+	);
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_extend_block_editor_settings_with_discussion_settings' );
