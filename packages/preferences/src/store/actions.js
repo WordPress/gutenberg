@@ -48,10 +48,29 @@ export function setDefaults( scope, defaults ) {
 	};
 }
 
+/** @typedef {() => Promise<Object>} WPPreferencesPersistenceLayerGet */
+/** @typedef {(*) => void} WPPreferencesPersistenceLayerSet */
+/**
+ * @typedef WPPreferencesPersistenceLayer
+ *
+ * @property {WPPreferencesPersistenceLayerGet} get An async function that gets data from the persistence layer.
+ * @property {WPPreferencesPersistenceLayerSet} set A  function that sets data in the persistence layer.
+ */
+
 /**
  * Sets the persistence layer.
  *
- * @param {Object} persistenceLayer Sets the persistence layer.
+ * When a persistence layer is set, the preferences store will:
+ * - call `get` immediately and update the store state to the value returned.
+ * - call `set` with all preferences whenever a preference changes value.
+ *
+ * `setPersistenceLayer` should ideally be dispatched at the start of an
+ * application's lifecycle, before any other actions have been dispatched to
+ * the preferences store.
+ *
+ * @param {WPPreferencesPersistenceLayer} persistenceLayer The persistence layer.
+ *
+ * @return {Object} Action object.
  */
 export async function setPersistenceLayer( persistenceLayer ) {
 	const persistedData = await persistenceLayer.get();

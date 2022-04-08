@@ -1,6 +1,6 @@
 # Preferences
 
-Utilities for storing WordPress preferences.
+A key/value store for application preferences.
 
 ## Installation
 
@@ -16,7 +16,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### Data store
 
-Preferences are persisted values of any kind.
+Preferences can a value of any JSON serializable type.
 
 Set the default preferences for any features on initialization by dispatching an action:
 
@@ -38,7 +38,7 @@ function initialize() {
 }
 ```
 
-Or the `get` selector to get a preference value, and the `set` action to update a preference to any value:
+Use the `get` selector to get a preference value, and the `set` action to update a preference:
 
 ```js
 wp.data
@@ -65,6 +65,60 @@ wp.data
 	.select( 'core/preferences' )
 	.get( 'namespace/editor-or-plugin-name', 'myPreferenceName' ); // false
 ```
+
+#### Setting up a persistence layer
+
+By default, this package only stores values in-memory. But it can be configured to persist preferences to browser storage or a database via an optional persistence layer.
+
+Use the `setPersistenceLayer` action to configure how the store persists its preference values.
+
+```js
+wp.data.dispatch( 'core/preferences' ).setPersistenceLayer( {
+	// `get` is asynchronous to support persisting preferences using a REST API.
+	// it will immediately be called by `setPersistenceLayer` and the returned
+	// value used as the initial state of the preferences.
+	async get() {
+		return JSON.parse( window.localStorage.getItem( 'MY_PREFERENCES' ) );
+	},
+
+	// `set` is synchronous. It's ok to use asynchronous code, but the
+	// preferences store won't wait for a promise to resolve, the function is
+	// 'fire and forget'.
+	set( preferences ) {
+		window.localStorage.setItem(
+			'MY_PREFERENCES',
+			JSON.stringify( preferences )
+		);
+	},
+} );
+```
+
+For application that persist data to an asynchronous API, a concern will be that loading preferences can lead to slower application start up.
+
+A recommendation is to pre-load any persistence layer data and keep it in a local cache particularly if you're using an asynchronous API to persist data.
+
+While `get` is only called currently when `setPersistenceLayer` is triggered.
+
+```js
+// Preloaded data from the server.
+let cache = preloadedData;
+wp.data.dispatch( 'core/preferences' ).setPersistenceLayer( {
+	async get() {
+		if ( cache ) {
+			return cache;
+		}
+
+		// Call to a made-up async API.
+		return await api.preferences.get();
+	},
+	set( preferences ) {
+		cache = preferences;
+		api.preferences.set( { data: preferences } );
+	},
+} );
+```
+
+See the `@wordpress/database-persistence-layer` package for a reference implementation.
 
 ### Components
 
@@ -134,9 +188,22 @@ _Returns_
 
 Sets the persistence layer.
 
+When a persistence layer is set, the preferences store will:
+
+-   call `get` immediately and update the store state to the value returned.
+-   call `set` with all preferences whenever a preference changes value.
+
+`setPersistenceLayer` should ideally be dispatched at the start of an
+application's lifecycle, before any other actions have been dispatched to
+the preferences store.
+
 _Parameters_
 
--   _persistenceLayer_ `Object`: Sets the persistence layer.
+-   _persistenceLayer_ `WPPreferencesPersistenceLayer`: The persistence layer.
+
+_Returns_
+
+-   `Object`: Action object.
 
 #### toggle
 
