@@ -38,10 +38,10 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 			array(
 				'api_version' => 2,
 				'attributes'  => array(
-					'borderColor'      => array(
+					'borderColor' => array(
 						'type' => 'string',
 					),
-					'style'            => array(
+					'style'       => array(
 						'type' => 'object',
 					),
 				),
@@ -427,7 +427,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 			)
 		);
 		$block_attrs = array(
-			'style'            => array(
+			'style' => array(
 				'border' => array(
 					'top'    => array(
 						'width'     => '2px',
