@@ -20,7 +20,7 @@ const variations = [
 	{
 		name: 'group-row',
 		title: __( 'Row' ),
-		description: __( 'Gather blocks in a horizontal layout container.' ),
+		description: __( 'Arrange blocks horizontally.' ),
 		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
@@ -32,7 +32,7 @@ const variations = [
 	{
 		name: 'group-stack',
 		title: __( 'Stack' ),
-		description: __( 'Gather blocks in a vertical layout container.' ),
+		description: __( 'Arrange blocks vertically.' ),
 		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
