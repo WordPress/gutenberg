@@ -37,7 +37,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		// Remove global styles added by core.
 		// This needs to be fixed in core but this will help us in the meanwhile.
 		$styles_without_existing_global_styles = array();
-		foreach( $settings['styles'] as $style ) {
+		foreach ( $settings['styles'] as $style ) {
 			if (
 				! isset( $style['__unstableType'] ) ||
 				! in_array( $style['__unstableType'], array( 'globalStyles', 'presets' ), true )
