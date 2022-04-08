@@ -475,48 +475,48 @@ component-family-name/
 
 ## Refactoring a component to TypeScript
 
-Using an IDE that supports TypeScript is very recommended! Assuming the dev env is setup correctly (including TypeScript):
+Using an IDE that supports TypeScript is very recommended! Assuming the dev env is set up correctly (including TypeScript):
 
-Given a component folder (eg. `packages/components/src/unit-control`):
+Given a component folder (e.g. `packages/components/src/unit-control`):
 
-1. Add the folder to `tsconfig.json`, if it isn’t already
-2. Remove any `// @ts-nocheck` comments in the folder, if any
-3. Rename `*.js{x}` files to `*.ts{x}` (except stories and unit tests)
-4. run `npm run dev` and take note of all the errors (your IDE should also flag them)
+1. Add the folder to `tsconfig.json`, if it isn’t already.
+2. Remove any `// @ts-nocheck` comments in the folder, if any.
+3. Rename `*.js{x}` files to `*.ts{x}` (except stories and unit tests).
+4. Run `npm run dev` and take note of all the errors (your IDE should also flag them).
 5. Since we want to focus on one component’s folder at the time, if any errors are coming from files outside of the folder that is being refactored, there are two potential approaches:
-    1. Following those same guidelines, refactor those dependencies first
-        1.  Ideally, start from the “leaf” of the dependency tree and slowly work your way up the chain.
+    1. Following those same guidelines, refactor those dependencies first.
+        1. Ideally, start from the “leaf” of the dependency tree and slowly work your way up the chain.
         2. Resume work on this component once all dependencies have been refactored.
     2. Alternatively:
-        1. For each of those files, add `// @ts-nocheck` at the start of the file
-        2. Add the folders to the `tsconfig.json` file
-        3. If you’re still getting errors about a component’s props, the easiest way is to slightly refactor this component and perform the props destructuring inside the component’s body (as opposed as in the function signature) — this is to prevent TypeScript from inferring the types of these props
-        4. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage)
-6. Create a new `types.ts` file
+        1. For each of those files, add `// @ts-nocheck` at the start of the file.
+        2. Add the folders to the `tsconfig.json` file.
+        3. If you’re still getting errors about a component’s props, the easiest way is to slightly refactor this component and perform the props destructuring inside the component’s body (as opposed as in the function signature) — this is to prevent TypeScript from inferring the types of these props.
+        4. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage).
+6. Create a new `types.ts` file.
 7. Slowly work your way through fixing the TypeScript errors in the folder:
     1. Try to avoid introducing any runtime change, if possible. The aim of this refactor is to simply rewrite the component to TypeScript.
     2. Extract props to `types.ts`, and use them to type components. The README can be of help when determining a prop’s type.
     3. Use existing HTML types when possible? (e.g. `required` for an input field?)
-    4. Use `CSSProperties` type where it makes sense
-    5. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package
-    6. Use `WordPressComponent` type if possible
+    4. Use `CSSProperties` type where it makes sense.
+    5. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
+    6. Use `WordPressComponent` type if possible.
     7. Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README.
     8. Prefer `unknown` to `any`, and in general avoid it when possible.
 8. Make sure:
-    1. tests still pass
-    2. Storybook example works as expected
-    3. usage in Gutenberg works as expected
-    4. `types.ts` docs and README docs are aligned
-9. Convert Storybook examples to TypeScript (and from knobs to controls, if necessary) ([example](https://github.com/WordPress/gutenberg/pull/39320))
-    1. Update all consumers of the component to potentially extend the newly added types (e.g. make `UnitControl` props extend `NumberControl` props after `NumberControl` types are made available)
-    2. Add a name export for the unconnected, un-forwarded component
-    3. Rename Story extension from `.js` to `.tsx`
-    4. Rewrite the `meta` story object, and export it as default
-        1. Use the `parameters.controls.exclude` property on the `meta` object to hide props from the docs (e.g. unstable or experimental)
-        2. Use the `argTypes` prop on the `meta` object to customise how each prop in the docs can be interactively controlled by the user (tip: use `control: { type: null }` to remove the interactive controls from a prop, without hiding the prop from the docs)
-    5. Comment out all existing stories
+    1. Tests still pass.
+    2. Storybook example works as expected.
+    3. Usage in Gutenberg works as expected.
+    4. `types.ts` docs and README docs are aligned.
+9. Convert Storybook examples to TypeScript (and from knobs to controls, if necessary) ([example](https://github.com/WordPress/gutenberg/pull/39320)).
+    1. Update all consumers of the component to potentially extend the newly added types (e.g. make `UnitControl` props extend `NumberControl` props after `NumberControl` types are made available).
+    2. Add a named export for the unconnected, un-forwarded component.
+    3. Rename Story extension from `.js` to `.tsx`.
+    4. Rewrite the `meta` story object, and export it as default.
+        1. Use the `parameters.controls.exclude` property on the `meta` object to hide props from the docs (e.g. unstable or experimental).
+        2. Use the `argTypes` prop on the `meta` object to customise how each prop in the docs can be interactively controlled by the user (tip: use `control: { type: null }` to remove the interactive controls from a prop, without hiding the prop from the docs).
+    5. Comment out all existing stories.
     6. Create a default template, where the component is being used in the most “vanilla” way possible.
-    7. Use the template for the `Default` story, which will serve as an interactive doc playgroung.
+    7. Use the template for the `Default` story, which will serve as an interactive doc playground.
     8. Add more focused stories as you see fit. These non-default stories should illustrate specific scenarios and usages of the component.
-10. Convert Unit tests
+10. Convert unit tests.
     1. TBD
