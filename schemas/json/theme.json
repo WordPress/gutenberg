@@ -376,6 +376,9 @@
 				"core/audio": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/avatar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/block": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -427,9 +430,6 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/comment-author-name": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
-				"core/comment-author-avatar": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/comment-content": {
@@ -864,6 +864,9 @@
 				"core/audio": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/avatar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/block": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -889,9 +892,6 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/comment-author-name": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"core/comment-author-avatar": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/comment-content": {
