@@ -89,6 +89,7 @@ function gutenberg_register_webfonts_from_theme_json() {
 	}
 	foreach ( $webfonts as $webfont ) {
 		wp_webfonts()->register_webfont( $webfont );
+		wp_webfonts()->enqueue_webfont( $webfont['font-family'] );
 	}
 }
 
