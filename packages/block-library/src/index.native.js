@@ -238,7 +238,7 @@ addFilter(
  *
  * registerCoreBlocks();
  * ```
- * @param {Object} blocksFlags Experimental flags
+ * @param {Object} [blocksFlags] Experimental flags
  *
  */
 export const registerCoreBlocks = ( blocksFlags ) => {
