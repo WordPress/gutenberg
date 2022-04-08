@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 22.4.0 (2022-04-08)
+
 ### New Feature
 
 -   Add `--webpack-src-dir` CLI flag to allow customizing the source code directory (`src` by default) ([#39618](https://github.com/WordPress/gutenberg/pull/39618)).

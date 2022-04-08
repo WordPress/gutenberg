@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.8.0 (2022-04-08)
+
 ### Enhancements
 
 -   Update `BorderControl` and `BorderBoxControl` to allow the passing of custom class names to popovers ([#39753](https://github.com/WordPress/gutenberg/pull/39753)).

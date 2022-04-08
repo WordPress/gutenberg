@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.2.0 (2022-04-08)
+
 ### New Features
 
 -   Add new `row` and `copy` icons. ([#39690](https://github.com/WordPress/gutenberg/pull/39690))
