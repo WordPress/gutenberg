@@ -95,13 +95,14 @@ export default {
 					onChange={ onChange }
 					isToolbar
 				/>
-				{ allowVerticalAlignment && layout?.orientation !== 'vertical' && (
-					<FlexLayoutVerticalAlignmentControl
-						layout={ layout }
-						onChange={ onChange }
-						isToolbar
-					/>
-				) }
+				{ allowVerticalAlignment &&
+					layout?.orientation !== 'vertical' && (
+						<FlexLayoutVerticalAlignmentControl
+							layout={ layout }
+							onChange={ onChange }
+							isToolbar
+						/>
+					) }
 			</BlockControls>
 		);
 	},
