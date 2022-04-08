@@ -57,7 +57,13 @@ export default function PostExcerptEditor( {
 		return document.body.textContent || document.body.innerText || '';
 	}, [ renderedExcerpt ] );
 	if ( ! postType || ! postId ) {
-		return <div { ...blockProps }>{ __( 'Post Excerpt' ) }</div>;
+		return (
+			<div { ...blockProps }>
+				{ __(
+					'Welcome to WordPress! This is a placeholder for your excerpt. In the WordPress editor, each paragraph, image, or video is presented as a distinct “block” of content. When you view your site, this block displays the excerpt of the post or page that you have assigned.'
+				) }
+			</div>
+		);
 	}
 	if ( isProtected && ! userCanEdit ) {
 		return (
