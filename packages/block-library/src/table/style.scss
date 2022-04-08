@@ -112,7 +112,7 @@
 		}
 	}
 
-	.has-border-top-color {
+	table[style*="border-top-color"] {
 		> *,
 		tr:first-child {
 			border-top-color: inherit;
@@ -122,8 +122,12 @@
 				border-top-color: inherit;
 			}
 		}
+
+		tr:not(:first-child) {
+			border-top-color: currentColor;
+		}
 	}
-	.has-border-right-color {
+	table[style*="border-right-color"] {
 		> *,
 		tr,
 		th,
@@ -131,7 +135,7 @@
 			border-right-color: inherit;
 		}
 	}
-	.has-border-bottom-color {
+	table[style*="border-bottom-color"] {
 		> *,
 		tr:last-child {
 			border-bottom-color: inherit;
@@ -151,7 +155,7 @@
 			border-bottom-color: currentColor;
 		}
 	}
-	.has-border-left-color {
+	table[style*="border-left-color"] {
 		> *,
 		tr,
 		th,

@@ -41,9 +41,6 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 					'borderColor'      => array(
 						'type' => 'string',
 					),
-					'sideBorderColors' => array(
-						'type' => 'object',
-					),
 					'style'            => array(
 						'type' => 'object',
 					),
@@ -285,7 +282,6 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'class' => 'has-border-top-color has-border-right-color has-border-bottom-color has-border-left-color',
 			'style' => 'border-top-width: 2px; border-top-style: dashed; border-top-color: #72aee6; border-right-width: 0.25rem; border-right-style: dotted; border-right-color: #e65054; border-bottom-width: 0.5em; border-bottom-style: solid; border-bottom-color: #007017; border-left-width: 1px; border-left-style: solid; border-left-color: #f6f7f7;',
 		);
 
@@ -376,7 +372,6 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'class' => 'has-border-top-color has-border-right-color has-border-bottom-color has-border-left-color',
 			'style' => 'border-top-color: #72aee6; border-right-color: #e65054; border-bottom-color: #007017; border-left-color: #f6f7f7;',
 		);
 
@@ -414,7 +409,6 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'class' => 'has-border-top-color has-border-right-color',
 			'style' => 'border-top-width: 2px; border-top-style: dashed; border-top-color: #72aee6; border-right-width: 0.25rem; border-right-color: #e65054; border-left-style: solid;',
 		);
 
@@ -433,37 +427,38 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 			)
 		);
 		$block_attrs = array(
-			'sideBorderColors' => array(
-				'top'    => 'red',
-				'right'  => 'green',
-				'bottom' => 'blue',
-				'left'   => 'yellow',
-			),
 			'style'            => array(
 				'border' => array(
 					'top'    => array(
-						'width' => '2px',
-						'style' => 'dashed',
+						'width'     => '2px',
+						'style'     => 'dashed',
+						'color'     => 'var:preset|color|red',
+						'colorSlug' => 'red',
 					),
 					'right'  => array(
-						'width' => '0.25rem',
-						'style' => 'dotted',
+						'width'     => '0.25rem',
+						'style'     => 'dotted',
+						'color'     => 'var:preset|color|green',
+						'colorSlug' => 'green',
 					),
 					'bottom' => array(
-						'width' => '0.5em',
-						'style' => 'solid',
+						'width'     => '0.5em',
+						'style'     => 'solid',
+						'color'     => 'var:preset|color|blue',
+						'colorSlug' => 'blue',
 					),
 					'left'   => array(
-						'width' => '1px',
-						'style' => 'solid',
+						'width'     => '1px',
+						'style'     => 'solid',
+						'color'     => 'var:preset|color|yellow',
+						'colorSlug' => 'yellow',
 					),
 				),
 			),
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'class' => 'has-border-top-color has-red-border-top-color has-border-right-color has-green-border-right-color has-border-bottom-color has-blue-border-bottom-color has-border-left-color has-yellow-border-left-color',
-			'style' => 'border-top-width: 2px; border-top-style: dashed; border-right-width: 0.25rem; border-right-style: dotted; border-bottom-width: 0.5em; border-bottom-style: solid; border-left-width: 1px; border-left-style: solid;',
+			'style' => 'border-top-width: 2px; border-top-style: dashed; border-top-color: var(--wp--preset--color--red); border-right-width: 0.25rem; border-right-style: dotted; border-right-color: var(--wp--preset--color--green); border-bottom-width: 0.5em; border-bottom-style: solid; border-bottom-color: var(--wp--preset--color--blue); border-left-width: 1px; border-left-style: solid; border-left-color: var(--wp--preset--color--yellow);',
 		);
 
 		$this->assertSame( $expected, $actual );

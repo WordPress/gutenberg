@@ -40,7 +40,7 @@ export function getBorderClassesAndStyles( attributes ) {
 export function useBorderProps( attributes ) {
 	const { colors } = useMultipleOriginColorsAndGradients();
 	const borderProps = getBorderClassesAndStyles( attributes );
-	const { borderColor, sideBorderColors } = attributes;
+	const { borderColor } = attributes;
 
 	// Force inline styles to apply named border colors when themes do not load
 	// their color stylesheets in the editor.
@@ -52,28 +52,6 @@ export function useBorderProps( attributes ) {
 
 		borderProps.style.borderColor = borderColorObject.color;
 	}
-
-	if ( ! sideBorderColors ) {
-		return borderProps;
-	}
-
-	const sides = {
-		top: 'borderTopColor',
-		right: 'borderRightColor',
-		bottom: 'borderBottomColor',
-		left: 'borderLeftColor',
-	};
-
-	Object.entries( sides ).forEach( ( [ side, property ] ) => {
-		if ( sideBorderColors[ side ] ) {
-			const { color } = getMultiOriginColor( {
-				colors,
-				namedColor: sideBorderColors[ side ],
-			} );
-
-			borderProps.style[ property ] = color;
-		}
-	} );
 
 	return borderProps;
 }

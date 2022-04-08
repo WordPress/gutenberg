@@ -32,12 +32,6 @@ function gutenberg_register_border_support( $block_type ) {
 			'type' => 'string',
 		);
 	}
-
-	if ( $has_border_color_support && ! array_key_exists( 'sideBorderColors', $block_type->attributes ) ) {
-		$block_type->attributes['sideBorderColors'] = array(
-			'type' => 'object',
-		);
-	}
 }
 
 /**
@@ -130,20 +124,6 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 			$border_color = $block_attributes['style']['border']['color'];
 			$styles[]     = sprintf( 'border-color: %s;', $border_color );
 		}
-
-		// Apply individual border sides' named color classes.
-		$has_named_side_border_colors = isset( $block_attributes['sideBorderColors'] );
-
-		if ( $has_named_side_border_colors ) {
-			foreach ( $sides  as $side ) {
-				$named_border_color = _wp_array_get( $block_attributes, array( 'sideBorderColors', $side ), false );
-
-				if ( $named_border_color ) {
-					$classes[] = sprintf( 'has-border-%s-color', $side );
-					$classes[] = sprintf( 'has-%s-border-%s-color', $named_border_color, $side );
-				}
-			}
-		}
 	}
 
 	// Generate styles for individual border sides.
@@ -212,13 +192,19 @@ function gutenberg_generate_individual_border_classes_and_styles( $side, $border
 		$styles[] = sprintf( 'border-%s-style: %s;', $side, $border['style'] );
 	}
 
-	if (
-		isset( $border['color'] ) &&
-		null !== $border['color'] &&
-		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
-	) {
-		$classes[] = sprintf( 'has-border-%s-color', $side );
-		$styles [] = sprintf( 'border-%s-color: %s;', $side, $border['color'] );
+	$border_color       = _wp_array_get( $border, array( 'color' ), null );
+	$named_border_color = _wp_array_get( $border, array( 'colorSlug' ), null );
+
+	$should_skip_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' );
+
+	if ( $border_color && ! $should_skip_color_serialization ) {
+		$has_color_preset = strpos( $border_color, 'var:preset|color|' ) !== false;
+
+		if ( $has_color_preset && $named_border_color ) {
+			$styles [] = sprintf( 'border-%s-color: var(--wp--preset--color--%s);', $side, $named_border_color );
+		} else {
+			$styles [] = sprintf( 'border-%s-color: %s;', $side, $border['color'] );
+		}
 	}
 
 	return array(

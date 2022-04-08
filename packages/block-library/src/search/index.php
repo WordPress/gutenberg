@@ -201,6 +201,16 @@ function apply_block_core_search_border_style( $attributes, $property, $side, &$
 		return;
 	}
 
+	if ( 'color' === $property && $side ) {
+		$slug_path         = array( 'style', 'border', $side, 'colorSlug' );
+		$named_color_value = _wp_array_get( $attributes, $slug_path, false );
+		$has_color_preset  = strpos( $value, 'var:preset|color|' ) !== false;
+
+		if ( $has_color_preset && $named_color_value ) {
+			$value = sprintf( 'var(--wp--preset--color--%s)', $named_color_value );
+		}
+	}
+
 	$property_suffix = $side ? sprintf( '%s-%s', $side, $property ) : $property;
 
 	if ( $is_button_inside ) {
@@ -364,37 +374,7 @@ function get_border_color_classes_for_block_core_search( $attributes ) {
 		$border_color_classes[] = sprintf( 'has-%s-border-color', esc_attr( $attributes['borderColor'] ) );
 	}
 
-	$border_color_classes[] = get_side_border_color_classes_for_block_core_search( $attributes, 'top' );
-	$border_color_classes[] = get_side_border_color_classes_for_block_core_search( $attributes, 'right' );
-	$border_color_classes[] = get_side_border_color_classes_for_block_core_search( $attributes, 'bottom' );
-	$border_color_classes[] = get_side_border_color_classes_for_block_core_search( $attributes, 'left' );
-
 	return implode( ' ', $border_color_classes );
-}
-
-/**
- * Generates required CSS classes for individual border side color selections.
- *
- * @param array  $attributes The block attributes.
- * @param string $side       Border side i.e. `top`, `right`, `bottom`, or `left`.
- *
- * @return string
- */
-function get_side_border_color_classes_for_block_core_search( $attributes, $side ) {
-	$classes = array();
-
-	$has_custom_border_color = ! empty( $attributes['style']['border'][ $side ]['color'] );
-	$has_named_border_color  = ! empty( $attributes['sideBorderColors'][ $side ] );
-
-	if ( $has_custom_border_color || $has_named_border_color ) {
-		$classes[] = sprintf( 'has-border-%s-color', esc_attr( $side ) );
-	}
-
-	if ( $has_named_border_color ) {
-		$classes[] = sprintf( 'has-%s-border-%s-color', esc_attr( $attributes['sideBorderColors'][ $side ] ), esc_attr( $side ) );
-	}
-
-	return implode( ' ', $classes );
 }
 
 /**

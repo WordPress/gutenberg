@@ -116,16 +116,16 @@
 html :where(.has-border-color) {
 	border-style: solid;
 }
-html :where(.has-border-top-color) {
+html :where([style*="border-top-color"]) {
 	border-top-style: solid;
 }
-html :where(.has-border-right-color) {
+html :where([style*="border-right-color"]) {
 	border-right-style: solid;
 }
-html :where(.has-border-bottom-color) {
+html :where([style*="border-bottom-color"]) {
 	border-bottom-style: solid;
 }
-html :where(.has-border-left-color) {
+html :where([style*="border-left-color"]) {
 	border-left-style: solid;
 }
 
