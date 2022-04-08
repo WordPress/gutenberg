@@ -22,9 +22,9 @@ import {
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	getBlockTypes,
 } from '@wordpress/blocks';
-import { withFilters } from '@wordpress/components';
 import { useEffect, useState, useContext } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
+import { PresetSvgFilter } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -131,8 +131,6 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 		''
 	);
 }
-
-const PresetSvgFilter = withFilters( 'editor.PresetSvgFilter' )( () => null );
 
 function getPresetsSvgFilters( blockPresets = {} ) {
 	return PRESET_METADATA.filter( ( metadata ) => metadata.svgFilter ).flatMap(

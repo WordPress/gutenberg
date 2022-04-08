@@ -362,23 +362,18 @@ const withDuotoneStyles = createHigherOrderComponent(
 	'withDuotoneStyles'
 );
 
-const withDuotoneFilter = createHigherOrderComponent(
-	( PresetSvgFilter ) => ( { metadata, preset } ) => {
-		if ( metadata.svgFilter !== 'duotone' ) {
-			return <PresetSvgFilter />;
-		}
-		return (
-			<>
-				<PresetSvgFilter />
-				<DuotoneFilter
-					id={ `wp-duotone-${ preset.slug }` }
-					values={ getValuesFromColors( preset.colors ) }
-				/>
-			</>
-		);
-	},
-	'withDuotoneFilter'
-);
+export function PresetSvgFilter( { metadata, preset } ) {
+	if ( metadata.svgFilter !== 'duotone' ) {
+		return null;
+	}
+
+	return (
+		<DuotoneFilter
+			id={ `wp-duotone-${ preset.slug }` }
+			values={ getValuesFromColors( preset.colors ) }
+		/>
+	);
+}
 
 addFilter(
 	'blocks.registerBlockType',
@@ -394,9 +389,4 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/duotone/with-styles',
 	withDuotoneStyles
-);
-addFilter(
-	'editor.PresetSvgFilter',
-	'core/editor/duotone/with-svg-filter',
-	withDuotoneFilter
 );

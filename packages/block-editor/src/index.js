@@ -3,6 +3,7 @@
  */
 import './hooks';
 export {
+	PresetSvgFilter,
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
 	useBorderProps as __experimentalUseBorderProps,
 	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,
