@@ -29,7 +29,7 @@ import {
 	__unstableIframe as Iframe,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
-import { useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
@@ -85,16 +85,21 @@ function MaybeIframe( {
 export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
+		isActive,
 		isTemplateMode,
 		wrapperBlockName,
 		wrapperUniqueId,
 	} = useSelect( ( select ) => {
 		const {
+			isFeatureActive,
 			isEditingTemplate,
 			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const _isTemplateMode = isEditingTemplate();
+		const feature = _isTemplateMode
+			? 'welcomeGuideTemplate'
+			: 'welcomeGuide';
 		let _wrapperBlockName;
 
 		if ( getCurrentPostType() === 'wp_block' ) {
@@ -105,6 +110,7 @@ export default function VisualEditor( { styles } ) {
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
+			isActive: isFeatureActive( feature ),
 			isTemplateMode: _isTemplateMode,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
@@ -186,6 +192,14 @@ export default function VisualEditor( { styles } ) {
 		return undefined;
 	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
 
+	const titleRef = useRef();
+	useEffect( () => {
+		if ( isActive ) {
+			return;
+		}
+		titleRef.current.focusTitle();
+	}, [ isActive ] );
+
 	return (
 		<BlockTools
 			__unstableContentRef={ ref }
@@ -240,7 +254,7 @@ export default function VisualEditor( { styles } ) {
 								className="edit-post-visual-editor__post-title-wrapper"
 								contentEditable={ false }
 							>
-								<PostTitle />
+								<PostTitle ref={ titleRef } />
 							</div>
 						) }
 						<RecursionProvider>

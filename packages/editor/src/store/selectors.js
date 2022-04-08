@@ -30,7 +30,6 @@ import {
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
-	EDIT_POST_STORE_NAME,
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
@@ -1091,43 +1090,18 @@ export function canUserUseUnfilteredHTML( state ) {
 }
 
 /**
- * Returns whether the given feature is enabled or not.
- *
- * @param {Object} state   Global application state.
- * @param {string} feature Feature slug.
- *
- * @return {boolean} Is active.
- */
-export const isFeatureActive = createRegistrySelector(
-	( select ) => ( state, feature ) => {
-		return !! select( preferencesStore ).get( 'core/edit-post', feature );
-	}
-);
-
-/**
- * Returns true if the template editing mode is enabled.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether we're editing the template.
- */
-export const isEditingTemplate = createRegistrySelector(
-	( select ) => ( state ) => {
-		return !! select( EDIT_POST_STORE_NAME ).isEditingTemplate( state );
-	}
-);
-
-/**
  * Returns whether the pre-publish panel should be shown
  * or skipped when the user clicks the "publish" button.
  *
- * @param {Object} state Global application state.
- *
  * @return {boolean} Whether the pre-publish panel should be shown or not.
  */
-export function isPublishSidebarEnabled( state ) {
-	return isFeatureActive( state, 'isPublishSidebarEnabled' );
-}
+export const isPublishSidebarEnabled = createRegistrySelector(
+	( select ) => () =>
+		!! select( preferencesStore ).get(
+			'core/edit-post',
+			'isPublishSidebarEnabled'
+		)
+);
 
 /**
  * Return the current block list.
