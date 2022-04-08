@@ -86,7 +86,7 @@ build_files=$(
 	build/edit-widgets/blocks/*/block.json \
 	build/widgets/blocks/*.php \
 	build/widgets/blocks/*/block.json \
-	build/style-engine/class-wp-style-engine-gutenberg.php \
+	build/style-engine/*.php \
 )
 
 
