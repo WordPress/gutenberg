@@ -83,6 +83,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			'center' => 'center',
 		);
 
+		$vertical_alignment_options = array(
+			'top'    => 'flex-start',
+			'center' => 'center',
+			'bottom' => 'flex-end',
+		);
+
 		if ( 'horizontal' === $layout_orientation ) {
 			$justify_content_options += array( 'space-between' => 'space-between' );
 		}
@@ -116,6 +122,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
+			}
+
+			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
+				$style .= "align-items: {$vertical_alignment_options[ $layout['verticalAlignment'] ]};";
+			} else {
+				$style .= 'align-items: center;';
 			}
 		} else {
 			$style .= 'flex-direction: column;';
