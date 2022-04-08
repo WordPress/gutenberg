@@ -176,6 +176,15 @@
 				}
 			}
 		},
+		"settingsPropertiesDefaultBlockStyles": {
+			"properties": {
+				"defaultBlockStyles": {
+					"description": "Setting that adds theme support for 'wp-block-styles', which loads the theme.css file for each block.",
+					"type": "boolean",
+					"default": false
+				}
+			}
+		},
 		"settingsPropertiesLayout": {
 			"properties": {
 				"layout": {
