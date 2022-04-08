@@ -19,7 +19,11 @@ let MemoizedBlockList;
 
 const MAX_HEIGHT = 2000;
 
-function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
+function AutoBlockPreview( {
+	viewportWidth,
+	__experimentalPadding,
+	__experimentalMinHeight,
+} ) {
 	const [
 		containerResizeListener,
 		{ width: containerWidth },
@@ -68,6 +72,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						contentHeight > MAX_HEIGHT
 							? MAX_HEIGHT * scale
 							: undefined,
+					minHeight: __experimentalMinHeight,
 				} }
 			>
 				<Iframe
@@ -98,6 +103,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						// This is a catch-all max-height for patterns.
 						// See: https://github.com/WordPress/gutenberg/pull/38175.
 						maxHeight: MAX_HEIGHT,
+						minHeight: __experimentalMinHeight,
 					} }
 				>
 					{ contentResizeListener }

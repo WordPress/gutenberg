@@ -10,7 +10,7 @@ import {
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 
-import { useState, useCallback } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useInstanceId, useResizeObserver } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -23,33 +23,6 @@ import SetupToolbar from './setup-toolbar';
 import usePatternsSetup from './use-patterns-setup';
 import { VIEWMODES } from './constants';
 
-function useBackgroundColor() {
-	const [ backgroundColor, setBackgroundColor ] = useState( 'rgba(0,0,0,0)' );
-	const ref = useCallback(
-		( node ) => {
-			if ( ! node ) {
-				return;
-			}
-			const { ownerDocument } = node;
-			const { defaultView } = ownerDocument;
-			const canvas = ownerDocument.querySelector(
-				'.editor-styles-wrapper'
-			);
-			if ( ! canvas ) {
-				return;
-			}
-			const computedBackgroundColor = defaultView
-				.getComputedStyle( canvas, null )
-				.getPropertyValue( 'background-color' );
-			if ( computedBackgroundColor !== backgroundColor ) {
-				setBackgroundColor( computedBackgroundColor );
-			}
-		},
-		[ backgroundColor, setBackgroundColor ]
-	);
-	return [ backgroundColor, ref ];
-}
-
 const SetupContent = ( {
 	viewMode,
 	activeSlide,
@@ -59,7 +32,6 @@ const SetupContent = ( {
 } ) => {
 	const composite = useCompositeState();
 	const containerClass = 'block-editor-block-pattern-setup__container';
-	const [ backgroundColor, nodeRef ] = useBackgroundColor();
 	if ( viewMode === VIEWMODES.carousel ) {
 		const slideClass = new Map( [
 			[ activeSlide, 'active-slide' ],
@@ -69,8 +41,7 @@ const SetupContent = ( {
 		return (
 			<div
 				className="block-editor-block-pattern-setup__carousel"
-				style={ { backgroundColor, height } }
-				ref={ nodeRef }
+				style={ { height } }
 			>
 				<div className={ containerClass }>
 					<ul className="carousel-container">
@@ -79,6 +50,7 @@ const SetupContent = ( {
 								className={ slideClass.get( index ) || '' }
 								key={ pattern.name }
 								pattern={ pattern }
+								minHeight={ height }
 							/>
 						) ) }
 					</ul>
@@ -139,7 +111,7 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 	);
 }
 
-function BlockPatternSlide( { className, pattern } ) {
+function BlockPatternSlide( { className, pattern, minHeight } ) {
 	const { blocks, title, description } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPatternSlide,
@@ -151,7 +123,10 @@ function BlockPatternSlide( { className, pattern } ) {
 			aria-label={ title }
 			aria-describedby={ description ? descriptionId : undefined }
 		>
-			<BlockPreview blocks={ blocks } />
+			<BlockPreview
+				blocks={ blocks }
+				__experimentalMinHeight={ minHeight }
+			/>
 			{ !! description && (
 				<VisuallyHidden id={ descriptionId }>
 					{ description }
