@@ -33,6 +33,21 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		$context = 'mobile';
 	}
 
+	if ( 'site-editor' === $context ) {
+		// Remove global styles added by core.
+		// This needs to be fixed in core but this will help us in the meanwhile.
+		$styles_without_existing_global_styles = array();
+		foreach( $settings['styles'] as $style ) {
+			if (
+				! isset( $style['__unstableType'] ) ||
+				! in_array( $style['__unstableType'], array( 'globalStyles', 'presets' ), true )
+			) {
+				$styles_without_existing_global_styles[] = $style;
+			}
+		}
+		$settings['styles'] = $styles_without_existing_global_styles;
+	}
+
 	if ( 'other' === $context ) {
 		// Make sure the styles array exists.
 		// In some contexts, like the navigation editor, it doesn't.
