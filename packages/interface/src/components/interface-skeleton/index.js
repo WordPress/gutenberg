@@ -79,6 +79,15 @@ function InterfaceSkeleton(
 		},
 	};
 
+	const sidebarVariants = {
+		hidden: { 
+			opacity: 0.25,
+		},
+		hover: {
+			opacity: 1,
+		},
+	};
+
 	return (
 		<div
 			{ ...navigateRegionsProps }
@@ -122,7 +131,7 @@ function InterfaceSkeleton(
 							animate={ isDistractionFree ? 'hidden' : 'hover' }
 							initial="hover"
 							whileHover="hover"
-							variants={ headerVariants }
+							variants={ sidebarVariants }
 							transition={ { type: 'tween', delay: 0.8 } }
 							className="interface-interface-skeleton__secondary-sidebar"
 							role="region"
@@ -150,7 +159,7 @@ function InterfaceSkeleton(
 							animate={ isDistractionFree ? 'hidden' : 'hover' }
 							initial="hover"
 							whileHover="hover"
-							variants={ headerVariants }
+							variants={ sidebarVariants }
 							transition={ { type: 'tween', delay: 0.8 } }
 							className="interface-interface-skeleton__sidebar"
 							role="region"
