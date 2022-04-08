@@ -9,6 +9,8 @@ import {
 	Platform,
 } from 'react-native';
 import { isArray } from 'lodash';
+import { runOnJS } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
@@ -163,38 +165,45 @@ export function Button( props ) {
 		  } )
 		: null;
 
+	const lonPressGesture = Gesture.LongPress().onStart( () => {
+		if ( onLongPress ) {
+			runOnJS( onLongPress )();
+		}
+	} );
+
 	const element = (
-		<TouchableOpacity
-			activeOpacity={ 0.7 }
-			accessible={ true }
-			accessibilityLabel={ label }
-			accessibilityStates={ states }
-			accessibilityRole={ 'button' }
-			accessibilityHint={ hint }
-			onPress={ onClick }
-			onLongPress={ onLongPress }
-			style={ containerStyle }
-			disabled={ isDisabled }
-			testID={ testID }
-		>
-			<View style={ buttonViewStyle }>
-				<View style={ { flexDirection: 'row' } }>
-					{ newIcon }
-					{ newChildren }
-					{ subscript && (
-						<Text
-							style={
-								isPressed
-									? styles.subscriptActive
-									: subscriptInactive
-							}
-						>
-							{ subscript }
-						</Text>
-					) }
+		<GestureDetector gesture={ lonPressGesture }>
+			<TouchableOpacity
+				activeOpacity={ 0.7 }
+				accessible={ true }
+				accessibilityLabel={ label }
+				accessibilityStates={ states }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ hint }
+				onPress={ onClick }
+				style={ containerStyle }
+				disabled={ isDisabled }
+				testID={ testID }
+			>
+				<View style={ buttonViewStyle }>
+					<View style={ { flexDirection: 'row' } }>
+						{ newIcon }
+						{ newChildren }
+						{ subscript && (
+							<Text
+								style={
+									isPressed
+										? styles.subscriptActive
+										: subscriptInactive
+								}
+							>
+								{ subscript }
+							</Text>
+						) }
+					</View>
 				</View>
-			</View>
-		</TouchableOpacity>
+			</TouchableOpacity>
+		</GestureDetector>
 	);
 
 	if ( ! shouldShowTooltip ) {
