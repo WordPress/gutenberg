@@ -12,7 +12,8 @@
 		"html": false,
 		"__experimentalLayout": true,
 		"spacing": {
-			"margin": [ "top", "bottom" ]
+			"margin": [ "top", "bottom" ],
+			"padding": true
 		},
 		"color": {
 			"gradients": true,
