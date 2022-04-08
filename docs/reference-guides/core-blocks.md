@@ -485,9 +485,9 @@ This block is deprecated. Please use the Comments Query Loop block instead. ([So
 -	**Supports:** ~~html~~, ~~inserter~~
 -	**Attributes:** commentId
 
-## Post Comments
+## Post Comments (deprecated)
 
-Display a post's comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
+This block is deprecated. Please use the Comments Query Loop block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
 
 -	**Name:** core/post-comments
 -	**Category:** theme
