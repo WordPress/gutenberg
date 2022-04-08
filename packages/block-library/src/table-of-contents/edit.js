@@ -134,9 +134,8 @@ export default function TableOfContentsEdit( {
 			let headingPage = 1;
 
 			/**
-			 * If the core/editor store is available, we can add permalinks to the
-			 * generated table of contents. This variable will be a link to
-			 * current post including pagination query if necessary.
+			 * A permalink to the current post. If the core/editor store is
+			 * unavailable, this variable will be null.
 			 */
 			const permalink = editorSelectors?.getPermalink() ?? null;
 
