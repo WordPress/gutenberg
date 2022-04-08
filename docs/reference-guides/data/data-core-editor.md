@@ -867,6 +867,31 @@ _Returns_
 
 -   `boolean`: Whether the post can be saved.
 
+### isEditingTemplate
+
+Returns true if the template editing mode is enabled.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether we're editing the template.
+
+### isFeatureActive
+
+Returns whether the given feature is enabled or not.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _feature_ `string`: Feature slug.
+
+_Returns_
+
+-   `boolean`: Is active.
+
 ### isFirstMultiSelectedBlock
 
 _Related_
@@ -967,6 +992,10 @@ _Returns_
 
 Returns whether the pre-publish panel should be shown
 or skipped when the user clicks the "publish" button.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
 
 _Returns_
 

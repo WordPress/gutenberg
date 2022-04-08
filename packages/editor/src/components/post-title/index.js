@@ -42,10 +42,13 @@ export default function PostTitle() {
 		placeholder,
 		isFocusMode,
 		hasFixedToolbar,
+		isActive,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
 			isCleanNewPost: _isCleanNewPost,
+			isFeatureActive,
+			isEditingTemplate,
 		} = select( editorStore );
 		const { getSettings } = select( blockEditorStore );
 		const {
@@ -53,6 +56,10 @@ export default function PostTitle() {
 			focusMode,
 			hasFixedToolbar: _hasFixedToolbar,
 		} = getSettings();
+		const _isTemplateMode = isEditingTemplate();
+		const feature = _isTemplateMode
+			? 'welcomeGuideTemplate'
+			: 'welcomeGuide';
 
 		return {
 			isCleanNewPost: _isCleanNewPost(),
@@ -60,6 +67,7 @@ export default function PostTitle() {
 			placeholder: titlePlaceholder,
 			isFocusMode: focusMode,
 			hasFixedToolbar: _hasFixedToolbar,
+			isActive: isFeatureActive( feature ),
 		};
 	}, [] );
 
@@ -75,10 +83,14 @@ export default function PostTitle() {
 		// only happen for a new post, which means we focus the title on new
 		// post so the author can start typing right away, without needing to
 		// click anything.
-		if ( isCleanNewPost && ( ! activeElement || body === activeElement ) ) {
+		if (
+			isCleanNewPost &&
+			! isActive &&
+			( ! activeElement || body === activeElement )
+		) {
 			ref.current.focus();
 		}
-	}, [ isCleanNewPost ] );
+	}, [ isCleanNewPost, isActive ] );
 
 	function onEnterPress() {
 		insertDefaultBlock( undefined, undefined, 0 );
