@@ -59,21 +59,26 @@ const SetupContent = ( {
 		);
 	}
 	return (
-		<Composite
-			{ ...composite }
-			role="listbox"
-			className={ containerClass }
-			aria-label={ __( 'Patterns list' ) }
+		<div
+			style={ { height } }
+			className="block-editor-block-pattern-setup__grid"
 		>
-			{ patterns.map( ( pattern ) => (
-				<BlockPattern
-					key={ pattern.name }
-					pattern={ pattern }
-					onSelect={ onBlockPatternSelect }
-					composite={ composite }
-				/>
-			) ) }
-		</Composite>
+			<Composite
+				{ ...composite }
+				role="listbox"
+				className={ containerClass }
+				aria-label={ __( 'Patterns list' ) }
+			>
+				{ patterns.map( ( pattern ) => (
+					<BlockPattern
+						key={ pattern.name }
+						pattern={ pattern }
+						onSelect={ onBlockPatternSelect }
+						composite={ composite }
+					/>
+				) ) }
+			</Composite>
+		</div>
 	);
 };
 
