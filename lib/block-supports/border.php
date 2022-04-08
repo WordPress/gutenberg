@@ -132,15 +132,8 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 			$border = _wp_array_get( $block_attributes, array( 'style', 'border', $side ), false );
 
 			if ( is_array( $border ) && ! empty( $border ) ) {
-				$split_border_attributes = gutenberg_generate_individual_border_classes_and_styles( $side, $border, $block_type );
-
-				if ( $split_border_attributes['classes'] ) {
-					$classes = array_merge( $classes, $split_border_attributes['classes'] );
-				}
-
-				if ( $split_border_attributes['styles'] ) {
-					$styles = array_merge( $styles, $split_border_attributes['styles'] );
-				}
+				$split_border_styles = gutenberg_generate_individual_border_classes_and_styles( $side, $border, $block_type );
+				$styles              = array_merge( $styles, $split_border_styles );
 			}
 		}
 	}
@@ -160,21 +153,20 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 }
 
 /**
- * Generates CSS classes and longhand CSS styles for an individual side border.
+ * Generates longhand CSS styles for an individual side border.
  *
  * If some values are omitted from the border configuration, using shorthand
  * styles would lead to `initial` values being used instead of the more
  * desirable inherited values. This could also lead to browser inconsistencies.
  *
- * @param string        $side       The side the classes and styles are being generated for.
+ * @param string        $side       The side the styles are being generated for.
  * @param array         $border     Array containing border color, style, and width values.
  * @param WP_Block_Type $block_type Block type.
  *
- * @return array CSS classes and longhand border styles for a single side.
+ * @return array Longhand CSS border styles for a single side.
  */
 function gutenberg_generate_individual_border_classes_and_styles( $side, $border, $block_type ) {
-	$classes = array();
-	$styles  = array();
+	$styles = array();
 
 	if (
 		isset( $border['width'] ) &&
@@ -207,10 +199,7 @@ function gutenberg_generate_individual_border_classes_and_styles( $side, $border
 		}
 	}
 
-	return array(
-		'classes' => $classes,
-		'styles'  => $styles,
-	);
+	return $styles;
 }
 
 /**
