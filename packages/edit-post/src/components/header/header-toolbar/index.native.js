@@ -6,7 +6,6 @@ import { Platform, ScrollView, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useRef } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -130,17 +129,12 @@ export default compose( [
 			getBlockSelectionEnd,
 			hasInserterItems,
 			getSelectedBlockClientId,
-			getBlock,
 		} = select( blockEditorStore );
 		const { getEditorSettings, isPostTitleSelected } = select(
 			editorStore
 		);
 		const isAnyBlockSelected = getSelectedBlockClientId();
 		const isTitleSelected = isPostTitleSelected();
-		const isBlockBeingReplaced =
-			isAnyBlockSelected &&
-			isUnmodifiedDefaultBlock( getBlock( getBlockSelectionEnd() ) );
-
 		return {
 			hasRedo: select( editorStore ).hasEditorRedo(),
 			hasUndo: select( editorStore ).hasEditorUndo(),
@@ -154,10 +148,7 @@ export default compose( [
 			isTextModeEnabled:
 				select( editPostStore ).getEditorMode() === 'text',
 			isRTL: select( blockEditorStore ).getSettings().isRTL,
-			isDefaultView:
-				isBlockBeingReplaced === null
-					? false
-					: ! isAnyBlockSelected && ! isTitleSelected,
+			isDefaultView: ! isAnyBlockSelected && ! isTitleSelected,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
