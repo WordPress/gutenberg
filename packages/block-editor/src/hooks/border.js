@@ -130,10 +130,14 @@ const getBorderObject = ( attributes, colors ) => {
 	// border objects.
 	const hydratedBorderStyles = { ...borderStyles };
 	borderSides.forEach( ( side ) => {
-		const namedColor = hydratedBorderStyles[ side ]?.colorSlug;
-		const { color } = getMultiOriginColor( { colors, namedColor } );
-
-		if ( color ) {
+		const colorSlug = getColorSlugFromVariable(
+			hydratedBorderStyles[ side ]?.color
+		);
+		if ( colorSlug ) {
+			const { color } = getMultiOriginColor( {
+				colors,
+				namedColor: colorSlug,
+			} );
 			hydratedBorderStyles[ side ] = {
 				...hydratedBorderStyles[ side ],
 				color,
@@ -143,6 +147,14 @@ const getBorderObject = ( attributes, colors ) => {
 
 	return hydratedBorderStyles;
 };
+
+function getColorSlugFromVariable( value ) {
+	const namedColor = /var:preset\|color\|(.+)/.exec( value );
+	if ( namedColor && namedColor[ 1 ] ) {
+		return namedColor[ 1 ];
+	}
+	return null;
+}
 
 export function BorderPanel( props ) {
 	const { attributes, clientId, setAttributes } = props;
@@ -187,13 +199,10 @@ export function BorderPanel( props ) {
 		let newBorderStyles = { ...newBorder };
 		let newBorderColor;
 
-		// Split borders will store their named colors within the
-		// `colorSlug` property of their respective style object.
 		if ( hasSplitBorders( newBorder ) ) {
 			// For each side check if the side has a color value set
 			// If so, determine if it belongs to a named color, in which case
-			// saved that named color to the `colorSlug` property and clear the
-			// color property.
+			// we update the color property.
 			//
 			// This deliberately overwrites `newBorderStyles` to avoid mutating
 			// the passed object which causes problems otherwise.
@@ -212,10 +221,6 @@ export function BorderPanel( props ) {
 					} );
 
 					if ( colorObject.slug ) {
-						// If we have a named color, set the sides color slug
-						// and update the saved style object's color value to
-						// reflect the matching preset CSS var.
-						newBorderStyles[ side ].colorSlug = colorObject.slug;
 						newBorderStyles[
 							side
 						].color = `var:preset|color|${ colorObject.slug }`;
@@ -489,19 +494,22 @@ export const withBorderColorPaletteStyles = createHigherOrderComponent(
 		} );
 		const { color: borderTopColor } = getMultiOriginColor( {
 			colors,
-			namedColor: style?.border?.top?.colorSlug,
+			namedColor: getColorSlugFromVariable( style?.border?.top?.color ),
 		} );
 		const { color: borderRightColor } = getMultiOriginColor( {
 			colors,
-			namedColor: style?.border?.right?.colorSlug,
+			namedColor: getColorSlugFromVariable( style?.border?.right?.color ),
 		} );
+
 		const { color: borderBottomColor } = getMultiOriginColor( {
 			colors,
-			namedColor: style?.border?.bottom?.colorSlug,
+			namedColor: getColorSlugFromVariable(
+				style?.border?.bottom?.color
+			),
 		} );
 		const { color: borderLeftColor } = getMultiOriginColor( {
 			colors,
-			namedColor: style?.border?.left?.colorSlug,
+			namedColor: getColorSlugFromVariable( style?.border?.left?.color ),
 		} );
 
 		const extraStyles = {
