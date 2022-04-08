@@ -12,7 +12,7 @@ import {
 	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseEntityRecords as useEntityRecords } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -247,23 +247,20 @@ export default function CommentTemplateEdit( {
 	const commentQuery = useCommentQueryArgs( {
 		postId,
 	} );
+	// Request only top-level comments. Replies are embedded.
+	const { records: topLevelComments, hasResolved } = useEntityRecords(
+		'root',
+		'comment',
+		[ commentQuery ]
+	);
 
-	const { topLevelComments, blocks } = useSelect(
+	const blocks = useSelect(
 		( select ) => {
-			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
-
-			return {
-				// Request only top-level comments. Replies are embedded.
-				topLevelComments: commentQuery
-					? getEntityRecords( 'root', 'comment', commentQuery )
-					: null,
-				blocks: getBlocks( clientId ),
-			};
+			return getBlocks( clientId );
 		},
 		[ clientId, commentQuery ]
 	);
-
 	// Generate a tree structure of comment IDs.
 	let commentTree = useCommentTree(
 		// Reverse the order of top comments if needed.
@@ -272,12 +269,16 @@ export default function CommentTemplateEdit( {
 			: topLevelComments
 	);
 
-	if ( ! topLevelComments ) {
+	if ( topLevelComments === null ) {
 		return (
 			<p { ...blockProps }>
 				<Spinner />
 			</p>
 		);
+	}
+
+	if ( topLevelComments?.length === 0 && hasResolved ) {
+		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
 	if ( ! postId ) {
@@ -286,10 +287,6 @@ export default function CommentTemplateEdit( {
 			threadComments,
 			threadCommentsDepth,
 		} );
-	}
-
-	if ( ! commentTree.length ) {
-		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
 	return (
