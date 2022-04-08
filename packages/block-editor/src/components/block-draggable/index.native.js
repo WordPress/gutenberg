@@ -7,10 +7,8 @@ import Animated, {
 	useAnimatedRef,
 	useAnimatedStyle,
 	useSharedValue,
+	withDelay,
 	withTiming,
-	scrollTo,
-	useAnimatedReaction,
-	Easing,
 } from 'react-native-reanimated';
 
 /**
@@ -33,18 +31,8 @@ import useBlockDropZone from '../use-block-drop-zone';
 import styles from './style.scss';
 
 const CHIP_OFFSET_TO_TOUCH_POSITION = 32;
-const BLOCK_COLLAPSED_HEIGHT = 20;
-const EXTRA_OFFSET_WHEN_CLOSE_TO_TOP_EDGE = 80;
-const SCROLL_ANIMATION_DURATION = 350;
-const COLLAPSE_HEIGHT_ANIMATION_CONFIG = {
-	duration: 350,
-	easing: Easing.out( Easing.exp ),
-};
-const EXPAND_HEIGHT_ANIMATION_CONFIG = {
-	duration: 350,
-	easing: Easing.in( Easing.exp ),
-};
-const COLLAPSE_OPACITY_ANIMATION_CONFIG = { duration: 150 };
+const BLOCK_OPACITY_ANIMATION_CONFIG = { duration: 350 };
+const BLOCK_OPACITY_ANIMATION_DELAY = 250;
 
 /**
  * Block draggable wrapper component
@@ -63,7 +51,7 @@ const COLLAPSE_OPACITY_ANIMATION_CONFIG = { duration: 150 };
  * @return {Function} Render function that passes `onScroll` event handler.
  */
 const BlockDraggableWrapper = ( { children } ) => {
-	const currentClientId = useRef();
+	const currentBlockLayout = useRef();
 
 	const wrapperStyles = usePreferredColorSchemeStyle(
 		styles[ 'draggable-wrapper__container' ],
@@ -93,7 +81,6 @@ const BlockDraggableWrapper = ( { children } ) => {
 		scale: useSharedValue( 0 ),
 	};
 	const isDragging = useSharedValue( false );
-	const scrollAnimation = useSharedValue( 0 );
 
 	const [
 		startScrolling,
@@ -133,27 +120,10 @@ const BlockDraggableWrapper = ( { children } ) => {
 		} );
 
 		const foundClientId = blockLayout?.clientId;
-		currentClientId.current = foundClientId;
+		currentBlockLayout.current = blockLayout;
 		if ( foundClientId ) {
 			startDraggingBlocks( [ foundClientId ] );
-
-			const isBlockOutOfScrollView = blockLayout.y < scroll.offsetY.value;
-			// If the dragging block is out of the scroll view, we have to
-			// scroll the block list to show the origin position of the block.
-			if ( isBlockOutOfScrollView ) {
-				scrollAnimation.value = scroll.offsetY.value;
-				const scrollOffsetTarget = Math.max(
-					0,
-					blockLayout.y - EXTRA_OFFSET_WHEN_CLOSE_TO_TOP_EDGE
-				);
-				scrollAnimation.value = withTiming(
-					scrollOffsetTarget,
-					{ duration: SCROLL_ANIMATION_DURATION },
-					() => startScrolling( position.y )
-				);
-			} else {
-				runOnUI( startScrolling )( position.y );
-			}
+			runOnUI( startScrolling )( position.y );
 		} else {
 			// We stop dragging if no block is found.
 			runOnUI( stopDragging )();
@@ -161,27 +131,18 @@ const BlockDraggableWrapper = ( { children } ) => {
 	};
 
 	const onStopDragging = () => {
-		if ( currentClientId.current ) {
+		const currentClientId = currentBlockLayout.current?.clientId;
+		if ( currentClientId ) {
 			onBlockDrop( {
 				// Dropping is only allowed at root level
 				srcRootClientId: '',
-				srcClientIds: [ currentClientId.current ],
+				srcClientIds: [ currentClientId ],
 				type: 'block',
 			} );
 		}
 		onBlockDragEnd();
 		stopDraggingBlocks();
 	};
-
-	// This hook is used for animating the scroll via a shared value.
-	useAnimatedReaction(
-		() => scrollAnimation.value,
-		( value ) => {
-			if ( isDragging.value ) {
-				scrollTo( animatedScrollRef, 0, value, false );
-			}
-		}
-	);
 
 	const onChipLayout = ( { nativeEvent: { layout } } ) => {
 		chip.width.value = layout.width;
@@ -281,50 +242,26 @@ const BlockDraggableWrapper = ( { children } ) => {
  * @return {Function} Render function which includes the parameter `isDraggable` to determine if the block can be dragged.
  */
 const BlockDraggable = ( { clientId, children } ) => {
-	const { blocksLayouts, findBlockLayoutByClientId } = useBlockListContext();
+	const { selectBlock } = useDispatch( blockEditorStore );
+	const wasBeingDragged = useRef( false );
 
-	const collapseAnimation = {
-		opacity: useSharedValue( 0 ),
-		height: useSharedValue( 0 ),
-		initialHeight: useSharedValue( 0 ),
+	const draggingAnimation = {
+		opacity: useSharedValue( 1 ),
 	};
 
-	const startBlockDragging = () => {
-		const blockLayout = findBlockLayoutByClientId(
-			blocksLayouts.current,
-			clientId
+	const startDraggingBlock = () => {
+		draggingAnimation.opacity.value = withTiming(
+			0.4,
+			BLOCK_OPACITY_ANIMATION_CONFIG
 		);
-		if ( blockLayout?.height > 0 ) {
-			collapseAnimation.initialHeight.value = blockLayout.height;
-			collapseAnimation.height.value = blockLayout.height;
-			collapseAnimation.opacity.value = withTiming(
-				1,
-				COLLAPSE_OPACITY_ANIMATION_CONFIG,
-				( completed ) => {
-					if ( completed ) {
-						collapseAnimation.height.value = withTiming(
-							BLOCK_COLLAPSED_HEIGHT,
-							COLLAPSE_HEIGHT_ANIMATION_CONFIG
-						);
-					}
-				}
-			);
-		}
 	};
 
-	const stopBlockDragging = () => {
-		collapseAnimation.height.value = withTiming(
-			collapseAnimation.initialHeight.value,
-			EXPAND_HEIGHT_ANIMATION_CONFIG,
-			( completed ) => {
-				if ( completed ) {
-					collapseAnimation.opacity.value = withTiming(
-						0,
-						COLLAPSE_OPACITY_ANIMATION_CONFIG
-					);
-				}
-			}
+	const stopDraggingBlock = () => {
+		draggingAnimation.opacity.value = withDelay(
+			BLOCK_OPACITY_ANIMATION_DELAY,
+			withTiming( 1, BLOCK_OPACITY_ANIMATION_CONFIG )
 		);
+		runOnJS( selectBlock )( clientId );
 	};
 
 	const { isDraggable, isBeingDragged } = useSelect(
@@ -349,53 +286,27 @@ const BlockDraggable = ( { clientId, children } ) => {
 
 	useEffect( () => {
 		if ( isBeingDragged ) {
-			startBlockDragging();
-		} else {
-			stopBlockDragging();
+			startDraggingBlock();
+			wasBeingDragged.current = true;
+		} else if ( wasBeingDragged.current ) {
+			stopDraggingBlock();
+			wasBeingDragged.current = false;
 		}
 	}, [ isBeingDragged ] );
 
-	const containerStyles = useAnimatedStyle( () => {
-		const canAnimateHeight =
-			collapseAnimation.height.value !== 0 &&
-			collapseAnimation.opacity.value !== 0;
+	const wrapperStyles = useAnimatedStyle( () => {
 		return {
-			height: canAnimateHeight ? collapseAnimation.height.value : 'auto',
+			opacity: draggingAnimation.opacity.value,
 		};
 	} );
-
-	const blockStyles = useAnimatedStyle( () => {
-		return {
-			display: collapseAnimation.opacity.value !== 0 ? 'none' : 'flex',
-			opacity: 1 - collapseAnimation.opacity.value,
-		};
-	} );
-
-	const placeholderDynamicStyles = useAnimatedStyle( () => {
-		return {
-			display: collapseAnimation.opacity.value === 0 ? 'none' : 'flex',
-			opacity: collapseAnimation.opacity.value,
-		};
-	} );
-	const placeholderStaticStyles = usePreferredColorSchemeStyle(
-		styles[ 'draggable-placeholder__container' ],
-		styles[ 'draggable-placeholder__container--dark' ]
-	);
-	const placeholderStyles = [
-		placeholderStaticStyles,
-		placeholderDynamicStyles,
-	];
 
 	if ( ! isDraggable ) {
 		return children( { isDraggable: false } );
 	}
 
 	return (
-		<Animated.View style={ containerStyles }>
-			<Animated.View style={ blockStyles }>
-				{ children( { isDraggable: true } ) }
-			</Animated.View>
-			<Animated.View style={ placeholderStyles } pointerEvents="none" />
+		<Animated.View style={ wrapperStyles }>
+			{ children( { isDraggable: true } ) }
 		</Animated.View>
 	);
 };
