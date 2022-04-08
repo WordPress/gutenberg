@@ -529,10 +529,10 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			// Root padding requires special logic to split shorthand values.
 			if ( '--wp--style--root--padding' === $css_property && is_string($value) ) {
 
-				$shorthand_top = '17px';
-				$shorthand_right = '17px';
-				$shorthand_bottom = '17px';
-				$shorthand_left = '17px';
+				$shorthand_top = '0';
+				$shorthand_right = '0';
+				$shorthand_bottom = '0';
+				$shorthand_left = '0';
 				
 				$separate_values = explode( ' ', $value );
 
