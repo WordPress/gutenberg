@@ -202,12 +202,10 @@ function apply_block_core_search_border_style( $attributes, $property, $side, &$
 	}
 
 	if ( 'color' === $property && $side ) {
-		$slug_path         = array( 'style', 'border', $side, 'colorSlug' );
-		$named_color_value = _wp_array_get( $attributes, $slug_path, false );
-		$has_color_preset  = strpos( $value, 'var:preset|color|' ) !== false;
-
-		if ( $has_color_preset && $named_color_value ) {
-			$value = sprintf( 'var(--wp--preset--color--%s)', $named_color_value );
+		$has_color_preset = strpos( $value, 'var:preset|color|' ) !== false;
+		if ( $has_color_preset ) {
+			$named_color_value = substr( $value, strrpos( $value, '|' ) + 1 );
+			$value             = sprintf( 'var(--wp--preset--color--%s)', $named_color_value );
 		}
 	}
 
