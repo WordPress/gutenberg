@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import isTextField from './is-text-field';
-import isNumberInput from './is-number-input';
+import isHTMLInputElement from './is-html-input-element';
 
 /**
  * Check whether the given element, assumed an input field or textarea,
@@ -18,9 +18,25 @@ import isNumberInput from './is-number-input';
  * @return {boolean} Whether the input/textareaa element has some "selection".
  */
 export default function inputFieldHasUncollapsedSelection( element ) {
-	if ( ! isTextField( element ) && ! isNumberInput( element ) ) {
+	if ( ! isTextField( element ) && ! isHTMLInputElement( element ) ) {
 		return false;
 	}
+
+	// Unfortunately, the HTML spec states that the `selectionStart` and
+	// `selectionEnd` attributes of `input` elements DO NOT APPLY to most
+	// non-text input types. This effectively means that we cannot inspect the
+	// selection state of numeric inputs, even email inputs, etc.
+	//
+	// The trade-off that this function makes is to assume that any such opaque
+	// element always has an uncollapsed selection. This should cause the block
+	// editor to defer to the browser's native selection handling (e.g. copying
+	// and pasting), thereby reducing friction for the user.
+	//
+	// See: https://html.spec.whatwg.org/multipage/input.html#do-not-apply
+	if ( ! isTextField( element ) ) {
+		return true;
+	}
+
 	try {
 		const {
 			selectionStart,

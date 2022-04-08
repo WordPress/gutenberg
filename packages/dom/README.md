@@ -57,9 +57,9 @@ _Returns_
 
 ### documentHasUncollapsedSelection
 
-Check whether the current document has any sort of selection. This includes
-ranges of text across elements and any selection inside `<input>` and
-`<textarea>` elements.
+Check whether the current document has any sort of (uncollapsed) selection.
+This includes ranges of text across elements and any selection inside
+textual `<input>` and `<textarea>` elements.
 
 _Parameters_
 
@@ -67,7 +67,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether there is any sort of "selection" in the document.
+-   `boolean`: Whether there is any recognizable text selection in the document.
 
 ### focus
 
