@@ -94,13 +94,12 @@
 				box-sizing: border-box;
 			}
 			.pattern-slide {
-				opacity: 0;
 				position: absolute;
 				top: 0;
 				width: 100%;
 				margin: auto;
 				padding: 0;
-				transition: transform 0.5s, opacity 0.5s, z-index 0.5s;
+				transition: transform 0.5s, z-index 0.5s;
 				z-index: z-index(".block-editor-block-pattern-setup .pattern-slide");
 
 				&.active-slide {
