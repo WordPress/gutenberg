@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 13.0.0-rc.1 =
+= 13.0.0 =
 
 ## Changelog
 
@@ -91,6 +91,7 @@
 
 ### Bug Fixes
 
+- Add the missing class-wp-style-engine-gutenberg.php in the plugin build ([40191](https://github.com/WordPress/gutenberg/pull/40191))
 - @wordpress/date: Fix ordinal token (S), RFC2822 token (r), and timezone offset handling. ([39670](https://github.com/WordPress/gutenberg/pull/39670))
 - Add `vendor/` to `.markdownlintignore`. ([39724](https://github.com/WordPress/gutenberg/pull/39724))
 - Consolidate `WP_Theme_JSON_Resolver` changes in both `lib/compat/wordpress-6.0` and `lib/experimental`. ([40140](https://github.com/WordPress/gutenberg/pull/40140))
@@ -402,6 +403,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @adamziel @ajlende @alexstine @andrewserong @annezazu @arcangelini @aristath @arthur791004 @atachibana @c4rl0sbr4v0 @carolinan @chintu51 @ciampo @dali-rajab @DAreRodz @dd32 @delowardev @dmsnell @draganescu @EliezerSPP @ellatrix @fluiddot @geriux @getdave @glendaviesnz @grappler @gwwar @gziolo @HILAYTRIVEDI @hypest @imangm @jakeparis @jameskoster @jasmussen @jezemery @jorgefilipecosta @jostnes @jsnajdr @JustinyAhin @kadimi @karolinakulinska @kevin940726 @MaggieCabrera @Mamaduka @mburridge @mchowning @michalczaplinski @mirka @ndiego @NekoJonez @noahtallen @noisysocks @ntsekouras @oandregal @ockham @ramonjd @ryanwelcher @scruffian @shimotmk @SiobhyB @sunil25393 @t-hamano @talldan @tomalec @tomasztunik @westonruter @youknowriad @zaguiini @ZebulanStanphill
+
+
 
 
 = 12.9.0 =
