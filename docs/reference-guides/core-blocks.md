@@ -262,7 +262,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 
 ## Group
 
-Combine blocks into a group. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/group))
+Gather blocks in a layout container. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/group))
 
 -	**Name:** core/group
 -	**Category:** design
