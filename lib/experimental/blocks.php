@@ -35,7 +35,7 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			$comment_args['hierarchical'] = false;
 		}
 
-		if ( get_option( 'page_comments' ) === '1' ) {
+		if ( get_option( 'page_comments' ) === '1' || get_option( 'page_comments' ) === true ) {
 			$per_page     = get_option( 'comments_per_page' );
 			$default_page = get_option( 'default_comments_page' );
 			if ( $per_page > 0 ) {

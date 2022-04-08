@@ -18,7 +18,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();
 
-		update_option( 'page_comments', '1' );
+		update_option( 'page_comments', true );
 		update_option( 'comments_per_page', self::$per_page );
 		update_option( 'comment_order', 'ASC' );
 
@@ -45,7 +45,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 	}
 
 	function test_build_comment_query_vars_from_block_with_context_no_pagination() {
-		update_option( 'page_comments', '0' );
+		update_option( 'page_comments', false );
 		$parsed_blocks = parse_blocks(
 			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
 		);
@@ -69,7 +69,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 				'hierarchical'              => 'threaded',
 			)
 		);
-		update_option( 'page_comments', '1' );
+		update_option( 'page_comments', true );
 	}
 
 	function test_build_comment_query_vars_from_block_with_context() {
