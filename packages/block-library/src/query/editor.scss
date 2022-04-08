@@ -20,6 +20,7 @@
 }
 
 .block-editor-query-pattern__selection-modal .components-modal__content {
+	overflow: hidden;
 	padding: 0;
 	&::before {
 		margin-bottom: 0;

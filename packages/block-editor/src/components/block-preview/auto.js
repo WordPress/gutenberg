@@ -103,7 +103,10 @@ function AutoBlockPreview( {
 						// This is a catch-all max-height for patterns.
 						// See: https://github.com/WordPress/gutenberg/pull/38175.
 						maxHeight: MAX_HEIGHT,
-						minHeight: __experimentalMinHeight,
+						minHeight:
+							scale < 1 && __experimentalMinHeight
+								? __experimentalMinHeight / scale
+								: __experimentalMinHeight,
 					} }
 				>
 					{ contentResizeListener }
