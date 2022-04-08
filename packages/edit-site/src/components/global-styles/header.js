@@ -9,7 +9,7 @@ import {
 	__experimentalView as View,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
-import { chevronRight, chevronLeft, Icon } from '@wordpress/icons';
+import { chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,12 +22,7 @@ function ScreenHeader( { title, description } ) {
 			<HStack spacing={ 2 }>
 				<View>
 					<NavigationBackButton
-						icon={
-							<Icon
-								icon={ isRTL() ? chevronRight : chevronLeft }
-								variant="muted"
-							/>
-						}
+						icon={ isRTL() ? chevronRight : chevronLeft }
 						size="small"
 						aria-label={ __( 'Navigate to the previous view' ) }
 					/>

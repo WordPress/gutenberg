@@ -73,6 +73,11 @@ function BlockListAppender( {
 				'block-list-appender wp-block',
 				className
 			) }
+			// Needed in case the whole editor is content editable (for multi
+			// selection). It fixes an edge case where ArrowDown and ArrowRight
+			// should collapse the selection to the end of that selection and
+			// not into the appender.
+			contentEditable={ false }
 			// The appender exists to let you add the first Paragraph before
 			// any is inserted. To that end, this appender should visually be
 			// presented as a block. That means theme CSS should style it as if

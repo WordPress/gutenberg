@@ -15,6 +15,7 @@ import {
 	createNewPost,
 	clickButton,
 	openListView,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -63,9 +64,8 @@ describe( 'Gallery', () => {
 		// The Gallery needs to be selected from the List view panel due to the
 		// way that Image uploads take and lose focus.
 		await openListView();
-		const galleryListLink = await page.waitForXPath(
-			`//a[contains(text(), 'Gallery')]`
-		);
+
+		const galleryListLink = ( await getListViewBlocks( 'Gallery' ) )[ 0 ];
 		await galleryListLink.click();
 
 		await page.click( '.wp-block-gallery .blocks-gallery-caption' );
@@ -85,27 +85,39 @@ describe( 'Gallery', () => {
 			'.wp-block-gallery .wp-block-image'
 		);
 
+		// Check that the Image is unselected, in which case the figcaption won't be
+		// in the DOM - due the way that the Gallery block handles the upload the latest
+		// image gets selected in order to scroll to the position of it, as in large
+		// galleries the new upload may be off-canvas. After upload the image is unselected
+		// so if we don't check for that it may get unselected again by this flow after we
+		// have re-selected it to edit it.
+		await page.waitForFunction(
+			() => ! document.querySelector( '.wp-block-image figcaption' )
+		);
+
 		// The Image needs to be selected from the List view panel due to the
 		// way that Image uploads take and lose focus.
 		await openListView();
 
-		const galleryListViewItem = await page.waitForXPath(
-			`//a[contains(text(), 'Gallery')]`
+		// Due to collapsed state of ListView nodes Gallery must be expanded to reveal the child blocks.
+		// This xpath selects the anchor node for the block which has a child span which contains the text
+		// label of the block and then selects the expander span for that node.
+		const galleryExpander = await page.waitForXPath(
+			`//a[span[text()='Gallery']]/span[contains(@class, 'block-editor-list-view__expander')]`
 		);
-		await galleryListViewItem.click();
 
-		const imageListLink = await page.waitForXPath(
-			`//a[contains(text(), 'Image')]`
-		);
+		await galleryExpander.click();
+
+		const imageListLink = ( await getListViewBlocks( 'Image' ) )[ 0 ];
 		await imageListLink.click();
 
 		const captionElement = await figureElement.$(
 			'.block-editor-rich-text__editable'
 		);
 
+		await captionElement.click();
 		const caption = 'Tested caption';
 
-		await captionElement.click();
 		await page.keyboard.type( caption );
 
 		expect( await getEditedPostContent() ).toMatch(

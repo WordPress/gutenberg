@@ -23,11 +23,11 @@ import {
 } from '../components/colors';
 import useSetting from '../components/use-setting';
 import {
+	BORDER_SUPPORT_KEY,
 	hasBorderSupport,
 	removeBorderAttribute,
-	shouldSkipSerialization,
 } from './border';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 
 // Defining empty array here instead of inline avoids unnecessary re-renders of
 // color control.
@@ -200,7 +200,7 @@ function addAttributes( settings ) {
 function addSaveProps( props, blockType, attributes ) {
 	if (
 		! hasBorderSupport( blockType, 'color' ) ||
-		shouldSkipSerialization( blockType )
+		shouldSkipSerialization( blockType, BORDER_SUPPORT_KEY, 'color' )
 	) {
 		return props;
 	}
@@ -231,7 +231,7 @@ function addSaveProps( props, blockType, attributes ) {
 function addEditProps( settings ) {
 	if (
 		! hasBorderSupport( settings, 'color' ) ||
-		shouldSkipSerialization( settings )
+		shouldSkipSerialization( settings, BORDER_SUPPORT_KEY, 'color' )
 	) {
 		return settings;
 	}
@@ -266,7 +266,7 @@ export const withBorderColorPaletteStyles = createHigherOrderComponent(
 
 		if (
 			! hasBorderSupport( name, 'color' ) ||
-			shouldSkipSerialization( name )
+			shouldSkipSerialization( name, BORDER_SUPPORT_KEY, 'color' )
 		) {
 			return <BlockListBlock { ...props } />;
 		}

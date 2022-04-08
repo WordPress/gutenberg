@@ -21,7 +21,9 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 				value={ excerpt }
 			/>
 			<ExternalLink
-				href={ __( 'https://wordpress.org/support/article/excerpt/' ) }
+				href={ __(
+					'https://wordpress.org/support/article/settings-sidebar/#excerpt'
+				) }
 			>
 				{ __( 'Learn more about manual excerpts' ) }
 			</ExternalLink>

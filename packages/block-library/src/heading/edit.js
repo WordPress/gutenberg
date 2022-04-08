@@ -45,7 +45,7 @@ function HeadingEdit( {
 		const settings = select( blockEditorStore ).getSettings();
 
 		return {
-			canGenerateAnchors: !! settings.__experimentalGenerateAnchors,
+			canGenerateAnchors: !! settings.generateAnchors,
 		};
 	}, [] );
 

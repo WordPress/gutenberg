@@ -29,7 +29,7 @@ import { store as blockEditorStore } from '../../store';
  * useBlockDisplayTitle( 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1', 17 );
  * ```
  *
- * @param {string} clientId Client ID of block.
+ * @param {string}           clientId      Client ID of block.
  * @param {number|undefined} maximumLength The maximum length that the block title string may be before truncated.
  * @return {?string} Block title.
  */

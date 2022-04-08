@@ -5,89 +5,83 @@ import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
- * Returns an action object used in signalling that an active area should be changed.
- *
- * @param {string} itemType Type of item.
- * @param {string} scope    Item scope.
- * @param {string} item     Item identifier.
- *
- * @return {Object} Action object.
- */
-function setSingleEnableItem( itemType, scope, item ) {
-	return {
-		type: 'SET_SINGLE_ENABLE_ITEM',
-		itemType,
-		scope,
-		item,
-	};
-}
-
-/**
- * Returns an action object used in signalling that a complementary item should be enabled.
+ * Enable the complementary area.
  *
  * @param {string} scope Complementary area scope.
  * @param {string} area  Area identifier.
- *
- * @return {Object} Action object.
  */
-export function enableComplementaryArea( scope, area ) {
-	return setSingleEnableItem( 'complementaryArea', scope, area );
-}
+export const enableComplementaryArea = ( scope, area ) => ( { registry } ) => {
+	// Return early if there's no area.
+	if ( ! area ) {
+		return;
+	}
+
+	registry
+		.dispatch( preferencesStore )
+		.set( scope, 'complementaryArea', area );
+};
 
 /**
- * Returns an action object used in signalling that the complementary area of a given scope should be disabled.
+ * Disable the complementary area.
  *
  * @param {string} scope Complementary area scope.
- *
- * @return {Object} Action object.
  */
-export function disableComplementaryArea( scope ) {
-	return setSingleEnableItem( 'complementaryArea', scope, undefined );
-}
+export const disableComplementaryArea = ( scope ) => ( { registry } ) => {
+	registry
+		.dispatch( preferencesStore )
+		.set( scope, 'complementaryArea', null );
+};
 
 /**
- * Returns an action object to make an area enabled/disabled.
+ * Pins an item.
  *
- * @param {string}  itemType Type of item.
- * @param {string}  scope    Item scope.
- * @param {string}  item     Item identifier.
- * @param {boolean} isEnable Boolean indicating if an area should be pinned or not.
+ * @param {string} scope Item scope.
+ * @param {string} item  Item identifier.
  *
  * @return {Object} Action object.
  */
-function setMultipleEnableItem( itemType, scope, item, isEnable ) {
-	return {
-		type: 'SET_MULTIPLE_ENABLE_ITEM',
-		itemType,
-		scope,
-		item,
-		isEnable,
-	};
-}
+export const pinItem = ( scope, item ) => ( { registry } ) => {
+	// Return early if there's no item.
+	if ( ! item ) {
+		return;
+	}
+
+	const pinnedItems = registry
+		.select( preferencesStore )
+		.get( scope, 'pinnedItems' );
+
+	// The item is already pinned, there's nothing to do.
+	if ( pinnedItems?.[ item ] === true ) {
+		return;
+	}
+
+	registry.dispatch( preferencesStore ).set( scope, 'pinnedItems', {
+		...pinnedItems,
+		[ item ]: true,
+	} );
+};
 
 /**
- * Returns an action object used in signalling that an item should be pinned.
+ * Unpins an item.
  *
- * @param {string} scope  Item scope.
- * @param {string} itemId Item identifier.
- *
- * @return {Object} Action object.
+ * @param {string} scope Item scope.
+ * @param {string} item  Item identifier.
  */
-export function pinItem( scope, itemId ) {
-	return setMultipleEnableItem( 'pinnedItems', scope, itemId, true );
-}
+export const unpinItem = ( scope, item ) => ( { registry } ) => {
+	// Return early if there's no item.
+	if ( ! item ) {
+		return;
+	}
 
-/**
- * Returns an action object used in signalling that an item should be unpinned.
- *
- * @param {string} scope  Item scope.
- * @param {string} itemId Item identifier.
- *
- * @return {Object} Action object.
- */
-export function unpinItem( scope, itemId ) {
-	return setMultipleEnableItem( 'pinnedItems', scope, itemId, false );
-}
+	const pinnedItems = registry
+		.select( preferencesStore )
+		.get( scope, 'pinnedItems' );
+
+	registry.dispatch( preferencesStore ).set( scope, 'pinnedItems', {
+		...pinnedItems,
+		[ item ]: false,
+	} );
+};
 
 /**
  * Returns an action object used in signalling that a feature should be toggled.
