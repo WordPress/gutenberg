@@ -34,6 +34,13 @@ interface BaseProps {
 	 * @default false
 	 */
 	hideLabelFromVision?: boolean;
+	/**
+	 * Whether the component should be in a focused state.
+	 * Used to coordinate focus states when the actual focused element and the component handling
+	 * visual focus are separate.
+	 *
+	 * @default false
+	 */
 	isFocused: boolean;
 	/**
 	 * The position of the label.
