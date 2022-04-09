@@ -215,7 +215,7 @@ describe( 'UnitControl', () => {
 			expect( input.value ).toBe( '300' );
 			expect( state ).toBe( 50 );
 
-			user.keyboard( '{Escape}' );
+			await user.keyboard( '{Escape}' );
 
 			expect( input.value ).toBe( '50' );
 			expect( state ).toBe( 50 );
@@ -408,7 +408,7 @@ describe( 'UnitControl', () => {
 		it( 'should update unit value when a new raw value is passed', async () => {
 			const { user } = render( <ControlledSyncUnits /> );
 
-			const [ inputA, inputB ] = screen.getAllByRole( 'spinbutton' );
+			const [ inputA, inputB ] = screen.getAllByRole( 'textbox' );
 			const [ selectA, selectB ] = screen.getAllByRole( 'combobox' );
 
 			const [ remOptionA ] = screen.getAllByRole( 'option', {
@@ -526,8 +526,8 @@ describe( 'UnitControl', () => {
 		} );
 	} );
 
-	describe( 'Unit switching convenience', () => {
-		it( 'should focus unit select when a charater matches the first of one of the units', async () => {
+	describe( 'Unit switching by typed or pasted input', () => {
+		it( 'should focus unit select when a character matches the first of one of the units', async () => {
 			const { user } = render( <UnitControl value={ '10%' } /> );
 
 			const input = getInput();
@@ -535,6 +535,25 @@ describe( 'UnitControl', () => {
 			await user.type( input, '55 e' );
 
 			expect( document.activeElement ).toBe( getSelect() );
+		} );
+
+		it( 'should update the unit when a pasted value contains a valid unit', async () => {
+			const { user } = render( <UnitControl /> );
+
+			await user.click( getInput() );
+			await user.paste( '1rem' );
+
+			expect( getSelect().value ).toBe( 'rem' );
+		} );
+
+		it( 'should forward the paste event', async () => {
+			const spyPaste = jest.fn();
+			const { user } = render( <UnitControl onPaste={ spyPaste } /> );
+
+			await user.click( getInput() );
+			await user.paste( '1rem' );
+
+			expect( spyPaste ).toHaveBeenCalled();
 		} );
 	} );
 } );

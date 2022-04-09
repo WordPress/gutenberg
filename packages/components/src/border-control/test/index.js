@@ -59,7 +59,7 @@ const clickButton = ( name ) => {
 };
 
 const setWidthInput = ( value ) => {
-	const widthInput = screen.getByRole( 'spinbutton' );
+	const widthInput = screen.getByRole( 'textbox' );
 	widthInput.focus();
 	fireEvent.change( widthInput, { target: { value } } );
 };
@@ -73,7 +73,7 @@ describe( 'BorderControl', () => {
 
 			const label = screen.getByText( props.label );
 			const colorButton = screen.getByLabelText( toggleLabelRegex );
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = screen.getByRole( 'textbox' );
 			const unitSelect = screen.getByRole( 'combobox' );
 			const slider = screen.queryByRole( 'slider' );
 
@@ -106,7 +106,7 @@ describe( 'BorderControl', () => {
 
 		it( 'should render placeholder in UnitControl', () => {
 			renderBorderControl( { placeholder: 'Mixed' } );
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = screen.getByRole( 'textbox' );
 
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
 		} );
@@ -271,7 +271,7 @@ describe( 'BorderControl', () => {
 			} );
 
 			rerenderBorderControl( rerender, { withSlider: true } );
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = screen.getByRole( 'textbox' );
 
 			expect( widthInput.value ).toEqual( '5' );
 		} );
