@@ -71,8 +71,8 @@ function PostTitle( _props, forwardedRef ) {
 
 	useImperativeHandle( forwardedRef, () => ( {
 		focusTitle: () => {
-			if ( ref.current && isCleanNewPost ) {
-				ref.current.focus();
+			if ( isCleanNewPost ) {
+				ref?.current?.focus();
 			}
 		},
 	} ) );

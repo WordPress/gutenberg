@@ -197,7 +197,7 @@ export default function VisualEditor( { styles } ) {
 		if ( isActive ) {
 			return;
 		}
-		titleRef.current.focusTitle();
+		titleRef?.current?.focusTitle();
 	}, [ isActive ] );
 
 	return (
