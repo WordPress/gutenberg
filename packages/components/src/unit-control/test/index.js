@@ -526,8 +526,8 @@ describe( 'UnitControl', () => {
 		} );
 	} );
 
-	describe( 'Unit switching convenience', () => {
-		it( 'should focus unit select when a charater matches the first of one of the units', async () => {
+	describe( 'Unit switching by typed or pasted input', () => {
+		it( 'should focus unit select when a character matches the first of one of the units', async () => {
 			const { user } = render( <UnitControl value={ '10%' } /> );
 
 			const input = getInput();
@@ -535,6 +535,25 @@ describe( 'UnitControl', () => {
 			await user.type( input, '55 e' );
 
 			expect( document.activeElement ).toBe( getSelect() );
+		} );
+
+		it( 'should update the unit when a pasted value contains a valid unit', async () => {
+			const { user } = render( <UnitControl /> );
+
+			await user.click( getInput() );
+			await user.paste( '1rem' );
+
+			expect( getSelect().value ).toBe( 'rem' );
+		} );
+
+		it( 'should forward the paste event', async () => {
+			const spyPaste = jest.fn();
+			const { user } = render( <UnitControl onPaste={ spyPaste } /> );
+
+			await user.click( getInput() );
+			await user.paste( '1rem' );
+
+			expect( spyPaste ).toHaveBeenCalled();
 		} );
 	} );
 } );
