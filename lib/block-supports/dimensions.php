@@ -25,7 +25,7 @@ function gutenberg_register_dimensions_support( $block_type ) {
 		return;
 	}
 
-	$has_dimensions_support = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions' ), false );
+	$has_dimensions_support = block_has_support( $block_type, array( '__experimentalDimensions' ), false );
 	// Future block supports such as height & width will be added here.
 
 	if ( $has_dimensions_support ) {

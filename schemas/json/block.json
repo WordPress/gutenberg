@@ -295,6 +295,11 @@
 					"description": "A block may want to disable the ability of being converted into a reusable block. By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.",
 					"default": true
 				},
+				"lock": {
+					"type": "boolean",
+					"description": "A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block 'Options' dropdown by default. To disable this behavior, set lock to false.",
+					"default": true
+				},
 				"spacing": {
 					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if the theme declares support.\n\nWhen the block declares support for a specific spacing property, the attributes definition is extended to include the style attribute.",
@@ -421,8 +426,18 @@
 			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site."
 		},
 		"viewScript": {
-			"type": "string",
-			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site."
+			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"editorStyle": {
 			"description": "Block type editor style definition. It will only be enqueued in the context of the editor.",

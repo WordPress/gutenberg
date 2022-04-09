@@ -216,22 +216,30 @@ export const __unstableGetClientIdsTree = createSelector(
 );
 
 /**
- * Returns an array containing the clientIds of all descendants of the
- * blocks given. Ids are returned in the same order that they appear in
- * the editor.
+ * Returns an array containing the clientIds of all descendants of the blocks
+ * given. Returned ids are ordered first by the order of the ids given, then
+ * by the order that they appear in the editor.
  *
  * @param {Object} state     Global application state.
  * @param {Array}  clientIds Array of blocks to inspect.
  *
  * @return {Array} ids of descendants.
  */
-export const getClientIdsOfDescendants = ( state, clientIds ) =>
-	clientIds.flatMap( ( clientId ) =>
-		getBlockOrder( state, clientId ).flatMap( ( descendantId ) => [
-			descendantId,
-			...getClientIdsOfDescendants( state, [ descendantId ] ),
-		] )
-	);
+export const getClientIdsOfDescendants = createSelector(
+	( state, clientIds ) => {
+		const collectedIds = [];
+		for ( const givenId of clientIds ) {
+			for ( const descendantId of getBlockOrder( state, givenId ) ) {
+				collectedIds.push(
+					descendantId,
+					...getClientIdsOfDescendants( state, [ descendantId ] )
+				);
+			}
+		}
+		return collectedIds;
+	},
+	( state ) => [ state.blocks.order ]
+);
 
 /**
  * Returns an array containing the clientIds of the top-level blocks and
@@ -243,11 +251,16 @@ export const getClientIdsOfDescendants = ( state, clientIds ) =>
  * @return {Array} ids of top-level and descendant blocks.
  */
 export const getClientIdsWithDescendants = createSelector(
-	( state ) =>
-		getBlockOrder( state ).flatMap( ( topLevelId ) => [
-			topLevelId,
-			...getClientIdsOfDescendants( state, [ topLevelId ] ),
-		] ),
+	( state ) => {
+		const collectedIds = [];
+		for ( const topLevelId of getBlockOrder( state ) ) {
+			collectedIds.push(
+				topLevelId,
+				...getClientIdsOfDescendants( state, [ topLevelId ] )
+			);
+		}
+		return collectedIds;
+	},
 	( state ) => [ state.blocks.order ]
 );
 
@@ -1565,12 +1578,12 @@ export function canMoveBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean} Whether a given block type can be locked/unlocked.
  */
 export function canLockBlockType( state, nameOrType ) {
-	if ( ! hasBlockSupport( nameOrType, '__experimentalLock', true ) ) {
+	if ( ! hasBlockSupport( nameOrType, 'lock', true ) ) {
 		return false;
 	}
 
 	// Use block editor settings as the default value.
-	return !! state.settings?.__experimentalCanLockBlocks;
+	return !! state.settings?.canLockBlocks;
 }
 
 /**

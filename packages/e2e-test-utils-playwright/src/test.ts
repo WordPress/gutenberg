@@ -99,6 +99,7 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 const test = base.extend<
 	{
 		pageUtils: PageUtils;
+		snapshotSuffix: void;
 	},
 	{
 		requestUtils: RequestUtils;
@@ -135,6 +136,16 @@ const test = base.extend<
 			await use( requestUtils );
 		},
 		{ scope: 'worker' },
+	],
+	// A work-around automatic fixture to remove the default snapshot suffix.
+	// See https://github.com/microsoft/playwright/issues/11134
+	snapshotSuffix: [
+		async ( {}, use, testInfo ) => {
+			testInfo.snapshotSuffix = '';
+
+			await use();
+		},
+		{ auto: true },
 	],
 } );
 

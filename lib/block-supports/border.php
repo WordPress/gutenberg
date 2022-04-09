@@ -13,7 +13,7 @@
  */
 function gutenberg_register_border_support( $block_type ) {
 	// Determine if any border related features are supported.
-	$has_border_support       = gutenberg_block_has_support( $block_type, array( '__experimentalBorder' ) );
+	$has_border_support       = block_has_support( $block_type, array( '__experimentalBorder' ) );
 	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
 
 	// Setup attributes and styles within that if needed.
@@ -161,7 +161,7 @@ function gutenberg_has_border_feature_support( $block_type, $feature, $default =
 
 	// Check if the specific feature has been opted into individually
 	// via nested flag under `__experimentalBorder`.
-	return gutenberg_block_has_support( $block_type, array( '__experimentalBorder', $feature ), $default );
+	return block_has_support( $block_type, array( '__experimentalBorder', $feature ), $default );
 }
 
 // Register the block support.

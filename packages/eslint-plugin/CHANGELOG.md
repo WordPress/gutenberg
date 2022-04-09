@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.0.0 (2022-04-08)
+
 ### Breaking Changes
 
 -   Revert the removal of the automatic environment detection of `test-unit` and `test-e2e` for the `recommended` preset. However, They will still be disabled if `@playwright/test` is installed in the project.
