@@ -184,10 +184,9 @@ export class Inserter extends Component {
 		} = this.props;
 		const { shouldReplaceBlock } = this.state;
 
-		// It's necessary to manually toggle 'isDefaultView' off to prevent
-		// a 'flash' of the 'expanded' default button displaying when a
-		// replaceable block is deselected.
 		if ( shouldReplaceBlock ) {
+			// Toggle 'isDefaultView' off to prevent the 'expanded' default button style
+			// from flashing when a replaceable block is deselected.
 			toggleFeature( 'isDefaultView' );
 		}
 
