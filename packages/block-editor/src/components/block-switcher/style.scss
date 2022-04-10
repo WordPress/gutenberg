@@ -46,7 +46,8 @@
 }
 
 .components-button.block-editor-block-switcher__no-switcher-icon {
-	width: $block-toolbar-height;
+	display: flex;
+	padding: 6px 12px !important;
 
 	.block-editor-blocks-icon {
 		margin-right: auto;
@@ -77,7 +78,6 @@
 		margin: 0 auto;
 		display: flex;
 		align-items: center;
-		min-width: 100%;
 	}
 
 	// Position the focus style correctly.
@@ -172,7 +172,7 @@
 // The block switcher in the contextual toolbar should be bigger.
 .block-editor-block-contextual-toolbar {
 	.components-button.block-editor-block-switcher__no-switcher-icon {
-		width: $grid-unit-60;
+		min-width: $button-size;
 	}
 
 	.components-button.block-editor-block-switcher__no-switcher-icon,
