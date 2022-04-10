@@ -22,6 +22,7 @@ import {
 	insertBefore,
 } from '@wordpress/icons';
 import { setBlockTypeImpressions } from '@wordpress/react-native-bridge';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -175,7 +176,20 @@ export class Inserter extends Component {
 	}
 
 	onToggle( isOpen ) {
-		const { blockTypeImpressions, onToggle, updateSettings } = this.props;
+		const {
+			blockTypeImpressions,
+			onToggle,
+			updateSettings,
+			toggleFeature,
+		} = this.props;
+		const { shouldReplaceBlock } = this.state;
+
+		// It's necessary to manually toggle 'isDefaultView' off to prevent
+		// a 'flash' of the 'expanded' default button displaying when a
+		// replaceable block is deselected.
+		if ( shouldReplaceBlock ) {
+			toggleFeature( 'isDefaultView' );
+		}
 
 		if ( ! isOpen ) {
 			const impressionsRemain = Object.values(
@@ -358,7 +372,8 @@ export class Inserter extends Component {
 export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { updateSettings } = dispatch( blockEditorStore );
-		return { updateSettings };
+		const { toggleFeature } = dispatch( editPostStore );
+		return { updateSettings, toggleFeature };
 	} ),
 	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
 		const {
