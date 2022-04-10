@@ -151,8 +151,16 @@ export default {
 					}
 					${ appendSelectors( selector, '> .alignfull' ) } {
 						max-width: none;
-						margin-left: calc( -1 * ${ padding?.left || 0 } ) !important;
-						margin-right: calc( -1 * ${ padding?.right || 0 } ) !important;
+						${
+							padding?.left
+								? `margin-left: calc( -1 * ${ padding?.left } ) !important;`
+								: ''
+						}
+						${
+							padding?.right
+								? `margin-left: calc( -1 * ${ padding?.right } ) !important;`
+								: ''
+						}
 					}
 				`
 				: '';
