@@ -9,12 +9,12 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 
 /**
- * Return details about the block lock state.
+ * Return details about the block lock status.
  *
  * @param {string}  clientId  The block client Id.
- * @param {boolean} checkRoot Optional check for root client ID of block list.
+ * @param {boolean} checkRoot Optional. Use root client ID when checking lock status.
  *
- * @return {Object} Block lock state
+ * @return {Object} Block lock status
  */
 export default function useBlockLock( clientId, checkRoot = false ) {
 	return useSelect(

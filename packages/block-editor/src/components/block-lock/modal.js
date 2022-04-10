@@ -13,32 +13,18 @@ import {
 } from '@wordpress/components';
 import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
-	const { canMove, canRemove } = useSelect(
-		( select ) => {
-			const {
-				canMoveBlock,
-				canRemoveBlock,
-				getBlockRootClientId,
-			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
-
-			return {
-				canMove: canMoveBlock( clientId, rootClientId ),
-				canRemove: canRemoveBlock( clientId, rootClientId ),
-			};
-		},
-		[ clientId ]
-	);
+	const { canMove, canRemove } = useBlockLock( clientId, true );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const instanceId = useInstanceId(
