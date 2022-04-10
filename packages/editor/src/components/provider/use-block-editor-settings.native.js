@@ -13,7 +13,10 @@ import { store as editorStore } from '../../store';
 
 function useNativeBlockEditorSettings( settings, hasTemplate ) {
 	const capabilities = settings.capabilities ?? {};
-	const editorSettings = useBlockEditorSettings( settings, hasTemplate );
+	const editorSettings = {
+		...useBlockEditorSettings( settings, hasTemplate ),
+		isDefaultView: settings.isDefaultView,
+	};
 
 	const supportReusableBlock = capabilities.reusableBlock === true;
 	const { reusableBlocks } = useSelect(

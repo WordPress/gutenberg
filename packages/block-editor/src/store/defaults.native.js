@@ -21,6 +21,7 @@ const SETTINGS_DEFAULTS = {
 			background: true,
 		},
 	},
+	isDefaultView: true,
 };
 
 export { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS };

@@ -9,7 +9,7 @@ import { I18nManager } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { EditorProvider } from '@wordpress/editor';
+import { EditorProvider, store as editorStore } from '@wordpress/editor';
 import { parse, serialize, store as blocksStore } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -19,6 +19,7 @@ import {
 } from '@wordpress/react-native-bridge';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -52,13 +53,15 @@ class Editor extends Component {
 		hasFixedToolbar,
 		focusMode,
 		hiddenBlockTypes,
-		blockTypes
+		blockTypes,
+		isDefaultView
 	) {
 		settings = {
 			...settings,
 			isRTL: I18nManager.isRTL,
 			hasFixedToolbar,
 			focusMode,
+			isDefaultView,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -138,6 +141,7 @@ class Editor extends Component {
 			postType,
 			featuredImageId,
 			initialHtml,
+			isDefaultView,
 			...props
 		} = this.props;
 
@@ -146,7 +150,8 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			hiddenBlockTypes,
-			blockTypes
+			blockTypes,
+			isDefaultView
 		);
 
 		const normalizedPost = post || {
@@ -184,6 +189,8 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
+		const { getSelectedBlockClientId } = select( blockEditorStore );
+		const { isPostTitleSelected } = select( editorStore );
 		const {
 			isFeatureActive,
 			getEditorMode,
@@ -191,6 +198,8 @@ export default compose( [
 			getHiddenBlockTypes,
 		} = select( editPostStore );
 		const { getBlockTypes } = select( blocksStore );
+		const isAnyBlockSelected =
+			getSelectedBlockClientId() || isPostTitleSelected();
 
 		return {
 			hasFixedToolbar:
@@ -200,6 +209,8 @@ export default compose( [
 			mode: getEditorMode(),
 			hiddenBlockTypes: getHiddenBlockTypes(),
 			blockTypes: getBlockTypes(),
+			isDefaultView:
+				isFeatureActive( 'isDefaultView' ) && ! isAnyBlockSelected,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

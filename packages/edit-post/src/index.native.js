@@ -31,6 +31,7 @@ export function initializeEditor( id, postType, postId ) {
 		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
 		welcomeGuide: true,
+		isDefaultView: true,
 	} );
 
 	return <Editor postId={ postId } postType={ postType } />;
