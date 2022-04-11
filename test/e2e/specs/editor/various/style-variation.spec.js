@@ -11,10 +11,8 @@ test.describe( 'adding blocks', () => {
 		await pageUtils.createNewPost();
 
 		// Inserting a quote block
-		await pageUtils.insertBlock( {
-			name: 'core/quote',
-			attributes: { content: 'Quote content' },
-		} );
+		await pageUtils.insertBlock( { name: 'core/quote' } );
+		await page.keyboard.type( 'Quote content' );
 
 		await pageUtils.clickBlockToolbarButton( 'Quote' );
 
