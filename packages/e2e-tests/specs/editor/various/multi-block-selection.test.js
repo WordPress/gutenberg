@@ -655,12 +655,15 @@ describe( 'Multi-block selection', () => {
 		// Select two columns.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		// Navigate to appender.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		// Select a paragraph.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -934,6 +937,7 @@ describe( 'Multi-block selection', () => {
 	it( 'should select separator (single element block)', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/hr' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );

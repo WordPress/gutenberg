@@ -42,7 +42,7 @@ export default function PreviewOptions( {
 			toggleProps={ toggleProps }
 			icon={ null }
 		>
-			{ () => (
+			{ ( renderContentProps ) => (
 				<>
 					<MenuGroup>
 						<MenuItem
@@ -67,7 +67,7 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
-					{ children }
+					{ children( renderContentProps ) }
 				</>
 			) }
 		</DropdownMenu>

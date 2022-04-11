@@ -143,6 +143,7 @@ describe( 'Preview', () => {
 		// Pressing preview without changes should bring same preview window to
 		// front and reload, but should not show interstitial.
 		await editorPage.bringToFront();
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 		previewTitle = await previewPage.$eval(
 			'.entry-title',
@@ -189,6 +190,7 @@ describe( 'Preview', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/7561
 		await editorPage.bringToFront();
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -298,10 +300,12 @@ describe( 'Preview', () => {
 		await editorPage.waitForSelector( '.editor-post-switch-to-draft' );
 		await editorPage.click( '.editor-post-switch-to-draft' );
 		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// Change the title.
 		await editorPage.type( '[aria-label="Add title"]', 'Draft ' );
 		await editorPage.keyboard.press( 'Tab' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// Open the preview page.
 		await waitForPreviewDropdownOpen( editorPage );

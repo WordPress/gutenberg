@@ -29,22 +29,25 @@ const MyPreviewOptions = () => (
 		deviceType={ deviceType }
 		setDeviceType={ setPreviewDeviceType }
 	>
-		<MenuGroup>
-			<div className="edit-post-header-preview__grouping-external">
-				<PostPreviewButton
-					className={ 'edit-post-header-preview__button-external' }
-					role="menuitem"
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-					textContent={
-						<>
-							{ __( 'Preview in new tab' ) }
-							<Icon icon={ external } />
-						</>
-					}
-				/>
-			</div>
-		</MenuGroup>
+		{ ( { onClose } ) => (
+			<MenuGroup>
+				<div className="edit-post-header-preview__grouping-external">
+					<PostPreviewButton
+						className={ 'edit-post-header-preview__button-external' }
+						role="menuitem"
+						forceIsAutosaveable={ hasActiveMetaboxes }
+						forcePreviewLink={ isSaving ? null : undefined }
+						textContent={
+							<>
+								{ __( 'Preview in new tab' ) }
+								<Icon icon={ external } />
+							</>
+						}
+						onPreview={ onClose }
+					/>
+				</div>
+			</MenuGroup>
+		) }
 	</PreviewOptions>
 );
 ```

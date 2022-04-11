@@ -201,6 +201,7 @@ describe( 'List view', () => {
 		);
 
 		await headingBlock.click();
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// Select all two blocks.
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );

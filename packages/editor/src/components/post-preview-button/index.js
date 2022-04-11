@@ -7,11 +7,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
 import { Button, VisuallyHidden } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { ifCondition, compose } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -19,101 +17,107 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-export class PostPreviewButton extends Component {
-	constructor() {
-		super( ...arguments );
+function PostPreviewButton( {
+	className,
+	textContent,
+	forceIsAutosaveable,
+	forcePreviewLink,
+	role,
+	onPreview,
+} ) {
+	const {
+		postId,
+		currentPostLink,
+		previewLink,
+		isSaveable,
+		isViewable,
+	} = useSelect(
+		( select ) => {
+			const {
+				getCurrentPostId,
+				getCurrentPostAttribute,
+				getEditedPostAttribute,
+				isEditedPostSaveable,
+				getEditedPostPreviewLink,
+			} = select( editorStore );
+			const { getPostType } = select( coreStore );
 
-		this.openPreviewWindow = this.openPreviewWindow.bind( this );
+			const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
+			return {
+				postId: getCurrentPostId(),
+				currentPostLink: getCurrentPostAttribute( 'link' ),
+				previewLink:
+					forcePreviewLink !== undefined
+						? forcePreviewLink
+						: getEditedPostPreviewLink(),
+				isSaveable: isEditedPostSaveable(),
+				isViewable: get( postType, [ 'viewable' ], false ),
+			};
+		},
+		[ forcePreviewLink ]
+	);
+	const targetId = `wp-preview-${ postId }`;
+	const { __unstableTriggerExternalPreview } = useDispatch( editorStore );
+
+	if ( ! isViewable ) {
+		return null;
 	}
 
-	getWindowTarget() {
-		const { postId } = this.props;
-		return `wp-preview-${ postId }`;
-	}
-
-	openPreviewWindow( event ) {
+	const openPreviewWindow = ( event ) => {
 		// Our Preview button has its 'href' and 'target' set correctly for a11y
 		// purposes. Unfortunately, though, we can't rely on the default 'click'
 		// handler since sometimes it incorrectly opens a new tab instead of reusing
 		// the existing one.
 		// https://github.com/WordPress/gutenberg/pull/8330
 		event.preventDefault();
-		this.props.triggerExternalPreview( {
-			targetId: this.getWindowTarget(),
-			forceAutosave: this.props.forceIsAutosaveable,
-			forcePreviewLink: this.props.forcePreviewLink,
+		__unstableTriggerExternalPreview( {
+			targetId,
+			forcePreviewLink,
+			forceAutosave: forceIsAutosaveable,
 		} );
-	}
+		if ( onPreview ) {
+			onPreview();
+		}
+	};
 
-	render() {
-		const { previewLink, currentPostLink, isSaveable, role } = this.props;
+	// Link to the `?preview=true` URL if we have it, since this lets us see
+	// changes that were autosaved since the post was last published. Otherwise,
+	// just link to the post's URL.
+	const href = previewLink || currentPostLink;
 
-		// Link to the `?preview=true` URL if we have it, since this lets us see
-		// changes that were autosaved since the post was last published. Otherwise,
-		// just link to the post's URL.
-		const href = previewLink || currentPostLink;
+	const classNames = classnames(
+		{
+			'editor-post-preview': ! className,
+		},
+		className
+	);
 
-		const classNames = classnames(
-			{
-				'editor-post-preview': ! this.props.className,
-			},
-			this.props.className
-		);
-
-		return (
-			<Button
-				variant={ ! this.props.className ? 'tertiary' : undefined }
-				className={ classNames }
-				href={ href }
-				target={ this.getWindowTarget() }
-				disabled={ ! isSaveable }
-				onClick={ this.openPreviewWindow }
-				role={ role }
-			>
-				{ this.props.textContent ? (
-					this.props.textContent
-				) : (
-					<>
-						{ _x( 'Preview', 'imperative verb' ) }
-						<VisuallyHidden as="span">
-							{
-								/* translators: accessibility text */
-								__( '(opens in a new tab)' )
-							}
-						</VisuallyHidden>
-					</>
-				) }
-			</Button>
-		);
-	}
+	return (
+		<Button
+			variant={ ! className ? 'tertiary' : undefined }
+			className={ classNames }
+			href={ href }
+			target={ targetId }
+			disabled={ ! isSaveable }
+			onClick={ openPreviewWindow }
+			role={ role }
+		>
+			{ !! textContent ? (
+				textContent
+			) : (
+				<>
+					{ _x( 'Preview', 'imperative verb' ) }
+					<VisuallyHidden as="span">
+						{
+							/* translators: accessibility text */
+							__( '(opens in a new tab)' )
+						}
+					</VisuallyHidden>
+				</>
+			) }
+		</Button>
+	);
 }
 
-export default compose( [
-	withSelect( ( select, { forcePreviewLink } ) => {
-		const {
-			getCurrentPostId,
-			getCurrentPostAttribute,
-			getEditedPostAttribute,
-			isEditedPostSaveable,
-			getEditedPostPreviewLink,
-		} = select( editorStore );
-		const { getPostType } = select( coreStore );
-
-		const previewLink = getEditedPostPreviewLink();
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-
-		return {
-			postId: getCurrentPostId(),
-			currentPostLink: getCurrentPostAttribute( 'link' ),
-			previewLink:
-				forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
-			isSaveable: isEditedPostSaveable(),
-			isViewable: get( postType, [ 'viewable' ], false ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		triggerExternalPreview: dispatch( editorStore )
-			.__unstableTriggerExternalPreview,
-	} ) ),
-	ifCondition( ( { isViewable } ) => isViewable ),
-] )( PostPreviewButton );
+export default PostPreviewButton;
