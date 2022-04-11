@@ -54,7 +54,7 @@ function gutenberg_get_layout_style( $selector, $layout, $padding, $has_block_ga
 		$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
-		if ( $content_size || $wide_size ) {
+		if ( $padding ) {
 			$style = "$selector {";
 			// Using important here to override the inline padding that could be potentially
 			// applied using the custom padding control before the layout inheritance is applied.
@@ -73,7 +73,7 @@ function gutenberg_get_layout_style( $selector, $layout, $padding, $has_block_ga
 			$style .= '}';
 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull {";
+			$style .= "$selector > .alignfull {";
 			$style .= 'max-width: none;';
 			$style .= isset( $padding['left'] ) ? sprintf( 'margin-left: calc( -1 * %s ) !important;', $padding['left'] ) : '';
 			$style .= isset( $padding['right'] ) ? sprintf( 'margin-right: calc( -1 * %s ) !important;', $padding['right'] ) : '';
