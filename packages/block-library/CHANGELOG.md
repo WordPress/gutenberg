@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.2.0 (2022-03-23)
+
 ### Bug Fix
 
 -   Table block: Fix deprecation eligibility to prevent loss of named (color palette) background color ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).

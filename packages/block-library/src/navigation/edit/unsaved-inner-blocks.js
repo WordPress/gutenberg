@@ -10,7 +10,7 @@ import { useInnerBlocksProps } from '@wordpress/block-editor';
 import { Disabled, Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,6 +25,22 @@ const DRAFT_MENU_PARAMS = [
 	{ status: 'draft', per_page: -1 },
 ];
 
+const DEFAULT_BLOCK = {
+	name: 'core/navigation-link',
+};
+
+const ALLOWED_BLOCKS = [
+	'core/navigation-link',
+	'core/search',
+	'core/social-links',
+	'core/page-list',
+	'core/spacer',
+	'core/home-link',
+	'core/site-title',
+	'core/site-logo',
+	'core/navigation-submenu',
+];
+
 export default function UnsavedInnerBlocks( {
 	blockProps,
 	blocks,
@@ -33,6 +49,33 @@ export default function UnsavedInnerBlocks( {
 	onSave,
 	hasSelection,
 } ) {
+	const originalBlocks = useRef();
+
+	useEffect( () => {
+		// Initially store the uncontrolled inner blocks for
+		// dirty state comparison.
+		if ( ! originalBlocks?.current ) {
+			originalBlocks.current = blocks;
+		}
+	}, [ blocks ] );
+
+	// If the current inner blocks object is different in any way
+	// from the original inner blocks from the post content then the
+	// user has made changes to the inner blocks. At this point the inner
+	// blocks can be considered "dirty".
+	const innerBlocksAreDirty = blocks !== originalBlocks.current;
+
+	const shouldDirectInsert = useMemo(
+		() =>
+			blocks.every(
+				( { name } ) =>
+					name === 'core/navigation-link' ||
+					name === 'core/navigation-submenu' ||
+					name === 'core/page-list'
+			),
+		[ blocks ]
+	);
+
 	// The block will be disabled in a block preview, use this as a way of
 	// avoiding the side-effects of this component for block previews.
 	const isDisabled = useContext( Disabled.Context );
@@ -40,6 +83,9 @@ export default function UnsavedInnerBlocks( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: hasSelection ? undefined : false,
+		allowedBlocks: ALLOWED_BLOCKS,
+		__experimentalDefaultBlock: DEFAULT_BLOCK,
+		__experimentalDirectInsert: shouldDirectInsert,
 	} );
 
 	const {
@@ -97,7 +143,8 @@ export default function UnsavedInnerBlocks( {
 			savingLock.current ||
 			! hasResolvedDraftNavigationMenus ||
 			! hasResolvedNavigationMenus ||
-			! hasSelection
+			! hasSelection ||
+			! innerBlocksAreDirty
 		) {
 			return;
 		}
@@ -118,19 +165,21 @@ export default function UnsavedInnerBlocks( {
 		blocks,
 	] );
 
+	const Wrapper = isSaving ? Disabled : 'div';
+
 	return (
-		<div className="wp-block-navigation__unsaved-changes">
-			<Disabled
+		<Wrapper className="wp-block-navigation__unsaved-changes">
+			<div
 				className={ classnames(
 					'wp-block-navigation__unsaved-changes-overlay',
 					{
-						'is-saving': hasSelection,
+						'is-saving': isSaving,
 					}
 				) }
 			>
 				<div { ...innerBlocksProps } />
-			</Disabled>
-			{ hasSelection && <Spinner /> }
-		</div>
+			</div>
+			{ isSaving && <Spinner /> }
+		</Wrapper>
 	);
 }

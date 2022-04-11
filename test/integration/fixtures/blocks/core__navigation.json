@@ -6,7 +6,8 @@
 			"showSubmenuIcon": true,
 			"openSubmenusOnClick": false,
 			"overlayMenu": "mobile",
-			"hasIcon": true
+			"hasIcon": true,
+			"maxNestingLevel": 5
 		},
 		"innerBlocks": []
 	}

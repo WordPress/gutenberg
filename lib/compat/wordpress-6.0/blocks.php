@@ -79,14 +79,14 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 			if ( ! empty( $block->context['query']['categoryIds'] ) ) {
 				$tax_query[] = array(
 					'taxonomy'         => 'category',
-					'terms'            => $block->context['query']['categoryIds'],
+					'terms'            => array_filter( array_map( 'intval', $block->context['query']['categoryIds'] ) ),
 					'include_children' => false,
 				);
 			}
 			if ( ! empty( $block->context['query']['tagIds'] ) ) {
 				$tax_query[] = array(
 					'taxonomy'         => 'post_tag',
-					'terms'            => $block->context['query']['tagIds'],
+					'terms'            => array_filter( array_map( 'intval', $block->context['query']['tagIds'] ) ),
 					'include_children' => false,
 				);
 			}
@@ -95,13 +95,10 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 		if ( ! empty( $block->context['query']['taxQuery'] ) ) {
 			$query['tax_query'] = array();
 			foreach ( $block->context['query']['taxQuery'] as $taxonomy => $terms ) {
-				if ( ! empty( $terms ) ) {
-					$term_ids = array_map( 'intval', $terms );
-					$term_ids = array_filter( $term_ids );
-
+				if ( is_taxonomy_viewable( $taxonomy ) && ! empty( $terms ) ) {
 					$query['tax_query'][] = array(
 						'taxonomy'         => $taxonomy,
-						'terms'            => $terms,
+						'terms'            => array_filter( array_map( 'intval', $terms ) ),
 						'include_children' => false,
 					);
 				}

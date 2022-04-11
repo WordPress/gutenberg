@@ -1,5 +1,13 @@
 .block-editor-block-switcher {
 	position: relative;
+	padding: 0 ($grid-unit-15 * 0.5);
+
+	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+	// This is best fixed by making the mover control area a proper single toolbar group.
+	// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
+	.components-button.components-dropdown-menu__toggle.has-icon.has-icon {
+		min-width: $button-size;
+	}
 }
 
 // Show an indicator triangle.
@@ -7,7 +15,6 @@
 .block-editor-block-switcher__toggle {
 	position: relative;
 }
-
 
 .components-button.block-editor-block-switcher__toggle,
 .components-button.block-editor-block-switcher__no-switcher-icon {

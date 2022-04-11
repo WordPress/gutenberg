@@ -18,6 +18,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
+import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -32,7 +33,7 @@ const AvatarInspectorControls = ( {
 	selectUser,
 } ) => (
 	<InspectorControls>
-		<PanelBody title={ __( 'Avatar Settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<RangeControl
 				label={ __( 'Image size' ) }
 				onChange={ ( newSize ) =>
@@ -45,16 +46,6 @@ const AvatarInspectorControls = ( {
 				initialPosition={ attributes?.size }
 				value={ attributes?.size }
 			/>
-			{ selectUser && (
-				<UserControl
-					value={ attributes?.userId }
-					onChange={ ( value ) => {
-						setAttributes( {
-							userId: value,
-						} );
-					} }
-				/>
-			) }
 			<ToggleControl
 				label={ __( 'Link to user profile' ) }
 				onChange={ () =>
@@ -73,6 +64,16 @@ const AvatarInspectorControls = ( {
 					checked={ attributes.linkTarget === '_blank' }
 				/>
 			) }
+			{ selectUser && (
+				<UserControl
+					value={ attributes?.userId }
+					onChange={ ( value ) => {
+						setAttributes( {
+							userId: value,
+						} );
+					} }
+				/>
+			) }
 		</PanelBody>
 	</InspectorControls>
 );
@@ -85,6 +86,12 @@ const ResizableAvatar = ( {
 	isSelected,
 } ) => {
 	const borderProps = useBorderProps( attributes );
+	const doubledSizedSrc = addQueryArgs(
+		removeQueryArgs( avatar?.src, [ 's' ] ),
+		{
+			s: attributes?.size * 2,
+		}
+	);
 	return (
 		<div { ...blockProps }>
 			<ResizableBox
@@ -112,7 +119,7 @@ const ResizableAvatar = ( {
 				maxWidth={ avatar.maxSize }
 			>
 				<img
-					src={ avatar.src }
+					src={ doubledSizedSrc }
 					alt={ avatar.alt }
 					{ ...borderProps }
 					className={ classnames(
@@ -215,7 +222,8 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 };
 
 export default function Edit( props ) {
-	if ( props?.context?.commentId ) {
+	// Don't show the Comment Edit controls if we have a comment ID set, or if we're in the Site Editor (where it is `null`).
+	if ( props?.context?.commentId || props?.context?.commentId === null ) {
 		return <CommentEdit { ...props } />;
 	}
 	return <UserEdit { ...props } />;

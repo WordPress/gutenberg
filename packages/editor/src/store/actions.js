@@ -16,6 +16,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -320,26 +321,22 @@ export function updatePostLock( lock ) {
 }
 
 /**
- * Action that enables the publish sidebar.
- *
- * @return {Object} Action object
+ * Enable the publish sidebar.
  */
-export function enablePublishSidebar() {
-	return {
-		type: 'ENABLE_PUBLISH_SIDEBAR',
-	};
-}
+export const enablePublishSidebar = () => ( { registry } ) => {
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/edit-post', 'isPublishSidebarEnabled', true );
+};
 
 /**
- * Action that disables the publish sidebar.
- *
- * @return {Object} Action object
+ * Disables the publish sidebar.
  */
-export function disablePublishSidebar() {
-	return {
-		type: 'DISABLE_PUBLISH_SIDEBAR',
-	};
-}
+export const disablePublishSidebar = () => ( { registry } ) => {
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core/edit-post', 'isPublishSidebarEnabled', false );
+};
 
 /**
  * Action that locks post saving.

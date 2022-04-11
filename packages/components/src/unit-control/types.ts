@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, SyntheticEvent } from 'react';
+import type { CSSProperties, FocusEventHandler, SyntheticEvent } from 'react';
 
 /**
  * Internal dependencies
@@ -131,4 +131,8 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 		 * @default 10
 		 */
 		shiftStep?: number;
+		/**
+		 * Callback when either the quantity or the unit inputs lose focus.
+		 */
+		onBlur?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
 	};

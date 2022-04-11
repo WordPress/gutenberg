@@ -212,6 +212,9 @@ const MediaReplaceFlow = ( {
 	);
 };
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md
+ */
 export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { createNotice, removeNotice } = dispatch( noticesStore );

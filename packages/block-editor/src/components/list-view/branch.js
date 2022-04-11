@@ -92,7 +92,7 @@ function ListViewBranch( props ) {
 		isBranchSelected = false,
 		listPosition = 0,
 		fixedListWindow,
-		expandNested = true,
+		expandNested,
 	} = props;
 
 	const {

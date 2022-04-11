@@ -1,9 +1,33 @@
 /**
  * Internal dependencies
  */
-import { getGapCSSValue } from '../gap';
+import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../gap';
 
 describe( 'gap', () => {
+	describe( 'getGapBoxControlValueFromStyle()', () => {
+		it( 'should return `null` if argument is falsey', () => {
+			expect( getGapBoxControlValueFromStyle( undefined ) ).toBeNull();
+			expect( getGapBoxControlValueFromStyle( '' ) ).toBeNull();
+		} );
+		it( 'should return box control value from string', () => {
+			const expectedValue = {
+				top: '88rem',
+				left: '88rem',
+			};
+			expect( getGapBoxControlValueFromStyle( '88rem' ) ).toEqual(
+				expectedValue
+			);
+		} );
+		it( 'should return box control value from object', () => {
+			const blockGapValue = {
+				top: '222em',
+				left: '22px',
+			};
+			expect( getGapBoxControlValueFromStyle( blockGapValue ) ).toEqual( {
+				...blockGapValue,
+			} );
+		} );
+	} );
 	describe( 'getGapCSSValue()', () => {
 		it( 'should return `null` if argument is falsey', () => {
 			expect( getGapCSSValue( undefined ) ).toBeNull();
