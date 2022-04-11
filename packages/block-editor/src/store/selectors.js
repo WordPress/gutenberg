@@ -1584,10 +1584,6 @@ export function canEditBlock( state, clientId ) {
 	}
 
 	const { lock } = attributes;
-	// No `lock` attribute means we can edit the block.
-	if ( lock === undefined || lock?.edit === undefined ) {
-		return true;
-	}
 
 	// When the edit is true, we cannot edit the block.
 	return ! lock?.edit;
