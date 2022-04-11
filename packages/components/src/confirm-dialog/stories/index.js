@@ -74,7 +74,7 @@ export default meta;
 
 const Template = ( args ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
+	const [ confirmVal, setConfirmVal ] = useState( '' );
 	const children = args.jsxChildren ?? args.children;
 
 	const handleConfirm = () => {
