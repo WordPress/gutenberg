@@ -68,7 +68,7 @@ export default function FileBlockInspector( {
 						) }
 					</PanelBody>
 				) }
-				<PanelBody title={ __( 'Text link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<SelectControl
 						label={ __( 'Link to' ) }
 						value={ textLinkHref }
@@ -80,8 +80,6 @@ export default function FileBlockInspector( {
 						checked={ openInNewWindow }
 						onChange={ changeOpenInNewWindow }
 					/>
-				</PanelBody>
-				<PanelBody title={ __( 'Download button settings' ) }>
 					<ToggleControl
 						label={ __( 'Show download button' ) }
 						checked={ showDownloadButton }
