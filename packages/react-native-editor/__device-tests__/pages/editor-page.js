@@ -93,7 +93,7 @@ class EditorPage {
 					textViewElementNameiOS = '//XCUIElementTypeTextView';
 					break;
 				default:
-					throw new Error (`${ blockName } is not defined!`)
+					throw new Error( `${ blockName } is not defined!` );
 			}
 			blockLocator = isAndroid()
 				? `//${ elementTypeAndroid }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]${ textViewElementNameAndroid }`
