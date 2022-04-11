@@ -489,10 +489,10 @@ class EditorPage {
 		);
 		while ( checkList.length === 0 ) {
 			await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom.
-			checkList = await waitForVisible( 
+			checkList = await waitForVisible(
 				this.driver,
 				blockActionsMenuButtonLocator
-			)
+			);
 		}
 
 		await blockActionsMenuButton.click();
