@@ -11,7 +11,6 @@ test.describe( 'adding blocks', () => {
 		await pageUtils.createNewPost();
 
 		// Inserting a quote block
-
 		await pageUtils.insertBlock( {
 			name: 'core/quote',
 			attributes: { value: '<p>Quote content</p>' },
