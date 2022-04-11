@@ -533,11 +533,11 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 				$shorthand_right  = '0';
 				$shorthand_bottom = '0';
 				$shorthand_left   = '0';
-		
+	
 				$separate_values = explode( ' ', $value );
 
 				switch ( count( $separate_values ) ) {
-					case 1:			
+					case 1:
 						$shorthand_top    = $separate_values[0];
 						$shorthand_right  = $separate_values[0];
 						$shorthand_bottom = $separate_values[0];
@@ -613,7 +613,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 
 		// If a variable value is added to the root, the corresponding property should be removed.
 		foreach ( $root_variable_duplicates as $duplicate ) {
-			$discard = array_search( $duplicate,array_column( $declarations, 'name' ) );
+			$discard = array_search( $duplicate, array_column( $declarations, 'name' ), true );
 			if ( $discard ) {
 				array_splice( $declarations, $discard, 1 );
 			}
