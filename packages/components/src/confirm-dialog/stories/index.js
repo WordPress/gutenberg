@@ -127,11 +127,6 @@ WithJSXMessage.parameters = {
 	controls: { exclude: 'children' },
 };
 
-export const VeeeryLongMessage = Template.bind( {} );
-VeeeryLongMessage.args = {
-	children: daText().repeat( 20 ),
-};
-
 // Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel` to be passed.
 // It's also necessary to explicitly close the dialog when needed. See `setIsOpen` calls below.
 export const Controlled = () => {
