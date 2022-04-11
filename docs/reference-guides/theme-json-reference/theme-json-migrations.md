@@ -2,6 +2,10 @@
 
 This guide documents the changes between different `theme.json` versions and how to upgrade. Using older versions will continue to be supported. Upgrading is recommended because new development will continue in the newer versions.
 
+## Migrating from v2 to v3
+
+Update `version` to `3`. No other changes necessary.
+
 ## Migrating from v1 to v2
 
 Upgrading to v2 enables some new features and adjusts the naming of some old features to be more consistent with one another.
