@@ -77,7 +77,7 @@ const Template = ( args ) => {
 	);
 };
 
-// Simplest usage: just declare the component with the required `onConfirm` prop.
+// Simplest usage: just declare the component with the required `onConfirm` prop. Note: the `onCancel` prop is optional here, unless you'd like to render the component in Controlled mode (see below)
 export const _default = Template.bind( {} );
 _default.args = {};
 
@@ -88,39 +88,51 @@ withCustomButtonLabels.args = {
 	confirmButtonText: 'Yes please!',
 };
 
-// Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel` to be passed.
-// It's also necessary to explicitly close the dialog when needed. See `setIsOpen` calls below.
-export const Controlled = () => {
+const controlledSnippet = `() => {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const [ confirmVal, setConfirmVal ] = useState(
-		"Hasn't confirmed or cancelled yet"
-	);
-
+	const [ confirmVal, setConfirmVal ] = useState('');
+	
 	const handleConfirm = () => {
 		setConfirmVal( 'Confirmed!' );
 		setIsOpen( false );
 	};
-
+	
 	const handleCancel = () => {
 		setConfirmVal( 'Cancelled' );
 		setIsOpen( false );
 	};
-
+	
 	return (
 		<>
-			<ConfirmDialog
-				isOpen={ isOpen }
-				onConfirm={ handleConfirm }
-				onCancel={ handleCancel }
-			>
-				Would you like to privately publish the post now?
-			</ConfirmDialog>
-
-			<Heading level={ 1 }>{ confirmVal }</Heading>
-
-			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
-				Open ConfirmDialog
-			</Button>
+		<ConfirmDialog
+		isOpen={ isOpen }
+		onConfirm={ handleConfirm }
+		onCancel={ handleCancel }
+		>
+		Would you like to privately publish the post now?
+		</ConfirmDialog>
+		
+		<Heading level={ 1 }>{ confirmVal }</Heading>
+		
+		<Button variant="primary" onClick={ () => setIsOpen( true ) }>
+		Open ConfirmDialog
+		</Button>
 		</>
-	);
+		);
+	};`;
+
+export const Controlled = Template.bind( {} );
+Controlled.args = {};
+Controlled.parameters = {
+	docs: {
+		description: {
+			story:
+				"Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel` to be passed. It's also necessary to explicitly close the dialog when needed. See `setIsOpen` calls below.",
+		},
+		source: {
+			code: controlledSnippet,
+			language: 'jsx',
+			type: 'auto',
+		},
+	},
 };
