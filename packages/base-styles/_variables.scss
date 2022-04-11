@@ -100,9 +100,8 @@ $block-padding: 14px; // Used to define space between block footprint and surrou
  */
 
 // Padding for blocks with a background color (e.g. paragraph or group).
-$block-bg-padding--v: 1.25rem;
-$block-bg-padding--h: 2.375rem;
-
+$block-bg-padding--v: 0.5em;
+$block-bg-padding--h: 1em;
 
 /**
  * React Native specific.
