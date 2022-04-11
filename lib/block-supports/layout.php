@@ -66,7 +66,7 @@ function gutenberg_get_layout_style( $selector, $layout, $padding, $has_block_ga
 				isset( $padding['left'] ) ? $padding['left'] : 0
 			);
 			$style .= '}';
-			$style  = "$selector > :where(:not(.alignleft):not(.alignright)) {";
+			$style .= "$selector > :where(:not(.alignleft):not(.alignright)) {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 			$style .= 'margin-left: auto !important;';
 			$style .= 'margin-right: auto !important;';
