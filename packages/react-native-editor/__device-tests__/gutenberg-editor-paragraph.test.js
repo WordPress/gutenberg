@@ -103,13 +103,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		await editorPage.getBlockAtPosition(
-			blockNames.paragraph,
-			1,
-			{
-				useWaitForVisible: true,
-			}
-		);
+		await editorPage.getBlockAtPosition( blockNames.paragraph, 1, {
+			useWaitForVisible: true,
+		} );
 
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 
