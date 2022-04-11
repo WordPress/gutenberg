@@ -73,19 +73,29 @@ const meta = {
 export default meta;
 
 const Template = ( args ) => {
+	const [ isOpen, setIsOpen ] = useState( false );
 	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
-	const confirmOutput = args.confirmOutput ?? 'Confirmed!';
 	const children = args.jsxChildren ?? args.children;
 
+	const handleConfirm = () => {
+		setConfirmVal( 'Confirmed!' );
+		setIsOpen( false );
+	};
+
+	const handleCancel = () => {
+		setConfirmVal( 'Cancelled' );
+		setIsOpen( false );
+	};
 	return (
 		<>
+			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
+				Open ConfirmDialog
+			</Button>
+
 			<ConfirmDialog
-				onConfirm={ () => setConfirmVal( confirmOutput ) }
-				onCancel={
-					args.cancelOutput
-						? () => setConfirmVal( args.cancelOutput )
-						: undefined
-				}
+				isOpen={ isOpen }
+				onConfirm={ handleConfirm }
+				onCancel={ handleCancel }
 				cancelButtonText={ args.cancelButtonText }
 				confirmButtonText={ args.confirmButtonText }
 			>
