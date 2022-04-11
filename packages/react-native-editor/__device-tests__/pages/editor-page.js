@@ -163,9 +163,7 @@ class EditorPage {
 	async hasBlockAtPosition( position = 1, blockName = '' ) {
 		return (
 			undefined !==
-			( await this.getBlockAtPosition( blockName, position, {
-				useWaitForVisible: true,
-			} ) )
+			( await this.getBlockAtPosition( blockName, position ) )
 		);
 	}
 
@@ -485,17 +483,16 @@ class EditorPage {
 			blockActionsMenuButtonLocator
 		);
 
-		if ( isAndroid() ) {
-			const block = await this.getBlockAtPosition( blockName, position );
-			let checkList = await this.driver.elementsByXPath(
+		const block = await this.getBlockAtPosition( blockName, position );
+		let checkList = await this.driver.elementsByXPath(
+			blockActionsMenuButtonLocator
+		);
+		while ( checkList.length === 0 ) {
+			await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom.
+			checkList = await waitForVisible( 
+				this.driver,
 				blockActionsMenuButtonLocator
-			);
-			while ( checkList.length === 0 ) {
-				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom.
-				checkList = await this.driver.elementsByXPath(
-					blockActionsMenuButtonLocator
-				);
-			}
+			)
 		}
 
 		await blockActionsMenuButton.click();
