@@ -523,6 +523,7 @@ class WP_Theme_JSON_5_9 {
 				is_string( $block_type->supports['__experimentalSelector'] )
 			) {
 				static::$blocks_metadata[ $block_name ]['selector'] = $block_type->supports['__experimentalSelector'];
+				static::$blocks_metadata['custom_selectors'][]      = $block_type->supports['__experimentalSelector'];
 			} else {
 				static::$blocks_metadata[ $block_name ]['selector'] = '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
 			}
@@ -652,7 +653,7 @@ class WP_Theme_JSON_5_9 {
 		}
 
 		if ( in_array( 'presets', $types, true ) ) {
-			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
+			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins, $blocks_metadata['custom_selectors'] );
 		}
 
 		return $stylesheet;
@@ -804,7 +805,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array $origins       List of origins to process presets from.
 	 * @return string The new stylesheet.
 	 */
-	protected function get_preset_classes( $setting_nodes, $origins ) {
+	protected function get_preset_classes( $setting_nodes, $origins, $custom_selectors ) {
 		$preset_rules = '';
 
 		foreach ( $setting_nodes as $metadata ) {
@@ -814,7 +815,7 @@ class WP_Theme_JSON_5_9 {
 
 			$selector      = $metadata['selector'];
 			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$preset_rules .= static::compute_preset_classes( $node, $selector, $origins );
+			$preset_rules .= static::compute_preset_classes( $node, $selector, $origins, $custom_selectors );
 		}
 
 		return $preset_rules;
@@ -925,7 +926,7 @@ class WP_Theme_JSON_5_9 {
 	 * @param array  $origins  List of origins to process.
 	 * @return string The result of processing the presets.
 	 */
-	protected static function compute_preset_classes( $settings, $selector, $origins ) {
+	protected static function compute_preset_classes( $settings, $selector, $origins, $custom_selectors ) {
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
@@ -944,11 +945,26 @@ class WP_Theme_JSON_5_9 {
 						array(
 							array(
 								'name'  => $property,
-								'value' => 'var(' . $css_var . ') !important',
+								'value' => 'var(' . $css_var . ')',
 							),
 						)
 					);
-				}
+					// For blocks with a custom class selector append presets to this in order
+					// to make sure that preset will be more specific.
+					foreach ( $custom_selectors as $custom_selector ) {
+						if ( strpos( $custom_selector, '.' ) !== false ) {
+							$stylesheet .= static::to_ruleset(
+								static::append_to_selector( $custom_selector, $class_name ),
+								array(
+									array(
+										'name'  => $property,
+										'value' => 'var(' . $css_var . ')',
+									),
+								)
+							);
+						}
+					}
+				};
 			}
 		}
 
