@@ -19,9 +19,9 @@ test.describe( 'adding blocks', () => {
 		await page.click( 'role=menuitem[name="Plain"i]' );
 
 		// Check the content
-		const quoteContent = `<!-- wp:quote {"className":"is-style-plain"} -->\n<blockquote class="wp-block-quote is-style-plain"><p>Quote content</p></blockquote>\n<!-- /wp:quote -->`;
-
 		const content = await pageUtils.getEditedPostContent();
-		expect( content ).toBe( quoteContent );
+		expect( content ).toBe(
+			`<!-- wp:quote {"className":"is-style-plain"} -->\n<blockquote class="wp-block-quote is-style-plain"><p>Quote content</p></blockquote>\n<!-- /wp:quote -->`
+		);
 	} );
 } );
