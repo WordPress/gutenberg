@@ -126,7 +126,10 @@ function ScreenBlockList() {
 				label={ __( 'Search for blocks' ) }
 				placeholder={ __( 'Search' ) }
 			/>
-			<div ref={ blockTypesListRef }>
+			<div
+				ref={ blockTypesListRef }
+				className="edit-site-block-types-item-list"
+			>
 				{ filteredBlockTypes.map( ( block ) => (
 					<BlockMenuItem
 						block={ block }
