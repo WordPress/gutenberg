@@ -17,23 +17,6 @@ const meta = {
 		children: {
 			control: { type: 'text' },
 		},
-		jsxChildren: {
-			control: {
-				type: 'select',
-				options: [
-					'<b>Bold text</b>',
-					'<i>Italic text</i>',
-					'<Heading level={ 2 }>A JSX Heading</Heading>',
-				],
-			},
-			mapping: {
-				'<b>Bold text</b>': <b>Bold text</b>,
-				'<i>Italic text</i>': <i>Italic text</i>,
-				'<Heading level={ 2 }>A JSX Heading</Heading>': (
-					<Heading level={ 2 }>A JSX Heading</Heading>
-				),
-			},
-		},
 		confirmButtonText: {
 			control: { type: 'text' },
 		},
@@ -54,10 +37,6 @@ const meta = {
 		children: 'Would you like to privately publish the post now?',
 	},
 	parameters: {
-		// Exclude jsxChildren by default becuase it's only used in one story.
-		controls: {
-			exclude: 'jsxChildren',
-		},
 		docs: { source: { state: 'open' } },
 	},
 };
@@ -67,7 +46,6 @@ export default meta;
 const Template = ( args ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ confirmVal, setConfirmVal ] = useState( '' );
-	const children = args.jsxChildren ?? args.children;
 
 	const handleConfirm = () => {
 		setConfirmVal( 'Confirmed!' );
@@ -91,7 +69,7 @@ const Template = ( args ) => {
 				cancelButtonText={ args.cancelButtonText }
 				confirmButtonText={ args.confirmButtonText }
 			>
-				{ children }
+				{ args.children }
 			</ConfirmDialog>
 
 			<Heading level={ 1 }>{ confirmVal }</Heading>
