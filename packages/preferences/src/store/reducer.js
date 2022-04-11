@@ -68,7 +68,7 @@ function withPersistenceLayer( reducer ) {
  *
  * @return {Object} Updated state.
  */
-const preferences = withPersistenceLayer( ( state = {}, action ) => {
+export const preferences = withPersistenceLayer( ( state = {}, action ) => {
 	if ( action.type === 'SET_PREFERENCE_VALUE' ) {
 		const { scope, name, value } = action;
 		return {
