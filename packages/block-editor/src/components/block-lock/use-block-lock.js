@@ -33,7 +33,7 @@ export default function useBlockLock( clientId, checkRoot = false ) {
 			return {
 				canMove: canMoveBlock( clientId, rootClientId ),
 				canRemove: canRemoveBlock( clientId, rootClientId ),
-				canLockBlock: canLockBlockType( getBlockName( clientId ) ),
+				canLock: canLockBlockType( getBlockName( clientId ) ),
 			};
 		},
 		[ clientId, checkRoot ]
