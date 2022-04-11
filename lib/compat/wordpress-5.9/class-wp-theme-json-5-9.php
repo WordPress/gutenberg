@@ -952,7 +952,6 @@ class WP_Theme_JSON_5_9 {
 					// For blocks with a custom class selector append presets to this in order
 					// to make sure that preset will be more specific.
 					foreach ( $custom_selectors as $custom_selector ) {
-						if ( strpos( $custom_selector, '.' ) !== false ) {
 							$stylesheet .= static::to_ruleset(
 								static::append_to_selector( $custom_selector, $class_name ),
 								array(
@@ -962,7 +961,6 @@ class WP_Theme_JSON_5_9 {
 									),
 								)
 							);
-						}
 					}
 				};
 			}
