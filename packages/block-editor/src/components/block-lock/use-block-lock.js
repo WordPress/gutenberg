@@ -11,12 +11,13 @@ import { store as blockEditorStore } from '../../store';
 /**
  * Return details about the block lock status.
  *
- * @param {string}  clientId  The block client Id.
- * @param {boolean} checkRoot Optional. Use root client ID when checking lock status.
+ * @param {string}  clientId    The block client Id.
+ * @param {boolean} checkParent Optional. The status is derived from the parent `templateLock`
+ *                              when the current block's lock state isn't defined.
  *
  * @return {Object} Block lock status
  */
-export default function useBlockLock( clientId, checkRoot = false ) {
+export default function useBlockLock( clientId, checkParent = false ) {
 	return useSelect(
 		( select ) => {
 			const {
@@ -26,7 +27,7 @@ export default function useBlockLock( clientId, checkRoot = false ) {
 				getBlockName,
 				getBlockRootClientId,
 			} = select( blockEditorStore );
-			const rootClientId = checkRoot
+			const rootClientId = checkParent
 				? getBlockRootClientId( clientId )
 				: null;
 
@@ -36,6 +37,6 @@ export default function useBlockLock( clientId, checkRoot = false ) {
 				canLock: canLockBlockType( getBlockName( clientId ) ),
 			};
 		},
-		[ clientId, checkRoot ]
+		[ clientId, checkParent ]
 	);
 }
