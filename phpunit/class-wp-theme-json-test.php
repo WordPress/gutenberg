@@ -2263,7 +2263,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$actual   = $theme_json->get_raw_data();
 		$expected = array(
-			'version' => 2,
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
 				'spacing' => array(
 					'blockGap' => 'valid value',
@@ -2329,7 +2329,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme->merge( $user );
 		$actual   = $theme->get_data();
 		$expected = array(
-			'version'  => 2,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color' => array(
 					'palette' => array(
@@ -2381,7 +2381,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$actual   = $theme->get_data();
 		$expected = array(
-			'version'  => 2,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color' => array(
 					'palette' => array(
@@ -2429,7 +2429,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$actual   = $user->get_data();
 		$expected = array(
-			'version'  => 2,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color' => array(
 					'palette' => array(
@@ -2459,7 +2459,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'theme'
 		);
 		$actual_v2   = $theme_v2->get_data();
-		$expected_v2 = array( 'version' => 2 );
+		$expected_v2 = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 		$this->assertEqualSetsWithIndex( $expected_v2, $actual_v2 );
 
 		$theme_v1    = new WP_Theme_JSON_Gutenberg(
@@ -2469,7 +2469,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'theme'
 		);
 		$actual_v1   = $theme_v1->get_data();
-		$expected_v1 = array( 'version' => 2 );
+		$expected_v1 = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 		$this->assertEqualSetsWithIndex( $expected_v1, $actual_v1 );
 	}
 
@@ -2490,7 +2490,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$actual   = $theme->get_data();
 		$expected = array(
-			'version'  => 2,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'appearanceTools' => true,
 				'blocks'          => array(
