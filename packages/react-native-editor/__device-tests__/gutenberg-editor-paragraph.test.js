@@ -20,9 +20,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 				useWaitForVisible: true,
 			}
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
@@ -61,9 +58,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 				useWaitForVisible: true,
 			}
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			testData.shortText
@@ -88,9 +82,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 				useWaitForVisible: true,
 			}
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
 		await clickBeginningOfElement(
 			editorPage.driver,
@@ -112,16 +103,13 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+		await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			1,
 			{
 				useWaitForVisible: true,
 			}
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 
@@ -176,7 +164,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		// Merge paragraphs.
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
 			2
 		);

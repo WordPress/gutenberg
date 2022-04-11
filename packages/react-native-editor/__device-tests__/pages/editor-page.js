@@ -72,39 +72,41 @@ class EditorPage {
 		position = 1,
 		options = { autoscroll: false, useWaitForVisible: false }
 	) {
-		let elementTypeAndroid;
-		let elementTypeiOS;
-		let textViewElementNameAndroid;
-		let textViewElementNameiOS;
-		switch ( blockName ) {
-			case blockNames.cover:
-				elementTypeiOS = 'XCUIElementTypeButton';
-				break;
-			case blockNames.paragraph:
-			case blockNames.heading:
-				elementTypeAndroid = 'android.view.ViewGroup';
-				elementTypeiOS = 'XCUIElementTypeButton';
-				textViewElementNameAndroid = '/android.widget.EditText';
-				textViewElementNameiOS = '//XCUIElementTypeTextView';
-				break;
-			// potentially can be removed when we have gone through all test cases
-			default:
-				elementTypeAndroid = '*';
-				elementTypeiOS = '*';
-				textViewElementNameAndroid = '';
-				textViewElementNameiOS = '';
-				break;
-		}
-		const blockLocator = isAndroid()
-			? `//${ elementTypeAndroid }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]${ textViewElementNameAndroid }`
-			: `(//${ elementTypeiOS }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])${ textViewElementNameiOS }`;
-
+		let blockLocator;
 		// Make it optional to use waitForVisible() so we can handle this test by test.
 		// This condition can be removed once we have gone through all test cases.
 		if ( options.useWaitForVisible ) {
+			let elementTypeAndroid;
+			let elementTypeiOS;
+			let textViewElementNameAndroid;
+			let textViewElementNameiOS;
+			switch ( blockName ) {
+				case blockNames.cover:
+					elementTypeAndroid = 'android.view.ViewGroup';
+					elementTypeiOS = 'XCUIElementTypeButton';
+					break;
+				case blockNames.paragraph:
+				case blockNames.heading:
+					elementTypeAndroid = 'android.view.ViewGroup';
+					elementTypeiOS = 'XCUIElementTypeButton';
+					textViewElementNameAndroid = '/android.widget.EditText';
+					textViewElementNameiOS = '//XCUIElementTypeTextView';
+					break;
+				default:
+					elementTypeAndroid = 'android.view.ViewGroup';
+					elementTypeiOS = 'XCUIElementTypeOther';
+					textViewElementNameAndroid = '';
+					textViewElementNameiOS = '';
+					break;
+			}
+			blockLocator = isAndroid()
+				? `//${ elementTypeAndroid }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]${ textViewElementNameAndroid }`
+				: `//${ elementTypeiOS }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]${ textViewElementNameiOS }`;
+
 			return await waitForVisible( this.driver, blockLocator );
 		}
 
+		blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
