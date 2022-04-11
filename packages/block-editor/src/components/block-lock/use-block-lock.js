@@ -32,11 +32,16 @@ export default function useBlockLock( clientId, checkParent = false ) {
 				? getBlockRootClientId( clientId )
 				: null;
 
+			const canEdit = canEditBlock( clientId );
+			const canMove = canMoveBlock( clientId, rootClientId );
+			const canRemove = canRemoveBlock( clientId, rootClientId );
+
 			return {
-				canEdit: canEditBlock( clientId ),
-				canMove: canMoveBlock( clientId, rootClientId ),
-				canRemove: canRemoveBlock( clientId, rootClientId ),
+				canEdit,
+				canMove,
+				canRemove,
 				canLock: canLockBlockType( getBlockName( clientId ) ),
+				isLocked: ! canEdit || ! canMove || ! canRemove,
 			};
 		},
 		[ clientId, checkParent ]
