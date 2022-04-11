@@ -106,7 +106,7 @@ class WP_Theme_JSON_Resolver_5_9 {
 			static::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
 		}
 
-		return wp_translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
+		return translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
 	}
 
 	/**
