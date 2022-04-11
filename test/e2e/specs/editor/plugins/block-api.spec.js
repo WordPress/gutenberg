@@ -4,6 +4,10 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Using Block API', () => {
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin( 'gutenberg-test-block-api' );
+	} );
+
 	test( 'Inserts the filtered hello world block even when filter added after block registration', async ( {
 		page,
 		pageUtils,
@@ -14,12 +18,7 @@ test.describe( 'Using Block API', () => {
 
 		await pageUtils.insertBlock( { name: 'e2e-tests/hello-world' } );
 
-		const blockContent = await page.textContent(
-			'div[data-type="e2e-tests/hello-world"]'
-		);
-
-		expect( blockContent ).toBe( 'Hello Editor!' );
-
-		await requestUtils.deactivatePlugin( 'gutenberg-test-block-api' );
+		const block = page.locator( '[data-type="e2e-tests/hello-world"]' );
+		await expect( block ).toHaveText( 'Hello Editor!' );
 	} );
 } );
