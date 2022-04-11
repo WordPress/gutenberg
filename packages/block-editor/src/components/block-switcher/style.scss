@@ -47,11 +47,12 @@
 
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	display: flex;
-	padding: 6px 12px !important;
+	padding: ($grid-unit-15 * 0.5) $grid-unit-15 !important;
 
-	.block-editor-blocks-icon {
+	.block-editor-block-icon {
 		margin-right: auto;
 		margin-left: auto;
+		min-width: $icon-size !important;
 	}
 }
 
@@ -78,6 +79,7 @@
 		margin: 0 auto;
 		display: flex;
 		align-items: center;
+		min-width: 100%;
 	}
 
 	// Position the focus style correctly.
