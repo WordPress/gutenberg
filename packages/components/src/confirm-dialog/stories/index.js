@@ -118,15 +118,6 @@ withCustomButtonLabels.args = {
 	confirmButtonText: 'Yes please!',
 };
 
-// JSX elements can be passed as children to further customize the dialog.
-export const WithJSXMessage = Template.bind( {} );
-WithJSXMessage.args = {
-	jsxChildren: '<Heading level={ 2 }>A JSX Heading</Heading>',
-};
-WithJSXMessage.parameters = {
-	controls: { exclude: 'children' },
-};
-
 // Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel` to be passed.
 // It's also necessary to explicitly close the dialog when needed. See `setIsOpen` calls below.
 export const Controlled = () => {
