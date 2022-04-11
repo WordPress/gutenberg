@@ -66,6 +66,7 @@ const meta = {
 		controls: {
 			exclude: 'jsxChildren',
 		},
+		docs: { source: { state: 'open' } },
 	},
 };
 
