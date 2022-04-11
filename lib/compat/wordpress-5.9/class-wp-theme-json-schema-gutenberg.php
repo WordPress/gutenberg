@@ -77,6 +77,10 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			$theme_json = self::migrate_v1_to_v2( $theme_json );
 		}
 
+		if ( 2 === $theme_json['version'] ) {
+			$theme_json['version'] = 3;
+		}
+
 		return $theme_json;
 	}
 
