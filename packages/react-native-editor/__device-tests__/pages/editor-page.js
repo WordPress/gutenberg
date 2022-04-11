@@ -90,7 +90,7 @@ class EditorPage {
 			// potentially can be removed when we have gone through all test cases
 			default:
 				elementTypeAndroid = '*';
-				elementTypeiOS = '*'
+				elementTypeiOS = '*';
 				textViewElementNameAndroid = '';
 				textViewElementNameiOS = '';
 				break;
