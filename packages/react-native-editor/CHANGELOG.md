@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 -   [*] Remove banner error notification on upload failure [#39694]
+-   [*] Remove title focus for default editor view. [#40111]
 
 ## 1.73.1
 
