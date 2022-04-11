@@ -243,10 +243,10 @@
 		"spacing": { 
 			"blockGap": "24px", 
 			"padding": {
-				"top": "17px",
-				"right": "17px",
-				"bottom": "17px",
-				"left": "17px"
+				"top": "var(--wp--style--block-gap)",
+				"right": "var(--wp--style--block-gap)",
+				"bottom": "var(--wp--style--block-gap)",
+				"left": "var(--wp--style--block-gap)"
 			}  
 		}
 	}
