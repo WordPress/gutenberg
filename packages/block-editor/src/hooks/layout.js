@@ -285,7 +285,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		);
 		const padding = layout?.inherit
 			? usedLayout?.padding
-			: get( attributes, [ 'style', 'padding' ] );
+			: get( attributes, [ 'style', 'spacing', 'padding' ] );
 
 		return (
 			<>
