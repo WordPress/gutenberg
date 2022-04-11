@@ -53,7 +53,7 @@ export default function create( {
 
 		// Prefer server data if it exists and is more recent.
 		// Otherwise fallback to localStorage data.
-		if ( serverData && serverTimestamp > localTimestamp ) {
+		if ( serverData && serverTimestamp >= localTimestamp ) {
 			cache = serverData;
 		} else if ( localData ) {
 			cache = localData;
