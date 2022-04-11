@@ -158,7 +158,7 @@ export default {
 						}
 						${
 							padding?.right
-								? `margin-left: calc( -1 * ${ padding?.right } ) !important;`
+								? `margin-right: calc( -1 * ${ padding?.right } ) !important;`
 								: ''
 						}
 					}
