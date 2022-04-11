@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { Button } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 import { Icon, lock } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 
@@ -19,7 +18,7 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockTitle from '../block-title';
 import ListViewExpander from './expander';
-import { store as blockEditorStore } from '../../store';
+import { useBlockLock } from '../block-lock';
 
 function ListViewBlockSelectButton(
 	{
@@ -36,14 +35,8 @@ function ListViewBlockSelectButton(
 	ref
 ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const isLocked = useSelect(
-		( select ) => {
-			const { canMoveBlock, canRemoveBlock } = select( blockEditorStore );
-
-			return ! canMoveBlock( clientId ) || ! canRemoveBlock( clientId );
-		},
-		[ clientId ]
-	);
+	const { canMove, canRemove } = useBlockLock( clientId );
+	const isLocked = ! canMove || ! canRemove;
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
