@@ -252,12 +252,13 @@ export default function CommentTemplateEdit( {
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
-
 			return {
 				// Request only top-level comments. Replies are embedded.
-				topLevelComments: commentQuery
-					? getEntityRecords( 'root', 'comment', commentQuery )
-					: null,
+				topLevelComments: getEntityRecords(
+					'root',
+					'comment',
+					commentQuery
+				),
 				blocks: getBlocks( clientId ),
 			};
 		},
@@ -272,14 +273,6 @@ export default function CommentTemplateEdit( {
 			: topLevelComments
 	);
 
-	if ( ! topLevelComments ) {
-		return (
-			<p { ...blockProps }>
-				<Spinner />
-			</p>
-		);
-	}
-
 	if ( ! postId ) {
 		commentTree = getCommentsPlaceholder( {
 			perPage: commentsPerPage,
@@ -288,7 +281,15 @@ export default function CommentTemplateEdit( {
 		} );
 	}
 
-	if ( ! commentTree.length ) {
+	if ( ! topLevelComments ) {
+		return (
+			<p { ...blockProps }>
+				<Spinner />
+			</p>
+		);
+	}
+
+	if ( topLevelComments.length === 0 && commentTree.length === 0 ) {
 		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
