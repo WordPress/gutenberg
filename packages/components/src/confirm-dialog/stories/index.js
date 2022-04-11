@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { text } from '@storybook/addon-knobs';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -14,9 +9,6 @@ import { useState } from '@wordpress/element';
 import Button from '../../button';
 import { Heading } from '../../heading';
 import { ConfirmDialog } from '..';
-
-const daText = () =>
-	text( 'message', 'Would you like to privately publish the post now?' );
 
 const meta = {
 	component: ConfirmDialog,
@@ -59,7 +51,7 @@ const meta = {
 		},
 	},
 	args: {
-		children: daText(),
+		children: 'Would you like to privately publish the post now?',
 	},
 	parameters: {
 		// Exclude jsxChildren by default becuase it's only used in one story.
@@ -143,7 +135,7 @@ export const Controlled = () => {
 				onConfirm={ handleConfirm }
 				onCancel={ handleCancel }
 			>
-				{ daText() }
+				Would you like to privately publish the post now?
 			</ConfirmDialog>
 
 			<Heading level={ 1 }>{ confirmVal }</Heading>
