@@ -31,13 +31,21 @@
 }
 
 .edit-post-editor__list-view-panel-header {
-	align-items: center;
 	border-bottom: $border-width solid $gray-300;
 	display: flex;
 	justify-content: space-between;
-	height: $grid-unit-60;
 	padding-left: $grid-unit-20;
-	padding-right: $grid-unit-05;
+
+	strong {
+		padding-top: $grid-unit-20;
+		display: block;
+	}
+
+	p {
+		margin-top: $grid-unit-10;
+		margin-bottom: $grid-unit-20;
+		max-width: 300px;
+	}
 }
 
 .edit-post-editor__list-view-panel-content {
