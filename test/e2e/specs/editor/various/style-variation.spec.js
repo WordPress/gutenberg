@@ -11,15 +11,14 @@ test.describe( 'adding blocks', () => {
 		await pageUtils.createNewPost();
 
 		// Inserting a quote block
-		await pageUtils.insertBlock( { name: 'core/quote' } );
-		await page.keyboard.type( 'Quote content' );
+		await pageUtils.insertBlock( {
+			name: 'core/quote',
+			attributes: { content: 'Quote content' },
+		} );
 
 		await pageUtils.clickBlockToolbarButton( 'Quote' );
 
-		const plainStyleButton = await page.locator(
-			'button[role="menuitem"]:has-text("Plain")'
-		);
-		await plainStyleButton.click();
+		await page.click( 'role=menuitem[name="Plain"i]' );
 
 		// Check the content
 		const quoteContent = `<!-- wp:quote {"className":"is-style-plain"} -->\n<blockquote class="wp-block-quote is-style-plain"><p>Quote content</p></blockquote>\n<!-- /wp:quote -->`;
