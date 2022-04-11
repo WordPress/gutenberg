@@ -3,7 +3,7 @@
  */
 import { convertLegacyData } from '..';
 
-const legacyData1 = {
+const legacyData = {
 	'core/interface': {
 		enableItems: {
 			singleEnableItems: {
@@ -136,7 +136,7 @@ const alreadyConvertedData = {
 
 describe( 'convertLegacyData', () => {
 	it( 'converts to the expected format', () => {
-		expect( convertLegacyData( legacyData1 ) ).toMatchInlineSnapshot( `
+		expect( convertLegacyData( legacyData ) ).toMatchInlineSnapshot( `
 		Object {
 		  "core/customize-widgets": Object {
 		    "fixedToolbar": true,
