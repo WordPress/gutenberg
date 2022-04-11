@@ -13,8 +13,7 @@ import useBlockLock from './use-block-lock';
 import BlockLockModal from './modal';
 
 export default function BlockLockMenuItem( { clientId } ) {
-	const { canMove, canRemove, canLock } = useBlockLock( clientId, true );
-	const isLocked = ! canMove || ! canRemove;
+	const { canLock, isLocked } = useBlockLock( clientId, true );
 
 	const [ isModalOpen, toggleModal ] = useReducer(
 		( isActive ) => ! isActive,

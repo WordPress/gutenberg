@@ -15,7 +15,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 
 export default function BlockLockToolbar( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { canMove, canRemove, canLock } = useBlockLock( clientId );
+	const { canEdit, canMove, canRemove, canLock } = useBlockLock( clientId );
 
 	const [ isModalOpen, toggleModal ] = useReducer(
 		( isActive ) => ! isActive,
@@ -26,7 +26,7 @@ export default function BlockLockToolbar( { clientId } ) {
 		return null;
 	}
 
-	if ( canMove && canRemove ) {
+	if ( canEdit && canMove && canRemove ) {
 		return null;
 	}
 

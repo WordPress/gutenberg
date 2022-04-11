@@ -35,8 +35,7 @@ function ListViewBlockSelectButton(
 	ref
 ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { canMove, canRemove } = useBlockLock( clientId );
-	const isLocked = ! canMove || ! canRemove;
+	const { isLocked } = useBlockLock( clientId );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
