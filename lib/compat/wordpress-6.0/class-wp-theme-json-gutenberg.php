@@ -198,6 +198,13 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	);
 
 	/**
+	 * The latest version of the schema in use.
+	 *
+	 * @var int
+	 */
+	const LATEST_SCHEMA = 3;
+
+	/**
 	 * Returns the current theme's wanted patterns(slugs) to be
 	 * registered from Pattern Directory.
 	 *
