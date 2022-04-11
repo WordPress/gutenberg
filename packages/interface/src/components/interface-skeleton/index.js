@@ -120,7 +120,7 @@ function InterfaceSkeleton(
 					{ !! secondarySidebar && (
 						<motion.div
 							animate={ isDistractionFree ? 'hidden' : 'hover' }
-							initial="hidden"
+							initial="hover"
 							whileHover="hover"
 							variants={ headerVariants }
 							transition={ { type: 'tween', delay: 0.8 } }
@@ -148,7 +148,7 @@ function InterfaceSkeleton(
 					{ !! sidebar && (
 						<motion.div
 							animate={ isDistractionFree ? 'hidden' : 'hover' }
-							initial="hidden"
+							initial="hover"
 							whileHover="hover"
 							variants={ headerVariants }
 							transition={ { type: 'tween', delay: 0.8 } }
