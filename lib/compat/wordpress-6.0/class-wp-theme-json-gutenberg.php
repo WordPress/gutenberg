@@ -417,8 +417,8 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	 * // => true
 	 * ```
 	 *
-	 * @param array      $data The data to inspect.
-	 * @param bool|array $path Boolean or path to a boolean.
+	 * @param array      $data    The data to inspect.
+	 * @param bool|array $path    Boolean or path to a boolean.
 	 * @param bool       $default Default value if the referenced path is missing.
 	 * @return boolean
 	 */
@@ -429,7 +429,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 
 		if ( is_array( $path ) ) {
 			$value = _wp_array_get( $data, $path );
-			if ( isset( $value ) ) {
+			if ( null !== $value ) {
 				return $value;
 			}
 		}
@@ -440,11 +440,10 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	/**
 	 * Returns a valid theme.json as provided by a theme.
 	 *
-	 * Unlike get_raw_data() this returns the presets flattened,
-	 * as provided by a theme. This also uses appearanceTools
-	 * instead of their opt-ins if all of them are true.
+	 * Unlike get_raw_data() this returns the presets flattened, as provided by a theme.
+	 * This also uses appearanceTools instead of their opt-ins if all of them are true.
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public function get_data() {
 		$output = $this->theme_json;
