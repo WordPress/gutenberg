@@ -610,12 +610,14 @@ function Navigation( {
 						onSave={ ( post ) => {
 							// Set some state used as a guard to prevent the creation of multiple posts.
 							setHasSavedUnsavedInnerBlocks( true );
-							// Switch to using the wp_navigation entity.
-							setRef( post.id );
 
-							showNavigationMenuCreateNotice(
-								__( `New Navigation Menu created.` )
-							);
+							// Switch to using the wp_navigation entity.
+							queueMicrotask( () => {
+								setRef( post.id );
+								showNavigationMenuCreateNotice(
+									__( `New Navigation Menu created.` )
+								);
+							} );
 						} }
 					/>
 				</ResponsiveWrapper>
