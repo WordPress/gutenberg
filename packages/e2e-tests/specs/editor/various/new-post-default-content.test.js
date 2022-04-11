@@ -33,14 +33,14 @@ describe( 'new editor filtered state', () => {
 
 		// open the sidebar, we want to see the excerpt.
 		await openDocumentSettingsSidebar();
-		const summaryButton = await findSidebarPanelToggleButtonWithTitle(
-			'Summary'
+		const excerptButton = await findSidebarPanelToggleButtonWithTitle(
+			'Excerpt'
 		);
-		if ( summaryButton ) {
-			await summaryButton.click( 'button' );
+		if ( excerptButton ) {
+			await excerptButton.click( 'button' );
 		}
 		const excerpt = await page.$eval(
-			'.editor-post-excerpt p',
+			'.editor-post-excerpt textarea',
 			( element ) => element.innerHTML
 		);
 

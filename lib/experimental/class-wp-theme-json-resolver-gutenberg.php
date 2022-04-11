@@ -25,12 +25,14 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 	 * the theme.json takes precedence.
 	 *
 	 * @param array $deprecated Deprecated argument.
+	 * @param array $settings Contains a key called with_supports to determine whether to include theme supports in the data.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
-	public static function get_theme_data( $deprecated = array() ) {
+	public static function get_theme_data( $deprecated = array(), $settings = array( 'with_supports' => true ) ) {
 		if ( ! empty( $deprecated ) ) {
 			_deprecated_argument( __METHOD__, '5.9' );
 		}
+
 		if ( null === static::$theme ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
@@ -49,6 +51,10 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 				$parent_theme->merge( static::$theme );
 				static::$theme = $parent_theme;
 			}
+		}
+
+		if ( ! $settings['with_supports'] ) {
+			return static::$theme;
 		}
 
 		/*
@@ -82,10 +88,14 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 				$default_gradients = true;
 			}
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
+
+			// Classic themes without a theme.json don't support global duotone.
+			$theme_support_data['settings']['color']['defaultDuotone'] = false;
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
 
 		return $with_theme_supports;
 	}
+
 }

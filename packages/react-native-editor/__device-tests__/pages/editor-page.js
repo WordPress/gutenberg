@@ -51,9 +51,31 @@ class EditorPage {
 	async getBlockAtPosition(
 		blockName,
 		position = 1,
-		options = { autoscroll: false }
+		options = { autoscroll: false, useWaitForVisible: false }
 	) {
-		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
+		let blockLocator;
+
+		// Make it optional to use waitForVisible() so we can handle this test by test.
+		// This condition can be removed once we have gone through all test cases.
+		if ( options.useWaitForVisible ) {
+			let elementType;
+			switch ( blockName ) {
+				case blockNames.cover:
+					elementType = 'XCUIElementTypeButton';
+					break;
+				default:
+					elementType = 'XCUIElementTypeOther';
+					break;
+			}
+
+			blockLocator = isAndroid()
+				? `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
+				: `(//${ elementType }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[1]`;
+
+			await waitForVisible( this.driver, blockLocator );
+		} else {
+			blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
+		}
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
@@ -429,6 +451,10 @@ class EditorPage {
 			: '//XCUIElementTypeButton';
 		const blockActionsMenuButtonIdentifier = `Open Block Actions Menu`;
 		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
+		const blockActionsMenuButton = await waitForVisible(
+			this.driver,
+			blockActionsMenuButtonLocator
+		);
 
 		if ( isAndroid() ) {
 			const block = await this.getBlockAtPosition( blockName, position );
@@ -443,14 +469,12 @@ class EditorPage {
 			}
 		}
 
-		const blockActionsMenuButton = await this.driver.elementByXPath(
-			blockActionsMenuButtonLocator
-		);
 		await blockActionsMenuButton.click();
 
 		const removeActionButtonIdentifier = 'Remove block';
 		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
-		const removeActionButton = await this.driver.elementByXPath(
+		const removeActionButton = await waitForVisible(
+			this.driver,
 			removeActionButtonLocator
 		);
 

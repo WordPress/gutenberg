@@ -225,18 +225,21 @@ export const __unstableGetClientIdsTree = createSelector(
  *
  * @return {Array} ids of descendants.
  */
-export const getClientIdsOfDescendants = ( state, clientIds ) => {
-	const collectedIds = [];
-	for ( const givenId of clientIds ) {
-		for ( const descendantId of getBlockOrder( state, givenId ) ) {
-			collectedIds.push(
-				descendantId,
-				...getClientIdsOfDescendants( state, [ descendantId ] )
-			);
+export const getClientIdsOfDescendants = createSelector(
+	( state, clientIds ) => {
+		const collectedIds = [];
+		for ( const givenId of clientIds ) {
+			for ( const descendantId of getBlockOrder( state, givenId ) ) {
+				collectedIds.push(
+					descendantId,
+					...getClientIdsOfDescendants( state, [ descendantId ] )
+				);
+			}
 		}
-	}
-	return collectedIds;
-};
+		return collectedIds;
+	},
+	( state ) => [ state.blocks.order ]
+);
 
 /**
  * Returns an array containing the clientIds of the top-level blocks and
@@ -1501,7 +1504,7 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 
 	const { lock } = attributes;
 	const parentIsLocked = !! getTemplateLock( state, rootClientId );
-	// If we don't have a lock on the blockType level, we differ to the parent templateLock.
+	// If we don't have a lock on the blockType level, we defer to the parent templateLock.
 	if ( lock === undefined || lock?.remove === undefined ) {
 		return ! parentIsLocked;
 	}
@@ -1542,7 +1545,7 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 
 	const { lock } = attributes;
 	const parentIsLocked = getTemplateLock( state, rootClientId ) === 'all';
-	// If we don't have a lock on the blockType level, we differ to the parent templateLock.
+	// If we don't have a lock on the blockType level, we defer to the parent templateLock.
 	if ( lock === undefined || lock?.move === undefined ) {
 		return ! parentIsLocked;
 	}
@@ -1575,12 +1578,12 @@ export function canMoveBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean} Whether a given block type can be locked/unlocked.
  */
 export function canLockBlockType( state, nameOrType ) {
-	if ( ! hasBlockSupport( nameOrType, '__experimentalLock', true ) ) {
+	if ( ! hasBlockSupport( nameOrType, 'lock', true ) ) {
 		return false;
 	}
 
 	// Use block editor settings as the default value.
-	return !! state.settings?.__experimentalCanLockBlocks;
+	return !! state.settings?.canLockBlocks;
 }
 
 /**

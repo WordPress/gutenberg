@@ -435,7 +435,7 @@ Block type frontend and editor script definition. It will be enqueued both in th
 
 ### View Script
 
--   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `viewScript`
@@ -446,6 +446,8 @@ Block type frontend and editor script definition. It will be enqueued both in th
 ```
 
 Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.
+
+_Note: An option to pass also an array of view scripts exists since WordPress `6.0.0`._
 
 ### Editor Style
 

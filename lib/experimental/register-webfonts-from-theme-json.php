@@ -9,18 +9,43 @@
  * Register webfonts defined in theme.json.
  */
 function gutenberg_register_webfonts_from_theme_json() {
-	// Get settings from theme.json.
-	$theme_settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
+	// Get settings.
+	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
+
+	// If in the editor, add webfonts defined in variations.
+	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
+
+		foreach ( $variations as $variation ) {
+
+			// Sanity check: Skip if fontFamilies are not defined in the variation.
+			if (
+				empty( $variation['settings'] ) ||
+				empty( $variation['settings']['typography'] ) ||
+				empty( $variation['settings']['typography']['fontFamilies'] )
+			) {
+				continue;
+			}
+
+			// Merge the variation settings with the global settings.
+			$settings['typography']                 = empty( $settings['typography'] ) ? array() : $settings['typography'];
+			$settings['typography']['fontFamilies'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
+			$settings['typography']['fontFamilies'] = array_merge( $settings['typography']['fontFamilies'], $variation['settings']['typography']['fontFamilies'] );
+
+			// Make sure there are no duplicates.
+			$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
+		}
+	}
 
 	// Bail out early if there are no settings for webfonts.
-	if ( empty( $theme_settings['typography'] ) || empty( $theme_settings['typography']['fontFamilies'] ) ) {
+	if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
 		return;
 	}
 
 	$webfonts = array();
 
 	// Look for fontFamilies.
-	foreach ( $theme_settings['typography']['fontFamilies'] as $font_families ) {
+	foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 		foreach ( $font_families as $font_family ) {
 
 			// Skip if fontFace is not defined.
@@ -64,6 +89,7 @@ function gutenberg_register_webfonts_from_theme_json() {
 	}
 	foreach ( $webfonts as $webfont ) {
 		wp_webfonts()->register_webfont( $webfont );
+		wp_webfonts()->enqueue_webfont( $webfont['font-family'] );
 	}
 }
 

@@ -71,7 +71,7 @@ require __DIR__ . '/compat/wordpress-5.9/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.0/block-editor-settings.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/compat/wordpress-6.0/get-global-styles-and-settings.php';
-require __DIR__ . '/compat/wordpress-5.9/render-svg-filters.php';
+require __DIR__ . '/compat/wordpress-6.0/render-svg-filters.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
 require __DIR__ . '/compat/wordpress-5.9/global-styles-css-custom-properties.php';
@@ -127,10 +127,10 @@ require __DIR__ . '/experimental/experiments-page.php';
 require __DIR__ . '/compat/wordpress-5.9/kses.php';
 require __DIR__ . '/pwa.php';
 
-// TODO: Move this to be loaded from the style engine package, via the build directory.
-// Part of the build process should be to copy the PHP file to the correct location,
-// similar to the loading behaviour in `blocks.php`.
-require __DIR__ . '/experimental/style-engine/class-wp-style-engine-gutenberg.php';
+// Copied package PHP files.
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php';
+}
 
 require __DIR__ . '/block-supports/utils.php';
 require __DIR__ . '/block-supports/elements.php';

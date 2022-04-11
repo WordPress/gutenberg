@@ -3,33 +3,21 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ExternalLink, TextareaControl } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { RichText } from '@wordpress/block-editor';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
-function PostExcerptMinimal( { excerpt, onChange } ) {
+function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	return (
-		<RichText
-			aria-label={ __( 'Post excerpt text' ) }
-			placeholder={ __( 'Add excerpt' ) }
-			value={ excerpt }
-			onChange={ onChange }
-			tagName="p"
-		/>
-	);
-}
-
-function PostExcerptVerbose( { excerpt, onChange } ) {
-	return (
-		<>
+		<div className="editor-post-excerpt">
 			<TextareaControl
 				label={ __( 'Write an excerpt (optional)' ) }
 				className="editor-post-excerpt__textarea"
-				onChange={ onChange }
+				onChange={ ( value ) => onUpdateExcerpt( value ) }
 				value={ excerpt }
 			/>
 			<ExternalLink
@@ -39,25 +27,19 @@ function PostExcerptVerbose( { excerpt, onChange } ) {
 			>
 				{ __( 'Learn more about manual excerpts' ) }
 			</ExternalLink>
-		</>
-	);
-}
-
-export default function PostExcerpt( { isMinimal } ) {
-	const { editPost } = useDispatch( editorStore );
-	const excerpt = useSelect(
-		( select ) => select( editorStore ).getEditedPostAttribute( 'excerpt' ),
-		[]
-	);
-	const Component = isMinimal ? PostExcerptMinimal : PostExcerptVerbose;
-	return (
-		<div className="editor-post-excerpt">
-			<Component
-				excerpt={ excerpt }
-				onChange={ ( newExcerpt ) =>
-					editPost( { excerpt: newExcerpt } )
-				}
-			/>
 		</div>
 	);
 }
+
+export default compose( [
+	withSelect( ( select ) => {
+		return {
+			excerpt: select( editorStore ).getEditedPostAttribute( 'excerpt' ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		onUpdateExcerpt( excerpt ) {
+			dispatch( editorStore ).editPost( { excerpt } );
+		},
+	} ) ),
+] )( PostExcerpt );
