@@ -64,36 +64,54 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/group' ],
-			isMatch: ( { backgroundColor, gradient, style } ) => {
-				/*
-				 * Make this transformation available only if the Group has background
-				 * or gradient set, because otherwise `Cover` block displays a Placeholder.
-				 *
-				 * This helps avoid arbitrary decisions about the Cover block's background
-				 * and user confusion about the existence of previous content.
-				 */
-				return (
+			transform: ( attributes, innerBlocks ) => {
+				const {
+					align,
+					anchor,
+					backgroundColor,
+					gradient,
+					layout,
+					style,
+				} = attributes;
+				// If no background or gradient color is provided, default to 50% opacity.
+				// This matches the styling of a Cover block with a background image,
+				// in the state where a background image has been removed.
+				const dimRatio =
 					backgroundColor ||
 					style?.color?.background ||
-					style?.color?.gradient ||
-					gradient
-				);
-			},
-			transform: (
-				{ align, anchor, backgroundColor, gradient, style },
-				innerBlocks
-			) => {
+					style?.color?.gradient
+						? undefined
+						: 50;
+
+				const newAttributes = {
+					align,
+					anchor,
+					dimRatio,
+					overlayColor: backgroundColor,
+					customOverlayColor: style?.color?.background,
+					gradient,
+					customGradient: style?.color?.gradient,
+				};
+
+				// For variations that use a flex layout (e.g. Row and Stack),
+				// wrap the block in a Cover instead of converting directly to the cover block.
+				if ( layout?.type === 'flex' ) {
+					return createBlock( 'core/cover', newAttributes, [
+						createBlock( 'core/group', attributes, innerBlocks ),
+					] );
+				}
+
 				return createBlock(
 					'core/cover',
-					{
-						align,
-						anchor,
-						overlayColor: backgroundColor,
-						customOverlayColor: style?.color?.background,
-						gradient,
-						customGradient: style?.color?.gradient,
-					},
-					innerBlocks
+					newAttributes,
+					innerBlocks?.length
+						? innerBlocks
+						: [
+								createBlock( 'core/paragraph', {
+									fontSize: 'large',
+									align: 'center',
+								} ),
+						  ]
 				);
 			},
 		},
