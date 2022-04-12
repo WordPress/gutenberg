@@ -60,9 +60,23 @@ export default function ImageCropper( {
 				crop={ position }
 				zoom={ zoom / 100 }
 				aspect={ aspect }
-				onCropChange={ setPosition }
+				onCropChange={ ( newPosition ) => {
+					if (
+						! Number.isNaN( newPosition.x ) &&
+						! Number.isNaN( newPosition.y )
+					) {
+						setPosition( newPosition );
+					}
+				} }
 				onCropComplete={ ( newCropPercent ) => {
-					setCrop( newCropPercent );
+					if (
+						! Number.isNaN( newCropPercent.x ) &&
+						! Number.isNaN( newCropPercent.y ) &&
+						! Number.isNaN( newCropPercent.width ) &&
+						! Number.isNaN( newCropPercent.height )
+					) {
+						setCrop( newCropPercent );
+					}
 				} }
 				onZoomChange={ ( newZoom ) => {
 					setZoom( newZoom * 100 );

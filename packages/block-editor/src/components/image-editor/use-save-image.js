@@ -3,30 +3,40 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useState,
+	useRef,
+	useLayoutEffect,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
-export default function useSaveImage( {
-	crop,
-	rotation,
-	height,
-	width,
-	aspect,
-	url,
-	id,
-	onSaveImage,
-	onFinishEditing,
-} ) {
+export default function useSaveImage( settings ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const [ isInProgress, setIsInProgress ] = useState( false );
+	const settingsRef = useRef( settings );
+	useLayoutEffect( () => {
+		settingsRef.current = settings;
+	} );
 
 	const cancel = useCallback( () => {
 		setIsInProgress( false );
-		onFinishEditing();
-	}, [ setIsInProgress, onFinishEditing ] );
+		settingsRef.current.onFinishEditing();
+	}, [ setIsInProgress ] );
 
 	const apply = useCallback( () => {
+		const {
+			crop,
+			rotation,
+			height,
+			width,
+			aspect,
+			url,
+			id,
+		} = settingsRef.current;
+
 		setIsInProgress( true );
 
 		let attrs = {};
@@ -49,7 +59,7 @@ export default function useSaveImage( {
 			data: attrs,
 		} )
 			.then( ( response ) => {
-				onSaveImage( {
+				settingsRef.current.onSaveImage( {
 					id: response.id,
 					url: response.source_url,
 					height: height && width ? width / aspect : undefined,
@@ -70,21 +80,9 @@ export default function useSaveImage( {
 			} )
 			.finally( () => {
 				setIsInProgress( false );
-				onFinishEditing();
+				settingsRef.current.onFinishEditing();
 			} );
-	}, [
-		setIsInProgress,
-		crop,
-		rotation,
-		height,
-		width,
-		aspect,
-		url,
-		onSaveImage,
-		createErrorNotice,
-		setIsInProgress,
-		onFinishEditing,
-	] );
+	}, [ setIsInProgress, createErrorNotice, setIsInProgress ] );
 
 	return useMemo(
 		() => ( {
