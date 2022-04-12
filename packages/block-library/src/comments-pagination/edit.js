@@ -53,6 +53,7 @@ export default function QueryPaginationEdit( {
 			].includes( innerBlock.name );
 		} );
 	}, [] );
+
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
@@ -63,6 +64,21 @@ export default function QueryPaginationEdit( {
 		],
 		__experimentalLayout: usedLayout,
 	} );
+
+	// Get the Discussion settings
+	const { pageComments } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings;
+	} );
+
+	// If paging comments is not enabled in the Discussion Settings then hide the pagination
+	// controls. We don't want to remove them from the template so that when the user enables
+	// paging comments, the controls will be visible.
+	if ( ! pageComments ) {
+		return null;
+	}
+
 	return (
 		<>
 			{ hasNextPreviousBlocks && (
