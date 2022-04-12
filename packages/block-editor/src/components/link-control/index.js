@@ -236,6 +236,7 @@ function LinkControl( {
 		) {
 			onChange( {
 				url: currentInputValue,
+				opensInNewTab: value?.opensInNewTab || undefined,
 				title: internalTextValue,
 			} );
 		}
