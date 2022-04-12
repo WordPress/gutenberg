@@ -7,10 +7,6 @@
  * @since      6.0.0
  */
 
-if ( class_exists( 'WP_REST_Block_Patterns_Controller' ) ) {
-	return;
-}
-
 /**
  * Core class used to access block patterns via the REST API.
  *
