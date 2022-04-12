@@ -26,7 +26,7 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 	 * @since 6.0.0
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'block-patterns/categories';
 	}
 
