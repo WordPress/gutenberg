@@ -8,7 +8,7 @@
 
 class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 	/**
-	 * @var string
+	 * @var string|null
 	 */
 	private $test_block_name;
 
