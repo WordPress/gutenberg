@@ -40,9 +40,9 @@ function HeaderToolbar( {
 	getStylesFromColorScheme,
 	onHideKeyboard,
 	isRTL,
-	isDefaultView,
+	noContentSelected,
 } ) {
-	const wasDefaultView = useRef( isDefaultView );
+	const wasNoContentSelected = useRef( noContentSelected );
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 
 	const scrollViewRef = useRef( null );
@@ -86,18 +86,18 @@ function HeaderToolbar( {
 	const onToggleInserter = useCallback(
 		( isOpen ) => {
 			if ( isOpen ) {
-				wasDefaultView.current = isDefaultView;
+				wasNoContentSelected.current = noContentSelected;
 			}
 			setIsInserterOpen( isOpen );
 		},
-		[ isDefaultView ]
+		[ noContentSelected ]
 	);
 
-	// Default view mode should be preserved while the inserter is open.
+	// Expanded mode should be preserved while the inserter is open.
 	// This way we prevent style updates during the opening transition.
-	const useDefaultView = isInserterOpen
-		? wasDefaultView.current
-		: isDefaultView;
+	const useExpandedMode = isInserterOpen
+		? wasNoContentSelected.current
+		: noContentSelected;
 
 	return (
 		<View
@@ -106,7 +106,8 @@ function HeaderToolbar( {
 					styles[ 'header-toolbar__container' ],
 					styles[ 'header-toolbar__container--dark' ]
 				),
-				useDefaultView && styles.containerDefault,
+				useExpandedMode &&
+					styles[ 'header-toolbar__container--expanded' ],
 			] }
 		>
 			<ScrollView
@@ -122,7 +123,7 @@ function HeaderToolbar( {
 			>
 				<Inserter
 					disabled={ ! showInserter }
-					isDefaultView={ useDefaultView }
+					useExpandedMode={ useExpandedMode }
 					onToggle={ onToggleInserter }
 				/>
 				{ renderHistoryButtons() }
@@ -174,7 +175,7 @@ export default compose( [
 			isTextModeEnabled:
 				select( editPostStore ).getEditorMode() === 'text',
 			isRTL: select( blockEditorStore ).getSettings().isRTL,
-			isDefaultView: ! isAnyBlockSelected && ! isTitleSelected,
+			noContentSelected: ! isAnyBlockSelected && ! isTitleSelected,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

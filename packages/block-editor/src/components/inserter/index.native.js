@@ -39,18 +39,18 @@ const defaultRenderToggle = ( {
 	style,
 	containerStyle,
 	onLongPress,
-	isDefaultView,
+	useExpandedMode,
 } ) => {
-	// The "default view" refers to the editor's appearance when no blocks
+	// The "expanded mode" refers to the editor's appearance when no blocks
 	// are currently selected. The "add block" button has a separate style
-	// for the "default view", which are added via the below "defaultViewProps"
-	// and "defaultViewText" variables.
-	const defaultViewProps = isDefaultView && {
+	// for the "expanded mode", which are added via the below "expandedModeViewProps"
+	// and "expandedModeViewText" variables.
+	const expandedModeViewProps = useExpandedMode && {
 		icon: <Icon icon={ plus } style={ style } />,
 		customContainerStyles: containerStyle,
 		fixedRatio: false,
 	};
-	const defaultViewText = (
+	const expandedModeViewText = (
 		<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
 			{ __( 'Add Blocks' ) }
 		</Text>
@@ -72,9 +72,9 @@ const defaultRenderToggle = ( {
 				onLongPress,
 			} }
 			isDisabled={ disabled }
-			{ ...defaultViewProps }
+			{ ...expandedModeViewProps }
 		>
-			{ isDefaultView && defaultViewText }
+			{ useExpandedMode && expandedModeViewText }
 		</ToolbarButton>
 	);
 };
@@ -244,13 +244,13 @@ export class Inserter extends Component {
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
 			showSeparator,
-			isDefaultView,
+			useExpandedMode,
 		} = this.props;
 		if ( showSeparator && isOpen ) {
 			return <BlockInsertionPoint />;
 		}
-		const style = isDefaultView
-			? styles[ 'inserter-menu__add-block-button-icon--default' ]
+		const style = useExpandedMode
+			? styles[ 'inserter-menu__add-block-button-icon--expanded' ]
 			: getStylesFromColorScheme(
 					styles[ 'inserter-menu__add-block-button-icon' ],
 					styles[ 'inserter-menu__add-block-button-icon--dark' ]
@@ -300,7 +300,7 @@ export class Inserter extends Component {
 					style,
 					containerStyle,
 					onLongPress,
-					isDefaultView,
+					useExpandedMode,
 				} ) }
 				<Picker
 					ref={ ( instance ) => ( this.picker = instance ) }
