@@ -61,19 +61,6 @@ export const block = css`
 	width: 100%;
 `;
 
-export const BackdropView = styled.div`
-	background: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.controlBorderRadius };
-	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
-	left: 0;
-	position: absolute;
-	top: 2px;
-	bottom: 2px;
-	transition: transform ${ CONFIG.transitionDurationFast } ease;
-	${ reduceMotion( 'transition' ) }
-	z-index: 1;
-`;
-
 export const VisualLabelWrapper = styled.div`
 	// Makes the inline label be the correct height, equivalent to setting line-height: 0
 	display: flex;
