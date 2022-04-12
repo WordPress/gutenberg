@@ -111,7 +111,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			}
 		}
 
-		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
 			$block_classes = array(
 				'css'            => 'styles',
 				'__unstableType' => 'theme',
