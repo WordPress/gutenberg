@@ -6,7 +6,7 @@ import { Platform, ScrollView, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -42,6 +42,9 @@ function HeaderToolbar( {
 	isRTL,
 	isDefaultView,
 } ) {
+	const wasDefaultView = useRef( isDefaultView );
+	const [ isInserterOpened, setIsInserterOpened ] = useState( false );
+
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
 		// scrollview doesn't seem to automatically adjust to RTL on Android so, scroll to end when Android
@@ -80,6 +83,22 @@ function HeaderToolbar( {
 		return isRTL ? buttons.reverse() : buttons;
 	};
 
+	const onToggleInserter = useCallback(
+		( isOpen ) => {
+			if ( isOpen ) {
+				wasDefaultView.current = isDefaultView;
+			}
+			setIsInserterOpened( isOpen );
+		},
+		[ isDefaultView ]
+	);
+
+	// Default view mode should be preserved while the inserter is open.
+	// This way we prevent style updates during the opening transition.
+	const useDefaultView = isInserterOpened
+		? wasDefaultView.current
+		: isDefaultView;
+
 	return (
 		<View
 			style={ [
@@ -87,7 +106,7 @@ function HeaderToolbar( {
 					styles.container,
 					styles.containerDark
 				),
-				isDefaultView && styles.containerDefault,
+				useDefaultView && styles.containerDefault,
 			] }
 		>
 			<ScrollView
@@ -101,7 +120,8 @@ function HeaderToolbar( {
 			>
 				<Inserter
 					disabled={ ! showInserter }
-					isDefaultView={ isDefaultView }
+					isDefaultView={ useDefaultView }
+					onToggle={ onToggleInserter }
 				/>
 				{ renderHistoryButtons() }
 				<BlockToolbar />
