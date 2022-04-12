@@ -5,7 +5,7 @@ import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Radio } from 'reakit';
 // eslint-disable-next-line no-restricted-imports
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -31,6 +31,10 @@ import Tooltip from '../../tooltip';
 
 const { ButtonContentView, LabelView } = styles;
 
+const REDUCED_MOTION_TRANSITION_CONFIG = {
+	duration: 0,
+};
+
 const LAYOUT_ID = 'toggle-group-backdrop-shared-layout-id';
 
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
@@ -52,6 +56,7 @@ function ToggleGroupControlOptionBase(
 	>,
 	forwardedRef: ForwardedRef< any >
 ) {
+	const shouldReduceMotion = useReducedMotion();
 	const toggleGroupControlContext = useToggleGroupControlContext();
 	const id = useInstanceId(
 		ToggleGroupControlOptionBase,
@@ -107,6 +112,11 @@ function ToggleGroupControlOptionBase(
 				{ isActive ? (
 					<motion.div
 						className={ backdropClassname }
+						transition={
+							shouldReduceMotion
+								? REDUCED_MOTION_TRANSITION_CONFIG
+								: undefined
+						}
 						role="presentation"
 						layoutId={ LAYOUT_ID }
 					/>
