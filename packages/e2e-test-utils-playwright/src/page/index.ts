@@ -21,6 +21,7 @@ import { openPreviewPage } from './preview';
 import { setBrowserViewport } from './set-browser-viewport';
 import { showBlockToolbar } from './show-block-toolbar';
 import { visitAdminPage } from './visit-admin-page';
+import { visitSiteEditor } from './site-editor';
 
 class PageUtils {
 	browser: Browser;
@@ -43,6 +44,7 @@ class PageUtils {
 	setClipboardData = setClipboardData;
 	showBlockToolbar = showBlockToolbar;
 	visitAdminPage = visitAdminPage;
+	visitSiteEditor = visitSiteEditor;
 	openDocumentSettingsSidebar = openDocumentSettingsSidebar;
 	openPreviewPage = openPreviewPage;
 	setBrowserViewport = setBrowserViewport;
