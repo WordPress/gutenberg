@@ -45,7 +45,7 @@ test.describe( 'Title', () => {
 		await expect( actual ).toEqual( 'Editing template: Index' );
 	} );
 
-	test( "displays the selected template part's name in the title for the header template", async ( {
+	test( 'displays the selected template name in the title for the header template', async ( {
 		editorTitle,
 		pageUtils,
 	} ) => {
