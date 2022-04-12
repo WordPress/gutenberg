@@ -124,6 +124,7 @@ require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
 
 // WordPress 6.1 compat.
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
+require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -134,7 +135,6 @@ require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider-local.php';
 require __DIR__ . '/experimental/webfonts.php';
 require __DIR__ . '/experimental/blocks.php';
-require __DIR__ . '/experimental/persisted-preferences.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 
