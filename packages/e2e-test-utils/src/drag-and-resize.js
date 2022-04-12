@@ -11,7 +11,11 @@
 export async function dragAndResize( element, delta ) {
 	const elementPoint = await element.clickablePoint();
 	await page.mouse.move( elementPoint.x, elementPoint.y );
+	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 	await page.mouse.down();
+	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 	await page.mouse.move( elementPoint.x + delta.x, elementPoint.y + delta.y );
+	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 	await page.mouse.up();
+	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 }

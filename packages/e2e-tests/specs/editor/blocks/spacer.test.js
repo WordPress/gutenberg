@@ -34,7 +34,7 @@ describe( 'Spacer', () => {
 		);
 		await page.keyboard.press( 'Enter' );
 
-		const resizableHandle = await page.$(
+		const resizableHandle = await page.waitForSelector(
 			'.block-library-spacer__resize-container .components-resizable-box__handle'
 		);
 		await dragAndResize( resizableHandle, { x: 0, y: 50 } );
