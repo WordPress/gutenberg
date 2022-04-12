@@ -7,6 +7,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 
+// This is limited by WP REST API
+const MAX_COMMENTS_PER_PAGE = 100;
+
 /**
  * Return an object with the query args needed to fetch the default page of
  * comments.
@@ -29,13 +32,22 @@ export const useCommentQueryArgs = ( { postId } ) => {
 
 	// Get the Discussion settings that may be needed to query the comments.
 	const {
-		commentsPerPage: perPage,
+		pageComments,
+		commentsPerPage,
 		defaultCommentsPage: defaultPage,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
 		return __experimentalDiscussionSettings;
 	} );
+
+	// WP REST API doesn't allow fetching more than max items limit set per single page of data.
+	// As for the editor performance is more important than completeness of data and fetching only the
+	// max allowed for single page should be enough for the purpose of design and laying out the page.
+	// Fetching over the limit would return an error here but would work with backend query.
+	const perPage = pageComments
+		? Math.min( commentsPerPage, MAX_COMMENTS_PER_PAGE )
+		: MAX_COMMENTS_PER_PAGE;
 
 	// Get the number of the default page.
 	const page = useDefaultPageIndex( {
