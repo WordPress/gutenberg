@@ -19,8 +19,10 @@ import {
 	RichText,
 	useBlockProps,
 	useSetting,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { formatLtr } from '@wordpress/icons';
 
 const name = 'core/paragraph';
@@ -63,6 +65,11 @@ function ParagraphBlock( {
 		} ),
 		style: { direction },
 	} );
+
+	const paragraphPlaceholder = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().paragraphPlaceholder;
+	}, [] );
 
 	return (
 		<>
@@ -145,7 +152,11 @@ function ParagraphBlock( {
 						  )
 				}
 				data-empty={ content ? false : true }
-				placeholder={ placeholder || __( 'Type / to choose a block' ) }
+				placeholder={
+					placeholder ||
+					paragraphPlaceholder ||
+					__( 'Type / to choose a block' )
+				}
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>

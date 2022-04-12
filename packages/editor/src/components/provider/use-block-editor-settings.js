@@ -132,6 +132,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'keepCaretInsideBlock',
 				'maxWidth',
 				'onUpdateDefaultBlockStyles',
+				'paragraphPlaceholder',
 				'styles',
 				'template',
 				'templateLock',
