@@ -10,7 +10,7 @@ import useResizeAware from 'react-resize-aware';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { Children, useMemo } from '@wordpress/element';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
 
 /**
@@ -85,10 +85,23 @@ function ToggleGroupControl(
 			),
 		[ className, cx, isBlock ]
 	);
+
+	let length = 0;
+	let activeIndex = -1;
+	Children.forEach( children, ( option, index ) => {
+		length += 1;
+		if ( option.props.value === radio.state ) activeIndex = index;
+	} );
+
 	return (
 		<BaseControl help={ help }>
 			<ToggleGroupControlContext.Provider
-				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
+				value={ {
+					...radio,
+					isBlock: ! isAdaptiveWidth,
+					length,
+					activeIndex,
+				} }
 			>
 				{ ! hideLabelFromVision && (
 					<div>
