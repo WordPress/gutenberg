@@ -88,6 +88,7 @@ class EditorPage {
 					break;
 				case blockNames.paragraph:
 				case blockNames.heading:
+				case blockNames.list:
 					elementTypeAndroid = 'android.view.ViewGroup';
 					elementTypeiOS = 'XCUIElementTypeButton';
 					textViewElementNameAndroid = '/android.widget.EditText';
