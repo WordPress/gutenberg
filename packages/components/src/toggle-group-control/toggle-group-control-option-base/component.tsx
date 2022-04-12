@@ -117,20 +117,20 @@ function ToggleGroupControlOptionBase(
 				>
 					<ButtonContentView>{ children }</ButtonContentView>
 				</Radio>
-				{ /* Animated backdrop using framer motion's shared layout animation */ }
-				{ isActive ? (
-					<motion.div
-						className={ backdropClasses }
-						transition={
-							shouldReduceMotion
-								? REDUCED_MOTION_TRANSITION_CONFIG
-								: undefined
-						}
-						role="presentation"
-						layoutId={ LAYOUT_ID }
-					/>
-				) : null }
 			</WithToolTip>
+			{ /* Animated backdrop using framer motion's shared layout animation */ }
+			{ isActive ? (
+				<motion.div
+					className={ backdropClasses }
+					transition={
+						shouldReduceMotion
+							? REDUCED_MOTION_TRANSITION_CONFIG
+							: undefined
+					}
+					role="presentation"
+					layoutId={ LAYOUT_ID }
+				/>
+			) : null }
 		</LabelView>
 	);
 }
