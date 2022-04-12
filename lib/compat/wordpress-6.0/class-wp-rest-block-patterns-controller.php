@@ -113,19 +113,19 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	public function prepare_item_for_response( $item, $request ) {
 		$fields = $this->get_fields_for_response( $request );
 		$keys   = array(
-			'name',
-			'title',
-			'description',
-			'viewportWidth',
-			'blockTypes',
-			'categories',
-			'keywords',
-			'content',
+			'name' => 'name',
+			'title' => 'title',
+			'description' => 'description',
+			'viewportWidth' => 'viewport_width',
+			'blockTypes' => 'block_types',
+			'categories' => 'categories',
+			'keywords' => 'keywords',
+			'content' => 'content',
 		);
 		$data   = array();
-		foreach ( $keys as $key ) {
-			if ( isset( $item[ $key ] ) && rest_is_field_included( $key, $fields ) ) {
-				$data[ $key ] = $item[ $key ];
+		foreach ( $keys as $item_key => $rest_key ) {
+			if ( isset( $item[ $item_key ] ) && rest_is_field_included( $rest_key, $fields ) ) {
+				$data[ $rest_key ] = $item[ $item_key ];
 			}
 		}
 
@@ -148,53 +148,53 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 			'title'      => 'block-pattern',
 			'type'       => 'object',
 			'properties' => array(
-				'name'          => array(
-					'description' => __( 'The pattern name.', 'gutenberg' ),
-					'type'        => 'string',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
+				'name'           => array(
+					'description'  => __( 'The pattern name.', 'gutenberg' ),
+					'type'         => 'string',
+					'readonly'     => true,
+					'context'      => array( 'view', 'embed' ),
 				),
-				'title'         => array(
-					'description' => __( 'The pattern title, in human readable format.', 'gutenberg' ),
-					'type'        => 'string',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
+				'title'          => array(
+					'description'  => __( 'The pattern title, in human readable format.', 'gutenberg' ),
+					'type'         => 'string',
+					'readonly'     => true,
+					'context'      => array( 'view', 'embed' ),
 				),
-				'description'   => array(
-					'description' => __( 'The pattern detailed description.', 'gutenberg' ),
-					'type'        => 'string',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
+				'description'    => array(
+					'description'  => __( 'The pattern detailed description.', 'gutenberg' ),
+					'type'         => 'string',
+					'readonly'     => true,
+					'context'      => array( 'view', 'embed' ),
 				),
-				'viewportWidth' => array(
-					'description' => __( 'The pattern viewport width for inserter preview.', 'gutenberg' ),
-					'type'        => 'number',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
+				'viewport_width' => array(
+					'description'  => __( 'The pattern viewport width for inserter preview.', 'gutenberg' ),
+					'type'         => 'number',
+					'readonly'     => true,
+					'context'      => array( 'view', 'embed' ),
 				),
-				'blockTypes'    => array(
-					'description' => __( 'Block types that the pattern is intended to be used with.', 'gutenberg' ),
-					'type'        => 'array',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
+				'block_types'    => array(
+					'description'  => __( 'Block types that the pattern is intended to be used with.', 'gutenberg' ),
+					'type'         => 'array',
+					'readonly'     => true,
+					'context'      => array( 'view', 'embed' ),
 				),
-				'categories'    => array(
-					'description' => __( 'The pattern category slugs.', 'gutenberg' ),
-					'type'        => 'array',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
+				'categories'     => array(
+					'description'  => __( 'The pattern category slugs.', 'gutenberg' ),
+					'type'         => 'array',
+					'readonly'     => true,
+					'context'      => array( 'view', 'embed' ),
 				),
-				'keywords'      => array(
-					'description' => __( 'The pattern keywords.', 'gutenberg' ),
-					'type'        => 'array',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
+				'keywords'       => array(
+					'description'  => __( 'The pattern keywords.', 'gutenberg' ),
+					'type'         => 'array',
+					'readonly'     => true,
+					'context'      => array( 'view', 'embed' ),
 				),
-				'content'       => array(
-					'description' => __( 'The pattern content.', 'gutenberg' ),
-					'type'        => 'string',
-					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
+				'content'        => array(
+					'description'  => __( 'The pattern content.', 'gutenberg' ),
+					'type'         => 'string',
+					'readonly'     => true,
+					'context'      => array( 'view', 'embed' ),
 				),
 			),
 		);
