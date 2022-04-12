@@ -103,8 +103,8 @@ function HeaderToolbar( {
 		<View
 			style={ [
 				getStylesFromColorScheme(
-					styles.container,
-					styles.containerDark
+					styles[ 'header-toolbar__container' ],
+					styles[ 'header-toolbar__container--dark' ]
 				),
 				useDefaultView && styles.containerDefault,
 			] }
@@ -116,7 +116,9 @@ function HeaderToolbar( {
 				showsHorizontalScrollIndicator={ false }
 				keyboardShouldPersistTaps="always"
 				alwaysBounceHorizontal={ false }
-				contentContainerStyle={ styles.scrollableContent }
+				contentContainerStyle={
+					styles[ 'header-toolbar__scrollable-content' ]
+				}
 			>
 				<Inserter
 					disabled={ ! showInserter }
@@ -127,7 +129,11 @@ function HeaderToolbar( {
 				<BlockToolbar />
 			</ScrollView>
 			{ showKeyboardHideButton && (
-				<ToolbarGroup passedStyle={ styles.keyboardHideContainer }>
+				<ToolbarGroup
+					passedStyle={
+						styles[ 'header-toolbar__keyboard-hide-container' ]
+					}
+				>
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
 						icon={ keyboardClose }
