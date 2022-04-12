@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
- import { Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
- /**
-  * Internal dependencies
-  */
- import RichText from '../rich-text';
+/**
+ * Internal dependencies
+ */
+import RichText from '../rich-text';
 
 export default class BlockButton extends Component {
 	render() {
