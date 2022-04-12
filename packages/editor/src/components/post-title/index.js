@@ -33,7 +33,7 @@ import { store as editorStore } from '../../store';
  */
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
-function PostTitle( _props, forwardedRef ) {
+function PostTitle( _, forwardedRef ) {
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );
 	const { editPost } = useDispatch( editorStore );
@@ -70,7 +70,7 @@ function PostTitle( _props, forwardedRef ) {
 	}, [] );
 
 	useImperativeHandle( forwardedRef, () => ( {
-		focusTitle: () => {
+		focus: () => {
 			if ( isCleanNewPost ) {
 				ref?.current?.focus();
 			}

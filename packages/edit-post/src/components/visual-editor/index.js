@@ -85,7 +85,7 @@ function MaybeIframe( {
 export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
-		isActive,
+		isWelcomeGuideVisible,
 		isTemplateMode,
 		wrapperBlockName,
 		wrapperUniqueId,
@@ -97,9 +97,6 @@ export default function VisualEditor( { styles } ) {
 		} = select( editPostStore );
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const _isTemplateMode = isEditingTemplate();
-		const feature = _isTemplateMode
-			? 'welcomeGuideTemplate'
-			: 'welcomeGuide';
 		let _wrapperBlockName;
 
 		if ( getCurrentPostType() === 'wp_block' ) {
@@ -110,7 +107,7 @@ export default function VisualEditor( { styles } ) {
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			isActive: isFeatureActive( feature ),
+			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			isTemplateMode: _isTemplateMode,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
@@ -194,11 +191,11 @@ export default function VisualEditor( { styles } ) {
 
 	const titleRef = useRef();
 	useEffect( () => {
-		if ( isActive ) {
+		if ( isWelcomeGuideVisible ) {
 			return;
 		}
-		titleRef?.current?.focusTitle();
-	}, [ isActive ] );
+		titleRef?.current?.focus();
+	}, [ isWelcomeGuideVisible ] );
 
 	return (
 		<BlockTools
