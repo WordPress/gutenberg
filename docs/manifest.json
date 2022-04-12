@@ -630,6 +630,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BoxModelOverlay",
+		"slug": "box-model-overlay",
+		"markdown_source": "../packages/components/src/box-model-overlay/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ButtonGroup",
 		"slug": "button-group",
 		"markdown_source": "../packages/components/src/button-group/README.md",

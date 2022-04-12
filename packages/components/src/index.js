@@ -186,6 +186,7 @@ export {
 } from './slot-fill';
 export { default as __experimentalStyleProvider } from './style-provider';
 export { ZStack as __experimentalZStack } from './z-stack';
+export { default as __experimentalBoxModelOverlay } from './box-model-overlay';
 
 // Higher-Order Components.
 export {
