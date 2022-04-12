@@ -113,6 +113,12 @@ export default function VisualEditor( { styles } ) {
 			wrapperUniqueId: getCurrentPostId(),
 		};
 	}, [] );
+	const { isCleanNewPost } = useSelect( ( select ) => {
+		const { isCleanNewPost: _isCleanNewPost } = select( editorStore );
+		return {
+			isCleanNewPost: _isCleanNewPost(),
+		};
+	}, [] );
 	const hasMetaBoxes = useSelect(
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
@@ -191,11 +197,11 @@ export default function VisualEditor( { styles } ) {
 
 	const titleRef = useRef();
 	useEffect( () => {
-		if ( isWelcomeGuideVisible ) {
+		if ( isWelcomeGuideVisible || ! isCleanNewPost ) {
 			return;
 		}
 		titleRef?.current?.focus();
-	}, [ isWelcomeGuideVisible ] );
+	}, [ isWelcomeGuideVisible, isCleanNewPost ] );
 
 	return (
 		<BlockTools
