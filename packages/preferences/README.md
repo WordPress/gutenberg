@@ -109,11 +109,11 @@ wp.data.dispatch( 'core/preferences' ).setPersistenceLayer( {
 } );
 ```
 
-For application that persist data to an asynchronous API, a concern will be that loading preferences can lead to slower application start up.
+For application that persist data to an asynchronous API, a concern is that loading preferences can lead to slower application start up.
 
 A recommendation is to pre-load any persistence layer data and keep it in a local cache particularly if you're using an asynchronous API to persist data.
 
-While `get` is only called currently when `setPersistenceLayer` is triggered.
+Note: currently `get` is called only when `setPersistenceLayer` is triggered. This may change in the future, so it's sensible to optimize `get` using a local cache, as shown in the example below.
 
 ```js
 // Preloaded data from the server.
@@ -133,8 +133,6 @@ wp.data.dispatch( 'core/preferences' ).setPersistenceLayer( {
 	},
 } );
 ```
-
-See the `@wordpress/database-persistence-layer` package for a reference implementation.
 
 ### Components
 
