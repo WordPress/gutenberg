@@ -7,7 +7,7 @@ import { useReducedMotion } from 'framer-motion';
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useState, memo } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,55 +26,16 @@ const TRANSITION_CONFIG = {
 };
 
 function ToggleGroupControlBackdrop( {
-	containerSizes,
+	containerSizes: { width: containerWidth },
 }: ToggleGroupControlBackdropProps ) {
 	const shouldReduceMotion = useReducedMotion();
-	const { items, state, isBlock } = useToggleGroupControlContext();
+	const { activeIndex, length } = useToggleGroupControlContext();
 
-	const [ itemSizes, setItemSizes ] = useState<
-		| null
-		| {
-				width: number;
-				left: number;
-		  }[]
-	>( null );
+	containerWidth ??= 0;
+	const width = containerWidth / length;
+	const x = `${ activeIndex * width }px`;
 
-	const selectedItemIndex = items.findIndex(
-		// All valid children (e.g. extending `ToggleGroupControlOptionBase`)
-		// have a `data-value` attribute.
-		( item ) =>
-			typeof state !== 'undefined' &&
-			item.ref.current?.dataset.value === `${ state }`
-	);
-
-	// `useLayoutEffect` is necessary because we need to wait for the DOM
-	// mutations to take effect before reading the new element's sizes and offsets.
-	useLayoutEffect( () => {
-		setItemSizes(
-			items.map( ( item ) => {
-				// Using `offsetLeft` in order to get the gap with respect to the
-				// `offsetParent` element. This is different from the behavior of other
-				// functions (like `getBoundingClientRect`), which compute those figures
-				// relatively to the viewport.
-				// For this reason, it's important that the `offsetParent` of each `<Radio>`
-				// option is the inner wrapper of `ToggleGroupControl` — which means that in
-				// the DOM tree between that wrapper and each `<Radio>` component there
-				// can't be any element with `position: relative` or `position: absolute`.
-				// See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetLeft
-
-				const toggleGroupOptionWrapper = item.ref.current?.closest(
-					'[data-toggle-group-control-option-wrapper="true"]'
-				) as HTMLElement | null;
-
-				return {
-					left: toggleGroupOptionWrapper?.offsetLeft ?? -1,
-					width: toggleGroupOptionWrapper?.offsetWidth ?? 0,
-				};
-			} )
-		);
-	}, [ containerSizes.width, containerSizes.height, items, isBlock ] );
-
-	return selectedItemIndex >= 0 && itemSizes?.[ selectedItemIndex ] ? (
+	return activeIndex >= 0 ? (
 		<AnimatedBackdrop
 			role="presentation"
 			transition={
@@ -85,10 +46,8 @@ function ToggleGroupControlBackdrop( {
 					  }
 					: TRANSITION_CONFIG
 			}
-			animate={ {
-				width: itemSizes[ selectedItemIndex ].width,
-				x: `${ itemSizes[ selectedItemIndex ].left }px`,
-			} }
+			animate={ { width, x } }
+			initial={ false }
 		/>
 	) : null;
 }
