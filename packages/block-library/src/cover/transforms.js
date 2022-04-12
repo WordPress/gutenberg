@@ -70,20 +70,22 @@ const transforms = {
 					anchor,
 					backgroundColor,
 					gradient,
-					layout,
 					style,
 				} = attributes;
+
 				// If no background or gradient color is provided, default to 50% opacity.
 				// This matches the styling of a Cover block with a background image,
 				// in the state where a background image has been removed.
 				const dimRatio =
 					backgroundColor ||
+					gradient ||
 					style?.color?.background ||
 					style?.color?.gradient
 						? undefined
 						: 50;
 
-				const newAttributes = {
+				// Move the background or gradient color to the parent Cover block.
+				const parentAttributes = {
 					align,
 					anchor,
 					dimRatio,
@@ -93,26 +95,29 @@ const transforms = {
 					customGradient: style?.color?.gradient,
 				};
 
-				// For variations that use a flex layout (e.g. Row and Stack),
-				// wrap the block in a Cover instead of converting directly to the cover block.
-				if ( layout?.type === 'flex' ) {
-					return createBlock( 'core/cover', newAttributes, [
-						createBlock( 'core/group', attributes, innerBlocks ),
-					] );
-				}
+				const attributesWithoutBackgroundColors = {
+					...attributes,
+					backgroundColor: undefined,
+					gradient: undefined,
+					style: {
+						...attributes?.style,
+						color: {
+							...attributes?.style?.color,
+							background: undefined,
+							gradient: undefined,
+						},
+					},
+				};
 
-				return createBlock(
-					'core/cover',
-					newAttributes,
-					innerBlocks?.length
-						? innerBlocks
-						: [
-								createBlock( 'core/paragraph', {
-									fontSize: 'large',
-									align: 'center',
-								} ),
-						  ]
-				);
+				// Preserve the block by nesting it within the Cover block,
+				// instead of converting the Group block directly to the Cover block.
+				return createBlock( 'core/cover', parentAttributes, [
+					createBlock(
+						'core/group',
+						attributesWithoutBackgroundColors,
+						innerBlocks
+					),
+				] );
 			},
 		},
 	],
