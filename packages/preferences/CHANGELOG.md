@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Breaking change
-
--   The preferences package is no longer compatible with the `@wordpress/data` persistence plugin. Please use the new `setPersistenceLayer` API. ([#39795](https://github.com/WordPress/gutenberg/pull/39795))
-
 ### Enhancement
 
 -   A new `setPersistenceLayer` action has been introduced. ([#39795](https://github.com/WordPress/gutenberg/pull/39795))
