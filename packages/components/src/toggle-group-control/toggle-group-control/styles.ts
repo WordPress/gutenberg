@@ -11,6 +11,8 @@ import { motion } from 'framer-motion';
  */
 import { CONFIG, COLORS } from '../../utils';
 
+export const inset = 2;
+
 export const ToggleGroupControl = css`
 	background: ${ COLORS.ui.background };
 	border: 1px solid;
@@ -19,7 +21,7 @@ export const ToggleGroupControl = css`
 	display: inline-flex;
 	min-height: ${ CONFIG.controlHeight };
 	min-width: 0;
-	padding: 2px;
+	padding: ${ inset }px;
 	position: relative;
 	&:hover {
 		border-color: ${ COLORS.ui.borderHover };

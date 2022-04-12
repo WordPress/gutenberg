@@ -15,7 +15,7 @@ import { memo } from '@wordpress/element';
 import type { ToggleGroupControlBackdropProps } from '../types';
 import { useToggleGroupControlContext } from '../context';
 import { CONFIG } from '../../utils';
-import { AnimatedBackdrop } from './styles';
+import { AnimatedBackdrop, inset } from './styles';
 
 const TRANSITION_CONFIG = {
 	type: 'tween',
@@ -32,8 +32,9 @@ function ToggleGroupControlBackdrop( {
 	const { activeIndex, length } = useToggleGroupControlContext();
 
 	containerWidth ??= 0;
-	const width = containerWidth / length;
-	const x = `${ activeIndex * width }px`;
+	const containerInsideWidth = Math.max( 0, containerWidth - inset * 2 );
+	const width = containerInsideWidth / length;
+	const x = `${ inset + activeIndex * width }px`;
 
 	return activeIndex >= 0 ? (
 		<AnimatedBackdrop
