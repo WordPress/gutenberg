@@ -235,10 +235,7 @@ function ButtonEdit( props ) {
 						} ) => {
 							setAttributes( { url: newURL } );
 
-							if (
-								'undefined' !== typeof newOpensInNewTab &&
-								opensInNewTab !== newOpensInNewTab
-							) {
+							if ( opensInNewTab !== newOpensInNewTab ) {
 								onToggleOpenInNewTab( newOpensInNewTab );
 							}
 						} }
