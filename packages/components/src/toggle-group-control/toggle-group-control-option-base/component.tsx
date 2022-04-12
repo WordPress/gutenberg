@@ -63,6 +63,8 @@ function ToggleGroupControlOptionBase(
 		value,
 		children,
 		showTooltip = false,
+		activeIndex,
+		length,
 		...radioProps
 	} = {
 		...toggleGroupControlContext,
@@ -79,12 +81,7 @@ function ToggleGroupControlOptionBase(
 	);
 
 	return (
-		<LabelView
-			className={ labelViewClasses }
-			data-active={ isActive }
-			// Necessary for the ToggleGroupControlBackdrop component to render properly
-			data-toggle-group-control-option-wrapper="true"
-		>
+		<LabelView className={ labelViewClasses }>
 			<WithToolTip
 				showTooltip={ showTooltip }
 				text={ radioProps[ 'aria-label' ] }
