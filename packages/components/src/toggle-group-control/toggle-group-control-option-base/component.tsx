@@ -108,7 +108,7 @@ function ToggleGroupControlOptionBase(
 				>
 					<ButtonContentView>{ children }</ButtonContentView>
 				</Radio>
-				{ /* Animated backdrop */ }
+				{ /* Animated backdrop using framer motion's shared layout animation */ }
 				{ isActive ? (
 					<motion.div
 						className={ backdropClassname }
