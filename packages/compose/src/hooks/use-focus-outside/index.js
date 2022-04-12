@@ -134,7 +134,9 @@ export default function useFocusOutside( onFocusOutside ) {
 	 *
 	 * @param {SyntheticEvent} event Event for mousedown or mouseup.
 	 */
-	const normalizeButtonFocus = useCallback( ( event ) => {
+	const normalizeButtonFocus = useCallback( (
+		/** @type {SyntheticEvent} */ event
+	) => {
 		const { type, target } = event;
 		const isInteractionEnd = includes( [ 'mouseup', 'touchend' ], type );
 
@@ -154,7 +156,9 @@ export default function useFocusOutside( onFocusOutside ) {
 	 *
 	 * @param {SyntheticEvent} event Blur event.
 	 */
-	const queueBlurCheck = useCallback( ( event ) => {
+	const queueBlurCheck = useCallback( (
+		/** @type {SyntheticEvent} */ event
+	) => {
 		// React does not allow using an event reference asynchronously
 		// due to recycling behavior, except when explicitly persisted.
 		event.persist();

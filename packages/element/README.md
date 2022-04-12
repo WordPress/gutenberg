@@ -200,7 +200,15 @@ _Returns_
 
 ### createRoot
 
-Undocumented declaration.
+Creates a root element for React.
+
+_Parameters_
+
+-   _target_ `HTMLElement`: DOM node into which element should be rendered.
+
+_Returns_
+
+-   `import('./react-dom/client').ReactRoot`: Root element.
 
 ### findDOMNode
 

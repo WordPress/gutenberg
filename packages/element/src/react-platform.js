@@ -42,4 +42,11 @@ export { render };
  */
 export { unmountComponentAtNode };
 
+/**
+ * Creates a root element for React.
+ *
+ * @param {HTMLElement} target DOM node into which element should be rendered.
+ *
+ * @return {import('./react-dom/client').ReactRoot} Root element.
+ */
 export { createRoot };

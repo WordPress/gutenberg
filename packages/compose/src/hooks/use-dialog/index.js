@@ -52,7 +52,9 @@ function useDialog( options ) {
 			currentOptions.current.onClose();
 		}
 	} );
-	const closeOnEscapeRef = useCallback( ( node ) => {
+	const closeOnEscapeRef = useCallback( (
+		/** @type {HTMLElement} */ node
+	) => {
 		if ( ! node ) {
 			return;
 		}
