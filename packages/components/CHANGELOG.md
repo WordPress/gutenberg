@@ -7,6 +7,11 @@
 -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791)).
 -   `Navigator`: prevent partially hiding focus ring styles, by removing unnecessary overflow rules on `NavigatorScreen` ([#44973](https://github.com/WordPress/gutenberg/pull/44973)).
 -   `Navigator`: restore focus only once per location  ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
+-   `ToggleGroupControl`: fix rendering glitch when used in combination with `Popover` ([#40276](https://github.com/WordPress/gutenberg/pull/40276)).
+
+### Enhancements
+
+-   `ToggleGroupControl`: rewrite backdrop animation with `framer-motion` ([#40276](https://github.com/WordPress/gutenberg/pull/40276)).
 
 ### Documentation
 
