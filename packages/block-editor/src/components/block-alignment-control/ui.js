@@ -6,7 +6,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
@@ -31,7 +31,7 @@ import useAvailableAlignments from './use-available-alignments';
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	none: {
 		icon: alignNone,
-		title: __( 'None' ),
+		title: _x( 'None', 'Alignment option' ),
 	},
 	left: {
 		icon: positionLeft,
