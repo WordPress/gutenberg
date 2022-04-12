@@ -456,14 +456,14 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations = () => async (
 
 export const getBlockPatterns = () => async ( { dispatch } ) => {
 	const patterns = await apiFetch( {
-		path: '/__experimental/block-patterns/patterns',
+		path: '/wp/v2/block-patterns/patterns',
 	} );
 	dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 };
 
 export const getBlockPatternCategories = () => async ( { dispatch } ) => {
 	const categories = await apiFetch( {
-		path: '/__experimental/block-patterns/categories',
+		path: '/wp/v2/block-patterns/categories',
 	} );
 	dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
 };

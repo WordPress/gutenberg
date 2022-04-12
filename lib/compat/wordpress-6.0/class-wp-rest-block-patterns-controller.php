@@ -24,7 +24,7 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'block-patterns/patterns';
 	}
 
