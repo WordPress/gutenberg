@@ -43,7 +43,7 @@ function HeaderToolbar( {
 	isDefaultView,
 } ) {
 	const wasDefaultView = useRef( isDefaultView );
-	const [ isInserterOpened, setIsInserterOpened ] = useState( false );
+	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
@@ -88,14 +88,14 @@ function HeaderToolbar( {
 			if ( isOpen ) {
 				wasDefaultView.current = isDefaultView;
 			}
-			setIsInserterOpened( isOpen );
+			setIsInserterOpen( isOpen );
 		},
 		[ isDefaultView ]
 	);
 
 	// Default view mode should be preserved while the inserter is open.
 	// This way we prevent style updates during the opening transition.
-	const useDefaultView = isInserterOpened
+	const useDefaultView = isInserterOpen
 		? wasDefaultView.current
 		: isDefaultView;
 
