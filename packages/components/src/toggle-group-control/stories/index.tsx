@@ -8,10 +8,12 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  */
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
+import type { ReactText } from 'react';
 
 /**
  * Internal dependencies
  */
+import Button from '../../button';
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
@@ -131,4 +133,55 @@ export const Borderless: ComponentStory< typeof ToggleGroupControl > =
 Borderless.args = {
 	...WithIcons.args,
 	__experimentalIsBorderless: true,
+};
+
+// TODO: remove before merging
+export const DoubleToggles: ComponentStory<
+	typeof ToggleGroupControl
+> = () => {
+	const aligns = [ 'Left', 'Center', 'Right' ];
+	const quantities = [ 'One', 'Two', 'Three', 'Four' ];
+
+	const [ alignState, setAlignState ] = useState< string | undefined >();
+	const [ quantityState, setQuantityState ] = useState<
+		string | undefined
+	>();
+
+	return (
+		<div>
+			<ToggleGroupControl
+				onChange={ ( value ) => setAlignState( value as string ) }
+				value={ alignState }
+				label={ 'Pick an alignment option' }
+			>
+				{ aligns.map( ( key ) => (
+					<ToggleGroupControlOption
+						key={ key }
+						value={ key }
+						label={ key }
+					/>
+				) ) }
+			</ToggleGroupControl>
+			<Button onClick={ () => setAlignState( undefined ) } isTertiary>
+				Reset
+			</Button>
+
+			<ToggleGroupControl
+				onChange={ ( value ) => setQuantityState( value as string ) }
+				value={ quantityState }
+				label={ 'Pick a quantity' }
+			>
+				{ quantities.map( ( key ) => (
+					<ToggleGroupControlOption
+						key={ key }
+						value={ key }
+						label={ key }
+					/>
+				) ) }
+			</ToggleGroupControl>
+			<Button onClick={ () => setQuantityState( undefined ) } isTertiary>
+				Reset
+			</Button>
+		</div>
+	);
 };
