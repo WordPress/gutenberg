@@ -5,6 +5,37 @@
  * @package gutenberg
  */
 
+function gutenberg_is_global_styles_in_5_8( $style ) {
+	if ( isset( $style['__unstableType'] ) && ( 'globalStyles' === $style['__unstableType'] ) ) {
+		return true;
+	}
+
+	return false;
+}
+
+function gutenberg_is_global_styles_in_5_9( $style ) {
+	/*
+	 * In WordPress 5.9 we don't have a mechanism to distinguish block styles generated via theme.json
+	 * from styles that come from the stylesheet of a theme.
+	 *
+	 * We do know that the block styles generated via theme.json have some rules for alignment.
+	 * Hence, by detecting the presence of these rules, we can tell with high certainty
+	 * whether or not the incoming $style has been generated from theme.json.
+	 */
+	$root_styles  = '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
+	$root_styles .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
+	$root_styles .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+	if(
+		( isset( $style['__unstableType'] ) && ( 'presets' === $style['__unstableType'] ) ) ||
+		( isset( $style['__unstableType'] ) && ( 'theme' === $style['__unstableType'] ) && str_contains( $style['css'], $root_styles ) )
+	) {
+		return true;
+	}
+
+	return false;
+}
+
 /**
  * Adds styles and __experimentalFeatures to the block editor settings.
  *
@@ -16,15 +47,6 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	// Set what is the context for this data request.
 	$context = 'other';
 	if (
-		is_callable( 'get_current_screen' ) &&
-		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		is_object( get_current_screen() ) &&
-		gutenberg_is_edit_site_page( get_current_screen()->id )
-	) {
-		$context = 'site-editor';
-	}
-
-	if (
 		defined( 'REST_REQUEST' ) &&
 		REST_REQUEST &&
 		isset( $_GET['context'] ) &&
@@ -33,65 +55,40 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		$context = 'mobile';
 	}
 
-	if ( 'site-editor' === $context ) {
-		// Remove global styles added by core.
-		// This needs to be fixed in core but this will help us in the meanwhile.
-		$styles_without_existing_global_styles = array();
-		foreach ( $settings['styles'] as $style ) {
-			if (
-				! isset( $style['__unstableType'] ) ||
-				! in_array( $style['__unstableType'], array( 'globalStyles', 'presets' ), true )
-			) {
-				$styles_without_existing_global_styles[] = $style;
-			}
-		}
-		$settings['styles'] = $styles_without_existing_global_styles;
-	}
-
 	if ( 'other' === $context ) {
+		global $wp_version;
+		$is_wp_5_8 = version_compare( $wp_version, '5.8', '>=' ) && version_compare( $wp_version, '5.9', '<' );
+		$is_wp_5_9 = version_compare( $wp_version, '5.9', '>=' ) && version_compare( $wp_version, '6.0', '<' );
+
 		// Make sure the styles array exists.
 		// In some contexts, like the navigation editor, it doesn't.
 		if ( ! isset( $settings['styles'] ) ) {
 			$settings['styles'] = array();
 		}
 
+		// Remove existing global styles provided by core.
 		$styles_without_existing_global_styles = array();
 		foreach ( $settings['styles'] as $style ) {
 			if (
-				! isset( $style['__unstableType'] ) ||
-				// '__unstableType' is 'globalStyles' for WordPress 5.8 and 'presets' for WordPress 5.9.
-				//
-				// Note that styles classified as'theme', can be from the theme stylesheet
-				// or from the theme.json (the styles section).
-				// We are unable to identify which is which, so we can't remove and recreate those.
-				// Instead, we reload the theme.json styles from the plugin.
-				// Because they'll use the same selectors and load later,
-				// they'll have higher priority than core's.
-				//
-				// Theoretically, this approach with 'theme' styles could be problematic:
-				// if we remove style properties in the plugin, if selectors change, etc.
-				// We need to address this issue directly in core by alowing to identify
-				// styles coming from theme.json.
-				//
-				// A final note about 'theme' styles: this flag is used to identify theme
-				// styles that may need to be removed if the user toggles
-				// "Preferences > Use theme styles" in the preferences modal.
-				//
-				! in_array( $style['__unstableType'], array( 'globalStyles', 'presets' ), true )
+				( $is_wp_5_8 && ! gutenberg_is_global_styles_in_5_8( $style ) ) ||
+				( $is_wp_5_9 && ! gutenberg_is_global_styles_in_5_9( $style ) )
 			) {
 				$styles_without_existing_global_styles[] = $style;
 			}
 		}
 
+		// Recreate global styles.
 		$new_global_styles = array();
 		$presets           = array(
 			array(
 				'css'            => 'variables',
 				'__unstableType' => 'presets',
+				'isGlobalStyles' => true,
 			),
 			array(
 				'css'            => 'presets',
 				'__unstableType' => 'presets',
+				'isGlobalStyles' => true,
 			),
 		);
 		foreach ( $presets as $preset_style ) {
@@ -102,10 +99,11 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			}
 		}
 
-		if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
+		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 			$block_classes = array(
 				'css'            => 'styles',
 				'__unstableType' => 'theme',
+				'isGlobalStyles' => true,
 			);
 			$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
 			if ( '' !== $actual_css ) {
