@@ -156,4 +156,7 @@ module.exports = {
 	addMediaButton: {
 		color: 'white',
 	},
+	'header-toolbar__container': {
+		height: 44,
+	},
 };
