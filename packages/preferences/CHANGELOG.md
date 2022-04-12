@@ -4,7 +4,7 @@
 
 ### Enhancement
 
--   A new `setPersistenceLayer` action has been introduced. ([#39795](https://github.com/WordPress/gutenberg/pull/39795))
+-   A new `setPersistenceLayer` action has been introduced. ([#40246](https://github.com/WordPress/gutenberg/pull/40246))
 
 ## 1.2.0 (2022-04-08)
 
