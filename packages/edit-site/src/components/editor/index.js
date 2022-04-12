@@ -5,7 +5,11 @@ import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Popover, Button, Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
-import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockContextProvider,
+	BlockBreadcrumb,
+	BlockStyles,
+} from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
 	ComplementaryArea,
@@ -236,6 +240,7 @@ function Editor( { onError } ) {
 											content={
 												<>
 													<EditorNotices />
+													<BlockStyles.Slot scope="core/block-inspector" />
 													{ editorMode === 'visual' &&
 														template && (
 															<BlockEditor
