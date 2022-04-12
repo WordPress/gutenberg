@@ -36,6 +36,7 @@ import { useListViewContext } from './context';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { useBlockLock } from '../block-lock';
 
 function ListViewBlock( {
 	block,
@@ -65,6 +66,7 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const { isLocked } = useBlockLock( clientId );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
@@ -73,13 +75,20 @@ function ListViewBlock( {
 		level
 	);
 
-	const blockAriaLabel = blockInformation
-		? sprintf(
-				// translators: %s: The title of the block. This string indicates a link to select the block.
-				__( '%s link' ),
-				blockInformation.title
-		  )
-		: __( 'Link' );
+	let blockAriaLabel = __( 'Link' );
+	if ( blockInformation ) {
+		blockAriaLabel = isLocked
+			? sprintf(
+					// translators: %s: The title of the block. This string indicates a link to select the locked block.
+					__( '%s link (locked)' ),
+					blockInformation.title
+			  )
+			: sprintf(
+					// translators: %s: The title of the block. This string indicates a link to select the block.
+					__( '%s link' ),
+					blockInformation.title
+			  );
+	}
 
 	const settingsAriaLabel = blockInformation
 		? sprintf(
