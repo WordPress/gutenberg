@@ -536,7 +536,9 @@ describe( 'useSelect', () => {
 				'count2'
 			);
 
-			rendered.getByText( 'Toggle' ).click();
+			act( () => {
+				rendered.getByText( 'Toggle' ).click();
+			} );
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
