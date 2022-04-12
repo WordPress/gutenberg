@@ -10,7 +10,7 @@ import styled from '@emotion/styled';
 import { CONFIG, COLORS, reduceMotion } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
-export const ToggleGroupControl = ( {
+export const toggleGroupControl = ( {
 	size,
 }: {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;

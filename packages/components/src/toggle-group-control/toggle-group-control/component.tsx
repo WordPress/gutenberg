@@ -79,7 +79,7 @@ function UnconnectedToggleGroupControl(
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.ToggleGroupControl( { size } ),
+				styles.toggleGroupControl( { size } ),
 				! __experimentalIsBorderless && styles.border,
 				isBlock && styles.block,
 				className
