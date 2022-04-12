@@ -196,14 +196,15 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
-		'appearanceTools' => null,
-		'border'          => array(
+		'appearanceTools'  => null,
+		'useRootVariables' => null,
+		'border'           => array(
 			'color'  => null,
 			'radius' => null,
 			'style'  => null,
 			'width'  => null,
 		),
-		'color'           => array(
+		'color'            => array(
 			'background'       => null,
 			'custom'           => null,
 			'customDuotone'    => null,
@@ -217,18 +218,18 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			'palette'          => null,
 			'text'             => null,
 		),
-		'custom'          => null,
-		'layout'          => array(
-			'contentSize' => null,
-			'wideSize'    => null,
+		'custom'           => null,
+		'layout'           => array(
+			'contentSize'  => null,
+			'wideSize'     => null,
 		),
-		'spacing'         => array(
+		'spacing'          => array(
 			'blockGap' => null,
 			'margin'   => null,
 			'padding'  => null,
 			'units'    => null,
 		),
-		'typography'      => array(
+		'typography'       => array(
 			'customFontSize' => null,
 			'dropCap'        => null,
 			'fontFamilies'   => null,
@@ -278,10 +279,12 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 				continue;
 			}
 
+			$use_root_vars = _wp_array_get( $this->theme_json, array( 'settings', 'useRootVariables' ), array() );
+			var_dump($use_root_vars);
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$selector     = $metadata['selector'];
 			$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
-			$declarations = static::compute_style_properties( $node, $settings, null, $selector );
+			$declarations = static::compute_style_properties( $node, $settings, null, $selector, $use_root_vars );
 
 			// 1. Separate the ones who use the general selector
 			// and the ones who use the duotone selector.
@@ -315,10 +318,11 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 			}
 
 			if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-
-				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
+				if ( $use_root_vars ) {
+					$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
 				$block_rules .= '.wp-site-blocks > * { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 				$block_rules .= '.wp-site-blocks > * > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
+				}				
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
@@ -503,7 +507,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	 * @param string $selector Selector for styles.
 	 * @return array Returns the modified $declarations.
 	 */
-	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $selector = null ) {
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $selector = null, $use_root_vars = null ) {
 		if ( null === $properties ) {
 			$properties = static::PROPERTIES_METADATA;
 		}
@@ -522,7 +526,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 				continue;
 			}
 
-			if ( strpos( $css_property, '--wp--style--root--' ) === 0 ) {
+			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && $use_root_vars ) {
 				$root_variable_duplicates[] = substr( $css_property, strlen( '--wp--style--root--' ) );
 			}
 

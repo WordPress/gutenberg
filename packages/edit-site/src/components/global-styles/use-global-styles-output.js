@@ -142,13 +142,14 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object} blockStyles Block styles.
+ * @param {Object}  blockStyles Block styles.
  *
- * @param {string} selector    The selector these declarations should attach to.
+ * @param {string}  selector    The selector these declarations should attach to.
  *
+ * @param {boolean} useRootVars Whether to use CSS custom properties in root selector.
  * @return {Array} An array of style declarations.
  */
-function getStylesDeclarations( blockStyles = {}, selector = '' ) {
+function getStylesDeclarations( blockStyles = {}, selector = '', useRootVars ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = reduce(
 		STYLE_PROPERTY,
@@ -245,7 +246,7 @@ function getStylesDeclarations( blockStyles = {}, selector = '' ) {
 		[]
 	);
 
-	if ( isRoot ) {
+	if ( isRoot && useRootVars ) {
 		return output;
 	}
 
@@ -391,11 +392,20 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 export const toStyles = ( tree, blockSelectors ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
+	const useRootVars = tree?.settings?.useRootVariables;
 
 	let ruleset =
-		'body { padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .wp-site-blocks > * { margin-top: 0; margin-bottom: 0; padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
+		'.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
+	if ( useRootVars ) {
+		ruleset =
+			'body { padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .wp-site-blocks > * { margin-top: 0; margin-bottom: 0; padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
+	}
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
-		const declarations = getStylesDeclarations( styles, selector );
+		const declarations = getStylesDeclarations(
+			styles,
+			selector,
+			useRootVars
+		);
 		if ( declarations.length === 0 ) {
 			return;
 		}
