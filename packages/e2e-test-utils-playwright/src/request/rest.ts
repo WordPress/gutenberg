@@ -146,8 +146,8 @@ async function getMaxBatchSize( this: RequestUtils, forceRefetch = false ) {
 interface BatchRequest {
 	method?: string;
 	path: string;
-	headers: Record< string, string | string[] >;
-	body: any;
+	headers?: Record< string, string | string[] >;
+	body?: any;
 }
 
 async function batchRest< BatchResponse >(

@@ -78,7 +78,6 @@ export default class Picker extends Component {
 			<BottomSheet
 				isVisible={ isVisible }
 				onClose={ this.onClose }
-				style={ { paddingBottom: 20 } }
 				hideHeader
 				testID={ testID }
 			>

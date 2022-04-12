@@ -80,11 +80,15 @@ registerCoreBlocks();
 
 ### AlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### AlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### Autocomplete
 
@@ -94,11 +98,15 @@ _Related_
 
 ### BlockAlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockAlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockBreadcrumb
 
@@ -151,11 +159,15 @@ Undocumented declaration.
 
 ### BlockIcon
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-icon/README.md>
 
 ### BlockInspector
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md>
 
 ### BlockList
 
@@ -163,7 +175,9 @@ Undocumented declaration.
 
 ### BlockMover
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-mover/README.md>
 
 ### BlockNavigationDropdown
 
@@ -239,7 +253,9 @@ _Returns_
 
 ### BlockToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md>
 
 ### BlockTools
 
@@ -255,11 +271,15 @@ _Parameters_
 
 ### BlockVerticalAlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### BlockVerticalAlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### ButtonBlockAppender
 
@@ -283,11 +303,15 @@ Undocumented declaration.
 
 ### ContrastChecker
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/contrast-checker/README.md>
 
 ### CopyHandler
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/copy-handler/README.md>
 
 ### createCustomColorsHOC
 
@@ -325,7 +349,9 @@ Undocumented declaration.
 
 ### FontSizePicker
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
 
 ### getColorClassName
 
@@ -469,15 +495,21 @@ _Related_
 
 ### JustifyContentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### JustifyToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### LineHeightControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
 
 ### MediaPlaceholder
 
@@ -487,7 +519,9 @@ _Related_
 
 ### MediaReplaceFlow
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md>
 
 ### MediaUpload
 
@@ -564,18 +598,20 @@ _Properties_
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
+-   _canLockBlocks_ `boolean`: Whether the user can manage Block Lock state
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+-   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
--   _\_\_experimentalGenerateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
--   _\_\_experimentalCanLockBlocks_ `boolean`: Whether the user can manage Block Lock state
 -   _\_\_unstableGalleryWithImageBlocks_ `boolean`: Whether the user has enabled the refactored gallery block which uses InnerBlocks
 
 ### SkipToSelectedBlock
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md>
 
 ### store
 

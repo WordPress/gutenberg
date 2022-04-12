@@ -146,6 +146,7 @@ export { default as ToggleControl } from './toggle-control';
 export {
 	ToggleGroupControl as __experimentalToggleGroupControl,
 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
+	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
 } from './toggle-group-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';

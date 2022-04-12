@@ -222,7 +222,8 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 };
 
 export default function Edit( props ) {
-	if ( props?.context?.commentId ) {
+	// Don't show the Comment Edit controls if we have a comment ID set, or if we're in the Site Editor (where it is `null`).
+	if ( props?.context?.commentId || props?.context?.commentId === null ) {
 		return <CommentEdit { ...props } />;
 	}
 	return <UserEdit { ...props } />;

@@ -13,7 +13,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
-import { useDispatch, useSelect, select } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { isRTL, __ } from '@wordpress/i18n';
 import {
 	formatListBullets,
@@ -24,14 +24,52 @@ import {
 	formatOutdentRTL,
 } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import OrderedListSettings from '../ordered-list-settings';
+import { migrateToListV2 } from './migrate';
 
 const TEMPLATE = [ [ 'core/list-item' ] ];
+
+/**
+ * At the moment, deprecations don't handle create blocks from attributes
+ * (like when using CPT templates). For this reason, this hook is necessary
+ * to avoid breaking templates using the old list block format.
+ *
+ * @param {Object} attributes Block attributes.
+ * @param {string} clientId   Block client ID.
+ */
+function useMigrateOnLoad( attributes, clientId ) {
+	const registry = useRegistry();
+	const { updateBlockAttributes, replaceInnerBlocks } = useDispatch(
+		blockEditorStore
+	);
+
+	useEffect( () => {
+		// As soon as the block is loaded, migrate it to the new version.
+
+		if ( ! attributes.values ) {
+			return;
+		}
+
+		const [ newAttributes, newInnerBlocks ] = migrateToListV2( attributes );
+
+		deprecated( 'Value attribute on the list block', {
+			since: '6.0',
+			version: '6.5',
+			alternative: 'inner blocks',
+		} );
+
+		registry.batch( () => {
+			updateBlockAttributes( clientId, newAttributes );
+			replaceInnerBlocks( clientId, newInnerBlocks );
+		} );
+	}, [ attributes.values ] );
+}
 
 function useOutdentList( clientId ) {
 	const { canOutdent } = useSelect(
@@ -49,14 +87,13 @@ function useOutdentList( clientId ) {
 		[ clientId ]
 	);
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+	const { getBlockRootClientId, getBlockAttributes, getBlock } = useSelect(
+		blockEditorStore
+	);
+
 	return [
 		canOutdent,
 		useCallback( () => {
-			const {
-				getBlockRootClientId,
-				getBlockAttributes,
-				getBlock,
-			} = select( blockEditorStore );
 			const parentBlockId = getBlockRootClientId( clientId );
 			const parentBlockAttributes = getBlockAttributes( parentBlockId );
 			// Create a new parent block without the inner blocks.
@@ -98,6 +135,7 @@ function Edit( { attributes, setAttributes, clientId } ) {
 		allowedBlocks: [ 'core/list-item' ],
 		template: TEMPLATE,
 	} );
+	useMigrateOnLoad( attributes, clientId );
 	const { ordered, reversed, start } = attributes;
 	const TagName = ordered ? 'ol' : 'ul';
 

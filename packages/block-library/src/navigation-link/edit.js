@@ -49,8 +49,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { name } from './block.json';
 
-const MAX_NESTING = 5;
-
 /**
  * A React hook to determine if it's dragging within the target element.
  *
@@ -400,6 +398,7 @@ export default function NavigationLinkEdit( {
 	} = attributes;
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
+	const { maxNestingLevel } = context;
 
 	const link = {
 		url,
@@ -452,7 +451,7 @@ export default function NavigationLinkEdit( {
 					getBlockParentsByBlockName( clientId, [
 						name,
 						'core/navigation-submenu',
-					] ).length >= MAX_NESTING,
+					] ).length >= maxNestingLevel,
 				isTopLevelLink:
 					getBlockName( getBlockRootClientId( clientId ) ) ===
 					'core/navigation',
@@ -738,40 +737,49 @@ export default function NavigationLinkEdit( {
 					) : (
 						<>
 							{ ! isInvalid && ! isDraft && (
-								<RichText
-									ref={ ref }
-									identifier="label"
-									className="wp-block-navigation-item__label"
-									value={ label }
-									onChange={ ( labelValue ) =>
-										setAttributes( {
-											label: labelValue,
-										} )
-									}
-									onMerge={ mergeBlocks }
-									onReplace={ onReplace }
-									__unstableOnSplitAtEnd={ () =>
-										insertBlocksAfter(
-											createBlock(
-												'core/navigation-link'
-											)
-										)
-									}
-									aria-label={ __( 'Navigation link text' ) }
-									placeholder={ itemLabelPlaceholder }
-									withoutInteractiveFormatting
-									allowedFormats={ [
-										'core/bold',
-										'core/italic',
-										'core/image',
-										'core/strikethrough',
-									] }
-									onClick={ () => {
-										if ( ! url ) {
-											setIsLinkOpen( true );
+								<>
+									<RichText
+										ref={ ref }
+										identifier="label"
+										className="wp-block-navigation-item__label"
+										value={ label }
+										onChange={ ( labelValue ) =>
+											setAttributes( {
+												label: labelValue,
+											} )
 										}
-									} }
-								/>
+										onMerge={ mergeBlocks }
+										onReplace={ onReplace }
+										__unstableOnSplitAtEnd={ () =>
+											insertBlocksAfter(
+												createBlock(
+													'core/navigation-link'
+												)
+											)
+										}
+										aria-label={ __(
+											'Navigation link text'
+										) }
+										placeholder={ itemLabelPlaceholder }
+										withoutInteractiveFormatting
+										allowedFormats={ [
+											'core/bold',
+											'core/italic',
+											'core/image',
+											'core/strikethrough',
+										] }
+										onClick={ () => {
+											if ( ! url ) {
+												setIsLinkOpen( true );
+											}
+										} }
+									/>
+									{ description && (
+										<span className="wp-block-navigation-item__description">
+											{ description }
+										</span>
+									) }
+								</>
 							) }
 							{ ( isInvalid || isDraft ) && (
 								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">

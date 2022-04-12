@@ -41,7 +41,10 @@ const secondFrame = {
 	},
 };
 
-const normalizedWidth = 250;
+const normalizedWidth = 248;
+const normalizedHeight = 152;
+
+const normalizedColorSwatchSize = 32;
 
 const StylesPreview = ( { label, isFocused } ) => {
 	const [ fontWeight ] = useStyle( 'typography.fontWeight' );
@@ -81,7 +84,7 @@ const StylesPreview = ( { label, isFocused } ) => {
 			className="edit-site-global-styles-preview__iframe"
 			head={ <EditorStyles styles={ styles } /> }
 			style={ {
-				height: 150 * ratio,
+				height: normalizedHeight * ratio,
 				visibility: ! width ? 'hidden' : 'visible',
 			} }
 			onMouseEnter={ () => setIsHovered( true ) }
@@ -91,7 +94,7 @@ const StylesPreview = ( { label, isFocused } ) => {
 			{ containerResizeListener }
 			<motion.div
 				style={ {
-					height: 150 * ratio,
+					height: normalizedHeight * ratio,
 					width: '100%',
 					background: gradientValue ?? backgroundColor,
 					cursor: 'pointer',
@@ -128,15 +131,20 @@ const StylesPreview = ( { label, isFocused } ) => {
 						>
 							Aa
 						</div>
-						<VStack spacing={ 2 * ratio }>
+						<VStack spacing={ 4 * ratio }>
 							{ highlightedColors.map( ( { slug, color } ) => (
 								<div
 									key={ slug }
 									style={ {
-										height: 30 * ratio,
-										width: 30 * ratio,
+										height:
+											normalizedColorSwatchSize * ratio,
+										width:
+											normalizedColorSwatchSize * ratio,
 										background: color,
-										borderRadius: 15 * ratio,
+										borderRadius:
+											( normalizedColorSwatchSize *
+												ratio ) /
+											2,
 									} }
 								/>
 							) ) }

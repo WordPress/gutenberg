@@ -312,16 +312,14 @@
 // Size multiple sequential buttons to be optically balanced.
 // Icons are 36px, as set by a 24px icon and 12px padding.
 .block-editor-block-toolbar > .components-toolbar > .block-editor-block-toolbar__slot, // When a plugin adds to a slot, the segment has a `components-toolbar` class.
-.block-editor-block-toolbar > .components-toolbar-group > .block-editor-block-toolbar__slot, // When no plugin adds to slots, the segment has a `components-toolbar-group` class.
 .block-editor-block-toolbar > .block-editor-block-toolbar__slot > .components-toolbar, // The nesting order is sometimes reversed.
 .block-editor-block-toolbar > .block-editor-block-toolbar__slot > .components-dropdown, // Targets unique markup for the "Replace" button.
-.block-editor-block-toolbar .block-editor-block-toolbar__slot .components-toolbar-group { // Inline formatting tools use this class.
+.block-editor-block-toolbar .components-toolbar-group {
 	padding-left: $grid-unit-15 * 0.5; // 6px.
 	padding-right: $grid-unit-15 * 0.5;
 
-	> .components-button,
-	> div > .components-button,
-	> .components-dropdown .components-button {
+	.components-button,
+	.components-button.has-icon.has-icon {
 		min-width: $block-toolbar-height - $grid-unit-15;
 		padding-left: $grid-unit-15 * 0.5; // 6px.
 		padding-right: $grid-unit-15 * 0.5;

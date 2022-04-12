@@ -138,4 +138,7 @@ function ContrastChecker( {
 	);
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/contrast-checker/README.md
+ */
 export default ContrastChecker;

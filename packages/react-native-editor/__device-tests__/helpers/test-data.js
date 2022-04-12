@@ -170,7 +170,7 @@ exports.multiLinesParagraphBlock = `<!-- wp:paragraph -->
 <p>multiple lines<br>multiple lines<br>multiple lines</p>
 <!-- /wp:paragraph -->`;
 
-exports.unknownElementBlock = `<!-- wp:paragraph -->
+exports.unknownElementParagraphBlock = `<!-- wp:paragraph -->
 <p><unknownhtmlelement>abc</unknownhtmlelement>D</p>
 <!-- /wp:paragraph -->`;
 

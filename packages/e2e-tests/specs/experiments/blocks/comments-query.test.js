@@ -24,10 +24,8 @@ describe( 'Comment Query Loop', () => {
 			'newest'
 		);
 	} );
-	beforeEach( async () => {
-		await createNewPost();
-	} );
 	it( 'Pagination links are working as expected', async () => {
+		await createNewPost();
 		// Insert the Query Comment Loop block.
 		await insertBlock( 'Comments Query Loop' );
 		// Insert the Comment Loop form.
@@ -48,12 +46,13 @@ describe( 'Comment Query Loop', () => {
 				`This is an automated comment - ${ i }`
 			);
 			await pressKeyTimes( 'Tab', 1 );
-			await page.keyboard.press( 'Enter' );
-			await page.waitForNavigation();
+			await Promise.all( [
+				page.keyboard.press( 'Enter' ),
+				page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+			] );
 		}
 
 		// We check that there is a previous comments page link.
-		await page.waitForSelector( '.wp-block-comments-pagination-previous' );
 		expect(
 			await page.$( '.wp-block-comments-pagination-previous' )
 		).not.toBeNull();
@@ -61,27 +60,66 @@ describe( 'Comment Query Loop', () => {
 			await page.$( '.wp-block-comments-pagination-next' )
 		).toBeNull();
 
-		await page.click( '.wp-block-comments-pagination-previous' );
+		await Promise.all( [
+			page.click( '.wp-block-comments-pagination-previous' ),
+			page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+		] );
 
 		// We check that there are a previous and a next link.
-		await page.waitForSelector( '.wp-block-comments-pagination-previous' );
-		await page.waitForSelector( '.wp-block-comments-pagination-next' );
 		expect(
 			await page.$( '.wp-block-comments-pagination-previous' )
 		).not.toBeNull();
 		expect(
 			await page.$( '.wp-block-comments-pagination-next' )
 		).not.toBeNull();
-		await page.click( '.wp-block-comments-pagination-previous' );
+
+		await Promise.all( [
+			page.click( '.wp-block-comments-pagination-previous' ),
+			page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+		] );
 
 		// We check that there is only have a next link
-		await page.waitForSelector( '.wp-block-comments-pagination-next' );
 		expect(
 			await page.$( '.wp-block-comments-pagination-previous' )
 		).toBeNull();
 		expect(
 			await page.$( '.wp-block-comments-pagination-next' )
 		).not.toBeNull();
+	} );
+	it( 'Pagination links are not appearing if break comments is not enabled', async () => {
+		await setOption( 'page_comments', '0' );
+		await createNewPost();
+		// Insert the Query Comment Loop block.
+		await insertBlock( 'Comments Query Loop' );
+		// Insert the Comment Loop form.
+		await insertBlock( 'Post Comments Form' );
+		await publishPost();
+		// Visit the post that was just published.
+		await page.click(
+			'.post-publish-panel__postpublish-buttons .is-primary'
+		);
+
+		// Create three comments for that post.
+		for ( let i = 0; i < 3; i++ ) {
+			await page.waitForSelector( 'textarea#comment' );
+			await page.click( 'textarea#comment' );
+			await page.type(
+				`textarea#comment`,
+				`This is an automated comment - ${ i }`
+			);
+			await pressKeyTimes( 'Tab', 1 );
+			await Promise.all( [
+				page.keyboard.press( 'Enter' ),
+				page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+			] );
+		}
+		// We check that there are no comments page link.
+		expect(
+			await page.$( '.wp-block-comments-pagination-previous' )
+		).toBeNull();
+		expect(
+			await page.$( '.wp-block-comments-pagination-next' )
+		).toBeNull();
 	} );
 	afterAll( async () => {
 		await trashAllComments();

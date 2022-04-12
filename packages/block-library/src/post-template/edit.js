@@ -26,7 +26,10 @@ const TEMPLATE = [
 ];
 
 function PostTemplateInnerBlocks() {
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
+	const innerBlocksProps = useInnerBlocksProps(
+		{ className: 'wp-block-post' },
+		{ template: TEMPLATE }
+	);
 	return <li { ...innerBlocksProps } />;
 }
 
@@ -38,6 +41,9 @@ function PostTemplateBlockPreview( {
 } ) {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
+		props: {
+			className: 'wp-block-post',
+		},
 	} );
 
 	const handleOnClick = () => {

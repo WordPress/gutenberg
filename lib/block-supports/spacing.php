@@ -15,7 +15,7 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_spacing_support( $block_type ) {
-	$has_spacing_support = gutenberg_block_has_support( $block_type, array( 'spacing' ), false );
+	$has_spacing_support = block_has_support( $block_type, array( 'spacing' ), false );
 
 	// Setup attributes and styles within that if needed.
 	if ( ! $block_type->attributes ) {
@@ -44,8 +44,8 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 	}
 
 	$attributes          = array();
-	$has_padding_support = gutenberg_block_has_support( $block_type, array( 'spacing', 'padding' ), false );
-	$has_margin_support  = gutenberg_block_has_support( $block_type, array( 'spacing', 'margin' ), false );
+	$has_padding_support = block_has_support( $block_type, array( 'spacing', 'padding' ), false );
+	$has_margin_support  = block_has_support( $block_type, array( 'spacing', 'margin' ), false );
 	$block_styles        = isset( $block_attributes['style'] ) ? $block_attributes['style'] : null;
 
 	if ( ! $block_styles ) {

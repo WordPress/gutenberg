@@ -73,7 +73,9 @@ class EditorPage {
 	) {
 		let blockLocator;
 
-		// Make it optional to use waitForVisible() because the behavior is not consistent everywhere.
+
+		// Make it optional to use waitForVisible() so we can handle this test by test.
+		// This condition can be removed once we have gone through all test cases.
 		if ( options.useWaitForVisible ) {
 			let elementType;
 			switch ( blockName ) {
@@ -93,7 +95,6 @@ class EditorPage {
 		} else {
 			blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
 		}
-
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
