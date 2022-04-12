@@ -76,10 +76,10 @@ class EditorPage {
 		// Make it optional to use waitForVisible() so we can handle this test by test.
 		// This condition can be removed once we have gone through all test cases.
 		if ( options.useWaitForVisible ) {
-			let elementTypeAndroid
-			let elementTypeiOS
-			let textViewElementNameAndroid
-			let textViewElementNameiOS
+			let elementTypeAndroid;
+			let elementTypeiOS;
+			let textViewElementNameAndroid;
+			let textViewElementNameiOS;
 			switch ( blockName ) {
 				case blockNames.cover:
 				case blockNames.image:
@@ -96,7 +96,7 @@ class EditorPage {
 					break;
 				// for blocks that have not been covered, exit this and use existing code
 				default:
-					return
+					return;
 			}
 			blockLocator = isAndroid()
 				? `//${ elementTypeAndroid }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]${ textViewElementNameAndroid }`
