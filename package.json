@@ -239,7 +239,7 @@
 		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\"",
 		"clean:package-types": "tsc --build --clean",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
-		"build:packages": "node ./bin/packages/build.js",
+		"build:packages": "npm run build:package-types && node ./bin/packages/build.js",
 		"build:package-types": "node ./bin/packages/validate-typescript-version.js && tsc --build",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"build": "npm run build:packages && wp-scripts build",
