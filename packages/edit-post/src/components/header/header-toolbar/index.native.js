@@ -155,12 +155,12 @@ export default compose( [
 			getBlockRootClientId,
 			getBlockSelectionEnd,
 			hasInserterItems,
-			getSelectedBlockClientId,
+			hasSelectedBlock,
 		} = select( blockEditorStore );
 		const { getEditorSettings, isPostTitleSelected } = select(
 			editorStore
 		);
-		const isAnyBlockSelected = getSelectedBlockClientId();
+		const isAnyBlockSelected = hasSelectedBlock();
 		const isTitleSelected = isPostTitleSelected();
 		return {
 			hasRedo: select( editorStore ).hasEditorRedo(),
