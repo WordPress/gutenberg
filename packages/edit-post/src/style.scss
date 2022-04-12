@@ -96,11 +96,4 @@ body.block-editor-page {
 	}
 }
 
-// For block themes, full width blocks at root level need
-// to overlay the root container padding.
-.is-root-container > .alignfull {
-	margin-right: calc(var(--wp--style--root--padding-right) * -1);
-	margin-left: calc(var(--wp--style--root--padding-left) * -1);
-}
-
 @include wordpress-admin-schemes();
