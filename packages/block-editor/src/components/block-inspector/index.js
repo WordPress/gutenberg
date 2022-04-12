@@ -11,13 +11,15 @@ import {
 import {
 	PanelBody,
 	__experimentalUseSlotFills as useSlotFills,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	FlexItem,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -238,6 +240,10 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 		[ blockName ]
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
+
+	const aligns = [ 'Left', 'Center', 'Right' ];
+	const [ alignState, setAlignState ] = useState();
+
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard { ...blockInformation } />
@@ -260,6 +266,21 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 				label={ __( 'Color' ) }
 				className="color-block-support-panel__inner-wrapper"
 			/>
+			<div>
+				<ToggleGroupControl
+					onChange={ setAlignState }
+					value={ alignState }
+					label={ 'Not in InspectorControls.Slot' }
+				>
+					{ aligns.map( ( key ) => (
+						<ToggleGroupControlOption
+							key={ key }
+							value={ key }
+							label={ key }
+						/>
+					) ) }
+				</ToggleGroupControl>
+			</div>
 			<InspectorControls.Slot
 				__experimentalGroup="typography"
 				label={ __( 'Typography' ) }
