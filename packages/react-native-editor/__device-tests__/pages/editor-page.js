@@ -566,7 +566,12 @@ class EditorPage {
 				false
 			);
 			if ( i !== paragraphs.length - 1 ) {
-				await this.typeTextToParagraphBlock( block, '\n', false, false );
+				await this.typeTextToParagraphBlock(
+					block,
+					'\n',
+					false,
+					false
+				);
 			}
 		}
 	}
