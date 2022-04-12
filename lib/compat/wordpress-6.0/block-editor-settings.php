@@ -5,6 +5,12 @@
  * @package gutenberg
  */
 
+/**
+ * Returns true if the style is coming from global styles.
+ *
+ * @param array $style Array containing a '__unstableType' key.
+ * @return boolean
+ */
 function gutenberg_is_global_styles_in_5_8( $style ) {
 	if ( isset( $style['__unstableType'] ) && ( 'globalStyles' === $style['__unstableType'] ) ) {
 		return true;
@@ -13,6 +19,12 @@ function gutenberg_is_global_styles_in_5_8( $style ) {
 	return false;
 }
 
+/**
+ * Returns true if the style is coming from global styles.
+ *
+ * @param array $style Array containing a '__unstableType' key and a 'css' key with the actual CSS.
+ * @return boolean
+ */
 function gutenberg_is_global_styles_in_5_9( $style ) {
 	/*
 	 * In WordPress 5.9 we don't have a mechanism to distinguish block styles generated via theme.json
@@ -26,7 +38,7 @@ function gutenberg_is_global_styles_in_5_9( $style ) {
 	$root_styles .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 	$root_styles .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
-	if(
+	if (
 		( isset( $style['__unstableType'] ) && ( 'presets' === $style['__unstableType'] ) ) ||
 		( isset( $style['__unstableType'] ) && ( 'theme' === $style['__unstableType'] ) && str_contains( $style['css'], $root_styles ) )
 	) {
