@@ -7,6 +7,11 @@
  */
 
 class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
+	/**
+	 * @var string
+	 */
+	private $test_block_name;
+
 	function setUp() {
 		parent::setUp();
 		$this->test_block_name = null;
