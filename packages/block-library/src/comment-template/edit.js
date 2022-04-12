@@ -254,11 +254,9 @@ export default function CommentTemplateEdit( {
 			const { getBlocks } = select( blockEditorStore );
 			return {
 				// Request only top-level comments. Replies are embedded.
-				topLevelComments: getEntityRecords(
-					'root',
-					'comment',
-					commentQuery
-				),
+				topLevelComments: commentQuery
+					? getEntityRecords( 'root', 'comment', commentQuery )
+					: null,
 				blocks: getBlocks( clientId ),
 			};
 		},
@@ -273,14 +271,6 @@ export default function CommentTemplateEdit( {
 			: topLevelComments
 	);
 
-	if ( ! postId ) {
-		commentTree = getCommentsPlaceholder( {
-			perPage: commentsPerPage,
-			threadComments,
-			threadCommentsDepth,
-		} );
-	}
-
 	if ( ! topLevelComments ) {
 		return (
 			<p { ...blockProps }>
@@ -289,7 +279,15 @@ export default function CommentTemplateEdit( {
 		);
 	}
 
-	if ( topLevelComments.length === 0 && commentTree.length === 0 ) {
+	if ( ! postId ) {
+		commentTree = getCommentsPlaceholder( {
+			perPage: commentsPerPage,
+			threadComments,
+			threadCommentsDepth,
+		} );
+	}
+
+	if ( ! commentTree.length ) {
 		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
