@@ -951,21 +951,28 @@ class WP_Theme_JSON_5_9 {
 					);
 					// For blocks with a custom class selector append presets to this in order
 					// to make sure that preset will be more specific.
+					$custom_block_selectors = '';
+					$x                      = 1;
+					$total_custom_selectors = count( $custom_selectors );
 					foreach ( $custom_selectors as $custom_selector ) {
-							$stylesheet .= static::to_ruleset(
-								static::append_to_selector( $custom_selector, $class_name ),
-								array(
-									array(
-										'name'  => $property,
-										'value' => 'var(' . $css_var . ')',
-									),
-								)
-							);
+						$custom_block_selectors .= static::append_to_selector( $custom_selector, $class_name );
+						if ( $x !== $total_custom_selectors ) {
+							$custom_block_selectors .= ',';
+						}
+						$x++;
 					}
+					$stylesheet .= static::to_ruleset(
+						$custom_block_selectors,
+						array(
+							array(
+								'name'  => $property,
+								'value' => 'var(' . $css_var . ')',
+							),
+						)
+					);
 				};
 			}
 		}
-
 		return $stylesheet;
 	}
 
