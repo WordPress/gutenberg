@@ -18,11 +18,11 @@ import { CONFIG } from '../../utils';
 import { AnimatedBackdrop } from './styles';
 
 const TRANSITION_CONFIG = {
-	type: 'spring',
-	bounce: 0,
+	type: 'tween',
+	ease: [ 0.25, 0.1, 0.25, 1 ],
 	// Transition durations in the config are expressed as a string in milliseconds,
 	// while `framer-motion` needs them as integers in seconds.
-	duration: parseInt( CONFIG.transitionDurationSlow, 10 ) / 1000,
+	duration: parseInt( CONFIG.transitionDurationFast, 10 ) / 1000,
 };
 
 function ToggleGroupControlBackdrop( {
