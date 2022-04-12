@@ -98,6 +98,9 @@ function gutenberg_register_theme_block_patterns() {
 
 	foreach ( $themes as $theme ) {
 		$dirpath = $theme->get_stylesheet_directory() . '/patterns/';
+		if ( ! is_dir( $dirpath ) || ! is_readable( $dirpath ) ) {
+			continue;
+		}
 		if ( file_exists( $dirpath ) ) {
 			$files = glob( $dirpath . '*.php' );
 			if ( $files ) {
@@ -105,24 +108,28 @@ function gutenberg_register_theme_block_patterns() {
 					$pattern_data = get_file_data( $file, $default_headers );
 
 					if ( empty( $pattern_data['slug'] ) ) {
-						trigger_error(
+						_doing_it_wrong(
+							'_register_theme_block_patterns',
 							sprintf(
 								/* translators: %s: file name. */
 								__( 'Could not register file "%s" as a block pattern ("Slug" field missing)', 'gutenberg' ),
 								$file
-							)
+							),
+							'6.0.0'
 						);
 						continue;
 					}
 
 					if ( ! preg_match( '/^[A-z0-9\/_-]+$/', $pattern_data['slug'] ) ) {
-						trigger_error(
+						_doing_it_wrong(
+							'_register_theme_block_patterns',
 							sprintf(
 								/* translators: %1s: file name; %2s: slug value found. */
 								__( 'Could not register file "%1$s" as a block pattern (invalid slug "%2$s")', 'gutenberg' ),
 								$file,
 								$pattern_data['slug']
-							)
+							),
+							'6.0.0'
 						);
 					}
 
@@ -132,12 +139,14 @@ function gutenberg_register_theme_block_patterns() {
 
 					// Title is a required property.
 					if ( ! $pattern_data['title'] ) {
-						trigger_error(
+						_doing_it_wrong(
+							'_register_theme_block_patterns',
 							sprintf(
 								/* translators: %1s: file name; %2s: slug value found. */
 								__( 'Could not register file "%s" as a block pattern ("Title" field missing)', 'gutenberg' ),
 								$file
-							)
+							),
+							'6.0.0'
 						);
 						continue;
 					}
