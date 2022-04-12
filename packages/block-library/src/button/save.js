@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	RichText,
+	BlockButton,
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
@@ -60,7 +60,8 @@ export default function save( { attributes, className } ) {
 
 	return (
 		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
-			<RichText.Content
+			<BlockButton
+				frontEnd={ true }
 				tagName="a"
 				className={ buttonClasses }
 				href={ url }

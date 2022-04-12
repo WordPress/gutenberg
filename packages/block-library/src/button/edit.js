@@ -19,7 +19,7 @@ import {
 import {
 	BlockControls,
 	InspectorControls,
-	RichText,
+	BlockButton,
 	useBlockProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
@@ -160,7 +160,7 @@ function ButtonEdit( props ) {
 					[ `has-custom-font-size` ]: blockProps.style.fontSize,
 				} ) }
 			>
-				<RichText
+				<BlockButton
 					ref={ richTextRef }
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }

@@ -121,6 +121,10 @@ _Returns_
 
 -   `WPElement`: Block Breadcrumb.
 
+### BlockButton
+
+Undocumented declaration.
+
 ### BlockColorsStyleSelector
 
 Undocumented declaration.
