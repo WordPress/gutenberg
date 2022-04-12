@@ -1,5 +1,66 @@
 == Changelog ==
 
+= 13.0.0-rc.3 =
+
+## Changelog
+
+### Enhancements
+
+#### Block Library
+- Deprecate the Post Comments block. ([40167](https://github.com/WordPress/gutenberg/pull/40167))
+- Update query block creation and replacement flows. ([38997](https://github.com/WordPress/gutenberg/pull/38997))
+
+#### Patterns
+- Add: Option to pick a pattern on page creation. ([40034](https://github.com/WordPress/gutenberg/pull/40034))
+
+#### Global Styles
+- [Global Styles]: Add search in block types list. ([39117](https://github.com/WordPress/gutenberg/pull/39117))
+
+
+### Bug Fixes
+
+#### Plugin
+- Fix REST API class redeclaration. ([40265](https://github.com/WordPress/gutenberg/pull/40265))
+
+#### Site Editor
+- Add block styles slot to the site editor so block style previews can be rendered. ([40245](https://github.com/WordPress/gutenberg/pull/40245))
+
+#### Block Locking
+- Block Toolbar: Display block title when no switcher is available. ([40207](https://github.com/WordPress/gutenberg/pull/40207))
+
+
+### Code Quality
+
+- Block patterns REST endpoint: Use snake case for field names. ([40254](https://github.com/WordPress/gutenberg/pull/40254))
+- Update patterns REST controllers namespace to stable. ([40252](https://github.com/WordPress/gutenberg/pull/40252))
+
+#### Block Locking
+- Block Editor: Introduce the 'useBlockLock' hook. ([40210](https://github.com/WordPress/gutenberg/pull/40210))
+- useBlockLock: Improve argument name and description. ([40220](https://github.com/WordPress/gutenberg/pull/40220))
+
+
+### Various
+
+#### Themes
+- Backport changes for Theme Export from 6.0. ([40215](https://github.com/WordPress/gutenberg/pull/40215))
+
+#### Block Locking
+- Try: Reusable block edit locking. ([39950](https://github.com/WordPress/gutenberg/pull/39950))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@DAreRodz @glendaviesnz @gziolo @jorgefilipecosta @jsnajdr @Mamaduka @ntsekouras @scruffian
+
+
 = 13.0.0-rc.2 =
 
 ## Changelog
