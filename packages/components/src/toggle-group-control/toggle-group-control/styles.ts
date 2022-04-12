@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import { CONFIG, COLORS } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
 export const toggleGroupControl = ( {
@@ -22,8 +22,6 @@ export const toggleGroupControl = ( {
 	min-width: 0;
 	padding: 2px;
 	position: relative;
-	transition: transform ${ CONFIG.transitionDurationFastest } linear;
-	${ reduceMotion( 'transition' ) }
 
 	${ toggleGroupControlSize( size ) }
 
