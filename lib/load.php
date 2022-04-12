@@ -31,32 +31,47 @@ function gutenberg_is_experiment_enabled( $name ) {
 // These files only need to be loaded if within a rest server instance
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
+	// WordPress 5.9 compat.
+	require_once __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-templates-controller.php';
+	require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-global-styles-controller.php';
+	require_once __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
 		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-menus-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Menu_Items_Controller' ) ) {
 		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-menu-items-controller.php';
 	}
-	if ( ! class_exists( 'WP_REST_Block_Navigation_Areas_Controller' ) ) {
-		require_once __DIR__ . '/experimental/class-wp-rest-block-navigation-areas-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Menu_Locations_Controller' ) ) {
 		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-menu-locations-controller.php';
 	}
-	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
-		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
-	}
-	require_once __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-templates-controller.php';
 	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
-
 	if ( ! class_exists( 'WP_REST_URL_Details_Controller' ) ) {
 		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-url-details-controller.php';
 	}
+	require_once __DIR__ . '/compat/wordpress-5.9/rest-api.php';
 
-	require __DIR__ . '/experimental/rest-api.php';
-	require __DIR__ . '/compat/wordpress-5.9/rest-api.php';
+	// WordPress 6.0 compat.
+	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
+	if ( ! class_exists( 'WP_REST_Block_Patterns_Controller' ) ) {
+		require_once __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-patterns-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Block_Pattern_Categories_Controller' ) ) {
+		require_once __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
+	}
+	require_once __DIR__ . '/compat/wordpress-6.0/rest-api.php';
+
+	// Experimental.
+	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
+		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
+	}
+	if ( ! class_exists( 'WP_REST_Block_Navigation_Areas_Controller' ) ) {
+		require_once __DIR__ . '/experimental/class-wp-rest-block-navigation-areas-controller.php';
+	}
+	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
 require __DIR__ . '/compat/wordpress-5.9/block-gallery.php';
@@ -89,21 +104,13 @@ require __DIR__ . '/compat/wordpress-5.9/edit-site-page.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
-require __DIR__ . '/compat/wordpress-5.9/class-wp-rest-global-styles-controller.php';
-require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/move-theme-editor-menu-item.php';
 require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
 require __DIR__ . '/compat/wordpress-6.0/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-template-utils.php';
-require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
-require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller.php';
-require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
-require __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-patterns-controller.php';
-require __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
 require __DIR__ . '/compat/wordpress-6.0/functions.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-6-0.php';
-require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.0/block-template.php';
 require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
