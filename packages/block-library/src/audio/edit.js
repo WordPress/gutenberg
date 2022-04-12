@@ -186,7 +186,7 @@ function AudioEdit( {
 							{ value: 'metadata', label: __( 'Metadata' ) },
 							{
 								value: 'none',
-								label: _x( 'None', '"Preload" value' ),
+								label: _x( 'None', 'Preload value' ),
 							},
 						] }
 					/>
