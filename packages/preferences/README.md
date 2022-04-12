@@ -12,11 +12,27 @@ npm install @wordpress/preferences --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
+## Key concepts
+
+### Scope
+
+Many API calls require a 'scope' parameter that acts like a namespace. If you have multiple parameters with the same key but they apply to different parts of your application, using scopes is the best way to segregate them.
+
+### Key
+
+Each preference is set against a key that should be a string.
+
+### Value
+
+Values can be of any type, but the types supported may be limited by the persistence layer configure. For example of preferences are saved to browser localStorage in JSON format, only JSON serializable types should be used.
+
+### Defaults
+
+Defaults are the value returned when a preference is `undefined`. These are not persisted, they are only kept in memory. They should be during the initialization of an application.
+
 ## Examples
 
 ### Data store
-
-Preferences can a value of any JSON serializable type.
 
 Set the default preferences for any features on initialization by dispatching an action:
 
