@@ -100,6 +100,15 @@ export const validateBlocksToTemplate = ( blocks ) => ( {
  *                                 text value. See `wp.richText.create`.
  */
 
+/**
+ * A selection object.
+ *
+ * @typedef {Object} WPSelection
+ *
+ * @property {WPBlockSelection} start The selection start.
+ * @property {WPBlockSelection} end   The selection end.
+ */
+
 /* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that selection state should be
@@ -601,7 +610,7 @@ export const insertBlocks = (
  * @param {?string} rootClientId      Optional root client ID of block list on
  *                                    which to insert.
  * @param {?number} index             Index at which block should be inserted.
- * @param {Object}  __unstableOptions Wether or not to show an inserter button.
+ * @param {Object}  __unstableOptions Whether or not to show an inserter button.
  *
  * @return {Object} Action object.
  */
@@ -656,6 +665,326 @@ export const synchronizeTemplate = () => ( { select, dispatch } ) => {
 	const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
 
 	dispatch.resetBlocks( updatedBlockList );
+};
+
+function mapRichTextSettings( attributeDefinition ) {
+	const {
+		multiline: multilineTag,
+		__unstableMultilineWrapperTags: multilineWrapperTags,
+		__unstablePreserveWhiteSpace: preserveWhiteSpace,
+	} = attributeDefinition;
+	return {
+		multilineTag,
+		multilineWrapperTags,
+		preserveWhiteSpace,
+	};
+}
+
+/**
+ * Delete the current selection.
+ *
+ * @param {boolean} isForward
+ */
+export const __unstableDeleteSelection = ( isForward ) => ( {
+	registry,
+	select,
+	dispatch,
+} ) => {
+	const selectionAnchor = select.getSelectionStart();
+	const selectionFocus = select.getSelectionEnd();
+
+	if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
+
+	// It's not mergeable if there's no rich text selection.
+	if (
+		! selectionAnchor.attributeKey ||
+		! selectionFocus.attributeKey ||
+		typeof selectionAnchor.offset === 'undefined' ||
+		typeof selectionFocus.offset === 'undefined'
+	)
+		return false;
+
+	const anchorRootClientId = select.getBlockRootClientId(
+		selectionAnchor.clientId
+	);
+	const focusRootClientId = select.getBlockRootClientId(
+		selectionFocus.clientId
+	);
+
+	// It's not mergeable if the selection doesn't start and end in the same
+	// block list. Maybe in the future it should be allowed.
+	if ( anchorRootClientId !== focusRootClientId ) {
+		return;
+	}
+
+	const blockOrder = select.getBlockOrder( anchorRootClientId );
+	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
+	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+
+	// Reassign selection start and end based on order.
+	let selectionStart, selectionEnd;
+
+	if ( anchorIndex > focusIndex ) {
+		selectionStart = selectionFocus;
+		selectionEnd = selectionAnchor;
+	} else {
+		selectionStart = selectionAnchor;
+		selectionEnd = selectionFocus;
+	}
+
+	const targetSelection = isForward ? selectionEnd : selectionStart;
+	const targetBlock = select.getBlock( targetSelection.clientId );
+	const targetBlockType = getBlockType( targetBlock.name );
+
+	if ( ! targetBlockType.merge ) {
+		return;
+	}
+
+	const selectionA = selectionStart;
+	const selectionB = selectionEnd;
+
+	const blockA = select.getBlock( selectionA.clientId );
+	const blockAType = getBlockType( blockA.name );
+
+	const blockB = select.getBlock( selectionB.clientId );
+	const blockBType = getBlockType( blockB.name );
+
+	const htmlA = blockA.attributes[ selectionA.attributeKey ];
+	const htmlB = blockB.attributes[ selectionB.attributeKey ];
+
+	const attributeDefinitionA =
+		blockAType.attributes[ selectionA.attributeKey ];
+	const attributeDefinitionB =
+		blockBType.attributes[ selectionB.attributeKey ];
+
+	let valueA = create( {
+		html: htmlA,
+		...mapRichTextSettings( attributeDefinitionA ),
+	} );
+	let valueB = create( {
+		html: htmlB,
+		...mapRichTextSettings( attributeDefinitionB ),
+	} );
+
+	// A robust way to retain selection position through various transforms
+	// is to insert a special character at the position and then recover it.
+	const START_OF_SELECTED_AREA = '\u0086';
+
+	valueA = remove( valueA, selectionA.offset, valueA.text.length );
+	valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
+
+	// Clone the blocks so we don't manipulate the original.
+	const cloneA = cloneBlock( blockA, {
+		[ selectionA.attributeKey ]: toHTMLString( {
+			value: valueA,
+			...mapRichTextSettings( attributeDefinitionA ),
+		} ),
+	} );
+	const cloneB = cloneBlock( blockB, {
+		[ selectionB.attributeKey ]: toHTMLString( {
+			value: valueB,
+			...mapRichTextSettings( attributeDefinitionB ),
+		} ),
+	} );
+
+	const followingBlock = isForward ? cloneA : cloneB;
+
+	// We can only merge blocks with similar types
+	// thus, we transform the block to merge first
+	const blocksWithTheSameType =
+		blockA.name === blockB.name
+			? [ followingBlock ]
+			: switchToBlockType( followingBlock, targetBlockType.name );
+
+	// If the block types can not match, do nothing
+	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+		return;
+	}
+
+	let updatedAttributes;
+
+	if ( isForward ) {
+		const blockToMerge = blocksWithTheSameType.pop();
+		updatedAttributes = targetBlockType.merge(
+			blockToMerge.attributes,
+			cloneB.attributes
+		);
+	} else {
+		const blockToMerge = blocksWithTheSameType.shift();
+		updatedAttributes = targetBlockType.merge(
+			cloneA.attributes,
+			blockToMerge.attributes
+		);
+	}
+
+	const newAttributeKey = findKey(
+		updatedAttributes,
+		( v ) =>
+			typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
+	);
+
+	const convertedHtml = updatedAttributes[ newAttributeKey ];
+	const convertedValue = create( {
+		html: convertedHtml,
+		...mapRichTextSettings( targetBlockType.attributes[ newAttributeKey ] ),
+	} );
+	const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
+	const newValue = remove( convertedValue, newOffset, newOffset + 1 );
+	const newHtml = toHTMLString( {
+		value: newValue,
+		...mapRichTextSettings( targetBlockType.attributes[ newAttributeKey ] ),
+	} );
+
+	updatedAttributes[ newAttributeKey ] = newHtml;
+
+	const selectedBlockClientIds = select.getSelectedBlockClientIds();
+	const replacement = [
+		...( isForward ? blocksWithTheSameType : [] ),
+		{
+			// Preserve the original client ID.
+			...targetBlock,
+			attributes: {
+				...targetBlock.attributes,
+				...updatedAttributes,
+			},
+		},
+		...( isForward ? [] : blocksWithTheSameType ),
+	];
+
+	registry.batch( () => {
+		dispatch.selectionChange(
+			targetBlock.clientId,
+			newAttributeKey,
+			newOffset,
+			newOffset
+		);
+
+		dispatch.replaceBlocks(
+			selectedBlockClientIds,
+			replacement,
+			0, // If we don't pass the `indexToSelect` it will default to the last block.
+			select.getSelectedBlocksInitialCaretPosition()
+		);
+	} );
+};
+
+/**
+ * Split the current selection.
+ */
+export const __unstableSplitSelection = () => ( { select, dispatch } ) => {
+	const selectionAnchor = select.getSelectionStart();
+	const selectionFocus = select.getSelectionEnd();
+
+	if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
+
+	// Can't split if the selection is not set.
+	if (
+		! selectionAnchor.attributeKey ||
+		! selectionFocus.attributeKey ||
+		typeof selectionAnchor.offset === 'undefined' ||
+		typeof selectionFocus.offset === 'undefined'
+	)
+		return;
+
+	const anchorRootClientId = select.getBlockRootClientId(
+		selectionAnchor.clientId
+	);
+	const focusRootClientId = select.getBlockRootClientId(
+		selectionFocus.clientId
+	);
+
+	// It's not splittable if the selection doesn't start and end in the same
+	// block list. Maybe in the future it should be allowed.
+	if ( anchorRootClientId !== focusRootClientId ) {
+		return;
+	}
+
+	const blockOrder = select.getBlockOrder( anchorRootClientId );
+	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
+	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+
+	// Reassign selection start and end based on order.
+	let selectionStart, selectionEnd;
+
+	if ( anchorIndex > focusIndex ) {
+		selectionStart = selectionFocus;
+		selectionEnd = selectionAnchor;
+	} else {
+		selectionStart = selectionAnchor;
+		selectionEnd = selectionFocus;
+	}
+
+	const selectionA = selectionStart;
+	const selectionB = selectionEnd;
+
+	const blockA = select.getBlock( selectionA.clientId );
+	const blockAType = getBlockType( blockA.name );
+
+	const blockB = select.getBlock( selectionB.clientId );
+	const blockBType = getBlockType( blockB.name );
+
+	const htmlA = blockA.attributes[ selectionA.attributeKey ];
+	const htmlB = blockB.attributes[ selectionB.attributeKey ];
+
+	const attributeDefinitionA =
+		blockAType.attributes[ selectionA.attributeKey ];
+	const attributeDefinitionB =
+		blockBType.attributes[ selectionB.attributeKey ];
+
+	let valueA = create( {
+		html: htmlA,
+		...mapRichTextSettings( attributeDefinitionA ),
+	} );
+	let valueB = create( {
+		html: htmlB,
+		...mapRichTextSettings( attributeDefinitionB ),
+	} );
+
+	valueA = remove( valueA, selectionA.offset, valueA.text.length );
+	valueB = remove( valueB, 0, selectionB.offset );
+
+	dispatch.replaceBlocks(
+		select.getSelectedBlockClientIds(),
+		[
+			{
+				// Preserve the original client ID.
+				...blockA,
+				attributes: {
+					...blockA.attributes,
+					[ selectionA.attributeKey ]: toHTMLString( {
+						value: valueA,
+						...mapRichTextSettings( attributeDefinitionA ),
+					} ),
+				},
+			},
+			createBlock( getDefaultBlockName() ),
+			{
+				// Preserve the original client ID.
+				...blockB,
+				attributes: {
+					...blockB.attributes,
+					[ selectionB.attributeKey ]: toHTMLString( {
+						value: valueB,
+						...mapRichTextSettings( attributeDefinitionB ),
+					} ),
+				},
+			},
+		],
+		1, // If we don't pass the `indexToSelect` it will default to the last block.
+		select.getSelectedBlocksInitialCaretPosition()
+	);
+};
+
+/**
+ * Expand the selection to cover the entire blocks, removing partial selection.
+ */
+export const __unstableExpandSelection = () => ( { select, dispatch } ) => {
+	const selectionAnchor = select.getSelectionStart();
+	const selectionFocus = select.getSelectionEnd();
+	dispatch.selectionChange( {
+		start: { clientId: selectionAnchor.clientId },
+		end: { clientId: selectionFocus.clientId },
+	} );
 };
 
 /**
@@ -719,17 +1048,10 @@ export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
 	if ( canRestoreTextSelection ) {
 		const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
 		const html = selectedBlock.attributes[ attributeKey ];
-		const {
-			multiline: multilineTag,
-			__unstableMultilineWrapperTags: multilineWrapperTags,
-			__unstablePreserveWhiteSpace: preserveWhiteSpace,
-		} = attributeDefinition;
 		const value = insert(
 			create( {
 				html,
-				multilineTag,
-				multilineWrapperTags,
-				preserveWhiteSpace,
+				...mapRichTextSettings( attributeDefinition ),
 			} ),
 			START_OF_SELECTED_AREA,
 			offset,
@@ -738,8 +1060,7 @@ export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
 
 		selectedBlock.attributes[ attributeKey ] = toHTMLString( {
 			value,
-			multilineTag,
-			preserveWhiteSpace,
+			...mapRichTextSettings( attributeDefinition ),
 		} );
 	}
 
@@ -769,23 +1090,15 @@ export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
 				v.indexOf( START_OF_SELECTED_AREA ) !== -1
 		);
 		const convertedHtml = updatedAttributes[ newAttributeKey ];
-		const {
-			multiline: multilineTag,
-			__unstableMultilineWrapperTags: multilineWrapperTags,
-			__unstablePreserveWhiteSpace: preserveWhiteSpace,
-		} = blockAType.attributes[ newAttributeKey ];
 		const convertedValue = create( {
 			html: convertedHtml,
-			multilineTag,
-			multilineWrapperTags,
-			preserveWhiteSpace,
+			...mapRichTextSettings( blockAType.attributes[ newAttributeKey ] ),
 		} );
 		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
 		const newHtml = toHTMLString( {
 			value: newValue,
-			multilineTag,
-			preserveWhiteSpace,
+			...mapRichTextSettings( blockAType.attributes[ newAttributeKey ] ),
 		} );
 
 		updatedAttributes[ newAttributeKey ] = newHtml;
@@ -978,10 +1291,10 @@ export function exitFormattedText() {
 /**
  * Action that changes the position of the user caret.
  *
- * @param {string} clientId     The selected block client ID.
- * @param {string} attributeKey The selected block attribute key.
- * @param {number} startOffset  The start offset.
- * @param {number} endOffset    The end offset.
+ * @param {string|WPSelection} clientId     The selected block client ID.
+ * @param {string}             attributeKey The selected block attribute key.
+ * @param {number}             startOffset  The start offset.
+ * @param {number}             endOffset    The end offset.
  *
  * @return {Object} Action object.
  */
@@ -991,13 +1304,17 @@ export function selectionChange(
 	startOffset,
 	endOffset
 ) {
-	return {
-		type: 'SELECTION_CHANGE',
-		clientId,
-		attributeKey,
-		startOffset,
-		endOffset,
-	};
+	if ( typeof clientId === 'string' ) {
+		return {
+			type: 'SELECTION_CHANGE',
+			clientId,
+			attributeKey,
+			startOffset,
+			endOffset,
+		};
+	}
+
+	return { type: 'SELECTION_CHANGE', ...clientId };
 }
 
 /**

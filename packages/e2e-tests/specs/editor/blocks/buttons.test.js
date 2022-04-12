@@ -6,6 +6,7 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
+	clickBlockAppender,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Buttons', () => {
@@ -15,6 +16,15 @@ describe( 'Buttons', () => {
 
 	it( 'has focus on button content', async () => {
 		await insertBlock( 'Buttons' );
+		await page.keyboard.type( 'Content' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'has focus on button content (slash inserter)', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '/buttons' );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

@@ -56,6 +56,11 @@ function ListViewBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
+	const isFirstSelectedBlock =
+		isSelected && selectedClientIds[ 0 ] === clientId;
+	const isLastSelectedBlock =
+		isSelected &&
+		selectedClientIds[ selectedClientIds.length - 1 ] === clientId;
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
@@ -102,7 +107,7 @@ function ListViewBlock( {
 
 	const listViewBlockSettingsClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
-		{ 'is-visible': isHovered || isSelected }
+		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
 
 	// If ListView has experimental features related to the Persistent List View,
@@ -177,6 +182,8 @@ function ListViewBlock( {
 
 	const classes = classnames( {
 		'is-selected': isSelected,
+		'is-first-selected': isFirstSelectedBlock,
+		'is-last-selected': isLastSelectedBlock,
 		'is-branch-selected':
 			withExperimentalPersistentListViewFeatures && isBranchSelected,
 		'is-dragging': isDragged,

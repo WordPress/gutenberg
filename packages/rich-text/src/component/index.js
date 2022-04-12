@@ -214,6 +214,10 @@ export function useRichText( {
 			return;
 		}
 
+		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
+			ref.current.focus();
+		}
+
 		applyFromProps();
 		hadSelectionUpdate.current = false;
 	}, [ hadSelectionUpdate.current ] );

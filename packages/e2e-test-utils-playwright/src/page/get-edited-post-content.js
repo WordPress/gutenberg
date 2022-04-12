@@ -5,5 +5,7 @@
  * @return {Promise} Promise resolving with post content markup.
  */
 export async function getEditedPostContent() {
-	return this.wpDataSelect( 'core/editor', 'getEditedPostContent' );
+	return await this.page.evaluate( () =>
+		window.wp.data.select( 'core/editor' ).getEditedPostContent()
+	);
 }

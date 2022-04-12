@@ -1,7 +1,7 @@
 /**
  * Clicks a block toolbar button.
  *
- * @this {import('.').PageUtils}
+ * @this {import('./').PageUtils}
  * @param {string} label The text string of the button label.
  */
 export async function clickBlockToolbarButton( label ) {

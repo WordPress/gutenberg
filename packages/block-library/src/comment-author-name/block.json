@@ -4,13 +4,13 @@
 	"name": "core/comment-author-name",
 	"title": "Comment Author Name",
 	"category": "theme",
-	"parent": [ "core/comment-template" ],
-	"description": "Add the author name of this comment.",
+	"ancestor": [ "core/comment-template" ],
+	"description": "Displays the name of the author of the comment.",
 	"textdomain": "default",
 	"attributes": {
 		"isLink": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		},
 		"linkTarget": {
 			"type": "string",
@@ -18,6 +18,10 @@
 		},
 		"textAlign": {
 			"type": "string"
+		},
+		"fontSize": {
+			"type": "string",
+			"default": "small"
 		}
 	},
 	"usesContext": [ "commentId" ],

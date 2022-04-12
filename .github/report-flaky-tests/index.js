@@ -65,6 +65,7 @@ const metaData = {
 			if ( isTrunk ) {
 				const headCommit = github.context.sha;
 				const baseCommit = meta.baseCommit || github.context.sha;
+				meta.baseCommit = baseCommit;
 
 				try {
 					const { data } = await octokit.rest.repos.compareCommits( {
@@ -85,14 +86,51 @@ const metaData = {
 				}
 			}
 
+			let testResultsList = body
+				.slice(
+					body.indexOf( TEST_RESULTS_LIST.open ) +
+						TEST_RESULTS_LIST.open.length,
+					body.indexOf( TEST_RESULTS_LIST.close )
+				)
+				/**
+				 * Split the text from:
+				 * ```
+				 * <!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->
+				 * ...
+				 * <!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->
+				 * <!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->
+				 * ```
+				 *
+				 * into:
+				 * ```
+				 * [
+				 *   '<!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->',
+				 *   '<!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->',
+				 *   '<!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->',
+				 * ]
+				 * ```
+				 */
+				.split(
+					new RegExp(
+						`(?<=${ TEST_RESULT.close })\n(?:\.\.\.\n)?(?=${ TEST_RESULT.open })`
+					)
+				);
+			// GitHub issues has character limits on issue's body,
+			// so we only preserve the first and the 9 latest results.
+			if ( testResultsList.length > 10 ) {
+				testResultsList = [
+					testResultsList[ 0 ],
+					'...',
+					...testResultsList.slice( -9 ),
+				];
+			}
+
 			// Reconstruct the body with the description + previous errors + new error.
 			body =
 				renderIssueDescription( { meta, testTitle, testPath } ) +
-				body.slice(
-					body.indexOf( TEST_RESULTS_LIST.open ),
-					body.indexOf( TEST_RESULTS_LIST.close )
-				) +
 				[
+					TEST_RESULTS_LIST.open,
+					...testResultsList,
 					renderTestErrorMessage( {
 						testRunner,
 						testPath,
