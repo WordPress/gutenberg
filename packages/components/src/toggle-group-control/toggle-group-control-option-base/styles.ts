@@ -89,3 +89,14 @@ export const buttonActive = css`
 		background: transparent;
 	}
 `;
+
+export const backdropView = css`
+	background: ${ COLORS.gray[ 900 ] };
+	border-radius: ${ CONFIG.controlBorderRadius };
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;
+`;

@@ -4,6 +4,8 @@
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Radio } from 'reakit';
+// eslint-disable-next-line no-restricted-imports
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -28,6 +30,8 @@ import { useCx } from '../../utils/hooks';
 import Tooltip from '../../tooltip';
 
 const { ButtonContentView, LabelView } = styles;
+
+const LAYOUT_ID = 'toggle-group-backdrop-shared-layout-id';
 
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
@@ -80,6 +84,7 @@ function ToggleGroupControlOptionBase(
 		className,
 		isActive && styles.buttonActive
 	);
+	const backdropClassname = cx( styles.backdropView );
 
 	return (
 		<LabelView className={ labelViewClasses } data-active={ isActive }>
@@ -98,6 +103,14 @@ function ToggleGroupControlOptionBase(
 				>
 					<ButtonContentView>{ children }</ButtonContentView>
 				</Radio>
+				{ /* Animated backdrop */ }
+				{ isActive ? (
+					<motion.div
+						className={ backdropClassname }
+						role="presentation"
+						layoutId={ LAYOUT_ID }
+					/>
+				) : null }
 			</WithToolTip>
 		</LabelView>
 	);
