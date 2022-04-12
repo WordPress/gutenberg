@@ -8,7 +8,7 @@ import { difference } from 'lodash';
  */
 import { speak } from '@wordpress/a11y';
 import { __, sprintf } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelectors } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { UP, DOWN, HOME, END } from '@wordpress/keycodes';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -31,9 +31,9 @@ export default function useBlockSelection() {
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		hasSelectedBlock,
-	} = useSelect( blockEditorStore );
+	} = useSelectors( blockEditorStore );
 
-	const { getBlockType } = useSelect( blocksStore );
+	const { getBlockType } = useSelectors( blocksStore );
 
 	const updateBlockSelection = useCallback(
 		async ( event, clientId, destinationClientId ) => {

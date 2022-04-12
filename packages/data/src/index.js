@@ -20,6 +20,7 @@ export {
 	useRegistry,
 } from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
+export { default as useSelectors } from './components/use-selectors';
 export { useDispatch } from './components/use-dispatch';
 export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';

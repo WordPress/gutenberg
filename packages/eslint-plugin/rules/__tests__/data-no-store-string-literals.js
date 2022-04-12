@@ -26,7 +26,7 @@ const valid = [
 	// Direct function calls.
 	`import { useDispatch } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; useDispatch( coreStore );`,
 	`import { dispatch } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; dispatch( coreStore );`,
-	`import { useSelect } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; useSelect( coreStore );`,
+	`import { useSelectors } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; useSelectors( coreStore );`,
 	`import { select } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; select( coreStore );`,
 	`import { resolveSelect } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; resolveSelect( coreStore );`,
 	`import { resolveSelect as resolveSelectAlias } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; resolveSelectAlias( coreStore );`,

@@ -15,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useSelectors } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { alignmentHelpers } from '@wordpress/components';
 
@@ -79,7 +79,7 @@ export default function ButtonsEdit( {
 		return preferredStyleVariations?.value?.[ buttonBlockName ];
 	}, [] );
 
-	const { getBlockOrder } = useSelect( blockEditorStore );
+	const { getBlockOrder } = useSelectors( blockEditorStore );
 	const { insertBlock, removeBlock, selectBlock } = useDispatch(
 		blockEditorStore
 	);

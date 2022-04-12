@@ -13,7 +13,7 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useSelectors } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
@@ -26,7 +26,7 @@ import { store as editPostStore } from '../../../store';
 export default function DeleteTemplate() {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
-	const { getEditorSettings } = useSelect( editorStore );
+	const { getEditorSettings } = useSelectors( editorStore );
 	const { updateEditorSettings, editPost } = useDispatch( editorStore );
 	const { deleteEntityRecord } = useDispatch( coreStore );
 	const { template } = useSelect( ( select ) => {

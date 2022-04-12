@@ -16,8 +16,8 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
  */
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
+import { useSelectors } from '@wordpress/data';
 
-const noop = () => {};
 const renderQueue = createQueue();
 
 /** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
@@ -34,11 +34,11 @@ const renderQueue = createQueue();
  *                                                    the `registry.select` method on the first
  *                                                    argument and the `registry` on the second
  *                                                    argument.
- *                                                    When a store key is passed, all selectors for
- *                                                    the store will be returned. This is only meant
- *                                                    for usage of these selectors in event
- *                                                    callbacks, not for data needed to create the
- *                                                    element tree.
+ *                                                    (deprecated) When a store key is passed, all
+ *                                                    selectors for the store will be returned. This
+ *                                                    is only meant for usage of these selectors in
+ *                                                    event callbacks, not for data needed to create
+ *                                                    the element tree.
  * @param {Array}                           deps      If provided, this memoizes the mapSelect so the
  *                                                    same `mapSelect` is invoked on every state
  *                                                    change unless the dependencies change.
@@ -69,7 +69,8 @@ const renderQueue = createQueue();
  * not change because the dependency is just the currency.
  *
  * When data is only used in an event callback, the data should not be retrieved
- * on render, so it may be useful to get the selectors function instead.
+ * on render, so you need to use useSelectors instead. For backwards compatibility
+ * only, this function still supports getting the selectors by passing a store.
  *
  * **Don't use `useSelect` this way when calling the selectors in the render
  * function because your component won't re-render on a data change.**
@@ -87,29 +88,17 @@ const renderQueue = createQueue();
  * }
  * ```
  *
- * @return {Function}  A custom react hook.
+ * @return {any}  The current map output or a store's selectors.
  */
 export default function useSelect( mapSelect, deps ) {
-	const hasMappingFunction = 'function' === typeof mapSelect;
-
-	// If we're recalling a store by its name or by
-	// its descriptor then we won't be caching the
-	// calls to `mapSelect` because we won't be calling it.
-	if ( ! hasMappingFunction ) {
-		deps = [];
+	// This is a deliberate rules-of-hooks violation that is safe to do because mapSelect's type stays stable over time.
+	// In almost any other case you should never do this in a hook.
+	// The rule needs to be disabled inside the entire function body.
+	/* eslint-disable react-hooks/rules-of-hooks */
+	if ( typeof mapSelect !== 'function' ) {
+		return useSelectors( mapSelect );
 	}
-
-	// Because of the "rule of hooks" we have to call `useCallback`
-	// on every invocation whether or not we have a real function
-	// for `mapSelect`. we'll create this intermediate variable to
-	// fulfill that need and then reference it with our "real"
-	// `_mapSelect` if we can.
-	const callbackMapper = useCallback(
-		hasMappingFunction ? mapSelect : noop,
-		deps
-	);
-	const _mapSelect = hasMappingFunction ? callbackMapper : null;
-
+	const _mapSelect = useCallback( mapSelect, deps );
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
 	// React can sometimes clear the `useMemo` cache.
@@ -141,36 +130,29 @@ export default function useSelect( mapSelect, deps ) {
 	// in that case, we would still want to memoize it.
 	const depsChangedFlag = useMemo( () => ( {} ), deps || [] );
 
-	let mapOutput;
+	let mapOutput = latestMapOutput.current;
 
-	if ( _mapSelect ) {
-		mapOutput = latestMapOutput.current;
-		const hasReplacedMapSelect = latestMapSelect.current !== _mapSelect;
-		const lastMapSelectFailed = !! latestMapOutputError.current;
+	const hasReplacedMapSelect = latestMapSelect.current !== _mapSelect;
+	const lastMapSelectFailed = !! latestMapOutputError.current;
 
-		if ( hasReplacedMapSelect || lastMapSelectFailed ) {
-			try {
-				mapOutput = wrapSelect( _mapSelect );
-			} catch ( error ) {
-				let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
+	if ( hasReplacedMapSelect || lastMapSelectFailed ) {
+		try {
+			mapOutput = wrapSelect( _mapSelect );
+		} catch ( error ) {
+			let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
 
-				if ( latestMapOutputError.current ) {
-					errorMessage += `\nThe error may be correlated with this previous error:\n`;
-					errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
-					errorMessage += 'Original stack trace:';
-				}
-
-				// eslint-disable-next-line no-console
-				console.error( errorMessage );
+			if ( latestMapOutputError.current ) {
+				errorMessage += `\nThe error may be correlated with this previous error:\n`;
+				errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
+				errorMessage += 'Original stack trace:';
 			}
+
+			// eslint-disable-next-line no-console
+			console.error( errorMessage );
 		}
 	}
 
 	useIsomorphicLayoutEffect( () => {
-		if ( ! hasMappingFunction ) {
-			return;
-		}
-
 		latestMapSelect.current = _mapSelect;
 		latestMapOutput.current = mapOutput;
 		latestMapOutputError.current = undefined;
@@ -187,10 +169,6 @@ export default function useSelect( mapSelect, deps ) {
 	} );
 
 	useIsomorphicLayoutEffect( () => {
-		if ( ! hasMappingFunction ) {
-			return;
-		}
-
 		const onStoreChange = () => {
 			if ( isMountedAndNotUnsubscribing.current ) {
 				try {
@@ -234,7 +212,8 @@ export default function useSelect( mapSelect, deps ) {
 		// If you're tempted to eliminate the spread dependencies below don't do it!
 		// We're passing these in from the calling function and want to make sure we're
 		// examining every individual value inside the `deps` array.
-	}, [ registry, wrapSelect, hasMappingFunction, depsChangedFlag ] );
+	}, [ registry, wrapSelect, depsChangedFlag ] );
 
-	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
+	return mapOutput;
+	/* eslint-enable react-hooks/rules-of-hooks */
 }

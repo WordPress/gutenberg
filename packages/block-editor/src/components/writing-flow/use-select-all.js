@@ -7,7 +7,7 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { isEntirelySelected } from '@wordpress/dom';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelectors } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRefEffect } from '@wordpress/compose';
 
@@ -21,7 +21,7 @@ export default function useSelectAll() {
 		getBlockOrder,
 		getSelectedBlockClientIds,
 		getBlockRootClientId,
-	} = useSelect( blockEditorStore );
+	} = useSelectors( blockEditorStore );
 	const { multiSelect } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 

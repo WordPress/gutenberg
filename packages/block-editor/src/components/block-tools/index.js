@@ -6,7 +6,7 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSelectors } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -40,7 +40,7 @@ export default function BlockTools( {
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const { getSelectedBlockClientIds, getBlockRootClientId } = useSelect(
+	const { getSelectedBlockClientIds, getBlockRootClientId } = useSelectors(
 		blockEditorStore
 	);
 	const {

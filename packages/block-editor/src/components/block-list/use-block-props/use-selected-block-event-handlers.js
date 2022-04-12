@@ -3,7 +3,7 @@
  */
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSelectors } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -24,7 +24,7 @@ export function useEventHandlers( clientId ) {
 		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
 		[ clientId ]
 	);
-	const { getBlockRootClientId, getBlockIndex } = useSelect(
+	const { getBlockRootClientId, getBlockIndex } = useSelectors(
 		blockEditorStore
 	);
 	const { insertDefaultBlock, removeBlock } = useDispatch( blockEditorStore );

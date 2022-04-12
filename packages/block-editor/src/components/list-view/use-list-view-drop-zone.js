@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelectors } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import {
 	useThrottle,
@@ -201,7 +201,7 @@ export default function useListViewDropZone() {
 		getBlockCount,
 		getDraggedBlockClientIds,
 		canInsertBlocks,
-	} = useSelect( blockEditorStore );
+	} = useSelectors( blockEditorStore );
 	const [ target, setTarget ] = useState();
 	const { rootClientId: targetRootClientId, blockIndex: targetBlockIndex } =
 		target || {};

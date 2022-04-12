@@ -14,7 +14,7 @@ import {
  * WordPress dependencies
  */
 import { useMemo, useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSelectors } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -65,7 +65,7 @@ function useGlobalStylesUserConfig() {
 		};
 	}, [] );
 
-	const { getEditedEntityRecord } = useSelect( coreStore );
+	const { getEditedEntityRecord } = useSelectors( coreStore );
 	const { editEntityRecord } = useDispatch( coreStore );
 	const config = useMemo( () => {
 		return {

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelectors, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -22,7 +22,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * @param {Object} popoverRef     The ref object of the popover node container.
  */
 export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
-	const { hasSelectedBlock, hasMultiSelection } = useSelect(
+	const { hasSelectedBlock, hasMultiSelection } = useSelectors(
 		blockEditorStore
 	);
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );

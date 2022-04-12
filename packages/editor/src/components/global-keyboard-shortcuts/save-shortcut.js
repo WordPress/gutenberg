@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelectors, useDispatch } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 
 /**
@@ -12,9 +12,11 @@ import { store as editorStore } from '../../store';
 
 function SaveShortcut( { resetBlocksOnSave } ) {
 	const { resetEditorBlocks, savePost } = useDispatch( editorStore );
-	const { isEditedPostDirty, getPostEdits, isPostSavingLocked } = useSelect(
-		editorStore
-	);
+	const {
+		isEditedPostDirty,
+		getPostEdits,
+		isPostSavingLocked,
+	} = useSelectors( editorStore );
 
 	useShortcut( 'core/editor/save', ( event ) => {
 		event.preventDefault();

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSelectors } from '@wordpress/data';
 import {
 	useShortcut,
 	store as keyboardShortcutsStore,
@@ -17,12 +17,12 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { getBlockSelectionStart } = useSelect( blockEditorStore );
+	const { getBlockSelectionStart } = useSelectors( blockEditorStore );
 	const {
 		getEditorMode,
 		isEditorSidebarOpened,
 		isListViewOpened,
-	} = useSelect( editPostStore );
+	} = useSelectors( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
 		const { richEditingEnabled, codeEditingEnabled } = select(
 			editorStore

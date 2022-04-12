@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelectors } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -16,7 +16,7 @@ import { store as blockEditorStore } from '../../../store';
  * @param {string} clientId Block client ID.
  */
 export function useFocusHandler( clientId ) {
-	const { isBlockSelected } = useSelect( blockEditorStore );
+	const { isBlockSelected } = useSelectors( blockEditorStore );
 	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
 
 	return useRefEffect(

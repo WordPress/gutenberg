@@ -3,7 +3,7 @@
  */
 import { useRefEffect } from '@wordpress/compose';
 
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSelectors } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -26,7 +26,7 @@ export function useInBetweenInserter() {
 		isMultiSelecting,
 		getSelectedBlockClientIds,
 		getTemplateLock,
-	} = useSelect( blockEditorStore );
+	} = useSelectors( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
 		blockEditorStore
 	);

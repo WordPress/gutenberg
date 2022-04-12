@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelectors } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -15,7 +15,9 @@ import { store as blockEditorStore } from '../../../store';
  * @param {string} clientId Block client ID.
  */
 export function useNavModeExit( clientId ) {
-	const { isNavigationMode, isBlockSelected } = useSelect( blockEditorStore );
+	const { isNavigationMode, isBlockSelected } = useSelectors(
+		blockEditorStore
+	);
 	const { setNavigationMode, selectBlock } = useDispatch( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
