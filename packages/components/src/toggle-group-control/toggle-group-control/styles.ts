@@ -19,6 +19,8 @@ export const ToggleGroupControl = css`
 	display: inline-flex;
 	min-height: ${ CONFIG.controlHeight };
 	min-width: 0;
+	padding: 2px;
+	position: relative;
 	&:hover {
 		border-color: ${ COLORS.ui.borderHover };
 	}
@@ -33,15 +35,8 @@ export const ToggleGroupControl = css`
 
 export const block = css`
 	display: flex;
-`;
-
-export const Liner = styled( 'div' )`
-	position: relative;
-	display: flex;
 	width: 100%;
-	margin: 2px;
 `;
-
 
 export const AnimatedBackdrop = styled( motion.div )`
 	background: ${ COLORS.gray[ 900 ] };
@@ -49,7 +44,7 @@ export const AnimatedBackdrop = styled( motion.div )`
 	box-shadow: none;
 	left: 0;
 	position: absolute;
-	top: 0;
-	bottom: 0;
+	top: 2px;
+	bottom: 2px;
 	z-index: 1;
 `;

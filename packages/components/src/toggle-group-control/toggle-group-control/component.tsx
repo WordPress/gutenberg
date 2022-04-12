@@ -118,11 +118,9 @@ function ToggleGroupControl(
 					{ ...otherProps }
 					ref={ forwardedRef }
 				>
-					<styles.Liner>
-						{ resizeListener }
-						<ToggleGroupControlBackdrop containerSizes={ sizes } />
-						{ children }
-					</styles.Liner>
+					{ resizeListener }
+					<ToggleGroupControlBackdrop containerSizes={ sizes } />
+					{ children }
 				</RadioGroup>
 			</ToggleGroupControlContext.Provider>
 		</BaseControl>
