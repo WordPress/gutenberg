@@ -82,6 +82,7 @@ class EditorPage {
 			let textViewElementNameiOS = '';
 			switch ( blockName ) {
 				case blockNames.cover:
+				case blockNames.image:
 					elementTypeAndroid = 'android.view.ViewGroup';
 					elementTypeiOS = 'XCUIElementTypeButton';
 					break;
@@ -163,7 +164,9 @@ class EditorPage {
 	async hasBlockAtPosition( position = 1, blockName = '' ) {
 		return (
 			undefined !==
-			( await this.getBlockAtPosition( blockName, position ) )
+			( await this.getBlockAtPosition( blockName, position, {
+				useWaitForVisible: true,
+			} ) )
 		);
 	}
 
@@ -526,8 +529,22 @@ class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	async typeTextToParagraphBlock( block, text, clear ) {
-		await typeString( this.driver, block, text, clear );
+	async typeTextToParagraphBlock(
+		block,
+		text,
+		clear,
+		useGetTextView = true
+	) {
+		let textViewElement = block;
+		// Temporary condition to handle tests that are not updated yet
+		// Can be removed once tests use the updated getBlockAtPosition() with a wait
+		if ( useGetTextView ) {
+			textViewElement = await this.getTextViewForParagraphBlock( block );
+		}
+		await typeString( this.driver, textViewElement, text, clear );
+		if ( useGetTextView ) {
+			await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
+		}
 	}
 
 	async sendTextToParagraphBlock( position, text, clear ) {
@@ -545,10 +562,11 @@ class EditorPage {
 			await this.typeTextToParagraphBlock(
 				block,
 				paragraphs[ i ],
-				clear
+				clear,
+				false
 			);
 			if ( i !== paragraphs.length - 1 ) {
-				await this.typeTextToParagraphBlock( block, '\n', false );
+				await this.typeTextToParagraphBlock( block, '\n', false, false );
 			}
 		}
 	}

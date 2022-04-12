@@ -23,7 +23,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			testData.shortText
+			testData.shortText,
+			true,
+			false
 		);
 
 		await clickMiddleOfElement(
@@ -34,6 +36,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			'\n',
+			false,
 			false
 		);
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -60,7 +63,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			testData.shortText
+			testData.shortText,
+			true,
+			false
 		);
 		await clickMiddleOfElement(
 			editorPage.driver,
@@ -69,7 +74,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			'\n'
+			'\n',
+			true,
+			false
 		);
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -90,7 +97,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			backspaceKey
+			backspaceKey,
+			true,
+			false
 		);
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -140,7 +149,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			backspaceKey
+			backspaceKey,
+			true,
+			false
 		);
 
 		// Verify the editor has not crashed.
@@ -173,7 +184,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			backspace
+			backspace,
+			true,
+			false
 		);
 		// Verify the editor has not crashed.
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
