@@ -207,9 +207,23 @@ const BoxModelOverlayWithRef = forwardRef<
 			attributeFilter: [ 'style' ],
 		} );
 
+		// Percentage paddings are based on parent element's width,
+		// so we need to also listen to the parent's size changes.
+		const parentElement = target.parentElement;
+		let parentResizeObserver: ResizeObserver;
+		if ( parentElement ) {
+			parentResizeObserver = new defaultView.ResizeObserver( update );
+			parentResizeObserver.observe( parentElement, {
+				box: 'content-box',
+			} );
+		}
+
 		return () => {
 			resizeObserver.disconnect();
 			mutationObserver.disconnect();
+			if ( parentResizeObserver ) {
+				parentResizeObserver.disconnect();
+			}
 		};
 	}, [ targetRef, shouldShowOverlay, update ] );
 

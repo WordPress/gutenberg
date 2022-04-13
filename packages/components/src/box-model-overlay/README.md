@@ -74,6 +74,25 @@ const Example = () => {
 };
 ```
 
+`<BoxModelOverlay>` under the hood listens to size and style changes of the target element to update the overlay style automatically using `ResizeObserver` and `MutationObserver`. In some edge cases when the observers aren't picking up the changes, you can use the instance method `update` on the ref of the overlay to update it manually.
+
+```jsx
+const Example = () => {
+	const overlayRef = useRef();
+
+	// Update the overlay style manually when `deps` changes.
+	useEffect( () => {
+		overlayRef.current.update();
+	}, [ deps ] );
+
+	return (
+		<BoxModelOverlay showValues={ showValues } ref={ overlayRef }>
+			<YourComponent />
+		</BoxModelOverlay>
+	);
+};
+```
+
 Here's an example of using it with `<BoxControl>`:
 
 ```jsx
