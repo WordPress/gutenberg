@@ -1,15 +1,18 @@
 /**
  * External dependencies
  */
-import { kebabCase, debounce } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
-import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
+import {
+	__experimentalUseFocusOutside as useFocusOutside,
+	useDebounce,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -198,7 +201,7 @@ function PaletteEditListView( {
 		};
 	}, [] );
 
-	const debounceOnChange = useCallback( debounce( onChange, 200 ), [] );
+	const debounceOnChange = useDebounce( onChange, 100 );
 
 	return (
 		<VStack spacing={ 3 }>
