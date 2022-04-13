@@ -31,7 +31,7 @@ if ( ! function_exists( '_wp_array_keys_to_kebab_case' ) ) {
  *
  * @return array The URI-resolved font face.
  */
-function gutenberg_resolve_font_face_uri( $font_face ) {
+function _gutenberg_resolve_font_face_uri( $font_face ) {
 	if ( empty( $font_face['src'] ) ) {
 		return $font_face;
 	}
@@ -58,7 +58,7 @@ function gutenberg_resolve_font_face_uri( $font_face ) {
  *
  * @return boolean True if they're equal, false otherwise.
  */
-function gutenberg_is_webfont_equal( $a, $b, $is_camel_case = true ) {
+function _gutenberg_is_webfont_equal( $a, $b, $is_camel_case = true ) {
 	$equality_attrs = $is_camel_case ? array(
 		'fontFamily',
 		'fontStyle',
@@ -86,7 +86,7 @@ function gutenberg_is_webfont_equal( $a, $b, $is_camel_case = true ) {
  *
  * @return integer|false The index of $webfont in $webfonts if found. False otherwise.
  */
-function gutenberg_find_webfont( $webfonts, $webfont_to_find ) {
+function _gutenberg_find_webfont( $webfonts, $webfont_to_find ) {
 	if ( ! count( $webfonts ) ) {
 		return false;
 	}
@@ -94,7 +94,7 @@ function gutenberg_find_webfont( $webfonts, $webfont_to_find ) {
 	$is_camel_case = isset( $webfonts[0]['fontFamily'] );
 
 	foreach ( $webfonts as $index => $webfont ) {
-		if ( gutenberg_is_webfont_equal( $webfont, $webfont_to_find, $is_camel_case ) ) {
+		if ( _gutenberg_is_webfont_equal( $webfont, $webfont_to_find, $is_camel_case ) ) {
 			return $index;
 		}
 	}

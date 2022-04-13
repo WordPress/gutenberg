@@ -272,7 +272,7 @@ class WP_Webfonts {
 		$font_family_slug = $this->get_font_slug( $font_face_to_unregister );
 
 		$font_family = $this->registered_webfonts[ $font_family_slug ];
-		$index       = gutenberg_find_webfont( $font_family, $font_face_to_unregister );
+		$index       = _gutenberg_find_webfont( $font_family, $font_face_to_unregister );
 
 		// Font face not found.
 		if ( false === $index ) {

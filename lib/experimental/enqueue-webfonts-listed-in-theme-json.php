@@ -12,7 +12,7 @@
  *
  * @return boolean True if registered programmatically, false otherwise.
  */
-function gutenberg_is_externally_registered_webfont( $webfont ) {
+function _gutenberg_is_externally_registered_webfont( $webfont ) {
 	return isset( $webfont['origin'] ) && 'gutenberg_wp_webfonts_api' === $webfont['origin'];
 }
 
@@ -21,7 +21,7 @@ function gutenberg_is_externally_registered_webfont( $webfont ) {
  *
  * Enqueued webfonts will end up in the front-end as inlined CSS.
  */
-function gutenberg_enqueue_webfonts_listed_in_theme_json() {
+function _gutenberg_enqueue_webfonts_listed_in_theme_json() {
 	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
 
 	// Bail out early if there are no settings for webfonts.
@@ -33,7 +33,7 @@ function gutenberg_enqueue_webfonts_listed_in_theme_json() {
 	foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 		foreach ( $font_families as $font_family ) {
 			// Skip dynamically included font families. We only want to enqueue explicitly added fonts.
-			if ( gutenberg_is_externally_registered_webfont( $font_family ) ) {
+			if ( _gutenberg_is_externally_registered_webfont( $font_family ) ) {
 				continue;
 			}
 
@@ -52,7 +52,7 @@ function gutenberg_enqueue_webfonts_listed_in_theme_json() {
 			// Loop through all the font faces, enqueueing each one of them.
 			foreach ( $font_family['fontFaces'] as $font_face ) {
 				// Skip dynamically included font faces. We only want to enqueue the font faces listed in theme.json.
-				if ( gutenberg_is_externally_registered_webfont( $font_face ) ) {
+				if ( _gutenberg_is_externally_registered_webfont( $font_face ) ) {
 					continue;
 				}
 
@@ -62,12 +62,12 @@ function gutenberg_enqueue_webfonts_listed_in_theme_json() {
 	}
 }
 
-add_filter( 'wp_loaded', 'gutenberg_enqueue_webfonts_listed_in_theme_json' );
+add_filter( 'wp_loaded', '_gutenberg_enqueue_webfonts_listed_in_theme_json' );
 
 // No need to run this -- opening the admin interface enqueues all the webfonts.
 add_action(
 	'admin_init',
 	function() {
-		remove_filter( 'wp_loaded', 'gutenberg_enqueue_webfonts_listed_in_theme_json' );
+		remove_filter( 'wp_loaded', '_gutenberg_enqueue_webfonts_listed_in_theme_json' );
 	}
 );

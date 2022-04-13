@@ -11,7 +11,7 @@
  * @param array $data The global styles.
  * @return array The global styles with missing fonts data.
  */
-function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
+function _gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 	$registered_font_families = wp_webfonts()->get_all_webfonts();
 
 	if ( empty( $registered_font_families ) ) {
@@ -78,7 +78,7 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 		foreach ( $registered_font_faces as $registered_font_face ) {
 			$registered_font_face = _wp_array_keys_to_camel_case( $registered_font_face );
 
-			if ( false !== gutenberg_find_webfont( $font_faces_in_theme_json, $registered_font_face ) ) {
+			if ( false !== _gutenberg_find_webfont( $font_faces_in_theme_json, $registered_font_face ) ) {
 				// Webfont is already there, so let's not add it.
 				continue;
 			}

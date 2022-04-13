@@ -12,9 +12,9 @@ require __DIR__ . '/class-wp-webfonts-mock-provider.php';
  * Tests the enqueueing of webfonts listed in theme.json
  *
  * @group  webfonts
- * @covers gutenberg_register_webfonts_from_theme_json
- *         gutenberg_add_registered_webfonts_to_theme_json
- *         gutenberg_enqueue_webfonts_listed_in_theme_json
+ * @covers _gutenberg_register_webfonts_from_theme_json
+ *         _gutenberg_add_registered_webfonts_to_theme_json
+ *         _gutenberg_enqueue_webfonts_listed_in_theme_json
  */
 class Enqueue_Only_Webfonts_Listed_In_Theme_JSON_Test extends WP_UnitTestCase {
 	/**
