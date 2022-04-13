@@ -23,7 +23,7 @@ test.describe( 'Site editor title', () => {
 		} );
 
 		const title = await page.locator(
-			'role=region[name="Header"] >> role=heading[level=1]'
+			'role=region[name="Header"i] >> role=heading[level=1]'
 		);
 
 		await expect( await title.textContent() ).toEqual(
@@ -42,7 +42,7 @@ test.describe( 'Site editor title', () => {
 		} );
 
 		const title = await page.locator(
-			'role=region[name="Header"] >> role=heading[level=1]'
+			'role=region[name="Header"i] >> role=heading[level=1]'
 		);
 
 		await expect( await title.textContent() ).toEqual(
@@ -60,12 +60,12 @@ test.describe( 'Site editor title', () => {
 		} );
 
 		// Select the header template part via list view.
-		await page.click( 'role=button[name="List View"]' );
+		await page.click( 'role=button[name="List View"i]' );
 		const listView = await page.locator(
-			'role=treegrid[name="Block navigation structure"]'
+			'role=treegrid[name="Block navigation structure"i]'
 		);
-		await listView.locator( 'a >> text="header"' ).click();
-		await page.click( 'role=button[name="Close List View Sidebar"]' );
+		await listView.locator( 'role=gridcell >> text="header"' ).click();
+		await page.click( 'role=button[name="Close List View Sidebar"i]' );
 
 		// Evaluate the document settings secondary title.
 		const secondaryTitle = await page.locator(
