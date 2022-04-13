@@ -8,11 +8,17 @@
 /**
  * Function that recursively renders a list of nested comments.
  *
- * @param WP_Comment[] $comments    The array of comments.
+ * @param WP_Comment[] $comments        The array of comments.
  * @param WP_Block     $block           Block instance.
+ * @param int          $depth           Depth of the current comment. We need to
+ * keep keep track of this to add the `depth-*` class to comments at different
+ * levels using `comment_class()`.
  * @return string
  */
-function block_core_comment_template_render_comments( $comments, $block ) {
+function block_core_comment_template_render_comments( $comments, $block, $depth = 1 ) {
+	global $comment_depth;
+	$comment_depth = $depth;
+
 	$content = '';
 	foreach ( $comments as $comment ) {
 
@@ -30,15 +36,20 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 		if ( ! empty( $children ) ) {
 			$inner_content  = block_core_comment_template_render_comments(
 				$children,
-				$block
+				$block,
+				$depth + 1
 			);
 			$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
 		}
 
-		$comment_classes = comment_class( 'hi', $comment->comment_ID );
+		$comment_classes = comment_class( '', $comment->comment_ID, $comment->comment_post_ID, false );
 
 		$content .= sprintf( '<li %1$s>' . $block_content . '</li>', $comment_classes );
 	}
+
+	// Because $comment_depth is passed as a global, we need to reset before
+	// returning from the function.
+	$comment_depth = $comment_depth - 1;
 
 	return $content;
 
@@ -81,7 +92,7 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	return sprintf(
 		'<ol %1$s>%2$s</ol>',
 		$wrapper_attributes,
-		block_core_comment_template_render_comments( $comments, $block )
+		block_core_comment_template_render_comments( $comments, $block, 1 )
 	);
 }
 
