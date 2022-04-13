@@ -62,7 +62,7 @@ function gutenberg_register_webfonts_from_theme_json( $settings ) {
 				foreach ( $font_family['fontFaces'] as $font_face ) {
 					$font_face['provider'] = $font_family['provider'];
 					$font_face             = gutenberg_resolve_font_face_uri( $font_face );
-					$font_face             = gutenberg_webfont_to_kebab_case( $font_face );
+					$font_face             = _wp_array_keys_to_kebab_case( $font_face );
 
 					$font_faces_to_register[] = $font_face;
 				}
@@ -77,7 +77,7 @@ function gutenberg_register_webfonts_from_theme_json( $settings ) {
 			foreach ( $font_family['fontFaces'] as $font_face ) {
 				if ( isset( $font_face['provider'] ) ) {
 					$font_face = gutenberg_resolve_font_face_uri( $font_face );
-					$font_face = gutenberg_webfont_to_kebab_case( $font_face );
+					$font_face = _wp_array_keys_to_kebab_case( $font_face );
 
 					$font_faces_to_register[] = $font_face;
 				}

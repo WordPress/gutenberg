@@ -181,7 +181,7 @@ class WP_Webfonts {
 
 		// Enqueueing a single font face.
 
-		$font_face            = gutenberg_webfont_to_kebab_case( $font_face );
+		$font_face            = _wp_array_keys_to_kebab_case( $font_face );
 		$font_face_to_enqueue = $this->unregister_font_face( $font_face );
 
 		if ( ! $font_face_to_enqueue ) {

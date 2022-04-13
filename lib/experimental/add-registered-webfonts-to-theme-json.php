@@ -55,7 +55,7 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 					function( $font_face ) {
 						$font_face['origin'] = 'gutenberg_wp_webfonts_api';
 
-						return gutenberg_webfont_to_camel_case( $font_face );
+						return _wp_array_keys_to_camel_case( $font_face );
 					},
 					$registered_font_faces
 				),
@@ -76,7 +76,7 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 		$font_faces_in_theme_json = $font_family_in_theme_json['fontFaces'];
 
 		foreach ( $registered_font_faces as $registered_font_face ) {
-			$registered_font_face = gutenberg_webfont_to_camel_case( $registered_font_face );
+			$registered_font_face = _wp_array_keys_to_camel_case( $registered_font_face );
 
 			if ( false !== gutenberg_find_webfont( $font_faces_in_theme_json, $registered_font_face ) ) {
 				// Webfont is already there, so let's not add it.

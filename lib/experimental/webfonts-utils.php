@@ -5,22 +5,23 @@
  * @package gutenberg
  */
 
-/**
- * Transforms the keys of the webfont defined in theme.json into
- * kebab case, so the Webfonts API can handle it.
- *
- * @param array $webfont The webfont to be tranformed.
- *
- * @return array The kebab-case version of the webfont.
- */
-function gutenberg_webfont_to_kebab_case( $webfont ) {
-	$kebab_cased_webfont = array();
+if ( ! function_exists( '_wp_array_keys_to_kebab_case' ) ) {
+	/**
+	 * Transforms the keys of the array to kebab-case.
+	 *
+	 * @param array $array The array to be tranformed.
+	 *
+	 * @return array The kebab-cased array.
+	 */
+	function _wp_array_keys_to_kebab_case( $array ) {
+		$kebab_cased_array = array();
 
-	foreach ( $webfont as $key => $value ) {
-		$kebab_cased_webfont[ _wp_to_kebab_case( $key ) ] = $value;
+		foreach ( $array as $key => $value ) {
+			$kebab_cased_array[ _wp_to_kebab_case( $key ) ] = $value;
+		}
+
+		return $kebab_cased_array;
 	}
-
-	return $kebab_cased_webfont;
 }
 
 /**
@@ -101,19 +102,21 @@ function gutenberg_find_webfont( $webfonts, $webfont_to_find ) {
 	return false;
 }
 
-/**
- * Converts webfont attributes from kebab case to camel case.
- *
- * @param array $webfont The kebab-cased webfont.
- *
- * @return array The camel-cased webfont.
- */
-function gutenberg_webfont_to_camel_case( $webfont ) {
-	$camel_cased_webfont = array();
+if ( ! function_exists( '_wp_array_keys_to_camel_case' ) ) {
+	/**
+	 * Transforms the keys of the array from kebab-case to camel-case.
+	 *
+	 * @param array $array The kebab-cased array.
+	 *
+	 * @return array The camel-cased array.
+	 */
+	function _wp_array_keys_to_camel_case( $array ) {
+		$camel_cased_array = array();
 
-	foreach ( $webfont as $key => $value ) {
-		$camel_cased_webfont[ lcfirst( str_replace( '-', '', ucwords( $key, '-' ) ) ) ] = $value;
+		foreach ( $array as $key => $value ) {
+			$camel_cased_array[ lcfirst( str_replace( '-', '', ucwords( $key, '-' ) ) ) ] = $value;
+		}
+
+		return $camel_cased_array;
 	}
-
-	return $camel_cased_webfont;
 }
