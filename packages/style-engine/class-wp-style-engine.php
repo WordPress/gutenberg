@@ -40,56 +40,46 @@ class WP_Style_Engine {
 			'padding' => array(
 				'property_key' => 'padding',
 				'path'         => array( 'spacing', 'padding' ),
-				'value_func'   => 'static::get_css_rules',
 			),
 			'margin'  => array(
 				'property_key' => 'margin',
 				'path'         => array( 'spacing', 'margin' ),
-				'value_func'   => 'static::get_css_rules',
 			),
 		),
 		'typography' => array(
 			'fontSize'       => array(
 				'property_key'     => 'font-size',
 				'path'             => array( 'typography', 'fontSize' ),
-				'value_func'       => 'static::get_css_rules',
 				'classname_schema' => 'has-%s-font-size',
 			),
 			'fontFamily'     => array(
 				'property_key'     => 'font-family',
 				'path'             => array( 'typography', 'fontFamily' ),
-				'value_func'       => 'static::get_css_rules',
 				'classname_schema' => 'has-%s-font-family',
 			),
 			'fontStyle'      => array(
 				'property_key' => 'font-style',
 				'path'         => array( 'typography', 'fontStyle' ),
-				'value_func'   => 'static::get_css_rules',
 			),
 			'fontWeight'     => array(
 				'property_key' => 'font-weight',
 				'path'         => array( 'typography', 'fontWeight' ),
-				'value_func'   => 'static::get_css_rules',
 			),
 			'lineHeight'     => array(
 				'property_key' => 'line-height',
 				'path'         => array( 'typography', 'lineHeight' ),
-				'value_func'   => 'static::get_css_rules',
 			),
 			'textDecoration' => array(
 				'property_key' => 'text-decoration',
 				'path'         => array( 'typography', 'textDecoration' ),
-				'value_func'   => 'static::get_css_rules',
 			),
 			'textTransform'  => array(
 				'property_key' => 'text-transform',
 				'path'         => array( 'typography', 'textTransform' ),
-				'value_func'   => 'static::get_css_rules',
 			),
 			'letterSpacing'  => array(
 				'property_key' => 'letter-spacing',
 				'path'         => array( 'typography', 'letterSpacing' ),
-				'value_func'   => 'static::get_css_rules',
 			),
 		),
 	);
@@ -121,11 +111,14 @@ class WP_Style_Engine {
 		$style_definition = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $path, null );
 
 		if ( ! empty( $style_definition ) ) {
+			// Style definitions can define a function to generate custom CSS rules.
 			if (
 				isset( $style_definition['value_func'] ) &&
 				is_callable( $style_definition['value_func'] )
 			) {
 				return call_user_func( $style_definition['value_func'], $style_value, $style_definition['property_key'] );
+			} else {
+				return static::get_css_rules( $style_value, $style_definition['property_key'] );
 			}
 		}
 
@@ -151,8 +144,6 @@ class WP_Style_Engine {
 		}
 
 		$classnames = array();
-		$use_schema = isset( $options['use_schema'] ) ? $options['use_schema'] : false;
-
 		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
 			foreach ( $definition_group as $style_definition ) {
 				$classname_value = _wp_array_get( $block_styles, $style_definition['path'], null );
@@ -161,10 +152,13 @@ class WP_Style_Engine {
 					continue;
 				}
 
+				$classname_value  = _wp_to_kebab_case( $classname_value );
 				$style_definition = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition['path'], null );
-				// If there is no stored schema we could generate classnames based on other properties such as the path or value or other prefix passed to options.
-				$schema       = $use_schema ? $style_definition['classname_schema'] : '';
-				$classnames[] = sprintf( $schema, $classname_value );
+				// Right now we expect a classname pattern to be stored in BLOCK_STYLE_DEFINITIONS_METADATA.
+				// One day, if there are no stored schemata, we could allow custom patterns or
+				// generate classnames based on other properties
+				// such as a path or a value or a prefix passed in options.
+				$classnames[] = isset( $style_definition['classname_schema'] ) ? sprintf( $style_definition['classname_schema'], $classname_value ) : $classname_value;
 			}
 		}
 

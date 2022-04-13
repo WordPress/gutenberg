@@ -107,7 +107,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$has_custom_font_size = isset( $block_attributes['style']['typography']['fontSize'] );
 
 		if ( $has_named_font_size ) {
-			$classes['fontSize'] = _wp_to_kebab_case( $block_attributes['fontSize'] );
+			$classes['fontSize'] = $block_attributes['fontSize'];
 		} elseif ( $has_custom_font_size ) {
 			$styles['fontSize'] = $block_attributes['style']['typography']['fontSize'];
 		}
@@ -118,7 +118,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$has_custom_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
 
 		if ( $has_named_font_family ) {
-			$classes['fontFamily'] = _wp_to_kebab_case( $block_attributes['fontFamily'] );
+			$classes['fontFamily'] = $block_attributes['fontFamily'];
 		} elseif ( $has_custom_font_family ) {
 			$font_family_custom = $block_attributes['style']['typography']['fontFamily'];
 			// Before using classes, the value was serialized as a CSS Custom Property.
@@ -184,10 +184,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	);
 
 	$classnames = $style_engine->get_classnames(
-		array( 'typography' => $classes ),
-		array(
-			'use_schema' => true,
-		)
+		array( 'typography' => $classes )
 	);
 
 	if ( ! empty( $classnames ) ) {
