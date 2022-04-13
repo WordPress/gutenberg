@@ -24,6 +24,20 @@ describe( 'Comment Query Loop', () => {
 			'newest'
 		);
 	} );
+	it( 'We show no results message if there are no comments', async () => {
+		await trashAllComments();
+		await createNewPost();
+		// Insert the Query Comment Loop block.
+		await insertBlock( 'Comments Query Loop' );
+		// await page.waitForResponse(response => response.status() === 200);
+		await page.waitForSelector( '[data-testid="noresults"]' );
+		expect(
+			await page.evaluate(
+				( el ) => el.innerText,
+				await page.$( '[data-testid="noresults"]' )
+			)
+		).toEqual( 'No results found.' );
+	} );
 	it( 'Pagination links are working as expected', async () => {
 		await createNewPost();
 		// Insert the Query Comment Loop block.

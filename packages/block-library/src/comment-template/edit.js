@@ -288,7 +288,11 @@ export default function CommentTemplateEdit( {
 	}
 
 	if ( ! commentTree.length ) {
-		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
+		return (
+			<p { ...blockProps } data-testid="noresults">
+				{ __( 'No results found.' ) }
+			</p>
+		);
 	}
 
 	return (
