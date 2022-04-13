@@ -104,32 +104,4 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * Test gutenberg_render_elements_support_styles() with a simple paragraph and link color preset.
-	 */
-	public function test_simple_paragraph_link_color_footer() {
-		$result = self::make_unique_id_one(
-			gutenberg_render_elements_support_styles(
-				null,
-				array(
-					'blockName' => 'core/paragraph',
-					'attrs'     => array(
-						'style' => array(
-							'elements' => array(
-								'link' => array(
-									'color' => array(
-										'text' => 'var:preset|color|subtle-background',
-									),
-								),
-							),
-						),
-					),
-				)
-			)
-		);
-		$this->assertSame(
-			$result,
-			'.wp-elements-1 a{color: var(--wp--preset--color--subtle-background);}'
-		);
-	}
 }
