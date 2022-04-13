@@ -117,20 +117,3 @@ function gutenberg_webfont_to_camel_case( $webfont ) {
 
 	return $camel_cased_webfont;
 }
-
-/**
- * Map the font families by slug and their corresponding indexes in $families.
- *
- * @param array[] $families The font families array.
- *
- * @return array An array in array( [slug] => [index]) format.
- */
-function gutenberg_map_font_family_indexes( $families ) {
-	$indexes = array();
-
-	foreach ( $families as $index => $family ) {
-		$indexes[ wp_webfonts()->get_font_slug( $family ) ] = $index;
-	}
-
-	return $indexes;
-}

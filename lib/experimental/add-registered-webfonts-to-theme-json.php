@@ -30,7 +30,16 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 		$data['settings']['typography']['fontFamilies'] = array();
 	}
 
-	$font_family_indexes_in_theme_json = gutenberg_map_font_family_indexes( $data['settings']['typography']['fontFamilies'] );
+	/**
+	 * Map the font families by slug to their corresponding index
+	 * in theme.json, so we can avoid looping theme.json looking for
+	 * font families every time we want to register a face.
+	 */
+	$font_family_indexes_in_theme_json = array();
+
+	foreach ( $data['settings']['typography']['fontFamilies'] as $index => $family ) {
+		$font_family_indexes_in_theme_json[ wp_webfonts()->get_font_slug( $family ) ] = $index;
+	}
 
 	foreach ( $registered_font_families as $slug => $registered_font_faces ) {
 		// Font family not in theme.json, so let's add it.
