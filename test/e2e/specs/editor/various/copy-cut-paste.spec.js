@@ -3,30 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Copy/cut/paste of whole blocks', () => {
-	test( 'should copy and paste individual blocks', async ( {
-		page,
-		pageUtils,
-	} ) => {
-		await pageUtils.createNewPost();
-
-		await page.click( 'role=button[name="Add default block"i]' );
-
-		await page.keyboard.type(
-			'Here is a unique string so we can test copying.'
-		);
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'ArrowUp' );
-
-		await pageUtils.pressKeyWithModifier( 'primary', 'c' );
-		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.press( 'ArrowDown' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
-		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
-	} );
-
+test.describe( 'Copy/cut/paste', () => {
 	test( 'should copy blocks when non textual elements are focused  (image, spacer)', async ( {
 		page,
 		pageUtils,
@@ -47,24 +24,22 @@ test.describe( 'Copy/cut/paste of whole blocks', () => {
 		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test( 'should cut and paste individual blocks', async ( {
+	test( 'should cut and paste individual non textual blocks', async ( {
 		page,
 		pageUtils,
 	} ) => {
 		await pageUtils.createNewPost();
 
-		await page.click( 'role=button[name="Add default block"i]' );
-
-		await page.keyboard.type( 'Yet another unique string.' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'ArrowUp' );
-
+		await pageUtils.insertBlock( { name: 'core/spacer' } );
+		// At this point the spacer wrapper should be focused.
 		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
 		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
 
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'ArrowDown' );
+		// The block appender is only visible when there's no selection.
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+		await page.click( 'role=button[name="Add default block"i]' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
 		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -219,6 +194,113 @@ test.describe( 'Copy/cut/paste of whole blocks', () => {
 		);
 
 		expect( blocksUpdated.length ).toEqual( 1 );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
+	test( 'should copy only partial selection of text blocks', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'A block' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'B block' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from both blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 5 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'c' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Create a new block at the top of the document to paste there.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
+	test( 'should copy/paste partial selection with other blocks in-between', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'A block' );
+		await pageUtils.insertBlock( { name: 'core/spacer' } );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'B block' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from outer blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 5 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'c' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Create a new block at the top of the document to paste there.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
+	test( 'should cut partial selection of text blocks', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'A block' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'B block' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from both blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 5 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Create a new block at the top of the document to paste there.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
+	test( 'should cut/paste partial selection with other blocks in-between', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'A block' );
+		await pageUtils.insertBlock( { name: 'core/spacer' } );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'B block' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from outer blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 5 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Create a new block at the top of the document to paste there.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
+	test( 'should cut partial selection and merge like a normal `delete` - not forward ', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await pageUtils.insertBlock( { name: 'core/heading' } );
+		await page.keyboard.type( 'Heading' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Paragraph' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from outer blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 2 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Create a new block at the top of the document to paste there.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
 		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

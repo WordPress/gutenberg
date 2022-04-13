@@ -1,7 +1,7 @@
 <!-- wp:paragraph -->
-<p>2</p>
+<p>A block</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Yet another unique string.</p>
+<p>B block</p>
 <!-- /wp:paragraph -->

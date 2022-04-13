@@ -33,6 +33,12 @@ import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { create, remove, toHTMLString } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import { mapRichTextSettings } from './utils';
 
 /**
  * A block selection object.
@@ -1003,6 +1009,107 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 
 	return blocksToMerge && blocksToMerge.length;
 }
+
+/**
+ * Get partial selected blocks with their content updated
+ * based on the selection.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object[]} Updated partial selected blocks.
+ */
+export const __unstableGetSelectedBlocksWithPartialSelection = ( state ) => {
+	const selectionAnchor = getSelectionStart( state );
+	const selectionFocus = getSelectionEnd( state );
+
+	if ( selectionAnchor.clientId === selectionFocus.clientId ) {
+		return EMPTY_ARRAY;
+	}
+
+	// Can't split if the selection is not set.
+	if (
+		! selectionAnchor.attributeKey ||
+		! selectionFocus.attributeKey ||
+		typeof selectionAnchor.offset === 'undefined' ||
+		typeof selectionFocus.offset === 'undefined'
+	) {
+		return EMPTY_ARRAY;
+	}
+
+	const anchorRootClientId = getBlockRootClientId(
+		state,
+		selectionAnchor.clientId
+	);
+	const focusRootClientId = getBlockRootClientId(
+		state,
+		selectionFocus.clientId
+	);
+
+	// It's not splittable if the selection doesn't start and end in the same
+	// block list. Maybe in the future it should be allowed.
+	if ( anchorRootClientId !== focusRootClientId ) {
+		return EMPTY_ARRAY;
+	}
+
+	const blockOrder = getBlockOrder( state, anchorRootClientId );
+	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
+	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+
+	// Reassign selection start and end based on order.
+	const [ selectionStart, selectionEnd ] =
+		anchorIndex > focusIndex
+			? [ selectionFocus, selectionAnchor ]
+			: [ selectionAnchor, selectionFocus ];
+
+	const blockA = getBlock( state, selectionStart.clientId );
+	const blockAType = getBlockType( blockA.name );
+
+	const blockB = getBlock( state, selectionEnd.clientId );
+	const blockBType = getBlockType( blockB.name );
+
+	const htmlA = blockA.attributes[ selectionStart.attributeKey ];
+	const htmlB = blockB.attributes[ selectionEnd.attributeKey ];
+
+	const attributeDefinitionA =
+		blockAType.attributes[ selectionStart.attributeKey ];
+	const attributeDefinitionB =
+		blockBType.attributes[ selectionEnd.attributeKey ];
+
+	let valueA = create( {
+		html: htmlA,
+		...mapRichTextSettings( attributeDefinitionA ),
+	} );
+	let valueB = create( {
+		html: htmlB,
+		...mapRichTextSettings( attributeDefinitionB ),
+	} );
+
+	valueA = remove( valueA, 0, selectionStart.offset );
+	valueB = remove( valueB, selectionEnd.offset, valueB.text.length );
+
+	return [
+		{
+			...blockA,
+			attributes: {
+				...blockA.attributes,
+				[ selectionStart.attributeKey ]: toHTMLString( {
+					value: valueA,
+					...mapRichTextSettings( attributeDefinitionA ),
+				} ),
+			},
+		},
+		{
+			...blockB,
+			attributes: {
+				...blockB.attributes,
+				[ selectionEnd.attributeKey ]: toHTMLString( {
+					value: valueB,
+					...mapRichTextSettings( attributeDefinitionB ),
+				} ),
+			},
+		},
+	];
+};
 
 /**
  * Returns an array containing all block client IDs in the editor in the order
