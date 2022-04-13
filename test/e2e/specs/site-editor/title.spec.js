@@ -3,12 +3,6 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.use( {
-	editorTitle: async ( { page, pageUtils, requestUtils }, use ) => {
-		await use( new EditorTitle( { page, pageUtils, requestUtils } ) );
-	},
-} );
-
 test.describe( 'Site editor title', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -30,7 +24,7 @@ test.describe( 'Site editor title', () => {
 	} );
 
 	test( 'displays the selected template name in the title for the index template', async ( {
-		editorTitle,
+		page,
 		pageUtils,
 	} ) => {
 		// Navigate to a template.
@@ -39,14 +33,17 @@ test.describe( 'Site editor title', () => {
 			postType: 'wp_template',
 		} );
 
-		// Evaluate the document settings title.
-		const actual = await editorTitle.getEditorTitle();
+		const title = await page.locator(
+			'role=region[name="Header"] >> role=heading[level=1]'
+		);
 
-		await expect( actual ).toEqual( 'Editing template: Index' );
+		await expect( await title.textContent() ).toEqual(
+			'Editing template: Index'
+		);
 	} );
 
 	test( 'displays the selected template name in the title for the header template', async ( {
-		editorTitle,
+		page,
 		pageUtils,
 	} ) => {
 		// Navigate to a template part.
@@ -55,14 +52,16 @@ test.describe( 'Site editor title', () => {
 			postType: 'wp_template_part',
 		} );
 
-		// Evaluate the document settings title.
-		const actual = await editorTitle.getEditorTitle();
+		const title = await page.locator(
+			'role=region[name="Header"] >> role=heading[level=1]'
+		);
 
-		await expect( actual ).toEqual( 'Editing template part: header' );
+		await expect( await title.textContent() ).toEqual(
+			'Editing template part: header'
+		);
 	} );
 
 	test( "displays the selected template part's name in the secondary title when a template part is selected from List View", async ( {
-		editorTitle,
 		page,
 		pageUtils,
 	} ) => {
@@ -80,30 +79,10 @@ test.describe( 'Site editor title', () => {
 		await page.click( 'role=button[name="Close List View Sidebar"]' );
 
 		// Evaluate the document settings secondary title.
-		const actual = await editorTitle.getEditorSecondaryTitle();
-
-		await expect( actual ).toEqual( 'header' );
-	} );
-} );
-
-class EditorTitle {
-	constructor( { page } ) {
-		this.page = page;
-	}
-
-	async getEditorTitle() {
-		const title = await this.page.locator(
-			'role=region[name="Header"] >> h1'
-		);
-
-		return title.textContent();
-	}
-
-	async getEditorSecondaryTitle() {
-		const secondaryTitle = await this.page.locator(
+		const secondaryTitle = await page.locator(
 			'.edit-site-document-actions__secondary-item'
 		);
 
-		return secondaryTitle.textContent();
-	}
-}
+		await expect( await secondaryTitle.textContent() ).toEqual( 'header' );
+	} );
+} );
