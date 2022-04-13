@@ -17,6 +17,7 @@ import {
 	setClipboardData,
 	pressKeyWithModifier,
 } from './press-key-with-modifier';
+import { pressKeyTimes } from './press-key-times';
 import { openPreviewPage } from './preview';
 import { setBrowserViewport } from './set-browser-viewport';
 import { showBlockToolbar } from './show-block-toolbar';
@@ -48,6 +49,7 @@ class PageUtils {
 	openDocumentSettingsSidebar = openDocumentSettingsSidebar;
 	openPreviewPage = openPreviewPage;
 	setBrowserViewport = setBrowserViewport;
+	pressKeyTimes = pressKeyTimes;
 }
 
 export { PageUtils };

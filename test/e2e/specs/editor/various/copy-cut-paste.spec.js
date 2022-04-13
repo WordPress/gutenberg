@@ -196,4 +196,111 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( blocksUpdated.length ).toEqual( 1 );
 		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
 	} );
+	test( 'should copy only partial selection of text blocks', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'A block' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'B block' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from both blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 5 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'c' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Create a new block at the top of the document to paste there.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
+	test( 'should copy/paste partial selection with other blocks in-between', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'A block' );
+		await pageUtils.insertBlock( { name: 'core/spacer' } );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'B block' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from outer blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 5 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'c' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Create a new block at the top of the document to paste there.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
+	test( 'should cut partial selection of text blocks', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'A block' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'B block' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from both blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 5 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Create a new block at the top of the document to paste there.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
+	test( 'should cut/paste partial selection with other blocks in-between', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'A block' );
+		await pageUtils.insertBlock( { name: 'core/spacer' } );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'B block' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from outer blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 5 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Create a new block at the top of the document to paste there.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
+	test( 'should cut partial selection and merge like a normal `delete` - not forward ', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await pageUtils.insertBlock( { name: 'core/heading' } );
+		await page.keyboard.type( 'Heading' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Paragraph' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from outer blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 2 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Create a new block at the top of the document to paste there.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
