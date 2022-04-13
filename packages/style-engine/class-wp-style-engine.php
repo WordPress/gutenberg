@@ -129,14 +129,11 @@ class WP_Style_Engine {
 	 * Returns a classname built using a provided schema.
 	 *
 	 * @param array $block_styles An array of styles from a block's attributes.
-	 *                            Some of the values may contain slugs that need to be parsed using a schema.
-	 * @param array $options = array(
-	 *     'use_schema' => (boolean) Whether to use the internal classname schema in BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * );.
+	 *                            Some values may contain slugs that need to be parsed using a schema.
 	 *
 	 * @return string A CSS classname.
 	 */
-	public function get_classnames( $block_styles, $options = array() ) {
+	public function get_classnames( $block_styles ) {
 		$output = '';
 
 		if ( empty( $block_styles ) ) {
