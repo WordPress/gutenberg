@@ -115,7 +115,8 @@ function gutenberg_render_elements_support_footer( $pre_render, $block ) {
 	$style = ".$class_name a{" . $link_color_declaration . ';}';
 
 	gutenberg_enqueue_block_support_styles( $style );
-	return $style;
+
+	return null;
 }
 
 // Remove WordPress core filter to avoid rendering duplicate elements stylesheet.
