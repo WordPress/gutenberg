@@ -85,3 +85,16 @@
 		box-shadow: 0 0 0 1px $gray-800, 0 0 0 calc(var(--wp-admin-border-width-focus) + 1px) var(--wp-admin-theme-color);
 	}
 }
+
+.edit-site-block-editor__block-list-exploded {
+	display: flex;
+	flex-direction: column;
+	width: $content-width;
+	margin: auto;
+}
+
+.edit-site-block-editor__block-list-exploded-inserter > div {
+	display: flex;
+	margin: 20px auto;
+	width: fit-content;
+}

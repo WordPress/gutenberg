@@ -10,7 +10,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus } from '@wordpress/icons';
+import { listView, plus, stack } from '@wordpress/icons';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
@@ -46,7 +46,7 @@ export default function Header( {
 		isListViewOpen,
 		listViewShortcut,
 		isLoaded,
-		isVisualMode,
+		mode,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -78,7 +78,7 @@ export default function Header( {
 			listViewShortcut: getShortcutRepresentation(
 				'core/edit-site/toggle-list-view'
 			),
-			isVisualMode: getEditorMode() === 'visual',
+			mode: getEditorMode(),
 		};
 	}, [] );
 
@@ -86,6 +86,7 @@ export default function Header( {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
 		setIsListViewOpened,
+		switchEditorMode,
 	} = useDispatch( editSiteStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -115,7 +116,7 @@ export default function Header( {
 						variant="primary"
 						isPressed={ isInserterOpen }
 						className="edit-site-header-toolbar__inserter-toggle"
-						disabled={ ! isVisualMode }
+						disabled={ mode !== 'visual' }
 						onMouseDown={ preventDefault }
 						onClick={ openInserter }
 						icon={ plus }
@@ -131,19 +132,36 @@ export default function Header( {
 						<>
 							<ToolbarItem
 								as={ ToolSelector }
-								disabled={ ! isVisualMode }
+								disabled={ mode !== 'visual' }
 							/>
 							<UndoButton />
 							<RedoButton />
 							<Button
 								className="edit-site-header-toolbar__list-view-toggle"
-								disabled={ ! isVisualMode }
+								disabled={ mode !== 'visual' }
 								icon={ listView }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
 								label={ __( 'List View' ) }
 								onClick={ toggleListView }
 								shortcut={ listViewShortcut }
+							/>
+							<Button
+								disabled={
+									mode !== 'visual' && mode !== 'exploded'
+								}
+								className="edit-site-header-toolbar__exploded-view-toggle"
+								icon={ stack }
+								isPressed={ mode === 'exploded' }
+								/* translators: button label text should, if possible, be under 16 characters. */
+								label={ __( 'Exploded View' ) }
+								onClick={ () =>
+									switchEditorMode(
+										mode === 'visual'
+											? 'exploded'
+											: 'visual'
+									)
+								}
 							/>
 						</>
 					) }

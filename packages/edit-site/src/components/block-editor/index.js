@@ -21,6 +21,8 @@ import {
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
 	__unstableBlockNameContext,
+	BlockPreview,
+	Inserter,
 } from '@wordpress/block-editor';
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
@@ -48,7 +50,7 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings } = useSelect(
+	const { settings, editorMode } = useSelect(
 		( select ) => {
 			let storedSettings = select( editSiteStore ).getSettings(
 				setIsInserterOpen
@@ -74,6 +76,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 
 			return {
 				settings: storedSettings,
+				editorMode: select( editSiteStore ).getEditorMode(),
 			};
 		},
 		[ setIsInserterOpen ]
@@ -172,23 +175,46 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			>
 				<BlockEditorKeyboardShortcuts.Register />
 				<BackButton />
-				<ResizableEditor
-					// Reinitialize the editor and reset the states when the template changes.
-					key={ templateId }
-					enableResizing={
-						isTemplatePart &&
-						// Disable resizing in mobile viewport.
-						! isMobileViewport
-					}
-					settings={ settings }
-					contentRef={ mergedRefs }
-				>
-					<BlockList
-						className="edit-site-block-editor__block-list wp-site-blocks"
-						__experimentalLayout={ LAYOUT }
-						renderAppender={ isTemplatePart ? false : undefined }
-					/>
-				</ResizableEditor>
+				{ editorMode === 'visual' && (
+					<ResizableEditor
+						// Reinitialize the editor and reset the states when the template changes.
+						key={ templateId }
+						enableResizing={
+							isTemplatePart &&
+							// Disable resizing in mobile viewport.
+							! isMobileViewport
+						}
+						settings={ settings }
+						contentRef={ mergedRefs }
+					>
+						<BlockList
+							className="edit-site-block-editor__block-list wp-site-blocks"
+							__experimentalLayout={ LAYOUT }
+							renderAppender={
+								isTemplatePart ? false : undefined
+							}
+						/>
+					</ResizableEditor>
+				) }
+				{ editorMode === 'exploded' && (
+					<div className="edit-site-block-editor__block-list-exploded">
+						{ blocks.map( ( block ) => (
+							<div key={ block.clientId }>
+								<div
+									className="edit-site-block-editor__block-list-exploded-inserter"
+									key={ block.clientId }
+								>
+									<Inserter
+										clientId={ block.clientId }
+										__experimentalIsQuick
+										isPrimary
+									/>
+								</div>
+								<BlockPreview blocks={ [ block ] } />
+							</div>
+						) ) }
+					</div>
+				) }
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />

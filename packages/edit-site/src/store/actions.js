@@ -468,7 +468,7 @@ export const switchEditorMode = ( mode ) => ( { registry } ) => {
 
 	if ( mode === 'visual' ) {
 		speak( __( 'Visual editor selected' ), 'assertive' );
-	} else if ( mode === 'mosaic' ) {
-		speak( __( 'Mosaic view selected' ), 'assertive' );
+	} else if ( mode === 'exploded' ) {
+		speak( __( 'Exploded view selected' ), 'assertive' );
 	}
 };

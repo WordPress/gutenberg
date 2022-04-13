@@ -241,7 +241,10 @@ function Editor( { onError } ) {
 												<>
 													<EditorNotices />
 													<BlockStyles.Slot scope="core/block-inspector" />
-													{ editorMode === 'visual' &&
+													{ ( editorMode ===
+														'visual' ||
+														editorMode ===
+															'exploded' ) &&
 														template && (
 															<BlockEditor
 																setIsInserterOpen={
