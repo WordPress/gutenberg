@@ -13,21 +13,13 @@ import testData from './helpers/test-data';
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.paragraph,
-			1,
-			{
-				useWaitForVisible: true,
-			}
+		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+			blockNames.paragraph
 		);
-
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			testData.shortText,
-			true,
-			false
+			testData.shortText
 		);
-
 		await clickMiddleOfElement(
 			editorPage.driver,
 			paragraphBlockElement,
@@ -36,7 +28,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			'\n',
-			false,
 			false
 		);
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -47,25 +38,21 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		expect( testData.shortText ).toMatch(
 			new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` )
 		);
-
 		await editorPage.removeBlockAtPosition( blockNames.paragraph, 2 );
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		let paragraphBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.paragraph,
-			1,
-			{
-				useWaitForVisible: true,
-			}
+		let paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+			blockNames.paragraph
 		);
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			testData.shortText,
-			true,
-			false
+			testData.shortText
 		);
 		await clickMiddleOfElement(
 			editorPage.driver,
@@ -74,9 +61,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			'\n',
-			true,
-			false
+			'\n'
 		);
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -89,17 +74,19 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 				useWaitForVisible: true,
 			}
 		);
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
-		await clickBeginningOfElement(
-			editorPage.driver,
+		const textViewElement = await editorPage.getTextViewForParagraphBlock(
 			paragraphBlockElement
 		);
+		await clickBeginningOfElement( editorPage.driver, textViewElement );
+
 		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			backspaceKey,
-			true,
-			false
+			backspaceKey
 		);
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -112,10 +99,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		await editorPage.getBlockAtPosition( blockNames.paragraph, 1, {
-			useWaitForVisible: true,
-		} );
-
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 
 		for ( let i = 3; i > 0; i-- ) {
@@ -141,17 +124,16 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			}
 		);
 
-		await clickBeginningOfElement(
-			editorPage.driver,
+		const textViewElement = await editorPage.getTextViewForParagraphBlock(
 			paragraphBlockElement
 		);
+
+		await clickBeginningOfElement( editorPage.driver, textViewElement );
 
 		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			backspaceKey,
-			true,
-			false
+			backspaceKey
 		);
 
 		// Verify the editor has not crashed.
@@ -175,23 +157,19 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			blockNames.paragraph,
 			2
 		);
-
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		} else {
-			await editorPage.clickParagraphBlockAtPosition( 2 );
-		}
-
+		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			backspace,
-			true,
-			false
+			backspaceKey
 		);
+
 		// Verify the editor has not crashed.
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text.length ).not.toEqual( 0 );
 
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 } );
