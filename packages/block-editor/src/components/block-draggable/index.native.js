@@ -150,8 +150,12 @@ const BlockDraggableWrapper = ( { children } ) => {
 	};
 
 	const onChipLayout = ( { nativeEvent: { layout } } ) => {
-		chip.width.value = layout.width;
-		chip.height.value = layout.height;
+		if ( layout.width > 0 ) {
+			chip.width.value = layout.width;
+		}
+		if ( layout.height > 0 ) {
+			chip.height.value = layout.height;
+		}
 	};
 
 	const startDragging = ( { x, y, id } ) => {
