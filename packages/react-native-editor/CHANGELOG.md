@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.73.2
+
+-   [**] [Quote block] Adds support for V2 behind a feature flag [#40133]
+
 ## 1.73.1
 
 -   [*] [Spacer block] Fix crash when changing the height value using the text input [#40053]
