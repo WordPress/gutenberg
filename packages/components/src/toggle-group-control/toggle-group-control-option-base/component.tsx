@@ -81,7 +81,7 @@ function ToggleGroupControlOptionBase(
 	);
 
 	return (
-		<LabelView className={ labelViewClasses }>
+		<LabelView className={ labelViewClasses } data-active={ isActive }>
 			<WithToolTip
 				showTooltip={ showTooltip }
 				text={ radioProps[ 'aria-label' ] }
