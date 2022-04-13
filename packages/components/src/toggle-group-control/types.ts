@@ -118,14 +118,10 @@ export type ToggleGroupControlContextProps = RadioStateReturn & {
 	 *
 	 * @default false
 	 */
-	activeIndex: number;
 	isBlock?: boolean;
-	length: number;
 };
 
 export type ToggleGroupControlBackdropProps = {
-	containerSizes: {
-		width: number | null;
-		height: number | null;
-	};
+	activeIndex: number | undefined;
+	optionSizes: number[] | undefined;
 };

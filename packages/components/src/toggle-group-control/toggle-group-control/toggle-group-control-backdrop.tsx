@@ -5,15 +5,9 @@
 import { useReducedMotion } from 'framer-motion';
 
 /**
- * WordPress dependencies
- */
-import { memo } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import type { ToggleGroupControlBackdropProps } from '../types';
-import { useToggleGroupControlContext } from '../context';
 import { CONFIG } from '../../utils';
 import { AnimatedBackdrop, inset } from './styles';
 
@@ -25,18 +19,26 @@ const TRANSITION_CONFIG = {
 	duration: parseInt( CONFIG.transitionDurationFast, 10 ) / 1000,
 };
 
-function ToggleGroupControlBackdrop( {
-	containerSizes: { width: containerWidth },
+const sumToNth = ( list: number[], toIndex: number ) => {
+	let sum = 0;
+	for ( let i = toIndex; i > 0; sum += list[ --i ] );
+	return sum;
+};
+
+export default function ToggleGroupControlBackdrop( {
+	activeIndex = -1,
+	optionSizes,
 }: ToggleGroupControlBackdropProps ) {
 	const shouldReduceMotion = useReducedMotion();
-	const { activeIndex, length } = useToggleGroupControlContext();
 
-	containerWidth ??= 0;
-	const containerInsideWidth = Math.max( 0, containerWidth - inset * 2 );
-	const width = containerInsideWidth / length;
-	const x = `${ inset + activeIndex * width }px`;
+	if ( activeIndex < 0 || ! optionSizes || ! optionSizes[ activeIndex ] ) {
+		return null;
+	}
 
-	return activeIndex >= 0 ? (
+	const width = optionSizes[ activeIndex ];
+	const x = inset + sumToNth( optionSizes, activeIndex );
+
+	return (
 		<AnimatedBackdrop
 			role="presentation"
 			transition={
@@ -50,7 +52,5 @@ function ToggleGroupControlBackdrop( {
 			animate={ { width, x } }
 			initial={ false }
 		/>
-	) : null;
+	);
 }
-
-export default memo( ToggleGroupControlBackdrop );

@@ -86,22 +86,23 @@ function ToggleGroupControl(
 		[ className, cx, isBlock ]
 	);
 
-	let length = 0;
-	let activeIndex = -1;
+	const optionSizes = useMemo< number[] | undefined >( () => {
+		return radio.items?.map( ( item ) => {
+			if ( ! item.ref.current ) return 0;
+			const { width } = getComputedStyle( item.ref.current );
+			return parseFloat( width );
+		} );
+	}, [ radio.items, radio.items.length, sizes.width ] );
+
+	let activeIndex;
 	Children.forEach( children, ( option, index ) => {
-		length += 1;
 		if ( option.props.value === radio.state ) activeIndex = index;
 	} );
 
 	return (
 		<BaseControl help={ help }>
 			<ToggleGroupControlContext.Provider
-				value={ {
-					...radio,
-					isBlock: ! isAdaptiveWidth,
-					length,
-					activeIndex,
-				} }
+				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
 			>
 				{ ! hideLabelFromVision && (
 					<div>
@@ -119,7 +120,10 @@ function ToggleGroupControl(
 					ref={ forwardedRef }
 				>
 					{ resizeListener }
-					<ToggleGroupControlBackdrop containerSizes={ sizes } />
+					<ToggleGroupControlBackdrop
+						activeIndex={ activeIndex }
+						optionSizes={ optionSizes }
+					/>
 					{ children }
 				</RadioGroup>
 			</ToggleGroupControlContext.Provider>

@@ -63,8 +63,6 @@ function ToggleGroupControlOptionBase(
 		value,
 		children,
 		showTooltip = false,
-		activeIndex,
-		length,
 		...radioProps
 	} = {
 		...toggleGroupControlContext,
