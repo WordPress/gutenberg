@@ -118,6 +118,7 @@ export default function useSelect( mapSelect, deps ) {
 	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
 	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
 
+	const latestRegistry = useRef( registry );
 	const latestMapSelect = useRef();
 	const latestIsAsync = useRef( isAsync );
 	const latestMapOutput = useRef();
@@ -145,10 +146,15 @@ export default function useSelect( mapSelect, deps ) {
 
 	if ( _mapSelect ) {
 		mapOutput = latestMapOutput.current;
+		const hasReplacedRegistry = latestRegistry.current !== registry;
 		const hasReplacedMapSelect = latestMapSelect.current !== _mapSelect;
 		const lastMapSelectFailed = !! latestMapOutputError.current;
 
-		if ( hasReplacedMapSelect || lastMapSelectFailed ) {
+		if (
+			hasReplacedRegistry ||
+			hasReplacedMapSelect ||
+			lastMapSelectFailed
+		) {
 			try {
 				mapOutput = wrapSelect( _mapSelect );
 			} catch ( error ) {
@@ -171,6 +177,7 @@ export default function useSelect( mapSelect, deps ) {
 			return;
 		}
 
+		latestRegistry.current = registry;
 		latestMapSelect.current = _mapSelect;
 		latestMapOutput.current = mapOutput;
 		latestMapOutputError.current = undefined;
@@ -219,7 +226,7 @@ export default function useSelect( mapSelect, deps ) {
 
 		// Catch any possible state changes during mount before the subscription
 		// could be set.
-		onChange();
+		onStoreChange();
 
 		const unsubscribers = listeningStores.current.map( ( storeName ) =>
 			registry.__unstableSubscribeStore( storeName, onChange )
