@@ -6,7 +6,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -16,20 +16,20 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import EntityRecordItem from './entity-record-item';
 
-function getEntityDescription( entity, length ) {
+function getEntityDescription( entity, count ) {
 	switch ( entity ) {
 		case 'site':
-			return _n(
-				'This change will affect your whole site.',
-				'These changes will affect your whole site.',
-				length
-			);
+			return 1 === count
+				? __( 'This change will affect your whole site.' )
+				: __( 'These changes will affect your whole site.' );
 		case 'wp_template':
-			return _n(
-				'This change will affect pages and posts that use this template.',
-				'These changes will affect pages and posts that use these templates.',
-				length
-			);
+			return 1 === count
+				? __(
+						'This change will affect pages and posts that use this template.'
+				  )
+				: __(
+						'These changes will affect pages and posts that use these templates.'
+				  );
 		case 'page':
 		case 'post':
 			return __( 'The following content has been modified.' );
@@ -42,6 +42,7 @@ export default function EntityTypeList( {
 	setUnselectedEntities,
 	closePanel,
 } ) {
+	const count = list.length;
 	const firstRecord = list[ 0 ];
 	const entityConfig = useSelect(
 		( select ) =>
@@ -52,12 +53,14 @@ export default function EntityTypeList( {
 		[ firstRecord.kind, firstRecord.name ]
 	);
 	const { name } = firstRecord;
-	const entityLabel =
-		name === 'wp_template_part'
-			? _n( 'Template Part', 'Template Parts', list.length )
-			: entityConfig.label;
+
+	let entityLabel = entityConfig.label;
+	if ( name === 'wp_template_part' ) {
+		entityLabel =
+			1 === count ? __( 'Template Part' ) : __( 'Template Parts' );
+	}
 	// Set description based on type of entity.
-	const description = getEntityDescription( name, list.length );
+	const description = getEntityDescription( name, count );
 
 	return (
 		<PanelBody title={ entityLabel } initialOpen={ true }>
