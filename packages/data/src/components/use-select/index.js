@@ -219,7 +219,7 @@ export default function useSelect( mapSelect, deps ) {
 
 		// Catch any possible state changes during mount before the subscription
 		// could be set.
-		onChange();
+		onStoreChange();
 
 		const unsubscribers = listeningStores.current.map( ( storeName ) =>
 			registry.__unstableSubscribeStore( storeName, onChange )
