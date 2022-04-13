@@ -1,108 +1,171 @@
 /**
  * External dependencies
  */
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+	Gesture,
+	GestureDetector,
+	LongPressGestureHandler,
+} from 'react-native-gesture-handler';
 import Animated, {
 	useSharedValue,
 	runOnJS,
-	runOnUI,
+	useAnimatedReaction,
+	useAnimatedGestureHandler,
 } from 'react-native-reanimated';
-import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
 /**
  * WordPress dependencies
  */
-import { Platform } from '@wordpress/element';
+import { createContext, useContext, useRef } from '@wordpress/element';
 
 /**
- * Draggable component
+ * Internal dependencies
+ */
+import styles from './style.scss';
+
+const Context = createContext( {} );
+const { Provider } = Context;
+
+/**
+ * Draggable component.
  *
- * @param {Object}                                      props                         Component props.
- * @param {JSX.Element}                                 props.children                Children to be rendered.
- * @param {number}                                      [props.maxDistance]           Maximum distance, that defines how far the finger is allowed to travel during a long press gesture.
- * @param {number}                                      [props.minDuration]           Minimum time, that a finger must remain pressed on the corresponding view.
- * @param {Function}                                    [props.onDragEnd]             Callback when dragging ends.
- * @param {Function}                                    [props.onDragOver]            Callback when dragging happens over an element.
- * @param {Function}                                    [props.onDragStart]           Callback when dragging starts.
- * @param {import('react-native-reanimated').StyleProp} [props.wrapperAnimatedStyles] Animated styles for the wrapper component.
+ * @param {Object}      props               Component props.
+ * @param {JSX.Element} props.children      Children to be rendered.
+ * @param {Function}    [props.onDragEnd]   Callback when dragging ends.
+ * @param {Function}    [props.onDragOver]  Callback when dragging happens over an element.
+ * @param {Function}    [props.onDragStart] Callback when dragging starts.
  *
  * @return {JSX.Element} The component to be rendered.
  */
-export default function Draggable( {
-	children,
-	maxDistance = 1000,
-	minDuration = 450,
-	onDragEnd,
-	onDragOver,
-	onDragStart,
-	wrapperAnimatedStyles,
-} ) {
+const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 	const isDragging = useSharedValue( false );
-	const isAnyTextInputFocused = useSharedValue( false );
+	const draggingId = useSharedValue( '' );
+	const panGestureRef = useRef();
 
-	const checkTextInputFocus = () => {
-		const isTextInputFocused =
-			TextInputState.currentlyFocusedInput() !== null;
-		isAnyTextInputFocused.value = isTextInputFocused;
-		return isTextInputFocused;
+	const initialPosition = {
+		x: useSharedValue( 0 ),
+		y: useSharedValue( 0 ),
+	};
+	const lastPosition = {
+		x: useSharedValue( 0 ),
+		y: useSharedValue( 0 ),
 	};
 
-	const dragStart = ( event ) => {
-		const isTextInputFocused = checkTextInputFocus();
+	useAnimatedReaction(
+		() => isDragging.value,
+		( result, previous ) => {
+			if ( result === previous ) {
+				return;
+			}
 
-		if ( ! isTextInputFocused && onDragStart ) {
-			runOnUI( onDragStart )( event );
+			if ( result ) {
+				if ( onDragStart ) {
+					onDragStart( {
+						x: initialPosition.x.value,
+						y: initialPosition.y.value,
+						id: draggingId.value,
+					} );
+				}
+			} else if ( onDragEnd ) {
+				onDragEnd( {
+					x: lastPosition.x.value,
+					y: lastPosition.y.value,
+					id: draggingId.value,
+				} );
+			}
 		}
-	};
-
-	const dragEnd = () => {
-		const isTextInputFocused = checkTextInputFocus();
-
-		if ( ! isTextInputFocused && onDragEnd ) {
-			runOnUI( onDragEnd )();
-		}
-	};
-
-	const longPressGesture = Gesture.LongPress()
-		.onStart( ( ev ) => {
-			'worklet';
-			isDragging.value = true;
-			runOnJS( dragStart )( ev );
-		} )
-		.onEnd( () => {
-			'worklet';
-			isDragging.value = false;
-			runOnJS( dragEnd )();
-		} )
-		.maxDistance( maxDistance )
-		.minDuration( minDuration )
-		.shouldCancelWhenOutside( false );
+	);
 
 	const panGesture = Gesture.Pan()
 		.manualActivation( true )
+		.onTouchesDown( ( event ) => {
+			const { x = 0, y = 0 } = event.allTouches[ 0 ];
+			initialPosition.x.value = x;
+			initialPosition.y.value = y;
+		} )
 		.onTouchesMove( ( _, state ) => {
-			'worklet';
 			if ( isDragging.value ) {
 				state.activate();
-			} else if ( Platform.isIOS || isAnyTextInputFocused.value ) {
-				state.fail();
 			}
 		} )
-		.onUpdate( ( ev ) => {
-			'worklet';
+		.onUpdate( ( event ) => {
+			lastPosition.x.value = event.x;
+			lastPosition.y.value = event.y;
+
 			if ( onDragOver ) {
-				onDragOver( ev );
+				onDragOver( event );
 			}
 		} )
+		.withRef( panGestureRef )
 		.shouldCancelWhenOutside( false );
 
-	const dragHandler = Gesture.Simultaneous( panGesture, longPressGesture );
-
 	return (
-		<GestureDetector gesture={ dragHandler }>
-			<Animated.View style={ wrapperAnimatedStyles }>
-				{ children }
+		<GestureDetector gesture={ panGesture }>
+			<Animated.View style={ styles.draggable__container }>
+				<Provider value={ { panGestureRef, isDragging, draggingId } }>
+					{ children }
+				</Provider>
 			</Animated.View>
 		</GestureDetector>
 	);
-}
+};
+
+/**
+ * Draggable trigger component.
+ *
+ * This component acts as the trigger for the dragging functionality.
+ *
+ * @param {Object}      props                  Component props.
+ * @param {JSX.Element} props.children         Children to be rendered.
+ * @param {*}           props.id               Identifier passed within the event callbacks.
+ * @param {boolean}     [props.enabled]        Enables the long-press gesture.
+ * @param {number}      [props.maxDistance]    Maximum distance, that defines how far the finger is allowed to travel during a long press gesture.
+ * @param {number}      [props.minDuration]    Minimum time, that a finger must remain pressed on the corresponding view.
+ * @param {Function}    [props.onLongPress]    Callback when long-press gesture is triggered over an element.
+ * @param {Function}    [props.onLongPressEnd] Callback when long-press gesture ends.
+ *
+ * @return {JSX.Element} The component to be rendered.
+ */
+const DraggableTrigger = ( {
+	children,
+	enabled = true,
+	id,
+	maxDistance = 1000,
+	minDuration = 500,
+	onLongPress,
+	onLongPressEnd,
+} ) => {
+	const { panGestureRef, isDragging, draggingId } = useContext( Context );
+
+	const gestureHandler = useAnimatedGestureHandler( {
+		onActive: () => {
+			isDragging.value = true;
+			draggingId.value = id;
+			if ( onLongPress ) {
+				runOnJS( onLongPress )( id );
+			}
+		},
+		onEnd: () => {
+			isDragging.value = false;
+			if ( onLongPressEnd ) {
+				runOnJS( onLongPressEnd )( id );
+			}
+		},
+	} );
+
+	return (
+		<LongPressGestureHandler
+			enabled={ enabled }
+			minDurationMs={ minDuration }
+			maxDist={ maxDistance }
+			simultaneousHandlers={ panGestureRef }
+			shouldCancelWhenOutside={ false }
+			onGestureEvent={ gestureHandler }
+		>
+			{ children }
+		</LongPressGestureHandler>
+	);
+};
+
+export { DraggableTrigger };
+export default Draggable;
