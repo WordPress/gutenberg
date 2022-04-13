@@ -105,11 +105,11 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test gutenberg_render_elements_support_footer() with a simple paragraph and link color preset.
+	 * Test gutenberg_render_elements_support_styles() with a simple paragraph and link color preset.
 	 */
 	public function test_simple_paragraph_link_color_footer() {
 		$result = self::make_unique_id_one(
-			gutenberg_render_elements_support_footer(
+			gutenberg_render_elements_support_styles(
 				null,
 				array(
 					'blockName' => 'core/paragraph',
