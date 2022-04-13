@@ -12,25 +12,22 @@ import {
 } from '@wordpress/components';
 import { InspectorControls, useSetting } from '@wordpress/block-editor';
 
-const SCALE_OPTIONS = (
-	<>
-		<ToggleGroupControlOption
-			value="cover"
-			label={ _x( 'Cover', 'Scale option for Image dimension control' ) }
-		/>
-		<ToggleGroupControlOption
-			value="contain"
-			label={ _x(
-				'Contain',
-				'Scale option for Image dimension control'
-			) }
-		/>
-		<ToggleGroupControlOption
-			value="fill"
-			label={ _x( 'Fill', 'Scale option for Image dimension control' ) }
-		/>
-	</>
-);
+const SCALE_OPTIONS = [
+	{
+		value: 'cover',
+		label: _x( 'Cover', 'Scale option for Image dimension control' ),
+	},
+	{
+		value: 'contain',
+		label: _x( 'Contain', 'Scale option for Image dimension control' ),
+	},
+	{
+		value: 'fill',
+		label: _x( 'Fill', 'Scale option for Image dimension control' ),
+	},
+].map( ( props ) => (
+	<ToggleGroupControlOption key={ props.value } { ...props } />
+) );
 
 const DEFAULT_SCALE = 'cover';
 const DEFAULT_SIZE = 'full';
@@ -140,7 +137,7 @@ const DimensionControls = ( {
 								scale: value,
 							} )
 						}
-						isBlock
+						isAdaptiveWidth
 					>
 						{ SCALE_OPTIONS }
 					</ToggleGroupControl>
