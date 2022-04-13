@@ -9,7 +9,7 @@ test.use( {
 	},
 } );
 
-test.describe( 'Title', () => {
+test.describe( 'Site editor title', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await Promise.all( [
