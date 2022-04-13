@@ -238,7 +238,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const mediaTextGeneralSettings = (
-		<PanelBody title={ __( 'Media & Text settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<ToggleControl
 				label={ __( 'Stack on mobile' ) }
 				checked={ isStackedOnMobile }

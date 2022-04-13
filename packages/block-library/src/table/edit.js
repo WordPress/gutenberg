@@ -451,7 +451,7 @@ function TableEdit( {
 			{ ! isEmpty && (
 				<InspectorControls>
 					<PanelBody
-						title={ __( 'Table settings' ) }
+						title={ __( 'Settings' ) }
 						className="blocks-table-settings"
 					>
 						<ToggleControl
