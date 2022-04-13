@@ -186,9 +186,10 @@ function gutenberg_generate_individual_border_classes_and_styles( $side, $border
 
 	$border_color = _wp_array_get( $border, array( 'color' ), null );
 
-	$should_skip_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' );
-
-	if ( $border_color && ! $should_skip_color_serialization ) {
+	if (
+		$border_color &&
+		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
+	) {
 		$has_color_preset = strpos( $border_color, 'var:preset|color|' ) !== false;
 		if ( $has_color_preset ) {
 			$named_color_slug = substr( $border_color, strrpos( $border_color, '|' ) + 1 );
