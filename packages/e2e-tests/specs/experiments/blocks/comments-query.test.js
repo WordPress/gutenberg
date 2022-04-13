@@ -27,9 +27,7 @@ describe( 'Comment Query Loop', () => {
 	it( 'We show no results message if there are no comments', async () => {
 		await trashAllComments();
 		await createNewPost();
-		// Insert the Query Comment Loop block.
 		await insertBlock( 'Comments Query Loop' );
-		// await page.waitForResponse(response => response.status() === 200);
 		await page.waitForSelector( '[data-testid="noresults"]' );
 		expect(
 			await page.evaluate(
@@ -40,9 +38,7 @@ describe( 'Comment Query Loop', () => {
 	} );
 	it( 'Pagination links are working as expected', async () => {
 		await createNewPost();
-		// Insert the Query Comment Loop block.
 		await insertBlock( 'Comments Query Loop' );
-		// Insert the Comment Loop form.
 		await insertBlock( 'Post Comments Form' );
 		await publishPost();
 		// Visit the post that was just published.
@@ -103,9 +99,7 @@ describe( 'Comment Query Loop', () => {
 	it( 'Pagination links are not appearing if break comments is not enabled', async () => {
 		await setOption( 'page_comments', '0' );
 		await createNewPost();
-		// Insert the Query Comment Loop block.
 		await insertBlock( 'Comments Query Loop' );
-		// Insert the Comment Loop form.
 		await insertBlock( 'Post Comments Form' );
 		await publishPost();
 		// Visit the post that was just published.
