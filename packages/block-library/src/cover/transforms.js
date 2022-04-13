@@ -205,6 +205,65 @@ const transforms = {
 					anchor,
 				} ),
 		},
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			isMatch: ( { url } ) => {
+				// If the Cover block uses background media, skip this transform,
+				// and instead use the Group block's default transform.
+				if ( url ) {
+					return false;
+				}
+				return true;
+			},
+			transform: ( attributes, innerBlocks ) => {
+				// Convert Cover overlay colors to comparable Group background colors.
+				const groupColorAttributes = {
+					backgroundColor: attributes?.overlayColor,
+					gradient: attributes?.gradient,
+					style: {
+						...attributes?.style,
+						color: {
+							background: attributes?.customOverlayColor,
+							gradient: attributes?.customGradient,
+							...attributes?.style?.color,
+						},
+					},
+				};
+
+				// If the Cover block contains only a single Group block as a direct child,
+				// then attempt to merge the Cover's background colors with the child Group block,
+				// and remove the Cover block as the wrapper.
+				if (
+					innerBlocks?.length === 1 &&
+					innerBlocks[ 0 ]?.name === 'core/group'
+				) {
+					return createBlock(
+						'core/group',
+						{
+							...groupColorAttributes,
+							...innerBlocks[ 0 ].attributes,
+							style: {
+								...innerBlocks[ 0 ].attributes?.style,
+								color: {
+									...groupColorAttributes?.style?.color,
+									...innerBlocks[ 0 ].attributes?.style
+										?.color,
+								},
+							},
+						},
+						innerBlocks[ 0 ]?.innerBlocks
+					);
+				}
+
+				// In all other cases, transform the Cover block directly to a Group block.
+				return createBlock(
+					'core/group',
+					{ ...attributes, ...groupColorAttributes },
+					innerBlocks
+				);
+			},
+		},
 	],
 };
 
