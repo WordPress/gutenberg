@@ -1,22 +1,26 @@
 /**
  * WordPress dependencies
  */
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 import {
-	activateTheme,
 	createNewPost,
 	insertBlock,
 	pressKeyTimes,
 	publishPost,
 	setOption,
-	trashAllComments,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Comments', () => {
+/**
+ * @typedef {import('@playwright/test').Page} Page
+ * @typedef {import('@wordpress/e2e-test-utils-playwright').RequestUtils} RequestUtils
+ */
+
+test.describe( 'Comments', () => {
 	let previousPageComments,
 		previousCommentsPerPage,
 		previousDefaultCommentsPage;
-	beforeAll( async () => {
-		await activateTheme( 'emptytheme' );
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
 		previousPageComments = await setOption( 'page_comments', '1' );
 		previousCommentsPerPage = await setOption( 'comments_per_page', '1' );
 		previousDefaultCommentsPage = await setOption(
@@ -24,13 +28,18 @@ describe( 'Comments', () => {
 			'newest'
 		);
 	} );
-	it( 'We show no results message if there are no comments', async () => {
-		await trashAllComments();
+
+	test( 'We show no results message if there are no comments', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.deleteAllComments();
 		await createNewPost();
 		await insertBlock( 'Comments' );
 		await page.waitForXPath( '//p[contains(text(), "No results found.")]' );
 	} );
-	it( 'Pagination links are working as expected', async () => {
+
+	test( 'Pagination links are working as expected', async ( { page } ) => {
 		await createNewPost();
 		await insertBlock( 'Comments' );
 		await publishPost();
@@ -89,7 +98,9 @@ describe( 'Comments', () => {
 			await page.$( '.wp-block-comments-pagination-next' )
 		).not.toBeNull();
 	} );
-	it( 'Pagination links are not appearing if break comments is not enabled', async () => {
+	test( 'Pagination links are not appearing if break comments is not enabled', async ( {
+		page,
+	} ) => {
 		await setOption( 'page_comments', '0' );
 		await createNewPost();
 		await insertBlock( 'Comments' );
@@ -121,9 +132,9 @@ describe( 'Comments', () => {
 			await page.$( '.wp-block-comments-pagination-next' )
 		).toBeNull();
 	} );
-	afterAll( async () => {
-		await trashAllComments();
-		await activateTheme( 'twentytwentyone' );
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllComments();
+		await requestUtils.activateTheme( 'twentytwentyone' );
 		await setOption( 'page_comments', previousPageComments );
 		await setOption( 'comments_per_page', previousCommentsPerPage );
 		await setOption( 'default_comments_page', previousDefaultCommentsPage );
