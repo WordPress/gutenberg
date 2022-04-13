@@ -418,7 +418,7 @@ class URLInput extends Component {
 
 	renderControl() {
 		const {
-			label,
+			label = null,
 			className,
 			isFullWidth,
 			instanceId,
@@ -435,8 +435,10 @@ class URLInput extends Component {
 			suggestionOptionIdPrefix,
 		} = this.state;
 
+		const inputId = `url-input-control-${ instanceId }`;
+
 		const controlProps = {
-			id: `url-input-control-${ instanceId }`,
+			id: inputId,
 			label,
 			className: classnames( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
@@ -453,7 +455,6 @@ class URLInput extends Component {
 			placeholder,
 			onKeyDown: this.onKeyDown,
 			role: 'combobox',
-			'aria-label': __( 'URL' ),
 			'aria-expanded': showSuggestions,
 			'aria-autocomplete': 'list',
 			'aria-owns': suggestionsListboxId,
@@ -464,9 +465,17 @@ class URLInput extends Component {
 			ref: this.inputRef,
 		};
 
+		// Set aria-label automatically if no discrete label specified
+		if ( ! label ) {
+			inputProps[ 'aria-label' ] = __( 'URL' );
+		}
+
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
+
+		// If renderControl is falsey, set the input's ID
+		inputProps.id = inputId;
 
 		return (
 			<BaseControl { ...controlProps }>
