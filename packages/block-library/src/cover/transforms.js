@@ -7,6 +7,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { IMAGE_BACKGROUND_TYPE, VIDEO_BACKGROUND_TYPE } from './shared';
+import cleanEmptyObject from '../utils/clean-empty-object';
 
 const transforms = {
 	from: [
@@ -218,7 +219,7 @@ const transforms = {
 			},
 			transform: ( attributes, innerBlocks ) => {
 				// Convert Cover overlay colors to comparable Group background colors.
-				const groupColorAttributes = {
+				const transformedColorAttributes = {
 					backgroundColor: attributes?.overlayColor,
 					gradient: attributes?.gradient,
 					style: {
@@ -238,17 +239,19 @@ const transforms = {
 					innerBlocks?.length === 1 &&
 					innerBlocks[ 0 ]?.name === 'core/group'
 				) {
+					const groupAttributes = cleanEmptyObject(
+						innerBlocks[ 0 ].attributes || {}
+					);
 					return createBlock(
 						'core/group',
 						{
-							...groupColorAttributes,
-							...innerBlocks[ 0 ].attributes,
+							...transformedColorAttributes,
+							...groupAttributes,
 							style: {
-								...innerBlocks[ 0 ].attributes?.style,
+								...groupAttributes?.style,
 								color: {
-									...groupColorAttributes?.style?.color,
-									...innerBlocks[ 0 ].attributes?.style
-										?.color,
+									...transformedColorAttributes?.style?.color,
+									...groupAttributes?.style?.color,
 								},
 							},
 						},
@@ -259,7 +262,7 @@ const transforms = {
 				// In all other cases, transform the Cover block directly to a Group block.
 				return createBlock(
 					'core/group',
-					{ ...attributes, ...groupColorAttributes },
+					{ ...attributes, ...transformedColorAttributes },
 					innerBlocks
 				);
 			},
