@@ -70,8 +70,8 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	if ( 'other' === $context ) {
 		global $wp_version;
 		$is_wp_5_8 = version_compare( $wp_version, '5.8', '>=' ) && version_compare( $wp_version, '5.9', '<' );
-		$is_wp_5_9 = version_compare( $wp_version, '5.9', '>=' ) && version_compare( $wp_version, '6.0', '<' );
-		$is_wp_6_0 = version_compare( $wp_version, '6.0', '>=' );
+		$is_wp_5_9 = version_compare( $wp_version, '5.9', '>=' ) && version_compare( $wp_version, '6.0-beta1', '<' );
+		$is_wp_6_0 = version_compare( $wp_version, '6.0-beta1', '>=' );
 
 		// Make sure the styles array exists.
 		// In some contexts, like the navigation editor, it doesn't.
