@@ -179,13 +179,15 @@ function Editor( { onError } ) {
 		templateType !== undefined &&
 		entityId !== undefined;
 
+	const secondarySidebarLabel = isListViewOpen
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const secondarySidebar = () => {
 		if ( isInserterOpen ) {
-			interfaceLabels.secondarySidebar = __( 'Block Library' );
 			return <InserterSidebar />;
 		}
 		if ( isListViewOpen ) {
-			interfaceLabels.secondarySidebar = __( 'List View' );
 			return <ListViewSidebar />;
 		}
 		return null;
@@ -213,7 +215,10 @@ function Editor( { onError } ) {
 										<KeyboardShortcuts.Register />
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
-											labels={ interfaceLabels }
+											labels={ {
+												...interfaceLabels,
+												secondarySidebar: secondarySidebarLabel,
+											} }
 											className={
 												showIconLabels &&
 												'show-icon-labels'

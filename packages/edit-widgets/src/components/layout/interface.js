@@ -85,7 +85,7 @@ function Interface( { blockEditorSettings } ) {
 		}
 	}, [ isInserterOpened, isListViewOpened, isHugeViewport ] );
 
-	interfaceLabels.secondarySidebar = isListViewOpened
+	const secondarySidebarLabel = isListViewOpened
 		? __( 'List View' )
 		: __( 'Block Library' );
 
@@ -93,7 +93,10 @@ function Interface( { blockEditorSettings } ) {
 
 	return (
 		<InterfaceSkeleton
-			labels={ interfaceLabels }
+			labels={ {
+				...interfaceLabels,
+				secondarySidebar: secondarySidebarLabel,
+			} }
 			header={ <Header /> }
 			secondarySidebar={ hasSecondarySidebar && <SecondarySidebar /> }
 			sidebar={

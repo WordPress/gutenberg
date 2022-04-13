@@ -170,13 +170,15 @@ function Layout( { styles } ) {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	const secondarySidebarLabel = isListViewOpened
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
-			interfaceLabels.secondarySidebar = __( 'Block Library' );
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
-			interfaceLabels.secondarySidebar = __( 'List View' );
 			return <ListViewSidebar />;
 		}
 		return null;
@@ -206,7 +208,10 @@ function Layout( { styles } ) {
 			<SettingsSidebar />
 			<InterfaceSkeleton
 				className={ className }
-				labels={ interfaceLabels }
+				labels={ {
+					...interfaceLabels,
+					secondarySidebar: secondarySidebarLabel,
+				} }
 				header={
 					<Header
 						setEntitiesSavedStatesCallback={
