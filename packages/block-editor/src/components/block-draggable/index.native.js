@@ -10,14 +10,14 @@ import Animated, {
 	withDelay,
 	withTiming,
 } from 'react-native-reanimated';
+import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
 /**
  * WordPress dependencies
  */
-import { Draggable } from '@wordpress/components';
+import { Draggable, DraggableTrigger } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -51,22 +51,15 @@ const BLOCK_OPACITY_ANIMATION_DELAY = 250;
  * @return {Function} Render function that passes `onScroll` event handler.
  */
 const BlockDraggableWrapper = ( { children } ) => {
-	const currentBlockLayout = useRef();
-
-	const wrapperStyles = usePreferredColorSchemeStyle(
-		styles[ 'draggable-wrapper__container' ],
-		styles[ 'draggable-wrapper__container--dark' ]
-	);
-
-	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const [ currentClientId, setCurrentClientId ] = useState();
 
 	const {
-		blocksLayouts,
-		scrollRef,
-		findBlockLayoutByPosition,
-	} = useBlockListContext();
+		selectBlock,
+		startDraggingBlocks,
+		stopDraggingBlocks,
+	} = useDispatch( blockEditorStore );
+
+	const { scrollRef } = useBlockListContext();
 	const animatedScrollRef = useAnimatedRef();
 	animatedScrollRef( scrollRef );
 
@@ -113,16 +106,10 @@ const BlockDraggableWrapper = ( { children } ) => {
 		};
 	}, [] );
 
-	const onStartDragging = ( position ) => {
-		const blockLayout = findBlockLayoutByPosition( blocksLayouts.current, {
-			x: position.x,
-			y: position.y + scroll.offsetY.value,
-		} );
-
-		const foundClientId = blockLayout?.clientId;
-		currentBlockLayout.current = blockLayout;
-		if ( foundClientId ) {
-			startDraggingBlocks( [ foundClientId ] );
+	const onStartDragging = ( { clientId, position } ) => {
+		if ( clientId ) {
+			startDraggingBlocks( [ clientId ] );
+			setCurrentClientId( clientId );
 			runOnUI( startScrolling )( position.y );
 		} else {
 			// We stop dragging if no block is found.
@@ -131,7 +118,6 @@ const BlockDraggableWrapper = ( { children } ) => {
 	};
 
 	const onStopDragging = () => {
-		const currentClientId = currentBlockLayout.current?.clientId;
 		if ( currentClientId ) {
 			onBlockDrop( {
 				// Dropping is only allowed at root level
@@ -139,6 +125,8 @@ const BlockDraggableWrapper = ( { children } ) => {
 				srcClientIds: [ currentClientId ],
 				type: 'block',
 			} );
+			selectBlock( currentClientId );
+			setCurrentClientId( undefined );
 		}
 		onBlockDragEnd();
 		stopDraggingBlocks();
@@ -149,7 +137,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 		chip.height.value = layout.height;
 	};
 
-	const startDragging = ( { x, y } ) => {
+	const startDragging = ( { x, y, id } ) => {
 		'worklet';
 		const dragPosition = { x, y };
 		chip.x.value = dragPosition.x;
@@ -158,7 +146,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 		isDragging.value = true;
 
 		chip.scale.value = withTiming( 1 );
-		runOnJS( onStartDragging )( dragPosition );
+		runOnJS( onStartDragging )( { clientId: id, position: dragPosition } );
 	};
 
 	const updateDragging = ( { x, y } ) => {
@@ -209,12 +197,10 @@ const BlockDraggableWrapper = ( { children } ) => {
 				isDragging={ isDragging }
 				targetBlockIndex={ targetBlockIndex }
 			/>
-
 			<Draggable
 				onDragStart={ startDragging }
 				onDragOver={ updateDragging }
 				onDragEnd={ stopDragging }
-				wrapperAnimatedStyles={ wrapperStyles }
 			>
 				{ children( { onScroll: scrollHandler } ) }
 			</Draggable>
@@ -235,14 +221,14 @@ const BlockDraggableWrapper = ( { children } ) => {
  * This component serves for animating the block when it is being dragged.
  * Hence, it should be wrapped around the rendering of a block.
  *
- * @param {Object}      props          Component props.
- * @param {JSX.Element} props.children Children to be rendered.
- * @param {string[]}    props.clientId Client id of the block.
+ * @param {Object}      props           Component props.
+ * @param {JSX.Element} props.children  Children to be rendered.
+ * @param {string[]}    props.clientId  Client id of the block.
+ * @param {boolean}     [props.enabled] Enables the draggable trigger.
  *
  * @return {Function} Render function which includes the parameter `isDraggable` to determine if the block can be dragged.
  */
-const BlockDraggable = ( { clientId, children } ) => {
-	const { selectBlock } = useDispatch( blockEditorStore );
+const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 	const wasBeingDragged = useRef( false );
 
 	const draggingAnimation = {
@@ -261,53 +247,69 @@ const BlockDraggable = ( { clientId, children } ) => {
 			BLOCK_OPACITY_ANIMATION_DELAY,
 			withTiming( 1, BLOCK_OPACITY_ANIMATION_CONFIG )
 		);
-		runOnJS( selectBlock )( clientId );
 	};
 
-	const { isDraggable, isBeingDragged } = useSelect(
+	const { isDraggable, isBeingDragged, canDragBlock } = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
 				getTemplateLock,
 				isBlockBeingDragged,
+				hasSelectedBlock,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
+			const isAnyTextInputFocused =
+				TextInputState.currentlyFocusedInput() !== null;
 
 			return {
 				isBeingDragged: isBlockBeingDragged( clientId ),
 				isDraggable: 'all' !== templateLock,
+				canDragBlock: hasSelectedBlock()
+					? ! isAnyTextInputFocused
+					: true,
 			};
 		},
 		[ clientId ]
 	);
 
 	useEffect( () => {
-		if ( isBeingDragged ) {
-			startDraggingBlock();
-			wasBeingDragged.current = true;
-		} else if ( wasBeingDragged.current ) {
-			stopDraggingBlock();
-			wasBeingDragged.current = false;
+		if ( isBeingDragged !== wasBeingDragged.current ) {
+			if ( isBeingDragged ) {
+				startDraggingBlock();
+			} else {
+				stopDraggingBlock();
+			}
 		}
+		wasBeingDragged.current = isBeingDragged;
 	}, [ isBeingDragged ] );
 
-	const wrapperStyles = useAnimatedStyle( () => {
+	const animatedWrapperStyles = useAnimatedStyle( () => {
 		return {
 			opacity: draggingAnimation.opacity.value,
 		};
 	} );
+	const wrapperStyles = [
+		animatedWrapperStyles,
+		styles[ 'draggable-wrapper__container' ],
+	];
 
 	if ( ! isDraggable ) {
 		return children( { isDraggable: false } );
 	}
 
 	return (
-		<Animated.View style={ wrapperStyles }>
-			{ children( { isDraggable: true } ) }
-		</Animated.View>
+		<DraggableTrigger
+			id={ clientId }
+			enabled={ enabled && canDragBlock }
+			minDuration={ 450 }
+		>
+			<Animated.View style={ wrapperStyles }>
+				{ children( { isDraggable: true } ) }
+			</Animated.View>
+		</DraggableTrigger>
 	);
 };
 
