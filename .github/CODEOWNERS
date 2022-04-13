@@ -106,13 +106,14 @@
 /packages/html-entities
 /packages/i18n                                  @swissspidy
 /packages/is-shallow-equal
+/packages/keyboard-shortcuts
 /packages/keycodes
+/packages/preferences                           @talldan
 /packages/priority-queue
 /packages/token-list
 /packages/url
 /packages/wordcount
 /packages/warning
-/packages/keyboard-shortcuts
 
 # Extensibility
 /packages/hooks                                 @adamsilverstein
