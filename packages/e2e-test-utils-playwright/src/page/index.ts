@@ -12,12 +12,16 @@ import { getEditedPostContent } from './get-edited-post-content';
 import { getPageError } from './get-page-error';
 import { insertBlock } from './insert-block';
 import { isCurrentURL } from './is-current-url';
+import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 import {
 	setClipboardData,
 	pressKeyWithModifier,
 } from './press-key-with-modifier';
+import { openPreviewPage } from './preview';
+import { setBrowserViewport } from './set-browser-viewport';
 import { showBlockToolbar } from './show-block-toolbar';
 import { visitAdminPage } from './visit-admin-page';
+import { visitSiteEditor } from './site-editor';
 
 class PageUtils {
 	browser: Browser;
@@ -40,6 +44,10 @@ class PageUtils {
 	setClipboardData = setClipboardData;
 	showBlockToolbar = showBlockToolbar;
 	visitAdminPage = visitAdminPage;
+	visitSiteEditor = visitSiteEditor;
+	openDocumentSettingsSidebar = openDocumentSettingsSidebar;
+	openPreviewPage = openPreviewPage;
+	setBrowserViewport = setBrowserViewport;
 }
 
 export { PageUtils };

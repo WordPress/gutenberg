@@ -14,6 +14,7 @@ import type { User } from './login';
 import { login } from './login';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
+import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { deleteAllPosts } from './posts';
@@ -118,6 +119,7 @@ class RequestUtils {
 	deleteAllPosts = deleteAllPosts;
 	deleteAllWidgets = deleteAllWidgets;
 	addWidgetBlock = addWidgetBlock;
+	deleteAllTemplates = deleteAllTemplates;
 }
 
 export type { StorageState };
