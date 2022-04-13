@@ -26,9 +26,7 @@ test.describe( 'Site editor title', () => {
 			'role=region[name="Header"i] >> role=heading[level=1]'
 		);
 
-		await expect( await title.textContent() ).toEqual(
-			'Editing template: Index'
-		);
+		await expect( title ).toHaveText( 'Editing template: Index' );
 	} );
 
 	test( 'displays the selected template name in the title for the header template', async ( {
@@ -45,9 +43,7 @@ test.describe( 'Site editor title', () => {
 			'role=region[name="Header"i] >> role=heading[level=1]'
 		);
 
-		await expect( await title.textContent() ).toEqual(
-			'Editing template part: header'
-		);
+		await expect( title ).toHaveText( 'Editing template part: header' );
 	} );
 
 	test( "displays the selected template part's name in the secondary title when a template part is selected from List View", async ( {
@@ -72,6 +68,6 @@ test.describe( 'Site editor title', () => {
 			'.edit-site-document-actions__secondary-item'
 		);
 
-		await expect( await secondaryTitle.textContent() ).toEqual( 'header' );
+		await expect( secondaryTitle ).toHaveText( 'header' );
 	} );
 } );
