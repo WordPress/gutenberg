@@ -7,8 +7,6 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { dragHandle } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
-import { getBlockType } from '@wordpress/blocks';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -16,7 +14,6 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import BlockIcon from '../block-icon';
 import styles from './style.scss';
-import { store as blockEditorStore } from '../../store';
 
 const shadowStyle = {
 	shadowColor: '#000',
@@ -33,30 +30,20 @@ const shadowStyle = {
 /**
  * Block draggable chip component
  *
+ * @param {Object} props        Component props.
+ * @param {Object} [props.icon] Block icon.
  * @return {JSX.Element} Chip component.
  */
-export default function BlockDraggableChip() {
+export default function BlockDraggableChip( { icon } ) {
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles[ 'draggable-chip__container' ],
 		styles[ 'draggable-chip__container--dark' ]
 	);
 
-	const { blockIcon } = useSelect( ( select ) => {
-		const { getBlockName, getDraggedBlockClientIds } = select(
-			blockEditorStore
-		);
-		const draggedBlockClientIds = getDraggedBlockClientIds();
-		const blockName = getBlockName( draggedBlockClientIds[ 0 ] );
-
-		return {
-			blockIcon: getBlockType( blockName )?.icon,
-		};
-	} );
-
 	return (
 		<View style={ [ containerStyle, shadowStyle ] }>
 			<BlockIcon icon={ dragHandle } />
-			<BlockIcon icon={ blockIcon } />
+			{ icon && <BlockIcon icon={ icon } /> }
 		</View>
 	);
 }
