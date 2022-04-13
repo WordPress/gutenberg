@@ -51,7 +51,6 @@ import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 
 const interfaceLabels = {
-	secondarySidebar: __( 'Block library' ),
 	/* translators: accessibility text for the editor top bar landmark region. */
 	header: __( 'Editor top bar' ),
 	/* translators: accessibility text for the editor content landmark region. */
@@ -173,9 +172,11 @@ function Layout( { styles } ) {
 
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
+			interfaceLabels.secondarySidebar = __( 'Block Library' );
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
+			interfaceLabels.secondarySidebar = __( 'List View' );
 			return <ListViewSidebar />;
 		}
 		return null;

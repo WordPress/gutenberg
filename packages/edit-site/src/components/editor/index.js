@@ -47,7 +47,6 @@ import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 
 const interfaceLabels = {
-	secondarySidebar: __( 'Block Library' ),
 	drawer: __( 'Navigation Sidebar' ),
 };
 
@@ -182,9 +181,11 @@ function Editor( { onError } ) {
 
 	const secondarySidebar = () => {
 		if ( isInserterOpen ) {
+			interfaceLabels.secondarySidebar = __( 'Block Library' );
 			return <InserterSidebar />;
 		}
 		if ( isListViewOpen ) {
+			interfaceLabels.secondarySidebar = __( 'List View' );
 			return <ListViewSidebar />;
 		}
 		return null;

@@ -85,6 +85,10 @@ function Interface( { blockEditorSettings } ) {
 		}
 	}, [ isInserterOpened, isListViewOpened, isHugeViewport ] );
 
+	interfaceLabels.secondarySidebar = isListViewOpened
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const hasSecondarySidebar = isListViewOpened || isInserterOpened;
 
 	return (
