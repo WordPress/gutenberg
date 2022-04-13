@@ -197,7 +197,7 @@ The settings section has the following structure:
 		"spacing": {
 			"margin": false,
 			"padding": false,
-			"blockGap": true,
+			"blockGap": null,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
 		"typography": {
