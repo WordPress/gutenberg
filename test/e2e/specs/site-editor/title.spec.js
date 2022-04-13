@@ -6,17 +6,6 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Site editor title', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
-		await Promise.all( [
-			requestUtils.deleteAllTemplates( 'wp_template' ),
-			requestUtils.deleteAllTemplates( 'wp_template_part' ),
-		] );
-	} );
-
-	test.afterEach( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllTemplates( 'wp_template' ),
-			requestUtils.deleteAllTemplates( 'wp_template_part' ),
-		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
