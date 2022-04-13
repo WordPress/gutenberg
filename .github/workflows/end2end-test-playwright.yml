@@ -63,6 +63,6 @@ jobs:
               uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
               if: always()
               with:
-                  name: flaky-tests-report
+                  name: flaky-tests-report-playwright
                   path: flaky-tests
                   if-no-files-found: ignore

@@ -2,9 +2,7 @@ name: Report Flaky Tests
 
 on:
     workflow_run:
-        # We should also add 'End-to-End Tests Playwright' here but that
-        # wil run this workflow whenever either one of them completes.
-        workflows: ['End-to-End Tests']
+        workflows: ['End-to-End Tests', 'End-to-End Tests Playwright']
         types:
             - completed
 
@@ -31,4 +29,4 @@ jobs:
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   label: '[Type] Flaky Test'
-                  artifact-name: flaky-tests-report
+                  artifact-name-prefix: flaky-tests-report
