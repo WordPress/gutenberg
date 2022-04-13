@@ -11,7 +11,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import type { PageUtils } from './index';
 
-const VISUAL_EDITOR_SELECTOR = '.edit-site-visual-editor iframe';
+const VISUAL_EDITOR_SELECTOR = 'iframe[title="Editor canvas"i]';
 
 interface SiteEditorQueryParams {
 	postId: string | number;
