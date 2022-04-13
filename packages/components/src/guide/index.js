@@ -6,10 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, Children } from '@wordpress/element';
+import { useState, useEffect, Children, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -17,7 +18,6 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
 import Modal from '../modal';
 import Button from '../button';
 import PageControl from './page-control';
-import FinishButton from './finish-button';
 
 export default function Guide( {
 	children,
@@ -27,6 +27,9 @@ export default function Guide( {
 	onFinish,
 	pages = [],
 } ) {
+	const guideContainer = useRef();
+	const nextButton = useRef();
+	const finishButton = useRef();
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
 	useEffect( () => {
@@ -37,6 +40,26 @@ export default function Guide( {
 			} );
 		}
 	}, [ children ] );
+
+	useEffect( () => {
+		const hasLostFocus = ! guideContainer.current.contains(
+			guideContainer.current.ownerDocument.activeElement
+		);
+
+		// Keeping the focus within the guide when the page changes
+		// prevents the modal from closing and avoids focus loss.
+		if ( ! hasLostFocus ) {
+			return;
+		}
+
+		if ( nextButton.current ) {
+			nextButton.current.focus();
+		} else if ( finishButton.current ) {
+			finishButton.current.focus();
+		} else {
+			focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
+		}
+	}, [ currentPage ] );
 
 	if ( Children.count( children ) ) {
 		pages = Children.map( children, ( child ) => ( { content: child } ) );
@@ -74,7 +97,7 @@ export default function Guide( {
 				}
 			} }
 		>
-			<div className="components-guide__container">
+			<div className="components-guide__container" ref={ guideContainer }>
 				<div className="components-guide__page">
 					{ pages[ currentPage ].image }
 
@@ -87,15 +110,6 @@ export default function Guide( {
 					) }
 
 					{ pages[ currentPage ].content }
-
-					{ ! canGoForward && (
-						<FinishButton
-							className="components-guide__inline-finish-button"
-							onClick={ onFinish }
-						>
-							{ finishButtonText || __( 'Finish' ) }
-						</FinishButton>
-					) }
 				</div>
 
 				<div className="components-guide__footer">
@@ -111,17 +125,19 @@ export default function Guide( {
 						<Button
 							className="components-guide__forward-button"
 							onClick={ goForward }
+							ref={ nextButton }
 						>
 							{ __( 'Next' ) }
 						</Button>
 					) }
 					{ ! canGoForward && (
-						<FinishButton
+						<Button
 							className="components-guide__finish-button"
 							onClick={ onFinish }
+							ref={ finishButton }
 						>
 							{ finishButtonText || __( 'Finish' ) }
-						</FinishButton>
+						</Button>
 					) }
 				</div>
 			</div>
