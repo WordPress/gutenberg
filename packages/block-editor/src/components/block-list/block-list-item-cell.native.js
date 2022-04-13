@@ -12,7 +12,6 @@ import { useEffect, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useBlockListContext } from './block-list-context';
-import BlockDraggable from '../block-draggable';
 
 function BlockListItemCell( { children, clientId, rootClientId } ) {
 	const { blocksLayouts, updateBlocksLayouts } = useBlockListContext();
@@ -37,13 +36,7 @@ function BlockListItemCell( { children, clientId, rootClientId } ) {
 		[ clientId, rootClientId, updateBlocksLayouts ]
 	);
 
-	return (
-		<View onLayout={ onLayout }>
-			<BlockDraggable clientId={ clientId }>
-				{ () => children }
-			</BlockDraggable>
-		</View>
-	);
+	return <View onLayout={ onLayout }>{ children }</View>;
 }
 
 export default BlockListItemCell;
