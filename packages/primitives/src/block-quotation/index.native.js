@@ -37,6 +37,12 @@ export const BlockQuotation = forwardRef( ( { ...props }, ref ) => {
 				},
 			} );
 		}
+		if ( child && child.props.identifier === 'value' ) {
+			return cloneElement( child, {
+				tagsToEliminate: [ 'div' ],
+				style: colorStyle,
+			} );
+		}
 		return child;
 	} );
 	return (
