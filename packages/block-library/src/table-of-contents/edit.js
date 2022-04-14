@@ -241,7 +241,7 @@ export default function TableOfContentsEdit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Table of Contents settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
 					label={ __( 'Only include current page' ) }
 					checked={ onlyIncludeCurrentPage }
