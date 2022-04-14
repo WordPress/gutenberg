@@ -9,15 +9,17 @@ import classnames from 'classnames';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
+	Button,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { moreVertical } from '@wordpress/icons';
+import { moreVertical, lock } from '@wordpress/icons';
 import {
 	useState,
 	useRef,
 	useEffect,
 	useCallback,
 	memo,
+	useReducer,
 } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
@@ -36,7 +38,7 @@ import { useListViewContext } from './context';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
-import { useBlockLock } from '../block-lock';
+import { useBlockLock, BlockLockModal } from '../block-lock';
 
 function ListViewBlock( {
 	block,
@@ -56,6 +58,10 @@ function ListViewBlock( {
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
+	const [ isModalOpen, toggleModal ] = useReducer(
+		( isActive ) => ! isActive,
+		false
+	);
 	const { clientId } = block;
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -196,7 +202,7 @@ function ListViewBlock( {
 		'is-branch-selected':
 			withExperimentalPersistentListViewFeatures && isBranchSelected,
 		'is-dragging': isDragged,
-		'has-single-cell': hideBlockActions,
+		'has-single-cell': hideBlockActions && ! isLocked,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
@@ -289,7 +295,18 @@ function ListViewBlock( {
 					</TreeGridCell>
 				</>
 			) }
-
+			<TreeGridCell className="block-editor-list-view-block__lock-cell">
+				{ () => {
+					return (
+						isLocked && (
+							<Button icon={ lock } onClick={ toggleModal } />
+						)
+					);
+				} }
+			</TreeGridCell>
+			{ isLocked && isModalOpen && (
+				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
+			) }
 			{ showBlockActions && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
