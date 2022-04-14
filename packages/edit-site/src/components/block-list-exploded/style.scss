@@ -15,13 +15,18 @@
 .edit-site-block-list-exploded__item-container {
 	position: relative;
 
-	::after {
+	&::after {
 		content: "";
 		position: absolute;
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
+		pointer-events: none;
+	}
+
+	&:hover::after {
+		border: 1px solid var(--wp-admin-theme-color);
 	}
 
 	&.is-selected::after {
