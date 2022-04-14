@@ -157,11 +157,8 @@ export default compose( [
 			hasInserterItems,
 			hasSelectedBlock,
 		} = select( blockEditorStore );
-		const { getEditorSettings, isPostTitleSelected } = select(
-			editorStore
-		);
+		const { getEditorSettings } = select( editorStore );
 		const isAnyBlockSelected = hasSelectedBlock();
-		const isTitleSelected = isPostTitleSelected();
 		return {
 			hasRedo: select( editorStore ).hasEditorRedo(),
 			hasUndo: select( editorStore ).hasEditorUndo(),
@@ -175,7 +172,7 @@ export default compose( [
 			isTextModeEnabled:
 				select( editPostStore ).getEditorMode() === 'text',
 			isRTL: select( blockEditorStore ).getSettings().isRTL,
-			noContentSelected: ! isAnyBlockSelected && ! isTitleSelected,
+			noContentSelected: ! isAnyBlockSelected,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
