@@ -24,8 +24,8 @@
 			"default": false
 		},
 		"showEmpty": {
-		  "type": "boolean",
-		  "default": false
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
