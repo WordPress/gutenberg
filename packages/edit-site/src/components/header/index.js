@@ -6,6 +6,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
@@ -47,6 +48,7 @@ export default function Header( {
 		listViewShortcut,
 		isLoaded,
 		mode,
+		hasMoreThanOneBlock,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -61,6 +63,7 @@ export default function Header( {
 			editorStore
 		);
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		const { getBlockCount } = select( blockEditorStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
@@ -79,6 +82,7 @@ export default function Header( {
 				'core/edit-site/toggle-list-view'
 			),
 			mode: getEditorMode(),
+			hasMoreThanOneBlock: getBlockCount() > 1,
 		};
 	}, [] );
 
@@ -106,6 +110,8 @@ export default function Header( {
 	);
 
 	const isFocusMode = templateType === 'wp_template_part';
+	const shouldEnableExplodedViewButton =
+		mode === 'exploded' || ( hasMoreThanOneBlock && mode === 'visual' );
 
 	return (
 		<div className="edit-site-header">
@@ -147,9 +153,7 @@ export default function Header( {
 								shortcut={ listViewShortcut }
 							/>
 							<Button
-								disabled={
-									mode !== 'visual' && mode !== 'exploded'
-								}
+								disabled={ ! shouldEnableExplodedViewButton }
 								className="edit-site-header-toolbar__exploded-view-toggle"
 								icon={ stack }
 								isPressed={ mode === 'exploded' }
