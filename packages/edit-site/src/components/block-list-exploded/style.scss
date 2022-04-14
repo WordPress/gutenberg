@@ -37,7 +37,6 @@
 	color: $white;
 	display: flex;
 	align-items: center;
-	gap: $grid-unit-10;
 	padding-left: $grid-unit-20;
 
 	.block-editor-block-mover__move-button-container {
@@ -58,4 +57,11 @@
 			top: 5px;
 		}
 	}
+}
+
+.edit-site-block-list-exploded__item-title {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	padding-right: $grid-unit-20;
 }

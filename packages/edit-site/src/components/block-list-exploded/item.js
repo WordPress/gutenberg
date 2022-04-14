@@ -15,6 +15,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { pure } from '@wordpress/compose';
 import { sprintf, __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,6 +42,7 @@ function BlockListExplodedItem( { clientId } ) {
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), title );
+	const blocksToPreview = useMemo( () => [ block ], [ block ] );
 
 	return (
 		<div>
@@ -77,7 +79,7 @@ function BlockListExplodedItem( { clientId } ) {
 					aria-label={ blockLabel }
 					tabIndex={ 0 }
 				>
-					<BlockPreview blocks={ [ block ] } />
+					<BlockPreview blocks={ blocksToPreview } />
 				</div>
 			</div>
 		</div>

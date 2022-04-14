@@ -13,8 +13,8 @@ function BlockListExplodedTopToolbar( { clientId } ) {
 
 	return (
 		<div className="edit-site-block-list-exploded__item-top-toolbar">
-			<BlockIcon icon={ icon } showColors />
-			<span>
+			<span className="edit-site-block-list-exploded__item-title">
+				<BlockIcon icon={ icon } showColors />
 				<BlockTitle clientId={ clientId } />
 			</span>
 			<BlockMover clientIds={ [ clientId ] } hideDragHandle />
