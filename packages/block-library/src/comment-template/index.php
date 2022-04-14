@@ -37,14 +37,14 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 			$comment_depth += 1;
 			$inner_content  = block_core_comment_template_render_comments(
 				$children,
-				$block,
+				$block
 			);
 			$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
 			$comment_depth -= 1;
 		}
 
 		// The `false` parameter at the end means that we do NOT want the function to `echo` the output but to return a string.
-		// See https://developer.wordpress.org/reference/functions/comment_class/#parameters
+		// See https://developer.wordpress.org/reference/functions/comment_class/#parameters.
 		$comment_classes = comment_class( '', $comment->comment_ID, $comment->comment_post_ID, false );
 
 		$content .= sprintf( '<li %1$s>' . $block_content . '</li>', $comment_classes );
