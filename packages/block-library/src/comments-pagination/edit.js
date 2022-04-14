@@ -79,6 +79,8 @@ export default function QueryPaginationEdit( {
 		return null;
 	}
 
+	// Else if paging comments is enabled display a pagination placeholder to enable styling
+	// all pagination controls regardless of available data and pagination state.
 	return (
 		<>
 			{ hasNextPreviousBlocks && (
