@@ -71,11 +71,13 @@
 		}
 	}
 }
-
-.block-editor-block-list__insertion-point-inserter .block-editor-inserter__toggle.components-button.has-icon {
-	background: var(--wp-admin-theme-color);
-	&:hover {
-		background: $gray-900;
+.edit-site-block-list-exploded__inserter,
+.block-editor-block-list__insertion-point-inserter {
+	.block-editor-inserter__toggle.components-button.has-icon {
+		background: var(--wp-admin-theme-color);
+		&:hover {
+			background: $gray-900;
+		}
 	}
 }
 
