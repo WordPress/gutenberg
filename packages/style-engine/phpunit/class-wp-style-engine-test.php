@@ -17,12 +17,9 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_styles_fixtures
 	 */
-	function test_generate_styles( $block_styles, $options, $expected_output ) {
+	function test_generate_styles( $block_styles, $expected_output ) {
 		$style_engine     = wp_get_style_engine();
-		$generated_styles = $style_engine->generate(
-			$block_styles,
-			$options
-		);
+		$generated_styles = $style_engine->generate( $block_styles );
 		$this->assertSame( $expected_output, $generated_styles );
 	}
 
@@ -35,13 +32,11 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		return array(
 			'default_return_value'                         => array(
 				'block_styles'    => array(),
-				'options'         => null,
 				'expected_output' => null,
 			),
 
 			'inline_invalid_block_styles_empty'            => array(
-				'block_styles'    => array(),
-				'options'         => array(),
+				'block_styles'    => 'hello world!',
 				'expected_output' => null,
 			),
 
@@ -49,7 +44,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'block_styles'    => array(
 					'pageBreakAfter' => 'verso',
 				),
-				'options'         => array(),
 				'expected_output' => array(),
 			),
 
@@ -57,7 +51,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'block_styles'    => array(
 					'pageBreakAfter' => 'verso',
 				),
-				'options'         => array(),
 				'expected_output' => array(),
 			),
 
@@ -67,7 +60,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'gap' => '1000vw',
 					),
 				),
-				'options'         => array(),
 				'expected_output' => array(),
 			),
 
@@ -82,7 +74,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'margin' => '111px',
 					),
 				),
-				'options'         => array(),
 				'expected_output' => array(
 					'css'        => 'margin: 111px;',
 					'classnames' => 'has-text-color has-texas-flood-color',
@@ -106,7 +97,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array(),
 				'expected_output' => array(
 					'css' => 'padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; margin-top: 12rem; margin-left: 2vh; margin-bottom: 2px; margin-right: 10em;',
 				),
@@ -125,7 +115,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'letterSpacing'  => '2',
 					),
 				),
-				'options'         => array(),
 				'expected_output' => array(
 					'css' => 'font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; font-weight: 800; line-height: 1.3; text-decoration: underline; text-transform: uppercase; letter-spacing: 2;',
 				),
@@ -152,7 +141,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array(),
 				'expected_output' => array(
 					'classnames' => 'has-text-color has-copper-socks-color has-background has-splendid-carrot-background-color has-like-wow-dude-gradient-background has-fantastic-font-size has-totally-awesome-font-family',
 				),
@@ -170,7 +158,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array(),
 				'expected_output' => array(
 					'css'        => 'color: #fff;',
 					'classnames' => 'has-text-color',
@@ -187,7 +174,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array(),
 				'expected_output' => array(),
 			),
 			'invalid_classnames_options'                   => array(
@@ -201,7 +187,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array(),
 				'expected_output' => array(),
 			),
 		);

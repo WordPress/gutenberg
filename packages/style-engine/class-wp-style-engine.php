@@ -175,15 +175,14 @@ class WP_Style_Engine {
 	 * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
 	 * @param array $block_styles An array of styles from a block's attributes.
-	 * @param array $options      An optional array of options.
 	 *
 	 * @return array|null array(
 	 *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
 	 *     'classnames' => (string) Classnames separated by a space.
 	 * );
 	 */
-	public function generate( $block_styles, $options = array() ) {
-		if ( empty( $block_styles ) ) {
+	public function generate( $block_styles ) {
+		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
 			return null;
 		}
 
