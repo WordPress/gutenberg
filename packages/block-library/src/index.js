@@ -138,7 +138,6 @@ export const __experimentalGetCoreBlocks = () => [
 	heading,
 	gallery,
 	list,
-	listItem,
 	quote,
 
 	// Register all remaining core blocks.
@@ -268,6 +267,10 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 			[
 				// Experimental blocks.
 				postAuthorName,
+				...( window.__experimentalEnableListBlockV2
+					? [ listItem ]
+					: [] ),
+
 				// Full Site Editing blocks.
 				...( enableFSEBlocks
 					? [
