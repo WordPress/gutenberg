@@ -66,11 +66,11 @@ export default function QueryPaginationEdit( {
 	} );
 
 	// Get the Discussion settings
-	const { pageComments } = useSelect( ( select ) => {
+	const pageComments = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
-	} );
+		return __experimentalDiscussionSettings?.pageComments;
+	}, [] );
 
 	// If paging comments is not enabled in the Discussion Settings then hide the pagination
 	// controls. We don't want to remove them from the template so that when the user enables
