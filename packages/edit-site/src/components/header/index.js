@@ -159,13 +159,14 @@ export default function Header( {
 								isPressed={ mode === 'exploded' }
 								/* translators: button label text should, if possible, be under 16 characters. */
 								label={ __( 'Exploded View' ) }
-								onClick={ () =>
+								onClick={ () => {
+									setIsListViewOpened( false );
 									switchEditorMode(
 										mode === 'visual'
 											? 'exploded'
 											: 'visual'
-									)
-								}
+									);
+								} }
 							/>
 						</>
 					) }
