@@ -7,11 +7,7 @@ describe( 'Gutenberg Editor Separator Block test', () => {
 	it( 'should be able to add a separator block', async () => {
 		await editorPage.addNewBlock( blockNames.separator );
 		const separatorBlock = await editorPage.getBlockAtPosition(
-			blockNames.separator,
-			1,
-			{
-				useWaitForVisible: true,
-			}
+			blockNames.separator
 		);
 
 		expect( separatorBlock ).toBeTruthy();
