@@ -139,17 +139,32 @@ class WP_Style_Engine {
 	 */
 	protected static function get_classnames( $style, $style_definition ) {
 		$classnames = array();
+		// Classnames expect an array value for slug or other metadata required to build the classname.
+		if ( ! is_array( $style ) ) {
+			return $classnames;
+		}
+
+		// Remove falsy values.
+		$filtered_style = array_filter(
+			$style,
+			function( $value ) {
+				return ! empty( $value );
+			}
+		);
 
 		if ( ! empty( $style_definition['classnames'] ) ) {
 			foreach ( $style_definition['classnames'] as $classname => $property ) {
-				if ( true === $property ) {
+				// Only add the required classname if there's a valid style value or classname slug.
+				if ( true === $property && ! empty( $filtered_style ) ) {
 					$classnames[] = $classname;
-				} elseif ( isset( $style[ $property ] ) ) {
+				}
+
+				if ( isset( $filtered_style[ $property ] ) ) {
 					// Right now we expect a classname pattern to be stored in BLOCK_STYLE_DEFINITIONS_METADATA.
 					// One day, if there are no stored schemata, we could allow custom patterns or
 					// generate classnames based on other properties
 					// such as a path or a value or a prefix passed in options.
-					$classnames[] = sprintf( $classname, _wp_to_kebab_case( $style[ $property ] ) );
+					$classnames[] = sprintf( $classname, _wp_to_kebab_case( $filtered_style[ $property ] ) );
 				}
 			}
 		}
@@ -162,9 +177,7 @@ class WP_Style_Engine {
 	 * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
 	 * @param array $block_styles An array of styles from a block's attributes.
-	 * @param array $options = array(
-	 *     'inline' => (boolean) Whether to return inline CSS rules destined to be inserted in an HTML `style` attribute.
-	 * );.
+	 * @param array $options      An optional array of options.
 	 *
 	 * @return array|null array(
 	 *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
@@ -197,7 +210,6 @@ class WP_Style_Engine {
 					$css_rules = array_merge( $css_rules, static::get_css_rules( $style_value, $style_definition['property_key'] ) );
 				}
 
-				// Classnames expect an array value for slug or other metadata required to build the classname.
 				$classnames = array_merge( $classnames, static::get_classnames( $style, $style_definition ) );
 			}
 		}
@@ -206,12 +218,12 @@ class WP_Style_Engine {
 		$css_output = '';
 		if ( ! empty( $css_rules ) ) {
 			// Generate inline style rules.
-			if ( isset( $options['inline'] ) && true === $options['inline'] ) {
-				foreach ( $css_rules as $rule => $value ) {
-					$filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
-					if ( ! empty( $filtered_css ) ) {
-						$css_output .= $filtered_css . '; ';
-					}
+			// In the future there might be a flag in the option to output
+			// inline CSS rules (for HTML style attributes) vs selectors + rules for style tags.
+			foreach ( $css_rules as $rule => $value ) {
+				$filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
+				if ( ! empty( $filtered_css ) ) {
+					$css_output .= $filtered_css . '; ';
 				}
 			}
 		}

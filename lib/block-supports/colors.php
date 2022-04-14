@@ -96,6 +96,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	}
 
 	// Gradients.
+
 	if ( $has_gradients_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' ) ) {
 		$color_block_styles['gradient'] = array(
 			'value' => isset( $block_attributes['style']['color']['gradient'] ) ? $block_attributes['style']['color']['gradient'] : null,
@@ -105,12 +106,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 
 	$attributes   = array();
 	$style_engine = gutenberg_get_style_engine();
-	$styles       = $style_engine->generate(
-		array( 'color' => $color_block_styles ),
-		array(
-			'inline' => true,
-		)
-	);
+	$styles       = $style_engine->generate( array( 'color' => $color_block_styles ) );
 
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];
