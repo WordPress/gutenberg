@@ -29,13 +29,15 @@ const metaData = {
 ( async function run() {
 	const token = core.getInput( 'repo-token', { required: true } );
 	const label = core.getInput( 'label', { required: true } );
-	const artifactName = core.getInput( 'artifact-name', { required: true } );
+	const artifactNamePrefix = core.getInput( 'artifact-name-prefix', {
+		required: true,
+	} );
 
 	const octokit = github.getOctokit( token );
 
 	const flakyTests = await downloadReportFromArtifact(
 		octokit,
-		artifactName
+		artifactNamePrefix
 	);
 
 	if ( ! flakyTests ) {
@@ -92,9 +94,27 @@ const metaData = {
 						TEST_RESULTS_LIST.open.length,
 					body.indexOf( TEST_RESULTS_LIST.close )
 				)
+				/**
+				 * Split the text from:
+				 * ```
+				 * <!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->
+				 * ...
+				 * <!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->
+				 * <!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->
+				 * ```
+				 *
+				 * into:
+				 * ```
+				 * [
+				 *   '<!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->',
+				 *   '<!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->',
+				 *   '<!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->',
+				 * ]
+				 * ```
+				 */
 				.split(
 					new RegExp(
-						`(?<=${ TEST_RESULT.close })\n(?=${ TEST_RESULT.open })`
+						`(?<=${ TEST_RESULT.close })\n(?:\.\.\.\n)?(?=${ TEST_RESULT.open })`
 					)
 				);
 			// GitHub issues has character limits on issue's body,
@@ -173,7 +193,7 @@ async function fetchAllIssuesLabeledFlaky( octokit, label ) {
 	return issues;
 }
 
-async function downloadReportFromArtifact( octokit, artifactName ) {
+async function downloadReportFromArtifact( octokit, artifactNamePrefix ) {
 	const {
 		data: { artifacts },
 	} = await octokit.rest.actions.listWorkflowRunArtifacts( {
@@ -181,8 +201,8 @@ async function downloadReportFromArtifact( octokit, artifactName ) {
 		run_id: github.context.payload.workflow_run.id,
 	} );
 
-	const matchArtifact = artifacts.find(
-		( artifact ) => artifact.name === artifactName
+	const matchArtifact = artifacts.find( ( artifact ) =>
+		artifact.name.startsWith( artifactNamePrefix )
 	);
 
 	if ( ! matchArtifact ) {

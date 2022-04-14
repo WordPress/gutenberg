@@ -19,6 +19,19 @@ _Returns_
 
 -   `boolean`: True if the block has controlled inner blocks.
 
+### canEditBlock
+
+Determines if the given block is allowed to be edited.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: The block client Id.
+
+_Returns_
+
+-   `boolean`: Whether the given block is allowed to be edited.
+
 ### canInsertBlocks
 
 Determines if the given blocks are allowed to be inserted into the block

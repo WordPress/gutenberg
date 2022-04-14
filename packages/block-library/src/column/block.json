@@ -35,6 +35,7 @@
 			}
 		},
 		"spacing": {
+			"blockGap": true,
 			"padding": true,
 			"__experimentalDefaultControls": {
 				"padding": true

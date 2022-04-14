@@ -9,7 +9,60 @@ import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import CommentsInspectorControls from './edit/comments-inspector-controls';
 
 const TEMPLATE = [
-	[ 'core/comment-template' ],
+	[
+		'core/comment-template',
+		{},
+		[
+			[
+				'core/columns',
+				{},
+				[
+					[
+						'core/column',
+						{ width: '40px' },
+						[
+							[
+								'core/avatar',
+								{
+									size: 40,
+									style: {
+										border: { radius: '20px' },
+									},
+								},
+							],
+						],
+					],
+					[
+						'core/column',
+						{},
+						[
+							[ 'core/comment-author-name' ],
+							[
+								'core/group',
+								{
+									layout: { type: 'flex' },
+									style: {
+										spacing: {
+											margin: {
+												top: '0px',
+												bottom: '0px',
+											},
+										},
+									},
+								},
+								[
+									[ 'core/comment-date' ],
+									[ 'core/comment-edit-link' ],
+								],
+							],
+							[ 'core/comment-content' ],
+							[ 'core/comment-reply-link' ],
+						],
+					],
+				],
+			],
+		],
+	],
 	[ 'core/comments-pagination' ],
 ];
 
