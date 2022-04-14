@@ -113,14 +113,16 @@ const transforms = {
 					...attributes,
 					backgroundColor: undefined,
 					gradient: undefined,
-					style: {
-						...attributes?.style,
-						color: {
-							...attributes?.style?.color,
-							background: undefined,
-							gradient: undefined,
-						},
-					},
+					style: attributes?.style
+						? {
+								...attributes?.style,
+								color: {
+									...attributes?.style?.color,
+									background: undefined,
+									gradient: undefined,
+								},
+						  }
+						: undefined,
 				};
 
 				// Preserve the block by nesting it within the Cover block,
