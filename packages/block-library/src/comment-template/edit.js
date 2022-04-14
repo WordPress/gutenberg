@@ -252,7 +252,6 @@ export default function CommentTemplateEdit( {
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
-
 			return {
 				// Request only top-level comments. Replies are embedded.
 				topLevelComments: commentQuery
@@ -289,7 +288,11 @@ export default function CommentTemplateEdit( {
 	}
 
 	if ( ! commentTree.length ) {
-		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
+		return (
+			<p { ...blockProps } data-testid="noresults">
+				{ __( 'No results found.' ) }
+			</p>
+		);
 	}
 
 	return (
