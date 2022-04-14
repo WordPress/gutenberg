@@ -73,6 +73,7 @@ function BlockListExplodedItem( { clientId } ) {
 						}
 					} }
 					onKeyPress={ () => selectBlock( clientId ) }
+					onFocus={ () => selectBlock( clientId ) }
 					aria-label={ blockLabel }
 					tabIndex={ 0 }
 				>
