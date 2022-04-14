@@ -37,8 +37,10 @@
 	color: $white;
 	display: flex;
 	align-items: center;
+	gap: $grid-unit-20;
 	padding-left: $grid-unit-20;
 
+	.block-editor-block-lock-toolbar,
 	.block-editor-block-mover__move-button-container {
 		background: transparent;
 		color: inherit;
@@ -47,21 +49,13 @@
 		.components-button {
 			color: $white;
 		}
-
-
-		// TODO: Absorb these in the BlockMover component (outside of mobile).
-		.block-editor-block-mover-button.is-down-button svg {
-			bottom: 5px;
-		}
-		.block-editor-block-mover-button.is-up-button svg {
-			top: 5px;
-		}
 	}
-}
 
-.edit-site-block-list-exploded__item-title {
-	display: flex;
-	align-items: center;
-	gap: $grid-unit-10;
-	padding-right: $grid-unit-20;
+	// TODO: Absorb these in the BlockMover component (outside of mobile).
+	.block-editor-block-mover-button.is-down-button svg {
+		bottom: 5px;
+	}
+	.block-editor-block-mover-button.is-up-button svg {
+		top: 5px;
+	}
 }

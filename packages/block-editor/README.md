@@ -173,6 +173,10 @@ _Related_
 
 Undocumented declaration.
 
+### BlockLockToolbar
+
+Undocumented declaration.
+
 ### BlockMover
 
 _Related_
