@@ -3,10 +3,56 @@
 	flex-direction: column;
 	width: $content-width;
 	margin: auto;
+	padding-bottom: 30px;
 }
 
 .edit-site-block-list-exploded__inserter > div {
 	display: flex;
-	margin: 20px auto;
+	margin: 30px auto;
 	width: fit-content;
+}
+
+.edit-site-block-list-exploded__item-container {
+	position: relative;
+
+	&.is-selected::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border: 2px solid var(--wp-admin-theme-color);
+	}
+}
+
+.edit-site-block-list-exploded__item-top-toolbar {
+	position: absolute;
+	top: -$block-toolbar-height - $grid-unit-20;
+	height: $block-toolbar-height;
+	background: var(--wp-admin-theme-color);
+	color: $white;
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	padding-left: $grid-unit-20;
+
+	.block-editor-block-mover__move-button-container {
+		background: transparent;
+		color: inherit;
+		border: none;
+
+		.components-button {
+			color: $white;
+		}
+
+
+		// TODO: Absorb these in the BlockMover component (outside of mobile).
+		.block-editor-block-mover-button.is-down-button svg {
+			bottom: 5px;
+		}
+		.block-editor-block-mover-button.is-up-button svg {
+			top: 5px;
+		}
+	}
 }

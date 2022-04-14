@@ -160,21 +160,23 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<BlockTools
-				className={ classnames( 'edit-site-visual-editor', {
-					'is-focus-mode': isTemplatePart,
-				} ) }
-				__unstableContentRef={ contentRef }
-				onClick={ ( event ) => {
-					// Clear selected block when clicking on the gray background.
-					if ( event.target === event.currentTarget ) {
-						clearSelectedBlock();
-					}
-				} }
-			>
-				<BlockEditorKeyboardShortcuts.Register />
-				<BackButton />
-				{ editorMode === 'visual' && (
+			{ editorMode === 'exploded' && <BlockListExploded /> }
+
+			{ editorMode === 'visual' && (
+				<BlockTools
+					className={ classnames( 'edit-site-visual-editor', {
+						'is-focus-mode': isTemplatePart,
+					} ) }
+					__unstableContentRef={ contentRef }
+					onClick={ ( event ) => {
+						// Clear selected block when clicking on the gray background.
+						if ( event.target === event.currentTarget ) {
+							clearSelectedBlock();
+						}
+					} }
+				>
+					<BlockEditorKeyboardShortcuts.Register />
+					<BackButton />
 					<ResizableEditor
 						// Reinitialize the editor and reset the states when the template changes.
 						key={ templateId }
@@ -194,23 +196,22 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 							}
 						/>
 					</ResizableEditor>
-				) }
-				{ editorMode === 'exploded' && <BlockListExploded /> }
-				<__unstableBlockSettingsMenuFirstItem>
-					{ ( { onClose } ) => (
-						<BlockInspectorButton onClick={ onClose } />
-					) }
-				</__unstableBlockSettingsMenuFirstItem>
-				<__unstableBlockToolbarLastItem>
-					<__unstableBlockNameContext.Consumer>
-						{ ( blockName ) =>
-							blockName === 'core/navigation' && (
-								<MaybeNavMenuSidebarToggle />
-							)
-						}
-					</__unstableBlockNameContext.Consumer>
-				</__unstableBlockToolbarLastItem>
-			</BlockTools>
+					<__unstableBlockSettingsMenuFirstItem>
+						{ ( { onClose } ) => (
+							<BlockInspectorButton onClick={ onClose } />
+						) }
+					</__unstableBlockSettingsMenuFirstItem>
+					<__unstableBlockToolbarLastItem>
+						<__unstableBlockNameContext.Consumer>
+							{ ( blockName ) =>
+								blockName === 'core/navigation' && (
+									<MaybeNavMenuSidebarToggle />
+								)
+							}
+						</__unstableBlockNameContext.Consumer>
+					</__unstableBlockToolbarLastItem>
+				</BlockTools>
+			) }
 			<ReusableBlocksMenuItems />
 		</BlockEditorProvider>
 	);

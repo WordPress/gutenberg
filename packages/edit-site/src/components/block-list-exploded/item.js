@@ -1,34 +1,42 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
 	store as blockEditorStore,
 	BlockPreview,
 	Inserter,
+	useBlockDisplayInformation,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { pure } from '@wordpress/compose';
 import { sprintf, __ } from '@wordpress/i18n';
-import { store as blocksStore } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import BlockListExplodedTopToolbar from './top-toolbar';
 
 function BlockListExplodedItem( { clientId } ) {
-	const { block, blockTitle } = useSelect(
+	const { block, isSelected } = useSelect(
 		( select ) => {
-			const { getBlock } = select( blockEditorStore );
-			const { getBlockType } = select( blocksStore );
-			const _block = getBlock( clientId );
-			const blockType = getBlockType( _block.name );
+			const { getBlock, isBlockSelected } = select( blockEditorStore );
 			return {
-				block: _block,
-				blockTitle: blockType?.title,
+				block: getBlock( clientId ),
+				isSelected: isBlockSelected( clientId ),
 			};
 		},
 		[ clientId ]
 	);
+	const { title } = useBlockDisplayInformation( clientId );
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
+	const blockLabel = sprintf( __( 'Block: %s' ), title );
 
 	return (
 		<div>
@@ -43,13 +51,23 @@ function BlockListExplodedItem( { clientId } ) {
 				/>
 			</div>
 			<div
-				role="button"
-				onClick={ () => selectBlock( clientId ) }
-				onKeyPress={ () => selectBlock( clientId ) }
-				aria-label={ blockLabel }
-				tabIndex={ 0 }
+				className={ classnames(
+					'edit-site-block-list-exploded__item-container',
+					{ 'is-selected': isSelected }
+				) }
 			>
-				<BlockPreview blocks={ [ block ] } />
+				{ isSelected && (
+					<BlockListExplodedTopToolbar clientId={ clientId } />
+				) }
+				<div
+					role="button"
+					onClick={ () => selectBlock( clientId ) }
+					onKeyPress={ () => selectBlock( clientId ) }
+					aria-label={ blockLabel }
+					tabIndex={ 0 }
+				>
+					<BlockPreview blocks={ [ block ] } />
+				</div>
 			</div>
 		</div>
 	);
