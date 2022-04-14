@@ -67,4 +67,9 @@
 			margin-top: 0.35em;
 		}
 	}
+
+	.comment-reply-title {
+		display: flex;
+		justify-content: space-between;
+	}
 }
