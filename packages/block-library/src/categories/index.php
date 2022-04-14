@@ -22,7 +22,7 @@ function render_block_core_categories( $attributes ) {
 		'orderby'      => 'name',
 		'show_count'   => ! empty( $attributes['showPostCounts'] ),
 		'title_li'     => '',
-		'hide_empty'   => ! empty( $attributes['showEmpty'] ),
+		'hide_empty'   => empty( $attributes['showEmpty'] ),
 	);
 	if ( ! empty( $attributes['showOnlyTopLevel'] ) && $attributes['showOnlyTopLevel'] ) {
 		$args['parent'] = 0;
