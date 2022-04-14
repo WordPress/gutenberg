@@ -47,7 +47,7 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 		// See https://developer.wordpress.org/reference/functions/comment_class/#parameters.
 		$comment_classes = comment_class( '', $comment->comment_ID, $comment->comment_post_ID, false );
 
-		$content .= sprintf( '<li %1$s>' . $block_content . '</li>', $comment_classes );
+		$content .= sprintf( '<li %1$s>%2$s</li>', $comment_classes, $block_content );
 	}
 
 	return $content;
