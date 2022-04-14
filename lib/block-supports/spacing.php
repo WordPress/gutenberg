@@ -58,15 +58,15 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 	$spacing_block_styles            = array();
 	$spacing_block_styles['padding'] = $has_padding_support && ! $skip_padding ? _wp_array_get( $block_styles, array( 'spacing', 'padding' ), null ) : null;
 	$spacing_block_styles['margin']  = $has_margin_support && ! $skip_margin ? _wp_array_get( $block_styles, array( 'spacing', 'margin' ), null ) : null;
-	$inline_styles                   = $style_engine->generate(
+	$styles                          = $style_engine->generate(
 		array( 'spacing' => $spacing_block_styles ),
 		array(
 			'inline' => true,
 		)
 	);
 
-	if ( ! empty( $inline_styles ) ) {
-		$attributes['style'] = $inline_styles;
+	if ( ! empty( $styles['css'] ) ) {
+		$attributes['style'] = $styles['css'];
 	}
 
 	return $attributes;

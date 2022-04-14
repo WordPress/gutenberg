@@ -13,11 +13,11 @@ require __DIR__ . '/../class-wp-style-engine.php';
  */
 class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
-	 * Tests generating styles based on various manifestations of the $block_styles argument.
+	 * Tests generating styles and classnames based on various manifestations of the $block_styles argument.
 	 *
-	 * @dataProvider data_generate_css_fixtures
+	 * @dataProvider data_generate_styles_fixtures
 	 */
-	function test_generate_css( $block_styles, $options, $expected_output ) {
+	function test_generate_styles( $block_styles, $options, $expected_output ) {
 		$style_engine     = wp_get_style_engine();
 		$generated_styles = $style_engine->generate(
 			$block_styles,
@@ -31,12 +31,12 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	public function data_generate_css_fixtures() {
+	public function data_generate_styles_fixtures() {
 		return array(
 			'default_return_value'                         => array(
 				'block_styles'    => array(),
 				'options'         => null,
-				'expected_output' => '',
+				'expected_output' => null,
 			),
 
 			'inline_invalid_block_styles_empty'            => array(
@@ -44,7 +44,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'options'         => array(
 					'inline' => true,
 				),
-				'expected_output' => '',
+				'expected_output' => null,
 			),
 
 			'inline_invalid_block_styles_unknown_style'    => array(
@@ -54,7 +54,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'options'         => array(
 					'inline' => true,
 				),
-				'expected_output' => '',
+				'expected_output' => array(),
 			),
 
 			'inline_invalid_block_styles_unknown_definition' => array(
@@ -64,7 +64,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'options'         => array(
 					'inline' => true,
 				),
-				'expected_output' => '',
+				'expected_output' => array(),
 			),
 
 			'inline_invalid_block_styles_unknown_property' => array(
@@ -76,11 +76,16 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'options'         => array(
 					'inline' => true,
 				),
-				'expected_output' => '',
+				'expected_output' => array(),
 			),
 
-			'inline_valid_style_string'                    => array(
+			'valid_inline_css_and_classnames'              => array(
 				'block_styles'    => array(
+					'color'   => array(
+						'text' => array(
+							'slug' => 'texas-flood',
+						),
+					),
 					'spacing' => array(
 						'margin' => '111px',
 					),
@@ -88,7 +93,10 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'options'         => array(
 					'inline' => true,
 				),
-				'expected_output' => 'margin: 111px;',
+				'expected_output' => array(
+					'css'        => 'margin: 111px;',
+					'classnames' => 'has-text-color has-texas-flood-color',
+				),
 			),
 
 			'inline_valid_box_model_style'                 => array(
@@ -111,7 +119,9 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'options'         => array(
 					'inline' => true,
 				),
-				'expected_output' => 'padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; margin-top: 12rem; margin-left: 2vh; margin-bottom: 2px; margin-right: 10em;',
+				'expected_output' => array(
+					'css' => 'padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; margin-top: 12rem; margin-left: 2vh; margin-bottom: 2px; margin-right: 10em;',
+				),
 			),
 
 			'inline_valid_typography_style'                => array(
@@ -130,48 +140,50 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'options'         => array(
 					'inline' => true,
 				),
-				'expected_output' => 'font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; font-weight: 800; line-height: 1.3; text-decoration: underline; text-transform: uppercase; letter-spacing: 2;',
+				'expected_output' => array(
+					'css' => 'font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; font-weight: 800; line-height: 1.3; text-decoration: underline; text-transform: uppercase; letter-spacing: 2;',
+				),
 			),
-		);
-	}
-
-	/**
-	 * Tests generating classnames based on various manifestations of the $block_styles argument.
-	 *
-	 * @dataProvider data_get_classnames_fixtures
-	 */
-	function test_get_classnames( $block_styles, $options, $expected_output ) {
-		$style_engine     = wp_get_style_engine();
-		$generated_styles = $style_engine->get_classnames(
-			$block_styles,
-			$options
-		);
-		$this->assertSame( $expected_output, $generated_styles );
-	}
-
-	/**
-	 * Data provider.
-	 *
-	 * @return array
-	 */
-	public function data_get_classnames_fixtures() {
-		return array(
-			'default_return_value'        => array(
-				'block_styles'    => array(),
-				'options'         => null,
-				'expected_output' => '',
-			),
-			'valid_classnames_use_schema' => array(
+			'valid_classnames_deduped'                     => array(
 				'block_styles'    => array(
+					'color'      => array(
+						'text'       => array(
+							'slug' => 'copper-socks',
+						),
+						'background' => array(
+							'slug' => 'splendid-carrot',
+						),
+						'gradient'   => array(
+							'slug' => 'like-wow-dude',
+						),
+					),
 					'typography' => array(
-						'fontSize'   => 'fantastic',
-						'fontFamily' => 'totally-awesome',
+						'fontSize'   => array(
+							'slug' => 'fantastic',
+						),
+						'fontFamily' => array(
+							'slug' => 'totally-awesome',
+						),
 					),
 				),
-				'options'         => array(
-					'use_schema' => true,
+				'options'         => array(),
+				'expected_output' => array(
+					'classnames' => 'has-text-color has-copper-socks-color has-background has-splendid-carrot-background-color has-like-wow-dude-gradient-background has-fantastic-font-size has-totally-awesome-font-family',
 				),
-				'expected_output' => 'has-fantastic-font-size has-totally-awesome-font-family',
+			),
+			'invalid_classnames_options'                   => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontSize'   => array(
+							'tomodachi' => 'friends',
+						),
+						'fontFamily' => array(
+							'oishii' => 'tasty',
+						),
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(),
 			),
 		);
 	}

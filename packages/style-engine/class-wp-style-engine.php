@@ -36,6 +36,32 @@ class WP_Style_Engine {
 	 *                    For example, `'padding' => 'array( 'top' => '1em' )` will return `array( 'padding-top' => '1em' )`
 	 */
 	const BLOCK_STYLE_DEFINITIONS_METADATA = array(
+		'color'      => array(
+			'text'       => array(
+				'property_key' => 'color',
+				'path'         => array( 'color', 'text' ),
+				'classnames'   => array(
+					'has-text-color' => true,
+					'has-%s-color'   => 'slug',
+				),
+			),
+			'background' => array(
+				'property_key' => 'background-color',
+				'path'         => array( 'color', 'background' ),
+				'classnames'   => array(
+					'has-background'          => true,
+					'has-%s-background-color' => 'slug',
+				),
+			),
+			'gradient'   => array(
+				'property_key' => 'background',
+				'path'         => array( 'color', 'gradient' ),
+				'classnames'   => array(
+					'has-background'             => true,
+					'has-%s-gradient-background' => 'slug',
+				),
+			),
+		),
 		'spacing'    => array(
 			'padding' => array(
 				'property_key' => 'padding',
@@ -48,14 +74,18 @@ class WP_Style_Engine {
 		),
 		'typography' => array(
 			'fontSize'       => array(
-				'property_key'     => 'font-size',
-				'path'             => array( 'typography', 'fontSize' ),
-				'classname_schema' => 'has-%s-font-size',
+				'property_key' => 'font-size',
+				'path'         => array( 'typography', 'fontSize' ),
+				'classnames'   => array(
+					'has-%s-font-size' => 'slug',
+				),
 			),
 			'fontFamily'     => array(
-				'property_key'     => 'font-family',
-				'path'             => array( 'typography', 'fontFamily' ),
-				'classname_schema' => 'has-%s-font-family',
+				'property_key' => 'font-family',
+				'path'         => array( 'typography', 'fontFamily' ),
+				'classnames'   => array(
+					'has-%s-font-family' => 'slug',
+				),
 			),
 			'fontStyle'      => array(
 				'property_key' => 'font-style',
@@ -100,66 +130,31 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns a CSS ruleset based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * Returns a classname.
 	 *
-	 * @param string|array  $style_value A single raw Gutenberg style attributes value for a CSS property.
-	 * @param array<string> $path        An array of strings representing a path to the style value.
-	 *
-	 * @return array A CSS ruleset compatible with generate().
-	 */
-	protected function get_block_style_css_rules( $style_value, $path ) {
-		$style_definition = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $path, null );
-
-		if ( ! empty( $style_definition ) ) {
-			// Style definitions can define a function to generate custom CSS rules.
-			if (
-				isset( $style_definition['value_func'] ) &&
-				is_callable( $style_definition['value_func'] )
-			) {
-				return call_user_func( $style_definition['value_func'], $style_value, $style_definition['property_key'] );
-			} else {
-				return static::get_css_rules( $style_value, $style_definition['property_key'] );
-			}
-		}
-
-		return array();
-	}
-
-	/**
-	 * Returns a classname built using a provided schema.
-	 *
-	 * @param array $block_styles An array of styles from a block's attributes.
-	 *                            Some values may contain slugs that need to be parsed using a schema.
+	 * @param array         $style            A single raw style from the generate() $block_styles array.
+	 * @param array<string> $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
 	 * @return string A CSS classname.
 	 */
-	public function get_classnames( $block_styles ) {
-		$output = '';
-
-		if ( empty( $block_styles ) ) {
-			return $output;
-		}
-
+	protected static function get_classnames( $style, $style_definition ) {
 		$classnames = array();
-		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
-			foreach ( $definition_group as $style_definition ) {
-				$classname_value = _wp_array_get( $block_styles, $style_definition['path'], null );
 
-				if ( empty( $classname_value ) ) {
-					continue;
+		if ( ! empty( $style_definition['classnames'] ) ) {
+			foreach ( $style_definition['classnames'] as $classname => $property ) {
+				if ( true === $property ) {
+					$classnames[] = $classname;
+				} elseif ( isset( $style[ $property ] ) ) {
+					// Right now we expect a classname pattern to be stored in BLOCK_STYLE_DEFINITIONS_METADATA.
+					// One day, if there are no stored schemata, we could allow custom patterns or
+					// generate classnames based on other properties
+					// such as a path or a value or a prefix passed in options.
+					$classnames[] = sprintf( $classname, _wp_to_kebab_case( $style[ $property ] ) );
 				}
-
-				$classname_value  = _wp_to_kebab_case( $classname_value );
-				$style_definition = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition['path'], null );
-				// Right now we expect a classname pattern to be stored in BLOCK_STYLE_DEFINITIONS_METADATA.
-				// One day, if there are no stored schemata, we could allow custom patterns or
-				// generate classnames based on other properties
-				// such as a path or a value or a prefix passed in options.
-				$classnames[] = isset( $style_definition['classname_schema'] ) ? sprintf( $style_definition['classname_schema'], $classname_value ) : $classname_value;
 			}
 		}
 
-		return implode( ' ', $classnames );
+		return $classnames;
 	}
 
 	/**
@@ -169,43 +164,67 @@ class WP_Style_Engine {
 	 * @param array $block_styles An array of styles from a block's attributes.
 	 * @param array $options = array(
 	 *     'inline' => (boolean) Whether to return inline CSS rules destined to be inserted in an HTML `style` attribute.
-	 *     'path'   => (array)   Specify a block style to generate, otherwise it'll try all in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 * );.
 	 *
-	 * @return string A CSS ruleset formatted to be placed in an HTML `style` attribute.
+	 * @return array|null array(
+	 *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
+	 *     'classnames' => (string) Classnames separated by a space.
+	 * );
 	 */
 	public function generate( $block_styles, $options = array() ) {
-		$output = '';
-
 		if ( empty( $block_styles ) ) {
-			return $output;
+			return null;
 		}
 
-		$rules = array();
+		$css_rules     = array();
+		$classnames    = array();
+		$styles_output = array();
 
+		// Collect CSS and classnames.
 		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
 			foreach ( $definition_group as $style_definition ) {
-				$style_value = _wp_array_get( $block_styles, $style_definition['path'], null );
-				if ( empty( $style_value ) ) {
+				$style = _wp_array_get( $block_styles, $style_definition['path'], null );
+
+				if ( empty( $style ) ) {
 					continue;
 				}
-				$rules = array_merge( $rules, $this->get_block_style_css_rules( $style_value, $style_definition['path'] ) );
+
+				// If there's no value property, we run with the assumption that $style _is_ the value.
+				$style_value = isset( $style['value'] ) ? $style['value'] : $style;
+
+				// If required in the future, style definitions could define a callable `value_func` to generate custom CSS rules.
+				if ( ! empty( $style_value ) ) {
+					$css_rules = array_merge( $css_rules, static::get_css_rules( $style_value, $style_definition['property_key'] ) );
+				}
+
+				// Classnames expect an array value for slug or other metadata required to build the classname.
+				$classnames = array_merge( $classnames, static::get_classnames( $style, $style_definition ) );
 			}
 		}
 
-		if ( ! empty( $rules ) ) {
+		// Build CSS rules output.
+		$css_output = '';
+		if ( ! empty( $css_rules ) ) {
 			// Generate inline style rules.
 			if ( isset( $options['inline'] ) && true === $options['inline'] ) {
-				foreach ( $rules as $rule => $value ) {
+				foreach ( $css_rules as $rule => $value ) {
 					$filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
 					if ( ! empty( $filtered_css ) ) {
-						$output .= $filtered_css . '; ';
+						$css_output .= $filtered_css . '; ';
 					}
 				}
 			}
 		}
 
-		return trim( $output );
+		if ( ! empty( $css_output ) ) {
+			$styles_output['css'] = trim( $css_output );
+		}
+
+		if ( ! empty( $classnames ) ) {
+			$styles_output['classnames'] = implode( ' ', array_unique( $classnames ) );
+		}
+
+		return $styles_output;
 	}
 
 	/**
@@ -218,7 +237,7 @@ class WP_Style_Engine {
 	 *
 	 * @return array The class name for the added style.
 	 */
-	public static function get_css_rules( $style_value, $style_property ) {
+	protected static function get_css_rules( $style_value, $style_property ) {
 		$rules = array();
 
 		if ( ! $style_value ) {
@@ -233,6 +252,7 @@ class WP_Style_Engine {
 		} else {
 			$rules[ $style_property ] = $style_value;
 		}
+
 		return $rules;
 	}
 }
