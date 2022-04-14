@@ -15,6 +15,10 @@
 function block_core_comment_template_render_comments( $comments, $block ) {
 	global $comment_depth;
 
+	if ( empty( $comment_depth ) ) {
+		$comment_depth = 1;
+	}
+
 	$content = '';
 	foreach ( $comments as $comment ) {
 
@@ -61,8 +65,6 @@ function block_core_comment_template_render_comments( $comments, $block ) {
  * defined by the block's inner blocks.
  */
 function render_block_core_comment_template( $attributes, $content, $block ) {
-	global $comment_depth;
-
 	// Bail out early if the post ID is not set for some reason.
 	if ( empty( $block->context['postId'] ) ) {
 		return '';
@@ -85,8 +87,6 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
-
-	$comment_depth = 1;
 
 	return sprintf(
 		'<ol %1$s>%2$s</ol>',
