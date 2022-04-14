@@ -15,7 +15,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { pure } from '@wordpress/compose';
 import { sprintf, __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,6 +24,7 @@ import BlockListExplodedTopToolbar from './top-toolbar';
 import { store as editSiteStore } from '../../store';
 
 function BlockListExplodedItem( { clientId } ) {
+	const blockWrapper = useRef();
 	const { block, isSelected } = useSelect(
 		( select ) => {
 			const { getBlock, isBlockSelected } = select( blockEditorStore );
@@ -43,6 +44,12 @@ function BlockListExplodedItem( { clientId } ) {
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), title );
 	const blocksToPreview = useMemo( () => [ block ], [ block ] );
+
+	useEffect( () => {
+		if ( isSelected ) {
+			blockWrapper.current.focus();
+		}
+	}, [ isSelected ] );
 
 	return (
 		<div>
@@ -66,6 +73,7 @@ function BlockListExplodedItem( { clientId } ) {
 					<BlockListExplodedTopToolbar clientId={ clientId } />
 				) }
 				<div
+					ref={ blockWrapper }
 					role="button"
 					onClick={ ( event ) => {
 						if ( event.detail === 1 ) {
