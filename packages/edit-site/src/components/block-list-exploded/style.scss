@@ -1,0 +1,12 @@
+.edit-site-block-list-exploded {
+	display: flex;
+	flex-direction: column;
+	width: $content-width;
+	margin: auto;
+}
+
+.edit-site-block-list-exploded__inserter > div {
+	display: flex;
+	margin: 20px auto;
+	width: fit-content;
+}

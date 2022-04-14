@@ -21,8 +21,6 @@ import {
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
 	__unstableBlockNameContext,
-	BlockPreview,
-	Inserter,
 } from '@wordpress/block-editor';
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
@@ -42,6 +40,7 @@ import BlockInspectorButton from './block-inspector-button';
 import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
+import BlockListExploded from '../block-list-exploded';
 
 const LAYOUT = {
 	type: 'default',
@@ -196,25 +195,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						/>
 					</ResizableEditor>
 				) }
-				{ editorMode === 'exploded' && (
-					<div className="edit-site-block-editor__block-list-exploded">
-						{ blocks.map( ( block ) => (
-							<div key={ block.clientId }>
-								<div
-									className="edit-site-block-editor__block-list-exploded-inserter"
-									key={ block.clientId }
-								>
-									<Inserter
-										clientId={ block.clientId }
-										__experimentalIsQuick
-										isPrimary
-									/>
-								</div>
-								<BlockPreview blocks={ [ block ] } />
-							</div>
-						) ) }
-					</div>
-				) }
+				{ editorMode === 'exploded' && <BlockListExploded /> }
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />
