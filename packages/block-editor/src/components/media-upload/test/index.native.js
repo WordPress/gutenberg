@@ -17,9 +17,11 @@ import {
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 	MEDIA_TYPE_AUDIO,
+	OPTION_CHOOSE_FROM_DEVICE,
 	OPTION_TAKE_VIDEO,
 	OPTION_TAKE_PHOTO,
 	OPTION_INSERT_FROM_URL,
+	OPTION_WORDPRESS_MEDIA_LIBRARY,
 } from '../index';
 
 const MEDIA_URL = 'http://host.media.type';
@@ -33,14 +35,14 @@ describe( 'MediaUpload component', () => {
 		expect( wrapper ).toBeTruthy();
 	} );
 
-	it( 'shows right media capture option for media type', () => {
+	describe( 'Media capture options for different media block types', () => {
 		const expectOptionForMediaType = ( mediaType, expectedOption ) => {
 			const wrapper = render(
 				<MediaUpload
 					allowedTypes={ [ mediaType ] }
 					render={ ( { open, getMediaOptions } ) => {
 						return (
-							<>
+							<>            
 								<TouchableWithoutFeedback onPress={ open }>
 									<Text>Open Picker</Text>
 								</TouchableWithoutFeedback>
@@ -52,11 +54,33 @@ describe( 'MediaUpload component', () => {
 			);
 			fireEvent.press( wrapper.getByText( 'Open Picker' ) );
 
-			wrapper.getByText( expectedOption );
+			wrapper.findByText( expectedOption );
 		};
-		expectOptionForMediaType( MEDIA_TYPE_IMAGE, OPTION_TAKE_PHOTO );
-		expectOptionForMediaType( MEDIA_TYPE_VIDEO, OPTION_TAKE_VIDEO );
-		expectOptionForMediaType( MEDIA_TYPE_AUDIO, OPTION_INSERT_FROM_URL );
+
+		it( 'shows the correct media capture options for the Image block', () => {
+			expectOptionForMediaType( MEDIA_TYPE_IMAGE, [
+				OPTION_CHOOSE_FROM_DEVICE,
+				OPTION_TAKE_PHOTO,
+				OPTION_WORDPRESS_MEDIA_LIBRARY,
+				OPTION_INSERT_FROM_URL,
+			] );
+		} );
+
+		it( 'shows the correct media capture options for the Video block', () => {
+			expectOptionForMediaType( MEDIA_TYPE_VIDEO, [
+				OPTION_CHOOSE_FROM_DEVICE,
+				OPTION_TAKE_VIDEO,
+				OPTION_WORDPRESS_MEDIA_LIBRARY,
+				OPTION_INSERT_FROM_URL,
+			] );
+		} );
+
+		it( 'shows the correct media capture options for the Audio block', () => {
+			expectOptionForMediaType( MEDIA_TYPE_AUDIO, [
+				OPTION_WORDPRESS_MEDIA_LIBRARY,
+				OPTION_INSERT_FROM_URL,
+			] );
+		} );
 	} );
 
 	const expectMediaPickerForOption = (

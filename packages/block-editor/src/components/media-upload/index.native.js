@@ -37,8 +37,10 @@ export const MEDIA_TYPE_ANY = 'any';
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
+export const OPTION_CHOOSE_FROM_DEVICE = __( 'Choose from Device' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 export const OPTION_INSERT_FROM_URL = __( 'Insert from URL' );
+export const OPTION_WORDPRESS_MEDIA_LIBRARY = __( 'WordPress Media Library' );
 
 const URL_MEDIA_SOURCE = 'URL';
 
