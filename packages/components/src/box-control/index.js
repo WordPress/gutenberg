@@ -48,7 +48,7 @@ function useUniqueId( idProp ) {
 }
 export default function BoxControl( {
 	id: idProp,
-	inputProps = defaultInputProps,
+	inputProps,
 	onChange = noop,
 	onChangeShowVisualizer = noop,
 	label = __( 'Box Control' ),
@@ -59,6 +59,8 @@ export default function BoxControl( {
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
 } ) {
+	inputProps = label === __( 'Margin' ) ? -Infinity : defaultInputProps;
+
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
 	} );
