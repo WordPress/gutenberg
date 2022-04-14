@@ -20,6 +20,7 @@ import { sprintf, __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockListExplodedTopToolbar from './top-toolbar';
+import { store as editSiteStore } from '../../store';
 
 function BlockListExplodedItem( { clientId } ) {
 	const { block, isSelected } = useSelect(
@@ -34,6 +35,9 @@ function BlockListExplodedItem( { clientId } ) {
 	);
 	const { title } = useBlockDisplayInformation( clientId );
 	const { selectBlock } = useDispatch( blockEditorStore );
+	// If the exploded list becomes part of block-editor
+	// This mode also need to move into the block-editor store.
+	const { switchEditorMode } = useDispatch( editSiteStore );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), title );
@@ -61,7 +65,13 @@ function BlockListExplodedItem( { clientId } ) {
 				) }
 				<div
 					role="button"
-					onClick={ () => selectBlock( clientId ) }
+					onClick={ ( event ) => {
+						if ( event.detail === 1 ) {
+							selectBlock( clientId );
+						} else if ( event.detail === 2 ) {
+							switchEditorMode( 'visual' );
+						}
+					} }
 					onKeyPress={ () => selectBlock( clientId ) }
 					aria-label={ blockLabel }
 					tabIndex={ 0 }
