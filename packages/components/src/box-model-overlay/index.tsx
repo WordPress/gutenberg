@@ -2,7 +2,6 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-import type { ReactElement, RefObject } from 'react';
 
 /**
  * WordPress dependencies
@@ -22,34 +21,14 @@ import {
  * Internal dependencies
  */
 import Popover from '../popover';
+import type {
+	BoxModelOverlayProps,
+	BoxModelOverlayPropsWithChildren,
+	BoxModelOverlayPropsWithTargetRef,
+	BoxModelOverlayHandle,
+} from './types';
 
-type BoxModelSides = 'top' | 'right' | 'bottom' | 'left';
-
-interface BoxModelOverlayHandle {
-	update: () => void;
-}
-
-interface BoxModelOverlayBaseProps {
-	showValues: {
-		margin?: {
-			[ side in BoxModelSides ]?: boolean;
-		};
-		padding?: {
-			[ side in BoxModelSides ]?: boolean;
-		};
-	};
-}
-interface BoxModelOverlayPropsWithTargetRef extends BoxModelOverlayBaseProps {
-	targetRef: RefObject< HTMLElement >;
-}
-interface BoxModelOverlayPropsWithChildren extends BoxModelOverlayBaseProps {
-	children: ReactElement;
-}
-type BoxModelOverlayProps =
-	| BoxModelOverlayPropsWithTargetRef
-	| BoxModelOverlayPropsWithChildren;
-
-const DEFAULT_SHOW_VALUES: BoxModelOverlayBaseProps[ 'showValues' ] = {};
+const DEFAULT_SHOW_VALUES: BoxModelOverlayProps[ 'showValues' ] = {};
 
 // Copied from Chrome's DevTools: https://github.com/ChromeDevTools/devtools-frontend/blob/088a8f175bd58f2e0e2d492e991a3253124d7c11/front_end/core/common/Color.ts#L931
 const MARGIN_COLOR = 'rgba( 246, 178, 107, 0.66 )';
@@ -69,9 +48,12 @@ const OverlayPopover = styled( Popover )`
 		&::before {
 			content: '';
 			display: block;
+			position: absolute;
 			box-sizing: border-box;
-			height: 100%;
-			width: 100%;
+			height: var( --wp-box-model-overlay-height );
+			width: var( --wp-box-model-overlay-width );
+			top: var( --wp-box-model-overlay-top );
+			left: var( --wp-box-model-overlay-left );
 			border-color: ${ PADDING_COLOR };
 			border-style: solid;
 			border-width: var( --wp-box-model-overlay-padding-top )
@@ -112,6 +94,10 @@ const BoxModelOverlayWithRef = forwardRef<
 			marginRight,
 			marginBottom,
 			marginLeft,
+			borderTopWidth,
+			borderRightWidth,
+			borderBottomWidth,
+			borderLeftWidth,
 		} = defaultView.getComputedStyle( target );
 
 		overlay.style.height = `${ domRect.height }px`;
@@ -144,6 +130,32 @@ const BoxModelOverlayWithRef = forwardRef<
 		}px), calc(-50% + ${
 			( borderWidths.bottom - borderWidths.top ) / 2
 		}px))`;
+
+		// Set pseudo element's position to take account for borders.
+		overlay.style.setProperty(
+			'--wp-box-model-overlay-height',
+			`${
+				domRect.height -
+				parseInt( borderTopWidth, 10 ) -
+				parseInt( borderBottomWidth, 10 )
+			}px`
+		);
+		overlay.style.setProperty(
+			'--wp-box-model-overlay-width',
+			`${
+				domRect.width -
+				parseInt( borderLeftWidth, 10 ) -
+				parseInt( borderRightWidth, 10 )
+			}px`
+		);
+		overlay.style.setProperty(
+			'--wp-box-model-overlay-top',
+			borderTopWidth
+		);
+		overlay.style.setProperty(
+			'--wp-box-model-overlay-left',
+			borderLeftWidth
+		);
 
 		// Setting padding values via CSS custom properties so that they can
 		// be applied in the pseudo elements.
