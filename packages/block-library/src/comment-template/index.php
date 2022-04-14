@@ -10,14 +10,10 @@
  *
  * @param WP_Comment[] $comments        The array of comments.
  * @param WP_Block     $block           Block instance.
- * @param int          $depth           Depth of the current comment. We need to
- * keep keep track of this to add the `depth-*` class to comments at different
- * levels using `comment_class()`.
  * @return string
  */
-function block_core_comment_template_render_comments( $comments, $block, $depth = 1 ) {
+function block_core_comment_template_render_comments( $comments, $block ) {
 	global $comment_depth;
-	$comment_depth = $depth;
 
 	$content = '';
 	foreach ( $comments as $comment ) {
@@ -34,22 +30,19 @@ function block_core_comment_template_render_comments( $comments, $block, $depth 
 		// If the comment has children, recurse to create the HTML for the nested
 		// comments.
 		if ( ! empty( $children ) ) {
+			$comment_depth += 1;
 			$inner_content  = block_core_comment_template_render_comments(
 				$children,
 				$block,
-				$depth + 1
 			);
 			$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
+			$comment_depth -= 1;
 		}
 
 		$comment_classes = comment_class( '', $comment->comment_ID, $comment->comment_post_ID, false );
 
 		$content .= sprintf( '<li %1$s>' . $block_content . '</li>', $comment_classes );
 	}
-
-	// Because $comment_depth is passed as a global, we need to reset before
-	// returning from the function.
-	$comment_depth = $comment_depth - 1;
 
 	return $content;
 
@@ -66,6 +59,8 @@ function block_core_comment_template_render_comments( $comments, $block, $depth 
  * defined by the block's inner blocks.
  */
 function render_block_core_comment_template( $attributes, $content, $block ) {
+	global $comment_depth;
+
 	// Bail out early if the post ID is not set for some reason.
 	if ( empty( $block->context['postId'] ) ) {
 		return '';
@@ -89,10 +84,12 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 
+	$comment_depth = 1;
+
 	return sprintf(
 		'<ol %1$s>%2$s</ol>',
 		$wrapper_attributes,
-		block_core_comment_template_render_comments( $comments, $block, 1 )
+		block_core_comment_template_render_comments( $comments, $block )
 	);
 }
 
