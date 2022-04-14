@@ -46,7 +46,6 @@ const TEMPLATE = [
 	[
 		'core/paragraph',
 		{
-			fontSize: 'large',
 			placeholder: _x( 'Content…', 'content placeholder' ),
 		},
 	],
