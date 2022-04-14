@@ -144,29 +144,27 @@ class WP_Style_Engine {
 			return $classnames;
 		}
 
-		// Remove falsy values.
-		$filtered_style = array_filter(
-			$style,
-			function( $value ) {
-				return ! empty( $value );
-			}
-		);
+		$required_classnames = array();
 
 		if ( ! empty( $style_definition['classnames'] ) ) {
 			foreach ( $style_definition['classnames'] as $classname => $property ) {
-				// Only add the required classname if there's a valid style value or classname slug.
-				if ( true === $property && ! empty( $filtered_style ) ) {
-					$classnames[] = $classname;
+				if ( true === $property ) {
+					$required_classnames[] = $classname;
 				}
 
-				if ( isset( $filtered_style[ $property ] ) ) {
+				if ( isset( $style[ $property ] ) ) {
 					// Right now we expect a classname pattern to be stored in BLOCK_STYLE_DEFINITIONS_METADATA.
 					// One day, if there are no stored schemata, we could allow custom patterns or
 					// generate classnames based on other properties
 					// such as a path or a value or a prefix passed in options.
-					$classnames[] = sprintf( $classname, _wp_to_kebab_case( $filtered_style[ $property ] ) );
+					$classnames[] = sprintf( $classname, _wp_to_kebab_case( $style[ $property ] ) );
 				}
 			}
+		}
+
+		// Only add the required classnames if there's a valid style value or classname slug.
+		if ( ! empty( $required_classnames ) && ( $style['value'] || ! empty( $classnames ) ) ) {
+			$classnames = array_merge( $required_classnames, $classnames );
 		}
 
 		return $classnames;

@@ -176,6 +176,20 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'classnames' => 'has-text-color',
 				),
 			),
+			'invalid_classnames_slug_key'                  => array(
+				'block_styles'    => array(
+					'color' => array(
+						'text'       => array(
+							'cheese' => 'pizza',
+						),
+						'background' => array(
+							'tomato' => 'sauce',
+						),
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(),
+			),
 			'invalid_classnames_options'                   => array(
 				'block_styles'    => array(
 					'typography' => array(
