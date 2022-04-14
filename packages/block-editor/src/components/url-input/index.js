@@ -455,6 +455,7 @@ class URLInput extends Component {
 			placeholder,
 			onKeyDown: this.onKeyDown,
 			role: 'combobox',
+			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
 			'aria-autocomplete': 'list',
 			'aria-owns': suggestionsListboxId,
@@ -464,11 +465,6 @@ class URLInput extends Component {
 					: undefined,
 			ref: this.inputRef,
 		};
-
-		// Set aria-label automatically if no discrete label specified
-		if ( ! label ) {
-			inputProps[ 'aria-label' ] = __( 'URL' );
-		}
 
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
