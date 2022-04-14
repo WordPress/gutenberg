@@ -27,7 +27,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 
 	ob_start();
 	comment_form( array(), $block->context['postId'] );
-	$form               = ob_get_clean();
+	$form = ob_get_clean();
 
 	// We use the outermost wrapping `<div />` returned by `comment_form()`
 	// which is identified by its default classname `comment-respond` to inject
