@@ -42,7 +42,7 @@ describe( 'MediaUpload component', () => {
 					allowedTypes={ [ mediaType ] }
 					render={ ( { open, getMediaOptions } ) => {
 						return (
-							<>            
+							<>
 								<TouchableWithoutFeedback onPress={ open }>
 									<Text>Open Picker</Text>
 								</TouchableWithoutFeedback>
