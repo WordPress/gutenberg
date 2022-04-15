@@ -16,12 +16,14 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
+import { store as blockEditorStore } from '../../store';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -164,10 +166,65 @@ async function loadScript( head, { id, src } ) {
 	} );
 }
 
+function useExplodedModeBackgroundStyles( isExplodedMode, deps = [] ) {
+	return useRefEffect(
+		( node ) => {
+			if ( ! isExplodedMode ) {
+				return;
+			}
+
+			let bodyStyleElement = node.querySelector(
+				'#body-reset-background'
+			);
+			if ( ! bodyStyleElement ) {
+				bodyStyleElement = node.ownerDocument.createElement( 'style' );
+				bodyStyleElement.id = 'body-reset-background';
+				node.prepend( bodyStyleElement );
+			}
+			bodyStyleElement.textContent = '';
+
+			let copiedStylesElement = node.querySelector(
+				'#body-background-copied-styles'
+			);
+			if ( ! copiedStylesElement ) {
+				copiedStylesElement = node.ownerDocument.createElement(
+					'style'
+				);
+				copiedStylesElement.id = 'body-background-copied-styles';
+				node.prepend( copiedStylesElement );
+			}
+			copiedStylesElement.textContent = '';
+
+			const styles = window.getComputedStyle( node.ownerDocument.body );
+			const newBackgroundStyles = Object.values( styles )
+				.filter( ( propertyName ) => {
+					return propertyName.indexOf( 'background' ) === 0;
+				} )
+				.map(
+					( propertyName ) =>
+						`${ propertyName }:${ styles.getPropertyValue(
+							propertyName
+						) };`
+				)
+				.join( '' );
+
+			copiedStylesElement.innerHTML = `:where( .is-root-container.is-exploded-mode > .wp-block ) { ${ newBackgroundStyles } }`;
+			bodyStyleElement.innerHTML =
+				'body { background: gray !important; }';
+		},
+		[ ...deps, isExplodedMode ]
+	);
+}
+
 function Iframe(
 	{ contentRef, children, head, tabIndex = 0, assets, ...props },
 	ref
 ) {
+	const isExplodedMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__unstableGetEditorMode() === 'exploded',
+		[]
+	);
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -212,19 +269,27 @@ function Iframe(
 
 		return () => node.removeEventListener( 'load', setDocumentIfReady );
 	}, [] );
-	const headRef = useRefEffect( ( element ) => {
-		scripts
-			.reduce(
-				( promise, script ) =>
-					promise.then( () => loadScript( element, script ) ),
-				Promise.resolve()
-			)
-			.finally( () => {
-				// When script are loaded, re-render blocks to allow them
-				// to initialise.
-				forceRender();
-			} );
-	}, [] );
+
+	const headBackgroundStylesRef = useExplodedModeBackgroundStyles(
+		isExplodedMode,
+		[ head ]
+	);
+	const headRef = useMergeRefs( [
+		useRefEffect( ( element ) => {
+			scripts
+				.reduce(
+					( promise, script ) =>
+						promise.then( () => loadScript( element, script ) ),
+					Promise.resolve()
+				)
+				.finally( () => {
+					// When script are loaded, re-render blocks to allow them
+					// to initialise.
+					forceRender();
+				} );
+		}, [] ),
+		headBackgroundStylesRef,
+	] );
 	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
 	const styleCompatibilityRef = useStylesCompatibility();
 

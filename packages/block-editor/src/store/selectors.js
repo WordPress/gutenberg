@@ -2541,7 +2541,18 @@ function getReusableBlocks( state ) {
  * @return {boolean} Is navigation mode enabled.
  */
 export function isNavigationMode( state ) {
-	return state.isNavigationMode;
+	return state.editorMode === 'navigation';
+}
+
+/**
+ * Returns the current editor mode.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} the editor mode.
+ */
+export function __unstableGetEditorMode( state ) {
+	return state.editorMode;
 }
 
 /**
