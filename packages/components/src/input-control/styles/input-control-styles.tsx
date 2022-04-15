@@ -210,7 +210,7 @@ export const Input = styled.input< InputProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.black };
+		color: ${ COLORS.gray[ 900 ] };
 		display: block;
 		font-family: inherit;
 		margin: 0;
