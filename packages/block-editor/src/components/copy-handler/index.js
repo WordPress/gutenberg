@@ -125,10 +125,10 @@ export function useClipboardHandler() {
 			event.preventDefault();
 
 			const isSelectionMergeable = __unstableIsSelectionMergeable();
-			const handleWholeBlocks =
+			const shouldHandleWholeBlocks =
 				__unstableIsSelectionCollapsed() || __unstableIsFullySelected();
 			const expandSelectionIsNeeded =
-				! handleWholeBlocks && ! isSelectionMergeable;
+				! shouldHandleWholeBlocks && ! isSelectionMergeable;
 			if ( event.type === 'copy' || event.type === 'cut' ) {
 				if ( selectedBlockClientIds.length === 1 ) {
 					flashBlock( selectedBlockClientIds[ 0 ] );
@@ -141,7 +141,7 @@ export function useClipboardHandler() {
 					notifyCopy( event.type, selectedBlockClientIds );
 					let blocks;
 					// Check if we have partial selection.
-					if ( handleWholeBlocks ) {
+					if ( shouldHandleWholeBlocks ) {
 						blocks = getBlocksByClientId( selectedBlockClientIds );
 					} else {
 						const [
@@ -167,7 +167,7 @@ export function useClipboardHandler() {
 				// We need to also check if at the start we needed to
 				// expand the selection, as in this point we might have
 				// programmatically fully selected the blocks above.
-				if ( handleWholeBlocks && ! expandSelectionIsNeeded ) {
+				if ( shouldHandleWholeBlocks && ! expandSelectionIsNeeded ) {
 					removeBlocks( selectedBlockClientIds );
 				} else {
 					__unstableDeleteSelection();
