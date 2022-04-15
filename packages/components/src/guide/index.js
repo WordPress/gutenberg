@@ -28,8 +28,6 @@ export default function Guide( {
 	pages = [],
 } ) {
 	const guideContainer = useRef();
-	const nextButton = useRef();
-	const finishButton = useRef();
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
 	useEffect( () => {
@@ -42,23 +40,9 @@ export default function Guide( {
 	}, [ children ] );
 
 	useEffect( () => {
-		const hasLostFocus = ! guideContainer.current.contains(
-			guideContainer.current.ownerDocument.activeElement
-		);
-
-		// Keeping the focus within the guide when the page changes
-		// prevents the modal from closing and avoids focus loss.
-		if ( ! hasLostFocus ) {
-			return;
-		}
-
-		if ( nextButton.current ) {
-			nextButton.current.focus();
-		} else if ( finishButton.current ) {
-			finishButton.current.focus();
-		} else {
-			focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
-		}
+		// Each time we change the current page, start from the first element of the page.
+		// This also solves any focus loss that can happen.
+		focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
 	}, [ currentPage ] );
 
 	if ( Children.count( children ) ) {
@@ -96,8 +80,9 @@ export default function Guide( {
 					goForward();
 				}
 			} }
+			ref={ guideContainer }
 		>
-			<div className="components-guide__container" ref={ guideContainer }>
+			<div className="components-guide__container">
 				<div className="components-guide__page">
 					{ pages[ currentPage ].image }
 
@@ -125,7 +110,6 @@ export default function Guide( {
 						<Button
 							className="components-guide__forward-button"
 							onClick={ goForward }
-							ref={ nextButton }
 						>
 							{ __( 'Next' ) }
 						</Button>
@@ -134,7 +118,6 @@ export default function Guide( {
 						<Button
 							className="components-guide__finish-button"
 							onClick={ onFinish }
-							ref={ finishButton }
 						>
 							{ finishButtonText || __( 'Finish' ) }
 						</Button>
