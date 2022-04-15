@@ -141,10 +141,7 @@ const BlockMoverButton = forwardRef(
 					onClick={ isDisabled ? null : onClick }
 					aria-disabled={ isDisabled }
 				/>
-				<VisuallyHidden
-					id={ descriptionId }
-					className="block-editor-block-mover-button__description"
-				>
+				<VisuallyHidden id={ descriptionId }>
 					{ getBlockMoverDescription(
 						blocksCount,
 						blockType && blockType.title,
