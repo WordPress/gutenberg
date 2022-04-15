@@ -70,7 +70,7 @@ export function useHeading(
 	}
 
 	const textProps = useText( {
-		color: COLORS.darkGray.heading,
+		color: COLORS.gray[ 900 ],
 		size: getHeadingFontSize( level ),
 		isBlock: true,
 		weight: CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],

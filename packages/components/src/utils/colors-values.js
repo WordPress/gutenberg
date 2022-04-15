@@ -29,9 +29,6 @@ export const G2 = {
 		200: '#e0e0e0', // Used sparingly for light borders.
 		100: '#f0f0f0', // Used for light gray backgrounds.
 	},
-	darkGray: {
-		heading: '#050505',
-	},
 	mediumGray: {
 		text: '#757575',
 	},
@@ -162,7 +159,7 @@ export const UI = {
 // Using Object.assign instead of { ...spread } syntax helps TypeScript
 // to extract the correct type defs here.
 export const COLORS = Object.assign( {}, BASE, {
-	darkGray: merge( {}, DARK_GRAY, G2.darkGray ),
+	darkGray: DARK_GRAY,
 	darkOpacity: DARK_OPACITY,
 	darkOpacityLight: DARK_OPACITY_LIGHT,
 	mediumGray: G2.mediumGray,
