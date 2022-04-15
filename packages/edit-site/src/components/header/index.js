@@ -25,6 +25,7 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
+import ThemeUpdater from './theme-udpdater';
 import { store as editSiteStore } from '../../store';
 
 const preventDefault = ( event ) => {
@@ -172,6 +173,7 @@ export default function Header( {
 
 			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
+					<ThemeUpdater />
 					{ ! isFocusMode && (
 						<PreviewOptions
 							deviceType={ deviceType }
