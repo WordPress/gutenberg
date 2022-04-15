@@ -79,6 +79,7 @@ export function useClipboardHandler() {
 		hasMultiSelection,
 		getSettings,
 		__unstableIsFullySelected,
+		__unstableIsSelectionCollapsed,
 		__unstableIsSelectionMergeable,
 		__unstableGetSelectedBlocksWithPartialSelection,
 	} = useSelect( blockEditorStore );
@@ -123,10 +124,11 @@ export function useClipboardHandler() {
 			const eventDefaultPrevented = event.defaultPrevented;
 			event.preventDefault();
 
-			const isFullySelected = __unstableIsFullySelected();
 			const isSelectionMergeable = __unstableIsSelectionMergeable();
+			const shouldHandleWholeBlocks =
+				__unstableIsSelectionCollapsed() || __unstableIsFullySelected();
 			const expandSelectionIsNeeded =
-				! isFullySelected && ! isSelectionMergeable;
+				! shouldHandleWholeBlocks && ! isSelectionMergeable;
 			if ( event.type === 'copy' || event.type === 'cut' ) {
 				if ( selectedBlockClientIds.length === 1 ) {
 					flashBlock( selectedBlockClientIds[ 0 ] );
@@ -139,7 +141,7 @@ export function useClipboardHandler() {
 					notifyCopy( event.type, selectedBlockClientIds );
 					let blocks;
 					// Check if we have partial selection.
-					if ( isFullySelected ) {
+					if ( shouldHandleWholeBlocks ) {
 						blocks = getBlocksByClientId( selectedBlockClientIds );
 					} else {
 						const [
@@ -165,7 +167,7 @@ export function useClipboardHandler() {
 				// We need to also check if at the start we needed to
 				// expand the selection, as in this point we might have
 				// programmatically fully selected the blocks above.
-				if ( isFullySelected && ! expandSelectionIsNeeded ) {
+				if ( shouldHandleWholeBlocks && ! expandSelectionIsNeeded ) {
 					removeBlocks( selectedBlockClientIds );
 				} else {
 					__unstableDeleteSelection();
