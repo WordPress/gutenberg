@@ -211,6 +211,11 @@ function useExplodedModeBackgroundStyles( isExplodedMode, deps = [] ) {
 			copiedStylesElement.innerHTML = `:where( .is-root-container.is-exploded-mode > .wp-block ) { ${ newBackgroundStyles } }`;
 			bodyStyleElement.innerHTML =
 				'body { background: gray !important; }';
+
+			return () => {
+				bodyStyleElement.textContent = '';
+				copiedStylesElement.textContent = '';
+			};
 		},
 		[ ...deps, isExplodedMode ]
 	);
