@@ -139,7 +139,8 @@ const BlockMoverButton = forwardRef(
 					aria-describedby={ descriptionId }
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
-					aria-disabled={ isDisabled }
+					disabled={ isDisabled }
+					__experimentalIsFocusable
 				/>
 				<VisuallyHidden id={ descriptionId }>
 					{ getBlockMoverDescription(
