@@ -30,7 +30,6 @@ export const G2 = {
 		100: '#f0f0f0', // Used for light gray backgrounds.
 	},
 	darkGray: {
-		primary: '#1e1e1e',
 		heading: '#050505',
 	},
 	mediumGray: {
