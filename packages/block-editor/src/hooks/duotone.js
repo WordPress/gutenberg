@@ -175,10 +175,10 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 	};
 	return useMemo(
 		() => [
+			unsetPreset,
 			...userPresets,
 			...themePresets,
 			...( disableDefault ? EMPTY_ARRAY : defaultPresets ),
-			unsetPreset,
 		],
 		[ disableDefault, userPresets, themePresets, defaultPresets ]
 	);

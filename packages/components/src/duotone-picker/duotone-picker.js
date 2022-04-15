@@ -8,6 +8,7 @@ import { isEqual } from 'lodash';
  */
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { swatch } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -35,13 +36,28 @@ function DuotonePicker( {
 	return (
 		<CircularOptionPicker
 			options={ duotonePalette.map( ( { colors, slug, name } ) => {
-				const style = {
-					background:
-						slug === 'unset'
-							? `red`
-							: getGradientFromCSSColors( colors, '135deg' ),
-					color: 'transparent',
-				};
+				const iconProps =
+					slug === 'unset'
+						? {
+								// TODO: @joen icon and styling for the unset swatch
+								icon: swatch,
+								style: {
+									minWidth: 0,
+									background: 'white',
+									color: 'black',
+									padding: '2px',
+									boxShadow: 'none',
+								},
+						  }
+						: {
+								style: {
+									background: getGradientFromCSSColors(
+										colors,
+										'135deg'
+									),
+									color: 'transparent',
+								},
+						  };
 				const tooltipText =
 					name ??
 					sprintf(
@@ -65,10 +81,10 @@ function DuotonePicker( {
 						isSelected={ isSelected }
 						aria-label={ label }
 						tooltipText={ tooltipText }
-						style={ style }
 						onClick={ () => {
 							onChange( isSelected ? undefined : colors );
 						} }
+						{ ...iconProps }
 					/>
 				);
 			} ) }
