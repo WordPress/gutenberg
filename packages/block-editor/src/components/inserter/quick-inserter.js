@@ -65,9 +65,7 @@ export default function QuickInserter( {
 				setInserterIsOpened: settings.__experimentalSetIsInserterOpened,
 				prioritizePatterns:
 					settings.__experimentalPreferPatternsOnRoot &&
-					! rootClientId &&
-					index > 0 &&
-					( index < blockCount || blockCount === 0 ),
+					! rootClientId,
 				insertionIndex: index === -1 ? blockCount : index,
 			};
 		},
