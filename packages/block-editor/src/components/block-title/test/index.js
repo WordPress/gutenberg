@@ -31,6 +31,8 @@ jest.mock( '@wordpress/blocks', () => {
 
 				case 'name-with-long-label':
 					return { title: 'Block With Long Label' };
+				case 'name-with-section':
+					return { title: 'Block With Section Support' };
 			}
 		},
 		__experimentalGetBlockLabel( { title } ) {
@@ -46,6 +48,11 @@ jest.mock( '@wordpress/blocks', () => {
 
 				default:
 					return title;
+			}
+		},
+		hasBlockSupport( name, support, defaultSupport = false ) {
+			if ( support === '__experimentalMetadata' ) {
+				return name === 'name-with-section' ? true : defaultSupport;
 			}
 		},
 	};
@@ -177,5 +184,20 @@ describe( 'BlockTitle', () => {
 		expect( wrapper.text() ).toBe(
 			'This is a longer label than typical for blocks to have.'
 		);
+	} );
+
+	it( 'should return section title if the block supports it', () => {
+		useSelect.mockImplementation( () => ( {
+			name: 'name-with-section',
+			attributes: {
+				metadata: { name: 'My custom section' },
+			},
+		} ) );
+
+		const wrapper = shallow(
+			<BlockTitle clientId="id-name-with-long-label" />
+		);
+
+		expect( wrapper.text() ).toBe( 'My custom section' );
 	} );
 } );

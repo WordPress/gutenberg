@@ -664,3 +664,17 @@ attributes: {
     }
 }
 ```
+
+### __experimentalMetadata
+
+-   Type: `boolean`
+-   Default value: `false`
+
+The block gets the `metadata` attribute added to the block definition when `__experimentalMetadata` is true. The `metadata` attribute has the type `object` without a default value provided. Blocks can manually add this attribute and set their defaults.
+The metadata attribute contains information related to the block.
+
+For now, the following metadata properties are available:
+- `name` - Contains a descriptive name of the block shown on the block switcher and blocklist view. E.g., A group block may be named "404 Section".
+
+This functionality is experimental, and the properties could be added or removed.
+In the future, `__experimentalMetadata` support may not exist, and the `metadata` attribute may be added unconditionally to all the blocks.

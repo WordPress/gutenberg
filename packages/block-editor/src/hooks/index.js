@@ -4,6 +4,7 @@
 import './compat';
 import './align';
 import './lock';
+import './metadata';
 import './anchor';
 import './custom-class-name';
 import './generated-class-name';
