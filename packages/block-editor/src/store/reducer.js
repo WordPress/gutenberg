@@ -1615,14 +1615,14 @@ export const blockListSettings = ( state = {}, action ) => {
  *
  * @return {string} Updated state.
  */
-export function isNavigationMode( state = false, action ) {
-	// Let inserting block always trigger Edit mode.
-	if ( action.type === 'INSERT_BLOCKS' ) {
-		return false;
+export function editorMode( state = 'edit', action ) {
+	// Let inserting block in navigation mode always trigger Edit mode.
+	if ( action.type === 'INSERT_BLOCKS' && state === 'navigation' ) {
+		return 'edit';
 	}
 
-	if ( action.type === 'SET_NAVIGATION_MODE' ) {
-		return action.isNavigationMode;
+	if ( action.type === 'SET_EDITOR_MODE' ) {
+		return action.mode;
 	}
 
 	return state;
@@ -1637,13 +1637,11 @@ export function isNavigationMode( state = false, action ) {
  * @return {string|null} Updated state.
  */
 export function hasBlockMovingClientId( state = null, action ) {
-	// Let inserting block always trigger Edit mode.
-
 	if ( action.type === 'SET_BLOCK_MOVING_MODE' ) {
 		return action.hasBlockMovingClientId;
 	}
 
-	if ( action.type === 'SET_NAVIGATION_MODE' ) {
+	if ( action.type === 'SET_EDITOR_MODE' ) {
 		return null;
 	}
 
@@ -1806,7 +1804,7 @@ export default combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
-	isNavigationMode,
+	editorMode,
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,

@@ -184,7 +184,7 @@ async function loadScript( head, { id, src } ) {
 }
 
 function Iframe(
-	{ contentRef, children, head, tabIndex = 0, assets, ...props },
+	{ contentRef, children, head, tabIndex = 0, assets, isZoomedOut, ...props },
 	ref
 ) {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
@@ -222,7 +222,6 @@ function Iframe(
 			contentDocument.dir = ownerDocument.dir;
 			documentElement.removeChild( contentDocument.head );
 			documentElement.removeChild( contentDocument.body );
-
 			return true;
 		}
 
@@ -231,6 +230,7 @@ function Iframe(
 
 		return () => node.removeEventListener( 'load', setDocumentIfReady );
 	}, [] );
+
 	const headRef = useRefEffect( ( element ) => {
 		scripts
 			.reduce(
@@ -285,12 +285,23 @@ function Iframe(
 				{ iframeDocument &&
 					createPortal(
 						<>
-							<head ref={ headRef }>{ head }</head>
+							<head ref={ headRef }>
+								{ head }
+								<style>
+									{ isZoomedOut
+										? `html { transition: padding 0.3s; background: #2f2f2f; padding: 100px 0; }`
+										: `html { transition: padding 0.3s; }` }
+								</style>
+							</head>
 							<body
 								ref={ bodyRef }
 								className={ classnames(
+									'block-editor-iframe__body',
 									BODY_CLASS_NAME,
-									...bodyClasses
+									...bodyClasses,
+									{
+										'is-zoomed-out': isZoomedOut,
+									}
 								) }
 							>
 								{ /*

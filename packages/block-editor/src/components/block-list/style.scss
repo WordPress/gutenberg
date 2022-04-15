@@ -13,15 +13,8 @@
 .block-editor-block-list__layout {
 	position: relative;
 
-	// Select tool/navigation mode shows the default cursor until an additional click edits.
-	&.is-navigate-mode {
-		cursor: default;
-	}
-
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
-	&.is-navigate-mode .block-editor-block-list__block.is-selected,
-	&.is-navigate-mode .block-editor-block-list__block.is-hovered,
 	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected),
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected {
@@ -56,10 +49,6 @@
 				background: transparent;
 			}
 		}
-	}
-
-	&.is-navigate-mode .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
-		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 	}
 
 	.block-editor-block-list__block.is-highlighted::after {
@@ -448,4 +437,20 @@
 		// solves this.
 		margin-bottom: auto;
 	}
+}
+
+/** Zoom Out mode styles **/
+.block-editor-iframe__body {
+	background: $white;
+	transition: all 0.3s;
+}
+
+.block-editor-iframe__body.is-zoomed-out {
+	transform-origin: top center;
+	transform: scale(0.45);
+	margin-bottom: -70%;
+}
+
+.block-editor-iframe__body.is-zoomed-out > .block-list-appender {
+	display: none;
 }

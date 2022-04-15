@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
@@ -18,14 +18,35 @@ import { store as blockEditorStore } from '../../store';
 
 function BlockListAppender( {
 	rootClientId,
-	canInsertDefaultBlock,
-	isLocked,
 	renderAppender: CustomAppender,
 	className,
-	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	if ( isLocked || CustomAppender === false ) {
+	const { hideInserter, canInsertDefaultBlock, selectedBlockClientId } =
+		useSelect(
+			( select ) => {
+				const {
+					canInsertBlockType,
+					getTemplateLock,
+					getSelectedBlockClientId,
+					__unstableGetEditorMode,
+				} = select( blockEditorStore );
+
+				return {
+					hideInserter:
+						!! getTemplateLock( rootClientId ) ||
+						__unstableGetEditorMode() !== 'edit',
+					canInsertDefaultBlock: canInsertBlockType(
+						getDefaultBlockName(),
+						rootClientId
+					),
+					selectedBlockClientId: getSelectedBlockClientId(),
+				};
+			},
+			[ rootClientId ]
+		);
+
+	if ( hideInserter || CustomAppender === false ) {
 		return null;
 	}
 
@@ -92,16 +113,4 @@ function BlockListAppender( {
 	);
 }
 
-export default withSelect( ( select, { rootClientId } ) => {
-	const { canInsertBlockType, getTemplateLock, getSelectedBlockClientId } =
-		select( blockEditorStore );
-
-	return {
-		isLocked: !! getTemplateLock( rootClientId ),
-		canInsertDefaultBlock: canInsertBlockType(
-			getDefaultBlockName(),
-			rootClientId
-		),
-		selectedBlockClientId: getSelectedBlockClientId(),
-	};
-} )( BlockListAppender );
+export default BlockListAppender;

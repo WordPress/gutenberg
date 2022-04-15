@@ -34,6 +34,7 @@ import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
+import useBlockOverlayActive from '../../block-content-overlay';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -58,10 +59,7 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps(
-	props = {},
-	{ __unstableIsHtml, __unstableIsDisabled = false } = {}
-) {
+export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const {
 		clientId,
 		className,
@@ -114,6 +112,8 @@ export function useBlockProps(
 		[ clientId ]
 	);
 
+	const hasOverlay = useBlockOverlayActive( clientId );
+
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
@@ -132,7 +132,7 @@ export function useBlockProps(
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
-		useDisabled( { isDisabled: ! __unstableIsDisabled } ),
+		useDisabled( { isDisabled: ! hasOverlay } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
@@ -158,6 +158,7 @@ export function useBlockProps(
 			// The wp-block className is important for editor styles.
 			classnames( 'block-editor-block-list__block', {
 				'wp-block': ! isAligned,
+				'has-block-overlay': hasOverlay,
 			} ),
 			className,
 			props.className,

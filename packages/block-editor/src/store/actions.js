@@ -1474,25 +1474,52 @@ export const __unstableMarkAutomaticChange =
 /**
  * Action that enables or disables the navigation mode.
  *
- * @param {string} isNavigationMode Enable/Disable navigation mode.
+ * @param {boolean} isNavigationMode Enable/Disable navigation mode.
  */
 export const setNavigationMode =
 	( isNavigationMode = true ) =>
 	( { dispatch } ) => {
-		dispatch( { type: 'SET_NAVIGATION_MODE', isNavigationMode } );
+		dispatch.__unstableSetEditorMode(
+			isNavigationMode ? 'navigation' : 'edit'
+		);
+	};
 
-		if ( isNavigationMode ) {
+/**
+ * Action that sets the editor mode
+ *
+ * @param {string} mode Editor mode
+ */
+export const __unstableSetEditorMode =
+	( mode ) =>
+	( { dispatch, select } ) => {
+		// When switching to zoom-out mode, we need to select to root block
+		if ( mode === 'zoom-out' ) {
+			const firstSelectedClientId = select.getBlockSelectionStart();
+			if ( firstSelectedClientId ) {
+				dispatch.selectBlock(
+					select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					)
+				);
+			}
+		}
+
+		dispatch( { type: 'SET_EDITOR_MODE', mode } );
+
+		if ( mode === 'navigation' ) {
 			speak(
 				__(
 					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
 				)
 			);
-		} else {
+		} else if ( mode === 'edit' ) {
 			speak(
 				__(
 					'You are currently in edit mode. To return to the navigation mode, press Escape.'
 				)
 			);
+		} else if ( mode === 'zoom-out' ) {
+			speak( __( 'You are currently in zoom-out mode.' ) );
 		}
 	};
 

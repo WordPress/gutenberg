@@ -19,7 +19,6 @@ import {
 	ContrastChecker,
 	getColorClassName,
 	Warning,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
@@ -310,7 +309,6 @@ function Navigation( {
 
 	const textDecoration = attributes.style?.typography?.textDecoration;
 
-	const hasBlockOverlay = useBlockOverlayActive( clientId );
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: classnames( className, {
@@ -328,7 +326,6 @@ function Navigation( {
 			[ getColorClassName( 'background-color', backgroundColor?.slug ) ]:
 				!! backgroundColor?.slug,
 			[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
-			'block-editor-block-content-overlay': hasBlockOverlay,
 		} ),
 		style: {
 			color: ! textColor?.slug && textColor?.color,

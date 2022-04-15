@@ -6,6 +6,9 @@
 	// like the popover is impacted by the block gap margin.
 	margin: 0 !important;
 
+	// Allow clicking through the toolbar holder.
+	pointer-events: none;
+
 	.components-popover__content {
 		margin: 0 !important;
 		min-width: auto;
@@ -15,14 +18,12 @@
 		outline: none;
 		box-shadow: none;
 		overflow-y: visible;
-
-		// Allow clicking through the toolbar holder.
-		pointer-events: none;
 	}
 
 	// Enable pointer events for the toolbar's content.
 	&:not(.block-editor-block-popover__inbetween) .components-popover__content {
-		* {
+		// check if rebase ok
+		div > * {
 			pointer-events: all;
 		}
 	}
@@ -47,5 +48,12 @@
 		* {
 			pointer-events: all;
 		}
+	}
+}
+
+.block-editor-block-popover__inbetween-container {
+	pointer-events: none !important;
+	> div > * {
+		pointer-events: all;
 	}
 }
