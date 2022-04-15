@@ -1,0 +1,23 @@
+.wp-block-post-comments-form {
+	textarea {
+		padding: calc(0.667em + 2px);
+	}
+
+	.comment-form {
+		textarea,
+		label {
+			display: block;
+			margin-bottom: 0.25em;
+		}
+	}
+
+	// Styles copied from button block styles.
+	input[type="submit"] {
+		border: none;
+		box-shadow: none;
+		cursor: pointer;
+		display: inline-block;
+		text-align: center;
+		overflow-wrap: break-word;
+	}
+}

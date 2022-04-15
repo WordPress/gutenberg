@@ -67,8 +67,59 @@ export default function PostCommentsFormEdit( {
 					</Warning>
 				) }
 
-				{ ( 'open' === commentStatus || isInSiteEditor ) &&
-					__( 'Post Comments Form' ) }
+				{ ( 'open' === commentStatus || isInSiteEditor ) && (
+					<div className="wp-block-post-comments">
+						<h3>{ __( 'Leave a Reply' ) }</h3>
+						<form noValidate="" className="comment-form">
+							<p>
+								<a
+									href="#post-comments-pseudo-link"
+									onClick={ ( event ) =>
+										event.preventDefault()
+									}
+								>
+									{ __( 'Logged in as admin' ) }
+								</a>
+								.{ ' ' }
+								<a
+									href="#post-comments-pseudo-link"
+									onClick={ ( event ) =>
+										event.preventDefault()
+									}
+								>
+									{ __( 'Log out?' ) }
+								</a>{ ' ' }
+								<span>
+									{ __( 'Required fields are marked' ) }{ ' ' }
+									<span>*</span>
+								</span>
+							</p>
+							<p>
+								<label htmlFor="comment">
+									{ __( 'Comment' ) }
+									<span>*</span>
+								</label>
+								<textarea
+									/* eslint-disable-next-line no-restricted-syntax */
+									id="comment"
+									name="comment"
+									cols="45"
+									rows="8"
+									maxLength="65525"
+									required=""
+								/>
+							</p>
+							<p>
+								<input
+									name="submit"
+									type="submit"
+									className="submit wp-block-button__link"
+									value={ __( 'Post Comment' ) }
+								/>
+							</p>
+						</form>
+					</div>
+				) }
 			</div>
 		</>
 	);
