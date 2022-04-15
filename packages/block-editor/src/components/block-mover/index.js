@@ -48,7 +48,7 @@ function BlockMover( {
 	// to an unfocused state (body as active element) without firing blur on,
 	// the rendering parent, leaving it unable to react to focus out.
 	return (
-		<div
+		<ToolbarGroup
 			className={ classnames( 'block-editor-block-mover', {
 				'is-visible': isFocused || ! isHidden,
 				'is-horizontal': orientation === 'horizontal',
@@ -73,7 +73,7 @@ function BlockMover( {
 					) }
 				</BlockDraggable>
 			) }
-			<ToolbarGroup className="block-editor-block-mover__move-button-container">
+			<div className="block-editor-block-mover__move-button-container">
 				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
 					{ ( itemProps ) => (
 						<BlockMoverUpButton
@@ -90,8 +90,8 @@ function BlockMover( {
 						/>
 					) }
 				</ToolbarItem>
-			</ToolbarGroup>
-		</div>
+			</div>
+		</ToolbarGroup>
 	);
 }
 
