@@ -1,7 +1,7 @@
 .edit-site-block-list-exploded {
 	display: flex;
 	flex-direction: column;
-	width: $content-width;
+	width: min(#{$content-width}, calc(100% - #{$grid-unit-40}));
 	margin: auto;
 }
 
