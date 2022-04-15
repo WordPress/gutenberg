@@ -35,16 +35,9 @@ Width of the preview container in pixels. Controls at what size the blocks will 
 
 Padding for the preview container body.
 
-### `__experimentalLive`
+### `__experimentalScale`
 
 -   **Type** `Boolean`
--   **Default:** `false`
+-   **Default:** `true`
 
 Enables displaying previews without an iframe container.
-
-### `__experimentalOnClick`
-
--   **Type** `Function`
--   **Default:** `undefined`
-
-Use this callback in combination with `__experimentalLive`. The callback is attached to the preview container element.

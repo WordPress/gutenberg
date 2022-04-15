@@ -77,7 +77,10 @@ function BlockListExplodedItem( { clientId } ) {
 				aria-label={ blockLabel }
 				tabIndex={ 0 }
 			>
-				<BlockPreview blocks={ blocksToPreview } />
+				<BlockPreview
+					blocks={ blocksToPreview }
+					__experimentalScale={ 0.8 }
+				/>
 			</div>
 		</div>
 	);

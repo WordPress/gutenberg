@@ -23,6 +23,7 @@ function AutoBlockPreview( {
 	viewportWidth,
 	__experimentalPadding,
 	__experimentalMinHeight,
+	__experimentalScale = true,
 } ) {
 	const [
 		containerResizeListener,
@@ -58,7 +59,10 @@ function AutoBlockPreview( {
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
-	const scale = containerWidth / viewportWidth;
+	const scale =
+		__experimentalScale === true
+			? containerWidth / viewportWidth
+			: __experimentalScale;
 
 	return (
 		<div className="block-editor-block-preview__container">
@@ -97,7 +101,10 @@ function AutoBlockPreview( {
 					tabIndex={ -1 }
 					style={ {
 						position: 'absolute',
-						width: viewportWidth,
+						width:
+							__experimentalScale === true
+								? viewportWidth
+								: 'calc( 100% / ' + __experimentalScale + ' )',
 						height: contentHeight,
 						pointerEvents: 'none',
 						// This is a catch-all max-height for patterns.
