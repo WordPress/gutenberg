@@ -19,7 +19,7 @@ import {
 import { isBlobURL } from '@wordpress/blob';
 import { useState } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect, withDispatch, withSelect } from '@wordpress/data';
 import {
 	MediaUpload,
 	MediaUploadCheck,
@@ -91,60 +91,37 @@ function getMediaDetails( media, postId ) {
 	};
 }
 
-function PostFeaturedImage( { noticeUI, noticeOperations } ) {
+function PostFeaturedImage( {
+	currentPostId,
+	featuredImageId,
+	onUpdateImage,
+	onRemoveImage,
+	media,
+	postType,
+	noticeUI,
+	noticeOperations,
+} ) {
 	const [ isLoading, setIsLoading ] = useState( false );
-	const {
-		media,
-		mediaUpload,
-		currentPostId,
-		postType,
-		featuredImageId,
-	} = useSelect( ( select ) => {
-		const { getMedia, getPostType } = select( coreStore );
-		const { getSettings } = select( blockEditorStore );
-		const { getCurrentPostId, getEditedPostAttribute } = select(
-			editorStore
-		);
-		const featuredImage = getEditedPostAttribute( 'featured_media' );
-
-		return {
-			media: featuredImage
-				? getMedia( featuredImage, { context: 'view' } )
-				: null,
-			currentPostId: getCurrentPostId(),
-			postType: getPostType( getEditedPostAttribute( 'type' ) ),
-			featuredImageId: featuredImage,
-			mediaUpload: getSettings().mediaUpload,
-		};
+	const mediaUpload = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
-	const { editPost } = useDispatch( editorStore );
-
 	const postLabel = get( postType, [ 'labels' ], {} );
 	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
 		media,
 		currentPostId
 	);
 
-	function onUpdateImage( image ) {
-		if ( isBlobURL( image?.url ) ) {
-			setIsLoading( true );
-			return;
-		}
-
-		editPost( { featured_media: image?.id } );
-		setIsLoading( false );
-	}
-
-	function onRemoveImage() {
-		editPost( { featured_media: 0 } );
-	}
-
 	function onDropImage( filesList ) {
 		mediaUpload( {
 			allowedTypes: [ 'image' ],
 			filesList,
 			onFileChange( [ image ] ) {
+				if ( isBlobURL( image?.url ) ) {
+					setIsLoading( true );
+					return;
+				}
 				onUpdateImage( image );
+				setIsLoading( false );
 			},
 			onError( message ) {
 				noticeOperations.removeAllNotices();
@@ -270,7 +247,36 @@ function PostFeaturedImage( { noticeUI, noticeOperations } ) {
 	);
 }
 
+const applyWithSelect = withSelect( ( select ) => {
+	const { getMedia, getPostType } = select( coreStore );
+	const { getCurrentPostId, getEditedPostAttribute } = select( editorStore );
+	const featuredImageId = getEditedPostAttribute( 'featured_media' );
+
+	return {
+		media: featuredImageId
+			? getMedia( featuredImageId, { context: 'view' } )
+			: null,
+		currentPostId: getCurrentPostId(),
+		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		featuredImageId,
+	};
+} );
+
+const applyWithDispatch = withDispatch( ( dispatch ) => {
+	const { editPost } = dispatch( editorStore );
+	return {
+		onUpdateImage( image ) {
+			editPost( { featured_media: image?.id } );
+		},
+		onRemoveImage() {
+			editPost( { featured_media: 0 } );
+		},
+	};
+} );
+
 export default compose(
 	withNotices,
+	applyWithSelect,
+	applyWithDispatch,
 	withFilters( 'editor.PostFeaturedImage' )
 )( PostFeaturedImage );
