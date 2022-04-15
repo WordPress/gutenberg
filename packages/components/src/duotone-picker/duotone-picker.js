@@ -8,7 +8,6 @@ import { isEqual } from 'lodash';
  */
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { swatch } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -39,13 +38,9 @@ function DuotonePicker( {
 				const iconProps =
 					slug === 'unset'
 						? {
-								// TODO: @joen icon and styling for the unset swatch
-								icon: swatch,
 								style: {
-									minWidth: 0,
-									background: 'white',
-									color: 'black',
-									padding: '2px',
+									background:
+										'#fff linear-gradient(-45deg, transparent 48%, #ddd 48%, #ddd 52%, transparent 52%)',
 									boxShadow: 'none',
 								},
 						  }
