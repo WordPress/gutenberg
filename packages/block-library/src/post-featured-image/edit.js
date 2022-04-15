@@ -57,22 +57,30 @@ function PostFeaturedImageDisplay( {
 	clientId,
 	attributes,
 	setAttributes,
-	context: { postId, postType, queryId },
+	context: { postId, postType: postTypeSlug, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const { isLink, height, width, scale, sizeSlug } = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
-		postType,
+		postTypeSlug,
 		'featured_media',
 		postId
 	);
 
-	const media = useSelect(
-		( select ) =>
-			featuredImage &&
-			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
-		[ featuredImage ]
+	const { media, postType } = useSelect(
+		( select ) => {
+			const { getMedia, getPostType } = select( coreStore );
+			return {
+				media:
+					featuredImage &&
+					getMedia( featuredImage, {
+						context: 'view',
+					} ),
+				postType: postTypeSlug && getPostType( postTypeSlug ),
+			};
+		},
+		[ featuredImage, postTypeSlug ]
 	);
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 
@@ -124,11 +132,15 @@ function PostFeaturedImageDisplay( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
-						label={ sprintf(
-							// translators: %s: Name of the post type e.g: "post".
-							__( 'Link to %s' ),
-							postType
-						) }
+						label={
+							postType?.labels.singular_name
+								? sprintf(
+										// translators: %s: Name of the post type e.g: "post".
+										__( 'Link to %s' ),
+										postType.labels.singular_name.toLowerCase()
+								  )
+								: __( 'Link to post' )
+						}
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
 					/>
