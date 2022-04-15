@@ -3,7 +3,7 @@
  */
 import './hooks';
 export {
-	PresetSvgFilter,
+	PresetDuotoneFilter as __unstablePresetDuotoneFilter,
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
 	useBorderProps as __experimentalUseBorderProps,
 	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,

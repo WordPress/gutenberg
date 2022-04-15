@@ -24,7 +24,7 @@ import {
 } from '@wordpress/blocks';
 import { useEffect, useState, useContext } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
-import { PresetSvgFilter } from '@wordpress/block-editor';
+import { __unstablePresetDuotoneFilter as PresetDuotoneFilter } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -140,8 +140,7 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 				.filter( ( origin ) => presetByOrigin[ origin ] )
 				.flatMap( ( origin ) =>
 					presetByOrigin[ origin ].map( ( preset ) => (
-						<PresetSvgFilter
-							metadata={ metadata }
+						<PresetDuotoneFilter
 							preset={ preset }
 							key={ preset.slug }
 						/>

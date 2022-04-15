@@ -362,11 +362,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 	'withDuotoneStyles'
 );
 
-export function PresetSvgFilter( { metadata, preset } ) {
-	if ( metadata.svgFilter !== 'duotone' ) {
-		return null;
-	}
-
+export function PresetDuotoneFilter( { preset } ) {
 	return (
 		<DuotoneFilter
 			id={ `wp-duotone-${ preset.slug }` }
