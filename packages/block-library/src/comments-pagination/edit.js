@@ -80,7 +80,7 @@ export default function QueryPaginationEdit( {
 		return (
 			<Warning>
 				{ __(
-					'Paging comments is disabled in the Discussion Settings'
+					'Comments Pagination block: paging comments is disabled in the Discussion Settings'
 				) }
 			</Warning>
 		);
