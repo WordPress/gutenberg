@@ -933,6 +933,25 @@ export function __unstableIsFullySelected( state ) {
 }
 
 /**
+ * Returns true if the selection is collapsed.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether the selection is collapsed.
+ */
+export function __unstableIsSelectionCollapsed( state ) {
+	const selectionAnchor = getSelectionStart( state );
+	const selectionFocus = getSelectionEnd( state );
+	return (
+		!! selectionAnchor &&
+		!! selectionFocus &&
+		selectionAnchor.clientId === selectionFocus.clientId &&
+		selectionAnchor.attributeKey === selectionFocus.attributeKey &&
+		selectionAnchor.offset === selectionFocus.offset
+	);
+}
+
+/**
  * Check whether the selection is mergeable.
  *
  * @param {Object}  state     Editor state.
