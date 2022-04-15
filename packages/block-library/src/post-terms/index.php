@@ -77,10 +77,9 @@ function register_block_core_post_terms() {
 	foreach ( $taxonomies as $taxonomy ) {
 		$variation = array(
 			'name'        => $taxonomy->name,
+			'title'       => $taxonomy->label,
 			/* translators: %s: taxonomy's label */
-			'title'       => sprintf( __( 'Post %s' ), $taxonomy->label ),
-			/* translators: %s: taxonomy's label */
-			'description' => sprintf( __( "Display a post's %s" ), $taxonomy->label ),
+			'description' => sprintf( __( 'Display the assigned %s' ), $taxonomy->label ),
 			'attributes'  => array(
 				'term' => $taxonomy->name,
 			),
