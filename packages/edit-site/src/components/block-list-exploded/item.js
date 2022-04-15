@@ -64,9 +64,11 @@ function BlockListExplodedItem( { clientId } ) {
 				ref={ blockWrapper }
 				role="button"
 				onClick={ ( event ) => {
-					if ( event.detail === 1 ) {
+					const isFirstClick = event.detail === 1;
+					const isDoubleClick = event.detail === 2;
+					if ( isFirstClick ) {
 						selectBlock( clientId );
-					} else if ( event.detail === 2 ) {
+					} else if ( isDoubleClick ) {
 						switchEditorMode( 'visual' );
 					}
 				} }
