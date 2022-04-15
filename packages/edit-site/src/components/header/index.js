@@ -6,11 +6,12 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus } from '@wordpress/icons';
+import { listView, plus, stack } from '@wordpress/icons';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
@@ -47,6 +48,7 @@ export default function Header( {
 		listViewShortcut,
 		isLoaded,
 		isVisualMode,
+		blockEditorMode,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -61,6 +63,7 @@ export default function Header( {
 			editorStore
 		);
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
@@ -79,6 +82,7 @@ export default function Header( {
 				'core/edit-site/toggle-list-view'
 			),
 			isVisualMode: getEditorMode() === 'visual',
+			blockEditorMode: __unstableGetEditorMode(),
 		};
 	}, [] );
 
@@ -87,6 +91,7 @@ export default function Header( {
 		setIsInserterOpened,
 		setIsListViewOpened,
 	} = useDispatch( editSiteStore );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -144,6 +149,21 @@ export default function Header( {
 								label={ __( 'List View' ) }
 								onClick={ toggleListView }
 								shortcut={ listViewShortcut }
+							/>
+							<Button
+								className="edit-site-header-toolbar__exploded-view-toggle"
+								icon={ stack }
+								isPressed={ blockEditorMode === 'exploded' }
+								/* translators: button label text should, if possible, be under 16 characters. */
+								label={ __( 'Exploded View' ) }
+								onClick={ () => {
+									setIsListViewOpened( false );
+									__unstableSetEditorMode(
+										blockEditorMode === 'exploded'
+											? 'edit'
+											: 'exploded'
+									);
+								} }
 							/>
 						</>
 					) }

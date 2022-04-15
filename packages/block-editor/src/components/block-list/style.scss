@@ -408,3 +408,13 @@
 		margin-bottom: auto;
 	}
 }
+
+/** Exploded mode styles **/
+.is-root-container.is-exploded-mode {
+	margin-top: 100px;
+}
+
+.is-root-container.is-exploded-mode > .wp-block {
+	transform: scale(0.8);
+	transform-origin: top center;
+}
