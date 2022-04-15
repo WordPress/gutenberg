@@ -188,6 +188,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	}
 
 	$settings['localAutosaveInterval'] = 15;
+	$settings['themeDevMode'] = defined('THEME_DEV_MODE') && THEME_DEV_MODE;
 
 	return $settings;
 }
