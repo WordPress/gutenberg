@@ -14,16 +14,22 @@ concurrency:
 
 jobs:
   pull_request_participants:
-    name: Gather pull request participants
+    name: Collect props
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
+    # Collects a list of contributors for a pull request and shares a list of
+    # Co-authored-by: trailers for merging contributors.
     #
+    # Performs the following steps:
+    # - Checks out the repository.
+    # - Compiles a list of contributors.
+    # - Leaves the list in a comment on the pull request. If a comment already exists, the previous one is updated.
     steps:
       - name: Checkout repository
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
 
-      - name: Compile contributor data
+      - name: Compile contributor list
         uses: actions/github-script@e3cbab99d3a9b271e1b79fc96d103a4a5534998c # v5.1.0
         id: contributor-data
         with:
