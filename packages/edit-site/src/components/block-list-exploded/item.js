@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import {
 	store as blockEditorStore,
 	BlockPreview,
-	Inserter,
 	useBlockDisplayInformation,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -52,43 +51,31 @@ function BlockListExplodedItem( { clientId } ) {
 	}, [ isSelected ] );
 
 	return (
-		<div>
+		<div
+			className={ classnames(
+				'edit-site-block-list-exploded__item-container',
+				{ 'is-selected': isSelected }
+			) }
+		>
+			{ isSelected && (
+				<BlockListExplodedTopToolbar clientId={ clientId } />
+			) }
 			<div
-				className="edit-site-block-list-exploded__inserter"
-				key={ block.clientId }
+				ref={ blockWrapper }
+				role="button"
+				onClick={ ( event ) => {
+					if ( event.detail === 1 ) {
+						selectBlock( clientId );
+					} else if ( event.detail === 2 ) {
+						switchEditorMode( 'visual' );
+					}
+				} }
+				onKeyPress={ () => selectBlock( clientId ) }
+				onFocus={ () => selectBlock( clientId ) }
+				aria-label={ blockLabel }
+				tabIndex={ 0 }
 			>
-				<Inserter
-					clientId={ block.clientId }
-					__experimentalIsQuick
-					isPrimary
-				/>
-			</div>
-			<div
-				className={ classnames(
-					'edit-site-block-list-exploded__item-container',
-					{ 'is-selected': isSelected }
-				) }
-			>
-				{ isSelected && (
-					<BlockListExplodedTopToolbar clientId={ clientId } />
-				) }
-				<div
-					ref={ blockWrapper }
-					role="button"
-					onClick={ ( event ) => {
-						if ( event.detail === 1 ) {
-							selectBlock( clientId );
-						} else if ( event.detail === 2 ) {
-							switchEditorMode( 'visual' );
-						}
-					} }
-					onKeyPress={ () => selectBlock( clientId ) }
-					onFocus={ () => selectBlock( clientId ) }
-					aria-label={ blockLabel }
-					tabIndex={ 0 }
-				>
-					<BlockPreview blocks={ blocksToPreview } />
-				</div>
+				<BlockPreview blocks={ blocksToPreview } />
 			</div>
 		</div>
 	);
