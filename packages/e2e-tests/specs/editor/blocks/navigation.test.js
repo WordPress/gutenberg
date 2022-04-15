@@ -1429,5 +1429,38 @@ describe( 'Navigation', () => {
 				'//*[contains(@class, "components-snackbar")]/*[text()="Navigation Menu successfully created."]'
 			);
 		} );
+
+		it( 'should always focus select menu button after item selection', async () => {
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNavigationMenu( {
+				title: 'Second Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+			await waitForBlock( 'Navigation' );
+			await page.waitForXPath( START_EMPTY_XPATH );
+
+			const selectMenuDropdown = await page.waitForSelector(
+				'[aria-label="Select Menu"]'
+			);
+			await selectMenuDropdown.click();
+			const exampleNavigationOption = await page.waitForXPath(
+				'//span[contains(text(), "Second Example Navigation")]'
+			);
+			await exampleNavigationOption.click();
+			const selectMenuDropdown2 = await page.waitForSelector(
+				'[aria-label="Select Menu"]'
+			);
+			await expect( selectMenuDropdown2 ).toHaveFocus();
+		} );
 	} );
 } );
