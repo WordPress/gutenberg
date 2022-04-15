@@ -1,6 +1,5 @@
 .block-editor-block-switcher {
 	position: relative;
-	padding: 0 ($grid-unit-15 * 0.5);
 
 	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
 	// This is best fixed by making the mover control area a proper single toolbar group.

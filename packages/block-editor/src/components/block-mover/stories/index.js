@@ -5,6 +5,7 @@ import { useEffect } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { useDispatch } from '@wordpress/data';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -58,34 +59,40 @@ function BlockMoverStory() {
 	return (
 		<div>
 			<p>The mover by default is vertical</p>
-			<BlockMover
-				clientIds={
-					blocks.length
-						? [ blocks[ 0 ].innerBlocks[ 1 ].clientId ]
-						: []
-				}
-			/>
+			<Toolbar label="Block Mover">
+				<BlockMover
+					clientIds={
+						blocks.length
+							? [ blocks[ 0 ].innerBlocks[ 1 ].clientId ]
+							: []
+					}
+				/>
+			</Toolbar>
 
 			<p style={ { marginTop: 36 } }>
 				But it can also accomodate horizontal blocks.
 			</p>
-			<BlockMover
-				clientIds={
-					blocks.length
-						? [ blocks[ 1 ].innerBlocks[ 1 ].clientId ]
-						: []
-				}
-			/>
+			<Toolbar label="Block Mover">
+				<BlockMover
+					clientIds={
+						blocks.length
+							? [ blocks[ 1 ].innerBlocks[ 1 ].clientId ]
+							: []
+					}
+				/>
+			</Toolbar>
 
 			<p style={ { marginTop: 36 } }>We can also hide the drag handle.</p>
-			<BlockMover
-				clientIds={
-					blocks.length
-						? [ blocks[ 1 ].innerBlocks[ 0 ].clientId ]
-						: []
-				}
-				hideDragHandle
-			/>
+			<Toolbar label="Block Mover">
+				<BlockMover
+					clientIds={
+						blocks.length
+							? [ blocks[ 1 ].innerBlocks[ 0 ].clientId ]
+							: []
+					}
+					hideDragHandle
+				/>
+			</Toolbar>
 		</div>
 	);
 }

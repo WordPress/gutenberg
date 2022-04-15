@@ -1,16 +1,17 @@
 .block-editor-block-mover__move-button-container {
 	display: flex;
-
 	padding: 0;
 	border: none;
 
 	@include break-small() {
+		width: $block-toolbar-height - $grid-unit-15;
+
 		.block-editor-block-mover:not(.is-horizontal) & {
 			flex-direction: column;
 
 			> * {
 				height: $block-toolbar-height * 0.5;
-				width: $block-toolbar-height;
+				width: 100%;
 				min-width: 0 !important; // overrides default button width.
 
 				// Focus style.
