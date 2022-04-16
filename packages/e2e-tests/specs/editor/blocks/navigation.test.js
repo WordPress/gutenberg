@@ -1431,24 +1431,27 @@ describe( 'Navigation', () => {
 		} );
 
 		it( 'should always focus select menu button after item selection', async () => {
+			// Create some navigation menus to work with.
 			await createNavigationMenu( {
 				title: 'Example Navigation',
 				content:
 					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
 			} );
-
 			await createNavigationMenu( {
 				title: 'Second Example Navigation',
 				content:
 					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
 			} );
 
+			// Create new post.
 			await createNewPost();
 
+			// Insert new block and wait for the insert to complete.
 			await insertBlock( 'Navigation' );
 			await waitForBlock( 'Navigation' );
 			await page.waitForXPath( START_EMPTY_XPATH );
 
+			// Change menus via the select menu toolbar button.
 			const selectMenuDropdown = await page.waitForSelector(
 				'[aria-label="Select Menu"]'
 			);
@@ -1457,6 +1460,8 @@ describe( 'Navigation', () => {
 				'//span[contains(text(), "Second Example Navigation")]'
 			);
 			await exampleNavigationOption.click();
+
+			// Once the options are closed, does select menu button receive focus?
 			const selectMenuDropdown2 = await page.waitForSelector(
 				'[aria-label="Select Menu"]'
 			);
