@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
@@ -105,6 +105,9 @@ function TableEdit( {
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 
+	const tableRef = useRef();
+	const [ hasTableCreated, setHasTableCreated ] = useState( false );
+
 	/**
 	 * Updates the initial column count used for table creation.
 	 *
@@ -137,6 +140,7 @@ function TableEdit( {
 				columnCount: parseInt( initialColumnCount, 10 ) || 2,
 			} )
 		);
+		setHasTableCreated( true );
 	}
 
 	/**
@@ -341,6 +345,15 @@ function TableEdit( {
 		}
 	}, [ isSelected ] );
 
+	useEffect( () => {
+		if ( hasTableCreated ) {
+			tableRef?.current
+				?.querySelector( 'td[contentEditable="true"]' )
+				?.focus();
+			setHasTableCreated( false );
+		}
+	}, [ hasTableCreated ] );
+
 	const sections = [ 'head', 'body', 'foot' ].filter(
 		( name ) => ! isEmptyTableSection( attributes[ name ] )
 	);
@@ -426,7 +439,7 @@ function TableEdit( {
 	const isEmpty = ! sections.length;
 
 	return (
-		<figure { ...useBlockProps() }>
+		<figure { ...useBlockProps( { ref: tableRef } ) }>
 			{ ! isEmpty && (
 				<>
 					<BlockControls group="block">
