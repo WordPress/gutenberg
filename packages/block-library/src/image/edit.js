@@ -22,8 +22,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
-/* global wp */
-
 /**
  * Internal dependencies
  */
