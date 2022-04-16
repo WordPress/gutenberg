@@ -115,10 +115,13 @@ export default function useTabNav() {
 			// these are not rendered in the content and perhaps in the
 			// future they can be rendered in an iframe or shadow DOM.
 			if (
-				( isFormElement( event.target ) ||
+				( isFormElement( event.target, true ) ||
 					event.target.getAttribute( 'data-block' ) ===
 						getSelectedBlockClientId() ) &&
-				isFormElement( focus.tabbable[ direction ]( event.target ) )
+				isFormElement(
+					focus.tabbable[ direction ]( event.target ),
+					true
+				)
 			) {
 				return;
 			}
