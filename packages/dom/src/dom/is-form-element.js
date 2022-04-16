@@ -8,7 +8,7 @@ import isInputOrTextArea from './is-input-or-text-area';
  * Detects if element is a form element.
  *
  * @param {Element} element                The element to check.
- * @param {boolean} includeContentEditable Rather or not to include elements with contentEditable attribute.
+ * @param {boolean} includeContentEditable Should include elements with contentEditable attribute.
  *
  * @return {boolean} True if form element and false otherwise.
  */

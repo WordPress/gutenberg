@@ -191,7 +191,7 @@ Detects if element is a form element.
 _Parameters_
 
 -   _element_ `Element`: The element to check.
--   _includeContentEditable_ `boolean`: Rather or not to include elements with contentEditable attribute.
+-   _includeContentEditable_ `boolean`: Should include elements with contentEditable attribute.
 
 _Returns_
 
