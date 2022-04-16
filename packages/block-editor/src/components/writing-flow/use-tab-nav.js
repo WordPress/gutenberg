@@ -118,10 +118,7 @@ export default function useTabNav() {
 				( isFormElement( event.target, true ) ||
 					event.target.getAttribute( 'data-block' ) ===
 						getSelectedBlockClientId() ) &&
-				isFormElement(
-					focus.tabbable[ direction ]( event.target ),
-					true
-				)
+				isFormElement( focus.tabbable[ direction ]( event.target ) )
 			) {
 				return;
 			}
