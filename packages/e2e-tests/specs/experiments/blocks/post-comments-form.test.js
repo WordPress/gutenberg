@@ -39,7 +39,7 @@ describe( 'Post Comments Form', () => {
 
 			// Ensure the placeholder is there
 			await expect( canvas() ).toMatchElement(
-				'.wp-block-post-comments .comment-form'
+				'.wp-block-post-comments-form .comment-form'
 			);
 		} );
 	} );
