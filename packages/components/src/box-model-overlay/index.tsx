@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  */
 import {
 	useRef,
-	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useCallback,
 	forwardRef,
@@ -197,7 +197,7 @@ const BoxModelOverlayWithRef = forwardRef<
 		[ showValues.margin, showValues.padding ]
 	);
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		const target = targetRef.current;
 
 		if ( ! shouldShowOverlay || ! target ) {
