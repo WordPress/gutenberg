@@ -111,7 +111,7 @@ function PostFeaturedImage( {
 		currentPostId
 	);
 
-	function onDropImage( filesList ) {
+	function onDropFiles( filesList ) {
 		mediaUpload( {
 			allowedTypes: [ 'image' ],
 			filesList,
@@ -204,7 +204,7 @@ function PostFeaturedImage( {
 										( postLabel.set_featured_image ||
 											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
 								</Button>
-								<DropZone onFilesDrop={ onDropImage } />
+								<DropZone onFilesDrop={ onDropFiles } />
 							</div>
 						) }
 						value={ featuredImageId }
@@ -262,17 +262,34 @@ const applyWithSelect = withSelect( ( select ) => {
 	};
 } );
 
-const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { editPost } = dispatch( editorStore );
-	return {
-		onUpdateImage( image ) {
-			editPost( { featured_media: image?.id } );
-		},
-		onRemoveImage() {
-			editPost( { featured_media: 0 } );
-		},
-	};
-} );
+const applyWithDispatch = withDispatch(
+	( dispatch, { noticeOperations }, { select } ) => {
+		const { editPost } = dispatch( editorStore );
+		return {
+			onUpdateImage( image ) {
+				editPost( { featured_media: image.id } );
+			},
+			onDropImage( filesList ) {
+				select( blockEditorStore )
+					.getSettings()
+					.mediaUpload( {
+						allowedTypes: [ 'image' ],
+						filesList,
+						onFileChange( [ image ] ) {
+							editPost( { featured_media: image.id } );
+						},
+						onError( message ) {
+							noticeOperations.removeAllNotices();
+							noticeOperations.createErrorNotice( message );
+						},
+					} );
+			},
+			onRemoveImage() {
+				editPost( { featured_media: 0 } );
+			},
+		};
+	}
+);
 
 export default compose(
 	withNotices,
