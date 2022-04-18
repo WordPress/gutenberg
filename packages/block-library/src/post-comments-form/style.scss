@@ -71,5 +71,10 @@
 	.comment-reply-title {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
+
+		:where(small) {
+			font-size: var(--wp--preset--font-size--small, smaller);
+		}
 	}
 }
