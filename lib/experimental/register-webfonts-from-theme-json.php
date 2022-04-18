@@ -10,7 +10,7 @@
  *
  * @param array $settings The theme.json file.
  */
-function _gutenberg_register_webfonts_from_theme_json( $settings ) {
+function _wp_register_webfonts_from_theme_json( $settings ) {
 	// If in the editor, add webfonts defined in variations.
 	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
