@@ -272,6 +272,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			nodes.push( {
 				styles: blockStyles,
 				selector: blockSelectors[ blockName ].selector,
+				duotoneSelector: blockSelectors[ blockName ].duotoneSelector,
 			} );
 		}
 
@@ -372,8 +373,25 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 	 * @link https://github.com/WordPress/gutenberg/issues/36147.
 	 */
 	let ruleset = 'body {margin: 0;}';
-	nodesWithStyles.forEach( ( { selector, styles } ) => {
-		// TODO: separate duotone & regular selector
+	nodesWithStyles.forEach( ( { selector, duotoneSelector, styles } ) => {
+		const duotoneStyles = {};
+		if ( styles?.filter ) {
+			duotoneStyles.filter = styles.filter;
+			delete styles.filter;
+		}
+
+		// Process duotone styles (they use color.__experimentalDuotone selector).
+		if ( duotoneSelector ) {
+			const duotoneDeclarations = getStylesDeclarations( duotoneStyles );
+			if ( duotoneDeclarations.length === 0 ) {
+				return;
+			}
+			ruleset =
+				ruleset +
+				`${ duotoneSelector }{${ duotoneDeclarations.join( ';' ) };}`;
+		}
+
+		// Process the remaning block styles (they use either normal block class or __experimentalSelector).
 		const declarations = getStylesDeclarations( styles );
 		if ( declarations.length === 0 ) {
 			return;
