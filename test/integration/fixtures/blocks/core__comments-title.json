@@ -1,0 +1,20 @@
+[
+	{
+		"name": "core/comments-title",
+		"isValid": true,
+		"attributes": {
+			"textColor": "vivid-purple",
+			"fontFamily": "source-serif-pro",
+			"fontSize": "x-large",
+			"style": {
+				"typography": {
+					"textTransform": "uppercase",
+					"fontStyle": "italic",
+					"fontWeight": "900",
+					"lineHeight": "3"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

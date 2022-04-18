@@ -1,0 +1,21 @@
+[
+	{
+		"blockName": "core/comments-title",
+		"attrs": {
+			"style": {
+				"typography": {
+					"textTransform": "uppercase",
+					"fontStyle": "italic",
+					"fontWeight": "900",
+					"lineHeight": "3"
+				}
+			},
+			"textColor": "vivid-purple",
+			"fontSize": "x-large",
+			"fontFamily": "source-serif-pro"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]
