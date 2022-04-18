@@ -21,7 +21,7 @@ function _gutenberg_is_externally_registered_webfont( $webfont ) {
  *
  * Enqueued webfonts will end up in the front-end as inlined CSS.
  */
-function _gutenberg_enqueue_webfonts_listed_in_theme_json() {
+function _wp_enqueue_webfonts_listed_in_theme_json() {
 	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
 
 	// Bail out early if there are no settings for webfonts.
@@ -62,12 +62,12 @@ function _gutenberg_enqueue_webfonts_listed_in_theme_json() {
 	}
 }
 
-add_filter( 'wp_loaded', '_gutenberg_enqueue_webfonts_listed_in_theme_json' );
+add_filter( 'wp_loaded', '_wp_enqueue_webfonts_listed_in_theme_json' );
 
 // No need to run this -- opening the admin interface enqueues all the webfonts.
 add_action(
 	'admin_init',
 	function() {
-		remove_filter( 'wp_loaded', '_gutenberg_enqueue_webfonts_listed_in_theme_json' );
+		remove_filter( 'wp_loaded', '_wp_enqueue_webfonts_listed_in_theme_json' );
 	}
 );
