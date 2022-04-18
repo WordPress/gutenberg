@@ -183,6 +183,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 				className="edit-site-visual-editor__editor-canvas"
 				{ ...props }
 			>
+				{ /* Filters need to be rendered before children to avoid Safari rendering issues. */ }
 				{ settings.svgFilters }
 				{ children }
 			</Iframe>
