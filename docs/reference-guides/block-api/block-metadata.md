@@ -215,6 +215,20 @@ An implementation should expect and tolerate unknown categories, providing some 
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
+### Ancestor
+
+-   Type: `string[]`
+-   Optional
+-   Localized: No
+-   Property: `ancestor`
+-   Since: `WordPress 6.0.0`
+
+```json
+{ "ancestor": [ "my-block/product" ] }
+```
+
+The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block. In comparrison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
+
 ### Icon
 
 -   Type: `string`

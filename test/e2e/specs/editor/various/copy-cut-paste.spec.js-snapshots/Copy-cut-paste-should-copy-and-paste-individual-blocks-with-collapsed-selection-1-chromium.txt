@@ -1,5 +1,5 @@
 <!-- wp:paragraph -->
-<p>Here is a unique string so we can test copying.</p>
+<p>Copy - collapsed selection</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->

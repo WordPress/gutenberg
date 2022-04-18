@@ -1,11 +1,15 @@
 <!-- wp:paragraph -->
-<p>Here is a unique string so we can test copying.</p>
+<p>block</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>2</p>
+<p>B </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Here is a unique string so we can test copying.</p>
+<p>A block</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>B block</p>
 <!-- /wp:paragraph -->

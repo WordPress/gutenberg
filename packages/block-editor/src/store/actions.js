@@ -23,6 +23,11 @@ import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
 /**
+ * Internal dependencies
+ */
+import { mapRichTextSettings } from './utils';
+
+/**
  * Action which will insert a default block insert action if there
  * are no other blocks at the root of the editor. This action should be used
  * in actions which may result in no blocks remaining in the editor (removal,
@@ -666,19 +671,6 @@ export const synchronizeTemplate = () => ( { select, dispatch } ) => {
 
 	dispatch.resetBlocks( updatedBlockList );
 };
-
-function mapRichTextSettings( attributeDefinition ) {
-	const {
-		multiline: multilineTag,
-		__unstableMultilineWrapperTags: multilineWrapperTags,
-		__unstablePreserveWhiteSpace: preserveWhiteSpace,
-	} = attributeDefinition;
-	return {
-		multilineTag,
-		multilineWrapperTags,
-		preserveWhiteSpace,
-	};
-}
 
 /**
  * Delete the current selection.

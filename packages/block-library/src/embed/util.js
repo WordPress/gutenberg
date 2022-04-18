@@ -66,9 +66,11 @@ export const isFromWordPress = ( html ) =>
 	html && html.includes( 'class="wp-embedded-content"' );
 
 export const getPhotoHtml = ( photo ) => {
+	// If full image url not found use thumbnail.
+	const imageUrl = photo.url || photo.thumbnail_url;
+
 	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
-	// actually the full size photo. If thumbnails not found, use full image.
-	const imageUrl = photo.thumbnail_url || photo.url;
+	// actually the full size photo.
 	const photoPreview = (
 		<p>
 			<img src={ imageUrl } alt={ photo.title } width="100%" />

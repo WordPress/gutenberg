@@ -271,7 +271,7 @@ class PostEditorTemplateMode {
 		await this.pageUtils.openDocumentSettingsSidebar();
 
 		const templatePanelButton = this.editorSettingsSidebar.locator(
-			'role=button[name="Template"i]'
+			'role=button[name=/^Template/i]'
 		);
 		const isExpanded =
 			( await templatePanelButton.getAttribute( 'aria-expanded' ) ) !==

@@ -47,7 +47,6 @@ import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 
 const interfaceLabels = {
-	secondarySidebar: __( 'Block Library' ),
 	drawer: __( 'Navigation Sidebar' ),
 };
 
@@ -180,6 +179,10 @@ function Editor( { onError } ) {
 		templateType !== undefined &&
 		entityId !== undefined;
 
+	const secondarySidebarLabel = isListViewOpen
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const secondarySidebar = () => {
 		if ( isInserterOpen ) {
 			return <InserterSidebar />;
@@ -212,7 +215,10 @@ function Editor( { onError } ) {
 										<KeyboardShortcuts.Register />
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
-											labels={ interfaceLabels }
+											labels={ {
+												...interfaceLabels,
+												secondarySidebar: secondarySidebarLabel,
+											} }
 											className={
 												showIconLabels &&
 												'show-icon-labels'

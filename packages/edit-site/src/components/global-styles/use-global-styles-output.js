@@ -28,12 +28,9 @@ import { getCSSRules } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-
-/**
- * Internal dependencies
- */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR } from './utils';
 import { GlobalStylesContext } from './context';
+import { useSetting } from './hooks';
 
 function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
@@ -329,12 +326,19 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 	return ruleset;
 };
 
-export const toStyles = ( tree, blockSelectors ) => {
+export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 
-	let ruleset =
-		'.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
+	/*
+	 * Reset default browser margin on the root body element.
+	 * This is set on the root selector **before** generating the ruleset
+	 * from the `theme.json`. This is to ensure that if the `theme.json` declares
+	 * `margin` in its `spacing` declaration for the `body` element then these
+	 * user-generated values take precedence in the CSS cascade.
+	 * @link https://github.com/WordPress/gutenberg/issues/36147.
+	 */
+	let ruleset = 'body {margin: 0;}';
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
 		const declarations = getStylesDeclarations( styles );
 		if ( declarations.length === 0 ) {
@@ -342,6 +346,26 @@ export const toStyles = ( tree, blockSelectors ) => {
 		}
 		ruleset = ruleset + `${ selector }{${ declarations.join( ';' ) };}`;
 	} );
+
+	/* Add alignment / layout styles */
+	ruleset =
+		ruleset +
+		'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
+	ruleset =
+		ruleset +
+		'.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
+	ruleset =
+		ruleset +
+		'.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+	if ( hasBlockGapSupport ) {
+		ruleset =
+			ruleset +
+			'.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
+		ruleset =
+			ruleset +
+			'.wp-site-blocks > * + * { margin-block-start: var( --wp--style--block-gap ); }';
+	}
 
 	nodesWithSettings.forEach( ( { selector, presets } ) => {
 		if ( ROOT_BLOCK_SELECTOR === selector ) {
@@ -378,6 +402,8 @@ export function useGlobalStylesOutput() {
 	const [ stylesheets, setStylesheets ] = useState( [] );
 	const [ settings, setSettings ] = useState( {} );
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	const [ blockGap ] = useSetting( 'spacing.blockGap' );
+	const hasBlockGapSupport = blockGap !== null;
 
 	useEffect( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
@@ -389,7 +415,11 @@ export function useGlobalStylesOutput() {
 			mergedConfig,
 			blockSelectors
 		);
-		const globalStyles = toStyles( mergedConfig, blockSelectors );
+		const globalStyles = toStyles(
+			mergedConfig,
+			blockSelectors,
+			hasBlockGapSupport
+		);
 		setStylesheets( [
 			{
 				css: customProperties,
@@ -403,5 +433,5 @@ export function useGlobalStylesOutput() {
 		setSettings( mergedConfig.settings );
 	}, [ mergedConfig ] );
 
-	return [ stylesheets, settings ];
+	return [ stylesheets, settings, hasBlockGapSupport ];
 }
