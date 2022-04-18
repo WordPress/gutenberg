@@ -681,7 +681,32 @@
 						},
 						"radius": {
 							"description": "Sets the `border-radius` CSS property.",
-							"type": "string"
+							"anyOf": [
+								{
+									"type": "string"
+								},
+								{
+									"type": "object",
+									"properties": {
+										"topLeft": {
+											"description": "Sets the `border-top-left-radius` CSS property.",
+											"type": "string"
+										},
+										"topRight": {
+											"description": "Sets the `border-top-right-radius` CSS property.",
+											"type": "string"
+										},
+										"bottomLeft": {
+											"description": "Sets the `border-bottom-left-radius` CSS property.",
+											"type": "string"
+										},
+										"bottomRight": {
+											"description": "Sets the `border-bottom-right-radius` CSS property.",
+											"type": "string"
+										}
+									}
+								}
+							]
 						},
 						"style": {
 							"description": "Sets the `border-style` CSS property.",
@@ -690,6 +715,62 @@
 						"width": {
 							"description": "Sets the `border-width` CSS property.",
 							"type": "string"
+						},
+						"top": {
+							"color": {
+								"description": "Sets the `border-top-color` CSS property.",
+								"type": "string"
+							},
+							"style": {
+								"description": "Sets the `border-top-style` CSS property.",
+								"type": "string"
+							},
+							"width": {
+								"description": "Sets the `border-top-width` CSS property.",
+								"type": "string"
+							}
+						},
+						"right": {
+							"color": {
+								"description": "Sets the `border-right-color` CSS property.",
+								"type": "string"
+							},
+							"style": {
+								"description": "Sets the `border-right-style` CSS property.",
+								"type": "string"
+							},
+							"width": {
+								"description": "Sets the `border-right-width` CSS property.",
+								"type": "string"
+							}
+						},
+						"bottom": {
+							"color": {
+								"description": "Sets the `border-bottom-color` CSS property.",
+								"type": "string"
+							},
+							"style": {
+								"description": "Sets the `border-bottom-style` CSS property.",
+								"type": "string"
+							},
+							"width": {
+								"description": "Sets the `border-bottom-width` CSS property.",
+								"type": "string"
+							}
+						},
+						"left": {
+							"color": {
+								"description": "Sets the `border-left-color` CSS property.",
+								"type": "string"
+							},
+							"style": {
+								"description": "Sets the `border-left-style` CSS property.",
+								"type": "string"
+							},
+							"width": {
+								"description": "Sets the `border-left-width` CSS property.",
+								"type": "string"
+							}
 						}
 					},
 					"additionalProperties": false

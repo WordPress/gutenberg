@@ -4,6 +4,41 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Copy/cut/paste', () => {
+	test( 'should copy and paste individual blocks with collapsed selection', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'Copy - collapsed selection' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'c' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'ArrowDown' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
+	test( 'should cut and paste individual blocks with collapsed selection', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.createNewPost();
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'Cut - collapsed selection' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'ArrowDown' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
+	} );
 	test( 'should copy blocks when non textual elements are focused  (image, spacer)', async ( {
 		page,
 		pageUtils,

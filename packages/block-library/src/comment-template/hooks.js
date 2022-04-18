@@ -96,9 +96,10 @@ const useDefaultPageIndex = ( { defaultPage, postId, perPage, queryArgs } ) => {
 			method: 'HEAD',
 			parse: false,
 		} ).then( ( res ) => {
+			const pages = parseInt( res.headers.get( 'X-WP-TotalPages' ) );
 			setDefaultPages( {
 				...defaultPages,
-				[ key ]: parseInt( res.headers.get( 'X-WP-TotalPages' ) ),
+				[ key ]: pages <= 1 ? 1 : pages, // If there are 0 pages, it means that there are no comments, but there is no 0th page.
 			} );
 		} );
 	}, [ defaultPage, postId, perPage, setDefaultPages ] );
