@@ -217,7 +217,7 @@ An advanced block that allows displaying post comments using different visual co
 
 ## Comments Title
 
-Displays a tittle with the comments count ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
+Displays a title with the number of comments ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
 
 -	**Name:** core/comments-title
 -	**Category:** theme

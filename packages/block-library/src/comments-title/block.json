@@ -5,7 +5,7 @@
 	"title": "Comments Title",
 	"category": "theme",
 	"ancestor": [ "core/comments-query-loop" ],
-	"description": "Displays a tittle with the comments count",
+	"description": "Displays a title with the number of comments",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {
