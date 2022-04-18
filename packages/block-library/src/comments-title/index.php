@@ -8,28 +8,25 @@
 /**
  * Renders the `core/comments-title` block on the server.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
+ * @param array $attributes Block attributes.
  *
  * @return string Return the post comments title.
  */
-function render_block_core_comments_title( $attributes, $content, $block ) {
+function render_block_core_comments_title( $attributes ) {
 	$comments_title     = '';
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 	/* translators: %s: The post title. */
-	$single_comment_label   = __( 'One Response to "%s"' );
+	$single_comment_label = __( 'One Response to "%s"' );
+	/* translators: 1: The number of comments, 2: The post title. */
 	$multiple_comment_label = __( '%1$s Responses to "%2$s"' );
 	if ( 1 === (int) get_comments_number() ) {
 		$comments_title = sprintf(
-			/* translators: %s: The post title. */
 			$single_comment_label,
 			get_the_title()
 		);
 	} else {
 		$comments_title = sprintf(
-			/* translators: 1: The number of comments, 2: The post title. */
 			$multiple_comment_label,
 			number_format_i18n( get_comments_number() ),
 			get_the_title()
