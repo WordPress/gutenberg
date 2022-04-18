@@ -74,6 +74,7 @@ export function useBlockProps(
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
+		isExplodedMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -86,6 +87,7 @@ export function useBlockProps(
 				isBlockMultiSelected,
 				isAncestorMultiSelected,
 				isFirstMultiSelectedBlock,
+				__unstableGetEditorMode,
 			} = select( blockEditorStore );
 			const isSelected = isBlockSelected( clientId );
 			const isPartOfMultiSelection =
@@ -106,6 +108,7 @@ export function useBlockProps(
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+				isExplodedMode: __unstableGetEditorMode() === 'exploded',
 			};
 		},
 		[ clientId ]
@@ -128,6 +131,7 @@ export function useBlockProps(
 			adjustScrolling,
 			enableAnimation,
 			triggerAnimationOnChange: index,
+			scale: isExplodedMode ? 0.8 : 1,
 		} ),
 		useDisabled( { isDisabled: ! __unstableIsDisabled } ),
 	] );

@@ -47,12 +47,14 @@ const getAbsolutePosition = ( element ) => {
  * @param {boolean} $1.adjustScrolling          Adjust the scroll position to the current block.
  * @param {boolean} $1.enableAnimation          Enable/Disable animation.
  * @param {*}       $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param {*}       $1.scale                    Scale of the element
  */
 function useMovingAnimation( {
 	isSelected,
 	adjustScrolling,
 	enableAnimation,
 	triggerAnimationOnChange,
+	scale = 1,
 } ) {
 	const ref = useRef();
 	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
@@ -126,10 +128,10 @@ function useMovingAnimation( {
 		}
 
 		const isMoving = x === 0 && y === 0;
-		ref.current.style.transformOrigin = isMoving ? '' : 'center';
+		ref.current.style.transformOrigin = 'center';
 		ref.current.style.transform = isMoving
-			? ''
-			: `translate3d(${ x }px,${ y }px,0)`;
+			? `scale(${ scale })`
+			: `translate3d(${ x }px,${ y }px,0) scale(${ scale })`;
 		ref.current.style.zIndex = ! isSelected || isMoving ? '' : '1';
 
 		preserveScrollPosition();
