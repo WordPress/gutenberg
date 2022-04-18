@@ -47,45 +47,25 @@ if ( ! function_exists( '_wp_register_webfonts_from_theme_json' ) ) {
 
 		foreach ( $settings['typography']['fontFamilies'] as $font_families_by_origin ) {
 			foreach ( $font_families_by_origin as $font_family ) {
-				if ( isset( $font_family['provider'] ) ) {
-					if ( empty( $font_family['fontFaces'] ) ) {
-						trigger_error(
-							sprintf(
-								/* translators: %s: font family name */
-								esc_html__( 'The "%s" font family specifies a provider, but no font faces.', 'gutenberg' ),
-								esc_html( $font_family['fontFamily'] )
-							)
-						);
-
-						continue;
-					}
-
-					foreach ( $font_family['fontFaces'] as $font_face ) {
-						$font_face['provider'] = $font_family['provider'];
-						$font_face             = _gutenberg_resolve_font_face_uri( $font_face );
-						$font_face             = _wp_array_keys_to_kebab_case( $font_face );
-
-						$font_faces_to_register[] = $font_face;
-					}
-
+				// Skip if no `fontFaces` are defined.
+				if ( empty( $font_family['fontFaces'] ) ) {
 					continue;
 				}
 
-				if ( ! isset( $font_family['fontFaces'] ) ) {
-					continue;
+				// Fallback to the `local` provider if no `provider` is defined.
+				if ( ! isset( $font_family['provider'] ) ) {
+					$font_family['provider'] = 'local';
 				}
 
 				foreach ( $font_family['fontFaces'] as $font_face ) {
-					if ( isset( $font_face['provider'] ) ) {
-						$font_face = _gutenberg_resolve_font_face_uri( $font_face );
-						$font_face = _wp_array_keys_to_kebab_case( $font_face );
+					$font_face['provider'] = $font_family['provider'];
+					$font_face             = _gutenberg_resolve_font_face_uri( $font_face );
+					$font_face             = _wp_array_keys_to_kebab_case( $font_face );
 
-						$font_faces_to_register[] = $font_face;
-					}
+					$font_faces_to_register[] = $font_face;
 				}
 			}
 		}
-
 		wp_register_webfonts( $font_faces_to_register );
 	}
 }
