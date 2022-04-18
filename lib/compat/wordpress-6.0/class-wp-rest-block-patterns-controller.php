@@ -193,7 +193,7 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'inserter'        => array(
+				'inserter'       => array(
 					'description' => __( 'Determines whether the pattern is visible in inserter.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'readonly'    => true,
