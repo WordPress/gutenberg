@@ -69,12 +69,13 @@
 	}
 
 	.comment-reply-title {
+		align-items: baseline;
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
+		margin-bottom: 0;
 
 		:where(small) {
-			font-size: var(--wp--preset--font-size--small, smaller);
+			font-size: var(--wp--preset--font-size--normal, smaller);
 		}
 	}
 }
