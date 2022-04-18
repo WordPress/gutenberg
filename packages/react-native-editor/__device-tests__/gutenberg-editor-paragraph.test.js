@@ -74,7 +74,10 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			2
 		);
 
-		await clickBeginningOfElement( editorPage.driver, paragraphBlockElement );
+		await clickBeginningOfElement(
+			editorPage.driver,
+			paragraphBlockElement
+		);
 
 		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
@@ -108,13 +111,18 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		// Merge paragraphs.
-		const blockText = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+		const blockText = await editorPage.getTextForParagraphBlockAtPosition(
+			2
+		);
 		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
 			2
 		);
 
-		await clickBeginningOfElement( editorPage.driver, paragraphBlockElement );
+		await clickBeginningOfElement(
+			editorPage.driver,
+			paragraphBlockElement
+		);
 		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
@@ -122,7 +130,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		// Verify the editor has not crashed.
-		const mergedBlockText = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		const mergedBlockText = await editorPage.getTextForParagraphBlockAtPosition(
+			1
+		);
 		expect( mergedBlockText.length ).not.toEqual( blockText.length );
 
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
