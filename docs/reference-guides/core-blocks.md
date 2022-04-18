@@ -221,8 +221,8 @@ Displays a tittle with the comments count ([Source](https://github.com/WordPress
 
 -	**Name:** core/comments-title
 -	**Category:** theme
--	**Supports:** color (background, gradients, text), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** textAlign
+-	**Supports:** align, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
+-	**Attributes:** multipleCommentsLabel, showPostTitle, showSingleCommentLabel, singleCommentLabel, textAlign
 
 ## Cover
 

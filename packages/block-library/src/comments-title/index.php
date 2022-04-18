@@ -18,16 +18,19 @@ function render_block_core_comments_title( $attributes, $content, $block ) {
 	$comments_title     = '';
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	/* translators: %s: The post title. */
+	$single_comment_label   = __( 'One Response to "%s"' );
+	$multiple_comment_label = __( '%1$s Responses to "%2$s"' );
 	if ( 1 === (int) get_comments_number() ) {
 		$comments_title = sprintf(
 			/* translators: %s: The post title. */
-			__( 'One Response to "%s"' ),
+			$single_comment_label,
 			get_the_title()
 		);
 	} else {
 		$comments_title = sprintf(
 			/* translators: 1: The number of comments, 2: The post title. */
-			_n( '%1$s Response to "%2$s"', '%1$s Responses to "%2$s"', get_comments_number() ),
+			$multiple_comment_label,
 			number_format_i18n( get_comments_number() ),
 			get_the_title()
 		);

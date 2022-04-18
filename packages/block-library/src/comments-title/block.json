@@ -7,30 +7,66 @@
 	"ancestor": [ "core/comments-query-loop" ],
 	"description": "Displays a tittle with the comments count",
 	"textdomain": "default",
-	"usesContext": [ "commentId" ],
+	"usesContext": [ "postId", "postType" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"
+		},
+		"singleCommentLabel": {
+			"type": "string"
+		},
+		"multipleCommentsLabel": {
+			"type": "string"
+		},
+		"showPostTitle": {
+			"type": "boolean",
+			"default": true
+		},
+		"showSingleCommentLabel": {
+			"type": "boolean"
 		}
 	},
 	"supports": {
+		"anchor": false,
+		"align": true,
 		"html": false,
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"width": true,
+				"color": true
+			}
+		},
 		"color": {
 			"gradients": true,
-			"text": true,
-			"background": true,
 			"__experimentalDefaultControls": {
+				"background": true,
 				"text": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": true
 			}
 		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontFamily": true,
-			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontFamily": true,
 			"__experimentalTextTransform": true,
-			"__experimentalLetterSpacing": true
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"__experimentalFontFamily": true,
+				"__experimentalFontStyle": true,
+				"__experimentalFontWeight": true
+			}
 		}
 	}
 }

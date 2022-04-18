@@ -3,6 +3,7 @@
 		"name": "core/comments-title",
 		"isValid": true,
 		"attributes": {
+			"showPostTitle": true,
 			"textColor": "vivid-purple",
 			"fontFamily": "source-serif-pro",
 			"fontSize": "x-large",
