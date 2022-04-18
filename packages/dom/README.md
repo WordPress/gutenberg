@@ -28,8 +28,8 @@ _Returns_
 
 ### documentHasSelection
 
-Check whether the current document has a selection. This checks for both
-focus in an input field and general text selection.
+Check whether the current document has a selection. This includes focus in
+input fields, textareas, and general rich-text selection.
 
 _Parameters_
 
