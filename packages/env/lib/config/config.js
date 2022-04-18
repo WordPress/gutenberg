@@ -256,6 +256,11 @@ function withOverrides( config ) {
 		getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) ||
 		config.env.tests.port;
 
+	// Override WordPress core with environment variable.
+	config.env.development.core =
+		process.env.WP_ENV_CORE || config.env.development.core;
+	config.env.tests.core = process.env.WP_ENV_CORE || config.env.tests.core;
+
 	// Override PHP version with environment variable.
 	config.env.development.phpVersion =
 		process.env.WP_ENV_PHP_VERSION || config.env.development.phpVersion;
