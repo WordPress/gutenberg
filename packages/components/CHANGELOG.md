@@ -9,6 +9,10 @@
 
 ## 19.8.0 (2022-04-08)
 
+### Bug Fix
+
+-   `InputControl`: allow user to input a value interactively in Storybook, by removing default value argument ([#40410](https://github.com/WordPress/gutenberg/pull/40410)).
+
 ### Enhancements
 
 -   Update `BorderControl` and `BorderBoxControl` to allow the passing of custom class names to popovers ([#39753](https://github.com/WordPress/gutenberg/pull/39753)).
