@@ -68,7 +68,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.insertBlock( { name: 'core/spacer' } );
 		// At this point the spacer wrapper should be focused.
 		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
-		expect( await pageUtils.getEditedPostContent() ).toBe( '' );
+		expect( await pageUtils.getEditedPostContent() ).toMatchSnapshot();
 
 		// The block appender is only visible when there's no selection.
 		await page.evaluate( () => {
