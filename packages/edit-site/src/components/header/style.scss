@@ -104,8 +104,9 @@ body.is-navigation-sidebar-open {
 	margin: 0 -6px 0;
 }
 
+
 /**
- * Buttons in the Toolbar
+ * Buttons on the right side
  */
 
 .edit-site-header__actions {
@@ -116,10 +117,6 @@ body.is-navigation-sidebar-open {
 	@include break-small () {
 		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
 	}
-
-	/**
-	 * Buttons in the Toolbar
- 	 */
 
 	gap: $grid-unit-05;
 
@@ -183,11 +180,8 @@ body.is-navigation-sidebar-open {
 	.edit-site-save-button__button {
 		padding-left: 6px;
 		padding-right: 6px;
-		margin-right: $grid-unit-05;
 	}
-	.block-editor-post-preview__button-toggle {
-		margin-right: $grid-unit-05;
-	}
+
 	// The inserter and the template details toggle have custom labels, different from their aria-label, so we don't want to display both.
 	.edit-site-header-toolbar__inserter-toggle.edit-site-header-toolbar__inserter-toggle,
 	.edit-site-document-actions__get-info.edit-site-document-actions__get-info.edit-site-document-actions__get-info {

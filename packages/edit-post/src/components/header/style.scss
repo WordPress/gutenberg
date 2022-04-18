@@ -44,6 +44,10 @@
 	}
 }
 
+/**
+ * Buttons on the right side
+ */
+
 .edit-post-header__settings {
 	display: inline-flex;
 	align-items: center;
@@ -53,10 +57,6 @@
 	@include break-small () {
 		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
 	}
-
-	/**
-	 * Buttons in the Toolbar
- 	 */
 
 	gap: $grid-unit-05;
 
@@ -89,6 +89,10 @@
 		padding-bottom: 0;
 	}
 }
+
+/**
+ * Show icon labels.
+ */
 
 .show-icon-labels.interface-pinned-items,
 .show-icon-labels .edit-post-header,
@@ -143,17 +147,7 @@
 			padding-right: $grid-unit-15;
 		}
 	}
-	.components-dropdown-menu__toggle {
-		margin-left: $grid-unit;
-		padding-left: $grid-unit;
-		padding-right: $grid-unit;
 
-		@include break-small {
-			margin-left: $grid-unit-15;
-			padding-left: $grid-unit-15;
-			padding-right: $grid-unit-15;
-		}
-	}
 	// The inserter has a custom label, different from its aria-label, so we don't want to display both.
 	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle {
 		&::after {
