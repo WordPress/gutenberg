@@ -373,6 +373,7 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 	 */
 	let ruleset = 'body {margin: 0;}';
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
+		// TODO: separate duotone & regular selector
 		const declarations = getStylesDeclarations( styles );
 		if ( declarations.length === 0 ) {
 			return;
@@ -429,9 +430,12 @@ const getBlockSelectors = ( blockTypes ) => {
 		const selector =
 			blockType?.supports?.__experimentalSelector ??
 			'.wp-block-' + name.replace( 'core/', '' ).replace( '/', '-' );
+		const duotoneSelector =
+			blockType?.supports?.color?.__experimentalDuotone ?? null;
 		result[ name ] = {
 			name,
 			selector,
+			duotoneSelector,
 		};
 	} );
 
