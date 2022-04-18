@@ -31,8 +31,8 @@ export function useIsHovered() {
 		);
 		return (
 			__unstableGetEditorMode() === 'navigation' ||
-			__unstableGetEditorMode() === 'exploded' ||
-			getSettings().outlineMode
+			( getSettings().outlineMode &&
+				__unstableGetEditorMode() === 'exploded' )
 		);
 	}, [] );
 
