@@ -147,7 +147,7 @@ $template = array(
 	array( 'core/heading', array(
 		'placeholder' => 'Add Author...',
 	) ),
-	// Make a Paragraph block optional.
+	// Allow a Paragraph block to be moved or removed.
 	array( 'core/paragraph', array(
 		'placeholder' => 'Add Description...',
 		'lock' => array(
