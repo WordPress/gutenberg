@@ -134,6 +134,7 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 
 function getPresetsSvgFilters( blockPresets = {} ) {
 	return PRESET_METADATA.filter(
+		// Duotone are the only type of filters for now.
 		( metadata ) => metadata.path.at( -1 ) === 'duotone'
 	).flatMap( ( metadata ) => {
 		const presetByOrigin = get( blockPresets, metadata.path, {} );
