@@ -227,15 +227,10 @@ function InsertionPointPopover( {
 	);
 }
 
-export default function InsertionPoint( { children, ...props } ) {
+export default function InsertionPoint( props ) {
 	const isVisible = useSelect( ( select ) => {
 		return select( blockEditorStore ).isBlockInsertionPointVisible();
 	}, [] );
 
-	return (
-		<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-			{ isVisible && <InsertionPointPopover { ...props } /> }
-			{ children }
-		</InsertionPointOpenRef.Provider>
-	);
+	return isVisible && <InsertionPointPopover { ...props } />;
 }
