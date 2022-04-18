@@ -133,21 +133,21 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 }
 
 function getPresetsSvgFilters( blockPresets = {} ) {
-	return PRESET_METADATA.filter( ( metadata ) => metadata.svgFilter ).flatMap(
-		( metadata ) => {
-			const presetByOrigin = get( blockPresets, metadata.path, {} );
-			return [ 'default', 'theme' ]
-				.filter( ( origin ) => presetByOrigin[ origin ] )
-				.flatMap( ( origin ) =>
-					presetByOrigin[ origin ].map( ( preset ) => (
-						<PresetDuotoneFilter
-							preset={ preset }
-							key={ preset.slug }
-						/>
-					) )
-				);
-		}
-	);
+	return PRESET_METADATA.filter(
+		( metadata ) => metadata.path.at( -1 ) === 'duotone'
+	).flatMap( ( metadata ) => {
+		const presetByOrigin = get( blockPresets, metadata.path, {} );
+		return [ 'default', 'theme' ]
+			.filter( ( origin ) => presetByOrigin[ origin ] )
+			.flatMap( ( origin ) =>
+				presetByOrigin[ origin ].map( ( preset ) => (
+					<PresetDuotoneFilter
+						preset={ preset }
+						key={ preset.slug }
+					/>
+				) )
+			);
+	} );
 }
 
 function flattenTree( input = {}, prefix, token ) {
