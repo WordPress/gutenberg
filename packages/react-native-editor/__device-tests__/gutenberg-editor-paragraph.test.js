@@ -69,21 +69,12 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
-		paragraphBlockElement = await editorPage.getBlockAtPosition(
+		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
-			2,
-			{
-				useWaitForVisible: true,
-			}
+			2
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
-		const textViewElement = await editorPage.getTextViewForParagraphBlock(
-			paragraphBlockElement
-		);
-		await clickBeginningOfElement( editorPage.driver, textViewElement );
+		await clickBeginningOfElement( editorPage.driver, paragraphBlockElement );
 
 		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
@@ -117,21 +108,13 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		// Merge paragraphs.
-		await editorPage.getTextForParagraphBlockAtPosition( 2 );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+		const blockText = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
 			blockNames.paragraph,
-			2,
-			{
-				useWaitForVisible: true,
-			}
+			2
 		);
 
-		const textViewElement = await editorPage.getTextViewForParagraphBlock(
-			paragraphBlockElement
-		);
-
-		await clickBeginningOfElement( editorPage.driver, textViewElement );
-
+		await clickBeginningOfElement( editorPage.driver, paragraphBlockElement );
 		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
@@ -139,8 +122,8 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		// Verify the editor has not crashed.
-		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
-		expect( text.length ).not.toEqual( 0 );
+		const mergedBlockText = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		expect( mergedBlockText.length ).not.toEqual( blockText.length );
 
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
