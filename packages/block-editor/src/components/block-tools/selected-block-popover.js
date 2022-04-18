@@ -79,18 +79,18 @@ function SelectedBlockPopover( {
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const showEmptyBlockSideInserter =
-		! isTyping && ! editorMode === 'visual' && isEmptyDefaultBlock;
+		! isTyping && ! editorMode === 'edit' && isEmptyDefaultBlock;
 	const shouldShowBreadcrumb =
 		editorMode === 'navigation' || editorMode === 'exploded';
 	const shouldShowContextualToolbar =
-		editorMode === 'visual' &&
+		editorMode === 'edit' &&
 		! hasFixedToolbar &&
 		isLargeViewport &&
 		! isMultiSelecting &&
 		! showEmptyBlockSideInserter &&
 		! isTyping;
 	const canFocusHiddenToolbar =
-		editorMode === 'visual' &&
+		editorMode === 'edit' &&
 		! shouldShowContextualToolbar &&
 		! hasFixedToolbar &&
 		! isEmptyDefaultBlock;
