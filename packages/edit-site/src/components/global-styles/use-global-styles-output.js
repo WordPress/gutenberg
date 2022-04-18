@@ -179,11 +179,7 @@ function getStylesDeclarations( blockStyles = {} ) {
 		STYLE_PROPERTY,
 		( declarations, { value, properties, useEngine }, key ) => {
 			const pathToValue = value;
-			if (
-				first( pathToValue ) === 'elements' ||
-				key === 'filter' ||
-				useEngine
-			) {
+			if ( first( pathToValue ) === 'elements' || useEngine ) {
 				return declarations;
 			}
 
