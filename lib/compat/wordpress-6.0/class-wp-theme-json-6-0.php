@@ -677,4 +677,99 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 
 		unset( $context['appearanceTools'] );
 	}
+
+	/**
+	 * Given a settings array, it returns the generated rulesets
+	 * for the preset classes.
+	 *
+	 * @param array  $settings Settings to process.
+	 * @param string $selector Selector wrapping the classes.
+	 * @param array  $origins  List of origins to process.
+	 * @return string The result of processing the presets.
+	 */
+	protected static function compute_preset_classes( $settings, $selector, $origins ) {
+		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+			// Classes at the global level do not need any CSS prefixed,
+			// and we don't want to increase its specificity.
+			$selector = '';
+		}
+
+		$stylesheet = '';
+		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
+			foreach ( $preset_metadata['classes'] as $class => $property ) {
+				foreach ( $slugs as $slug ) {
+					$css_var     = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
+					$class_name  = static::replace_slug_in_string( $class, $slug );
+					$stylesheet .= static::to_ruleset(
+						static::append_to_selector( $selector, $class_name ),
+						array(
+							array(
+								'name'  => '--wp--user--preset--' . $property,
+								'value' => 'var(' . $css_var . ')',
+							),
+						)
+					);
+				}
+			}
+		}
+
+		return $stylesheet;
+	}
+
+		/**
+	 * Given a styles array, it extracts the style properties
+	 * and adds them to the $declarations array following the format:
+	 *
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
+	 *
+	 * @param array $styles Styles to process.
+	 * @param array $settings Theme settings.
+	 * @param array $properties Properties metadata.
+	 * @return array Returns the modified $declarations.
+	 */
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null ) {
+		if ( null === $properties ) {
+			$properties = static::PROPERTIES_METADATA;
+		}
+
+		$declarations = array();
+		if ( empty( $styles ) ) {
+			return $declarations;
+		}
+
+		foreach ( $properties as $css_property => $value_path ) {
+			$value = static::get_property_value( $styles, $value_path );
+
+			// Look up protected properties, keyed by value path.
+			// Skip protected properties that are explicitly set to `null`.
+			if ( is_array( $value_path ) ) {
+				$path_string = implode( '.', $value_path );
+				if (
+					array_key_exists( $path_string, static::PROTECTED_PROPERTIES ) &&
+					_wp_array_get( $settings, static::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+				) {
+					continue;
+				}
+			}
+
+			// Skip if empty and not "0" or value represents array of longhand values.
+			$has_missing_value = empty( $value ) && ! is_numeric( $value );
+			if ( $has_missing_value || is_array( $value ) ) {
+				continue;
+			}
+
+			$declarations[] = array(
+				'name'  => $css_property,
+				'value' => 'var(--wp--user--preset--' . $css_property . ',' . $value . ')',
+			);
+		}
+
+		return $declarations;
+	}
 }

@@ -948,12 +948,8 @@ class WP_Theme_JSON_5_9 {
 						static::append_to_selector( $selector, $class_name ),
 						array(
 							array(
-								'name'  => '--wp--user--preset--' . $property,
-								'value' => 'var(' . $css_var . ')',
-							),
-							array(
 								'name'  => $property,
-								'value' => 'var(' . $css_var . ')',
+								'value' => 'var(' . $css_var . ') !important',
 							),
 						)
 					);
@@ -1267,7 +1263,7 @@ class WP_Theme_JSON_5_9 {
 
 			$declarations[] = array(
 				'name'  => $css_property,
-				'value' => 'var(--wp--user--preset--' . $css_property . ',' . $value . ')',
+				'value' => $value,
 			);
 		}
 

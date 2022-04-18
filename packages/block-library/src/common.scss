@@ -152,3 +152,14 @@ html :where(img[class*="wp-image-"]) {
 	height: auto;
 	max-width: 100%;
 }
+
+/**
+ * Provide default colors if user presets applied to block.
+ */
+.has-background {
+	background-color: var(--wp--user--preset--background-color);
+}
+
+.has-text-color {
+	color: var(--wp--user--preset--color);
+}
