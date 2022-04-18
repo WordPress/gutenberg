@@ -282,12 +282,16 @@ const typeStringAndroid = async (
 };
 
 // Calculates middle x,y and clicks that position
-const clickMiddleOfElement = async ( driver, element ) => {
+const clickMiddleOfElement = async ( driver, element, isParagraph = false ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
-
 	const action = await new wd.TouchAction( driver );
-	action.press( { x: location.x + size.width / 2, y: location.y } );
+	// Condition to make it work on iOS Paragraph blocks on both environments, the default calculation somehow doesn't work for this combination but works for others.
+	if ( isParagraph === true && ! isAndroid() ) {
+		action.press( { x: size.width / 2, y: location.y } );
+	} else {
+		action.press( { x: location.x + size.width / 2, y: location.y } );
+	}
 	action.release();
 	await action.perform();
 };
