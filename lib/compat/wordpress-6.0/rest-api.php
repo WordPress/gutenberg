@@ -34,3 +34,21 @@ function gutenberg_register_edit_site_export_endpoint() {
 	$editor_settings->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_endpoint' );
+
+/**
+ * Registers the block patterns REST API routes.
+ */
+function gutenberg_register_rest_block_patterns() {
+	$block_patterns = new WP_REST_Block_Patterns_Controller();
+	$block_patterns->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
+
+/**
+ * Registers the block pattern categories REST API routes.
+ */
+function gutenberg_register_rest_block_pattern_categories() {
+	$block_patterns = new WP_REST_Block_Pattern_Categories_Controller();
+	$block_patterns->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_block_pattern_categories' );

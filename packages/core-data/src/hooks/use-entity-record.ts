@@ -30,10 +30,10 @@ interface Options {
 /**
  * Resolves the specified entity record.
  *
- * @param  kind                                 Kind of the requested entity.
- * @param  name                                 Name of the requested  entity.
- * @param  recordId                             Record ID of the requested entity.
- * @param  options                              Hook options.
+ * @param  kind                   Kind of the requested entity.
+ * @param  name                   Name of the requested  entity.
+ * @param  recordId               Record ID of the requested entity.
+ * @param  options                Hook options.
  * @param  [options.enabled=true] Whether to run the query or short-circuit and return null. Defaults to true.
  * @example
  * ```js

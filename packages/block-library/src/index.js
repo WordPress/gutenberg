@@ -13,6 +13,7 @@ import {
  * Internal dependencies
  */
 import * as archives from './archives';
+import * as avatar from './avatar';
 import * as audio from './audio';
 import * as button from './button';
 import * as buttons from './buttons';
@@ -78,6 +79,7 @@ import * as postTitle from './post-title';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as query from './query';
+import * as queryNoResults from './query-no-results';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
 import * as queryPaginationNumbers from './query-pagination-numbers';
@@ -136,7 +138,6 @@ export const __experimentalGetCoreBlocks = () => [
 	heading,
 	gallery,
 	list,
-	listItem,
 	quote,
 
 	// Register all remaining core blocks.
@@ -189,6 +190,7 @@ export const __experimentalGetCoreBlocks = () => [
 	siteTagline,
 	query,
 	templatePart,
+	avatar,
 	postTitle,
 	postExcerpt,
 	postFeaturedImage,
@@ -202,7 +204,21 @@ export const __experimentalGetCoreBlocks = () => [
 	queryPaginationNext,
 	queryPaginationNumbers,
 	queryPaginationPrevious,
+	queryNoResults,
+	readMore,
+	commentAuthorName,
+	commentContent,
+	commentDate,
+	commentEditLink,
+	commentReplyLink,
+	commentTemplate,
+	commentsQueryLoop,
+	commentsPagination,
+	commentsPaginationNext,
+	commentsPaginationNumbers,
+	commentsPaginationPrevious,
 	postComments,
+	homeLink,
 	logInOut,
 	termDescription,
 	queryTitle,
@@ -250,30 +266,20 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	? ( { enableFSEBlocks } = {} ) => {
 			[
 				// Experimental blocks.
-				homeLink,
 				postAuthorName,
+				...( window.__experimentalEnableListBlockV2
+					? [ listItem ]
+					: [] ),
 
 				// Full Site Editing blocks.
 				...( enableFSEBlocks
 					? [
 							commentAuthorAvatar,
-							commentAuthorName,
-							commentContent,
-							commentDate,
-							commentEditLink,
-							commentReplyLink,
-							commentTemplate,
-							commentsQueryLoop,
-							commentsPagination,
-							commentsPaginationNext,
-							commentsPaginationNumbers,
-							commentsPaginationPrevious,
 							navigationArea,
 							postComment,
 							postCommentsCount,
 							postCommentsForm,
 							postCommentsLink,
-							readMore,
 					  ]
 					: [] ),
 			].forEach( registerBlock );

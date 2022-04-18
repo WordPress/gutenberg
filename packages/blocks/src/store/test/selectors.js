@@ -586,6 +586,7 @@ describe( 'selectors', () => {
 			title: 'Paragraph',
 			category: 'text',
 			keywords: [ 'body' ],
+			description: 'writing flow',
 		};
 
 		const state = {
@@ -598,6 +599,10 @@ describe( 'selectors', () => {
 			[ 'name', name ],
 			[ 'block type', blockType ],
 			[ 'block type without category', omit( blockType, 'category' ) ],
+			[
+				'block type without description',
+				omit( blockType, 'description' ),
+			],
 		] )( 'by %s', ( label, nameOrType ) => {
 			it( 'should return false if not match', () => {
 				const result = isMatchingSearchTerm(
@@ -665,6 +670,18 @@ describe( 'selectors', () => {
 						state,
 						nameOrType,
 						'TEXT'
+					);
+
+					expect( result ).toBe( true );
+				} );
+			}
+
+			if ( nameOrType.description ) {
+				it( 'should return true if match using the description', () => {
+					const result = isMatchingSearchTerm(
+						state,
+						nameOrType,
+						'flow'
 					);
 
 					expect( result ).toBe( true );

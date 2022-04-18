@@ -27,6 +27,9 @@ function render_block_core_comment_author_name( $attributes, $content, $block ) 
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= 'has-text-align-' . esc_attr( $attributes['textAlign'] );
 	}
+	if ( isset( $attributes['fontSize'] ) ) {
+		$classes .= 'has-' . esc_attr( $attributes['fontSize'] ) . '-font-size';
+	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	$comment_author     = get_comment_author( $comment );

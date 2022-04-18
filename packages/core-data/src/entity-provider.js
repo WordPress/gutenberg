@@ -78,7 +78,7 @@ export default function EntityProvider( { kind, type: name, id, children } ) {
  * @param {string} kind The entity kind.
  * @param {string} name The entity name.
  */
-export function useEntityProviderId( kind, name ) {
+export function useEntityId( kind, name ) {
 	return useContext( getEntityContext( kind, name ) );
 }
 
@@ -100,7 +100,7 @@ export function useEntityProviderId( kind, name ) {
  * 							  `protected` props.
  */
 export function useEntityProp( kind, name, prop, _id ) {
-	const providerId = useEntityProviderId( kind, name );
+	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 
 	const { value, fullValue } = useSelect(
@@ -151,7 +151,7 @@ export function useEntityProp( kind, name, prop, _id ) {
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
-	const providerId = useEntityProviderId( kind, name );
+	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const { content, blocks } = useSelect(
 		( select ) => {

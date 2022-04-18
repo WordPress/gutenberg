@@ -33,8 +33,7 @@ $z-layers: (
 	".block-editor-url-input__suggestions": 30,
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
-	".interface-interface-skeleton__content": 91,
-	".edit-site-list.interface-interface-skeleton__content": 29, // The content area needs to be lower than the header so tools dropdowns appear over the content.
+	".interface-interface-skeleton__content": 20,
 	".edit-site-header": 62,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
@@ -83,10 +82,6 @@ $z-layers: (
 
 	// Ensures content overlay appears higher than resize containers used for image/video/etc.
 	".block-editor-block-content-overlay__overlay": 10,
-
-	// The block mover, particularly in nested contexts,
-	// should overlap most block content.
-	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 61,
 
 	// Query block setup state.
 	".block-editor-block-pattern-setup .pattern-slide": 100,

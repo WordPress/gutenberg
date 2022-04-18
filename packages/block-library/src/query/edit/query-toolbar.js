@@ -16,6 +16,7 @@ export default function QueryToolbar( {
 	attributes: { query, displayLayout },
 	setQuery,
 	setDisplayLayout,
+	openPatternSelectionModal,
 } ) {
 	const maxPageInputId = useInstanceId(
 		QueryToolbar,
@@ -128,6 +129,11 @@ export default function QueryToolbar( {
 					/>
 				</ToolbarGroup>
 			) }
+			<ToolbarGroup className="wp-block-template-part__block-control-group">
+				<ToolbarButton onClick={ openPatternSelectionModal }>
+					{ __( 'Replace' ) }
+				</ToolbarButton>
+			</ToolbarGroup>
 			<ToolbarGroup controls={ displayLayoutControls } />
 		</>
 	);

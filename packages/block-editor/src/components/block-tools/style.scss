@@ -112,42 +112,6 @@
 			border-right-color: $gray-200;
 		}
 	}
-
-	.block-editor-block-mover-button {
-		overflow: hidden;
-	}
-
-	// Extra specificity to override standard toolbar button styles.
-	.block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
-		min-width: $block-toolbar-height*0.5;
-		width: $block-toolbar-height*0.5;
-
-		svg {
-			min-width: $block-toolbar-height*0.5;
-		}
-	}
-}
-
-// Position mover arrows for both toolbars.
-.block-editor-block-contextual-toolbar .block-editor-block-mover:not(.is-horizontal) {
-	// Position SVGs.
-	.block-editor-block-mover-button {
-		&:focus::before {
-			left: 0 !important;
-			min-width: 0;
-			width: 100%;
-		}
-	}
-
-	@include break-small() {
-		.block-editor-block-mover-button.is-up-button svg {
-			top: 5px;
-		}
-
-		.block-editor-block-mover-button.is-down-button svg {
-			bottom: 5px;
-		}
-	}
 }
 
 /**

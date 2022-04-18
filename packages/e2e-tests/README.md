@@ -2,6 +2,8 @@
 
 End-To-End (E2E) tests for WordPress.
 
+**Note that there's currently an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate E2E tests to Playwright instead. This package is deprecated and will only accept bug fixes until fully migrated.**
+
 ## Installation
 
 Install the module

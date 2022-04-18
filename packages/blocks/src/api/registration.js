@@ -164,6 +164,17 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 				serverSideBlockDefinitions[ blockName ].apiVersion =
 					definitions[ blockName ].apiVersion;
 			}
+			// The `ancestor` prop is not included in the definitions shared
+			// from the server yet, so it needs to be polyfilled as well.
+			// @see https://github.com/WordPress/gutenberg/pull/39894
+			if (
+				serverSideBlockDefinitions[ blockName ].ancestor ===
+					undefined &&
+				definitions[ blockName ].ancestor
+			) {
+				serverSideBlockDefinitions[ blockName ].ancestor =
+					definitions[ blockName ].ancestor;
+			}
 			continue;
 		}
 		serverSideBlockDefinitions[ blockName ] = mapKeys(
@@ -187,6 +198,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'title',
 		'category',
 		'parent',
+		'ancestor',
 		'icon',
 		'description',
 		'keywords',

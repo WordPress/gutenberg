@@ -8,7 +8,7 @@ import { castArray, first, last } from 'lodash';
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import { Button } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
@@ -139,12 +139,10 @@ const BlockMoverButton = forwardRef(
 					aria-describedby={ descriptionId }
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
-					aria-disabled={ isDisabled }
+					disabled={ isDisabled }
+					__experimentalIsFocusable
 				/>
-				<span
-					id={ descriptionId }
-					className="block-editor-block-mover-button__description"
-				>
+				<VisuallyHidden id={ descriptionId }>
 					{ getBlockMoverDescription(
 						blocksCount,
 						blockType && blockType.title,
@@ -154,7 +152,7 @@ const BlockMoverButton = forwardRef(
 						direction === 'up' ? -1 : 1,
 						orientation
 					) }
-				</span>
+				</VisuallyHidden>
 			</>
 		);
 	}

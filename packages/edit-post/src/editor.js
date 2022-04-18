@@ -18,6 +18,7 @@ import { StrictMode, useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -50,7 +51,6 @@ function Editor( {
 		( select ) => {
 			const {
 				isFeatureActive,
-				getPreference,
 				__experimentalGetPreviewDeviceType,
 				isEditingTemplate,
 				getEditedPostTemplate,
@@ -86,7 +86,8 @@ function Editor( {
 				focusMode: isFeatureActive( 'focusMode' ),
 				hasReducedUI: isFeatureActive( 'reducedUI' ),
 				hasThemeStyles: isFeatureActive( 'themeStyles' ),
-				preferredStyleVariations: getPreference(
+				preferredStyleVariations: select( preferencesStore ).get(
+					'core/edit-post',
 					'preferredStyleVariations'
 				),
 				hiddenBlockTypes: getHiddenBlockTypes(),

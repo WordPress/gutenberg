@@ -11,7 +11,7 @@ import './style';
 import './color';
 import './duotone';
 import './font-size';
-import './border-color';
+import './border';
 import './layout';
 
 export { useCustomSides } from './dimensions';
