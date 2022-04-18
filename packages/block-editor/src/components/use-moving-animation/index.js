@@ -63,7 +63,7 @@ function useMovingAnimation( {
 		0
 	);
 	const [ finishedAnimation, endAnimation ] = useReducer( counterReducer, 0 );
-	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
+	const [ transform, setTransform ] = useState( { x: 0, y: 0, scale: 1 } );
 	const previous = useMemo(
 		() => ( ref.current ? getAbsolutePosition( ref.current ) : null ),
 		[ triggerAnimationOnChange ]
@@ -111,56 +111,44 @@ function useMovingAnimation( {
 			return;
 		}
 
-		ref.current.style.transform = '';
+		ref.current.style.transform = `scale( ${ scale } )`;
 		const destination = getAbsolutePosition( ref.current );
 
 		triggerAnimation();
 		setTransform( {
 			x: Math.round( previous.left - destination.left ),
 			y: Math.round( previous.top - destination.top ),
+			scale,
 		} );
 	}, [ triggerAnimationOnChange ] );
 
-	// Only called when either the x or y value changes.
-	function onFrameChange( { x, y } ) {
+	function onChange( { value } ) {
 		if ( ! ref.current ) {
 			return;
 		}
-
-		const isMoving = x === 0 && y === 0;
-		ref.current.style.transformOrigin = 'center';
-		ref.current.style.transform = isMoving
-			? `scale(${ scale })`
-			: `translate3d(${ x }px,${ y }px,0) scale(${ scale })`;
-		ref.current.style.zIndex = ! isSelected || isMoving ? '' : '1';
+		let { x, y, scale: currentScale } = value;
+		x = Math.round( x );
+		y = Math.round( y );
+		const finishedMoving = x === 0 && y === 0 && currentScale === scale;
+		ref.current.style.transformOrigin = 'center center';
+		ref.current.style.transform = finishedMoving
+			? `scale( ${ scale } )`
+			: `translate3d(${ x }px,${ y }px,0) scale(${ currentScale })`;
+		ref.current.style.zIndex = isSelected ? '1' : '';
 
 		preserveScrollPosition();
 	}
-
-	// Called for every frame computed by useSpring.
-	function onChange( { value } ) {
-		let { x, y } = value;
-		x = Math.round( x );
-		y = Math.round( y );
-
-		if ( x !== onChange.x || y !== onChange.y ) {
-			onFrameChange( { x, y } );
-			onChange.x = x;
-			onChange.y = y;
-		}
-	}
-
-	onChange.x = 0;
-	onChange.y = 0;
 
 	useSpring( {
 		from: {
 			x: transform.x,
 			y: transform.y,
+			scale: transform.scale,
 		},
 		to: {
 			x: 0,
 			y: 0,
+			scale,
 		},
 		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
