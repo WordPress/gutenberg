@@ -113,36 +113,27 @@ body.is-navigation-sidebar-open {
 	align-items: center;
 	padding-right: $grid-unit-05;
 
+	@include break-small () {
+		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
+	}
+
+	/**
+	 * Buttons in the Toolbar
+ 	 */
+
+	gap: $grid-unit-05;
+
+	@include break-small() {
+		gap: $grid-unit-10;
+	}
+
+	// Pinned items.
 	.interface-pinned-items {
 		display: none;
 
 		@include break-medium() {
 			display: inline-flex;
 		}
-	}
-
-	// Adjust button paddings to scale better to mobile.
-	.editor-post-saved-state,
-	.components-button.components-button {
-		margin-right: $grid-unit-05;
-
-		@include break-small() {
-			margin-right: $grid-unit-15;
-		}
-	}
-
-	.editor-post-saved-state,
-	.components-button.is-tertiary {
-		padding: 0 #{$grid-unit-15 * 0.5};
-	}
-
-	.edit-site-more-menu .components-button,
-	.interface-pinned-items .components-button {
-		margin-right: 0;
-	}
-
-	@include break-small() {
-		padding-right: $grid-unit-20;
 	}
 }
 
