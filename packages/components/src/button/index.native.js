@@ -9,13 +9,12 @@ import {
 	Platform,
 } from 'react-native';
 import { isArray } from 'lodash';
-import { runOnJS } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement } from '@wordpress/element';
+import { Children, cloneElement, useCallback } from '@wordpress/element';
 import {
 	usePreferredColorScheme,
 	usePreferredColorSchemeStyle,
@@ -165,25 +164,32 @@ export function Button( props ) {
 		  } )
 		: null;
 
-	const lonPressGesture = Gesture.LongPress().onStart( () => {
-		if ( onLongPress ) {
-			runOnJS( onLongPress )();
-		}
-	} );
+	const longPressHandler = useCallback(
+		( { nativeEvent } ) => {
+			if ( nativeEvent.state === State.ACTIVE && onLongPress ) {
+				onLongPress();
+			}
+		},
+		[ onLongPress ]
+	);
 
 	const element = (
-		<GestureDetector gesture={ lonPressGesture }>
-			<TouchableOpacity
-				activeOpacity={ 0.7 }
-				accessible={ true }
-				accessibilityLabel={ label }
-				accessibilityStates={ states }
-				accessibilityRole={ 'button' }
-				accessibilityHint={ hint }
-				onPress={ onClick }
-				style={ containerStyle }
-				disabled={ isDisabled }
-				testID={ testID }
+		<TouchableOpacity
+			activeOpacity={ 0.7 }
+			accessible={ true }
+			accessibilityLabel={ label }
+			accessibilityStates={ states }
+			accessibilityRole={ 'button' }
+			accessibilityHint={ hint }
+			onPress={ onClick }
+			style={ containerStyle }
+			disabled={ isDisabled }
+			testID={ testID }
+		>
+			<LongPressGestureHandler
+				minDurationMs={ 500 }
+				maxDist={ 150 }
+				onHandlerStateChange={ longPressHandler }
 			>
 				<View style={ buttonViewStyle }>
 					<View style={ { flexDirection: 'row' } }>
@@ -202,8 +208,8 @@ export function Button( props ) {
 						) }
 					</View>
 				</View>
-			</TouchableOpacity>
-		</GestureDetector>
+			</LongPressGestureHandler>
+		</TouchableOpacity>
 	);
 
 	if ( ! shouldShowTooltip ) {
