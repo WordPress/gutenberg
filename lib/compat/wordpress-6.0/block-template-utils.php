@@ -16,7 +16,7 @@
  * @return Bool Whether this file is in an ignored directory.
  */
 function gutenberg_is_theme_directory_ignored( $path ) {
-	$directories_to_ignore = array( '.git', 'node_modules', 'vendor' );
+	$directories_to_ignore = array( '.svn', '.git', '.hg', '.bzr', 'node_modules', 'vendor' );
 	foreach ( $directories_to_ignore as $directory ) {
 		if ( strpos( $path, $directory ) === 0 ) {
 			return true;
@@ -41,19 +41,17 @@ function gutenberg_generate_block_templates_export_file() {
 		return new WP_Error( 'missing_zip_package', __( 'Zip Export not supported.', 'gutenberg' ) );
 	}
 
-	$obscura  = wp_generate_password( 12, false, false );
-	$filename = get_temp_dir() . 'edit-site-export-' . $obscura . '.zip';
+	$obscura    = wp_generate_password( 12, false, false );
+	$theme_name = wp_get_theme()->get( 'TextDomain' );
+	$filename   = get_temp_dir() . $theme_name . $obscura . '.zip';
 
 	$zip = new ZipArchive();
 	if ( true !== $zip->open( $filename, ZipArchive::CREATE | ZipArchive::OVERWRITE ) ) {
 		return new WP_Error( 'unable_to_create_zip', __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
 	}
 
-	$theme_name = wp_get_theme()->get( 'TextDomain' );
-
-	$zip->addEmptyDir( $theme_name );
-	$zip->addEmptyDir( $theme_name . '/templates' );
-	$zip->addEmptyDir( $theme_name . '/parts' );
+	$zip->addEmptyDir( 'templates' );
+	$zip->addEmptyDir( 'parts' );
 
 	// Get path of the theme.
 	$theme_path = wp_normalize_path( get_stylesheet_directory() );
@@ -69,11 +67,11 @@ function gutenberg_generate_block_templates_export_file() {
 		// Skip directories as they are added automatically.
 		if ( ! $file->isDir() ) {
 			// Get real and relative path for current file.
-			$file_path     = wp_normalize_path( $file->getRealPath() );
+			$file_path     = wp_normalize_path( $file );
 			$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
 
 			if ( ! gutenberg_is_theme_directory_ignored( $relative_path ) ) {
-				$zip->addFile( $file_path, $theme_name . '/' . $relative_path );
+				$zip->addFile( $file_path, $relative_path );
 			}
 		}
 	}
@@ -84,7 +82,7 @@ function gutenberg_generate_block_templates_export_file() {
 		$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
 
 		$zip->addFromString(
-			$theme_name . '/templates/' . $template->slug . '.html',
+			'templates/' . $template->slug . '.html',
 			$template->content
 		);
 	}
@@ -93,18 +91,38 @@ function gutenberg_generate_block_templates_export_file() {
 	$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
 	foreach ( $template_parts as $template_part ) {
 		$zip->addFromString(
-			$theme_name . '/parts/' . $template_part->slug . '.html',
+			'parts/' . $template_part->slug . '.html',
 			$template_part->content
 		);
 	}
 
 	// Load theme.json into the zip file.
-	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) );
+	// Merge with user data.
 	$tree->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
 
+	$theme_json_raw = $tree->get_data();
+	// If a version is defined, add a schema.
+	if ( $theme_json_raw['version'] ) {
+		global $wp_version;
+		$theme_json_version = 'wp/' . substr( $wp_version, 0, 3 );
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
+			$theme_json_version = 'trunk';
+		}
+		$schema         = array( '$schema' => 'https://schemas.wp.org/' . $theme_json_version . '/theme.json' );
+		$theme_json_raw = array_merge( $schema, $theme_json_raw );
+	}
+
+	// Convert to a string.
+	$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+
+	// Replace 4 spaces with a tab.
+	$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
+
+	// Add the theme.json file to the zip.
 	$zip->addFromString(
-		$theme_name . '/theme.json',
-		wp_json_encode( $tree->get_data(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
+		'theme.json',
+		$theme_json_tabbed
 	);
 
 	// Save changes to the zip file.

@@ -103,8 +103,6 @@ export default function SearchEdit( {
 		} );
 	}, [ insertedInNavigationBlock ] );
 	const borderRadius = style?.border?.radius;
-	const borderColor = style?.border?.color;
-	const borderWidth = style?.border?.width;
 	const borderProps = useBorderProps( attributes );
 
 	// Check for old deprecated numerical border radius. Done as a separate
@@ -392,10 +390,18 @@ export default function SearchEdit( {
 		radius ? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })` : undefined;
 
 	const getWrapperStyles = () => {
-		const styles = {
-			borderColor,
-			borderWidth: isButtonPositionInside ? borderWidth : undefined,
-		};
+		const styles = isButtonPositionInside
+			? borderProps.style
+			: {
+					borderRadius: borderProps.style?.borderRadius,
+					borderTopLeftRadius: borderProps.style?.borderTopLeftRadius,
+					borderTopRightRadius:
+						borderProps.style?.borderTopRightRadius,
+					borderBottomLeftRadius:
+						borderProps.style?.borderBottomLeftRadius,
+					borderBottomRightRadius:
+						borderProps.style?.borderBottomRightRadius,
+			  };
 
 		const isNonZeroBorderRadius =
 			borderRadius !== undefined && parseInt( borderRadius, 10 ) !== 0;
@@ -417,11 +423,11 @@ export default function SearchEdit( {
 				} = borderRadius;
 
 				return {
+					...styles,
 					borderTopLeftRadius: padBorderRadius( topLeft ),
 					borderTopRightRadius: padBorderRadius( topRight ),
 					borderBottomLeftRadius: padBorderRadius( bottomLeft ),
 					borderBottomRightRadius: padBorderRadius( bottomRight ),
-					...styles,
 				};
 			}
 

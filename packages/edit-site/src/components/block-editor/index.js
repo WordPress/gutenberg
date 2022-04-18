@@ -8,20 +8,26 @@ import classnames from 'classnames';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockList,
 	BlockEditorProvider,
 	__experimentalLinkControl,
 	BlockInspector,
 	BlockTools,
+	__unstableBlockToolbarLastItem,
 	__unstableBlockSettingsMenuFirstItem,
 	__unstableUseTypingObserver as useTypingObserver,
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
+	__unstableBlockNameContext,
 } from '@wordpress/block-editor';
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { listView } from '@wordpress/icons';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -42,17 +48,44 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, templateId, page } = useSelect(
+	const { settings } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				getEditedPostType,
-				getEditedPostId,
-				getPage,
-			} = select( editSiteStore );
+			let storedSettings = select( editSiteStore ).getSettings(
+				setIsInserterOpen
+			);
+
+			if ( ! storedSettings.__experimentalBlockPatterns ) {
+				storedSettings = {
+					...storedSettings,
+					__experimentalBlockPatterns: select(
+						coreStore
+					).getBlockPatterns(),
+				};
+			}
+
+			if ( ! storedSettings.__experimentalBlockPatternCategories ) {
+				storedSettings = {
+					...storedSettings,
+					__experimentalBlockPatternCategories: select(
+						coreStore
+					).getBlockPatternCategories(),
+				};
+			}
 
 			return {
-				settings: getSettings( setIsInserterOpen ),
+				settings: storedSettings,
+			};
+		},
+		[ setIsInserterOpen ]
+	);
+
+	const { templateType, templateId, page } = useSelect(
+		( select ) => {
+			const { getEditedPostType, getEditedPostId, getPage } = select(
+				editSiteStore
+			);
+
+			return {
 				templateType: getEditedPostType(),
 				templateId: getEditedPostId(),
 				page: getPage(),
@@ -60,17 +93,45 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		},
 		[ setIsInserterOpen ]
 	);
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		templateType
 	);
 	const { setPage } = useDispatch( editSiteStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const openNavigationSidebar = useCallback( () => {
+		enableComplementaryArea(
+			'core/edit-site',
+			'edit-site/navigation-menu'
+		);
+	}, [ enableComplementaryArea ] );
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	const isTemplatePart = templateType === 'wp_template_part';
+
+	const NavMenuSidebarToggle = () => (
+		<ToolbarGroup>
+			<ToolbarButton
+				className="components-toolbar__control"
+				label={ __( 'Open list view' ) }
+				onClick={ openNavigationSidebar }
+				icon={ listView }
+			/>
+		</ToolbarGroup>
+	);
+
+	// Conditionally include NavMenu sidebar in Plugin only.
+	// Optimise for dead code elimination.
+	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
+	let MaybeNavMenuSidebarToggle = 'Fragment';
+
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		MaybeNavMenuSidebarToggle = NavMenuSidebarToggle;
+	}
 
 	return (
 		<BlockEditorProvider
@@ -133,6 +194,15 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						<BlockInspectorButton onClick={ onClose } />
 					) }
 				</__unstableBlockSettingsMenuFirstItem>
+				<__unstableBlockToolbarLastItem>
+					<__unstableBlockNameContext.Consumer>
+						{ ( blockName ) =>
+							blockName === 'core/navigation' && (
+								<MaybeNavMenuSidebarToggle />
+							)
+						}
+					</__unstableBlockNameContext.Consumer>
+				</__unstableBlockToolbarLastItem>
 			</BlockTools>
 			<ReusableBlocksMenuItems />
 		</BlockEditorProvider>

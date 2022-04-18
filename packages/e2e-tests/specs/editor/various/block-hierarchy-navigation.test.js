@@ -8,6 +8,7 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	openDocumentSettingsSidebar,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 
 async function openListViewSidebar() {
@@ -49,12 +50,11 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the columns blocks.
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
-		const columnsBlockMenuItem = (
-			await page.$x(
-				"//a[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Columns')]"
-			)
+
+		const firstColumnsBlockMenuItem = (
+			await getListViewBlocks( 'Columns' )
 		 )[ 0 ];
-		await columnsBlockMenuItem.click();
+		await firstColumnsBlockMenuItem.click();
 
 		// Tweak the columns count.
 		await openDocumentSettingsSidebar();
@@ -73,12 +73,10 @@ describe( 'Navigating the block hierarchy', () => {
 		);
 
 		// Navigate to the last column block.
-		const lastColumnsBlockMenuItem = (
-			await page.$x(
-				"//a[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Column')]"
-			)
-		 )[ 3 ];
-		await lastColumnsBlockMenuItem.click();
+		const lastColumnBlockMenuItem = (
+			await getListViewBlocks( 'Column' )
+		 )[ 2 ];
+		await lastColumnBlockMenuItem.click();
 
 		// Insert text in the last column block.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
@@ -186,11 +184,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Try selecting the group block using the Outline.
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
-		const groupMenuItem = (
-			await page.$x(
-				"//a[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Group')]"
-			)
-		 )[ 0 ];
+		const groupMenuItem = ( await getListViewBlocks( 'Group' ) )[ 0 ];
 		await groupMenuItem.click();
 
 		// The group block's wrapper should be selected.

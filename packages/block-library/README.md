@@ -14,7 +14,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Building JavaScript for the browser
 
-If a `view.js` file is present in the block's directory, this file will be built along other assets, making it available to load from the browser.
+If a `view.js` file (or a file prefixed with `view`, e.g. `view-example.js`) is present in the block's directory, this file will be built along other assets, making it available to load from the browser.
 
 This enables us to, for instance, load this file when the block is present on the page in two ways:
 

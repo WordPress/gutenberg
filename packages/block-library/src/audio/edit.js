@@ -159,7 +159,7 @@ function AudioEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Audio settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Autoplay' ) }
 						onChange={ toggleAttribute( 'autoplay' ) }
@@ -186,7 +186,7 @@ function AudioEdit( {
 							{ value: 'metadata', label: __( 'Metadata' ) },
 							{
 								value: 'none',
-								label: _x( 'None', '"Preload" value' ),
+								label: _x( 'None', 'Preload value' ),
 							},
 						] }
 					/>

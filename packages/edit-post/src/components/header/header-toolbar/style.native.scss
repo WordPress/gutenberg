@@ -1,5 +1,5 @@
 
-.container {
+.header-toolbar__container {
 	height: $mobile-header-toolbar-height;
 	flex-direction: row;
 	background-color: $app-background;
@@ -7,16 +7,20 @@
 	border-top-width: 1px;
 }
 
-.containerDark {
+.header-toolbar__container--dark {
 	background-color: $app-background-dark-alt;
 	border-top-color: $background-dark-elevated;
 }
 
-.scrollableContent {
+.header-toolbar__container--expanded {
+	height: $mobile-header-toolbar-expanded-height;
+}
+
+.header-toolbar__scrollable-content {
 	flex-grow: 1; // Fixes RTL issue on Android.
 }
 
-.keyboardHideContainer {
+.header-toolbar__keyboard-hide-container {
 	padding-right: 0;
 	padding-left: 0;
 	padding-top: 4px;

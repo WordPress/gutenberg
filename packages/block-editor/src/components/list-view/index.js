@@ -72,7 +72,7 @@ function ListView(
 		showNestedBlocks,
 		showBlockMovers,
 		id,
-		expandNested,
+		expandNested = false,
 		...props
 	},
 	ref

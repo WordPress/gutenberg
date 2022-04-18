@@ -3,11 +3,11 @@
 exports[`props should render correctly 1`] = `
 .emotion-1 {
   background-color: #fff;
-  color: #000;
+  color: #1e1e1e;
   position: relative;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   outline: none;
-  border-radius: 2px;
+  border-radius: calc(2px - 1px);
 }
 
 .emotion-1 .components-card-body {
@@ -26,13 +26,13 @@ exports[`props should render correctly 1`] = `
 }
 
 .emotion-5:first-of-type {
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
+  border-top-left-radius: calc(2px - 1px);
+  border-top-right-radius: calc(2px - 1px);
 }
 
 .emotion-5:last-of-type {
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: calc(2px - 1px);
+  border-bottom-right-radius: calc(2px - 1px);
 }
 
 .emotion-7 {
@@ -172,7 +172,7 @@ Snapshot Diff:
           tabindex="-1"
         />
 +       <div
-+         class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
++         class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium em57xhy0"
 +         data-wp-c16t="true"
 +         data-wp-component="CardBody"
 +       >

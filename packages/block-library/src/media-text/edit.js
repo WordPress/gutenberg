@@ -46,7 +46,6 @@ const TEMPLATE = [
 	[
 		'core/paragraph',
 		{
-			fontSize: 'large',
 			placeholder: _x( 'Content…', 'content placeholder' ),
 		},
 	],
@@ -161,7 +160,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const image = useSelect(
 		( select ) =>
 			mediaId && isSelected
-				? select( coreStore ).getMedia( mediaId )
+				? select( coreStore ).getMedia( mediaId, { context: 'view' } )
 				: null,
 		[ isSelected, mediaId ]
 	);
@@ -238,7 +237,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const mediaTextGeneralSettings = (
-		<PanelBody title={ __( 'Media & Text settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<ToggleControl
 				label={ __( 'Stack on mobile' ) }
 				checked={ isStackedOnMobile }

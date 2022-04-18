@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 const getTypeAnnotation = require( '../lib/get-type-annotation' );
+const engine = require( '../lib/engine' );
 
 const getSimpleTypeNode = require( './fixtures/type-annotations/simple-types/get-node' );
 const getArraysGenericTypesUnionsAndIntersctionsNode = require( './fixtures/type-annotations/arrays-generic-types-unions-intersections/get-node' );
@@ -316,6 +317,50 @@ describe( 'Type annotations', () => {
 			expect( getTypeAnnotation( { tag: 'type' }, node, 0 ) ).toBe(
 				'( string | number )[]'
 			);
+		} );
+	} );
+
+	describe( 'statically-wrapped function exceptions', () => {
+		it( 'should find types for inner function with `createSelector`', () => {
+			const { tokens } = engine(
+				'test.ts',
+				`/**
+					 * Returns the number of things
+					 *
+					 * @param state - stores all the things
+					 */
+					export const getCount = createSelector( ( state: string[] ) => state.length );
+					`
+			);
+
+			expect(
+				getTypeAnnotation(
+					{ tag: 'param', name: 'state' },
+					tokens[ 0 ],
+					0
+				)
+			).toBe( 'string[]' );
+		} );
+
+		it( 'should find types for inner function with `createRegistrySelector`', () => {
+			const { tokens } = engine(
+				'test.ts',
+				`/**
+					 * Returns the number of things
+					 *
+					 * @param state - stores all the things
+					 */
+					export const getCount = createRegistrySelector( ( select ) => ( state: number ) => state );
+					`
+			);
+
+			expect(
+				getTypeAnnotation(
+					{ tag: 'param', name: 'state' },
+					tokens[ 0 ],
+					0
+				)
+			).toBe( 'number' );
 		} );
 	} );
 } );

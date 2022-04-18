@@ -7,6 +7,8 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import ColorPalette from '../';
+import Popover from '../../popover';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta = {
 	title: 'Components/ColorPalette',
@@ -42,7 +44,12 @@ export default meta;
 
 const Template = ( args ) => {
 	const [ color, setColor ] = useState( '#f00' );
-	return <ColorPalette { ...args } value={ color } onChange={ setColor } />;
+	return (
+		<SlotFillProvider>
+			<ColorPalette { ...args } value={ color } onChange={ setColor } />
+			<Popover.Slot />
+		</SlotFillProvider>
+	);
 };
 
 export const Default = Template.bind( {} );

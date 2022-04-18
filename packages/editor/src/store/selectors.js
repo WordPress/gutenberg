@@ -20,11 +20,11 @@ import { Platform } from '@wordpress/element';
 import { layout } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS } from './defaults';
 import {
 	EDIT_MERGE_PROPERTIES,
 	PERMALINK_POSTNAME_REGEX,
@@ -1093,16 +1093,15 @@ export function canUserUseUnfilteredHTML( state ) {
  * Returns whether the pre-publish panel should be shown
  * or skipped when the user clicks the "publish" button.
  *
- * @param {Object} state Global application state.
- *
  * @return {boolean} Whether the pre-publish panel should be shown or not.
  */
-export function isPublishSidebarEnabled( state ) {
-	if ( state.preferences.hasOwnProperty( 'isPublishSidebarEnabled' ) ) {
-		return state.preferences.isPublishSidebarEnabled;
-	}
-	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
-}
+export const isPublishSidebarEnabled = createRegistrySelector(
+	( select ) => () =>
+		!! select( preferencesStore ).get(
+			'core/edit-post',
+			'isPublishSidebarEnabled'
+		)
+);
 
 /**
  * Return the current block list.
