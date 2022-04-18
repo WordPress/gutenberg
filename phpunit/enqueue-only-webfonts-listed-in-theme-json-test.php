@@ -13,7 +13,7 @@ require __DIR__ . '/class-wp-webfonts-mock-provider.php';
  *
  * @group  webfonts
  * @covers _wp_register_webfonts_from_theme_json
- *         _gutenberg_add_registered_webfonts_to_theme_json
+ *         _wp_add_registered_webfonts_to_theme_json
  *         _wp_enqueue_webfonts_listed_in_theme_json
  */
 class Enqueue_Only_Webfonts_Listed_In_Theme_JSON_Test extends WP_UnitTestCase {

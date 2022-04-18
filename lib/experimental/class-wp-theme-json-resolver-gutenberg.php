@@ -41,7 +41,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 			_wp_register_webfonts_from_theme_json( $original_theme_json->get_settings() );
 
 			if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-				$theme_json_data = _gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
+				$theme_json_data = _wp_add_registered_webfonts_to_theme_json( $theme_json_data );
 			}
 
 			static::$theme = new WP_Theme_JSON_Gutenberg( $theme_json_data );

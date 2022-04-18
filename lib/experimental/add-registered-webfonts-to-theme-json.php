@@ -11,7 +11,7 @@
  * @param array $data The global styles.
  * @return array The global styles with missing fonts data.
  */
-function _gutenberg_add_registered_webfonts_to_theme_json( $data ) {
+function _wp_add_registered_webfonts_to_theme_json( $data ) {
 	$registered_font_families = wp_webfonts()->get_all_webfonts();
 
 	if ( empty( $registered_font_families ) ) {
