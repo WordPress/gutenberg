@@ -17,7 +17,7 @@ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInpu
  */
 import { Draggable, DraggableTrigger } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -33,6 +33,7 @@ import styles from './style.scss';
 const CHIP_OFFSET_TO_TOUCH_POSITION = 32;
 const BLOCK_OPACITY_ANIMATION_CONFIG = { duration: 350 };
 const BLOCK_OPACITY_ANIMATION_DELAY = 250;
+const DEFAULT_LONG_PRESS_MIN_DURATION = 500;
 
 /**
  * Block draggable wrapper component
@@ -304,7 +305,14 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 		<DraggableTrigger
 			id={ clientId }
 			enabled={ enabled && canDragBlock }
-			minDuration={ 450 }
+			minDuration={ Platform.select( {
+				// On iOS, using a lower min duration than the default
+				// value prevents the long-press gesture from being
+				// triggered in underneath elements. This is required to
+				// prevent enabling text editing when dragging is available.
+				ios: canDragBlock ? 450 : DEFAULT_LONG_PRESS_MIN_DURATION,
+				android: DEFAULT_LONG_PRESS_MIN_DURATION,
+			} ) }
 		>
 			<Animated.View style={ wrapperStyles }>
 				{ children( { isDraggable: true } ) }
