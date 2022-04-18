@@ -16,7 +16,7 @@ import Animated, {
 /**
  * WordPress dependencies
  */
-import { createContext, useContext, useRef } from '@wordpress/element';
+import { createContext, useContext, useRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -99,12 +99,14 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 		.withRef( panGestureRef )
 		.shouldCancelWhenOutside( false );
 
+	const providerValue = useMemo( () => {
+		return { panGestureRef, isDragging, draggingId };
+	}, [] );
+
 	return (
 		<GestureDetector gesture={ panGesture }>
 			<Animated.View style={ styles.draggable__container }>
-				<Provider value={ { panGestureRef, isDragging, draggingId } }>
-					{ children }
-				</Provider>
+				<Provider value={ providerValue }>{ children }</Provider>
 			</Animated.View>
 		</GestureDetector>
 	);
