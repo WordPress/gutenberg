@@ -112,42 +112,6 @@
 			border-right-color: $gray-200;
 		}
 	}
-
-	.block-editor-block-mover-button {
-		overflow: hidden;
-	}
-
-	// Extra specificity to override standard toolbar button styles.
-	.block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
-		min-width: $block-toolbar-height*0.5;
-		width: $block-toolbar-height*0.5;
-
-		svg {
-			min-width: $block-toolbar-height*0.5;
-		}
-	}
-}
-
-// Position mover arrows for both toolbars.
-.block-editor-block-contextual-toolbar .block-editor-block-mover:not(.is-horizontal) {
-	// Position SVGs.
-	.block-editor-block-mover-button {
-		&:focus::before {
-			left: 0 !important;
-			min-width: 0;
-			width: 100%;
-		}
-	}
-
-	@include break-small() {
-		.block-editor-block-mover-button.is-up-button svg {
-			top: 5px;
-		}
-
-		.block-editor-block-mover-button.is-down-button svg {
-			bottom: 5px;
-		}
-	}
 }
 
 /**
@@ -306,31 +270,4 @@
 
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
-}
-
-
-// Size multiple sequential buttons to be optically balanced.
-// Icons are 36px, as set by a 24px icon and 12px padding.
-.block-editor-block-toolbar > .components-toolbar > .block-editor-block-toolbar__slot, // When a plugin adds to a slot, the segment has a `components-toolbar` class.
-.block-editor-block-toolbar > .block-editor-block-toolbar__slot > .components-toolbar, // The nesting order is sometimes reversed.
-.block-editor-block-toolbar > .block-editor-block-toolbar__slot > .components-dropdown, // Targets unique markup for the "Replace" button.
-.block-editor-block-toolbar .components-toolbar-group {
-	padding-left: $grid-unit-15 * 0.5; // 6px.
-	padding-right: $grid-unit-15 * 0.5;
-
-	.components-button,
-	.components-button.has-icon.has-icon {
-		min-width: $block-toolbar-height - $grid-unit-15;
-		padding-left: $grid-unit-15 * 0.5; // 6px.
-		padding-right: $grid-unit-15 * 0.5;
-
-		svg {
-			min-width: $button-size-small; // This is the optimal icon size, and we size the whole button after this.
-		}
-
-		&::before {
-			left: 2px;
-			right: 2px;
-		}
-	}
 }
