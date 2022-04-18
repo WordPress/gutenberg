@@ -75,7 +75,7 @@
 		margin-bottom: 0;
 
 		:where(small) {
-			font-size: var(--wp--preset--font-size--normal, smaller);
+			font-size: var(--wp--preset--font-size--medium, smaller);
 		}
 	}
 }
