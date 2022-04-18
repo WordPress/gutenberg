@@ -34,7 +34,6 @@ export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Value',
 	placeholder: 'Placeholder',
-	value: '',
 };
 
 export const WithPrefix = Template.bind( {} );
