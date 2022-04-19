@@ -25,10 +25,10 @@ function render_block_core_comments_title( $attributes ) {
 		return;
 	}
 
-	$single_default_comment_label = $show_post_title ? 'One response to' : 'One response';
+	$single_default_comment_label = $show_post_title ? __( 'One response to' ) : __( 'One response' );
 	$single_comment_label         = ! empty( $attributes['singleCommentLabel'] ) ? $attributes['singleCommentLabel'] : $single_default_comment_label;
 
-	$multiple_default_comment_label = $show_post_title ? 'Responses to' : 'Responses';
+	$multiple_default_comment_label = $show_post_title ? __( 'Responses to' ) : __( 'Responses' );
 	$multiple_comment_label         = ! empty( $attributes['multipleCommentsLabel'] ) ? $attributes['multipleCommentsLabel'] : $multiple_default_comment_label;
 
 	$comments_title = '%1$s %2$s %3$s';
