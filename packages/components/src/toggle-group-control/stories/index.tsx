@@ -2,18 +2,20 @@
  * External dependencies
  */
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
+// eslint-disable-next-line no-restricted-imports
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
-import type { ReactText } from 'react';
 
 /**
  * Internal dependencies
  */
 import Button from '../../button';
+import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
@@ -183,5 +185,53 @@ export const DoubleToggles: ComponentStory<
 				Reset
 			</Button>
 		</div>
+	);
+};
+
+// TODO: Remove before merging as well.
+const { Fill: InspectorControls, Slot } = createSlotFill( 'InspectorControls' );
+// @ts-expect-error
+InspectorControls.Slot = Slot;
+
+export const RenderViaSlot: ComponentStory<
+	typeof ToggleGroupControl
+> = () => {
+	const [ alignState, setAlignState ] = useState< string | undefined >();
+	const aligns = [ 'Left', 'Center', 'Right' ];
+
+	return (
+		<SlotFillProvider>
+			{ /* This motion.div element breaks the `ToggleGroupControl` backdrop,
+			 * because motion registers it as the "motion parent" of the backdrop
+			 * (even if the `ToggleGroupControl` gets rendered in another part of the
+			 * tree via Slot/Fill)
+			 */ }
+			<motion.div>
+				<InspectorControls>
+					<ToggleGroupControl
+						onChange={ ( value ) =>
+							setAlignState( value as string )
+						}
+						value={ alignState }
+						label={ 'Pick an alignment option' }
+					>
+						{ aligns.map( ( key ) => (
+							<ToggleGroupControlOption
+								key={ key }
+								value={ key }
+								label={ key }
+							/>
+						) ) }
+					</ToggleGroupControl>
+				</InspectorControls>
+			</motion.div>
+			<div>
+				{ /* @ts-expect-error */ }
+				<InspectorControls.Slot bubblesVirtually />
+				<Button onClick={ () => setAlignState( undefined ) } isTertiary>
+					Reset
+				</Button>
+			</div>
+		</SlotFillProvider>
 	);
 };
