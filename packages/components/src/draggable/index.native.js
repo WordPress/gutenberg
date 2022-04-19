@@ -2,7 +2,11 @@
  * External dependencies
  */
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, runOnJS } from 'react-native-reanimated';
+import Animated, {
+	useSharedValue,
+	runOnJS,
+	runOnUI,
+} from 'react-native-reanimated';
 import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
 /**
@@ -27,7 +31,7 @@ import { Platform } from '@wordpress/element';
 export default function Draggable( {
 	children,
 	maxDistance = 1000,
-	minDuration = 500,
+	minDuration = 450,
 	onDragEnd,
 	onDragOver,
 	onDragStart,
@@ -37,37 +41,38 @@ export default function Draggable( {
 	const isAnyTextInputFocused = useSharedValue( false );
 
 	const checkTextInputFocus = () => {
-		isAnyTextInputFocused.value =
+		const isTextInputFocused =
 			TextInputState.currentlyFocusedInput() !== null;
+		isAnyTextInputFocused.value = isTextInputFocused;
+		return isTextInputFocused;
+	};
+
+	const dragStart = ( event ) => {
+		const isTextInputFocused = checkTextInputFocus();
+
+		if ( ! isTextInputFocused && onDragStart ) {
+			runOnUI( onDragStart )( event );
+		}
+	};
+
+	const dragEnd = () => {
+		const isTextInputFocused = checkTextInputFocus();
+
+		if ( ! isTextInputFocused && onDragEnd ) {
+			runOnUI( onDragEnd )();
+		}
 	};
 
 	const longPressGesture = Gesture.LongPress()
-		.onBegin( () => {
-			'worklet';
-			runOnJS( checkTextInputFocus )();
-		} )
 		.onStart( ( ev ) => {
 			'worklet';
-			if ( isAnyTextInputFocused.value ) {
-				return;
-			}
-
 			isDragging.value = true;
-
-			if ( onDragStart ) {
-				onDragStart( ev );
-			}
+			runOnJS( dragStart )( ev );
 		} )
 		.onEnd( () => {
 			'worklet';
-			if ( isAnyTextInputFocused.value ) {
-				return;
-			}
-
 			isDragging.value = false;
-			if ( onDragEnd ) {
-				onDragEnd();
-			}
+			runOnJS( dragEnd )();
 		} )
 		.maxDistance( maxDistance )
 		.minDuration( minDuration )
