@@ -22,6 +22,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
+	BlockCaption,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
@@ -587,19 +588,18 @@ export default function Image( {
 			{ ! temporaryURL && controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-				<RichText
-					ref={ captionRef }
-					tagName="figcaption"
-					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Add caption' ) }
-					value={ caption }
+				<BlockCaption
+					captionRef={ captionRef }
+					containerRef={ containerRef }
 					onChange={ ( value ) =>
 						setAttributes( { caption: value } )
 					}
-					inlineToolbar
-					__unstableOnSplitAtEnd={ () =>
+					caption={ caption }
+					ariaLabel={ __( 'Image caption text' ) }
+					insertBlocksAfter={ () =>
 						insertBlocksAfter( createBlock( 'core/paragraph' ) )
 					}
+					inlineToolbar
 				/>
 			) }
 		</ImageEditingProvider>

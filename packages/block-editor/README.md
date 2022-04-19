@@ -121,6 +121,20 @@ _Returns_
 
 -   `WPElement`: Block Breadcrumb.
 
+### BlockCaption
+
+Block caption component which is a thin wrapper around the RichText component
+that can be used to render captions for blocks like image block, video block,
+table block, embed block, gallery block e.t.c
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+
+_Returns_
+
+-   `WPElement`: Block Caption.
+
 ### BlockColorsStyleSelector
 
 Undocumented declaration.

@@ -8,12 +8,22 @@ import { __ } from '@wordpress/i18n';
  */
 import RichText from '../rich-text/';
 
+// eslint-disable-next-line jsdoc/require-param
+/**
+ * Block caption component which is a thin wrapper around the RichText component
+ * that can be used to render captions for blocks like image block, video block,
+ * table block, embed block, gallery block e.t.c
+ *
+ * @param {Object} props Component props.
+ * @return {WPElement} Block Caption.
+ */
+
 const BlockCaption = ( {
 	isSelected,
 	onChange,
 	placeholder = __( 'Add caption' ),
 	ariaLabel = __( 'Caption text' ),
-	ref,
+	captionRef,
 	caption,
 	tagName = 'figcaption',
 	className,
@@ -34,7 +44,7 @@ const BlockCaption = ( {
 
 	return (
 		<RichText
-			ref={ ref }
+			ref={ captionRef }
 			tagName={ tagName }
 			aria-label={ ariaLabel }
 			placeholder={ placeholder }
