@@ -142,6 +142,7 @@ export default function CustomGradientBar( {
 							disableAlpha={ disableAlpha }
 							insertPosition={ gradientBarState.insertPosition }
 							value={ controlPoints }
+							label="test"
 							onChange={ onChange }
 							onOpenInserter={ () => {
 								gradientBarStateDispatch( {

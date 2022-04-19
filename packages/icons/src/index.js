@@ -67,6 +67,7 @@ export { default as download } from './library/download';
 export { default as edit } from './library/edit';
 export { default as external } from './library/external';
 export { default as file } from './library/file';
+export { default as filter } from './library/filter';
 export { default as flipHorizontal } from './library/flip-horizontal';
 export { default as flipVertical } from './library/flip-vertical';
 export { default as formatBold } from './library/format-bold';
