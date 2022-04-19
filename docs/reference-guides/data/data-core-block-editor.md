@@ -1248,6 +1248,7 @@ _Parameters_
 
 -   _firstBlockClientId_ `string`: Client ID of the first block to merge.
 -   _secondBlockClientId_ `string`: Client ID of the second block to merge.
+-   _initialPosition_ `0|-1|null`: Value reflecting direction of merge. An initialPosition of -1 indicates a reverse merge (e.g. via backspace).
 
 ### moveBlocksDown
 

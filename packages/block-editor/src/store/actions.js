@@ -979,16 +979,21 @@ export const __unstableExpandSelection = () => ( { select, dispatch } ) => {
 	} );
 };
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Action that merges two blocks.
  *
- * @param {string} firstBlockClientId  Client ID of the first block to merge.
- * @param {string} secondBlockClientId Client ID of the second block to merge.
+ * @param {string}    firstBlockClientId  Client ID of the first block to merge.
+ * @param {string}    secondBlockClientId Client ID of the second block to merge.
+ * @param {0|-1|null} initialPosition     Value reflecting direction of merge. An initialPosition of -1
+ *                                        indicates a reverse merge (e.g. via backspace).
  */
-export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
-	select,
-	dispatch,
-} ) => {
+/* eslint-enable jsdoc/valid-types */
+export const mergeBlocks = (
+	firstBlockClientId,
+	secondBlockClientId,
+	initialPosition = 0
+) => ( { select, dispatch } ) => {
 	const blocks = [ firstBlockClientId, secondBlockClientId ];
 	dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
@@ -998,7 +1003,7 @@ export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
 
 	// Only focus the previous block if it's not mergeable.
 	if ( blockAType && ! blockAType.merge ) {
-		dispatch.selectBlock( blockA.clientId );
+		dispatch.selectBlock( blockA.clientId, initialPosition );
 		return;
 	}
 

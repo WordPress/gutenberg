@@ -306,7 +306,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 					clientId
 				);
 				if ( previousBlockClientId ) {
-					mergeBlocks( previousBlockClientId, clientId );
+					mergeBlocks( previousBlockClientId, clientId, -1 );
 				}
 			}
 		},

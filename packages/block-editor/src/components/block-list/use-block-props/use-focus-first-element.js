@@ -99,10 +99,6 @@ export function useFocusFirstElement( clientId ) {
 		const isReverse = -1 === initialPosition;
 		const target =
 			( isReverse ? last : first )( textInputs ) || ref.current;
-		// Backspacing into a caption field should delete the caption text
-		// and then select the parent block when the caption is empty.
-		// This prevents the caret from getting stuck inside the caption input.
-		const targetIsCaption = target?.nodeName === 'FIGCAPTION';
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
 			ref.current.focus();
@@ -123,7 +119,7 @@ export function useFocusFirstElement( clientId ) {
 			}
 		}
 
-		placeCaretAtHorizontalEdge( target, targetIsCaption || isReverse );
+		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition, clientId ] );
 
 	return ref;
