@@ -2,17 +2,25 @@
 	{
 		"blockName": "core/comments-title",
 		"attrs": {
+			"level": 4,
 			"style": {
-				"typography": {
-					"textTransform": "uppercase",
-					"fontStyle": "italic",
-					"fontWeight": "900",
-					"lineHeight": "3"
+				"spacing": {
+					"padding": {
+						"top": "6px",
+						"right": "6px",
+						"bottom": "6px",
+						"left": "6px"
+					}
+				},
+				"border": {
+					"width": "3px",
+					"radius": "100px"
 				}
 			},
-			"textColor": "vivid-purple",
-			"fontSize": "x-large",
-			"fontFamily": "source-serif-pro"
+			"borderColor": "vivid-red",
+			"backgroundColor": "primary",
+			"textColor": "background",
+			"fontSize": "large"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",

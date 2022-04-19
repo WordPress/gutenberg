@@ -4,15 +4,24 @@
 		"isValid": true,
 		"attributes": {
 			"showPostTitle": true,
-			"textColor": "vivid-purple",
-			"fontFamily": "source-serif-pro",
-			"fontSize": "x-large",
+			"showCommentsCount": true,
+			"level": 4,
+			"borderColor": "vivid-red",
+			"backgroundColor": "primary",
+			"textColor": "background",
+			"fontSize": "large",
 			"style": {
-				"typography": {
-					"textTransform": "uppercase",
-					"fontStyle": "italic",
-					"fontWeight": "900",
-					"lineHeight": "3"
+				"spacing": {
+					"padding": {
+						"top": "6px",
+						"right": "6px",
+						"bottom": "6px",
+						"left": "6px"
+					}
+				},
+				"border": {
+					"width": "3px",
+					"radius": "100px"
 				}
 			}
 		},
