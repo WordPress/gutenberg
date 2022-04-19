@@ -444,3 +444,7 @@
 		box-shadow: $border-width 0 0 0 var(--wp-admin-theme-color) inset;
 	}
 }
+
+.is-root-container.is-exploded-mode > .block-list-appender {
+	display: none;
+}
