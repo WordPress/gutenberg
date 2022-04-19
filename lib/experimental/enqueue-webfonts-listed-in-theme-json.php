@@ -8,11 +8,12 @@
 /**
  * Check if the webfont was registered programmatically.
  *
- * @param array $webfont The webfont that'll have their origin checked.
+ * @since 6.0.0
  *
+ * @param array $webfont The webfont to check.
  * @return boolean True if registered programmatically, false otherwise.
  */
-function _gutenberg_is_externally_registered_webfont( $webfont ) {
+function _gutenberg_is_externally_registered_webfont( array $webfont ) {
 	return isset( $webfont['origin'] ) && 'gutenberg_wp_webfonts_api' === $webfont['origin'];
 }
 
@@ -21,6 +22,8 @@ if ( ! function_exists( '_wp_enqueue_webfonts_listed_in_theme_json' ) ) {
 	 * Enqueue webfonts listed in theme.json.
 	 *
 	 * Enqueued webfonts will end up in the front-end as inlined CSS.
+	 *
+	 * @since 6.0.0
 	 */
 	function _wp_enqueue_webfonts_listed_in_theme_json() {
 		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();

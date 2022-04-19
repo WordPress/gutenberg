@@ -180,7 +180,6 @@ class WP_Webfonts {
 		}
 
 		// Enqueueing a single font face.
-
 		$font_face            = _wp_array_keys_to_kebab_case( $font_face );
 		$font_face_to_enqueue = $this->unregister_font_face( $font_face );
 
@@ -209,6 +208,8 @@ class WP_Webfonts {
 
 	/**
 	 * Checks if a font family is registered.
+	 *
+	 * @since 6.0.0
 	 *
 	 * @param string $font_family_name The font family name to check in the registry.
 	 * @return bool True if found, else false.
@@ -265,11 +266,17 @@ class WP_Webfonts {
 	/**
 	 * Unregisters a font face.
 	 *
-	 * @param array $font_face_to_unregister The font face object, to unregister.
-	 * @return array|false The font face object if unregistered, false otherwise.
+	 * @since 6.0.0
+	 *
+	 * @param array $font_face_to_unregister The font face to unregister.
+	 * @return array|false The font face if unregistered, false otherwise.
 	 */
-	private function unregister_font_face( $font_face_to_unregister ) {
+	private function unregister_font_face( array $font_face_to_unregister ) {
 		$font_family_slug = $this->get_font_slug( $font_face_to_unregister );
+
+		if ( false === $font_family_slug || ! isset( $this->registered_webfonts[ $font_family_slug ] ) ) {
+			return false;
+		}
 
 		$font_family = $this->registered_webfonts[ $font_family_slug ];
 		$index       = _gutenberg_find_webfont( $font_family, $font_face_to_unregister );
@@ -283,7 +290,7 @@ class WP_Webfonts {
 		unset( $this->registered_webfonts[ $font_family_slug ][ $index ] );
 
 		// No font faces left, let's remove the font family entry.
-		if ( 0 === count( $this->registered_webfonts[ $font_family_slug ] ) ) {
+		if ( empty( $this->registered_webfonts[ $font_family_slug ] ) ) {
 			unset( $this->registered_webfonts[ $font_family_slug ] );
 		}
 
@@ -296,10 +303,9 @@ class WP_Webfonts {
 	 * @since 6.0.0
 	 *
 	 * @param array $webfont The webfont arguments.
-	 *
 	 * @return array|false The validated webfont arguments, or false if the webfont is invalid.
 	 */
-	public function validate_webfont( $webfont ) {
+	public function validate_webfont( array $webfont ) {
 		$webfont = wp_parse_args(
 			$webfont,
 			array(

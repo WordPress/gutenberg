@@ -7,12 +7,14 @@
 
 if ( ! function_exists( '_wp_add_registered_webfonts_to_theme_json' ) ) {
 	/**
-	 * Add missing fonts data to the global styles.
+	 * Add missing webfonts data to the global styles.
+	 *
+	 * @since 6.0.0
 	 *
 	 * @param array $data The global styles.
-	 * @return array The global styles with missing fonts data.
+	 * @return array The global styles with missing webfonts data.
 	 */
-	function _wp_add_registered_webfonts_to_theme_json( $data ) {
+	function _wp_add_registered_webfonts_to_theme_json( array $data ) {
 		$registered_font_families = wp_webfonts()->get_all_webfonts();
 
 		if ( empty( $registered_font_families ) ) {

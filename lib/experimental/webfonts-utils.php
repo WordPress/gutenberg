@@ -5,33 +5,15 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( '_wp_array_keys_to_kebab_case' ) ) {
-	/**
-	 * Transforms the keys of the array to kebab-case.
-	 *
-	 * @param array $array The array to be tranformed.
-	 *
-	 * @return array The kebab-cased array.
-	 */
-	function _wp_array_keys_to_kebab_case( $array ) {
-		$kebab_cased_array = array();
-
-		foreach ( $array as $key => $value ) {
-			$kebab_cased_array[ _wp_to_kebab_case( $key ) ] = $value;
-		}
-
-		return $kebab_cased_array;
-	}
-}
-
 /**
  * Transforms the source of the font face from `file.:/` into an actual URI.
  *
- * @param array $font_face The font face.
+ * @since 6.0.0
  *
+ * @param array $font_face The font face.
  * @return array The URI-resolved font face.
  */
-function _gutenberg_resolve_font_face_uri( $font_face ) {
+function _gutenberg_resolve_font_face_uri( array $font_face ) {
 	if ( empty( $font_face['src'] ) ) {
 		return $font_face;
 	}
@@ -51,6 +33,8 @@ function _gutenberg_resolve_font_face_uri( $font_face ) {
 
 /**
  * Compares if the two given webfonts are the equal.
+ *
+ * @since 6.0.0
  *
  * @param array   $webfont1      The first webfont.
  * @param array   $webfont2      The second webfont.
@@ -88,13 +72,14 @@ function _gutenberg_is_webfont_equal( array $webfont1, array $webfont2, $is_came
 /**
  * Finds $webfont_to_find in $webfonts.
  *
+ * @since 6.0.0
+ *
  * @param array[] $webfonts The webfonts array.
  * @param array   $webfont_to_find The webfont to find.
- *
  * @return integer|false The index of $webfont in $webfonts if found. False otherwise.
  */
-function _gutenberg_find_webfont( $webfonts, $webfont_to_find ) {
-	if ( ! count( $webfonts ) ) {
+function _gutenberg_find_webfont( array $webfonts, $webfont_to_find ) {
+	if ( empty( $webfonts ) ) {
 		return false;
 	}
 
@@ -111,19 +96,40 @@ function _gutenberg_find_webfont( $webfonts, $webfont_to_find ) {
 
 if ( ! function_exists( '_wp_array_keys_to_camel_case' ) ) {
 	/**
-	 * Transforms the keys of the array from kebab-case to camel-case.
+	 * Transforms the keys in the given array to camelCase.
 	 *
-	 * @param array $array The kebab-cased array.
+	 * @since 6.0.0
 	 *
-	 * @return array The camel-cased array.
+	 * @param array $to_transform The array to transform.
+	 * @return array Given array with camelCase keys.
 	 */
-	function _wp_array_keys_to_camel_case( $array ) {
+	function _wp_array_keys_to_camel_case( array $to_transform ) {
 		$camel_cased_array = array();
 
-		foreach ( $array as $key => $value ) {
+		foreach ( $to_transform as $key => $value ) {
 			$camel_cased_array[ _wp_to_kebab_case( $key ) ] = $value;
 		}
 
 		return $camel_cased_array;
+	}
+}
+
+if ( ! function_exists( '_wp_array_keys_to_kebab_case' ) ) {
+	/**
+	 * Transforms the keys in the given array to kebab-case.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @param array $to_transform The array to be transformed.
+	 * @return array Given array with kebab-case keys.
+	 */
+	function _wp_array_keys_to_kebab_case( array $to_transform ) {
+		$kebab_cased_array = array();
+
+		foreach ( $to_transform as $key => $value ) {
+			$kebab_cased_array[ _wp_to_kebab_case( $key ) ] = $value;
+		}
+
+		return $kebab_cased_array;
 	}
 }
