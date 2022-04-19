@@ -21,6 +21,11 @@ import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
+/**
+ * Internal dependencies
+ */
+import HeadingLevelDropdown from '../heading/heading-level-dropdown';
+
 export default function Edit( {
 	attributes: {
 		textAlign,
@@ -29,16 +34,15 @@ export default function Edit( {
 		showSingleCommentLabel,
 		showPostTitle,
 		showCommentsCount,
+		level,
 	},
 	setAttributes,
 	context: { postType, postId },
 } ) {
+	const TagName = 'h' + level;
 	const [ commentsCount, setCommentsCount ] = useState();
-
 	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
-
 	const isSiteEditor = typeof postId === 'undefined';
-
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -78,6 +82,12 @@ export default function Edit( {
 				value={ textAlign }
 				onChange={ ( newAlign ) =>
 					setAttributes( { textAlign: newAlign } )
+				}
+			/>
+			<HeadingLevelDropdown
+				selectedLevel={ level }
+				onChange={ ( newLevel ) =>
+					setAttributes( { level: newLevel } )
 				}
 			/>
 		</BlockControls>
@@ -138,7 +148,7 @@ export default function Edit( {
 		<>
 			{ blockControls }
 			{ inspectorControls }
-			<h3 { ...blockProps }>
+			<TagName { ...blockProps }>
 				{ showSingleCommentLabel || commentsCount === 1 ? (
 					<>
 						<PlainText
@@ -181,7 +191,7 @@ export default function Edit( {
 						{ showPostTitle ? postTitle : null }
 					</>
 				) }
-			</h3>
+			</TagName>
 		</>
 	);
 }
