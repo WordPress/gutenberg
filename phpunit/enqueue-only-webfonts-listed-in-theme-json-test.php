@@ -200,7 +200,7 @@ EOF;
 
 		$expected = <<<EOF
 <style id='webfonts-inline-css' type='text/css'>
-@font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-through-different-providers/assets/fonts/Roboto-Bold.ttf') format('truetype');}@font-face{font-family:Roboto;font-style:regular;font-weight:400;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-through-different-providers/assets/fonts/Roboto-Regular.ttf') format('truetype');}
+@font-face{font-family:Roboto;font-style:regular;font-weight:400;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-through-different-providers/assets/fonts/Roboto-Regular.ttf') format('truetype');}@font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-through-different-providers/assets/fonts/Roboto-Bold.ttf') format('truetype');}\n
 </style>
 EOF;
 
