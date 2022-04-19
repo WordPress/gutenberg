@@ -50,27 +50,34 @@ function _gutenberg_resolve_font_face_uri( $font_face ) {
 }
 
 /**
- * Compares two webfonts.
+ * Compares if the two given webfonts are the equal.
  *
- * @param array   $a The first webfont.
- * @param array   $b The second webfont.
- * @param boolean $is_camel_case If the font attributes are in camel case or kebab case. Defaults to camel case.
- *
- * @return boolean True if they're equal, false otherwise.
+ * @param array   $webfont1      The first webfont.
+ * @param array   $webfont2      The second webfont.
+ * @param boolean $is_camel_case True if the font attributes are in camel case; else false for kebab case.
+ *                               Defaults to camel case.
+ * @return boolean True if the webfonts are equal, false otherwise.
  */
-function _gutenberg_is_webfont_equal( $a, $b, $is_camel_case = true ) {
-	$equality_attrs = $is_camel_case ? array(
-		'fontFamily',
-		'fontStyle',
-		'fontWeight',
-	) : array(
-		'font-family',
-		'font-style',
-		'font-weight',
-	);
+function _gutenberg_is_webfont_equal( array $webfont1, array $webfont2, $is_camel_case = true ) {
+	$equality_attrs = $is_camel_case
+		? array(
+			'fontFamily',
+			'fontStyle',
+			'fontWeight',
+		)
+		: array(
+			'font-family',
+			'font-style',
+			'font-weight',
+		);
 
 	foreach ( $equality_attrs as $attr ) {
-		if ( $a[ $attr ] !== $b[ $attr ] ) {
+		// Bail out if the attribute does not exist.
+		if ( ! isset( $webfont1[ $attr ] ) || ! isset( $webfont2[ $attr ] ) ) {
+			return false;
+		}
+
+		if ( $webfont1[ $attr ] !== $webfont2[ $attr ] ) {
 			return false;
 		}
 	}
