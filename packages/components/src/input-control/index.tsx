@@ -92,7 +92,7 @@ export function UnforwardedInputControl(
  * InputControl components let users enter and edit text. This is an experimental component
  * intended to (in time) merge with or replace `TextControl`.
  *
- * ```jsx
+ * @example
  * import { __experimentalInputControl as InputControl } from '@wordpress/components';
  * import { useState } from '@wordpress/compose';
  *
@@ -106,7 +106,6 @@ export function UnforwardedInputControl(
  *  	/>
  *   );
  * };
- * ```
  */
 export const InputControl = forwardRef( UnforwardedInputControl );
 
