@@ -24,6 +24,9 @@ export default function NavigationMenuSidebar() {
 				<Flex>
 					<FlexBlock>
 						<strong>{ __( 'Navigation Menus' ) }</strong>
+						<span className="edit-site-navigation-sidebar__beta">
+							{ __( 'Beta' ) }
+						</span>
 					</FlexBlock>
 				</Flex>
 			}
