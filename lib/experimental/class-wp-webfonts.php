@@ -173,7 +173,7 @@ class WP_Webfonts {
 
 		// Enqueueing the font family completely.
 		if ( ! $font_face ) {
-			$font_family_to_enqueue           = $this->unregister_font_family( $font_family_name );
+			$font_family_to_enqueue           = $this->remove_font_family( $font_family_name );
 			$this->enqueued_webfonts[ $slug ] = $font_family_to_enqueue;
 
 			return true;
@@ -249,7 +249,7 @@ class WP_Webfonts {
 	 * @param string $font_family_name The font family, by name, to unregister.
 	 * @return array[]|false The font face objects of the family if unregistered, false otherwise.
 	 */
-	private function unregister_font_family( $font_family_name ) {
+	private function remove_font_family( $font_family_name ) {
 		$slug = $this->get_font_slug( $font_family_name );
 
 		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
