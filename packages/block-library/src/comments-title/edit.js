@@ -99,7 +99,7 @@ function Edit( {
 		</InspectorControls>
 	);
 
-	const postTitle = postId ? rawTitle : 'Post Title';
+	const postTitle = postId ? `“${ rawTitle }”` : 'Post Title';
 
 	return (
 		<>
