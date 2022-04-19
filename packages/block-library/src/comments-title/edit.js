@@ -12,7 +12,6 @@ import {
 	useBlockProps,
 	PlainText,
 	InspectorControls,
-	Warning,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
@@ -135,16 +134,6 @@ export default function Edit( {
 	const multiplePlaceholder = showPostTitle
 		? __( 'Responses to ' )
 		: __( 'Responses' );
-
-	if ( commentsCount === 0 && ! isSiteEditor ) {
-		return (
-			<Warning>
-				{ __(
-					'Comments Title block: No comments found. The title will not be displayed on the site.'
-				) }
-			</Warning>
-		);
-	}
 
 	return (
 		<>
