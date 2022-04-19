@@ -19,11 +19,7 @@ if ( ! function_exists( '_wp_register_webfonts_from_theme_json' ) ) {
 			foreach ( $variations as $variation ) {
 
 				// Sanity check: Skip if fontFamilies are not defined in the variation.
-				if (
-					empty( $variation['settings'] ) ||
-					empty( $variation['settings']['typography'] ) ||
-					empty( $variation['settings']['typography']['fontFamilies'] )
-				) {
+				if ( empty( $variation['settings']['typography']['fontFamilies'] ) ) {
 					continue;
 				}
 
