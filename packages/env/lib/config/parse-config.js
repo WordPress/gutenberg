@@ -114,6 +114,24 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
+	const sshProtocol = sourceString.match(
+		/^(git@github.com[^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?.git$/
+	);
+	if ( sshProtocol ) {
+		return {
+			type: 'git',
+			url: `${ sshProtocol[ 1 ] }/${ sshProtocol[ 2 ] }`,
+			ref: sshProtocol[ 5 ] || 'master',
+			path: path.resolve(
+				workDirectoryPath,
+				sshProtocol[ 2 ],
+				sshProtocol[ 4 ] || '.'
+			),
+			clonePath: path.resolve( workDirectoryPath, sshProtocol[ 2 ] ),
+			basename: sshProtocol[ 4 ] || sshProtocol[ 2 ],
+		};
+	}
+
 	const gitHubFields = sourceString.match(
 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/
 	);
