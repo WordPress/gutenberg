@@ -699,17 +699,33 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
 			foreach ( $preset_metadata['classes'] as $class => $property ) {
 				foreach ( $slugs as $slug ) {
-					$css_var     = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
-					$class_name  = static::replace_slug_in_string( $class, $slug );
-					$stylesheet .= static::to_ruleset(
-						static::append_to_selector( $selector, $class_name ),
-						array(
+					$css_var    = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
+					$class_name = static::replace_slug_in_string( $class, $slug );
+					if ( ( ! str_contains( $class_name, '-color' ) && ! str_contains( $class_name, '-background' ) ) || str_contains( $class_name, '-gradient-background' ) ) {
+						$stylesheet .= static::to_ruleset(
+							static::append_to_selector( $selector, $class_name ),
 							array(
-								'name'  => '--wp--user--preset--' . $property,
-								'value' => 'var(' . $css_var . ')',
-							),
-						)
-					);
+								array(
+									'name'  => '--wp--user--preset--' . $property,
+									'value' => 'var(' . $css_var . ')',
+								),
+								array(
+									'name'  => $property,
+									'value' => 'var(' . $css_var . ')',
+								),
+							)
+						);
+					} else {
+						$stylesheet .= static::to_ruleset(
+							static::append_to_selector( $selector, $class_name ),
+							array(
+								array(
+									'name'  => '--wp--user--preset--' . $property,
+									'value' => 'var(' . $css_var . ')',
+								),
+							)
+						);
+					}
 				}
 			}
 		}
@@ -717,7 +733,7 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 		return $stylesheet;
 	}
 
-		/**
+	/**
 	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
