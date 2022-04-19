@@ -96,6 +96,9 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 				onDragOver( event );
 			}
 		} )
+		.onEnd( () => {
+			isDragging.value = false;
+		} )
 		.withRef( panGestureRef )
 		.shouldCancelWhenOutside( false );
 
