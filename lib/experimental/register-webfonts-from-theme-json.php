@@ -23,11 +23,11 @@ if ( ! function_exists( '_wp_register_webfonts_from_theme_json' ) ) {
 					continue;
 				}
 
-			    // Merge the variation settings with the global settings.
-			    $settings['typography']                          = empty( $settings['typography'] ) ? array() : $settings['typography'];
-			    $settings['typography']['fontFamilies']          = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
-			    $settings['typography']['fontFamilies']['theme'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies']['theme'];
-			    $settings['typography']['fontFamilies']['theme'] = array_merge( $settings['typography']['fontFamilies']['theme'], $variation['settings']['typography']['fontFamilies']['theme'] );
+				// Merge the variation settings with the global settings.
+				$settings['typography']                          = empty( $settings['typography'] ) ? array() : $settings['typography'];
+				$settings['typography']['fontFamilies']          = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
+				$settings['typography']['fontFamilies']['theme'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies']['theme'];
+				$settings['typography']['fontFamilies']['theme'] = array_merge( $settings['typography']['fontFamilies']['theme'], $variation['settings']['typography']['fontFamilies']['theme'] );
 
 				// Make sure there are no duplicates.
 				$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
