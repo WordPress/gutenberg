@@ -113,7 +113,7 @@ function BlockStyles( {
 							onMouseLeave={ () => styleItemHandler( null ) }
 							onBlur={ () => styleItemHandler( null ) }
 							onClick={ () => onSelectStylePreview( style ) }
-							tabIndex="0"
+							aria-current={ activeStyle.name === style.name }
 						>
 							<Text
 								as="span"
