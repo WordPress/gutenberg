@@ -245,7 +245,6 @@ const labelMargin = ( {
 const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 	&&& {
 		box-sizing: border-box;
-		color: currentColor;
 		display: block;
 		padding-top: 0;
 		padding-bottom: 0;
