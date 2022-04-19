@@ -13,7 +13,6 @@ import {
 	PlainText,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { withInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
@@ -21,7 +20,7 @@ import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
-function Edit( {
+export default function Edit( {
 	attributes: {
 		textAlign,
 		singleCommentLabel,
@@ -44,7 +43,7 @@ function Edit( {
 
 	useEffect( () => {
 		if ( ! postId ) {
-			setCommentsCount( 2 );
+			setCommentsCount( 0 );
 		}
 		const currentPostId = postId;
 		apiFetch( {
@@ -54,12 +53,18 @@ function Edit( {
 			} ),
 			method: 'HEAD',
 			parse: false,
-		} ).then( ( res ) => {
-			// Stale requests will have the `currentPostId` of an older closure.
-			if ( currentPostId === postId ) {
-				setCommentsCount( parseInt( res.headers.get( 'X-WP-Total' ) ) );
-			}
-		} );
+		} )
+			.then( ( res ) => {
+				// Stale requests will have the `currentPostId` of an older closure.
+				if ( currentPostId === postId ) {
+					setCommentsCount(
+						parseInt( res.headers.get( 'X-WP-Total' ) )
+					);
+				}
+			} )
+			.catch( () => {
+				setCommentsCount( 0 );
+			} );
 	}, [ postId ] );
 
 	const blockControls = (
@@ -101,6 +106,14 @@ function Edit( {
 
 	const postTitle = postId ? `“${ rawTitle }”` : 'Post Title';
 
+	const singlePlaceholder = showPostTitle
+		? __( 'One response to ' )
+		: __( 'One response' );
+
+	const multiplePlaceholder = showPostTitle
+		? __( ' Responses to ' )
+		: __( ' Responses' );
+
 	return (
 		<>
 			{ blockControls }
@@ -111,8 +124,8 @@ function Edit( {
 						<PlainText
 							__experimentalVersion={ 2 }
 							tagName="span"
-							aria-label={ __( 'One response to ' ) }
-							placeholder={ __( 'One response to ' ) }
+							aria-label={ singlePlaceholder }
+							placeholder={ singlePlaceholder }
 							value={ singleCommentLabel }
 							onChange={ ( newLabel ) =>
 								setAttributes( {
@@ -128,8 +141,8 @@ function Edit( {
 						<PlainText
 							__experimentalVersion={ 2 }
 							tagName="span"
-							aria-label={ __( ' Responses to ' ) }
-							placeholder={ __( ' Responses to ' ) }
+							aria-label={ multiplePlaceholder }
+							placeholder={ multiplePlaceholder }
 							value={ multipleCommentsLabel }
 							onChange={ ( newLabel ) =>
 								setAttributes( {
@@ -144,5 +157,3 @@ function Edit( {
 		</>
 	);
 }
-
-export default withInstanceId( Edit );

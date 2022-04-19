@@ -222,7 +222,7 @@ Displays a title with the number of comments ([Source](https://github.com/WordPr
 -	**Name:** core/comments-title
 -	**Category:** theme
 -	**Supports:** align, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
--	**Attributes:** multipleCommentsLabel, showPostTitle, showSingleCommentLabel, singleCommentLabel, textAlign
+-	**Attributes:** level, multipleCommentsLabel, showPostTitle, showSingleCommentLabel, singleCommentLabel, textAlign
 
 ## Cover
 

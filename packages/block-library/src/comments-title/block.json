@@ -24,6 +24,10 @@
 		},
 		"showSingleCommentLabel": {
 			"type": "boolean"
+		},
+		"level": {
+			"type": "number",
+			"default": 2
 		}
 	},
 	"supports": {
@@ -34,11 +38,7 @@
 			"radius": true,
 			"color": true,
 			"width": true,
-			"style": true,
-			"__experimentalDefaultControls": {
-				"width": true,
-				"color": true
-			}
+			"style": true
 		},
 		"color": {
 			"gradients": true,
@@ -49,10 +49,7 @@
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true,
-			"__experimentalDefaultControls": {
-				"padding": true
-			}
+			"padding": true
 		},
 		"typography": {
 			"fontSize": true,
