@@ -33,8 +33,7 @@
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },
 		{ "path": "packages/warning" },
-		{ "path": "packages/wordcount" },
-		{ "path": "./tsconfig.test.json" }
+		{ "path": "packages/wordcount" }
 	],
 	"files": []
 }
