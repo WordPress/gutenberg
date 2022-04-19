@@ -224,8 +224,8 @@ const BlockDraggableWrapper = ( { children } ) => {
 			>
 				{ draggedBlockIcon && (
 					<Animated.View
-						entering={ ZoomInEasyDown }
-						exiting={ ZoomOutEasyDown }
+						entering={ ZoomInEasyDown.duration( 200 ) }
+						exiting={ ZoomOutEasyDown.duration( 150 ) }
 					>
 						<DraggableChip icon={ draggedBlockIcon } />
 					</Animated.View>
