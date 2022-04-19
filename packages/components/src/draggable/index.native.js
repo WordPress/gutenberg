@@ -55,7 +55,7 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 	useAnimatedReaction(
 		() => isDragging.value,
 		( result, previous ) => {
-			if ( result === previous ) {
+			if ( result === previous || previous === null ) {
 				return;
 			}
 
