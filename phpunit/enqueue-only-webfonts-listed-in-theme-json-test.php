@@ -9,14 +9,14 @@
 require __DIR__ . '/class-wp-webfonts-mock-provider.php';
 
 /**
- * Tests the enqueueing of webfonts listed in theme.json
+ * Integration tests for the enqueueing of webfonts listed in theme.json.
  *
  * @group  webfonts
  * @covers _wp_register_webfonts_from_theme_json
- *         _wp_add_registered_webfonts_to_theme_json
- *         _wp_enqueue_webfonts_listed_in_theme_json
+ * @covers _wp_add_registered_webfonts_to_theme_json
+ * @covers _wp_enqueue_webfonts_listed_in_theme_json
  */
-class Enqueue_Only_Webfonts_Listed_In_Theme_JSON_Test extends WP_UnitTestCase {
+class Test_WebfontsApi_EnqueueWebfontsListedInThemeJSON extends WP_UnitTestCase {
 	/**
 	 * WP_Webfonts instance reference
 	 *
@@ -48,8 +48,8 @@ class Enqueue_Only_Webfonts_Listed_In_Theme_JSON_Test extends WP_UnitTestCase {
 	/**
 	 * Set up the new theme root directory and throw away the WP_Webfonts class.
 	 */
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		global $wp_styles;
 
@@ -69,14 +69,14 @@ class Enqueue_Only_Webfonts_Listed_In_Theme_JSON_Test extends WP_UnitTestCase {
 		// /themes is necessary as theme.php functions assume /themes is the root if there is only one root.
 		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', $this->theme_root );
 
-		$theme_root_callback = function () {
+		$theme_root_callback = function() {
 			return $this->theme_root;
 		};
 
 		add_filter( 'theme_root', $theme_root_callback );
 		add_filter( 'stylesheet_root', $theme_root_callback );
 		add_filter( 'template_root', $theme_root_callback );
-		$this->queries = array();
+
 		// Clear caches.
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
@@ -85,7 +85,7 @@ class Enqueue_Only_Webfonts_Listed_In_Theme_JSON_Test extends WP_UnitTestCase {
 	/**
 	 * Restores the original theme root and WP_Webfonts instance.
 	 */
-	public function tearDown() {
+	public function tear_down() {
 		global $wp_webfonts;
 		global $wp_styles;
 
@@ -97,7 +97,94 @@ class Enqueue_Only_Webfonts_Listed_In_Theme_JSON_Test extends WP_UnitTestCase {
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
 
-		parent::tearDown();
+		parent::tear_down();
+	}
+
+	/**
+	 * Enqueue an externally registered font family.
+	 *
+	 * The `enqueue-font-family` theme registers two font families
+	 * but only one is listed in theme.json.
+	 */
+	public function test_enqueue_an_externally_registered_font_family() {
+		$this->generate_styles_for_theme( 'enqueue-font-family' );
+
+		$expected = <<<EOF
+<style id='webfonts-inline-css' type='text/css'>
+@font-face{font-family:Roboto;font-style:normal;font-weight:400;font-display:fallback;font-stretch:normal;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/enqueue-font-family/assets/fonts/Roboto-regular.ttf') format('truetype');}
+</style>
+EOF;
+
+		$this->assertStringContainsString(
+			$expected,
+			get_echo( 'wp_print_styles' )
+		);
+	}
+
+	/**
+	 * Enqueue only one of all externally registered font faces.
+	 *
+	 * The `enqueue-only-one-font-face` theme registers two font faces
+	 * for Roboto, but only one is listed in theme.json.
+	 */
+	public function test_enqueue_only_one_of_all_externally_registered_font_faces() {
+		$this->generate_styles_for_theme( 'enqueue-only-one-font-face' );
+
+		$expected = <<<EOF
+<style id='webfonts-inline-css' type='text/css'>
+@font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;font-stretch:normal;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/enqueue-only-one-font-face/assets/fonts/Roboto-Bold.ttf') format('truetype');}
+</style>
+EOF;
+
+		$this->assertStringContainsString(
+			$expected,
+			get_echo( 'wp_print_styles' )
+		);
+	}
+
+	/**
+	 * Register (and enqueue) a collection of font faces to the same provider.
+	 *
+	 * The `register-and-enqueue-to-the-same-provider` theme registers and
+	 * enqueue a font family listed in theme.json through the same provider, declared
+	 * at top level.
+	 */
+	public function test_register_and_enqueue_font_faces_to_same_provider() {
+		$this->generate_styles_for_theme( 'register-and-enqueue-to-the-same-provider' );
+
+		$expected = <<<EOF
+<style id='webfonts-inline-css' type='text/css'>
+@font-face{font-family:Roboto;font-style:regular;font-weight:400;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-to-the-same-provider/assets/fonts/Roboto-Regular.ttf') format('truetype');}@font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-to-the-same-provider/assets/fonts/Roboto-Bold.ttf') format('truetype');}
+</style>
+EOF;
+
+		$this->assertStringContainsString(
+			$expected,
+			get_echo( 'wp_print_styles' )
+		);
+	}
+
+	/**
+	 * Register (and enqueue) a collection of font faces through different providers.
+	 *
+	 * The `register-and-enqueue-through-different-providers` theme registers and
+	 * enqueue a font family listed in theme.json through different providers,
+	 * declared at font face level.
+	 */
+	public function test_register_and_enqueue_font_faces_through_different_providers() {
+		wp_register_webfont_provider( 'mock', 'WP_Webfonts_Mock_Provider' );
+		$this->generate_styles_for_theme( 'register-and-enqueue-through-different-providers' );
+
+		$expected = <<<EOF
+<style id='webfonts-inline-css' type='text/css'>
+@font-face{font-family:Roboto;font-style:regular;font-weight:400;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-through-different-providers/assets/fonts/Roboto-Regular.ttf') format('truetype');}@font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-through-different-providers/assets/fonts/Roboto-Bold.ttf') format('truetype');}
+</style>
+EOF;
+
+		$this->assertStringContainsString(
+			$expected,
+			get_echo( 'wp_print_styles' )
+		);
 	}
 
 	/**
@@ -121,92 +208,5 @@ class Enqueue_Only_Webfonts_Listed_In_Theme_JSON_Test extends WP_UnitTestCase {
 		do_action( 'wp_loaded' );
 
 		wp_webfonts()->generate_and_enqueue_styles();
-	}
-
-	/**
-	 * Enqueue an externally registered font family.
-	 *
-	 * The `enqueue-font-family` theme registers two font families
-	 * but only one is listed in theme.json.
-	 */
-	public function test_enqueue_an_externally_registered_font_family() {
-		$this->generate_styles_for_theme( 'enqueue-font-family' );
-
-		$expected = <<<EOF
-<style id='webfonts-inline-css' type='text/css'>
-@font-face{font-family:Roboto;font-style:normal;font-weight:400;font-display:fallback;font-stretch:normal;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/enqueue-font-family/assets/fonts/Roboto-regular.ttf') format('truetype');}
-</style>
-EOF;
-
-		$this->assertContains(
-			$expected,
-			get_echo( 'wp_print_styles' )
-		);
-	}
-
-	/**
-	 * Enqueue only one of all externally registered font faces.
-	 *
-	 * The `enqueue-only-one-font-face` theme registers two font faces
-	 * for Roboto, but only one is listed in theme.json.
-	 */
-	public function test_enqueue_only_one_of_all_externally_registered_font_faces() {
-		$this->generate_styles_for_theme( 'enqueue-only-one-font-face' );
-
-		$expected = <<<EOF
-<style id='webfonts-inline-css' type='text/css'>
-@font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;font-stretch:normal;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/enqueue-only-one-font-face/assets/fonts/Roboto-Bold.ttf') format('truetype');}
-</style>
-EOF;
-
-		$this->assertContains(
-			$expected,
-			get_echo( 'wp_print_styles' )
-		);
-	}
-
-	/**
-	 * Register (and enqueue) a collection of font faces to the same provider.
-	 *
-	 * The `register-and-enqueue-to-the-same-provider` theme registers and
-	 * enqueue a font family listed in theme.json through the same provider, declared
-	 * at top level.
-	 */
-	public function test_register_and_enqueue_font_faces_to_same_provider() {
-		$this->generate_styles_for_theme( 'register-and-enqueue-to-the-same-provider' );
-
-		$expected = <<<EOF
-<style id='webfonts-inline-css' type='text/css'>
-@font-face{font-family:Roboto;font-style:regular;font-weight:400;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-to-the-same-provider/assets/fonts/Roboto-Regular.ttf') format('truetype');}@font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-to-the-same-provider/assets/fonts/Roboto-Bold.ttf') format('truetype');}
-</style>
-EOF;
-
-		$this->assertContains(
-			$expected,
-			get_echo( 'wp_print_styles' )
-		);
-	}
-
-	/**
-	 * Register (and enqueue) a collection of font faces through different providers.
-	 *
-	 * The `register-and-enqueue-through-different-providers` theme registers and
-	 * enqueue a font family listed in theme.json through different providers,
-	 * declared at font face level.
-	 */
-	public function test_register_and_enqueue_font_faces_through_different_providers() {
-		wp_register_webfont_provider( 'mock', 'WP_Webfonts_Mock_Provider' );
-		$this->generate_styles_for_theme( 'register-and-enqueue-through-different-providers' );
-
-		$expected = <<<EOF
-<style id='webfonts-inline-css' type='text/css'>
-@font-face{font-family:Roboto;font-style:regular;font-weight:400;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-through-different-providers/assets/fonts/Roboto-Regular.ttf') format('truetype');}@font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-through-different-providers/assets/fonts/Roboto-Bold.ttf') format('truetype');}\n
-</style>
-EOF;
-
-		$this->assertContains(
-			$expected,
-			get_echo( 'wp_print_styles' )
-		);
 	}
 }

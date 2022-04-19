@@ -59,7 +59,8 @@ if ( ! function_exists( '_wp_enqueue_webfonts_listed_in_theme_json' ) ) {
 
 					/*
 					 * Skip if this font-face's font-family is not defined. Why?
-					 * Its font-family may be different from its parent (i.e. `$font_family`).
+					 * The font-face's font-family is the key used during the registration
+					 * process. Its font-family may be different from its parent `$font_family`.
 					 * For example, the parent may define a fallback such as "serif",
 					 * whereas this font-face may define only the font-family.
 					 */
