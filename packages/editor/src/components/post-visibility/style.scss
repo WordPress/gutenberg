@@ -1,12 +1,10 @@
 .edit-post-post-visibility__dialog,
 .editor-post-visibility__dialog-fieldset {
-	padding: $grid-unit-05;
-	padding-top: 0;
+	padding: $grid-unit-10;
 
 	.editor-post-visibility__dialog-legend {
 		font-weight: 600;
-		margin-bottom: 1em;
-		margin-top: 0.5em;
+		margin-top: 1em;
 		padding: 0;
 	}
 
@@ -20,7 +18,7 @@
 	}
 
 	.editor-post-visibility__dialog-info {
-		margin-top: 0;
+		margin-top: 0.5em;
 		margin-left: $grid-unit-40;
 	}
 
@@ -33,7 +31,7 @@
 .editor-post-visibility__dialog-password {
 	.editor-post-visibility__dialog-password-input[type="text"] {
 		@include input-control;
-		margin-left: $grid-unit * 4.5;
-		margin-top: $grid-unit-10;
+		margin-left: $grid-unit * 4;
+		width: calc(100% - #{$grid-unit * 4});
 	}
 }

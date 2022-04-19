@@ -96,8 +96,9 @@ export class PostVisibility extends Component {
 				className="editor-post-visibility__dialog-fieldset"
 			>
 				<legend className="editor-post-visibility__dialog-legend">
-					{ __( 'Post Visibility' ) }
+					{ __( 'Visibility' ) }
 				</legend>
+				<p>{ __( 'Control how this post is viewed.' ) }</p>
 				{ visibilityOptions.map( ( { value, label, info } ) => (
 					<div
 						key={ value }
@@ -129,28 +130,25 @@ export class PostVisibility extends Component {
 						}
 					</div>
 				) ) }
+				{ this.state.hasPassword && (
+					<div className="editor-post-visibility__dialog-password">
+						<VisuallyHidden
+							as="label"
+							htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+						>
+							{ __( 'Create password' ) }
+						</VisuallyHidden>
+						<input
+							className="editor-post-visibility__dialog-password-input"
+							id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+							type="text"
+							onChange={ this.updatePassword }
+							value={ password }
+							placeholder={ __( 'Use a secure password' ) }
+						/>
+					</div>
+				) }
 			</fieldset>,
-			this.state.hasPassword && (
-				<div
-					className="editor-post-visibility__dialog-password"
-					key="password-selector"
-				>
-					<VisuallyHidden
-						as="label"
-						htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
-					>
-						{ __( 'Create password' ) }
-					</VisuallyHidden>
-					<input
-						className="editor-post-visibility__dialog-password-input"
-						id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
-						type="text"
-						onChange={ this.updatePassword }
-						value={ password }
-						placeholder={ __( 'Use a secure password' ) }
-					/>
-				</div>
-			),
 			<ConfirmDialog
 				key="private-publish-confirmation"
 				isOpen={ this.state.showPrivateConfirmDialog }
