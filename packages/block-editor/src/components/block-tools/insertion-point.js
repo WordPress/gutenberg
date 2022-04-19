@@ -24,7 +24,7 @@ import { isRTL } from '@wordpress/i18n';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { usePopoverScroll } from './use-popover-scroll';
+import { usePopoverScroll } from '../block-popover';
 
 export const InsertionPointOpenRef = createContext();
 
