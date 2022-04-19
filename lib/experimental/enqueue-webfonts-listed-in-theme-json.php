@@ -57,7 +57,17 @@ if ( ! function_exists( '_wp_enqueue_webfonts_listed_in_theme_json' ) ) {
 						continue;
 					}
 
-					wp_webfonts()->enqueue_webfont( $font_family, $font_face );
+					/*
+					 * Skip if this font-face's font-family is not defined. Why?
+					 * Its font-family may be different from its parent (i.e. `$font_family`).
+					 * For example, the parent may define a fallback such as "serif",
+					 * whereas this font-face may define only the font-family.
+					 */
+					if ( ! isset( $font_face['fontFamily'] ) ) {
+						continue;
+					}
+
+					wp_webfonts()->enqueue_webfont( $font_face['fontFamily'], $font_face );
 				}
 			}
 		}
