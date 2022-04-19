@@ -221,6 +221,7 @@ export const __experimentalGetCoreBlocks = () => [
 	commentsPaginationPrevious,
 
 	postComments,
+	postCommentsForm,
 	homeLink,
 	logInOut,
 	termDescription,
@@ -281,7 +282,6 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 							navigationArea,
 							postComment,
 							postCommentsCount,
-							postCommentsForm,
 							postCommentsLink,
 					  ]
 					: [] ),
