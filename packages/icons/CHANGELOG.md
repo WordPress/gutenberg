@@ -3,7 +3,7 @@
 ## Unreleased
 ### New Features
 
--   Add new `filter` icon.
+-   Add new `filter` icon. ([#40435](https://github.com/WordPress/gutenberg/pull/40435))
 
 ## 8.2.0 (2022-04-08)
 
