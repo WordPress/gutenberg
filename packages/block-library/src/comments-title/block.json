@@ -22,9 +22,6 @@
 			"type": "boolean",
 			"default": true
 		},
-		"showSingleCommentLabel": {
-			"type": "boolean"
-		},
 		"showCommentsCount": {
 			"type": "boolean",
 			"default": true

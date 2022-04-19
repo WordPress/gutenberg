@@ -15,7 +15,12 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	PanelBody,
+	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -30,7 +35,6 @@ export default function Edit( {
 		textAlign,
 		singleCommentLabel,
 		multipleCommentsLabel,
-		showSingleCommentLabel,
 		showPostTitle,
 		showCommentsCount,
 		level,
@@ -40,6 +44,7 @@ export default function Edit( {
 } ) {
 	const TagName = 'h' + level;
 	const [ commentsCount, setCommentsCount ] = useState();
+	const [ editingMode, setEditingMode ] = useState( 'plural' );
 	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	const isSiteEditor = typeof postId === 'undefined';
 	const blockProps = useBlockProps( {
@@ -95,6 +100,22 @@ export default function Edit( {
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
+				{ isSiteEditor && (
+					<ToggleGroupControl
+						label={ __( 'Editing mode' ) }
+						onChange={ setEditingMode }
+						value={ editingMode }
+					>
+						<ToggleGroupControlOption
+							label={ __( 'Singular' ) }
+							value="singular"
+						/>
+						<ToggleGroupControlOption
+							label={ __( 'Plural' ) }
+							value="plural"
+						/>
+					</ToggleGroupControl>
+				) }
 				<ToggleControl
 					label={ __( 'Show post title' ) }
 					checked={ showPostTitle }
@@ -109,18 +130,6 @@ export default function Edit( {
 						setAttributes( { showCommentsCount: value } )
 					}
 				/>
-				{ isSiteEditor && (
-					<ToggleControl
-						label={ __( 'Show single comment' ) }
-						help={ __(
-							'Toggles between single comments and multiple comments reply sentence'
-						) }
-						checked={ showSingleCommentLabel }
-						onChange={ ( value ) =>
-							setAttributes( { showSingleCommentLabel: value } )
-						}
-					/>
-				) }
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -140,7 +149,7 @@ export default function Edit( {
 			{ blockControls }
 			{ inspectorControls }
 			<TagName { ...blockProps }>
-				{ showSingleCommentLabel || commentsCount === 1 ? (
+				{ editingMode === 'singular' || commentsCount === 1 ? (
 					<>
 						<PlainText
 							__experimentalVersion={ 2 }
