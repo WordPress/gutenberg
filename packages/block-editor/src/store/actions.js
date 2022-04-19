@@ -988,12 +988,12 @@ export const __unstableExpandSelection = () => ( { select, dispatch } ) => {
  * @param {0|-1|null} initialPosition     Value reflecting direction of merge. An initialPosition of -1
  *                                        indicates a reverse merge (e.g. via backspace).
  */
-/* eslint-enable jsdoc/valid-types */
 export const mergeBlocks = (
 	firstBlockClientId,
 	secondBlockClientId,
 	initialPosition = 0
 ) => ( { select, dispatch } ) => {
+	/* eslint-enable jsdoc/valid-types */
 	const blocks = [ firstBlockClientId, secondBlockClientId ];
 	dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
