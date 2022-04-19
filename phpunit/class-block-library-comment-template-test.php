@@ -61,13 +61,12 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			build_comment_query_vars_from_block( $block ),
 			array(
-				'orderby'                   => 'comment_date_gmt',
-				'order'                     => 'ASC',
-				'status'                    => 'approve',
-				'no_found_rows'             => false,
-				'update_comment_meta_cache' => false,
-				'post_id'                   => self::$custom_post->ID,
-				'hierarchical'              => 'threaded',
+				'orderby'       => 'comment_date_gmt',
+				'order'         => 'ASC',
+				'status'        => 'approve',
+				'no_found_rows' => false,
+				'post_id'       => self::$custom_post->ID,
+				'hierarchical'  => 'threaded',
 			)
 		);
 		update_option( 'page_comments', true );
@@ -88,15 +87,14 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			build_comment_query_vars_from_block( $block ),
 			array(
-				'orderby'                   => 'comment_date_gmt',
-				'order'                     => 'ASC',
-				'status'                    => 'approve',
-				'no_found_rows'             => false,
-				'update_comment_meta_cache' => false,
-				'post_id'                   => self::$custom_post->ID,
-				'hierarchical'              => 'threaded',
-				'number'                    => 5,
-				'paged'                     => 1,
+				'orderby'       => 'comment_date_gmt',
+				'order'         => 'ASC',
+				'status'        => 'approve',
+				'no_found_rows' => false,
+				'post_id'       => self::$custom_post->ID,
+				'hierarchical'  => 'threaded',
+				'number'        => 5,
+				'paged'         => 1,
 			)
 		);
 	}
@@ -111,14 +109,13 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			build_comment_query_vars_from_block( $block ),
 			array(
-				'orderby'                   => 'comment_date_gmt',
-				'order'                     => 'ASC',
-				'status'                    => 'approve',
-				'no_found_rows'             => false,
-				'update_comment_meta_cache' => false,
-				'hierarchical'              => 'threaded',
-				'number'                    => 5,
-				'paged'                     => 1,
+				'orderby'       => 'comment_date_gmt',
+				'order'         => 'ASC',
+				'status'        => 'approve',
+				'no_found_rows' => false,
+				'hierarchical'  => 'threaded',
+				'number'        => 5,
+				'paged'         => 1,
 			)
 		);
 	}

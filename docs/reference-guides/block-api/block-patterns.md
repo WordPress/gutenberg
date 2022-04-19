@@ -27,6 +27,7 @@ The properties available for block patterns are:
 -   `keywords` (optional): An array of aliases or keywords that help users discover the pattern while searching.
 -   `viewportWidth` (optional): An integer specifying the intended width of the pattern to allow for a scaled preview of the pattern in the inserter.
 -   `blockTypes` (optional): An array of block types that the pattern is intended to be used with. Each value needs to be the declared block's `name`.
+-   `inserter` (optional): By default, all patterns will appear in the inserter. To hide a pattern so that it can only be inserted programmatically, set the `inserter` to `false`.
 
 The following code sample registers a block pattern named 'my-plugin/my-awesome-pattern':
 
