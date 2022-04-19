@@ -110,16 +110,18 @@ export default function Edit( {
 						setAttributes( { showCommentsCount: value } )
 					}
 				/>
-				<ToggleControl
-					label={ __( 'Show single comment' ) }
-					help={ __(
-						'Toggles between single comments and multiple comments reply sentence'
-					) }
-					checked={ showSingleCommentLabel }
-					onChange={ ( value ) =>
-						setAttributes( { showSingleCommentLabel: value } )
-					}
-				/>
+				{ isSiteEditor && (
+					<ToggleControl
+						label={ __( 'Show single comment' ) }
+						help={ __(
+							'Toggles between single comments and multiple comments reply sentence'
+						) }
+						checked={ showSingleCommentLabel }
+						onChange={ ( value ) =>
+							setAttributes( { showSingleCommentLabel: value } )
+						}
+					/>
+				) }
 			</PanelBody>
 		</InspectorControls>
 	);

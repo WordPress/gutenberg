@@ -13,25 +13,34 @@
  * @return string Return the post comments title.
  */
 function render_block_core_comments_title( $attributes ) {
-	$comments_title     = '';
-	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
-	/* translators: %s: The post title. */
-	$single_comment_label = __( 'One Response to "%s"' );
-	/* translators: 1: The number of comments, 2: The post title. */
-	$multiple_comment_label = __( '%1$s Responses to "%2$s"' );
-	if ( 1 === (int) get_comments_number() ) {
-		$comments_title = sprintf(
-			$single_comment_label,
-			get_the_title()
-		);
-	} else {
-		$comments_title = sprintf(
-			$multiple_comment_label,
-			number_format_i18n( get_comments_number() ),
-			get_the_title()
-		);
+
+	$align_class_name    = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
+	$show_post_title     = ! empty( $attributes['showPostTitle'] ) && $attributes['showPostTitle'];
+	$show_comments_count = ! empty( $attributes['showCommentsCount'] ) && $attributes['showCommentsCount'];
+	$wrapper_attributes  = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$post_title          = $show_post_title ? sprintf( '"%1$s"', get_the_title() ) : null;
+	$comments_count      = number_format_i18n( get_comments_number() );
+
+	if ( '0' === $comments_count ) {
+		return;
 	}
+
+	$single_default_comment_label = $show_post_title ? 'One response to' : 'One response';
+	$single_comment_label         = ! empty( $attributes['singleCommentLabel'] ) ? $attributes['singleCommentLabel'] : $single_default_comment_label;
+
+	$multiple_default_comment_label = $show_post_title ? 'Responses to' : 'Responses';
+	$multiple_comment_label         = ! empty( $attributes['multipleCommentsLabel'] ) ? $attributes['multipleCommentsLabel'] : $multiple_default_comment_label;
+
+	$comments_title = '%1$s %2$s %3$s';
+
+	$comments_title = sprintf(
+		$comments_title,
+		// If there is only one comment, only display the label.
+		'1' !== $comments_count && $show_comments_count ? $comments_count : null,
+		'1' === $comments_count ? $single_comment_label : $multiple_comment_label,
+		$post_title
+	);
+
 	return sprintf(
 		'<h3 id="comments" %1$s>%2$s</h3>',
 		$wrapper_attributes,
@@ -39,9 +48,9 @@ function render_block_core_comments_title( $attributes ) {
 	);
 }
 
-/**
- * Registers the `core/comments-title` block on the server.
- */
+	/**
+	 * Registers the `core/comments-title` block on the server.
+	 */
 function register_block_core_comments_title() {
 	register_block_type_from_metadata(
 		__DIR__ . '/comments-title',
@@ -51,4 +60,4 @@ function register_block_core_comments_title() {
 	);
 }
 
-add_action( 'init', 'register_block_core_comments_title' );
+	add_action( 'init', 'register_block_core_comments_title' );
