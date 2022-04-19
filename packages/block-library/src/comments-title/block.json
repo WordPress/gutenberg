@@ -25,6 +25,10 @@
 		"showSingleCommentLabel": {
 			"type": "boolean"
 		},
+		"showCommentsCount": {
+			"type": "boolean",
+			"default": true
+		},
 		"level": {
 			"type": "number",
 			"default": 2

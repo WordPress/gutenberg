@@ -12,6 +12,7 @@ import {
 	useBlockProps,
 	PlainText,
 	InspectorControls,
+	Warning,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
@@ -27,6 +28,7 @@ export default function Edit( {
 		multipleCommentsLabel,
 		showSingleCommentLabel,
 		showPostTitle,
+		showCommentsCount,
 	},
 	setAttributes,
 	context: { postType, postId },
@@ -35,6 +37,8 @@ export default function Edit( {
 
 	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 
+	const isSiteEditor = typeof postId === 'undefined';
+
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -42,8 +46,9 @@ export default function Edit( {
 	} );
 
 	useEffect( () => {
-		if ( ! postId ) {
-			setCommentsCount( 0 );
+		if ( isSiteEditor ) {
+			setCommentsCount( 3 );
+			return;
 		}
 		const currentPostId = postId;
 		apiFetch( {
@@ -88,31 +93,46 @@ export default function Edit( {
 						setAttributes( { showPostTitle: value } )
 					}
 				/>
-				{ ! postId && (
-					<ToggleControl
-						label={ __( 'Show single comment' ) }
-						help={ __(
-							'Toggles between single comments and multiple comments reply sentence'
-						) }
-						checked={ showSingleCommentLabel }
-						onChange={ ( value ) =>
-							setAttributes( { showSingleCommentLabel: value } )
-						}
-					/>
-				) }
+				<ToggleControl
+					label={ __( 'Show comments count' ) }
+					checked={ showCommentsCount }
+					onChange={ ( value ) =>
+						setAttributes( { showCommentsCount: value } )
+					}
+				/>
+				<ToggleControl
+					label={ __( 'Show single comment' ) }
+					help={ __(
+						'Toggles between single comments and multiple comments reply sentence'
+					) }
+					checked={ showSingleCommentLabel }
+					onChange={ ( value ) =>
+						setAttributes( { showSingleCommentLabel: value } )
+					}
+				/>
 			</PanelBody>
 		</InspectorControls>
 	);
 
-	const postTitle = postId ? `“${ rawTitle }”` : 'Post Title';
+	const postTitle = isSiteEditor ? '"Post Title"' : `“${ rawTitle }”`;
 
 	const singlePlaceholder = showPostTitle
 		? __( 'One response to ' )
 		: __( 'One response' );
 
 	const multiplePlaceholder = showPostTitle
-		? __( ' Responses to ' )
-		: __( ' Responses' );
+		? __( 'Responses to ' )
+		: __( 'Responses' );
+
+	if ( commentsCount === 0 && ! isSiteEditor ) {
+		return (
+			<Warning>
+				{ __(
+					'Comments Title block: No comments found. The title will not be displayed on the site.'
+				) }
+			</Warning>
+		);
+	}
 
 	return (
 		<>
@@ -137,12 +157,20 @@ export default function Edit( {
 					</>
 				) : (
 					<>
-						{ commentsCount }
+						{ showCommentsCount ? commentsCount : null }
 						<PlainText
 							__experimentalVersion={ 2 }
 							tagName="span"
-							aria-label={ multiplePlaceholder }
-							placeholder={ multiplePlaceholder }
+							aria-label={
+								showCommentsCount
+									? ` ${ multiplePlaceholder }`
+									: multiplePlaceholder
+							}
+							placeholder={
+								showCommentsCount
+									? ` ${ multiplePlaceholder }`
+									: multiplePlaceholder
+							}
 							value={ multipleCommentsLabel }
 							onChange={ ( newLabel ) =>
 								setAttributes( {
