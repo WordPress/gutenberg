@@ -81,27 +81,24 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	// Text colors.
 	// Check support for text colors.
 	if ( $has_text_colors_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'text' ) ) {
-		$color_block_styles['text'] = array(
-			'value' => isset( $block_attributes['style']['color']['text'] ) ? $block_attributes['style']['color']['text'] : null,
-			'slug'  => array_key_exists( 'textColor', $block_attributes ) ? $block_attributes['textColor'] : null,
-		);
+		$preset_text_color          = array_key_exists( 'textColor', $block_attributes ) ? "var:preset|color|{$block_attributes['textColor']}" : null;
+		$custom_text_color          = isset( $block_attributes['style']['color']['text'] ) ? $block_attributes['style']['color']['text'] : null;
+		$color_block_styles['text'] = $preset_text_color ?: $custom_text_color;
 	}
 
 	// Background colors.
 	if ( $has_background_colors_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'background' ) ) {
-		$color_block_styles['background'] = array(
-			'value' => isset( $block_attributes['style']['color']['background'] ) ? $block_attributes['style']['color']['background'] : null,
-			'slug'  => array_key_exists( 'backgroundColor', $block_attributes ) ? $block_attributes['backgroundColor'] : null,
-		);
+		$preset_background_color          = array_key_exists( 'backgroundColor', $block_attributes ) ? "var:preset|background-color|{$block_attributes['backgroundColor']}" : null;
+		$custom_background_color          = isset( $block_attributes['style']['color']['background'] ) ? $block_attributes['style']['color']['background'] : null;
+		$color_block_styles['background'] = $preset_background_color ?: $custom_background_color;
 	}
 
 	// Gradients.
 
 	if ( $has_gradients_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' ) ) {
-		$color_block_styles['gradient'] = array(
-			'value' => isset( $block_attributes['style']['color']['gradient'] ) ? $block_attributes['style']['color']['gradient'] : null,
-			'slug'  => array_key_exists( 'gradient', $block_attributes ) ? $block_attributes['gradient'] : null,
-		);
+		$preset_gradient_color          = array_key_exists( 'gradient', $block_attributes ) ? "var:preset|background|{$block_attributes['gradient']}" : null;
+		$custom_gradient_color          = isset( $block_attributes['style']['color']['gradient'] ) ? $block_attributes['style']['color']['gradient'] : null;
+		$color_block_styles['gradient'] = $preset_gradient_color ?: $custom_gradient_color;
 	}
 
 	$attributes   = array();

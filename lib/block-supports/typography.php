@@ -100,48 +100,43 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	$typography_block_styles = array();
 	if ( $has_font_size_support && ! $should_skip_font_size ) {
-		$typography_block_styles['fontSize'] = array(
-			'value' => isset( $block_attributes['style']['typography']['fontSize'] ) ? $block_attributes['style']['typography']['fontSize'] : null,
-			'slug'  => array_key_exists( 'fontSize', $block_attributes ) ? $block_attributes['fontSize'] : null,
-		);
+		$preset_font_size                    = array_key_exists( 'fontSize', $block_attributes ) ? "var:preset|font-size|{$block_attributes['fontSize']}" : null;
+		$custom_font_size                    = isset( $block_attributes['style']['typography']['fontSize'] ) ? $block_attributes['style']['typography']['fontSize'] : null;
+		$typography_block_styles['fontSize'] = $preset_font_size ?: $custom_font_size;
 	}
 
 	if ( $has_font_family_support && ! $should_skip_font_family ) {
-		$typography_block_styles['fontFamily']['slug'] = array_key_exists( 'fontFamily', $block_attributes ) ? $block_attributes['fontFamily'] : null;
-		if ( isset( $block_attributes['style']['typography']['fontFamily'] ) ) {
-			// Before using classes, the value was serialized as a CSS Custom Property.
-			// We don't need to check for a preset when it lands in core.
-			$font_family_value                              = gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['fontFamily'], 'font-family' );
-			$typography_block_styles['fontFamily']['value'] = $font_family_value;
-		}
+		$preset_font_family                    = array_key_exists( 'fontFamily', $block_attributes ) ? "var:preset|font-family|{$block_attributes['fontFamily']}" : null;
+		$custom_font_family                    = isset( $block_attributes['style']['typography']['fontFamily'] ) ? gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['fontFamily'], 'font-family' ) : null;
+		$typography_block_styles['fontFamily'] = $preset_font_family ?: $custom_font_family;
 	}
 
 	if ( $has_font_style_support && ! $should_skip_font_style && isset( $block_attributes['style']['typography']['fontStyle'] ) ) {
-		$typography_block_styles['fontStyle']['value'] =
+		$typography_block_styles['fontStyle'] =
 			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['fontStyle'], 'font-style' );
 	}
 
 	if ( $has_font_weight_support && ! $should_skip_font_weight && isset( $block_attributes['style']['typography']['fontWeight'] ) ) {
-		$typography_block_styles['fontWeight']['value'] =
+		$typography_block_styles['fontWeight'] =
 			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['fontWeight'], 'font-weight' );
 	}
 
 	if ( $has_line_height_support && ! $should_skip_line_height && isset( $block_attributes['style']['typography']['lineHeight'] ) ) {
-			$typography_block_styles['lineHeight']['value'] = $block_attributes['style']['typography']['lineHeight'];
+			$typography_block_styles['lineHeight'] = $block_attributes['style']['typography']['lineHeight'];
 	}
 
 	if ( $has_text_decoration_support && ! $should_skip_text_decoration && isset( $block_attributes['style']['typography']['textDecoration'] ) ) {
-		$typography_block_styles['textDecoration']['value'] =
+		$typography_block_styles['textDecoration'] =
 			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['textDecoration'], 'text-decoration' );
 	}
 
 	if ( $has_text_transform_support && ! $should_skip_text_transform && isset( $block_attributes['style']['typography']['textTransform'] ) ) {
-		$typography_block_styles['textTransform']['value'] =
+		$typography_block_styles['textTransform'] =
 			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['textTransform'], 'text-transform' );
 	}
 
 	if ( $has_letter_spacing_support && ! $should_skip_letter_spacing && isset( $block_attributes['style']['typography']['letterSpacing'] ) ) {
-		$typography_block_styles['letterSpacing']['value'] =
+		$typography_block_styles['letterSpacing'] =
 			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['letterSpacing'], 'letter-spacing' );
 	}
 
