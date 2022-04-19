@@ -788,4 +788,53 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 
 		return $declarations;
 	}
+
+	/**
+	 * Returns the stylesheet that results of processing
+	 * the theme.json structure this object represents.
+	 *
+	 * @param array $types    Types of styles to load. Will load all by default. It accepts:
+	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
+	 *                         'styles': only the styles section in theme.json.
+	 *                         'presets': only the classes for the presets.
+	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
+	 * @return string Stylesheet.
+	 */
+	public function get_stylesheet( $types = array( 'variables', 'styles' ), $origins = null ) {
+		if ( null === $origins ) {
+			$origins = static::VALID_ORIGINS;
+		}
+
+		if ( is_string( $types ) ) {
+			// Dispatch error and map old arguments to new ones.
+			_deprecated_argument( __FUNCTION__, '5.9' );
+			if ( 'block_styles' === $types ) {
+				$types = array( 'styles', 'presets' );
+			} elseif ( 'css_variables' === $types ) {
+				$types = array( 'variables' );
+			} else {
+				$types = array( 'variables', 'styles', 'presets' );
+			}
+		}
+
+		$blocks_metadata = static::get_blocks_metadata();
+		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata );
+		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
+		$stylesheet = '';
+
+		if ( in_array( 'variables', $types, true ) ) {
+			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
+		}
+
+		if ( in_array( 'styles', $types, true ) ) {
+			$stylesheet .= $this->get_block_classes( $style_nodes );
+		}
+
+		if ( in_array( 'presets', $types, true ) ) {
+			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
+		}
+
+		return $stylesheet;
+	}
 }
