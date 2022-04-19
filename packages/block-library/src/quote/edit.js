@@ -75,6 +75,7 @@ export default function QuoteEdit( {
 	insertBlocksAfter,
 	clientId,
 	className,
+	style,
 } ) {
 	const { align, citation } = attributes;
 
@@ -89,6 +90,7 @@ export default function QuoteEdit( {
 		className: classNames( className, {
 			[ `has-text-align-${ align }` ]: align,
 		} ),
+		...( ! isWebPlatform && { style } ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
@@ -129,6 +131,7 @@ export default function QuoteEdit( {
 						__unstableOnSplitAtEnd={ () =>
 							insertBlocksAfter( createBlock( 'core/paragraph' ) )
 						}
+						{ ...( ! isWebPlatform ? { textAlign: align } : {} ) }
 					/>
 				) }
 			</BlockQuotation>
