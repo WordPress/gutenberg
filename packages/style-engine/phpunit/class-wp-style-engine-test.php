@@ -66,9 +66,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			'valid_inline_css_and_classnames'              => array(
 				'block_styles'    => array(
 					'color'   => array(
-						'text' => array(
-							'slug' => 'texas-flood',
-						),
+						'text' => 'var:preset|color|texas-flood',
 					),
 					'spacing' => array(
 						'margin' => '111px',
@@ -122,23 +120,13 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			'valid_classnames_deduped'                     => array(
 				'block_styles'    => array(
 					'color'      => array(
-						'text'       => array(
-							'slug' => 'copper-socks',
-						),
-						'background' => array(
-							'slug' => 'splendid-carrot',
-						),
-						'gradient'   => array(
-							'slug' => 'like-wow-dude',
-						),
+						'text'       => 'var:preset|color|copper-socks',
+						'background' => 'var:preset|background-color|splendid-carrot',
+						'gradient'   => 'var:preset|background|like-wow-dude',
 					),
 					'typography' => array(
-						'fontSize'   => array(
-							'slug' => 'fantastic',
-						),
-						'fontFamily' => array(
-							'slug' => 'totally-awesome',
-						),
+						'fontSize'   => 'var:preset|font-size|fantastic',
+						'fontFamily' => 'var:preset|font-family|totally-awesome',
 					),
 				),
 				'expected_output' => array(
@@ -148,14 +136,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			'valid_classnames_with_null_style_values'      => array(
 				'block_styles'    => array(
 					'color' => array(
-						'text'       => array(
-							'value' => '#fff',
-							'slug'  => null,
-						),
-						'background' => array(
-							'value' => null,
-							'slug'  => null,
-						),
+						'text'       => '#fff',
+						'background' => null,
 					),
 				),
 				'expected_output' => array(
@@ -163,18 +145,20 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'classnames' => 'has-text-color',
 				),
 			),
-			'invalid_classnames_slug_key'                  => array(
+			'invalid_classnames_preset_value'              => array(
 				'block_styles'    => array(
-					'color' => array(
-						'text'       => array(
-							'cheese' => 'pizza',
-						),
-						'background' => array(
-							'tomato' => 'sauce',
-						),
+					'color'   => array(
+						'text'       => 'var:cheese|color|fantastic',
+						'background' => 'var:preset|fromage|fantastic',
+					),
+					'spacing' => array(
+						'margin'  => 'var:cheese|spacing|margin',
+						'padding' => 'var:preset|spacing|padding',
 					),
 				),
-				'expected_output' => array(),
+				'expected_output' => array(
+					'classnames' => 'has-text-color has-background',
+				),
 			),
 			'invalid_classnames_options'                   => array(
 				'block_styles'    => array(
