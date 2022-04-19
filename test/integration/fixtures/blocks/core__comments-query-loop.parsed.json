@@ -4,6 +4,33 @@
 		"attrs": {},
 		"innerBlocks": [
 			{
+				"blockName": "core/comments-title",
+				"attrs": {
+					"level": 4,
+					"style": {
+						"spacing": {
+							"padding": {
+								"top": "6px",
+								"right": "6px",
+								"bottom": "6px",
+								"left": "6px"
+							}
+						},
+						"border": {
+							"width": "3px",
+							"radius": "100px"
+						}
+					},
+					"borderColor": "vivid-red",
+					"backgroundColor": "primary",
+					"textColor": "background",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			},
+			{
 				"blockName": "core/comment-template",
 				"attrs": {},
 				"innerBlocks": [
@@ -32,11 +59,11 @@
 										"innerContent": []
 									}
 								],
-								"innerHTML": "\n\t\t<div class=\"wp-block-column\" style=\"flex-basis:40px\">\n\t\t\t\n\t\t</div>\n\t\t",
+								"innerHTML": "\n\t<div class=\"wp-block-column\" style=\"flex-basis:40px\"></div>\n\t",
 								"innerContent": [
-									"\n\t\t<div class=\"wp-block-column\" style=\"flex-basis:40px\">\n\t\t\t",
+									"\n\t<div class=\"wp-block-column\" style=\"flex-basis:40px\">",
 									null,
-									"\n\t\t</div>\n\t\t"
+									"</div>\n\t"
 								]
 							},
 							{
@@ -81,13 +108,13 @@
 												"innerContent": []
 											}
 										],
-										"innerHTML": "\n\t\t\t<div class=\"wp-block-group\" style=\"margin-top:0px;margin-bottom:0px\">\n\t\t\t\t\n\n\t\t\t\t\n\t\t\t</div>\n\t\t\t",
+										"innerHTML": "\n\t<div class=\"wp-block-group\" style=\"margin-top:0px;margin-bottom:0px\">\n\t\n\t</div>\n\t",
 										"innerContent": [
-											"\n\t\t\t<div class=\"wp-block-group\" style=\"margin-top:0px;margin-bottom:0px\">\n\t\t\t\t",
+											"\n\t<div class=\"wp-block-group\" style=\"margin-top:0px;margin-bottom:0px\">",
 											null,
-											"\n\n\t\t\t\t",
+											"\n\t\n\t",
 											null,
-											"\n\t\t\t</div>\n\t\t\t"
+											"</div>\n\t"
 										]
 									},
 									{
@@ -105,27 +132,27 @@
 										"innerContent": []
 									}
 								],
-								"innerHTML": "\n\t\t<div class=\"wp-block-column\">\n\t\t\t\n\n\t\t\t\n\n\t\t\t\n\n\t\t\t\n\t\t</div>\n\t\t",
+								"innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\n\t\n\t\n\t\n\t\n\t</div>\n\t",
 								"innerContent": [
-									"\n\t\t<div class=\"wp-block-column\">\n\t\t\t",
+									"\n\t<div class=\"wp-block-column\">",
 									null,
-									"\n\n\t\t\t",
+									"\n\t\n\t",
 									null,
-									"\n\n\t\t\t",
+									"\n\t\n\t",
 									null,
-									"\n\n\t\t\t",
+									"\n\t\n\t",
 									null,
-									"\n\t\t</div>\n\t\t"
+									"</div>\n\t"
 								]
 							}
 						],
-						"innerHTML": "\n\t<div class=\"wp-block-columns\">\n\t\t\n\n\t\t\n\t</div>\n\t",
+						"innerHTML": "\n\t<div class=\"wp-block-columns\">\n\t\n\t</div>\n\t",
 						"innerContent": [
-							"\n\t<div class=\"wp-block-columns\">\n\t\t",
+							"\n\t<div class=\"wp-block-columns\">",
 							null,
-							"\n\n\t\t",
+							"\n\t\n\t",
 							null,
-							"\n\t</div>\n\t"
+							"</div>\n\t"
 						]
 					}
 				],
@@ -158,25 +185,27 @@
 						"innerContent": []
 					}
 				],
-				"innerHTML": "\n\t\n\n\t\n\n\t\n\t",
+				"innerHTML": "\n\t\n\t\n\t\n\t\n\t\n\t",
 				"innerContent": [
 					"\n\t",
 					null,
-					"\n\n\t",
+					"\n\t\n\t",
 					null,
-					"\n\n\t",
+					"\n\t\n\t",
 					null,
 					"\n\t"
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-comments-query-loop\">\n\t\n\n\t\n</div>\n",
+		"innerHTML": "\n<div class=\"wp-block-comments-query-loop\">\n\n\t\n\t\n\t</div>\n\t",
 		"innerContent": [
-			"\n<div class=\"wp-block-comments-query-loop\">\n\t",
+			"\n<div class=\"wp-block-comments-query-loop\">",
 			null,
 			"\n\n\t",
 			null,
-			"\n</div>\n"
+			"\n\t\n\t",
+			null,
+			"</div>\n\t"
 		]
 	}
 ]

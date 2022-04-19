@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Add new `commentTitle` icon. ([#40419](https://github.com/WordPress/gutenberg/pull/40419))
+
 ## 8.2.0 (2022-04-08)
 
 ### New Features
