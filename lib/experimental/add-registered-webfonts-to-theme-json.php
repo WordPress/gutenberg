@@ -31,7 +31,7 @@ if ( ! function_exists( '_wp_add_registered_webfonts_to_theme_json' ) ) {
 			$data['settings']['typography']['fontFamilies'] = array();
 		}
 
-		/**
+		/*
 		 * Map the font families by slug to their corresponding index
 		 * in theme.json, so we can avoid looping theme.json looking for
 		 * font families every time we want to register a face.
