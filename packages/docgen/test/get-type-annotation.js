@@ -105,13 +105,24 @@ describe( 'Type annotations', () => {
 			'should handle %s',
 			( literal ) => {
 				const node = parse( `
-				function fn( foo: ${ literal } ): ${ literal } {
-					return BigInt( '1000' ) as ${ literal };
-				}
-			` );
+					function fn( foo: ${ literal } ): ${ literal } {
+						return BigInt( '1000' ) as ${ literal };
+					}
+				` );
 				expect(
 					getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
 				).toBe( literal );
+			}
+		);
+
+		it.each( [ "'a-string-literal'", '1000n', 'true', '1000' ] )(
+			'should handle %s in the return',
+			( literal ) => {
+				const node = parse( `
+					function fn( foo: ${ literal } ): ${ literal } {
+						return BigInt( '1000' ) as ${ literal };
+					}
+				` );
 				expect( getTypeAnnotation( { tag: 'return' }, node ) ).toBe(
 					literal
 				);
