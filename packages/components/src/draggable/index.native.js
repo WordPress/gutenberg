@@ -39,6 +39,7 @@ const { Provider } = Context;
  */
 const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 	const isDragging = useSharedValue( false );
+	const isPanActive = useSharedValue( false );
 	const draggingId = useSharedValue( '' );
 	const panGestureRef = useRef();
 
@@ -84,7 +85,8 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 			initialPosition.y.value = y;
 		} )
 		.onTouchesMove( ( _, state ) => {
-			if ( isDragging.value ) {
+			if ( ! isPanActive.value && isDragging.value ) {
+				isPanActive.value = true;
 				state.activate();
 			}
 		} )
@@ -97,6 +99,7 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 			}
 		} )
 		.onEnd( () => {
+			isPanActive.value = false;
 			isDragging.value = false;
 		} )
 		.withRef( panGestureRef )
@@ -144,6 +147,10 @@ const DraggableTrigger = ( {
 
 	const gestureHandler = useAnimatedGestureHandler( {
 		onActive: () => {
+			if ( isDragging.value ) {
+				return;
+			}
+
 			isDragging.value = true;
 			draggingId.value = id;
 			if ( onLongPress ) {
