@@ -126,7 +126,7 @@ export default function Edit( {
 		</InspectorControls>
 	);
 
-	const postTitle = isSiteEditor ? '"Post Title"' : `“${ rawTitle }”`;
+	const postTitle = isSiteEditor ? __( '"Post Title"' ) : `"${ rawTitle }"`;
 
 	const singlePlaceholder = showPostTitle
 		? __( 'One response to ' )

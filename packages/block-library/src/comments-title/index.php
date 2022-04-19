@@ -20,6 +20,10 @@ function render_block_core_comments_title( $attributes ) {
 	$wrapper_attributes  = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 	$post_title          = $show_post_title ? sprintf( '"%1$s"', get_the_title() ) : null;
 	$comments_count      = number_format_i18n( get_comments_number() );
+	$tag_name            = 'h2';
+	if ( isset( $attributes['level'] ) ) {
+		$tag_name = 'h' . $attributes['level'];
+	}
 
 	if ( '0' === $comments_count ) {
 		return;
@@ -42,7 +46,8 @@ function render_block_core_comments_title( $attributes ) {
 	);
 
 	return sprintf(
-		'<h3 id="comments" %1$s>%2$s</h3>',
+		'<%1$s id="comments" %2$s>%3$s</%1$s>',
+		$tag_name,
 		$wrapper_attributes,
 		$comments_title
 	);
