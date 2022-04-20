@@ -13,6 +13,7 @@ const detectDirectoryType = require( './detect-directory-type' );
 const { validateConfig, ValidationError } = require( './validate-config' );
 const readRawConfigFile = require( './read-raw-config-file' );
 const parseConfig = require( './parse-config' );
+const { includeTestsPath, parseSourceString } = parseConfig;
 const md5 = require( '../md5' );
 
 /**
@@ -255,6 +256,18 @@ function withOverrides( config ) {
 	config.env.tests.port =
 		getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) ||
 		config.env.tests.port;
+
+	// Override WordPress core with environment variable.
+	if ( process.env.WP_ENV_CORE ) {
+		const coreSource = includeTestsPath(
+			parseSourceString( process.env.WP_ENV_CORE, {
+				workDirectoryPath: config.workDirectoryPath,
+			} ),
+			{ workDirectoryPath: config.workDirectoryPath }
+		);
+		config.env.development.coreSource = coreSource;
+		config.env.tests.coreSource = coreSource;
+	}
 
 	// Override PHP version with environment variable.
 	config.env.development.phpVersion =

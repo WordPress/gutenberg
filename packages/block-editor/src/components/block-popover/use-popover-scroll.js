@@ -10,7 +10,7 @@ import { useRefEffect } from '@wordpress/compose';
  *
  * @param {Object} scrollableRef
  */
-export function usePopoverScroll( scrollableRef ) {
+function usePopoverScroll( scrollableRef ) {
 	return useRefEffect(
 		( node ) => {
 			if ( ! scrollableRef ) {
@@ -32,3 +32,5 @@ export function usePopoverScroll( scrollableRef ) {
 		[ scrollableRef ]
 	);
 }
+
+export default usePopoverScroll;

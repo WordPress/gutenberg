@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Consolidate the main black colors to gray-900. Affects `AlignmentMatrixControl`, `InputControl`, `Heading`, `SelectControl`, `Spinner (Experimental)`, and `Text` ([#40391](https://github.com/WordPress/gutenberg/pull/40391)).
+
+### Internal
+
+-   Remove individual color object exports from the `utils/colors-values.js` file. Colors should now be used from the main `COLORS` export([#40387](https://github.com/WordPress/gutenberg/pull/40387)).
+
+
 ## 19.8.0 (2022-04-08)
 
 ### Enhancements

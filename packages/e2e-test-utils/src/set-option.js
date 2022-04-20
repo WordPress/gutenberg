@@ -18,7 +18,7 @@ import { pressKeyWithModifier } from './press-key-with-modifier';
 export async function setOption( setting, value ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'options.php' );
-
+	await page.waitForSelector( `#${ setting }` );
 	const previousValue = await page.$eval(
 		`#${ setting }`,
 		( element ) => element.value

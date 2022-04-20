@@ -9,7 +9,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import InsertionPoint, { InsertionPointOpenRef } from './insertion-point';
-import BlockPopover from './block-popover';
+import BlockPopover from './selected-block-popover';
 
 export default function BlockToolsBackCompat( { children } ) {
 	const openRef = useContext( InsertionPointOpenRef );
