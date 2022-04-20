@@ -107,7 +107,7 @@ if ( ! function_exists( '_wp_array_keys_to_camel_case' ) ) {
 		$camel_cased_array = array();
 
 		foreach ( $to_transform as $key => $value ) {
-			$camel_cased_array[ _wp_to_kebab_case( $key ) ] = $value;
+			$camel_cased_array[ lcfirst( str_replace( '-', '', ucwords( $key, '-' ) ) ) ] = $value;
 		}
 
 		return $camel_cased_array;
