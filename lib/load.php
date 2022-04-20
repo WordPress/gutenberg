@@ -156,7 +156,6 @@ require __DIR__ . '/block-supports/colors.php';
 require __DIR__ . '/block-supports/typography.php';
 require __DIR__ . '/block-supports/border.php';
 require __DIR__ . '/block-supports/layout.php';
-require __DIR__ . '/block-supports/lock.php';
 require __DIR__ . '/block-supports/spacing.php';
 require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';

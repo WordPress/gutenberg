@@ -269,3 +269,30 @@ function gutenberg_rest_comment_set_children_as_embeddable() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable' );
+
+/**
+ * Registers the lock block attribute for block types.
+ *
+ * Once 6.0 is the minimum supported WordPress version for the Gutenberg
+ * plugin, this shim can be removed
+ *
+ * Doesn't need to be backported into Core.
+ *
+ * @param array $args Array of arguments for registering a block type.
+ * @return array $args
+ */
+function gutenberg_register_lock_attribute( $args ) {
+	// Setup attributes if needed.
+	if ( empty( $args['attributes'] ) ) {
+		$args['attributes'] = array();
+	}
+
+	if ( ! array_key_exists( 'lock', $args['attributes'] ) ) {
+		$args['attributes']['lock'] = array(
+			'type' => 'object',
+		);
+	}
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_register_lock_attribute' );
