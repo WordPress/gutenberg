@@ -26,7 +26,7 @@ import { formatLtr } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { useExitOnEnterAtEnd } from './use-enter';
+import { useOnEnter } from './use-enter';
 
 const name = 'core/paragraph';
 
@@ -62,7 +62,7 @@ function ParagraphBlock( {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const blockProps = useBlockProps( {
-		ref: useExitOnEnterAtEnd( { clientId, content } ),
+		ref: useOnEnter( { clientId, content } ),
 		className: classnames( {
 			'has-drop-cap': dropCap,
 			[ `has-text-align-${ align }` ]: align,
