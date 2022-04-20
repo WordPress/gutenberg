@@ -22,7 +22,9 @@ test.describe( 'adding a quote', () => {
 		const content = await pageUtils.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:quote -->
-<blockquote class="wp-block-quote"><p>Quote content</p></blockquote>
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>Quote content</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
 	} );
