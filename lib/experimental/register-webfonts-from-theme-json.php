@@ -56,8 +56,19 @@ if ( ! function_exists( '_wp_register_webfonts_from_theme_json' ) ) {
 				}
 
 				foreach ( $font_family['fontFaces'] as $font_face ) {
+
+					// Transforms the source of the font face from `file.:/` into an actual URI.
+					if ( ! empty( $font_face['src'] ) ) {
+						$font_face['src'] = (array) $font_face['src'];
+						foreach ( $font_face['src'] as $src_key => $url ) {
+							// Tweak the URL to be relative to the theme root.
+							if ( ! str_starts_with( $url, 'file:./' ) ) {
+								continue;
+							}
+							$font_face['src'][ $src_key ] = get_theme_file_uri( str_replace( 'file:./', '', $url ) );
+						}
+					}
 					$font_face['provider'] = $font_family['provider'];
-					$font_face             = _wp_resolve_font_face_uri( $font_face );
 					$font_face             = _wp_array_keys_to_kebab_case( $font_face );
 
 					$font_faces_to_register[] = $font_face;
