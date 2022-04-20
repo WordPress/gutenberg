@@ -35,11 +35,16 @@ const updateCurrentFocusedInput = ( value ) => {
 describe( 'Aztec Input State', () => {
 	it( 'listens to focus change event', () => {
 		const listener = jest.fn();
+		const anotherRef = { current: null };
 		addFocusChangeListener( listener );
 
 		updateCurrentFocusedInput( ref );
 
 		expect( listener ).toHaveBeenCalledWith( { isFocused: true } );
+
+		updateCurrentFocusedInput( anotherRef );
+
+		expect( listener ).toHaveBeenCalledTimes( 1 );
 
 		updateCurrentFocusedInput( null );
 
