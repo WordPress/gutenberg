@@ -114,21 +114,29 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
-	const sshProtocol = sourceString.match(
-		/^(git@github.com[^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?.git$/
+	const sshRegEx = RegExp( ''
+	+ '('                               // 1. The git url
+	+ /(?:(?:git\+)?ssh:\/\/)?/.source  // ssh protocol (optional)
+	+ /(?:[^@]+)\@/.source              // username
+	+ /(?:[^\/]+)\//.source               // domain
+	+ /(.*)/.source                     // 2. path
+	+ /\/(.*\.git)/.source              // 3. repo
+	+ ')'
+	+ /(?:#(.*))?/.source               // 4. branch
 	);
-	if ( sshProtocol ) {
+	const sshFields = sourceString.match( sshRegEx );
+	if ( sshFields ) {
 		return {
 			type: 'git',
-			url: `${ sshProtocol[ 1 ] }/${ sshProtocol[ 2 ] }`,
-			ref: sshProtocol[ 5 ] || 'master',
+			url: `${ sshFields[ 1 ] }`,
+			ref: sshFields[ 4 ] || 'master',
 			path: path.resolve(
 				workDirectoryPath,
-				sshProtocol[ 2 ],
-				sshProtocol[ 4 ] || '.'
+				sshFields[ 2 ],
+				sshFields[ 3 ]
 			),
-			clonePath: path.resolve( workDirectoryPath, sshProtocol[ 2 ] ),
-			basename: sshProtocol[ 4 ] || sshProtocol[ 2 ],
+			clonePath: path.resolve( workDirectoryPath, sshFields[ 2 ] ),
+			basename: sshFields[ 3 ],
 		};
 	}
 
