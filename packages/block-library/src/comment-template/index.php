@@ -35,8 +35,8 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 
 		/*
 		 * We need to create the CSS classes BEFORE recursing into the children.
-		 * This is because comment_class() uses globals like
-		 * `$comment_alt` and `$comment_thread_alt` which are order-sensitive.
+		 * This is because comment_class() uses globals like `$comment_alt`
+		 * and `$comment_thread_alt` which are order-sensitive.
 		 *
 		 * The `false` parameter at the end means that we do NOT want the function
 		 * to `echo` the output but to return a string.
