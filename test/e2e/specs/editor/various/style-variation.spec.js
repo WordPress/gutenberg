@@ -16,6 +16,9 @@ test.describe( 'adding blocks', () => {
 			attributes: { value: '<p>Quote content</p>' },
 		} );
 
+		// Select the quote block.
+		await page.keyboard.press( 'ArrowDown' );
+
 		await pageUtils.clickBlockToolbarButton( 'Quote' );
 
 		await page.click( 'role=menuitem[name="Plain"i]' );
@@ -24,7 +27,9 @@ test.describe( 'adding blocks', () => {
 		const content = await pageUtils.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:quote {"className":"is-style-plain"} -->
-<blockquote class="wp-block-quote is-style-plain"><p>Quote content</p></blockquote>
+<blockquote class="wp-block-quote is-style-plain"><!-- wp:paragraph -->
+<p>Quote content</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
 	} );
