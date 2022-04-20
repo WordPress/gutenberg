@@ -121,8 +121,9 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['fontWeight'], 'font-weight' );
 	}
 
-	if ( $has_line_height_support && ! $should_skip_line_height && isset( $block_attributes['style']['typography']['lineHeight'] ) ) {
-			$typography_block_styles['lineHeight'] = $block_attributes['style']['typography']['lineHeight'];
+	if ( $has_line_height_support && ! $should_skip_line_height ) {
+			$typography_block_styles['lineHeight'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'lineHeight' ), null );
+;
 	}
 
 	if ( $has_text_decoration_support && ! $should_skip_text_decoration && isset( $block_attributes['style']['typography']['textDecoration'] ) ) {
@@ -156,6 +157,9 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 }
 
 /**
+ * Note: this method is for backwards compatibility.
+ * It mostly replaces `gutenberg_typography_get_css_variable_inline_style()`.
+ *
  * Generates an inline style value for a typography feature e.g. text decoration,
  * text transform, and font style.
  *
@@ -175,13 +179,46 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
 	// We have a preset CSS variable as the style.
 	// Get the style value from the string and return CSS style.
 	$index_to_splice = strrpos( $style_value, '|' ) + 1;
-	// @TODO
-	// Font family requires the slugs to be converted to kebab case. Should this be optional in this method?
-	// Let's test with some older blocks.
 	$slug = _wp_to_kebab_case( substr( $style_value, $index_to_splice ) );
 
 	// Return the actual CSS inline style value e.g. `var(--wp--preset--text-decoration--underline);`.
 	return sprintf( 'var(--wp--preset--%s--%s);', $css_property, $slug );
+}
+
+/**
+ * Deprecated.
+ * This method is no longer used and will have to be deprecated in Core.
+ *
+ * It can be deleted once migrated to the next WordPress version.
+ *
+ * Generates an inline style for a typography feature e.g. text decoration,
+ * text transform, and font style.
+ *
+ * @param array  $attributes   Block's attributes.
+ * @param string $feature      Key for the feature within the typography styles.
+ * @param string $css_property Slug for the CSS property the inline style sets.
+ *
+ * @return string              CSS inline style.
+ */
+function gutenberg_typography_get_css_variable_inline_style( $attributes, $feature, $css_property ) {
+	// Retrieve current attribute value or skip if not found.
+	$style_value = _wp_array_get( $attributes, array( 'style', 'typography', $feature ), false );
+	if ( ! $style_value ) {
+		return;
+	}
+
+	// If we don't have a preset CSS variable, we'll assume it's a regular CSS value.
+	if ( strpos( $style_value, "var:preset|{$css_property}|" ) === false ) {
+		return sprintf( '%s:%s;', $css_property, $style_value );
+	}
+
+	// We have a preset CSS variable as the style.
+	// Get the style value from the string and return CSS style.
+	$index_to_splice = strrpos( $style_value, '|' ) + 1;
+	$slug            = substr( $style_value, $index_to_splice );
+
+	// Return the actual CSS inline style e.g. `text-decoration:var(--wp--preset--text-decoration--underline);`.
+	return sprintf( '%s:var(--wp--preset--%s--%s);', $css_property, $css_property, $slug );
 }
 
 // Register the block support.
