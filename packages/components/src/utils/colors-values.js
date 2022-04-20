@@ -13,12 +13,6 @@ const BASE = {
 	white: '#fff',
 };
 
-/**
- * TODO: Continue to update values as "G2" design evolves.
- *
- * "G2" refers to the movement to advance the interface of the block editor.
- * https://github.com/WordPress/gutenberg/issues/18667
- */
 const G2 = {
 	blue: {
 		medium: {
@@ -34,10 +28,6 @@ const G2 = {
 		300: '#ddd', // Used for most borders.
 		200: '#e0e0e0', // Used sparingly for light borders.
 		100: '#f0f0f0', // Used for light gray backgrounds.
-	},
-	darkGray: {
-		primary: '#1e1e1e',
-		heading: '#050505',
 	},
 	mediumGray: {
 		text: '#757575',
@@ -169,10 +159,16 @@ const UI = {
 // Using Object.assign instead of { ...spread } syntax helps TypeScript
 // to extract the correct type defs here.
 export const COLORS = Object.assign( {}, BASE, {
-	darkGray: merge( {}, DARK_GRAY, G2.darkGray ),
+	darkGray: DARK_GRAY,
 	darkOpacity: DARK_OPACITY,
 	darkOpacityLight: DARK_OPACITY_LIGHT,
 	mediumGray: G2.mediumGray,
+	/**
+	 * The main gray color object (since Apr 16, 2022).
+	 *
+	 * We are in the process of simplifying the colors in this file,
+	 * please prefer this `gray` object in the meantime.
+	 */
 	gray: G2.gray,
 	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
 	lightGrayLight: LIGHT_OPACITY_LIGHT,
