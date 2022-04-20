@@ -10,6 +10,7 @@ if ( ! function_exists( '_wp_add_registered_webfonts_to_theme_json' ) ) {
 	 * Add missing webfonts data to the global styles.
 	 *
 	 * @since 6.0.0
+	 * @private
 	 *
 	 * @param array $data The global styles.
 	 * @return array The global styles with missing webfonts data.
