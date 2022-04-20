@@ -218,6 +218,23 @@
 		border: none;
 		box-shadow: none;
 	}
+	//styles for the anchor wrapper of cover content when use linkable featured image
+	//and since it only propose to make cover linkable, it should mirror some properties from parent to make sure
+	//content position change whenever parent's properties change
+	.wp-block-cover__inner-wrapper-link {
+		display: inherit;
+		justify-content: inherit;
+		align-items: inherit;
+		text-decoration: none;
+		min-height: inherit;
+		width: 100%;
+		cursor: pointer;
+
+	}
+	.wp-block-cover__inner-wrapper-link:hover,
+	.wp-block-cover__inner-wrapper-link:active {
+		text-decoration: none;
+	}
 }
 
 .wp-block-cover__video-background {

@@ -7,6 +7,9 @@
 	"description": "Add an image or video with a text overlay — great for headers.",
 	"textdomain": "default",
 	"attributes": {
+		"isLink": {
+			"type": "boolean"
+		},
 		"url": {
 			"type": "string"
 		},
@@ -74,6 +77,9 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", false ]
+		},
+		"imageSizeSlug": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

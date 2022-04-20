@@ -30,6 +30,7 @@ import {
 	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
+	SelectControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -54,7 +55,7 @@ import {
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { postFeaturedImage, cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
@@ -78,6 +79,12 @@ import {
 extend( [ namesPlugin ] );
 
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
+
+function getImageSourceUrlBySizeSlug( media, slug ) {
+	return (
+		media?.media_details?.sizes?.[ slug ]?.source_url || media?.source_url
+	);
+}
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -300,7 +307,7 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
-	context: { postId, postType },
+	context: { postId, postType: postTypeSlug },
 } ) {
 	const {
 		contentPosition,
@@ -317,28 +324,49 @@ function CoverEdit( {
 		alt,
 		allowedBlocks,
 		templateLock,
+		imageSizeSlug,
+		isLink,
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
 		'postType',
-		postType,
+		postTypeSlug,
 		'featured_media',
 		postId
 	);
-
-	const media = useSelect(
-		( select ) =>
-			featuredImage &&
-			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
-		[ featuredImage ]
+	const { media, featuredMedia, postType } = useSelect(
+		( select ) => {
+			const { getMedia, getPostType } = select( coreStore );
+			return {
+				media: id && getMedia( id, { context: 'view' } ),
+				featuredMedia:
+					featuredImage &&
+					getMedia( featuredImage, { context: 'view' } ),
+				postType: getPostType( postTypeSlug ),
+			};
+		},
+		[ featuredImage, postTypeSlug, id ]
 	);
-	const mediaUrl = media?.source_url;
 
+	const imageSizes = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().imageSizes,
+		[]
+	);
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) => {
+			return featuredMedia?.media_details?.sizes?.[ slug ]?.source_url;
+		} )
+		.map( ( { name, slug } ) => ( {
+			value: slug,
+			label: name,
+		} ) );
 	// instead of destructuring the attributes
 	// we define the url and background type
 	// depending on the value of the useFeaturedImage flag
 	// to preview in edit the dynamic featured image
-	const url = useFeaturedImage ? mediaUrl : attributes.url;
+	const url = useFeaturedImage
+		? getImageSourceUrlBySizeSlug( featuredMedia, imageSizeSlug )
+		: getImageSourceUrlBySizeSlug( media, imageSizeSlug ); //if type is not an image it will return source_url
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;
@@ -512,6 +540,23 @@ function CoverEdit( {
 			<InspectorControls>
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
+						{ useFeaturedImage && (
+							<ToggleControl
+								label={
+									postType?.labels?.singular_name
+										? sprintf(
+												// translators: %s: Name of the post type e.g: "post".
+												__( 'Link to %s' ),
+												postType.labels.singular_name.toLowerCase()
+										  )
+										: __( 'Link to post' )
+								}
+								onChange={ () =>
+									setAttributes( { isLink: ! isLink } )
+								}
+								checked={ isLink }
+							/>
+						) }
 						{ isImageBackground && (
 							<Fragment>
 								<ToggleControl
@@ -649,6 +694,40 @@ function CoverEdit( {
 						}
 					/>
 				</ToolsPanelItem>
+				{ isImageBackground && (
+					<ToolsPanelItem
+						hasValue={ () => !! imageSizeSlug }
+						label={ __( 'Image size' ) }
+						onDeselect={ () =>
+							setAttributes( {
+								imageSizeSlug: undefined,
+							} )
+						}
+						resetAllFilter={ () => ( {
+							imageSizeSlug: undefined,
+						} ) }
+						isShownByDefault={ false }
+						panelId={ clientId }
+					>
+						<SelectControl
+							label={ __( 'Image size' ) }
+							value={ imageSizeSlug || 'full' }
+							options={ imageSizeOptions }
+							onChange={ ( nextSizeSlug ) =>
+								setAttributes( {
+									imageSizeSlug: nextSizeSlug,
+									url: getImageSourceUrlBySizeSlug(
+										media,
+										nextSizeSlug
+									),
+								} )
+							}
+							help={ __(
+								'Select the size of the source image.'
+							) }
+						/>
+					</ToolsPanelItem>
+				) }
 			</InspectorControls>
 		</>
 	);
