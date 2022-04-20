@@ -50,6 +50,10 @@
 		background-color: $black;
 	}
 
+	[class*="-background-color"] {
+		background-color: var(--wp--user--preset--background-color);
+	}
+
 	.has-background-dim.has-background-gradient {
 		background-color: transparent;
 	}
