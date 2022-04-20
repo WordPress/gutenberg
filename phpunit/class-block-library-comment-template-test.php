@@ -144,16 +144,17 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test rendering 3 nested comments:
+	 * Test rendering nested comments:
 	 *
 	 * └─ comment 1
 	 *    └─ comment 2
-	 *       └─ comment 3
+	 *       └─ comment 4
+	 *    └─ comment 3
 	 */
 	function test_rendering_comment_template_nested() {
 		$first_level_ids = self::factory()->comment->create_post_comments(
 			self::$custom_post->ID,
-			1,
+			2,
 			array(
 				'comment_parent'       => self::$comment_ids[0],
 				'comment_author'       => 'Test',
