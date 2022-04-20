@@ -5,31 +5,33 @@
  * @package gutenberg
  */
 
-/**
- * Transforms the source of the font face from `file.:/` into an actual URI.
- *
- * @since 6.0.0
- * @private
- *
- * @param array $font_face The font face.
- * @return array The URI-resolved font face.
- */
-function _gutenberg_resolve_font_face_uri( array $font_face ) {
-	if ( empty( $font_face['src'] ) ) {
+if ( ! function_exists( '_wp_resolve_font_face_uri' ) ) {
+	/**
+	 * Transforms the source of the font face from `file.:/` into an actual URI.
+	 *
+	 * @since 6.0.0
+	 * @private
+	 *
+	 * @param array $font_face The font face.
+	 * @return array The URI-resolved font face.
+	 */
+	function _wp_resolve_font_face_uri( array $font_face ) {
+		if ( empty( $font_face['src'] ) ) {
+			return $font_face;
+		}
+
+		$font_face['src'] = (array) $font_face['src'];
+
+		foreach ( $font_face['src'] as $src_key => $url ) {
+			// Tweak the URL to be relative to the theme root.
+			if ( ! str_starts_with( $url, 'file:./' ) ) {
+				continue;
+			}
+			$font_face['src'][ $src_key ] = get_theme_file_uri( str_replace( 'file:./', '', $url ) );
+		}
+
 		return $font_face;
 	}
-
-	$font_face['src'] = (array) $font_face['src'];
-
-	foreach ( $font_face['src'] as $src_key => $url ) {
-		// Tweak the URL to be relative to the theme root.
-		if ( ! str_starts_with( $url, 'file:./' ) ) {
-			continue;
-		}
-		$font_face['src'][ $src_key ] = get_theme_file_uri( str_replace( 'file:./', '', $url ) );
-	}
-
-	return $font_face;
 }
 
 /**

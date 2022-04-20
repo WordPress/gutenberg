@@ -57,7 +57,7 @@ if ( ! function_exists( '_wp_register_webfonts_from_theme_json' ) ) {
 
 				foreach ( $font_family['fontFaces'] as $font_face ) {
 					$font_face['provider'] = $font_family['provider'];
-					$font_face             = _gutenberg_resolve_font_face_uri( $font_face );
+					$font_face             = _wp_resolve_font_face_uri( $font_face );
 					$font_face             = _wp_array_keys_to_kebab_case( $font_face );
 
 					$font_faces_to_register[] = $font_face;
