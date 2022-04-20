@@ -84,7 +84,7 @@ export function useOnEnter( props ) {
 				);
 				replaceInnerBlocks(
 					getNextBlockClientId( wrapperClientId ),
-					wrapperBlock.innerBlocks.slice( position )
+					wrapperBlock.innerBlocks.slice( position + 1 )
 				);
 				insertBlock(
 					createBlock( 'core/paragraph' ),
