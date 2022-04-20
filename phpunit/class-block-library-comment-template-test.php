@@ -144,11 +144,12 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test rendering nested comments:
+	 * Test rendering nested comments, and for correct odd/even classes.
 	 *
 	 * └─ comment 1
 	 *    └─ comment 2
 	 *       └─ comment 4
+	 *       └─ comment 5
 	 *    └─ comment 3
 	 */
 	function test_rendering_comment_template_nested() {
@@ -166,7 +167,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 
 		$second_level_ids = self::factory()->comment->create_post_comments(
 			self::$custom_post->ID,
-			1,
+			2,
 			array(
 				'comment_parent'       => $first_level_ids[0],
 				'comment_author'       => 'Test',
@@ -223,9 +224,19 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 											Hello world
 										</div>
 									</li>
+									<li id="comment-{$second_level_ids[1]}" class="comment even alt depth-3">
+										<div class="has-small-font-size wp-block-comment-author-name">
+											<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+												Test
+											</a>
+										</div>
+										<div class="wp-block-comment-content">
+											Hello world
+										</div>
+									</li>
 								</ol>
 							</li>
-							<li id="comment-{$first_level_ids[1]}" class="comment even depth-2">
+							<li id="comment-{$first_level_ids[1]}" class="comment odd depth-2">
 								<div class="has-small-font-size wp-block-comment-author-name">
 									<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
 										Test
