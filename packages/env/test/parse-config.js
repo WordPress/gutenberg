@@ -28,11 +28,11 @@ const gitTests = [
 		basename: 'repo.git',
 	},
 	{
-		sourceString: 'ssh://git@github.com/owner/repo.git',
-		url: 'ssh://git@github.com/owner/repo.git',
+		sourceString: 'ssh://git@github.com/owner/long/path/repo.git',
+		url: 'ssh://git@github.com/owner/long/path/repo.git',
 		ref: 'master',
-		path: currentDirectory + '/owner/repo.git',
-		clonePath: currentDirectory + '/owner',
+		path: currentDirectory + '/owner/long/path/repo.git',
+		clonePath: currentDirectory + '/owner/long/path',
 		basename: 'repo.git',
 	},
 	{
