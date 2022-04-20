@@ -279,7 +279,7 @@ class WP_Webfonts {
 		}
 
 		$font_family = $this->registered_webfonts[ $font_family_slug ];
-		$index       = _gutenberg_find_webfont( $font_family, $font_face_to_unregister );
+		$index       = $this->find_webfont( $font_family, $font_face_to_unregister );
 
 		// Font face not found.
 		if ( false === $index ) {
@@ -529,5 +529,46 @@ class WP_Webfonts {
 		}
 
 		return $webfonts_by_provider;
+	}
+
+	/**
+	 * Finds $webfont_to_find in $webfonts.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @param array[] $webfonts The webfonts array.
+	 * @param array   $webfont_to_find The webfont to find.
+	 * @return integer|false The index of $webfont in $webfonts if found. False otherwise.
+	 */
+	public function find_webfont( array $webfonts, $webfont_to_find ) {
+		if ( empty( $webfonts ) ) {
+			return false;
+		}
+
+		$is_camel_case = isset( $webfonts[0]['fontFamily'] );
+
+		foreach ( $webfonts as $index => $webfont ) {
+			$equality_attrs = $is_camel_case
+				? array( 'fontFamily', 'fontStyle', 'fontWeight' )
+				: array( 'font-family', 'font-style', 'font-weight' );
+
+			$found = $index;
+			foreach ( $equality_attrs as $attr ) {
+				// Bail out if the attribute does not exist, or if the values are not equal.
+				if (
+					empty( $webfont[ $attr ] ) ||
+					empty( $webfont_to_find[ $attr ] ) ||
+					$webfont[ $attr ] !== $webfont_to_find[ $attr ]
+				) {
+					$found = false;
+					break;
+				}
+			}
+			if ( false !== $found ) {
+				return $found;
+			}
+		}
+
+		return false;
 	}
 }

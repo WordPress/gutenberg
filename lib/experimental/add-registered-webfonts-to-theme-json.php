@@ -82,7 +82,7 @@ if ( ! function_exists( '_wp_add_registered_webfonts_to_theme_json' ) ) {
 			foreach ( $registered_font_faces as $registered_font_face ) {
 				$registered_font_face = _wp_array_keys_to_camel_case( $registered_font_face );
 
-				if ( false !== _gutenberg_find_webfont( $font_faces_in_theme_json, $registered_font_face ) ) {
+				if ( false !== wp_webfonts()->find_webfont( $font_faces_in_theme_json, $registered_font_face ) ) {
 					// Webfont is already there, so let's not add it.
 					continue;
 				}
