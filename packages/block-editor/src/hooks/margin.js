@@ -149,6 +149,7 @@ export function MarginEdit( props ) {
 					units={ units }
 					allowReset={ false }
 					splitOnAxis={ splitOnAxis }
+					spacingType={ __( 'Margin' ) }
 				/>
 			</>
 		),

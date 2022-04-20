@@ -58,8 +58,9 @@ export default function BoxControl( {
 	splitOnAxis = false,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
+	spacingType,
 } ) {
-	inputProps = label === __( 'Margin' ) ? -Infinity : defaultInputProps;
+	inputProps = spacingType === 'Margin' ? -Infinity : defaultInputProps;
 
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
