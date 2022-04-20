@@ -102,7 +102,7 @@ export function UnforwardedInputControl(
  *   return (
  *  	<InputControl
  *  		value={ value }
- *  		onChange={ ( nextValue ) => setValue( nextValue ) }
+ *  		onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
  *  	/>
  *   );
  * };
