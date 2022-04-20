@@ -38,9 +38,19 @@ function TaxonomyControls( { onChange, query } ) {
 	const taxonomiesInfo = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
-			const termsQuery = { per_page: MAX_FETCHED_TERMS };
 			const _taxonomiesInfo = taxonomies?.map( ( { slug, name } ) => {
-				const _terms = getEntityRecords( 'taxonomy', slug, termsQuery );
+				let _terms = [];
+				// When _terms is a multiple of MAX_FETCHED_TERMS, a full page has been returned
+				for ( let page = 1; _terms % MAX_FETCHED_TERMS === 0; page++ ) {
+					const termsQuery = { per_page: MAX_FETCHED_TERMS, page };
+					const termsPage = getEntityRecords(
+						'taxonomy',
+						slug,
+						termsQuery
+					);
+					if ( ! termsPage?.length ) break;
+					_terms = [ ..._terms, ...termsPage ];
+				}
 				return {
 					slug,
 					name,
