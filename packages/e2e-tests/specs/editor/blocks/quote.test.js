@@ -107,6 +107,7 @@ describe( 'Quote', () => {
 
 		it( 'and renders a void paragraph if both the cite and quote are void', async () => {
 			await insertBlock( 'Quote' );
+			await page.keyboard.press( 'ArrowRight' ); // Select the quote
 			await transformBlockTo( 'Unwrap' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
