@@ -144,17 +144,17 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test rendering nested comments:
+	 * Test rendering nested comments, and for correct odd/even classes.
 	 *
 	 * └─ comment 1
-	 *    └─ comment 2
-	 *       └─ comment 4
+	 * └─ comment 2
 	 *    └─ comment 3
+	 *       └─ comment 4
 	 */
 	function test_rendering_comment_template_nested() {
 		$first_level_ids = self::factory()->comment->create_post_comments(
 			self::$custom_post->ID,
-			2,
+			1,
 			array(
 				'comment_parent'       => self::$comment_ids[0],
 				'comment_author'       => 'Test',
@@ -193,7 +193,17 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 			'',
 			<<<END
 				<ol >
-					<li id="comment-{$top_level_ids[0]}" class="comment odd alt thread-odd thread-alt depth-1">
+					<li id="comment-{$top_level_ids[0]}" class="comment even depth-2">
+						<div class="has-small-font-size wp-block-comment-author-name">
+							<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+								Test
+							</a>
+						</div>
+						<div class="wp-block-comment-content">
+							Hello world
+						</div>
+					</li>
+					<li id="comment-{$top_level_ids[1]}" class="comment odd alt thread-odd thread-alt depth-1">
 						<div class="has-small-font-size wp-block-comment-author-name">
 							<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
 								Test
@@ -224,16 +234,6 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 										</div>
 									</li>
 								</ol>
-							</li>
-							<li id="comment-{$first_level_ids[1]}" class="comment even depth-2">
-								<div class="has-small-font-size wp-block-comment-author-name">
-									<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
-										Test
-									</a>
-								</div>
-								<div class="wp-block-comment-content">
-									Hello world
-								</div>
 							</li>
 						</ol>
 					</li>
