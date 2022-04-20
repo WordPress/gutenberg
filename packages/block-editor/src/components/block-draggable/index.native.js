@@ -374,6 +374,10 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 					: DEFAULT_LONG_PRESS_MIN_DURATION,
 				android: DEFAULT_LONG_PRESS_MIN_DURATION,
 			} ) }
+			onLongPress={ () => {
+				// Ensure that no text input is focused when starting the dragging gesture in order to prevent conflicts with text editing.
+				RCTAztecView.InputState.blurCurrentFocusedElement();
+			} }
 		>
 			<Animated.View style={ wrapperStyles }>
 				{ children( { isDraggable: true } ) }
