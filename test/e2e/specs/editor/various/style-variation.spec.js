@@ -13,8 +13,10 @@ test.describe( 'adding blocks', () => {
 		// Inserting a quote block
 		await pageUtils.insertBlock( {
 			name: 'core/quote',
-			attributes: { value: '<p>Quote content</p>' },
 		} );
+
+		// Type content right after.
+		await page.keyboard.type( 'Quote content' );
 
 		await pageUtils.clickBlockToolbarButton( 'Quote' );
 
