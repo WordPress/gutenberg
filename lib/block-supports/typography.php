@@ -123,7 +123,6 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	if ( $has_line_height_support && ! $should_skip_line_height ) {
 			$typography_block_styles['lineHeight'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'lineHeight' ), null );
-;
 	}
 
 	if ( $has_text_decoration_support && ! $should_skip_text_decoration && isset( $block_attributes['style']['typography']['textDecoration'] ) ) {
@@ -179,7 +178,7 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
 	// We have a preset CSS variable as the style.
 	// Get the style value from the string and return CSS style.
 	$index_to_splice = strrpos( $style_value, '|' ) + 1;
-	$slug = _wp_to_kebab_case( substr( $style_value, $index_to_splice ) );
+	$slug            = _wp_to_kebab_case( substr( $style_value, $index_to_splice ) );
 
 	// Return the actual CSS inline style value e.g. `var(--wp--preset--text-decoration--underline);`.
 	return sprintf( 'var(--wp--preset--%s--%s);', $css_property, $slug );
