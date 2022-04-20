@@ -8,10 +8,10 @@
 /**
  * Renders the `core/cover` block on server.
  *
- * @param array $attributes  The block attributes.
- * @param array $content     The block rendered content.
- * @param object $block      The block object.
- * @return string Returns    the cover block markup, if useFeaturedImage is true.
+ * @param array  $attributes  The block attributes.
+ * @param array  $content     The block rendered content.
+ * @param object $block       The block object.
+ * @return string Returns     the cover block markup, if useFeaturedImage is true.
  */
 function render_block_core_cover( $attributes, $content, $block ) {
 	if ( false === $attributes['useFeaturedImage'] ) {
@@ -74,10 +74,10 @@ function render_block_core_cover( $attributes, $content, $block ) {
 		);
 
 		if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-			$post_ID                = $block->context['postId'];
-			$post_permalink         = get_the_permalink( $post_ID );
-			$inner_content_length   = mb_strrpos( $content, '</div' ) - mb_strpos( $content, '<span' );
-			$inner_content          = mb_substr( $content, mb_strpos( $content, '<span' ), $inner_content_length );
+			$post_ID              = $block->context['postId'];
+			$post_permalink       = get_the_permalink( $post_ID );
+			$inner_content_length = mb_strrpos( $content, '</div' ) - mb_strpos( $content, '<span' );
+			$inner_content        = mb_substr( $content, mb_strpos( $content, '<span' ), $inner_content_length );
 			// we used preg_replace here to get ride of any nested links cos nested links is not allowed in HTML.
 			$inner_content_linkable = sprintf( '<a href="%1s" class="wp-block-cover__inner-wrapper-link">%2s</a>', $post_permalink, preg_replace( array( '/<a.*?>/s', '/<\/a.*?>/s' ), '', $inner_content ) );
 			$content                = str_replace( $inner_content, $inner_content_linkable, $content );
