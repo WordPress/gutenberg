@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -14,57 +13,24 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { RawHTML } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
-
-function PostCommentsDisplay( { postId } ) {
-	return useSelect(
-		( select ) => {
-			const comments = select( coreStore ).getEntityRecords(
-				'root',
-				'comment',
-				{
-					post: postId,
-				}
-			);
-			// TODO: "No Comments" placeholder should be editable.
-			return comments && comments.length
-				? comments.map( ( comment ) => (
-						<RawHTML
-							className="wp-block-post-comments__comment"
-							key={ comment.id }
-						>
-							{ comment.content.rendered }
-						</RawHTML>
-				  ) )
-				: __( 'No comments.' );
-		},
-		[ postId ]
-	);
-}
+import { useSelect } from '@wordpress/data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 
 export default function PostCommentsEdit( {
-	attributes,
+	attributes: { textAlign },
 	setAttributes,
-	context,
+	context: { postType, postId },
 } ) {
-	const { postType, postId } = context;
-	const { textAlign } = attributes;
+	let [ postTitle ] = useEntityProp( 'postType', postType, 'title', postId );
+	postTitle = postTitle || __( 'Post Title' );
+	const { name: currentUserName } = useSelect( ( select ) =>
+		select( coreStore ).getCurrentUser()
+	);
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-
-	if ( ! postType || ! postId ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __( 'Post comments block: no post found.' ) }
-				</Warning>
-			</div>
-		);
-	}
 
 	return (
 		<>
@@ -78,7 +44,138 @@ export default function PostCommentsEdit( {
 			</BlockControls>
 
 			<div { ...blockProps }>
-				<PostCommentsDisplay postId={ postId } />
+				<Warning>
+					{ __(
+						'This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments Query Loop" block.'
+					) }
+				</Warning>
+
+				<h3>
+					{ __( 'One response to' ) } “{ postTitle }”
+				</h3>
+
+				<div className="navigation">
+					<div className="alignleft">
+						<a href="#top">« { __( 'Older Comments' ) }</a>
+					</div>
+					<div className="alignright">
+						<a href="#top">{ __( 'Newer Comments' ) } »</a>
+					</div>
+				</div>
+
+				<ol className="commentlist">
+					<li className="comment even thread-even depth-1">
+						<article className="comment-body">
+							<footer className="comment-meta">
+								<div className="comment-author vcard">
+									<img
+										alt=""
+										src="http://1.gravatar.com/avatar/d7a973c7dab26985da5f961be7b74480?s=32&d=mm&r=g"
+										className="avatar avatar-32 photo"
+										height="32"
+										width="32"
+										loading="lazy"
+									/>
+									<b className="fn">
+										<a href="#top" className="url">
+											{ __( 'A WordPress Commenter' ) }
+										</a>
+									</b>{ ' ' }
+									<span className="says">
+										{ __( 'says' ) }:
+									</span>
+								</div>
+
+								<div className="comment-metadata">
+									<a href="#top">
+										<time dateTime="2000-01-01T00:00:00+00:00">
+											{ __(
+												'January 1, 2000 at 00:00 am'
+											) }
+										</time>
+									</a>{ ' ' }
+									<span className="edit-link">
+										<a
+											className="comment-edit-link"
+											href="#top"
+										>
+											{ __( 'Edit' ) }
+										</a>
+									</span>
+								</div>
+							</footer>
+
+							<div className="comment-content">
+								<p>
+									{ __( 'Hi, this is a comment.' ) }
+									<br />
+									{ __(
+										'To get started with moderating, editing, and deleting comments, please visit the Comments screen in the dashboard.'
+									) }
+									<br />
+									{ __(
+										'Commenter avatars come from'
+									) }{ ' ' }
+									<a href="https://gravatar.com/">Gravatar</a>
+									.
+								</p>
+							</div>
+
+							<div className="reply">
+								<a
+									className="comment-reply-link"
+									href="#top"
+									aria-label="Reply to A WordPress Commenter"
+								>
+									{ __( 'Reply' ) }
+								</a>
+							</div>
+						</article>
+					</li>
+				</ol>
+
+				<div className="navigation">
+					<div className="alignleft">
+						<a href="#top">« { __( 'Older Comments' ) }</a>
+					</div>
+					<div className="alignright">
+						<a href="#top">{ __( 'Newer Comments' ) } »</a>
+					</div>
+				</div>
+
+				<div className="comment-respond">
+					<h3 className="comment-reply-title">
+						{ __( 'Leave a Reply' ) }
+					</h3>
+
+					<form className="comment-form" noValidate={ true }>
+						<p className="logged-in-as">
+							{ __( 'Logged in as' ) } { currentUserName }.{ ' ' }
+							<a href="#top">{ __( 'Log out?' ) }</a>{ ' ' }
+						</p>
+						<p className="comment-form-comment">
+							<label htmlFor="comment">
+								{ __( 'Comment' ) }{ ' ' }
+								<span className="required">*</span>
+							</label>
+							<textarea
+								name="comment"
+								cols="45"
+								rows="8"
+								required={ true }
+							/>
+						</p>
+						<p className="form-submit wp-block-button">
+							<input
+								name="submit"
+								type="submit"
+								disabled={ true }
+								className="submit wp-block-button__link"
+								value={ __( 'Post Comment' ) }
+							/>
+						</p>
+					</form>
+				</div>
 			</div>
 		</>
 	);
