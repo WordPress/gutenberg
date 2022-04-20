@@ -88,6 +88,10 @@
 -   Automatically copy `block.json` files located in the `src` folder and its subfolders to the output folder (`build` by default) ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
 -   Scan the `src` directory for `block.json` files to detect defined scripts to use them as entry points with the `start` and `build` commands. ([#37661](https://github.com/WordPress/gutenberg/pull/37661)).
 
+### Enhancements
+
+-   Disable `selector-class-pattern` rule when linting styles until we have more flexible handling ([#37531](https://github.com/WordPress/gutenberg/pull/37531)).
+
 ### Bug Fixes
 
 -   Prevent the `CleanWebpackPlugin` plugin from deleting webpack assets during multi-configuration builds [#35980](https://github.com/WordPress/gutenberg/issues/35980).
