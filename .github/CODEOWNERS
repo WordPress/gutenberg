@@ -141,11 +141,6 @@
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey @geriux
 /phpunit/class-wp-theme-json-test.php                                @oandregal
 
-# Web App
-/packages/admin-manifest                        @ellatrix
-/lib/pwa.php                                    @ellatrix
-/lib/service-worker.js                          @ellatrix
-
 # Native
 /packages/components/src/mobile/global-styles-context                @geriux
 

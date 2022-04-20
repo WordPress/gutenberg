@@ -132,7 +132,6 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 require __DIR__ . '/experimental/experiments-page.php';
 require __DIR__ . '/compat/wordpress-5.9/kses.php';
-require __DIR__ . '/pwa.php';
 
 // Copied package PHP files.
 if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php' ) ) {
