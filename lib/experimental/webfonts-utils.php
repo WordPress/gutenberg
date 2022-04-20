@@ -5,27 +5,6 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( '_wp_array_keys_to_camel_case' ) ) {
-	/**
-	 * Transforms the keys in the given array to camelCase.
-	 *
-	 * @since 6.0.0
-	 * @private
-	 *
-	 * @param array $to_transform The array to transform.
-	 * @return array Given array with camelCase keys.
-	 */
-	function _wp_array_keys_to_camel_case( array $to_transform ) {
-		$camel_cased_array = array();
-
-		foreach ( $to_transform as $key => $value ) {
-			$camel_cased_array[ lcfirst( str_replace( '-', '', ucwords( $key, '-' ) ) ) ] = $value;
-		}
-
-		return $camel_cased_array;
-	}
-}
-
 if ( ! function_exists( '_wp_array_keys_to_kebab_case' ) ) {
 	/**
 	 * Transforms the keys in the given array to kebab-case.

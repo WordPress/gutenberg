@@ -45,6 +45,22 @@ if ( ! function_exists( '_wp_add_registered_webfonts_to_theme_json' ) ) {
 			$font_family_indexes_in_theme_json[ wp_webfonts()->get_font_slug( $family ) ] = $index;
 		}
 
+		/**
+		 * Transforms the keys in the given array to camelCase.
+		 *
+		 * @param array $to_transform The array to transform.
+		 * @return array Given array with camelCase keys.
+		 */
+		$array_keys_to_camel_case = function( array $to_transform ) {
+			$camel_cased_array = array();
+
+			foreach ( $to_transform as $key => $value ) {
+				$camel_cased_array[ lcfirst( str_replace( '-', '', ucwords( $key, '-' ) ) ) ] = $value;
+			}
+
+			return $camel_cased_array;
+		};
+
 		foreach ( $registered_font_families as $slug => $registered_font_faces ) {
 			// Font family not in theme.json, so let's add it.
 			if ( ! isset( $font_family_indexes_in_theme_json[ $slug ] ) ) {
@@ -56,10 +72,10 @@ if ( ! function_exists( '_wp_add_registered_webfonts_to_theme_json' ) ) {
 					'name'       => $family_name,
 					'slug'       => $slug,
 					'fontFaces'  => array_map(
-						function( $font_face ) {
+						function( $font_face ) use ( $array_keys_to_camel_case ) {
 							$font_face['origin'] = 'gutenberg_wp_webfonts_api';
 
-							return _wp_array_keys_to_camel_case( $font_face );
+							return $array_keys_to_camel_case( $font_face );
 						},
 						$registered_font_faces
 					),
@@ -80,7 +96,7 @@ if ( ! function_exists( '_wp_add_registered_webfonts_to_theme_json' ) ) {
 			$font_faces_in_theme_json = $font_family_in_theme_json['fontFaces'];
 
 			foreach ( $registered_font_faces as $registered_font_face ) {
-				$registered_font_face = _wp_array_keys_to_camel_case( $registered_font_face );
+				$registered_font_face = $array_keys_to_camel_case( $registered_font_face );
 
 				if ( false !== wp_webfonts()->find_webfont( $font_faces_in_theme_json, $registered_font_face ) ) {
 					// Webfont is already there, so let's not add it.
