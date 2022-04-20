@@ -35,45 +35,6 @@ if ( ! function_exists( '_wp_resolve_font_face_uri' ) ) {
 }
 
 /**
- * Compares if the two given webfonts are the equal.
- *
- * @since 6.0.0
- * @private
- *
- * @param array   $webfont1      The first webfont.
- * @param array   $webfont2      The second webfont.
- * @param boolean $is_camel_case True if the font attributes are in camel case; else false for kebab case.
- *                               Defaults to camel case.
- * @return boolean True if the webfonts are equal, false otherwise.
- */
-function _gutenberg_is_webfont_equal( array $webfont1, array $webfont2, $is_camel_case = true ) {
-	$equality_attrs = $is_camel_case
-		? array(
-			'fontFamily',
-			'fontStyle',
-			'fontWeight',
-		)
-		: array(
-			'font-family',
-			'font-style',
-			'font-weight',
-		);
-
-	foreach ( $equality_attrs as $attr ) {
-		// Bail out if the attribute does not exist.
-		if ( ! isset( $webfont1[ $attr ] ) || ! isset( $webfont2[ $attr ] ) ) {
-			return false;
-		}
-
-		if ( $webfont1[ $attr ] !== $webfont2[ $attr ] ) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-/**
  * Finds $webfont_to_find in $webfonts.
  *
  * @since 6.0.0
@@ -91,8 +52,24 @@ function _gutenberg_find_webfont( array $webfonts, $webfont_to_find ) {
 	$is_camel_case = isset( $webfonts[0]['fontFamily'] );
 
 	foreach ( $webfonts as $index => $webfont ) {
-		if ( _gutenberg_is_webfont_equal( $webfont, $webfont_to_find, $is_camel_case ) ) {
-			return $index;
+		$equality_attrs = $is_camel_case
+			? array( 'fontFamily', 'fontStyle', 'fontWeight' )
+			: array( 'font-family', 'font-style', 'font-weight' );
+
+		$found = $index;
+		foreach ( $equality_attrs as $attr ) {
+			// Bail out if the attribute does not exist, or if the values are not equal.
+			if (
+				empty( $webfont[ $attr ] ) ||
+				empty( $webfont_to_find[ $attr ] ) ||
+				$webfont[ $attr ] !== $webfont_to_find[ $attr ]
+			) {
+				$found = false;
+				break;
+			}
+		}
+		if ( false !== $found ) {
+			return $found;
 		}
 	}
 
