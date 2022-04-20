@@ -114,15 +114,16 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
-	const sshRegEx = RegExp( ''
-	+ '('                               // 1. The git url
-	+ /(?:(?:git\+)?ssh:\/\/)?/.source  // ssh protocol (optional)
-	+ /(?:[^@]+)\@/.source              // username
-	+ /(?:[^\/]+)\//.source               // domain
-	+ /(.*)/.source                     // 2. path
-	+ /\/(.*\.git)/.source              // 3. repo
-	+ ')'
-	+ /(?:#(.*))?/.source               // 4. branch
+	const sshRegEx = RegExp(
+		'' +
+			'(' + // 1. The git url
+			/(?:(?:git\+)?ssh:\/\/)?/.source + // ssh protocol (optional)
+			/(?:[^@]+)\@/.source + // username
+			/(?:[^\/]+)\//.source + // domain
+			/(.*)/.source + // 2. path
+			/\/(.*\.git)/.source + // 3. repo
+			')' +
+			/(?:#(.*))?/.source // 4. branch
 	);
 	const sshFields = sourceString.match( sshRegEx );
 	if ( sshFields ) {
