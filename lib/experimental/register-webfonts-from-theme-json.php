@@ -9,6 +9,8 @@ if ( ! function_exists( '_wp_register_webfonts_from_theme_json' ) ) {
 	/**
 	 * Register webfonts defined in theme.json
 	 *
+	 * @private
+	 *
 	 * @param array $settings The theme.json file.
 	 */
 	function _wp_register_webfonts_from_theme_json( $settings ) {

@@ -9,6 +9,7 @@
  * Transforms the source of the font face from `file.:/` into an actual URI.
  *
  * @since 6.0.0
+ * @private
  *
  * @param array $font_face The font face.
  * @return array The URI-resolved font face.
@@ -35,6 +36,7 @@ function _gutenberg_resolve_font_face_uri( array $font_face ) {
  * Compares if the two given webfonts are the equal.
  *
  * @since 6.0.0
+ * @private
  *
  * @param array   $webfont1      The first webfont.
  * @param array   $webfont2      The second webfont.
@@ -73,6 +75,7 @@ function _gutenberg_is_webfont_equal( array $webfont1, array $webfont2, $is_came
  * Finds $webfont_to_find in $webfonts.
  *
  * @since 6.0.0
+ * @private
  *
  * @param array[] $webfonts The webfonts array.
  * @param array   $webfont_to_find The webfont to find.
@@ -99,6 +102,7 @@ if ( ! function_exists( '_wp_array_keys_to_camel_case' ) ) {
 	 * Transforms the keys in the given array to camelCase.
 	 *
 	 * @since 6.0.0
+	 * @private
 	 *
 	 * @param array $to_transform The array to transform.
 	 * @return array Given array with camelCase keys.
@@ -119,6 +123,7 @@ if ( ! function_exists( '_wp_array_keys_to_kebab_case' ) ) {
 	 * Transforms the keys in the given array to kebab-case.
 	 *
 	 * @since 6.0.0
+	 * @private
 	 *
 	 * @param array $to_transform The array to be transformed.
 	 * @return array Given array with kebab-case keys.
