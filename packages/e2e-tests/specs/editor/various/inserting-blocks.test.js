@@ -10,7 +10,6 @@ import {
 	pressKeyTimes,
 	searchForBlock,
 	setBrowserViewport,
-	showBlockToolbar,
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
@@ -248,12 +247,11 @@ describe( 'Inserting blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'First paragraph' );
 		await insertBlock( 'Image' );
-		await showBlockToolbar();
 		const paragraphBlock = await page.$(
 			'p[aria-label="Paragraph block"]'
 		);
 		paragraphBlock.click();
-		await showBlockToolbar();
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// Open the global inserter and search for the Heading block.
 		await searchForBlock( 'Heading' );
@@ -261,7 +259,6 @@ describe( 'Inserting blocks', () => {
 		const headingButton = (
 			await page.$x( `//button//span[contains(text(), 'Heading')]` )
 		 )[ 0 ];
-
 		// Hover over the block should show the blue line indicator.
 		await headingButton.hover();
 

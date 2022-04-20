@@ -79,18 +79,19 @@ function SelectedBlockPopover( {
 		[ clientId ]
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
+	const isToolbarForced = useRef( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const { stopTyping } = useDispatch( blockEditorStore );
 
-	// Controls when the side inserter on empty lines should
-	// be shown, including writing and selection modes.
+	const showEmptyBlockSideInserter =
+		! isTyping && ! isNavigationMode && isEmptyDefaultBlock;
 	const shouldShowBreadcrumb = isNavigationMode;
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
 		! hasFixedToolbar &&
 		isLargeViewport &&
 		! isMultiSelecting &&
+		! showEmptyBlockSideInserter &&
 		( ! isTyping || isCaretWithinFormattedText );
 	const canFocusHiddenToolbar =
 		! isNavigationMode &&
@@ -101,7 +102,7 @@ function SelectedBlockPopover( {
 	useShortcut(
 		'core/block-editor/focus-toolbar',
 		() => {
-			setIsToolbarForced( true );
+			isToolbarForced.current = true;
 			stopTyping( true );
 		},
 		{
@@ -110,20 +111,14 @@ function SelectedBlockPopover( {
 	);
 
 	useEffect( () => {
-		if ( ! shouldShowContextualToolbar ) {
-			setIsToolbarForced( false );
-		}
-	}, [ shouldShowContextualToolbar ] );
+		isToolbarForced.current = false;
+	} );
 
 	// Stores the active toolbar item index so the block toolbar can return focus
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
 
-	if (
-		! shouldShowBreadcrumb &&
-		! shouldShowContextualToolbar &&
-		! isToolbarForced
-	) {
+	if ( ! shouldShowBreadcrumb && ! shouldShowContextualToolbar ) {
 		return null;
 	}
 
@@ -145,7 +140,7 @@ function SelectedBlockPopover( {
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
 		>
-			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
+			{ shouldShowContextualToolbar && (
 				<div
 					onFocus={ onFocus }
 					onBlur={ onBlur }
@@ -170,11 +165,11 @@ function SelectedBlockPopover( {
 					/>
 				</div>
 			) }
-			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
+			{ shouldShowContextualToolbar && (
 				<BlockContextualToolbar
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
-					focusOnMount={ isToolbarForced }
+					focusOnMount={ isToolbarForced.current }
 					__experimentalInitialIndex={
 						initialToolbarItemIndexRef.current
 					}
