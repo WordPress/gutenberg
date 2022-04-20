@@ -319,28 +319,14 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 		wasBeingDragged.current = isBeingDragged;
 	}, [ isBeingDragged ] );
 
-	const onFocusAztec = useCallback( () => {
-		setIsEditingText( true );
+	const onFocusChangeAztec = useCallback( ( { isFocused } ) => {
+		setIsEditingText( isFocused );
 	}, [] );
-
-	const onBlurAztec = useCallback( () => {
-		setIsEditingText( false );
-	}, [] );
-
-	const registerAztecListeners = () => {
-		RCTAztecView.InputState.addFocusListener( onFocusAztec );
-		RCTAztecView.InputState.addBlurListener( onBlurAztec );
-	};
-
-	const unregisterAztecListeners = () => {
-		RCTAztecView.InputState.removeFocusListener( onFocusAztec );
-		RCTAztecView.InputState.removeBlurListener( onBlurAztec );
-	};
 
 	useEffect( () => {
-		registerAztecListeners();
+		RCTAztecView.InputState.addFocusChangeListener( onFocusChangeAztec );
 		return () => {
-			unregisterAztecListeners();
+			RCTAztecView.InputState.removeFocusListener( onFocusChangeAztec );
 		};
 	}, [] );
 

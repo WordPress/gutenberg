@@ -5,51 +5,40 @@ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInpu
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
-const focusListeners = [];
-const blurListeners = [];
+const focusChangeListeners = [];
 
 let currentFocusedElement = null;
 
 /**
- * Adds a listener that will be called when any Aztec view is focused.
+ * Adds a listener that will be called in the following cases:
+ *
+ * - An Aztec view is being focused and all were previously unfocused.
+ * - An Aztec view is being unfocused and none will be focused.
+ *
+ * Note that this listener won't be called when switching focus between Aztec views.
  *
  * @param {Function} listener
  */
-export const addFocusListener = ( listener ) => {
-	focusListeners.push( listener );
+export const addFocusChangeListener = ( listener ) => {
+	focusChangeListeners.push( listener );
 };
 
 /**
- * Adds a listener that will be called when any Aztec view is unfocused.
+ * Removes a listener from the focus change listeners list.
  *
  * @param {Function} listener
  */
-export const addBlurListener = ( listener ) => {
-	blurListeners.push( listener );
-};
-
-/**
- * Removes a listener from the focus listeners list.
- *
- * @param {Function} listener
- */
-export const removeFocusListener = ( listener ) => {
-	const itemIndex = focusListeners.indexOf( listener );
+export const removeFocusChangeListener = ( listener ) => {
+	const itemIndex = focusChangeListeners.indexOf( listener );
 	if ( itemIndex !== -1 ) {
-		focusListeners.splice( itemIndex, 1 );
+		focusChangeListeners.splice( itemIndex, 1 );
 	}
 };
 
-/**
- * Removes a listener from the blur listeners list.
- *
- * @param {Function} listener
- */
-export const removeBlurListener = ( listener ) => {
-	const itemIndex = blurListeners.indexOf( listener );
-	if ( itemIndex !== -1 ) {
-		blurListeners.splice( itemIndex, 1 );
-	}
+const notifyListeners = ( { isFocused } ) => {
+	focusChangeListeners.forEach( ( listener ) => {
+		listener( { isFocused } );
+	} );
 };
 
 /**
@@ -71,29 +60,18 @@ export const getCurrentFocusedElement = () => {
 };
 
 /**
- * Notifies that an Aztec view is being focused.
- *
- * @param {RefObject} element Aztec view being focused.
+ * Notifies that an Aztec view is being focused or unfocused.
  */
-export const notifyFocus = ( element ) => {
-	currentFocusedElement = element;
-
-	focusListeners.forEach( ( listener ) => {
-		listener( element );
-	} );
-};
-
-/**
- * Notifies that an Aztec view is being unfocused.
- *
- * @param {RefObject} element Aztec view being unfocused.
- */
-export const notifyBlur = ( element ) => {
-	currentFocusedElement = null;
-
-	blurListeners.forEach( ( listener ) => {
-		listener( element );
-	} );
+export const notifyInputChange = () => {
+	const focusedInput = TextInputState.currentlyFocusedInput();
+	const hasAnyFocusedInput = focusedInput !== null;
+	if ( hasAnyFocusedInput && ! currentFocusedElement ) {
+		notifyListeners( { isFocused: true } );
+		currentFocusedElement = focusedInput;
+	} else if ( ! hasAnyFocusedInput && currentFocusedElement ) {
+		currentFocusedElement = null;
+		notifyListeners( { isFocused: false } );
+	}
 };
 
 /**

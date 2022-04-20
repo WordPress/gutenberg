@@ -122,7 +122,7 @@ class AztecView extends Component {
 	}
 
 	_onFocus( event ) {
-		AztecInputState.notifyFocus( this.aztecViewRef.current );
+		AztecInputState.notifyInputChange();
 
 		if ( ! this.props.onFocus ) {
 			return;
@@ -136,7 +136,7 @@ class AztecView extends Component {
 		this.selectionEndCaretY = null;
 
 		AztecInputState.blur( this.aztecViewRef.current );
-		AztecInputState.notifyBlur( this.aztecViewRef.current );
+		AztecInputState.notifyInputChange();
 
 		if ( ! this.props.onBlur ) {
 			return;

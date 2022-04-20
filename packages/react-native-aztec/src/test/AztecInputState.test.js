@@ -7,16 +7,13 @@ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInpu
  * Internal dependencies
  */
 import {
-	addBlurListener,
-	addFocusListener,
+	addFocusChangeListener,
 	getCurrentFocusedElement,
 	isFocused,
 	focus,
 	blur,
-	notifyBlur,
-	notifyFocus,
-	removeFocusListener,
-	removeBlurListener,
+	notifyInputChange,
+	removeFocusChangeListener,
 } from '../AztecInputState';
 
 jest.mock(
@@ -24,61 +21,62 @@ jest.mock(
 	() => ( {
 		focusTextInput: jest.fn(),
 		blurTextInput: jest.fn(),
+		currentlyFocusedInput: jest.fn(),
 	} )
 );
 
 const ref = { current: null };
 
+const updateCurrentFocusedInput = ( value ) => {
+	TextInputState.currentlyFocusedInput.mockReturnValue( value );
+	notifyInputChange();
+};
+
 describe( 'Aztec Input State', () => {
-	it( 'listens to focus event', () => {
+	it( 'listens to focus change event', () => {
 		const listener = jest.fn();
-		addFocusListener( listener );
-		notifyFocus( ref );
-		expect( listener ).toHaveBeenCalledWith( ref );
+		addFocusChangeListener( listener );
+
+		updateCurrentFocusedInput( ref );
+
+		expect( listener ).toHaveBeenCalledWith( { isFocused: true } );
+
+		updateCurrentFocusedInput( null );
+
+		expect( listener ).toHaveBeenCalledWith( { isFocused: false } );
 	} );
 
-	it( 'listens to blur event', () => {
+	it( 'does not call focus change listener if removed', () => {
 		const listener = jest.fn();
-		addBlurListener( listener );
-		notifyBlur( ref );
-		expect( listener ).toHaveBeenCalledWith( ref );
-	} );
+		addFocusChangeListener( listener );
+		removeFocusChangeListener( listener );
 
-	it( 'does not call focus listener if removed', () => {
-		const listener = jest.fn();
-		addFocusListener( listener );
-		removeFocusListener( listener );
-		notifyFocus( ref );
-		expect( listener ).not.toHaveBeenCalled();
-	} );
+		updateCurrentFocusedInput( ref );
 
-	it( 'does not call blur listener if removed', () => {
-		const listener = jest.fn();
-		addBlurListener( listener );
-		removeBlurListener( listener );
-		notifyBlur( ref );
-		expect( listener ).not.toHaveBeenCalled();
+		expect( listener ).not.toHaveBeenCalledWith( { isFocused: true } );
+
+		updateCurrentFocusedInput( null );
+
+		expect( listener ).not.toHaveBeenCalledWith( { isFocused: false } );
 	} );
 
 	it( 'returns true if an element is focused', () => {
-		notifyFocus( ref );
+		updateCurrentFocusedInput( ref );
 		expect( isFocused() ).toBeTruthy();
 	} );
 
 	it( 'returns false if an element is unfocused', () => {
-		notifyFocus( ref );
-		notifyBlur( ref );
+		updateCurrentFocusedInput( null );
 		expect( isFocused() ).toBeFalsy();
 	} );
 
 	it( 'returns current focused element', () => {
-		notifyFocus( ref );
+		updateCurrentFocusedInput( ref );
 		expect( getCurrentFocusedElement() ).toBe( ref );
 	} );
 
 	it( 'returns null if focused element is unfocused', () => {
-		notifyFocus( ref );
-		notifyBlur( ref );
+		updateCurrentFocusedInput( null );
 		expect( getCurrentFocusedElement() ).toBe( null );
 	} );
 
