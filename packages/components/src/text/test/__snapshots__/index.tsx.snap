@@ -1,5 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Text should render align 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -3,7 +3,8 @@
+      "color": "#1e1e1e",
+      "font-size": "calc((13 / 13) * 13px)",
+      "font-weight": "normal",
+      "line-height": "1.2",
+      "margin": "0",
++     "text-align": "center",
+    },
+  ]
+`;
+
 exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
 .emotion-0 {
   color: #1e1e1e;
