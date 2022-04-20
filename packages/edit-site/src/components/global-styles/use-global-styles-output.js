@@ -24,6 +24,7 @@ import {
 } from '@wordpress/blocks';
 import { useEffect, useState, useContext } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
+import { __unstablePresetDuotoneFilter as PresetDuotoneFilter } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -56,16 +57,27 @@ function compileStyleValue( uncompiledValue ) {
 function getPresetsDeclarations( blockPresets = {} ) {
 	return reduce(
 		PRESET_METADATA,
-		( declarations, { path, valueKey, cssVarInfix } ) => {
+		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
 			const presetByOrigin = get( blockPresets, path, [] );
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( value ) => {
-						declarations.push(
-							`--wp--preset--${ cssVarInfix }--${ kebabCase(
-								value.slug
-							) }: ${ value[ valueKey ] }`
-						);
+						if ( valueKey ) {
+							declarations.push(
+								`--wp--preset--${ cssVarInfix }--${ kebabCase(
+									value.slug
+								) }: ${ value[ valueKey ] }`
+							);
+						} else if (
+							valueFunc &&
+							typeof valueFunc === 'function'
+						) {
+							declarations.push(
+								`--wp--preset--${ cssVarInfix }--${ kebabCase(
+									value.slug
+								) }: ${ valueFunc( value ) }`
+							);
+						}
 					} );
 				}
 			} );
@@ -118,6 +130,25 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 		},
 		''
 	);
+}
+
+function getPresetsSvgFilters( blockPresets = {} ) {
+	return PRESET_METADATA.filter(
+		// Duotone are the only type of filters for now.
+		( metadata ) => metadata.path.at( -1 ) === 'duotone'
+	).flatMap( ( metadata ) => {
+		const presetByOrigin = get( blockPresets, metadata.path, {} );
+		return [ 'default', 'theme' ]
+			.filter( ( origin ) => presetByOrigin[ origin ] )
+			.flatMap( ( origin ) =>
+				presetByOrigin[ origin ].map( ( preset ) => (
+					<PresetDuotoneFilter
+						preset={ preset }
+						key={ preset.slug }
+					/>
+				) )
+			);
+	} );
 }
 
 function flattenTree( input = {}, prefix, token ) {
@@ -212,7 +243,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 
 	const pickStyleKeys = ( treeToPickFrom ) =>
 		pickBy( treeToPickFrom, ( value, key ) =>
-			[ 'border', 'color', 'spacing', 'typography' ].includes( key )
+			[ 'border', 'color', 'spacing', 'typography', 'filter' ].includes(
+				key
+			)
 		);
 
 	// Top-level.
@@ -239,6 +272,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			nodes.push( {
 				styles: blockStyles,
 				selector: blockSelectors[ blockName ].selector,
+				duotoneSelector: blockSelectors[ blockName ].duotoneSelector,
 			} );
 		}
 
@@ -339,7 +373,25 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 	 * @link https://github.com/WordPress/gutenberg/issues/36147.
 	 */
 	let ruleset = 'body {margin: 0;}';
-	nodesWithStyles.forEach( ( { selector, styles } ) => {
+	nodesWithStyles.forEach( ( { selector, duotoneSelector, styles } ) => {
+		const duotoneStyles = {};
+		if ( styles?.filter ) {
+			duotoneStyles.filter = styles.filter;
+			delete styles.filter;
+		}
+
+		// Process duotone styles (they use color.__experimentalDuotone selector).
+		if ( duotoneSelector ) {
+			const duotoneDeclarations = getStylesDeclarations( duotoneStyles );
+			if ( duotoneDeclarations.length === 0 ) {
+				return;
+			}
+			ruleset =
+				ruleset +
+				`${ duotoneSelector }{${ duotoneDeclarations.join( ';' ) };}`;
+		}
+
+		// Process the remaning block styles (they use either normal block class or __experimentalSelector).
 		const declarations = getStylesDeclarations( styles );
 		if ( declarations.length === 0 ) {
 			return;
@@ -382,6 +434,13 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 	return ruleset;
 };
 
+export function toSvgFilters( tree, blockSelectors ) {
+	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
+	return nodesWithSettings.flatMap( ( { presets } ) => {
+		return getPresetsSvgFilters( presets );
+	} );
+}
+
 const getBlockSelectors = ( blockTypes ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
@@ -389,9 +448,12 @@ const getBlockSelectors = ( blockTypes ) => {
 		const selector =
 			blockType?.supports?.__experimentalSelector ??
 			'.wp-block-' + name.replace( 'core/', '' ).replace( '/', '-' );
+		const duotoneSelector =
+			blockType?.supports?.color?.__experimentalDuotone ?? null;
 		result[ name ] = {
 			name,
 			selector,
+			duotoneSelector,
 		};
 	} );
 
@@ -401,6 +463,7 @@ const getBlockSelectors = ( blockTypes ) => {
 export function useGlobalStylesOutput() {
 	const [ stylesheets, setStylesheets ] = useState( [] );
 	const [ settings, setSettings ] = useState( {} );
+	const [ svgFilters, setSvgFilters ] = useState( {} );
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
@@ -420,6 +483,7 @@ export function useGlobalStylesOutput() {
 			blockSelectors,
 			hasBlockGapSupport
 		);
+		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		setStylesheets( [
 			{
 				css: customProperties,
@@ -431,7 +495,8 @@ export function useGlobalStylesOutput() {
 			},
 		] );
 		setSettings( mergedConfig.settings );
+		setSvgFilters( filters );
 	}, [ mergedConfig ] );
 
-	return [ stylesheets, settings, hasBlockGapSupport ];
+	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }

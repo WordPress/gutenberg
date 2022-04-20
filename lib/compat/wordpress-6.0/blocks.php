@@ -293,11 +293,10 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 	function build_comment_query_vars_from_block( $block ) {
 
 		$comment_args = array(
-			'orderby'                   => 'comment_date_gmt',
-			'order'                     => 'ASC',
-			'status'                    => 'approve',
-			'no_found_rows'             => false,
-			'update_comment_meta_cache' => false, // We lazy-load comment meta for performance.
+			'orderby'       => 'comment_date_gmt',
+			'order'         => 'ASC',
+			'status'        => 'approve',
+			'no_found_rows' => false,
 		);
 
 		if ( ! empty( $block->context['postId'] ) ) {

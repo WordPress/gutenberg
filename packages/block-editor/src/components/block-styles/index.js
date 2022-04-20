@@ -9,7 +9,6 @@ import classnames from 'classnames';
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { ENTER, SPACE } from '@wordpress/keycodes';
 import {
 	Button,
 	__experimentalText as Text,
@@ -113,18 +112,8 @@ function BlockStyles( {
 							onFocus={ () => styleItemHandler( style ) }
 							onMouseLeave={ () => styleItemHandler( null ) }
 							onBlur={ () => styleItemHandler( null ) }
-							onKeyDown={ ( event ) => {
-								if (
-									ENTER === event.keyCode ||
-									SPACE === event.keyCode
-								) {
-									event.preventDefault();
-									onSelectStylePreview( style );
-								}
-							} }
 							onClick={ () => onSelectStylePreview( style ) }
-							role="button"
-							tabIndex="0"
+							aria-current={ activeStyle.name === style.name }
 						>
 							<Text
 								as="span"
