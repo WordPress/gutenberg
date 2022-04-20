@@ -5,18 +5,6 @@
  * @package gutenberg
  */
 
-/**
- * Check if the webfont was registered programmatically.
- *
- * @since 6.0.0
- *
- * @param array $webfont The webfont to check.
- * @return boolean True if registered programmatically, false otherwise.
- */
-function _gutenberg_is_externally_registered_webfont( array $webfont ) {
-	return isset( $webfont['origin'] ) && 'gutenberg_wp_webfonts_api' === $webfont['origin'];
-}
-
 if ( ! function_exists( '_wp_enqueue_webfonts_listed_in_theme_json' ) ) {
 	/**
 	 * Enqueue webfonts listed in theme.json.
@@ -37,7 +25,7 @@ if ( ! function_exists( '_wp_enqueue_webfonts_listed_in_theme_json' ) ) {
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 			foreach ( $font_families as $font_family ) {
 				// Skip dynamically included font families. We only want to enqueue explicitly added fonts.
-				if ( _gutenberg_is_externally_registered_webfont( $font_family ) ) {
+				if ( isset( $font_family['origin'] ) && 'gutenberg_wp_webfonts_api' === $font_family['origin'] ) {
 					continue;
 				}
 
@@ -56,7 +44,7 @@ if ( ! function_exists( '_wp_enqueue_webfonts_listed_in_theme_json' ) ) {
 				// Loop through all the font faces, enqueueing each one of them.
 				foreach ( $font_family['fontFaces'] as $font_face ) {
 					// Skip dynamically included font faces. We only want to enqueue the font faces listed in theme.json.
-					if ( _gutenberg_is_externally_registered_webfont( $font_face ) ) {
+					if ( isset( $font_face['origin'] ) && 'gutenberg_wp_webfonts_api' === $font_face['origin'] ) {
 						continue;
 					}
 
