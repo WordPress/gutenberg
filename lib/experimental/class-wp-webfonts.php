@@ -63,10 +63,10 @@ class WP_Webfonts {
 
 		// Register callback to generate and enqueue styles.
 		if ( did_action( 'wp_enqueue_scripts' ) ) {
-			$this->stylesheet_handle = 'webfonts-footer';
+			$this->stylesheet_handle = 'wp-webfonts-footer';
 			$hook                    = 'wp_print_footer_scripts';
 		} else {
-			$this->stylesheet_handle = 'webfonts';
+			$this->stylesheet_handle = 'wp-webfonts';
 			$hook                    = 'wp_enqueue_scripts';
 		}
 		add_action( $hook, array( $this, 'generate_and_enqueue_styles' ) );

@@ -110,7 +110,7 @@ class Test_WebfontsApi_EnqueueWebfontsListedInThemeJSON extends WP_UnitTestCase 
 		$this->generate_styles_for_theme( 'enqueue-font-family' );
 
 		$expected = <<<EOF
-<style id='webfonts-inline-css' type='text/css'>
+<style id='wp-webfonts-inline-css' type='text/css'>
 @font-face{font-family:Roboto;font-style:normal;font-weight:400;font-display:fallback;font-stretch:normal;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/enqueue-font-family/assets/fonts/Roboto-regular.ttf') format('truetype');}
 </style>
 EOF;
@@ -131,7 +131,7 @@ EOF;
 		$this->generate_styles_for_theme( 'enqueue-only-one-font-face' );
 
 		$expected = <<<EOF
-<style id='webfonts-inline-css' type='text/css'>
+<style id='wp-webfonts-inline-css' type='text/css'>
 @font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;font-stretch:normal;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/enqueue-only-one-font-face/assets/fonts/Roboto-Bold.ttf') format('truetype');}
 </style>
 EOF;
@@ -153,7 +153,7 @@ EOF;
 		$this->generate_styles_for_theme( 'register-and-enqueue-to-the-same-provider' );
 
 		$expected = <<<EOF
-<style id='webfonts-inline-css' type='text/css'>
+<style id='wp-webfonts-inline-css' type='text/css'>
 @font-face{font-family:Roboto;font-style:regular;font-weight:400;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-to-the-same-provider/assets/fonts/Roboto-Regular.ttf') format('truetype');}@font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-to-the-same-provider/assets/fonts/Roboto-Bold.ttf') format('truetype');}
 </style>
 EOF;
@@ -176,7 +176,7 @@ EOF;
 		$this->generate_styles_for_theme( 'register-and-enqueue-through-different-providers' );
 
 		$expected = <<<EOF
-<style id='webfonts-inline-css' type='text/css'>
+<style id='wp-webfonts-inline-css' type='text/css'>
 @font-face{font-family:Roboto;font-style:regular;font-weight:400;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-through-different-providers/assets/fonts/Roboto-Regular.ttf') format('truetype');}@font-face{font-family:Roboto;font-style:bold;font-weight:900;font-display:fallback;src:local(Roboto), url('/wp-content/plugins/gutenberg/phpunit/data/themedir1/register-and-enqueue-through-different-providers/assets/fonts/Roboto-Bold.ttf') format('truetype');}
 </style>
 EOF;
