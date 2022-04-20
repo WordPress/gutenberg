@@ -112,7 +112,7 @@ export function useFocusFirstElement( clientId ) {
 			if (
 				focusElement &&
 				isInsideRootBlock( ref.current, focusElement ) &&
-				isFormElement( focusElement, true )
+				isFormElement( focusElement )
 			) {
 				focusElement.focus();
 				return;

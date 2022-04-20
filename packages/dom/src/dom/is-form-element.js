@@ -7,28 +7,14 @@ import isInputOrTextArea from './is-input-or-text-area';
  *
  * Detects if element is a form element.
  *
- * @param {Element} element                The element to check.
- * @param {boolean} includeContentEditable Should include elements with contentEditable attribute.
+ * @param {Element} element The element to check.
  *
  * @return {boolean} True if form element and false otherwise.
  */
-export default function isFormElement(
-	element,
-	includeContentEditable = false
-) {
+export default function isFormElement( element ) {
 	const { tagName } = element;
 	const checkForInputTextarea = isInputOrTextArea( element );
-	let checkContentEditable = false;
-	if (
-		includeContentEditable &&
-		element.getAttribute( 'contentEditable' ) === 'true'
-	) {
-		checkContentEditable = true;
-	}
 	return (
-		checkForInputTextarea ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		checkContentEditable
+		checkForInputTextarea || tagName === 'BUTTON' || tagName === 'SELECT'
 	);
 }
