@@ -34,6 +34,8 @@ const CHIP_OFFSET_TO_TOUCH_POSITION = 32;
 const BLOCK_OPACITY_ANIMATION_CONFIG = { duration: 350 };
 const BLOCK_OPACITY_ANIMATION_DELAY = 250;
 const DEFAULT_LONG_PRESS_MIN_DURATION = 500;
+const DEFAULT_IOS_LONG_PRESS_MIN_DURATION =
+	DEFAULT_LONG_PRESS_MIN_DURATION - 50;
 
 /**
  * Block draggable wrapper component
@@ -310,7 +312,9 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 				// value prevents the long-press gesture from being
 				// triggered in underneath elements. This is required to
 				// prevent enabling text editing when dragging is available.
-				ios: canDragBlock ? 450 : DEFAULT_LONG_PRESS_MIN_DURATION,
+				ios: canDragBlock
+					? DEFAULT_IOS_LONG_PRESS_MIN_DURATION
+					: DEFAULT_LONG_PRESS_MIN_DURATION,
 				android: DEFAULT_LONG_PRESS_MIN_DURATION,
 			} ) }
 		>
