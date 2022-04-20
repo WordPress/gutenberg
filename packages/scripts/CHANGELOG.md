@@ -13,6 +13,7 @@
 -   Add `vendor/` to `.markdownlintignore`, to match `lint-md-docs` docs ([#39724](https://github.com/WordPress/gutenberg/pull/39724)).
 -   Include files with `.jsx` extension in the build process ([#39613](https://github.com/WordPress/gutenberg/pull/39613)).
 -   Ensure that the default logic for entry points in the build commands is executed only when used the default config ([#39618](https://github.com/WordPress/gutenberg/pull/39618)).
+-   Update `markdownlint` and `markdownlint-cli` to the latest versions ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
 
 ## 22.2.0 (2022-03-11)
 
