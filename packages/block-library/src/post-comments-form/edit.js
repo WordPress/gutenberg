@@ -90,6 +90,7 @@ export default function PostCommentsFormEdit( {
 									className="submit wp-block-button__link"
 									label={ __( 'Post Comment' ) }
 									value={ __( 'Post Comment' ) }
+									readOnly
 								/>
 							</p>
 						</form>
