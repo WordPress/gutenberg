@@ -187,7 +187,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		);
 
 		$top_level_ids = self::$comment_ids;
-		$expected = str_replace(
+		$expected      = str_replace(
 			array( "\n", "\t" ),
 			'',
 			<<<END
@@ -231,7 +231,9 @@ END
 		);
 
 		$this->assertEquals(
-			gutenberg_render_block_core_comment_template( null, null, $block ), $expected );
+			gutenberg_render_block_core_comment_template( null, null, $block ),
+			$expected
+		);
 	}
 	/**
 	 * Test that both "Older Comments" and "Newer Comments" are displayed in the correct order
