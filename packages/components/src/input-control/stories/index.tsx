@@ -23,6 +23,7 @@ const meta: ComponentMeta< typeof InputControl > = {
 		prefix: { control: { type: null } },
 		suffix: { control: { type: null } },
 		type: { control: { type: 'text' } },
+		value: { control: { disable: true } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -31,11 +32,7 @@ const meta: ComponentMeta< typeof InputControl > = {
 };
 export default meta;
 
-const UncontrolledTemplate: ComponentStory< typeof InputControl > = (
-	args
-) => <InputControl { ...args } />;
-
-const ControlledTemplate: ComponentStory< typeof InputControl > = ( args ) => {
+const Template: ComponentStory< typeof InputControl > = ( args ) => {
 	const [ value, setValue ] = useState( '' );
 
 	return (
@@ -47,41 +44,33 @@ const ControlledTemplate: ComponentStory< typeof InputControl > = ( args ) => {
 	);
 };
 
-export const Default = UncontrolledTemplate.bind( {} );
+export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Value',
 	placeholder: 'Placeholder',
 };
 
-export const WithPrefix = UncontrolledTemplate.bind( {} );
+export const WithPrefix = Template.bind( {} );
 WithPrefix.args = {
 	...Default.args,
 	prefix: <span style={ { paddingLeft: 8 } }>@</span>,
 };
 
-export const WithSuffix = UncontrolledTemplate.bind( {} );
+export const WithSuffix = Template.bind( {} );
 WithSuffix.args = {
 	...Default.args,
 	suffix: <button style={ { marginRight: 4 } }>Send</button>,
 };
 
-export const WithSideLabel = UncontrolledTemplate.bind( {} );
+export const WithSideLabel = Template.bind( {} );
 WithSideLabel.args = {
 	...Default.args,
 	labelPosition: 'side',
 };
 
-export const WithEdgeLabel = UncontrolledTemplate.bind( {} );
+export const WithEdgeLabel = Template.bind( {} );
 WithEdgeLabel.args = {
 	...Default.args,
 	__unstableInputWidth: '20em',
 	labelPosition: 'edge',
-};
-
-export const Controlled = ControlledTemplate.bind( {} );
-Controlled.args = {
-	...Default.args,
-};
-Controlled.argTypes = {
-	value: { control: { disable: true } },
 };
