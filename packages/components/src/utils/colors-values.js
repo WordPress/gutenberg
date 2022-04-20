@@ -8,7 +8,7 @@ import { merge } from 'lodash';
  */
 import { rgba } from './colors';
 
-export const BASE = {
+const BASE = {
 	black: '#000',
 	white: '#fff',
 };
@@ -19,7 +19,7 @@ export const BASE = {
  * "G2" refers to the movement to advance the interface of the block editor.
  * https://github.com/WordPress/gutenberg/issues/18667
  */
-export const G2 = {
+const G2 = {
 	blue: {
 		medium: {
 			focus: '#007cba',
@@ -49,7 +49,7 @@ export const G2 = {
 	},
 };
 
-export const DARK_GRAY = {
+const DARK_GRAY = {
 	900: '#191e23',
 	800: '#23282d',
 	700: '#32373c',
@@ -63,7 +63,7 @@ export const DARK_GRAY = {
 	placeholder: rgba( G2.gray[ 900 ], 0.62 ),
 };
 
-export const DARK_OPACITY = {
+const DARK_OPACITY = {
 	900: rgba( '#000510', 0.9 ),
 	800: rgba( '#00000a', 0.85 ),
 	700: rgba( '#06060b', 0.8 ),
@@ -76,7 +76,7 @@ export const DARK_OPACITY = {
 	backgroundFill: rgba( DARK_GRAY[ 700 ], 0.7 ),
 };
 
-export const DARK_OPACITY_LIGHT = {
+const DARK_OPACITY_LIGHT = {
 	900: rgba( '#304455', 0.45 ),
 	800: rgba( '#425863', 0.4 ),
 	700: rgba( '#667886', 0.35 ),
@@ -88,7 +88,7 @@ export const DARK_OPACITY_LIGHT = {
 	100: rgba( '#747474', 0.05 ),
 };
 
-export const LIGHT_GRAY = {
+const LIGHT_GRAY = {
 	900: '#a2aab2',
 	800: '#b5bcc2',
 	700: '#ccd0d4',
@@ -101,7 +101,7 @@ export const LIGHT_GRAY = {
 	placeholder: rgba( BASE.white, 0.65 ),
 };
 
-export const LIGHT_OPACITY_LIGHT = {
+const LIGHT_OPACITY_LIGHT = {
 	900: rgba( BASE.white, 0.5 ),
 	800: rgba( BASE.white, 0.45 ),
 	700: rgba( BASE.white, 0.4 ),
@@ -117,7 +117,7 @@ export const LIGHT_OPACITY_LIGHT = {
 // Additional colors.
 // Some are from https://make.wordpress.org/design/handbook/foundations/colors/.
 
-export const BLUE = {
+const BLUE = {
 	wordpress: {
 		700: '#00669b',
 	},
@@ -139,19 +139,19 @@ export const BLUE = {
 	},
 };
 
-export const ALERT = {
+const ALERT = {
 	yellow: '#f0b849',
 	red: '#d94f4f',
 	green: '#4ab866',
 };
 
-export const ADMIN = {
+const ADMIN = {
 	theme: `var( --wp-admin-theme-color, ${ BLUE.wordpress[ 700 ] })`,
 	themeDark10: `var( --wp-admin-theme-color-darker-10, ${ BLUE.medium.focus })`,
 };
 
 // Namespaced values for raw colors hex codes.
-export const UI = {
+const UI = {
 	theme: ADMIN.theme,
 	background: BASE.white,
 	backgroundDisabled: LIGHT_GRAY[ 200 ],

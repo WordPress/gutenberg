@@ -1,6 +1,11 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### New Features
+
+-   Add new `filter` icon. ([#40435](https://github.com/WordPress/gutenberg/pull/40435))
+
+-   Add new `commentTitle` icon. ([#40419](https://github.com/WordPress/gutenberg/pull/40419))
 
 ## 8.2.0 (2022-04-08)
 

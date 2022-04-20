@@ -292,3 +292,33 @@ export const getAttributesFromPreview = memoize(
 		return attributes;
 	}
 );
+
+/**
+ * Returns the attributes derived from the preview, merged with the current attributes.
+ *
+ * @param {Object}  currentAttributes       The current attributes of the block.
+ * @param {Object}  preview                 The preview data.
+ * @param {string}  title                   The block's title, e.g. Twitter.
+ * @param {boolean} isResponsive            Boolean indicating if the block supports responsive content.
+ * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
+ * @return {Object} Merged attributes.
+ */
+export const getMergedAttributesWithPreview = (
+	currentAttributes,
+	preview,
+	title,
+	isResponsive,
+	ignorePreviousClassName = false
+) => {
+	const { allowResponsive, className } = currentAttributes;
+	return {
+		...currentAttributes,
+		...getAttributesFromPreview(
+			preview,
+			title,
+			ignorePreviousClassName ? undefined : className,
+			isResponsive,
+			allowResponsive
+		),
+	};
+};

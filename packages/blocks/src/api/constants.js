@@ -104,6 +104,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'color', 'text' ],
 		requiresOptOut: true,
 	},
+	filter: {
+		value: [ 'filter', 'duotone' ],
+		support: [ 'color', '__experimentalDuotone' ],
+	},
 	linkColor: {
 		value: [ 'elements', 'link', 'color', 'text' ],
 		support: [ 'color', 'link' ],

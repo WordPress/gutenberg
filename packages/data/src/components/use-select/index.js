@@ -123,7 +123,6 @@ export default function useSelect( mapSelect, deps ) {
 	const latestIsAsync = useRef( isAsync );
 	const latestMapOutput = useRef();
 	const latestMapOutputError = useRef();
-	const isMountedAndNotUnsubscribing = useRef();
 
 	// Keep track of the stores being selected in the _mapSelect function,
 	// and only subscribe to those stores later.
@@ -181,7 +180,6 @@ export default function useSelect( mapSelect, deps ) {
 		latestMapSelect.current = _mapSelect;
 		latestMapOutput.current = mapOutput;
 		latestMapOutputError.current = undefined;
-		isMountedAndNotUnsubscribing.current = true;
 
 		// This has to run after the other ref updates
 		// to avoid using stale values in the flushed
@@ -199,21 +197,17 @@ export default function useSelect( mapSelect, deps ) {
 		}
 
 		const onStoreChange = () => {
-			if ( isMountedAndNotUnsubscribing.current ) {
-				try {
-					const newMapOutput = wrapSelect( latestMapSelect.current );
+			try {
+				const newMapOutput = wrapSelect( latestMapSelect.current );
 
-					if (
-						isShallowEqual( latestMapOutput.current, newMapOutput )
-					) {
-						return;
-					}
-					latestMapOutput.current = newMapOutput;
-				} catch ( error ) {
-					latestMapOutputError.current = error;
+				if ( isShallowEqual( latestMapOutput.current, newMapOutput ) ) {
+					return;
 				}
-				forceRender();
+				latestMapOutput.current = newMapOutput;
+			} catch ( error ) {
+				latestMapOutputError.current = error;
 			}
+			forceRender();
 		};
 
 		const onChange = () => {
@@ -233,10 +227,9 @@ export default function useSelect( mapSelect, deps ) {
 		);
 
 		return () => {
-			isMountedAndNotUnsubscribing.current = false;
 			// The return value of the subscribe function could be undefined if the store is a custom generic store.
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
-			renderQueue.flush( queueContext );
+			renderQueue.cancel( queueContext );
 		};
 		// If you're tempted to eliminate the spread dependencies below don't do it!
 		// We're passing these in from the calling function and want to make sure we're
