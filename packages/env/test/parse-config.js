@@ -1,11 +1,15 @@
 /**
+ * External dependencies
+ */
+const _path = require( 'path' );
+
+/**
  * Internal dependencies
  */
 const { parseSourceString } = require( '../lib/config/parse-config' );
-const path = require( 'path' );
 
 const parseSourceStringOptions = { workDirectoryPath: '.' };
-const currentDirectory = path.resolve( '.' );
+const currentDirectory = _path.resolve( '.' );
 
 describe( 'parse-config', () => {
 	it( 'returns null for null source', () => {
@@ -43,7 +47,6 @@ const gitTests = [
 
 describe.each( gitTests )( 'parse-config :: git', ( source ) => {
 	it( `parses ${ source.sourceString }`, () => {
-		debugger;
 		const { type, url, ref, path, clonePath, basename } = parseSourceString(
 			source.sourceString,
 			parseSourceStringOptions
