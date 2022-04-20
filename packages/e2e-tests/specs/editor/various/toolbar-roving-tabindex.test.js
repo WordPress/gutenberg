@@ -42,9 +42,7 @@ async function testBlockToolbarKeyboardNavigation(
 
 async function wrapCurrentBlockWithGroup( currentBlockTitle ) {
 	await page.click( `[aria-label="${ currentBlockTitle }"]` );
-	await page.evaluate( () => {
-		document.querySelector( '.editor-block-list-item-group' ).click();
-	} );
+	await page.click( '.editor-block-list-item-group' );
 }
 
 async function testGroupKeyboardNavigation(
