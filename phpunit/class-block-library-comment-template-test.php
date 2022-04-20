@@ -225,6 +225,16 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 									</li>
 								</ol>
 							</li>
+							<li id="comment-{$first_level_ids[1]}" class="comment even depth-2">
+								<div class="has-small-font-size wp-block-comment-author-name">
+									<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+										Test
+									</a>
+								</div>
+								<div class="wp-block-comment-content">
+									Hello world
+								</div>
+							</li>
 						</ol>
 					</li>
 				</ol>
