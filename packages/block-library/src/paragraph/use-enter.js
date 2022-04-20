@@ -60,7 +60,8 @@ export function useExitOnEnterAtEnd( props ) {
 			event.preventDefault();
 
 			const position = order.indexOf( clientId );
-			// It should be the last block.
+
+			// If it is the last block, exit.
 			if ( position === order.length - 1 ) {
 				moveBlocksToPosition(
 					[ clientId ],
@@ -71,17 +72,19 @@ export function useExitOnEnterAtEnd( props ) {
 				return;
 			}
 
+			// If it is in the middle, split the block in two.
 			const wrapperBlock = getBlock( wrapperClientId );
 			batch( () => {
 				duplicateBlocks( [ wrapperClientId ] );
 				const blockIndex = getBlockIndex( wrapperClientId );
+
 				replaceInnerBlocks(
 					wrapperClientId,
-					wrapperBlock.innerBlocks.splice( 0, position )
+					wrapperBlock.innerBlocks.slice( 0, position )
 				);
 				replaceInnerBlocks(
 					getNextBlockClientId( wrapperClientId ),
-					wrapperBlock.innerBlocks.splice( position )
+					wrapperBlock.innerBlocks.slice( position )
 				);
 				insertBlock(
 					createBlock( 'core/paragraph' ),
