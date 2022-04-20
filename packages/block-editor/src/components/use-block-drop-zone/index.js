@@ -126,7 +126,9 @@ export default function useBlockDropZone( {
 			);
 
 			if ( ! targetBlock() ) {
-				setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
+				setTargetBlockIndex(
+					targetIndex === undefined ? 0 : targetIndex
+				);
 
 				if ( targetIndex !== null ) {
 					showInsertionPoint( targetRootClientId, targetIndex );
