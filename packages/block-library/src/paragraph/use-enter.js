@@ -8,7 +8,7 @@ import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { hasBlockSupport, createBlock } from '@wordpress/blocks';
 
-export function useExitOnEnterAtEnd( props ) {
+export function useOnEnter( props ) {
 	const { batch } = useRegistry();
 	const {
 		moveBlocksToPosition,
@@ -48,7 +48,7 @@ export function useExitOnEnterAtEnd( props ) {
 			if (
 				! hasBlockSupport(
 					getBlockName( wrapperClientId ),
-					'__experimentalExitOnEnterAtEnd',
+					'__experimentalOnEnter',
 					false
 				)
 			) {
