@@ -1308,6 +1308,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "UnitRangeControl",
+		"slug": "unit-range-control",
+		"markdown_source": "../packages/components/src/unit-range-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "VStack",
 		"slug": "v-stack",
 		"markdown_source": "../packages/components/src/v-stack/README.md",

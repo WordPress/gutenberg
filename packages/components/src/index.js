@@ -173,6 +173,7 @@ export {
 	useCustomUnits as __experimentalUseCustomUnits,
 	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
 } from './unit-control';
+export { UnitRangeControl as __experimentalUnitRangeControl } from './unit-range-control';
 export { View as __experimentalView } from './view';
 export { VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
