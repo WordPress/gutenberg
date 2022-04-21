@@ -40,11 +40,11 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 		 */
 		$fn_get_webfonts_from_theme_json = static function() {
 			// Get settings from theme.json.
-			$settings = WP_Theme_JSON_Resolver::get_merged_data()->get_settings();
+			$settings = WP_Theme_JSON_Resolver_6_0::get_merged_data()->get_settings();
 
 			// If in the editor, add webfonts defined in variations.
 			if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-				$variations = WP_Theme_JSON_Resolver::get_style_variations();
+				$variations = WP_Theme_JSON_Resolver_6_0::get_style_variations();
 				foreach ( $variations as $variation ) {
 					// Skip if fontFamilies are not defined in the variation.
 					if (
