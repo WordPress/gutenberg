@@ -238,13 +238,11 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 				}
 
 				// Validate the `src` property.
-				if ( ! empty( $webfont['src'] ) ) {
-					foreach ( (array) $webfont['src'] as $src ) {
-						if ( empty( $src ) || ! is_string( $src ) ) {
-							trigger_error( __( 'Each webfont src must be a non-empty string.', 'gutenberg' ) );
+				foreach ( (array) $webfont['src'] as $src ) {
+					if ( ! is_string( $src ) || '' === trim( $src ) ) {
+						trigger_error( __( 'Each webfont src must be a non-empty string.', 'gutenberg' ) );
 
-							return false;
-						}
+						return false;
 					}
 				}
 
