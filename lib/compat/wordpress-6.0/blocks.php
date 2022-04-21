@@ -283,7 +283,7 @@ add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable'
  */
 function gutenberg_register_lock_attribute( $args ) {
 	// Setup attributes if needed.
-	if ( empty( $args['attributes'] ) ) {
+	if ( ! isset( $args['attributes'] ) ) {
 		$args['attributes'] = array();
 	}
 
