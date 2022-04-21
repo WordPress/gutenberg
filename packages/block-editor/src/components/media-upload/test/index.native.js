@@ -17,7 +17,6 @@ import {
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 	MEDIA_TYPE_AUDIO,
-	OPTION_CHOOSE_FROM_DEVICE,
 	OPTION_TAKE_VIDEO,
 	OPTION_TAKE_PHOTO,
 	OPTION_INSERT_FROM_URL,
@@ -36,7 +35,10 @@ describe( 'MediaUpload component', () => {
 	} );
 
 	describe( 'Media capture options for different media block types', () => {
-		const expectOptionForMediaType = ( mediaType, expectedOption ) => {
+		const expectOptionForMediaType = async (
+			mediaType,
+			expectedOptions
+		) => {
 			const wrapper = render(
 				<MediaUpload
 					allowedTypes={ [ mediaType ] }
@@ -52,14 +54,16 @@ describe( 'MediaUpload component', () => {
 					} }
 				/>
 			);
-			fireEvent.press( wrapper.getByText( 'Open Picker' ) );
+			await fireEvent.press( wrapper.getByText( 'Open Picker' ) );
 
-			wrapper.findByText( expectedOption );
+			await expectedOptions.forEach( ( item ) => {
+				const option = wrapper.getByText( item );
+				expect( option ).toBeVisible();
+			} );
 		};
 
 		it( 'shows the correct media capture options for the Image block', () => {
 			expectOptionForMediaType( MEDIA_TYPE_IMAGE, [
-				OPTION_CHOOSE_FROM_DEVICE,
 				OPTION_TAKE_PHOTO,
 				OPTION_WORDPRESS_MEDIA_LIBRARY,
 				OPTION_INSERT_FROM_URL,
@@ -68,7 +72,6 @@ describe( 'MediaUpload component', () => {
 
 		it( 'shows the correct media capture options for the Video block', () => {
 			expectOptionForMediaType( MEDIA_TYPE_VIDEO, [
-				OPTION_CHOOSE_FROM_DEVICE,
 				OPTION_TAKE_VIDEO,
 				OPTION_WORDPRESS_MEDIA_LIBRARY,
 				OPTION_INSERT_FROM_URL,
@@ -77,7 +80,6 @@ describe( 'MediaUpload component', () => {
 
 		it( 'shows the correct media capture options for the Audio block', () => {
 			expectOptionForMediaType( MEDIA_TYPE_AUDIO, [
-				OPTION_WORDPRESS_MEDIA_LIBRARY,
 				OPTION_INSERT_FROM_URL,
 			] );
 		} );
