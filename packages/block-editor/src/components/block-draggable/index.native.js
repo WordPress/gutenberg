@@ -291,6 +291,7 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 				getTemplateLock,
 				isBlockBeingDragged,
 				getSelectedBlockClientId,
+				hasSelectedInnerBlock,
 			} = _select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 			const templateLock = rootClientId
@@ -302,7 +303,9 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 				isBeingDragged: isBlockBeingDragged( clientId ),
 				isDraggable: 'all' !== templateLock,
 				isBlockSelected:
-					selectedBlockClientId && selectedBlockClientId === clientId,
+					selectedBlockClientId &&
+					( selectedBlockClientId === clientId ||
+						hasSelectedInnerBlock( clientId, true ) ),
 			};
 		},
 		[ clientId ]
