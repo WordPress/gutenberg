@@ -136,3 +136,10 @@ $split-border-control-offset: 55px;
 		}
 	}
 }
+
+// Override the `hr` styles defined for the complementary area component
+// from the `@wordpress/interface` package.
+.edit-site-global-styles-sidebar hr {
+	margin: 0;
+	border-color: rgba(0, 0, 0, 0.1);
+}
