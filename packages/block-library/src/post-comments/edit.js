@@ -213,6 +213,8 @@ export default function PostCommentsEdit( {
 										<span className="required">*</span>
 									</label>
 									<textarea
+										// eslint-disable-next-line no-restricted-syntax
+										id="comment"
 										name="comment"
 										cols="45"
 										rows="8"
