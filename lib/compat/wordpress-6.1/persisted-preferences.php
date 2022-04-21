@@ -23,7 +23,15 @@ function gutenberg_configure_persisted_preferences() {
 				'context' => array( 'edit' ),
 				'schema'  => array(
 					'type'                 => 'object',
-					'properties'           => array(),
+					'properties'           => array(
+						'__modified' => array(
+							'description' => __( 'The date and time the preferences were updated.', 'default' ),
+							'type'        => 'string',
+							'format'      => 'date-time',
+							'context'     => array( 'edit' ),
+							'readonly'    => true,
+						),
+					),
 					'additionalProperties' => true,
 				),
 			),
@@ -47,13 +55,16 @@ function gutenberg_configure_persisted_preferences() {
 				var localData = JSON.parse(
 					localStorage.getItem( localStorageRestoreKey )
 				);
-				var serverTimestamp =
-				    serverData && serverData.__timestamp ? serverData?.__timestamp : 0;
-				var localTimestamp =
-				    localData && localData.__timestamp ? localData.__timestamp : 0;
+
+				// Date parse returns NaN for invalid input. Coerce anything invalid
+				// into a conveniently comparable zero.
+				var serverModified =
+				    Date.parse( serverData && serverData.__modified ) || 0;
+				var localModified =
+				    Date.parse( localData && localData.__modified ) || 0;
 
 				var preloadedData;
-				if ( serverData && serverTimestamp > localTimestamp ) {
+				if ( serverData && serverModified >= localModified ) {
 					preloadedData = serverData;
 				} else if ( localData ) {
 					preloadedData = localData;

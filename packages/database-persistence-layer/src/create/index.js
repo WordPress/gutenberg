@@ -48,8 +48,11 @@ export default function create( {
 		const localData = JSON.parse(
 			localStorage.getItem( localStorageRestoreKey )
 		);
-		const serverTimestamp = serverData?.__timestamp ?? 0;
-		const localTimestamp = localData?.__timestamp ?? 0;
+
+		// Date parse returns NaN for invalid input. Coerce anything invalid
+		// into a conveniently comparable zero.
+		const serverTimestamp = Date.parse( serverData?.__modified ) || 0;
+		const localTimestamp = Date.parse( localData?.__modified ) || 0;
 
 		// Prefer server data if it exists and is more recent.
 		// Otherwise fallback to localStorage data.
@@ -65,7 +68,10 @@ export default function create( {
 	}
 
 	function set( newData ) {
-		const dataWithTimestamp = { ...newData, __timestamp: Date.now() };
+		const dataWithTimestamp = {
+			...newData,
+			__modified: new Date().toISOString(),
+		};
 		cache = dataWithTimestamp;
 
 		// Store data in local storage as a fallback. If for some reason the
