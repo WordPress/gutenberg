@@ -4,7 +4,7 @@
 
 ## Breaking Changes
 
--   Remove `lint-md-js` script that was broken for some time and it's extemely hard to make it work correctly with the recommended ESLint config in Markdown files.
+-   Remove `lint-md-js` script that was broken for some time and it's extemely hard to make it work correctly with the recommended ESLint config in Markdown files ([#40511](https://github.com/WordPress/gutenberg/pull/40511)).
 
 ## 22.5.0 (2022-04-21)
 
