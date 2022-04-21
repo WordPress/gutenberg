@@ -49,6 +49,7 @@ export default function useResizeAware(): [
 				overflow: 'hidden',
 				zIndex: -1,
 			} }
+			aria-hidden="true"
 			ref={ ref }
 		/>
 	);
