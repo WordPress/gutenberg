@@ -71,7 +71,7 @@ export default function PostCommentsFormEdit( {
 				) }
 
 				{ ( 'open' === commentStatus || isInSiteEditor ) && (
-					<div className="wp-block-post-comments-form">
+					<div>
 						<h3>{ __( 'Leave a Reply' ) }</h3>
 						<form
 							noValidate
