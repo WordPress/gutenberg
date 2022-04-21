@@ -14,6 +14,7 @@ import {
 } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
+import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
 
 export default function PostCommentsFormEdit( {
 	attributes,
@@ -35,6 +36,8 @@ export default function PostCommentsFormEdit( {
 	} );
 
 	const isInSiteEditor = postType === undefined || postId === undefined;
+
+	const disabledFormRef = useDisabled();
 
 	return (
 		<>
@@ -70,7 +73,11 @@ export default function PostCommentsFormEdit( {
 				{ ( 'open' === commentStatus || isInSiteEditor ) && (
 					<div className="wp-block-post-comments-form">
 						<h3>{ __( 'Leave a Reply' ) }</h3>
-						<form noValidate className="comment-form">
+						<form
+							noValidate
+							className="comment-form"
+							ref={ disabledFormRef }
+						>
 							<p>
 								<label htmlFor="comment">
 									{ __( 'Comment' ) }
@@ -81,7 +88,6 @@ export default function PostCommentsFormEdit( {
 									name="comment"
 									cols="45"
 									rows="8"
-									disabled
 								/>
 							</p>
 							<p>
