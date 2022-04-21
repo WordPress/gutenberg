@@ -2,9 +2,9 @@
 /**
  * Handler for theme.json webfonts.
  *
- * @package    WordPress
- * @subpackage WebFonts
  * @since      6.0.0
+ * @subpackage WebFonts
+ * @package    WordPress
  */
 
 if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
@@ -23,7 +23,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 	 * for webfonts to be defined in a theme's `theme.json` file for style
 	 * variations.
 	 *
-	 * @link https://github.com/WordPress/gutenberg/issues/40472
+	 * @link  https://github.com/WordPress/gutenberg/issues/40472
 	 *
 	 * @since 6.0.0
 	 */
@@ -165,7 +165,6 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			 * @since 6.0.0
 			 *
 			 * @param array $src Webfont file(s) `src`.
-			 *
 			 * @return array Webfont's `src` in URI.
 			 */
 			private function transform_src_into_uri( array $src ) {
@@ -187,7 +186,6 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			 * @since 6.0.0
 			 *
 			 * @param array $font_face Font face to convert.
-			 *
 			 * @return array Font faces with each property in kebab-case format.
 			 */
 			private function convert_keys_to_kebab_case( array $font_face ) {
@@ -208,7 +206,6 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			 * @since 6.0.0
 			 *
 			 * @param array $webfont The webfont arguments.
-			 *
 			 * @return array|false The validated webfont arguments, or false if the webfont is invalid.
 			 */
 			public function validate_webfont( $webfont ) {
@@ -350,7 +347,6 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			 * @since 6.0.0
 			 *
 			 * @param array $webfont Webfont to process.
-			 *
 			 * @return array Ordered `src` items.
 			 */
 			private function order_src( array $webfont ) {
@@ -373,7 +369,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 				// Add woff2.
 				if ( ! empty( $src['woff2'] ) ) {
 					$src_ordered[] = array(
-						'url'    => $src['woff2'],
+						'url'    => sanitize_url( $src['woff2'] ),
 						'format' => 'woff2',
 					);
 				}
@@ -381,7 +377,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 				// Add woff.
 				if ( ! empty( $src['woff'] ) ) {
 					$src_ordered[] = array(
-						'url'    => $src['woff'],
+						'url'    => sanitize_url( $src['woff'] ),
 						'format' => 'woff',
 					);
 				}
@@ -389,7 +385,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 				// Add ttf.
 				if ( ! empty( $src['ttf'] ) ) {
 					$src_ordered[] = array(
-						'url'    => $src['ttf'],
+						'url'    => sanitize_url( $src['ttf'] ),
 						'format' => 'truetype',
 					);
 				}
@@ -397,7 +393,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 				// Add eot.
 				if ( ! empty( $src['eot'] ) ) {
 					$src_ordered[] = array(
-						'url'    => $src['eot'],
+						'url'    => sanitize_url( $src['eot'] ),
 						'format' => 'embedded-opentype',
 					);
 				}
@@ -405,7 +401,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 				// Add otf.
 				if ( ! empty( $src['otf'] ) ) {
 					$src_ordered[] = array(
-						'url'    => $src['otf'],
+						'url'    => sanitize_url( $src['otf'] ),
 						'format' => 'opentype',
 					);
 				}
@@ -420,7 +416,6 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			 * @since 6.0.0
 			 *
 			 * @param array $webfont Webfont to process.
-			 *
 			 * @return string This font-family's CSS.
 			 */
 			private function build_font_face_css( array $webfont ) {
@@ -469,7 +464,6 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			 *
 			 * @param string $font_family Font family.
 			 * @param array  $value       Value to process.
-			 *
 			 * @return string The CSS.
 			 */
 			private function compile_src( $font_family, array $value ) {
@@ -514,6 +508,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			 * @since 6.0.0
 			 *
 			 * @param array $mime_types Array of mime types.
+			 *
 			 * @return array Mime types with webfonts formats.
 			 */
 			public function add_mime_types( $mime_types ) {
