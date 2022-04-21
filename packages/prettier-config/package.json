@@ -27,6 +27,9 @@
 	],
 	"main": "lib/index.js",
 	"types": "build-types",
+	"peerDependencies": {
+		"prettier": ">=2"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.74.0
+
+-   [**] [Quote block] Adds support for V2 behind a feature flag [#40133]
+-   [**] Update "add block" button's style in default editor view. [#39726]
 -   [*] Remove banner error notification on upload failure [#39694]
 
 ## 1.73.1

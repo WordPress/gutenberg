@@ -177,7 +177,7 @@ function AudioEdit( {
 		>
 			<View>
 				<InspectorControls>
-					<PanelBody title={ __( 'Audio settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }

@@ -9,6 +9,7 @@ import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import CommentsInspectorControls from './edit/comments-inspector-controls';
 
 const TEMPLATE = [
+	[ 'core/comments-title' ],
 	[
 		'core/comment-template',
 		{},

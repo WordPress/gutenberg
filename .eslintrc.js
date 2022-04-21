@@ -26,7 +26,7 @@ const majorMinorRegExp =
  */
 const developmentFiles = [
 	'**/benchmark/**/*.js',
-	'**/@(__mocks__|__tests__|test)/**/*.js',
+	'**/@(__mocks__|__tests__|test)/**/*.{js,ts,tsx}',
 	'**/@(storybook|stories)/**/*.js',
 	'packages/babel-preset-default/bin/**/*.js',
 ];

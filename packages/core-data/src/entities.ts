@@ -79,6 +79,7 @@ export const rootEntitiesConfig = [
 		name: 'sidebar',
 		kind: 'root',
 		baseURL: '/wp/v2/sidebars',
+		baseURLParams: { context: 'edit' },
 		plural: 'sidebars',
 		transientEdits: { blocks: true },
 		label: __( 'Widget areas' ),

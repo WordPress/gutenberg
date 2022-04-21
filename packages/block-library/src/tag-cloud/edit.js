@@ -110,7 +110,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Tag Cloud settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
 					label={ __( 'Taxonomy' ) }
 					options={ getTaxonomyOptions() }
