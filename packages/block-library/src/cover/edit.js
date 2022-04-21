@@ -68,10 +68,10 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
-	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
+	mediaPosition,
 } from './shared';
 
 extend( [ namesPlugin ] );
@@ -244,10 +244,6 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 		}
 	}, [ ! url && ! overlayColor, setIsDark ] );
 	return isDark;
-}
-
-function mediaPosition( { x, y } ) {
-	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
 }
 
 /**
@@ -435,11 +431,12 @@ function CoverEdit( {
 	const isImgElement = ! ( hasParallax || isRepeated );
 
 	const style = {
-		...( isImageBackground && ! isImgElement
-			? backgroundImageStyles( url )
-			: undefined ),
 		minHeight: minHeightWithUnit || undefined,
 	};
+
+	const backgroundImage = url ? `url(${ url })` : undefined;
+
+	const backgroundPosition = mediaPosition( focalPoint );
 
 	const bgStyle = { backgroundColor: overlayColor.color };
 	const mediaStyle = {
@@ -775,16 +772,24 @@ function CoverEdit( {
 					) }
 					style={ { backgroundImage: gradientValue, ...bgStyle } }
 				/>
-
-				{ url && isImageBackground && isImgElement && (
-					<img
-						ref={ isDarkElement }
-						className="wp-block-cover__image-background"
-						alt={ alt }
-						src={ url }
-						style={ mediaStyle }
-					/>
-				) }
+				{ url &&
+					isImageBackground &&
+					( isImgElement ? (
+						<img
+							ref={ isDarkElement }
+							className="wp-block-cover__image-background"
+							alt={ alt }
+							src={ url }
+							style={ mediaStyle }
+						/>
+					) : (
+						<div
+							ref={ isDarkElement }
+							role="img"
+							className="wp-block-cover__image-background"
+							style={ { backgroundImage, backgroundPosition } }
+						/>
+					) ) }
 				{ url && isVideoBackground && (
 					<video
 						ref={ isDarkElement }
