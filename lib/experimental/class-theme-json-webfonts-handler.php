@@ -40,17 +40,40 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 		 */
 		$fn_get_webfonts_from_theme_json = static function() {
 			// Get settings from theme.json.
-			$theme_settings = WP_Theme_JSON_Resolver::get_merged_data()->get_settings();
+			$settings = WP_Theme_JSON_Resolver::get_merged_data()->get_settings();
+
+			// If in the editor, add webfonts defined in variations.
+			if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+				$variations = WP_Theme_JSON_Resolver::get_style_variations();
+				foreach ( $variations as $variation ) {
+					// Skip if fontFamilies are not defined in the variation.
+					if (
+						empty( $variation['settings'] ) ||
+						empty( $variation['settings']['typography'] ) ||
+						empty( $variation['settings']['typography']['fontFamilies'] )
+					) {
+						continue;
+					}
+
+					$settings['typography']                          = empty( $settings['typography'] ) ? array() : $settings['typography'];
+					$settings['typography']['fontFamilies']          = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
+					$settings['typography']['fontFamilies']['theme'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies']['theme'];
+					$settings['typography']['fontFamilies']['theme'] = array_merge( $settings['typography']['fontFamilies']['theme'], $variation['settings']['typography']['fontFamilies']['theme'] );
+
+					// Make sure there are no duplicates.
+					$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
+				}
+			}
 
 			// Bail out early if there are no settings for webfonts.
-			if ( empty( $theme_settings['typography'] ) || empty( $theme_settings['typography']['fontFamilies'] ) ) {
+			if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
 				return array();
 			}
 
 			$webfonts = array();
 
 			// Look for fontFamilies.
-			foreach ( $theme_settings['typography']['fontFamilies'] as $font_families ) {
+			foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 				foreach ( $font_families as $font_family ) {
 
 					// Skip if fontFace is not defined.
