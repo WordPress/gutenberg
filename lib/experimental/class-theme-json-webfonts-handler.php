@@ -454,7 +454,10 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 
 				foreach ( $value as $item ) {
 
-					if ( str_starts_with( $item['url'], get_site_url() ) ) {
+					if (
+						str_starts_with( $item['url'], site_url() ) ||
+						str_starts_with( $item['url'], home_url() )
+					) {
 						$item['url'] = wp_make_link_relative( $item['url'] );
 					}
 
