@@ -40,30 +40,35 @@ function gutenberg_configure_persisted_preferences() {
 	wp_add_inline_script(
 		'wp-preferences',
 		sprintf(
-			'const serverData = %s;
-			const userId = "%s";
-			const localStorageRestoreKey = `WP_PREFERENCES_USER_${ userId }`;
-			const localData = JSON.parse(
-				localStorage.getItem( localStorageRestoreKey )
-			);
-			const serverTimestamp = serverData?.__timestamp ?? 0;
-			const localTimestamp = localData?.__timestamp ?? 0;
+			'( function() {
+				var serverData = %s;
+				var userId = "%s";
+				var localStorageRestoreKey = "WP_PREFERENCES_USER_" + userId;
+				var localData = JSON.parse(
+					localStorage.getItem( localStorageRestoreKey )
+				);
+				var serverTimestamp =
+				    serverData && serverData.__timestamp ? serverData?.__timestamp : 0;
+				var localTimestamp =
+				    localData && localData.__timestamp ? localData.__timestamp : 0;
 
-			let preloadedData;
-			if ( serverData && serverTimestamp > localTimestamp ) {
-				preloadedData = serverData;
-			} else if ( localData ) {
-				preloadedData = localData;
-			} else {
-				// Check if there is data in the legacy format from the old persistence system.
-				const { __unstableConvertLegacyLocalStorageData } = wp.databasePersistenceLayer;
-				preloadedData = __unstableConvertLegacyLocalStorageData( userId );
-			}
+				var preloadedData;
+				if ( serverData && serverTimestamp > localTimestamp ) {
+					preloadedData = serverData;
+				} else if ( localData ) {
+					preloadedData = localData;
+				} else {
+					// Check if there is data in the legacy format from the old persistence system.
+					const convertLegacyLocalStorageData =
+					    wp.databasePersistenceLayer.__unstableConvertLegacyLocalStorageData;
+					preloadedData = convertLegacyLocalStorageData( userId );
+				}
 
-			const { create } = wp.databasePersistenceLayer;
-			const persistenceLayer = create( { preloadedData, localStorageRestoreKey } );
-			const { store: preferencesStore } = wp.preferences;
-			wp.data.dispatch( "core/preferences" ).setPersistenceLayer( persistenceLayer );',
+				var create = wp.databasePersistenceLayer.create;
+				var persistenceLayer = create( { preloadedData, localStorageRestoreKey } );
+				var preferencesStore = wp.preferences.store;
+				wp.data.dispatch( "core/preferences" ).setPersistenceLayer( persistenceLayer );
+			} ) ();',
 			wp_json_encode( $preload_data ),
 			$user_id
 		),
