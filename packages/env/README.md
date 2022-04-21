@@ -474,22 +474,22 @@ Additionally, the key `env` is available to override any of the above options on
 
 ```json
 {
-	"plugins": [ "." ],
-	"config": {
-		"KEY_1": true,
-		"KEY_2": false
-	},
-	"env": {
-		"development": {
-			"themes": [ "./one-theme" ]
-		},
-		"tests": {
-			"config": {
-				"KEY_1": false
-			},
-			"port": 3000
-		}
-	}
+  "plugins": ["."],
+  "config": {
+    "KEY_1": true,
+    "KEY_2": false
+  },
+  "env": {
+    "development": {
+      "themes": ["./one-theme"]
+    },
+    "tests": {
+      "config": {
+        "KEY_1": false
+      },
+      "port": 3000
+    }
+  }
 }
 ```
 
