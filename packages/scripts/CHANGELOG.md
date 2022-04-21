@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## Breaking Changes
+
+-   Remove the previously deprecated and undocumented `format-js` command.
+
 ## 22.4.0 (2022-04-08)
 
 ### New Feature
