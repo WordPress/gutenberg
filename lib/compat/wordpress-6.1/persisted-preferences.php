@@ -9,11 +9,6 @@
  * Register the user meta for persisted preferences.
  */
 function gutenberg_configure_persisted_preferences() {
-	$user_id = get_current_user_id();
-	if ( empty( $user_id ) ) {
-		return;
-	}
-
 	global $wpdb;
 
 	$meta_key = $wpdb->get_blog_prefix() . 'persisted_preferences';
@@ -34,6 +29,11 @@ function gutenberg_configure_persisted_preferences() {
 			),
 		)
 	);
+
+	$user_id = get_current_user_id();
+	if ( empty( $user_id ) ) {
+		return;
+	}
 
 	$preload_data = get_user_meta( $user_id, $meta_key, true );
 
