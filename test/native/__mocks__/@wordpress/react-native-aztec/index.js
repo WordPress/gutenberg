@@ -9,9 +9,15 @@ import { omit } from 'lodash';
  */
 import { forwardRef } from '@wordpress/element';
 
+const reactNativeAztecMock = jest.createMockFromModule(
+	'@wordpress/react-native-aztec'
+);
+// Preserve the mock of AztecInputState to be exported with the AztecView mock.
+const AztecInputState = reactNativeAztecMock.default.InputState;
+
 const UNSUPPORTED_PROPS = [ 'style' ];
 
-const RCTAztecView = ( { accessibilityLabel, text, ...rest }, ref ) => {
+const AztecView = ( { accessibilityLabel, text, ...rest }, ref ) => {
 	return (
 		<TextInput
 			{ ...omit( rest, UNSUPPORTED_PROPS ) }
@@ -24,4 +30,8 @@ const RCTAztecView = ( { accessibilityLabel, text, ...rest }, ref ) => {
 	);
 };
 
-export default forwardRef( RCTAztecView );
+// Replace default mock of AztecView component with custom implementation.
+reactNativeAztecMock.default = forwardRef( AztecView );
+reactNativeAztecMock.default.InputState = AztecInputState;
+
+module.exports = reactNativeAztecMock;
