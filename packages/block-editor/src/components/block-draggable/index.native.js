@@ -326,7 +326,9 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 	useEffect( () => {
 		RCTAztecView.InputState.addFocusChangeListener( onFocusChangeAztec );
 		return () => {
-			RCTAztecView.InputState.removeFocusListener( onFocusChangeAztec );
+			RCTAztecView.InputState.removeFocusChangeListener(
+				onFocusChangeAztec
+			);
 		};
 	}, [] );
 
