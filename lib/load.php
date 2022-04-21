@@ -114,7 +114,7 @@ require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
 require __DIR__ . '/compat/wordpress-6.0/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.0/functions.php';
-require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-6-0.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-6-0.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.0/block-template.php';
@@ -124,10 +124,15 @@ require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
 
 // WordPress 6.1 compat.
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
+require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-6-1.php';
+require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-resolver-6-1.php';
+require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/register-webfonts-from-theme-json.php';
+require __DIR__ . '/experimental/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/experimental/class-wp-webfonts.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
