@@ -88,7 +88,7 @@ function wp_get_global_stylesheet_gutenberg( $types = array() ) {
  * Adds global style rules to the inline style for each block.
  */
 function wp_add_global_styles_for_blocks() {
-	$tree = WP_Theme_JSON_Resolver_6_1::get_merged_data();
+	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	// TODO some nodes dont have a name...
 	$block_nodes = $tree->get_block_nodes();
 
