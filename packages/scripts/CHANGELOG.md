@@ -4,7 +4,7 @@
 
 ## Breaking Changes
 
--   Remove the previously deprecated and undocumented `format-js` command ([#40512](https://github.com/WordPress/gutenberg/pull/40512)).
+-   Remove the previously deprecated and undocumented `format-js` command ([#40512](https://github.com/WordPress/gutenberg/pull/40512)). You should use the `format` command instead.
 
 ## 22.4.0 (2022-04-08)
 
