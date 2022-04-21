@@ -4,11 +4,6 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import InputControl from '..';
@@ -32,17 +27,9 @@ const meta: ComponentMeta< typeof InputControl > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof InputControl > = ( args ) => {
-	const [ value, setValue ] = useState( '' );
-
-	return (
-		<InputControl
-			{ ...args }
-			value={ value }
-			onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
-		/>
-	);
-};
+const Template: ComponentStory< typeof InputControl > = ( args ) => (
+	<InputControl { ...args } />
+);
 
 export const Default = Template.bind( {} );
 Default.args = {
