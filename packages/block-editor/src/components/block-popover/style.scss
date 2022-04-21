@@ -2,6 +2,9 @@
 .components-popover.block-editor-block-popover {
 	z-index: z-index(".block-editor-block-popover");
 	position: absolute;
+	// Shouldn't be needed but it looks
+	// like the popover is impacted by the block gap margin.
+	margin: 0 !important;
 
 	.components-popover__content {
 		margin: 0 !important;
