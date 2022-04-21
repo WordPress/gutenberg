@@ -18,6 +18,7 @@ const meta: ComponentMeta< typeof InputControl > = {
 		prefix: { control: { type: null } },
 		suffix: { control: { type: null } },
 		type: { control: { type: 'text' } },
+		value: { control: { disable: true } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -34,7 +35,6 @@ export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Value',
 	placeholder: 'Placeholder',
-	value: '',
 };
 
 export const WithPrefix = Template.bind( {} );
