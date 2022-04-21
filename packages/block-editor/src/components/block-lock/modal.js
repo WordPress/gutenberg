@@ -13,8 +13,7 @@ import {
 } from '@wordpress/components';
 import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { isReusableBlock, getBlockType } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -25,18 +24,7 @@ import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
-	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
-	const { isReusable } = useSelect(
-		( select ) => {
-			const { getBlockName } = select( blockEditorStore );
-			const blockName = getBlockName( clientId );
-
-			return {
-				isReusable: isReusableBlock( getBlockType( blockName ) ),
-			};
-		},
-		[ clientId ]
-	);
+	const { canMove, canRemove } = useBlockLock( clientId );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const instanceId = useInstanceId(
@@ -48,9 +36,8 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		setLock( {
 			move: ! canMove,
 			remove: ! canRemove,
-			...( isReusable ? { edit: ! canEdit } : {} ),
 		} );
-	}, [ canEdit, canMove, canRemove, isReusable ] );
+	}, [ canMove, canRemove ] );
 
 	const isAllChecked = Object.values( lock ).every( Boolean );
 	const isMixed = Object.values( lock ).some( Boolean ) && ! isAllChecked;
@@ -94,36 +81,10 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							setLock( {
 								move: newValue,
 								remove: newValue,
-								...( isReusable ? { edit: newValue } : {} ),
 							} )
 						}
 					/>
 					<ul className="block-editor-block-lock-modal__checklist">
-						{ isReusable && (
-							<li className="block-editor-block-lock-modal__checklist-item">
-								<CheckboxControl
-									label={
-										<>
-											{ __( 'Restrict editing' ) }
-											<Icon
-												icon={
-													lock.edit
-														? lockIcon
-														: unlockIcon
-												}
-											/>
-										</>
-									}
-									checked={ !! lock.edit }
-									onChange={ ( edit ) =>
-										setLock( ( prevLock ) => ( {
-											...prevLock,
-											edit,
-										} ) )
-									}
-								/>
-							</li>
-						) }
 						<li className="block-editor-block-lock-modal__checklist-item">
 							<CheckboxControl
 								label={
