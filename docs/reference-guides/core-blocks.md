@@ -170,6 +170,15 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Supports:** align, ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
+## Comments
+
+An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments))
+
+-	**Name:** core/comments-query-loop
+-	**Category:** theme
+-	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
+-	**Attributes:** tagName
+
 ## Comments Pagination
 
 Displays a paginated navigation to next/previous set of comments, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination))
@@ -205,15 +214,6 @@ Displays the previous comment's page link. ([Source](https://github.com/WordPres
 -	**Category:** theme
 -	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
-
-## Comments Query Loop
-
-An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-query-loop))
-
--	**Name:** core/comments-query-loop
--	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** tagName
 
 ## Comments Title
 
@@ -487,7 +487,7 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 
 ## Post Comment (deprecated)
 
-This block is deprecated. Please use the Comments Query Loop block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
+This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
 
 -	**Name:** core/post-comment
 -	**Category:** theme
@@ -496,7 +496,7 @@ This block is deprecated. Please use the Comments Query Loop block instead. ([So
 
 ## Post Comments (deprecated)
 
-This block is deprecated. Please use the Comments Query Loop block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
+This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
 
 -	**Name:** core/post-comments
 -	**Category:** theme
