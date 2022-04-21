@@ -9,6 +9,8 @@
  * Register the user meta for persisted preferences.
  */
 function gutenberg_configure_persisted_preferences() {
+	// Create a meta key that incorporates the blog prefix so that each site
+	// on a multisite can have distinct user preferences.
 	global $wpdb;
 	$meta_key = $wpdb->get_blog_prefix() . 'persisted_preferences';
 	register_meta(
