@@ -24,7 +24,7 @@ Each preference is set against a key that should be a string.
 
 ### Value
 
-Values can be of any type, but the types supported may be limited by the persistence layer configure. For example of preferences are saved to browser localStorage in JSON format, only JSON serializable types should be used.
+Values can be of any type, but the types supported may be limited by the persistence layer configure. For example if preferences are saved to browser localStorage in JSON format, only JSON serializable types should be used.
 
 ### Defaults
 
