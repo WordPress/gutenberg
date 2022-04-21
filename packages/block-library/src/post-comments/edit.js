@@ -16,6 +16,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
 
 export default function PostCommentsEdit( {
 	attributes: { textAlign },
@@ -82,6 +83,8 @@ export default function PostCommentsEdit( {
 		} ),
 	} );
 
+	const disabledRef = useDisabled();
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -97,7 +100,10 @@ export default function PostCommentsEdit( {
 				<Warning>{ warning }</Warning>
 
 				{ showPlacholder && (
-					<>
+					<div
+						className="wp-block-post-comments__placeholder"
+						ref={ disabledRef }
+					>
 						<h3>
 							{ __( 'One response to' ) } “{ postTitle }”
 						</h3>
@@ -217,15 +223,13 @@ export default function PostCommentsEdit( {
 									<input
 										name="submit"
 										type="submit"
-										disabled
 										className="submit wp-block-button__link"
 										value={ __( 'Post Comment' ) }
-										readOnly
 									/>
 								</p>
 							</form>
 						</div>
-					</>
+					</div>
 				) }
 			</div>
 		</>
