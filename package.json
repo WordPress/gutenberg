@@ -255,7 +255,6 @@
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit test/integration/full-content/ && npm run format test/integration/fixtures/blocks/*.json",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"format": "wp-scripts format",
-		"format-js": "wp-scripts format-js",
 		"format-php": "wp-env run composer run-script format",
 		"lint": "concurrently \"npm run lint-lockfile\" \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
 		"lint-js": "wp-scripts lint-js",
