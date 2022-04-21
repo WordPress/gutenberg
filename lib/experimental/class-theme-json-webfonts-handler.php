@@ -361,7 +361,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 
 				foreach ( $webfont['src'] as $url ) {
 					// Add data URIs first.
-					if ( 0 === strpos( trim( $url ), 'data:' ) ) {
+					if ( str_starts_with( trim( $url ), 'data:' ) ) {
 						$src_ordered[] = array(
 							'url'    => $url,
 							'format' => 'data',
@@ -479,7 +479,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 
 				foreach ( $value as $item ) {
 
-					if ( 0 === strpos( $item['url'], get_site_url() ) ) {
+					if ( str_starts_with( $item['url'], get_site_url() ) ) {
 						$item['url'] = wp_make_link_relative( $item['url'] );
 					}
 
