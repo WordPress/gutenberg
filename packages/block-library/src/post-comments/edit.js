@@ -11,6 +11,7 @@ import {
 	BlockControls,
 	Warning,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -23,9 +24,17 @@ export default function PostCommentsEdit( {
 } ) {
 	let [ postTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	postTitle = postTitle || __( 'Post Title' );
+
 	const { name: currentUserName } = useSelect( ( select ) =>
 		select( coreStore ).getCurrentUser()
 	);
+
+	const { avatarURL } = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.__experimentalDiscussionSettings
+	);
+
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -69,8 +78,8 @@ export default function PostCommentsEdit( {
 							<footer className="comment-meta">
 								<div className="comment-author vcard">
 									<img
-										alt=""
-										src="http://1.gravatar.com/avatar/d7a973c7dab26985da5f961be7b74480?s=32&d=mm&r=g"
+										alt="Commenter Avatar"
+										src={ avatarURL }
 										className="avatar avatar-32 photo"
 										height="32"
 										width="32"
