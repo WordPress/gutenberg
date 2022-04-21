@@ -48,8 +48,8 @@ _Example:_
 It might also be a good idea to get familiar with the [JavaScript Build Setup tutorial](https://github.com/WordPress/gutenberg/tree/HEAD/docs/how-to-guides/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
 
 ## Automatic block.json detection and the source code directory
-When using the `start` or `build` commands, the source code directory ( the default is `./src`) and its subdirectories are scanned for the existence of `block.json` files. If one or more are found, they are treated a entry points and will be output into corresponding folders in the `build` directory. The allows for the creation of multiple blocks that use a single build process. The source directory can be customized using the `--webpack-src-dir` flag.
 
+When using the `start` or `build` commands, the source code directory ( the default is `./src`) and its subdirectories are scanned for the existence of `block.json` files. If one or more are found, they are treated a entry points and will be output into corresponding folders in the `build` directory. The allows for the creation of multiple blocks that use a single build process. The source directory can be customized using the `--webpack-src-dir` flag.
 
 ## Updating to New Release
 
@@ -58,7 +58,6 @@ To update an existing project to a new version of `@wordpress/scripts`, open the
 In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
 
 We commit to keeping the breaking changes minimal so you can upgrade `@wordpress/scripts` as seamless as possible.
-
 
 ## Available Scripts
 
@@ -323,9 +322,13 @@ _Example:_
 }
 ```
 
+This script provides the following custom options:
+
+-   `--dist-tag` – allows specifying a custom dist-tag when updating npm packages. Defaults to `latest`. This is especially useful when using [`@wordpress/dependency-extraction-webpack-plugin`](https://www.npmjs.com/package/@wordpress/dependency-extraction-webpack-plugin). It lets installing the npm dependencies at versions used by the given WordPress major version for local testing, etc. Example: `wp-scripts packages-update --dist-tag=wp-6.0`.
+
 #### Advanced information
 
-The command checks which packages whose name starts with `@wordpress/` are used in the project by reading the package.json file, and then executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one.
+The command detects project dependencies that have name starting with `@wordpress/` by scanning the `package.json` file. By default, it executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one. You can chose a different dist-tag than `latest` by using the `--dist-tag` option when running the command.
 
 ### `plugin-zip`
 
@@ -380,7 +383,7 @@ _Example:_
 		"start:hot": "wp-scripts start --hot",
 		"start:custom": "wp-scripts start entry-one.js entry-two.js --output-path=custom",
 		"start:copy-php": "wp-scripts start --webpack-copy-php",
-		"start:custom-directory": "wp-scripts start --webpack-src-dir=custom-directory",
+		"start:custom-directory": "wp-scripts start --webpack-src-dir=custom-directory"
 	}
 }
 ```

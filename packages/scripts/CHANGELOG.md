@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages.
+
 ## 22.4.0 (2022-04-08)
 
 ### New Feature
