@@ -15,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { useEntityProp } from '@wordpress/core-data';
 
 export default function PostCommentsEdit( {
 	attributes: { textAlign },
@@ -24,10 +24,6 @@ export default function PostCommentsEdit( {
 } ) {
 	let [ postTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	postTitle = postTitle || __( 'Post Title' );
-
-	const { name: currentUserName } = useSelect( ( select ) =>
-		select( coreStore ).getCurrentUser()
-	);
 
 	const { avatarURL } = useSelect(
 		( select ) =>
@@ -158,10 +154,6 @@ export default function PostCommentsEdit( {
 					</h3>
 
 					<form className="comment-form" noValidate={ true }>
-						<p className="logged-in-as">
-							{ __( 'Logged in as' ) } { currentUserName }.{ ' ' }
-							<a href="#top">{ __( 'Log out?' ) }</a>{ ' ' }
-						</p>
 						<p className="comment-form-comment">
 							<label htmlFor="comment">
 								{ __( 'Comment' ) }{ ' ' }
