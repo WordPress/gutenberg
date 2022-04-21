@@ -1,3 +1,7 @@
+.edit-post-post-visibility__dialog .components-popover__content {
+	min-width: 260px;
+}
+
 .edit-post-post-visibility__dialog,
 .editor-post-visibility__dialog-fieldset {
 	padding: $grid-unit-10;
@@ -19,7 +23,11 @@
 
 	.editor-post-visibility__dialog-info {
 		margin-top: 0.5em;
-		margin-left: $grid-unit-40;
+		margin-left: $grid-unit-15 + $radio-input-size-sm;
+
+		@include break-small {
+			margin-left: $grid-unit-15 + $radio-input-size;
+		}
 	}
 
 	// Remove bottom margin on the last label only.
