@@ -118,13 +118,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			return $nodes;
 		}
 
-		// TODO - test this ( turn off separate assets i think)
 		$nodes = array_merge( $nodes, static::get_block_nodes_private( $theme_json ) );
 
 		return $nodes;
 	}
 
-	// TODO - this is duplicated from get_style_nodes.
 	public function get_block_nodes() {
 		return static::get_block_nodes_private( $this->theme_json );
 	}
