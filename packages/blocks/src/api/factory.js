@@ -220,14 +220,11 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	}
 
 	// If the transform has a `isMatch` function specified, check that it returns true.
-	if ( isFunction( transform.isMatch ) ) {
-		const attributes = transform.isMultiBlock
-			? blocks.map( ( block ) => block.attributes )
-			: sourceBlock.attributes;
-		const block = transform.isMultiBlock ? blocks : sourceBlock;
-		if ( ! transform.isMatch( attributes, block ) ) {
-			return false;
-		}
+	if (
+		isFunction( transform.isMatch ) &&
+		! checkTransformIsMatch( transform, blocks, sourceBlock )
+	) {
+		return false;
 	}
 
 	if (
@@ -458,6 +455,24 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 }
 
 /**
+ * Checks that a given transforms isMatch method passes for given source blocks.
+ *
+ * @param {Object}       transform   A transform object.
+ * @param {Array|Object} blocks      Blocks array.
+ * @param {Object}       sourceBlock Source block being transformed.
+ *
+ * @return {boolean} True if given blocks are a match for given tranform.
+ */
+function checkTransformIsMatch( transform, blocks, sourceBlock ) {
+	const attributes = transform.isMultiBlock
+		? blocks.map( ( block ) => block.attributes )
+		: sourceBlock.attributes;
+	const block = transform.isMultiBlock ? blocks : sourceBlock;
+
+	return transform.isMatch( attributes, block );
+}
+
+/**
  * Switch one or more blocks into one or more blocks of the new block type.
  *
  * @param {Array|Object} blocks Blocks array or block object.
@@ -483,7 +498,9 @@ export function switchToBlockType( blocks, name ) {
 				t.type === 'block' &&
 				( isWildcardBlockTransform( t ) ||
 					t.blocks.indexOf( name ) !== -1 ) &&
-				( ! isMultiBlock || t.isMultiBlock )
+				( ! isMultiBlock || t.isMultiBlock ) &&
+				( ! isFunction( t.isMatch ) ||
+					checkTransformIsMatch( t, blocks, firstBlock ) )
 		) ||
 		findTransform(
 			transformationsFrom,
@@ -491,7 +508,9 @@ export function switchToBlockType( blocks, name ) {
 				t.type === 'block' &&
 				( isWildcardBlockTransform( t ) ||
 					t.blocks.indexOf( sourceName ) !== -1 ) &&
-				( ! isMultiBlock || t.isMultiBlock )
+				( ! isMultiBlock || t.isMultiBlock ) &&
+				( ! isFunction( t.isMatch ) ||
+					checkTransformIsMatch( t, blocks, firstBlock ) )
 		);
 
 	// Stop if there is no valid transformation.
