@@ -1,31 +1,11 @@
 [
 	{
-		"blockName": "core/comments-query-loop",
+		"blockName": "core/comments",
 		"attrs": {},
 		"innerBlocks": [
 			{
 				"blockName": "core/comments-title",
-				"attrs": {
-					"level": 4,
-					"style": {
-						"spacing": {
-							"padding": {
-								"top": "6px",
-								"right": "6px",
-								"bottom": "6px",
-								"left": "6px"
-							}
-						},
-						"border": {
-							"width": "3px",
-							"radius": "100px"
-						}
-					},
-					"borderColor": "vivid-red",
-					"backgroundColor": "primary",
-					"textColor": "background",
-					"fontSize": "large"
-				},
+				"attrs": {},
 				"innerBlocks": [],
 				"innerHTML": "",
 				"innerContent": []
@@ -59,11 +39,11 @@
 										"innerContent": []
 									}
 								],
-								"innerHTML": "\n\t<div class=\"wp-block-column\" style=\"flex-basis:40px\"></div>\n\t",
+								"innerHTML": "\n    <div class=\"wp-block-column\" style=\"flex-basis:40px\"></div>\n    ",
 								"innerContent": [
-									"\n\t<div class=\"wp-block-column\" style=\"flex-basis:40px\">",
+									"\n    <div class=\"wp-block-column\" style=\"flex-basis:40px\">",
 									null,
-									"</div>\n\t"
+									"</div>\n    "
 								]
 							},
 							{
@@ -108,56 +88,77 @@
 												"innerContent": []
 											}
 										],
-										"innerHTML": "\n\t<div class=\"wp-block-group\" style=\"margin-top:0px;margin-bottom:0px\">\n\t\n\t</div>\n\t",
+										"innerHTML": "\n    <div class=\"wp-block-group\" style=\"margin-top:0px;margin-bottom:0px\">\n    \n    </div>\n    ",
 										"innerContent": [
-											"\n\t<div class=\"wp-block-group\" style=\"margin-top:0px;margin-bottom:0px\">",
+											"\n    <div class=\"wp-block-group\" style=\"margin-top:0px;margin-bottom:0px\">",
 											null,
-											"\n\t\n\t",
+											"\n    \n    ",
 											null,
-											"</div>\n\t"
+											"</div>\n    "
 										]
 									},
 									{
 										"blockName": "core/comment-content",
-										"attrs": {},
+										"attrs": {
+											"style": {
+												"elements": {
+													"link": {
+														"color": {
+															"text": "var:preset|color|vivid-cyan-blue"
+														}
+													}
+												}
+											},
+											"textColor": "foreground"
+										},
 										"innerBlocks": [],
 										"innerHTML": "",
 										"innerContent": []
 									},
 									{
 										"blockName": "core/comment-reply-link",
-										"attrs": {},
+										"attrs": {
+											"style": {
+												"elements": {
+													"link": {
+														"color": {
+															"text": "var:preset|color|vivid-cyan-blue"
+														}
+													}
+												}
+											}
+										},
 										"innerBlocks": [],
 										"innerHTML": "",
 										"innerContent": []
 									}
 								],
-								"innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\n\t\n\t\n\t\n\t\n\t</div>\n\t",
+								"innerHTML": "\n    <div class=\"wp-block-column\">\n    \n    \n    \n    \n    \n    </div>\n    ",
 								"innerContent": [
-									"\n\t<div class=\"wp-block-column\">",
+									"\n    <div class=\"wp-block-column\">",
 									null,
-									"\n\t\n\t",
+									"\n    \n    ",
 									null,
-									"\n\t\n\t",
+									"\n    \n    ",
 									null,
-									"\n\t\n\t",
+									"\n    \n    ",
 									null,
-									"</div>\n\t"
+									"</div>\n    "
 								]
 							}
 						],
-						"innerHTML": "\n\t<div class=\"wp-block-columns\">\n\t\n\t</div>\n\t",
+						"innerHTML": "\n    <div class=\"wp-block-columns\">\n    \n    </div>\n    ",
 						"innerContent": [
-							"\n\t<div class=\"wp-block-columns\">",
+							"\n    <div class=\"wp-block-columns\">",
 							null,
-							"\n\t\n\t",
+							"\n    \n    ",
 							null,
-							"</div>\n\t"
+							"</div>\n    "
 						]
 					}
 				],
-				"innerHTML": "\n\t\n\t",
-				"innerContent": [ "\n\t", null, "\n\t" ]
+				"innerHTML": "\n    \n    ",
+				"innerContent": [ "\n    ", null, "\n    " ]
 			},
 			{
 				"blockName": "core/comments-pagination",
@@ -185,27 +186,27 @@
 						"innerContent": []
 					}
 				],
-				"innerHTML": "\n\t\n\t\n\t\n\t\n\t\n\t",
+				"innerHTML": "\n    \n    \n    \n    \n    \n    ",
 				"innerContent": [
-					"\n\t",
+					"\n    ",
 					null,
-					"\n\t\n\t",
+					"\n    \n    ",
 					null,
-					"\n\t\n\t",
+					"\n    \n    ",
 					null,
-					"\n\t"
+					"\n    "
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-comments-query-loop\">\n\n\t\n\t\n\t</div>\n\t",
+		"innerHTML": "\n<div class=\"wp-block-comments\">\n\n    \n    \n    </div>\n    ",
 		"innerContent": [
-			"\n<div class=\"wp-block-comments-query-loop\">",
+			"\n<div class=\"wp-block-comments\">",
 			null,
-			"\n\n\t",
+			"\n\n    ",
 			null,
-			"\n\t\n\t",
+			"\n    \n    ",
 			null,
-			"</div>\n\t"
+			"</div>\n    "
 		]
 	}
 ]
