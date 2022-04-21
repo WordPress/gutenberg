@@ -93,41 +93,9 @@ function wp_add_global_styles_for_blocks() {
 	$block_nodes = $tree->get_block_nodes();
 
 	foreach ( $block_nodes as $metadata ) {
-
 		$block_css = $tree->get_styles_for_block( $metadata );
 		$block_name = str_replace( 'core/', '', $metadata['name'] );
 		wp_add_inline_style( "wp-block-" . $block_name, $block_css );
-
-		/* this might be needed for duotone styles?
-
-		if ( null === $metadata['selector'] ) {
-			continue;
-		}
-		$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-		$selector     = $metadata['selector'];
-		$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
-		$declarations = static::compute_style_properties( $node, $settings );
-
-		// 1. Separate the ones who use the general selector
-		// and the ones who use the duotone selector.
-		$declarations_duotone = array();
-		foreach ( $declarations as $index => $declaration ) {
-			if ( 'filter' === $declaration['name'] ) {
-				unset( $declarations[ $index ] );
-				$declarations_duotone[] = $declaration;
-			}
-		}
-
-		// 2. Generate the rules that use the general selector.
-		$block_rules .= static::to_ruleset( $selector, $declarations );
-
-		// 3. Generate the rules that use the duotone selector.
-		if ( isset( $metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
-			$selector_duotone = static::scope_selector( $metadata['selector'], $metadata['duotone'] );
-			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
-		}*/
-
-
 	}
 
 }
