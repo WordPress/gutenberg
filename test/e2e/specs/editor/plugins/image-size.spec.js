@@ -4,13 +4,13 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'changing image size', () => {
-	test.beforeEach( async ( { pageUtils } ) => {
-		await pageUtils.activatePlugin( 'gutenberg-test-image-size' );
+	test.beforeEach( async ( { requestUtils, pageUtils } ) => {
+		await requestUtils.activatePlugin( 'gutenberg-test-image-size' );
 		await pageUtils.createNewPost();
 	} );
 
-	test.afterEach( async ( { pageUtils } ) => {
-		await pageUtils.deactivatePlugin( 'gutenberg-test-image-size' );
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin( 'gutenberg-test-image-size' );
 	} );
 
 	test( 'should insert and change my image size', async ( {

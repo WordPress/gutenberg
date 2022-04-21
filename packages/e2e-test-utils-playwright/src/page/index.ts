@@ -23,10 +23,8 @@ import { setBrowserViewport } from './set-browser-viewport';
 import { showBlockToolbar } from './show-block-toolbar';
 import { visitAdminPage } from './visit-admin-page';
 import { visitSiteEditor } from './site-editor';
-import { activatePlugin } from './activate-plugin';
 import { getCurrentUser } from './get-current-user';
 import { switchUserToAdmin, switchUserToTest } from './switch-user';
-import { deactivatePlugin } from './deactivate-plugin';
 
 class PageUtils {
 	browser: Browser;
@@ -54,11 +52,10 @@ class PageUtils {
 	openPreviewPage = openPreviewPage;
 	setBrowserViewport = setBrowserViewport;
 	pressKeyTimes = pressKeyTimes;
-	activatePlugin = activatePlugin;
 	getCurrentUser = getCurrentUser;
 	switchUserToAdmin = switchUserToAdmin;
 	switchUserToTest = switchUserToTest;
-	deactivatePlugin = deactivatePlugin;
+	
 }
 
 export { PageUtils };
