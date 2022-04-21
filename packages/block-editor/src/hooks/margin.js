@@ -158,10 +158,10 @@ export function MarginVisualizer( { clientId, attributes } ) {
 			borderRightWidth: margin?.right ?? 0,
 			borderBottomWidth: margin?.bottom ?? 0,
 			borderLeftWidth: margin?.left ?? 0,
-			top: margin?.top ? `-${ margin?.top }` : 0,
-			right: margin?.right ? `-${ margin?.right }` : 0,
-			bottom: margin?.bottom ? `-${ margin?.bottom }` : 0,
-			left: margin?.left ? `-${ margin?.left }` : 0,
+			top: margin?.top ? `-${ margin.top }` : 0,
+			right: margin?.right ? `-${ margin.right }` : 0,
+			bottom: margin?.bottom ? `-${ margin.bottom }` : 0,
+			left: margin?.left ? `-${ margin.left }` : 0,
 		};
 	}, [ margin ] );
 
