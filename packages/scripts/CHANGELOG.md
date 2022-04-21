@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the previously deprecated and undocumented `format-js` command ([#40512](https://github.com/WordPress/gutenberg/pull/40512)). You should use the `format` command instead.
+
 ### New Feature
 
 -   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages ([#40514](https://github.com/WordPress/gutenberg/pull/40514)).

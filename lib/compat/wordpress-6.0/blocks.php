@@ -228,13 +228,14 @@ if ( ! function_exists( 'get_comments_pagination_arrow' ) ) {
 function gutenberg_extend_block_editor_settings_with_discussion_settings( $settings ) {
 
 	$settings['__experimentalDiscussionSettings'] = array(
-		'commentOrder'        => get_option( 'comment_order' ),
-		'commentsPerPage'     => get_option( 'comments_per_page' ),
-		'defaultCommentsPage' => get_option( 'default_comments_page' ),
-		'pageComments'        => get_option( 'page_comments' ),
-		'threadComments'      => get_option( 'thread_comments' ),
-		'threadCommentsDepth' => get_option( 'thread_comments_depth' ),
-		'avatarURL'           => get_avatar_url(
+		'commentOrder'         => get_option( 'comment_order' ),
+		'commentsPerPage'      => get_option( 'comments_per_page' ),
+		'defaultCommentsPage'  => get_option( 'default_comments_page' ),
+		'pageComments'         => get_option( 'page_comments' ),
+		'threadComments'       => get_option( 'thread_comments' ),
+		'threadCommentsDepth'  => get_option( 'thread_comments_depth' ),
+		'defaultCommentStatus' => get_option( 'default_comment_status' ),
+		'avatarURL'            => get_avatar_url(
 			'',
 			array(
 				'size'          => 96,

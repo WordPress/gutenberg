@@ -12,6 +12,9 @@
 
 -   Remove individual color object exports from the `utils/colors-values.js` file. Colors should now be used from the main `COLORS` export([#40387](https://github.com/WordPress/gutenberg/pull/40387)).
 
+### Bug Fix
+
+-   `InputControl`: allow user to input a value interactively in Storybook, by removing default value argument ([#40410](https://github.com/WordPress/gutenberg/pull/40410)).
 
 ## 19.8.0 (2022-04-08)
 
