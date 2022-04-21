@@ -4,7 +4,7 @@
 
 ### New Feature
 
--   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages.
+-   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages ([#40514](https://github.com/WordPress/gutenberg/pull/40514)).
 
 ## 22.4.0 (2022-04-08)
 
