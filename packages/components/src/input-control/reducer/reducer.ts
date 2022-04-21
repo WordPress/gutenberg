@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import type { SyntheticEvent } from 'react';
+import type { SyntheticEvent, ChangeEvent, PointerEvent } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { useReducer } from '@wordpress/element';
+import { useReducer, useLayoutEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,6 +18,7 @@ import {
 	initialStateReducer,
 } from './state';
 import * as actions from './actions';
+import type { InputChangeCallback } from '../types';
 
 /**
  * Prepares initialState for the reducer.
@@ -131,13 +132,15 @@ function inputControlStateReducer(
  * This technique uses the "stateReducer" design pattern:
  * https://kentcdodds.com/blog/the-state-reducer-pattern/
  *
- * @param  stateReducer An external state reducer.
- * @param  initialState The initial state for the reducer.
+ * @param  stateReducer    An external state reducer.
+ * @param  initialState    The initial state for the reducer.
+ * @param  onChangeHandler A handler for the onChange event.
  * @return State, dispatch, and a collection of actions.
  */
 export function useInputControlStateReducer(
 	stateReducer: StateReducer = initialStateReducer,
-	initialState: Partial< InputState > = initialInputControlState
+	initialState: Partial< InputState > = initialInputControlState,
+	onChangeHandler: InputChangeCallback
 ) {
 	const [ state, dispatch ] = useReducer< StateReducer >(
 		inputControlStateReducer( stateReducer ),
@@ -200,6 +203,36 @@ export function useInputControlStateReducer(
 	const pressUp = createKeyEvent( actions.PRESS_UP );
 	const pressDown = createKeyEvent( actions.PRESS_DOWN );
 	const pressEnter = createKeyEvent( actions.PRESS_ENTER );
+
+	const currentState = useRef( state );
+	const currentValueProp = useRef( initialState.value );
+	useLayoutEffect( () => {
+		currentState.current = state;
+		currentValueProp.current = initialState.value;
+	} );
+	useLayoutEffect( () => {
+		if (
+			state.value !== currentValueProp.current &&
+			! currentState.current.isDirty
+		) {
+			onChangeHandler( state.value ?? '', {
+				event: currentState.current._event as
+					| ChangeEvent< HTMLInputElement >
+					| PointerEvent< HTMLInputElement >,
+			} );
+		}
+	}, [ state.value ] );
+	useLayoutEffect( () => {
+		if (
+			initialState.value !== currentState.current.value &&
+			! currentState.current.isDirty
+		) {
+			reset(
+				initialState.value,
+				currentState.current._event as SyntheticEvent
+			);
+		}
+	}, [ initialState.value ] );
 
 	return {
 		change,
