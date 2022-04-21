@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import useResizeAware from 'react-resize-aware';
 
 /**
  * WordPress dependencies
  */
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
 
 const { clearTimeout, setTimeout } = window;
 
@@ -60,7 +60,7 @@ export function useResizeLabel( {
 	 * This custom hook uses injects an iFrame into the element, allowing it
 	 * to tap into the onResize (window) callback events.
 	 */
-	const [ resizeListener, sizes ] = useResizeAware();
+	const [ resizeListener, sizes ] = useResizeObserver();
 
 	/*
 	 * Indicates if the x/y axis is preferred.
