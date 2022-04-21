@@ -438,7 +438,7 @@ class URLInput extends Component {
 		const inputId = `url-input-control-${ instanceId }`;
 
 		const controlProps = {
-			id: inputId,
+			id: inputId, // Passes attribute to label for the for attribute
 			label,
 			className: classnames( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
@@ -446,6 +446,7 @@ class URLInput extends Component {
 		};
 
 		const inputProps = {
+			id: inputId,
 			value,
 			required: true,
 			className: 'block-editor-url-input__input',
@@ -469,9 +470,6 @@ class URLInput extends Component {
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
-
-		// If renderControl is falsey, set the input's ID
-		inputProps.id = inputId;
 
 		return (
 			<BaseControl { ...controlProps }>
