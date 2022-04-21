@@ -11,7 +11,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 	add_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' );
 	/**
 	 * Runs the theme.json webfonts handler to expose defined webfonts
-	 * to the editor's typography pickers and generate `@font-face` style
+	 * to the editor's typography pickers and generate '@font-face' style
 	 * declarations.
 	 *
 	 * This is not a public API, but rather an internal handler.
@@ -36,7 +36,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 		}
 
 		/**
-		 * Handler for `theme.json` webfonts.
+		 * Handler for theme.json webfonts.
 		 *
 		 * This class is intentionally placed within the function to create
 		 * a private, non-public, non-accessible container. This code will be
@@ -65,7 +65,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			private $stylesheet_handle = '';
 
 			/**
-			 * Initialize the handler.
+			 * Initializes the handler.
 			 *
 			 * @since 6.0.0
 			 */
@@ -87,7 +87,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Register webfonts within the `theme.json`.
+			 * Registers webfonts declared in theme.json.
 			 *
 			 * @since 6.0.0
 			 */
@@ -116,7 +116,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Gets the webfonts from `theme.json`.
+			 * Gets the webfonts from theme.json.
 			 *
 			 * @since 6.0.0
 			 *
@@ -155,10 +155,10 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Transform each `src` into an URI by replacing the `file:./`
+			 * Transforms each 'src' into an URI by replacing 'file:./'
 			 * placeholder from theme.json.
 			 *
-			 * The absolute path to the webfont file(s) Cannot be defined in
+			 * The absolute path to the webfont file(s) cannot be defined in
 			 * theme.json. `file:./` is the placeholder which is replaced by
 			 * the theme's URL path to the theme's root.
 			 *
@@ -182,7 +182,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Converts the face-face properties (i.e. keys) into kebab-case.
+			 * Converts the font-face properties (i.e. keys) into kebab-case.
 			 *
 			 * @since 6.0.0
 			 *
@@ -203,7 +203,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Validate a webfont.
+			 * Validates a webfont.
 			 *
 			 * @since 6.0.0
 			 *
@@ -230,14 +230,14 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 					return false;
 				}
 
-				// Make a `src` property is defined.
+				// Check that the `src` property is defined and a valid type.
 				if ( empty( $webfont['src'] ) || ( ! is_string( $webfont['src'] ) && ! is_array( $webfont['src'] ) ) ) {
 					trigger_error( __( 'Webfont src must be a non-empty string or an array of strings.', 'gutenberg' ) );
 
 					return false;
 				}
 
-				// Validate the 'src' property.
+				// Validate the `src` property.
 				if ( ! empty( $webfont['src'] ) ) {
 					foreach ( (array) $webfont['src'] as $src ) {
 						if ( empty( $src ) || ! is_string( $src ) ) {
@@ -287,7 +287,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Generate and enqueue webfonts styles.
+			 * Generates and enqueues webfonts styles.
 			 *
 			 * @since 6.0.0
 			 */
@@ -309,7 +309,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Generate and enqueue editor styles.
+			 * Generates and enqueues editor styles.
 			 *
 			 * @since 6.0.0
 			 */
@@ -326,7 +326,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Gets the `@font-face` CSS styles for locally-hosted font files.
+			 * Gets the '@font-face' CSS styles for locally-hosted font files.
 			 *
 			 * @since 6.0.0
 			 *
@@ -347,7 +347,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Order `src` items to optimize for browser support.
+			 * Orders 'src' items to optimize for browser support.
 			 *
 			 * @since 6.0.0
 			 *
@@ -465,7 +465,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Compiles the `src` into valid CSS.
+			 * Compiles the 'src' into valid CSS.
 			 *
 			 * @since 6.0.0
 			 *
@@ -511,7 +511,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			}
 
 			/**
-			 * Add webfonts mime types.
+			 * Adds webfonts mime types.
 			 *
 			 * @since 6.0.0
 			 *
