@@ -56,15 +56,6 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			private $webfonts = array();
 
 			/**
-			 * Stylesheet handle.
-			 *
-			 * @since 6.0.0
-			 *
-			 * @var string
-			 */
-			private $stylesheet_handle = '';
-
-			/**
 			 * Initializes the handler.
 			 *
 			 * @since 6.0.0
@@ -72,15 +63,7 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 			public function init() {
 				add_action( 'wp_loaded', array( $this, 'register_webfonts' ) );
 
-				// Register callback to generate and enqueue styles.
-				if ( did_action( 'wp_enqueue_scripts' ) ) {
-					$this->stylesheet_handle = 'wp-webfonts-footer';
-					$hook                    = 'wp_print_footer_scripts';
-				} else {
-					$this->stylesheet_handle = 'wp-webfonts';
-					$hook                    = 'wp_enqueue_scripts';
-				}
-				add_action( $hook, array( $this, 'generate_and_enqueue_styles' ) );
+				add_action( 'wp_enqueue_scripts', array( $this, 'generate_and_enqueue_styles' ) );
 				add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
 
 				add_filter( 'mime_types', array( $this, 'add_mime_types' ) );
@@ -296,11 +279,11 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 				}
 
 				// Enqueue the stylesheet.
-				wp_register_style( $this->stylesheet_handle, '' );
-				wp_enqueue_style( $this->stylesheet_handle );
+				wp_register_style( 'wp-webfonts', '' );
+				wp_enqueue_style( 'wp-webfonts' );
 
 				// Add the styles to the stylesheet.
-				wp_add_inline_style( $this->stylesheet_handle, $styles );
+				wp_add_inline_style( 'wp-webfonts', $styles );
 			}
 
 			/**
