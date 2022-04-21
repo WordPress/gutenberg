@@ -76,8 +76,12 @@ describe( 'Aztec Input State', () => {
 	} );
 
 	it( 'returns current focused element', () => {
+		const anotherRef = { current: null };
 		updateCurrentFocusedInput( ref );
 		expect( getCurrentFocusedElement() ).toBe( ref );
+
+		updateCurrentFocusedInput( anotherRef );
+		expect( getCurrentFocusedElement() ).toBe( anotherRef );
 	} );
 
 	it( 'returns null if focused element is unfocused', () => {

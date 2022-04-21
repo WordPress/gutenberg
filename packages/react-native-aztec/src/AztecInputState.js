@@ -65,12 +65,15 @@ export const getCurrentFocusedElement = () => {
 export const notifyInputChange = () => {
 	const focusedInput = TextInputState.currentlyFocusedInput();
 	const hasAnyFocusedInput = focusedInput !== null;
-	if ( hasAnyFocusedInput && ! currentFocusedElement ) {
-		notifyListeners( { isFocused: true } );
+
+	if ( hasAnyFocusedInput ) {
+		if ( ! currentFocusedElement ) {
+			notifyListeners( { isFocused: true } );
+		}
 		currentFocusedElement = focusedInput;
-	} else if ( ! hasAnyFocusedInput && currentFocusedElement ) {
-		currentFocusedElement = null;
+	} else if ( currentFocusedElement ) {
 		notifyListeners( { isFocused: false } );
+		currentFocusedElement = null;
 	}
 };
 
