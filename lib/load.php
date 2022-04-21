@@ -142,7 +142,6 @@ require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
-require __DIR__ . '/pwa.php';
 
 // Copied package PHP files.
 if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php' ) ) {
