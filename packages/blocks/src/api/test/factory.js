@@ -1288,6 +1288,98 @@ describe( 'block factory', () => {
 			expect( transformedBlocks ).toBeNull();
 		} );
 
+		it( 'should accept transformations that have an isMatch method that returns true', () => {
+			registerBlockType(
+				'core/updated-text-block',
+				defaultBlockSettings
+			);
+			registerBlockType( 'core/text-block', {
+				attributes: {
+					matches: {
+						type: 'boolean',
+						default: true,
+					},
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							isMatch: ( { matches } ) => matches === true,
+							transform: ( { value } ) => {
+								return createBlock( 'core/updated-text-block', {
+									value: 'chicken ' + value,
+								} );
+							},
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'text-block',
+			} );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/updated-text-block'
+			);
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+		} );
+
+		it( 'should reject transformations that have an isMatch method that returns false', () => {
+			registerBlockType(
+				'core/updated-text-block',
+				defaultBlockSettings
+			);
+			registerBlockType( 'core/text-block', {
+				attributes: {
+					matches: {
+						type: 'boolean',
+						default: false,
+					},
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							isMatch: ( { matches } ) => matches === true,
+							transform: ( { value } ) => {
+								return createBlock( 'core/updated-text-block', {
+									value: 'chicken ' + value,
+								} );
+							},
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'text-block',
+			} );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/updated-text-block'
+			);
+
+			expect( transformedBlocks ).toBeNull();
+		} );
+
 		it( 'should reject transformations that return an empty array', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
