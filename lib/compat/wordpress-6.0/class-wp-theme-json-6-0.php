@@ -780,9 +780,13 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 				continue;
 			}
 
+			$user_preset_var = 'background' === $css_property
+				? '--wp--user--preset--' . $css_property . '-color'
+				: '--wp--user--preset--' . $css_property;
+
 			$declarations[] = array(
 				'name'  => $css_property,
-				'value' => 'var(--wp--user--preset--' . $css_property . ',' . $value . ')',
+				'value' => 'var(' . $user_preset_var . ',' . $value . ')',
 			);
 		}
 
