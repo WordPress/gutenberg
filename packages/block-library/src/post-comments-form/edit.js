@@ -14,7 +14,10 @@ import {
 } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+import {
+	__experimentalUseDisabled as useDisabled,
+	useInstanceId,
+} from '@wordpress/compose';
 
 export default function PostCommentsFormEdit( {
 	attributes,
@@ -38,6 +41,8 @@ export default function PostCommentsFormEdit( {
 	const isInSiteEditor = postType === undefined || postId === undefined;
 
 	const disabledFormRef = useDisabled();
+
+	const instanceId = useInstanceId( PostCommentsFormEdit );
 
 	return (
 		<>
@@ -79,12 +84,12 @@ export default function PostCommentsFormEdit( {
 							ref={ disabledFormRef }
 						>
 							<p>
-								<label htmlFor="comment">
+								<label htmlFor={ `comment-${ instanceId }` }>
 									{ __( 'Comment' ) }
 								</label>
 								<textarea
 									/* eslint-disable-next-line no-restricted-syntax */
-									id="comment"
+									id={ `comment-${ instanceId }` }
 									name="comment"
 									cols="45"
 									rows="8"
