@@ -1,4 +1,9 @@
 <?php
+/**
+ * Load global styles assets in the front-end.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Enqueues the global styles defined via theme.json.

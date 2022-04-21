@@ -43,10 +43,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		$blocks_metadata = static::get_blocks_metadata();
-		$separate_block_assets = wp_should_load_separate_core_block_assets();
+		$blocks_metadata            = static::get_blocks_metadata();
+		$separate_block_assets      = wp_should_load_separate_core_block_assets();
 		$style_nodes_without_blocks = static::get_style_nodes( $this->theme_json, $blocks_metadata, $separate_block_assets );
-		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
+		$setting_nodes              = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
 		$stylesheet = '';
 
@@ -123,13 +123,25 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		return $nodes;
 	}
 
+	/**
+	 * A public helper to get the block nodes from a theme.json file.
+	 *
+	 * @return array The block nodes in theme.json.
+	 */
 	public function get_block_nodes() {
 		return static::get_block_nodes_private( $this->theme_json );
 	}
 
+	/**
+	 * An internal method to get the block nodes from a theme.json file.
+	 *
+	 * @param array $theme_json The theme.json converted to an array.
+	 *
+	 * @return array The block nodes in theme.json.
+	 */
 	private static function get_block_nodes_private( $theme_json ) {
 		$selectors = static::get_blocks_metadata();
-		$nodes = array();
+		$nodes     = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
 		}
@@ -182,7 +194,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$selector     = $block_metadata['selector'];
 		$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
 		$declarations = static::compute_style_properties( $node, $settings );
-		$block_rules = static::to_ruleset( $selector, $declarations );
+		$block_rules  = static::to_ruleset( $selector, $declarations );
 		return $block_rules;
 	}
 }

@@ -93,9 +93,9 @@ function wp_add_global_styles_for_blocks() {
 	$block_nodes = $tree->get_block_nodes();
 
 	foreach ( $block_nodes as $metadata ) {
-		$block_css = $tree->get_styles_for_block( $metadata );
+		$block_css  = $tree->get_styles_for_block( $metadata );
 		$block_name = str_replace( 'core/', '', $metadata['name'] );
-		wp_add_inline_style( "wp-block-" . $block_name, $block_css );
+		wp_add_inline_style( 'wp-block-' . $block_name, $block_css );
 	}
 
 }
