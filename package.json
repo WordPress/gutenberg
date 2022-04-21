@@ -266,7 +266,6 @@
 		"lint-lockfile": "node ./bin/validate-package-lock.js",
 		"lint-css": "wp-scripts lint-style \"**/*.scss\"",
 		"lint-css:fix": "npm run lint-css -- --fix",
-		"lint:md-js": "wp-scripts lint-md-js",
 		"lint:md-docs": "wp-scripts lint-md-docs",
 		"native": "npm run --prefix packages/react-native-editor",
 		"postinstall": "patch-package && node ./patches/patch-xcode.js",
