@@ -26,7 +26,7 @@ function gutenberg_configure_persisted_preferences() {
 				'schema'  => array(
 					'type'                 => 'object',
 					'properties'           => array(
-						'__modified' => array(
+						'_modified' => array(
 							'description' => __( 'The date and time the preferences were updated.', 'default' ),
 							'type'        => 'string',
 							'format'      => 'date-time',
@@ -61,9 +61,9 @@ function gutenberg_configure_persisted_preferences() {
 				// Date parse returns NaN for invalid input. Coerce anything invalid
 				// into a conveniently comparable zero.
 				var serverModified =
-				    Date.parse( serverData && serverData.__modified ) || 0;
+				    Date.parse( serverData && serverData._modified ) || 0;
 				var localModified =
-				    Date.parse( localData && localData.__modified ) || 0;
+				    Date.parse( localData && localData._modified ) || 0;
 
 				var preloadedData;
 				if ( serverData && serverModified >= localModified ) {
