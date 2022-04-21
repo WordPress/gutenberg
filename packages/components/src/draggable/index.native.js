@@ -80,22 +80,30 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 	const panGesture = Gesture.Pan()
 		.manualActivation( true )
 		.onTouchesDown( ( event ) => {
-			const { x = 0, y = 0 } = event.allTouches[ 0 ];
+			const firstEvent = event.allTouches.filter( ( item ) => {
+				return item.id === 0;
+			} )[ 0 ];
+			const { x = 0, y = 0 } = firstEvent;
 			initialPosition.x.value = x;
 			initialPosition.y.value = y;
 		} )
-		.onTouchesMove( ( _, state ) => {
+		.onTouchesMove( ( event, state ) => {
 			if ( ! isPanActive.value && isDragging.value ) {
 				isPanActive.value = true;
 				state.activate();
 			}
-		} )
-		.onUpdate( ( event ) => {
-			lastPosition.x.value = event.x;
-			lastPosition.y.value = event.y;
 
-			if ( onDragOver ) {
-				onDragOver( event );
+			if ( isPanActive.value && isDragging.value ) {
+				const firstEvent = event.allTouches.filter( ( item ) => {
+					return item.id === 0;
+				} )[ 0 ];
+
+				lastPosition.x.value = firstEvent.x;
+				lastPosition.y.value = firstEvent.y;
+
+				if ( onDragOver ) {
+					onDragOver( firstEvent );
+				}
 			}
 		} )
 		.onEnd( () => {
