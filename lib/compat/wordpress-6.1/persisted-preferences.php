@@ -10,7 +10,6 @@
  */
 function gutenberg_configure_persisted_preferences() {
 	global $wpdb;
-
 	$meta_key = $wpdb->get_blog_prefix() . 'persisted_preferences';
 	register_meta(
 		'user',
@@ -19,9 +18,10 @@ function gutenberg_configure_persisted_preferences() {
 			'type'         => 'object',
 			'single'       => true,
 			'show_in_rest' => array(
-				'name'   => 'persisted_preferences',
-				'type'   => 'object',
-				'schema' => array(
+				'name'    => 'persisted_preferences',
+				'type'    => 'object',
+				'context' => array( 'edit' ),
+				'schema'  => array(
 					'type'                 => 'object',
 					'properties'           => array(),
 					'additionalProperties' => true,
