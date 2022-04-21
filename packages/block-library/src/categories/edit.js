@@ -128,7 +128,7 @@ export default function CategoriesEdit( {
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Categories settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }

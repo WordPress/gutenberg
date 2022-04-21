@@ -75,7 +75,7 @@ export default function SpacerControls( {
 } ) {
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Spacer settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				{ orientation === 'horizontal' && (
 					<DimensionInput
 						label={ __( 'Width' ) }

@@ -69,7 +69,7 @@ function PostAuthorEdit( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Author Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					{ ! isDescendentOfQueryLoop && !! authors?.length && (
 						<SelectControl
 							label={ __( 'Author' ) }

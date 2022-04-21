@@ -5,7 +5,11 @@ import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Popover, Button, Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
-import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockContextProvider,
+	BlockBreadcrumb,
+	BlockStyles,
+} from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
 	ComplementaryArea,
@@ -43,7 +47,6 @@ import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 
 const interfaceLabels = {
-	secondarySidebar: __( 'Block Library' ),
 	drawer: __( 'Navigation Sidebar' ),
 };
 
@@ -176,6 +179,10 @@ function Editor( { onError } ) {
 		templateType !== undefined &&
 		entityId !== undefined;
 
+	const secondarySidebarLabel = isListViewOpen
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const secondarySidebar = () => {
 		if ( isInserterOpen ) {
 			return <InserterSidebar />;
@@ -208,7 +215,10 @@ function Editor( { onError } ) {
 										<KeyboardShortcuts.Register />
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
-											labels={ interfaceLabels }
+											labels={ {
+												...interfaceLabels,
+												secondarySidebar: secondarySidebarLabel,
+											} }
 											className={
 												showIconLabels &&
 												'show-icon-labels'
@@ -236,6 +246,7 @@ function Editor( { onError } ) {
 											content={
 												<>
 													<EditorNotices />
+													<BlockStyles.Slot scope="core/block-inspector" />
 													{ editorMode === 'visual' &&
 														template && (
 															<BlockEditor

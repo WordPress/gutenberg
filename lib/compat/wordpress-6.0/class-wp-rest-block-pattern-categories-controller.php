@@ -7,10 +7,6 @@
  * @since      6.0.0
  */
 
-if ( class_exists( 'WP_REST_Block_Pattern_Categories_Controller' ) ) {
-	return;
-}
-
 /**
  * Core class used to access block pattern categories via the REST API.
  *
@@ -26,7 +22,7 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 	 * @since 6.0.0
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'block-patterns/categories';
 	}
 
@@ -140,13 +136,13 @@ class WP_REST_Block_Pattern_Categories_Controller extends WP_REST_Controller {
 					'description' => __( 'The category name.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'label' => array(
 					'description' => __( 'The category label, in human readable format.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
-					'context'     => array( 'view', 'embed' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 			),
 		);

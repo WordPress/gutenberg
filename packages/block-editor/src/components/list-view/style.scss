@@ -46,11 +46,17 @@
 	}
 
 	// Border radius for corners of the selected item.
-	&.is-selected td:first-child {
-		border-radius: $radius-block-ui 0 0 $radius-block-ui;
+	&.is-first-selected td:first-child {
+		border-top-left-radius: $radius-block-ui;
 	}
-	&.is-selected td:last-child {
-		border-radius: 0 $radius-block-ui $radius-block-ui 0;
+	&.is-first-selected td:last-child {
+		border-top-right-radius: $radius-block-ui;
+	}
+	&.is-last-selected td:first-child {
+		border-bottom-left-radius: $radius-block-ui;
+	}
+	&.is-last-selected td:last-child {
+		border-bottom-right-radius: $radius-block-ui;
 	}
 	&.is-branch-selected:not(.is-selected) {
 		// Lighten a CSS variable without introducing a new SASS variable
@@ -58,18 +64,24 @@
 			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
 			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
 	}
-	&.is-branch-selected.is-selected td:first-child {
-		border-radius: $radius-block-ui 0 0 0;
+	&.is-branch-selected.is-first-selected td:first-child {
+		border-top-left-radius: $radius-block-ui;
 	}
-	&.is-branch-selected.is-selected td:last-child {
-		border-radius: 0 $radius-block-ui 0 0;
+	&.is-branch-selected.is-first-selected td:last-child {
+		border-top-right-radius: $radius-block-ui;
 	}
 	&[aria-expanded="false"] {
-		&.is-branch-selected.is-selected td:first-child {
-			border-radius: $radius-block-ui 0 0 $radius-block-ui;
+		&.is-branch-selected.is-first-selected td:first-child {
+			border-top-left-radius: $radius-block-ui;
 		}
-		&.is-branch-selected.is-selected td:last-child {
-			border-radius: 0 $radius-block-ui $radius-block-ui 0;
+		&.is-branch-selected.is-first-selected td:last-child {
+			border-top-right-radius: $radius-block-ui;
+		}
+		&.is-branch-selected.is-last-selected td:first-child {
+			border-bottom-left-radius: $radius-block-ui;
+		}
+		&.is-branch-selected.is-last-selected td:last-child {
+			border-bottom-right-radius: $radius-block-ui;
 		}
 	}
 	&.is-branch-selected:not(.is-selected) td {
@@ -167,17 +179,23 @@
 	.block-editor-list-view-block__mover-cell {
 		line-height: 0;
 		width: $button-size;
-		opacity: 0;
 		vertical-align: middle;
 		@include reduce-motion("transition");
+
+		> * {
+			opacity: 0;
+		}
 
 		// Show on hover, visible, and show above to keep the hit area size.
 		&:hover,
 		&.is-visible {
 			position: relative;
 			z-index: 1;
-			opacity: 1;
-			@include edit-post__fade-in-animation;
+
+			> * {
+				opacity: 1;
+				@include edit-post__fade-in-animation;
+			}
 		}
 
 		&,
