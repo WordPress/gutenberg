@@ -11,7 +11,7 @@ const { parseSourceString } = require( '../lib/config/parse-config' );
 const parseSourceStringOptions = { workDirectoryPath: '.' };
 const currentDirectory = _path.resolve( '.' );
 
-describe( 'parse-config', () => {
+describe( 'parseSourceString', () => {
 	it( 'returns null for null source', () => {
 		const wpSource = parseSourceString( null, {} );
 		expect( wpSource ).toBeNull();
@@ -20,32 +20,32 @@ describe( 'parse-config', () => {
 
 const gitTests = [
 	{
-		sourceString: 'git@github.com/owner/repo.git',
-		url: 'git@github.com/owner/repo.git',
+		sourceString: 'ssh://git@github.com/short.git',
+		url: 'ssh://git@github.com/short.git',
 		ref: 'master',
-		path: currentDirectory + '/owner/repo.git',
-		clonePath: currentDirectory + '/owner',
-		basename: 'repo.git',
+		path: currentDirectory + '/short',
+		clonePath: currentDirectory + '/short',
+		basename: 'short',
 	},
 	{
 		sourceString: 'ssh://git@github.com/owner/long/path/repo.git',
 		url: 'ssh://git@github.com/owner/long/path/repo.git',
 		ref: 'master',
-		path: currentDirectory + '/owner/long/path/repo.git',
-		clonePath: currentDirectory + '/owner/long/path',
-		basename: 'repo.git',
+		path: currentDirectory + '/owner/long/path/repo',
+		clonePath: currentDirectory + '/owner/long/path/repo',
+		basename: 'repo',
 	},
 	{
 		sourceString: 'git+ssh://git@github.com/owner/repo.git#kitchen-sink',
 		url: 'git+ssh://git@github.com/owner/repo.git',
 		ref: 'kitchen-sink',
-		path: currentDirectory + '/owner/repo.git',
-		clonePath: currentDirectory + '/owner',
-		basename: 'repo.git',
+		path: currentDirectory + '/owner/repo',
+		clonePath: currentDirectory + '/owner/repo',
+		basename: 'repo',
 	},
 ];
 
-describe.each( gitTests )( 'parse-config :: git', ( source ) => {
+describe.each( gitTests )( 'parseSourceString', ( source ) => {
 	it( `parses ${ source.sourceString }`, () => {
 		const { type, url, ref, path, clonePath, basename } = parseSourceString(
 			source.sourceString,
