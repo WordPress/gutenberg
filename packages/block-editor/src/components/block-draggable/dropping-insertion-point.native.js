@@ -108,17 +108,15 @@ export default function DroppingInsertionPoint( {
 			: null;
 
 		const elementsPositions = {
-			top: parseInt(
+			top: Math.floor(
 				previousElement
 					? previousElement.y + previousElement.height
-					: nextElement?.y,
-				10
+					: nextElement?.y
 			),
-			bottom: parseInt(
+			bottom: Math.floor(
 				nextElement
 					? nextElement.y
-					: previousElement.y + previousElement.height,
-				10
+					: previousElement.y + previousElement.height
 			),
 		};
 
