@@ -16,7 +16,10 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+import {
+	__experimentalUseDisabled as useDisabled,
+	useInstanceId,
+} from '@wordpress/compose';
 
 export default function PostCommentsEdit( {
 	attributes: { textAlign },
@@ -84,6 +87,8 @@ export default function PostCommentsEdit( {
 	} );
 
 	const disabledRef = useDisabled();
+
+	const textareaId = useInstanceId( PostCommentsEdit );
 
 	return (
 		<>
@@ -208,13 +213,14 @@ export default function PostCommentsEdit( {
 
 							<form className="comment-form" noValidate>
 								<p className="comment-form-comment">
-									<label htmlFor="comment">
+									<label
+										htmlFor={ `comment-${ textareaId }` }
+									>
 										{ __( 'Comment' ) }{ ' ' }
 										<span className="required">*</span>
 									</label>
 									<textarea
-										// eslint-disable-next-line no-restricted-syntax
-										id="comment"
+										id={ `comment-${ textareaId }` }
 										name="comment"
 										cols="45"
 										rows="8"
