@@ -994,7 +994,7 @@ export function getAutosave(
 	postType: string,
 	postId: number,
 	authorId: number
-): EntityRecord {
+): EntityRecord | undefined {
 	if ( authorId === undefined ) {
 		return;
 	}
