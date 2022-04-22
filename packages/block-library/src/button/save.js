@@ -60,8 +60,7 @@ export default function save( { attributes, className } ) {
 
 	return (
 		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
-			<ElementButton
-				frontEnd={ true }
+			<ElementButton.Content
 				tagName="a"
 				className={ buttonClasses }
 				href={ url }

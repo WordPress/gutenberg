@@ -18,10 +18,12 @@ export default class ElementButton extends Component {
 			return <button { ...newProps } />;
 		}
 
-		if ( this.props.frontEnd ) {
-			return <RichText.Content { ...newProps } />;
-		}
-
 		return <RichText { ...newProps } />;
 	}
+}
+
+ElementButton.Content = ( props ) => {
+	const newProps = { ...props };
+	newProps.className += ' wp-element-button';
+	return <RichText.Content { ...newProps } />;
 }
