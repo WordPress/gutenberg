@@ -618,7 +618,7 @@ export const getEditedEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: RecordKey
-	): EntityRecord => ( {
+	): EntityRecord | undefined => ( {
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
