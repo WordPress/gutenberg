@@ -309,7 +309,7 @@ export const getRawEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		key: string | number
-	): EntityRecord => {
+	): EntityRecord | undefined => {
 		const record = getEntityRecord( state, kind, name, key );
 		return (
 			record &&
