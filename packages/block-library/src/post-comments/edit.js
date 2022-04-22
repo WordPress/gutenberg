@@ -16,10 +16,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import {
-	__experimentalUseDisabled as useDisabled,
-	useInstanceId,
-} from '@wordpress/compose';
+import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import CommentsForm from '../post-comments-form/form';
 
 export default function PostCommentsEdit( {
 	attributes: { textAlign },
@@ -87,8 +89,6 @@ export default function PostCommentsEdit( {
 	} );
 
 	const disabledRef = useDisabled();
-
-	const textareaId = useInstanceId( PostCommentsEdit );
 
 	return (
 		<>
@@ -206,37 +206,7 @@ export default function PostCommentsEdit( {
 							</div>
 						</div>
 
-						<div className="comment-respond">
-							<h3 className="comment-reply-title">
-								{ __( 'Leave a Reply' ) }
-							</h3>
-
-							<form className="comment-form" noValidate>
-								<p className="comment-form-comment">
-									<label
-										htmlFor={ `comment-${ textareaId }` }
-									>
-										{ __( 'Comment' ) }{ ' ' }
-										<span className="required">*</span>
-									</label>
-									<textarea
-										id={ `comment-${ textareaId }` }
-										name="comment"
-										cols="45"
-										rows="8"
-										required
-									/>
-								</p>
-								<p className="form-submit wp-block-button">
-									<input
-										name="submit"
-										type="submit"
-										className="submit wp-block-button__link"
-										value={ __( 'Post Comment' ) }
-									/>
-								</p>
-							</form>
-						</div>
+						<CommentsForm />
 					</div>
 				) }
 			</div>
