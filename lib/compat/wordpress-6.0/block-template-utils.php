@@ -8,17 +8,17 @@
  */
 
 /**
- * Filters theme directories that should be ignored during export.
+ * Filters theme files and folders that should be ignored during export.
  *
  * @since 6.0.0
  *
  * @param string $path The path of the file in the theme.
- * @return Bool Whether this file is in an ignored directory.
+ * @return Bool Whether this file is ignored.
  */
-function gutenberg_is_theme_file_ignored( $path ) {
-	$directories_to_ignore = array( '.DS_Store', '.svn', '.git', '.hg', '.bzr', 'node_modules', 'vendor' );
-	foreach ( $directories_to_ignore as $directory ) {
-		if ( strpos( $path, $directory ) === 0 ) {
+function gutenberg_is_theme_directory_ignored( $path ) {
+	$ignore_list = array( '.DS_Store', '.svn', '.git', '.hg', '.bzr', 'node_modules', 'vendor' );
+	foreach ( $ignore_list as $ignored ) {
+		if ( strpos( $path, $ignored ) === 0 ) {
 			return true;
 		}
 	}
@@ -70,7 +70,7 @@ function gutenberg_generate_block_templates_export_file() {
 			$file_path     = wp_normalize_path( $file );
 			$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
 
-			if ( ! gutenberg_is_theme_file_ignored( $relative_path ) ) {
+			if ( ! gutenberg_is_theme_directory_ignored( $relative_path ) ) {
 				$zip->addFile( $file_path, $relative_path );
 			}
 		}
