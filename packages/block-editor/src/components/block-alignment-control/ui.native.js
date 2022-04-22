@@ -1,17 +1,11 @@
 /**
- * External dependencies
- */
-import classNames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
-	MenuGroup,
-	MenuItem,
+	BottomSheetSelectControl,
 } from '@wordpress/components';
 import {
 	alignNone,
@@ -21,7 +15,6 @@ import {
 	stretchFullWidth,
 	stretchWide,
 } from '@wordpress/icons';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -67,6 +60,7 @@ function BlockAlignmentUI( {
 	controls,
 	isToolbar,
 	isCollapsed = true,
+	isBottomSheetControl = false,
 } ) {
 	const enabledControls = useAvailableAlignments( controls );
 	const hasEnabledControls = !! enabledControls.length;
@@ -83,81 +77,44 @@ function BlockAlignmentUI( {
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
-	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	const toolbarUIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	const UIComponent = isBottomSheetControl
+		? BottomSheetSelectControl
+		: toolbarUIComponent;
+
 	const commonProps = {
 		popoverProps: POPOVER_PROPS,
-		icon: activeAlignmentControl
-			? activeAlignmentControl.icon
-			: defaultAlignmentControl.icon,
 		label: __( 'Align' ),
 		toggleProps: { describedBy: __( 'Change alignment' ) },
 	};
-	const extraProps =
-		isToolbar || Platform.isNative
-			? {
-					isCollapsed: isToolbar ? isCollapsed : undefined,
-					controls: enabledControls.map(
-						( { name: controlName } ) => {
-							return {
-								...BLOCK_ALIGNMENTS_CONTROLS[ controlName ],
-								isActive:
-									value === controlName ||
-									( ! value && controlName === 'none' ),
-								role: isCollapsed ? 'menuitemradio' : undefined,
-								onClick: () => onChangeAlignment( controlName ),
-							};
-						}
-					),
-			  }
-			: {
-					children: ( { onClose } ) => {
-						return (
-							<>
-								<MenuGroup className="block-editor-block-alignment-control__menu-group">
-									{ enabledControls.map(
-										( { name: controlName, info } ) => {
-											const {
-												icon,
-												title,
-											} = BLOCK_ALIGNMENTS_CONTROLS[
-												controlName
-											];
-											// If no value is provided, mark as selected the `none` option.
-											const isSelected =
-												controlName === value ||
-												( ! value &&
-													controlName === 'none' );
-											return (
-												<MenuItem
-													key={ controlName }
-													icon={ icon }
-													iconPosition="left"
-													className={ classNames(
-														'components-dropdown-menu__menu-item',
-														{
-															'is-active': isSelected,
-														}
-													) }
-													isSelected={ isSelected }
-													onClick={ () => {
-														onChangeAlignment(
-															controlName
-														);
-														onClose();
-													} }
-													role="menuitemradio"
-													info={ info }
-												>
-													{ title }
-												</MenuItem>
-											);
-										}
-									) }
-								</MenuGroup>
-							</>
-						);
-					},
-			  };
+	const extraProps = isBottomSheetControl
+		? {
+				options: enabledControls.map( ( { name: controlName } ) => {
+					const control = BLOCK_ALIGNMENTS_CONTROLS[ controlName ];
+					return {
+						value: controlName,
+						label: control.title,
+						icon: control.icon,
+					};
+				} ),
+				value: activeAlignmentControl ? value : 'none',
+				onChange: ( align ) => onChangeAlignment( align ),
+		  }
+		: {
+				icon: activeAlignmentControl
+					? activeAlignmentControl.icon
+					: defaultAlignmentControl.icon,
+				isCollapsed: isToolbar ? isCollapsed : undefined,
+				controls: enabledControls.map( ( { name: controlName } ) => {
+					return {
+						...BLOCK_ALIGNMENTS_CONTROLS[ controlName ],
+						isActive:
+							value === controlName ||
+							( ! value && controlName === 'none' ),
+						onClick: () => onChangeAlignment( controlName ),
+					};
+				} ),
+		  };
 
 	return <UIComponent { ...commonProps } { ...extraProps } />;
 }
