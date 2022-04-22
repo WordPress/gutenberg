@@ -12,7 +12,10 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { postList as icon } from '@wordpress/icons';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	BlockAlignmentControl,
+} from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import {
 	Icon,
@@ -20,7 +23,6 @@ import {
 	ToggleControl,
 	RangeControl,
 	QueryControls,
-	BottomSheetSelectControl,
 } from '@wordpress/components';
 import { store as blocksStore } from '@wordpress/blocks';
 
@@ -28,11 +30,7 @@ import { store as blocksStore } from '@wordpress/blocks';
  * Internal dependencies
  */
 import styles from './style.scss';
-import {
-	MIN_EXCERPT_LENGTH,
-	MAX_EXCERPT_LENGTH,
-	BLOCK_ALIGNMENTS_CONTROLS,
-} from './constants';
+import { MIN_EXCERPT_LENGTH, MAX_EXCERPT_LENGTH } from './constants';
 
 class LatestPostsEdit extends Component {
 	constructor() {
@@ -207,11 +205,10 @@ class LatestPostsEdit extends Component {
 					/>
 					{ displayFeaturedImage && (
 						<>
-							<BottomSheetSelectControl
-								label={ __( 'Image alignment' ) }
-								options={ BLOCK_ALIGNMENTS_CONTROLS }
-								onChange={ this.onSetFeaturedImageAlign }
+							<BlockAlignmentControl
 								value={ featuredImageAlign }
+								onChange={ this.onSetFeaturedImageAlign }
+								controls={ [ 'left', 'center', 'right' ] }
 							/>
 							<ToggleControl
 								label={ __( 'Add link to featured image' ) }
