@@ -40,7 +40,7 @@ export default function debounceAsync( func, delayMS ) {
 		// Clear any active timeouts, abandoning any requests that have
 		// been queued but not been made.
 		if ( timeoutId ) {
-			window.clearTimeout( timeoutId );
+			clearTimeout( timeoutId );
 			timeoutId = null;
 		}
 
