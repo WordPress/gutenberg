@@ -113,16 +113,20 @@ const transforms = {
 					...attributes,
 					backgroundColor: undefined,
 					gradient: undefined,
-					style: attributes?.style
-						? {
-								...attributes?.style,
-								color: {
-									...attributes?.style?.color,
-									background: undefined,
-									gradient: undefined,
-								},
-						  }
-						: undefined,
+					style:
+						attributes?.customOverlayColor ||
+						attributes?.customGradient ||
+						attributes?.style?.color
+							? {
+									...attributes?.style,
+									color: {
+										background:
+											attributes?.customOverlayColor,
+										gradient: attributes?.customGradient,
+										...attributes?.style?.color,
+									},
+							  }
+							: undefined,
 				};
 
 				// Preserve the block by nesting it within the Cover block,
