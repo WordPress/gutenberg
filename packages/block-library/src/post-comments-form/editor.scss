@@ -1,25 +1,3 @@
-.wp-block-post-comments-form {
-	textarea {
-		padding: calc(0.667em + 2px);
-		border: 1px solid $gray-600;
-		font-size: 1em;
-		font-family: inherit;
-	}
-
-	.comment-form {
-		textarea,
-		label {
-			display: block;
-			margin-bottom: 0.25em;
-		}
-	}
-
-	input[name="submit"] {
-		border: none;
-		box-shadow: none;
-		cursor: pointer;
-		display: inline-block;
-		text-align: center;
-		overflow-wrap: break-word;
-	}
+.wp-block-post-comments-form * {
+	pointer-events: none;
 }
