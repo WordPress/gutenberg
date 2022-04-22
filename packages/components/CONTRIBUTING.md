@@ -517,6 +517,6 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
     5. Comment out all existing stories.
     6. Create a default template, where the component is being used in the most “vanilla” way possible.
     7. Use the template for the `Default` story, which will serve as an interactive doc playground.
-    8. Add more focused stories as you see fit. These non-default stories should illustrate specific scenarios and usages of the component.
+    8. Add more focused stories as you see fit. These non-default stories should illustrate specific scenarios and usages of the component. A developer looking at the Docs tab should be able to understand what each story is demonstrating. Add JSDoc comments to stories when necessary.
 10. Convert unit tests.
     1. TBD
