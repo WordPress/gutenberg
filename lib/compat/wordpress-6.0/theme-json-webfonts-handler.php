@@ -55,13 +55,20 @@ if ( ! function_exists( '_wp_theme_json_webfonts_handler' ) ) {
 						continue;
 					}
 
-					$settings['typography']                          = empty( $settings['typography'] ) ? array() : $settings['typography'];
-					$settings['typography']['fontFamilies']          = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
-					$settings['typography']['fontFamilies']['theme'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies']['theme'];
-					$settings['typography']['fontFamilies']['theme'] = array_merge( $settings['typography']['fontFamilies']['theme'], $variation['settings']['typography']['fontFamilies']['theme'] );
+					// Initialize the array structure.
+					if ( empty( $settings['typography'] ) ) {
+						$settings['typography'] = array();
+					}
+					if ( empty( $settings['typography']['fontFamilies'] ) ) {
+						$settings['typography']['fontFamilies'] = array();
+					}
+					if ( empty( $settings['typography']['fontFamilies']['theme'] ) ) {
+						$settings['typography']['fontFamilies']['theme'] = array();
+					}
 
-					// Make sure there are no duplicates.
-					$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
+					// Combine variations with settings. Remove duplicates.
+					$settings['typography']['fontFamilies']['theme'] = array_merge( $settings['typography']['fontFamilies']['theme'], $variation['settings']['typography']['fontFamilies']['theme'] );
+					$settings['typography']['fontFamilies']          = array_unique( $settings['typography']['fontFamilies'] );
 				}
 			}
 
