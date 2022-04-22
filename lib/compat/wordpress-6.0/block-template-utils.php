@@ -13,7 +13,7 @@
  * @since 6.0.0
  *
  * @param string $path The path of the file in the theme.
- * @return Bool Whether this file is ignored.
+ * @return Bool Whether this file or directory is ignored.
  */
 function gutenberg_is_theme_directory_ignored( $path ) {
 	$ignore_list = array( '.DS_Store', '.svn', '.git', '.hg', '.bzr', 'node_modules', 'vendor' );
