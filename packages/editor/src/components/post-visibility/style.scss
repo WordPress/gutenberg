@@ -1,27 +1,22 @@
-.edit-post-post-visibility__dialog .components-popover__content {
-	min-width: 260px;
-}
+.editor-post-visibility__fieldset {
+	padding: $grid-unit-20;
 
-.edit-post-post-visibility__dialog,
-.editor-post-visibility__dialog-fieldset {
-	padding: $grid-unit-10;
-
-	.editor-post-visibility__dialog-legend {
+	.editor-post-visibility__legend {
 		font-weight: 600;
 		margin-top: 1em;
 		padding: 0;
 	}
 
-	.editor-post-visibility__dialog-radio[type="radio"] {
+	.editor-post-visibility__radio[type="radio"] {
 		@include radio-control;
 		margin-top: 2px;
 	}
 
-	.editor-post-visibility__dialog-label {
+	.editor-post-visibility__label {
 		font-weight: 600;
 	}
 
-	.editor-post-visibility__dialog-info {
+	.editor-post-visibility__info {
 		margin-top: 0.5em;
 		margin-left: $grid-unit-15 + $radio-input-size-sm;
 
@@ -31,13 +26,11 @@
 	}
 
 	// Remove bottom margin on the last label only.
-	.editor-post-visibility__choice:last-child .editor-post-visibility__dialog-info {
+	.editor-post-visibility__choice:last-child .editor-post-visibility__info {
 		margin-bottom: 0;
 	}
-}
 
-.editor-post-visibility__dialog-password {
-	.editor-post-visibility__dialog-password-input[type="text"] {
+	.editor-post-visibility__password .editor-post-visibility__password-input[type="text"] {
 		@include input-control;
 		margin-left: $grid-unit * 4;
 		width: calc(100% - #{$grid-unit * 4});

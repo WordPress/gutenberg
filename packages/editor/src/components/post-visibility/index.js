@@ -93,9 +93,9 @@ export class PostVisibility extends Component {
 		return [
 			<fieldset
 				key="visibility-selector"
-				className="editor-post-visibility__dialog-fieldset"
+				className="editor-post-visibility__fieldset"
 			>
-				<legend className="editor-post-visibility__dialog-legend">
+				<legend className="editor-post-visibility__legend">
 					{ __( 'Visibility' ) }
 				</legend>
 				<p>{ __( 'Control how this post is viewed.' ) }</p>
@@ -112,18 +112,18 @@ export class PostVisibility extends Component {
 							checked={ visibilityHandlers[ value ].checked }
 							id={ `editor-post-${ value }-${ instanceId }` }
 							aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
-							className="editor-post-visibility__dialog-radio"
+							className="editor-post-visibility__radio"
 						/>
 						<label
 							htmlFor={ `editor-post-${ value }-${ instanceId }` }
-							className="editor-post-visibility__dialog-label"
+							className="editor-post-visibility__label"
 						>
 							{ label }
 						</label>
 						{
 							<p
 								id={ `editor-post-${ value }-${ instanceId }-description` }
-								className="editor-post-visibility__dialog-info"
+								className="editor-post-visibility__info"
 							>
 								{ info }
 							</p>
@@ -131,16 +131,16 @@ export class PostVisibility extends Component {
 					</div>
 				) ) }
 				{ this.state.hasPassword && (
-					<div className="editor-post-visibility__dialog-password">
+					<div className="editor-post-visibility__password">
 						<VisuallyHidden
 							as="label"
-							htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+							htmlFor={ `editor-post-visibility__password-input-${ instanceId }` }
 						>
 							{ __( 'Create password' ) }
 						</VisuallyHidden>
 						<input
-							className="editor-post-visibility__dialog-password-input"
-							id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+							className="editor-post-visibility__password-input"
+							id={ `editor-post-visibility__password-input-${ instanceId }` }
 							type="text"
 							onChange={ this.updatePassword }
 							value={ password }
