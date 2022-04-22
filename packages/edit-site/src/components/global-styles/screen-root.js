@@ -44,16 +44,20 @@ function ScreenRoot() {
 						</CardMedia>
 					</Card>
 					{ !! variations?.length && (
-						<NavigationButton path="/variations">
-							<HStack justify="space-between">
-								<FlexItem>{ __( 'Browse styles' ) }</FlexItem>
-								<IconWithCurrentColor
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
-								/>
-							</HStack>
-						</NavigationButton>
+						<ItemGroup>
+							<NavigationButton path="/variations">
+								<HStack justify="space-between">
+									<FlexItem>
+										{ __( 'Browse styles' ) }
+									</FlexItem>
+									<IconWithCurrentColor
+										icon={
+											isRTL() ? chevronLeft : chevronRight
+										}
+									/>
+								</HStack>
+							</NavigationButton>
+						</ItemGroup>
 					) }
 					<ContextMenu />
 				</VStack>
