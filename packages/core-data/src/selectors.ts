@@ -808,7 +808,7 @@ export function getUndoEdit( state: State ): any | undefined {
  *
  * @return The edit.
  */
-export function getRedoEdit( state: State ): Object {
+export function getRedoEdit( state: State ): any | undefined {
 	return state.undo[ state.undo.length + getCurrentUndoOffset( state ) ];
 }
 
