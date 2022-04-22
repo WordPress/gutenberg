@@ -16,6 +16,15 @@
 function render_block_core_post_comments( $attributes, $content, $block ) {
 	global $post;
 
+	// Do we have child blocks?
+	if ( count( $block->inner_blocks ) > 0 ) {
+		$inner_blocks_html = '';
+		foreach ( $block->inner_blocks as $inner_block ) {
+			$inner_blocks_html .= $inner_block->render();
+		}
+		return $inner_blocks_html;
+	}
+
 	$post_id = $block->context['postId'];
 	if ( ! isset( $post_id ) ) {
 		return '';
