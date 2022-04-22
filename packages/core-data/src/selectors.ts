@@ -1089,7 +1089,7 @@ export function __experimentalGetTemplateForLink(
  */
 export function __experimentalGetCurrentThemeBaseGlobalStyles(
 	state: State
-): Object | null {
+): any | null {
 	const currentTheme = getCurrentTheme( state );
 	if ( ! currentTheme ) {
 		return null;
