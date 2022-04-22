@@ -197,7 +197,12 @@ function BlockPopoverInbetween( {
 			) }
 			__unstableForcePosition
 		>
-			<div style={ style }>{ children }</div>
+			<div
+				className="block-editor-block-popover__inbetween-container"
+				style={ style }
+			>
+				{ children }
+			</div>
 		</Popover>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
