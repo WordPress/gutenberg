@@ -16,7 +16,7 @@
  * @return Bool Whether this file is in an ignored directory.
  */
 function gutenberg_is_theme_directory_ignored( $path ) {
-	$directories_to_ignore = array( '.svn', '.git', '.hg', '.bzr', 'node_modules', 'vendor' );
+	$directories_to_ignore = array( '.DS_Store', '.svn', '.git', '.hg', '.bzr', 'node_modules', 'vendor' );
 	foreach ( $directories_to_ignore as $directory ) {
 		if ( strpos( $path, $directory ) === 0 ) {
 			return true;
