@@ -142,7 +142,10 @@ export default function Header( {
 							<RedoButton />
 							<Button
 								className="edit-site-header-toolbar__list-view-toggle"
-								disabled={ ! isVisualMode }
+								disabled={
+									! isVisualMode &&
+									blockEditorMode === 'exploded'
+								}
 								icon={ listView }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
