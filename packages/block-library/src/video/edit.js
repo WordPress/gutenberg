@@ -61,7 +61,8 @@ function VideoEdit( {
 	const { id, caption, controls, poster, src, tracks } = attributes;
 	const isTemporaryVideo = ! id && isBlobURL( src );
 	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+		[]
 	);
 
 	useEffect( () => {
