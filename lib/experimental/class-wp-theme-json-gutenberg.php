@@ -14,12 +14,8 @@
  *
  * @access private
  */
-<<<<<<< HEAD
+
 class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
-
-=======
-class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_0 {
-
 	const ELEMENTS = array(
 		'link' => 'a',
 		'h1'   => 'h1',
@@ -30,5 +26,4 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_0 {
 		'h6'   => 'h6',
 		'button' => '.wp-element-button',
 	);
->>>>>>> 3236c0a7f9 (Rename to ElementButton)
 }
