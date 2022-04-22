@@ -8,11 +8,15 @@ import { Component } from '@wordpress/element';
  */
 import RichText from '../rich-text';
 
+const getElementProps = ( props ) => {
+	const newProps = { ...props };
+	newProps.className += ' wp-element-button';
+	return newProps;
+}
+
 export default class ElementButton extends Component {
 	render() {
-		const newProps = { ...this.props };
-		newProps.className += ' wp-element-button';
-
+		const newProps = getElementProps( this.props );
 		// If children are set then we only need a button, not RichText.
 		if ( newProps.children ) {
 			return <button { ...newProps } />;
@@ -23,7 +27,6 @@ export default class ElementButton extends Component {
 }
 
 ElementButton.Content = ( props ) => {
-	const newProps = { ...props };
-	newProps.className += ' wp-element-button';
+	const newProps = getElementProps( props );
 	return <RichText.Content { ...newProps } />;
-}
+};
