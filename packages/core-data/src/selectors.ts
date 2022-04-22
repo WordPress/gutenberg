@@ -397,7 +397,7 @@ export function getEntityRecords(
 	kind: string,
 	name: string,
 	query?: EntityQuery< any >
-): Array< EntityRecord > {
+): Array< EntityRecord > | undefined {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState = get( state.entities.records, [
