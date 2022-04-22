@@ -865,7 +865,7 @@ export function __experimentalGetCurrentGlobalStylesId( state: State ): string {
  *
  * @return Index data.
  */
-export function getThemeSupports( state: State ): Object {
+export function getThemeSupports( state: State ): any {
 	return getCurrentTheme( state )?.theme_supports ?? EMPTY_OBJECT;
 }
 
