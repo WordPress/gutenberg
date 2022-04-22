@@ -12,6 +12,7 @@ import {
 	Warning,
 	useBlockProps,
 	store as blockEditorStore,
+	InnerBlocks,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -27,6 +28,7 @@ export default function PostCommentsEdit( {
 	attributes: { textAlign },
 	setAttributes,
 	context: { postType, postId },
+	clientId,
 } ) {
 	let [ postTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	postTitle = postTitle || __( 'Post Title' );
@@ -42,6 +44,10 @@ export default function PostCommentsEdit( {
 		( select ) =>
 			select( blockEditorStore ).getSettings()
 				.__experimentalDiscussionSettings
+	);
+
+	const innerBlocks = useSelect( ( select ) =>
+		select( blockEditorStore ).getBlocks( clientId )
 	);
 
 	const isSiteEditor = postType === undefined || postId === undefined;
@@ -89,6 +95,10 @@ export default function PostCommentsEdit( {
 	} );
 
 	const disabledRef = useDisabled();
+
+	if ( innerBlocks.length > 0 ) {
+		return <InnerBlocks />;
+	}
 
 	return (
 		<>
