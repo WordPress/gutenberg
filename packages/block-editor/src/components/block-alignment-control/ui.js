@@ -13,6 +13,7 @@ import {
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
@@ -56,7 +57,7 @@ function BlockAlignmentUI( {
 	};
 	const extraProps = isToolbar
 		? {
-				isCollapsed: isToolbar ? isCollapsed : undefined,
+				isCollapsed,
 				controls: enabledControls.map( ( { name: controlName } ) => {
 					return {
 						...BLOCK_ALIGNMENTS_CONTROLS[ controlName ],
