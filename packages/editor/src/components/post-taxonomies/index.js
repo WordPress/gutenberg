@@ -28,7 +28,7 @@ export function PostTaxonomies( {
 	);
 	const visibleTaxonomies = filter(
 		availableTaxonomies,
-		( taxonomy ) => taxonomy.visibility.show_ui
+		( taxonomy ) => taxonomy.visibility?.show_ui
 	);
 	return visibleTaxonomies.map( ( taxonomy ) => {
 		const TaxonomyComponent = taxonomy.hierarchical
