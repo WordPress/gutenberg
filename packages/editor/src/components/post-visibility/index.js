@@ -6,9 +6,11 @@ import { Component } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	__experimentalConfirmDialog as ConfirmDialog,
+	Button,
 } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { close as closeIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -73,7 +75,7 @@ export class PostVisibility extends Component {
 	}
 
 	render() {
-		const { visibility, password, instanceId } = this.props;
+		const { visibility, password, instanceId, onClose } = this.props;
 
 		const visibilityHandlers = {
 			public: {
@@ -90,74 +92,82 @@ export class PostVisibility extends Component {
 			},
 		};
 
-		return [
-			<fieldset
-				key="visibility-selector"
-				className="editor-post-visibility__fieldset"
-			>
-				<legend className="editor-post-visibility__legend">
-					{ __( 'Visibility' ) }
-				</legend>
-				<p>{ __( 'Control how this post is viewed.' ) }</p>
-				{ visibilityOptions.map( ( { value, label, info } ) => (
-					<div
-						key={ value }
-						className="editor-post-visibility__choice"
-					>
-						<input
-							type="radio"
-							name={ `editor-post-visibility__setting-${ instanceId }` }
-							value={ value }
-							onChange={ visibilityHandlers[ value ].onSelect }
-							checked={ visibilityHandlers[ value ].checked }
-							id={ `editor-post-${ value }-${ instanceId }` }
-							aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
-							className="editor-post-visibility__radio"
-						/>
-						<label
-							htmlFor={ `editor-post-${ value }-${ instanceId }` }
-							className="editor-post-visibility__label"
+		return (
+			<>
+				<Button
+					className="editor-post-visibility__close"
+					isSmall
+					icon={ closeIcon }
+					onClick={ onClose }
+				/>
+				<fieldset className="editor-post-visibility__fieldset">
+					<legend className="editor-post-visibility__legend">
+						{ __( 'Visibility' ) }
+					</legend>
+					<p>{ __( 'Control how this post is viewed.' ) }</p>
+					{ visibilityOptions.map( ( { value, label, info } ) => (
+						<div
+							key={ value }
+							className="editor-post-visibility__choice"
 						>
-							{ label }
-						</label>
-						{
-							<p
-								id={ `editor-post-${ value }-${ instanceId }-description` }
-								className="editor-post-visibility__info"
+							<input
+								type="radio"
+								name={ `editor-post-visibility__setting-${ instanceId }` }
+								value={ value }
+								onChange={
+									visibilityHandlers[ value ].onSelect
+								}
+								checked={ visibilityHandlers[ value ].checked }
+								id={ `editor-post-${ value }-${ instanceId }` }
+								aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
+								className="editor-post-visibility__radio"
+							/>
+							<label
+								htmlFor={ `editor-post-${ value }-${ instanceId }` }
+								className="editor-post-visibility__label"
 							>
-								{ info }
-							</p>
-						}
-					</div>
-				) ) }
-				{ this.state.hasPassword && (
-					<div className="editor-post-visibility__password">
-						<VisuallyHidden
-							as="label"
-							htmlFor={ `editor-post-visibility__password-input-${ instanceId }` }
-						>
-							{ __( 'Create password' ) }
-						</VisuallyHidden>
-						<input
-							className="editor-post-visibility__password-input"
-							id={ `editor-post-visibility__password-input-${ instanceId }` }
-							type="text"
-							onChange={ this.updatePassword }
-							value={ password }
-							placeholder={ __( 'Use a secure password' ) }
-						/>
-					</div>
-				) }
-			</fieldset>,
-			<ConfirmDialog
-				key="private-publish-confirmation"
-				isOpen={ this.state.showPrivateConfirmDialog }
-				onConfirm={ this.confirmPrivate }
-				onCancel={ this.handleDialogCancel }
-			>
-				{ __( 'Would you like to privately publish this post now?' ) }
-			</ConfirmDialog>,
-		];
+								{ label }
+							</label>
+							{
+								<p
+									id={ `editor-post-${ value }-${ instanceId }-description` }
+									className="editor-post-visibility__info"
+								>
+									{ info }
+								</p>
+							}
+						</div>
+					) ) }
+					{ this.state.hasPassword && (
+						<div className="editor-post-visibility__password">
+							<VisuallyHidden
+								as="label"
+								htmlFor={ `editor-post-visibility__password-input-${ instanceId }` }
+							>
+								{ __( 'Create password' ) }
+							</VisuallyHidden>
+							<input
+								className="editor-post-visibility__password-input"
+								id={ `editor-post-visibility__password-input-${ instanceId }` }
+								type="text"
+								onChange={ this.updatePassword }
+								value={ password }
+								placeholder={ __( 'Use a secure password' ) }
+							/>
+						</div>
+					) }
+				</fieldset>
+				<ConfirmDialog
+					isOpen={ this.state.showPrivateConfirmDialog }
+					onConfirm={ this.confirmPrivate }
+					onCancel={ this.handleDialogCancel }
+				>
+					{ __(
+						'Would you like to privately publish this post now?'
+					) }
+				</ConfirmDialog>
+			</>
+		);
 	}
 }
 

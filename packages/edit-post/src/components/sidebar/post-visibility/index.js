@@ -34,7 +34,9 @@ export function PostVisibility() {
 									<PostVisibilityLabel />
 								</Button>
 							) }
-							renderContent={ () => <PostVisibilityForm /> }
+							renderContent={ ( { onClose } ) => (
+								<PostVisibilityForm onClose={ onClose } />
+							) }
 						/>
 					) }
 				</PanelRow>
