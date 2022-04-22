@@ -224,16 +224,20 @@ const transforms = {
 				const transformedColorAttributes = {
 					backgroundColor: attributes?.overlayColor,
 					gradient: attributes?.gradient,
-					style: attributes?.style
-						? {
-								...attributes?.style,
-								color: {
-									background: attributes?.customOverlayColor,
-									gradient: attributes?.customGradient,
-									...attributes?.style?.color,
-								},
-						  }
-						: undefined,
+					style:
+						attributes?.customOverlayColor ||
+						attributes?.customGradient ||
+						attributes?.style?.color
+							? {
+									...attributes?.style,
+									color: {
+										background:
+											attributes?.customOverlayColor,
+										gradient: attributes?.customGradient,
+										...attributes?.style?.color,
+									},
+							  }
+							: undefined,
 				};
 
 				// If the Cover block contains only a single Group block as a direct child,
@@ -251,16 +255,20 @@ const transforms = {
 						{
 							...transformedColorAttributes,
 							...groupAttributes,
-							style: groupAttributes?.style
-								? {
-										...groupAttributes?.style,
-										color: {
-											...transformedColorAttributes?.style
-												?.color,
-											...groupAttributes?.style?.color,
-										},
-								  }
-								: undefined,
+							style:
+								attributes?.customOverlayColor ||
+								attributes?.customGradient ||
+								attributes?.style?.color
+									? {
+											...groupAttributes?.style,
+											color: {
+												...transformedColorAttributes
+													?.style?.color,
+												...groupAttributes?.style
+													?.color,
+											},
+									  }
+									: undefined,
 						},
 						innerBlocks[ 0 ]?.innerBlocks
 					);
