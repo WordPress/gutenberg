@@ -6,59 +6,22 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
-import {
-	alignNone,
-	positionCenter,
-	positionLeft,
-	positionRight,
-	stretchFullWidth,
-	stretchWide,
-} from '@wordpress/icons';
-
 /**
  * Internal dependencies
  */
 import useAvailableAlignments from './use-available-alignments';
-
-const BLOCK_ALIGNMENTS_CONTROLS = {
-	none: {
-		icon: alignNone,
-		title: _x( 'None', 'Alignment option' ),
-	},
-	left: {
-		icon: positionLeft,
-		title: __( 'Align left' ),
-	},
-	center: {
-		icon: positionCenter,
-		title: __( 'Align center' ),
-	},
-	right: {
-		icon: positionRight,
-		title: __( 'Align right' ),
-	},
-	wide: {
-		icon: stretchWide,
-		title: __( 'Wide width' ),
-	},
-	full: {
-		icon: stretchFullWidth,
-		title: __( 'Full width' ),
-	},
-};
-
-const DEFAULT_CONTROL = 'none';
-
-const POPOVER_PROPS = {
-	isAlternate: true,
-};
+import {
+	BLOCK_ALIGNMENTS_CONTROLS,
+	DEFAULT_CONTROL,
+	POPOVER_PROPS,
+} from './constants';
 
 function BlockAlignmentUI( {
 	value,

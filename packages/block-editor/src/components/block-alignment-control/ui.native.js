@@ -7,52 +7,16 @@ import {
 	ToolbarGroup,
 	BottomSheetSelectControl,
 } from '@wordpress/components';
-import {
-	alignNone,
-	positionCenter,
-	positionLeft,
-	positionRight,
-	stretchFullWidth,
-	stretchWide,
-} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import useAvailableAlignments from './use-available-alignments';
-
-const BLOCK_ALIGNMENTS_CONTROLS = {
-	none: {
-		icon: alignNone,
-		title: __( 'None' ),
-	},
-	left: {
-		icon: positionLeft,
-		title: __( 'Align left' ),
-	},
-	center: {
-		icon: positionCenter,
-		title: __( 'Align center' ),
-	},
-	right: {
-		icon: positionRight,
-		title: __( 'Align right' ),
-	},
-	wide: {
-		icon: stretchWide,
-		title: __( 'Wide width' ),
-	},
-	full: {
-		icon: stretchFullWidth,
-		title: __( 'Full width' ),
-	},
-};
-
-const DEFAULT_CONTROL = 'none';
-
-const POPOVER_PROPS = {
-	isAlternate: true,
-};
+import {
+	BLOCK_ALIGNMENTS_CONTROLS,
+	DEFAULT_CONTROL,
+	POPOVER_PROPS,
+} from './constants';
 
 function BlockAlignmentUI( {
 	value,
