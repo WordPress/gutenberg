@@ -151,7 +151,7 @@ export function getEntitiesByKind(
 export function getEntitiesConfig(
 	state: State,
 	kind: string
-): Array< Object > {
+): Array< any > {
 	return filter( state.entities.config, { kind } );
 }
 
