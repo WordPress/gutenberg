@@ -502,12 +502,13 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
     6. Use `WordPressComponent` type if possible.
     7. Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README. Add `@default` values where appropriate.
     8. Prefer `unknown` to `any`, and in general avoid it when possible.
-8. Make sure:
+8. On the component's main export, add a JSDoc comment that includes the main description and `@example` code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/943cec92f21fedcd256502ea72d9903941f3b05a/packages/components/src/unit-control/index.tsx#L290-L306))
+9. Make sure:
     1. Tests still pass.
     2. Storybook example works as expected.
     3. Usage in Gutenberg works as expected.
     4. `types.ts` docs and README docs are aligned.
-9. Convert Storybook examples to TypeScript (and from knobs to controls, if necessary) ([example](https://github.com/WordPress/gutenberg/pull/39320)).
+10. Convert Storybook examples to TypeScript (and from knobs to controls, if necessary) ([example](https://github.com/WordPress/gutenberg/pull/39320)).
     1. Update all consumers of the component to potentially extend the newly added types (e.g. make `UnitControl` props extend `NumberControl` props after `NumberControl` types are made available).
     2. Add a named export for the unconnected, un-forwarded component.
     3. Rename Story extension from `.js` to `.tsx`.
@@ -518,5 +519,5 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
     6. Create a default template, where the component is being used in the most “vanilla” way possible.
     7. Use the template for the `Default` story, which will serve as an interactive doc playground.
     8. Add more focused stories as you see fit. These non-default stories should illustrate specific scenarios and usages of the component. A developer looking at the Docs tab should be able to understand what each story is demonstrating. Add JSDoc comments to stories when necessary.
-10. Convert unit tests.
+11. Convert unit tests.
     1. TBD
