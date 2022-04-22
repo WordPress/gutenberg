@@ -796,7 +796,7 @@ function getCurrentUndoOffset( state: State ): number {
  *
  * @return The edit.
  */
-export function getUndoEdit( state: State ): Object | undefined {
+export function getUndoEdit( state: State ): any | undefined {
 	return state.undo[ state.undo.length - 2 + getCurrentUndoOffset( state ) ];
 }
 
