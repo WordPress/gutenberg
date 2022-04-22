@@ -12,7 +12,7 @@ const getElementProps = ( props ) => {
 	const newProps = { ...props };
 	newProps.className += ' wp-element-button';
 	return newProps;
-}
+};
 
 export default class ElementButton extends Component {
 	render() {
