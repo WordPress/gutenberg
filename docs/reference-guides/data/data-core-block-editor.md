@@ -19,6 +19,19 @@ _Returns_
 
 -   `boolean`: True if the block has controlled inner blocks.
 
+### canEditBlock
+
+Determines if the given block is allowed to be edited.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: The block client Id.
+
+_Returns_
+
+-   `boolean`: Whether the given block is allowed to be edited.
+
 ### canInsertBlocks
 
 Determines if the given blocks are allowed to be inserted into the block
@@ -980,11 +993,9 @@ _Returns_
 
 ### isCaretWithinFormattedText
 
+> **Deprecated**
+
 Returns true if the caret is within formatted text, or false otherwise.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
 
 _Returns_
 
@@ -1136,6 +1147,8 @@ _Parameters_
 
 ### enterFormattedText
 
+> **Deprecated**
+
 Returns an action object used in signalling that the caret has entered formatted text.
 
 _Returns_
@@ -1143,6 +1156,8 @@ _Returns_
 -   `Object`: Action object.
 
 ### exitFormattedText
+
+> **Deprecated**
 
 Returns an action object used in signalling that the user caret has exited formatted text.
 

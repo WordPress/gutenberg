@@ -534,9 +534,9 @@ This is useful for plugin development.
 }
 ```
 
-#### Latest development WordPress + current directory as a plugin
+### Latest development WordPress + current directory as a plugin
 
-This is useful for plugin development when upstream Core changes need to be tested.
+This is useful for plugin development when upstream Core changes need to be tested. This can also be set via the environment variable `WP_ENV_CORE`.
 
 ```json
 {

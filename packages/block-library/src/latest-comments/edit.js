@@ -35,7 +35,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Latest comments settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Display avatar' ) }
 						checked={ displayAvatar }
