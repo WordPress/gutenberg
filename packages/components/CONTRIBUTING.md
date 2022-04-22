@@ -494,20 +494,20 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
         4. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage).
 6. Create a new `types.ts` file.
 7. Slowly work your way through fixing the TypeScript errors in the folder:
-    1. Try to avoid introducing any runtime change, if possible. The aim of this refactor is to simply rewrite the component to TypeScript.
+    1. Try to avoid introducing any runtime changes, if possible. The aim of this refactor is to simply rewrite the component to TypeScript.
     2. Extract props to `types.ts`, and use them to type components. The README can be of help when determining a prop’s type.
     3. Use existing HTML types when possible? (e.g. `required` for an input field?)
-    4. Use `CSSProperties` type where it makes sense.
+    4. Use the `CSSProperties` type where it makes sense.
     5. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
     6. Use `WordPressComponent` type if possible.
     7. Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README. Add `@default` values where appropriate.
     8. Prefer `unknown` to `any`, and in general avoid it when possible.
 8. On the component's main export, add a JSDoc comment that includes the main description and `@example` code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/943cec92f21fedcd256502ea72d9903941f3b05a/packages/components/src/unit-control/index.tsx#L290-L306))
-9. Make sure:
-    1. Tests still pass.
-    2. Storybook example works as expected.
-    3. Usage in Gutenberg works as expected.
-    4. `types.ts` docs and README docs are aligned.
+9. Make sure that:
+    1. tests still pass;
+    2. storybook examples work as expected.
+    3. the component still works as expected in its usage in Gutenberg;
+    4. the JSDocs comments on `types.ts` and README docs are aligned.
 10. Convert Storybook examples to TypeScript (and from knobs to controls, if necessary) ([example](https://github.com/WordPress/gutenberg/pull/39320)).
     1. Update all consumers of the component to potentially extend the newly added types (e.g. make `UnitControl` props extend `NumberControl` props after `NumberControl` types are made available).
     2. Add a named export for the unconnected, un-forwarded component.
