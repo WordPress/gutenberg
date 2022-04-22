@@ -60,8 +60,8 @@
 
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
-/bin/api-docs                                   @ntwb @nerrad @ajitbohra @oandregal
-/docs/tool                                      @ajitbohra @oandregal
+/bin/api-docs                                   @ntwb @nerrad @ajitbohra
+/docs/tool                                      @ajitbohra
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
@@ -70,7 +70,7 @@
 /packages/create-block-tutorial-template        @gziolo @mkaz @ryanwelcher
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/dependency-extraction-webpack-plugin  @gziolo
-/packages/docgen                                @oandregal
+/packages/docgen
 /packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @ntwb @nerrad @ajitbohra
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
@@ -133,13 +133,7 @@
 
 # PHP
 /lib                                                                 @timothybjacobs @spacedmonkey
-/lib/compat/wordpress-5.9/kses.php                                   @timothybjacobs @spacedmonkey @oandregal
-/lib/compat/wordpress-5.9/theme.json                                 @timothybjacobs @spacedmonkey @oandregal
-/lib/compat/wordpress-6.0/theme-i18n.json                            @timothybjacobs @spacedmonkey @oandregal
-/lib/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php          @timothybjacobs @spacedmonkey @oandregal
-/lib/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php @timothybjacobs @spacedmonkey @oandregal
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey @geriux
-/phpunit/class-wp-theme-json-test.php                                @oandregal
 
 # Native
 /packages/components/src/mobile/global-styles-context                @geriux
