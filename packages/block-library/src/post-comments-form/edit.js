@@ -14,10 +14,11 @@ import {
 } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	__experimentalUseDisabled as useDisabled,
-	useInstanceId,
-} from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import CommentsForm from './form';
 
 export default function PostCommentsFormEdit( {
 	attributes,
@@ -39,10 +40,6 @@ export default function PostCommentsFormEdit( {
 	} );
 
 	const isInSiteEditor = postType === undefined || postId === undefined;
-
-	const disabledFormRef = useDisabled();
-
-	const instanceId = useInstanceId( PostCommentsFormEdit );
 
 	return (
 		<>
@@ -76,35 +73,7 @@ export default function PostCommentsFormEdit( {
 				) }
 
 				{ ( 'open' === commentStatus || isInSiteEditor ) && (
-					<div>
-						<h3>{ __( 'Leave a Reply' ) }</h3>
-						<form
-							noValidate
-							className="comment-form"
-							ref={ disabledFormRef }
-						>
-							<p>
-								<label htmlFor={ `comment-${ instanceId }` }>
-									{ __( 'Comment' ) }
-								</label>
-								<textarea
-									id={ `comment-${ instanceId }` }
-									name="comment"
-									cols="45"
-									rows="8"
-								/>
-							</p>
-							<p>
-								<input
-									name="submit"
-									className="submit wp-block-button__link"
-									label={ __( 'Post Comment' ) }
-									value={ __( 'Post Comment' ) }
-									readOnly
-								/>
-							</p>
-						</form>
-					</div>
+					<CommentsForm />
 				) }
 			</div>
 		</>
