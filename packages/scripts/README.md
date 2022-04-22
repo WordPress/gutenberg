@@ -297,9 +297,13 @@ _Example:_
 }
 ```
 
+This script provides the following custom options:
+
+-   `--dist-tag` – allows specifying a custom dist-tag when updating npm packages. Defaults to `latest`. This is especially useful when using [`@wordpress/dependency-extraction-webpack-plugin`](https://www.npmjs.com/package/@wordpress/dependency-extraction-webpack-plugin). It lets installing the npm dependencies at versions used by the given WordPress major version for local testing, etc. Example: `wp-scripts packages-update --dist-tag=wp-6.0`.
+
 #### Advanced information
 
-The command checks which packages whose name starts with `@wordpress/` are used in the project by reading the package.json file, and then executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one.
+The command detects project dependencies that have name starting with `@wordpress/` by scanning the `package.json` file. By default, it executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one. You can chose a different dist-tag than `latest` by using the `--dist-tag` option when running the command.
 
 ### `plugin-zip`
 
