@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Theme_JSON_Gutenberg class
+ * WP_Theme_JSON_6_1 class
  *
  * @package gutenberg
  */
@@ -87,4 +87,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		return static::$blocks_metadata;
 	}
+
+	const ELEMENTS = array(
+		'link' => 'a',
+		'h1'   => 'h1',
+		'h2'   => 'h2',
+		'h3'   => 'h3',
+		'h4'   => 'h4',
+		'h5'   => 'h5',
+		'h6'   => 'h6',
+		'button' => '.wp-element-button',
+	);
 }
