@@ -18,11 +18,15 @@
 
 		// Allow clicking through the toolbar holder.
 		pointer-events: none;
-
-		// Position the block toolbar.
-		> * {
+		> div > * {
 			pointer-events: all;
 		}
 	}
 }
 
+.block-editor-block-popover__inbetween-container {
+	pointer-events: none !important;
+	> div > * {
+		pointer-events: all;
+	}
+}
