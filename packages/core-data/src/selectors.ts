@@ -539,7 +539,7 @@ export function getEntityRecordEdits(
 	kind: string,
 	name: string,
 	recordId: RecordKey
-): any {
+): any | undefined {
 	return get( state.entities.records, [ kind, name, 'edits', recordId ] );
 }
 
