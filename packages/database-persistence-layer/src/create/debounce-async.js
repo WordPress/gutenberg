@@ -9,20 +9,22 @@
  * This is distinct from `lodash.debounce` in that it waits for promise
  * resolution.
  *
- * @param {number} delayMS A delay in milliseconds.
+ * @param {Function} func    A function that returns a promise.
+ * @param {number}   delayMS A delay in milliseconds.
+ *
  * @return {Function} A function that debounce whatever function is passed
  *                    to it.
  */
-export default function createAsyncDebounce( delayMS ) {
+export default function debounceAsync( func, delayMS ) {
 	let timeoutId;
 	let activePromise;
 
-	return async function debounce( func ) {
+	return async function debounced( ...args ) {
 		// This is a leading edge debounce. If there's no promise or timeout
 		// in progress,
 		if ( ! activePromise && ! timeoutId ) {
 			// Keep a reference to the promise.
-			activePromise = func().finally( () => {
+			activePromise = func( ...args ).finally( () => {
 				// As soon this promise is complete, clear the way for the
 				// next one to happen immediately.
 				activePromise = null;
@@ -44,7 +46,7 @@ export default function createAsyncDebounce( delayMS ) {
 
 		// Schedule the next request but with a delay.
 		timeoutId = setTimeout( () => {
-			activePromise = func().finally( () => {
+			activePromise = func( ...args ).finally( () => {
 				// As soon this promise is complete, clear the way for the
 				// next one to happen immediately.
 				activePromise = null;
