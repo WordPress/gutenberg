@@ -1440,7 +1440,17 @@ export const setNavigationMode = ( isNavigationMode = true ) => ( {
  *
  * @param {string} mode Editor mode
  */
-export const __unstableSetEditorMode = ( mode ) => ( { dispatch } ) => {
+export const __unstableSetEditorMode = ( mode ) => ( { dispatch, select } ) => {
+	// When switching to exploded mode, we need to select to parent block
+	if ( mode === 'exploded' ) {
+		const firstSelectedClientId = select.getBlockSelectionStart();
+		if ( firstSelectedClientId ) {
+			dispatch.selectBlock(
+				select.getBlockHierarchyRootClientId( firstSelectedClientId )
+			);
+		}
+	}
+
 	dispatch( { type: 'SET_EDITOR_MODE', mode } );
 
 	if ( mode === 'navigation' ) {
