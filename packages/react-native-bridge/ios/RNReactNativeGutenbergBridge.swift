@@ -395,7 +395,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
     @objc
     func generateHapticFeedback() {
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        UISelectionFeedbackGenerator().selectionChanged()
     }
 }
 
