@@ -558,7 +558,7 @@ export function getEntityRecordEdits(
  * @return The entity record's non transient edits.
  */
 export const getEntityRecordNonTransientEdits = createSelector(
-	( state: State, kind: string, name: string, recordId: RecordKey ): any => {
+	( state: State, kind: string, name: string, recordId: RecordKey ): any | undefined => {
 		const { transientEdits } = getEntityConfig( state, kind, name ) || {};
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
 		if ( ! transientEdits ) {
