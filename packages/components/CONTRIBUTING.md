@@ -475,7 +475,7 @@ component-family-name/
 
 ## Refactoring a component to TypeScript
 
-Using an IDE that supports TypeScript is very recommended! Assuming the dev env is set up correctly (including TypeScript):
+*Note: This section assumes that the local developer environment is set up correctly, including TypeScript linting. We also strongly recommend using an IDE that supports TypeScript.*
 
 Given a component folder (e.g. `packages/components/src/unit-control`):
 
