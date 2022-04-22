@@ -29,11 +29,11 @@ class WP_Style_Engine {
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
 	 * For every style definition, the follow properties are valid:
-	 *
+	 *  - classnames   => an array of classnames to be returned for block styles. The key is a classname or pattern.
+	 *                    A value of `true` means the classname should be applied always. Otherwise a valid CSS property
+	 *                    to match the incoming value, e.g., "color" to match var:preset|color|somePresetName.
 	 *  - property_key => the key that represents a valid CSS property, e.g., "margin" or "border".
 	 *  - path         => a path that accesses the corresponding style value in the block style object.
-	 *  - value_func   => a function to generate an array of valid CSS rules for a particular style object.
-	 *                    For example, `'padding' => 'array( 'top' => '1em' )` will return `array( 'padding-top' => '1em' )`
 	 */
 	const BLOCK_STYLE_DEFINITIONS_METADATA = array(
 		'color'      => array(
@@ -240,8 +240,8 @@ class WP_Style_Engine {
 
 	/**
 	 * Default style value parser that returns a CSS ruleset.
-	 * If the input contains an array, it will treated like a box model
-	 * for styles such as margins, padding, and borders
+	 * If the input contains an array, it will be treated like a box model
+	 * for styles such as margins and padding
 	 *
 	 * @param string|array $style_value    A single raw Gutenberg style attributes value for a CSS property.
 	 * @param string       $style_property The CSS property for which we're creating a rule.
