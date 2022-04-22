@@ -132,7 +132,7 @@ export const getUserQueryResults = createSelector(
 export function getEntitiesByKind(
 	state: State,
 	kind: string
-): Array< Object > {
+): Array< any > {
 	deprecated( "wp.data.select( 'core' ).getEntitiesByKind()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntitiesConfig()",
