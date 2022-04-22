@@ -73,7 +73,6 @@ export default function BlockPopover( {
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ selectedElement }
-			shouldAnchorIncludePadding
 			// Used to safeguard sticky position behavior against cases where it would permanently
 			// obscure specific sections of a block.
 			__unstableEditorCanvasWrapper={ __unstableContentRef?.current }
