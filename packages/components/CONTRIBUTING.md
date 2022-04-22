@@ -512,7 +512,19 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 10. Convert Storybook examples to TypeScript (and from knobs to controls, if necessary) ([example](https://github.com/WordPress/gutenberg/pull/39320)).
 	1. Update all consumers of the component to potentially extend the newly added types (e.g. make `UnitControl` props extend `NumberControl` props after `NumberControl` types are made available).
 	2. Rename Story extension from `.js` to `.tsx`.
-	3. Rewrite the `meta` story object, and export it as default.
+	3. Rewrite the `meta` story object, and export it as default. In particular, make sure you add the following settings under the `parameters` key:
+
+		```tsx
+		const meta: ComponentMeta< typeof MyComponent > = {
+			parameters: {
+				controls: { expanded: true },
+				docs: { source: { state: 'open' } },
+			},
+		};
+		```
+
+		These options will display prop descriptions in the `Canvas ▸ Controls` tab, and expand code snippets in the `Docs` tab.
+
 	4. Go to the component in Storybook and check the props table in the Docs tab. If there are props that shouldn't be there, check that your types are correct, or consider `Omit`-ing props that shouldn't be exposed.
 		1. Use the `parameters.controls.exclude` property on the `meta` object to hide props from the docs.
 		2. Use the `argTypes` prop on the `meta` object to customize how each prop in the docs can be interactively controlled by the user (tip: use `control: { type: null }` to remove the interactive controls from a prop, without hiding the prop from the docs).
