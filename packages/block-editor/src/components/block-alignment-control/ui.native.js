@@ -47,9 +47,7 @@ function BlockAlignmentUI( {
 		: toolbarUIComponent;
 
 	const commonProps = {
-		popoverProps: POPOVER_PROPS,
 		label: __( 'Align' ),
-		toggleProps: { describedBy: __( 'Change alignment' ) },
 	};
 	const extraProps = isBottomSheetControl
 		? {
@@ -78,6 +76,8 @@ function BlockAlignmentUI( {
 						onClick: () => onChangeAlignment( controlName ),
 					};
 				} ),
+				popoverProps: POPOVER_PROPS,
+				toggleProps: { describedBy: __( 'Change alignment' ) },
 		  };
 
 	return <UIComponent { ...commonProps } { ...extraProps } />;
