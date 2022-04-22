@@ -65,6 +65,7 @@ const TEMPLATE = [
 		],
 	],
 	[ 'core/comments-pagination' ],
+	[ 'core/post-comments-form' ],
 ];
 
 export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
