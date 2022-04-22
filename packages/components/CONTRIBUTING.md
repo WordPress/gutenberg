@@ -513,11 +513,13 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
     1. Update all consumers of the component to potentially extend the newly added types (e.g. make `UnitControl` props extend `NumberControl` props after `NumberControl` types are made available).
     2. Rename Story extension from `.js` to `.tsx`.
     3. Rewrite the `meta` story object, and export it as default.
+    4. Go to the component in Storybook and check the props table in the Docs tab. If there are props that shouldn't be there, check that your types are correct, or consider `Omit`-ing props that shouldn't be exposed.
         1. Use the `parameters.controls.exclude` property on the `meta` object to hide props from the docs (e.g. unstable or experimental).
         2. Use the `argTypes` prop on the `meta` object to customize how each prop in the docs can be interactively controlled by the user (tip: use `control: { type: null }` to remove the interactive controls from a prop, without hiding the prop from the docs).
+        3. See the [official docs](https://storybook.js.org/docs/react/essentials/controls) for more details.
     4. Comment out all existing stories.
     5. Create a default template, where the component is being used in the most “vanilla” way possible.
     6. Use the template for the `Default` story, which will serve as an interactive doc playground.
-    7. Add more focused stories as you see fit. These non-default stories should illustrate specific scenarios and usages of the component. A developer looking at the Docs tab should be able to understand what each story is demonstrating. Add JSDoc comments to stories when necessary.
+		7. Add more focused stories as you see fit. These non-default stories should illustrate specific scenarios and usages of the component. A developer looking at the Docs tab should be able to understand what each story is demonstrating. Add JSDoc comments to stories when necessary.
 11. Convert unit tests.
     1. TBD
