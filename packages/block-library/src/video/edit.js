@@ -70,9 +70,7 @@ function VideoEdit( {
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					onFileChange: ( [ { url } ] ) => {
-						setAttributes( { src: url } );
-					},
+					onFileChange: ( [ media ] ) => onSelectVideo( media ),
 					onError: ( message ) => {
 						noticeOperations.createErrorNotice( message );
 					},
