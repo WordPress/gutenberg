@@ -1,10 +1,12 @@
+/** @typedef {import('../types').AnyFunction} AnyFunction */
+
 /**
  * Higher-order reducer creator which creates a combined reducer object, keyed
  * by a property on the action object.
  *
  * @param {string} actionProperty Action property by which to key object.
  *
- * @return {Function} Higher-order reducer.
+ * @return {AnyFunction} Higher-order reducer.
  */
 export const onSubKey = ( actionProperty ) => ( reducer ) => (
 	state = {},

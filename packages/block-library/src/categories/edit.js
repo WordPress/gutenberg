@@ -25,11 +25,12 @@ export default function CategoriesEdit( {
 		showHierarchy,
 		showPostCounts,
 		showOnlyTopLevel,
+		showEmpty,
 	},
 	setAttributes,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
-	const query = { per_page: -1, hide_empty: true, context: 'view' };
+	const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
 	if ( showOnlyTopLevel ) {
 		query.parent = 0;
 	}
@@ -128,7 +129,7 @@ export default function CategoriesEdit( {
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Categories settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
@@ -143,6 +144,11 @@ export default function CategoriesEdit( {
 						label={ __( 'Show only top level categories' ) }
 						checked={ showOnlyTopLevel }
 						onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
+					/>
+					<ToggleControl
+						label={ __( 'Show empty categories' ) }
+						checked={ showEmpty }
+						onChange={ toggleAttribute( 'showEmpty' ) }
 					/>
 					{ ! showOnlyTopLevel && (
 						<ToggleControl

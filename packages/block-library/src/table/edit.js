@@ -25,6 +25,7 @@ import {
 	TextControl,
 	ToggleControl,
 	ToolbarDropdownMenu,
+	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -451,7 +452,7 @@ function TableEdit( {
 			{ ! isEmpty && (
 				<InspectorControls>
 					<PanelBody
-						title={ __( 'Table settings' ) }
+						title={ __( 'Settings' ) }
 						className="blocks-table-settings"
 					>
 						<ToggleControl
@@ -477,7 +478,15 @@ function TableEdit( {
 					className={ classnames(
 						colorProps.className,
 						borderProps.className,
-						{ 'has-fixed-layout': hasFixedLayout }
+						{
+							'has-fixed-layout': hasFixedLayout,
+							// This is required in the editor only to overcome
+							// the fact the editor rewrites individual border
+							// widths into a shorthand format.
+							'has-individual-borders': hasSplitBorders(
+								attributes?.style?.border
+							),
+						}
 					) }
 					style={ { ...colorProps.style, ...borderProps.style } }
 				>

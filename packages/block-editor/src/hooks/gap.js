@@ -40,34 +40,36 @@ export function hasGapValue( props ) {
 }
 
 /**
- * Returns a BoxControl object value from a given blockGap style.
+ * Returns a BoxControl object value from a given blockGap style value.
  * The string check is for backwards compatibility before Gutenberg supported
  * split gap values (row and column) and the value was a string n + unit.
  *
- * @param {string? | Object?} rawBlockGapValue A style object.
- * @return {Object?}                           A value to pass to the BoxControl component.
+ * @param {string? | Object?} blockGapValue A block gap string or axial object value, e.g., '10px' or { top: '10px', left: '10px'}.
+ * @return {Object|null}                    A value to pass to the BoxControl component.
  */
-export function getGapValueFromStyle( rawBlockGapValue ) {
-	if ( ! rawBlockGapValue ) {
-		return rawBlockGapValue;
+export function getGapBoxControlValueFromStyle( blockGapValue ) {
+	if ( ! blockGapValue ) {
+		return null;
 	}
 
-	const isValueString = typeof rawBlockGapValue === 'string';
+	const isValueString = typeof blockGapValue === 'string';
 	return {
-		top: isValueString ? rawBlockGapValue : rawBlockGapValue?.top,
-		left: isValueString ? rawBlockGapValue : rawBlockGapValue?.left,
+		top: isValueString ? blockGapValue : blockGapValue?.top,
+		left: isValueString ? blockGapValue : blockGapValue?.left,
 	};
 }
 
 /**
  * Returns a CSS value for the `gap` property from a given blockGap style.
  *
- * @param {string? | Object?} blockGapValue A style object.
+ * @param {string? | Object?} blockGapValue A block gap string or axial object value, e.g., '10px' or { top: '10px', left: '10px'}.
  * @param {string?}           defaultValue  A default gap value.
  * @return {string|null}                    The concatenated gap value (row and column).
  */
 export function getGapCSSValue( blockGapValue, defaultValue = '0' ) {
-	const blockGapBoxControlValue = getGapValueFromStyle( blockGapValue );
+	const blockGapBoxControlValue = getGapBoxControlValueFromStyle(
+		blockGapValue
+	);
 	if ( ! blockGapBoxControlValue ) {
 		return null;
 	}
@@ -142,14 +144,22 @@ export function GapEdit( props ) {
 		return null;
 	}
 
+	const splitOnAxis =
+		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+
 	const onChange = ( next ) => {
+		let blockGap = next;
+
+		// If splitOnAxis activated we need to return a BoxControl object to the BoxControl component.
+		if ( !! next && splitOnAxis ) {
+			blockGap = { ...getGapBoxControlValueFromStyle( next ) };
+		}
+
 		const newStyle = {
 			...style,
 			spacing: {
 				...style?.spacing,
-				blockGap: {
-					...getGapValueFromStyle( next ),
-				},
+				blockGap,
 			},
 		};
 
@@ -171,9 +181,7 @@ export function GapEdit( props ) {
 		}
 	};
 
-	const splitOnAxis =
-		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
-	const gapValue = getGapValueFromStyle( style?.spacing?.blockGap );
+	const gapValue = getGapBoxControlValueFromStyle( style?.spacing?.blockGap );
 
 	// The BoxControl component expects a full complement of side values.
 	// Gap row and column values translate to top/bottom and left/right respectively.

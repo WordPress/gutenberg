@@ -18,20 +18,28 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$classes = '';
+	$classes = 'comment-respond'; // See comment further below.
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= 'has-text-align-' . $attributes['textAlign'];
 	}
 
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+
 	ob_start();
 	comment_form( array(), $block->context['postId'] );
-	$form               = ob_get_clean();
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$form = ob_get_clean();
+
+	// We use the outermost wrapping `<div />` returned by `comment_form()`
+	// which is identified by its default classname `comment-respond` to inject
+	// our wrapper attributes. This way, it is guaranteed that all styling applied
+	// to the block is carried along when the comment form is moved to the location
+	// of the 'Reply' link that the user clicked by Core's `comment-reply.js` script.
+	$form = str_replace( 'class="comment-respond"', $wrapper_attributes, $form );
 
 	// Enqueue the comment-reply script.
 	wp_enqueue_script( 'comment-reply' );
 
-	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $form );
+	return $form;
 }
 
 /**

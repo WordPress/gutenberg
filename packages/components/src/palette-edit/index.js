@@ -9,7 +9,10 @@ import { kebabCase } from 'lodash';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
-import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
+import {
+	__experimentalUseFocusOutside as useFocusOutside,
+	useDebounce,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -197,6 +200,9 @@ function PaletteEditListView( {
 			}
 		};
 	}, [] );
+
+	const debounceOnChange = useDebounce( onChange, 100 );
+
 	return (
 		<VStack spacing={ 3 }>
 			<ItemGroup isRounded>
@@ -212,7 +218,7 @@ function PaletteEditListView( {
 							}
 						} }
 						onChange={ ( newElement ) => {
-							onChange(
+							debounceOnChange(
 								elements.map(
 									( currentElement, currentIndex ) => {
 										if ( currentIndex === index ) {

@@ -14,6 +14,10 @@ import {
 } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	__experimentalUseDisabled as useDisabled,
+	useInstanceId,
+} from '@wordpress/compose';
 
 export default function PostCommentsFormEdit( {
 	attributes,
@@ -34,6 +38,12 @@ export default function PostCommentsFormEdit( {
 		} ),
 	} );
 
+	const isInSiteEditor = postType === undefined || postId === undefined;
+
+	const disabledFormRef = useDisabled();
+
+	const instanceId = useInstanceId( PostCommentsFormEdit );
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -45,7 +55,7 @@ export default function PostCommentsFormEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ ! commentStatus && (
+				{ ! commentStatus && ! isInSiteEditor && (
 					<Warning>
 						{ __(
 							'Post Comments Form block: comments are not enabled for this post type.'
@@ -53,7 +63,7 @@ export default function PostCommentsFormEdit( {
 					</Warning>
 				) }
 
-				{ 'open' !== commentStatus && (
+				{ 'open' !== commentStatus && ! isInSiteEditor && (
 					<Warning>
 						{ sprintf(
 							/* translators: 1: Post type (i.e. "post", "page") */
@@ -65,7 +75,37 @@ export default function PostCommentsFormEdit( {
 					</Warning>
 				) }
 
-				{ 'open' === commentStatus && __( 'Post Comments Form' ) }
+				{ ( 'open' === commentStatus || isInSiteEditor ) && (
+					<div>
+						<h3>{ __( 'Leave a Reply' ) }</h3>
+						<form
+							noValidate
+							className="comment-form"
+							ref={ disabledFormRef }
+						>
+							<p>
+								<label htmlFor={ `comment-${ instanceId }` }>
+									{ __( 'Comment' ) }
+								</label>
+								<textarea
+									id={ `comment-${ instanceId }` }
+									name="comment"
+									cols="45"
+									rows="8"
+								/>
+							</p>
+							<p>
+								<input
+									name="submit"
+									className="submit wp-block-button__link"
+									label={ __( 'Post Comment' ) }
+									value={ __( 'Post Comment' ) }
+									readOnly
+								/>
+							</p>
+						</form>
+					</div>
+				) }
 			</div>
 		</>
 	);

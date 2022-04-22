@@ -9,6 +9,7 @@ import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	Fragment,
 	useEffect,
@@ -28,8 +29,8 @@ import {
 	Spinner,
 	TextareaControl,
 	ToggleControl,
+	ToolbarButton,
 	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -54,7 +55,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { cover as icon } from '@wordpress/icons';
+import { postFeaturedImage, cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -74,8 +75,6 @@ import {
 } from './shared';
 
 extend( [ namesPlugin ] );
-
-const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -298,11 +297,12 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
+	context: { postId, postType },
 } ) {
 	const {
 		contentPosition,
 		id,
-		backgroundType,
+		useFeaturedImage,
 		dimRatio,
 		focalPoint,
 		hasParallax,
@@ -310,12 +310,35 @@ function CoverEdit( {
 		isRepeated,
 		minHeight,
 		minHeightUnit,
-		style: styleAttribute,
-		url,
 		alt,
 		allowedBlocks,
 		templateLock,
 	} = attributes;
+
+	const [ featuredImage ] = useEntityProp(
+		'postType',
+		postType,
+		'featured_media',
+		postId
+	);
+
+	const media = useSelect(
+		( select ) =>
+			featuredImage &&
+			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
+		[ featuredImage ]
+	);
+	const mediaUrl = media?.source_url;
+
+	// instead of destructuring the attributes
+	// we define the url and background type
+	// depending on the value of the useFeaturedImage flag
+	// to preview in edit the dynamic featured image
+	const url = useFeaturedImage ? mediaUrl : attributes.url;
+	const backgroundType = useFeaturedImage
+		? IMAGE_BACKGROUND_TYPE
+		: attributes.backgroundType;
+
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
@@ -371,6 +394,13 @@ function CoverEdit( {
 	const toggleIsRepeated = () => {
 		setAttributes( {
 			isRepeated: ! isRepeated,
+		} );
+	};
+
+	const toggleUseFeaturedImage = () => {
+		setAttributes( {
+			useFeaturedImage: ! useFeaturedImage,
+			dimRatio: dimRatio === 100 ? 50 : dimRatio,
 		} );
 	};
 
@@ -458,14 +488,22 @@ function CoverEdit( {
 				/>
 			</BlockControls>
 			<BlockControls group="other">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*,video/*"
-					onSelect={ onSelectMedia }
-					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
+				<ToolbarButton
+					icon={ postFeaturedImage }
+					label={ __( 'Use featured image' ) }
+					isPressed={ useFeaturedImage }
+					onClick={ toggleUseFeaturedImage }
 				/>
+				{ ! useFeaturedImage && (
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*,video/*"
+						onSelect={ onSelectMedia }
+						name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
+					/>
+				) }
 			</BlockControls>
 			<InspectorControls>
 				{ !! url && (
@@ -499,27 +537,32 @@ function CoverEdit( {
 								}
 							/>
 						) }
-						{ url && isImageBackground && isImgElement && (
-							<TextareaControl
-								label={ __( 'Alt text (alternative text)' ) }
-								value={ alt }
-								onChange={ ( newAlt ) =>
-									setAttributes( { alt: newAlt } )
-								}
-								help={
-									<>
-										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+						{ ! useFeaturedImage &&
+							url &&
+							isImageBackground &&
+							isImgElement && (
+								<TextareaControl
+									label={ __(
+										'Alt text (alternative text)'
+									) }
+									value={ alt }
+									onChange={ ( newAlt ) =>
+										setAttributes( { alt: newAlt } )
+									}
+									help={
+										<>
+											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+												{ __(
+													'Describe the purpose of the image'
+												) }
+											</ExternalLink>
 											{ __(
-												'Describe the purpose of the image'
+												'Leave empty if the image is purely decorative.'
 											) }
-										</ExternalLink>
-										{ __(
-											'Leave empty if the image is purely decorative.'
-										) }
-									</>
-								}
-							/>
-						) }
+										</>
+									}
+								/>
+							) }
 						<PanelRow>
 							<Button
 								variant="secondary"
@@ -533,6 +576,7 @@ function CoverEdit( {
 										focalPoint: undefined,
 										hasParallax: undefined,
 										isRepeated: undefined,
+										useFeaturedImage: false,
 									} )
 								}
 							>
@@ -696,11 +740,6 @@ function CoverEdit( {
 				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
-				<BoxControlVisualizer
-					values={ styleAttribute?.spacing?.padding }
-					showValues={ styleAttribute?.visualizers?.padding }
-					className="block-library-cover__padding-visualizer"
-				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
 					onResizeStart={ () => {

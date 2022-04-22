@@ -222,6 +222,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 					element &&
 					createPortal(
 						<LayoutStyle
+							blockName={ name }
 							selector={ `.wp-container-${ id }` }
 							layout={ usedLayout }
 							style={ attributes?.style }

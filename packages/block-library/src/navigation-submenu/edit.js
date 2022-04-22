@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, pull } from 'lodash';
+import { escape, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -54,8 +54,6 @@ const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
 };
-
-const MAX_NESTING = 5;
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -293,7 +291,7 @@ export default function NavigationSubmenuEdit( {
 		url,
 		opensInNewTab,
 	};
-	const { showSubmenuIcon, openSubmenusOnClick } = context;
+	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const {
@@ -351,7 +349,7 @@ export default function NavigationSubmenuEdit( {
 			return {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, name ).length >=
-					MAX_NESTING,
+					maxNestingLevel,
 				isTopLevelItem:
 					getBlockParentsByBlockName( clientId, name ).length === 0,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
@@ -503,9 +501,9 @@ export default function NavigationSubmenuEdit( {
 	// Always use overlay colors for submenus.
 	const innerBlocksColors = getColors( context, true );
 
-	if ( isAtMaxNesting ) {
-		pull( ALLOWED_BLOCKS, 'core/navigation-submenu' );
-	}
+	const allowedBlocks = isAtMaxNesting
+		? without( ALLOWED_BLOCKS, 'core/navigation-submenu' )
+		: ALLOWED_BLOCKS;
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -528,7 +526,7 @@ export default function NavigationSubmenuEdit( {
 			},
 		},
 		{
-			allowedBlocks: ALLOWED_BLOCKS,
+			allowedBlocks,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: true,
 

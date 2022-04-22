@@ -35,6 +35,7 @@ import * as commentsQueryLoop from './comments-query-loop';
 import * as commentsPagination from './comments-pagination';
 import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
+import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -138,7 +139,6 @@ export const __experimentalGetCoreBlocks = () => [
 	heading,
 	gallery,
 	list,
-	listItem,
 	quote,
 
 	// Register all remaining core blocks.
@@ -191,6 +191,7 @@ export const __experimentalGetCoreBlocks = () => [
 	siteTagline,
 	query,
 	templatePart,
+	avatar,
 	postTitle,
 	postExcerpt,
 	postFeaturedImage,
@@ -204,7 +205,24 @@ export const __experimentalGetCoreBlocks = () => [
 	queryPaginationNext,
 	queryPaginationNumbers,
 	queryPaginationPrevious,
+	queryNoResults,
+	readMore,
+	commentAuthorName,
+	commentContent,
+	commentDate,
+	commentEditLink,
+	commentReplyLink,
+	commentTemplate,
+	commentsTitle,
+	commentsQueryLoop,
+	commentsPagination,
+	commentsPaginationNext,
+	commentsPaginationNumbers,
+	commentsPaginationPrevious,
+
 	postComments,
+	postCommentsForm,
+	homeLink,
 	logInOut,
 	termDescription,
 	queryTitle,
@@ -252,31 +270,19 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	? ( { enableFSEBlocks } = {} ) => {
 			[
 				// Experimental blocks.
-				avatar,
-				homeLink,
 				postAuthorName,
-				queryNoResults,
+				...( window.__experimentalEnableListBlockV2
+					? [ listItem ]
+					: [] ),
+
 				// Full Site Editing blocks.
 				...( enableFSEBlocks
 					? [
 							commentAuthorAvatar,
-							commentAuthorName,
-							commentContent,
-							commentDate,
-							commentEditLink,
-							commentReplyLink,
-							commentTemplate,
-							commentsQueryLoop,
-							commentsPagination,
-							commentsPaginationNext,
-							commentsPaginationNumbers,
-							commentsPaginationPrevious,
 							navigationArea,
 							postComment,
 							postCommentsCount,
-							postCommentsForm,
 							postCommentsLink,
-							readMore,
 					  ]
 					: [] ),
 			].forEach( registerBlock );

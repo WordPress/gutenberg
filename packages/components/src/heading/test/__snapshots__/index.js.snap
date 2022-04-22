@@ -5,7 +5,7 @@ exports[`props should render correctly 1`] = `
   color: #1e1e1e;
   line-height: 1.2;
   margin: 0;
-  color: #050505;
+  color: #1e1e1e;
   font-size: calc(1.95 * 13px);
   font-weight: 600;
   display: block;
@@ -27,7 +27,7 @@ Snapshot Diff:
 
   Array [
     Object {
-      "color": "#050505",
+      "color": "#1e1e1e",
       "display": "block",
 -     "font-size": "calc(1.25 * 13px)",
 +     "font-size": "calc(1.95 * 13px)",
@@ -45,7 +45,7 @@ Snapshot Diff:
 
   Array [
     Object {
-      "color": "#050505",
+      "color": "#1e1e1e",
       "display": "block",
 -     "font-size": "calc(1.25 * 13px)",
 +     "font-size": "calc(1.95 * 13px)",

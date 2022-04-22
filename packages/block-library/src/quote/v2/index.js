@@ -7,19 +7,16 @@ import { quote as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import metadata from './block.json';
 import edit from './edit';
 import save from './save';
-
-const { name } = metadata;
-
-export { metadata, name };
+import transforms from './transforms';
+import deprecated from './deprecated';
 
 const settings = {
 	icon,
 	example: {
 		attributes: {
-			attribution: 'Julio Cortázar',
+			citation: 'Julio Cortázar',
 		},
 		innerBlocks: [
 			{
@@ -30,8 +27,10 @@ const settings = {
 			},
 		],
 	},
+	transforms,
 	edit,
 	save,
+	deprecated,
 };
 
 export default settings;

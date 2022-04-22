@@ -7,7 +7,7 @@ const { sync: resolveBin } = require( 'resolve-bin' );
 /**
  * Internal dependencies
  */
-const { getWebpackArgs, hasArgInCLI } = require( '../utils' );
+const { getWebpackArgs, hasArgInCLI, getArgFromCLI } = require( '../utils' );
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 
@@ -22,6 +22,10 @@ if ( hasArgInCLI( '--webpack-bundle-analyzer' ) ) {
 if ( hasArgInCLI( '--webpack-copy-php' ) ) {
 	process.env.WP_COPY_PHP_FILES_TO_DIST = true;
 }
+
+process.env.WP_SRC_DIRECTORY = hasArgInCLI( '--webpack-src-dir' )
+	? getArgFromCLI( '--webpack-src-dir' )
+	: 'src';
 
 const { status } = spawn( resolveBin( 'webpack' ), getWebpackArgs(), {
 	stdio: 'inherit',

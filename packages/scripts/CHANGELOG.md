@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `lint-md-js` script that was broken for some time and it's extemely hard to make it work correctly with the recommended ESLint config in Markdown files ([#40511](https://github.com/WordPress/gutenberg/pull/40511)).
+-   Remove the previously deprecated and undocumented `format-js` command ([#40512](https://github.com/WordPress/gutenberg/pull/40512)). You should use the `format` command instead.
+
+### New Feature
+
+-   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages ([#40514](https://github.com/WordPress/gutenberg/pull/
+
+## 22.5.0 (2022-04-21)
+
+### Bug Fixes
+
+-   Update `markdownlint` and `markdownlint-cli` to the latest versions ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
+
+## 22.4.0 (2022-04-08)
+
+### New Feature
+
+-   Add `--webpack-src-dir` CLI flag to allow customizing the source code directory (`src` by default) ([#39618](https://github.com/WordPress/gutenberg/pull/39618)).
+
+### Bug Fixes
+
+-   Add `vendor/` to `.markdownlintignore`, to match `lint-md-docs` docs ([#39724](https://github.com/WordPress/gutenberg/pull/39724)).
+-   Include files with `.jsx` extension in the build process ([#39613](https://github.com/WordPress/gutenberg/pull/39613)).
+-   Ensure that the default logic for entry points in the build commands is executed only when used the default config ([#39618](https://github.com/WordPress/gutenberg/pull/39618)).
+
 ## 22.2.0 (2022-03-11)
 
 ### Enhancement
@@ -75,6 +102,10 @@
 -   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)). For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed.
 -   Automatically copy `block.json` files located in the `src` folder and its subfolders to the output folder (`build` by default) ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
 -   Scan the `src` directory for `block.json` files to detect defined scripts to use them as entry points with the `start` and `build` commands. ([#37661](https://github.com/WordPress/gutenberg/pull/37661)).
+
+### Enhancements
+
+-   Disable `selector-class-pattern` rule when linting styles until we have more flexible handling ([#37531](https://github.com/WordPress/gutenberg/pull/37531)).
 
 ### Bug Fixes
 
