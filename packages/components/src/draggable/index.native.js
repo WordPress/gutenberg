@@ -120,7 +120,7 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 		.shouldCancelWhenOutside( false );
 
 	const providerValue = useMemo( () => {
-		return { panGestureRef, isDragging, draggingId };
+		return { panGestureRef, isDragging, isPanActive, draggingId };
 	}, [] );
 
 	return (
@@ -157,7 +157,9 @@ const DraggableTrigger = ( {
 	onLongPress,
 	onLongPressEnd,
 } ) => {
-	const { panGestureRef, isDragging, draggingId } = useContext( Context );
+	const { panGestureRef, isDragging, isPanActive, draggingId } = useContext(
+		Context
+	);
 
 	const gestureHandler = useAnimatedGestureHandler( {
 		onActive: () => {
@@ -172,7 +174,10 @@ const DraggableTrigger = ( {
 			}
 		},
 		onEnd: () => {
-			isDragging.value = false;
+			if ( ! isPanActive.value ) {
+				isDragging.value = false;
+			}
+
 			if ( onLongPressEnd ) {
 				runOnJS( onLongPressEnd )( id );
 			}
