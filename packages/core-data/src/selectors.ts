@@ -210,7 +210,7 @@ export const getEntityRecord = createSelector(
 		name: string,
 		key: RecordKey,
 		query?: EntityQuery< any >
-	): Object | undefined => {
+	): EntityRecord | undefined => {
 		const queriedState = get( state.entities.records, [
 			kind,
 			name,
