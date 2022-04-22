@@ -77,12 +77,20 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 		}
 	);
 
+	function getFirstTouchEvent( event ) {
+		'worklet';
+
+		const sortedEventsById = event.allTouches.sort(
+			( a, b ) => b.id + a.id
+		);
+		return sortedEventsById[ 0 ];
+	}
+
 	const panGesture = Gesture.Pan()
 		.manualActivation( true )
 		.onTouchesDown( ( event ) => {
-			const firstEvent = event.allTouches.filter( ( item ) => {
-				return item.id === 0;
-			} )[ 0 ];
+			const firstEvent = getFirstTouchEvent( event );
+
 			const { x = 0, y = 0 } = firstEvent;
 			initialPosition.x.value = x;
 			initialPosition.y.value = y;
@@ -94,9 +102,7 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 			}
 
 			if ( isPanActive.value && isDragging.value ) {
-				const firstEvent = event.allTouches.filter( ( item ) => {
-					return item.id === 0;
-				} )[ 0 ];
+				const firstEvent = getFirstTouchEvent( event );
 
 				lastPosition.x.value = firstEvent.x;
 				lastPosition.y.value = firstEvent.y;
