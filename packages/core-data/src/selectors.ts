@@ -877,7 +877,7 @@ export function getThemeSupports( state: State ): Object {
  *
  * @return Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
  */
-export function getEmbedPreview( state: State, url: string ): Object {
+export function getEmbedPreview( state: State, url: string ): any {
 	return state.embedPreviews[ url ];
 }
 
