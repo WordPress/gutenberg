@@ -114,9 +114,9 @@ describe( 'create', () => {
 			expect( await get() ).toEqual( data );
 		} );
 
-		it( 'returns data from the REST API if it has a more recent timestamp than localStorage', async () => {
+		it( 'returns data from the REST API if it has a more recent modified date than localStorage', async () => {
 			const data = {
-				__timestamp: 1,
+				_modified: '2022-04-22T00:00:00.000Z',
 				test: 'api',
 			};
 			apiFetch.mockResolvedValueOnce( {
@@ -128,7 +128,7 @@ describe( 'create', () => {
 				'getItem'
 			).mockReturnValueOnce(
 				JSON.stringify( {
-					__timestamp: 0,
+					_modified: '2022-04-21T00:00:00.000Z',
 					test: 'localStorage',
 				} )
 			);
@@ -137,18 +137,18 @@ describe( 'create', () => {
 			expect( await get() ).toEqual( data );
 		} );
 
-		it( 'returns data from localStorage if it has a more recent timestamp than data from the REST API', async () => {
+		it( 'returns data from localStorage if it has a more recent modified date than data from the REST API', async () => {
 			apiFetch.mockResolvedValueOnce( {
 				meta: {
 					persisted_preferences: {
-						__timestamp: 0,
+						_modified: '2022-04-21T00:00:00.000Z',
 						test: 'api',
 					},
 				},
 			} );
 
 			const data = {
-				__timestamp: 1,
+				_modified: '2022-04-22T00:00:00.000Z',
 				test: 'localStorage',
 			};
 			jest.spyOn(
