@@ -39,9 +39,9 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 	return get_the_term_list(
 		$block->context['postId'],
 		$attributes['term'],
-		"<div $wrapper_attributes>",
+		"<div $wrapper_attributes>" . ( isset( $attributes['prefix'] ) ? $attributes['prefix'] : '' ),
 		'<span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span>',
-		'</div>'
+		( isset( $attributes['suffix'] ) ? $attributes['suffix'] : '' ) . '</div>'
 	);
 }
 

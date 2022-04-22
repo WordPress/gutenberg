@@ -591,7 +591,7 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 -	**Name:** core/post-terms
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** separator, term, textAlign
+-	**Attributes:** prefix, separator, suffix, term, textAlign
 
 ## Post Title
 
