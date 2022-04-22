@@ -88,7 +88,6 @@ export default function PostCommentsFormEdit( {
 									{ __( 'Comment' ) }
 								</label>
 								<textarea
-									/* eslint-disable-next-line no-restricted-syntax */
 									id={ `comment-${ instanceId }` }
 									name="comment"
 									cols="45"
