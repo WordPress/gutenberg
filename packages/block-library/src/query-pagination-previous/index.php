@@ -43,6 +43,13 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 			$wrapper_attributes,
 			$label
 		);
+	} else {
+		$wrapper_attributes .= 'style="visibility:hidden;"';
+		$content = sprintf(
+			'<span %1$s>%2$s</span>',
+			$wrapper_attributes,
+			$label
+		);
 	}
 	return $content;
 }
