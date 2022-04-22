@@ -288,7 +288,7 @@ export function __experimentalGetEntityRecordNoResolver(
 	kind: string,
 	name: string,
 	key: string | number
-): EntityRecord {
+): EntityRecord | null {
 	return getEntityRecord( state, kind, name, key );
 }
 
