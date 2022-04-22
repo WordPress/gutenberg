@@ -8,7 +8,7 @@ import { Component } from '@wordpress/element';
  */
 import RichText from '../rich-text';
 
-export default class BlockButton extends Component {
+export default class ElementButton extends Component {
 	render() {
 		const newProps = { ...this.props };
 		newProps.className += ' wp-element-button';

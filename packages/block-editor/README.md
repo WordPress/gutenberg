@@ -121,10 +121,6 @@ _Returns_
 
 -   `WPElement`: Block Breadcrumb.
 
-### BlockButton
-
-Undocumented declaration.
-
 ### BlockColorsStyleSelector
 
 Undocumented declaration.
@@ -348,6 +344,10 @@ _Returns_
 -   `Function`: Higher-order component.
 
 ### DefaultBlockAppender
+
+Undocumented declaration.
+
+### ElementButton
 
 Undocumented declaration.
 

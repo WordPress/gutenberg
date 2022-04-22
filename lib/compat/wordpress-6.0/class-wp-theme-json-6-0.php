@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Theme_JSON_Gutenberg class
+ * WP_Theme_JSON_6_0 class
  *
  * @package gutenberg
  */
@@ -65,17 +65,6 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 		'text-decoration'            => array( 'typography', 'textDecoration' ),
 		'text-transform'             => array( 'typography', 'textTransform' ),
 		'filter'                     => array( 'filter', 'duotone' ),
-	);
-
-	const ELEMENTS = array(
-		'link' => 'a',
-		'h1'   => 'h1',
-		'h2'   => 'h2',
-		'h3'   => 'h3',
-		'h4'   => 'h4',
-		'h5'   => 'h5',
-		'h6'   => 'h6',
-		'button' => '.wp-element-button',
 	);
 
 	/**

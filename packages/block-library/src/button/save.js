@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	BlockButton,
+	ElementButton,
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
@@ -60,7 +60,7 @@ export default function save( { attributes, className } ) {
 
 	return (
 		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
-			<BlockButton
+			<ElementButton
 				frontEnd={ true }
 				tagName="a"
 				className={ buttonClasses }
