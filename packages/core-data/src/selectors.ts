@@ -201,7 +201,7 @@ export function getEntityConfig(
  * @param  key   Record's key
  * @param  query Optional query.
  *
- * @return any Record.
+ * @return Record.
  */
 export const getEntityRecord = createSelector(
 	(
