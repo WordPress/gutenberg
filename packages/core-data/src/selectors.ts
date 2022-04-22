@@ -165,7 +165,7 @@ export function getEntitiesConfig(
  *
  * @return Entity config
  */
-export function getEntity( state: State, kind: string, name: string ): Object {
+export function getEntity( state: State, kind: string, name: string ): any {
 	deprecated( "wp.data.select( 'core' ).getEntity()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntityConfig()",
