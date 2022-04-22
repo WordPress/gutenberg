@@ -500,7 +500,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
     4. Use `CSSProperties` type where it makes sense.
     5. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
     6. Use `WordPressComponent` type if possible.
-    7. Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README.
+    7. Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README. Add `@default` values where appropriate.
     8. Prefer `unknown` to `any`, and in general avoid it when possible.
 8. Make sure:
     1. Tests still pass.
