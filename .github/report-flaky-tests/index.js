@@ -133,7 +133,7 @@ const metaData = {
 				[
 					TEST_RESULTS_LIST.open,
 					...testResultsList,
-					renderTestErrorMessage( {
+					renderTestResult( {
 						testRunner,
 						testPath,
 						testResults,
@@ -242,7 +242,7 @@ function renderIssueBody( {
 } ) {
 	return (
 		renderIssueDescription( { meta, testTitle, testPath } ) +
-		renderTestResults( { testRunner, testPath, testResults } )
+		renderTestResultsList( { testRunner, testPath, testResults } )
 	);
 }
 
@@ -263,14 +263,14 @@ ${ testTitle }
 `;
 }
 
-function renderTestResults( { testRunner, testPath, testResults } ) {
+function renderTestResultsList( { testRunner, testPath, testResults } ) {
 	return `${ TEST_RESULTS_LIST.open }
-${ renderTestErrorMessage( { testRunner, testPath, testResults } ) }
+${ renderTestResults( { testRunner, testPath, testResults } ) }
 ${ TEST_RESULTS_LIST.close }
 `;
 }
 
-function renderTestResults( { testRunner, testResults, testPath } ) {
+function renderTestErrorMessage( { testRunner, testResults, testPath } ) {
 	switch ( testRunner ) {
 		case '@playwright/test': {
 			// Could do a slightly better formatting than this.
@@ -297,7 +297,7 @@ function renderTestResults( { testRunner, testResults, testPath } ) {
 	}
 }
 
-function renderTestErrorMessage( { testRunner, testPath, testResults } ) {
+function renderTestResults( { testRunner, testPath, testResults } ) {
 	const date = new Date().toISOString();
 	// It will look something like this without formatting:
 	// ▶ [2021-08-31T16:15:19.875Z] Test passed after 2 failed attempts on trunk
@@ -310,7 +310,7 @@ function renderTestErrorMessage( { testRunner, testPath, testResults } ) {
 </summary>
 
 \`\`\`
-${ renderTestResults( { testRunner, testPath, testResults } ) }
+${ renderTestErrorMessage( { testRunner, testPath, testResults } ) }
 \`\`\`
 </details>${ TEST_RESULT.close }`;
 }
