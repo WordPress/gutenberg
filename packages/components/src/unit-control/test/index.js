@@ -215,7 +215,7 @@ describe( 'UnitControl', () => {
 			expect( input.value ).toBe( '300px' );
 			expect( state ).toBe( 50 );
 
-			user.keyboard( '{Escape}' );
+			await user.keyboard( '{Escape}' );
 
 			expect( input.value ).toBe( '50' );
 			expect( state ).toBe( 50 );

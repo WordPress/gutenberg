@@ -178,10 +178,6 @@ function UnforwardedUnitControl(
 				: undefined;
 			const changeProps = { event, data };
 
-			onChangeProp?.(
-				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
-				changeProps
-			);
 			onUnitChange?.( validParsedUnit, changeProps );
 
 			setUnit( validParsedUnit );
