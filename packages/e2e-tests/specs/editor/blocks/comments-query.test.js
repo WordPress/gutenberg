@@ -28,13 +28,7 @@ describe( 'Comment Query Loop', () => {
 		await trashAllComments();
 		await createNewPost();
 		await insertBlock( 'Comments Query Loop' );
-		await page.waitForSelector( '[data-testid="noresults"]' );
-		expect(
-			await page.evaluate(
-				( el ) => el.innerText,
-				await page.$( '[data-testid="noresults"]' )
-			)
-		).toEqual( 'No results found.' );
+		await page.waitForXPath( '//p[contains(text(), "No results found.")]' );
 	} );
 	it( 'Pagination links are working as expected', async () => {
 		await createNewPost();

@@ -228,13 +228,14 @@ if ( ! function_exists( 'get_comments_pagination_arrow' ) ) {
 function gutenberg_extend_block_editor_settings_with_discussion_settings( $settings ) {
 
 	$settings['__experimentalDiscussionSettings'] = array(
-		'commentOrder'        => get_option( 'comment_order' ),
-		'commentsPerPage'     => get_option( 'comments_per_page' ),
-		'defaultCommentsPage' => get_option( 'default_comments_page' ),
-		'pageComments'        => get_option( 'page_comments' ),
-		'threadComments'      => get_option( 'thread_comments' ),
-		'threadCommentsDepth' => get_option( 'thread_comments_depth' ),
-		'avatarURL'           => get_avatar_url(
+		'commentOrder'         => get_option( 'comment_order' ),
+		'commentsPerPage'      => get_option( 'comments_per_page' ),
+		'defaultCommentsPage'  => get_option( 'default_comments_page' ),
+		'pageComments'         => get_option( 'page_comments' ),
+		'threadComments'       => get_option( 'thread_comments' ),
+		'threadCommentsDepth'  => get_option( 'thread_comments_depth' ),
+		'defaultCommentStatus' => get_option( 'default_comment_status' ),
+		'avatarURL'            => get_avatar_url(
 			'',
 			array(
 				'size'          => 96,
@@ -269,3 +270,30 @@ function gutenberg_rest_comment_set_children_as_embeddable() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable' );
+
+/**
+ * Registers the lock block attribute for block types.
+ *
+ * Once 6.0 is the minimum supported WordPress version for the Gutenberg
+ * plugin, this shim can be removed
+ *
+ * Doesn't need to be backported into Core.
+ *
+ * @param array $args Array of arguments for registering a block type.
+ * @return array $args
+ */
+function gutenberg_register_lock_attribute( $args ) {
+	// Setup attributes if needed.
+	if ( ! isset( $args['attributes'] ) ) {
+		$args['attributes'] = array();
+	}
+
+	if ( ! array_key_exists( 'lock', $args['attributes'] ) ) {
+		$args['attributes']['lock'] = array(
+			'type' => 'object',
+		);
+	}
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_register_lock_attribute' );

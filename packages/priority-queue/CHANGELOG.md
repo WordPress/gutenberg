@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.7.0 (2022-04-21)
+
 ### New features
 
 -  Add a new `cancel` method that removes scheduled callbacks without executing them.

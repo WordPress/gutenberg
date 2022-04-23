@@ -1,6 +1,8 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 8.3.0 (2022-04-21)
 ### New Features
 
 -   Add new `filter` icon. ([#40435](https://github.com/WordPress/gutenberg/pull/40435))

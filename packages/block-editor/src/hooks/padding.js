@@ -2,12 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
+import {
+	Platform,
+	useState,
+	useRef,
+	useEffect,
+	useMemo,
+} from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -20,6 +27,7 @@ import {
 	useIsDimensionsSupportValid,
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
+import BlockPopover from '../components/block-popover';
 
 /**
  * Determines if there is padding support.
@@ -124,26 +132,12 @@ export function PaddingEdit( props ) {
 		} );
 	};
 
-	const onChangeShowVisualizer = ( next ) => {
-		const newStyle = {
-			...style,
-			visualizers: {
-				padding: next,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
 	return Platform.select( {
 		web: (
 			<>
 				<BoxControl
 					values={ style?.spacing?.padding }
 					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
 					label={ __( 'Padding' ) }
 					sides={ sides }
 					units={ units }
@@ -154,4 +148,55 @@ export function PaddingEdit( props ) {
 		),
 		native: null,
 	} );
+}
+
+export function PaddingVisualizer( { clientId, attributes } ) {
+	const padding = attributes?.style?.spacing?.padding;
+	const style = useMemo( () => {
+		return {
+			borderTopWidth: padding?.top ?? 0,
+			borderRightWidth: padding?.right ?? 0,
+			borderBottomWidth: padding?.bottom ?? 0,
+			borderLeftWidth: padding?.left ?? 0,
+		};
+	}, [ padding ] );
+
+	const [ isActive, setIsActive ] = useState( false );
+	const valueRef = useRef( padding );
+	const timeoutRef = useRef();
+
+	const clearTimer = () => {
+		if ( timeoutRef.current ) {
+			window.clearTimeout( timeoutRef.current );
+		}
+	};
+
+	useEffect( () => {
+		if ( ! isShallowEqual( padding, valueRef.current ) ) {
+			setIsActive( true );
+			valueRef.current = padding;
+
+			clearTimer();
+
+			timeoutRef.current = setTimeout( () => {
+				setIsActive( false );
+			}, 400 );
+		}
+
+		return () => clearTimer();
+	}, [ padding ] );
+
+	if ( ! isActive ) {
+		return null;
+	}
+
+	return (
+		<BlockPopover
+			clientId={ clientId }
+			__unstableCoverTarget
+			__unstableRefreshSize={ padding }
+		>
+			<div className="block-editor__padding-visualizer" style={ style } />
+		</BlockPopover>
+	);
 }

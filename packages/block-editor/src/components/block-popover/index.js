@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { Popover } from '@wordpress/components';
 import { getScrollContainer } from '@wordpress/dom';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +20,8 @@ export default function BlockPopover( {
 	clientId,
 	bottomClientId,
 	children,
+	__unstableRefreshSize,
+	__unstableCoverTarget = false,
 	__unstablePopoverSlot,
 	__unstableContentRef,
 	...props
@@ -26,6 +29,17 @@ export default function BlockPopover( {
 	const selectedElement = useBlockElement( clientId );
 	const lastSelectedElement = useBlockElement( bottomClientId ?? clientId );
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
+	const style = useMemo( () => {
+		if ( ! selectedElement || lastSelectedElement !== selectedElement ) {
+			return {};
+		}
+
+		return {
+			position: 'absolute',
+			width: selectedElement.offsetWidth,
+			height: selectedElement.offsetHeight,
+		};
+	}, [ selectedElement, lastSelectedElement, __unstableRefreshSize ] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
 		return null;
@@ -50,7 +64,9 @@ export default function BlockPopover( {
 			position="top right left"
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
-			__unstableStickyBoundaryElement={ stickyBoundaryElement }
+			__unstableStickyBoundaryElement={
+				__unstableCoverTarget ? undefined : stickyBoundaryElement
+			}
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
@@ -61,13 +77,15 @@ export default function BlockPopover( {
 			// Used to safeguard sticky position behavior against cases where it would permanently
 			// obscure specific sections of a block.
 			__unstableEditorCanvasWrapper={ __unstableContentRef?.current }
+			__unstableForcePosition={ __unstableCoverTarget }
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',
 				props.className
 			) }
 		>
-			{ children }
+			{ __unstableCoverTarget && <div style={ style }>{ children }</div> }
+			{ ! __unstableCoverTarget && children }
 		</Popover>
 	);
 }
