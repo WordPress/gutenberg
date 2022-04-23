@@ -10,11 +10,6 @@ import { clamp, noop } from 'lodash';
 import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
 
 /**
- * Internal dependencies
- */
-import { useControlledState } from '../utils/hooks';
-
-/**
  * A float supported clamp function for a specific value.
  *
  * @param {number|null} value The value to clamp.
@@ -29,42 +24,6 @@ export function floatClamp( value, min, max ) {
 	}
 
 	return parseFloat( clamp( value, min, max ) );
-}
-
-/**
- * Hook to store a clamped value, derived from props.
- *
- * @param {Object} settings         Hook settings.
- * @param {number} settings.min     The minimum value.
- * @param {number} settings.max     The maximum value.
- * @param {number} settings.value   The current value.
- * @param {any}    settings.initial The initial value.
- *
- * @return {[*, Function]} The controlled value and the value setter.
- */
-export function useControlledRangeValue( {
-	min,
-	max,
-	value: valueProp,
-	initial,
-} ) {
-	const [ state, setInternalState ] = useControlledState(
-		floatClamp( valueProp, min, max ),
-		{ initial, fallback: null }
-	);
-
-	const setState = useCallback(
-		( nextValue ) => {
-			if ( nextValue === null ) {
-				setInternalState( null );
-			} else {
-				setInternalState( floatClamp( nextValue, min, max ) );
-			}
-		},
-		[ min, max ]
-	);
-
-	return [ state, setState ];
 }
 
 /**

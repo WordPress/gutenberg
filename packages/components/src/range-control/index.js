@@ -19,7 +19,7 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
 import { COLORS } from '../utils';
-import { floatClamp, useControlledRangeValue } from './utils';
+import { floatClamp } from './utils';
 import InputRange from './input-range';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
@@ -70,12 +70,7 @@ function RangeControl(
 	},
 	ref
 ) {
-	const [ value, setValue ] = useControlledRangeValue( {
-		min,
-		max,
-		value: valueProp,
-		initial: initialPosition,
-	} );
+	const [ value, setValue ] = useState( valueProp ?? initialPosition ?? '' );
 	const isResetPendent = useRef( false );
 
 	if ( step === 'any' ) {
