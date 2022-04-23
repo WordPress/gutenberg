@@ -16,7 +16,7 @@
  * @return Bool Whether this file is in an ignored directory.
  */
 function gutenberg_is_theme_directory_ignored( $path ) {
-	$directories_to_ignore = array( '.git', 'node_modules', 'vendor' );
+	$directories_to_ignore = array( '.svn', '.git', '.hg', '.bzr', 'node_modules', 'vendor' );
 	foreach ( $directories_to_ignore as $directory ) {
 		if ( strpos( $path, $directory ) === 0 ) {
 			return true;
@@ -97,12 +97,28 @@ function gutenberg_generate_block_templates_export_file() {
 	}
 
 	// Load theme.json into the zip file.
-	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) );
+	// Merge with user data.
 	$tree->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
+
+	$theme_json_raw = $tree->get_data();
+	// If a version is defined, add a schema.
+	if ( $theme_json_raw['version'] ) {
+		global $wp_version;
+		$theme_json_version = 'wp/' . substr( $wp_version, 0, 3 );
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
+			$theme_json_version = 'trunk';
+		}
+		$schema         = array( '$schema' => 'https://schemas.wp.org/' . $theme_json_version . '/theme.json' );
+		$theme_json_raw = array_merge( $schema, $theme_json_raw );
+	}
+
 	// Convert to a string.
-	$theme_json_encoded = wp_json_encode( $tree->get_data(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+	$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+
 	// Replace 4 spaces with a tab.
 	$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
+
 	// Add the theme.json file to the zip.
 	$zip->addFromString(
 		'theme.json',

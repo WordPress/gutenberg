@@ -48,17 +48,18 @@ function block_core_gallery_render( $attributes, $content ) {
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
-	$gap       = preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
-	$id        = uniqid();
-	$class     = 'wp-block-gallery-' . $id;
-	$content   = preg_replace(
+	$gap     = preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
+	$class   = wp_unique_id( 'wp-block-gallery-' );
+	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
 		'class="' . $class . ' ',
 		$content,
 		1
 	);
-	$gap_value = $gap ? $gap : 'var( --wp--style--block-gap, 0.5em )';
-	$style     = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_value . '}';
+	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
+	// gap on the gallery.
+	$gap_value = $gap ? $gap : 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
+	$style     = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_value . '; gap: ' . $gap_value . '}';
 	// Ideally styles should be loaded in the head, but blocks may be parsed
 	// after that, so loading in the footer for now.
 	// See https://core.trac.wordpress.org/ticket/53494.

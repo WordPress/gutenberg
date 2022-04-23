@@ -51,6 +51,54 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'border', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
 	},
+	borderTopColor: {
+		value: [ 'border', 'top', 'color' ],
+		support: [ '__experimentalBorder', 'color' ],
+	},
+	borderTopStyle: {
+		value: [ 'border', 'top', 'style' ],
+		support: [ '__experimentalBorder', 'style' ],
+	},
+	borderTopWidth: {
+		value: [ 'border', 'top', 'width' ],
+		support: [ '__experimentalBorder', 'width' ],
+	},
+	borderRightColor: {
+		value: [ 'border', 'right', 'color' ],
+		support: [ '__experimentalBorder', 'color' ],
+	},
+	borderRightStyle: {
+		value: [ 'border', 'right', 'style' ],
+		support: [ '__experimentalBorder', 'style' ],
+	},
+	borderRightWidth: {
+		value: [ 'border', 'right', 'width' ],
+		support: [ '__experimentalBorder', 'width' ],
+	},
+	borderBottomColor: {
+		value: [ 'border', 'bottom', 'color' ],
+		support: [ '__experimentalBorder', 'color' ],
+	},
+	borderBottomStyle: {
+		value: [ 'border', 'bottom', 'style' ],
+		support: [ '__experimentalBorder', 'style' ],
+	},
+	borderBottomWidth: {
+		value: [ 'border', 'bottom', 'width' ],
+		support: [ '__experimentalBorder', 'width' ],
+	},
+	borderLeftColor: {
+		value: [ 'border', 'left', 'color' ],
+		support: [ '__experimentalBorder', 'color' ],
+	},
+	borderLeftStyle: {
+		value: [ 'border', 'left', 'style' ],
+		support: [ '__experimentalBorder', 'style' ],
+	},
+	borderLeftWidth: {
+		value: [ 'border', 'left', 'width' ],
+		support: [ '__experimentalBorder', 'width' ],
+	},
 	color: {
 		value: [ 'color', 'text' ],
 		support: [ 'color', 'text' ],

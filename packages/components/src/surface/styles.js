@@ -10,7 +10,7 @@ import { CONFIG, COLORS } from '../utils';
 
 export const Surface = css`
 	background-color: ${ CONFIG.surfaceColor };
-	color: ${ COLORS.black };
+	color: ${ COLORS.darkGray.primary };
 	position: relative;
 `;
 

@@ -34,6 +34,7 @@ export default function save( { attributes } ) {
 		customOverlayColor,
 		dimRatio,
 		focalPoint,
+		useFeaturedImage,
 		hasParallax,
 		isDark,
 		isRepeated,
@@ -60,7 +61,7 @@ export default function save( { attributes } ) {
 	const isImgElement = ! ( hasParallax || isRepeated );
 
 	const style = {
-		...( isImageBackground && ! isImgElement
+		...( isImageBackground && ! isImgElement && ! useFeaturedImage
 			? backgroundImageStyles( url )
 			: {} ),
 		minHeight: minHeight || undefined,
@@ -113,19 +114,22 @@ export default function save( { attributes } ) {
 				style={ bgStyle }
 			/>
 
-			{ isImageBackground && isImgElement && url && (
-				<img
-					className={ classnames(
-						'wp-block-cover__image-background',
-						id ? `wp-image-${ id }` : null
-					) }
-					alt={ alt }
-					src={ url }
-					style={ { objectPosition } }
-					data-object-fit="cover"
-					data-object-position={ objectPosition }
-				/>
-			) }
+			{ ! useFeaturedImage &&
+				isImageBackground &&
+				isImgElement &&
+				url && (
+					<img
+						className={ classnames(
+							'wp-block-cover__image-background',
+							id ? `wp-image-${ id }` : null
+						) }
+						alt={ alt }
+						src={ url }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) }
 			{ isVideoBackground && url && (
 				<video
 					className={ classnames(

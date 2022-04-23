@@ -2,10 +2,17 @@
 
 ## Unreleased
 
-### Bug Fix
+## 22.4.0 (2022-04-08)
+
+### New Feature
+
+-   Add `--webpack-src-dir` CLI flag to allow customizing the source code directory (`src` by default) ([#39618](https://github.com/WordPress/gutenberg/pull/39618)).
+
+### Bug Fixes
 
 -   Add `vendor/` to `.markdownlintignore`, to match `lint-md-docs` docs ([#39724](https://github.com/WordPress/gutenberg/pull/39724)).
 -   Include files with `.jsx` extension in the build process ([#39613](https://github.com/WordPress/gutenberg/pull/39613)).
+-   Ensure that the default logic for entry points in the build commands is executed only when used the default config ([#39618](https://github.com/WordPress/gutenberg/pull/39618)).
 
 ## 22.2.0 (2022-03-11)
 

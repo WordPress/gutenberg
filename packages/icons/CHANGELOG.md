@@ -2,23 +2,26 @@
 
 ## Unreleased
 
+## 8.2.0 (2022-04-08)
+
+### New Features
+
+-   Add new `row` and `copy` icons. ([#39690](https://github.com/WordPress/gutenberg/pull/39690))
+-   Add new `listItem` icon. ([#39929](https://github.com/WordPress/gutenberg/pull/39929))
+
 ## 8.1.0 (2022-03-23)
 
 ## 8.0.0 (2022-03-11)
 
 ### Breaking Changes
 
--   Changed `dragHandle` footprint from 18x18 to 24x24 to match other icons.  ([#39342](https://github.com/WordPress/gutenberg/pull/39342))
-
-### New Features
-
-- Add new `row` and `copy` icons. 
+-   Changed `dragHandle` footprint from 18x18 to 24x24 to match other icons. ([#39342](https://github.com/WordPress/gutenberg/pull/39342))
 
 ## 7.0.0 (2022-02-23)
 
 ### New Features
 
-- Added new icon: `post`, and refreshed the existing `pin` icon. ([#39139](https://github.com/WordPress/gutenberg/pull/39139))
+-   Added new icon: `post`, and refreshed the existing `pin` icon. ([#39139](https://github.com/WordPress/gutenberg/pull/39139))
 
 ### Breaking Changes
 

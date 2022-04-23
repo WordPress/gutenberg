@@ -22,20 +22,14 @@ test.describe( 'new editor state', () => {
 
 	test.describe( 'dropdown', () => {
 		test( 'toggles via click', async ( { page } ) => {
-			const isMoreMenuOpen = async () =>
-				!! ( await page.locator(
-					'.interface-more-menu-dropdown__content'
-				) );
-
-			expect( await isMoreMenuOpen() ).toBe( true );
-
+			const isMoreMenuOpen = page.locator( 'role=menu[name="Options"i]' );
 			// Toggle opened.
-			await page.click( '.interface-more-menu-dropdown > button' );
-			expect( await isMoreMenuOpen() ).toBe( true );
+			await page.click( 'role=button[name="Options"i]' );
+			await expect( isMoreMenuOpen ).toBeVisible();
 
 			//Toggle closed.
-			await page.click( '.interface-more-menu-dropdown > button' );
-			expect( await isMoreMenuOpen() ).toBe( true );
+			await page.click( 'role=button[name="Options"i]' );
+			await expect( isMoreMenuOpen ).not.toBeVisible();
 		} );
 	} );
 } );

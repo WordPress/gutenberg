@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { AccessibilityInfo, Platform } from 'react-native';
+import { AccessibilityInfo, Platform, Text } from 'react-native';
 import { delay } from 'lodash';
 
 /**
@@ -15,6 +15,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import {
 	Icon,
+	plus,
 	plusCircle,
 	plusCircleFilled,
 	insertAfter,
@@ -32,27 +33,51 @@ import { store as blockEditorStore } from '../../store';
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
-const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
-	<ToolbarButton
-		title={ _x( 'Add block', 'Generic label for block inserter button' ) }
-		icon={
-			<Icon
-				icon={ plusCircleFilled }
-				style={ style }
-				color={ style.color }
-			/>
-		}
-		onClick={ onToggle }
-		extraProps={ {
-			hint: __( 'Double tap to add a block' ),
-			// testID is present to disambiguate this element for native UI tests. It's not
-			// usually required for components. See: https://git.io/JeQ7G.
-			testID: 'add-block-button',
-			onLongPress,
-		} }
-		isDisabled={ disabled }
-	/>
-);
+const defaultRenderToggle = ( {
+	onToggle,
+	disabled,
+	style,
+	containerStyle,
+	onLongPress,
+	useExpandedMode,
+} ) => {
+	// The "expanded mode" refers to the editor's appearance when no blocks
+	// are currently selected. The "add block" button has a separate style
+	// for the "expanded mode", which are added via the below "expandedModeViewProps"
+	// and "expandedModeViewText" variables.
+	const expandedModeViewProps = useExpandedMode && {
+		icon: <Icon icon={ plus } style={ style } />,
+		customContainerStyles: containerStyle,
+		fixedRatio: false,
+	};
+	const expandedModeViewText = (
+		<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
+			{ __( 'Add Blocks' ) }
+		</Text>
+	);
+
+	return (
+		<ToolbarButton
+			title={ _x(
+				'Add block',
+				'Generic label for block inserter button'
+			) }
+			icon={ <Icon icon={ plusCircleFilled } style={ style } /> }
+			onClick={ onToggle }
+			extraProps={ {
+				hint: __( 'Double tap to add a block' ),
+				// testID is present to disambiguate this element for native UI tests. It's not
+				// usually required for components. See: https://git.io/JeQ7G.
+				testID: 'add-block-button',
+				onLongPress,
+			} }
+			isDisabled={ disabled }
+			{ ...expandedModeViewProps }
+		>
+			{ useExpandedMode && expandedModeViewText }
+		</ToolbarButton>
+	);
+};
 
 export class Inserter extends Component {
 	constructor() {
@@ -219,13 +244,21 @@ export class Inserter extends Component {
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
 			showSeparator,
+			useExpandedMode,
 		} = this.props;
 		if ( showSeparator && isOpen ) {
 			return <BlockInsertionPoint />;
 		}
-		const style = getStylesFromColorScheme(
-			styles.addBlockButton,
-			styles.addBlockButtonDark
+		const style = useExpandedMode
+			? styles[ 'inserter-menu__add-block-button-icon--expanded' ]
+			: getStylesFromColorScheme(
+					styles[ 'inserter-menu__add-block-button-icon' ],
+					styles[ 'inserter-menu__add-block-button-icon--dark' ]
+			  );
+
+		const containerStyle = getStylesFromColorScheme(
+			styles[ 'inserter-menu__add-block-button' ],
+			styles[ 'inserter-menu__add-block-button--dark' ]
 		);
 
 		const onPress = () => {
@@ -265,7 +298,9 @@ export class Inserter extends Component {
 					isOpen,
 					disabled,
 					style,
+					containerStyle,
 					onLongPress,
+					useExpandedMode,
 				} ) }
 				<Picker
 					ref={ ( instance ) => ( this.picker = instance ) }

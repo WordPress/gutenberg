@@ -1,5 +1,13 @@
 .block-editor-block-switcher {
 	position: relative;
+	padding: 0 ($grid-unit-15 * 0.5);
+
+	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+	// This is best fixed by making the mover control area a proper single toolbar group.
+	// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
+	.components-button.components-dropdown-menu__toggle.has-icon.has-icon {
+		min-width: $button-size;
+	}
 }
 
 // Show an indicator triangle.
@@ -7,7 +15,6 @@
 .block-editor-block-switcher__toggle {
 	position: relative;
 }
-
 
 .components-button.block-editor-block-switcher__toggle,
 .components-button.block-editor-block-switcher__no-switcher-icon {
@@ -39,11 +46,15 @@
 }
 
 .components-button.block-editor-block-switcher__no-switcher-icon {
-	width: $block-toolbar-height;
+	display: flex;
+	// The `!important` is used to vastly simplify the overriding of an inherited selector.
+	// Can be removed if we refactor .block-editor-block-toolbar .components-toolbar-group .components-button.has-icon.has-icon
+	padding: ($grid-unit-15 * 0.5) $grid-unit-15 !important;
 
-	.block-editor-blocks-icon {
+	.block-editor-block-icon {
 		margin-right: auto;
 		margin-left: auto;
+		min-width: $icon-size !important;
 	}
 }
 
@@ -165,7 +176,7 @@
 // The block switcher in the contextual toolbar should be bigger.
 .block-editor-block-contextual-toolbar {
 	.components-button.block-editor-block-switcher__no-switcher-icon {
-		width: $grid-unit-60;
+		min-width: $button-size;
 	}
 
 	.components-button.block-editor-block-switcher__no-switcher-icon,

@@ -16,6 +16,8 @@ import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 
+/** @typedef {import('./types').AnyFunction} AnyFunction */
+
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
  * undefined (if no request has been made for given taxonomy), null (if a
@@ -185,7 +187,7 @@ export function themeGlobalStyleVariations( state = {}, action ) {
  *
  * @param {Object} entityConfig Entity config.
  *
- * @return {Function} Reducer.
+ * @return {AnyFunction} Reducer.
  */
 function entity( entityConfig ) {
 	return flowRight( [
@@ -398,16 +400,32 @@ export const entities = ( state = {}, action ) => {
 };
 
 /**
+ * @typedef {Object} UndoStateMeta
+ *
+ * @property {number} offset          Where in the undo stack we are.
+ * @property {Object} [flattenedUndo] Flattened form of undo stack.
+ */
+
+/** @typedef {Array<Object> & UndoStateMeta} UndoState */
+
+/**
+ * @type {UndoState}
+ *
+ * @todo Given how we use this we might want to make a custom class for it.
+ */
+const UNDO_INITIAL_STATE = Object.assign( [], { offset: 0 } );
+
+/** @type {Object} */
+let lastEditAction;
+
+/**
  * Reducer keeping track of entity edit undo history.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {UndoState} state  Current state.
+ * @param {Object}    action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {UndoState} Updated state.
  */
-const UNDO_INITIAL_STATE = [];
-UNDO_INITIAL_STATE.offset = 0;
-let lastEditAction;
 export function undo( state = UNDO_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
@@ -439,8 +457,11 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				}
 			}
 
+			/** @type {UndoState} */
 			let nextState;
+
 			if ( isUndoOrRedo ) {
+				// @ts-ignore we might consider using Object.assign({}, state)
 				nextState = [ ...state ];
 				nextState.offset =
 					state.offset + ( action.meta.isUndo ? -1 : 1 );
@@ -480,6 +501,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 					( key ) => ! action.transientEdits[ key ]
 				)
 			) {
+				// @ts-ignore we might consider using Object.assign({}, state)
 				nextState = [ ...state ];
 				nextState.flattenedUndo = {
 					...state.flattenedUndo,
@@ -491,6 +513,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 
 			// Clear potential redos, because this only supports linear history.
 			nextState =
+				// @ts-ignore this needs additional cleanup, probably involving code-level changes
 				nextState || state.slice( 0, state.offset || undefined );
 			nextState.offset = nextState.offset || 0;
 			nextState.pop();

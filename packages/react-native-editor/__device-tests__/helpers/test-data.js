@@ -165,3 +165,15 @@ exports.moreBlockEmpty = `<!-- wp:more -->
 exports.paragraphBlockEmpty = `<!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->`;
+
+exports.multiLinesParagraphBlock = `<!-- wp:paragraph -->
+<p>multiple lines<br>multiple lines<br>multiple lines</p>
+<!-- /wp:paragraph -->`;
+
+exports.unknownElementParagraphBlock = `<!-- wp:paragraph -->
+<p><unknownhtmlelement>abc</unknownhtmlelement>D</p>
+<!-- /wp:paragraph -->`;
+
+exports.lettersInParagraphBlock = `<!-- wp:paragraph -->
+<p>ABCD</p>
+<!-- /wp:paragraph -->`;

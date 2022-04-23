@@ -14,8 +14,8 @@ import useBlockDisplayTitle from './use-block-display-title';
  * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" maximumLength={ 17 }/>
  * ```
  *
- * @param {Object} props
- * @param {string} props.clientId Client ID of block.
+ * @param {Object}           props
+ * @param {string}           props.clientId      Client ID of block.
  * @param {number|undefined} props.maximumLength The maximum length that the block title string may be before truncated.
  *
  * @return {JSX.Element} Block title.

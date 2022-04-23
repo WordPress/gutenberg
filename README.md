@@ -41,9 +41,13 @@ Review the [Create a Block tutorial](/docs/getting-started/create-block/README.m
 
 ### Contribute to Gutenberg
 
-Gutenberg is an open-source project and welcomes all contributors from code to design, from documentation to triage. The project is built by many contributors and volunteers and we'd love your help building it.
+Gutenberg is an open-source project and welcomes all contributors from code to design, and from documentation to triage. The project is built by many contributors and volunteers and we'd love your help building it.
 
-See the [Contributors Handbook](https://developer.wordpress.org/block-editor/contributors/) for all the details on how you can contribute. See [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/HEAD/CONTRIBUTING.md) for the contributing guidelines.
+See the [Contributors Handbook](https://developer.wordpress.org/block-editor/contributors/) for all the details on how you can contribute. 
+
+To get up and running quickly with **code contribution** see [Getting Started With Code Contribution](/docs/contributors/code/getting-started-with-code-contribution.md). Also check out the other resources available on the [Code Contributions](/docs/contributors/code/README.md) page.
+
+In whichever way you wish to contribute please be sure to read the [Contributing Guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/CONTRIBUTING.md) first.
 
 As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](https://github.com/WordPress/gutenberg/blob/HEAD/CODE_OF_CONDUCT.md).
 
