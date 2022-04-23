@@ -210,7 +210,7 @@ export const Input = styled.input< InputProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.black };
+		color: ${ COLORS.gray[ 900 ] };
 		display: block;
 		font-family: inherit;
 		margin: 0;
@@ -245,7 +245,6 @@ const labelMargin = ( {
 const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 	&&& {
 		box-sizing: border-box;
-		color: currentColor;
 		display: block;
 		padding-top: 0;
 		padding-bottom: 0;

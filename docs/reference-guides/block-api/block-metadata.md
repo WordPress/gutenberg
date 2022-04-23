@@ -1,4 +1,4 @@
-# Metadata
+# Metadata in block.json
 
 Starting in WordPress 5.8 release, we encourage using the `block.json` metadata file as the canonical way to register block types. Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
 
@@ -461,7 +461,7 @@ Block type frontend and editor script definition. It will be enqueued both in th
 
 Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.
 
-_Note: An option to pass also an array of view scripts exists since WordPress `6.0.0`._
+_Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
 
 ### Editor Style
 
