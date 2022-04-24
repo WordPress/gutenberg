@@ -39,6 +39,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	if ( ! $query->have_posts() ) {
 		return '';
 	}
+	update_post_thumbnail_cache( $query );
 
 	$classnames = '';
 	if ( isset( $block->context['displayLayout'] ) && isset( $block->context['query'] ) ) {
