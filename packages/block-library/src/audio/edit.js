@@ -16,6 +16,7 @@ import {
 	withNotices,
 } from '@wordpress/components';
 import {
+	BlockCaption,
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
@@ -25,7 +26,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
@@ -54,6 +55,7 @@ function AudioEdit( {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	}, [] );
+	const containerRef = useRef();
 
 	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
@@ -125,6 +127,7 @@ function AudioEdit( {
 	} );
 
 	const blockProps = useBlockProps( {
+		ref: containerRef,
 		className: classes,
 	} );
 
@@ -203,11 +206,10 @@ function AudioEdit( {
 				</Disabled>
 				{ isTemporaryAudio && <Spinner /> }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						tagName="figcaption"
+					<BlockCaption
+						containerRef={ containerRef }
 						aria-label={ __( 'Audio caption text' ) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
+						caption={ caption }
 						onChange={ ( value ) =>
 							setAttributes( { caption: value } )
 						}
