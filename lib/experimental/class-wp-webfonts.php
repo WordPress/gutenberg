@@ -127,10 +127,16 @@ class WP_Web_Fonts extends WP_Dependencies {
 		}
 
 		if ( $variation['src'] ) {
-			return $this->add( $variation_handle, $variation['src'], array(), false, $variation );
+			$result = $this->add( $variation_handle, $variation['src'], array(), false, array( 'font-properties' => $variation ) );
 		} else {
-			return $this->add( $variation_handle, false, array(), false, $variation );
+			$result = $this->add( $variation_handle, false, array(), false, array( 'font-properties' => $variation ) );
 		}
+
+		if ( $result ) {
+			$this->providers[ $variation['provider'] ]['fonts'][] = $variation_handle;
+		}
+
+		return $result;
 	}
 
 	/**
@@ -246,34 +252,39 @@ class WP_Web_Fonts extends WP_Dependencies {
 		$styles    = '';
 		$providers = $this->get_providers();
 
+		$obj = $this->registered[ $handle ];
+
 		/*
 		 * Loop through each of the providers to get the CSS for their respective webfonts
 		 * to incrementally generate the collective styles for all of them.
 		 */
-		foreach ( $providers as $provider_id => $provider_class ) {
-
+		foreach ( $providers as $provider_id => $provider ) {
 			// Bail out if the provider class does not exist.
-			if ( ! class_exists( $provider_class ) ) {
+			if ( ! class_exists( $provider['class'] ) ) {
 				/* translators: %s is the provider name. */
 				trigger_error( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider_id ) );
 				continue;
 			}
 
-			$provider_webfonts = isset( $webfonts_by_provider[ $provider_id ] )
-				? $webfonts_by_provider[ $provider_id ]
-				: array();
+			$fonts = $this->get_enqueued_fonts_for_provider( $provider_id );
 
 			// If there are no registered webfonts for this provider, skip it.
-			if ( empty( $provider_webfonts ) ) {
+			if ( empty( $fonts ) ) {
 				continue;
+			}
+
+			$provider_fonts = array();
+
+			foreach ( $fonts as $font_handle ) {
+				$provider_fonts[ $font_handle ] = $this->get_data( $font_handle, 'font-properties' );
 			}
 
 			/*
 			 * Process the webfonts by first passing them to the provider via `set_webfonts()`
 			 * and then getting the CSS from the provider.
 			 */
-			$provider = new $provider_class();
-			$provider->set_webfonts( $provider_webfonts );
+			$provider = new $provider['class']();
+			$provider->set_webfonts( $provider_fonts );
 			$styles .= $provider->get_css();
 		}
 
@@ -293,7 +304,10 @@ class WP_Web_Fonts extends WP_Dependencies {
 		if ( empty( $provider ) || empty( $class ) || ! class_exists( $class ) ) {
 			return false;
 		}
-		$this->providers[ $provider ] = $class;
+		$this->providers[ $provider ] = array(
+			'class' => $class,
+			'fonts' => array(),
+		);
 		return true;
 	}
 
@@ -302,10 +316,28 @@ class WP_Web_Fonts extends WP_Dependencies {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @return WP_Web_Fonts_Provider[] All registered providers, each keyed by their unique ID.
+	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
 	 */
 	public function get_providers() {
 		return $this->providers;
+	}
+
+	/**
+	 * Retrieves a list of enqueued web font variations for a provider.
+	 *
+	 * @return array[] Webfonts organized by providers.
+	 */
+	private function get_enqueued_fonts_for_provider( $provider ) {
+		$providers = $this->get_providers();
+
+		if ( empty( $providers[ $provider ] ) ) {
+			return array();
+		}
+
+		return array_intersect(
+			$providers[ $provider ]['fonts'],
+			$this->get_enqueued()
+		);
 	}
 
 }
