@@ -6,11 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
 	RichText,
+	BlockCaption,
 	BlockIcon,
 	AlignmentControl,
 	useBlockProps,
@@ -104,6 +105,8 @@ function TableEdit( {
 
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
+
+	const containerRef = useRef();
 
 	/**
 	 * Updates the initial column count used for table creation.
@@ -425,8 +428,12 @@ function TableEdit( {
 
 	const isEmpty = ! sections.length;
 
+	const blockProps = useBlockProps( {
+		ref: containerRef,
+	} );
+
 	return (
-		<figure { ...useBlockProps() }>
+		<figure { ...blockProps }>
 			{ ! isEmpty && (
 				<>
 					<BlockControls group="block">
@@ -494,11 +501,12 @@ function TableEdit( {
 				</table>
 			) }
 			{ ! isEmpty && (
-				<RichText
+				<BlockCaption
+					containerRef={ containerRef }
 					tagName="figcaption"
-					aria-label={ __( 'Table caption text' ) }
+					ariaLabel={ __( 'Table caption text' ) }
 					placeholder={ __( 'Add caption' ) }
-					value={ caption }
+					caption={ caption }
 					onChange={ ( value ) =>
 						setAttributes( { caption: value } )
 					}
