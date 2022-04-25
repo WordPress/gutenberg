@@ -8,10 +8,17 @@
 /**
  * Optimizes the preload paths registered in Core (`edit-form-blocks.php`).
  *
- * @param array $preload_paths Preload paths to be filtered.
+ * @param array                   $preload_paths        Preload paths to be filtered.
+ * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
+ *
  * @return array
  */
-function gutenberg_optimize_preload_paths( $preload_paths ) {
+function gutenberg_optimize_preload_paths( $preload_paths, $block_editor_context ) {
+	// optimize only the post editor page, not site or widgets.
+	if ( 'core/edit-post' !== $block_editor_context->name ) {
+		return $preload_paths;
+	}
+
 	// remove preload of the `/` route.
 	$root_index = array_search( '/', $preload_paths, true );
 	if ( false !== $root_index ) {
@@ -48,7 +55,7 @@ function gutenberg_optimize_preload_paths( $preload_paths ) {
 
 	return $preload_paths;
 }
-add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_optimize_preload_paths' );
+add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_optimize_preload_paths', 10, 2 );
 
 /**
  * Disables loading remote block patterns from REST while initializing the editor.
