@@ -61,7 +61,7 @@ const metaData = {
 		let issue;
 
 		if ( reportedIssue ) {
-			let body = reportedIssue.body;
+			const body = reportedIssue.body;
 			const meta = metaData.get( body );
 
 			if ( isTrunk ) {
@@ -88,37 +88,39 @@ const metaData = {
 				}
 			}
 
-			let testResultsList = body.includes( TEST_RESULTS_LIST.open )
-				? body
-						.slice(
-							body.indexOf( TEST_RESULTS_LIST.open ) +
-								TEST_RESULTS_LIST.open.length,
-							body.indexOf( TEST_RESULTS_LIST.close )
-						)
-						/**
-						 * Split the text from:
-						 * ```
-						 * <!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->
-						 * ...
-						 * <!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->
-						 * <!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->
-						 * ```
-						 *
-						 * into:
-						 * ```
-						 * [
-						 *   '<!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->',
-						 *   '<!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->',
-						 *   '<!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->',
-						 * ]
-						 * ```
-						 */
-						.split(
-							new RegExp(
-								`(?<=${ TEST_RESULT.close })\n+(?:\.\.\.\n+)?(?=${ TEST_RESULT.open })`
+			let testResultsList =
+				body.includes( TEST_RESULTS_LIST.open ) &&
+				body.includes( TEST_RESULTS_LIST.close )
+					? body
+							.slice(
+								body.indexOf( TEST_RESULTS_LIST.open ) +
+									TEST_RESULTS_LIST.open.length,
+								body.indexOf( TEST_RESULTS_LIST.close )
 							)
-						)
-				: [];
+							/**
+							 * Split the text from:
+							 * ```
+							 * <!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->
+							 * ...
+							 * <!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->
+							 * <!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->
+							 * ```
+							 *
+							 * into:
+							 * ```
+							 * [
+							 *   '<!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->',
+							 *   '<!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->',
+							 *   '<!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->',
+							 * ]
+							 * ```
+							 */
+							.split(
+								new RegExp(
+									`(?<=${ TEST_RESULT.close })\n+(?:\.\.\.\n+)?(?=${ TEST_RESULT.open })`
+								)
+							)
+					: [];
 			// GitHub issues has character limits on issue's body,
 			// so we only preserve the first and the 9 latest results.
 			if ( testResultsList.length > 10 ) {
@@ -129,25 +131,26 @@ const metaData = {
 				];
 			}
 
-			// Reconstruct the body with the description + previous errors + new error.
-			body =
-				renderIssueDescription( { meta, testTitle, testPath } ) +
-				[
-					TEST_RESULTS_LIST.open,
-					...testResultsList,
-					renderTestResult( {
-						testRunner,
-						testPath,
-						testResults,
-					} ),
-					TEST_RESULTS_LIST.close,
-				].join( '\n' );
+			// Concat the test results list with the latest test results.
+			const formattedTestResults = [
+				...testResultsList,
+				formatTestResults( {
+					testRunner,
+					testPath,
+					testResults,
+				} ),
+			].join( '\n' );
 
 			const response = await octokit.rest.issues.update( {
 				...github.context.repo,
 				issue_number: reportedIssue.number,
 				state: 'open',
-				body,
+				body: renderIssueBody( {
+					meta,
+					testTitle,
+					testPath,
+					formattedTestResults,
+				} ),
 			} );
 
 			issue = response.data;
@@ -168,10 +171,9 @@ const metaData = {
 				title: issueTitle,
 				body: renderIssueBody( {
 					meta,
-					testRunner,
 					testTitle,
 					testPath,
-					testResults,
+					formattedTestResults: formatTestResults( testResults ),
 				} ),
 				labels: [ label ],
 			} );
@@ -237,18 +239,10 @@ function getIssueTitle( testTitle ) {
 
 function renderIssueBody( {
 	meta,
-	testRunner,
 	testTitle,
 	testPath,
-	testResults,
+	formattedTestResults,
 } ) {
-	return (
-		renderIssueDescription( { meta, testTitle, testPath } ) +
-		renderTestResultsList( { testRunner, testPath, testResults } )
-	);
-}
-
-function renderIssueDescription( { meta, testTitle, testPath } ) {
 	return `${ metaData.render( meta ) }
 **Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
 
@@ -262,17 +256,13 @@ ${ testTitle }
 \`${ meta.failedTimes } / ${ meta.totalCommits + meta.failedTimes }\` runs
 
 ## Errors
-`;
-}
-
-function renderTestResultsList( { testRunner, testPath, testResults } ) {
-	return `${ TEST_RESULTS_LIST.open }
-${ renderTestResults( { testRunner, testPath, testResults } ) }
+${ TEST_RESULTS_LIST.open }
+${ formattedTestResults }
 ${ TEST_RESULTS_LIST.close }
 `;
 }
 
-function renderTestErrorMessage( { testRunner, testResults, testPath } ) {
+function formatTestErrorMessage( { testRunner, testResults, testPath } ) {
 	switch ( testRunner ) {
 		case '@playwright/test': {
 			// Could do a slightly better formatting than this.
@@ -299,7 +289,7 @@ function renderTestErrorMessage( { testRunner, testResults, testPath } ) {
 	}
 }
 
-function renderTestResults( { testRunner, testPath, testResults } ) {
+function formatTestResults( { testRunner, testPath, testResults } ) {
 	const date = new Date().toISOString();
 	// It will look something like this without formatting:
 	// ▶ [2021-08-31T16:15:19.875Z] Test passed after 2 failed attempts on trunk
@@ -312,7 +302,7 @@ function renderTestResults( { testRunner, testPath, testResults } ) {
 </summary>
 
 \`\`\`
-${ renderTestErrorMessage( { testRunner, testPath, testResults } ) }
+${ formatTestErrorMessage( { testRunner, testPath, testResults } ) }
 \`\`\`
 </details>${ TEST_RESULT.close }`;
 }
