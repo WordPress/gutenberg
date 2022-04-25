@@ -20,10 +20,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			paragraphBlockElement,
 			testData.shortText
 		);
-		await clickMiddleOfElement(
-			editorPage.driver,
-			paragraphBlockElement
-		);
+		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			'\n',
@@ -55,10 +52,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			paragraphBlockElement,
 			testData.shortText
 		);
-		await clickMiddleOfElement(
-			editorPage.driver,
-			paragraphBlockElement
-		);
+		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			'\n'
