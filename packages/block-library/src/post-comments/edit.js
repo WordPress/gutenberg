@@ -11,8 +11,8 @@ import {
 	BlockControls,
 	Warning,
 	useBlockProps,
+	useInnerBlocksProps,
 	store as blockEditorStore,
-	InnerBlocks,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -21,14 +21,18 @@ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import CommentsInspectorControls from './edit/comments-inspector-controls';
 import Placeholder from './edit/placeholder';
+import TEMPLATE from './edit/template';
 
 export default function PostCommentsEdit( {
-	attributes: { textAlign },
+	attributes,
 	setAttributes,
 	context: { postType, postId },
 	clientId,
 } ) {
+	const { tagName: TagName, textAlign } = attributes;
+
 	const [ commentStatus ] = useEntityProp(
 		'postType',
 		postType,
@@ -89,9 +93,20 @@ export default function PostCommentsEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+	} );
 
 	if ( innerBlocks.length > 0 ) {
-		return <InnerBlocks />;
+		return (
+			<>
+				<CommentsInspectorControls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+				/>
+				<TagName { ...innerBlocksProps } />
+			</>
+		);
 	}
 
 	return (
