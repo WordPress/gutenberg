@@ -21,7 +21,7 @@ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import Placeholder from './placeholder';
+import Placeholder from './edit/placeholder';
 
 export default function PostCommentsEdit( {
 	attributes: { textAlign },

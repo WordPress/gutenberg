@@ -10,7 +10,7 @@ import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import CommentsForm from '../post-comments-form/form';
+import CommentsForm from '../../post-comments-form/form';
 
 export default function PostCommentsPlaceholder( { postType, postId } ) {
 	let [ postTitle ] = useEntityProp( 'postType', postType, 'title', postId );
