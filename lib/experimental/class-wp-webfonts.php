@@ -12,17 +12,9 @@ class WP_Web_Fonts extends WP_Dependencies {
 	private $providers = array();
 
 	/**
-	 * Get the list of providers.
 	 *
-	 * @since 6.0.0
-	 *
-	 * @return WP_Web_Fonts_Provider[] All registered providers, each keyed by their unique ID.
 	 */
-	public function get_providers() {
-		return $this->providers;
-	}
-
-	public function __contstruct() {
+	public function __construct() {
 		/**
 		 * Fires when the WP_Web_Fonts instance is initialized.
 		 *
@@ -31,6 +23,42 @@ class WP_Web_Fonts extends WP_Dependencies {
 		 * @param WP_Web_Fonts $wp_web_fonts WP_Web_Fonts instance (passed by reference).
 		 */
 		do_action_ref_array( 'wp_default_web_fonts', array( &$this ) );
+	}
+
+	/**
+	 * Get the list of all registered web fonts and variations.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @return array[]
+	 */
+	public function get_registered() {
+		return array_keys( $this->registered );
+	}
+
+	/**
+	 * Get the list of enqueued web fonts and variations.
+	 *
+	 * @return array[]
+	 */
+	public function get_enqueued() {
+		return $this->queue;
+	}
+
+	/**
+	 * Gets a list of all variations registered for a font family.
+	 *
+	 * @param $font_family
+	 * @return array
+	 */
+	public function get_variations( $font_family ) {
+		$font_family_handle = sanitize_title( $font_family );
+
+		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
+			return array();
+		}
+
+		return $this->registered[ $font_family_handle ]->deps;
 	}
 
 	/**
@@ -93,10 +121,15 @@ class WP_Web_Fonts extends WP_Dependencies {
 
 		$variation = $this->validate_variation( $font_family, $variation );
 
+		// Variation validation failed.
+		if ( ! $variation ) {
+			return false;
+		}
+
 		if ( $variation['src'] ) {
-			return $this->add( $variation_handle, $variation['src'] );
+			return $this->add( $variation_handle, $variation['src'], array(), false, $variation );
 		} else {
-			return $this->add( $variation_handle, false );
+			return $this->add( $variation_handle, false, array(), false, $variation );
 		}
 	}
 
@@ -157,6 +190,12 @@ class WP_Web_Fonts extends WP_Dependencies {
 			return false;
 		}
 
+		//Verify provider.
+		if ( ! class_exists( $variation['provider'] ) ) {
+			trigger_error( __( 'The provider class specified does not exist.', 'gutenberg' ) );
+			return false;
+		}
+
 		// Check the font-display.
 		if ( ! in_array( $variation['font-display'], array( 'auto', 'block', 'fallback', 'swap' ), true ) ) {
 			$variation['font-display'] = 'fallback';
@@ -190,4 +229,83 @@ class WP_Web_Fonts extends WP_Dependencies {
 
 		return $variation;
 	}
+
+	/**
+	 * Generate styles for webfonts.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @param array[] $webfonts_by_provider Webfonts organized by provider.
+	 * @return string $styles Generated styles.
+	 */
+	public function do_item( $handle, $group = false ) {
+		if ( ! parent::do_item( $handle ) ) {
+			return false;
+		}
+
+		$styles    = '';
+		$providers = $this->get_providers();
+
+		/*
+		 * Loop through each of the providers to get the CSS for their respective webfonts
+		 * to incrementally generate the collective styles for all of them.
+		 */
+		foreach ( $providers as $provider_id => $provider_class ) {
+
+			// Bail out if the provider class does not exist.
+			if ( ! class_exists( $provider_class ) ) {
+				/* translators: %s is the provider name. */
+				trigger_error( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider_id ) );
+				continue;
+			}
+
+			$provider_webfonts = isset( $webfonts_by_provider[ $provider_id ] )
+				? $webfonts_by_provider[ $provider_id ]
+				: array();
+
+			// If there are no registered webfonts for this provider, skip it.
+			if ( empty( $provider_webfonts ) ) {
+				continue;
+			}
+
+			/*
+			 * Process the webfonts by first passing them to the provider via `set_webfonts()`
+			 * and then getting the CSS from the provider.
+			 */
+			$provider = new $provider_class();
+			$provider->set_webfonts( $provider_webfonts );
+			$styles .= $provider->get_css();
+		}
+
+		return $styles;
+	}
+
+	/**
+	 * Register a provider.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @param string $provider The provider name.
+	 * @param string $class    The provider class name.
+	 * @return bool True if successfully registered, else false.
+	 */
+	public function register_provider( $provider, $class ) {
+		if ( empty( $provider ) || empty( $class ) || ! class_exists( $class ) ) {
+			return false;
+		}
+		$this->providers[ $provider ] = $class;
+		return true;
+	}
+
+	/**
+	 * Get the list of providers.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @return WP_Web_Fonts_Provider[] All registered providers, each keyed by their unique ID.
+	 */
+	public function get_providers() {
+		return $this->providers;
+	}
+
 }
