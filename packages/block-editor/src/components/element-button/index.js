@@ -1,37 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import RichText from '../rich-text';
-
-const getElementProps = ( props ) => {
+const getElementProps = ( props, ref ) => {
 	const newProps = { ...props };
 	newProps.className += ' wp-element-button';
+	newProps.ref = ref;
 	return newProps;
 };
 
-export default class ElementButton extends Component {
-	render() {
-		const newProps = getElementProps( this.props );
-		// If children are set then we only need a button, not RichText.
-		if ( newProps.children ) {
-			return <button { ...newProps } />;
-		}
+const ElementButton = forwardRef( ( props, ref ) => {
+	return <button { ...getElementProps( props, ref ) } />;
+} );
 
-		return <RichText { ...newProps } />;
-	}
-}
+ElementButton.Link = forwardRef( ( props, ref ) => {
+	// eslint-disable-next-line jsx-a11y/anchor-has-content
+	return <a { ...getElementProps( props, ref ) } />;
+} );
 
-ElementButton.Content = ( props ) => {
-	const newProps = getElementProps( props );
-	// If children are set then we only need a button, not RichText.
-	if ( newProps.children ) {
-		return <button { ...newProps } />;
-	}
-
-	return <RichText.Content { ...newProps } />;
-};
+export default ElementButton;

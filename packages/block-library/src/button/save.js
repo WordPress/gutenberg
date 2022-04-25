@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import {
 	ElementButton,
+	RichText,
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
@@ -60,8 +61,8 @@ export default function save( { attributes, className } ) {
 
 	return (
 		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
-			<ElementButton.Content
-				tagName="a"
+			<RichText.Content
+				tagName={ ElementButton.Link }
 				className={ buttonClasses }
 				href={ url }
 				title={ title }

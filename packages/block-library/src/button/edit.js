@@ -18,8 +18,9 @@ import {
 } from '@wordpress/components';
 import {
 	BlockControls,
-	InspectorControls,
 	ElementButton,
+	InspectorControls,
+	RichText,
 	useBlockProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
@@ -160,7 +161,8 @@ function ButtonEdit( props ) {
 					[ `has-custom-font-size` ]: blockProps.style.fontSize,
 				} ) }
 			>
-				<ElementButton
+				<RichText
+					tagName={ ElementButton.Link }
 					ref={ richTextRef }
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }

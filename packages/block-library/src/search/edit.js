@@ -269,7 +269,8 @@ export default function SearchEdit( {
 				) }
 
 				{ ! buttonUseIcon && (
-					<ElementButton
+					<RichText
+						tagName={ ElementButton }
 						className={ buttonClasses }
 						style={ buttonStyles }
 						aria-label={ __( 'Button text' ) }
