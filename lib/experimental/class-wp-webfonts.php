@@ -1,6 +1,6 @@
 <?php
 
-class WP_Web_Fonts extends WP_Dependencies {
+class WP_Webfonts extends WP_Dependencies {
 
 	/**
 	 * An array of registered providers.
@@ -16,13 +16,13 @@ class WP_Web_Fonts extends WP_Dependencies {
 	 */
 	public function __construct() {
 		/**
-		 * Fires when the WP_Web_Fonts instance is initialized.
+		 * Fires when the WP_Webfonts instance is initialized.
 		 *
 		 * @since X.X.X
 		 *
-		 * @param WP_Web_Fonts $wp_web_fonts WP_Web_Fonts instance (passed by reference).
+		 * @param WP_Webfonts $wp_webfonts WP_Webfonts instance (passed by reference).
 		 */
-		do_action_ref_array( 'wp_default_web_fonts', array( &$this ) );
+		do_action_ref_array( 'wp_default_webfonts', array( &$this ) );
 	}
 
 	/**
@@ -30,7 +30,7 @@ class WP_Web_Fonts extends WP_Dependencies {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @return array[]
+	 * @return strings[]
 	 */
 	public function get_registered() {
 		return array_keys( $this->registered );
@@ -126,6 +126,8 @@ class WP_Web_Fonts extends WP_Dependencies {
 			return false;
 		}
 
+		$variation_handle = $font_family_handle . '-' . $variation_handle;
+
 		if ( $variation['src'] ) {
 			$result = $this->add( $variation_handle, $variation['src'], array(), false, array( 'font-properties' => $variation ) );
 		} else {
@@ -146,9 +148,9 @@ class WP_Web_Fonts extends WP_Dependencies {
 	 * @param $variation_handle
 	 */
 	public function add_dependency( $font_family_handle, $variation_handle ) {
-		$dependencies = $this->registered[ $font_family_handle ];
+		$dependencies = $this->registered[ $font_family_handle ]->deps;
 		$dependencies[] = $variation_handle;
-		$this->registered[ $font_family_handle ] = $dependencies;
+		$this->registered[ $font_family_handle ]->deps = $dependencies;
 	}
 
 	/**
@@ -178,6 +180,9 @@ class WP_Web_Fonts extends WP_Dependencies {
 				trigger_error( __( 'Webfont src must be a non-empty string or an array of strings.', 'gutenberg' ) );
 				return false;
 			}
+		} elseif ( ! class_exists( $variation['provider'] ) ) {
+			trigger_error( __( 'The provider class specified does not exist.', 'gutenberg' ) );
+			return false;
 		}
 
 		// Validate the 'src' property.
@@ -193,12 +198,6 @@ class WP_Web_Fonts extends WP_Dependencies {
 		// Check the font-weight.
 		if ( ! is_string( $variation['font-weight'] ) && ! is_int( $variation['font-weight'] ) ) {
 			trigger_error( __( 'Webfont font weight must be a properly formatted string or integer.', 'gutenberg' ) );
-			return false;
-		}
-
-		//Verify provider.
-		if ( ! class_exists( $variation['provider'] ) ) {
-			trigger_error( __( 'The provider class specified does not exist.', 'gutenberg' ) );
 			return false;
 		}
 
@@ -304,6 +303,7 @@ class WP_Web_Fonts extends WP_Dependencies {
 		if ( empty( $provider ) || empty( $class ) || ! class_exists( $class ) ) {
 			return false;
 		}
+
 		$this->providers[ $provider ] = array(
 			'class' => $class,
 			'fonts' => array(),

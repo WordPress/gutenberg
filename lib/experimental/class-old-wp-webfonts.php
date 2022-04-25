@@ -76,26 +76,6 @@ class WP_Webfonts {
 	}
 
 	/**
-	 * Get the list of registered fonts.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @return array[]
-	 */
-	public function get_registered_webfonts() {
-		return $this->registered_webfonts;
-	}
-
-	/**
-	 * Get the list of enqueued fonts.
-	 *
-	 * @return array[]
-	 */
-	public function get_enqueued_webfonts() {
-		return $this->enqueued_webfonts;
-	}
-
-	/**
 	 * Get the list of all fonts.
 	 *
 	 * @return array[]
