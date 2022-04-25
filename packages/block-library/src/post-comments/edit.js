@@ -23,7 +23,6 @@ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
  */
 import CommentsInspectorControls from './edit/comments-inspector-controls';
 import Placeholder from './edit/placeholder';
-import TEMPLATE from './edit/template';
 
 export default function PostCommentsEdit( {
 	attributes,
@@ -93,9 +92,7 @@ export default function PostCommentsEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
 
 	if ( innerBlocks.length > 0 ) {
 		return (
