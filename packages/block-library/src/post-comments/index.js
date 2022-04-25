@@ -21,10 +21,8 @@ export const settings = {
 	variations: [
 		{
 			name: 'default',
-			title: 'Post Comments',
 			isDefault: true,
 			innerBlocks: TEMPLATE,
-			icon,
 			scope: [ 'inserter' ],
 		},
 	],
