@@ -21,8 +21,8 @@ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import CommentsInspectorControls from './edit/comments-inspector-controls';
-import Placeholder from './edit/placeholder';
+import CommentsInspectorControls from './comments-inspector-controls';
+import Placeholder from './placeholder';
 
 export default function PostCommentsEdit( {
 	attributes,
