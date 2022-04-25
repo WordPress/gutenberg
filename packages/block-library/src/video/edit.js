@@ -16,6 +16,7 @@ import {
 	withNotices,
 } from '@wordpress/components';
 import {
+	BlockCaption,
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
@@ -63,6 +64,7 @@ function VideoEdit( {
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload
 	);
+	const containerRef = useRef();
 
 	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
@@ -136,6 +138,7 @@ function VideoEdit( {
 	} );
 
 	const blockProps = useBlockProps( {
+		ref: containerRef,
 		className: classes,
 	} );
 
@@ -265,11 +268,10 @@ function VideoEdit( {
 				</Disabled>
 				{ isTemporaryVideo && <Spinner /> }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						tagName="figcaption"
+					<BlockCaption
+						containerRef={ containerRef }
 						aria-label={ __( 'Video caption text' ) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
+						caption={ caption }
 						onChange={ ( value ) =>
 							setAttributes( { caption: value } )
 						}
