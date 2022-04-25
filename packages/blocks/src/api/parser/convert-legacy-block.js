@@ -57,6 +57,9 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 
 	// Convert Post Comment blocks in existing content to Comment blocks.
 	// TODO: Remove these checks when WordPress 6.0 is released.
+	if ( name === 'core/comments-query-loop' ) {
+		name = 'core/post-comments';
+	}
 	if ( name === 'core/post-comment-author' ) {
 		name = 'core/comment-author-name';
 	}
