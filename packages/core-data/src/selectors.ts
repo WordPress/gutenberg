@@ -132,7 +132,7 @@ export const getUserQueryResults = createSelector(
 export function getEntitiesByKind(
 	state: State,
 	kind: string
-): Array< Object > {
+): Array< any > {
 	deprecated( "wp.data.select( 'core' ).getEntitiesByKind()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntitiesConfig()",
@@ -151,7 +151,7 @@ export function getEntitiesByKind(
 export function getEntitiesConfig(
 	state: State,
 	kind: string
-): Array< Object > {
+): Array< any > {
 	return filter( state.entities.config, { kind } );
 }
 
@@ -165,7 +165,7 @@ export function getEntitiesConfig(
  *
  * @return Entity config
  */
-export function getEntity( state: State, kind: string, name: string ): Object {
+export function getEntity( state: State, kind: string, name: string ): any {
 	deprecated( "wp.data.select( 'core' ).getEntity()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntityConfig()",
@@ -201,7 +201,7 @@ export function getEntityConfig(
  * @param  key   Record's key
  * @param  query Optional query.
  *
- * @return any Record.
+ * @return Record.
  */
 export const getEntityRecord = createSelector(
 	(
@@ -210,7 +210,7 @@ export const getEntityRecord = createSelector(
 		name: string,
 		key: RecordKey,
 		query?: EntityQuery< any >
-	): Object | undefined => {
+	): EntityRecord | undefined => {
 		const queriedState = get( state.entities.records, [
 			kind,
 			name,
@@ -288,7 +288,7 @@ export function __experimentalGetEntityRecordNoResolver(
 	kind: string,
 	name: string,
 	key: string | number
-): EntityRecord {
+): EntityRecord | null {
 	return getEntityRecord( state, kind, name, key );
 }
 
@@ -309,7 +309,7 @@ export const getRawEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		key: string | number
-	): EntityRecord => {
+	): EntityRecord | undefined => {
 		const record = getEntityRecord( state, kind, name, key );
 		return (
 			record &&
@@ -397,7 +397,7 @@ export function getEntityRecords(
 	kind: string,
 	name: string,
 	query?: EntityQuery< any >
-): Array< EntityRecord > {
+): Array< EntityRecord > | undefined {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState = get( state.entities.records, [
@@ -539,7 +539,7 @@ export function getEntityRecordEdits(
 	kind: string,
 	name: string,
 	recordId: RecordKey
-): any {
+): any | undefined {
 	return get( state.entities.records, [ kind, name, 'edits', recordId ] );
 }
 
@@ -558,7 +558,7 @@ export function getEntityRecordEdits(
  * @return The entity record's non transient edits.
  */
 export const getEntityRecordNonTransientEdits = createSelector(
-	( state: State, kind: string, name: string, recordId: RecordKey ): any => {
+	( state: State, kind: string, name: string, recordId: RecordKey ): any | undefined => {
 		const { transientEdits } = getEntityConfig( state, kind, name ) || {};
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
 		if ( ! transientEdits ) {
@@ -618,7 +618,7 @@ export const getEditedEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: RecordKey
-	): EntityRecord => ( {
+	): EntityRecord | undefined => ( {
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
@@ -796,7 +796,7 @@ function getCurrentUndoOffset( state: State ): number {
  *
  * @return The edit.
  */
-export function getUndoEdit( state: State ): Object {
+export function getUndoEdit( state: State ): any | undefined {
 	return state.undo[ state.undo.length - 2 + getCurrentUndoOffset( state ) ];
 }
 
@@ -808,7 +808,7 @@ export function getUndoEdit( state: State ): Object {
  *
  * @return The edit.
  */
-export function getRedoEdit( state: State ): Object {
+export function getRedoEdit( state: State ): any | undefined {
 	return state.undo[ state.undo.length + getCurrentUndoOffset( state ) ];
 }
 
@@ -865,7 +865,7 @@ export function __experimentalGetCurrentGlobalStylesId( state: State ): string {
  *
  * @return Index data.
  */
-export function getThemeSupports( state: State ): Object {
+export function getThemeSupports( state: State ): any {
 	return getCurrentTheme( state )?.theme_supports ?? EMPTY_OBJECT;
 }
 
@@ -877,7 +877,7 @@ export function getThemeSupports( state: State ): Object {
  *
  * @return Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
  */
-export function getEmbedPreview( state: State, url: string ): Object {
+export function getEmbedPreview( state: State, url: string ): any {
 	return state.embedPreviews[ url ];
 }
 
@@ -994,7 +994,7 @@ export function getAutosave(
 	postType: string,
 	postId: number,
 	authorId: number
-): EntityRecord {
+): EntityRecord | undefined {
 	if ( authorId === undefined ) {
 		return;
 	}
@@ -1090,7 +1090,7 @@ export function __experimentalGetTemplateForLink(
  */
 export function __experimentalGetCurrentThemeBaseGlobalStyles(
 	state: State
-): Object | null {
+): any | null {
 	const currentTheme = getCurrentTheme( state );
 	if ( ! currentTheme ) {
 		return null;
