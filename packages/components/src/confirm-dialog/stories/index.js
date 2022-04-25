@@ -79,7 +79,49 @@ const Template = ( args ) => {
 
 // Simplest usage: just declare the component with the required `onConfirm` prop. Note: the `onCancel` prop is optional here, unless you'd like to render the component in Controlled mode (see below)
 export const _default = Template.bind( {} );
+const _defaultSnippet = `() => {
+  const [ isOpen, setIsOpen ] = useState( false );
+  const [ confirmVal, setConfirmVal ] = useState('');
+
+  const handleConfirm = () => {
+    setConfirmVal( 'Confirmed!' );
+    setIsOpen( false );
+  };
+
+  const handleCancel = () => {
+    setConfirmVal( 'Cancelled' );
+    setIsOpen( false );
+  };
+
+  return (
+    <>
+    <ConfirmDialog
+      isOpen={ isOpen }
+      onConfirm={ handleConfirm }
+      onCancel={ handleCancel }
+    >
+      Would you like to privately publish the post now?
+    </ConfirmDialog>
+
+    <Heading level={ 1 }>{ confirmVal }</Heading>
+
+    <Button variant="primary" onClick={ () => setIsOpen( true ) }>
+      Open ConfirmDialog
+    </Button>
+    </>
+    );
+  };`;
 _default.args = {};
+_default.parameters = {
+	docs: {
+		source: {
+			code: _defaultSnippet,
+			language: 'jsx',
+			type: 'auto',
+			format: 'true',
+		},
+	},
+};
 
 // To customize button text, pass the `cancelButtonText` and/or `confirmButtonText` props.
 export const withCustomButtonLabels = Template.bind( {} );
@@ -88,49 +130,27 @@ withCustomButtonLabels.args = {
 	confirmButtonText: 'Yes please!',
 };
 
-const controlledSnippet = `() => {
-	const [ isOpen, setIsOpen ] = useState( false );
-	const [ confirmVal, setConfirmVal ] = useState('');
-	
-	const handleConfirm = () => {
-		setConfirmVal( 'Confirmed!' );
-		setIsOpen( false );
-	};
-	
-	const handleCancel = () => {
-		setConfirmVal( 'Cancelled' );
-		setIsOpen( false );
-	};
-	
-	return (
-		<>
-		<ConfirmDialog
-		isOpen={ isOpen }
-		onConfirm={ handleConfirm }
-		onCancel={ handleCancel }
-		>
-		Would you like to privately publish the post now?
-		</ConfirmDialog>
-		
-		<Heading level={ 1 }>{ confirmVal }</Heading>
-		
-		<Button variant="primary" onClick={ () => setIsOpen( true ) }>
-		Open ConfirmDialog
-		</Button>
-		</>
-		);
-	};`;
+const uncontrolledSnippet = `<>
+  <ConfirmDialog
+    onConfirm={ handleConfirm }
+  >
+    Would you like to privately publish the post now?
+  </ConfirmDialog>
+  
+  <Heading level={ 1 } />
+</>
+`;
 
-export const Controlled = Template.bind( {} );
-Controlled.args = {};
-Controlled.parameters = {
+export const Uncontrolled = Template.bind( {} );
+Uncontrolled.args = {};
+Uncontrolled.parameters = {
 	docs: {
 		description: {
 			story:
-				"Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel` to be passed. It's also necessary to explicitly close the dialog when needed. See `setIsOpen` calls below.",
+				'To render in Uncontrolled Mode, omit passing a boolean to the `isOpen` prop. This will allow the component to close itself without the need for an explicit callback. In Uncontrolled mode, `onCancel` is optional.',
 		},
 		source: {
-			code: controlledSnippet,
+			code: uncontrolledSnippet,
 			language: 'jsx',
 			type: 'auto',
 		},
