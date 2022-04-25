@@ -1,8 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-export default function save() {
-	return <InnerBlocks.Content />;
+export default function save( { attributes: { tagName: Tag } } ) {
+	return (
+		<Tag { ...useBlockProps.save() }>
+			<InnerBlocks.Content />
+		</Tag>
+	);
 }
