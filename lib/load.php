@@ -118,10 +118,11 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 }
 require __DIR__ . '/experimental/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
-require __DIR__ . '/experimental/class-wp-webfonts.php';
+require __DIR__ . '/experimental/class-NEW-web-fonts.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider-local.php';
-require __DIR__ . '/experimental/webfonts.php';
+require __DIR__ . '/experimental/web-fonts.php';
+require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 
