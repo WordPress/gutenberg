@@ -55,7 +55,7 @@ export default function PostCommentsFormEdit( {
 	);
 
 	let warning = false;
-	let showPlacholder = true;
+	let showPlaceholder = true;
 
 	if ( ! isSiteEditor && 'open' !== commentStatus ) {
 		if ( 'closed' === commentStatus ) {
@@ -66,7 +66,7 @@ export default function PostCommentsFormEdit( {
 				),
 				postType
 			);
-			showPlacholder = false;
+			showPlaceholder = false;
 		} else if ( ! postTypeSupportsComments ) {
 			warning = sprintf(
 				/* translators: 1: Post type (i.e. "post", "page") */
@@ -75,12 +75,12 @@ export default function PostCommentsFormEdit( {
 				),
 				postType
 			);
-			showPlacholder = false;
+			showPlaceholder = false;
 		} else if ( 'open' !== defaultCommentStatus ) {
 			warning = __(
 				'Post Comments Form block: Comments are not enabled.'
 			);
-			showPlacholder = false;
+			showPlaceholder = false;
 		}
 	}
 
@@ -97,7 +97,7 @@ export default function PostCommentsFormEdit( {
 			<div { ...blockProps }>
 				{ warning && <Warning>{ warning }</Warning> }
 
-				{ showPlacholder ? <CommentsForm /> : null }
+				{ showPlaceholder ? <CommentsForm /> : null }
 			</div>
 		</>
 	);

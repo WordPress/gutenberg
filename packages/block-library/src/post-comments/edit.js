@@ -55,7 +55,7 @@ export default function PostCommentsEdit( {
 	let warning = __(
 		'Post Comments block: This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments Query Loop" block.'
 	);
-	let showPlacholder = true;
+	let showPlaceholder = true;
 
 	if ( ! isSiteEditor && 'open' !== commentStatus ) {
 		if ( 'closed' === commentStatus ) {
@@ -66,7 +66,7 @@ export default function PostCommentsEdit( {
 				),
 				postType
 			);
-			showPlacholder = false;
+			showPlaceholder = false;
 		} else if ( ! postTypeSupportsComments ) {
 			warning = sprintf(
 				/* translators: 1: Post type (i.e. "post", "page") */
@@ -75,10 +75,10 @@ export default function PostCommentsEdit( {
 				),
 				postType
 			);
-			showPlacholder = false;
+			showPlaceholder = false;
 		} else if ( 'open' !== defaultCommentStatus ) {
 			warning = __( 'Post Comments block: Comments are not enabled.' );
-			showPlacholder = false;
+			showPlaceholder = false;
 		}
 	}
 
@@ -104,7 +104,7 @@ export default function PostCommentsEdit( {
 			<div { ...blockProps }>
 				<Warning>{ warning }</Warning>
 
-				{ showPlacholder && (
+				{ showPlaceholder && (
 					<div
 						className="wp-block-post-comments__placeholder"
 						ref={ disabledRef }
