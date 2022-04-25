@@ -13,7 +13,7 @@ import classnames from 'classnames/dedupe';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
-import { RichText, BlockIcon } from '@wordpress/block-editor';
+import { BlockCaption, RichText, BlockIcon } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
@@ -64,6 +64,7 @@ class EmbedPreview extends Component {
 			icon,
 			label,
 			insertBlocksAfter,
+			containerRef,
 		} = this.props;
 		const { scripts } = preview;
 		const { interactive } = this.state;
@@ -138,10 +139,9 @@ class EmbedPreview extends Component {
 					</Placeholder>
 				) }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						tagName="figcaption"
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
+					<BlockCaption
+						containerRef={ containerRef }
+						caption={ caption }
 						onChange={ onCaptionChange }
 						inlineToolbar
 						__unstableOnSplitAtEnd={ () =>

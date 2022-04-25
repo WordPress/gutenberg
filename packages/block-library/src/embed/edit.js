@@ -23,7 +23,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -51,6 +51,8 @@ const EmbedEdit = ( props ) => {
 	};
 	const { icon, title } =
 		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;
+
+	const containerRef = useRef();
 
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
@@ -162,7 +164,9 @@ const EmbedEdit = ( props ) => {
 		}
 	}, [ preview, isEditingURL ] );
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		ref: containerRef,
+	} );
 
 	if ( fetching ) {
 		return (
@@ -246,6 +250,7 @@ const EmbedEdit = ( props ) => {
 					icon={ icon }
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
+					containerRef={ containerRef }
 				/>
 			</View>
 		</>
