@@ -33,10 +33,10 @@ function render_block_core_search( $attributes ) {
 	$use_icon_button  = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
 	$show_input       = ( ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'] ) ? false : true;
 	$show_button      = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
-	$post_type        = $attributes['postType'];
+	$query_params     = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
 	$input_markup     = '';
-	$post_type_markup = '';
 	$button_markup    = '';
+	$query_params_markup = '';
 	$inline_styles    = styles_for_block_core_search( $attributes );
 	$color_classes    = get_color_classes_for_block_core_search( $attributes );
 	$is_button_inside = ! empty( $attributes['buttonPosition'] ) &&
@@ -71,11 +71,14 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
-	if ( $post_type ) {
-		$post_type_markup = sprintf(
-			'<input type="hidden" name="post_type" value="%s" />',
-			esc_attr( $post_type )
-		);
+	if ( count( $query_params ) > 0 ) {
+		foreach ($query_params as $param => $value ) {
+			$query_params_markup .= sprintf(
+				'<input type="hidden" name="%s" value="%s" />',
+				esc_attr( $param ),
+				esc_attr( $value )
+			);
+		}
 	}
 
 	if ( $show_button ) {
@@ -114,7 +117,7 @@ function render_block_core_search( $attributes ) {
 		'<div class="wp-block-search__inside-wrapper %s" %s>%s</div>',
 		esc_attr( $field_markup_classes ),
 		$inline_styles['wrapper'],
-		$input_markup . $post_type_markup . $button_markup
+		$input_markup . $query_params_markup . $button_markup
 	);
 	$wrapper_attributes   = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 

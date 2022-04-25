@@ -68,7 +68,7 @@ export default function SearchEdit( {
 		label,
 		showLabel,
 		placeholder,
-		postType,
+		query,
 		width,
 		widthUnit,
 		align,
@@ -251,9 +251,15 @@ export default function SearchEdit( {
 						setAttributes( { placeholder: event.target.value } )
 					}
 				/>
-				{ !! postType && (
-					<input type="hidden" name="post_type" value={ postType } />
-				) }
+				{ !! query &&
+					Object.keys( query ).map( ( key ) => (
+						<input
+							key={ key }
+							type="hidden"
+							name={ key }
+							value={ query[ key ] }
+						/>
+					) ) }
 			</>
 >>>>>>> 1641205f40 (Add postType attribute to Search Block)
 		);

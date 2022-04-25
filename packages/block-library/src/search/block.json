@@ -39,8 +39,9 @@
 			"type": "boolean",
 			"default": false
 		},
-		"postType": {
-			"type": "string"
+		"query": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"supports": {
