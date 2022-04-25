@@ -331,6 +331,9 @@
 					{ "docs/contributors/documentation/copy-guide.md": [] }
 				]
 			},
+			{
+				"docs/contributors/how-to-get-your-pull-request-reviewed.md": []
+			},
 			{ "docs/contributors/triage.md": [] },
 			{ "docs/contributors/localizing.md": [] },
 			{ "docs/contributors/accessibility-testing.md": [] },

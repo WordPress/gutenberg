@@ -2124,6 +2124,12 @@
 		"parent": "documentation"
 	},
 	{
+		"title": "How To Get Your Pull Request Reviewed?",
+		"slug": "how-to-get-your-pull-request-reviewed",
+		"markdown_source": "../docs/contributors/how-to-get-your-pull-request-reviewed.md",
+		"parent": "contributors"
+	},
+	{
 		"title": "Triage",
 		"slug": "triage",
 		"markdown_source": "../docs/contributors/triage.md",
@@ -2145,12 +2151,6 @@
 		"title": "Repository Management",
 		"slug": "repository-management",
 		"markdown_source": "../docs/contributors/repository-management.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "How To Get Your Pull Request Reviewed?",
-		"slug": "how-to-get-your-pull-request-reviewed",
-		"markdown_source": "../docs/contributors/how-to-get-your-pull-request-reviewed.md",
 		"parent": "contributors"
 	},
 	{
