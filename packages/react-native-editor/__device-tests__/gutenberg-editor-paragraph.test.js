@@ -22,8 +22,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 		await clickMiddleOfElement(
 			editorPage.driver,
-			paragraphBlockElement,
-			true
+			paragraphBlockElement
 		);
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
@@ -58,8 +57,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 		await clickMiddleOfElement(
 			editorPage.driver,
-			paragraphBlockElement,
-			true
+			paragraphBlockElement
 		);
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
@@ -86,9 +84,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
-		expect(
-			text0.replace( /\s/g, '' ) + text1.replace( /\s/g, '' )
-		).toMatch( text.replace( /\s/g, '' ) );
+		expect( text0 + text1 ).toMatch( text );
 		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 1 );
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );

@@ -506,21 +506,6 @@ class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
-	async getTextViewForParagraphBlock( block ) {
-		let textViewElementName = 'XCUIElementTypeTextView';
-		if ( isAndroid() ) {
-			textViewElementName = 'android.widget.EditText';
-		}
-
-		const accessibilityId = await block.getAttribute(
-			this.accessibilityIdKey
-		);
-		const blockLocator = `//*[@${
-			this.accessibilityIdXPathAttrib
-		}=${ JSON.stringify( accessibilityId ) }]//${ textViewElementName }`;
-		return await this.driver.elementByXPath( blockLocator );
-	}
-
 	async typeTextToParagraphBlock( block, text, clear ) {
 		await typeString( this.driver, block, text, clear );
 	}
