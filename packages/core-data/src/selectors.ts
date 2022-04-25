@@ -129,10 +129,7 @@ export const getUserQueryResults = createSelector(
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesByKind(
-	state: State,
-	kind: string
-): Array< any > {
+export function getEntitiesByKind( state: State, kind: string ): Array< any > {
 	deprecated( "wp.data.select( 'core' ).getEntitiesByKind()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntitiesConfig()",
@@ -148,10 +145,7 @@ export function getEntitiesByKind(
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesConfig(
-	state: State,
-	kind: string
-): Array< any > {
+export function getEntitiesConfig( state: State, kind: string ): Array< any > {
 	return filter( state.entities.config, { kind } );
 }
 
@@ -558,7 +552,12 @@ export function getEntityRecordEdits(
  * @return The entity record's non transient edits.
  */
 export const getEntityRecordNonTransientEdits = createSelector(
-	( state: State, kind: string, name: string, recordId: RecordKey ): any | undefined => {
+	(
+		state: State,
+		kind: string,
+		name: string,
+		recordId: RecordKey
+	): any | undefined => {
 		const { transientEdits } = getEntityConfig( state, kind, name ) || {};
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
 		if ( ! transientEdits ) {

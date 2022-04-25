@@ -75,7 +75,7 @@ _Parameters_
 
 _Returns_
 
--   `EntityRecord`: The autosave for the post and author.
+-   `EntityRecord | undefined`: The autosave for the post and author.
 
 ### getAutosaves
 
@@ -155,7 +155,7 @@ _Parameters_
 
 _Returns_
 
--   `EntityRecord`: The entity record, merged with its edits.
+-   `EntityRecord | undefined`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -168,7 +168,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
+-   `any`: Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
 
 ### getEntitiesByKind
 
@@ -183,7 +183,7 @@ _Parameters_
 
 _Returns_
 
--   `Array< Object >`: Array of entities with config matching kind.
+-   `Array< any >`: Array of entities with config matching kind.
 
 ### getEntitiesConfig
 
@@ -196,7 +196,7 @@ _Parameters_
 
 _Returns_
 
--   `Array< Object >`: Array of entities with config matching kind.
+-   `Array< any >`: Array of entities with config matching kind.
 
 ### getEntity
 
@@ -212,7 +212,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Entity config
+-   `any`: Entity config
 
 ### getEntityConfig
 
@@ -244,7 +244,7 @@ _Parameters_
 
 _Returns_
 
--   `Object | undefined`: any Record.
+-   `EntityRecord | undefined`: Record.
 
 ### getEntityRecordEdits
 
@@ -259,7 +259,7 @@ _Parameters_
 
 _Returns_
 
--   `any`: The entity record's edits.
+-   `any | undefined`: The entity record's edits.
 
 ### getEntityRecordNonTransientEdits
 
@@ -278,7 +278,7 @@ _Parameters_
 
 _Returns_
 
--   `any`: The entity record's non transient edits.
+-   `any | undefined`: The entity record's non transient edits.
 
 ### getEntityRecords
 
@@ -293,7 +293,7 @@ _Parameters_
 
 _Returns_
 
--   `Array< EntityRecord >`: Records.
+-   `Array< EntityRecord > | undefined`: Records.
 
 ### getLastEntityDeleteError
 
@@ -339,7 +339,7 @@ _Parameters_
 
 _Returns_
 
--   `EntityRecord`: Object with the entity's raw attributes.
+-   `EntityRecord | undefined`: Object with the entity's raw attributes.
 
 ### getRedoEdit
 
@@ -352,7 +352,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: The edit.
+-   `any | undefined`: The edit.
 
 ### getReferenceByDistinctEdits
 
@@ -385,7 +385,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Index data.
+-   `any`: Index data.
 
 ### getUndoEdit
 
@@ -398,7 +398,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: The edit.
+-   `any | undefined`: The edit.
 
 ### getUserQueryResults
 
