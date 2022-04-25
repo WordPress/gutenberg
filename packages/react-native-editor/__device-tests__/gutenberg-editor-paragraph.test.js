@@ -71,10 +71,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			paragraphBlockElement
 		);
 
-		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			backspaceKey
+			backspace
 		);
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -113,10 +112,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			editorPage.driver,
 			paragraphBlockElement
 		);
-		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			backspaceKey
+			backspace
 		);
 
 		// Verify the editor has not crashed.
@@ -142,10 +140,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			blockNames.paragraph,
 			2
 		);
-		const backspaceKey = isAndroid() ? backspace : '\b\b';
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			backspaceKey
+			backspace
 		);
 
 		// Verify the editor has not crashed.
