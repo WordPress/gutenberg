@@ -222,7 +222,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// If the transform has a `isMatch` function specified, check that it returns true.
 	if (
 		isFunction( transform.isMatch ) &&
-		! checkTransformIsMatch( transform, blocks, sourceBlock )
+		! checkTransformIsMatch( transform, blocks )
 	) {
 		return false;
 	}
@@ -457,13 +457,13 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 /**
  * Checks that a given transforms isMatch method passes for given source blocks.
  *
- * @param {Object}       transform   A transform object.
- * @param {Array|Object} blocks      Blocks array.
- * @param {Object}       sourceBlock Source block being transformed.
+ * @param {Object} transform A transform object.
+ * @param {Array}  blocks    Blocks array.
  *
  * @return {boolean} True if given blocks are a match for given tranform.
  */
-function checkTransformIsMatch( transform, blocks, sourceBlock ) {
+function checkTransformIsMatch( transform, blocks ) {
+	const sourceBlock = first( blocks );
 	const attributes = transform.isMultiBlock
 		? blocks.map( ( block ) => block.attributes )
 		: sourceBlock.attributes;
@@ -500,7 +500,7 @@ export function switchToBlockType( blocks, name ) {
 					t.blocks.indexOf( name ) !== -1 ) &&
 				( ! isMultiBlock || t.isMultiBlock ) &&
 				( ! isFunction( t.isMatch ) ||
-					checkTransformIsMatch( t, blocks, firstBlock ) )
+					checkTransformIsMatch( t, blocksArray ) )
 		) ||
 		findTransform(
 			transformationsFrom,
@@ -510,7 +510,7 @@ export function switchToBlockType( blocks, name ) {
 					t.blocks.indexOf( sourceName ) !== -1 ) &&
 				( ! isMultiBlock || t.isMultiBlock ) &&
 				( ! isFunction( t.isMatch ) ||
-					checkTransformIsMatch( t, blocks, firstBlock ) )
+					checkTransformIsMatch( t, blocksArray ) )
 		);
 
 	// Stop if there is no valid transformation.
