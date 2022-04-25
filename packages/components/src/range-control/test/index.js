@@ -4,6 +4,11 @@
 import { fireEvent, render } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import RangeControl from '../';
@@ -14,6 +19,15 @@ const getNumberInput = ( container ) =>
 	container.querySelector( 'input[type="number"]' );
 const getResetButton = ( container ) =>
 	container.querySelector( '.components-range-control__reset' );
+
+function ControlledRangeControl( props ) {
+	const [ value, setValue ] = useState( props.value );
+	const onChange = ( v ) => {
+		setValue( v );
+		props.onChange?.( v );
+	};
+	return <RangeControl { ...props } onChange={ onChange } value={ value } />;
+}
 
 describe( 'RangeControl', () => {
 	describe( '#render()', () => {
@@ -296,25 +310,31 @@ describe( 'RangeControl', () => {
 			expect( spy ).toHaveBeenCalledWith( 33 );
 		} );
 
-		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
-			const { container } = render(
-				<RangeControl
-					initialPosition={ undefined }
-					min={ 0 }
-					max={ 100 }
-					allowReset={ true }
-					resetFallbackValue={ undefined }
-				/>
-			);
+		it.concurrent.each( [ RangeControl, ControlledRangeControl ] )(
+			'should reset to a 50% of min/max value, if no initialPosition or resetFallbackValue is defined',
+			( Component ) => {
+				const value =
+					Component === ControlledRangeControl ? 89 : undefined;
+				const { container } = render(
+					<Component
+						initialPosition={ undefined }
+						min={ 0 }
+						max={ 100 }
+						allowReset={ true }
+						resetFallbackValue={ undefined }
+						value={ value }
+					/>
+				);
 
-			const resetButton = getResetButton( container );
-			const rangeInput = getRangeInput( container );
-			const numberInput = getNumberInput( container );
+				const resetButton = getResetButton( container );
+				const rangeInput = getRangeInput( container );
+				const numberInput = getNumberInput( container );
 
-			fireEvent.click( resetButton );
+				fireEvent.click( resetButton );
 
-			expect( rangeInput.value ).toBe( '50' );
-			expect( numberInput.value ).toBe( '' );
-		} );
+				expect( rangeInput.value ).toBe( '50' );
+				expect( numberInput.value ).toBe( '' );
+			}
+		);
 	} );
 } );
