@@ -70,7 +70,7 @@ function RangeControl(
 	},
 	ref
 ) {
-	const isResetPendent = useRef( false )
+	const isResetPendent = useRef( false );
 	const [ value, setValue ] = useControlledValue( {
 		defaultValue: initialPosition ?? '',
 		value: isResetPendent.current ? undefined : valueProp,
