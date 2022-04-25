@@ -501,7 +501,7 @@ Display a post's comments. ([Source](https://github.com/WordPress/gutenberg/tree
 -	**Name:** core/post-comments
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** textAlign
+-	**Attributes:** tagName, textAlign
 
 ## Post Comments Count
 
