@@ -923,7 +923,7 @@ describe( 'actions', () => {
 				type: 'MERGE_BLOCKS',
 				blocks: [ blockA.clientId, blockB.clientId ],
 			} );
-			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'chicken' );
+			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'chicken', 0 );
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
