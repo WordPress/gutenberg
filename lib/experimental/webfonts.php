@@ -7,24 +7,24 @@
  * @since      6.0.0
  */
 
-if ( ! function_exists( 'wp_web_fonts' ) ) {
+if ( ! function_exists( 'wp_webfonts' ) ) {
 	/**
-	 * Initialize $wp_web_fonts if it has not been set.
+	 * Initialize $wp_webfonts if it has not been set.
 	 *
 	 * @since X.X.X
 	 *
-	 * @global WP_Web_Fonts $wp_web_fonts
+	 * @global WP_Webfonts $wp_webfonts
 	 *
-	 * @return WP_Web_Fonts WP_Web_Fonts instance.
+	 * @return WP_Webfonts WP_Webfonts instance.
 	 */
-	function wp_web_fonts() {
-		global $wp_web_fonts;
+	function wp_webfonts() {
+		global $wp_webfonts;
 
-		if ( ! ( $wp_web_fonts instanceof WP_Web_Fonts ) ) {
-			$wp_web_fonts = new WP_Web_Fonts();
+		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
+			$wp_webfonts = new WP_Webfonts();
 		}
 
-		return $wp_web_fonts;
+		return $wp_webfonts;
 	}
 }
 
@@ -36,9 +36,9 @@ if ( ! function_exists( 'wp_register_web_font_family' ) ) {
 	 * @return array|bool
 	 */
 	function wp_register_web_font_family( $font_family ) {
-		$wp_web_fonts = wp_web_fonts();
+		$wp_webfonts = wp_webfonts();
 
-		return $wp_web_fonts->add( $font_family, false );
+		return $wp_webfonts->add( sanitize_title( $font_family ), false );
 	}
 }
 
@@ -50,21 +50,21 @@ if ( ! function_exists( 'wp_register_web_font_variation' ) ) {
 	 * @return mixed
 	 */
 	function wp_register_web_font_variation( $font_family, $variation_handle, $variation ) {
-		return wp_web_fonts()->add_variation( $font_family, $variation_handle, $variation );
+		return wp_webfonts()->add_variation( $font_family, $variation_handle, $variation );
 	}
 }
 
-if ( ! function_exists( 'wp_register_web_fonts' ) ) {
+if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	/**
 	 * Registers a list of web fonts and variations.
 	 *
-	 * @param $web_fonts
+	 * @param $webfonts
 	 * @return array
 	 */
-	function wp_register_web_fonts( $web_fonts, $enqueue = false ) {
+	function wp_register_webfonts( $webfonts, $enqueue = false ) {
 		$registered = array();
 
-		foreach ( $web_fonts as $font_family => $variations ) {
+		foreach ( $webfonts as $font_family => $variations ) {
 			wp_register_web_font_family( $font_family );
 
 			foreach ( $variations as $variation_handle => $variation ) {
@@ -85,8 +85,8 @@ if ( ! function_exists( 'wp_enqueue_web_font' ) ) {
 	 * Enqueues a web font family and all variations.
 	 */
 	function wp_enqueue_web_font( $handle ) {
-		$wp_web_fonts = wp_web_fonts();
-		$wp_web_fonts->enqueue( $handle );
+		$wp_webfonts = wp_webfonts();
+		$wp_webfonts->enqueue( $handle );
 	}
 }
 
@@ -95,21 +95,21 @@ if ( ! function_exists( 'wp_enqueue_web_font_variations' ) ) {
 	 * Enqueues a specific set of web font variations.
 	 */
 	function wp_enqueue_web_font_variations( $variations ) {
-		$wp_web_fonts = wp_web_fonts();
+		$wp_webfonts = wp_webfonts();
 
 		// Looking to enqueue all variations of a font family.
 		foreach ( $variations as $variation ) {
-			$wp_web_fonts->enqueue( $variation );
+			$wp_webfonts->enqueue( $variation );
 		}
 	}
 }
 
 if ( ! function_exists( 'wp_deregister_web_font_family' ) ) {
 	/**
-	 * Unregisters an entire font family and all vcariations.
+	 * Unregisters an entire font family and all variations.
 	 */
 	function wp_deregister_web_font_family( $font_family ) {
-		wp_web_fonts()->remove_family( $font_family );
+		wp_webfonts()->remove_family( $font_family );
 	}
 }
 
@@ -118,26 +118,9 @@ if ( ! function_exists( 'wp_deregister_web_font_variation' ) ) {
 	 * @param $variation_handle
 	 */
 	function wp_deregister_web_font_variation( $font_family, $variation_handle ) {
-		wp_web_fonts()->remove_variation( $font_family, $variation_handle );
+		wp_webfonts()->remove_variation( $font_family, $variation_handle );
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-/** Unaltered so far. */
-
-
-
 
 if ( ! function_exists( 'wp_register_webfont_provider' ) ) {
 	/**
@@ -191,6 +174,42 @@ if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
 		return wp_webfonts()->get_providers();
 	}
 }
+
+if ( ! function_exists( 'wp_print_webfonts' ) ) {
+	function wp_print_webfonts( $handles = false ) {
+		global $wp_webfonts;
+
+		/**
+		 * Fires before webfonts in the $handles queue are printed.
+		 *
+		 * @since X.X.X
+		 */
+		do_action( 'wp_print_webfonts' );
+
+		if ( '' === $handles ) { // For 'wp_head'.
+			$handles = false;
+		}
+
+		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
+
+		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
+			if ( ! $handles ) {
+				return array(); // No need to instantiate if nothing is there.
+			}
+		}
+
+		return wp_webfonts()->do_items( $handles );
+	}
+}
+
+
+
+
+
+
+
+
+
 
 /**
  * Add webfonts mime types.
