@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { postComments as icon } from '@wordpress/icons';
-import { registerBlockVariation } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,13 +18,14 @@ export const settings = {
 	icon,
 	edit,
 	save,
+	variations: [
+		{
+			name: 'default',
+			title: 'Post Comments',
+			isDefault: true,
+			innerBlocks: TEMPLATE,
+			icon,
+			scope: [ 'inserter' ],
+		},
+	],
 };
-
-registerBlockVariation( 'core/post-comments', {
-	name: 'new', // <-- ??
-	title: 'Post Comments',
-	isDefault: true,
-	innerBlocks: TEMPLATE,
-	icon,
-	scope: [ 'inserter' ],
-} );
