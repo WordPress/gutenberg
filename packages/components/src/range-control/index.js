@@ -18,7 +18,7 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
-import { COLORS } from '../utils';
+import { COLORS, useControlledValue } from '../utils';
 import { floatClamp } from './utils';
 import InputRange from './input-range';
 import RangeRail from './rail';
@@ -70,8 +70,26 @@ function RangeControl(
 	},
 	ref
 ) {
-	const [ value, setValue ] = useState( valueProp ?? initialPosition ?? '' );
-	const isResetPendent = useRef( false );
+	const isResetPendent = useRef( false )
+	const [ value, setValue ] = useControlledValue( {
+		defaultValue: initialPosition ?? '',
+		value: isResetPendent.current ? undefined : valueProp,
+		onChange: ( nextValue ) => {
+			/*
+			 * Calls onChange only when nextValue is numeric
+			 * otherwise may queue a reset for the blur event.
+			 */
+			if ( ! isNaN( nextValue ) ) {
+				if ( nextValue < min || nextValue > max ) {
+					nextValue = floatClamp( nextValue, min, max );
+				}
+				onChange( nextValue );
+				isResetPendent.current = false;
+			} else if ( allowReset ) {
+				isResetPendent.current = true;
+			}
+		},
+	} );
 
 	if ( step === 'any' ) {
 		// The tooltip and number input field are hidden when the step is "any"
@@ -121,25 +139,11 @@ function RangeControl(
 	const handleOnRangeChange = ( event ) => {
 		const nextValue = parseFloat( event.target.value );
 		setValue( nextValue );
-		onChange( nextValue );
 	};
 
 	const handleOnChange = ( nextValue ) => {
 		nextValue = parseFloat( nextValue );
 		setValue( nextValue );
-		/*
-		 * Calls onChange only when nextValue is numeric
-		 * otherwise may queue a reset for the blur event.
-		 */
-		if ( ! isNaN( nextValue ) ) {
-			if ( nextValue < min || nextValue > max ) {
-				nextValue = floatClamp( nextValue, min, max );
-			}
-			onChange( nextValue );
-			isResetPendent.current = false;
-		} else if ( allowReset ) {
-			isResetPendent.current = true;
-		}
 	};
 
 	const handleOnInputNumberBlur = () => {
