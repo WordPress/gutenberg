@@ -2148,6 +2148,12 @@
 		"parent": "contributors"
 	},
 	{
+		"title": "How To Get Your Pull Request Reviewed?",
+		"slug": "how-to-get-your-pull-request-reviewed",
+		"markdown_source": "../docs/contributors/how-to-get-your-pull-request-reviewed.md",
+		"parent": "contributors"
+	},
+	{
 		"title": "Folder Structure",
 		"slug": "folder-structure",
 		"markdown_source": "../docs/contributors/folder-structure.md",

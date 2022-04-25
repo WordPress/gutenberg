@@ -13,6 +13,7 @@ This document covers:
     -   [Design Review](#design-review)
     -   [Merging Pull Requests](#merging-pull-requests)
     -   [Closing Pull Requests](#closing-pull-requests)
+    -   [How To Get Your Pull Request Reviewed?](/docs/contributors/how-to-get-your-pull-request-reviewed.md)
 -   [Projects](#projects)
 
 ## Issues
