@@ -66,7 +66,16 @@ function ScreenRoot() {
 			<CardDivider />
 
 			<CardBody>
-				<Spacer as="p" paddingTop={ 2 } marginBottom={ 4 }>
+				<Spacer
+					as="p"
+					paddingTop={ 2 }
+					/*
+					 * 13px matches the text inset of the NavigationButton (12px padding, plus the width of the button's border).
+					 * This is an ad hoc override for this particular instance only and should be reconsidered before making into a pattern.
+					 */
+					paddingX="13px"
+					marginBottom={ 4 }
+				>
 					{ __(
 						'Customize the appearance of specific blocks for the whole site.'
 					) }
