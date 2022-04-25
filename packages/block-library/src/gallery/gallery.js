@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	BlockCaption,
+	RichText,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -23,6 +27,7 @@ export const Gallery = ( props ) => {
 		mediaPlaceholder,
 		insertBlocksAfter,
 		blockProps,
+		containerRef,
 	} = props;
 
 	const { align, columns, caption, imageCrop } = attributes;
@@ -78,8 +83,8 @@ export const Gallery = ( props ) => {
 				</View>
 			) }
 			<RichTextVisibilityHelper
+				containerRef={ containerRef }
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-				captionFocused={ captionFocused }
 				onFocusCaption={ onFocusCaption }
 				tagName="figcaption"
 				className="blocks-gallery-caption"
@@ -98,13 +103,12 @@ export const Gallery = ( props ) => {
 
 function RichTextVisibilityHelper( {
 	isHidden,
-	captionFocused,
 	onFocusCaption,
 	className,
 	value,
 	placeholder,
 	tagName,
-	captionRef,
+	containerRef,
 	...richTextProps
 } ) {
 	if ( isHidden ) {
@@ -112,14 +116,14 @@ function RichTextVisibilityHelper( {
 	}
 
 	return (
-		<RichText
-			ref={ captionRef }
-			value={ value }
-			placeholder={ placeholder }
+		<BlockCaption
 			className={ className }
 			tagName={ tagName }
-			isSelected={ captionFocused }
+			placeholder={ placeholder }
+			containerRef={ containerRef }
+			caption={ value }
 			onClick={ onFocusCaption }
+			unstableOnFocus={ onFocusCaption }
 			{ ...richTextProps }
 		/>
 	);

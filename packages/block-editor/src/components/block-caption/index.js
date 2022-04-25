@@ -30,7 +30,6 @@ const BlockCaption = ( {
 	onFocusCaption,
 	insertBlocksAfter = () => {},
 	unstableOnFocus,
-	inlineToolbar,
 	containerRef,
 	...richTextProps
 } ) => {
@@ -38,7 +37,7 @@ const BlockCaption = ( {
 		// If caption is empty, we set focus to the block so that backspacing selects
 		// the parent block and the caret is not stuck inside the caption input.
 		if ( ! caption ) {
-			containerRef.current.focus();
+			containerRef.current?.focus();
 		}
 	};
 
@@ -56,7 +55,6 @@ const BlockCaption = ( {
 			isSelected={ isSelected }
 			onClick={ onFocusCaption }
 			unstableOnFocus={ unstableOnFocus }
-			inlineToolbar={ inlineToolbar }
 			{ ...richTextProps }
 		/>
 	);
