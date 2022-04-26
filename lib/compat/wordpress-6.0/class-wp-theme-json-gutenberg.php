@@ -557,10 +557,11 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_5_9 {
 	 * )
 	 * ```
 	 *
-	 * @param array  $styles Styles to process.
-	 * @param array  $settings Theme settings.
-	 * @param array  $properties Properties metadata.
-	 * @param string $selector Selector for styles.
+	 * @param array   $styles Styles to process.
+	 * @param array   $settings Theme settings.
+	 * @param array   $properties Properties metadata.
+	 * @param string  $selector Selector for styles.
+	 * @param boolean $use_root_vars Whether to use root variables.
 	 * @return array Returns the modified $declarations.
 	 */
 	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $selector = null, $use_root_vars = null ) {
