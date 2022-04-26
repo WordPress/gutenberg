@@ -55,7 +55,7 @@ class WP_Style_Engine {
 				'path'         => array( 'color', 'background' ),
 				'classnames'   => array(
 					'has-background'          => true,
-					'has-%s-background-color' => 'background-color',
+					'has-%s-background-color' => 'color',
 				),
 			),
 			'gradient'   => array(
@@ -63,7 +63,7 @@ class WP_Style_Engine {
 				'path'         => array( 'color', 'gradient' ),
 				'classnames'   => array(
 					'has-background'             => true,
-					'has-%s-gradient-background' => 'background',
+					'has-%s-gradient-background' => 'gradient',
 				),
 			),
 		),
@@ -135,6 +135,22 @@ class WP_Style_Engine {
 	}
 
 	/**
+	 * Extracts the slug in kebab case from a preset string, e.g., "heavenly-blue" from 'var:preset|color|heavenlyBlue'.
+	 *
+	 * @param string $style_value  A single css preset value.
+	 * @param string $property_key The CSS property that is the second element of the preset string. Used for matching.
+	 *
+	 * @return string|null The slug, or null if not found.
+	 */
+	protected static function get_slug_from_preset_value( $style_value, $property_key ) {
+		if ( is_string( $style_value ) && strpos( $style_value, "var:preset|{$property_key}|" ) !== false ) {
+			$index_to_splice = strrpos( $style_value, '|' ) + 1;
+			return _wp_to_kebab_case( substr( $style_value, $index_to_splice ) );
+		}
+		return null;
+	}
+
+	/**
 	 * Returns classnames, and generates classname(s) from a CSS preset property pattern, e.g., 'var:preset|color|heavenly-blue'.
 	 *
 	 * @param array         $style_value      A single raw style value or css preset property from the generate() $block_styles array.
@@ -150,9 +166,9 @@ class WP_Style_Engine {
 					$classnames[] = $classname;
 				}
 
-				if ( is_string( $style_value ) && strpos( $style_value, "var:preset|{$property_key}|" ) !== false ) {
-					$index_to_splice = strrpos( $style_value, '|' ) + 1;
-					$slug            = _wp_to_kebab_case( substr( $style_value, $index_to_splice ) );
+				$slug = static::get_slug_from_preset_value( $style_value, $property_key );
+
+				if ( $slug ) {
 					// Right now we expect a classname pattern to be stored in BLOCK_STYLE_DEFINITIONS_METADATA.
 					// One day, if there are no stored schemata, we could allow custom patterns or
 					// generate classnames based on other properties

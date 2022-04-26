@@ -120,8 +120,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'block_styles'    => array(
 					'color'      => array(
 						'text'       => 'var:preset|color|copper-socks',
-						'background' => 'var:preset|background-color|splendid-carrot',
-						'gradient'   => 'var:preset|background|like-wow-dude',
+						'background' => 'var:preset|color|splendid-carrot',
+						'gradient'   => 'var:preset|gradient|like-wow-dude',
 					),
 					'typography' => array(
 						'fontSize'   => 'var:preset|font-size|fantastic',
